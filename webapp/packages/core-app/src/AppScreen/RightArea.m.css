@@ -1,12 +1,11 @@
-.space {
-  composes: theme-typography--body2 theme-background-primary from global;
-}
 .pane {
   composes: theme-background-surface theme-text-on-surface from global;
   display: flex;
-  position: relative;
-  overflow: hidden;
+  overflow: auto;
 }
 .loader {
   height: 100%;
+}
+.slideBox {
+  flex: 1;
 }

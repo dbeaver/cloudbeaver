@@ -6,7 +6,8 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import { getComputed, Loader, Pane, ResizerControls, s, Split, splitStyles, useS, useSplitUserState, useStyles } from '@cloudbeaver/core-blocks';
+
+import { getComputed, Loader, Pane, ResizerControls, s, Split, SplitStyles, useS, useSplitUserState } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { LeftBarPanelService, SideBarPanel, SideBarPanelService } from '@cloudbeaver/core-ui';
 
@@ -14,7 +15,7 @@ import style from './Main.m.css';
 import { RightArea } from './RightArea';
 
 export const Main = observer(function Main() {
-  const styles = useS(style);
+  const styles = useS(SplitStyles, style);
   const sideBarPanelService = useService(SideBarPanelService);
   const leftBarPanelService = useService(LeftBarPanelService);
 
@@ -39,7 +40,7 @@ export const Main = observer(function Main() {
               <SideBarPanel container={leftBarPanelService.tabsContainer} />
             </Loader>
           </Pane>
-          <ResizerControls className={s(styles, { ResizerControls: true })} />
+          <ResizerControls className={s(styles, { resizerControls: true })} />
           <Pane className={s(styles, { pane: true })}>
             <Split
               className={s(styles, { split: true })}
@@ -51,7 +52,7 @@ export const Main = observer(function Main() {
               <Pane className={s(styles, { pane: true })}>
                 <RightArea />
               </Pane>
-              <ResizerControls className={s(styles, { ResizerControls: true })} />
+              <ResizerControls className={s(styles, { resizerControls: true })} />
               <Pane basis="250px" main className={s(styles, { pane: true })}>
                 <Loader suspense className={s(styles, { loader: true })}>
                   <SideBarPanel container={sideBarPanelService.tabsContainer} />

@@ -63,6 +63,7 @@ export * from './Slide/SlideBox';
 export * from './Slide/SlideBoxStyles';
 export * from './Slide/SlideElement';
 export * from './Slide/SlideOverlay';
+export { default as SlideBoxStyles } from './Slide/SlideBox.m.css';
 
 export * from './Split/styles';
 export * from './Split/SplitControls';
@@ -71,6 +72,8 @@ export * from './Split/ResizerControls';
 export * from './Split/Split';
 export * from './Split/useSplit';
 export * from './Split/useSplitUserState';
+export { default as SplitStyles } from './Split/Split.m.css';
+export { default as SplitHorizontalStyles } from './Split/SplitHorizontal.m.css';
 
 export * from './Table/EventTableItemExpandFlag';
 export * from './Table/EventTableItemSelectionFlag';
@@ -91,7 +94,6 @@ export * from './Table/TableSelect';
 export * from './Table/getSelectedItems';
 
 export * from './Expand/Expandable';
-export * from './Expand/EXPANDABLE_FORM_STYLES';
 
 export * from './Tree/TreeNode/EventTreeNodeClickFlag';
 export * from './Tree/TreeNode/EventTreeNodeExpandFlag';

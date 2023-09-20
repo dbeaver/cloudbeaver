@@ -15,7 +15,6 @@ import {
   Combobox,
   Container,
   Expandable,
-  EXPANDABLE_FORM_STYLES,
   FieldCheckbox,
   Group,
   GroupItem,
