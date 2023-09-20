@@ -30,6 +30,10 @@ public class SMUtils {
         return isAdmin(webSession) || webSession.hasPermission(RMConstants.PERMISSION_RM_ADMIN);
     }
 
+    public static boolean isRMAdmin(@NotNull Set<String> permissions) {
+        return isAdmin(permissions) || permissions.contains(RMConstants.PERMISSION_RM_ADMIN);
+    }
+
     public static boolean hasProjectPermission(
         SMCredentialsProvider credentialsProvider,
         RMProject project,
