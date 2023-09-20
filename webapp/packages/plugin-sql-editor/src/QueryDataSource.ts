@@ -199,6 +199,7 @@ export class QueryDataSource<TOptions extends IDataQueryOptions = IDataQueryOpti
           where: options.whereFilter || undefined,
         },
         dataFormat: this.dataFormat,
+        readLogs: options.readLogs,
       });
 
       return taskInfo;

@@ -363,16 +363,18 @@ public class WebServiceSQL implements DBWServiceSQL {
         @NotNull String sql,
         @Nullable String resultId,
         @Nullable WebSQLDataFilter filter,
-        @Nullable WebDataFormat dataFormat)
+        @Nullable WebDataFormat dataFormat,
+        boolean readLogs,
+        @NotNull WebSession webSession)
     {
-        WebAsyncTaskProcessor<String> runnable = new WebAsyncTaskProcessor<String>() {
+        WebAsyncTaskProcessor<String> runnable = new WebAsyncTaskProcessor<>() {
             @Override
-            public void run(DBRProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
+            public void run(DBRProgressMonitor monitor) throws InvocationTargetException {
                 try {
                     monitor.beginTask("Execute query", 1);
                     monitor.subTask("Process query " + sql);
                     WebSQLExecuteInfo executeResults = contextInfo.getProcessor().processQuery(
-                        monitor, contextInfo, sql, resultId, filter, dataFormat);
+                        monitor, contextInfo, sql, resultId, filter, dataFormat, webSession, readLogs);
                     this.result = executeResults.getStatusMessage();
                     this.extendedResults = executeResults;
                 } catch (Throwable e) {

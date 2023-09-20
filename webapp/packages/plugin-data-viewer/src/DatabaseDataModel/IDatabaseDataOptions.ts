@@ -14,4 +14,5 @@ export interface IDatabaseDataOptions {
   catalog?: string;
   whereFilter: string;
   constraints: SqlDataFilterConstraint[];
+  readLogs?: boolean;
 }
