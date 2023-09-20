@@ -18,20 +18,16 @@ package io.cloudbeaver.server.events;
 
 import io.cloudbeaver.model.WebServerMessage;
 import io.cloudbeaver.model.session.BaseWebSession;
-import io.cloudbeaver.server.CBPlatform;
 import org.jkiss.code.NotNull;
-import org.jkiss.dbeaver.model.websocket.WSEventHandler;
 import org.jkiss.dbeaver.model.websocket.event.WSErrorEvent;
 
-import java.util.Collection;
-
-public class EventHandlerLogSend extends WSDefaultEventHandler<WSErrorEvent> {
+public class WSEventLogSendHandler extends WSDefaultEventHandler<WSErrorEvent> {
 
     protected void updateSessionData(@NotNull BaseWebSession activeUserSession, @NotNull WSErrorEvent event) {
         activeUserSession.addSessionMessage(new WebServerMessage(WebServerMessage.MessageType.ERROR, event.getErrorMessage()));
     }
 
     protected boolean isAcceptableInSession(@NotNull BaseWebSession activeUserSession, @NotNull WSErrorEvent event) {
-        return WSWebUtils.isSessionIdEquals(activeUserSession, event.getSessionId()); // skip events from current session
+        return WSWebUtils.isSessionIdEquals(activeUserSession, event.getSessionId());
     }
 }
