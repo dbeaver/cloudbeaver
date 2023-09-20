@@ -7,7 +7,6 @@
  */
 import { observer } from 'mobx-react-lite';
 import { useMemo } from 'react';
-import styled, { css } from 'reshadow';
 
 import { s, SContext, StyleRegistry, Translate, useS, useUserData } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
