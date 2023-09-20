@@ -53,8 +53,8 @@ public class RMNIOFileSystemProvider extends NIOFileSystemProvider {
     }
 
     @Override
-    public FileSystem newFileSystem(URI uri, Map<String, ?> env) throws IOException {
-        throw new FileAlreadyExistsException("RM file system already exist");
+    public FileSystem newFileSystem(URI uri, Map<String, ?> env) {
+        return getFileSystem(uri);
     }
 
     @Override

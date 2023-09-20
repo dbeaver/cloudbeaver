@@ -16,6 +16,8 @@
  */
 package io.cloudbeaver.model.rm.fs;
 
+import io.cloudbeaver.BaseWebProjectImpl;
+import io.cloudbeaver.model.rm.fs.nio.RMNIOFileSystemProvider;
 import io.cloudbeaver.model.session.WebSession;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.DBException;
@@ -25,11 +27,17 @@ import org.jkiss.dbeaver.model.fs.DBFVirtualFileSystem;
 import org.jkiss.dbeaver.model.fs.DBFVirtualFileSystemRoot;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 
-public class RMVirtualFileSystem implements DBFVirtualFileSystem {
-    private final WebSession webSession;
+import java.net.URI;
+import java.nio.file.Path;
 
-    public RMVirtualFileSystem(WebSession webSession) {
+public class RMVirtualFileSystem implements DBFVirtualFileSystem {
+    @NotNull
+    private final WebSession webSession;
+    private final RMNIOFileSystemProvider rmNioFileSystemProvider;
+
+    public RMVirtualFileSystem(@NotNull WebSession webSession) {
         this.webSession = webSession;
+        this.rmNioFileSystemProvider = new RMNIOFileSystemProvider(webSession.getRmController());
     }
 
     @NotNull
@@ -63,6 +71,20 @@ public class RMVirtualFileSystem implements DBFVirtualFileSystem {
     @NotNull
     @Override
     public DBFVirtualFileSystemRoot[] getRootFolders(DBRProgressMonitor monitor, @NotNull DBPProject project) throws DBException {
-        return new DBFVirtualFileSystemRoot[0];
+        if (!(project instanceof BaseWebProjectImpl)) {
+            throw new DBException("Unsupported project type: " + project.getClass().getName());
+        }
+        BaseWebProjectImpl webProject = (BaseWebProjectImpl) project;
+        return new RMVirtualFileSystemRoot[]{new RMVirtualFileSystemRoot(this, webProject.getRmProject())};
+    }
+
+    @Override
+    public Path getPath(DBRProgressMonitor monitor, @NotNull URI fileUri) throws DBException {
+        return rmNioFileSystemProvider.getPath(fileUri);
+    }
+
+    @NotNull
+    public WebSession getWebSession() {
+        return webSession;
     }
 }

@@ -16,29 +16,33 @@
  */
 package io.cloudbeaver.model.rm.fs;
 
+import io.cloudbeaver.model.rm.fs.nio.RMNIOFileSystem;
+import io.cloudbeaver.model.rm.fs.nio.RMNIOFileSystemProvider;
+import io.cloudbeaver.model.rm.fs.nio.RMPath;
 import org.jkiss.code.NotNull;
-import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.DBPImage;
 import org.jkiss.dbeaver.model.fs.DBFVirtualFileSystem;
 import org.jkiss.dbeaver.model.fs.DBFVirtualFileSystemRoot;
-import org.jkiss.dbeaver.model.rm.RMResource;
+import org.jkiss.dbeaver.model.rm.RMProject;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 
 import java.nio.file.Path;
 
 public class RMVirtualFileSystemRoot implements DBFVirtualFileSystemRoot {
+    @NotNull
     private final RMVirtualFileSystem rmFileSystem;
-    private final RMResource rmResource;
+    @NotNull
+    private final RMProject rmProject;
 
-    public RMVirtualFileSystemRoot(RMVirtualFileSystem rmFileSystem, RMResource rmResource) {
+    public RMVirtualFileSystemRoot(@NotNull RMVirtualFileSystem rmFileSystem, @NotNull RMProject rmProject) {
         this.rmFileSystem = rmFileSystem;
-        this.rmResource = rmResource;
+        this.rmProject = rmProject;
     }
 
     @NotNull
     @Override
     public String getName() {
-        return rmResource.getName();
+        return rmProject.getName();
     }
 
     @NotNull
@@ -50,7 +54,7 @@ public class RMVirtualFileSystemRoot implements DBFVirtualFileSystemRoot {
     @NotNull
     @Override
     public String getRootId() {
-        return rmResource.getName();
+        return rmProject.getId();
     }
 
     @Override
@@ -60,7 +64,8 @@ public class RMVirtualFileSystemRoot implements DBFVirtualFileSystemRoot {
 
     @NotNull
     @Override
-    public Path getRootPath(DBRProgressMonitor monitor) throws DBException {
-        return null;
+    public Path getRootPath(DBRProgressMonitor monitor) {
+        var rm = rmFileSystem.getWebSession().getRmController();
+        return new RMPath(new RMNIOFileSystem(rmProject.getId(), rm, new RMNIOFileSystemProvider(rm)));
     }
 }

@@ -20,6 +20,7 @@ import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.nio.NIOPath;
+import org.jkiss.utils.ArrayUtils;
 import org.jkiss.utils.CommonUtils;
 
 import java.io.IOException;
@@ -59,14 +60,18 @@ public class RMPath extends NIOPath {
     @Override
     public Path getRoot() {
         if (isProjectPath()) {
-            return null;
+            return new RMPath(new RMNIOFileSystem(null, getFileSystem().getRmController(), getFileSystem().rmProvider()));
         }
         return new RMPath(rmNioFileSystem);
     }
 
     @Override
     public Path getFileName() {
-        return this;
+        var parts = pathParts();
+        if (ArrayUtils.isEmpty(parts)) {
+            return this;
+        }
+        return new RMPath(rmNioFileSystem, parts[parts.length - 1]);
     }
 
     @Override
@@ -88,14 +93,6 @@ public class RMPath extends NIOPath {
     @Override
     public int getNameCount() {
         return pathParts().length;
-    }
-
-    @Override
-    public boolean startsWith(@NotNull Path other) {
-        if (!(other instanceof RMPath)) {
-            return false;
-        }
-        return toString().startsWith(other.toString());
     }
 
     @Override

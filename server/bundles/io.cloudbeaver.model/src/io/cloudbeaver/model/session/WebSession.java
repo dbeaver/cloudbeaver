@@ -51,6 +51,8 @@ import org.jkiss.dbeaver.model.app.DBPProject;
 import org.jkiss.dbeaver.model.auth.*;
 import org.jkiss.dbeaver.model.connection.DBPConnectionConfiguration;
 import org.jkiss.dbeaver.model.exec.DBCException;
+import org.jkiss.dbeaver.model.fs.DBFFileSystemDescriptor;
+import org.jkiss.dbeaver.model.fs.DBFVirtualFileSystem;
 import org.jkiss.dbeaver.model.meta.Association;
 import org.jkiss.dbeaver.model.meta.Property;
 import org.jkiss.dbeaver.model.navigator.DBNModel;
@@ -71,6 +73,7 @@ import org.jkiss.dbeaver.model.sql.DBQuotaException;
 import org.jkiss.dbeaver.model.websocket.event.WSEventType;
 import org.jkiss.dbeaver.model.websocket.event.WSSessionLogUpdatedEvent;
 import org.jkiss.dbeaver.registry.DataSourceDescriptor;
+import org.jkiss.dbeaver.registry.fs.FileSystemProviderRegistry;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.dbeaver.runtime.jobs.DisconnectJob;
 import org.jkiss.utils.CommonUtils;
@@ -81,6 +84,7 @@ import javax.servlet.http.HttpSession;
 import java.lang.reflect.InvocationTargetException;
 import java.time.Instant;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -122,6 +126,7 @@ public class WebSession extends BaseWebSession
     private DBNModel navigatorModel;
     private final DBRProgressMonitor progressMonitor = new SessionProgressMonitor();
     private final Map<String, DBWSessionHandler> sessionHandlers;
+    private final Map<String, DBFVirtualFileSystem> fileSystems = new ConcurrentHashMap<>();
 
     public WebSession(
         @NotNull HttpSession httpSession,
@@ -616,7 +621,7 @@ public class WebSession extends BaseWebSession
             log.error("Error closing web session tokens");
         }
         this.userContext.setUser(null);
-
+        this.fileSystems.clear();
         super.close();
     }
 
@@ -895,7 +900,11 @@ public class WebSession extends BaseWebSession
     // Auth credentials provider
     // Adds auth properties passed from web (by user)
     @Override
-    public boolean provideAuthParameters(@NotNull DBRProgressMonitor monitor, @NotNull DBPDataSourceContainer dataSourceContainer, @NotNull DBPConnectionConfiguration configuration) {
+    public boolean provideAuthParameters(
+        @NotNull DBRProgressMonitor monitor,
+        @NotNull DBPDataSourceContainer dataSourceContainer,
+        @NotNull DBPConnectionConfiguration configuration
+    ) {
         try {
             // Properties from nested auth sessions
             for (DBACredentialsProvider contextCredentialsProvider : getContextCredentialsProviders()) {
@@ -924,6 +933,32 @@ public class WebSession extends BaseWebSession
             log.error(e);
         }
         return true;
+    }
+
+    public Collection<DBFVirtualFileSystem> getFileSystems() {
+        return fileSystems.values();
+    }
+
+    @Nullable
+    public DBFVirtualFileSystem getFileSystem(@NotNull String fsId) {
+        return fileSystems.get(fsId);
+    }
+
+    private void loadFileSystems() {
+        var fsRegistry = FileSystemProviderRegistry.getInstance();
+        for (DBFFileSystemDescriptor fileSystemProviderDescriptor : fsRegistry.getFileSystemProviders()) {
+            var fsProvider = fileSystemProviderDescriptor.getInstance();
+            DBFVirtualFileSystem[] availableFileSystems = fsProvider.getAvailableFileSystems(getProgressMonitor(), getSessionContext());
+            for (DBFVirtualFileSystem fs : availableFileSystems) {
+                if (!fileSystems.containsKey(fs.getId())) {
+                    addFileSystem(fs);
+                }
+            }
+        }
+    }
+
+    public void addFileSystem(@NotNull DBFVirtualFileSystem fileSystem) {
+        fileSystems.put(fileSystem.getId(), fileSystem);
     }
 
     @NotNull

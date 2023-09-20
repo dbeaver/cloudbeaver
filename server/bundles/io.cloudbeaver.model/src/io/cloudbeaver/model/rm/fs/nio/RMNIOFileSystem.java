@@ -61,6 +61,10 @@ public class RMNIOFileSystem extends NIOFileSystem {
     public FileSystemProvider provider() {
         return rmNioFileSystemProvider;
     }
+    
+    public RMNIOFileSystemProvider rmProvider() {
+        return rmNioFileSystemProvider;
+    }
 
     @Override
     public void close() throws IOException {
