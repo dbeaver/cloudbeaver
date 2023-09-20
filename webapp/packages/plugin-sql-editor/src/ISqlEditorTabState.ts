@@ -5,6 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
+import type { IOutputLogType } from './SqlResultTabs/OutputLogs/IOutputLogTypes';
 
 export interface IResultTab {
   tabId: string;
@@ -41,6 +42,10 @@ export interface IExecutionPlanTab {
   options?: Record<string, any>;
 }
 
+export interface IOutputLogsTab extends ISqlEditorResultTab {
+  selectedLogTypes: IOutputLogType[];
+}
+
 export interface ISqlEditorTabState {
   editorId: string;
   datasourceKey: string;
@@ -54,6 +59,7 @@ export interface ISqlEditorTabState {
   resultTabs: IResultTab[];
   statisticsTabs: IStatisticsTab[];
   executionPlanTabs: IExecutionPlanTab[];
+  outputLogsTab?: IOutputLogsTab;
 
   // mode
   currentModeId?: string;

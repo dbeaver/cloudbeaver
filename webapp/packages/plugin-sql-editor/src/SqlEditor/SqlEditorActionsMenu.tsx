@@ -11,7 +11,6 @@ import { s, SContext, StyleRegistry, useS } from '@cloudbeaver/core-blocks';
 import { MenuBar, MenuBarItemStyles, MenuBarStyles } from '@cloudbeaver/core-ui';
 import { IDataContext, useMenu } from '@cloudbeaver/core-view';
 
-import { DATA_CONTEXT_SQL_EDITOR_STATE } from '../DATA_CONTEXT_SQL_EDITOR_STATE';
 import type { ISqlEditorTabState } from '../ISqlEditorTabState';
 import { SQL_EDITOR_ACTIONS_MENU } from './SQL_EDITOR_ACTIONS_MENU';
 import SqlEditorActionsMenuBarStyles from './SqlEditorActionsMenuBar.m.css';
@@ -43,7 +42,6 @@ const registry: StyleRegistry = [
 export const SqlEditorActionsMenu = observer<Props>(function SqlEditorActionsMenu({ state, context, className }) {
   const styles = useS(SqlEditorActionsMenuBarStyles, SqlEditorActionsMenuBarItemStyles);
   const menu = useMenu({ menu: SQL_EDITOR_ACTIONS_MENU, context });
-  menu.context.set(DATA_CONTEXT_SQL_EDITOR_STATE, state);
 
   return (
     <SContext registry={registry}>
