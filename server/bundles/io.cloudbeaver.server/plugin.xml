@@ -70,7 +70,7 @@
         <eventHandler class="io.cloudbeaver.server.events.WSUserSecretEventHandlerImpl">
             <topic id="cb_user_secret"/>
         </eventHandler>
-        <eventHandler class="io.cloudbeaver.server.events.EventHandlerLogSend">
+        <eventHandler class="io.cloudbeaver.server.events.WSEventLogSendHandler">
             <topic id="cb_session_log"/>
         </eventHandler>
     </extension>
