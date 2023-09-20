@@ -19,9 +19,49 @@ import { useCodemirrorExtensions } from './useCodemirrorExtensions';
 import { type IDefaultExtensions, useEditorDefaultExtensions } from './useEditorDefaultExtensions';
 
 export const Editor = observer<IEditorProps & IDefaultExtensions, IEditorRef>(
-  forwardRef(function Editor({ lineNumbers, extensions, ...rest }, ref) {
+  forwardRef(function Editor(
+    {
+      extensions,
+      lineNumbers,
+      tooltips,
+      highlightSpecialChars,
+      syntaxHighlighting,
+      bracketMatching,
+      dropCursor,
+      crosshairCursor,
+      foldGutter,
+      highlightActiveLineGutter,
+      highlightSelectionMatches,
+      highlightActiveLine,
+      indentOnInput,
+      rectangularSelection,
+      keymap,
+      lineWrapping,
+      ...rest
+    },
+    ref,
+  ) {
     extensions = useCodemirrorExtensions(extensions);
-    const defaultExtensions = useEditorDefaultExtensions({ lineNumbers });
+
+
+    const defaultExtensions = useEditorDefaultExtensions({
+      lineNumbers,
+      tooltips,
+      highlightSpecialChars,
+      syntaxHighlighting,
+      bracketMatching,
+      dropCursor,
+      crosshairCursor,
+      foldGutter,
+      highlightActiveLineGutter,
+      highlightSelectionMatches,
+      highlightActiveLine,
+      indentOnInput,
+      rectangularSelection,
+      keymap,
+      lineWrapping,
+    });
+
     extensions.set(...defaultExtensions);
 
     return styled(EDITOR_BASE_STYLES)(
