@@ -12,7 +12,6 @@ export * from './ConnectionForm/connectionFormConfigureContext';
 export * from './ConnectionForm/ConnectionFormLoader';
 export * from './ConnectionForm/ConnectionFormService';
 export * from './ConnectionForm/ConnectionFormState';
-export * from './ConnectionForm/Contexts/connectionFormStateContext';
 export * from './ConnectionForm/IConnectionFormProps';
 export * from './ConnectionForm/useConnectionFormState';
 export * from './ContextMenu/DATA_CONTEXT_CONNECTION';

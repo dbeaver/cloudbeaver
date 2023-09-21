@@ -11,7 +11,7 @@ import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { ProjectInfoResource } from '@cloudbeaver/core-projects';
 import { PermissionsService } from '@cloudbeaver/core-root';
 import { CachedMapAllKey, getCachedMapResourceLoaderState } from '@cloudbeaver/core-sdk';
-import { ActionService, DATA_CONTEXT_LOADABLE_STATE, DATA_CONTEXT_MENU, MenuService } from '@cloudbeaver/core-view';
+import { ActionService, DATA_CONTEXT_MENU, MenuService } from '@cloudbeaver/core-view';
 import { MENU_CONNECTIONS } from '@cloudbeaver/plugin-connections';
 
 import { ACTION_CONNECTION_SEARCH } from './Actions/ACTION_CONNECTION_SEARCH';
@@ -53,9 +53,7 @@ export class SearchConnectionPluginBootstrap extends Bootstrap {
         return false;
       },
       getLoader: (context, action) => {
-        const state = context.get(DATA_CONTEXT_LOADABLE_STATE);
-
-        return state.getState(action.id, () => getCachedMapResourceLoaderState(this.projectInfoResource, CachedMapAllKey));
+        return getCachedMapResourceLoaderState(this.projectInfoResource, () => CachedMapAllKey);
       },
       handler: async (context, action) => {
         switch (action) {

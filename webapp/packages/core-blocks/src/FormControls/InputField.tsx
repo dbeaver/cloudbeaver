@@ -20,6 +20,7 @@ import { Loader } from '../Loader/Loader';
 import { useTranslate } from '../localization/useTranslate';
 import { s } from '../s';
 import { useCombinedHandler } from '../useCombinedHandler';
+import { useCombinedRef } from '../useCombinedRef';
 import { useMergeRefs } from '../useMergeRefs';
 import { useS } from '../useS';
 import { useStateDelay } from '../useStateDelay';
@@ -95,7 +96,7 @@ export const InputField: InputFieldType = observer(
     ref,
   ) {
     const inputRef = useRef<HTMLInputElement | null>(null);
-    const mergedRef = useMergeRefs(inputRef, ref);
+    const mergedRef = useCombinedRef(inputRef, ref);
     const capsLock = useCapsLockTracker();
     const [passwordRevealed, setPasswordRevealed] = useState(false);
     const translate = useTranslate();
@@ -135,9 +136,9 @@ export const InputField: InputFieldType = observer(
     const handleKeyDown = useCombinedHandler(rest.onKeyDown, capsLock.handleKeyDown, context?.keyDown);
 
     const passwordType = rest.type === 'password';
-    const uncontrolled = passwordType && !canShowPassword;
+    let uncontrolled = passwordType && !canShowPassword;
 
-    let value: any = valueControlled ?? defaultValue ?? undefined;
+    let value: any = valueControlled ?? undefined;
 
     if (state && name !== undefined && name in state) {
       value = state[name];
@@ -150,6 +151,8 @@ export const InputField: InputFieldType = observer(
     if (passwordType && !rest.readOnly && capsLock.warn) {
       description = translate('ui_capslock_on');
     }
+
+    uncontrolled ||= value === undefined;
 
     useLayoutEffect(() => {
       if (uncontrolled && isNotNullDefined(value) && inputRef.current) {
@@ -174,6 +177,7 @@ export const InputField: InputFieldType = observer(
             type={passwordRevealed ? 'text' : rest.type}
             name={name}
             value={uncontrolled ? undefined : value ?? ''}
+            defaultValue={defaultValue}
             className={styles.input}
             onChange={handleChange}
             onBlur={handleBlur}

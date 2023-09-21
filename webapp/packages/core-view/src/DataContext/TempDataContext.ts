@@ -132,9 +132,10 @@ export class TempDataContext implements IDataContext {
 
   get<T>(context: DataContextGetter<T>): T {
     if (!this.hasOwn(context)) {
-      const defaultValue = context();
+      const defaultValue = context(this);
 
       if (defaultValue !== undefined) {
+        this.set(context, defaultValue);
         return defaultValue;
       }
 

@@ -11,11 +11,11 @@ import { DBDriverResource } from '@cloudbeaver/core-connections';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import { isObjectPropertyInfoStateEqual } from '@cloudbeaver/core-sdk';
+import { formStateContext } from '@cloudbeaver/core-ui/src/Form/formStateContext';
 
 import { connectionFormConfigureContext } from '../connectionFormConfigureContext';
 import { ConnectionFormService } from '../ConnectionFormService';
 import { connectionConfigContext } from '../Contexts/connectionConfigContext';
-import { connectionFormStateContext } from '../Contexts/connectionFormStateContext';
 import type { IConnectionFormFillConfigData, IConnectionFormState, IConnectionFormSubmitData } from '../IConnectionFormProps';
 import { DriverPropertiesLoader } from './DriverPropertiesLoader';
 
@@ -95,7 +95,7 @@ export class ConnectionDriverPropertiesTabService extends Bootstrap {
     }
 
     if (!isObjectPropertyInfoStateEqual(driver.driverProperties, config.properties, data.info.properties)) {
-      const stateContext = contexts.getContext(connectionFormStateContext);
+      const stateContext = contexts.getContext(formStateContext);
 
       stateContext.markEdited();
     }

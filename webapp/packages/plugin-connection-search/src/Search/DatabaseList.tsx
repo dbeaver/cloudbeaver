@@ -9,13 +9,13 @@ import { observer } from 'mobx-react-lite';
 import { useCallback, useState } from 'react';
 import styled, { css } from 'reshadow';
 
-import { ItemList, ItemListSearch, SubmittingForm, TextPlaceholder, useFocus, useTranslate } from '@cloudbeaver/core-blocks';
+import { Form, ItemList, ItemListSearch, TextPlaceholder, useFocus, useTranslate } from '@cloudbeaver/core-blocks';
 import type { AdminConnectionSearchInfo } from '@cloudbeaver/core-sdk';
 
 import { Database } from './Database';
 
 const styles = css`
-  SubmittingForm {
+  Form {
     composes: theme-background-surface theme-text-on-surface from global;
     flex: 1;
     display: flex;
@@ -50,7 +50,7 @@ export const DatabaseList = observer<Props>(function DatabaseList({ databases, h
   const placeholderMessage = isSearched ? 'connections_not_found' : 'connections_administration_search_database_tip';
 
   return styled(styles)(
-    <SubmittingForm ref={focusedRef} className={className} onSubmit={onSearch}>
+    <Form ref={focusedRef} className={className} onSubmit={onSearch}>
       <ItemListSearch
         value={hosts}
         placeholder={translate('connections_administration_search_database_tip')}
@@ -64,6 +64,6 @@ export const DatabaseList = observer<Props>(function DatabaseList({ databases, h
         ))}
       </ItemList>
       {!databases.length && <TextPlaceholder>{translate(placeholderMessage)}</TextPlaceholder>}
-    </SubmittingForm>,
+    </Form>,
   );
 });

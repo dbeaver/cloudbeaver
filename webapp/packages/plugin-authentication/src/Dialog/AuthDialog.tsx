@@ -9,18 +9,7 @@ import { observer } from 'mobx-react-lite';
 import styled from 'reshadow';
 
 import { AuthProvider, AuthProviderConfiguration, UserInfoResource } from '@cloudbeaver/core-authentication';
-import {
-  ErrorMessage,
-  getComputed,
-  Link,
-  s,
-  SubmittingForm,
-  TextPlaceholder,
-  useErrorDetails,
-  useS,
-  useStyles,
-  useTranslate,
-} from '@cloudbeaver/core-blocks';
+import { ErrorMessage, Form, getComputed, Link, s, TextPlaceholder, useErrorDetails, useS, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import {
   CommonDialogBody,
@@ -224,9 +213,9 @@ export const AuthDialog: DialogComponent<IAuthOptions, null> = observer(function
               onClose={rejectDialog}
             />
           ) : (
-            <SubmittingForm className={s(styles, { submittingForm: true })} onSubmit={() => login(linkUser)}>
+            <Form className={s(styles, { submittingForm: true })} onSubmit={() => login(linkUser)}>
               {renderForm(state.activeProvider, state.activeConfiguration)}
-            </SubmittingForm>
+            </Form>
           )}
         </CommonDialogBody>
         {!federate && (

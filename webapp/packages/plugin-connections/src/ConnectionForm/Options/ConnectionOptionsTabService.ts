@@ -23,13 +23,13 @@ import { LocalizationService } from '@cloudbeaver/core-localization';
 import { isSharedProject, ProjectInfoResource } from '@cloudbeaver/core-projects';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
 import { DriverConfigurationType, isObjectPropertyInfoStateEqual, ObjectPropertyInfo } from '@cloudbeaver/core-sdk';
+import { formStateContext } from '@cloudbeaver/core-ui/src/Form/formStateContext';
 import { getUniqueName, isNotNullDefined, isValuesEqual } from '@cloudbeaver/core-utils';
 
 import { connectionFormConfigureContext } from '../connectionFormConfigureContext';
 import { ConnectionFormService } from '../ConnectionFormService';
 import { connectionConfigContext } from '../Contexts/connectionConfigContext';
 import { connectionCredentialsStateContext } from '../Contexts/connectionCredentialsStateContext';
-import { connectionFormStateContext } from '../Contexts/connectionFormStateContext';
 import type { IConnectionFormFillConfigData, IConnectionFormState, IConnectionFormSubmitData } from '../IConnectionFormProps';
 import { getConnectionName } from './getConnectionName';
 
@@ -343,7 +343,7 @@ export class ConnectionOptionsTabService extends Bootstrap {
 
   private async formAuthState(data: IConnectionFormState, contexts: IExecutionContextProvider<IConnectionFormState>) {
     const config = contexts.getContext(connectionConfigContext);
-    const stateContext = contexts.getContext(connectionFormStateContext);
+    const stateContext = contexts.getContext(formStateContext);
 
     const driver = await this.dbDriverResource.load(config.driverId!, ['includeProviderProperties']);
     const authModel = await this.databaseAuthModelsResource.load(config.authModelId ?? data.info?.authModel ?? driver.defaultAuthModel);
@@ -357,7 +357,7 @@ export class ConnectionOptionsTabService extends Bootstrap {
       const message = this.localizationService.translate('connections_public_connection_cloud_auth_required', undefined, {
         providerLabel: provider.label,
       });
-      stateContext.setStatusMessage(message);
+      stateContext.setInfo(message);
       stateContext.readonly = data.mode === 'edit';
     }
   }
@@ -368,7 +368,7 @@ export class ConnectionOptionsTabService extends Bootstrap {
     }
 
     const config = contexts.getContext(connectionConfigContext);
-    const stateContext = contexts.getContext(connectionFormStateContext);
+    const stateContext = contexts.getContext(formStateContext);
     const driver = await this.dbDriverResource.load(data.config.driverId!, ['includeProviderProperties']);
 
     if (

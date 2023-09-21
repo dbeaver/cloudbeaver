@@ -18,18 +18,19 @@ import {
   TextPlaceholder,
   useAutoLoad,
   useObjectRef,
+  useResource,
   useTranslate,
 } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import type { AdminUserInfo, ObjectPropertyInfo } from '@cloudbeaver/core-sdk';
-import { TabContainerPanelComponent, useTab, useTabState } from '@cloudbeaver/core-ui';
+import { FormMode, TabContainerPanelComponent, useTab, useTabState } from '@cloudbeaver/core-ui';
 
-import { getOriginTabId } from './getOriginTabId';
-import type { IUserFormProps } from './UserFormService';
+import type { UserFormProps } from '../AdministrationUserFormService';
+import { getUserFormOriginTabId } from './getUserFormOriginTabId';
 
 interface IInnerState extends IAutoLoadable {
   state: IState;
-  user: AdminUserInfo;
+  user: AdminUserInfo | undefined;
 }
 
 interface IState {
@@ -40,10 +41,13 @@ interface IState {
   exception: Error | null;
 }
 
-export const OriginInfoPanel: TabContainerPanelComponent<IUserFormProps> = observer(function OriginInfoPanel({ tabId, user }) {
+export const UserFormOriginInfoPanel: TabContainerPanelComponent<UserFormProps> = observer(function UserFormOriginInfoPanel({
+  tabId,
+  formState: { mode, state },
+}) {
   const translate = useTranslate();
   const usersResource = useService(UsersResource);
-  const state = useTabState<IState>(() => ({
+  const localState = useTabState<IState>(() => ({
     origin: null,
     properties: [],
     state: {},
@@ -51,17 +55,21 @@ export const OriginInfoPanel: TabContainerPanelComponent<IUserFormProps> = obser
     loaded: false,
     exception: null,
   }));
-
-  let origin = user.origins.find(origin => getOriginTabId('origin', origin) === tabId);
+  const editing = mode === FormMode.Edit;
+  const userInfo = useResource(UserFormOriginInfoPanel, UsersResource, state.userId, { active: editing });
+  let origin = userInfo.data?.origins.find(origin => getUserFormOriginTabId('origin', origin) === tabId);
 
   if (!origin) {
-    origin = user.origins[0];
+    origin = userInfo.data?.origins[0];
   }
 
   const loadableState = useObjectRef<IInnerState>(
     () => ({
       get exception(): Error | null {
         return this.state.exception;
+      },
+      isError(): boolean {
+        return !!this.state.exception;
       },
       isLoaded(): boolean {
         return this.state.loaded;
@@ -70,7 +78,7 @@ export const OriginInfoPanel: TabContainerPanelComponent<IUserFormProps> = obser
         return this.state.loading;
       },
       async load(reload = false) {
-        if ((this.state.loaded && !reload) || this.state.loading) {
+        if ((this.state.loaded && !reload) || this.state.loading || !this.user) {
           return;
         }
 
@@ -81,10 +89,10 @@ export const OriginInfoPanel: TabContainerPanelComponent<IUserFormProps> = obser
           usersResource.markOutdated(this.user.userId);
           const userOrigin = await usersResource.load(this.user.userId, ['customIncludeOriginDetails']);
 
-          let origin = userOrigin.origins.find(origin => getOriginTabId('origin', origin) === tabId);
+          let origin = userOrigin.origins.find(origin => getUserFormOriginTabId('origin', origin) === tabId);
 
           if (!origin) {
-            origin = user.origins[0];
+            origin = this.user.origins[0];
           }
 
           const propertiesState = {} as Record<string, any>;
@@ -106,21 +114,21 @@ export const OriginInfoPanel: TabContainerPanelComponent<IUserFormProps> = obser
       },
     }),
     {
-      state,
-      user,
+      state: localState,
+      user: userInfo.data as AdminUserInfo | undefined,
     },
-    ['reload', 'load', 'isLoaded', 'isLoading'],
+    ['reload', 'load', 'isLoaded', 'isLoading', 'isError'],
   );
 
   const { selected } = useTab(tabId);
 
-  useAutoLoad(OriginInfoPanel, loadableState, selected);
+  useAutoLoad(UserFormOriginInfoPanel, loadableState, selected);
 
   if (!selected) {
     return null;
   }
 
-  if (state.loading) {
+  if (localState.loading) {
     return (
       <ColoredContainer parent>
         <Group large>
@@ -130,17 +138,17 @@ export const OriginInfoPanel: TabContainerPanelComponent<IUserFormProps> = obser
     );
   }
 
-  if (state.exception) {
+  if (localState.exception) {
     return (
       <ColoredContainer parent>
         <Group large>
-          <ExceptionMessage exception={state.exception} onRetry={() => loadableState.reload?.()} />
+          <ExceptionMessage exception={localState.exception} onRetry={() => loadableState.reload?.()} />
         </Group>
       </ColoredContainer>
     );
   }
 
-  if (!origin || (state.loaded && state.properties.length === 0)) {
+  if (!origin || (localState.loaded && localState.properties.length === 0)) {
     return (
       <ColoredContainer parent>
         <Group large>
@@ -151,9 +159,9 @@ export const OriginInfoPanel: TabContainerPanelComponent<IUserFormProps> = obser
   }
 
   return (
-    <ColoredContainer parent>
+    <ColoredContainer>
       <Group gap large>
-        <ObjectPropertyInfoForm properties={state.properties} state={state.state} readOnly small autoHide />
+        <ObjectPropertyInfoForm properties={localState.properties} state={localState.state} readOnly small autoHide />
       </Group>
     </ColoredContainer>
   );
