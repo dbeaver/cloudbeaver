@@ -20,11 +20,7 @@ import { useObservableRef } from './useObservableRef';
 import { useS } from './useS';
 import { useStyles } from './useStyles';
 
-type buttonMod = Array<'raised' | 'unelevated' | 'outlined' | 'secondary'>;
-
-type buttonModMap = {
-  [key in buttonMod[number]]: boolean;
-};
+type ButtonMod = Array<'raised' | 'unelevated' | 'outlined' | 'secondary'>;
 
 type ButtonProps = (React.ButtonHTMLAttributes<HTMLButtonElement | HTMLAnchorElement> &
   React.LinkHTMLAttributes<HTMLLinkElement | HTMLButtonElement> &
@@ -33,7 +29,7 @@ type ButtonProps = (React.ButtonHTMLAttributes<HTMLButtonElement | HTMLAnchorEle
   icon?: string;
   viewBox?: string;
   styles?: ComponentStyle;
-  mod?: buttonMod;
+  mod?: ButtonMod;
   tag?: 'button' | 'a' | 'div';
   href?: string;
   target?: '_blank' | '_self' | '_parent' | '_top';
@@ -88,11 +84,6 @@ export const Button = observer<ButtonProps>(function Button({
     disabled = true;
   }
 
-  const modMap = mod?.reduce((map, mod) => {
-    map[mod] = true;
-    return map;
-  }, {} as buttonModMap);
-
   const Button = tag;
   return styled(useStyles(oldStyles))(
     <Button
@@ -104,10 +95,10 @@ export const Button = observer<ButtonProps>(function Button({
         styles,
         {
           button: true,
-          raised: modMap?.raised,
-          outlined: modMap?.outlined,
-          secondary: modMap?.secondary,
-          unelevated: modMap?.unelevated,
+          raised: mod?.includes('raised'),
+          outlined: mod?.includes('outlined'),
+          secondary: mod?.includes('secondary'),
+          unelevated: mod?.includes('unelevated'),
           loading,
         },
         className,

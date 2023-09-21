@@ -8,17 +8,15 @@
 import type React from 'react';
 
 import { App, useService } from '@cloudbeaver/core-di';
+import { clsx } from '@cloudbeaver/core-utils';
 
 import style from './AppRefreshButton.m.css';
-import { s } from './s';
-import { useS } from './useS';
 
 interface IProps {
   className?: string;
 }
 
 export const AppRefreshButton: React.FC<IProps> = function AppRefreshButton({ className }) {
-  const styles = useS(style);
   const app = useService(App);
 
   function refresh() {
@@ -26,7 +24,7 @@ export const AppRefreshButton: React.FC<IProps> = function AppRefreshButton({ cl
   }
 
   return (
-    <button className={s(styles, { button: true }, className)} onClick={refresh}>
+    <button className={clsx(style.button, className)} onClick={refresh}>
       Refresh
     </button>
   );

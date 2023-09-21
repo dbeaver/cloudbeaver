@@ -8,12 +8,14 @@
 import { s } from './s';
 import style from './TextPlaceholder.m.css';
 import { useS } from './useS';
+import {observer} from "mobx-react-lite";
 
 interface Props {
   className?: string;
+  children?: React.ReactNode;
 }
 
-export const TextPlaceholder: React.FC<React.PropsWithChildren<Props>> = function TextPlaceholder({ className, children }) {
+export const TextPlaceholder = observer<Props>(function TextPlaceholder({ className, children }) {
   const styles = useS(style);
 
   return (
@@ -21,4 +23,4 @@ export const TextPlaceholder: React.FC<React.PropsWithChildren<Props>> = functio
       <span className={s(styles, { content: true }, className)}>{children}</span>
     </div>
   );
-};
+});

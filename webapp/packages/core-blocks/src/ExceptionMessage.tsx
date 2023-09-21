@@ -19,51 +19,6 @@ import { s } from './s';
 import { useErrorDetails } from './useErrorDetails';
 import { useS } from './useS';
 import { useStyles } from './useStyles';
-
-const oldStyle = css`
-  error[|inline] {
-    align-items: center;
-    height: 38px;
-    padding: 0;
-
-    & error-data {
-      display: flex;
-      align-items: center;
-      padding: 0;
-    }
-    & error-icon {
-      display: flex;
-      align-items: center;
-      align-content: center;
-
-      & IconOrImage {
-        height: 24px;
-        width: 24px;
-      }
-    }
-    & error-message {
-      line-height: 1.2;
-      -webkit-line-clamp: 2;
-      display: -webkit-box;
-      -webkit-box-orient: vertical;
-      overflow: hidden;
-      padding: 0 16px;
-    }
-    & error-name {
-      display: none;
-    }
-    & error-actions {
-      margin-top: 0;
-    }
-  }
-  error-action-close {
-    cursor: pointer;
-    width: 18px;
-    height: 18px;
-    flex-shrink: 0;
-  }
-`;
-
 interface Props {
   exception?: Error;
   icon?: boolean;

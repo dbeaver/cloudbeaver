@@ -5,6 +5,8 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
+import { observer } from 'mobx-react-lite';
+
 import type { ComponentStyle } from '@cloudbeaver/core-theming';
 
 import style from './Cell.m.css';
@@ -18,9 +20,10 @@ interface Props {
   style?: ComponentStyle;
   ripple?: boolean;
   className?: string;
+  children?: React.ReactNode;
 }
 
-export const Cell: React.FC<React.PropsWithChildren<Props>> = function Cell({ before, after, description, className, ripple = true, children }) {
+export const Cell = observer<Props>(function Cell({ before, after, description, className, ripple = true, children }) {
   const styles = useS(style);
 
   return (
@@ -35,4 +38,4 @@ export const Cell: React.FC<React.PropsWithChildren<Props>> = function Cell({ be
       </main>
     </cell>
   );
-};
+});

@@ -11,13 +11,14 @@ import { Icon } from './Icon';
 import { s } from './s';
 import style from './TimerIcon.m.css';
 import { useS } from './useS';
+import {observer} from "mobx-react-lite";
 
 interface Props {
   state: 'play' | 'stop';
   interval: number;
 }
 
-export const TimerIcon: React.FC<Props & React.ButtonHTMLAttributes<HTMLDivElement>> = function TimerIcon({ state, interval, ...rest }) {
+export const TimerIcon = observer<Props & React.ButtonHTMLAttributes<HTMLDivElement>>(function TimerIcon({ state, interval, ...rest }) {
   const styles = useS(style);
 
   return (
@@ -29,4 +30,4 @@ export const TimerIcon: React.FC<Props & React.ButtonHTMLAttributes<HTMLDivEleme
       <div className={s(styles, { interval: true })}>{interval}</div>
     </div>
   );
-};
+});

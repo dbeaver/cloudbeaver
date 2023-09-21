@@ -8,12 +8,14 @@
 import style from './Code.m.css';
 import { s } from './s';
 import { useS } from './useS';
+import {observer} from "mobx-react-lite";
 
 interface Props {
   className?: string;
+  children?: React.ReactNode;
 }
 
-export const Code: React.FC<React.PropsWithChildren<Props>> = function Code({ children, className }) {
+export const Code = observer<Props>(function Code({ children, className }) {
   const styles = useS(style);
 
   return (
@@ -21,4 +23,4 @@ export const Code: React.FC<React.PropsWithChildren<Props>> = function Code({ ch
       <code>{children}</code>
     </div>
   );
-};
+});

@@ -5,6 +5,8 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
+import { observer } from 'mobx-react-lite';
+
 import { IconOrImage } from './IconOrImage';
 import style from './Link.m.css';
 import { s } from './s';
@@ -14,9 +16,10 @@ interface Props extends React.AnchorHTMLAttributes<HTMLAnchorElement> {
   wrapper?: boolean;
   indicator?: boolean;
   inline?: boolean;
+  children?: React.ReactNode;
 }
 
-export const Link: React.FC<Props> = function Link({ inline, wrapper, indicator, className, children, ...rest }) {
+export const Link = observer<Props>(function Link({ inline, wrapper, indicator, className, children, ...rest }) {
   const styles = useS(style);
 
   return (
@@ -27,4 +30,4 @@ export const Link: React.FC<Props> = function Link({ inline, wrapper, indicator,
       </a>
     </div>
   );
-};
+});

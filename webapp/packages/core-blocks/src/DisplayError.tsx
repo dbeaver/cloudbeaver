@@ -5,6 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
+import { observer } from 'mobx-react-lite';
 import type React from 'react';
 
 import { ENotificationType } from '@cloudbeaver/core-events';
@@ -20,9 +21,10 @@ interface Props {
   error?: Error;
   errorInfo?: React.ErrorInfo;
   className?: string;
+  children?: React.ReactNode;
 }
 
-export const DisplayError: React.FC<React.PropsWithChildren<Props>> = function DisplayError({ root, children, error, errorInfo, className }) {
+export const DisplayError = observer<Props>(function DisplayError({ root, children, error, errorInfo, className }) {
   const styles = useS(style);
   const stack = errorInfo?.componentStack || error?.stack;
 
@@ -43,4 +45,4 @@ export const DisplayError: React.FC<React.PropsWithChildren<Props>> = function D
       </div>
     </div>
   );
-};
+});
