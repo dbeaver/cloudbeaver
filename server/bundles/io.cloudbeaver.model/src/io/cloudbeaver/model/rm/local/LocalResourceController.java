@@ -43,8 +43,9 @@ import org.jkiss.dbeaver.model.runtime.VoidProgressMonitor;
 import org.jkiss.dbeaver.model.security.SMController;
 import org.jkiss.dbeaver.model.security.SMObjectType;
 import org.jkiss.dbeaver.model.sql.DBQuotaException;
-import org.jkiss.dbeaver.model.websocket.event.WSErrorEvent;
+import org.jkiss.dbeaver.model.websocket.event.MessageType;
 import org.jkiss.dbeaver.model.websocket.event.WSEventType;
+import org.jkiss.dbeaver.model.websocket.event.WSSessionLogUpdatedEvent;
 import org.jkiss.dbeaver.registry.*;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.utils.ArrayUtils;
@@ -966,15 +967,11 @@ public class LocalResourceController implements RMController {
             } catch (Exception e) {
                 if (credentialsProvider.getActiveUserCredentials() != null) {
                     WebAppUtils.getWebApplication().getEventController().addEvent(
-                        new WSErrorEvent(
-                            WSEventType.SESSION_LOG_MESSAGE_ADDED,
+                        new WSSessionLogUpdatedEvent(
+                            WSEventType.SESSION_LOG_UPDATED,
                             credentialsProvider.getActiveUserCredentials().getSmSessionId(),
                             credentialsProvider.getActiveUserCredentials().getUserId(),
-                            e.getMessage()));
-                } else {
-                    WebAppUtils.getWebApplication().getEventController().addEvent(
-                        new WSErrorEvent(
-                            WSEventType.SESSION_LOG_MESSAGE_ADDED,
+                            MessageType.ERROR,
                             e.getMessage()));
                 }
                 log.error("Error before file reading", e);

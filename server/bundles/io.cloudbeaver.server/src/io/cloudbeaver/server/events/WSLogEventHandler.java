@@ -19,15 +19,15 @@ package io.cloudbeaver.server.events;
 import io.cloudbeaver.model.WebServerMessage;
 import io.cloudbeaver.model.session.BaseWebSession;
 import org.jkiss.code.NotNull;
-import org.jkiss.dbeaver.model.websocket.event.WSErrorEvent;
+import org.jkiss.dbeaver.model.websocket.event.WSSessionLogUpdatedEvent;
 
-public class WSEventLogSendHandler extends WSDefaultEventHandler<WSErrorEvent> {
+public class WSLogEventHandler extends WSDefaultEventHandler<WSSessionLogUpdatedEvent> {
 
-    protected void updateSessionData(@NotNull BaseWebSession activeUserSession, @NotNull WSErrorEvent event) {
-        activeUserSession.addSessionMessage(new WebServerMessage(WebServerMessage.MessageType.ERROR, event.getErrorMessage()));
+    protected void updateSessionData(@NotNull BaseWebSession activeUserSession, @NotNull WSSessionLogUpdatedEvent event) {
+        activeUserSession.addSessionMessage(new WebServerMessage(event.getMessageType(), event.getMessage()));
     }
 
-    protected boolean isAcceptableInSession(@NotNull BaseWebSession activeUserSession, @NotNull WSErrorEvent event) {
+    protected boolean isAcceptableInSession(@NotNull BaseWebSession activeUserSession, @NotNull WSSessionLogUpdatedEvent event) {
         return WSWebUtils.isSessionIdEquals(activeUserSession, event.getSessionId());
     }
 }
