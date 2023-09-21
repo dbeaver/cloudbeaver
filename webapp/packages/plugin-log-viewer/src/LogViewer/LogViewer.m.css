@@ -1,0 +1,19 @@
+.split {
+  display: flex;
+  flex-direction: row;
+  flex: 1;
+  overflow: hidden;
+  z-index: 0;
+}
+.pane {
+  composes: theme-background-surface theme-text-on-surface from global;
+}
+.logViewWrapper,
+.pane {
+  z-index: 0;
+  position: relative;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  overflow: hidden;
+}

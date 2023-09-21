@@ -17,8 +17,6 @@ import {
   SlideElement,
   SlideOverlay,
   Split,
-  SplitHorizontalStyles,
-  SplitStyles,
   useS,
   useSplitUserState,
 } from '@cloudbeaver/core-blocks';
@@ -34,7 +32,7 @@ interface Props {
 }
 
 export const RightArea = observer<Props>(function RightArea({ className }) {
-  const styles = useS(SplitStyles, SplitHorizontalStyles, SlideBoxStyles, style);
+  const styles = useS(SlideBoxStyles, style);
   const toolsPanelService = useService(ToolsPanelService);
   const optionsPanelService = useService(OptionsPanelService);
   const splitState = useSplitUserState('right-area');
@@ -66,7 +64,7 @@ export const RightArea = observer<Props>(function RightArea({ className }) {
               <NavigationTabsBar />
             </Loader>
           </Pane>
-          <ResizerControls className={s(styles, { resizerControls: true })} />
+          <ResizerControls />
           <Pane className={s(styles, { pane: true })} basis="30%" main>
             <Loader className={s(styles, { loader: true })} suspense>
               <ToolsPanel container={toolsPanelService.tabsContainer} />

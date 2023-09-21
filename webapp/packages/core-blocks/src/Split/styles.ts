@@ -53,28 +53,3 @@ export const splitStyles = css`
     box-sizing: border-box;
   }
 `;
-
-export const splitHorizontalStyles = css`
-  space {
-    height: 100%;
-  }
-  Split {
-    flex-direction: column;
-    height: 100%;
-  }
-
-  ResizerControls {
-    position: relative;
-    cursor: ns-resize;
-    height: 2px;
-    width: initial;
-  }
-
-  ResizerControls:before {
-    height: 4px;
-    width: 100%;
-    top: -1px;
-    left: 0;
-    cursor: ns-resize;
-  }
-`;

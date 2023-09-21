@@ -1,0 +1,25 @@
+.split {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+  z-index: 0;
+  flex-direction: column;
+  height: 100%;
+}
+.captureView {
+  flex: 1;
+  display: flex;
+  overflow: auto;
+  position: relative;
+}
+.pane {
+  flex: 1 1 0%;
+  overflow: auto;
+  z-index: 0;
+  composes: theme-typography--body2 from global;
+  display: flex;
+  position: relative;
+}
+.pane:first-child {
+  flex-direction: column;
+}

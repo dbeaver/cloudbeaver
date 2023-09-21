@@ -72,8 +72,6 @@ export * from './Split/ResizerControls';
 export * from './Split/Split';
 export * from './Split/useSplit';
 export * from './Split/useSplitUserState';
-export { default as SplitStyles } from './Split/Split.m.css';
-export { default as SplitHorizontalStyles } from './Split/SplitHorizontal.m.css';
 
 export * from './Table/EventTableItemExpandFlag';
 export * from './Table/EventTableItemSelectionFlag';

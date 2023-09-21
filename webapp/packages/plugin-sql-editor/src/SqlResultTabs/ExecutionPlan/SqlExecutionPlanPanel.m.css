@@ -1,20 +1,12 @@
-.space {
-  composes: theme-typography--body2 theme-background-primary from global;
-  display: flex;
-  flex-direction: row;
-  flex: 1;
-  overflow: hidden;
-}
 .pane {
   composes: theme-background-surface theme-text-on-surface from global;
-  display: flex;
-  position: relative;
   flex: 1 1 0%;
   overflow: auto;
   z-index: 0;
-}
-.loader {
-  height: 100%;
+
+  &:first-child {
+    overflow: hidden;
+  }
 }
 .split {
   display: flex;
@@ -23,4 +15,3 @@
   overflow: hidden;
   z-index: 0;
 }
-
