@@ -94,7 +94,7 @@ const ProjectRenderer: NavigationNodeRendererComponent = observer(function Manag
         path={path}
         expanded={expanded}
         dragging={dragging}
-        className={s(styles, { treeNode: true, hideProjects, project }, className)}
+        className={s(styles, { projectNode: true, hideProjects, project }, className)}
         control={NavigationNodeProjectControl}
         component={component}
       />

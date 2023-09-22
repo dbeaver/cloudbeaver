@@ -2,8 +2,7 @@
   transition: opacity 0.3s ease;
   opacity: 1;
 
-  &.outdated,
-  .dragging {
+  &.outdated {
     opacity: 0.5;
   }
 }

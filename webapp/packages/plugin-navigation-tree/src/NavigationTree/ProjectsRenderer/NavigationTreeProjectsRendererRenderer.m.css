@@ -1,4 +1,4 @@
-.treeNode {
+.projectNode {
   margin-top: 8px;
 
   &.project:only-child,
