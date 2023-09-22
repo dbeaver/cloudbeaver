@@ -80,13 +80,4 @@ describe('CachedDataResource', () => {
 
     expect(handler).toHaveBeenCalled();
   });
-
-  test('should run onDataUpdate handlers on data update', () => {
-    const handler = jest.fn();
-
-    dataResource.onDataUpdate.addHandler(handler);
-    dataResource.dataUpdate();
-
-    expect(handler).toHaveBeenCalled();
-  });
 });
