@@ -6,9 +6,6 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import styled, { css, use } from 'reshadow';
-
-import type { ComponentStyle } from '@cloudbeaver/core-theming';
 
 import { Button } from './Button';
 import style from './ExceptionMessage.m.css';
@@ -18,7 +15,7 @@ import { useTranslate } from './localization/useTranslate';
 import { s } from './s';
 import { useErrorDetails } from './useErrorDetails';
 import { useS } from './useS';
-import { useStyles } from './useStyles';
+
 interface Props {
   exception?: Error;
   icon?: boolean;
@@ -43,7 +40,7 @@ export const ExceptionMessage = observer<Props>(function ExceptionMessage({ exce
   }
 
   return (
-    <div {...use({ inline, icon })} className={s(styles, { error: true, icon, inline }, className)}>
+    <div className={s(styles, { error: true, icon, inline }, className)}>
       <div className={s(styles, { errorIcon: true })} title={error.message}>
         <IconOrImage className={s(styles, { iconOrImage: true })} icon={inline || icon ? '/icons/error_icon_sm.svg' : '/icons/error_icon.svg'} />
       </div>

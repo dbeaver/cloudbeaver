@@ -65,7 +65,6 @@ export * from './Slide/SlideElement';
 export * from './Slide/SlideOverlay';
 export { default as SlideBoxStyles } from './Slide/SlideBox.m.css';
 
-export * from './Split/styles';
 export * from './Split/SplitControls';
 export * from './Split/Pane';
 export * from './Split/ResizerControls';
@@ -161,6 +160,7 @@ export * from './ErrorMessage';
 export * from './preventFocusHandler';
 export * from './StatusMessage';
 export * from './ExceptionMessage';
+export { default as ExceptionMessageStyles } from './ExceptionMessage.m.css';
 export * from './getComputed';
 export * from './IconButton';
 export { default as IconButtonStyles } from './IconButton.m.css';
