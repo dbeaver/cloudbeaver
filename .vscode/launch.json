@@ -4,9 +4,10 @@
     {
       "type": "chrome",
       "request": "launch",
-      "name": "Debug CE",
+      "name": "Chrome",
       "url": "http://127.0.0.1:3100",
-      "webRoot": "${workspaceFolder}/webapp/packages/product-default"
+      "webRoot": "${workspaceFolder}/..",
+      "sourceMaps": true
     },
     {
       "type": "java",
@@ -14,21 +15,21 @@
       "cwd": "${workspaceFolder}/../opt/cbce",
       "request": "launch",
       "mainClass": "org.eclipse.equinox.launcher.Main",
-      "classPaths": [
-        "${env:DBEAVER_DEVEL_ECLIPSE_PATH}/plugins/org.eclipse.equinox.launcher_1.6.400.v20210924-0641.jar"
-      ],
       "windows": {
         "type": "java",
         "name": "CloudBeaver CE",
         "request": "launch",
         "mainClass": "org.eclipse.equinox.launcher.Main",
+        "classPaths": [
+          "${workspaceFolder}/../eclipse/eclipse/plugins/org.eclipse.equinox.launcher_1.6.400.v20210924-0641.jar"
+        ],
         "args": [
           "-product",
           "io.cloudbeaver.product.ce.product",
           "-configuration",
-          "file:${env:DBEAVER_DEVEL_ECLIPSE_WORKSPACE_PATH}/.metadata/.plugins/org.eclipse.pde.core/CloudbeaverServer.product/",
+          "file:${workspaceFolder}/../eclipse/workspace/.metadata/.plugins/org.eclipse.pde.core/CloudbeaverServer.product/",
           "-dev",
-          "file:${env:DBEAVER_DEVEL_ECLIPSE_WORKSPACE_PATH}/.metadata/.plugins/org.eclipse.pde.core/CloudbeaverServer.product/dev.properties",
+          "file:${workspaceFolder}/../eclipse/workspace/.metadata/.plugins/org.eclipse.pde.core/CloudbeaverServer.product/dev.properties",
           "-os",
           "win32",
           "-ws",
@@ -54,13 +55,16 @@
         "name": "CloudBeaver CE",
         "request": "launch",
         "mainClass": "org.eclipse.equinox.launcher.Main",
+        "classPaths": [
+          "${workspaceFolder}/../eclipse/Eclipse.app/Contents/Eclipse/plugins/org.eclipse.equinox.launcher_1.6.400.v20210924-0641.jar"
+        ],
         "args": [
           "-product",
           "io.cloudbeaver.product.ce.product",
           "-configuration",
-          "file:${env:DBEAVER_DEVEL_ECLIPSE_WORKSPACE_PATH}/.metadata/.plugins/org.eclipse.pde.core/CloudbeaverServer.product/",
+          "file:${workspaceFolder}/../eclipse/workspace/.metadata/.plugins/org.eclipse.pde.core/CloudbeaverServer.product/",
           "-dev",
-          "file:${env:DBEAVER_DEVEL_ECLIPSE_WORKSPACE_PATH}/.metadata/.plugins/org.eclipse.pde.core/CloudbeaverServer.product/dev.properties",
+          "file:${workspaceFolder}/../eclipse/workspace/.metadata/.plugins/org.eclipse.pde.core/CloudbeaverServer.product/dev.properties",
           "-os",
           "macosx",
           "-ws",
