@@ -167,59 +167,79 @@ describe('CachedMapResource', () => {
   });
 
   test('should run onDataOutdated handlers on data outdate', () => {
+    const handler = jest.fn();
+
     mapResource.set('key1', { id: 'key1', value: 1 });
     mapResource.set('key2', { id: 'key2', value: 2 });
 
     mapResource.onDataOutdated.addHandler(key => {
+      handler();
       expect(key).toBe('key1');
     });
 
     mapResource.markOutdated('key1');
+    expect(handler).toHaveBeenCalled();
   });
 
   test('should run onDataUpdate handlers on data update', () => {
+    const handler = jest.fn();
+
     mapResource.set('key1', { id: 'key1', value: 1 });
     mapResource.set('key2', { id: 'key2', value: 2 });
 
     mapResource.onDataUpdate.addHandler(key => {
+      handler();
       expect(key).toBe('key2');
     });
 
     mapResource.dataUpdate('key2');
+    expect(handler).toHaveBeenCalled();
   });
 
   test('should run onItemDelete handlers on data delete', () => {
+    const handler = jest.fn();
+
     mapResource.set('key1', { id: 'key1', value: 1 });
     mapResource.set('key2', { id: 'key2', value: 2 });
 
     mapResource.onItemDelete.addHandler(key => {
+      handler();
       expect(key).toBe('key1');
     });
 
     mapResource.delete('key1');
+    expect(handler).toHaveBeenCalled();
   });
 
   test('should run onItemUpdate handlers on data delete', () => {
+    const handler = jest.fn();
+
     mapResource.set('key1', { id: 'key1', value: 1 });
     mapResource.set('key2', { id: 'key2', value: 2 });
 
     mapResource.onItemUpdate.addHandler(key => {
+      handler();
       expect(key).toBe('key2');
     });
 
     mapResource.set('key2', { id: 'key2', value: 22 });
+    expect(handler).toHaveBeenCalled();
   });
 
   test('should run onDataError handlers on data error', async () => {
+    const handler = jest.fn();
+
     mapResource.set('key1', { id: 'key1', value: 1 });
     mapResource.set('key2', { id: 'key2', value: 2 });
 
     mapResource.onDataError.addHandler(data => {
+      handler();
       expect(data.param).toBe(ERROR_ITEM_ID);
       expect(data.exception.message).toBe(TEST_ERROR_MESSAGE);
     });
 
     await expect(mapResource.load(ERROR_ITEM_ID)).rejects.toThrow(TEST_ERROR_MESSAGE);
+    expect(handler).toHaveBeenCalled();
   });
 
   test('should be able to get an exception if the one occurred for the key', async () => {
