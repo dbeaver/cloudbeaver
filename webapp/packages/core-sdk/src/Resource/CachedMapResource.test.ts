@@ -14,6 +14,8 @@ interface ILoaderData {
   value: number;
 }
 
+const ERROR_ITEM_ID = 'error';
+
 const LOADER_DATA_MOCK: ILoaderData[] = [
   {
     id: '1',
@@ -23,11 +25,25 @@ const LOADER_DATA_MOCK: ILoaderData[] = [
     id: '2',
     value: 2,
   },
+  {
+    id: ERROR_ITEM_ID,
+    value: 3,
+  },
 ];
+
+const TEST_ERROR_MESSAGE = 'Test error';
 
 class TestMapResource extends CachedMapResource<string, ILoaderData> {
   constructor() {
     super();
+  }
+
+  async fetchAnError() {
+    return new Promise((_, reject) => {
+      setTimeout(() => {
+        reject(new Error(TEST_ERROR_MESSAGE));
+      }, 1);
+    });
   }
 
   private async fetchFromAPI(key: ResourceKey<string> | undefined): Promise<ILoaderData[]> {
@@ -46,6 +62,10 @@ class TestMapResource extends CachedMapResource<string, ILoaderData> {
   }
 
   protected async loader(key: ResourceKey<string>) {
+    if (key === ERROR_ITEM_ID) {
+      await this.fetchAnError();
+    }
+
     const data = await this.fetchFromAPI(key);
     this.replace(resourceKeyList(data.map(d => d.id)), data);
     return this.data;
@@ -97,6 +117,16 @@ describe('CachedMapResource', () => {
     expect(mapResource.get('2')).toBeUndefined(); // This key was not loaded
   });
 
+  test('should NOT load data for a key that produces an error', async () => {
+    await expect(mapResource.load(ERROR_ITEM_ID)).rejects.toThrow(TEST_ERROR_MESSAGE);
+    expect(mapResource.get(ERROR_ITEM_ID)).toBeUndefined();
+  });
+
+  test('should change loaded state when data is loaded ', async () => {
+    await mapResource.load('1');
+    expect(mapResource.isLoaded('1')).toBe(true);
+  });
+
   test('should set and get a value', () => {
     mapResource.set('key1', { id: 'key1', value: 1 });
     expect(mapResource.get('key1')).toStrictEqual({ id: 'key1', value: 1 });
@@ -124,5 +154,66 @@ describe('CachedMapResource', () => {
     expect(mapResource.get('key1')).toStrictEqual({ id: 'key1', value: 11 });
     expect(mapResource.get('key2')).toBeUndefined();
     expect(mapResource.get('key3')).toStrictEqual({ id: 'key3', value: 33 });
+  });
+
+  test('should outdated certain keys', () => {
+    mapResource.set('key1', { id: 'key1', value: 1 });
+    mapResource.set('key2', { id: 'key2', value: 2 });
+
+    mapResource.markOutdated('key1');
+
+    expect(mapResource.isOutdated('key1')).toBe(true);
+    expect(mapResource.isOutdated('key2')).toBe(false);
+  });
+
+  test('should run onDataOutdated handlers on data outdate', () => {
+    mapResource.set('key1', { id: 'key1', value: 1 });
+    mapResource.set('key2', { id: 'key2', value: 2 });
+
+    mapResource.onDataOutdated.addHandler(key => {
+      expect(key).toBe('key1');
+    });
+
+    mapResource.markOutdated('key1');
+  });
+
+  test('should run onDataUpdate handlers on data update', () => {
+    mapResource.set('key1', { id: 'key1', value: 1 });
+    mapResource.set('key2', { id: 'key2', value: 2 });
+
+    mapResource.onDataUpdate.addHandler(key => {
+      expect(key).toBe('key2');
+    });
+
+    mapResource.dataUpdate('key2');
+  });
+
+  test('should run onItemDelete handlers on data delete', () => {
+    mapResource.set('key1', { id: 'key1', value: 1 });
+    mapResource.set('key2', { id: 'key2', value: 2 });
+
+    mapResource.onItemDelete.addHandler(key => {
+      expect(key).toBe('key1');
+    });
+
+    mapResource.delete('key1');
+  });
+
+  test('should run onItemDelete handlers on data delete', () => {
+    mapResource.set('key1', { id: 'key1', value: 1 });
+    mapResource.set('key2', { id: 'key2', value: 2 });
+
+    mapResource.onItemUpdate.addHandler(key => {
+      expect(key).toBe('key2');
+    });
+
+    mapResource.set('key2', { id: 'key2', value: 22 });
+  });
+
+  test('should run onItemDelete handlers on data delete', () => {
+    mapResource.set('key1', { id: 'key1', value: 1 });
+    mapResource.set('key2', { id: 'key2', value: 2 });
+
+    mapResource.set('key2', { id: 'key2', value: 22 });
   });
 });
