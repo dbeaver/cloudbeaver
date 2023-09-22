@@ -15,14 +15,23 @@ import org.jkiss.dbeaver.model.security.exception.SMRefreshTokenExpiredException
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Set;
 
 public class SMUtils {
     public static boolean isAdmin(SMCredentialsProvider webSession) {
         return webSession.hasPermission(DBWConstants.PERMISSION_ADMIN);
     }
 
+    public static boolean isAdmin(@NotNull Set<String> permissions) {
+        return permissions.contains(DBWConstants.PERMISSION_ADMIN);
+    }
+
     public static boolean isRMAdmin(SMCredentialsProvider webSession) {
         return isAdmin(webSession) || webSession.hasPermission(RMConstants.PERMISSION_RM_ADMIN);
+    }
+
+    public static boolean isRMAdmin(@NotNull Set<String> permissions) {
+        return isAdmin(permissions) || permissions.contains(RMConstants.PERMISSION_RM_ADMIN);
     }
 
     public static boolean hasProjectPermission(
