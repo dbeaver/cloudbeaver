@@ -199,7 +199,7 @@ describe('CachedMapResource', () => {
     mapResource.delete('key1');
   });
 
-  test('should run onItemDelete handlers on data delete', () => {
+  test('should run onItemUpdate handlers on data delete', () => {
     mapResource.set('key1', { id: 'key1', value: 1 });
     mapResource.set('key2', { id: 'key2', value: 2 });
 
@@ -210,10 +210,20 @@ describe('CachedMapResource', () => {
     mapResource.set('key2', { id: 'key2', value: 22 });
   });
 
-  test('should run onItemDelete handlers on data delete', () => {
+  test('should run onDataError handlers on data error', async () => {
     mapResource.set('key1', { id: 'key1', value: 1 });
     mapResource.set('key2', { id: 'key2', value: 2 });
 
-    mapResource.set('key2', { id: 'key2', value: 22 });
+    mapResource.onDataError.addHandler(data => {
+      expect(data.param).toBe(ERROR_ITEM_ID);
+      expect(data.exception.message).toBe(TEST_ERROR_MESSAGE);
+    });
+
+    await expect(mapResource.load(ERROR_ITEM_ID)).rejects.toThrow(TEST_ERROR_MESSAGE);
+  });
+
+  test('should be able to get an exception if the one occurred for the key', async () => {
+    await expect(mapResource.load(ERROR_ITEM_ID)).rejects.toThrow(TEST_ERROR_MESSAGE);
+    expect(mapResource.getException(ERROR_ITEM_ID)?.message).toBe(TEST_ERROR_MESSAGE);
   });
 });
