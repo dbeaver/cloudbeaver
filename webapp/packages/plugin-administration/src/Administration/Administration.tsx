@@ -14,7 +14,6 @@ import {
   Loader,
   SContext,
   SlideBox,
-  slideBoxStyles,
   SlideElement,
   SlideOverlay,
   StyleRegistry,
@@ -120,7 +119,7 @@ export const Administration = observer<React.PropsWithChildren<Props>>(function 
     contentRef.current?.scrollTo({ top: 0, left: 0 });
   }, [activeScreen?.item]);
 
-  return styled(useStyles(BASE_TAB_STYLES, verticalTabStyles, administrationStyles, tabsStyles, slideBoxStyles))(
+  return styled(useStyles(BASE_TAB_STYLES, verticalTabStyles, administrationStyles, tabsStyles))(
     <CaptureView view={administrationViewService}>
       <SContext registry={registry}>
         <AdministrationCaptureViewContext />
@@ -139,21 +138,21 @@ export const Administration = observer<React.PropsWithChildren<Props>>(function 
           </TabList>
           <content-container ref={contentRef} as="div">
             {children}
-            <SlideBox open={optionsPanelService.active}>
-              <SlideElement>
+            <SlideBox>
+              <SlideElement open={optionsPanelService.active}>
                 <Loader suspense>
                   <content>
                     <OptionsPanel />
                   </content>
                 </Loader>
               </SlideElement>
-              <SlideElement>
+              <SlideElement open={optionsPanelService.active}>
                 <Loader suspense>
                   <content>
                     <ItemContent activeScreen={activeScreen} configurationWizard={configurationWizard} />
                   </content>
                 </Loader>
-                <SlideOverlay onClick={() => optionsPanelService.close()} />
+                <SlideOverlay open={optionsPanelService.active} onClick={() => optionsPanelService.close()} />
               </SlideElement>
             </SlideBox>
           </content-container>

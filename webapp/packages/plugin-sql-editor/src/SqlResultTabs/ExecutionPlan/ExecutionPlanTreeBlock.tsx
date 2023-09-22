@@ -42,8 +42,8 @@ export const ExecutionPlanTreeBlock = observer<Props>(function ExecutionPlanTree
   const state = useExecutionPlanTreeState(nodeList, onNodeSelect);
 
   return (
-    <Split {...splitState} className={s(styles, { split: true }, className)} sticky={30} split="horizontal" keepRatio>
-      <Pane className={s(styles, { pane: true })}>
+    <Split {...splitState} sticky={30} split="horizontal" keepRatio>
+      <Pane>
         {state.nodes.length && state.columns.length ? (
           <Table selectedItems={state.selectedNodes} onSelect={state.selectNode}>
             <TableHeader fixed>

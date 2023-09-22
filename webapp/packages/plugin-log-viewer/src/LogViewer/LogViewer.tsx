@@ -36,7 +36,6 @@ export const LogViewer = observer(function LogViewer() {
   return (
     <div className={s(styles, { logViewWrapper: true })}>
       <Split
-        className={s(styles, { split: true })}
         {...splitState}
         mode={logViewerState.selectedItem ? splitState.mode : 'minimize'}
         disable={!logViewerState.selectedItem}

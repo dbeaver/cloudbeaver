@@ -1,31 +1,6 @@
-.pane {
-  composes: theme-background-surface theme-text-on-surface from global;
-  display: flex;
-  overflow: auto;
-}
 .loader {
   height: 100%;
 }
 .slideBox {
   flex: 1;
-}
-.space {
-  display: flex;
-  flex-direction: row;
-  flex: 1;
-  overflow: hidden;
-  height: 100%;
-}
-.split {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  flex: 1;
-  overflow: hidden;
-  z-index: 0;
-}
-.pane {
-  flex: 1 1 0%;
-  overflow: auto;
-  z-index: 0;
 }

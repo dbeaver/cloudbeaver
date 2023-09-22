@@ -33,13 +33,7 @@ export const SqlExecutionPlanPanel = observer<Props>(function SqlExecutionPlanPa
   }
 
   return (
-    <Split
-      className={s(styles, { split: true })}
-      {...splitState}
-      mode={selectedNode ? splitState.mode : 'minimize'}
-      disable={!selectedNode}
-      sticky={30}
-    >
+    <Split {...splitState} mode={selectedNode ? splitState.mode : 'minimize'} disable={!selectedNode} sticky={30}>
       <Pane className={s(styles, { pane: true })}>
         <ExecutionPlanTreeBlock nodeList={data.executionPlan.nodes} query={data.executionPlan.query} onNodeSelect={setSelectedNode} />
       </Pane>

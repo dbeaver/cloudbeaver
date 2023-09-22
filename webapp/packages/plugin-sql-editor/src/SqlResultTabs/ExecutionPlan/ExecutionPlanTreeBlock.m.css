@@ -1,17 +1,3 @@
-.pane {
-  composes: theme-background-surface theme-text-on-surface from global;
-  flex: 1 1 0%;
-  overflow: auto;
-  z-index: 0;
-}
-.split {
-  display: flex;
-  flex: 1;
-  overflow: hidden;
-  z-index: 0;
-  height: 100%;
-  flex-direction: column;
-}
 .textarea > :global(textarea) {
   border: none !important;
 }

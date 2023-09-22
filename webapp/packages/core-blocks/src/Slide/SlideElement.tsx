@@ -5,11 +5,20 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
+import { observer } from 'mobx-react-lite';
+
+import { s } from '../s';
+import { useS } from '../useS';
+import style from './SlideElement.m.css';
 
 interface Props {
   className?: string;
+  children?: React.ReactNode;
+  open?: boolean;
 }
 
-export const SlideElement: React.FC<React.PropsWithChildren<Props>> = function SlideElement({ children, className }) {
-  return <div className={className}>{children}</div>;
-};
+export const SlideElement = observer<Props>(function SlideElement({ children,open, className }) {
+  const styles = useS(style);
+
+  return <div className={s(styles, { slideElement: true, open }, className)}>{children}</div>;
+});

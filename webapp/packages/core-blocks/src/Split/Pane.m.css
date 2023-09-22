@@ -1,0 +1,7 @@
+.pane {
+  flex: 1 1 0%;
+  overflow: auto;
+  z-index: 0;
+  composes: theme-background-surface theme-text-on-surface from global;
+  display: flex;
+}

@@ -36,7 +36,7 @@ export const SqlEditor = observer<Props>(function SqlEditor({ state }) {
   return (
     <Loader suspense>
       <CaptureView className={s(styles, { captureView: true })} view={sqlEditorView}>
-        <Split className={s(styles, { split: true })} {...splitState} split="horizontal" sticky={30}>
+        <Split {...splitState} split="horizontal" sticky={30}>
           <Pane className={s(styles, { pane: true })}>
             <SqlEditorLoader state={state} />
           </Pane>

@@ -60,7 +60,6 @@ export * from './PropertiesTable/PropertiesTable';
 export * from './PropertiesTable/IProperty';
 
 export * from './Slide/SlideBox';
-export * from './Slide/SlideBoxStyles';
 export * from './Slide/SlideElement';
 export * from './Slide/SlideOverlay';
 export { default as SlideBoxStyles } from './Slide/SlideBox.m.css';

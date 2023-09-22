@@ -1,14 +1,7 @@
 .split {
-  display: flex;
-  flex-direction: row;
-  flex: 1;
-  overflow: hidden;
-  z-index: 0;
-}
-.pane {
-  flex: 1 1 0%;
-  overflow: auto;
-  z-index: 0;
+  &:not(.disabled) {
+    gap: 8px;
+  }
 }
 
 .paneContent {
@@ -42,9 +35,6 @@
   flex: 1;
   flex-direction: column;
   overflow: hidden;
-}
-.split:not(.disabled) {
-  gap: 8px;
 }
 .pane {
   &:first-child {

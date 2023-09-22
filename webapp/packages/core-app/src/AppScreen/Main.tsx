@@ -29,31 +29,24 @@ export const Main = observer(function Main() {
     <Loader className={s(styles, { loader: true })} suspense>
       <main className={s(styles, { space: true })}>
         <Split
-          className={s(styles, { split: true })}
           {...splitMainState}
           sticky={30}
           mode={leftBarDisabled ? 'minimize' : splitMainState.mode}
           disable={leftBarDisabled}
         >
-          <Pane className={s(styles, { pane: true })} basis="250px" main>
+          <Pane  basis="250px" main>
             <Loader suspense>
               <SideBarPanel container={leftBarPanelService.tabsContainer} />
             </Loader>
           </Pane>
           <ResizerControls />
-          <Pane className={s(styles, { pane: true })}>
-            <Split
-              className={s(styles, { split: true })}
-              {...splitRightState}
-              mode={sideBarDisabled ? 'minimize' : splitRightState.mode}
-              disable={sideBarDisabled}
-              sticky={30}
-            >
+          <Pane>
+            <Split {...splitRightState} mode={sideBarDisabled ? 'minimize' : splitRightState.mode} disable={sideBarDisabled} sticky={30}>
               <Pane className={s(styles, { pane: true })}>
                 <RightArea />
               </Pane>
               <ResizerControls />
-              <Pane basis="250px" main className={s(styles, { pane: true })}>
+              <Pane basis="250px" main >
                 <Loader suspense className={s(styles, { loader: true })}>
                   <SideBarPanel container={sideBarPanelService.tabsContainer} />
                 </Loader>

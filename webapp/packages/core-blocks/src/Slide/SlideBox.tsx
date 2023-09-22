@@ -5,14 +5,19 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
+import { observer } from 'mobx-react-lite';
 import { useEffect, useRef } from 'react';
 
+import { s, useS } from '../index';
+import style from './SlideBox.m.css';
+
 interface Props {
-  open?: boolean;
   className?: string;
+  children?: React.ReactNode;
 }
 
-export const SlideBox: React.FC<React.PropsWithChildren<Props>> = function SlideBox({ children, className }) {
+export const SlideBox = observer<Props>(function SlideBox({ children, className }) {
+  const styles = useS(style);
   const divRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -37,8 +42,8 @@ export const SlideBox: React.FC<React.PropsWithChildren<Props>> = function Slide
   }, []);
 
   return (
-    <div ref={divRef} className={className}>
+    <div ref={divRef} className={s(styles, { slideBox: true }, className)}>
       {children}
     </div>
   );
-};
+});
