@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 import { action, observable } from 'mobx';
-import { useEffect, useLayoutEffect } from 'react';
+import { useLayoutEffect } from 'react';
 
 import { useObjectRef } from './useObjectRef';
 import { useObservableRef } from './useObservableRef';
@@ -137,6 +137,8 @@ export function useFocus<T extends HTMLElement>({ autofocus, focusFirstChild, on
       reference.removeEventListener('focusin', focusHandler);
       reference.removeEventListener('focusout', blurHandler);
     };
+    // TODO: probably we need to create a PR to https://github.com/facebook/react/blob/main/packages/eslint-plugin-react-hooks for custom stable hooks
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [reference]);
 
   useLayoutEffect(
