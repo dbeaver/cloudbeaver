@@ -40,6 +40,7 @@ module.exports = (env, argv) => {
 
   return merge(commonConfig(env, argv), {
     mode: 'development',
+    context: resolve(__dirname, '../../../../../'),
     entry: {
       main,
       sso,
