@@ -80,4 +80,11 @@ describe('CachedDataResource', () => {
 
     expect(handler).toHaveBeenCalled();
   });
+
+  test('should be able to clear the data', async () => {
+    await dataResource.load();
+    dataResource.clear();
+
+    expect(dataResource.data).toEqual([]);
+  });
 });
