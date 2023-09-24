@@ -49,6 +49,10 @@ describe('CachedDataResource', () => {
     dataResource = new TestDataResource();
   });
 
+  test('should instantiate correctly', () => {
+    expect(dataResource).toBeInstanceOf(CachedDataResource);
+  });
+
   test('should initialize with an empty array', () => {
     expect(dataResource.data).toEqual([]);
   });

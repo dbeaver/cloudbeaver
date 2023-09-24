@@ -83,6 +83,10 @@ describe('CachedMapResource', () => {
     mapResource = new TestMapResource();
   });
 
+  test('should instantiate correctly', () => {
+    expect(mapResource).toBeInstanceOf(CachedMapResource);
+  });
+
   test('should return all entries', () => {
     mapResource.set('key1', { id: 'key1', value: 1 });
     mapResource.set('key2', { id: 'key2', value: 2 });
