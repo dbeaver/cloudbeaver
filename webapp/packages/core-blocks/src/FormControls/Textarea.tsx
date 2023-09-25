@@ -7,7 +7,7 @@
  */
 import { observer } from 'mobx-react-lite';
 import { useCallback, useContext } from 'react';
-import styled, { css, use } from 'reshadow';
+import styled, { css } from 'reshadow';
 
 import type { ComponentStyle } from '@cloudbeaver/core-theming';
 
@@ -17,35 +17,9 @@ import elementsSizeStyles from '../Containers/shared/ElementsSize.m.css';
 import { s } from '../s';
 import { useS } from '../useS';
 import { useStyles } from '../useStyles';
-import { baseFormControlStyles, baseValidFormControlStyles } from './baseFormControlStyles';
 import { FormContext } from './FormContext';
-
-const styles = css`
-  textarea {
-    line-height: 19px;
-  }
-  field[|embedded] {
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-
-    & textarea {
-      border-radius: 0 !important;
-      height: 100%;
-      resize: none !important;
-    }
-  }
-  field-label {
-    display: block;
-    padding-bottom: 10px;
-    composes: theme-typography--body1 from global;
-    font-weight: 500;
-
-    &:empty {
-      display: none;
-    }
-  }
-`;
+import formControlStyles from './FormControl.m.css';
+import textareaStyle from './Textarea.m.css';
 
 type BaseProps = Omit<React.TextareaHTMLAttributes<HTMLTextAreaElement>, 'onChange' | 'style'> &
   ILayoutSizeProps & {
@@ -77,7 +51,7 @@ interface TextareaType {
 
 export const Textarea: TextareaType = observer(function Textarea({
   name,
-  style,
+  style: styleProp,
   value: controlledValue,
   state,
   required,
@@ -92,7 +66,7 @@ export const Textarea: TextareaType = observer(function Textarea({
 }: ControlledProps | ObjectProps<any, any>) {
   const layoutProps = getLayoutProps(rest);
   rest = filterLayoutFakeProps(rest);
-  const sizeStyles = useS(elementsSizeStyles);
+  const styles = useS(formControlStyles, elementsSizeStyles, textareaStyle);
   const context = useContext(FormContext);
 
   const handleChange = useCallback(
@@ -112,14 +86,21 @@ export const Textarea: TextareaType = observer(function Textarea({
 
   const value = state ? state[name] : controlledValue;
 
-  return styled(useStyles(baseFormControlStyles, baseValidFormControlStyles, styles, style))(
-    <field className={s(sizeStyles, { ...layoutProps }, className)} {...use({ embedded })}>
-      <field-label title={labelTooltip || rest.title}>
+  return styled(useStyles(styleProp))(
+    <div className={s(styles, { ...layoutProps, field: true, embedded }, className)}>
+      <label className={s(styles, { fieldLabel: true })} title={labelTooltip || rest.title}>
         {children}
         {required && ' *'}
-      </field-label>
-      <textarea {...rest} value={value ?? ''} name={name} data-embedded={embedded} onChange={handleChange} {...use({ mod })} />
-      {description && <field-description>{description}</field-description>}
-    </field>,
+      </label>
+      <textarea
+        {...rest}
+        className={s(styles, { textarea: true })}
+        value={value ?? ''}
+        name={name}
+        data-embedded={embedded}
+        onChange={handleChange}
+      />
+      {description && <div className={s(styles, { fieldDescription: true, valid: true })}>{description}</div>}
+    </div>,
   );
 });
