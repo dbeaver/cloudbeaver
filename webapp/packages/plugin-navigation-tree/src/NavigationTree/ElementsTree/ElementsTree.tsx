@@ -100,9 +100,18 @@ const oldStyles = css`
 `;
 
 export interface ElementsTreeProps extends IElementsTreeOptions, React.PropsWithChildren {
+  /**
+   * Specifies the root node for the elements tree, if applicable.
+   */
   root?: string;
   selectionTree?: boolean;
+  /**
+   * Specifies a custom control component for navigation tree.
+   */
   control?: NavTreeControlComponent;
+  /**
+   * A placeholder component to be displayed when the elements tree is empty.
+   */
   emptyPlaceholder?: React.FC;
   big?: boolean;
   style?: ComponentStyle;

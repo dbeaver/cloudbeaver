@@ -12,7 +12,9 @@ export interface IDatabaseDataOptions {
   connectionKey: IConnectionInfoParams;
   schema?: string;
   catalog?: string;
+  /** A raw string representation of the query filter conditions ("id=4") */
   whereFilter: string;
+  /** A complex object that can represent filters and sorting options of the result set */
   constraints: SqlDataFilterConstraint[];
   readLogs?: boolean;
 }

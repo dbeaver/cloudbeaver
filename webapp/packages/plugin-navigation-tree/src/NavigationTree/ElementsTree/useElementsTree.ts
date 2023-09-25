@@ -71,6 +71,9 @@ export interface IElementsTreeOptions {
   renderers?: IElementsTreeCustomRenderer[];
   nodeInfoTransformers?: IElementsTreeCustomNodeInfo[];
   expandStateGetters?: IElementsTreeNodeExpandInfoGetter[];
+  /**
+   * A field that stores the state of the node in the local storage. Ensuring that the state persists after a page refresh.
+   */
   localState?: MetadataMap<string, ITreeNodeState>;
   getChildren: (id: string) => string[] | undefined;
   loadChildren: (id: string, manual: boolean) => Promise<boolean>;
