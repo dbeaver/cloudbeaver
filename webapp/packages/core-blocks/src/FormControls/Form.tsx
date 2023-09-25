@@ -22,29 +22,28 @@ type FormDetailedProps = Omit<React.DetailedHTMLProps<React.FormHTMLAttributes<H
 };
 
 export const Form = forwardRef<HTMLFormElement, FormDetailedProps>(function Form(
-  { context, disabled: disabledProp, disableEnterSubmit, focusFirstChild, children, onSubmit, onChange = () => {}, ...rest },
+  { context, disabled: disabledProp, disableEnterSubmit, focusFirstChild, children, onSubmit, onChange, ...rest },
   ref,
 ) {
   const [focusedRef] = useFocus<HTMLFormElement>({ focusFirstChild });
-  let [disabled, setDisabled] = useState(false);
+  const [disabledLocal, setDisabledLocal] = useState(false);
 
-  disabled = disabled || disabledProp || false;
+  const disabled = disabledLocal || disabledProp || false;
 
   const formContext = useForm({
+    disableEnterSubmit,
     parent: context,
     onSubmit(event) {
       const result = onSubmit?.(event);
 
       if (result instanceof Promise) {
-        setDisabled(true);
+        setDisabledLocal(true);
         result.finally(() => {
-          setDisabled(false);
+          setDisabledLocal(false);
         });
-      } else {
-        setDisabled(false);
       }
     },
-    disableEnterSubmit,
+    onChange,
   });
 
   const setFormRef = useCombinedRef<HTMLFormElement>(formContext.setRef, focusedRef, ref);
