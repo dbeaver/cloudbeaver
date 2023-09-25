@@ -11,7 +11,6 @@ import { ExecutorHandlersCollection, ExecutorInterrupter, IExecutorHandler, type
 import type { LocalizationService } from '@cloudbeaver/core-localization';
 
 import { TabsContainer } from '../Tabs/TabsContainer/TabsContainer';
-import { FormMode } from './FormMode';
 import { formStatusContext } from './formStatusContext';
 import { formValidationContext } from './formValidationContext';
 import type { IFormProps } from './IFormProps';
