@@ -9,19 +9,19 @@ import { observer } from 'mobx-react-lite';
 import { useContext, useRef } from 'react';
 
 import { IResultSetRowKey, isBooleanValuePresentationAvailable } from '@cloudbeaver/plugin-data-viewer';
-import type { FormatterProps } from '@cloudbeaver/plugin-react-data-grid';
+import type { RenderCellProps } from '@cloudbeaver/plugin-react-data-grid';
 
 import { CellContext } from '../CellRenderer/CellContext';
 import { TableDataContext } from '../TableDataContext';
 import { BooleanFormatter } from './CellFormatters/BooleanFormatter';
 import { TextFormatter } from './CellFormatters/TextFormatter';
 
-interface IProps extends FormatterProps<IResultSetRowKey> {
+interface IProps extends RenderCellProps<IResultSetRowKey> {
   isEditing: boolean;
 }
 
 export const CellFormatterFactory = observer<IProps>(function CellFormatterFactory(props) {
-  const formatterRef = useRef<React.FC<FormatterProps<IResultSetRowKey>> | null>(null);
+  const formatterRef = useRef<React.FC<RenderCellProps<IResultSetRowKey>> | null>(null);
   const tableDataContext = useContext(TableDataContext);
   const cellContext = useContext(CellContext);
 

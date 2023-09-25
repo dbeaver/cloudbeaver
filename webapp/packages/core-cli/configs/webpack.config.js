@@ -242,6 +242,7 @@ module.exports = (env, argv) => {
     plugins: [
       new ForkTsCheckerWebpackPlugin({
         typescript: {
+          configFile: resolve('tsconfig.json'),
           configOverwrite: {
             include: ['**/src/**/*.ts', '**/src/**/*.tsx'],
           },

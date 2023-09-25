@@ -20,12 +20,14 @@ export type CheckboxMod = 'primary' | 'surface' | 'small';
 const checkboxStyles = css`
   checkbox {
     composes: theme-checkbox from global;
+    box-sizing: content-box !important;
   }
   checkbox-input {
     composes: theme-checkbox_native-control from global;
   }
   checkbox-background {
     composes: theme-checkbox__background from global;
+    box-sizing: border-box !important;
   }
   checkbox-checkmark {
     composes: theme-checkbox__checkmark from global;
@@ -42,6 +44,7 @@ const checkboxStyles = css`
   checkbox-container {
     display: flex;
     align-items: center;
+    height: 32px;
   }
   checkbox-label {
     composes: theme-typography--body2 from global;

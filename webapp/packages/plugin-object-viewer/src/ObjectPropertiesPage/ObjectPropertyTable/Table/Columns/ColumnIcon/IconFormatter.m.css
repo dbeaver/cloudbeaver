@@ -6,10 +6,13 @@
  * you may not use this file except in compliance with the License.
  */
 
-@mixin base-common-dialog() {
-  :global(.#{$theme-class}) {
-    dialog-body-overflow {
-      background-image: linear-gradient(to top, $mdc-theme-surface, rgba($mdc-theme-surface, 0));
-    }
-  }
+.icon {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.staticImage {
+  width: 16px;
 }

@@ -17,6 +17,7 @@
 package io.cloudbeaver.server.events;
 
 import io.cloudbeaver.model.session.BaseWebSession;
+import io.cloudbeaver.service.security.SMUtils;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
@@ -24,11 +25,14 @@ import org.jkiss.dbeaver.model.websocket.event.permissions.WSSubjectPermissionEv
 import org.jkiss.utils.ArrayUtils;
 import org.jkiss.utils.CommonUtils;
 
+import java.util.HashSet;
+
 public class WSSubjectPermissionUpdatedEventHandler extends WSDefaultEventHandler<WSSubjectPermissionEvent> {
     private static final Log log = Log.getLog(WSSubjectPermissionUpdatedEventHandler.class);
 
     @Override
     protected void updateSessionData(@NotNull BaseWebSession activeUserSession, @NotNull WSSubjectPermissionEvent event) {
+        var oldUserPermissions = new HashSet<>(activeUserSession.getUserContext().getUserPermissions());
         try {
             activeUserSession.getUserContext().refreshSMSession();
         } catch (DBException e) {
@@ -36,7 +40,11 @@ public class WSSubjectPermissionUpdatedEventHandler extends WSDefaultEventHandle
             log.error("Error refreshing session", e);
         }
         activeUserSession.refreshUserData();
-        super.updateSessionData(activeUserSession, event);
+        var newUserPermissions = activeUserSession.getUserContext().getUserPermissions();
+        boolean shouldUpdateData = !(SMUtils.isRMAdmin(oldUserPermissions) && SMUtils.isRMAdmin(newUserPermissions));
+        if (shouldUpdateData) {
+            super.updateSessionData(activeUserSession, event);
+        }
     }
 
     @Override

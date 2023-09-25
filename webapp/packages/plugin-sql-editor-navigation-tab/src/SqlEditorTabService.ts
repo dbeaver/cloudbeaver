@@ -309,6 +309,7 @@ export class SqlEditorTabService extends Bootstrap {
     tab.handlerState.resultTabs = observable([]);
     tab.handlerState.executionPlanTabs = observable([]);
     tab.handlerState.statisticsTabs = observable([]);
+    tab.handlerState.outputLogsTab = undefined;
 
     return true;
   }

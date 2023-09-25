@@ -9,33 +9,16 @@ import { observer } from 'mobx-react-lite';
 import { forwardRef, useContext, useEffect, useImperativeHandle, useLayoutEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { usePopper } from 'react-popper';
-import styled, { css } from 'reshadow';
 
+import { s, useS } from '@cloudbeaver/core-blocks';
 import { EventContext, EventStopPropagationFlag } from '@cloudbeaver/core-events';
 import { InlineEditor } from '@cloudbeaver/core-ui';
 import type { IResultSetElementKey, IResultSetRowKey } from '@cloudbeaver/plugin-data-viewer';
-import type { EditorProps } from '@cloudbeaver/plugin-react-data-grid';
+import type { RenderEditCellProps } from '@cloudbeaver/plugin-react-data-grid';
 
-import { DataGridContext, IColumnResizeInfo } from '../DataGridContext';
-import { TableDataContext } from '../TableDataContext';
-
-const styles = css`
-  editor {
-    composes: theme-typography--body2 from global;
-  }
-  box {
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: 0;
-    height: 100%;
-  }
-  InlineEditor {
-    font-size: 12px;
-    left: -1px;
-    top: 0;
-  }
-`;
+import style from './CellEditor.m.css';
+import { DataGridContext, IColumnResizeInfo } from './DataGridContext';
+import { TableDataContext } from './TableDataContext';
 
 export interface IEditorRef {
   focus: () => void;
@@ -43,7 +26,7 @@ export interface IEditorRef {
 
 const lockNavigation = ['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Home', 'End', 'Enter'];
 
-export const CellEditor = observer<Pick<EditorProps<IResultSetRowKey>, 'row' | 'column' | 'onClose'>, IEditorRef>(
+export const CellEditor = observer<Pick<RenderEditCellProps<IResultSetRowKey>, 'row' | 'column' | 'onClose'>, IEditorRef>(
   forwardRef(function CellEditor({ row, column, onClose }, ref) {
     const dataGridContext = useContext(DataGridContext);
     const tableDataContext = useContext(TableDataContext);
@@ -54,6 +37,7 @@ export const CellEditor = observer<Pick<EditorProps<IResultSetRowKey>, 'row' | '
       placement: 'right',
       modifiers: [{ name: 'flip', enabled: false }],
     });
+    const styles = useS(style);
 
     if (!dataGridContext || !tableDataContext || column.columnDataIndex === null) {
       throw new Error('DataGridContext should be provided');
@@ -114,10 +98,10 @@ export const CellEditor = observer<Pick<EditorProps<IResultSetRowKey>, 'row' | '
       event.stopPropagation();
     };
 
-    return styled(styles)(
-      <box
+    return (
+      <div
         ref={setElementRef}
-        as="div"
+        className={s(styles, { box: true })}
         onKeyDown={handleKeyDown}
         onClick={preventClick}
         onDoubleClick={preventClick}
@@ -126,11 +110,12 @@ export const CellEditor = observer<Pick<EditorProps<IResultSetRowKey>, 'row' | '
       >
         {
           createPortal(
-            <editor ref={setPopperRef} as="div" style={popper.styles.popper} {...popper.attributes.popper}>
+            <div ref={setPopperRef} className={s(styles, { editor: true })} style={popper.styles.popper} {...popper.attributes.popper}>
               <InlineEditor
                 ref={inputRef}
                 value={value}
                 controlsPosition="inside"
+                className={s(styles, { inlineEditor: true })}
                 edited
                 hideSave
                 hideCancel
@@ -143,11 +128,11 @@ export const CellEditor = observer<Pick<EditorProps<IResultSetRowKey>, 'row' | '
                 onChange={handleChange}
                 onUndo={handleUndo}
               />
-            </editor>,
+            </div>,
             dataGridContext.getEditorPortal()!,
           ) as any
         }
-      </box>,
+      </div>
     );
   }),
 );

@@ -5,8 +5,10 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
+import { createKeyBinding } from '@cloudbeaver/core-view';
 
-@import "@cloudbeaver/core-theming/src/styles/theme-dark";
-@import "base-common-dialog";
-
-@include base-common-dialog;
+export const KEY_BINDING_SQL_EDITOR_SHOW_OUTPUT = createKeyBinding({
+  id: 'sql-editor-show-output',
+  keys: 'shift+ctrl+o',
+  preventDefault: true,
+});

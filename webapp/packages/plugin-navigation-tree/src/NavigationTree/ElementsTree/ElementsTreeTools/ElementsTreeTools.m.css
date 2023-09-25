@@ -15,7 +15,3 @@
   flex-direction: row;
   overflow-x: auto;
 }
-
-.fill {
-  flex: 1;
-}

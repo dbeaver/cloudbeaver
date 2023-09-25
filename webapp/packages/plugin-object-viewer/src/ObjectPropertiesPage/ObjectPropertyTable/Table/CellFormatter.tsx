@@ -17,7 +17,7 @@ import { ContextMenu } from '@cloudbeaver/core-ui';
 import { useMenu } from '@cloudbeaver/core-view';
 import { DATA_CONTEXT_CONNECTION } from '@cloudbeaver/plugin-connections';
 import { MENU_NAV_TREE, useNode } from '@cloudbeaver/plugin-navigation-tree';
-import type { FormatterProps } from '@cloudbeaver/plugin-react-data-grid';
+import type { RenderCellProps } from '@cloudbeaver/plugin-react-data-grid';
 
 import { getValue } from '../../helpers';
 import { TableContext } from './TableContext';
@@ -99,7 +99,7 @@ export const Menu = observer<Props>(function Menu({ value, node }) {
   );
 });
 
-export const CellFormatter = observer<FormatterProps<DBObject>>(function CellFormatter(props) {
+export const CellFormatter = observer<RenderCellProps<DBObject>>(function CellFormatter(props) {
   const tableContext = useContext(TableContext);
 
   if (!tableContext.tableData) {

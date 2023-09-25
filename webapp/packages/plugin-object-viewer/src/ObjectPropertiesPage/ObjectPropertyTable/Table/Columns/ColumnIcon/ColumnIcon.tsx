@@ -16,6 +16,6 @@ export const ColumnIcon: ICustomColumn = {
   maxWidth: 40,
   minWidth: 40,
   frozen: true,
-  formatter: IconFormatter,
+  renderCell: props => <IconFormatter {...props} />,
   order: 1,
 };

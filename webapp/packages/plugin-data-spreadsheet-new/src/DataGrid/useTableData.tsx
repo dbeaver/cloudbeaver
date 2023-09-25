@@ -35,11 +35,10 @@ export const indexColumn: Column<IResultSetRowKey, any> = {
   name: '#',
   minWidth: 60,
   width: 60,
-  selectable: false,
   resizable: false,
   frozen: true,
-  headerRenderer: TableIndexColumnHeader,
-  formatter: IndexFormatter,
+  renderHeaderCell: props => <TableIndexColumnHeader {...props} />,
+  renderCell: props => <IndexFormatter {...props} />,
 };
 
 const COLUMN_PADDING = 16 + 2;
@@ -54,7 +53,6 @@ export function useTableData(
   model: IDatabaseDataModel<any, IDatabaseResultSet>,
   resultIndex: number,
   gridDIVElement: React.RefObject<HTMLDivElement | null>,
-  onCellKeyDown?: (event: React.KeyboardEvent<HTMLDivElement>) => void,
 ): ITableData {
   const format = model.source.getAction(resultIndex, ResultSetFormatAction);
   const data = model.source.getAction(resultIndex, ResultSetDataAction);
@@ -94,16 +92,12 @@ export function useTableData(
         }).map(width => width + COLUMN_PADDING);
 
         const columns: Array<Column<IResultSetRowKey, any>> = this.columnKeys.map<Column<IResultSetRowKey, any>>((col, index) => ({
-          // key: uuid(),
           key: ResultSetDataKeysUtils.serialize(col),
           columnDataIndex: col,
           name: this.getColumnInfo(col)?.label || '?',
           editable: true,
           width: Math.min(300, Math.max(columnsWidth[index], cellsWidth[index] ?? 0)),
-          headerRenderer: TableColumnHeader,
-          editorOptions: {
-            onCellKeyDown,
-          },
+          renderHeaderCell: props => <TableColumnHeader {...props} />,
         }));
         columns.unshift(indexColumn);
 
