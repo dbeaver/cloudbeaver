@@ -78,8 +78,7 @@ export class FormBaseService<TState, TProps extends IFormProps<TState> = IFormPr
       const messages = validation.messages.map(message => this.localizationService.translate(message));
       this.notificationService.notify(
         {
-          title:
-            data.mode === FormMode.Edit ? 'connections_administration_connection_save_error' : 'connections_administration_connection_create_error',
+          title: 'core_ui_form_save_error',
           message: messages.join('\n'),
         },
         validation.valid ? ENotificationType.Info : ENotificationType.Error,
