@@ -7,7 +7,7 @@
  */
 import { observer } from 'mobx-react-lite';
 import { ReactNode, useContext, useState } from 'react';
-import styled, { css } from 'reshadow';
+import styled from 'reshadow';
 
 import type { ComponentStyle } from '@cloudbeaver/core-theming';
 import { blobToData, bytesToSize } from '@cloudbeaver/core-utils';
@@ -22,35 +22,11 @@ import { s } from '../s';
 import { UploadArea } from '../UploadArea';
 import { useS } from '../useS';
 import { useStyles } from '../useStyles';
-import { baseFormControlStyles, baseInvalidFormControlStyles, baseValidFormControlStyles } from './baseFormControlStyles';
 import { FormContext } from './FormContext';
+import formControlStyles from './FormControl.m.css';
+import inputFileTextContentStyles from './InputFileTextContent.m.css';
 
 const DEFAULT_MAX_FILE_SIZE = 2048;
-
-const INPUT_FILE_FIELD_STYLES = css`
-  field-label {
-    display: block;
-    composes: theme-typography--body1 from global;
-    font-weight: 500;
-  }
-  field-label:not(:empty) {
-    padding-bottom: 10px;
-  }
-  field-description {
-    display: flex;
-    align-items: center;
-    gap: 2px;
-  }
-  IconButton {
-    width: 12px;
-    height: 12px;
-    flex-shrink: 0;
-    cursor: pointer;
-    &:hover {
-      opacity: 0.5;
-    }
-  }
-`;
 
 interface Props<TState> extends ILayoutSizeProps {
   name: keyof TState;
@@ -80,7 +56,7 @@ export const InputFileTextContent: InputFileTextContentType = observer(function 
   tooltip,
   required,
   fileName,
-  style,
+  style: styleProp,
   maxFileSize = DEFAULT_MAX_FILE_SIZE,
   disabled,
   className,
@@ -97,8 +73,7 @@ export const InputFileTextContent: InputFileTextContentType = observer(function 
 
   const layoutProps = getLayoutProps(rest);
   rest = filterLayoutFakeProps(rest);
-  const styles = useStyles(INPUT_FILE_FIELD_STYLES, baseFormControlStyles, style, error ? baseInvalidFormControlStyles : baseValidFormControlStyles);
-  const sizeStyles = useS(elementsSizeStyles);
+  const styles = useS(formControlStyles, elementsSizeStyles, inputFileTextContentStyles);
 
   const savedExternally = !!fileName && state[name] !== '';
   const saved = savedExternally || !!state[name];
@@ -166,21 +141,28 @@ export const InputFileTextContent: InputFileTextContentType = observer(function 
     }
   }
 
-  return styled(styles)(
-    <field className={s(sizeStyles, { ...layoutProps }, className)}>
-      <field-label title={labelTooltip}>
+  return styled(useStyles(styleProp))(
+    <div className={s(styles, { ...layoutProps, field: true }, className)}>
+      <div className={s(styles, { fieldLabel: true })} title={labelTooltip}>
         {children}
         {required && ' *'}
-      </field-label>
+      </div>
       <UploadArea title={tooltip} disabled={disabled} accept={accept} reset onChange={handleChange}>
         <Button icon="/icons/import.svg" tag="div" mod={['outlined']} disabled={disabled}>
           {translate('ui_upload_file')}
         </Button>
       </UploadArea>
-      <field-description>
+      <div className={s(styles, { fieldDescription: true })}>
         {description}
-        {(selected || saved) && <IconButton disabled={disabled} name="cross" onClick={removeFile} />}
-      </field-description>
-    </field>,
+        {(selected || saved) && (
+          <IconButton
+            className={s(styles, { iconButton: true, valid: !error, invalid: !!error })}
+            disabled={disabled}
+            name="cross"
+            onClick={removeFile}
+          />
+        )}
+      </div>
+    </div>,
   );
 });
