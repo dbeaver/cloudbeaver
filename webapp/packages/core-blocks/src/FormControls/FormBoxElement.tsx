@@ -5,28 +5,20 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import styled, { css, use } from 'reshadow';
+import { observer } from 'mobx-react-lite';
 
-const styles = css`
-  box-element {
-    flex-basis: 550px;
-    flex-grow: 1;
-
-    &[|max] {
-      width: 100%;
-    }
-  }
-`;
+import { s } from '../s';
+import { useS } from '../useS';
+import style from './FormBoxElement.m.css';
 
 interface Props {
   className?: string;
   max?: boolean;
+  children?: React.ReactNode;
 }
 
-export const FormBoxElement: React.FC<React.PropsWithChildren<Props>> = function FormBoxElement({ children, className, max }) {
-  return styled(styles)(
-    <box-element as="div" className={className} {...use({ max })}>
-      {children}
-    </box-element>,
-  );
-};
+export const FormBoxElement = observer<Props>(function FormBoxElement({ children, className, max }) {
+  const styles = useS(style);
+
+  return <div className={s(styles, { boxElement: true, max })}>{children}</div>;
+});
