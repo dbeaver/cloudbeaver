@@ -7,7 +7,6 @@
  */
 import { observer } from 'mobx-react-lite';
 import React, { forwardRef, useContext } from 'react';
-import styled, { use } from 'reshadow';
 
 import {
   ConnectionImageWithMask,
@@ -26,9 +25,9 @@ import { EventContext, EventStopPropagationFlag } from '@cloudbeaver/core-events
 import { EObjectFeature, NavNodeInfoResource, NavTreeResource } from '@cloudbeaver/core-navigation-tree';
 
 import type { NavTreeControlComponent, NavTreeControlProps } from '../ElementsTree/NavigationNodeComponent';
+import style from '../ElementsTree/NavigationTreeNode/NavigationNode/NavigationNodeControl.m.css';
 import { NavigationNodeExpand } from '../ElementsTree/NavigationTreeNode/NavigationNode/NavigationNodeExpand';
 import { TreeNodeMenuLoader } from '../ElementsTree/NavigationTreeNode/TreeNodeMenu/TreeNodeMenuLoader';
-import style from '../NavigationNodeControl.m.css';
 
 export const ConnectionNavNodeControl: NavTreeControlComponent = observer<NavTreeControlProps, HTMLDivElement>(
   forwardRef(function ConnectionNavNodeControl({ node, nodeInfo, dndElement, dndPlaceholder, className, onClick }, ref) {
