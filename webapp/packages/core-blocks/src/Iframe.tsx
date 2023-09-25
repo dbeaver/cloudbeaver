@@ -8,7 +8,7 @@
 import { observer } from 'mobx-react-lite';
 import type { DetailedHTMLProps, IframeHTMLAttributes } from 'react';
 
-import style from './iframe.m.css';
+import style from './Iframe.m.css';
 import { s } from './s';
 import { useS } from './useS';
 
