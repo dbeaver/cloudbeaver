@@ -11,12 +11,12 @@
     transition: width cubic-bezier(0.4, 0, 0.2, 1) 0.6s;
     width: 100%;
   }
+}
 
-  &.open {
-    transform: translateX(0%);
+.open .slideElement {
+  transform: translateX(0%);
 
-    &:first-child {
-      width: calc(100% - 120px);
-    }
+  &:first-child {
+    width: calc(100% - 120px);
   }
 }

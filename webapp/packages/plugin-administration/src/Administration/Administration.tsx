@@ -138,21 +138,21 @@ export const Administration = observer<React.PropsWithChildren<Props>>(function 
           </TabList>
           <content-container ref={contentRef} as="div">
             {children}
-            <SlideBox>
-              <SlideElement open={optionsPanelService.active}>
+            <SlideBox open={optionsPanelService.active}>
+              <SlideElement>
                 <Loader suspense>
                   <content>
                     <OptionsPanel />
                   </content>
                 </Loader>
               </SlideElement>
-              <SlideElement open={optionsPanelService.active}>
+              <SlideElement>
                 <Loader suspense>
                   <content>
                     <ItemContent activeScreen={activeScreen} configurationWizard={configurationWizard} />
                   </content>
                 </Loader>
-                <SlideOverlay open={optionsPanelService.active} onClick={() => optionsPanelService.close()} />
+                <SlideOverlay onClick={() => optionsPanelService.close()} />
               </SlideElement>
             </SlideBox>
           </content-container>

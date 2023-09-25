@@ -19,11 +19,11 @@ interface Props {
   open?: boolean;
 }
 
-export const SlideOverlay = observer<Props>(function SlideOverlay({ className, open, onClick }) {
+export const SlideOverlay = observer<Props>(function SlideOverlay({ className, onClick }) {
   const styles = useS(style);
 
   return (
-    <div className={s(styles, { slideOverlay: true, open }, className)} onClick={onClick}>
+    <div className={s(styles, { slideOverlay: true }, className)} onClick={onClick}>
       <div className={s(styles, { iconBtn: true })}>
         <Icon className={s(styles, { icon: true })} name="angle" viewBox="0 0 15 8" />
       </div>

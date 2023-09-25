@@ -9,15 +9,20 @@ import { observer } from 'mobx-react-lite';
 import { useEffect, useRef } from 'react';
 
 import { s, useS } from '../index';
-import style from './SlideBox.m.css';
+import SlideBoxStyles from './SlideBox.m.css';
+import SlideBoxElementStyles from './SlideElement.m.css';
+import SlideBoxOverlayStyles from './SlideOverlay.m.css';
 
 interface Props {
   className?: string;
   children?: React.ReactNode;
+  open?: boolean;
 }
 
-export const SlideBox = observer<Props>(function SlideBox({ children, className }) {
-  const styles = useS(style);
+export const SlideBox = observer<Props>(function SlideBox({ children, open, className }) {
+  const slideBoxStyles = useS(SlideBoxStyles);
+  const slideBoxElementStyles = useS(SlideBoxElementStyles);
+  const slideBoxOverlayStyles = useS(SlideBoxOverlayStyles);
   const divRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -42,7 +47,10 @@ export const SlideBox = observer<Props>(function SlideBox({ children, className 
   }, []);
 
   return (
-    <div ref={divRef} className={s(styles, { slideBox: true }, className)}>
+    <div
+      ref={divRef}
+      className={s(slideBoxStyles, { slideBox: true}, s(slideBoxElementStyles, { open }), s(slideBoxOverlayStyles, { open }), className)}
+    >
       {children}
     </div>
   );

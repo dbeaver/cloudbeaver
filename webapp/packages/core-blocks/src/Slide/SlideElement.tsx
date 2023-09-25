@@ -17,8 +17,8 @@ interface Props {
   open?: boolean;
 }
 
-export const SlideElement = observer<Props>(function SlideElement({ children,open, className }) {
+export const SlideElement = observer<Props>(function SlideElement({ children, className }) {
   const styles = useS(style);
 
-  return <div className={s(styles, { slideElement: true, open }, className)}>{children}</div>;
+  return <div className={s(styles, { slideElement: true }, className)}>{children}</div>;
 });
