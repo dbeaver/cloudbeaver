@@ -28,7 +28,9 @@ enum CBServerEventId {
     cb_rm_project_removed,
 
     cb_object_permissions_updated,
-    cb_subject_permissions_updated
+    cb_subject_permissions_updated,
+
+    cb_database_output_log_updated
 }
 
 # Events sent by client
@@ -48,7 +50,8 @@ enum CBEventTopic {
     cb_scripts,
     cb_projects,
     cb_object_permissions,
-    cb_subject_permissions
+    cb_subject_permissions,
+    cb_database_output_log
 }
 
 # Base server event interface
@@ -151,6 +154,22 @@ type CBProjectsActiveEvent implements CBClientEvent {
     id: CBClientEventId!
     topicId: CBEventTopic
     projectIds: [String!]! # list of active projects
+}
+
+# Database output log event
+type CBDatabaseOutputLogEvent implements CBServerEvent {
+    id: CBServerEventId!
+    topicId: CBEventTopic
+    contextId: String!
+    messages: [WSOutputLogInfo!]!
+    eventTimestamp: Int!
+}
+
+# Define the type for WSOutputLogInfo
+type WSOutputLogInfo {
+    severity: String
+    message: String
+    # Add more fields as needed
 }
 
 extend type Query {
