@@ -5,19 +5,19 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import styled, { css } from 'reshadow';
+import { observer } from 'mobx-react-lite';
 
-const styles = css`
-  group {
-    box-sizing: border-box;
-    display: flex;
-  }
-`;
+import { s } from '../s';
+import { useS } from '../useS';
+import style from './FormGroup.m.css';
 
 interface Props {
   className?: string;
+  children?: React.ReactNode;
 }
 
-export const FormGroup: React.FC<React.PropsWithChildren<Props>> = function FormGroup({ children, className }) {
-  return styled(styles)(<group className={className}>{children}</group>);
-};
+export const FormGroup = observer<Props>(function FormGroup({ children, className }) {
+  const styles = useS(style);
+
+  return <div className={s(styles, { group: true }, className)}>{children}</div>;
+});

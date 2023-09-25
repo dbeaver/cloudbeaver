@@ -61,7 +61,6 @@ export const Filter = observer<ControlledProps | ObjectsProps<any, any>>(functio
   onClick,
 }) {
   const styles = useS(filterStyle);
-  const oldStyles = useStyles(propStyle);
   const [inputRef, ref] = useFocus<HTMLInputElement>({});
   const [toggled, setToggled] = useState(!toggleMode);
 
@@ -108,7 +107,7 @@ export const Filter = observer<ControlledProps | ObjectsProps<any, any>>(functio
     value = state[name];
   }
 
-  return styled(oldStyles)(
+  return styled(useStyles(propStyle))(
     <div className={s(styles, { filterContainer: true })} onClick={onClick}>
       <InputField
         className={s(styles, { inputField: true, max, toggled })}
