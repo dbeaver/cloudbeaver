@@ -5,56 +5,32 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import styled, { css } from 'reshadow';
+import { observer } from 'mobx-react-lite';
 
 import { filterLayoutFakeProps, getLayoutProps } from '../Containers/filterLayoutFakeProps';
 import type { ILayoutSizeProps } from '../Containers/ILayoutSizeProps';
 import elementsSizeStyles from '../Containers/shared/ElementsSize.m.css';
 import { s } from '../s';
 import { useS } from '../useS';
-import { useStyles } from '../useStyles';
-import { baseFormControlStyles, baseValidFormControlStyles } from './baseFormControlStyles';
-
-const style = css`
-  field-label {
-    composes: theme-typography--body1 from global;
-    font-weight: 500;
-    margin-bottom: 10px;
-    box-sizing: border-box;
-    overflow: hidden;
-    white-space: initial;
-    text-overflow: ellipsis;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-  }
-  field-description {
-    padding: 0;
-  }
-`;
+import formControlStyles from './FormControl.m.css';
+import style from './FormFieldDescription.m.css';
 
 interface Props extends ILayoutSizeProps {
   label?: string;
   title?: string;
   className?: string;
+  children?: React.ReactNode;
 }
 
-export const FormFieldDescription: React.FC<React.PropsWithChildren<Props>> = function FormFieldDescription({
-  label,
-  title,
-  children,
-  className,
-  ...rest
-}) {
+export const FormFieldDescription = observer<Props>(function FormFieldDescription({ label, title, children, className, ...rest }) {
+  const styles = useS(formControlStyles, elementsSizeStyles, style);
   const layoutProps = getLayoutProps(rest);
   rest = filterLayoutFakeProps(rest);
-  const styles = useStyles(baseFormControlStyles, baseValidFormControlStyles, style);
-  const sizeStyles = useS(elementsSizeStyles);
 
-  return styled(styles)(
-    <field title={title} className={s(sizeStyles, { ...layoutProps }, className)} {...rest}>
-      {label && <field-label as="label">{label}</field-label>}
-      <field-description>{children}</field-description>
-    </field>,
+  return (
+    <div title={title} className={s(styles, { ...layoutProps, field: true }, className)} {...rest}>
+      {label && <label className={s(styles, { fieldLabel: true })}>{label}</label>}
+      <div className={s(styles, { fieldDescription: true, valid: true })}>{children}</div>
+    </div>
   );
-};
+});
