@@ -25,6 +25,8 @@ import {
 import { ProcessNotificationController } from './ProcessNotificationController';
 
 export const DELAY_DELETING = 1000;
+const TIMESTAMP_DIFFERENCE_THRESHOLD = 100;
+
 @injectable()
 export class NotificationService {
   // todo change to common new Map()
@@ -56,6 +58,17 @@ export class NotificationService {
 
       if (persistentNotifications.length >= maxPersistentAllow) {
         throw new Error(`You cannot create more than ${maxPersistentAllow} persistent notification`);
+      }
+    }
+
+    if (options.details !== undefined) {
+      const currentTime = options.timestamp || Date.now();
+      const previousNotification = this.notificationList.values.reverse().find(notification => notification.details === options.details);
+
+      if (previousNotification) {
+        if (currentTime - previousNotification.timestamp < TIMESTAMP_DIFFERENCE_THRESHOLD) {
+          return previousNotification;
+        }
       }
     }
 
@@ -183,6 +196,15 @@ export class NotificationService {
     }
 
     console.error(exception);
+  }
+
+  throwSilently(exception: Error | GQLError | undefined | null): void {
+    this.logError({
+      title: '',
+      details: exception,
+      isSilent: true,
+    });
+    throw exception;
   }
 
   close(id: number, delayDeleting = true): void {

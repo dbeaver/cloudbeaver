@@ -6,32 +6,26 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import styled, { css } from 'reshadow';
 
-import { Button, ColoredContainer, FormFieldDescription, Group, IconOrImage, Link, TextPlaceholder, useTranslate } from '@cloudbeaver/core-blocks';
+import {
+  Button,
+  ColoredContainer,
+  FormFieldDescription,
+  Group,
+  IconOrImage,
+  Link,
+  s,
+  TextPlaceholder,
+  useS,
+  useTranslate,
+} from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { CommonDialogBody, CommonDialogFooter, CommonDialogHeader, CommonDialogWrapper, DialogComponentProps } from '@cloudbeaver/core-dialogs';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
 import { ThemeService } from '@cloudbeaver/core-theming';
 import { useAppVersion } from '@cloudbeaver/plugin-version';
 
-const productInfoDialogStyles = css`
-  contacts-info {
-    display: flex;
-    white-space: pre-wrap;
-  }
-  FormFieldDescription {
-    white-space: pre-wrap;
-  }
-  IconOrImage {
-    max-width: 154px;
-    height: 32px;
-  }
-  CommonDialogFooter {
-    align-items: center;
-    justify-content: flex-end;
-  }
-`;
+import ProductInfoDialogStyles from './ProductInfoDialog.m.css';
 
 export const ProductInfoDialog = observer<DialogComponentProps<null>>(function ProductInfoDialog(props) {
   const translate = useTranslate();
@@ -43,7 +37,9 @@ export const ProductInfoDialog = observer<DialogComponentProps<null>>(function P
   const productInfo = serverConfigResource.data?.productInfo;
   const logoIcon = themeService.currentThemeId === 'light' ? '/icons/product-logo_light.svg' : '/icons/product-logo_dark.svg';
 
-  return styled(productInfoDialogStyles)(
+  const styles = useS(ProductInfoDialogStyles);
+
+  return (
     <CommonDialogWrapper size="large">
       <CommonDialogHeader title="app_product_info" onReject={props.rejectDialog} />
       <CommonDialogBody>
@@ -53,17 +49,29 @@ export const ProductInfoDialog = observer<DialogComponentProps<null>>(function P
               <TextPlaceholder>{translate('app_product_info_placeholder')}</TextPlaceholder>
             ) : (
               <>
-                <IconOrImage icon={logoIcon} />
-                <FormFieldDescription label={translate('app_product_info_name')}>{productInfo.name}</FormFieldDescription>
-                <FormFieldDescription label={translate('app_product_info_description')}>{productInfo.description}</FormFieldDescription>
+                <IconOrImage className={s(styles, { iconOrImage: true })} icon={logoIcon} />
+                <FormFieldDescription className={s(styles, { formFieldDescription: true })} label={translate('app_product_info_name')}>
+                  {productInfo.name}
+                </FormFieldDescription>
+                <FormFieldDescription className={s(styles, { formFieldDescription: true })} label={translate('app_product_info_description')}>
+                  {productInfo.description}
+                </FormFieldDescription>
                 {productInfo.licenseInfo && (
-                  <FormFieldDescription label={translate('app_product_info_license_info')}>{productInfo.licenseInfo}</FormFieldDescription>
+                  <FormFieldDescription className={s(styles, { formFieldDescription: true })} label={translate('app_product_info_license_info')}>
+                    {productInfo.licenseInfo}
+                  </FormFieldDescription>
                 )}
-                <FormFieldDescription label={translate('app_product_info_build_time')}>{productInfo.buildTime}</FormFieldDescription>
-                <FormFieldDescription label="Backend version">{productInfo.version}</FormFieldDescription>
-                <FormFieldDescription label="Frontend version">{version.frontendVersion}</FormFieldDescription>
-                <FormFieldDescription label={translate('app_product_info_contacts')}>
-                  <contacts-info>
+                <FormFieldDescription className={s(styles, { formFieldDescription: true })} label={translate('app_product_info_build_time')}>
+                  {productInfo.buildTime}
+                </FormFieldDescription>
+                <FormFieldDescription className={s(styles, { formFieldDescription: true })} label="Backend version">
+                  {productInfo.version}
+                </FormFieldDescription>
+                <FormFieldDescription className={s(styles, { formFieldDescription: true })} label="Frontend version">
+                  {version.frontendVersion}
+                </FormFieldDescription>
+                <FormFieldDescription className={s(styles, { formFieldDescription: true })} label={translate('app_product_info_contacts')}>
+                  <div className={s(styles, { contactsInfo: true })}>
                     You can contact us via our
                     <Link href="https://cloudbeaver.io/contact/" target="_blank" rel="noopener noreferrer">
                       {' '}
@@ -74,18 +82,18 @@ export const ProductInfoDialog = observer<DialogComponentProps<null>>(function P
                       {' '}
                       Github
                     </Link>
-                  </contacts-info>
+                  </div>
                 </FormFieldDescription>
               </>
             )}
           </Group>
         </ColoredContainer>
       </CommonDialogBody>
-      <CommonDialogFooter>
+      <CommonDialogFooter className={s(styles, { commonDialogFooter: true })}>
         <Button type="button" mod={['outlined']} onClick={props.rejectDialog}>
           {translate('ui_processing_ok')}
         </Button>
       </CommonDialogFooter>
-    </CommonDialogWrapper>,
+    </CommonDialogWrapper>
   );
 });

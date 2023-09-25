@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 import { action, observable } from 'mobx';
-import { useContext, useMemo } from 'react';
+import { useContext, useEffect } from 'react';
 
 import { useObservableRef } from '../useObservableRef';
 import { useUserData } from '../useUserData';
@@ -26,15 +26,17 @@ export function useFolderExplorer(root: string, options: IFolderExplorerOptions 
     data => typeof data === 'object' && typeof data.folder === 'string' && Array.isArray(data.path) && Array.isArray(data.fullPath),
   );
 
-  useMemo(
+  const saveState = options.saveState;
+
+  useEffect(
     action(() => {
-      if (!options.saveState) {
+      if (!saveState) {
         userState.folder = root;
         userState.fullPath = [root];
         userState.path = [];
       }
     }),
-    [userState],
+    [userState, saveState],
   );
 
   const data = useObservableRef<IFolderExplorerContext>(

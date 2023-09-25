@@ -145,6 +145,8 @@ export const PropertyItem = observer<Props>(function PropertyItem({ property, va
   }, [property]);
 
   const focus = menuOpen;
+  const keyPlaceholder = String(property.keyPlaceholder);
+  const valuePlaceholder = String(property.valuePlaceholder);
 
   return styled(styles)(
     <property-item>
@@ -153,7 +155,7 @@ export const PropertyItem = observer<Props>(function PropertyItem({ property, va
           ref={keyInputRef}
           type="text"
           name={property.id}
-          placeholder={property.keyPlaceholder}
+          placeholder={keyPlaceholder}
           readOnly={!isDeletable}
           autoComplete="none"
           onChange={handleKeyChange}
@@ -161,11 +163,11 @@ export const PropertyItem = observer<Props>(function PropertyItem({ property, va
           {property.displayName || property.key}
         </ShadowInput>
       </property-name>
-      <property-value ref={setValueRef} title={propertyValue}>
+      <property-value ref={setValueRef} title={String(propertyValue)}>
         <ShadowInput
           type="text"
           name={`${property.id}_value`}
-          placeholder={property.valuePlaceholder}
+          placeholder={valuePlaceholder}
           autoComplete="none"
           readOnly={readOnly}
           data-focus={focus}

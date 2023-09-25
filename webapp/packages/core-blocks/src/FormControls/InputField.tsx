@@ -6,13 +6,13 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import { forwardRef, useCallback, useContext, useLayoutEffect, useRef, useState } from 'react';
+import React, { forwardRef, useCallback, useContext, useLayoutEffect, useRef, useState } from 'react';
 import styled, { use } from 'reshadow';
 
 import type { ComponentStyle } from '@cloudbeaver/core-theming';
 import { isNotNullDefined } from '@cloudbeaver/core-utils';
 
-import { getLayoutProps } from '../Containers/filterLayoutFakeProps';
+import { filterLayoutFakeProps, getLayoutProps } from '../Containers/filterLayoutFakeProps';
 import type { ILayoutSizeProps } from '../Containers/ILayoutSizeProps';
 import elementsSizeStyles from '../Containers/shared/ElementsSize.m.css';
 import { Icon } from '../Icon';
@@ -41,6 +41,7 @@ type BaseProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange' | 
     style?: ComponentStyle;
     canShowPassword?: boolean;
     onCustomCopy?: () => void;
+    icon?: React.ReactElement;
   };
 
 type ControlledProps = BaseProps & {
@@ -90,6 +91,7 @@ export const InputField: InputFieldType = observer(
       canShowPassword = true,
       onChange,
       onCustomCopy,
+      icon,
       ...rest
     }: ControlledProps | ObjectProps<any, any>,
     ref,
@@ -100,6 +102,7 @@ export const InputField: InputFieldType = observer(
     const [passwordRevealed, setPasswordRevealed] = useState(false);
     const translate = useTranslate();
     const layoutProps = getLayoutProps(rest);
+    rest = filterLayoutFakeProps(rest);
     const propStyles = useStyles(style);
     const styles = useS(inputFieldStyle, formControlStyles, elementsSizeStyles);
     const context = useContext(FormContext);
@@ -195,6 +198,7 @@ export const InputField: InputFieldType = observer(
               <Icon name="copy" viewBox="0 0 32 32" className={styles.icon} />
             </div>
           )}
+          {icon && <div data-testid="icon-container" className={styles.customIconContainer}>{icon}</div>}
         </div>
         {(description || passwordType) && (
           <div data-testid="field-description" className={s(styles, { fieldDescription: true, valid: !error, invalid: error })}>

@@ -72,7 +72,6 @@ export * from './Split/Split';
 export * from './Split/useSplit';
 export * from './Split/useSplitUserState';
 
-export * from './Table/BASE_TABLE_STYLES';
 export * from './Table/EventTableItemExpandFlag';
 export * from './Table/EventTableItemSelectionFlag';
 export * from './Table/Table';
@@ -120,6 +119,7 @@ export * from './FormControls/Checkboxes/useCheckboxState';
 export * from './FormControls/BASE_DROPDOWN_STYLES';
 export * from './FormControls/FormBox';
 export * from './FormControls/Filter';
+export * from './Fill';
 
 export * from './Containers/Container';
 export * from './Containers/Group';
@@ -163,6 +163,7 @@ export * from './StatusMessage';
 export * from './ExceptionMessage';
 export * from './getComputed';
 export * from './IconButton';
+export { default as IconButtonStyles } from './IconButton.m.css';
 export * from './IconOrImage';
 export * from './s';
 export * from './SContext';

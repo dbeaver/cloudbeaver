@@ -324,6 +324,9 @@ public class LocalResourceController implements RMController {
     @Override
     public RMProject getProject(@NotNull String projectId, boolean readResources, boolean readProperties) throws DBException {
         RMProject project = makeProjectFromId(projectId, true);
+        if (project == null) {
+            return null;
+        }
         if (readResources) {
             doProjectOperation(projectId, () -> {
                 project.setChildren(
@@ -870,7 +873,15 @@ public class LocalResourceController implements RMController {
         var projectName = parseProjectName(projectId);
         var projectPath = getProjectPath(projectId);
         if (!Files.exists(projectPath)) {
-            return null;
+            if (isPrivateProject(projectId) && isProjectOwner(projectId)) {
+                try {
+                    Files.createDirectories(projectPath);
+                } catch (Exception e) {
+                    throw new DBException("Failed to create project " + projectId + ": " + e.getMessage(), e);
+                }
+            } else {
+                return null;
+            }
         }
         Set<RMProjectPermission> permissions = Set.of();
         if (loadPermissions && credentialsProvider.getActiveUserCredentials() != null) {
@@ -1208,6 +1219,12 @@ public class LocalResourceController implements RMController {
     public static boolean isPrivateProject(String projectId) {
         RMProjectName rmProjectName = parseProjectNameUnsafe(projectId);
         return RMProjectType.USER.getPrefix().equals(rmProjectName.getPrefix());
+    }
+
+    private boolean isProjectOwner(String projectId) {
+        var activeUserCredentials = credentialsProvider.getActiveUserCredentials();
+        var userId = activeUserCredentials == null ? null : activeUserCredentials.getUserId();
+        return isProjectOwner(projectId, userId);
     }
 
     public static boolean isProjectOwner(String projectId, String userId) {

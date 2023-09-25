@@ -124,6 +124,7 @@ export class SqlEditorBootstrap extends Bootstrap {
           case ACTION_RENAME: {
             const state = context.get(DATA_CONTEXT_SQL_EDITOR_STATE);
             const dataSource = this.sqlDataSourceService.get(state.editorId);
+            const executionContext = dataSource?.executionContext;
 
             if (!dataSource) {
               return;
@@ -131,11 +132,8 @@ export class SqlEditorBootstrap extends Bootstrap {
 
             let connection: Connection | undefined;
 
-            if (dataSource.executionContext) {
-              connection = this.connectionInfoResource.get({
-                projectId: dataSource.executionContext.projectId,
-                connectionId: dataSource.executionContext.connectionId,
-              });
+            if (executionContext) {
+              connection = this.connectionInfoResource.get(createConnectionParam(executionContext.projectId, executionContext.connectionId));
             }
 
             const name = getSqlEditorName(state, dataSource, connection);

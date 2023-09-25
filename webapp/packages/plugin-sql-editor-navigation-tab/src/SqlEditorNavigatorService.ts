@@ -101,13 +101,14 @@ export class SqlEditorNavigatorService {
           tab = this.navigationTabsService.findTab(
             isSQLEditorTab(tab => {
               const dataSource = this.sqlDataSourceService.get(tab.handlerState.editorId);
+              const executionContext = dataSource?.executionContext;
 
               return (
                 tab.handlerState.source === SQL_EDITOR_SOURCE_ACTION &&
-                dataSource?.executionContext !== undefined &&
+                executionContext !== undefined &&
                 data.connectionKey !== undefined &&
                 this.connectionInfoResource.isKeyEqual(
-                  createConnectionParam(dataSource.executionContext.projectId, dataSource.executionContext.connectionId),
+                  createConnectionParam(executionContext.projectId, executionContext.connectionId),
                   data.connectionKey,
                 )
               );

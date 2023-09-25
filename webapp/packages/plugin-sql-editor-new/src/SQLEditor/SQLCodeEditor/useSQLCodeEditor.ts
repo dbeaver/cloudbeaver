@@ -5,6 +5,8 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
+import { observable } from 'mobx';
+
 import { useObservableRef } from '@cloudbeaver/core-blocks';
 import type { EditorState, EditorView, IEditorRef } from '@cloudbeaver/plugin-codemirror6';
 
@@ -64,7 +66,7 @@ export function useSQLCodeEditor(editorRef: IEditorRef | null) {
         }
       },
     }),
-    {},
+    { editorRef: observable.ref },
     { editorRef },
   );
 

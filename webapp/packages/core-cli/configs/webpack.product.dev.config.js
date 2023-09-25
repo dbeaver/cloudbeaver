@@ -35,10 +35,12 @@ if (fs.existsSync(certPath) && fs.existsSync(keyPath)) {
 }
 
 module.exports = (env, argv) => {
-  const urlObject = new URL(env.server);
+  const envServer = env.server ?? process.env.server;
+  const urlObject = new URL(envServer);
 
   return merge(commonConfig(env, argv), {
     mode: 'development',
+    context: resolve(__dirname, '../../../../../'),
     entry: {
       main,
       sso,
@@ -49,6 +51,7 @@ module.exports = (env, argv) => {
     },
     devServer: {
       allowedHosts: 'all',
+      host: '0.0.0.0',
       // port: 8080,
       client: {
         webSocketURL: 'auto://0.0.0.0:0/ws',
@@ -57,7 +60,7 @@ module.exports = (env, argv) => {
       server,
       proxy: {
         '/api': {
-          target: env.server,
+          target: envServer,
         },
         '/api/ws': {
           target: `${urlObject.protocol === 'https:' ? 'wss:' : 'ws:'}//${urlObject.hostname}:${urlObject.port}/api/ws`,

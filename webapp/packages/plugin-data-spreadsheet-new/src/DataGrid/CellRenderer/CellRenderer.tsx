@@ -9,7 +9,7 @@ import { computed, observable } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import { useContext, useEffect } from 'react';
 
-import { getComputed, useMouse, useObjectRef, useObservableRef } from '@cloudbeaver/core-blocks';
+import { getComputed, useCombinedHandler, useMouse, useObjectRef, useObservableRef } from '@cloudbeaver/core-blocks';
 import { EventContext, EventStopPropagationFlag } from '@cloudbeaver/core-events';
 import { clsx } from '@cloudbeaver/core-utils';
 import { DatabaseEditChangeType, IResultSetElementKey, IResultSetRowKey, isBooleanValuePresentationAvailable } from '@cloudbeaver/plugin-data-viewer';
@@ -22,7 +22,7 @@ import { TableDataContext } from '../TableDataContext';
 import { CellContext } from './CellContext';
 
 export const CellRenderer = observer<CellRendererProps<IResultSetRowKey, unknown>>(function CellRenderer(props) {
-  const { row, column, isCellSelected, selectCell } = props;
+  const { row, column, isCellSelected, onDoubleClick, selectCell } = props;
   const dataGridContext = useContext(DataGridContext);
   const tableDataContext = useContext(TableDataContext);
   const selectionContext = useContext(DataGridSelectionContext);
@@ -49,6 +49,9 @@ export const CellRenderer = observer<CellRendererProps<IResultSetRowKey, unknown
       get isSelected(): boolean {
         return selectionContext.isSelected(this.position.rowIdx, this.position.idx) || false;
       },
+      get isFocused(): boolean {
+        return this.isEditing ? false : this.isCellSelected;
+      },
       get editionState(): DatabaseEditChangeType | null {
         if (!this.cell) {
           return null;
@@ -61,13 +64,15 @@ export const CellRenderer = observer<CellRendererProps<IResultSetRowKey, unknown
       row: observable.ref,
       column: observable.ref,
       rowIdx: observable.ref,
+      isCellSelected: observable.ref,
       position: computed,
       cell: computed,
       isEditing: computed,
       isSelected: computed,
+      isFocused: computed,
       editionState: computed,
     },
-    { row, column, rowIdx },
+    { row, column, rowIdx, isCellSelected },
   );
 
   const classes = getComputed(() =>
@@ -120,7 +125,7 @@ export const CellRenderer = observer<CellRendererProps<IResultSetRowKey, unknown
           false,
         );
       },
-      doubleClick(event: React.MouseEvent<HTMLDivElement>) {
+      doubleClick(args: any, event: React.MouseEvent<HTMLDivElement>) {
         if (
           !this.isEditable(this.column) ||
           // !this.dataGridContext.isGridInFocus()
@@ -136,11 +141,9 @@ export const CellRenderer = observer<CellRendererProps<IResultSetRowKey, unknown
       row,
       column,
       rowIdx,
-      isCellSelected,
       selectionContext,
       dataGridContext,
       editingContext,
-      tableDataContext,
       isEditable,
       selectCell,
     },
@@ -148,6 +151,7 @@ export const CellRenderer = observer<CellRendererProps<IResultSetRowKey, unknown
   );
 
   useEffect(() => () => editingContext.closeEditor(cellContext.position), []);
+  const handleDoubleClick = useCombinedHandler(state.doubleClick, onDoubleClick);
 
   return (
     <CellContext.Provider value={cellContext}>
@@ -158,9 +162,8 @@ export const CellRenderer = observer<CellRendererProps<IResultSetRowKey, unknown
         data-column-index={column.idx}
         onMouseDown={state.mouseDown}
         onMouseUp={state.mouseUp}
-        onDoubleClick={state.doubleClick}
         {...props}
-        isCellSelected={cellContext.isEditing ? false : isCellSelected}
+        onDoubleClick={handleDoubleClick}
       />
     </CellContext.Provider>
   );

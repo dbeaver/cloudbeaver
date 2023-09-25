@@ -3,6 +3,6 @@
 <target name="org.jkiss.tp.cloudbeaver">
 	<locations>
 		<location path="../eclipse/Eclipse.app/Contents/Eclipse/plugins" type="Directory"/>
-		<location path="../eclipse/plugins" type="Directory"/>
+		<location path="../eclipse/eclipse/plugins" type="Directory"/>
 	</locations>
 </target>

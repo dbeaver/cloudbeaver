@@ -9,11 +9,11 @@ import { observer } from 'mobx-react-lite';
 import { useContext } from 'react';
 
 import type { DBObject } from '@cloudbeaver/core-navigation-tree';
-import type { HeaderRendererProps } from '@cloudbeaver/plugin-react-data-grid';
+import type { RenderHeaderCellProps } from '@cloudbeaver/plugin-react-data-grid';
 
 import { TableContext } from './TableContext';
 
-export const HeaderRenderer = observer<HeaderRendererProps<DBObject>>(function HeaderRenderer(props) {
+export const HeaderRenderer = observer<RenderHeaderCellProps<DBObject>>(function HeaderRenderer(props) {
   const tableContext = useContext(TableContext);
   const dataColumn = tableContext.tableData?.columns.find(column => column.key === props.column.key);
 

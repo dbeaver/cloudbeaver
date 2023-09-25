@@ -2,7 +2,6 @@ export * from './ConnectionExecutionContext/ConnectionExecutionContext';
 export * from './ConnectionExecutionContext/ConnectionExecutionContextResource';
 export * from './ConnectionExecutionContext/ConnectionExecutionContextService';
 export * from './ConnectionExecutionContext/IConnectionExecutionContext';
-export * from './ConnectionExecutionContext/IConnectionExecutionContextInfo';
 
 export * from './extensions/IObjectCatalogProvider';
 export * from './extensions/IObjectCatalogSetter';

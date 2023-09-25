@@ -7,7 +7,7 @@
   font-weight: 500;
 }
 .fieldLabel:not(:empty) {
-  padding-bottom: 10px;
+  margin-bottom: 10px;
 }
 .inputContainer {
   position: relative;
@@ -18,8 +18,8 @@
   right: 8px;
   top: 50%;
   transform: translateY(-50%);
-  width: 24px;
-  height: 24px;
+  width: 16px;
+  height: 16px;
   display: flex;
 }
 .iconContainer {
@@ -29,6 +29,15 @@
     height: 100%;
   }
 }
+
+.customIconContainer {
+  composes: iconContainer;
+  right: 4px;
+  width: 24px;
+  height: 24px;
+  cursor: auto;
+}
+
 .input[disabled] + .iconContainer {
   cursor: auto;
   opacity: 0.8;
