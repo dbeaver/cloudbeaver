@@ -42,7 +42,7 @@ export default [
   ['administration_configuration_wizard_configuration_custom_connections', 'Enable private connections'],
   [
     'administration_configuration_wizard_configuration_custom_connections_description',
-    'Allows users to create private connections. Otherwise, all new connections can be created from the administration part only',
+    'Allows users to create private connections. Otherwise, all new connections can be created by the administrator only',
   ],
   ['administration_configuration_wizard_configuration_navigation_tree_view', 'Navigator simple view'],
   [

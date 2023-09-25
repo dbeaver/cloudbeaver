@@ -21,7 +21,7 @@ export default [
   ['administration_configuration_wizard_configuration_custom_connections', 'Разрешить пользовательские подключения'],
   [
     'administration_configuration_wizard_configuration_custom_connections_description',
-    'Позволяет пользователям создавать собственные подключения. Иначе, любые подключения могут быть добавлены только со страницы администрирования',
+    'Позволяет пользователям создавать собственные подключения. Иначе, любые подключения могут быть добавлены только администратором',
   ],
   ['administration_configuration_wizard_configuration_navigation_tree_view', 'Упрощенная версия дерева навигации'],
   [
