@@ -7,66 +7,17 @@
  */
 import { observer } from 'mobx-react-lite';
 import { useCallback, useEffect, useState } from 'react';
-import styled, { css, use } from 'reshadow';
+import styled from 'reshadow';
 
 import type { ComponentStyle } from '@cloudbeaver/core-theming';
 
 import { IconButton } from '../IconButton';
+import { s } from '../s';
 import { useFocus } from '../useFocus';
+import { useS } from '../useS';
 import { useStyles } from '../useStyles';
+import filterStyle from './Filter.m.css';
 import { InputField } from './InputField';
-
-const filterStyles = css`
-  filter-container {
-    position: relative;
-    min-width: 24px;
-    min-height: 24px;
-  }
-  InputField {
-    display: none;
-    width: 300px;
-    &[|max] {
-      width: 100%;
-    }
-    &[|toggled] {
-      display: block;
-    }
-  }
-  IconButton {
-    position: absolute;
-    right: 0;
-    top: 0;
-    margin: 0;
-    width: 24px;
-    height: 24px;
-    border-radius: 2px;
-    cursor: auto;
-
-    &[|toggled] {
-      right: 4px;
-      top: 4px;
-    }
-    &[name='cross'] {
-      width: 16px;
-      height: 16px;
-      top: 8px;
-      right: 8px;
-    }
-  }
-`;
-
-const toggleModeButtonStyle = css`
-  IconButton {
-    composes: theme-background-primary theme-text-on-primary from global;
-    cursor: pointer;
-  }
-`;
-
-const innerInputStyle = css`
-  input {
-    padding-right: 40px !important;
-  }
-`;
 
 interface BaseProps {
   toggleMode?: boolean;
@@ -103,13 +54,14 @@ export const Filter = observer<ControlledProps | ObjectsProps<any, any>>(functio
   disabled,
   max,
   className,
-  style,
+  style: propStyle,
   onFilter,
   onToggle,
   onKeyDown,
   onClick,
 }) {
-  const styles = useStyles(filterStyles, style, toggleMode && toggleModeButtonStyle);
+  const styles = useS(filterStyle);
+  const oldStyles = useStyles(propStyle);
   const [inputRef, ref] = useFocus<HTMLInputElement>({});
   const [toggled, setToggled] = useState(!toggleMode);
 
@@ -156,24 +108,29 @@ export const Filter = observer<ControlledProps | ObjectsProps<any, any>>(functio
     value = state[name];
   }
 
-  return styled(styles)(
-    <filter-container className={className} onClick={onClick}>
+  return styled(oldStyles)(
+    <div className={s(styles, { filterContainer: true })} onClick={onClick}>
       <InputField
+        className={s(styles, { inputField: true, max, toggled })}
         ref={inputRef}
-        style={[innerInputStyle, style]}
+        style={propStyle}
         placeholder={placeholder}
         disabled={disabled}
         name={name}
         value={value}
         onChange={filter}
         onKeyDown={onKeyDown}
-        {...use({ toggled, max })}
       />
       {String(value) ? (
-        <IconButton name="cross" disabled={disabled} onClick={() => filter('', name)} />
+        <IconButton
+          className={s(styles, { iconButton: true, cross: true, toggleMode })}
+          name="cross"
+          disabled={disabled}
+          onClick={() => filter('', name)}
+        />
       ) : (
-        <IconButton name="search" disabled={disabled} onClick={toggle} {...use({ toggled })} />
+        <IconButton className={s(styles, { iconButton: true, toggled, toggleMode })} name="search" disabled={disabled} onClick={toggle} />
       )}
-    </filter-container>,
+    </div>,
   );
 });
