@@ -25,8 +25,9 @@ import { useRefInherit } from '../useRefInherit';
 import { useS } from '../useS';
 import { useStateDelay } from '../useStateDelay';
 import { useStyles } from '../useStyles';
-import { baseFormControlStyles, baseInvalidFormControlStyles, baseValidFormControlStyles } from './baseFormControlStyles';
 import { FormContext } from './FormContext';
+import formControlStyles from './FormControl.m.css';
+import InputFilesStyles from './InputFiles.m.css';
 import { isControlPresented } from './isControlPresented';
 
 const INPUT_FIELD_STYLES = css`
@@ -89,7 +90,7 @@ export const InputFiles: InputFilesType = observer(
   forwardRef(function InputFiles(
     {
       name,
-      style,
+      style: propStyle,
       value: valueControlled,
       required,
       state,
@@ -114,8 +115,7 @@ export const InputFiles: InputFilesType = observer(
     const ref = useRefInherit<HTMLInputElement>(refInherit);
     const [innerState, setInnerState] = useState<FileList | null>(null);
     const translate = useTranslate();
-    const styles = useStyles(baseFormControlStyles, error ? baseInvalidFormControlStyles : baseValidFormControlStyles, INPUT_FIELD_STYLES, style);
-    const sizeStyles = useS(elementsSizeStyles);
+    const styles = useS(formControlStyles, elementsSizeStyles, InputFilesStyles);
     const context = useContext(FormContext);
     loading = useStateDelay(loading ?? false, 300);
 
@@ -195,28 +195,28 @@ export const InputFiles: InputFilesType = observer(
 
     const files = Array.from(value ?? []);
 
-    return styled(styles)(
-      <field className={s(sizeStyles, { ...layoutProps }, className)}>
-        <field-label title={labelTooltip || rest.title}>
+    return styled(useStyles(propStyle))(
+      <div className={s(styles, { ...layoutProps, field: true }, className)}>
+        <label title={labelTooltip || rest.title} className={s(styles, { fieldLabel: true })}>
           {children}
           {required && ' *'}
-        </field-label>
-        <input-container>
+        </label>
+        <div className={s(styles, { inputContainer: true })}>
           <UploadArea ref={ref} {...rest} name={name} value={value} {...use({ mod })} required={required} onChange={handleChange}>
             <Button icon="/icons/import.svg" tag="div" loading={loading} mod={['outlined']}>
               {translate(rest.multiple ? 'ui_upload_files' : 'ui_upload_file')}
             </Button>
           </UploadArea>
           {!hideTags && (
-            <Tags>
+            <Tags className={s(styles, { tags: true })}>
               {files.map((file, i) => (
                 <Tag key={file.name} id={i} label={file.name} onRemove={removeFile} />
               ))}
             </Tags>
           )}
-        </input-container>
-        {description && <field-description>{description}</field-description>}
-      </field>,
+        </div>
+        {description && <div className={s(styles, { fieldDescription: true, valid: !error, invalid: error })}>{description}</div>}
+      </div>,
     );
   }),
 );
