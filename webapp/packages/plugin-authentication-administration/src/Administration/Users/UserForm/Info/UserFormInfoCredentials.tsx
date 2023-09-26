@@ -9,7 +9,7 @@ import { observer } from 'mobx-react-lite';
 
 import { isLocalUser, UsersResource } from '@cloudbeaver/core-authentication';
 import { Container, GroupTitle, InputField, useCustomInputValidation, useResource, useTranslate } from '@cloudbeaver/core-blocks';
-import { FormMode, useTabState } from '@cloudbeaver/core-ui';
+import { FormMode } from '@cloudbeaver/core-ui';
 import { isValuesEqual } from '@cloudbeaver/core-utils';
 
 import type { UserFormProps } from '../AdministrationUserFormService';
@@ -58,9 +58,9 @@ export const UserFormInfoCredentials = observer<Props>(function UserFormInfoCred
             canShowPassword={tabState.state['password'] !== ''}
             disabled={disabled}
             mod="surface"
+            required={!editing}
             keepSize
             tiny
-            required={!editing}
           >
             {translate('authentication_user_password')}
           </InputField>
@@ -70,11 +70,11 @@ export const UserFormInfoCredentials = observer<Props>(function UserFormInfoCred
             name="passwordRepeat"
             placeholder={editing ? PASSWORD_PLACEHOLDER : ''}
             disabled={disabled}
-            canShowPassword
             mod="surface"
+            required={!editing}
+            canShowPassword
             keepSize
             tiny
-            required={!editing}
           >
             {translate('authentication_user_password_repeat')}
           </InputField>

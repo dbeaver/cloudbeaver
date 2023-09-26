@@ -9,8 +9,11 @@ import { action, makeObservable, observable, toJS } from 'mobx';
 
 import type { AdminUser, UsersResource } from '@cloudbeaver/core-authentication';
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
+import type { ServerConfig, ServerConfigResource } from '@cloudbeaver/core-root';
+import { getCachedDataResourceLoaderState } from '@cloudbeaver/core-sdk';
 import { FormMode, formValidationContext, IFormState } from '@cloudbeaver/core-ui';
-import { isArraysEqual, isObjectsEqual, isValuesEqual } from '@cloudbeaver/core-utils';
+import { isArraysEqual, isDefined, isObjectsEqual, isValuesEqual } from '@cloudbeaver/core-utils';
+import { DATA_CONTEXT_LOADABLE_STATE } from '@cloudbeaver/core-view';
 
 import type { IUserFormState } from '../AdministrationUserFormService';
 import type { AdministrationUserFormState } from '../AdministrationUserFormState';
@@ -34,7 +37,11 @@ export class UserFormInfoPart implements IUserFormInfoPart {
   private loaded: boolean;
   private loading: boolean;
 
-  constructor(private readonly formState: AdministrationUserFormState, private readonly usersResource: UsersResource) {
+  constructor(
+    private readonly serverConfigResource: ServerConfigResource,
+    private readonly formState: AdministrationUserFormState,
+    private readonly usersResource: UsersResource,
+  ) {
     this.state = {
       userId: formState.state.userId || '',
       enabled: true,
@@ -50,6 +57,7 @@ export class UserFormInfoPart implements IUserFormInfoPart {
     this.loaded = false;
     this.loading = false;
 
+    this.formState.configureTask.addHandler(this.configure.bind(this));
     this.formState.submitTask.addHandler(this.save.bind(this));
     this.formState.validationTask.addHandler(this.validate.bind(this));
 
@@ -127,6 +135,12 @@ export class UserFormInfoPart implements IUserFormInfoPart {
     try {
       this.loading = true;
 
+      await this.loadInitialState();
+
+      if (!this.isChanged()) {
+        return;
+      }
+
       if (this.formState.mode === FormMode.Create) {
         const user = await this.usersResource.create({
           userId: this.state.userId,
@@ -163,13 +177,18 @@ export class UserFormInfoPart implements IUserFormInfoPart {
       }
     }
   }
+  private configure() {
+    const loadableStateContext = this.formState.dataContext.get(DATA_CONTEXT_LOADABLE_STATE);
 
-  private fillDefaultConfig(user: AdminUser) {
+    loadableStateContext.getState('user-info', () => [getCachedDataResourceLoaderState(this.serverConfigResource, undefined)]);
+  }
+
+  private fillDefaultConfig(serverConfig: ServerConfig | null, user: AdminUser | null) {
     user = toJS(user);
     this.initialState.userId = user?.userId || '';
     this.initialState.enabled = user?.enabled || false;
     this.initialState.metaParameters = observable(user?.metaParameters || {});
-    this.initialState.teams = observable(user?.grantedTeams || []);
+    this.initialState.teams = observable(user?.grantedTeams || [serverConfig?.defaultUserTeam].filter(isDefined));
 
     if (this.isChanged()) {
       return;
@@ -237,10 +256,7 @@ export class UserFormInfoPart implements IUserFormInfoPart {
   private async loader() {
     try {
       this.loading = true;
-      if (this.formState.mode === FormMode.Edit && this.initialState.userId) {
-        const user = await this.usersResource.load(this.initialState.userId, ['includeMetaParameters']);
-        this.fillDefaultConfig(user);
-      }
+      await this.loadInitialState();
       this.loaded = true;
       this.exception = null;
     } catch (exception: any) {
@@ -248,5 +264,16 @@ export class UserFormInfoPart implements IUserFormInfoPart {
     } finally {
       this.loading = false;
     }
+  }
+
+  private async loadInitialState() {
+    let user: AdminUser | null = null;
+    const serverConfig = await this.serverConfigResource.load();
+
+    if (this.formState.mode === FormMode.Edit && this.initialState.userId) {
+      user = await this.usersResource.load(this.initialState.userId, ['includeMetaParameters']);
+    }
+
+    this.fillDefaultConfig(serverConfig, user);
   }
 }

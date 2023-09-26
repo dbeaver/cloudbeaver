@@ -10,7 +10,6 @@ import { observer } from 'mobx-react-lite';
 import {
   ColoredContainer,
   Group,
-  InfoItem,
   StaticImage,
   Table,
   TableBody,
@@ -32,16 +31,15 @@ import {
   isCloudConnection,
 } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
-import type { TLocalizationToken } from '@cloudbeaver/core-localization';
 import { isGlobalProject, ProjectInfoResource } from '@cloudbeaver/core-projects';
 import { AdminSubjectType, CachedMapAllKey, resourceKeyList } from '@cloudbeaver/core-sdk';
-import { FormMode, type TabContainerPanelComponent, useTab, useTabState } from '@cloudbeaver/core-ui';
+import { type TabContainerPanelComponent, useTab, useTabState } from '@cloudbeaver/core-ui';
 import { isDefined } from '@cloudbeaver/core-utils';
 
 import type { UserFormProps } from '../AdministrationUserFormService';
 import type { IUserFormConnectionAccessPart } from './IUserFormConnectionAccessPart';
 
-export const UserFormConnectionAccess: TabContainerPanelComponent<UserFormProps> = observer(function UserFormConnectionAccess({ tabId, formState }) {
+export const UserFormConnectionAccess: TabContainerPanelComponent<UserFormProps> = observer(function UserFormConnectionAccess({ tabId }) {
   const translate = useTranslate();
   const tab = useTab(tabId);
   const driversResource = useService(DBDriverResource);
@@ -84,15 +82,15 @@ export const UserFormConnectionAccess: TabContainerPanelComponent<UserFormProps>
   }
 
   const disabled = tabState.isLoading();
-  let info: TLocalizationToken | null = null;
+  // let info: TLocalizationToken | null = null;
 
-  if (formState.mode === FormMode.Edit && tabState.isChanged()) {
-    info = 'ui_save_reminder';
-  }
+  // if (formState.mode === FormMode.Edit && tabState.isChanged()) {
+  //   info = 'ui_save_reminder';
+  // }
 
   return (
     <ColoredContainer vertical gap>
-      {info && <InfoItem info={info} />}
+      {/* {info && <InfoItem info={info} />} */}
       <Group box large overflow>
         <Table selectedItems={tabState.selectedConnections}>
           <TableHeader fixed>

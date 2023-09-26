@@ -7,20 +7,9 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import {
-  ColoredContainer,
-  Container,
-  FieldCheckbox,
-  Group,
-  GroupTitle,
-  InfoItem,
-  Placeholder,
-  useAutoLoad,
-  useTranslate,
-} from '@cloudbeaver/core-blocks';
+import { ColoredContainer, Container, FieldCheckbox, Group, GroupTitle, Placeholder, useAutoLoad, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import type { TLocalizationToken } from '@cloudbeaver/core-localization';
-import { FormMode, TabContainerPanelComponent, useTab, useTabState } from '@cloudbeaver/core-ui';
+import { TabContainerPanelComponent, useTab, useTabState } from '@cloudbeaver/core-ui';
 
 import type { UserFormProps } from '../AdministrationUserFormService';
 import type { IUserFormInfoPart } from './IUserFormInfoPart';
@@ -38,15 +27,15 @@ export const UserFormInfo: TabContainerPanelComponent<UserFormProps> = observer(
   useAutoLoad(UserFormInfo, tabState, tab.selected);
 
   const disabled = tabState.isLoading();
-  let info: TLocalizationToken | null = null;
+  // let info: TLocalizationToken | null = null;
 
-  if (formState.mode === FormMode.Edit && tabState.isChanged()) {
-    info = 'ui_save_reminder';
-  }
+  // if (formState.mode === FormMode.Edit && tabState.isChanged()) {
+  //   info = 'ui_save_reminder';
+  // }
 
   return (
     <ColoredContainer vertical gap overflow>
-      {info && <InfoItem info={info} />}
+      {/* {info && <InfoItem info={info} />} */}
       <Container gap overflow>
         <Group small gap vertical overflow>
           <UserFormInfoCredentials formState={formState} tabState={tabState} tabSelected={tab.selected} disabled={disabled} />
