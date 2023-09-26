@@ -167,7 +167,7 @@ export const SSH: TabContainerPanelComponent<Props> = observer(function SSH({ st
             </InputField>
             {keyAuth && <SSHKeyUploader state={handlerState} saved={keySaved} disabled={disabled || !enabled} readonly={readonly} />}
           </Container>
-          {credentialsSavingEnabled && (
+          {credentialsSavingEnabled && !formState.config.template && (
             <FieldCheckbox
               id={SSH_TUNNEL_ID + ' savePassword'}
               name="savePassword"
