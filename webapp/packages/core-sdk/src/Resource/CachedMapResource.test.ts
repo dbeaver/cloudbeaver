@@ -5,18 +5,20 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
+import { toJS } from 'mobx';
+
 import { CachedMapResource } from './CachedMapResource';
 import type { ResourceKey } from './ResourceKey';
 import { resourceKeyList } from './ResourceKeyList';
 
-interface ILoaderData {
+interface IEntityData {
   id: string;
   value: number;
 }
 
 const ERROR_ITEM_ID = 'error';
 
-const LOADER_DATA_MOCK: ILoaderData[] = [
+const DATA_MOCK: IEntityData[] = [
   {
     id: '1',
     value: 1,
@@ -32,41 +34,34 @@ const LOADER_DATA_MOCK: ILoaderData[] = [
 ];
 
 const TEST_ERROR_MESSAGE = 'Test error';
+const DEFAULT_STATE = () => new Map();
 
-class TestMapResource extends CachedMapResource<string, ILoaderData> {
-  constructor() {
-    super();
-  }
-
-  async fetchAnError() {
-    return new Promise((_, reject) => {
-      setTimeout(() => {
-        reject(new Error(TEST_ERROR_MESSAGE));
-      }, 1);
-    });
-  }
-
-  private async fetchFromAPI(key: ResourceKey<string> | undefined): Promise<ILoaderData[]> {
-    return new Promise(resolve => {
-      setTimeout(() => {
-        if (key) {
-          const data = LOADER_DATA_MOCK.find(d => d.id === key);
-          if (data) {
-            resolve([data]);
-          }
-        } else {
-          resolve(LOADER_DATA_MOCK);
+async function fetchMock(key: ResourceKey<string> | undefined): Promise<IEntityData[]> {
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      if (key) {
+        if (key === ERROR_ITEM_ID) {
+          reject(new Error(TEST_ERROR_MESSAGE));
         }
-      }, 1);
-    });
+
+        const data = DATA_MOCK.find(d => d.id === key);
+        if (data) {
+          resolve([data]);
+        }
+      } else {
+        resolve(DATA_MOCK);
+      }
+    }, 1);
+  });
+}
+
+class TestMapResource extends CachedMapResource<string, IEntityData> {
+  constructor() {
+    super(DEFAULT_STATE);
   }
 
   protected async loader(key: ResourceKey<string>) {
-    if (key === ERROR_ITEM_ID) {
-      await this.fetchAnError();
-    }
-
-    const data = await this.fetchFromAPI(key);
+    const data = await fetchMock(key);
     this.replace(resourceKeyList(data.map(d => d.id)), data);
     return this.data;
   }
@@ -85,6 +80,10 @@ describe('CachedMapResource', () => {
 
   test('should instantiate correctly', () => {
     expect(mapResource).toBeInstanceOf(CachedMapResource);
+  });
+
+  test('should initialize with the initial value', () => {
+    expect(toJS(mapResource.data)).toEqual(DEFAULT_STATE());
   });
 
   test('should return all entries', () => {
@@ -111,10 +110,6 @@ describe('CachedMapResource', () => {
     expect(mapResource.keys).toEqual(['key1', 'key2']);
   });
 
-  test('should initialize with an empty map', () => {
-    expect(mapResource.entries).toEqual([]);
-  });
-
   test('should load data for a specific key', async () => {
     await mapResource.load('1');
     expect(mapResource.get('1')).toEqual({ id: '1', value: 1 });
@@ -126,7 +121,7 @@ describe('CachedMapResource', () => {
     expect(mapResource.get(ERROR_ITEM_ID)).toBeUndefined();
   });
 
-  test('should change loaded state when data is loaded ', async () => {
+  test('should mark loaded data as loaded', async () => {
     await mapResource.load('1');
     expect(mapResource.isLoaded('1')).toBe(true);
   });
@@ -151,13 +146,17 @@ describe('CachedMapResource', () => {
   test('should replace multiple keys', () => {
     mapResource.set('key1', { id: 'key1', value: 1 });
     mapResource.set('key2', { id: 'key2', value: 2 });
+    mapResource.set('key4', { id: 'key4', value: 4 });
+
     mapResource.replace(resourceKeyList(['key1', 'key3']), [
       { id: 'key1', value: 11 },
       { id: 'key3', value: 33 },
     ]);
+
     expect(mapResource.get('key1')).toStrictEqual({ id: 'key1', value: 11 });
     expect(mapResource.get('key2')).toBeUndefined();
     expect(mapResource.get('key3')).toStrictEqual({ id: 'key3', value: 33 });
+    expect(mapResource.data.size).toBe(2);
   });
 
   test('should outdated certain keys', () => {
@@ -215,7 +214,7 @@ describe('CachedMapResource', () => {
     expect(handler).toHaveBeenCalled();
   });
 
-  test('should run onItemUpdate handlers on data delete', () => {
+  test('should run onItemUpdate handlers on item update', () => {
     const handler = jest.fn();
 
     mapResource.set('key1', { id: 'key1', value: 1 });

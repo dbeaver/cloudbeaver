@@ -12,6 +12,8 @@ interface ILoaderData {
   value: number;
 }
 
+const DEFAULT_STATE: () => ILoaderData[] = () => [];
+
 const LOADER_DATA_MOCK: ILoaderData[] = [
   {
     id: '1',
@@ -23,21 +25,21 @@ const LOADER_DATA_MOCK: ILoaderData[] = [
   },
 ];
 
+async function fetchMock(): Promise<ILoaderData[]> {
+  return new Promise(resolve => {
+    setTimeout(() => {
+      resolve(LOADER_DATA_MOCK);
+    }, 1);
+  });
+}
+
 class TestDataResource extends CachedDataResource<ILoaderData[]> {
   constructor() {
-    super(() => []);
-  }
-
-  private async fetchFromAPI(): Promise<ILoaderData[]> {
-    return new Promise(resolve => {
-      setTimeout(() => {
-        resolve(LOADER_DATA_MOCK);
-      }, 1);
-    });
+    super(DEFAULT_STATE);
   }
 
   protected async loader() {
-    const data = await this.fetchFromAPI();
+    const data = await fetchMock();
     return data;
   }
 }
@@ -53,8 +55,8 @@ describe('CachedDataResource', () => {
     expect(dataResource).toBeInstanceOf(CachedDataResource);
   });
 
-  test('should initialize with an empty array', () => {
-    expect(dataResource.data).toEqual([]);
+  test('should initialize with the default state', () => {
+    expect(dataResource.data).toEqual(DEFAULT_STATE());
   });
 
   test('should load data', async () => {
