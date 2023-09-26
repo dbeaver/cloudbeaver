@@ -95,7 +95,7 @@ export const SSL: TabContainerPanelComponent<Props> = observer(function SSL({ st
             </React.Fragment>
           ))}
 
-          {credentialsSavingEnabled && (
+          {credentialsSavingEnabled && !formState.config.template && (
             <FieldCheckbox
               id={handler.id + ' savePassword'}
               name="savePassword"

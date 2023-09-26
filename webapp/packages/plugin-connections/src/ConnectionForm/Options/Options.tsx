@@ -321,7 +321,7 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
                       tiny
                     />
                   </Container>
-                  {credentialsSavingEnabled && (
+                  {credentialsSavingEnabled && !config.template && (
                     <Container wrap gap>
                       <FieldCheckbox
                         id={config.connectionId + 'authNeeded'}
