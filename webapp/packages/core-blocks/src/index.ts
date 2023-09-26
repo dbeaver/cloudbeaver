@@ -44,6 +44,7 @@ export * from './Menu/useMouseContextMenu';
 
 export * from './ObjectPropertyInfo/ObjectPropertyInfoForm/ObjectPropertyInfoForm';
 export * from './ObjectPropertyInfo/useObjectPropertyCategories';
+export * from './ObjectPropertyInfo/ObjectPropertyInfoForm/getPropertyControlType';
 
 export * from './Overlay/Overlay';
 export * from './Overlay/OverlayActions';
