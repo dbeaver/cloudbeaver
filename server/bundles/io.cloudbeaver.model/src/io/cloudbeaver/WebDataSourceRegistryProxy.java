@@ -208,8 +208,8 @@ public class WebDataSourceRegistryProxy implements DBPDataSourceRegistry, DataSo
 
     @Nullable
     @Override
-    public DBWNetworkProfile getNetworkProfile(String name) {
-        return dataSourceRegistry.getNetworkProfile(name);
+    public DBWNetworkProfile getNetworkProfile(String source, String name) {
+        return dataSourceRegistry.getNetworkProfile(source, name);
     }
 
     @NotNull
