@@ -19,6 +19,7 @@ import { isControlPresented } from '../../FormControls/isControlPresented';
 import { Textarea } from '../../FormControls/Textarea';
 import { Link } from '../../Link';
 import { useTranslate } from '../../localization/useTranslate';
+import { type ControlType, getPropertyControlType } from './getPropertyControlType';
 
 const RESERVED_KEYWORDS = ['no', 'off', 'new-password'];
 
@@ -35,26 +36,6 @@ interface RenderFieldProps {
   className?: string;
   canShowPassword?: boolean;
   onFocus?: (event: React.FocusEvent<HTMLInputElement>) => void;
-}
-
-type ControlType = 'checkbox' | 'combobox' | 'link' | 'input' | 'textarea' | 'file';
-
-function getControlTypeFor(property: ObjectPropertyInfo): ControlType {
-  const dataType = property.dataType?.toLowerCase();
-
-  if (dataType === 'boolean') {
-    return 'checkbox';
-  } else if (property.validValues && property.validValues.length > 0) {
-    return 'combobox';
-  } else if (property.features.includes('href')) {
-    return 'link';
-  } else if (dataType === 'string' && property.length === 'MULTILINE') {
-    return 'textarea';
-  } else if (property.features.includes('file')) {
-    return 'file';
-  }
-
-  return 'input';
 }
 
 function getValue(value: any, controlType: ControlType) {
@@ -87,15 +68,15 @@ export const RenderField = observer<RenderFieldProps>(function RenderField({
 }) {
   const translate = useTranslate();
 
-  const controltype = getControlTypeFor(property);
+  const controlType = getPropertyControlType(property);
   const password = property.features.includes('password');
 
-  const value = getValue(property.value, controltype);
-  const defaultValue = getValue(property.defaultValue, controltype);
+  const value = getValue(property.value, controlType);
+  const defaultValue = getValue(property.defaultValue, controlType);
   const passwordSaved = showRememberTip && ((password && !!property.value) || saved);
   const description = passwordSaved ? translate('ui_processing_saved') : undefined;
 
-  if (controltype === 'file' && state) {
+  if (controlType === 'file' && state) {
     return (
       <InputFileTextContent
         tooltip={property.description}
@@ -112,7 +93,7 @@ export const RenderField = observer<RenderFieldProps>(function RenderField({
     );
   }
 
-  if (controltype === 'link') {
+  if (controlType === 'link') {
     return (
       <FormFieldDescription label={property.displayName} className={className}>
         <Link href={state?.[property.id!]} target="_blank" rel="noopener noreferrer">
@@ -133,7 +114,7 @@ export const RenderField = observer<RenderFieldProps>(function RenderField({
     );
   }
 
-  if (controltype === 'checkbox') {
+  if (controlType === 'checkbox') {
     if (state !== undefined) {
       return (
         <FieldCheckbox
@@ -164,7 +145,7 @@ export const RenderField = observer<RenderFieldProps>(function RenderField({
     );
   }
 
-  if (controltype === 'combobox') {
+  if (controlType === 'combobox') {
     if (state !== undefined) {
       return (
         <Combobox
@@ -201,7 +182,7 @@ export const RenderField = observer<RenderFieldProps>(function RenderField({
     );
   }
 
-  if (controltype === 'textarea') {
+  if (controlType === 'textarea') {
     if (state !== undefined) {
       return (
         <Textarea

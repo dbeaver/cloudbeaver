@@ -32,6 +32,7 @@ interface ObjectPropertyFormProps extends ILayoutSizeProps {
   hideEmptyPlaceholder?: boolean;
   canShowPassword?: boolean;
   isSaved?: (property: ObjectPropertyInfo) => boolean;
+  geLayoutSize?: (property: ObjectPropertyInfo) => ILayoutSizeProps;
   onFocus?: (name: string) => void;
 }
 
@@ -49,6 +50,7 @@ export const ObjectPropertyInfoForm = observer<ObjectPropertyFormProps>(function
   hideEmptyPlaceholder,
   canShowPassword,
   isSaved,
+  geLayoutSize,
   onFocus,
   ...rest
 }) {
@@ -77,7 +79,7 @@ export const ObjectPropertyInfoForm = observer<ObjectPropertyFormProps>(function
         return (
           <RenderField
             key={property.id}
-            className={s(sizeStyles, { ...layoutProps }, className)}
+            className={s(sizeStyles, { ...(geLayoutSize ? geLayoutSize(property) : layoutProps) }, className)}
             property={property}
             state={state}
             editable={editable}

@@ -11,6 +11,7 @@ import {
   Container,
   Expandable,
   EXPANDABLE_FORM_STYLES,
+  getPropertyControlType,
   Group,
   GroupTitle,
   ObjectPropertyInfoForm,
@@ -54,7 +55,7 @@ export const ProviderPropertiesForm = observer<Props>(function ProviderPropertie
                 state={config.providerProperties}
                 disabled={disabled}
                 readOnly={readonly}
-                medium
+                maximum
                 hideEmptyPlaceholder
               />
             </Container>
@@ -84,8 +85,7 @@ export const ProviderPropertiesForm = observer<Props>(function ProviderPropertie
                 category={category}
                 disabled={disabled}
                 readOnly={readonly}
-                small
-                noGrow
+                geLayoutSize={property => (getPropertyControlType(property) === 'checkbox' ? { maximum: true } : { small: true, noGrow: true })}
                 hideEmptyPlaceholder
               />
             </Container>
