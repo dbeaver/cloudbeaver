@@ -7,14 +7,13 @@
  */
 import { CachedDataResource } from './CachedDataResource';
 
-interface ILoaderData {
+interface IEntityData {
   id: string;
   value: number;
 }
 
-const DEFAULT_STATE: () => ILoaderData[] = () => [];
-
-const LOADER_DATA_MOCK: ILoaderData[] = [
+const DEFAULT_STATE_GETTER: () => IEntityData[] = () => [];
+const DATA_MOCK_GETTER: () => IEntityData[] = () => [
   {
     id: '1',
     value: 1,
@@ -25,17 +24,17 @@ const LOADER_DATA_MOCK: ILoaderData[] = [
   },
 ];
 
-async function fetchMock(): Promise<ILoaderData[]> {
+async function fetchMock(): Promise<IEntityData[]> {
   return new Promise(resolve => {
     setTimeout(() => {
-      resolve(LOADER_DATA_MOCK);
+      resolve(DATA_MOCK_GETTER());
     }, 1);
   });
 }
 
-class TestDataResource extends CachedDataResource<ILoaderData[]> {
+class TestDataResource extends CachedDataResource<IEntityData[]> {
   constructor() {
-    super(DEFAULT_STATE);
+    super(DEFAULT_STATE_GETTER);
   }
 
   protected async loader() {
@@ -56,12 +55,12 @@ describe('CachedDataResource', () => {
   });
 
   test('should initialize with the default state', () => {
-    expect(dataResource.data).toEqual(DEFAULT_STATE());
+    expect(dataResource.data).toEqual(DEFAULT_STATE_GETTER());
   });
 
   test('should load data', async () => {
     await dataResource.load();
-    expect(dataResource.data).toEqual(LOADER_DATA_MOCK);
+    expect(dataResource.data).toEqual(DATA_MOCK_GETTER());
   });
 
   test('should be able to outdate the data', () => {

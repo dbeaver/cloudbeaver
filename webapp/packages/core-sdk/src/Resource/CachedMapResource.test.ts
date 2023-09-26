@@ -18,7 +18,7 @@ interface IEntityData {
 
 const ERROR_ITEM_ID = 'error';
 
-const DATA_MOCK: IEntityData[] = [
+const DATA_MOCK_GETTER: () => IEntityData[] = () => [
   {
     id: '1',
     value: 1,
@@ -34,9 +34,11 @@ const DATA_MOCK: IEntityData[] = [
 ];
 
 const TEST_ERROR_MESSAGE = 'Test error';
-const DEFAULT_STATE = () => new Map();
+const DEFAULT_STATE_GETTER = () => new Map();
 
 async function fetchMock(key: ResourceKey<string> | undefined): Promise<IEntityData[]> {
+  const data = DATA_MOCK_GETTER();
+
   return new Promise((resolve, reject) => {
     setTimeout(() => {
       if (key) {
@@ -44,12 +46,12 @@ async function fetchMock(key: ResourceKey<string> | undefined): Promise<IEntityD
           reject(new Error(TEST_ERROR_MESSAGE));
         }
 
-        const data = DATA_MOCK.find(d => d.id === key);
-        if (data) {
-          resolve([data]);
+        const item = data.find(d => d.id === key);
+        if (item) {
+          resolve([item]);
         }
       } else {
-        resolve(DATA_MOCK);
+        resolve(data);
       }
     }, 1);
   });
@@ -57,7 +59,7 @@ async function fetchMock(key: ResourceKey<string> | undefined): Promise<IEntityD
 
 class TestMapResource extends CachedMapResource<string, IEntityData> {
   constructor() {
-    super(DEFAULT_STATE);
+    super(DEFAULT_STATE_GETTER);
   }
 
   protected async loader(key: ResourceKey<string>) {
@@ -83,7 +85,7 @@ describe('CachedMapResource', () => {
   });
 
   test('should initialize with the initial value', () => {
-    expect(toJS(mapResource.data)).toEqual(DEFAULT_STATE());
+    expect(toJS(mapResource.data)).toEqual(DEFAULT_STATE_GETTER());
   });
 
   test('should return all entries', () => {
