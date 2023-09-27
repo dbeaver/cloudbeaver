@@ -24,10 +24,7 @@ export interface IDatabaseDataModel<TOptions = any, TResult extends IDatabaseDat
   /** Holds metadata about a data request. */
   readonly requestInfo: IRequestInfo;
   readonly supportedDataFormats: ResultDataFormat[];
-  /**
-   * Represents the count of records loaded from the database per request.
-   * It can be updated using the setCountGain method.
-   */
+  /** Represents the value by which the number of loaded rows will be increased when loading the next data portion */
   readonly countGain: number;
 
   readonly onOptionsChange: IExecutor;

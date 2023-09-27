@@ -99,7 +99,7 @@ interface Props {
   resultIndex: number | undefined;
   presentationId: string | undefined;
   valuePresentationId: string | null | undefined;
-  /** Hide tools panel from Table Viewer */
+  /** Display data in simple mode, some features will be hidden or disabled */
   simple?: boolean;
   context?: IDataContext;
   className?: string;
