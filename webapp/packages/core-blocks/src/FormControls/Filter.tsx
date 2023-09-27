@@ -7,7 +7,6 @@
  */
 import { observer } from 'mobx-react-lite';
 import { useCallback, useEffect, useState } from 'react';
-import styled from 'reshadow';
 
 import type { ComponentStyle } from '@cloudbeaver/core-theming';
 
@@ -15,7 +14,6 @@ import { IconButton } from '../IconButton';
 import { s } from '../s';
 import { useFocus } from '../useFocus';
 import { useS } from '../useS';
-import { useStyles } from '../useStyles';
 import filterStyle from './Filter.m.css';
 import { InputField } from './InputField';
 
@@ -54,7 +52,6 @@ export const Filter = observer<ControlledProps | ObjectsProps<any, any>>(functio
   disabled,
   max,
   className,
-  style: propStyle,
   onFilter,
   onToggle,
   onKeyDown,
@@ -107,12 +104,11 @@ export const Filter = observer<ControlledProps | ObjectsProps<any, any>>(functio
     value = state[name];
   }
 
-  return styled(useStyles(propStyle))(
+  return (
     <div className={s(styles, { filterContainer: true })} onClick={onClick}>
       <InputField
-        className={s(styles, { inputField: true, max, toggled })}
+        className={s(styles, { inputField: true, max, toggled }, className)}
         ref={inputRef}
-        style={propStyle}
         placeholder={placeholder}
         disabled={disabled}
         name={name}
@@ -130,6 +126,6 @@ export const Filter = observer<ControlledProps | ObjectsProps<any, any>>(functio
       ) : (
         <IconButton className={s(styles, { iconButton: true, toggled, toggleMode })} name="search" disabled={disabled} onClick={toggle} />
       )}
-    </div>,
+    </div>
   );
 });
