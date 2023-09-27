@@ -955,7 +955,19 @@ public class LocalResourceController implements RMController {
 
     protected <T> T doProjectOperation(String projectId, RMFileOperation<T> operation) throws DBException {
         for (RMFileOperationHandler fileHandler : fileHandlers) {
-            fileHandler.projectOpened(projectId);
+            try {
+                fileHandler.projectOpened(projectId);
+            } catch (Exception e) {
+                if (credentialsProvider.getActiveUserCredentials() != null) {
+                    WebAppUtils.getWebApplication().getEventController().addEvent(
+                        new WSSessionLogUpdatedEvent(
+                            WSEventType.SESSION_LOG_UPDATED,
+                            credentialsProvider.getActiveUserCredentials().getSmSessionId(),
+                            credentialsProvider.getActiveUserCredentials().getUserId(),
+                            MessageType.ERROR,
+                            e.getMessage()));
+                }
+            }
         }
         return operation.doOperation();
     }
