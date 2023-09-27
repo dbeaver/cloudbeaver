@@ -144,6 +144,8 @@ export class SqlQueryService {
     }
 
     const editable = this.dataViewerService.isDataEditable(connectionInfo);
+    const isOutputLogsTabOpened = !!editorState.outputLogsTab;
+
     model
       .setAccess(editable ? DatabaseDataAccessMode.Default : DatabaseDataAccessMode.Readonly)
       .setOptions({
@@ -151,6 +153,7 @@ export class SqlQueryService {
         connectionKey,
         constraints: [],
         whereFilter: '',
+        readLogs: isOutputLogsTabOpened,
       })
       .source.setExecutionContext(executionContext)
       .setSupportedDataFormats(connectionInfo.supportedDataFormats);
@@ -218,6 +221,8 @@ export class SqlQueryService {
       statistics.modelId = model.id;
 
       const editable = this.dataViewerService.isDataEditable(connectionInfo);
+      const isOutputLogsTabOpened = !!editorState.outputLogsTab;
+
       model
         .setAccess(editable ? DatabaseDataAccessMode.Default : DatabaseDataAccessMode.Readonly)
         .setOptions({
@@ -225,6 +230,7 @@ export class SqlQueryService {
           connectionKey,
           constraints: [],
           whereFilter: '',
+          readLogs: isOutputLogsTabOpened,
         })
         .source.setExecutionContext(executionContext)
         .setSupportedDataFormats(connectionInfo.supportedDataFormats);
