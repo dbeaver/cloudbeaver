@@ -11,8 +11,11 @@
   composes: theme-typography--body1 from global;
   box-sizing: border-box;
   overflow: hidden;
-  white-space: nowrap;
+  white-space: initial;
   text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
 }
 
 .fieldDescription {
