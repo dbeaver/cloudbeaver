@@ -9,7 +9,6 @@ import { computed, observable } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import { forwardRef } from 'react';
 
-import { getComputed } from '../../getComputed';
 import { s } from '../../s';
 import { useObjectRef } from '../../useObjectRef';
 import { useObservableRef } from '../../useObservableRef';
@@ -115,10 +114,8 @@ export const TreeNode = observer<Props, HTMLDivElement | null>(
       },
     );
 
-    const elementExpanded = getComputed(() => nodeContext.externalExpanded ?? nodeContext.expanded);
-
     return (
-      <div ref={ref} className={s(styles, { node: true, expanded: elementExpanded }, className)}>
+      <div ref={ref} className={s(styles, { node: true }, className)}>
         <TreeNodeContext.Provider value={nodeContext}>{children}</TreeNodeContext.Provider>
       </div>
     );

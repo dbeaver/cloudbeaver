@@ -18,7 +18,6 @@ import { NavigationNodeRendererLoader } from './NavigationNodeRendererLoader';
 
 export const NavigationNodeElement: NavTreeNodeComponent = observer(function NavigationNodeElement({ nodeId, path, expanded, dragging, className }) {
   const context = useContext(ElementsTreeContext);
-  const navNodeInfoResource = useService(NavNodeInfoResource);
 
   if (context?.tree.renderers) {
     for (const renderer of context.tree.renderers) {
@@ -39,6 +38,11 @@ export const NavigationNodeElement: NavTreeNodeComponent = observer(function Nav
     }
   }
 
+  return <NavigationNodeRenderer nodeId={nodeId} path={path} expanded={expanded} dragging={dragging} className={className} />;
+});
+
+const NavigationNodeRenderer: NavTreeNodeComponent = observer(function NavigationNodeRenderer({ nodeId, path, expanded, dragging, className }) {
+  const navNodeInfoResource = useService(NavNodeInfoResource);
   const node = navNodeInfoResource.get(nodeId);
 
   if (!node) {
@@ -49,7 +53,6 @@ export const NavigationNodeElement: NavTreeNodeComponent = observer(function Nav
     );
   }
 
-  // TODO: after node update reference can be lost and NavigationNode skip update
   return (
     <NavigationNodeRendererLoader
       node={node}

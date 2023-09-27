@@ -64,7 +64,7 @@ export const TreeNodeSelect = observer<Props>(function TreeNodeSelect({
   }
 
   return (
-    <div className={s(styles, { treeNodeSelect: true }, className)} onClick={handleClick} onDoubleClick={handleDbClick}>
+    <div className={className} onClick={handleClick} onDoubleClick={handleDbClick}>
       {loading ? (
         <Loader className={s(styles, { loader: true })} small />
       ) : (
