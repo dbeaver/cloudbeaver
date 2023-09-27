@@ -228,7 +228,6 @@ export const RenderField = observer<RenderFieldProps>(function RenderField({
         value={value}
         disabled={disabled}
         readOnly={readOnly}
-        mod="surface"
         className={className}
       >
         {property.displayName ?? ''}

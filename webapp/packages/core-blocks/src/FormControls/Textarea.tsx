@@ -7,16 +7,12 @@
  */
 import { observer } from 'mobx-react-lite';
 import { useCallback, useContext } from 'react';
-import styled, { css } from 'reshadow';
-
-import type { ComponentStyle } from '@cloudbeaver/core-theming';
 
 import { filterLayoutFakeProps, getLayoutProps } from '../Containers/filterLayoutFakeProps';
 import type { ILayoutSizeProps } from '../Containers/ILayoutSizeProps';
 import elementsSizeStyles from '../Containers/shared/ElementsSize.m.css';
 import { s } from '../s';
 import { useS } from '../useS';
-import { useStyles } from '../useStyles';
 import { FormContext } from './FormContext';
 import formControlStyles from './FormControl.m.css';
 import textareaStyle from './Textarea.m.css';
@@ -25,8 +21,6 @@ type BaseProps = Omit<React.TextareaHTMLAttributes<HTMLTextAreaElement>, 'onChan
   ILayoutSizeProps & {
     description?: string;
     labelTooltip?: string;
-    mod?: 'surface';
-    style?: ComponentStyle;
     embedded?: boolean;
   };
 
@@ -51,7 +45,6 @@ interface TextareaType {
 
 export const Textarea: TextareaType = observer(function Textarea({
   name,
-  style: styleProp,
   value: controlledValue,
   state,
   required,
@@ -59,7 +52,6 @@ export const Textarea: TextareaType = observer(function Textarea({
   className,
   description,
   labelTooltip,
-  mod,
   embedded,
   onChange = () => {},
   ...rest
@@ -86,7 +78,7 @@ export const Textarea: TextareaType = observer(function Textarea({
 
   const value = state ? state[name] : controlledValue;
 
-  return styled(useStyles(styleProp))(
+  return (
     <div className={s(styles, { ...layoutProps, field: true, embedded }, className)}>
       <label className={s(styles, { fieldLabel: true })} title={labelTooltip || rest.title}>
         {children}
@@ -100,7 +92,7 @@ export const Textarea: TextareaType = observer(function Textarea({
         data-embedded={embedded}
         onChange={handleChange}
       />
-      {description && <div className={s(styles, { fieldDescription: true, valid: true })}>{description}</div>}
-    </div>,
+      {description && <div className={s(styles, { fieldDescription: true })}>{description}</div>}
+    </div>
   );
 });
