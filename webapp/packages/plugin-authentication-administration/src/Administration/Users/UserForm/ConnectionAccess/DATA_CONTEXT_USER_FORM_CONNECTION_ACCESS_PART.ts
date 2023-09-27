@@ -11,10 +11,9 @@ import { createDataContext, DATA_CONTEXT_DI_PROVIDER } from '@cloudbeaver/core-v
 
 import type { AdministrationUserFormState } from '../AdministrationUserFormState';
 import { DATA_CONTEXT_USER_FORM_INFO_PART } from '../Info/DATA_CONTEXT_USER_FORM_INFO_PART';
-import type { IUserFormConnectionAccessPart } from './IUserFormConnectionAccessPart';
 import { UserFormConnectionAccessPart } from './UserFormConnectionAccessPart';
 
-export const DATA_CONTEXT_USER_FORM_CONNECTION_ACCESS_PART = createDataContext<IUserFormConnectionAccessPart>(
+export const DATA_CONTEXT_USER_FORM_CONNECTION_ACCESS_PART = createDataContext<UserFormConnectionAccessPart>(
   'User Form Connection Access Part',
   context => {
     context.get(DATA_CONTEXT_USER_FORM_INFO_PART); // ensure that info part is loaded first

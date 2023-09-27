@@ -13,12 +13,12 @@ import { FormMode } from '@cloudbeaver/core-ui';
 import { isValuesEqual } from '@cloudbeaver/core-utils';
 
 import type { UserFormProps } from '../AdministrationUserFormService';
-import type { IUserFormInfoPart } from './IUserFormInfoPart';
+import type { UserFormInfoPart } from './UserFormInfoPart';
 
 const PASSWORD_PLACEHOLDER = '••••••';
 
 interface Props extends UserFormProps {
-  tabState: IUserFormInfoPart;
+  tabState: UserFormInfoPart;
   tabSelected: boolean;
   disabled: boolean;
 }

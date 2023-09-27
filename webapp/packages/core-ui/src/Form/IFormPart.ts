@@ -5,12 +5,11 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import type { AdminConnectionGrantInfo } from '@cloudbeaver/core-sdk';
 import type { ILoadableState } from '@cloudbeaver/core-utils';
 
-export interface IUserFormConnectionAccessPart extends ILoadableState {
-  grantedConnections: AdminConnectionGrantInfo[];
-  selectedConnections: Map<any, boolean>;
+export interface IFormPart<TState> extends ILoadableState {
+  state: TState;
+  initialState: TState;
 
   isChanged(): boolean;
 

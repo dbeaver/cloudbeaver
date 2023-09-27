@@ -10,14 +10,12 @@ import { observer } from 'mobx-react-lite';
 import {
   ColoredContainer,
   Group,
-  StaticImage,
   Table,
   TableBody,
   TableColumnHeader,
   TableColumnValue,
   TableHeader,
   TableItem,
-  TableItemSelect,
   TextPlaceholder,
   useAutoLoad,
   useResource,
@@ -32,18 +30,19 @@ import {
 } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
 import { isGlobalProject, ProjectInfoResource } from '@cloudbeaver/core-projects';
-import { AdminSubjectType, CachedMapAllKey, resourceKeyList } from '@cloudbeaver/core-sdk';
+import { CachedMapAllKey, resourceKeyList } from '@cloudbeaver/core-sdk';
 import { type TabContainerPanelComponent, useTab, useTabState } from '@cloudbeaver/core-ui';
 import { isDefined } from '@cloudbeaver/core-utils';
 
 import type { UserFormProps } from '../AdministrationUserFormService';
-import type { IUserFormConnectionAccessPart } from './IUserFormConnectionAccessPart';
+import type { UserFormConnectionAccessPart } from './UserFormConnectionAccessPart';
+import { UserFormConnectionTableItem } from './UserFormConnectionTableItem';
 
 export const UserFormConnectionAccess: TabContainerPanelComponent<UserFormProps> = observer(function UserFormConnectionAccess({ tabId }) {
   const translate = useTranslate();
   const tab = useTab(tabId);
   const driversResource = useService(DBDriverResource);
-  const tabState = useTabState<IUserFormConnectionAccessPart>();
+  const tabState = useTabState<UserFormConnectionAccessPart>();
   const projectLoader = useResource(UserFormConnectionAccess, ProjectInfoResource, CachedMapAllKey, { active: tab.selected });
   const connectionsLoader = useResource(
     UserFormConnectionAccess,
@@ -67,10 +66,6 @@ export const UserFormConnectionAccess: TabContainerPanelComponent<UserFormProps>
 
   useAutoLoad(UserFormConnectionAccess, tabState, tab.selected);
 
-  function getConnectionPermission(connectionId: string) {
-    return tabState.grantedConnections.find(connectionPermission => connectionPermission.dataSourceId === connectionId);
-  }
-
   if (connections.length === 0) {
     return (
       <ColoredContainer>
@@ -79,6 +74,14 @@ export const UserFormConnectionAccess: TabContainerPanelComponent<UserFormProps>
         </Group>
       </ColoredContainer>
     );
+  }
+
+  function handleSelect(connectionId: string, state: boolean) {
+    if (state) {
+      tabState.add(connectionId);
+    } else {
+      tabState.delete(connectionId);
+    }
   }
 
   const disabled = tabState.isLoading();
@@ -92,7 +95,7 @@ export const UserFormConnectionAccess: TabContainerPanelComponent<UserFormProps>
     <ColoredContainer vertical gap>
       {/* {info && <InfoItem info={info} />} */}
       <Group box large overflow>
-        <Table selectedItems={tabState.selectedConnections}>
+        <Table onSelect={handleSelect}>
           <TableHeader fixed>
             <TableColumnHeader min />
             <TableColumnHeader min />
@@ -105,33 +108,9 @@ export const UserFormConnectionAccess: TabContainerPanelComponent<UserFormProps>
                 <TableColumnValue colSpan={4}>{translate('cloud_connections_access_placeholder')}</TableColumnValue>
               </TableItem>
             )}
-            {localConnections.map(connection => {
-              const connectionPermission = getConnectionPermission(connection.id);
-              const driver = driversResource.get(connection.driverId);
-              const isTeamProvided = connectionPermission?.subjectType === AdminSubjectType.Team;
-
-              let grantedBy = '';
-              if (isTeamProvided) {
-                grantedBy = `${translate('authentication_administration_user_connections_access_granted_team')} ${connectionPermission.subjectId}`;
-              } else if (connectionPermission) {
-                grantedBy = translate('authentication_administration_user_connections_access_granted_directly');
-              }
-
-              return (
-                <TableItem key={connection.id} item={connection.id} selectDisabled={isTeamProvided}>
-                  <TableColumnValue centerContent flex>
-                    <TableItemSelect disabled={isTeamProvided || disabled} checked={isTeamProvided} />
-                  </TableColumnValue>
-                  <TableColumnValue centerContent>
-                    <StaticImage icon={driver?.icon} width={24} block />
-                  </TableColumnValue>
-                  <TableColumnValue title={connection.name} ellipsis>
-                    {connection.name}
-                  </TableColumnValue>
-                  <TableColumnValue title={grantedBy}>{grantedBy}</TableColumnValue>
-                </TableItem>
-              );
-            })}
+            {localConnections.map(connection => (
+              <UserFormConnectionTableItem key={connection.id} connection={connection} disabled={disabled} />
+            ))}
           </TableBody>
         </Table>
       </Group>

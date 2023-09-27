@@ -13,10 +13,10 @@ import { CachedMapAllKey } from '@cloudbeaver/core-sdk';
 import { isDefined } from '@cloudbeaver/core-utils';
 
 import type { UserFormProps } from '../AdministrationUserFormService';
-import type { IUserFormInfoPart } from './IUserFormInfoPart';
+import type { UserFormInfoPart } from './UserFormInfoPart';
 
 interface Props extends UserFormProps {
-  tabState: IUserFormInfoPart;
+  tabState: UserFormInfoPart;
   tabSelected: boolean;
   disabled: boolean;
 }

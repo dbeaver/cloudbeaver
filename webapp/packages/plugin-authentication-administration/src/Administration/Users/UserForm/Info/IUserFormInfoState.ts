@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import type { ILoadableState } from '@cloudbeaver/core-utils';
 
 export interface IUserFormInfoState {
   userId: string;
@@ -13,14 +12,4 @@ export interface IUserFormInfoState {
   password: string;
   metaParameters: Record<string, any>;
   teams: string[];
-}
-
-export interface IUserFormInfoPart extends ILoadableState {
-  state: IUserFormInfoState;
-  initialState: IUserFormInfoState;
-
-  isChanged(): boolean;
-
-  load(): Promise<void>;
-  save(): Promise<void>;
 }

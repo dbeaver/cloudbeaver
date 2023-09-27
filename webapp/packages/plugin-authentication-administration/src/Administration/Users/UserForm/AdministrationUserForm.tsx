@@ -42,17 +42,26 @@ export const AdministrationUserForm = observer<Props>(function AdministrationUse
     async onSubmit() {
       const mode = state.mode;
       const saved = await state.save();
+      const userFormInfoPart = state.dataContext.get(DATA_CONTEXT_USER_FORM_INFO_PART);
 
       if (saved) {
-        const userFormInfoPart = state.dataContext.get(DATA_CONTEXT_USER_FORM_INFO_PART);
-
         if (mode === FormMode.Create) {
+          onClose();
           notificationService.logSuccess({ title: 'authentication_administration_user_created', message: userFormInfoPart.state.userId });
         } else {
           notificationService.logSuccess({ title: 'authentication_administration_user_updated', message: userFormInfoPart.state.userId });
         }
-
-        onClose();
+      } else {
+        if (state.mode === FormMode.Create) {
+          // user not created
+          notificationService.logError({ title: 'authentication_administration_user_create_failed' });
+        } else {
+          // user created but not all data saved correctly
+          if (mode === FormMode.Create) {
+            notificationService.logSuccess({ title: 'authentication_administration_user_created', message: userFormInfoPart.state.userId });
+          }
+          notificationService.logError({ title: 'authentication_administration_user_update_failed' });
+        }
       }
     },
   });

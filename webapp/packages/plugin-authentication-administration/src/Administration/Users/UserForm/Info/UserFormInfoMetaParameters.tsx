@@ -11,10 +11,10 @@ import { UserMetaParametersResource } from '@cloudbeaver/core-authentication';
 import { Group, GroupTitle, ObjectPropertyInfoForm, useResource, useTranslate } from '@cloudbeaver/core-blocks';
 
 import type { UserFormProps } from '../AdministrationUserFormService';
-import type { IUserFormInfoPart } from './IUserFormInfoPart';
+import type { UserFormInfoPart } from './UserFormInfoPart';
 
 interface Props extends UserFormProps {
-  tabState: IUserFormInfoPart;
+  tabState: UserFormInfoPart;
   tabSelected: boolean;
   disabled: boolean;
 }

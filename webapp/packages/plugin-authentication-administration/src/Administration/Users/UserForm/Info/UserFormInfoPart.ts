@@ -5,77 +5,35 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { action, makeObservable, observable, toJS } from 'mobx';
+import { observable } from 'mobx';
 
 import type { AdminUser, UsersResource } from '@cloudbeaver/core-authentication';
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
-import type { ServerConfig, ServerConfigResource } from '@cloudbeaver/core-root';
+import type { ServerConfigResource } from '@cloudbeaver/core-root';
 import { getCachedDataResourceLoaderState } from '@cloudbeaver/core-sdk';
-import { FormMode, formValidationContext, IFormState } from '@cloudbeaver/core-ui';
+import { FormMode, FormPart, formValidationContext, IFormState } from '@cloudbeaver/core-ui';
 import { isArraysEqual, isDefined, isObjectsEqual, isValuesEqual } from '@cloudbeaver/core-utils';
 import { DATA_CONTEXT_LOADABLE_STATE } from '@cloudbeaver/core-view';
 
 import type { IUserFormState } from '../AdministrationUserFormService';
 import type { AdministrationUserFormState } from '../AdministrationUserFormState';
-import type { IUserFormInfoPart } from './IUserFormInfoPart';
-
-interface IUserFormInfoState {
-  userId: string;
-  enabled: boolean;
-  password: string;
-  metaParameters: Record<string, any>;
-  teams: string[];
-}
+import type { IUserFormInfoState } from './IUserFormInfoState';
 
 const DEFAULT_ENABLED = true;
 
-export class UserFormInfoPart implements IUserFormInfoPart {
-  state: IUserFormInfoState;
-  initialState: IUserFormInfoState;
-
-  exception: Error | null;
-  promise: Promise<any> | null;
-
-  private loaded: boolean;
-  private loading: boolean;
-
+export class UserFormInfoPart extends FormPart<IUserFormInfoState, IUserFormState> {
   constructor(
     private readonly serverConfigResource: ServerConfigResource,
-    private readonly formState: AdministrationUserFormState,
+    formState: AdministrationUserFormState,
     private readonly usersResource: UsersResource,
   ) {
-    this.state = {
+    super(formState, {
       userId: formState.state.userId || '',
       enabled: DEFAULT_ENABLED,
       password: '',
       metaParameters: {},
       teams: [],
-    };
-    this.initialState = toJS(this.state);
-
-    this.exception = null;
-    this.promise = null;
-
-    this.loaded = false;
-    this.loading = false;
-
-    this.formState.configureTask.addHandler(this.configure.bind(this));
-    this.formState.submitTask.addHandler(this.save.bind(this));
-    this.formState.validationTask.addHandler(this.validate.bind(this));
-
-    makeObservable<this, 'loaded' | 'loading' | 'fillDefaultConfig'>(this, {
-      state: observable,
-      initialState: observable,
-      promise: observable.ref,
-      exception: observable.ref,
-      loaded: observable,
-      loading: observable,
-      fillDefaultConfig: action,
     });
-  }
-
-  isLoading(): boolean {
-    return this.loading;
   }
 
   isOutdated(): boolean {
@@ -98,10 +56,6 @@ export class UserFormInfoPart implements IUserFormInfoPart {
     return this.loaded;
   }
 
-  isError(): boolean {
-    return this.exception !== null;
-  }
-
   isChanged(): boolean {
     if (!this.loaded) {
       return false;
@@ -116,53 +70,27 @@ export class UserFormInfoPart implements IUserFormInfoPart {
     );
   }
 
-  async load() {
-    if (this.loading) {
-      return this.promise;
+  protected override async saveChanges(): Promise<void> {
+    if (this.formState.mode === FormMode.Create) {
+      const user = await this.usersResource.create({
+        userId: this.state.userId,
+      });
+      this.initialState.userId = user.userId;
+      this.formState.setMode(FormMode.Edit);
     }
 
-    this.promise = this.loader();
-    this.promise.finally(() => {
-      this.promise = null;
-    });
+    // load actual data of user to prevent conflicts
+    await this.usersResource.refresh(this.state.userId);
 
-    await this.promise;
+    await this.updateCredentials();
+    await this.updateTeams();
+    await this.updateStatus();
+    await this.updateMetaParameters();
+
+    this.usersResource.markOutdated(this.state.userId);
   }
 
-  async save(): Promise<void> {
-    if (this.loading) {
-      return;
-    }
-
-    try {
-      this.loading = true;
-
-      await this.loadInitialState();
-
-      if (!this.isChanged()) {
-        return;
-      }
-
-      if (this.formState.mode === FormMode.Create) {
-        const user = await this.usersResource.create({
-          userId: this.state.userId,
-        });
-        this.initialState.userId = user.userId;
-        this.formState.setMode(FormMode.Edit);
-      }
-      await this.updateCredentials();
-      await this.updateTeams();
-      await this.updateStatus();
-      await this.updateMetaParameters();
-
-      this.usersResource.markOutdated(this.state.userId);
-      this.loaded = false;
-    } finally {
-      this.loading = false;
-    }
-  }
-
-  private validate(data: IFormState<IUserFormState>, contexts: IExecutionContextProvider<IFormState<IUserFormState>>) {
+  protected override validate(data: IFormState<IUserFormState>, contexts: IExecutionContextProvider<IFormState<IUserFormState>>) {
     if (!this.loaded) {
       return;
     }
@@ -179,24 +107,10 @@ export class UserFormInfoPart implements IUserFormInfoPart {
       }
     }
   }
-  private configure() {
+  protected override configure() {
     const loadableStateContext = this.formState.dataContext.get(DATA_CONTEXT_LOADABLE_STATE);
 
     loadableStateContext.getState('user-info', () => [getCachedDataResourceLoaderState(this.serverConfigResource, undefined)]);
-  }
-
-  private fillDefaultConfig(serverConfig: ServerConfig | null, user: AdminUser | null) {
-    user = toJS(user);
-    this.initialState.userId = user?.userId || this.formState.state.userId || '';
-    this.initialState.enabled = user?.enabled || DEFAULT_ENABLED;
-    this.initialState.metaParameters = observable(user?.metaParameters || {});
-    this.initialState.teams = observable(user?.grantedTeams || [serverConfig?.defaultUserTeam].filter(isDefined));
-
-    if (this.isChanged()) {
-      return;
-    }
-
-    this.state = toJS(this.initialState);
   }
 
   private async updateCredentials() {
@@ -255,20 +169,7 @@ export class UserFormInfoPart implements IUserFormInfoPart {
     await this.usersResource.setMetaParameters(this.state.userId, this.state.metaParameters);
   }
 
-  private async loader() {
-    try {
-      this.loading = true;
-      await this.loadInitialState();
-      this.loaded = true;
-      this.exception = null;
-    } catch (exception: any) {
-      this.exception = exception;
-    } finally {
-      this.loading = false;
-    }
-  }
-
-  private async loadInitialState() {
+  protected override async loader() {
     let user: AdminUser | null = null;
     const serverConfig = await this.serverConfigResource.load();
 
@@ -276,6 +177,12 @@ export class UserFormInfoPart implements IUserFormInfoPart {
       user = await this.usersResource.load(this.initialState.userId, ['includeMetaParameters']);
     }
 
-    this.fillDefaultConfig(serverConfig, user);
+    this.setInitialState({
+      userId: user?.userId || this.formState.state.userId || '',
+      enabled: user?.enabled || DEFAULT_ENABLED,
+      metaParameters: observable(user?.metaParameters || {}),
+      teams: observable(user?.grantedTeams || [serverConfig?.defaultUserTeam].filter(isDefined)),
+      password: '',
+    });
   }
 }

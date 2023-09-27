@@ -33,6 +33,7 @@ export interface IFormState<TState> extends ILoadableState {
   readonly formStateTask: IExecutor<TState>;
   readonly fillDefaultConfigTask: IExecutor<IFormState<TState>>;
   readonly submitTask: IExecutor<IFormState<TState>>;
+  readonly validationTask: IExecutor<IFormState<TState>>;
 
   setMode(mode: FormMode): this;
   setPartsState(state: MetadataMap<string, any>): this;

@@ -12,16 +12,16 @@ import { useService } from '@cloudbeaver/core-di';
 import { TabContainerPanelComponent, useTab, useTabState } from '@cloudbeaver/core-ui';
 
 import type { UserFormProps } from '../AdministrationUserFormService';
-import type { IUserFormInfoPart } from './IUserFormInfoPart';
 import { UserFormInfoCredentials } from './UserFormInfoCredentials';
 import { UserFormInfoMetaParameters } from './UserFormInfoMetaParameters';
+import type { UserFormInfoPart } from './UserFormInfoPart';
 import { UserFormInfoPartService } from './UserFormInfoPartService';
 import { UserFormInfoTeams } from './UserFormInfoTeams';
 
 export const UserFormInfo: TabContainerPanelComponent<UserFormProps> = observer(function UserFormInfo({ tabId, formState }) {
   const translate = useTranslate();
   const tab = useTab(tabId);
-  const tabState = useTabState<IUserFormInfoPart>();
+  const tabState = useTabState<UserFormInfoPart>();
   const userFormInfoPartService = useService(UserFormInfoPartService);
 
   useAutoLoad(UserFormInfo, tabState, tab.selected);
