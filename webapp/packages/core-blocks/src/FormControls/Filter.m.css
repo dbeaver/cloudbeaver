@@ -40,9 +40,6 @@
   }
 }
 
-.innerInputStyle {
-}
-
 .toggleMode {
   composes: theme-background-primary theme-text-on-primary from global;
   cursor: pointer;

@@ -8,12 +8,10 @@
 import { observer } from 'mobx-react-lite';
 import React, { forwardRef, useCallback, useContext, useLayoutEffect, useRef, useState } from 'react';
 
-import type { ComponentStyle } from '@cloudbeaver/core-theming';
 import { isNotNullDefined } from '@cloudbeaver/core-utils';
 
 import { filterLayoutFakeProps, getLayoutProps } from '../Containers/filterLayoutFakeProps';
 import type { ILayoutSizeProps } from '../Containers/ILayoutSizeProps';
-import elementsSizeStyles from '../Containers/shared/ElementsSize.m.css';
 import { Icon } from '../Icon';
 import { Loader } from '../Loader/Loader';
 import { useTranslate } from '../localization/useTranslate';
@@ -22,9 +20,10 @@ import { useCombinedHandler } from '../useCombinedHandler';
 import { useMergeRefs } from '../useMergeRefs';
 import { useS } from '../useS';
 import { useStateDelay } from '../useStateDelay';
-import { useStyles } from '../useStyles';
+import { Field } from './Field';
+import { FieldDescription } from './FieldDescription';
+import { FieldLabel } from './FieldLabel';
 import { FormContext } from './FormContext';
-import formControlStyles from './FormControl.m.css';
 import inputFieldStyle from './InputField.m.css';
 import { isControlPresented } from './isControlPresented';
 import { useCapsLockTracker } from './useCapsLockTracker';
@@ -35,9 +34,7 @@ type BaseProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange' | 
     loading?: boolean;
     description?: string;
     labelTooltip?: string;
-    mod?: 'surface';
     ref?: React.ForwardedRef<HTMLInputElement>;
-    style?: ComponentStyle;
     canShowPassword?: boolean;
     onCustomCopy?: () => void;
     icon?: React.ReactElement;
@@ -72,7 +69,6 @@ export const InputField: InputFieldType = observer(
   forwardRef<HTMLInputElement>(function InputField(
     {
       name,
-      style,
       value: valueControlled,
       defaultValue,
       required,
@@ -85,7 +81,6 @@ export const InputField: InputFieldType = observer(
       loading,
       description,
       labelTooltip,
-      mod,
       autoHide,
       canShowPassword = true,
       onChange,
@@ -102,8 +97,7 @@ export const InputField: InputFieldType = observer(
     const translate = useTranslate();
     const layoutProps = getLayoutProps(rest);
     rest = filterLayoutFakeProps(rest);
-    const propStyles = useStyles(style);
-    const styles = useS(inputFieldStyle, formControlStyles, elementsSizeStyles);
+    const styles = useS(inputFieldStyle);
     const context = useContext(FormContext);
     loading = useStateDelay(loading ?? false, 300);
 
@@ -163,47 +157,42 @@ export const InputField: InputFieldType = observer(
     }
 
     return (
-      <div data-testid="field" className={s(styles, { ...layoutProps, field: true }, className)}>
-        <div data-testid="field-label" title={labelTooltip || rest.title} className={styles.fieldLabel}>
+      <Field {...layoutProps} className={className}>
+        <FieldLabel title={labelTooltip || rest.title} required={required}>
           {children}
-          {required && ' *'}
-        </div>
-        <div data-testid="input-container" className={styles.inputContainer}>
+        </FieldLabel>
+        <div className={s(styles, { inputContainer: true })}>
           <input
             ref={mergedRef}
             {...rest}
             type={passwordRevealed ? 'text' : rest.type}
             name={name}
             value={uncontrolled ? undefined : value ?? ''}
-            className={styles.input}
+            className={s(styles, { input: true })}
+            required={required}
             onChange={handleChange}
             onBlur={handleBlur}
             onKeyDown={handleKeyDown}
-            required={required}
           />
           {loading && (
-            <div data-testid="loader-container" title={translate('ui_processing_loading')} className={styles.loaderContainer}>
+            <div title={translate('ui_processing_loading')} className={styles.loaderContainer}>
               <Loader small />
             </div>
           )}
           {passwordType && canShowPassword && (
-            <div data-testid="icon-container" title={translate('ui_reveal_password')} className={styles.iconContainer} onClick={revealPassword}>
+            <div title={translate('ui_reveal_password')} className={styles.iconContainer} onClick={revealPassword}>
               <Icon name={passwordRevealed ? 'password-hide' : 'password-show'} viewBox="0 0 16 16" className={styles.icon} />
             </div>
           )}
           {onCustomCopy && (
-            <div data-testid="icon-container" title={translate('ui_copy_to_clipboard')} className={styles.iconContainer} onClick={onCustomCopy}>
+            <div title={translate('ui_copy_to_clipboard')} className={styles.iconContainer} onClick={onCustomCopy}>
               <Icon name="copy" viewBox="0 0 32 32" className={styles.icon} />
             </div>
           )}
-          {icon && <div data-testid="icon-container" className={styles.customIconContainer}>{icon}</div>}
+          {icon && <div className={styles.customIconContainer}>{icon}</div>}
         </div>
-        {(description || passwordType) && (
-          <div data-testid="field-description" className={s(styles, { fieldDescription: true, invalid: error })}>
-            {description}
-          </div>
-        )}
-      </div>
+        {(description || passwordType) && <FieldDescription invalid={error}>{description}</FieldDescription>}
+      </Field>
     );
   }),
 );

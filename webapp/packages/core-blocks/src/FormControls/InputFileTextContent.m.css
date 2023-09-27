@@ -1,11 +1,3 @@
-.fieldLabel {
-  display: block;
-  composes: theme-typography--body1 from global;
-  font-weight: 500;
-}
-.fieldLabel:not(:empty) {
-  padding-bottom: 10px;
-}
 .fieldDescription {
   display: flex;
   align-items: center;

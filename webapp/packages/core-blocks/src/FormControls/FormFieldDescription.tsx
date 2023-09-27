@@ -7,13 +7,14 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import { filterLayoutFakeProps, getLayoutProps } from '../Containers/filterLayoutFakeProps';
+import { filterLayoutFakeProps } from '../Containers/filterLayoutFakeProps';
 import type { ILayoutSizeProps } from '../Containers/ILayoutSizeProps';
-import elementsSizeStyles from '../Containers/shared/ElementsSize.m.css';
 import { s } from '../s';
 import { useS } from '../useS';
-import formControlStyles from './FormControl.m.css';
+import { Field } from './Field';
+import { FieldDescription } from './FieldDescription';
 import style from './FormFieldDescription.m.css';
+import { FieldLabel } from './FieldLabel';
 
 interface Props extends ILayoutSizeProps {
   label?: string;
@@ -21,15 +22,20 @@ interface Props extends ILayoutSizeProps {
   className?: string;
 }
 
-export const FormFieldDescription: React.FC<React.PropsWithChildren<Props>> = observer(function FormFieldDescription({ label, title, children, className, ...rest }) {
-  const styles = useS(formControlStyles, elementsSizeStyles, style);
-  const layoutProps = getLayoutProps(rest);
+export const FormFieldDescription: React.FC<React.PropsWithChildren<Props>> = observer(function FormFieldDescription({
+  label,
+  title,
+  children,
+  className,
+  ...rest
+}) {
+  const styles = useS(style);
   rest = filterLayoutFakeProps(rest);
 
   return (
-    <div title={title} className={s(styles, { ...layoutProps, field: true }, className)} {...rest}>
-      {label && <label className={s(styles, { fieldLabel: true })}>{label}</label>}
-      <div className={s(styles, { fieldDescription: true })}>{children}</div>
-    </div>
+    <Field title={title} className={className} {...rest}>
+      {label && <FieldLabel>{label}</FieldLabel>}
+      <FieldDescription className={s(styles, { fieldDescription: true })}>{children}</FieldDescription>
+    </Field>
   );
 });

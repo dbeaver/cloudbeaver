@@ -1,0 +1,8 @@
+.field {
+  box-sizing: border-box;
+
+  & .field {
+    height: 32px;
+    padding: 0;
+  }
+}

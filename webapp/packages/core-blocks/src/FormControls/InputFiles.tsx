@@ -13,7 +13,6 @@ import type { ComponentStyle } from '@cloudbeaver/core-theming';
 import { Button } from '../Button';
 import { filterLayoutFakeProps, getLayoutProps } from '../Containers/filterLayoutFakeProps';
 import type { ILayoutSizeProps } from '../Containers/ILayoutSizeProps';
-import elementsSizeStyles from '../Containers/shared/ElementsSize.m.css';
 import { useTranslate } from '../localization/useTranslate';
 import { s } from '../s';
 import { Tag } from '../Tags/Tag';
@@ -23,8 +22,10 @@ import { useCombinedHandler } from '../useCombinedHandler';
 import { useRefInherit } from '../useRefInherit';
 import { useS } from '../useS';
 import { useStateDelay } from '../useStateDelay';
+import { Field } from './Field';
+import { FieldDescription } from './FieldDescription';
+import { FieldLabel } from './FieldLabel';
 import { FormContext } from './FormContext';
-import formControlStyles from './FormControl.m.css';
 import InputFilesStyles from './InputFiles.m.css';
 import { isControlPresented } from './isControlPresented';
 
@@ -35,9 +36,7 @@ type BaseProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange' | 
     description?: string;
     labelTooltip?: string;
     hideTags?: boolean;
-    mod?: 'surface';
     ref?: React.Ref<HTMLInputElement>;
-    style?: ComponentStyle;
     aggregate?: boolean;
     onDuplicate?: (files: File[]) => void;
   };
@@ -67,7 +66,6 @@ export const InputFiles: InputFilesType = observer(
   forwardRef(function InputFiles(
     {
       name,
-      style: propStyle,
       value: valueControlled,
       required,
       state,
@@ -78,7 +76,6 @@ export const InputFiles: InputFilesType = observer(
       description,
       labelTooltip,
       hideTags,
-      mod,
       autoHide,
       aggregate,
       onChange,
@@ -92,7 +89,7 @@ export const InputFiles: InputFilesType = observer(
     const ref = useRefInherit<HTMLInputElement>(refInherit);
     const [innerState, setInnerState] = useState<FileList | null>(null);
     const translate = useTranslate();
-    const styles = useS(formControlStyles, elementsSizeStyles, InputFilesStyles);
+    const styles = useS(InputFilesStyles);
     const context = useContext(FormContext);
     loading = useStateDelay(loading ?? false, 300);
 
@@ -173,11 +170,10 @@ export const InputFiles: InputFilesType = observer(
     const files = Array.from(value ?? []);
 
     return (
-      <div className={s(styles, { ...layoutProps, field: true }, className)}>
-        <label title={labelTooltip || rest.title} className={s(styles, { fieldLabel: true })}>
+      <Field {...layoutProps} className={className}>
+        <FieldLabel title={labelTooltip || rest.title} required={required}>
           {children}
-          {required && ' *'}
-        </label>
+        </FieldLabel>
         <div className={s(styles, { inputContainer: true })}>
           <UploadArea ref={ref} {...rest} name={name} value={value} required={required} onChange={handleChange}>
             <Button icon="/icons/import.svg" tag="div" loading={loading} mod={['outlined']}>
@@ -192,8 +188,8 @@ export const InputFiles: InputFilesType = observer(
             </Tags>
           )}
         </div>
-        {description && <div className={s(styles, { fieldDescription: true, invalid: error })}>{description}</div>}
-      </div>
+        {description && <FieldDescription invalid={error}>{description}</FieldDescription>}
+      </Field>
     );
   }),
 );

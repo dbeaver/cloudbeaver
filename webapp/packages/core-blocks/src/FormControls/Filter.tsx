@@ -107,8 +107,8 @@ export const Filter = observer<ControlledProps | ObjectsProps<any, any>>(functio
   return (
     <div className={s(styles, { filterContainer: true })} onClick={onClick}>
       <InputField
-        className={s(styles, { inputField: true, max, toggled }, className)}
         ref={inputRef}
+        className={s(styles, { inputField: true, max, toggled }, className)}
         placeholder={placeholder}
         disabled={disabled}
         name={name}

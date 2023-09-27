@@ -1,5 +1,6 @@
 .textarea {
   line-height: 19px;
+  font-size: 12px;
 }
 .field.embedded {
   height: 100%;
@@ -10,15 +11,5 @@
     border-radius: 0 !important;
     height: 100%;
     resize: none !important;
-  }
-}
-.fieldLabel {
-  display: block;
-  padding-bottom: 10px;
-  composes: theme-typography--body1 from global;
-  font-weight: 500;
-
-  &:empty {
-    display: none;
   }
 }

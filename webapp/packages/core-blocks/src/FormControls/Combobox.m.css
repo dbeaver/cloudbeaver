@@ -12,15 +12,17 @@
   margin: 0;
 }
 
-.fieldLabel {
-  display: block;
-  padding-bottom: 10px;
-  composes: theme-typography--body1 from global;
-  font-weight: 500;
+.input {
+  padding-right: 24px !important;
 }
 
 .input {
-  padding-right: 24px !important;
+  font-size: 12px;
+
+  &.select {
+    cursor: pointer;
+    user-select: none;
+  }
 }
 
 .menuButton {

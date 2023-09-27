@@ -7,17 +7,13 @@
  */
 import { observer } from 'mobx-react-lite';
 import { useCallback, useContext } from 'react';
-import styled from 'reshadow';
 
 import { filterLayoutFakeProps, getLayoutProps } from '../Containers/filterLayoutFakeProps';
 import type { ILayoutSizeProps } from '../Containers/ILayoutSizeProps';
-import elementsSizeStyles from '../Containers/shared/ElementsSize.m.css';
 import { s } from '../s';
 import { useS } from '../useS';
-import { useStyles } from '../useStyles';
-import { baseFormControlStyles } from './baseFormControlStyles';
+import { Field } from './Field';
 import { FormContext } from './FormContext';
-import formControlStyles from './FormControl.m.css';
 import style from './Radio.m.css';
 import { RadioGroupContext } from './RadioGroupContext';
 
@@ -60,7 +56,7 @@ export const Radio: RadioType = observer(function Radio({
   children,
   ...rest
 }: ControlledProps | ObjectProps<any, any>) {
-  const styles = useS(formControlStyles, elementsSizeStyles, style);
+  const styles = useS(style);
 
   const layoutProps = getLayoutProps(rest);
   rest = filterLayoutFakeProps(rest);
@@ -104,7 +100,7 @@ export const Radio: RadioType = observer(function Radio({
   }
 
   return (
-    <div className={s(styles, { ...layoutProps, field: true, menu: mod?.includes('menu') }, className)}>
+    <Field {...layoutProps} className={s(styles, { field: true, menu: mod?.includes('menu') }, className)}>
       <div
         className={s(styles, {
           radio: true,
@@ -133,6 +129,6 @@ export const Radio: RadioType = observer(function Radio({
       <label className={s(styles, { label: true, disabled: rest.disabled })} htmlFor={id}>
         {children}
       </label>
-    </div>
+    </Field>
   );
 });

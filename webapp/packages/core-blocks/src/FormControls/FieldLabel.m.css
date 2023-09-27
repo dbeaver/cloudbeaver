@@ -1,0 +1,16 @@
+.fieldLabel {
+  composes: theme-typography--body1 from global;
+  display: block;
+  box-sizing: border-box;
+  overflow: hidden;
+  white-space: initial;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  font-weight: 500;
+}
+
+.fieldLabel:not(:empty) {
+  padding-bottom: 10px;
+}

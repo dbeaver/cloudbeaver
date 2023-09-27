@@ -11,7 +11,6 @@ import { Menu, MenuButton, MenuItem, useMenuState } from 'reakit/Menu';
 
 import { filterLayoutFakeProps, getLayoutProps } from '../Containers/filterLayoutFakeProps';
 import type { ILayoutSizeProps } from '../Containers/ILayoutSizeProps';
-import elementsSizeStyles from '../Containers/shared/ElementsSize.m.css';
 import { getComputed } from '../getComputed';
 import { Icon } from '../Icon';
 import { IconOrImage } from '../IconOrImage';
@@ -20,8 +19,10 @@ import { useTranslate } from '../localization/useTranslate';
 import { s } from '../s';
 import { useS } from '../useS';
 import comboboxStyles from './Combobox.m.css';
+import { Field } from './Field';
+import { FieldDescription } from './FieldDescription';
+import { FieldLabel } from './FieldLabel';
 import { FormContext } from './FormContext';
-import formControlStyles from './FormControl.m.css';
 
 type BaseProps<TKey, TValue> = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'onSelect' | 'name' | 'value' | 'defaultValue'> &
   ILayoutSizeProps & {
@@ -93,7 +94,7 @@ export const Combobox: ComboboxType = observer(function Combobox({
   const context = useContext(FormContext);
   const menuRef = useRef<HTMLDivElement>(null);
   const [inputRef, setInputRef] = useState<HTMLInputElement | null>(null);
-  const styles = useS(elementsSizeStyles, formControlStyles, comboboxStyles);
+  const styles = useS(comboboxStyles);
 
   const menu = useMenuState({
     placement: 'bottom-end',
@@ -255,12 +256,12 @@ export const Combobox: ComboboxType = observer(function Combobox({
   }
 
   return (
-    <div data-testid="field" className={s(styles, { field: true, inline, ...layoutProps }, className)}>
+    <Field {...layoutProps} className={s(styles, { field: true, inline }, className)}>
       {children && (
-        <div title={title} data-testid="field-label" className={styles.fieldLabel}>
+        <FieldLabel title={title} className={styles.fieldLabel}>
           {children}
           {rest.required && ' *'}
-        </div>
+        </FieldLabel>
       )}
       <div data-testid="input-box" className={styles.inputBox}>
         {(icon || loading) && (
@@ -322,20 +323,14 @@ export const Combobox: ComboboxType = observer(function Combobox({
                       {icon && typeof icon === 'string' ? <IconOrImage icon={icon} className={styles.iconOrImage} /> : icon}
                     </div>
                   )}
-                  <div data-testid="item-value" className={styles.itemValue}>
-                    {valueSelector(item)}
-                  </div>
+                  <div>{valueSelector(item)}</div>
                 </MenuItem>
               );
             })
           )}
         </Menu>
       </div>
-      {description && (
-        <div data-testid="field-description" className={styles.fieldDescription}>
-          {description}
-        </div>
-      )}
-    </div>
+      {description && <FieldDescription>{description}</FieldDescription>}
+    </Field>
   );
 });

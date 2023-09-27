@@ -1,14 +1,6 @@
 .icon {
   composes: theme-text-on-secondary from global;
 }
-.fieldLabel {
-  display: block;
-  composes: theme-typography--body1 from global;
-  font-weight: 500;
-}
-.fieldLabel:not(:empty) {
-  margin-bottom: 10px;
-}
 .inputContainer {
   position: relative;
 }
@@ -36,6 +28,10 @@
   width: 24px;
   height: 24px;
   cursor: auto;
+}
+
+.input {
+  font-size: 12px;
 }
 
 .input[disabled] + .iconContainer {
