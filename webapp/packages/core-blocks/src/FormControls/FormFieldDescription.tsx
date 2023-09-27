@@ -19,10 +19,9 @@ interface Props extends ILayoutSizeProps {
   label?: string;
   title?: string;
   className?: string;
-  children?: React.ReactNode;
 }
 
-export const FormFieldDescription = observer<Props>(function FormFieldDescription({ label, title, children, className, ...rest }) {
+export const FormFieldDescription: React.FC<React.PropsWithChildren<Props>> = observer(function FormFieldDescription({ label, title, children, className, ...rest }) {
   const styles = useS(formControlStyles, elementsSizeStyles, style);
   const layoutProps = getLayoutProps(rest);
   rest = filterLayoutFakeProps(rest);
@@ -30,7 +29,7 @@ export const FormFieldDescription = observer<Props>(function FormFieldDescriptio
   return (
     <div title={title} className={s(styles, { ...layoutProps, field: true }, className)} {...rest}>
       {label && <label className={s(styles, { fieldLabel: true })}>{label}</label>}
-      <div className={s(styles, { fieldDescription: true, valid: true })}>{children}</div>
+      <div className={s(styles, { fieldDescription: true })}>{children}</div>
     </div>
   );
 });

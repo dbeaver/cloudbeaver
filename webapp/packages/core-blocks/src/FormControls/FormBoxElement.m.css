@@ -1,8 +1,0 @@
-.boxElement {
-  flex-basis: 550px;
-  flex-grow: 1;
-
-  &.max {
-    width: 100%;
-  }
-}

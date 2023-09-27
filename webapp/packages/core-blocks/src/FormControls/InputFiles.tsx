@@ -7,7 +7,6 @@
  */
 import { observer } from 'mobx-react-lite';
 import { forwardRef, useContext, useEffect, useState } from 'react';
-import styled, { css, use } from 'reshadow';
 
 import type { ComponentStyle } from '@cloudbeaver/core-theming';
 
@@ -24,32 +23,10 @@ import { useCombinedHandler } from '../useCombinedHandler';
 import { useRefInherit } from '../useRefInherit';
 import { useS } from '../useS';
 import { useStateDelay } from '../useStateDelay';
-import { useStyles } from '../useStyles';
 import { FormContext } from './FormContext';
 import formControlStyles from './FormControl.m.css';
 import InputFilesStyles from './InputFiles.m.css';
 import { isControlPresented } from './isControlPresented';
-
-const INPUT_FIELD_STYLES = css`
-  field-label {
-    display: block;
-    composes: theme-typography--body1 from global;
-    font-weight: 500;
-  }
-  field-label:not(:empty) {
-    padding-bottom: 10px;
-  }
-  input-container {
-    position: relative;
-  }
-  Tags {
-    padding-top: 8px;
-
-    &:empty {
-      display: none;
-    }
-  }
-`;
 
 type BaseProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'name' | 'value' | 'style'> &
   ILayoutSizeProps & {
@@ -195,14 +172,14 @@ export const InputFiles: InputFilesType = observer(
 
     const files = Array.from(value ?? []);
 
-    return styled(useStyles(propStyle))(
+    return (
       <div className={s(styles, { ...layoutProps, field: true }, className)}>
         <label title={labelTooltip || rest.title} className={s(styles, { fieldLabel: true })}>
           {children}
           {required && ' *'}
         </label>
         <div className={s(styles, { inputContainer: true })}>
-          <UploadArea ref={ref} {...rest} name={name} value={value} {...use({ mod })} required={required} onChange={handleChange}>
+          <UploadArea ref={ref} {...rest} name={name} value={value} required={required} onChange={handleChange}>
             <Button icon="/icons/import.svg" tag="div" loading={loading} mod={['outlined']}>
               {translate(rest.multiple ? 'ui_upload_files' : 'ui_upload_file')}
             </Button>
@@ -215,8 +192,8 @@ export const InputFiles: InputFilesType = observer(
             </Tags>
           )}
         </div>
-        {description && <div className={s(styles, { fieldDescription: true, valid: !error, invalid: error })}>{description}</div>}
-      </div>,
+        {description && <div className={s(styles, { fieldDescription: true, invalid: error })}>{description}</div>}
+      </div>
     );
   }),
 );

@@ -109,8 +109,7 @@ export const Radio: RadioType = observer(function Radio({
         className={s(styles, {
           radio: true,
           primary: mod?.includes('primary'),
-          small: mod?.includes('small'),
-          menu: mod?.includes('menu'),
+          small: mod?.includes('small') || mod?.includes('menu'),
           disabledRadio: rest.disabled,
           radioNoRipple: !ripple,
         })}

@@ -43,11 +43,7 @@
   composes: theme-radio_small from global;
 }
 
-.menu {
-  composes: theme-radio_small from global;
-}
-
-div.menu.field {
+.field.menu {
   padding: 0;
 
   & .radio {
