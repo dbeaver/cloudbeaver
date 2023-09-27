@@ -93,7 +93,6 @@ export const SettingsInfoFormField = observer<SettingsInfoFormFieldProps>(functi
       description={description}
       disabled={disabled}
       readOnly={readOnly}
-      mod="surface"
       className={className}
       small
       onChange={onChange}

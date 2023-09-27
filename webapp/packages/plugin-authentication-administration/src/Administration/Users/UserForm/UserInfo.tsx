@@ -61,7 +61,6 @@ export const UserInfo: TabContainerPanelComponent<IUserFormProps> = observer(fun
             state={controller.credentials}
             disabled={controller.isSaving}
             readOnly={editing}
-            mod="surface"
             keepSize
             tiny
             required
@@ -78,7 +77,6 @@ export const UserInfo: TabContainerPanelComponent<IUserFormProps> = observer(fun
                 placeholder={editing ? PASSWORD_PLACEHOLDER : ''}
                 disabled={controller.isSaving}
                 canShowPassword={controller.credentials['password'] !== ''}
-                mod="surface"
                 keepSize
                 tiny
                 required
@@ -92,7 +90,6 @@ export const UserInfo: TabContainerPanelComponent<IUserFormProps> = observer(fun
                 placeholder={editing ? PASSWORD_PLACEHOLDER : ''}
                 canShowPassword={controller.credentials['passwordRepeat'] !== ''}
                 disabled={controller.isSaving}
-                mod="surface"
                 keepSize
                 tiny
                 required

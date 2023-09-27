@@ -30,10 +30,10 @@ export const MetaParametersForm = observer<Props>(function MetaParametersForm({ 
       <Container medium gap>
         <Group form gap>
           <Container wrap gap>
-            <InputField type="text" name="userId" minLength={1} state={user} mod="surface" disabled readOnly required tiny fill>
+            <InputField type="text" name="userId" minLength={1} state={user} disabled readOnly required tiny fill>
               {translate('plugin_user_profile_info_id')}
             </InputField>
-            <InputField type="text" name="displayName" minLength={1} state={user} mod="surface" disabled readOnly required tiny fill>
+            <InputField type="text" name="displayName" minLength={1} state={user} disabled readOnly required tiny fill>
               {translate('plugin_user_profile_info_displayName')}
             </InputField>
           </Container>

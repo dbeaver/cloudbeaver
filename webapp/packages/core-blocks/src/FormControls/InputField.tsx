@@ -7,7 +7,6 @@
  */
 import { observer } from 'mobx-react-lite';
 import { forwardRef, useCallback, useContext, useLayoutEffect, useRef, useState } from 'react';
-import styled, { use } from 'reshadow';
 
 import type { ComponentStyle } from '@cloudbeaver/core-theming';
 import { isNotNullDefined } from '@cloudbeaver/core-utils';
@@ -161,7 +160,7 @@ export const InputField: InputFieldType = observer(
       return null;
     }
 
-    return styled(propStyles)(
+    return (
       <div data-testid="field" className={s(styles, { ...layoutProps, field: true }, className)}>
         <div data-testid="field-label" title={labelTooltip || rest.title} className={styles.fieldLabel}>
           {children}
@@ -178,7 +177,6 @@ export const InputField: InputFieldType = observer(
             onChange={handleChange}
             onBlur={handleBlur}
             onKeyDown={handleKeyDown}
-            {...use({ mod })}
             required={required}
           />
           {loading && (
@@ -198,11 +196,11 @@ export const InputField: InputFieldType = observer(
           )}
         </div>
         {(description || passwordType) && (
-          <div data-testid="field-description" className={s(styles, { fieldDescription: true, valid: !error, invalid: error })}>
+          <div data-testid="field-description" className={s(styles, { fieldDescription: true, invalid: error })}>
             {description}
           </div>
         )}
-      </div>,
+      </div>
     );
   }),
 );
