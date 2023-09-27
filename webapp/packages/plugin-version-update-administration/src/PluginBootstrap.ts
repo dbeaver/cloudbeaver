@@ -23,7 +23,7 @@ export class PluginBootstrap extends Bootstrap {
     this.administrationItemService.create({
       name: 'version-update',
       type: AdministrationItemType.Administration,
-      order: 5,
+      order: 8,
       getContentComponent: () => VersionUpdate,
       getDrawerComponent: () => VersionUpdateDrawerItem,
     });
