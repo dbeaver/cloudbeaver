@@ -11,7 +11,7 @@ import { DBDriverResource } from '@cloudbeaver/core-connections';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import { isObjectPropertyInfoStateEqual } from '@cloudbeaver/core-sdk';
-import { formStateContext } from '@cloudbeaver/core-ui/src/Form/formStateContext';
+import { formStateContext } from '@cloudbeaver/core-ui';
 
 import { connectionFormConfigureContext } from '../connectionFormConfigureContext';
 import { ConnectionFormService } from '../ConnectionFormService';

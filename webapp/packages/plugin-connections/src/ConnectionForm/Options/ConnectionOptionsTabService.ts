@@ -23,7 +23,7 @@ import { LocalizationService } from '@cloudbeaver/core-localization';
 import { isSharedProject, ProjectInfoResource } from '@cloudbeaver/core-projects';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
 import { DriverConfigurationType, isObjectPropertyInfoStateEqual, ObjectPropertyInfo } from '@cloudbeaver/core-sdk';
-import { formStateContext } from '@cloudbeaver/core-ui/src/Form/formStateContext';
+import { formStateContext } from '@cloudbeaver/core-ui';
 import { getUniqueName, isNotNullDefined, isValuesEqual } from '@cloudbeaver/core-utils';
 
 import { connectionFormConfigureContext } from '../connectionFormConfigureContext';

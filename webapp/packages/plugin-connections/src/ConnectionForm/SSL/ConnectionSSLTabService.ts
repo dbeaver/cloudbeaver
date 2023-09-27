@@ -12,7 +12,7 @@ import { DBDriverResource, NetworkHandlerResource } from '@cloudbeaver/core-conn
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import { CachedMapAllKey, type NetworkHandlerConfigInput } from '@cloudbeaver/core-sdk';
-import { formStateContext } from '@cloudbeaver/core-ui/src/Form/formStateContext';
+import { formStateContext } from '@cloudbeaver/core-ui';
 import { isNotNullDefined, isObjectsEqual } from '@cloudbeaver/core-utils';
 
 import { connectionFormConfigureContext } from '../connectionFormConfigureContext';

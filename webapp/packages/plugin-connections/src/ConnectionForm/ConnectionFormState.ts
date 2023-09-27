@@ -11,8 +11,7 @@ import { ConnectionInfoResource, createConnectionParam, DatabaseConnection, ICon
 import { Executor, IExecutionContextProvider, IExecutor } from '@cloudbeaver/core-executor';
 import type { ProjectInfoResource, ProjectsService } from '@cloudbeaver/core-projects';
 import type { ConnectionConfig, ResourceKeySimple } from '@cloudbeaver/core-sdk';
-import type { IFormStateInfo } from '@cloudbeaver/core-ui';
-import { formStateContext } from '@cloudbeaver/core-ui/src/Form/formStateContext';
+import { formStateContext, type IFormStateInfo } from '@cloudbeaver/core-ui';
 import { MetadataMap, uuid } from '@cloudbeaver/core-utils';
 
 import { connectionFormConfigureContext } from './connectionFormConfigureContext';

@@ -14,7 +14,7 @@ import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { executorHandlerFilter, IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import { isGlobalProject, ProjectInfoResource } from '@cloudbeaver/core-projects';
 import { PermissionsService } from '@cloudbeaver/core-root';
-import { formStateContext } from '@cloudbeaver/core-ui/src/Form/formStateContext';
+import { formStateContext } from '@cloudbeaver/core-ui';
 import type { MetadataValueGetter } from '@cloudbeaver/core-utils';
 import {
   connectionConfigContext,
