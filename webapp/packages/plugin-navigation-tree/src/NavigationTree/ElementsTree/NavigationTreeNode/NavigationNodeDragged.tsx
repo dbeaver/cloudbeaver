@@ -7,16 +7,15 @@
  */
 import { observer } from 'mobx-react-lite';
 import { useContext } from 'react';
-import styled from 'reshadow';
 
-import { getComputed, TreeNode, useObjectRef, useStyles } from '@cloudbeaver/core-blocks';
+import { getComputed, TreeNode, useObjectRef } from '@cloudbeaver/core-blocks';
 
 import { ElementsTreeContext } from '../ElementsTreeContext';
 import type { NavigationNodeComponent } from '../NavigationNodeComponent';
 import { transformNodeInfo } from '../transformNodeInfo';
 import { NavigationNodeControlLoader } from './NavigationNode/NavigationNodeLoaders';
 
-export const NavigationNodeDragged: NavigationNodeComponent = observer(function NavigationNode({ node, className, control: externalControl, style }) {
+export const NavigationNodeDragged: NavigationNodeComponent = observer(function NavigationNodeDragged({ node, className, control: externalControl }) {
   const contextRef = useObjectRef({
     context: useContext(ElementsTreeContext),
   });
@@ -25,10 +24,10 @@ export const NavigationNodeDragged: NavigationNodeComponent = observer(function 
   const Control = control || externalControl || NavigationNodeControlLoader;
   const nodeInfo = transformNodeInfo(node, contextRef.context?.tree.nodeInfoTransformers ?? []);
 
-  return styled(useStyles(style))(
+  return (
     <TreeNode externalExpanded={false} className={className} leaf>
       {/* <DNDPreview data={dndData} src="/icons/empty.svg" /> */}
       <Control nodeInfo={nodeInfo} node={node} dndPlaceholder />
-    </TreeNode>,
+    </TreeNode>
   );
 });

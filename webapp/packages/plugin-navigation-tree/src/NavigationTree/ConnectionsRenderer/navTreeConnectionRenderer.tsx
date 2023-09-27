@@ -6,9 +6,8 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import styled from 'reshadow';
 
-import { Translate, TREE_NODE_STYLES, TreeNodeNestedMessage } from '@cloudbeaver/core-blocks';
+import { Translate, TreeNodeNestedMessage } from '@cloudbeaver/core-blocks';
 import { NAV_NODE_TYPE_CONNECTION } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
 import { NavNodeInfoResource } from '@cloudbeaver/core-navigation-tree';
@@ -42,10 +41,10 @@ const ConnectionRenderer: NavigationNodeRendererComponent = observer(function Ma
   const node = navNodeInfoResource.get(nodeId);
 
   if (!node) {
-    return styled(TREE_NODE_STYLES)(
+    return (
       <TreeNodeNestedMessage>
         <Translate token="app_navigationTree_node_not_found" />
-      </TreeNodeNestedMessage>,
+      </TreeNodeNestedMessage>
     );
   }
 

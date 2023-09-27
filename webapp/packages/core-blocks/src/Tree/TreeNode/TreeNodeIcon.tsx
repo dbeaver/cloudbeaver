@@ -5,30 +5,25 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import styled, { css } from 'reshadow';
+import { observer } from 'mobx-react-lite';
 
-import type { ComponentStyle } from '@cloudbeaver/core-theming';
-
+import { s } from '../../s';
 import { StaticImage } from '../../StaticImage';
-import { useStyles } from '../../useStyles';
-
-const styles = css`
-  StaticImage {
-    height: 100%;
-  }
-`;
+import { useS } from '../../useS';
+import style from './TreeNodeIcon.m.css';
 
 interface Props {
   icon?: string;
-  style?: ComponentStyle;
   className?: string;
 }
 
-export const TreeNodeIcon: React.FC<React.PropsWithChildren<Props>> = function TreeNodeIcon({ icon, style, className, children }) {
-  return styled(useStyles(styles, style))(
-    <icon className={className}>
-      {icon && <StaticImage icon={icon} />}
+export const TreeNodeIcon: React.FC<React.PropsWithChildren<Props>> = observer(function TreeNodeIcon({ icon, className, children }) {
+  const styles = useS(style);
+
+  return (
+    <div className={s(styles, { treeNodeIcon: true }, className)}>
+      {icon && <StaticImage className={s(styles, { staticImage: true })} icon={icon} />}
       {children}
-    </icon>,
+    </div>
   );
-};
+});
