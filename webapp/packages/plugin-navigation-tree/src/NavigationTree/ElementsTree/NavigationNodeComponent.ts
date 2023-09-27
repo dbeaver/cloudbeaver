@@ -17,6 +17,7 @@ export type NavTreeNodeComponent = React.FC<{
   path: string[];
   dragging?: boolean;
   expanded?: boolean;
+  big?: boolean;
   className?: string;
 }>;
 

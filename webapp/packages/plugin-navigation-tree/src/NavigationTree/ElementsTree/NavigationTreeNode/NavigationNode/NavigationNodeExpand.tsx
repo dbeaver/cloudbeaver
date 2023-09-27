@@ -7,9 +7,8 @@
  */
 import { observer } from 'mobx-react-lite';
 import { useContext, useDeferredValue } from 'react';
-import styled from 'reshadow';
 
-import { getComputed, TREE_NODE_STYLES, TreeNodeExpand } from '@cloudbeaver/core-blocks';
+import { getComputed, TreeNodeExpand } from '@cloudbeaver/core-blocks';
 
 import { ElementsTreeContext } from '../../ElementsTreeContext';
 
@@ -27,5 +26,5 @@ export const NavigationNodeExpand = observer<Props>(function NavigationNodeExpan
     return null;
   }
 
-  return styled(TREE_NODE_STYLES)(<TreeNodeExpand filterActive={filterActive} />);
+  return <TreeNodeExpand filterActive={filterActive} />;
 });

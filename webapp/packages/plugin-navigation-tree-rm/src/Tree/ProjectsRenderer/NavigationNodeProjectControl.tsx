@@ -9,7 +9,7 @@ import { observer } from 'mobx-react-lite';
 import React, { forwardRef, useContext } from 'react';
 import styled, { css, use } from 'reshadow';
 
-import { getComputed, TREE_NODE_STYLES, TreeNodeContext, TreeNodeControl, TreeNodeName, useMouseContextMenu } from '@cloudbeaver/core-blocks';
+import { getComputed, s, TreeNodeContext, TreeNodeControl, TreeNodeName, useMouseContextMenu, useS } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { EventContext, EventStopPropagationFlag } from '@cloudbeaver/core-events';
 import { NavNodeInfoResource } from '@cloudbeaver/core-navigation-tree';
@@ -23,47 +23,15 @@ import {
   NavTreeControlProps,
   TreeNodeMenuLoader,
 } from '@cloudbeaver/plugin-navigation-tree';
+import { ResourceManagerService } from '@cloudbeaver/plugin-resource-manager';
 
 import { getRmProjectNodeId } from '../../NavNodes/getRmProjectNodeId';
 import { DATA_CONTEXT_RESOURCE_MANAGER_TREE_RESOURCE_TYPE_ID } from '../DATA_CONTEXT_RESOURCE_MANAGER_TREE_RESOURCE_TYPE_ID';
-import { ResourceManagerService } from '@cloudbeaver/plugin-resource-manager';
-
-const styles = css`
-  TreeNodeControl {
-    transition: opacity 0.3s ease;
-    opacity: 1;
-
-    &[|outdated] {
-      opacity: 0.5;
-    }
-  }
-  TreeNodeControl:hover > portal,
-  TreeNodeControl:global([aria-selected='true']) > portal,
-  portal:focus-within {
-    visibility: visible;
-  }
-  TreeNodeName {
-    composes: theme-text-text-hint-on-light theme-typography--caption from global;
-    height: 100%;
-    max-width: 250px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-  portal {
-    position: relative;
-    box-sizing: border-box;
-    margin-left: auto !important;
-    margin-right: 8px !important;
-    visibility: hidden;
-  }
-  name-box {
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-`;
+import style from './NavigationNodeProjectControl.m.css';
 
 export const NavigationNodeProjectControl: NavTreeControlComponent = observer<NavTreeControlProps, HTMLDivElement>(
   forwardRef(function NavigationNodeProjectControl({ node, dndElement, dndPlaceholder, className }, ref) {
+    const styles = useS(style);
     const mouseContextMenu = useMouseContextMenu();
     const viewContext = useContext(CaptureViewContext);
     const elementsTreeContext = useContext(ElementsTreeContext);
@@ -125,26 +93,22 @@ export const NavigationNodeProjectControl: NavTreeControlComponent = observer<Na
       return null;
     }
 
-    return styled(
-      TREE_NODE_STYLES,
-      styles,
-    )(
+    return (
       <TreeNodeControl
         ref={ref}
         onClick={handleClick}
         onContextMenu={handleContextMenuOpen}
-        {...use({ outdated, dragging: dndElement })}
-        className={className}
+        className={s(styles, { treeNodeControl: true, outdated,  }, className)}
       >
-        <TreeNodeName title={name}>
-          <name-box>{name}</name-box>
+        <TreeNodeName title={name} className={s(styles, { treeNodeName: true })}>
+          <div className={s(styles, { nameBox: true })}>{name}</div>
         </TreeNodeName>
         {!dndPlaceholder && (
-          <portal onClick={handlePortalClick}>
+          <div onClick={handlePortalClick} className={s(styles, { portal: true })}>
             <TreeNodeMenuLoader mouseContextMenu={mouseContextMenu} node={node} selected={selected} />
-          </portal>
+          </div>
         )}
-      </TreeNodeControl>,
+      </TreeNodeControl>
     );
   }),
 );
