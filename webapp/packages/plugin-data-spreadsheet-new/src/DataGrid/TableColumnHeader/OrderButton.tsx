@@ -6,28 +6,11 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import styled, { css } from 'reshadow';
 
-import { IconOrImage, useTranslate } from '@cloudbeaver/core-blocks';
+import { IconOrImage, s, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import { EOrder, getNextOrder, IDatabaseDataModel, ResultSetConstraintAction } from '@cloudbeaver/plugin-data-viewer';
 
-const styles = css`
-  order-button {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    flex-shrink: 0;
-    height: 28px;
-    width: 16px;
-    box-sizing: border-box;
-    cursor: pointer;
-    background: transparent;
-    outline: none;
-    color: inherit;
-    padding: 0;
-    margin-left: 8px;
-  }
-`;
+import style from './OrderButton.m.css';
 
 interface Props {
   model: IDatabaseDataModel;
@@ -41,6 +24,7 @@ export const OrderButton = observer<Props>(function OrderButton({ model, resultI
   const constraints = model.source.getAction(resultIndex, ResultSetConstraintAction);
   const currentOrder = constraints.getOrder(attributePosition);
   const disabled = model.isDisabled(resultIndex) || model.isLoading();
+  const styles = useS(style);
 
   let icon = 'order-arrow-unknown';
   if (currentOrder === EOrder.asc) {
@@ -61,16 +45,15 @@ export const OrderButton = observer<Props>(function OrderButton({ model, resultI
     event.preventDefault();
   }
 
-  return styled(styles)(
-    <order-button
-      as="button"
+  return (
+    <button
       title={translate('data_grid_table_tooltip_column_header_order')}
-      className={className}
+      className={s(styles, { orderButton: true }, className)}
       disabled={disabled}
       onMouseDown={preventFocus}
       onClick={handleSort}
     >
-      <IconOrImage icon={icon} viewBox="0 0 16 16" className={currentOrder === null ? 'rdg-table-header__order-button_unordered' : undefined} />
-    </order-button>,
+      <IconOrImage icon={icon} viewBox="0 0 16 16" className={s(styles, {}, currentOrder === null && 'rdg-table-header__order-button_unordered')} />
+    </button>
   );
 });

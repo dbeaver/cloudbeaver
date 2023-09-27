@@ -38,7 +38,7 @@ import java.util.List;
 public class RMNIOFileSystem extends NIOFileSystem {
     private static final Log log = Log.getLog(RMNIOFileSystem.class);
     @Nullable
-    // null for root rm:// path
+    // null for root 'rm://' path
     private final String rmProjectId;
     @NotNull
     private final RMController rmController;
@@ -59,10 +59,6 @@ public class RMNIOFileSystem extends NIOFileSystem {
 
     @Override
     public FileSystemProvider provider() {
-        return rmNioFileSystemProvider;
-    }
-    
-    public RMNIOFileSystemProvider rmProvider() {
         return rmNioFileSystemProvider;
     }
 

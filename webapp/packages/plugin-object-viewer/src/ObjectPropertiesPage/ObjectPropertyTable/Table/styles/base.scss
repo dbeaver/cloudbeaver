@@ -10,45 +10,52 @@
 
 .metadata-grid-container {
   .cb-metadata-grid-theme {
-    outline: 0;
-    height: 100%;
-    background-color: inherit;
-    border: none;
+    outline: 0 !important;
+    height: 100% !important;
+    background-color: inherit !important;
+    border: none !important;
+    font-family: inherit !important;
+    font-size: inherit !important;
+
+    * {
+      font-size: inherit !important;
+      font-family: inherit !important;
+    }
 
     .rdg-header-row,
     .rdg-row {
-      background-color: transparent;
+      background-color: transparent !important;
     }
 
     .rdg-header-row {
-      text-transform: uppercase;
+      text-transform: uppercase !important;
     }
 
     .rdg-cell {
-      border-color: transparent;
-      display: flex;
-      flex-direction: row;
-      user-select: text;
+      border-color: transparent !important;
+      display: flex !important;
+      flex-direction: row !important;
+      user-select: text !important;
 
       &.rdg-cell-frozen {
-        box-shadow: none;
+        box-shadow: none !important;
       }
     }
 
     .rdg-cell:global([aria-selected='true']) {
-      box-shadow: none;
+      box-shadow: none !important;
     }
 
     .cell-formatter {
-      display: flex;
-      align-items: center;
-      width: 100%;
+      display: flex !important;
+      align-items: center !important;
+      width: 100% !important;
     }
 
     .cell-formatter__value {
-      overflow: hidden;
-      white-space: nowrap;
-      text-overflow: ellipsis;
+      overflow: hidden !important;
+      white-space: nowrap !important;
+      text-overflow: ellipsis !important;
     }
   }
 }

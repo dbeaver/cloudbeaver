@@ -8,24 +8,9 @@
 import { CoreSettingsService } from '@cloudbeaver/core-app';
 import type { TableState } from '@cloudbeaver/core-blocks';
 import { injectable } from '@cloudbeaver/core-di';
-import {
-  CommonDialogService,
-  ConfirmationDialogDelete,
-  ContextMenuService,
-  DialogueStateResult,
-  IContextMenuItem,
-  IMenuContext,
-  IMenuItem,
-} from '@cloudbeaver/core-dialogs';
+import { CommonDialogService, ContextMenuService, IContextMenuItem, IMenuContext, IMenuItem } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
-import {
-  ENodeFeature,
-  getNodeDisplayName,
-  type NavNode,
-  NavNodeInfoResource,
-  NavTreeResource,
-  NavTreeSettingsService,
-} from '@cloudbeaver/core-navigation-tree';
+import { ENodeFeature, type NavNode, NavNodeInfoResource, NavTreeResource, NavTreeSettingsService } from '@cloudbeaver/core-navigation-tree';
 import { resourceKeyList } from '@cloudbeaver/core-sdk';
 
 interface IObjectPropertyTableFooterContext {

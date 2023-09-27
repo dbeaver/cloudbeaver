@@ -19,7 +19,14 @@ const style = css`
   field-label {
     composes: theme-typography--body1 from global;
     font-weight: 500;
-    padding-bottom: 10px;
+    margin-bottom: 10px;
+    box-sizing: border-box;
+    overflow: hidden;
+    white-space: initial;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
   }
   field-description {
     padding: 0;

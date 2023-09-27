@@ -8,17 +8,18 @@
 import { observer } from 'mobx-react-lite';
 import { useCallback, useContext, useEffect, useRef } from 'react';
 
-import { getComputed, IconOrImage } from '@cloudbeaver/core-blocks';
-import { clsx, isValidUrl } from '@cloudbeaver/core-utils';
+import { getComputed, IconOrImage, s, useS } from '@cloudbeaver/core-blocks';
+import { isValidUrl } from '@cloudbeaver/core-utils';
 import type { IResultSetRowKey } from '@cloudbeaver/plugin-data-viewer';
-import type { FormatterProps } from '@cloudbeaver/plugin-react-data-grid';
+import type { RenderCellProps } from '@cloudbeaver/plugin-react-data-grid';
 
 import { EditingContext } from '../../../Editing/EditingContext';
-import { CellEditor, IEditorRef } from '../../CellEditor/CellEditor';
+import { CellEditor, IEditorRef } from '../../CellEditor';
 import { CellContext } from '../../CellRenderer/CellContext';
 import { TableDataContext } from '../../TableDataContext';
+import styles from './TextFormatter.m.css';
 
-export const TextFormatter = observer<FormatterProps<IResultSetRowKey>>(function TextFormatter({ row, column, isCellSelected }) {
+export const TextFormatter = observer<RenderCellProps<IResultSetRowKey>>(function TextFormatter({ row, column }) {
   const editorRef = useRef<IEditorRef>(null);
   const editingContext = useContext(EditingContext);
   const tableDataContext = useContext(TableDataContext);
@@ -28,10 +29,11 @@ export const TextFormatter = observer<FormatterProps<IResultSetRowKey>>(function
     throw new Error('Contexts required');
   }
 
+  const style = useS(styles);
   const formatter = tableDataContext.format;
   const rawValue = getComputed(() => formatter.get(tableDataContext.getCellValue(cellContext.cell!)!));
 
-  const classes = clsx('text-formatter', { 'cell-null': rawValue === null });
+  const classes = s(style, { textFormatter: true, nullValue: rawValue === null });
 
   const value = formatter.toDisplayString(rawValue);
 
@@ -39,13 +41,14 @@ export const TextFormatter = observer<FormatterProps<IResultSetRowKey>>(function
     editingContext.closeEditor(cellContext.position);
   }, [cellContext]);
 
+  const isFocused = cellContext.isFocused;
   useEffect(() => {
-    if (isCellSelected) {
+    if (isFocused) {
       if (cellContext.isEditing) {
         editorRef.current?.focus();
       }
     }
-  }, [isCellSelected]);
+  }, [isFocused]);
 
   if (cellContext.isEditing) {
     return (
@@ -60,11 +63,11 @@ export const TextFormatter = observer<FormatterProps<IResultSetRowKey>>(function
   return (
     <div title={value} className={classes}>
       {isUrl && (
-        <a href={rawValue as string} target="_blank" rel="noreferrer" draggable={false}>
-          <IconOrImage icon="external-link" viewBox="0 0 24 24" />
+        <a href={rawValue as string} target="_blank" rel="noreferrer" draggable={false} className={s(style, { a: true })}>
+          <IconOrImage icon="external-link" viewBox="0 0 24 24" className={s(style, { icon: true })} />
         </a>
       )}
-      <div className="text-formatter__value">{value}</div>
+      <div className={s(style, { textFormatterValue: true })}>{value}</div>
     </div>
   );
 });
