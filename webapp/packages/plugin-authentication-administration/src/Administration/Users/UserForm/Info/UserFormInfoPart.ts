@@ -27,6 +27,8 @@ interface IUserFormInfoState {
   teams: string[];
 }
 
+const DEFAULT_ENABLED = true;
+
 export class UserFormInfoPart implements IUserFormInfoPart {
   state: IUserFormInfoState;
   initialState: IUserFormInfoState;
@@ -44,7 +46,7 @@ export class UserFormInfoPart implements IUserFormInfoPart {
   ) {
     this.state = {
       userId: formState.state.userId || '',
-      enabled: true,
+      enabled: DEFAULT_ENABLED,
       password: '',
       metaParameters: {},
       teams: [],
@@ -185,8 +187,8 @@ export class UserFormInfoPart implements IUserFormInfoPart {
 
   private fillDefaultConfig(serverConfig: ServerConfig | null, user: AdminUser | null) {
     user = toJS(user);
-    this.initialState.userId = user?.userId || '';
-    this.initialState.enabled = user?.enabled || false;
+    this.initialState.userId = user?.userId || this.formState.state.userId || '';
+    this.initialState.enabled = user?.enabled || DEFAULT_ENABLED;
     this.initialState.metaParameters = observable(user?.metaParameters || {});
     this.initialState.teams = observable(user?.grantedTeams || [serverConfig?.defaultUserTeam].filter(isDefined));
 
