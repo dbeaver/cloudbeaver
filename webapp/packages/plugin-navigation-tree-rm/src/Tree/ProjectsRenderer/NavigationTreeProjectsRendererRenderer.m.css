@@ -1,0 +1,12 @@
+.projectNode {
+  margin-top: 8px;
+
+  &.project:only-child,
+  &.hideProjects {
+    margin-top: 0px;
+  }
+
+  & > .navigationNodeNested {
+    padding-left: 0 !important;
+  }
+}

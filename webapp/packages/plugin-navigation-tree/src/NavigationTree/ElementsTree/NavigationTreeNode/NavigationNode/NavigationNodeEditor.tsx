@@ -7,22 +7,12 @@
  */
 import { observer } from 'mobx-react-lite';
 import { useState } from 'react';
-import styled, { css } from 'reshadow';
 
+import { s, useS } from '@cloudbeaver/core-blocks';
 import { EventContext, EventStopPropagationFlag } from '@cloudbeaver/core-events';
 import { InlineEditor } from '@cloudbeaver/core-ui';
 
-const styles = css`
-  InlineEditor {
-    height: 22px;
-
-    & input,
-    & input[disabled],
-    & input[readonly] {
-      padding: 1px;
-    }
-  }
-`;
+import style from './NavigationNodeEditor.m.css';
 
 interface Props {
   name: string;
@@ -32,6 +22,7 @@ interface Props {
 }
 
 export const NavigationNodeEditor = observer<Props>(function NavigationNodeEditor({ name: initialName, disabled, onSave, onClose }) {
+  const styles = useS(style);
   const [name, setName] = useState(initialName);
   const isNameChanged = initialName !== name;
   const isDisabledSave = disabled || !isNameChanged;
@@ -44,13 +35,13 @@ export const NavigationNodeEditor = observer<Props>(function NavigationNodeEdito
     EventContext.set(event, EventStopPropagationFlag);
   }
 
-  return styled(styles)(
+  return (
     <InlineEditor
       value={name}
       disabled={disabled}
       disableSave={isDisabledSave}
       controlsPosition="inside"
-      style={styles}
+      className={s(styles, { inlineEditor: true })}
       simple
       autofocus
       onChange={setName}
@@ -59,6 +50,6 @@ export const NavigationNodeEditor = observer<Props>(function NavigationNodeEdito
       onReject={onClose}
       onBlur={onClose}
       onClick={stopPropagation}
-    />,
+    />
   );
 });

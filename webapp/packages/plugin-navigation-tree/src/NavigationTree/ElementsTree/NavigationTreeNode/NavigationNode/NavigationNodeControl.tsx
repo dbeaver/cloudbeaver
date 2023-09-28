@@ -8,12 +8,11 @@
 import { action, observable } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import React, { forwardRef, useContext } from 'react';
-import styled, { use } from 'reshadow';
 
 import {
   getComputed,
   Loader,
-  TREE_NODE_STYLES,
+  s,
   TreeNodeContext,
   TreeNodeControl,
   TreeNodeIcon,
@@ -21,6 +20,7 @@ import {
   useMouseContextMenu,
   useObjectRef,
   useObservableRef,
+  useS,
 } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { EventContext, EventStopPropagationFlag } from '@cloudbeaver/core-events';
@@ -29,7 +29,7 @@ import { getNodePlainName, type INodeActions, NavNodeInfoResource, NavTreeResour
 import type { NavTreeControlComponent, NavTreeControlProps } from '../../NavigationNodeComponent';
 import { TreeNodeMenuLoader } from '../TreeNodeMenu/TreeNodeMenuLoader';
 import { DATA_ATTRIBUTE_NODE_EDITING } from './DATA_ATTRIBUTE_NODE_EDITING';
-import { NAVIGATION_NODE_CONTROL_STYLES } from './NAVIGATION_NODE_CONTROL_STYLES';
+import style from './NavigationNodeControl.m.css';
 import { NavigationNodeExpand } from './NavigationNodeExpand';
 import { NavigationNodeEditorLoader } from './NavigationNodeLoaders';
 
@@ -49,6 +49,7 @@ interface IEditingState {
 
 export const NavigationNodeControl: NavTreeControlComponent = observer<NavTreeControlProps, HTMLDivElement>(
   forwardRef(function NavigationNodeControl({ node, nodeInfo, dndElement, dndPlaceholder, className, onClick }, ref) {
+    const styles = useS(style);
     const mouseContextMenu = useMouseContextMenu();
     const treeNodeContext = useContext(TreeNodeContext);
     const navNodeInfoResource = useService(NavNodeInfoResource);
@@ -129,35 +130,31 @@ export const NavigationNodeControl: NavTreeControlComponent = observer<NavTreeCo
 
     const attributes = { [DATA_ATTRIBUTE_NODE_EDITING]: editing };
 
-    return styled(
-      TREE_NODE_STYLES,
-      NAVIGATION_NODE_CONTROL_STYLES,
-    )(
+    return (
       <TreeNodeControl
         ref={ref}
         {...attributes}
-        className={className}
+        className={s(styles, { treeNodeControl: true, dragging: !!dndElement, editing }, className)}
         onClick={onClick}
         onContextMenu={handleContextMenuOpen}
-        {...use({ editing, dragging: dndElement })}
       >
         <NavigationNodeExpand nodeId={node.id} />
         <TreeNodeIcon icon={icon} />
-        <TreeNodeName title={title} {...use({ editing })}>
+        <TreeNodeName title={title} className={s(styles, { treeNodeName: true })}>
           <Loader suspense inline fullSize>
             {editing ? (
               <NavigationNodeEditorLoader name={getNodePlainName(node)} disabled={saving} onSave={editingState.save} onClose={editingState.cancel} />
             ) : (
-              <name-box>{name}</name-box>
+              <div className={s(styles, { nameBox: true })}>{name}</div>
             )}
           </Loader>
         </TreeNodeName>
         {!editing && !dndPlaceholder && (
-          <portal onClick={handlePortalClick}>
+          <div className={s(styles, { portal: true })} onClick={handlePortalClick}>
             <TreeNodeMenuLoader mouseContextMenu={mouseContextMenu} node={node} actions={nodeActions} selected={selected} />
-          </portal>
+          </div>
         )}
-      </TreeNodeControl>,
+      </TreeNodeControl>
     );
   }),
 );

@@ -7,13 +7,13 @@
  */
 import { observer } from 'mobx-react-lite';
 import { useContext } from 'react';
-import styled, { css, use } from 'reshadow';
 
-import { getComputed, Translate, TREE_NODE_STYLES, TreeNodeNestedMessage } from '@cloudbeaver/core-blocks';
+import { getComputed, s, SContext, StyleRegistry, Translate, TreeNodeNestedMessage, useS } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import type { NavNodeInfoResource } from '@cloudbeaver/core-navigation-tree';
 import { NAV_NODE_TYPE_PROJECT, ProjectsService } from '@cloudbeaver/core-projects';
 
+import { NavigationNodeControlRendererStyles, NavigationNodeNestedStyles } from '../../index';
 import { useNode } from '../../NodesManager/useNode';
 import { ElementsTreeContext } from '../ElementsTree/ElementsTreeContext';
 import type { NavigationNodeRendererComponent } from '../ElementsTree/NavigationNodeComponent';
@@ -21,25 +21,24 @@ import { isDraggingInsideProject } from '../ElementsTree/NavigationTreeNode/isDr
 import { NavigationNodeRendererLoader } from '../ElementsTree/NavigationTreeNode/NavigationNodeRendererLoader';
 import type { IElementsTreeCustomRenderer } from '../ElementsTree/useElementsTree';
 import { NavigationNodeProjectControl } from './NavigationNodeProjectControl';
+import style from './NavigationTreeProjectsRendererRenderer.m.css';
 
-const nestedStyles = css`
-  TreeNode {
-    margin-top: 8px;
-
-    &[|project]:only-child,
-    &[|hideProjects] {
-      margin-top: 0px;
-
-      & Control {
-        display: none;
-      }
-    }
-
-    & NavigationNodeNested {
-      padding-left: 0 !important;
-    }
-  }
-`;
+const registry: StyleRegistry = [
+  [
+    NavigationNodeNestedStyles,
+    {
+      mode: 'append',
+      styles: [style],
+    },
+  ],
+  [
+    NavigationNodeControlRendererStyles,
+    {
+      mode: 'append',
+      styles: [style],
+    },
+  ],
+];
 
 export function navigationTreeProjectsRendererRenderer(navNodeInfoResource: NavNodeInfoResource): IElementsTreeCustomRenderer {
   return nodeId => {
@@ -61,6 +60,7 @@ const ProjectRenderer: NavigationNodeRendererComponent = observer(function Manag
   className,
   expanded,
 }) {
+  const styles = useS(style);
   const projectsService = useService(ProjectsService);
   const elementsTreeContext = useContext(ElementsTreeContext);
 
@@ -78,26 +78,26 @@ const ProjectRenderer: NavigationNodeRendererComponent = observer(function Manag
   const hideProjects = elementsTreeContext?.tree.settings?.projects === false && !isDragging;
 
   if (!node) {
-    return styled(TREE_NODE_STYLES)(
+    return (
       <TreeNodeNestedMessage>
         <Translate token="app_navigationTree_node_not_found" />
-      </TreeNodeNestedMessage>,
+      </TreeNodeNestedMessage>
     );
   }
 
   const project = node.nodeType === NAV_NODE_TYPE_PROJECT && singleProject && !isDragging;
 
-  return styled(nestedStyles)(
-    <NavigationNodeRendererLoader
-      node={node}
-      path={path}
-      expanded={expanded}
-      dragging={dragging}
-      className={className}
-      control={NavigationNodeProjectControl}
-      style={nestedStyles}
-      component={component}
-      {...use({ hideProjects, project })}
-    />,
+  return (
+    <SContext registry={registry}>
+      <NavigationNodeRendererLoader
+        node={node}
+        path={path}
+        expanded={expanded}
+        dragging={dragging}
+        className={s(styles, { projectNode: true, hideProjects, project }, className)}
+        control={NavigationNodeProjectControl}
+        component={component}
+      />
+    </SContext>
   );
 });
