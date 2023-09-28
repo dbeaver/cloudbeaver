@@ -11,4 +11,6 @@ Bundle-ClassPath: .
 Require-Bundle: io.cloudbeaver.model,
  org.jkiss.dbeaver.model,
  org.jkiss.dbeaver.model.nio
+Export-Package: io.cloudbeaver.service.rm.nio,
+ io.cloudbeaver.service.rm.fs
 Automatic-Module-Name: io.cloudbeaver.service.rm.nio

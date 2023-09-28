@@ -96,7 +96,7 @@ public class RMNIOTest {
 
     @Test
     public void testNotExistProject() {
-        RMPath notExistPath = new RMPath(new RMNIOFileSystem("s_not_exist", webSession.getRmController(), rmFsProvider));
+        RMPath notExistPath = new RMPath(new RMNIOFileSystem("s_not_exist", rmFsProvider));
         Assert.assertFalse(Files.exists(notExistPath));
     }
 
@@ -105,7 +105,7 @@ public class RMNIOTest {
         var randomName = SecurityUtils.generateUniqueId();
         String randomProject = "s_random_project_" + randomName;
 
-        RMPath newProjectPath = new RMPath(new RMNIOFileSystem(randomProject, webSession.getRmController(), rmFsProvider));
+        RMPath newProjectPath = new RMPath(new RMNIOFileSystem(randomProject, rmFsProvider));
         Assert.assertFalse(Files.exists(newProjectPath));
 
         //create project via nio

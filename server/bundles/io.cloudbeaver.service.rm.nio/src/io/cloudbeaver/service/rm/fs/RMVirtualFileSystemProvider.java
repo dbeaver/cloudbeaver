@@ -26,6 +26,8 @@ import org.jkiss.dbeaver.model.fs.DBFFileSystemProvider;
 import org.jkiss.dbeaver.model.fs.DBFVirtualFileSystem;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 
+import java.net.URI;
+import java.nio.file.Path;
 import java.nio.file.spi.FileSystemProvider;
 
 public class RMVirtualFileSystemProvider implements DBFFileSystemProvider {

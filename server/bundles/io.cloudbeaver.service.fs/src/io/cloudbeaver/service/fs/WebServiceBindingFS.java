@@ -20,8 +20,6 @@ import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.service.DBWBindingContext;
 import io.cloudbeaver.service.WebServiceBindingBase;
 import io.cloudbeaver.service.fs.impl.WebServiceFS;
-import io.cloudbeaver.service.fs.model.RMProjectPermissions;
-import io.cloudbeaver.service.fs.model.RMSubjectProjectPermissions;
 import org.jkiss.utils.CommonUtils;
 
 /**
@@ -38,80 +36,34 @@ public class WebServiceBindingFS extends WebServiceBindingBase<DBWServiceFS> {
     @Override
     public void bindWiring(DBWBindingContext model) throws DBWebException {
         model.getQueryType()
-            .dataFetcher("rmListProjects",
-                env -> getService(env).listProjects(getWebSession(env)))
-            .dataFetcher("rmListSharedProjects",
-                env -> getService(env).listSharedProjects(getWebSession(env)))
-            .dataFetcher("rmProject",
-                env -> getService(env).getProject(getWebSession(env), env.getArgument("projectId")))
-            .dataFetcher("rmListResources",
-                env -> getService(env).listResources(getWebSession(env),
-                    env.getArgument("projectId"),
-                    env.getArgument("folder"),
-                    env.getArgument("nameMask"),
-                    CommonUtils.toBoolean(env.getArgument("readProperties")),
-                    CommonUtils.toBoolean(env.getArgument("readHistory"))))
-            .dataFetcher("rmReadResourceAsString",
-                env -> getService(env).readResourceAsString(getWebSession(env),
-                    env.getArgument("projectId"),
-                    env.getArgument("resourcePath")))
-            .dataFetcher("rmListProjectPermissions", env -> getService(env).listProjectPermissions())
-            .dataFetcher("rmListProjectGrantedPermissions", env -> getService(env).listProjectGrantedPermissions(
-                getWebSession(env),
-                env.getArgument("projectId")
-            ))
-            .dataFetcher("rmListSubjectProjectsPermissionGrants", env -> getService(env).listSubjectProjectsPermissionGrants(
-                getWebSession(env),
-                env.getArgument("subjectId")
-            ))
+            .dataFetcher("fsListFileSystems",
+                env -> getService(env).getAvailableFileSystems(getWebSession(env)))
+            .dataFetcher("fsFile",
+                env -> getService(env).getFile(getWebSession(env), env.getArgument("fileURI")))
+            .dataFetcher("fsListFiles",
+                env -> getService(env).getFiles(getWebSession(env), env.getArgument("folderURI")))
+            .dataFetcher("fsReadFileContentAsString",
+                env -> getService(env).readFileContent(getWebSession(env), env.getArgument("fileURI")))
         ;
         model.getMutationType()
-            .dataFetcher("rmCreateResource",
-                env -> getService(env).createResource(getWebSession(env),
-                    env.getArgument("projectId"),
-                    env.getArgument("resourcePath"),
-                    CommonUtils.toBoolean(env.getArgument("isFolder"))))
-            .dataFetcher("rmMoveResource",
-                env -> getService(env).moveResource(getWebSession(env),
-                    env.getArgument("projectId"),
-                    env.getArgument("oldResourcePath"),
-                    env.getArgument("newResourcePath")))
-            .dataFetcher("rmDeleteResource",
-                env -> getService(env).deleteResource(getWebSession(env),
-                    env.getArgument("projectId"),
-                    env.getArgument("resourcePath")))
-            .dataFetcher("rmWriteResourceStringContent",
-                env -> getService(env).writeResourceStringContent(getWebSession(env),
-                    env.getArgument("projectId"),
-                    env.getArgument("resourcePath"),
+            .dataFetcher("fsCreateFile",
+                env -> getService(env).createFile(getWebSession(env), env.getArgument("fileURI")))
+            .dataFetcher("fsCreateFolder",
+                env -> getService(env).createFolder(getWebSession(env), env.getArgument("folderURI")))
+            .dataFetcher("fsDeleteFile",
+                env -> getService(env).deleteFile(getWebSession(env), env.getArgument("fileURI")))
+            .dataFetcher("fsMoveFile",
+                env -> getService(env).moveFile(
+                    getWebSession(env),
+                    env.getArgument("fromURI"),
+                    env.getArgument("toURI")
+                ))
+            .dataFetcher("fsWriteFileStringContent",
+                env -> getService(env).writeFileContent(
+                    getWebSession(env),
+                    env.getArgument("fileURI"),
                     env.getArgument("data"),
-                    env.getArgument("forceOverwrite")))
-            .dataFetcher("rmCreateProject", env -> getService(env).createProject(
-                getWebSession(env),
-                env.getArgument("projectName"),
-                env.getArgument("description")
-            ))
-            .dataFetcher("rmDeleteProject", env -> getService(env).deleteProject(
-                getWebSession(env),
-                getProjectReference(env)
-            ))
-            .dataFetcher("rmSetProjectPermissions", env -> getService(env).setProjectPermissions(
-                getWebSession(env),
-                env.getArgument("projectId"),
-                new RMSubjectProjectPermissions(env.getArgument("permissions"))
-            ))
-            .dataFetcher("rmSetResourceProperty", env -> getService(env).setResourceProperty(
-                getWebSession(env),
-                env.getArgument("projectId"),
-                env.getArgument("resourcePath"),
-                env.getArgument("name"),
-                env.getArgument("value")
-            ))
-            .dataFetcher("rmSetSubjectProjectPermissions", env -> getService(env).setSubjectProjectPermissions(
-                getWebSession(env),
-                env.getArgument("subjectId"),
-                new RMProjectPermissions(env.getArgument("permissions"))
-            ))
-        ;
+                    CommonUtils.toBoolean(env.getArgument("forceOverwrite"))
+                ));
     }
 }

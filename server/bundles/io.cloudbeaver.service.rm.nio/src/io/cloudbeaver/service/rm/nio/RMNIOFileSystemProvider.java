@@ -65,7 +65,7 @@ public class RMNIOFileSystemProvider extends NIOFileSystemProvider {
             projectId = null;
         }
         try {
-            return new RMNIOFileSystem(projectId, rmController, this);
+            return new RMNIOFileSystem(projectId, this);
         } catch (Exception e) {
             throw new FileSystemNotFoundException("RM file system not found: " + e.getMessage());
         }
@@ -78,7 +78,7 @@ public class RMNIOFileSystemProvider extends NIOFileSystemProvider {
         if (CommonUtils.isEmpty(projectId)) {
             projectId = null;
         }
-        RMNIOFileSystem rmNioFileSystem = new RMNIOFileSystem(projectId, rmController, this);
+        RMNIOFileSystem rmNioFileSystem = new RMNIOFileSystem(projectId, this);
         String resourcePath = uri.getPath();
         if (CommonUtils.isNotEmpty(resourcePath) && projectId == null) {
             throw new IllegalArgumentException("Project is not specified in URI");
@@ -130,7 +130,6 @@ public class RMNIOFileSystemProvider extends NIOFileSystemProvider {
                             .map(rmProject -> (Path) new RMPath(
                                     new RMNIOFileSystem(
                                         rmProject.getId(),
-                                        rmController,
                                         RMNIOFileSystemProvider.this
                                     )
                                 )
@@ -286,5 +285,10 @@ public class RMNIOFileSystemProvider extends NIOFileSystemProvider {
             }
         }
         return null;
+    }
+
+    @NotNull
+    public RMController getRmController() {
+        return rmController;
     }
 }

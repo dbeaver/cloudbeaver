@@ -52,7 +52,7 @@ import org.jkiss.dbeaver.model.auth.*;
 import org.jkiss.dbeaver.model.connection.DBPConnectionConfiguration;
 import org.jkiss.dbeaver.model.exec.DBCException;
 import org.jkiss.dbeaver.model.fs.DBFFileSystemDescriptor;
-import org.jkiss.dbeaver.model.fs.DBFVirtualFileSystem;
+import org.jkiss.dbeaver.model.fs.DBFFileSystemManager;
 import org.jkiss.dbeaver.model.meta.Association;
 import org.jkiss.dbeaver.model.meta.Property;
 import org.jkiss.dbeaver.model.navigator.DBNModel;
@@ -82,6 +82,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.lang.reflect.InvocationTargetException;
+import java.nio.file.Path;
 import java.nio.file.spi.FileSystemProvider;
 import java.time.Instant;
 import java.util.*;
@@ -127,7 +128,7 @@ public class WebSession extends BaseWebSession
     private DBNModel navigatorModel;
     private final DBRProgressMonitor progressMonitor = new SessionProgressMonitor();
     private final Map<String, DBWSessionHandler> sessionHandlers;
-    private final Map<String, FileSystemProvider> fileSystems = new ConcurrentHashMap<>();
+    private final DBFFileSystemManager fileSystemManager = new DBFFileSystemManager();
 
     public WebSession(
         @NotNull HttpSession httpSession,
@@ -245,6 +246,7 @@ public class WebSession extends BaseWebSession
         super.refreshUserData();
         refreshSessionAuth();
 
+        this.fileSystemManager.reloadFileSystems(getProgressMonitor(), getWorkspace().getAuthContext());
         initNavigatorModel();
     }
 
@@ -332,6 +334,7 @@ public class WebSession extends BaseWebSession
 
         this.navigatorModel = new DBNModel(DBWorkbench.getPlatform(), getWorkspace().getProjects());
         this.navigatorModel.setModelAuthContext(getWorkspace().getAuthContext());
+        this.navigatorModel.setFileSystemManager(this.fileSystemManager);
         this.navigatorModel.initialize();
 
         this.locale = Locale.getDefault().getLanguage();
@@ -622,7 +625,7 @@ public class WebSession extends BaseWebSession
             log.error("Error closing web session tokens");
         }
         this.userContext.setUser(null);
-        this.fileSystems.clear();
+        this.fileSystemManager.clear();
         super.close();
     }
 
@@ -936,30 +939,9 @@ public class WebSession extends BaseWebSession
         return true;
     }
 
-    public Collection<FileSystemProvider> getFileSystems() {
-        return fileSystems.values();
-    }
-
-    @Nullable
-    public FileSystemProvider getFileSystem(@NotNull String fsId) {
-        return fileSystems.get(fsId);
-    }
-
-    private void loadFileSystems() {
-        var fsRegistry = FileSystemProviderRegistry.getInstance();
-        for (DBFFileSystemDescriptor fileSystemProviderDescriptor : fsRegistry.getFileSystemProviders()) {
-            var fsProvider = fileSystemProviderDescriptor.getInstance();
-            DBFVirtualFileSystem[] availableFileSystems = fsProvider.getAvailableFileSystems(getProgressMonitor(), getSessionContext());
-            for (DBFVirtualFileSystem fs : availableFileSystems) {
-                if (!fileSystems.containsKey(fs.getId())) {
-                    addFileSystem(fs);
-                }
-            }
-        }
-    }
-
-    public void addFileSystem(@NotNull DBFVirtualFileSystem fileSystem) {
-        fileSystems.put(fileSystem.getId(), fileSystem);
+    @NotNull
+    public DBFFileSystemManager getFileSystemManager() {
+        return fileSystemManager;
     }
 
     @NotNull

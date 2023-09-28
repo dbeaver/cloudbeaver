@@ -7,24 +7,24 @@ type FSFile @since(version: "23.2.2") {
 }
 
 extend type Query @since(version: "23.2.2") {
-    fsFileSystems: [String!]!
+    fsListFileSystems: [String!]!
 
     fsFile(fileURI: String!):  FSFile!
 
-    fsFiles(folderURI: String!): [FSFile!]!
+    fsListFiles(folderURI: String!): [FSFile!]!
 
     # Reads file contents as string in UTF-8
-    fsFileContentAsString(fileURI: String!): String!
+    fsReadFileContentAsString(fileURI: String!): String!
 }
 
 extend type Mutation @since(version: "23.2.2") {
     fsCreateFile(fileURI:String!): FSFile!
 
-    fsCreateFolder(fileURI:String!): FSFile!
-
-    fsMoveFile(oldFileURI: String!, newFileURI: String!): FSFile!
+    fsCreateFolder(folderURI:String!): FSFile!
 
     fsDeleteFile(fileURI:String!): Boolean!
+
+    fsMoveFile(fromURI: String!, toURI: String!): FSFile!
 
     fsWriteFileStringContent(
         fileURI:String!

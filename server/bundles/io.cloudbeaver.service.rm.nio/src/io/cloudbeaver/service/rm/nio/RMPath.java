@@ -60,7 +60,7 @@ public class RMPath extends NIOPath {
     @Override
     public Path getRoot() {
         if (isProjectPath()) {
-            return new RMPath(new RMNIOFileSystem(null, getFileSystem().getRmController(), getFileSystem().rmProvider()));
+            return new RMPath(new RMNIOFileSystem(null, getFileSystem().rmProvider()));
         }
         return new RMPath(rmNioFileSystem);
     }

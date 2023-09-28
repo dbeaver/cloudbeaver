@@ -29,11 +29,9 @@ import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 
 public class RMVirtualFileSystem implements DBFVirtualFileSystem {
     @NotNull
-    private final WebSession webSession;
     private final RMNIOFileSystemProvider rmNioFileSystemProvider;
 
     public RMVirtualFileSystem(@NotNull WebSession webSession) {
-        this.webSession = webSession;
         this.rmNioFileSystemProvider = new RMNIOFileSystemProvider(webSession.getRmController());
     }
 
@@ -73,10 +71,5 @@ public class RMVirtualFileSystem implements DBFVirtualFileSystem {
         }
         BaseWebProjectImpl webProject = (BaseWebProjectImpl) project;
         return new RMVirtualFileSystemRoot[]{new RMVirtualFileSystemRoot(this, webProject.getRmProject(), rmNioFileSystemProvider)};
-    }
-
-    @NotNull
-    public WebSession getWebSession() {
-        return webSession;
     }
 }

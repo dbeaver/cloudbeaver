@@ -72,7 +72,6 @@ public class RMVirtualFileSystemRoot implements DBFVirtualFileSystemRoot {
     @NotNull
     @Override
     public Path getRootPath(DBRProgressMonitor monitor) {
-        var rm = rmFileSystem.getWebSession().getRmController();
-        return new RMPath(new RMNIOFileSystem(rmProject.getId(), rm, rmNioFileSystemProvider));
+        return new RMPath(new RMNIOFileSystem(rmProject.getId(), rmNioFileSystemProvider));
     }
 }
