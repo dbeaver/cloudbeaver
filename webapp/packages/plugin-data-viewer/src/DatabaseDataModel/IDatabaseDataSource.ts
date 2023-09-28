@@ -83,7 +83,8 @@ export interface IDatabaseDataSource<TOptions, TResult extends IDatabaseDataResu
   setExecutionContext: (context: IConnectionExecutionContext | null) => this;
 
   retry: () => Promise<void>;
-  /** Allows to perform an asynchronous action on the data source, this action will wait previous action to finish and save or load requests. The data source will have a loading and disabled state while performing an action */
+  /** Allows to perform an asynchronous action on the data source, this action will wait previous action to finish and save or load requests.
+   * The data source will have a loading and disabled state while performing an action */
   runTask: <T>(task: () => Promise<T>) => Promise<T>;
   requestData: () => Promise<void> | void;
   refreshData: () => Promise<void> | void;
