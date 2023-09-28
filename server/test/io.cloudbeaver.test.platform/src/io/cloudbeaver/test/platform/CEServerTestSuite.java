@@ -17,6 +17,7 @@
 
 package io.cloudbeaver.test.platform;
 
+import io.cloudbeaver.model.rm.RMNIOTest;
 import io.cloudbeaver.model.rm.lock.RMLockTest;
 import io.cloudbeaver.server.CBApplication;
 import io.cloudbeaver.server.CBApplicationCE;
@@ -36,7 +37,8 @@ import java.nio.file.Path;
         ConnectionsTest.class,
         AuthenticationTest.class,
         ResourceManagerTest.class,
-        RMLockTest.class
+        RMLockTest.class,
+        RMNIOTest.class
     }
 )
 public class CEServerTestSuite {

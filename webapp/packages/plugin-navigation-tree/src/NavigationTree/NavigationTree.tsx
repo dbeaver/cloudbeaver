@@ -7,14 +7,14 @@
  */
 import { observer } from 'mobx-react-lite';
 import { useMemo } from 'react';
-import styled, { css } from 'reshadow';
 
-import { Translate, useUserData } from '@cloudbeaver/core-blocks';
+import { s, SContext, StyleRegistry, Translate, useS, useUserData } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { NavNodeInfoResource, NavTreeResource, ProjectsNavNodeService, ROOT_NODE_PATH } from '@cloudbeaver/core-navigation-tree';
 import { ProjectsService } from '@cloudbeaver/core-projects';
 import { CaptureView } from '@cloudbeaver/core-view';
 
+import { ElementsTreeToolsStyles } from '../index';
 import { NavNodeViewService } from '../NodesManager/NavNodeView/NavNodeViewService';
 import { navigationTreeConnectionGroupFilter } from './ConnectionGroup/navigationTreeConnectionGroupFilter';
 import { navigationTreeConnectionGroupRenderer } from './ConnectionGroup/navigationTreeConnectionGroupRenderer';
@@ -26,7 +26,9 @@ import {
 } from './ElementsTree/ElementsTreeTools/NavigationTreeSettings/createElementsTreeSettings';
 import { transformFilteredNodeInfo } from './ElementsTree/transformFilteredNodeInfo';
 import type { IElementsTreeSettings } from './ElementsTree/useElementsTree';
+import elementsTreeToolsStyles from './ElementsTreeTools.m.css';
 import { getNavigationTreeUserSettingsId } from './getNavigationTreeUserSettingsId';
+import style from './NavigationTree.m.css';
 import { navigationTreeDuplicateFilter } from './navigationTreeDuplicateIdFilter';
 import { NavigationTreeService } from './NavigationTreeService';
 import { navigationTreeProjectFilter } from './ProjectsRenderer/navigationTreeProjectFilter';
@@ -36,49 +38,18 @@ import { navigationTreeProjectsRendererRenderer } from './ProjectsRenderer/navig
 import { ProjectsSettingsPlaceholderElement } from './ProjectsRenderer/ProjectsSettingsForm';
 import { useNavigationTree } from './useNavigationTree';
 
-const navigationTreeStyles = css`
-  CaptureView {
-    outline: none;
-    display: flex;
-    flex: 1;
-    flex-direction: column;
-    overflow: hidden;
-  }
-
-  ElementsTree {
-    min-width: 100%;
-    width: max-content;
-  }
-
-  center {
-    display: flex;
-    height: 100%;
-    width: 100%;
-
-    & message {
-      margin: auto;
-      text-align: center;
-    }
-  }
-
-  message {
-    box-sizing: border-box;
-    max-width: 240px;
-    padding: 24px;
-  }
-`;
-
-const elementsTreeStyles = css`
-  tools {
-    composes: theme-border-color-background from global;
-  }
-  tools > *:last-child:not(:first-child) {
-    border-bottom: solid 1px;
-    border-color: inherit;
-  }
-`;
+const registry: StyleRegistry = [
+  [
+    ElementsTreeToolsStyles,
+    {
+      mode: 'append',
+      styles: [elementsTreeToolsStyles],
+    },
+  ],
+];
 
 export const NavigationTree = observer(function NavigationTree() {
+  const styles = useS(style);
   const projectsNavNodeService = useService(ProjectsNavNodeService);
   const projectsService = useService(ProjectsService);
   const navTreeService = useService(NavigationTreeService);
@@ -113,34 +84,34 @@ export const NavigationTree = observer(function NavigationTree() {
 
   const settingsElements = useMemo(() => [ProjectsSettingsPlaceholderElement], []);
 
-  return styled(navigationTreeStyles)(
-    <CaptureView view={navTreeService}>
-      <ElementsTree
-        root={root}
-        localState={navTreeService.treeState}
-        filters={[duplicateFilter, connectionGroupFilter, projectFilter]}
-        renderers={[projectsRendererRenderer, navigationTreeConnectionGroupRenderer, connectionRenderer]}
-        navNodeFilterCompare={navigationTreeProjectSearchCompare}
-        nodeInfoTransformers={[transformFilteredNode]}
-        expandStateGetters={[projectsExpandStateGetter]}
-        settingsElements={settingsElements}
-        emptyPlaceholder={() =>
-          styled(navigationTreeStyles)(
-            <center>
-              <message>
+  return (
+    <SContext registry={registry}>
+      <CaptureView view={navTreeService} className={s(styles, { captureView: true })}>
+        <ElementsTree
+          root={root}
+          localState={navTreeService.treeState}
+          filters={[duplicateFilter, connectionGroupFilter, projectFilter]}
+          renderers={[projectsRendererRenderer, navigationTreeConnectionGroupRenderer, connectionRenderer]}
+          navNodeFilterCompare={navigationTreeProjectSearchCompare}
+          nodeInfoTransformers={[transformFilteredNode]}
+          expandStateGetters={[projectsExpandStateGetter]}
+          settingsElements={settingsElements}
+          className={s(styles, { elementsTree: true })}
+          emptyPlaceholder={() => (
+            <div className={s(styles, { center: true })}>
+              <div className={s(styles, { message: true })}>
                 <Translate token="app_navigationTree_empty_placeholder" />
-              </message>
-            </center>,
-          )
-        }
-        customSelect={handleSelect}
-        customSelectReset={handleSelectReset}
-        settings={settings}
-        style={elementsTreeStyles}
-        getChildren={navTreeService.getChildren}
-        loadChildren={navTreeService.loadNestedNodes}
-        onOpen={handleOpen}
-      />
-    </CaptureView>,
+              </div>
+            </div>
+          )}
+          customSelect={handleSelect}
+          customSelectReset={handleSelectReset}
+          settings={settings}
+          getChildren={navTreeService.getChildren}
+          loadChildren={navTreeService.loadNestedNodes}
+          onOpen={handleOpen}
+        />
+      </CaptureView>
+    </SContext>
   );
 });

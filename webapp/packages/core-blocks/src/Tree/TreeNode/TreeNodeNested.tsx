@@ -5,7 +5,12 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
+import { observer } from 'mobx-react-lite';
 import { forwardRef } from 'react';
+
+import { s } from '../../s';
+import { useS } from '../../useS';
+import style from './TreeNodeNested.m.css';
 
 interface Props extends React.PropsWithChildren {
   expanded?: boolean;
@@ -13,10 +18,14 @@ interface Props extends React.PropsWithChildren {
   className?: string;
 }
 
-export const TreeNodeNested = forwardRef<HTMLDivElement, Props>(function TreeNodeNested({ className, children }, ref) {
-  return (
-    <div ref={ref} className={className}>
-      {children}
-    </div>
-  );
-});
+export const TreeNodeNested = observer(
+  forwardRef<HTMLDivElement, Props>(function TreeNodeNested({ root, className, children }, ref) {
+    const styles = useS(style);
+
+    return (
+      <div ref={ref} className={s(styles, { treeNodeNested: true, root }, className)}>
+        {children}
+      </div>
+    );
+  }),
+);
