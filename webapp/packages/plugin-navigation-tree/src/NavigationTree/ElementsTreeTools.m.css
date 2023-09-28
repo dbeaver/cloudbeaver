@@ -1,0 +1,8 @@
+.tools {
+  composes: theme-border-color-background from global;
+}
+
+.tools > *:last-child:not(:first-child) {
+  border-bottom: solid 1px;
+  border-color: inherit;
+}
