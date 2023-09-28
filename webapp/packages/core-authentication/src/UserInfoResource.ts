@@ -108,7 +108,7 @@ export class UserInfoResource extends CachedDataResource<UserInfo | null, void, 
 
     if (authInfo.userTokens && authInfo.authStatus === AuthStatus.Success) {
       this.resetIncludes();
-      this.markOutdated();
+      this.setData(await this.loader());
       this.sessionDataResource.markOutdated();
     }
 

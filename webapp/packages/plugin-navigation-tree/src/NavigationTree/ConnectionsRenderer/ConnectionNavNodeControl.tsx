@@ -7,30 +7,31 @@
  */
 import { observer } from 'mobx-react-lite';
 import React, { forwardRef, useContext } from 'react';
-import styled, { use } from 'reshadow';
 
 import {
   ConnectionImageWithMask,
   getComputed,
   Loader,
-  TREE_NODE_STYLES,
+  s,
   TreeNodeContext,
   TreeNodeControl,
   TreeNodeIcon,
   TreeNodeName,
   useMouseContextMenu,
+  useS,
 } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { EventContext, EventStopPropagationFlag } from '@cloudbeaver/core-events';
 import { EObjectFeature, NavNodeInfoResource, NavTreeResource } from '@cloudbeaver/core-navigation-tree';
 
 import type { NavTreeControlComponent, NavTreeControlProps } from '../ElementsTree/NavigationNodeComponent';
-import { NAVIGATION_NODE_CONTROL_STYLES } from '../ElementsTree/NavigationTreeNode/NavigationNode/NAVIGATION_NODE_CONTROL_STYLES';
+import style from '../ElementsTree/NavigationTreeNode/NavigationNode/NavigationNodeControl.m.css';
 import { NavigationNodeExpand } from '../ElementsTree/NavigationTreeNode/NavigationNode/NavigationNodeExpand';
 import { TreeNodeMenuLoader } from '../ElementsTree/NavigationTreeNode/TreeNodeMenu/TreeNodeMenuLoader';
 
 export const ConnectionNavNodeControl: NavTreeControlComponent = observer<NavTreeControlProps, HTMLDivElement>(
   forwardRef(function ConnectionNavNodeControl({ node, nodeInfo, dndElement, dndPlaceholder, className, onClick }, ref) {
+    const styles = useS(style);
     const mouseContextMenu = useMouseContextMenu();
     const treeNodeContext = useContext(TreeNodeContext);
     const navNodeInfoResource = useService(NavNodeInfoResource);
@@ -58,26 +59,28 @@ export const ConnectionNavNodeControl: NavTreeControlComponent = observer<NavTre
       treeNodeContext.select();
     }
 
-    return styled(
-      TREE_NODE_STYLES,
-      NAVIGATION_NODE_CONTROL_STYLES,
-    )(
-      <TreeNodeControl ref={ref} className={className} onClick={onClick} onContextMenu={handleContextMenuOpen} {...use({ dragging: dndElement })}>
+    return (
+      <TreeNodeControl
+        ref={ref}
+        className={s(styles, { treeNodeControl: true, dragging: !!dndElement }, className)}
+        onClick={onClick}
+        onContextMenu={handleContextMenuOpen}
+      >
         <NavigationNodeExpand nodeId={node.id} />
-        <TreeNodeIcon {...use({ connected })}>
+        <TreeNodeIcon>
           <ConnectionImageWithMask icon={icon} connected={connected} maskId="tree-node-icon" />
         </TreeNodeIcon>
-        <TreeNodeName title={title}>
+        <TreeNodeName title={title} className={s(styles, { treeNodeName: true })}>
           <Loader suspense inline fullSize>
-            <name-box>{name}</name-box>
+            <div className={s(styles, { nameBox: true })}>{name}</div>
           </Loader>
         </TreeNodeName>
         {!dndPlaceholder && (
-          <portal onClick={handlePortalClick}>
+          <div className={s(styles, { portal: true })} onClick={handlePortalClick}>
             <TreeNodeMenuLoader mouseContextMenu={mouseContextMenu} node={node} selected={selected} />
-          </portal>
+          </div>
         )}
-      </TreeNodeControl>,
+      </TreeNodeControl>
     );
   }),
 );

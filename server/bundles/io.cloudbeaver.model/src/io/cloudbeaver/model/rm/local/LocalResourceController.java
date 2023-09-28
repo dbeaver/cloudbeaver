@@ -730,6 +730,12 @@ public class LocalResourceController implements RMController {
         return makeResourcePath(projectId, getTargetPath(projectId, resourcePath), false).toArray(RMResource[]::new);
     }
 
+    @Nullable
+    @Override
+    public RMResource getResource(@NotNull String projectId, @NotNull String resourcePath) throws DBException {
+        return makeResourceFromPath(projectId, getTargetPath(projectId, resourcePath), null, false, false, false);
+    }
+
     @NotNull
     @Override
     public byte[] getResourceContents(@NotNull String projectId, @NotNull String resourcePath) throws DBException {

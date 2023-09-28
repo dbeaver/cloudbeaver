@@ -15,11 +15,11 @@ import { CaptureViewContext, useDataContext } from '@cloudbeaver/core-view';
 import { DataPresentationComponent, IDatabaseResultSet, TableViewerLoader } from '@cloudbeaver/plugin-data-viewer';
 
 import { DATA_CONTEXT_DV_DDM_RS_GROUPING } from './DataContext/DATA_CONTEXT_DV_DDM_RS_GROUPING';
+import { DEFAULT_GROUPING_QUERY_OPERATION } from './DEFAULT_GROUPING_QUERY_OPERATION';
 import type { IGroupingQueryState } from './IGroupingQueryState';
 import { useGroupingData } from './useGroupingData';
 import { useGroupingDataModel } from './useGroupingDataModel';
 import { useGroupingDnDColumns } from './useGroupingDnDColumns';
-import { DEFAULT_GROUPING_QUERY_OPERATION } from './DEFAULT_GROUPING_QUERY_OPERATION';
 
 const styles = css`
   drop-area {

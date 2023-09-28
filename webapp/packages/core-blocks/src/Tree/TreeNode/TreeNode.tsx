@@ -8,14 +8,14 @@
 import { computed, observable } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import { forwardRef } from 'react';
-import styled, { use } from 'reshadow';
 
-import { getComputed } from '../../getComputed';
+import { s } from '../../s';
 import { useObjectRef } from '../../useObjectRef';
 import { useObservableRef } from '../../useObservableRef';
+import { useS } from '../../useS';
 import type { ITreeNodeState } from './ITreeNodeState';
+import style from './TreeNode.m.css';
 import { ITreeNodeContext, TreeNodeContext } from './TreeNodeContext';
-import { TREE_NODE_STYLES } from './TreeNodeStyles';
 
 interface Props extends ITreeNodeState {
   className?: string;
@@ -48,6 +48,7 @@ export const TreeNode = observer<Props, HTMLDivElement | null>(
     },
     ref,
   ) {
+    const styles = useS(style);
     const handlersRef = useObjectRef(handlers);
 
     async function processAction(action: () => Promise<void>) {
@@ -113,12 +114,10 @@ export const TreeNode = observer<Props, HTMLDivElement | null>(
       },
     );
 
-    const elementExpanded = getComputed(() => nodeContext.externalExpanded ?? nodeContext.expanded);
-
-    return styled(TREE_NODE_STYLES)(
-      <node {...use({ expanded: elementExpanded })} ref={ref} className={className}>
+    return (
+      <div ref={ref} className={s(styles, { node: true }, className)}>
         <TreeNodeContext.Provider value={nodeContext}>{children}</TreeNodeContext.Provider>
-      </node>,
+      </div>
     );
   }),
 );

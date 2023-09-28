@@ -25,6 +25,7 @@ export * from './ConnectionImageWithMask/ConnectionImageWithMask';
 export { default as ConnectionImageWithMaskSvgStyles } from './ConnectionImageWithMask/ConnectionImageWithMaskSvg.m.css';
 
 export * from './Menu/ACTION_ICON_BUTTON_STYLES';
+export { default as ActionIconButtonStyles } from './ActionIconButton.m.css';
 export * from './Menu/Menu';
 export { default as MenuStyles } from './Menu/Menu.m.css';
 export * from './Menu/MenuBarSmallItem';
@@ -44,6 +45,7 @@ export * from './Menu/useMouseContextMenu';
 
 export * from './ObjectPropertyInfo/ObjectPropertyInfoForm/ObjectPropertyInfoForm';
 export * from './ObjectPropertyInfo/useObjectPropertyCategories';
+export * from './ObjectPropertyInfo/ObjectPropertyInfoForm/getPropertyControlType';
 
 export * from './Overlay/Overlay';
 export * from './Overlay/OverlayActions';
@@ -103,12 +105,13 @@ export * from './Tree/TreeNode/TreeNodeName';
 export * from './Tree/TreeNode/TreeNodeNested';
 export * from './Tree/TreeNode/TreeNodeNestedMessage';
 export * from './Tree/TreeNode/TreeNodeSelect';
-export * from './Tree/TreeNode/TreeNodeStyles';
 export * from './Button';
 export * from './ToolsPanel/ToolsAction';
 export * from './ToolsPanel/ToolsPanel';
 export { default as ToolsPanelStyles } from './ToolsPanel/ToolsPanel.m.css';
 export { default as ToolsActionStyles } from './ToolsPanel/ToolsAction.m.css';
+export { default as TreeNodeNestedMessageStyles } from './Tree/TreeNode/TreeNodeNestedMessage.m.css';
+export { default as TreeNodeStyles } from './Tree/TreeNode/TreeNode.m.css';
 export * from './FormControls/Checkboxes/Checkbox';
 export * from './FormControls/Checkboxes/FieldCheckbox';
 export * from './FormControls/Checkboxes/CheckboxMarkup';
