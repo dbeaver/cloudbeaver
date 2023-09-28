@@ -51,7 +51,7 @@ export const RightArea = observer<Props>(function RightArea({ className }) {
             </Loader>
           </Pane>
         </Split>
-        <SlideOverlay />
+        <SlideOverlay onClick={() => optionsPanelService.close()} />
       </SlideElement>
     </SlideBox>
   );

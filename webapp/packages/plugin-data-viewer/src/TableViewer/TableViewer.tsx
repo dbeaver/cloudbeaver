@@ -266,6 +266,7 @@ export const TableViewer = observer<Props, HTMLDivElement>(
           {!simple && (
             <TablePresentationBar
               type={DataPresentationType.toolsPanel}
+              className={s(styles, { tablePresentationBar: true })}
               presentationId={valuePresentationId ?? null}
               dataFormat={dataFormat}
               supportedDataFormat={[dataFormat]}
