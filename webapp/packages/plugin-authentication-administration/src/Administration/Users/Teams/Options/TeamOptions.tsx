@@ -9,7 +9,7 @@ import { observer } from 'mobx-react-lite';
 import { useRef } from 'react';
 import styled, { css } from 'reshadow';
 
-import { ColoredContainer, Group, InputField, SubmittingForm, Textarea, useResource, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
+import { ColoredContainer, Form, Group, InputField, Textarea, useResource, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
 import type { TabContainerPanelComponent } from '@cloudbeaver/core-ui';
 
@@ -18,7 +18,7 @@ import { Permissions } from './Permissions';
 import { TeamMetaParameters } from './TeamMetaParameters';
 
 const styles = css`
-  SubmittingForm {
+  Form {
     flex: 1;
     overflow: auto;
   }
@@ -32,7 +32,7 @@ export const TeamOptions: TabContainerPanelComponent<ITeamFormProps> = observer(
   const edit = state.mode === 'edit';
 
   return styled(style)(
-    <SubmittingForm ref={formRef}>
+    <Form ref={formRef}>
       <ColoredContainer parent gap overflow>
         <Group small gap>
           <InputField name="teamId" state={state.config} readOnly={state.readonly || edit} disabled={state.disabled} required tiny fill>
@@ -48,6 +48,6 @@ export const TeamOptions: TabContainerPanelComponent<ITeamFormProps> = observer(
         {!serverConfigResource.resource.distributed && <Permissions state={state} />}
         <TeamMetaParameters state={state} />
       </ColoredContainer>
-    </SubmittingForm>,
+    </Form>,
   );
 });

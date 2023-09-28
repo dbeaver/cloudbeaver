@@ -10,11 +10,12 @@ import { observer } from 'mobx-react-lite';
 import { useEffect, useMemo, useState } from 'react';
 import { useTabState } from 'reakit/Tab';
 
-import { useExecutor, useObjectRef, useObservableRef } from '@cloudbeaver/core-blocks';
+import { useAutoLoad, useExecutor, useObjectRef, useObservableRef } from '@cloudbeaver/core-blocks';
 import { Executor, ExecutorInterrupter } from '@cloudbeaver/core-executor';
-import { isNull, isUndefined, MetadataMap, MetadataValueGetter } from '@cloudbeaver/core-utils';
+import { isDefined, isNull, isUndefined, MetadataMap, MetadataValueGetter } from '@cloudbeaver/core-utils';
+import { useDataContext } from '@cloudbeaver/core-view';
 
-import type { ITabData, ITabsContainer } from './TabsContainer/ITabsContainer';
+import type { ITabData, ITabInfo, ITabsContainer } from './TabsContainer/ITabsContainer';
 import { ITabsContext, TabsContext } from './TabsContext';
 import type { TabDirection } from './TabsContext';
 
@@ -54,6 +55,7 @@ export const TabsState = observer(function TabsState<T = Record<string, any>>({
   canClose,
   ...rest
 }: Props<T>): React.ReactElement | null {
+  const context = useDataContext();
   const props = useMemo(() => rest as any as T, [...Object.values(rest)]);
   let displayed: string[] = [];
 
@@ -168,6 +170,7 @@ export const TabsState = observer(function TabsState<T = Record<string, any>>({
 
   const value = useObservableRef<ITabsContext<T>>(
     () => ({
+      context,
       canClose(tabId) {
         return (
           dynamic.canClose?.({
@@ -177,7 +180,7 @@ export const TabsState = observer(function TabsState<T = Record<string, any>>({
         );
       },
       getTabInfo(tabId: string) {
-        return dynamic.container?.getTabInfo(tabId);
+        return dynamic.container?.getDisplayedTabInfo(tabId, dynamic.props);
       },
       getTabState(tabId: string, valueGetter?: MetadataValueGetter<string, any>) {
         return dynamic.container?.getTabState(dynamic.tabsState, tabId, dynamic.props, valueGetter);
@@ -265,6 +268,30 @@ export const TabsState = observer(function TabsState<T = Record<string, any>>({
       enabledBaseActions,
     },
   );
+
+  if (container) {
+    let currentTabInfo: ITabInfo<T, never> | undefined;
+
+    if (state.selectedId) {
+      currentTabInfo = value.getTabInfo(state.selectedId);
+    }
+
+    useAutoLoad(
+      TabsState,
+      container
+        .getDisplayed(props)
+        .map(tab => tab.getLoader?.(context, props))
+        .filter(isDefined)
+        .flat(),
+    );
+
+    useAutoLoad(
+      TabsState,
+      [currentTabInfo?.getLoader?.(context, props) || []].flat().filter(loader => loader.lazy),
+      true,
+      true,
+    );
+  }
 
   return <TabsContext.Provider value={value}>{children}</TabsContext.Provider>;
 });

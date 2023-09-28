@@ -14,12 +14,12 @@ import {
   ColoredContainer,
   Combobox,
   FieldCheckbox,
+  Form,
   Group,
   GroupTitle,
   InputField,
   Link,
   ObjectPropertyInfoForm,
-  SubmittingForm,
   Textarea,
   useClipboard,
   useObjectPropertyCategories,
@@ -33,7 +33,7 @@ import type { TabContainerPanelComponent } from '@cloudbeaver/core-ui';
 import type { IAuthConfigurationFormProps } from '../IAuthConfigurationFormProps';
 
 const styles = css`
-  SubmittingForm {
+  Form {
     flex: 1;
     overflow: auto;
   }
@@ -62,7 +62,7 @@ export const AuthConfigurationOptions: TabContainerPanelComponent<IAuthConfigura
   }, [state]);
 
   return styled(style)(
-    <SubmittingForm ref={formRef}>
+    <Form ref={formRef}>
       <ColoredContainer parent gap overflow>
         <Group small gap>
           <Combobox
@@ -178,6 +178,6 @@ export const AuthConfigurationOptions: TabContainerPanelComponent<IAuthConfigura
           </Group>
         )}
       </ColoredContainer>
-    </SubmittingForm>,
+    </Form>,
   );
 });
