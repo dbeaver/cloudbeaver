@@ -5,32 +5,18 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import styled, { css, use } from 'reshadow';
+import { observer } from 'mobx-react-lite';
 
-const styles = css`
-  status {
-    composes: theme-background-positive from global;
-    position: absolute;
-    opacity: 0;
-    transition: opacity 0.3s ease;
-    bottom: 0;
-    right: 0;
-    box-sizing: border-box;
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-
-    &[|connected] {
-      opacity: 1;
-    }
-  }
-`;
+import { s } from '../s';
+import { useS } from '../useS';
+import style from './ConnectionMark.m.css';
 
 interface Props {
   connected: boolean;
   className?: string;
 }
 
-export const ConnectionMark: React.FC<Props> = function ConnectionMark({ connected, className }) {
-  return styled(styles)(<status {...use({ connected })} className={className} />);
-};
+export const ConnectionMark: React.FC<Props> = observer(function ConnectionMark({ connected, className }) {
+  const styles = useS(style);
+  return <div className={s(styles, { status: true, connected }, className)} />;
+});
