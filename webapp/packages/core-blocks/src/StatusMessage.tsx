@@ -19,17 +19,17 @@ import { useS } from './useS';
 
 interface Props {
   message?: string | string[] | null;
-  status?: ENotificationType;
+  type?: ENotificationType | null;
   exception?: Error | null;
   className?: string;
   onShowDetails?: () => void;
 }
 
-export const StatusMessage = observer<Props>(function StatusMessage({ status, message, exception = null, className, onShowDetails }) {
+export const StatusMessage = observer<Props>(function StatusMessage({ type, message, exception = null, className, onShowDetails }) {
   const styles = useS(style);
   const translate = useTranslate();
   const errorDetails = useErrorDetails(exception);
-  const isError = status === ENotificationType.Error || exception !== null;
+  const isError = type === ENotificationType.Error || exception !== null;
 
   if (Array.isArray(message)) {
     message = message.map(m => translate(m)).join(', ');
@@ -42,7 +42,7 @@ export const StatusMessage = observer<Props>(function StatusMessage({ status, me
 
   if (isError) {
     icon = '/icons/error_icon.svg';
-  } else if (status === ENotificationType.Success) {
+  } else if (type === ENotificationType.Success) {
     icon = '/icons/success_icon.svg';
   }
 

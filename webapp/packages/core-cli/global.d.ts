@@ -46,16 +46,36 @@ declare module 'reshadow' {
   declare function taggedStyled(strs: TemplateStringsArray, ...values: any[]): IdFunction;
   declare function taggedStyled<A extends JSX.Element>(node: A): A;
 
+  /**
+   *
+   * @deprecated use css-modules instead
+   */
   declare function styled(...styles: StylesMap[]): typeof taggedStyled;
+  /**
+   *
+   * @deprecated use css-modules instead
+   */
   declare function styled(strs: TemplateStringsArray, ...values: any[]): IdFunction;
 
+  /**
+   *
+   * @deprecated use css-modules instead
+   */
   export declare var use: ((value: StylesMap) => {}) & {
     [key: string]: typeof Component;
   };
 
+  /**
+   *
+   * @deprecated use css-modules instead
+   */
   export declare function css(strs: TemplateStringsArray, ...values: any[]): StylesMap;
   export declare function keyframes(strs: TemplateStringsArray, ...values: any[]): string;
 
+  /**
+   *
+   * @deprecated use css-modules instead
+   */
   export declare function create(styles: StylesMap[]): StylesMap;
 
   declare var jsx: typeof createElement;

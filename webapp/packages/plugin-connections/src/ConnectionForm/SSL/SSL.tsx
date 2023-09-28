@@ -12,10 +12,10 @@ import styled, { css } from 'reshadow';
 import {
   ColoredContainer,
   FieldCheckbox,
+  Form,
   Group,
   GroupTitle,
   ObjectPropertyInfoForm,
-  SubmittingForm,
   Switch,
   useAdministrationSettings,
   useObjectPropertyCategories,
@@ -30,7 +30,7 @@ import type { IConnectionFormProps } from '../IConnectionFormProps';
 import { SAVED_VALUE_INDICATOR } from './SAVED_VALUE_INDICATOR';
 
 const SSl_STYLES = css`
-  SubmittingForm {
+  Form {
     display: flex;
     flex-direction: column;
     flex: 1;
@@ -58,7 +58,7 @@ export const SSL: TabContainerPanelComponent<Props> = observer(function SSL({ st
   const autofillToken = isSafari ? 'section-connection-authentication-ssl section-ssl' : 'new-password';
 
   return styled(styles)(
-    <SubmittingForm>
+    <Form>
       <ColoredContainer parent>
         <Group gap form large vertical>
           <Switch name="enabled" state={handlerState} description={handler.description} mod={['primary']} disabled={disabled || readonly}>
@@ -107,6 +107,6 @@ export const SSL: TabContainerPanelComponent<Props> = observer(function SSL({ st
           )}
         </Group>
       </ColoredContainer>
-    </SubmittingForm>,
+    </Form>,
   );
 });

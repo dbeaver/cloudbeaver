@@ -9,7 +9,8 @@ import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
 import { AUTH_PROVIDER_LOCAL_ID } from '@cloudbeaver/core-authentication';
-import { Button, IconOrImage, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
+import { Button, IconOrImage, StatusMessage, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
+import { ENotificationType } from '@cloudbeaver/core-events';
 import type { UserInfo } from '@cloudbeaver/core-sdk';
 import { BASE_TAB_STYLES, TabList, TabsState, UNDERLINE_TAB_BIG_STYLES, UNDERLINE_TAB_STYLES } from '@cloudbeaver/core-ui';
 
@@ -113,12 +114,7 @@ export const UserForm = observer<Props>(function UserForm({ user, state, onClose
         <top-bar>
           <top-bar-tabs>
             <status-message>
-              {state.info.statusMessage && (
-                <>
-                  <IconOrImage icon="/icons/info_icon.svg" />
-                  {translate(state.info.statusMessage)}
-                </>
-              )}
+              <StatusMessage type={ENotificationType.Info} message={state.info.statusMessage} />
             </status-message>
             <TabList aria-label="User Settings" style={style} disabled={state.info.disabled}>
               <UserInfoTab style={style} />

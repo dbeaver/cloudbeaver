@@ -5,7 +5,8 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import type { MetadataMap, MetadataValueGetter } from '@cloudbeaver/core-utils';
+import type { ILoadableState, MetadataMap, MetadataValueGetter } from '@cloudbeaver/core-utils';
+import type { IDataContextProvider } from '@cloudbeaver/core-view';
 
 import type { TabProps } from '../Tab/TabProps';
 
@@ -15,7 +16,7 @@ export interface ITabData<T = void> {
 }
 
 export type TabContainerTabComponent<TProps = void> = React.FC<TabProps & TProps>;
-export type TabContainerPanelComponent<TProps = void> = React.FC<{ tabId: string } & TProps>;
+export type TabContainerPanelComponent<TProps = void> = React.FC<{ tabId: string; className?: string } & TProps>;
 
 export interface ITabInfoOptions<TProps = void, TOptions extends Record<string, any> = never> {
   key: string;
@@ -31,6 +32,7 @@ export interface ITabInfoOptions<TProps = void, TOptions extends Record<string, 
   panel: () => TabContainerPanelComponent<TProps> | React.ExoticComponent;
 
   stateGetter?: (props: TProps) => MetadataValueGetter<string, any>;
+  getLoader?: (context: IDataContextProvider, props?: TProps) => ILoadableState[] | ILoadableState;
 
   isHidden?: (tabId: string, props?: TProps) => boolean;
   isDisabled?: (tabId: string, props?: TProps) => boolean;
@@ -49,6 +51,7 @@ export interface ITabsContainer<TProps = void, TOptions extends Record<string, a
   readonly selectedId: string | null;
   has: (tabId: string) => boolean;
   getTabInfo: (tabId: string) => ITabInfo<TProps, TOptions> | undefined;
+  getDisplayedTabInfo: (tabId: string, props?: TProps) => ITabInfo<TProps, TOptions> | undefined;
   getTabState: <T>(state: MetadataMap<string, any>, tabId: string, props: TProps, valueGetter?: MetadataValueGetter<string, T>) => T;
   getDisplayed: (props?: TProps) => Array<ITabInfo<TProps, TOptions>>;
   getIdList: (props?: TProps) => string[];

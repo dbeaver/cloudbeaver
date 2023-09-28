@@ -49,7 +49,7 @@ export function useS<T extends ComponentStyle[]>(...componentStyles: [...T]): Ex
   const themeService = useService(ThemeService);
   const [currentThemeId, setCurrentThemeId] = useState(() => themeService.currentThemeId);
   const lastThemeRef = useRef<string>(currentThemeId);
-  //@ts-ignore
+  // @ts-ignore
   const filteredStyles = themeService.mapStyles(componentStyles.flat(Infinity).filter(Boolean) as Style[], context);
   const trackTheme = filteredStyles.some(style => typeof style === 'function');
 

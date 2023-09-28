@@ -20,14 +20,7 @@ import { LocalizationService } from '@cloudbeaver/core-localization';
 import { EObjectFeature, NodeManagerUtils } from '@cloudbeaver/core-navigation-tree';
 import { getCachedMapResourceLoaderState } from '@cloudbeaver/core-sdk';
 import { OptionsPanelService } from '@cloudbeaver/core-ui';
-import {
-  DATA_CONTEXT_LOADABLE_STATE,
-  DATA_CONTEXT_MENU,
-  MenuBaseItem,
-  menuExtractItems,
-  MenuSeparatorItem,
-  MenuService,
-} from '@cloudbeaver/core-view';
+import { DATA_CONTEXT_MENU, MenuBaseItem, menuExtractItems, MenuSeparatorItem, MenuService } from '@cloudbeaver/core-view';
 import { MENU_APP_ACTIONS } from '@cloudbeaver/plugin-top-app-bar';
 
 import { ConnectionSchemaManagerService } from './ConnectionSchemaManagerService';
@@ -91,24 +84,19 @@ export class ConnectionSchemaManagerBootstrap extends Bootstrap {
           return [];
         }
 
-        const state = context.get(DATA_CONTEXT_LOADABLE_STATE);
+        const activeConnectionKey = this.connectionSchemaManagerService.activeConnectionKey;
 
-        return state.getState(menu.id, () => {
-          if (!this.connectionSchemaManagerService.activeConnectionKey) {
-            return this.appAuthService.loaders;
-          }
-          return [
-            ...this.appAuthService.loaders,
-            getCachedMapResourceLoaderState(
-              this.containerResource,
-              {
-                ...this.connectionSchemaManagerService.activeConnectionKey,
-                catalogId: this.connectionSchemaManagerService.activeObjectCatalogId,
-              },
-              undefined,
-            ),
-          ];
-        });
+        if (!activeConnectionKey) {
+          return this.appAuthService.loaders;
+        }
+
+        return [
+          ...this.appAuthService.loaders,
+          getCachedMapResourceLoaderState(this.containerResource, () => ({
+            ...activeConnectionKey,
+            catalogId: this.connectionSchemaManagerService.activeObjectCatalogId,
+          })),
+        ];
       },
     });
 
@@ -193,9 +181,7 @@ export class ConnectionSchemaManagerBootstrap extends Bootstrap {
           return [];
         }
 
-        const state = context.get(DATA_CONTEXT_LOADABLE_STATE);
-
-        return state.getState(menu.id, () => this.appAuthService.loaders);
+        return this.appAuthService.loaders;
       },
       hideIfEmpty: () => false,
       getInfo: (context, menu) => {

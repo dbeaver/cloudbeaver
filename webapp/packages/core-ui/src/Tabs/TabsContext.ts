@@ -10,6 +10,7 @@ import type { TabStateReturn } from 'reakit/Tab';
 
 import type { IExecutor } from '@cloudbeaver/core-executor';
 import type { MetadataMap, MetadataValueGetter } from '@cloudbeaver/core-utils';
+import type { IDataContext } from '@cloudbeaver/core-view';
 
 import type { ITabData, ITabInfo, ITabsContainer } from './TabsContainer/ITabsContainer';
 
@@ -26,6 +27,7 @@ export interface ITabsContext<T = Record<string, any>> {
   closable: boolean;
   tabList?: string[];
   enabledBaseActions?: boolean;
+  context: IDataContext;
   canClose: (tabId: string) => boolean;
   getTabInfo: (tabId: string) => ITabInfo<T> | undefined;
   getTabState: <T>(tabId: string, valueGetter?: MetadataValueGetter<string, T>) => T;

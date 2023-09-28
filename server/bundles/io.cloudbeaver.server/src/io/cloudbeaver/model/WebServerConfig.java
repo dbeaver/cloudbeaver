@@ -212,4 +212,9 @@ public class WebServerConfig {
     public String getDefaultAuthRole() {
         return application.getDefaultAuthRole();
     }
+
+    @Property
+    public String getDefaultUserTeam() {
+        return application.getAppConfiguration().getDefaultUserTeam();
+    }
 }

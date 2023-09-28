@@ -8,7 +8,7 @@
 import { action, observable } from 'mobx';
 import { observer } from 'mobx-react-lite';
 
-import { Button, Container, Fill, InputField, SubmittingForm, Translate, useFocus, useObservableRef, useTranslate } from '@cloudbeaver/core-blocks';
+import { Button, Container, Fill, Form, InputField, Translate, useFocus, useObservableRef, useTranslate } from '@cloudbeaver/core-blocks';
 import { CommonDialogBody, CommonDialogFooter, CommonDialogHeader, CommonDialogWrapper, DialogComponent } from '@cloudbeaver/core-dialogs';
 import { ProjectSelect } from '@cloudbeaver/plugin-projects';
 
@@ -83,7 +83,7 @@ export const SaveScriptDialog: DialogComponent<Payload, ISaveScriptDialogResult>
     <CommonDialogWrapper size="small" className={className} fixedWidth>
       <CommonDialogHeader title={translate('plugin_resource_manager_scripts_save_script')} icon="/icons/sql_script_m.svg" onReject={rejectDialog} />
       <CommonDialogBody>
-        <SubmittingForm ref={focusedRef} onSubmit={state.submit}>
+        <Form ref={focusedRef} onSubmit={state.submit}>
           <Container center gap>
             <ProjectSelect
               value={state.projectId}
@@ -108,7 +108,7 @@ export const SaveScriptDialog: DialogComponent<Payload, ISaveScriptDialogResult>
               {translate('ui_name') + ':'}
             </InputField>
           </Container>
-        </SubmittingForm>
+        </Form>
       </CommonDialogBody>
       <CommonDialogFooter>
         <Button type="button" mod={['outlined']} onClick={rejectDialog}>
