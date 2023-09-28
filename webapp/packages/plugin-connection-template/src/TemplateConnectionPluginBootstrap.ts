@@ -9,9 +9,8 @@ import { AppAuthService } from '@cloudbeaver/core-authentication';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
 import { ProjectInfoResource, ProjectsService } from '@cloudbeaver/core-projects';
-import { PermissionsService } from '@cloudbeaver/core-root';
 import { CachedMapAllKey, getCachedDataResourceLoaderState, getCachedMapResourceLoaderState } from '@cloudbeaver/core-sdk';
-import { ActionService, DATA_CONTEXT_LOADABLE_STATE, DATA_CONTEXT_MENU, MenuService } from '@cloudbeaver/core-view';
+import { ActionService, DATA_CONTEXT_MENU, MenuService } from '@cloudbeaver/core-view';
 import { MENU_CONNECTIONS } from '@cloudbeaver/plugin-connections';
 
 import { ACTION_CONNECTION_TEMPLATE } from './Actions/ACTION_CONNECTION_TEMPLATE';
@@ -28,7 +27,6 @@ export class TemplateConnectionPluginBootstrap extends Bootstrap {
     private readonly projectInfoResource: ProjectInfoResource,
     private readonly templateConnectionsResource: TemplateConnectionsResource,
     private readonly commonDialogService: CommonDialogService,
-    private readonly permissionsService: PermissionsService,
     private readonly templateConnectionsService: TemplateConnectionsService,
     private readonly projectsService: ProjectsService,
   ) {
@@ -49,13 +47,11 @@ export class TemplateConnectionPluginBootstrap extends Bootstrap {
         !this.projectsService.userProject?.canEditDataSources ||
         !this.templateConnectionsService.projectTemplates.length,
       getLoader: (context, action) => {
-        const state = context.get(DATA_CONTEXT_LOADABLE_STATE);
-
-        return state.getState(action.id, () => [
+        return [
           ...this.appAuthService.loaders,
-          getCachedMapResourceLoaderState(this.projectInfoResource, CachedMapAllKey),
+          getCachedMapResourceLoaderState(this.projectInfoResource, () => CachedMapAllKey),
           getCachedDataResourceLoaderState(this.templateConnectionsResource, undefined, undefined),
-        ]);
+        ];
       },
       handler: async (context, action) => {
         switch (action) {

@@ -1,4 +1,5 @@
 export * from './Action/Actions/ACTION_COLLAPSE_ALL';
+export * from './Action/Actions/ACTION_CREATE';
 export * from './Action/Actions/ACTION_DELETE';
 export * from './Action/Actions/ACTION_EDIT';
 export * from './Action/Actions/ACTION_EXPORT';
@@ -31,7 +32,9 @@ export * from './Action/KeyBinding/IKeyBinding';
 export * from './Action/KeyBinding/getCommonAndOSSpecificKeys';
 export * from './Action/KeyBinding/getBindingLabel';
 export * from './DataContext/createDataContext';
+export * from './DataContext/DATA_CONTEXT_DI_PROVIDER';
 export * from './DataContext/DataContext';
+export * from './DataContext/dataContextAddDIProvider';
 export * from './DataContext/DynamicDataContext';
 export * from './DataContext/IDataContext';
 export * from './DataContext/IDataContextProvider';

@@ -6,34 +6,34 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import { useCallback, useContext } from 'react';
-import styled, { css } from 'reshadow';
+import { useState } from 'react';
 
-import { UsersResource } from '@cloudbeaver/core-authentication';
-import { Loader, TableContext, useResource } from '@cloudbeaver/core-blocks';
-import type { AdminUserInfo } from '@cloudbeaver/core-sdk';
+import { Loader, s, TableItemExpandProps, useS } from '@cloudbeaver/core-blocks';
+import { App, useService } from '@cloudbeaver/core-di';
+import { FormMode } from '@cloudbeaver/core-ui';
 
-import { UserForm } from '../UserForm/UserForm';
+import { AdministrationUserForm } from '../UserForm/AdministrationUserForm';
+import { AdministrationUserFormService } from '../UserForm/AdministrationUserFormService';
+import { AdministrationUserFormState } from '../UserForm/AdministrationUserFormState';
+import style from './UserEdit.m.css';
 
-const styles = css`
-  box {
-    composes: theme-background-secondary theme-text-on-secondary from global;
-    box-sizing: border-box;
-    padding-bottom: 24px;
-    height: 560px;
-    display: flex;
-    flex-direction: column;
-  }
-`;
+export const UserEdit = observer<TableItemExpandProps<string>>(function UserEdit({ item, onClose }) {
+  const styles = useS(style);
+  const administrationUserFormService = useService(AdministrationUserFormService);
+  const app = useService(App);
+  const [state] = useState(() => {
+    const state = new AdministrationUserFormState(app, administrationUserFormService, {
+      userId: item,
+    });
+    state.setMode(FormMode.Edit);
+    return state;
+  });
 
-interface Props {
-  item: string;
-}
-
-export const UserEdit = observer<Props>(function UserEdit({ item }) {
-  const user = useResource(UserEdit, UsersResource, { key: item, includes: ['includeMetaParameters'] });
-  const tableContext = useContext(TableContext);
-  const collapse = useCallback(() => tableContext?.setItemExpand(item, false), [tableContext]);
-
-  return styled(styles)(<box>{user.data ? <UserForm user={user.data as AdminUserInfo} editing onCancel={collapse} /> : <Loader />}</box>);
+  return (
+    <div className={s(styles, { box: true })}>
+      <Loader suspense>
+        <AdministrationUserForm state={state} onClose={onClose} />
+      </Loader>
+    </div>
+  );
 });

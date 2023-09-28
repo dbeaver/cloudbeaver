@@ -84,7 +84,7 @@ export function useTeamsTable(): Readonly<State> {
           await resource.resource.deleteTeam(resourceKeyList(deletionList), { force: true });
 
           this.tableState.unselect();
-          this.tableState.unexpand(deletionList);
+          this.tableState.collapse(deletionList);
         } catch (exception: any) {
           notificationService.logException(exception, 'Teams delete Error');
         } finally {

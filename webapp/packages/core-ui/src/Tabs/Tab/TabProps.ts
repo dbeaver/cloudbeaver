@@ -16,6 +16,7 @@ export type TabProps = PropsWithChildren<{
   tabId: string;
   title?: string;
   menuContext?: IDataContext;
+  selected?: boolean;
   disabled?: boolean;
   className?: string;
   style?: ComponentStyle;

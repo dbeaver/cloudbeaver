@@ -17,13 +17,13 @@ import { Loader } from '../Loader/Loader';
 import { useTranslate } from '../localization/useTranslate';
 import { s } from '../s';
 import { useCombinedHandler } from '../useCombinedHandler';
-import { useMergeRefs } from '../useMergeRefs';
+import { useCombinedRef } from '../useCombinedRef';
 import { useS } from '../useS';
 import { useStateDelay } from '../useStateDelay';
+import { FormContext } from './FormContext';
 import { Field } from './Field';
 import { FieldDescription } from './FieldDescription';
 import { FieldLabel } from './FieldLabel';
-import { FormContext } from './FormContext';
 import inputFieldStyle from './InputField.m.css';
 import { isControlPresented } from './isControlPresented';
 import { useCapsLockTracker } from './useCapsLockTracker';
@@ -91,7 +91,7 @@ export const InputField: InputFieldType = observer(
     ref,
   ) {
     const inputRef = useRef<HTMLInputElement | null>(null);
-    const mergedRef = useMergeRefs(inputRef, ref);
+    const mergedRef = useCombinedRef(inputRef, ref);
     const capsLock = useCapsLockTracker();
     const [passwordRevealed, setPasswordRevealed] = useState(false);
     const translate = useTranslate();
@@ -130,9 +130,9 @@ export const InputField: InputFieldType = observer(
     const handleKeyDown = useCombinedHandler(rest.onKeyDown, capsLock.handleKeyDown, context?.keyDown);
 
     const passwordType = rest.type === 'password';
-    const uncontrolled = passwordType && !canShowPassword;
+    let uncontrolled = passwordType && !canShowPassword;
 
-    let value: any = valueControlled ?? defaultValue ?? undefined;
+    let value: any = valueControlled ?? undefined;
 
     if (state && name !== undefined && name in state) {
       value = state[name];
@@ -145,6 +145,8 @@ export const InputField: InputFieldType = observer(
     if (passwordType && !rest.readOnly && capsLock.warn) {
       description = translate('ui_capslock_on');
     }
+
+    uncontrolled ||= value === undefined;
 
     useLayoutEffect(() => {
       if (uncontrolled && isNotNullDefined(value) && inputRef.current) {
@@ -170,6 +172,7 @@ export const InputField: InputFieldType = observer(
             value={uncontrolled ? undefined : value ?? ''}
             className={s(styles, { input: true })}
             required={required}
+            defaultValue={defaultValue}
             onChange={handleChange}
             onBlur={handleBlur}
             onKeyDown={handleKeyDown}

@@ -7,7 +7,7 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import { Button, s, SubmittingForm, useFocus, useS, useTranslate } from '@cloudbeaver/core-blocks';
+import { Button, Form, s, useFocus, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import { useDBDriver } from '@cloudbeaver/core-connections';
 import { CommonDialogBody, CommonDialogFooter, CommonDialogHeader, CommonDialogWrapper, DialogComponent } from '@cloudbeaver/core-dialogs';
 import type { ConnectionConfig } from '@cloudbeaver/core-sdk';
@@ -41,7 +41,7 @@ export const ConnectionAuthenticationDialog: DialogComponent<Payload> = observer
         onReject={rejectDialog}
       />
       <CommonDialogBody>
-        <SubmittingForm ref={focusedRef} className={s(styles, { submittingForm: true })} onSubmit={() => resolveDialog()}>
+        <Form ref={focusedRef} className={s(styles, { submittingForm: true })} onSubmit={() => resolveDialog()}>
           <ConnectionAuthenticationFormLoader
             config={payload.config}
             authModelId={payload.authModelId}
@@ -50,7 +50,7 @@ export const ConnectionAuthenticationDialog: DialogComponent<Payload> = observer
             className={s(styles, { connectionAuthenticationFormLoader: true })}
             hideFeatures={['nonSecuredProperty']}
           />
-        </SubmittingForm>
+        </Form>
       </CommonDialogBody>
       <CommonDialogFooter>
         <Button mod={['unelevated']} className={s(styles, { button: true })} onClick={() => resolveDialog()}>

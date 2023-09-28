@@ -20,7 +20,7 @@ export function useMenuContext(menu: IMenu, _menuContext?: IDataContext): IDataC
 
   context.set(DATA_CONTEXT_MENU, menu);
 
-  if (context.has(DATA_CONTEXT_LOADABLE_STATE, false)) {
+  if (!context.has(DATA_CONTEXT_LOADABLE_STATE, false)) {
     context.set(DATA_CONTEXT_LOADABLE_STATE, loadableStateContext());
   }
 
