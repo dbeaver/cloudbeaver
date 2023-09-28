@@ -9,7 +9,7 @@ import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
 import { getCachedDataResourceLoaderState } from '@cloudbeaver/core-sdk';
 import { SideBarPanelService } from '@cloudbeaver/core-ui';
-import { ActionService, DATA_CONTEXT_LOADABLE_STATE, DATA_CONTEXT_MENU, menuExtractItems, MenuService } from '@cloudbeaver/core-view';
+import { ActionService, DATA_CONTEXT_MENU, menuExtractItems, MenuService } from '@cloudbeaver/core-view';
 import { MENU_TOOLS } from '@cloudbeaver/plugin-tools-panel';
 
 import { ACTION_RESOURCE_MANAGER_SCRIPTS } from './Actions/ACTION_RESOURCE_MANAGER_SCRIPTS';
@@ -58,9 +58,7 @@ export class PluginBootstrap extends Bootstrap {
       isHidden: () => !this.resourceManagerScriptsService.enabled,
       isChecked: () => this.resourceManagerScriptsService.active,
       getLoader: (context, action) => {
-        const state = context.get(DATA_CONTEXT_LOADABLE_STATE);
-
-        return state.getState(action.id, () => getCachedDataResourceLoaderState(this.serverConfigResource, undefined, undefined));
+        return getCachedDataResourceLoaderState(this.serverConfigResource, undefined, undefined);
       },
       handler: (context, action) => {
         switch (action) {

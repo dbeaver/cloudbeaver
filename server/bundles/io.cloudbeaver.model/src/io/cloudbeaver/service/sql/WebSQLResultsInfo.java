@@ -26,7 +26,9 @@ import org.jkiss.dbeaver.model.struct.DBSAttributeBase;
 import org.jkiss.dbeaver.model.struct.DBSDataContainer;
 import org.jkiss.dbeaver.model.struct.DBSTypedObject;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Web query results info.
@@ -80,6 +82,18 @@ public class WebSQLResultsInfo {
             }
         }
         return null;
+    }
+
+    @NotNull
+    public Set<DBDRowIdentifier> getRowIdentifiers() {
+        Set<DBDRowIdentifier> rowIdentifiers = new HashSet<>();
+        for (DBDAttributeBinding column : attributes) {
+            DBDRowIdentifier rowIdentifier = column.getRowIdentifier();
+            if (rowIdentifier != null) {
+                 rowIdentifiers.add(rowIdentifier);
+            }
+        }
+        return rowIdentifiers;
     }
 
     public DBSAttributeBase getAttribute(String attributeName) {

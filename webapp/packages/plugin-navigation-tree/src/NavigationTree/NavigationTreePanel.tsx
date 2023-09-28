@@ -6,25 +6,19 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import styled, { css } from 'reshadow';
 
+import { s, useS } from '@cloudbeaver/core-blocks';
 import type { TabContainerPanelComponent } from '@cloudbeaver/core-ui';
 
 import { NavigationTreeLoader } from './NavigationTreeLoader';
-
-const styles = css`
-  container {
-    display: flex;
-    flex-direction: column;
-    flex: 1;
-    overflow: auto;
-  }
-`;
+import style from './NavigationTreePanel.m.css';
 
 export const NavigationTreePanel: TabContainerPanelComponent = observer(function NavigationTreePanel() {
-  return styled(styles)(
-    <container>
+  const styles = useS(style);
+
+  return (
+    <div className={s(styles, { container: true })}>
       <NavigationTreeLoader />
-    </container>,
+    </div>
   );
 });

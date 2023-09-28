@@ -7,11 +7,11 @@
  */
 import { makeObservable, observable } from 'mobx';
 
-import { UsersResource } from '@cloudbeaver/core-authentication';
 import { PlaceholderContainer } from '@cloudbeaver/core-blocks';
-import { injectable } from '@cloudbeaver/core-di';
-import type { AdminUserInfo } from '@cloudbeaver/core-sdk';
+import { App, injectable } from '@cloudbeaver/core-di';
 
+import { AdministrationUserFormService } from '../UserForm/AdministrationUserFormService';
+import { AdministrationUserFormState } from '../UserForm/AdministrationUserFormState';
 import { UsersAdministrationNavigationService } from '../UsersAdministrationNavigationService';
 
 export interface IToolsContainerProps {
@@ -20,18 +20,19 @@ export interface IToolsContainerProps {
 
 @injectable()
 export class CreateUserService {
-  user: AdminUserInfo | null;
+  state: AdministrationUserFormState | null;
   readonly toolsContainer: PlaceholderContainer<IToolsContainerProps>;
 
   constructor(
+    private readonly app: App,
+    private readonly administrationUserFormService: AdministrationUserFormService,
     private readonly usersAdministrationNavigationService: UsersAdministrationNavigationService,
-    private readonly usersResource: UsersResource,
   ) {
     this.toolsContainer = new PlaceholderContainer();
-    this.user = null;
+    this.state = null;
 
     makeObservable(this, {
-      user: observable,
+      state: observable,
     });
 
     this.clearUserTemplate = this.clearUserTemplate.bind(this);
@@ -45,16 +46,16 @@ export class CreateUserService {
   }
 
   create(): void {
-    if (this.user) {
+    if (this.state) {
       return;
     }
 
-    this.user = this.usersResource.getEmptyUser();
+    this.state = new AdministrationUserFormState(this.app, this.administrationUserFormService, { userId: null });
     this.usersAdministrationNavigationService.navToCreate();
   }
 
   clearUserTemplate(): void {
-    this.user = null;
+    this.state = null;
   }
 
   close(): void {

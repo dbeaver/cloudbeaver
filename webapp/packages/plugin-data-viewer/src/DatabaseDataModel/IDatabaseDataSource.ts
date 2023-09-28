@@ -17,6 +17,7 @@ export interface IRequestInfo {
   readonly originalQuery: string;
   readonly requestDuration: number;
   readonly requestMessage: string;
+  /** A string representation of the filters constraints applied to the data request. Also returns as it is in case of whereFilter */
   readonly requestFilter: string;
   readonly source: string | null;
 }
@@ -30,11 +31,13 @@ export interface IDatabaseDataSource<TOptions, TResult extends IDatabaseDataResu
   readonly access: DatabaseDataAccessMode;
   readonly dataFormat: ResultDataFormat;
   readonly supportedDataFormats: ResultDataFormat[];
+  /** Indicates whether database supports filtering and sorting via constraints */
   readonly constraintsAvailable: boolean;
   readonly actions: IDatabaseDataActions<TOptions, TResult>;
   readonly results: TResult[];
   readonly offset: number;
   readonly count: number;
+  /** Options of the previous request */
   readonly prevOptions: Readonly<TOptions> | null;
   readonly options: TOptions | null;
   readonly requestInfo: IRequestInfo;
@@ -80,6 +83,8 @@ export interface IDatabaseDataSource<TOptions, TResult extends IDatabaseDataResu
   setExecutionContext: (context: IConnectionExecutionContext | null) => this;
 
   retry: () => Promise<void>;
+  /** Allows to perform an asynchronous action on the data source, this action will wait previous action to finish and save or load requests.
+   * The data source will have a loading and disabled state while performing an action */
   runTask: <T>(task: () => Promise<T>) => Promise<T>;
   requestData: () => Promise<void> | void;
   refreshData: () => Promise<void> | void;

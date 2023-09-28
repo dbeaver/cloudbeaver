@@ -8,7 +8,7 @@
 import { observer } from 'mobx-react-lite';
 import { useRef } from 'react';
 
-import { Button, Container, FieldCheckbox, Fill, Group, InputField, s, SubmittingForm, useS, useTranslate } from '@cloudbeaver/core-blocks';
+import { Button, Container, FieldCheckbox, Fill, Form, Group, InputField, s, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import { CommonDialogBody, CommonDialogFooter, CommonDialogHeader, CommonDialogWrapper, DialogComponentProps } from '@cloudbeaver/core-dialogs';
 
 import style from './AutoRefreshSettingsDialog.m.css';
@@ -42,7 +42,7 @@ export const AutoRefreshSettingsDialog = observer<DialogComponentProps<Payload>>
       <CommonDialogHeader title="data_viewer_auto_refresh_settings" icon="/icons/settings_cog_m.svg" onReject={rejectDialog} />
       <CommonDialogBody noBodyPadding noOverflow>
         <div className={s(styles, { wrapper: true })}>
-          <SubmittingForm ref={formRef} onSubmit={() => resolve()}>
+          <Form ref={formRef} onSubmit={() => resolve()}>
             <Container>
               <Group form gap>
                 <InputField name="interval" state={payload.settings} type="number" min={5} max={3600}>
@@ -54,7 +54,7 @@ export const AutoRefreshSettingsDialog = observer<DialogComponentProps<Payload>>
                 </FieldCheckbox>
               </Group>
             </Container>
-          </SubmittingForm>
+          </Form>
         </div>
       </CommonDialogBody>
       <CommonDialogFooter>

@@ -7,7 +7,7 @@
  */
 import { useEffect, useState } from 'react';
 
-import { ILoadableState, isLoadableStateHasException } from '@cloudbeaver/core-utils';
+import type { ILoadableState } from '@cloudbeaver/core-utils';
 
 import { getComputed } from '../getComputed';
 
@@ -24,29 +24,35 @@ export function useAutoLoad(component: { name: string }, state: IAutoLoadable | 
   for (const loader of state as IAutoLoadable[]) {
     getComputed(
       // activate mobx subscriptions
-      () => (!loader.isLoaded() || loader.isOutdated?.() === true) && !isLoadableStateHasException(loader),
+      () => (!loader.isLoaded() || loader.isOutdated?.() === true) && !loader.isError(),
     );
   }
 
+  const obj = {
+    [loadFunctionName]: () => {
+      if (!enabled) {
+        return;
+      }
+
+      for (const loader of state as IAutoLoadable[]) {
+        if (loader.isError() || (loader.lazy === true && !lazy)) {
+          continue;
+        }
+
+        if (!loader.isLoaded() || loader.isOutdated?.() === true) {
+          loader.load();
+        }
+      }
+    },
+  };
+
+  const promises = state.map(loader => loader.promise).filter(Boolean) as Promise<any>[];
+
+  if (promises.length > 0) {
+    throw Promise.all(promises);
+  }
+
   useEffect(() => {
-    const obj = {
-      [loadFunctionName]: () => {
-        if (!enabled) {
-          return;
-        }
-
-        for (const loader of state as IAutoLoadable[]) {
-          if (isLoadableStateHasException(loader) || (loader.lazy === true && !lazy)) {
-            continue;
-          }
-
-          if (!loader.isLoaded() || loader.isOutdated?.() === true) {
-            loader.load();
-          }
-        }
-      },
-    };
-
     obj[loadFunctionName]();
   });
 }

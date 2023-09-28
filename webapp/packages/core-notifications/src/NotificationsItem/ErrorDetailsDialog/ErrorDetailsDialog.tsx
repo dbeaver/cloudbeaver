@@ -19,13 +19,13 @@ function DisplayErrorInfo({ error }: { error: IErrorInfo }) {
 
   return (
     <>
-      <property className={s(styles, { property: true })}>
-        {error.isHtml ? <Iframe srcDoc={error.message} /> : <message className={s(styles, { message: true })}>{error.message}</message>}
-      </property>
+      <div className={s(styles, { property: true })}>
+        {error.isHtml ? <Iframe srcDoc={error.message} /> : <div className={s(styles, { message: true })}>{error.message}</div>}
+      </div>
       {error.stackTrace && (
-        <property className={s(styles, { property: true })}>
+        <div className={s(styles, { property: true })}>
           <Textarea className={s(styles, { textarea: true })} value={error.stackTrace} readOnly embedded />
-        </property>
+        </div>
       )}
     </>
   );

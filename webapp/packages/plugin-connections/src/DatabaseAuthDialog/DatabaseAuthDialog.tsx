@@ -7,7 +7,7 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import { ErrorMessage, Loader, s, SubmittingForm, useAdministrationSettings, useFocus, useS } from '@cloudbeaver/core-blocks';
+import { ErrorMessage, Form, Loader, s, useAdministrationSettings, useFocus, useS } from '@cloudbeaver/core-blocks';
 import { IConnectionInfoParams, useConnectionInfo, useDBDriver } from '@cloudbeaver/core-connections';
 import { useController } from '@cloudbeaver/core-di';
 import { CommonDialogBody, CommonDialogFooter, CommonDialogHeader, CommonDialogWrapper, DialogComponent } from '@cloudbeaver/core-dialogs';
@@ -47,7 +47,7 @@ export const DatabaseAuthDialog: DialogComponent<Payload> = observer(function Da
         onReject={options?.persistent ? undefined : rejectDialog}
       />
       <CommonDialogBody>
-        <SubmittingForm ref={focusedRef} className={s(styles, { submittingForm: true })} onSubmit={controller.login}>
+        <Form ref={focusedRef} className={s(styles, { submittingForm: true })} onSubmit={controller.login}>
           {!connection.isLoaded() || connection.isLoading() || !controller.configured ? (
             <Loader />
           ) : (
@@ -63,7 +63,7 @@ export const DatabaseAuthDialog: DialogComponent<Payload> = observer(function Da
               hideFeatures={['nonSecuredProperty']}
             />
           )}
-        </SubmittingForm>
+        </Form>
       </CommonDialogBody>
       <CommonDialogFooter>
         <DBAuthDialogFooter isAuthenticating={controller.isAuthenticating} onLogin={controller.login}>

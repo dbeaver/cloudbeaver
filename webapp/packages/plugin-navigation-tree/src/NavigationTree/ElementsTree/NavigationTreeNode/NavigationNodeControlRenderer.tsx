@@ -7,16 +7,15 @@
  */
 import { observer } from 'mobx-react-lite';
 import { forwardRef, useCallback, useContext, useDeferredValue, useEffect, useRef, useState } from 'react';
-import styled, { css, use } from 'reshadow';
 
-import { getComputed, TreeNodeContext, useMergeRefs, useObjectRef } from '@cloudbeaver/core-blocks';
+import { getComputed, s, TreeNodeContext, useMergeRefs, useObjectRef, useS } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { type NavNode, NavNodeInfoResource } from '@cloudbeaver/core-navigation-tree';
-import type { ComponentStyle } from '@cloudbeaver/core-theming';
 
 import { ElementsTreeContext } from '../ElementsTreeContext';
 import type { NavTreeControlComponent } from '../NavigationNodeComponent';
 import { NavigationNodeControlLoader } from './NavigationNode/NavigationNodeLoaders';
+import style from './NavigationNodeControlRenderer.m.css';
 import type { INavigationNode } from './useNavigationNode';
 
 interface Props {
@@ -24,22 +23,11 @@ interface Props {
   navNode: INavigationNode;
   dragging?: boolean;
   control?: NavTreeControlComponent | undefined;
-  style?: ComponentStyle;
 }
 
-const styles = css`
-  Control {
-    transition: opacity 0.3s ease;
-    opacity: 1;
-
-    &[|outdated] {
-      opacity: 0.5;
-    }
-  }
-`;
-
 export const NavigationNodeControlRenderer = observer<Props, HTMLDivElement>(
-  forwardRef(function NavigationNodeControlRenderer({ node, navNode, dragging, control: externalControl, style }, ref) {
+  forwardRef(function NavigationNodeControlRenderer({ node, navNode, dragging, control: externalControl }, ref) {
+    const styles = useS(style);
     const elementRef = useRef<HTMLDivElement | null>(null);
     const [size, setSize] = useState(24);
     const contextRef = useObjectRef({
@@ -108,8 +96,15 @@ export const NavigationNodeControlRenderer = observer<Props, HTMLDivElement>(
       treeNodeContext.select(event.ctrlKey || event.metaKey);
     }
 
-    return styled(styles)(
-      <Control ref={mergedRef} {...use({ outdated })} nodeInfo={nodeInfo} dndElement={dragging} style={style} node={node} onClick={onClickHandler} />,
+    return (
+      <Control
+        ref={mergedRef}
+        className={s(styles, { control: true, outdated })}
+        nodeInfo={nodeInfo}
+        dndElement={dragging}
+        node={node}
+        onClick={onClickHandler}
+      />
     );
   }),
 );

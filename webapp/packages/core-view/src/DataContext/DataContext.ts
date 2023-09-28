@@ -120,10 +120,11 @@ export class DataContext implements IDataContext {
   }
 
   get<T>(context: DataContextGetter<T>): T {
-    if (!this.map.has(context)) {
-      const defaultValue = context();
+    if (!this.hasOwn(context)) {
+      const defaultValue = context(this);
 
       if (defaultValue !== undefined) {
+        this.set(context, defaultValue);
         return defaultValue;
       }
 

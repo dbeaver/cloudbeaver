@@ -20,6 +20,7 @@ const stylesCache = new MetadataMap<string, Map<ThemeSelector<any>, Promise<unde
  * Changes styles depending on theme
  *
  * @param componentStyles styles array
+ * @deprecated use useS and css-modules instead
  */
 export function useStyles(...componentStyles: ComponentStyle[]): Record<string, any> {
   // todo do you understand that we store ALL STYLES in each component that uses this hook?

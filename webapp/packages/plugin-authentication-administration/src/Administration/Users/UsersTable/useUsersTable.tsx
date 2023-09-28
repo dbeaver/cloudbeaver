@@ -89,7 +89,7 @@ export function useUsersTable(filters: IUserFilters) {
           this.state.unselect();
 
           for (const id of deletionList) {
-            this.state.unexpand(id);
+            this.state.collapse(id);
           }
         } catch (exception: any) {
           notificationService.logException(exception, 'authentication_administration_user_delete_fail');

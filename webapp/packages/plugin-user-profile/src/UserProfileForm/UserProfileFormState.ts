@@ -5,7 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import type { IFormStateInfo } from '@cloudbeaver/core-blocks';
+import type { IFormStateInfo } from '@cloudbeaver/core-ui';
 
 import type { IUserProfileFormState } from './IUserProfileFormState';
 
@@ -16,6 +16,7 @@ export class UserProfileFormState implements IUserProfileFormState {
       edited: false,
       readonly: false,
       statusMessage: null,
+      statusType: null,
     };
   }
 
