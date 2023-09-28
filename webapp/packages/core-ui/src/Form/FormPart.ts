@@ -91,6 +91,7 @@ export abstract class FormPart<TPartState, TFormState = any> implements IFormPar
       this.exception = null;
     } catch (exception: any) {
       this.exception = exception;
+      throw exception;
     } finally {
       this.loading = false;
     }
