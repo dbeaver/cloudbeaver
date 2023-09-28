@@ -82,6 +82,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.lang.reflect.InvocationTargetException;
+import java.nio.file.spi.FileSystemProvider;
 import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -126,7 +127,7 @@ public class WebSession extends BaseWebSession
     private DBNModel navigatorModel;
     private final DBRProgressMonitor progressMonitor = new SessionProgressMonitor();
     private final Map<String, DBWSessionHandler> sessionHandlers;
-    private final Map<String, DBFVirtualFileSystem> fileSystems = new ConcurrentHashMap<>();
+    private final Map<String, FileSystemProvider> fileSystems = new ConcurrentHashMap<>();
 
     public WebSession(
         @NotNull HttpSession httpSession,
@@ -935,12 +936,12 @@ public class WebSession extends BaseWebSession
         return true;
     }
 
-    public Collection<DBFVirtualFileSystem> getFileSystems() {
+    public Collection<FileSystemProvider> getFileSystems() {
         return fileSystems.values();
     }
 
     @Nullable
-    public DBFVirtualFileSystem getFileSystem(@NotNull String fsId) {
+    public FileSystemProvider getFileSystem(@NotNull String fsId) {
         return fileSystems.get(fsId);
     }
 

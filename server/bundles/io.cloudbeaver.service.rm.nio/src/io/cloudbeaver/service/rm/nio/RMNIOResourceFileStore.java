@@ -14,23 +14,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.cloudbeaver.model.rm.fs.nio;
+package io.cloudbeaver.service.rm.nio;
 
 import org.jkiss.dbeaver.model.nio.NIOFileStore;
-import org.jkiss.dbeaver.model.rm.RMProject;
+import org.jkiss.dbeaver.model.rm.RMResource;
 
 import java.io.IOException;
 
-public class RMNIOProjectFileStore extends NIOFileStore {
-    private final RMProject rmProject;
+public class RMNIOResourceFileStore extends NIOFileStore {
+    private final RMResource rmResource;
 
-    public RMNIOProjectFileStore(RMProject rmProject) {
-        this.rmProject = rmProject;
+    public RMNIOResourceFileStore(RMResource rmResource) {
+        this.rmResource = rmResource;
     }
 
     @Override
     public String name() {
-        return rmProject.getName();
+        return rmResource.getName();
     }
 
     @Override
@@ -45,6 +45,6 @@ public class RMNIOProjectFileStore extends NIOFileStore {
 
     @Override
     public long getTotalSpace() throws IOException {
-        return 0;
+        return rmResource.getLength();
     }
 }

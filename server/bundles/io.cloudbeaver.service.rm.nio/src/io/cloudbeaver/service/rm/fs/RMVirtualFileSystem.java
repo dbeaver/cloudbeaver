@@ -14,11 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.cloudbeaver.model.rm.fs;
+package io.cloudbeaver.service.rm.fs;
 
 import io.cloudbeaver.BaseWebProjectImpl;
-import io.cloudbeaver.model.rm.fs.nio.RMNIOFileSystemProvider;
 import io.cloudbeaver.model.session.WebSession;
+import io.cloudbeaver.service.rm.nio.RMNIOFileSystemProvider;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.DBPImage;
@@ -26,9 +26,6 @@ import org.jkiss.dbeaver.model.app.DBPProject;
 import org.jkiss.dbeaver.model.fs.DBFVirtualFileSystem;
 import org.jkiss.dbeaver.model.fs.DBFVirtualFileSystemRoot;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
-
-import java.net.URI;
-import java.nio.file.Path;
 
 public class RMVirtualFileSystem implements DBFVirtualFileSystem {
     @NotNull
@@ -75,12 +72,7 @@ public class RMVirtualFileSystem implements DBFVirtualFileSystem {
             throw new DBException("Unsupported project type: " + project.getClass().getName());
         }
         BaseWebProjectImpl webProject = (BaseWebProjectImpl) project;
-        return new RMVirtualFileSystemRoot[]{new RMVirtualFileSystemRoot(this, webProject.getRmProject())};
-    }
-
-    @Override
-    public Path getPath(DBRProgressMonitor monitor, @NotNull URI fileUri) throws DBException {
-        return rmNioFileSystemProvider.getPath(fileUri);
+        return new RMVirtualFileSystemRoot[]{new RMVirtualFileSystemRoot(this, webProject.getRmProject(), rmNioFileSystemProvider)};
     }
 
     @NotNull

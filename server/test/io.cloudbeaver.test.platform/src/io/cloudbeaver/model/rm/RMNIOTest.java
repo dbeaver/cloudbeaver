@@ -16,11 +16,11 @@
  */
 package io.cloudbeaver.model.rm;
 
-import io.cloudbeaver.model.rm.fs.nio.RMNIOFileSystem;
-import io.cloudbeaver.model.rm.fs.nio.RMNIOFileSystemProvider;
-import io.cloudbeaver.model.rm.fs.nio.RMPath;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.server.CBConstants;
+import io.cloudbeaver.service.rm.nio.RMNIOFileSystem;
+import io.cloudbeaver.service.rm.nio.RMNIOFileSystemProvider;
+import io.cloudbeaver.service.rm.nio.RMPath;
 import io.cloudbeaver.test.platform.CEServerTestSuite;
 import io.cloudbeaver.utils.WebTestUtils;
 import org.jkiss.dbeaver.DBException;

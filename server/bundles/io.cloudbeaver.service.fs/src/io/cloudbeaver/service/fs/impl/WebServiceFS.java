@@ -28,6 +28,7 @@ import org.jkiss.utils.CommonUtils;
 import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.spi.FileSystemProvider;
 
 /**
  * Web file system implementation
@@ -39,7 +40,7 @@ public class WebServiceFS implements DBWServiceFS {
     public String[] getAvailableFileSystems(@NotNull WebSession webSession) {
         return webSession.getFileSystems()
             .stream()
-            .map(DBFVirtualFileSystem::getId)
+            .map(FileSystemProvider::getScheme)
             .toArray(String[]::new);
     }
 
@@ -47,8 +48,8 @@ public class WebServiceFS implements DBWServiceFS {
     @Override
     public FSFile getFile(@NotNull WebSession webSession, @NotNull URI fileUri) throws DBWebException {
         try {
-            DBFVirtualFileSystem fs = getFileSystem(webSession, fileUri);
-            Path filePath = fs.getPath(webSession.getProgressMonitor(), fileUri);
+            FileSystemProvider fs = getFileSystem(webSession, fileUri);
+            Path filePath = fs.getPath(fileUri);
             return new FSFile(filePath);
         } catch (Exception e) {
             throw new DBWebException("Failed to found file:" + e.getMessage(), e);
@@ -59,8 +60,8 @@ public class WebServiceFS implements DBWServiceFS {
     @Override
     public FSFile[] getFiles(@NotNull WebSession webSession, @NotNull URI folderUri) throws DBWebException {
         try {
-            DBFVirtualFileSystem fs = getFileSystem(webSession, folderUri);
-            Path folderPath = fs.getPath(webSession.getProgressMonitor(), folderUri);
+            FileSystemProvider fs = getFileSystem(webSession, folderUri);
+            Path folderPath = fs.getPath(folderUri);
             try (var filesStream = Files.list(folderPath)) {
                 return filesStream.map(FSFile::new)
                     .toArray(FSFile[]::new);
@@ -74,8 +75,8 @@ public class WebServiceFS implements DBWServiceFS {
     @Override
     public String readFileContent(@NotNull WebSession webSession, @NotNull URI fileUri) throws DBWebException {
         try {
-            DBFVirtualFileSystem fs = getFileSystem(webSession, fileUri);
-            Path filePath = fs.getPath(webSession.getProgressMonitor(), fileUri);
+            FileSystemProvider fs = getFileSystem(webSession, fileUri);
+            Path filePath = fs.getPath(fileUri);
             return Files.readString(filePath);
         } catch (Exception e) {
             throw new DBWebException("Failed to read file content:" + e.getMessage(), e);
@@ -86,8 +87,8 @@ public class WebServiceFS implements DBWServiceFS {
     @Override
     public FSFile createFile(@NotNull WebSession webSession, @NotNull URI fileUri) throws DBWebException {
         try {
-            DBFVirtualFileSystem fs = getFileSystem(webSession, fileUri);
-            Path filePath = fs.getPath(webSession.getProgressMonitor(), fileUri);
+            FileSystemProvider fs = getFileSystem(webSession, fileUri);
+            Path filePath = fs.getPath(fileUri);
             Files.createFile(filePath);
             return new FSFile(filePath);
         } catch (Exception e) {
@@ -99,8 +100,8 @@ public class WebServiceFS implements DBWServiceFS {
     @Override
     public FSFile createFolder(@NotNull WebSession webSession, @NotNull URI fileUri) throws DBWebException {
         try {
-            DBFVirtualFileSystem fs = getFileSystem(webSession, fileUri);
-            Path filePath = fs.getPath(webSession.getProgressMonitor(), fileUri);
+            FileSystemProvider fs = getFileSystem(webSession, fileUri);
+            Path filePath = fs.getPath(fileUri);
             Files.createDirectory(filePath);
             return new FSFile(filePath);
         } catch (Exception e) {
@@ -111,8 +112,8 @@ public class WebServiceFS implements DBWServiceFS {
     @Override
     public boolean deleteFile(@NotNull WebSession webSession, @NotNull URI fileUri) throws DBWebException {
         try {
-            DBFVirtualFileSystem fs = getFileSystem(webSession, fileUri);
-            Path filePath = fs.getPath(webSession.getProgressMonitor(), fileUri);
+            FileSystemProvider fs = getFileSystem(webSession, fileUri);
+            Path filePath = fs.getPath(fileUri);
             Files.delete(filePath);
             return true;
         } catch (Exception e) {
@@ -120,12 +121,12 @@ public class WebServiceFS implements DBWServiceFS {
         }
     }
 
-    private DBFVirtualFileSystem getFileSystem(@NotNull WebSession webSession, @NotNull URI fileUri) throws DBException {
+    private FileSystemProvider getFileSystem(@NotNull WebSession webSession, @NotNull URI fileUri) throws DBException {
         String fsId = fileUri.getScheme();
         if (CommonUtils.isEmpty(fsId)) {
             throw new DBException("File system id not present in file uri: " + fileUri);
         }
-        DBFVirtualFileSystem fs = webSession.getFileSystem(fsId);
+        FileSystemProvider fs = webSession.getFileSystem(fsId);
         if (fs == null) {
             throw new DBException("File system not found" + fsId);
         }

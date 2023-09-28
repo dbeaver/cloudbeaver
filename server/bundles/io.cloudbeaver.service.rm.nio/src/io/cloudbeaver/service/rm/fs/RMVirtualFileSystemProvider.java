@@ -14,16 +14,36 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.cloudbeaver.model.rm.fs;
+package io.cloudbeaver.service.rm.fs;
 
 import io.cloudbeaver.model.session.WebSession;
+import io.cloudbeaver.service.rm.nio.RMNIOFileSystemProvider;
 import org.jkiss.code.NotNull;
+import org.jkiss.code.Nullable;
+import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.auth.SMSessionContext;
 import org.jkiss.dbeaver.model.fs.DBFFileSystemProvider;
 import org.jkiss.dbeaver.model.fs.DBFVirtualFileSystem;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 
+import java.nio.file.spi.FileSystemProvider;
+
 public class RMVirtualFileSystemProvider implements DBFFileSystemProvider {
+
+    @Nullable
+    @Override
+    public FileSystemProvider createNioFileSystemProvider(
+        @NotNull DBRProgressMonitor monitor,
+        @NotNull SMSessionContext sessionContext
+    ) throws DBException {
+        var session = sessionContext.getPrimaryAuthSpace();
+        if (!(session instanceof WebSession)) {
+            return null;
+        }
+        WebSession webSession = (WebSession) session;
+        return new RMNIOFileSystemProvider(webSession.getRmController());
+    }
+
     @Override
     public DBFVirtualFileSystem[] getAvailableFileSystems(@NotNull DBRProgressMonitor monitor, @NotNull SMSessionContext sessionContext) {
         var session = sessionContext.getPrimaryAuthSpace();

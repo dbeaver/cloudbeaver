@@ -14,11 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.cloudbeaver.model.rm.fs;
+package io.cloudbeaver.service.rm.fs;
 
-import io.cloudbeaver.model.rm.fs.nio.RMNIOFileSystem;
-import io.cloudbeaver.model.rm.fs.nio.RMNIOFileSystemProvider;
-import io.cloudbeaver.model.rm.fs.nio.RMPath;
+import io.cloudbeaver.service.rm.nio.RMNIOFileSystemProvider;
+import io.cloudbeaver.service.rm.nio.RMNIOFileSystem;
+import io.cloudbeaver.service.rm.nio.RMPath;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.model.DBPImage;
 import org.jkiss.dbeaver.model.fs.DBFVirtualFileSystem;
@@ -33,10 +33,17 @@ public class RMVirtualFileSystemRoot implements DBFVirtualFileSystemRoot {
     private final RMVirtualFileSystem rmFileSystem;
     @NotNull
     private final RMProject rmProject;
+    @NotNull
+    private final RMNIOFileSystemProvider rmNioFileSystemProvider;
 
-    public RMVirtualFileSystemRoot(@NotNull RMVirtualFileSystem rmFileSystem, @NotNull RMProject rmProject) {
+    public RMVirtualFileSystemRoot(
+        @NotNull RMVirtualFileSystem rmFileSystem,
+        @NotNull RMProject rmProject,
+        @NotNull RMNIOFileSystemProvider rmNioFileSystemProvider
+    ) {
         this.rmFileSystem = rmFileSystem;
         this.rmProject = rmProject;
+        this.rmNioFileSystemProvider = rmNioFileSystemProvider;
     }
 
     @NotNull
@@ -66,6 +73,6 @@ public class RMVirtualFileSystemRoot implements DBFVirtualFileSystemRoot {
     @Override
     public Path getRootPath(DBRProgressMonitor monitor) {
         var rm = rmFileSystem.getWebSession().getRmController();
-        return new RMPath(new RMNIOFileSystem(rmProject.getId(), rm, new RMNIOFileSystemProvider(rm)));
+        return new RMPath(new RMNIOFileSystem(rmProject.getId(), rm, rmNioFileSystemProvider));
     }
 }

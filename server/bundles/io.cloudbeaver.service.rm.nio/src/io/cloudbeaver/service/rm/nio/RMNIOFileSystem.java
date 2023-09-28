@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.cloudbeaver.model.rm.fs.nio;
+package io.cloudbeaver.service.rm.nio;
 
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
@@ -145,5 +145,9 @@ public class RMNIOFileSystem extends NIOFileSystem {
         } catch (DBException e) {
             throw new IOException("Failed to get project:" + e.getMessage(), e);
         }
+    }
+
+    public RMNIOFileSystemProvider rmProvider() {
+        return rmNioFileSystemProvider;
     }
 }
