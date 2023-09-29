@@ -16,23 +16,28 @@
  */
 package io.cloudbeaver.service.rm.fs;
 
-import io.cloudbeaver.BaseWebProjectImpl;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.service.rm.nio.RMNIOFileSystemProvider;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.DBPImage;
-import org.jkiss.dbeaver.model.app.DBPProject;
 import org.jkiss.dbeaver.model.fs.DBFVirtualFileSystem;
 import org.jkiss.dbeaver.model.fs.DBFVirtualFileSystemRoot;
+import org.jkiss.dbeaver.model.rm.RMProject;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
+
+import java.net.URI;
+import java.nio.file.Path;
 
 public class RMVirtualFileSystem implements DBFVirtualFileSystem {
     @NotNull
     private final RMNIOFileSystemProvider rmNioFileSystemProvider;
 
-    public RMVirtualFileSystem(@NotNull WebSession webSession) {
+    @NotNull
+    private final RMProject rmProject;
+    public RMVirtualFileSystem(@NotNull WebSession webSession, @NotNull RMProject rmProject) {
         this.rmNioFileSystemProvider = new RMNIOFileSystemProvider(webSession.getRmController());
+        this.rmProject = rmProject;
     }
 
     @NotNull
@@ -60,16 +65,17 @@ public class RMVirtualFileSystem implements DBFVirtualFileSystem {
     @NotNull
     @Override
     public String getId() {
-        return "rm";
+        return rmProject.getId();
+    }
+
+    @Override
+    public Path of(DBRProgressMonitor monitor, URI uri) {
+        return rmNioFileSystemProvider.getPath(uri);
     }
 
     @NotNull
     @Override
-    public DBFVirtualFileSystemRoot[] getRootFolders(DBRProgressMonitor monitor, @NotNull DBPProject project) throws DBException {
-        if (!(project instanceof BaseWebProjectImpl)) {
-            throw new DBException("Unsupported project type: " + project.getClass().getName());
-        }
-        BaseWebProjectImpl webProject = (BaseWebProjectImpl) project;
-        return new RMVirtualFileSystemRoot[]{new RMVirtualFileSystemRoot(this, webProject.getRmProject(), rmNioFileSystemProvider)};
+    public DBFVirtualFileSystemRoot[] getRootFolders(DBRProgressMonitor monitor) throws DBException {
+        return new RMVirtualFileSystemRoot[]{new RMVirtualFileSystemRoot(this, rmProject, rmNioFileSystemProvider)};
     }
 }

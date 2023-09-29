@@ -4,7 +4,7 @@
 <plugin>
 
     <extension point="org.jkiss.dbeaver.fileSystem">
-        <fileSystemProvider id="rm-nio" label="RM NIO" class="com.dbeaver.cloud.aws.s3.AWSFileSystemProviderS3">
+        <fileSystemProvider id="rm-nio" label="RM NIO" class="io.cloudbeaver.service.rm.fs.RMVirtualFileSystemProvider">
 
         </fileSystemProvider>
     </extension>

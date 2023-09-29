@@ -43,9 +43,9 @@ public class WebServiceFS implements DBWServiceFS {
     @Override
     public String[] getAvailableFileSystems(@NotNull WebSession webSession) {
         return webSession.getFileSystemManager()
-            .getNioFileSystems()
+            .getDbfFileSystems()
             .stream()
-            .map(FileSystemProvider::getScheme)
+            .map(DBFVirtualFileSystem::getType)
             .toArray(String[]::new);
     }
 
@@ -53,10 +53,10 @@ public class WebServiceFS implements DBWServiceFS {
     @Override
     public FSFile getFile(@NotNull WebSession webSession, @NotNull URI fileUri) throws DBWebException {
         try {
-            Path filePath = webSession.getFileSystemManager().of(fileUri);
+            Path filePath = webSession.getFileSystemManager().of(webSession.getProgressMonitor(), fileUri);
             return new FSFile(filePath);
         } catch (Exception e) {
-            throw new DBWebException("Failed to found file:" + e.getMessage(), e);
+            throw new DBWebException("Failed to found file: " + e.getMessage(), e);
         }
     }
 
@@ -64,13 +64,13 @@ public class WebServiceFS implements DBWServiceFS {
     @Override
     public FSFile[] getFiles(@NotNull WebSession webSession, @NotNull URI folderURI) throws DBWebException {
         try {
-            Path folderPath = webSession.getFileSystemManager().of(folderURI);
+            Path folderPath = webSession.getFileSystemManager().of(webSession.getProgressMonitor(), folderURI);
             try (var filesStream = Files.list(folderPath)) {
                 return filesStream.map(FSFile::new)
                     .toArray(FSFile[]::new);
             }
         } catch (Exception e) {
-            throw new DBWebException("Failed to list files:" + e.getMessage(), e);
+            throw new DBWebException("Failed to list files: " + e.getMessage(), e);
         }
     }
 
@@ -78,10 +78,10 @@ public class WebServiceFS implements DBWServiceFS {
     @Override
     public String readFileContent(@NotNull WebSession webSession, @NotNull URI fileUri) throws DBWebException {
         try {
-            Path filePath = webSession.getFileSystemManager().of(fileUri);
+            Path filePath = webSession.getFileSystemManager().of(webSession.getProgressMonitor(), fileUri);
             return Files.readString(filePath);
         } catch (Exception e) {
-            throw new DBWebException("Failed to read file content:" + e.getMessage(), e);
+            throw new DBWebException("Failed to read file content: " + e.getMessage(), e);
         }
     }
 
@@ -93,14 +93,14 @@ public class WebServiceFS implements DBWServiceFS {
         boolean forceOverwrite
     ) throws DBWebException {
         try {
-            Path filePath = webSession.getFileSystemManager().of(fileURI);
+            Path filePath = webSession.getFileSystemManager().of(webSession.getProgressMonitor(), fileURI);
             if (!forceOverwrite && Files.exists(filePath)) {
                 throw new DBException("Cannot overwrite exist file");
             }
             Files.writeString(filePath, data);
             return true;
         } catch (Exception e) {
-            throw new DBWebException("Failed to write file content:" + e.getMessage(), e);
+            throw new DBWebException("Failed to write file content: " + e.getMessage(), e);
         }
     }
 
@@ -108,23 +108,23 @@ public class WebServiceFS implements DBWServiceFS {
     @Override
     public FSFile createFile(@NotNull WebSession webSession, @NotNull URI fileUri) throws DBWebException {
         try {
-            Path filePath = webSession.getFileSystemManager().of(fileUri);
+            Path filePath = webSession.getFileSystemManager().of(webSession.getProgressMonitor(), fileUri);
             Files.createFile(filePath);
             return new FSFile(filePath);
         } catch (Exception e) {
-            throw new DBWebException("Failed to create file:" + e.getMessage(), e);
+            throw new DBWebException("Failed to create file: " + e.getMessage(), e);
         }
     }
 
     @Override
     public FSFile moveFile(@NotNull WebSession webSession, @NotNull URI fromURI, @NotNull URI toURI) throws DBWebException {
         try {
-            Path from = webSession.getFileSystemManager().of(fromURI);
-            Path to = webSession.getFileSystemManager().of(toURI);
+            Path from = webSession.getFileSystemManager().of(webSession.getProgressMonitor(), fromURI);
+            Path to = webSession.getFileSystemManager().of(webSession.getProgressMonitor(), toURI);
             Files.move(from, to);
             return new FSFile(to);
         } catch (Exception e) {
-            throw new DBWebException("Failed to move file:" + e.getMessage(), e);
+            throw new DBWebException("Failed to move file: " + e.getMessage(), e);
         }
     }
 
@@ -132,22 +132,22 @@ public class WebServiceFS implements DBWServiceFS {
     @Override
     public FSFile createFolder(@NotNull WebSession webSession, @NotNull URI folderURI) throws DBWebException {
         try {
-            Path folderPath = webSession.getFileSystemManager().of(folderURI);
+            Path folderPath = webSession.getFileSystemManager().of(webSession.getProgressMonitor(), folderURI);
             Files.createDirectory(folderPath);
             return new FSFile(folderPath);
         } catch (Exception e) {
-            throw new DBWebException("Failed to create folder:" + e.getMessage(), e);
+            throw new DBWebException("Failed to create folder: " + e.getMessage(), e);
         }
     }
 
     @Override
     public boolean deleteFile(@NotNull WebSession webSession, @NotNull URI fileUri) throws DBWebException {
         try {
-            Path filePath = webSession.getFileSystemManager().of(fileUri);
+            Path filePath = webSession.getFileSystemManager().of(webSession.getProgressMonitor(), fileUri);
             Files.delete(filePath);
             return true;
         } catch (Exception e) {
-            throw new DBWebException("Failed to create folder:" + e.getMessage(), e);
+            throw new DBWebException("Failed to create folder: " + e.getMessage(), e);
         }
     }
 }

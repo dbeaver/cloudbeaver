@@ -59,8 +59,8 @@ public class RMPath extends NIOPath {
 
     @Override
     public Path getRoot() {
-        if (isProjectPath()) {
-            return new RMPath(new RMNIOFileSystem(null, getFileSystem().rmProvider()));
+        if (isProjectPath() || isRmRootPath()) {
+            return null;
         }
         return new RMPath(rmNioFileSystem);
     }
@@ -76,8 +76,7 @@ public class RMPath extends NIOPath {
 
     @Override
     public Path getParent() {
-        // project is root and have no parent
-        if (isProjectPath()) {
+        if (isRmRootPath() || isProjectPath()) {
             return null;
         }
 
@@ -124,8 +123,11 @@ public class RMPath extends NIOPath {
     public URI toUri() {
         var fileSystem = getFileSystem();
         var uriBuilder = new StringBuilder(fileSystem.provider().getScheme())
-            .append("://")
-            .append(rmProjectId);
+            .append("://");
+
+        if (rmProjectId != null) {
+            uriBuilder.append(rmProjectId);
+        }
 
         String rmResourcePath = getResourcePath();
         if (rmResourcePath != null) {

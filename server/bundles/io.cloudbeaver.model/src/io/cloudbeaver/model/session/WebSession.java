@@ -51,7 +51,6 @@ import org.jkiss.dbeaver.model.app.DBPProject;
 import org.jkiss.dbeaver.model.auth.*;
 import org.jkiss.dbeaver.model.connection.DBPConnectionConfiguration;
 import org.jkiss.dbeaver.model.exec.DBCException;
-import org.jkiss.dbeaver.model.fs.DBFFileSystemDescriptor;
 import org.jkiss.dbeaver.model.fs.DBFFileSystemManager;
 import org.jkiss.dbeaver.model.meta.Association;
 import org.jkiss.dbeaver.model.meta.Property;
@@ -73,7 +72,6 @@ import org.jkiss.dbeaver.model.sql.DBQuotaException;
 import org.jkiss.dbeaver.model.websocket.event.WSEventType;
 import org.jkiss.dbeaver.model.websocket.event.WSSessionLogUpdatedEvent;
 import org.jkiss.dbeaver.registry.DataSourceDescriptor;
-import org.jkiss.dbeaver.registry.fs.FileSystemProviderRegistry;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.dbeaver.runtime.jobs.DisconnectJob;
 import org.jkiss.utils.CommonUtils;
@@ -82,11 +80,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.lang.reflect.InvocationTargetException;
-import java.nio.file.Path;
-import java.nio.file.spi.FileSystemProvider;
 import java.time.Instant;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -128,7 +123,7 @@ public class WebSession extends BaseWebSession
     private DBNModel navigatorModel;
     private final DBRProgressMonitor progressMonitor = new SessionProgressMonitor();
     private final Map<String, DBWSessionHandler> sessionHandlers;
-    private final DBFFileSystemManager fileSystemManager = new DBFFileSystemManager();
+    private final DBFFileSystemManager fileSystemManager;
 
     public WebSession(
         @NotNull HttpSession httpSession,
@@ -139,6 +134,7 @@ public class WebSession extends BaseWebSession
         this.lastAccessTime = this.createTime;
         setLocale(CommonUtils.toString(httpSession.getAttribute(ATTR_LOCALE), this.locale));
         this.sessionHandlers = sessionHandlers;
+        this.fileSystemManager = new DBFFileSystemManager(getSessionContext());
     }
 
     @Override
@@ -246,7 +242,7 @@ public class WebSession extends BaseWebSession
         super.refreshUserData();
         refreshSessionAuth();
 
-        this.fileSystemManager.reloadFileSystems(getProgressMonitor(), getWorkspace().getAuthContext());
+        this.fileSystemManager.reloadFileSystems(getProgressMonitor());
         initNavigatorModel();
     }
 
@@ -625,7 +621,7 @@ public class WebSession extends BaseWebSession
             log.error("Error closing web session tokens");
         }
         this.userContext.setUser(null);
-        this.fileSystemManager.clear();
+        this.fileSystemManager.close();
         super.close();
     }
 
