@@ -669,7 +669,7 @@ public class WebServiceAdmin implements DBWServiceAdmin {
     }
 
     @Override
-    public boolean deleteConnectionAccess(
+    public boolean deleteConnectionsAccess(
         @NotNull WebSession webSession,
         @Nullable String projectId,
         @NotNull List<String> connectionIds,

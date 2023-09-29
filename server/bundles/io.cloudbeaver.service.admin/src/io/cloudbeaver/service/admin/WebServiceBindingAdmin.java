@@ -124,8 +124,8 @@ public class WebServiceBindingAdmin extends WebServiceBindingBase<DBWServiceAdmi
                     getProjectReference(env),
                     env.getArgument("connectionIds"),
                     env.getArgument("subjects")))
-            .dataFetcher("deleteConnectionAccess",
-                env -> getService(env).deleteConnectionAccess(
+            .dataFetcher("deleteConnectionsAccess",
+                env -> getService(env).deleteConnectionsAccess(
                     getWebSession(env),
                     getProjectReference(env),
                     env.getArgument("connectionIds"),

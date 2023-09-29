@@ -164,7 +164,7 @@ public interface DBWServiceAdmin extends DBWService {
     ) throws DBWebException;
 
     @WebAction(requirePermissions = DBWConstants.PERMISSION_ADMIN)
-    boolean deleteConnectionAccess(
+    boolean deleteConnectionsAccess(
         @NotNull WebSession webSession,
         @Nullable String projectId,
         @NotNull List<String> connectionIds,
