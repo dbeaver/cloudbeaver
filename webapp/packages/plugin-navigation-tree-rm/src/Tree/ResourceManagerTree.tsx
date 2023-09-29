@@ -7,9 +7,8 @@
  */
 import { observer } from 'mobx-react-lite';
 import { useMemo } from 'react';
-import styled, { css } from 'reshadow';
 
-import { getComputed, useResource, useUserData } from '@cloudbeaver/core-blocks';
+import { getComputed, s, useResource, useS, useUserData } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { NavNodeInfoResource, NavTreeResource, ProjectsNavNodeService } from '@cloudbeaver/core-navigation-tree';
 import { ProjectInfoResource, ProjectsService } from '@cloudbeaver/core-projects';
@@ -25,6 +24,7 @@ import {
   NavigationTreeService,
   validateElementsTreeSettings,
 } from '@cloudbeaver/plugin-navigation-tree';
+import { ResourceManagerService } from '@cloudbeaver/plugin-resource-manager';
 
 import { navigationTreeProjectFilter } from './ProjectsRenderer/navigationTreeProjectFilter';
 import { navigationTreeProjectSearchCompare } from './ProjectsRenderer/navigationTreeProjectSearchCompare';
@@ -33,47 +33,16 @@ import { navigationTreeProjectsRendererRenderer } from './ProjectsRenderer/navig
 import { navigationTreeResourceTypeFilter } from './ProjectsRenderer/navigationTreeResourceTypeFilter';
 import { ProjectsSettingsPlaceholderElement } from './ProjectsRenderer/ProjectsSettingsForm';
 import { navigationTreeResourceExpandStateGetter } from './ResourceFolderRenderer/navigationTreeResourceExpandStateGetter';
+import style from './ResourceManagerTree.m.css';
 import { ResourceManagerTreeCaptureViewContext } from './ResourceManagerTreeCaptureViewContext';
 import { transformResourceNodeInfo } from './ResourceRenderer/transformResourceNodeInfo';
-import { ResourceManagerService } from '@cloudbeaver/plugin-resource-manager';
-
-const styles = css`
-  CaptureView {
-    outline: none;
-    display: flex;
-    flex: 1;
-    flex-direction: column;
-    overflow: auto;
-  }
-  ElementsTreeLoader {
-    min-width: 100%;
-    width: max-content;
-  }
-  Loader {
-    display: flex;
-    height: 100%;
-    width: 100%;
-    min-width: 240px;
-  }
-  center {
-    height: 100%;
-    width: 100%;
-    display: flex;
-  }
-  message {
-    padding: 24px;
-    box-sizing: border-box;
-    max-width: 240px;
-    text-align: center;
-    margin: auto;
-  }
-`;
 
 interface Props extends React.PropsWithChildren {
   resourceTypeId?: string;
 }
 
 export const ResourceManagerTree: React.FC<Props> = observer(function ResourceManagerTree({ resourceTypeId, children }) {
+  const styles = useS(style);
   const root = RESOURCES_NODE_PATH;
 
   const projectsNavNodeService = useService(ProjectsNavNodeService);
@@ -131,8 +100,8 @@ export const ResourceManagerTree: React.FC<Props> = observer(function ResourceMa
 
   const settingsElements = useMemo(() => [ProjectsSettingsPlaceholderElement], []);
 
-  return styled(styles)(
-    <CaptureView view={navTreeService}>
+  return (
+    <CaptureView view={navTreeService} className={s(styles, { captureView: true })}>
       <ResourceManagerTreeCaptureViewContext resourceTypeId={resourceTypeId} />
       <ElementsTreeLoader
         root={root}
@@ -145,15 +114,14 @@ export const ResourceManagerTree: React.FC<Props> = observer(function ResourceMa
         expandStateGetters={[projectsExpandStateGetter, resourceExpandStateGetter]}
         navNodeFilterCompare={navigationTreeProjectSearchCompare}
         settingsElements={settingsElements}
-        emptyPlaceholder={() =>
-          styled(styles)(
-            <center>
-              <message>{children}</message>
-            </center>,
-          )
-        }
+        className={s(styles, { elementsTreeLoader: true })}
+        emptyPlaceholder={() => (
+          <div className={s(styles, { center: true })}>
+            <div className={s(styles, { message: true })}>{children}</div>
+          </div>
+        )}
         onOpen={node => navTreeService.navToNode(node.id, node.parentId)}
       />
-    </CaptureView>,
+    </CaptureView>
   );
 });

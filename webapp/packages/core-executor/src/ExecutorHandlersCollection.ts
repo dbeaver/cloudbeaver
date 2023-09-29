@@ -82,6 +82,10 @@ export class ExecutorHandlersCollection<T = unknown, TResult = any | Promise<any
     return this;
   }
 
+  removeBefore(executor: IExecutorHandlersCollection<any, TResult>): void {
+    this.chain = this.chain.filter(link => link.executor !== executor || link.type !== 'before');
+  }
+
   next<TNext>(executor: IExecutorHandlersCollection<TNext, TResult>, map?: ExecutorDataMap<T, TNext>, filter?: ExecutorDataFilter<T>): this {
     this.chain.push({
       executor,
@@ -90,6 +94,10 @@ export class ExecutorHandlersCollection<T = unknown, TResult = any | Promise<any
       type: 'next',
     });
     return this;
+  }
+
+  removeNext(executor: IExecutorHandlersCollection<any, TResult>): void {
+    this.chain = this.chain.filter(link => link.executor !== executor || link.type !== 'next');
   }
 
   hasHandler(handler: IExecutorHandler<T, TResult>): boolean {

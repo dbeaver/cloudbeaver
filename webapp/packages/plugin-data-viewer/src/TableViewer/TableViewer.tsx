@@ -99,6 +99,7 @@ interface Props {
   resultIndex: number | undefined;
   presentationId: string | undefined;
   valuePresentationId: string | null | undefined;
+  /** Display data in simple mode, some features will be hidden or disabled */
   simple?: boolean;
   context?: IDataContext;
   className?: string;

@@ -8,7 +8,7 @@
 import { observer } from 'mobx-react-lite';
 import { useState } from 'react';
 
-import { Button, Container, Group, GroupTitle, InputField, s, SubmittingForm, Table, TableBody, useS } from '@cloudbeaver/core-blocks';
+import { Button, Container, Form, Group, GroupTitle, InputField, s, Table, TableBody, useS } from '@cloudbeaver/core-blocks';
 
 import styles from './GroupingColumnEditorTable.m.css';
 import { GroupingTableItem } from './GroupingTableItem';
@@ -36,29 +36,29 @@ export const GroupingColumnEditorTable = observer<Props>(function GroupingColumn
 
   return (
     <Group box medium overflow>
-        <Container className={s(style, { header: true })}>
-          <GroupTitle>{title}</GroupTitle>
-          <SubmittingForm className={s(style, { headerActions: true })} onSubmit={addColumnHandler}>
-              <InputField
-                className={s(style, { inputField: true })}
-                placeholder={placeholder}
-                value={newColumnName}
-                onChange={v => setNewColumnName(String(v))}
-              />
-              <Button mod={['unelevated']} onClick={addColumnHandler}>
-                +
-              </Button>
-          </SubmittingForm>
-        </Container>
-        <Container className={s(style, { tableContainer: true })} overflow>
-          <Table keys={columns}>
-            <TableBody>
-              {columns.map((name, idx) => (
-                <GroupingTableItem key={idx} id={name} name={name} onDelete={onDelete} />
-              ))}
-            </TableBody>
-          </Table>
-        </Container>
+      <Container className={s(style, { header: true })}>
+        <GroupTitle>{title}</GroupTitle>
+        <Form className={s(style, { headerActions: true })} onSubmit={addColumnHandler}>
+          <InputField
+            className={s(style, { inputField: true })}
+            placeholder={placeholder}
+            value={newColumnName}
+            onChange={v => setNewColumnName(String(v))}
+          />
+          <Button mod={['unelevated']} onClick={addColumnHandler}>
+            +
+          </Button>
+        </Form>
+      </Container>
+      <Container className={s(style, { tableContainer: true })} overflow>
+        <Table keys={columns}>
+          <TableBody>
+            {columns.map((name, idx) => (
+              <GroupingTableItem key={idx} id={name} name={name} onDelete={onDelete} />
+            ))}
+          </TableBody>
+        </Table>
+      </Container>
     </Group>
   );
 });

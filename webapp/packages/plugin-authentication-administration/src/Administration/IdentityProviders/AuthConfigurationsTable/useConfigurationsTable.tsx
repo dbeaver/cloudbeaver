@@ -81,7 +81,7 @@ export function useConfigurationsTable(): Readonly<State> {
           await resource.deleteConfiguration(resourceKeyList(deletionList));
 
           this.tableState.unselect();
-          this.tableState.unexpand(deletionList);
+          this.tableState.collapse(deletionList);
         } catch (exception: any) {
           notificationService.logException(exception, 'Configurations delete failed');
         } finally {

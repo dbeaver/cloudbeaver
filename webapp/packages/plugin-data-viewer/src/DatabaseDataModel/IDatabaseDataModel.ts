@@ -16,12 +16,15 @@ export interface IRequestEventData<TOptions = any, TResult extends IDatabaseData
   model: IDatabaseDataModel<TOptions, TResult>;
 }
 
+/** Represents an interface for interacting with a database. It is used for managing and requesting data. */
 export interface IDatabaseDataModel<TOptions = any, TResult extends IDatabaseDataResult = IDatabaseDataResult> {
   readonly id: string;
   readonly name: string | null;
   readonly source: IDatabaseDataSource<TOptions, TResult>;
+  /** Holds metadata about a data request. */
   readonly requestInfo: IRequestInfo;
   readonly supportedDataFormats: ResultDataFormat[];
+  /** Represents the value by which the number of loaded rows will be increased when loading the next data portion */
   readonly countGain: number;
 
   readonly onOptionsChange: IExecutor;

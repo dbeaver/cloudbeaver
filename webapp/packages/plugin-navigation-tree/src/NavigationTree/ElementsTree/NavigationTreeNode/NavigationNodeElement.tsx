@@ -7,9 +7,8 @@
  */
 import { observer } from 'mobx-react-lite';
 import { useContext } from 'react';
-import styled from 'reshadow';
 
-import { Translate, TREE_NODE_STYLES, TreeNodeNestedMessage } from '@cloudbeaver/core-blocks';
+import { Translate, TreeNodeNestedMessage } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { NavNodeInfoResource } from '@cloudbeaver/core-navigation-tree';
 
@@ -19,7 +18,6 @@ import { NavigationNodeRendererLoader } from './NavigationNodeRendererLoader';
 
 export const NavigationNodeElement: NavTreeNodeComponent = observer(function NavigationNodeElement({ nodeId, path, expanded, dragging, className }) {
   const context = useContext(ElementsTreeContext);
-  const navNodeInfoResource = useService(NavNodeInfoResource);
 
   if (context?.tree.renderers) {
     for (const renderer of context.tree.renderers) {
@@ -40,17 +38,21 @@ export const NavigationNodeElement: NavTreeNodeComponent = observer(function Nav
     }
   }
 
+  return <NavigationNodeRenderer nodeId={nodeId} path={path} expanded={expanded} dragging={dragging} className={className} />;
+});
+
+const NavigationNodeRenderer: NavTreeNodeComponent = observer(function NavigationNodeRenderer({ nodeId, path, expanded, dragging, className }) {
+  const navNodeInfoResource = useService(NavNodeInfoResource);
   const node = navNodeInfoResource.get(nodeId);
 
   if (!node) {
-    return styled(TREE_NODE_STYLES)(
+    return (
       <TreeNodeNestedMessage>
         <Translate token="app_navigationTree_node_not_found" />
-      </TreeNodeNestedMessage>,
+      </TreeNodeNestedMessage>
     );
   }
 
-  // TODO: after node update reference can be lost and NavigationNode skip update
   return (
     <NavigationNodeRendererLoader
       node={node}

@@ -17,9 +17,9 @@ export type CachedDataResourceGetter<TValue, TIncludes> = TValue extends null
   ? CachedResourceValueIncludes<TValue, TIncludes> | null
   : CachedResourceValueIncludes<TValue, TIncludes>;
 
-  /**
-   * CachedDataResource is a resource that stores data that has no identifiers.
-   */
+/**
+ * CachedDataResource is a resource that stores data that has no identifiers.
+ */
 export abstract class CachedDataResource<
   TData,
   TKey = void,
@@ -78,11 +78,11 @@ export function getCachedDataResourceLoaderState<TData, TKey = void, TContext ex
     isOutdated() {
       return resource.isOutdated(param);
     },
-    load() {
-      return resource.load(param, context);
+    async load() {
+      await resource.load(param, context);
     },
-    reload() {
-      return resource.refresh(param, context);
+    async reload() {
+      await resource.refresh(param, context);
     },
   };
 }

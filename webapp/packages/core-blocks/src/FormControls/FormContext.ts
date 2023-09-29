@@ -7,7 +7,7 @@
  */
 import { createContext } from 'react';
 
-import type { IExecutor } from '@cloudbeaver/core-executor';
+import type { IExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
 
 export type FormChangeValues = string | number | boolean | FileList | null | undefined;
 export type FormChangeHandler = (value: FormChangeValues, name: string | undefined) => void;
@@ -19,9 +19,18 @@ export interface IChangeData {
 }
 
 export interface IFormContext {
-  changeExecutor: IExecutor<IChangeData>;
+  ref: HTMLFormElement | null;
+  onValidate: SyncExecutor;
+  onSubmit: SyncExecutor;
+  onChange: IExecutor<IChangeData>;
+  parent: IFormContext | null;
+  disableEnterSubmit: boolean;
+  setRef: (ref: HTMLFormElement | null) => void;
   change: FormChangeHandler;
   keyDown: KeyHandler;
+  validate: () => boolean;
+  reportValidity: () => boolean;
+  submit: (event?: SubmitEvent) => void;
 }
 
 export const FormContext = createContext<IFormContext | null>(null);

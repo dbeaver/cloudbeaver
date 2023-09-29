@@ -267,32 +267,32 @@ export abstract class CachedMapResource<
 
 export function getCachedMapResourceLoaderState<TKey, TValue, TContext extends Record<string, any> = Record<string, never>>(
   resource: CachedMapResource<TKey, TValue, TContext>,
-  key: ResourceKey<TKey>,
-  includes?: CachedResourceIncludeArgs<TValue, TContext> | undefined,
+  getKey: () => ResourceKey<TKey>,
+  getIncludes?: () => CachedResourceIncludeArgs<TValue, TContext> | undefined,
   lazy?: boolean,
 ): ILoadableState {
   return {
     lazy,
     get exception() {
-      return resource.getException(key);
+      return resource.getException(getKey());
     },
     isLoading() {
-      return resource.isLoading(key);
+      return resource.isLoading(getKey());
     },
     isLoaded() {
-      return resource.isLoaded(key, includes);
+      return resource.isLoaded(getKey(), getIncludes?.());
     },
     isError() {
       return isContainsException(this.exception);
     },
     isOutdated() {
-      return resource.isOutdated(key);
+      return resource.isOutdated(getKey());
     },
-    load() {
-      return resource.load(key, includes);
+    async load() {
+      await resource.load(getKey(), getIncludes?.());
     },
-    reload() {
-      return resource.refresh(key, includes);
+    async reload() {
+      await resource.refresh(getKey(), getIncludes?.());
     },
   };
 }

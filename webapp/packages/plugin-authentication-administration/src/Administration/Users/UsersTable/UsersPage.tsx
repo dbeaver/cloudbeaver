@@ -41,13 +41,13 @@ export const UsersPage = observer<Props>(function UsersPage({ sub, param }) {
   return styled(style)(
     <ColoredContainer vertical wrap gap parent>
       <Group box keepSize>
-        <UsersAdministrationToolsPanel create={create} onUpdate={table.update} />
+        <UsersAdministrationToolsPanel onUpdate={table.update} />
       </Group>
 
       <Container overflow gap>
-        {create && createUserService.user && (
+        {create && createUserService.state && (
           <Group box>
-            <CreateUser user={createUserService.user} onCancel={createUserService.cancelCreate} />
+            <CreateUser state={createUserService.state} onCancel={createUserService.cancelCreate} />
           </Group>
         )}
 

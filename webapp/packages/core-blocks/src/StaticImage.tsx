@@ -7,19 +7,26 @@
  */
 import { GlobalConstants, isValidUrl } from '@cloudbeaver/core-utils';
 
+import { s } from './s';
+import style from './StaticImage.m.css';
+import { useS } from './useS';
+
 interface Props {
   icon?: string;
   className?: string;
   title?: string;
+  width?: number;
+  block?: boolean;
   onClick?: (e: React.MouseEvent) => void;
 }
 
-export const StaticImage: React.FC<Props> = function StaticImage({ icon, className, title, onClick }) {
+export const StaticImage: React.FC<Props> = function StaticImage({ icon, className, title, width, block, onClick }) {
+  const styles = useS(style);
   if (!icon) {
     return null;
   }
 
   const url = isValidUrl(icon) ? icon : GlobalConstants.absoluteUrl(icon);
 
-  return <img className={className} src={url} title={title} onClick={onClick} />;
+  return <img className={s(styles, { block }, className)} src={url} title={title} width={width} onClick={onClick} />;
 };

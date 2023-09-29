@@ -172,15 +172,15 @@ export function useResource<
   });
 
   function getData(): any {
-    if (actions?.active === false) {
-      if (isResourceKeyList(propertiesRef.key) || isResourceKeyListAlias(propertiesRef.key)) {
-        return [];
-      }
-
-      return undefined;
+    if (propertiesRef.resource instanceof CachedDataResource) {
+      return propertiesRef.resource.data;
     }
     if (propertiesRef.resource instanceof CachedMapResource) {
-      if (propertiesRef.key === null) {
+      if (actions?.active === false || propertiesRef.key === null) {
+        if (isResourceKeyList(propertiesRef.key) || isResourceKeyListAlias(propertiesRef.key)) {
+          return [];
+        }
+
         return undefined;
       }
       return propertiesRef.resource.get(propertiesRef.key);

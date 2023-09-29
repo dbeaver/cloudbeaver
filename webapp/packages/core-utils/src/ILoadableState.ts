@@ -12,9 +12,10 @@ export interface ILoadableState {
   isLoaded: () => boolean;
   isError: () => boolean;
   readonly exception?: (Error | null)[] | Error | null;
-  load: () => void;
-  reload?: () => void;
+  load: () => void | Promise<void>;
+  reload?: () => void | Promise<void>;
 
+  promise?: Promise<any> | null;
   isOutdated?: () => boolean;
   isCancelled?: () => boolean;
   cancel?: () => void;
@@ -34,4 +35,12 @@ export function isContainsException(exception?: (Error | null)[] | Error | null)
   }
 
   return !!exception;
+}
+
+export function getFirstException(exception?: (Error | null)[] | Error | null): Error | null {
+  if (Array.isArray(exception)) {
+    return exception.find(Boolean) || null;
+  }
+
+  return exception || null;
 }
