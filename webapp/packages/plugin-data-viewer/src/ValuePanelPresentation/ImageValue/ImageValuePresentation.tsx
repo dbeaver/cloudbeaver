@@ -22,7 +22,6 @@ import { ResultSetDataContentAction } from '../../DatabaseDataModel/Actions/Resu
 import { ResultSetDataKeysUtils } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetDataKeysUtils';
 import { ResultSetFormatAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetFormatAction';
 import { ResultSetSelectAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetSelectAction';
-import { ResultSetViewAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetViewAction';
 import type { IDatabaseResultSet } from '../../DatabaseDataModel/IDatabaseResultSet';
 import type { IDataValuePanelProps } from '../../TableViewer/ValuePanel/DataValuePanelService';
 import { QuotaPlaceholder } from '../QuotaPlaceholder';
@@ -141,7 +140,15 @@ export const ImageValuePresentation: TabContainerPanelComponent<IDataValuePanelP
           return !!this.src;
         },
         get truncated() {
-          return isResultSetContentValue(this.cellValue) && content.isContentTruncated(this.cellValue);
+          if (isResultSetContentValue(this.cellValue)) {
+            if (this.cellValue.binary) {
+              return content.isContentTruncated(this.cellValue);
+            }
+            if (this.cellValue.blob) {
+              return false;
+            }
+          }
+          return false;
         },
         stretch: false,
         toggleStretch() {
