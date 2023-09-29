@@ -107,7 +107,15 @@ export class ConnectionAccessTabService extends Bootstrap {
     const changed = await this.isChanged(key, state.grantedSubjects);
 
     if (changed) {
-      await this.connectionInfoResource.setAccessSubjects(key, state.grantedSubjects);
+      if (state.initialGrantedSubjects.length > state.grantedSubjects.length) {
+
+        const subjectsToRemove = state.initialGrantedSubjects.filter(subject => !state.grantedSubjects.includes(subject));
+        await this.connectionInfoResource.deleteConnectionsAccess(key, subjectsToRemove);
+      } else if (state.initialGrantedSubjects.length < state.grantedSubjects.length) {
+
+        const subjectsToAdd = state.grantedSubjects.filter(subject => !state.initialGrantedSubjects.includes(subject));
+        await this.connectionInfoResource.addConnectionsAccess(key, subjectsToAdd);
+      }
       state.initialGrantedSubjects = state.grantedSubjects.slice();
     }
   }
