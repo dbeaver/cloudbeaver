@@ -31,11 +31,10 @@ export const TextFormatter = observer<RenderCellProps<IResultSetRowKey>>(functio
 
   const style = useS(styles);
   const formatter = tableDataContext.format;
-  const rawValue = getComputed(() => formatter.get(tableDataContext.getCellValue(cellContext.cell!)!));
+  const rawValue = getComputed(() => formatter.get(cellContext.cell!));
+  const value = formatter.getDisplayString(cellContext.cell!);
 
   const classes = s(style, { textFormatter: true, nullValue: rawValue === null });
-
-  const value = formatter.toDisplayString(rawValue);
 
   const handleClose = useCallback(() => {
     editingContext.closeEditor(cellContext.position);

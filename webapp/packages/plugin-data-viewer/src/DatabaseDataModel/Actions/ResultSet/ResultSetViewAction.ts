@@ -5,7 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { action, computed, makeObservable, observable } from 'mobx';
+import { action, makeObservable, observable } from 'mobx';
 
 import { DataTypeLogicalOperation, ResultDataFormat, SqlResultColumn } from '@cloudbeaver/core-sdk';
 
@@ -14,6 +14,7 @@ import type { IDatabaseDataSource } from '../../IDatabaseDataSource';
 import type { IDatabaseResultSet } from '../../IDatabaseResultSet';
 import { databaseDataAction } from '../DatabaseDataActionDecorator';
 import type { IDatabaseDataResultAction } from '../IDatabaseDataResultAction';
+import { compareResultSetRowKeys } from './compareResultSetRowKeys';
 import type { IResultSetContentValue } from './IResultSetContentValue';
 import type { IResultSetColumnKey, IResultSetElementKey, IResultSetRowKey } from './IResultSetDataKey';
 import { isResultSetContentValue } from './isResultSetContentValue';
@@ -27,7 +28,7 @@ export class ResultSetViewAction extends DatabaseDataAction<any, IDatabaseResult
   static dataFormat = [ResultDataFormat.Resultset];
 
   get rowKeys(): IResultSetRowKey[] {
-    return [...this.editor.addRows, ...this.data.rows.map((c, index) => ({ index }))].sort((a, b) => a.index - b.index);
+    return [...this.editor.addRows, ...this.data.rows.map((c, index) => ({ index, subIndex: 0 }))].sort(compareResultSetRowKeys);
   }
 
   get columnKeys(): IResultSetColumnKey[] {
@@ -52,10 +53,6 @@ export class ResultSetViewAction extends DatabaseDataAction<any, IDatabaseResult
     this.editor = editor;
 
     makeObservable<this, 'columnsOrder'>(this, {
-      rowKeys: computed,
-      columnKeys: computed,
-      rows: computed,
-      columns: computed,
       columnsOrder: observable,
       setColumnOrder: action,
     });
@@ -129,7 +126,7 @@ export class ResultSetViewAction extends DatabaseDataAction<any, IDatabaseResult
     return { row, column };
   }
 
-  getCellValue(cell: IResultSetElementKey): IResultSetValue | undefined {
+  getCellValue(cell: IResultSetElementKey): IResultSetValue {
     const edited = this.editor.get(cell);
 
     if (edited !== undefined) {
@@ -137,7 +134,7 @@ export class ResultSetViewAction extends DatabaseDataAction<any, IDatabaseResult
     }
 
     if (cell.row.index >= this.rows.length || cell.column.index >= this.columns.length) {
-      return undefined;
+      throw new Error('Cell is out of range');
     }
 
     return this.rows[cell.row.index][cell.column.index];

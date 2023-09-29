@@ -9,6 +9,8 @@ export * from './DatabaseDataModel/Actions/Document/IDocumentElementKey';
 export * from './DatabaseDataModel/Actions/ResultSet/DataContext/DATA_CONTEXT_DV_DDM_RS_COLUMN_KEY';
 export * from './DatabaseDataModel/DataContext/DATA_CONTEXT_DV_DDM';
 export * from './DatabaseDataModel/DataContext/DATA_CONTEXT_DV_DDM_RESULT_INDEX';
+export * from './DatabaseDataModel/Actions/ResultSet/compareResultSetRowKeys';
+export * from './DatabaseDataModel/Actions/ResultSet/createResultSetContentValue';
 export * from './DatabaseDataModel/Actions/ResultSet/IResultSetDataKey';
 export * from './DatabaseDataModel/Actions/ResultSet/IResultSetContentValue';
 export * from './DatabaseDataModel/Actions/ResultSet/isResultSetContentValue';

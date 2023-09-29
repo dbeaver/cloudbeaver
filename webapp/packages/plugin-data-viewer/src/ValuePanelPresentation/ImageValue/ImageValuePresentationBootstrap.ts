@@ -57,8 +57,12 @@ export class ImageValuePresentationBootstrap extends Bootstrap {
   load(): void {}
 
   private isImage(value: IResultSetContentValue | null) {
-    if (value !== null && 'binary' in value) {
+    if (value?.binary) {
       return getMIME(value.binary || '') !== null;
+    }
+
+    if (value?.blob) {
+      return value.blob.type.startsWith('image/');
     }
 
     return false;

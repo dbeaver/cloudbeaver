@@ -13,6 +13,7 @@ import type { ITask } from '@cloudbeaver/core-executor';
 import {
   AsyncTaskInfoService,
   GraphQLService,
+  IResultSetUploadingBlob,
   ResultDataFormat,
   SqlExecuteInfo,
   SqlQueryResults,
@@ -154,11 +155,16 @@ export class ContainerDataSource extends DatabaseDataSource<IDataContainerOption
           continue;
         }
         const executionContextInfo = executionContext.context!;
+        const projectId = executionContextInfo.projectId;
+        const connectionId = executionContextInfo.connectionId;
+        const contextId = executionContextInfo.id;
+        const resultsId = result.id;
+
         const updateVariables: UpdateResultsDataBatchMutationVariables = {
-          projectId: executionContextInfo.projectId,
-          connectionId: executionContextInfo.connectionId,
-          contextId: executionContextInfo.id,
-          resultsId: result.id,
+          projectId,
+          connectionId,
+          contextId,
+          resultsId,
         };
         let editor: ResultSetEditAction | DocumentEditAction | undefined;
 
@@ -172,23 +178,35 @@ export class ContainerDataSource extends DatabaseDataSource<IDataContainerOption
 
         const response = await this.graphQLService.sdk.updateResultsDataBatch(updateVariables);
 
-        this.requestInfo = {
-          ...this.requestInfo,
-          requestDuration: response.result.duration,
-          requestMessage: 'Saved successfully',
-          source: null,
-        };
-
         if (editor) {
           const responseResult = this.transformResults(executionContextInfo, response.result.results, 0).find(
             newResult => newResult.id === result.id,
           );
 
           if (responseResult) {
-            editor.applyUpdate(responseResult);
+            editor.applyPartialUpdate(responseResult);
+          }
+
+          let blobs: IResultSetUploadingBlob[] = [];
+          if (editor instanceof ResultSetEditAction) {
+            blobs = editor.getBlobs();
+          }
+
+          for (const blob of blobs) {
+            try {
+              await this.graphQLService.sdk.uploadBlobResultSet(projectId, connectionId, contextId, resultsId, blob);
+            } catch {}
           }
         }
+
+        this.requestInfo = {
+          ...this.requestInfo,
+          requestDuration: response.result.duration,
+          requestMessage: 'Saved successfully',
+          source: null,
+        };
       }
+
       this.clearError();
     } catch (exception: any) {
       this.error = exception;

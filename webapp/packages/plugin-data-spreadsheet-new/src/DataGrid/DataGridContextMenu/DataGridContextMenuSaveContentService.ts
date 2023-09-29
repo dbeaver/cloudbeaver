@@ -5,25 +5,26 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
+import { selectFiles } from '@cloudbeaver/core-browser';
 import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { ResultSetDataContentAction, ResultSetDataKeysUtils } from '@cloudbeaver/plugin-data-viewer';
+import {
+  createResultSetContentValue,
+  ResultSetDataContentAction,
+  ResultSetDataKeysUtils,
+  ResultSetEditAction,
+  ResultSetFormatAction,
+} from '@cloudbeaver/plugin-data-viewer';
 
 import { DataGridContextMenuService } from './DataGridContextMenuService';
 
 @injectable()
 export class DataGridContextMenuSaveContentService {
-  private static readonly menuContentSaveToken = 'menuContentSave';
-
   constructor(private readonly dataGridContextMenuService: DataGridContextMenuService, private readonly notificationService: NotificationService) {}
-
-  getMenuContentSaveToken(): string {
-    return DataGridContextMenuSaveContentService.menuContentSaveToken;
-  }
 
   register(): void {
     this.dataGridContextMenuService.add(this.dataGridContextMenuService.getMenuToken(), {
-      id: this.getMenuContentSaveToken(),
+      id: 'menuContentDownload',
       order: 4,
       title: 'ui_download',
       icon: '/icons/export.svg',
@@ -41,6 +42,36 @@ export class DataGridContextMenuSaveContentService {
       isHidden: context => {
         const content = context.data.model.source.getAction(context.data.resultIndex, ResultSetDataContentAction);
         return !content.isDownloadable(context.data.key);
+      },
+      isDisabled: context => {
+        const content = context.data.model.source.getAction(context.data.resultIndex, ResultSetDataContentAction);
+
+        return (
+          context.data.model.isLoading() ||
+          (!!content.activeElement && ResultSetDataKeysUtils.isElementsKeyEqual(context.data.key, content.activeElement))
+        );
+      },
+    });
+    this.dataGridContextMenuService.add(this.dataGridContextMenuService.getMenuToken(), {
+      id: 'menuContentUpload',
+      order: 5,
+      title: 'ui_upload',
+      icon: '/icons/import.svg',
+      isPresent(context) {
+        return context.contextType === DataGridContextMenuService.cellContext;
+      },
+      onClick: async context => {
+        selectFiles(files => {
+          const edit = context.data.model.source.getAction(context.data.resultIndex, ResultSetEditAction);
+          const file = files?.item(0) ?? undefined;
+          if (file) {
+            edit.set(context.data.key, createResultSetContentValue({ blob: file, contentLength: file.length, contentType: file.type }));
+          }
+        });
+      },
+      isHidden: context => {
+        const content = context.data.model.source.getAction(context.data.resultIndex, ResultSetFormatAction);
+        return !content.isBinary(context.data.key);
       },
       isDisabled: context => {
         const content = context.data.model.source.getAction(context.data.resultIndex, ResultSetDataContentAction);

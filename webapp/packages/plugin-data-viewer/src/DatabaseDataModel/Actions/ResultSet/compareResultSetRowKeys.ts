@@ -5,13 +5,8 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
+import type { IResultSetRowKey } from './IResultSetDataKey';
 
-export interface IResultSetContentValue {
-  $type: 'content';
-  blob?: Blob;
-  binary?: string;
-  text?: string;
-  value?: string;
-  contentType?: string;
-  contentLength?: number;
+export function compareResultSetRowKeys(a: IResultSetRowKey, b: IResultSetRowKey): number {
+  return a.index + a.subIndex / 10 - b.index - b.subIndex / 10;
 }

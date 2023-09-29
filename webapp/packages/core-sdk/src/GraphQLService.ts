@@ -9,6 +9,7 @@ import { injectable } from '@cloudbeaver/core-di';
 
 import { CustomGraphQLClient } from './CustomGraphQLClient';
 import { EnvironmentService } from './EnvironmentService';
+import { uploadBlobResultSetExtension } from './Extensions/uploadBlobResultSetExtension';
 import { uploadDriverLibraryExtension } from './Extensions/uploadDriverLibraryExtension';
 import type { IResponseInterceptor } from './IResponseInterceptor';
 import { getSdk } from './sdk';
@@ -19,6 +20,7 @@ function extendedSDK(client: CustomGraphQLClient) {
   return {
     ...sdk,
     ...uploadDriverLibraryExtension(client),
+    ...uploadBlobResultSetExtension(client),
   };
 }
 
