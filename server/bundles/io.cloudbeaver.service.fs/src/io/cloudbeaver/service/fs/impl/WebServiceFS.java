@@ -22,17 +22,11 @@ import io.cloudbeaver.service.fs.DBWServiceFS;
 import io.cloudbeaver.service.fs.model.FSFile;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.DBException;
-import org.jkiss.dbeaver.model.fs.DBFFileSystemProvider;
 import org.jkiss.dbeaver.model.fs.DBFVirtualFileSystem;
-import org.jkiss.dbeaver.registry.fs.FileSystemProviderDescriptor;
-import org.jkiss.dbeaver.registry.fs.FileSystemProviderRegistry;
-import org.jkiss.utils.CommonUtils;
 
 import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.spi.FileSystemProvider;
-import java.util.Arrays;
 
 /**
  * Web file system implementation
@@ -43,7 +37,7 @@ public class WebServiceFS implements DBWServiceFS {
     @Override
     public String[] getAvailableFileSystems(@NotNull WebSession webSession) {
         return webSession.getFileSystemManager()
-            .getDbfFileSystems()
+            .getVirtualFileSystems()
             .stream()
             .map(DBFVirtualFileSystem::getType)
             .toArray(String[]::new);

@@ -1,4 +1,3 @@
-# Metadata queries
 type FSFile @since(version: "23.2.2") {
     name: String!
     length: Int!

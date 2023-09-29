@@ -9,8 +9,8 @@
         <version>1.0.0-SNAPSHOT</version>
          <relativePath>../</relativePath>
     </parent>
-    <artifactId>io.cloudbeaver.service.rm</artifactId>
-    <version>1.0.33-SNAPSHOT</version>
+    <artifactId>io.cloudbeaver.service.fs</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
     <packaging>eclipse-plugin</packaging>
 
 </project>
