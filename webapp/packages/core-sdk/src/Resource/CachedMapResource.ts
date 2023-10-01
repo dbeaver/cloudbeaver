@@ -10,8 +10,9 @@ import { action, computed, makeObservable } from 'mobx';
 import { ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
 import { ILoadableState, isArraysEqual, isContainsException } from '@cloudbeaver/core-utils';
 
-import { CachedResource, CachedResourceKey, ICachedResourceMetadata } from './CachedResource';
+import { CachedResource, CachedResourceKey } from './CachedResource';
 import type { CachedResourceIncludeArgs, CachedResourceValueIncludes } from './CachedResourceIncludes';
+import type { ICachedResourceMetadata } from './ICachedResourceMetadata';
 import type { ResourceKey, ResourceKeySimple } from './ResourceKey';
 import type { ResourceKeyAlias } from './ResourceKeyAlias';
 import { isResourceKeyList, resourceKeyList, ResourceKeyList } from './ResourceKeyList';
@@ -61,7 +62,7 @@ export abstract class CachedMapResource<
     this.onItemUpdate = new SyncExecutor<ResourceKeySimple<TKey>>(null);
     this.onItemDelete = new SyncExecutor<ResourceKeySimple<TKey>>(null);
 
-    this.addAlias(CachedMapAllKey, () => resourceKeyList(this.keys));
+    this.aliases.add(CachedMapAllKey, () => resourceKeyList(this.keys));
 
     makeObservable<this, 'dataSet' | 'dataDelete'>(this, {
       set: action,
@@ -84,9 +85,7 @@ export abstract class CachedMapResource<
   deleteInResource<T = TKey>(resource: CachedMapResource<T, any, any>, map?: (key: ResourceKey<TKey>) => ResourceKey<T>): this {
     this.onItemDelete.addHandler(param => {
       try {
-        if (this.logActivity) {
-          console.group(this.getActionPrefixedName(' outdate - ' + resource.getName()));
-        }
+        this.logger.group('outdate - ' + resource.logger.getName());
 
         if (map) {
           param = map(param) as any as TKey;
@@ -94,9 +93,7 @@ export abstract class CachedMapResource<
 
         resource.delete(param as any as T);
       } finally {
-        if (this.logActivity) {
-          console.groupEnd();
-        }
+        this.logger.groupEnd();
       }
     });
 
@@ -104,11 +101,11 @@ export abstract class CachedMapResource<
   }
 
   has(key: ResourceKey<TKey>): boolean {
-    if (this.isAlias(key) && (!this.hasMetadata(key) || this.isLoaded(key))) {
+    if (this.aliases.isAlias(key) && (!this.metadata.has(key) || this.isLoaded(key))) {
       return false;
     }
 
-    key = this.transformToKey(key);
+    key = this.aliases.transformToKey(key);
     return ResourceKeyUtils.every(key, key => this.dataHas(this.getKeyRef(key)));
   }
 
@@ -116,7 +113,7 @@ export abstract class CachedMapResource<
   get(key: ResourceKeyList<TKey> | ResourceKeyListAlias<TKey, any>): Array<TValue | undefined>;
   get(key: ResourceKey<TKey>): Array<TValue | undefined> | TValue | undefined;
   get(key: ResourceKey<TKey>): Array<TValue | undefined> | TValue | undefined {
-    key = this.transformToKey(key);
+    key = this.aliases.transformToKey(key);
     return ResourceKeyUtils.map(key, key => this.dataGet(this.getKeyRef(key)));
   }
 
@@ -124,7 +121,7 @@ export abstract class CachedMapResource<
   set(key: ResourceKeyList<TKey> | ResourceKeyListAlias<TKey, any>, value: TValue[]): void;
   set(key: ResourceKey<TKey>, value: TValue | TValue[]): void;
   set(originalKey: ResourceKey<TKey>, value: TValue | TValue[]): void {
-    const key = this.transformToKey(originalKey);
+    const key = this.aliases.transformToKey(originalKey);
 
     if (isResourceKeyList(key)) {
       if (key.length === 0) {
@@ -149,7 +146,7 @@ export abstract class CachedMapResource<
   }
 
   delete(originalKey: ResourceKey<TKey>): void {
-    const key = this.transformToKey(originalKey);
+    const key = this.aliases.transformToKey(originalKey);
 
     if (isResourceKeyList(key) && key.length === 0) {
       return;
@@ -159,7 +156,7 @@ export abstract class CachedMapResource<
     ResourceKeyUtils.forEach(key, key => {
       this.dataDelete(this.getKeyRef(key));
     });
-    this.deleteMetadata(originalKey);
+    this.metadata.delete(originalKey);
     // rewrites pending outdate
     // this.markUpdated(key);
   }

@@ -5,7 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { action, computed, makeObservable, observable, toJS } from 'mobx';
+import { action, makeObservable, observable, toJS } from 'mobx';
 
 import { Dependency } from '@cloudbeaver/core-di';
 import {
@@ -19,62 +19,33 @@ import {
   SyncExecutor,
   TaskScheduler,
 } from '@cloudbeaver/core-executor';
-import { isNotNullDefined, isPrimitive, MetadataMap, uuid } from '@cloudbeaver/core-utils';
+import { isPrimitive, MetadataMap } from '@cloudbeaver/core-utils';
 
-import { isResourceAlias, ResourceAlias, ResourceAliasFactory, ResourceAliasOptions } from './ResourceAlias';
+import {
+  CachedResourceOffsetPageKey,
+  CachedResourceOffsetPageListKey,
+  expandOffsetPageRange,
+  isOffsetPageInRange,
+  isOffsetPageOutdated,
+} from './CachedResourceOffsetPageKeys';
+import type { ICachedResourceMetadata } from './ICachedResourceMetadata';
+import { isResourceAlias } from './ResourceAlias';
+import { ResourceAliases } from './ResourceAliases';
 import { ResourceError } from './ResourceError';
 import type { ResourceKey, ResourceKeyFlat } from './ResourceKey';
-import { resourceKeyAlias, ResourceKeyAlias, resourceKeyAliasFactory } from './ResourceKeyAlias';
+import { resourceKeyAlias } from './ResourceKeyAlias';
 import { isResourceKeyList, resourceKeyList, ResourceKeyList } from './ResourceKeyList';
-import { type ResourceKeyListAlias, resourceKeyListAlias, resourceKeyListAliasFactory } from './ResourceKeyListAlias';
+import { resourceKeyListAlias } from './ResourceKeyListAlias';
 import { ResourceKeyUtils } from './ResourceKeyUtils';
-
-interface IPageInfo {
-  offset: number;
-  limit: number;
-}
-
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
-export interface ICachedResourcePageOptions extends IPageInfo {}
-
-interface IResourcePage {
-  from: number;
-  to: number;
-  outdated: boolean;
-}
-
-export interface ICachedResourcePage {
-  totalCount?: number;
-  end?: number;
-  pages: IResourcePage[];
-}
-
-export interface ICachedResourceMetadata {
-  loaded: boolean;
-  outdated: boolean;
-  loading: boolean;
-  includes: string[];
-  exception: Error | null;
-  /** List of generated id's added each time resource is used and removed on release */
-  dependencies: string[];
-  page?: ICachedResourcePage;
-}
-
-export interface IUseData<TKey> {
-  id: string | undefined;
-  param: ResourceKey<TKey>;
-  isInUse: boolean;
-}
+import { ResourceLogger } from './ResourceLogger';
+import { ResourceMetadata } from './ResourceMetadata';
+import { ResourceOffsetPagination } from './ResourceOffsetPagination';
+import { ResourceUseTracker } from './ResourceUseTracker';
 
 export interface IDataError<TKey> {
   param: ResourceKey<TKey>;
   exception: Error;
 }
-
-export type IParamAlias<TKey> = {
-  id: string;
-  getAlias: (param: ResourceAlias<TKey, any>) => ResourceKey<TKey>;
-};
 
 export type CachedResourceData<TResource> = TResource extends CachedResource<infer T, any, any, any, any> ? T : never;
 export type CachedResourceValue<TResource> = TResource extends CachedResource<any, infer T, any, any, any> ? T : never;
@@ -82,24 +53,8 @@ export type CachedResourceKey<TResource> = TResource extends CachedResource<any,
 export type CachedResourceContext<TResource> = TResource extends CachedResource<any, any, any, infer T, any> ? T : void;
 export type CachedResourceMetadata<TResource> = TResource extends CachedResource<any, any, any, any, infer T> ? T : void;
 
-export const CACHED_RESOURCE_DEFAULT_PAGE_OFFSET = 0;
-export const CACHED_RESOURCE_DEFAULT_PAGE_LIMIT = 100;
 export const CachedResourceParamKey = resourceKeyAlias('@cached-resource/param-default');
 export const CachedResourceListEmptyKey = resourceKeyListAlias('@cached-resource/empty');
-export const CachedResourcePageListKey = resourceKeyListAliasFactory<any, [offset: number, limit: number], Readonly<ICachedResourcePageOptions>>(
-  '@cached-resource/page-list',
-  (offset: number, limit: number) => ({
-    offset,
-    limit,
-  }),
-);
-export const CachedResourcePageKey = resourceKeyAliasFactory<any, [offset: number, limit: number], Readonly<ICachedResourcePageOptions>>(
-  '@cached-resource/page',
-  (offset: number, limit: number) => ({
-    offset,
-    limit,
-  }),
-);
 
 /**
  * CachedResource is a base class for all resources. It is used to load, cache and manage data from external sources.
@@ -113,73 +68,63 @@ export abstract class CachedResource<
 > extends Dependency {
   data: TData;
 
-  get isResourceInUse(): boolean {
-    return this.getAllMetadata().some(metadata => metadata.dependencies.length > 0);
-  }
-
   readonly onClear: ISyncExecutor;
-  readonly onUse: ISyncExecutor<IUseData<TKey>>;
   readonly onDataOutdated: ISyncExecutor<ResourceKey<TKey>>;
   readonly onDataUpdate: ISyncExecutor<ResourceKey<TKey>>;
   readonly onDataError: ISyncExecutor<IDataError<ResourceKey<TKey>>>;
   readonly beforeLoad: IExecutor<ResourceKey<TKey>>;
-
-  protected metadata: MetadataMap<TKey, TMetadata>;
+  readonly useTracker: ResourceUseTracker<TKey, TMetadata>;
+  readonly offsetPagination: ResourceOffsetPagination<TKey, TMetadata>;
+  readonly aliases: ResourceAliases<TKey>;
   protected defaultIncludes: TInclude;
-
   protected get loading(): boolean {
     return this.scheduler.executing;
   }
 
-  protected scheduler: TaskScheduler<ResourceKey<TKey>>;
-  protected paramAliases: Array<IParamAlias<TKey>>;
-  protected logActivity: boolean;
   protected outdateWaitList: ResourceKey<TKey>[];
+  protected readonly scheduler: TaskScheduler<ResourceKey<TKey>>;
+  protected readonly logger: ResourceLogger;
+  protected readonly metadata: ResourceMetadata<TKey, TMetadata>;
 
   /** Need to infer value type */
   private readonly typescriptHack: TValue;
-  private captureAliasGetterExecution: boolean;
 
   constructor(defaultKey: ResourceKey<TKey>, private readonly defaultValue: () => TData, defaultIncludes: TInclude = [] as any) {
     super();
+
+    this.logger = new ResourceLogger(this.getName());
+    this.aliases = new ResourceAliases(this.logger, this.validateKey.bind(this));
+    this.metadata = new ResourceMetadata(this.aliases, this.getDefaultMetadata.bind(this), this.isKeyEqual.bind(this), this.getKeyRef.bind(this));
+    this.offsetPagination = new ResourceOffsetPagination(this.metadata);
+    this.useTracker = new ResourceUseTracker(this.logger, this.aliases, this.metadata);
 
     this.isKeyEqual = this.isKeyEqual.bind(this);
     this.isIntersect = this.isIntersect.bind(this);
     this.loadingTask = this.loadingTask.bind(this);
 
-    this.logActivity = false;
-
     this.typescriptHack = null as any;
     this.defaultIncludes = defaultIncludes;
-    this.paramAliases = [];
     this.outdateWaitList = [];
-    this.captureAliasGetterExecution = false;
-    this.metadata = new MetadataMap((key, metadata) => observable(this.getDefaultMetadata(key, metadata) as TMetadata, undefined, { deep: false }));
     this.scheduler = new TaskScheduler(this.isIntersect);
     this.data = defaultValue();
     this.beforeLoad = new Executor(null, this.isIntersect);
     this.onClear = new SyncExecutor();
-    this.onUse = new SyncExecutor();
     this.onDataOutdated = new SyncExecutor<ResourceKey<TKey>>(null);
     this.onDataUpdate = new SyncExecutor<ResourceKey<TKey>>(null);
     this.onDataError = new SyncExecutor<IDataError<ResourceKey<TKey>>>(null);
 
-    this.onUse.setInitialDataGetter(this.getInitialOnUseData.bind(this));
-    this.addAlias(CachedResourceParamKey, () => defaultKey);
-    this.addAlias(CachedResourceListEmptyKey, () => resourceKeyList([]));
-    this.addAlias(CachedResourcePageKey, key => key.target);
-    this.addAlias(CachedResourcePageListKey, key => key.target ?? CachedResourceListEmptyKey);
+    this.aliases.add(CachedResourceParamKey, () => defaultKey);
+    this.aliases.add(CachedResourceListEmptyKey, () => resourceKeyList([]));
+    this.aliases.add(CachedResourceOffsetPageKey, key => key.target);
+    this.aliases.add(CachedResourceOffsetPageListKey, key => key.target ?? CachedResourceListEmptyKey);
 
-    if (this.logActivity) {
-      // this.spy(this.beforeLoad, 'beforeLoad');
-      // this.spy(this.onDataOutdated, 'onDataOutdated');
-      this.spy(this.onDataUpdate, 'onDataUpdate');
-      this.spy(this.onDataError, 'onDataError');
-    }
+    // this.logger.spy(this.beforeLoad, 'beforeLoad');
+    // this.logger.spy(this.onDataOutdated, 'onDataOutdated');
+    this.logger.spy(this.onDataUpdate, 'onDataUpdate');
+    this.logger.spy(this.onDataError, 'onDataError');
 
     makeObservable<this, 'loader' | 'commitIncludes' | 'resetIncludes' | 'markOutdatedSync'>(this, {
       data: observable,
-      isResourceInUse: computed,
       loader: action,
       markLoading: action,
       markLoaded: action,
@@ -189,21 +134,20 @@ export abstract class CachedResource<
       commitIncludes: action,
       markOutdatedSync: action,
       resetIncludes: action,
-      use: action,
-      free: action,
       clear: action,
     });
 
     setInterval(() => {
       // mark resource outdate when it's not used
-      if (!this.isResourceInUse && !this.isOutdated()) {
+      if (!this.useTracker.isResourceInUse && !this.isOutdated()) {
+        this.logger.log('not in use');
         this.markOutdated();
-
-        if (this.logActivity) {
-          console.log('Resource outdated lazy: ', this.getName());
-        }
       }
     }, 5 * 60 * 1000);
+  }
+
+  getName(): string {
+    return this.constructor.name;
   }
 
   /**
@@ -214,19 +158,19 @@ export abstract class CachedResource<
     let subscription: string | null = null;
 
     const subscriptionHandler = () => {
-      if (resource.isResourceInUse) {
-        if (!subscription || !this.hasUseId(subscription)) {
-          subscription = this.use(CachedResourceParamKey);
+      if (resource.useTracker.isResourceInUse) {
+        if (!subscription || !this.useTracker.hasUseId(subscription)) {
+          subscription = this.useTracker.use(CachedResourceParamKey);
         }
       } else {
         if (subscription) {
-          this.free(CachedResourceParamKey, subscription);
+          this.useTracker.free(CachedResourceParamKey, subscription);
           subscription = null;
         }
       }
     };
 
-    resource.onUse.addHandler(subscriptionHandler);
+    resource.useTracker.onUse.addHandler(subscriptionHandler);
     this.onClear.addHandler(subscriptionHandler);
   }
 
@@ -245,15 +189,8 @@ export abstract class CachedResource<
     // TODO: do we want to sync "Clean" action?
     resource.outdateResource(this, mapOut);
 
-    if (this.logActivity) {
-      // resource.onDataUpdate.addHandler(resource.logLock('onDataUpdate > ' + this.getName()));
-    }
-
-    // resource.onDataUpdate.addHandler(param => { this.load(param, context); });
-
-    if (this.logActivity) {
-      // resource.onDataUpdate.addHandler(resource.logLock('onDataUpdate < ' + this.getName()));
-    }
+    resource.onDataUpdate.addHandler(resource.logger.logExecutor('onDataUpdate > ' + this.logger.getName()));
+    resource.onDataUpdate.addHandler(resource.logger.logExecutor('onDataUpdate < ' + this.logger.getName()));
 
     this.preloadResource(resource, mapTo);
   }
@@ -267,9 +204,7 @@ export abstract class CachedResource<
   updateResource<T = TKey>(resource: CachedResource<any, any, T, any, any>, map?: (param: ResourceKey<TKey>) => ResourceKey<T>): this {
     this.onDataUpdate.addHandler(param => {
       try {
-        if (this.logActivity) {
-          console.group(this.getActionPrefixedName(' update - ' + resource.getName()));
-        }
+        this.logger.group(' update - ' + resource.logger.getName());
 
         if (map) {
           param = map(param) as ResourceKey<TKey>;
@@ -277,9 +212,7 @@ export abstract class CachedResource<
 
         resource.markUpdated(param as ResourceKey<T>);
       } finally {
-        if (this.logActivity) {
-          console.groupEnd();
-        }
+        this.logger.groupEnd();
       }
     });
 
@@ -295,9 +228,7 @@ export abstract class CachedResource<
   outdateResource<T = TKey>(resource: CachedResource<any, any, T, any, any>, map?: (param: ResourceKey<TKey>) => ResourceKey<T>): this {
     this.onDataOutdated.addHandler(param => {
       try {
-        if (this.logActivity) {
-          console.group(this.getActionPrefixedName(' outdate - ' + resource.getName()));
-        }
+        this.logger.group(' outdate - ' + resource.logger.getName());
 
         if (map) {
           param = map(param) as ResourceKey<TKey>;
@@ -305,9 +236,7 @@ export abstract class CachedResource<
 
         resource.markOutdated(param as ResourceKey<T>);
       } finally {
-        if (this.logActivity) {
-          console.groupEnd();
-        }
+        this.logger.groupEnd();
       }
     });
 
@@ -325,9 +254,7 @@ export abstract class CachedResource<
 
     this.beforeLoad.addHandler(async param => {
       try {
-        if (this.logActivity) {
-          console.group(this.getActionPrefixedName(' preload - ' + resource.getName()));
-        }
+        this.logger.group(' preload - ' + resource.logger.getName());
 
         if (map) {
           param = map(param) as ResourceKey<TKey>;
@@ -335,9 +262,7 @@ export abstract class CachedResource<
 
         await resource.load(param as ResourceKey<T>);
       } finally {
-        if (this.logActivity) {
-          console.groupEnd();
-        }
+        this.logger.groupEnd();
       }
     });
 
@@ -351,76 +276,15 @@ export abstract class CachedResource<
   before(handler: IExecutorHandler<ResourceKey<TKey>>): this {
     this.beforeLoad.addHandler(async (param, contexts) => {
       try {
-        if (this.logActivity) {
-          console.group(this.getActionPrefixedName(' preload - ' + handler.name));
-        }
+        this.logger.group(' before - ' + handler.name);
 
         await handler(param, contexts);
       } finally {
-        if (this.logActivity) {
-          console.groupEnd();
-        }
+        this.logger.groupEnd();
       }
     });
 
     return this;
-  }
-
-  /**
-   * Return true if resource is in use
-   * @param param - Resource key
-   */
-  isInUse(param: ResourceKey<TKey>): boolean {
-    return this.someMetadata(param, metadata => metadata.dependencies.length > 0);
-  }
-
-  /**
-   * Return true if resource is in use by {@link id}
-   * @param id - Dependency id
-   */
-  hasUseId(id: string): boolean {
-    return this.getAllMetadata().some(metadata => metadata.dependencies.includes(id));
-  }
-
-  /**
-   * Use resource by {@link param}. Optionally provide {@link id} to track dependency.
-   * @param param - Resource key
-   * @param id - Dependency id (uuid by default)
-   * @returns Dependency id
-   */
-  use(param: ResourceKey<TKey>, id = uuid()): string {
-    this.updateMetadata(param, metadata => {
-      metadata.dependencies.push(id);
-    });
-    if (isResourceAlias(param)) {
-      param = this.transformToAlias(param);
-    }
-    this.onUse.execute({ id, param, isInUse: true });
-    if (this.logActivity) {
-      console.log('Use resource: ', this.getName(), param);
-    }
-    return id;
-  }
-
-  /**
-   * Release resource by {@link param} and {@link id}
-   * @param param - Resource key
-   * @param id - Dependency id
-   */
-  free(param: ResourceKey<TKey>, id: string): void {
-    this.updateMetadata(param, metadata => {
-      if (metadata.dependencies.length > 0) {
-        metadata.dependencies = metadata.dependencies.filter(v => v !== id);
-      }
-    });
-    if (isResourceAlias(param)) {
-      param = this.transformToAlias(param);
-    }
-    this.onUse.execute({ id, param, isInUse: false });
-
-    if (this.logActivity) {
-      console.log('Free resource: ', this.getName(), param);
-    }
   }
 
   isLoaded(param?: ResourceKey<TKey>, includes?: TInclude): boolean {
@@ -428,20 +292,20 @@ export abstract class CachedResource<
       param = CachedResourceParamKey;
     }
 
-    if (!this.hasMetadata(param)) {
+    if (!this.metadata.has(param)) {
       return false;
     }
 
-    const pageKey = this.isAlias(param, CachedResourcePageKey) || this.isAlias(param, CachedResourcePageListKey);
+    const pageKey = this.aliases.isAlias(param, CachedResourceOffsetPageKey) || this.aliases.isAlias(param, CachedResourceOffsetPageListKey);
     if (pageKey) {
-      const pageInfo = this.getPageInfo(pageKey);
+      const pageInfo = this.offsetPagination.getPageInfo(pageKey);
 
-      if (!pageInfo || !isPageInRange(pageInfo, pageKey.options)) {
+      if (!pageInfo || !isOffsetPageInRange(pageInfo, pageKey.options)) {
         return false;
       }
     }
 
-    return this.everyMetadata(param, metadata => metadata.loaded) && (!includes || this.isIncludes(param, includes));
+    return this.metadata.every(param, metadata => metadata.loaded) && (!includes || this.isIncludes(param, includes));
   }
 
   /**
@@ -453,27 +317,6 @@ export abstract class CachedResource<
       param = CachedResourceParamKey;
     }
     return !this.isLoaded(param, context) || this.isOutdated(param);
-  }
-
-  hasAlias(key: ResourceAlias<TKey, any>): boolean {
-    return this.paramAliases.some(alias => alias.id === key.id);
-  }
-
-  isAlias<TOptions extends ResourceAliasOptions>(
-    key: ResourceKey<TKey>,
-    aliasToCompare?: ResourceAlias<TKey, TOptions> | ResourceAliasFactory<TKey, TOptions>,
-  ): ResourceAlias<TKey, TOptions> | undefined {
-    if (isResourceAlias(key)) {
-      key = this.transformToAlias(key);
-      if (this.hasAlias(key)) {
-        if (aliasToCompare === undefined) {
-          return key as ResourceAlias<TKey, TOptions>;
-        }
-        return key.find(aliasToCompare);
-      }
-      throw new Error(`Alias ${key.toString()} is not registered in ${this.getName()}`);
-    }
-    return undefined;
   }
 
   /**
@@ -489,7 +332,7 @@ export abstract class CachedResource<
       key = CachedResourceParamKey;
     }
 
-    return this.someMetadata(key, metadata => metadata.loading);
+    return this.metadata.some(key, metadata => metadata.loading);
   }
 
   /**
@@ -498,137 +341,7 @@ export abstract class CachedResource<
    * @param includes - Includes
    */
   isIncludes(key: ResourceKey<TKey>, includes: TInclude): boolean {
-    return this.everyMetadata(key, metadata => includes.every(include => metadata.includes.includes(include)));
-  }
-
-  getPageInfo(key: ResourceAlias<TKey, Readonly<ICachedResourcePageOptions>>): ICachedResourcePage | undefined {
-    if (!this.hasMetadata(key as TKey)) {
-      return undefined;
-    }
-
-    const page = this.getMetadata(key as TKey).page;
-
-    if (!page || !isPageInRange(page, key.options)) {
-      return undefined;
-    }
-
-    return page;
-  }
-
-  hasNextPage(key: ResourceAlias<TKey, Readonly<ICachedResourcePageOptions>>): boolean {
-    const pageInfo = this.getPageInfo(key);
-    const to = key.options.offset + key.options.limit;
-
-    if (!pageInfo) {
-      return false;
-    }
-
-    return pageInfo.end === undefined || to < pageInfo.end;
-  }
-
-  hasMetadata(key: ResourceKey<TKey>): boolean {
-    if (isResourceKeyList(key)) {
-      return key.every(key => this.metadata.has(this.getMetadataKeyRef(key)));
-    }
-
-    return this.metadata.has(this.getMetadataKeyRef(key));
-  }
-
-  everyMetadata(param: ResourceKey<TKey>, predicate: (metadata: TMetadata) => boolean): boolean {
-    if (!this.hasMetadata(param)) {
-      return false;
-    }
-
-    return !this.someMetadata(param, key => !predicate(key));
-  }
-
-  someMetadata(param: ResourceKey<TKey>, predicate: (metadata: TMetadata) => boolean): boolean {
-    if (!this.hasMetadata(param)) {
-      return false;
-    }
-
-    if (isResourceKeyList(param)) {
-      return param.some(key => predicate(this.getMetadata(key)));
-    }
-
-    let result = false;
-
-    if (predicate(this.getMetadata(param))) {
-      result = true;
-    }
-
-    if (isResourceAlias(param)) {
-      param = this.transformToKey(param);
-
-      if (isResourceKeyList(param)) {
-        if (this.someMetadata(param, predicate)) {
-          result = true;
-        }
-      }
-    }
-
-    return result;
-  }
-
-  mapMetadata<TValue>(param: ResourceKeyFlat<TKey>, map: (metadata: TMetadata | undefined) => TValue): TValue;
-  mapMetadata<TValue>(param: ResourceKeyList<TKey>, map: (metadata: TMetadata | undefined) => TValue): TValue[];
-  mapMetadata<TValue>(param: ResourceKey<TKey>, map: (metadata: TMetadata | undefined) => TValue): TValue | TValue[];
-  mapMetadata<TValue>(param: ResourceKey<TKey>, map: (metadata: TMetadata | undefined) => TValue): TValue | TValue[] {
-    const callback = (key: ResourceKeyFlat<TKey>) => {
-      if (!this.hasMetadata(key)) {
-        return map(undefined);
-      }
-      return map(this.getMetadata(key));
-    };
-
-    if (isResourceKeyList(param)) {
-      return param.map(callback);
-    }
-
-    return callback(param);
-  }
-
-  /**
-   * Use it instead of this.metadata.values
-   * This method can be overridden
-   */
-  getAllMetadata(): TMetadata[] {
-    return [...this.metadata.values()];
-  }
-
-  /**
-   * Use it instead of this.metadata.get
-   * This method can be overridden
-   */
-  getMetadata(key: ResourceKeyFlat<TKey>): TMetadata;
-  getMetadata(key: ResourceKeyList<TKey>): TMetadata[];
-  getMetadata(key: ResourceKey<TKey>): TMetadata | TMetadata[];
-  getMetadata(key: ResourceKey<TKey>): TMetadata | TMetadata[] {
-    if (isResourceKeyList(key)) {
-      return key.map(key => this.getMetadata(key));
-    }
-
-    return this.metadata.get(this.getMetadataKeyRef(key));
-  }
-
-  /**
-   * Use to update metadata
-   * This method can be overridden
-   */
-  updateMetadata(key: ResourceKey<TKey>, callback: (data: TMetadata) => void): void {
-    ResourceKeyUtils.forEach(key, key => {
-      callback(this.getMetadata(key));
-    });
-  }
-
-  /**
-   * Use it instead of this.metadata.delete
-   * This method can be overridden
-   */
-  deleteMetadata(param: ResourceKey<TKey>): void {
-    ResourceKeyUtils.forEach(param, key => {
-      this.metadata.delete(this.getMetadataKeyRef(key));
-    });
+    return this.metadata.every(key, metadata => includes.every(include => metadata.includes.includes(include)));
   }
 
   getException(param: ResourceKeyFlat<TKey>): Error | null;
@@ -636,10 +349,10 @@ export abstract class CachedResource<
   getException(param: ResourceKey<TKey>): Error[] | Error | null;
   getException(param: ResourceKey<TKey>): Error[] | Error | null {
     if (isResourceKeyList(param)) {
-      return this.mapMetadata(param, metadata => metadata?.exception || null).filter<Error>((exception): exception is Error => exception !== null);
+      return this.metadata.map(param, metadata => metadata?.exception || null).filter<Error>((exception): exception is Error => exception !== null);
     }
 
-    return this.mapMetadata(param, metadata => metadata?.exception || null);
+    return this.metadata.map(param, metadata => metadata?.exception || null);
   }
 
   isOutdated(param?: ResourceKey<TKey>): boolean {
@@ -647,60 +360,34 @@ export abstract class CachedResource<
       param = CachedResourceParamKey;
     }
 
-    const pageKey = this.isAlias(param, CachedResourcePageKey) || this.isAlias(param, CachedResourcePageListKey);
+    const pageKey = this.aliases.isAlias(param, CachedResourceOffsetPageKey) || this.aliases.isAlias(param, CachedResourceOffsetPageListKey);
     if (pageKey) {
-      const pageInfo = this.getPageInfo(pageKey);
+      const pageInfo = this.offsetPagination.getPageInfo(pageKey);
 
-      if (isPageOutdated(pageInfo?.pages || [], pageKey.options)) {
+      if (isOffsetPageOutdated(pageInfo?.pages || [], pageKey.options)) {
         return true;
       }
     }
 
-    return this.someMetadata(param, metadata => !metadata.loaded || metadata.outdated);
-  }
-
-  protected setPageEnd(key: ResourceAlias<TKey, Readonly<ICachedResourcePageOptions>>, hasNextPage: boolean): void {
-    const count = key.options.offset + key.options.limit;
-
-    this.updateMetadata(key as TKey, metadata => {
-      let end = metadata.page?.end;
-
-      if (hasNextPage) {
-        if (end !== undefined && end <= count) {
-          end = undefined;
-        }
-      } else {
-        end = count;
-      }
-
-      metadata.page = observable({
-        pages: [],
-        ...metadata.page,
-        end,
-      });
-
-      if (!hasNextPage) {
-        metadata.page.pages = limitPages(metadata.page?.pages || [], count);
-      }
-    });
+    return this.metadata.some(param, metadata => !metadata.loaded || metadata.outdated);
   }
 
   markLoading(param: ResourceKey<TKey>, state: boolean, context?: TInclude): void {
-    this.updateMetadata(param, metadata => {
+    this.metadata.update(param, metadata => {
       metadata.loading = state;
     });
   }
 
   markLoaded(param: ResourceKey<TKey>, includes?: TInclude): void {
-    const pageKey = this.isAlias(param, CachedResourcePageKey) || this.isAlias(param, CachedResourcePageListKey);
+    const pageKey = this.aliases.isAlias(param, CachedResourceOffsetPageKey) || this.aliases.isAlias(param, CachedResourceOffsetPageListKey);
 
-    this.updateMetadata(param, metadata => {
+    this.metadata.update(param, metadata => {
       metadata.loaded = true;
 
       if (pageKey) {
-        metadata.page = observable({
-          ...metadata.page,
-          pages: expandRange(metadata.page?.pages || [], pageKey.options, false),
+        metadata.offsetPage = observable({
+          ...metadata.offsetPage,
+          pages: expandOffsetPageRange(metadata.offsetPage?.pages || [], pageKey.options, false),
         });
       }
 
@@ -710,9 +397,9 @@ export abstract class CachedResource<
     });
 
     if (isResourceAlias(param)) {
-      param = this.transformToKey(param);
+      param = this.aliases.transformToKey(param);
 
-      this.updateMetadata(param, metadata => {
+      this.metadata.update(param, metadata => {
         metadata.loaded = true;
         if (includes) {
           this.commitIncludes(metadata, includes);
@@ -723,24 +410,24 @@ export abstract class CachedResource<
 
   markError(exception: Error, key: ResourceKey<TKey>, include?: TInclude): ResourceError {
     exception = new ResourceError(this, key, include, exception.message, { cause: exception });
-    const pageKey = this.isAlias(key, CachedResourcePageKey) || this.isAlias(key, CachedResourcePageListKey);
-    this.updateMetadata(key, metadata => {
+    const pageKey = this.aliases.isAlias(key, CachedResourceOffsetPageKey) || this.aliases.isAlias(key, CachedResourceOffsetPageListKey);
+    this.metadata.update(key, metadata => {
       metadata.exception = exception;
       metadata.outdated = false;
 
       if (pageKey) {
-        metadata.page = observable({
-          ...metadata.page,
-          pages: expandRange(metadata.page?.pages || [], pageKey.options, false),
+        metadata.offsetPage = observable({
+          ...metadata.offsetPage,
+          pages: expandOffsetPageRange(metadata.offsetPage?.pages || [], pageKey.options, false),
         });
       } else {
-        metadata.page?.pages.forEach(page => {
+        metadata.offsetPage?.pages.forEach(page => {
           page.outdated = false;
         });
       }
     });
     if (isResourceAlias(key)) {
-      key = this.transformToAlias(key);
+      key = this.aliases.transformToAlias(key);
     }
     this.onDataError.execute({ param: key, exception });
     return exception as ResourceError;
@@ -751,7 +438,7 @@ export abstract class CachedResource<
       param = CachedResourceParamKey;
     }
 
-    this.updateMetadata(param, metadata => {
+    this.metadata.update(param, metadata => {
       metadata.exception = null;
     });
   }
@@ -775,23 +462,23 @@ export abstract class CachedResource<
     if (param === undefined) {
       param = CachedResourceParamKey;
     }
-    const pageKey = this.isAlias(param, CachedResourcePageKey) || this.isAlias(param, CachedResourcePageListKey);
+    const pageKey = this.aliases.isAlias(param, CachedResourceOffsetPageKey) || this.aliases.isAlias(param, CachedResourceOffsetPageListKey);
 
-    this.updateMetadata(param, metadata => {
+    this.metadata.update(param, metadata => {
       metadata.outdated = false;
 
       if (pageKey) {
-        metadata.page = observable({
-          ...metadata.page,
-          pages: expandRange(metadata.page?.pages || [], pageKey.options, false),
+        metadata.offsetPage = observable({
+          ...metadata.offsetPage,
+          pages: expandOffsetPageRange(metadata.offsetPage?.pages || [], pageKey.options, false),
         });
       }
     });
 
     if (isResourceAlias(param)) {
-      param = this.transformToKey(param);
+      param = this.aliases.transformToKey(param);
 
-      this.updateMetadata(param, metadata => {
+      this.metadata.update(param, metadata => {
         metadata.outdated = false;
       });
     }
@@ -808,29 +495,9 @@ export abstract class CachedResource<
 
     this.cleanError(key);
     if (isResourceAlias(key)) {
-      key = this.transformToAlias(key);
+      key = this.aliases.transformToAlias(key);
     }
     this.onDataUpdate.execute(key);
-  }
-
-  addAlias<TOptions extends ResourceAliasOptions>(
-    param: ResourceAlias<TKey, TOptions> | ResourceAliasFactory<TKey, TOptions>,
-    getAlias: (param: ResourceAlias<TKey, TOptions>) => ResourceKey<TKey>,
-  ): void {
-    this.paramAliases.push({ id: param.id, getAlias });
-  }
-
-  replaceAlias<TOptions extends ResourceAliasOptions>(
-    param: ResourceAlias<TKey, TOptions> | ResourceAliasFactory<TKey, TOptions>,
-    getAlias: (param: ResourceAlias<TKey, TOptions>) => ResourceKey<TKey>,
-  ): void {
-    const indexOf = this.paramAliases.findIndex(aliasInfo => aliasInfo.id === param.id);
-
-    if (indexOf === -1) {
-      this.addAlias(param, getAlias);
-    } else {
-      this.paramAliases.splice(indexOf, 1, { id: param.id, getAlias });
-    }
   }
 
   async refresh(key?: ResourceKey<TKey>, context?: TInclude): Promise<any> {
@@ -861,19 +528,19 @@ export abstract class CachedResource<
       key = CachedResourceParamKey;
     }
 
-    if (!this.hasMetadata(key)) {
+    if (!this.metadata.has(key)) {
       return this.defaultIncludes;
     }
 
-    const metadata = this.getMetadata(key);
+    const metadata = this.metadata.get(key);
     return metadata.includes;
   }
 
   clear(): void {
     this.resetDataToDefault();
     this.metadata.clear();
-    this.onUse.execute(this.getInitialOnUseData());
-    this.onDataUpdate.execute(this.transformToAlias(CachedResourceParamKey));
+    this.useTracker.clear();
+    this.onDataUpdate.execute(this.aliases.transformToAlias(CachedResourceParamKey));
   }
 
   /**
@@ -916,8 +583,8 @@ export abstract class CachedResource<
     }
 
     if (isResourceAlias(key) && isResourceAlias(nextKey)) {
-      key = this.transformToAlias(key);
-      nextKey = this.transformToAlias(nextKey);
+      key = this.aliases.transformToAlias(key);
+      nextKey = this.aliases.transformToAlias(nextKey);
 
       return key.isEqual(nextKey) && this.isIntersect(key.target, nextKey.target);
     } else if (isResourceAlias(key) || isResourceAlias(nextKey)) {
@@ -942,145 +609,14 @@ export abstract class CachedResource<
   }
 
   /**
-   * Can be overridden to provide static link to complicated keys
-   */
-  protected getMetadataKeyRef(key: ResourceKeyFlat<TKey>): TKey {
-    if (isResourceAlias(key)) {
-      key = this.transformToAlias(key);
-
-      if (isNotNullDefined(key.target)) {
-        return this.getMetadataKeyRef(key.target);
-      }
-
-      return key.toString() as TKey;
-    }
-
-    if (isPrimitive(key)) {
-      return key;
-    }
-
-    const ref = Array.from(this.metadata.keys()).find(k => this.isKeyEqual(k, key as TKey));
-
-    if (ref) {
-      return ref;
-    }
-
-    return this.getKeyRef(key);
-  }
-
-  //TODO must be protected
-  transformToKey(param: ResourceKey<TKey>): TKey | ResourceKeyList<TKey> {
-    let deep = 0;
-
-    while (deep < 10) {
-      if (!this.validateResourceKey(param)) {
-        let paramString = JSON.stringify(toJS(param));
-
-        if (isResourceKeyList(param)) {
-          paramString = param.toString();
-        }
-        console.warn(this.getActionPrefixedName(`wrong param "${paramString}"`));
-      }
-
-      if (isResourceAlias(param)) {
-        for (const alias of this.paramAliases) {
-          if (alias.id === param.id) {
-            param = this.captureGetAlias(alias, param);
-            deep++;
-            break;
-          }
-        }
-      } else {
-        break;
-      }
-    }
-
-    if (deep === 10) {
-      console.warn(this.getActionPrefixedName('parameter transform was stopped'));
-    }
-
-    if (isResourceAlias(param)) {
-      throw new Error(this.getActionPrefixedName(`Can't resolve alias ${param.toString()}`));
-    }
-    return param;
-  }
-
-  // TODO: add information about original alias for debugging
-  protected transformToAlias(
-    key: ResourceKeyAlias<TKey, any> | ResourceKeyListAlias<TKey, any>,
-  ): ResourceKeyAlias<TKey, any> | ResourceKeyListAlias<TKey, any> {
-    if (this.captureAliasGetterExecution) {
-      return key;
-    }
-
-    let deep = 0;
-    // eslint-disable-next-line no-labels
-    transform: if (deep < 10) {
-      if (!this.validateResourceKey(key)) {
-        let paramString = JSON.stringify(toJS(key));
-
-        if (isResourceKeyList(key) || isResourceAlias(key)) {
-          paramString = key.toString();
-        }
-        console.warn(this.getActionPrefixedName(`wrong param "${paramString}"`));
-      }
-
-      for (const alias of this.paramAliases) {
-        if (alias.id === key.id) {
-          const data = this.captureGetAlias(alias, key);
-
-          if (isResourceAlias(data)) {
-            key = data.setParent(key);
-          } else {
-            return key;
-          }
-          deep++;
-          // eslint-disable-next-line no-labels
-          break transform;
-        }
-      }
-    } else {
-      console.warn('CachedResource: parameter transform was stopped');
-    }
-    return key;
-  }
-
-  protected captureGetAlias(alias: IParamAlias<TKey>, param: ResourceAlias<TKey, any>): ResourceKey<TKey> {
-    try {
-      this.captureAliasGetterExecution = true;
-      return alias.getAlias(param);
-    } finally {
-      this.captureAliasGetterExecution = false;
-    }
-  }
-
-  /**
-   * Check if key is valid. Can be overridden to provide custom validation.
-   * When key is alias checks that alias is registered.
-   * When key is list checks that all keys are valid.
-   * When key is primitive checks that this type of primitive is valid for current resource.
-   * @param param - Resource key
-   */
-  protected validateResourceKey(param: ResourceKey<TKey>): boolean {
-    if (isResourceAlias(param)) {
-      return this.hasAlias(param);
-    }
-
-    if (isResourceKeyList(param)) {
-      return param.length === 0 || param.every(this.validateKey.bind(this));
-    }
-    return this.validateKey(param);
-  }
-
-  /**
    * Check if key is valid. Can be overridden to provide custom validation.
    */
   protected abstract validateKey(key: TKey): boolean;
 
   protected resetIncludes(): void {
-    for (const metadata of this.getAllMetadata()) {
+    this.metadata.update(metadata => {
       metadata.includes = observable([...this.defaultIncludes]);
-    }
+    });
   }
 
   protected commitIncludes(metadata: TMetadata, includes: ReadonlyArray<string>): void {
@@ -1101,31 +637,31 @@ export abstract class CachedResource<
 
   protected markOutdatedSync(key: ResourceKey<TKey>): void {
     // Commented because it can lead to skipping existing keys outdate if some of them doesn't exists
-    // if (!this.hasMetadata(key)) {
+    // if (!this.metadata.has(key)) {
     //   return;
     // }
-    const pageKey = this.isAlias(key, CachedResourcePageKey) || this.isAlias(key, CachedResourcePageListKey);
-    this.updateMetadata(key, metadata => {
+    const pageKey = this.aliases.isAlias(key, CachedResourceOffsetPageKey) || this.aliases.isAlias(key, CachedResourceOffsetPageListKey);
+    this.metadata.update(key, metadata => {
       metadata.outdated = true;
 
       if (pageKey) {
-        metadata.page = observable({
-          ...metadata.page,
-          pages: expandRange(metadata.page?.pages || [], pageKey.options, true),
+        metadata.offsetPage = observable({
+          ...metadata.offsetPage,
+          pages: expandOffsetPageRange(metadata.offsetPage?.pages || [], pageKey.options, true),
         });
       } else {
-        metadata.page?.pages.forEach(page => {
+        metadata.offsetPage?.pages.forEach(page => {
           page.outdated = true;
         });
       }
     });
 
     if (isResourceAlias(key)) {
-      key = this.transformToKey(key);
+      key = this.aliases.transformToKey(key);
 
-      this.updateMetadata(key, metadata => {
+      this.metadata.update(key, metadata => {
         metadata.outdated = true;
-        metadata.page?.pages.forEach(page => {
+        metadata.offsetPage?.pages.forEach(page => {
           page.outdated = true;
         });
       });
@@ -1134,18 +670,11 @@ export abstract class CachedResource<
     this.onDataOutdated.execute(key);
   }
 
-  protected getInitialOnUseData(): IUseData<TKey> {
-    return {
-      id: undefined,
-      param: CachedResourceParamKey,
-      isInUse: false,
-    };
-  }
   /**
    * Use to extend metadata
    * @returns {Record<string, any>} Object Map
    */
-  protected getDefaultMetadata(key: TKey, metadata: MetadataMap<TKey, TMetadata>): ICachedResourceMetadata {
+  protected getDefaultMetadata(key: TKey, metadata: MetadataMap<TKey, TMetadata>): TMetadata {
     return {
       loaded: false,
       outdated: true,
@@ -1153,7 +682,7 @@ export abstract class CachedResource<
       exception: null,
       includes: observable([...this.defaultIncludes]),
       dependencies: observable([]),
-    };
+    } as ICachedResourceMetadata as TMetadata;
   }
 
   protected async preLoadData(
@@ -1211,7 +740,7 @@ export abstract class CachedResource<
     exitCheck?: (key: ResourceKey<TKey>, context?: ReadonlyArray<string>) => boolean,
   ): Promise<T | undefined> {
     if (isResourceAlias(key)) {
-      key = this.transformToAlias(key);
+      key = this.aliases.transformToAlias(key);
     }
 
     const context = new ExecutionContext(key);
@@ -1266,7 +795,7 @@ export abstract class CachedResource<
 
   protected async loadData(key: ResourceKey<TKey>, refresh: boolean, include?: TInclude): Promise<void> {
     if (isResourceAlias(key)) {
-      key = this.transformToAlias(key);
+      key = this.aliases.transformToAlias(key);
     }
     const contexts = new ExecutionContext(key);
     if (!refresh) {
@@ -1336,9 +865,7 @@ export abstract class CachedResource<
     refresh: boolean,
     promise: (param: ResourceKey<TKey>, context: ReadonlyArray<string> | undefined, refresh: boolean) => Promise<T>,
   ) {
-    if (this.logActivity) {
-      console.log(this.getActionPrefixedName('loading'));
-    }
+    this.logger.log('loading');
 
     const value = await promise(param, context, refresh);
     this.markUpdated(param);
@@ -1352,139 +879,4 @@ export abstract class CachedResource<
     }
     this.outdateWaitList = [];
   }
-
-  public getName(): string {
-    return this.constructor.name;
-  }
-
-  protected logLock =
-    (action: string): IExecutorHandler<any> =>
-    () => {
-      console.log(this.getActionPrefixedName(action));
-    };
-
-  private readonly logName =
-    (action: string): IExecutorHandler<any> =>
-    () => {
-      console.log(this.getActionPrefixedName(action));
-    };
-
-  protected getActionPrefixedName(action: string): string {
-    return this.getName() + ': ' + action;
-  }
-
-  private readonly logInterrupted =
-    (action: string): IExecutorHandler<any> =>
-    (data, contexts) => {
-      if (ExecutorInterrupter.isInterrupted(contexts)) {
-        console.log(this.getActionPrefixedName(action) + 'interrupted');
-      }
-    };
-
-  private spy(executor: ISyncExecutor<any>, action: string): void {
-    executor.addHandler(this.logName(action)).addPostHandler(this.logInterrupted(action));
-  }
-}
-
-export function getNextPageOffset(info: ICachedResourcePage): number {
-  let lastPage: IResourcePage | undefined = undefined;
-
-  for (const page of info.pages) {
-    if (!lastPage) {
-      lastPage = page;
-      continue;
-    }
-    if (page.from !== lastPage.to) {
-      break;
-    }
-    lastPage = page;
-  }
-
-  return lastPage?.to ?? CACHED_RESOURCE_DEFAULT_PAGE_OFFSET;
-}
-
-function isPageOutdated(pages: IResourcePage[], info: IPageInfo): boolean {
-  for (const { from, to, outdated } of pages) {
-    if (outdated && info.offset >= from && info.offset + info.limit <= to) {
-      return true;
-    }
-  }
-  return false;
-}
-
-function isPageInRange({ pages, end }: ICachedResourcePage, info: IPageInfo): boolean {
-  const infoTo = info.offset + info.limit;
-  let meetFrom = false;
-  let meetTo = false;
-  let lastIndex = -1;
-
-  for (const { from, to } of pages) {
-    if (lastIndex === -1) {
-      lastIndex = from;
-    }
-    if (from !== lastIndex) {
-      return false;
-    }
-    lastIndex = to;
-    if (info.offset >= from) {
-      meetFrom = true;
-    }
-    if (infoTo <= to || (end !== undefined && end <= infoTo)) {
-      meetTo = true;
-    }
-    if (meetFrom && meetTo) {
-      return true;
-    }
-  }
-  return false;
-}
-
-function limitPages(pages: IResourcePage[], limit: number): IResourcePage[] {
-  const result: IResourcePage[] = [];
-
-  for (const page of pages) {
-    if (page.from >= limit) {
-      break;
-    }
-    result.push({ ...page, to: Math.min(limit, page.to) });
-  }
-
-  return result;
-}
-
-function expandRange(pages: IResourcePage[], info: IPageInfo, outdated: boolean): IResourcePage[] {
-  pages = [...pages, { from: info.offset, to: info.offset + info.limit, outdated, end: false }].sort((a, b) => a.from - b.from);
-  const result: IResourcePage[] = [];
-  let previous: IResourcePage | undefined;
-
-  for (const { from, to, outdated } of pages) {
-    if (!previous) {
-      previous = { from, to, outdated };
-      continue;
-    }
-
-    if (from <= previous.from + previous.to) {
-      if (previous.outdated === outdated) {
-        previous.to = Math.max(previous.to, to);
-      } else {
-        if (previous.from < from) {
-          result.push({ ...previous, to: from });
-        }
-        if (previous.to > to) {
-          result.push({ from, to, outdated });
-          previous = { ...previous, from: to };
-        } else {
-          previous = { from, to, outdated };
-        }
-      }
-    } else {
-      result.push(previous);
-      previous = { from, to, outdated };
-    }
-  }
-
-  if (previous) {
-    result.push(previous);
-  }
-  return result;
 }

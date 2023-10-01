@@ -7,8 +7,9 @@
  */
 import { ILoadableState, isContainsException } from '@cloudbeaver/core-utils';
 
-import { CachedResource, CachedResourceParamKey, ICachedResourceMetadata } from './CachedResource';
+import { CachedResource, CachedResourceParamKey } from './CachedResource';
 import type { CachedResourceIncludeArgs, CachedResourceValueIncludes } from './CachedResourceIncludes';
+import type { ICachedResourceMetadata } from './ICachedResourceMetadata';
 
 export type CachedDataResourceData<TResource> = TResource extends CachedDataResource<infer T, any, any> ? T : never;
 export type CachedDataResourceKey<TResource> = TResource extends CachedDataResource<any, infer T, any> ? T : never;

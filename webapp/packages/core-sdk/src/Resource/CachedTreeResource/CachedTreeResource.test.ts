@@ -5,9 +5,9 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
+import type { ResourceKey } from '../ResourceKey';
+import { resourceKeyList } from '../ResourceKeyList';
 import { CachedTreeChildrenKey, CachedTreeResource, CachedTreeRootChildrenKey } from './CachedTreeResource';
-import type { ResourceKey } from './ResourceKey';
-import { resourceKeyList } from './ResourceKeyList';
 
 interface IMockDataEntity {
   name: string;
@@ -60,13 +60,13 @@ describe('CachedMapResource', () => {
     expect(treeResource.isOutdated('root/level2')).toBe(false);
   });
 
-  test('the nodes metadata should be outdated after markOutdated is called on it', () => {
+  test('children outdated if parent outdated', () => {
     treeResource.set('root', { name: 'root' });
     treeResource.set('root/level2', { name: 'level2' });
     treeResource.markOutdated('root');
 
-    expect(treeResource.getMetadata('root').outdated).toBe(true);
-    expect(treeResource.getMetadata('root/level2').outdated).toBe(false);
+    expect(treeResource.isOutdated('root')).toBe(true);
+    expect(treeResource.isOutdated('root/level2')).toBe(false);
   });
 
   test('should run onDataOutdated handlers on data outdate', () => {

@@ -189,7 +189,7 @@ export * from './useExecutor';
 export * from './useFn';
 export * from './useFocus';
 export * from './useFormValidator';
-export * from './ResourcesHooks/usePagination';
+export * from './ResourcesHooks/useOffsetPagination';
 export * from './ResourcesHooks/useResource';
 export * from './useMouse';
 export * from './useObjectRef';

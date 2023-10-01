@@ -120,7 +120,7 @@ export class TeamsResource extends CachedMapResource<string, TeamInfo, TeamResou
   }
 
   protected async loader(originalKey: ResourceKey<string>, includes?: string[]): Promise<Map<string, TeamInfo>> {
-    const all = this.isAlias(originalKey, CachedMapAllKey);
+    const all = this.aliases.isAlias(originalKey, CachedMapAllKey);
     const teamsList: TeamInfo[] = [];
 
     await ResourceKeyUtils.forEachAsync(originalKey, async key => {

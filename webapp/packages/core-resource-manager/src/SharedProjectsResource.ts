@@ -122,7 +122,7 @@ export class SharedProjectsResource extends CachedMapResource<string, SharedProj
 
     try {
       await this.performUpdate(key, undefined, async key => {
-        await ResourceKeyUtils.forEachAsync(this.transformToKey(key), async projectId => {
+        await ResourceKeyUtils.forEachAsync(this.aliases.transformToKey(key), async projectId => {
           await this.graphQLService.sdk.deleteProject({
             projectId,
           });
@@ -138,7 +138,7 @@ export class SharedProjectsResource extends CachedMapResource<string, SharedProj
   }
 
   protected async loader(key: ResourceKey<string>): Promise<Map<string, SharedProject>> {
-    const all = this.isAlias(key, CachedMapAllKey);
+    const all = this.aliases.isAlias(key, CachedMapAllKey);
 
     if (all) {
       const { projects } = await this.graphQLService.sdk.getSharedProjects();
@@ -149,7 +149,7 @@ export class SharedProjectsResource extends CachedMapResource<string, SharedProj
         this.set(resourceKeyList(projects.map(project => project.id)), projects as SharedProject[]);
       });
     } else {
-      await ResourceKeyUtils.forEachAsync(this.transformToKey(key), async projectId => {
+      await ResourceKeyUtils.forEachAsync(this.aliases.transformToKey(key), async projectId => {
         const { project } = await this.graphQLService.sdk.getProject({
           projectId,
         });

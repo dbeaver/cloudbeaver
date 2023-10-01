@@ -220,14 +220,14 @@ export function useResource<
       use(key: ResourceKey<TKeyArg> | null): void {
         key = toJS(key);
 
-        if (this.useRef[0] !== null && propertiesRef.resource.hasUseId(this.useRef[1])) {
+        if (this.useRef[0] !== null && propertiesRef.resource.useTracker.hasUseId(this.useRef[1])) {
           if (key !== null && propertiesRef.resource.isIntersect(key, this.useRef[0])) {
             return;
           }
 
-          propertiesRef.resource.free(this.useRef[0], this.useRef[1]);
+          propertiesRef.resource.useTracker.free(this.useRef[0], this.useRef[1]);
         }
-        this.useRef = [key, key === null ? '' : propertiesRef.resource.use(key)];
+        this.useRef = [key, key === null ? '' : propertiesRef.resource.useTracker.use(key)];
       },
       async [loadFunctionName](refresh?: boolean): Promise<void> {
         const { key, includes, resource } = propertiesRef;

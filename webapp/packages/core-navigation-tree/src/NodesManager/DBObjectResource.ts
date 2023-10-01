@@ -12,8 +12,8 @@ import { ExecutorInterrupter } from '@cloudbeaver/core-executor';
 import {
   CACHED_RESOURCE_DEFAULT_PAGE_OFFSET,
   CachedMapResource,
-  CachedResourcePageKey,
-  CachedResourcePageListKey,
+  CachedResourceOffsetPageKey,
+  CachedResourceOffsetPageListKey,
   DetailsError,
   GraphQLService,
   isResourceAlias,
@@ -38,14 +38,14 @@ export class DBObjectResource extends CachedMapResource<string, DBObject> {
   ) {
     super();
 
-    this.addAlias(DBObjectParentKey, param => resourceKeyList(navTreeResource.get(param.options.parentId) || []));
+    this.aliases.add(DBObjectParentKey, param => resourceKeyList(navTreeResource.get(param.options.parentId) || []));
     // this.preloadResource(this.navNodeInfoResource);
     this.navNodeInfoResource.outdateResource(this);
     this.navNodeInfoResource.deleteInResource(this);
 
     this.navTreeResource.onDataOutdated.addHandler(key => {
       ResourceKeyUtils.forEach(key, nodeId => {
-        const pageAlias = this.isAlias(nodeId, CachedResourcePageKey) || this.isAlias(nodeId, CachedResourcePageListKey);
+        const pageAlias = this.aliases.isAlias(nodeId, CachedResourceOffsetPageKey) || this.aliases.isAlias(nodeId, CachedResourceOffsetPageListKey);
 
         if (pageAlias) {
           this.markOutdated(DBObjectParentKey(pageAlias.target));
@@ -59,8 +59,9 @@ export class DBObjectResource extends CachedMapResource<string, DBObject> {
 
     this.beforeLoad.addHandler(async (originalKey, context) => {
       await this.navTreeResource.waitLoad();
-      const parentKey = this.isAlias(originalKey, DBObjectParentKey);
-      const pageKey = this.isAlias(originalKey, CachedResourcePageKey) || this.isAlias(originalKey, CachedResourcePageListKey);
+      const parentKey = this.aliases.isAlias(originalKey, DBObjectParentKey);
+      const pageKey =
+        this.aliases.isAlias(originalKey, CachedResourceOffsetPageKey) || this.aliases.isAlias(originalKey, CachedResourceOffsetPageListKey);
       let limit = this.navTreeResource.childrenLimit;
       let offset = CACHED_RESOURCE_DEFAULT_PAGE_OFFSET;
 
@@ -70,11 +71,11 @@ export class DBObjectResource extends CachedMapResource<string, DBObject> {
       }
 
       if (parentKey) {
-        await this.navTreeResource.load(CachedResourcePageKey(offset, limit).setTarget(parentKey.options.parentId));
+        await this.navTreeResource.load(CachedResourceOffsetPageKey(offset, limit).setTarget(parentKey.options.parentId));
         return;
       }
 
-      const key = ResourceKeyUtils.toList(this.transformToKey(originalKey));
+      const key = ResourceKeyUtils.toList(this.aliases.transformToKey(originalKey));
       const parents = [
         ...new Set(
           key.map(nodeId => this.navNodeInfoResource.get(nodeId)?.parentId).filter<string>((nodeId): nodeId is string => nodeId !== undefined),
@@ -94,8 +95,9 @@ export class DBObjectResource extends CachedMapResource<string, DBObject> {
   protected async loader(originalKey: ResourceKey<string>): Promise<Map<string, DBObject>> {
     let limit = this.navTreeResource.childrenLimit;
     let offset = CACHED_RESOURCE_DEFAULT_PAGE_OFFSET;
-    const parentKey = this.isAlias(originalKey, DBObjectParentKey);
-    const pageKey = this.isAlias(originalKey, CachedResourcePageKey) || this.isAlias(originalKey, CachedResourcePageListKey);
+    const parentKey = this.aliases.isAlias(originalKey, DBObjectParentKey);
+    const pageKey =
+      this.aliases.isAlias(originalKey, CachedResourceOffsetPageKey) || this.aliases.isAlias(originalKey, CachedResourceOffsetPageListKey);
 
     if (pageKey) {
       limit = pageKey.options.limit;
@@ -107,9 +109,9 @@ export class DBObjectResource extends CachedMapResource<string, DBObject> {
       await this.loadFromChildren(nodeId, offset, limit);
 
       runInAction(() => {
-        this.setPageEnd(
-          CachedResourcePageKey(offset, limit).setTarget(originalKey),
-          this.navTreeResource.hasNextPage(CachedResourcePageKey(offset, limit).setTarget(nodeId)),
+        this.offsetPagination.setPageEnd(
+          CachedResourceOffsetPageKey(offset, limit).setTarget(originalKey),
+          this.navTreeResource.offsetPagination.hasNextPage(CachedResourceOffsetPageKey(offset, limit).setTarget(nodeId)),
         );
       });
       return this.data;

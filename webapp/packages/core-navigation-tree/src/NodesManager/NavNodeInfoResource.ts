@@ -47,7 +47,7 @@ export class NavNodeInfoResource extends CachedMapResource<string, NavNode, Reco
   }
 
   setDetails(keyObject: ResourceKeySimple<string>, state: boolean): void {
-    this.updateMetadata(keyObject, metadata => {
+    this.metadata.update(keyObject, metadata => {
       if (!metadata.withDetails && state) {
         metadata.outdated = true;
       }

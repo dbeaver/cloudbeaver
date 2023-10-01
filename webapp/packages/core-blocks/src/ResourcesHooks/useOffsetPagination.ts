@@ -12,10 +12,10 @@ import {
   CACHED_RESOURCE_DEFAULT_PAGE_LIMIT,
   CACHED_RESOURCE_DEFAULT_PAGE_OFFSET,
   CachedMapResource,
-  CachedResourcePageKey,
-  CachedResourcePageListKey,
+  CachedResourceOffsetPageKey,
+  CachedResourceOffsetPageListKey,
   getNextPageOffset,
-  ICachedResourcePageOptions,
+  ICachedResourceOffsetPageOptions,
   ResourceKey,
   ResourceKeyAlias,
   ResourceKeyList,
@@ -29,40 +29,40 @@ interface IOptions<TKey extends ResourceKey<any>> {
   pageSize?: number;
 }
 
-interface IPagination<TKey> {
+interface IOffsetPagination<TKey> {
   key: TKey extends ResourceKeyListAlias<any, any> | ResourceKeyList<any>
-    ? ResourceKeyListAlias<any, Readonly<ICachedResourcePageOptions>>
-    : ResourceKeyAlias<any, Readonly<ICachedResourcePageOptions>>;
+    ? ResourceKeyListAlias<any, Readonly<ICachedResourceOffsetPageOptions>>
+    : ResourceKeyAlias<any, Readonly<ICachedResourceOffsetPageOptions>>;
   hasNextPage: boolean;
   refresh: () => void;
   loadMore: () => void;
 }
 
-interface IPaginationPrivate<TKey extends ResourceKey<any>> extends IPagination<TKey> {
+interface IOffsetPaginationPrivate<TKey extends ResourceKey<any>> extends IOffsetPagination<TKey> {
   offset: number;
   resource: CachedMapResource<any, any, any, any>;
-  _key: ResourceKeyAlias<any, Readonly<ICachedResourcePageOptions>> | ResourceKeyListAlias<any, Readonly<ICachedResourcePageOptions>>;
+  _key: ResourceKeyAlias<any, Readonly<ICachedResourceOffsetPageOptions>> | ResourceKeyListAlias<any, Readonly<ICachedResourceOffsetPageOptions>>;
 }
 
-export function usePagination<TResource extends CachedMapResource<any, any, any, any>, TKey extends ResourceKey<any>>(
+export function useOffsetPagination<TResource extends CachedMapResource<any, any, any, any>, TKey extends ResourceKey<any>>(
   ctor: IServiceConstructor<TResource>,
   options?: IOptions<TKey>,
-): IPagination<TKey> {
+): IOffsetPagination<TKey> {
   const targetKey = options?.key;
   const pageSize = options?.pageSize || CACHED_RESOURCE_DEFAULT_PAGE_LIMIT;
   const resource = useService(ctor);
-  const pageInfo = resource.getPageInfo(createPageKey(0, 0, targetKey));
+  const pageInfo = resource.offsetPagination.getPageInfo(createPageKey(0, 0, targetKey));
   const offset = Math.max(
     (pageInfo ? getNextPageOffset(pageInfo) : CACHED_RESOURCE_DEFAULT_PAGE_OFFSET) - pageSize,
     CACHED_RESOURCE_DEFAULT_PAGE_OFFSET,
   );
 
-  const pagination = useObservableRef<IPaginationPrivate<TKey>>(
+  const pagination = useObservableRef<IOffsetPaginationPrivate<TKey>>(
     () => ({
       offset,
       _key: createPageKey(offset, pageSize, targetKey),
       get key() {
-        const pageInfo = resource.getPageInfo(createPageKey(0, 0, this._key.target));
+        const pageInfo = resource.offsetPagination.getPageInfo(createPageKey(0, 0, this._key.target));
 
         for (const page of pageInfo?.pages || []) {
           if (page.outdated && page.from < this._key.options.offset) {
@@ -72,7 +72,7 @@ export function usePagination<TResource extends CachedMapResource<any, any, any,
         return this._key as any;
       },
       get hasNextPage(): boolean {
-        return this.resource.hasNextPage(this._key);
+        return this.resource.offsetPagination.hasNextPage(this._key);
       },
       loadMore() {
         if (this.hasNextPage) {
@@ -104,9 +104,9 @@ function createPageKey(
   offset: number,
   limit: number,
   target: ResourceKey<any>,
-): ResourceKeyAlias<any, Readonly<ICachedResourcePageOptions>> | ResourceKeyListAlias<any, Readonly<ICachedResourcePageOptions>> {
+): ResourceKeyAlias<any, Readonly<ICachedResourceOffsetPageOptions>> | ResourceKeyListAlias<any, Readonly<ICachedResourceOffsetPageOptions>> {
   if (target instanceof ResourceKeyList || target instanceof ResourceKeyListAlias) {
-    return CachedResourcePageListKey(offset, limit).setTarget(target);
+    return CachedResourceOffsetPageListKey(offset, limit).setTarget(target);
   }
-  return CachedResourcePageKey(offset, limit).setTarget(target);
+  return CachedResourceOffsetPageKey(offset, limit).setTarget(target);
 }

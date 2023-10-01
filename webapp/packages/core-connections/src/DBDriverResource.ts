@@ -66,7 +66,7 @@ export class DBDriverResource extends CachedMapResource<string, DBDriver, Driver
 
   protected async loader(originalKey: ResourceKey<string>, includes?: ReadonlyArray<string>): Promise<Map<string, DBDriver>> {
     const driversList: DBDriver[] = [];
-    const all = this.isAlias(originalKey, CachedMapAllKey);
+    const all = this.aliases.isAlias(originalKey, CachedMapAllKey);
 
     await ResourceKeyUtils.forEachAsync(originalKey, async key => {
       const driverId = isResourceAlias(key) ? undefined : key;

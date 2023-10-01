@@ -17,8 +17,8 @@ import {
   CACHED_RESOURCE_DEFAULT_PAGE_OFFSET,
   CachedMapAllKey,
   CachedMapResource,
-  CachedResourcePageKey,
-  CachedResourcePageListKey,
+  CachedResourceOffsetPageKey,
+  CachedResourceOffsetPageListKey,
   DetailsError,
   NavNodeChildrenQuery as fake,
   GraphQLService,
@@ -173,7 +173,7 @@ export class NavTreeResource extends CachedMapResource<string, string[], Record<
     const list = resourceKeyList(ResourceKeyUtils.mapArray(keyObject, key => this.getNestedChildren(key)).flat());
     this.navNodeInfoResource.setDetails(list, state);
 
-    this.updateMetadata(list, metadata => {
+    this.metadata.update(list, metadata => {
       if (!metadata.withDetails && state) {
         metadata.outdated = true;
       }
@@ -441,8 +441,9 @@ export class NavTreeResource extends CachedMapResource<string, string[], Record<
   }
 
   protected async loader(originalKey: ResourceKey<string>): Promise<Map<string, string[]>> {
-    const pageKey = this.isAlias(originalKey, CachedResourcePageKey) || this.isAlias(originalKey, CachedResourcePageListKey);
-    const allKey = this.isAlias(originalKey, CachedMapAllKey);
+    const pageKey =
+      this.aliases.isAlias(originalKey, CachedResourceOffsetPageKey) || this.aliases.isAlias(originalKey, CachedResourceOffsetPageListKey);
+    const allKey = this.aliases.isAlias(originalKey, CachedMapAllKey);
 
     if (allKey) {
       throw new Error('Loading all nodes is prohibited');
@@ -457,8 +458,8 @@ export class NavTreeResource extends CachedMapResource<string, string[], Record<
       const navNodeChildren = await this.loadNodeChildren(nodeId, offset, limit);
       values.push(navNodeChildren);
 
-      this.setPageEnd(
-        CachedResourcePageKey(offset, navNodeChildren.navNodeChildren.length).setTarget(nodeId),
+      this.offsetPagination.setPageEnd(
+        CachedResourceOffsetPageKey(offset, navNodeChildren.navNodeChildren.length).setTarget(nodeId),
         navNodeChildren.navNodeChildren.length === limit,
       );
     });
@@ -497,7 +498,7 @@ export class NavTreeResource extends CachedMapResource<string, string[], Record<
       }
 
       for (const node of data) {
-        const metadata = this.getMetadata(node.parentPath);
+        const metadata = this.metadata.get(node.parentPath);
 
         this.setDetails(resourceKeyList([node.navNodeInfo.id, ...node.navNodeChildren.map(node => node.id)]), metadata.withDetails);
       }
@@ -515,7 +516,7 @@ export class NavTreeResource extends CachedMapResource<string, string[], Record<
         data.map(data => this.insertSlice(data, offset, limit)),
       );
     } else {
-      const metadata = this.getMetadata(data.parentPath);
+      const metadata = this.metadata.get(data.parentPath);
 
       this.setDetails(resourceKeyList([data.navNodeInfo.id, ...data.navNodeChildren.map(node => node.id)]), metadata.withDetails);
 
@@ -543,7 +544,7 @@ export class NavTreeResource extends CachedMapResource<string, string[], Record<
   }
 
   private async loadNodeChildren(parentPath: string, offset: number, limit: number): Promise<NavNodeChildrenQuery> {
-    const metadata = this.getMetadata(parentPath);
+    const metadata = this.metadata.get(parentPath);
     const { navNodeChildren, navNodeInfo } = await this.graphQLService.sdk.navNodeChildren({
       parentPath,
       offset,

@@ -49,7 +49,7 @@ export class ConnectionExecutionContextResource extends CachedMapResource<string
       () => CachedMapAllKey,
     );
 
-    this.addAlias(ConnectionExecutionContextProjectKey, param =>
+    this.aliases.add(ConnectionExecutionContextProjectKey, param =>
       resourceKeyList(
         Array.from(this.data.entries())
           .filter(([key, context]) => context.projectId === param.options.projectId)
@@ -138,8 +138,8 @@ export class ConnectionExecutionContextResource extends CachedMapResource<string
   protected async loader(originalKey: ResourceKey<string>): Promise<Map<string, IConnectionExecutionContextInfo>> {
     const contextsList: IConnectionExecutionContextInfo[] = [];
     let projectId: string | undefined;
-    const all = this.isAlias(originalKey, CachedMapAllKey);
-    const projectKey = this.isAlias(originalKey, ConnectionExecutionContextProjectKey);
+    const all = this.aliases.isAlias(originalKey, CachedMapAllKey);
+    const projectKey = this.aliases.isAlias(originalKey, ConnectionExecutionContextProjectKey);
 
     if (projectKey) {
       projectId = projectKey.options.projectId;

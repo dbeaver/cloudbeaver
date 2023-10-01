@@ -22,7 +22,7 @@ import {
   useStyles,
   useTranslate,
 } from '@cloudbeaver/core-blocks';
-import { CachedResourcePageListKey } from '@cloudbeaver/core-sdk';
+import { CachedResourceOffsetPageListKey } from '@cloudbeaver/core-sdk';
 import { TabContainerPanelComponent, useTab } from '@cloudbeaver/core-ui';
 
 import type { ITeamFormProps } from '../ITeamFormProps';
@@ -53,7 +53,7 @@ export const GrantedUsers: TabContainerPanelComponent<ITeamFormProps> = observer
   const state = useGrantedUsers(formState.config, formState.mode);
   const { selected } = useTab(tabId);
 
-  const users = useResource(GrantedUsers, UsersResource, CachedResourcePageListKey(0, 1000).setTarget(UsersResourceFilterKey()), {
+  const users = useResource(GrantedUsers, UsersResource, CachedResourceOffsetPageListKey(0, 1000).setTarget(UsersResourceFilterKey()), {
     active: selected,
   });
 

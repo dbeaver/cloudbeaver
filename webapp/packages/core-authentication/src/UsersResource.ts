@@ -15,8 +15,8 @@ import {
   CACHED_RESOURCE_DEFAULT_PAGE_OFFSET,
   CachedMapAllKey,
   CachedMapResource,
-  CachedResourcePageKey,
-  CachedResourcePageListKey,
+  CachedResourceOffsetPageKey,
+  CachedResourceOffsetPageListKey,
   GetUsersListQueryVariables,
   GraphQLService,
   isResourceAlias,
@@ -70,7 +70,7 @@ export class UsersResource extends CachedMapResource<string, AdminUser, UserReso
     super();
 
     sessionPermissionsResource.require(this, EAdminPermission.admin).outdateResource(this);
-    this.addAlias(UsersResourceFilterKey, key =>
+    this.aliases.add(UsersResourceFilterKey, key =>
       resourceKeyList(
         this.entries
           .filter(
@@ -81,7 +81,7 @@ export class UsersResource extends CachedMapResource<string, AdminUser, UserReso
       ),
     );
 
-    this.addAlias(UsersResourceNewUsers, () => {
+    this.aliases.add(UsersResourceNewUsers, () => {
       const orderedKeys = this.entries
         .filter(k => isNewUser(k[1]))
         .sort((a, b) => compareUsers(a[1], b[1]))
@@ -218,7 +218,7 @@ export class UsersResource extends CachedMapResource<string, AdminUser, UserReso
   }
 
   protected async loader(originalKey: ResourceKey<string>, includes?: string[]): Promise<Map<string, AdminUser>> {
-    const all = this.isAlias(originalKey, CachedMapAllKey);
+    const all = this.aliases.isAlias(originalKey, CachedMapAllKey);
 
     if (all) {
       throw new Error('Loading all users is prohibited');
@@ -242,8 +242,9 @@ export class UsersResource extends CachedMapResource<string, AdminUser, UserReso
 
         usersList.push(user);
       } else {
-        const pageKey = this.isAlias(originalKey, CachedResourcePageKey) || this.isAlias(originalKey, CachedResourcePageListKey);
-        const filterKey = this.isAlias(originalKey, UsersResourceFilterKey);
+        const pageKey =
+          this.aliases.isAlias(originalKey, CachedResourceOffsetPageKey) || this.aliases.isAlias(originalKey, CachedResourceOffsetPageListKey);
+        const filterKey = this.aliases.isAlias(originalKey, UsersResourceFilterKey);
         let offset = CACHED_RESOURCE_DEFAULT_PAGE_OFFSET;
         let limit = CACHED_RESOURCE_DEFAULT_PAGE_LIMIT;
         let userIdMask: string | undefined;
@@ -274,7 +275,7 @@ export class UsersResource extends CachedMapResource<string, AdminUser, UserReso
 
         usersList.push(...users);
 
-        this.setPageEnd(CachedResourcePageListKey(offset, users.length).setTarget(filterKey), users.length === limit);
+        this.offsetPagination.setPageEnd(CachedResourceOffsetPageListKey(offset, users.length).setTarget(filterKey), users.length === limit);
       }
     });
 

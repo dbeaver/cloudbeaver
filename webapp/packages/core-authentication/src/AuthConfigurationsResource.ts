@@ -76,7 +76,7 @@ export class AuthConfigurationsResource extends CachedMapResource<string, AuthCo
   }
 
   protected async loader(originalKey: ResourceKey<string>): Promise<Map<string, AuthConfiguration>> {
-    const all = this.isAlias(originalKey, CachedMapAllKey);
+    const all = this.aliases.isAlias(originalKey, CachedMapAllKey);
     const configurationsList: AuthConfiguration[] = [];
 
     await ResourceKeyUtils.forEachAsync(originalKey, async key => {

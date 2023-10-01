@@ -10,7 +10,7 @@ import { observer } from 'mobx-react-lite';
 import { Link, s, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { NavTreeResource } from '@cloudbeaver/core-navigation-tree';
-import { CachedResourcePageKey, getNextPageOffset } from '@cloudbeaver/core-sdk';
+import { CachedResourceOffsetPageKey, getNextPageOffset } from '@cloudbeaver/core-sdk';
 
 import type { NavigationNodeRendererComponent } from '../NavigationNodeComponent';
 import { NAVIGATION_TREE_LIMIT } from './elementsTreeLimitFilter';
@@ -31,9 +31,9 @@ const NavTreeLimitMessage: NavigationNodeRendererComponent = observer(function N
 
   function loadMore() {
     const parentNodeId = path[path.length - 1];
-    const pageInfo = navTreeResource.getPageInfo(CachedResourcePageKey(0, 0).setTarget(parentNodeId));
+    const pageInfo = navTreeResource.offsetPagination.getPageInfo(CachedResourceOffsetPageKey(0, 0).setTarget(parentNodeId));
     if (pageInfo) {
-      navTreeResource.load(CachedResourcePageKey(getNextPageOffset(pageInfo), limit).setTarget(parentNodeId));
+      navTreeResource.load(CachedResourceOffsetPageKey(getNextPageOffset(pageInfo), limit).setTarget(parentNodeId));
     }
   }
 
