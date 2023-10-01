@@ -8,20 +8,17 @@
 import { injectable } from '@cloudbeaver/core-di';
 import { Executor, IExecutor } from '@cloudbeaver/core-executor';
 import { ProjectsService } from '@cloudbeaver/core-projects';
-import { DataSynchronizationService, ServerEventId } from '@cloudbeaver/core-root';
 import {
-  CachedResourceIncludeArgs,
+  type CachedResourceIncludeArgs,
   CachedTreeChildrenKey,
   CachedTreeResource,
-  DetailsError,
-  GetResourceListQueryVariables,
-  GraphQLService,
   isResourceAlias,
-  ResourceKey,
+  type ResourceKey,
   resourceKeyList,
   ResourceKeyUtils,
-  RmResource,
-} from '@cloudbeaver/core-sdk';
+} from '@cloudbeaver/core-resource';
+import { DataSynchronizationService, ServerEventId } from '@cloudbeaver/core-root';
+import { DetailsError, GetResourceListQueryVariables, GraphQLService, RmResource } from '@cloudbeaver/core-sdk';
 import { createPath, getPathParent, getPathParts } from '@cloudbeaver/core-utils';
 
 import { ResourceManagerEventHandler } from './ResourceManagerEventHandler';

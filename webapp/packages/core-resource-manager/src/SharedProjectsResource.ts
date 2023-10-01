@@ -11,20 +11,16 @@ import type { AdminObjectGrantInfo } from '@cloudbeaver/core-administration';
 import { EAdminPermission } from '@cloudbeaver/core-authentication';
 import { injectable } from '@cloudbeaver/core-di';
 import { ProjectInfoResource } from '@cloudbeaver/core-projects';
-import { SessionPermissionsResource } from '@cloudbeaver/core-root';
 import {
   CachedMapAllKey,
   CachedMapResource,
-  GraphQLService,
-  isResourceKeyAlias,
-  ResourceKey,
+  type ResourceKey,
+  type ResourceKeyList,
   resourceKeyList,
-  ResourceKeyList,
   ResourceKeyUtils,
-  RmProject,
-  RmProjectPermissions,
-  RmSubjectProjectPermissions,
-} from '@cloudbeaver/core-sdk';
+} from '@cloudbeaver/core-resource';
+import { SessionPermissionsResource } from '@cloudbeaver/core-root';
+import { GraphQLService, RmProject, RmProjectPermissions, RmSubjectProjectPermissions } from '@cloudbeaver/core-sdk';
 import { isArraysEqual } from '@cloudbeaver/core-utils';
 
 const newSymbol = Symbol('new-project');

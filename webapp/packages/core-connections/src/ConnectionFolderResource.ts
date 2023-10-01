@@ -9,18 +9,17 @@ import { action, makeObservable, runInAction } from 'mobx';
 
 import { AppAuthService } from '@cloudbeaver/core-authentication';
 import { injectable } from '@cloudbeaver/core-di';
-import { SessionDataResource } from '@cloudbeaver/core-root';
 import {
   CachedMapAllKey,
   CachedMapResource,
-  ConnectionFolderInfoFragment,
-  GraphQLService,
   isResourceAlias,
-  ResourceKey,
+  type ResourceKey,
   resourceKeyAliasFactory,
   resourceKeyList,
   ResourceKeyUtils,
-} from '@cloudbeaver/core-sdk';
+} from '@cloudbeaver/core-resource';
+import { SessionDataResource } from '@cloudbeaver/core-root';
+import { ConnectionFolderInfoFragment, GraphQLService } from '@cloudbeaver/core-sdk';
 
 import { createConnectionFolderParam } from './createConnectionFolderParam';
 import { getConnectionFolderIdFromNodeId } from './NavTree/getConnectionFolderIdFromNodeId';

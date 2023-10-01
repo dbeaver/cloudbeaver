@@ -9,7 +9,7 @@ import { ConnectionExecutionContextResource } from '@cloudbeaver/core-connection
 import { injectable } from '@cloudbeaver/core-di';
 import { CachedDataResource } from '@cloudbeaver/core-resource';
 import { ServerEventId } from '@cloudbeaver/core-root';
-import { CbDatabaseOutputLogEvent } from '@cloudbeaver/core-sdk';
+import type { CbDatabaseOutputLogEvent } from '@cloudbeaver/core-sdk';
 
 import type { IOutputLogType } from './IOutputLogTypes';
 import { OutputLogsEventHandler } from './OutputLogsEventHandler';

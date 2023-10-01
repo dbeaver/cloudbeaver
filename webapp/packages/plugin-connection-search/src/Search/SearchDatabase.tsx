@@ -13,7 +13,7 @@ import { DBDriverResource } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
 import { ProjectInfoResource } from '@cloudbeaver/core-projects';
 import { CachedMapAllKey } from '@cloudbeaver/core-resource';
-import { AdminConnectionSearchInfo } from '@cloudbeaver/core-sdk';
+import type { AdminConnectionSearchInfo } from '@cloudbeaver/core-sdk';
 import { ConnectionFormLoader } from '@cloudbeaver/plugin-connections';
 
 import { ConnectionSearchService } from './ConnectionSearchService';

@@ -12,7 +12,7 @@ import styled from 'reshadow';
 import { Combobox, Group, GroupTitle, ITag, s, Tag, Tags, useResource, useS, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
 import { DBDriverResource } from '@cloudbeaver/core-connections';
 import { CachedMapAllKey, resourceKeyList } from '@cloudbeaver/core-resource';
-import { ServerConfigInput } from '@cloudbeaver/core-sdk';
+import type { ServerConfigInput } from '@cloudbeaver/core-sdk';
 
 import style from './ServerConfigurationDriversForm.m.css';
 

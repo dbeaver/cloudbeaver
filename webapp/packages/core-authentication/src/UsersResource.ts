@@ -6,27 +6,23 @@
  * you may not use this file except in compliance with the License.
  */
 import { injectable } from '@cloudbeaver/core-di';
-import { ServerConfigResource, SessionPermissionsResource } from '@cloudbeaver/core-root';
 import {
-  AdminConnectionGrantInfo,
-  AdminUserInfo,
-  AdminUserInfoFragment,
   CACHED_RESOURCE_DEFAULT_PAGE_LIMIT,
   CACHED_RESOURCE_DEFAULT_PAGE_OFFSET,
   CachedMapAllKey,
   CachedMapResource,
   CachedResourceOffsetPageKey,
   CachedResourceOffsetPageListKey,
-  GetUsersListQueryVariables,
-  GraphQLService,
   isResourceAlias,
-  ResourceKey,
+  type ResourceKey,
   resourceKeyList,
   resourceKeyListAlias,
   resourceKeyListAliasFactory,
-  ResourceKeySimple,
+  type ResourceKeySimple,
   ResourceKeyUtils,
-} from '@cloudbeaver/core-sdk';
+} from '@cloudbeaver/core-resource';
+import { ServerConfigResource, SessionPermissionsResource } from '@cloudbeaver/core-root';
+import { AdminConnectionGrantInfo, AdminUserInfo, AdminUserInfoFragment, GetUsersListQueryVariables, GraphQLService } from '@cloudbeaver/core-sdk';
 
 import { AUTH_PROVIDER_LOCAL_ID } from './AUTH_PROVIDER_LOCAL_ID';
 import { AuthInfoService } from './AuthInfoService';

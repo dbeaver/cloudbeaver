@@ -12,15 +12,14 @@ import { injectable } from '@cloudbeaver/core-di';
 import {
   CachedMapAllKey,
   CachedMapResource,
-  GraphQLService,
   isResourceAlias,
-  ResourceKey,
+  type ResourceKey,
   resourceKeyAliasFactory,
   resourceKeyList,
-  ResourceKeySimple,
+  type ResourceKeySimple,
   ResourceKeyUtils,
-  SqlContextInfo,
-} from '@cloudbeaver/core-sdk';
+} from '@cloudbeaver/core-resource';
+import { GraphQLService, SqlContextInfo } from '@cloudbeaver/core-sdk';
 import { flat } from '@cloudbeaver/core-utils';
 
 import { ConnectionInfoActiveProjectKey, ConnectionInfoResource } from '../ConnectionInfoResource';

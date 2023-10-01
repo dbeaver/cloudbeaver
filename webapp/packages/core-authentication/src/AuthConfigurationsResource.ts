@@ -8,20 +8,17 @@
 import { runInAction } from 'mobx';
 
 import { injectable } from '@cloudbeaver/core-di';
-import { SessionPermissionsResource } from '@cloudbeaver/core-root';
 import {
-  AdminAuthProviderConfiguration,
   CachedMapAllKey,
   CachedMapResource,
-  GetAuthProviderConfigurationsQueryVariables,
-  GraphQLService,
   isResourceAlias,
-  ResourceKey,
-  ResourceKeyList,
+  type ResourceKey,
   resourceKeyList,
-  ResourceKeySimple,
+  type ResourceKeySimple,
   ResourceKeyUtils,
-} from '@cloudbeaver/core-sdk';
+} from '@cloudbeaver/core-resource';
+import { SessionPermissionsResource } from '@cloudbeaver/core-root';
+import { AdminAuthProviderConfiguration, GetAuthProviderConfigurationsQueryVariables, GraphQLService } from '@cloudbeaver/core-sdk';
 
 import type { AuthProviderConfiguration } from './AuthProvidersResource';
 import { EAdminPermission } from './EAdminPermission';

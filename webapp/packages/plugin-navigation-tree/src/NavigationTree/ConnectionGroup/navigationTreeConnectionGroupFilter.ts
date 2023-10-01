@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 import { ENodeFeature, EObjectFeature, type NavNode, type NavNodeInfoResource, ROOT_NODE_PATH } from '@cloudbeaver/core-navigation-tree';
-import { resourceKeyList } from '@cloudbeaver/core-sdk';
+import { resourceKeyList } from '@cloudbeaver/core-resource';
 
 import type { IElementsTreeFilter } from '../ElementsTree/useElementsTree';
 

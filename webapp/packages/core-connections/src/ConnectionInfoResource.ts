@@ -11,25 +11,27 @@ import { AppAuthService, UserInfoResource } from '@cloudbeaver/core-authenticati
 import { injectable } from '@cloudbeaver/core-di';
 import { ExecutorInterrupter, ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
 import { ProjectInfoResource, ProjectsService } from '@cloudbeaver/core-projects';
+import {
+  CachedMapAllKey,
+  CachedMapResource,
+  type CachedResourceIncludeArgs,
+  isResourceAlias,
+  type ResourceKey,
+  resourceKeyList,
+  type ResourceKeyList,
+  resourceKeyListAlias,
+  resourceKeyListAliasFactory,
+  ResourceKeyUtils,
+} from '@cloudbeaver/core-resource';
 import { DataSynchronizationService, NavigatorViewSettings, ServerEventId, SessionDataResource } from '@cloudbeaver/core-root';
 import {
   AdminConnectionGrantInfo,
   AdminConnectionSearchInfo,
-  CachedMapAllKey,
-  CachedMapResource,
-  CachedResourceIncludeArgs,
   ConnectionConfig,
   GetUserConnectionsQueryVariables,
   GraphQLService,
   InitConnectionMutationVariables,
-  isResourceAlias,
   NavigatorSettingsInput,
-  ResourceKey,
-  resourceKeyList,
-  ResourceKeyList,
-  resourceKeyListAlias,
-  resourceKeyListAliasFactory,
-  ResourceKeyUtils,
   TestConnectionMutation,
   UserConnectionAuthPropertiesFragment,
 } from '@cloudbeaver/core-sdk';

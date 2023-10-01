@@ -14,7 +14,8 @@ import { CommonDialogService, ConfirmationDialog, DialogueStateResult } from '@c
 import { NotificationService } from '@cloudbeaver/core-events';
 import { executorHandlerFilter, ExecutorInterrupter, IExecutorHandler } from '@cloudbeaver/core-executor';
 import { ProjectInfoResource, ProjectsService } from '@cloudbeaver/core-projects';
-import type { ConnectionConfig, ResourceKey, ResourceKeySimple } from '@cloudbeaver/core-sdk';
+import type { ResourceKey, ResourceKeySimple } from '@cloudbeaver/core-resource';
+import type { ConnectionConfig } from '@cloudbeaver/core-sdk';
 import { OptionsPanelService } from '@cloudbeaver/core-ui';
 import { AuthenticationService } from '@cloudbeaver/plugin-authentication';
 

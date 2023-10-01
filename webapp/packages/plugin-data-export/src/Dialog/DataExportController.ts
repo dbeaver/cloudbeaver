@@ -12,13 +12,7 @@ import { IDestructibleController, IInitializableController, injectable } from '@
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { ErrorDetailsDialog } from '@cloudbeaver/core-notifications';
-import {
-  DataTransferOutputSettings,
-  DataTransferProcessorInfo,
-  GQLErrorCatcher,
-  ObjectPropertyInfo,
-  ObjectPropertyLength,
-} from '@cloudbeaver/core-sdk';
+import { DataTransferOutputSettings, DataTransferProcessorInfo, GQLErrorCatcher } from '@cloudbeaver/core-sdk';
 
 import { DataExportService } from '../DataExportService';
 import type { IExportContext } from '../IExportContext';

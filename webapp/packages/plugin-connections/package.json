@@ -36,7 +36,8 @@
     "@cloudbeaver/core-sdk": "~0.1.0",
     "@cloudbeaver/core-ui": "~0.1.0",
     "@cloudbeaver/core-utils": "~0.1.0",
-    "@cloudbeaver/core-view": "~0.1.0"
+    "@cloudbeaver/core-view": "~0.1.0",
+    "@cloudbeaver/core-resource": "~0.1.0"
   },
   "peerDependencies": {
     "react": "~18.x.x",

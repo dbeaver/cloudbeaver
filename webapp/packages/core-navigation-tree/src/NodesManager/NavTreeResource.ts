@@ -12,26 +12,24 @@ import { AppAuthService, UserInfoResource } from '@cloudbeaver/core-authenticati
 import { injectable } from '@cloudbeaver/core-di';
 import { Executor, ExecutorInterrupter, IExecutionContext, IExecutor } from '@cloudbeaver/core-executor';
 import { ProjectInfoResource } from '@cloudbeaver/core-projects';
-import { SessionDataResource } from '@cloudbeaver/core-root';
 import {
   CACHED_RESOURCE_DEFAULT_PAGE_OFFSET,
   CachedMapAllKey,
   CachedMapResource,
   CachedResourceOffsetPageKey,
   CachedResourceOffsetPageListKey,
-  DetailsError,
-  NavNodeChildrenQuery as fake,
-  GraphQLService,
-  ICachedResourceMetadata,
+  type ICachedResourceMetadata,
   isResourceAlias,
   isResourceKeyList,
   ResourceError,
-  ResourceKey,
-  ResourceKeyList,
+  type ResourceKey,
   resourceKeyList,
-  ResourceKeySimple,
+  type ResourceKeyList,
+  type ResourceKeySimple,
   ResourceKeyUtils,
-} from '@cloudbeaver/core-sdk';
+} from '@cloudbeaver/core-resource';
+import { SessionDataResource } from '@cloudbeaver/core-root';
+import { DetailsError, NavNodeChildrenQuery as fake, GraphQLService } from '@cloudbeaver/core-sdk';
 import { flat, isDefined, isUndefined, MetadataMap } from '@cloudbeaver/core-utils';
 
 import { NavTreeSettingsService } from '../NavTreeSettingsService';

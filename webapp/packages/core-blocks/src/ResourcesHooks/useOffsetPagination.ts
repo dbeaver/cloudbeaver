@@ -20,7 +20,7 @@ import {
   ResourceKeyAlias,
   ResourceKeyList,
   ResourceKeyListAlias,
-} from '@cloudbeaver/core-sdk';
+} from '@cloudbeaver/core-resource';
 
 import { useObservableRef } from '../useObservableRef';
 

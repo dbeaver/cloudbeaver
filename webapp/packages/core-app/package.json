@@ -29,7 +29,8 @@
     "@cloudbeaver/core-root": "~0.1.0",
     "@cloudbeaver/core-routing": "~0.1.0",
     "@cloudbeaver/core-theming": "~0.1.0",
-    "@cloudbeaver/core-ui": "~0.1.0"
+    "@cloudbeaver/core-ui": "~0.1.0",
+    "@cloudbeaver/core-resource": "~0.1.0"
   },
   "peerDependencies": {
     "react": "~18.x.x",

@@ -8,15 +8,8 @@
 import { injectable } from '@cloudbeaver/core-di';
 import { ExecutorInterrupter } from '@cloudbeaver/core-executor';
 import { ProjectsService } from '@cloudbeaver/core-projects';
-import {
-  CachedMapAllKey,
-  CachedMapResource,
-  GraphQLService,
-  ResourceKey,
-  resourceKeyList,
-  ResourceKeyUtils,
-  SqlDialectInfo,
-} from '@cloudbeaver/core-sdk';
+import { CachedMapAllKey, CachedMapResource, type ResourceKey, resourceKeyList, ResourceKeyUtils } from '@cloudbeaver/core-resource';
+import { GraphQLService, SqlDialectInfo } from '@cloudbeaver/core-sdk';
 
 import type { IConnectionExecutionContextInfo } from './ConnectionExecutionContext/ConnectionExecutionContextResource';
 import {

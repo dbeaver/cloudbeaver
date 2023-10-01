@@ -14,14 +14,13 @@ import {
   CachedMapResource,
   CachedResourceOffsetPageKey,
   CachedResourceOffsetPageListKey,
-  DetailsError,
-  GraphQLService,
   isResourceAlias,
-  ResourceKey,
+  type ResourceKey,
   resourceKeyList,
   resourceKeyListAliasFactory,
   ResourceKeyUtils,
-} from '@cloudbeaver/core-sdk';
+} from '@cloudbeaver/core-resource';
+import { DetailsError, GraphQLService } from '@cloudbeaver/core-sdk';
 
 import type { DBObject } from './EntityTypes';
 import { NavNodeInfoResource } from './NavNodeInfoResource';

@@ -12,7 +12,7 @@ import { AuthProviderConfiguration, AuthProvidersResource } from '@cloudbeaver/c
 import { Button, Cell, IconOrImage, Link, Loader, useResource, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { CachedMapAllKey } from '@cloudbeaver/core-resource';
-import { UserInfo } from '@cloudbeaver/core-sdk';
+import type { UserInfo } from '@cloudbeaver/core-sdk';
 import { AuthenticationService } from '@cloudbeaver/plugin-authentication';
 
 const styles = css`

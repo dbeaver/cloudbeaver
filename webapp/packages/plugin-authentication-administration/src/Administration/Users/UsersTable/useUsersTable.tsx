@@ -12,7 +12,7 @@ import { TableState, useObservableRef, useOffsetPagination, useResource, useTran
 import { useService } from '@cloudbeaver/core-di';
 import { CommonDialogService, ConfirmationDialogDelete, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { resourceKeyList } from '@cloudbeaver/core-sdk';
+import { resourceKeyList } from '@cloudbeaver/core-resource';
 import { ILoadableState, isArraysEqual, isDefined } from '@cloudbeaver/core-utils';
 
 import type { IUserFilters } from './Filters/useUsersTableFilters';

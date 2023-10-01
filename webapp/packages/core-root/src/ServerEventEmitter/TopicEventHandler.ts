@@ -8,7 +8,7 @@
 import { Connectable, connectable, filter, map, merge, Observable, Subject } from 'rxjs';
 
 import { ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
-import type { CachedResource } from '@cloudbeaver/core-sdk';
+import type { CachedResource } from '@cloudbeaver/core-resource';
 import { compose } from '@cloudbeaver/core-utils';
 
 import type { IBaseServerEvent, IServerEventCallback, IServerEventEmitter, Subscription } from './IServerEventEmitter';

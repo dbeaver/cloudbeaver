@@ -22,7 +22,7 @@ import { CommonDialogService, ConfirmationDialogDelete, DialogueStateResult } fr
 import { NotificationService } from '@cloudbeaver/core-events';
 import { LocalizationService } from '@cloudbeaver/core-localization';
 import { isGlobalProject, isSharedProject, ProjectInfoResource, projectInfoSortByName } from '@cloudbeaver/core-projects';
-import { resourceKeyList } from '@cloudbeaver/core-sdk';
+import { resourceKeyList } from '@cloudbeaver/core-resource';
 import { isArraysEqual, isDefined, isObjectsEqual } from '@cloudbeaver/core-utils';
 
 @injectable()

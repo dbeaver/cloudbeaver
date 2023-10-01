@@ -26,7 +26,7 @@ import {
   ResourceKey,
   ResourceKeyList,
   ResourceKeyListAlias,
-} from '@cloudbeaver/core-sdk';
+} from '@cloudbeaver/core-resource';
 import { ILoadableState, isArraysEqual, isContainsException, LoadingError } from '@cloudbeaver/core-utils';
 
 import { ErrorContext } from '../ErrorContext';

@@ -9,18 +9,9 @@ import { computed, makeObservable } from 'mobx';
 
 import { AppAuthService } from '@cloudbeaver/core-authentication';
 import { injectable } from '@cloudbeaver/core-di';
+import { CachedMapAllKey, CachedMapResource, isResourceAlias, type ResourceKey, resourceKeyList, ResourceKeyUtils } from '@cloudbeaver/core-resource';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
-import {
-  CachedMapAllKey,
-  CachedMapResource,
-  DatabaseDriverFragment,
-  DriverListQueryVariables,
-  GraphQLService,
-  isResourceAlias,
-  ResourceKey,
-  resourceKeyList,
-  ResourceKeyUtils,
-} from '@cloudbeaver/core-sdk';
+import { DatabaseDriverFragment, DriverListQueryVariables, GraphQLService } from '@cloudbeaver/core-sdk';
 import { isArraysEqual } from '@cloudbeaver/core-utils';
 
 export type DBDriver = DatabaseDriverFragment;

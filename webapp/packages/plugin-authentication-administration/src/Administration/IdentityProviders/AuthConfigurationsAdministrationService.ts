@@ -13,7 +13,7 @@ import { PlaceholderContainer } from '@cloudbeaver/core-blocks';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { CachedMapAllKey } from '@cloudbeaver/core-resource';
-import { AdminAuthProviderConfiguration } from '@cloudbeaver/core-sdk';
+import type { AdminAuthProviderConfiguration } from '@cloudbeaver/core-sdk';
 
 import { CreateAuthConfigurationService } from './CreateAuthConfigurationService';
 

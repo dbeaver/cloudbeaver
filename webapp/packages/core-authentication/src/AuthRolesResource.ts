@@ -8,7 +8,7 @@
 import { injectable } from '@cloudbeaver/core-di';
 import { CachedDataResource } from '@cloudbeaver/core-resource';
 import { SessionPermissionsResource } from '@cloudbeaver/core-root';
-import type { GraphQLService } from '@cloudbeaver/core-sdk';
+import { GraphQLService } from '@cloudbeaver/core-sdk';
 
 import { EAdminPermission } from './EAdminPermission';
 

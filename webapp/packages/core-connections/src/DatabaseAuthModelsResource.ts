@@ -8,7 +8,7 @@
 import { injectable } from '@cloudbeaver/core-di';
 import { CachedMapAllKey, CachedMapResource, resourceKeyList } from '@cloudbeaver/core-resource';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
-import type { DatabaseAuthModel, GraphQLService } from '@cloudbeaver/core-sdk';
+import { type DatabaseAuthModel, GraphQLService } from '@cloudbeaver/core-sdk';
 
 @injectable()
 export class DatabaseAuthModelsResource extends CachedMapResource<string, DatabaseAuthModel> {
