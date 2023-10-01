@@ -18,7 +18,8 @@ import { IDestructibleController, IInitializableController, injectable } from '@
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { ErrorDetailsDialog } from '@cloudbeaver/core-notifications';
-import { CachedMapAllKey, GQLErrorCatcher, NetworkHandlerAuthType } from '@cloudbeaver/core-sdk';
+import { CachedMapAllKey } from '@cloudbeaver/core-resource';
+import { GQLErrorCatcher, NetworkHandlerAuthType } from '@cloudbeaver/core-sdk';
 
 import type { IConnectionAuthenticationConfig } from '../ConnectionAuthentication/IConnectionAuthenticationConfig';
 

@@ -24,7 +24,7 @@ import {
 } from '@cloudbeaver/core-blocks';
 import { isCloudConnection } from '@cloudbeaver/core-connections';
 import type { TLocalizationToken } from '@cloudbeaver/core-localization';
-import { CachedMapAllKey, CachedResourceOffsetPageListKey } from '@cloudbeaver/core-sdk';
+import { CachedMapAllKey, CachedResourceOffsetPageListKey } from '@cloudbeaver/core-resource';
 import { TabContainerPanelComponent, useTab } from '@cloudbeaver/core-ui';
 import type { IConnectionFormProps } from '@cloudbeaver/plugin-connections';
 

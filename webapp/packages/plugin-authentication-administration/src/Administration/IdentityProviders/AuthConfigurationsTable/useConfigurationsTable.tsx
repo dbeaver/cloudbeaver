@@ -12,7 +12,8 @@ import { TableState, useObservableRef, useTranslate } from '@cloudbeaver/core-bl
 import { useService } from '@cloudbeaver/core-di';
 import { CommonDialogService, ConfirmationDialogDelete, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { AdminAuthProviderConfiguration, CachedMapAllKey, resourceKeyList } from '@cloudbeaver/core-sdk';
+import { CachedMapAllKey, resourceKeyList } from '@cloudbeaver/core-resource';
+import type { AdminAuthProviderConfiguration } from '@cloudbeaver/core-sdk';
 
 interface State {
   tableState: TableState;

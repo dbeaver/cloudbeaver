@@ -41,7 +41,7 @@ import {
   ROOT_NODE_PATH,
 } from '@cloudbeaver/core-navigation-tree';
 import { getProjectNodeId, NAV_NODE_TYPE_PROJECT, ProjectInfoResource } from '@cloudbeaver/core-projects';
-import { CachedMapAllKey, ResourceKeyAlias, resourceKeyList, ResourceKeySimple, ResourceKeyUtils } from '@cloudbeaver/core-sdk';
+import { CachedMapAllKey, ResourceKeyAlias, resourceKeyList, ResourceKeySimple, ResourceKeyUtils } from '@cloudbeaver/core-resource';
 import { createPath } from '@cloudbeaver/core-utils';
 import { ACTION_NEW_FOLDER, ActionService, DATA_CONTEXT_MENU, IAction, IDataContextProvider, MenuService } from '@cloudbeaver/core-view';
 import { DATA_CONTEXT_ELEMENTS_TREE, type IElementsTree, MENU_ELEMENTS_TREE_TOOLS } from '@cloudbeaver/plugin-navigation-tree';

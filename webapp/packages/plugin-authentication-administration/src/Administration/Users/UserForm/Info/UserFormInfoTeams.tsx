@@ -9,7 +9,7 @@ import { observer } from 'mobx-react-lite';
 
 import { compareTeams, TeamsResource } from '@cloudbeaver/core-authentication';
 import { FieldCheckbox, Group, GroupTitle, useResource, useTranslate } from '@cloudbeaver/core-blocks';
-import { CachedMapAllKey } from '@cloudbeaver/core-sdk';
+import { CachedMapAllKey } from '@cloudbeaver/core-resource';
 import { isDefined } from '@cloudbeaver/core-utils';
 
 import type { UserFormProps } from '../AdministrationUserFormService';

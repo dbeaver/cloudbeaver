@@ -12,7 +12,7 @@ import { TableState, useObservableRef, useResource, useTranslate } from '@cloudb
 import { useService } from '@cloudbeaver/core-di';
 import { CommonDialogService, ConfirmationDialogDelete, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { CachedMapAllKey, resourceKeyList } from '@cloudbeaver/core-sdk';
+import { CachedMapAllKey, resourceKeyList } from '@cloudbeaver/core-resource';
 import type { ILoadableState } from '@cloudbeaver/core-utils';
 
 interface State {

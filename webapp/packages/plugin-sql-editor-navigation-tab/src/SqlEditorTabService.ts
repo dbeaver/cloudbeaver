@@ -31,7 +31,8 @@ import { NotificationService } from '@cloudbeaver/core-events';
 import { Executor, ExecutorInterrupter, IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import { NavNodeInfoResource, NodeManagerUtils, objectNavNodeProvider } from '@cloudbeaver/core-navigation-tree';
 import { projectProvider, projectSetter, projectSetterState } from '@cloudbeaver/core-projects';
-import { NavNodeInfoFragment, resourceKeyList, ResourceKeySimple, ResourceKeyUtils } from '@cloudbeaver/core-sdk';
+import { resourceKeyList, ResourceKeySimple, ResourceKeyUtils } from '@cloudbeaver/core-resource';
+import type { NavNodeInfoFragment } from '@cloudbeaver/core-sdk';
 import { isArraysEqual } from '@cloudbeaver/core-utils';
 import { ITab, ITabOptions, NavigationTabsService, TabHandler } from '@cloudbeaver/plugin-navigation-tabs';
 import {

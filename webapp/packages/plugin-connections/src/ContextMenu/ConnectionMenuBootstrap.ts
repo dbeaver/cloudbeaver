@@ -16,6 +16,7 @@ import {
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { DATA_CONTEXT_NAV_NODE, EObjectFeature, NavNodeManagerService } from '@cloudbeaver/core-navigation-tree';
+import { getCachedMapResourceLoaderState } from '@cloudbeaver/core-resource';
 import {
   CONNECTION_NAVIGATOR_VIEW_SETTINGS,
   isNavigatorViewSettingsEqual,
@@ -23,7 +24,6 @@ import {
   PermissionsService,
   ServerConfigResource,
 } from '@cloudbeaver/core-root';
-import { getCachedMapResourceLoaderState } from '@cloudbeaver/core-sdk';
 import { ACTION_DELETE, ActionService, DATA_CONTEXT_MENU, DATA_CONTEXT_MENU_NESTED, MenuSeparatorItem, MenuService } from '@cloudbeaver/core-view';
 import { MENU_APP_ACTIONS } from '@cloudbeaver/plugin-top-app-bar';
 

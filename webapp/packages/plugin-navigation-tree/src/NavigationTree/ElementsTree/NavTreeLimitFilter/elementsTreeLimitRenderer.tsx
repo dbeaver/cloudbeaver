@@ -10,7 +10,7 @@ import { observer } from 'mobx-react-lite';
 import { Link, s, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { NavTreeResource } from '@cloudbeaver/core-navigation-tree';
-import { CachedResourceOffsetPageKey, getNextPageOffset } from '@cloudbeaver/core-sdk';
+import { CachedResourceOffsetPageKey, getNextPageOffset } from '@cloudbeaver/core-resource';
 
 import type { NavigationNodeRendererComponent } from '../NavigationNodeComponent';
 import { NAVIGATION_TREE_LIMIT } from './elementsTreeLimitFilter';

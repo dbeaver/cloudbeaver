@@ -9,7 +9,7 @@ import { action } from 'mobx';
 
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { Executor, IExecutionContextProvider, IExecutor, ISyncContextLoader, ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
-import { resourceKeyList, ResourceKeyUtils } from '@cloudbeaver/core-sdk';
+import { resourceKeyList, ResourceKeyUtils } from '@cloudbeaver/core-resource';
 import { NavigationService } from '@cloudbeaver/core-ui';
 import { MetadataMap } from '@cloudbeaver/core-utils';
 import type { IDataContextProvider } from '@cloudbeaver/core-view';

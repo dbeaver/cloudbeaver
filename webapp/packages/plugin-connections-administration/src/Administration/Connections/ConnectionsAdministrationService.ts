@@ -13,8 +13,8 @@ import { ConnectionInfoActiveProjectKey, ConnectionInfoResource, DatabaseConnect
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService, ConfirmationDialog, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
+import { CachedMapAllKey } from '@cloudbeaver/core-resource';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
-import { CachedMapAllKey } from '@cloudbeaver/core-sdk';
 
 import { CreateConnectionService } from './CreateConnectionService';
 

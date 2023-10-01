@@ -15,8 +15,8 @@ import {
 } from '@cloudbeaver/core-connections';
 import { TaskScheduler } from '@cloudbeaver/core-executor';
 import type { ProjectInfoResource } from '@cloudbeaver/core-projects';
+import { isResourceAlias, ResourceKey, ResourceKeyUtils } from '@cloudbeaver/core-resource';
 import { getRmResourceKey, ResourceManagerResource } from '@cloudbeaver/core-resource-manager';
-import { isResourceAlias, ResourceKey, ResourceKeyUtils } from '@cloudbeaver/core-sdk';
 import { debounce, getPathName, isArraysEqual, isNotNullDefined, isObjectsEqual, isValuesEqual } from '@cloudbeaver/core-utils';
 import { SCRIPTS_TYPE_ID } from '@cloudbeaver/plugin-resource-manager-scripts';
 import { BaseSqlDataSource, ESqlDataSourceFeatures, SqlEditorService } from '@cloudbeaver/plugin-sql-editor';

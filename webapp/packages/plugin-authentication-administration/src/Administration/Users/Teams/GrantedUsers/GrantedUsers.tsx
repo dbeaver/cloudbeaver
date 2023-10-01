@@ -22,7 +22,7 @@ import {
   useStyles,
   useTranslate,
 } from '@cloudbeaver/core-blocks';
-import { CachedResourceOffsetPageListKey } from '@cloudbeaver/core-sdk';
+import { CachedResourceOffsetPageListKey } from '@cloudbeaver/core-resource';
 import { TabContainerPanelComponent, useTab } from '@cloudbeaver/core-ui';
 
 import type { ITeamFormProps } from '../ITeamFormProps';

@@ -10,7 +10,7 @@ import styled from 'reshadow';
 
 import { Translate, useResource, useStyles } from '@cloudbeaver/core-blocks';
 import { DBDriverResource, NetworkHandlerResource } from '@cloudbeaver/core-connections';
-import { CachedMapAllKey } from '@cloudbeaver/core-sdk';
+import { CachedMapAllKey } from '@cloudbeaver/core-resource';
 import { Tab, TabContainerTabComponent, TabTitle } from '@cloudbeaver/core-ui';
 
 import type { IConnectionFormProps } from '../IConnectionFormProps';

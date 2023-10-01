@@ -15,7 +15,7 @@ import { NotificationService } from '@cloudbeaver/core-events';
 import { ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
 import { type NavNode, NavNodeInfoResource, NavTreeResource, ROOT_NODE_PATH } from '@cloudbeaver/core-navigation-tree';
 import { ProjectInfoResource, ProjectsService } from '@cloudbeaver/core-projects';
-import { CachedMapAllKey, CachedResourceOffsetPageKey, getNextPageOffset, ResourceKeyUtils } from '@cloudbeaver/core-sdk';
+import { CachedMapAllKey, CachedResourceOffsetPageKey, getNextPageOffset, ResourceKeyUtils } from '@cloudbeaver/core-resource';
 import type { IDNDData } from '@cloudbeaver/core-ui';
 import { ILoadableState, MetadataMap, throttle } from '@cloudbeaver/core-utils';
 

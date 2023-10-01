@@ -25,7 +25,7 @@ import {
   nodeDeleteContext,
   NodeManagerUtils,
 } from '@cloudbeaver/core-navigation-tree';
-import { ResourceKeyUtils } from '@cloudbeaver/core-sdk';
+import { ResourceKeyUtils } from '@cloudbeaver/core-resource';
 import {
   ACTION_DELETE,
   ACTION_OPEN,

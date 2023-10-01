@@ -8,7 +8,7 @@
 import { DATA_CONTEXT_ADMINISTRATION_ITEM_ROUTE } from '@cloudbeaver/core-administration';
 import { AUTH_PROVIDER_LOCAL_ID, AuthProvidersResource } from '@cloudbeaver/core-authentication';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
-import { CachedMapAllKey, getCachedMapResourceLoaderState } from '@cloudbeaver/core-sdk';
+import { CachedMapAllKey, getCachedMapResourceLoaderState } from '@cloudbeaver/core-resource';
 import { ACTION_CREATE, ActionService, MenuService } from '@cloudbeaver/core-view';
 
 import { MENU_USERS_ADMINISTRATION } from '../../../Menus/MENU_USERS_ADMINISTRATION';

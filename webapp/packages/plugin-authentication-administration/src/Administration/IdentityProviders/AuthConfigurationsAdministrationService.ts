@@ -12,7 +12,8 @@ import { AuthConfigurationsResource, AuthProviderService, AuthProvidersResource 
 import { PlaceholderContainer } from '@cloudbeaver/core-blocks';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { AdminAuthProviderConfiguration, CachedMapAllKey } from '@cloudbeaver/core-sdk';
+import { CachedMapAllKey } from '@cloudbeaver/core-resource';
+import { AdminAuthProviderConfiguration } from '@cloudbeaver/core-sdk';
 
 import { CreateAuthConfigurationService } from './CreateAuthConfigurationService';
 

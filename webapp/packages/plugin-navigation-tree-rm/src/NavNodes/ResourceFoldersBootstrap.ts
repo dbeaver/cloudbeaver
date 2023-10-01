@@ -24,6 +24,13 @@ import {
 } from '@cloudbeaver/core-navigation-tree';
 import { ProjectInfoResource, ProjectsService } from '@cloudbeaver/core-projects';
 import {
+  CachedMapAllKey,
+  CachedTreeChildrenKey,
+  getCachedMapResourceLoaderState,
+  resourceKeyList,
+  ResourceKeyUtils,
+} from '@cloudbeaver/core-resource';
+import {
   getRmResourceKey,
   getRmResourcePath,
   NAV_NODE_TYPE_RM_PROJECT,
@@ -31,7 +38,6 @@ import {
   ResourceManagerResource,
   RESOURCES_NODE_PATH,
 } from '@cloudbeaver/core-resource-manager';
-import { CachedMapAllKey, CachedTreeChildrenKey, getCachedMapResourceLoaderState, resourceKeyList, ResourceKeyUtils } from '@cloudbeaver/core-sdk';
 import { createPath, getPathParent } from '@cloudbeaver/core-utils';
 import { ACTION_NEW_FOLDER, ActionService, DATA_CONTEXT_MENU, IAction, IDataContextProvider, MenuService } from '@cloudbeaver/core-view';
 import { DATA_CONTEXT_ELEMENTS_TREE, MENU_ELEMENTS_TREE_TOOLS } from '@cloudbeaver/plugin-navigation-tree';

@@ -7,8 +7,9 @@
  */
 import type { PermissionInfo } from '@cloudbeaver/core-administration';
 import { injectable } from '@cloudbeaver/core-di';
+import { CachedDataResource } from '@cloudbeaver/core-resource';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
-import { CachedDataResource, GraphQLService } from '@cloudbeaver/core-sdk';
+import { GraphQLService } from '@cloudbeaver/core-sdk';
 
 @injectable()
 export class ProjectPermissionsResource extends CachedDataResource<PermissionInfo[]> {

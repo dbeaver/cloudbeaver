@@ -30,7 +30,7 @@ import {
 } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
 import { isGlobalProject, ProjectInfoResource } from '@cloudbeaver/core-projects';
-import { CachedMapAllKey, resourceKeyList } from '@cloudbeaver/core-sdk';
+import { CachedMapAllKey, resourceKeyList } from '@cloudbeaver/core-resource';
 import { type TabContainerPanelComponent, useTab, useTabState } from '@cloudbeaver/core-ui';
 import { isDefined } from '@cloudbeaver/core-utils';
 

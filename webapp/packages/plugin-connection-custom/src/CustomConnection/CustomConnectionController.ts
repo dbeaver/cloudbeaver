@@ -11,7 +11,7 @@ import { ConnectionsManagerService, DBDriver, DBDriverResource } from '@cloudbea
 import { IInitializableController, injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { ProjectsService } from '@cloudbeaver/core-projects';
-import { CachedMapAllKey } from '@cloudbeaver/core-sdk';
+import { CachedMapAllKey } from '@cloudbeaver/core-resource';
 import { isArraysEqual } from '@cloudbeaver/core-utils';
 import { PublicConnectionFormService } from '@cloudbeaver/plugin-connections';
 
