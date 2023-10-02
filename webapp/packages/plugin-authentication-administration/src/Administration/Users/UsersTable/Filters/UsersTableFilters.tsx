@@ -7,80 +7,39 @@
  */
 import { observer } from 'mobx-react-lite';
 import { useState } from 'react';
-import styled, { css, use } from 'reshadow';
 
 import { AuthRolesResource } from '@cloudbeaver/core-authentication';
-import { Combobox, Filter, Group, IconOrImage, useResource, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
+import { Combobox, Filter, Group, IconOrImage, s, useResource, useS, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
 
+import style from './UsersTableFilters.m.css';
 import { IUserFilters, USER_ROLE_ALL, USER_STATUSES } from './useUsersTableFilters';
-
-const styles = css`
-  filter-container {
-    display: flex;
-    gap: 12px;
-  }
-
-  Filter {
-    flex: 1;
-  }
-
-  actions {
-    composes: theme-form-element-radius theme-background-surface theme-text-on-surface theme theme-border-color-background from global;
-    box-sizing: border-box;
-    border: 2px solid;
-    height: 32px;
-  }
-
-  button {
-    position: relative;
-    box-sizing: border-box;
-    background: inherit;
-    cursor: pointer;
-    width: 28px;
-    height: 100%;
-    padding: 4px;
-
-    &:hover {
-      opacity: 0.8;
-    }
-
-    &[|active] {
-      background: var(--theme-secondary);
-    }
-  }
-
-  IconOrImage {
-    width: 100%;
-    height: 100%;
-  }
-`;
-
 interface Props {
   filters: IUserFilters;
 }
 
 export const UsersTableFilters = observer<Props>(function UsersTableFilters({ filters }) {
+  const styles = useS(style);
   const translate = useTranslate();
-  const style = useStyles(styles);
   const authRolesResource = useResource(UsersTableFilters, AuthRolesResource, undefined);
 
   const [open, setOpen] = useState(false);
 
-  return styled(style)(
+  return (
     <Group parent compact gap>
-      <filter-container>
+      <div className={s(styles, { filterContainer: true })}>
         <Filter
           placeholder={translate('authentication_administration_users_filters_search_placeholder')}
           value={filters.search}
+          className={s(styles, { filter: true })}
           max
           onFilter={filters.setSearch}
         />
-        <actions>
-          <button {...use({ active: open })} onClick={() => setOpen(!open)}>
-            <IconOrImage icon="filter" />
+        <div className={s(styles, { actions: true })}>
+          <button className={s(styles, { button: true, active: open })} onClick={() => setOpen(!open)}>
+            <IconOrImage className={s(styles, { iconOrImage: true })} icon="filter" />
           </button>
-        </actions>
-      </filter-container>
+        </div>
+      </div>
 
       {open && (
         <Group box gap>
@@ -101,6 +60,6 @@ export const UsersTableFilters = observer<Props>(function UsersTableFilters({ fi
           )}
         </Group>
       )}
-    </Group>,
+    </Group>
   );
 });
