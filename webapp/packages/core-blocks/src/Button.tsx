@@ -7,9 +7,6 @@
  */
 import { observable } from 'mobx';
 import { observer } from 'mobx-react-lite';
-import styled, { css, use } from 'reshadow';
-
-import type { ComponentStyle } from '@cloudbeaver/core-theming';
 
 import style from './Button.m.css';
 import { IconOrImage } from './IconOrImage';
@@ -28,7 +25,6 @@ type ButtonProps = (React.ButtonHTMLAttributes<HTMLButtonElement | HTMLAnchorEle
   loading?: boolean;
   icon?: string;
   viewBox?: string;
-  styles?: ComponentStyle;
   mod?: ButtonMod;
   tag?: 'button' | 'a' | 'div';
   href?: string;
@@ -43,7 +39,6 @@ export const Button = observer<ButtonProps>(function Button({
   icon,
   viewBox,
   mod,
-  styles: oldStyles,
   tag = 'button',
   type = 'button',
   disabled = false,
@@ -85,12 +80,11 @@ export const Button = observer<ButtonProps>(function Button({
   }
 
   const Button = tag;
-  return styled(useStyles(oldStyles))(
+  return (
     <Button
       {...rest}
       type={type}
       disabled={disabled}
-      {...use({ loading })}
       className={s(
         styles,
         {
@@ -113,6 +107,6 @@ export const Button = observer<ButtonProps>(function Button({
       )}
       <span className={s(styles, { buttonLabel: true }, className)}>{children}</span>
       <Loader className={s(styles, { loader: true })} small />
-    </Button>,
+    </Button>
   );
 });

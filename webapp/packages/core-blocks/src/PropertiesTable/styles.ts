@@ -91,14 +91,3 @@ export const PROPERTIES_FILTER_STYLES = css`
     }
   }
 `;
-
-export const PROPERTIES_TABLE_ADD_STYLES = css`
-  button-icon {
-    margin-right: 0px !important;
-  }
-  button-label {
-    composes: theme-typography--caption from global;
-    text-transform: initial;
-    font-weight: 600;
-  }
-`;

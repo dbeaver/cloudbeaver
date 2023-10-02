@@ -16,7 +16,10 @@ import { useTranslate } from '../localization/useTranslate';
 import { useObjectRef } from '../useObjectRef';
 import type { IProperty } from './IProperty';
 import { PropertyItem } from './PropertyItem';
-import { PROPERTIES_FILTER_STYLES, PROPERTIES_TABLE_ADD_STYLES, PROPERTIES_TABLE_STYLES } from './styles';
+import { PROPERTIES_FILTER_STYLES, PROPERTIES_TABLE_STYLES } from './styles';
+import { SContext, StyleRegistry } from '../SContext';
+import { ButtonStyles } from '../index';
+import PropertiesTableAddButtonStyles from './PropertiesTableAddButtonStyles.m.css';
 
 type PropertiesState = Record<string, string | null>;
 
@@ -31,6 +34,16 @@ interface Props {
   className?: string;
   filterable?: boolean;
 }
+
+const registry: StyleRegistry = [
+  [
+    ButtonStyles,
+    {
+      mode: 'append',
+      styles: [PropertiesTableAddButtonStyles],
+    },
+  ],
+];
 
 export const PropertiesTable = observer<Props>(function PropertiesTable(props) {
   const { className, onAdd, readOnly, propertiesState } = props;
@@ -116,43 +129,45 @@ export const PropertiesTable = observer<Props>(function PropertiesTable(props) {
   const isKeyUnique = useCallback((key: string) => propsRef.properties.filter(property => property.key === key).length === 1, []);
 
   return styled(PROPERTIES_TABLE_STYLES)(
-    <properties className={className}>
-      <properties-header>
-        <properties-header-name>
-          <div>{translate('core_block_properties_table_name')}</div>
-          {props.filterable ? (
-            <Filter
-              value={filterValue}
-              placeholder={translate('core_block_properties_table_filter_name')}
-              style={PROPERTIES_FILTER_STYLES}
-              onFilter={setFilterValue}
+    <SContext registry={registry}>
+      <properties className={className}>
+        <properties-header>
+          <properties-header-name>
+            <div>{translate('core_block_properties_table_name')}</div>
+            {props.filterable ? (
+              <Filter
+                value={filterValue}
+                placeholder={translate('core_block_properties_table_filter_name')}
+                style={PROPERTIES_FILTER_STYLES}
+                onFilter={setFilterValue}
+              />
+            ) : null}
+          </properties-header-name>
+          <properties-header-value>{translate('core_block_properties_table_value')}</properties-header-value>
+        </properties-header>
+        <properties-list>
+          {onAdd && !readOnly && (
+            <properties-header-add>
+              <Button icon="add_sm" viewBox="0 0 18 18" type="button" onClick={() => onAdd()}>
+                {translate('core_block_properties_table_add')}
+              </Button>
+            </properties-header-add>
+          )}
+          {sortedProperties.get().map(property => (
+            <PropertyItem
+              key={property.id}
+              property={property}
+              value={propertiesState?.[property.key] ?? undefined}
+              error={!isKeyUnique(property.key)}
+              readOnly={readOnly}
+              onNameChange={changeName}
+              onValueChange={changeValue}
+              onRemove={removeProperty}
             />
-          ) : null}
-        </properties-header-name>
-        <properties-header-value>{translate('core_block_properties_table_value')}</properties-header-value>
-      </properties-header>
-      <properties-list>
-        {onAdd && !readOnly && (
-          <properties-header-add>
-            <Button icon="add_sm" viewBox="0 0 18 18" type="button" styles={PROPERTIES_TABLE_ADD_STYLES} onClick={() => onAdd()}>
-              {translate('core_block_properties_table_add')}
-            </Button>
-          </properties-header-add>
-        )}
-        {sortedProperties.get().map(property => (
-          <PropertyItem
-            key={property.id}
-            property={property}
-            value={propertiesState?.[property.key] ?? undefined}
-            error={!isKeyUnique(property.key)}
-            readOnly={readOnly}
-            onNameChange={changeName}
-            onValueChange={changeValue}
-            onRemove={removeProperty}
-          />
-        ))}
-        <properties-list-overflow />
-      </properties-list>
-    </properties>,
+          ))}
+          <properties-list-overflow />
+        </properties-list>
+      </properties>,
+    </SContext>
   );
 });
