@@ -55,12 +55,31 @@ export class UserFormConnectionAccessPart extends FormPart<AdminConnectionGrantI
   }
 
   protected override async saveChanges() {
+    const { connectionsToRevoke, connectionsToGrant } = this.getConnectionsDifferences(
+      this.getGrantedConnections(this.initialState),
+      this.getGrantedConnections(this.state),
+    );
+
     const userFormInfoPart = this.formState.dataContext.get(DATA_CONTEXT_USER_FORM_INFO_PART);
-    await this.usersResource.setConnections(userFormInfoPart.state.userId, this.getGrantedConnections(this.state));
+
+    if (connectionsToRevoke.length > 0) {
+      await this.usersResource.deleteConnectionsAccess(userFormInfoPart.state.userId, connectionsToRevoke);
+    }
+
+    if (connectionsToGrant.length > 0) {
+      await this.usersResource.addConnectionsAccess(userFormInfoPart.state.userId, connectionsToGrant);
+    }
   }
 
   private getGrantedConnections(state: AdminConnectionGrantInfo[]): string[] {
     return state.filter(connection => connection.subjectType !== AdminSubjectType.Team).map(connection => connection.dataSourceId);
+  }
+
+  private getConnectionsDifferences(current: string[], next: string[]): { connectionsToRevoke: string[]; connectionsToGrant: string[] } {
+    const connectionsToRevoke = current.filter(subjectId => !next.includes(subjectId));
+    const connectionsToGrant = next.filter(subjectId => !current.includes(subjectId));
+
+    return { connectionsToRevoke, connectionsToGrant };
   }
 
   protected override async loader() {

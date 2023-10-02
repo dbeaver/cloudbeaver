@@ -104,20 +104,24 @@ export class ConnectionAccessTabService extends Bootstrap {
 
     const key = createConnectionParam(data.state.projectId, config.connectionId);
 
-    const changed = await this.isChanged(key, state.grantedSubjects);
+    const currentGrantedSubjects = await this.connectionInfoResource.loadAccessSubjects(key);
+    const currentGrantedSubjectIds = currentGrantedSubjects.map(subject => subject.subjectId);
 
-    if (changed) {
-      if (state.initialGrantedSubjects.length > state.grantedSubjects.length) {
+    const { subjectsToRevoke, subjectsToGrant } = await this.getSubjectDifferences(currentGrantedSubjectIds, state.grantedSubjects);
 
-        const subjectsToRemove = state.initialGrantedSubjects.filter(subject => !state.grantedSubjects.includes(subject));
-        await this.connectionInfoResource.deleteConnectionsAccess(key, subjectsToRemove);
-      } else if (state.initialGrantedSubjects.length < state.grantedSubjects.length) {
-
-        const subjectsToAdd = state.grantedSubjects.filter(subject => !state.initialGrantedSubjects.includes(subject));
-        await this.connectionInfoResource.addConnectionsAccess(key, subjectsToAdd);
-      }
-      state.initialGrantedSubjects = state.grantedSubjects.slice();
+    if (subjectsToRevoke.length === 0 && subjectsToGrant.length === 0) {
+      return;
     }
+
+    if (subjectsToRevoke.length > 0) {
+      await this.connectionInfoResource.deleteConnectionsAccess(key, subjectsToRevoke);
+    }
+
+    if (subjectsToGrant.length > 0) {
+      await this.connectionInfoResource.addConnectionsAccess(key, subjectsToGrant);
+    }
+
+    state.initialGrantedSubjects = state.grantedSubjects.slice();
   }
 
   private async formState(data: IConnectionFormState, contexts: IExecutionContextProvider<IConnectionFormState>) {
@@ -145,5 +149,12 @@ export class ConnectionAccessTabService extends Bootstrap {
     }
 
     return current.some(value => !next.some(subjectId => subjectId === value.subjectId));
+  }
+
+  private async getSubjectDifferences(current: string[], next: string[]): Promise<{ subjectsToRevoke: string[]; subjectsToGrant: string[] }> {
+    const subjectsToRevoke = current.filter(subjectId => !next.includes(subjectId));
+    const subjectsToGrant = next.filter(subjectId => !current.includes(subjectId));
+
+    return { subjectsToRevoke, subjectsToGrant };
   }
 }

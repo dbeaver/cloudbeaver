@@ -95,15 +95,38 @@ export class GrantedConnectionsTabService extends Bootstrap {
       return;
     }
 
+    const { connectionsToRevoke, connectionsToGrant } = this.getConnectionsDifferences(state);
+
     try {
-      await this.graphQLService.sdk.setSubjectConnectionAccess({
-        subjectId: config.teamId,
-        connections: state.grantedSubjects,
-      });
+      if (connectionsToRevoke.length > 0) {
+        await this.graphQLService.sdk.deleteConnectionsAccess({
+          projectId: 'g_GlobalConfiguration',
+          subjects: [config.teamId],
+          connectionIds: connectionsToRevoke,
+        });
+      }
+
+      if (connectionsToGrant.length > 0) {
+        await this.graphQLService.sdk.addConnectionsAccess({
+          projectId: 'g_GlobalConfiguration',
+          subjects: [config.teamId],
+          connectionIds: connectionsToGrant,
+        });
+      }
 
       state.loaded = false;
     } catch (exception: any) {
       this.notificationService.logException(exception);
     }
+  }
+
+  private getConnectionsDifferences(state: IGrantedConnectionsTabState): { connectionsToRevoke: string[]; connectionsToGrant: string[] } {
+    const current = state.initialGrantedSubjects;
+    const next = state.grantedSubjects;
+
+    const connectionsToRevoke = current.filter(subjectId => !next.includes(subjectId));
+    const connectionsToGrant = next.filter(subjectId => !current.includes(subjectId));
+
+    return { connectionsToRevoke, connectionsToGrant };
   }
 }
