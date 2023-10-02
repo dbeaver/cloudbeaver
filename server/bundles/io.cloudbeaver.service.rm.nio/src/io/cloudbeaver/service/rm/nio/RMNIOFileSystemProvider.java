@@ -91,7 +91,8 @@ public class RMNIOFileSystemProvider extends NIOFileSystemProvider {
     }
 
     @Override
-    public RMByteArrayChannel newByteChannel(Path path, Set<? extends OpenOption> options, FileAttribute<?>... attrs) throws IOException {
+    public RMByteArrayChannel newByteChannel(Path path, Set<? extends OpenOption> options, FileAttribute<?>... attrs)
+        throws IOException {
         RMPath rmPath = (RMPath) path;
         if (Files.isDirectory(rmPath)) {
             throw new IllegalArgumentException("Cannot open channel for a folder");
@@ -115,7 +116,8 @@ public class RMNIOFileSystemProvider extends NIOFileSystemProvider {
     }
 
     @Override
-    public DirectoryStream<Path> newDirectoryStream(Path dir, DirectoryStream.Filter<? super Path> filter) throws IOException {
+    public DirectoryStream<Path> newDirectoryStream(Path dir, DirectoryStream.Filter<? super Path> filter)
+        throws IOException {
         RMPath rmDir = (RMPath) dir;
         String rmDirPath = rmDir.getResourcePath();
         String separator = rmDir.getFileSystem().getSeparator();
@@ -207,7 +209,9 @@ public class RMNIOFileSystemProvider extends NIOFileSystemProvider {
         RMPath rmSource = (RMPath) source;
         RMPath rmTarget = (RMPath) target;
         try {
-            rmController.moveResource(rmSource.getRmProjectId(), rmSource.getResourcePath(), rmTarget.getResourcePath());
+            rmController.moveResource(rmSource.getRmProjectId(),
+                rmSource.getResourcePath(),
+                rmTarget.getResourcePath());
         } catch (DBException e) {
             throw new IOException("Failed to move rm resource:  " + e.getMessage(), e);
         }
@@ -230,19 +234,7 @@ public class RMNIOFileSystemProvider extends NIOFileSystemProvider {
         if (rmPath.isRmRootPath()) {
             throw new IllegalArgumentException("Cannot create file store for path: " + path);
         }
-        if (rmPath.isProjectPath()) {
-            return new RMNIOProjectFileStore(rmPath.getFileSystem().getRmProject());
-        } else {
-            try {
-                RMResource rmResource = rmController.getResource(rmPath.getRmProjectId(), rmPath.getResourcePath());
-                if (rmResource == null) {
-                    throw new FileNotFoundException();
-                }
-                return new RMNIOResourceFileStore(rmResource);
-            } catch (DBException e) {
-                throw new IOException("Failed to ");
-            }
-        }
+        return new RMNIOProjectFileStore(rmPath.getFileSystem().getRmProject());
     }
 
     @Override
