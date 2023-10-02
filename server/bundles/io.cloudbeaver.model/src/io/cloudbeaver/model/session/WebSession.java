@@ -123,7 +123,6 @@ public class WebSession extends BaseWebSession
     private DBNModel navigatorModel;
     private final DBRProgressMonitor progressMonitor = new SessionProgressMonitor();
     private final Map<String, DBWSessionHandler> sessionHandlers;
-    private final DBFFileSystemManager fileSystemManager;
 
     public WebSession(
         @NotNull HttpSession httpSession,
@@ -134,7 +133,6 @@ public class WebSession extends BaseWebSession
         this.lastAccessTime = this.createTime;
         setLocale(CommonUtils.toString(httpSession.getAttribute(ATTR_LOCALE), this.locale));
         this.sessionHandlers = sessionHandlers;
-        this.fileSystemManager = new DBFFileSystemManager(getSessionContext());
     }
 
     @Override
@@ -242,7 +240,6 @@ public class WebSession extends BaseWebSession
         super.refreshUserData();
         refreshSessionAuth();
 
-        this.fileSystemManager.reloadFileSystems(getProgressMonitor());
         initNavigatorModel();
     }
 
@@ -330,7 +327,6 @@ public class WebSession extends BaseWebSession
 
         this.navigatorModel = new DBNModel(DBWorkbench.getPlatform(), getWorkspace().getProjects());
         this.navigatorModel.setModelAuthContext(getWorkspace().getAuthContext());
-        this.navigatorModel.setFileSystemManager(this.fileSystemManager);
         this.navigatorModel.initialize();
 
         this.locale = Locale.getDefault().getLanguage();
@@ -621,7 +617,6 @@ public class WebSession extends BaseWebSession
             log.error("Error closing web session tokens");
         }
         this.userContext.setUser(null);
-        this.fileSystemManager.close();
         super.close();
     }
 
@@ -936,11 +931,6 @@ public class WebSession extends BaseWebSession
     }
 
     @NotNull
-    public DBFFileSystemManager getFileSystemManager() {
-        return fileSystemManager;
-    }
-
-    @NotNull
     @Override
     public String getAuthContextType() {
         return WEB_SESSION_AUTH_CONTEXT_TYPE;
@@ -1052,6 +1042,15 @@ public class WebSession extends BaseWebSession
         for (DBPDataSourceContainer c : projectConnections) {
             removeConnection(new WebConnectionInfo(this, c));
         }
+    }
+
+    @NotNull
+    public DBFFileSystemManager getFileSystemManager(String projectId) throws DBException {
+        var project = getProjectById(projectId);
+        if (project == null) {
+            throw new DBException("Project not found: " + projectId);
+        }
+        return project.getFileSystemManager();
     }
 
     private class SessionProgressMonitor extends BaseProgressMonitor {

@@ -29,28 +29,62 @@ import java.net.URI;
  */
 public interface DBWServiceFS extends DBWService {
     @NotNull
-    String[] getAvailableFileSystems(@NotNull WebSession webSession);
+    String[] getAvailableFileSystems(@NotNull WebSession webSession, @NotNull String projectId) throws DBWebException;
 
     @NotNull
-    FSFile getFile(@NotNull WebSession webSession, @NotNull URI fileURI) throws DBWebException;
+    FSFile getFile(
+        @NotNull WebSession webSession,
+        @NotNull String projectId,
+        @NotNull URI fileURI
+    ) throws DBWebException;
 
     @NotNull
-    FSFile[] getFiles(@NotNull WebSession webSession, @NotNull URI folderURI) throws DBWebException;
+    FSFile[] getFiles(
+        @NotNull WebSession webSession,
+        @NotNull String projectId,
+        @NotNull URI folderURI
+    ) throws DBWebException;
 
     @NotNull
-    String readFileContent(@NotNull WebSession webSession, @NotNull URI fileURI) throws DBWebException;
+    String readFileContent(
+        @NotNull WebSession webSession,
+        @NotNull String projectId,
+        @NotNull URI fileURI
+    ) throws DBWebException;
+
+    boolean writeFileContent(
+        @NotNull WebSession webSession,
+        @NotNull String projectId,
+        @NotNull URI fileURI,
+        @NotNull String data,
+        boolean forceOverwrite
+    ) throws DBWebException;
 
     @NotNull
-    boolean writeFileContent(@NotNull WebSession webSession, @NotNull URI fileURI, @NotNull String data, boolean forceOverwrite) throws DBWebException;
+    FSFile createFile(
+        @NotNull WebSession webSession,
+        @NotNull String projectId,
+        @NotNull URI fileURI
+    ) throws DBWebException;
+
+    FSFile moveFile(
+        @NotNull WebSession webSession,
+        @NotNull String projectId,
+        @NotNull URI fromURI,
+        @NotNull URI toURI
+    ) throws DBWebException;
 
     @NotNull
-    FSFile createFile(@NotNull WebSession webSession, @NotNull URI fileURI) throws DBWebException;
+    FSFile createFolder(
+        @NotNull WebSession webSession,
+        @NotNull String projectId,
+        @NotNull URI folderURI
+    ) throws DBWebException;
 
-    FSFile moveFile(@NotNull WebSession webSession, @NotNull URI fromURI, @NotNull URI toURI) throws DBWebException;
-
-    @NotNull
-    FSFile createFolder(@NotNull WebSession webSession, @NotNull URI folderURI) throws DBWebException;
-
-    boolean deleteFile(@NotNull WebSession webSession, @NotNull URI fileURI) throws DBWebException;
+    boolean deleteFile(
+        @NotNull WebSession webSession,
+        @NotNull String projectId,
+        @NotNull URI fileURI
+    ) throws DBWebException;
 
 }

@@ -37,33 +37,55 @@ public class WebServiceBindingFS extends WebServiceBindingBase<DBWServiceFS> {
     public void bindWiring(DBWBindingContext model) throws DBWebException {
         model.getQueryType()
             .dataFetcher("fsListFileSystems",
-                env -> getService(env).getAvailableFileSystems(getWebSession(env)))
+                env -> getService(env).getAvailableFileSystems(getWebSession(env), env.getArgument("projectId")))
             .dataFetcher("fsFile",
-                env -> getService(env).getFile(getWebSession(env), env.getArgument("fileURI")))
+                env -> getService(env).getFile(getWebSession(env),
+                    env.getArgument("projectId"),
+                    env.getArgument("fileURI"))
+            )
             .dataFetcher("fsListFiles",
-                env -> getService(env).getFiles(getWebSession(env), env.getArgument("folderURI")))
+                env -> getService(env).getFiles(getWebSession(env),
+                    env.getArgument("projectId"),
+                    env.getArgument("folderURI"))
+            )
             .dataFetcher("fsReadFileContentAsString",
-                env -> getService(env).readFileContent(getWebSession(env), env.getArgument("fileURI")))
+                env -> getService(env).readFileContent(getWebSession(env),
+                    env.getArgument("projectId"),
+                    env.getArgument("fileURI"))
+            )
         ;
         model.getMutationType()
             .dataFetcher("fsCreateFile",
-                env -> getService(env).createFile(getWebSession(env), env.getArgument("fileURI")))
+                env -> getService(env).createFile(getWebSession(env),
+                    env.getArgument("projectId"),
+                    env.getArgument("fileURI"))
+            )
             .dataFetcher("fsCreateFolder",
-                env -> getService(env).createFolder(getWebSession(env), env.getArgument("folderURI")))
+                env -> getService(env).createFolder(getWebSession(env),
+                    env.getArgument("projectId"),
+                    env.getArgument("folderURI"))
+            )
             .dataFetcher("fsDeleteFile",
-                env -> getService(env).deleteFile(getWebSession(env), env.getArgument("fileURI")))
+                env -> getService(env).deleteFile(getWebSession(env),
+                    env.getArgument("projectId"),
+                    env.getArgument("fileURI"))
+            )
             .dataFetcher("fsMoveFile",
                 env -> getService(env).moveFile(
                     getWebSession(env),
+                    env.getArgument("projectId"),
                     env.getArgument("fromURI"),
-                    env.getArgument("toURI")
-                ))
+                    env.getArgument("toURI"))
+            )
             .dataFetcher("fsWriteFileStringContent",
                 env -> getService(env).writeFileContent(
                     getWebSession(env),
+                    env.getArgument("projectId"),
                     env.getArgument("fileURI"),
                     env.getArgument("data"),
                     CommonUtils.toBoolean(env.getArgument("forceOverwrite"))
-                ));
+                )
+            )
+        ;
     }
 }
