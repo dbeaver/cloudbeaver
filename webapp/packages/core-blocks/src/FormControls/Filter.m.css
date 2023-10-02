@@ -2,7 +2,6 @@
   position: relative;
   min-width: 24px;
   min-height: 24px;
-  flex: 1;
 }
 .inputField {
   display: none;
