@@ -37,6 +37,7 @@
   overflow: hidden;
 }
 .pane {
+  border-radius: var(--theme-group-element-radius);
   &:first-child {
     position: relative;
   }
