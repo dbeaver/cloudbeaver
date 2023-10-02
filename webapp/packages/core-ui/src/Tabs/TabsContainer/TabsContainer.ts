@@ -46,7 +46,7 @@ export class TabsContainer<TProps = void, TOptions extends Record<string, any> =
       return;
     }
 
-    const info = this.getTabInfo(tabId);
+    const info = this.getDisplayedTabInfo(tabId, props);
 
     if (!info) {
       return;
@@ -65,13 +65,37 @@ export class TabsContainer<TProps = void, TOptions extends Record<string, any> =
   }
 
   getTabState<T>(state: MetadataMap<string, any>, tabId: string, props: TProps, valueGetter?: MetadataValueGetter<string, T>): T {
-    const tabInfo = this.getTabInfo(tabId);
+    const tabInfo = this.getDisplayedTabInfo(tabId, props);
 
     return state.get(tabId, valueGetter || tabInfo?.stateGetter?.(props));
   }
 
   getDisplayed(props?: TProps): Array<ITabInfo<TProps, TOptions>> {
     return this.tabInfoList.filter(tabInfo => !tabInfo.isHidden?.(tabInfo.key, props));
+  }
+
+  getDisplayedTabInfo(tabId: string, props?: TProps): ITabInfo<TProps, TOptions> | undefined {
+    if (this.tabInfoMap.has(tabId)) {
+      return this.getTabInfo(tabId);
+    }
+
+    const displayed = this.getDisplayed(props);
+
+    for (const tabInfo of displayed) {
+      if (tabInfo.generator) {
+        const generated = tabInfo.generator(tabInfo.key, props);
+
+        if (generated.includes(tabId)) {
+          return tabInfo;
+        }
+      } else {
+        if (tabInfo.key === tabId) {
+          return tabInfo;
+        }
+      }
+    }
+
+    return undefined;
   }
 
   getIdList(props?: TProps): string[] {

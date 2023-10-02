@@ -13,9 +13,9 @@ import {
   Button,
   Container,
   Fill,
+  Form,
   InputField,
   s,
-  SubmittingForm,
   Translate,
   useFocus,
   useObservableRef,
@@ -156,7 +156,7 @@ export const FolderDialog: DialogComponent<FolderDialogPayload, IFolderDialogRes
     <CommonDialogWrapper size="small" className={className} fixedWidth>
       <CommonDialogHeader subTitle={subTitle} title={title} icon={icon} viewBox={viewBox} bigIcon={bigIcon} onReject={rejectDialog} />
       <CommonDialogBody>
-        <SubmittingForm ref={focusedRef} onSubmit={resolveHandler}>
+        <Form ref={focusedRef} onSubmit={resolveHandler}>
           <Container center gap>
             {selectProject && <ProjectSelect value={state.projectId} filter={filterProject} onChange={projectId => state.setProjectId(projectId)} />}
             <InputField
@@ -170,7 +170,7 @@ export const FolderDialog: DialogComponent<FolderDialogPayload, IFolderDialogRes
               {translate('ui_name') + ':'}
             </InputField>
           </Container>
-        </SubmittingForm>
+        </Form>
       </CommonDialogBody>
       <CommonDialogFooter className={s(styles, { footer: true })}>
         <Button type="button" mod={['outlined']} onClick={rejectDialog}>

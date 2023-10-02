@@ -24,15 +24,7 @@ import {
   ServerConfigResource,
 } from '@cloudbeaver/core-root';
 import { getCachedMapResourceLoaderState } from '@cloudbeaver/core-sdk';
-import {
-  ACTION_DELETE,
-  ActionService,
-  DATA_CONTEXT_LOADABLE_STATE,
-  DATA_CONTEXT_MENU,
-  DATA_CONTEXT_MENU_NESTED,
-  MenuSeparatorItem,
-  MenuService,
-} from '@cloudbeaver/core-view';
+import { ACTION_DELETE, ActionService, DATA_CONTEXT_MENU, DATA_CONTEXT_MENU_NESTED, MenuSeparatorItem, MenuService } from '@cloudbeaver/core-view';
 import { MENU_APP_ACTIONS } from '@cloudbeaver/plugin-top-app-bar';
 
 import { ConnectionAuthService } from '../ConnectionAuthService';
@@ -215,12 +207,14 @@ export class ConnectionMenuBootstrap extends Bootstrap {
         return false;
       },
       getLoader: (context, action) => {
-        const state = context.get(DATA_CONTEXT_LOADABLE_STATE);
         const connection = context.get(DATA_CONTEXT_CONNECTION);
 
         if (action === ACTION_CONNECTION_CHANGE_CREDENTIALS) {
-          return state.getState(action.id, () =>
-            getCachedMapResourceLoaderState(this.connectionInfoResource, createConnectionParam(connection), ['includeCredentialsSaved'], true),
+          return getCachedMapResourceLoaderState(
+            this.connectionInfoResource,
+            () => createConnectionParam(connection),
+            () => ['includeCredentialsSaved' as const],
+            true,
           );
         }
 

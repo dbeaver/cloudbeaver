@@ -36,7 +36,12 @@
     {
       "label": "Build CE",
       "type": "shell",
-      "command": "./build-sqlite.bat",
+      "windows": {
+        "command": "./build-sqlite.bat"
+      },
+      "osx": {
+        "command": "./build-sqlite.sh"
+      },
       "options": {
         "cwd": "${workspaceFolder}/deploy"
       },

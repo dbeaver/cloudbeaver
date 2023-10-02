@@ -71,6 +71,7 @@ export interface IElementsTreeOptions {
   renderers?: IElementsTreeCustomRenderer[];
   nodeInfoTransformers?: IElementsTreeCustomNodeInfo[];
   expandStateGetters?: IElementsTreeNodeExpandInfoGetter[];
+  /** Allows to pass external state. It can be used to manipulate a tree state from the outside or to store it in an external state */
   localState?: MetadataMap<string, ITreeNodeState>;
   getChildren: (id: string) => string[] | undefined;
   loadChildren: (id: string, manual: boolean) => Promise<boolean>;
