@@ -16,12 +16,12 @@
  */
 package io.cloudbeaver.service.sql;
 
-import io.cloudbeaver.service.DBWService;
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.WebAction;
 import io.cloudbeaver.model.WebAsyncTaskInfo;
 import io.cloudbeaver.model.WebConnectionInfo;
 import io.cloudbeaver.model.session.WebSession;
+import io.cloudbeaver.service.DBWService;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
@@ -123,6 +123,12 @@ public interface DBWServiceSQL extends DBWService {
             @NotNull String resultsId,
             @NotNull Integer lobColumnIndex,
             @Nullable List<WebSQLResultsRow> row) throws DBWebException;
+
+    @WebAction
+    void writeLobValue(
+        @NotNull WebSQLContextInfo contextInfo,
+        @NotNull String resultsId,
+        @Nullable List<WebSQLResultsRow> row) throws DBWebException;
 
     @WebAction
     String updateResultsDataBatchScript(

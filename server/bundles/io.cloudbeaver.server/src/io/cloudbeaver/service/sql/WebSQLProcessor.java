@@ -742,6 +742,15 @@ public class WebSQLProcessor implements WebSessionProvider {
         }
     }
 
+    public void writeLobValue(
+        @NotNull DBRProgressMonitor monitor,
+        @NotNull WebSQLContextInfo contextInfo,
+        @NotNull String resultsId,
+        @Nullable List<WebSQLResultsRow> row
+    ) throws DBException {
+        updateResultsDataBatch(monitor, contextInfo, resultsId, row, null, null, null);
+    }
+
     ////////////////////////////////////////////////
     // Misc
 
