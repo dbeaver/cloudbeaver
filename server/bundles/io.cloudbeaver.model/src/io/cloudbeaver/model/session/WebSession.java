@@ -76,15 +76,15 @@ import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.dbeaver.runtime.jobs.DisconnectJob;
 import org.jkiss.utils.CommonUtils;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 import java.lang.reflect.InvocationTargetException;
 import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 /**
  * Web session.
@@ -1017,6 +1017,9 @@ public class WebSession extends BaseWebSession
     }
 
     public void deleteSessionProject(@Nullable WebProjectImpl project) {
+        if (project != null) {
+            project.dispose();
+        }
         getWorkspace().removeProject(project);
         if (navigatorModel != null) {
             navigatorModel.getRoot().removeProject(project);
