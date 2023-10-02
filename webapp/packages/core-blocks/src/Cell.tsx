@@ -7,8 +7,6 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import type { ComponentStyle } from '@cloudbeaver/core-theming';
-
 import style from './Cell.m.css';
 import { s } from './s';
 import { useS } from './useS';
@@ -17,7 +15,6 @@ interface Props {
   description?: React.ReactElement | string;
   before?: React.ReactElement;
   after?: React.ReactElement;
-  style?: ComponentStyle;
   ripple?: boolean;
   className?: string;
   children?: React.ReactNode;
@@ -27,7 +24,7 @@ export const Cell = observer<Props>(function Cell({ before, after, description, 
   const styles = useS(style);
 
   return (
-    <cell className={s(styles, { ripple }, className)}>
+    <div className={s(styles, { ripple }, className)}>
       <main className={s(styles, { main: true })}>
         <div className={s(styles, { before: true })}>{before}</div>
         <div className={s(styles, { info: true })}>
@@ -36,6 +33,6 @@ export const Cell = observer<Props>(function Cell({ before, after, description, 
         </div>
         <div className={s(styles, { after: true })}>{after}</div>
       </main>
-    </cell>
+    </div>
   );
 });

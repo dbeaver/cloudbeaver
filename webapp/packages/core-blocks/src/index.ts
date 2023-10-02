@@ -161,6 +161,7 @@ export * from './FormControls/useForm';
 export * from './FormControls/Textarea';
 export * from './Link';
 export * from './Cell';
+export { default as CellStyles } from './Cell.m.css';
 export * from './UploadArea';
 export * from './ErrorMessage';
 export * from './preventFocusHandler';
