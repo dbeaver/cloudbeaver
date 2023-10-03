@@ -33,15 +33,7 @@ import {
 } from '@cloudbeaver/core-resource-manager';
 import { CachedMapAllKey, CachedTreeChildrenKey, getCachedMapResourceLoaderState, resourceKeyList, ResourceKeyUtils } from '@cloudbeaver/core-sdk';
 import { createPath, getPathParent } from '@cloudbeaver/core-utils';
-import {
-  ACTION_NEW_FOLDER,
-  ActionService,
-  DATA_CONTEXT_LOADABLE_STATE,
-  DATA_CONTEXT_MENU,
-  IAction,
-  IDataContextProvider,
-  MenuService,
-} from '@cloudbeaver/core-view';
+import { ACTION_NEW_FOLDER, ActionService, DATA_CONTEXT_MENU, IAction, IDataContextProvider, MenuService } from '@cloudbeaver/core-view';
 import { DATA_CONTEXT_ELEMENTS_TREE, MENU_ELEMENTS_TREE_TOOLS } from '@cloudbeaver/plugin-navigation-tree';
 import { FolderDialog } from '@cloudbeaver/plugin-projects';
 import { ResourceManagerService } from '@cloudbeaver/plugin-resource-manager';
@@ -96,9 +88,7 @@ export class ResourceFoldersBootstrap extends Bootstrap {
         return true;
       },
       getLoader: (context, action) => {
-        const state = context.get(DATA_CONTEXT_LOADABLE_STATE);
-
-        return state.getState(action.id, () => getCachedMapResourceLoaderState(this.projectInfoResource, CachedMapAllKey));
+        return getCachedMapResourceLoaderState(this.projectInfoResource, () => CachedMapAllKey);
       },
       isDisabled: context => this.getTargetNode(context) === undefined,
       handler: this.elementsTreeActionHandler.bind(this),

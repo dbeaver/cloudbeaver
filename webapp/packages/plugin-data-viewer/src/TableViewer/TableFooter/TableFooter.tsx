@@ -9,7 +9,7 @@ import { observer } from 'mobx-react-lite';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import styled, { css, use } from 'reshadow';
 
-import { SubmittingForm, ToolsPanel } from '@cloudbeaver/core-blocks';
+import { Form, getComputed, ToolsPanel } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import type { IDataContext } from '@cloudbeaver/core-view';
 
@@ -99,7 +99,7 @@ export const TableFooter = observer<Props>(function TableFooter({ resultIndex, m
     }
   }, [model.countGain]);
 
-  const disabled = model.isLoading() || model.isDisabled(resultIndex);
+  const disabled = getComputed(() => model.isLoading() || model.isDisabled(resultIndex));
 
   return styled(tableFooterStyles)(
     <ToolsPanel>
@@ -108,7 +108,7 @@ export const TableFooter = observer<Props>(function TableFooter({ resultIndex, m
       </reload> */}
       <AutoRefreshButton model={model} disabled={disabled} />
       <count>
-        <SubmittingForm onSubmit={handleChange}>
+        <Form onSubmit={handleChange}>
           <input
             ref={ref}
             type="number"
@@ -120,7 +120,7 @@ export const TableFooter = observer<Props>(function TableFooter({ resultIndex, m
             onBlur={handleChange}
             {...use({ mod: 'surface' })}
           />
-        </SubmittingForm>
+        </Form>
       </count>
       <TableFooterMenu model={model} resultIndex={resultIndex} simple={simple} context={context} />
       {model.source.requestInfo.requestMessage.length > 0 && (

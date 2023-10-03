@@ -1,6 +1,6 @@
 {
   "parser": "@typescript-eslint/parser",
-  "plugins": ["@typescript-eslint"],
+  "plugins": ["@typescript-eslint/eslint-plugin"],
   "overrides": [
     {
       "files": ["**/*.cjs"],
@@ -29,7 +29,7 @@
     "default-param-last": "off",
     "func-call-spacing": "off",
     "keyword-spacing": "off",
-    "no-duplicate-imports": "off",
+    "no-duplicate-imports": "error",
     "object-curly-spacing": "off",
     "quotes": "off",
     "space-before-function-paren": "off",
@@ -59,7 +59,7 @@
     "@typescript-eslint/ban-ts-comment": "off",
     "@typescript-eslint/no-for-in-array": "off",
     "@typescript-eslint/no-use-before-define": "off",
-    "@typescript-eslint/no-unused-vars": "warn",
+    "@typescript-eslint/no-unused-vars": ["warn", { "destructuredArrayIgnorePattern": "^_" }],
     "@typescript-eslint/no-non-null-assertion": "off",
     "@typescript-eslint/explicit-function-return-type": "off",
     "@typescript-eslint/no-empty-function": "off",
@@ -88,7 +88,6 @@
     "@typescript-eslint/default-param-last": ["error"],
     "@typescript-eslint/func-call-spacing": ["error"],
     "@typescript-eslint/keyword-spacing": ["error"],
-    "@typescript-eslint/no-duplicate-imports": ["error"],
     "@typescript-eslint/object-curly-spacing": ["error", "always"],
     "@typescript-eslint/quotes": [
       "error",

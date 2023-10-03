@@ -5,24 +5,28 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { create } from 'reshadow';
 
 import { useService } from '@cloudbeaver/core-di';
-import { BaseStyles, ComponentStyle, Style, ThemeService } from '@cloudbeaver/core-theming';
+import { BaseStyles, ClassCollection, ComponentStyle, Style, ThemeSelector, ThemeService } from '@cloudbeaver/core-theming';
+import { MetadataMap } from '@cloudbeaver/core-utils';
 
 import { useExecutor } from './useExecutor';
+
+const stylesCache = new MetadataMap<string, Map<ThemeSelector<any>, Promise<undefined | BaseStyles | BaseStyles[]>>>(() => new Map());
 
 /**
  * Changes styles depending on theme
  *
  * @param componentStyles styles array
+ * @deprecated use useS and css-modules instead
  */
 export function useStyles(...componentStyles: ComponentStyle[]): Record<string, any> {
   // todo do you understand that we store ALL STYLES in each component that uses this hook?
 
+  const [, forceUpdate] = useState(0);
   const stylesRef = useRef<ComponentStyle[]>([]);
-  const [patch, forceUpdate] = useState(0);
   const loadedStyles = useRef<BaseStyles[]>([]);
   const themeService = useService(ThemeService);
   const [currentThemeId, setCurrentThemeId] = useState(() => themeService.currentThemeId);
@@ -42,6 +46,8 @@ export function useStyles(...componentStyles: ComponentStyle[]): Record<string, 
     ],
   });
 
+  const themedStyles: Array<Promise<undefined | BaseStyles | BaseStyles[]>> = [];
+  const staticStyles: BaseStyles[] = [];
   let changed = lastThemeRef.current !== currentThemeId || filteredStyles.length !== stylesRef.current.length;
   for (let i = 0; !changed && i < filteredStyles.length; i++) {
     changed = stylesRef.current[i] !== filteredStyles[i];
@@ -50,11 +56,20 @@ export function useStyles(...componentStyles: ComponentStyle[]): Record<string, 
   if (changed) {
     stylesRef.current = filteredStyles;
     lastThemeRef.current = currentThemeId;
-    const staticStyles: BaseStyles[] = [];
-    const themedStyles: Array<Promise<undefined | BaseStyles | BaseStyles[]>> = [];
 
     for (const style of filteredStyles) {
-      const data = typeof style === 'object' ? style : style(currentThemeId);
+      let data: ClassCollection<Record<string, string>> | Promise<undefined | BaseStyles | BaseStyles[]>;
+
+      if (typeof style === 'object') {
+        data = style;
+      } else {
+        if (!stylesCache.get(currentThemeId).has(style)) {
+          data = style(currentThemeId);
+          stylesCache.get(currentThemeId).set(style, style(currentThemeId));
+        } else {
+          data = stylesCache.get(currentThemeId).get(style)!;
+        }
+      }
 
       if (data instanceof Promise) {
         themedStyles.push(data);
@@ -63,16 +78,18 @@ export function useStyles(...componentStyles: ComponentStyle[]): Record<string, 
       }
     }
     loadedStyles.current = staticStyles.flat(Infinity);
-
-    if (themedStyles.length > 0) {
-      Promise.all(themedStyles).then(styles => {
-        loadedStyles.current = [staticStyles, styles].flat(Infinity).filter(Boolean) as BaseStyles[];
-        forceUpdate(patch + 1);
-      });
-    }
   }
 
-  const styles = useMemo(() => create(loadedStyles.current), [patch, loadedStyles.current]);
+  useEffect(() => {
+    if (changed && themedStyles.length > 0) {
+      Promise.all(themedStyles).then(styles => {
+        loadedStyles.current = [staticStyles, styles].flat(Infinity).filter(Boolean) as BaseStyles[];
+        forceUpdate(i => i + 1);
+      });
+    }
+  });
+
+  const styles = useMemo(() => create(loadedStyles.current), [loadedStyles.current]);
 
   return styles; // todo this method is called in each rerender
 }

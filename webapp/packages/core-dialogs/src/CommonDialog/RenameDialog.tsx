@@ -8,9 +8,8 @@
 import { observable } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import { useEffect } from 'react';
-import styled, { css } from 'reshadow';
 
-import { Button, Container, InputField, SubmittingForm, useFocus, useObservableRef, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
+import { Button, Container, Fill, Form, InputField, s, useFocus, useObservableRef, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import { throttleAsync } from '@cloudbeaver/core-utils';
 
 import { CommonDialogBody } from './CommonDialog/CommonDialogBody';
@@ -18,16 +17,7 @@ import { CommonDialogFooter } from './CommonDialog/CommonDialogFooter';
 import { CommonDialogHeader } from './CommonDialog/CommonDialogHeader';
 import { CommonDialogWrapper } from './CommonDialog/CommonDialogWrapper';
 import type { DialogComponent } from './CommonDialogService';
-
-const style = css`
-  CommonDialogFooter {
-    align-items: center;
-  }
-
-  fill {
-    flex: 1;
-  }
-`;
+import style from './RenameDialog.m.css';
 
 interface IRenameDialogState {
   value: string;
@@ -59,6 +49,7 @@ export const RenameDialog: DialogComponent<RenameDialogPayload, string> = observ
 }) {
   const translate = useTranslate();
   const [focusedRef] = useFocus<HTMLFormElement>({ focusFirstChild: true });
+  const styles = useS(style);
 
   const { icon, subTitle, bigIcon, viewBox, value, objectName, create, confirmActionText } = payload;
   let { title } = payload;
@@ -102,27 +93,27 @@ export const RenameDialog: DialogComponent<RenameDialogPayload, string> = observ
 
   const errorMessage = state.valid ? ' ' : translate(state.message ?? 'ui_rename_taken_or_invalid');
 
-  return styled(useStyles(style))(
+  return (
     <CommonDialogWrapper size="small" className={className} fixedWidth>
       <CommonDialogHeader title={title} subTitle={subTitle} icon={icon} viewBox={viewBox} bigIcon={bigIcon} onReject={rejectDialog} />
       <CommonDialogBody>
-        <SubmittingForm ref={focusedRef} onSubmit={() => resolveDialog(state.value)}>
+        <Form ref={focusedRef} onSubmit={() => resolveDialog(state.value)}>
           <Container center>
             <InputField name="value" state={state} error={!state.valid} description={errorMessage} onChange={() => state.validate()}>
               {translate('ui_name') + ':'}
             </InputField>
           </Container>
-        </SubmittingForm>
+        </Form>
       </CommonDialogBody>
-      <CommonDialogFooter>
+      <CommonDialogFooter className={s(styles, { footer: true })}>
         <Button type="button" mod={['outlined']} onClick={rejectDialog}>
           {translate('ui_processing_cancel')}
         </Button>
-        <fill />
+        <Fill />
         <Button type="button" mod={['unelevated']} disabled={!state.valid} onClick={() => resolveDialog(state.value)}>
           {translate(confirmActionText || (create ? 'ui_create' : 'ui_rename'))}
         </Button>
       </CommonDialogFooter>
-    </CommonDialogWrapper>,
+    </CommonDialogWrapper>
   );
 });

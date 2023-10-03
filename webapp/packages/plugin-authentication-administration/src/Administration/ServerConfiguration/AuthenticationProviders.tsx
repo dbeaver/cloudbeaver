@@ -51,7 +51,7 @@ export const AuthenticationProviders: PlaceholderComponent<IConfigurationPlaceho
   const isAnonymousAccessDisabled = authSettingsService.settings.getValue('disableAnonymousAccess');
 
   useExecutor({
-    executor: formContext.changeExecutor,
+    executor: formContext.onChange,
     handlers: [
       function switchControls() {
         if (serverConfig.enabledAuthProviders?.length === 0) {

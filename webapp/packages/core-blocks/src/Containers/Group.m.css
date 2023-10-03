@@ -31,4 +31,8 @@
   &.center {
     margin: 0 auto;
   }
+
+  &.overflow {
+    overflow: auto;
+  }
 }

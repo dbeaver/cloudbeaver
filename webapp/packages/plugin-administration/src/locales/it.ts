@@ -42,10 +42,7 @@ export default [
 
   ['administration_configuration_wizard_configuration_plugins', 'Configurazione'],
   ['administration_configuration_wizard_configuration_custom_connections', 'Abilita connessioni custom'],
-  [
-    'administration_configuration_wizard_configuration_custom_connections_description',
-    "Permette agli utenti di creare connessioni custom. Altrimenti tutte le nuvoe connessioni saranno create solo dall'amministratore",
-  ],
+  ['administration_configuration_wizard_configuration_custom_connections_description', 'Permette agli utenti di creare connessioni custom'],
   ['administration_configuration_wizard_configuration_navigation_tree_view', 'Vista semplice del navigatore'],
   [
     'administration_configuration_wizard_configuration_navigation_tree_view_description',

@@ -10,7 +10,7 @@ import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
 import { ProjectInfoResource } from '@cloudbeaver/core-projects';
 import { CachedMapAllKey, getCachedMapResourceLoaderState } from '@cloudbeaver/core-sdk';
-import { ActionService, DATA_CONTEXT_LOADABLE_STATE, MenuService } from '@cloudbeaver/core-view';
+import { ActionService, MenuService } from '@cloudbeaver/core-view';
 import { MENU_CONNECTIONS } from '@cloudbeaver/plugin-connections';
 
 import { ACTION_CONNECTION_CUSTOM } from './Actions/ACTION_CONNECTION_CUSTOM';
@@ -51,9 +51,7 @@ export class CustomConnectionPluginBootstrap extends Bootstrap {
         return false;
       },
       getLoader: (context, action) => {
-        const state = context.get(DATA_CONTEXT_LOADABLE_STATE);
-
-        return state.getState(action.id, () => getCachedMapResourceLoaderState(this.projectInfoResource, CachedMapAllKey));
+        return getCachedMapResourceLoaderState(this.projectInfoResource, () => CachedMapAllKey);
       },
       handler: async (context, action) => {
         switch (action) {

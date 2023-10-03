@@ -11,17 +11,25 @@ import { useContext } from 'react';
 import { useExecutor, useObjectRef, useObservableRef } from '@cloudbeaver/core-blocks';
 import { EventContext, EventStopPropagationFlag } from '@cloudbeaver/core-events';
 
+import { TabContext } from '../TabContext';
 import type { ITabData } from '../TabsContainer/ITabsContainer';
 import { TabsContext } from '../TabsContext';
 
 export function useTab(
-  tabId: string,
+  tabId?: string,
   onOpen?: (tab: ITabData<any>) => Promise<void> | void,
   onClose?: (tab: ITabData<any>) => Promise<void> | void,
   onClick?: (tabId: string) => void,
 ) {
   const state = useContext(TabsContext);
+  const tabContext = useContext(TabContext);
   const refObject = useObjectRef({ onClick });
+
+  tabId = tabId || tabContext?.tabId;
+
+  if (tabId === undefined) {
+    throw new Error('Tab id not provided');
+  }
 
   if (!state) {
     throw new Error('TabsContext not provided');
@@ -71,7 +79,7 @@ export function useTab(
       },
       handleClose(e: React.MouseEvent<HTMLDivElement>) {
         EventContext.set(e, EventStopPropagationFlag); // TODO: probably should use special flag
-        this.state.close(tabId);
+        this.state.close(this.tabId);
       },
     }),
     {

@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 import { action, observable } from 'mobx';
-import { useEffect } from 'react';
+import { useLayoutEffect } from 'react';
 
 import { useObjectRef } from './useObjectRef';
 import { useObservableRef } from './useObservableRef';
@@ -38,8 +38,6 @@ export function useFocus<T extends HTMLElement>({ autofocus, focusFirstChild, on
       setRef(ref: T | null) {
         if (this.reference !== ref) {
           this.reference = ref;
-
-          this.updateFocus();
         }
       },
       updateFocus() {
@@ -64,12 +62,12 @@ export function useFocus<T extends HTMLElement>({ autofocus, focusFirstChild, on
       focusFirstChild() {
         if (this.reference !== null && optionsRef.focusFirstChild) {
           const firstFocusable = this.reference.querySelectorAll<T>(`
-            button:not([disabled=disabled]), 
+            button:not([disabled]):not([disabled=disabled]), 
             [href], 
-            input:not([disabled=disabled]):not([readonly=readonly]), 
-            select:not([disabled=disabled]):not([readonly=readonly]), 
-            textarea:not([disabled=disabled]):not([readonly=readonly]), 
-            [tabndex]:not([tabndex="-1"])`);
+            input:not([disabled]):not([readonly]):not([disabled=disabled]):not([readonly=readonly]), 
+            select:not([disabled]):not([readonly]):not([disabled=disabled]):not([readonly=readonly]), 
+            textarea:not([disabled]):not([readonly]):not([disabled=disabled]):not([readonly=readonly]), 
+            [tabindex]:not([tabindex="-1"])`);
 
           let tabIndex = -1;
           let lastElement: T | undefined;
@@ -108,9 +106,8 @@ export function useFocus<T extends HTMLElement>({ autofocus, focusFirstChild, on
     'useFocus',
   );
 
-  useEffect(() => {
-    const reference = state.reference;
-
+  const reference = state.reference;
+  useLayoutEffect(() => {
     if (!reference) {
       return;
     }
@@ -134,13 +131,17 @@ export function useFocus<T extends HTMLElement>({ autofocus, focusFirstChild, on
     reference.addEventListener('focusin', focusHandler);
     reference.addEventListener('focusout', blurHandler);
 
+    state.updateFocus();
+
     return () => {
       reference.removeEventListener('focusin', focusHandler);
       reference.removeEventListener('focusout', blurHandler);
     };
-  }, [state.reference]);
+    // TODO: probably we need to create a PR to https://github.com/facebook/react/blob/main/packages/eslint-plugin-react-hooks for custom stable hooks
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [reference]);
 
-  useEffect(
+  useLayoutEffect(
     () => () => {
       state.restoreFocus();
     },

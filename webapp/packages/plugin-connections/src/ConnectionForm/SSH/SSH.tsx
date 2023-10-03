@@ -17,10 +17,10 @@ import {
   Expandable,
   EXPANDABLE_FORM_STYLES,
   FieldCheckbox,
+  Form,
   Group,
   GroupItem,
   InputField,
-  SubmittingForm,
   Switch,
   useAdministrationSettings,
   useResource,
@@ -37,7 +37,7 @@ import { authTypes } from './authTypes';
 import { SSHKeyUploader } from './SSHKeyUploader';
 
 const SSH_STYLES = css`
-  SubmittingForm {
+  Form {
     display: flex;
     flex-direction: column;
     flex: 1;
@@ -93,7 +93,7 @@ export const SSH: TabContainerPanelComponent<Props> = observer(function SSH({ st
   }, []);
 
   return styled(styles)(
-    <SubmittingForm>
+    <Form>
       <ColoredContainer parent>
         <Group form gap keepSize large>
           <Switch name="enabled" state={handlerState} mod={['primary']} disabled={disabled || readonly}>
@@ -147,6 +147,7 @@ export const SSH: TabContainerPanelComponent<Props> = observer(function SSH({ st
               mod="surface"
               required={handlerState.savePassword}
               tiny
+              fill
             >
               {translate('connections_network_handler_ssh_tunnel_user')}
             </InputField>
@@ -161,12 +162,13 @@ export const SSH: TabContainerPanelComponent<Props> = observer(function SSH({ st
               required={!keyAuth && handlerState.savePassword}
               description={passwordSaved ? translate('ui_processing_saved') : undefined}
               tiny
+              fill
             >
               {passwordLabel}
             </InputField>
             {keyAuth && <SSHKeyUploader state={handlerState} saved={keySaved} disabled={disabled || !enabled} readonly={readonly} />}
           </Container>
-          {credentialsSavingEnabled && (
+          {credentialsSavingEnabled && !formState.config.template && (
             <FieldCheckbox
               id={SSH_TUNNEL_ID + ' savePassword'}
               name="savePassword"
@@ -213,6 +215,6 @@ export const SSH: TabContainerPanelComponent<Props> = observer(function SSH({ st
           </GroupItem>
         </Group>
       </ColoredContainer>
-    </SubmittingForm>,
+    </Form>,
   );
 });

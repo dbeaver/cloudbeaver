@@ -89,7 +89,7 @@ export function useUsersTable(filters: IUserFilters) {
           this.state.unselect();
 
           for (const id of deletionList) {
-            this.state.unexpand(id);
+            this.state.collapse(id);
           }
         } catch (exception: any) {
           notificationService.logException(exception, 'authentication_administration_user_delete_fail');
@@ -103,6 +103,8 @@ export function useUsersTable(filters: IUserFilters) {
     }),
     {
       loading: observable.ref,
+      usersLoader: observable.ref,
+      loadableState: observable.ref,
       users: computed<AdminUser[]>({ equals: (first, second) => isArraysEqual(first, second, undefined, true) }),
       update: action.bound,
       delete: action.bound,

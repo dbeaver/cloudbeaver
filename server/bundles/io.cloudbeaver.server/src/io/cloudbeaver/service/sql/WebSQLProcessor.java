@@ -20,6 +20,7 @@ import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.model.WebConnectionInfo;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.model.session.WebSessionProvider;
+import io.cloudbeaver.server.jobs.SqlOutputLogReaderJob;
 import org.eclipse.jface.text.Document;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
@@ -31,10 +32,12 @@ import org.jkiss.dbeaver.model.DBUtils;
 import org.jkiss.dbeaver.model.data.*;
 import org.jkiss.dbeaver.model.edit.DBEPersistAction;
 import org.jkiss.dbeaver.model.exec.*;
+import org.jkiss.dbeaver.model.exec.output.DBCServerOutputReader;
 import org.jkiss.dbeaver.model.exec.plan.DBCPlan;
 import org.jkiss.dbeaver.model.exec.plan.DBCQueryPlanner;
 import org.jkiss.dbeaver.model.exec.plan.DBCQueryPlannerConfiguration;
 import org.jkiss.dbeaver.model.impl.AbstractExecutionSource;
+import org.jkiss.dbeaver.model.impl.DefaultServerOutputReader;
 import org.jkiss.dbeaver.model.navigator.DBNDatabaseItem;
 import org.jkiss.dbeaver.model.navigator.DBNNode;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
@@ -52,6 +55,7 @@ import org.jkiss.utils.CommonUtils;
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 /**
  * Web SQL processor.
@@ -152,7 +156,9 @@ public class WebSQLProcessor implements WebSessionProvider {
         @NotNull String sql,
         @Nullable String resultId,
         @Nullable WebSQLDataFilter filter,
-        @Nullable WebDataFormat dataFormat) throws DBWebException {
+        @Nullable WebDataFormat dataFormat,
+        @NotNull WebSession webSession,
+        boolean readLogs) throws DBWebException {
         if (filter == null) {
             // Use default filter
             filter = new WebSQLDataFilter();
@@ -203,6 +209,17 @@ public class WebSQLProcessor implements WebSessionProvider {
                         webDataFilter.getOffset(),
                         webDataFilter.getLimit()))
                     {
+                        SqlOutputLogReaderJob sqlOutputLogReaderJob = null;
+                        if (readLogs) {
+                            DBPDataSource dataSource = context.getDataSource();
+                            DBCServerOutputReader dbcServerOutputReader = DBUtils.getAdapter(DBCServerOutputReader.class, dataSource);
+                            if (dbcServerOutputReader == null) {
+                                dbcServerOutputReader = new DefaultServerOutputReader();
+                            }
+                            sqlOutputLogReaderJob = new SqlOutputLogReaderJob(
+                                webSession, context, dbStat, dbcServerOutputReader, contextInfo.getId());
+                            sqlOutputLogReaderJob.schedule();
+                        }
                         // Set query timeout
                         int queryTimeout = (int) session.getDataSource().getContainer().getPreferenceStore()
                             .getDouble(WebSQLConstants.QUOTA_PROP_SQL_QUERY_TIMEOUT);
@@ -220,6 +237,11 @@ public class WebSQLProcessor implements WebSessionProvider {
                         }
 
                         boolean hasResultSet = dbStat.executeStatement();
+
+                        // Wait SqlLogStateJob, if its starts
+                        if (sqlOutputLogReaderJob != null) {
+                            sqlOutputLogReaderJob.join();
+                        }
                         fillQueryResults(contextInfo, dataContainer, dbStat, hasResultSet, executeInfo, webDataFilter, dataFilter, dataFormat);
                     } catch (DBException e) {
                         throw new InvocationTargetException(e);
@@ -294,56 +316,67 @@ public class WebSQLProcessor implements WebSessionProvider {
         @Nullable List<WebSQLResultsRow> addedRows,
         @Nullable WebDataFormat dataFormat) throws DBException
     {
-        Map<DBSDataManipulator.ExecuteBatch, Object[]> resultBatches = new LinkedHashMap<>();
-
+        List<Object[]> newResultSetRows = new ArrayList<>();
         KeyDataReceiver keyReceiver = new KeyDataReceiver(contextInfo.getResults(resultsId));
-
-        DBSDataManipulator dataManipulator = generateUpdateResultsDataBatch(
-            monitor, contextInfo, resultsId, updatedRows, deletedRows, addedRows, dataFormat, resultBatches, keyReceiver);
-
         WebSQLResultsInfo resultsInfo = contextInfo.getResults(resultsId);
+
+        Set<DBDRowIdentifier> rowIdentifierList = new HashSet<>();
+        // several row identifiers could be if we update result set table with join
+        // we can't add or delete rows from result set table with join
+        if (!CommonUtils.isEmpty(deletedRows) || !CommonUtils.isEmpty(addedRows)) {
+            rowIdentifierList.add(resultsInfo.getDefaultRowIdentifier());
+        } else if (!CommonUtils.isEmpty(updatedRows)) {
+            rowIdentifierList = resultsInfo.getRowIdentifiers();
+        }
 
         long totalUpdateCount = 0;
 
         WebSQLExecuteInfo result = new WebSQLExecuteInfo();
         List<WebSQLQueryResults> queryResults = new ArrayList<>();
+        for (var rowIdentifier : rowIdentifierList) {
+            Map<DBSDataManipulator.ExecuteBatch, Object[]> resultBatches = new LinkedHashMap<>();
+            DBSDataManipulator dataManipulator = generateUpdateResultsDataBatch(
+                monitor, resultsInfo, rowIdentifier, updatedRows, deletedRows, addedRows, dataFormat, resultBatches, keyReceiver);
 
-        DBCExecutionContext executionContext = getExecutionContext(dataManipulator);
-        try (DBCSession session = executionContext.openSession(monitor, DBCExecutionPurpose.USER, "Update data in container")) {
-            DBCTransactionManager txnManager = DBUtils.getTransactionManager(executionContext);
-            boolean revertToAutoCommit = false;
-            if (txnManager != null && txnManager.isSupportsTransactions() && txnManager.isAutoCommit()) {
-                txnManager.setAutoCommit(monitor, false);
-                revertToAutoCommit = true;
-            }
-            try {
-                Map<String, Object> options = Collections.emptyMap();
-                for (Map.Entry<DBSDataManipulator.ExecuteBatch, Object[]> rb : resultBatches.entrySet()) {
-                    DBSDataManipulator.ExecuteBatch batch = rb.getKey();
-                    Object[] rowValues = rb.getValue();
-                    keyReceiver.setRow(rowValues);
-                    DBCStatistics statistics = batch.execute(session, options);
 
-                    // Patch result rows (adapt to web format)
-                    for (int i = 0; i < rowValues.length; i++) {
-                        rowValues[i] = WebSQLUtils.makeWebCellValue(webSession, resultsInfo.getAttributeByPosition(i), rowValues[i], dataFormat);
+            DBCExecutionContext executionContext = getExecutionContext(dataManipulator);
+            try (DBCSession session = executionContext.openSession(monitor, DBCExecutionPurpose.USER, "Update data in container")) {
+                DBCTransactionManager txnManager = DBUtils.getTransactionManager(executionContext);
+                boolean revertToAutoCommit = false;
+                if (txnManager != null && txnManager.isSupportsTransactions() && txnManager.isAutoCommit()) {
+                    txnManager.setAutoCommit(monitor, false);
+                    revertToAutoCommit = true;
+                }
+                try {
+                    Map<String, Object> options = Collections.emptyMap();
+                    for (Map.Entry<DBSDataManipulator.ExecuteBatch, Object[]> rb : resultBatches.entrySet()) {
+                        DBSDataManipulator.ExecuteBatch batch = rb.getKey();
+                        Object[] rowValues = rb.getValue();
+                        keyReceiver.setRow(rowValues);
+                        DBCStatistics statistics = batch.execute(session, options);
+
+                        // Patch result rows (adapt to web format)
+                        for (int i = 0; i < rowValues.length; i++) {
+                            rowValues[i] = WebSQLUtils.makeWebCellValue(webSession, resultsInfo.getAttributeByPosition(i), rowValues[i], dataFormat);
+                        }
+
+                        totalUpdateCount += statistics.getRowsUpdated();
+                        result.setDuration(result.getDuration() + statistics.getExecuteTime());
+                        newResultSetRows.add(rowValues);
                     }
 
-                    totalUpdateCount += statistics.getRowsUpdated();
-                    result.setDuration(result.getDuration() + statistics.getExecuteTime());
-                }
-
-                if (txnManager != null && txnManager.isSupportsTransactions()) {
-                    txnManager.commit(session);
-                }
-            } catch (Exception e) {
-                if (txnManager != null && txnManager.isSupportsTransactions()) {
-                    txnManager.rollback(session, null);
-                }
-                throw new DBCException("Error persisting data changes", e);
-            } finally {
-                if (revertToAutoCommit) {
-                    txnManager.setAutoCommit(monitor, true);
+                    if (txnManager != null && txnManager.isSupportsTransactions()) {
+                        txnManager.commit(session);
+                    }
+                } catch (Exception e) {
+                    if (txnManager != null && txnManager.isSupportsTransactions()) {
+                        txnManager.rollback(session, null);
+                    }
+                    throw new DBCException("Error persisting data changes", e);
+                } finally {
+                    if (revertToAutoCommit) {
+                        txnManager.setAutoCommit(monitor, true);
+                    }
                 }
             }
         }
@@ -355,7 +388,7 @@ public class WebSQLProcessor implements WebSessionProvider {
         WebSQLQueryResults updateResults = new WebSQLQueryResults(webSession, dataFormat);
         updateResults.setUpdateRowCount(totalUpdateCount);
         updateResults.setResultSet(updatedResultSet);
-        updatedResultSet.setRows(resultBatches.values().toArray(new Object[0][]));
+        updatedResultSet.setRows(newResultSetRows.toArray(new Object[0][]));
 
         queryResults.add(updateResults);
 
@@ -375,26 +408,42 @@ public class WebSQLProcessor implements WebSessionProvider {
     {
         Map<DBSDataManipulator.ExecuteBatch, Object[]> resultBatches = new LinkedHashMap<>();
 
-        DBSDataManipulator dataManipulator = generateUpdateResultsDataBatch(
-            monitor, contextInfo, resultsId, updatedRows, deletedRows, addedRows, dataFormat, resultBatches, null);
 
-        List<DBEPersistAction> actions = new ArrayList<>();
-
-        DBCExecutionContext executionContext = getExecutionContext(dataManipulator);
-        try (DBCSession session = executionContext.openSession(monitor, DBCExecutionPurpose.USER, "Update data in container")) {
-            Map<String, Object> options = Collections.emptyMap();
-            for (DBSDataManipulator.ExecuteBatch batch : resultBatches.keySet()) {
-                batch.generatePersistActions(session, actions, options);
-            }
+        WebSQLResultsInfo resultsInfo = contextInfo.getResults(resultsId);
+        Set<DBDRowIdentifier> rowIdentifierList = new HashSet<>();
+        // several row identifiers could be if we update result set table with join
+        // we can't add or delete rows from result set table with join
+        if (!CommonUtils.isEmpty(deletedRows) || !CommonUtils.isEmpty(addedRows)) {
+            rowIdentifierList.add(resultsInfo.getDefaultRowIdentifier());
+        } else if (!CommonUtils.isEmpty(updatedRows)) {
+            rowIdentifierList = resultsInfo.getRowIdentifiers();
         }
+        StringBuilder sqlBuilder = new StringBuilder();
+        for (var rowIdentifier : rowIdentifierList) {
+            DBSDataManipulator dataManipulator = generateUpdateResultsDataBatch(
+                monitor, resultsInfo, rowIdentifier, updatedRows, deletedRows, addedRows, dataFormat, resultBatches, null);
 
-        return SQLUtils.generateScript(executionContext.getDataSource(), actions.toArray(new DBEPersistAction[0]), false);
+            List<DBEPersistAction> actions = new ArrayList<>();
+
+            DBCExecutionContext executionContext = getExecutionContext(dataManipulator);
+            try (DBCSession session = executionContext.openSession(monitor, DBCExecutionPurpose.USER, "Update data in container")) {
+                Map<String, Object> options = Collections.emptyMap();
+                for (DBSDataManipulator.ExecuteBatch batch : resultBatches.keySet()) {
+                    batch.generatePersistActions(session, actions, options);
+                }
+            }
+
+            sqlBuilder.append(
+                SQLUtils.generateScript(executionContext.getDataSource(), actions.toArray(new DBEPersistAction[0]), false)
+            );
+        }
+        return sqlBuilder.toString();
     }
 
     private DBSDataManipulator generateUpdateResultsDataBatch(
         @NotNull DBRProgressMonitor monitor,
-        @NotNull WebSQLContextInfo contextInfo,
-        @NotNull String resultsId,
+        @NotNull WebSQLResultsInfo resultsInfo,
+        @NotNull DBDRowIdentifier rowIdentifier,
         @Nullable List<WebSQLResultsRow> updatedRows,
         @Nullable List<WebSQLResultsRow> deletedRows,
         @Nullable List<WebSQLResultsRow> addedRows,
@@ -403,10 +452,7 @@ public class WebSQLProcessor implements WebSessionProvider {
         @Nullable DBDDataReceiver keyReceiver)
         throws DBException
     {
-        WebSQLResultsInfo resultsInfo = contextInfo.getResults(resultsId);
 
-        DBDRowIdentifier rowIdentifier = resultsInfo.getDefaultRowIdentifier();
-        checkRowIdentifier(resultsInfo, rowIdentifier);
         DBSEntity dataContainer = rowIdentifier.getEntity();
         checkDataEditAllowed(dataContainer);
         DBSDataManipulator dataManipulator = (DBSDataManipulator) dataContainer;
@@ -427,7 +473,9 @@ public class WebSQLProcessor implements WebSessionProvider {
             if (!CommonUtils.isEmpty(updatedRows)) {
 
                 for (WebSQLResultsRow row : updatedRows) {
-                    Map<String, Object> updateValues = row.getUpdateValues();
+                    Map<String, Object> updateValues = row.getUpdateValues().entrySet().stream()
+                        .filter(x -> CommonUtils.equalObjects(allAttributes[CommonUtils.toInt(x.getKey())].getRowIdentifier(), rowIdentifier))
+                        .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
                     if (CommonUtils.isEmpty(row.getData()) || CommonUtils.isEmpty(updateValues)) {
                         continue;
                     }

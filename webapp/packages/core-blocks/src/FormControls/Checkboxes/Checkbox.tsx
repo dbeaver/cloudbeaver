@@ -16,6 +16,7 @@ import { CheckboxMarkup, CheckboxMod } from './CheckboxMarkup';
 import { CheckboxOnChangeEvent, useCheckboxState } from './useCheckboxState';
 
 export interface CheckboxBaseProps {
+  caption?: string;
   mod?: CheckboxMod[];
   ripple?: boolean;
   indeterminate?: boolean;

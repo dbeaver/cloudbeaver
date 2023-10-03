@@ -40,6 +40,7 @@ module.exports = (env, argv) => {
 
   return merge(commonConfig(env, argv), {
     mode: 'development',
+    context: resolve(__dirname, '../../../../../'),
     entry: {
       main,
       sso,
@@ -60,10 +61,12 @@ module.exports = (env, argv) => {
       proxy: {
         '/api': {
           target: envServer,
+          secure: false,
         },
         '/api/ws': {
           target: `${urlObject.protocol === 'https:' ? 'wss:' : 'ws:'}//${urlObject.hostname}:${urlObject.port}/api/ws`,
           ws: true,
+          secure: false,
         },
       },
       onListening: function (devServer, ...args) {

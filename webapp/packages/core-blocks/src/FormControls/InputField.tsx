@@ -6,13 +6,13 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import { forwardRef, useCallback, useContext, useLayoutEffect, useRef, useState } from 'react';
+import React, { forwardRef, useCallback, useContext, useLayoutEffect, useRef, useState } from 'react';
 import styled, { use } from 'reshadow';
 
 import type { ComponentStyle } from '@cloudbeaver/core-theming';
 import { isNotNullDefined } from '@cloudbeaver/core-utils';
 
-import { getLayoutProps } from '../Containers/filterLayoutFakeProps';
+import { filterLayoutFakeProps, getLayoutProps } from '../Containers/filterLayoutFakeProps';
 import type { ILayoutSizeProps } from '../Containers/ILayoutSizeProps';
 import elementsSizeStyles from '../Containers/shared/ElementsSize.m.css';
 import { Icon } from '../Icon';
@@ -20,6 +20,7 @@ import { Loader } from '../Loader/Loader';
 import { useTranslate } from '../localization/useTranslate';
 import { s } from '../s';
 import { useCombinedHandler } from '../useCombinedHandler';
+import { useCombinedRef } from '../useCombinedRef';
 import { useMergeRefs } from '../useMergeRefs';
 import { useS } from '../useS';
 import { useStateDelay } from '../useStateDelay';
@@ -41,6 +42,7 @@ type BaseProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange' | 
     style?: ComponentStyle;
     canShowPassword?: boolean;
     onCustomCopy?: () => void;
+    icon?: React.ReactElement;
   };
 
 type ControlledProps = BaseProps & {
@@ -90,16 +92,18 @@ export const InputField: InputFieldType = observer(
       canShowPassword = true,
       onChange,
       onCustomCopy,
+      icon,
       ...rest
     }: ControlledProps | ObjectProps<any, any>,
     ref,
   ) {
     const inputRef = useRef<HTMLInputElement | null>(null);
-    const mergedRef = useMergeRefs(inputRef, ref);
+    const mergedRef = useCombinedRef(inputRef, ref);
     const capsLock = useCapsLockTracker();
     const [passwordRevealed, setPasswordRevealed] = useState(false);
     const translate = useTranslate();
     const layoutProps = getLayoutProps(rest);
+    rest = filterLayoutFakeProps(rest);
     const propStyles = useStyles(style);
     const styles = useS(inputFieldStyle, formControlStyles, elementsSizeStyles);
     const context = useContext(FormContext);
@@ -134,9 +138,9 @@ export const InputField: InputFieldType = observer(
     const handleKeyDown = useCombinedHandler(rest.onKeyDown, capsLock.handleKeyDown, context?.keyDown);
 
     const passwordType = rest.type === 'password';
-    const uncontrolled = passwordType && !canShowPassword;
+    let uncontrolled = passwordType && !canShowPassword;
 
-    let value: any = valueControlled ?? defaultValue ?? undefined;
+    let value: any = valueControlled ?? undefined;
 
     if (state && name !== undefined && name in state) {
       value = state[name];
@@ -149,6 +153,8 @@ export const InputField: InputFieldType = observer(
     if (passwordType && !rest.readOnly && capsLock.warn) {
       description = translate('ui_capslock_on');
     }
+
+    uncontrolled ||= value === undefined;
 
     useLayoutEffect(() => {
       if (uncontrolled && isNotNullDefined(value) && inputRef.current) {
@@ -173,6 +179,7 @@ export const InputField: InputFieldType = observer(
             type={passwordRevealed ? 'text' : rest.type}
             name={name}
             value={uncontrolled ? undefined : value ?? ''}
+            defaultValue={defaultValue}
             className={styles.input}
             onChange={handleChange}
             onBlur={handleBlur}
@@ -195,6 +202,7 @@ export const InputField: InputFieldType = observer(
               <Icon name="copy" viewBox="0 0 32 32" className={styles.icon} />
             </div>
           )}
+          {icon && <div data-testid="icon-container" className={styles.customIconContainer}>{icon}</div>}
         </div>
         {(description || passwordType) && (
           <div data-testid="field-description" className={s(styles, { fieldDescription: true, valid: !error, invalid: error })}>

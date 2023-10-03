@@ -9,6 +9,6 @@ import { injectable } from './injectable';
 
 @injectable()
 export abstract class Bootstrap {
-  abstract register(): void | Promise<void>;
-  abstract load(): void | Promise<void>;
+  register(): void | Promise<void> {}
+  load(): void | Promise<void> {}
 }

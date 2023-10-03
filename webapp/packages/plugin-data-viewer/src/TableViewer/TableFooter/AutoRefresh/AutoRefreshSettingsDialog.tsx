@@ -7,37 +7,12 @@
  */
 import { observer } from 'mobx-react-lite';
 import { useRef } from 'react';
-import styled, { css } from 'reshadow';
 
-import { Button, Container, FieldCheckbox, Group, InputField, SubmittingForm, useTranslate } from '@cloudbeaver/core-blocks';
+import { Button, Container, FieldCheckbox, Fill, Form, Group, InputField, s, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import { CommonDialogBody, CommonDialogFooter, CommonDialogHeader, CommonDialogWrapper, DialogComponentProps } from '@cloudbeaver/core-dialogs';
 
+import style from './AutoRefreshSettingsDialog.m.css';
 import type { IAutoRefreshSettings } from './IAutoRefreshSettings';
-
-const styles = css`
-  footer-container {
-    display: flex;
-    width: min-content;
-    flex: 1;
-    align-items: center;
-    justify-content: flex-end;
-    gap: 24px;
-  }
-  buttons {
-    flex: 1;
-    display: flex;
-    gap: 24px;
-  }
-  wrapper {
-    display: flex;
-    height: 100%;
-    width: 100%;
-    overflow: auto;
-  }
-  fill {
-    flex: 1;
-  }
-`;
 
 interface Payload {
   settings: IAutoRefreshSettings;
@@ -49,6 +24,7 @@ export const AutoRefreshSettingsDialog = observer<DialogComponentProps<Payload>>
   payload,
 }) {
   const translate = useTranslate();
+  const styles = useS(style);
   const formRef = useRef<HTMLFormElement>(null);
 
   function resolve() {
@@ -61,12 +37,12 @@ export const AutoRefreshSettingsDialog = observer<DialogComponentProps<Payload>>
     }
   }
 
-  return styled(styles)(
+  return (
     <CommonDialogWrapper size="small">
       <CommonDialogHeader title="data_viewer_auto_refresh_settings" icon="/icons/settings_cog_m.svg" onReject={rejectDialog} />
       <CommonDialogBody noBodyPadding noOverflow>
-        <wrapper>
-          <SubmittingForm ref={formRef} onSubmit={() => resolve()}>
+        <div className={s(styles, { wrapper: true })}>
+          <Form ref={formRef} onSubmit={() => resolve()}>
             <Container>
               <Group form gap>
                 <InputField name="interval" state={payload.settings} type="number" min={5} max={3600}>
@@ -78,22 +54,22 @@ export const AutoRefreshSettingsDialog = observer<DialogComponentProps<Payload>>
                 </FieldCheckbox>
               </Group>
             </Container>
-          </SubmittingForm>
-        </wrapper>
+          </Form>
+        </div>
       </CommonDialogBody>
       <CommonDialogFooter>
-        <footer-container>
-          <buttons>
+        <div className={s(styles, { footerContainer: true })}>
+          <div className={s(styles, { buttons: true })}>
             <Button mod={['outlined']} onClick={() => rejectDialog()}>
               {translate('ui_processing_cancel')}
             </Button>
-            <fill />
+            <Fill />
             <Button mod={['unelevated']} onClick={() => resolve()}>
               {translate('ui_processing_ok')}
             </Button>
-          </buttons>
-        </footer-container>
+          </div>
+        </div>
       </CommonDialogFooter>
-    </CommonDialogWrapper>,
+    </CommonDialogWrapper>
   );
 });

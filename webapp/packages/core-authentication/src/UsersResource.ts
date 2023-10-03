@@ -56,12 +56,6 @@ export const UsersResourceNewUsers = resourceKeyListAlias('@users-resource/new-u
 
 interface UserCreateOptions {
   userId: string;
-  teams: string[];
-  credentials: IAuthCredentials;
-  metaParameters: Record<string, any>;
-  grantedConnections: string[];
-  enabled: boolean;
-  authRole?: string;
 }
 
 @injectable()
@@ -129,30 +123,17 @@ export class UsersResource extends CachedMapResource<string, AdminUser, UserReso
     await this.graphQLService.sdk.saveUserMetaParameters({ userId, parameters });
   }
 
-  async create({ userId, teams, credentials, metaParameters, grantedConnections, enabled, authRole }: UserCreateOptions): Promise<AdminUser> {
+  async create({ userId }: UserCreateOptions): Promise<AdminUser> {
     const { user } = await this.graphQLService.sdk.createUser({
       userId,
-      enabled,
-      authRole,
+      enabled: false,
       ...this.getDefaultIncludes(),
       ...this.getIncludesMap(userId),
     });
 
-    try {
-      await this.updateCredentials(userId, credentials);
-
-      for (const teamId of teams) {
-        await this.grantTeam(userId, teamId, true);
-      }
-
-      await this.setConnections(userId, grantedConnections);
-      await this.setMetaParameters(userId, metaParameters);
-      const user = (await this.refresh(userId)) as unknown as AdminUserNew;
-      user[NEW_USER_SYMBOL] = true;
-    } catch (exception: any) {
-      this.delete(userId);
-      throw exception;
-    }
+    const newUser = user as unknown as AdminUserNew;
+    newUser[NEW_USER_SYMBOL] = true;
+    this.set(user.userId, newUser);
 
     return this.get(user.userId)!;
   }

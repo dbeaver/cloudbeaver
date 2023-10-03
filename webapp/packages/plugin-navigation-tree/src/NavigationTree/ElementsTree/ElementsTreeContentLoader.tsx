@@ -6,9 +6,8 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import styled from 'reshadow';
 
-import { getComputed, Loader, Translate, TREE_NODE_STYLES, TreeNodeNestedMessage } from '@cloudbeaver/core-blocks';
+import { getComputed, Loader, Translate, TreeNodeNestedMessage } from '@cloudbeaver/core-blocks';
 import type { ILoadableState } from '@cloudbeaver/core-utils';
 
 import type { IElementsTreeContext } from './ElementsTreeContext';
@@ -33,10 +32,10 @@ export const ElementsTreeContentLoader = observer<React.PropsWithChildren<Props>
     if (loading) {
       return <Loader />;
     } else if (context.tree.filtering) {
-      return styled(TREE_NODE_STYLES)(
+      return (
         <TreeNodeNestedMessage>
           <Translate token="app_navigationTree_node_no_results" filter={context.tree.filter} />
-        </TreeNodeNestedMessage>,
+        </TreeNodeNestedMessage>
       );
     } else if (context.folderExplorer.root === context.folderExplorer.state.folder) {
       return <>{Placeholder && <Placeholder />}</>;

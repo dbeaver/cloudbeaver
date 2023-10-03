@@ -39,7 +39,7 @@ export const SettingsInfoFormField = observer<SettingsInfoFormFieldProps>(functi
 }) {
   if (type === FormFieldType.Checkbox) {
     return (
-      <FieldCheckbox id={id} checked={value} title={description} disabled={disabled || readOnly} className={className} onChange={onChange}>
+      <FieldCheckbox id={id} checked={value} title={description} disabled={disabled || readOnly} className={className} tiny onChange={onChange}>
         {name ?? ''}
       </FieldCheckbox>
     );
@@ -57,6 +57,7 @@ export const SettingsInfoFormField = observer<SettingsInfoFormFieldProps>(functi
         disabled={disabled}
         readOnly={readOnly}
         className={className}
+        tiny
         onSelect={onSelect}
       >
         {name ?? ''}
@@ -94,6 +95,7 @@ export const SettingsInfoFormField = observer<SettingsInfoFormFieldProps>(functi
       readOnly={readOnly}
       mod="surface"
       className={className}
+      small
       onChange={onChange}
     >
       {name ?? ''}

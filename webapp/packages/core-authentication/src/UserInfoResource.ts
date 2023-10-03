@@ -50,7 +50,7 @@ export class UserInfoResource extends CachedDataResource<UserInfo | null, void, 
   constructor(
     private readonly graphQLService: GraphQLService,
     private readonly authProviderService: AuthProviderService,
-    private readonly sessionResource: SessionResource,
+    sessionResource: SessionResource,
     private readonly sessionDataResource: SessionDataResource,
   ) {
     super(() => null, undefined, ['customIncludeOriginDetails', 'includeConfigurationParameters']);
@@ -108,7 +108,7 @@ export class UserInfoResource extends CachedDataResource<UserInfo | null, void, 
 
     if (authInfo.userTokens && authInfo.authStatus === AuthStatus.Success) {
       this.resetIncludes();
-      this.markOutdated();
+      this.setData(await this.loader());
       this.sessionDataResource.markOutdated();
     }
 

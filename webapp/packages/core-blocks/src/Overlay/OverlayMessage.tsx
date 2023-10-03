@@ -6,18 +6,21 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import styled from 'reshadow';
 
-import { OVERLAY_BASE_STYLES } from './OVERLAY_BASE_STYLES';
+import { s } from '../s';
+import { useS } from '../useS';
+import style from './OverlayMessage.m.css';
 
 interface Props {
   className?: string;
 }
 
 export const OverlayMessage = observer<React.PropsWithChildren<Props>>(function OverlayMessage({ className, children }) {
-  return styled(OVERLAY_BASE_STYLES)(
-    <message className={className}>
-      <message-box>{children}</message-box>
-    </message>,
+  const styles = useS(style);
+
+  return (
+    <div className={s(styles, { message: true }, className)}>
+      <div className={s(styles, { messageBox: true })}>{children}</div>
+    </div>
   );
 });

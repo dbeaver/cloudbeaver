@@ -11,6 +11,7 @@ import {
   Container,
   Expandable,
   EXPANDABLE_FORM_STYLES,
+  getPropertyControlType,
   Group,
   GroupTitle,
   ObjectPropertyInfoForm,
@@ -43,18 +44,18 @@ export const ProviderPropertiesForm = observer<Props>(function ProviderPropertie
   const nonBooleanProperties = supportedProperties.filter(property => !property.category && property.dataType !== 'Boolean');
 
   return (
-    <>
+    <Group form gap>
       {isUncategorizedExists && (
-        <Group form gap>
+        <>
           <GroupTitle>{translate('ui_settings')}</GroupTitle>
           {booleanProperties.length > 0 && (
-            <Container gap wrap>
+            <Container gap wrap dense>
               <ObjectPropertyInfoForm
                 properties={booleanProperties}
                 state={config.providerProperties}
                 disabled={disabled}
                 readOnly={readonly}
-                keepSize
+                maximum
                 hideEmptyPlaceholder
               />
             </Container>
@@ -71,33 +72,30 @@ export const ProviderPropertiesForm = observer<Props>(function ProviderPropertie
               />
             </Container>
           )}
-        </Group>
+        </>
       )}
 
-      {categories.length > 0 && (
-        <Group gap form>
-          <GroupTitle>{translate('ui_advanced_settings')}</GroupTitle>
-          <Container wrap gap>
-            {categories.map((category, index) => (
-              <Container key={`${category}_${config.driverId}`} gap>
-                <Expandable style={EXPANDABLE_FORM_STYLES} label={category} defaultExpanded={index === 0}>
-                  <Container wrap gap>
-                    <ObjectPropertyInfoForm
-                      properties={supportedProperties}
-                      state={config.providerProperties}
-                      category={category}
-                      disabled={disabled}
-                      readOnly={readonly}
-                      keepSize
-                      hideEmptyPlaceholder
-                    />
-                  </Container>
-                </Expandable>
-              </Container>
-            ))}
-          </Container>
-        </Group>
-      )}
-    </>
+      {categories.map((category, index) => (
+        <Container key={`${category}_${config.driverId}`} gap>
+          <Expandable style={EXPANDABLE_FORM_STYLES} label={category} defaultExpanded={index === 0}>
+            <Container dense={isOnlyBooleans(supportedProperties, category)} wrap gap>
+              <ObjectPropertyInfoForm
+                properties={supportedProperties}
+                state={config.providerProperties}
+                category={category}
+                disabled={disabled}
+                readOnly={readonly}
+                geLayoutSize={property => (getPropertyControlType(property) === 'checkbox' ? { maximum: true } : { small: true, noGrow: true })}
+                hideEmptyPlaceholder
+              />
+            </Container>
+          </Expandable>
+        </Container>
+      ))}
+    </Group>
   );
 });
+
+function isOnlyBooleans(properties: DriverProviderPropertyInfo[], category?: string): boolean {
+  return properties.filter(property => !category || property.category === category).every(property => property.dataType === 'Boolean');
+}

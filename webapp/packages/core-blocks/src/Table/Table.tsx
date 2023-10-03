@@ -7,12 +7,13 @@
  */
 import { action, computed, observable } from 'mobx';
 import { observer } from 'mobx-react-lite';
-import { useCallback, useEffect, useMemo, useState } from 'react';
-import styled, { use } from 'reshadow';
+import { useCallback, useEffect, useState } from 'react';
 
+import { s } from '../s';
 import { useObjectRef } from '../useObjectRef';
 import { useObservableRef } from '../useObservableRef';
-import { BASE_TABLE_STYLES } from './BASE_TABLE_STYLES';
+import { useS } from '../useS';
+import style from './Table.m.css';
 import { ITableContext, ITableState, TableContext } from './TableContext';
 
 interface Props {
@@ -36,6 +37,7 @@ export const Table = observer<React.PropsWithChildren<Props>>(function Table({
   onSelect,
 }) {
   const props = useObjectRef({ onSelect });
+  const styles = useS(style);
 
   const [selected] = useState<Map<any, boolean>>(() => selectedItems || observable(new Map()));
   const [expanded] = useState<Map<any, boolean>>(() => expandedItems || observable(new Map()));
@@ -93,8 +95,6 @@ export const Table = observer<React.PropsWithChildren<Props>>(function Table({
     { keys, isItemSelectable },
   );
 
-  const isExpanded = useMemo(() => computed(() => Array.from(expanded.values()).some(Boolean)), [expanded]);
-
   const setItemSelect = useCallback((item: any, state: boolean) => {
     selected.set(item, state);
     if (props.onSelect) {
@@ -115,11 +115,9 @@ export const Table = observer<React.PropsWithChildren<Props>>(function Table({
     collapse,
   }));
 
-  return styled(BASE_TABLE_STYLES)(
+  return (
     <TableContext.Provider value={context}>
-      <table className={className} {...use({ expanded: isExpanded.get(), size })}>
-        {children}
-      </table>
-    </TableContext.Provider>,
+      <table className={s(styles, { table: true, big: size === 'big' }, className)}>{children}</table>
+    </TableContext.Provider>
   );
 });

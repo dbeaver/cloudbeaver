@@ -12,12 +12,12 @@ import { ADMINISTRATION_TOOLS_PANEL_STYLES, AdministrationItemContentComponent, 
 import {
   ColoredContainer,
   Container,
+  Form,
   Group,
   GroupItem,
   GroupTitle,
   Loader,
   Placeholder,
-  SubmittingForm,
   ToolsAction,
   ToolsPanel,
   useFocus,
@@ -38,7 +38,7 @@ import { ServerConfigurationDriversForm } from './ServerConfigurationDriversForm
 import { ServerConfigurationService } from './ServerConfigurationService';
 
 const styles = css`
-  SubmittingForm {
+  Form {
     flex: 1;
     display: flex;
     overflow: auto;
@@ -97,7 +97,7 @@ export const ServerConfigurationPage: AdministrationItemContentComponent = obser
   }
 
   return styled(style)(
-    <SubmittingForm ref={focusedRef} name="server_config" onChange={handleChange}>
+    <Form ref={focusedRef} name="server_config" onChange={handleChange}>
       {!configurationWizard && (
         <ToolsPanel>
           <ToolsAction
@@ -153,6 +153,6 @@ export const ServerConfigurationPage: AdministrationItemContentComponent = obser
           }
         </Loader>
       </ColoredContainer>
-    </SubmittingForm>,
+    </Form>,
   );
 });

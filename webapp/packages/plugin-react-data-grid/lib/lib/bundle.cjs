@@ -3,89 +3,359 @@
 Object.defineProperties(exports, { __esModule: { value: true }, [Symbol.toStringTag]: { value: 'Module' } });
 
 const react = require('react');
+const reactDom = require('react-dom');
 const clsx = require('clsx');
 const jsxRuntime = require('react/jsx-runtime');
 
-function styleInject(css, ref) {
-  if ( ref === void 0 ) ref = {};
-  var insertAt = ref.insertAt;
-
-  if (!css || typeof document === 'undefined') { return; }
-
-  var head = document.head || document.getElementsByTagName('head')[0];
-  var style = document.createElement('style');
-  style.type = 'text/css';
-
-  if (insertAt === 'top') {
-    if (head.firstChild) {
-      head.insertBefore(style, head.firstChild);
-    } else {
-      head.appendChild(style);
-    }
-  } else {
-    head.appendChild(style);
+function getColSpan(column, lastFrozenColumnIndex, args) {
+  const colSpan = typeof column.colSpan === 'function' ? column.colSpan(args) : 1;
+  if (Number.isInteger(colSpan) && colSpan > 1 && (!column.frozen || column.idx + colSpan - 1 <= lastFrozenColumnIndex)) {
+    return colSpan;
   }
-
-  if (style.styleSheet) {
-    style.styleSheet.cssText = css;
-  } else {
-    style.appendChild(document.createTextNode(css));
-  }
+  return undefined;
 }
 
-var css_248z$f = ".cj343x0700-beta13{background-color:inherit;border-block-end:1px solid var(--rdg-border-color);border-inline-end:1px solid var(--rdg-border-color);contain:size style;grid-row-start:var(--rdg-grid-row-start);outline:none;overflow:hidden;overflow:clip;padding-block:0;padding-inline:8px;position:relative;text-overflow:ellipsis;white-space:nowrap}.cj343x0700-beta13[aria-selected=true]{outline:2px solid var(--rdg-selection-color);outline-offset:-2px}.csofj7r700-beta13 .cj343x0700-beta13{contain:content}.ch2wcw8700-beta13{position:sticky;z-index:1}.c1wvphzh700-beta13{box-shadow:calc(2px*var(--rdg-sign)) 0 5px -2px hsla(0,0%,53%,.3)}";
-styleInject(css_248z$f,{"insertAt":"top"});
+function stopPropagation(event) {
+  event.stopPropagation();
+}
+function scrollIntoView(element) {
+  element?.scrollIntoView({
+    inline: 'nearest',
+    block: 'nearest'
+  });
+}
 
-const cell = "cj343x0700-beta13";
+function createCellEvent(event) {
+  let defaultPrevented = false;
+  const cellEvent = {
+    ...event,
+    preventGridDefault() {
+      defaultPrevented = true;
+    },
+    isGridDefaultPrevented() {
+      return defaultPrevented;
+    }
+  };
+  Object.setPrototypeOf(cellEvent, Object.getPrototypeOf(event));
+  return cellEvent;
+}
+
+const nonInputKeys = new Set(['Unidentified', 'Alt', 'AltGraph', 'CapsLock', 'Control', 'Fn', 'FnLock', 'Meta', 'NumLock', 'ScrollLock', 'Shift', 'Tab', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowUp', 'End', 'Home', 'PageDown', 'PageUp', 'Insert', 'ContextMenu', 'Escape', 'Pause', 'Play', 'PrintScreen', 'F1', 'F3', 'F4', 'F5', 'F6', 'F7', 'F8', 'F9', 'F10', 'F11', 'F12']);
+function isCtrlKeyHeldDown(e) {
+  return (e.ctrlKey || e.metaKey) && e.key !== 'Control';
+}
+function isDefaultCellInput(event) {
+  return !nonInputKeys.has(event.key);
+}
+function onEditorNavigation({
+  key,
+  target
+}) {
+  if (key === 'Tab' && (target instanceof HTMLInputElement || target instanceof HTMLTextAreaElement || target instanceof HTMLSelectElement)) {
+    return target.closest('.rdg-editor-container')?.querySelectorAll('input, textarea, select').length === 1;
+  }
+  return false;
+}
+
+const measuringCellClassname = "m1l09lto7-0-0-beta-37";
+function renderMeasuringCells(viewportColumns) {
+  return viewportColumns.map(({
+    key,
+    idx,
+    minWidth,
+    maxWidth
+  }) => /*#__PURE__*/jsxRuntime.jsx("div", {
+    className: measuringCellClassname,
+    style: {
+      gridColumnStart: idx + 1,
+      minWidth,
+      maxWidth
+    },
+    "data-measuring-cell-key": key
+  }, key));
+}
+
+function isSelectedCellEditable({
+  selectedPosition,
+  columns,
+  rows
+}) {
+  const column = columns[selectedPosition.idx];
+  const row = rows[selectedPosition.rowIdx];
+  return isCellEditable(column, row);
+}
+function isCellEditable(column, row) {
+  return column.renderEditCell != null && (typeof column.editable === 'function' ? column.editable(row) : column.editable) !== false;
+}
+function getSelectedCellColSpan({
+  rows,
+  topSummaryRows,
+  bottomSummaryRows,
+  rowIdx,
+  mainHeaderRowIdx,
+  lastFrozenColumnIndex,
+  column
+}) {
+  const topSummaryRowsCount = topSummaryRows?.length ?? 0;
+  if (rowIdx === mainHeaderRowIdx) {
+    return getColSpan(column, lastFrozenColumnIndex, {
+      type: 'HEADER'
+    });
+  }
+  if (topSummaryRows && rowIdx > mainHeaderRowIdx && rowIdx <= topSummaryRowsCount + mainHeaderRowIdx) {
+    return getColSpan(column, lastFrozenColumnIndex, {
+      type: 'SUMMARY',
+      row: topSummaryRows[rowIdx + topSummaryRowsCount]
+    });
+  }
+  if (rowIdx >= 0 && rowIdx < rows.length) {
+    const row = rows[rowIdx];
+    return getColSpan(column, lastFrozenColumnIndex, {
+      type: 'ROW',
+      row
+    });
+  }
+  if (bottomSummaryRows) {
+    return getColSpan(column, lastFrozenColumnIndex, {
+      type: 'SUMMARY',
+      row: bottomSummaryRows[rowIdx - rows.length]
+    });
+  }
+  return undefined;
+}
+function getNextSelectedCellPosition({
+  moveUp,
+  moveNext,
+  cellNavigationMode,
+  columns,
+  colSpanColumns,
+  rows,
+  topSummaryRows,
+  bottomSummaryRows,
+  minRowIdx,
+  mainHeaderRowIdx,
+  maxRowIdx,
+  currentPosition: {
+    idx: currentIdx,
+    rowIdx: currentRowIdx
+  },
+  nextPosition,
+  lastFrozenColumnIndex,
+  isCellWithinBounds
+}) {
+  let {
+    idx: nextIdx,
+    rowIdx: nextRowIdx
+  } = nextPosition;
+  const columnsCount = columns.length;
+  const setColSpan = moveNext => {
+    for (const column of colSpanColumns) {
+      const colIdx = column.idx;
+      if (colIdx > nextIdx) break;
+      const colSpan = getSelectedCellColSpan({
+        rows,
+        topSummaryRows,
+        bottomSummaryRows,
+        rowIdx: nextRowIdx,
+        mainHeaderRowIdx,
+        lastFrozenColumnIndex,
+        column
+      });
+      if (colSpan && nextIdx > colIdx && nextIdx < colSpan + colIdx) {
+        nextIdx = colIdx + (moveNext ? colSpan : 0);
+        break;
+      }
+    }
+  };
+  const getParentRowIdx = parent => {
+    return parent.level + mainHeaderRowIdx;
+  };
+  const setHeaderGroupColAndRowSpan = () => {
+    if (moveNext) {
+      const nextColumn = columns[nextIdx];
+      let parent = nextColumn.parent;
+      while (parent !== undefined) {
+        const parentRowIdx = getParentRowIdx(parent);
+        if (nextRowIdx === parentRowIdx) {
+          nextIdx = parent.idx + parent.colSpan;
+          break;
+        }
+        parent = parent.parent;
+      }
+    } else if (moveUp) {
+      const nextColumn = columns[nextIdx];
+      let parent = nextColumn.parent;
+      let found = false;
+      while (parent !== undefined) {
+        const parentRowIdx = getParentRowIdx(parent);
+        if (nextRowIdx >= parentRowIdx) {
+          nextIdx = parent.idx;
+          nextRowIdx = parentRowIdx;
+          found = true;
+          break;
+        }
+        parent = parent.parent;
+      }
+      if (!found) {
+        nextIdx = currentIdx;
+        nextRowIdx = currentRowIdx;
+      }
+    }
+  };
+  if (isCellWithinBounds(nextPosition)) {
+    setColSpan(moveNext);
+    if (nextRowIdx < mainHeaderRowIdx) {
+      setHeaderGroupColAndRowSpan();
+    }
+  }
+  if (cellNavigationMode === 'CHANGE_ROW') {
+    const isAfterLastColumn = nextIdx === columnsCount;
+    const isBeforeFirstColumn = nextIdx === -1;
+    if (isAfterLastColumn) {
+      const isLastRow = nextRowIdx === maxRowIdx;
+      if (!isLastRow) {
+        nextIdx = 0;
+        nextRowIdx += 1;
+      }
+    } else if (isBeforeFirstColumn) {
+      const isFirstRow = nextRowIdx === minRowIdx;
+      if (!isFirstRow) {
+        nextRowIdx -= 1;
+        nextIdx = columnsCount - 1;
+      }
+      setColSpan(false);
+    }
+  }
+  if (nextRowIdx < mainHeaderRowIdx) {
+    const nextColumn = columns[nextIdx];
+    let parent = nextColumn.parent;
+    const nextParentRowIdx = nextRowIdx;
+    nextRowIdx = mainHeaderRowIdx;
+    while (parent !== undefined) {
+      const parentRowIdx = getParentRowIdx(parent);
+      if (parentRowIdx >= nextParentRowIdx) {
+        nextRowIdx = parentRowIdx;
+        nextIdx = parent.idx;
+      }
+      parent = parent.parent;
+    }
+  }
+  return {
+    idx: nextIdx,
+    rowIdx: nextRowIdx
+  };
+}
+function canExitGrid({
+  maxColIdx,
+  minRowIdx,
+  maxRowIdx,
+  selectedPosition: {
+    rowIdx,
+    idx
+  },
+  shiftKey
+}) {
+  const atLastCellInRow = idx === maxColIdx;
+  const atFirstCellInRow = idx === 0;
+  const atLastRow = rowIdx === maxRowIdx;
+  const atFirstRow = rowIdx === minRowIdx;
+  return shiftKey ? atFirstCellInRow && atFirstRow : atLastCellInRow && atLastRow;
+}
+
+const cell = "c1wupbe7-0-0-beta-37";
 const cellClassname = `rdg-cell ${cell}`;
-const cellAutoResizeClassname = "csofj7r700-beta13";
-const cellFrozen = "ch2wcw8700-beta13";
+const cellFrozen = "cd0kgiy7-0-0-beta-37";
 const cellFrozenClassname = `rdg-cell-frozen ${cellFrozen}`;
-const cellFrozenLast = "c1wvphzh700-beta13";
+const cellFrozenLast = "c1730fa47-0-0-beta-37";
 const cellFrozenLastClassname = `rdg-cell-frozen-last ${cellFrozenLast}`;
 
-var css_248z$e = ".rnvodz5700-beta13{--rdg-color:#000;--rdg-border-color:#ddd;--rdg-summary-border-color:#aaa;--rdg-background-color:#fff;--rdg-header-background-color:#f9f9f9;--rdg-row-hover-background-color:#f5f5f5;--rdg-row-selected-background-color:#dbecfa;--row-selected-hover-background-color:#c9e3f8;--rdg-checkbox-color:#005194;--rdg-checkbox-focus-color:#61b8ff;--rdg-checkbox-disabled-border-color:#ccc;--rdg-checkbox-disabled-background-color:#ddd;--rdg-selection-color:#66afe9;--rdg-font-size:14px;background-color:var(--rdg-background-color);block-size:350px;border:1px solid var(--rdg-border-color);box-sizing:border-box;color:var(--rdg-color);color-scheme:var(--rdg-color-scheme,light dark);contain:strict;contain:size layout style paint;content-visibility:auto;display:grid;font-size:var(--rdg-font-size);overflow:auto;user-select:none}@supports not (contain:strict){.rnvodz5700-beta13{position:relative;z-index:0}}.rnvodz5700-beta13 *,.rnvodz5700-beta13 :after,.rnvodz5700-beta13 :before{box-sizing:inherit}.rnvodz5700-beta13:before{content:\"\";grid-column:1/-1;grid-row:1/-1}.rnvodz5700-beta13.rdg-dark{--rdg-color-scheme:dark;--rdg-color:#ddd;--rdg-border-color:#444;--rdg-summary-border-color:#555;--rdg-background-color:#212121;--rdg-header-background-color:#1b1b1b;--rdg-row-hover-background-color:#171717;--rdg-row-selected-background-color:#1a73bc;--row-selected-hover-background-color:#1768ab;--rdg-checkbox-color:#94cfff;--rdg-checkbox-focus-color:#c7e6ff;--rdg-checkbox-disabled-border-color:#000;--rdg-checkbox-disabled-background-color:#333}.rnvodz5700-beta13.rdg-light{--rdg-color-scheme:light}@media (prefers-color-scheme:dark){.rnvodz5700-beta13:not(.rdg-light){--rdg-color:#ddd;--rdg-border-color:#444;--rdg-summary-border-color:#555;--rdg-background-color:#212121;--rdg-header-background-color:#1b1b1b;--rdg-row-hover-background-color:#171717;--rdg-row-selected-background-color:#1a73bc;--row-selected-hover-background-color:#1768ab;--rdg-checkbox-color:#94cfff;--rdg-checkbox-focus-color:#c7e6ff;--rdg-checkbox-disabled-border-color:#000;--rdg-checkbox-disabled-background-color:#333}}.vlqv91k700-beta13.r1upfr80700-beta13{cursor:move}.f1lsfrzw700-beta13{grid-column:1/-1;pointer-events:none;z-index:4}";
-styleInject(css_248z$e,{"insertAt":"top"});
+function getRowStyle(rowIdx, height) {
+  if (height !== undefined) {
+    return {
+      '--rdg-grid-row-start': rowIdx,
+      '--rdg-row-height': `${height}px`
+    };
+  }
+  return {
+    '--rdg-grid-row-start': rowIdx
+  };
+}
+function getHeaderCellStyle(column, rowIdx, rowSpan) {
+  const gridRowEnd = rowIdx + 1;
+  const paddingBlockStart = `calc(${rowSpan - 1} * var(--rdg-header-row-height))`;
+  if (column.parent === undefined) {
+    return {
+      insetBlockStart: 0,
+      gridRowStart: 1,
+      gridRowEnd,
+      paddingBlockStart
+    };
+  }
+  return {
+    insetBlockStart: `calc(${rowIdx - rowSpan} * var(--rdg-header-row-height))`,
+    gridRowStart: gridRowEnd - rowSpan,
+    gridRowEnd,
+    paddingBlockStart
+  };
+}
+function getCellStyle(column, colSpan = 1) {
+  const index = column.idx + 1;
+  return {
+    gridColumnStart: index,
+    gridColumnEnd: index + colSpan,
+    insetInlineStart: column.frozen ? `var(--rdg-frozen-left-${column.idx})` : undefined
+  };
+}
+function getCellClassname(column, ...extraClasses) {
+  return clsx(cellClassname, ...extraClasses, column.frozen && cellFrozenClassname, column.isLastFrozenColumn && cellFrozenLastClassname);
+}
 
-const root = "rnvodz5700-beta13";
-const rootClassname = `rdg ${root}`;
-const viewportDragging = "vlqv91k700-beta13";
-const viewportDraggingClassname = `rdg-viewport-dragging ${viewportDragging}`;
-const focusSinkClassname = "f1lsfrzw700-beta13";
+const {
+  min,
+  max,
+  round,
+  floor,
+  sign,
+  abs
+} = Math;
+function assertIsValidKeyGetter(keyGetter) {
+  if (typeof keyGetter !== 'function') {
+    throw new Error('Please specify the rowKeyGetter prop to use selection');
+  }
+}
+function clampColumnWidth(width, {
+  minWidth,
+  maxWidth
+}) {
+  width = max(width, minWidth);
+  if (typeof maxWidth === 'number' && maxWidth >= minWidth) {
+    return min(width, maxWidth);
+  }
+  return width;
+}
+function getHeaderCellRowSpan(column, rowIdx) {
+  return column.parent === undefined ? rowIdx : column.level - column.parent.level;
+}
 
-var css_248z$d = ".r1upfr80700-beta13{background-color:var(--rdg-background-color);display:contents;line-height:var(--rdg-row-height)}.r1upfr80700-beta13:hover{background-color:var(--rdg-row-hover-background-color)}.r1upfr80700-beta13[aria-selected=true]{background-color:var(--rdg-row-selected-background-color)}.r1upfr80700-beta13[aria-selected=true]:hover{background-color:var(--row-selected-hover-background-color)}.r190mhd3700-beta13{outline:2px solid var(--rdg-selection-color);outline-offset:-2px}.r139qu9m700-beta13:before{border-inline-start:2px solid var(--rdg-selection-color);content:\"\";display:inline-block;height:100%;inset-inline-start:0;position:sticky}";
-styleInject(css_248z$d,{"insertAt":"top"});
-
-const row = "r1upfr80700-beta13";
-const rowClassname = `rdg-row ${row}`;
-const rowSelected = "r190mhd3700-beta13";
-const rowSelectedClassname = `rdg-row-selected`;
-const rowSelectedWithFrozenCell = "r139qu9m700-beta13";
-
-var css_248z$c = ".c2xai5k700-beta13{align-items:center;cursor:pointer;display:flex;inset:0;justify-content:center;margin-inline-end:1px;position:absolute}.c1nhzyev700-beta13{all:unset}.cdhtjkm700-beta13{background-color:var(--rdg-background-color);block-size:20px;border:2px solid var(--rdg-border-color);content:\"\";inline-size:20px}.c1nhzyev700-beta13:checked+.cdhtjkm700-beta13{background-color:var(--rdg-checkbox-color);outline:4px solid var(--rdg-background-color);outline-offset:-6px}.c1nhzyev700-beta13:focus+.cdhtjkm700-beta13{border-color:var(--rdg-checkbox-focus-color)}.cy65rq2700-beta13{cursor:default}.cy65rq2700-beta13 .cdhtjkm700-beta13{background-color:var(--rdg-checkbox-disabled-background-color);border-color:var(--rdg-checkbox-disabled-border-color)}";
-styleInject(css_248z$c,{"insertAt":"top"});
-
-const checkboxLabel = "c2xai5k700-beta13";
+const checkboxLabel = "c1hs68w07-0-0-beta-37";
 const checkboxLabelClassname = `rdg-checkbox-label ${checkboxLabel}`;
-const checkboxInput = "c1nhzyev700-beta13";
+const checkboxInput = "cojpd0n7-0-0-beta-37";
 const checkboxInputClassname = `rdg-checkbox-input ${checkboxInput}`;
-const checkbox = "cdhtjkm700-beta13";
+const checkbox = "cwsfieb7-0-0-beta-37";
 const checkboxClassname = `rdg-checkbox ${checkbox}`;
-const checkboxLabelDisabled = "cy65rq2700-beta13";
+const checkboxLabelDisabled = "c1fgadbl7-0-0-beta-37";
 const checkboxLabelDisabledClassname = `rdg-checkbox-label-disabled ${checkboxLabelDisabled}`;
-const CheckboxFormatter = /*#__PURE__*/react.forwardRef(function CheckboxFormatter({
+function renderCheckbox({
   onChange,
   ...props
-}, ref) {
+}) {
   function handleChange(e) {
     onChange(e.target.checked, e.nativeEvent.shiftKey);
   }
-
   return /*#__PURE__*/jsxRuntime.jsxs("label", {
     className: clsx(checkboxLabelClassname, props.disabled && checkboxLabelDisabledClassname),
     children: [/*#__PURE__*/jsxRuntime.jsx("input", {
       type: "checkbox",
-      ref: ref,
       ...props,
       className: checkboxInputClassname,
       onChange: handleChange
@@ -93,82 +363,23 @@ const CheckboxFormatter = /*#__PURE__*/react.forwardRef(function CheckboxFormatt
       className: checkboxClassname
     })]
   });
-});
-
-const useLayoutEffect = typeof window === 'undefined' ? react.useEffect : react.useLayoutEffect;
-
-function useFocusRef(isSelected) {
-  const ref = react.useRef(null);
-  useLayoutEffect(() => {
-    if (!isSelected) return;
-    ref.current?.focus({
-      preventScroll: true
-    });
-  }, [isSelected]);
-  return {
-    ref,
-    tabIndex: isSelected ? 0 : -1
-  };
 }
 
-const DataGridDefaultComponentsContext = /*#__PURE__*/react.createContext(undefined);
-const DataGridDefaultComponentsProvider = DataGridDefaultComponentsContext.Provider;
-function useDefaultComponents() {
-  return react.useContext(DataGridDefaultComponentsContext);
-}
-
-function SelectCellFormatter({
-  value,
-  isCellSelected,
-  disabled,
-  onChange,
-  'aria-label': ariaLabel,
-  'aria-labelledby': ariaLabelledBy
-}) {
-  const {
-    ref,
-    tabIndex
-  } = useFocusRef(isCellSelected);
-  const Formatter = useDefaultComponents().checkboxFormatter;
-  return /*#__PURE__*/jsxRuntime.jsx(Formatter, {
-    "aria-label": ariaLabel,
-    "aria-labelledby": ariaLabelledBy,
-    ref: ref,
-    tabIndex: tabIndex,
-    disabled: disabled,
-    checked: value,
-    onChange: onChange
+const groupCellContent = "g1w3c5217-0-0-beta-37";
+const groupCellContentClassname = `rdg-group-cell-content ${groupCellContent}`;
+const caret = "cm5tyhw7-0-0-beta-37";
+const caretClassname = `rdg-caret ${caret}`;
+function renderToggleGroup(props) {
+  return /*#__PURE__*/jsxRuntime.jsx(ToggleGroup, {
+    ...props
   });
 }
-
-function ValueFormatter(props) {
-  try {
-    return /*#__PURE__*/jsxRuntime.jsx(jsxRuntime.Fragment, {
-      children: props.row[props.column.key]
-    });
-  } catch {
-    return null;
-  }
-}
-
-var css_248z$b = ".g1vzro7t700-beta13{outline:none}.c1fsqdic700-beta13{stroke:currentColor;stroke-width:1.5px;fill:transparent;margin-inline-start:4px;vertical-align:middle}.c1fsqdic700-beta13>path{transition:d .1s}";
-styleInject(css_248z$b,{"insertAt":"top"});
-
-const groupCellContent = "g1vzro7t700-beta13";
-const groupCellContentClassname = `rdg-group-cell-content ${groupCellContent}`;
-const caret = "c1fsqdic700-beta13";
-const caretClassname = `rdg-caret ${caret}`;
-function ToggleGroupFormatter({
+function ToggleGroup({
   groupKey,
   isExpanded,
-  isCellSelected,
+  tabIndex,
   toggleGroup
 }) {
-  const {
-    ref,
-    tabIndex
-  } = useFocusRef(isCellSelected);
-
   function handleKeyDown({
     key
   }) {
@@ -176,10 +387,8 @@ function ToggleGroupFormatter({
       toggleGroup();
     }
   }
-
   const d = isExpanded ? 'M1 1 L 7 7 L 13 1' : 'M1 7 L 7 1 L 13 7';
   return /*#__PURE__*/jsxRuntime.jsxs("span", {
-    ref: ref,
     className: groupCellContentClassname,
     tabIndex: tabIndex,
     onKeyDown: handleKeyDown,
@@ -196,6 +405,39 @@ function ToggleGroupFormatter({
   });
 }
 
+function renderValue(props) {
+  try {
+    return props.row[props.column.key];
+  } catch {
+    return null;
+  }
+}
+
+const DataGridDefaultRenderersContext = /*#__PURE__*/react.createContext(undefined);
+const DataGridDefaultRenderersProvider = DataGridDefaultRenderersContext.Provider;
+function useDefaultRenderers() {
+  return react.useContext(DataGridDefaultRenderersContext);
+}
+
+function SelectCellFormatter({
+  value,
+  tabIndex,
+  disabled,
+  onChange,
+  'aria-label': ariaLabel,
+  'aria-labelledby': ariaLabelledBy
+}) {
+  const renderCheckbox = useDefaultRenderers().renderCheckbox;
+  return renderCheckbox({
+    'aria-label': ariaLabel,
+    'aria-labelledby': ariaLabelledBy,
+    tabIndex,
+    disabled,
+    checked: value,
+    onChange
+  });
+}
+
 const RowSelectionContext = /*#__PURE__*/react.createContext(undefined);
 const RowSelectionProvider = RowSelectionContext.Provider;
 const RowSelectionChangeContext = /*#__PURE__*/react.createContext(undefined);
@@ -203,24 +445,36 @@ const RowSelectionChangeProvider = RowSelectionChangeContext.Provider;
 function useRowSelection() {
   const rowSelectionContext = react.useContext(RowSelectionContext);
   const rowSelectionChangeContext = react.useContext(RowSelectionChangeContext);
-
   if (rowSelectionContext === undefined || rowSelectionChangeContext === undefined) {
     throw new Error('useRowSelection must be used within DataGrid cells');
   }
-
   return [rowSelectionContext, rowSelectionChangeContext];
 }
 
 const SELECT_COLUMN_KEY = 'select-row';
-
+function HeaderRenderer(props) {
+  const [isRowSelected, onRowSelectionChange] = useRowSelection();
+  return /*#__PURE__*/jsxRuntime.jsx(SelectCellFormatter, {
+    "aria-label": "Select All",
+    tabIndex: props.tabIndex,
+    value: isRowSelected,
+    onChange: checked => {
+      onRowSelectionChange({
+        type: 'HEADER',
+        checked
+      });
+    }
+  });
+}
 function SelectFormatter(props) {
   const [isRowSelected, onRowSelectionChange] = useRowSelection();
   return /*#__PURE__*/jsxRuntime.jsx(SelectCellFormatter, {
     "aria-label": "Select",
-    isCellSelected: props.isCellSelected,
+    tabIndex: props.tabIndex,
     value: isRowSelected,
     onChange: (checked, isShiftClick) => {
       onRowSelectionChange({
+        type: 'ROW',
         row: props.row,
         checked,
         isShiftClick
@@ -228,15 +482,15 @@ function SelectFormatter(props) {
     }
   });
 }
-
 function SelectGroupFormatter(props) {
   const [isRowSelected, onRowSelectionChange] = useRowSelection();
   return /*#__PURE__*/jsxRuntime.jsx(SelectCellFormatter, {
     "aria-label": "Select Group",
-    isCellSelected: props.isCellSelected,
+    tabIndex: props.tabIndex,
     value: isRowSelected,
     onChange: checked => {
       onRowSelectionChange({
+        type: 'ROW',
         row: props.row,
         checked,
         isShiftClick: false
@@ -244,7 +498,6 @@ function SelectGroupFormatter(props) {
     }
   });
 }
-
 const SelectColumn = {
   key: SELECT_COLUMN_KEY,
   name: '',
@@ -254,316 +507,88 @@ const SelectColumn = {
   resizable: false,
   sortable: false,
   frozen: true,
-
-  headerRenderer(props) {
-    return /*#__PURE__*/jsxRuntime.jsx(SelectCellFormatter, {
-      "aria-label": "Select All",
-      isCellSelected: props.isCellSelected,
-      value: props.allRowsSelected,
-      onChange: props.onAllRowsSelectionChange
+  renderHeaderCell(props) {
+    return /*#__PURE__*/jsxRuntime.jsx(HeaderRenderer, {
+      ...props
     });
   },
-
-  formatter: SelectFormatter,
-  groupFormatter: SelectGroupFormatter
+  renderCell(props) {
+    return /*#__PURE__*/jsxRuntime.jsx(SelectFormatter, {
+      ...props
+    });
+  },
+  renderGroupCell(props) {
+    return /*#__PURE__*/jsxRuntime.jsx(SelectGroupFormatter, {
+      ...props
+    });
+  }
 };
 
-function getColSpan(column, lastFrozenColumnIndex, args) {
-  const colSpan = typeof column.colSpan === 'function' ? column.colSpan(args) : 1;
-
-  if (Number.isInteger(colSpan) && colSpan > 1 && (!column.frozen || column.idx + colSpan - 1 <= lastFrozenColumnIndex)) {
-    return colSpan;
-  }
-
-  return undefined;
-}
-
-function scrollIntoView(element) {
-  element?.scrollIntoView({
-    inline: 'nearest',
-    block: 'nearest'
-  });
-}
-
-const nonInputKeys = new Set(['Unidentified', 'Alt', 'AltGraph', 'CapsLock', 'Control', 'Fn', 'FnLock', 'Meta', 'NumLock', 'ScrollLock', 'Shift', 'Tab', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowUp', 'End', 'Home', 'PageDown', 'PageUp', 'Insert', 'ContextMenu', 'Escape', 'Pause', 'Play', 'PrintScreen', 'F1', 'F3', 'F4', 'F5', 'F6', 'F7', 'F8', 'F9', 'F10', 'F11', 'F12']);
-function isCtrlKeyHeldDown(e) {
-  return (e.ctrlKey || e.metaKey) && e.key !== 'Control';
-}
-function isDefaultCellInput(event) {
-  return !nonInputKeys.has(event.key);
-}
-function onEditorNavigation({
-  key,
-  target
-}) {
-  if (key === 'Tab' && (target instanceof HTMLInputElement || target instanceof HTMLTextAreaElement || target instanceof HTMLSelectElement)) {
-    return target.matches('.rdg-editor-container > :only-child, .rdg-editor-container > label:only-child > :only-child');
-  }
-
-  return false;
-}
-
-function isSelectedCellSelectable(columns, selectedPosition) {
-  const column = columns[selectedPosition.idx];
-  return column.selectable !== false;
-}
-function isSelectedCellEditable({
-  selectedPosition,
-  columns,
-  rows,
-  isGroupRow
-}) {
-  const column = columns[selectedPosition.idx];
-  const row = rows[selectedPosition.rowIdx];
-  return !isGroupRow(row) && isCellEditable(column, row);
-}
-function isCellEditable(column, row) {
-  return column.editor != null && !column.rowGroup && (typeof column.editable === 'function' ? column.editable(row) : column.editable) !== false;
-}
-function getSelectedCellColSpan({
-  rows,
-  summaryRows,
-  rowIdx,
-  lastFrozenColumnIndex,
-  column,
-  isGroupRow
-}) {
-  if (rowIdx === -1) {
-    return getColSpan(column, lastFrozenColumnIndex, {
-      type: 'HEADER'
-    });
-  }
-
-  if (rowIdx >= 0 && rowIdx < rows.length) {
-    const row = rows[rowIdx];
-
-    if (!isGroupRow(row)) {
-      return getColSpan(column, lastFrozenColumnIndex, {
-        type: 'ROW',
-        row
-      });
-    }
-
-    return undefined;
-  }
-
-  if (summaryRows) {
-    return getColSpan(column, lastFrozenColumnIndex, {
-      type: 'SUMMARY',
-      row: summaryRows[rowIdx - rows.length]
-    });
-  }
-
-  return undefined;
-}
-function getNextSelectedCellPosition({
-  cellNavigationMode,
-  columns,
-  colSpanColumns,
-  rows,
-  summaryRows,
-  minRowIdx,
-  maxRowIdx,
-  currentPosition: {
-    idx: currentIdx
-  },
-  nextPosition,
-  lastFrozenColumnIndex,
-  isCellWithinBounds,
-  isGroupRow
-}) {
-  let {
-    idx: nextIdx,
-    rowIdx: nextRowIdx
-  } = nextPosition;
-
-  const setColSpan = moveRight => {
-    if (nextRowIdx >= 0 && nextRowIdx < rows.length) {
-      const row = rows[nextRowIdx];
-      if (isGroupRow(row)) return;
-    }
-
-    for (const column of colSpanColumns) {
-      const colIdx = column.idx;
-      if (colIdx > nextIdx) break;
-      const colSpan = getSelectedCellColSpan({
-        rows,
-        summaryRows,
-        rowIdx: nextRowIdx,
-        lastFrozenColumnIndex,
-        column,
-        isGroupRow
-      });
-
-      if (colSpan && nextIdx > colIdx && nextIdx < colSpan + colIdx) {
-        nextIdx = colIdx + (moveRight ? colSpan : 0);
-        break;
-      }
-    }
-  };
-
-  if (isCellWithinBounds(nextPosition)) {
-    setColSpan(nextIdx - currentIdx > 0);
-  }
-
-  if (cellNavigationMode !== 'NONE') {
-    const columnsCount = columns.length;
-    const isAfterLastColumn = nextIdx === columnsCount;
-    const isBeforeFirstColumn = nextIdx === -1;
-
-    if (isAfterLastColumn) {
-      if (cellNavigationMode === 'CHANGE_ROW') {
-        const isLastRow = nextRowIdx === maxRowIdx;
-
-        if (!isLastRow) {
-          nextIdx = 0;
-          nextRowIdx += 1;
-        }
-      } else {
-        nextIdx = 0;
-      }
-    } else if (isBeforeFirstColumn) {
-      if (cellNavigationMode === 'CHANGE_ROW') {
-        const isFirstRow = nextRowIdx === minRowIdx;
-
-        if (!isFirstRow) {
-          nextRowIdx -= 1;
-          nextIdx = columnsCount - 1;
-        }
-      } else {
-        nextIdx = columnsCount - 1;
-      }
-
-      setColSpan(false);
-    }
-  }
-
-  return {
-    idx: nextIdx,
-    rowIdx: nextRowIdx
-  };
-}
-function canExitGrid({
-  cellNavigationMode,
-  maxColIdx,
-  minRowIdx,
-  maxRowIdx,
-  selectedPosition: {
-    rowIdx,
-    idx
-  },
-  shiftKey
-}) {
-  if (cellNavigationMode === 'NONE' || cellNavigationMode === 'CHANGE_ROW') {
-    const atLastCellInRow = idx === maxColIdx;
-    const atFirstCellInRow = idx === 0;
-    const atLastRow = rowIdx === maxRowIdx;
-    const atFirstRow = rowIdx === minRowIdx;
-    return shiftKey ? atFirstCellInRow && atFirstRow : atLastCellInRow && atLastRow;
-  }
-
-  return false;
-}
-
-function getRowStyle(rowIdx, height) {
-  if (height !== undefined) {
-    return {
-      '--rdg-grid-row-start': rowIdx,
-      '--rdg-row-height': `${height}px`
-    };
-  }
-
-  return {
-    '--rdg-grid-row-start': rowIdx
-  };
-}
-function getCellStyle(column, colSpan) {
-  return {
-    gridColumnStart: column.idx + 1,
-    gridColumnEnd: colSpan !== undefined ? `span ${colSpan}` : undefined,
-    insetInlineStart: column.frozen ? `var(--rdg-frozen-left-${column.idx})` : undefined
-  };
-}
-function getCellClassname(column, ...extraClasses) {
-  return clsx(cellClassname, ...extraClasses, column.frozen && cellFrozenClassname, column.isLastFrozenColumn && cellFrozenLastClassname);
-}
-
-const {
-  min,
-  max,
-  round,
-  floor,
-  sign,
-  abs,
-  ceil
-} = Math;
-function assertIsValidKeyGetter(keyGetter) {
-  if (typeof keyGetter !== 'function') {
-    throw new Error('Please specify the rowKeyGetter prop to use selection');
-  }
-}
-function clampColumnWidth(width, {
-  minWidth,
-  maxWidth
-}) {
-  width = max(width, minWidth);
-
-  if (typeof maxWidth === 'number' && maxWidth >= minWidth) {
-    return min(width, maxWidth);
-  }
-
-  return width;
-}
-
+const DEFAULT_COLUMN_WIDTH = 'auto';
+const DEFAULT_COLUMN_MIN_WIDTH = 50;
 function useCalculatedColumns({
   rawColumns,
-  columnWidths,
+  defaultColumnOptions,
+  measuredColumnWidths,
+  resizedColumnWidths,
   viewportWidth,
   scrollLeft,
-  defaultColumnOptions,
-  rawGroupBy,
   enableVirtualization
 }) {
-  const defaultWidth = defaultColumnOptions?.width;
-  const defaultMinWidth = defaultColumnOptions?.minWidth ?? 80;
-  const defaultMaxWidth = defaultColumnOptions?.maxWidth;
-  const defaultFormatter = defaultColumnOptions?.formatter ?? ValueFormatter;
+  const defaultWidth = defaultColumnOptions?.width ?? DEFAULT_COLUMN_WIDTH;
+  const defaultMinWidth = defaultColumnOptions?.minWidth ?? DEFAULT_COLUMN_MIN_WIDTH;
+  const defaultMaxWidth = defaultColumnOptions?.maxWidth ?? undefined;
+  const defaultCellRenderer = defaultColumnOptions?.renderCell ?? renderValue;
   const defaultSortable = defaultColumnOptions?.sortable ?? false;
   const defaultResizable = defaultColumnOptions?.resizable ?? false;
   const {
     columns,
     colSpanColumns,
     lastFrozenColumnIndex,
-    groupBy
+    headerRowsCount
   } = react.useMemo(() => {
-    const groupBy = [];
     let lastFrozenColumnIndex = -1;
-    const columns = rawColumns.map(rawColumn => {
-      const rowGroup = rawGroupBy?.includes(rawColumn.key) ?? false;
-      const frozen = rowGroup || rawColumn.frozen || false;
-      const column = { ...rawColumn,
-        idx: 0,
-        frozen,
-        isLastFrozenColumn: false,
-        rowGroup,
-        width: rawColumn.width ?? defaultWidth,
-        minWidth: rawColumn.minWidth ?? defaultMinWidth,
-        maxWidth: rawColumn.maxWidth ?? defaultMaxWidth,
-        sortable: rawColumn.sortable ?? defaultSortable,
-        resizable: rawColumn.resizable ?? defaultResizable,
-        formatter: rawColumn.formatter ?? defaultFormatter
-      };
-
-      if (rowGroup) {
-        column.groupFormatter ?? (column.groupFormatter = ToggleGroupFormatter);
+    let headerRowsCount = 1;
+    const columns = [];
+    collectColumns(rawColumns, 1);
+    function collectColumns(rawColumns, level, parent) {
+      for (const rawColumn of rawColumns) {
+        if ('children' in rawColumn) {
+          const calculatedColumnParent = {
+            name: rawColumn.name,
+            parent,
+            idx: -1,
+            colSpan: 0,
+            level: 0,
+            headerCellClass: rawColumn.headerCellClass
+          };
+          collectColumns(rawColumn.children, level + 1, calculatedColumnParent);
+          continue;
+        }
+        const frozen = rawColumn.frozen ?? false;
+        const column = {
+          ...rawColumn,
+          parent,
+          idx: 0,
+          level: 0,
+          frozen,
+          isLastFrozenColumn: false,
+          width: rawColumn.width ?? defaultWidth,
+          minWidth: rawColumn.minWidth ?? defaultMinWidth,
+          maxWidth: rawColumn.maxWidth ?? defaultMaxWidth,
+          sortable: rawColumn.sortable ?? defaultSortable,
+          resizable: rawColumn.resizable ?? defaultResizable,
+          renderCell: rawColumn.renderCell ?? defaultCellRenderer
+        };
+        columns.push(column);
+        if (frozen) {
+          lastFrozenColumnIndex++;
+        }
+        if (level > headerRowsCount) {
+          headerRowsCount = level;
+        }
       }
-
-      if (frozen) {
-        lastFrozenColumnIndex++;
-      }
-
-      return column;
-    });
+    }
     columns.sort(({
       key: aKey,
       frozen: frozenA
@@ -573,50 +598,33 @@ function useCalculatedColumns({
     }) => {
       if (aKey === SELECT_COLUMN_KEY) return -1;
       if (bKey === SELECT_COLUMN_KEY) return 1;
-
-      if (rawGroupBy?.includes(aKey)) {
-        if (rawGroupBy.includes(bKey)) {
-          return rawGroupBy.indexOf(aKey) - rawGroupBy.indexOf(bKey);
-        }
-
-        return -1;
-      }
-
-      if (rawGroupBy?.includes(bKey)) return 1;
-
       if (frozenA) {
         if (frozenB) return 0;
         return -1;
       }
-
       if (frozenB) return 1;
       return 0;
     });
     const colSpanColumns = [];
     columns.forEach((column, idx) => {
       column.idx = idx;
-
-      if (column.rowGroup) {
-        groupBy.push(column.key);
-      }
-
+      updateColumnParent(column, idx, 0);
       if (column.colSpan != null) {
         colSpanColumns.push(column);
       }
     });
-
     if (lastFrozenColumnIndex !== -1) {
       columns[lastFrozenColumnIndex].isLastFrozenColumn = true;
     }
-
     return {
       columns,
       colSpanColumns,
       lastFrozenColumnIndex,
-      groupBy
+      headerRowsCount
     };
-  }, [rawColumns, defaultWidth, defaultMinWidth, defaultMaxWidth, defaultFormatter, defaultResizable, defaultSortable, rawGroupBy]);
+  }, [rawColumns, defaultWidth, defaultMinWidth, defaultMaxWidth, defaultCellRenderer, defaultResizable, defaultSortable]);
   const {
+    templateColumns,
     layoutCssVars,
     totalFrozenColumnWidth,
     columnMetrics
@@ -624,114 +632,70 @@ function useCalculatedColumns({
     const columnMetrics = new Map();
     let left = 0;
     let totalFrozenColumnWidth = 0;
-    let templateColumns = '';
-    let allocatedWidth = 0;
-    let unassignedColumnsCount = 0;
-
+    const templateColumns = [];
     for (const column of columns) {
-      let width = getSpecifiedWidth(column, columnWidths, viewportWidth);
-
-      if (width === undefined) {
-        unassignedColumnsCount++;
-      } else {
+      let width = resizedColumnWidths.get(column.key) ?? measuredColumnWidths.get(column.key) ?? column.width;
+      if (typeof width === 'number') {
         width = clampColumnWidth(width, column);
-        allocatedWidth += width;
-        columnMetrics.set(column, {
-          width,
-          left: 0
-        });
-      }
-    }
-
-    for (const column of columns) {
-      let width;
-
-      if (columnMetrics.has(column)) {
-        const columnMetric = columnMetrics.get(column);
-        columnMetric.left = left;
-        ({
-          width
-        } = columnMetric);
       } else {
-        const unallocatedWidth = viewportWidth - allocatedWidth;
-        const unallocatedColumnWidth = round(unallocatedWidth / unassignedColumnsCount);
-        width = clampColumnWidth(unallocatedColumnWidth, column);
-        allocatedWidth += width;
-        unassignedColumnsCount--;
-        columnMetrics.set(column, {
-          width,
-          left
-        });
+        width = column.minWidth;
       }
-
+      templateColumns.push(`${width}px`);
+      columnMetrics.set(column, {
+        width,
+        left
+      });
       left += width;
-      templateColumns += `${width}px `;
     }
-
     if (lastFrozenColumnIndex !== -1) {
       const columnMetric = columnMetrics.get(columns[lastFrozenColumnIndex]);
       totalFrozenColumnWidth = columnMetric.left + columnMetric.width;
     }
-
-    const layoutCssVars = {
-      gridTemplateColumns: templateColumns
-    };
-
+    const layoutCssVars = {};
     for (let i = 0; i <= lastFrozenColumnIndex; i++) {
       const column = columns[i];
       layoutCssVars[`--rdg-frozen-left-${column.idx}`] = `${columnMetrics.get(column).left}px`;
     }
-
     return {
+      templateColumns,
       layoutCssVars,
       totalFrozenColumnWidth,
       columnMetrics
     };
-  }, [columnWidths, columns, viewportWidth, lastFrozenColumnIndex]);
+  }, [measuredColumnWidths, resizedColumnWidths, columns, lastFrozenColumnIndex]);
   const [colOverscanStartIdx, colOverscanEndIdx] = react.useMemo(() => {
     if (!enableVirtualization) {
       return [0, columns.length - 1];
     }
-
     const viewportLeft = scrollLeft + totalFrozenColumnWidth;
     const viewportRight = scrollLeft + viewportWidth;
     const lastColIdx = columns.length - 1;
     const firstUnfrozenColumnIdx = min(lastFrozenColumnIndex + 1, lastColIdx);
-
     if (viewportLeft >= viewportRight) {
       return [firstUnfrozenColumnIdx, firstUnfrozenColumnIdx];
     }
-
     let colVisibleStartIdx = firstUnfrozenColumnIdx;
-
     while (colVisibleStartIdx < lastColIdx) {
       const {
         left,
         width
       } = columnMetrics.get(columns[colVisibleStartIdx]);
-
       if (left + width > viewportLeft) {
         break;
       }
-
       colVisibleStartIdx++;
     }
-
     let colVisibleEndIdx = colVisibleStartIdx;
-
     while (colVisibleEndIdx < lastColIdx) {
       const {
         left,
         width
       } = columnMetrics.get(columns[colVisibleEndIdx]);
-
       if (left + width >= viewportRight) {
         break;
       }
-
       colVisibleEndIdx++;
     }
-
     const colOverscanStartIdx = max(firstUnfrozenColumnIdx, colVisibleStartIdx - 1);
     const colOverscanEndIdx = min(lastColIdx, colVisibleEndIdx + 1);
     return [colOverscanStartIdx, colOverscanEndIdx];
@@ -741,31 +705,109 @@ function useCalculatedColumns({
     colSpanColumns,
     colOverscanStartIdx,
     colOverscanEndIdx,
+    templateColumns,
     layoutCssVars,
-    columnMetrics,
+    headerRowsCount,
     lastFrozenColumnIndex,
-    totalFrozenColumnWidth,
-    groupBy
+    totalFrozenColumnWidth
   };
 }
-
-function getSpecifiedWidth({
-  key,
-  width
-}, columnWidths, viewportWidth) {
-  if (columnWidths.has(key)) {
-    return columnWidths.get(key);
+function updateColumnParent(column, index, level) {
+  if (level < column.level) {
+    column.level = level;
   }
-
-  if (typeof width === 'number') {
-    return width;
+  if (column.parent !== undefined) {
+    const {
+      parent
+    } = column;
+    if (parent.idx === -1) {
+      parent.idx = index;
+    }
+    parent.colSpan += 1;
+    updateColumnParent(parent, index, level - 1);
   }
+}
 
-  if (typeof width === 'string' && /^\d+%$/.test(width)) {
-    return floor(viewportWidth * parseInt(width, 10) / 100);
+const useLayoutEffect = typeof window === 'undefined' ? react.useEffect : react.useLayoutEffect;
+
+function useColumnWidths(columns, viewportColumns, templateColumns, gridRef, gridWidth, resizedColumnWidths, measuredColumnWidths, setResizedColumnWidths, setMeasuredColumnWidths, onColumnResize) {
+  const prevGridWidthRef = react.useRef(gridWidth);
+  const columnsCanFlex = columns.length === viewportColumns.length;
+  const ignorePreviouslyMeasuredColumns = columnsCanFlex && gridWidth !== prevGridWidthRef.current;
+  const newTemplateColumns = [...templateColumns];
+  const columnsToMeasure = [];
+  for (const {
+    key,
+    idx,
+    width
+  } of viewportColumns) {
+    if (typeof width === 'string' && (ignorePreviouslyMeasuredColumns || !measuredColumnWidths.has(key)) && !resizedColumnWidths.has(key)) {
+      newTemplateColumns[idx] = width;
+      columnsToMeasure.push(key);
+    }
   }
-
-  return undefined;
+  const gridTemplateColumns = newTemplateColumns.join(' ');
+  useLayoutEffect(() => {
+    prevGridWidthRef.current = gridWidth;
+    updateMeasuredWidths(columnsToMeasure);
+  });
+  function updateMeasuredWidths(columnsToMeasure) {
+    if (columnsToMeasure.length === 0) return;
+    setMeasuredColumnWidths(measuredColumnWidths => {
+      const newMeasuredColumnWidths = new Map(measuredColumnWidths);
+      let hasChanges = false;
+      for (const key of columnsToMeasure) {
+        const measuredWidth = measureColumnWidth(gridRef, key);
+        hasChanges ||= measuredWidth !== measuredColumnWidths.get(key);
+        if (measuredWidth === undefined) {
+          newMeasuredColumnWidths.delete(key);
+        } else {
+          newMeasuredColumnWidths.set(key, measuredWidth);
+        }
+      }
+      return hasChanges ? newMeasuredColumnWidths : measuredColumnWidths;
+    });
+  }
+  function handleColumnResize(column, nextWidth) {
+    const {
+      key: resizingKey
+    } = column;
+    const newTemplateColumns = [...templateColumns];
+    const columnsToMeasure = [];
+    for (const {
+      key,
+      idx,
+      width
+    } of viewportColumns) {
+      if (resizingKey === key) {
+        const width = typeof nextWidth === 'number' ? `${nextWidth}px` : nextWidth;
+        newTemplateColumns[idx] = width;
+      } else if (columnsCanFlex && typeof width === 'string' && !resizedColumnWidths.has(key)) {
+        newTemplateColumns[idx] = width;
+        columnsToMeasure.push(key);
+      }
+    }
+    gridRef.current.style.gridTemplateColumns = newTemplateColumns.join(' ');
+    const measuredWidth = typeof nextWidth === 'number' ? nextWidth : measureColumnWidth(gridRef, resizingKey);
+    reactDom.flushSync(() => {
+      setResizedColumnWidths(resizedColumnWidths => {
+        const newResizedColumnWidths = new Map(resizedColumnWidths);
+        newResizedColumnWidths.set(resizingKey, measuredWidth);
+        return newResizedColumnWidths;
+      });
+      updateMeasuredWidths(columnsToMeasure);
+    });
+    onColumnResize?.(column.idx, measuredWidth);
+  }
+  return {
+    gridTemplateColumns,
+    handleColumnResize
+  };
+}
+function measureColumnWidth(gridRef, key) {
+  const selector = `[data-measuring-cell-key="${CSS.escape(key)}"]`;
+  const measuringCell = gridRef.current.querySelector(selector);
+  return measuringCell?.getBoundingClientRect().width;
 }
 
 function useGridDimensions() {
@@ -789,14 +831,14 @@ function useGridDimensions() {
     } = gridRef.current.getBoundingClientRect();
     const initialWidth = width - offsetWidth + clientWidth;
     const initialHeight = height - offsetHeight + clientHeight;
-    setInlineSize(handleDevicePixelRatio(initialWidth));
+    setInlineSize(initialWidth);
     setBlockSize(initialHeight);
     const resizeObserver = new ResizeObserver(entries => {
-      if (entries[0].contentBoxSize?.length > 0) {
-        const size = entries[0].contentBoxSize[0];
-        setInlineSize(handleDevicePixelRatio(size.inlineSize));
+      const size = entries[0].contentBoxSize[0];
+      reactDom.flushSync(() => {
+        setInlineSize(size.inlineSize);
         setBlockSize(size.blockSize);
-      }
+      });
     });
     resizeObserver.observe(gridRef.current);
     return () => {
@@ -806,47 +848,31 @@ function useGridDimensions() {
   return [gridRef, inlineSize, blockSize];
 }
 
-function handleDevicePixelRatio(size) {
-  return size - (devicePixelRatio === 1 ? 0 : ceil(devicePixelRatio));
-}
-
 function useLatestFunc(fn) {
   const ref = react.useRef(fn);
   react.useEffect(() => {
     ref.current = fn;
   });
-  return react.useCallback((...args) => {
+  const callbackFn = react.useCallback((...args) => {
     ref.current(...args);
   }, []);
+  return fn ? callbackFn : fn;
 }
 
-function useRovingCellRef(isSelected) {
+function useRovingTabIndex(isSelected) {
   const [isChildFocused, setIsChildFocused] = react.useState(false);
-  const [cell, setRef] = react.useState(null);
-
   if (isChildFocused && !isSelected) {
     setIsChildFocused(false);
   }
-
   function onFocus(event) {
     if (event.target !== event.currentTarget) {
       setIsChildFocused(true);
     }
   }
-
-  useLayoutEffect(() => {
-    if (isSelected && cell) {
-      scrollIntoView(cell);
-      if (cell.contains(document.activeElement)) return;
-      cell.focus({
-        preventScroll: true
-      });
-    }
-  }, [isSelected, cell]);
-  const isFocused = isSelected && !isChildFocused;
+  const isFocusable = isSelected && !isChildFocused;
   return {
-    ref: setRef,
-    tabIndex: isFocused ? 0 : -1,
+    tabIndex: isFocusable ? 0 : -1,
+    childTabIndex: isSelected ? 0 : -1,
     onFocus: isSelected ? onFocus : undefined
   };
 }
@@ -855,41 +881,34 @@ function useViewportColumns({
   columns,
   colSpanColumns,
   rows,
-  summaryRows,
+  topSummaryRows,
+  bottomSummaryRows,
   colOverscanStartIdx,
   colOverscanEndIdx,
   lastFrozenColumnIndex,
   rowOverscanStartIdx,
-  rowOverscanEndIdx,
-  isGroupRow
+  rowOverscanEndIdx
 }) {
   const startIdx = react.useMemo(() => {
     if (colOverscanStartIdx === 0) return 0;
     let startIdx = colOverscanStartIdx;
-
     const updateStartIdx = (colIdx, colSpan) => {
       if (colSpan !== undefined && colIdx + colSpan > colOverscanStartIdx) {
         startIdx = colIdx;
         return true;
       }
-
       return false;
     };
-
     for (const column of colSpanColumns) {
       const colIdx = column.idx;
       if (colIdx >= startIdx) break;
-
       if (updateStartIdx(colIdx, getColSpan(column, lastFrozenColumnIndex, {
         type: 'HEADER'
       }))) {
         break;
       }
-
       for (let rowIdx = rowOverscanStartIdx; rowIdx <= rowOverscanEndIdx; rowIdx++) {
         const row = rows[rowIdx];
-        if (isGroupRow(row)) continue;
-
         if (updateStartIdx(colIdx, getColSpan(column, lastFrozenColumnIndex, {
           type: 'ROW',
           row
@@ -897,9 +916,18 @@ function useViewportColumns({
           break;
         }
       }
-
-      if (summaryRows != null) {
-        for (const row of summaryRows) {
+      if (topSummaryRows != null) {
+        for (const row of topSummaryRows) {
+          if (updateStartIdx(colIdx, getColSpan(column, lastFrozenColumnIndex, {
+            type: 'SUMMARY',
+            row
+          }))) {
+            break;
+          }
+        }
+      }
+      if (bottomSummaryRows != null) {
+        for (const row of bottomSummaryRows) {
           if (updateStartIdx(colIdx, getColSpan(column, lastFrozenColumnIndex, {
             type: 'SUMMARY',
             row
@@ -909,43 +937,1972 @@ function useViewportColumns({
         }
       }
     }
-
     return startIdx;
-  }, [rowOverscanStartIdx, rowOverscanEndIdx, rows, summaryRows, colOverscanStartIdx, lastFrozenColumnIndex, colSpanColumns, isGroupRow]);
+  }, [rowOverscanStartIdx, rowOverscanEndIdx, rows, topSummaryRows, bottomSummaryRows, colOverscanStartIdx, lastFrozenColumnIndex, colSpanColumns]);
   return react.useMemo(() => {
     const viewportColumns = [];
-
     for (let colIdx = 0; colIdx <= colOverscanEndIdx; colIdx++) {
       const column = columns[colIdx];
       if (colIdx < startIdx && !column.frozen) continue;
       viewportColumns.push(column);
     }
-
     return viewportColumns;
   }, [startIdx, colOverscanEndIdx, columns]);
 }
 
-function isReadonlyArray(arr) {
-  return Array.isArray(arr);
-}
-
 function useViewportRows({
-  rawRows,
+  rows,
   rowHeight,
   clientHeight,
   scrollTop,
-  groupBy,
-  rowGrouper,
-  expandedGroupIds,
   enableVirtualization
 }) {
-  const [groupedRows, rowsCount] = react.useMemo(() => {
-    if (groupBy.length === 0 || rowGrouper == null) return [undefined, rawRows.length];
+  const {
+    totalRowHeight,
+    gridTemplateRows,
+    getRowTop,
+    getRowHeight,
+    findRowIdx
+  } = react.useMemo(() => {
+    if (typeof rowHeight === 'number') {
+      return {
+        totalRowHeight: rowHeight * rows.length,
+        gridTemplateRows: ` repeat(${rows.length}, ${rowHeight}px)`,
+        getRowTop: rowIdx => rowIdx * rowHeight,
+        getRowHeight: () => rowHeight,
+        findRowIdx: offset => floor(offset / rowHeight)
+      };
+    }
+    let totalRowHeight = 0;
+    let gridTemplateRows = ' ';
+    const rowPositions = rows.map(row => {
+      const currentRowHeight = rowHeight(row);
+      const position = {
+        top: totalRowHeight,
+        height: currentRowHeight
+      };
+      gridTemplateRows += `${currentRowHeight}px `;
+      totalRowHeight += currentRowHeight;
+      return position;
+    });
+    const validateRowIdx = rowIdx => {
+      return max(0, min(rows.length - 1, rowIdx));
+    };
+    return {
+      totalRowHeight,
+      gridTemplateRows,
+      getRowTop: rowIdx => rowPositions[validateRowIdx(rowIdx)].top,
+      getRowHeight: rowIdx => rowPositions[validateRowIdx(rowIdx)].height,
+      findRowIdx(offset) {
+        let start = 0;
+        let end = rowPositions.length - 1;
+        while (start <= end) {
+          const middle = start + floor((end - start) / 2);
+          const currentOffset = rowPositions[middle].top;
+          if (currentOffset === offset) return middle;
+          if (currentOffset < offset) {
+            start = middle + 1;
+          } else if (currentOffset > offset) {
+            end = middle - 1;
+          }
+          if (start > end) return end;
+        }
+        return 0;
+      }
+    };
+  }, [rowHeight, rows]);
+  let rowOverscanStartIdx = 0;
+  let rowOverscanEndIdx = rows.length - 1;
+  if (enableVirtualization) {
+    const overscanThreshold = 4;
+    const rowVisibleStartIdx = findRowIdx(scrollTop);
+    const rowVisibleEndIdx = findRowIdx(scrollTop + clientHeight);
+    rowOverscanStartIdx = max(0, rowVisibleStartIdx - overscanThreshold);
+    rowOverscanEndIdx = min(rows.length - 1, rowVisibleEndIdx + overscanThreshold);
+  }
+  return {
+    rowOverscanStartIdx,
+    rowOverscanEndIdx,
+    totalRowHeight,
+    gridTemplateRows,
+    getRowTop,
+    getRowHeight,
+    findRowIdx
+  };
+}
 
+const cellCopied = "ccpfvsn7-0-0-beta-37";
+const cellCopiedClassname = `rdg-cell-copied ${cellCopied}`;
+const cellDraggedOver = "c1bmg16t7-0-0-beta-37";
+const cellDraggedOverClassname = `rdg-cell-dragged-over ${cellDraggedOver}`;
+function Cell({
+  column,
+  colSpan,
+  isCellSelected,
+  isCopied,
+  isDraggedOver,
+  row,
+  rowIdx,
+  className,
+  onClick,
+  onDoubleClick,
+  onContextMenu,
+  onRowChange,
+  selectCell,
+  ...props
+}, refComponent) {
+  const {
+    tabIndex,
+    childTabIndex,
+    onFocus
+  } = useRovingTabIndex(isCellSelected);
+  const {
+    cellClass
+  } = column;
+  className = getCellClassname(column, typeof cellClass === 'function' ? cellClass(row) : cellClass, className, isCopied && cellCopiedClassname, isDraggedOver && cellDraggedOverClassname);
+  const isEditable = isCellEditable(column, row);
+  function selectCellWrapper(openEditor) {
+    selectCell({
+      rowIdx,
+      idx: column.idx
+    }, openEditor);
+  }
+  function handleClick(event) {
+    if (onClick) {
+      const cellEvent = createCellEvent(event);
+      onClick({
+        row,
+        column,
+        selectCell: selectCellWrapper
+      }, cellEvent);
+      if (cellEvent.isGridDefaultPrevented()) return;
+    }
+    selectCellWrapper();
+  }
+  function handleContextMenu(event) {
+    if (onContextMenu) {
+      const cellEvent = createCellEvent(event);
+      onContextMenu({
+        row,
+        column,
+        selectCell: selectCellWrapper
+      }, cellEvent);
+      if (cellEvent.isGridDefaultPrevented()) return;
+    }
+    selectCellWrapper();
+  }
+  function handleDoubleClick(event) {
+    if (onDoubleClick) {
+      const cellEvent = createCellEvent(event);
+      onDoubleClick({
+        row,
+        column,
+        selectCell: selectCellWrapper
+      }, cellEvent);
+      if (cellEvent.isGridDefaultPrevented()) return;
+    }
+    selectCellWrapper(true);
+  }
+  function handleRowChange(newRow) {
+    onRowChange(column, newRow);
+  }
+  return /*#__PURE__*/jsxRuntime.jsx("div", {
+    role: "gridcell",
+    "aria-colindex": column.idx + 1,
+    "aria-colspan": colSpan,
+    "aria-selected": isCellSelected,
+    "aria-readonly": !isEditable || undefined,
+    ref: refComponent,
+    tabIndex: tabIndex,
+    className: className,
+    style: getCellStyle(column, colSpan),
+    onClick: handleClick,
+    onDoubleClick: handleDoubleClick,
+    onContextMenu: handleContextMenu,
+    onFocus: onFocus,
+    ...props,
+    children: column.renderCell({
+      column,
+      row,
+      isCellEditable: isEditable,
+      tabIndex: childTabIndex,
+      onRowChange: handleRowChange
+    })
+  });
+}
+const CellComponent = /*#__PURE__*/react.memo( /*#__PURE__*/react.forwardRef(Cell));
+const CellComponent$1 = CellComponent;
+function defaultRenderCell(key, props) {
+  return /*#__PURE__*/jsxRuntime.jsx(CellComponent, {
+    ...props
+  }, key);
+}
+
+const cellDragHandle = "cadd3bp7-0-0-beta-37";
+const cellDragHandleFrozenClassname = "ccmuez27-0-0-beta-37";
+const cellDragHandleClassname = `rdg-cell-drag-handle ${cellDragHandle}`;
+function DragHandle({
+  gridRowStart,
+  rows,
+  columns,
+  selectedPosition,
+  latestDraggedOverRowIdx,
+  isCellEditable,
+  onRowsChange,
+  onFill,
+  setDragging,
+  setDraggedOverRowIdx
+}) {
+  const {
+    idx,
+    rowIdx
+  } = selectedPosition;
+  const column = columns[idx];
+  function handleMouseDown(event) {
+    if (event.buttons !== 1) return;
+    setDragging(true);
+    window.addEventListener('mouseover', onMouseOver);
+    window.addEventListener('mouseup', onMouseUp);
+    function onMouseOver(event) {
+      if (event.buttons !== 1) onMouseUp();
+    }
+    function onMouseUp() {
+      window.removeEventListener('mouseover', onMouseOver);
+      window.removeEventListener('mouseup', onMouseUp);
+      setDragging(false);
+      handleDragEnd();
+    }
+  }
+  function handleDragEnd() {
+    const overRowIdx = latestDraggedOverRowIdx.current;
+    if (overRowIdx === undefined) return;
+    const startRowIndex = rowIdx < overRowIdx ? rowIdx + 1 : overRowIdx;
+    const endRowIndex = rowIdx < overRowIdx ? overRowIdx + 1 : rowIdx;
+    updateRows(startRowIndex, endRowIndex);
+    setDraggedOverRowIdx(undefined);
+  }
+  function handleDoubleClick(event) {
+    event.stopPropagation();
+    updateRows(rowIdx + 1, rows.length);
+  }
+  function updateRows(startRowIdx, endRowIdx) {
+    const column = columns[idx];
+    const sourceRow = rows[rowIdx];
+    const updatedRows = [...rows];
+    const indexes = [];
+    for (let i = startRowIdx; i < endRowIdx; i++) {
+      if (isCellEditable({
+        rowIdx: i,
+        idx
+      })) {
+        const updatedRow = onFill({
+          columnKey: column.key,
+          sourceRow,
+          targetRow: rows[i]
+        });
+        if (updatedRow !== rows[i]) {
+          updatedRows[i] = updatedRow;
+          indexes.push(i);
+        }
+      }
+    }
+    if (indexes.length > 0) {
+      onRowsChange?.(updatedRows, {
+        indexes,
+        column
+      });
+    }
+  }
+  const colSpan = column.colSpan?.({
+    type: 'ROW',
+    row: rows[rowIdx]
+  }) ?? 1;
+  const style = getCellStyle(column, colSpan);
+  return /*#__PURE__*/jsxRuntime.jsx("div", {
+    style: {
+      ...style,
+      gridRowStart,
+      insetInlineStart: style.insetInlineStart && typeof column.width === 'number' ? `calc(${style.insetInlineStart} + ${column.width}px - var(--rdg-drag-handle-size))` : undefined
+    },
+    className: clsx(cellDragHandleClassname, column.frozen && cellDragHandleFrozenClassname),
+    onMouseDown: handleMouseDown,
+    onDoubleClick: handleDoubleClick
+  });
+}
+
+const cellEditing = "c1tngyp17-0-0-beta-37";
+function EditCell({
+  column,
+  colSpan,
+  row,
+  rowIdx,
+  onRowChange,
+  closeEditor,
+  onKeyDown,
+  navigate
+}) {
+  const frameRequestRef = react.useRef();
+  const commitOnOutsideClick = column.editorOptions?.commitOnOutsideClick !== false;
+  const commitOnOutsideMouseDown = useLatestFunc(() => {
+    onClose(true, false);
+  });
+  react.useEffect(() => {
+    if (!commitOnOutsideClick) return;
+    function onWindowCaptureMouseDown() {
+      frameRequestRef.current = requestAnimationFrame(commitOnOutsideMouseDown);
+    }
+    addEventListener('mousedown', onWindowCaptureMouseDown, {
+      capture: true
+    });
+    return () => {
+      removeEventListener('mousedown', onWindowCaptureMouseDown, {
+        capture: true
+      });
+      cancelFrameRequest();
+    };
+  }, [commitOnOutsideClick, commitOnOutsideMouseDown]);
+  function cancelFrameRequest() {
+    cancelAnimationFrame(frameRequestRef.current);
+  }
+  function handleKeyDown(event) {
+    if (onKeyDown) {
+      const cellEvent = createCellEvent(event);
+      onKeyDown({
+        mode: 'EDIT',
+        row,
+        column,
+        rowIdx,
+        navigate() {
+          navigate(event);
+        },
+        onClose
+      }, cellEvent);
+      if (cellEvent.isGridDefaultPrevented()) return;
+    }
+    if (event.key === 'Escape') {
+      onClose();
+    } else if (event.key === 'Enter') {
+      onClose(true);
+    } else if (onEditorNavigation(event)) {
+      navigate(event);
+    }
+  }
+  function onClose(commitChanges = false, shouldFocusCell = true) {
+    if (commitChanges) {
+      onRowChange(row, true, shouldFocusCell);
+    } else {
+      closeEditor(shouldFocusCell);
+    }
+  }
+  function onEditorRowChange(row, commitChangesAndFocus = false) {
+    onRowChange(row, commitChangesAndFocus, commitChangesAndFocus);
+  }
+  const {
+    cellClass
+  } = column;
+  const className = getCellClassname(column, 'rdg-editor-container', typeof cellClass === 'function' ? cellClass(row) : cellClass, !column.editorOptions?.displayCellContent && cellEditing);
+  return /*#__PURE__*/jsxRuntime.jsx("div", {
+    role: "gridcell",
+    "aria-colindex": column.idx + 1,
+    "aria-colspan": colSpan,
+    "aria-selected": true,
+    className: className,
+    style: getCellStyle(column, colSpan),
+    onKeyDown: handleKeyDown,
+    onMouseDownCapture: cancelFrameRequest,
+    children: column.renderEditCell != null && /*#__PURE__*/jsxRuntime.jsxs(jsxRuntime.Fragment, {
+      children: [column.renderEditCell({
+        column,
+        row,
+        onRowChange: onEditorRowChange,
+        onClose
+      }), column.editorOptions?.displayCellContent && column.renderCell({
+        column,
+        row,
+        isCellEditable: true,
+        tabIndex: -1,
+        onRowChange: onEditorRowChange
+      })]
+    })
+  });
+}
+
+function GroupedColumnHeaderCell({
+  column,
+  rowIdx,
+  isCellSelected,
+  selectCell
+}) {
+  const {
+    tabIndex,
+    onFocus
+  } = useRovingTabIndex(isCellSelected);
+  const {
+    colSpan
+  } = column;
+  const rowSpan = getHeaderCellRowSpan(column, rowIdx);
+  const index = column.idx + 1;
+  function onClick() {
+    selectCell({
+      idx: column.idx,
+      rowIdx
+    });
+  }
+  return /*#__PURE__*/jsxRuntime.jsx("div", {
+    role: "columnheader",
+    "aria-colindex": index,
+    "aria-colspan": colSpan,
+    "aria-rowspan": rowSpan,
+    "aria-selected": isCellSelected,
+    tabIndex: tabIndex,
+    className: clsx(cellClassname, column.headerCellClass),
+    style: {
+      ...getHeaderCellStyle(column, rowIdx, rowSpan),
+      gridColumnStart: index,
+      gridColumnEnd: index + colSpan
+    },
+    onFocus: onFocus,
+    onClick: onClick,
+    children: column.name
+  });
+}
+
+const headerSortCellClassname = "hizp7y17-0-0-beta-37";
+const headerSortName = "h14cojrm7-0-0-beta-37";
+const headerSortNameClassname = `rdg-header-sort-name ${headerSortName}`;
+function renderHeaderCell({
+  column,
+  sortDirection,
+  priority
+}) {
+  if (!column.sortable) return column.name;
+  return /*#__PURE__*/jsxRuntime.jsx(SortableHeaderCell, {
+    sortDirection: sortDirection,
+    priority: priority,
+    children: column.name
+  });
+}
+function SortableHeaderCell({
+  sortDirection,
+  priority,
+  children
+}) {
+  const renderSortStatus = useDefaultRenderers().renderSortStatus;
+  return /*#__PURE__*/jsxRuntime.jsxs("span", {
+    className: headerSortCellClassname,
+    children: [/*#__PURE__*/jsxRuntime.jsx("span", {
+      className: headerSortNameClassname,
+      children: children
+    }), /*#__PURE__*/jsxRuntime.jsx("span", {
+      children: renderSortStatus({
+        sortDirection,
+        priority
+      })
+    })]
+  });
+}
+
+const cellSortableClassname = "celq7o97-0-0-beta-37";
+const cellResizable = "ceqw94e7-0-0-beta-37";
+const cellResizableClassname = `rdg-cell-resizable ${cellResizable}`;
+const resizeHandleClassname = "r12jy2ca7-0-0-beta-37";
+function HeaderCell({
+  column,
+  colSpan,
+  rowIdx,
+  isCellSelected,
+  onColumnResize,
+  sortColumns,
+  onSortColumnsChange,
+  selectCell,
+  shouldFocusGrid,
+  direction
+}) {
+  const isRtl = direction === 'rtl';
+  const rowSpan = getHeaderCellRowSpan(column, rowIdx);
+  const {
+    tabIndex,
+    childTabIndex,
+    onFocus
+  } = useRovingTabIndex(isCellSelected);
+  const sortIndex = sortColumns?.findIndex(sort => sort.columnKey === column.key);
+  const sortColumn = sortIndex !== undefined && sortIndex > -1 ? sortColumns[sortIndex] : undefined;
+  const sortDirection = sortColumn?.direction;
+  const priority = sortColumn !== undefined && sortColumns.length > 1 ? sortIndex + 1 : undefined;
+  const ariaSort = sortDirection && !priority ? sortDirection === 'ASC' ? 'ascending' : 'descending' : undefined;
+  const className = getCellClassname(column, column.headerCellClass, column.sortable && cellSortableClassname, column.resizable && cellResizableClassname);
+  const renderHeaderCell$1 = column.renderHeaderCell ?? renderHeaderCell;
+  function onPointerDown(event) {
+    if (event.pointerType === 'mouse' && event.buttons !== 1) {
+      return;
+    }
+    const {
+      currentTarget,
+      pointerId
+    } = event;
+    const headerCell = currentTarget.parentElement;
+    const {
+      right,
+      left
+    } = headerCell.getBoundingClientRect();
+    const offset = isRtl ? event.clientX - left : right - event.clientX;
+    function onPointerMove(event) {
+      event.preventDefault();
+      const {
+        right,
+        left
+      } = headerCell.getBoundingClientRect();
+      const width = isRtl ? right + offset - event.clientX : event.clientX + offset - left;
+      if (width > 0) {
+        onColumnResize(column, clampColumnWidth(width, column));
+      }
+    }
+    function onLostPointerCapture() {
+      currentTarget.removeEventListener('pointermove', onPointerMove);
+      currentTarget.removeEventListener('lostpointercapture', onLostPointerCapture);
+    }
+    currentTarget.setPointerCapture(pointerId);
+    currentTarget.addEventListener('pointermove', onPointerMove);
+    currentTarget.addEventListener('lostpointercapture', onLostPointerCapture);
+  }
+  function onSort(ctrlClick) {
+    if (onSortColumnsChange == null) return;
+    const {
+      sortDescendingFirst
+    } = column;
+    if (sortColumn === undefined) {
+      const nextSort = {
+        columnKey: column.key,
+        direction: sortDescendingFirst ? 'DESC' : 'ASC'
+      };
+      onSortColumnsChange(sortColumns && ctrlClick ? [...sortColumns, nextSort] : [nextSort]);
+    } else {
+      let nextSortColumn;
+      if (sortDescendingFirst === true && sortDirection === 'DESC' || sortDescendingFirst !== true && sortDirection === 'ASC') {
+        nextSortColumn = {
+          columnKey: column.key,
+          direction: sortDirection === 'ASC' ? 'DESC' : 'ASC'
+        };
+      }
+      if (ctrlClick) {
+        const nextSortColumns = [...sortColumns];
+        if (nextSortColumn) {
+          nextSortColumns[sortIndex] = nextSortColumn;
+        } else {
+          nextSortColumns.splice(sortIndex, 1);
+        }
+        onSortColumnsChange(nextSortColumns);
+      } else {
+        onSortColumnsChange(nextSortColumn ? [nextSortColumn] : []);
+      }
+    }
+  }
+  function onClick(event) {
+    selectCell({
+      idx: column.idx,
+      rowIdx
+    });
+    if (column.sortable) {
+      onSort(event.ctrlKey || event.metaKey);
+    }
+  }
+  function onDoubleClick() {
+    onColumnResize(column, 'max-content');
+  }
+  function handleFocus(event) {
+    onFocus?.(event);
+    if (shouldFocusGrid) {
+      selectCell({
+        idx: 0,
+        rowIdx
+      });
+    }
+  }
+  function onKeyDown(event) {
+    if (event.key === ' ' || event.key === 'Enter') {
+      event.preventDefault();
+      onSort(event.ctrlKey || event.metaKey);
+    }
+  }
+  return /*#__PURE__*/jsxRuntime.jsxs("div", {
+    role: "columnheader",
+    "aria-colindex": column.idx + 1,
+    "aria-colspan": colSpan,
+    "aria-rowspan": rowSpan,
+    "aria-selected": isCellSelected,
+    "aria-sort": ariaSort,
+    tabIndex: shouldFocusGrid ? 0 : tabIndex,
+    className: className,
+    style: {
+      ...getHeaderCellStyle(column, rowIdx, rowSpan),
+      ...getCellStyle(column, colSpan)
+    },
+    onFocus: handleFocus,
+    onClick: onClick,
+    onKeyDown: column.sortable ? onKeyDown : undefined,
+    children: [renderHeaderCell$1({
+      column,
+      sortDirection,
+      priority,
+      tabIndex: childTabIndex
+    }), column.resizable && /*#__PURE__*/jsxRuntime.jsx("div", {
+      className: resizeHandleClassname,
+      onClick: stopPropagation,
+      onDoubleClick: onDoubleClick,
+      onPointerDown: onPointerDown
+    })]
+  });
+}
+
+const row = "r1otpg647-0-0-beta-37";
+const rowClassname = `rdg-row ${row}`;
+const rowSelected = "rel5gk27-0-0-beta-37";
+const rowSelectedClassname = 'rdg-row-selected';
+const rowSelectedWithFrozenCell = "r1qymf1z7-0-0-beta-37";
+
+const headerRow = "h197vzie7-0-0-beta-37";
+const headerRowClassname = `rdg-header-row ${headerRow}`;
+function HeaderRow({
+  rowIdx,
+  columns,
+  onColumnResize,
+  sortColumns,
+  onSortColumnsChange,
+  lastFrozenColumnIndex,
+  selectedCellIdx,
+  selectCell,
+  shouldFocusGrid,
+  direction
+}) {
+  const cells = [];
+  for (let index = 0; index < columns.length; index++) {
+    const column = columns[index];
+    const colSpan = getColSpan(column, lastFrozenColumnIndex, {
+      type: 'HEADER'
+    });
+    if (colSpan !== undefined) {
+      index += colSpan - 1;
+    }
+    cells.push( /*#__PURE__*/jsxRuntime.jsx(HeaderCell, {
+      column: column,
+      colSpan: colSpan,
+      rowIdx: rowIdx,
+      isCellSelected: selectedCellIdx === column.idx,
+      onColumnResize: onColumnResize,
+      onSortColumnsChange: onSortColumnsChange,
+      sortColumns: sortColumns,
+      selectCell: selectCell,
+      shouldFocusGrid: shouldFocusGrid && index === 0,
+      direction: direction
+    }, column.key));
+  }
+  return /*#__PURE__*/jsxRuntime.jsx("div", {
+    role: "row",
+    "aria-rowindex": rowIdx,
+    className: clsx(headerRowClassname, selectedCellIdx === -1 && rowSelectedClassname),
+    children: cells
+  });
+}
+const HeaderRow$1 = /*#__PURE__*/react.memo(HeaderRow);
+
+function GroupedColumnHeaderRow({
+  rowIdx,
+  level,
+  columns,
+  selectedCellIdx,
+  selectCell
+}) {
+  const cells = [];
+  const renderedParents = new Set();
+  for (const column of columns) {
+    let {
+      parent
+    } = column;
+    if (parent === undefined) continue;
+    while (parent.level > level) {
+      if (parent.parent === undefined) break;
+      parent = parent.parent;
+    }
+    if (parent.level === level && !renderedParents.has(parent)) {
+      renderedParents.add(parent);
+      const {
+        idx
+      } = parent;
+      cells.push( /*#__PURE__*/jsxRuntime.jsx(GroupedColumnHeaderCell, {
+        column: parent,
+        rowIdx: rowIdx,
+        isCellSelected: selectedCellIdx === idx,
+        selectCell: selectCell
+      }, idx));
+    }
+  }
+  return /*#__PURE__*/jsxRuntime.jsx("div", {
+    role: "row",
+    "aria-rowindex": rowIdx,
+    className: headerRowClassname,
+    children: cells
+  });
+}
+const GroupedColumnHeaderRow$1 = /*#__PURE__*/react.memo(GroupedColumnHeaderRow);
+
+function Row({
+  className,
+  rowIdx,
+  gridRowStart,
+  height,
+  selectedCellIdx,
+  isRowSelected,
+  copiedCellIdx,
+  draggedOverCellIdx,
+  lastFrozenColumnIndex,
+  row,
+  viewportColumns,
+  selectedCellEditor,
+  onCellClick,
+  onCellDoubleClick,
+  onCellContextMenu,
+  rowClass,
+  setDraggedOverRowIdx,
+  onMouseEnter,
+  onRowChange,
+  selectCell,
+  ...props
+}, ref) {
+  const defaultComponents = useDefaultRenderers();
+  const cellRenderer = defaultComponents?.renderCell ?? defaultRenderCell;
+  const handleRowChange = useLatestFunc((column, newRow) => {
+    onRowChange(column, rowIdx, newRow);
+  });
+  function handleDragEnter(event) {
+    setDraggedOverRowIdx?.(rowIdx);
+    onMouseEnter?.(event);
+  }
+  className = clsx(rowClassname, `rdg-row-${rowIdx % 2 === 0 ? 'even' : 'odd'}`, rowClass?.(row, rowIdx), className, selectedCellIdx === -1 && rowSelectedClassname);
+  const cells = [];
+  for (let index = 0; index < viewportColumns.length; index++) {
+    const column = viewportColumns[index];
+    const {
+      idx
+    } = column;
+    const colSpan = getColSpan(column, lastFrozenColumnIndex, {
+      type: 'ROW',
+      row
+    });
+    if (colSpan !== undefined) {
+      index += colSpan - 1;
+    }
+    const isCellSelected = selectedCellIdx === idx;
+    if (isCellSelected && selectedCellEditor) {
+      cells.push(selectedCellEditor);
+    } else {
+      cells.push(cellRenderer(column.key, {
+        column,
+        colSpan,
+        row,
+        rowIdx,
+        isCopied: copiedCellIdx === idx,
+        isDraggedOver: draggedOverCellIdx === idx,
+        isCellSelected,
+        onClick: onCellClick,
+        onDoubleClick: onCellDoubleClick,
+        onContextMenu: onCellContextMenu,
+        onRowChange: handleRowChange,
+        selectCell
+      }));
+    }
+  }
+  return /*#__PURE__*/jsxRuntime.jsx(RowSelectionProvider, {
+    value: isRowSelected,
+    children: /*#__PURE__*/jsxRuntime.jsx("div", {
+      role: "row",
+      ref: ref,
+      className: className,
+      onMouseEnter: handleDragEnter,
+      style: getRowStyle(gridRowStart, height),
+      ...props,
+      children: cells
+    })
+  });
+}
+const RowComponent = /*#__PURE__*/react.memo( /*#__PURE__*/react.forwardRef(Row));
+const RowComponent$1 = RowComponent;
+function defaultRenderRow(key, props) {
+  return /*#__PURE__*/jsxRuntime.jsx(RowComponent, {
+    ...props
+  }, key);
+}
+
+function ScrollToCell({
+  scrollToPosition: {
+    idx,
+    rowIdx
+  },
+  gridElement,
+  setScrollToCellPosition
+}) {
+  const ref = react.useRef(null);
+  useLayoutEffect(() => {
+    scrollIntoView(ref.current);
+  });
+  useLayoutEffect(() => {
+    function removeScrollToCell() {
+      setScrollToCellPosition(null);
+    }
+    const observer = new IntersectionObserver(removeScrollToCell, {
+      root: gridElement,
+      threshold: 1.0
+    });
+    observer.observe(ref.current);
+    return () => {
+      observer.disconnect();
+    };
+  }, [gridElement, setScrollToCellPosition]);
+  return /*#__PURE__*/jsxRuntime.jsx("div", {
+    ref: ref,
+    style: {
+      gridColumn: idx === undefined ? '1/-1' : idx + 1,
+      gridRow: rowIdx === undefined ? '1/-1' : rowIdx + 2
+    }
+  });
+}
+
+const arrow = "a1mygwml7-0-0-beta-37";
+const arrowClassname = `rdg-sort-arrow ${arrow}`;
+function renderSortStatus({
+  sortDirection,
+  priority
+}) {
+  return /*#__PURE__*/jsxRuntime.jsxs(jsxRuntime.Fragment, {
+    children: [renderSortIcon({
+      sortDirection
+    }), renderSortPriority({
+      priority
+    })]
+  });
+}
+function renderSortIcon({
+  sortDirection
+}) {
+  if (sortDirection === undefined) return null;
+  return /*#__PURE__*/jsxRuntime.jsx("svg", {
+    viewBox: "0 0 12 8",
+    width: "12",
+    height: "8",
+    className: arrowClassname,
+    "aria-hidden": true,
+    children: /*#__PURE__*/jsxRuntime.jsx("path", {
+      d: sortDirection === 'ASC' ? 'M0 8 6 0 12 8' : 'M0 0 6 8 12 0'
+    })
+  });
+}
+function renderSortPriority({
+  priority
+}) {
+  return priority;
+}
+
+const root = "r104f42s7-0-0-beta-37";
+const rootClassname = `rdg ${root}`;
+const viewportDragging = "v7ly7s7-0-0-beta-37";
+const viewportDraggingClassname = `rdg-viewport-dragging ${viewportDragging}`;
+const focusSinkClassname = "fc4f4zb7-0-0-beta-37";
+const focusSinkHeaderAndSummaryClassname = "fq51q037-0-0-beta-37";
+
+const summaryCellClassname = "s1n3hxke7-0-0-beta-37";
+function SummaryCell({
+  column,
+  colSpan,
+  row,
+  rowIdx,
+  isCellSelected,
+  selectCell
+}) {
+  const {
+    tabIndex,
+    childTabIndex,
+    onFocus
+  } = useRovingTabIndex(isCellSelected);
+  const {
+    summaryCellClass
+  } = column;
+  const className = getCellClassname(column, summaryCellClassname, typeof summaryCellClass === 'function' ? summaryCellClass(row) : summaryCellClass);
+  function onClick() {
+    selectCell({
+      rowIdx,
+      idx: column.idx
+    });
+  }
+  return /*#__PURE__*/jsxRuntime.jsx("div", {
+    role: "gridcell",
+    "aria-colindex": column.idx + 1,
+    "aria-colspan": colSpan,
+    "aria-selected": isCellSelected,
+    tabIndex: tabIndex,
+    className: className,
+    style: getCellStyle(column, colSpan),
+    onClick: onClick,
+    onFocus: onFocus,
+    children: column.renderSummaryCell?.({
+      column,
+      row,
+      tabIndex: childTabIndex
+    })
+  });
+}
+const SummaryCell$1 = /*#__PURE__*/react.memo(SummaryCell);
+
+const summaryRow = "snfqesz7-0-0-beta-37";
+const topSummaryRow = "t1jijrjz7-0-0-beta-37";
+const topSummaryRowBorderClassname = "t14bmecc7-0-0-beta-37";
+const bottomSummaryRowBorderClassname = "b1odhhml7-0-0-beta-37";
+const summaryRowClassname = `rdg-summary-row ${summaryRow}`;
+const topSummaryRowClassname = `rdg-top-summary-row ${topSummaryRow}`;
+function SummaryRow({
+  rowIdx,
+  gridRowStart,
+  row,
+  viewportColumns,
+  top,
+  bottom,
+  lastFrozenColumnIndex,
+  selectedCellIdx,
+  isTop,
+  showBorder,
+  selectCell,
+  'aria-rowindex': ariaRowIndex
+}) {
+  const cells = [];
+  for (let index = 0; index < viewportColumns.length; index++) {
+    const column = viewportColumns[index];
+    const colSpan = getColSpan(column, lastFrozenColumnIndex, {
+      type: 'SUMMARY',
+      row
+    });
+    if (colSpan !== undefined) {
+      index += colSpan - 1;
+    }
+    const isCellSelected = selectedCellIdx === column.idx;
+    cells.push( /*#__PURE__*/jsxRuntime.jsx(SummaryCell$1, {
+      column: column,
+      colSpan: colSpan,
+      row: row,
+      rowIdx: rowIdx,
+      isCellSelected: isCellSelected,
+      selectCell: selectCell
+    }, column.key));
+  }
+  return /*#__PURE__*/jsxRuntime.jsx("div", {
+    role: "row",
+    "aria-rowindex": ariaRowIndex,
+    className: clsx(rowClassname, `rdg-row-${rowIdx % 2 === 0 ? 'even' : 'odd'}`, summaryRowClassname, isTop ? [topSummaryRowClassname, showBorder && topSummaryRowBorderClassname] : ['rdg-bottom-summary-row', showBorder && bottomSummaryRowBorderClassname], selectedCellIdx === -1 && rowSelectedClassname),
+    style: {
+      ...getRowStyle(gridRowStart),
+      '--rdg-summary-row-top': top !== undefined ? `${top}px` : undefined,
+      '--rdg-summary-row-bottom': bottom !== undefined ? `${bottom}px` : undefined
+    },
+    children: cells
+  });
+}
+const SummaryRow$1 = /*#__PURE__*/react.memo(SummaryRow);
+
+function DataGrid(props, ref) {
+  const {
+    columns: rawColumns,
+    rows,
+    topSummaryRows,
+    bottomSummaryRows,
+    rowKeyGetter,
+    onRowsChange,
+    rowHeight: rawRowHeight,
+    headerRowHeight: rawHeaderRowHeight,
+    summaryRowHeight: rawSummaryRowHeight,
+    selectedRows,
+    onSelectedCellChange,
+    onSelectedRowsChange,
+    sortColumns,
+    onSortColumnsChange,
+    defaultColumnOptions,
+    onCellClick,
+    onCellDoubleClick,
+    onCellContextMenu,
+    onCellKeyDown,
+    onScroll,
+    onColumnResize,
+    onFill,
+    onCopy,
+    onPaste,
+    enableVirtualization: rawEnableVirtualization,
+    renderers,
+    className,
+    style,
+    rowClass,
+    direction: rawDirection,
+    role: rawRole,
+    'aria-label': ariaLabel,
+    'aria-labelledby': ariaLabelledBy,
+    'aria-describedby': ariaDescribedBy,
+    'aria-rowcount': rawAriaRowCount,
+    'data-testid': testId
+  } = props;
+  const defaultRenderers = useDefaultRenderers();
+  const role = rawRole ?? 'grid';
+  const rowHeight = rawRowHeight ?? 35;
+  const headerRowHeight = rawHeaderRowHeight ?? (typeof rowHeight === 'number' ? rowHeight : 35);
+  const summaryRowHeight = rawSummaryRowHeight ?? (typeof rowHeight === 'number' ? rowHeight : 35);
+  const renderRow = renderers?.renderRow ?? defaultRenderers?.renderRow ?? defaultRenderRow;
+  const renderCell = renderers?.renderCell ?? defaultRenderers?.renderCell ?? defaultRenderCell;
+  const renderSortStatus$1 = renderers?.renderSortStatus ?? defaultRenderers?.renderSortStatus ?? renderSortStatus;
+  const renderCheckbox$1 = renderers?.renderCheckbox ?? defaultRenderers?.renderCheckbox ?? renderCheckbox;
+  const noRowsFallback = renderers?.noRowsFallback ?? defaultRenderers?.noRowsFallback;
+  const enableVirtualization = rawEnableVirtualization ?? true;
+  const direction = rawDirection ?? 'ltr';
+  const [scrollTop, setScrollTop] = react.useState(0);
+  const [scrollLeft, setScrollLeft] = react.useState(0);
+  const [resizedColumnWidths, setResizedColumnWidths] = react.useState(() => new Map());
+  const [measuredColumnWidths, setMeasuredColumnWidths] = react.useState(() => new Map());
+  const [copiedCell, setCopiedCell] = react.useState(null);
+  const [isDragging, setDragging] = react.useState(false);
+  const [draggedOverRowIdx, setOverRowIdx] = react.useState(undefined);
+  const [scrollToPosition, setScrollToPosition] = react.useState(null);
+  const [gridRef, gridWidth, gridHeight] = useGridDimensions();
+  const {
+    columns,
+    colSpanColumns,
+    lastFrozenColumnIndex,
+    headerRowsCount,
+    colOverscanStartIdx,
+    colOverscanEndIdx,
+    templateColumns,
+    layoutCssVars,
+    totalFrozenColumnWidth
+  } = useCalculatedColumns({
+    rawColumns,
+    defaultColumnOptions,
+    measuredColumnWidths,
+    resizedColumnWidths,
+    scrollLeft,
+    viewportWidth: gridWidth,
+    enableVirtualization
+  });
+  const topSummaryRowsCount = topSummaryRows?.length ?? 0;
+  const bottomSummaryRowsCount = bottomSummaryRows?.length ?? 0;
+  const summaryRowsCount = topSummaryRowsCount + bottomSummaryRowsCount;
+  const headerAndTopSummaryRowsCount = headerRowsCount + topSummaryRowsCount;
+  const groupedColumnHeaderRowsCount = headerRowsCount - 1;
+  const minRowIdx = -headerAndTopSummaryRowsCount;
+  const mainHeaderRowIdx = minRowIdx + groupedColumnHeaderRowsCount;
+  const maxRowIdx = rows.length + bottomSummaryRowsCount - 1;
+  const [selectedPosition, setSelectedPosition] = react.useState(() => ({
+    idx: -1,
+    rowIdx: minRowIdx - 1,
+    mode: 'SELECT'
+  }));
+  const prevSelectedPosition = react.useRef(selectedPosition);
+  const latestDraggedOverRowIdx = react.useRef(draggedOverRowIdx);
+  const lastSelectedRowIdx = react.useRef(-1);
+  const focusSinkRef = react.useRef(null);
+  const shouldFocusCellRef = react.useRef(false);
+  const isTreeGrid = role === 'treegrid';
+  const headerRowsHeight = headerRowsCount * headerRowHeight;
+  const clientHeight = gridHeight - headerRowsHeight - summaryRowsCount * summaryRowHeight;
+  const isSelectable = selectedRows != null && onSelectedRowsChange != null;
+  const isRtl = direction === 'rtl';
+  const leftKey = isRtl ? 'ArrowRight' : 'ArrowLeft';
+  const rightKey = isRtl ? 'ArrowLeft' : 'ArrowRight';
+  const ariaRowCount = rawAriaRowCount ?? headerRowsCount + rows.length + summaryRowsCount;
+  const defaultGridComponents = react.useMemo(() => ({
+    renderCheckbox: renderCheckbox$1,
+    renderSortStatus: renderSortStatus$1,
+    renderCell
+  }), [renderCheckbox$1, renderSortStatus$1, renderCell]);
+  const allRowsSelected = react.useMemo(() => {
+    const {
+      length
+    } = rows;
+    return length !== 0 && selectedRows != null && rowKeyGetter != null && selectedRows.size >= length && rows.every(row => selectedRows.has(rowKeyGetter(row)));
+  }, [rows, selectedRows, rowKeyGetter]);
+  const {
+    rowOverscanStartIdx,
+    rowOverscanEndIdx,
+    totalRowHeight,
+    gridTemplateRows,
+    getRowTop,
+    getRowHeight,
+    findRowIdx
+  } = useViewportRows({
+    rows,
+    rowHeight,
+    clientHeight,
+    scrollTop,
+    enableVirtualization
+  });
+  const viewportColumns = useViewportColumns({
+    columns,
+    colSpanColumns,
+    colOverscanStartIdx,
+    colOverscanEndIdx,
+    lastFrozenColumnIndex,
+    rowOverscanStartIdx,
+    rowOverscanEndIdx,
+    rows,
+    topSummaryRows,
+    bottomSummaryRows
+  });
+  const {
+    gridTemplateColumns,
+    handleColumnResize
+  } = useColumnWidths(columns, viewportColumns, templateColumns, gridRef, gridWidth, resizedColumnWidths, measuredColumnWidths, setResizedColumnWidths, setMeasuredColumnWidths, onColumnResize);
+  const minColIdx = isTreeGrid ? -1 : 0;
+  const maxColIdx = columns.length - 1;
+  const selectedCellIsWithinSelectionBounds = isCellWithinSelectionBounds(selectedPosition);
+  const selectedCellIsWithinViewportBounds = isCellWithinViewportBounds(selectedPosition);
+  const handleColumnResizeLatest = useLatestFunc(handleColumnResize);
+  const onSortColumnsChangeLatest = useLatestFunc(onSortColumnsChange);
+  const onCellClickLatest = useLatestFunc(onCellClick);
+  const onCellDoubleClickLatest = useLatestFunc(onCellDoubleClick);
+  const onCellContextMenuLatest = useLatestFunc(onCellContextMenu);
+  const selectRowLatest = useLatestFunc(selectRow);
+  const handleFormatterRowChangeLatest = useLatestFunc(updateRow);
+  const selectCellLatest = useLatestFunc(selectCell);
+  const selectHeaderCellLatest = useLatestFunc(({
+    idx,
+    rowIdx
+  }) => {
+    selectCell({
+      rowIdx: minRowIdx + rowIdx - 1,
+      idx
+    });
+  });
+  useLayoutEffect(() => {
+    if (!selectedCellIsWithinSelectionBounds || isSamePosition(selectedPosition, prevSelectedPosition.current)) {
+      prevSelectedPosition.current = selectedPosition;
+      return;
+    }
+    prevSelectedPosition.current = selectedPosition;
+    if (selectedPosition.idx === -1) {
+      focusSinkRef.current.focus({
+        preventScroll: true
+      });
+      scrollIntoView(focusSinkRef.current);
+    }
+  });
+  useLayoutEffect(() => {
+    if (!shouldFocusCellRef.current) return;
+    shouldFocusCellRef.current = false;
+    const cell = getCellToScroll(gridRef.current);
+    if (cell === null) return;
+    scrollIntoView(cell);
+    const elementToFocus = cell.querySelector('[tabindex="0"]') ?? cell;
+    elementToFocus.focus({
+      preventScroll: true
+    });
+  });
+  react.useImperativeHandle(ref, () => ({
+    element: gridRef.current,
+    selectedCell: selectedPosition,
+    scrollToCell({
+      idx,
+      rowIdx
+    }) {
+      const scrollToIdx = idx !== undefined && idx > lastFrozenColumnIndex && idx < columns.length ? idx : undefined;
+      const scrollToRowIdx = rowIdx !== undefined && isRowIdxWithinViewportBounds(rowIdx) ? rowIdx : undefined;
+      if (scrollToIdx !== undefined || scrollToRowIdx !== undefined) {
+        setScrollToPosition({
+          idx: scrollToIdx,
+          rowIdx: scrollToRowIdx
+        });
+      }
+    },
+    selectCell
+  }));
+  const setDraggedOverRowIdx = react.useCallback(rowIdx => {
+    setOverRowIdx(rowIdx);
+    latestDraggedOverRowIdx.current = rowIdx;
+  }, []);
+  function selectRow(args) {
+    if (!onSelectedRowsChange) return;
+    assertIsValidKeyGetter(rowKeyGetter);
+    if (args.type === 'HEADER') {
+      const newSelectedRows = new Set(selectedRows);
+      for (const row of rows) {
+        const rowKey = rowKeyGetter(row);
+        if (args.checked) {
+          newSelectedRows.add(rowKey);
+        } else {
+          newSelectedRows.delete(rowKey);
+        }
+      }
+      onSelectedRowsChange(newSelectedRows);
+      return;
+    }
+    const {
+      row,
+      checked,
+      isShiftClick
+    } = args;
+    const newSelectedRows = new Set(selectedRows);
+    const rowKey = rowKeyGetter(row);
+    if (checked) {
+      newSelectedRows.add(rowKey);
+      const previousRowIdx = lastSelectedRowIdx.current;
+      const rowIdx = rows.indexOf(row);
+      lastSelectedRowIdx.current = rowIdx;
+      if (isShiftClick && previousRowIdx !== -1 && previousRowIdx !== rowIdx) {
+        const step = sign(rowIdx - previousRowIdx);
+        for (let i = previousRowIdx + step; i !== rowIdx; i += step) {
+          const row = rows[i];
+          newSelectedRows.add(rowKeyGetter(row));
+        }
+      }
+    } else {
+      newSelectedRows.delete(rowKey);
+      lastSelectedRowIdx.current = -1;
+    }
+    onSelectedRowsChange(newSelectedRows);
+  }
+  function handleKeyDown(event) {
+    const {
+      idx,
+      rowIdx,
+      mode
+    } = selectedPosition;
+    if (mode === 'EDIT') return;
+    if (onCellKeyDown && isRowIdxWithinViewportBounds(rowIdx)) {
+      const row = rows[rowIdx];
+      const cellEvent = createCellEvent(event);
+      onCellKeyDown({
+        mode: 'SELECT',
+        row,
+        column: columns[idx],
+        rowIdx,
+        selectCell
+      }, cellEvent);
+      if (cellEvent.isGridDefaultPrevented()) return;
+    }
+    if (!(event.target instanceof Element)) return;
+    const isCellEvent = event.target.closest('.rdg-cell') !== null;
+    const isRowEvent = isTreeGrid && event.target === focusSinkRef.current;
+    if (!isCellEvent && !isRowEvent) return;
+    const {
+      keyCode
+    } = event;
+    if (selectedCellIsWithinViewportBounds && (onPaste != null || onCopy != null) && isCtrlKeyHeldDown(event)) {
+      const cKey = 67;
+      const vKey = 86;
+      if (keyCode === cKey) {
+        handleCopy();
+        return;
+      }
+      if (keyCode === vKey) {
+        handlePaste();
+        return;
+      }
+    }
+    switch (event.key) {
+      case 'Escape':
+        setCopiedCell(null);
+        return;
+      case 'ArrowUp':
+      case 'ArrowDown':
+      case 'ArrowLeft':
+      case 'ArrowRight':
+      case 'Tab':
+      case 'Home':
+      case 'End':
+      case 'PageUp':
+      case 'PageDown':
+        navigate(event);
+        break;
+      default:
+        handleCellInput(event);
+        break;
+    }
+  }
+  function handleScroll(event) {
+    const {
+      scrollTop,
+      scrollLeft
+    } = event.currentTarget;
+    reactDom.flushSync(() => {
+      setScrollTop(scrollTop);
+      setScrollLeft(abs(scrollLeft));
+    });
+    onScroll?.(event);
+  }
+  function updateRow(column, rowIdx, row) {
+    if (typeof onRowsChange !== 'function') return;
+    if (row === rows[rowIdx]) return;
+    const updatedRows = [...rows];
+    updatedRows[rowIdx] = row;
+    onRowsChange(updatedRows, {
+      indexes: [rowIdx],
+      column
+    });
+  }
+  function commitEditorChanges() {
+    if (selectedPosition.mode !== 'EDIT') return;
+    updateRow(columns[selectedPosition.idx], selectedPosition.rowIdx, selectedPosition.row);
+  }
+  function handleCopy() {
+    const {
+      idx,
+      rowIdx
+    } = selectedPosition;
+    const sourceRow = rows[rowIdx];
+    const sourceColumnKey = columns[idx].key;
+    setCopiedCell({
+      row: sourceRow,
+      columnKey: sourceColumnKey
+    });
+    onCopy?.({
+      sourceRow,
+      sourceColumnKey
+    });
+  }
+  function handlePaste() {
+    if (!onPaste || !onRowsChange || copiedCell === null || !isCellEditable(selectedPosition)) {
+      return;
+    }
+    const {
+      idx,
+      rowIdx
+    } = selectedPosition;
+    const targetColumn = columns[idx];
+    const targetRow = rows[rowIdx];
+    const updatedTargetRow = onPaste({
+      sourceRow: copiedCell.row,
+      sourceColumnKey: copiedCell.columnKey,
+      targetRow,
+      targetColumnKey: targetColumn.key
+    });
+    updateRow(targetColumn, rowIdx, updatedTargetRow);
+  }
+  function handleCellInput(event) {
+    if (!selectedCellIsWithinViewportBounds) return;
+    const row = rows[selectedPosition.rowIdx];
+    const {
+      key,
+      shiftKey
+    } = event;
+    if (isSelectable && shiftKey && key === ' ') {
+      assertIsValidKeyGetter(rowKeyGetter);
+      const rowKey = rowKeyGetter(row);
+      selectRow({
+        type: 'ROW',
+        row,
+        checked: !selectedRows.has(rowKey),
+        isShiftClick: false
+      });
+      event.preventDefault();
+      return;
+    }
+    if (isCellEditable(selectedPosition) && isDefaultCellInput(event)) {
+      setSelectedPosition(({
+        idx,
+        rowIdx
+      }) => ({
+        idx,
+        rowIdx,
+        mode: 'EDIT',
+        row,
+        originalRow: row
+      }));
+    }
+  }
+  function isColIdxWithinSelectionBounds(idx) {
+    return idx >= minColIdx && idx <= maxColIdx;
+  }
+  function isRowIdxWithinViewportBounds(rowIdx) {
+    return rowIdx >= 0 && rowIdx < rows.length;
+  }
+  function isCellWithinSelectionBounds({
+    idx,
+    rowIdx
+  }) {
+    return rowIdx >= minRowIdx && rowIdx <= maxRowIdx && isColIdxWithinSelectionBounds(idx);
+  }
+  function isCellWithinViewportBounds({
+    idx,
+    rowIdx
+  }) {
+    return isRowIdxWithinViewportBounds(rowIdx) && isColIdxWithinSelectionBounds(idx);
+  }
+  function isCellEditable(position) {
+    return isCellWithinViewportBounds(position) && isSelectedCellEditable({
+      columns,
+      rows,
+      selectedPosition: position
+    });
+  }
+  function selectCell(position, enableEditor) {
+    if (!isCellWithinSelectionBounds(position)) return;
+    commitEditorChanges();
+    if (enableEditor && isCellEditable(position)) {
+      const row = rows[position.rowIdx];
+      setSelectedPosition({
+        ...position,
+        mode: 'EDIT',
+        row,
+        originalRow: row
+      });
+    } else if (isSamePosition(selectedPosition, position)) {
+      scrollIntoView(getCellToScroll(gridRef.current));
+    } else {
+      shouldFocusCellRef.current = true;
+      setSelectedPosition({
+        ...position,
+        mode: 'SELECT'
+      });
+    }
+    onSelectedCellChange?.(position);
+  }
+  function getNextPosition(key, ctrlKey, shiftKey) {
+    const {
+      idx,
+      rowIdx
+    } = selectedPosition;
+    const isRowSelected = selectedCellIsWithinSelectionBounds && idx === -1;
+    switch (key) {
+      case 'ArrowUp':
+        return {
+          idx,
+          rowIdx: rowIdx - 1
+        };
+      case 'ArrowDown':
+        return {
+          idx,
+          rowIdx: rowIdx + 1
+        };
+      case leftKey:
+        return {
+          idx: idx - 1,
+          rowIdx
+        };
+      case rightKey:
+        return {
+          idx: idx + 1,
+          rowIdx
+        };
+      case 'Tab':
+        return {
+          idx: idx + (shiftKey ? -1 : 1),
+          rowIdx
+        };
+      case 'Home':
+        if (isRowSelected) return {
+          idx,
+          rowIdx: minRowIdx
+        };
+        return {
+          idx: 0,
+          rowIdx: ctrlKey ? minRowIdx : rowIdx
+        };
+      case 'End':
+        if (isRowSelected) return {
+          idx,
+          rowIdx: maxRowIdx
+        };
+        return {
+          idx: maxColIdx,
+          rowIdx: ctrlKey ? maxRowIdx : rowIdx
+        };
+      case 'PageUp':
+        {
+          if (selectedPosition.rowIdx === minRowIdx) return selectedPosition;
+          const nextRowY = getRowTop(rowIdx) + getRowHeight(rowIdx) - clientHeight;
+          return {
+            idx,
+            rowIdx: nextRowY > 0 ? findRowIdx(nextRowY) : 0
+          };
+        }
+      case 'PageDown':
+        {
+          if (selectedPosition.rowIdx >= rows.length) return selectedPosition;
+          const nextRowY = getRowTop(rowIdx) + clientHeight;
+          return {
+            idx,
+            rowIdx: nextRowY < totalRowHeight ? findRowIdx(nextRowY) : rows.length - 1
+          };
+        }
+      default:
+        return selectedPosition;
+    }
+  }
+  function navigate(event) {
+    const {
+      key,
+      shiftKey
+    } = event;
+    let cellNavigationMode = 'NONE';
+    if (key === 'Tab') {
+      if (canExitGrid({
+        shiftKey,
+        maxColIdx,
+        minRowIdx,
+        maxRowIdx,
+        selectedPosition
+      })) {
+        commitEditorChanges();
+        return;
+      }
+      cellNavigationMode = 'CHANGE_ROW';
+    }
+    event.preventDefault();
+    const ctrlKey = isCtrlKeyHeldDown(event);
+    const nextPosition = getNextPosition(key, ctrlKey, shiftKey);
+    if (isSamePosition(selectedPosition, nextPosition)) return;
+    const nextSelectedCellPosition = getNextSelectedCellPosition({
+      moveUp: key === 'ArrowUp',
+      moveNext: key === rightKey || key === 'Tab' && !shiftKey,
+      columns,
+      colSpanColumns,
+      rows,
+      topSummaryRows,
+      bottomSummaryRows,
+      minRowIdx,
+      mainHeaderRowIdx,
+      maxRowIdx,
+      lastFrozenColumnIndex,
+      cellNavigationMode,
+      currentPosition: selectedPosition,
+      nextPosition,
+      isCellWithinBounds: isCellWithinSelectionBounds
+    });
+    selectCell(nextSelectedCellPosition);
+  }
+  function getDraggedOverCellIdx(currentRowIdx) {
+    if (draggedOverRowIdx === undefined) return;
+    const {
+      rowIdx
+    } = selectedPosition;
+    const isDraggedOver = rowIdx < draggedOverRowIdx ? rowIdx < currentRowIdx && currentRowIdx <= draggedOverRowIdx : rowIdx > currentRowIdx && currentRowIdx >= draggedOverRowIdx;
+    return isDraggedOver ? selectedPosition.idx : undefined;
+  }
+  function renderDragHandle() {
+    if (onFill == null || selectedPosition.mode === 'EDIT' || !isCellWithinViewportBounds(selectedPosition)) {
+      return;
+    }
+    return /*#__PURE__*/jsxRuntime.jsx(DragHandle, {
+      gridRowStart: headerAndTopSummaryRowsCount + selectedPosition.rowIdx + 1,
+      rows: rows,
+      columns: columns,
+      selectedPosition: selectedPosition,
+      isCellEditable: isCellEditable,
+      latestDraggedOverRowIdx: latestDraggedOverRowIdx,
+      onRowsChange: onRowsChange,
+      onFill: onFill,
+      setDragging: setDragging,
+      setDraggedOverRowIdx: setDraggedOverRowIdx
+    });
+  }
+  function getCellEditor(rowIdx) {
+    if (selectedPosition.rowIdx !== rowIdx || selectedPosition.mode === 'SELECT') return;
+    const {
+      idx,
+      row
+    } = selectedPosition;
+    const column = columns[idx];
+    const colSpan = getColSpan(column, lastFrozenColumnIndex, {
+      type: 'ROW',
+      row
+    });
+    const closeEditor = shouldFocusCell => {
+      shouldFocusCellRef.current = shouldFocusCell;
+      setSelectedPosition(({
+        idx,
+        rowIdx
+      }) => ({
+        idx,
+        rowIdx,
+        mode: 'SELECT'
+      }));
+    };
+    const onRowChange = (row, commitChanges, shouldFocusCell) => {
+      if (commitChanges) {
+        reactDom.flushSync(() => {
+          updateRow(column, selectedPosition.rowIdx, row);
+          closeEditor(shouldFocusCell);
+        });
+      } else {
+        setSelectedPosition(position => ({
+          ...position,
+          row
+        }));
+      }
+    };
+    if (rows[selectedPosition.rowIdx] !== selectedPosition.originalRow) {
+      closeEditor(false);
+    }
+    return /*#__PURE__*/jsxRuntime.jsx(EditCell, {
+      column: column,
+      colSpan: colSpan,
+      row: row,
+      rowIdx: rowIdx,
+      onRowChange: onRowChange,
+      closeEditor: closeEditor,
+      onKeyDown: onCellKeyDown,
+      navigate: navigate
+    }, column.key);
+  }
+  function getRowViewportColumns(rowIdx) {
+    const selectedColumn = selectedPosition.idx === -1 ? undefined : columns[selectedPosition.idx];
+    if (selectedColumn !== undefined && selectedPosition.rowIdx === rowIdx && !viewportColumns.includes(selectedColumn)) {
+      return selectedPosition.idx > colOverscanEndIdx ? [...viewportColumns, selectedColumn] : [...viewportColumns.slice(0, lastFrozenColumnIndex + 1), selectedColumn, ...viewportColumns.slice(lastFrozenColumnIndex + 1)];
+    }
+    return viewportColumns;
+  }
+  function getViewportRows() {
+    const rowElements = [];
+    const {
+      idx: selectedIdx,
+      rowIdx: selectedRowIdx
+    } = selectedPosition;
+    const startRowIdx = selectedCellIsWithinViewportBounds && selectedRowIdx < rowOverscanStartIdx ? rowOverscanStartIdx - 1 : rowOverscanStartIdx;
+    const endRowIdx = selectedCellIsWithinViewportBounds && selectedRowIdx > rowOverscanEndIdx ? rowOverscanEndIdx + 1 : rowOverscanEndIdx;
+    for (let viewportRowIdx = startRowIdx; viewportRowIdx <= endRowIdx; viewportRowIdx++) {
+      const isRowOutsideViewport = viewportRowIdx === rowOverscanStartIdx - 1 || viewportRowIdx === rowOverscanEndIdx + 1;
+      const rowIdx = isRowOutsideViewport ? selectedRowIdx : viewportRowIdx;
+      let rowColumns = viewportColumns;
+      const selectedColumn = selectedIdx === -1 ? undefined : columns[selectedIdx];
+      if (selectedColumn !== undefined) {
+        if (isRowOutsideViewport) {
+          rowColumns = [selectedColumn];
+        } else {
+          rowColumns = getRowViewportColumns(rowIdx);
+        }
+      }
+      const row = rows[rowIdx];
+      const gridRowStart = headerAndTopSummaryRowsCount + rowIdx + 1;
+      let key = rowIdx;
+      let isRowSelected = false;
+      if (typeof rowKeyGetter === 'function') {
+        key = rowKeyGetter(row);
+        isRowSelected = selectedRows?.has(key) ?? false;
+      }
+      rowElements.push(renderRow(key, {
+        'aria-rowindex': headerAndTopSummaryRowsCount + rowIdx + 1,
+        'aria-selected': isSelectable ? isRowSelected : undefined,
+        rowIdx,
+        row,
+        viewportColumns: rowColumns,
+        isRowSelected,
+        onCellClick: onCellClickLatest,
+        onCellDoubleClick: onCellDoubleClickLatest,
+        onCellContextMenu: onCellContextMenuLatest,
+        rowClass,
+        gridRowStart,
+        height: getRowHeight(rowIdx),
+        copiedCellIdx: copiedCell !== null && copiedCell.row === row ? columns.findIndex(c => c.key === copiedCell.columnKey) : undefined,
+        selectedCellIdx: selectedRowIdx === rowIdx ? selectedIdx : undefined,
+        draggedOverCellIdx: getDraggedOverCellIdx(rowIdx),
+        setDraggedOverRowIdx: isDragging ? setDraggedOverRowIdx : undefined,
+        lastFrozenColumnIndex,
+        onRowChange: handleFormatterRowChangeLatest,
+        selectCell: selectCellLatest,
+        selectedCellEditor: getCellEditor(rowIdx)
+      }));
+    }
+    return rowElements;
+  }
+  if (selectedPosition.idx > maxColIdx || selectedPosition.rowIdx > maxRowIdx) {
+    setSelectedPosition({
+      idx: -1,
+      rowIdx: minRowIdx - 1,
+      mode: 'SELECT'
+    });
+    setDraggedOverRowIdx(undefined);
+  }
+  let templateRows = `repeat(${headerRowsCount}, ${headerRowHeight}px)`;
+  if (topSummaryRowsCount > 0) {
+    templateRows += ` repeat(${topSummaryRowsCount}, ${summaryRowHeight}px)`;
+  }
+  if (rows.length > 0) {
+    templateRows += gridTemplateRows;
+  }
+  if (bottomSummaryRowsCount > 0) {
+    templateRows += ` repeat(${bottomSummaryRowsCount}, ${summaryRowHeight}px)`;
+  }
+  const isGroupRowFocused = selectedPosition.idx === -1 && selectedPosition.rowIdx !== minRowIdx - 1;
+  return /*#__PURE__*/jsxRuntime.jsxs("div", {
+    role: role,
+    "aria-label": ariaLabel,
+    "aria-labelledby": ariaLabelledBy,
+    "aria-describedby": ariaDescribedBy,
+    "aria-multiselectable": isSelectable ? true : undefined,
+    "aria-colcount": columns.length,
+    "aria-rowcount": ariaRowCount,
+    className: clsx(rootClassname, className, isDragging && viewportDraggingClassname),
+    style: {
+      ...style,
+      scrollPaddingInlineStart: selectedPosition.idx > lastFrozenColumnIndex || scrollToPosition?.idx !== undefined ? `${totalFrozenColumnWidth}px` : undefined,
+      scrollPaddingBlock: isRowIdxWithinViewportBounds(selectedPosition.rowIdx) || scrollToPosition?.rowIdx !== undefined ? `${headerRowsHeight + topSummaryRowsCount * summaryRowHeight}px ${bottomSummaryRowsCount * summaryRowHeight}px` : undefined,
+      gridTemplateColumns,
+      gridTemplateRows: templateRows,
+      '--rdg-header-row-height': `${headerRowHeight}px`,
+      '--rdg-summary-row-height': `${summaryRowHeight}px`,
+      '--rdg-sign': isRtl ? -1 : 1,
+      ...layoutCssVars
+    },
+    dir: direction,
+    ref: gridRef,
+    onScroll: handleScroll,
+    onKeyDown: handleKeyDown,
+    "data-testid": testId,
+    children: [/*#__PURE__*/jsxRuntime.jsx(DataGridDefaultRenderersProvider, {
+      value: defaultGridComponents,
+      children: /*#__PURE__*/jsxRuntime.jsxs(RowSelectionChangeProvider, {
+        value: selectRowLatest,
+        children: [/*#__PURE__*/jsxRuntime.jsxs(RowSelectionProvider, {
+          value: allRowsSelected,
+          children: [Array.from({
+            length: groupedColumnHeaderRowsCount
+          }, (_, index) => /*#__PURE__*/jsxRuntime.jsx(GroupedColumnHeaderRow$1, {
+            rowIdx: index + 1,
+            level: -groupedColumnHeaderRowsCount + index,
+            columns: getRowViewportColumns(minRowIdx + index),
+            selectedCellIdx: selectedPosition.rowIdx === minRowIdx + index ? selectedPosition.idx : undefined,
+            selectCell: selectHeaderCellLatest
+          }, index)), /*#__PURE__*/jsxRuntime.jsx(HeaderRow$1, {
+            rowIdx: headerRowsCount,
+            columns: getRowViewportColumns(mainHeaderRowIdx),
+            onColumnResize: handleColumnResizeLatest,
+            sortColumns: sortColumns,
+            onSortColumnsChange: onSortColumnsChangeLatest,
+            lastFrozenColumnIndex: lastFrozenColumnIndex,
+            selectedCellIdx: selectedPosition.rowIdx === mainHeaderRowIdx ? selectedPosition.idx : undefined,
+            selectCell: selectHeaderCellLatest,
+            shouldFocusGrid: !selectedCellIsWithinSelectionBounds,
+            direction: direction
+          })]
+        }), rows.length === 0 && noRowsFallback ? noRowsFallback : /*#__PURE__*/jsxRuntime.jsxs(jsxRuntime.Fragment, {
+          children: [topSummaryRows?.map((row, rowIdx) => {
+            const gridRowStart = headerRowsCount + 1 + rowIdx;
+            const summaryRowIdx = mainHeaderRowIdx + 1 + rowIdx;
+            const isSummaryRowSelected = selectedPosition.rowIdx === summaryRowIdx;
+            const top = headerRowsHeight + summaryRowHeight * rowIdx;
+            return /*#__PURE__*/jsxRuntime.jsx(SummaryRow$1, {
+              "aria-rowindex": gridRowStart,
+              rowIdx: summaryRowIdx,
+              gridRowStart: gridRowStart,
+              row: row,
+              top: top,
+              bottom: undefined,
+              viewportColumns: getRowViewportColumns(summaryRowIdx),
+              lastFrozenColumnIndex: lastFrozenColumnIndex,
+              selectedCellIdx: isSummaryRowSelected ? selectedPosition.idx : undefined,
+              isTop: true,
+              showBorder: rowIdx === topSummaryRowsCount - 1,
+              selectCell: selectCellLatest
+            }, rowIdx);
+          }), getViewportRows(), bottomSummaryRows?.map((row, rowIdx) => {
+            const gridRowStart = headerAndTopSummaryRowsCount + rows.length + rowIdx + 1;
+            const summaryRowIdx = rows.length + rowIdx;
+            const isSummaryRowSelected = selectedPosition.rowIdx === summaryRowIdx;
+            const top = clientHeight > totalRowHeight ? gridHeight - summaryRowHeight * (bottomSummaryRows.length - rowIdx) : undefined;
+            const bottom = top === undefined ? summaryRowHeight * (bottomSummaryRows.length - 1 - rowIdx) : undefined;
+            return /*#__PURE__*/jsxRuntime.jsx(SummaryRow$1, {
+              "aria-rowindex": ariaRowCount - bottomSummaryRowsCount + rowIdx + 1,
+              rowIdx: summaryRowIdx,
+              gridRowStart: gridRowStart,
+              row: row,
+              top: top,
+              bottom: bottom,
+              viewportColumns: getRowViewportColumns(summaryRowIdx),
+              lastFrozenColumnIndex: lastFrozenColumnIndex,
+              selectedCellIdx: isSummaryRowSelected ? selectedPosition.idx : undefined,
+              isTop: false,
+              showBorder: rowIdx === 0,
+              selectCell: selectCellLatest
+            }, rowIdx);
+          })]
+        })]
+      })
+    }), renderDragHandle(), renderMeasuringCells(viewportColumns), isTreeGrid && /*#__PURE__*/jsxRuntime.jsx("div", {
+      ref: focusSinkRef,
+      tabIndex: isGroupRowFocused ? 0 : -1,
+      className: clsx(focusSinkClassname, isGroupRowFocused && [rowSelected, lastFrozenColumnIndex !== -1 && rowSelectedWithFrozenCell], !isRowIdxWithinViewportBounds(selectedPosition.rowIdx) && focusSinkHeaderAndSummaryClassname),
+      style: {
+        gridRowStart: selectedPosition.rowIdx + headerAndTopSummaryRowsCount + 1
+      }
+    }), scrollToPosition !== null && /*#__PURE__*/jsxRuntime.jsx(ScrollToCell, {
+      scrollToPosition: scrollToPosition,
+      setScrollToCellPosition: setScrollToPosition,
+      gridElement: gridRef.current
+    })]
+  });
+}
+function getCellToScroll(gridEl) {
+  return gridEl.querySelector(':scope > [role="row"] > [tabindex="0"]');
+}
+function isSamePosition(p1, p2) {
+  return p1.idx === p2.idx && p1.rowIdx === p2.rowIdx;
+}
+const DataGrid$1 = /*#__PURE__*/react.forwardRef(DataGrid);
+
+function GroupCell({
+  id,
+  groupKey,
+  childRows,
+  isExpanded,
+  isCellSelected,
+  column,
+  row,
+  groupColumnIndex,
+  isGroupByColumn,
+  toggleGroup: toggleGroupWrapper
+}) {
+  const {
+    tabIndex,
+    childTabIndex,
+    onFocus
+  } = useRovingTabIndex(isCellSelected);
+  function toggleGroup() {
+    toggleGroupWrapper(id);
+  }
+  const isLevelMatching = isGroupByColumn && groupColumnIndex === column.idx;
+  return /*#__PURE__*/jsxRuntime.jsx("div", {
+    role: "gridcell",
+    "aria-colindex": column.idx + 1,
+    "aria-selected": isCellSelected,
+    tabIndex: tabIndex,
+    className: getCellClassname(column),
+    style: {
+      ...getCellStyle(column),
+      cursor: isLevelMatching ? 'pointer' : 'default'
+    },
+    onClick: isLevelMatching ? toggleGroup : undefined,
+    onFocus: onFocus,
+    children: (!isGroupByColumn || isLevelMatching) && column.renderGroupCell?.({
+      groupKey,
+      childRows,
+      column,
+      row,
+      isExpanded,
+      tabIndex: childTabIndex,
+      toggleGroup
+    })
+  }, column.key);
+}
+const GroupCell$1 = /*#__PURE__*/react.memo(GroupCell);
+
+const groupRow = "gyxx7e97-0-0-beta-37";
+const groupRowClassname = `rdg-group-row ${groupRow}`;
+function GroupedRow({
+  className,
+  row,
+  rowIdx,
+  viewportColumns,
+  selectedCellIdx,
+  isRowSelected,
+  selectCell,
+  gridRowStart,
+  height,
+  groupBy,
+  toggleGroup,
+  ...props
+}) {
+  const idx = viewportColumns[0].key === SELECT_COLUMN_KEY ? row.level + 1 : row.level;
+  function handleSelectGroup() {
+    selectCell({
+      rowIdx,
+      idx: -1
+    });
+  }
+  return /*#__PURE__*/jsxRuntime.jsx(RowSelectionProvider, {
+    value: isRowSelected,
+    children: /*#__PURE__*/jsxRuntime.jsx("div", {
+      role: "row",
+      "aria-level": row.level + 1,
+      "aria-setsize": row.setSize,
+      "aria-posinset": row.posInSet + 1,
+      "aria-expanded": row.isExpanded,
+      className: clsx(rowClassname, groupRowClassname, `rdg-row-${rowIdx % 2 === 0 ? 'even' : 'odd'}`, className, selectedCellIdx === -1 && rowSelectedClassname),
+      onClick: handleSelectGroup,
+      style: getRowStyle(gridRowStart, height),
+      ...props,
+      children: viewportColumns.map(column => /*#__PURE__*/jsxRuntime.jsx(GroupCell$1, {
+        id: row.id,
+        groupKey: row.groupKey,
+        childRows: row.childRows,
+        isExpanded: row.isExpanded,
+        isCellSelected: selectedCellIdx === column.idx,
+        column: column,
+        row: row,
+        groupColumnIndex: idx,
+        toggleGroup: toggleGroup,
+        isGroupByColumn: groupBy.includes(column.key)
+      }, column.key))
+    })
+  });
+}
+const GroupedRow$1 = /*#__PURE__*/react.memo(GroupedRow);
+
+function TreeDataGrid({
+  columns: rawColumns,
+  rows: rawRows,
+  rowHeight: rawRowHeight,
+  rowKeyGetter: rawRowKeyGetter,
+  onCellKeyDown: rawOnCellKeyDown,
+  onRowsChange,
+  selectedRows: rawSelectedRows,
+  onSelectedRowsChange: rawOnSelectedRowsChange,
+  renderers,
+  groupBy: rawGroupBy,
+  rowGrouper,
+  expandedGroupIds,
+  onExpandedGroupIdsChange,
+  ...props
+}, ref) {
+  const defaultRenderers = useDefaultRenderers();
+  const rawRenderRow = renderers?.renderRow ?? defaultRenderers?.renderRow ?? defaultRenderRow;
+  const headerAndTopSummaryRowsCount = 1 + (props.topSummaryRows?.length ?? 0);
+  const isRtl = props.direction === 'rtl';
+  const leftKey = isRtl ? 'ArrowRight' : 'ArrowLeft';
+  const rightKey = isRtl ? 'ArrowLeft' : 'ArrowRight';
+  const toggleGroupLatest = useLatestFunc(toggleGroup);
+  const {
+    columns,
+    groupBy
+  } = react.useMemo(() => {
+    const columns = [...rawColumns].sort(({
+      key: aKey
+    }, {
+      key: bKey
+    }) => {
+      if (aKey === SELECT_COLUMN_KEY) return -1;
+      if (bKey === SELECT_COLUMN_KEY) return 1;
+      if (rawGroupBy.includes(aKey)) {
+        if (rawGroupBy.includes(bKey)) {
+          return rawGroupBy.indexOf(aKey) - rawGroupBy.indexOf(bKey);
+        }
+        return -1;
+      }
+      if (rawGroupBy.includes(bKey)) return 1;
+      return 0;
+    });
+    const groupBy = [];
+    for (const [index, column] of columns.entries()) {
+      if (rawGroupBy.includes(column.key)) {
+        groupBy.push(column.key);
+        columns[index] = {
+          ...column,
+          frozen: true,
+          renderCell: () => null,
+          renderGroupCell: column.renderGroupCell ?? renderToggleGroup,
+          editable: false
+        };
+      }
+    }
+    return {
+      columns,
+      groupBy
+    };
+  }, [rawColumns, rawGroupBy]);
+  const [groupedRows, rowsCount] = react.useMemo(() => {
+    if (groupBy.length === 0) return [undefined, rawRows.length];
     const groupRows = (rows, [groupByKey, ...remainingGroupByKeys], startRowIndex) => {
       let groupRowsCount = 0;
       const groups = {};
-
       for (const [key, childRows] of Object.entries(rowGrouper(rows, groupByKey))) {
         const [childGroups, childRowsCount] = remainingGroupByKeys.length === 0 ? [childRows, childRows.length] : groupRows(childRows, remainingGroupByKeys, startRowIndex + groupRowsCount + 1);
         groups[key] = {
@@ -955,26 +2912,22 @@ function useViewportRows({
         };
         groupRowsCount += childRowsCount + 1;
       }
-
       return [groups, groupRowsCount];
     };
-
     return groupRows(rawRows, groupBy, 0);
   }, [groupBy, rowGrouper, rawRows]);
   const [rows, isGroupRow] = react.useMemo(() => {
     const allGroupRows = new Set();
     if (!groupedRows) return [rawRows, isGroupRow];
     const flattenedRows = [];
-
     const expandGroup = (rows, parentId, level) => {
       if (isReadonlyArray(rows)) {
         flattenedRows.push(...rows);
         return;
       }
-
       Object.keys(rows).forEach((groupKey, posInSet, keys) => {
         const id = parentId !== undefined ? `${parentId}__${groupKey}` : groupKey;
-        const isExpanded = expandedGroupIds?.has(id) ?? false;
+        const isExpanded = expandedGroupIds.has(id);
         const {
           childRows,
           childGroups,
@@ -993,2075 +2946,242 @@ function useViewportRows({
         };
         flattenedRows.push(groupRow);
         allGroupRows.add(groupRow);
-
         if (isExpanded) {
           expandGroup(childGroups, id, level + 1);
         }
       });
     };
-
     expandGroup(groupedRows, undefined, 0);
     return [flattenedRows, isGroupRow];
-
     function isGroupRow(row) {
       return allGroupRows.has(row);
     }
   }, [expandedGroupIds, groupedRows, rawRows]);
-  const {
-    totalRowHeight,
-    gridTemplateRows,
-    getRowTop,
-    getRowHeight,
-    findRowIdx
-  } = react.useMemo(() => {
-    if (typeof rowHeight === 'number') {
-      return {
-        totalRowHeight: rowHeight * rows.length,
-        gridTemplateRows: ` repeat(${rows.length}, ${rowHeight}px)`,
-        getRowTop: rowIdx => rowIdx * rowHeight,
-        getRowHeight: () => rowHeight,
-        findRowIdx: offset => floor(offset / rowHeight)
-      };
-    }
-
-    let totalRowHeight = 0;
-    let gridTemplateRows = ' ';
-    const rowPositions = rows.map(row => {
-      const currentRowHeight = isGroupRow(row) ? rowHeight({
-        type: 'GROUP',
-        row
-      }) : rowHeight({
-        type: 'ROW',
-        row
-      });
-      const position = {
-        top: totalRowHeight,
-        height: currentRowHeight
-      };
-      gridTemplateRows += `${currentRowHeight}px `;
-      totalRowHeight += currentRowHeight;
-      return position;
-    });
-
-    const validateRowIdx = rowIdx => {
-      return max(0, min(rows.length - 1, rowIdx));
-    };
-
-    return {
-      totalRowHeight,
-      gridTemplateRows,
-      getRowTop: rowIdx => rowPositions[validateRowIdx(rowIdx)].top,
-      getRowHeight: rowIdx => rowPositions[validateRowIdx(rowIdx)].height,
-
-      findRowIdx(offset) {
-        let start = 0;
-        let end = rowPositions.length - 1;
-
-        while (start <= end) {
-          const middle = start + floor((end - start) / 2);
-          const currentOffset = rowPositions[middle].top;
-          if (currentOffset === offset) return middle;
-
-          if (currentOffset < offset) {
-            start = middle + 1;
-          } else if (currentOffset > offset) {
-            end = middle - 1;
-          }
-
-          if (start > end) return end;
+  const rowHeight = react.useMemo(() => {
+    if (typeof rawRowHeight === 'function') {
+      return row => {
+        if (isGroupRow(row)) {
+          return rawRowHeight({
+            type: 'GROUP',
+            row
+          });
         }
-
-        return 0;
-      }
-
-    };
-  }, [isGroupRow, rowHeight, rows]);
-  let rowOverscanStartIdx = 0;
-  let rowOverscanEndIdx = rows.length - 1;
-
-  if (enableVirtualization) {
-    const overscanThreshold = 4;
-    const rowVisibleStartIdx = findRowIdx(scrollTop);
-    const rowVisibleEndIdx = findRowIdx(scrollTop + clientHeight);
-    rowOverscanStartIdx = max(0, rowVisibleStartIdx - overscanThreshold);
-    rowOverscanEndIdx = min(rows.length - 1, rowVisibleEndIdx + overscanThreshold);
-  }
-
-  return {
-    rowOverscanStartIdx,
-    rowOverscanEndIdx,
-    rows,
-    rowsCount,
-    totalRowHeight,
-    gridTemplateRows,
-    isGroupRow,
-    getRowTop,
-    getRowHeight,
-    findRowIdx
-  };
-}
-
-var css_248z$a = ".h1af91pe700-beta13{cursor:pointer;display:flex}.h1af91pe700-beta13:focus{outline:none}.hifiwer700-beta13{flex-grow:1;overflow:hidden;overflow:clip;text-overflow:ellipsis}";
-styleInject(css_248z$a,{"insertAt":"top"});
-
-const headerSortCell = "h1af91pe700-beta13";
-const headerSortCellClassname = `rdg-header-sort-cell ${headerSortCell}`;
-const headerSortName = "hifiwer700-beta13";
-const headerSortNameClassname = `rdg-header-sort-name ${headerSortName}`;
-function HeaderRenderer({
-  column,
-  sortDirection,
-  priority,
-  onSort,
-  isCellSelected
-}) {
-  if (!column.sortable) return /*#__PURE__*/jsxRuntime.jsx(jsxRuntime.Fragment, {
-    children: column.name
-  });
-  return /*#__PURE__*/jsxRuntime.jsx(SortableHeaderCell, {
-    onSort: onSort,
-    sortDirection: sortDirection,
-    priority: priority,
-    isCellSelected: isCellSelected,
-    children: column.name
-  });
-}
-
-function SortableHeaderCell({
-  onSort,
-  sortDirection,
-  priority,
-  children,
-  isCellSelected
-}) {
-  const SortIcon = useDefaultComponents().sortIcon;
-  const {
-    ref,
-    tabIndex
-  } = useFocusRef(isCellSelected);
-
-  function handleKeyDown(event) {
-    if (event.key === ' ' || event.key === 'Enter') {
-      event.preventDefault();
-      onSort(event.ctrlKey || event.metaKey);
-    }
-  }
-
-  function handleClick(event) {
-    onSort(event.ctrlKey || event.metaKey);
-  }
-
-  return /*#__PURE__*/jsxRuntime.jsxs("span", {
-    ref: ref,
-    tabIndex: tabIndex,
-    className: headerSortCellClassname,
-    onClick: handleClick,
-    onKeyDown: handleKeyDown,
-    children: [/*#__PURE__*/jsxRuntime.jsx("span", {
-      className: headerSortNameClassname,
-      children: children
-    }), /*#__PURE__*/jsxRuntime.jsxs("span", {
-      children: [/*#__PURE__*/jsxRuntime.jsx(SortIcon, {
-        sortDirection: sortDirection
-      }), priority]
-    })]
-  });
-}
-
-var css_248z$9 = ".c6l2wv1700-beta13{touch-action:none}.c6l2wv1700-beta13:after{content:\"\";cursor:col-resize;inline-size:10px;inset-block-end:0;inset-block-start:0;inset-inline-end:0;position:absolute}";
-styleInject(css_248z$9,{"insertAt":"top"});
-
-const cellResizable = "c6l2wv1700-beta13";
-const cellResizableClassname = `rdg-cell-resizable ${cellResizable}`;
-function HeaderCell({
-  column,
-  colSpan,
-  isCellSelected,
-  onColumnResize,
-  allRowsSelected,
-  onAllRowsSelectionChange,
-  sortColumns,
-  onSortColumnsChange,
-  selectCell,
-  shouldFocusGrid,
-  direction
-}) {
-  const isRtl = direction === 'rtl';
-  const {
-    ref,
-    tabIndex,
-    onFocus
-  } = useRovingCellRef(isCellSelected);
-  const sortIndex = sortColumns?.findIndex(sort => sort.columnKey === column.key);
-  const sortColumn = sortIndex !== undefined && sortIndex > -1 ? sortColumns[sortIndex] : undefined;
-  const sortDirection = sortColumn?.direction;
-  const priority = sortColumn !== undefined && sortColumns.length > 1 ? sortIndex + 1 : undefined;
-  const ariaSort = sortDirection && !priority ? sortDirection === 'ASC' ? 'ascending' : 'descending' : undefined;
-  const className = getCellClassname(column, column.headerCellClass, column.resizable && cellResizableClassname);
-  const HeaderRenderer$1 = column.headerRenderer ?? HeaderRenderer;
-
-  function onPointerDown(event) {
-    if (event.pointerType === 'mouse' && event.buttons !== 1) {
-      return;
-    }
-
-    const {
-      currentTarget,
-      pointerId
-    } = event;
-    const {
-      right,
-      left
-    } = currentTarget.getBoundingClientRect();
-    const offset = isRtl ? event.clientX - left : right - event.clientX;
-
-    if (offset > 11) {
-      return;
-    }
-
-    function onPointerMove(event) {
-      const {
-        right,
-        left
-      } = currentTarget.getBoundingClientRect();
-      const width = isRtl ? right + offset - event.clientX : event.clientX + offset - left;
-
-      if (width > 0) {
-        onColumnResize(column, clampColumnWidth(width, column));
-      }
-    }
-
-    function onLostPointerCapture() {
-      currentTarget.removeEventListener('pointermove', onPointerMove);
-      currentTarget.removeEventListener('lostpointercapture', onLostPointerCapture);
-    }
-
-    currentTarget.setPointerCapture(pointerId);
-    currentTarget.addEventListener('pointermove', onPointerMove);
-    currentTarget.addEventListener('lostpointercapture', onLostPointerCapture);
-  }
-
-  function onSort(ctrlClick) {
-    if (onSortColumnsChange == null) return;
-    const {
-      sortDescendingFirst
-    } = column;
-
-    if (sortColumn === undefined) {
-      const nextSort = {
-        columnKey: column.key,
-        direction: sortDescendingFirst ? 'DESC' : 'ASC'
-      };
-      onSortColumnsChange(sortColumns && ctrlClick ? [...sortColumns, nextSort] : [nextSort]);
-    } else {
-      let nextSortColumn;
-
-      if (sortDescendingFirst && sortDirection === 'DESC' || !sortDescendingFirst && sortDirection === 'ASC') {
-        nextSortColumn = {
-          columnKey: column.key,
-          direction: sortDirection === 'ASC' ? 'DESC' : 'ASC'
-        };
-      }
-
-      if (ctrlClick) {
-        const nextSortColumns = [...sortColumns];
-
-        if (nextSortColumn) {
-          nextSortColumns[sortIndex] = nextSortColumn;
-        } else {
-          nextSortColumns.splice(sortIndex, 1);
-        }
-
-        onSortColumnsChange(nextSortColumns);
-      } else {
-        onSortColumnsChange(nextSortColumn ? [nextSortColumn] : []);
-      }
-    }
-  }
-
-  function onClick() {
-    selectCell(column.idx);
-  }
-
-  function onDoubleClick(event) {
-    const {
-      right,
-      left
-    } = event.currentTarget.getBoundingClientRect();
-    const offset = isRtl ? event.clientX - left : right - event.clientX;
-
-    if (offset > 11) {
-      return;
-    }
-
-    onColumnResize(column, 'auto');
-  }
-
-  function handleFocus(event) {
-    onFocus?.(event);
-
-    if (shouldFocusGrid) {
-      selectCell(0);
-    }
-  }
-
-  return /*#__PURE__*/jsxRuntime.jsx("div", {
-    role: "columnheader",
-    "aria-colindex": column.idx + 1,
-    "aria-selected": isCellSelected,
-    "aria-sort": ariaSort,
-    "aria-colspan": colSpan,
-    ref: ref,
-    tabIndex: shouldFocusGrid ? 0 : tabIndex,
-    className: className,
-    style: { ...getCellStyle(column, colSpan),
-      minWidth: column.minWidth,
-      maxWidth: column.maxWidth ?? undefined
-    },
-    onFocus: handleFocus,
-    onClick: onClick,
-    onDoubleClick: column.resizable ? onDoubleClick : undefined,
-    onPointerDown: column.resizable ? onPointerDown : undefined,
-    children: /*#__PURE__*/jsxRuntime.jsx(HeaderRenderer$1, {
-      column: column,
-      sortDirection: sortDirection,
-      priority: priority,
-      onSort: onSort,
-      allRowsSelected: allRowsSelected,
-      onAllRowsSelectionChange: onAllRowsSelectionChange,
-      isCellSelected: isCellSelected
-    })
-  });
-}
-
-var css_248z$8 = ".h10tskcx700-beta13{background-color:var(--rdg-header-background-color);display:contents;font-weight:700;line-height:var(--rdg-header-row-height)}.h10tskcx700-beta13>.cj343x0700-beta13{inset-block-start:0;position:sticky;z-index:2}.h10tskcx700-beta13>.ch2wcw8700-beta13{z-index:3}";
-styleInject(css_248z$8,{"insertAt":"top"});
-
-const headerRow = "h10tskcx700-beta13";
-const headerRowClassname = `rdg-header-row ${headerRow}`;
-
-function HeaderRow({
-  columns,
-  allRowsSelected,
-  onAllRowsSelectionChange,
-  onColumnResize,
-  sortColumns,
-  onSortColumnsChange,
-  lastFrozenColumnIndex,
-  selectedCellIdx,
-  selectCell,
-  shouldFocusGrid,
-  direction
-}) {
-  const cells = [];
-
-  for (let index = 0; index < columns.length; index++) {
-    const column = columns[index];
-    const colSpan = getColSpan(column, lastFrozenColumnIndex, {
-      type: 'HEADER'
-    });
-
-    if (colSpan !== undefined) {
-      index += colSpan - 1;
-    }
-
-    cells.push( /*#__PURE__*/jsxRuntime.jsx(HeaderCell, {
-      column: column,
-      colSpan: colSpan,
-      isCellSelected: selectedCellIdx === column.idx,
-      onColumnResize: onColumnResize,
-      allRowsSelected: allRowsSelected,
-      onAllRowsSelectionChange: onAllRowsSelectionChange,
-      onSortColumnsChange: onSortColumnsChange,
-      sortColumns: sortColumns,
-      selectCell: selectCell,
-      shouldFocusGrid: shouldFocusGrid && index === 0,
-      direction: direction
-    }, column.key));
-  }
-
-  return /*#__PURE__*/jsxRuntime.jsx("div", {
-    role: "row",
-    "aria-rowindex": 1,
-    className: clsx(headerRowClassname, selectedCellIdx === -1 && rowSelectedClassname),
-    style: getRowStyle(1),
-    children: cells
-  });
-}
-
-const HeaderRow$1 = /*#__PURE__*/react.memo(HeaderRow);
-
-var css_248z$7 = ".c6ra8a3700-beta13,.cq910m0700-beta13{background-color:#ccf}.cq910m0700-beta13.c6ra8a3700-beta13{background-color:#99f}";
-styleInject(css_248z$7,{"insertAt":"top"});
-
-const cellCopied = "c6ra8a3700-beta13";
-const cellCopiedClassname = `rdg-cell-copied ${cellCopied}`;
-const cellDraggedOver = "cq910m0700-beta13";
-const cellDraggedOverClassname = `rdg-cell-dragged-over ${cellDraggedOver}`;
-
-function Cell({
-  column,
-  colSpan,
-  className,
-  isScrolling,
-  isCellSelected,
-  isCopied,
-  isDraggedOver,
-  row,
-  dragHandle,
-  onRowClick,
-  onRowDoubleClick,
-  onRowChange,
-  selectCell,
-  onClick,
-  onDoubleClick,
-  onContextMenu,
-  onMouseDown,
-  onFocus: focusEventHandler,
-  ...props
-}, refComponent) {
-  const {
-    ref,
-    tabIndex,
-    onFocus
-  } = useRovingCellRef(isCellSelected);
-
-  function setRef(element) {
-    ref(element);
-
-    if (typeof refComponent === 'function') {
-      refComponent(element);
-    } else if (typeof refComponent === 'object' && refComponent !== null) {
-      refComponent.current = element;
-    }
-  }
-
-  const {
-    cellClass
-  } = column;
-  className = getCellClassname(column, typeof cellClass === 'function' ? cellClass(row) : cellClass, className, isCopied && cellCopiedClassname, isDraggedOver && cellDraggedOverClassname);
-
-  function selectCellWrapper(openEditor) {
-    selectCell(row, column, openEditor);
-  }
-
-  function handleMouseDown(event) {
-    selectCellWrapper(column.editorOptions?.editOnClick);
-    onRowClick?.(row, column);
-    onMouseDown?.(event);
-  }
-
-  function handleClick(event) {
-    onClick?.(event);
-  }
-
-  function handleContextMenu(event) {
-    selectCellWrapper();
-    onContextMenu?.(event);
-  }
-
-  function handleDoubleClick(event) {
-    selectCellWrapper(true);
-    onRowDoubleClick?.(row, column);
-    onDoubleClick?.(event);
-  }
-
-  function handleFocus(event) {
-    onFocus?.(event);
-    focusEventHandler?.(event);
-  }
-
-  return /*#__PURE__*/jsxRuntime.jsx("div", {
-    role: "gridcell",
-    "aria-colindex": column.idx + 1,
-    "aria-selected": isCellSelected,
-    "aria-colspan": colSpan,
-    "aria-readonly": !isCellEditable(column, row) || undefined,
-    ref: setRef,
-    tabIndex: tabIndex,
-    className: className,
-    style: getCellStyle(column, colSpan),
-    onMouseDown: handleMouseDown,
-    onClick: handleClick,
-    onDoubleClick: handleDoubleClick,
-    onContextMenu: handleContextMenu,
-    onFocus: handleFocus,
-    ...props,
-    children: !column.rowGroup && /*#__PURE__*/jsxRuntime.jsxs(jsxRuntime.Fragment, {
-      children: [/*#__PURE__*/jsxRuntime.jsx(column.formatter, {
-        column: column,
-        row: row,
-        isScrolling: isScrolling,
-        isCellSelected: isCellSelected,
-        onRowChange: onRowChange
-      }), dragHandle]
-    })
-  });
-}
-
-const Cell$1 = /*#__PURE__*/react.memo( /*#__PURE__*/react.forwardRef(Cell));
-
-function Row({
-  className,
-  rowIdx,
-  gridRowStart,
-  height,
-  selectedCellIdx,
-  isScrolling,
-  isRowSelected,
-  copiedCellIdx,
-  draggedOverCellIdx,
-  lastFrozenColumnIndex,
-  row,
-  viewportColumns,
-  selectedCellEditor,
-  selectedCellDragHandle,
-  onRowClick,
-  onRowDoubleClick,
-  rowClass,
-  setDraggedOverRowIdx,
-  onMouseEnter,
-  onRowChange,
-  selectCell,
-  ...props
-}, ref) {
-  const defaultComponents = useDefaultComponents();
-  const CellRenderer = defaultComponents?.cellRenderer ?? Cell$1;
-  const handleRowChange = useLatestFunc(newRow => {
-    onRowChange(rowIdx, newRow);
-  });
-
-  function handleDragEnter(event) {
-    setDraggedOverRowIdx?.(rowIdx);
-    onMouseEnter?.(event);
-  }
-
-  className = clsx(rowClassname, `rdg-row-${rowIdx % 2 === 0 ? 'even' : 'odd'}`, rowClass?.(row), className, selectedCellIdx === -1 && rowSelectedClassname);
-  const cells = [];
-
-  for (let index = 0; index < viewportColumns.length; index++) {
-    const column = viewportColumns[index];
-    const {
-      idx
-    } = column;
-    const colSpan = getColSpan(column, lastFrozenColumnIndex, {
-      type: 'ROW',
-      row
-    });
-
-    if (colSpan !== undefined) {
-      index += colSpan - 1;
-    }
-
-    const isCellSelected = selectedCellIdx === idx;
-
-    if (isCellSelected && selectedCellEditor) {
-      cells.push(selectedCellEditor);
-    } else {
-      cells.push( /*#__PURE__*/jsxRuntime.jsx(CellRenderer, {
-        isScrolling: isScrolling,
-        column: column,
-        colSpan: colSpan,
-        row: row,
-        isCopied: copiedCellIdx === idx,
-        isDraggedOver: draggedOverCellIdx === idx,
-        isCellSelected: isCellSelected,
-        dragHandle: isCellSelected ? selectedCellDragHandle : undefined,
-        onRowClick: onRowClick,
-        onRowDoubleClick: onRowDoubleClick,
-        onRowChange: handleRowChange,
-        selectCell: selectCell
-      }, column.key));
-    }
-  }
-
-  return /*#__PURE__*/jsxRuntime.jsx(RowSelectionProvider, {
-    value: isRowSelected,
-    children: /*#__PURE__*/jsxRuntime.jsx("div", {
-      role: "row",
-      ref: ref,
-      className: className,
-      onMouseEnter: handleDragEnter,
-      style: getRowStyle(gridRowStart, height),
-      ...props,
-      children: cells
-    })
-  });
-}
-
-const Row$1 = /*#__PURE__*/react.memo( /*#__PURE__*/react.forwardRef(Row));
-
-function GroupCell({
-  id,
-  groupKey,
-  childRows,
-  isScrolling,
-  isExpanded,
-  isCellSelected,
-  column,
-  row,
-  groupColumnIndex,
-  toggleGroup: toggleGroupWrapper
-}) {
-  const {
-    ref,
-    tabIndex,
-    onFocus
-  } = useRovingCellRef(isCellSelected);
-
-  function toggleGroup() {
-    toggleGroupWrapper(id);
-  }
-
-  const isLevelMatching = column.rowGroup && groupColumnIndex === column.idx;
-  return /*#__PURE__*/jsxRuntime.jsx("div", {
-    role: "gridcell",
-    "aria-colindex": column.idx + 1,
-    "aria-selected": isCellSelected,
-    ref: ref,
-    tabIndex: tabIndex,
-    className: getCellClassname(column),
-    style: { ...getCellStyle(column),
-      cursor: isLevelMatching ? 'pointer' : 'default'
-    },
-    onClick: isLevelMatching ? toggleGroup : undefined,
-    onFocus: onFocus,
-    children: (!column.rowGroup || groupColumnIndex === column.idx) && column.groupFormatter && /*#__PURE__*/jsxRuntime.jsx(column.groupFormatter, {
-      groupKey: groupKey,
-      childRows: childRows,
-      column: column,
-      row: row,
-      isScrolling: isScrolling,
-      isExpanded: isExpanded,
-      isCellSelected: isCellSelected,
-      toggleGroup: toggleGroup
-    })
-  }, column.key);
-}
-
-const GroupCell$1 = /*#__PURE__*/react.memo(GroupCell);
-
-var css_248z$6 = ".g1yxluv3700-beta13:not([aria-selected=true]){background-color:var(--rdg-header-background-color)}.g1yxluv3700-beta13>.cj343x0700-beta13:not(:last-child):not(.c1wvphzh700-beta13){border-inline-end:none}";
-styleInject(css_248z$6,{"insertAt":"top"});
-
-const groupRow = "g1yxluv3700-beta13";
-const groupRowClassname = `rdg-group-row ${groupRow}`;
-
-function GroupedRow({
-  id,
-  groupKey,
-  viewportColumns,
-  childRows,
-  rowIdx,
-  row,
-  gridRowStart,
-  height,
-  level,
-  isScrolling,
-  isExpanded,
-  selectedCellIdx,
-  isRowSelected,
-  selectGroup,
-  toggleGroup,
-  ...props
-}) {
-  const idx = viewportColumns[0].key === SELECT_COLUMN_KEY ? level + 1 : level;
-
-  function handleSelectGroup() {
-    selectGroup(rowIdx);
-  }
-
-  return /*#__PURE__*/jsxRuntime.jsx(RowSelectionProvider, {
-    value: isRowSelected,
-    children: /*#__PURE__*/jsxRuntime.jsx("div", {
-      role: "row",
-      "aria-level": level,
-      "aria-expanded": isExpanded,
-      className: clsx(rowClassname, groupRowClassname, `rdg-row-${rowIdx % 2 === 0 ? 'even' : 'odd'}`, selectedCellIdx === -1 && rowSelectedClassname),
-      onClick: handleSelectGroup,
-      style: getRowStyle(gridRowStart, height),
-      ...props,
-      children: viewportColumns.map(column => /*#__PURE__*/jsxRuntime.jsx(GroupCell$1, {
-        id: id,
-        groupKey: groupKey,
-        childRows: childRows,
-        isScrolling: isScrolling,
-        isExpanded: isExpanded,
-        isCellSelected: selectedCellIdx === column.idx,
-        column: column,
-        row: row,
-        groupColumnIndex: idx,
-        toggleGroup: toggleGroup
-      }, column.key))
-    })
-  });
-}
-
-const GroupRowRenderer = /*#__PURE__*/react.memo(GroupedRow);
-
-var css_248z$5 = ".s8wc6fl700-beta13{inset-block-end:var(--rdg-summary-row-bottom);inset-block-start:var(--rdg-summary-row-top)}";
-styleInject(css_248z$5,{"insertAt":"top"});
-
-const summaryCellClassname = "s8wc6fl700-beta13";
-
-function SummaryCell({
-  column,
-  colSpan,
-  row,
-  isCellSelected,
-  selectCell
-}) {
-  const {
-    ref,
-    tabIndex,
-    onFocus
-  } = useRovingCellRef(isCellSelected);
-  const {
-    summaryFormatter: SummaryFormatter,
-    summaryCellClass
-  } = column;
-  const className = getCellClassname(column, summaryCellClassname, typeof summaryCellClass === 'function' ? summaryCellClass(row) : summaryCellClass);
-
-  function onClick() {
-    selectCell(row, column);
-  }
-
-  return /*#__PURE__*/jsxRuntime.jsx("div", {
-    role: "gridcell",
-    "aria-colindex": column.idx + 1,
-    "aria-colspan": colSpan,
-    "aria-selected": isCellSelected,
-    ref: ref,
-    tabIndex: tabIndex,
-    className: className,
-    style: getCellStyle(column, colSpan),
-    onClick: onClick,
-    onFocus: onFocus,
-    children: SummaryFormatter && /*#__PURE__*/jsxRuntime.jsx(SummaryFormatter, {
-      column: column,
-      row: row,
-      isCellSelected: isCellSelected
-    })
-  });
-}
-
-const SummaryCell$1 = /*#__PURE__*/react.memo(SummaryCell);
-
-var css_248z$4 = ".skuhp55700-beta13.r1upfr80700-beta13{line-height:var(--rdg-summary-row-height)}.skuhp55700-beta13.r1upfr80700-beta13>.cj343x0700-beta13{position:sticky}.sf8l5ub700-beta13>.cj343x0700-beta13{border-block-start:2px solid var(--rdg-summary-border-color)}";
-styleInject(css_248z$4,{"insertAt":"top"});
-
-const summaryRow = "skuhp55700-beta13";
-const summaryRowBorderClassname = "sf8l5ub700-beta13";
-const summaryRowClassname = `rdg-summary-row ${summaryRow}`;
-
-function SummaryRow({
-  rowIdx,
-  gridRowStart,
-  row,
-  viewportColumns,
-  top,
-  bottom,
-  lastFrozenColumnIndex,
-  selectedCellIdx,
-  selectCell,
-  'aria-rowindex': ariaRowIndex
-}) {
-  const cells = [];
-
-  for (let index = 0; index < viewportColumns.length; index++) {
-    const column = viewportColumns[index];
-    const colSpan = getColSpan(column, lastFrozenColumnIndex, {
-      type: 'SUMMARY',
-      row
-    });
-
-    if (colSpan !== undefined) {
-      index += colSpan - 1;
-    }
-
-    const isCellSelected = selectedCellIdx === column.idx;
-    cells.push( /*#__PURE__*/jsxRuntime.jsx(SummaryCell$1, {
-      column: column,
-      colSpan: colSpan,
-      row: row,
-      isCellSelected: isCellSelected,
-      selectCell: selectCell
-    }, column.key));
-  }
-
-  return /*#__PURE__*/jsxRuntime.jsx("div", {
-    role: "row",
-    "aria-rowindex": ariaRowIndex,
-    className: clsx(rowClassname, `rdg-row-${rowIdx % 2 === 0 ? 'even' : 'odd'}`, summaryRowClassname, rowIdx === 0 && summaryRowBorderClassname, selectedCellIdx === -1 && rowSelectedClassname),
-    style: { ...getRowStyle(gridRowStart),
-      '--rdg-summary-row-top': top !== undefined ? `${top}px` : undefined,
-      '--rdg-summary-row-bottom': bottom !== undefined ? `${bottom}px` : undefined
-    },
-    children: cells
-  });
-}
-
-const SummaryRow$1 = /*#__PURE__*/react.memo(SummaryRow);
-
-var css_248z$3 = ".cis5rrm700-beta13.rdg-cell{padding:0}";
-styleInject(css_248z$3,{"insertAt":"top"});
-
-const cellEditing = "cis5rrm700-beta13";
-function EditCell({
-  column,
-  colSpan,
-  row,
-  isScrolling,
-  onRowChange,
-  closeEditor
-}) {
-  const frameRequestRef = react.useRef();
-  const commitOnOutsideClick = column.editorOptions?.commitOnOutsideClick !== false;
-  const commitOnOutsideMouseDown = useLatestFunc(() => {
-    onClose(true);
-  });
-  react.useEffect(() => {
-    if (!commitOnOutsideClick) return;
-
-    function onWindowCaptureMouseDown() {
-      frameRequestRef.current = requestAnimationFrame(commitOnOutsideMouseDown);
-    }
-
-    addEventListener('mousedown', onWindowCaptureMouseDown, {
-      capture: true
-    });
-    return () => {
-      removeEventListener('mousedown', onWindowCaptureMouseDown, {
-        capture: true
-      });
-      cancelFrameRequest();
-    };
-  }, [commitOnOutsideClick, commitOnOutsideMouseDown]);
-
-  function cancelFrameRequest() {
-    cancelAnimationFrame(frameRequestRef.current);
-  }
-
-  function onKeyDown(event) {
-    if (event.key === 'Escape') {
-      event.stopPropagation();
-      onClose();
-    } else if (event.key === 'Enter') {
-      event.stopPropagation();
-      onClose(true);
-    } else {
-      const onNavigation = column.editorOptions?.onNavigation ?? onEditorNavigation;
-
-      if (!onNavigation(event)) {
-        event.stopPropagation();
-      }
-    }
-  }
-
-  function onClose(commitChanges) {
-    if (commitChanges) {
-      onRowChange(row, true);
-    } else {
-      closeEditor();
-    }
-  }
-
-  const {
-    cellClass
-  } = column;
-  const className = getCellClassname(column, 'rdg-editor-container', typeof cellClass === 'function' ? cellClass(row) : cellClass, !column.editorOptions?.renderFormatter && cellEditing);
-  return /*#__PURE__*/jsxRuntime.jsx("div", {
-    role: "gridcell",
-    "aria-colindex": column.idx + 1,
-    "aria-colspan": colSpan,
-    "aria-selected": true,
-    className: className,
-    style: getCellStyle(column, colSpan),
-    onKeyDown: onKeyDown,
-    onMouseDownCapture: commitOnOutsideClick ? cancelFrameRequest : undefined,
-    children: column.editor != null && /*#__PURE__*/jsxRuntime.jsxs(jsxRuntime.Fragment, {
-      children: [/*#__PURE__*/jsxRuntime.jsx(column.editor, {
-        column: column,
-        row: row,
-        onRowChange: onRowChange,
-        onClose: onClose
-      }), column.editorOptions?.renderFormatter && /*#__PURE__*/jsxRuntime.jsx(column.formatter, {
-        column: column,
-        row: row,
-        isScrolling: isScrolling,
-        isCellSelected: true,
-        onRowChange: onRowChange
-      })]
-    })
-  });
-}
-
-var css_248z$2 = ".c1w9bbhr700-beta13{background-color:var(--rdg-selection-color);block-size:8px;cursor:move;inline-size:8px;inset-block-end:0;inset-inline-end:0;position:absolute}.c1w9bbhr700-beta13:hover{background-color:var(--rdg-background-color);block-size:16px;border:2px solid var(--rdg-selection-color);inline-size:16px}";
-styleInject(css_248z$2,{"insertAt":"top"});
-
-const cellDragHandle = "c1w9bbhr700-beta13";
-const cellDragHandleClassname = `rdg-cell-drag-handle ${cellDragHandle}`;
-function DragHandle({
-  rows,
-  columns,
-  selectedPosition,
-  latestDraggedOverRowIdx,
-  isCellEditable,
-  onRowsChange,
-  onFill,
-  setDragging,
-  setDraggedOverRowIdx
-}) {
-  function handleMouseDown(event) {
-    if (event.buttons !== 1) return;
-    setDragging(true);
-    window.addEventListener('mouseover', onMouseOver);
-    window.addEventListener('mouseup', onMouseUp);
-
-    function onMouseOver(event) {
-      if (event.buttons !== 1) onMouseUp();
-    }
-
-    function onMouseUp() {
-      window.removeEventListener('mouseover', onMouseOver);
-      window.removeEventListener('mouseup', onMouseUp);
-      setDragging(false);
-      handleDragEnd();
-    }
-  }
-
-  function handleDragEnd() {
-    const overRowIdx = latestDraggedOverRowIdx.current;
-    if (overRowIdx === undefined) return;
-    const {
-      rowIdx
-    } = selectedPosition;
-    const startRowIndex = rowIdx < overRowIdx ? rowIdx + 1 : overRowIdx;
-    const endRowIndex = rowIdx < overRowIdx ? overRowIdx + 1 : rowIdx;
-    updateRows(startRowIndex, endRowIndex);
-    setDraggedOverRowIdx(undefined);
-  }
-
-  function handleDoubleClick(event) {
-    event.stopPropagation();
-    updateRows(selectedPosition.rowIdx + 1, rows.length);
-  }
-
-  function updateRows(startRowIdx, endRowIdx) {
-    const {
-      idx,
-      rowIdx
-    } = selectedPosition;
-    const column = columns[idx];
-    const sourceRow = rows[rowIdx];
-    const updatedRows = [...rows];
-    const indexes = [];
-
-    for (let i = startRowIdx; i < endRowIdx; i++) {
-      if (isCellEditable({
-        rowIdx: i,
-        idx
-      })) {
-        const updatedRow = onFill({
-          columnKey: column.key,
-          sourceRow,
-          targetRow: rows[i]
+        return rawRowHeight({
+          type: 'ROW',
+          row
         });
-
-        if (updatedRow !== rows[i]) {
-          updatedRows[i] = updatedRow;
-          indexes.push(i);
-        }
-      }
+      };
     }
-
-    if (indexes.length > 0) {
-      onRowsChange?.(updatedRows, {
-        indexes,
-        column
-      });
-    }
-  }
-
-  return /*#__PURE__*/jsxRuntime.jsx("div", {
-    className: cellDragHandleClassname,
-    onMouseDown: handleMouseDown,
-    onDoubleClick: handleDoubleClick
-  });
-}
-
-var css_248z$1 = ".a3cv93f700-beta13{fill:currentColor}.a3cv93f700-beta13>path{transition:d .1s}";
-styleInject(css_248z$1,{"insertAt":"top"});
-
-const arrow = "a3cv93f700-beta13";
-const arrowClassname = `rdg-sort-arrow ${arrow}`;
-function SortIcon({
-  sortDirection
-}) {
-  return sortDirection !== undefined ? /*#__PURE__*/jsxRuntime.jsx("svg", {
-    viewBox: "0 0 12 8",
-    width: "12",
-    height: "8",
-    className: arrowClassname,
-    "aria-hidden": true,
-    children: /*#__PURE__*/jsxRuntime.jsx("path", {
-      d: sortDirection === 'ASC' ? 'M0 8 6 0 12 8' : 'M0 0 6 8 12 0'
-    })
-  }) : null;
-}
-
-const initialPosition = {
-  idx: -1,
-  rowIdx: -2,
-  mode: 'SELECT'
-};
-
-function DataGrid({
-  columns: rawColumns,
-  rows: rawRows,
-  summaryRows,
-  rowKeyGetter,
-  onRowsChange,
-  rowHeight,
-  headerRowHeight: rawHeaderRowHeight,
-  summaryRowHeight: rawSummaryRowHeight,
-  selectedRows,
-  onSelectedCellChange,
-  onSelectedRowsChange,
-  sortColumns,
-  onSortColumnsChange,
-  defaultColumnOptions,
-  groupBy: rawGroupBy,
-  rowGrouper,
-  expandedGroupIds,
-  onExpandedGroupIdsChange,
-  onRowClick,
-  onRowDoubleClick,
-  onScroll,
-  onColumnResize,
-  onFill,
-  onCopy,
-  onPaste,
-  cellNavigationMode: rawCellNavigationMode,
-  enableVirtualization,
-  components,
-  className,
-  style,
-  rowClass,
-  direction,
-  'aria-label': ariaLabel,
-  'aria-labelledby': ariaLabelledBy,
-  'aria-describedby': ariaDescribedBy,
-  'data-testid': testId
-}, ref) {
-  const defaultComponents = useDefaultComponents();
-  rowHeight ?? (rowHeight = 35);
-  const headerRowHeight = rawHeaderRowHeight ?? (typeof rowHeight === 'number' ? rowHeight : 35);
-  const summaryRowHeight = rawSummaryRowHeight ?? (typeof rowHeight === 'number' ? rowHeight : 35);
-  const CellRenderer = components?.cellRenderer ?? defaultComponents?.cellRenderer ?? Cell$1;
-  const RowRenderer = components?.rowRenderer ?? defaultComponents?.rowRenderer ?? Row$1;
-  const sortIcon = components?.sortIcon ?? defaultComponents?.sortIcon ?? SortIcon;
-  const checkboxFormatter = components?.checkboxFormatter ?? defaultComponents?.checkboxFormatter ?? CheckboxFormatter;
-  const noRowsFallback = components?.noRowsFallback ?? defaultComponents?.noRowsFallback;
-  const cellNavigationMode = rawCellNavigationMode ?? 'NONE';
-  enableVirtualization ?? (enableVirtualization = true);
-  direction ?? (direction = 'ltr');
-  const scrollingResetRef = react.useRef(-1);
-  const [isScrolling, setScrolling] = react.useState(false);
-  const [scrollTop, setScrollTop] = react.useState(0);
-  const [scrollLeft, setScrollLeft] = react.useState(0);
-  const [columnWidths, setColumnWidths] = react.useState(() => new Map());
-  const [selectedPosition, setSelectedPosition] = react.useState(initialPosition);
-  const [copiedCell, setCopiedCell] = react.useState(null);
-  const [isDragging, setDragging] = react.useState(false);
-  const [draggedOverRowIdx, setOverRowIdx] = react.useState(undefined);
-  const [autoResizeColumn, setAutoResizeColumn] = react.useState(null);
-  const prevSelectedPosition = react.useRef(selectedPosition);
-  const latestDraggedOverRowIdx = react.useRef(draggedOverRowIdx);
-  const lastSelectedRowIdx = react.useRef(-1);
-  const rowRef = react.useRef(null);
-  const [gridRef, gridWidth, gridHeight] = useGridDimensions();
-  const headerRowsCount = 1;
-  const summaryRowsCount = summaryRows?.length ?? 0;
-  const clientHeight = gridHeight - headerRowHeight - summaryRowsCount * summaryRowHeight;
-  const isSelectable = selectedRows != null && onSelectedRowsChange != null;
-  const isHeaderRowSelected = selectedPosition.rowIdx === -1;
-  const isRtl = direction === 'rtl';
-  const leftKey = isRtl ? 'ArrowRight' : 'ArrowLeft';
-  const rightKey = isRtl ? 'ArrowLeft' : 'ArrowRight';
-  const defaultGridComponents = react.useMemo(() => ({
-    sortIcon,
-    checkboxFormatter,
-    cellRenderer: CellRenderer
-  }), [sortIcon, checkboxFormatter, CellRenderer]);
-  const allRowsSelected = react.useMemo(() => {
-    const {
-      length
-    } = rawRows;
-    return length !== 0 && selectedRows != null && rowKeyGetter != null && selectedRows.size >= length && rawRows.every(row => selectedRows.has(rowKeyGetter(row)));
-  }, [rawRows, selectedRows, rowKeyGetter]);
-  const {
-    columns,
-    colSpanColumns,
-    colOverscanStartIdx,
-    colOverscanEndIdx,
-    layoutCssVars,
-    columnMetrics,
-    lastFrozenColumnIndex,
-    totalFrozenColumnWidth,
-    groupBy
-  } = useCalculatedColumns({
-    rawColumns,
-    columnWidths,
-    scrollLeft,
-    viewportWidth: gridWidth,
-    defaultColumnOptions,
-    rawGroupBy: rowGrouper ? rawGroupBy : undefined,
-    enableVirtualization
-  });
-  const {
-    rowOverscanStartIdx,
-    rowOverscanEndIdx,
-    rows,
-    rowsCount,
-    totalRowHeight,
-    gridTemplateRows,
-    isGroupRow,
-    getRowTop,
-    getRowHeight,
-    findRowIdx
-  } = useViewportRows({
-    rawRows,
-    groupBy,
-    rowGrouper,
-    rowHeight,
-    clientHeight,
-    scrollTop,
-    expandedGroupIds,
-    enableVirtualization
-  });
-  const viewportColumns = useViewportColumns({
-    columns,
-    colSpanColumns,
-    colOverscanStartIdx,
-    colOverscanEndIdx,
-    lastFrozenColumnIndex,
-    rowOverscanStartIdx,
-    rowOverscanEndIdx,
-    rows,
-    summaryRows,
-    isGroupRow
-  });
-  const hasGroups = groupBy.length > 0 && typeof rowGrouper === 'function';
-  const minColIdx = hasGroups ? -1 : 0;
-  const maxColIdx = columns.length - 1;
-  const minRowIdx = -1;
-  const maxRowIdx = headerRowsCount + rows.length + summaryRowsCount - 2;
-  const selectedCellIsWithinSelectionBounds = isCellWithinSelectionBounds(selectedPosition);
-  const selectedCellIsWithinViewportBounds = isCellWithinViewportBounds(selectedPosition);
-  const selectRowLatest = useLatestFunc(selectRow);
-  const selectAllRowsLatest = useLatestFunc(selectAllRows);
-  const handleFormatterRowChangeLatest = useLatestFunc(updateRow);
-  const selectViewportCellLatest = useLatestFunc((row, column, enableEditor) => {
+    return rawRowHeight;
+  }, [isGroupRow, rawRowHeight]);
+  const getParentRowAndIndex = react.useCallback(row => {
     const rowIdx = rows.indexOf(row);
-    selectCell({
-      rowIdx,
-      idx: column.idx
-    }, enableEditor);
-  });
-  const selectGroupLatest = useLatestFunc(rowIdx => {
-    selectCell({
-      rowIdx,
-      idx: -1
-    });
-  });
-  const selectHeaderCellLatest = useLatestFunc(idx => {
-    selectCell({
-      rowIdx: -1,
-      idx
-    });
-  });
-  const selectSummaryCellLatest = useLatestFunc((summaryRow, column) => {
-    const rowIdx = summaryRows.indexOf(summaryRow) + headerRowsCount + rows.length - 1;
-    selectCell({
-      rowIdx,
-      idx: column.idx
-    });
-  });
-  const toggleGroupLatest = useLatestFunc(toggleGroup);
-  useLayoutEffect(() => {
-    if (!selectedCellIsWithinSelectionBounds || isSamePosition(selectedPosition, prevSelectedPosition.current)) {
-      prevSelectedPosition.current = selectedPosition;
-      return;
+    for (let i = rowIdx - 1; i >= 0; i--) {
+      const parentRow = rows[i];
+      if (isGroupRow(parentRow) && (!isGroupRow(row) || row.parentId === parentRow.id)) {
+        return [parentRow, i];
+      }
     }
-
-    prevSelectedPosition.current = selectedPosition;
-
-    if (selectedPosition.idx === -1) {
-      rowRef.current.focus({
-        preventScroll: true
-      });
-      scrollIntoView(rowRef.current);
-    }
-  });
-  useLayoutEffect(() => {
-    if (autoResizeColumn === null) return;
-    const columnElement = gridRef.current.querySelector(`[aria-colindex="${autoResizeColumn.idx + 1}"]`);
-    const {
-      width
-    } = columnElement.getBoundingClientRect();
-    setColumnWidths(columnWidths => {
-      const newColumnWidths = new Map(columnWidths);
-      newColumnWidths.set(autoResizeColumn.key, width);
-      return newColumnWidths;
-    });
-    setAutoResizeColumn(null);
-    onColumnResize?.(autoResizeColumn.idx, width);
-  }, [autoResizeColumn, gridRef, onColumnResize]);
-  react.useImperativeHandle(ref, () => ({
-    element: gridRef.current,
-    selectedCell: selectedPosition,
-    scrollToColumn,
-
-    scrollToRow(rowIdx) {
-      const {
-        current
-      } = gridRef;
-      if (!current) return;
-      current.scrollTo({
-        top: getRowTop(rowIdx),
-        behavior: 'smooth'
-      });
-    },
-
-    selectCell
-  }));
-  const handleColumnResize = react.useCallback((column, width) => {
-    if (width === 'auto') {
-      setAutoResizeColumn(column);
-      return;
-    }
-
-    setColumnWidths(columnWidths => {
-      const newColumnWidths = new Map(columnWidths);
-      newColumnWidths.set(column.key, width);
-      return newColumnWidths;
-    });
-    onColumnResize?.(column.idx, width);
-  }, [onColumnResize]);
-  const setDraggedOverRowIdx = react.useCallback(rowIdx => {
-    setOverRowIdx(rowIdx);
-    latestDraggedOverRowIdx.current = rowIdx;
-  }, []);
-
-  function selectRow({
-    row,
-    checked,
-    isShiftClick
-  }) {
-    if (!onSelectedRowsChange) return;
-    assertIsValidKeyGetter(rowKeyGetter);
-    const newSelectedRows = new Set(selectedRows);
-
+    return undefined;
+  }, [isGroupRow, rows]);
+  const rowKeyGetter = react.useCallback(row => {
     if (isGroupRow(row)) {
-      for (const childRow of row.childRows) {
-        const rowKey = rowKeyGetter(childRow);
-
-        if (checked) {
-          newSelectedRows.add(rowKey);
+      return row.id;
+    }
+    if (typeof rawRowKeyGetter === 'function') {
+      return rawRowKeyGetter(row);
+    }
+    const parentRowAndIndex = getParentRowAndIndex(row);
+    if (parentRowAndIndex !== undefined) {
+      const {
+        startRowIndex,
+        childRows
+      } = parentRowAndIndex[0];
+      const groupIndex = childRows.indexOf(row);
+      return startRowIndex + groupIndex + 1;
+    }
+    return rows.indexOf(row);
+  }, [getParentRowAndIndex, isGroupRow, rawRowKeyGetter, rows]);
+  const selectedRows = react.useMemo(() => {
+    if (rawSelectedRows == null) return null;
+    assertIsValidKeyGetter(rawRowKeyGetter);
+    const selectedRows = new Set(rawSelectedRows);
+    for (const row of rows) {
+      if (isGroupRow(row)) {
+        const isGroupRowSelected = row.childRows.every(cr => rawSelectedRows.has(rawRowKeyGetter(cr)));
+        if (isGroupRowSelected) {
+          selectedRows.add(row.id);
+        }
+      }
+    }
+    return selectedRows;
+  }, [isGroupRow, rawRowKeyGetter, rawSelectedRows, rows]);
+  function onSelectedRowsChange(newSelectedRows) {
+    if (!rawOnSelectedRowsChange) return;
+    assertIsValidKeyGetter(rawRowKeyGetter);
+    const newRawSelectedRows = new Set(rawSelectedRows);
+    for (const row of rows) {
+      const key = rowKeyGetter(row);
+      if (selectedRows?.has(key) && !newSelectedRows.has(key)) {
+        if (isGroupRow(row)) {
+          for (const cr of row.childRows) {
+            newRawSelectedRows.delete(rawRowKeyGetter(cr));
+          }
         } else {
-          newSelectedRows.delete(rowKey);
+          newRawSelectedRows.delete(key);
+        }
+      } else if (!selectedRows?.has(key) && newSelectedRows.has(key)) {
+        if (isGroupRow(row)) {
+          for (const cr of row.childRows) {
+            newRawSelectedRows.add(rawRowKeyGetter(cr));
+          }
+        } else {
+          newRawSelectedRows.add(key);
         }
       }
-
-      onSelectedRowsChange(newSelectedRows);
-      return;
     }
-
-    const rowKey = rowKeyGetter(row);
-
-    if (checked) {
-      newSelectedRows.add(rowKey);
-      const previousRowIdx = lastSelectedRowIdx.current;
-      const rowIdx = rows.indexOf(row);
-      lastSelectedRowIdx.current = rowIdx;
-
-      if (isShiftClick && previousRowIdx !== -1 && previousRowIdx !== rowIdx) {
-        const step = sign(rowIdx - previousRowIdx);
-
-        for (let i = previousRowIdx + step; i !== rowIdx; i += step) {
-          const row = rows[i];
-          if (isGroupRow(row)) continue;
-          newSelectedRows.add(rowKeyGetter(row));
-        }
-      }
-    } else {
-      newSelectedRows.delete(rowKey);
-      lastSelectedRowIdx.current = -1;
-    }
-
-    onSelectedRowsChange(newSelectedRows);
+    rawOnSelectedRowsChange(newRawSelectedRows);
   }
-
-  function selectAllRows(checked) {
-    if (!onSelectedRowsChange) return;
-    assertIsValidKeyGetter(rowKeyGetter);
-    const newSelectedRows = new Set(selectedRows);
-
-    for (const row of rawRows) {
-      const rowKey = rowKeyGetter(row);
-
-      if (checked) {
-        newSelectedRows.add(rowKey);
-      } else {
-        newSelectedRows.delete(rowKey);
+  function handleKeyDown(args, event) {
+    rawOnCellKeyDown?.(args, event);
+    if (event.isGridDefaultPrevented()) return;
+    if (args.mode === 'EDIT') return;
+    const {
+      column,
+      rowIdx,
+      selectCell
+    } = args;
+    const idx = column?.idx ?? -1;
+    const row = rows[rowIdx];
+    if (!isGroupRow(row)) return;
+    if (idx === -1 && (event.key === leftKey && row.isExpanded || event.key === rightKey && !row.isExpanded)) {
+      event.preventDefault();
+      event.preventGridDefault();
+      toggleGroup(row.id);
+    }
+    if (idx === -1 && event.key === leftKey && !row.isExpanded && row.level !== 0) {
+      const parentRowAndIndex = getParentRowAndIndex(row);
+      if (parentRowAndIndex !== undefined) {
+        event.preventGridDefault();
+        selectCell({
+          idx,
+          rowIdx: parentRowAndIndex[1]
+        });
       }
     }
-
-    onSelectedRowsChange(newSelectedRows);
+    if (isCtrlKeyHeldDown(event) && (event.keyCode === 67 || event.keyCode === 86)) {
+      event.preventGridDefault();
+    }
   }
-
-  function toggleGroup(expandedGroupId) {
-    if (!onExpandedGroupIdsChange) return;
+  function handleRowsChange(updatedRows, {
+    indexes,
+    column
+  }) {
+    if (!onRowsChange) return;
+    const updatedRawRows = [...rawRows];
+    const rawIndexes = [];
+    indexes.forEach(index => {
+      const rawIndex = rawRows.indexOf(rows[index]);
+      updatedRawRows[rawIndex] = updatedRows[index];
+      rawIndexes.push(rawIndex);
+    });
+    onRowsChange(updatedRawRows, {
+      indexes: rawIndexes,
+      column
+    });
+  }
+  function toggleGroup(groupId) {
     const newExpandedGroupIds = new Set(expandedGroupIds);
-
-    if (newExpandedGroupIds.has(expandedGroupId)) {
-      newExpandedGroupIds.delete(expandedGroupId);
+    if (newExpandedGroupIds.has(groupId)) {
+      newExpandedGroupIds.delete(groupId);
     } else {
-      newExpandedGroupIds.add(expandedGroupId);
+      newExpandedGroupIds.add(groupId);
     }
-
     onExpandedGroupIdsChange(newExpandedGroupIds);
   }
-
-  function handleKeyDown(event) {
-    if (!(event.target instanceof Element)) return;
-    const isCellEvent = event.target.closest('.rdg-cell') !== null;
-    const isRowEvent = hasGroups && event.target === rowRef.current;
-    if (!isCellEvent && !isRowEvent) return;
-    const {
-      key,
-      keyCode
-    } = event;
-    const {
-      rowIdx
-    } = selectedPosition;
-
-    if (selectedCellIsWithinViewportBounds && (onPaste != null || onCopy != null) && isCtrlKeyHeldDown(event) && !isGroupRow(rows[rowIdx]) && selectedPosition.mode === 'SELECT') {
-      const cKey = 67;
-      const vKey = 86;
-
-      if (keyCode === cKey) {
-        handleCopy();
-        return;
-      }
-
-      if (keyCode === vKey) {
-        handlePaste();
-        return;
-      }
-    }
-
-    if (isRowIdxWithinViewportBounds(rowIdx)) {
-      const row = rows[rowIdx];
-
-      if (isGroupRow(row) && selectedPosition.idx === -1 && (key === leftKey && row.isExpanded || key === rightKey && !row.isExpanded)) {
-        event.preventDefault();
-        toggleGroup(row.id);
-        return;
-      }
-    }
-
-    switch (event.key) {
-      case 'Escape':
-        setCopiedCell(null);
-        return;
-
-      case 'ArrowUp':
-      case 'ArrowDown':
-      case 'ArrowLeft':
-      case 'ArrowRight':
-      case 'Tab':
-      case 'Home':
-      case 'End':
-      case 'PageUp':
-      case 'PageDown':
-        navigate(event);
-        break;
-
-      default:
-        handleCellInput(event);
-        break;
-    }
-  }
-
-  function handleScroll(event) {
-    const {
-      scrollTop,
-      scrollLeft
-    } = event.currentTarget;
-    setScrollTop(scrollTop);
-    setScrollLeft(abs(scrollLeft));
-    setScrolling(true);
-    onScroll?.(event);
-    clearTimeout(scrollingResetRef.current);
-    scrollingResetRef.current = setTimeout(() => setScrolling(false), 16);
-  }
-
-  function getRawRowIdx(rowIdx) {
-    return hasGroups ? rawRows.indexOf(rows[rowIdx]) : rowIdx;
-  }
-
-  function updateRow(rowIdx, row) {
-    if (typeof onRowsChange !== 'function') return;
-    const rawRowIdx = getRawRowIdx(rowIdx);
-    if (row === rawRows[rawRowIdx]) return;
-    const updatedRows = [...rawRows];
-    updatedRows[rawRowIdx] = row;
-    onRowsChange(updatedRows, {
-      indexes: [rawRowIdx],
-      column: columns[selectedPosition.idx]
-    });
-  }
-
-  function commitEditorChanges() {
-    if (selectedPosition.mode !== 'EDIT') return;
-    updateRow(selectedPosition.rowIdx, selectedPosition.row);
-  }
-
-  function handleCopy() {
-    const {
-      idx,
-      rowIdx
-    } = selectedPosition;
-    const sourceRow = rawRows[getRawRowIdx(rowIdx)];
-    const sourceColumnKey = columns[idx].key;
-    setCopiedCell({
-      row: sourceRow,
-      columnKey: sourceColumnKey
-    });
-    onCopy?.({
-      sourceRow,
-      sourceColumnKey
-    });
-  }
-
-  function handlePaste() {
-    if (!onPaste || !onRowsChange || copiedCell === null || !isCellEditable(selectedPosition)) {
-      return;
-    }
-
-    const {
-      idx,
-      rowIdx
-    } = selectedPosition;
-    const targetRow = rawRows[getRawRowIdx(rowIdx)];
-    const updatedTargetRow = onPaste({
-      sourceRow: copiedCell.row,
-      sourceColumnKey: copiedCell.columnKey,
-      targetRow,
-      targetColumnKey: columns[idx].key
-    });
-    updateRow(rowIdx, updatedTargetRow);
-  }
-
-  function handleCellInput(event) {
-    if (!selectedCellIsWithinViewportBounds) return;
-    const row = rows[selectedPosition.rowIdx];
-    if (isGroupRow(row)) return;
-    const {
-      key,
-      shiftKey
-    } = event;
-
-    if (isSelectable && shiftKey && key === ' ') {
-      assertIsValidKeyGetter(rowKeyGetter);
-      const rowKey = rowKeyGetter(row);
-      selectRow({
-        row,
-        checked: !selectedRows.has(rowKey),
-        isShiftClick: false
-      });
-      event.preventDefault();
-      return;
-    }
-
-    const column = columns[selectedPosition.idx];
-    column.editorOptions?.onCellKeyDown?.(event);
-    if (event.isDefaultPrevented()) return;
-
-    if (isCellEditable(selectedPosition) && isDefaultCellInput(event)) {
-      setSelectedPosition(({
-        idx,
-        rowIdx
-      }) => ({
-        idx,
-        rowIdx,
-        mode: 'EDIT',
-        row,
-        originalRow: row
-      }));
-    }
-  }
-
-  function isColIdxWithinSelectionBounds(idx) {
-    return idx >= minColIdx && idx <= maxColIdx;
-  }
-
-  function isRowIdxWithinViewportBounds(rowIdx) {
-    return rowIdx >= 0 && rowIdx < rows.length;
-  }
-
-  function isCellWithinSelectionBounds({
-    idx,
-    rowIdx
+  function renderRow(key, {
+    row,
+    rowClass,
+    onCellClick,
+    onCellDoubleClick,
+    onCellContextMenu,
+    onRowChange,
+    lastFrozenColumnIndex,
+    copiedCellIdx,
+    draggedOverCellIdx,
+    setDraggedOverRowIdx,
+    selectedCellEditor,
+    ...rowProps
   }) {
-    return rowIdx >= minRowIdx && rowIdx <= maxRowIdx && isColIdxWithinSelectionBounds(idx);
-  }
-
-  function isCellWithinViewportBounds({
-    idx,
-    rowIdx
-  }) {
-    return isRowIdxWithinViewportBounds(rowIdx) && isColIdxWithinSelectionBounds(idx);
-  }
-
-  function isCellEditable(position) {
-    return isCellWithinViewportBounds(position) && isSelectedCellEditable({
-      columns,
-      rows,
-      selectedPosition: position,
-      isGroupRow
-    });
-  }
-
-  function isCellSelectable(position) {
-    return isCellWithinViewportBounds(position) && isSelectedCellSelectable(columns, position);
-  }
-
-  function selectCell(position, enableEditor) {
-    if (!isCellWithinSelectionBounds(position)) return;
-    commitEditorChanges();
-
-    if (enableEditor && isCellEditable(position)) {
-      const row = rows[position.rowIdx];
-      setSelectedPosition({ ...position,
-        mode: 'EDIT',
-        row,
-        originalRow: row
-      });
-    } else if (isSamePosition(selectedPosition, position)) {
-      scrollIntoView(gridRef.current?.querySelector('[tabindex="0"]'));
-    }
-
-    if (isCellSelectable(position)) {
-      setSelectedPosition({ ...position,
-        mode: 'SELECT'
-      });
-      onSelectedCellChange?.(position);
-    }
-  }
-
-  function scrollToColumn(idx) {
-    const {
-      current
-    } = gridRef;
-    if (!current) return;
-
-    if (idx > lastFrozenColumnIndex) {
+    if (isGroupRow(row)) {
       const {
-        rowIdx
-      } = selectedPosition;
-      if (!isCellWithinSelectionBounds({
-        rowIdx,
-        idx
-      })) return;
-      const {
-        clientWidth
-      } = current;
-      const column = columns[idx];
-      const {
-        left,
-        width
-      } = columnMetrics.get(column);
-      let right = left + width;
-      const colSpan = getSelectedCellColSpan({
-        rows,
-        summaryRows,
-        rowIdx,
-        lastFrozenColumnIndex,
-        column,
-        isGroupRow
-      });
-
-      if (colSpan !== undefined) {
-        const {
-          left,
-          width
-        } = columnMetrics.get(columns[column.idx + colSpan - 1]);
-        right = left + width;
-      }
-
-      const isCellAtLeftBoundary = left < scrollLeft + totalFrozenColumnWidth;
-      const isCellAtRightBoundary = right > clientWidth + scrollLeft;
-      const sign = isRtl ? -1 : 1;
-
-      if (isCellAtLeftBoundary) {
-        current.scrollLeft = (left - totalFrozenColumnWidth) * sign;
-      } else if (isCellAtRightBoundary) {
-        current.scrollLeft = (right - clientWidth) * sign;
-      }
-    }
-  }
-
-  function getNextPosition(key, ctrlKey, shiftKey) {
-    const {
-      idx,
-      rowIdx
-    } = selectedPosition;
-    const row = rows[rowIdx];
-    const isRowSelected = selectedCellIsWithinSelectionBounds && idx === -1;
-
-    if (key === leftKey && isRowSelected && isGroupRow(row) && !row.isExpanded && row.level !== 0) {
-      let parentRowIdx = -1;
-
-      for (let i = selectedPosition.rowIdx - 1; i >= 0; i--) {
-        const parentRow = rows[i];
-
-        if (isGroupRow(parentRow) && parentRow.id === row.parentId) {
-          parentRowIdx = i;
-          break;
-        }
-      }
-
-      if (parentRowIdx !== -1) {
-        return {
-          idx,
-          rowIdx: parentRowIdx
-        };
-      }
-    }
-
-    switch (key) {
-      case 'ArrowUp':
-        return {
-          idx,
-          rowIdx: rowIdx - 1
-        };
-
-      case 'ArrowDown':
-        return {
-          idx,
-          rowIdx: rowIdx + 1
-        };
-
-      case leftKey:
-        return {
-          idx: idx - 1,
-          rowIdx
-        };
-
-      case rightKey:
-        return {
-          idx: idx + 1,
-          rowIdx
-        };
-
-      case 'Tab':
-        return {
-          idx: idx + (shiftKey ? -1 : 1),
-          rowIdx
-        };
-
-      case 'Home':
-        if (isRowSelected) return {
-          idx,
-          rowIdx: 0
-        };
-        return {
-          idx: 0,
-          rowIdx: ctrlKey ? minRowIdx : rowIdx
-        };
-
-      case 'End':
-        if (isRowSelected) return {
-          idx,
-          rowIdx: rows.length - 1
-        };
-        return {
-          idx: maxColIdx,
-          rowIdx: ctrlKey ? maxRowIdx : rowIdx
-        };
-
-      case 'PageUp':
-        {
-          if (selectedPosition.rowIdx === minRowIdx) return selectedPosition;
-          const nextRowY = getRowTop(rowIdx) + getRowHeight(rowIdx) - clientHeight;
-          return {
-            idx,
-            rowIdx: nextRowY > 0 ? findRowIdx(nextRowY) : 0
-          };
-        }
-
-      case 'PageDown':
-        {
-          if (selectedPosition.rowIdx >= rows.length) return selectedPosition;
-          const nextRowY = getRowTop(rowIdx) + clientHeight;
-          return {
-            idx,
-            rowIdx: nextRowY < totalRowHeight ? findRowIdx(nextRowY) : rows.length - 1
-          };
-        }
-
-      default:
-        return selectedPosition;
-    }
-  }
-
-  function navigate(event) {
-    const {
-      key,
-      shiftKey
-    } = event;
-    let mode = cellNavigationMode;
-
-    if (key === 'Tab') {
-      if (canExitGrid({
-        shiftKey,
-        cellNavigationMode,
-        maxColIdx,
-        minRowIdx,
-        maxRowIdx,
-        selectedPosition
-      })) {
-        commitEditorChanges();
-        return;
-      }
-
-      mode = cellNavigationMode === 'NONE' ? 'CHANGE_ROW' : cellNavigationMode;
-    }
-
-    event.preventDefault();
-    const ctrlKey = isCtrlKeyHeldDown(event);
-    const nextPosition = getNextPosition(key, ctrlKey, shiftKey);
-    if (isSamePosition(selectedPosition, nextPosition)) return;
-    const nextSelectedCellPosition = getNextSelectedCellPosition({
-      columns,
-      colSpanColumns,
-      rows,
-      summaryRows,
-      minRowIdx,
-      maxRowIdx,
-      lastFrozenColumnIndex,
-      cellNavigationMode: mode,
-      currentPosition: selectedPosition,
-      nextPosition,
-      isCellWithinBounds: isCellWithinSelectionBounds,
-      isGroupRow
-    });
-    selectCell(nextSelectedCellPosition);
-  }
-
-  function getDraggedOverCellIdx(currentRowIdx) {
-    if (draggedOverRowIdx === undefined) return;
-    const {
-      rowIdx
-    } = selectedPosition;
-    const isDraggedOver = rowIdx < draggedOverRowIdx ? rowIdx < currentRowIdx && currentRowIdx <= draggedOverRowIdx : rowIdx > currentRowIdx && currentRowIdx >= draggedOverRowIdx;
-    return isDraggedOver ? selectedPosition.idx : undefined;
-  }
-
-  function getLayoutCssVars() {
-    if (autoResizeColumn === null) return layoutCssVars;
-    const {
-      gridTemplateColumns
-    } = layoutCssVars;
-    const newSizes = gridTemplateColumns.split(' ');
-    newSizes[autoResizeColumn.idx] = 'max-content';
-    return { ...layoutCssVars,
-      gridTemplateColumns: newSizes.join(' ')
-    };
-  }
-
-  function getDragHandle(rowIdx) {
-    if (selectedPosition.rowIdx !== rowIdx || selectedPosition.mode === 'EDIT' || hasGroups || onFill == null) {
-      return;
-    }
-
-    return /*#__PURE__*/jsxRuntime.jsx(DragHandle, {
-      rows: rawRows,
-      columns: columns,
-      selectedPosition: selectedPosition,
-      isCellEditable: isCellEditable,
-      latestDraggedOverRowIdx: latestDraggedOverRowIdx,
-      onRowsChange: onRowsChange,
-      onFill: onFill,
-      setDragging: setDragging,
-      setDraggedOverRowIdx: setDraggedOverRowIdx
-    });
-  }
-
-  function getCellEditor(rowIdx) {
-    if (selectedPosition.rowIdx !== rowIdx || selectedPosition.mode === 'SELECT') return;
-    const {
-      idx,
-      row
-    } = selectedPosition;
-    const column = columns[idx];
-    const colSpan = getColSpan(column, lastFrozenColumnIndex, {
-      type: 'ROW',
-      row
-    });
-
-    const closeEditor = () => {
-      setSelectedPosition(({
-        idx,
-        rowIdx
-      }) => ({
-        idx,
-        rowIdx,
-        mode: 'SELECT'
-      }));
-    };
-
-    const onRowChange = (row, commitChanges) => {
-      if (commitChanges) {
-        updateRow(selectedPosition.rowIdx, row);
-        closeEditor();
-      } else {
-        setSelectedPosition(position => ({ ...position,
-          row
-        }));
-      }
-    };
-
-    if (rows[selectedPosition.rowIdx] !== selectedPosition.originalRow) {
-      closeEditor();
-    }
-
-    return /*#__PURE__*/jsxRuntime.jsx(EditCell, {
-      column: column,
-      colSpan: colSpan,
-      row: row,
-      isScrolling: isScrolling,
-      onRowChange: onRowChange,
-      closeEditor: closeEditor
-    }, column.key);
-  }
-
-  function getRowViewportColumns(rowIdx) {
-    const selectedColumn = columns[selectedPosition.idx];
-
-    if (selectedColumn !== undefined && selectedPosition.rowIdx === rowIdx && !viewportColumns.includes(selectedColumn)) {
-      return selectedPosition.idx > colOverscanEndIdx ? [...viewportColumns, selectedColumn] : [...viewportColumns.slice(0, lastFrozenColumnIndex + 1), selectedColumn, ...viewportColumns.slice(lastFrozenColumnIndex + 1)];
-    }
-
-    return viewportColumns;
-  }
-
-  function getViewportRows() {
-    const rowElements = [];
-    let startRowIndex = 0;
-    const {
-      idx: selectedIdx,
-      rowIdx: selectedRowIdx
-    } = selectedPosition;
-    const startRowIdx = selectedCellIsWithinViewportBounds && selectedRowIdx < rowOverscanStartIdx ? rowOverscanStartIdx - 1 : rowOverscanStartIdx;
-    const endRowIdx = selectedCellIsWithinViewportBounds && selectedRowIdx > rowOverscanEndIdx ? rowOverscanEndIdx + 1 : rowOverscanEndIdx;
-
-    for (let viewportRowIdx = startRowIdx; viewportRowIdx <= endRowIdx; viewportRowIdx++) {
-      const isRowOutsideViewport = viewportRowIdx === rowOverscanStartIdx - 1 || viewportRowIdx === rowOverscanEndIdx + 1;
-      const rowIdx = isRowOutsideViewport ? selectedRowIdx : viewportRowIdx;
-      let rowColumns = viewportColumns;
-      const selectedColumn = columns[selectedIdx];
-
-      if (selectedColumn !== undefined) {
-        if (isRowOutsideViewport) {
-          rowColumns = [selectedColumn];
-        } else {
-          rowColumns = getRowViewportColumns(rowIdx);
-        }
-      }
-
-      const row = rows[rowIdx];
-      const gridRowStart = headerRowsCount + rowIdx + 1;
-
-      if (isGroupRow(row)) {
-        ({
-          startRowIndex
-        } = row);
-        const isGroupRowSelected = isSelectable && row.childRows.every(cr => selectedRows.has(rowKeyGetter(cr)));
-        rowElements.push( /*#__PURE__*/jsxRuntime.jsx(GroupRowRenderer, {
-          "aria-level": row.level + 1,
-          "aria-setsize": row.setSize,
-          "aria-posinset": row.posInSet + 1,
-          "aria-rowindex": headerRowsCount + startRowIndex + 1,
-          "aria-selected": isSelectable ? isGroupRowSelected : undefined,
-          id: row.id,
-          groupKey: row.groupKey,
-          viewportColumns: rowColumns,
-          childRows: row.childRows,
-          rowIdx: rowIdx,
-          row: row,
-          gridRowStart: gridRowStart,
-          height: getRowHeight(rowIdx),
-          level: row.level,
-          isScrolling: isScrolling,
-          isExpanded: row.isExpanded,
-          selectedCellIdx: selectedRowIdx === rowIdx ? selectedIdx : undefined,
-          isRowSelected: isGroupRowSelected,
-          selectGroup: selectGroupLatest,
-          toggleGroup: toggleGroupLatest
-        }, row.id));
-        continue;
-      }
-
-      startRowIndex++;
-      let key;
-      let isRowSelected = false;
-
-      if (typeof rowKeyGetter === 'function') {
-        key = rowKeyGetter(row);
-        isRowSelected = selectedRows?.has(key) ?? false;
-      } else {
-        key = hasGroups ? startRowIndex : rowIdx;
-      }
-
-      rowElements.push( /*#__PURE__*/jsxRuntime.jsx(RowRenderer, {
-        "aria-rowindex": headerRowsCount + (hasGroups ? startRowIndex : rowIdx) + 1,
-        "aria-selected": isSelectable ? isRowSelected : undefined,
-        rowIdx: rowIdx,
+        startRowIndex
+      } = row;
+      return /*#__PURE__*/jsxRuntime.jsx(GroupedRow$1, {
+        ...rowProps,
+        "aria-rowindex": headerAndTopSummaryRowsCount + startRowIndex + 1,
         row: row,
-        isScrolling: isScrolling,
-        viewportColumns: rowColumns,
-        isRowSelected: isRowSelected,
-        onRowClick: onRowClick,
-        onRowDoubleClick: onRowDoubleClick,
-        rowClass: rowClass,
-        gridRowStart: gridRowStart,
-        height: getRowHeight(rowIdx),
-        copiedCellIdx: copiedCell !== null && copiedCell.row === row ? columns.findIndex(c => c.key === copiedCell.columnKey) : undefined,
-        selectedCellIdx: selectedRowIdx === rowIdx ? selectedIdx : undefined,
-        draggedOverCellIdx: getDraggedOverCellIdx(rowIdx),
-        setDraggedOverRowIdx: isDragging ? setDraggedOverRowIdx : undefined,
-        lastFrozenColumnIndex: lastFrozenColumnIndex,
-        onRowChange: handleFormatterRowChangeLatest,
-        selectCell: selectViewportCellLatest,
-        selectedCellDragHandle: getDragHandle(rowIdx),
-        selectedCellEditor: getCellEditor(rowIdx)
-      }, key));
+        groupBy: groupBy,
+        toggleGroup: toggleGroupLatest
+      }, key);
     }
-
-    return rowElements;
+    let ariaRowIndex = rowProps['aria-rowindex'];
+    const parentRowAndIndex = getParentRowAndIndex(row);
+    if (parentRowAndIndex !== undefined) {
+      const {
+        startRowIndex,
+        childRows
+      } = parentRowAndIndex[0];
+      const groupIndex = childRows.indexOf(row);
+      ariaRowIndex = startRowIndex + headerAndTopSummaryRowsCount + groupIndex + 2;
+    }
+    return rawRenderRow(key, {
+      ...rowProps,
+      'aria-rowindex': ariaRowIndex,
+      row,
+      rowClass,
+      onCellClick,
+      onCellDoubleClick,
+      onCellContextMenu,
+      onRowChange,
+      lastFrozenColumnIndex,
+      copiedCellIdx,
+      draggedOverCellIdx,
+      setDraggedOverRowIdx,
+      selectedCellEditor
+    });
   }
-
-  if (selectedPosition.idx > maxColIdx || selectedPosition.rowIdx > maxRowIdx) {
-    setSelectedPosition(initialPosition);
-    setDraggedOverRowIdx(undefined);
-  }
-
-  let templateRows = `${headerRowHeight}px`;
-
-  if (rows.length > 0) {
-    templateRows += gridTemplateRows;
-  }
-
-  if (summaryRowsCount > 0) {
-    templateRows += ` repeat(${summaryRowsCount}, ${summaryRowHeight}px)`;
-  }
-
-  const isGroupRowFocused = selectedPosition.idx === -1 && selectedPosition.rowIdx !== -2;
-  return /*#__PURE__*/jsxRuntime.jsxs("div", {
-    role: hasGroups ? 'treegrid' : 'grid',
-    "aria-label": ariaLabel,
-    "aria-labelledby": ariaLabelledBy,
-    "aria-describedby": ariaDescribedBy,
-    "aria-multiselectable": isSelectable ? true : undefined,
-    "aria-colcount": columns.length,
-    "aria-rowcount": headerRowsCount + rowsCount + summaryRowsCount,
-    className: clsx(rootClassname, className, isDragging && viewportDraggingClassname, autoResizeColumn !== null && cellAutoResizeClassname),
-    style: { ...style,
-      scrollPaddingInlineStart: selectedPosition.idx > lastFrozenColumnIndex ? `${totalFrozenColumnWidth}px` : undefined,
-      scrollPaddingBlock: selectedPosition.rowIdx >= 0 && selectedPosition.rowIdx < rows.length ? `${headerRowHeight}px ${summaryRowsCount * summaryRowHeight}px` : undefined,
-      gridTemplateRows: templateRows,
-      '--rdg-header-row-height': `${headerRowHeight}px`,
-      '--rdg-summary-row-height': `${summaryRowHeight}px`,
-      '--rdg-sign': isRtl ? -1 : 1,
-      ...getLayoutCssVars()
-    },
-    dir: direction,
-    ref: gridRef,
-    onScroll: handleScroll,
-    onKeyDown: handleKeyDown,
-    "data-testid": testId,
-    children: [hasGroups && /*#__PURE__*/jsxRuntime.jsx("div", {
-      ref: rowRef,
-      tabIndex: isGroupRowFocused ? 0 : -1,
-      className: clsx(focusSinkClassname, isGroupRowFocused && [rowSelected, lastFrozenColumnIndex !== -1 && rowSelectedWithFrozenCell]),
-      style: {
-        gridRowStart: selectedPosition.rowIdx + 2
-      },
-      onKeyDown: handleKeyDown
-    }), /*#__PURE__*/jsxRuntime.jsxs(DataGridDefaultComponentsProvider, {
-      value: defaultGridComponents,
-      children: [/*#__PURE__*/jsxRuntime.jsx(HeaderRow$1, {
-        columns: getRowViewportColumns(-1),
-        onColumnResize: handleColumnResize,
-        allRowsSelected: allRowsSelected,
-        onAllRowsSelectionChange: selectAllRowsLatest,
-        sortColumns: sortColumns,
-        onSortColumnsChange: onSortColumnsChange,
-        lastFrozenColumnIndex: lastFrozenColumnIndex,
-        selectedCellIdx: isHeaderRowSelected ? selectedPosition.idx : undefined,
-        selectCell: selectHeaderCellLatest,
-        shouldFocusGrid: !selectedCellIsWithinSelectionBounds,
-        direction: direction
-      }), rows.length === 0 && noRowsFallback ? noRowsFallback : /*#__PURE__*/jsxRuntime.jsxs(jsxRuntime.Fragment, {
-        children: [/*#__PURE__*/jsxRuntime.jsx(RowSelectionChangeProvider, {
-          value: selectRowLatest,
-          children: getViewportRows()
-        }), summaryRows?.map((row, rowIdx) => {
-          const gridRowStart = headerRowsCount + rows.length + rowIdx + 1;
-          const summaryRowIdx = headerRowsCount + rows.length + rowIdx - 1;
-          const isSummaryRowSelected = selectedPosition.rowIdx === summaryRowIdx;
-          const top = clientHeight > totalRowHeight ? gridHeight - summaryRowHeight * (summaryRows.length - rowIdx) : undefined;
-          const bottom = top === undefined ? summaryRowHeight * (summaryRows.length - 1 - rowIdx) : undefined;
-          return /*#__PURE__*/jsxRuntime.jsx(SummaryRow$1, {
-            "aria-rowindex": headerRowsCount + rowsCount + rowIdx + 1,
-            rowIdx: rowIdx,
-            gridRowStart: gridRowStart,
-            row: row,
-            top: top,
-            bottom: bottom,
-            viewportColumns: getRowViewportColumns(summaryRowIdx),
-            lastFrozenColumnIndex: lastFrozenColumnIndex,
-            selectedCellIdx: isSummaryRowSelected ? selectedPosition.idx : undefined,
-            selectCell: selectSummaryCellLatest
-          }, rowIdx);
-        })]
-      })]
-    })]
+  return /*#__PURE__*/jsxRuntime.jsx(DataGrid$1, {
+    ...props,
+    role: "treegrid",
+    "aria-rowcount": rowsCount + 1 + (props.topSummaryRows?.length ?? 0) + (props.bottomSummaryRows?.length ?? 0),
+    ref: ref,
+    columns: columns,
+    rows: rows,
+    rowHeight: rowHeight,
+    rowKeyGetter: rowKeyGetter,
+    onRowsChange: handleRowsChange,
+    selectedRows: selectedRows,
+    onSelectedRowsChange: onSelectedRowsChange,
+    onCellKeyDown: handleKeyDown,
+    renderers: {
+      ...renderers,
+      renderRow
+    }
   });
 }
-
-function isSamePosition(p1, p2) {
-  return p1.idx === p2.idx && p1.rowIdx === p2.rowIdx;
+function isReadonlyArray(arr) {
+  return Array.isArray(arr);
 }
+const TreeDataGrid$1 = /*#__PURE__*/react.forwardRef(TreeDataGrid);
 
-const DataGrid$1 = /*#__PURE__*/react.forwardRef(DataGrid);
-
-var css_248z = ".t1u15qzo700-beta13{appearance:none;background-color:var(--rdg-background-color);block-size:100%;border:2px solid #ccc;box-sizing:border-box;color:var(--rdg-color);font-family:inherit;font-size:var(--rdg-font-size);inline-size:100%;padding-block:0;padding-inline:6px;vertical-align:top}.t1u15qzo700-beta13:focus{border-color:var(--rdg-selection-color);outline:none}.t1u15qzo700-beta13::placeholder{color:#999;opacity:1}";
-styleInject(css_248z,{"insertAt":"top"});
-
-const textEditor = "t1u15qzo700-beta13";
-const textEditorClassname = `rdg-text-editor ${textEditor}`;
-
+const textEditorInternalClassname = "tlmcuo07-0-0-beta-37";
+const textEditorClassname = `rdg-text-editor ${textEditorInternalClassname}`;
 function autoFocusAndSelect(input) {
   input?.focus();
   input?.select();
 }
-
-function TextEditor({
+function textEditor({
   row,
   column,
   onRowChange,
@@ -3071,24 +3191,29 @@ function TextEditor({
     className: textEditorClassname,
     ref: autoFocusAndSelect,
     value: row[column.key],
-    onChange: event => onRowChange({ ...row,
+    onChange: event => onRowChange({
+      ...row,
       [column.key]: event.target.value
     }),
-    onBlur: () => onClose(true)
+    onBlur: () => onClose(true, false)
   });
 }
 
-exports.Cell = Cell$1;
-exports.CheckboxFormatter = CheckboxFormatter;
-exports.DataGridDefaultComponentsProvider = DataGridDefaultComponentsProvider;
-exports.HeaderRenderer = HeaderRenderer;
-exports.Row = Row$1;
+exports.Cell = CellComponent$1;
+exports.DataGridDefaultRenderersProvider = DataGridDefaultRenderersProvider;
+exports.Row = RowComponent$1;
 exports.SELECT_COLUMN_KEY = SELECT_COLUMN_KEY;
 exports.SelectCellFormatter = SelectCellFormatter;
 exports.SelectColumn = SelectColumn;
-exports.TextEditor = TextEditor;
-exports.ToggleGroupFormatter = ToggleGroupFormatter;
-exports.ValueFormatter = ValueFormatter;
+exports.ToggleGroup = ToggleGroup;
+exports.TreeDataGrid = TreeDataGrid$1;
 exports.default = DataGrid$1;
+exports.renderCheckbox = renderCheckbox;
+exports.renderHeaderCell = renderHeaderCell;
+exports.renderSortIcon = renderSortIcon;
+exports.renderSortPriority = renderSortPriority;
+exports.renderToggleGroup = renderToggleGroup;
+exports.renderValue = renderValue;
+exports.textEditor = textEditor;
 exports.useRowSelection = useRowSelection;
 //# sourceMappingURL=bundle.cjs.map

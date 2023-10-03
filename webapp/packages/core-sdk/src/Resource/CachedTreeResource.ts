@@ -474,11 +474,11 @@ export function getCachedTreeResourceLoaderState<TValue, TContext extends Record
     isOutdated() {
       return resource.isOutdated(key);
     },
-    load() {
-      return resource.load(key, includes);
+    async load() {
+      await resource.load(key, includes);
     },
-    reload() {
-      return resource.refresh(key, includes);
+    async reload() {
+      await resource.refresh(key, includes);
     },
   };
 }

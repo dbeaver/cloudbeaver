@@ -9,6 +9,7 @@ import { observer } from 'mobx-react-lite';
 import { useContext } from 'react';
 import { TabList as BaseTabList, TabListOptions, TabStateReturn } from 'reakit/Tab';
 
+import { useTranslate } from '@cloudbeaver/core-blocks';
 import type { ComponentStyle } from '@cloudbeaver/core-theming';
 
 import { generateTabElement } from './generateTabElement';
@@ -19,10 +20,12 @@ interface Props extends Omit<TabListOptions, keyof TabStateReturn> {
   'aria-label'?: string;
   style?: ComponentStyle;
   childrenFirst?: boolean;
+  className?: string;
 }
 
 export const TabList = observer<React.PropsWithChildren<Props>>(function TabList({ style, children, childrenFirst, ...props }) {
   const state = useContext(TabsContext);
+  const translate = useTranslate();
 
   if (!state) {
     throw new Error('Tabs context was not provided');
@@ -31,7 +34,7 @@ export const TabList = observer<React.PropsWithChildren<Props>>(function TabList
   if (state.container) {
     const displayed = state.container.getDisplayed(state.props);
     return (
-      <BaseTabList {...props} {...state.state} area-label={props['aria-label'] ?? state.container.areaLabel}>
+      <BaseTabList {...props} {...state.state} area-label={translate(props['aria-label'] ?? state.container.areaLabel)}>
         {childrenFirst && children}
         {displayed
           .map(
@@ -61,7 +64,7 @@ export const TabList = observer<React.PropsWithChildren<Props>>(function TabList
   }
 
   return (
-    <BaseTabList {...props} {...state.state}>
+    <BaseTabList {...props} {...state.state} area-label={translate(props['aria-label'])}>
       {children}
     </BaseTabList>
   );

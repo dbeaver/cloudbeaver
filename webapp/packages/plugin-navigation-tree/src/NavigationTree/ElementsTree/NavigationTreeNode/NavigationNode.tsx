@@ -7,9 +7,8 @@
  */
 import { observer } from 'mobx-react-lite';
 import { useDeferredValue, useEffect } from 'react';
-import styled, { css, use } from 'reshadow';
 
-import { getComputed, TreeNode, useStyles } from '@cloudbeaver/core-blocks';
+import { getComputed, s, TreeNode, useMergeRefs, useS } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { DATA_CONTEXT_NAV_NODE, DATA_CONTEXT_NAV_NODES, NavNodeManagerService } from '@cloudbeaver/core-navigation-tree';
 import { useDNDData } from '@cloudbeaver/core-ui';
@@ -17,16 +16,11 @@ import { useDataContext } from '@cloudbeaver/core-view';
 
 import { useNavTreeDropBox } from '../../useNavTreeDropBox';
 import type { NavigationNodeComponent } from '../NavigationNodeComponent';
+import style from './NavigationNode.m.css';
 import { DATA_ATTRIBUTE_NODE_EDITING } from './NavigationNode/DATA_ATTRIBUTE_NODE_EDITING';
 import { NavigationNodeNested } from './NavigationNode/NavigationNodeNested';
 import { NavigationNodeControlRenderer } from './NavigationNodeControlRenderer';
 import { useNavigationNode } from './useNavigationNode';
-
-const styles = css`
-  TreeNode[|hovered] ::before {
-    opacity: 0.16;
-  }
-`;
 
 export const NavigationNode: NavigationNodeComponent = observer(function NavigationNode({
   node,
@@ -35,8 +29,8 @@ export const NavigationNode: NavigationNodeComponent = observer(function Navigat
   control: externalControl,
   expanded: externalExpanded,
   className,
-  style,
 }) {
+  const styles = useS(style);
   const navNodeManagerService = useService(NavNodeManagerService);
   const navNode = useNavigationNode(node, path);
   const context = useDataContext();
@@ -63,6 +57,8 @@ export const NavigationNode: NavigationNodeComponent = observer(function Navigat
     },
   });
 
+  const controlRef = useMergeRefs(navNode.ref, dndData.setTargetRef);
+
   const dndBox = useNavTreeDropBox(node, {
     expanded: navNode.expanded,
     expand: navNode.expand,
@@ -75,12 +71,6 @@ export const NavigationNode: NavigationNodeComponent = observer(function Navigat
     externalExpanded = false;
   }
 
-  function setRef(refObj: HTMLDivElement | null) {
-    //@ts-expect-error ignore
-    navNode.ref.current = refObj;
-    dndData.setTargetRef(refObj);
-  }
-
   const hasNodes = getComputed(() => !!dndBox.state.context && dndBox.state.canDrop && dndBox.state.isOverCurrent);
   const expanded = useDeferredValue(navNode.expanded || externalExpanded);
 
@@ -91,7 +81,7 @@ export const NavigationNode: NavigationNodeComponent = observer(function Navigat
     [],
   );
 
-  return styled(useStyles(style, styles))(
+  return (
     <TreeNode
       ref={dndBox.setRef}
       group={navNode.group}
@@ -103,23 +93,15 @@ export const NavigationNode: NavigationNodeComponent = observer(function Navigat
       showInFilter={navNode.showInFilter}
       externalExpanded={externalExpanded}
       leaf={navNode.leaf}
-      className={className}
+      className={s(styles, { treeNode: true, hovered: hasNodes, expanded: externalExpanded ?? navNode.expanded }, className)}
       onExpand={navNode.expand}
       onClick={navNode.click}
       onOpen={navNode.open}
       onSelect={navNode.select}
-      {...use({ hovered: hasNodes })}
     >
       {/* <DNDPreview data={dndData} src="/icons/empty.svg" /> */}
-      <NavigationNodeControlRenderer
-        ref={setRef}
-        navNode={navNode}
-        dragging={dndData.state.isDragging}
-        control={externalControl}
-        style={style}
-        node={node}
-      />
-      {expanded && <NavigationNodeNested nodeId={node.id} path={path} component={component} />}
-    </TreeNode>,
+      <NavigationNodeControlRenderer ref={controlRef} navNode={navNode} dragging={dndData.state.isDragging} control={externalControl} node={node} />
+      {expanded && <NavigationNodeNested nodeId={node.id} path={path} component={component} className={s(styles, { navNodeNested: true })} />}
+    </TreeNode>
   );
 });

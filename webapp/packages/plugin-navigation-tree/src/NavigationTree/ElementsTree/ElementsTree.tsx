@@ -6,8 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import { useCallback, useMemo, useRef } from 'react';
-import styled, { css, use } from 'reshadow';
+import { useCallback, useMemo, useState } from 'react';
 
 import {
   EventTreeNodeClickFlag,
@@ -16,18 +15,18 @@ import {
   FolderExplorer,
   FolderExplorerPath,
   PlaceholderElement,
+  s,
   Translate,
-  TREE_NODE_STYLES,
   TreeNodeNested,
   TreeNodeNestedMessage,
-  useStyles,
+  useS,
 } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { EventContext, EventStopPropagationFlag } from '@cloudbeaver/core-events';
 import { EObjectFeature, type NavNode, NavNodeInfoResource, NavTreeResource, ROOT_NODE_PATH } from '@cloudbeaver/core-navigation-tree';
-import type { ComponentStyle } from '@cloudbeaver/core-theming';
 
 import { useNavTreeDropBox } from '../useNavTreeDropBox';
+import style from './ElementsTree.m.css';
 import { ElementsTreeContentLoader } from './ElementsTreeContentLoader';
 import { ElementsTreeContext, IElementsTreeContext } from './ElementsTreeContext';
 import { elementsTreeNameFilter } from './elementsTreeNameFilter';
@@ -43,70 +42,14 @@ import { useDropOutside } from './useDropOutside';
 import { IElementsTreeOptions, useElementsTree } from './useElementsTree';
 import { useElementsTreeFolderExplorer } from './useElementsTreeFolderExplorer';
 
-const styles = css`
-  box {
-    display: flex;
-    flex-direction: column;
-    box-sizing: border-box;
-  }
-
-  tree {
-    position: relative;
-    box-sizing: border-box;
-    display: flex;
-    flex: 1;
-    flex-direction: column;
-
-    & tree-elements {
-      position: relative;
-      box-sizing: border-box;
-      display: flex;
-      flex-direction: column;
-      flex: 1;
-    }
-  }
-
-  tree-box {
-    flex: 1;
-    overflow: auto;
-    display: flex;
-    width: 250px;
-    min-width: 100%;
-    max-width: 100%;
-  }
-
-  FolderExplorerPath {
-    padding: 0 4px 8px 4px;
-  }
-
-  drop-outside {
-    composes: theme-border-color-background from global;
-    border: dashed 2px;
-    border-radius: var(--theme-group-element-radius);
-    margin: 12px;
-    box-sizing: border-box;
-    position: relative;
-
-    &[|bottom] {
-      order: 2;
-    }
-
-    &:not([|showDropOutside]) {
-      display: none;
-    }
-    &[|active] {
-      border-color: var(--theme-positive) !important;
-    }
-  }
-`;
-
 export interface ElementsTreeProps extends IElementsTreeOptions, React.PropsWithChildren {
+  /** Specifies the root path for the tree. ROOT_NODE_PATH will be used if not defined */
   root?: string;
   selectionTree?: boolean;
+  /** Specifies a custom control component for navigation tree */
   control?: NavTreeControlComponent;
+  /** A placeholder component to be displayed when the elements tree is empty */
   emptyPlaceholder?: React.FC;
-  big?: boolean;
-  style?: ComponentStyle;
   className?: string;
   settingsElements?: PlaceholderElement<IElementsTreeSettingsProps>[];
   navNodeFilterCompare?: NavNodeFilterCompareFn;
@@ -128,8 +71,6 @@ export const ElementsTree = observer<ElementsTreeProps>(function ElementsTree({
   renderers = [],
   expandStateGetters,
   settingsElements,
-  big,
-  style,
   className,
   getChildren,
   loadChildren,
@@ -143,9 +84,10 @@ export const ElementsTree = observer<ElementsTreeProps>(function ElementsTree({
   onSelect,
   onFilter,
 }) {
+  const styles = useS(style);
   const navTreeResource = useService(NavTreeResource);
   const navNodeInfoResource = useService(NavNodeInfoResource);
-  const treeRootRef = useRef<HTMLDivElement>(null);
+  const [treeRootRef, setTreeRootRef] = useState<HTMLDivElement | null>(null);
   const folderExplorer = useElementsTreeFolderExplorer(baseRoot, settings);
 
   const root = folderExplorer.state.folder;
@@ -190,9 +132,9 @@ export const ElementsTree = observer<ElementsTreeProps>(function ElementsTree({
       folderExplorer,
       selectionTree,
       control,
-      getTreeRoot: () => treeRootRef.current,
+      getTreeRoot: () => treeRootRef,
     }),
-    [tree, folderExplorer, selectionTree, control],
+    [tree, folderExplorer, selectionTree, control, treeRootRef],
   );
 
   const getName = useCallback((folder: string) => navNodeInfoResource.get(folder)?.name || 'Not found', [navNodeInfoResource]);
@@ -217,20 +159,23 @@ export const ElementsTree = observer<ElementsTreeProps>(function ElementsTree({
     tree.resetSelection();
   }
 
-  return styled(useStyles(TREE_NODE_STYLES, styles, style))(
+  return (
     <>
-      <ElementsTreeTools tree={tree} settingsElements={settingsElements} style={style} />
-      <tree-box ref={treeRootRef} {...use({ big })}>
+      <ElementsTreeTools tree={tree} settingsElements={settingsElements} />
+      <div ref={setTreeRootRef} className={s(styles, { treeBox: true })}>
         <ElementsTreeContext.Provider value={context}>
-          <box className={className}>
+          <div className={s(styles, { box: true }, className)}>
             <FolderExplorer state={folderExplorer}>
-              <tree ref={dropOutside.mouse.reference} onClick={handleClick}>
-                {settings?.showFolderExplorerPath && <FolderExplorerPath getName={getName} canSkip={canSkip} />}
-                <drop-outside
+              <div ref={dropOutside.mouse.reference} className={s(styles, { tree: true })} onClick={handleClick}>
+                {settings?.showFolderExplorerPath && (
+                  <FolderExplorerPath className={s(styles, { folderExplorerPath: true })} getName={getName} canSkip={canSkip} />
+                )}
+                <div
                   ref={dndBox.setRef}
-                  {...use({
+                  className={s(styles, {
+                    dropOutside: true,
                     showDropOutside: dropOutside.showDropOutside,
-                    active: dropOutside.zoneActive,
+                    active: !!dropOutside.zoneActive,
                     bottom: dropOutside.bottom,
                   })}
                 >
@@ -239,9 +184,9 @@ export const ElementsTree = observer<ElementsTreeProps>(function ElementsTree({
                       <Translate token="app_navigationTree_drop_here" />
                     </TreeNodeNestedMessage>
                   </TreeNodeNested>
-                </drop-outside>
+                </div>
                 <ElementsTreeContentLoader context={context} emptyPlaceholder={emptyPlaceholder} childrenState={tree}>
-                  <tree-elements>
+                  <div className={s(styles, { treeElements: true })}>
                     <NavigationNodeNested
                       ref={dropOutside.nestedRef}
                       nodeId={root}
@@ -249,13 +194,13 @@ export const ElementsTree = observer<ElementsTreeProps>(function ElementsTree({
                       path={folderExplorer.state.path}
                       root
                     />
-                  </tree-elements>
+                  </div>
                 </ElementsTreeContentLoader>
-              </tree>
+              </div>
             </FolderExplorer>
-          </box>
+          </div>
         </ElementsTreeContext.Provider>
-      </tree-box>
-    </>,
+      </div>
+    </>
   );
 });

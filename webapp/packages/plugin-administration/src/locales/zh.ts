@@ -33,7 +33,7 @@ export default [
 
   ['administration_configuration_wizard_configuration_plugins', '配置'],
   ['administration_configuration_wizard_configuration_custom_connections', '允许自定义连接'],
-  ['administration_configuration_wizard_configuration_custom_connections_description', '允许用户创建自定义连接。否则，只能从管理部分创建所有新连接'],
+  ['administration_configuration_wizard_configuration_custom_connections_description', '允许用户创建自定义连接'],
   ['administration_configuration_wizard_configuration_navigation_tree_view', '导航器简单视图'],
   ['administration_configuration_wizard_configuration_navigation_tree_view_description', '默认情况下，所有用户的新连接在导航树中将仅包含基本信息'],
 

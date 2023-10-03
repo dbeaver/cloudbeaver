@@ -6,15 +6,16 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
+import React from 'react';
 import styled, { css } from 'reshadow';
 
 import {
   ColoredContainer,
   FieldCheckbox,
+  Form,
   Group,
   GroupTitle,
   ObjectPropertyInfoForm,
-  SubmittingForm,
   Switch,
   useAdministrationSettings,
   useObjectPropertyCategories,
@@ -29,7 +30,7 @@ import type { IConnectionFormProps } from '../IConnectionFormProps';
 import { SAVED_VALUE_INDICATOR } from './SAVED_VALUE_INDICATOR';
 
 const SSl_STYLES = css`
-  SubmittingForm {
+  Form {
     display: flex;
     flex-direction: column;
     flex: 1;
@@ -57,7 +58,7 @@ export const SSL: TabContainerPanelComponent<Props> = observer(function SSL({ st
   const autofillToken = isSafari ? 'section-connection-authentication-ssl section-ssl' : 'new-password';
 
   return styled(styles)(
-    <SubmittingForm>
+    <Form>
       <ColoredContainer parent>
         <Group gap form large vertical>
           <Switch name="enabled" state={handlerState} description={handler.description} mod={['primary']} disabled={disabled || readonly}>
@@ -78,7 +79,7 @@ export const SSL: TabContainerPanelComponent<Props> = observer(function SSL({ st
           )}
 
           {categories.map(category => (
-            <>
+            <React.Fragment key={category}>
               <GroupTitle keepSize>{category}</GroupTitle>
               <ObjectPropertyInfoForm
                 state={handlerState.properties}
@@ -91,10 +92,10 @@ export const SSL: TabContainerPanelComponent<Props> = observer(function SSL({ st
                 showRememberTip
                 small
               />
-            </>
+            </React.Fragment>
           ))}
 
-          {credentialsSavingEnabled && (
+          {credentialsSavingEnabled && !formState.config.template && (
             <FieldCheckbox
               id={handler.id + ' savePassword'}
               name="savePassword"
@@ -106,6 +107,6 @@ export const SSL: TabContainerPanelComponent<Props> = observer(function SSL({ st
           )}
         </Group>
       </ColoredContainer>
-    </SubmittingForm>,
+    </Form>,
   );
 });

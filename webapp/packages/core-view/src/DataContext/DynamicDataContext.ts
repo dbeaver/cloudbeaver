@@ -9,6 +9,7 @@ import { action, makeObservable, observable } from 'mobx';
 
 import type { DataContextGetter } from './DataContextGetter';
 import type { DeleteVersionedContextCallback, IDataContext } from './IDataContext';
+import type { IDataContextProvider } from './IDataContextProvider';
 
 export class DynamicDataContext implements IDataContext {
   fallback: IDataContext;
@@ -24,16 +25,17 @@ export class DynamicDataContext implements IDataContext {
 
     makeObservable(this, {
       fallback: observable.ref,
-      flush: action,
       set: action,
+      clear: action,
     });
   }
 
+  setFallBack(fallback?: IDataContextProvider): void;
   setFallBack(fallback: IDataContext): void {
     if (this.fallback === fallback) {
       return;
     }
-    this.flush();
+    this.clear();
     this.fallback = fallback;
   }
 
@@ -55,12 +57,20 @@ export class DynamicDataContext implements IDataContext {
     return this;
   }
 
+  hasOwn(context: DataContextGetter<any>): boolean {
+    return this.fallback.hasOwn(context);
+  }
+
   has(context: DataContextGetter<any>): boolean {
     return this.fallback.has(context);
   }
 
   get<T>(context: DataContextGetter<T>): T {
     return this.fallback.get(context);
+  }
+
+  getOwn<T>(context: DataContextGetter<T>): T | undefined {
+    return this.fallback.getOwn(context);
   }
 
   hasValue<T>(context: DataContextGetter<T>, value: T): boolean {
@@ -75,7 +85,7 @@ export class DynamicDataContext implements IDataContext {
     return this.fallback.tryGet(context);
   }
 
-  flush(): void {
+  clear(): void {
     for (const deleteCallback of this.contexts.values()) {
       deleteCallback();
     }

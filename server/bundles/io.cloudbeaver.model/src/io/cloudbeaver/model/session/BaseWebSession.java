@@ -16,6 +16,7 @@
  */
 package io.cloudbeaver.model.session;
 
+import io.cloudbeaver.model.WebServerMessage;
 import io.cloudbeaver.model.app.WebApplication;
 import io.cloudbeaver.model.app.WebAuthApplication;
 import io.cloudbeaver.websocket.CBWebSessionEventHandler;
@@ -200,6 +201,8 @@ public abstract class BaseWebSession extends AbstractSessionPersistent {
     public void removeSessionProject(@Nullable String projectId) throws DBException {
         userContext.getAccessibleProjectIds().remove(projectId);
     }
+
+    public abstract void addSessionMessage(WebServerMessage message);
 
     @Property
     public boolean isValid() {

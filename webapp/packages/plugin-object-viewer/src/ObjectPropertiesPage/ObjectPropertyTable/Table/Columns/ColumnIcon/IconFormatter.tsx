@@ -6,27 +6,19 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import styled, { css } from 'reshadow';
 
-import { StaticImage } from '@cloudbeaver/core-blocks';
+import { s, StaticImage, useS } from '@cloudbeaver/core-blocks';
 import type { DBObject } from '@cloudbeaver/core-navigation-tree';
 import { useNode } from '@cloudbeaver/plugin-navigation-tree';
-import type { FormatterProps } from '@cloudbeaver/plugin-react-data-grid';
+import type { RenderCellProps } from '@cloudbeaver/plugin-react-data-grid';
 
-const styles = css`
-  icon {
-    width: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    & StaticImage {
-      width: 16px;
-    }
-  }
-`;
+import style from './IconFormatter.m.css';
 
-export const IconFormatter = observer<FormatterProps<DBObject>>(function IconFormatter(props) {
+export const IconFormatter = observer<RenderCellProps<DBObject>>(function IconFormatter(props) {
   const { node } = useNode(props.row.id);
+  const styles = useS(style);
 
-  return styled(styles)(<icon>{node?.icon && <StaticImage icon={node.icon} />}</icon>);
+  return (
+    <div className={s(styles, { icon: true })}>{node?.icon && <StaticImage icon={node.icon} className={s(styles, { staticImage: true })} />}</div>
+  );
 });

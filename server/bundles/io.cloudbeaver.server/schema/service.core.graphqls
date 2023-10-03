@@ -117,6 +117,7 @@ type ServerConfig {
     hostName: String! @deprecated # use container id instead
     containerId: String!
     defaultAuthRole: String
+    defaultUserTeam: String # [23.2.2]
 
     anonymousAccessEnabled: Boolean!
     supportsCustomConnections: Boolean!

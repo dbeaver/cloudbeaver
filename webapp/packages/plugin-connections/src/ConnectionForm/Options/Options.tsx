@@ -15,6 +15,7 @@ import {
   Combobox,
   Container,
   FieldCheckbox,
+  Form,
   FormFieldDescription,
   getComputed,
   Group,
@@ -23,7 +24,6 @@ import {
   ObjectPropertyInfoForm,
   Radio,
   RadioGroup,
-  SubmittingForm,
   Textarea,
   useAdministrationSettings,
   useFormValidator,
@@ -50,7 +50,7 @@ import { useOptions } from './useOptions';
 const PROFILE_AUTH_MODEL_ID = 'profile';
 
 const styles = css`
-  SubmittingForm {
+  Form {
     flex: 1;
     overflow: auto;
   }
@@ -168,7 +168,7 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
   }
 
   return styled(styles)(
-    <SubmittingForm ref={formRef} disabled={driverMap.isLoading()} onChange={handleFormChange}>
+    <Form ref={formRef} disabled={driverMap.isLoading()} onChange={handleFormChange}>
       <ColoredContainer wrap overflow parent gap>
         <Container medium gap>
           <Group form gap>
@@ -206,7 +206,7 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
                 >
                   {translate('connections_connection_configuration')}
               </Combobox>*/}
-                  <FormFieldDescription label={translate('connections_connection_configuration')} tiny fill>
+                  <FormFieldDescription label={translate('connections_connection_configuration')} tiny>
                     <Container gap>
                       <RadioGroup name="configurationType" state={config}>
                         {driverConfiguration.map(conf => (
@@ -321,7 +321,7 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
                       tiny
                     />
                   </Container>
-                  {credentialsSavingEnabled && (
+                  {credentialsSavingEnabled && !config.template && (
                     <Container wrap gap>
                       <FieldCheckbox
                         id={config.connectionId + 'authNeeded'}
@@ -355,6 +355,6 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
           )}
         </Container>
       </ColoredContainer>
-    </SubmittingForm>,
+    </Form>,
   );
 });

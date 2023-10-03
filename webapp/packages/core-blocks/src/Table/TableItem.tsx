@@ -7,25 +7,28 @@
  */
 import { observer } from 'mobx-react-lite';
 import { Children, useCallback, useContext, useMemo } from 'react';
-import styled, { use } from 'reshadow';
 
 import { EventContext } from '@cloudbeaver/core-events';
 
 import { getComputed } from '../getComputed';
 import { Loader } from '../Loader/Loader';
+import { s } from '../s';
 import { useObjectRef } from '../useObjectRef';
-import { BASE_TABLE_STYLES } from './BASE_TABLE_STYLES';
+import { useS } from '../useS';
 import { EventTableItemSelectionFlag } from './EventTableItemSelectionFlag';
+import cellStyles from './TableColumnValue.m.css';
 import { TableContext } from './TableContext';
+import rowStyles from './TableItem.m.css';
 import { ITableItemContext, TableItemContext } from './TableItemContext';
 
-interface ExpandProps {
-  item: any;
+export interface TableItemExpandProps<T> {
+  item: T;
+  onClose: () => void;
 }
 
-interface Props {
-  item: any;
-  expandElement?: React.FunctionComponent<ExpandProps>;
+interface Props<T> extends React.PropsWithChildren {
+  item: T;
+  expandElement?: React.FunctionComponent<TableItemExpandProps<T>>;
   selectOnItem?: boolean;
   selectDisabled?: boolean;
   disabled?: boolean;
@@ -35,7 +38,11 @@ interface Props {
   onDoubleClick?: () => void;
 }
 
-export const TableItem = observer<React.PropsWithChildren<Props>>(function TableItem({
+interface ITableItemComponent {
+  <T>(props: Props<T>): React.ReactElement<any, any> | null;
+}
+
+export const TableItem: ITableItemComponent = observer(function TableItem({
   item,
   expandElement,
   selectOnItem,
@@ -49,6 +56,7 @@ export const TableItem = observer<React.PropsWithChildren<Props>>(function Table
 }) {
   const context = useContext(TableContext);
   const props = useObjectRef({ selectOnItem });
+  const styles = useS(rowStyles, cellStyles);
 
   if (!context) {
     throw new Error('TableContext must be provided');
@@ -98,28 +106,31 @@ export const TableItem = observer<React.PropsWithChildren<Props>>(function Table
     [onDoubleClick],
   );
 
+  const handleClose = useCallback(() => {
+    context.setItemExpand(item, false);
+  }, [context, item]);
+
   const ExpandElement = expandElement;
 
-  return styled(BASE_TABLE_STYLES)(
+  return (
     <TableItemContext.Provider value={itemContext}>
       <tr
         title={title}
-        className={className}
+        className={s(styles, { selected: isSelected, expanded: isExpanded, disabled, row: true }, className)}
         onClick={handleClick}
         onDoubleClick={handleDoubleClick}
-        {...use({ selected: isSelected, expanded: isExpanded, disabled })}
       >
         {children}
       </tr>
       {isExpanded && ExpandElement && (
-        <tr {...use({ noHover: true, expanded: isExpanded })}>
-          <td colSpan={Children.toArray(children).length} {...use({ expandArea: true })}>
+        <tr className={s(styles, { noHover: true, expanded: isExpanded, row: true })}>
+          <td colSpan={Children.toArray(children).length} className={s(styles, { expandArea: true, cell: true })}>
             <Loader suspense>
-              <ExpandElement item={item} />
+              <ExpandElement item={item} onClose={handleClose} />
             </Loader>
           </td>
         </tr>
       )}
-    </TableItemContext.Provider>,
+    </TableItemContext.Provider>
   );
 });

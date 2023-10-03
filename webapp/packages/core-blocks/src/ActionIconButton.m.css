@@ -1,0 +1,10 @@
+.actionIconButton {
+  composes: theme-form-element-radius theme-ripple from global;
+
+  padding: 4px !important;
+  margin: 2px !important;
+  width: 24px !important;
+  height: 24px !important;
+  overflow: hidden;
+  flex-shrink: 0;
+}

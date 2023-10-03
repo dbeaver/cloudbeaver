@@ -8,7 +8,7 @@
 import { observer } from 'mobx-react-lite';
 import styled, { css, use } from 'reshadow';
 
-import { BASE_TABLE_STYLES, IconOrImage, Link, TableColumnValue, TableItem, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
+import { IconOrImage, Link, TableColumnValue, TableItem, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
 import { isSameDay } from '@cloudbeaver/core-utils';
 
 import type { ILogEntry } from './ILogEntry';
@@ -76,7 +76,7 @@ export const LogEntry = observer<Props>(function LogEntry({ item, onSelect, sele
       break;
   }
 
-  return styled(useStyles(BASE_TABLE_STYLES, style))(
+  return styled(useStyles(style))(
     <TableItem item={item.id} className={className} {...use({ selected })}>
       <TableColumnValue title={item.type} centerContent flex {...use({ icon: true })}>
         <icon-box>{icon && <IconOrImage icon={icon} />}</icon-box>
