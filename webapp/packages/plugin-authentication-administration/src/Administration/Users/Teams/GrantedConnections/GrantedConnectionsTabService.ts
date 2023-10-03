@@ -12,7 +12,7 @@ import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { executorHandlerFilter, IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import { isGlobalProject, ProjectInfoResource } from '@cloudbeaver/core-projects';
-import { CachedMapAllKey, GraphQLService } from '@cloudbeaver/core-sdk';
+import { AdminConnectionGrantInfo, CachedMapAllKey, GraphQLService } from '@cloudbeaver/core-sdk';
 import { isArraysEqual, MetadataValueGetter } from '@cloudbeaver/core-utils';
 
 import { teamContext } from '../Contexts/teamContext';
@@ -95,7 +95,7 @@ export class GrantedConnectionsTabService extends Bootstrap {
       return;
     }
 
-    const { connectionsToRevoke, connectionsToGrant } = this.getConnectionsDifferences(state);
+    const { connectionsToRevoke, connectionsToGrant } = this.getConnectionsDifferences(grantInfo, state);
 
     try {
       if (connectionsToRevoke.length > 0) {
@@ -120,12 +120,15 @@ export class GrantedConnectionsTabService extends Bootstrap {
     }
   }
 
-  private getConnectionsDifferences(state: IGrantedConnectionsTabState): { connectionsToRevoke: string[]; connectionsToGrant: string[] } {
-    const current = state.initialGrantedSubjects;
+  private getConnectionsDifferences(
+    grantInfo: AdminConnectionGrantInfo[],
+    state: IGrantedConnectionsTabState,
+  ): { connectionsToRevoke: string[]; connectionsToGrant: string[] } {
+    const current = grantInfo.map(info => info.connectionId);
     const next = state.grantedSubjects;
 
-    const connectionsToRevoke = current.filter(subjectId => !next.includes(subjectId));
-    const connectionsToGrant = next.filter(subjectId => !current.includes(subjectId));
+    const connectionsToRevoke = current.filter(connectionId => !next.includes(connectionId));
+    const connectionsToGrant = next.filter(connectionId => !current.includes(connectionId));
 
     return { connectionsToRevoke, connectionsToGrant };
   }

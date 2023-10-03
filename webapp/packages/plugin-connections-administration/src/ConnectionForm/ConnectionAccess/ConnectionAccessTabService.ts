@@ -107,7 +107,7 @@ export class ConnectionAccessTabService extends Bootstrap {
     const currentGrantedSubjects = await this.connectionInfoResource.loadAccessSubjects(key);
     const currentGrantedSubjectIds = currentGrantedSubjects.map(subject => subject.subjectId);
 
-    const { subjectsToRevoke, subjectsToGrant } = await this.getSubjectDifferences(currentGrantedSubjectIds, state.grantedSubjects);
+    const { subjectsToRevoke, subjectsToGrant } = this.getSubjectDifferences(currentGrantedSubjectIds, state.grantedSubjects);
 
     if (subjectsToRevoke.length === 0 && subjectsToGrant.length === 0) {
       return;
@@ -151,7 +151,7 @@ export class ConnectionAccessTabService extends Bootstrap {
     return current.some(value => !next.some(subjectId => subjectId === value.subjectId));
   }
 
-  private async getSubjectDifferences(current: string[], next: string[]): Promise<{ subjectsToRevoke: string[]; subjectsToGrant: string[] }> {
+  private getSubjectDifferences(current: string[], next: string[]): { subjectsToRevoke: string[]; subjectsToGrant: string[] } {
     const subjectsToRevoke = current.filter(subjectId => !next.includes(subjectId));
     const subjectsToGrant = next.filter(subjectId => !current.includes(subjectId));
 
