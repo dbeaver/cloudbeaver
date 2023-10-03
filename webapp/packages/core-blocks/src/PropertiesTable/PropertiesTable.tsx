@@ -12,14 +12,14 @@ import styled from 'reshadow';
 
 import { Button } from '../Button';
 import { Filter } from '../FormControls/Filter';
+import { ButtonStyles } from '../index';
 import { useTranslate } from '../localization/useTranslate';
+import { SContext, StyleRegistry } from '../SContext';
 import { useObjectRef } from '../useObjectRef';
 import type { IProperty } from './IProperty';
+import PropertiesTableAddButtonStyles from './PropertiesTableAddButtonStyles.m.css';
 import { PropertyItem } from './PropertyItem';
 import { PROPERTIES_FILTER_STYLES, PROPERTIES_TABLE_STYLES } from './styles';
-import { SContext, StyleRegistry } from '../SContext';
-import { ButtonStyles } from '../index';
-import PropertiesTableAddButtonStyles from './PropertiesTableAddButtonStyles.m.css';
 
 type PropertiesState = Record<string, string | null>;
 
@@ -167,7 +167,7 @@ export const PropertiesTable = observer<Props>(function PropertiesTable(props) {
           ))}
           <properties-list-overflow />
         </properties-list>
-      </properties>,
-    </SContext>
+      </properties>
+    </SContext>,
   );
 });
