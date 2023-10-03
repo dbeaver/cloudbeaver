@@ -12,13 +12,13 @@ import { DBDriverResource, NetworkHandlerResource } from '@cloudbeaver/core-conn
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import { CachedMapAllKey, type NetworkHandlerConfigInput } from '@cloudbeaver/core-sdk';
+import { formStateContext } from '@cloudbeaver/core-ui';
 import { isNotNullDefined, isObjectsEqual } from '@cloudbeaver/core-utils';
 
 import { connectionFormConfigureContext } from '../connectionFormConfigureContext';
 import { ConnectionFormService } from '../ConnectionFormService';
 import { connectionConfigContext } from '../Contexts/connectionConfigContext';
 import { connectionCredentialsStateContext } from '../Contexts/connectionCredentialsStateContext';
-import { connectionFormStateContext } from '../Contexts/connectionFormStateContext';
 import type { IConnectionFormFillConfigData, IConnectionFormState, IConnectionFormSubmitData } from '../IConnectionFormProps';
 import { getSSLDefaultConfig } from './getSSLDefaultConfig';
 import { getSSLDriverHandler } from './getSSLDriverHandler';
@@ -192,7 +192,7 @@ export class ConnectionSSLTabService extends Bootstrap {
   private formState(data: IConnectionFormState, contexts: IExecutionContextProvider<IConnectionFormState>) {
     const config = contexts.getContext(connectionConfigContext);
     if (config.networkHandlersConfig !== undefined) {
-      const stateContext = contexts.getContext(connectionFormStateContext);
+      const stateContext = contexts.getContext(formStateContext);
 
       stateContext.markEdited();
     }

@@ -9,8 +9,19 @@ import { observer } from 'mobx-react-lite';
 import { useEffect } from 'react';
 import styled, { css } from 'reshadow';
 
-import { ExceptionMessage, IconOrImage, Loader, Placeholder, useExecutor, useObjectRef, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
+import {
+  ExceptionMessage,
+  IconOrImage,
+  Loader,
+  Placeholder,
+  StatusMessage,
+  useExecutor,
+  useObjectRef,
+  useStyles,
+  useTranslate,
+} from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
+import { ENotificationType } from '@cloudbeaver/core-events';
 import type { ConnectionConfig } from '@cloudbeaver/core-sdk';
 import { BASE_TAB_STYLES, TabList, TabPanelList, TabsState, UNDERLINE_TAB_BIG_STYLES, UNDERLINE_TAB_STYLES } from '@cloudbeaver/core-ui';
 
@@ -144,12 +155,7 @@ export const ConnectionForm = observer<Props>(function ConnectionForm({ state, o
         <connection-top-bar>
           <connection-top-bar-tabs>
             <connection-status-message>
-              {state.statusMessage && (
-                <>
-                  <IconOrImage icon="/icons/info_icon.svg" />
-                  {translate(state.statusMessage)}
-                </>
-              )}
+              <StatusMessage type={ENotificationType.Info} message={state.statusMessage} />
             </connection-status-message>
             <TabList style={style} disabled={state.disabled} />
           </connection-top-bar-tabs>

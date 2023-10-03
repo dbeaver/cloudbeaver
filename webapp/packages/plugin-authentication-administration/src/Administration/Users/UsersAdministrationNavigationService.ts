@@ -8,6 +8,8 @@
 import { AdministrationScreenService } from '@cloudbeaver/core-administration';
 import { injectable } from '@cloudbeaver/core-di';
 
+import { ADMINISTRATION_ITEM_USER_CREATE_PARAM } from './ADMINISTRATION_ITEM_USER_CREATE_PARAM';
+
 export enum EUsersAdministrationSub {
   Users = 'users',
   Teams = 'teams',
@@ -27,7 +29,7 @@ export class UsersAdministrationNavigationService {
   }
 
   navToCreate(): void {
-    this.navToSub(EUsersAdministrationSub.Users, 'create');
+    this.navToSub(EUsersAdministrationSub.Users, ADMINISTRATION_ITEM_USER_CREATE_PARAM);
   }
 
   navToSub(sub: EUsersAdministrationSub, param?: string): void {

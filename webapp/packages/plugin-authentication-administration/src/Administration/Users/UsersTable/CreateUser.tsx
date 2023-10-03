@@ -7,16 +7,13 @@
  */
 import styled, { css } from 'reshadow';
 
-import { Translate } from '@cloudbeaver/core-blocks';
-import type { AdminUserInfo } from '@cloudbeaver/core-sdk';
+import { Loader, Translate } from '@cloudbeaver/core-blocks';
+import type { IFormState } from '@cloudbeaver/core-ui';
 
-import { UserForm } from '../UserForm/UserForm';
+import { AdministrationUserForm } from '../UserForm/AdministrationUserForm';
+import type { IUserFormState, UserFormProps } from '../UserForm/AdministrationUserFormService';
 
 const styles = css`
-  user-create-footer,
-  user-create-content {
-    composes: theme-background-secondary theme-text-on-secondary from global;
-  }
   user-create {
     display: flex;
     flex-direction: column;
@@ -35,6 +32,7 @@ const styles = css`
   }
 
   user-create-content {
+    composes: theme-background-secondary theme-text-on-secondary from global;
     position: relative;
     display: flex;
     flex-direction: column;
@@ -44,18 +42,20 @@ const styles = css`
 `;
 
 interface Props {
-  user: AdminUserInfo;
+  state: IFormState<IUserFormState>;
   onCancel: () => void;
 }
 
-export const CreateUser: React.FC<Props> = function CreateUser({ user, onCancel }) {
+export const CreateUser: React.FC<Props> = function CreateUser({ state, onCancel }) {
   return styled(styles)(
     <user-create>
       <title-bar>
         <Translate token="authentication_administration_user_connections_user_add" />
       </title-bar>
       <user-create-content>
-        <UserForm user={user} onCancel={onCancel} />
+        <Loader suspense>
+          <AdministrationUserForm state={state} onClose={onCancel} />
+        </Loader>
       </user-create-content>
     </user-create>,
   );

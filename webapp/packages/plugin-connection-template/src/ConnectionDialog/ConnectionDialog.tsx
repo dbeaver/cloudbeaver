@@ -7,7 +7,7 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import { ErrorMessage, Loader, s, SubmittingForm, useAdministrationSettings, useFocus, useS, useTranslate } from '@cloudbeaver/core-blocks';
+import { ErrorMessage, Form, Loader, s, useAdministrationSettings, useFocus, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import { useController } from '@cloudbeaver/core-di';
 import { CommonDialogBody, CommonDialogFooter, CommonDialogHeader, CommonDialogWrapper, DialogComponent } from '@cloudbeaver/core-dialogs';
 import { ConnectionAuthenticationFormLoader } from '@cloudbeaver/plugin-connections';
@@ -53,7 +53,7 @@ export const ConnectionDialog: DialogComponent<null, null> = observer(function C
               {controller.isConnecting && translate('basicConnection_connectionDialog_connecting_message')}
             </center>
           ) : (
-            <SubmittingForm ref={focusedRef} className={s(styles, { submittingForm: true })} onSubmit={controller.onConnect}>
+            <Form ref={focusedRef} className={s(styles, { submittingForm: true })} onSubmit={controller.onConnect}>
               <ConnectionAuthenticationFormLoader
                 config={controller.config}
                 authModelId={controller.authModel.id}
@@ -63,7 +63,7 @@ export const ConnectionDialog: DialogComponent<null, null> = observer(function C
                 disabled={controller.isConnecting}
                 className={s(styles, { connectionAuthenticationFormLoader: true })}
               />
-            </SubmittingForm>
+            </Form>
           ))}
       </CommonDialogBody>
       {controller.step === ConnectionStep.Connection && (

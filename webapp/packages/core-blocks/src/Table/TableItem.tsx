@@ -21,13 +21,14 @@ import { TableContext } from './TableContext';
 import rowStyles from './TableItem.m.css';
 import { ITableItemContext, TableItemContext } from './TableItemContext';
 
-interface ExpandProps {
-  item: any;
+export interface TableItemExpandProps<T> {
+  item: T;
+  onClose: () => void;
 }
 
-interface Props {
-  item: any;
-  expandElement?: React.FunctionComponent<ExpandProps>;
+interface Props<T> extends React.PropsWithChildren {
+  item: T;
+  expandElement?: React.FunctionComponent<TableItemExpandProps<T>>;
   selectOnItem?: boolean;
   selectDisabled?: boolean;
   disabled?: boolean;
@@ -37,7 +38,11 @@ interface Props {
   onDoubleClick?: () => void;
 }
 
-export const TableItem = observer<React.PropsWithChildren<Props>>(function TableItem({
+interface ITableItemComponent {
+  <T>(props: Props<T>): React.ReactElement<any, any> | null;
+}
+
+export const TableItem: ITableItemComponent = observer(function TableItem({
   item,
   expandElement,
   selectOnItem,
@@ -101,6 +106,10 @@ export const TableItem = observer<React.PropsWithChildren<Props>>(function Table
     [onDoubleClick],
   );
 
+  const handleClose = useCallback(() => {
+    context.setItemExpand(item, false);
+  }, [context, item]);
+
   const ExpandElement = expandElement;
 
   return (
@@ -117,7 +126,7 @@ export const TableItem = observer<React.PropsWithChildren<Props>>(function Table
         <tr className={s(styles, { noHover: true, expanded: isExpanded, row: true })}>
           <td colSpan={Children.toArray(children).length} className={s(styles, { expandArea: true, cell: true })}>
             <Loader suspense>
-              <ExpandElement item={item} />
+              <ExpandElement item={item} onClose={handleClose} />
             </Loader>
           </td>
         </tr>

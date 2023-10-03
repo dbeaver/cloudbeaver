@@ -13,4 +13,7 @@ export type ThemeSelector<T extends Record<string, string> = Record<string, stri
 ) => Promise<undefined | BaseStyles<T> | BaseStyles<T>[]>;
 export type Style<T extends Record<string, string> = Record<string, string>> = BaseStyles<T> | ThemeSelector<T>;
 export type DynamicStyle<T extends Record<string, string> = Record<string, string>> = Style<T> | boolean | undefined;
+/**
+ * @deprecated use SContext and StyleRegistry instead
+ */
 export type ComponentStyle<T extends Record<string, string> = Record<string, string>> = DynamicStyle<T> | ComponentStyle<T>[];

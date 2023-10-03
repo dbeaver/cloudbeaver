@@ -3,8 +3,8 @@ Bundle-ManifestVersion: 2
 Bundle-Vendor: DBeaver Corp
 Bundle-Name: Cloudbeaver Web Model
 Bundle-SymbolicName: io.cloudbeaver.model;singleton:=true
-Bundle-Version: 1.0.37.qualifier
-Bundle-Release-Date: 20230925
+Bundle-Version: 1.0.38.qualifier
+Bundle-Release-Date: 20230209
 Bundle-RequiredExecutionEnvironment: JavaSE-11
 Bundle-ActivationPolicy: lazy
 Bundle-ClassPath: .
@@ -12,6 +12,7 @@ Require-Bundle:  org.jkiss.dbeaver.data.gis;visibility:=reexport,
  org.jkiss.dbeaver.model;visibility:=reexport,
  org.jkiss.dbeaver.model.sm;visibility:=reexport,
  org.jkiss.dbeaver.model.event;visibility:=reexport,
+ org.jkiss.dbeaver.model.nio;visibility:=reexport,
  org.jkiss.dbeaver.registry;visibility:=reexport,
  org.jkiss.dbeaver.net.ssh,
  org.jkiss.bundle.graphql.java;visibility:=reexport,
@@ -29,6 +30,7 @@ Export-Package: io.cloudbeaver,
  io.cloudbeaver.model.rm,
  io.cloudbeaver.model.rm.local,
  io.cloudbeaver.model.rm.lock,
+ io.cloudbeaver.model.rm.fs.nio,
  io.cloudbeaver.model.session,
  io.cloudbeaver.model.user,
  io.cloudbeaver.registry,

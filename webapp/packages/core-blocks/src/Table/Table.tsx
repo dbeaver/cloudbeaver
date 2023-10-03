@@ -7,7 +7,7 @@
  */
 import { action, computed, observable } from 'mobx';
 import { observer } from 'mobx-react-lite';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 import { s } from '../s';
 import { useObjectRef } from '../useObjectRef';
@@ -95,8 +95,6 @@ export const Table = observer<React.PropsWithChildren<Props>>(function Table({
     { keys, isItemSelectable },
   );
 
-  const isExpanded = useMemo(() => computed(() => Array.from(expanded.values()).some(Boolean)), [expanded]);
-
   const setItemSelect = useCallback((item: any, state: boolean) => {
     selected.set(item, state);
     if (props.onSelect) {
@@ -119,7 +117,7 @@ export const Table = observer<React.PropsWithChildren<Props>>(function Table({
 
   return (
     <TableContext.Provider value={context}>
-      <table className={s(styles, { table: true, expanded: isExpanded.get(), big: size === 'big' }, className)}>{children}</table>
+      <table className={s(styles, { table: true, big: size === 'big' }, className)}>{children}</table>
     </TableContext.Provider>
   );
 });

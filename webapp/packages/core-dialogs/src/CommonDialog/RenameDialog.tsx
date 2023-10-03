@@ -9,7 +9,7 @@ import { observable } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import { useEffect } from 'react';
 
-import { Button, Container, Fill, InputField, s, SubmittingForm, useFocus, useObservableRef, useS, useTranslate } from '@cloudbeaver/core-blocks';
+import { Button, Container, Fill, Form, InputField, s, useFocus, useObservableRef, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import { throttleAsync } from '@cloudbeaver/core-utils';
 
 import { CommonDialogBody } from './CommonDialog/CommonDialogBody';
@@ -97,13 +97,13 @@ export const RenameDialog: DialogComponent<RenameDialogPayload, string> = observ
     <CommonDialogWrapper size="small" className={className} fixedWidth>
       <CommonDialogHeader title={title} subTitle={subTitle} icon={icon} viewBox={viewBox} bigIcon={bigIcon} onReject={rejectDialog} />
       <CommonDialogBody>
-        <SubmittingForm ref={focusedRef} onSubmit={() => resolveDialog(state.value)}>
+        <Form ref={focusedRef} onSubmit={() => resolveDialog(state.value)}>
           <Container center>
             <InputField name="value" state={state} error={!state.valid} description={errorMessage} onChange={() => state.validate()}>
               {translate('ui_name') + ':'}
             </InputField>
           </Container>
-        </SubmittingForm>
+        </Form>
       </CommonDialogBody>
       <CommonDialogFooter className={s(styles, { footer: true })}>
         <Button type="button" mod={['outlined']} onClick={rejectDialog}>

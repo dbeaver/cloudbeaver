@@ -15,6 +15,7 @@ import {
   Combobox,
   Container,
   FieldCheckbox,
+  Form,
   FormFieldDescription,
   getComputed,
   Group,
@@ -23,7 +24,6 @@ import {
   ObjectPropertyInfoForm,
   Radio,
   RadioGroup,
-  SubmittingForm,
   Textarea,
   useAdministrationSettings,
   useFormValidator,
@@ -50,7 +50,7 @@ import { useOptions } from './useOptions';
 const PROFILE_AUTH_MODEL_ID = 'profile';
 
 const styles = css`
-  SubmittingForm {
+  Form {
     flex: 1;
     overflow: auto;
   }
@@ -168,7 +168,7 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
   }
 
   return styled(styles)(
-    <SubmittingForm ref={formRef} disabled={driverMap.isLoading()} onChange={handleFormChange}>
+    <Form ref={formRef} disabled={driverMap.isLoading()} onChange={handleFormChange}>
       <ColoredContainer wrap overflow parent gap>
         <Container medium gap>
           <Group form gap>
@@ -355,6 +355,6 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
           )}
         </Container>
       </ColoredContainer>
-    </SubmittingForm>,
+    </Form>,
   );
 });

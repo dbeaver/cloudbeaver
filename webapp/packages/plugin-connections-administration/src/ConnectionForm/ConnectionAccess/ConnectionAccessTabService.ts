@@ -14,11 +14,11 @@ import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { executorHandlerFilter, IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import { isGlobalProject, ProjectInfoResource } from '@cloudbeaver/core-projects';
 import { PermissionsService } from '@cloudbeaver/core-root';
+import { formStateContext } from '@cloudbeaver/core-ui';
 import type { MetadataValueGetter } from '@cloudbeaver/core-utils';
 import {
   connectionConfigContext,
   ConnectionFormService,
-  connectionFormStateContext,
   IConnectionFormProps,
   IConnectionFormState,
   IConnectionFormSubmitData,
@@ -124,7 +124,7 @@ export class ConnectionAccessTabService extends Bootstrap {
     const changed = await this.isChanged(key, state.grantedSubjects);
 
     if (changed) {
-      const stateContext = contexts.getContext(connectionFormStateContext);
+      const stateContext = contexts.getContext(formStateContext);
 
       stateContext.markEdited();
     }

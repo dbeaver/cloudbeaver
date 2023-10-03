@@ -7,8 +7,8 @@
  */
 import { useCallback } from 'react';
 
-export function useCombinedRef<T>(...refs: React.ForwardedRef<T>[]) {
-  return useCallback((instance: T | null) => {
+export function useCombinedRef<T>(...refs: React.Ref<T>[]): React.RefCallback<T> {
+  return useCallback(instance => {
     for (const ref of refs) {
       if (typeof ref === 'function') {
         ref(instance);

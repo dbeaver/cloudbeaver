@@ -8,7 +8,7 @@
 import { observer } from 'mobx-react-lite';
 import { useState } from 'react';
 
-import { Button, Group, InputField, s, SubmittingForm, Table, TableBody, useS, useTranslate } from '@cloudbeaver/core-blocks';
+import { Button, Form, Group, InputField, s, Table, TableBody, useS, useTranslate } from '@cloudbeaver/core-blocks';
 
 import styles from './FiltersTable.m.css';
 import { FiltersTableItem } from './FiltersTableItem';
@@ -39,7 +39,7 @@ export const FiltersTable = observer<Props>(function FiltersTable({ title, filte
       <div className={s(style, { container: true })}>
         <header className={s(style, { header: true })}>
           <h4 className={s(style, { headerTitle: true })}>{title}</h4>
-          <SubmittingForm className={s(style, { submittingForm: true })} onSubmit={add}>
+          <Form className={s(style, { submittingForm: true })} onSubmit={add}>
             <div className={s(style, { headerActions: true })}>
               <InputField
                 className={s(style, { inputField: true })}
@@ -51,7 +51,7 @@ export const FiltersTable = observer<Props>(function FiltersTable({ title, filte
                 +
               </Button>
             </div>
-          </SubmittingForm>
+          </Form>
         </header>
         <div className={s(style, { tableContainer: true })}>
           <Table className={s(style, { table: true })} keys={filters}>
