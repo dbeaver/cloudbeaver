@@ -16,13 +16,13 @@
  */
 package io.cloudbeaver.service.rm.fs;
 
-import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.service.rm.nio.RMNIOFileSystemProvider;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.DBPImage;
 import org.jkiss.dbeaver.model.fs.DBFVirtualFileSystem;
 import org.jkiss.dbeaver.model.fs.DBFVirtualFileSystemRoot;
+import org.jkiss.dbeaver.model.rm.RMController;
 import org.jkiss.dbeaver.model.rm.RMProject;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 
@@ -35,8 +35,9 @@ public class RMVirtualFileSystem implements DBFVirtualFileSystem {
 
     @NotNull
     private final RMProject rmProject;
-    public RMVirtualFileSystem(@NotNull WebSession webSession, @NotNull RMProject rmProject) {
-        this.rmNioFileSystemProvider = new RMNIOFileSystemProvider(webSession.getRmController());
+
+    public RMVirtualFileSystem(@NotNull RMController rmController, @NotNull RMProject rmProject) {
+        this.rmNioFileSystemProvider = new RMNIOFileSystemProvider(rmController);
         this.rmProject = rmProject;
     }
 
