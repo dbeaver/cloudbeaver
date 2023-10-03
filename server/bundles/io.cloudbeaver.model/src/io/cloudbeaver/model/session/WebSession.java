@@ -77,16 +77,18 @@ import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.dbeaver.runtime.jobs.DisconnectJob;
 import org.jkiss.utils.CommonUtils;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-
 /**
  * Web session.
  * Is the main source of data in web application
@@ -429,6 +431,16 @@ public class WebSession extends BaseWebSession
         }
     }
 
+    private void resetTempFolder(){
+        Path path = getWorkspace().getAbsolutePath().resolve("temp-sql-upload-files").resolve(this.getSessionId());
+        try {
+            Files.delete(path);
+        } catch (IOException e) {
+            addSessionError(e);
+            log.error("Error deleting temp path", e);
+        }
+    }
+
     private void resetNavigationModel() {
         Map<String, WebConnectionInfo> conCopy;
         synchronized (this.connections) {
@@ -609,6 +621,7 @@ public class WebSession extends BaseWebSession
         try {
             resetNavigationModel();
             resetSessionCache();
+            resetTempFolder();
         } catch (Throwable e) {
             log.error(e);
         }

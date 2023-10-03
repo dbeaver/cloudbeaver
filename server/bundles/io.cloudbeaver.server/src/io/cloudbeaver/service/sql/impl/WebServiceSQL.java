@@ -83,7 +83,7 @@ public class WebServiceSQL implements DBWServiceSQL {
             conToRead.addAll(session.getConnections());
         }
 
-        List<WebSQLContextInfo> contexts  = new ArrayList<>();
+        List<WebSQLContextInfo> contexts = new ArrayList<>();
         for (WebConnectionInfo con : conToRead) {
             WebSQLProcessor sqlProcessor = WebServiceBindingSQL.getSQLProcessor(con, false);
             if (sqlProcessor != null) {
@@ -132,8 +132,7 @@ public class WebServiceSQL implements DBWServiceSQL {
         @NotNull String query,
         Integer position,
         Integer maxResults,
-        Boolean simpleMode) throws DBWebException
-    {
+        Boolean simpleMode) throws DBWebException {
         try {
             DBPDataSource dataSource = sqlContext.getProcessor().getConnection().getDataSourceContainer().getDataSource();
 
@@ -207,8 +206,7 @@ public class WebServiceSQL implements DBWServiceSQL {
     public SQLGeneratorDescriptor[] getEntityQueryGenerators(
         @NotNull WebSession session,
         @NotNull List<String> nodePathList)
-        throws DBWebException
-    {
+        throws DBWebException {
         List<DBSObject> objectList = getObjectListFromNodeIds(session, nodePathList);
         return SQLGeneratorConfigurationRegistry.getInstance().getApplicableGenerators(objectList, session).toArray(new SQLGeneratorDescriptor[0]);
     }
@@ -295,8 +293,7 @@ public class WebServiceSQL implements DBWServiceSQL {
         @Nullable List<WebSQLResultsRow> updatedRows,
         @Nullable List<WebSQLResultsRow> deletedRows,
         @Nullable List<WebSQLResultsRow> addedRows,
-        @Nullable WebDataFormat dataFormat) throws DBWebException
-    {
+        @Nullable WebDataFormat dataFormat) throws DBWebException {
         try {
             WebSQLExecuteInfo[] result = new WebSQLExecuteInfo[1];
 
@@ -320,25 +317,24 @@ public class WebServiceSQL implements DBWServiceSQL {
 
     @Override
     public String readLobValue(
-            @NotNull WebSQLContextInfo contextInfo,
-            @NotNull String resultsId,
-            @NotNull Integer lobColumnIndex,
-            @Nullable List<WebSQLResultsRow> row) throws DBWebException
-    {
+        @NotNull WebSQLContextInfo contextInfo,
+        @NotNull String resultsId,
+        @NotNull Integer lobColumnIndex,
+        @Nullable List<WebSQLResultsRow> row) throws DBWebException {
         try {
             var result = new StringBuilder();
 
             DBExecUtils.tryExecuteRecover(
-                    contextInfo.getProcessor().getWebSession().getProgressMonitor(),
-                    contextInfo.getProcessor().getConnection().getDataSource(),
-                    monitor -> {
-                        try {
-                            result.append(contextInfo.getProcessor().readLobValue(
-                                    monitor, contextInfo, resultsId, lobColumnIndex, row.get(0)));
-                        } catch (Exception e) {
-                            throw new InvocationTargetException(e);
-                        }
+                contextInfo.getProcessor().getWebSession().getProgressMonitor(),
+                contextInfo.getProcessor().getConnection().getDataSource(),
+                monitor -> {
+                    try {
+                        result.append(contextInfo.getProcessor().readLobValue(
+                            monitor, contextInfo, resultsId, lobColumnIndex, row.get(0)));
+                    } catch (Exception e) {
+                        throw new InvocationTargetException(e);
                     }
+                }
             );
             return result.toString();
         } catch (DBException e) {
@@ -365,8 +361,7 @@ public class WebServiceSQL implements DBWServiceSQL {
         @Nullable WebSQLDataFilter filter,
         @Nullable WebDataFormat dataFormat,
         boolean readLogs,
-        @NotNull WebSession webSession)
-    {
+        @NotNull WebSession webSession) {
         WebAsyncTaskProcessor<String> runnable = new WebAsyncTaskProcessor<>() {
             @Override
             public void run(DBRProgressMonitor monitor) throws InvocationTargetException {
@@ -404,7 +399,7 @@ public class WebServiceSQL implements DBWServiceSQL {
                     DBSDataContainer dataContainer = contextInfo.getProcessor().getDataContainerByNodePath(
                         monitor, nodePath, DBSDataContainer.class);
 
-                    WebSQLExecuteInfo executeResults =  contextInfo.getProcessor().readDataFromContainer(
+                    WebSQLExecuteInfo executeResults = contextInfo.getProcessor().readDataFromContainer(
                         contextInfo,
                         monitor,
                         dataContainer,
@@ -474,8 +469,8 @@ public class WebServiceSQL implements DBWServiceSQL {
             connectionInfo.getDataSourceContainer().getPreferenceStore(),
             sqlScript);
         List<WebSQLQueryInfo> queriesInfo = queries.stream()
-                .map(query -> new WebSQLQueryInfo(query.getOffset(), query.getOffset() + query.getText().length()))
-                .collect(Collectors.toList());
+            .map(query -> new WebSQLQueryInfo(query.getOffset(), query.getOffset() + query.getText().length()))
+            .collect(Collectors.toList());
         return new WebSQLScriptInfo(queriesInfo);
     }
 
