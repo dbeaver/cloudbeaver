@@ -12,6 +12,7 @@ export interface IResultSetContentValue {
   binary?: string;
   text?: string;
   value?: string;
+  fileId?: string;
   contentType?: string;
   contentLength?: number;
 }

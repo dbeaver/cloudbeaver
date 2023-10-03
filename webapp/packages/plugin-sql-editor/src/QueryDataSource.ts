@@ -13,18 +13,19 @@ import type { ITask } from '@cloudbeaver/core-executor';
 import {
   AsyncTaskInfoService,
   GraphQLService,
-  IResultSetUploadingBlob,
   ResultDataFormat,
   SqlExecuteInfo,
   SqlQueryResults,
   UpdateResultsDataBatchMutationVariables,
 } from '@cloudbeaver/core-sdk';
+import { uuid } from '@cloudbeaver/core-utils';
 import {
   DatabaseDataSource,
   DocumentEditAction,
   IDatabaseDataOptions,
   IDatabaseResultSet,
   IRequestInfo,
+  IResultSetContentValue,
   ResultSetEditAction,
 } from '@cloudbeaver/plugin-data-viewer';
 
@@ -115,9 +116,24 @@ export class QueryDataSource<TOptions extends IDataQueryOptions = IDataQueryOpti
 
         if (result.dataFormat === ResultDataFormat.Resultset) {
           editor = this.actions.get(result, ResultSetEditAction);
-          editor.fillBatch(updateVariables);
         } else if (result.dataFormat === ResultDataFormat.Document) {
           editor = this.actions.get(result, DocumentEditAction);
+        }
+
+        let blobs: IResultSetContentValue[] = [];
+        if (editor instanceof ResultSetEditAction) {
+          blobs = editor.getBlobsToUpload();
+        }
+
+        for (const blob of blobs) {
+          const fileId = uuid();
+          try {
+            await this.graphQLService.sdk.uploadBlobResultSet(fileId, blob.blob!);
+          } catch {}
+          blob.fileId = fileId;
+        }
+
+        if (editor) {
           editor.fillBatch(updateVariables);
         }
 
@@ -130,17 +146,6 @@ export class QueryDataSource<TOptions extends IDataQueryOptions = IDataQueryOpti
 
           if (responseResult) {
             editor.applyPartialUpdate(responseResult);
-          }
-
-          let blobs: IResultSetUploadingBlob[] = [];
-          if (editor instanceof ResultSetEditAction) {
-            blobs = editor.getBlobs();
-          }
-
-          for (const blob of blobs) {
-            try {
-              await this.graphQLService.sdk.uploadBlobResultSet(projectId, connectionId, contextId, resultsId, blob);
-            } catch {}
           }
         }
 

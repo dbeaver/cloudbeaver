@@ -8,7 +8,7 @@
 import { action, makeObservable, observable } from 'mobx';
 
 import { ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
-import { IResultSetUploadingBlob, ResultDataFormat, SqlResultRow, UpdateResultsDataBatchMutationVariables } from '@cloudbeaver/core-sdk';
+import { ResultDataFormat, SqlResultRow, UpdateResultsDataBatchMutationVariables } from '@cloudbeaver/core-sdk';
 
 import type { IDatabaseDataSource } from '../../IDatabaseDataSource';
 import type { IDatabaseResultSet } from '../../IDatabaseResultSet';
@@ -22,6 +22,8 @@ import {
   IDatabaseDataEditApplyActionUpdate,
 } from '../IDatabaseDataEditAction';
 import { compareResultSetRowKeys } from './compareResultSetRowKeys';
+import { createResultSetContentValue } from './createResultSetContentValue';
+import type { IResultSetContentValue } from './IResultSetContentValue';
 import type { IResultSetColumnKey, IResultSetElementKey, IResultSetRowKey } from './IResultSetDataKey';
 import { isResultSetContentValue } from './isResultSetContentValue';
 import { ResultSetDataAction } from './ResultSetDataAction';
@@ -524,8 +526,8 @@ export class ResultSetEditAction extends DatabaseEditAction<IResultSetElementKey
     }
   }
 
-  getBlobs(): Array<IResultSetUploadingBlob> {
-    const blobs: Array<IResultSetUploadingBlob> = [];
+  getBlobsToUpload(): Array<IResultSetContentValue> {
+    const blobs: Array<IResultSetContentValue> = [];
 
     for (const update of this.updates) {
       if (update.type === DatabaseEditChangeType.delete) {
@@ -534,12 +536,8 @@ export class ResultSetEditAction extends DatabaseEditAction<IResultSetElementKey
 
       for (let i = 0; i < update.update.length; i++) {
         const value = update.update[i];
-        if (isResultSetContentValue(value) && value.blob) {
-          blobs.push({
-            data: update.source ?? [],
-            index: i,
-            blob: value.blob,
-          });
+        if (isResultSetContentValue(value) && value.blob && value.fileId === undefined) {
+          blobs.push(value);
         }
       }
     }
@@ -561,9 +559,14 @@ export class ResultSetEditAction extends DatabaseEditAction<IResultSetElementKey
               data: update.source,
               updateValues: update.update.reduce<Record<number, IResultSetValue>>((obj, value, index) => {
                 if (isResultSetContentValue(value) && value.blob) {
-                  return obj;
-                }
-                if (value !== update.source![index]) {
+                  if (value.fileId) {
+                    obj[index] = createResultSetContentValue({
+                      fileId: value.fileId,
+                      contentType: value.blob.type,
+                      contentLength: value.blob.size,
+                    });
+                  }
+                } else if (value !== update.source![index]) {
                   obj[index] = value;
                 }
                 return obj;

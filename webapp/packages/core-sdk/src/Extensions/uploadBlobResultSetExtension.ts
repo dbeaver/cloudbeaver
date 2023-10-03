@@ -9,50 +9,22 @@ import { GlobalConstants } from '@cloudbeaver/core-utils';
 
 import type { CustomGraphQLClient, UploadProgressEvent } from '../CustomGraphQLClient';
 
-export interface IResultSetUploadingBlob {
-  data: Array<any>;
-  index: number;
-  blob: Blob;
-}
-
 export interface IUploadDriverLibraryExtension {
-  uploadBlobResultSet: (
-    projectId: string,
-    connectionId: string,
-    contextId: string,
-    resultsId: string,
-
-    data: IResultSetUploadingBlob,
-    onUploadProgress?: (event: UploadProgressEvent) => void,
-  ) => Promise<void>;
+  uploadBlobResultSet: (fileId: string, data: Blob, onUploadProgress?: (event: UploadProgressEvent) => void) => Promise<void>;
 }
 
 export function uploadBlobResultSetExtension(client: CustomGraphQLClient): IUploadDriverLibraryExtension {
   return {
-    uploadBlobResultSet(
-      projectId: string,
-      connectionId: string,
-      contextId: string,
-      resultsId: string,
-
-      data: IResultSetUploadingBlob,
-      onUploadProgress?: (event: UploadProgressEvent) => void,
-    ): Promise<void> {
+    uploadBlobResultSet(fileId: string, data: Blob, onUploadProgress?: (event: UploadProgressEvent) => void): Promise<void> {
       const ds = new DataTransfer();
-      if (data.blob instanceof File) {
-        ds.items.add(data.blob);
+      if (data instanceof File) {
+        ds.items.add(data);
       } else {
-        ds.items.add(new File([data.blob], 'file'));
+        ds.items.add(new File([data], 'file'));
       }
 
       // api/resultset/blob
-      return client.uploadFile(
-        GlobalConstants.absoluteServiceUrl('resultset', 'blob'),
-        ds.files,
-        undefined,
-        { projectId, connectionId, contextId, resultsId, data: data.data, index: data.index },
-        onUploadProgress,
-      );
+      return client.uploadFile(GlobalConstants.absoluteServiceUrl('resultset', 'blob'), ds.files, undefined, { fileId }, onUploadProgress);
     },
   };
 }
