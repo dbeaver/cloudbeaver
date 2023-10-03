@@ -143,7 +143,7 @@ export class QueryDataSource<TOptions extends IDataQueryOptions = IDataQueryOpti
           );
 
           if (responseResult) {
-            editor.applyPartialUpdate(responseResult);
+            editor.applyUpdate(responseResult);
           }
         }
 
