@@ -211,8 +211,7 @@ public class WebSQLProcessor implements WebSessionProvider {
                         DBCStatementType.SCRIPT,
                         sqlQuery,
                         webDataFilter.getOffset(),
-                        webDataFilter.getLimit()))
-                    {
+                        webDataFilter.getLimit())) {
                         SqlOutputLogReaderJob sqlOutputLogReaderJob = null;
                         if (readLogs) {
                             DBPDataSource dataSource = context.getDataSource();
@@ -452,8 +451,7 @@ public class WebSQLProcessor implements WebSessionProvider {
         @Nullable WebDataFormat dataFormat,
         @NotNull Map<DBSDataManipulator.ExecuteBatch, Object[]> resultBatches,
         @Nullable DBDDataReceiver keyReceiver)
-        throws DBException
-    {
+        throws DBException {
 
         DBSEntity dataContainer = rowIdentifier.getEntity();
         checkDataEditAllowed(dataContainer);
@@ -553,13 +551,18 @@ public class WebSQLProcessor implements WebSessionProvider {
                     for (int i = 0; i < allAttributes.length; i++) {
                         if (addedValues.get(i) != null) {
                             Object realCellValue;
-                            if (row.getUpdateValues().get(i) != null) {
-                                Path path = WebSQLFileLoaderServlet.DATA_FOLDER_UPLOAD
-                                    .resolve(webSession.getSessionId())
-                                    .resolve(row.getUpdateValues().get(i).toString());
+                            if (addedValues.get(i) instanceof LinkedTreeMap) {
+                                LinkedTreeMap<String, Object> variables = (LinkedTreeMap<String, Object>) addedValues.get(i);
+                                if (variables.get("fileId") != null) {
+                                    Path path = WebSQLFileLoaderServlet.DATA_FOLDER_UPLOAD
+                                        .resolve(webSession.getSessionId())
+                                        .resolve(variables.get("fileId").toString());
 
-                                byte[] file = Files.readAllBytes(path);
-                                realCellValue = convertInputCellValue(session, allAttributes[i], file, withoutExecution);
+                                    byte[] file = Files.readAllBytes(path);
+                                    realCellValue = convertInputCellValue(session, allAttributes[i], file, withoutExecution);
+                                } else {
+                                    continue;
+                                }
                             } else {
                                 realCellValue = convertInputCellValue(session, allAttributes[i],
                                     addedValues.get(i), withoutExecution);
@@ -618,8 +621,7 @@ public class WebSQLProcessor implements WebSessionProvider {
         DBCSession session,
         DBSDocumentLocator dataContainer,
         WebSQLResultsInfo resultsInfo,
-        WebSQLResultsRow row) throws DBException
-    {
+        WebSQLResultsRow row) throws DBException {
         // Document reference
         DBDDocument document = null;
         Map<String, Object> keyMap = new LinkedHashMap<>();
