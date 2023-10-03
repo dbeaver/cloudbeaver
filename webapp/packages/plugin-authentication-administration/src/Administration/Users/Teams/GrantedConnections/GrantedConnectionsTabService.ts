@@ -86,6 +86,12 @@ export class GrantedConnectionsTabService extends Bootstrap {
       return;
     }
 
+    const globalProject = this.projectInfoResource.values.find(isGlobalProject);
+
+    if (!globalProject) {
+      throw new Error('The global project does not exist');
+    }
+
     const grantInfo = await this.teamsResource.getSubjectConnectionAccess(config.teamId);
     const initial = grantInfo.map(info => info.connectionId);
 
@@ -100,7 +106,7 @@ export class GrantedConnectionsTabService extends Bootstrap {
     try {
       if (connectionsToRevoke.length > 0) {
         await this.graphQLService.sdk.deleteConnectionsAccess({
-          projectId: 'g_GlobalConfiguration',
+          projectId: globalProject.id,
           subjects: [config.teamId],
           connectionIds: connectionsToRevoke,
         });
@@ -108,7 +114,7 @@ export class GrantedConnectionsTabService extends Bootstrap {
 
       if (connectionsToGrant.length > 0) {
         await this.graphQLService.sdk.addConnectionsAccess({
-          projectId: 'g_GlobalConfiguration',
+          projectId: globalProject.id,
           subjects: [config.teamId],
           connectionIds: connectionsToGrant,
         });

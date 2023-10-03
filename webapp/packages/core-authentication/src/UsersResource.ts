@@ -33,6 +33,7 @@ import { AuthInfoService } from './AuthInfoService';
 import { AuthProviderService } from './AuthProviderService';
 import { EAdminPermission } from './EAdminPermission';
 import type { IAuthCredentials } from './IAuthCredentials';
+import { isGlobalProject, ProjectInfoResource } from '@cloudbeaver/core-projects';
 
 const NEW_USER_SYMBOL = Symbol('new-user');
 
@@ -65,6 +66,7 @@ export class UsersResource extends CachedMapResource<string, AdminUser, UserReso
     private readonly serverConfigResource: ServerConfigResource,
     private readonly authProviderService: AuthProviderService,
     private readonly authInfoService: AuthInfoService,
+    private readonly projectInfoResource: ProjectInfoResource,
     sessionPermissionsResource: SessionPermissionsResource,
   ) {
     super();
@@ -116,16 +118,28 @@ export class UsersResource extends CachedMapResource<string, AdminUser, UserReso
   }
 
   async addConnectionsAccess(userId: string, connectionIds: string[]): Promise<void> {
+    const globalProject = this.projectInfoResource.values.find(isGlobalProject);
+
+    if (!globalProject) {
+      throw new Error('The global project does not exist');
+    }
+
     await this.graphQLService.sdk.addConnectionsAccess({
-      projectId: 'g_GlobalConfiguration',
+      projectId: globalProject.id,
       connectionIds,
       subjects: [userId],
     });
   }
 
   async deleteConnectionsAccess(userId: string, connectionIds: string[]): Promise<void> {
+    const globalProject = this.projectInfoResource.values.find(isGlobalProject);
+
+    if (!globalProject) {
+      throw new Error('The global project does not exist');
+    }
+
     await this.graphQLService.sdk.deleteConnectionsAccess({
-      projectId: 'g_GlobalConfiguration',
+      projectId: globalProject.id,
       connectionIds,
       subjects: [userId],
     });
