@@ -15,7 +15,6 @@ import { s } from './s';
 import { useObjectRef } from './useObjectRef';
 import { useObservableRef } from './useObservableRef';
 import { useS } from './useS';
-import { useStyles } from './useStyles';
 
 type ButtonMod = Array<'raised' | 'unelevated' | 'outlined' | 'secondary'>;
 

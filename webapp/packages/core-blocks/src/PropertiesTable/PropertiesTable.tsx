@@ -11,8 +11,8 @@ import { useCallback, useMemo, useState } from 'react';
 import styled from 'reshadow';
 
 import { Button } from '../Button';
+import ButtonStyles from '../Button.m.css';
 import { Filter } from '../FormControls/Filter';
-import { ButtonStyles } from '../index';
 import { useTranslate } from '../localization/useTranslate';
 import { SContext, StyleRegistry } from '../SContext';
 import { useObjectRef } from '../useObjectRef';
