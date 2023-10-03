@@ -182,9 +182,7 @@ export class ContainerDataSource extends DatabaseDataSource<IDataContainerOption
 
         for (const blob of blobs) {
           const fileId = uuid();
-          try {
-            await this.graphQLService.sdk.uploadBlobResultSet(fileId, blob.blob!);
-          } catch {}
+          await this.graphQLService.sdk.uploadBlobResultSet(fileId, blob.blob!);
           blob.fileId = fileId;
         }
 

@@ -582,7 +582,7 @@ export class ResultSetEditAction extends DatabaseEditAction<IResultSetElementKey
           }
           const addedRows = batch.addedRows as SqlResultRow[];
 
-          addedRows.push({ data: replaceBlobsWithNull(update.update) });
+          addedRows.push({ data: replaceUploadBlobs(update.update) });
           break;
         }
 
@@ -700,6 +700,23 @@ function replaceBlobsWithNull(values: IResultSetValue[]) {
   return values.map(value => {
     if (isResultSetContentValue(value) && value.blob) {
       return null;
+    }
+    return value;
+  });
+}
+
+function replaceUploadBlobs(values: IResultSetValue[]) {
+  return values.map(value => {
+    if (isResultSetContentValue(value) && value.blob) {
+      if (value.fileId) {
+        return createResultSetContentValue({
+          fileId: value.fileId,
+          contentType: value.blob.type,
+          contentLength: value.blob.size,
+        });
+      } else {
+        return null;
+      }
     }
     return value;
   });

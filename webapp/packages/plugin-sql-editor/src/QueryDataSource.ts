@@ -127,9 +127,7 @@ export class QueryDataSource<TOptions extends IDataQueryOptions = IDataQueryOpti
 
         for (const blob of blobs) {
           const fileId = uuid();
-          try {
-            await this.graphQLService.sdk.uploadBlobResultSet(fileId, blob.blob!);
-          } catch {}
+          await this.graphQLService.sdk.uploadBlobResultSet(fileId, blob.blob!);
           blob.fileId = fileId;
         }
 
