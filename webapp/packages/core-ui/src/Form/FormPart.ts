@@ -122,6 +122,10 @@ export abstract class FormPart<TPartState, TFormState = any> implements IFormPar
     await this.load();
   }
 
+  reset() {
+    this.setState(toJS(this.initialState));
+  }
+
   protected setInitialState(initialState: TPartState) {
     this.initialState = initialState;
 
@@ -129,7 +133,11 @@ export abstract class FormPart<TPartState, TFormState = any> implements IFormPar
       return;
     }
 
-    this.state = toJS(this.initialState);
+    this.setState(toJS(this.initialState));
+  }
+
+  protected setState(state: TPartState) {
+    this.state = state;
   }
 
   protected configure(data: IFormState<TFormState>, contexts: IExecutionContextProvider<IFormState<TFormState>>): void | Promise<void> {}
