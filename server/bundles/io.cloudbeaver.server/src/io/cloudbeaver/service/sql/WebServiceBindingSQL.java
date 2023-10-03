@@ -257,7 +257,7 @@ public class WebServiceBindingSQL extends WebServiceBindingBase<DBWServiceSQL> i
         );
         servletContext.addServlet(
             "sqlUploadFile",
-            new WebSQLFileLoaderServlet(application, getServiceImpl()),
+            new WebSQLFileLoaderServlet(application),
             application.getServicesURI() + "resultset/blob/*"
         );
     }

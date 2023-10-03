@@ -20,29 +20,27 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import io.cloudbeaver.DBWConstants;
+import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.server.CBApplication;
 import io.cloudbeaver.server.CBPlatform;
-import io.cloudbeaver.service.WebServiceBindingBase;
 import io.cloudbeaver.service.WebServiceServletBase;
 import org.eclipse.jetty.server.Request;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.data.json.JSONUtils;
-import org.jkiss.utils.CommonUtils;
+import org.jkiss.dbeaver.model.runtime.VoidProgressMonitor;
 
 import javax.servlet.MultipartConfigElement;
+import javax.servlet.ServletException;
 import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.lang.reflect.Type;
+import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.AbstractMap;
-import java.util.List;
 import java.util.Map;
-import java.util.Objects;
-import java.util.stream.Collectors;
 
 @MultipartConfig
 public class WebSQLFileLoaderServlet extends WebServiceServletBase {
@@ -53,17 +51,16 @@ public class WebSQLFileLoaderServlet extends WebServiceServletBase {
     }.getType();
     private static final String REQUEST_PARAM_VARIABLES = "variables";
 
+    public static final Path DATA_FOLDER_UPLOAD =
+        CBPlatform.getInstance().getTempFolder(new VoidProgressMonitor(), "temp-sql-upload-files");
+
     private static final Gson gson = new GsonBuilder()
         .serializeNulls()
         .setPrettyPrinting()
         .create();
 
-    private final DBWServiceSQL dbwServiceSQL;
-
-    public WebSQLFileLoaderServlet(CBApplication application,
-                                   DBWServiceSQL dbwServiceSQL) {
+    public WebSQLFileLoaderServlet(CBApplication application) {
         super(application);
-        this.dbwServiceSQL = dbwServiceSQL;
     }
 
     @Override
@@ -81,50 +78,23 @@ public class WebSQLFileLoaderServlet extends WebServiceServletBase {
             return;
         }
 
-        Path tempFolder = CBPlatform.getInstance().getTempFolder(session.getProgressMonitor(), "temp-sql-upload-files");
+        Path tempFolder = DATA_FOLDER_UPLOAD.resolve(session.getSessionId());
+
         MultipartConfigElement multiPartConfig = new MultipartConfigElement(tempFolder.toString());
         request.setAttribute(Request.__MULTIPART_CONFIG_ELEMENT, multiPartConfig);
 
         Map<String, Object> variables = gson.fromJson(request.getParameter(REQUEST_PARAM_VARIABLES), MAP_STRING_OBJECT_TYPE);
 
-        String projectId = JSONUtils.getString(variables, "projectId");
-        String connectionId = JSONUtils.getString(variables, "connectionId");
-        String contextId = JSONUtils.getString(variables, "contextId");
-        String resultsId = JSONUtils.getString(variables, "resultsId");
-        String data = JSONUtils.getString(variables, "data");
-        Integer index = JSONUtils.getInteger(variables, "index");
+        String fileId = JSONUtils.getString(variables, "fileId");
 
-        if (projectId == null || connectionId == null || contextId == null || resultsId == null || data == null) {
-            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Missing required parameters");
-            return;
-        }
-
-        WebSQLContextInfo webSQLContextInfo = WebServiceBindingSQL.getSQLContext(
-            WebServiceBindingSQL.getSQLProcessor(WebServiceBindingBase.getWebConnection(session, projectId, connectionId)), contextId);
-
-        try {
-            Map<String, Object> updateValuesMap = request.getParts().stream()
-                .filter(p -> !CommonUtils.isEmpty(p.getSubmittedFileName()))
-                .map(p -> {
-                    try {
-                        return new AbstractMap.SimpleEntry<>(String.valueOf(index), p.getInputStream());
-                    } catch (IOException e) {
-                        log.error("Error reading file contents", e);
-                        return null;
-                    }
-                })
-                .filter(Objects::nonNull)
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
-
-            variables.put("updateValues", updateValuesMap);
-
-            WebSQLResultsRow webSQLResultsRow = new WebSQLResultsRow(variables);
-
-            dbwServiceSQL.writeLobValue(webSQLContextInfo, resultsId, List.of(webSQLResultsRow));
-
-        } catch (Exception e) {
-            log.error("Error processing file upload request", e);
-            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Error processing file upload");
+        if (fileId != null) {
+            Path file = tempFolder.resolve(fileId);
+            try {
+                Files.write(file, request.getPart("files[]").getInputStream().readAllBytes());
+            } catch (ServletException e) {
+                log.error(e.getMessage());
+                throw new DBWebException(e.getMessage());
+            }
         }
     }
 }

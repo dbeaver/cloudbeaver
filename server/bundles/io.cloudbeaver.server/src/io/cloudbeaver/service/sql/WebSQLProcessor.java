@@ -16,6 +16,7 @@
  */
 package io.cloudbeaver.service.sql;
 
+import com.google.gson.internal.LinkedTreeMap;
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.model.WebConnectionInfo;
 import io.cloudbeaver.model.session.WebSession;
@@ -52,7 +53,10 @@ import org.jkiss.dbeaver.utils.GeneralUtils;
 import org.jkiss.utils.ArrayUtils;
 import org.jkiss.utils.CommonUtils;
 
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
@@ -314,8 +318,7 @@ public class WebSQLProcessor implements WebSessionProvider {
         @Nullable List<WebSQLResultsRow> updatedRows,
         @Nullable List<WebSQLResultsRow> deletedRows,
         @Nullable List<WebSQLResultsRow> addedRows,
-        @Nullable WebDataFormat dataFormat) throws DBException
-    {
+        @Nullable WebDataFormat dataFormat) throws DBException {
         List<Object[]> newResultSetRows = new ArrayList<>();
         KeyDataReceiver keyReceiver = new KeyDataReceiver(contextInfo.getResults(resultsId));
         WebSQLResultsInfo resultsInfo = contextInfo.getResults(resultsId);
@@ -404,8 +407,7 @@ public class WebSQLProcessor implements WebSessionProvider {
         @Nullable List<WebSQLResultsRow> updatedRows,
         @Nullable List<WebSQLResultsRow> deletedRows,
         @Nullable List<WebSQLResultsRow> addedRows,
-        @Nullable WebDataFormat dataFormat) throws DBException
-    {
+        @Nullable WebDataFormat dataFormat) throws DBException {
         Map<DBSDataManipulator.ExecuteBatch, Object[]> resultBatches = new LinkedHashMap<>();
 
 
@@ -492,8 +494,19 @@ public class WebSQLProcessor implements WebSessionProvider {
                     Object[] rowValues = new Object[updateAttributes.length + keyAttributes.length];
                     for (int i = 0; i < updateAttributes.length; i++) {
                         DBDAttributeBinding updateAttribute = updateAttributes[i];
-                        Object realCellValue = convertInputCellValue(session, updateAttribute,
-                            updateValues.get(String.valueOf(updateAttribute.getOrdinalPosition())), withoutExecution);
+                        LinkedTreeMap<String, Object> variables =
+                            (LinkedTreeMap<String, Object>) updateValues.get(String.valueOf(updateAttribute.getOrdinalPosition()));
+                        Object realCellValue;
+                        if (variables.get("fileId") != null) {
+                            Path path = WebSQLFileLoaderServlet.DATA_FOLDER_UPLOAD
+                                .resolve(webSession.getSessionId())
+                                .resolve(variables.get("fileId").toString());
+
+                            byte[] file = Files.readAllBytes(path);
+                            realCellValue = convertInputCellValue(session, updateAttribute, file, withoutExecution);
+                        } else {
+                            realCellValue = convertInputCellValue(session, updateAttribute, variables, withoutExecution);
+                        }
                         rowValues[i] = realCellValue;
                         finalRow[updateAttribute.getOrdinalPosition()] = realCellValue;
                     }
@@ -539,8 +552,18 @@ public class WebSQLProcessor implements WebSessionProvider {
 
                     for (int i = 0; i < allAttributes.length; i++) {
                         if (addedValues.get(i) != null) {
-                            Object realCellValue = convertInputCellValue(session, allAttributes[i],
-                                addedValues.get(i), withoutExecution);
+                            Object realCellValue;
+                            if (row.getUpdateValues().get(i) != null) {
+                                Path path = WebSQLFileLoaderServlet.DATA_FOLDER_UPLOAD
+                                    .resolve(webSession.getSessionId())
+                                    .resolve(row.getUpdateValues().get(i).toString());
+
+                                byte[] file = Files.readAllBytes(path);
+                                realCellValue = convertInputCellValue(session, allAttributes[i], file, withoutExecution);
+                            } else {
+                                realCellValue = convertInputCellValue(session, allAttributes[i],
+                                    addedValues.get(i), withoutExecution);
+                            }
                             insertAttributes.put(allAttributes[i], realCellValue);
                             finalRow[i] = realCellValue;
                         }
@@ -583,6 +606,8 @@ public class WebSQLProcessor implements WebSessionProvider {
                     resultBatches.put(deleteBatch, new Object[0]);
                 }
             }
+        } catch (IOException e) {
+            throw new DBWebException(e.getMessage());
         }
 
         return dataManipulator;
@@ -741,16 +766,6 @@ public class WebSQLProcessor implements WebSessionProvider {
             }
         }
     }
-
-    public void writeLobValue(
-        @NotNull DBRProgressMonitor monitor,
-        @NotNull WebSQLContextInfo contextInfo,
-        @NotNull String resultsId,
-        @Nullable List<WebSQLResultsRow> row
-    ) throws DBException {
-        updateResultsDataBatch(monitor, contextInfo, resultsId, row, null, null, null);
-    }
-
     ////////////////////////////////////////////////
     // Misc
 

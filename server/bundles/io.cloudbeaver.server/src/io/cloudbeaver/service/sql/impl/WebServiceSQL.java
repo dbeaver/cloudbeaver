@@ -343,29 +343,6 @@ public class WebServiceSQL implements DBWServiceSQL {
     }
 
     @Override
-    public void writeLobValue(
-        @NotNull WebSQLContextInfo contextInfo,
-        @NotNull String resultsId,
-        @Nullable List<WebSQLResultsRow> row) throws DBWebException {
-        try {
-            DBExecUtils.tryExecuteRecover(
-                contextInfo.getProcessor().getWebSession().getProgressMonitor(),
-                contextInfo.getProcessor().getConnection().getDataSource(),
-                monitor -> {
-                    try {
-                        contextInfo.getProcessor().writeLobValue(monitor, contextInfo, resultsId, row);
-                    } catch (Exception e) {
-                        throw new InvocationTargetException(e);
-                    }
-                }
-            );
-        } catch (DBException e) {
-            throw new DBWebException("Error writing LOB value ", e);
-        }
-    }
-
-
-    @Override
     public String updateResultsDataBatchScript(@NotNull WebSQLContextInfo contextInfo, @NotNull String resultsId, @Nullable List<WebSQLResultsRow> updatedRows, @Nullable List<WebSQLResultsRow> deletedRows, @Nullable List<WebSQLResultsRow> addedRows, WebDataFormat dataFormat) throws DBWebException {
         try {
             return contextInfo.getProcessor().generateResultsDataUpdateScript(
