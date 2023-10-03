@@ -43,6 +43,9 @@ import org.jkiss.dbeaver.model.runtime.VoidProgressMonitor;
 import org.jkiss.dbeaver.model.security.SMController;
 import org.jkiss.dbeaver.model.security.SMObjectType;
 import org.jkiss.dbeaver.model.sql.DBQuotaException;
+import org.jkiss.dbeaver.model.websocket.event.MessageType;
+import org.jkiss.dbeaver.model.websocket.event.WSEventType;
+import org.jkiss.dbeaver.model.websocket.event.WSSessionLogUpdatedEvent;
 import org.jkiss.dbeaver.registry.*;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.utils.ArrayUtils;
@@ -958,7 +961,19 @@ public class LocalResourceController implements RMController {
 
     protected <T> T doProjectOperation(String projectId, RMFileOperation<T> operation) throws DBException {
         for (RMFileOperationHandler fileHandler : fileHandlers) {
-            fileHandler.projectOpened(projectId);
+            try {
+                fileHandler.projectOpened(projectId);
+            } catch (Exception e) {
+                if (credentialsProvider.getActiveUserCredentials() != null) {
+                    WebAppUtils.getWebApplication().getEventController().addEvent(
+                        new WSSessionLogUpdatedEvent(
+                            WSEventType.SESSION_LOG_UPDATED,
+                            credentialsProvider.getActiveUserCredentials().getSmSessionId(),
+                            credentialsProvider.getActiveUserCredentials().getUserId(),
+                            MessageType.ERROR,
+                            e.getMessage()));
+                }
+            }
         }
         return operation.doOperation();
     }
@@ -968,6 +983,15 @@ public class LocalResourceController implements RMController {
             try {
                 fileHandler.beforeFileRead(projectId, file);
             } catch (Exception e) {
+                if (credentialsProvider.getActiveUserCredentials() != null) {
+                    WebAppUtils.getWebApplication().getEventController().addEvent(
+                        new WSSessionLogUpdatedEvent(
+                            WSEventType.SESSION_LOG_UPDATED,
+                            credentialsProvider.getActiveUserCredentials().getSmSessionId(),
+                            credentialsProvider.getActiveUserCredentials().getUserId(),
+                            MessageType.ERROR,
+                            e.getMessage()));
+                }
                 log.error("Error before file reading", e);
             }
         }

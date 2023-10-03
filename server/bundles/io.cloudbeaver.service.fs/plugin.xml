@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.2"?>
+
+<plugin>
+
+    <extension point="io.cloudbeaver.service">
+        <service id="file.system" label="File system" description="File system services"
+                 class="io.cloudbeaver.service.fs.WebServiceBindingFS">
+        </service>
+    </extension>
+
+</plugin>

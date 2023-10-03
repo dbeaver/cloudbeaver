@@ -14,12 +14,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.cloudbeaver.model.rm.fs.nio;
+package io.cloudbeaver.service.rm.nio;
 
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.nio.NIOPath;
+import org.jkiss.utils.ArrayUtils;
 import org.jkiss.utils.CommonUtils;
 
 import java.io.IOException;
@@ -58,7 +59,7 @@ public class RMPath extends NIOPath {
 
     @Override
     public Path getRoot() {
-        if (isProjectPath()) {
+        if (isProjectPath() || isRmRootPath()) {
             return null;
         }
         return new RMPath(rmNioFileSystem);
@@ -66,13 +67,16 @@ public class RMPath extends NIOPath {
 
     @Override
     public Path getFileName() {
-        return this;
+        var parts = pathParts();
+        if (ArrayUtils.isEmpty(parts)) {
+            return this;
+        }
+        return new RMPath(rmNioFileSystem, parts[parts.length - 1]);
     }
 
     @Override
     public Path getParent() {
-        // project is root and have no parent
-        if (isProjectPath()) {
+        if (isRmRootPath() || isProjectPath()) {
             return null;
         }
 
@@ -88,14 +92,6 @@ public class RMPath extends NIOPath {
     @Override
     public int getNameCount() {
         return pathParts().length;
-    }
-
-    @Override
-    public boolean startsWith(@NotNull Path other) {
-        if (!(other instanceof RMPath)) {
-            return false;
-        }
-        return toString().startsWith(other.toString());
     }
 
     @Override
@@ -127,8 +123,11 @@ public class RMPath extends NIOPath {
     public URI toUri() {
         var fileSystem = getFileSystem();
         var uriBuilder = new StringBuilder(fileSystem.provider().getScheme())
-            .append("://")
-            .append(rmProjectId);
+            .append("://");
+
+        if (rmProjectId != null) {
+            uriBuilder.append(rmProjectId);
+        }
 
         String rmResourcePath = getResourcePath();
         if (rmResourcePath != null) {
