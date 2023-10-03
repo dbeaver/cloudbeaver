@@ -68,6 +68,7 @@ import org.jkiss.dbeaver.model.security.SMController;
 import org.jkiss.dbeaver.model.security.SMObjectType;
 import org.jkiss.dbeaver.model.security.user.SMObjectPermissions;
 import org.jkiss.dbeaver.model.sql.DBQuotaException;
+import org.jkiss.dbeaver.model.websocket.event.MessageType;
 import org.jkiss.dbeaver.model.websocket.event.WSEventType;
 import org.jkiss.dbeaver.model.websocket.event.WSSessionLogUpdatedEvent;
 import org.jkiss.dbeaver.registry.DataSourceDescriptor;
@@ -726,15 +727,20 @@ public class WebSession extends BaseWebSession
         synchronized (sessionMessages) {
             sessionMessages.add(message);
         }
-        addSessionEvent(new WSSessionLogUpdatedEvent());
+        addSessionEvent(new WSSessionLogUpdatedEvent(
+            WSEventType.SESSION_LOG_UPDATED,
+            this.userContext.getSmSessionId(),
+            this.userContext.getUserId(),
+            MessageType.ERROR,
+            message.getMessage()));
     }
 
     public void addInfoMessage(String message) {
-        addSessionMessage(new WebServerMessage(WebServerMessage.MessageType.INFO, message));
+        addSessionMessage(new WebServerMessage(MessageType.INFO, message));
     }
 
     public void addWarningMessage(String message) {
-        addSessionMessage(new WebServerMessage(WebServerMessage.MessageType.WARNING, message));
+        addSessionMessage(new WebServerMessage(MessageType.WARNING, message));
     }
 
     public List<WebServerMessage> readLog(Integer maxEntries, Boolean clearLog) {

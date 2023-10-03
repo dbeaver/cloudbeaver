@@ -17,25 +17,16 @@
 package io.cloudbeaver.model;
 
 import io.cloudbeaver.utils.CBModelConstants;
+import org.jkiss.dbeaver.model.websocket.event.MessageType;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
 
 /**
  * Web server message
  */
 public class WebServerMessage {
-
-
-    public enum MessageType {
-        DEBUG,
-        INFO,
-        WARNING,
-        ERROR
-    }
 
     private final MessageType type;
     private final Instant time;
