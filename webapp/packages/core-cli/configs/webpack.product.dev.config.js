@@ -76,7 +76,7 @@ module.exports = (env, argv) => {
         const logger = devServer.compiler.getInfrastructureLogger('webpack-dev-server');
         const port = devServer.server.address().port;
         logger.info(`Proxy from http://localhost:8080 to http://127.0.0.1:${port}`);
-        httpProxy.createProxyServer({ target:`http://127.0.0.1:${port}` }).listen(8080);
+        httpProxy.createProxyServer({ target:`http://127.0.0.1:${port}`, secure: false }).listen(8080);
       },
     },
     devtool: 'source-map',

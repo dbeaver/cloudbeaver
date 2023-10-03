@@ -18,8 +18,10 @@ import {
   SqlQueryResults,
   UpdateResultsDataBatchMutationVariables,
 } from '@cloudbeaver/core-sdk';
+import { uuid } from '@cloudbeaver/core-utils';
 
 import { DocumentEditAction } from './DatabaseDataModel/Actions/Document/DocumentEditAction';
+import type { IResultSetContentValue } from './DatabaseDataModel/Actions/ResultSet/IResultSetContentValue';
 import { ResultSetEditAction } from './DatabaseDataModel/Actions/ResultSet/ResultSetEditAction';
 import { DatabaseDataSource } from './DatabaseDataModel/DatabaseDataSource';
 import type { IDatabaseDataOptions } from './DatabaseDataModel/IDatabaseDataOptions';
@@ -154,30 +156,43 @@ export class ContainerDataSource extends DatabaseDataSource<IDataContainerOption
           continue;
         }
         const executionContextInfo = executionContext.context!;
+        const projectId = executionContextInfo.projectId;
+        const connectionId = executionContextInfo.connectionId;
+        const contextId = executionContextInfo.id;
+        const resultsId = result.id;
+
         const updateVariables: UpdateResultsDataBatchMutationVariables = {
-          projectId: executionContextInfo.projectId,
-          connectionId: executionContextInfo.connectionId,
-          contextId: executionContextInfo.id,
-          resultsId: result.id,
+          projectId,
+          connectionId,
+          contextId,
+          resultsId,
         };
         let editor: ResultSetEditAction | DocumentEditAction | undefined;
 
         if (result.dataFormat === ResultDataFormat.Resultset) {
           editor = this.actions.get(result, ResultSetEditAction);
-          editor.fillBatch(updateVariables);
         } else if (result.dataFormat === ResultDataFormat.Document) {
           editor = this.actions.get(result, DocumentEditAction);
+        }
+
+        let blobs: IResultSetContentValue[] = [];
+        if (editor instanceof ResultSetEditAction) {
+          blobs = editor.getBlobsToUpload();
+        }
+
+        for (const blob of blobs) {
+          const fileId = uuid();
+          try {
+            await this.graphQLService.sdk.uploadBlobResultSet(fileId, blob.blob!);
+          } catch {}
+          blob.fileId = fileId;
+        }
+
+        if (editor) {
           editor.fillBatch(updateVariables);
         }
 
         const response = await this.graphQLService.sdk.updateResultsDataBatch(updateVariables);
-
-        this.requestInfo = {
-          ...this.requestInfo,
-          requestDuration: response.result.duration,
-          requestMessage: 'Saved successfully',
-          source: null,
-        };
 
         if (editor) {
           const responseResult = this.transformResults(executionContextInfo, response.result.results, 0).find(
@@ -185,10 +200,18 @@ export class ContainerDataSource extends DatabaseDataSource<IDataContainerOption
           );
 
           if (responseResult) {
-            editor.applyUpdate(responseResult);
+            editor.applyPartialUpdate(responseResult);
           }
         }
+
+        this.requestInfo = {
+          ...this.requestInfo,
+          requestDuration: response.result.duration,
+          requestMessage: 'Saved successfully',
+          source: null,
+        };
       }
+
       this.clearError();
     } catch (exception: any) {
       this.error = exception;

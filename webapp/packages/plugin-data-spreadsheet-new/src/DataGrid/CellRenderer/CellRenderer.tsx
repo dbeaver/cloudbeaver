@@ -90,6 +90,10 @@ export const CellRenderer = observer<CellRendererProps<IResultSetRowKey, unknown
       return false;
     }
 
+    if (tableDataContext.format.isBinary(cellContext.cell)) {
+      return false;
+    }
+
     const resultColumn = tableDataContext.getColumnInfo(cellContext.cell.column);
     const value = tableDataContext.getCellValue(cellContext.cell);
 

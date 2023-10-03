@@ -20,8 +20,8 @@ import type { IResultSetContentValue } from '../../DatabaseDataModel/Actions/Res
 import { isResultSetContentValue } from '../../DatabaseDataModel/Actions/ResultSet/isResultSetContentValue';
 import { ResultSetDataContentAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetDataContentAction';
 import { ResultSetDataKeysUtils } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetDataKeysUtils';
+import { ResultSetFormatAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetFormatAction';
 import { ResultSetSelectAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetSelectAction';
-import { ResultSetViewAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetViewAction';
 import type { IDatabaseResultSet } from '../../DatabaseDataModel/IDatabaseResultSet';
 import type { IDataValuePanelProps } from '../../TableViewer/ValuePanel/DataValuePanelService';
 import { QuotaPlaceholder } from '../QuotaPlaceholder';
@@ -107,18 +107,22 @@ export const ImageValuePresentation: TabContainerPanelComponent<IDataValuePanelP
           return selection.elements[0] || focusCell;
         },
         get cellValue() {
-          const view = this.model.source.getAction(this.resultIndex, ResultSetViewAction);
-          const cellValue = view.getCellValue(this.selectedCell);
+          const format = this.model.source.getAction(this.resultIndex, ResultSetFormatAction);
 
-          return cellValue;
+          return format.get(this.selectedCell);
         },
         get src() {
           if (this.savedSrc) {
             return this.savedSrc;
           }
 
-          if (isResultSetContentValue(this.cellValue) && this.cellValue.binary) {
-            return `data:${getMIME(this.cellValue.binary)};base64,${this.cellValue.binary}`;
+          if (isResultSetContentValue(this.cellValue)) {
+            if (this.cellValue.binary) {
+              return `data:${getMIME(this.cellValue.binary)};base64,${this.cellValue.binary}`;
+            }
+            if (this.cellValue.blob) {
+              return URL.createObjectURL(this.cellValue.blob);
+            }
           } else if (typeof this.cellValue === 'string' && isValidUrl(this.cellValue) && isImageFormat(this.cellValue)) {
             return this.cellValue;
           }
@@ -136,7 +140,15 @@ export const ImageValuePresentation: TabContainerPanelComponent<IDataValuePanelP
           return !!this.src;
         },
         get truncated() {
-          return isResultSetContentValue(this.cellValue) && content.isContentTruncated(this.cellValue);
+          if (isResultSetContentValue(this.cellValue)) {
+            if (this.cellValue.binary) {
+              return content.isContentTruncated(this.cellValue);
+            }
+            if (this.cellValue.blob) {
+              return false;
+            }
+          }
+          return false;
         },
         stretch: false,
         toggleStretch() {

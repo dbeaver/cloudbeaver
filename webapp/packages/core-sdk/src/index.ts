@@ -1,5 +1,6 @@
 export * from './AsyncTask/AsyncTask';
 export * from './AsyncTask/AsyncTaskInfoService';
+export * from './Extensions/uploadBlobResultSetExtension';
 export * from './Resource/CachedDataResource';
 export * from './Resource/CachedMapResource';
 export * from './Resource/CachedResource';

@@ -17,8 +17,8 @@ export const ResultSetDataKeysUtils = {
   serialize(key: IResultSetColumnKey | IResultSetRowKey): string {
     let base = `${key.index}`;
 
-    if ('key' in key) {
-      base += `_${key.key}`;
+    if ('subIndex' in key) {
+      base += `.${key.subIndex}`;
     }
 
     return base;
@@ -28,14 +28,14 @@ export const ResultSetDataKeysUtils = {
       return false;
     }
 
-    const keyA = 'key' in a;
-    const keyB = 'key' in b;
+    const keyA = 'subIndex' in a;
+    const keyB = 'subIndex' in b;
 
     if (keyA !== keyB) {
       return false;
     }
 
-    if (keyA && (a as IResultSetRowKey).key !== (b as IResultSetRowKey).key) {
+    if (keyA && (a as IResultSetRowKey).subIndex !== (b as IResultSetRowKey).subIndex) {
       return false;
     }
 

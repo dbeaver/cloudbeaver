@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-export function blobToData(blob: Blob | File): Promise<string | null> {
+export function blobToBase64(blob: Blob | File, slice?: number): Promise<string | null> {
   return new Promise((resolve, reject) => {
     const fileReader = new FileReader();
     fileReader.onload = () => {
@@ -15,6 +15,10 @@ export function blobToData(blob: Blob | File): Promise<string | null> {
     fileReader.onerror = () => {
       reject(fileReader.error);
     };
+
+    if (slice) {
+      blob = blob.slice(0, slice);
+    }
 
     fileReader.readAsDataURL(blob);
   });

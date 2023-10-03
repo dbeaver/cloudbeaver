@@ -10,7 +10,7 @@ import { ReactNode, useContext, useState } from 'react';
 import styled, { css } from 'reshadow';
 
 import type { ComponentStyle } from '@cloudbeaver/core-theming';
-import { blobToData, bytesToSize } from '@cloudbeaver/core-utils';
+import { blobToBase64, bytesToSize } from '@cloudbeaver/core-utils';
 
 import { Button } from '../Button';
 import { filterLayoutFakeProps, getLayoutProps } from '../Containers/filterLayoutFakeProps';
@@ -152,7 +152,7 @@ export const InputFileTextContent: InputFileTextContentType = observer(function 
       try {
         validateFileSize(file.size);
 
-        const value = await blobToData(file);
+        const value = await blobToBase64(file);
 
         if (value) {
           setSelected(file);

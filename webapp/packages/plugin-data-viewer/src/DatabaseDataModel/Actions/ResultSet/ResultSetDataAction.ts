@@ -43,6 +43,7 @@ export class ResultSetDataAction extends DatabaseDataAction<any, IDatabaseResult
     return {
       row: {
         index: 0,
+        subIndex: 0,
       },
       column: {
         index: 0,
@@ -55,7 +56,7 @@ export class ResultSetDataAction extends DatabaseDataAction<any, IDatabaseResult
       const index = row.index + shift;
       this.result.data.rows.splice(index, 0, value);
 
-      return { index };
+      return { index, subIndex: 0 };
     }
 
     return undefined;
@@ -66,7 +67,7 @@ export class ResultSetDataAction extends DatabaseDataAction<any, IDatabaseResult
       const index = row.index + shift;
       this.result.data.rows.splice(index, 1);
 
-      return { index: index - 1 };
+      return { index: index - 1, subIndex: 0 };
     }
     return undefined;
   }
