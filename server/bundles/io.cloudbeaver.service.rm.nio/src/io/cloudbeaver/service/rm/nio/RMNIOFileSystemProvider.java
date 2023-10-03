@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.cloudbeaver.model.rm.fs.nio;
+package io.cloudbeaver.service.rm.nio;
 
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.DBException;
@@ -53,8 +53,8 @@ public class RMNIOFileSystemProvider extends NIOFileSystemProvider {
     }
 
     @Override
-    public FileSystem newFileSystem(URI uri, Map<String, ?> env) throws IOException {
-        throw new FileAlreadyExistsException("RM file system already exist");
+    public FileSystem newFileSystem(URI uri, Map<String, ?> env) {
+        return getFileSystem(uri);
     }
 
     @Override
@@ -65,7 +65,7 @@ public class RMNIOFileSystemProvider extends NIOFileSystemProvider {
             projectId = null;
         }
         try {
-            return new RMNIOFileSystem(projectId, rmController, this);
+            return new RMNIOFileSystem(projectId, this);
         } catch (Exception e) {
             throw new FileSystemNotFoundException("RM file system not found: " + e.getMessage());
         }
@@ -78,7 +78,7 @@ public class RMNIOFileSystemProvider extends NIOFileSystemProvider {
         if (CommonUtils.isEmpty(projectId)) {
             projectId = null;
         }
-        RMNIOFileSystem rmNioFileSystem = new RMNIOFileSystem(projectId, rmController, this);
+        RMNIOFileSystem rmNioFileSystem = new RMNIOFileSystem(projectId, this);
         String resourcePath = uri.getPath();
         if (CommonUtils.isNotEmpty(resourcePath) && projectId == null) {
             throw new IllegalArgumentException("Project is not specified in URI");
@@ -91,10 +91,11 @@ public class RMNIOFileSystemProvider extends NIOFileSystemProvider {
     }
 
     @Override
-    public RMByteArrayChannel newByteChannel(Path path, Set<? extends OpenOption> options, FileAttribute<?>... attrs) throws IOException {
+    public RMByteArrayChannel newByteChannel(Path path, Set<? extends OpenOption> options, FileAttribute<?>... attrs)
+        throws IOException {
         RMPath rmPath = (RMPath) path;
-        if (rmPath.isProjectPath()) {
-            throw new IllegalArgumentException("Cannot open channel for the project");
+        if (Files.isDirectory(rmPath)) {
+            throw new IllegalArgumentException("Cannot open channel for a folder");
         }
 
         try {
@@ -115,7 +116,8 @@ public class RMNIOFileSystemProvider extends NIOFileSystemProvider {
     }
 
     @Override
-    public DirectoryStream<Path> newDirectoryStream(Path dir, DirectoryStream.Filter<? super Path> filter) throws IOException {
+    public DirectoryStream<Path> newDirectoryStream(Path dir, DirectoryStream.Filter<? super Path> filter)
+        throws IOException {
         RMPath rmDir = (RMPath) dir;
         String rmDirPath = rmDir.getResourcePath();
         String separator = rmDir.getFileSystem().getSeparator();
@@ -130,7 +132,6 @@ public class RMNIOFileSystemProvider extends NIOFileSystemProvider {
                             .map(rmProject -> (Path) new RMPath(
                                     new RMNIOFileSystem(
                                         rmProject.getId(),
-                                        rmController,
                                         RMNIOFileSystemProvider.this
                                     )
                                 )
@@ -166,6 +167,9 @@ public class RMNIOFileSystemProvider extends NIOFileSystemProvider {
     public void createDirectory(Path dir, FileAttribute<?>... attrs) throws IOException {
         RMPath rmDir = (RMPath) dir;
         try {
+            if (rmDir.isRmRootPath()) {
+                return;
+            }
             if (rmDir.isProjectPath()) {
                 rmController.createProject(RMUtils.getProjectName(rmDir.getRmProjectId()), null);
             } else {
@@ -180,7 +184,7 @@ public class RMNIOFileSystemProvider extends NIOFileSystemProvider {
     public void delete(Path path) throws IOException {
         RMPath rmPath = (RMPath) path;
         if (rmPath.isRmRootPath()) {
-            throw new IOException("Can not delete root rm directory");
+            throw new IOException("Cannot delete root rm dir:" + path);
         }
         try {
             String rmProjectId = rmPath.getRmProjectId();
@@ -205,7 +209,9 @@ public class RMNIOFileSystemProvider extends NIOFileSystemProvider {
         RMPath rmSource = (RMPath) source;
         RMPath rmTarget = (RMPath) target;
         try {
-            rmController.moveResource(rmSource.getRmProjectId(), rmSource.getResourcePath(), rmTarget.getResourcePath());
+            rmController.moveResource(rmSource.getRmProjectId(),
+                rmSource.getResourcePath(),
+                rmTarget.getResourcePath());
         } catch (DBException e) {
             throw new IOException("Failed to move rm resource:  " + e.getMessage(), e);
         }
@@ -225,25 +231,19 @@ public class RMNIOFileSystemProvider extends NIOFileSystemProvider {
     @Override
     public FileStore getFileStore(Path path) throws IOException {
         RMPath rmPath = (RMPath) path;
-        if (rmPath.isProjectPath()) {
-            return new RMNIOProjectFileStore(rmPath.getFileSystem().getRmProject());
-        } else {
-            try {
-                RMResource rmResource = rmController.getResource(rmPath.getRmProjectId(), rmPath.getResourcePath());
-                if (rmResource == null) {
-                    throw new FileNotFoundException();
-                }
-                return new RMNIOResourceFileStore(rmResource);
-            } catch (DBException e) {
-                throw new IOException("Failed to ");
-            }
+        if (rmPath.isRmRootPath()) {
+            throw new IllegalArgumentException("Cannot create file store for path: " + path);
         }
+        return new RMNIOProjectFileStore(rmPath.getFileSystem().getRmProject());
     }
 
     @Override
     public void checkAccess(Path path, AccessMode... modes) throws IOException {
         RMPath rmPath = (RMPath) path;
         try {
+            if (rmPath.isRmRootPath()) {
+                return;
+            }
             if (rmPath.isProjectPath()) {
                 if (rmController.getProject(rmPath.getRmProjectId(), false, false) == null) {
                     // we should throw error, otherwise Files.exists return true
@@ -272,8 +272,8 @@ public class RMNIOFileSystemProvider extends NIOFileSystemProvider {
                     return type.cast(new RMRootBasicAttribute());
                 }
                 if (rmPath.isProjectPath()) {
-                    boolean projectNotExist = rmController.getProject(rmPath.getRmProjectId(), false, false) == null;
-                    if (projectNotExist) {
+                    boolean projectExist = rmController.getProject(rmPath.getRmProjectId(), false, false) != null;
+                    if (!projectExist) {
                         throw new FileNotFoundException();
                     }
                     return type.cast(new RMRootBasicAttribute());
@@ -289,5 +289,10 @@ public class RMNIOFileSystemProvider extends NIOFileSystemProvider {
             }
         }
         return null;
+    }
+
+    @NotNull
+    public RMController getRmController() {
+        return rmController;
     }
 }

@@ -1,0 +1,34 @@
+type FSFile @since(version: "23.2.2") {
+    name: String!
+    length: Int!
+    folder: Boolean!
+    metaData: Object!
+}
+
+extend type Query @since(version: "23.2.2") {
+    fsListFileSystems(projectId: ID!): [String!]!
+
+    fsFile(projectId: ID!, fileURI: String!):  FSFile!
+
+    fsListFiles(projectId: ID!, folderURI: String!): [FSFile!]!
+
+    # Reads file contents as string in UTF-8
+    fsReadFileContentAsString(projectId: ID!, fileURI: String!): String!
+}
+
+extend type Mutation @since(version: "23.2.2") {
+    fsCreateFile(projectId: ID!, fileURI:String!): FSFile!
+
+    fsCreateFolder(projectId: ID!, folderURI:String!): FSFile!
+
+    fsDeleteFile(projectId: ID!, fileURI:String!): Boolean!
+
+    fsMoveFile(projectId: ID!, fromURI: String!, toURI: String!): FSFile!
+
+    fsWriteFileStringContent(
+        projectId: ID!,
+        fileURI:String!,
+        data: String!,
+        forceOverwrite: Boolean!
+    ): Boolean!
+}

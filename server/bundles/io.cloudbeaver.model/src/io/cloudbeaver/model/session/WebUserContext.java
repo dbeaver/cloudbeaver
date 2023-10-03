@@ -115,11 +115,7 @@ public class WebUserContext implements SMCredentialsProvider {
         );
         setRefreshToken(smRefreshToken);
         setUserPermissions(smAuthPermissions.getPermissions());
-        this.securityController = application.createSecurityController(this);
         this.adminSecurityController = application.getAdminSecurityController(this);
-        this.secretController = application.getSecretController(this);
-        this.rmController = application.createResourceController(this, workspace);
-        this.fileController = application.createFileController(this);
         if (isSessionChanged) {
             this.smSessionId = smAuthPermissions.getSessionId();
             setUser(smAuthPermissions.getUserId() == null ? null : new WebUser(securityController.getCurrentUser()));

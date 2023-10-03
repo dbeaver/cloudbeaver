@@ -51,6 +51,7 @@ import org.jkiss.dbeaver.model.app.DBPProject;
 import org.jkiss.dbeaver.model.auth.*;
 import org.jkiss.dbeaver.model.connection.DBPConnectionConfiguration;
 import org.jkiss.dbeaver.model.exec.DBCException;
+import org.jkiss.dbeaver.model.fs.DBFFileSystemManager;
 import org.jkiss.dbeaver.model.meta.Association;
 import org.jkiss.dbeaver.model.meta.Property;
 import org.jkiss.dbeaver.model.navigator.DBNModel;
@@ -76,15 +77,15 @@ import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.dbeaver.runtime.jobs.DisconnectJob;
 import org.jkiss.utils.CommonUtils;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 import java.lang.reflect.InvocationTargetException;
 import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 /**
  * Web session.
@@ -617,7 +618,6 @@ public class WebSession extends BaseWebSession
             log.error("Error closing web session tokens");
         }
         this.userContext.setUser(null);
-
         super.close();
     }
 
@@ -901,7 +901,11 @@ public class WebSession extends BaseWebSession
     // Auth credentials provider
     // Adds auth properties passed from web (by user)
     @Override
-    public boolean provideAuthParameters(@NotNull DBRProgressMonitor monitor, @NotNull DBPDataSourceContainer dataSourceContainer, @NotNull DBPConnectionConfiguration configuration) {
+    public boolean provideAuthParameters(
+        @NotNull DBRProgressMonitor monitor,
+        @NotNull DBPDataSourceContainer dataSourceContainer,
+        @NotNull DBPConnectionConfiguration configuration
+    ) {
         try {
             // Properties from nested auth sessions
             for (DBACredentialsProvider contextCredentialsProvider : getContextCredentialsProviders()) {
@@ -1019,6 +1023,9 @@ public class WebSession extends BaseWebSession
     }
 
     public void deleteSessionProject(@Nullable WebProjectImpl project) {
+        if (project != null) {
+            project.dispose();
+        }
         getWorkspace().removeProject(project);
         if (navigatorModel != null) {
             navigatorModel.getRoot().removeProject(project);
@@ -1044,6 +1051,15 @@ public class WebSession extends BaseWebSession
         for (DBPDataSourceContainer c : projectConnections) {
             removeConnection(new WebConnectionInfo(this, c));
         }
+    }
+
+    @NotNull
+    public DBFFileSystemManager getFileSystemManager(String projectId) throws DBException {
+        var project = getProjectById(projectId);
+        if (project == null) {
+            throw new DBException("Project not found: " + projectId);
+        }
+        return project.getFileSystemManager();
     }
 
     private class SessionProgressMonitor extends BaseProgressMonitor {
