@@ -34,6 +34,7 @@ input RMSubjectProjectPermissions {
     permissions: [String!]!
 }
 
+
 input RMProjectPermissions {
     projectId: String!
     permissions: [String!]!
@@ -59,42 +60,41 @@ extend type Query {
         folder: String,
         nameMask: String,
         readProperties: Boolean,
-        readHistory: Boolean): [RMResource!]!
+        readHistory: Boolean): [RMResource!]! @deprecated
 
     # Reads resource contents as string in UTF-8
     rmReadResourceAsString(
         projectId: String!,
-        resourcePath: String!): String!
+        resourcePath: String!): String! @deprecated
 
 }
 
 extend type Mutation {
-
     rmCreateResource(
         projectId: String!,
         resourcePath: String!,
-        isFolder: Boolean!): String!
+        isFolder: Boolean!): String! @deprecated
 
     rmMoveResource(
         projectId: String!,
         oldResourcePath: String!,
-        newResourcePath: String): String!
+        newResourcePath: String): String! @deprecated
 
     rmDeleteResource(
         projectId: String!,
         resourcePath: String!,
-        recursive: Boolean!): Boolean
+        recursive: Boolean!): Boolean @deprecated
 
     rmWriteResourceStringContent(
         projectId: String!,
         resourcePath: String!,
         data: String!,
-        forceOverwrite: Boolean!): String!
+        forceOverwrite: Boolean!): String! @deprecated
 
     rmCreateProject(
         projectId: ID,
         projectName: String!,
-        description: String): RMProject!
+        description: String): RMProject! @deprecated
 
     rmDeleteProject(projectId: ID!): Boolean!
 

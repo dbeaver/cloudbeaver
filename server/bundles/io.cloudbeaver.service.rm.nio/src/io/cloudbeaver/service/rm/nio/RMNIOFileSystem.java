@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.cloudbeaver.model.rm.fs.nio;
+package io.cloudbeaver.service.rm.nio;
 
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
@@ -41,19 +41,15 @@ public class RMNIOFileSystem extends NIOFileSystem {
     // null for root 'rm://' path
     private final String rmProjectId;
     @NotNull
-    private final RMController rmController;
-    @NotNull
     private final RMNIOFileSystemProvider rmNioFileSystemProvider;
     @Nullable
     private RMProject rmProject;
 
     public RMNIOFileSystem(
         @Nullable String rmProjectId,
-        @NotNull RMController rmController,
         @NotNull RMNIOFileSystemProvider rmNioFileSystemProvider
     ) {
         this.rmProjectId = rmProjectId;
-        this.rmController = rmController;
         this.rmNioFileSystemProvider = rmNioFileSystemProvider;
     }
 
@@ -119,7 +115,7 @@ public class RMNIOFileSystem extends NIOFileSystem {
 
     @NotNull
     public RMController getRmController() {
-        return rmController;
+        return rmNioFileSystemProvider.getRmController();
     }
 
     @Nullable
@@ -136,7 +132,7 @@ public class RMNIOFileSystem extends NIOFileSystem {
             throw new IOException("Project id not specified");
         }
         try {
-            RMProject project = rmController.getProject(rmProjectId, false, false);
+            RMProject project = getRmController().getProject(rmProjectId, false, false);
             if (project == null) {
                 throw new FileNotFoundException("Project not exist: " + rmProjectId);
             }
@@ -145,5 +141,9 @@ public class RMNIOFileSystem extends NIOFileSystem {
         } catch (DBException e) {
             throw new IOException("Failed to get project:" + e.getMessage(), e);
         }
+    }
+
+    public RMNIOFileSystemProvider rmProvider() {
+        return rmNioFileSystemProvider;
     }
 }

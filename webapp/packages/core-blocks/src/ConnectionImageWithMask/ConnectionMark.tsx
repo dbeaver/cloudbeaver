@@ -16,7 +16,8 @@ interface Props {
   className?: string;
 }
 
-export const ConnectionMark: React.FC<Props> = observer(function ConnectionMark({ connected, className }) {
+export const ConnectionMark = observer<Props>(function ConnectionMark({ connected, className }) {
   const styles = useS(style);
+
   return <div className={s(styles, { status: true, connected }, className)} />;
 });

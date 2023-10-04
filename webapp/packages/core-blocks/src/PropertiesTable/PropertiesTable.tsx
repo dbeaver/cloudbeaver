@@ -11,12 +11,15 @@ import { useCallback, useMemo, useState } from 'react';
 import styled from 'reshadow';
 
 import { Button } from '../Button';
+import ButtonStyles from '../Button.m.css';
 import { Filter } from '../FormControls/Filter';
 import { useTranslate } from '../localization/useTranslate';
+import { SContext, StyleRegistry } from '../SContext';
 import { useObjectRef } from '../useObjectRef';
 import type { IProperty } from './IProperty';
+import PropertiesTableAddButtonStyles from './PropertiesTableAddButtonStyles.m.css';
 import { PropertyItem } from './PropertyItem';
-import { PROPERTIES_FILTER_STYLES, PROPERTIES_TABLE_ADD_STYLES, PROPERTIES_TABLE_STYLES } from './styles';
+import { PROPERTIES_FILTER_STYLES, PROPERTIES_TABLE_STYLES } from './styles';
 
 type PropertiesState = Record<string, string | null>;
 
@@ -31,6 +34,16 @@ interface Props {
   className?: string;
   filterable?: boolean;
 }
+
+const registry: StyleRegistry = [
+  [
+    ButtonStyles,
+    {
+      mode: 'append',
+      styles: [PropertiesTableAddButtonStyles],
+    },
+  ],
+];
 
 export const PropertiesTable = observer<Props>(function PropertiesTable(props) {
   const { className, onAdd, readOnly, propertiesState } = props;
@@ -133,11 +146,13 @@ export const PropertiesTable = observer<Props>(function PropertiesTable(props) {
       </properties-header>
       <properties-list>
         {onAdd && !readOnly && (
-          <properties-header-add>
-            <Button icon="add_sm" viewBox="0 0 18 18" type="button" styles={PROPERTIES_TABLE_ADD_STYLES} onClick={() => onAdd()}>
-              {translate('core_block_properties_table_add')}
-            </Button>
-          </properties-header-add>
+          <SContext registry={registry}>
+            <properties-header-add>
+              <Button icon="add_sm" viewBox="0 0 18 18" type="button" onClick={() => onAdd()}>
+                {translate('core_block_properties_table_add')}
+              </Button>
+            </properties-header-add>
+          </SContext>
         )}
         {sortedProperties.get().map(property => (
           <PropertyItem

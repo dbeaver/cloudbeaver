@@ -23,7 +23,7 @@
  * questions.
  */
 
-package io.cloudbeaver.model.rm.fs.nio;
+package io.cloudbeaver.service.rm.nio;
 
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.nio.ByteArrayChannel;
