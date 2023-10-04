@@ -11,9 +11,10 @@ import styled from 'reshadow';
 
 import { s, useStyles } from '@cloudbeaver/core-blocks';
 import { Connection, ConnectionInfoResource, createConnectionParam } from '@cloudbeaver/core-connections';
+import { useDataContext } from '@cloudbeaver/core-data-context';
 import { useService } from '@cloudbeaver/core-di';
 import { ITabData, Tab, TabIcon, TabTitle } from '@cloudbeaver/core-ui';
-import { CaptureViewContext, useDataContext } from '@cloudbeaver/core-view';
+import { CaptureViewContext } from '@cloudbeaver/core-view';
 import type { TabHandlerTabComponent } from '@cloudbeaver/plugin-navigation-tabs';
 import { DATA_CONTEXT_SQL_EDITOR_STATE, getSqlEditorName, ISqlEditorTabState, SqlDataSourceService } from '@cloudbeaver/plugin-sql-editor';
 

@@ -7,9 +7,21 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import { Button, Group, Loader, s, useAutoLoad, useS, useTranslate } from '@cloudbeaver/core-blocks';
+import {
+  Button,
+  CommonDialogBody,
+  CommonDialogFooter,
+  CommonDialogHeader,
+  CommonDialogWrapper,
+  Group,
+  Loader,
+  s,
+  useAutoLoad,
+  useS,
+  useTranslate,
+} from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { CommonDialogBody, CommonDialogFooter, CommonDialogHeader, CommonDialogWrapper, DialogComponentProps } from '@cloudbeaver/core-dialogs';
+import type { DialogComponentProps } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { type NavNode, NavTreeResource } from '@cloudbeaver/core-navigation-tree';
 

@@ -10,6 +10,8 @@ import { coreAppManifest } from '@cloudbeaver/core-app';
 import { coreAuthenticationManifest } from '@cloudbeaver/core-authentication';
 import { coreBlocksManifest } from '@cloudbeaver/core-blocks';
 import { coreBrowserManifest } from '@cloudbeaver/core-browser';
+import { coreBrowserCookiesManifest } from '@cloudbeaver/core-browser-cookies';
+import { coreBrowserSettingsManifest } from '@cloudbeaver/core-browser-settings';
 import { coreConnectionsManifest } from '@cloudbeaver/core-connections';
 import { coreDIManifest, PluginManifest } from '@cloudbeaver/core-di';
 import { codeDialogsManifest } from '@cloudbeaver/core-dialogs';
@@ -52,6 +54,8 @@ export const coreManifests: PluginManifest[] = [
   coreRootManifest,
   corePluginManifest,
   coreBrowserManifest,
+  coreBrowserSettingsManifest,
+  coreBrowserCookiesManifest,
   coreProductManifest,
   coreProjectsManifest,
   coreAuthenticationManifest,

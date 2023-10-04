@@ -30,6 +30,7 @@ export const defaultServerConfig: (productConfiguration?: Record<string, any>) =
     resourceManagerEnabled: true,
     licenseRequired: false,
     licenseValid: false,
+    distributed: false,
     configurationMode: false,
     developmentMode: false,
     redirectOnFederatedAuth: false,

@@ -15,8 +15,7 @@
     "lint-fix": "eslint ./src/ --ext .ts,.tsx --fix"
   },
   "dependencies": {
-    "react-data-grid": "file:lib"
+    "react-data-grid": "file:react-data-grid-dist"
   },
-  "peerDependencies": {
-  }
+  "peerDependencies": {}
 }

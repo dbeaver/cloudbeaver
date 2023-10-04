@@ -10,12 +10,11 @@ import { useContext, useState } from 'react';
 import styled, { css, use } from 'reshadow';
 
 import { getComputed, Icon, useMouse, useStateDelay } from '@cloudbeaver/core-blocks';
-import { ConnectionInfoResource } from '@cloudbeaver/core-connections';
+import { ConnectionInfoResource, DATA_CONTEXT_CONNECTION } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
 import { DATA_CONTEXT_NAV_NODE, type DBObject, type NavNode, NavNodeManagerService } from '@cloudbeaver/core-navigation-tree';
 import { ContextMenu } from '@cloudbeaver/core-ui';
 import { useMenu } from '@cloudbeaver/core-view';
-import { DATA_CONTEXT_CONNECTION } from '@cloudbeaver/plugin-connections';
 import { MENU_NAV_TREE, useNode } from '@cloudbeaver/plugin-navigation-tree';
 import type { RenderCellProps } from '@cloudbeaver/plugin-react-data-grid';
 

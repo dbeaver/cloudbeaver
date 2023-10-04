@@ -7,11 +7,10 @@
  */
 import { computed, makeObservable, observable } from 'mobx';
 
-import type { IProperty } from '@cloudbeaver/core-blocks';
+import { ErrorDetailsDialog, type IProperty } from '@cloudbeaver/core-blocks';
 import { IDestructibleController, IInitializableController, injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { ErrorDetailsDialog } from '@cloudbeaver/core-notifications';
 import { DataTransferOutputSettings, DataTransferProcessorInfo, GQLErrorCatcher } from '@cloudbeaver/core-sdk';
 
 import { DataExportService } from '../DataExportService';

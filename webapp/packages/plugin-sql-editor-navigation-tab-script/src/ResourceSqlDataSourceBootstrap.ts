@@ -7,9 +7,10 @@
  */
 import { action, makeObservable, observable, untracked } from 'mobx';
 
+import { ConfirmationDialog } from '@cloudbeaver/core-blocks';
 import { ConnectionInfoResource, IConnectionExecutionContextInfo } from '@cloudbeaver/core-connections';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
-import { CommonDialogService, ConfirmationDialog, DialogueStateResult } from '@cloudbeaver/core-dialogs';
+import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { ProjectInfoResource } from '@cloudbeaver/core-projects';
 import { CachedMapAllKey, resourceKeyList, ResourceKeySimple, ResourceKeyUtils } from '@cloudbeaver/core-resource';

@@ -8,9 +8,9 @@
 import { computed, observable } from 'mobx';
 
 import { AuthConfigurationsResource, compareAuthConfigurations } from '@cloudbeaver/core-authentication';
-import { TableState, useObservableRef, useTranslate } from '@cloudbeaver/core-blocks';
+import { ConfirmationDialogDelete, TableState, useObservableRef, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { CommonDialogService, ConfirmationDialogDelete, DialogueStateResult } from '@cloudbeaver/core-dialogs';
+import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { CachedMapAllKey, resourceKeyList } from '@cloudbeaver/core-resource';
 import type { AdminAuthProviderConfiguration } from '@cloudbeaver/core-sdk';

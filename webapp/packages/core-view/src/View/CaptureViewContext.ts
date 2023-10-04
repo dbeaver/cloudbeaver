@@ -7,6 +7,6 @@
  */
 import { createContext } from 'react';
 
-import type { IDataContext } from '../DataContext/IDataContext';
+import type { IDataContext } from '@cloudbeaver/core-data-context';
 
 export const CaptureViewContext = createContext<IDataContext | undefined>(undefined);

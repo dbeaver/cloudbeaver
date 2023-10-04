@@ -8,9 +8,10 @@
 import { observer } from 'mobx-react-lite';
 
 import { s, useS } from '@cloudbeaver/core-blocks';
+import type { IDataContext } from '@cloudbeaver/core-data-context';
 import { useService } from '@cloudbeaver/core-di';
 import { MenuBar } from '@cloudbeaver/core-ui';
-import { IDataContext, useMenu } from '@cloudbeaver/core-view';
+import { useMenu } from '@cloudbeaver/core-view';
 
 import { DATA_CONTEXT_DV_DDM } from '../../../DatabaseDataModel/DataContext/DATA_CONTEXT_DV_DDM';
 import { DATA_CONTEXT_DV_DDM_RESULT_INDEX } from '../../../DatabaseDataModel/DataContext/DATA_CONTEXT_DV_DDM_RESULT_INDEX';

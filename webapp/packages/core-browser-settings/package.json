@@ -1,0 +1,28 @@
+{
+  "name": "@cloudbeaver/core-browser-settings",
+  "sideEffects": true,
+  "version": "0.1.0",
+  "description": "",
+  "license": "Apache-2.0",
+  "main": "lib/index.js",
+  "module": "lib/index.js",
+  "types": "src/index.ts",
+  "scripts": {
+    "build": "core-cli-build --mode=production --config ../core-cli/configs/webpack.plugin.config.js",
+    "lint": "eslint ./src/ --ext .ts,.tsx",
+    "lint-fix": "eslint ./src/ --ext .ts,.tsx --fix",
+    "test": "core-cli-test",
+    "validate-dependencies": "core-cli-validate-dependencies"
+  },
+  "dependencies": {
+    "@cloudbeaver/core-di": "~0.1.0",
+    "@cloudbeaver/core-plugin": "~0.1.0"
+  },
+  "peerDependencies": {
+    "@testing-library/jest-dom": "~6.x.x",
+    "mobx": "~6.x.x",
+    "mobx-react-lite": "~3.x.x",
+    "react": "~18.x.x",
+    "react-dom": "~18.x.x"
+  }
+}

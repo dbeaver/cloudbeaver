@@ -33,6 +33,7 @@ import resourceManager from '@cloudbeaver/plugin-resource-manager';
 import resourceManagerAdministration from '@cloudbeaver/plugin-resource-manager-administration';
 import resourceManagerScripts from '@cloudbeaver/plugin-resource-manager-scripts';
 import root from '@cloudbeaver/plugin-root';
+import { sessionExpirationPlugin } from '@cloudbeaver/plugin-session-expiration';
 import settingsMenu from '@cloudbeaver/plugin-settings-menu';
 import settingsMenuAdministration from '@cloudbeaver/plugin-settings-menu-administration';
 import settingsPanelPlugin from '@cloudbeaver/plugin-settings-panel';
@@ -42,9 +43,11 @@ import sqlEditorResource from '@cloudbeaver/plugin-sql-editor-navigation-tab-scr
 import sqlEditorNew from '@cloudbeaver/plugin-sql-editor-new';
 import sqlEditorScreen from '@cloudbeaver/plugin-sql-editor-screen';
 import { sqlGeneratorPlugin } from '@cloudbeaver/plugin-sql-generator';
+import { ssoPlugin } from '@cloudbeaver/plugin-sso';
 import theme from '@cloudbeaver/plugin-theme';
 import toolsPanel from '@cloudbeaver/plugin-tools-panel';
 import topAppBar from '@cloudbeaver/plugin-top-app-bar';
+import { administrationTopAppBarPlugin } from '@cloudbeaver/plugin-top-app-bar-administration';
 import userProfile from '@cloudbeaver/plugin-user-profile';
 import userProfileAdministration from '@cloudbeaver/plugin-user-profile-administration';
 import version from '@cloudbeaver/plugin-version';
@@ -53,6 +56,7 @@ import versionUpdate from '@cloudbeaver/plugin-version-update-administration';
 import { defaultProductManifest } from './manifest';
 
 const PLUGINS: PluginManifest[] = [
+  ssoPlugin,
   devTools,
   administration,
   spreadsheetNew,
@@ -94,9 +98,11 @@ const PLUGINS: PluginManifest[] = [
   navigationTreeRMPlugin,
   datasourceContextSwitch,
   topAppBar,
+  administrationTopAppBarPlugin,
   version,
   navigationTabs,
   root,
+  sessionExpirationPlugin,
   toolsPanel,
   projects,
   browserPlugin,

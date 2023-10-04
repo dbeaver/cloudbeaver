@@ -7,6 +7,7 @@
  */
 import { computed, makeObservable, observable, untracked } from 'mobx';
 
+import { ConfirmationDialog } from '@cloudbeaver/core-blocks';
 import {
   ConnectionExecutionContextResource,
   ConnectionExecutionContextService,
@@ -26,7 +27,7 @@ import {
   objectSchemaSetter,
 } from '@cloudbeaver/core-connections';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
-import { CommonDialogService, ConfirmationDialog, DialogueStateResult } from '@cloudbeaver/core-dialogs';
+import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { Executor, ExecutorInterrupter, IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import { NavNodeInfoResource, NodeManagerUtils, objectNavNodeProvider } from '@cloudbeaver/core-navigation-tree';

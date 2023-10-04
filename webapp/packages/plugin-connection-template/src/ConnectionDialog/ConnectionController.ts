@@ -7,6 +7,7 @@
  */
 import { computed, makeObservable, observable } from 'mobx';
 
+import { ErrorDetailsDialog } from '@cloudbeaver/core-blocks';
 import {
   Connection,
   ConnectionInfoProjectKey,
@@ -21,7 +22,6 @@ import {
 import { IDestructibleController, IInitializableController, injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { ErrorDetailsDialog } from '@cloudbeaver/core-notifications';
 import { ProjectsService } from '@cloudbeaver/core-projects';
 import { CachedMapAllKey } from '@cloudbeaver/core-resource';
 import { DatabaseAuthModel, DetailsError, NetworkHandlerAuthType } from '@cloudbeaver/core-sdk';

@@ -8,6 +8,7 @@
 import { untracked } from 'mobx';
 
 import { UserInfoResource } from '@cloudbeaver/core-authentication';
+import { ConfirmationDialogDelete } from '@cloudbeaver/core-blocks';
 import {
   CONNECTION_FOLDER_NAME_VALIDATION,
   ConnectionFolderProjectKey,
@@ -21,8 +22,9 @@ import {
   IConnectionFolderParam,
   IConnectionInfoParams,
 } from '@cloudbeaver/core-connections';
+import type { IDataContextProvider } from '@cloudbeaver/core-data-context';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
-import { CommonDialogService, ConfirmationDialogDelete, DialogueStateResult } from '@cloudbeaver/core-dialogs';
+import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { ExecutorInterrupter, IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import { LocalizationService } from '@cloudbeaver/core-localization';
@@ -43,7 +45,7 @@ import {
 import { getProjectNodeId, NAV_NODE_TYPE_PROJECT, ProjectInfoResource } from '@cloudbeaver/core-projects';
 import { CachedMapAllKey, ResourceKeyAlias, resourceKeyList, ResourceKeySimple, ResourceKeyUtils } from '@cloudbeaver/core-resource';
 import { createPath } from '@cloudbeaver/core-utils';
-import { ACTION_NEW_FOLDER, ActionService, DATA_CONTEXT_MENU, IAction, IDataContextProvider, MenuService } from '@cloudbeaver/core-view';
+import { ACTION_NEW_FOLDER, ActionService, DATA_CONTEXT_MENU, IAction, MenuService } from '@cloudbeaver/core-view';
 import { DATA_CONTEXT_ELEMENTS_TREE, type IElementsTree, MENU_ELEMENTS_TREE_TOOLS } from '@cloudbeaver/plugin-navigation-tree';
 import { FolderDialog } from '@cloudbeaver/plugin-projects';
 

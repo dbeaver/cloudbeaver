@@ -15101,7 +15101,7 @@ rc@^1.2.7:
     minimist "^1.2.0"
     strip-json-comments "~2.0.1"
 
-"react-data-grid@file:packages/plugin-react-data-grid/lib":
+"react-data-grid@file:packages/plugin-react-data-grid/react-data-grid-dist":
   version "7.0.0-beta.37"
   dependencies:
     clsx "^2.0.0"
