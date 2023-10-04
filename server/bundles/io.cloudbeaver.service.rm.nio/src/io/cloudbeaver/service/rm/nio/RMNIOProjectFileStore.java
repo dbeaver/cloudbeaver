@@ -14,35 +14,37 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.cloudbeaver.model.rm.fs.nio;
+package io.cloudbeaver.service.rm.nio;
 
-import org.jkiss.code.NotNull;
-import org.jkiss.dbeaver.model.nio.NIOFileBasicAttribute;
-import org.jkiss.dbeaver.model.rm.RMResource;
+import org.jkiss.dbeaver.model.nio.NIOFileStore;
+import org.jkiss.dbeaver.model.rm.RMProject;
 
-import java.nio.file.attribute.FileTime;
+import java.io.IOException;
 
-public class RMResourceBasicAttribute extends NIOFileBasicAttribute {
+public class RMNIOProjectFileStore extends NIOFileStore {
+    private final RMProject rmProject;
 
-    @NotNull
-    private final RMResource rmResource;
-
-    public RMResourceBasicAttribute(@NotNull RMResource rmResource) {
-        this.rmResource = rmResource;
+    public RMNIOProjectFileStore(RMProject rmProject) {
+        this.rmProject = rmProject;
     }
 
     @Override
-    public FileTime lastModifiedTime() {
-        return FileTime.fromMillis(rmResource.getLastModified());
+    public String name() {
+        return rmProject.getName();
     }
 
     @Override
-    public boolean isDirectory() {
-        return rmResource.isFolder();
+    public String type() {
+        return "rmfs";
     }
 
     @Override
-    public long size() {
-        return rmResource.getLength();
+    public boolean isReadOnly() {
+        return false;
+    }
+
+    @Override
+    public long getTotalSpace() throws IOException {
+        return 0;
     }
 }

@@ -82,7 +82,7 @@ export class WindowsService {
             clearInterval(this.trackWindowClose);
             this.trackWindowClose = undefined;
           }
-        });
+        }, 100);
       }
     }
   }
