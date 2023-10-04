@@ -1,0 +1,18 @@
+.fieldLabel {
+  display: block;
+  composes: theme-typography--body1 from global;
+  font-weight: 500;
+}
+.fieldLabel:not(:empty) {
+  padding-bottom: 10px;
+}
+.inputContainer {
+  position: relative;
+}
+.tags {
+  padding-top: 8px;
+
+  &:empty {
+    display: none;
+  }
+}

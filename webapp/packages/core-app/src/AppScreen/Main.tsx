@@ -46,8 +46,8 @@ export const Main = observer(function Main() {
                 <RightArea />
               </Pane>
               <ResizerControls />
-              <Pane basis="250px" main >
-                <Loader suspense className={s(styles, { loader: true })}>
+              <Pane basis="250px" main>
+                <Loader className={s(styles, { loader: true })} suspense>
                   <SideBarPanel container={sideBarPanelService.tabsContainer} />
                 </Loader>
               </Pane>

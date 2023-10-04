@@ -117,7 +117,6 @@ export const SSH: TabContainerPanelComponent<Props> = observer(function SSH({ st
               state={handlerState.properties}
               disabled={disabled || !enabled}
               readOnly={readonly}
-              mod="surface"
               required
               small
             >
@@ -129,7 +128,6 @@ export const SSH: TabContainerPanelComponent<Props> = observer(function SSH({ st
               state={handlerState.properties}
               disabled={disabled || !enabled}
               readOnly={readonly}
-              mod="surface"
               required
               tiny
             >
@@ -143,7 +141,6 @@ export const SSH: TabContainerPanelComponent<Props> = observer(function SSH({ st
               state={handlerState}
               disabled={disabled || !enabled}
               readOnly={readonly}
-              mod="surface"
               required={handlerState.savePassword}
               tiny
               fill
@@ -157,7 +154,6 @@ export const SSH: TabContainerPanelComponent<Props> = observer(function SSH({ st
               state={handlerState}
               disabled={disabled || !enabled}
               readOnly={readonly}
-              mod="surface"
               required={!keyAuth && handlerState.savePassword}
               description={passwordSaved ? translate('ui_processing_saved') : undefined}
               tiny
@@ -187,7 +183,6 @@ export const SSH: TabContainerPanelComponent<Props> = observer(function SSH({ st
                   disabled={disabled || !enabled}
                   readOnly={readonly}
                   labelTooltip={aliveIntervalLabel}
-                  mod="surface"
                   tiny
                 >
                   {aliveIntervalLabel}
@@ -199,7 +194,6 @@ export const SSH: TabContainerPanelComponent<Props> = observer(function SSH({ st
                   disabled={disabled || !enabled}
                   readOnly={readonly}
                   labelTooltip={connectTimeoutLabel}
-                  mod="surface"
                   tiny
                 >
                   {connectTimeoutLabel}
