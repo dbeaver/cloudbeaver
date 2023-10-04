@@ -62,11 +62,10 @@ export * from './PropertiesTable/PropertiesTable';
 export * from './PropertiesTable/IProperty';
 
 export * from './Slide/SlideBox';
-export * from './Slide/SlideBoxStyles';
 export * from './Slide/SlideElement';
 export * from './Slide/SlideOverlay';
+export { default as SlideBoxStyles } from './Slide/SlideBox.m.css';
 
-export * from './Split/styles';
 export * from './Split/SplitControls';
 export * from './Split/Pane';
 export * from './Split/ResizerControls';
@@ -93,7 +92,6 @@ export * from './Table/TableSelect';
 export * from './Table/getSelectedItems';
 
 export * from './Expand/Expandable';
-export * from './Expand/EXPANDABLE_FORM_STYLES';
 
 export * from './Tree/TreeNode/EventTreeNodeClickFlag';
 export * from './Tree/TreeNode/EventTreeNodeExpandFlag';
@@ -108,6 +106,7 @@ export * from './Tree/TreeNode/TreeNodeNested';
 export * from './Tree/TreeNode/TreeNodeNestedMessage';
 export * from './Tree/TreeNode/TreeNodeSelect';
 export * from './Button';
+export { default as ButtonStyles } from './Button.m.css';
 export * from './ToolsPanel/ToolsAction';
 export * from './ToolsPanel/ToolsPanel';
 export { default as ToolsPanelStyles } from './ToolsPanel/ToolsPanel.m.css';
@@ -163,11 +162,13 @@ export * from './FormControls/useForm';
 export * from './FormControls/Textarea';
 export * from './Link';
 export * from './Cell';
+export { default as CellStyles } from './Cell.m.css';
 export * from './UploadArea';
 export * from './ErrorMessage';
 export * from './preventFocusHandler';
 export * from './StatusMessage';
 export * from './ExceptionMessage';
+export { default as ExceptionMessageStyles } from './ExceptionMessage.m.css';
 export * from './getComputed';
 export * from './IconButton';
 export { default as IconButtonStyles } from './IconButton.m.css';

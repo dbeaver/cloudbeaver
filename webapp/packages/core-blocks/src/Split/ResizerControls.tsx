@@ -6,17 +6,28 @@
  * you may not use this file except in compliance with the License.
  */
 import { Resizer } from 'go-split';
+import { observer } from 'mobx-react-lite';
 
+import { s } from '../s';
+import { useS } from '../useS';
+import style from './ResizeControls.m.css';
 import { SplitControls } from './SplitControls';
+import { useSplit } from './useSplit';
 
 interface ResizerControlsProps {
   className?: string;
 }
 
-export function ResizerControls({ className }: ResizerControlsProps) {
+export const ResizerControls = observer<ResizerControlsProps>(function ResizerControls({ className }: ResizerControlsProps) {
+  const styles = useS(style);
+  const split = useSplit();
+
+  const vertical = split.state.split === 'vertical';
+  const horizontal = split.state.split === 'horizontal';
+
   return (
-    <Resizer className={className}>
+    <Resizer className={s(styles, { resizerControls: true, vertical, horizontal }, className)}>
       <SplitControls />
     </Resizer>
   );
-}
+});

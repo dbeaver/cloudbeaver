@@ -10,7 +10,6 @@ import { observer } from 'mobx-react-lite';
 import {
   Container,
   Expandable,
-  EXPANDABLE_FORM_STYLES,
   getPropertyControlType,
   Group,
   GroupTitle,
@@ -77,7 +76,7 @@ export const ProviderPropertiesForm = observer<Props>(function ProviderPropertie
 
       {categories.map((category, index) => (
         <Container key={`${category}_${config.driverId}`} gap>
-          <Expandable style={EXPANDABLE_FORM_STYLES} label={category} defaultExpanded={index === 0}>
+          <Expandable label={category} defaultExpanded={index === 0}>
             <Container dense={isOnlyBooleans(supportedProperties, category)} wrap gap>
               <ObjectPropertyInfoForm
                 properties={supportedProperties}
