@@ -13,7 +13,8 @@
     "build": "core-cli-build --mode=production --config ../core-cli/configs/webpack.plugin.config.js",
     "lint": "eslint ./src/ --ext .ts,.tsx",
     "lint-fix": "eslint ./src/ --ext .ts,.tsx --fix",
-    "test": "tsc -b && core-cli-test",
+    "pretest": "tsc -b",
+    "test": "core-cli-test",
     "validate-dependencies": "core-cli-validate-dependencies",
     "update-ts-references": "rimraf --glob dist/* && typescript-resolve-references"
   },
