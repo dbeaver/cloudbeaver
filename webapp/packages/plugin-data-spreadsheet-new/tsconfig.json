@@ -49,6 +49,9 @@
       "path": "..\\core-utils"
     },
     {
+      "path": "..\\core-browser"
+    },
+    {
       "path": "..\\tests-runner"
     }
   ],
