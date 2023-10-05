@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 /* eslint-disable @typescript-eslint/no-var-requires */
-const testingAttributes = require('../lib/babel-plugins/TestingAttributes.js');
+const testingAttributes = require('../dist/babel-plugins/TestingAttributes.js');
 const { warn } = console;
 
 // Prevents resolution warnings from babel-plugin-module-resolver

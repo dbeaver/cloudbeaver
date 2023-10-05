@@ -2,12 +2,12 @@
   "compilerOptions": {
     "rootDir": "src",
     "module": "CommonJS",
-    "outDir": "lib",
+    "outDir": "dist",
     "moduleResolution": "node",
     "esModuleInterop": true,
     "emitDeclarationOnly": false,
     "skipLibCheck": true
   },
   "include": ["src/**/*"],
-  "exclude": ["node_modules/**/*", "lib/**/*", "tests/**/*"]
+  "exclude": ["node_modules/**/*", "dist/**/*", "tests/**/*"]
 }

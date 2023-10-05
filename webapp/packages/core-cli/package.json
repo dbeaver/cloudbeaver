@@ -22,7 +22,6 @@
     "typescript-resolve-references": "./bin/typescript-resolve-references.js"
   },
   "scripts": {
-    "preinstall": "rimraf --glob lib/* && rimraf tsconfig.tsbuildinfo",
     "install": "tsc"
   },
   "engines": {
