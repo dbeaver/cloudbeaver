@@ -65,7 +65,7 @@ export class DataGridContextMenuSaveContentService {
           const edit = context.data.model.source.getAction(context.data.resultIndex, ResultSetEditAction);
           const file = files?.item(0) ?? undefined;
           if (file) {
-            edit.set(context.data.key, createResultSetContentValue({ blob: file, contentLength: file.length, contentType: file.type }));
+            edit.set(context.data.key, createResultSetContentValue({ blob: file, contentLength: file.size, contentType: file.type }));
           }
         });
       },

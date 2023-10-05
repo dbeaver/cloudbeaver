@@ -61,11 +61,7 @@ export class ImageValuePresentationBootstrap extends Bootstrap {
       return getMIME(value.binary || '') !== null;
     }
 
-    if (value?.blob) {
-      return value.blob.type.startsWith('image/');
-    }
-
-    return false;
+    return value?.contentType?.startsWith('image/') ?? false;
   }
 
   private isImageUrl(value: IResultSetValue | undefined) {

@@ -344,8 +344,8 @@ export class ResultSetEditAction extends DatabaseEditAction<IResultSetElementKey
         case DatabaseEditChangeType.update: {
           if (value) {
             this.data.setRowValue(update.update.row, value);
-            update.update.source = value;
           }
+          applyResultToUpdate(update.update, value);
           this.shiftRow(update.update.row, offset);
           this.removeEmptyUpdate(update.update);
           break;
@@ -354,9 +354,8 @@ export class ResultSetEditAction extends DatabaseEditAction<IResultSetElementKey
         case DatabaseEditChangeType.add: {
           if (value) {
             this.data.insertRow(update.update.row, value, 1);
-            update.update.source = value;
           }
-          update.update.type = DatabaseEditChangeType.update;
+          applyResultToUpdate(update.update, value);
           this.shiftRow(update.update.row, offset);
           this.removeEmptyUpdate(update.update);
           offset--;
@@ -387,79 +386,7 @@ export class ResultSetEditAction extends DatabaseEditAction<IResultSetElementKey
   }
 
   applyUpdate(result: IDatabaseResultSet): void {
-    const applyUpdate: Array<IDatabaseDataEditApplyActionUpdate<IResultSetRowKey>> = [];
-    let rowIndex = 0;
-    let deleteShift = 0;
-
-    const insertedRows: IResultSetRowKey[] = [];
-
-    if (result.data?.rows?.length !== this.updates.length) {
-      console.warn('ResultSetEditAction: returned data differs from performed update');
-    }
-
-    for (const update of this.updates) {
-      switch (update.type) {
-        case DatabaseEditChangeType.update: {
-          const value = result.data?.rows?.[rowIndex];
-
-          if (value !== undefined) {
-            this.data.setRowValue(update.row, value);
-            applyUpdate.push({
-              type: DatabaseEditChangeType.update,
-              row: update.row,
-              newRow: update.row,
-            });
-          }
-
-          rowIndex++;
-          break;
-        }
-
-        case DatabaseEditChangeType.add: {
-          const value = result.data?.rows?.[rowIndex];
-
-          if (value !== undefined) {
-            const newRow = this.data.insertRow(update.row, value, insertedRows.length);
-
-            if (newRow) {
-              applyUpdate.push({
-                type: DatabaseEditChangeType.add,
-                row: update.row,
-                newRow,
-              });
-            }
-          }
-
-          insertedRows.push(update.row);
-          rowIndex++;
-          break;
-        }
-
-        case DatabaseEditChangeType.delete: {
-          this.revert({ row: update.row, column: { index: 0 } });
-          const insertShift = insertedRows.filter(row => row.index <= update.row.index).length;
-          const newRow = this.data.removeRow(update.row, deleteShift + insertShift);
-
-          if (newRow) {
-            applyUpdate.push({
-              type: DatabaseEditChangeType.delete,
-              row: update.row,
-              newRow,
-            });
-          }
-
-          deleteShift--;
-          break;
-        }
-      }
-    }
-
-    if (applyUpdate.length > 0) {
-      this.applyAction.execute({
-        resultId: result.id,
-        updates: applyUpdate,
-      });
-    }
+    this.applyPartialUpdate(result);
 
     this.clear();
   }
@@ -720,4 +647,24 @@ function replaceUploadBlobs(values: IResultSetValue[]) {
     }
     return value;
   });
+}
+
+function applyResultToUpdate(update: IResultSetUpdate, result?: IResultSetValue[]): void {
+  if (result) {
+    update.source = result;
+
+    update.update = update.update.map((value, i) => {
+      const source = update.source![i];
+      if (isResultSetContentValue(source) && isResultSetContentValue(value) && value.blob) {
+        if (value.fileId && value.contentLength === source.contentLength) {
+          return JSON.parse(JSON.stringify(source));
+        }
+      }
+      return value;
+    });
+  }
+
+  if (update.type === DatabaseEditChangeType.add) {
+    update.type = DatabaseEditChangeType.update;
+  }
 }

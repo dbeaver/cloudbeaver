@@ -198,7 +198,7 @@ export class ContainerDataSource extends DatabaseDataSource<IDataContainerOption
           );
 
           if (responseResult) {
-            editor.applyPartialUpdate(responseResult);
+            editor.applyUpdate(responseResult);
           }
         }
 
