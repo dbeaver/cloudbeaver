@@ -47,7 +47,7 @@ jobs:
         uses: actions/cache@v3
         with:
           path: "**/packages/*/dist"
-          key: ${{ runner.os }}-dist-${{ hashFiles('**/yarn.lock') }}
+          key: ${{ runner.os }}-dist-
           restore-keys: |
             ${{ runner.os }}-dist-
 
