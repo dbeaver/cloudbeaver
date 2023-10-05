@@ -11,8 +11,8 @@
     ]
   },
   "scripts": {
-    "prebuild": "npm run clean-dist && lerna run gql:gen --stream --parallel",
-    "pretest": "npm run clean-dist && lerna run gql:gen --stream --parallel",
+    "prebuild": "lerna run gql:gen --stream --parallel",
+    "pretest": "lerna run gql:gen --stream --parallel && yarn lerna run test --scope @cloudbeaver/tests-runner",
     "clean-dist": "rimraf --glob lib/*"
   },
   "devDependencies": {

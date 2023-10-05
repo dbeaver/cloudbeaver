@@ -6,6 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 import { UserDataService } from '@cloudbeaver/core-authentication';
+import type { IDataContextProvider } from '@cloudbeaver/core-data-context';
 import { injectable } from '@cloudbeaver/core-di';
 import { LocalizationService } from '@cloudbeaver/core-localization';
 import {
@@ -15,7 +16,6 @@ import {
   DATA_CONTEXT_MENU,
   getBindingLabel,
   IAction,
-  IDataContextProvider,
   KeyBindingService,
   MenuService,
 } from '@cloudbeaver/core-view';

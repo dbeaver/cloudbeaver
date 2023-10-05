@@ -11,7 +11,7 @@ import { getComputed, useExecutor, useObjectRef } from '@cloudbeaver/core-blocks
 import { useService } from '@cloudbeaver/core-di';
 import { SyncExecutor } from '@cloudbeaver/core-executor';
 import { EObjectFeature, type NavNode, NavNodeInfoResource } from '@cloudbeaver/core-navigation-tree';
-import { resourceKeyList } from '@cloudbeaver/core-sdk';
+import { resourceKeyList } from '@cloudbeaver/core-resource';
 import type { IDNDData } from '@cloudbeaver/core-ui';
 
 import { useChildren } from '../../../NodesManager/useChildren';

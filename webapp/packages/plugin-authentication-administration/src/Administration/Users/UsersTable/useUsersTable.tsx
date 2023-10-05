@@ -8,11 +8,11 @@
 import { action, computed, observable } from 'mobx';
 
 import { AdminUser, compareUsers, UsersResource, UsersResourceFilterKey, UsersResourceNewUsers } from '@cloudbeaver/core-authentication';
-import { TableState, useObservableRef, usePagination, useResource, useTranslate } from '@cloudbeaver/core-blocks';
+import { ConfirmationDialogDelete, TableState, useObservableRef, useOffsetPagination, useResource, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { CommonDialogService, ConfirmationDialogDelete, DialogueStateResult } from '@cloudbeaver/core-dialogs';
+import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { resourceKeyList } from '@cloudbeaver/core-sdk';
+import { resourceKeyList } from '@cloudbeaver/core-resource';
 import { ILoadableState, isArraysEqual, isDefined } from '@cloudbeaver/core-utils';
 
 import type { IUserFilters } from './Filters/useUsersTableFilters';
@@ -31,7 +31,7 @@ interface State {
 export function useUsersTable(filters: IUserFilters) {
   const translate = useTranslate();
   const usersResource = useService(UsersResource);
-  const pagination = usePagination(UsersResource, {
+  const pagination = useOffsetPagination(UsersResource, {
     key: UsersResourceFilterKey(filters.search, filters.status === 'true' ? true : filters.status === 'false' ? false : undefined),
   });
   const usersLoader = useResource(useUsersTable, usersResource, pagination.key);

@@ -10,8 +10,8 @@ import { computed, makeObservable } from 'mobx';
 import { UserDataService, UserInfoResource } from '@cloudbeaver/core-authentication';
 import { Dependency, injectable } from '@cloudbeaver/core-di';
 import { Executor, ExecutorInterrupter, IExecutor, ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
+import { CachedMapAllKey, resourceKeyList, ResourceKeyUtils } from '@cloudbeaver/core-resource';
 import { DataSynchronizationService, ServerConfigResource, ServerEventId } from '@cloudbeaver/core-root';
-import { CachedMapAllKey, resourceKeyList, ResourceKeyUtils } from '@cloudbeaver/core-sdk';
 import { NavigationService } from '@cloudbeaver/core-ui';
 import { isArraysEqual } from '@cloudbeaver/core-utils';
 

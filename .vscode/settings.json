@@ -9,6 +9,7 @@
   "java.jdt.ls.vmargs": "-XX:+UseParallelGC -XX:GCTimeRatio=4 -XX:AdaptiveSizePolicyWeight=90 -Dsun.zip.disableMemoryMapping=true -Xmx16G -Xms100m -Xlog:disable",
   "java.compile.nullAnalysis.mode": "automatic",
 
+  "typescript.preferences.useAliasesForRenames": false,
   "typescript.preferences.importModuleSpecifier": "relative",
   "typescript.preferences.includePackageJsonAutoImports": "on",
   "typescript.preferences.quoteStyle": "single",
@@ -21,7 +22,6 @@
     "typescript",
     "typescriptreact"
   ],
-  "eslint.packageManager": "yarn",
   "eslint.workingDirectories": ["webapp"],
 
   "editor.defaultFormatter": "esbenp.prettier-vscode",

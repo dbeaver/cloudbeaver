@@ -7,7 +7,8 @@
  */
 import { injectable } from '@cloudbeaver/core-di';
 import { ExecutorInterrupter } from '@cloudbeaver/core-executor';
-import { CachedDataResource, CachedResource, GraphQLService } from '@cloudbeaver/core-sdk';
+import { CachedDataResource, CachedResource } from '@cloudbeaver/core-resource';
+import { GraphQLService } from '@cloudbeaver/core-sdk';
 
 import { DataSynchronizationService } from './DataSynchronization/DataSynchronizationService';
 import { SessionDataResource } from './SessionDataResource';

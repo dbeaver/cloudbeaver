@@ -9,7 +9,7 @@ import type { PluginManifest } from '@cloudbeaver/core-di';
 
 import { PluginManagerService } from './PluginManagerService';
 
-export const manifest: PluginManifest = {
+export const corePluginManifest: PluginManifest = {
   info: {
     name: 'Core Plugin',
   },

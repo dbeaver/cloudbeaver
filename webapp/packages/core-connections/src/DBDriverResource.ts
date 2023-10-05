@@ -9,18 +9,9 @@ import { computed, makeObservable } from 'mobx';
 
 import { AppAuthService } from '@cloudbeaver/core-authentication';
 import { injectable } from '@cloudbeaver/core-di';
+import { CachedMapAllKey, CachedMapResource, isResourceAlias, type ResourceKey, resourceKeyList, ResourceKeyUtils } from '@cloudbeaver/core-resource';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
-import {
-  CachedMapAllKey,
-  CachedMapResource,
-  DatabaseDriverFragment,
-  DriverListQueryVariables,
-  GraphQLService,
-  isResourceAlias,
-  ResourceKey,
-  resourceKeyList,
-  ResourceKeyUtils,
-} from '@cloudbeaver/core-sdk';
+import { DatabaseDriverFragment, DriverListQueryVariables, GraphQLService } from '@cloudbeaver/core-sdk';
 import { isArraysEqual } from '@cloudbeaver/core-utils';
 
 export type DBDriver = DatabaseDriverFragment;
@@ -66,7 +57,7 @@ export class DBDriverResource extends CachedMapResource<string, DBDriver, Driver
 
   protected async loader(originalKey: ResourceKey<string>, includes?: ReadonlyArray<string>): Promise<Map<string, DBDriver>> {
     const driversList: DBDriver[] = [];
-    const all = this.isAlias(originalKey, CachedMapAllKey);
+    const all = this.aliases.isAlias(originalKey, CachedMapAllKey);
 
     await ResourceKeyUtils.forEachAsync(originalKey, async key => {
       const driverId = isResourceAlias(key) ? undefined : key;

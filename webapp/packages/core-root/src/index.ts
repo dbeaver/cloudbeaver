@@ -24,4 +24,4 @@ export * from './SessionExpireService';
 export * from './SessionExpireEventService';
 export * from './ServerNodeService';
 export * from './WindowEventsService';
-export { manifest as coreRootManifest } from './manifest';
+export * from './manifest';

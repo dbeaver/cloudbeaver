@@ -9,7 +9,7 @@ import type { PluginManifest } from '@cloudbeaver/core-di';
 
 import { LocalizationService } from './LocalizationService';
 
-export const manifest: PluginManifest = {
+export const coreLocalizationManifest: PluginManifest = {
   info: {
     name: 'Core Localization',
   },

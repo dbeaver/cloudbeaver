@@ -6,8 +6,9 @@
  * you may not use this file except in compliance with the License.
  */
 import { injectable } from '@cloudbeaver/core-di';
+import { CachedMapAllKey, CachedMapResource, resourceKeyList } from '@cloudbeaver/core-resource';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
-import { CachedMapAllKey, CachedMapResource, DataTransferProcessorInfo, GraphQLService, resourceKeyList } from '@cloudbeaver/core-sdk';
+import { DataTransferProcessorInfo, GraphQLService } from '@cloudbeaver/core-sdk';
 
 @injectable()
 export class DataTransferProcessorsResource extends CachedMapResource<string, DataTransferProcessorInfo> {
