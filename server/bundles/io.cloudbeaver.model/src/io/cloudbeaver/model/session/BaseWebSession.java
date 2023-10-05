@@ -30,6 +30,7 @@ import org.jkiss.dbeaver.model.auth.SMSessionContext;
 import org.jkiss.dbeaver.model.auth.impl.AbstractSessionPersistent;
 import org.jkiss.dbeaver.model.meta.Property;
 import org.jkiss.dbeaver.model.websocket.event.WSEvent;
+import org.jkiss.dbeaver.model.websocket.event.WSEventDeleteTempFile;
 import org.jkiss.dbeaver.model.websocket.event.session.WSSessionExpiredEvent;
 
 import java.time.Instant;
@@ -165,13 +166,13 @@ public abstract class BaseWebSession extends AbstractSessionPersistent {
     @Override
     public void close() {
         super.close();
-        var sessionExpiredEvent = new WSSessionExpiredEvent(getSessionId());
+        var sessionExpiredEvent = new WSSessionExpiredEvent();
         application.getEventController().addEvent(sessionExpiredEvent);
+        application.getEventController().addEvent(new WSEventDeleteTempFile(getSessionId()));
         synchronized (sessionEventHandlers) {
             for (CBWebSessionEventHandler sessionEventHandler : sessionEventHandlers) {
                 try {
                     sessionEventHandler.handleWebSessionEvent(sessionExpiredEvent);
-                    sessionEventHandler.resetTempFolder();
                 } catch (DBException e) {
                     log.warn("Failed to send session expiration event", e);
                 }

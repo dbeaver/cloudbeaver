@@ -24,5 +24,4 @@ public interface CBWebSessionEventHandler {
 
     void close();
 
-    void resetTempFolder();
 }
