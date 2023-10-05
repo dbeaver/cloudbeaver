@@ -1,4 +1,4 @@
-name: "Commit Message Validation"
+name: validation
 
 on:
   pull_request:
@@ -11,7 +11,7 @@ on:
       - edited
       - ready_for_review
       - labeled
-      
+
 jobs:
-  validate-commit-message:
+  commit-message:
     uses: dbeaver/dbeaver/.github/workflows/reused-commit-msgs-validator.yml@devel
