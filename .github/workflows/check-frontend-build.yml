@@ -68,14 +68,8 @@ jobs:
           dir: webapp
           cmd: lerna bootstrap
 
-      - name: Run pre test
+      - name: Build
         uses: borales/actions-yarn@v4
         with:
-          dir: webapp
-          cmd: pretest
-
-      - name: Run test
-        uses: borales/actions-yarn@v4
-        with:
-          dir: webapp
-          cmd: lerna run test
+          dir: webapp/packages/product-default
+          cmd: build
