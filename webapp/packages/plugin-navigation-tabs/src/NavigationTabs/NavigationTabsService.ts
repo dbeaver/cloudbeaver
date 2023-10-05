@@ -13,7 +13,7 @@ import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
 import { ProjectsService } from '@cloudbeaver/core-projects';
-import { resourceKeyList, ResourceKeySimple, ResourceKeyUtils } from '@cloudbeaver/core-sdk';
+import { resourceKeyList, ResourceKeySimple, ResourceKeyUtils } from '@cloudbeaver/core-resource';
 import { LocalStorageSaveService } from '@cloudbeaver/core-settings';
 import { isArraysEqual, MetadataMap, TempMap } from '@cloudbeaver/core-utils';
 import { ACTION_OPEN_IN_TAB, IActiveView, View } from '@cloudbeaver/core-view';

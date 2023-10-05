@@ -10,7 +10,7 @@ import { ClientEventId, ISessionEvent, SessionEventId, SessionEventSource, Sessi
 import type { CbProjectsActiveEvent, CbProjectUpdateEvent as IProjectInfoEvent } from '@cloudbeaver/core-sdk';
 import { isArraysEqual } from '@cloudbeaver/core-utils';
 
-export { IProjectInfoEvent };
+export type { IProjectInfoEvent };
 
 @injectable()
 export class ProjectInfoEventHandler extends TopicEventHandler<IProjectInfoEvent, ISessionEvent, SessionEventId, SessionEventTopic> {

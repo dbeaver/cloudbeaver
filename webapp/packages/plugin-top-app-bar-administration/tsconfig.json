@@ -1,0 +1,31 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "rootDir": "src",
+    "outDir": "dist",
+    "tsBuildInfoFile": "dist/tsconfig.tsbuildinfo"
+  },
+  "references": [
+    {
+      "path": "..\\plugin-administration"
+    },
+    {
+      "path": "..\\plugin-top-app-bar"
+    },
+    {
+      "path": "..\\core-di"
+    }
+  ],
+  "include": [
+    "__custom_mocks__/**/*",
+    "src/**/*",
+    "src/**/*.json",
+    "src/**/*.css",
+    "src/**/*.scss"
+  ],
+  "exclude": [
+    "lib/**/*",
+    "dist/**/*",
+    "**/node_modules"
+  ]
+}

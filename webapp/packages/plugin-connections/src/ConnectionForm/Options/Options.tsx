@@ -33,10 +33,10 @@ import {
 } from '@cloudbeaver/core-blocks';
 import { DatabaseAuthModelsResource, DBDriverResource, isLocalConnection } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
+import { CachedResourceListEmptyKey, resourceKeyList } from '@cloudbeaver/core-resource';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
-import { CachedResourceListEmptyKey, DriverConfigurationType, resourceKeyList } from '@cloudbeaver/core-sdk';
-import type { TabContainerPanelComponent } from '@cloudbeaver/core-ui';
-import { useAuthenticationAction } from '@cloudbeaver/core-ui';
+import { DriverConfigurationType } from '@cloudbeaver/core-sdk';
+import { type TabContainerPanelComponent, useAuthenticationAction } from '@cloudbeaver/core-ui';
 import { isSafari } from '@cloudbeaver/core-utils';
 import { ProjectSelect } from '@cloudbeaver/plugin-projects';
 

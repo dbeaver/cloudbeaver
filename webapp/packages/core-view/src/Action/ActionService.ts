@@ -5,9 +5,9 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
+import type { IDataContextProvider } from '@cloudbeaver/core-data-context';
 import { injectable } from '@cloudbeaver/core-di';
 
-import type { IDataContextProvider } from '../DataContext/IDataContextProvider';
 import { ActionItem } from './ActionItem';
 import type { IAction } from './IAction';
 import type { IActionHandler } from './IActionHandler';

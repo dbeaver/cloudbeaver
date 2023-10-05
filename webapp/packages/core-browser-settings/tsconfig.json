@@ -1,0 +1,31 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "exclude": [
+    "lib/**/*",
+    "dist/**/*",
+    "**/node_modules"
+  ],
+  "compilerOptions": {
+    "rootDir": "src",
+    "outDir": "dist",
+    "tsBuildInfoFile": "dist/tsconfig.tsbuildinfo"
+  },
+  "references": [
+    {
+      "path": "..\\core-di"
+    },
+    {
+      "path": "..\\core-plugin"
+    },
+    {
+      "path": "..\\tests-runner"
+    }
+  ],
+  "include": [
+    "__custom_mocks__/**/*",
+    "src/**/*",
+    "src/**/*.json",
+    "src/**/*.css",
+    "src/**/*.scss"
+  ]
+}

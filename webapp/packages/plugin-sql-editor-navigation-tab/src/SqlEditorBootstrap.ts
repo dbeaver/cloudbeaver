@@ -5,24 +5,26 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
+import { RenameDialog } from '@cloudbeaver/core-blocks';
 import {
   Connection,
   ConnectionInfoResource,
   createConnectionParam,
+  DATA_CONTEXT_CONNECTION,
   IConnectionInfoParams,
   isConnectionProvider,
   isObjectCatalogProvider,
   isObjectSchemaProvider,
 } from '@cloudbeaver/core-connections';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
-import { CommonDialogService, DialogueStateResult, RenameDialog } from '@cloudbeaver/core-dialogs';
+import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import type { IExecutorHandler } from '@cloudbeaver/core-executor';
 import { ExtensionUtils } from '@cloudbeaver/core-extensions';
 import { LocalizationService } from '@cloudbeaver/core-localization';
 import { DATA_CONTEXT_NAV_NODE, EObjectFeature, NodeManagerUtils } from '@cloudbeaver/core-navigation-tree';
 import { ISessionAction, sessionActionContext, SessionActionService } from '@cloudbeaver/core-root';
 import { ACTION_RENAME, ActionService, DATA_CONTEXT_MENU_NESTED, menuExtractItems, MenuService, ViewService } from '@cloudbeaver/core-view';
-import { DATA_CONTEXT_CONNECTION, MENU_CONNECTIONS } from '@cloudbeaver/plugin-connections';
+import { MENU_CONNECTIONS } from '@cloudbeaver/plugin-connections';
 import { NavigationTabsService } from '@cloudbeaver/plugin-navigation-tabs';
 import {
   DATA_CONTEXT_SQL_EDITOR_STATE,

@@ -8,6 +8,8 @@
 import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
+import { useStyles } from '@cloudbeaver/core-blocks';
+
 import { additionalProps, getValue, matchType } from '../helpers';
 import type { ObjectPropertyProps } from './ObjectPropertyProps';
 

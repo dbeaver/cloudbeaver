@@ -18,7 +18,7 @@ import {
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { LocalizationService } from '@cloudbeaver/core-localization';
 import { EObjectFeature, NodeManagerUtils } from '@cloudbeaver/core-navigation-tree';
-import { getCachedMapResourceLoaderState } from '@cloudbeaver/core-sdk';
+import { getCachedMapResourceLoaderState } from '@cloudbeaver/core-resource';
 import { OptionsPanelService } from '@cloudbeaver/core-ui';
 import { DATA_CONTEXT_MENU, MenuBaseItem, menuExtractItems, MenuSeparatorItem, MenuService } from '@cloudbeaver/core-view';
 import { MENU_APP_ACTIONS } from '@cloudbeaver/plugin-top-app-bar';

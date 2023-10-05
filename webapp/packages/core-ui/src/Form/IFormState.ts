@@ -5,10 +5,10 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
+import type { IDataContext } from '@cloudbeaver/core-data-context';
 import type { ENotificationType } from '@cloudbeaver/core-events';
 import type { IExecutor } from '@cloudbeaver/core-executor';
 import type { ILoadableState, MetadataMap } from '@cloudbeaver/core-utils';
-import type { IDataContext } from '@cloudbeaver/core-view';
 
 import type { FormBaseService } from './FormBaseService';
 import type { FormMode } from './FormMode';

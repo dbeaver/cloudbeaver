@@ -7,8 +7,9 @@
  */
 import { ConnectionExecutionContextResource } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
+import { CachedDataResource } from '@cloudbeaver/core-resource';
 import { ServerEventId } from '@cloudbeaver/core-root';
-import { CachedDataResource, CbDatabaseOutputLogEvent } from '@cloudbeaver/core-sdk';
+import type { CbDatabaseOutputLogEvent } from '@cloudbeaver/core-sdk';
 
 import type { IOutputLogType } from './IOutputLogTypes';
 import { OutputLogsEventHandler } from './OutputLogsEventHandler';
@@ -38,7 +39,7 @@ export class OutputLogsResource extends CachedDataResource<IOutputLog[]> {
     );
 
     // hack, we need to call this.use() to initialize resource at startup
-    this.use(undefined);
+    this.useTracker.use(undefined);
 
     this.connectionExecutionContextResource.onItemDelete.addHandler(key => {
       this.setData(this.data.filter(log => log.contextId !== key));

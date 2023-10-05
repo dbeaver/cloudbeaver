@@ -1,14 +1,52 @@
 {
-  "extends": "../../tsconfig.json",
+  "extends": "../../tsconfig.base.json",
   "compilerOptions": {
     "rootDir": "src",
-    "outDir": "lib"
+    "outDir": "dist",
+    "tsBuildInfoFile": "dist/tsconfig.tsbuildinfo"
   },
-  "include": ["src"],
-  "exclude": ["**/node_modules", "**/.*/"],
   "references": [
     {
-      "path": "../*"
+      "path": "..\\core-authentication"
+    },
+    {
+      "path": "..\\core-di"
+    },
+    {
+      "path": "..\\core-localization"
+    },
+    {
+      "path": "..\\core-plugin"
+    },
+    {
+      "path": "..\\core-projects"
+    },
+    {
+      "path": "..\\core-resource"
+    },
+    {
+      "path": "..\\core-resource-manager"
+    },
+    {
+      "path": "..\\core-root"
+    },
+    {
+      "path": "..\\core-sdk"
+    },
+    {
+      "path": "..\\tests-runner"
     }
+  ],
+  "include": [
+    "__custom_mocks__/**/*",
+    "src/**/*",
+    "src/**/*.json",
+    "src/**/*.css",
+    "src/**/*.scss"
+  ],
+  "exclude": [
+    "lib/**/*",
+    "dist/**/*",
+    "**/node_modules"
   ]
 }

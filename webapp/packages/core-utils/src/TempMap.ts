@@ -8,12 +8,7 @@
 import { action, makeObservable, observable } from 'mobx';
 
 import { cacheValue, ICachedValueObject } from './cacheValue';
-
-const combine = <T>(a: IterableIterator<T>, b: IterableIterator<T>): IterableIterator<T> =>
-  (function* () {
-    yield* a;
-    yield* b;
-  })();
+import { combineITerableIterators } from './combineITerableIterators';
 
 export class TempMap<TKey, TValue> implements Map<TKey, TValue> {
   get size(): number {
@@ -124,7 +119,9 @@ export class TempMap<TKey, TValue> implements Map<TKey, TValue> {
   }
 
   keys(): IterableIterator<TKey> {
-    return this.keysTemp.value(() => Array.from(new Set(combine(this.target.keys(), this.temp.keys()))).filter(key => !this.isDeleted(key))).values();
+    return this.keysTemp
+      .value(() => Array.from(new Set(combineITerableIterators(this.target.keys(), this.temp.keys()))).filter(key => !this.isDeleted(key)))
+      .values();
   }
 
   values(): IterableIterator<TValue> {

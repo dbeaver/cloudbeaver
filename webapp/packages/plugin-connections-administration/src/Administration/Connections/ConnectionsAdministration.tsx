@@ -24,7 +24,7 @@ import {
 } from '@cloudbeaver/core-blocks';
 import { ConnectionInfoActiveProjectKey, ConnectionInfoResource, DBDriverResource } from '@cloudbeaver/core-connections';
 import { useController, useService } from '@cloudbeaver/core-di';
-import { CachedMapAllKey } from '@cloudbeaver/core-sdk';
+import { CachedMapAllKey } from '@cloudbeaver/core-resource';
 
 import { ConnectionsAdministrationController } from './ConnectionsAdministrationController';
 import { ConnectionsTable } from './ConnectionsTable/ConnectionsTable';

@@ -8,8 +8,9 @@
 import { observer } from 'mobx-react-lite';
 
 import { s, SContext, type StyleRegistry, useS } from '@cloudbeaver/core-blocks';
+import type { IDataContext } from '@cloudbeaver/core-data-context';
 import { MenuBar, MenuBarItemStyles, MenuBarStyles } from '@cloudbeaver/core-ui';
-import { IDataContext, useMenu } from '@cloudbeaver/core-view';
+import { useMenu } from '@cloudbeaver/core-view';
 
 import { DATA_CONTEXT_SQL_EDITOR_STATE } from '../DATA_CONTEXT_SQL_EDITOR_STATE';
 import type { ISqlEditorTabState } from '../ISqlEditorTabState';

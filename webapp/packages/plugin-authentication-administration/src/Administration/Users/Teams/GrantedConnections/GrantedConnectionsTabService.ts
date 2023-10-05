@@ -12,7 +12,8 @@ import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { executorHandlerFilter, IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import { isGlobalProject, ProjectInfoResource } from '@cloudbeaver/core-projects';
-import { CachedMapAllKey, GraphQLService } from '@cloudbeaver/core-sdk';
+import { CachedMapAllKey } from '@cloudbeaver/core-resource';
+import { GraphQLService } from '@cloudbeaver/core-sdk';
 import { isArraysEqual, MetadataValueGetter } from '@cloudbeaver/core-utils';
 
 import { teamContext } from '../Contexts/teamContext';

@@ -6,9 +6,9 @@
  * you may not use this file except in compliance with the License.
  */
 import { UsersResource } from '@cloudbeaver/core-authentication';
+import { createDataContext, DATA_CONTEXT_DI_PROVIDER } from '@cloudbeaver/core-data-context';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
 import { DATA_CONTEXT_FORM_STATE } from '@cloudbeaver/core-ui';
-import { createDataContext, DATA_CONTEXT_DI_PROVIDER } from '@cloudbeaver/core-view';
 
 import type { AdministrationUserFormState } from '../AdministrationUserFormState';
 import { UserFormInfoPart } from './UserFormInfoPart';

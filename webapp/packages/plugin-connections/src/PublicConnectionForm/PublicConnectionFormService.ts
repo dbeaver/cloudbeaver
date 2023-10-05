@@ -8,13 +8,15 @@
 import { action, makeObservable, observable } from 'mobx';
 
 import { UserInfoResource } from '@cloudbeaver/core-authentication';
+import { ConfirmationDialog } from '@cloudbeaver/core-blocks';
 import { ConnectionInfoResource, createConnectionParam, IConnectionInfoParams } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
-import { CommonDialogService, ConfirmationDialog, DialogueStateResult } from '@cloudbeaver/core-dialogs';
+import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { executorHandlerFilter, ExecutorInterrupter, IExecutorHandler } from '@cloudbeaver/core-executor';
 import { ProjectInfoResource, ProjectsService } from '@cloudbeaver/core-projects';
-import type { ConnectionConfig, ResourceKey, ResourceKeySimple } from '@cloudbeaver/core-sdk';
+import type { ResourceKey, ResourceKeySimple } from '@cloudbeaver/core-resource';
+import type { ConnectionConfig } from '@cloudbeaver/core-sdk';
 import { OptionsPanelService } from '@cloudbeaver/core-ui';
 import { AuthenticationService } from '@cloudbeaver/plugin-authentication';
 
