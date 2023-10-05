@@ -6,27 +6,10 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import styled, { css } from 'reshadow';
 
-import { Button, useTranslate } from '@cloudbeaver/core-blocks';
+import { Button, useS, useTranslate } from '@cloudbeaver/core-blocks';
 
-const styles = css`
-  controls {
-    display: flex;
-    flex: 1;
-    height: 100%;
-    align-items: center;
-    margin: auto;
-  }
-
-  fill {
-    flex: 1;
-  }
-
-  Button:not(:first-child) {
-    margin-left: 24px;
-  }
-`;
+import style from './ConnectionDialogFooter.m.css';
 
 interface Props {
   isConnecting: boolean;
@@ -35,16 +18,17 @@ interface Props {
 }
 
 export const ConnectionDialogFooter = observer<Props>(function ConnectionDialogFooter({ isConnecting, onConnect, onBack }) {
+  const styles = useS(style);
   const translate = useTranslate();
-  return styled(styles)(
-    <controls>
-      <fill />
+  return (
+    <div className={styles.controls}>
+      <div className={styles.fill} />
       <Button type="button" mod={['outlined']} disabled={isConnecting} onClick={onBack}>
         {translate('ui_stepper_back')}
       </Button>
       <Button type="button" mod={['unelevated']} disabled={isConnecting} onClick={onConnect}>
         {isConnecting ? translate('basicConnection_connectionDialog_connecting') : translate('connections_connection_connect')}
       </Button>
-    </controls>,
+    </div>
   );
 });
