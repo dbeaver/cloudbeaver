@@ -48,6 +48,9 @@
       "path": "..\\core-utils"
     },
     {
+      "path": "..\\core-projects"
+    },
+    {
       "path": "..\\tests-runner"
     }
   ],
