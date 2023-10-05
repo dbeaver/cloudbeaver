@@ -18,7 +18,7 @@
     "gql:gen:dev": "graphql-codegen --watch",
     "lint": "eslint ./src/ --ext .ts,.tsx",
     "lint-fix": "eslint ./src/ --ext .ts,.tsx --fix",
-    "test": "core-cli-test",
+    "test": "tsc -b && core-cli-test",
     "validate-dependencies": "core-cli-validate-dependencies",
     "update-ts-references": "rimraf --glob dist/* && typescript-resolve-references"
   },

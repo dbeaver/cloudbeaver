@@ -1,15 +1,8 @@
 {
   "extends": "../../tsconfig.base.json",
   "exclude": [
-    "react-data-grid-dist",
-    "lib",
-    "dist",
-    "node_modules",
     "lib/**/*",
     "dist/**/*",
-    "node_modules/**/*",
-    "**/*.test.ts",
-    "**/*.test.tsx",
     "**/node_modules"
   ],
   "compilerOptions": {
@@ -19,6 +12,7 @@
   },
   "references": [],
   "include": [
+    "__custom_mocks__/**/*",
     "src/**/*",
     "src/**/*.json",
     "src/**/*.css",

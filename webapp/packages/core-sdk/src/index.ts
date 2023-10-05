@@ -12,4 +12,4 @@ export * from './isObjectPropertyInfoStateEqual';
 export * from './sdk';
 export * from './ServerInternalError';
 export * from './ServiceError';
-export { manifest as coreSDKManifest } from './manifest';
+export * from './manifest';

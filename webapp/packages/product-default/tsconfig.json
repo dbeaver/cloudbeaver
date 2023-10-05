@@ -173,6 +173,7 @@
     }
   ],
   "include": [
+    "__custom_mocks__/**/*",
     "src/**/*",
     "src/**/*.json",
     "src/**/*.css",
@@ -181,8 +182,6 @@
   "exclude": [
     "lib/**/*",
     "dist/**/*",
-    "**/node_modules",
-    "**/*.test.ts",
-    "**/*.test.tsx"
+    "**/node_modules"
   ]
 }

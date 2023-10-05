@@ -7,7 +7,6 @@
  */
 import { configure } from 'mobx';
 
-import coreManifests from '@cloudbeaver/core-bootstrap';
 import { App, IServiceInjector, PluginManifest } from '@cloudbeaver/core-di';
 
 export interface IApplication {
@@ -21,16 +20,19 @@ export function createApp(...plugins: PluginManifest[]): IApplication {
   (globalThis as any)._VERSION_ = '00.0.0';
   configure({ enforceActions: 'never' });
 
-  const app = new App([...coreManifests, ...plugins]);
+  const app = new App(plugins);
   const injector = app.getServiceInjector();
 
+  //@ts-expect-error
   app.registerServices();
 
   return {
     app,
     injector,
     async init() {
+      //@ts-expect-error
       await app.initializeServices();
+      //@ts-expect-error
       await app.loadServices();
     },
   };

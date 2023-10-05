@@ -1,14 +1,8 @@
 {
   "extends": "../../tsconfig.base.json",
   "exclude": [
-    "**/*.test.ts",
-    "**/*.test.tsx",
-    "lib",
-    "dist",
-    "node_modules",
     "lib/**/*",
     "dist/**/*",
-    "node_modules/**/*",
     "**/node_modules"
   ],
   "compilerOptions": {
@@ -25,6 +19,7 @@
     }
   ],
   "include": [
+    "__custom_mocks__/**/*",
     "src/**/*",
     "src/**/*.json",
     "src/**/*.css",

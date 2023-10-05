@@ -1,13 +1,8 @@
 {
   "extends": "../../tsconfig.base.json",
   "exclude": [
-    "graphql-request/src/types.ts",
-    "codegen.ts",
     "lib/**/*",
     "dist/**/*",
-    "node_modules/**/*",
-    "**/*.test.ts",
-    "**/*.test.tsx",
     "**/node_modules"
   ],
   "compilerOptions": {
@@ -24,6 +19,7 @@
     }
   ],
   "include": [
+    "__custom_mocks__/**/*",
     "src/**/*",
     "src/**/*.json",
     "src/**/*.css",

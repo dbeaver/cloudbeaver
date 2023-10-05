@@ -11,22 +11,22 @@ import connectionSearch from '@cloudbeaver/plugin-connection-search';
 import connectionTemplate from '@cloudbeaver/plugin-connection-template';
 import connectionPlugin from '@cloudbeaver/plugin-connections';
 import connectionAdministration from '@cloudbeaver/plugin-connections-administration';
-import dataExport from '@cloudbeaver/plugin-data-export';
-import spreadsheetNew from '@cloudbeaver/plugin-data-spreadsheet-new';
-import dataViewer from '@cloudbeaver/plugin-data-viewer';
+import { dataExportManifest } from '@cloudbeaver/plugin-data-export';
+import { dataSpreadsheetNewManifest } from '@cloudbeaver/plugin-data-spreadsheet-new';
+import { dataViewerManifest } from '@cloudbeaver/plugin-data-viewer';
 import { dvResultSetGroupingPlugin } from '@cloudbeaver/plugin-data-viewer-result-set-grouping';
-import datasourceContextSwitch from '@cloudbeaver/plugin-datasource-context-switch';
+import { datasourceContextSwitchPluginManifest } from '@cloudbeaver/plugin-datasource-context-switch';
 import ddlViewer from '@cloudbeaver/plugin-ddl-viewer';
 import devTools from '@cloudbeaver/plugin-devtools';
 import gisViewer from '@cloudbeaver/plugin-gis-viewer';
 import help from '@cloudbeaver/plugin-help';
 import localization from '@cloudbeaver/plugin-localization';
 import logViewer from '@cloudbeaver/plugin-log-viewer';
-import navigationTabs from '@cloudbeaver/plugin-navigation-tabs';
-import navigationTree from '@cloudbeaver/plugin-navigation-tree';
+import { navigationTabsPlugin } from '@cloudbeaver/plugin-navigation-tabs';
+import { navigationTreePlugin } from '@cloudbeaver/plugin-navigation-tree';
 import navigationTreeFilters from '@cloudbeaver/plugin-navigation-tree-filters';
 import { navigationTreeRMPlugin } from '@cloudbeaver/plugin-navigation-tree-rm';
-import objectViewer from '@cloudbeaver/plugin-object-viewer';
+import { objectViewerManifest } from '@cloudbeaver/plugin-object-viewer';
 import productPlugin from '@cloudbeaver/plugin-product';
 import projects from '@cloudbeaver/plugin-projects';
 import resourceManager from '@cloudbeaver/plugin-resource-manager';
@@ -59,7 +59,7 @@ const PLUGINS: PluginManifest[] = [
   ssoPlugin,
   devTools,
   administration,
-  spreadsheetNew,
+  dataSpreadsheetNewManifest,
   authentication,
   authenticationAdministration,
   theme,
@@ -67,12 +67,12 @@ const PLUGINS: PluginManifest[] = [
   connectionCustom,
   connectionTemplate,
   connectionSearch,
-  dataExport,
-  dataViewer,
+  dataExportManifest,
+  dataViewerManifest,
   dvResultSetGroupingPlugin,
   gisViewer,
   ddlViewer,
-  objectViewer,
+  objectViewerManifest,
   sqlEditor,
   sqlEditorTab,
   sqlEditorScreen,
@@ -94,13 +94,13 @@ const PLUGINS: PluginManifest[] = [
   resourceManagerScripts,
   sqlEditorResource,
   logViewer,
-  navigationTree,
+  navigationTreePlugin,
   navigationTreeRMPlugin,
-  datasourceContextSwitch,
+  datasourceContextSwitchPluginManifest,
   topAppBar,
   administrationTopAppBarPlugin,
   version,
-  navigationTabs,
+  navigationTabsPlugin,
   root,
   sessionExpirationPlugin,
   toolsPanel,

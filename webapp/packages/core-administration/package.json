@@ -13,7 +13,7 @@
     "build": "core-cli-build --mode=production --config ../core-cli/configs/webpack.plugin.config.js",
     "lint": "eslint ./src/ --ext .ts,.tsx",
     "lint-fix": "eslint ./src/ --ext .ts,.tsx --fix",
-    "test": "core-cli-test",
+    "test": "tsc -b && core-cli-test",
     "validate-dependencies": "core-cli-validate-dependencies",
     "update-ts-references": "rimraf --glob dist/* && typescript-resolve-references"
   },
@@ -32,9 +32,6 @@
     "@cloudbeaver/core-settings": "~0.1.0",
     "@cloudbeaver/core-theming": "~0.1.0",
     "@cloudbeaver/core-utils": "~0.1.0"
-  },
-  "devDependencies": {
-    "@cloudbeaver/core-theming": "~0.1.0"
   },
   "peerDependencies": {
     "react": "~18.x.x",

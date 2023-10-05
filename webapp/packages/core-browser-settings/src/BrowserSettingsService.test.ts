@@ -7,20 +7,19 @@
  */
 import '@testing-library/jest-dom';
 
-import { mockAuthentication } from '@cloudbeaver/core-authentication/mocks/mockAuthentication';
-import { createApp } from '@cloudbeaver/core-cli/tests/utils/createApp';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
-import { createGQLEndpoint } from '@cloudbeaver/core-root/mocks/createGQLEndpoint';
-import { mockAppInit } from '@cloudbeaver/core-root/mocks/mockAppInit';
-import { mockGraphQL } from '@cloudbeaver/core-root/mocks/mockGraphQL';
-import { mockServerConfig } from '@cloudbeaver/core-root/mocks/resolvers/mockServerConfig';
+import { createGQLEndpoint } from '@cloudbeaver/core-root/dist/__custom_mocks__/createGQLEndpoint';
+import { mockAppInit } from '@cloudbeaver/core-root/dist/__custom_mocks__/mockAppInit';
+import { mockGraphQL } from '@cloudbeaver/core-root/dist/__custom_mocks__/mockGraphQL';
+import { mockServerConfig } from '@cloudbeaver/core-root/dist/__custom_mocks__/resolvers/mockServerConfig';
+import { createApp } from '@cloudbeaver/tests-runner';
 
 import { BrowserSettingsService, CookiesSettings, DeprecatedCookiesSettings } from './BrowserSettingsService';
 
 const endpoint = createGQLEndpoint();
 const app = createApp();
 
-const server = mockGraphQL(...mockAppInit(endpoint), ...mockAuthentication(endpoint));
+const server = mockGraphQL(...mockAppInit(endpoint));
 
 beforeAll(() => app.init());
 

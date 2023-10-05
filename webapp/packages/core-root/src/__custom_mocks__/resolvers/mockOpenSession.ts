@@ -18,6 +18,8 @@ export function mockOpenSession(
   return res(
     ctx.data({
       session: {
+        valid: true,
+        remainingTime: 0,
         createTime: date,
         lastAccessTime: date,
         cacheExpired: false,

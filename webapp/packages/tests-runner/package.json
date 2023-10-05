@@ -1,0 +1,30 @@
+{
+  "name": "@cloudbeaver/tests-runner",
+  "version": "0.1.0",
+  "description": "",
+  "license": "Apache-2.0",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "core-cli-build --mode=production --config ../core-cli/configs/webpack.plugin.config.js",
+    "lint": "eslint ./src/ --ext .ts,.tsx",
+    "lint-fix": "eslint ./src/ --ext .ts,.tsx --fix",
+    "test": "tsc -b && core-cli-test",
+    "validate-dependencies": "core-cli-validate-dependencies",
+    "update-ts-references": "rimraf --glob dist/* && typescript-resolve-references"
+  },
+  "dependencies": {
+    "@testing-library/react": "^14.x.x",
+    "@cloudbeaver/core-di": "~0.1.0"
+  },
+  "peerDependencies": {
+    "@testing-library/jest-dom": "~6.x.x",
+    "mobx": "~6.x.x",
+    "react": "~18.x.x",
+    "reshadow": "~0.x.x"
+  },
+  "sideEffects": [
+    "src/**/*.css",
+    "src/**/*.scss",
+    "public/**/*"
+  ]
+}
