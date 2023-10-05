@@ -132,7 +132,8 @@ public class WebServiceSQL implements DBWServiceSQL {
         @NotNull String query,
         Integer position,
         Integer maxResults,
-        Boolean simpleMode) throws DBWebException {
+        Boolean simpleMode) throws DBWebException
+    {
         try {
             DBPDataSource dataSource = sqlContext.getProcessor().getConnection().getDataSourceContainer().getDataSource();
 
@@ -204,9 +205,9 @@ public class WebServiceSQL implements DBWServiceSQL {
 
     @Override
     public SQLGeneratorDescriptor[] getEntityQueryGenerators(
-            @NotNull WebSession session,
-            @NotNull List<String> nodePathList)
-            throws DBWebException
+        @NotNull WebSession session,
+        @NotNull List<String> nodePathList)
+        throws DBWebException
     {
         List<DBSObject> objectList = getObjectListFromNodeIds(session, nodePathList);
         return SQLGeneratorConfigurationRegistry.getInstance().getApplicableGenerators(objectList, session).toArray(new SQLGeneratorDescriptor[0]);
@@ -333,7 +334,7 @@ public class WebServiceSQL implements DBWServiceSQL {
                     monitor -> {
                         try {
                             result.append(contextInfo.getProcessor().readLobValue(
-                                monitor, contextInfo, resultsId, lobColumnIndex, row.get(0)));
+                            monitor, contextInfo, resultsId, lobColumnIndex, row.get(0)));
                         } catch (Exception e) {
                             throw new InvocationTargetException(e);
                         }
@@ -364,7 +365,8 @@ public class WebServiceSQL implements DBWServiceSQL {
         @Nullable WebSQLDataFilter filter,
         @Nullable WebDataFormat dataFormat,
         boolean readLogs,
-        @NotNull WebSession webSession) {
+        @NotNull WebSession webSession)
+    {
         WebAsyncTaskProcessor<String> runnable = new WebAsyncTaskProcessor<>() {
             @Override
             public void run(DBRProgressMonitor monitor) throws InvocationTargetException {

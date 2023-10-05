@@ -63,8 +63,6 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
-import static io.cloudbeaver.service.sql.WebSQLFileLoaderServlet.TEMP_FILE_FOLDER;
-
 /**
  * Web SQL processor.
  */
@@ -75,6 +73,7 @@ public class WebSQLProcessor implements WebSessionProvider {
     private static final int MAX_RESULTS_COUNT = 100;
 
     private static final String FILE_ID = "fileId";
+    private static final String TEMP_FILE_FOLDER = "temp-sql-upload-files";
 
     private final WebSession webSession;
     private final WebConnectionInfo connection;
@@ -217,7 +216,8 @@ public class WebSQLProcessor implements WebSessionProvider {
                         DBCStatementType.SCRIPT,
                         sqlQuery,
                         webDataFilter.getOffset(),
-                        webDataFilter.getLimit())) {
+                        webDataFilter.getLimit()))
+                    {
                         SqlOutputLogReaderJob sqlOutputLogReaderJob = null;
                         if (readLogs) {
                             DBPDataSource dataSource = context.getDataSource();
@@ -323,7 +323,8 @@ public class WebSQLProcessor implements WebSessionProvider {
         @Nullable List<WebSQLResultsRow> updatedRows,
         @Nullable List<WebSQLResultsRow> deletedRows,
         @Nullable List<WebSQLResultsRow> addedRows,
-        @Nullable WebDataFormat dataFormat) throws DBException {
+        @Nullable WebDataFormat dataFormat) throws DBException
+    {
         List<Object[]> newResultSetRows = new ArrayList<>();
         KeyDataReceiver keyReceiver = new KeyDataReceiver(contextInfo.getResults(resultsId));
         WebSQLResultsInfo resultsInfo = contextInfo.getResults(resultsId);
@@ -412,7 +413,8 @@ public class WebSQLProcessor implements WebSessionProvider {
         @Nullable List<WebSQLResultsRow> updatedRows,
         @Nullable List<WebSQLResultsRow> deletedRows,
         @Nullable List<WebSQLResultsRow> addedRows,
-        @Nullable WebDataFormat dataFormat) throws DBException {
+        @Nullable WebDataFormat dataFormat) throws DBException
+    {
         Map<DBSDataManipulator.ExecuteBatch, Object[]> resultBatches = new LinkedHashMap<>();
 
 
@@ -754,6 +756,7 @@ public class WebSQLProcessor implements WebSessionProvider {
             }
         }
     }
+
     ////////////////////////////////////////////////
     // Misc
 

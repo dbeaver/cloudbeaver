@@ -50,7 +50,7 @@ public class WebSQLFileLoaderServlet extends WebServiceServletBase {
     }.getType();
     private static final String REQUEST_PARAM_VARIABLES = "variables";
 
-    public static final String TEMP_FILE_FOLDER = "temp-sql-upload-files";
+    private static final String TEMP_FILE_FOLDER = "temp-sql-upload-files";
 
     private static final String FILE_ID = "fileId";
 
