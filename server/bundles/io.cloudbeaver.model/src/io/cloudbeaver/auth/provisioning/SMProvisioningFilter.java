@@ -26,13 +26,10 @@ public class SMProvisioningFilter {
     private final Integer offset;
     @Nullable
     private final Integer limit;
-    @Nullable
-    private final String cursor;
 
     public SMProvisioningFilter(Map<String, Object> params) {
         this.offset = JSONUtils.getInteger(params, "offset");
         this.limit = JSONUtils.getInteger(params, "limit");
-        this.cursor = JSONUtils.getString(params, "cursor");
     }
 
     @Nullable
@@ -43,10 +40,5 @@ public class SMProvisioningFilter {
     @Nullable
     public Integer getLimit() {
         return limit;
-    }
-
-    @Nullable
-    public String getCursor() {
-        return cursor;
     }
 }
