@@ -21,6 +21,7 @@ import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.model.WebConnectionInfo;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.model.session.WebSessionProvider;
+import io.cloudbeaver.server.CBPlatform;
 import io.cloudbeaver.server.jobs.SqlOutputLogReaderJob;
 import org.eclipse.jface.text.Document;
 import org.jkiss.code.NotNull;
@@ -42,6 +43,7 @@ import org.jkiss.dbeaver.model.impl.DefaultServerOutputReader;
 import org.jkiss.dbeaver.model.navigator.DBNDatabaseItem;
 import org.jkiss.dbeaver.model.navigator.DBNNode;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
+import org.jkiss.dbeaver.model.runtime.VoidProgressMonitor;
 import org.jkiss.dbeaver.model.sql.SQLQuery;
 import org.jkiss.dbeaver.model.sql.SQLSyntaxManager;
 import org.jkiss.dbeaver.model.sql.SQLUtils;
@@ -61,6 +63,8 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
+import static io.cloudbeaver.service.sql.WebSQLFileLoaderServlet.TEMP_FILE_FOLDER;
+
 /**
  * Web SQL processor.
  */
@@ -69,6 +73,8 @@ public class WebSQLProcessor implements WebSessionProvider {
     private static final Log log = Log.getLog(WebSQLProcessor.class);
 
     private static final int MAX_RESULTS_COUNT = 100;
+
+    private static final String FILE_ID = "fileId";
 
     private final WebSession webSession;
     private final WebConnectionInfo connection;
@@ -451,7 +457,8 @@ public class WebSQLProcessor implements WebSessionProvider {
         @Nullable WebDataFormat dataFormat,
         @NotNull Map<DBSDataManipulator.ExecuteBatch, Object[]> resultBatches,
         @Nullable DBDDataReceiver keyReceiver)
-        throws DBException {
+        throws DBException
+    {
 
         DBSEntity dataContainer = rowIdentifier.getEntity();
         checkDataEditAllowed(dataContainer);
@@ -494,17 +501,7 @@ public class WebSQLProcessor implements WebSessionProvider {
                         DBDAttributeBinding updateAttribute = updateAttributes[i];
                         LinkedTreeMap<String, Object> variables =
                             (LinkedTreeMap<String, Object>) updateValues.get(String.valueOf(updateAttribute.getOrdinalPosition()));
-                        Object realCellValue;
-                        if (variables.get("fileId") != null) {
-                            Path path = WebSQLFileLoaderServlet.DATA_FOLDER_UPLOAD
-                                .resolve(webSession.getSessionId())
-                                .resolve(variables.get("fileId").toString());
-
-                            byte[] file = Files.readAllBytes(path);
-                            realCellValue = convertInputCellValue(session, updateAttribute, file, withoutExecution);
-                        } else {
-                            realCellValue = convertInputCellValue(session, updateAttribute, variables, withoutExecution);
-                        }
+                        Object realCellValue = setCellRowValue(variables, webSession, session, updateAttribute, withoutExecution);
                         rowValues[i] = realCellValue;
                         finalRow[updateAttribute.getOrdinalPosition()] = realCellValue;
                     }
@@ -553,16 +550,7 @@ public class WebSQLProcessor implements WebSessionProvider {
                             Object realCellValue;
                             if (addedValues.get(i) instanceof LinkedTreeMap) {
                                 LinkedTreeMap<String, Object> variables = (LinkedTreeMap<String, Object>) addedValues.get(i);
-                                if (variables.get("fileId") != null) {
-                                    Path path = WebSQLFileLoaderServlet.DATA_FOLDER_UPLOAD
-                                        .resolve(webSession.getSessionId())
-                                        .resolve(variables.get("fileId").toString());
-
-                                    byte[] file = Files.readAllBytes(path);
-                                    realCellValue = convertInputCellValue(session, allAttributes[i], file, withoutExecution);
-                                } else {
-                                    continue;
-                                }
+                                realCellValue = setCellRowValue(variables, webSession, session, allAttributes[i], withoutExecution);
                             } else {
                                 realCellValue = convertInputCellValue(session, allAttributes[i],
                                     addedValues.get(i), withoutExecution);
@@ -609,8 +597,6 @@ public class WebSQLProcessor implements WebSessionProvider {
                     resultBatches.put(deleteBatch, new Object[0]);
                 }
             }
-        } catch (IOException e) {
-            throw new DBWebException(e.getMessage());
         }
 
         return dataManipulator;
@@ -953,5 +939,25 @@ public class WebSQLProcessor implements WebSessionProvider {
 
     private static DBCExecutionPurpose resolveQueryPurpose(DBDDataFilter filter) {
         return filter.hasFilters() ? DBCExecutionPurpose.USER_FILTERED : DBCExecutionPurpose.USER;
+    }
+
+    private Object setCellRowValue(Object cellRow, WebSession webSession, DBCSession dbcSession, DBDAttributeBinding allAttributes, boolean withoutExecution) {
+        if (cellRow instanceof LinkedTreeMap) {
+            LinkedTreeMap<String, Object> variables = (LinkedTreeMap<String, Object>) cellRow;
+            if (variables.get(FILE_ID) != null) {
+                Path path = CBPlatform.getInstance()
+                    .getTempFolder(new VoidProgressMonitor(), TEMP_FILE_FOLDER)
+                    .resolve(webSession.getSessionId())
+                    .resolve(variables.get(FILE_ID).toString());
+
+                try {
+                    var file = Files.newInputStream(path);
+                    return convertInputCellValue(dbcSession, allAttributes, file, withoutExecution);
+                } catch (IOException | DBCException e) {
+                    return new DBException(e.getMessage());
+                }
+            }
+        }
+        return cellRow;
     }
 }

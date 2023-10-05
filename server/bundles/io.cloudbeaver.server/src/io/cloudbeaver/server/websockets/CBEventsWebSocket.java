@@ -18,16 +18,22 @@ package io.cloudbeaver.server.websockets;
 
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.model.session.BaseWebSession;
+import io.cloudbeaver.server.CBPlatform;
 import io.cloudbeaver.websocket.CBWebSessionEventHandler;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.WriteCallback;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.Log;
+import org.jkiss.dbeaver.model.runtime.VoidProgressMonitor;
 import org.jkiss.dbeaver.model.websocket.event.WSClientEvent;
 import org.jkiss.dbeaver.model.websocket.event.WSClientEventType;
 import org.jkiss.dbeaver.model.websocket.event.WSEvent;
 import org.jkiss.dbeaver.model.websocket.event.client.WSUpdateActiveProjectsClientEvent;
 import org.jkiss.dbeaver.model.websocket.event.session.WSSocketConnectedEvent;
+import org.jkiss.utils.IOUtils;
+
+import java.io.IOException;
+import java.nio.file.Path;
 
 public class CBEventsWebSocket extends CBAbstractWebSocket implements CBWebSessionEventHandler {
     private static final Log log = Log.getLog(CBEventsWebSocket.class);
@@ -36,6 +42,8 @@ public class CBEventsWebSocket extends CBAbstractWebSocket implements CBWebSessi
     private final BaseWebSession webSession;
     @NotNull
     private final WriteCallback callback;
+
+    private static final String TEMP_FILE_FOLDER = "temp-sql-upload-files";
 
     public CBEventsWebSocket(@NotNull BaseWebSession webSession) {
         this.webSession = webSession;
@@ -100,6 +108,17 @@ public class CBEventsWebSocket extends CBAbstractWebSocket implements CBWebSessi
     @Override
     public void handleWebSessionEvent(WSEvent event) {
         super.handleEvent(event);
+    }
+
+    public void resetTempFolder() {
+        Path path = CBPlatform.getInstance()
+            .getTempFolder(new VoidProgressMonitor(), TEMP_FILE_FOLDER)
+            .resolve(this.webSession.getSessionId());
+        try {
+            IOUtils.deleteDirectory(path);
+        } catch (IOException e) {
+            log.error("Error deleting temp path", e);
+        }
     }
 
     @Override

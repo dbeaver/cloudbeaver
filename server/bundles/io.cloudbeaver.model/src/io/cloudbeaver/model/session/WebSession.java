@@ -80,10 +80,7 @@ import org.jkiss.utils.CommonUtils;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -101,7 +98,6 @@ public class WebSession extends BaseWebSession
     public static final SMSessionType CB_SESSION_TYPE = new SMSessionType("CloudBeaver");
     private static final String WEB_SESSION_AUTH_CONTEXT_TYPE = "web-session";
     private static final String ATTR_LOCALE = "locale";
-
     private static final AtomicInteger TASK_ID = new AtomicInteger();
 
     private final AtomicInteger taskCount = new AtomicInteger();
@@ -431,16 +427,6 @@ public class WebSession extends BaseWebSession
         }
     }
 
-    private void resetTempFolder(){
-        Path path = getWorkspace().getAbsolutePath().resolve("temp-sql-upload-files").resolve(this.getSessionId());
-        try {
-            Files.delete(path);
-        } catch (IOException e) {
-            addSessionError(e);
-            log.error("Error deleting temp path", e);
-        }
-    }
-
     private void resetNavigationModel() {
         Map<String, WebConnectionInfo> conCopy;
         synchronized (this.connections) {
@@ -621,7 +607,6 @@ public class WebSession extends BaseWebSession
         try {
             resetNavigationModel();
             resetSessionCache();
-            resetTempFolder();
         } catch (Throwable e) {
             log.error(e);
         }

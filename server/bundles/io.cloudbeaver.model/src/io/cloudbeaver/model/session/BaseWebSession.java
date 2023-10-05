@@ -165,11 +165,13 @@ public abstract class BaseWebSession extends AbstractSessionPersistent {
     @Override
     public void close() {
         super.close();
-        var sessionExpiredEvent = new WSSessionExpiredEvent();
+        var sessionExpiredEvent = new WSSessionExpiredEvent(getSessionId());
+        application.getEventController().addEvent(sessionExpiredEvent);
         synchronized (sessionEventHandlers) {
             for (CBWebSessionEventHandler sessionEventHandler : sessionEventHandlers) {
                 try {
                     sessionEventHandler.handleWebSessionEvent(sessionExpiredEvent);
+                    sessionEventHandler.resetTempFolder();
                 } catch (DBException e) {
                     log.warn("Failed to send session expiration event", e);
                 }

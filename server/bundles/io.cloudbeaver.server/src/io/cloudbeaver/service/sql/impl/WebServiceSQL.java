@@ -204,9 +204,10 @@ public class WebServiceSQL implements DBWServiceSQL {
 
     @Override
     public SQLGeneratorDescriptor[] getEntityQueryGenerators(
-        @NotNull WebSession session,
-        @NotNull List<String> nodePathList)
-        throws DBWebException {
+            @NotNull WebSession session,
+            @NotNull List<String> nodePathList)
+            throws DBWebException
+    {
         List<DBSObject> objectList = getObjectListFromNodeIds(session, nodePathList);
         return SQLGeneratorConfigurationRegistry.getInstance().getApplicableGenerators(objectList, session).toArray(new SQLGeneratorDescriptor[0]);
     }
@@ -293,7 +294,8 @@ public class WebServiceSQL implements DBWServiceSQL {
         @Nullable List<WebSQLResultsRow> updatedRows,
         @Nullable List<WebSQLResultsRow> deletedRows,
         @Nullable List<WebSQLResultsRow> addedRows,
-        @Nullable WebDataFormat dataFormat) throws DBWebException {
+        @Nullable WebDataFormat dataFormat) throws DBWebException
+    {
         try {
             WebSQLExecuteInfo[] result = new WebSQLExecuteInfo[1];
 
@@ -317,24 +319,25 @@ public class WebServiceSQL implements DBWServiceSQL {
 
     @Override
     public String readLobValue(
-        @NotNull WebSQLContextInfo contextInfo,
-        @NotNull String resultsId,
-        @NotNull Integer lobColumnIndex,
-        @Nullable List<WebSQLResultsRow> row) throws DBWebException {
+            @NotNull WebSQLContextInfo contextInfo,
+            @NotNull String resultsId,
+            @NotNull Integer lobColumnIndex,
+            @Nullable List<WebSQLResultsRow> row) throws DBWebException
+    {
         try {
             var result = new StringBuilder();
 
             DBExecUtils.tryExecuteRecover(
-                contextInfo.getProcessor().getWebSession().getProgressMonitor(),
-                contextInfo.getProcessor().getConnection().getDataSource(),
-                monitor -> {
-                    try {
-                        result.append(contextInfo.getProcessor().readLobValue(
-                            monitor, contextInfo, resultsId, lobColumnIndex, row.get(0)));
-                    } catch (Exception e) {
-                        throw new InvocationTargetException(e);
+                    contextInfo.getProcessor().getWebSession().getProgressMonitor(),
+                    contextInfo.getProcessor().getConnection().getDataSource(),
+                    monitor -> {
+                        try {
+                            result.append(contextInfo.getProcessor().readLobValue(
+                                monitor, contextInfo, resultsId, lobColumnIndex, row.get(0)));
+                        } catch (Exception e) {
+                            throw new InvocationTargetException(e);
+                        }
                     }
-                }
             );
             return result.toString();
         } catch (DBException e) {
@@ -469,8 +472,8 @@ public class WebServiceSQL implements DBWServiceSQL {
             connectionInfo.getDataSourceContainer().getPreferenceStore(),
             sqlScript);
         List<WebSQLQueryInfo> queriesInfo = queries.stream()
-            .map(query -> new WebSQLQueryInfo(query.getOffset(), query.getOffset() + query.getText().length()))
-            .collect(Collectors.toList());
+                .map(query -> new WebSQLQueryInfo(query.getOffset(), query.getOffset() + query.getText().length()))
+                .collect(Collectors.toList());
         return new WebSQLScriptInfo(queriesInfo);
     }
 

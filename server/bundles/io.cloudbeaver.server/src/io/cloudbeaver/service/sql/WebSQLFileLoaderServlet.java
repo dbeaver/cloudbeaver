@@ -19,7 +19,6 @@ package io.cloudbeaver.service.sql;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
-import io.cloudbeaver.DBWConstants;
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.server.CBApplication;
@@ -31,16 +30,16 @@ import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.data.json.JSONUtils;
 import org.jkiss.dbeaver.model.runtime.VoidProgressMonitor;
 
-import javax.servlet.MultipartConfigElement;
-import javax.servlet.ServletException;
-import javax.servlet.annotation.MultipartConfig;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.lang.reflect.Type;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Map;
+import javax.servlet.MultipartConfigElement;
+import javax.servlet.ServletException;
+import javax.servlet.annotation.MultipartConfig;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 @MultipartConfig
 public class WebSQLFileLoaderServlet extends WebServiceServletBase {
@@ -51,13 +50,14 @@ public class WebSQLFileLoaderServlet extends WebServiceServletBase {
     }.getType();
     private static final String REQUEST_PARAM_VARIABLES = "variables";
 
-    public static final Path DATA_FOLDER_UPLOAD =
-        CBPlatform.getInstance().getTempFolder(new VoidProgressMonitor(), "temp-sql-upload-files");
+    public static final String TEMP_FILE_FOLDER = "temp-sql-upload-files";
+
+    private static final String FILE_ID = "fileId";
 
     private static final Gson gson = new GsonBuilder()
-        .serializeNulls()
-        .setPrettyPrinting()
-        .create();
+            .serializeNulls()
+            .setPrettyPrinting()
+            .create();
 
     public WebSQLFileLoaderServlet(CBApplication application) {
         super(application);
@@ -65,12 +65,12 @@ public class WebSQLFileLoaderServlet extends WebServiceServletBase {
 
     @Override
     protected void processServiceRequest(
-        WebSession session,
-        HttpServletRequest request,
-        HttpServletResponse response
+            WebSession session,
+            HttpServletRequest request,
+            HttpServletResponse response
     ) throws DBException, IOException {
-        if (!session.hasPermission(DBWConstants.PERMISSION_ADMIN)) {
-            response.sendError(HttpServletResponse.SC_FORBIDDEN, "Driver management accessible for admins only");
+        if (!session.isAuthorizedInSecurityManager()) {
+            response.sendError(HttpServletResponse.SC_FORBIDDEN, "Update for users only");
             return;
         }
 
@@ -78,19 +78,21 @@ public class WebSQLFileLoaderServlet extends WebServiceServletBase {
             return;
         }
 
-        Path tempFolder = DATA_FOLDER_UPLOAD.resolve(session.getSessionId());
+        Path tempFolder = CBPlatform.getInstance()
+                .getTempFolder(new VoidProgressMonitor(), TEMP_FILE_FOLDER)
+                .resolve(session.getSessionId());
 
         MultipartConfigElement multiPartConfig = new MultipartConfigElement(tempFolder.toString());
         request.setAttribute(Request.__MULTIPART_CONFIG_ELEMENT, multiPartConfig);
 
         Map<String, Object> variables = gson.fromJson(request.getParameter(REQUEST_PARAM_VARIABLES), MAP_STRING_OBJECT_TYPE);
 
-        String fileId = JSONUtils.getString(variables, "fileId");
+        String fileId = JSONUtils.getString(variables, FILE_ID);
 
         if (fileId != null) {
             Path file = tempFolder.resolve(fileId);
             try {
-                Files.write(file, request.getPart("files[]").getInputStream().readAllBytes());
+                Files.write(file, request.getPart("files[]").getInputStream().readAllBytes()); // "fileData"
             } catch (ServletException e) {
                 log.error(e.getMessage());
                 throw new DBWebException(e.getMessage());
