@@ -264,7 +264,7 @@ module.exports = (env, argv) => {
       new MiniCssExtractPlugin({
         filename: devMode ? 'styles/[name].css' : 'styles/[name].[contenthash].css',
         chunkFilename: devMode ? 'styles/[name].bundle.css' : 'styles/[name].[contenthash].css',
-        ignoreOrder: false, // Enable to remove warnings about conflicting order
+        ignoreOrder: true, // Enable to remove warnings about conflicting order
         insert: linkTag => {
           let reshadowObj = document.getElementById('__reshadow__');
 
