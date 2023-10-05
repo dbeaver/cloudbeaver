@@ -4,3 +4,6 @@
 .slideBox {
   flex: 1;
 }
+.pane {
+  composes: theme-background-surface theme-text-on-surface from global;
+}
