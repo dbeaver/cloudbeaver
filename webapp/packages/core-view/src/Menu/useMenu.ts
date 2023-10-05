@@ -8,10 +8,10 @@
 import { computed, observable } from 'mobx';
 
 import { useObservableRef } from '@cloudbeaver/core-blocks';
+import type { IDataContext } from '@cloudbeaver/core-data-context';
 import { useService } from '@cloudbeaver/core-di';
 import { flat, ILoadableState } from '@cloudbeaver/core-utils';
 
-import type { IDataContext } from '../DataContext/IDataContext';
 import { DATA_CONTEXT_MENU_LOCAL } from './DATA_CONTEXT_MENU_LOCAL';
 import type { IMenu } from './IMenu';
 import type { IMenuHandler } from './IMenuHandler';

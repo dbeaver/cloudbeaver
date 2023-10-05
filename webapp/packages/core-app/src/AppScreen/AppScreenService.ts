@@ -12,8 +12,12 @@ import { injectable } from '@cloudbeaver/core-di';
 export class AppScreenService {
   static screenName = 'app';
   readonly placeholder: PlaceholderContainer;
+  readonly rightAreaTop: PlaceholderContainer;
+  readonly rightAreaBottom: PlaceholderContainer;
 
   constructor() {
     this.placeholder = new PlaceholderContainer();
+    this.rightAreaTop = new PlaceholderContainer();
+    this.rightAreaBottom = new PlaceholderContainer();
   }
 }

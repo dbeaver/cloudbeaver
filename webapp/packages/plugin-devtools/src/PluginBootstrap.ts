@@ -7,8 +7,8 @@
  */
 import { EAdminPermission } from '@cloudbeaver/core-authentication';
 import { App, Bootstrap, DIService, injectable, IServiceConstructor } from '@cloudbeaver/core-di';
+import { CachedResource } from '@cloudbeaver/core-resource';
 import { PermissionsService } from '@cloudbeaver/core-root';
-import { CachedResource } from '@cloudbeaver/core-sdk';
 import { ActionService, DATA_CONTEXT_MENU, DATA_CONTEXT_SUBMENU_ITEM, MenuBaseItem, MenuService } from '@cloudbeaver/core-view';
 import { TOP_NAV_BAR_SETTINGS_MENU } from '@cloudbeaver/plugin-settings-menu';
 import { MENU_USER_PROFILE } from '@cloudbeaver/plugin-user-profile';

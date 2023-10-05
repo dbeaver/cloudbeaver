@@ -10,15 +10,18 @@ import { coreAppManifest } from '@cloudbeaver/core-app';
 import { coreAuthenticationManifest } from '@cloudbeaver/core-authentication';
 import { coreBlocksManifest } from '@cloudbeaver/core-blocks';
 import { coreBrowserManifest } from '@cloudbeaver/core-browser';
+import { coreBrowserCookiesManifest } from '@cloudbeaver/core-browser-cookies';
+import { coreBrowserSettingsManifest } from '@cloudbeaver/core-browser-settings';
 import { coreConnectionsManifest } from '@cloudbeaver/core-connections';
 import { coreDIManifest, PluginManifest } from '@cloudbeaver/core-di';
-import { codeDialogsManifest } from '@cloudbeaver/core-dialogs';
+import { coreDialogsManifest } from '@cloudbeaver/core-dialogs';
 import { coreEventsManifest } from '@cloudbeaver/core-events';
 import { coreLocalizationManifest } from '@cloudbeaver/core-localization';
 import { coreNavigationTree } from '@cloudbeaver/core-navigation-tree';
 import { corePluginManifest } from '@cloudbeaver/core-plugin';
 import { coreProductManifest } from '@cloudbeaver/core-product';
 import { coreProjectsManifest } from '@cloudbeaver/core-projects';
+import { coreResourceManifest } from '@cloudbeaver/core-resource';
 import { resourceManagerManifest } from '@cloudbeaver/core-resource-manager';
 import { coreRootManifest } from '@cloudbeaver/core-root';
 import { coreRoutingManifest } from '@cloudbeaver/core-routing';
@@ -46,10 +49,13 @@ export const coreManifests: PluginManifest[] = [
   coreBlocksManifest,
   coreSettingsManifest,
   coreEventsManifest,
+  coreResourceManifest,
   coreSDKManifest,
   coreRootManifest,
   corePluginManifest,
   coreBrowserManifest,
+  coreBrowserSettingsManifest,
+  coreBrowserCookiesManifest,
   coreProductManifest,
   coreProjectsManifest,
   coreAuthenticationManifest,
@@ -59,7 +65,7 @@ export const coreManifests: PluginManifest[] = [
   coreVersionUpdateManifest,
   coreConnectionsManifest,
   coreAdministrationManifest,
-  codeDialogsManifest,
+  coreDialogsManifest,
   resourceManagerManifest,
   coreAppManifest,
   coreNavigationTree,

@@ -6,7 +6,8 @@
  * you may not use this file except in compliance with the License.
  */
 import type { IExecutorHandlersCollection } from '@cloudbeaver/core-executor';
-import type { AdminAuthProviderConfiguration, CachedMapResource, GetAuthProviderConfigurationsQueryVariables } from '@cloudbeaver/core-sdk';
+import type { CachedMapResource } from '@cloudbeaver/core-resource';
+import type { AdminAuthProviderConfiguration, GetAuthProviderConfigurationsQueryVariables } from '@cloudbeaver/core-sdk';
 
 export type AuthConfigurationFormMode = 'edit' | 'create';
 

@@ -8,7 +8,7 @@
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
 import { DATA_CONTEXT_NAV_NODE, EObjectFeature } from '@cloudbeaver/core-navigation-tree';
-import { getCachedMapResourceLoaderState } from '@cloudbeaver/core-sdk';
+import { getCachedMapResourceLoaderState } from '@cloudbeaver/core-resource';
 import { DATA_CONTEXT_MENU, DATA_CONTEXT_MENU_NESTED, MenuBaseItem, MenuService } from '@cloudbeaver/core-view';
 
 import { GeneratedSqlDialog } from './GeneratedSqlDialog';

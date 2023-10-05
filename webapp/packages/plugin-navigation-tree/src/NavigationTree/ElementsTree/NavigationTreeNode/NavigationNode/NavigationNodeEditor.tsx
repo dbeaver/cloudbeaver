@@ -14,14 +14,19 @@ import { InlineEditor } from '@cloudbeaver/core-ui';
 
 import style from './NavigationNodeEditor.m.css';
 
-interface Props {
+export interface NavigationNodeEditorProps {
   name: string;
   disabled?: boolean;
   onSave: (name: string) => void;
   onClose: () => void;
 }
 
-export const NavigationNodeEditor = observer<Props>(function NavigationNodeEditor({ name: initialName, disabled, onSave, onClose }) {
+export const NavigationNodeEditor = observer<NavigationNodeEditorProps>(function NavigationNodeEditor({
+  name: initialName,
+  disabled,
+  onSave,
+  onClose,
+}) {
   const styles = useS(style);
   const [name, setName] = useState(initialName);
   const isNameChanged = initialName !== name;

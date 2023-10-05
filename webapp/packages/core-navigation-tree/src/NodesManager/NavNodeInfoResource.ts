@@ -11,16 +11,15 @@ import { AppAuthService } from '@cloudbeaver/core-authentication';
 import { injectable } from '@cloudbeaver/core-di';
 import {
   CachedMapResource,
-  GraphQLService,
-  ICachedResourceMetadata,
+  type ICachedResourceMetadata,
   isResourceAlias,
-  NavNodeInfoFragment,
-  ResourceKey,
-  ResourceKeyList,
+  type ResourceKey,
+  type ResourceKeyList,
   resourceKeyList,
-  ResourceKeySimple,
+  type ResourceKeySimple,
   ResourceKeyUtils,
-} from '@cloudbeaver/core-sdk';
+} from '@cloudbeaver/core-resource';
+import { GraphQLService, NavNodeInfoFragment } from '@cloudbeaver/core-sdk';
 import { getPathParents, MetadataMap } from '@cloudbeaver/core-utils';
 
 import type { NavNode } from './EntityTypes';
@@ -47,7 +46,7 @@ export class NavNodeInfoResource extends CachedMapResource<string, NavNode, Reco
   }
 
   setDetails(keyObject: ResourceKeySimple<string>, state: boolean): void {
-    this.updateMetadata(keyObject, metadata => {
+    this.metadata.update(keyObject, metadata => {
       if (!metadata.withDetails && state) {
         metadata.outdated = true;
       }

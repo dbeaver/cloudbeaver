@@ -13,6 +13,10 @@ addEventListener('message', event => {
 });
 
 addEventListener('fetch', async event => {
+  if (!(event instanceof FetchEvent)) {
+    return;
+  }
+
   const { request } = event;
   const url = new URL(request.url);
 

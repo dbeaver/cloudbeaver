@@ -8,7 +8,7 @@
 import { Connectable, connectable, filter, map, merge, Observable, Subject } from 'rxjs';
 
 import { ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
-import type { CachedResource } from '@cloudbeaver/core-sdk';
+import type { CachedResource } from '@cloudbeaver/core-resource';
 import { compose } from '@cloudbeaver/core-utils';
 
 import type { IBaseServerEvent, IServerEventCallback, IServerEventEmitter, Subscription } from './IServerEventEmitter';
@@ -108,11 +108,11 @@ export abstract class TopicEventHandler<
     const index = this.activeResources.indexOf(resource);
 
     if (index !== -1) {
-      if (!resource.isResourceInUse) {
+      if (!resource.useTracker.isResourceInUse) {
         this.removeActiveResource(resource);
       }
     } else {
-      if (resource.isResourceInUse) {
+      if (resource.useTracker.isResourceInUse) {
         this.activeResources.push(resource);
 
         if (!this.subscription) {
@@ -143,7 +143,7 @@ export abstract class TopicEventHandler<
         subscription: this.resourceUseHandler.bind(this, resource),
       };
       this.subscribedResources.set(resource, info);
-      resource.onUse.addHandler(info.subscription);
+      resource.useTracker.onUse.addHandler(info.subscription);
       // console.log('Register: ', resource.getName());
     }
 
@@ -158,7 +158,7 @@ export abstract class TopicEventHandler<
 
       if (info.listeners === 0) {
         this.removeActiveResource(resource);
-        resource.onUse.removeHandler(info.subscription);
+        resource.useTracker.onUse.removeHandler(info.subscription);
         this.subscribedResources.delete(resource);
         // console.log('Unregister: ', resource.getName());
       }

@@ -14,6 +14,7 @@ export type PlaceholderComponent<T extends Record<string, any> = Record<string, 
 export interface PlaceholderElement<T extends Record<string, any> = Record<string, any>> {
   id: string;
   component: PlaceholderComponent<T>;
+  isHidden?: (props: T) => boolean;
   order?: number;
 }
 
@@ -24,11 +25,16 @@ export class PlaceholderContainer<T extends Record<string, any> = Record<string,
     return this.placeholders;
   }
 
-  add(component: PlaceholderComponent<T>, order?: number): void {
+  getDisplayed(props: T): Array<PlaceholderElement<T>> {
+    return this.placeholders.filter(placeholder => !placeholder.isHidden?.(props));
+  }
+
+  add(component: PlaceholderComponent<T>, order?: number, isHidden?: (props: T) => boolean): void {
     const placeholder: PlaceholderElement<T> = {
       id: uuid(),
       component,
       order,
+      isHidden,
     };
 
     if (order === undefined) {

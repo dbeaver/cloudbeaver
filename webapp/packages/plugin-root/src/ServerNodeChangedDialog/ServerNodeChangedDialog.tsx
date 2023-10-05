@@ -7,9 +7,18 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import { Button, s, useS, useTranslate } from '@cloudbeaver/core-blocks';
+import {
+  Button,
+  CommonDialogBody,
+  CommonDialogFooter,
+  CommonDialogHeader,
+  CommonDialogWrapper,
+  s,
+  useS,
+  useTranslate,
+} from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { CommonDialogBody, CommonDialogFooter, CommonDialogHeader, CommonDialogWrapper, DialogComponent } from '@cloudbeaver/core-dialogs';
+import type { DialogComponent } from '@cloudbeaver/core-dialogs';
 import { RouterService } from '@cloudbeaver/core-routing';
 
 import style from './ServerNodeChangedDialog.m.css';

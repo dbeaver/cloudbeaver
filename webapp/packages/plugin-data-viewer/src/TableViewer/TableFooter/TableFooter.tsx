@@ -10,8 +10,8 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import styled, { css, use } from 'reshadow';
 
 import { Form, getComputed, ToolsPanel } from '@cloudbeaver/core-blocks';
+import type { IDataContext } from '@cloudbeaver/core-data-context';
 import { useService } from '@cloudbeaver/core-di';
-import type { IDataContext } from '@cloudbeaver/core-view';
 
 import type { IDatabaseDataModel } from '../../DatabaseDataModel/IDatabaseDataModel';
 import { DataViewerSettingsService } from '../../DataViewerSettingsService';

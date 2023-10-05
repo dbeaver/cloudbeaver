@@ -10,7 +10,7 @@ import { generateFileName } from './generateFileName';
 describe('generateFileName', () => {
   it('should generate a file name in the expected format', () => {
     const mockDate = new Date('2020-09-09T14:13:20');
-    const spy = jest.spyOn(global, 'Date').mockImplementation(() => mockDate as unknown as string);
+    const spy = jest.spyOn(global, 'Date').mockImplementation(() => mockDate);
 
     const fileName = 'my-file';
     const fileFormat = '.txt';

@@ -7,6 +7,7 @@
  */
 import { computed, makeObservable, observable } from 'mobx';
 
+import { ConfirmationDialogDelete } from '@cloudbeaver/core-blocks';
 import {
   compareConnectionsInfo,
   compareNewConnectionsInfo,
@@ -18,11 +19,11 @@ import {
   IConnectionInfoParams,
 } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
-import { CommonDialogService, ConfirmationDialogDelete, DialogueStateResult } from '@cloudbeaver/core-dialogs';
+import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { LocalizationService } from '@cloudbeaver/core-localization';
 import { isGlobalProject, isSharedProject, ProjectInfoResource, projectInfoSortByName } from '@cloudbeaver/core-projects';
-import { resourceKeyList } from '@cloudbeaver/core-sdk';
+import { resourceKeyList } from '@cloudbeaver/core-resource';
 import { isArraysEqual, isDefined, isObjectsEqual } from '@cloudbeaver/core-utils';
 
 @injectable()
