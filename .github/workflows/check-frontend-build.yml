@@ -1,4 +1,4 @@
-name: Run Jest Tests
+name: Build frontend
 
 # Controls when the workflow will run
 on:
