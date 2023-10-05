@@ -1,14 +1,44 @@
 {
-  "extends": "../../tsconfig.json",
+  "extends": "../../tsconfig.base.json",
   "compilerOptions": {
     "rootDir": "src",
-    "outDir": "lib"
+    "outDir": "dist",
+    "tsBuildInfoFile": "dist/tsconfig.tsbuildinfo"
   },
-  "include": ["src"],
-  "exclude": ["**/node_modules", "**/.*/"],
   "references": [
     {
-      "path": "../*"
+      "path": "..\\plugin-administration"
+    },
+    {
+      "path": "..\\core-blocks"
+    },
+    {
+      "path": "..\\core-di"
+    },
+    {
+      "path": "..\\core-events"
+    },
+    {
+      "path": "..\\core-executor"
+    },
+    {
+      "path": "..\\core-localization"
+    },
+    {
+      "path": "..\\core-root"
     }
+  ],
+  "include": [
+    "src/**/*",
+    "src/**/*.json",
+    "src/**/*.css",
+    "src/**/*.scss"
+  ],
+  "exclude": [
+    "lib/**/*",
+    "dist/**/*",
+    "**/node_modules",
+    "**/*.test.ts",
+    "**/*.test.tsx"
   ]
 }

@@ -1,20 +1,21 @@
 {
   "name": "@cloudbeaver/core-utils",
-  "sideEffects": false,
+  "sideEffects": [
+    "src/**/*.css",
+    "src/**/*.scss",
+    "public/**/*"
+  ],
   "version": "0.1.0",
   "description": "",
   "license": "Apache-2.0",
-  "main": "lib/core-utils.js",
-  "module": "lib/core-utils.js",
-  "types": "src/index.ts",
+  "main": "dist/index.js",
   "scripts": {
-    "prebuild": "rimraf --glob lib/*",
     "build": "core-cli-build --mode=production --config ../core-cli/configs/webpack.plugin.config.js",
-    "postbuild": "tsc",
     "lint": "eslint ./src/ --ext .ts,.tsx",
     "lint-fix": "eslint ./src/ --ext .ts,.tsx --fix",
     "test": "core-cli-test",
-    "validate-dependencies": "core-cli-validate-dependencies"
+    "validate-dependencies": "core-cli-validate-dependencies",
+    "update-ts-references": "rimraf --glob dist/* && typescript-resolve-references"
   },
   "dependencies": {
     "@timohausmann/quadtree-ts": "~2.0.0-beta.1",

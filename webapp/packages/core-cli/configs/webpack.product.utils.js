@@ -1,5 +1,6 @@
 const fs = require('fs');
 const { resolve } = require('path');
+const { getCloudBeaverDeps } = require('../utils/getCloudBeaverDeps');
 
 function getServiceWorkerSource() {
   return require.resolve('@cloudbeaver/core-browser/src/service-worker.ts');
@@ -7,15 +8,6 @@ function getServiceWorkerSource() {
 
 function withTimestamp(version) {
   return `${version}.${new Date().toISOString().substr(0, 19).replace('T', '').split(/[-:]+/).join('').slice(0, -2)}`;
-}
-
-function getCloudbeaverDeps(package) {
-  if (!package.dependencies) {
-    return [];
-  }
-
-  return Object.keys(package.dependencies)
-    .filter(dependency => /@cloudbeaver\/(.*?)/.test(dependency));
 }
 
 function scanCloudbeaverDeps(package) {
@@ -26,7 +18,7 @@ function scanCloudbeaverDeps(package) {
     const dependency = list.shift();
 
     if (!deps.has(dependency)) {
-      list.push(...getCloudbeaverDeps(require(resolve('../../node_modules', dependency, 'package.json'))));
+      list.push(...getCloudBeaverDeps(require(resolve('../../node_modules', dependency, 'package.json'))));
     }
 
     deps.add(dependency);

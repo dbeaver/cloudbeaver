@@ -1,10 +1,64 @@
 {
-  "extends": "../../tsconfig.json",
+  "extends": "../../tsconfig.base.json",
+  "exclude": [
+    "mocks",
+    "**/*.test.ts",
+    "**/*.test.tsx",
+    "lib",
+    "dist",
+    "node_modules",
+    "lib/**/*",
+    "dist/**/*",
+    "node_modules/**/*",
+    "**/node_modules"
+  ],
   "compilerOptions": {
     "rootDir": "src",
-    "outDir": "lib"
+    "outDir": "dist",
+    "tsBuildInfoFile": "dist/tsconfig.tsbuildinfo"
   },
-  "include": ["src"],
-  "exclude": ["**/node_modules", "**/.*/"],
-  "references": [{ "path": "../*" }]
+  "references": [
+    {
+      "path": "..\\core-data-context"
+    },
+    {
+      "path": "..\\core-di"
+    },
+    {
+      "path": "..\\core-executor"
+    },
+    {
+      "path": "..\\core-localization"
+    },
+    {
+      "path": "..\\core-plugin"
+    },
+    {
+      "path": "..\\core-resource"
+    },
+    {
+      "path": "..\\core-root"
+    },
+    {
+      "path": "..\\core-routing"
+    },
+    {
+      "path": "..\\core-sdk"
+    },
+    {
+      "path": "..\\core-settings"
+    },
+    {
+      "path": "..\\core-theming"
+    },
+    {
+      "path": "..\\core-utils"
+    }
+  ],
+  "include": [
+    "src/**/*",
+    "src/**/*.json",
+    "src/**/*.css",
+    "src/**/*.scss"
+  ]
 }

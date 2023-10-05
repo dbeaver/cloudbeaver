@@ -1,27 +1,30 @@
 {
   "name": "@cloudbeaver/plugin-d3js",
-  "sideEffects": false,
+  "sideEffects": [
+    "src/**/*.css",
+    "src/**/*.scss",
+    "public/**/*"
+  ],
   "version": "0.1.0",
   "description": "The plugin reexports d3js library and contains utility functions and components for d3js",
   "license": "Apache-2.0",
-  "main": "lib/index.js",
-  "module": "lib/index.js",
-  "types": "src/index.ts",
+  "main": "dist/index.js",
   "scripts": {
-    "prebuild": "rimraf --glob lib/*",
-    "build": "webpack --config ../../configs/webpack.plugin.config.js",
-    "postbuild": "tsc",
+    "build": "core-cli-build --mode=production --config ../core-cli/configs/webpack.plugin.config.js",
     "lint": "eslint ./src/ --ext .ts,.tsx",
     "lint-fix": "eslint ./src/ --ext .ts,.tsx --fix",
     "test": "core-cli-test",
-    "validate-dependencies": "core-cli-validate-dependencies"
+    "validate-dependencies": "core-cli-validate-dependencies",
+    "update-ts-references": "rimraf --glob dist/* && typescript-resolve-references"
   },
   "dependencies": {
     "d3": "^7.8.5",
-    "d3-drag": "^3.0.0"
+    "d3-drag": "^3.0.0",
+    "@cloudbeaver/core-di": "~0.1.0"
   },
   "devDependencies": {
     "@types/d3": "^7.4.0",
     "@types/d3-drag": "^3.0.3"
-  }
+  },
+  "peerDependencies": {}
 }

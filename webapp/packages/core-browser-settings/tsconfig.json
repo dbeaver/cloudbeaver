@@ -1,10 +1,33 @@
 {
-  "extends": "../../tsconfig.json",
+  "extends": "../../tsconfig.base.json",
+  "exclude": [
+    "**/*.test.ts",
+    "**/*.test.tsx",
+    "lib",
+    "dist",
+    "node_modules",
+    "lib/**/*",
+    "dist/**/*",
+    "node_modules/**/*",
+    "**/node_modules"
+  ],
   "compilerOptions": {
     "rootDir": "src",
-    "outDir": "lib"
+    "outDir": "dist",
+    "tsBuildInfoFile": "dist/tsconfig.tsbuildinfo"
   },
-  "include": ["src"],
-  "exclude": ["**/node_modules", "**/.*/"],
-  "references": [{ "path": "../*" }]
+  "references": [
+    {
+      "path": "..\\core-di"
+    },
+    {
+      "path": "..\\core-plugin"
+    }
+  ],
+  "include": [
+    "src/**/*",
+    "src/**/*.json",
+    "src/**/*.css",
+    "src/**/*.scss"
+  ]
 }

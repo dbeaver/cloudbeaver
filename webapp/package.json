@@ -10,11 +10,6 @@
       "**/core-cli/**"
     ]
   },
-  "scripts": {
-    "prebuild": "npm run clean-dist && lerna run gql:gen --stream --parallel",
-    "pretest": "npm run clean-dist && lerna run gql:gen --stream --parallel",
-    "clean-dist": "rimraf --glob lib/*"
-  },
   "devDependencies": {
     "@testing-library/dom": "^9.3.1",
     "@testing-library/jest-dom": "^6.1.3",

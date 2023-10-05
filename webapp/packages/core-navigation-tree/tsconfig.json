@@ -1,10 +1,62 @@
 {
-  "extends": "../../tsconfig.json",
+  "extends": "../../tsconfig.base.json",
   "compilerOptions": {
     "rootDir": "src",
-    "outDir": "lib"
+    "outDir": "dist",
+    "tsBuildInfoFile": "dist/tsconfig.tsbuildinfo"
   },
-  "include": ["src"],
-  "exclude": ["**/node_modules", "**/.*/"],
-  "references": [{ "path": "../*" }]
+  "references": [
+    {
+      "path": "..\\core-app"
+    },
+    {
+      "path": "..\\core-authentication"
+    },
+    {
+      "path": "..\\core-data-context"
+    },
+    {
+      "path": "..\\core-di"
+    },
+    {
+      "path": "..\\core-executor"
+    },
+    {
+      "path": "..\\core-extensions"
+    },
+    {
+      "path": "..\\core-plugin"
+    },
+    {
+      "path": "..\\core-projects"
+    },
+    {
+      "path": "..\\core-resource"
+    },
+    {
+      "path": "..\\core-root"
+    },
+    {
+      "path": "..\\core-sdk"
+    },
+    {
+      "path": "..\\core-ui"
+    },
+    {
+      "path": "..\\core-utils"
+    }
+  ],
+  "include": [
+    "src/**/*",
+    "src/**/*.json",
+    "src/**/*.css",
+    "src/**/*.scss"
+  ],
+  "exclude": [
+    "lib/**/*",
+    "dist/**/*",
+    "**/node_modules",
+    "**/*.test.ts",
+    "**/*.test.tsx"
+  ]
 }
