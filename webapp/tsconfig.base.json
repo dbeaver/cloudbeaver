@@ -21,7 +21,7 @@
     "noUnusedParameters": false,
     "removeComments": false,
     "preserveConstEnums": true,
-    "sourceMap": false,
+    "sourceMap": true,
     "strict": true,
     "skipLibCheck": true,
     "skipDefaultLibCheck": true,
