@@ -70,7 +70,8 @@ jobs:
           cmd: build
 
   tests:
-    runs-on: macos-latest
+    # macos slower for tests for some reason
+    runs-on: ubuntu-latest
     defaults:
       run:
         working-directory: ./webapp
