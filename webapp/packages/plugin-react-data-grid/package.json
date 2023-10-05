@@ -19,5 +19,6 @@
   "dependencies": {
     "react-data-grid": "file:react-data-grid-dist"
   },
-  "peerDependencies": {}
+  "peerDependencies": {},
+  "devDependencies": {}
 }

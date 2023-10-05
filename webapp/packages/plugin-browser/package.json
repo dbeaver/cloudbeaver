@@ -28,5 +28,6 @@
     "mobx": "~6.x.x",
     "mobx-react-lite": "~3.x.x",
     "reshadow": "~0.x.x"
-  }
+  },
+  "devDependencies": {}
 }

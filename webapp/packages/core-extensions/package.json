@@ -17,5 +17,6 @@
     "update-ts-references": "rimraf --glob dist/* && typescript-resolve-references"
   },
   "dependencies": {},
-  "peerDependencies": {}
+  "peerDependencies": {},
+  "devDependencies": {}
 }

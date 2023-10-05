@@ -26,5 +26,6 @@
     "react": "~18.x.x",
     "@testing-library/jest-dom": "~6.x.x",
     "@testing-library/react": "~13.x.x"
-  }
+  },
+  "devDependencies": {}
 }

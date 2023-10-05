@@ -36,5 +36,8 @@
     "mobx": "~6.x.x",
     "msw": "~1.x.x",
     "@testing-library/jest-dom": "^6.x.x"
+  },
+  "devDependencies": {
+    "@cloudbeaver/tests-runner": "~0.1.0"
   }
 }

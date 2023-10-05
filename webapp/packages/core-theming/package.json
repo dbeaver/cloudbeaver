@@ -42,5 +42,8 @@
     "mobx": "~6.x.x",
     "react": "~18.x.x",
     "reshadow": "~0.x.x"
+  },
+  "devDependencies": {
+    "@cloudbeaver/tests-runner": "~0.1.0"
   }
 }

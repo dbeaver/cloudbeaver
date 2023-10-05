@@ -27,5 +27,6 @@
     "src/**/*.css",
     "src/**/*.scss",
     "public/**/*"
-  ]
+  ],
+  "devDependencies": {}
 }

@@ -21,5 +21,6 @@
     "@cloudbeaver/core-product": "~0.1.0",
     "@cloudbeaver/core-settings": "~0.1.0"
   },
-  "peerDependencies": {}
+  "peerDependencies": {},
+  "devDependencies": {}
 }

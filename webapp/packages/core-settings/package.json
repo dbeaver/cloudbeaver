@@ -24,5 +24,6 @@
   },
   "peerDependencies": {
     "mobx": "~6.x.x"
-  }
+  },
+  "devDependencies": {}
 }

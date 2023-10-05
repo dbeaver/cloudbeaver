@@ -44,5 +44,6 @@
     "mobx-react-lite": "~3.x.x",
     "reshadow": "~0.x.x",
     "@testing-library/jest-dom": "~6.x.x"
-  }
+  },
+  "devDependencies": {}
 }

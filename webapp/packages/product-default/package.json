@@ -10,7 +10,7 @@
   "license": "Apache-2.0",
   "main": "dist/index.js",
   "scripts": {
-    "prebuild": "cd ../../ && lerna run gql:gen --stream --parallel",
+    "prebuild": "tsc -b && cd ../../ && lerna run gql:gen --stream --parallel",
     "build": "core-cli-build --mode=production --config ../core-cli/configs/webpack.product.config.js",
     "dev": "concurrently -P -k \"cd ../../ && lerna run gql:gen:dev --stream --parallel\" \"core-cli-build serve --mode=development --progress --config=../core-cli/configs/webpack.product.dev.config.js --port=3100 {@}\"",
     "preanalyse": "rimraf --glob lib/* && if not exist lib mkdir lib",
@@ -85,5 +85,6 @@
   "peerDependencies": {},
   "product": {
     "name": "CloudBeaver Community"
-  }
+  },
+  "devDependencies": {}
 }

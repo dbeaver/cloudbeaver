@@ -53,6 +53,9 @@
     },
     {
       "path": "..\\core-view"
+    },
+    {
+      "path": "..\\tests-runner"
     }
   ],
   "include": [

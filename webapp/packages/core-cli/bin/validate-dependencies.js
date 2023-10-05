@@ -20,7 +20,8 @@ const srcDir = path.join(root, 'src');
 const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
 
 // Keep track of the dependencies that were found in the .ts files
-const foundDependencies = new Set();
+const cloudbeaverDependencies = new Set();
+const cloudbeaverDevDependencies = new Set();
 
 // A helper function that recursively processes a directory and its subdirectories
 function processDirectory(directory) {
@@ -50,8 +51,17 @@ function processDirectory(directory) {
             const dep = match.split('/')[1].replace(/['"]/g, '');
             const fullDep = `@cloudbeaver/${dep}`;
 
-            foundDependencies.add(fullDep);
+            cloudbeaverDependencies.add(fullDep);
           });
+        }
+      } else if (/\.test.tsx?$/i.test(file)) {
+        //@cloudbeaver/tests-runner
+        // Read the contents of the file
+        const fileContent = fs.readFileSync(filePath, 'utf8');
+        const regex = /import\s+(type\s+|)(\{[^}]*\}|\w+)\s+from\s+['"]@cloudbeaver\/tests-runner(\/[^'"]*)?['"]/g;
+        const matches = fileContent.match(regex);
+        if (matches?.length) {
+          cloudbeaverDevDependencies.add('@cloudbeaver/tests-runner');
         }
       }
     }
@@ -88,13 +98,13 @@ for (const dep in dependenciesToRemove) {
 for (const dep in dependenciesToAdd) {
   // If a dependency was not found in any of the .ts/.tsx files, delete it from the `package.json` file
   // Make sure we are deleting only internal dependencies
-  if (dep.includes('@cloudbeaver') && !foundDependencies.has(dep)) {
+  if (dep.includes('@cloudbeaver') && !cloudbeaverDependencies.has(dep)) {
     delete dependenciesToAdd[dep];
   }
 }
 
 // Plugins first, core packages after
-const sortedDependencies = [...foundDependencies.values()].sort((a, b) => {
+const sortedDependencies = [...cloudbeaverDependencies.values()].sort((a, b) => {
   const aPlugin = a.includes('plugin-');
   const bPlugin = b.includes('plugin-');
 
@@ -120,5 +130,16 @@ sortedDependencies.forEach(dep => {
   }
 });
 
+packageJson.devDependencies = packageJson.devDependencies || {};
+const devDependencies = packageJson.devDependencies;
+
+const sortedDevDependencies = [...cloudbeaverDevDependencies.values()].sort((a, b) => a.localeCompare(b));
+
+for (const dep of sortedDevDependencies) {
+  if (!devDependencies[dep]) {
+    devDependencies[dep] = '~0.1.0';
+  }
+}
+
 // Write the updated `package.json`
-fs.writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2));
+fs.writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2) + '\n', 'utf8');

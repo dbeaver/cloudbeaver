@@ -7,14 +7,23 @@
  */
 
 function getCloudBeaverDeps(package) {
-  const deps = [...Object.keys(package.dependencies || {}), ...Object.keys(package.peerDependencies || {})];
+  const resultMap = {
+    'dependencies': [],
+    'peerDependencies': [],
+    'devDependencies': [],
+  };
 
-  if (deps.length === 0) {
-    return [];
+  for (const dep of Object.keys(resultMap)) {
+    const deps = Object.keys(package[dep] || {});
+
+    for (const dependency of deps) {
+      if (!resultMap[dep].includes(dependency) && /@cloudbeaver\/(.*?)/.test(dependency)) {
+        resultMap[dep].push(dependency);
+      }
+    }
   }
 
-  return deps
-    .filter(dependency => /@cloudbeaver\/(.*?)/.test(dependency));
+  return resultMap;
 }
 
 module.exports = {

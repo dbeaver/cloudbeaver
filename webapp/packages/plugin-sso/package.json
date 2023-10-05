@@ -19,5 +19,6 @@
   "peerDependencies": {},
   "dependencies": {
     "@cloudbeaver/core-di": "~0.1.0"
-  }
+  },
+  "devDependencies": {}
 }

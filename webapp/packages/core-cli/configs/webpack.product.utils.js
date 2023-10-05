@@ -18,7 +18,8 @@ function scanCloudbeaverDeps(package) {
     const dependency = list.shift();
 
     if (!deps.has(dependency)) {
-      list.push(...getCloudBeaverDeps(require(resolve('../../node_modules', dependency, 'package.json'))));
+      const allDependencies = getCloudBeaverDeps(require(resolve('../../node_modules', dependency, 'package.json')));
+      list.push(...allDependencies.dependencies, ...allDependencies.peerDependencies);
     }
 
     deps.add(dependency);

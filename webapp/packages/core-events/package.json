@@ -28,5 +28,8 @@
   "peerDependencies": {
     "@testing-library/jest-dom": "~6.x.x",
     "mobx": "~6.x.x"
+  },
+  "devDependencies": {
+    "@cloudbeaver/tests-runner": "~0.1.0"
   }
 }

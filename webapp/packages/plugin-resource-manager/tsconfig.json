@@ -32,6 +32,9 @@
     },
     {
       "path": "..\\core-sdk"
+    },
+    {
+      "path": "..\\tests-runner"
     }
   ],
   "include": [

@@ -38,6 +38,9 @@
     },
     {
       "path": "..\\core-utils"
+    },
+    {
+      "path": "..\\tests-runner"
     }
   ],
   "include": [

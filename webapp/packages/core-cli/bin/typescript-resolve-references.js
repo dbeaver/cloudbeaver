@@ -15,7 +15,8 @@ const pkg = require(resolve('package.json'));
 const typescriptConfig = require(tsConfigPath);
 // const typescriptRootConfig = require(tsRootConfigPath);
 
-const dependencies = getCloudBeaverDeps(pkg);
+const allDependencies = getCloudBeaverDeps(pkg);
+const dependencies = [...allDependencies.dependencies, ...allDependencies.devDependencies, ...allDependencies.peerDependencies];
 const currentDir = resolve();
 
 const nodeModules = [resolve('node_modules')];
@@ -56,5 +57,5 @@ for (const exclude of defaultExclude) {
   }
 }
 
-fs.writeFileSync(tsConfigPath, JSON.stringify(typescriptConfig, undefined, 2), 'utf8');
+fs.writeFileSync(tsConfigPath, JSON.stringify(typescriptConfig, undefined, 2) + '\n', 'utf8');
 // fs.writeFileSync(tsRootConfigPath, JSON.stringify(typescriptRootConfig, undefined, 2), 'utf8');

@@ -26,6 +26,9 @@
     },
     {
       "path": "..\\core-settings"
+    },
+    {
+      "path": "..\\tests-runner"
     }
   ],
   "include": [

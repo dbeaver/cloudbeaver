@@ -28,5 +28,6 @@
     "@cloudbeaver/core-ui": "~0.1.0",
     "@cloudbeaver/core-utils": "~0.1.0"
   },
-  "peerDependencies": {}
+  "peerDependencies": {},
+  "devDependencies": {}
 }

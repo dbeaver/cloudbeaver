@@ -16,6 +16,9 @@
     },
     {
       "path": "..\\core-plugin"
+    },
+    {
+      "path": "..\\tests-runner"
     }
   ],
   "include": [
