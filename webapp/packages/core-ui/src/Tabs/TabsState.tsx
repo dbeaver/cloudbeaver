@@ -11,13 +11,12 @@ import { useEffect, useMemo, useState } from 'react';
 import { useTabState } from 'reakit/Tab';
 
 import { useAutoLoad, useExecutor, useObjectRef, useObservableRef } from '@cloudbeaver/core-blocks';
+import { useDataContext } from '@cloudbeaver/core-data-context';
 import { Executor, ExecutorInterrupter } from '@cloudbeaver/core-executor';
 import { isDefined, isNull, isUndefined, MetadataMap, MetadataValueGetter } from '@cloudbeaver/core-utils';
-import { useDataContext } from '@cloudbeaver/core-view';
 
 import type { ITabData, ITabInfo, ITabsContainer } from './TabsContainer/ITabsContainer';
-import { ITabsContext, TabsContext } from './TabsContext';
-import type { TabDirection } from './TabsContext';
+import { ITabsContext, type TabDirection, TabsContext } from './TabsContext';
 
 type ExtractContainerProps<T> = T extends void ? Record<string, any> : T;
 

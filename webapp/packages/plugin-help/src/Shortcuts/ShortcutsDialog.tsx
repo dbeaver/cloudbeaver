@@ -5,8 +5,21 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { Button, Container, Group, GroupTitle, Link, s, useS, useTranslate } from '@cloudbeaver/core-blocks';
-import { CommonDialogBody, CommonDialogFooter, CommonDialogHeader, CommonDialogWrapper, DialogComponent } from '@cloudbeaver/core-dialogs';
+import {
+  Button,
+  CommonDialogBody,
+  CommonDialogFooter,
+  CommonDialogHeader,
+  CommonDialogWrapper,
+  Container,
+  Group,
+  GroupTitle,
+  Link,
+  s,
+  useS,
+  useTranslate,
+} from '@cloudbeaver/core-blocks';
+import type { DialogComponent } from '@cloudbeaver/core-dialogs';
 
 import { Shortcut } from './Shortcut';
 import { DATA_VIEWER_SHORTCUTS, NAVIGATION_TREE_SHORTCUTS, SQL_EDITOR_SHORTCUTS } from './SHORTCUTS_DATA';

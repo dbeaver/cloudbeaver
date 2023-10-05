@@ -8,20 +8,17 @@
 import { injectable } from '@cloudbeaver/core-di';
 import { Executor, IExecutor } from '@cloudbeaver/core-executor';
 import { ProjectsService } from '@cloudbeaver/core-projects';
-import { DataSynchronizationService, ServerEventId } from '@cloudbeaver/core-root';
 import {
-  CachedResourceIncludeArgs,
+  type CachedResourceIncludeArgs,
   CachedTreeChildrenKey,
   CachedTreeResource,
-  DetailsError,
-  GetResourceListQueryVariables,
-  GraphQLService,
   isResourceAlias,
-  ResourceKey,
+  type ResourceKey,
   resourceKeyList,
   ResourceKeyUtils,
-  RmResource,
-} from '@cloudbeaver/core-sdk';
+} from '@cloudbeaver/core-resource';
+import { DataSynchronizationService, ServerEventId } from '@cloudbeaver/core-root';
+import { DetailsError, GetResourceListQueryVariables, GraphQLService, RmResource } from '@cloudbeaver/core-sdk';
 import { createPath, getPathParent, getPathParts } from '@cloudbeaver/core-utils';
 
 import { ResourceManagerEventHandler } from './ResourceManagerEventHandler';
@@ -58,7 +55,7 @@ export class ResourceManagerResource extends CachedTreeResource<RmResourceInfo, 
       async key => {
         const parent = getPathParent(key);
 
-        if (this.isInUse(key)) {
+        if (this.useTracker.isInUse(key)) {
           dataSynchronizationService.requestSynchronization('resource', key).then(async state => {
             if (state) {
               if (!this.isOutdated(parent)) {
@@ -79,7 +76,7 @@ export class ResourceManagerResource extends CachedTreeResource<RmResourceInfo, 
     resourceManagerEventHandler.onEvent<string>(
       ServerEventId.CbRmResourceUpdated,
       key => {
-        if (this.isInUse(key)) {
+        if (this.useTracker.isInUse(key)) {
           dataSynchronizationService.requestSynchronization('resource', key).then(state => {
             if (state) {
               this.onDataUpdate.execute(key);
@@ -98,7 +95,7 @@ export class ResourceManagerResource extends CachedTreeResource<RmResourceInfo, 
     resourceManagerEventHandler.onEvent<string>(
       ServerEventId.CbRmResourceDeleted,
       key => {
-        if (this.isInUse(key)) {
+        if (this.useTracker.isInUse(key)) {
           dataSynchronizationService.requestSynchronization('resource', key).then(state => {
             if (state) {
               this.delete(key);
@@ -214,7 +211,7 @@ export class ResourceManagerResource extends CachedTreeResource<RmResourceInfo, 
     const resourcesList = new Map<string, RmResourceInfo>();
 
     await ResourceKeyUtils.forEachAsync(key, async key => {
-      const childrenKey = this.isAlias(key, CachedTreeChildrenKey);
+      const childrenKey = this.aliases.isAlias(key, CachedTreeChildrenKey);
       if (childrenKey) {
         const resourceKey = getRmResourceKey(childrenKey.options.path);
 

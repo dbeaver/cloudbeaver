@@ -17,7 +17,7 @@ import {
 } from '@cloudbeaver/core-authentication';
 import { FormContext, Group, GroupTitle, PlaceholderComponent, Switch, useExecutor, useResource, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { CachedMapAllKey } from '@cloudbeaver/core-sdk';
+import { CachedMapAllKey } from '@cloudbeaver/core-resource';
 import type { IConfigurationPlaceholderProps } from '@cloudbeaver/plugin-administration';
 
 import { ServerConfigurationAdminForm } from './ServerConfigurationAdminForm';

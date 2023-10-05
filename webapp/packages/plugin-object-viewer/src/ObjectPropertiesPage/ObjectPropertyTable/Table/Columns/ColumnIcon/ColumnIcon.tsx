@@ -10,7 +10,6 @@ import { IconFormatter } from './IconFormatter';
 
 export const ColumnIcon: ICustomColumn = {
   key: 'columnIcon',
-  columnDataIndex: null,
   name: '',
   width: 40,
   maxWidth: 40,

@@ -8,18 +8,17 @@
 import { observer } from 'mobx-react-lite';
 
 import { getComputed, Icon, IMouseContextMenu, s, useS } from '@cloudbeaver/core-blocks';
-import { ConnectionInfoResource } from '@cloudbeaver/core-connections';
+import { ConnectionInfoResource, DATA_CONTEXT_CONNECTION } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
 import { DATA_CONTEXT_NAV_NODE, type INodeActions, type NavNode } from '@cloudbeaver/core-navigation-tree';
 import { ContextMenu } from '@cloudbeaver/core-ui';
 import { useMenu } from '@cloudbeaver/core-view';
-import { DATA_CONTEXT_CONNECTION } from '@cloudbeaver/plugin-connections';
 
 import { MENU_NAV_TREE } from '../../MENU_NAV_TREE';
 import { DATA_CONTEXT_NAV_NODE_ACTIONS } from './DATA_CONTEXT_NAV_NODE_ACTIONS';
 import style from './TreeNodeMenu.m.css';
 
-interface Props {
+export interface TreeNodeMenuProps {
   node: NavNode;
   actions?: INodeActions;
   selected?: boolean;
@@ -27,7 +26,7 @@ interface Props {
   onClose?: () => void;
 }
 
-export const TreeNodeMenu = observer<Props>(function TreeNodeMenu({ node, actions, selected, mouseContextMenu, onClose }) {
+export const TreeNodeMenu = observer<TreeNodeMenuProps>(function TreeNodeMenu({ node, actions, selected, mouseContextMenu, onClose }) {
   const styles = useS(style);
   const connectionsInfoResource = useService(ConnectionInfoResource);
   const menu = useMenu({ menu: MENU_NAV_TREE });

@@ -8,12 +8,11 @@
 import type { PluginManifest } from '@cloudbeaver/core-di';
 
 import { PluginBootstrap } from './PluginBootstrap';
-import { AdministrationTopAppBarBootstrapService } from './TopNavBar/AdministrationTopAppBarBootstrapService';
 import { TopNavService } from './TopNavBar/TopNavService';
 
 export const topAppBarPlugin: PluginManifest = {
   info: {
     name: 'Top App Bar plugin',
   },
-  providers: [PluginBootstrap, TopNavService, AdministrationTopAppBarBootstrapService],
+  providers: [PluginBootstrap, TopNavService],
 };

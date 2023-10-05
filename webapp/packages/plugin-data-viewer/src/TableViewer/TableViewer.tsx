@@ -22,9 +22,9 @@ import {
   useS,
   useSplitUserState,
 } from '@cloudbeaver/core-blocks';
+import type { IDataContext } from '@cloudbeaver/core-data-context';
 import { useService } from '@cloudbeaver/core-di';
 import { ResultDataFormat } from '@cloudbeaver/core-sdk';
-import type { IDataContext } from '@cloudbeaver/core-view';
 
 import { ResultSetConstraintAction } from '../DatabaseDataModel/Actions/ResultSet/ResultSetConstraintAction';
 import { DataPresentationService, DataPresentationType } from '../DataPresentationService';
@@ -38,7 +38,7 @@ import { TableToolsPanel } from './TableToolsPanel';
 import style from './TableViewer.m.css';
 import { TableViewerStorageService } from './TableViewerStorageService';
 
-interface Props {
+export interface TableViewerProps {
   tableId: string;
   resultIndex: number | undefined;
   presentationId: string | undefined;
@@ -51,7 +51,7 @@ interface Props {
   onValuePresentationChange: (id: string | null) => void;
 }
 
-export const TableViewer = observer<Props, HTMLDivElement>(
+export const TableViewer = observer<TableViewerProps, HTMLDivElement>(
   forwardRef(function TableViewer(
     {
       tableId,

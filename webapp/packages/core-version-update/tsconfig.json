@@ -1,15 +1,31 @@
 {
-  "extends": "../../tsconfig.json",
+  "extends": "../../tsconfig.base.json",
   "compilerOptions": {
     "rootDir": "src",
-    "outDir": "lib",
+    "outDir": "dist",
+    "tsBuildInfoFile": "dist/tsconfig.tsbuildinfo"
   },
+  "references": [
+    {
+      "path": "..\\core-di"
+    },
+    {
+      "path": "..\\core-localization"
+    },
+    {
+      "path": "..\\core-version"
+    }
+  ],
   "include": [
-    "src"
+    "__custom_mocks__/**/*",
+    "src/**/*",
+    "src/**/*.json",
+    "src/**/*.css",
+    "src/**/*.scss"
   ],
   "exclude": [
-    "**/node_modules",
-    "**/.*/"
-  ],
-  "references": [{ "path": "../*" }]
+    "lib/**/*",
+    "dist/**/*",
+    "**/node_modules"
+  ]
 }

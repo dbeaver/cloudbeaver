@@ -10,9 +10,10 @@ import { useContext } from 'react';
 import styled from 'reshadow';
 
 import { useStyles } from '@cloudbeaver/core-blocks';
+import { useDataContext } from '@cloudbeaver/core-data-context';
 import type { ComponentStyle } from '@cloudbeaver/core-theming';
 import { ITabData, Tab, TabIcon, TabTitle } from '@cloudbeaver/core-ui';
-import { CaptureViewContext, useDataContext } from '@cloudbeaver/core-view';
+import { CaptureViewContext } from '@cloudbeaver/core-view';
 
 import type { ISqlEditorResultTab } from '../ISqlEditorTabState';
 import { DATA_CONTEXT_SQL_EDITOR_RESULT_ID } from './DATA_CONTEXT_SQL_EDITOR_RESULT_ID';

@@ -9,7 +9,7 @@ import { injectable } from '@cloudbeaver/core-di';
 import { ISessionEvent, SessionEventId, SessionEventSource, SessionEventTopic, TopicEventHandler } from '@cloudbeaver/core-root';
 import type { CbDatasourceFolderEvent as IConnectionFolderEvent } from '@cloudbeaver/core-sdk';
 
-export { IConnectionFolderEvent };
+export type { IConnectionFolderEvent };
 
 @injectable()
 export class ConnectionFolderEventHandler extends TopicEventHandler<IConnectionFolderEvent, ISessionEvent, SessionEventId, SessionEventTopic> {

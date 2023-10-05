@@ -8,7 +8,7 @@
 import { observer } from 'mobx-react-lite';
 import { useEffect } from 'react';
 
-import { s, TextPlaceholder, usePagination, useResource, useTranslate } from '@cloudbeaver/core-blocks';
+import { s, TextPlaceholder, useOffsetPagination, useResource, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { type DBObject, DBObjectParentKey, DBObjectResource, NavTreeResource } from '@cloudbeaver/core-navigation-tree';
 import { isDefined } from '@cloudbeaver/core-utils';
@@ -28,7 +28,7 @@ export const ObjectPropertyTable = observer<ObjectPropertyTableProps>(function O
   const navNodeViewService = useService(NavNodeViewService);
   const navTreeResource = useService(NavTreeResource);
 
-  const pagination = usePagination(DBObjectResource, {
+  const pagination = useOffsetPagination(DBObjectResource, {
     key: DBObjectParentKey(objectId),
     pageSize: navTreeResource.childrenLimit,
   });

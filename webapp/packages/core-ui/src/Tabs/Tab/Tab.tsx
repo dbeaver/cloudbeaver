@@ -11,8 +11,9 @@ import { Tab as BaseTab } from 'reakit/Tab';
 import styled, { use } from 'reshadow';
 
 import { getComputed, Icon, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
+import type { IDataContext } from '@cloudbeaver/core-data-context';
 import type { ComponentStyle } from '@cloudbeaver/core-theming';
-import { IDataContext, useMenu } from '@cloudbeaver/core-view';
+import { useMenu } from '@cloudbeaver/core-view';
 
 import { ContextMenu } from '../../ContextMenu/ContextMenu';
 import { TabContext } from '../TabContext';

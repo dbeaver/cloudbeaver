@@ -1,3 +1,14 @@
+export * from './CommonDialog/CommonDialog/CommonDialogBody';
+export * from './CommonDialog/CommonDialog/CommonDialogFooter';
+export * from './CommonDialog/CommonDialog/CommonDialogHeader';
+export * from './CommonDialog/CommonDialog/CommonDialogWrapper';
+export * from './CommonDialog/ConfirmationDialog';
+export * from './CommonDialog/ConfirmationDialogDelete';
+export * from './CommonDialog/RenameDialog';
+export * from './CommonDialog/DialogsPortal';
+
+export * from './ErrorDetailsDialog/ErrorDetailsDialog';
+
 export * from './AppRefreshButton';
 export * from './ComplexLoader';
 export * from './DisplayError';
@@ -42,6 +53,7 @@ export * from './Menu/MenuSeparator';
 export { default as MenuSeparatorStyles } from './Menu/MenuSeparator.m.css';
 export * from './Menu/MenuStateContext';
 export * from './Menu/useMouseContextMenu';
+export { MenuTrigger, type MenuState } from './MenuPanel/MenuTrigger';
 
 export * from './ObjectPropertyInfo/ObjectPropertyInfoForm/ObjectPropertyInfoForm';
 export * from './ObjectPropertyInfo/useObjectPropertyCategories';
@@ -189,7 +201,7 @@ export * from './useExecutor';
 export * from './useFn';
 export * from './useFocus';
 export * from './useFormValidator';
-export * from './ResourcesHooks/usePagination';
+export * from './ResourcesHooks/useOffsetPagination';
 export * from './ResourcesHooks/useResource';
 export * from './useMouse';
 export * from './useObjectRef';

@@ -7,12 +7,12 @@
  */
 import { computed, makeObservable, observable } from 'mobx';
 
+import { ErrorDetailsDialog } from '@cloudbeaver/core-blocks';
 import { IInitializableController, injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
 import { ENotificationType, INotification } from '@cloudbeaver/core-events';
 import { LocalizationService } from '@cloudbeaver/core-localization';
 import { NavNodeManagerService } from '@cloudbeaver/core-navigation-tree';
-import { ErrorDetailsDialog } from '@cloudbeaver/core-notifications';
 import { ServerErrorType, ServerInternalError } from '@cloudbeaver/core-sdk';
 import { Deferred, EDeferredState, errorOf } from '@cloudbeaver/core-utils';
 

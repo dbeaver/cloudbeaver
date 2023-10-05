@@ -9,10 +9,24 @@ import { computed, observable } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import { useEffect } from 'react';
 
-import { Button, ErrorMessage, Loader, s, useClipboard, useErrorDetails, useObservableRef, useS, useTranslate } from '@cloudbeaver/core-blocks';
+import {
+  Button,
+  CommonDialogBody,
+  CommonDialogFooter,
+  CommonDialogHeader,
+  CommonDialogWrapper,
+  ErrorMessage,
+  Loader,
+  s,
+  useClipboard,
+  useErrorDetails,
+  useObservableRef,
+  useS,
+  useTranslate,
+} from '@cloudbeaver/core-blocks';
 import { ConnectionInfoResource, createConnectionParam } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
-import { CommonDialogBody, CommonDialogFooter, CommonDialogHeader, CommonDialogWrapper, DialogComponentProps } from '@cloudbeaver/core-dialogs';
+import type { DialogComponentProps } from '@cloudbeaver/core-dialogs';
 import { GQLErrorCatcher, SqlDialectInfo } from '@cloudbeaver/core-sdk';
 import { useCodemirrorExtensions } from '@cloudbeaver/plugin-codemirror6';
 import { SqlDialectInfoService } from '@cloudbeaver/plugin-sql-editor';

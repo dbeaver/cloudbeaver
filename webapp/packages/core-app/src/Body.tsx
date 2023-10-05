@@ -8,14 +8,13 @@
 import { observer } from 'mobx-react-lite';
 import { useLayoutEffect, useRef } from 'react';
 
-import { Loader, s, useResource, useS, useStyles } from '@cloudbeaver/core-blocks';
+import { DialogsPortal, Loader, s, useResource, useS, useStyles } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { DialogsPortal } from '@cloudbeaver/core-dialogs';
 import { Notifications } from '@cloudbeaver/core-notifications';
 import { ProjectInfoResource } from '@cloudbeaver/core-projects';
+import { CachedMapAllKey } from '@cloudbeaver/core-resource';
 import { SessionPermissionsResource } from '@cloudbeaver/core-root';
 import { ScreenService } from '@cloudbeaver/core-routing';
-import { CachedMapAllKey } from '@cloudbeaver/core-sdk';
 import { ThemeService } from '@cloudbeaver/core-theming';
 import { DNDProvider } from '@cloudbeaver/core-ui';
 import { useAppVersion } from '@cloudbeaver/plugin-version';

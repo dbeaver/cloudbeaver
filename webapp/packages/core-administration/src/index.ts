@@ -1,4 +1,4 @@
-export { manifest as coreAdministrationManifest } from './manifest';
+export * from './manifest';
 export * from './AdministrationItem/AdministrationItemService';
 export * from './AdministrationItem/filterConfigurationWizard';
 export * from './AdministrationItem/IAdministrationItem';

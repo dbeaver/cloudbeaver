@@ -15,8 +15,8 @@ import {
 } from '@cloudbeaver/core-connections';
 import { TaskScheduler } from '@cloudbeaver/core-executor';
 import type { ProjectInfoResource } from '@cloudbeaver/core-projects';
+import { isResourceAlias, ResourceKey, ResourceKeyUtils } from '@cloudbeaver/core-resource';
 import { getRmResourceKey, ResourceManagerResource } from '@cloudbeaver/core-resource-manager';
-import { isResourceAlias, ResourceKey, ResourceKeyUtils } from '@cloudbeaver/core-sdk';
 import { debounce, getPathName, isArraysEqual, isNotNullDefined, isObjectsEqual, isValuesEqual } from '@cloudbeaver/core-utils';
 import { SCRIPTS_TYPE_ID } from '@cloudbeaver/plugin-resource-manager-scripts';
 import { BaseSqlDataSource, ESqlDataSourceFeatures, SqlEditorService } from '@cloudbeaver/plugin-sql-editor';
@@ -175,7 +175,7 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
 
   setResourceKey(resourceKey: string | undefined): void {
     if (this.state.resourceKey && this.resourceUseKeyId) {
-      this.resourceManagerResource.free(toJS(this.state.resourceKey), this.resourceUseKeyId);
+      this.resourceManagerResource.useTracker.free(toJS(this.state.resourceKey), this.resourceUseKeyId);
       this.resourceUseKeyId = null;
     }
 
@@ -265,7 +265,7 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
 
   async load(): Promise<void> {
     if (this.state.resourceKey && !this.resourceUseKeyId) {
-      this.resourceUseKeyId = this.resourceManagerResource.use(this.state.resourceKey);
+      this.resourceUseKeyId = this.resourceManagerResource.useTracker.use(this.state.resourceKey);
     }
     await this.read();
   }
@@ -284,7 +284,7 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
     super.dispose();
     this.resourceManagerResource.onItemUpdate.removeHandler(this.syncResource);
     if (this.state.resourceKey && this.resourceUseKeyId) {
-      this.resourceManagerResource.free(this.state.resourceKey, this.resourceUseKeyId);
+      this.resourceManagerResource.useTracker.free(this.state.resourceKey, this.resourceUseKeyId);
       this.resourceUseKeyId = null;
     }
   }
