@@ -9,8 +9,8 @@ import { observer } from 'mobx-react-lite';
 import type { ButtonHTMLAttributes } from 'react';
 import styled, { css, use } from 'reshadow';
 
-import { IconOrImage, ToolsAction, useTranslate } from '@cloudbeaver/core-blocks';
-import { IMenuItem, MenuTrigger } from '@cloudbeaver/core-dialogs';
+import { IconOrImage, MenuTrigger, ToolsAction, useTranslate } from '@cloudbeaver/core-blocks';
+import type { IMenuItem } from '@cloudbeaver/core-dialogs';
 
 type Props = ButtonHTMLAttributes<any> & {
   menuItem: IMenuItem;

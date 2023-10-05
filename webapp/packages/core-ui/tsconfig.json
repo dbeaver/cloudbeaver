@@ -1,10 +1,58 @@
 {
-  "extends": "../../tsconfig.json",
+  "extends": "../../tsconfig.base.json",
   "compilerOptions": {
     "rootDir": "src",
-    "outDir": "lib"
+    "outDir": "dist",
+    "tsBuildInfoFile": "dist/tsconfig.tsbuildinfo"
   },
-  "include": ["src"],
-  "exclude": ["**/node_modules", "**/.*/"],
-  "references": [{ "path": "../*" }]
+  "references": [
+    {
+      "path": "..\\core-authentication"
+    },
+    {
+      "path": "..\\core-blocks"
+    },
+    {
+      "path": "..\\core-data-context"
+    },
+    {
+      "path": "..\\core-di"
+    },
+    {
+      "path": "..\\core-dialogs"
+    },
+    {
+      "path": "..\\core-events"
+    },
+    {
+      "path": "..\\core-executor"
+    },
+    {
+      "path": "..\\core-localization"
+    },
+    {
+      "path": "..\\core-routing"
+    },
+    {
+      "path": "..\\core-theming"
+    },
+    {
+      "path": "..\\core-utils"
+    },
+    {
+      "path": "..\\core-view"
+    }
+  ],
+  "include": [
+    "__custom_mocks__/**/*",
+    "src/**/*",
+    "src/**/*.json",
+    "src/**/*.css",
+    "src/**/*.scss"
+  ],
+  "exclude": [
+    "lib/**/*",
+    "dist/**/*",
+    "**/node_modules"
+  ]
 }

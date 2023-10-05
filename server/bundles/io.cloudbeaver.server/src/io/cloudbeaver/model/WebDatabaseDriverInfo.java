@@ -241,10 +241,8 @@ public class WebDatabaseDriverInfo {
 
     @Property
     public boolean getRequiresServerName() {
-        if (driver.getSampleURL() == null) {
-            return false;
-        }
-        return driver.getSampleURL().contains(URL_SERVER_FIELD);
+        return driver.getSupportedPageFields().contains(DBConstants.PROP_SERVER) ||
+            (driver.getSampleURL() != null && driver.getSampleURL().contains(URL_SERVER_FIELD));
     }
 
     @Property

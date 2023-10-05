@@ -5,17 +5,9 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
+import type { IDataContextProvider } from '@cloudbeaver/core-data-context';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
-import {
-  ACTION_REDO,
-  ACTION_UNDO,
-  ActionService,
-  IAction,
-  IDataContextProvider,
-  KEY_BINDING_REDO,
-  KEY_BINDING_UNDO,
-  KeyBindingService,
-} from '@cloudbeaver/core-view';
+import { ACTION_REDO, ACTION_UNDO, ActionService, IAction, KEY_BINDING_REDO, KEY_BINDING_UNDO, KeyBindingService } from '@cloudbeaver/core-view';
 
 import { ACTION_SQL_EDITOR_EXECUTE } from './actions/ACTION_SQL_EDITOR_EXECUTE';
 import { ACTION_SQL_EDITOR_EXECUTE_NEW } from './actions/ACTION_SQL_EDITOR_EXECUTE_NEW';
@@ -28,7 +20,6 @@ import { KEY_BINDING_SQL_EDITOR_EXECUTE_NEW } from './actions/bindings/KEY_BINDI
 import { KEY_BINDING_SQL_EDITOR_EXECUTE_SCRIPT } from './actions/bindings/KEY_BINDING_SQL_EDITOR_EXECUTE_SCRIPT';
 import { KEY_BINDING_SQL_EDITOR_FORMAT } from './actions/bindings/KEY_BINDING_SQL_EDITOR_FORMAT';
 import { KEY_BINDING_SQL_EDITOR_SHOW_EXECUTION_PLAN } from './actions/bindings/KEY_BINDING_SQL_EDITOR_SHOW_EXECUTION_PLAN';
-import { KEY_BINDING_SQL_EDITOR_SHOW_OUTPUT } from './actions/bindings/KEY_BINDING_SQL_EDITOR_SHOW_OUTPUT';
 import { ESqlDataSourceFeatures } from './SqlDataSource/ESqlDataSourceFeatures';
 import { DATA_CONTEXT_SQL_EDITOR_DATA } from './SqlEditor/DATA_CONTEXT_SQL_EDITOR_DATA';
 

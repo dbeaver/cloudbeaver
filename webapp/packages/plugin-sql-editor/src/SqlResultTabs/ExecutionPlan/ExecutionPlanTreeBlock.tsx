@@ -6,43 +6,27 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import styled, { css } from 'reshadow';
 
 import {
   Pane,
   ResizerControls,
+  s,
   Split,
-  splitStyles,
   Table,
   TableBody,
   TableColumnHeader,
   TableHeader,
   Textarea,
   TextPlaceholder,
+  useS,
   useSplitUserState,
   useTranslate,
 } from '@cloudbeaver/core-blocks';
 import type { SqlExecutionPlanNode } from '@cloudbeaver/core-sdk';
 
+import style from './ExecutionPlanTreeBlock.m.css';
 import { NestedNode } from './NestedNode';
 import { useExecutionPlanTreeState } from './useExecutionPlanTreeState';
-
-const styles = css`
-  Pane {
-    composes: theme-background-surface theme-text-on-surface from global;
-  }
-  Split {
-    height: 100%;
-    flex-direction: column;
-  }
-  ResizerControls {
-    width: 100%;
-    height: 2px;
-  }
-  Textarea > :global(textarea) {
-    border: none !important;
-  }
-`;
 
 interface Props {
   nodeList: SqlExecutionPlanNode[];
@@ -52,15 +36,13 @@ interface Props {
 }
 
 export const ExecutionPlanTreeBlock = observer<Props>(function ExecutionPlanTreeBlock({ nodeList, query, onNodeSelect, className }) {
+  const styles = useS(style);
   const translate = useTranslate();
   const splitState = useSplitUserState('execution-plan-block');
   const state = useExecutionPlanTreeState(nodeList, onNodeSelect);
 
-  return styled(
-    styles,
-    splitStyles,
-  )(
-    <Split {...splitState} className={className} sticky={30} split="horizontal" keepRatio>
+  return (
+    <Split {...splitState} sticky={30} split="horizontal" keepRatio>
       <Pane>
         {state.nodes.length && state.columns.length ? (
           <Table selectedItems={state.selectedNodes} onSelect={state.selectNode}>
@@ -87,8 +69,8 @@ export const ExecutionPlanTreeBlock = observer<Props>(function ExecutionPlanTree
       </Pane>
       <ResizerControls />
       <Pane basis="30%" main>
-        <Textarea className={className} name="value" rows={3} value={query} readOnly embedded />
+        <Textarea className={s(styles, { textarea: true }, className)} name="value" rows={3} value={query} readOnly embedded />
       </Pane>
-    </Split>,
+    </Split>
   );
 });

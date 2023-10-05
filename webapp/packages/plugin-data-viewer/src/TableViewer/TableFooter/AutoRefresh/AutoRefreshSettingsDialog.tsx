@@ -8,8 +8,23 @@
 import { observer } from 'mobx-react-lite';
 import { useRef } from 'react';
 
-import { Button, Container, FieldCheckbox, Fill, Form, Group, InputField, s, useS, useTranslate } from '@cloudbeaver/core-blocks';
-import { CommonDialogBody, CommonDialogFooter, CommonDialogHeader, CommonDialogWrapper, DialogComponentProps } from '@cloudbeaver/core-dialogs';
+import {
+  Button,
+  CommonDialogBody,
+  CommonDialogFooter,
+  CommonDialogHeader,
+  CommonDialogWrapper,
+  Container,
+  FieldCheckbox,
+  Fill,
+  Form,
+  Group,
+  InputField,
+  s,
+  useS,
+  useTranslate,
+} from '@cloudbeaver/core-blocks';
+import type { DialogComponentProps } from '@cloudbeaver/core-dialogs';
 
 import style from './AutoRefreshSettingsDialog.m.css';
 import type { IAutoRefreshSettings } from './IAutoRefreshSettings';

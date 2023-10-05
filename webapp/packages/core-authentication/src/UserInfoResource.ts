@@ -9,17 +9,9 @@ import { computed, makeObservable, runInAction } from 'mobx';
 
 import { injectable } from '@cloudbeaver/core-di';
 import { AutoRunningTask, ISyncExecutor, ITask, SyncExecutor, whileTask } from '@cloudbeaver/core-executor';
+import { CachedDataResource, type ResourceKeySimple, ResourceKeyUtils } from '@cloudbeaver/core-resource';
 import { SessionDataResource, SessionResource } from '@cloudbeaver/core-root';
-import {
-  AuthInfo,
-  AuthStatus,
-  CachedDataResource,
-  GetActiveUserQueryVariables,
-  GraphQLService,
-  ResourceKeySimple,
-  ResourceKeyUtils,
-  UserInfo,
-} from '@cloudbeaver/core-sdk';
+import { AuthInfo, AuthStatus, GetActiveUserQueryVariables, GraphQLService, UserInfo } from '@cloudbeaver/core-sdk';
 
 import { AUTH_PROVIDER_LOCAL_ID } from './AUTH_PROVIDER_LOCAL_ID';
 import { AuthProviderService } from './AuthProviderService';

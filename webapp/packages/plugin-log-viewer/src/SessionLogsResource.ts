@@ -10,8 +10,9 @@ import { runInAction } from 'mobx';
 import { CoreSettingsService } from '@cloudbeaver/core-app';
 import { AppAuthService } from '@cloudbeaver/core-authentication';
 import { injectable } from '@cloudbeaver/core-di';
+import { CachedDataResource } from '@cloudbeaver/core-resource';
 import { ServerEventId, SessionDataResource } from '@cloudbeaver/core-root';
-import { CachedDataResource, GraphQLService, LogEntry } from '@cloudbeaver/core-sdk';
+import { GraphQLService, LogEntry } from '@cloudbeaver/core-sdk';
 import { uuid } from '@cloudbeaver/core-utils';
 
 import { LogViewerSettingsService } from './LogViewer/LogViewerSettingsService';

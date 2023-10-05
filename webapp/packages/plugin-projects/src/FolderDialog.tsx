@@ -11,6 +11,10 @@ import { useEffect } from 'react';
 
 import {
   Button,
+  CommonDialogBody,
+  CommonDialogFooter,
+  CommonDialogHeader,
+  CommonDialogWrapper,
   Container,
   Fill,
   Form,
@@ -23,12 +27,12 @@ import {
   useS,
   useTranslate,
 } from '@cloudbeaver/core-blocks';
-import { CommonDialogBody, CommonDialogFooter, CommonDialogHeader, CommonDialogWrapper, DialogComponent } from '@cloudbeaver/core-dialogs';
+import type { DialogComponent } from '@cloudbeaver/core-dialogs';
 import { ProjectInfo, ProjectInfoResource } from '@cloudbeaver/core-projects';
 import { createPath, throttleAsync } from '@cloudbeaver/core-utils';
-import { ProjectSelect } from '@cloudbeaver/plugin-projects';
 
 import style from './FolderDialog.m.css';
+import { ProjectSelect } from './ProjectSelect';
 
 interface IFolderDialogState {
   value: string;

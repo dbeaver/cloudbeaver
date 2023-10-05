@@ -7,8 +7,8 @@
  */
 import type { NavNode, NavNodeInfoResource, ProjectsNavNodeService } from '@cloudbeaver/core-navigation-tree';
 import { isResourceOfType, ProjectInfoResource } from '@cloudbeaver/core-projects';
+import { resourceKeyList } from '@cloudbeaver/core-resource';
 import { NAV_NODE_TYPE_RM_RESOURCE } from '@cloudbeaver/core-resource-manager';
-import { resourceKeyList } from '@cloudbeaver/core-sdk';
 import { isNotNullDefined } from '@cloudbeaver/core-utils';
 import type { IElementsTreeFilter } from '@cloudbeaver/plugin-navigation-tree';
 

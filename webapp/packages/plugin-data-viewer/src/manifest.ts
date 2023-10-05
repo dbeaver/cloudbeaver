@@ -25,7 +25,7 @@ import { ImageValuePresentationBootstrap } from './ValuePanelPresentation/ImageV
 import { TextValuePresentationBootstrap } from './ValuePanelPresentation/TextValue/TextValuePresentationBootstrap';
 import { TextValuePresentationService } from './ValuePanelPresentation/TextValue/TextValuePresentationService';
 
-export const manifest: PluginManifest = {
+export const dataViewerManifest: PluginManifest = {
   info: {
     name: 'Data Viewer Plugin',
   },

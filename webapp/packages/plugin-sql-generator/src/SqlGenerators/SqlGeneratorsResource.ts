@@ -7,15 +7,8 @@
  */
 import { injectable } from '@cloudbeaver/core-di';
 import { NavNodeInfoResource } from '@cloudbeaver/core-navigation-tree';
-import {
-  CachedMapResource,
-  GraphQLService,
-  isResourceAlias,
-  ResourceKey,
-  resourceKeyList,
-  ResourceKeyUtils,
-  SqlQueryGenerator,
-} from '@cloudbeaver/core-sdk';
+import { CachedMapResource, isResourceAlias, type ResourceKey, resourceKeyList, ResourceKeyUtils } from '@cloudbeaver/core-resource';
+import { GraphQLService, SqlQueryGenerator } from '@cloudbeaver/core-sdk';
 
 export const MAX_GENERATORS_LENGTH = 15;
 

@@ -1,9 +1,76 @@
 {
-  "extends": "../../tsconfig.json",
+  "extends": "../../tsconfig.base.json",
   "compilerOptions": {
     "rootDir": "src",
-    "outDir": "lib"
+    "outDir": "dist",
+    "tsBuildInfoFile": "dist/tsconfig.tsbuildinfo"
   },
-  "include": ["src"],
-  "references": [{ "path": "../*" }]
+  "references": [
+    {
+      "path": "..\\plugin-navigation-tree"
+    },
+    {
+      "path": "..\\plugin-projects"
+    },
+    {
+      "path": "..\\plugin-resource-manager"
+    },
+    {
+      "path": "..\\core-authentication"
+    },
+    {
+      "path": "..\\core-blocks"
+    },
+    {
+      "path": "..\\core-connections"
+    },
+    {
+      "path": "..\\core-data-context"
+    },
+    {
+      "path": "..\\core-di"
+    },
+    {
+      "path": "..\\core-dialogs"
+    },
+    {
+      "path": "..\\core-events"
+    },
+    {
+      "path": "..\\core-executor"
+    },
+    {
+      "path": "..\\core-localization"
+    },
+    {
+      "path": "..\\core-navigation-tree"
+    },
+    {
+      "path": "..\\core-projects"
+    },
+    {
+      "path": "..\\core-resource"
+    },
+    {
+      "path": "..\\core-resource-manager"
+    },
+    {
+      "path": "..\\core-utils"
+    },
+    {
+      "path": "..\\core-view"
+    }
+  ],
+  "include": [
+    "__custom_mocks__/**/*",
+    "src/**/*",
+    "src/**/*.json",
+    "src/**/*.css",
+    "src/**/*.scss"
+  ],
+  "exclude": [
+    "lib/**/*",
+    "dist/**/*",
+    "**/node_modules"
+  ]
 }

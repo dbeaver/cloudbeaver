@@ -1,16 +1,19 @@
 const { resolve } = require('path');
+const CopyWebpackPlugin = require('copy-webpack-plugin');
 const PeerDepsExternalsPlugin = require('peer-deps-externals-webpack-plugin');
 const { merge } = require('webpack-merge');
 
 const commonConfig = require('./webpack.config.js');
 
-const main = resolve('src/index.ts');
+const index = resolve('src/index.ts');
 const outputDir = resolve('lib');
 const package = require(resolve('package.json'));
 
 module.exports = (env, argv) => merge(commonConfig(env, argv), {
   entry: {
-    [package.name.replace('@cloudbeaver/', '')]: main,
+    // [package.name.replace('@cloudbeaver/', '')]: index,
+    
+    index,
   },
   output: {
     filename: '[name].js',
@@ -19,13 +22,7 @@ module.exports = (env, argv) => merge(commonConfig(env, argv), {
     libraryTarget: 'commonjs',
     path: outputDir,
   },
-  optimization: {
-    // splitChunks: {
-    //   chunks: 'all',
-    // },
-    // minimize: false,
-    // concatenateModules: false,
-  },
+  externals: /^@cloudbeaver\/.+$/i,
   plugins: [
     new PeerDepsExternalsPlugin(),
   ],

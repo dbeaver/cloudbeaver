@@ -7,15 +7,9 @@
  */
 import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
+import { CachedMapAllKey, CachedMapResource, resourceKeyList } from '@cloudbeaver/core-resource';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
-import {
-  CachedMapAllKey,
-  CachedMapResource,
-  GraphQLService,
-  NetworkHandlerConfigInput,
-  NetworkHandlerDescriptor,
-  resourceKeyList,
-} from '@cloudbeaver/core-sdk';
+import { GraphQLService, NetworkHandlerConfigInput, NetworkHandlerDescriptor } from '@cloudbeaver/core-sdk';
 
 export const SSH_TUNNEL_ID = 'ssh_tunnel';
 

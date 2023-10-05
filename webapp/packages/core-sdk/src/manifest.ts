@@ -11,7 +11,7 @@ import { AsyncTaskInfoService } from './AsyncTask/AsyncTaskInfoService';
 import { EnvironmentService } from './EnvironmentService';
 import { GraphQLService } from './GraphQLService';
 
-export const manifest: PluginManifest = {
+export const coreSDKManifest: PluginManifest = {
   info: {
     name: 'Core SDK',
   },

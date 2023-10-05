@@ -6,19 +6,23 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import { css } from 'reshadow';
 
-import { Cell, IconOrImage, useTranslate } from '@cloudbeaver/core-blocks';
+import { Cell, CellStyles, IconOrImage, s, SContext, StyleRegistry, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { VersionResource, VersionService } from '@cloudbeaver/core-version';
 import { VersionUpdateService } from '@cloudbeaver/core-version-update';
 
-const style = css`
-  before {
-    width: 40px;
-    height: 40px;
-  }
-`;
+import VersionCheckCellStyles from './VersionCheckerCellStyles.m.css';
+
+const registry: StyleRegistry = [
+  [
+    CellStyles,
+    {
+      mode: 'append',
+      styles: [VersionCheckCellStyles],
+    },
+  ],
+];
 
 export const VersionChecker = observer(function VersionChecker() {
   const translate = useTranslate();
@@ -34,13 +38,10 @@ export const VersionChecker = observer(function VersionChecker() {
       : '';
 
   return (
-    <Cell
-      before={<IconOrImage icon={icon} />}
-      description={versionUpdateService.newVersionAvailable ? description : undefined}
-      style={style}
-      ripple={false}
-    >
-      {translate(text)}
-    </Cell>
+    <SContext registry={registry}>
+      <Cell before={<IconOrImage icon={icon} />} description={versionUpdateService.newVersionAvailable ? description : undefined} ripple={false}>
+        {translate(text)}
+      </Cell>
+    </SContext>
   );
 });

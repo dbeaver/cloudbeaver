@@ -7,17 +7,12 @@
  */
 import { action, makeObservable, observable } from 'mobx';
 
+import { dataContextAddDIProvider, type IDataContext, TempDataContext } from '@cloudbeaver/core-data-context';
 import type { App } from '@cloudbeaver/core-di';
 import type { ENotificationType } from '@cloudbeaver/core-events';
 import { Executor, IExecutionContextProvider, type IExecutor } from '@cloudbeaver/core-executor';
 import { isLoadableStateHasException, MetadataMap, uuid } from '@cloudbeaver/core-utils';
-import {
-  DATA_CONTEXT_LOADABLE_STATE,
-  dataContextAddDIProvider,
-  type IDataContext,
-  loadableStateContext,
-  TempDataContext,
-} from '@cloudbeaver/core-view';
+import { DATA_CONTEXT_LOADABLE_STATE, loadableStateContext } from '@cloudbeaver/core-view';
 
 import { DATA_CONTEXT_FORM_STATE } from './DATA_CONTEXT_FORM_STATE';
 import type { FormBaseService } from './FormBaseService';

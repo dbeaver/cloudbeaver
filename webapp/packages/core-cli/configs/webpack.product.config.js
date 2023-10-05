@@ -8,7 +8,7 @@ const { merge } = require('webpack-merge');
 
 const commonConfig = require('./webpack.config.js');
 const { getAssets, withTimestamp } = require('./webpack.product.utils');
-const HtmlInjectWebpackPlugin = require('./HtmlInjectWebpackPlugin.js');
+const HtmlInjectWebpackPlugin = require('../utils/HtmlInjectWebpackPlugin.js');
 
 const main = resolve('src/index.ts');
 const sso = require.resolve('@cloudbeaver/plugin-sso/src/index.ts');
@@ -41,6 +41,12 @@ module.exports = (env, argv) => {
       swSrc: getServiceWorkerSource(),
       swDest: 'service-worker.js',
       maximumFileSizeToCacheInBytes: 20 * 1024 * 1024,
+      exclude: [
+        /\.map$/,
+        /manifest.*\.js$/,
+        /\.tsx?$/,
+        /\.tsbuildinfo$/,
+      ],
     })];
   }
 
@@ -49,6 +55,7 @@ module.exports = (env, argv) => {
       main,
       sso,
     },
+    devtool: false,
     output: {
       filename: 'index.[contenthash].js',
       chunkFilename: '[name].[contenthash].bundle.js',
