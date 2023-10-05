@@ -9,7 +9,7 @@ import { observable } from 'mobx';
 import { useDrag } from 'react-dnd';
 
 import { useObjectRef, useObservableRef } from '@cloudbeaver/core-blocks';
-import type { IDataContextProvider } from '@cloudbeaver/core-view';
+import type { IDataContextProvider } from '@cloudbeaver/core-data-context';
 
 import { DND_ELEMENT_TYPE } from './DND_ELEMENT_TYPE';
 

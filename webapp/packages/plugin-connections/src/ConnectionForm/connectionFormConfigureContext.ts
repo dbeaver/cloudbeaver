@@ -7,7 +7,8 @@
  */
 import type { DatabaseConnection } from '@cloudbeaver/core-connections';
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
-import type { CachedResourceIncludeArgs, GetUserConnectionsQueryVariables } from '@cloudbeaver/core-sdk';
+import type { CachedResourceIncludeArgs } from '@cloudbeaver/core-resource';
+import type { GetUserConnectionsQueryVariables } from '@cloudbeaver/core-sdk';
 
 import type { IConnectionFormState } from './IConnectionFormProps';
 

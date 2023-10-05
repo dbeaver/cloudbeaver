@@ -1,0 +1,8 @@
+.bodyContent {
+    composes: theme-background-surface theme-text-on-surface theme-typography from global;
+    height: 100vh;
+    display: flex;
+    padding: 0 !important;
+    flex-direction: column;
+    overflow: hidden;
+}

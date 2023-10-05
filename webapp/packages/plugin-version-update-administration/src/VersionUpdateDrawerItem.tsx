@@ -11,7 +11,7 @@ import styled, { css } from 'reshadow';
 import type { AdministrationItemDrawerProps } from '@cloudbeaver/core-administration';
 import { Translate, useResource, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { CachedMapAllKey } from '@cloudbeaver/core-sdk';
+import { CachedMapAllKey } from '@cloudbeaver/core-resource';
 import { Tab, TabIcon, TabTitle } from '@cloudbeaver/core-ui';
 import { VersionResource } from '@cloudbeaver/core-version';
 import { VersionUpdateService } from '@cloudbeaver/core-version-update';

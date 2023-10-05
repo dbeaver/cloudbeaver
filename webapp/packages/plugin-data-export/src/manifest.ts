@@ -16,7 +16,7 @@ import { DataTransferProcessorsResource } from './DataTransferProcessorsResource
 import { DefaultExportOutputSettingsResource } from './Dialog/DefaultExportOutputSettingsResource';
 import { LocaleService } from './LocaleService';
 
-export const manifest: PluginManifest = {
+export const dataExportManifest: PluginManifest = {
   info: {
     name: 'Data Export Plugin',
   },

@@ -8,9 +8,8 @@
 import { observer } from 'mobx-react-lite';
 import styled from 'reshadow';
 
-import { Icon } from '@cloudbeaver/core-blocks';
+import { Icon, MenuTrigger } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { MenuTrigger } from '@cloudbeaver/core-dialogs';
 import { EventContext, EventStopPropagationFlag } from '@cloudbeaver/core-events';
 import type { IDatabaseDataModel, IDataPresentationActions, IDataTableActions, IResultSetElementKey } from '@cloudbeaver/plugin-data-viewer';
 

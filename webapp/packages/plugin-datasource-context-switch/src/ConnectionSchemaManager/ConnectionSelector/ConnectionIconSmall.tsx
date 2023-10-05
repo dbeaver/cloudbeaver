@@ -18,7 +18,7 @@ import {
   useStyles,
 } from '@cloudbeaver/core-blocks';
 import { ConnectionInfoResource, DBDriverResource } from '@cloudbeaver/core-connections';
-import { CachedMapAllKey } from '@cloudbeaver/core-sdk';
+import { CachedMapAllKey } from '@cloudbeaver/core-resource';
 import type { ComponentStyle } from '@cloudbeaver/core-theming';
 
 import { default as ConnectionImageWithMaskSvgBackgroundStyles } from './ConnectionImageWithMask.m.css';

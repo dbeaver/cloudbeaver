@@ -16,7 +16,7 @@ import { DataGridSettingsService } from './DataGridSettingsService';
 import { LocaleService } from './LocaleService';
 import { SpreadsheetBootstrap } from './SpreadsheetBootstrap';
 
-export const manifest: PluginManifest = {
+export const dataSpreadsheetNewManifest: PluginManifest = {
   info: { name: 'New spreadsheet implementation' },
   providers: [
     SpreadsheetBootstrap,

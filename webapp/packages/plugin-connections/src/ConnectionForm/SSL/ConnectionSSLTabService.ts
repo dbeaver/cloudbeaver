@@ -11,7 +11,8 @@ import React from 'react';
 import { DBDriverResource, NetworkHandlerResource } from '@cloudbeaver/core-connections';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
-import { CachedMapAllKey, type NetworkHandlerConfigInput } from '@cloudbeaver/core-sdk';
+import { CachedMapAllKey } from '@cloudbeaver/core-resource';
+import type { NetworkHandlerConfigInput } from '@cloudbeaver/core-sdk';
 import { formStateContext } from '@cloudbeaver/core-ui';
 import { isNotNullDefined, isObjectsEqual } from '@cloudbeaver/core-utils';
 

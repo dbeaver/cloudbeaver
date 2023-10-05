@@ -5,69 +5,44 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
+import { observer } from 'mobx-react-lite';
 import type React from 'react';
-import styled, { css, use } from 'reshadow';
 
 import { ENotificationType } from '@cloudbeaver/core-events';
-import type { ComponentStyle } from '@cloudbeaver/core-theming';
 
 import { AppRefreshButton } from './AppRefreshButton';
+import style from './DisplayError.m.css';
+import { s } from './s';
 import { NotificationMark } from './Snackbars/NotificationMark';
-import { useStyles } from './useStyles';
-
-const style = css`
-  error {
-    width: 100%;
-    height: 100%;
-    display: flex;
-    overflow: auto;
-
-    &[|root] {
-      height: 100vh;
-    }
-  }
-  error-inner-block {
-    display: flex;
-    margin: auto;
-    padding: 16px 24px;
-    flex-direction: column;
-    align-items: center;
-  }
-  NotificationMark {
-    width: 40px;
-    height: 40px;
-  }
-  details {
-    padding: 8px 16px;
-  }
-`;
+import { useS } from './useS';
 
 interface Props {
   root?: boolean;
   error?: Error;
   errorInfo?: React.ErrorInfo;
   className?: string;
-  styles?: ComponentStyle;
+  children?: React.ReactNode;
 }
 
-export const DisplayError: React.FC<React.PropsWithChildren<Props>> = function DisplayError({ root, children, error, errorInfo, className, styles }) {
+export const DisplayError = observer<Props>(function DisplayError({ root, children, error, errorInfo, className }) {
+  const styles = useS(style);
   const stack = errorInfo?.componentStack || error?.stack;
 
-  return styled(useStyles(style, styles))(
-    <error className={className} {...use({ root })}>
-      <error-inner-block>
-        <NotificationMark type={ENotificationType.Error} />
+  return (
+    <div className={s(styles, { error: true, root }, className)}>
+      <div className={s(styles, { errorInnerBlock: true })}>
+        <NotificationMark className={s(styles, { notificationMark: true })} type={ENotificationType.Error} />
         <p>Something went wrong.</p>
         {root && <AppRefreshButton />}
         {children}
         {error && (
-          <details style={{ whiteSpace: 'pre-wrap' }}>
+          <div className={s(styles, { details: true })}>
             {error.toString()}
             {stack && <br />}
             {stack}
-          </details>
+          </div>
         )}
-      </error-inner-block>
-    </error>,
+      </div>
+    </div>
   );
-};
+});

@@ -7,8 +7,7 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import { Loader, s, useS } from '@cloudbeaver/core-blocks';
-import { CommonDialogBody, CommonDialogHeader, CommonDialogWrapper } from '@cloudbeaver/core-dialogs';
+import { CommonDialogBody, CommonDialogHeader, CommonDialogWrapper, Loader, s, useS } from '@cloudbeaver/core-blocks';
 
 import type { IDriver } from './Driver';
 import { DriverSelector } from './DriverSelector';

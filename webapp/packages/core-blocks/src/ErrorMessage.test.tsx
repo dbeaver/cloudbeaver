@@ -8,19 +8,36 @@
 import '@testing-library/jest-dom';
 import { screen } from '@testing-library/react';
 
-import { mockAuthentication } from '@cloudbeaver/core-authentication/mocks/mockAuthentication';
-import { createApp } from '@cloudbeaver/core-cli/tests/utils/createApp';
-import { renderInApp } from '@cloudbeaver/core-cli/tests/utils/renderInApp';
-import { createGQLEndpoint } from '@cloudbeaver/core-root/mocks/createGQLEndpoint';
-import { mockAppInit } from '@cloudbeaver/core-root/mocks/mockAppInit';
-import { mockGraphQL } from '@cloudbeaver/core-root/mocks/mockGraphQL';
+import { coreBrowserManifest } from '@cloudbeaver/core-browser';
+import { coreEventsManifest } from '@cloudbeaver/core-events';
+import { coreLocalizationManifest } from '@cloudbeaver/core-localization';
+import { corePluginManifest } from '@cloudbeaver/core-plugin';
+import { coreProductManifest } from '@cloudbeaver/core-product';
+import { coreRootManifest } from '@cloudbeaver/core-root';
+import { createGQLEndpoint } from '@cloudbeaver/core-root/dist/__custom_mocks__/createGQLEndpoint';
+import { mockAppInit } from '@cloudbeaver/core-root/dist/__custom_mocks__/mockAppInit';
+import { mockGraphQL } from '@cloudbeaver/core-root/dist/__custom_mocks__/mockGraphQL';
+import { coreSDKManifest } from '@cloudbeaver/core-sdk';
+import { coreSettingsManifest } from '@cloudbeaver/core-settings';
+import { coreThemingManifest } from '@cloudbeaver/core-theming';
+import { createApp, renderInApp } from '@cloudbeaver/tests-runner';
 
 import { ErrorMessage } from './ErrorMessage';
 
 const endpoint = createGQLEndpoint();
-const app = createApp();
+const app = createApp(
+  coreEventsManifest,
+  corePluginManifest,
+  coreProductManifest,
+  coreRootManifest,
+  coreSDKManifest,
+  coreSettingsManifest,
+  coreBrowserManifest,
+  coreThemingManifest,
+  coreLocalizationManifest,
+);
 
-mockGraphQL(...mockAppInit(endpoint), ...mockAuthentication(endpoint));
+mockGraphQL(...mockAppInit(endpoint));
 
 beforeAll(() => app.init());
 

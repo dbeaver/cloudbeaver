@@ -8,8 +8,22 @@
 import { action, observable } from 'mobx';
 import { observer } from 'mobx-react-lite';
 
-import { Button, Container, Fill, Form, InputField, Translate, useFocus, useObservableRef, useTranslate } from '@cloudbeaver/core-blocks';
-import { CommonDialogBody, CommonDialogFooter, CommonDialogHeader, CommonDialogWrapper, DialogComponent } from '@cloudbeaver/core-dialogs';
+import {
+  Button,
+  CommonDialogBody,
+  CommonDialogFooter,
+  CommonDialogHeader,
+  CommonDialogWrapper,
+  Container,
+  Fill,
+  Form,
+  InputField,
+  Translate,
+  useFocus,
+  useObservableRef,
+  useTranslate,
+} from '@cloudbeaver/core-blocks';
+import type { DialogComponent } from '@cloudbeaver/core-dialogs';
 import { ProjectSelect } from '@cloudbeaver/plugin-projects';
 
 export interface ISaveScriptDialogResult {
