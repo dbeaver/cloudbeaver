@@ -8,5 +8,6 @@
 import type { IResultSetRowKey } from './IResultSetDataKey';
 
 export function compareResultSetRowKeys(a: IResultSetRowKey, b: IResultSetRowKey): number {
+  // subIndex is used to sort rows with the same index
   return a.index + a.subIndex / 10 - b.index - b.subIndex / 10;
 }

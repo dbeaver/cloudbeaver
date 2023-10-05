@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 import { ResultDataFormat } from '@cloudbeaver/core-sdk';
-import { base64ToBlob, removeLineBreak } from '@cloudbeaver/core-utils';
+import { removeLineBreak } from '@cloudbeaver/core-utils';
 
 import { DatabaseDataAction } from '../../DatabaseDataAction';
 import type { IDatabaseDataSource } from '../../IDatabaseDataSource';
@@ -99,11 +99,11 @@ export class ResultSetFormatAction
 
   getLongestCells(offset = 0, count?: number): string[] {
     const cells: string[] = [];
-    const columns = this.view.columnKeys.length;
+    const columnsCount = this.view.columnKeys.length;
     count ??= this.view.rowKeys.length;
 
     for (let rowIndex = offset; rowIndex < offset + count; rowIndex++) {
-      for (let columnIndex = 0; columnIndex < columns; columnIndex++) {
+      for (let columnIndex = 0; columnIndex < columnsCount; columnIndex++) {
         const key = { row: this.view.rowKeys[rowIndex], column: this.view.columnKeys[columnIndex] };
         const displayString = this.getDisplayString(key);
         const current = cells[columnIndex] ?? '';

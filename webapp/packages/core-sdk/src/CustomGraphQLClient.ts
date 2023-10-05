@@ -32,6 +32,19 @@ export class CustomGraphQLClient extends GraphQLClient {
 
   async uploadFile<T = any, V extends Variables = Variables>(
     url: string,
+    file: Blob,
+    query?: string,
+    variables?: V,
+    onUploadProgress?: (event: UploadProgressEvent) => void,
+  ): Promise<T> {
+    return this.interceptors.reduce(
+      (accumulator, interceptor) => interceptor(accumulator),
+      this.overrideFilesUpload<T, V>(url, file, query, variables, onUploadProgress),
+    );
+  }
+
+  async uploadFiles<T = any, V extends Variables = Variables>(
+    url: string,
     files: FileList,
     query?: string,
     variables?: V,
@@ -39,7 +52,7 @@ export class CustomGraphQLClient extends GraphQLClient {
   ): Promise<T> {
     return this.interceptors.reduce(
       (accumulator, interceptor) => interceptor(accumulator),
-      this.overrideFileUpload<T, V>(url, files, query, variables, onUploadProgress),
+      this.overrideFilesUpload<T, V>(url, files, query, variables, onUploadProgress),
     );
   }
 
@@ -107,9 +120,9 @@ export class CustomGraphQLClient extends GraphQLClient {
     }
   }
 
-  private async overrideFileUpload<T, V extends Variables = Variables>(
+  private async overrideFilesUpload<T, V extends Variables = Variables>(
     url: string,
-    files: FileList,
+    files: FileList | Blob,
     query?: string,
     variables?: V,
     onUploadProgress?: (event: UploadProgressEvent) => void,
@@ -118,19 +131,24 @@ export class CustomGraphQLClient extends GraphQLClient {
     try {
       const { operationName } = resolveRequestDocument(query ?? '');
       // TODO: we don't support GQL response right now
-      const response = await axios.postForm/*<GqlResponse>*/ <T>(
-        url,
-        {
-          operationName,
-          query,
-          variables: JSON.stringify(variables),
-          'files[]': files,
-        },
-        {
-          onUploadProgress,
-          responseType: 'json',
-        },
-      );
+      const data = {
+        operationName,
+        query,
+        variables: JSON.stringify(variables),
+        'files[]': undefined as any,
+        fileData: undefined as any,
+      };
+
+      if (files instanceof FileList) {
+        data['files[]'] = files;
+      } else {
+        data.fileData = files;
+      }
+
+      const response = await axios.postForm/*<GqlResponse>*/ <T>(url, data, {
+        onUploadProgress,
+        responseType: 'json',
+      });
 
       // TODO: we don't support GQL response right now
       // TODO: seems here can be undefined
