@@ -609,7 +609,8 @@ public class WebSQLProcessor implements WebSessionProvider {
         DBCSession session,
         DBSDocumentLocator dataContainer,
         WebSQLResultsInfo resultsInfo,
-        WebSQLResultsRow row) throws DBException {
+        WebSQLResultsRow row) throws DBException
+    {
         // Document reference
         DBDDocument document = null;
         Map<String, Object> keyMap = new LinkedHashMap<>();
