@@ -27,7 +27,7 @@ jobs:
         id: yarn-cache-dir-path
         run: echo "dir=$(yarn cache dir)" >> $GITHUB_OUTPUT
 
-      - name: Restore yarn cache
+      - name: restore yarn cache
         uses: actions/cache@v3
         with:
           path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
@@ -35,15 +35,15 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-yarn-
 
-      - name: Restore lerna
+      - name: restore node_modules
         uses: actions/cache@v3
         with:
           path: "**/node_modules"
-          key: ${{ runner.os }}-lerna-${{ hashFiles('**/yarn.lock') }}
+          key: ${{ runner.os }}-node_modules-${{ hashFiles('**/yarn.lock') }}
           restore-keys: |
-            ${{ runner.os }}-lerna-
+            ${{ runner.os }}-node_modules-
 
-      - name: Restore typescript cache
+      - name: restore typescript cache
         uses: actions/cache@v3
         with:
           path: "**/packages/*/dist"
@@ -63,7 +63,7 @@ jobs:
           dir: webapp
           cmd: lerna bootstrap
 
-      - name: Build
+      - name: build
         uses: borales/actions-yarn@v4
         with:
           dir: webapp/packages/product-default
@@ -86,7 +86,7 @@ jobs:
         id: yarn-cache-dir-path
         run: echo "dir=$(yarn cache dir)" >> $GITHUB_OUTPUT
 
-      - name: Restore yarn cache
+      - name: restore yarn cache
         uses: actions/cache@v3
         with:
           path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
@@ -94,15 +94,15 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-yarn-
 
-      - name: Restore lerna
+      - name: restore node_modules
         uses: actions/cache@v3
         with:
           path: "**/node_modules"
-          key: ${{ runner.os }}-lerna-${{ hashFiles('**/yarn.lock') }}
+          key: ${{ runner.os }}-node_modules-${{ hashFiles('**/yarn.lock') }}
           restore-keys: |
-            ${{ runner.os }}-lerna-
+            ${{ runner.os }}-node_modules-
 
-      - name: Restore typescript cache
+      - name: restore typescript cache
         uses: actions/cache@v3
         with:
           path: "**/packages/*/dist"
@@ -122,13 +122,13 @@ jobs:
           dir: webapp
           cmd: lerna bootstrap
 
-      - name: Run pre test
+      - name: generate sdk
         uses: borales/actions-yarn@v4
         with:
           dir: webapp
           cmd: pretest
 
-      - name: Run test
+      - name: run test
         uses: borales/actions-yarn@v4
         with:
           dir: webapp
