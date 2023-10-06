@@ -7,25 +7,25 @@
   },
   "references": [
     {
-      "path": "..\\plugin-administration"
+      "path": "../plugin-administration"
     },
     {
-      "path": "..\\plugin-user-profile"
+      "path": "../plugin-user-profile"
     },
     {
-      "path": "..\\core-di"
+      "path": "../core-di"
     }
   ],
   "include": [
-    "__custom_mocks__/**/*",
-    "src/**/*",
+    "__custom_mocks__/**",
+    "src/**",
     "src/**/*.json",
     "src/**/*.css",
     "src/**/*.scss"
   ],
   "exclude": [
-    "lib/**/*",
-    "dist/**/*",
-    "**/node_modules"
+    "**/node_modules",
+    "lib/**",
+    "dist/**"
   ]
 }

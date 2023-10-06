@@ -7,25 +7,25 @@
   },
   "references": [
     {
-      "path": "..\\core-di"
+      "path": "../core-di"
     },
     {
-      "path": "..\\core-executor"
+      "path": "../core-executor"
     },
     {
-      "path": "..\\core-utils"
+      "path": "../core-utils"
     }
   ],
   "include": [
-    "__custom_mocks__/**/*",
-    "src/**/*",
+    "__custom_mocks__/**",
+    "src/**",
     "src/**/*.json",
     "src/**/*.css",
     "src/**/*.scss"
   ],
   "exclude": [
-    "lib/**/*",
-    "dist/**/*",
-    "**/node_modules"
+    "**/node_modules",
+    "lib/**",
+    "dist/**"
   ]
 }

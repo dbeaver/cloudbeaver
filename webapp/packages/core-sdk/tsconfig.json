@@ -1,9 +1,9 @@
 {
   "extends": "../../tsconfig.base.json",
   "exclude": [
-    "lib/**/*",
-    "dist/**/*",
-    "**/node_modules"
+    "**/node_modules",
+    "lib/**",
+    "dist/**"
   ],
   "compilerOptions": {
     "rootDir": "src",
@@ -12,15 +12,15 @@
   },
   "references": [
     {
-      "path": "..\\core-di"
+      "path": "../core-di"
     },
     {
-      "path": "..\\core-utils"
+      "path": "../core-utils"
     }
   ],
   "include": [
-    "__custom_mocks__/**/*",
-    "src/**/*",
+    "__custom_mocks__/**",
+    "src/**",
     "src/**/*.json",
     "src/**/*.css",
     "src/**/*.scss"

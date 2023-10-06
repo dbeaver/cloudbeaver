@@ -7,31 +7,31 @@
   },
   "references": [
     {
-      "path": "..\\core-blocks"
+      "path": "../core-blocks"
     },
     {
-      "path": "..\\core-browser"
+      "path": "../core-browser"
     },
     {
-      "path": "..\\core-di"
+      "path": "../core-di"
     },
     {
-      "path": "..\\core-events"
+      "path": "../core-events"
     },
     {
-      "path": "..\\core-localization"
+      "path": "../core-localization"
     }
   ],
   "include": [
-    "__custom_mocks__/**/*",
-    "src/**/*",
+    "__custom_mocks__/**",
+    "src/**",
     "src/**/*.json",
     "src/**/*.css",
     "src/**/*.scss"
   ],
   "exclude": [
-    "lib/**/*",
-    "dist/**/*",
-    "**/node_modules"
+    "**/node_modules",
+    "lib/**",
+    "dist/**"
   ]
 }

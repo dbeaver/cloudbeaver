@@ -7,40 +7,40 @@
   },
   "references": [
     {
-      "path": "..\\core-di"
+      "path": "../core-di"
     },
     {
-      "path": "..\\core-events"
+      "path": "../core-events"
     },
     {
-      "path": "..\\core-executor"
+      "path": "../core-executor"
     },
     {
-      "path": "..\\core-localization"
+      "path": "../core-localization"
     },
     {
-      "path": "..\\core-plugin"
+      "path": "../core-plugin"
     },
     {
-      "path": "..\\core-root"
+      "path": "../core-root"
     },
     {
-      "path": "..\\core-settings"
+      "path": "../core-settings"
     },
     {
-      "path": "..\\tests-runner"
+      "path": "../tests-runner"
     }
   ],
   "include": [
-    "__custom_mocks__/**/*",
-    "src/**/*",
+    "__custom_mocks__/**",
+    "src/**",
     "src/**/*.json",
     "src/**/*.css",
     "src/**/*.scss"
   ],
   "exclude": [
-    "lib/**/*",
-    "dist/**/*",
-    "**/node_modules"
+    "**/node_modules",
+    "lib/**",
+    "dist/**"
   ]
 }
