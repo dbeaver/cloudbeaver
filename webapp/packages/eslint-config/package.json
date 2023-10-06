@@ -1,6 +1,6 @@
 {
   "name": "@cloudbeaver/eslint-config",
-  "sideEffects": false,
+  "sideEffects": [],
   "version": "0.1.0",
   "main": "index.js",
   "description": "ESLint for CloudBeaver",

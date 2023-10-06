@@ -23,7 +23,7 @@ import { NotificationService } from '@cloudbeaver/core-events';
 import type { IExecutionContextProvider, ISyncContextLoader } from '@cloudbeaver/core-executor';
 import { type INodeNavigationData, NavNodeManagerService, NodeManagerUtils, objectNavNodeProvider } from '@cloudbeaver/core-navigation-tree';
 import { projectProvider } from '@cloudbeaver/core-projects';
-import { ResourceKey, resourceKeyList, ResourceKeySimple, ResourceKeyUtils } from '@cloudbeaver/core-sdk';
+import { ResourceKey, resourceKeyList, ResourceKeySimple, ResourceKeyUtils } from '@cloudbeaver/core-resource';
 import { ITab, NavigationTabsService, TabHandler } from '@cloudbeaver/plugin-navigation-tabs';
 
 import type { IObjectViewerTabContext } from './IObjectViewerTabContext';

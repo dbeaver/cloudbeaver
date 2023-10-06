@@ -8,8 +8,9 @@
 import { AppAuthService } from '@cloudbeaver/core-authentication';
 import { Connection, ConnectionInfoResource } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
+import { CachedDataResource, ResourceKeyUtils } from '@cloudbeaver/core-resource';
 import { SessionDataResource } from '@cloudbeaver/core-root';
-import { CachedDataResource, GraphQLService, ResourceKeyUtils } from '@cloudbeaver/core-sdk';
+import { GraphQLService } from '@cloudbeaver/core-sdk';
 
 @injectable()
 export class TemplateConnectionsResource extends CachedDataResource<Connection[]> {

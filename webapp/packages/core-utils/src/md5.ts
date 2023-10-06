@@ -5,6 +5,4 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import md5 from 'md5';
-
-export { md5 };
+export { default as md5 } from 'md5';

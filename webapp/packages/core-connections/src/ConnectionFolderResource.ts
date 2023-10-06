@@ -9,18 +9,17 @@ import { action, makeObservable, runInAction } from 'mobx';
 
 import { AppAuthService } from '@cloudbeaver/core-authentication';
 import { injectable } from '@cloudbeaver/core-di';
-import { SessionDataResource } from '@cloudbeaver/core-root';
 import {
   CachedMapAllKey,
   CachedMapResource,
-  ConnectionFolderInfoFragment,
-  GraphQLService,
   isResourceAlias,
-  ResourceKey,
+  type ResourceKey,
   resourceKeyAliasFactory,
   resourceKeyList,
   ResourceKeyUtils,
-} from '@cloudbeaver/core-sdk';
+} from '@cloudbeaver/core-resource';
+import { SessionDataResource } from '@cloudbeaver/core-root';
+import { ConnectionFolderInfoFragment, GraphQLService } from '@cloudbeaver/core-sdk';
 
 import { createConnectionFolderParam } from './createConnectionFolderParam';
 import { getConnectionFolderIdFromNodeId } from './NavTree/getConnectionFolderIdFromNodeId';
@@ -44,7 +43,7 @@ export class ConnectionFolderResource extends CachedMapResource<IConnectionFolde
     appAuthService.requireAuthentication(this);
     sessionDataResource.outdateResource(this);
 
-    this.addAlias(ConnectionFolderProjectKey, param => resourceKeyList(this.keys.filter(key => key.projectId === param.options.projectId)));
+    this.aliases.add(ConnectionFolderProjectKey, param => resourceKeyList(this.keys.filter(key => key.projectId === param.options.projectId)));
 
     makeObservable<this>(this, {
       create: action,
@@ -85,8 +84,8 @@ export class ConnectionFolderResource extends CachedMapResource<IConnectionFolde
   }
 
   protected async loader(originalKey: ResourceKey<IConnectionFolderParam>): Promise<Map<IConnectionFolderParam, ConnectionFolder>> {
-    const all = this.isAlias(originalKey, CachedMapAllKey);
-    const projectFoldersKey = this.isAlias(originalKey, ConnectionFolderProjectKey);
+    const all = this.aliases.isAlias(originalKey, CachedMapAllKey);
+    const projectFoldersKey = this.aliases.isAlias(originalKey, ConnectionFolderProjectKey);
     const folderList: ConnectionFolder[] = [];
     let projectId: string | undefined;
     let folderId: string | undefined;

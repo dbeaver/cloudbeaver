@@ -7,8 +7,8 @@
  */
 import type { PropsWithChildren } from 'react';
 
+import type { IDataContext } from '@cloudbeaver/core-data-context';
 import type { ComponentStyle } from '@cloudbeaver/core-theming';
-import type { IDataContext } from '@cloudbeaver/core-view';
 
 import type { ITabData } from '../TabsContainer/ITabsContainer';
 

@@ -5,18 +5,11 @@
 process.title = 'core-test';
 
 const jest = require('jest');
-const { resolve } = require('path');
 
 if (process.env.NODE_ENV == null) {
   process.env.NODE_ENV = 'test';
 }
 
-const argv = [
-  ...process.argv.slice(2, process.argv.length),
-  '--roots',
-  resolve('.'),
-  '--config',
-  require.resolve('../configs/jest.config.js'),
-];
+const argv = [...process.argv.slice(2, process.argv.length), '--config', require.resolve('../configs/jest.config.js')];
 
 jest.run(argv);

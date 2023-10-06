@@ -1,0 +1,5 @@
+.pane {
+  &:first-child {
+    overflow: hidden;
+  }
+}

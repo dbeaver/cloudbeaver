@@ -8,9 +8,9 @@
 import { createContext } from 'react';
 import type { TabStateReturn } from 'reakit/Tab';
 
+import type { IDataContext } from '@cloudbeaver/core-data-context';
 import type { IExecutor } from '@cloudbeaver/core-executor';
 import type { MetadataMap, MetadataValueGetter } from '@cloudbeaver/core-utils';
-import type { IDataContext } from '@cloudbeaver/core-view';
 
 import type { ITabData, ITabInfo, ITabsContainer } from './TabsContainer/ITabsContainer';
 
