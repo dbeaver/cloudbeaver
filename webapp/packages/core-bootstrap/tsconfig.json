@@ -7,88 +7,88 @@
   },
   "references": [
     {
-      "path": "..\\core-administration"
+      "path": "../core-administration"
     },
     {
-      "path": "..\\core-app"
+      "path": "../core-app"
     },
     {
-      "path": "..\\core-authentication"
+      "path": "../core-authentication"
     },
     {
-      "path": "..\\core-blocks"
+      "path": "../core-blocks"
     },
     {
-      "path": "..\\core-browser"
+      "path": "../core-browser"
     },
     {
-      "path": "..\\core-browser-cookies"
+      "path": "../core-browser-cookies"
     },
     {
-      "path": "..\\core-browser-settings"
+      "path": "../core-browser-settings"
     },
     {
-      "path": "..\\core-connections"
+      "path": "../core-connections"
     },
     {
-      "path": "..\\core-di"
+      "path": "../core-di"
     },
     {
-      "path": "..\\core-dialogs"
+      "path": "../core-dialogs"
     },
     {
-      "path": "..\\core-events"
+      "path": "../core-events"
     },
     {
-      "path": "..\\core-executor"
+      "path": "../core-executor"
     },
     {
-      "path": "..\\core-localization"
+      "path": "../core-localization"
     },
     {
-      "path": "..\\core-navigation-tree"
+      "path": "../core-navigation-tree"
     },
     {
-      "path": "..\\core-plugin"
+      "path": "../core-plugin"
     },
     {
-      "path": "..\\core-product"
+      "path": "../core-product"
     },
     {
-      "path": "..\\core-projects"
+      "path": "../core-projects"
     },
     {
-      "path": "..\\core-resource"
+      "path": "../core-resource"
     },
     {
-      "path": "..\\core-resource-manager"
+      "path": "../core-resource-manager"
     },
     {
-      "path": "..\\core-root"
+      "path": "../core-root"
     },
     {
-      "path": "..\\core-routing"
+      "path": "../core-routing"
     },
     {
-      "path": "..\\core-sdk"
+      "path": "../core-sdk"
     },
     {
-      "path": "..\\core-settings"
+      "path": "../core-settings"
     },
     {
-      "path": "..\\core-theming"
+      "path": "../core-theming"
     },
     {
-      "path": "..\\core-ui"
+      "path": "../core-ui"
     },
     {
-      "path": "..\\core-version"
+      "path": "../core-version"
     },
     {
-      "path": "..\\core-version-update"
+      "path": "../core-version-update"
     },
     {
-      "path": "..\\core-view"
+      "path": "../core-view"
     }
   ],
   "include": [
@@ -99,8 +99,8 @@
     "src/**/*.scss"
   ],
   "exclude": [
+    "**/node_modules",
     "lib/**/*",
-    "dist/**/*",
-    "**/node_modules"
+    "dist/**/*"
   ]
 }

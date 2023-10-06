@@ -10,8 +10,8 @@ const commonConfig = require('./webpack.config.js');
 const { getAssets, withTimestamp } = require('./webpack.product.utils');
 const HtmlInjectWebpackPlugin = require('../utils/HtmlInjectWebpackPlugin.js');
 
-const main = resolve('src/index.ts');
-const sso = require.resolve('@cloudbeaver/plugin-sso/src/index.ts');
+const main = resolve('dist/index.js');
+const sso = require.resolve('@cloudbeaver/plugin-sso/dist/index.js');
 const ssoHtmlTemplate = require.resolve('@cloudbeaver/plugin-sso/src/index.html.ejs');
 const outputDir = resolve('lib');
 const package = require(resolve('package.json'));

@@ -7,55 +7,55 @@
   },
   "references": [
     {
-      "path": "..\\plugin-navigation-tree-rm"
+      "path": "../plugin-navigation-tree-rm"
     },
     {
-      "path": "..\\plugin-projects"
+      "path": "../plugin-projects"
     },
     {
-      "path": "..\\plugin-resource-manager"
+      "path": "../plugin-resource-manager"
     },
     {
-      "path": "..\\plugin-tools-panel"
+      "path": "../plugin-tools-panel"
     },
     {
-      "path": "..\\core-authentication"
+      "path": "../core-authentication"
     },
     {
-      "path": "..\\core-blocks"
+      "path": "../core-blocks"
     },
     {
-      "path": "..\\core-connections"
+      "path": "../core-connections"
     },
     {
-      "path": "..\\core-di"
+      "path": "../core-di"
     },
     {
-      "path": "..\\core-dialogs"
+      "path": "../core-dialogs"
     },
     {
-      "path": "..\\core-localization"
+      "path": "../core-localization"
     },
     {
-      "path": "..\\core-plugin"
+      "path": "../core-plugin"
     },
     {
-      "path": "..\\core-projects"
+      "path": "../core-projects"
     },
     {
-      "path": "..\\core-resource"
+      "path": "../core-resource"
     },
     {
-      "path": "..\\core-resource-manager"
+      "path": "../core-resource-manager"
     },
     {
-      "path": "..\\core-root"
+      "path": "../core-root"
     },
     {
-      "path": "..\\core-ui"
+      "path": "../core-ui"
     },
     {
-      "path": "..\\core-view"
+      "path": "../core-view"
     }
   ],
   "include": [
@@ -66,8 +66,8 @@
     "src/**/*.scss"
   ],
   "exclude": [
+    "**/node_modules",
     "lib/**/*",
-    "dist/**/*",
-    "**/node_modules"
+    "dist/**/*"
   ]
 }
