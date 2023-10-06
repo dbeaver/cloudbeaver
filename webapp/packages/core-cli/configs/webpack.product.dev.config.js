@@ -6,8 +6,8 @@ const fs = require('fs');
 const { URL } = require('url');
 
 const commonConfig = require('./webpack.config.js');
-const index = resolve('src/index.ts');
-const sso = require.resolve('@cloudbeaver/plugin-sso/src/index.ts');
+const index = resolve('dist/index.js');
+const sso = require.resolve('@cloudbeaver/plugin-sso/dist/index.js');
 const ssoHtmlTemplate = require.resolve('@cloudbeaver/plugin-sso/src/index.html.ejs');
 const { getAssets } = require('./webpack.product.utils');
 
