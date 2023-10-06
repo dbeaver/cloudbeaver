@@ -75,7 +75,7 @@ export const CheckboxMarkup: React.FC<ICheckboxMarkupProps> = function CheckboxM
       {label && (id || rest.name) && (
         <label className={s(styles, { checkboxLabel: true })} htmlFor={id || rest.name}>
           {label}
-          {caption && <checkbox-caption>{caption}</checkbox-caption>}
+          {caption && <div className={s(styles, { checkboxCaption: true })}>{caption}</div>}
         </label>
       )}
     </div>
