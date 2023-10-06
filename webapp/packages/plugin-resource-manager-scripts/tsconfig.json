@@ -7,55 +7,55 @@
   },
   "references": [
     {
-      "path": "..\\plugin-navigation-tree-rm"
+      "path": "../plugin-navigation-tree-rm/tsconfig.json"
     },
     {
-      "path": "..\\plugin-projects"
+      "path": "../plugin-projects/tsconfig.json"
     },
     {
-      "path": "..\\plugin-resource-manager"
+      "path": "../plugin-resource-manager/tsconfig.json"
     },
     {
-      "path": "..\\plugin-tools-panel"
+      "path": "../plugin-tools-panel/tsconfig.json"
     },
     {
-      "path": "..\\core-authentication"
+      "path": "../core-authentication/tsconfig.json"
     },
     {
-      "path": "..\\core-blocks"
+      "path": "../core-blocks/tsconfig.json"
     },
     {
-      "path": "..\\core-connections"
+      "path": "../core-connections/tsconfig.json"
     },
     {
-      "path": "..\\core-di"
+      "path": "../core-di/tsconfig.json"
     },
     {
-      "path": "..\\core-dialogs"
+      "path": "../core-dialogs/tsconfig.json"
     },
     {
-      "path": "..\\core-localization"
+      "path": "../core-localization/tsconfig.json"
     },
     {
-      "path": "..\\core-plugin"
+      "path": "../core-plugin/tsconfig.json"
     },
     {
-      "path": "..\\core-projects"
+      "path": "../core-projects/tsconfig.json"
     },
     {
-      "path": "..\\core-resource"
+      "path": "../core-resource/tsconfig.json"
     },
     {
-      "path": "..\\core-resource-manager"
+      "path": "../core-resource-manager/tsconfig.json"
     },
     {
-      "path": "..\\core-root"
+      "path": "../core-root/tsconfig.json"
     },
     {
-      "path": "..\\core-ui"
+      "path": "../core-ui/tsconfig.json"
     },
     {
-      "path": "..\\core-view"
+      "path": "../core-view/tsconfig.json"
     }
   ],
   "include": [
@@ -66,8 +66,8 @@
     "src/**/*.scss"
   ],
   "exclude": [
+    "**/node_modules",
     "lib/**/*",
-    "dist/**/*",
-    "**/node_modules"
+    "dist/**/*"
   ]
 }

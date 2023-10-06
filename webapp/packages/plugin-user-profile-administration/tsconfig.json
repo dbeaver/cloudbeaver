@@ -7,13 +7,13 @@
   },
   "references": [
     {
-      "path": "..\\plugin-administration"
+      "path": "../plugin-administration/tsconfig.json"
     },
     {
-      "path": "..\\plugin-user-profile"
+      "path": "../plugin-user-profile/tsconfig.json"
     },
     {
-      "path": "..\\core-di"
+      "path": "../core-di/tsconfig.json"
     }
   ],
   "include": [
@@ -24,8 +24,8 @@
     "src/**/*.scss"
   ],
   "exclude": [
+    "**/node_modules",
     "lib/**/*",
-    "dist/**/*",
-    "**/node_modules"
+    "dist/**/*"
   ]
 }

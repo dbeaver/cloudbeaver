@@ -86,6 +86,7 @@
     "madge": "^6.1.0",
     "react-refresh": "^0.14.0",
     "tsconfig-paths-webpack-plugin": "^4.1.0",
+    "upath": "^2.0.1",
     "workbox-webpack-plugin": "^7.0.0"
   }
 }

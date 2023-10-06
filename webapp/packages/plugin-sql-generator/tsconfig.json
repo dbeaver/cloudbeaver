@@ -7,46 +7,46 @@
   },
   "references": [
     {
-      "path": "..\\plugin-codemirror6"
+      "path": "../plugin-codemirror6/tsconfig.json"
     },
     {
-      "path": "..\\plugin-data-viewer"
+      "path": "../plugin-data-viewer/tsconfig.json"
     },
     {
-      "path": "..\\plugin-sql-editor"
+      "path": "../plugin-sql-editor/tsconfig.json"
     },
     {
-      "path": "..\\plugin-sql-editor-new"
+      "path": "../plugin-sql-editor-new/tsconfig.json"
     },
     {
-      "path": "..\\core-blocks"
+      "path": "../core-blocks/tsconfig.json"
     },
     {
-      "path": "..\\core-connections"
+      "path": "../core-connections/tsconfig.json"
     },
     {
-      "path": "..\\core-di"
+      "path": "../core-di/tsconfig.json"
     },
     {
-      "path": "..\\core-dialogs"
+      "path": "../core-dialogs/tsconfig.json"
     },
     {
-      "path": "..\\core-events"
+      "path": "../core-events/tsconfig.json"
     },
     {
-      "path": "..\\core-localization"
+      "path": "../core-localization/tsconfig.json"
     },
     {
-      "path": "..\\core-navigation-tree"
+      "path": "../core-navigation-tree/tsconfig.json"
     },
     {
-      "path": "..\\core-resource"
+      "path": "../core-resource/tsconfig.json"
     },
     {
-      "path": "..\\core-sdk"
+      "path": "../core-sdk/tsconfig.json"
     },
     {
-      "path": "..\\core-view"
+      "path": "../core-view/tsconfig.json"
     }
   ],
   "include": [
@@ -57,8 +57,8 @@
     "src/**/*.scss"
   ],
   "exclude": [
+    "**/node_modules",
     "lib/**/*",
-    "dist/**/*",
-    "**/node_modules"
+    "dist/**/*"
   ]
 }
