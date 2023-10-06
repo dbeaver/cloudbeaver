@@ -1,9 +1,4 @@
 .field {
   box-sizing: border-box;
   max-width: 100%;
-
-  & .field {
-    height: 32px;
-    padding: 0;
-  }
 }
