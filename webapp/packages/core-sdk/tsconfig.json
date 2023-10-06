@@ -12,10 +12,10 @@
   },
   "references": [
     {
-      "path": "..\\core-di"
+      "path": "../core-di"
     },
     {
-      "path": "..\\core-utils"
+      "path": "../core-utils"
     }
   ],
   "include": [

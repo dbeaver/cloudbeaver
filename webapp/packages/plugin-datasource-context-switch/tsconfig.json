@@ -7,49 +7,49 @@
   },
   "references": [
     {
-      "path": "..\\plugin-navigation-tabs"
+      "path": "../plugin-navigation-tabs"
     },
     {
-      "path": "..\\plugin-top-app-bar"
+      "path": "../plugin-top-app-bar"
     },
     {
-      "path": "..\\core-authentication"
+      "path": "../core-authentication"
     },
     {
-      "path": "..\\core-blocks"
+      "path": "../core-blocks"
     },
     {
-      "path": "..\\core-connections"
+      "path": "../core-connections"
     },
     {
-      "path": "..\\core-di"
+      "path": "../core-di"
     },
     {
-      "path": "..\\core-events"
+      "path": "../core-events"
     },
     {
-      "path": "..\\core-extensions"
+      "path": "../core-extensions"
     },
     {
-      "path": "..\\core-localization"
+      "path": "../core-localization"
     },
     {
-      "path": "..\\core-navigation-tree"
+      "path": "../core-navigation-tree"
     },
     {
-      "path": "..\\core-projects"
+      "path": "../core-projects"
     },
     {
-      "path": "..\\core-resource"
+      "path": "../core-resource"
     },
     {
-      "path": "..\\core-theming"
+      "path": "../core-theming"
     },
     {
-      "path": "..\\core-ui"
+      "path": "../core-ui"
     },
     {
-      "path": "..\\core-view"
+      "path": "../core-view"
     }
   ],
   "include": [

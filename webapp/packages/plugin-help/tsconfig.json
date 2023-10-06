@@ -7,43 +7,43 @@
   },
   "references": [
     {
-      "path": "..\\plugin-navigation-tree"
+      "path": "../plugin-navigation-tree"
     },
     {
-      "path": "..\\plugin-sql-editor"
+      "path": "../plugin-sql-editor"
     },
     {
-      "path": "..\\plugin-top-app-bar"
+      "path": "../plugin-top-app-bar"
     },
     {
-      "path": "..\\core-app"
+      "path": "../core-app"
     },
     {
-      "path": "..\\core-blocks"
+      "path": "../core-blocks"
     },
     {
-      "path": "..\\core-di"
+      "path": "../core-di"
     },
     {
-      "path": "..\\core-dialogs"
+      "path": "../core-dialogs"
     },
     {
-      "path": "..\\core-events"
+      "path": "../core-events"
     },
     {
-      "path": "..\\core-localization"
+      "path": "../core-localization"
     },
     {
-      "path": "..\\core-routing"
+      "path": "../core-routing"
     },
     {
-      "path": "..\\core-settings"
+      "path": "../core-settings"
     },
     {
-      "path": "..\\core-utils"
+      "path": "../core-utils"
     },
     {
-      "path": "..\\core-view"
+      "path": "../core-view"
     }
   ],
   "include": [

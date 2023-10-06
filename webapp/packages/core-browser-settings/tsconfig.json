@@ -12,13 +12,13 @@
   },
   "references": [
     {
-      "path": "..\\core-di"
+      "path": "../core-di"
     },
     {
-      "path": "..\\core-plugin"
+      "path": "../core-plugin"
     },
     {
-      "path": "..\\tests-runner"
+      "path": "../tests-runner"
     }
   ],
   "include": [

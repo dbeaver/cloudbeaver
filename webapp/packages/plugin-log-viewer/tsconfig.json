@@ -7,43 +7,43 @@
   },
   "references": [
     {
-      "path": "..\\plugin-tools-panel"
+      "path": "../plugin-tools-panel"
     },
     {
-      "path": "..\\core-app"
+      "path": "../core-app"
     },
     {
-      "path": "..\\core-authentication"
+      "path": "../core-authentication"
     },
     {
-      "path": "..\\core-blocks"
+      "path": "../core-blocks"
     },
     {
-      "path": "..\\core-di"
+      "path": "../core-di"
     },
     {
-      "path": "..\\core-localization"
+      "path": "../core-localization"
     },
     {
-      "path": "..\\core-plugin"
+      "path": "../core-plugin"
     },
     {
-      "path": "..\\core-resource"
+      "path": "../core-resource"
     },
     {
-      "path": "..\\core-root"
+      "path": "../core-root"
     },
     {
-      "path": "..\\core-sdk"
+      "path": "../core-sdk"
     },
     {
-      "path": "..\\core-utils"
+      "path": "../core-utils"
     },
     {
-      "path": "..\\core-view"
+      "path": "../core-view"
     },
     {
-      "path": "..\\tests-runner"
+      "path": "../tests-runner"
     }
   ],
   "include": [

@@ -7,16 +7,16 @@
   },
   "references": [
     {
-      "path": "..\\core-di"
+      "path": "../core-di"
     },
     {
-      "path": "..\\core-root"
+      "path": "../core-root"
     },
     {
-      "path": "..\\core-settings"
+      "path": "../core-settings"
     },
     {
-      "path": "..\\core-utils"
+      "path": "../core-utils"
     }
   ],
   "include": [

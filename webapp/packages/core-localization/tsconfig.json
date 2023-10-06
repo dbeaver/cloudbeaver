@@ -7,28 +7,28 @@
   },
   "references": [
     {
-      "path": "..\\core-di"
+      "path": "../core-di"
     },
     {
-      "path": "..\\core-events"
+      "path": "../core-events"
     },
     {
-      "path": "..\\core-executor"
+      "path": "../core-executor"
     },
     {
-      "path": "..\\core-plugin"
+      "path": "../core-plugin"
     },
     {
-      "path": "..\\core-root"
+      "path": "../core-root"
     },
     {
-      "path": "..\\core-sdk"
+      "path": "../core-sdk"
     },
     {
-      "path": "..\\core-settings"
+      "path": "../core-settings"
     },
     {
-      "path": "..\\tests-runner"
+      "path": "../tests-runner"
     }
   ],
   "include": [

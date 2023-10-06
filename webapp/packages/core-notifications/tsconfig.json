@@ -7,16 +7,16 @@
   },
   "references": [
     {
-      "path": "..\\core-blocks"
+      "path": "../core-blocks"
     },
     {
-      "path": "..\\core-di"
+      "path": "../core-di"
     },
     {
-      "path": "..\\core-dialogs"
+      "path": "../core-dialogs"
     },
     {
-      "path": "..\\core-events"
+      "path": "../core-events"
     }
   ],
   "include": [

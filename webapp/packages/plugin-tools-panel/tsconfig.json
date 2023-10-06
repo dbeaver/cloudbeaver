@@ -7,31 +7,31 @@
   },
   "references": [
     {
-      "path": "..\\plugin-top-app-bar"
+      "path": "../plugin-top-app-bar"
     },
     {
-      "path": "..\\core-app"
+      "path": "../core-app"
     },
     {
-      "path": "..\\core-blocks"
+      "path": "../core-blocks"
     },
     {
-      "path": "..\\core-di"
+      "path": "../core-di"
     },
     {
-      "path": "..\\core-localization"
+      "path": "../core-localization"
     },
     {
-      "path": "..\\core-plugin"
+      "path": "../core-plugin"
     },
     {
-      "path": "..\\core-ui"
+      "path": "../core-ui"
     },
     {
-      "path": "..\\core-utils"
+      "path": "../core-utils"
     },
     {
-      "path": "..\\core-view"
+      "path": "../core-view"
     }
   ],
   "include": [

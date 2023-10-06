@@ -7,25 +7,25 @@
   },
   "references": [
     {
-      "path": "..\\plugin-administration"
+      "path": "../plugin-administration"
     },
     {
-      "path": "..\\core-blocks"
+      "path": "../core-blocks"
     },
     {
-      "path": "..\\core-di"
+      "path": "../core-di"
     },
     {
-      "path": "..\\core-events"
+      "path": "../core-events"
     },
     {
-      "path": "..\\core-executor"
+      "path": "../core-executor"
     },
     {
-      "path": "..\\core-localization"
+      "path": "../core-localization"
     },
     {
-      "path": "..\\core-root"
+      "path": "../core-root"
     }
   ],
   "include": [

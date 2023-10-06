@@ -7,19 +7,19 @@
   },
   "references": [
     {
-      "path": "..\\plugin-top-app-bar"
+      "path": "../plugin-top-app-bar"
     },
     {
-      "path": "..\\core-blocks"
+      "path": "../core-blocks"
     },
     {
-      "path": "..\\core-di"
+      "path": "../core-di"
     },
     {
-      "path": "..\\core-ui"
+      "path": "../core-ui"
     },
     {
-      "path": "..\\core-view"
+      "path": "../core-view"
     }
   ],
   "include": [

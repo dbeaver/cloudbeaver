@@ -7,40 +7,40 @@
   },
   "references": [
     {
-      "path": "..\\core-authentication"
+      "path": "../core-authentication"
     },
     {
-      "path": "..\\core-di"
+      "path": "../core-di"
     },
     {
-      "path": "..\\core-dialogs"
+      "path": "../core-dialogs"
     },
     {
-      "path": "..\\core-events"
+      "path": "../core-events"
     },
     {
-      "path": "..\\core-executor"
+      "path": "../core-executor"
     },
     {
-      "path": "..\\core-localization"
+      "path": "../core-localization"
     },
     {
-      "path": "..\\core-resource"
+      "path": "../core-resource"
     },
     {
-      "path": "..\\core-root"
+      "path": "../core-root"
     },
     {
-      "path": "..\\core-sdk"
+      "path": "../core-sdk"
     },
     {
-      "path": "..\\core-theming"
+      "path": "../core-theming"
     },
     {
-      "path": "..\\core-utils"
+      "path": "../core-utils"
     },
     {
-      "path": "..\\tests-runner"
+      "path": "../tests-runner"
     }
   ],
   "include": [

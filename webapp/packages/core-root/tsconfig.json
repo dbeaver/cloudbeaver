@@ -12,22 +12,22 @@
   },
   "references": [
     {
-      "path": "..\\core-di"
+      "path": "../core-di"
     },
     {
-      "path": "..\\core-executor"
+      "path": "../core-executor"
     },
     {
-      "path": "..\\core-resource"
+      "path": "../core-resource"
     },
     {
-      "path": "..\\core-sdk"
+      "path": "../core-sdk"
     },
     {
-      "path": "..\\core-settings"
+      "path": "../core-settings"
     },
     {
-      "path": "..\\core-utils"
+      "path": "../core-utils"
     }
   ],
   "include": [

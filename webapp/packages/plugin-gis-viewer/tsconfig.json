@@ -7,22 +7,22 @@
   },
   "references": [
     {
-      "path": "..\\plugin-data-viewer"
+      "path": "../plugin-data-viewer"
     },
     {
-      "path": "..\\core-blocks"
+      "path": "../core-blocks"
     },
     {
-      "path": "..\\core-di"
+      "path": "../core-di"
     },
     {
-      "path": "..\\core-localization"
+      "path": "../core-localization"
     },
     {
-      "path": "..\\core-sdk"
+      "path": "../core-sdk"
     },
     {
-      "path": "..\\core-ui"
+      "path": "../core-ui"
     }
   ],
   "include": [

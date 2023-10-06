@@ -7,19 +7,19 @@
   },
   "references": [
     {
-      "path": "..\\core-blocks"
+      "path": "../core-blocks"
     },
     {
-      "path": "..\\core-browser"
+      "path": "../core-browser"
     },
     {
-      "path": "..\\core-di"
+      "path": "../core-di"
     },
     {
-      "path": "..\\core-events"
+      "path": "../core-events"
     },
     {
-      "path": "..\\core-localization"
+      "path": "../core-localization"
     }
   ],
   "include": [

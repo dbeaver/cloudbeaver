@@ -7,43 +7,43 @@
   },
   "references": [
     {
-      "path": "..\\plugin-version"
+      "path": "../plugin-version"
     },
     {
-      "path": "..\\core-blocks"
+      "path": "../core-blocks"
     },
     {
-      "path": "..\\core-di"
+      "path": "../core-di"
     },
     {
-      "path": "..\\core-executor"
+      "path": "../core-executor"
     },
     {
-      "path": "..\\core-localization"
+      "path": "../core-localization"
     },
     {
-      "path": "..\\core-notifications"
+      "path": "../core-notifications"
     },
     {
-      "path": "..\\core-plugin"
+      "path": "../core-plugin"
     },
     {
-      "path": "..\\core-projects"
+      "path": "../core-projects"
     },
     {
-      "path": "..\\core-resource"
+      "path": "../core-resource"
     },
     {
-      "path": "..\\core-root"
+      "path": "../core-root"
     },
     {
-      "path": "..\\core-routing"
+      "path": "../core-routing"
     },
     {
-      "path": "..\\core-theming"
+      "path": "../core-theming"
     },
     {
-      "path": "..\\core-ui"
+      "path": "../core-ui"
     }
   ],
   "include": [

@@ -7,64 +7,64 @@
   },
   "references": [
     {
-      "path": "..\\plugin-datasource-context-switch"
+      "path": "../plugin-datasource-context-switch"
     },
     {
-      "path": "..\\core-app"
+      "path": "../core-app"
     },
     {
-      "path": "..\\core-authentication"
+      "path": "../core-authentication"
     },
     {
-      "path": "..\\core-blocks"
+      "path": "../core-blocks"
     },
     {
-      "path": "..\\core-connections"
+      "path": "../core-connections"
     },
     {
-      "path": "..\\core-data-context"
+      "path": "../core-data-context"
     },
     {
-      "path": "..\\core-di"
+      "path": "../core-di"
     },
     {
-      "path": "..\\core-dialogs"
+      "path": "../core-dialogs"
     },
     {
-      "path": "..\\core-events"
+      "path": "../core-events"
     },
     {
-      "path": "..\\core-executor"
+      "path": "../core-executor"
     },
     {
-      "path": "..\\core-localization"
+      "path": "../core-localization"
     },
     {
-      "path": "..\\core-navigation-tree"
+      "path": "../core-navigation-tree"
     },
     {
-      "path": "..\\core-plugin"
+      "path": "../core-plugin"
     },
     {
-      "path": "..\\core-projects"
+      "path": "../core-projects"
     },
     {
-      "path": "..\\core-resource"
+      "path": "../core-resource"
     },
     {
-      "path": "..\\core-theming"
+      "path": "../core-theming"
     },
     {
-      "path": "..\\core-ui"
+      "path": "../core-ui"
     },
     {
-      "path": "..\\core-utils"
+      "path": "../core-utils"
     },
     {
-      "path": "..\\core-view"
+      "path": "../core-view"
     },
     {
-      "path": "..\\tests-runner"
+      "path": "../tests-runner"
     }
   ],
   "include": [

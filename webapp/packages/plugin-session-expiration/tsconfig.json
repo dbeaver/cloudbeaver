@@ -7,31 +7,31 @@
   },
   "references": [
     {
-      "path": "..\\plugin-root"
+      "path": "../plugin-root"
     },
     {
-      "path": "..\\core-authentication"
+      "path": "../core-authentication"
     },
     {
-      "path": "..\\core-blocks"
+      "path": "../core-blocks"
     },
     {
-      "path": "..\\core-di"
+      "path": "../core-di"
     },
     {
-      "path": "..\\core-dialogs"
+      "path": "../core-dialogs"
     },
     {
-      "path": "..\\core-events"
+      "path": "../core-events"
     },
     {
-      "path": "..\\core-root"
+      "path": "../core-root"
     },
     {
-      "path": "..\\core-routing"
+      "path": "../core-routing"
     },
     {
-      "path": "..\\core-sdk"
+      "path": "../core-sdk"
     }
   ],
   "include": [
