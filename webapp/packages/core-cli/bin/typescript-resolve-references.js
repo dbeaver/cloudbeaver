@@ -46,11 +46,11 @@ typescriptConfig.compilerOptions = {
   tsBuildInfoFile: 'dist/tsconfig.tsbuildinfo',
 };
 
-typescriptConfig.include = ['__custom_mocks__/**', 'src/**', 'src/**/*.json', 'src/**/*.css', 'src/**/*.scss'];
+typescriptConfig.include = ['__custom_mocks__/**/*', 'src/**/*', 'src/**/*.json', 'src/**/*.css', 'src/**/*.scss'];
 
 typescriptConfig.exclude = typescriptConfig.exclude || [];
 
-const defaultExclude = ['lib/**', 'dist/**', '**/node_modules'];
+const defaultExclude = ['lib/**/*', 'dist/**/*', '**/node_modules'];
 
 for (const exclude of defaultExclude) {
   if (!typescriptConfig.exclude.includes(exclude)) {

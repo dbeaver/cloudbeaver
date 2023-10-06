@@ -2,8 +2,8 @@
   "extends": "../../tsconfig.base.json",
   "exclude": [
     "**/node_modules",
-    "lib/**",
-    "dist/**"
+    "lib/**/*",
+    "dist/**/*"
   ],
   "compilerOptions": {
     "rootDir": "src",
@@ -12,8 +12,8 @@
   },
   "references": [],
   "include": [
-    "__custom_mocks__/**",
-    "src/**",
+    "__custom_mocks__/**/*",
+    "src/**/*",
     "src/**/*.json",
     "src/**/*.css",
     "src/**/*.scss"
