@@ -1,11 +1,10 @@
 const { resolve } = require('path');
 const PnpWebpackPlugin = require('pnp-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
-const { CSSSourceResolver } = require('../utils/CSSSourceResolver.js');
+const { SourceAssetsResolver } = require('../utils/SourceAssetsResolver.js');
 const { IgnoreNotFoundExportPlugin } = require('../utils/IgnoreNotFoundExportPlugin.js');
 const excludedFromVendor = require('./excludedFromVendor.js');
-
-const supportedStyles = /\.(css|s[ac]ss)$/;
+const webpack = require('webpack');
 
 const nodeModules = [
   resolve('node_modules'), // product
@@ -154,7 +153,7 @@ module.exports = (env, argv) => {
     resolve: {
       extensions: ['.ts', '.tsx', '.wasm', '.mjs', '.js', '.jsx', '.json'],
       modules: nodeModules,
-      plugins: [PnpWebpackPlugin, new CSSSourceResolver(supportedStyles)],
+      plugins: [PnpWebpackPlugin, new SourceAssetsResolver(['.json5', '.css', '.scss'])],
     },
     resolveLoader: {
       modules: nodeModules,
@@ -162,33 +161,18 @@ module.exports = (env, argv) => {
     },
     module: {
       rules: [
-        devMode && {
-          test: /\.jsx?$/,
-          enforce: 'pre',
-          exclude: /node_modules/,
-          use: ['source-map-loader'],
-        },
-        {
-          test: /\.json5$/i,
-          loader: 'json5-loader',
-          type: 'javascript/auto',
-        },
-        {
-          test: /\.jsx?$/,
-          exclude: /node_modules/,
-          use: ['thread-loader', babelLoader],
-        },
         {
           test: /\.tsx?$/,
           exclude: /node_modules/,
           use: [
-            // 'thread-loader',
-            babelLoader,
             {
               loader: 'ts-loader',
               options: {
                 // happyPackMode: true,
                 // transpileOnly: true,
+                compilerOptions: {
+                  sourceMap: devMode,
+                },
                 projectReferences: true,
                 ignoreDiagnostics: [6059, 2307],
               },
@@ -196,7 +180,23 @@ module.exports = (env, argv) => {
           ],
         },
         {
-          test: supportedStyles,
+          test: /\.json5$/i,
+          loader: 'json5-loader',
+          type: 'javascript/auto',
+        },
+        devMode && {
+          test: /\.jsx?$/,
+          enforce: 'pre',
+          exclude: /node_modules/,
+          use: ['source-map-loader'],
+        },
+        {
+          test: /\.jsx?$/,
+          exclude: /node_modules/,
+          use: ['thread-loader', babelLoader],
+        },
+        {
+          test: /\.(css|s[ac]ss)$/,
           exclude: /node_modules/,
           oneOf: [
             {
@@ -259,6 +259,9 @@ module.exports = (env, argv) => {
       //       syntactic: true,
       //     },
       //   },
+      // }),
+      // new webpack.WatchIgnorePlugin({
+      //   paths: [/\.jsx?$/, /\.d\.[cm]ts$/],
       // }),
       new IgnoreNotFoundExportPlugin(),
       new MiniCssExtractPlugin({

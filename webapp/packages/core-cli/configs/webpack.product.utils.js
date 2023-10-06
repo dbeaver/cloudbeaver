@@ -3,7 +3,7 @@ const { resolve } = require('path');
 const { getCloudBeaverDeps } = require('../utils/getCloudBeaverDeps');
 
 function getServiceWorkerSource() {
-  return require.resolve('@cloudbeaver/core-browser/src/service-worker.ts');
+  return require.resolve('@cloudbeaver/core-browser/dist/service-worker.js');
 }
 
 function withTimestamp(version) {
