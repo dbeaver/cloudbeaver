@@ -10,8 +10,9 @@ import { useContext, useState } from 'react';
 import styled, { css, use } from 'reshadow';
 
 import { useTranslate } from '@cloudbeaver/core-blocks';
+import { useDataContext } from '@cloudbeaver/core-data-context';
 import { useTabLocalState } from '@cloudbeaver/core-ui';
-import { CaptureViewContext, useDataContext } from '@cloudbeaver/core-view';
+import { CaptureViewContext } from '@cloudbeaver/core-view';
 import { DataPresentationComponent, IDatabaseResultSet, TableViewerLoader } from '@cloudbeaver/plugin-data-viewer';
 
 import { DATA_CONTEXT_DV_DDM_RS_GROUPING } from './DataContext/DATA_CONTEXT_DV_DDM_RS_GROUPING';

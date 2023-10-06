@@ -8,13 +8,13 @@
 import React from 'react';
 
 import { AdministrationItemService, AdministrationItemType } from '@cloudbeaver/core-administration';
-import { PlaceholderContainer } from '@cloudbeaver/core-blocks';
+import { ConfirmationDialog, PlaceholderContainer } from '@cloudbeaver/core-blocks';
 import { ConnectionInfoActiveProjectKey, ConnectionInfoResource, DatabaseConnection, DBDriverResource } from '@cloudbeaver/core-connections';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
-import { CommonDialogService, ConfirmationDialog, DialogueStateResult } from '@cloudbeaver/core-dialogs';
+import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
+import { CachedMapAllKey } from '@cloudbeaver/core-resource';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
-import { CachedMapAllKey } from '@cloudbeaver/core-sdk';
 
 import { CreateConnectionService } from './CreateConnectionService';
 

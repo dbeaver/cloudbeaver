@@ -6,7 +6,8 @@
  * you may not use this file except in compliance with the License.
  */
 import type { NavNodeInfoResource } from '@cloudbeaver/core-navigation-tree';
-import type { IElementsTreeCustomNodeInfo } from '@cloudbeaver/plugin-navigation-tree';
+
+import type { IElementsTreeCustomNodeInfo } from './useElementsTree';
 
 export function transformFilteredNodeInfo(navNodeInfoResource: NavNodeInfoResource): IElementsTreeCustomNodeInfo {
   return function transformFilteredNodeInfo(nodeId, info) {

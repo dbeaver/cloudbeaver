@@ -12,10 +12,12 @@ import {
   ConnectionsManagerService,
   ConnectionsSettingsService,
   createConnectionParam,
+  DATA_CONTEXT_CONNECTION,
 } from '@cloudbeaver/core-connections';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { DATA_CONTEXT_NAV_NODE, EObjectFeature, NavNodeManagerService } from '@cloudbeaver/core-navigation-tree';
+import { getCachedMapResourceLoaderState } from '@cloudbeaver/core-resource';
 import {
   CONNECTION_NAVIGATOR_VIEW_SETTINGS,
   isNavigatorViewSettingsEqual,
@@ -23,7 +25,6 @@ import {
   PermissionsService,
   ServerConfigResource,
 } from '@cloudbeaver/core-root';
-import { getCachedMapResourceLoaderState } from '@cloudbeaver/core-sdk';
 import { ACTION_DELETE, ActionService, DATA_CONTEXT_MENU, DATA_CONTEXT_MENU_NESTED, MenuSeparatorItem, MenuService } from '@cloudbeaver/core-view';
 import { MENU_APP_ACTIONS } from '@cloudbeaver/plugin-top-app-bar';
 
@@ -37,7 +38,6 @@ import { ACTION_CONNECTION_EDIT } from './Actions/ACTION_CONNECTION_EDIT';
 import { ACTION_CONNECTION_VIEW_ADVANCED } from './Actions/ACTION_CONNECTION_VIEW_ADVANCED';
 import { ACTION_CONNECTION_VIEW_SIMPLE } from './Actions/ACTION_CONNECTION_VIEW_SIMPLE';
 import { ACTION_CONNECTION_VIEW_SYSTEM_OBJECTS } from './Actions/ACTION_CONNECTION_VIEW_SYSTEM_OBJECTS';
-import { DATA_CONTEXT_CONNECTION } from './DATA_CONTEXT_CONNECTION';
 import { MENU_CONNECTION_VIEW } from './MENU_CONNECTION_VIEW';
 import { MENU_CONNECTIONS } from './MENU_CONNECTIONS';
 

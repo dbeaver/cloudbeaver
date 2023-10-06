@@ -9,16 +9,24 @@ import { observer } from 'mobx-react-lite';
 import styled from 'reshadow';
 
 import { AuthProvider, AuthProviderConfiguration, UserInfoResource } from '@cloudbeaver/core-authentication';
-import { ErrorMessage, Form, getComputed, Link, s, TextPlaceholder, useErrorDetails, useS, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
-import { useService } from '@cloudbeaver/core-di';
 import {
   CommonDialogBody,
   CommonDialogFooter,
   CommonDialogHeader,
-  CommonDialogService,
   CommonDialogWrapper,
-  DialogComponent,
-} from '@cloudbeaver/core-dialogs';
+  ErrorMessage,
+  Form,
+  getComputed,
+  Link,
+  s,
+  TextPlaceholder,
+  useErrorDetails,
+  useS,
+  useStyles,
+  useTranslate,
+} from '@cloudbeaver/core-blocks';
+import { useService } from '@cloudbeaver/core-di';
+import { CommonDialogService, DialogComponent } from '@cloudbeaver/core-dialogs';
 import { BASE_TAB_STYLES, Tab, TabList, TabsState, TabTitle, UNDERLINE_TAB_BIG_STYLES, UNDERLINE_TAB_STYLES } from '@cloudbeaver/core-ui';
 
 import { AuthenticationService } from '../AuthenticationService';

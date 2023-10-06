@@ -12,6 +12,7 @@ import { Fill } from './Fill';
 
 @injectable()
 export class AdministrationTopAppBarService {
+  readonly navBarPlaceholder = new PlaceholderContainer();
   readonly placeholder = new PlaceholderContainer();
 
   constructor() {

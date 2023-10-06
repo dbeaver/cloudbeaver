@@ -1,6 +1,4 @@
-import { manifest } from './manifest';
-
-export default manifest;
+export * from './manifest';
 
 export * from './DatabaseDataModel/Actions/Document/DocumentDataAction';
 export * from './DatabaseDataModel/Actions/Document/DocumentEditAction';

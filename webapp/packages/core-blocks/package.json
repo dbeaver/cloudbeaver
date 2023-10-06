@@ -1,34 +1,37 @@
 {
   "name": "@cloudbeaver/core-blocks",
-  "sideEffects": false,
+  "sideEffects": [
+    "src/**/*.css",
+    "src/**/*.scss",
+    "public/**",
+    "public/**/*"
+  ],
   "version": "0.1.0",
   "description": "",
   "license": "Apache-2.0",
-  "main": "lib/index.js",
-  "module": "lib/index.js",
-  "types": "src/index.ts",
+  "main": "dist/index.js",
   "scripts": {
-    "prebuild": "rimraf --glob lib/*",
-    "build": "webpack --config ../../configs/webpack.plugin.config.js",
-    "postbuild": "tsc",
+    "build": "core-cli-build --mode=production --config ../core-cli/configs/webpack.plugin.config.js",
     "lint": "eslint ./src/ --ext .ts,.tsx",
     "lint-fix": "eslint ./src/ --ext .ts,.tsx --fix",
+    "pretest": "tsc -b",
     "test": "core-cli-test",
-    "validate-dependencies": "core-cli-validate-dependencies"
+    "validate-dependencies": "core-cli-validate-dependencies",
+    "update-ts-references": "rimraf --glob dist/* && typescript-resolve-references"
   },
   "dependencies": {
-    "@cloudbeaver/core-di": "~0.1.0",
-    "@cloudbeaver/core-localization": "~0.1.0",
-    "@cloudbeaver/core-theming": "~0.1.0",
-    "@cloudbeaver/core-events": "~0.1.0",
-    "@cloudbeaver/core-utils": "~0.1.0",
-    "@cloudbeaver/core-dialogs": "~0.1.0",
-    "@cloudbeaver/core-notifications": "~0.1.0",
-    "@cloudbeaver/core-sdk": "~0.1.0",
-    "@cloudbeaver/core-executor": "~0.1.0",
-    "@cloudbeaver/core-root": "~0.1.0",
+    "go-split": "^3.4.1",
     "@cloudbeaver/core-authentication": "~0.1.0",
-    "go-split": "^3.4.1"
+    "@cloudbeaver/core-di": "~0.1.0",
+    "@cloudbeaver/core-dialogs": "~0.1.0",
+    "@cloudbeaver/core-events": "~0.1.0",
+    "@cloudbeaver/core-executor": "~0.1.0",
+    "@cloudbeaver/core-localization": "~0.1.0",
+    "@cloudbeaver/core-resource": "~0.1.0",
+    "@cloudbeaver/core-root": "~0.1.0",
+    "@cloudbeaver/core-sdk": "~0.1.0",
+    "@cloudbeaver/core-theming": "~0.1.0",
+    "@cloudbeaver/core-utils": "~0.1.0"
   },
   "peerDependencies": {
     "reshadow": "~0.x.x",
@@ -38,5 +41,8 @@
     "mobx-react-lite": "~3.x.x",
     "@testing-library/jest-dom": "~6.x.x",
     "@testing-library/react": "~13.x.x"
+  },
+  "devDependencies": {
+    "@cloudbeaver/tests-runner": "~0.1.0"
   }
 }

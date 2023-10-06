@@ -41,7 +41,7 @@ import {
   isProjectSetter,
   isProjectSetterState,
 } from '@cloudbeaver/core-projects';
-import { CachedMapAllKey } from '@cloudbeaver/core-sdk';
+import { CachedMapAllKey } from '@cloudbeaver/core-resource';
 import { ITab, NavigationTabsService } from '@cloudbeaver/plugin-navigation-tabs';
 
 export interface IConnectionInfo {

@@ -3,6 +3,8 @@ export * from './ConnectionExecutionContext/ConnectionExecutionContextResource';
 export * from './ConnectionExecutionContext/ConnectionExecutionContextService';
 export * from './ConnectionExecutionContext/IConnectionExecutionContext';
 
+export * from './DataContexts/DATA_CONTEXT_CONNECTION';
+
 export * from './extensions/IObjectCatalogProvider';
 export * from './extensions/IObjectCatalogSetter';
 export * from './extensions/IObjectSchemaProvider';

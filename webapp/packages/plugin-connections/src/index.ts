@@ -14,7 +14,6 @@ export * from './ConnectionForm/ConnectionFormService';
 export * from './ConnectionForm/ConnectionFormState';
 export * from './ConnectionForm/IConnectionFormProps';
 export * from './ConnectionForm/useConnectionFormState';
-export * from './ContextMenu/DATA_CONTEXT_CONNECTION';
 export * from './ContextMenu/MENU_CONNECTION_VIEW';
 export * from './ContextMenu/MENU_CONNECTIONS';
 export * from './PublicConnectionForm/PublicConnectionFormService';

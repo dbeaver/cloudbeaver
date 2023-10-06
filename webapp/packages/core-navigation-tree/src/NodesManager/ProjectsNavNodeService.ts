@@ -7,7 +7,7 @@
  */
 import { injectable } from '@cloudbeaver/core-di';
 import { NAV_NODE_TYPE_PROJECT, ProjectInfo, ProjectInfoResource } from '@cloudbeaver/core-projects';
-import { resourceKeyList } from '@cloudbeaver/core-sdk';
+import { resourceKeyList } from '@cloudbeaver/core-resource';
 
 import { NavNodeInfoResource } from './NavNodeInfoResource';
 

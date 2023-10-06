@@ -1,10 +1,64 @@
 {
-  "extends": "../../tsconfig.json",
+  "extends": "../../tsconfig.base.json",
   "compilerOptions": {
     "rootDir": "src",
-    "outDir": "lib"
+    "outDir": "dist",
+    "tsBuildInfoFile": "dist/tsconfig.tsbuildinfo"
   },
-  "include": ["src"],
-  "exclude": ["**/node_modules", "**/.*/"],
-  "references": [{ "path": "../*" }]
+  "references": [
+    {
+      "path": "..\\plugin-codemirror6"
+    },
+    {
+      "path": "..\\plugin-data-viewer"
+    },
+    {
+      "path": "..\\plugin-sql-editor"
+    },
+    {
+      "path": "..\\plugin-sql-editor-new"
+    },
+    {
+      "path": "..\\core-blocks"
+    },
+    {
+      "path": "..\\core-connections"
+    },
+    {
+      "path": "..\\core-di"
+    },
+    {
+      "path": "..\\core-dialogs"
+    },
+    {
+      "path": "..\\core-events"
+    },
+    {
+      "path": "..\\core-localization"
+    },
+    {
+      "path": "..\\core-navigation-tree"
+    },
+    {
+      "path": "..\\core-resource"
+    },
+    {
+      "path": "..\\core-sdk"
+    },
+    {
+      "path": "..\\core-view"
+    }
+  ],
+  "include": [
+    "__custom_mocks__/**/*",
+    "src/**/*",
+    "src/**/*.json",
+    "src/**/*.css",
+    "src/**/*.scss"
+  ],
+  "exclude": [
+    "lib/**/*",
+    "dist/**/*",
+    "**/node_modules"
+  ]
 }

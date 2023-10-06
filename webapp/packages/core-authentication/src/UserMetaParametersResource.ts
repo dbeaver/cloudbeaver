@@ -7,8 +7,9 @@
  */
 import { injectable } from '@cloudbeaver/core-di';
 import { ExecutorInterrupter } from '@cloudbeaver/core-executor';
+import { CachedDataResource } from '@cloudbeaver/core-resource';
 import { SessionResource } from '@cloudbeaver/core-root';
-import { CachedDataResource, GraphQLService, UserConnectionAuthPropertiesFragment } from '@cloudbeaver/core-sdk';
+import { GraphQLService, UserConnectionAuthPropertiesFragment } from '@cloudbeaver/core-sdk';
 
 import { UserInfoResource } from './UserInfoResource';
 

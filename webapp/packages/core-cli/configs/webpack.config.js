@@ -1,31 +1,10 @@
 const { resolve } = require('path');
 const PnpWebpackPlugin = require('pnp-webpack-plugin');
-const ModuleDependencyWarning = require('webpack/lib/ModuleDependencyWarning');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
-const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
-const threadLoader = require('thread-loader');
-
+const { SourceAssetsResolver } = require('../utils/SourceAssetsResolver.js');
+const { IgnoreNotFoundExportPlugin } = require('../utils/IgnoreNotFoundExportPlugin.js');
 const excludedFromVendor = require('./excludedFromVendor.js');
-// const ESLintPlugin = require('eslint-webpack-plugin');
-
-class IgnoreNotFoundExportPlugin {
-  apply(compiler) {
-    const messageRegExp = /export '.*'( \(imported as '.*'\))? was not found in/;
-    function doneHook(stats) {
-      stats.compilation.warnings = stats.compilation.warnings.filter(warn => {
-        if (warn instanceof ModuleDependencyWarning && messageRegExp.test(warn.message)) {
-          return false;
-        }
-        return true;
-      });
-    }
-    if (compiler.hooks) {
-      compiler.hooks.done.tap('IgnoreNotFoundExportPlugin', doneHook);
-    } else {
-      compiler.plugin('done', doneHook);
-    }
-  }
-}
+const webpack = require('webpack');
 
 const nodeModules = [
   resolve('node_modules'), // product
@@ -33,18 +12,15 @@ const nodeModules = [
   resolve('../../node_modules/@cloudbeaver/core-cli/node_modules'), // core-cli
 ];
 
-threadLoader.warmup({}, ['babel-loader', 'css-loader', 'sass-loader', 'postcss-loader', 'style-loader', 'json5-loader', MiniCssExtractPlugin.loader]);
-
 module.exports = (env, argv) => {
   process.env.NODE_ENV = argv.mode;
-  const devTool = 'source-map' in env && 'source-map';
   const devMode = argv.mode !== 'production';
   function getBaseStyleLoaders() {
     const loaders = [];
 
     // Broke styles order in dev mode
     // if (devMode) {
-    //  loaders.push('style-loader');
+    //   loaders.push('style-loader');
     // } else {
     loaders.push(MiniCssExtractPlugin.loader);
     // }
@@ -74,24 +50,21 @@ module.exports = (env, argv) => {
       {
         loader: 'css-loader',
         options: {
+          esModule: true,
           modules: modules,
-          sourceMap: devMode,
         },
       },
       {
         loader: 'postcss-loader',
         options: {
-          sourceMap: devMode,
           postcssOptions: {
             plugins: postCssPlugins,
-            sourceMap: devMode,
           },
         },
       },
       {
         loader: 'sass-loader',
         options: {
-          sourceMap: devMode,
           sassOptions: {
             implementation: require('sass'),
             includePaths: nodeModules,
@@ -106,7 +79,7 @@ module.exports = (env, argv) => {
     loader: require.resolve('babel-loader'),
     options: {
       root: __dirname,
-      cacheDirectory: true,
+      // cacheDirectory: true,
       envName: argv.mode,
     },
   };
@@ -140,7 +113,7 @@ module.exports = (env, argv) => {
             reuseExistingChunk: true,
           },
           packages: {
-            test: /[\\/]packages[\\/]((plugin|core)-.*?)[\\/]src[\\/]/,
+            test: /[\\/]packages[\\/]((plugin|core)-.*?)[\\/](src|dist)[\\/]/,
             filename: '[name].[contenthash].js',
             name(module) {
               const path = module.context ?? module.resource;
@@ -178,18 +151,9 @@ module.exports = (env, argv) => {
       pathinfo: false,
     },
     resolve: {
-      extensions: ['.ts', '.tsx', '.js'],
+      extensions: ['.ts', '.tsx', '.wasm', '.mjs', '.js', '.jsx', '.json'],
       modules: nodeModules,
-      // alias: {
-      // "react/jsx-dev-runtime": "react/jsx-dev-runtime.js", // 17->18
-      // "react/jsx-runtime": "react/jsx-runtime.js",
-      // "react/jsx-runtime.js": "react/jsx-runtime", // 18->17
-      // "react/jsx-dev-runtime.js": "react/jsx-dev-runtime"
-      // },
-      fallback: {
-        // path: require.resolve('path-browserify'),
-      },
-      plugins: [PnpWebpackPlugin],
+      plugins: [PnpWebpackPlugin, new SourceAssetsResolver(['.json5', '.css', '.scss'])],
     },
     resolveLoader: {
       modules: nodeModules,
@@ -198,12 +162,36 @@ module.exports = (env, argv) => {
     module: {
       rules: [
         {
+          test: /\.tsx?$/,
+          exclude: /node_modules/,
+          use: [
+            {
+              loader: 'ts-loader',
+              options: {
+                // happyPackMode: true,
+                // transpileOnly: true,
+                compilerOptions: {
+                  sourceMap: devMode,
+                },
+                projectReferences: true,
+                ignoreDiagnostics: [6059, 2307],
+              },
+            },
+          ],
+        },
+        {
           test: /\.json5$/i,
           loader: 'json5-loader',
           type: 'javascript/auto',
         },
+        devMode && {
+          test: /\.jsx?$/,
+          enforce: 'pre',
+          exclude: /node_modules/,
+          use: ['source-map-loader'],
+        },
         {
-          test: /\.(ts|js)x?$/,
+          test: /\.jsx?$/,
           exclude: /node_modules/,
           use: ['thread-loader', babelLoader],
         },
@@ -238,28 +226,48 @@ module.exports = (env, argv) => {
         },
       ],
     },
-    devtool: devTool,
+    ignoreWarnings: [/Failed to parse source map/],
+    devtool: devMode ? 'source-map' : false,
     plugins: [
-      new ForkTsCheckerWebpackPlugin({
-        typescript: {
-          typescriptPath: require.resolve('typescript'),
-          configFile: resolve('tsconfig.json'),
-          configOverwrite: {
-            include: ['**/src/**/*.ts', '**/src/**/*.tsx'],
-          },
-          diagnosticOptions: {
-            semantic: true,
-            syntactic: true,
-          },
-        },
-      }),
+      // new ForkTsCheckerWebpackPlugin({
+      //   typescript: {
+      //     // async: true,
+      //     typescriptPath: require.resolve('typescript'),
+      //     configFile: resolve('tsconfig.json'),
+      //     mode: 'readonly',
+      //     // build: true,
+      //     // configOverwrite: {
+      //     //   include: ['**/src/**/*.ts', '**/src/**/*.tsx', '**/src/**/*.css'],
+      //     // },
+      //     profile: true,
+      //     diagnosticOptions: {
+      //       semantic: true,
+      //       syntactic: true,
+      //     },
+      //   },
+      // }),
+      // new ForkTsCheckerWebpackPlugin({
+      //   typescript: {
+      //     typescriptPath: require.resolve('typescript'),
+      //     configFile: resolve('tsconfig.json'),
+      //     // build: true,
+      //     configOverwrite: {
+      //       include: ['**/src/**/*.ts', '**/src/**/*.tsx'],
+      //     },
+      //     diagnosticOptions: {
+      //       semantic: true,
+      //       syntactic: true,
+      //     },
+      //   },
+      // }),
+      // new webpack.WatchIgnorePlugin({
+      //   paths: [/\.jsx?$/, /\.d\.[cm]ts$/],
+      // }),
       new IgnoreNotFoundExportPlugin(),
       new MiniCssExtractPlugin({
-        // Options similar to the same options in webpackOptions.output
-        // all options are optional
         filename: devMode ? 'styles/[name].css' : 'styles/[name].[contenthash].css',
         chunkFilename: devMode ? 'styles/[name].bundle.css' : 'styles/[name].[contenthash].css',
-        ignoreOrder: false, // Enable to remove warnings about conflicting order
+        ignoreOrder: true, // Enable to remove warnings about conflicting order
         insert: linkTag => {
           let reshadowObj = document.getElementById('__reshadow__');
 

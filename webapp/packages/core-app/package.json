@@ -1,31 +1,31 @@
 {
   "name": "@cloudbeaver/core-app",
-  "sideEffects": false,
+  "sideEffects": [
+    "src/**/*.css",
+    "src/**/*.scss",
+    "public/**/*"
+  ],
   "version": "0.1.0",
   "description": "",
   "license": "Apache-2.0",
-  "main": "lib/index.js",
-  "module": "lib/index.js",
-  "types": "src/index.ts",
+  "main": "dist/index.js",
   "scripts": {
-    "prebuild": "rimraf --glob lib/*",
-    "build": "webpack --config ../../configs/webpack.plugin.config.js",
-    "postbuild": "tsc",
+    "build": "core-cli-build --mode=production --config ../core-cli/configs/webpack.plugin.config.js",
     "lint": "eslint ./src/ --ext .ts,.tsx",
     "lint-fix": "eslint ./src/ --ext .ts,.tsx --fix",
-    "validate-dependencies": "core-cli-validate-dependencies"
+    "validate-dependencies": "core-cli-validate-dependencies",
+    "update-ts-references": "rimraf --glob dist/* && typescript-resolve-references"
   },
   "dependencies": {
-    "@cloudbeaver/plugin-navigation-tabs": "~0.1.0",
-    "@cloudbeaver/plugin-tools-panel": "~0.1.0",
     "@cloudbeaver/plugin-version": "~0.1.0",
     "@cloudbeaver/core-blocks": "~0.1.0",
     "@cloudbeaver/core-di": "~0.1.0",
-    "@cloudbeaver/core-dialogs": "~0.1.0",
     "@cloudbeaver/core-executor": "~0.1.0",
     "@cloudbeaver/core-localization": "~0.1.0",
     "@cloudbeaver/core-notifications": "~0.1.0",
     "@cloudbeaver/core-plugin": "~0.1.0",
+    "@cloudbeaver/core-projects": "~0.1.0",
+    "@cloudbeaver/core-resource": "~0.1.0",
     "@cloudbeaver/core-root": "~0.1.0",
     "@cloudbeaver/core-routing": "~0.1.0",
     "@cloudbeaver/core-theming": "~0.1.0",
@@ -37,5 +37,6 @@
     "mobx": "~6.x.x",
     "mobx-react-lite": "~3.x.x",
     "reshadow": "~0.x.x"
-  }
+  },
+  "devDependencies": {}
 }

@@ -10,7 +10,6 @@ import { SelectorFormatter } from './SelectorFormatter';
 
 export const ColumnSelect: ICustomColumn = {
   key: 'columnSelector',
-  columnDataIndex: null,
   name: '',
   width: 40,
   maxWidth: 40,

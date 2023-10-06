@@ -7,30 +7,22 @@
  */
 import { observer } from 'mobx-react-lite';
 import { useState } from 'react';
-import styled, { css } from 'reshadow';
 
-import { Loader, Pane, ResizerControls, Split, splitStyles, useSplitUserState } from '@cloudbeaver/core-blocks';
+import { Loader, Pane, ResizerControls, s, Split, useS, useSplitUserState } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 
 import type { IExecutionPlanTab } from '../../ISqlEditorTabState';
 import { ExecutionPlanTreeBlock } from './ExecutionPlanTreeBlock';
 import { PropertiesPanel } from './PropertiesPanel/PropertiesPanel';
+import style from './SqlExecutionPlanPanel.m.css';
 import { SqlExecutionPlanService } from './SqlExecutionPlanService';
-
-const styles = css`
-  Pane {
-    composes: theme-background-surface theme-text-on-surface from global;
-  }
-  Pane:first-child {
-    overflow: hidden;
-  }
-`;
 
 interface Props {
   executionPlanTab: IExecutionPlanTab;
 }
 
 export const SqlExecutionPlanPanel = observer<Props>(function SqlExecutionPlanPanel({ executionPlanTab }) {
+  const styles = useS(style);
   const sqlExecutionPlanService = useService(SqlExecutionPlanService);
   const data = sqlExecutionPlanService.data.get(executionPlanTab.tabId);
   const [selectedNode, setSelectedNode] = useState<string | null>(null);
@@ -40,18 +32,15 @@ export const SqlExecutionPlanPanel = observer<Props>(function SqlExecutionPlanPa
     return <Loader cancelDisabled={!data?.task.cancellable} onCancel={() => data?.task.cancel()} />;
   }
 
-  return styled(
-    styles,
-    splitStyles,
-  )(
+  return (
     <Split {...splitState} mode={selectedNode ? splitState.mode : 'minimize'} disable={!selectedNode} sticky={30}>
-      <Pane>
+      <Pane className={s(styles, { pane: true })}>
         <ExecutionPlanTreeBlock nodeList={data.executionPlan.nodes} query={data.executionPlan.query} onNodeSelect={setSelectedNode} />
       </Pane>
       <ResizerControls />
-      <Pane basis="30%" main>
+      <Pane className={s(styles, { pane: true })} basis="30%" main>
         {selectedNode && <PropertiesPanel selectedNode={selectedNode} nodeList={data.executionPlan.nodes} />}
       </Pane>
-    </Split>,
+    </Split>
   );
 });

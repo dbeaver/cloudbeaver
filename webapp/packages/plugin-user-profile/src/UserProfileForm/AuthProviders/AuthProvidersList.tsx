@@ -10,7 +10,8 @@ import styled, { css } from 'reshadow';
 
 import { AuthProvidersResource } from '@cloudbeaver/core-authentication';
 import { Cell, getComputed, IconOrImage, Link, Loader, useResource, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
-import { resourceKeyList, UserInfo } from '@cloudbeaver/core-sdk';
+import { resourceKeyList } from '@cloudbeaver/core-resource';
+import type { UserInfo } from '@cloudbeaver/core-sdk';
 
 const styles = css`
   container {
