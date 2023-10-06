@@ -6,6 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 import type { UsersResource } from '@cloudbeaver/core-authentication';
+import { type ProjectInfoResource, isGlobalProject } from '@cloudbeaver/core-projects';
 import { type AdminConnectionGrantInfo, AdminSubjectType } from '@cloudbeaver/core-sdk';
 import { FormMode, FormPart } from '@cloudbeaver/core-ui';
 import { isArraysEqual } from '@cloudbeaver/core-utils';
@@ -15,7 +16,11 @@ import type { AdministrationUserFormState } from '../AdministrationUserFormState
 import { DATA_CONTEXT_USER_FORM_INFO_PART } from '../Info/DATA_CONTEXT_USER_FORM_INFO_PART';
 
 export class UserFormConnectionAccessPart extends FormPart<AdminConnectionGrantInfo[], IUserFormState> {
-  constructor(formState: AdministrationUserFormState, private readonly usersResource: UsersResource) {
+  constructor(
+    formState: AdministrationUserFormState,
+    private readonly usersResource: UsersResource,
+    private readonly projectInfoResource: ProjectInfoResource,
+  ) {
     super(formState, []);
   }
 
@@ -62,12 +67,18 @@ export class UserFormConnectionAccessPart extends FormPart<AdminConnectionGrantI
 
     const userFormInfoPart = this.formState.dataContext.get(DATA_CONTEXT_USER_FORM_INFO_PART);
 
+    const globalProject = this.projectInfoResource.values.find(isGlobalProject);
+
+    if (!globalProject) {
+      throw new Error('The global project does not exist');
+    }
+
     if (connectionsToRevoke.length > 0) {
-      await this.usersResource.deleteConnectionsAccess(userFormInfoPart.state.userId, connectionsToRevoke);
+      await this.usersResource.deleteConnectionsAccess(globalProject.id, userFormInfoPart.state.userId, connectionsToRevoke);
     }
 
     if (connectionsToGrant.length > 0) {
-      await this.usersResource.addConnectionsAccess(userFormInfoPart.state.userId, connectionsToGrant);
+      await this.usersResource.addConnectionsAccess(globalProject.id, userFormInfoPart.state.userId, connectionsToGrant);
     }
   }
 

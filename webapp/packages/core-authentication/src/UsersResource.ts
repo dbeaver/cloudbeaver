@@ -29,7 +29,6 @@ import { AuthInfoService } from './AuthInfoService';
 import { AuthProviderService } from './AuthProviderService';
 import { EAdminPermission } from './EAdminPermission';
 import type { IAuthCredentials } from './IAuthCredentials';
-import { isGlobalProject, ProjectInfoResource } from '@cloudbeaver/core-projects';
 
 const NEW_USER_SYMBOL = Symbol('new-user');
 
@@ -62,7 +61,6 @@ export class UsersResource extends CachedMapResource<string, AdminUser, UserReso
     private readonly serverConfigResource: ServerConfigResource,
     private readonly authProviderService: AuthProviderService,
     private readonly authInfoService: AuthInfoService,
-    private readonly projectInfoResource: ProjectInfoResource,
     sessionPermissionsResource: SessionPermissionsResource,
   ) {
     super();
@@ -113,29 +111,17 @@ export class UsersResource extends CachedMapResource<string, AdminUser, UserReso
     return grantedConnections;
   }
 
-  async addConnectionsAccess(userId: string, connectionIds: string[]): Promise<void> {
-    const globalProject = this.projectInfoResource.values.find(isGlobalProject);
-
-    if (!globalProject) {
-      throw new Error('The global project does not exist');
-    }
-
+  async addConnectionsAccess(projectId: string, userId: string, connectionIds: string[]): Promise<void> {
     await this.graphQLService.sdk.addConnectionsAccess({
-      projectId: globalProject.id,
+      projectId,
       connectionIds,
       subjects: [userId],
     });
   }
 
-  async deleteConnectionsAccess(userId: string, connectionIds: string[]): Promise<void> {
-    const globalProject = this.projectInfoResource.values.find(isGlobalProject);
-
-    if (!globalProject) {
-      throw new Error('The global project does not exist');
-    }
-
+  async deleteConnectionsAccess(projectId: string, userId: string, connectionIds: string[]): Promise<void> {
     await this.graphQLService.sdk.deleteConnectionsAccess({
-      projectId: globalProject.id,
+      projectId,
       connectionIds,
       subjects: [userId],
     });
