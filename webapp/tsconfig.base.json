@@ -3,7 +3,7 @@
     "baseUrl": ".",
     "allowUnreachableCode": false,
     "allowSyntheticDefaultImports": true,
-    "allowJs": true,
+    "allowJs": false,
     "lib": ["dom", "ES2019", "ES2022.Error"],
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,

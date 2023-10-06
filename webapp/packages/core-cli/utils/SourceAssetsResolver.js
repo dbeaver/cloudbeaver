@@ -6,22 +6,22 @@
  * you may not use this file except in compliance with the License.
  */
 
-class CSSSourceResolver {
+class SourceAssetsResolver {
   // https://github.com/webpack/enhanced-resolve/
-  constructor(supportedStyles) {
+  constructor(extensions) {
     this.source = 'after-normal-resolve';
     this.target = 'relative';
-    this.supportedStyles = supportedStyles;
+    this.extensions = extensions;
   }
 
   apply(resolver) {
     const target = resolver.ensureHook(this.target);
-    resolver.getHook(this.source).tapAsync('CSSSourceResolver', (request, resolveContext, callback) => {
+    resolver.getHook(this.source).tapAsync('SourceAssetsResolver', (request, resolveContext, callback) => {
       const descriptionFileRoot = /** @type {string} */ (request.descriptionFileRoot);
       let relativePath = /** @type {string} */ (request.relativePath);
       const requestRequest = /** @type {string | undefined} */ (request.request);
 
-      if (this.supportedStyles.test(requestRequest) && relativePath.startsWith('./dist')) {
+      if (relativePath?.startsWith('./dist') && this.extensions.some(ext => requestRequest?.endsWith(ext))) {
         relativePath = './' + resolver.join(relativePath.replace('./dist', './src'), requestRequest);
         const path = resolver.join(descriptionFileRoot, relativePath);
         const obj = {
@@ -40,7 +40,7 @@ class CSSSourceResolver {
 }
 
 module.exports = {
-  CSSSourceResolver,
+  SourceAssetsResolver,
 };
 
 // class CSSSourceResolver {
