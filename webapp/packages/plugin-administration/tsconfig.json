@@ -59,15 +59,15 @@
     }
   ],
   "include": [
-    "__custom_mocks__/**",
-    "src/**",
+    "__custom_mocks__/**/*",
+    "src/**/*",
     "src/**/*.json",
     "src/**/*.css",
     "src/**/*.scss"
   ],
   "exclude": [
     "**/node_modules",
-    "lib/**",
-    "dist/**"
+    "lib/**/*",
+    "dist/**/*"
   ]
 }
