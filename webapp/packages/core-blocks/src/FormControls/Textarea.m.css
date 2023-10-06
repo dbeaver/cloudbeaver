@@ -1,5 +1,6 @@
 .textarea {
   line-height: 19px;
+  font-size: 12px;
 }
 .field.embedded {
   height: 100%;

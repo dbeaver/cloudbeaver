@@ -45,7 +45,7 @@ export const CheckboxMarkup: React.FC<ICheckboxMarkupProps> = function CheckboxM
   });
 
   return (
-    <div className={s(styles, { checkboxContainer: true, small: mod.includes('small') })} title={title}>
+    <div className={s(styles, { checkboxContainer: true, small: mod.includes('small') }, className)} title={title}>
       <div
         className={s(styles, {
           checkbox: true,

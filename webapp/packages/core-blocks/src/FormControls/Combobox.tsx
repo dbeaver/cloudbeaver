@@ -258,7 +258,7 @@ export const Combobox: ComboboxType = observer(function Combobox({
   return (
     <Field {...layoutProps} className={s(styles, { field: true, inline }, className)}>
       {children && (
-        <FieldLabel title={title} className={s(styles, { fieldLabel: true })}>
+        <FieldLabel required={rest.required} title={title} className={s(styles, { fieldLabel: true })}>
           {children}
         </FieldLabel>
       )}
