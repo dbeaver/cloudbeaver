@@ -7,49 +7,49 @@
   },
   "references": [
     {
-      "path": "../plugin-data-viewer"
+      "path": "../plugin-data-viewer/tsconfig.json"
     },
     {
-      "path": "../plugin-react-data-grid"
+      "path": "../plugin-react-data-grid/tsconfig.json"
     },
     {
-      "path": "../core-blocks"
+      "path": "../core-blocks/tsconfig.json"
     },
     {
-      "path": "../core-data-context"
+      "path": "../core-data-context/tsconfig.json"
     },
     {
-      "path": "../core-di"
+      "path": "../core-di/tsconfig.json"
     },
     {
-      "path": "../core-dialogs"
+      "path": "../core-dialogs/tsconfig.json"
     },
     {
-      "path": "../core-events"
+      "path": "../core-events/tsconfig.json"
     },
     {
-      "path": "../core-executor"
+      "path": "../core-executor/tsconfig.json"
     },
     {
-      "path": "../core-localization"
+      "path": "../core-localization/tsconfig.json"
     },
     {
-      "path": "../core-plugin"
+      "path": "../core-plugin/tsconfig.json"
     },
     {
-      "path": "../core-sdk"
+      "path": "../core-sdk/tsconfig.json"
     },
     {
-      "path": "../core-theming"
+      "path": "../core-theming/tsconfig.json"
     },
     {
-      "path": "../core-ui"
+      "path": "../core-ui/tsconfig.json"
     },
     {
-      "path": "../core-utils"
+      "path": "../core-utils/tsconfig.json"
     },
     {
-      "path": "../tests-runner"
+      "path": "../tests-runner/tsconfig.json"
     }
   ],
   "include": [
