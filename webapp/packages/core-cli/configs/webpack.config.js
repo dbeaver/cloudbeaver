@@ -162,24 +162,6 @@ module.exports = (env, argv) => {
     module: {
       rules: [
         {
-          test: /\.tsx?$/,
-          exclude: /node_modules/,
-          use: [
-            {
-              loader: 'ts-loader',
-              options: {
-                // happyPackMode: true,
-                // transpileOnly: true,
-                compilerOptions: {
-                  sourceMap: devMode,
-                },
-                projectReferences: true,
-                ignoreDiagnostics: [6059, 2307],
-              },
-            },
-          ],
-        },
-        {
           test: /\.json5$/i,
           loader: 'json5-loader',
           type: 'javascript/auto',
@@ -229,40 +211,9 @@ module.exports = (env, argv) => {
     ignoreWarnings: [/Failed to parse source map/],
     devtool: devMode ? 'source-map' : false,
     plugins: [
-      // new ForkTsCheckerWebpackPlugin({
-      //   typescript: {
-      //     // async: true,
-      //     typescriptPath: require.resolve('typescript'),
-      //     configFile: resolve('tsconfig.json'),
-      //     mode: 'readonly',
-      //     // build: true,
-      //     // configOverwrite: {
-      //     //   include: ['**/src/**/*.ts', '**/src/**/*.tsx', '**/src/**/*.css'],
-      //     // },
-      //     profile: true,
-      //     diagnosticOptions: {
-      //       semantic: true,
-      //       syntactic: true,
-      //     },
-      //   },
-      // }),
-      // new ForkTsCheckerWebpackPlugin({
-      //   typescript: {
-      //     typescriptPath: require.resolve('typescript'),
-      //     configFile: resolve('tsconfig.json'),
-      //     // build: true,
-      //     configOverwrite: {
-      //       include: ['**/src/**/*.ts', '**/src/**/*.tsx'],
-      //     },
-      //     diagnosticOptions: {
-      //       semantic: true,
-      //       syntactic: true,
-      //     },
-      //   },
-      // }),
-      // new webpack.WatchIgnorePlugin({
-      //   paths: [/\.jsx?$/, /\.d\.[cm]ts$/],
-      // }),
+      new webpack.WatchIgnorePlugin({
+        paths: [/.tsbuildinfo$/],
+      }),
       new IgnoreNotFoundExportPlugin(),
       new MiniCssExtractPlugin({
         filename: devMode ? 'styles/[name].css' : 'styles/[name].[contenthash].css',

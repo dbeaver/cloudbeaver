@@ -7,31 +7,31 @@
   },
   "references": [
     {
-      "path": "../plugin-settings-menu"
+      "path": "../plugin-settings-menu/tsconfig.json"
     },
     {
-      "path": "../core-authentication"
+      "path": "../core-authentication/tsconfig.json"
     },
     {
-      "path": "../core-blocks"
+      "path": "../core-blocks/tsconfig.json"
     },
     {
-      "path": "../core-di"
+      "path": "../core-di/tsconfig.json"
     },
     {
-      "path": "../core-localization"
+      "path": "../core-localization/tsconfig.json"
     },
     {
-      "path": "../core-plugin"
+      "path": "../core-plugin/tsconfig.json"
     },
     {
-      "path": "../core-settings"
+      "path": "../core-settings/tsconfig.json"
     },
     {
-      "path": "../core-ui"
+      "path": "../core-ui/tsconfig.json"
     },
     {
-      "path": "../core-view"
+      "path": "../core-view/tsconfig.json"
     }
   ],
   "include": [
