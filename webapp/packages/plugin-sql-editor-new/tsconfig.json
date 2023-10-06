@@ -7,34 +7,34 @@
   },
   "references": [
     {
-      "path": "../plugin-codemirror6"
+      "path": "../plugin-codemirror6/tsconfig.json"
     },
     {
-      "path": "../plugin-sql-editor"
+      "path": "../plugin-sql-editor/tsconfig.json"
     },
     {
-      "path": "../core-blocks"
+      "path": "../core-blocks/tsconfig.json"
     },
     {
-      "path": "../core-di"
+      "path": "../core-di/tsconfig.json"
     },
     {
-      "path": "../core-events"
+      "path": "../core-events/tsconfig.json"
     },
     {
-      "path": "../core-localization"
+      "path": "../core-localization/tsconfig.json"
     },
     {
-      "path": "../core-navigation-tree"
+      "path": "../core-navigation-tree/tsconfig.json"
     },
     {
-      "path": "../core-sdk"
+      "path": "../core-sdk/tsconfig.json"
     },
     {
-      "path": "../core-ui"
+      "path": "../core-ui/tsconfig.json"
     },
     {
-      "path": "../core-utils"
+      "path": "../core-utils/tsconfig.json"
     }
   ],
   "include": [

@@ -7,34 +7,34 @@
   },
   "references": [
     {
-      "path": "../core-administration"
+      "path": "../core-administration/tsconfig.json"
     },
     {
-      "path": "../core-authentication"
+      "path": "../core-authentication/tsconfig.json"
     },
     {
-      "path": "../core-di"
+      "path": "../core-di/tsconfig.json"
     },
     {
-      "path": "../core-executor"
+      "path": "../core-executor/tsconfig.json"
     },
     {
-      "path": "../core-navigation-tree"
+      "path": "../core-navigation-tree/tsconfig.json"
     },
     {
-      "path": "../core-projects"
+      "path": "../core-projects/tsconfig.json"
     },
     {
-      "path": "../core-resource"
+      "path": "../core-resource/tsconfig.json"
     },
     {
-      "path": "../core-root"
+      "path": "../core-root/tsconfig.json"
     },
     {
-      "path": "../core-sdk"
+      "path": "../core-sdk/tsconfig.json"
     },
     {
-      "path": "../core-utils"
+      "path": "../core-utils/tsconfig.json"
     }
   ],
   "include": [

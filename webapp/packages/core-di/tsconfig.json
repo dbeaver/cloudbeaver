@@ -7,7 +7,7 @@
   },
   "references": [
     {
-      "path": "../core-executor"
+      "path": "../core-executor/tsconfig.json"
     }
   ],
   "include": [

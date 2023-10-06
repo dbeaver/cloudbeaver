@@ -7,31 +7,31 @@
   },
   "references": [
     {
-      "path": "../plugin-settings-menu"
+      "path": "../plugin-settings-menu/tsconfig.json"
     },
     {
-      "path": "../plugin-version"
+      "path": "../plugin-version/tsconfig.json"
     },
     {
-      "path": "../core-blocks"
+      "path": "../core-blocks/tsconfig.json"
     },
     {
-      "path": "../core-di"
+      "path": "../core-di/tsconfig.json"
     },
     {
-      "path": "../core-dialogs"
+      "path": "../core-dialogs/tsconfig.json"
     },
     {
-      "path": "../core-localization"
+      "path": "../core-localization/tsconfig.json"
     },
     {
-      "path": "../core-root"
+      "path": "../core-root/tsconfig.json"
     },
     {
-      "path": "../core-theming"
+      "path": "../core-theming/tsconfig.json"
     },
     {
-      "path": "../core-view"
+      "path": "../core-view/tsconfig.json"
     }
   ],
   "include": [
