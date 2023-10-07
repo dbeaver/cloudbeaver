@@ -100,11 +100,11 @@ export const Button = observer<ButtonProps>(function Button({
     >
       <div className={s(styles, { ripple: true })} />
       {icon && (
-        <div className={s(styles, { buttonIcon: true, disabled }, className)}>
+        <div className={s(styles, { buttonIcon: true, disabled })}>
           <IconOrImage icon={icon} viewBox={viewBox} />
         </div>
       )}
-      <span className={s(styles, { buttonLabel: true }, className)}>{children}</span>
+      <span className={s(styles, { buttonLabel: true })}>{children}</span>
       <Loader className={s(styles, { loader: true })} small />
     </Button>
   );
