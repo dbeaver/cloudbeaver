@@ -1,30 +1,27 @@
 {
   "name": "@cloudbeaver/product-default",
-  "sideEffects": false,
+  "sideEffects": [
+    "src/**/*.css",
+    "src/**/*.scss",
+    "public/**/*"
+  ],
   "version": "23.2.2",
-  "description": "",
+  "description": "CloudBeaver Community",
   "license": "Apache-2.0",
-  "main": "lib/index.js",
-  "module": "lib/index.js",
-  "types": "src/index.ts",
+  "main": "dist/index.js",
   "scripts": {
-    "prebuild": "rimraf --glob lib/* && rimraf tsconfig.tsbuildinfo && cd ../../ && lerna run gql:gen --stream --parallel",
+    "prebuild": "rimraf --glob lib/* && lerna run gql:gen --stream --parallel && tsc -b",
     "build": "core-cli-build --mode=production --config ../core-cli/configs/webpack.product.config.js",
-    "dev": "concurrently -P -k \"cd ../../ && lerna run gql:gen:dev --stream --parallel\" \"core-cli-build serve --mode=development --progress --config=../core-cli/configs/webpack.product.dev.config.js --port=3100 {@}\"",
-    "preanalyse": "rimraf --glob lib/* && if not exist lib mkdir lib",
+    "dev": "yarn run prebuild && concurrently -P -k \"yarn tsc -b --watch --preserveWatchOutput\" \"lerna run gql:gen:dev --stream --parallel\" \"core-cli-build serve --mode=development --progress --config=../core-cli/configs/webpack.product.dev.config.js --port=3100 {@}\"",
     "analyse": "core-cli-build --mode=production --config ../core-cli/configs/webpack.product.config.js --profile --json > ./lib/stats.json",
     "postanalyse": "core-cli-analyzer ./lib/stats.json",
     "lint": "eslint ./src/ --ext .ts,.tsx",
     "lint-fix": "eslint ./src/ --ext .ts,.tsx --fix",
     "version:new": "yarn version --no-git-tag-version",
-    "postinstall": "rimraf node_modules/.cache"
+    "validate-dependencies": "core-cli-validate-dependencies",
+    "update-ts-references": "rimraf --glob dist/* && typescript-resolve-references"
   },
   "dependencies": {
-    "@cloudbeaver/core-blocks": "~0.1.0",
-    "@cloudbeaver/core-bootstrap": "~0.1.0",
-    "@cloudbeaver/core-di": "~0.1.0",
-    "@cloudbeaver/core-product": "~0.1.0",
-    "@cloudbeaver/core-version-update": "~0.1.0",
     "@cloudbeaver/plugin-administration": "~0.1.0",
     "@cloudbeaver/plugin-authentication": "~0.1.0",
     "@cloudbeaver/plugin-authentication-administration": "~0.1.0",
@@ -54,7 +51,9 @@
     "@cloudbeaver/plugin-projects": "~0.1.0",
     "@cloudbeaver/plugin-resource-manager": "~0.1.0",
     "@cloudbeaver/plugin-resource-manager-administration": "~0.1.0",
+    "@cloudbeaver/plugin-resource-manager-scripts": "~0.1.0",
     "@cloudbeaver/plugin-root": "~0.1.0",
+    "@cloudbeaver/plugin-session-expiration": "~0.1.0",
     "@cloudbeaver/plugin-settings-menu": "~0.1.0",
     "@cloudbeaver/plugin-settings-menu-administration": "~0.1.0",
     "@cloudbeaver/plugin-settings-panel": "~0.1.0",
@@ -67,15 +66,22 @@
     "@cloudbeaver/plugin-theme": "~0.1.0",
     "@cloudbeaver/plugin-tools-panel": "~0.1.0",
     "@cloudbeaver/plugin-top-app-bar": "~0.1.0",
+    "@cloudbeaver/plugin-top-app-bar-administration": "~0.1.0",
     "@cloudbeaver/plugin-user-profile": "~0.1.0",
     "@cloudbeaver/plugin-user-profile-administration": "~0.1.0",
     "@cloudbeaver/plugin-version": "~0.1.0",
-    "@cloudbeaver/plugin-version-update-administration": "~0.1.0"
-  },
-  "peerDependencies": {
+    "@cloudbeaver/plugin-version-update-administration": "~0.1.0",
+    "@cloudbeaver/core-blocks": "~0.1.0",
+    "@cloudbeaver/core-bootstrap": "~0.1.0",
+    "@cloudbeaver/core-di": "~0.1.0",
+    "@cloudbeaver/core-product": "~0.1.0",
+    "@cloudbeaver/core-version-update": "~0.1.0",
+    "@cloudbeaver/plugin-sso": "~0.1.0",
     "reflect-metadata": "~0.x.x"
   },
+  "peerDependencies": {},
   "product": {
     "name": "CloudBeaver Community"
-  }
+  },
+  "devDependencies": {}
 }

@@ -8,11 +8,11 @@
 import { useCallback, useEffect } from 'react';
 
 import { useStateDelay } from '@cloudbeaver/core-blocks';
+import type { IDataContextProvider } from '@cloudbeaver/core-data-context';
 import { useService } from '@cloudbeaver/core-di';
 import { ENodeMoveType, type NavNode, NavNodeManagerService } from '@cloudbeaver/core-navigation-tree';
 import { IDNDBox, useDNDBox } from '@cloudbeaver/core-ui';
 import { throttleAsync } from '@cloudbeaver/core-utils';
-import type { IDataContextProvider } from '@cloudbeaver/core-view';
 
 interface INodeState {
   expanded: boolean;

@@ -27,6 +27,8 @@ export const Placeholder = observer(function Placeholder<T extends Record<string
     });
   }
 
+  elements = elements.filter(placeholder => !placeholder.isHidden?.(rest as unknown as T));
+
   return (
     <>
       {elements.map(({ id, component: Component }) => (

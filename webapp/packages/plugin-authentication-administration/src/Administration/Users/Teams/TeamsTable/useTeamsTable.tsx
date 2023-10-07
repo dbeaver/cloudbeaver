@@ -8,11 +8,11 @@
 import { computed, observable } from 'mobx';
 
 import { compareTeams, TeamInfo, TeamsResource } from '@cloudbeaver/core-authentication';
-import { TableState, useObservableRef, useResource, useTranslate } from '@cloudbeaver/core-blocks';
+import { ConfirmationDialogDelete, TableState, useObservableRef, useResource, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { CommonDialogService, ConfirmationDialogDelete, DialogueStateResult } from '@cloudbeaver/core-dialogs';
+import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { CachedMapAllKey, resourceKeyList } from '@cloudbeaver/core-sdk';
+import { CachedMapAllKey, resourceKeyList } from '@cloudbeaver/core-resource';
 import type { ILoadableState } from '@cloudbeaver/core-utils';
 
 interface State {

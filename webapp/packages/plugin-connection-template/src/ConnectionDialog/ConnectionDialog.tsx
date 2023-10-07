@@ -7,9 +7,22 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import { ErrorMessage, Form, Loader, s, useAdministrationSettings, useFocus, useS, useTranslate } from '@cloudbeaver/core-blocks';
+import {
+  CommonDialogBody,
+  CommonDialogFooter,
+  CommonDialogHeader,
+  CommonDialogWrapper,
+  ErrorMessage,
+  Form,
+  Loader,
+  s,
+  useAdministrationSettings,
+  useFocus,
+  useS,
+  useTranslate,
+} from '@cloudbeaver/core-blocks';
 import { useController } from '@cloudbeaver/core-di';
-import { CommonDialogBody, CommonDialogFooter, CommonDialogHeader, CommonDialogWrapper, DialogComponent } from '@cloudbeaver/core-dialogs';
+import type { DialogComponent } from '@cloudbeaver/core-dialogs';
 import { ConnectionAuthenticationFormLoader } from '@cloudbeaver/plugin-connections';
 
 import { ConnectionController, ConnectionStep } from './ConnectionController';

@@ -8,7 +8,8 @@
 import { useState } from 'react';
 
 import { useService } from '@cloudbeaver/core-di';
-import type { AdminAuthProviderConfiguration, CachedMapResource, GetAuthProviderConfigurationsQueryVariables } from '@cloudbeaver/core-sdk';
+import type { CachedMapResource } from '@cloudbeaver/core-resource';
+import type { AdminAuthProviderConfiguration, GetAuthProviderConfigurationsQueryVariables } from '@cloudbeaver/core-sdk';
 
 import { AuthConfigurationFormService } from './AuthConfigurationFormService';
 import { AuthConfigurationFormState } from './AuthConfigurationFormState';

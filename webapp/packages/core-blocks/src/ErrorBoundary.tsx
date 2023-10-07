@@ -6,21 +6,14 @@
  * you may not use this file except in compliance with the License.
  */
 import React, { ErrorInfo } from 'react';
-import styled, { css } from 'reshadow';
 
-import type { ComponentStyle } from '@cloudbeaver/core-theming';
 import { errorOf, LoadingError } from '@cloudbeaver/core-utils';
 
 import { Button } from './Button';
 import { DisplayError } from './DisplayError';
+import style from './ErrorBoundary.m.css';
 import { ErrorContext, IExceptionContext } from './ErrorContext';
 import { ExceptionMessage } from './ExceptionMessage';
-
-const style = css`
-  action {
-    padding: 8px 16px;
-  }
-`;
 
 interface Props {
   icon?: boolean;
@@ -28,7 +21,6 @@ interface Props {
   inline?: boolean;
   remount?: boolean;
   className?: string;
-  styles?: ComponentStyle;
   onClose?: () => any;
   onRefresh?: () => any;
 }
@@ -48,6 +40,7 @@ export class ErrorBoundary extends React.Component<React.PropsWithChildren<Props
   }
   constructor(props: Props) {
     super(props);
+
     this.state = { exceptions: [] };
 
     this.refresh = this.refresh.bind(this);
@@ -75,23 +68,23 @@ export class ErrorBoundary extends React.Component<React.PropsWithChildren<Props
   }
 
   render(): React.ReactNode {
-    const { root, inline, icon, children, styles, className, onClose } = this.props;
+    const { root, inline, icon, children, className, onClose } = this.props;
 
     for (const errorData of this.state.exceptions) {
       if (root) {
-        return styled(style)(
-          <DisplayError className={className} root={root} error={errorData.error} styles={styles} errorInfo={errorData.errorInfo}>
+        return (
+          <DisplayError className={className} root={root} error={errorData.error} errorInfo={errorData.errorInfo}>
             {onClose && (
-              <action>
+              <div className={style.action}>
                 <Button onClick={onClose}>Close</Button>
-              </action>
+              </div>
             )}
             {this.canRefresh && (
-              <action>
+              <div className={style.action}>
                 <Button onClick={this.refresh}>Refresh</Button>
-              </action>
+              </div>
             )}
-          </DisplayError>,
+          </DisplayError>
         );
       } else {
         return (
@@ -100,7 +93,6 @@ export class ErrorBoundary extends React.Component<React.PropsWithChildren<Props
             icon={icon}
             className={className}
             exception={errorData.error}
-            styles={styles}
             onRetry={this.canRefresh ? this.refresh : undefined}
             onClose={onClose}
           />

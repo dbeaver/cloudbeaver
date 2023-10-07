@@ -6,8 +6,9 @@
  * you may not use this file except in compliance with the License.
  */
 import { UserInfoResource } from '@cloudbeaver/core-authentication';
+import { ConfirmationDialog } from '@cloudbeaver/core-blocks';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
-import { CommonDialogService, ConfirmationDialog, DialogueStateResult } from '@cloudbeaver/core-dialogs';
+import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
 
 @injectable()

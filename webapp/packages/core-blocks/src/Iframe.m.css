@@ -1,0 +1,4 @@
+.iframe {
+  composes: theme-border-color-background from global;
+  border: 1px solid;
+}

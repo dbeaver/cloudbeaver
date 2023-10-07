@@ -5,13 +5,13 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
+import type { IDataContextProvider } from '@cloudbeaver/core-data-context';
 import { injectable } from '@cloudbeaver/core-di';
 import { flat, ILoadableState } from '@cloudbeaver/core-utils';
 
 import { ActionService } from '../Action/ActionService';
 import { isAction } from '../Action/createAction';
 import type { IAction } from '../Action/IAction';
-import type { IDataContextProvider } from '../DataContext/IDataContextProvider';
 import { isMenu } from './createMenu';
 import { DATA_CONTEXT_MENU } from './DATA_CONTEXT_MENU';
 import { DATA_CONTEXT_MENU_LOCAL } from './DATA_CONTEXT_MENU_LOCAL';

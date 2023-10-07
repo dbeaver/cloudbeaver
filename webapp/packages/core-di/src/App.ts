@@ -6,7 +6,6 @@
  * you may not use this file except in compliance with the License.
  */
 import { Executor, IExecutor } from '@cloudbeaver/core-executor';
-import { flat } from '@cloudbeaver/core-utils';
 
 import { Bootstrap } from './Bootstrap';
 import { Dependency } from './Dependency';
@@ -40,7 +39,7 @@ export class App {
   }
 
   getServices(): IServiceConstructor<any>[] {
-    return flat(this.plugins.map(plugin => plugin.providers));
+    return this.plugins.map(plugin => plugin.providers).flat();
   }
 
   registerChildContainer(container: DIContainer): void {

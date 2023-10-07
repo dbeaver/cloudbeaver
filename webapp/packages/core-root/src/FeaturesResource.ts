@@ -6,7 +6,8 @@
  * you may not use this file except in compliance with the License.
  */
 import { injectable } from '@cloudbeaver/core-di';
-import { CachedDataResource, GraphQLService, WebFeatureSet } from '@cloudbeaver/core-sdk';
+import { CachedDataResource } from '@cloudbeaver/core-resource';
+import { GraphQLService, WebFeatureSet } from '@cloudbeaver/core-sdk';
 
 import { ServerConfigResource } from './ServerConfigResource';
 

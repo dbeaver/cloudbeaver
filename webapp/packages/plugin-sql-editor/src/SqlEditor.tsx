@@ -6,60 +6,42 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import styled, { css } from 'reshadow';
 
-import { Loader, Pane, ResizerControls, Split, splitHorizontalStyles, splitStyles, useSplitUserState, useStyles } from '@cloudbeaver/core-blocks';
+import { Loader, Pane, ResizerControls, s, Split, useS, useSplitUserState, useStyles } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { CaptureView } from '@cloudbeaver/core-view';
 
 import type { ISqlEditorTabState } from './ISqlEditorTabState';
 import { SqlDataSourceService } from './SqlDataSource/SqlDataSourceService';
+import style from './SqlEditor.m.css';
 import { SqlEditorLoader } from './SqlEditor/SqlEditorLoader';
 import { SqlEditorOverlay } from './SqlEditorOverlay';
 import { SqlEditorStatusBar } from './SqlEditorStatusBar';
 import { SqlEditorView } from './SqlEditorView';
 import { SqlResultTabs } from './SqlResultTabs/SqlResultTabs';
 import { useDataSource } from './useDataSource';
-
-const viewerStyles = css`
-  CaptureView {
-    flex: 1;
-    display: flex;
-    overflow: auto;
-    position: relative;
-  }
-  Pane {
-    composes: theme-typography--body2 from global;
-    display: flex;
-    position: relative;
-  }
-  Pane:first-child {
-    flex-direction: column;
-  }
-`;
-
 interface Props {
   state: ISqlEditorTabState;
 }
 
 export const SqlEditor = observer<Props>(function SqlEditor({ state }) {
+  const styles = useS(style);
   const sqlEditorView = useService(SqlEditorView);
   const sqlDataSourceService = useService(SqlDataSourceService);
-  const styles = useStyles(splitStyles, splitHorizontalStyles, viewerStyles);
   const dataSource = sqlDataSourceService.get(state.editorId);
 
   useDataSource(dataSource);
   const splitState = useSplitUserState(`sql-editor-${dataSource?.sourceKey ?? 'default'}`);
 
-  return styled(styles)(
+  return (
     <Loader suspense>
-      <CaptureView view={sqlEditorView}>
+      <CaptureView className={s(styles, { captureView: true })} view={sqlEditorView}>
         <Split {...splitState} split="horizontal" sticky={30}>
-          <Pane>
+          <Pane className={s(styles, { pane: true })}>
             <SqlEditorLoader state={state} />
           </Pane>
           <ResizerControls />
-          <Pane basis="50%" main>
+          <Pane className={s(styles, { pane: true })} basis="50%" main>
             <Loader suspense>
               <SqlResultTabs state={state} />
             </Loader>
@@ -68,6 +50,6 @@ export const SqlEditor = observer<Props>(function SqlEditor({ state }) {
         <SqlEditorOverlay state={state} />
         <SqlEditorStatusBar dataSource={dataSource} />
       </CaptureView>
-    </Loader>,
+    </Loader>
   );
 });

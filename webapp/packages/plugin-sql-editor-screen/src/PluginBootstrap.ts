@@ -5,6 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
+import type { IDataContextProvider } from '@cloudbeaver/core-data-context';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { MENU_TAB } from '@cloudbeaver/core-ui';
@@ -13,7 +14,6 @@ import {
   ActionService,
   DATA_CONTEXT_MENU,
   IAction,
-  IDataContextProvider,
   KEY_BINDING_OPEN_IN_TAB,
   KeyBindingService,
   MenuService,

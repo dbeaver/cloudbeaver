@@ -7,8 +7,8 @@
  */
 import { useContext } from 'react';
 
-import type { IDataContext } from '../DataContext/IDataContext';
-import { useDynamicDataContext } from '../DataContext/useDynamicDataContext';
+import { IDataContext, useDynamicDataContext } from '@cloudbeaver/core-data-context';
+
 import { CaptureViewContext } from './CaptureViewContext';
 
 export function useCaptureViewContext(capture: (context: IDataContext | undefined) => void): void {

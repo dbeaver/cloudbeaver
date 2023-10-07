@@ -9,7 +9,7 @@ import { observer } from 'mobx-react-lite';
 import { useEffect } from 'react';
 import styled, { css } from 'reshadow';
 
-import { TextPlaceholder, usePagination, useResource, useTranslate } from '@cloudbeaver/core-blocks';
+import { TextPlaceholder, useOffsetPagination, useResource, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { type DBObject, DBObjectParentKey, DBObjectResource, NavNodeInfoResource, NavTreeResource } from '@cloudbeaver/core-navigation-tree';
 import { isDefined } from '@cloudbeaver/core-utils';
@@ -35,7 +35,7 @@ export const VirtualFolderPanel: NavNodeTransformViewComponent = observer(functi
   const navNodeInfoResource = useService(NavNodeInfoResource);
   const tree = useResource(VirtualFolderPanel, NavTreeResource, nodeId);
 
-  const pagination = usePagination(DBObjectResource, {
+  const pagination = useOffsetPagination(DBObjectResource, {
     key: DBObjectParentKey(nodeId),
     pageSize: tree.resource.childrenLimit,
   });
