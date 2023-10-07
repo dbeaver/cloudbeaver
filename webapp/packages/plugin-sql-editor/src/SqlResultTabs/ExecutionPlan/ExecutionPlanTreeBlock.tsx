@@ -42,8 +42,8 @@ export const ExecutionPlanTreeBlock = observer<Props>(function ExecutionPlanTree
   const state = useExecutionPlanTreeState(nodeList, onNodeSelect);
 
   return (
-    <Split {...splitState} sticky={30} split="horizontal" keepRatio>
-      <Pane>
+    <Split className={s(styles, { split: true }, className)} {...splitState} sticky={30} split="horizontal" keepRatio>
+      <Pane className={styles.pane}>
         {state.nodes.length && state.columns.length ? (
           <Table selectedItems={state.selectedNodes} onSelect={state.selectNode}>
             <TableHeader fixed>
@@ -67,8 +67,8 @@ export const ExecutionPlanTreeBlock = observer<Props>(function ExecutionPlanTree
           <TextPlaceholder>{translate('sql_execution_plan_placeholder')}</TextPlaceholder>
         )}
       </Pane>
-      <ResizerControls />
-      <Pane basis="30%" main>
+      <ResizerControls className={styles.resizerControls} />
+      <Pane className={styles.pane} basis="30%" main>
         <Textarea className={s(styles, { textarea: true }, className)} name="value" rows={3} value={query} readOnly embedded />
       </Pane>
     </Split>
