@@ -11,7 +11,7 @@ import { LocalStorageSaveService } from './LocalStorageSaveService';
 import { SettingsManagerService } from './SettingsManagerService';
 import { SettingsService } from './SettingsService';
 
-export const manifest: PluginManifest = {
+export const coreSettingsManifest: PluginManifest = {
   info: {
     name: 'Core Settings',
   },

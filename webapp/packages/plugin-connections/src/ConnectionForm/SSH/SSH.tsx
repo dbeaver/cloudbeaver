@@ -15,7 +15,6 @@ import {
   Combobox,
   Container,
   Expandable,
-  EXPANDABLE_FORM_STYLES,
   FieldCheckbox,
   Form,
   Group,
@@ -179,7 +178,7 @@ export const SSH: TabContainerPanelComponent<Props> = observer(function SSH({ st
             </FieldCheckbox>
           )}
           <Container gap>
-            <Expandable style={EXPANDABLE_FORM_STYLES} label={translate('connections_network_handler_ssh_tunnel_advanced_settings')}>
+            <Expandable label={translate('connections_network_handler_ssh_tunnel_advanced_settings')}>
               <Container gap>
                 <InputField
                   type="number"

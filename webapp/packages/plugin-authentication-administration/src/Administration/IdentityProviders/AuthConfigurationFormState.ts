@@ -8,7 +8,8 @@
 import { computed, makeObservable, observable } from 'mobx';
 
 import { Executor, IExecutionContextProvider, IExecutor } from '@cloudbeaver/core-executor';
-import type { AdminAuthProviderConfiguration, CachedMapResource, GetAuthProviderConfigurationsQueryVariables } from '@cloudbeaver/core-sdk';
+import type { CachedMapResource } from '@cloudbeaver/core-resource';
+import type { AdminAuthProviderConfiguration, GetAuthProviderConfigurationsQueryVariables } from '@cloudbeaver/core-sdk';
 
 import type { AuthConfigurationFormService } from './AuthConfigurationFormService';
 import { authConfigurationFormConfigureContext } from './Contexts/authConfigurationFormConfigureContext';

@@ -20,13 +20,13 @@ const style = css`
   }
 `;
 
-interface Props {
+export interface NodeLinkProps {
   name: string;
   nodeId?: string;
 }
 
 // TODO: we probably can get name from NavNodeInfoResource but element can be not loaded
-export const NodeLink: React.FC<React.PropsWithChildren<Props>> = function NodeLink({ children, name, nodeId }) {
+export const NodeLink: React.FC<React.PropsWithChildren<NodeLinkProps>> = function NodeLink({ children, name, nodeId }) {
   const navigationTreeService = useService(NavigationTreeService);
 
   const handleClick = useCallback(() => {

@@ -1,10 +1,64 @@
 {
-  "extends": "../../tsconfig.json",
+  "extends": "../../tsconfig.base.json",
   "compilerOptions": {
     "rootDir": "src",
-    "outDir": "lib"
+    "outDir": "dist",
+    "tsBuildInfoFile": "dist/tsconfig.tsbuildinfo"
   },
-  "include": ["src"],
-  "exclude": ["**/node_modules", "**/.*/"],
-  "references": [{ "path": "../*" }]
+  "references": [
+    {
+      "path": "../plugin-authentication/tsconfig.json"
+    },
+    {
+      "path": "../plugin-top-app-bar/tsconfig.json"
+    },
+    {
+      "path": "../core-authentication/tsconfig.json"
+    },
+    {
+      "path": "../core-blocks/tsconfig.json"
+    },
+    {
+      "path": "../core-di/tsconfig.json"
+    },
+    {
+      "path": "../core-dialogs/tsconfig.json"
+    },
+    {
+      "path": "../core-events/tsconfig.json"
+    },
+    {
+      "path": "../core-executor/tsconfig.json"
+    },
+    {
+      "path": "../core-localization/tsconfig.json"
+    },
+    {
+      "path": "../core-resource/tsconfig.json"
+    },
+    {
+      "path": "../core-sdk/tsconfig.json"
+    },
+    {
+      "path": "../core-theming/tsconfig.json"
+    },
+    {
+      "path": "../core-ui/tsconfig.json"
+    },
+    {
+      "path": "../core-view/tsconfig.json"
+    }
+  ],
+  "include": [
+    "__custom_mocks__/**/*",
+    "src/**/*",
+    "src/**/*.json",
+    "src/**/*.css",
+    "src/**/*.scss"
+  ],
+  "exclude": [
+    "**/node_modules",
+    "lib/**/*",
+    "dist/**/*"
+  ]
 }

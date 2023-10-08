@@ -7,8 +7,8 @@
  */
 import { useContext } from 'react';
 
-import type { IDataContext } from '../DataContext/IDataContext';
-import { useDataContext } from '../DataContext/useDataContext';
+import { IDataContext, useDataContext } from '@cloudbeaver/core-data-context';
+
 import { CaptureViewContext } from './CaptureViewContext';
 import { DATA_CONTEXT_VIEW } from './DATA_CONTEXT_VIEW';
 import type { IView } from './IView';

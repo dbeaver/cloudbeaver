@@ -23,9 +23,9 @@ import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import type { DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { Executor, ExecutorInterrupter, IExecutionContextProvider, IExecutorHandler } from '@cloudbeaver/core-executor';
+import { CachedMapAllKey } from '@cloudbeaver/core-resource';
 import { ISessionAction, ServerConfigResource, sessionActionContext, SessionActionService, SessionDataResource } from '@cloudbeaver/core-root';
 import { ScreenService, WindowsService } from '@cloudbeaver/core-routing';
-import { CachedMapAllKey } from '@cloudbeaver/core-sdk';
 import { NavigationService } from '@cloudbeaver/core-ui';
 
 import { AuthDialogService } from './Dialog/AuthDialogService';

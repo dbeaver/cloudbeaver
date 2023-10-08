@@ -6,15 +6,9 @@
  * you may not use this file except in compliance with the License.
  */
 import { injectable } from '@cloudbeaver/core-di';
+import { CachedMapAllKey, CachedMapResource, resourceKeyList } from '@cloudbeaver/core-resource';
 import { SessionDataResource } from '@cloudbeaver/core-root';
-import {
-  AdminObjectGrantInfoFragment,
-  AdminPermissionInfoFragment,
-  CachedMapAllKey,
-  CachedMapResource,
-  GraphQLService,
-  resourceKeyList,
-} from '@cloudbeaver/core-sdk';
+import { AdminObjectGrantInfoFragment, AdminPermissionInfoFragment, GraphQLService } from '@cloudbeaver/core-sdk';
 
 export type PermissionInfo = AdminPermissionInfoFragment;
 export type AdminObjectGrantInfo = AdminObjectGrantInfoFragment;

@@ -11,7 +11,7 @@ import { injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService, ContextMenuService, IContextMenuItem, IMenuContext, IMenuItem } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { ENodeFeature, type NavNode, NavNodeInfoResource, NavTreeResource, NavTreeSettingsService } from '@cloudbeaver/core-navigation-tree';
-import { resourceKeyList } from '@cloudbeaver/core-sdk';
+import { resourceKeyList } from '@cloudbeaver/core-resource';
 
 interface IObjectPropertyTableFooterContext {
   nodeIds: string[];

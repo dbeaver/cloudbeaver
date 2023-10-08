@@ -14,7 +14,7 @@ import { DBDriverResource } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { isSharedProject, ProjectInfoResource, ProjectsService } from '@cloudbeaver/core-projects';
-import { CachedMapAllKey } from '@cloudbeaver/core-sdk';
+import { CachedMapAllKey } from '@cloudbeaver/core-resource';
 
 import { ConnectionManualService } from './ConnectionManualService';
 import { DriverList } from './DriverList';

@@ -11,7 +11,7 @@ import { RouterService } from './RouterService';
 import { ScreenService } from './Screen/ScreenService';
 import { WindowsService } from './WindowsService';
 
-export const manifest: PluginManifest = {
+export const coreRoutingManifest: PluginManifest = {
   info: {
     name: 'Core Routing',
   },

@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
-import type { ResourceKey } from '@cloudbeaver/core-sdk';
+import type { ResourceKey } from '@cloudbeaver/core-resource';
 
 export interface INodeDeleteContext {
   confirmed: boolean;

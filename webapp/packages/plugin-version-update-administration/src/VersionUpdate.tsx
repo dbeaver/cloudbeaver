@@ -12,7 +12,7 @@ import { gte } from 'semver';
 import type { AdministrationItemContentComponent } from '@cloudbeaver/core-administration';
 import { ColoredContainer, useResource, useStyles } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { CachedMapAllKey } from '@cloudbeaver/core-sdk';
+import { CachedMapAllKey } from '@cloudbeaver/core-resource';
 import { VersionResource, VersionService } from '@cloudbeaver/core-version';
 
 import { Instructions } from './Instructions';

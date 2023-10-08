@@ -1,0 +1,80 @@
+name: frontend
+
+on:
+  # Triggers the workflow on push or pull request events but only for the "devel" branch
+  pull_request:
+    branches: ["devel"]
+    paths:
+      - "webapp/**" # monitor for the frontend changes
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+  # Allows you to reuse workflows by referencing their YAML files
+  workflow_call:
+
+jobs:
+  build_and_test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./webapp
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version: "18"
+
+      - name: Get yarn cache directory path
+        id: yarn-cache-dir-path
+        run: echo "dir=$(yarn cache dir)" >> $GITHUB_OUTPUT
+
+      - name: restore yarn cache
+        uses: actions/cache@v3
+        with:
+          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
+
+      - name: restore node_modules
+        uses: actions/cache@v3
+        with:
+          path: "**/node_modules"
+          key: ${{ runner.os }}-node_modules-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-node_modules-
+
+      - name: restore typescript cache
+        uses: actions/cache@v3
+        with:
+          path: "**/packages/*/dist"
+          key: ${{ runner.os }}-dist-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-dist-
+
+      - name: yarn install
+        uses: borales/actions-yarn@v4
+        with:
+          dir: webapp
+          cmd: install
+
+      - name: yarn lerna bootstrap
+        uses: borales/actions-yarn@v4
+        with:
+          dir: webapp
+          cmd: lerna bootstrap
+
+      - name: build
+        uses: borales/actions-yarn@v4
+        with:
+          dir: webapp/packages/product-default
+          cmd: build
+
+      - name: test
+        uses: borales/actions-yarn@v4
+        with:
+          dir: webapp
+          cmd: lerna run test

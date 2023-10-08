@@ -5,12 +5,15 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
+import { observer } from 'mobx-react-lite';
 import { forwardRef, useLayoutEffect } from 'react';
-import styled, { css, use } from 'reshadow';
 
 import { uuid } from '@cloudbeaver/core-utils';
 
+import { s } from './s';
+import style from './UploadArea.m.css';
 import { useRefInherit } from './useRefInherit';
+import { useS } from './useS';
 
 interface Props extends Omit<React.DetailedHTMLProps<React.InputHTMLAttributes<HTMLInputElement>, HTMLInputElement>, 'value'> {
   value?: FileList | null;
@@ -19,46 +22,35 @@ interface Props extends Omit<React.DetailedHTMLProps<React.InputHTMLAttributes<H
   reset?: boolean;
 }
 
-const styles = css`
-  label {
-    cursor: pointer;
-    width: fit-content;
+export const UploadArea = observer(
+  forwardRef<HTMLInputElement, Props>(function UploadArea({ id = uuid(), value, reset, children, className, ...rest }, refInherit) {
+    const styles = useS(style);
+    const ref = useRefInherit<HTMLInputElement>(refInherit);
 
-    &[|disabled] {
-      cursor: default;
-    }
-  }
-`;
+    const handleChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+      if (rest.onChange) {
+        await (rest.onChange(event) as void | Promise<void>);
 
-export const UploadArea = forwardRef<HTMLInputElement, Props>(function UploadArea(
-  { id = uuid(), value, reset, children, className, ...rest },
-  refInherit,
-) {
-  const ref = useRefInherit<HTMLInputElement>(refInherit);
-
-  const handleChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (rest.onChange) {
-      await (rest.onChange(event) as void | Promise<void>);
-
-      if (reset) {
-        const target = event.target as HTMLInputElement;
-        target.value = '';
+        if (reset) {
+          const target = event.target as HTMLInputElement;
+          target.value = '';
+        }
       }
-    }
-  };
+    };
 
-  useLayoutEffect(() => {
-    if (ref.current && value !== undefined) {
-      ref.current.files = value;
-    }
-  });
+    useLayoutEffect(() => {
+      if (ref.current && value !== undefined) {
+        ref.current.files = value;
+      }
+    });
 
-  return styled(styles)(
-    <>
-      <input ref={ref} {...rest} type="file" id={id} hidden onChange={handleChange} />
-      <label htmlFor={id} {...use({ disabled: rest.disabled })} className={className} title={rest.title}>
-        {children}
-      </label>
-    </>,
-  );
-});
+    return (
+      <>
+        <input ref={ref} {...rest} type="file" id={id} hidden onChange={handleChange} />
+        <label className={s(styles, { label: true, disabled: rest.disabled }, className)} htmlFor={id} title={rest.title}>
+          {children}
+        </label>
+      </>
+    );
+  }),
+);

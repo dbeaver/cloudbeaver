@@ -9,7 +9,7 @@ import { observer } from 'mobx-react-lite';
 
 import { PermissionsResource } from '@cloudbeaver/core-administration';
 import { FieldCheckbox, Group, GroupTitle, useResource, useTranslate } from '@cloudbeaver/core-blocks';
-import { CachedMapAllKey } from '@cloudbeaver/core-sdk';
+import { CachedMapAllKey } from '@cloudbeaver/core-resource';
 
 import type { ITeamFormProps } from '../ITeamFormProps';
 

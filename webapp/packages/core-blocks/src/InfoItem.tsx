@@ -6,12 +6,14 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import styled, { css } from 'reshadow';
 
 import type { TLocalizationToken } from '@cloudbeaver/core-localization';
 
 import { IconOrImage } from './IconOrImage';
+import style from './InfoItem.m.css';
 import { useTranslate } from './localization/useTranslate';
+import { s } from './s';
+import { useS } from './useS';
 
 export interface IInfoItem {
   info: TLocalizationToken;
@@ -22,25 +24,14 @@ interface Props extends IInfoItem {
   className?: string;
 }
 
-const styles = css`
-  info-item {
-    display: flex;
-    align-items: center;
-    flex: 0 0 auto;
-  }
-  IconOrImage {
-    width: 24px;
-    height: 24px;
-    margin-right: 16px;
-  }
-`;
-
 export const InfoItem = observer<Props>(function InfoItem({ info, icon = '/icons/info_icon.svg', className }) {
+  const styles = useS(style);
+
   const translate = useTranslate();
-  return styled(styles)(
-    <info-item className={className}>
-      <IconOrImage icon={icon} />
+  return (
+    <div className={s(styles, { infoItem: true }, className)}>
+      <IconOrImage className={s(styles, { iconOrImage: true })} icon={icon} />
       {translate(info)}
-    </info-item>,
+    </div>
   );
 });

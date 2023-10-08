@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 import type { NavNode, NavNodeInfoResource, NavTreeResource } from '@cloudbeaver/core-navigation-tree';
-import { resourceKeyList } from '@cloudbeaver/core-sdk';
+import { resourceKeyList } from '@cloudbeaver/core-resource';
 import type { MetadataMap } from '@cloudbeaver/core-utils';
 
 import { EEquality, NavNodeFilterCompareFn } from './NavNodeFilterCompareFn';
