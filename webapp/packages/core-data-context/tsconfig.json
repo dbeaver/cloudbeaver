@@ -7,10 +7,10 @@
   },
   "references": [
     {
-      "path": "../core-di"
+      "path": "../core-di/tsconfig.json"
     },
     {
-      "path": "../core-utils"
+      "path": "../core-utils/tsconfig.json"
     }
   ],
   "include": [

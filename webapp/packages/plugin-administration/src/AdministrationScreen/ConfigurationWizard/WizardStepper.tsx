@@ -29,10 +29,8 @@ const styles = css`
   actions {
     composes: theme-border-color-background from global;
     border-right: solid 1px;
-
-    & Button {
-      margin-right: 16px;
-    }
+    display: flex;
+    gap: 16px;
   }
 
   actions,
