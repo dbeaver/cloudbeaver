@@ -7,28 +7,28 @@
   },
   "references": [
     {
-      "path": "..\\core-administration"
+      "path": "../core-administration/tsconfig.json"
     },
     {
-      "path": "..\\core-blocks"
+      "path": "../core-blocks/tsconfig.json"
     },
     {
-      "path": "..\\core-di"
+      "path": "../core-di/tsconfig.json"
     },
     {
-      "path": "..\\core-resource"
+      "path": "../core-resource/tsconfig.json"
     },
     {
-      "path": "..\\core-root"
+      "path": "../core-root/tsconfig.json"
     },
     {
-      "path": "..\\core-ui"
+      "path": "../core-ui/tsconfig.json"
     },
     {
-      "path": "..\\core-version"
+      "path": "../core-version/tsconfig.json"
     },
     {
-      "path": "..\\core-version-update"
+      "path": "../core-version-update/tsconfig.json"
     }
   ],
   "include": [
@@ -39,8 +39,8 @@
     "src/**/*.scss"
   ],
   "exclude": [
+    "**/node_modules",
     "lib/**/*",
-    "dist/**/*",
-    "**/node_modules"
+    "dist/**/*"
   ]
 }

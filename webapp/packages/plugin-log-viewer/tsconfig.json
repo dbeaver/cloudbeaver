@@ -7,43 +7,43 @@
   },
   "references": [
     {
-      "path": "..\\plugin-tools-panel"
+      "path": "../plugin-tools-panel/tsconfig.json"
     },
     {
-      "path": "..\\core-app"
+      "path": "../core-app/tsconfig.json"
     },
     {
-      "path": "..\\core-authentication"
+      "path": "../core-authentication/tsconfig.json"
     },
     {
-      "path": "..\\core-blocks"
+      "path": "../core-blocks/tsconfig.json"
     },
     {
-      "path": "..\\core-di"
+      "path": "../core-di/tsconfig.json"
     },
     {
-      "path": "..\\core-localization"
+      "path": "../core-localization/tsconfig.json"
     },
     {
-      "path": "..\\core-plugin"
+      "path": "../core-plugin/tsconfig.json"
     },
     {
-      "path": "..\\core-resource"
+      "path": "../core-resource/tsconfig.json"
     },
     {
-      "path": "..\\core-root"
+      "path": "../core-root/tsconfig.json"
     },
     {
-      "path": "..\\core-sdk"
+      "path": "../core-sdk/tsconfig.json"
     },
     {
-      "path": "..\\core-utils"
+      "path": "../core-utils/tsconfig.json"
     },
     {
-      "path": "..\\core-view"
+      "path": "../core-view/tsconfig.json"
     },
     {
-      "path": "..\\tests-runner"
+      "path": "../tests-runner/tsconfig.json"
     }
   ],
   "include": [
@@ -54,8 +54,8 @@
     "src/**/*.scss"
   ],
   "exclude": [
+    "**/node_modules",
     "lib/**/*",
-    "dist/**/*",
-    "**/node_modules"
+    "dist/**/*"
   ]
 }

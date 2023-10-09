@@ -7,10 +7,10 @@
   },
   "references": [
     {
-      "path": "..\\core-di"
+      "path": "../core-di/tsconfig.json"
     },
     {
-      "path": "..\\core-version"
+      "path": "../core-version/tsconfig.json"
     }
   ],
   "include": [
@@ -21,8 +21,8 @@
     "src/**/*.scss"
   ],
   "exclude": [
+    "**/node_modules",
     "lib/**/*",
-    "dist/**/*",
-    "**/node_modules"
+    "dist/**/*"
   ]
 }
