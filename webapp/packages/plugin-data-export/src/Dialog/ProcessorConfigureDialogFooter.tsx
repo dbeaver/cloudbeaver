@@ -17,14 +17,11 @@ const styles = css`
     height: 100%;
     align-items: center;
     margin: auto;
+    gap: 24px;
   }
 
   fill {
     flex: 1;
-  }
-
-  Button:not(:first-child) {
-    margin-left: 24px;
   }
 `;
 

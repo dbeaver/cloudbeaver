@@ -7,19 +7,19 @@
   },
   "references": [
     {
-      "path": "../plugin-settings-menu"
+      "path": "../plugin-settings-menu/tsconfig.json"
     },
     {
-      "path": "../core-di"
+      "path": "../core-di/tsconfig.json"
     },
     {
-      "path": "../core-localization"
+      "path": "../core-localization/tsconfig.json"
     },
     {
-      "path": "../core-root"
+      "path": "../core-root/tsconfig.json"
     },
     {
-      "path": "../core-view"
+      "path": "../core-view/tsconfig.json"
     }
   ],
   "include": [
@@ -30,8 +30,8 @@
     "src/**/*.scss"
   ],
   "exclude": [
+    "**/node_modules",
     "lib/**/*",
-    "dist/**/*",
-    "**/node_modules"
+    "dist/**/*"
   ]
 }

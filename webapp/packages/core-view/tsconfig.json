@@ -7,25 +7,25 @@
   },
   "references": [
     {
-      "path": "../core-blocks"
+      "path": "../core-blocks/tsconfig.json"
     },
     {
-      "path": "../core-data-context"
+      "path": "../core-data-context/tsconfig.json"
     },
     {
-      "path": "../core-di"
+      "path": "../core-di/tsconfig.json"
     },
     {
-      "path": "../core-extensions"
+      "path": "../core-extensions/tsconfig.json"
     },
     {
-      "path": "../core-localization"
+      "path": "../core-localization/tsconfig.json"
     },
     {
-      "path": "../core-theming"
+      "path": "../core-theming/tsconfig.json"
     },
     {
-      "path": "../core-utils"
+      "path": "../core-utils/tsconfig.json"
     }
   ],
   "include": [
@@ -36,8 +36,8 @@
     "src/**/*.scss"
   ],
   "exclude": [
+    "**/node_modules",
     "lib/**/*",
-    "dist/**/*",
-    "**/node_modules"
+    "dist/**/*"
   ]
 }

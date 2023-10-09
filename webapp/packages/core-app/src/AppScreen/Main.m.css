@@ -9,6 +9,7 @@
   composes: theme-background-surface theme-text-on-surface from global;
   display: flex;
   position: relative;
+  overflow: hidden;
 }
 .loader {
   height: 100%;
