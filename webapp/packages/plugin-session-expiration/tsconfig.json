@@ -7,9 +7,6 @@
   },
   "references": [
     {
-      "path": "../plugin-root/tsconfig.json"
-    },
-    {
       "path": "../core-authentication/tsconfig.json"
     },
     {
@@ -32,6 +29,9 @@
     },
     {
       "path": "../core-sdk/tsconfig.json"
+    },
+    {
+      "path": "../plugin-root/tsconfig.json"
     }
   ],
   "include": [

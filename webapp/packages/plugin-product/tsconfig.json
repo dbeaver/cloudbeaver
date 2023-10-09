@@ -7,12 +7,6 @@
   },
   "references": [
     {
-      "path": "../plugin-settings-menu/tsconfig.json"
-    },
-    {
-      "path": "../plugin-version/tsconfig.json"
-    },
-    {
       "path": "../core-blocks/tsconfig.json"
     },
     {
@@ -31,7 +25,13 @@
       "path": "../core-theming/tsconfig.json"
     },
     {
+      "path": "../core-version/tsconfig.json"
+    },
+    {
       "path": "../core-view/tsconfig.json"
+    },
+    {
+      "path": "../plugin-settings-menu/tsconfig.json"
     }
   ],
   "include": [

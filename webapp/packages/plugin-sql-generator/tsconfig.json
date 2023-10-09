@@ -7,18 +7,6 @@
   },
   "references": [
     {
-      "path": "../plugin-codemirror6/tsconfig.json"
-    },
-    {
-      "path": "../plugin-data-viewer/tsconfig.json"
-    },
-    {
-      "path": "../plugin-sql-editor/tsconfig.json"
-    },
-    {
-      "path": "../plugin-sql-editor-new/tsconfig.json"
-    },
-    {
       "path": "../core-blocks/tsconfig.json"
     },
     {
@@ -47,6 +35,18 @@
     },
     {
       "path": "../core-view/tsconfig.json"
+    },
+    {
+      "path": "../plugin-codemirror6/tsconfig.json"
+    },
+    {
+      "path": "../plugin-data-viewer/tsconfig.json"
+    },
+    {
+      "path": "../plugin-sql-editor/tsconfig.json"
+    },
+    {
+      "path": "../plugin-sql-editor-new/tsconfig.json"
     }
   ],
   "include": [

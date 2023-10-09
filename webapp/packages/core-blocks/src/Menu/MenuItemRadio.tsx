@@ -31,4 +31,4 @@ export const MenuItemRadio: ReakitProxyComponent<'button', Options> = observer<R
       </MenuItemRadio>
     );
   },
-);
+) as ReakitProxyComponent<'button', Options>;

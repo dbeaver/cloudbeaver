@@ -7,24 +7,6 @@
   },
   "references": [
     {
-      "path": "../plugin-navigation-tabs/tsconfig.json"
-    },
-    {
-      "path": "../plugin-navigation-tree-rm/tsconfig.json"
-    },
-    {
-      "path": "../plugin-resource-manager/tsconfig.json"
-    },
-    {
-      "path": "../plugin-resource-manager-scripts/tsconfig.json"
-    },
-    {
-      "path": "../plugin-sql-editor/tsconfig.json"
-    },
-    {
-      "path": "../plugin-sql-editor-navigation-tab/tsconfig.json"
-    },
-    {
       "path": "../core-blocks/tsconfig.json"
     },
     {
@@ -71,6 +53,24 @@
     },
     {
       "path": "../core-view/tsconfig.json"
+    },
+    {
+      "path": "../plugin-navigation-tabs/tsconfig.json"
+    },
+    {
+      "path": "../plugin-navigation-tree-rm/tsconfig.json"
+    },
+    {
+      "path": "../plugin-resource-manager/tsconfig.json"
+    },
+    {
+      "path": "../plugin-resource-manager-scripts/tsconfig.json"
+    },
+    {
+      "path": "../plugin-sql-editor/tsconfig.json"
+    },
+    {
+      "path": "../plugin-sql-editor-navigation-tab/tsconfig.json"
     }
   ],
   "include": [

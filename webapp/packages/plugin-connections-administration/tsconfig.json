@@ -7,9 +7,6 @@
   },
   "references": [
     {
-      "path": "../plugin-connections/tsconfig.json"
-    },
-    {
       "path": "../core-administration/tsconfig.json"
     },
     {
@@ -53,6 +50,9 @@
     },
     {
       "path": "../core-utils/tsconfig.json"
+    },
+    {
+      "path": "../plugin-connections/tsconfig.json"
     }
   ],
   "include": [

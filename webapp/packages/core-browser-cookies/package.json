@@ -10,24 +10,19 @@
   "license": "Apache-2.0",
   "main": "dist/index.js",
   "scripts": {
-    "build": "core-cli-build --mode=production --config ../core-cli/configs/webpack.plugin.config.js",
+    "build": "tsc -b",
     "lint": "eslint ./src/ --ext .ts,.tsx",
     "lint-fix": "eslint ./src/ --ext .ts,.tsx --fix",
-    "pretest": "tsc -b",
-    "test": "core-cli-test",
+    "test": "yarn build && core-cli-test",
     "validate-dependencies": "core-cli-validate-dependencies",
-    "update-ts-references": "rimraf --glob dist/* && typescript-resolve-references"
+    "update-ts-references": "rimraf --glob dist && typescript-resolve-references"
   },
   "dependencies": {
     "@cloudbeaver/core-browser-settings": "~0.1.0",
     "@cloudbeaver/core-di": "~0.1.0"
   },
-  "peerDependencies": {
-    "@testing-library/jest-dom": "~6.x.x",
-    "mobx": "~6.x.x",
-    "mobx-react-lite": "~3.x.x",
-    "react": "~18.x.x",
-    "react-dom": "~18.x.x"
-  },
-  "devDependencies": {}
+  "peerDependencies": {},
+  "devDependencies": {
+    "typescript": "^5.2.2"
+  }
 }

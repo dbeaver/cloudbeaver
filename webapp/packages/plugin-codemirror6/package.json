@@ -10,36 +10,39 @@
   "license": "Apache-2.0",
   "main": "dist/index.js",
   "scripts": {
-    "build": "core-cli-build --mode=production --config ../core-cli/configs/webpack.plugin.config.js",
+    "build": "tsc -b",
     "lint": "eslint ./src/ --ext .ts,.tsx",
     "lint-fix": "eslint ./src/ --ext .ts,.tsx --fix",
     "validate-dependencies": "core-cli-validate-dependencies",
-    "update-ts-references": "rimraf --glob dist/* && typescript-resolve-references"
+    "update-ts-references": "rimraf --glob dist && typescript-resolve-references"
   },
   "dependencies": {
+    "@cloudbeaver/core-blocks": "~0.1.0",
+    "@cloudbeaver/core-theming": "~0.1.0",
+    "@cloudbeaver/core-utils": "~0.1.0",
+    "@codemirror/autocomplete": "6.9.0",
+    "@codemirror/commands": "6.2.5",
     "@codemirror/lang-html": "6.4.6",
     "@codemirror/lang-javascript": "6.2.1",
     "@codemirror/lang-json": "6.0.1",
     "@codemirror/lang-sql": "6.5.4",
     "@codemirror/lang-xml": "6.0.2",
-    "@codemirror/merge": "6.1.2",
-    "@codemirror/commands": "6.2.5",
-    "@codemirror/autocomplete": "6.9.0",
-    "@codemirror/search": "6.5.2",
     "@codemirror/language": "6.9.0",
+    "@codemirror/merge": "6.1.2",
+    "@codemirror/search": "6.5.2",
     "@codemirror/state": "6.2.1",
     "@codemirror/view": "6.18.0",
-    "@cloudbeaver/core-blocks": "~0.1.0",
+    "@lezer/highlight": "^1.1.6",
+    "mobx-react-lite": "^4.0.5",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "reshadow": "~0.x.x"
+  },
+  "peerDependencies": {},
+  "devDependencies": {
     "@cloudbeaver/core-theming": "~0.1.0",
-    "@cloudbeaver/core-utils": "~0.1.0"
-  },
-  "peerDependencies": {
-    "react": "~18.x.x",
-    "react-dom": "~18.x.x",
-    "mobx": "~6.x.x",
-    "mobx-react-lite": "~3.x.x",
-    "reshadow": "~0.x.x",
-    "@testing-library/jest-dom": "~6.x.x"
-  },
-  "devDependencies": {}
+    "@types/react": "^18.2.25",
+    "typescript": "^5.2.2",
+    "typescript-plugin-css-modules": "^5.0.1"
+  }
 }
