@@ -215,4 +215,4 @@ export const InputField: InputFieldType = observer<ControlledProps | ObjectProps
       </div>,
     );
   }),
-);
+) as InputFieldType;
