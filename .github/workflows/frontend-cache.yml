@@ -64,10 +64,10 @@ jobs:
         uses: borales/actions-yarn@v4
         with:
           dir: webapp/packages/product-default
-          cmd: build
+          cmd: build # build tyescript source code
 
       - name: test
         uses: borales/actions-yarn@v4
         with:
           dir: webapp
-          cmd: lerna run test
+          cmd: lerna run test # build packages that have test script

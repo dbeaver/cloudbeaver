@@ -81,8 +81,8 @@ type ObjectProps<TKey extends keyof TState, TState> = BaseProps & {
 };
 
 interface InputFilesType {
-  (props: ControlledProps): React.ReactElement<any, any> | null;
-  <TKey extends keyof TState, TState>(props: ObjectProps<TKey, TState>): React.ReactElement<any, any> | null;
+  (props: ControlledProps): React.ReactNode;
+  <TKey extends keyof TState, TState>(props: ObjectProps<TKey, TState>): React.ReactNode;
 }
 
 export const InputFiles: InputFilesType = observer(

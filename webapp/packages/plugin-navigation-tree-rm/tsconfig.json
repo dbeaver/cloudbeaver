@@ -7,15 +7,6 @@
   },
   "references": [
     {
-      "path": "../plugin-navigation-tree/tsconfig.json"
-    },
-    {
-      "path": "../plugin-projects/tsconfig.json"
-    },
-    {
-      "path": "../plugin-resource-manager/tsconfig.json"
-    },
-    {
       "path": "../core-authentication/tsconfig.json"
     },
     {
@@ -59,6 +50,15 @@
     },
     {
       "path": "../core-view/tsconfig.json"
+    },
+    {
+      "path": "../plugin-navigation-tree/tsconfig.json"
+    },
+    {
+      "path": "../plugin-projects/tsconfig.json"
+    },
+    {
+      "path": "../plugin-resource-manager/tsconfig.json"
     }
   ],
   "include": [

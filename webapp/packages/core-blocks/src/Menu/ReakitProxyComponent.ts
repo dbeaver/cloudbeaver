@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import type { ReactElement } from 'react';
 import type { As, PropsWithAs } from 'reakit-utils/types';
 
 export type ReakitProxyPropsWithAs<O, T extends As> = Omit<PropsWithAs<O, T>, 'children'> & {
@@ -20,6 +19,6 @@ export type ReakitProxyComponent<T extends As, O> = {
       as: TT;
     },
     context?: any,
-  ): ReactElement<any, any> | null;
-  (props: ReakitProxyPropsWithAs<O, T>, context?: any): ReactElement<any, any> | null;
+  ): React.ReactNode;
+  (props: ReakitProxyPropsWithAs<O, T>, context?: any): React.ReactNode;
 };

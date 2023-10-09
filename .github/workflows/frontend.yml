@@ -71,7 +71,7 @@ jobs:
         uses: borales/actions-yarn@v4
         with:
           dir: webapp/packages/product-default
-          cmd: build
+          cmd: pack
 
       - name: test
         uses: borales/actions-yarn@v4

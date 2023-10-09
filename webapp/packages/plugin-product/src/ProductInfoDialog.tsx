@@ -27,7 +27,7 @@ import { useService } from '@cloudbeaver/core-di';
 import type { DialogComponentProps } from '@cloudbeaver/core-dialogs';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
 import { ThemeService } from '@cloudbeaver/core-theming';
-import { useAppVersion } from '@cloudbeaver/plugin-version';
+import { useAppVersion } from '@cloudbeaver/core-version';
 
 import ProductInfoDialogStyles from './ProductInfoDialog.m.css';
 

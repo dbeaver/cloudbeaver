@@ -39,7 +39,7 @@ interface Props<T> extends React.PropsWithChildren {
 }
 
 interface ITableItemComponent {
-  <T>(props: Props<T>): React.ReactElement<any, any> | null;
+  <T>(props: Props<T>): React.ReactNode;
 }
 
 export const TableItem: ITableItemComponent = observer(function TableItem({

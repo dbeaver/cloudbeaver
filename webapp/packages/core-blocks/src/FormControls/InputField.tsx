@@ -66,8 +66,8 @@ type ObjectProps<TKey extends keyof TState, TState> = BaseProps & {
 };
 
 interface InputFieldType {
-  (props: ControlledProps): React.ReactElement<any, any> | null;
-  <TKey extends keyof TState, TState>(props: ObjectProps<TKey, TState>): React.ReactElement<any, any> | null;
+  (props: ControlledProps): React.ReactNode;
+  <TKey extends keyof TState, TState>(props: ObjectProps<TKey, TState>): React.ReactNode;
 }
 
 export const InputField: InputFieldType = observer(
@@ -202,7 +202,11 @@ export const InputField: InputFieldType = observer(
               <Icon name="copy" viewBox="0 0 32 32" className={styles.icon} />
             </div>
           )}
-          {icon && <div data-testid="icon-container" className={styles.customIconContainer}>{icon}</div>}
+          {icon && (
+            <div data-testid="icon-container" className={styles.customIconContainer}>
+              {icon}
+            </div>
+          )}
         </div>
         {(description || passwordType) && (
           <div data-testid="field-description" className={s(styles, { fieldDescription: true, valid: !error, invalid: error })}>

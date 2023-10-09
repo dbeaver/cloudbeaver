@@ -31,8 +31,8 @@ interface IBaseProps {
 }
 
 interface SwitchType {
-  (props: IBaseProps & ICheckboxControlledProps): React.ReactElement<any, any> | null;
-  <TKey extends string>(props: IBaseProps & ICheckboxObjectProps<TKey>): React.ReactElement<any, any> | null;
+  (props: IBaseProps & ICheckboxControlledProps): React.ReactNode;
+  <TKey extends string>(props: IBaseProps & ICheckboxObjectProps<TKey>): React.ReactNode;
 }
 
 export const Switch: SwitchType = observer(function Switch({

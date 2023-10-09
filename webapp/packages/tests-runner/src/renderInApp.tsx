@@ -5,7 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { render, RenderOptions } from '@testing-library/react';
+import { queries, Queries, render, RenderOptions, RenderResult } from '@testing-library/react';
 
 import { AppContext, IServiceInjector } from '@cloudbeaver/core-di';
 
@@ -17,6 +17,14 @@ function ApplicationWrapper(serviceInjector: IServiceInjector): React.FC<React.P
   };
 }
 
-export function renderInApp(ui: React.ReactElement, app: IApplication, options?: Omit<RenderOptions, 'wrapper' | 'queries'>) {
+export function renderInApp<
+  Q extends Queries = typeof queries,
+  Container extends Element | DocumentFragment = HTMLElement,
+  BaseElement extends Element | DocumentFragment = Container,
+>(
+  ui: React.ReactElement,
+  app: IApplication,
+  options?: Omit<RenderOptions<Q, Container, BaseElement>, 'queries' | 'wrapper'>,
+): RenderResult<Q, Container, BaseElement> {
   return render(ui, { wrapper: ApplicationWrapper(app.injector), ...options });
 }

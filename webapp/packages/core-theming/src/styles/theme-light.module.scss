@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-@import 'theme-light';
+@import './theme-light';
 
 @include theme-matcher;
 @include layout-grid;
