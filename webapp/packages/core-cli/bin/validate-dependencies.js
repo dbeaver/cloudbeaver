@@ -23,6 +23,7 @@ const currentPackage = JSON.parse(fs.readFileSync(currentPackagePath, 'utf8'));
 // Keep track of the dependencies that were found in the source files
 const dependencies = new Set();
 const devDependencies = new Set();
+let isSuccess = true;
 
 const sourceFilesIterator = glob.globIterateSync('**/*.{ts,tsx,scss,css}', { cwd: currentPackageSrcPath });
 const importRegex = /(import|export) ((type |)([\w,\s]*?)(\{[\w\s\n,]*?\}|) from |)['"]((@[\w-]*\/[\w-]*)|([^\\.].*?))(\/.*)*['"]/g;
@@ -84,6 +85,8 @@ for (const sideEffect of sideEffects) {
   }
 }
 
+console.log('Analyzing dependencies...');
+
 const newDependencies = [...dependencies].sort(sortDependencies);
 
 logUnmetAndExtraDependencies('dependencies', newDependencies, currentPackage.dependencies);
@@ -107,6 +110,10 @@ currentPackage.devDependencies = [...devDependencies].sort(sortDependencies).red
   }),
   currentPackage.devDependencies,
 );
+
+if (isSuccess) {
+  console.log('All dependencies are valid');
+}
 
 // Write the updated `package.json`
 fs.writeFileSync(currentPackagePath, JSON.stringify(currentPackage, null, 2) + '\n', 'utf8');
@@ -152,9 +159,11 @@ function logUnmetAndExtraDependencies(key, newDependencies, current) {
 
   if (unmetDependencies.length > 0) {
     console.warn(`Unmet ${key} found:`, unmetDependencies);
+    isSuccess = false;
   }
 
   if (extraDependencies.length > 0) {
     console.warn(`Extra ${key} found:`, extraDependencies);
+    isSuccess = false;
   }
 }
