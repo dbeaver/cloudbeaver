@@ -11,7 +11,7 @@
   "main": "dist/index.js",
   "scripts": {
     "clean": "rimraf node_modules",
-    "build": "yarn run clean && tsc -b",
+    "build": "yarn run gql:gen && tsc -b",
     "gql:gen": "yarn run clean && graphql-codegen",
     "gql:gen:dev": "yarn run clean && graphql-codegen --watch",
     "lint": "eslint ./src/ --ext .ts,.tsx",

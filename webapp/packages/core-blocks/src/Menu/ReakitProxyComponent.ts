@@ -7,9 +7,7 @@
  */
 import type { As, PropsWithAs } from 'reakit-utils/types';
 
-export type ReakitProxyPropsWithAs<O, T extends As> = Omit<PropsWithAs<O, T>, 'children'> & {
-  children?: React.ReactNode;
-};
+export type ReakitProxyPropsWithAs<O, T extends As> = PropsWithAs<O, T>;
 
 export type ReakitProxyComponentOptions<T extends As, O> = ReakitProxyPropsWithAs<O, T>;
 

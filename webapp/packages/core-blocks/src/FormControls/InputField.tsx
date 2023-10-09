@@ -69,8 +69,8 @@ interface InputFieldType {
   <TKey extends keyof TState, TState>(props: ObjectProps<TKey, TState>): React.ReactElement<any, any> | null;
 }
 
-export const InputField: InputFieldType = observer(
-  forwardRef<HTMLInputElement>(function InputField(
+export const InputField: InputFieldType = observer<ControlledProps | ObjectProps<any, any>, HTMLInputElement>(
+  forwardRef(function InputField(
     {
       name,
       style,
@@ -93,7 +93,7 @@ export const InputField: InputFieldType = observer(
       onCustomCopy,
       icon,
       ...rest
-    }: ControlledProps | ObjectProps<any, any>,
+    },
     ref,
   ) {
     const inputRef = useRef<HTMLInputElement | null>(null);
