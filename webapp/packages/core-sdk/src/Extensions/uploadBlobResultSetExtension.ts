@@ -16,15 +16,8 @@ export interface IUploadDriverLibraryExtension {
 export function uploadBlobResultSetExtension(client: CustomGraphQLClient): IUploadDriverLibraryExtension {
   return {
     uploadBlobResultSet(fileId: string, data: Blob, onUploadProgress?: (event: UploadProgressEvent) => void): Promise<void> {
-      const ds = new DataTransfer();
-      if (data instanceof File) {
-        ds.items.add(data);
-      } else {
-        ds.items.add(new File([data], 'file'));
-      }
-
       // api/resultset/blob
-      return client.uploadFile(GlobalConstants.absoluteServiceUrl('resultset', 'blob'), ds.files, undefined, { fileId }, onUploadProgress);
+      return client.uploadFile(GlobalConstants.absoluteServiceUrl('resultset', 'blob'), data, undefined, { fileId }, onUploadProgress);
     },
   };
 }

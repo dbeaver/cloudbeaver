@@ -8,15 +8,8 @@
 import { injectable } from '@cloudbeaver/core-di';
 import { ExecutorInterrupter } from '@cloudbeaver/core-executor';
 import { ProjectsService } from '@cloudbeaver/core-projects';
-import {
-  CachedMapAllKey,
-  CachedMapResource,
-  GraphQLService,
-  ResourceKey,
-  resourceKeyList,
-  ResourceKeyUtils,
-  SqlDialectInfo,
-} from '@cloudbeaver/core-sdk';
+import { CachedMapAllKey, CachedMapResource, type ResourceKey, resourceKeyList, ResourceKeyUtils } from '@cloudbeaver/core-resource';
+import { GraphQLService, SqlDialectInfo } from '@cloudbeaver/core-sdk';
 
 import type { IConnectionExecutionContextInfo } from './ConnectionExecutionContext/ConnectionExecutionContextResource';
 import {
@@ -38,14 +31,14 @@ export class ConnectionDialectResource extends CachedMapResource<IConnectionInfo
   ) {
     super();
     this.sync(connectionInfoResource);
-    this.addAlias(ConnectionInfoProjectKey, param =>
+    this.aliases.add(ConnectionInfoProjectKey, param =>
       resourceKeyList(connectionInfoResource.keys.filter(key => param.options.projectIds.includes(key.projectId))),
     );
 
-    this.addAlias(ConnectionInfoActiveProjectKey, () =>
+    this.aliases.add(ConnectionInfoActiveProjectKey, () =>
       resourceKeyList(connectionInfoResource.keys.filter(key => projectsService.activeProjects.some(({ id }) => id === key.projectId))),
     );
-    this.replaceAlias(CachedMapAllKey, () => resourceKeyList(connectionInfoResource.keys));
+    this.aliases.replace(CachedMapAllKey, () => resourceKeyList(connectionInfoResource.keys));
     this.before(ExecutorInterrupter.interrupter(key => !connectionInfoResource.isConnected(key)));
   }
 
@@ -64,7 +57,7 @@ export class ConnectionDialectResource extends CachedMapResource<IConnectionInfo
     includes: string[],
   ): Promise<Map<IConnectionInfoParams, ConnectionDialect>> {
     const dialects: ConnectionDialect[] = [];
-    const keys = ResourceKeyUtils.toList(this.transformToKey(originalKey));
+    const keys = ResourceKeyUtils.toList(this.aliases.transformToKey(originalKey));
 
     for (const key of keys) {
       const { dialect } = await this.graphQLService.sdk.querySqlDialectInfo({

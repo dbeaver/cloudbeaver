@@ -24,7 +24,7 @@ import {
 import { Connection, ConnectionInfoProjectKey, ConnectionInfoResource, DBDriverResource, isCloudConnection } from '@cloudbeaver/core-connections';
 import type { TLocalizationToken } from '@cloudbeaver/core-localization';
 import { isGlobalProject, ProjectInfo, ProjectInfoResource } from '@cloudbeaver/core-projects';
-import { CachedMapAllKey } from '@cloudbeaver/core-sdk';
+import { CachedMapAllKey } from '@cloudbeaver/core-resource';
 import { TabContainerPanelComponent, useTab } from '@cloudbeaver/core-ui';
 
 import type { ITeamFormProps } from '../ITeamFormProps';

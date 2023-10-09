@@ -10,7 +10,8 @@ import { action, computed, makeObservable, observable } from 'mobx';
 import { ConnectionInfoResource, createConnectionParam, DatabaseConnection, IConnectionInfoParams } from '@cloudbeaver/core-connections';
 import { Executor, IExecutionContextProvider, IExecutor } from '@cloudbeaver/core-executor';
 import type { ProjectInfoResource, ProjectsService } from '@cloudbeaver/core-projects';
-import type { ConnectionConfig, ResourceKeySimple } from '@cloudbeaver/core-sdk';
+import type { ResourceKeySimple } from '@cloudbeaver/core-resource';
+import type { ConnectionConfig } from '@cloudbeaver/core-sdk';
 import { formStateContext, type IFormStateInfo } from '@cloudbeaver/core-ui';
 import { MetadataMap, uuid } from '@cloudbeaver/core-utils';
 

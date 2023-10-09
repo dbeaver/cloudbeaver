@@ -11,6 +11,7 @@ import styled, { css } from 'reshadow';
 import { ADMINISTRATION_TOOLS_PANEL_STYLES, AdministrationItemContentComponent, ConfigurationWizardService } from '@cloudbeaver/core-administration';
 import {
   ColoredContainer,
+  ConfirmationDialog,
   Container,
   Form,
   Group,
@@ -26,7 +27,7 @@ import {
   useTranslate,
 } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { CommonDialogService, ConfirmationDialog, DialogueStateResult } from '@cloudbeaver/core-dialogs';
+import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
 
 import { ServerConfigurationConfigurationForm } from './Form/ServerConfigurationConfigurationForm';

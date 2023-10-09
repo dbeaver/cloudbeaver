@@ -7,7 +7,8 @@
  */
 import { injectable } from '@cloudbeaver/core-di';
 import { NavNodeInfoResource } from '@cloudbeaver/core-navigation-tree';
-import { CachedMapResource, GraphQLService, isResourceAlias, ResourceKey, ResourceKeyUtils } from '@cloudbeaver/core-sdk';
+import { CachedMapResource, isResourceAlias, ResourceKey, ResourceKeyUtils } from '@cloudbeaver/core-resource';
+import { GraphQLService } from '@cloudbeaver/core-sdk';
 
 @injectable()
 export class DdlResource extends CachedMapResource<string, string> {

@@ -8,18 +8,16 @@
 import { computed, makeObservable, runInAction } from 'mobx';
 
 import { injectable } from '@cloudbeaver/core-di';
-import { ServerConfigResource } from '@cloudbeaver/core-root';
 import {
-  AuthProviderConfigurationInfoFragment,
-  AuthProviderInfoFragment,
   CachedMapAllKey,
   CachedMapResource,
-  GraphQLService,
-  ResourceKey,
+  type ResourceKey,
   resourceKeyList,
-  ResourceKeySimple,
+  type ResourceKeySimple,
   ResourceKeyUtils,
-} from '@cloudbeaver/core-sdk';
+} from '@cloudbeaver/core-resource';
+import { ServerConfigResource } from '@cloudbeaver/core-root';
+import { AuthProviderConfigurationInfoFragment, AuthProviderInfoFragment, GraphQLService } from '@cloudbeaver/core-sdk';
 
 import { AuthConfigurationsResource } from './AuthConfigurationsResource';
 import { AuthSettingsService } from './AuthSettingsService';
@@ -105,7 +103,7 @@ export class AuthProvidersResource extends CachedMapResource<string, AuthProvide
   }
 
   protected async loader(originalKey: ResourceKey<string>): Promise<Map<string, AuthProvider>> {
-    const all = this.isAlias(originalKey, CachedMapAllKey);
+    const all = this.aliases.isAlias(originalKey, CachedMapAllKey);
 
     const { providers } = await this.graphQLService.sdk.getAuthProviders();
 

@@ -12,7 +12,8 @@ import { AdministrationSettingsService } from '@cloudbeaver/core-administration'
 import { FormContext, GroupTitle, PlaceholderComponent, Switch, useResource, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { FeaturesResource } from '@cloudbeaver/core-root';
-import type { IConfigurationPlaceholderProps } from '@cloudbeaver/plugin-administration';
+
+import type { IConfigurationPlaceholderProps } from '../ServerConfigurationService';
 
 export const ServerConfigurationFeaturesForm: PlaceholderComponent<IConfigurationPlaceholderProps> = observer(
   function ServerConfigurationFeaturesForm({ state: { serverConfig }, configurationWizard }) {

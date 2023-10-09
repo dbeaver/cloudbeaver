@@ -23,7 +23,7 @@ import type { ObjectPropertyInfo } from '@cloudbeaver/core-sdk';
 import type { IConnectionAuthenticationConfig } from './IConnectionAuthenticationConfig';
 import { NetworkHandlers } from './NetworkHandlers';
 
-interface Props {
+export interface ConnectionAuthenticationFormProps {
   config: Partial<IConnectionAuthenticationConfig>;
   authModelId: string | null;
   authProperties?: ObjectPropertyInfo[];
@@ -35,7 +35,7 @@ interface Props {
   hideFeatures?: string[];
 }
 
-export const ConnectionAuthenticationForm = observer<Props>(function ConnectionAuthenticationForm({
+export const ConnectionAuthenticationForm = observer<ConnectionAuthenticationFormProps>(function ConnectionAuthenticationForm({
   config,
   networkHandlers,
   authProperties,

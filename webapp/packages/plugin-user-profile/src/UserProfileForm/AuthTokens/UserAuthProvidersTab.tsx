@@ -8,6 +8,7 @@
 import { observer } from 'mobx-react-lite';
 import styled from 'reshadow';
 
+import { useStyles, useTranslate } from '@cloudbeaver/core-blocks';
 import type { ComponentStyle } from '@cloudbeaver/core-theming';
 import { Tab, TabTitle } from '@cloudbeaver/core-ui';
 

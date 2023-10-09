@@ -7,7 +7,7 @@
  */
 import { injectable } from '@cloudbeaver/core-di';
 import { TaskScheduler } from '@cloudbeaver/core-executor';
-import { CachedMapAllKey, ResourceKeyUtils } from '@cloudbeaver/core-sdk';
+import { CachedMapAllKey, ResourceKeyUtils } from '@cloudbeaver/core-resource';
 import { MetadataMap } from '@cloudbeaver/core-utils';
 
 import type { IConnectionInfoParams } from '../IConnectionsResource';

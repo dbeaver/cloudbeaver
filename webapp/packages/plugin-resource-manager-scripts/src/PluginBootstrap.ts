@@ -6,8 +6,8 @@
  * you may not use this file except in compliance with the License.
  */
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
+import { getCachedDataResourceLoaderState } from '@cloudbeaver/core-resource';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
-import { getCachedDataResourceLoaderState } from '@cloudbeaver/core-sdk';
 import { SideBarPanelService } from '@cloudbeaver/core-ui';
 import { ActionService, DATA_CONTEXT_MENU, menuExtractItems, MenuService } from '@cloudbeaver/core-view';
 import { MENU_TOOLS } from '@cloudbeaver/plugin-tools-panel';

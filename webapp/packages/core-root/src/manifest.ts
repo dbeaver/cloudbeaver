@@ -30,7 +30,7 @@ import { SessionService } from './SessionService';
 import { SessionSettingsService } from './SessionSettingsService';
 import { WindowEventsService } from './WindowEventsService';
 
-export const manifest: PluginManifest = {
+export const coreRootManifest: PluginManifest = {
   info: {
     name: 'Core Root',
   },

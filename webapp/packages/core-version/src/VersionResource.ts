@@ -8,8 +8,8 @@
 import { computed, makeObservable, observable } from 'mobx';
 
 import { injectable } from '@cloudbeaver/core-di';
+import { CachedMapResource, resourceKeyList } from '@cloudbeaver/core-resource';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
-import { CachedMapResource, resourceKeyList } from '@cloudbeaver/core-sdk';
 
 export interface IVersion {
   number: string;

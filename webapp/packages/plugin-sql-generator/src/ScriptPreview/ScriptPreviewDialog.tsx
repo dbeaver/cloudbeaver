@@ -7,10 +7,22 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import { Button, Fill, s, useClipboard, useResource, useS, useTranslate } from '@cloudbeaver/core-blocks';
+import {
+  Button,
+  CommonDialogBody,
+  CommonDialogFooter,
+  CommonDialogHeader,
+  CommonDialogWrapper,
+  Fill,
+  s,
+  useClipboard,
+  useResource,
+  useS,
+  useTranslate,
+} from '@cloudbeaver/core-blocks';
 import { ConnectionDialectResource, ConnectionExecutionContextService, createConnectionParam } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
-import { CommonDialogBody, CommonDialogFooter, CommonDialogHeader, CommonDialogWrapper, DialogComponentProps } from '@cloudbeaver/core-dialogs';
+import type { DialogComponentProps } from '@cloudbeaver/core-dialogs';
 import { useCodemirrorExtensions } from '@cloudbeaver/plugin-codemirror6';
 import type { IDatabaseDataModel } from '@cloudbeaver/plugin-data-viewer';
 import { SQLCodeEditorLoader, useSqlDialectExtension } from '@cloudbeaver/plugin-sql-editor-new';

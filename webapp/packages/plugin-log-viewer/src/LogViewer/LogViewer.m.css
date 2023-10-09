@@ -1,0 +1,9 @@
+.logViewWrapper,
+.pane {
+  z-index: 0;
+  position: relative;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  overflow: hidden;
+}

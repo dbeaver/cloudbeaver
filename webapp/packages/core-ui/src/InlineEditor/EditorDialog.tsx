@@ -8,15 +8,17 @@
 import { observer } from 'mobx-react-lite';
 import { ChangeEvent, useCallback, useEffect, useRef, useState } from 'react';
 
-import { Button, s, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import {
+  Button,
   CommonDialogBody,
   CommonDialogFooter,
   CommonDialogHeader,
   CommonDialogWrapper,
-  DialogComponent,
-  DialogComponentProps,
-} from '@cloudbeaver/core-dialogs';
+  s,
+  useS,
+  useTranslate,
+} from '@cloudbeaver/core-blocks';
+import type { DialogComponent, DialogComponentProps } from '@cloudbeaver/core-dialogs';
 
 import style from './EditorDialog.m.css';
 

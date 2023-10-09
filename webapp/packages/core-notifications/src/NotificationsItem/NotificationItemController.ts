@@ -7,11 +7,10 @@
  */
 import { makeObservable, observable } from 'mobx';
 
+import { ErrorDetailsDialog } from '@cloudbeaver/core-blocks';
 import { IInitializableController, injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
 import { ENotificationType, INotification } from '@cloudbeaver/core-events';
-
-import { ErrorDetailsDialog } from './ErrorDetailsDialog/ErrorDetailsDialog';
 
 const FadeTimeout = 5000;
 

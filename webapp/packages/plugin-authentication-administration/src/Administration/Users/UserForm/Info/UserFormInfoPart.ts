@@ -9,8 +9,8 @@ import { observable } from 'mobx';
 
 import type { AdminUser, UsersResource } from '@cloudbeaver/core-authentication';
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
+import { getCachedDataResourceLoaderState } from '@cloudbeaver/core-resource';
 import type { ServerConfigResource } from '@cloudbeaver/core-root';
-import { getCachedDataResourceLoaderState } from '@cloudbeaver/core-sdk';
 import { FormMode, FormPart, formValidationContext, IFormState } from '@cloudbeaver/core-ui';
 import { isArraysEqual, isDefined, isObjectsEqual, isValuesEqual } from '@cloudbeaver/core-utils';
 import { DATA_CONTEXT_LOADABLE_STATE } from '@cloudbeaver/core-view';

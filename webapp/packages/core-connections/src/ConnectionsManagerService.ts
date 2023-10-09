@@ -7,9 +7,9 @@
  */
 import { computed, makeObservable } from 'mobx';
 
-import { ProcessSnackbar } from '@cloudbeaver/core-blocks';
+import { ConfirmationDialogDelete, ProcessSnackbar } from '@cloudbeaver/core-blocks';
 import { injectable } from '@cloudbeaver/core-di';
-import { CommonDialogService, ConfirmationDialogDelete, DialogueStateResult } from '@cloudbeaver/core-dialogs';
+import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { Executor, ExecutorInterrupter, IExecutor } from '@cloudbeaver/core-executor';
 import { ProjectInfo, projectInfoSortByName, ProjectsService } from '@cloudbeaver/core-projects';

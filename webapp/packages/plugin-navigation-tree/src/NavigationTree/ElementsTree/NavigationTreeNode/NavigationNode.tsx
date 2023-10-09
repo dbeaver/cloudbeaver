@@ -9,10 +9,10 @@ import { observer } from 'mobx-react-lite';
 import { useDeferredValue, useEffect } from 'react';
 
 import { getComputed, s, TreeNode, useMergeRefs, useS } from '@cloudbeaver/core-blocks';
+import { useDataContext } from '@cloudbeaver/core-data-context';
 import { useService } from '@cloudbeaver/core-di';
 import { DATA_CONTEXT_NAV_NODE, DATA_CONTEXT_NAV_NODES, NavNodeManagerService } from '@cloudbeaver/core-navigation-tree';
 import { useDNDData } from '@cloudbeaver/core-ui';
-import { useDataContext } from '@cloudbeaver/core-view';
 
 import { useNavTreeDropBox } from '../../useNavTreeDropBox';
 import type { NavigationNodeComponent } from '../NavigationNodeComponent';

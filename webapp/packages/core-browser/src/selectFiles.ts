@@ -15,6 +15,14 @@ export function selectFiles(callback: (files: FileList | null) => any): void {
     removed = true;
     input.remove();
   };
+  input.style.position = 'fixed';
+  input.style.top = '-100px';
+  input.style.left = '-100px';
+  input.style.opacity = '0';
+  input.style.pointerEvents = 'none';
+  input.style.zIndex = '-1';
+  document.body.append(input);
+
   input.click();
 
   setTimeout(() => {

@@ -8,12 +8,11 @@
 import { observer } from 'mobx-react-lite';
 import { forwardRef, ReactNode, useImperativeHandle } from 'react';
 import { Disclosure, DisclosureContent, DisclosureStateReturn, useDisclosureState } from 'reakit';
-import styled, { css, use } from 'reshadow';
-
-import type { ComponentStyle } from '@cloudbeaver/core-theming';
 
 import { IconOrImage } from '../IconOrImage';
-import { useStyles } from '../useStyles';
+import { s } from '../s';
+import { useS } from '../useS';
+import style from './Expandable.m.css';
 
 export type ExpandableState = Pick<DisclosureStateReturn, 'setVisible' | 'show' | 'hide' | 'toggle' | 'visible'>;
 
@@ -22,61 +21,27 @@ interface Props {
   children: ReactNode;
   defaultExpanded?: boolean;
   disabled?: boolean;
-  style?: ComponentStyle;
 }
 
-const styles = css`
-  Disclosure {
-    border: none;
-    padding: 0;
-    margin: 0;
-    background: transparent;
-    color: inherit;
-    font: inherit;
-    outline: none;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    max-width: max-content;
-  }
-  expand-icon {
-    display: flex;
-    box-sizing: border-box;
-    flex-shrink: 0;
-    opacity: 0.5;
-    width: 16px;
-    height: 16px;
-    transform: rotate(-90deg);
-    margin-right: 8px;
-
-    &[|expanded] {
-      transform: rotate(0deg);
-    }
-  }
-  IconOrImage {
-    width: 100%;
-    height: 100%;
-  }
-`;
-
 export const Expandable = observer<Props, ExpandableState>(
-  forwardRef(function Expandable({ label, defaultExpanded, disabled, children, style }, ref) {
+  forwardRef(function Expandable({ label, defaultExpanded, disabled, children }, ref) {
+    const styles = useS(style);
     const disclosure = useDisclosureState({ visible: defaultExpanded ?? false });
 
     useImperativeHandle(ref, () => disclosure);
 
-    return styled(useStyles(styles, style))(
+    return (
       <>
-        <Disclosure {...disclosure} disabled={disabled}>
-          <expand-icon {...use({ expanded: disclosure.visible })}>
-            <IconOrImage icon="arrow" />
-          </expand-icon>
-          <expand-label as="h2">{label}</expand-label>
+        <Disclosure className={s(styles, { disclosure: true })} {...disclosure} disabled={disabled}>
+          <div className={s(styles, { expandIcon: true, expanded: disclosure.visible })}>
+            <IconOrImage className={s(styles, { iconOrImage: true })} icon="arrow" />
+          </div>
+          <h2 className={s(styles, { expandLabel: true })}>{label}</h2>
         </Disclosure>
         <DisclosureContent {...disclosure}>
           <>{children}</>
         </DisclosureContent>
-      </>,
+      </>
     );
   }),
 );

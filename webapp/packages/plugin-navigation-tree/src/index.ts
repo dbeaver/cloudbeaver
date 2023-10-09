@@ -1,4 +1,4 @@
-import { navigationTreePlugin } from './manifest';
+export * from './manifest';
 
 export * from './NavigationTree/ElementsTree/ElementsTreeTools/NavigationTreeSettings/createElementsTreeSettings';
 export * from './NavigationTree/ElementsTree/ElementsTreeTools/NavigationTreeSettings/DATA_CONTEXT_NAV_TREE_ROOT';
@@ -46,6 +46,3 @@ export * from './NodesManager/useChildren';
 export * from './NodesManager/NodeLinkLoader';
 
 export * from './NavigationTreeSettingsService';
-
-export { navigationTreePlugin };
-export default navigationTreePlugin;
