@@ -164,7 +164,7 @@ public class CBPlatform extends BasePlatformImpl {
         new SessionStateJob(this)
             .scheduleMonitor();
 
-        new AbstractJob("delete temp folder") {
+        new AbstractJob("Delete temp folder") {
             @Override
             protected IStatus run(DBRProgressMonitor monitor) {
                 try {
