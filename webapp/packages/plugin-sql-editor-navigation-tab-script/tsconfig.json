@@ -7,70 +7,70 @@
   },
   "references": [
     {
-      "path": "..\\plugin-navigation-tabs"
+      "path": "../core-blocks/tsconfig.json"
     },
     {
-      "path": "..\\plugin-navigation-tree-rm"
+      "path": "../core-connections/tsconfig.json"
     },
     {
-      "path": "..\\plugin-resource-manager"
+      "path": "../core-di/tsconfig.json"
     },
     {
-      "path": "..\\plugin-resource-manager-scripts"
+      "path": "../core-dialogs/tsconfig.json"
     },
     {
-      "path": "..\\plugin-sql-editor"
+      "path": "../core-events/tsconfig.json"
     },
     {
-      "path": "..\\plugin-sql-editor-navigation-tab"
+      "path": "../core-executor/tsconfig.json"
     },
     {
-      "path": "..\\core-blocks"
+      "path": "../core-localization/tsconfig.json"
     },
     {
-      "path": "..\\core-connections"
+      "path": "../core-navigation-tree/tsconfig.json"
     },
     {
-      "path": "..\\core-di"
+      "path": "../core-plugin/tsconfig.json"
     },
     {
-      "path": "..\\core-dialogs"
+      "path": "../core-projects/tsconfig.json"
     },
     {
-      "path": "..\\core-events"
+      "path": "../core-resource/tsconfig.json"
     },
     {
-      "path": "..\\core-executor"
+      "path": "../core-resource-manager/tsconfig.json"
     },
     {
-      "path": "..\\core-localization"
+      "path": "../core-root/tsconfig.json"
     },
     {
-      "path": "..\\core-navigation-tree"
+      "path": "../core-settings/tsconfig.json"
     },
     {
-      "path": "..\\core-plugin"
+      "path": "../core-utils/tsconfig.json"
     },
     {
-      "path": "..\\core-projects"
+      "path": "../core-view/tsconfig.json"
     },
     {
-      "path": "..\\core-resource"
+      "path": "../plugin-navigation-tabs/tsconfig.json"
     },
     {
-      "path": "..\\core-resource-manager"
+      "path": "../plugin-navigation-tree-rm/tsconfig.json"
     },
     {
-      "path": "..\\core-root"
+      "path": "../plugin-resource-manager/tsconfig.json"
     },
     {
-      "path": "..\\core-settings"
+      "path": "../plugin-resource-manager-scripts/tsconfig.json"
     },
     {
-      "path": "..\\core-utils"
+      "path": "../plugin-sql-editor/tsconfig.json"
     },
     {
-      "path": "..\\core-view"
+      "path": "../plugin-sql-editor-navigation-tab/tsconfig.json"
     }
   ],
   "include": [
@@ -81,8 +81,8 @@
     "src/**/*.scss"
   ],
   "exclude": [
+    "**/node_modules",
     "lib/**/*",
-    "dist/**/*",
-    "**/node_modules"
+    "dist/**/*"
   ]
 }

@@ -10,16 +10,14 @@
   "license": "Apache-2.0",
   "main": "dist/index.js",
   "scripts": {
-    "build": "core-cli-build --mode=production --config ../core-cli/configs/webpack.plugin.config.js",
+    "build": "tsc -b",
     "lint": "eslint ./src/ --ext .ts,.tsx",
     "lint-fix": "eslint ./src/ --ext .ts,.tsx --fix",
-    "pretest": "tsc -b",
-    "test": "core-cli-test",
+    "test": "yarn build && core-cli-test",
     "validate-dependencies": "core-cli-validate-dependencies",
-    "update-ts-references": "rimraf --glob dist/* && typescript-resolve-references"
+    "update-ts-references": "rimraf --glob dist && typescript-resolve-references"
   },
   "dependencies": {
-    "@cloudbeaver/plugin-settings-menu": "~0.1.0",
     "@cloudbeaver/core-authentication": "~0.1.0",
     "@cloudbeaver/core-blocks": "~0.1.0",
     "@cloudbeaver/core-di": "~0.1.0",
@@ -27,12 +25,15 @@
     "@cloudbeaver/core-plugin": "~0.1.0",
     "@cloudbeaver/core-settings": "~0.1.0",
     "@cloudbeaver/core-ui": "~0.1.0",
-    "@cloudbeaver/core-view": "~0.1.0"
-  },
-  "peerDependencies": {
-    "mobx-react-lite": "~3.x.x",
-    "react": "~18.x.x",
+    "@cloudbeaver/core-view": "~0.1.0",
+    "@cloudbeaver/plugin-settings-menu": "~0.1.0",
+    "mobx-react-lite": "^4.0.5",
+    "react": "^18.2.0",
     "reshadow": "~0.x.x"
   },
-  "devDependencies": {}
+  "peerDependencies": {},
+  "devDependencies": {
+    "@types/react": "^18.2.25",
+    "typescript": "^5.2.2"
+  }
 }

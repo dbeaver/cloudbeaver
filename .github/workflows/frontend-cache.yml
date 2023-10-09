@@ -1,17 +1,13 @@
-name: frontend
+name: frontend-cache
 
 on:
-  # Triggers the workflow on push or pull request events but only for the "devel" branch
-  pull_request:
+  push:
     branches: ["devel"]
     paths:
-      - "webapp/**" # monitor for the frontend changes
+      - "webapp/**"
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
-
-  # Allows you to reuse workflows by referencing their YAML files
-  workflow_call:
 
 jobs:
   build_and_test:
@@ -71,10 +67,10 @@ jobs:
         uses: borales/actions-yarn@v4
         with:
           dir: webapp/packages/product-default
-          cmd: bundle
+          cmd: build # build tyescript source code
 
       - name: test
         uses: borales/actions-yarn@v4
         with:
           dir: webapp
-          cmd: lerna run test
+          cmd: lerna run test # build packages that have test script

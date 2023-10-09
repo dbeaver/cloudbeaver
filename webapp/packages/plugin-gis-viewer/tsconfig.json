@@ -7,22 +7,22 @@
   },
   "references": [
     {
-      "path": "..\\plugin-data-viewer"
+      "path": "../core-blocks/tsconfig.json"
     },
     {
-      "path": "..\\core-blocks"
+      "path": "../core-di/tsconfig.json"
     },
     {
-      "path": "..\\core-di"
+      "path": "../core-localization/tsconfig.json"
     },
     {
-      "path": "..\\core-localization"
+      "path": "../core-sdk/tsconfig.json"
     },
     {
-      "path": "..\\core-sdk"
+      "path": "../core-ui/tsconfig.json"
     },
     {
-      "path": "..\\core-ui"
+      "path": "../plugin-data-viewer/tsconfig.json"
     }
   ],
   "include": [
@@ -33,8 +33,8 @@
     "src/**/*.scss"
   ],
   "exclude": [
+    "**/node_modules",
     "lib/**/*",
-    "dist/**/*",
-    "**/node_modules"
+    "dist/**/*"
   ]
 }

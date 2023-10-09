@@ -1,9 +1,9 @@
 {
   "extends": "../../tsconfig.base.json",
   "exclude": [
+    "**/node_modules",
     "lib/**/*",
-    "dist/**/*",
-    "**/node_modules"
+    "dist/**/*"
   ],
   "compilerOptions": {
     "rootDir": "src",
@@ -12,43 +12,73 @@
   },
   "references": [
     {
-      "path": "..\\core-data-context"
+      "path": "../core-data-context/tsconfig.json"
     },
     {
-      "path": "..\\core-di"
+      "path": "../core-di/tsconfig.json"
     },
     {
-      "path": "..\\core-executor"
+      "path": "../core-executor/tsconfig.json"
     },
     {
-      "path": "..\\core-localization"
+      "path": "../core-localization/tsconfig.json"
     },
     {
-      "path": "..\\core-plugin"
+      "path": "../core-plugin/tsconfig.json"
     },
     {
-      "path": "..\\core-resource"
+      "path": "../core-resource/tsconfig.json"
     },
     {
-      "path": "..\\core-root"
+      "path": "../core-root/tsconfig.json"
     },
     {
-      "path": "..\\core-routing"
+      "path": "../core-routing/tsconfig.json"
     },
     {
-      "path": "..\\core-sdk"
+      "path": "../core-sdk/tsconfig.json"
     },
     {
-      "path": "..\\core-settings"
+      "path": "../core-settings/tsconfig.json"
     },
     {
-      "path": "..\\core-theming"
+      "path": "../core-theming/tsconfig.json"
     },
     {
-      "path": "..\\core-utils"
+      "path": "../core-utils/tsconfig.json"
     },
     {
-      "path": "..\\tests-runner"
+      "path": "../core-browser/tsconfig.json"
+    },
+    {
+      "path": "../core-events/tsconfig.json"
+    },
+    {
+      "path": "../core-localization/tsconfig.json"
+    },
+    {
+      "path": "../core-plugin/tsconfig.json"
+    },
+    {
+      "path": "../core-product/tsconfig.json"
+    },
+    {
+      "path": "../core-root/tsconfig.json"
+    },
+    {
+      "path": "../core-routing/tsconfig.json"
+    },
+    {
+      "path": "../core-sdk/tsconfig.json"
+    },
+    {
+      "path": "../core-settings/tsconfig.json"
+    },
+    {
+      "path": "../core-theming/tsconfig.json"
+    },
+    {
+      "path": "../tests-runner/tsconfig.json"
     }
   ],
   "include": [

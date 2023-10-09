@@ -7,43 +7,43 @@
   },
   "references": [
     {
-      "path": "..\\plugin-navigation-tree"
+      "path": "../core-app/tsconfig.json"
     },
     {
-      "path": "..\\plugin-sql-editor"
+      "path": "../core-blocks/tsconfig.json"
     },
     {
-      "path": "..\\plugin-top-app-bar"
+      "path": "../core-di/tsconfig.json"
     },
     {
-      "path": "..\\core-app"
+      "path": "../core-dialogs/tsconfig.json"
     },
     {
-      "path": "..\\core-blocks"
+      "path": "../core-events/tsconfig.json"
     },
     {
-      "path": "..\\core-di"
+      "path": "../core-localization/tsconfig.json"
     },
     {
-      "path": "..\\core-dialogs"
+      "path": "../core-routing/tsconfig.json"
     },
     {
-      "path": "..\\core-events"
+      "path": "../core-settings/tsconfig.json"
     },
     {
-      "path": "..\\core-localization"
+      "path": "../core-utils/tsconfig.json"
     },
     {
-      "path": "..\\core-routing"
+      "path": "../core-view/tsconfig.json"
     },
     {
-      "path": "..\\core-settings"
+      "path": "../plugin-navigation-tree/tsconfig.json"
     },
     {
-      "path": "..\\core-utils"
+      "path": "../plugin-sql-editor/tsconfig.json"
     },
     {
-      "path": "..\\core-view"
+      "path": "../plugin-top-app-bar/tsconfig.json"
     }
   ],
   "include": [
@@ -54,8 +54,8 @@
     "src/**/*.scss"
   ],
   "exclude": [
+    "**/node_modules",
     "lib/**/*",
-    "dist/**/*",
-    "**/node_modules"
+    "dist/**/*"
   ]
 }

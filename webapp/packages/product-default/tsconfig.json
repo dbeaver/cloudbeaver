@@ -7,169 +7,169 @@
   },
   "references": [
     {
-      "path": "..\\plugin-administration"
+      "path": "../core-blocks/tsconfig.json"
     },
     {
-      "path": "..\\plugin-authentication"
+      "path": "../core-bootstrap/tsconfig.json"
     },
     {
-      "path": "..\\plugin-authentication-administration"
+      "path": "../core-di/tsconfig.json"
     },
     {
-      "path": "..\\plugin-browser"
+      "path": "../core-product/tsconfig.json"
     },
     {
-      "path": "..\\plugin-connection-custom"
+      "path": "../core-version-update/tsconfig.json"
     },
     {
-      "path": "..\\plugin-connection-search"
+      "path": "../plugin-administration/tsconfig.json"
     },
     {
-      "path": "..\\plugin-connection-template"
+      "path": "../plugin-authentication/tsconfig.json"
     },
     {
-      "path": "..\\plugin-connections"
+      "path": "../plugin-authentication-administration/tsconfig.json"
     },
     {
-      "path": "..\\plugin-connections-administration"
+      "path": "../plugin-browser/tsconfig.json"
     },
     {
-      "path": "..\\plugin-data-export"
+      "path": "../plugin-connection-custom/tsconfig.json"
     },
     {
-      "path": "..\\plugin-data-spreadsheet-new"
+      "path": "../plugin-connection-search/tsconfig.json"
     },
     {
-      "path": "..\\plugin-data-viewer"
+      "path": "../plugin-connection-template/tsconfig.json"
     },
     {
-      "path": "..\\plugin-data-viewer-result-set-grouping"
+      "path": "../plugin-connections/tsconfig.json"
     },
     {
-      "path": "..\\plugin-datasource-context-switch"
+      "path": "../plugin-connections-administration/tsconfig.json"
     },
     {
-      "path": "..\\plugin-ddl-viewer"
+      "path": "../plugin-data-export/tsconfig.json"
     },
     {
-      "path": "..\\plugin-devtools"
+      "path": "../plugin-data-spreadsheet-new/tsconfig.json"
     },
     {
-      "path": "..\\plugin-gis-viewer"
+      "path": "../plugin-data-viewer/tsconfig.json"
     },
     {
-      "path": "..\\plugin-help"
+      "path": "../plugin-data-viewer-result-set-grouping/tsconfig.json"
     },
     {
-      "path": "..\\plugin-localization"
+      "path": "../plugin-datasource-context-switch/tsconfig.json"
     },
     {
-      "path": "..\\plugin-log-viewer"
+      "path": "../plugin-ddl-viewer/tsconfig.json"
     },
     {
-      "path": "..\\plugin-navigation-tabs"
+      "path": "../plugin-devtools/tsconfig.json"
     },
     {
-      "path": "..\\plugin-navigation-tree"
+      "path": "../plugin-gis-viewer/tsconfig.json"
     },
     {
-      "path": "..\\plugin-navigation-tree-filters"
+      "path": "../plugin-help/tsconfig.json"
     },
     {
-      "path": "..\\plugin-navigation-tree-rm"
+      "path": "../plugin-localization/tsconfig.json"
     },
     {
-      "path": "..\\plugin-object-viewer"
+      "path": "../plugin-log-viewer/tsconfig.json"
     },
     {
-      "path": "..\\plugin-product"
+      "path": "../plugin-navigation-tabs/tsconfig.json"
     },
     {
-      "path": "..\\plugin-projects"
+      "path": "../plugin-navigation-tree/tsconfig.json"
     },
     {
-      "path": "..\\plugin-resource-manager"
+      "path": "../plugin-navigation-tree-filters/tsconfig.json"
     },
     {
-      "path": "..\\plugin-resource-manager-administration"
+      "path": "../plugin-navigation-tree-rm/tsconfig.json"
     },
     {
-      "path": "..\\plugin-resource-manager-scripts"
+      "path": "../plugin-object-viewer/tsconfig.json"
     },
     {
-      "path": "..\\plugin-root"
+      "path": "../plugin-product/tsconfig.json"
     },
     {
-      "path": "..\\plugin-session-expiration"
+      "path": "../plugin-projects/tsconfig.json"
     },
     {
-      "path": "..\\plugin-settings-menu"
+      "path": "../plugin-resource-manager/tsconfig.json"
     },
     {
-      "path": "..\\plugin-settings-menu-administration"
+      "path": "../plugin-resource-manager-administration/tsconfig.json"
     },
     {
-      "path": "..\\plugin-settings-panel"
+      "path": "../plugin-resource-manager-scripts/tsconfig.json"
     },
     {
-      "path": "..\\plugin-sql-editor"
+      "path": "../plugin-root/tsconfig.json"
     },
     {
-      "path": "..\\plugin-sql-editor-navigation-tab"
+      "path": "../plugin-session-expiration/tsconfig.json"
     },
     {
-      "path": "..\\plugin-sql-editor-navigation-tab-script"
+      "path": "../plugin-settings-menu/tsconfig.json"
     },
     {
-      "path": "..\\plugin-sql-editor-new"
+      "path": "../plugin-settings-menu-administration/tsconfig.json"
     },
     {
-      "path": "..\\plugin-sql-editor-screen"
+      "path": "../plugin-settings-panel/tsconfig.json"
     },
     {
-      "path": "..\\plugin-sql-generator"
+      "path": "../plugin-sql-editor/tsconfig.json"
     },
     {
-      "path": "..\\plugin-theme"
+      "path": "../plugin-sql-editor-navigation-tab/tsconfig.json"
     },
     {
-      "path": "..\\plugin-tools-panel"
+      "path": "../plugin-sql-editor-navigation-tab-script/tsconfig.json"
     },
     {
-      "path": "..\\plugin-top-app-bar"
+      "path": "../plugin-sql-editor-new/tsconfig.json"
     },
     {
-      "path": "..\\plugin-top-app-bar-administration"
+      "path": "../plugin-sql-editor-screen/tsconfig.json"
     },
     {
-      "path": "..\\plugin-user-profile"
+      "path": "../plugin-sql-generator/tsconfig.json"
     },
     {
-      "path": "..\\plugin-user-profile-administration"
+      "path": "../plugin-sso/tsconfig.json"
     },
     {
-      "path": "..\\plugin-version"
+      "path": "../plugin-theme/tsconfig.json"
     },
     {
-      "path": "..\\plugin-version-update-administration"
+      "path": "../plugin-tools-panel/tsconfig.json"
     },
     {
-      "path": "..\\core-blocks"
+      "path": "../plugin-top-app-bar/tsconfig.json"
     },
     {
-      "path": "..\\core-bootstrap"
+      "path": "../plugin-top-app-bar-administration/tsconfig.json"
     },
     {
-      "path": "..\\core-di"
+      "path": "../plugin-user-profile/tsconfig.json"
     },
     {
-      "path": "..\\core-product"
+      "path": "../plugin-user-profile-administration/tsconfig.json"
     },
     {
-      "path": "..\\core-version-update"
+      "path": "../plugin-version/tsconfig.json"
     },
     {
-      "path": "..\\plugin-sso"
+      "path": "../plugin-version-update-administration/tsconfig.json"
     }
   ],
   "include": [
@@ -180,8 +180,8 @@
     "src/**/*.scss"
   ],
   "exclude": [
+    "**/node_modules",
     "lib/**/*",
-    "dist/**/*",
-    "**/node_modules"
+    "dist/**/*"
   ]
 }

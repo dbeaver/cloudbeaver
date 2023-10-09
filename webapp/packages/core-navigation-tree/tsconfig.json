@@ -7,46 +7,91 @@
   },
   "references": [
     {
-      "path": "..\\core-app"
+      "path": "../core-app/tsconfig.json"
     },
     {
-      "path": "..\\core-authentication"
+      "path": "../core-authentication/tsconfig.json"
     },
     {
-      "path": "..\\core-data-context"
+      "path": "../core-data-context/tsconfig.json"
     },
     {
-      "path": "..\\core-di"
+      "path": "../core-di/tsconfig.json"
     },
     {
-      "path": "..\\core-executor"
+      "path": "../core-executor/tsconfig.json"
     },
     {
-      "path": "..\\core-extensions"
+      "path": "../core-extensions/tsconfig.json"
     },
     {
-      "path": "..\\core-plugin"
+      "path": "../core-plugin/tsconfig.json"
     },
     {
-      "path": "..\\core-projects"
+      "path": "../core-projects/tsconfig.json"
     },
     {
-      "path": "..\\core-resource"
+      "path": "../core-resource/tsconfig.json"
     },
     {
-      "path": "..\\core-root"
+      "path": "../core-root/tsconfig.json"
     },
     {
-      "path": "..\\core-sdk"
+      "path": "../core-sdk/tsconfig.json"
     },
     {
-      "path": "..\\core-ui"
+      "path": "../core-ui/tsconfig.json"
     },
     {
-      "path": "..\\core-utils"
+      "path": "../core-utils/tsconfig.json"
     },
     {
-      "path": "..\\tests-runner"
+      "path": "../core-app/tsconfig.json"
+    },
+    {
+      "path": "../core-authentication/tsconfig.json"
+    },
+    {
+      "path": "../core-browser/tsconfig.json"
+    },
+    {
+      "path": "../core-events/tsconfig.json"
+    },
+    {
+      "path": "../core-localization/tsconfig.json"
+    },
+    {
+      "path": "../core-plugin/tsconfig.json"
+    },
+    {
+      "path": "../core-product/tsconfig.json"
+    },
+    {
+      "path": "../core-projects/tsconfig.json"
+    },
+    {
+      "path": "../core-root/tsconfig.json"
+    },
+    {
+      "path": "../core-routing/tsconfig.json"
+    },
+    {
+      "path": "../core-sdk/tsconfig.json"
+    },
+    {
+      "path": "../core-settings/tsconfig.json"
+    },
+    {
+      "path": "../core-theming/tsconfig.json"
+    },
+    {
+      "path": "../core-ui/tsconfig.json"
+    },
+    {
+      "path": "../core-view/tsconfig.json"
+    },
+    {
+      "path": "../tests-runner/tsconfig.json"
     }
   ],
   "include": [
@@ -57,8 +102,8 @@
     "src/**/*.scss"
   ],
   "exclude": [
+    "**/node_modules",
     "lib/**/*",
-    "dist/**/*",
-    "**/node_modules"
+    "dist/**/*"
   ]
 }

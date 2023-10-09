@@ -57,7 +57,7 @@ cd ..\cloudbeaver\webapp
 
 call yarn
 call yarn lerna bootstrap
-call yarn lerna run build --no-bail --stream --scope=@cloudbeaver/product-default &::-- -- --env source-map
+call yarn lerna run bundle --no-bail --stream --scope=@cloudbeaver/product-default &::-- -- --env source-map
 
 cd ..\deploy
 

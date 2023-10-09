@@ -7,58 +7,58 @@
   },
   "references": [
     {
-      "path": "..\\plugin-navigation-tree"
+      "path": "../core-authentication/tsconfig.json"
     },
     {
-      "path": "..\\plugin-projects"
+      "path": "../core-blocks/tsconfig.json"
     },
     {
-      "path": "..\\plugin-resource-manager"
+      "path": "../core-connections/tsconfig.json"
     },
     {
-      "path": "..\\core-authentication"
+      "path": "../core-data-context/tsconfig.json"
     },
     {
-      "path": "..\\core-blocks"
+      "path": "../core-di/tsconfig.json"
     },
     {
-      "path": "..\\core-connections"
+      "path": "../core-dialogs/tsconfig.json"
     },
     {
-      "path": "..\\core-data-context"
+      "path": "../core-events/tsconfig.json"
     },
     {
-      "path": "..\\core-di"
+      "path": "../core-executor/tsconfig.json"
     },
     {
-      "path": "..\\core-dialogs"
+      "path": "../core-localization/tsconfig.json"
     },
     {
-      "path": "..\\core-events"
+      "path": "../core-navigation-tree/tsconfig.json"
     },
     {
-      "path": "..\\core-executor"
+      "path": "../core-projects/tsconfig.json"
     },
     {
-      "path": "..\\core-localization"
+      "path": "../core-resource/tsconfig.json"
     },
     {
-      "path": "..\\core-navigation-tree"
+      "path": "../core-resource-manager/tsconfig.json"
     },
     {
-      "path": "..\\core-projects"
+      "path": "../core-utils/tsconfig.json"
     },
     {
-      "path": "..\\core-resource"
+      "path": "../core-view/tsconfig.json"
     },
     {
-      "path": "..\\core-resource-manager"
+      "path": "../plugin-navigation-tree/tsconfig.json"
     },
     {
-      "path": "..\\core-utils"
+      "path": "../plugin-projects/tsconfig.json"
     },
     {
-      "path": "..\\core-view"
+      "path": "../plugin-resource-manager/tsconfig.json"
     }
   ],
   "include": [
@@ -69,8 +69,8 @@
     "src/**/*.scss"
   ],
   "exclude": [
+    "**/node_modules",
     "lib/**/*",
-    "dist/**/*",
-    "**/node_modules"
+    "dist/**/*"
   ]
 }

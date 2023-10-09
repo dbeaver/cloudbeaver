@@ -7,40 +7,40 @@
   },
   "references": [
     {
-      "path": "..\\plugin-connections"
+      "path": "../core-blocks/tsconfig.json"
     },
     {
-      "path": "..\\core-blocks"
+      "path": "../core-connections/tsconfig.json"
     },
     {
-      "path": "..\\core-connections"
+      "path": "../core-di/tsconfig.json"
     },
     {
-      "path": "..\\core-di"
+      "path": "../core-dialogs/tsconfig.json"
     },
     {
-      "path": "..\\core-dialogs"
+      "path": "../core-events/tsconfig.json"
     },
     {
-      "path": "..\\core-events"
+      "path": "../core-localization/tsconfig.json"
     },
     {
-      "path": "..\\core-localization"
+      "path": "../core-plugin/tsconfig.json"
     },
     {
-      "path": "..\\core-plugin"
+      "path": "../core-projects/tsconfig.json"
     },
     {
-      "path": "..\\core-projects"
+      "path": "../core-resource/tsconfig.json"
     },
     {
-      "path": "..\\core-resource"
+      "path": "../core-utils/tsconfig.json"
     },
     {
-      "path": "..\\core-utils"
+      "path": "../core-view/tsconfig.json"
     },
     {
-      "path": "..\\core-view"
+      "path": "../plugin-connections/tsconfig.json"
     }
   ],
   "include": [
@@ -51,8 +51,8 @@
     "src/**/*.scss"
   ],
   "exclude": [
+    "**/node_modules",
     "lib/**/*",
-    "dist/**/*",
-    "**/node_modules"
+    "dist/**/*"
   ]
 }

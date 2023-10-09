@@ -7,40 +7,40 @@
   },
   "references": [
     {
-      "path": "..\\plugin-data-viewer"
+      "path": "../core-blocks/tsconfig.json"
     },
     {
-      "path": "..\\plugin-sql-editor"
+      "path": "../core-connections/tsconfig.json"
     },
     {
-      "path": "..\\core-blocks"
+      "path": "../core-data-context/tsconfig.json"
     },
     {
-      "path": "..\\core-connections"
+      "path": "../core-di/tsconfig.json"
     },
     {
-      "path": "..\\core-data-context"
+      "path": "../core-dialogs/tsconfig.json"
     },
     {
-      "path": "..\\core-di"
+      "path": "../core-localization/tsconfig.json"
     },
     {
-      "path": "..\\core-dialogs"
+      "path": "../core-sdk/tsconfig.json"
     },
     {
-      "path": "..\\core-localization"
+      "path": "../core-ui/tsconfig.json"
     },
     {
-      "path": "..\\core-sdk"
+      "path": "../core-utils/tsconfig.json"
     },
     {
-      "path": "..\\core-ui"
+      "path": "../core-view/tsconfig.json"
     },
     {
-      "path": "..\\core-utils"
+      "path": "../plugin-data-viewer/tsconfig.json"
     },
     {
-      "path": "..\\core-view"
+      "path": "../plugin-sql-editor/tsconfig.json"
     }
   ],
   "include": [
@@ -51,8 +51,8 @@
     "src/**/*.scss"
   ],
   "exclude": [
+    "**/node_modules",
     "lib/**/*",
-    "dist/**/*",
-    "**/node_modules"
+    "dist/**/*"
   ]
 }

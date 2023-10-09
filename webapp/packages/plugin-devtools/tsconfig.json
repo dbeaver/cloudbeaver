@@ -7,37 +7,37 @@
   },
   "references": [
     {
-      "path": "..\\plugin-settings-menu"
+      "path": "../core-authentication/tsconfig.json"
     },
     {
-      "path": "..\\plugin-user-profile"
+      "path": "../core-blocks/tsconfig.json"
     },
     {
-      "path": "..\\core-authentication"
+      "path": "../core-data-context/tsconfig.json"
     },
     {
-      "path": "..\\core-blocks"
+      "path": "../core-di/tsconfig.json"
     },
     {
-      "path": "..\\core-data-context"
+      "path": "../core-resource/tsconfig.json"
     },
     {
-      "path": "..\\core-di"
+      "path": "../core-root/tsconfig.json"
     },
     {
-      "path": "..\\core-resource"
+      "path": "../core-settings/tsconfig.json"
     },
     {
-      "path": "..\\core-root"
+      "path": "../core-ui/tsconfig.json"
     },
     {
-      "path": "..\\core-settings"
+      "path": "../core-view/tsconfig.json"
     },
     {
-      "path": "..\\core-ui"
+      "path": "../plugin-settings-menu/tsconfig.json"
     },
     {
-      "path": "..\\core-view"
+      "path": "../plugin-user-profile/tsconfig.json"
     }
   ],
   "include": [
@@ -48,8 +48,8 @@
     "src/**/*.scss"
   ],
   "exclude": [
+    "**/node_modules",
     "lib/**/*",
-    "dist/**/*",
-    "**/node_modules"
+    "dist/**/*"
   ]
 }

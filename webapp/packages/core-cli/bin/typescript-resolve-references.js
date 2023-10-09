@@ -5,7 +5,8 @@ require('./validate-dependencies');
 process.title = 'typescript-resolve-references';
 
 const fs = require('fs');
-const { resolve, relative, join } = require('path');
+const { resolve, join } = require('path');
+const upath = require('upath');
 const { getCloudBeaverDeps } = require('../utils/getCloudBeaverDeps');
 
 const tsConfigPath = resolve('tsconfig.json');
@@ -25,9 +26,12 @@ typescriptConfig.references = [];
 // typescriptRootConfig.references = typescriptRootConfig.references || [];
 
 for (const dependency of dependencies) {
-  const dependencyPath = resolve(require.resolve(join(dependency, 'src', 'index.ts'), { paths: nodeModules }), '../..');
+  if (!dependency.startsWith('@cloudbeaver')) {
+    continue;
+  }
+  const dependencyPath = resolve(require.resolve(join(dependency, 'src', 'index.ts'), { paths: nodeModules }), '../../tsconfig.json');
   typescriptConfig.references.push({
-    path: relative(currentDir, dependencyPath),
+    path: upath.relative(currentDir, dependencyPath),
   });
 
   // const relativePath = relative(tsRootPath, dependencyPath);

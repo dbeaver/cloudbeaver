@@ -7,64 +7,127 @@
   },
   "references": [
     {
-      "path": "..\\plugin-datasource-context-switch"
+      "path": "../core-app/tsconfig.json"
     },
     {
-      "path": "..\\core-app"
+      "path": "../core-authentication/tsconfig.json"
     },
     {
-      "path": "..\\core-authentication"
+      "path": "../core-blocks/tsconfig.json"
     },
     {
-      "path": "..\\core-blocks"
+      "path": "../core-connections/tsconfig.json"
     },
     {
-      "path": "..\\core-connections"
+      "path": "../core-data-context/tsconfig.json"
     },
     {
-      "path": "..\\core-data-context"
+      "path": "../core-di/tsconfig.json"
     },
     {
-      "path": "..\\core-di"
+      "path": "../core-dialogs/tsconfig.json"
     },
     {
-      "path": "..\\core-dialogs"
+      "path": "../core-events/tsconfig.json"
     },
     {
-      "path": "..\\core-events"
+      "path": "../core-executor/tsconfig.json"
     },
     {
-      "path": "..\\core-executor"
+      "path": "../core-localization/tsconfig.json"
     },
     {
-      "path": "..\\core-localization"
+      "path": "../core-navigation-tree/tsconfig.json"
     },
     {
-      "path": "..\\core-navigation-tree"
+      "path": "../core-plugin/tsconfig.json"
     },
     {
-      "path": "..\\core-plugin"
+      "path": "../core-projects/tsconfig.json"
     },
     {
-      "path": "..\\core-projects"
+      "path": "../core-resource/tsconfig.json"
     },
     {
-      "path": "..\\core-resource"
+      "path": "../core-theming/tsconfig.json"
     },
     {
-      "path": "..\\core-theming"
+      "path": "../core-ui/tsconfig.json"
     },
     {
-      "path": "..\\core-ui"
+      "path": "../core-utils/tsconfig.json"
     },
     {
-      "path": "..\\core-utils"
+      "path": "../core-view/tsconfig.json"
     },
     {
-      "path": "..\\core-view"
+      "path": "../plugin-datasource-context-switch/tsconfig.json"
     },
     {
-      "path": "..\\tests-runner"
+      "path": "../core-administration/tsconfig.json"
+    },
+    {
+      "path": "../core-app/tsconfig.json"
+    },
+    {
+      "path": "../core-authentication/tsconfig.json"
+    },
+    {
+      "path": "../core-browser/tsconfig.json"
+    },
+    {
+      "path": "../core-connections/tsconfig.json"
+    },
+    {
+      "path": "../core-dialogs/tsconfig.json"
+    },
+    {
+      "path": "../core-events/tsconfig.json"
+    },
+    {
+      "path": "../core-localization/tsconfig.json"
+    },
+    {
+      "path": "../core-navigation-tree/tsconfig.json"
+    },
+    {
+      "path": "../core-plugin/tsconfig.json"
+    },
+    {
+      "path": "../core-product/tsconfig.json"
+    },
+    {
+      "path": "../core-projects/tsconfig.json"
+    },
+    {
+      "path": "../core-root/tsconfig.json"
+    },
+    {
+      "path": "../core-routing/tsconfig.json"
+    },
+    {
+      "path": "../core-sdk/tsconfig.json"
+    },
+    {
+      "path": "../core-settings/tsconfig.json"
+    },
+    {
+      "path": "../core-theming/tsconfig.json"
+    },
+    {
+      "path": "../core-ui/tsconfig.json"
+    },
+    {
+      "path": "../core-view/tsconfig.json"
+    },
+    {
+      "path": "../plugin-datasource-context-switch/tsconfig.json"
+    },
+    {
+      "path": "../plugin-navigation-tabs/tsconfig.json"
+    },
+    {
+      "path": "../tests-runner/tsconfig.json"
     }
   ],
   "include": [
@@ -75,8 +138,8 @@
     "src/**/*.scss"
   ],
   "exclude": [
+    "**/node_modules",
     "lib/**/*",
-    "dist/**/*",
-    "**/node_modules"
+    "dist/**/*"
   ]
 }

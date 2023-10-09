@@ -4,142 +4,157 @@
 'use strict';
 process.title = 'core-filter-deps';
 
+const glob = require('glob');
 const fs = require('fs');
 const path = require('path');
 
 // Resolve current root
-const root = path.resolve('.');
+const currentPackageRoot = path.resolve('.');
 
 // Replace with the correct path to the `package.json` file
-const packageJsonPath = path.join(root, 'package.json');
+const currentPackagePath = path.join(currentPackageRoot, 'package.json');
 
 // Replace with the correct path to the `src` directory
-const srcDir = path.join(root, 'src');
+const currentPackageSrcPath = path.join(currentPackageRoot, 'src');
 
 // Read the contents of the `package.json` file
-const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
+const currentPackage = JSON.parse(fs.readFileSync(currentPackagePath, 'utf8'));
 
-// Keep track of the dependencies that were found in the .ts files
-const cloudbeaverDependencies = new Set();
-const cloudbeaverDevDependencies = new Set();
+// Keep track of the dependencies that were found in the source files
+const dependencies = new Set();
+const devDependencies = new Set();
 
-// A helper function that recursively processes a directory and its subdirectories
-function processDirectory(directory) {
-  // Iterate over all files in the directory
-  fs.readdirSync(directory).forEach(file => {
-    // Check if the file is a directory
-    const filePath = path.join(directory, file);
-    const fileStat = fs.statSync(filePath);
+const sourceFilesIterator = glob.globIterateSync('**/*.{ts,tsx,scss,css}', { cwd: currentPackageSrcPath });
+const importRegex = /(import|export) ((type |)([\w,\s]*?)(\{[\w\s\n,]*?\}|) from |)['"]((@[\w-]*\/[\w-]*)|([^\\.].*?))(\/.*)*['"]/g;
+const testFileRegex = /((__custom_mocks__|__tests__).*|\.test)\.tsx?$/i;
+const tsFileRegex = /\.ts$/i;
+const tsxFileRegex = /\.tsx$/i;
+const styleFileRegex = /\.s?css$/i;
+const cssModuleFileRegex = /\.(m|module)\.s?css$/i;
 
-    if (fileStat.isDirectory()) {
-      // If it is, recursively process the subdirectory
-      processDirectory(filePath);
+for (const file of sourceFilesIterator) {
+  const isCSSModuleFileRegex = cssModuleFileRegex.test(file);
+  const isTSFileRegex = tsFileRegex.test(file);
+  const isStyleFileRegex = styleFileRegex.test(file);
+  const isTSXFileRegex = tsxFileRegex.test(file);
+  const isTestFile = testFileRegex.test(file);
+
+  if (isTSFileRegex) {
+    devDependencies.add('typescript');
+  }
+
+  if (isCSSModuleFileRegex) {
+    devDependencies.add('typescript-plugin-css-modules');
+  }
+
+  if (isTestFile) {
+    devDependencies.add('@types/jest');
+  }
+
+  if (isTSXFileRegex) {
+    if (isTestFile) {
+      devDependencies.add('react');
     } else {
-      // Otherwise, check if the file is a .ts/.tsx file
-      const extensions = /(?<!\.test).tsx?$/i;
-      if (extensions.test(file)) {
-        // Read the contents of the file
-        const fileContent = fs.readFileSync(filePath, 'utf8');
-        const regex = /import\s+(type\s+|)(\{[^}]*\}|\w+)\s+from\s+['"]@cloudbeaver\/([^/'"]*)(\/[^'"]*)?['"]/g;
-
-        // Find all imports that start with `@cloudbeaver`
-        const matches = fileContent.match(regex);
-
-        // Add the found dependencies to the set
-        if (matches) {
-          matches.forEach(match => {
-            const dep = match.split('/')[1].replace(/['"]/g, '');
-            const fullDep = `@cloudbeaver/${dep}`;
-
-            cloudbeaverDependencies.add(fullDep);
-          });
-        }
-      } else if (/\.test.tsx?$/i.test(file)) {
-        //@cloudbeaver/tests-runner
-        // Read the contents of the file
-        const fileContent = fs.readFileSync(filePath, 'utf8');
-        const regex = /import\s+(type\s+|)(\{[^}]*\}|\w+)\s+from\s+['"]@cloudbeaver\/tests-runner(\/[^'"]*)?['"]/g;
-        const matches = fileContent.match(regex);
-        if (matches?.length) {
-          cloudbeaverDevDependencies.add('@cloudbeaver/tests-runner');
-        }
-      }
+      dependencies.add('react');
     }
-  });
+    devDependencies.add('@types/react');
+  }
+
+  const fileContent = fs.readFileSync(path.join(currentPackageSrcPath, file), 'utf8');
+  const matches = fileContent.matchAll(importRegex);
+  for (const match of matches) {
+    const dep = match[6];
+
+    if (isStyleFileRegex || isTestFile) {
+      devDependencies.add(dep);
+      continue;
+    }
+
+    dependencies.add(dep);
+  }
 }
 
-// Start processing the `src` directory
-processDirectory(srcDir);
-
-packageJson.sideEffects = packageJson.sideEffects || [];
+currentPackage.sideEffects = currentPackage.sideEffects || [];
 
 const sideEffects = ['src/**/*.css', 'src/**/*.scss', 'public/**/*'];
 
 for (const sideEffect of sideEffects) {
-  if (!packageJson.sideEffects.includes(sideEffect)) {
-    packageJson.sideEffects.push(sideEffect);
+  if (!currentPackage.sideEffects.includes(sideEffect)) {
+    currentPackage.sideEffects.push(sideEffect);
   }
 }
 
-packageJson.peerDependencies = packageJson.peerDependencies || {};
+const newDependencies = [...dependencies].sort(sortDependencies);
 
-const isProduct = /^@cloudbeaver\/product-.+$/.test(packageJson.name) || true;
+logUnmetAndExtraDependencies('dependencies', newDependencies, currentPackage.dependencies);
 
-const dependenciesToRemove = isProduct ? packageJson.peerDependencies : packageJson.dependencies;
-const dependenciesToAdd = isProduct ? packageJson.dependencies : packageJson.peerDependencies;
+currentPackage.dependencies = newDependencies.reduce(
+  (acc, dep) => ({
+    ...acc,
+    [dep]: getVersion(dep, acc?.[dep]),
+  }),
+  currentPackage.dependencies,
+);
 
-for (const dep in dependenciesToRemove) {
-  if (dep.includes('@cloudbeaver')) {
-    delete dependenciesToRemove[dep];
-  }
-}
+const newDevDependencies = [...devDependencies].sort(sortDependencies);
 
-// Iterate over the dependencies in the `package.json` file
-for (const dep in dependenciesToAdd) {
-  // If a dependency was not found in any of the .ts/.tsx files, delete it from the `package.json` file
-  // Make sure we are deleting only internal dependencies
-  if (dep.includes('@cloudbeaver') && !cloudbeaverDependencies.has(dep)) {
-    delete dependenciesToAdd[dep];
-  }
-}
+logUnmetAndExtraDependencies('dev dependencies', newDevDependencies, currentPackage.devDependencies);
 
-// Plugins first, core packages after
-const sortedDependencies = [...cloudbeaverDependencies.values()].sort((a, b) => {
-  const aPlugin = a.includes('plugin-');
-  const bPlugin = b.includes('plugin-');
-
-  if (aPlugin && bPlugin) {
-    return a.localeCompare(b);
-  }
-
-  if (aPlugin && !bPlugin) {
-    return -1;
-  }
-
-  if (!aPlugin && bPlugin) {
-    return 1;
-  }
-
-  return a.localeCompare(b);
-});
-
-// Add the dependencies that were found in the .ts/.tsx files to the `package.json` file
-sortedDependencies.forEach(dep => {
-  if (!dependenciesToAdd[dep]) {
-    dependenciesToAdd[dep] = '~0.1.0';
-  }
-});
-
-packageJson.devDependencies = packageJson.devDependencies || {};
-const devDependencies = packageJson.devDependencies;
-
-const sortedDevDependencies = [...cloudbeaverDevDependencies.values()].sort((a, b) => a.localeCompare(b));
-
-for (const dep of sortedDevDependencies) {
-  if (!devDependencies[dep]) {
-    devDependencies[dep] = '~0.1.0';
-  }
-}
+currentPackage.devDependencies = [...devDependencies].sort(sortDependencies).reduce(
+  (acc, dep) => ({
+    ...acc,
+    [dep]: getVersion(dep, acc?.[dep]),
+  }),
+  currentPackage.devDependencies,
+);
 
 // Write the updated `package.json`
-fs.writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2) + '\n', 'utf8');
+fs.writeFileSync(currentPackagePath, JSON.stringify(currentPackage, null, 2) + '\n', 'utf8');
+
+function getVersion(dependency, current) {
+  if (dependency.startsWith('@cloudbeaver')) {
+    return '~0.1.0';
+  }
+
+  if (current) {
+    return current;
+  }
+
+  try {
+    if (fs.existsSync(path.join(require.resolve(dependency), 'package.json')) === false) {
+      console.error(`Dependency ${dependency} not found`);
+      return '*';
+    }
+  } catch {
+    try {
+      if (fs.existsSync(path.join('@types', require.resolve(dependency), 'package.json')) === false) {
+        console.error(`Dependency ${dependency} not found`);
+        return '*';
+      } else {
+        return '^' + require(path.join('@types', require.resolve(dependency), 'package.json')).version;
+      }
+    } catch {
+      console.error(`Dependency ${dependency} not found`);
+      return '*';
+    }
+  }
+
+  return '^' + require(path.join(dependency, 'package.json')).version;
+}
+
+function sortDependencies(a, b) {
+  return a.localeCompare(b);
+}
+
+function logUnmetAndExtraDependencies(key, newDependencies, current) {
+  const unmetDependencies = newDependencies.filter(dep => !current?.[dep]);
+  const extraDependencies = Object.keys(current || {}).filter(dep => !newDependencies.includes(dep));
+
+  if (unmetDependencies.length > 0) {
+    console.warn(`Unmet ${key} found:`, unmetDependencies);
+  }
+
+  if (extraDependencies.length > 0) {
+    console.warn(`Extra ${key} found:`, extraDependencies);
+  }
+}
