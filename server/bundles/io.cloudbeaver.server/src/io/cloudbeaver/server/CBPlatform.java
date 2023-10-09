@@ -22,8 +22,10 @@ import io.cloudbeaver.server.jobs.SessionStateJob;
 import io.cloudbeaver.server.jobs.WebSessionMonitorJob;
 import io.cloudbeaver.service.session.WebSessionManager;
 import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Plugin;
+import org.eclipse.core.runtime.Status;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
@@ -39,6 +41,7 @@ import org.jkiss.dbeaver.model.impl.app.DefaultCertificateStorage;
 import org.jkiss.dbeaver.model.preferences.DBPPreferenceStore;
 import org.jkiss.dbeaver.model.qm.QMRegistry;
 import org.jkiss.dbeaver.model.qm.QMUtils;
+import org.jkiss.dbeaver.model.runtime.AbstractJob;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.runtime.VoidProgressMonitor;
 import org.jkiss.dbeaver.registry.BasePlatformImpl;
@@ -49,6 +52,7 @@ import org.jkiss.dbeaver.runtime.qm.QMLogFileWriter;
 import org.jkiss.dbeaver.runtime.qm.QMRegistryImpl;
 import org.jkiss.dbeaver.utils.ContentUtils;
 import org.jkiss.dbeaver.utils.GeneralUtils;
+import org.jkiss.utils.IOUtils;
 import org.osgi.framework.Bundle;
 
 import java.io.IOException;
@@ -67,6 +71,7 @@ public class CBPlatform extends BasePlatformImpl {
     public static final String PLUGIN_ID = "io.cloudbeaver.server"; //$NON-NLS-1$
 
     private static final Log log = Log.getLog(CBPlatform.class);
+    private static final String TEMP_FILE_FOLDER = "temp-sql-upload-files";
 
     public static final String WORK_DATA_FOLDER_NAME = ".work-data";
 
@@ -159,6 +164,17 @@ public class CBPlatform extends BasePlatformImpl {
         new SessionStateJob(this)
             .scheduleMonitor();
 
+        new AbstractJob("delete temp folder") {
+            @Override
+            protected IStatus run(DBRProgressMonitor monitor) {
+                try {
+                    IOUtils.deleteDirectory(getTempFolder(monitor, TEMP_FILE_FOLDER));
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+                return Status.OK_STATUS;
+            }
+        }.schedule();
         log.info("Web platform initialized (" + (System.currentTimeMillis() - startTime) + "ms)");
     }
 

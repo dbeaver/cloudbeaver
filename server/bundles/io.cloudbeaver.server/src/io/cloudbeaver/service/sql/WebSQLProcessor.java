@@ -43,7 +43,6 @@ import org.jkiss.dbeaver.model.impl.DefaultServerOutputReader;
 import org.jkiss.dbeaver.model.navigator.DBNDatabaseItem;
 import org.jkiss.dbeaver.model.navigator.DBNNode;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
-import org.jkiss.dbeaver.model.runtime.VoidProgressMonitor;
 import org.jkiss.dbeaver.model.sql.SQLQuery;
 import org.jkiss.dbeaver.model.sql.SQLSyntaxManager;
 import org.jkiss.dbeaver.model.sql.SQLUtils;
@@ -950,7 +949,7 @@ public class WebSQLProcessor implements WebSessionProvider {
             LinkedTreeMap<String, Object> variables = (LinkedTreeMap<String, Object>) cellRow;
             if (variables.get(FILE_ID) != null) {
                 Path path = CBPlatform.getInstance()
-                    .getTempFolder(new VoidProgressMonitor(), TEMP_FILE_FOLDER)
+                    .getTempFolder(webSession.getProgressMonitor(), TEMP_FILE_FOLDER)
                     .resolve(webSession.getSessionId())
                     .resolve(variables.get(FILE_ID).toString());
 

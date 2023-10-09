@@ -30,8 +30,6 @@ enum CBServerEventId {
     cb_object_permissions_updated,
     cb_subject_permissions_updated,
 
-    cb_temp_folder_deleted,
-
     cb_database_output_log_updated
 }
 

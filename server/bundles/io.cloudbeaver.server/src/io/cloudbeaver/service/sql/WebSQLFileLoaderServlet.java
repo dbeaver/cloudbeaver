@@ -28,7 +28,6 @@ import org.eclipse.jetty.server.Request;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.data.json.JSONUtils;
-import org.jkiss.dbeaver.model.runtime.VoidProgressMonitor;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
@@ -79,7 +78,7 @@ public class WebSQLFileLoaderServlet extends WebServiceServletBase {
         }
 
         Path tempFolder = CBPlatform.getInstance()
-                .getTempFolder(new VoidProgressMonitor(), TEMP_FILE_FOLDER)
+                .getTempFolder(session.getProgressMonitor(), TEMP_FILE_FOLDER)
                 .resolve(session.getSessionId());
 
         MultipartConfigElement multiPartConfig = new MultipartConfigElement(tempFolder.toString());
