@@ -30,7 +30,6 @@
     "@cloudbeaver/core-settings": "~0.1.0",
     "@cloudbeaver/core-theming": "~0.1.0",
     "@cloudbeaver/core-utils": "~0.1.0",
-    "@cloudbeaver/core-projects": "~0.1.0",
     "mobx": "^6.10.2"
   },
   "peerDependencies": {},
