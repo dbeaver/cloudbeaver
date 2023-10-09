@@ -49,13 +49,13 @@ export const RightArea = observer<Props>(function RightArea({ className }) {
       </SlideElement>
       <SlideElement>
         <Split {...splitState} sticky={30} split="horizontal" mode={toolsDisabled ? 'minimize' : splitState.mode} disable={toolsDisabled} keepRatio>
-          <Pane>
+          <Pane className={s(styles, { pane: true })}>
             <Loader className={s(styles, { loader: true })} suspense>
               <Placeholder container={appScreenService.rightAreaTop} />
             </Loader>
           </Pane>
           <ResizerControls />
-          <Pane basis="30%" main>
+          <Pane className={s(styles, { pane: true })} basis="30%" main>
             <Loader className={s(styles, { loader: true })} suspense>
               <Placeholder container={appScreenService.rightAreaBottom} />
             </Loader>

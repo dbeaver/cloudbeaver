@@ -26,7 +26,7 @@ typescriptConfig.references = [];
 // typescriptRootConfig.references = typescriptRootConfig.references || [];
 
 for (const dependency of dependencies) {
-  const dependencyPath = resolve(require.resolve(join(dependency, 'src', 'index.ts'), { paths: nodeModules }), '../..');
+  const dependencyPath = resolve(require.resolve(join(dependency, 'src', 'index.ts'), { paths: nodeModules }), '../../tsconfig.json');
   typescriptConfig.references.push({
     path: upath.relative(currentDir, dependencyPath),
   });
