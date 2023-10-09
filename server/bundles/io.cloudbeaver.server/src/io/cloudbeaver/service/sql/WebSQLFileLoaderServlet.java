@@ -92,7 +92,7 @@ public class WebSQLFileLoaderServlet extends WebServiceServletBase {
         if (fileId != null) {
             Path file = tempFolder.resolve(fileId);
             try {
-                Files.write(file, request.getPart("files[]").getInputStream().readAllBytes()); // "fileData"
+                Files.write(file, request.getPart("fileData").getInputStream().readAllBytes());
             } catch (ServletException e) {
                 log.error(e.getMessage());
                 throw new DBWebException(e.getMessage());
