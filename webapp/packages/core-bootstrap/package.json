@@ -10,11 +10,11 @@
   "license": "Apache-2.0",
   "main": "dist/index.js",
   "scripts": {
-    "build": "core-cli-build --mode=production --config ../core-cli/configs/webpack.plugin.config.js",
+    "build": "tsc -b",
     "lint": "eslint ./src/ --ext .ts,.tsx",
     "lint-fix": "eslint ./src/ --ext .ts,.tsx --fix",
     "validate-dependencies": "core-cli-validate-dependencies",
-    "update-ts-references": "rimraf --glob dist/* && typescript-resolve-references"
+    "update-ts-references": "rimraf --glob dist && typescript-resolve-references"
   },
   "dependencies": {
     "@cloudbeaver/core-administration": "~0.1.0",
@@ -44,14 +44,15 @@
     "@cloudbeaver/core-ui": "~0.1.0",
     "@cloudbeaver/core-version": "~0.1.0",
     "@cloudbeaver/core-version-update": "~0.1.0",
-    "@cloudbeaver/core-view": "~0.1.0"
-  },
-  "peerDependencies": {
-    "react": "~18.x.x",
-    "react-dom": "~18.x.x",
-    "mobx": "~6.x.x",
-    "mobx-react-lite": "~3.x.x",
+    "@cloudbeaver/core-view": "~0.1.0",
+    "mobx": "^6.10.2",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
     "reshadow": "~0.x.x"
   },
-  "devDependencies": {}
+  "peerDependencies": {},
+  "devDependencies": {
+    "@types/react": "^18.2.25",
+    "typescript": "^5.2.2"
+  }
 }
