@@ -7,18 +7,6 @@
   },
   "references": [
     {
-      "path": "../plugin-authentication/tsconfig.json"
-    },
-    {
-      "path": "../plugin-navigation-tree/tsconfig.json"
-    },
-    {
-      "path": "../plugin-projects/tsconfig.json"
-    },
-    {
-      "path": "../plugin-top-app-bar/tsconfig.json"
-    },
-    {
       "path": "../core-authentication/tsconfig.json"
     },
     {
@@ -74,6 +62,18 @@
     },
     {
       "path": "../core-view/tsconfig.json"
+    },
+    {
+      "path": "../plugin-authentication/tsconfig.json"
+    },
+    {
+      "path": "../plugin-navigation-tree/tsconfig.json"
+    },
+    {
+      "path": "../plugin-projects/tsconfig.json"
+    },
+    {
+      "path": "../plugin-top-app-bar/tsconfig.json"
     }
   ],
   "include": [

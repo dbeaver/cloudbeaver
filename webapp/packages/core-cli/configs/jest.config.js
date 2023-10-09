@@ -5,6 +5,8 @@ const path = require('path');
 module.exports = {
   testEnvironment: 'jsdom',
   rootDir: path.resolve('./dist'),
+  moduleFileExtensions: ['js', 'jsx', 'json'],
+  testMatch: ['**/?(*.)+(spec|test).js?(x)'],
   transformIgnorePatterns: [
     '\\.pnp\\.[^\\/]+$',
     'node_modules/(?!@ngrx|(?!deck.gl)|ng-dynamic)',

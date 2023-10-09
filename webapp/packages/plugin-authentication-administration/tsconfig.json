@@ -7,12 +7,6 @@
   },
   "references": [
     {
-      "path": "../plugin-administration/tsconfig.json"
-    },
-    {
-      "path": "../plugin-authentication/tsconfig.json"
-    },
-    {
       "path": "../core-administration/tsconfig.json"
     },
     {
@@ -62,6 +56,12 @@
     },
     {
       "path": "../core-view/tsconfig.json"
+    },
+    {
+      "path": "../plugin-administration/tsconfig.json"
+    },
+    {
+      "path": "../plugin-authentication/tsconfig.json"
     }
   ],
   "include": [

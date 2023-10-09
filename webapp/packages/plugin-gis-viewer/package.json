@@ -10,32 +10,34 @@
   "license": "Apache-2.0",
   "main": "dist/index.js",
   "scripts": {
-    "build": "core-cli-build --mode=production --config ../core-cli/configs/webpack.plugin.config.js",
+    "build": "tsc -b",
     "lint": "eslint ./src/ --ext .ts,.tsx",
     "lint-fix": "eslint ./src/ --ext .ts,.tsx --fix",
     "validate-dependencies": "core-cli-validate-dependencies",
-    "update-ts-references": "rimraf --glob dist/* && typescript-resolve-references"
+    "update-ts-references": "rimraf --glob dist && typescript-resolve-references"
   },
   "dependencies": {
-    "leaflet": "~1.9.4",
-    "react-leaflet": "~4.2.1",
-    "wellknown": "~0.5.0",
-    "@cloudbeaver/plugin-data-viewer": "~0.1.0",
     "@cloudbeaver/core-blocks": "~0.1.0",
     "@cloudbeaver/core-di": "~0.1.0",
     "@cloudbeaver/core-localization": "~0.1.0",
     "@cloudbeaver/core-sdk": "~0.1.0",
-    "@cloudbeaver/core-ui": "~0.1.0"
+    "@cloudbeaver/core-ui": "~0.1.0",
+    "@cloudbeaver/plugin-data-viewer": "~0.1.0",
+    "geojson": "^0.5.0",
+    "leaflet": "^1.9.4",
+    "mobx-react-lite": "^4.0.5",
+    "react": "^18.2.0",
+    "react-leaflet": "^4.2.1",
+    "reshadow": "~0.x.x",
+    "wellknown": "^0.5.0"
   },
-  "peerDependencies": {
-    "mobx": "~6.x.x",
-    "mobx-react-lite": "~3.x.x",
-    "react": "~18.x.x",
-    "reshadow": "~0.x.x"
-  },
+  "peerDependencies": {},
   "devDependencies": {
     "@types/leaflet": "^1.9.4",
+    "@types/react": "^18.2.25",
     "@types/react-leaflet": "~3.0.0",
-    "@types/wellknown": "~0.5.5"
+    "@types/wellknown": "~0.5.5",
+    "leaflet": "^1.9.4",
+    "typescript": "^5.2.2"
   }
 }

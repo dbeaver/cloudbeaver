@@ -13,7 +13,7 @@ export function mockGetActiveUser(
   req: GraphQLRequest<GetActiveUserQueryVariables>,
   res: ResponseComposition<GetActiveUserQuery>,
   ctx: GraphQLContext<GetActiveUserQuery>,
-) {
+): ReturnType<ResponseComposition<GetActiveUserQuery>> {
   return res(
     ctx.data({
       user: null as unknown as undefined,

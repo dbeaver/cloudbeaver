@@ -18,6 +18,9 @@
       "path": "../core-plugin/tsconfig.json"
     },
     {
+      "path": "../core-root/tsconfig.json"
+    },
+    {
       "path": "../tests-runner/tsconfig.json"
     }
   ],

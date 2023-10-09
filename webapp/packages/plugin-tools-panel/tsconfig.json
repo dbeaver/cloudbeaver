@@ -7,9 +7,6 @@
   },
   "references": [
     {
-      "path": "../plugin-top-app-bar/tsconfig.json"
-    },
-    {
       "path": "../core-app/tsconfig.json"
     },
     {
@@ -32,6 +29,9 @@
     },
     {
       "path": "../core-view/tsconfig.json"
+    },
+    {
+      "path": "../plugin-top-app-bar/tsconfig.json"
     }
   ],
   "include": [

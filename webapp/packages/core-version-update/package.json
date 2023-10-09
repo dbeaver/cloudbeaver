@@ -10,22 +10,22 @@
   "license": "Apache-2.0",
   "main": "dist/index.js",
   "scripts": {
-    "build": "core-cli-build --mode=production --config ../core-cli/configs/webpack.plugin.config.js",
+    "build": "tsc -b",
     "lint": "eslint ./src/ --ext .ts,.tsx",
     "lint-fix": "eslint ./src/ --ext .ts,.tsx --fix",
     "validate-dependencies": "core-cli-validate-dependencies",
-    "update-ts-references": "rimraf --glob dist/* && typescript-resolve-references"
+    "update-ts-references": "rimraf --glob dist && typescript-resolve-references"
   },
   "dependencies": {
-    "semver": "~7.5.4",
     "@cloudbeaver/core-di": "~0.1.0",
     "@cloudbeaver/core-localization": "~0.1.0",
-    "@cloudbeaver/core-version": "~0.1.0"
+    "@cloudbeaver/core-version": "~0.1.0",
+    "mobx": "^6.10.2",
+    "semver": "^7.5.4"
   },
-  "peerDependencies": {
-    "mobx": "~6.x.x"
-  },
+  "peerDependencies": {},
   "devDependencies": {
-    "@types/semver": "~7.5.1"
+    "@types/semver": "~7.5.1",
+    "typescript": "^5.2.2"
   }
 }
