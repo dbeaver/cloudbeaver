@@ -21,7 +21,6 @@ import { useTranslate } from '../localization/useTranslate';
 import { s } from '../s';
 import { useCombinedHandler } from '../useCombinedHandler';
 import { useCombinedRef } from '../useCombinedRef';
-import { useMergeRefs } from '../useMergeRefs';
 import { useS } from '../useS';
 import { useStateDelay } from '../useStateDelay';
 import { useStyles } from '../useStyles';
@@ -66,8 +65,8 @@ type ObjectProps<TKey extends keyof TState, TState> = BaseProps & {
 };
 
 interface InputFieldType {
-  (props: ControlledProps): React.ReactNode;
-  <TKey extends keyof TState, TState>(props: ObjectProps<TKey, TState>): React.ReactNode;
+  (props: ControlledProps): React.ReactElement<any, any> | null;
+  <TKey extends keyof TState, TState>(props: ObjectProps<TKey, TState>): React.ReactElement<any, any> | null;
 }
 
 export const InputField: InputFieldType = observer(

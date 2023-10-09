@@ -19,6 +19,6 @@ export type ReakitProxyComponent<T extends As, O> = {
       as: TT;
     },
     context?: any,
-  ): React.ReactNode;
-  (props: ReakitProxyPropsWithAs<O, T>, context?: any): React.ReactNode;
+  ): React.ReactElement<any, any> | null;
+  (props: ReakitProxyPropsWithAs<O, T>, context?: any): React.ReactElement<any, any> | null;
 };

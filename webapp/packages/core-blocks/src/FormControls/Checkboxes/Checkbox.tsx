@@ -51,8 +51,8 @@ export interface ICheckboxObjectProps<TKey extends string> extends CheckboxInput
 }
 
 export interface CheckboxType {
-  (props: CheckboxBaseProps & ICheckboxControlledProps): React.ReactNode;
-  <TKey extends string>(props: CheckboxBaseProps & ICheckboxObjectProps<TKey>): React.ReactNode;
+  (props: CheckboxBaseProps & ICheckboxControlledProps): React.ReactElement<any, any> | null;
+  <TKey extends string>(props: CheckboxBaseProps & ICheckboxObjectProps<TKey>): React.ReactElement<any, any> | null;
 }
 
 export const Checkbox: CheckboxType = observer(function Checkbox({
