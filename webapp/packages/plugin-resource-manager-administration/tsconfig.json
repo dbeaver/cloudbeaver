@@ -7,9 +7,6 @@
   },
   "references": [
     {
-      "path": "../plugin-administration/tsconfig.json"
-    },
-    {
       "path": "../core-blocks/tsconfig.json"
     },
     {
@@ -26,6 +23,9 @@
     },
     {
       "path": "../core-root/tsconfig.json"
+    },
+    {
+      "path": "../plugin-administration/tsconfig.json"
     }
   ],
   "include": [

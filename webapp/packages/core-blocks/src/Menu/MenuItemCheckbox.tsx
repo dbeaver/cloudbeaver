@@ -31,4 +31,4 @@ export const MenuItemCheckbox: ReakitProxyComponent<'button', Options> = observe
       </MenuItemCheckbox>
     );
   },
-);
+) as ReakitProxyComponent<'button', Options>;

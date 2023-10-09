@@ -7,12 +7,6 @@
   },
   "references": [
     {
-      "path": "../plugin-codemirror6/tsconfig.json"
-    },
-    {
-      "path": "../plugin-sql-editor/tsconfig.json"
-    },
-    {
       "path": "../core-blocks/tsconfig.json"
     },
     {
@@ -35,6 +29,12 @@
     },
     {
       "path": "../core-utils/tsconfig.json"
+    },
+    {
+      "path": "../plugin-codemirror6/tsconfig.json"
+    },
+    {
+      "path": "../plugin-sql-editor/tsconfig.json"
     }
   ],
   "include": [

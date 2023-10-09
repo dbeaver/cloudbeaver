@@ -57,7 +57,7 @@ cd ../cloudbeaver/webapp
 
 yarn
 yarn lerna run bootstrap
-yarn lerna run build --no-bail --stream --scope=@cloudbeaver/product-default #-- -- --env source-map
+yarn lerna run bundle --no-bail --stream --scope=@cloudbeaver/product-default #-- -- --env source-map
 if [[ "$?" -ne 0 ]] ; then
   echo 'Application build failed'; exit $rc
 fi

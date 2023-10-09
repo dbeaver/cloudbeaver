@@ -7,9 +7,6 @@
   },
   "references": [
     {
-      "path": "../plugin-data-viewer/tsconfig.json"
-    },
-    {
       "path": "../core-blocks/tsconfig.json"
     },
     {
@@ -23,6 +20,9 @@
     },
     {
       "path": "../core-ui/tsconfig.json"
+    },
+    {
+      "path": "../plugin-data-viewer/tsconfig.json"
     }
   ],
   "include": [

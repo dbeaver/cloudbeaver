@@ -6,10 +6,10 @@
  * you may not use this file except in compliance with the License.
  */
 
-@import "@cloudbeaver/core-theming/src/styles/theme-dark";
-@import "base-code-editor";
-@import "base-code-editor-autocompletion";
-@import "base-code-editor-tooltip";
+@import '@cloudbeaver/core-theming/src/styles/theme-dark';
+@import './base-code-editor';
+@import './base-code-editor-autocompletion';
+@import './base-code-editor-tooltip';
 
 $meta: #ff1717;
 $keyword: rgb(115, 158, 202);
@@ -25,7 +25,7 @@ $comment: rgb(102, 151, 104);
 $string: rgb(202, 197, 128);
 $string-2: #f50;
 $qualifier: #555;
-$builtin:#ab87ff;
+$builtin: #ab87ff;
 $bracket: #cc7;
 $tag: #170;
 $attribute: #00c;

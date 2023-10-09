@@ -10,11 +10,11 @@
   "license": "Apache-2.0",
   "main": "dist/index.js",
   "scripts": {
-    "build": "core-cli-build --mode=production --config ../core-cli/configs/webpack.plugin.config.js",
+    "build": "tsc -b",
     "lint": "eslint ./src/ --ext .ts,.tsx",
     "lint-fix": "eslint ./src/ --ext .ts,.tsx --fix",
     "validate-dependencies": "core-cli-validate-dependencies",
-    "update-ts-references": "rimraf --glob dist/* && typescript-resolve-references"
+    "update-ts-references": "rimraf --glob dist && typescript-resolve-references"
   },
   "dependencies": {
     "@cloudbeaver/core-administration": "~0.1.0",
@@ -26,10 +26,11 @@
     "@cloudbeaver/core-resource": "~0.1.0",
     "@cloudbeaver/core-root": "~0.1.0",
     "@cloudbeaver/core-sdk": "~0.1.0",
-    "@cloudbeaver/core-utils": "~0.1.0"
+    "@cloudbeaver/core-utils": "~0.1.0",
+    "mobx": "^6.10.2"
   },
-  "peerDependencies": {
-    "mobx": "~6.x.x"
-  },
-  "devDependencies": {}
+  "peerDependencies": {},
+  "devDependencies": {
+    "typescript": "^5.2.2"
+  }
 }

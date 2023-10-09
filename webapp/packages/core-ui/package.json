@@ -10,15 +10,13 @@
   "license": "Apache-2.0",
   "main": "dist/index.js",
   "scripts": {
-    "build": "core-cli-build --mode=production --config ../core-cli/configs/webpack.plugin.config.js",
+    "build": "tsc -b",
     "lint": "eslint ./src/ --ext .ts,.tsx",
     "lint-fix": "eslint ./src/ --ext .ts,.tsx --fix",
     "validate-dependencies": "core-cli-validate-dependencies",
-    "update-ts-references": "rimraf --glob dist/* && typescript-resolve-references"
+    "update-ts-references": "rimraf --glob dist && typescript-resolve-references"
   },
   "dependencies": {
-    "react-dnd": "~16.0.1",
-    "react-dnd-html5-backend": "~16.0.1",
     "@cloudbeaver/core-authentication": "~0.1.0",
     "@cloudbeaver/core-blocks": "~0.1.0",
     "@cloudbeaver/core-data-context": "~0.1.0",
@@ -30,13 +28,19 @@
     "@cloudbeaver/core-routing": "~0.1.0",
     "@cloudbeaver/core-theming": "~0.1.0",
     "@cloudbeaver/core-utils": "~0.1.0",
-    "@cloudbeaver/core-view": "~0.1.0"
+    "@cloudbeaver/core-view": "~0.1.0",
+    "mobx": "^6.10.2",
+    "mobx-react-lite": "^4.0.5",
+    "react": "^18.2.0",
+    "react-dnd": "^16.0.1",
+    "react-dnd-html5-backend": "^16.0.1",
+    "reakit": "~1.x.x",
+    "reshadow": "~0.x.x"
   },
-  "peerDependencies": {
-    "mobx": "~6.x.x",
-    "mobx-react-lite": "~3.x.x",
-    "reshadow": "~0.x.x",
-    "reakit": "~1.x.x"
-  },
-  "devDependencies": {}
+  "peerDependencies": {},
+  "devDependencies": {
+    "@types/react": "^18.2.25",
+    "typescript": "^5.2.2",
+    "typescript-plugin-css-modules": "^5.0.1"
+  }
 }

@@ -22,7 +22,7 @@ interface IMenuItemElementProps {
   displayLabel?: boolean;
   tooltip?: string;
   binding?: string;
-  icon?: string | React.ReactNode;
+  icon?: React.ReactNode;
   menu?: boolean;
   loading?: boolean;
   panelAvailable?: boolean;

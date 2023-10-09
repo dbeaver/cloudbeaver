@@ -28,6 +28,9 @@
     },
     {
       "path": "../core-utils/tsconfig.json"
+    },
+    {
+      "path": "../core-sdk/tsconfig.json"
     }
   ],
   "include": [

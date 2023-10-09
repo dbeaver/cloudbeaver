@@ -6,7 +6,8 @@
  * you may not use this file except in compliance with the License.
  */
 import { useService } from '@cloudbeaver/core-di';
-import { VersionService } from '@cloudbeaver/core-version';
+
+import { VersionService } from './VersionService';
 
 export function useAppVersion(short = false) {
   const versionService = useService(VersionService);

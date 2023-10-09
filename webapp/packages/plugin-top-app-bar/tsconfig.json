@@ -7,9 +7,6 @@
   },
   "references": [
     {
-      "path": "../plugin-version/tsconfig.json"
-    },
-    {
       "path": "../core-app/tsconfig.json"
     },
     {
@@ -29,6 +26,9 @@
     },
     {
       "path": "../core-ui/tsconfig.json"
+    },
+    {
+      "path": "../core-version/tsconfig.json"
     },
     {
       "path": "../core-view/tsconfig.json"

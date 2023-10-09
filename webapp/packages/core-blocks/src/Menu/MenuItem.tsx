@@ -48,4 +48,4 @@ export const MenuItem: ReakitProxyComponent<'button', MenuItemOptions> = observe
       </MenuItem>
     );
   },
-);
+) as ReakitProxyComponent<'button', MenuItemOptions>;
