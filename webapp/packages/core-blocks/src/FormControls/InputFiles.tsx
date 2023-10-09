@@ -219,4 +219,4 @@ export const InputFiles: InputFilesType = observer(
       </field>,
     );
   }),
-);
+) as InputFilesType;
