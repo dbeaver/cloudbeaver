@@ -34,24 +34,24 @@ module.exports = api => {
       setSpreadProperties: true,
     },
     presets: [
-      [
-        '@babel/preset-env',
-        {
-          modules: testMode ? undefined : false,
-          targets: {
-            node: 'current',
-            browsers: [
-              'defaults',
-              'not IE 11',
-              // "last 1 chrome version",
-              // "last 1 firefox version",
-              // "last 1 edge version",
-              // "last 1 safari version"
-            ],
-          },
-          exclude: ['transform-async-to-generator', 'transform-regenerator'],
-        },
-      ],
+      // [
+      //   '@babel/preset-env',
+      //   {
+      //     modules: testMode ? undefined : false,
+      //     targets: {
+      //       node: 'current',
+      //       browsers: [
+      //         'defaults',
+      //         'not IE 11',
+      //         // "last 1 chrome version",
+      //         // "last 1 firefox version",
+      //         // "last 1 edge version",
+      //         // "last 1 safari version"
+      //       ],
+      //     },
+      //     exclude: ['transform-async-to-generator', 'transform-regenerator'],
+      //   },
+      // ],
       // ['@babel/preset-typescript', { isTSX: true, allExtensions: true, onlyRemoveTypeImports: true }],
       [
         '@babel/preset-react',

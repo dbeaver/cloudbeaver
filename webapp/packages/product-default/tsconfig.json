@@ -7,6 +7,21 @@
   },
   "references": [
     {
+      "path": "../core-blocks/tsconfig.json"
+    },
+    {
+      "path": "../core-bootstrap/tsconfig.json"
+    },
+    {
+      "path": "../core-di/tsconfig.json"
+    },
+    {
+      "path": "../core-product/tsconfig.json"
+    },
+    {
+      "path": "../core-version-update/tsconfig.json"
+    },
+    {
       "path": "../plugin-administration/tsconfig.json"
     },
     {
@@ -130,6 +145,9 @@
       "path": "../plugin-sql-generator/tsconfig.json"
     },
     {
+      "path": "../plugin-sso/tsconfig.json"
+    },
+    {
       "path": "../plugin-theme/tsconfig.json"
     },
     {
@@ -152,24 +170,6 @@
     },
     {
       "path": "../plugin-version-update-administration/tsconfig.json"
-    },
-    {
-      "path": "../core-blocks/tsconfig.json"
-    },
-    {
-      "path": "../core-bootstrap/tsconfig.json"
-    },
-    {
-      "path": "../core-di/tsconfig.json"
-    },
-    {
-      "path": "../core-product/tsconfig.json"
-    },
-    {
-      "path": "../core-version-update/tsconfig.json"
-    },
-    {
-      "path": "../plugin-sso/tsconfig.json"
     }
   ],
   "include": [

@@ -7,12 +7,6 @@
   },
   "references": [
     {
-      "path": "../plugin-data-viewer/tsconfig.json"
-    },
-    {
-      "path": "../plugin-sql-editor/tsconfig.json"
-    },
-    {
       "path": "../core-blocks/tsconfig.json"
     },
     {
@@ -41,6 +35,12 @@
     },
     {
       "path": "../core-view/tsconfig.json"
+    },
+    {
+      "path": "../plugin-data-viewer/tsconfig.json"
+    },
+    {
+      "path": "../plugin-sql-editor/tsconfig.json"
     }
   ],
   "include": [

@@ -60,7 +60,7 @@ export function useTableColumnDnD(model: IDatabaseDataModel, resultIndex: number
   let side: TableColumnInsertPositionSide = null;
 
   if (columnKey && dndBox.state.isOver && dndBox.state.context) {
-    const dndColumnKey = dndBox.state.context.get(DATA_CONTEXT_DV_DDM_RS_COLUMN_KEY);
+    const dndColumnKey = dndBox.state.context.tryGet(DATA_CONTEXT_DV_DDM_RS_COLUMN_KEY);
 
     if (resultSetViewAction && dndColumnKey && resultSetViewAction.columnIndex(columnKey) > resultSetViewAction.columnIndex(dndColumnKey)) {
       side = 'right';

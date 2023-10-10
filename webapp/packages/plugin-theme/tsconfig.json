@@ -7,9 +7,6 @@
   },
   "references": [
     {
-      "path": "../plugin-settings-menu/tsconfig.json"
-    },
-    {
       "path": "../core-di/tsconfig.json"
     },
     {
@@ -17,6 +14,9 @@
     },
     {
       "path": "../core-view/tsconfig.json"
+    },
+    {
+      "path": "../plugin-settings-menu/tsconfig.json"
     }
   ],
   "include": [

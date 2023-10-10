@@ -21,7 +21,6 @@ import { useTranslate } from '../localization/useTranslate';
 import { s } from '../s';
 import { useCombinedHandler } from '../useCombinedHandler';
 import { useCombinedRef } from '../useCombinedRef';
-import { useMergeRefs } from '../useMergeRefs';
 import { useS } from '../useS';
 import { useStateDelay } from '../useStateDelay';
 import { useStyles } from '../useStyles';
@@ -70,8 +69,8 @@ interface InputFieldType {
   <TKey extends keyof TState, TState>(props: ObjectProps<TKey, TState>): React.ReactElement<any, any> | null;
 }
 
-export const InputField: InputFieldType = observer(
-  forwardRef<HTMLInputElement>(function InputField(
+export const InputField: InputFieldType = observer<ControlledProps | ObjectProps<any, any>, HTMLInputElement>(
+  forwardRef(function InputField(
     {
       name,
       style,
@@ -94,7 +93,7 @@ export const InputField: InputFieldType = observer(
       onCustomCopy,
       icon,
       ...rest
-    }: ControlledProps | ObjectProps<any, any>,
+    },
     ref,
   ) {
     const inputRef = useRef<HTMLInputElement | null>(null);
@@ -202,7 +201,11 @@ export const InputField: InputFieldType = observer(
               <Icon name="copy" viewBox="0 0 32 32" className={styles.icon} />
             </div>
           )}
-          {icon && <div data-testid="icon-container" className={styles.customIconContainer}>{icon}</div>}
+          {icon && (
+            <div data-testid="icon-container" className={styles.customIconContainer}>
+              {icon}
+            </div>
+          )}
         </div>
         {(description || passwordType) && (
           <div data-testid="field-description" className={s(styles, { fieldDescription: true, valid: !error, invalid: error })}>
@@ -212,4 +215,4 @@ export const InputField: InputFieldType = observer(
       </div>,
     );
   }),
-);
+) as InputFieldType;

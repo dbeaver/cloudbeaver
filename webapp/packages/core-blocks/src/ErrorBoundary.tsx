@@ -67,7 +67,7 @@ export class ErrorBoundary extends React.Component<React.PropsWithChildren<Props
     });
   }
 
-  render(): React.ReactNode {
+  render(): React.ReactElement<any, any> | null {
     const { root, inline, icon, children, className, onClose } = this.props;
 
     for (const errorData of this.state.exceptions) {
