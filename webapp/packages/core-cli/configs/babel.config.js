@@ -7,23 +7,9 @@
  */
 /* eslint-disable @typescript-eslint/no-var-requires */
 const testingAttributes = require('../dist/babel-plugins/TestingAttributes.js');
-const { warn } = console;
-
-// Prevents resolution warnings from babel-plugin-module-resolver
-// See https://github.com/tleunen/babel-plugin-module-resolver/issues/315
-// eslint-disable-next-line no-console
-console.warn = (...args) => {
-  for (const arg of args) {
-    if (arg.startsWith('Could not resolve') && /src/.test(arg)) {
-      return;
-    }
-  }
-  warn(...args);
-};
 
 module.exports = api => {
   const devMode = !api.env('production');
-  const testMode = api.env('test');
   api.cache.never();
 
   return {
@@ -34,25 +20,6 @@ module.exports = api => {
       setSpreadProperties: true,
     },
     presets: [
-      // [
-      //   '@babel/preset-env',
-      //   {
-      //     modules: testMode ? undefined : false,
-      //     targets: {
-      //       node: 'current',
-      //       browsers: [
-      //         'defaults',
-      //         'not IE 11',
-      //         // "last 1 chrome version",
-      //         // "last 1 firefox version",
-      //         // "last 1 edge version",
-      //         // "last 1 safari version"
-      //       ],
-      //     },
-      //     exclude: ['transform-async-to-generator', 'transform-regenerator'],
-      //   },
-      // ],
-      // ['@babel/preset-typescript', { isTSX: true, allExtensions: true, onlyRemoveTypeImports: true }],
       [
         '@babel/preset-react',
         {
@@ -61,26 +28,6 @@ module.exports = api => {
         },
       ],
     ],
-    plugins: [
-      // 'babel-plugin-transform-typescript-metadata',
-      // '@babel/plugin-syntax-dynamic-import',
-      // '@babel/plugin-proposal-nullish-coalescing-operator',
-      // '@babel/plugin-proposal-optional-chaining',
-      // ['@babel/plugin-proposal-decorators', { legacy: true }],
-      // ['@babel/plugin-proposal-class-properties'],
-      // ['@babel/plugin-proposal-object-rest-spread', { useBuiltIns: true }],
-      [testingAttributes, {}],
-      [require('@reshadow/babel'), {}],
-      // /*devMode &&*/ [
-      //   'babel-plugin-module-resolver',
-      //   {
-      //     alias: {
-      //       '^@cloudbeaver/([^/]*)$': '@cloudbeaver/\\1/lib',
-      //       '^@cloudbeaver/([^/]*)/(.*)$': '@cloudbeaver/\\1/\\2',
-      //     },
-      //   },
-      // ],
-      devMode && !testMode && require.resolve('react-refresh/babel'),
-    ].filter(Boolean),
+    plugins: [[testingAttributes, {}], [require('@reshadow/babel'), {}], devMode && require.resolve('react-refresh/babel')].filter(Boolean),
   };
 };
