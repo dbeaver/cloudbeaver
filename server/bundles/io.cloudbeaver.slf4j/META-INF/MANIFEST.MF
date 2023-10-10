@@ -5,7 +5,7 @@ Bundle-Name: CloudBeaver SLF4j Binding
 Bundle-SymbolicName: io.cloudbeaver.slf4j;singleton:=true
 Bundle-Version: 1.0.0.qualifier
 Bundle-Release-Date: 20231009
-Bundle-RequiredExecutionEnvironment: JavaSE-11
+Bundle-RequiredExecutionEnvironment: JavaSE-17
 Bundle-ActivationPolicy: lazy
 Bundle-ClassPath: .
 Fragment-Host: slf4j.api
