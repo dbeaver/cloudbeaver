@@ -112,6 +112,18 @@ public class WebServiceBindingRM extends WebServiceBindingBase<DBWServiceRM> {
                 env.getArgument("subjectId"),
                 new RMProjectPermissions(env.getArgument("permissions"))
             ))
+            .dataFetcher("rmAddProjectsPermissions", env -> getService(env).addProjectsPermissions(
+                getWebSession(env),
+                env.getArgument("projectIds"),
+                env.getArgument("subjectIds"),
+                env.getArgument("permissions")
+            ))
+            .dataFetcher("rmDeleteProjectsPermissions", env -> getService(env).addProjectsPermissions(
+                getWebSession(env),
+                env.getArgument("projectIds"),
+                env.getArgument("subjectIds"),
+                env.getArgument("permissions")
+            ))
         ;
     }
 }

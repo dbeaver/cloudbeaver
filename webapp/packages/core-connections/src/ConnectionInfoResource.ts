@@ -361,10 +361,18 @@ export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoPar
     return subjects;
   }
 
-  async setAccessSubjects(connectionKey: IConnectionInfoParams, subjects: string[]): Promise<void> {
-    await this.graphQLService.sdk.setConnectionAccess({
+  async addConnectionsAccess(connectionKey: IConnectionInfoParams, subjects: string[]): Promise<void> {
+    await this.graphQLService.sdk.addConnectionsAccess({
       projectId: connectionKey.projectId,
-      connectionId: connectionKey.connectionId,
+      connectionIds: [connectionKey.connectionId],
+      subjects,
+    });
+  }
+
+  async deleteConnectionsAccess(connectionKey: IConnectionInfoParams, subjects: string[]): Promise<void> {
+    await this.graphQLService.sdk.deleteConnectionsAccess({
+      projectId: connectionKey.projectId,
+      connectionIds: [connectionKey.connectionId],
       subjects,
     });
   }
