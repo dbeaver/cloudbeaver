@@ -47,8 +47,10 @@ import org.jkiss.dbeaver.model.auth.SMCredentialsProvider;
 import org.jkiss.dbeaver.model.data.json.JSONUtils;
 import org.jkiss.dbeaver.model.navigator.DBNBrowseSettings;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
-import org.jkiss.dbeaver.model.security.*;
-import org.jkiss.dbeaver.model.security.user.SMObjectPermissions;
+import org.jkiss.dbeaver.model.security.SMAdminController;
+import org.jkiss.dbeaver.model.security.SMAuthProviderCustomConfiguration;
+import org.jkiss.dbeaver.model.security.SMConstants;
+import org.jkiss.dbeaver.model.security.SMObjectType;
 import org.jkiss.dbeaver.model.websocket.event.WSEventController;
 import org.jkiss.dbeaver.model.websocket.event.WSServerConfigurationChangedEvent;
 import org.jkiss.dbeaver.registry.BaseApplicationImpl;
@@ -256,7 +258,8 @@ public abstract class CBApplication extends BaseWebApplication implements WebAut
         if (CommonUtils.isEmpty(localHostAddress)) {
             localHostAddress = System.getProperty(CBConstants.VAR_CB_LOCAL_HOST_ADDR);
         }
-        if (CommonUtils.isEmpty(localHostAddress) || "127.0.0.1".equals(localHostAddress) || "::0".equals(localHostAddress)) {
+        if (CommonUtils.isEmpty(localHostAddress) || "127.0.0.1".equals(localHostAddress) || "::0".equals(
+            localHostAddress)) {
             localHostAddress = "localhost";
         }
 
@@ -278,8 +281,10 @@ public abstract class CBApplication extends BaseWebApplication implements WebAut
         }
 
         log.debug(GeneralUtils.getProductName() + " " + GeneralUtils.getProductVersion() + " is starting"); //$NON-NLS-1$
-        log.debug("\tOS: " + System.getProperty(StandardConstants.ENV_OS_NAME) + " " + System.getProperty(StandardConstants.ENV_OS_VERSION) + " (" + System.getProperty(StandardConstants.ENV_OS_ARCH) + ")");
-        log.debug("\tJava version: " + System.getProperty(StandardConstants.ENV_JAVA_VERSION) + " by " + System.getProperty(StandardConstants.ENV_JAVA_VENDOR) + " (" + System.getProperty(StandardConstants.ENV_JAVA_ARCH) + "bit)");
+        log.debug("\tOS: " + System.getProperty(StandardConstants.ENV_OS_NAME) + " " + System.getProperty(
+            StandardConstants.ENV_OS_VERSION) + " (" + System.getProperty(StandardConstants.ENV_OS_ARCH) + ")");
+        log.debug("\tJava version: " + System.getProperty(StandardConstants.ENV_JAVA_VERSION) + " by " + System.getProperty(
+            StandardConstants.ENV_JAVA_VENDOR) + " (" + System.getProperty(StandardConstants.ENV_JAVA_ARCH) + "bit)");
         log.debug("\tInstall path: '" + SystemVariablesResolver.getInstallPath() + "'"); //$NON-NLS-1$ //$NON-NLS-2$
         log.debug("\tGlobal workspace: '" + instanceLoc.getURL() + "'"); //$NON-NLS-1$ //$NON-NLS-2$
         log.debug("\tMemory available " + (runtime.totalMemory() / (1024 * 1024)) + "Mb/" + (runtime.maxMemory() / (1024 * 1024)) + "Mb");
@@ -309,7 +314,8 @@ public abstract class CBApplication extends BaseWebApplication implements WebAut
         }
         {
             // Perform services initialization
-            for (DBWServiceInitializer wsi : WebServiceRegistry.getInstance().getWebServices(DBWServiceInitializer.class)) {
+            for (DBWServiceInitializer wsi : WebServiceRegistry.getInstance()
+                .getWebServices(DBWServiceInitializer.class)) {
                 try {
                     wsi.initializeService(this);
                 } catch (Exception e) {
@@ -379,7 +385,8 @@ public abstract class CBApplication extends BaseWebApplication implements WebAut
         String autoAdminName = System.getenv(CBConstants.VAR_AUTO_CB_ADMIN_NAME);
         String autoAdminPassword = System.getenv(CBConstants.VAR_AUTO_CB_ADMIN_PASSWORD);
 
-        if (CommonUtils.isEmpty(autoServerName) || CommonUtils.isEmpty(autoAdminName) || CommonUtils.isEmpty(autoAdminPassword)) {
+        if (CommonUtils.isEmpty(autoServerName) || CommonUtils.isEmpty(autoAdminName) || CommonUtils.isEmpty(
+            autoAdminPassword)) {
             // Try to load from auto config file
             if (configPath.exists()) {
                 File autoConfigFile = new File(configPath, CBConstants.AUTO_CONFIG_FILE_NAME);
@@ -393,13 +400,15 @@ public abstract class CBApplication extends BaseWebApplication implements WebAut
                         autoAdminName = autoProps.getProperty(CBConstants.VAR_AUTO_CB_ADMIN_NAME);
                         autoAdminPassword = autoProps.getProperty(CBConstants.VAR_AUTO_CB_ADMIN_PASSWORD);
                     } catch (IOException e) {
-                        log.error("Error loading auto configuration file '" + autoConfigFile.getAbsolutePath() + "'", e);
+                        log.error("Error loading auto configuration file '" + autoConfigFile.getAbsolutePath() + "'",
+                            e);
                     }
                 }
             }
         }
 
-        if (CommonUtils.isEmpty(autoServerName) || CommonUtils.isEmpty(autoAdminName) || CommonUtils.isEmpty(autoAdminPassword)) {
+        if (CommonUtils.isEmpty(autoServerName) || CommonUtils.isEmpty(autoAdminName) || CommonUtils.isEmpty(
+            autoAdminPassword)) {
             log.info("No auto configuration was found. Server must be configured manually");
             return;
         }
@@ -495,6 +504,7 @@ public abstract class CBApplication extends BaseWebApplication implements WebAut
     protected Path loadServerConfiguration() throws DBException {
         Path path = super.loadServerConfiguration();
 
+
         File runtimeConfigFile = getRuntimeAppConfigFile();
         if (runtimeConfigFile.exists()) {
             log.debug("Runtime configuration [" + runtimeConfigFile.getAbsolutePath() + "]");
@@ -514,7 +524,9 @@ public abstract class CBApplication extends BaseWebApplication implements WebAut
             parseConfiguration(configPath.toFile());
         }
         // Set default preferences
-        PrefUtils.setDefaultPreferenceValue(ModelPreferences.getPreferences(), ModelPreferences.UI_DRIVERS_HOME, getDriversLocation());
+        PrefUtils.setDefaultPreferenceValue(ModelPreferences.getPreferences(),
+            ModelPreferences.UI_DRIVERS_HOME,
+            getDriversLocation());
     }
 
     private void parseConfiguration(File configFile) throws DBException {
@@ -551,10 +563,14 @@ public abstract class CBApplication extends BaseWebApplication implements WebAut
             workspaceLocation = WebAppUtils.getRelativePath(
                 JSONUtils.getString(serverConfig, CBConstants.PARAM_WORKSPACE_LOCATION, workspaceLocation), homeFolder);
 
-            maxSessionIdleTime = JSONUtils.getLong(serverConfig, CBConstants.PARAM_SESSION_EXPIRE_PERIOD, maxSessionIdleTime);
+            maxSessionIdleTime = JSONUtils.getLong(serverConfig,
+                CBConstants.PARAM_SESSION_EXPIRE_PERIOD,
+                maxSessionIdleTime);
 
             develMode = JSONUtils.getBoolean(serverConfig, CBConstants.PARAM_DEVEL_MODE, develMode);
-            enableSecurityManager = JSONUtils.getBoolean(serverConfig, CBConstants.PARAM_SECURITY_MANAGER, enableSecurityManager);
+            enableSecurityManager = JSONUtils.getBoolean(serverConfig,
+                CBConstants.PARAM_SECURITY_MANAGER,
+                enableSecurityManager);
             //SM config
             gson.fromJson(
                 gson.toJsonTree(JSONUtils.getObject(serverConfig, CBConstants.PARAM_SM_CONFIGURATION)),
@@ -636,7 +652,8 @@ public abstract class CBApplication extends BaseWebApplication implements WebAut
 
     }
 
-    protected void readProductConfiguration(Map<String, Object> serverConfig, Gson gson, String homeFolder) throws DBException {
+    protected void readProductConfiguration(Map<String, Object> serverConfig, Gson gson, String homeFolder)
+        throws DBException {
         String productConfigPath = WebAppUtils.getRelativePath(
             JSONUtils.getString(
                 serverConfig,
@@ -652,7 +669,8 @@ public abstract class CBApplication extends BaseWebApplication implements WebAut
                 log.error("Product configuration file not found (" + productConfigFile.getAbsolutePath() + "'");
             } else {
                 log.debug("Load product configuration from '" + productConfigFile.getAbsolutePath() + "'");
-                try (Reader reader = new InputStreamReader(new FileInputStream(productConfigFile), StandardCharsets.UTF_8)) {
+                try (Reader reader = new InputStreamReader(new FileInputStream(productConfigFile),
+                    StandardCharsets.UTF_8)) {
                     productConfiguration.putAll(JSONUtils.parseMap(gson, reader));
                 } catch (Exception e) {
                     throw new DBException("Error reading product configuration", e);
@@ -673,11 +691,13 @@ public abstract class CBApplication extends BaseWebApplication implements WebAut
     }
 
     protected Map<String, Object> readConnectionsPermissionsConfiguration(Path parentPath) {
-        String permissionsConfigPath = WebAppUtils.getRelativePath(CBConstants.DEFAULT_DATASOURCE_PERMISSIONS_CONFIGURATION, parentPath);
+        String permissionsConfigPath = WebAppUtils.getRelativePath(CBConstants.DEFAULT_DATASOURCE_PERMISSIONS_CONFIGURATION,
+            parentPath);
         File permissionsConfigFile = new File(permissionsConfigPath);
         if (permissionsConfigFile.exists()) {
             log.debug("Load permissions configuration from '" + permissionsConfigFile.getAbsolutePath() + "'");
-            try (Reader reader = new InputStreamReader(new FileInputStream(permissionsConfigFile), StandardCharsets.UTF_8)) {
+            try (Reader reader = new InputStreamReader(new FileInputStream(permissionsConfigFile),
+                StandardCharsets.UTF_8)) {
                 return JSONUtils.parseMap(getGson(), reader);
             } catch (Exception e) {
                 log.error("Error reading permissions configuration", e);
@@ -841,7 +861,8 @@ public abstract class CBApplication extends BaseWebApplication implements WebAut
         configurationMode = CommonUtils.isEmpty(serverName);
 
         // Reloading configuration by services
-        for (DBWServiceServerConfigurator wsc : WebServiceRegistry.getInstance().getWebServices(DBWServiceServerConfigurator.class)) {
+        for (DBWServiceServerConfigurator wsc : WebServiceRegistry.getInstance()
+            .getWebServices(DBWServiceServerConfigurator.class)) {
             try {
                 wsc.reloadConfiguration(appConfig);
             } catch (Exception e) {
@@ -878,7 +899,9 @@ public abstract class CBApplication extends BaseWebApplication implements WebAut
             String anonymousTeamId = appConfig.getAnonymousUserTeam();
             var securityController = getSecurityController();
             for (DBPDataSourceContainer ds : WebServiceUtils.getGlobalDataSourceRegistry().getDataSources()) {
-                var datasourcePermissions = securityController.getObjectPermissions(anonymousTeamId, ds.getId(), SMObjectType.datasource);
+                var datasourcePermissions = securityController.getObjectPermissions(anonymousTeamId,
+                    ds.getId(),
+                    SMObjectType.datasource);
                 if (ArrayUtils.isEmpty(datasourcePermissions.getPermissions())) {
                     securityController.setObjectPermissions(
                         Set.of(ds.getId()),
@@ -897,7 +920,8 @@ public abstract class CBApplication extends BaseWebApplication implements WebAut
     private void grantPermissionsToConnections() {
         try {
             var globalRegistry = WebDataSourceUtils.getGlobalDataSourceRegistry();
-            var permissionsConfiguration = readConnectionsPermissionsConfiguration(globalRegistry.getProject().getMetadataFolder(false));
+            var permissionsConfiguration = readConnectionsPermissionsConfiguration(globalRegistry.getProject()
+                .getMetadataFolder(false));
             if (permissionsConfiguration == null) {
                 return;
             }
@@ -905,7 +929,8 @@ public abstract class CBApplication extends BaseWebApplication implements WebAut
                 var dataSourceId = entry.getKey();
                 var ds = globalRegistry.getDataSource(dataSourceId);
                 if (ds == null) {
-                    log.error("Connection " + dataSourceId + " is not found in project " + globalRegistry.getProject().getName());
+                    log.error("Connection " + dataSourceId + " is not found in project " + globalRegistry.getProject()
+                        .getName());
                 }
                 List<String> permissions = JSONUtils.getStringList(permissionsConfiguration, dataSourceId);
                 var securityController = getSecurityController();
@@ -971,7 +996,10 @@ public abstract class CBApplication extends BaseWebApplication implements WebAut
             var originServerConfig = getServerConfigProps(this.originalConfigurationProperties); // get server properties from original configuration file
             rootConfig.put("server", serverConfigProperties);
             if (!CommonUtils.isEmpty(newServerName)) {
-                copyConfigValue(originServerConfig, serverConfigProperties, CBConstants.PARAM_SERVER_NAME, newServerName);
+                copyConfigValue(originServerConfig,
+                    serverConfigProperties,
+                    CBConstants.PARAM_SERVER_NAME,
+                    newServerName);
             }
             if (!CommonUtils.isEmpty(newServerURL)) {
                 copyConfigValue(
@@ -979,10 +1007,14 @@ public abstract class CBApplication extends BaseWebApplication implements WebAut
             }
             if (sessionExpireTime > 0) {
                 copyConfigValue(
-                    originServerConfig, serverConfigProperties, CBConstants.PARAM_SESSION_EXPIRE_PERIOD, sessionExpireTime);
+                    originServerConfig,
+                    serverConfigProperties,
+                    CBConstants.PARAM_SESSION_EXPIRE_PERIOD,
+                    sessionExpireTime);
             }
             var databaseConfigProperties = new LinkedHashMap<String, Object>();
-            Map<String, Object> oldRuntimeDBConfig = JSONUtils.getObject(originServerConfig, CBConstants.PARAM_DB_CONFIGURATION);
+            Map<String, Object> oldRuntimeDBConfig = JSONUtils.getObject(originServerConfig,
+                CBConstants.PARAM_DB_CONFIGURATION);
             if (!CommonUtils.isEmpty(databaseConfiguration) && !isDistributed()) {
                 for (Map.Entry<String, Object> mp : databaseConfiguration.entrySet()) {
                     copyConfigValue(oldRuntimeDBConfig, databaseConfigProperties, mp.getKey(), mp.getValue());
@@ -998,23 +1030,41 @@ public abstract class CBApplication extends BaseWebApplication implements WebAut
             copyConfigValue(
                 oldAppConfig, appConfigProperties, "anonymousAccessEnabled", appConfig.isAnonymousAccessEnabled());
             copyConfigValue(
-                oldAppConfig, appConfigProperties, "supportsCustomConnections", appConfig.isSupportsCustomConnections());
+                oldAppConfig,
+                appConfigProperties,
+                "supportsCustomConnections",
+                appConfig.isSupportsCustomConnections());
             copyConfigValue(
-                oldAppConfig, appConfigProperties, "publicCredentialsSaveEnabled", appConfig.isPublicCredentialsSaveEnabled());
+                oldAppConfig,
+                appConfigProperties,
+                "publicCredentialsSaveEnabled",
+                appConfig.isPublicCredentialsSaveEnabled());
             copyConfigValue(
-                oldAppConfig, appConfigProperties, "adminCredentialsSaveEnabled", appConfig.isAdminCredentialsSaveEnabled());
+                oldAppConfig,
+                appConfigProperties,
+                "adminCredentialsSaveEnabled",
+                appConfig.isAdminCredentialsSaveEnabled());
             copyConfigValue(
                 oldAppConfig, appConfigProperties, "enableReverseProxyAuth", appConfig.isEnabledReverseProxyAuth());
             copyConfigValue(
                 oldAppConfig, appConfigProperties, "forwardProxy", appConfig.isEnabledForwardProxy());
             copyConfigValue(
-                oldAppConfig, appConfigProperties, "linkExternalCredentialsWithUser", appConfig.isLinkExternalCredentialsWithUser());
+                oldAppConfig,
+                appConfigProperties,
+                "linkExternalCredentialsWithUser",
+                appConfig.isLinkExternalCredentialsWithUser());
             copyConfigValue(
                 oldAppConfig, appConfigProperties, "redirectOnFederatedAuth", appConfig.isRedirectOnFederatedAuth());
             copyConfigValue(
-                oldAppConfig, appConfigProperties, CBConstants.PARAM_RESOURCE_MANAGER_ENABLED, appConfig.isResourceManagerEnabled());
+                oldAppConfig,
+                appConfigProperties,
+                CBConstants.PARAM_RESOURCE_MANAGER_ENABLED,
+                appConfig.isResourceManagerEnabled());
             copyConfigValue(
-                oldAppConfig, appConfigProperties, CBConstants.PARAM_SHOW_READ_ONLY_CONN_INFO, appConfig.isShowReadOnlyConnectionInfo());
+                oldAppConfig,
+                appConfigProperties,
+                CBConstants.PARAM_SHOW_READ_ONLY_CONN_INFO,
+                appConfig.isShowReadOnlyConnectionInfo());
             copyConfigValue(
                 oldAppConfig,
                 appConfigProperties,
@@ -1022,7 +1072,8 @@ public abstract class CBApplication extends BaseWebApplication implements WebAut
                 appConfig.isGrantConnectionsAccessToAnonymousTeam());
 
             Map<String, Object> resourceQuotas = new LinkedHashMap<>();
-            Map<String, Object> originResourceQuotas = JSONUtils.getObject(oldAppConfig, CBConstants.PARAM_RESOURCE_QUOTAS);
+            Map<String, Object> originResourceQuotas = JSONUtils.getObject(oldAppConfig,
+                CBConstants.PARAM_RESOURCE_QUOTAS);
             for (Map.Entry<String, Object> mp : appConfig.getResourceQuotas().entrySet()) {
                 copyConfigValue(originResourceQuotas, resourceQuotas, mp.getKey(), mp.getValue());
             }
@@ -1136,7 +1187,12 @@ public abstract class CBApplication extends BaseWebApplication implements WebAut
     }
 
     // gets info about patterns from original configuration file and saves it to runtime config
-    private void copyConfigValue(Map<String, Object> oldConfig, Map<String, Object> newConfig, String key, Object defaultValue) {
+    private void copyConfigValue(
+        Map<String, Object> oldConfig,
+        Map<String, Object> newConfig,
+        String key,
+        Object defaultValue
+    ) {
         Object value = oldConfig.get(key);
         if (value instanceof Map && defaultValue instanceof Map) {
             Map<String, Object> subValue = new LinkedHashMap<>();

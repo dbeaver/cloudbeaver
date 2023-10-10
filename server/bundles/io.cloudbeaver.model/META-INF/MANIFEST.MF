@@ -8,7 +8,7 @@ Bundle-Release-Date: 20231009
 Bundle-RequiredExecutionEnvironment: JavaSE-11
 Bundle-ActivationPolicy: lazy
 Bundle-ClassPath: .
-Require-Bundle:  org.jkiss.dbeaver.data.gis;visibility:=reexport,
+Require-Bundle: org.jkiss.dbeaver.data.gis;visibility:=reexport,
  org.jkiss.dbeaver.model;visibility:=reexport,
  org.jkiss.dbeaver.model.sm;visibility:=reexport,
  org.jkiss.dbeaver.model.event;visibility:=reexport,
@@ -18,7 +18,7 @@ Require-Bundle:  org.jkiss.dbeaver.data.gis;visibility:=reexport,
  org.jkiss.bundle.graphql.java;visibility:=reexport,
  org.jkiss.bundle.apache.dbcp,
  com.google.gson;visibility:=reexport,
- jakarta.servlet-api;visibility:=reexport
+ jakarta.servlet-api;bundle-version="[4.0.0,4.0.0]";visibility:=reexport
 Export-Package: io.cloudbeaver,
  io.cloudbeaver.auth,
  io.cloudbeaver.auth.provider,
