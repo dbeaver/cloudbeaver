@@ -2343,7 +2343,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
                 dbStat.setString(index++, permission);
             }
             dbStat.execute();
-            addObjectPermissionsUpdateEvent(objectIds, objectType);
+            addObjectPermissionsDeleteEvent(objectIds, objectType);
         } catch (SQLException e) {
             throw new DBCException("Error granting object permissions", e);
         }
@@ -2370,6 +2370,18 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
     private void addObjectPermissionsUpdateEvent(@NotNull Set<String> objectIds, @NotNull SMObjectType objectType) {
         for (var objectId : objectIds) {
             var event = WSObjectPermissionEvent.update(
+                getSmSessionId(),
+                getUserId(),
+                objectType,
+                objectId
+            );
+            application.getEventController().addEvent(event);
+        }
+    }
+
+    private void addObjectPermissionsDeleteEvent(@NotNull Set<String> objectIds, @NotNull SMObjectType objectType) {
+        for (var objectId : objectIds) {
+            var event = WSObjectPermissionEvent.delete(
                 getSmSessionId(),
                 getUserId(),
                 objectType,
