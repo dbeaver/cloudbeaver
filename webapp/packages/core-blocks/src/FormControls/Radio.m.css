@@ -24,7 +24,6 @@
 .field {
   display: inline-flex;
   align-items: center;
-  font-weight: 500;
   vertical-align: middle;
 }
 .label {
