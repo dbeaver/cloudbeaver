@@ -12,6 +12,8 @@ type ObjectPropertyInfo {
     displayName: String
     # Property description
     description: String
+    # Property hint
+    hint: String @since(version: "23.2.3")
     # Property category (may be used if object has a lot of properties)
     category: String
     # Property data type (int, String, etc)
