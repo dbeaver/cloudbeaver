@@ -85,7 +85,6 @@ module.exports = (env, argv) => {
   };
 
   return {
-    // target: !devMode ? "web" : "browserslist",
     optimization: {
       runtimeChunk: 'single',
       moduleIds: 'deterministic',
@@ -104,7 +103,7 @@ module.exports = (env, argv) => {
         enforceSizeThreshold: 50000,
         cacheGroups: {
           locale: {
-            test: /[\\/]locales[\\/].*?\.ts/,
+            test: /[\\/]locales[\\/].*?\.js/,
             filename: '[name].[contenthash].js',
             name(module) {
               return module.rawRequest.substr(2);
