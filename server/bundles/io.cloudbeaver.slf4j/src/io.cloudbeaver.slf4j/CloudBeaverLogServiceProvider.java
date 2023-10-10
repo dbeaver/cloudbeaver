@@ -19,4 +19,6 @@ package io.cloudbeaver.slf4j;
 import ch.qos.logback.classic.spi.LogbackServiceProvider;
 
 public class CloudBeaverLogServiceProvider extends LogbackServiceProvider {
+    public CloudBeaverLogServiceProvider() {
+    }
 }
