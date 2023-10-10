@@ -95,27 +95,41 @@ public class WebServiceBindingAdmin extends WebServiceBindingBase<DBWServiceAdmi
                 env -> getService(env).revokeUserTeam(getWebSession(env), env.getArgument("userId"), env.getArgument("teamId")))
             .dataFetcher("setSubjectPermissions",
                 env -> getService(env).setSubjectPermissions(getWebSession(env), env.getArgument("subjectId"), env.getArgument("permissions")))
-        .dataFetcher("setUserCredentials",
-            env -> getService(env).setUserCredentials(getWebSession(env), env.getArgument("userId"), env.getArgument("providerId"), env.getArgument("credentials")))
-        .dataFetcher("deleteUserCredentials",
-            env -> getService(env).deleteUserCredentials(getWebSession(env), env.getArgument("userId"), env.getArgument("providerId")))
-        .dataFetcher("enableUser",
-            env -> getService(env).enableUser(getWebSession(env), env.getArgument("userId"), env.getArgument("enabled")))
-        .dataFetcher("setUserAuthRole",
-            env -> getService(env).setUserAuthRole(getWebSession(env), env.getArgument("userId"), env.getArgument("authRole")))
-        .dataFetcher("searchConnections", env -> getService(env).searchConnections(getWebSession(env), env.getArgument("hostNames")))
-
-        .dataFetcher("getConnectionSubjectAccess",
-            env -> getService(env).getConnectionSubjectAccess(
-                getWebSession(env),
-                getProjectReference(env),
-                env.getArgument("connectionId")))
-        .dataFetcher("setConnectionSubjectAccess",
-            env -> getService(env).setConnectionSubjectAccess(
-                getWebSession(env),
-                getProjectReference(env),
-                env.getArgument("connectionId"),
-                env.getArgument("subjects")))
+            .dataFetcher("setUserCredentials",
+                env -> getService(env).setUserCredentials(getWebSession(env),
+                    env.getArgument("userId"),
+                    env.getArgument("providerId"),
+                    env.getArgument("credentials")))
+            .dataFetcher("deleteUserCredentials",
+                env -> getService(env).deleteUserCredentials(getWebSession(env), env.getArgument("userId"), env.getArgument("providerId")))
+            .dataFetcher("enableUser",
+                env -> getService(env).enableUser(getWebSession(env), env.getArgument("userId"), env.getArgument("enabled")))
+            .dataFetcher("setUserAuthRole",
+                env -> getService(env).setUserAuthRole(getWebSession(env), env.getArgument("userId"), env.getArgument("authRole")))
+            .dataFetcher("searchConnections", env -> getService(env).searchConnections(getWebSession(env), env.getArgument("hostNames")))
+            .dataFetcher("getConnectionSubjectAccess",
+                env -> getService(env).getConnectionSubjectAccess(
+                    getWebSession(env),
+                    getProjectReference(env),
+                    env.getArgument("connectionId")))
+            .dataFetcher("setConnectionSubjectAccess",
+                env -> getService(env).setConnectionSubjectAccess(
+                    getWebSession(env),
+                    getProjectReference(env),
+                    env.getArgument("connectionId"),
+                    env.getArgument("subjects")))
+            .dataFetcher("addConnectionsAccess",
+                env -> getService(env).addConnectionsAccess(
+                    getWebSession(env),
+                    getProjectReference(env),
+                    env.getArgument("connectionIds"),
+                    env.getArgument("subjects")))
+            .dataFetcher("deleteConnectionsAccess",
+                env -> getService(env).deleteConnectionsAccess(
+                    getWebSession(env),
+                    getProjectReference(env),
+                    env.getArgument("connectionIds"),
+                    env.getArgument("subjects")))
 
         .dataFetcher("getSubjectConnectionAccess",
             env -> getService(env).getSubjectConnectionAccess(getWebSession(env), env.getArgument("subjectId")))
