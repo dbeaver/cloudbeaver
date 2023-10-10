@@ -2343,6 +2343,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
                 dbStat.setString(index++, permission);
             }
             dbStat.execute();
+            addObjectPermissionsUpdateEvent(objectIds, objectType);
         } catch (SQLException e) {
             throw new DBCException("Error granting object permissions", e);
         }
