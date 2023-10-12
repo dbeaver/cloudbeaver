@@ -13,7 +13,7 @@
   },
   "tasks": [
     {
-      "label": "Run Tests",
+      "label": "Run Tests CE",
       "type": "shell",
       "command": "yarn",
       "group": "test",
@@ -53,19 +53,8 @@
     {
       "label": "Yarn Install",
       "type": "shell",
-      "command": "yarn",
+      "command": "yarn install; yarn lerna bootstrap",
       "args": []
-    },
-    {
-      "label": "Lerna Bootstrap",
-      "type": "shell",
-      "command": "yarn",
-      "args": ["lerna", "bootstrap"]
-    },
-    {
-      "label": "Bootstrap",
-      "dependsOrder": "sequence",
-      "dependsOn": ["Yarn Install", "Lerna Bootstrap"]
     }
   ],
   "inputs": [
