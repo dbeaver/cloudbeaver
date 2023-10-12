@@ -44,7 +44,7 @@ export const UserFormInfoCredentials = observer<Props>(function UserFormInfoCred
   return (
     <Container gap vertical>
       <GroupTitle keepSize>{translate('authentication_user_credentials')}</GroupTitle>
-      <InputField type="text" name="userId" state={tabState.state} readOnly={editing} disabled={disabled} mod="surface" keepSize tiny required>
+      <InputField type="text" name="userId" state={tabState.state} readOnly={editing} disabled={disabled} keepSize tiny required>
         {translate('authentication_user_name')}
       </InputField>
       {local && (
@@ -57,7 +57,6 @@ export const UserFormInfoCredentials = observer<Props>(function UserFormInfoCred
             placeholder={editing ? PASSWORD_PLACEHOLDER : ''}
             canShowPassword={tabState.state['password'] !== ''}
             disabled={disabled}
-            mod="surface"
             required={!editing}
             keepSize
             tiny
@@ -70,7 +69,6 @@ export const UserFormInfoCredentials = observer<Props>(function UserFormInfoCred
             name="passwordRepeat"
             placeholder={editing ? PASSWORD_PLACEHOLDER : ''}
             disabled={disabled}
-            mod="surface"
             required={!editing}
             canShowPassword
             keepSize

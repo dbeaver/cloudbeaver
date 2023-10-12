@@ -22,7 +22,7 @@ export const ServerConfigurationInfoForm = observer<Props>(function ServerConfig
   return (
     <Group form gap>
       <GroupTitle>{translate('administration_configuration_wizard_configuration_server_info')}</GroupTitle>
-      <InputField type="text" name="serverName" state={state.serverConfig} mod="surface" required medium>
+      <InputField type="text" name="serverName" state={state.serverConfig} required medium>
         {translate('administration_configuration_wizard_configuration_server_name')}
       </InputField>
       <InputField
@@ -31,7 +31,6 @@ export const ServerConfigurationInfoForm = observer<Props>(function ServerConfig
         name="serverURL"
         state={state.serverConfig}
         readOnly={serverConfigLoader.resource.distributed}
-        mod="surface"
         required
         medium
       >
@@ -42,7 +41,6 @@ export const ServerConfigurationInfoForm = observer<Props>(function ServerConfig
         type="number"
         name="sessionExpireTime"
         state={state.serverConfig}
-        mod="surface"
         min={1}
         mapState={v => (v === 0 ? 60000 : v ?? 1800000) / 1000 / 60}
         mapValue={v => (v === undefined ? 30 : Number(v) || 1) * 1000 * 60}

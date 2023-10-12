@@ -1,0 +1,46 @@
+.filterContainer {
+  position: relative;
+  min-width: 24px;
+  min-height: 24px;
+}
+.inputField {
+  display: none;
+  width: 300px;
+  &.max {
+    width: 100%;
+  }
+  &.toggled {
+    display: block;
+  }
+
+  & .input {
+    padding-right: 40px !important;
+  }
+
+}
+.iconButton {
+  position: absolute;
+  right: 0;
+  top: 0;
+  margin: 0;
+  width: 24px;
+  height: 24px;
+  border-radius: 2px;
+  cursor: auto;
+
+  &.toggled {
+    right: 4px;
+    top: 4px;
+  }
+  &.cross {
+    width: 16px;
+    height: 16px;
+    top: 8px;
+    right: 8px;
+  }
+}
+
+.toggleMode {
+  composes: theme-background-primary theme-text-on-primary from global;
+  cursor: pointer;
+}
