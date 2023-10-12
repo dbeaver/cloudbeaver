@@ -1,9 +1,0 @@
-mutation setSubjectProjectsPermissions(
-  $subjectId: String!
-  $permissions: [RMProjectPermissions!]!
-) {
-  rmSetSubjectProjectPermissions(
-    subjectId: $subjectId
-    permissions: $permissions
-  )
-}

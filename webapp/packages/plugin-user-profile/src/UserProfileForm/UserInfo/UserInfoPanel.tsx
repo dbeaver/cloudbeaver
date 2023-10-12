@@ -45,13 +45,13 @@ export const UserInfoPanel = observer<Props>(function UserInfoPanel({ user, clas
           <Group form gap>
             <GroupTitle>{translate('plugin_user_profile_info')}</GroupTitle>
             <Container wrap gap>
-              <InputField type="text" name="userId" minLength={1} state={user} mod="surface" readOnly required tiny fill>
+              <InputField type="text" name="userId" minLength={1} state={user} readOnly required tiny fill>
                 {translate('plugin_user_profile_info_id')}
               </InputField>
-              <InputField type="text" name="displayName" minLength={1} state={user} mod="surface" readOnly required tiny fill>
+              <InputField type="text" name="displayName" minLength={1} state={user} readOnly required tiny fill>
                 {translate('plugin_user_profile_info_displayName')}
               </InputField>
-              <InputField type="text" name="authRole" mod="surface" state={user} autoHide readOnly tiny fill>
+              <InputField type="text" name="authRole" state={user} autoHide readOnly tiny fill>
                 {translate('authentication_user_role')}
               </InputField>
             </Container>

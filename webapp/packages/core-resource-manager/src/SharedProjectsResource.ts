@@ -67,16 +67,18 @@ export class SharedProjectsResource extends CachedMapResource<string, SharedProj
     }
   }
 
-  async setAccessSubjects(projectId: string, permissions: ProjectPermission[]): Promise<void> {
-    await this.graphQLService.sdk.setProjectPermissions({
-      projectId,
+  async addProjectPermissions(projectIds: string[], subjectIds: string[], permissions: string[]): Promise<void> {
+    await this.graphQLService.sdk.addProjectsPermissions({
+      projectIds,
+      subjectIds,
       permissions,
     });
   }
 
-  async setSubjectProjectsAccess(subjectId: string, permissions: ProjectSubjectPermission[]): Promise<void> {
-    await this.graphQLService.sdk.setSubjectProjectsPermissions({
-      subjectId,
+  async deleteProjectPermissions(projectIds: string[], subjectIds: string[], permissions: string[]): Promise<void> {
+    await this.graphQLService.sdk.deleteProjectsPermissions({
+      projectIds,
+      subjectIds,
       permissions,
     });
   }
