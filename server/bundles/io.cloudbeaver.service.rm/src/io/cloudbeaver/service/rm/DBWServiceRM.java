@@ -136,6 +136,7 @@ public interface DBWServiceRM extends DBWService {
     @WebAction(requirePermissions = {RMConstants.PERMISSION_RM_ADMIN})
     List<AdminPermissionInfo> listProjectPermissions() throws DBWebException;
 
+    @Deprecated
     @WebProjectAction(
         requireProjectPermissions = RMConstants.PERMISSION_PROJECT_ADMIN
     )
@@ -145,11 +146,28 @@ public interface DBWServiceRM extends DBWService {
         @NotNull RMSubjectProjectPermissions projectPermissions
     ) throws DBWebException;
 
+    @Deprecated
     @WebAction(requirePermissions = DBWConstants.PERMISSION_ADMIN)
     boolean setSubjectProjectPermissions(
         @NotNull WebSession webSession,
         @NotNull String subjectId,
         @NotNull RMProjectPermissions projectPermissions
+    ) throws DBWebException;
+
+    @WebAction(requirePermissions = DBWConstants.PERMISSION_ADMIN)
+    boolean deleteProjectsPermissions(
+        @NotNull WebSession webSession,
+        @NotNull List<String> projectIds,
+        @NotNull List<String> subjectIds,
+        @NotNull List<String> permissions
+    ) throws DBWebException;
+
+    @WebAction(requirePermissions = DBWConstants.PERMISSION_ADMIN)
+    boolean addProjectsPermissions(
+        @NotNull WebSession webSession,
+        @NotNull List<String> projectIds,
+        @NotNull List<String> subjectIds,
+        @NotNull List<String> permissions
     ) throws DBWebException;
 
     @WebProjectAction(

@@ -41,6 +41,10 @@
     "disableReferencedProjectLoad": true,
     "disableSolutionSearching": true,
 
+    // disable support of helpers
+    "noEmitHelpers": false,
+    "importHelpers": true,
+
     "types": ["reflect-metadata", "node", "jest", "@cloudbeaver/core-cli/global.d.ts"],
     "plugins": [
       {

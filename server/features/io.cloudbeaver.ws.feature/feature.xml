@@ -2,7 +2,7 @@
 <feature
         id="io.cloudbeaver.ws.feature"
         label="%featureName"
-        version="1.0.36.qualifier"
+        version="1.0.37.qualifier"
         provider-name="%providerName"
         plugin="io.cloudbeaver.model">
 
@@ -39,9 +39,9 @@
 
     <!-- Logging -->
 
+    <plugin id="io.cloudbeaver.slf4j" download-size="0" install-size="0" version="0.0.0" unpack="false"/>
     <plugin id="ch.qos.logback.core" download-size="0" install-size="0" version="0.0.0" unpack="false"/>
     <plugin id="ch.qos.logback.classic" download-size="0" install-size="0" version="0.0.0" unpack="false"/>
-    <plugin id="ch.qos.logback.slf4j" download-size="0" install-size="0" version="0.0.0" unpack="false"/>
 
 
 </feature>
