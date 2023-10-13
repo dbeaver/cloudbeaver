@@ -67,3 +67,4 @@ export * from './createLastPromiseGetter';
 export * from './removeMetadataFromBase64';
 export * from './renamePathName';
 export * from './removeLineBreak';
+export * from './replaceSubstring';
