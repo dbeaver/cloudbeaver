@@ -18,6 +18,7 @@ import { databaseDataAction } from '../DatabaseDataActionDecorator';
 import type { IResultSetContentValue } from './IResultSetContentValue';
 import type { IResultSetDataContentAction } from './IResultSetDataContentAction';
 import type { IResultSetElementKey } from './IResultSetDataKey';
+import { isResultSetContentValue } from './isResultSetContentValue';
 import { ResultSetDataAction } from './ResultSetDataAction';
 import { ResultSetDataKeysUtils } from './ResultSetDataKeysUtils';
 import { IResultSetValue, ResultSetFormatAction } from './ResultSetFormatAction';
@@ -56,7 +57,7 @@ export class ResultSetDataContentAction extends DatabaseDataAction<any, IDatabas
   }
 
   isDownloadable(element: IResultSetElementKey) {
-    return !!this.result.data?.hasRowIdentifier && this.format.isBinary(element);
+    return !!this.result.data?.hasRowIdentifier && isResultSetContentValue(this.format.get(element));
   }
 
   async getFileDataUrl(element: IResultSetElementKey) {

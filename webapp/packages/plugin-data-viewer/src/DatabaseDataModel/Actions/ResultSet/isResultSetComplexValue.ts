@@ -7,11 +7,6 @@
  */
 import type { IResultSetComplexValue } from './IResultSetComplexValue';
 
-export interface IResultSetContentValue extends IResultSetComplexValue {
-  $type: 'content';
-  binary?: string;
-  text?: string;
-  value?: string;
-  contentType?: string;
-  contentLength?: number;
+export function isResultSetComplexValue(value: any): value is IResultSetComplexValue {
+  return value !== null && typeof value === 'object' && '$type' in value && typeof value.$type === 'string';
 }

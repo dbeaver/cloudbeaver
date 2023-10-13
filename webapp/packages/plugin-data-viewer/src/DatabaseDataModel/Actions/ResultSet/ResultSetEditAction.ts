@@ -22,10 +22,12 @@ import {
   IDatabaseDataEditApplyActionUpdate,
 } from '../IDatabaseDataEditAction';
 import { compareResultSetRowKeys } from './compareResultSetRowKeys';
-import { createResultSetContentValue } from './createResultSetContentValue';
-import type { IResultSetContentValue } from './IResultSetContentValue';
+import { createResultSetFileValue } from './createResultSetFileValue';
+import type { IResultSetBlobValue } from './IResultSetBlobValue';
 import type { IResultSetColumnKey, IResultSetElementKey, IResultSetRowKey } from './IResultSetDataKey';
+import { isResultSetBlobValue } from './isResultSetBlobValue';
 import { isResultSetContentValue } from './isResultSetContentValue';
+import { isResultSetFileValue } from './isResultSetFileValue';
 import { ResultSetDataAction } from './ResultSetDataAction';
 import { ResultSetDataKeysUtils } from './ResultSetDataKeysUtils';
 import type { IResultSetValue } from './ResultSetFormatAction';
@@ -453,8 +455,8 @@ export class ResultSetEditAction extends DatabaseEditAction<IResultSetElementKey
     }
   }
 
-  getBlobsToUpload(): Array<IResultSetContentValue> {
-    const blobs: Array<IResultSetContentValue> = [];
+  getBlobsToUpload(): Array<IResultSetBlobValue> {
+    const blobs: Array<IResultSetBlobValue> = [];
 
     for (const update of this.updates) {
       if (update.type === DatabaseEditChangeType.delete) {
@@ -463,7 +465,7 @@ export class ResultSetEditAction extends DatabaseEditAction<IResultSetElementKey
 
       for (let i = 0; i < update.update.length; i++) {
         const value = update.update[i];
-        if (isResultSetContentValue(value) && value.blob && value.fileId === undefined) {
+        if (isResultSetBlobValue(value) && value.fileId === undefined) {
           blobs.push(value);
         }
       }
@@ -485,13 +487,9 @@ export class ResultSetEditAction extends DatabaseEditAction<IResultSetElementKey
             updatedRows.push({
               data: update.source,
               updateValues: update.update.reduce<Record<number, IResultSetValue>>((obj, value, index) => {
-                if (isResultSetContentValue(value) && value.blob) {
+                if (isResultSetBlobValue(value)) {
                   if (value.fileId) {
-                    obj[index] = createResultSetContentValue({
-                      fileId: value.fileId,
-                      contentType: value.blob.type,
-                      contentLength: value.blob.size,
-                    });
+                    obj[index] = createResultSetFileValue(value.fileId, value.contentType, value.contentLength);
                   }
                 } else if (value !== update.source![index]) {
                   obj[index] = value;
@@ -625,7 +623,7 @@ export class ResultSetEditAction extends DatabaseEditAction<IResultSetElementKey
 
 function replaceBlobsWithNull(values: IResultSetValue[]) {
   return values.map(value => {
-    if (isResultSetContentValue(value) && value.blob) {
+    if (isResultSetBlobValue(value)) {
       return null;
     }
     return value;
@@ -634,13 +632,9 @@ function replaceBlobsWithNull(values: IResultSetValue[]) {
 
 function replaceUploadBlobs(values: IResultSetValue[]) {
   return values.map(value => {
-    if (isResultSetContentValue(value) && value.blob) {
+    if (isResultSetBlobValue(value)) {
       if (value.fileId) {
-        return createResultSetContentValue({
-          fileId: value.fileId,
-          contentType: value.blob.type,
-          contentLength: value.blob.size,
-        });
+        return createResultSetFileValue(value.fileId, value.contentType, value.contentLength);
       } else {
         return null;
       }
@@ -655,7 +649,7 @@ function applyResultToUpdate(update: IResultSetUpdate, result?: IResultSetValue[
 
     update.update = update.update.map((value, i) => {
       const source = update.source![i];
-      if (isResultSetContentValue(source) && isResultSetContentValue(value) && value.blob) {
+      if (isResultSetContentValue(source) && isResultSetFileValue(value)) {
         if (value.fileId && value.contentLength === source.contentLength) {
           return JSON.parse(JSON.stringify(source));
         }

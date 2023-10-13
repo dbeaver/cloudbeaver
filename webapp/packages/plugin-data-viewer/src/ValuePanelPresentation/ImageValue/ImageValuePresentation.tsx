@@ -16,7 +16,7 @@ import { QuotasService } from '@cloudbeaver/core-root';
 import type { TabContainerPanelComponent } from '@cloudbeaver/core-ui';
 import { bytesToSize, download, getMIME, isImageFormat, isValidUrl } from '@cloudbeaver/core-utils';
 
-import type { IResultSetContentValue } from '../../DatabaseDataModel/Actions/ResultSet/IResultSetContentValue';
+import { isResultSetBlobValue } from '../../DatabaseDataModel/Actions/ResultSet/isResultSetBlobValue';
 import { isResultSetContentValue } from '../../DatabaseDataModel/Actions/ResultSet/isResultSetContentValue';
 import { ResultSetDataContentAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetDataContentAction';
 import { ResultSetDataKeysUtils } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetDataKeysUtils';
@@ -116,13 +116,12 @@ export const ImageValuePresentation: TabContainerPanelComponent<IDataValuePanelP
             return this.savedSrc;
           }
 
-          if (isResultSetContentValue(this.cellValue)) {
-            if (this.cellValue.binary) {
-              return `data:${getMIME(this.cellValue.binary)};base64,${this.cellValue.binary}`;
-            }
-            if (this.cellValue.blob) {
-              return URL.createObjectURL(this.cellValue.blob);
-            }
+          if (isResultSetBlobValue(this.cellValue)) {
+            return URL.createObjectURL(this.cellValue.blob);
+          }
+
+          if (isResultSetContentValue(this.cellValue) && this.cellValue.binary) {
+            return `data:${getMIME(this.cellValue.binary)};base64,${this.cellValue.binary}`;
           } else if (typeof this.cellValue === 'string' && isValidUrl(this.cellValue) && isImageFormat(this.cellValue)) {
             return this.cellValue;
           }
@@ -140,12 +139,12 @@ export const ImageValuePresentation: TabContainerPanelComponent<IDataValuePanelP
           return !!this.src;
         },
         get truncated() {
+          if (isResultSetBlobValue(this.cellValue)) {
+            return false;
+          }
           if (isResultSetContentValue(this.cellValue)) {
             if (this.cellValue.binary) {
               return content.isContentTruncated(this.cellValue);
-            }
-            if (this.cellValue.blob) {
-              return false;
             }
           }
           return false;
@@ -184,10 +183,11 @@ export const ImageValuePresentation: TabContainerPanelComponent<IDataValuePanelP
 
     const save = state.canSave ? state.save : undefined;
     const loading = model.isLoading();
+    const value = state.cellValue;
 
-    if (state.truncated && !state.savedSrc) {
+    if (state.truncated && !state.savedSrc && isResultSetContentValue(value)) {
       const limit = bytesToSize(quotasService.getQuota('sqlBinaryPreviewMaxLength'));
-      const valueSize = bytesToSize((state.cellValue as unknown as IResultSetContentValue).contentLength ?? 0);
+      const valueSize = bytesToSize(value.contentLength ?? 0);
 
       const load = async () => {
         try {

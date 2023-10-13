@@ -21,7 +21,7 @@ import {
 import { uuid } from '@cloudbeaver/core-utils';
 
 import { DocumentEditAction } from './DatabaseDataModel/Actions/Document/DocumentEditAction';
-import type { IResultSetContentValue } from './DatabaseDataModel/Actions/ResultSet/IResultSetContentValue';
+import type { IResultSetBlobValue } from './DatabaseDataModel/Actions/ResultSet/IResultSetBlobValue';
 import { ResultSetEditAction } from './DatabaseDataModel/Actions/ResultSet/ResultSetEditAction';
 import { DatabaseDataSource } from './DatabaseDataModel/DatabaseDataSource';
 import type { IDatabaseDataOptions } from './DatabaseDataModel/IDatabaseDataOptions';
@@ -175,14 +175,14 @@ export class ContainerDataSource extends DatabaseDataSource<IDataContainerOption
           editor = this.actions.get(result, DocumentEditAction);
         }
 
-        let blobs: IResultSetContentValue[] = [];
+        let blobs: IResultSetBlobValue[] = [];
         if (editor instanceof ResultSetEditAction) {
           blobs = editor.getBlobsToUpload();
         }
 
         for (const blob of blobs) {
           const fileId = uuid();
-          await this.graphQLService.sdk.uploadBlobResultSet(fileId, blob.blob!);
+          await this.graphQLService.sdk.uploadBlobResultSet(fileId, blob.blob);
           blob.fileId = fileId;
         }
 

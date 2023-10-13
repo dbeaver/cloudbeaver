@@ -15,7 +15,7 @@ import type { IDatabaseResultSet } from '../../IDatabaseResultSet';
 import { databaseDataAction } from '../DatabaseDataActionDecorator';
 import type { IDatabaseDataResultAction } from '../IDatabaseDataResultAction';
 import { compareResultSetRowKeys } from './compareResultSetRowKeys';
-import type { IResultSetContentValue } from './IResultSetContentValue';
+import type { IResultSetComplexValue } from './IResultSetComplexValue';
 import type { IResultSetColumnKey, IResultSetElementKey, IResultSetRowKey } from './IResultSetDataKey';
 import { isResultSetContentValue } from './isResultSetContentValue';
 import { ResultSetDataAction } from './ResultSetDataAction';
@@ -140,7 +140,7 @@ export class ResultSetViewAction extends DatabaseDataAction<any, IDatabaseResult
     return this.rows[cell.row.index][cell.column.index];
   }
 
-  getContent(cell: IResultSetElementKey): IResultSetContentValue | null {
+  getContent(cell: IResultSetElementKey): IResultSetComplexValue | null {
     const value = this.getCellValue(cell);
 
     if (isResultSetContentValue(value)) {
