@@ -146,6 +146,7 @@ export class ResultSetEditAction extends DatabaseEditAction<IResultSetElementKey
         value = createResultSetContentValue({
           text: String(value),
           contentLength: String(value).length,
+          contentType: prevValue.contentType ?? 'text/plain',
         });
       }
     }
