@@ -22,10 +22,12 @@ import {
   IDatabaseDataEditApplyActionUpdate,
 } from '../IDatabaseDataEditAction';
 import { compareResultSetRowKeys } from './compareResultSetRowKeys';
+import { createResultSetContentValue } from './createResultSetContentValue';
 import { createResultSetFileValue } from './createResultSetFileValue';
 import type { IResultSetBlobValue } from './IResultSetBlobValue';
 import type { IResultSetColumnKey, IResultSetElementKey, IResultSetRowKey } from './IResultSetDataKey';
 import { isResultSetBlobValue } from './isResultSetBlobValue';
+import { isResultSetComplexValue } from './isResultSetComplexValue';
 import { isResultSetContentValue } from './isResultSetContentValue';
 import { isResultSetFileValue } from './isResultSetFileValue';
 import { ResultSetDataAction } from './ResultSetDataAction';
@@ -139,13 +141,12 @@ export class ResultSetEditAction extends DatabaseEditAction<IResultSetElementKey
     const [update] = this.getOrCreateUpdate(key.row, DatabaseEditChangeType.update);
     const prevValue = update.source?.[key.column.index] as any;
 
-    if (isResultSetContentValue(prevValue) && !isResultSetContentValue(value) && value !== null) {
+    if (isResultSetContentValue(prevValue) && !isResultSetComplexValue(value)) {
       if ('text' in prevValue) {
-        value = {
-          ...prevValue,
+        value = createResultSetContentValue({
           text: String(value),
           contentLength: String(value).length,
-        };
+        });
       }
     }
 
