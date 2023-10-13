@@ -89,6 +89,11 @@ public class WebPropertyInfo {
     }
 
     @Property
+    public String getHint() {
+        return property.getHint();
+    }
+
+    @Property
     public int getOrder() {
         return property instanceof ObjectPropertyDescriptor ? ((ObjectPropertyDescriptor) property).getOrderNumber() : -1;
     }
