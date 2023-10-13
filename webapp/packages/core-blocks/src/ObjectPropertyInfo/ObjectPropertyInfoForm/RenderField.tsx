@@ -193,7 +193,6 @@ export const RenderField = observer<RenderFieldProps>(function RenderField({
           state={state}
           disabled={disabled}
           readOnly={readOnly}
-          mod="surface"
           className={className}
         >
           {property.displayName ?? ''}
@@ -210,7 +209,6 @@ export const RenderField = observer<RenderFieldProps>(function RenderField({
         value={value}
         disabled={disabled}
         readOnly={readOnly}
-        mod="surface"
         className={className}
       >
         {property.displayName ?? ''}
@@ -232,7 +230,6 @@ export const RenderField = observer<RenderFieldProps>(function RenderField({
         readOnly={readOnly}
         autoHide={autoHide}
         autoComplete={RESERVED_KEYWORDS.includes(autofillToken) ? autofillToken : `${autofillToken} ${property.id}`}
-        mod="surface"
         className={className}
         canShowPassword={canShowPassword}
         onFocus={onFocus}
@@ -254,7 +251,6 @@ export const RenderField = observer<RenderFieldProps>(function RenderField({
       disabled={disabled}
       readOnly={readOnly}
       autoComplete={RESERVED_KEYWORDS.includes(autofillToken) ? autofillToken : `${autofillToken} ${property.id}`}
-      mod="surface"
       className={className}
       canShowPassword={canShowPassword}
       onFocus={onFocus}

@@ -38,6 +38,7 @@ import org.jkiss.dbeaver.model.websocket.event.permissions.WSObjectPermissionEve
 import org.jkiss.dbeaver.model.websocket.event.resource.WSResourceProperty;
 
 import java.nio.charset.StandardCharsets;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -346,6 +347,49 @@ public class WebServiceRM implements DBWServiceRM {
             return true;
         } catch (Exception e) {
             throw new DBWebException("Error granting project permissions", e);
+        }
+    }
+
+    @Override
+    public boolean deleteProjectsPermissions(
+        @NotNull WebSession webSession,
+        @NotNull List<String> projectIds,
+        @NotNull List<String> subjectIds,
+        @NotNull List<String> permissions
+    ) throws DBWebException {
+        try {
+            SMAdminController smAdminController = webSession.getAdminSecurityController();
+            smAdminController.deleteObjectPermissions(
+                new HashSet<>(projectIds),
+                SMObjectType.project,
+                new HashSet<>(subjectIds),
+                new HashSet<>(permissions)
+            );
+            return true;
+        } catch (Exception e) {
+            throw new DBWebException("Error deleting project permissions", e);
+        }
+    }
+
+    @Override
+    public boolean addProjectsPermissions(
+        @NotNull WebSession webSession,
+        @NotNull List<String> projectIds,
+        @NotNull List<String> subjectIds,
+        @NotNull List<String> permissions
+    ) throws DBWebException {
+        try {
+            SMAdminController smAdminController = webSession.getAdminSecurityController();
+            smAdminController.addObjectPermissions(
+                new HashSet<>(projectIds),
+                SMObjectType.project,
+                new HashSet<>(subjectIds),
+                new HashSet<>(permissions),
+                webSession.getUserId()
+            );
+            return true;
+        } catch (Exception e) {
+            throw new DBWebException("Error adding project permissions", e);
         }
     }
 

@@ -157,9 +157,15 @@ extend type Query {
     # Permissions
 
     getConnectionSubjectAccess(projectId: ID!, connectionId: ID): [AdminConnectionGrantInfo!]!
+    @deprecated(reason: "23.2.2")
     setConnectionSubjectAccess(projectId: ID!, connectionId: ID!, subjects: [ID!]!): Boolean
+    @since(version: "23.2.2")
+    addConnectionsAccess(projectId: ID!, connectionIds: [ID!]!, subjects: [ID!]!): Boolean
+    @since(version: "23.2.2")
+    deleteConnectionsAccess(projectId: ID!, connectionIds: [ID!]!, subjects: [ID!]!): Boolean
 
     getSubjectConnectionAccess(subjectId: ID!): [AdminConnectionGrantInfo!]!
+    @deprecated(reason: "23.2.2")
     setSubjectConnectionAccess(subjectId: ID!, connections: [ID!]!): Boolean
 
     #### Feature sets
