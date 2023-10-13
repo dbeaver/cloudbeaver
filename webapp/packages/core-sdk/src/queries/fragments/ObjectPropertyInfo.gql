@@ -2,6 +2,7 @@ fragment ObjectPropertyInfo on ObjectPropertyInfo {
   id
   displayName
   description
+  hint
   category
   dataType
   value
@@ -9,5 +10,5 @@ fragment ObjectPropertyInfo on ObjectPropertyInfo {
   defaultValue
   length
   features
-  order 
+  order
 }
