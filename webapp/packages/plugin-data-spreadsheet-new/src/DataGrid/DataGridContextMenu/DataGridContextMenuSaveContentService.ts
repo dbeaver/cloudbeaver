@@ -70,8 +70,8 @@ export class DataGridContextMenuSaveContentService {
         });
       },
       isHidden: context => {
-        const content = context.data.model.source.getAction(context.data.resultIndex, ResultSetFormatAction);
-        return !content.isBinary(context.data.key);
+        const format = context.data.model.source.getAction(context.data.resultIndex, ResultSetFormatAction);
+        return !format.isBinary(context.data.key);
       },
       isDisabled: context => {
         const content = context.data.model.source.getAction(context.data.resultIndex, ResultSetDataContentAction);
