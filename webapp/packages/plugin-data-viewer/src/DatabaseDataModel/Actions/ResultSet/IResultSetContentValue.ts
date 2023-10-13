@@ -11,7 +11,6 @@ export interface IResultSetContentValue extends IResultSetComplexValue {
   $type: 'content';
   binary?: string;
   text?: string;
-  value?: string;
   contentType?: string;
   contentLength?: number;
 }

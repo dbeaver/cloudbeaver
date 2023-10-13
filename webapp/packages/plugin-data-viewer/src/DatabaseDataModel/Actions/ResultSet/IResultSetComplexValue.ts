@@ -8,4 +8,5 @@
 
 export interface IResultSetComplexValue {
   $type: string;
+  value?: any;
 }

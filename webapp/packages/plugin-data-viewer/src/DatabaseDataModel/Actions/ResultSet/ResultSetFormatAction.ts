@@ -16,6 +16,7 @@ import type { IDatabaseDataFormatAction } from '../IDatabaseDataFormatAction';
 import type { IResultSetComplexValue } from './IResultSetComplexValue';
 import type { IResultSetElementKey, IResultSetPartialKey } from './IResultSetDataKey';
 import { isResultSetBlobValue } from './isResultSetBlobValue';
+import { isResultSetComplexValue } from './isResultSetComplexValue';
 import { isResultSetContentValue } from './isResultSetContentValue';
 import { isResultSetGeometryValue } from './isResultSetGeometryValue';
 import { ResultSetEditAction } from './ResultSetEditAction';
@@ -149,6 +150,16 @@ export class ResultSetFormatAction
         return value.text;
       }
 
+      return '';
+    }
+
+    if (isResultSetComplexValue(value)) {
+      if (value.value !== undefined) {
+        if (typeof value.value === 'object' && value.value !== null) {
+          return JSON.stringify(value.value);
+        }
+        return String(value.value);
+      }
       return '';
     }
 
