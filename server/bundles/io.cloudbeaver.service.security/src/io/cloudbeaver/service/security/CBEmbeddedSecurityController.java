@@ -67,7 +67,8 @@ import java.util.stream.Collectors;
 /**
  * Server controller
  */
-public class CBEmbeddedSecurityController implements SMAdminController, SMAuthenticationManager {
+public class CBEmbeddedSecurityController<T extends WebAuthApplication>
+    implements SMAdminController, SMAuthenticationManager {
 
     private static final Log log = Log.getLog(CBEmbeddedSecurityController.class);
 
@@ -80,14 +81,14 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
     }.getType();
     private static final Gson gson = new GsonBuilder().create();
 
-    protected final WebAuthApplication application;
+    protected final T application;
     protected final CBDatabase database;
     protected final SMCredentialsProvider credentialsProvider;
 
     protected final SMControllerConfiguration smConfig;
 
     public CBEmbeddedSecurityController(
-        WebAuthApplication application,
+        T application,
         CBDatabase database,
         SMCredentialsProvider credentialsProvider,
         SMControllerConfiguration smConfig
@@ -164,6 +165,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
         for (SMUserProvisioning user : userImportList.getUsers()) {
             if (isSubjectExists(user.getUserId())) {
                 log.info("Skip already exist user: " + user.getUserId());
+                setUserAuthRole(user.getUserId(), userImportList.getAuthRole());
                 continue;
             }
             createUser(user.getUserId(), user.getMetaParameters(), true, userImportList.getAuthRole());
@@ -584,7 +586,11 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
         try (Connection dbCon = database.openConnection()) {
             try (PreparedStatement dbStat = dbCon.prepareStatement(
                 database.normalizeTableNames("UPDATE {table_prefix}CB_USER SET DEFAULT_AUTH_ROLE=? WHERE USER_ID=?"))) {
-                dbStat.setString(1, authRole);
+                if (authRole == null) {
+                    dbStat.setNull(1, Types.VARCHAR);
+                } else {
+                    dbStat.setString(1, authRole);
+                }
                 dbStat.setString(2, userId);
                 if (dbStat.executeUpdate() <= 0) {
                     throw new SMException("User not found");
