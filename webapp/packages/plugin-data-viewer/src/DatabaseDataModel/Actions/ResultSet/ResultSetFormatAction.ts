@@ -6,7 +6,6 @@
  * you may not use this file except in compliance with the License.
  */
 import { ResultDataFormat } from '@cloudbeaver/core-sdk';
-import { removeLineBreak } from '@cloudbeaver/core-utils';
 
 import { DatabaseDataAction } from '../../DatabaseDataAction';
 import type { IDatabaseDataSource } from '../../IDatabaseDataSource';
@@ -29,6 +28,8 @@ export type IResultSetValue =
   | Record<string, string | number | Record<string, any> | null>
   | IResultSetComplexValue
   | null;
+
+const DISPLAY_STRING_LENGTH = 200;
 
 @databaseDataAction()
 export class ResultSetFormatAction
@@ -175,7 +176,7 @@ export class ResultSetFormatAction
 
     if (isResultSetGeometryValue(value)) {
       if (value.text !== undefined) {
-        return value.text;
+        return this.truncateText(String(value.text), DISPLAY_STRING_LENGTH);
       }
 
       return '[null]';
@@ -187,21 +188,20 @@ export class ResultSetFormatAction
 
     if (isResultSetContentValue(value)) {
       if (value.text !== undefined) {
-        return value.text;
+        return this.truncateText(String(value.text), DISPLAY_STRING_LENGTH);
       }
 
       return '[null]';
     }
 
-    if (typeof value === 'string' && value.length > 1000) {
-      return removeLineBreak(
-        value
-          .split('')
-          .map(v => (v.charCodeAt(0) < 32 ? ' ' : v))
-          .join(''),
-      );
-    }
+    return this.truncateText(String(value), DISPLAY_STRING_LENGTH);
+  }
 
-    return removeLineBreak(String(value));
+  truncateText(text: string, length: number): string {
+    return text
+      .slice(0, length)
+      .split('')
+      .map(v => (v.charCodeAt(0) < 32 ? ' ' : v))
+      .join('');
   }
 }
