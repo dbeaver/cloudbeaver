@@ -18,6 +18,7 @@ import { bytesToSize, download, getMIME, isImageFormat, isValidUrl } from '@clou
 
 import { isResultSetBlobValue } from '../../DatabaseDataModel/Actions/ResultSet/isResultSetBlobValue';
 import { isResultSetContentValue } from '../../DatabaseDataModel/Actions/ResultSet/isResultSetContentValue';
+import { isResultSetFileValue } from '../../DatabaseDataModel/Actions/ResultSet/isResultSetFileValue';
 import { ResultSetDataContentAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetDataContentAction';
 import { ResultSetDataKeysUtils } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetDataKeysUtils';
 import { ResultSetFormatAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetFormatAction';
@@ -139,7 +140,7 @@ export const ImageValuePresentation: TabContainerPanelComponent<IDataValuePanelP
           return !!this.src;
         },
         get truncated() {
-          if (isResultSetBlobValue(this.cellValue)) {
+          if (isResultSetFileValue(this.cellValue)) {
             return false;
           }
           if (isResultSetContentValue(this.cellValue)) {

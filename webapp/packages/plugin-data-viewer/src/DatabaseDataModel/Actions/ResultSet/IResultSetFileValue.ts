@@ -8,8 +8,8 @@
 import type { IResultSetComplexValue } from './IResultSetComplexValue';
 
 export interface IResultSetFileValue extends IResultSetComplexValue {
-  $type: 'content';
-  fileId?: string;
+  $type: 'file';
+  fileId: string | null;
   contentType?: string;
   contentLength?: number;
 }

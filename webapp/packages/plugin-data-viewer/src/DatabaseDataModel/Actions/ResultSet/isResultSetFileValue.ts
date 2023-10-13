@@ -9,5 +9,5 @@ import type { IResultSetFileValue } from './IResultSetFileValue';
 import { isResultSetComplexValue } from './isResultSetComplexValue';
 
 export function isResultSetFileValue(value: any): value is IResultSetFileValue {
-  return isResultSetComplexValue(value) && value.$type === 'content' && 'fileId' in value && ['string', 'undefined'].includes(typeof value.fileId);
+  return isResultSetComplexValue(value) && value.$type === 'file';
 }

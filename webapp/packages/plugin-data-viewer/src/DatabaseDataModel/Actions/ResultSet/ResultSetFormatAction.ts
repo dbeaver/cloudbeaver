@@ -18,6 +18,7 @@ import type { IResultSetElementKey, IResultSetPartialKey } from './IResultSetDat
 import { isResultSetBlobValue } from './isResultSetBlobValue';
 import { isResultSetComplexValue } from './isResultSetComplexValue';
 import { isResultSetContentValue } from './isResultSetContentValue';
+import { isResultSetFileValue } from './isResultSetFileValue';
 import { isResultSetGeometryValue } from './isResultSetGeometryValue';
 import { ResultSetEditAction } from './ResultSetEditAction';
 import { ResultSetViewAction } from './ResultSetViewAction';
@@ -90,7 +91,7 @@ export class ResultSetFormatAction
     if (key.row) {
       const value = this.get(key as IResultSetElementKey);
 
-      if (isResultSetBlobValue(value)) {
+      if (isResultSetFileValue(value)) {
         return true;
       }
 
@@ -202,6 +203,16 @@ export class ResultSetFormatAction
         return this.truncateText(String(value.text), DISPLAY_STRING_LENGTH);
       }
 
+      return '[null]';
+    }
+
+    if (isResultSetComplexValue(value)) {
+      if (value.value !== undefined) {
+        if (typeof value.value === 'object' && value.value !== null) {
+          return JSON.stringify(value.value);
+        }
+        return String(value.value);
+      }
       return '[null]';
     }
 

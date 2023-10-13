@@ -465,7 +465,7 @@ export class ResultSetEditAction extends DatabaseEditAction<IResultSetElementKey
 
       for (let i = 0; i < update.update.length; i++) {
         const value = update.update[i];
-        if (isResultSetBlobValue(value) && value.fileId === undefined) {
+        if (isResultSetBlobValue(value) && value.fileId === null) {
           blobs.push(value);
         }
       }
@@ -488,7 +488,7 @@ export class ResultSetEditAction extends DatabaseEditAction<IResultSetElementKey
               data: update.source,
               updateValues: update.update.reduce<Record<number, IResultSetValue>>((obj, value, index) => {
                 if (isResultSetBlobValue(value)) {
-                  if (value.fileId) {
+                  if (value.fileId !== null) {
                     obj[index] = createResultSetFileValue(value.fileId, value.contentType, value.contentLength);
                   }
                 } else if (value !== update.source![index]) {
@@ -633,7 +633,7 @@ function replaceBlobsWithNull(values: IResultSetValue[]) {
 function replaceUploadBlobs(values: IResultSetValue[]) {
   return values.map(value => {
     if (isResultSetBlobValue(value)) {
-      if (value.fileId) {
+      if (value.fileId !== null) {
         return createResultSetFileValue(value.fileId, value.contentType, value.contentLength);
       } else {
         return null;

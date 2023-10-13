@@ -10,7 +10,7 @@ import type { IResultSetBlobValue } from './IResultSetBlobValue';
 
 export function createResultSetBlobValue(blob: Blob, fileId?: string): IResultSetBlobValue {
   return {
-    ...createResultSetFileValue(fileId, blob.type, blob.size),
+    ...createResultSetFileValue(fileId ?? null, blob.type, blob.size),
     blob,
   };
 }

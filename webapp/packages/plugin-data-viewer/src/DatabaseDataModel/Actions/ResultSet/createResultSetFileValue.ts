@@ -7,9 +7,9 @@
  */
 import type { IResultSetFileValue } from './IResultSetFileValue';
 
-export function createResultSetFileValue(fileId?: string, contentType?: string, contentLength?: number): IResultSetFileValue {
+export function createResultSetFileValue(fileId: string | null, contentType?: string, contentLength?: number): IResultSetFileValue {
   return {
-    $type: 'content',
+    $type: 'file',
     fileId,
     contentType,
     contentLength,
