@@ -60,7 +60,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Collectors;
 
 /**
  * Web SQL processor.
@@ -483,7 +482,7 @@ public class WebSQLProcessor implements WebSessionProvider {
                 for (WebSQLResultsRow row : updatedRows) {
                     Map<String, Object> updateValues = row.getUpdateValues().entrySet().stream()
                         .filter(x -> CommonUtils.equalObjects(allAttributes[CommonUtils.toInt(x.getKey())].getRowIdentifier(), rowIdentifier))
-                        .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+                        .collect(HashMap::new, (m,v) -> m.put(v.getKey(), v.getValue()), HashMap::putAll);
                     if (CommonUtils.isEmpty(row.getData()) || CommonUtils.isEmpty(updateValues)) {
                         continue;
                     }
@@ -501,13 +500,7 @@ public class WebSQLProcessor implements WebSessionProvider {
                     for (int i = 0; i < updateAttributes.length; i++) {
                         DBDAttributeBinding updateAttribute = updateAttributes[i];
                         Object value = updateValues.get(String.valueOf(updateAttribute.getOrdinalPosition()));
-                        Object realCellValue;
-                        if (value instanceof LinkedTreeMap) {
-                            LinkedTreeMap<String, Object> variables = (LinkedTreeMap<String, Object>) value;
-                            realCellValue = setCellRowValue(variables, webSession, session, updateAttribute, withoutExecution);
-                        } else {
-                            realCellValue = setCellRowValue(value, webSession, session, updateAttribute, withoutExecution);
-                        }
+                        Object realCellValue = setCellRowValue(value, webSession, session, updateAttribute, withoutExecution);
                         rowValues[i] = realCellValue;
                         finalRow[updateAttribute.getOrdinalPosition()] = realCellValue;
                     }
