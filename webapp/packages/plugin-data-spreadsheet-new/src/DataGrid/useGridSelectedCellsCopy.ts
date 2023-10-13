@@ -20,7 +20,7 @@ const EVENT_KEY_CODE = {
 };
 
 function getCellCopyValue(tableData: ITableData, key: IResultSetElementKey): string {
-  return tableData.format.getDisplayString(key);
+  return tableData.format.getText(key);
 }
 
 function getSelectedCellsValue(tableData: ITableData, selectedCells: Map<string, IResultSetElementKey[]>) {

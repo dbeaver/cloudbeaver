@@ -225,7 +225,7 @@ export class DataGridContextMenuFilterService {
         menuItemsGetter: context => {
           const { model, resultIndex, key } = context.data;
           const format = model.source.getAction(resultIndex, ResultSetFormatAction);
-          const cellValue = format.getDisplayString(key);
+          const cellValue = format.getText(key);
           const items = this.getGeneralizedMenuItems(context, cellValue, 'filter');
           return items;
         },
@@ -270,7 +270,7 @@ export class DataGridContextMenuFilterService {
                 icon: 'filter-custom',
                 onClick: async () => {
                   const format = model.source.getAction(resultIndex, ResultSetFormatAction);
-                  const displayString = format.getDisplayString(key);
+                  const displayString = format.getText(key);
                   const customValue = await this.commonDialogService.open(FilterCustomValueDialog, {
                     defaultValue: displayString,
                     inputTitle: title + ':',
