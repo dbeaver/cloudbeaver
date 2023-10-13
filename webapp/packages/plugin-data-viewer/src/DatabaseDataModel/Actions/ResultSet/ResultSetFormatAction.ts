@@ -17,6 +17,7 @@ import type { IDatabaseDataFormatAction } from '../IDatabaseDataFormatAction';
 import type { IResultSetContentValue } from './IResultSetContentValue';
 import type { IResultSetElementKey, IResultSetPartialKey } from './IResultSetDataKey';
 import { isResultSetContentValue } from './isResultSetContentValue';
+import { isResultSetGeometryValue } from './isResultSetGeometryValue';
 import { ResultSetEditAction } from './ResultSetEditAction';
 import { ResultSetViewAction } from './ResultSetViewAction';
 
@@ -136,6 +137,14 @@ export class ResultSetFormatAction
       return '';
     }
 
+    if (isResultSetGeometryValue(value)) {
+      if (value.text !== undefined) {
+        return value.text;
+      }
+
+      return '';
+    }
+
     if (this.isBinary(key)) {
       return '';
     }
@@ -158,8 +167,24 @@ export class ResultSetFormatAction
       return '[null]';
     }
 
-    if (this.isBinary(key) || isResultSetContentValue(value)) {
+    if (isResultSetGeometryValue(value)) {
+      if (value.text !== undefined) {
+        return value.text;
+      }
+
+      return '[null]';
+    }
+
+    if (this.isBinary(key)) {
       return '[blob]';
+    }
+
+    if (isResultSetContentValue(value)) {
+      if (value.text !== undefined) {
+        return value.text;
+      }
+
+      return '[null]';
     }
 
     if (typeof value === 'string' && value.length > 1000) {

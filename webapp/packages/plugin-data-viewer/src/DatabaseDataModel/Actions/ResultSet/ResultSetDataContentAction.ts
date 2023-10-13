@@ -18,10 +18,9 @@ import { databaseDataAction } from '../DatabaseDataActionDecorator';
 import type { IResultSetContentValue } from './IResultSetContentValue';
 import type { IResultSetDataContentAction } from './IResultSetDataContentAction';
 import type { IResultSetElementKey } from './IResultSetDataKey';
-import { isResultSetContentValue } from './isResultSetContentValue';
 import { ResultSetDataAction } from './ResultSetDataAction';
 import { ResultSetDataKeysUtils } from './ResultSetDataKeysUtils';
-import type { IResultSetValue } from './ResultSetFormatAction';
+import { IResultSetValue, ResultSetFormatAction } from './ResultSetFormatAction';
 import { ResultSetViewAction } from './ResultSetViewAction';
 
 const RESULT_VALUE_PATH = 'sql-result-value';
@@ -30,29 +29,18 @@ const RESULT_VALUE_PATH = 'sql-result-value';
 export class ResultSetDataContentAction extends DatabaseDataAction<any, IDatabaseResultSet> implements IResultSetDataContentAction {
   static dataFormat = [ResultDataFormat.Resultset];
 
-  private readonly view: ResultSetViewAction;
-  private readonly data: ResultSetDataAction;
-
-  private readonly graphQLService: GraphQLService;
-  private readonly quotasService: QuotasService;
-
   private readonly cache: Map<string, string>;
   activeElement: IResultSetElementKey | null;
 
   constructor(
     source: IDatabaseDataSource<any, IDatabaseResultSet>,
-    view: ResultSetViewAction,
-    data: ResultSetDataAction,
-    graphQLService: GraphQLService,
-    quotasService: QuotasService,
+    private readonly view: ResultSetViewAction,
+    private readonly data: ResultSetDataAction,
+    private readonly format: ResultSetFormatAction,
+    private readonly graphQLService: GraphQLService,
+    private readonly quotasService: QuotasService,
   ) {
     super(source);
-
-    this.view = view;
-    this.data = data;
-
-    this.graphQLService = graphQLService;
-    this.quotasService = quotasService;
 
     this.cache = new Map();
     this.activeElement = null;
@@ -68,8 +56,7 @@ export class ResultSetDataContentAction extends DatabaseDataAction<any, IDatabas
   }
 
   isDownloadable(element: IResultSetElementKey) {
-    const cellValue = this.view.getCellValue(element);
-    return !!this.result.data?.hasRowIdentifier && isResultSetContentValue(cellValue);
+    return !!this.result.data?.hasRowIdentifier && this.format.isBinary(element);
   }
 
   async getFileDataUrl(element: IResultSetElementKey) {

@@ -53,7 +53,7 @@ public class WebServiceFS implements DBWServiceFS {
     public FSFile getFile(@NotNull WebSession webSession, @NotNull String projectId, @NotNull URI fileUri)
         throws DBWebException {
         try {
-            Path filePath = webSession.getFileSystemManager(projectId).of(webSession.getProgressMonitor(), fileUri);
+            Path filePath = webSession.getFileSystemManager(projectId).getPathFromURI(webSession.getProgressMonitor(), fileUri);
             return new FSFile(filePath);
         } catch (Exception e) {
             throw new DBWebException("Failed to found file: " + e.getMessage(), e);
@@ -65,7 +65,7 @@ public class WebServiceFS implements DBWServiceFS {
     public FSFile[] getFiles(@NotNull WebSession webSession, @NotNull String projectId, @NotNull URI folderURI)
         throws DBWebException {
         try {
-            Path folderPath = webSession.getFileSystemManager(projectId).of(webSession.getProgressMonitor(), folderURI);
+            Path folderPath = webSession.getFileSystemManager(projectId).getPathFromURI(webSession.getProgressMonitor(), folderURI);
             try (var filesStream = Files.list(folderPath)) {
                 return filesStream.map(FSFile::new)
                     .toArray(FSFile[]::new);
@@ -80,7 +80,7 @@ public class WebServiceFS implements DBWServiceFS {
     public String readFileContent(@NotNull WebSession webSession, @NotNull String projectId, @NotNull URI fileUri)
         throws DBWebException {
         try {
-            Path filePath = webSession.getFileSystemManager(projectId).of(webSession.getProgressMonitor(), fileUri);
+            Path filePath = webSession.getFileSystemManager(projectId).getPathFromURI(webSession.getProgressMonitor(), fileUri);
             return Files.readString(filePath);
         } catch (Exception e) {
             throw new DBWebException("Failed to read file content: " + e.getMessage(), e);
@@ -97,7 +97,7 @@ public class WebServiceFS implements DBWServiceFS {
     )
         throws DBWebException {
         try {
-            Path filePath = webSession.getFileSystemManager(projectId).of(webSession.getProgressMonitor(), fileURI);
+            Path filePath = webSession.getFileSystemManager(projectId).getPathFromURI(webSession.getProgressMonitor(), fileURI);
             if (!forceOverwrite && Files.exists(filePath)) {
                 throw new DBException("Cannot overwrite exist file");
             }
@@ -116,7 +116,7 @@ public class WebServiceFS implements DBWServiceFS {
         @NotNull URI fileUri
     ) throws DBWebException {
         try {
-            Path filePath = webSession.getFileSystemManager(projectId).of(webSession.getProgressMonitor(), fileUri);
+            Path filePath = webSession.getFileSystemManager(projectId).getPathFromURI(webSession.getProgressMonitor(), fileUri);
             Files.createFile(filePath);
             return new FSFile(filePath);
         } catch (Exception e) {
@@ -132,8 +132,8 @@ public class WebServiceFS implements DBWServiceFS {
         @NotNull URI toURI
     ) throws DBWebException {
         try {
-            Path from = webSession.getFileSystemManager(projectId).of(webSession.getProgressMonitor(), fromURI);
-            Path to = webSession.getFileSystemManager(projectId).of(webSession.getProgressMonitor(), toURI);
+            Path from = webSession.getFileSystemManager(projectId).getPathFromURI(webSession.getProgressMonitor(), fromURI);
+            Path to = webSession.getFileSystemManager(projectId).getPathFromURI(webSession.getProgressMonitor(), toURI);
             Files.move(from, to);
             return new FSFile(to);
         } catch (Exception e) {
@@ -149,7 +149,7 @@ public class WebServiceFS implements DBWServiceFS {
         @NotNull URI folderURI
     ) throws DBWebException {
         try {
-            Path folderPath = webSession.getFileSystemManager(projectId).of(webSession.getProgressMonitor(), folderURI);
+            Path folderPath = webSession.getFileSystemManager(projectId).getPathFromURI(webSession.getProgressMonitor(), folderURI);
             Files.createDirectory(folderPath);
             return new FSFile(folderPath);
         } catch (Exception e) {
@@ -164,7 +164,7 @@ public class WebServiceFS implements DBWServiceFS {
         @NotNull URI fileUri
     ) throws DBWebException {
         try {
-            Path filePath = webSession.getFileSystemManager(projectId).of(webSession.getProgressMonitor(), fileUri);
+            Path filePath = webSession.getFileSystemManager(projectId).getPathFromURI(webSession.getProgressMonitor(), fileUri);
             Files.delete(filePath);
             return true;
         } catch (Exception e) {

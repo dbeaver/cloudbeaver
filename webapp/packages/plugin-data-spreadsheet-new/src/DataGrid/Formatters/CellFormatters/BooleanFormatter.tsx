@@ -5,9 +5,8 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { computed } from 'mobx';
 import { observer } from 'mobx-react-lite';
-import { useContext, useMemo } from 'react';
+import { useContext } from 'react';
 
 import { getComputed, s, useS } from '@cloudbeaver/core-blocks';
 import type { IResultSetRowKey } from '@cloudbeaver/plugin-data-viewer';
@@ -51,17 +50,13 @@ export const BooleanFormatter = observer<RenderCellProps<IResultSetRowKey>>(func
       return;
     }
 
-    const nextValue = !resultColumn.required && booleanValue === false ? null : !booleanValue;
+    const nextValue = !resultColumn.required && value === false ? null : !booleanValue;
 
     tableDataContext.editor.set(cell, nextValue);
   }
 
   return (
-    <span
-      className={s(styles, { booleanFormatter: true, nullValue: booleanValue === null, disabled })}
-      title={stringifiedValue}
-      onClick={toggleValue}
-    >
+    <span className={s(styles, { booleanFormatter: true, nullValue: value === null, disabled })} title={stringifiedValue} onClick={toggleValue}>
       {valueRepresentation}
     </span>
   );
