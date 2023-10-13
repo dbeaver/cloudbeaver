@@ -7,11 +7,10 @@
  */
 import type { IResultSetComplexValue } from './IResultSetComplexValue';
 
-export interface IResultSetContentValue extends IResultSetComplexValue {
-  $type: 'content';
-  binary?: string;
-  text?: string;
-  value?: string;
-  contentType?: string;
-  contentLength?: number;
+export interface IResultSetGeometryValue extends IResultSetComplexValue {
+  $type: 'geometry';
+  srid: number;
+  text: string;
+  mapText: string | null;
+  properties: Record<string, any> | null;
 }

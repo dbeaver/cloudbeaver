@@ -25,7 +25,7 @@ import {
   IDatabaseDataOptions,
   IDatabaseResultSet,
   IRequestInfo,
-  IResultSetContentValue,
+  IResultSetBlobValue,
   ResultSetEditAction,
 } from '@cloudbeaver/plugin-data-viewer';
 
@@ -120,7 +120,7 @@ export class QueryDataSource<TOptions extends IDataQueryOptions = IDataQueryOpti
           editor = this.actions.get(result, DocumentEditAction);
         }
 
-        let blobs: IResultSetContentValue[] = [];
+        let blobs: IResultSetBlobValue[] = [];
         if (editor instanceof ResultSetEditAction) {
           blobs = editor.getBlobsToUpload();
         }

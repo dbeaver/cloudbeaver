@@ -7,11 +7,9 @@
  */
 import type { IResultSetComplexValue } from './IResultSetComplexValue';
 
-export interface IResultSetContentValue extends IResultSetComplexValue {
+export interface IResultSetFileValue extends IResultSetComplexValue {
   $type: 'content';
-  binary?: string;
-  text?: string;
-  value?: string;
+  fileId?: string;
   contentType?: string;
   contentLength?: number;
 }

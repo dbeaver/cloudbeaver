@@ -9,7 +9,7 @@ import { selectFiles } from '@cloudbeaver/core-browser';
 import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import {
-  createResultSetContentValue,
+  createResultSetBlobValue,
   ResultSetDataContentAction,
   ResultSetDataKeysUtils,
   ResultSetEditAction,
@@ -65,7 +65,7 @@ export class DataGridContextMenuSaveContentService {
           const edit = context.data.model.source.getAction(context.data.resultIndex, ResultSetEditAction);
           const file = files?.item(0) ?? undefined;
           if (file) {
-            edit.set(context.data.key, createResultSetContentValue({ blob: file, contentLength: file.size, contentType: file.type }));
+            edit.set(context.data.key, createResultSetBlobValue(file));
           }
         });
       },

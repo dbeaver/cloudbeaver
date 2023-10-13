@@ -14,8 +14,9 @@ import type { IDatabaseResultSet } from '../../IDatabaseResultSet';
 import { databaseDataAction } from '../DatabaseDataActionDecorator';
 import { DatabaseEditChangeType } from '../IDatabaseDataEditAction';
 import type { IDatabaseDataFormatAction } from '../IDatabaseDataFormatAction';
-import type { IResultSetContentValue } from './IResultSetContentValue';
+import type { IResultSetComplexValue } from './IResultSetComplexValue';
 import type { IResultSetElementKey, IResultSetPartialKey } from './IResultSetDataKey';
+import { isResultSetBlobValue } from './isResultSetBlobValue';
 import { isResultSetContentValue } from './isResultSetContentValue';
 import { isResultSetGeometryValue } from './isResultSetGeometryValue';
 import { ResultSetEditAction } from './ResultSetEditAction';
@@ -26,7 +27,7 @@ export type IResultSetValue =
   | number
   | boolean
   | Record<string, string | number | Record<string, any> | null>
-  | IResultSetContentValue
+  | IResultSetComplexValue
   | null;
 
 @databaseDataAction()
@@ -86,8 +87,13 @@ export class ResultSetFormatAction
 
     if (key.row) {
       const value = this.get(key as IResultSetElementKey);
+
+      if (isResultSetBlobValue(value)) {
+        return true;
+      }
+
       if (isResultSetContentValue(value)) {
-        return value.binary !== undefined || value.blob !== undefined;
+        return value.binary !== undefined;
       }
     }
 
