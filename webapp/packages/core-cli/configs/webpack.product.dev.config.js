@@ -6,8 +6,8 @@ const fs = require('fs');
 const { URL } = require('url');
 
 const commonConfig = require('./webpack.config.js');
-const main = resolve('src/index.ts');
-const sso = require.resolve('@cloudbeaver/plugin-sso/src/index.ts');
+const index = resolve('dist/index.js');
+const sso = require.resolve('@cloudbeaver/plugin-sso/dist/index.js');
 const ssoHtmlTemplate = require.resolve('@cloudbeaver/plugin-sso/src/index.html.ejs');
 const { getAssets } = require('./webpack.product.utils');
 
@@ -15,7 +15,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const HtmlReplaceWebpackPlugin = require('html-replace-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const ReactRefreshPlugin = require('@pmmmwh/react-refresh-webpack-plugin');
-const HtmlInjectWebpackPlugin = require('./HtmlInjectWebpackPlugin');
+const HtmlInjectWebpackPlugin = require('../utils/HtmlInjectWebpackPlugin');
 
 
 const package = require(resolve('package.json'));
@@ -42,7 +42,7 @@ module.exports = (env, argv) => {
     mode: 'development',
     context: resolve(__dirname, '../../../../../'),
     entry: {
-      main,
+      index,
       sso,
     },
     optimization: {
@@ -78,8 +78,7 @@ module.exports = (env, argv) => {
         logger.info(`Proxy from http://localhost:8080 to http://127.0.0.1:${port}`);
         httpProxy.createProxyServer({ target:`http://127.0.0.1:${port}` }).listen(8080);
       },
-    },
-    devtool: 'source-map',
+    }, 
     plugins: [
       new CopyWebpackPlugin({
         patterns: getAssets(package, ''),
@@ -91,7 +90,7 @@ module.exports = (env, argv) => {
       new HtmlWebpackPlugin({
         template: resolve('src/index.html.ejs'),
         inject: 'body',
-        chunks: ['main'],
+        chunks: ['index'],
         version: package.version,
         title: package.product?.name,
       }),

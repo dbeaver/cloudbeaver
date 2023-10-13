@@ -1,0 +1,7 @@
+.fieldLabel {
+  composes: theme-typography--body1 from global;
+  box-sizing: border-box;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}

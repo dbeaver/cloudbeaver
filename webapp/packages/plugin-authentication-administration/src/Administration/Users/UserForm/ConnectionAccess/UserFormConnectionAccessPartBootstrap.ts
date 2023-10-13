@@ -9,7 +9,7 @@ import React from 'react';
 
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { isGlobalProject, ProjectInfoResource } from '@cloudbeaver/core-projects';
-import { CachedMapAllKey, getCachedMapResourceLoaderState } from '@cloudbeaver/core-sdk';
+import { CachedMapAllKey, getCachedMapResourceLoaderState } from '@cloudbeaver/core-resource';
 
 import { AdministrationUserFormService } from '../AdministrationUserFormService';
 import { DATA_CONTEXT_USER_FORM_CONNECTION_ACCESS_PART } from './DATA_CONTEXT_USER_FORM_CONNECTION_ACCESS_PART';

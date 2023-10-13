@@ -1,4 +1,4 @@
-export { manifest as coreAuthenticationManifest } from './manifest';
+export * from './manifest';
 export * from './ELMRole';
 export * from './AppAuthService';
 export * from './AUTH_PROVIDER_LOCAL_ID';

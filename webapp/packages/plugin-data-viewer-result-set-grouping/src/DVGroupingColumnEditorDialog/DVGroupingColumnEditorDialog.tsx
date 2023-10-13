@@ -8,8 +8,19 @@
 import { observer } from 'mobx-react-lite';
 import { useState } from 'react';
 
-import { Button, Container, Group, s, useS, useTranslate } from '@cloudbeaver/core-blocks';
-import { CommonDialogBody, CommonDialogFooter, CommonDialogHeader, CommonDialogWrapper, DialogComponentProps } from '@cloudbeaver/core-dialogs';
+import {
+  Button,
+  CommonDialogBody,
+  CommonDialogFooter,
+  CommonDialogHeader,
+  CommonDialogWrapper,
+  Container,
+  Group,
+  s,
+  useS,
+  useTranslate,
+} from '@cloudbeaver/core-blocks';
+import type { DialogComponentProps } from '@cloudbeaver/core-dialogs';
 
 import type { IResultSetGroupingData } from '../DataContext/DATA_CONTEXT_DV_DDM_RS_GROUPING';
 import styles from './DVGroupingColumnEditorDialog.m.css';

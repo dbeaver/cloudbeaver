@@ -6,8 +6,8 @@
  * you may not use this file except in compliance with the License.
  */
 import { useCombinedRef } from '@cloudbeaver/core-blocks';
+import { useDataContext } from '@cloudbeaver/core-data-context';
 import { IDNDBox, IDNDData, useDNDBox, useDNDData } from '@cloudbeaver/core-ui';
-import { useDataContext } from '@cloudbeaver/core-view';
 import {
   DATA_CONTEXT_DV_DDM,
   DATA_CONTEXT_DV_DDM_RESULT_INDEX,
@@ -60,7 +60,7 @@ export function useTableColumnDnD(model: IDatabaseDataModel, resultIndex: number
   let side: TableColumnInsertPositionSide = null;
 
   if (columnKey && dndBox.state.isOver && dndBox.state.context) {
-    const dndColumnKey = dndBox.state.context.get(DATA_CONTEXT_DV_DDM_RS_COLUMN_KEY);
+    const dndColumnKey = dndBox.state.context.tryGet(DATA_CONTEXT_DV_DDM_RS_COLUMN_KEY);
 
     if (resultSetViewAction && dndColumnKey && resultSetViewAction.columnIndex(columnKey) > resultSetViewAction.columnIndex(dndColumnKey)) {
       side = 'right';

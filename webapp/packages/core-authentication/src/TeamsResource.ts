@@ -7,18 +7,15 @@
  */
 import { injectable } from '@cloudbeaver/core-di';
 import {
-  AdminConnectionGrantInfo,
-  AdminTeamInfoFragment,
   CachedMapAllKey,
   CachedMapResource,
-  GetTeamsListQueryVariables,
-  GraphQLService,
   isResourceAlias,
-  ResourceKey,
+  type ResourceKey,
   resourceKeyList,
-  ResourceKeySimple,
+  type ResourceKeySimple,
   ResourceKeyUtils,
-} from '@cloudbeaver/core-sdk';
+} from '@cloudbeaver/core-resource';
+import { AdminConnectionGrantInfo, AdminTeamInfoFragment, GetTeamsListQueryVariables, GraphQLService } from '@cloudbeaver/core-sdk';
 import { isArraysEqual } from '@cloudbeaver/core-utils';
 
 const NEW_TEAM_SYMBOL = Symbol('new-team');
@@ -120,7 +117,7 @@ export class TeamsResource extends CachedMapResource<string, TeamInfo, TeamResou
   }
 
   protected async loader(originalKey: ResourceKey<string>, includes?: string[]): Promise<Map<string, TeamInfo>> {
-    const all = this.isAlias(originalKey, CachedMapAllKey);
+    const all = this.aliases.isAlias(originalKey, CachedMapAllKey);
     const teamsList: TeamInfo[] = [];
 
     await ResourceKeyUtils.forEachAsync(originalKey, async key => {

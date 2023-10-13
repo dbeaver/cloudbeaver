@@ -7,7 +7,7 @@
  */
 
 @import '@cloudbeaver/core-theming/src/styles/theme-dark';
-@import 'base-metadata-grid';
+@import './base-metadata-grid';
 
 :global .#{$theme-class} {
   @include base-metadata-grid;

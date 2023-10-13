@@ -11,25 +11,27 @@ import { AppAuthService, UserInfoResource } from '@cloudbeaver/core-authenticati
 import { injectable } from '@cloudbeaver/core-di';
 import { ExecutorInterrupter, ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
 import { ProjectInfoResource, ProjectsService } from '@cloudbeaver/core-projects';
+import {
+  CachedMapAllKey,
+  CachedMapResource,
+  type CachedResourceIncludeArgs,
+  isResourceAlias,
+  type ResourceKey,
+  resourceKeyList,
+  type ResourceKeyList,
+  resourceKeyListAlias,
+  resourceKeyListAliasFactory,
+  ResourceKeyUtils,
+} from '@cloudbeaver/core-resource';
 import { DataSynchronizationService, NavigatorViewSettings, ServerEventId, SessionDataResource } from '@cloudbeaver/core-root';
 import {
   AdminConnectionGrantInfo,
   AdminConnectionSearchInfo,
-  CachedMapAllKey,
-  CachedMapResource,
-  CachedResourceIncludeArgs,
   ConnectionConfig,
   GetUserConnectionsQueryVariables,
   GraphQLService,
   InitConnectionMutationVariables,
-  isResourceAlias,
   NavigatorSettingsInput,
-  ResourceKey,
-  resourceKeyList,
-  ResourceKeyList,
-  resourceKeyListAlias,
-  resourceKeyListAliasFactory,
-  ResourceKeyUtils,
   TestConnectionMutation,
   UserConnectionAuthPropertiesFragment,
 } from '@cloudbeaver/core-sdk';
@@ -97,9 +99,9 @@ export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoPar
     this.sessionUpdate = false;
     this.nodeIdMap = new Map();
 
-    this.addAlias(ConnectionInfoProjectKey, param => resourceKeyList(this.keys.filter(key => param.options.projectIds.includes(key.projectId))));
+    this.aliases.add(ConnectionInfoProjectKey, param => resourceKeyList(this.keys.filter(key => param.options.projectIds.includes(key.projectId))));
 
-    this.addAlias(ConnectionInfoActiveProjectKey, () =>
+    this.aliases.add(ConnectionInfoActiveProjectKey, () =>
       resourceKeyList(this.keys.filter(key => projectsService.activeProjects.some(({ id }) => id === key.projectId))),
     );
 
@@ -232,7 +234,7 @@ export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoPar
   isConnected(key: ResourceKeyList<IConnectionInfoParams>): boolean;
   isConnected(key: ResourceKey<IConnectionInfoParams>): boolean;
   isConnected(key: ResourceKey<IConnectionInfoParams>): boolean {
-    key = ResourceKeyUtils.toList(this.transformToKey(key));
+    key = ResourceKeyUtils.toList(this.aliases.transformToKey(key));
     return this.get(key).every(connection => connection?.connected ?? false);
   }
 
@@ -359,10 +361,18 @@ export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoPar
     return subjects;
   }
 
-  async setAccessSubjects(connectionKey: IConnectionInfoParams, subjects: string[]): Promise<void> {
-    await this.graphQLService.sdk.setConnectionAccess({
+  async addConnectionsAccess(connectionKey: IConnectionInfoParams, subjects: string[]): Promise<void> {
+    await this.graphQLService.sdk.addConnectionsAccess({
       projectId: connectionKey.projectId,
-      connectionId: connectionKey.connectionId,
+      connectionIds: [connectionKey.connectionId],
+      subjects,
+    });
+  }
+
+  async deleteConnectionsAccess(connectionKey: IConnectionInfoParams, subjects: string[]): Promise<void> {
+    await this.graphQLService.sdk.deleteConnectionsAccess({
+      projectId: connectionKey.projectId,
+      connectionIds: [connectionKey.connectionId],
       subjects,
     });
   }
@@ -434,7 +444,7 @@ export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoPar
   deleteConnection(key: ResourceKeyList<IConnectionInfoParams>): Promise<void>;
   deleteConnection(key: ResourceKey<IConnectionInfoParams>): Promise<void>;
   async deleteConnection(key: ResourceKey<IConnectionInfoParams>): Promise<void> {
-    key = this.transformToKey(key);
+    key = this.aliases.transformToKey(key);
     await ResourceKeyUtils.forEachAsync(key, async key => {
       await this.performUpdate(key, [], async () => {
         await this.graphQLService.sdk.deleteConnection({ projectId: key.projectId, connectionId: key.connectionId });
@@ -469,7 +479,7 @@ export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoPar
     refresh: boolean,
   ): Promise<Map<IConnectionInfoParams, Connection>> {
     const connectionsList: Connection[] = [];
-    const projectKey = this.isAlias(originalKey, ConnectionInfoProjectKey);
+    const projectKey = this.aliases.isAlias(originalKey, ConnectionInfoProjectKey);
     let removedConnections: IConnectionInfoParams[] = [];
     let projectId: string | undefined;
     let projectIds: string[] | undefined;
@@ -478,12 +488,12 @@ export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoPar
       projectIds = projectKey.options.projectIds;
     }
 
-    if (this.isAlias(originalKey, ConnectionInfoActiveProjectKey)) {
+    if (this.aliases.isAlias(originalKey, ConnectionInfoActiveProjectKey)) {
       projectIds = this.projectsService.activeProjects.map(project => project.id);
     }
 
     if (isResourceAlias(originalKey)) {
-      const key = this.transformToKey(originalKey);
+      const key = this.aliases.transformToKey(originalKey);
       const outdated = ResourceKeyUtils.filter(key, key => this.isOutdated(key));
 
       if (!refresh && outdated.length === 1) {
@@ -515,7 +525,7 @@ export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoPar
 
     runInAction(() => {
       if (isResourceAlias(originalKey)) {
-        removedConnections = ResourceKeyUtils.toList(this.transformToKey(originalKey)).filter(
+        removedConnections = ResourceKeyUtils.toList(this.aliases.transformToKey(originalKey)).filter(
           key => !connectionsList.some(connection => isConnectionInfoParamEqual(key, createConnectionParam(connection))),
         );
       }

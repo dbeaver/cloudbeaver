@@ -22,8 +22,9 @@ import {
 import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
+import { CachedMapAllKey } from '@cloudbeaver/core-resource';
 import { FEATURE_GIT_ID, ServerConfigResource } from '@cloudbeaver/core-root';
-import { CachedMapAllKey, GraphQLService, SqlCompletionProposal, SqlScriptInfoFragment } from '@cloudbeaver/core-sdk';
+import { GraphQLService, SqlCompletionProposal, SqlScriptInfoFragment } from '@cloudbeaver/core-sdk';
 
 import { getSqlEditorName } from './getSqlEditorName';
 import type { ISqlEditorTabState } from './ISqlEditorTabState';

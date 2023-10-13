@@ -20,10 +20,10 @@ export const ServerConfigurationAdminForm = observer<Props>(function ServerConfi
   return (
     <Group form gap medium>
       <GroupTitle>{translate('administration_configuration_wizard_configuration_admin')}</GroupTitle>
-      <InputField type="text" name="adminName" state={serverConfig} minLength={6} mod="surface" required tiny>
+      <InputField type="text" name="adminName" state={serverConfig} minLength={6} required tiny>
         {translate('administration_configuration_wizard_configuration_admin_name')}
       </InputField>
-      <InputField type="password" name="adminPassword" state={serverConfig} autoComplete="new-password" mod="surface" required tiny>
+      <InputField type="password" name="adminPassword" state={serverConfig} autoComplete="new-password" required tiny>
         {translate('administration_configuration_wizard_configuration_admin_password')}
       </InputField>
     </Group>

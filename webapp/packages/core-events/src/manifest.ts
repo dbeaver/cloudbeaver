@@ -11,7 +11,7 @@ import { EventsSettingsService } from './EventsSettingsService';
 import { ExceptionsCatcherService } from './ExceptionsCatcherService';
 import { NotificationService } from './NotificationService';
 
-export const manifest: PluginManifest = {
+export const coreEventsManifest: PluginManifest = {
   info: {
     name: 'Core Events',
   },

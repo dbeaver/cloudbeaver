@@ -33,10 +33,10 @@ import {
 } from '@cloudbeaver/core-blocks';
 import { DatabaseAuthModelsResource, DBDriverResource, isLocalConnection } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
+import { CachedResourceListEmptyKey, resourceKeyList } from '@cloudbeaver/core-resource';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
-import { CachedResourceListEmptyKey, DriverConfigurationType, resourceKeyList } from '@cloudbeaver/core-sdk';
-import type { TabContainerPanelComponent } from '@cloudbeaver/core-ui';
-import { useAuthenticationAction } from '@cloudbeaver/core-ui';
+import { DriverConfigurationType } from '@cloudbeaver/core-sdk';
+import { type TabContainerPanelComponent, useAuthenticationAction } from '@cloudbeaver/core-ui';
 import { isSafari } from '@cloudbeaver/core-utils';
 import { ProjectSelect } from '@cloudbeaver/plugin-projects';
 
@@ -236,7 +236,6 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
                 disabled={disabled}
                 readOnly={readonly}
                 autoComplete={`section-${config.driverId || 'driver'} section-jdbc`}
-                mod="surface"
               >
                 {translate('customConnection_url_JDBC')}
               </InputField>
@@ -253,7 +252,7 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
           </Group>
           <Group form gap>
             <Container wrap gap>
-              <InputField type="text" name="name" minLength={1} state={config} disabled={disabled} readOnly={readonly} mod="surface" required fill>
+              <InputField type="text" name="name" minLength={1} state={config} disabled={disabled} readOnly={readonly} required fill>
                 {translate('connections_connection_name')}
               </InputField>
               {!config.template && (
@@ -272,7 +271,6 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
                   state={config}
                   disabled={disabled}
                   autoComplete={`section-${config.driverId || 'driver'} section-folder`}
-                  mod="surface"
                   autoHide
                   readOnly
                   tiny
@@ -328,6 +326,7 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
                         name="saveCredentials"
                         state={config}
                         disabled={disabled || readonly || config.sharedCredentials}
+                        mod={['primary']}
                         keepSize
                       >
                         {translate('connections_connection_edit_save_credentials')}

@@ -1,32 +1,31 @@
 {
   "name": "@cloudbeaver/core-sdk",
-  "sideEffects": false,
+  "sideEffects": [
+    "src/**/*.css",
+    "src/**/*.scss",
+    "public/**/*"
+  ],
   "version": "0.1.0",
   "description": "",
   "license": "Apache-2.0",
-  "main": "lib/index.js",
-  "module": "lib/index.js",
-  "types": "src/index.ts",
+  "main": "dist/index.js",
   "scripts": {
-    "prebuild": "rimraf --glob lib/* & rimraf node_modules",
-    "build": "webpack --config ../../configs/webpack.plugin.config.js",
-    "postbuild": "tsc",
-    "pregql:gen": "rimraf node_modules",
-    "gql:gen": "graphql-codegen",
-    "pregql:gen:dev": "rimraf node_modules",
-    "gql:gen:dev": "graphql-codegen --watch",
+    "clean": "rimraf node_modules",
+    "build": "yarn run gql:gen && tsc -b",
+    "gql:gen": "yarn run clean && graphql-codegen",
+    "gql:gen:dev": "yarn run clean && graphql-codegen --watch",
     "lint": "eslint ./src/ --ext .ts,.tsx",
     "lint-fix": "eslint ./src/ --ext .ts,.tsx --fix",
-    "test": "core-cli-test",
-    "validate-dependencies": "core-cli-validate-dependencies"
+    "test": "yarn build && core-cli-test",
+    "validate-dependencies": "core-cli-validate-dependencies",
+    "update-ts-references": "rimraf --glob dist && typescript-resolve-references"
   },
   "dependencies": {
     "@cloudbeaver/core-di": "~0.1.0",
-    "@cloudbeaver/core-executor": "~0.1.0",
     "@cloudbeaver/core-utils": "~0.1.0",
-    "axios": "~1.5.0",
-    "graphql": "~16.x.x",
-    "graphql-request": "~6.1.0"
+    "axios": "^1.5.0",
+    "graphql-request": "^6.1.0",
+    "mobx": "^6.10.2"
   },
   "devDependencies": {
     "@graphql-codegen/add": "~5.0.0",
@@ -36,9 +35,9 @@
     "@graphql-codegen/typescript-graphql-files-modules": "~2.2.1",
     "@graphql-codegen/typescript-graphql-request": "~5.0.0",
     "@graphql-codegen/typescript-operations": "~4.0.1",
-    "@parcel/watcher": "~2.3.0"
+    "@parcel/watcher": "~2.3.0",
+    "graphql": "^16.8.1",
+    "typescript": "^5.2.2"
   },
-  "peerDependencies": {
-    "mobx": "~6.x.x"
-  }
+  "peerDependencies": {}
 }

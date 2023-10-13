@@ -5,6 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
+/// <reference lib="WebWorker" />
 import { Workbox } from 'workbox-window';
 
 import { injectable } from '@cloudbeaver/core-di';

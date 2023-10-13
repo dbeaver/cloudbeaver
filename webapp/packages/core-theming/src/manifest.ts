@@ -11,7 +11,7 @@ import { LocaleService } from './LocaleService';
 import { ThemeService } from './ThemeService';
 import { ThemeSettingsService } from './ThemeSettingsService';
 
-export const manifest: PluginManifest = {
+export const coreThemingManifest: PluginManifest = {
   info: {
     name: 'Core Theming',
   },

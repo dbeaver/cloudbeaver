@@ -5,7 +5,7 @@ Bundle-SymbolicName: io.cloudbeaver.test.platform
 Bundle-Version: 1.0.0.qualifier
 Bundle-Release-Date: 20220606
 Bundle-Vendor: DBeaver Corp
-Bundle-RequiredExecutionEnvironment: JavaSE-11
+Bundle-RequiredExecutionEnvironment: JavaSE-17
 Bundle-ActivationPolicy: lazy
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.core.resources,
@@ -24,5 +24,6 @@ Require-Bundle: org.eclipse.core.runtime,
  io.cloudbeaver.resources.drivers.base,
  io.cloudbeaver.product.ce,
  io.cloudbeaver.service.auth,
- io.cloudbeaver.service.rm
+ io.cloudbeaver.service.rm,
+ io.cloudbeaver.service.rm.nio
 Export-Package: io.cloudbeaver.test.platform

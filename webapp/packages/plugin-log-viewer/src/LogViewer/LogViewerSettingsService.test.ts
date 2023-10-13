@@ -7,23 +7,48 @@
  */
 import '@testing-library/jest-dom';
 
-import { CoreSettingsService } from '@cloudbeaver/core-app';
-import { mockAuthentication } from '@cloudbeaver/core-authentication/mocks/mockAuthentication';
-import { createApp } from '@cloudbeaver/core-cli/tests/utils/createApp';
-import { ServerConfigResource } from '@cloudbeaver/core-root';
-import { createGQLEndpoint } from '@cloudbeaver/core-root/mocks/createGQLEndpoint';
-import { mockAppInit } from '@cloudbeaver/core-root/mocks/mockAppInit';
-import { mockGraphQL } from '@cloudbeaver/core-root/mocks/mockGraphQL';
-import { mockServerConfig } from '@cloudbeaver/core-root/mocks/resolvers/mockServerConfig';
-import administrationPlugin from '@cloudbeaver/plugin-administration';
-import toolsPanel from '@cloudbeaver/plugin-tools-panel';
-import topAppBarPlugin from '@cloudbeaver/plugin-top-app-bar';
+import { coreAppManifest, CoreSettingsService } from '@cloudbeaver/core-app';
+import { coreAuthenticationManifest } from '@cloudbeaver/core-authentication';
+import { mockAuthentication } from '@cloudbeaver/core-authentication/dist/__custom_mocks__/mockAuthentication';
+import { coreBrowserManifest } from '@cloudbeaver/core-browser';
+import { coreEventsManifest } from '@cloudbeaver/core-events';
+import { coreLocalizationManifest } from '@cloudbeaver/core-localization';
+import { corePluginManifest } from '@cloudbeaver/core-plugin';
+import { coreProductManifest } from '@cloudbeaver/core-product';
+import { coreRootManifest, ServerConfigResource } from '@cloudbeaver/core-root';
+import { createGQLEndpoint } from '@cloudbeaver/core-root/dist/__custom_mocks__/createGQLEndpoint';
+import { mockAppInit } from '@cloudbeaver/core-root/dist/__custom_mocks__/mockAppInit';
+import { mockGraphQL } from '@cloudbeaver/core-root/dist/__custom_mocks__/mockGraphQL';
+import { mockServerConfig } from '@cloudbeaver/core-root/dist/__custom_mocks__/resolvers/mockServerConfig';
+import { coreRoutingManifest } from '@cloudbeaver/core-routing';
+import { coreSDKManifest } from '@cloudbeaver/core-sdk';
+import { coreSettingsManifest } from '@cloudbeaver/core-settings';
+import { coreThemingManifest } from '@cloudbeaver/core-theming';
+import { coreViewManifest } from '@cloudbeaver/core-view';
+import toolsPanelPlugin from '@cloudbeaver/plugin-tools-panel';
+import { createApp } from '@cloudbeaver/tests-runner';
 
 import { logViewerPlugin } from '../manifest';
 import { LogViewerSettings, LogViewerSettingsService } from './LogViewerSettingsService';
 
 const endpoint = createGQLEndpoint();
-const app = createApp(administrationPlugin, topAppBarPlugin, toolsPanel, logViewerPlugin);
+const app = createApp(
+  logViewerPlugin,
+  toolsPanelPlugin,
+  corePluginManifest,
+  coreProductManifest,
+  coreRootManifest,
+  coreSDKManifest,
+  coreViewManifest,
+  coreAuthenticationManifest,
+  coreSettingsManifest,
+  coreBrowserManifest,
+  coreLocalizationManifest,
+  coreEventsManifest,
+  coreAppManifest,
+  coreRoutingManifest,
+  coreThemingManifest,
+);
 
 const server = mockGraphQL(...mockAppInit(endpoint), ...mockAuthentication(endpoint));
 

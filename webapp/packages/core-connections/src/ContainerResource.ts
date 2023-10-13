@@ -8,15 +8,8 @@
 import { AppAuthService } from '@cloudbeaver/core-authentication';
 import { injectable } from '@cloudbeaver/core-di';
 import { ExecutorInterrupter } from '@cloudbeaver/core-executor';
-import {
-  CachedMapResource,
-  GraphQLService,
-  isResourceAlias,
-  NavNodeInfoFragment,
-  ResourceKey,
-  resourceKeyList,
-  ResourceKeyUtils,
-} from '@cloudbeaver/core-sdk';
+import { CachedMapResource, isResourceAlias, type ResourceKey, resourceKeyList, ResourceKeyUtils } from '@cloudbeaver/core-resource';
+import { GraphQLService, NavNodeInfoFragment } from '@cloudbeaver/core-sdk';
 import { isNull } from '@cloudbeaver/core-utils';
 
 import { ConnectionInfoActiveProjectKey, ConnectionInfoResource } from './ConnectionInfoResource';

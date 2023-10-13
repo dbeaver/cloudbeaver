@@ -3,9 +3,9 @@ Bundle-ManifestVersion: 2
 Bundle-Vendor: DBeaver Corp
 Bundle-Name: Cloudbeaver Web Service - Resource manager
 Bundle-SymbolicName: io.cloudbeaver.service.rm;singleton:=true
-Bundle-Version: 1.0.35.qualifier
-Bundle-Release-Date: 20230209
-Bundle-RequiredExecutionEnvironment: JavaSE-11
+Bundle-Version: 1.0.36.qualifier
+Bundle-Release-Date: 20231023
+Bundle-RequiredExecutionEnvironment: JavaSE-17
 Bundle-ActivationPolicy: lazy
 Bundle-ClassPath: .
 Require-Bundle: io.cloudbeaver.server,

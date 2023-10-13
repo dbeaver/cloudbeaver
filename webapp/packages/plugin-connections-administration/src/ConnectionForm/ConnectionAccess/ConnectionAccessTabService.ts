@@ -104,12 +104,24 @@ export class ConnectionAccessTabService extends Bootstrap {
 
     const key = createConnectionParam(data.state.projectId, config.connectionId);
 
-    const changed = await this.isChanged(key, state.grantedSubjects);
+    const currentGrantedSubjects = await this.connectionInfoResource.loadAccessSubjects(key);
+    const currentGrantedSubjectIds = currentGrantedSubjects.map(subject => subject.subjectId);
 
-    if (changed) {
-      await this.connectionInfoResource.setAccessSubjects(key, state.grantedSubjects);
-      state.initialGrantedSubjects = state.grantedSubjects.slice();
+    const { subjectsToRevoke, subjectsToGrant } = this.getSubjectDifferences(currentGrantedSubjectIds, state.grantedSubjects);
+
+    if (subjectsToRevoke.length === 0 && subjectsToGrant.length === 0) {
+      return;
     }
+
+    if (subjectsToRevoke.length > 0) {
+      await this.connectionInfoResource.deleteConnectionsAccess(key, subjectsToRevoke);
+    }
+
+    if (subjectsToGrant.length > 0) {
+      await this.connectionInfoResource.addConnectionsAccess(key, subjectsToGrant);
+    }
+
+    state.initialGrantedSubjects = state.grantedSubjects.slice();
   }
 
   private async formState(data: IConnectionFormState, contexts: IExecutionContextProvider<IConnectionFormState>) {
@@ -137,5 +149,12 @@ export class ConnectionAccessTabService extends Bootstrap {
     }
 
     return current.some(value => !next.some(subjectId => subjectId === value.subjectId));
+  }
+
+  private getSubjectDifferences(current: string[], next: string[]): { subjectsToRevoke: string[]; subjectsToGrant: string[] } {
+    const subjectsToRevoke = current.filter(subjectId => !next.includes(subjectId));
+    const subjectsToGrant = next.filter(subjectId => !current.includes(subjectId));
+
+    return { subjectsToRevoke, subjectsToGrant };
   }
 }

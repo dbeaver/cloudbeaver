@@ -2267,6 +2267,90 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
     }
 
 
+    @Override
+    public void addObjectPermissions(
+        @NotNull Set<String> objectIds,
+        @NotNull SMObjectType objectType,
+        @NotNull Set<String> subjectIds,
+        @NotNull Set<String> permissions,
+        @NotNull String grantor
+    ) throws DBException {
+        if (CommonUtils.isEmpty(objectIds) || CommonUtils.isEmpty(subjectIds) || CommonUtils.isEmpty(permissions)) {
+            return;
+        }
+        Set<String> filteredSubjects = getFilteredSubjects(subjectIds);
+        try (Connection dbCon = database.openConnection();
+             JDBCTransaction txn = new JDBCTransaction(dbCon);
+             PreparedStatement dbStat = dbCon.prepareStatement(database.normalizeTableNames(
+                 "INSERT INTO {table_prefix}CB_OBJECT_PERMISSIONS" +
+                     "(OBJECT_ID,OBJECT_TYPE,GRANT_TIME,GRANTED_BY,SUBJECT_ID,PERMISSION) "
+                     + "VALUES(?,?,?,?,?,?)"))
+        ) {
+            for (String objectId : objectIds) {
+                dbStat.setString(1, objectId);
+                dbStat.setString(2, objectType.name());
+                dbStat.setTimestamp(3, new Timestamp(System.currentTimeMillis()));
+                dbStat.setString(4, grantor);
+                for (String subjectId : subjectIds) {
+                    if (!filteredSubjects.contains(subjectId)) {
+                        log.error("Subject '" + subjectId + "' is not found in database");
+                        continue;
+                    }
+                    dbStat.setString(5, subjectId);
+                    for (String permission : permissions) {
+                        dbStat.setString(6, permission);
+                        dbStat.execute();
+                    }
+                }
+                txn.commit();
+            }
+            addObjectPermissionsUpdateEvent(objectIds, objectType);
+        } catch (SQLException e) {
+            throw new DBCException("Error granting object permissions", e);
+        }
+    }
+
+    @Override
+    public void deleteObjectPermissions(
+        @NotNull Set<String> objectIds,
+        @NotNull SMObjectType objectType,
+        @NotNull Set<String> subjectIds,
+        @NotNull Set<String> permissions
+    ) throws DBException {
+        if (CommonUtils.isEmpty(objectIds) || CommonUtils.isEmpty(subjectIds) || CommonUtils.isEmpty(permissions)) {
+            return;
+        }
+        String sql = "DELETE FROM {table_prefix}CB_OBJECT_PERMISSIONS WHERE " +
+            "OBJECT_TYPE=?" +
+            " AND " +
+            "OBJECT_ID IN (" + SQLUtils.generateParamList(objectIds.size()) + ")" +
+            " AND " +
+            "SUBJECT_ID IN (" + SQLUtils.generateParamList(subjectIds.size()) + ")" +
+            " AND " +
+            "PERMISSION IN (" + SQLUtils.generateParamList(permissions.size()) + ")";
+
+        try (
+            Connection dbCon = database.openConnection();
+            PreparedStatement dbStat = dbCon.prepareStatement(database.normalizeTableNames(sql))
+        ) {
+            int index = 1;
+            dbStat.setString(index++, objectType.name());
+            for (String objectId : objectIds) {
+                dbStat.setString(index++, objectId);
+            }
+            for (String subjectId : subjectIds) {
+                dbStat.setString(index++, subjectId);
+            }
+            for (String permission : permissions) {
+                dbStat.setString(index++, permission);
+            }
+            dbStat.execute();
+            addObjectPermissionsDeleteEvent(objectIds, objectType);
+        } catch (SQLException e) {
+            throw new DBCException("Error granting object permissions", e);
+        }
+    }
+
 
     private void addSubjectPermissionsUpdateEvent(@NotNull String subjectId, @Nullable SMSubjectType subjectType) {
         if (subjectType == null) {
@@ -2288,6 +2372,18 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
     private void addObjectPermissionsUpdateEvent(@NotNull Set<String> objectIds, @NotNull SMObjectType objectType) {
         for (var objectId : objectIds) {
             var event = WSObjectPermissionEvent.update(
+                getSmSessionId(),
+                getUserId(),
+                objectType,
+                objectId
+            );
+            application.getEventController().addEvent(event);
+        }
+    }
+
+    private void addObjectPermissionsDeleteEvent(@NotNull Set<String> objectIds, @NotNull SMObjectType objectType) {
+        for (var objectId : objectIds) {
+            var event = WSObjectPermissionEvent.delete(
                 getSmSessionId(),
                 getUserId(),
                 objectType,

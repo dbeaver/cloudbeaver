@@ -8,10 +8,10 @@
 import { action, autorun, computed, IReactionDisposer, observable, untracked } from 'mobx';
 import { useEffect } from 'react';
 
-import { useExecutor, useObservableRef } from '@cloudbeaver/core-blocks';
+import { ConfirmationDialog, useExecutor, useObservableRef } from '@cloudbeaver/core-blocks';
 import { ConnectionExecutionContextService, createConnectionParam } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
-import { CommonDialogService, ConfirmationDialog, DialogueStateResult } from '@cloudbeaver/core-dialogs';
+import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { SyncExecutor } from '@cloudbeaver/core-executor';
 import type { SqlCompletionProposal, SqlDialectInfo, SqlScriptInfoFragment } from '@cloudbeaver/core-sdk';

@@ -1,14 +1,73 @@
 {
-  "extends": "../../tsconfig.json",
+  "extends": "../../tsconfig.base.json",
   "compilerOptions": {
     "rootDir": "src",
-    "outDir": "lib"
+    "outDir": "dist",
+    "tsBuildInfoFile": "dist/tsconfig.tsbuildinfo"
   },
-  "include": ["src"],
-  "exclude": ["**/node_modules", "**/.*/"],
   "references": [
     {
-      "path": "../*"
+      "path": "../core-authentication/tsconfig.json"
+    },
+    {
+      "path": "../core-blocks/tsconfig.json"
+    },
+    {
+      "path": "../core-connections/tsconfig.json"
+    },
+    {
+      "path": "../core-di/tsconfig.json"
+    },
+    {
+      "path": "../core-dialogs/tsconfig.json"
+    },
+    {
+      "path": "../core-localization/tsconfig.json"
+    },
+    {
+      "path": "../core-plugin/tsconfig.json"
+    },
+    {
+      "path": "../core-projects/tsconfig.json"
+    },
+    {
+      "path": "../core-resource/tsconfig.json"
+    },
+    {
+      "path": "../core-resource-manager/tsconfig.json"
+    },
+    {
+      "path": "../core-root/tsconfig.json"
+    },
+    {
+      "path": "../core-ui/tsconfig.json"
+    },
+    {
+      "path": "../core-view/tsconfig.json"
+    },
+    {
+      "path": "../plugin-navigation-tree-rm/tsconfig.json"
+    },
+    {
+      "path": "../plugin-projects/tsconfig.json"
+    },
+    {
+      "path": "../plugin-resource-manager/tsconfig.json"
+    },
+    {
+      "path": "../plugin-tools-panel/tsconfig.json"
     }
+  ],
+  "include": [
+    "__custom_mocks__/**/*",
+    "src/**/*",
+    "src/**/*.json",
+    "src/**/*.css",
+    "src/**/*.scss"
+  ],
+  "exclude": [
+    "**/node_modules",
+    "lib/**/*",
+    "dist/**/*"
   ]
 }

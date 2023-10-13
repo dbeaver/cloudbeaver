@@ -7,91 +7,16 @@
  */
 import { observable } from 'mobx';
 import { observer } from 'mobx-react-lite';
-import styled, { css, use } from 'reshadow';
 
-import type { ComponentStyle } from '@cloudbeaver/core-theming';
-
+import style from './Button.m.css';
 import { IconOrImage } from './IconOrImage';
 import { Loader } from './Loader/Loader';
+import { s } from './s';
 import { useObjectRef } from './useObjectRef';
 import { useObservableRef } from './useObservableRef';
-import { useStyles } from './useStyles';
+import { useS } from './useS';
 
-const buttonStyles = css`
-  button-label {
-    composes: theme-button__label from global;
-  }
-  button-icon {
-    composes: theme-button__icon from global;
-  }
-  ripple {
-    composes: theme-button_ripple from global;
-  }
-  Button {
-    composes: theme-button from global;
-    display: flex;
-
-    & IconOrImage {
-      width: 100%;
-    }
-
-    &[disabled] IconOrImage {
-      opacity: 0.5;
-    }
-
-    & Loader,
-    & button-label {
-      transition: opacity cubic-bezier(0.4, 0, 0.2, 1) 0.3s;
-    }
-
-    & Loader {
-      position: absolute;
-      opacity: 0 !important;
-    }
-
-    & button-label {
-      line-height: 1;
-      opacity: 1;
-    }
-
-    &[|loading] {
-      & Loader {
-        opacity: 1 !important;
-      }
-
-      & button-label {
-        opacity: 0;
-      }
-    }
-
-    &[href] {
-      text-decoration: none !important;
-    }
-  }
-`;
-
-const buttonMod = {
-  raised: css`
-    Button {
-      composes: theme-button_raised from global;
-    }
-  `,
-  unelevated: css`
-    Button {
-      composes: theme-button_unelevated from global;
-    }
-  `,
-  outlined: css`
-    Button {
-      composes: theme-button_outlined from global;
-    }
-  `,
-  secondary: css`
-    Button {
-      composes: theme-button_secondary from global;
-    }
-  `,
-};
+type ButtonMod = Array<'raised' | 'unelevated' | 'outlined' | 'secondary'>;
 
 type ButtonProps = (React.ButtonHTMLAttributes<HTMLButtonElement | HTMLAnchorElement> &
   React.LinkHTMLAttributes<HTMLLinkElement | HTMLButtonElement> &
@@ -99,8 +24,7 @@ type ButtonProps = (React.ButtonHTMLAttributes<HTMLButtonElement | HTMLAnchorEle
   loading?: boolean;
   icon?: string;
   viewBox?: string;
-  styles?: ComponentStyle;
-  mod?: Array<keyof typeof buttonMod>;
+  mod?: ButtonMod;
   tag?: 'button' | 'a' | 'div';
   href?: string;
   target?: '_blank' | '_self' | '_parent' | '_top';
@@ -114,7 +38,6 @@ export const Button = observer<ButtonProps>(function Button({
   icon,
   viewBox,
   mod,
-  styles,
   tag = 'button',
   type = 'button',
   disabled = false,
@@ -124,6 +47,7 @@ export const Button = observer<ButtonProps>(function Button({
   className,
   ...rest
 }) {
+  const styles = useS(style);
   const handlersRef = useObjectRef({ onClick });
   const state = useObservableRef(
     () => ({
@@ -155,16 +79,33 @@ export const Button = observer<ButtonProps>(function Button({
   }
 
   const Button = tag;
-  return styled(useStyles(styles, buttonStyles, ...(mod || []).map(mod => buttonMod[mod])))(
-    <Button {...rest} type={type} disabled={disabled} {...use({ loading })} className={className} onClick={state.click}>
-      <ripple />
-      {icon && (
-        <button-icon>
-          <IconOrImage icon={icon} viewBox={viewBox} />
-        </button-icon>
+  return (
+    <Button
+      {...rest}
+      type={type}
+      disabled={disabled}
+      className={s(
+        styles,
+        {
+          button: true,
+          raised: mod?.includes('raised'),
+          outlined: mod?.includes('outlined'),
+          secondary: mod?.includes('secondary'),
+          unelevated: mod?.includes('unelevated'),
+          loading,
+        },
+        className,
       )}
-      <button-label as="span">{children}</button-label>
-      <Loader small />
-    </Button>,
+      onClick={state.click}
+    >
+      <div className={s(styles, { ripple: true })} />
+      {icon && (
+        <div className={s(styles, { buttonIcon: true, disabled })}>
+          <IconOrImage icon={icon} viewBox={viewBox} />
+        </div>
+      )}
+      <span className={s(styles, { buttonLabel: true })}>{children}</span>
+      <Loader className={s(styles, { loader: true })} small />
+    </Button>
   );
 });

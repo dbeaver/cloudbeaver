@@ -10,6 +10,10 @@ import { observer } from 'mobx-react-lite';
 import {
   Button,
   ColoredContainer,
+  CommonDialogBody,
+  CommonDialogFooter,
+  CommonDialogHeader,
+  CommonDialogWrapper,
   FormFieldDescription,
   Group,
   IconOrImage,
@@ -20,10 +24,10 @@ import {
   useTranslate,
 } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { CommonDialogBody, CommonDialogFooter, CommonDialogHeader, CommonDialogWrapper, DialogComponentProps } from '@cloudbeaver/core-dialogs';
+import type { DialogComponentProps } from '@cloudbeaver/core-dialogs';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
 import { ThemeService } from '@cloudbeaver/core-theming';
-import { useAppVersion } from '@cloudbeaver/plugin-version';
+import { useAppVersion } from '@cloudbeaver/core-version';
 
 import ProductInfoDialogStyles from './ProductInfoDialog.m.css';
 
