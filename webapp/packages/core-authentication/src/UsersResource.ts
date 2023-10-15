@@ -111,8 +111,20 @@ export class UsersResource extends CachedMapResource<string, AdminUser, UserReso
     return grantedConnections;
   }
 
-  async setConnections(userId: string, connections: string[]): Promise<void> {
-    await this.graphQLService.sdk.setConnections({ userId, connections });
+  async addConnectionsAccess(projectId: string, userId: string, connectionIds: string[]): Promise<void> {
+    await this.graphQLService.sdk.addConnectionsAccess({
+      projectId,
+      connectionIds,
+      subjects: [userId],
+    });
+  }
+
+  async deleteConnectionsAccess(projectId: string, userId: string, connectionIds: string[]): Promise<void> {
+    await this.graphQLService.sdk.deleteConnectionsAccess({
+      projectId,
+      connectionIds,
+      subjects: [userId],
+    });
   }
 
   async setMetaParameters(userId: string, parameters: Record<string, any>): Promise<void> {

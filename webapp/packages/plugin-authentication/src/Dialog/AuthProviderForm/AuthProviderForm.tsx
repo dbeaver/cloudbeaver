@@ -53,7 +53,6 @@ export const AuthProviderForm = observer<Props>(function AuthProviderForm({ prov
               disabled={authenticate}
               canShowPassword={false}
               autoComplete={`section-authentication section-${provider.id} ${parameter.id}`}
-              mod="surface"
             >
               {parameter.displayName}
             </InputField>

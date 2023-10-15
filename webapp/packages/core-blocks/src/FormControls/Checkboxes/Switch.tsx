@@ -8,10 +8,11 @@
 import { observer } from 'mobx-react-lite';
 
 import { filterLayoutFakeProps } from '../../Containers/filterLayoutFakeProps';
-import elementsSizeStyles from '../../Containers/shared/ElementsSize.m.css';
 import { s } from '../../s';
 import { useS } from '../../useS';
-import formControlStyles from '../FormControl.m.css';
+import { Field } from '../Field';
+import { FieldDescription } from '../FieldDescription';
+import { FieldLabel } from '../FieldLabel';
 import { isControlPresented } from '../isControlPresented';
 import type { ICheckboxControlledProps, ICheckboxObjectProps } from './Checkbox';
 import switchStyles from './Switch.m.css';
@@ -64,14 +65,14 @@ export const Switch: SwitchType = observer(function Switch({
     onChange,
   });
   rest = filterLayoutFakeProps(rest);
-  const styles = useS(elementsSizeStyles, formControlStyles, switchStyles, ...mod.map(mod => switchMod[mod]));
+  const styles = useS(switchStyles, ...mod.map(mod => switchMod[mod]));
 
   if (autoHide && !isControlPresented(name, state)) {
     return null;
   }
 
   return (
-    <div data-testid="field" className={s(styles, { field: true }, className)} title={rest.title}>
+    <Field data-testid="field" title={rest.title}>
       <div data-testid="switch-body" className={styles.switchBody}>
         <div data-testid="switch-control" className={s(styles, { switchControl: true, disabled: disabled, checked: checkboxState.checked })}>
           <div data-testid="switch-control-track" className={styles.switchControlTrack} />
@@ -91,15 +92,11 @@ export const Switch: SwitchType = observer(function Switch({
             />
           </div>
         </div>
-        <label htmlFor={id || value || name} data-testid="field-label" className={styles.fieldLabel}>
+        <FieldLabel htmlFor={id || value || name} data-testid="field-label" className={styles.fieldLabel}>
           {children}
-        </label>
+        </FieldLabel>
       </div>
-      {description && (
-        <div data-testid="field-description" className={styles.fieldDescription}>
-          {description}
-        </div>
-      )}
-    </div>
+      {description && <FieldDescription>{description}</FieldDescription>}
+    </Field>
   );
 });

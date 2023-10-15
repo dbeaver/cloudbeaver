@@ -7,52 +7,21 @@
  */
 import { observer } from 'mobx-react-lite';
 import { useCallback, useContext } from 'react';
-import styled, { css, use } from 'reshadow';
-
-import type { ComponentStyle } from '@cloudbeaver/core-theming';
 
 import { filterLayoutFakeProps, getLayoutProps } from '../Containers/filterLayoutFakeProps';
 import type { ILayoutSizeProps } from '../Containers/ILayoutSizeProps';
-import elementsSizeStyles from '../Containers/shared/ElementsSize.m.css';
 import { s } from '../s';
 import { useS } from '../useS';
-import { useStyles } from '../useStyles';
-import { baseFormControlStyles, baseValidFormControlStyles } from './baseFormControlStyles';
+import { Field } from './Field';
+import { FieldDescription } from './FieldDescription';
+import { FieldLabel } from './FieldLabel';
 import { FormContext } from './FormContext';
-
-const styles = css`
-  textarea {
-    line-height: 19px;
-  }
-  field[|embedded] {
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-
-    & textarea {
-      border-radius: 0 !important;
-      height: 100%;
-      resize: none !important;
-    }
-  }
-  field-label {
-    display: block;
-    padding-bottom: 10px;
-    composes: theme-typography--body1 from global;
-    font-weight: 500;
-
-    &:empty {
-      display: none;
-    }
-  }
-`;
+import textareaStyle from './Textarea.m.css';
 
 type BaseProps = Omit<React.TextareaHTMLAttributes<HTMLTextAreaElement>, 'onChange' | 'style'> &
   ILayoutSizeProps & {
     description?: string;
     labelTooltip?: string;
-    mod?: 'surface';
-    style?: ComponentStyle;
     embedded?: boolean;
   };
 
@@ -77,7 +46,6 @@ interface TextareaType {
 
 export const Textarea: TextareaType = observer(function Textarea({
   name,
-  style,
   value: controlledValue,
   state,
   required,
@@ -85,14 +53,13 @@ export const Textarea: TextareaType = observer(function Textarea({
   className,
   description,
   labelTooltip,
-  mod,
   embedded,
   onChange = () => {},
   ...rest
 }: ControlledProps | ObjectProps<any, any>) {
   const layoutProps = getLayoutProps(rest);
   rest = filterLayoutFakeProps(rest);
-  const sizeStyles = useS(elementsSizeStyles);
+  const styles = useS(textareaStyle);
   const context = useContext(FormContext);
 
   const handleChange = useCallback(
@@ -112,14 +79,20 @@ export const Textarea: TextareaType = observer(function Textarea({
 
   const value = state ? state[name] : controlledValue;
 
-  return styled(useStyles(baseFormControlStyles, baseValidFormControlStyles, styles, style))(
-    <field className={s(sizeStyles, { ...layoutProps }, className)} {...use({ embedded })}>
-      <field-label title={labelTooltip || rest.title}>
+  return (
+    <Field {...layoutProps} className={s(styles, { field: true, embedded }, className)}>
+      <FieldLabel  className={s(styles, { fieldLabel: true })} title={labelTooltip || rest.title} required={required}>
         {children}
-        {required && ' *'}
-      </field-label>
-      <textarea {...rest} value={value ?? ''} name={name} data-embedded={embedded} onChange={handleChange} {...use({ mod })} />
-      {description && <field-description>{description}</field-description>}
-    </field>,
+      </FieldLabel>
+      <textarea
+        {...rest}
+        className={s(styles, { textarea: true })}
+        value={value ?? ''}
+        name={name}
+        data-embedded={embedded}
+        onChange={handleChange}
+      />
+      {description && <FieldDescription>{description}</FieldDescription>}
+    </Field>
   );
 });

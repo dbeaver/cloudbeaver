@@ -13,13 +13,17 @@ import styled from 'reshadow';
 import { Button } from '../Button';
 import ButtonStyles from '../Button.m.css';
 import { Filter } from '../FormControls/Filter';
+import FilterStyles from '../FormControls/Filter.m.css';
+import InputFieldStyles from '../FormControls/InputField.m.css';
 import { useTranslate } from '../localization/useTranslate';
 import { SContext, StyleRegistry } from '../SContext';
 import { useObjectRef } from '../useObjectRef';
 import type { IProperty } from './IProperty';
+import PropertiesTableFilterStyles from './PropertiesTableFilterStyles.m.css';
+import PropertiesTableInputStyles from './PropertiesTableInputStyles.m.css';
 import PropertiesTableAddButtonStyles from './PropertiesTableAddButtonStyles.m.css';
 import { PropertyItem } from './PropertyItem';
-import { PROPERTIES_FILTER_STYLES, PROPERTIES_TABLE_STYLES } from './styles';
+import { PROPERTIES_TABLE_STYLES } from './styles';
 
 type PropertiesState = Record<string, string | null>;
 
@@ -36,6 +40,20 @@ interface Props {
 }
 
 const registry: StyleRegistry = [
+  [
+    InputFieldStyles,
+    {
+      mode: 'append',
+      styles: [PropertiesTableInputStyles],
+    },
+  ],
+  [
+    FilterStyles,
+    {
+      mode: 'append',
+      styles: [PropertiesTableFilterStyles],
+    },
+  ],
   [
     ButtonStyles,
     {
@@ -134,12 +152,13 @@ export const PropertiesTable = observer<Props>(function PropertiesTable(props) {
         <properties-header-name>
           <div>{translate('core_block_properties_table_name')}</div>
           {props.filterable ? (
-            <Filter
-              value={filterValue}
-              placeholder={translate('core_block_properties_table_filter_name')}
-              style={PROPERTIES_FILTER_STYLES}
-              onFilter={setFilterValue}
-            />
+            <SContext registry={registry}>
+              <Filter
+                value={filterValue}
+                placeholder={translate('core_block_properties_table_filter_name')}
+                onFilter={setFilterValue}
+              />
+            </SContext>
           ) : null}
         </properties-header-name>
         <properties-header-value>{translate('core_block_properties_table_value')}</properties-header-value>

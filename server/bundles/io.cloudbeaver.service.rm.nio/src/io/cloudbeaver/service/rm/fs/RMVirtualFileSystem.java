@@ -69,7 +69,7 @@ public class RMVirtualFileSystem implements DBFVirtualFileSystem {
     }
 
     @Override
-    public Path getPathByURI(DBRProgressMonitor monitor, URI uri) {
+    public Path getPathByURI(@NotNull DBRProgressMonitor monitor, @NotNull URI uri) {
         return rmNioFileSystemProvider.getPath(uri);
     }
 

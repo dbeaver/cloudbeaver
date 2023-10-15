@@ -45,3 +45,7 @@
 .input:not(:only-child) {
   padding-right: 32px !important;
 }
+.input {
+  font-size: 12px;
+}
+

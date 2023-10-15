@@ -35,7 +35,7 @@
     "react-dnd": "^16.0.1",
     "react-dnd-html5-backend": "^16.0.1",
     "reakit": "~1.x.x",
-    "reshadow": "~0.x.x"
+    "reshadow": "^0.0.1"
   },
   "peerDependencies": {},
   "devDependencies": {
