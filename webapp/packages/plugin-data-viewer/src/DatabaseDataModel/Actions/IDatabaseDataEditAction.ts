@@ -12,9 +12,9 @@ import type { IDatabaseDataResult } from '../IDatabaseDataResult';
 
 // order is matter, used for sorting and changes diff
 export enum DatabaseEditChangeType {
-  update,
-  add,
-  delete,
+  update = 0,
+  add = 1,
+  delete = 2,
 }
 
 export interface IDatabaseDataEditActionValue<TKey, TValue> {
@@ -54,6 +54,7 @@ export interface IDatabaseDataEditAction<TKey, TValue, TResult extends IDatabase
   add: (key?: TKey) => void;
   duplicate: (...key: TKey[]) => void;
   delete: (key: TKey) => void;
+  applyPartialUpdate(result: TResult): void;
   applyUpdate: (result: TResult) => void;
   revert: (key: TKey) => void;
   clear: () => void;

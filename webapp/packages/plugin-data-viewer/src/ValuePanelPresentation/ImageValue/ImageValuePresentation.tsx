@@ -7,85 +7,76 @@
  */
 import { action, computed, observable } from 'mobx';
 import { observer } from 'mobx-react-lite';
-import styled, { css, use } from 'reshadow';
 
-import { Button, IconOrImage, useObservableRef, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
+import { ActionIconButtonStyles, Button, Container, Fill, IconButton, s, useObservableRef, useS, useTranslate } from '@cloudbeaver/core-blocks';
+import { selectFiles } from '@cloudbeaver/core-browser';
 import { useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { QuotasService } from '@cloudbeaver/core-root';
 import type { TabContainerPanelComponent } from '@cloudbeaver/core-ui';
 import { bytesToSize, download, getMIME, isImageFormat, isValidUrl } from '@cloudbeaver/core-utils';
 
-import type { IResultSetContentValue } from '../../DatabaseDataModel/Actions/ResultSet/IResultSetContentValue';
+import { createResultSetBlobValue } from '../../DatabaseDataModel/Actions/ResultSet/createResultSetBlobValue';
+import { isResultSetBlobValue } from '../../DatabaseDataModel/Actions/ResultSet/isResultSetBlobValue';
 import { isResultSetContentValue } from '../../DatabaseDataModel/Actions/ResultSet/isResultSetContentValue';
+import { isResultSetFileValue } from '../../DatabaseDataModel/Actions/ResultSet/isResultSetFileValue';
 import { ResultSetDataContentAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetDataContentAction';
 import { ResultSetDataKeysUtils } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetDataKeysUtils';
+import { ResultSetEditAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetEditAction';
+import { ResultSetFormatAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetFormatAction';
 import { ResultSetSelectAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetSelectAction';
-import { ResultSetViewAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetViewAction';
 import type { IDatabaseResultSet } from '../../DatabaseDataModel/IDatabaseResultSet';
 import type { IDataValuePanelProps } from '../../TableViewer/ValuePanel/DataValuePanelService';
 import { QuotaPlaceholder } from '../QuotaPlaceholder';
-import { VALUE_PANEL_TOOLS_STYLES } from '../ValuePanelTools/VALUE_PANEL_TOOLS_STYLES';
-
-const styles = css`
-  img {
-    margin: auto;
-    max-width: 100%;
-    max-height: 100%;
-    object-fit: contain;
-
-    &[|stretch] {
-      margin: unset;
-    }
-  }
-
-  container {
-    display: flex;
-    gap: 16px;
-    flex: 1;
-    flex-direction: column;
-  }
-
-  image {
-    flex: 1;
-    display: flex;
-    overflow: auto;
-  }
-`;
+import styles from './ImageValuePresentation.m.css';
 
 interface IToolsProps {
   loading?: boolean;
   stretch?: boolean;
   onToggleStretch?: () => void;
   onSave?: () => void;
+  onUpload?: () => void;
 }
 
-const Tools = observer<IToolsProps>(function Tools({ loading, stretch, onToggleStretch, onSave }) {
+const Tools = observer<IToolsProps>(function Tools({ loading, stretch, onToggleStretch, onSave, onUpload }) {
   const translate = useTranslate();
 
-  return styled(VALUE_PANEL_TOOLS_STYLES)(
-    <tools-container>
-      {onSave && (
-        <Button disabled={loading} onClick={onSave}>
-          {translate('ui_download')}
-        </Button>
-      )}
+  return (
+    <Container gap dense keepSize>
+      <Container keepSize flexStart center>
+        {onSave && (
+          <IconButton
+            title={translate('ui_download')}
+            className={ActionIconButtonStyles.actionIconButton}
+            name="/icons/export.svg"
+            disabled={loading}
+            img
+            onClick={onSave}
+          />
+        )}
+        {onUpload && (
+          <IconButton
+            title={translate('ui_upload')}
+            className={ActionIconButtonStyles.actionIconButton}
+            name="/icons/import.svg"
+            disabled={loading}
+            img
+            onClick={onUpload}
+          />
+        )}
+      </Container>
+      <Fill />
       {onToggleStretch && (
-        <tools>
-          <tools-action as="button" title={translate('data_viewer_presentation_value_image_fit')} disabled={stretch} onClick={onToggleStretch}>
-            <IconOrImage icon="img-fit-size" />
-          </tools-action>
-          <tools-action
-            as="button"
-            title={translate('data_viewer_presentation_value_image_original_size')}
-            disabled={!stretch}
+        <Container keepSize flexEnd center>
+          <IconButton
+            title={translate(stretch ? 'data_viewer_presentation_value_image_original_size' : 'data_viewer_presentation_value_image_fit')}
+            className={ActionIconButtonStyles.actionIconButton}
+            name={stretch ? 'img-original-size' : 'img-fit-size'}
             onClick={onToggleStretch}
-          >
-            <IconOrImage icon="img-original-size" />
-          </tools-action>
-        </tools>
+          />
+        </Container>
       )}
-    </tools-container>,
+    </Container>
   );
 });
 
@@ -94,27 +85,37 @@ export const ImageValuePresentation: TabContainerPanelComponent<IDataValuePanelP
     const translate = useTranslate();
     const notificationService = useService(NotificationService);
     const quotasService = useService(QuotasService);
-    const style = useStyles(styles);
-
-    const content = model.source.getAction(resultIndex, ResultSetDataContentAction);
+    const style = useS(styles);
 
     const state = useObservableRef(
       () => ({
+        get editAction(): ResultSetEditAction {
+          return this.model.source.getAction(this.resultIndex, ResultSetEditAction);
+        },
+        get contentAction(): ResultSetDataContentAction {
+          return this.model.source.getAction(this.resultIndex, ResultSetDataContentAction);
+        },
+        get selectAction(): ResultSetSelectAction {
+          return this.model.source.getAction(this.resultIndex, ResultSetSelectAction);
+        },
+        get formatAction(): ResultSetFormatAction {
+          return this.model.source.getAction(this.resultIndex, ResultSetFormatAction);
+        },
         get selectedCell() {
-          const selection = this.model.source.getAction(this.resultIndex, ResultSetSelectAction);
-          const focusCell = selection.getFocusedElement();
+          const focusCell = this.selectAction.getFocusedElement();
 
-          return selection.elements[0] || focusCell;
+          return this.selectAction.elements[0] || focusCell;
         },
         get cellValue() {
-          const view = this.model.source.getAction(this.resultIndex, ResultSetViewAction);
-          const cellValue = view.getCellValue(this.selectedCell);
-
-          return cellValue;
+          return this.formatAction.get(this.selectedCell);
         },
         get src() {
           if (this.savedSrc) {
             return this.savedSrc;
+          }
+
+          if (isResultSetBlobValue(this.cellValue)) {
+            return URL.createObjectURL(this.cellValue.blob);
           }
 
           if (isResultSetContentValue(this.cellValue) && this.cellValue.binary) {
@@ -126,17 +127,28 @@ export const ImageValuePresentation: TabContainerPanelComponent<IDataValuePanelP
           return '';
         },
         get savedSrc() {
-          return content.retrieveFileDataUrlFromCache(this.selectedCell);
+          return this.contentAction.retrieveFileDataUrlFromCache(this.selectedCell);
         },
         get canSave() {
           if (this.truncated) {
-            return content.isDownloadable(this.selectedCell);
+            return this.contentAction.isDownloadable(this.selectedCell);
           }
 
           return !!this.src;
         },
+        get canUpload() {
+          return this.formatAction.isBinary(this.selectedCell);
+        },
         get truncated() {
-          return isResultSetContentValue(this.cellValue) && content.isContentTruncated(this.cellValue);
+          if (isResultSetFileValue(this.cellValue)) {
+            return false;
+          }
+          if (isResultSetContentValue(this.cellValue)) {
+            if (this.cellValue.binary) {
+              return this.contentAction.isContentTruncated(this.cellValue);
+            }
+          }
+          return false;
         },
         stretch: false,
         toggleStretch() {
@@ -145,7 +157,7 @@ export const ImageValuePresentation: TabContainerPanelComponent<IDataValuePanelP
         async save() {
           try {
             if (this.truncated) {
-              await content.downloadFileData(this.selectedCell);
+              await this.contentAction.downloadFileData(this.selectedCell);
             } else {
               download(this.src, '', true);
             }
@@ -153,10 +165,23 @@ export const ImageValuePresentation: TabContainerPanelComponent<IDataValuePanelP
             this.notificationService.logException(exception, 'data_viewer_presentation_value_content_download_error');
           }
         },
+        async upload() {
+          selectFiles(files => {
+            const file = files?.item(0) ?? undefined;
+            if (file) {
+              this.editAction.set(this.selectedCell, createResultSetBlobValue(file));
+            }
+          });
+        },
       }),
       {
+        editAction: computed,
+        contentAction: computed,
+        selectAction: computed,
+        formatAction: computed,
         selectedCell: computed,
         cellValue: computed,
+        canUpload: computed,
         src: computed,
         savedSrc: computed,
         canSave: computed,
@@ -166,50 +191,58 @@ export const ImageValuePresentation: TabContainerPanelComponent<IDataValuePanelP
         resultIndex: observable.ref,
         toggleStretch: action.bound,
         save: action.bound,
+        upload: action.bound,
       },
       { model, resultIndex, notificationService },
     );
 
     const save = state.canSave ? state.save : undefined;
+    const upload = state.canUpload ? state.upload : undefined;
     const loading = model.isLoading();
+    const value = state.cellValue;
 
-    if (state.truncated && !state.savedSrc) {
+    if (state.truncated && !state.savedSrc && isResultSetContentValue(value)) {
       const limit = bytesToSize(quotasService.getQuota('sqlBinaryPreviewMaxLength'));
-      const valueSize = bytesToSize((state.cellValue as unknown as IResultSetContentValue).contentLength ?? 0);
+      const valueSize = bytesToSize(value.contentLength ?? 0);
 
       const load = async () => {
         try {
-          await content.resolveFileDataUrl(state.selectedCell);
+          await state.contentAction.resolveFileDataUrl(state.selectedCell);
         } catch (exception: any) {
           notificationService.logException(exception, 'data_viewer_presentation_value_content_download_error');
         }
       };
 
-      return styled(style)(
-        <container>
-          <QuotaPlaceholder limit={limit} size={valueSize}>
-            {content.isDownloadable(state.selectedCell) && (
-              <Button
-                disabled={loading}
-                loading={!!content.activeElement && ResultSetDataKeysUtils.isElementsKeyEqual(content.activeElement, state.selectedCell)}
-                onClick={load}
-              >
-                {translate('ui_view')}
-              </Button>
-            )}
-          </QuotaPlaceholder>
-          <Tools loading={loading} onSave={save} />
-        </container>,
+      return (
+        <Container vertical>
+          <Container fill overflow center>
+            <QuotaPlaceholder limit={limit} size={valueSize}>
+              {state.contentAction.isDownloadable(state.selectedCell) && (
+                <Button
+                  disabled={loading}
+                  loading={
+                    !!state.contentAction.activeElement &&
+                    ResultSetDataKeysUtils.isElementsKeyEqual(state.contentAction.activeElement, state.selectedCell)
+                  }
+                  onClick={load}
+                >
+                  {translate('ui_view')}
+                </Button>
+              )}
+            </QuotaPlaceholder>
+          </Container>
+          <Tools loading={loading} onSave={save} onUpload={upload} />
+        </Container>
       );
     }
 
-    return styled(style)(
-      <container>
-        <image>
-          <img src={state.src} {...use({ stretch: state.stretch })} />
-        </image>
-        <Tools loading={loading} stretch={state.stretch} onToggleStretch={state.toggleStretch} onSave={save} />
-      </container>,
+    return (
+      <Container vertical>
+        <Container fill overflow center>
+          <img src={state.src} className={s(style, { img: true, stretch: state.stretch })} />
+        </Container>
+        <Tools loading={loading} stretch={state.stretch} onToggleStretch={state.toggleStretch} onSave={save} onUpload={upload} />
+      </Container>
     );
   },
 );

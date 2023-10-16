@@ -230,7 +230,7 @@ export class TableFooterMenuService {
 
         return !editor?.isEdited();
       },
-      onClick: context => context.data.model.save(),
+      onClick: context => context.data.model.save().catch(() => {}),
     });
 
     this.registerMenuItem({
