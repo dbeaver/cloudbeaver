@@ -217,7 +217,7 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
     public void setUserTeams(String userId, String[] teamIds, String grantorId) throws DBCException {
         try (Connection dbCon = database.openConnection()) {
             try (JDBCTransaction txn = new JDBCTransaction(dbCon)) {
-                setUserTeams(userId, teamIds, grantorId);
+                setUserTeams(dbCon, userId, teamIds, grantorId);
                 txn.commit();
             }
         } catch (SQLException e) {
