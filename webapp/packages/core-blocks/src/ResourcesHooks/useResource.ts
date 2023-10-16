@@ -17,12 +17,13 @@ import {
   CachedMapResourceListGetter,
   CachedMapResourceLoader,
   CachedMapResourceValue,
-  CachedResource,
   CachedResourceContext,
   CachedResourceData,
   CachedResourceKey,
+  IResource,
   isResourceKeyList,
   isResourceKeyListAlias,
+  Resource,
   ResourceKey,
   ResourceKeyList,
   ResourceKeyListAlias,
@@ -39,16 +40,11 @@ export interface ResourceKeyWithIncludes<TKey, TIncludes> {
   readonly includes: TIncludes;
 }
 
-type ResourceData<TResource extends CachedResource<any, any, any, any, any>, TKey, TIncludes> = TResource extends CachedDataResource<
-  any,
-  any,
-  any,
-  any
->
+type ResourceData<TResource extends IResource<any, any, any, any>, TKey, TIncludes> = TResource extends CachedDataResource<any, any, any, any>
   ? CachedResourceData<TResource>
   : CachedMapResourceLoader<TKey, CachedResourceKey<TResource>, CachedResourceData<TResource> extends Map<any, infer I> ? I : never, TIncludes>;
 
-interface IActions<TResource extends CachedResource<any, any, any, any, any>, TKey, TIncludes> {
+interface IActions<TResource extends IResource<any, any, any, any>, TKey, TIncludes> {
   active?: boolean;
   forceSuspense?: boolean;
   silent?: boolean;
@@ -111,7 +107,7 @@ type TResult<TResource, TKey, TIncludes> = TResource extends CachedDataResource<
  * @param actions
  */
 export function useResource<
-  TResource extends CachedResource<any, any, any, any, any>,
+  TResource extends IResource<any, any, any, any>,
   TKeyArg extends ResourceKey<CachedResourceKey<TResource>>,
   TIncludes extends Readonly<CachedResourceContext<TResource>>,
 >(
@@ -122,7 +118,7 @@ export function useResource<
 ): TResult<TResource, TKeyArg, TIncludes>;
 
 export function useResource<
-  TResource extends CachedResource<any, any, any, any, any>,
+  TResource extends Resource<any, any, any, any>,
   TKeyArg extends ResourceKey<CachedResourceKey<TResource>>,
   TIncludes extends CachedResourceContext<TResource>,
 >(
@@ -132,7 +128,7 @@ export function useResource<
   actions?: TResource extends any ? IActions<TResource, TKeyArg, TIncludes> : never,
 ): IMapResourceResult<TResource, TIncludes> | IMapResourceListResult<TResource, TIncludes> | IDataResourceResult<TResource, TIncludes> {
   // eslint-disable-next-line react-hooks/rules-of-hooks
-  const resource = ctor instanceof CachedResource ? ctor : useService(ctor);
+  const resource = ctor instanceof Resource ? ctor : useService(ctor);
   const errorContext = useContext(ErrorContext);
   let key: ResourceKey<TKeyArg> | null = keyObj as ResourceKey<TKeyArg>;
   let includes: TIncludes = [] as unknown as TIncludes;
@@ -233,10 +229,10 @@ export function useResource<
         const { key, includes, resource } = propertiesRef;
 
         if (refresh) {
-          resource.markOutdated(key);
+          await resource.refresh(key, includes as any);
+        } else {
+          await resource.load(key, includes as any);
         }
-
-        await resource.load(key, includes as any);
       },
       async load(refresh?: boolean): Promise<void> {
         if (propertiesRef.key === null) {
@@ -332,7 +328,7 @@ export function useResource<
 
         if (!this.isLoaded()) {
           if (this.loading) {
-            throw this.resource.waitLoad();
+            throw refObj.load();
           }
 
           if (this.canLoad) {

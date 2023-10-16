@@ -319,6 +319,7 @@ export const DataGridTable = observer<IDataPresentationProps<any, IDatabaseResul
         // TODO: update focus after render rows update
         if (data.type === 'focus') {
           if (!data.key?.column || !data.key.row) {
+            focusSyncRef.current = null;
             return;
           }
 
@@ -369,6 +370,8 @@ export const DataGridTable = observer<IDataPresentationProps<any, IDatabaseResul
         row,
         column: { ...column.columnDataIndex },
       });
+    } else {
+      selectionAction.focus(null);
     }
   };
 

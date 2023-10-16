@@ -49,6 +49,7 @@ export abstract class DatabaseEditAction<TKey, TValue, TResult extends IDatabase
   abstract add(key?: TKey): void;
   abstract duplicate(...key: TKey[]): void;
   abstract delete(...key: TKey[]): void;
+  abstract applyPartialUpdate(result: TResult): void;
   abstract applyUpdate(result: TResult): void;
   abstract revert(...key: TKey[]): void;
   abstract clear(): void;

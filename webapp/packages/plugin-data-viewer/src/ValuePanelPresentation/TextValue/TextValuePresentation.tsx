@@ -115,15 +115,13 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
     let valueSize: string | undefined;
 
     if (selection.elements.length > 0 || focusCell) {
-      const view = model.source.getAction(resultIndex, ResultSetViewAction);
       const format = model.source.getAction(resultIndex, ResultSetFormatAction);
 
       firstSelectedCell = selection.elements[0] || focusCell;
 
-      const value = view.getCellValue(firstSelectedCell) ?? '';
-
-      stringValue = format.getText(value) ?? '';
-      readonly = format.isReadOnly(firstSelectedCell);
+      const value = format.get(firstSelectedCell);
+      stringValue = format.getText(firstSelectedCell);
+      readonly = format.isReadOnly(firstSelectedCell) || format.isBinary(firstSelectedCell);
 
       if (isResultSetContentValue(value)) {
         valueTruncated = content.isContentTruncated(value);

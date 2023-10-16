@@ -13,6 +13,7 @@ import { Checkbox, Loader, Placeholder, TableColumnValue, TableItem, TableItemEx
 import { useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 
+import { AdministrationUsersManagementService } from '../../../AdministrationUsersManagementService';
 import { UsersAdministrationService } from '../UsersAdministrationService';
 import { UserEdit } from './UserEdit';
 
@@ -36,6 +37,7 @@ export const User = observer<Props>(function User({ user, displayAuthRole, selec
   const teams = user.grantedTeams.join(', ');
   const usersService = useService(UsersResource);
   const notificationService = useService(NotificationService);
+  const administrationUsersManagementService = useService(AdministrationUsersManagementService);
   const translate = useTranslate();
 
   async function handleEnabledCheckboxChange(enabled: boolean) {
@@ -49,6 +51,8 @@ export const User = observer<Props>(function User({ user, displayAuthRole, selec
   const enabledCheckboxTitle = usersService.isActiveUser(user.userId)
     ? translate('administration_teams_team_granted_users_permission_denied')
     : undefined;
+
+  const userManagementDisabled = administrationUsersManagementService.externalUserProviderEnabled;
 
   return styled(styles)(
     <TableItem item={user.userId} expandElement={UserEdit} selectDisabled={!selectable}>
@@ -74,7 +78,7 @@ export const User = observer<Props>(function User({ user, displayAuthRole, selec
       <TableColumnValue>
         <Checkbox
           checked={user.enabled}
-          disabled={usersService.isActiveUser(user.userId)}
+          disabled={usersService.isActiveUser(user.userId) || userManagementDisabled}
           title={enabledCheckboxTitle}
           onChange={handleEnabledCheckboxChange}
         />

@@ -11,6 +11,7 @@ import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { CachedMapAllKey, getCachedMapResourceLoaderState } from '@cloudbeaver/core-resource';
 import { ACTION_CREATE, ActionService, MenuService } from '@cloudbeaver/core-view';
 
+import { AdministrationUsersManagementService } from '../../../AdministrationUsersManagementService';
 import { MENU_USERS_ADMINISTRATION } from '../../../Menus/MENU_USERS_ADMINISTRATION';
 import { ADMINISTRATION_ITEM_USER_CREATE_PARAM } from '../ADMINISTRATION_ITEM_USER_CREATE_PARAM';
 import { CreateUserService } from './CreateUserService';
@@ -22,6 +23,7 @@ export class CreateUserBootstrap extends Bootstrap {
     private readonly createUserService: CreateUserService,
     private readonly menuService: MenuService,
     private readonly actionService: ActionService,
+    private readonly administrationUsersManagementService: AdministrationUsersManagementService,
   ) {
     super();
   }
@@ -37,7 +39,7 @@ export class CreateUserBootstrap extends Bootstrap {
     this.actionService.addHandler({
       id: 'users-table-base',
       isActionApplicable: (context, action) => {
-        if (action === ACTION_CREATE) {
+        if (action === ACTION_CREATE && !this.administrationUsersManagementService.externalUserProviderEnabled) {
           return this.authProvidersResource.has(AUTH_PROVIDER_LOCAL_ID);
         }
 
@@ -52,9 +54,7 @@ export class CreateUserBootstrap extends Bootstrap {
 
         return false;
       },
-      getLoader: (context, action) => {
-        return getCachedMapResourceLoaderState(this.authProvidersResource, () => CachedMapAllKey);
-      },
+      getLoader: () => getCachedMapResourceLoaderState(this.authProvidersResource, () => CachedMapAllKey),
       handler: (context, action) => {
         switch (action) {
           case ACTION_CREATE:

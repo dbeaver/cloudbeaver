@@ -10,9 +10,10 @@ import { action, computed, makeObservable } from 'mobx';
 import { ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
 import { ILoadableState, isArraysEqual, isContainsException } from '@cloudbeaver/core-utils';
 
-import { CachedResource, CachedResourceKey } from './CachedResource';
+import { CachedResource } from './CachedResource';
 import type { CachedResourceIncludeArgs, CachedResourceValueIncludes } from './CachedResourceIncludes';
 import type { ICachedResourceMetadata } from './ICachedResourceMetadata';
+import type { CachedResourceKey } from './IResource';
 import type { ResourceKey, ResourceKeySimple } from './ResourceKey';
 import type { ResourceKeyAlias } from './ResourceKeyAlias';
 import { isResourceKeyList, resourceKeyList, ResourceKeyList } from './ResourceKeyList';

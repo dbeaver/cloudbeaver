@@ -13,6 +13,7 @@ import type { RenderCellProps } from '@cloudbeaver/plugin-react-data-grid';
 
 import { CellContext } from '../CellRenderer/CellContext';
 import { TableDataContext } from '../TableDataContext';
+import { BlobFormatter } from './CellFormatters/BlobFormatter';
 import { BooleanFormatter } from './CellFormatters/BooleanFormatter';
 import { TextFormatter } from './CellFormatters/TextFormatter';
 
@@ -29,14 +30,19 @@ export const CellFormatterFactory = observer<IProps>(function CellFormatterFacto
     formatterRef.current = TextFormatter;
 
     if (cellContext.cell) {
-      const resultColumn = tableDataContext.getColumnInfo(cellContext.cell.column);
-      const value = tableDataContext.getCellValue(cellContext.cell);
+      const isBlob = tableDataContext.format.isBinary(cellContext.cell);
 
-      if (value !== undefined) {
-        const rawValue = tableDataContext.format.get(value);
+      if (isBlob) {
+        formatterRef.current = BlobFormatter;
+      } else {
+        const value = tableDataContext.getCellValue(cellContext.cell);
+        if (value !== undefined) {
+          const resultColumn = tableDataContext.getColumnInfo(cellContext.cell.column);
+          const rawValue = tableDataContext.format.get(cellContext.cell);
 
-        if (resultColumn && isBooleanValuePresentationAvailable(rawValue, resultColumn)) {
-          formatterRef.current = BooleanFormatter;
+          if (resultColumn && isBooleanValuePresentationAvailable(rawValue, resultColumn)) {
+            formatterRef.current = BooleanFormatter;
+          }
         }
       }
     }

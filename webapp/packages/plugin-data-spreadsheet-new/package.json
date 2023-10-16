@@ -30,6 +30,7 @@
     "@cloudbeaver/core-theming": "~0.1.0",
     "@cloudbeaver/core-ui": "~0.1.0",
     "@cloudbeaver/core-utils": "~0.1.0",
+    "@cloudbeaver/core-browser": "~0.1.0",
     "@cloudbeaver/plugin-data-viewer": "~0.1.0",
     "@cloudbeaver/plugin-react-data-grid": "~0.1.0",
     "@popperjs/core": "^2.11.8",
