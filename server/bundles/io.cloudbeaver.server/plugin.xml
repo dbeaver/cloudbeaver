@@ -74,7 +74,7 @@
             <topic id="cb_session_log"/>
         </eventHandler>
         <eventHandler class="io.cloudbeaver.server.events.WSDeleteTempFileHandler">
-            <topic id="cb_delete_temp_file"/>
+            <topic id="cb_delete_temp_folder"/>
         </eventHandler>
     </extension>
 

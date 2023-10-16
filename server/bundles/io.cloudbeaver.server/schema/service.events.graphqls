@@ -52,7 +52,7 @@ enum CBEventTopic {
     cb_object_permissions,
     cb_subject_permissions,
     cb_database_output_log,
-    cb_delete_temp_file
+    cb_delete_temp_folder
 }
 
 # Base server event interface
