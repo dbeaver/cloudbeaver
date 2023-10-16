@@ -23,4 +23,5 @@ public interface CBWebSessionEventHandler {
     void handleWebSessionEvent(WSEvent event) throws DBException;
 
     void close();
+
 }

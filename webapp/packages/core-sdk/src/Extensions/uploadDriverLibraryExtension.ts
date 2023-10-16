@@ -16,7 +16,7 @@ export interface IUploadDriverLibraryExtension {
 export function uploadDriverLibraryExtension(client: CustomGraphQLClient): IUploadDriverLibraryExtension {
   return {
     uploadDriverLibrary(driverId: string, files: FileList, onUploadProgress?: (event: UploadProgressEvent) => void): Promise<void> {
-      return client.uploadFile(GlobalConstants.absoluteServiceUrl('drivers', 'library'), files, undefined, { driverId }, onUploadProgress);
+      return client.uploadFiles(GlobalConstants.absoluteServiceUrl('drivers', 'library'), files, undefined, { driverId }, onUploadProgress);
     },
   };
 }

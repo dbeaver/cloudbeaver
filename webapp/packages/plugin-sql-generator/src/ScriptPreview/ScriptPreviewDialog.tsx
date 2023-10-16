@@ -52,8 +52,10 @@ export const ScriptPreviewDialog = observer<DialogComponentProps<Payload>>(funct
   extensions.set(...sqlDialect);
 
   const apply = async () => {
-    await payload.model.save();
-    rejectDialog();
+    try {
+      await payload.model.save();
+      rejectDialog();
+    } catch {}
   };
 
   return (
