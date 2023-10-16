@@ -27,10 +27,6 @@ public class WSEventHandlerWorkspaceConfigUpdate extends WSDefaultEventHandler<W
 
     @Override
     public void handleEvent(@NotNull WSWorkspaceConfigurationChangedEvent event) {
-        var eventType = WSEventType.valueById(event.getId());
-        if (eventType == null) {
-            return;
-        }
         String configFileName = event.getConfigFilePath();
         WorkspaceConfigEventManager.fireConfigChangedEvent(configFileName);
         super.handleEvent(event);
