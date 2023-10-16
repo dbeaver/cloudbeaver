@@ -17,6 +17,7 @@ import {
   IResultSetRowKey,
   ResultSetConstraintAction,
   ResultSetDataAction,
+  ResultSetDataContentAction,
   ResultSetDataKeysUtils,
   ResultSetEditAction,
   ResultSetFormatAction,
@@ -58,6 +59,7 @@ export function useTableData(
   const data = model.source.getAction(resultIndex, ResultSetDataAction);
   const editor = model.source.getAction(resultIndex, ResultSetEditAction);
   const view = model.source.getAction(resultIndex, ResultSetViewAction);
+  const dataContent = model.source.getAction(resultIndex, ResultSetDataContentAction);
   const constraints = model.source.getAction(resultIndex, ResultSetConstraintAction);
 
   return useObservableRef<ITableData & { gridDIVElement: React.RefObject<HTMLDivElement | null> }>(
@@ -188,6 +190,7 @@ export function useTableData(
       rows: computed,
       columnKeys: computed,
       format: observable.ref,
+      dataContent: observable.ref,
       data: observable.ref,
       editor: observable.ref,
       view: observable.ref,
@@ -196,6 +199,7 @@ export function useTableData(
     },
     {
       format,
+      dataContent,
       data,
       editor,
       view,

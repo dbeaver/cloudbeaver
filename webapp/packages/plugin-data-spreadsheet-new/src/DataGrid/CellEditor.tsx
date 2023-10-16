@@ -72,7 +72,7 @@ export const CellEditor = observer<Pick<RenderEditCellProps<IResultSetRowKey>, '
 
     const cellKey: IResultSetElementKey = { row, column: column.columnDataIndex };
 
-    const value = tableDataContext.format.getText(tableDataContext.getCellValue(cellKey)!) ?? '';
+    const value = tableDataContext.format.getText(cellKey);
 
     const handleSave = () => onClose(false);
     const handleReject = () => {

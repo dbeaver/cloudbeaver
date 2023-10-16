@@ -27,7 +27,6 @@
 
 .textFormatterValue {
   overflow: hidden;
-  white-space: pre;
   text-overflow: ellipsis;
 }
 

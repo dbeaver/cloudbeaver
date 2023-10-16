@@ -5,11 +5,10 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { computed } from 'mobx';
 import { observer } from 'mobx-react-lite';
-import { useContext, useMemo } from 'react';
+import { useContext } from 'react';
 
-import { s, useS } from '@cloudbeaver/core-blocks';
+import { getComputed, s, useS } from '@cloudbeaver/core-blocks';
 import type { IResultSetRowKey } from '@cloudbeaver/plugin-data-viewer';
 import type { RenderCellProps } from '@cloudbeaver/plugin-react-data-grid';
 
@@ -25,35 +24,35 @@ export const BooleanFormatter = observer<RenderCellProps<IResultSetRowKey>>(func
   const editingContext = useContext(EditingContext);
   const cellContext = useContext(CellContext);
 
-  if (!context || !tableDataContext || !editingContext || !cellContext.cell) {
+  const cell = cellContext.cell;
+
+  if (!context || !tableDataContext || !editingContext || !cell) {
     throw new Error('Contexts required');
   }
 
   const styles = useS(style);
 
   const formatter = tableDataContext.format;
-  const rawValue = useMemo(
-    () => computed(() => formatter.get(tableDataContext.getCellValue(cellContext!.cell!)!)),
-    [tableDataContext, cellContext.cell, formatter],
-  ).get();
-  const value = typeof rawValue === 'string' ? rawValue.toLowerCase() === 'true' : rawValue;
-  const stringifiedValue = formatter.toDisplayString(value);
-  const valueRepresentation = value === null ? stringifiedValue : `[${value ? 'v' : ' '}]`;
-  const disabled = !column.editable || editingContext.readonly || formatter.isReadOnly(cellContext.cell);
+  const value = getComputed(() => formatter.get(cell));
+  const textValue = getComputed(() => formatter.getText(cell));
+  const booleanValue = getComputed(() => textValue.toLowerCase() === 'true');
+  const stringifiedValue = getComputed(() => formatter.getDisplayString(cell));
+  const valueRepresentation = value === null ? stringifiedValue : `[${booleanValue ? 'v' : ' '}]`;
+  const disabled = !column.editable || editingContext.readonly || formatter.isReadOnly(cell);
 
   function toggleValue() {
-    if (disabled || !tableDataContext || !cellContext.cell) {
+    if (disabled || !tableDataContext || !cell) {
       return;
     }
-    const resultColumn = tableDataContext.getColumnInfo(cellContext.cell.column);
+    const resultColumn = tableDataContext.getColumnInfo(cell.column);
 
     if (!resultColumn) {
       return;
     }
 
-    const nextValue = !resultColumn.required && value === false ? null : !value;
+    const nextValue = !resultColumn.required && value === false ? null : !booleanValue;
 
-    tableDataContext.editor.set(cellContext.cell, nextValue);
+    tableDataContext.editor.set(cell, nextValue);
   }
 
   return (

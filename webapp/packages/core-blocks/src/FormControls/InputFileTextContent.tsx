@@ -9,7 +9,7 @@ import { observer } from 'mobx-react-lite';
 import { ReactNode, useContext, useState } from 'react';
 
 import type { ComponentStyle } from '@cloudbeaver/core-theming';
-import { blobToData, bytesToSize } from '@cloudbeaver/core-utils';
+import { blobToBase64, bytesToSize } from '@cloudbeaver/core-utils';
 
 import { Button } from '../Button';
 import type { ILayoutSizeProps } from '../Containers/ILayoutSizeProps';
@@ -121,7 +121,7 @@ export const InputFileTextContent: InputFileTextContentType = observer(function 
       try {
         validateFileSize(file.size);
 
-        const value = await blobToData(file);
+        const value = await blobToBase64(file);
 
         if (value) {
           setSelected(file);

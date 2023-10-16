@@ -121,6 +121,19 @@ export class DocumentEditAction extends DatabaseEditAction<IDocumentElementKey, 
     );
   }
 
+  applyPartialUpdate(result: IDatabaseResultSet): void {
+    let rowIndex = 0;
+
+    for (const [id, document] of this.editedElements) {
+      const value = result.data?.rows?.[rowIndex];
+
+      if (value !== undefined) {
+        this.data.set(id, value[0]);
+      }
+      rowIndex++;
+    }
+  }
+
   applyUpdate(result: IDatabaseResultSet): void {
     let rowIndex = 0;
 

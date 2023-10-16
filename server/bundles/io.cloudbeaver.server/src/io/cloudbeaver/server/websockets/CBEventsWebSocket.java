@@ -101,7 +101,6 @@ public class CBEventsWebSocket extends CBAbstractWebSocket implements CBWebSessi
     public void handleWebSessionEvent(WSEvent event) {
         super.handleEvent(event);
     }
-
     @Override
     protected void handleEventException(Exception e) {
         super.handleEventException(e);

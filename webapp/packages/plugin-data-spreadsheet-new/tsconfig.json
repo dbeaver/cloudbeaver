@@ -43,6 +43,9 @@
       "path": "../core-utils/tsconfig.json"
     },
     {
+      "path": "../core-browser/tsconfig.json"
+    },
+    {
       "path": "../plugin-data-viewer/tsconfig.json"
     },
     {
