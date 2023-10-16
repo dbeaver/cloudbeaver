@@ -83,7 +83,7 @@ public class WebServiceSQL implements DBWServiceSQL {
             conToRead.addAll(session.getConnections());
         }
 
-        List<WebSQLContextInfo> contexts  = new ArrayList<>();
+        List<WebSQLContextInfo> contexts = new ArrayList<>();
         for (WebConnectionInfo con : conToRead) {
             WebSQLProcessor sqlProcessor = WebServiceBindingSQL.getSQLProcessor(con, false);
             if (sqlProcessor != null) {
@@ -334,7 +334,7 @@ public class WebServiceSQL implements DBWServiceSQL {
                     monitor -> {
                         try {
                             result.append(contextInfo.getProcessor().readLobValue(
-                                    monitor, contextInfo, resultsId, lobColumnIndex, row.get(0)));
+                            monitor, contextInfo, resultsId, lobColumnIndex, row.get(0)));
                         } catch (Exception e) {
                             throw new InvocationTargetException(e);
                         }
@@ -404,7 +404,7 @@ public class WebServiceSQL implements DBWServiceSQL {
                     DBSDataContainer dataContainer = contextInfo.getProcessor().getDataContainerByNodePath(
                         monitor, nodePath, DBSDataContainer.class);
 
-                    WebSQLExecuteInfo executeResults =  contextInfo.getProcessor().readDataFromContainer(
+                    WebSQLExecuteInfo executeResults = contextInfo.getProcessor().readDataFromContainer(
                         contextInfo,
                         monitor,
                         dataContainer,

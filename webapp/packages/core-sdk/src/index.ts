@@ -1,5 +1,6 @@
 export * from './AsyncTask/AsyncTask';
 export * from './AsyncTask/AsyncTaskInfoService';
+export * from './Extensions/uploadBlobResultSetExtension';
 export * from './CustomGraphQLClient';
 export * from './DetailsError';
 export * from './EnvironmentService';

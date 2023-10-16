@@ -6,7 +6,6 @@
  * you may not use this file except in compliance with the License.
  */
 import { ResultDataFormat } from '@cloudbeaver/core-sdk';
-import { removeLineBreak } from '@cloudbeaver/core-utils';
 
 import { DatabaseDataAction } from '../../DatabaseDataAction';
 import type { IDatabaseDataSource } from '../../IDatabaseDataSource';
@@ -14,12 +13,25 @@ import type { IDatabaseResultSet } from '../../IDatabaseResultSet';
 import { databaseDataAction } from '../DatabaseDataActionDecorator';
 import { DatabaseEditChangeType } from '../IDatabaseDataEditAction';
 import type { IDatabaseDataFormatAction } from '../IDatabaseDataFormatAction';
+import type { IResultSetComplexValue } from './IResultSetComplexValue';
 import type { IResultSetElementKey, IResultSetPartialKey } from './IResultSetDataKey';
+import { isResultSetBlobValue } from './isResultSetBlobValue';
+import { isResultSetComplexValue } from './isResultSetComplexValue';
 import { isResultSetContentValue } from './isResultSetContentValue';
+import { isResultSetFileValue } from './isResultSetFileValue';
+import { isResultSetGeometryValue } from './isResultSetGeometryValue';
 import { ResultSetEditAction } from './ResultSetEditAction';
 import { ResultSetViewAction } from './ResultSetViewAction';
 
-export type IResultSetValue = string | number | boolean | Record<string, string | number | Record<string, any> | null> | null;
+export type IResultSetValue =
+  | string
+  | number
+  | boolean
+  | Record<string, string | number | Record<string, any> | null>
+  | IResultSetComplexValue
+  | null;
+
+const DISPLAY_STRING_LENGTH = 200;
 
 @databaseDataAction()
 export class ResultSetFormatAction
@@ -35,29 +47,6 @@ export class ResultSetFormatAction
     super(source);
     this.view = view;
     this.edit = edit;
-  }
-
-  getHeaders(): string[] {
-    return this.view.columns.map(column => column.name!).filter(name => name !== undefined);
-  }
-
-  getLongestCells(offset = 0, count?: number): string[] {
-    const rows = this.view.rows.slice(offset, count);
-    const cells: string[] = [];
-
-    for (const row of rows) {
-      for (let i = 0; i < row.length; i++) {
-        const value = this.toDisplayString(row[i]);
-        const columnIndex = this.view.columnIndex({ index: i });
-        const current = cells[columnIndex] ?? '';
-
-        if (value.length > current.length) {
-          cells[columnIndex] = value;
-        }
-      }
-    }
-
-    return cells;
   }
 
   isReadOnly(key: IResultSetPartialKey): boolean {
@@ -85,26 +74,99 @@ export class ResultSetFormatAction
 
     return readonly;
   }
-
-  isNull(value: IResultSetValue): boolean {
-    return this.get(value) === null;
+  isNull(key: IResultSetElementKey): boolean {
+    return this.get(key) === null;
   }
 
-  get(value: IResultSetValue): IResultSetValue {
-    if (value !== null && typeof value === 'object') {
-      if ('text' in value) {
-        return value.text;
-      } else if ('value' in value) {
-        return value.value;
-      }
-      return value;
+  isBinary(key: IResultSetPartialKey): boolean {
+    if (!key.column) {
+      return false;
     }
 
-    return value;
+    const column = this.view.getColumn(key.column);
+    if (column?.dataKind?.toLocaleLowerCase() === 'binary') {
+      return true;
+    }
+
+    if (key.row) {
+      const value = this.get(key as IResultSetElementKey);
+
+      if (isResultSetFileValue(value)) {
+        return true;
+      }
+
+      if (isResultSetContentValue(value)) {
+        return value.binary !== undefined;
+      }
+    }
+
+    return false;
   }
 
-  getText(value: IResultSetValue): string | null {
-    value = this.get(value);
+  getHeaders(): string[] {
+    return this.view.columns.map(column => column.name!).filter(name => name !== undefined);
+  }
+
+  getLongestCells(offset = 0, count?: number): string[] {
+    const cells: string[] = [];
+    const columnsCount = this.view.columnKeys.length;
+    count ??= this.view.rowKeys.length;
+
+    for (let rowIndex = offset; rowIndex < offset + count; rowIndex++) {
+      for (let columnIndex = 0; columnIndex < columnsCount; columnIndex++) {
+        const key = { row: this.view.rowKeys[rowIndex], column: this.view.columnKeys[columnIndex] };
+        const displayString = this.getDisplayString(key);
+        const current = cells[columnIndex] ?? '';
+
+        if (displayString.length > current.length) {
+          cells[columnIndex] = displayString;
+        }
+      }
+    }
+
+    return cells;
+  }
+
+  get(key: IResultSetElementKey): IResultSetValue {
+    return this.view.getCellValue(key);
+  }
+
+  getText(key: IResultSetElementKey): string {
+    const value = this.get(key);
+
+    if (value === null) {
+      return '';
+    }
+
+    if (isResultSetContentValue(value)) {
+      if (value.text !== undefined) {
+        return value.text;
+      }
+
+      return '';
+    }
+
+    if (isResultSetGeometryValue(value)) {
+      if (value.text !== undefined) {
+        return value.text;
+      }
+
+      return '';
+    }
+
+    if (isResultSetComplexValue(value)) {
+      if (value.value !== undefined) {
+        if (typeof value.value === 'object' && value.value !== null) {
+          return JSON.stringify(value.value);
+        }
+        return String(value.value);
+      }
+      return '';
+    }
+
+    if (this.isBinary(key)) {
+      return '';
+    }
 
     if (value !== null && typeof value === 'object') {
       return JSON.stringify(value);
@@ -117,22 +179,51 @@ export class ResultSetFormatAction
     return value;
   }
 
-  toDisplayString(value: IResultSetValue): string {
-    value = this.getText(value);
+  getDisplayString(key: IResultSetElementKey): string {
+    const value = this.get(key);
 
     if (value === null) {
       return '[null]';
     }
 
-    if (typeof value === 'string' && value.length > 1000) {
-      return removeLineBreak(
-        value
-          .split('')
-          .map(v => (v.charCodeAt(0) < 32 ? ' ' : v))
-          .join(''),
-      );
+    if (isResultSetGeometryValue(value)) {
+      if (value.text !== undefined) {
+        return this.truncateText(String(value.text), DISPLAY_STRING_LENGTH);
+      }
+
+      return '[null]';
     }
 
-    return removeLineBreak(String(value));
+    if (this.isBinary(key)) {
+      return '[blob]';
+    }
+
+    if (isResultSetContentValue(value)) {
+      if (value.text !== undefined) {
+        return this.truncateText(String(value.text), DISPLAY_STRING_LENGTH);
+      }
+
+      return '[null]';
+    }
+
+    if (isResultSetComplexValue(value)) {
+      if (value.value !== undefined) {
+        if (typeof value.value === 'object' && value.value !== null) {
+          return JSON.stringify(value.value);
+        }
+        return String(value.value);
+      }
+      return '[null]';
+    }
+
+    return this.truncateText(String(value), DISPLAY_STRING_LENGTH);
+  }
+
+  truncateText(text: string, length: number): string {
+    return text
+      .slice(0, length)
+      .split('')
+      .map(v => (v.charCodeAt(0) < 32 ? ' ' : v))
+      .join('');
   }
 }
