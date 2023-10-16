@@ -29,16 +29,16 @@ import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.data.json.JSONUtils;
 
-import java.io.IOException;
-import java.lang.reflect.Type;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.Map;
 import javax.servlet.MultipartConfigElement;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.lang.reflect.Type;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Map;
 
 @MultipartConfig
 public class WebSQLFileLoaderServlet extends WebServiceServletBase {
@@ -88,7 +88,7 @@ public class WebSQLFileLoaderServlet extends WebServiceServletBase {
 
         String fileId = JSONUtils.getString(variables, FILE_ID);
 
-        if (fileId != null) {
+        if (fileId != null && !fileId.matches(".*[/..].*")) {
             Path file = tempFolder.resolve(fileId);
             try {
                 Files.write(file, request.getPart("fileData").getInputStream().readAllBytes());
@@ -96,6 +96,8 @@ public class WebSQLFileLoaderServlet extends WebServiceServletBase {
                 log.error(e.getMessage());
                 throw new DBWebException(e.getMessage());
             }
+        } else {
+            throw new DBException("Invalid file name");
         }
     }
 }
