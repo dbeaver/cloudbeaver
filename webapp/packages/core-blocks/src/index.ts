@@ -35,8 +35,6 @@ export * from './localization/useTranslate';
 export * from './ConnectionImageWithMask/ConnectionImageWithMask';
 export { default as ConnectionImageWithMaskSvgStyles } from './ConnectionImageWithMask/ConnectionImageWithMaskSvg.m.css';
 
-export * from './Menu/ACTION_ICON_BUTTON_STYLES';
-export { default as ActionIconButtonStyles } from './ActionIconButton.m.css';
 export * from './Menu/Menu';
 export { default as MenuStyles } from './Menu/Menu.m.css';
 export * from './Menu/MenuBarSmallItem';
@@ -182,6 +180,7 @@ export * from './ExceptionMessage';
 export { default as ExceptionMessageStyles } from './ExceptionMessage.m.css';
 export * from './getComputed';
 export * from './IconButton';
+export * from './ActionIconButton';
 export { default as IconButtonStyles } from './IconButton.m.css';
 export * from './IconOrImage';
 export * from './s';
