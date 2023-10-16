@@ -35,7 +35,7 @@
     "react": "^18.2.0",
     "reakit": "~1.x.x",
     "reakit-utils": "^0.15.2",
-    "reshadow": "~0.x.x"
+    "reshadow": "^0.0.1"
   },
   "peerDependencies": {},
   "devDependencies": {
