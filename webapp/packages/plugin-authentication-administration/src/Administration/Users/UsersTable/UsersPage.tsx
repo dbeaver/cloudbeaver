@@ -13,6 +13,7 @@ import { AuthRolesResource } from '@cloudbeaver/core-authentication';
 import { ColoredContainer, Container, Group, Placeholder, useResource, useStyles } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 
+import { AdministrationUsersManagementService } from '../../../AdministrationUsersManagementService';
 import { CreateUser } from './CreateUser';
 import { CreateUserService } from './CreateUserService';
 import { UsersTableFilters } from './Filters/UsersTableFilters';
@@ -30,6 +31,7 @@ export const UsersPage = observer<Props>(function UsersPage({ sub, param }) {
   const style = useStyles(ADMINISTRATION_TOOLS_PANEL_STYLES);
   const createUserService = useService(CreateUserService);
   const authRolesResource = useResource(UsersPage, AuthRolesResource, undefined);
+  const administrationUsersManagementService = useService(AdministrationUsersManagementService);
 
   const filters = useUsersTableFilters();
   const table = useUsersTable(filters);
@@ -37,6 +39,7 @@ export const UsersPage = observer<Props>(function UsersPage({ sub, param }) {
   const create = param === 'create';
   const displayAuthRole = authRolesResource.data.length > 0;
   const loading = authRolesResource.isLoading() || table.loadableState.isLoading();
+  const userManagementDisabled = administrationUsersManagementService.externalUserProviderEnabled;
 
   return styled(style)(
     <ColoredContainer vertical wrap gap parent>
@@ -45,7 +48,7 @@ export const UsersPage = observer<Props>(function UsersPage({ sub, param }) {
       </Group>
 
       <Container overflow gap>
-        {create && createUserService.state && (
+        {create && createUserService.state && !userManagementDisabled && (
           <Group box>
             <CreateUser state={createUserService.state} onCancel={createUserService.cancelCreate} />
           </Group>

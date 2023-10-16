@@ -12,6 +12,8 @@ export {
 } from './Resource/CachedResourceOffsetPageKeys';
 export * from './Resource/CachedTreeResource/CachedTreeResource';
 export * from './Resource/ICachedResourceMetadata';
+export * from './Resource/IResource';
+export * from './Resource/Resource';
 export * from './Resource/ResourceAlias';
 export * from './Resource/ResourceError';
 export * from './Resource/ResourceKey';
