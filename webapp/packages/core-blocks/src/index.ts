@@ -182,6 +182,7 @@ export * from './getComputed';
 export * from './IconButton';
 export * from './ActionIconButton';
 export { default as IconButtonStyles } from './IconButton.m.css';
+export { default as ActionIconButtonStyles } from './ActionIconButton.m.css';
 export * from './IconOrImage';
 export * from './s';
 export * from './SContext';
