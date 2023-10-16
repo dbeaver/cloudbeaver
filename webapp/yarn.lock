@@ -15618,7 +15618,7 @@ reserved-words@^0.1.2:
   resolved "https://registry.yarnpkg.com/reserved-words/-/reserved-words-0.1.2.tgz#00a0940f98cd501aeaaac316411d9adc52b31ab1"
   integrity sha512-0S5SrIUJ9LfpbVl4Yzij6VipUdafHrOTzvmfazSw/jeZrZtQK303OPZW+obtkaw7jQlTQppy0UvZWm9872PbRw==
 
-reshadow@^0.0.1, reshadow@~0.x.x:
+reshadow@^0.0.1:
   version "0.0.1"
   resolved "https://registry.yarnpkg.com/reshadow/-/reshadow-0.0.1.tgz#9a34bd7f88858836a904a22e2662ec5d1ec027b8"
   integrity sha512-/S0hIXfPV1ddD4yCsk1g2pzTMz03z13QYw7sTLhMQ00luV5vcHziuli7l2IlmkG/Fvyt3LD5cdFw6E4s476G5Q==
