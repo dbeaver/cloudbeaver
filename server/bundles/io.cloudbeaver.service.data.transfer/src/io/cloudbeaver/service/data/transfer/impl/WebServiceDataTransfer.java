@@ -246,12 +246,6 @@ public class WebServiceDataTransfer implements DBWServiceDataTransfer {
         // Remove extension property (we specify file name directly)
         properties.remove(StreamConsumerSettings.PROP_FILE_EXTENSION);
 
-        consumer.initTransfer(
-            dataContainer,
-            settings,
-            new IDataTransferConsumer.TransferParameters(processor.isBinaryFormat(), processor.isHTMLFormat()),
-            exporter,
-            properties);
 
         DatabaseTransferProducer producer = new DatabaseTransferProducer(
             dataContainer,
@@ -260,6 +254,14 @@ public class WebServiceDataTransfer implements DBWServiceDataTransfer {
         producerSettings.setExtractType(DatabaseProducerSettings.ExtractType.SINGLE_QUERY);
         producerSettings.setQueryRowCount(false);
         producerSettings.setOpenNewConnections(CommonUtils.getOption(parameters.getDbProducerSettings(), "openNewConnection"));
+
+        consumer.initTransfer(
+            dataContainer,
+            settings,
+            new IDataTransferConsumer.TransferParameters(processor.isBinaryFormat(), processor.isHTMLFormat()),
+            exporter,
+            properties,
+            producer.getProject());
 
         producer.transferData(monitor, consumer, null, producerSettings, null);
 

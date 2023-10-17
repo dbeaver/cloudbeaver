@@ -5,8 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { flat } from '@cloudbeaver/core-utils';
-
 import { ExecutionContext } from './ExecutionContext';
 import { executionExceptionContext } from './executionExceptionContext';
 import { ExecutorHandlersCollection } from './ExecutorHandlersCollection';
@@ -35,7 +33,7 @@ export class SyncExecutor<T = void> extends ExecutorHandlersCollection<T> implem
     if (!context) {
       context = new ExecutionContext(data);
     }
-    return this.executeHandlersCollection<T>(this, data, context, flat([scope || []]));
+    return this.executeHandlersCollection<T>(this, data, context, [scope || []].flat());
   }
 
   executeScope(
@@ -52,7 +50,7 @@ export class SyncExecutor<T = void> extends ExecutorHandlersCollection<T> implem
     if (!context) {
       context = new ExecutionContext(data);
     }
-    return this.executeHandlersCollection<T>(this, data, context, flat([scope || []]));
+    return this.executeHandlersCollection<T>(this, data, context, [scope || []].flat());
   }
 
   private executeHandlersCollection<T>(
@@ -118,7 +116,7 @@ export class SyncExecutor<T = void> extends ExecutorHandlersCollection<T> implem
       const mappedData = link.map ? link.map(data, context) : data;
       const chainedContext = new ExecutionContext(mappedData, context);
 
-      this.executeHandlersCollection(link.executor, mappedData, chainedContext, flat([collection.getLinkHandlers(link.executor) || []]));
+      this.executeHandlersCollection(link.executor, mappedData, chainedContext, [collection.getLinkHandlers(link.executor) || []].flat());
     }
   }
 

@@ -15,4 +15,5 @@ export interface IFormPart<TState> extends ILoadableState {
 
   load(): Promise<void>;
   save(): Promise<void>;
+  reset(): void;
 }

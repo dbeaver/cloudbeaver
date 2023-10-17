@@ -9,7 +9,7 @@ import { ConnectionsManagerService } from '@cloudbeaver/core-connections';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
 import { ProjectInfoResource } from '@cloudbeaver/core-projects';
-import { CachedMapAllKey, getCachedMapResourceLoaderState } from '@cloudbeaver/core-sdk';
+import { CachedMapAllKey, getCachedMapResourceLoaderState } from '@cloudbeaver/core-resource';
 import { ActionService, MenuService } from '@cloudbeaver/core-view';
 import { MENU_CONNECTIONS } from '@cloudbeaver/plugin-connections';
 

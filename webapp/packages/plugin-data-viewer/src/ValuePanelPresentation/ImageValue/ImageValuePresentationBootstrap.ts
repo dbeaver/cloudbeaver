@@ -9,7 +9,7 @@ import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { ResultDataFormat } from '@cloudbeaver/core-sdk';
 import { getMIME, isImageFormat, isValidUrl } from '@cloudbeaver/core-utils';
 
-import type { IResultSetContentValue } from '../../DatabaseDataModel/Actions/ResultSet/IResultSetContentValue';
+import { isResultSetBlobValue } from '../../DatabaseDataModel/Actions/ResultSet/isResultSetBlobValue';
 import { isResultSetContentValue } from '../../DatabaseDataModel/Actions/ResultSet/isResultSetContentValue';
 import type { IResultSetValue } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetFormatAction';
 import { ResultSetSelectAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetSelectAction';
@@ -46,7 +46,7 @@ export class ImageValuePresentationBootstrap extends Bootstrap {
 
           const cellValue = view.getCellValue(firstSelectedCell);
 
-          return !(this.isImageUrl(cellValue) || (isResultSetContentValue(cellValue) && this.isImage(cellValue)));
+          return !this.isImage(cellValue);
         }
 
         return true;
@@ -56,15 +56,14 @@ export class ImageValuePresentationBootstrap extends Bootstrap {
 
   load(): void {}
 
-  private isImage(value: IResultSetContentValue | null) {
-    if (value !== null && 'binary' in value) {
+  private isImage(value: IResultSetValue) {
+    if (isResultSetContentValue(value) && value?.binary) {
       return getMIME(value.binary || '') !== null;
     }
+    if (isResultSetContentValue(value) || isResultSetBlobValue(value)) {
+      return value?.contentType?.startsWith('image/') ?? false;
+    }
 
-    return false;
-  }
-
-  private isImageUrl(value: IResultSetValue | undefined) {
     if (typeof value !== 'string') {
       return false;
     }

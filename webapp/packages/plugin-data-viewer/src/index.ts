@@ -1,6 +1,4 @@
-import { manifest } from './manifest';
-
-export default manifest;
+export * from './manifest';
 
 export * from './DatabaseDataModel/Actions/Document/DocumentDataAction';
 export * from './DatabaseDataModel/Actions/Document/DocumentEditAction';
@@ -9,9 +7,21 @@ export * from './DatabaseDataModel/Actions/Document/IDocumentElementKey';
 export * from './DatabaseDataModel/Actions/ResultSet/DataContext/DATA_CONTEXT_DV_DDM_RS_COLUMN_KEY';
 export * from './DatabaseDataModel/DataContext/DATA_CONTEXT_DV_DDM';
 export * from './DatabaseDataModel/DataContext/DATA_CONTEXT_DV_DDM_RESULT_INDEX';
+export * from './DatabaseDataModel/Actions/ResultSet/compareResultSetRowKeys';
+export * from './DatabaseDataModel/Actions/ResultSet/createResultSetBlobValue';
+export * from './DatabaseDataModel/Actions/ResultSet/createResultSetContentValue';
+export * from './DatabaseDataModel/Actions/ResultSet/createResultSetFileValue';
 export * from './DatabaseDataModel/Actions/ResultSet/IResultSetDataKey';
+export * from './DatabaseDataModel/Actions/ResultSet/IResultSetBlobValue';
+export * from './DatabaseDataModel/Actions/ResultSet/IResultSetComplexValue';
+export * from './DatabaseDataModel/Actions/ResultSet/IResultSetFileValue';
 export * from './DatabaseDataModel/Actions/ResultSet/IResultSetContentValue';
+export * from './DatabaseDataModel/Actions/ResultSet/IResultSetGeometryValue';
+export * from './DatabaseDataModel/Actions/ResultSet/isResultSetBlobValue';
+export * from './DatabaseDataModel/Actions/ResultSet/isResultSetComplexValue';
 export * from './DatabaseDataModel/Actions/ResultSet/isResultSetContentValue';
+export * from './DatabaseDataModel/Actions/ResultSet/isResultSetFileValue';
+export * from './DatabaseDataModel/Actions/ResultSet/isResultSetGeometryValue';
 export * from './DatabaseDataModel/Actions/ResultSet/ResultSetConstraintAction';
 export * from './DatabaseDataModel/Actions/ResultSet/ResultSetDataAction';
 export * from './DatabaseDataModel/Actions/ResultSet/ResultSetDataKeysUtils';

@@ -25,9 +25,8 @@ import {
   ResultSetDataKeysUtils,
   ResultSetSelectAction,
 } from '@cloudbeaver/plugin-data-viewer';
-import type { DataGridHandle, Position } from '@cloudbeaver/plugin-react-data-grid';
-import DataGrid from '@cloudbeaver/plugin-react-data-grid';
-import '@cloudbeaver/plugin-react-data-grid/lib/lib/styles.css';
+import DataGrid, { type DataGridHandle, type Position } from '@cloudbeaver/plugin-react-data-grid';
+import '@cloudbeaver/plugin-react-data-grid/react-data-grid-dist/lib/styles.css';
 
 import { CellPosition, EditingContext } from '../Editing/EditingContext';
 import { useEditing } from '../Editing/useEditing';
@@ -320,6 +319,7 @@ export const DataGridTable = observer<IDataPresentationProps<any, IDatabaseResul
         // TODO: update focus after render rows update
         if (data.type === 'focus') {
           if (!data.key?.column || !data.key.row) {
+            focusSyncRef.current = null;
             return;
           }
 
@@ -370,6 +370,8 @@ export const DataGridTable = observer<IDataPresentationProps<any, IDatabaseResul
         row,
         column: { ...column.columnDataIndex },
       });
+    } else {
+      selectionAction.focus(null);
     }
   };
 

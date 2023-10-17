@@ -1,10 +1,67 @@
 {
-  "extends": "../../tsconfig.json",
+  "extends": "../../tsconfig.base.json",
   "compilerOptions": {
     "rootDir": "src",
-    "outDir": "lib"
+    "outDir": "dist",
+    "tsBuildInfoFile": "dist/tsconfig.tsbuildinfo"
   },
-  "include": ["src"],
-  "exclude": ["**/node_modules", "**/.*/"],
-  "references": [{ "path": "../*" }]
+  "references": [
+    {
+      "path": "../core-authentication/tsconfig.json"
+    },
+    {
+      "path": "../core-blocks/tsconfig.json"
+    },
+    {
+      "path": "../core-connections/tsconfig.json"
+    },
+    {
+      "path": "../core-di/tsconfig.json"
+    },
+    {
+      "path": "../core-events/tsconfig.json"
+    },
+    {
+      "path": "../core-extensions/tsconfig.json"
+    },
+    {
+      "path": "../core-localization/tsconfig.json"
+    },
+    {
+      "path": "../core-navigation-tree/tsconfig.json"
+    },
+    {
+      "path": "../core-projects/tsconfig.json"
+    },
+    {
+      "path": "../core-resource/tsconfig.json"
+    },
+    {
+      "path": "../core-theming/tsconfig.json"
+    },
+    {
+      "path": "../core-ui/tsconfig.json"
+    },
+    {
+      "path": "../core-view/tsconfig.json"
+    },
+    {
+      "path": "../plugin-navigation-tabs/tsconfig.json"
+    },
+    {
+      "path": "../plugin-top-app-bar/tsconfig.json"
+    }
+  ],
+  "include": [
+    "__custom_mocks__/**/*",
+    "src/**/*",
+    "src/**/*.json",
+    "src/**/*.css",
+    "src/**/*.scss"
+  ],
+  "exclude": [
+    "**/node_modules",
+    "lib/**/*",
+    "dist/**/*"
+  ]
 }

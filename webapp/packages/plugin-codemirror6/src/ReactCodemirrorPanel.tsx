@@ -7,6 +7,7 @@
  */
 import { Compartment, StateEffect } from '@codemirror/state';
 import { showPanel } from '@codemirror/view';
+import { observer } from 'mobx-react-lite';
 import { useContext, useLayoutEffect, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 
@@ -18,7 +19,7 @@ interface Props extends React.PropsWithChildren {
   top?: boolean;
 }
 
-export const ReactCodemirrorPanel: React.FC<Props> = function ReactCodemirrorPanel({ className, children, incomingView, top }) {
+export const ReactCodemirrorPanel: React.FC<Props> = observer(function ReactCodemirrorPanel({ className, children, incomingView, top }) {
   const dom = useMemo(() => document.createElement('div'), []);
   const compartment = useMemo(() => new Compartment(), []);
   const context = useContext(ReactCodemirrorContext);
@@ -52,5 +53,5 @@ export const ReactCodemirrorPanel: React.FC<Props> = function ReactCodemirrorPan
     return undefined;
   }, [className]);
 
-  return createPortal(children, dom);
-};
+  return createPortal(children, dom) as any;
+});

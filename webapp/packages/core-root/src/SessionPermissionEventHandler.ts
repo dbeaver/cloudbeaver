@@ -11,7 +11,7 @@ import type { CbSubjectPermissionUpdateEvent as ISessionPermissionEvent } from '
 import { TopicEventHandler } from './ServerEventEmitter/TopicEventHandler';
 import { ISessionEvent, SessionEventId, SessionEventSource, SessionEventTopic } from './SessionEventSource';
 
-export { ISessionPermissionEvent };
+export type { ISessionPermissionEvent };
 
 @injectable()
 export class SessionPermissionEventHandler extends TopicEventHandler<ISessionPermissionEvent, ISessionEvent, SessionEventId, SessionEventTopic> {

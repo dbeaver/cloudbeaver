@@ -6,10 +6,10 @@
  * you may not use this file except in compliance with the License.
  */
 
-@import "@cloudbeaver/core-theming/src/styles/theme-light";
-@import "base-code-editor";
-@import "base-code-editor-autocompletion";
-@import "base-code-editor-tooltip";
+@import '@cloudbeaver/core-theming/src/styles/theme-light';
+@import './base-code-editor';
+@import './base-code-editor-autocompletion';
+@import './base-code-editor-tooltip';
 
 $meta: #ff1717;
 $keyword: #07a;

@@ -8,16 +8,19 @@
 import { observer } from 'mobx-react-lite';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
-import { Button, InputField, s, useS, useTranslate } from '@cloudbeaver/core-blocks';
-import { useService } from '@cloudbeaver/core-di';
 import {
+  Button,
   CommonDialogBody,
   CommonDialogFooter,
   CommonDialogHeader,
   CommonDialogWrapper,
-  DialogComponent,
-  DialogComponentProps,
-} from '@cloudbeaver/core-dialogs';
+  InputField,
+  s,
+  useS,
+  useTranslate,
+} from '@cloudbeaver/core-blocks';
+import { useService } from '@cloudbeaver/core-di';
+import type { DialogComponent, DialogComponentProps } from '@cloudbeaver/core-dialogs';
 import { ClipboardService } from '@cloudbeaver/core-ui';
 
 import style from './FilterCustomValueDialog.m.css';

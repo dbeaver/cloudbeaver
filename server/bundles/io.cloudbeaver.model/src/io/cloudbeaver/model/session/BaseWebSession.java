@@ -16,6 +16,7 @@
  */
 package io.cloudbeaver.model.session;
 
+import io.cloudbeaver.model.WebServerMessage;
 import io.cloudbeaver.model.app.WebApplication;
 import io.cloudbeaver.model.app.WebAuthApplication;
 import io.cloudbeaver.websocket.CBWebSessionEventHandler;
@@ -29,6 +30,7 @@ import org.jkiss.dbeaver.model.auth.SMSessionContext;
 import org.jkiss.dbeaver.model.auth.impl.AbstractSessionPersistent;
 import org.jkiss.dbeaver.model.meta.Property;
 import org.jkiss.dbeaver.model.websocket.event.WSEvent;
+import org.jkiss.dbeaver.model.websocket.event.WSEventDeleteTempFile;
 import org.jkiss.dbeaver.model.websocket.event.session.WSSessionExpiredEvent;
 
 import java.time.Instant;
@@ -165,6 +167,8 @@ public abstract class BaseWebSession extends AbstractSessionPersistent {
     public void close() {
         super.close();
         var sessionExpiredEvent = new WSSessionExpiredEvent();
+        application.getEventController().addEvent(sessionExpiredEvent);
+        application.getEventController().addEvent(new WSEventDeleteTempFile(getSessionId()));
         synchronized (sessionEventHandlers) {
             for (CBWebSessionEventHandler sessionEventHandler : sessionEventHandlers) {
                 try {
@@ -200,6 +204,8 @@ public abstract class BaseWebSession extends AbstractSessionPersistent {
     public void removeSessionProject(@Nullable String projectId) throws DBException {
         userContext.getAccessibleProjectIds().remove(projectId);
     }
+
+    public abstract void addSessionMessage(WebServerMessage message);
 
     @Property
     public boolean isValid() {

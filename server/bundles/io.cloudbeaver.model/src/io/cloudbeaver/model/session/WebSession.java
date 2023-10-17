@@ -51,6 +51,7 @@ import org.jkiss.dbeaver.model.app.DBPProject;
 import org.jkiss.dbeaver.model.auth.*;
 import org.jkiss.dbeaver.model.connection.DBPConnectionConfiguration;
 import org.jkiss.dbeaver.model.exec.DBCException;
+import org.jkiss.dbeaver.model.fs.DBFFileSystemManager;
 import org.jkiss.dbeaver.model.meta.Association;
 import org.jkiss.dbeaver.model.meta.Property;
 import org.jkiss.dbeaver.model.navigator.DBNModel;
@@ -68,6 +69,7 @@ import org.jkiss.dbeaver.model.security.SMController;
 import org.jkiss.dbeaver.model.security.SMObjectType;
 import org.jkiss.dbeaver.model.security.user.SMObjectPermissions;
 import org.jkiss.dbeaver.model.sql.DBQuotaException;
+import org.jkiss.dbeaver.model.websocket.event.MessageType;
 import org.jkiss.dbeaver.model.websocket.event.WSEventType;
 import org.jkiss.dbeaver.model.websocket.event.WSSessionLogUpdatedEvent;
 import org.jkiss.dbeaver.registry.DataSourceDescriptor;
@@ -84,7 +86,6 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-
 /**
  * Web session.
  * Is the main source of data in web application
@@ -97,7 +98,6 @@ public class WebSession extends BaseWebSession
     public static final SMSessionType CB_SESSION_TYPE = new SMSessionType("CloudBeaver");
     private static final String WEB_SESSION_AUTH_CONTEXT_TYPE = "web-session";
     private static final String ATTR_LOCALE = "locale";
-
     private static final AtomicInteger TASK_ID = new AtomicInteger();
 
     private final AtomicInteger taskCount = new AtomicInteger();
@@ -616,7 +616,6 @@ public class WebSession extends BaseWebSession
             log.error("Error closing web session tokens");
         }
         this.userContext.setUser(null);
-
         super.close();
     }
 
@@ -726,15 +725,20 @@ public class WebSession extends BaseWebSession
         synchronized (sessionMessages) {
             sessionMessages.add(message);
         }
-        addSessionEvent(new WSSessionLogUpdatedEvent());
+        addSessionEvent(new WSSessionLogUpdatedEvent(
+            WSEventType.SESSION_LOG_UPDATED,
+            this.userContext.getSmSessionId(),
+            this.userContext.getUserId(),
+            MessageType.ERROR,
+            message.getMessage()));
     }
 
     public void addInfoMessage(String message) {
-        addSessionMessage(new WebServerMessage(WebServerMessage.MessageType.INFO, message));
+        addSessionMessage(new WebServerMessage(MessageType.INFO, message));
     }
 
     public void addWarningMessage(String message) {
-        addSessionMessage(new WebServerMessage(WebServerMessage.MessageType.WARNING, message));
+        addSessionMessage(new WebServerMessage(MessageType.WARNING, message));
     }
 
     public List<WebServerMessage> readLog(Integer maxEntries, Boolean clearLog) {
@@ -895,7 +899,11 @@ public class WebSession extends BaseWebSession
     // Auth credentials provider
     // Adds auth properties passed from web (by user)
     @Override
-    public boolean provideAuthParameters(@NotNull DBRProgressMonitor monitor, @NotNull DBPDataSourceContainer dataSourceContainer, @NotNull DBPConnectionConfiguration configuration) {
+    public boolean provideAuthParameters(
+        @NotNull DBRProgressMonitor monitor,
+        @NotNull DBPDataSourceContainer dataSourceContainer,
+        @NotNull DBPConnectionConfiguration configuration
+    ) {
         try {
             // Properties from nested auth sessions
             for (DBACredentialsProvider contextCredentialsProvider : getContextCredentialsProviders()) {
@@ -1013,6 +1021,9 @@ public class WebSession extends BaseWebSession
     }
 
     public void deleteSessionProject(@Nullable WebProjectImpl project) {
+        if (project != null) {
+            project.dispose();
+        }
         getWorkspace().removeProject(project);
         if (navigatorModel != null) {
             navigatorModel.getRoot().removeProject(project);
@@ -1038,6 +1049,15 @@ public class WebSession extends BaseWebSession
         for (DBPDataSourceContainer c : projectConnections) {
             removeConnection(new WebConnectionInfo(this, c));
         }
+    }
+
+    @NotNull
+    public DBFFileSystemManager getFileSystemManager(String projectId) throws DBException {
+        var project = getProjectById(projectId);
+        if (project == null) {
+            throw new DBException("Project not found: " + projectId);
+        }
+        return project.getFileSystemManager();
     }
 
     private class SessionProgressMonitor extends BaseProgressMonitor {

@@ -11,7 +11,7 @@ import styled from 'reshadow';
 import { getComputed, Loader, useStateDelay, useStyles } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { DBObjectResource } from '@cloudbeaver/core-navigation-tree';
-import { resourceKeyList } from '@cloudbeaver/core-sdk';
+import { resourceKeyList } from '@cloudbeaver/core-resource';
 import type { ComponentStyle } from '@cloudbeaver/core-theming';
 import { Tab, TabIcon, TabTitle } from '@cloudbeaver/core-ui';
 import { NavNodeViewService, useChildren, useNode } from '@cloudbeaver/plugin-navigation-tree';

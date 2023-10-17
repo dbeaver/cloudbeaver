@@ -10,7 +10,7 @@ import React from 'react';
 import { AuthConfigurationsResource, AuthProvidersResource } from '@cloudbeaver/core-authentication';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
-import { CachedMapAllKey } from '@cloudbeaver/core-sdk';
+import { CachedMapAllKey } from '@cloudbeaver/core-resource';
 import { getUniqueName } from '@cloudbeaver/core-utils';
 
 import { AuthConfigurationFormService } from '../AuthConfigurationFormService';

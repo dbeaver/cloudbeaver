@@ -10,20 +10,15 @@ import { useContext } from 'react';
 import styled from 'reshadow';
 
 import { useStyles } from '@cloudbeaver/core-blocks';
+import { useDataContext } from '@cloudbeaver/core-data-context';
 import { ITabData, Tab, TabIcon, TabTitle } from '@cloudbeaver/core-ui';
-import { CaptureViewContext, useDataContext } from '@cloudbeaver/core-view';
+import { CaptureViewContext } from '@cloudbeaver/core-view';
 import type { TabHandlerTabComponent } from '@cloudbeaver/plugin-navigation-tabs';
 import { useNode } from '@cloudbeaver/plugin-navigation-tree';
 
 import type { IObjectViewerTabState } from './IObjectViewerTabState';
 
-export const ObjectViewerTab: TabHandlerTabComponent<IObjectViewerTabState> = observer(function ObjectViewerTab({
-  tab,
-  handler,
-  onSelect,
-  onClose,
-  style,
-}) {
+export const ObjectViewerTab: TabHandlerTabComponent<IObjectViewerTabState> = observer(function ObjectViewerTab({ tab, onSelect, onClose, style }) {
   // const connectionsInfoResource = useService(ConnectionInfoResource);
   const viewContext = useContext(CaptureViewContext);
   const tabMenuContext = useDataContext(viewContext);

@@ -610,14 +610,7 @@ public class WebServiceAdmin implements DBWServiceAdmin {
         @NotNull String connectionId,
         @NotNull List<String> subjects
     ) throws DBWebException {
-        DBPProject globalProject = webSession.getProjectById(projectId);
-        if (!WebServiceUtils.isGlobalProject(globalProject)) {
-            throw new DBWebException("Project '" + projectId + "'is not global");
-        }
-        DBPDataSourceContainer dataSource = getDataSourceRegistry(webSession, projectId).getDataSource(connectionId);
-        if (dataSource == null) {
-            throw new DBWebException("Connection '" + connectionId + "' not found");
-        }
+        validateThatConnectionGlobal(webSession, projectId, List.of(connectionId));
         WebUser grantor = webSession.getUser();
         if (grantor == null) {
             throw new DBWebException("Cannot grant connection access in anonymous mode");
@@ -631,6 +624,72 @@ public class WebServiceAdmin implements DBWServiceAdmin {
                     Set.of(SMConstants.DATA_SOURCE_ACCESS_PERMISSION), grantor.getUserId());
         } catch (DBException e) {
             throw new DBWebException("Error setting connection subject access", e);
+        }
+        return true;
+    }
+
+    void validateThatConnectionGlobal(WebSession webSession, String projectId, Collection<String> connectionIds) throws DBWebException {
+        DBPProject globalProject = webSession.getProjectById(projectId);
+        if (!WebServiceUtils.isGlobalProject(globalProject)) {
+            throw new DBWebException("Project '" + projectId + "'is not global");
+        }
+        for (String connectionId : connectionIds) {
+            DBPDataSourceContainer dataSource = getDataSourceRegistry(webSession, projectId).getDataSource(connectionId);
+            if (dataSource == null) {
+                throw new DBWebException("Connection '" + connectionId + "' not found");
+            }
+        }
+    }
+
+    @Override
+    public boolean addConnectionsAccess(
+        @NotNull WebSession webSession,
+        @Nullable String projectId,
+        @NotNull List<String> connectionIds,
+        @NotNull List<String> subjects
+    ) throws DBWebException {
+        validateThatConnectionGlobal(webSession, projectId, connectionIds);
+        WebUser grantor = webSession.getUser();
+        if (grantor == null) {
+            throw new DBWebException("Cannot grant connection access in anonymous mode");
+        }
+        try {
+            var adminSM = webSession.getAdminSecurityController();
+            adminSM.addObjectPermissions(
+                new HashSet<>(connectionIds),
+                SMObjectType.datasource,
+                new HashSet<>(subjects),
+                Set.of(SMConstants.DATA_SOURCE_ACCESS_PERMISSION),
+                grantor.getUserId()
+            );
+        } catch (DBException e) {
+            throw new DBWebException("Error adding connection subject access", e);
+        }
+        return true;
+    }
+
+    @Override
+    public boolean deleteConnectionsAccess(
+        @NotNull WebSession webSession,
+        @Nullable String projectId,
+        @NotNull List<String> connectionIds,
+        @NotNull List<String> subjects
+    ) throws DBWebException {
+        validateThatConnectionGlobal(webSession, projectId, connectionIds);
+        WebUser grantor = webSession.getUser();
+        if (grantor == null) {
+            throw new DBWebException("Cannot grant connection access in anonymous mode");
+        }
+        try {
+            var adminSM = webSession.getAdminSecurityController();
+            adminSM.deleteObjectPermissions(
+                new HashSet<>(connectionIds),
+                SMObjectType.datasource,
+                new HashSet<>(subjects),
+                Set.of(SMConstants.DATA_SOURCE_ACCESS_PERMISSION)
+            );
+        } catch (DBException e) {
+            throw new DBWebException("Error adding connection subject access", e);
         }
         return true;
     }

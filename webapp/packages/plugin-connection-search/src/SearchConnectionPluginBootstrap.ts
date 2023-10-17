@@ -9,8 +9,8 @@ import { EAdminPermission } from '@cloudbeaver/core-authentication';
 import { ConnectionsManagerService } from '@cloudbeaver/core-connections';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { ProjectInfoResource } from '@cloudbeaver/core-projects';
+import { CachedMapAllKey, getCachedMapResourceLoaderState } from '@cloudbeaver/core-resource';
 import { PermissionsService } from '@cloudbeaver/core-root';
-import { CachedMapAllKey, getCachedMapResourceLoaderState } from '@cloudbeaver/core-sdk';
 import { ActionService, DATA_CONTEXT_MENU, MenuService } from '@cloudbeaver/core-view';
 import { MENU_CONNECTIONS } from '@cloudbeaver/plugin-connections';
 

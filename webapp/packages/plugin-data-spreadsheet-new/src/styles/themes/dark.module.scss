@@ -7,7 +7,7 @@
  */
 
 @import '@cloudbeaver/core-theming/src/styles/theme-dark';
-@import 'base-react-grid';
+@import './base-react-grid';
 
 :global .#{$theme-class} {
   @include base-react-grid;

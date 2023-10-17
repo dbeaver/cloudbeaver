@@ -27,7 +27,8 @@ import {
   useStyles,
   useTranslate,
 } from '@cloudbeaver/core-blocks';
-import { AuthProviderConfigurationParametersFragment, CachedMapAllKey } from '@cloudbeaver/core-sdk';
+import { CachedMapAllKey } from '@cloudbeaver/core-resource';
+import type { AuthProviderConfigurationParametersFragment } from '@cloudbeaver/core-sdk';
 import type { TabContainerPanelComponent } from '@cloudbeaver/core-ui';
 
 import type { IAuthConfigurationFormProps } from '../IAuthConfigurationFormProps';

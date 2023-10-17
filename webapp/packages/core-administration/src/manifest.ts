@@ -14,7 +14,7 @@ import { ConfigurationWizardService } from './AdministrationScreen/Configuration
 import { AdministrationSettingsService } from './AdministrationSettingsService';
 import { PermissionsResource } from './PermissionsResource';
 
-export const manifest: PluginManifest = {
+export const coreAdministrationManifest: PluginManifest = {
   info: {
     name: 'Core Administration',
   },

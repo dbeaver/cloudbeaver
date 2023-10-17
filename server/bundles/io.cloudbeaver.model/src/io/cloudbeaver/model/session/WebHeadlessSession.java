@@ -16,6 +16,7 @@
  */
 package io.cloudbeaver.model.session;
 
+import io.cloudbeaver.model.WebServerMessage;
 import io.cloudbeaver.model.app.WebAuthApplication;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.DBException;
@@ -34,6 +35,11 @@ public class WebHeadlessSession extends BaseWebSession {
 
     @Override
     public void addSessionError(Throwable exception) {
+
+    }
+
+    @Override
+    public void addSessionMessage(WebServerMessage message) {
 
     }
 

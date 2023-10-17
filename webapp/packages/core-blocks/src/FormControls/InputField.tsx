@@ -7,26 +7,23 @@
  */
 import { observer } from 'mobx-react-lite';
 import React, { forwardRef, useCallback, useContext, useLayoutEffect, useRef, useState } from 'react';
-import styled, { use } from 'reshadow';
 
-import type { ComponentStyle } from '@cloudbeaver/core-theming';
 import { isNotNullDefined } from '@cloudbeaver/core-utils';
 
 import { filterLayoutFakeProps, getLayoutProps } from '../Containers/filterLayoutFakeProps';
 import type { ILayoutSizeProps } from '../Containers/ILayoutSizeProps';
-import elementsSizeStyles from '../Containers/shared/ElementsSize.m.css';
 import { Icon } from '../Icon';
 import { Loader } from '../Loader/Loader';
 import { useTranslate } from '../localization/useTranslate';
 import { s } from '../s';
 import { useCombinedHandler } from '../useCombinedHandler';
 import { useCombinedRef } from '../useCombinedRef';
-import { useMergeRefs } from '../useMergeRefs';
 import { useS } from '../useS';
 import { useStateDelay } from '../useStateDelay';
-import { useStyles } from '../useStyles';
+import { Field } from './Field';
+import { FieldDescription } from './FieldDescription';
+import { FieldLabel } from './FieldLabel';
 import { FormContext } from './FormContext';
-import formControlStyles from './FormControl.m.css';
 import inputFieldStyle from './InputField.m.css';
 import { isControlPresented } from './isControlPresented';
 import { useCapsLockTracker } from './useCapsLockTracker';
@@ -37,9 +34,7 @@ type BaseProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange' | 
     loading?: boolean;
     description?: string;
     labelTooltip?: string;
-    mod?: 'surface';
     ref?: React.ForwardedRef<HTMLInputElement>;
-    style?: ComponentStyle;
     canShowPassword?: boolean;
     onCustomCopy?: () => void;
     icon?: React.ReactElement;
@@ -70,11 +65,10 @@ interface InputFieldType {
   <TKey extends keyof TState, TState>(props: ObjectProps<TKey, TState>): React.ReactElement<any, any> | null;
 }
 
-export const InputField: InputFieldType = observer(
-  forwardRef<HTMLInputElement>(function InputField(
+export const InputField: InputFieldType = observer<ControlledProps | ObjectProps<any, any>, HTMLInputElement>(
+  forwardRef(function InputField(
     {
       name,
-      style,
       value: valueControlled,
       defaultValue,
       required,
@@ -87,14 +81,13 @@ export const InputField: InputFieldType = observer(
       loading,
       description,
       labelTooltip,
-      mod,
       autoHide,
       canShowPassword = true,
       onChange,
       onCustomCopy,
       icon,
       ...rest
-    }: ControlledProps | ObjectProps<any, any>,
+    },
     ref,
   ) {
     const inputRef = useRef<HTMLInputElement | null>(null);
@@ -104,8 +97,7 @@ export const InputField: InputFieldType = observer(
     const translate = useTranslate();
     const layoutProps = getLayoutProps(rest);
     rest = filterLayoutFakeProps(rest);
-    const propStyles = useStyles(style);
-    const styles = useS(inputFieldStyle, formControlStyles, elementsSizeStyles);
+    const styles = useS(inputFieldStyle);
     const context = useContext(FormContext);
     loading = useStateDelay(loading ?? false, 300);
 
@@ -166,13 +158,12 @@ export const InputField: InputFieldType = observer(
       return null;
     }
 
-    return styled(propStyles)(
-      <div data-testid="field" className={s(styles, { ...layoutProps, field: true }, className)}>
-        <div data-testid="field-label" title={labelTooltip || rest.title} className={styles.fieldLabel}>
+    return (
+      <Field {...layoutProps} className={s(styles, {}, className)}>
+        <FieldLabel title={labelTooltip || rest.title} className={s(styles, { fieldLabel: true })} required={required}>
           {children}
-          {required && ' *'}
-        </div>
-        <div data-testid="input-container" className={styles.inputContainer}>
+        </FieldLabel>
+        <div className={s(styles, { inputContainer: true })}>
           <input
             ref={mergedRef}
             {...rest}
@@ -180,36 +171,35 @@ export const InputField: InputFieldType = observer(
             name={name}
             value={uncontrolled ? undefined : value ?? ''}
             defaultValue={defaultValue}
-            className={styles.input}
+            className={s(styles, { input: true })}
+            required={required}
             onChange={handleChange}
             onBlur={handleBlur}
             onKeyDown={handleKeyDown}
-            {...use({ mod })}
-            required={required}
           />
           {loading && (
-            <div data-testid="loader-container" title={translate('ui_processing_loading')} className={styles.loaderContainer}>
+            <div title={translate('ui_processing_loading')} className={s(styles, { loaderContainer: true })}>
               <Loader small />
             </div>
           )}
           {passwordType && canShowPassword && (
-            <div data-testid="icon-container" title={translate('ui_reveal_password')} className={styles.iconContainer} onClick={revealPassword}>
+            <div title={translate('ui_reveal_password')} className={styles.iconContainer} onClick={revealPassword}>
               <Icon name={passwordRevealed ? 'password-hide' : 'password-show'} viewBox="0 0 16 16" className={styles.icon} />
             </div>
           )}
           {onCustomCopy && (
-            <div data-testid="icon-container" title={translate('ui_copy_to_clipboard')} className={styles.iconContainer} onClick={onCustomCopy}>
+            <div title={translate('ui_copy_to_clipboard')} className={styles.iconContainer} onClick={onCustomCopy}>
               <Icon name="copy" viewBox="0 0 32 32" className={styles.icon} />
             </div>
           )}
-          {icon && <div data-testid="icon-container" className={styles.customIconContainer}>{icon}</div>}
+          {icon && (
+            <div data-testid="icon-container" className={s(styles, { customIconContainer: true })}>
+              {icon}
+            </div>
+          )}
         </div>
-        {(description || passwordType) && (
-          <div data-testid="field-description" className={s(styles, { fieldDescription: true, valid: !error, invalid: error })}>
-            {description}
-          </div>
-        )}
-      </div>,
+        {(description || passwordType) && <FieldDescription invalid={error}>{description}</FieldDescription>}
+      </Field>
     );
   }),
-);
+) as InputFieldType;

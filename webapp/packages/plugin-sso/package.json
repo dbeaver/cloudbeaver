@@ -1,19 +1,26 @@
 {
   "name": "@cloudbeaver/plugin-sso",
-  "sideEffects": false,
+  "sideEffects": [
+    "src/**/*.css",
+    "src/**/*.scss",
+    "public/**/*"
+  ],
   "version": "0.1.0",
   "description": "",
   "license": "Apache-2.0",
-  "main": "lib/index.js",
-  "module": "lib/index.js",
-  "types": "src/index.ts",
+  "main": "dist/index.js",
   "scripts": {
-    "prebuild": "rimraf --glob lib/*",
-    "build": "webpack --config ../../configs/webpack.plugin.config.js",
-    "postbuild": "tsc",
+    "build": "tsc -b",
     "lint": "eslint ./src/ --ext .ts,.tsx",
     "lint-fix": "eslint ./src/ --ext .ts,.tsx --fix",
-    "validate-dependencies": "core-cli-validate-dependencies"
+    "validate-dependencies": "core-cli-validate-dependencies",
+    "update-ts-references": "rimraf --glob dist && typescript-resolve-references"
   },
-  "peerDependencies": {}
+  "peerDependencies": {},
+  "dependencies": {
+    "@cloudbeaver/core-di": "~0.1.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.2.2"
+  }
 }

@@ -14,7 +14,6 @@ import {
   Loader,
   SContext,
   SlideBox,
-  slideBoxStyles,
   SlideElement,
   SlideOverlay,
   StyleRegistry,
@@ -120,7 +119,7 @@ export const Administration = observer<React.PropsWithChildren<Props>>(function 
     contentRef.current?.scrollTo({ top: 0, left: 0 });
   }, [activeScreen?.item]);
 
-  return styled(useStyles(BASE_TAB_STYLES, verticalTabStyles, administrationStyles, tabsStyles, slideBoxStyles))(
+  return styled(useStyles(BASE_TAB_STYLES, verticalTabStyles, administrationStyles, tabsStyles))(
     <CaptureView view={administrationViewService}>
       <SContext registry={registry}>
         <AdministrationCaptureViewContext />

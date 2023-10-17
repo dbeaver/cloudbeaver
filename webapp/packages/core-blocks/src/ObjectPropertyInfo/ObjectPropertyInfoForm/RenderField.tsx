@@ -158,6 +158,7 @@ export const RenderField = observer<RenderFieldProps>(function RenderField({
           title={property.description}
           disabled={disabled}
           readOnly={readOnly}
+          description={property.hint}
           className={className}
         >
           {property.displayName ?? ''}
@@ -175,6 +176,7 @@ export const RenderField = observer<RenderFieldProps>(function RenderField({
         title={property.description}
         disabled={disabled}
         readOnly={readOnly}
+        description={property.hint}
         className={className}
       >
         {property.displayName ?? ''}
@@ -193,7 +195,6 @@ export const RenderField = observer<RenderFieldProps>(function RenderField({
           state={state}
           disabled={disabled}
           readOnly={readOnly}
-          mod="surface"
           className={className}
         >
           {property.displayName ?? ''}
@@ -210,7 +211,6 @@ export const RenderField = observer<RenderFieldProps>(function RenderField({
         value={value}
         disabled={disabled}
         readOnly={readOnly}
-        mod="surface"
         className={className}
       >
         {property.displayName ?? ''}
@@ -227,12 +227,11 @@ export const RenderField = observer<RenderFieldProps>(function RenderField({
         name={property.id!}
         state={state}
         defaultValue={defaultValue}
-        description={description}
+        description={description ?? property.hint}
         disabled={disabled}
         readOnly={readOnly}
         autoHide={autoHide}
         autoComplete={RESERVED_KEYWORDS.includes(autofillToken) ? autofillToken : `${autofillToken} ${property.id}`}
-        mod="surface"
         className={className}
         canShowPassword={canShowPassword}
         onFocus={onFocus}
@@ -250,11 +249,10 @@ export const RenderField = observer<RenderFieldProps>(function RenderField({
       name={property.id!}
       value={value}
       defaultValue={defaultValue}
-      description={description}
+      description={description ?? property.hint}
       disabled={disabled}
       readOnly={readOnly}
       autoComplete={RESERVED_KEYWORDS.includes(autofillToken) ? autofillToken : `${autofillToken} ${property.id}`}
-      mod="surface"
       className={className}
       canShowPassword={canShowPassword}
       onFocus={onFocus}

@@ -12,7 +12,8 @@ import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { executorHandlerFilter, IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import { isGlobalProject, ProjectInfoResource } from '@cloudbeaver/core-projects';
-import { CachedMapAllKey, GraphQLService } from '@cloudbeaver/core-sdk';
+import { CachedMapAllKey } from '@cloudbeaver/core-resource';
+import { AdminConnectionGrantInfo, GraphQLService } from '@cloudbeaver/core-sdk';
 import { isArraysEqual, MetadataValueGetter } from '@cloudbeaver/core-utils';
 
 import { teamContext } from '../Contexts/teamContext';
@@ -86,6 +87,12 @@ export class GrantedConnectionsTabService extends Bootstrap {
       return;
     }
 
+    const globalProject = this.projectInfoResource.values.find(isGlobalProject);
+
+    if (!globalProject) {
+      throw new Error('The global project does not exist');
+    }
+
     const grantInfo = await this.teamsResource.getSubjectConnectionAccess(config.teamId);
     const initial = grantInfo.map(info => info.connectionId);
 
@@ -95,15 +102,41 @@ export class GrantedConnectionsTabService extends Bootstrap {
       return;
     }
 
+    const { connectionsToRevoke, connectionsToGrant } = this.getConnectionsDifferences(grantInfo, state);
+
     try {
-      await this.graphQLService.sdk.setSubjectConnectionAccess({
-        subjectId: config.teamId,
-        connections: state.grantedSubjects,
-      });
+      if (connectionsToRevoke.length > 0) {
+        await this.graphQLService.sdk.deleteConnectionsAccess({
+          projectId: globalProject.id,
+          subjects: [config.teamId],
+          connectionIds: connectionsToRevoke,
+        });
+      }
+
+      if (connectionsToGrant.length > 0) {
+        await this.graphQLService.sdk.addConnectionsAccess({
+          projectId: globalProject.id,
+          subjects: [config.teamId],
+          connectionIds: connectionsToGrant,
+        });
+      }
 
       state.loaded = false;
     } catch (exception: any) {
       this.notificationService.logException(exception);
     }
+  }
+
+  private getConnectionsDifferences(
+    grantInfo: AdminConnectionGrantInfo[],
+    state: IGrantedConnectionsTabState,
+  ): { connectionsToRevoke: string[]; connectionsToGrant: string[] } {
+    const current = grantInfo.map(info => info.connectionId);
+    const next = state.grantedSubjects;
+
+    const connectionsToRevoke = current.filter(connectionId => !next.includes(connectionId));
+    const connectionsToGrant = next.filter(connectionId => !current.includes(connectionId));
+
+    return { connectionsToRevoke, connectionsToGrant };
   }
 }

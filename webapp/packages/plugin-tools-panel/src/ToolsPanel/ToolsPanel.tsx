@@ -11,8 +11,11 @@ import { useRef } from 'react';
 import styled, { css } from 'reshadow';
 
 import { useStyles, useUserData } from '@cloudbeaver/core-blocks';
-import { BASE_TAB_STYLES, ITabData, ITabsContainer, TabList, TabPanelList, TabsState, UNDERLINE_TAB_STYLES } from '@cloudbeaver/core-ui';
+import { useService } from '@cloudbeaver/core-di';
+import { BASE_TAB_STYLES, ITabData, TabList, TabPanelList, TabsState, UNDERLINE_TAB_STYLES } from '@cloudbeaver/core-ui';
 import { isArraysEqual } from '@cloudbeaver/core-utils';
+
+import { ToolsPanelService } from './ToolsPanelService';
 
 const tabsStyles = css`
   TabList {
@@ -47,18 +50,16 @@ const formStyles = css`
   }
 `;
 
-interface Props {
-  container: ITabsContainer;
-}
-
 interface IToolsState {
   selectedTabId: string | undefined;
 }
 
-export const ToolsPanel = observer<Props>(function ToolsPanel({ container }) {
+export const ToolsPanel = observer(function ToolsPanel() {
+  const toolsPanelService = useService(ToolsPanelService);
+
   const state = useUserData<IToolsState>('tools', () => ({ selectedTabId: undefined }));
   const tabStyle = [BASE_TAB_STYLES, tabsStyles, UNDERLINE_TAB_STYLES];
-  const tabs = container.getIdList();
+  const tabs = toolsPanelService.tabsContainer.getIdList();
   const prevTabs = useRef<string[]>(tabs);
   const equal = isArraysEqual(prevTabs.current, tabs);
 
@@ -92,7 +93,7 @@ export const ToolsPanel = observer<Props>(function ToolsPanel({ container }) {
   }
 
   return styled(useStyles(tabStyle, formStyles))(
-    <TabsState currentTabId={state.selectedTabId} container={container} lazy onChange={handleTabChange}>
+    <TabsState currentTabId={state.selectedTabId} container={toolsPanelService.tabsContainer} lazy onChange={handleTabChange}>
       <box>
         <TabList style={tabStyle} />
         <content-box>

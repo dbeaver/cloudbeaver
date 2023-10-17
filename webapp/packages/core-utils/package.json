@@ -1,35 +1,37 @@
 {
   "name": "@cloudbeaver/core-utils",
-  "sideEffects": false,
+  "sideEffects": [
+    "src/**/*.css",
+    "src/**/*.scss",
+    "public/**/*"
+  ],
   "version": "0.1.0",
   "description": "",
   "license": "Apache-2.0",
-  "main": "lib/core-utils.js",
-  "module": "lib/core-utils.js",
-  "types": "src/index.ts",
+  "main": "dist/index.js",
   "scripts": {
-    "prebuild": "rimraf --glob lib/*",
-    "build": "core-cli-build --mode=production --config ../core-cli/configs/webpack.plugin.config.js",
-    "postbuild": "tsc",
+    "build": "tsc -b",
     "lint": "eslint ./src/ --ext .ts,.tsx",
     "lint-fix": "eslint ./src/ --ext .ts,.tsx --fix",
-    "test": "core-cli-test",
-    "validate-dependencies": "core-cli-validate-dependencies"
+    "test": "yarn build && core-cli-test",
+    "validate-dependencies": "core-cli-validate-dependencies",
+    "update-ts-references": "rimraf --glob dist && typescript-resolve-references"
   },
   "dependencies": {
-    "@timohausmann/quadtree-ts": "~2.0.0-beta.1",
-    "clsx": "~2.0.0",
-    "fast-deep-equal": "~3.1.3",
-    "md5": "~2.3.0",
+    "@timohausmann/quadtree-ts": "^2.0.0-beta.1",
+    "clsx": "^2.0.0",
+    "fast-deep-equal": "^3.1.3",
+    "md5": "^2.3.0",
+    "mobx": "^6.10.2",
     "underscore": "^1.13.6",
-    "uuid": "~9.0.0"
+    "uuid": "^9.0.1"
   },
-  "peerDependencies": {
-    "mobx": "~6.x.x"
-  },
+  "peerDependencies": {},
   "devDependencies": {
     "@types/md5": "~2.3.2",
     "@types/uuid": "~9.0.3",
-    "@types/underscore": "^1.11.9"
+    "@types/underscore": "^1.11.9",
+    "typescript": "^5.2.2",
+    "@types/jest": "^29.5.5"
   }
 }

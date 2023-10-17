@@ -7,38 +7,24 @@
  */
 import { observer } from 'mobx-react-lite';
 import { useLayoutEffect, useRef } from 'react';
-import styled, { css } from 'reshadow';
 
-import { Loader, useResource, useStyles } from '@cloudbeaver/core-blocks';
+import { DialogsPortal, Loader, s, useResource, useS } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { DialogsPortal } from '@cloudbeaver/core-dialogs';
 import { Notifications } from '@cloudbeaver/core-notifications';
 import { ProjectInfoResource } from '@cloudbeaver/core-projects';
+import { CachedMapAllKey } from '@cloudbeaver/core-resource';
 import { SessionPermissionsResource } from '@cloudbeaver/core-root';
 import { ScreenService } from '@cloudbeaver/core-routing';
-import { CachedMapAllKey } from '@cloudbeaver/core-sdk';
 import { ThemeService } from '@cloudbeaver/core-theming';
 import { DNDProvider } from '@cloudbeaver/core-ui';
-import { useAppVersion } from '@cloudbeaver/plugin-version';
+import { useAppVersion } from '@cloudbeaver/core-version';
 
-const bodyStyles = css`
-  theme {
-    composes: theme-background-surface theme-text-on-surface theme-typography from global;
-    height: 100vh;
-    display: flex;
-    padding: 0 !important; /* fix additional padding with modal reakit menu */
-    flex-direction: column;
-    overflow: hidden;
-  }
-  Loader {
-    height: 100vh;
-  }
-`;
+import style from './Body.m.css';
 
 export const Body = observer(function Body() {
   // const serverConfigLoader = useResource(Body, ServerConfigResource, undefined);
+  const styles = useS(style);
   const themeService = useService(ThemeService);
-  const style = useStyles(bodyStyles);
   const ref = useRef<HTMLDivElement>(null);
   useResource(Body, SessionPermissionsResource, undefined);
   const screenService = useService(ScreenService);
@@ -56,15 +42,15 @@ export const Body = observer(function Body() {
     document.documentElement.dataset.backendVersion = backendVersion;
   });
 
-  return styled(style)(
+  return (
     <DNDProvider>
       <Loader suspense>
-        <theme ref={ref} className={`theme-${themeService.currentTheme.id}`}>
+        <div ref={ref} className={s(styles, { bodyContent: true }, `theme-${themeService.currentTheme.id}`)}>
           <Loader suspense>{Screen && <Screen {...screenService.routerService.params} />}</Loader>
           <DialogsPortal />
           <Notifications />
-        </theme>
+        </div>
       </Loader>
-    </DNDProvider>,
+    </DNDProvider>
   );
 });

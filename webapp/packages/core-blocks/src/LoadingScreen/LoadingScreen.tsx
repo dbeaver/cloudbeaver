@@ -8,7 +8,7 @@
 import { useEffect, useRef } from 'react';
 import styled from 'reshadow';
 
-import { Icon } from '../Icons';
+import { Icon } from '../Icon';
 import styles from './loading-screen.css';
 
 const FADE_IN_DELAY = 300;

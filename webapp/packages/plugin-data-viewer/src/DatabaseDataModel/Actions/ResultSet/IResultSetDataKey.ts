@@ -12,7 +12,7 @@ export interface IResultSetColumnKey {
 
 export interface IResultSetRowKey {
   index: number;
-  key?: string;
+  subIndex: number;
 }
 
 export interface IResultSetElementKey {

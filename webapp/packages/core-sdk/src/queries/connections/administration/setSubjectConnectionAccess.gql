@@ -1,3 +1,0 @@
-query setSubjectConnectionAccess($subjectId: ID!, $connections: [ID!]!) {
-  setSubjectConnectionAccess(subjectId: $subjectId, connections: $connections)
-}

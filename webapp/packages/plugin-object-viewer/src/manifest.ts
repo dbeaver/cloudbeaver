@@ -16,7 +16,7 @@ import { ObjectPropertyTableFooterService } from './ObjectPropertiesPage/ObjectP
 import { ObjectViewerBootstrap } from './ObjectViewerBootstrap';
 import { ObjectViewerTabService } from './ObjectViewerTabService';
 
-export const manifest: PluginManifest = {
+export const objectViewerManifest: PluginManifest = {
   info: { name: 'Object Viewer Plugin' },
 
   providers: [

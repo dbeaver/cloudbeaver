@@ -7,14 +7,12 @@
  */
 import { observer } from 'mobx-react-lite';
 import { forwardRef, useContext, useEffect, useState } from 'react';
-import styled, { css, use } from 'reshadow';
 
 import type { ComponentStyle } from '@cloudbeaver/core-theming';
 
 import { Button } from '../Button';
 import { filterLayoutFakeProps, getLayoutProps } from '../Containers/filterLayoutFakeProps';
 import type { ILayoutSizeProps } from '../Containers/ILayoutSizeProps';
-import elementsSizeStyles from '../Containers/shared/ElementsSize.m.css';
 import { useTranslate } from '../localization/useTranslate';
 import { s } from '../s';
 import { Tag } from '../Tags/Tag';
@@ -24,31 +22,12 @@ import { useCombinedHandler } from '../useCombinedHandler';
 import { useRefInherit } from '../useRefInherit';
 import { useS } from '../useS';
 import { useStateDelay } from '../useStateDelay';
-import { useStyles } from '../useStyles';
-import { baseFormControlStyles, baseInvalidFormControlStyles, baseValidFormControlStyles } from './baseFormControlStyles';
+import { Field } from './Field';
+import { FieldDescription } from './FieldDescription';
+import { FieldLabel } from './FieldLabel';
 import { FormContext } from './FormContext';
+import InputFilesStyles from './InputFiles.m.css';
 import { isControlPresented } from './isControlPresented';
-
-const INPUT_FIELD_STYLES = css`
-  field-label {
-    display: block;
-    composes: theme-typography--body1 from global;
-    font-weight: 500;
-  }
-  field-label:not(:empty) {
-    padding-bottom: 10px;
-  }
-  input-container {
-    position: relative;
-  }
-  Tags {
-    padding-top: 8px;
-
-    &:empty {
-      display: none;
-    }
-  }
-`;
 
 type BaseProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'name' | 'value' | 'style'> &
   ILayoutSizeProps & {
@@ -57,9 +36,7 @@ type BaseProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange' | 
     description?: string;
     labelTooltip?: string;
     hideTags?: boolean;
-    mod?: 'surface';
     ref?: React.Ref<HTMLInputElement>;
-    style?: ComponentStyle;
     aggregate?: boolean;
     onDuplicate?: (files: File[]) => void;
   };
@@ -89,7 +66,6 @@ export const InputFiles: InputFilesType = observer(
   forwardRef(function InputFiles(
     {
       name,
-      style,
       value: valueControlled,
       required,
       state,
@@ -100,7 +76,6 @@ export const InputFiles: InputFilesType = observer(
       description,
       labelTooltip,
       hideTags,
-      mod,
       autoHide,
       aggregate,
       onChange,
@@ -114,8 +89,7 @@ export const InputFiles: InputFilesType = observer(
     const ref = useRefInherit<HTMLInputElement>(refInherit);
     const [innerState, setInnerState] = useState<FileList | null>(null);
     const translate = useTranslate();
-    const styles = useStyles(baseFormControlStyles, error ? baseInvalidFormControlStyles : baseValidFormControlStyles, INPUT_FIELD_STYLES, style);
-    const sizeStyles = useS(elementsSizeStyles);
+    const styles = useS(InputFilesStyles);
     const context = useContext(FormContext);
     loading = useStateDelay(loading ?? false, 300);
 
@@ -195,28 +169,27 @@ export const InputFiles: InputFilesType = observer(
 
     const files = Array.from(value ?? []);
 
-    return styled(styles)(
-      <field className={s(sizeStyles, { ...layoutProps }, className)}>
-        <field-label title={labelTooltip || rest.title}>
+    return (
+      <Field {...layoutProps} className={className}>
+        <FieldLabel title={labelTooltip || rest.title} required={required} className={s(styles, { fieldLabel: true })}>
           {children}
-          {required && ' *'}
-        </field-label>
-        <input-container>
-          <UploadArea ref={ref} {...rest} name={name} value={value} {...use({ mod })} required={required} onChange={handleChange}>
+        </FieldLabel>
+        <div className={s(styles, { inputContainer: true })}>
+          <UploadArea ref={ref} {...rest} name={name} value={value} required={required} onChange={handleChange}>
             <Button icon="/icons/import.svg" tag="div" loading={loading} mod={['outlined']}>
               {translate(rest.multiple ? 'ui_upload_files' : 'ui_upload_file')}
             </Button>
           </UploadArea>
           {!hideTags && (
-            <Tags>
+            <Tags className={s(styles, { tags: true })}>
               {files.map((file, i) => (
                 <Tag key={file.name} id={i} label={file.name} onRemove={removeFile} />
               ))}
             </Tags>
           )}
-        </input-container>
-        {description && <field-description>{description}</field-description>}
-      </field>,
+        </div>
+        {description && <FieldDescription invalid={error}>{description}</FieldDescription>}
+      </Field>
     );
   }),
-);
+) as InputFilesType;

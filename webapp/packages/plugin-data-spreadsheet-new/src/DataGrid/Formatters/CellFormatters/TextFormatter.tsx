@@ -31,11 +31,11 @@ export const TextFormatter = observer<RenderCellProps<IResultSetRowKey>>(functio
 
   const style = useS(styles);
   const formatter = tableDataContext.format;
-  const rawValue = getComputed(() => formatter.get(tableDataContext.getCellValue(cellContext.cell!)!));
+  const rawValue = getComputed(() => formatter.get(cellContext.cell!));
+  const textValue = formatter.getText(cellContext.cell!);
+  const displayValue = formatter.getDisplayString(cellContext.cell!);
 
   const classes = s(style, { textFormatter: true, nullValue: rawValue === null });
-
-  const value = formatter.toDisplayString(rawValue);
 
   const handleClose = useCallback(() => {
     editingContext.closeEditor(cellContext.position);
@@ -58,16 +58,14 @@ export const TextFormatter = observer<RenderCellProps<IResultSetRowKey>>(functio
     );
   }
 
-  const isUrl = typeof rawValue === 'string' && isValidUrl(rawValue);
-
   return (
-    <div title={value} className={classes}>
-      {isUrl && (
-        <a href={rawValue as string} target="_blank" rel="noreferrer" draggable={false} className={s(style, { a: true })}>
+    <div title={displayValue} className={classes}>
+      {isValidUrl(textValue) && (
+        <a href={textValue} target="_blank" rel="noreferrer" draggable={false} className={s(style, { a: true })}>
           <IconOrImage icon="external-link" viewBox="0 0 24 24" className={s(style, { icon: true })} />
         </a>
       )}
-      <div className={s(style, { textFormatterValue: true })}>{value}</div>
+      <div className={s(style, { textFormatterValue: true })}>{displayValue}</div>
     </div>
   );
 });
