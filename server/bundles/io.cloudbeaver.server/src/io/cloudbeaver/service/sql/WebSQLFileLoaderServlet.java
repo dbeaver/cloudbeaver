@@ -40,6 +40,8 @@ import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import static io.cloudbeaver.service.sql.WebSQLConstants.FORBIDDEN_CHARACTERS_FILE_REGEX;
+
 @MultipartConfig
 public class WebSQLFileLoaderServlet extends WebServiceServletBase {
 
@@ -88,7 +90,7 @@ public class WebSQLFileLoaderServlet extends WebServiceServletBase {
 
         String fileId = JSONUtils.getString(variables, FILE_ID);
 
-        if (fileId != null && !fileId.matches(".*[/..].*")) {
+        if (fileId != null && !fileId.matches(FORBIDDEN_CHARACTERS_FILE_REGEX)) {
             Path file = tempFolder.resolve(fileId);
             try {
                 Files.write(file, request.getPart("fileData").getInputStream().readAllBytes());
@@ -97,7 +99,9 @@ public class WebSQLFileLoaderServlet extends WebServiceServletBase {
                 throw new DBWebException(e.getMessage());
             }
         } else {
-            throw new DBException("Invalid file name");
+            String illegalCharacters = fileId != null ?
+                fileId.replaceAll(FORBIDDEN_CHARACTERS_FILE_REGEX, " ").strip() : null;
+            throw new DBException("Resource path '" + fileId + "' contains illegal characters: " + illegalCharacters);
         }
     }
 }
