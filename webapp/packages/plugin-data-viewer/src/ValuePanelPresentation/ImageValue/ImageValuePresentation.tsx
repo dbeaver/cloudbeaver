@@ -8,7 +8,7 @@
 import { action, computed, observable } from 'mobx';
 import { observer } from 'mobx-react-lite';
 
-import { ActionIconButtonStyles, Button, Container, Fill, IconButton, s, useObservableRef, useS, useTranslate } from '@cloudbeaver/core-blocks';
+import { ActionIconButton, Button, Container, Fill, s, useObservableRef, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import { selectFiles } from '@cloudbeaver/core-browser';
 import { useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
@@ -44,33 +44,14 @@ const Tools = observer<IToolsProps>(function Tools({ loading, stretch, onToggleS
   return (
     <Container gap dense keepSize>
       <Container keepSize flexStart center>
-        {onSave && (
-          <IconButton
-            title={translate('ui_download')}
-            className={ActionIconButtonStyles.actionIconButton}
-            name="/icons/export.svg"
-            disabled={loading}
-            img
-            onClick={onSave}
-          />
-        )}
-        {onUpload && (
-          <IconButton
-            title={translate('ui_upload')}
-            className={ActionIconButtonStyles.actionIconButton}
-            name="/icons/import.svg"
-            disabled={loading}
-            img
-            onClick={onUpload}
-          />
-        )}
+        {onSave && <ActionIconButton title={translate('ui_download')} name="/icons/export.svg" disabled={loading} img onClick={onSave} />}
+        {onUpload && <ActionIconButton title={translate('ui_upload')} name="/icons/import.svg" disabled={loading} img onClick={onUpload} />}
       </Container>
       <Fill />
       {onToggleStretch && (
         <Container keepSize flexEnd center>
-          <IconButton
+          <ActionIconButton
             title={translate(stretch ? 'data_viewer_presentation_value_image_original_size' : 'data_viewer_presentation_value_image_fit')}
-            className={ActionIconButtonStyles.actionIconButton}
             name={stretch ? 'img-original-size' : 'img-fit-size'}
             onClick={onToggleStretch}
           />
