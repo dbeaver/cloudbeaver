@@ -187,8 +187,9 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
         throws DBException, SQLException {
         for (SMUserProvisioning user : userImportList.getUsers()) {
             if (isSubjectExists(user.getUserId())) {
-                log.info("Skip already exist user: " + user.getUserId());
+                log.info("User already exist : " + user.getUserId());
                 setUserAuthRole(connection, user.getUserId(), userImportList.getAuthRole());
+                enableUser(connection, user.getUserId(), true);
                 continue;
             }
             createUser(connection, user.getUserId(), user.getMetaParameters(), true, userImportList.getAuthRole());
@@ -592,14 +593,18 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
 
     public void enableUser(String userId, boolean enabled) throws DBException {
         try (Connection dbCon = database.openConnection()) {
-            try (PreparedStatement dbStat = dbCon.prepareStatement(
-                database.normalizeTableNames("UPDATE {table_prefix}CB_USER SET IS_ACTIVE=? WHERE USER_ID=?"))) {
-                dbStat.setString(1, enabled ? CHAR_BOOL_TRUE : CHAR_BOOL_FALSE);
-                dbStat.setString(2, userId);
-                dbStat.executeUpdate();
-            }
+            enableUser(dbCon, userId, enabled);
         } catch (SQLException e) {
             throw new DBCException("Error while updating user configuration", e);
+        }
+    }
+
+    public void enableUser(Connection dbCon, String userId, boolean enabled) throws SQLException {
+        try (PreparedStatement dbStat = dbCon.prepareStatement(database.normalizeTableNames(
+            "UPDATE {table_prefix}CB_USER SET IS_ACTIVE=? WHERE USER_ID=?"))) {
+            dbStat.setString(1, enabled ? CHAR_BOOL_TRUE : CHAR_BOOL_FALSE);
+            dbStat.setString(2, userId);
+            dbStat.executeUpdate();
         }
     }
 
