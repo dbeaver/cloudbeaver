@@ -16,6 +16,7 @@
  */
 package io.cloudbeaver.server;
 
+import org.jkiss.dbeaver.model.auth.AuthInfo;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.InstanceCreator;
@@ -24,7 +25,6 @@ import io.cloudbeaver.auth.CBAuthConstants;
 import io.cloudbeaver.model.app.BaseWebApplication;
 import io.cloudbeaver.model.app.WebAuthApplication;
 import io.cloudbeaver.model.app.WebAuthConfiguration;
-import io.cloudbeaver.model.session.WebAuthInfo;
 import io.cloudbeaver.registry.WebDriverRegistry;
 import io.cloudbeaver.registry.WebServiceRegistry;
 import io.cloudbeaver.server.jetty.CBJettyServer;
@@ -825,7 +825,7 @@ public abstract class CBApplication extends BaseWebApplication implements WebAut
         @NotNull String newServerURL,
         @NotNull String adminName,
         @Nullable String adminPassword,
-        @NotNull List<WebAuthInfo> authInfoList,
+        @NotNull List<AuthInfo> authInfoList,
         long sessionExpireTime,
         @NotNull CBAppConfig appConfig,
         @Nullable SMCredentialsProvider credentialsProvider
@@ -886,7 +886,7 @@ public abstract class CBApplication extends BaseWebApplication implements WebAut
     protected abstract void finishSecurityServiceConfiguration(
         @NotNull String adminName,
         @Nullable String adminPassword,
-        @NotNull List<WebAuthInfo> authInfoList
+        @NotNull List<AuthInfo> authInfoList
     ) throws DBException;
 
     public synchronized void flushConfiguration(SMCredentialsProvider credentialsProvider) throws DBException {
