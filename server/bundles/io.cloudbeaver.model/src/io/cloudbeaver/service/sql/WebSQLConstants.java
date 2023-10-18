@@ -46,5 +46,4 @@ public class WebSQLConstants {
     public static final String ATTR_SRID = "srid";
     public static final String ATTR_PROPERTIES = "properties";
 
-    public static final String FORBIDDEN_CHARACTERS_FILE_REGEX = "(?U)[\\w.$()@ -]+";
 }

@@ -40,8 +40,6 @@ import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import static io.cloudbeaver.service.sql.WebSQLConstants.FORBIDDEN_CHARACTERS_FILE_REGEX;
-
 @MultipartConfig
 public class WebSQLFileLoaderServlet extends WebServiceServletBase {
 
@@ -54,6 +52,8 @@ public class WebSQLFileLoaderServlet extends WebServiceServletBase {
     private static final String TEMP_FILE_FOLDER = "temp-sql-upload-files";
 
     private static final String FILE_ID = "fileId";
+
+    private static final String FORBIDDEN_CHARACTERS_FILE_REGEX = "(?U)[\\w.$()@ -]+";
 
     private static final Gson gson = new GsonBuilder()
             .serializeNulls()
