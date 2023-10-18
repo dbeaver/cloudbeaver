@@ -53,6 +53,8 @@ public class WebSQLFileLoaderServlet extends WebServiceServletBase {
 
     private static final String FILE_ID = "fileId";
 
+    private static final String FORBIDDEN_CHARACTERS_FILE_REGEX = "(?U)[\\w.$()@ -]+";
+
     private static final Gson gson = new GsonBuilder()
             .serializeNulls()
             .setPrettyPrinting()
@@ -88,7 +90,7 @@ public class WebSQLFileLoaderServlet extends WebServiceServletBase {
 
         String fileId = JSONUtils.getString(variables, FILE_ID);
 
-        if (fileId != null) {
+        if (fileId != null && !fileId.matches(FORBIDDEN_CHARACTERS_FILE_REGEX)) {
             Path file = tempFolder.resolve(fileId);
             try {
                 Files.write(file, request.getPart("fileData").getInputStream().readAllBytes());
@@ -96,6 +98,10 @@ public class WebSQLFileLoaderServlet extends WebServiceServletBase {
                 log.error(e.getMessage());
                 throw new DBWebException(e.getMessage());
             }
+        } else {
+            String illegalCharacters = fileId != null ?
+                fileId.replaceAll(FORBIDDEN_CHARACTERS_FILE_REGEX, " ").strip() : null;
+            throw new DBException("Resource path '" + fileId + "' contains illegal characters: " + illegalCharacters);
         }
     }
 }
