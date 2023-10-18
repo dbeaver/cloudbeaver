@@ -54,7 +54,6 @@ interface ISQLEditorDataPrivate extends ISQLEditorData {
   updateParserScripts(): Promise<void>;
   loadDatabaseDataModels(): Promise<void>;
   getExecutingQuery(script: boolean): ISQLScriptSegment | undefined;
-  getResolvedSegment(): Promise<ISQLScriptSegment | undefined>;
   getSubQuery(): ISQLScriptSegment | undefined;
 }
 

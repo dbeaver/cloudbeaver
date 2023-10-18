@@ -10,9 +10,8 @@ import React, { useState } from 'react';
 import styled from 'reshadow';
 
 import {
-  ActionIconButtonStyles,
+  ActionIconButton,
   Fill,
-  IconButton,
   IconButtonStyles,
   PlaceholderElement,
   s,
@@ -56,7 +55,7 @@ export const ElementsTreeTools = observer<React.PropsWithChildren<Props>>(functi
   const translate = useTranslate();
   const [opened, setOpen] = useState(false);
   const deprecatedStyles = useStyles(style);
-  const styles = useS(ElementsTreeToolsStyles, ElementsTreeToolsIconButtonStyles, ActionIconButtonStyles);
+  const styles = useS(ElementsTreeToolsStyles, ElementsTreeToolsIconButtonStyles);
 
   useCaptureViewContext(context => {
     context?.set(DATA_CONTEXT_NAV_TREE_ROOT, tree.baseRoot);
@@ -70,21 +69,21 @@ export const ElementsTreeTools = observer<React.PropsWithChildren<Props>>(functi
       <div className={s(styles, { tools: true })}>
         <div className={s(styles, { actions: true })}>
           {tree.settings?.configurable && (
-            <IconButton
+            <ActionIconButton
               name="/icons/settings_cog_sm.svg"
               title={translate('ui_settings')}
-              className={s(styles, { primary: true, actionIconButton: true, opened })}
+              className={s(styles, { primary: true, opened })}
               img
               onClick={() => setOpen(!opened)}
             />
           )}
           <Fill />
           <ElementsTreeToolsMenu tree={tree} />
-          <IconButton
+          <ActionIconButton
             name="/icons/refresh_sm.svg#root"
             title={translate('app_navigationTree_refresh')}
             disabled={loading}
-            className={s(styles, { primary: true, actionIconButton: true, loading })}
+            className={s(styles, { primary: true, loading })}
             img
             onClick={() => tree.refresh(root)}
           />
