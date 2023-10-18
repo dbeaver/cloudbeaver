@@ -9,7 +9,17 @@ import { observer } from 'mobx-react-lite';
 import styled, { css, use } from 'reshadow';
 
 import { AdminUser, UsersResource } from '@cloudbeaver/core-authentication';
-import { Checkbox, Loader, Placeholder, TableColumnValue, TableItem, TableItemExpand, TableItemSelect, useTranslate } from '@cloudbeaver/core-blocks';
+import {
+  Checkbox,
+  Loader,
+  Placeholder,
+  TableColumnValue,
+  TableItem,
+  TableItemExpand,
+  TableItemSelect,
+  useAutoLoad,
+  useTranslate,
+} from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 
@@ -39,6 +49,8 @@ export const User = observer<Props>(function User({ user, displayAuthRole, selec
   const notificationService = useService(NotificationService);
   const administrationUsersManagementService = useService(AdministrationUsersManagementService);
   const translate = useTranslate();
+
+  useAutoLoad(User, administrationUsersManagementService.loaders);
 
   async function handleEnabledCheckboxChange(enabled: boolean) {
     try {

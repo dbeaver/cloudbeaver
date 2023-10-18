@@ -8,7 +8,7 @@
 import { makeObservable, observable, toJS } from 'mobx';
 
 import { Dependency } from '@cloudbeaver/core-di';
-import { isPrimitive, MetadataMap } from '@cloudbeaver/core-utils';
+import { isContainsException, isPrimitive, MetadataMap } from '@cloudbeaver/core-utils';
 
 import { CachedResourceParamKey } from './CachedResource';
 import type { ICachedResourceMetadata } from './ICachedResourceMetadata';
@@ -64,6 +64,11 @@ export abstract class Resource<
     if (param === undefined) {
       param = CachedResourceParamKey;
     }
+
+    if (isContainsException(this.getException(param))) {
+      return false;
+    }
+
     return !this.isLoaded(param, context) || this.isOutdated(param);
   }
 

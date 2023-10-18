@@ -26,7 +26,7 @@ export const UserFormInfo: TabContainerPanelComponent<UserFormProps> = observer(
   const userFormInfoPartService = useService(UserFormInfoPartService);
   const administrationUsersManagementService = useService(AdministrationUsersManagementService);
 
-  useAutoLoad(UserFormInfo, tabState, tab.selected);
+  useAutoLoad(UserFormInfo, [tabState, ...administrationUsersManagementService.loaders], tab.selected);
 
   const disabled = tabState.isLoading();
   const userManagementDisabled = administrationUsersManagementService.externalUserProviderEnabled;

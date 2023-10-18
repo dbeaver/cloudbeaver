@@ -274,7 +274,7 @@ export abstract class CachedResource<
       }
     }
 
-    return this.metadata.every(param, metadata => metadata.loaded) && (!includes || this.isIncludes(param, includes));
+    return this.metadata.every(param, metadata => metadata.loaded && (!includes || includes.every(include => metadata.includes.includes(include))));
   }
 
   /**
@@ -283,15 +283,6 @@ export abstract class CachedResource<
    */
   waitLoad(): Promise<void> {
     return this.scheduler.wait();
-  }
-
-  /**
-   * Return true if specified {@link includes} is loaded for specified {@link key}
-   * @param key - Resource key
-   * @param includes - Includes
-   */
-  isIncludes(key: ResourceKey<TKey>, includes: TInclude): boolean {
-    return this.metadata.every(key, metadata => includes.every(include => metadata.includes.includes(include)));
   }
 
   isOutdated(param?: ResourceKey<TKey>): boolean {

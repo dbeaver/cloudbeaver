@@ -5,7 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { action, computed, makeObservable } from 'mobx';
+import { action, computed, entries, keys, makeObservable, values } from 'mobx';
 
 import { ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
 import { ILoadableState, isArraysEqual, isContainsException } from '@cloudbeaver/core-utils';
@@ -47,15 +47,15 @@ export abstract class CachedMapResource<
   readonly onItemDelete: ISyncExecutor<ResourceKeySimple<TKey>>;
 
   get entries(): [TKey, TValue][] {
-    return Array.from(this.data.entries());
+    return entries(this.data) as [TKey, TValue][];
   }
 
   get values(): TValue[] {
-    return Array.from(this.data.values());
+    return values(this.data) as TValue[];
   }
 
   get keys(): TKey[] {
-    return Array.from(this.data.keys());
+    return keys(this.data) as TKey[];
   }
 
   constructor(defaultValue?: () => Map<TKey, TValue>, defaultIncludes?: CachedResourceIncludeArgs<TValue, TContext>) {

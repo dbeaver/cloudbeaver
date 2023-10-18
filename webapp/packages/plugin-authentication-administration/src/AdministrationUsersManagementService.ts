@@ -9,6 +9,7 @@ import { computed, makeObservable } from 'mobx';
 
 import { injectable } from '@cloudbeaver/core-di';
 import { type ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
+import { type ILoadableState, isArraysEqual } from '@cloudbeaver/core-utils';
 
 import { externalUserProviderStatusContext } from './externalUserProviderStatusContext';
 
@@ -20,11 +21,20 @@ export class AdministrationUsersManagementService {
 
     return projectsContext.externalUserProviderEnabled;
   }
+
+  get loaders(): ILoadableState[] {
+    const contexts = this.getExternalUserProviderStatus.execute();
+    const projectsContext = contexts.getContext(externalUserProviderStatusContext);
+
+    return projectsContext.loaders;
+  }
+
   readonly getExternalUserProviderStatus: ISyncExecutor;
 
   constructor() {
     makeObservable(this, {
       externalUserProviderEnabled: computed,
+      loaders: computed<ILoadableState[]>({ equals: (a, b) => isArraysEqual(a, b) }),
     });
 
     this.getExternalUserProviderStatus = new SyncExecutor();

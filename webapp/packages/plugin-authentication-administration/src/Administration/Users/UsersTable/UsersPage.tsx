@@ -10,7 +10,7 @@ import styled from 'reshadow';
 
 import { ADMINISTRATION_TOOLS_PANEL_STYLES, IAdministrationItemSubItem } from '@cloudbeaver/core-administration';
 import { AuthRolesResource } from '@cloudbeaver/core-authentication';
-import { ColoredContainer, Container, Group, Placeholder, useResource, useStyles } from '@cloudbeaver/core-blocks';
+import { ColoredContainer, Container, Group, Placeholder, useAutoLoad, useResource, useStyles } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 
 import { AdministrationUsersManagementService } from '../../../AdministrationUsersManagementService';
@@ -33,6 +33,7 @@ export const UsersPage = observer<Props>(function UsersPage({ sub, param }) {
   const authRolesResource = useResource(UsersPage, AuthRolesResource, undefined);
   const administrationUsersManagementService = useService(AdministrationUsersManagementService);
 
+  useAutoLoad(UsersPage, administrationUsersManagementService.loaders);
   const filters = useUsersTableFilters();
   const table = useUsersTable(filters);
 

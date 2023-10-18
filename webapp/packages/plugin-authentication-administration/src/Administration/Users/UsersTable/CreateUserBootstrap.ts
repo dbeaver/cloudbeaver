@@ -54,7 +54,10 @@ export class CreateUserBootstrap extends Bootstrap {
 
         return false;
       },
-      getLoader: () => getCachedMapResourceLoaderState(this.authProvidersResource, () => CachedMapAllKey),
+      getLoader: () => [
+        getCachedMapResourceLoaderState(this.authProvidersResource, () => CachedMapAllKey),
+        ...this.administrationUsersManagementService.loaders,
+      ],
       handler: (context, action) => {
         switch (action) {
           case ACTION_CREATE:

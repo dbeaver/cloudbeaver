@@ -147,11 +147,9 @@ export const Administration = observer<React.PropsWithChildren<Props>>(function 
                 </Loader>
               </SlideElement>
               <SlideElement>
-                <Loader suspense>
-                  <content>
-                    <ItemContent activeScreen={activeScreen} configurationWizard={configurationWizard} />
-                  </content>
-                </Loader>
+                <content>
+                  <ItemContent activeScreen={activeScreen} configurationWizard={configurationWizard} />
+                </content>
                 <SlideOverlay onClick={() => optionsPanelService.close()} />
               </SlideElement>
             </SlideBox>
