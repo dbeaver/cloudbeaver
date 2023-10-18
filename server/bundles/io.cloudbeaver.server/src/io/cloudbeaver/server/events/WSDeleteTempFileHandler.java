@@ -25,6 +25,7 @@ import org.jkiss.dbeaver.model.websocket.event.WSEventDeleteTempFile;
 import org.jkiss.utils.IOUtils;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 
 public class WSDeleteTempFileHandler implements WSEventHandler<WSEventDeleteTempFile> {
@@ -36,10 +37,12 @@ public class WSDeleteTempFileHandler implements WSEventHandler<WSEventDeleteTemp
         Path path = CBPlatform.getInstance()
                 .getTempFolder(new VoidProgressMonitor(), TEMP_FILE_FOLDER)
                 .resolve(sessionId);
-        try {
-            IOUtils.deleteDirectory(path);
-        } catch (IOException e) {
-            log.error("Error deleting temp path", e);
+        if (Files.exists(path)) {
+            try {
+                IOUtils.deleteDirectory(path);
+            } catch (IOException e) {
+                log.error("Error deleting temp path", e);
+            }
         }
     }
 
