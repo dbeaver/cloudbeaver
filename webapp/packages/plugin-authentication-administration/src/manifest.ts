@@ -30,6 +30,7 @@ import { UsersAdministrationNavigationService } from './Administration/Users/Use
 import { UsersAdministrationService } from './Administration/Users/UsersAdministrationService';
 import { CreateUserBootstrap } from './Administration/Users/UsersTable/CreateUserBootstrap';
 import { CreateUserService } from './Administration/Users/UsersTable/CreateUserService';
+import { AdministrationUsersManagementService } from './AdministrationUsersManagementService';
 import { AuthenticationLocaleService } from './AuthenticationLocaleService';
 import { PluginBootstrap } from './PluginBootstrap';
 
@@ -64,5 +65,6 @@ export const manifest: PluginManifest = {
     UserFormOriginPartBootstrap,
     UserFormConnectionAccessPartBootstrap,
     UserFormInfoPartService,
+    AdministrationUsersManagementService,
   ],
 };

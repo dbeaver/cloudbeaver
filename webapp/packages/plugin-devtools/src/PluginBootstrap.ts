@@ -14,6 +14,7 @@ import { TOP_NAV_BAR_SETTINGS_MENU } from '@cloudbeaver/plugin-settings-menu';
 import { MENU_USER_PROFILE } from '@cloudbeaver/plugin-user-profile';
 
 import { ACTION_DEVTOOLS } from './actions/ACTION_DEVTOOLS';
+import { ACTION_DEVTOOLS_MODE_CONFIGURATION } from './actions/ACTION_DEVTOOLS_MODE_CONFIGURATION';
 import { ACTION_DEVTOOLS_MODE_DISTRIBUTED } from './actions/ACTION_DEVTOOLS_MODE_DISTRIBUTED';
 import { DATA_CONTEXT_MENU_SEARCH } from './ContextMenu/DATA_CONTEXT_MENU_SEARCH';
 import { SearchResourceMenuItem } from './ContextMenu/SearchResourceMenuItem';
@@ -97,7 +98,16 @@ export class PluginBootstrap extends Bootstrap {
           ];
         }
 
-        return [new SearchResourceMenuItem(), ACTION_DEVTOOLS_MODE_DISTRIBUTED, MENU_PLUGINS, ...items];
+        return [new SearchResourceMenuItem(), ACTION_DEVTOOLS_MODE_DISTRIBUTED, ACTION_DEVTOOLS_MODE_CONFIGURATION, MENU_PLUGINS, ...items];
+      },
+    });
+
+    this.actionService.addHandler({
+      id: 'devtools-mode-configuration',
+      isActionApplicable: (context, action) => action === ACTION_DEVTOOLS_MODE_CONFIGURATION,
+      isChecked: () => this.devToolsService.isConfiguration,
+      handler: () => {
+        this.devToolsService.setConfigurationMode(!this.devToolsService.isConfiguration);
       },
     });
 
