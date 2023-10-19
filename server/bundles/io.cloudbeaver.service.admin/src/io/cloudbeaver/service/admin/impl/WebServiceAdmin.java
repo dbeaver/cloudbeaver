@@ -526,7 +526,7 @@ public class WebServiceAdmin implements DBWServiceAdmin {
             if (CommonUtils.isEmpty(adminName)) {
                 adminName = CBConstants.DEFAULT_ADMIN_NAME;
             }
-            for(WebAuthInfo webAuthInfo : authInfoList) {
+            for (WebAuthInfo webAuthInfo : authInfoList) {
                 authInfos.add(new AuthInfo(
                     webAuthInfo.getAuthProviderDescriptor().getId(),
                     webAuthInfo.getUserCredentials()));
