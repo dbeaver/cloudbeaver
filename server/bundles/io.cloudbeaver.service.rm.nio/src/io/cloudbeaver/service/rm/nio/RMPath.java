@@ -131,9 +131,6 @@ public class RMPath extends NIOPath {
                 .append("://");
         }
 
-        if (rmProjectId != null) {
-            uriBuilder.append(rmProjectId);
-        }
         var paths = new ArrayList<String>();
         paths.add(rmProjectId);
         paths.add(getResourcePath());
