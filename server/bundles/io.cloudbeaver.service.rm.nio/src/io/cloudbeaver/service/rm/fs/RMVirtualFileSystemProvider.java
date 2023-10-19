@@ -16,13 +16,12 @@
  */
 package io.cloudbeaver.service.rm.fs;
 
-import io.cloudbeaver.WebProjectImpl;
-import io.cloudbeaver.model.session.WebSession;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.app.DBPProject;
 import org.jkiss.dbeaver.model.fs.DBFFileSystemProvider;
 import org.jkiss.dbeaver.model.fs.DBFVirtualFileSystem;
+import org.jkiss.dbeaver.model.rm.RMControllerProvider;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 
 public class RMVirtualFileSystemProvider implements DBFFileSystemProvider {
@@ -33,16 +32,11 @@ public class RMVirtualFileSystemProvider implements DBFFileSystemProvider {
         @NotNull DBRProgressMonitor monitor,
         @NotNull DBPProject project
     ) {
-        var session = project.getSessionContext().getPrimaryAuthSpace();
-        if (!(session instanceof WebSession)) {
+        if (!(project instanceof RMControllerProvider)) {
             return new DBFVirtualFileSystem[0];
         }
-        WebSession webSession = (WebSession) session;
-        WebProjectImpl webProject = webSession.getProjectById(project.getId());
-        if (webProject == null) {
-            log.warn(String.format("Project %s not found in session %s", project.getId(), webSession.getSessionId()));
-            return new DBFVirtualFileSystem[0];
-        }
-        return new DBFVirtualFileSystem[]{new RMVirtualFileSystem(webSession, webProject.getRmProject())};
+        RMControllerProvider rmControllerProvider = (RMControllerProvider) project;
+        return new DBFVirtualFileSystem[]{new RMVirtualFileSystem(rmControllerProvider.getResourceController(),
+            rmControllerProvider.getRMProject())};
     }
 }
