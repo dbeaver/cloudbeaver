@@ -39,11 +39,19 @@ export const ItemContent = observer<Props>(function ItemContent({ activeScreen, 
     if (sub) {
       const Component = sub.getComponent ? sub.getComponent() : item.getContentComponent();
 
-      return <Component item={item} sub={sub} param={activeScreen.param} configurationWizard={configurationWizard} />;
+      return (
+        <Loader suspense>
+          <Component item={item} sub={sub} param={activeScreen.param} configurationWizard={configurationWizard} />
+        </Loader>
+      );
     }
   }
 
   const Component = item.getContentComponent();
 
-  return <Component item={item} configurationWizard={configurationWizard} />;
+  return (
+    <Loader suspense>
+      <Component item={item} configurationWizard={configurationWizard} />
+    </Loader>
+  );
 });

@@ -7,6 +7,9 @@
  */
 import { observer } from 'mobx-react-lite';
 
+import { isDefined } from '@cloudbeaver/core-utils';
+
+import { useAutoLoad } from '../Loader/useAutoLoad';
 import type { PlaceholderContainer, PlaceholderElement } from './PlaceholderContainer';
 
 type Props<T extends Record<string, any>> = T & {
@@ -26,6 +29,14 @@ export const Placeholder = observer(function Placeholder<T extends Record<string
       return (a.order ?? Number.MAX_SAFE_INTEGER) - (b.order ?? Number.MAX_SAFE_INTEGER);
     });
   }
+
+  useAutoLoad(
+    Placeholder,
+    elements
+      .map(element => element.getLoaders?.(rest as unknown as T))
+      .flat()
+      .filter(isDefined),
+  );
 
   elements = elements.filter(placeholder => !placeholder.isHidden?.(rest as unknown as T));
 

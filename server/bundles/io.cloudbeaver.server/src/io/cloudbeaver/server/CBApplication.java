@@ -325,20 +325,20 @@ public abstract class CBApplication extends BaseWebApplication implements WebAut
 
         }
 
-        {
-            try {
-                initializeSecurityController();
-            } catch (Exception e) {
-                log.error("Error initializing database", e);
-                return;
-            }
-        }
         try {
             initializeServer();
         } catch (DBException e) {
             log.error("Error initializing server", e);
             return;
         }
+
+        try {
+            initializeSecurityController();
+        } catch (Exception e) {
+            log.error("Error initializing database", e);
+            return;
+        }
+
 
         if (configurationMode) {
             // Try to configure automatically

@@ -7,7 +7,7 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import { s, SContext, StyleRegistry, ToolsAction, ToolsPanel, useResource, useTranslate } from '@cloudbeaver/core-blocks';
+import { s, SContext, StyleRegistry, ToolsAction, ToolsPanel, useTranslate } from '@cloudbeaver/core-blocks';
 import { MenuBar, MenuBarItemStyles } from '@cloudbeaver/core-ui';
 import { useMenu } from '@cloudbeaver/core-view';
 
