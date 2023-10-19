@@ -25,6 +25,8 @@ import org.jkiss.utils.CommonUtils;
 
 import java.io.IOException;
 import java.net.URI;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.LinkOption;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -138,6 +140,7 @@ public class RMPath extends NIOPath {
         uriBuilder.append(
             paths.stream()
                 .filter(Objects::nonNull)
+                .map(s -> URLEncoder.encode(s, StandardCharsets.UTF_8))
                 .collect(Collectors.joining(fileSystem.getSeparator()))
         );
 
