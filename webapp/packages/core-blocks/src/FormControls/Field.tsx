@@ -1,7 +1,7 @@
 import { observer } from 'mobx-react-lite';
 import type { HTMLAttributes, PropsWithChildren } from 'react';
 
-import { getLayoutProps } from '../Containers/filterLayoutFakeProps';
+import { filterLayoutFakeProps, getLayoutProps } from '../Containers/filterLayoutFakeProps';
 import type { ILayoutSizeProps } from '../Containers/ILayoutSizeProps';
 import elementsSizeStyles from '../Containers/shared/ElementsSize.m.css';
 import { s } from '../s';
@@ -14,8 +14,8 @@ type Props = ILayoutSizeProps &
   };
 export const Field: React.FC<PropsWithChildren<Props>> = observer(function Field({ children, className, ...rest }) {
   const styles = useS(fieldStyles, elementsSizeStyles);
-
   const layoutProps = getLayoutProps(rest);
+  rest = filterLayoutFakeProps(rest);
 
   return (
     <div {...rest} className={s(styles, { ...layoutProps, field: true }, className)}>

@@ -123,17 +123,17 @@ function filterApplicable(contexts: IDataContextProvider): (creator: IMenuItemsC
   const local = contexts.get(DATA_CONTEXT_MENU_LOCAL);
 
   return (creator: IMenuItemsCreator) => {
+    if (creator.menus) {
+      const applicable = creator.menus.some(menu => contexts.hasValue(DATA_CONTEXT_MENU, menu, false));
+
+      if (!applicable) {
+        return false;
+      }
+    }
+
     if (local) {
       if (!creator.menus && !creator.contexts) {
         return false;
-      }
-
-      if (creator.menus) {
-        const applicable = creator.menus.some(menu => contexts.hasValue(DATA_CONTEXT_MENU, menu, false));
-
-        if (!applicable) {
-          return false;
-        }
       }
 
       if (creator.contexts) {
@@ -149,14 +149,6 @@ function filterApplicable(contexts: IDataContextProvider): (creator: IMenuItemsC
 
     if (creator.isApplicable?.(contexts) === false) {
       return false;
-    }
-
-    if (creator.menus) {
-      const applicable = creator.menus.some(menu => contexts.hasValue(DATA_CONTEXT_MENU, menu, false));
-
-      if (!applicable) {
-        return false;
-      }
     }
 
     return true;
