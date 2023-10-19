@@ -27,7 +27,10 @@ import java.io.IOException;
 import java.net.URI;
 import java.nio.file.LinkOption;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 public class RMPath extends NIOPath {
     @NotNull
@@ -71,7 +74,7 @@ public class RMPath extends NIOPath {
         if (ArrayUtils.isEmpty(parts)) {
             return this;
         }
-        return new RMPath(rmNioFileSystem, parts[parts.length - 1]);
+        return new RMPath(new RMNIOFileSystem(null, getFileSystem().rmProvider()), parts[parts.length - 1]);
     }
 
     @Override
@@ -122,20 +125,31 @@ public class RMPath extends NIOPath {
     @Override
     public URI toUri() {
         var fileSystem = getFileSystem();
-        var uriBuilder = new StringBuilder(fileSystem.provider().getScheme())
-            .append("://");
+        var uriBuilder = new StringBuilder();
+        if (isAbsolute()) {
+            uriBuilder.append(fileSystem.provider().getScheme())
+                .append("://");
+        }
 
         if (rmProjectId != null) {
             uriBuilder.append(rmProjectId);
         }
+        var paths = new ArrayList<String>();
+        paths.add(rmProjectId);
+        paths.add(getResourcePath());
 
-        String rmResourcePath = getResourcePath();
-        if (rmResourcePath != null) {
-            uriBuilder.append(fileSystem.getSeparator())
-                .append(rmResourcePath);
-        }
+        uriBuilder.append(
+            paths.stream()
+                .filter(Objects::nonNull)
+                .collect(Collectors.joining(fileSystem.getSeparator()))
+        );
 
         return URI.create(uriBuilder.toString());
+    }
+
+    @Override
+    public boolean isAbsolute() {
+        return rmNioFileSystem.getRmProjectId() != null;
     }
 
     @Override
