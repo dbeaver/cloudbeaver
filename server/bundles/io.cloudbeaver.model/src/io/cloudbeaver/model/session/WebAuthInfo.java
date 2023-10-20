@@ -157,8 +157,4 @@ public class WebAuthInfo implements SMSessionPrincipal {
     public String getUserName() {
         return user.getUserId();
     }
-
-    public String getAuthProviderConfigurationId() {
-        return authProviderConfigurationId;
-    }
 }
