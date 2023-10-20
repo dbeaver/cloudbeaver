@@ -53,7 +53,7 @@ public class WebSQLFileLoaderServlet extends WebServiceServletBase {
 
     private static final String FILE_ID = "fileId";
 
-    private static final String FORBIDDEN_CHARACTERS_FILE_REGEX = "(?U)[\\w.$()@ -]+";
+    private static final String FORBIDDEN_CHARACTERS_FILE_REGEX = "(?U)[$()@ /]+";
 
     private static final Gson gson = new GsonBuilder()
             .serializeNulls()
@@ -90,7 +90,7 @@ public class WebSQLFileLoaderServlet extends WebServiceServletBase {
 
         String fileId = JSONUtils.getString(variables, FILE_ID);
 
-        if (fileId != null && !fileId.matches(FORBIDDEN_CHARACTERS_FILE_REGEX)) {
+        if (fileId != null && !fileId.matches(FORBIDDEN_CHARACTERS_FILE_REGEX) && !fileId.startsWith(".")) {
             Path file = tempFolder.resolve(fileId);
             try {
                 Files.write(file, request.getPart("fileData").getInputStream().readAllBytes());
