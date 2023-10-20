@@ -19,7 +19,7 @@ package io.cloudbeaver.service.rm.fs;
 import io.cloudbeaver.service.rm.nio.RMNIOFileSystemProvider;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.DBException;
-import org.jkiss.dbeaver.model.DBPImage;
+import org.jkiss.dbeaver.model.fs.DBFFileSystemProvider;
 import org.jkiss.dbeaver.model.fs.DBFVirtualFileSystem;
 import org.jkiss.dbeaver.model.fs.DBFVirtualFileSystemRoot;
 import org.jkiss.dbeaver.model.rm.RMController;
@@ -30,15 +30,24 @@ import java.net.URI;
 import java.nio.file.Path;
 
 public class RMVirtualFileSystem implements DBFVirtualFileSystem {
+    private final RMVirtualFileSystemProvider provider;
+
     @NotNull
     private final RMNIOFileSystemProvider rmNioFileSystemProvider;
 
     @NotNull
     private final RMProject rmProject;
 
-    public RMVirtualFileSystem(@NotNull RMController rmController, @NotNull RMProject rmProject) {
-        this.rmNioFileSystemProvider = new RMNIOFileSystemProvider(rmController);
-        this.rmProject = rmProject;
+    public RMVirtualFileSystem(@NotNull RMVirtualFileSystemProvider provider, @NotNull RMController controller, @NotNull RMProject project) {
+        this.provider = provider;
+        this.rmNioFileSystemProvider = new RMNIOFileSystemProvider(controller);
+        this.rmProject = project;
+    }
+
+    @NotNull
+    @Override
+    public DBFFileSystemProvider getProvider() {
+        return provider;
     }
 
     @NotNull
@@ -56,11 +65,6 @@ public class RMVirtualFileSystem implements DBFVirtualFileSystem {
     @Override
     public String getDescription() {
         return "Resource Manager file system";
-    }
-
-    @Override
-    public DBPImage getIcon() {
-        return null;
     }
 
     @NotNull

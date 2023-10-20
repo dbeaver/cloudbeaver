@@ -27,6 +27,12 @@ import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 public class RMVirtualFileSystemProvider implements DBFFileSystemProvider {
     private static final Log log = Log.getLog(RMVirtualFileSystemProvider.class);
 
+    @NotNull
+    @Override
+    public String getId() {
+        return "rm-nio";
+    }
+
     @Override
     public DBFVirtualFileSystem[] getAvailableFileSystems(
         @NotNull DBRProgressMonitor monitor,
