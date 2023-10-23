@@ -17,3 +17,5 @@ export * from './Administration/Users/UserForm/Info/UserFormInfoPartService';
 export * from './Administration/IdentityProviders/IAuthConfigurationFormProps';
 export * from './Administration/IdentityProviders/AuthConfigurationFormService';
 export * from './Menus/MENU_USERS_ADMINISTRATION';
+export * from './AdministrationUsersManagementService';
+export * from './externalUserProviderStatusContext';

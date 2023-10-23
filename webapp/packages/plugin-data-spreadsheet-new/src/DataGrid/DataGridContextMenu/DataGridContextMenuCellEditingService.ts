@@ -55,7 +55,7 @@ export class DataGridContextMenuCellEditingService {
         const cellValue = view.getCellValue(context.data.key);
         const column = view.getColumn(context.data.key.column);
 
-        if (!column || cellValue === undefined || format.isReadOnly(context.data.key)) {
+        if (!column || cellValue === undefined || format.isReadOnly(context.data.key) || format.isBinary(context.data.key)) {
           return true;
         }
 
@@ -78,7 +78,7 @@ export class DataGridContextMenuCellEditingService {
         const format = model.source.getAction(resultIndex, ResultSetFormatAction);
         const cellValue = view.getCellValue(key);
 
-        return cellValue === undefined || format.isReadOnly(context.data.key) || view.getColumn(key.column)?.required || format.isNull(cellValue);
+        return cellValue === undefined || format.isReadOnly(context.data.key) || view.getColumn(key.column)?.required || format.isNull(key);
       },
       onClick(context) {
         context.data.model.source.getAction(context.data.resultIndex, ResultSetEditAction).set(context.data.key, null);

@@ -82,7 +82,6 @@ export class DataGridContextMenuFilterService {
   ): Array<IContextMenuItem<IDataGridCellMenuContext>> {
     const { model, resultIndex, key } = context.data;
     const data = model.source.getAction(resultIndex, ResultSetDataAction);
-    const format = model.source.getAction(resultIndex, ResultSetFormatAction);
     const supportedOperations = data.getColumnOperations(key.column);
     const columnLabel = data.getColumn(key.column)?.label || '';
 
@@ -100,8 +99,7 @@ export class DataGridContextMenuFilterService {
         },
         titleGetter() {
           const val = typeof value === 'function' ? value() : value;
-          const stringifyValue = format.toDisplayString(val);
-          const wrappedValue = wrapOperationArgument(operation.id, stringifyValue);
+          const wrappedValue = wrapOperationArgument(operation.id, val);
           const clippedValue = replaceMiddle(wrappedValue, ' ... ', 8, 30);
           return `${columnLabel} ${operation.expression} ${clippedValue}`;
         },
@@ -220,14 +218,14 @@ export class DataGridContextMenuFilterService {
         const supportedOperations = data.getColumnOperations(key.column);
         const value = data.getCellValue(key);
 
-        return value === undefined || supportedOperations.length === 0 || format.isNull(value);
+        return value === undefined || supportedOperations.length === 0 || format.isNull(key);
       },
       panel: new ComputedContextMenuModel<IDataGridCellMenuContext>({
         id: 'cellValuePanel',
         menuItemsGetter: context => {
           const { model, resultIndex, key } = context.data;
-          const data = model.source.getAction(resultIndex, ResultSetDataAction);
-          const cellValue = data.getCellValue(key);
+          const format = model.source.getAction(resultIndex, ResultSetFormatAction);
+          const cellValue = format.getText(key);
           const items = this.getGeneralizedMenuItems(context, cellValue, 'filter');
           return items;
         },
@@ -253,10 +251,8 @@ export class DataGridContextMenuFilterService {
         id: 'customValuePanel',
         menuItemsGetter: context => {
           const { model, resultIndex, key } = context.data;
-          const format = model.source.getAction(resultIndex, ResultSetFormatAction);
           const data = model.source.getAction(resultIndex, ResultSetDataAction);
           const supportedOperations = data.getColumnOperations(key.column);
-          const cellValue = data.getCellValue(key) ?? '';
           const columnLabel = data.getColumn(key.column)?.label || '';
 
           return supportedOperations
@@ -273,9 +269,10 @@ export class DataGridContextMenuFilterService {
                 title: title + ' ..',
                 icon: 'filter-custom',
                 onClick: async () => {
-                  const stringifyCellValue = format.toDisplayString(cellValue);
+                  const format = model.source.getAction(resultIndex, ResultSetFormatAction);
+                  const displayString = format.getText(key);
                   const customValue = await this.commonDialogService.open(FilterCustomValueDialog, {
-                    defaultValue: stringifyCellValue,
+                    defaultValue: displayString,
                     inputTitle: title + ':',
                   });
 

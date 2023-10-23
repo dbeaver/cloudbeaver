@@ -10,8 +10,9 @@ import type { IDatabaseDataResult } from '../IDatabaseDataResult';
 
 export interface IDatabaseDataFormatAction<TKey, TResult extends IDatabaseDataResult> extends IDatabaseDataAction<any, TResult> {
   isReadOnly: (key: TKey) => boolean;
-  get: (value: any) => any;
-  getText: (value: any) => string | null;
-  isNull: (value: any) => boolean;
-  toDisplayString: (value: any) => string;
+  isNull: (key: TKey) => boolean;
+  isBinary: (key: TKey) => boolean;
+  get: (key: TKey) => any;
+  getText: (key: TKey) => string;
+  getDisplayString: (key: TKey) => string;
 }

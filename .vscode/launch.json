@@ -10,7 +10,13 @@
       "sourceMaps": true,
       "sourceMapPathOverrides": {
         "webpack:///*": "${workspaceFolder}/../*"
-      }
+      },
+      "skipFiles": [
+        "<node_internals>/**",
+        "**/node_modules/**",
+        "${workspaceFolder}/webapp/**/node_modules/**/*.js",
+        "${workspaceFolder}/webapp/**/dist/**/*.js"
+      ]
     },
     {
       "type": "java",
@@ -24,7 +30,7 @@
         "request": "launch",
         "mainClass": "org.eclipse.equinox.launcher.Main",
         "classPaths": [
-          "${workspaceFolder}/../eclipse/eclipse/plugins/org.eclipse.equinox.launcher_1.6.400.v20210924-0641.jar"
+          "${workspaceFolder}/../eclipse/eclipse/plugins/org.eclipse.equinox.launcher_1.6.500.v20230717-2134.jar"
         ],
         "args": [
           "-product",
@@ -59,7 +65,7 @@
         "request": "launch",
         "mainClass": "org.eclipse.equinox.launcher.Main",
         "classPaths": [
-          "${workspaceFolder}/../eclipse/Eclipse.app/Contents/Eclipse/plugins/org.eclipse.equinox.launcher_1.6.400.v20210924-0641.jar"
+          "${workspaceFolder}/../eclipse/Eclipse.app/Contents/Eclipse/plugins/org.eclipse.equinox.launcher_1.6.500.v20230717-2134.jar"
         ],
         "args": [
           "-product",

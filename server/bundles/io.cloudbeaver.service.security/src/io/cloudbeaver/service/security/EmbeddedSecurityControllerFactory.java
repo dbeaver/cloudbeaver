@@ -31,7 +31,7 @@ import java.util.Map;
 /**
  * Embedded Security Controller Factory
  */
-public class EmbeddedSecurityControllerFactory {
+public class EmbeddedSecurityControllerFactory<T extends WebAuthApplication> {
     private static volatile CBDatabase DB_INSTANCE;
 
     public static CBDatabase getDbInstance() {
@@ -42,7 +42,7 @@ public class EmbeddedSecurityControllerFactory {
      * Create new security controller instance with custom configuration
      */
     public CBEmbeddedSecurityController createSecurityService(
-        WebAuthApplication application,
+        T application,
         Map<String, Object> databaseConfig,
         SMCredentialsProvider credentialsProvider,
         SMControllerConfiguration smConfig
@@ -86,7 +86,7 @@ public class EmbeddedSecurityControllerFactory {
     }
 
     protected CBEmbeddedSecurityController createEmbeddedSecurityController(
-        WebAuthApplication application,
+        T application,
         CBDatabase database,
         SMCredentialsProvider credentialsProvider,
         SMControllerConfiguration smConfig

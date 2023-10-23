@@ -5,9 +5,8 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { action, makeObservable, observable, toJS } from 'mobx';
+import { action, makeObservable, observable } from 'mobx';
 
-import { Dependency } from '@cloudbeaver/core-di';
 import {
   ExecutionContext,
   Executor,
@@ -19,7 +18,6 @@ import {
   SyncExecutor,
   TaskScheduler,
 } from '@cloudbeaver/core-executor';
-import { isPrimitive, MetadataMap } from '@cloudbeaver/core-utils';
 
 import {
   CachedResourceOffsetPageKey,
@@ -29,29 +27,20 @@ import {
   isOffsetPageOutdated,
 } from './CachedResourceOffsetPageKeys';
 import type { ICachedResourceMetadata } from './ICachedResourceMetadata';
+import type { IResource } from './IResource';
+import { Resource } from './Resource';
 import { isResourceAlias } from './ResourceAlias';
-import { ResourceAliases } from './ResourceAliases';
 import { ResourceError } from './ResourceError';
 import type { ResourceKey, ResourceKeyFlat } from './ResourceKey';
 import { resourceKeyAlias } from './ResourceKeyAlias';
-import { isResourceKeyList, resourceKeyList, ResourceKeyList } from './ResourceKeyList';
+import { resourceKeyList } from './ResourceKeyList';
 import { resourceKeyListAlias } from './ResourceKeyListAlias';
-import { ResourceKeyUtils } from './ResourceKeyUtils';
-import { ResourceLogger } from './ResourceLogger';
-import { ResourceMetadata } from './ResourceMetadata';
 import { ResourceOffsetPagination } from './ResourceOffsetPagination';
-import { ResourceUseTracker } from './ResourceUseTracker';
 
 export interface IDataError<TKey> {
   param: ResourceKey<TKey>;
   exception: Error;
 }
-
-export type CachedResourceData<TResource> = TResource extends CachedResource<infer T, any, any, any, any> ? T : never;
-export type CachedResourceValue<TResource> = TResource extends CachedResource<any, infer T, any, any, any> ? T : never;
-export type CachedResourceKey<TResource> = TResource extends CachedResource<any, any, infer T, any, any> ? T : never;
-export type CachedResourceContext<TResource> = TResource extends CachedResource<any, any, any, infer T, any> ? T : void;
-export type CachedResourceMetadata<TResource> = TResource extends CachedResource<any, any, any, any, infer T> ? T : void;
 
 export const CachedResourceParamKey = resourceKeyAlias('@cached-resource/param-default');
 export const CachedResourceListEmptyKey = resourceKeyListAlias('@cached-resource/empty');
@@ -65,48 +54,33 @@ export abstract class CachedResource<
   TKey,
   TInclude extends ReadonlyArray<string>,
   TMetadata extends ICachedResourceMetadata = ICachedResourceMetadata,
-> extends Dependency {
-  data: TData;
-
+> extends Resource<TData, TKey, TInclude, TValue, TMetadata> {
   readonly onClear: ISyncExecutor;
   readonly onDataOutdated: ISyncExecutor<ResourceKey<TKey>>;
   readonly onDataUpdate: ISyncExecutor<ResourceKey<TKey>>;
   readonly onDataError: ISyncExecutor<IDataError<ResourceKey<TKey>>>;
   readonly beforeLoad: IExecutor<ResourceKey<TKey>>;
-  readonly useTracker: ResourceUseTracker<TKey, TMetadata>;
   readonly offsetPagination: ResourceOffsetPagination<TKey, TMetadata>;
-  readonly aliases: ResourceAliases<TKey>;
-  protected defaultIncludes: TInclude;
   protected get loading(): boolean {
     return this.scheduler.executing;
   }
 
   protected outdateWaitList: ResourceKey<TKey>[];
   protected readonly scheduler: TaskScheduler<ResourceKey<TKey>>;
-  protected readonly logger: ResourceLogger;
-  protected readonly metadata: ResourceMetadata<TKey, TMetadata>;
 
   /** Need to infer value type */
   private readonly typescriptHack: TValue;
 
-  constructor(defaultKey: ResourceKey<TKey>, private readonly defaultValue: () => TData, defaultIncludes: TInclude = [] as any) {
-    super();
+  constructor(defaultKey: ResourceKey<TKey>, defaultValue: () => TData, defaultIncludes: TInclude = [] as any) {
+    super(defaultValue, defaultIncludes);
 
-    this.logger = new ResourceLogger(this.getName());
-    this.aliases = new ResourceAliases(this.logger, this.validateKey.bind(this));
-    this.metadata = new ResourceMetadata(this.aliases, this.getDefaultMetadata.bind(this), this.isKeyEqual.bind(this), this.getKeyRef.bind(this));
     this.offsetPagination = new ResourceOffsetPagination(this.metadata);
-    this.useTracker = new ResourceUseTracker(this.logger, this.aliases, this.metadata);
 
-    this.isKeyEqual = this.isKeyEqual.bind(this);
-    this.isIntersect = this.isIntersect.bind(this);
     this.loadingTask = this.loadingTask.bind(this);
 
     this.typescriptHack = null as any;
-    this.defaultIncludes = defaultIncludes;
     this.outdateWaitList = [];
     this.scheduler = new TaskScheduler(this.isIntersect);
-    this.data = defaultValue();
     this.beforeLoad = new Executor(null, this.isIntersect);
     this.onClear = new SyncExecutor();
     this.onDataOutdated = new SyncExecutor<ResourceKey<TKey>>(null);
@@ -124,7 +98,6 @@ export abstract class CachedResource<
     this.logger.spy(this.onDataError, 'onDataError');
 
     makeObservable<this, 'loader' | 'commitIncludes' | 'resetIncludes' | 'markOutdatedSync'>(this, {
-      data: observable,
       loader: action,
       markLoading: action,
       markLoaded: action,
@@ -146,15 +119,11 @@ export abstract class CachedResource<
     }, 5 * 60 * 1000);
   }
 
-  getName(): string {
-    return this.constructor.name;
-  }
-
   /**
    * Mark resource as in use when {@link resource} is in use
    * @param resource resource to depend on
    */
-  connect(resource: CachedResource<any, any, any, any, any>): void {
+  connect(resource: IResource<any, any, any, any, any>): void {
     let subscription: string | null = null;
 
     const subscriptionHandler = () => {
@@ -305,18 +274,7 @@ export abstract class CachedResource<
       }
     }
 
-    return this.metadata.every(param, metadata => metadata.loaded) && (!includes || this.isIncludes(param, includes));
-  }
-
-  /**
-   * Return true if resource is outdated or not loaded
-   * @param param - Resource key
-   */
-  isLoadable(param?: ResourceKey<TKey>, context?: TInclude): boolean {
-    if (param === undefined) {
-      param = CachedResourceParamKey;
-    }
-    return !this.isLoaded(param, context) || this.isOutdated(param);
+    return this.metadata.every(param, metadata => metadata.loaded && (!includes || includes.every(include => metadata.includes.includes(include))));
   }
 
   /**
@@ -325,34 +283,6 @@ export abstract class CachedResource<
    */
   waitLoad(): Promise<void> {
     return this.scheduler.wait();
-  }
-
-  isLoading(key?: ResourceKey<TKey>): boolean {
-    if (key === undefined) {
-      key = CachedResourceParamKey;
-    }
-
-    return this.metadata.some(key, metadata => metadata.loading);
-  }
-
-  /**
-   * Return true if specified {@link includes} is loaded for specified {@link key}
-   * @param key - Resource key
-   * @param includes - Includes
-   */
-  isIncludes(key: ResourceKey<TKey>, includes: TInclude): boolean {
-    return this.metadata.every(key, metadata => includes.every(include => metadata.includes.includes(include)));
-  }
-
-  getException(param: ResourceKeyFlat<TKey>): Error | null;
-  getException(param: ResourceKeyList<TKey>): Error[] | null;
-  getException(param: ResourceKey<TKey>): Error[] | Error | null;
-  getException(param: ResourceKey<TKey>): Error[] | Error | null {
-    if (isResourceKeyList(param)) {
-      return this.metadata.map(param, metadata => metadata?.exception || null).filter<Error>((exception): exception is Error => exception !== null);
-    }
-
-    return this.metadata.map(param, metadata => metadata?.exception || null);
   }
 
   isOutdated(param?: ResourceKey<TKey>): boolean {
@@ -564,55 +494,6 @@ export abstract class CachedResource<
     }, {});
   }
 
-  /**
-   * Can be overridden to provide equality check for complicated keys
-   */
-  isKeyEqual(param: TKey, second: TKey): boolean {
-    return param === second;
-  }
-
-  /**
-   * Check if key is a part of nextKey
-   * @param nextKey - Resource key
-   * @param key - Resource key
-   * @returns {boolean} Returns true if key can be represented by nextKey
-   */
-  isIntersect(key: ResourceKey<TKey>, nextKey: ResourceKey<TKey>): boolean {
-    if (key === nextKey) {
-      return true;
-    }
-
-    if (isResourceAlias(key) && isResourceAlias(nextKey)) {
-      key = this.aliases.transformToAlias(key);
-      nextKey = this.aliases.transformToAlias(nextKey);
-
-      return key.isEqual(nextKey) && this.isIntersect(key.target, nextKey.target);
-    } else if (isResourceAlias(key) || isResourceAlias(nextKey)) {
-      return true;
-    }
-
-    if (isResourceKeyList(key) || isResourceKeyList(nextKey)) {
-      return ResourceKeyUtils.isIntersect(key, nextKey, this.isKeyEqual);
-    }
-
-    return ResourceKeyUtils.isIntersect(key, nextKey, this.isKeyEqual);
-  }
-
-  /**
-   * Can be overridden to provide static link to complicated keys
-   */
-  protected getKeyRef(key: TKey): TKey {
-    if (isPrimitive(key)) {
-      return key;
-    }
-    return Object.freeze(toJS(key));
-  }
-
-  /**
-   * Check if key is valid. Can be overridden to provide custom validation.
-   */
-  protected abstract validateKey(key: TKey): boolean;
-
   protected resetIncludes(): void {
     this.metadata.update(metadata => {
       metadata.includes = observable([...this.defaultIncludes]);
@@ -668,21 +549,6 @@ export abstract class CachedResource<
     }
 
     this.onDataOutdated.execute(key);
-  }
-
-  /**
-   * Use to extend metadata
-   * @returns {Record<string, any>} Object Map
-   */
-  protected getDefaultMetadata(key: TKey, metadata: MetadataMap<TKey, TMetadata>): TMetadata {
-    return {
-      loaded: false,
-      outdated: true,
-      loading: false,
-      exception: null,
-      includes: observable([...this.defaultIncludes]),
-      dependencies: observable([]),
-    } as ICachedResourceMetadata as TMetadata;
   }
 
   protected async preLoadData(

@@ -13,6 +13,7 @@ import { Combobox, Group, GroupTitle, ITag, s, Tag, Tags, useResource, useS, use
 import { DBDriverResource } from '@cloudbeaver/core-connections';
 import { CachedMapAllKey, resourceKeyList } from '@cloudbeaver/core-resource';
 import type { ServerConfigInput } from '@cloudbeaver/core-sdk';
+import { isDefined } from '@cloudbeaver/core-utils';
 
 import style from './ServerConfigurationDriversForm.m.css';
 
@@ -25,7 +26,7 @@ export const ServerConfigurationDriversForm = observer<Props>(function ServerCon
   const translate = useTranslate();
   const driversResource = useResource(ServerConfigurationDriversForm, DBDriverResource, CachedMapAllKey);
 
-  const drivers = driversResource.resource.values.slice().sort(driversResource.resource.compare);
+  const drivers = driversResource.data.filter(isDefined).sort(driversResource.resource.compare);
 
   const tags: ITag[] = driversResource.resource
     .get(resourceKeyList(serverConfig.disabledDrivers || []))
