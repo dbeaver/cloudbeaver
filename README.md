@@ -22,6 +22,12 @@ You can see live demo of CloudBeaver here: https://demo.cloudbeaver.io
 
 ## Changelog
 
+### CloudBeaver 23.2.3 - 2023-10-23
+
+- The SSL option is available for establishing a connection in SQL Server;
+- Added the ability to edit binary values in a table;
+- Different bug fixes and enhancements have been made.
+
 ### CloudBeaver 23.2.2 - 2023-10-09
 
 - The 'Save credentials' checkbox has been removed from a template creating form as credentials are not stored in templates;
