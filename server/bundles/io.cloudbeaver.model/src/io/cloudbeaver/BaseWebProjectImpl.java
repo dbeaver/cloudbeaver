@@ -62,6 +62,12 @@ public class BaseWebProjectImpl extends BaseProjectImpl implements RMControllerP
         return resourceController;
     }
 
+    @NotNull
+    @Override
+    public RMProject getRMProject() {
+        return project;
+    }
+
     @Override
     public boolean isVirtual() {
         return true;

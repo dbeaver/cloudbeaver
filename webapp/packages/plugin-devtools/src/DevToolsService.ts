@@ -14,6 +14,7 @@ import { LocalStorageSaveService } from '@cloudbeaver/core-settings';
 interface IDevToolsSettings {
   enabled: boolean;
   distributed: boolean;
+  configuration: boolean;
 }
 
 const DEVTOOLS = 'devtools';
@@ -28,6 +29,10 @@ export class DevToolsService {
     return this.settings.distributed;
   }
 
+  get isConfiguration(): boolean {
+    return this.settings.configuration;
+  }
+
   private readonly settings: IDevToolsSettings;
 
   constructor(private readonly serverConfigResource: ServerConfigResource, private readonly autoSaveService: LocalStorageSaveService) {
@@ -37,23 +42,29 @@ export class DevToolsService {
       settings: observable,
     });
     this.autoSaveService.withAutoSave(DEVTOOLS, this.settings, getDefaultDevToolsSettings);
-    this.serverConfigResource.onDataUpdate.addHandler(this.syncDistributedMode.bind(this));
+    this.serverConfigResource.onDataUpdate.addHandler(this.syncSettingsOverride.bind(this));
   }
 
   switch() {
     this.settings.enabled = !this.settings.enabled;
-    this.syncDistributedMode();
+    this.syncSettingsOverride();
   }
 
   setDistributedMode(distributed: boolean) {
     this.settings.distributed = distributed;
-    this.syncDistributedMode();
+    this.syncSettingsOverride();
   }
 
-  private syncDistributedMode() {
+  setConfigurationMode(configuration: boolean) {
+    this.settings.configuration = configuration;
+    this.syncSettingsOverride();
+  }
+
+  private syncSettingsOverride() {
     if (this.isEnabled) {
       if (this.serverConfigResource.data) {
         this.serverConfigResource.data.distributed = this.isDistributed;
+        this.serverConfigResource.data.configurationMode = this.isConfiguration;
       }
     }
   }
@@ -61,7 +72,8 @@ export class DevToolsService {
 
 function getDefaultDevToolsSettings(): IDevToolsSettings {
   return {
-    enabled: false,
+    enabled: process.env.NODE_ENV === 'development',
     distributed: false,
+    configuration: false,
   };
 }

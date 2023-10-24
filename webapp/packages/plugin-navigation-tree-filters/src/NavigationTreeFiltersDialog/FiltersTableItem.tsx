@@ -7,7 +7,7 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import { ActionIconButtonStyles, IconButton, s, TableColumnValue, TableItem, useS } from '@cloudbeaver/core-blocks';
+import { ActionIconButton, s, TableColumnValue, TableItem, useS } from '@cloudbeaver/core-blocks';
 
 import styles from './FiltersTableItem.m.css';
 
@@ -20,13 +20,13 @@ interface Props {
 }
 
 export const FiltersTableItem = observer<Props>(function FiltersTableItem({ id, name, disabled, className, onDelete }) {
-  const style = useS(ActionIconButtonStyles, styles);
+  const style = useS(styles);
 
   return (
     <TableItem className={s(style, { tableItem: true }, className)} item={id} title={name} disabled={disabled} selectDisabled={disabled}>
       <TableColumnValue>{name}</TableColumnValue>
       <TableColumnValue className={s(style, { deleteColumnCell: true })} flex>
-        <IconButton className={s(ActionIconButtonStyles, { actionIconButton: true })} name="cross-bold" onClick={() => onDelete(id)} />
+        <ActionIconButton name="cross-bold" onClick={() => onDelete(id)} />
       </TableColumnValue>
     </TableItem>
   );

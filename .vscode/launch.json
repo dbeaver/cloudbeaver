@@ -10,7 +10,13 @@
       "sourceMaps": true,
       "sourceMapPathOverrides": {
         "webpack:///*": "${workspaceFolder}/../*"
-      }
+      },
+      "skipFiles": [
+        "<node_internals>/**",
+        "**/node_modules/**",
+        "${workspaceFolder}/webapp/**/node_modules/**/*.js",
+        "${workspaceFolder}/webapp/**/dist/**/*.js"
+      ]
     },
     {
       "type": "java",
