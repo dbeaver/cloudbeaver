@@ -5,6 +5,9 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { createMenu } from '@cloudbeaver/core-view';
+import { createAction } from '@cloudbeaver/core-view';
 
-export const OUTPUT_LOGS_FILTER_MENU = createMenu('output_logs_filter_menu', 'Filter', 'filter');
+export const ACTION_LOGS_WRAP_MODE = createAction('logs-wrap-mode', {
+  label: 'sql_editor_output_logs_wrap_mode',
+  tooltip: 'sql_editor_output_logs_wrap_mode',
+});

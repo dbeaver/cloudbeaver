@@ -7,7 +7,7 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import { Container, Group, s, useResource, useS } from '@cloudbeaver/core-blocks';
+import { Container, useResource } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { EditorLoader } from '@cloudbeaver/plugin-codemirror6';
 
@@ -27,13 +27,16 @@ export const OutputLogsPanel = observer<Props>(function SqlOutputLogsPanel({ sql
   const outputLogs = outputLogsService.getOutputLogs(data, sqlEditorTabState);
 
   const state = useOutputLogsPanelState(outputLogs, sqlEditorTabState);
+  const wrapMode = sqlEditorTabState.outputLogsTab?.wrapMode;
 
   return (
-    <Container className="theme-background-secondary" parent vertical gap dense>
-      <OutputLogsToolbar state={state} sqlEditorTabState={sqlEditorTabState}/>
-      <Group overflow box>
-        {data && <EditorLoader value={state.resultValue} foldGutter={false} highlightActiveLine={false} lineWrapping readonly />}
-      </Group>
+    <Container className="theme-background-secondary" overflow vertical noWrap dense parent gap>
+      <OutputLogsToolbar state={state} sqlEditorTabState={sqlEditorTabState} />
+      {data && (
+        <Container overflow>
+          <EditorLoader value={state.resultValue} foldGutter={false} lineWrapping={wrapMode} highlightActiveLine={false} readonly />
+        </Container>
+      )}
     </Container>
   );
 });

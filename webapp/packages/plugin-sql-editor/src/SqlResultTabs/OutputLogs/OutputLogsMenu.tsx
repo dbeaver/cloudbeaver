@@ -8,23 +8,23 @@
 import { observer } from 'mobx-react-lite';
 import React, { useEffect } from 'react';
 
-import { Icon, s, useS } from '@cloudbeaver/core-blocks';
+import { ActionIconButton, s, useS } from '@cloudbeaver/core-blocks';
 import { ContextMenu } from '@cloudbeaver/core-ui';
 import { useMenu } from '@cloudbeaver/core-view';
 
 import { DATA_CONTEXT_SQL_EDITOR_STATE } from '../../DATA_CONTEXT_SQL_EDITOR_STATE';
 import type { ISqlEditorTabState } from '../../ISqlEditorTabState';
-import { OUTPUT_LOGS_FILTER_MENU } from './OUTPUT_LOGS_FILTER_MENU';
+import { OUTPUT_LOGS_MENU } from './OUTPUT_LOGS_MENU';
 import style from './OutputLogTypesFilterMenu.m.css';
 
 interface Props {
   sqlEditorTabState: ISqlEditorTabState;
 }
 
-export const OutputLogsFilterMenu = observer<Props>(function OutputLogTypesFilterMenu({ sqlEditorTabState }) {
+export const OutputLogsFilterMenu = observer<Props>(function OutputLogsFilterMenu({ sqlEditorTabState }) {
   const styles = useS(style);
   const menu = useMenu({
-    menu: OUTPUT_LOGS_FILTER_MENU,
+    menu: OUTPUT_LOGS_MENU,
   });
 
   useEffect(() => {
@@ -32,8 +32,8 @@ export const OutputLogsFilterMenu = observer<Props>(function OutputLogTypesFilte
   }, []);
 
   return (
-    <ContextMenu className={s(styles, { contextMenu: true })} menu={menu} placement="bottom-end" modal>
-      <Icon className={s(styles, { icon: true })} name="filter" viewBox="0 0 16 16" />
+    <ContextMenu className={s(styles, { contextMenu: true })} menu={menu} modal>
+      <ActionIconButton name="/icons/settings_cog_sm.svg" viewBox="0 0 16 16" img />
     </ContextMenu>
   );
 });

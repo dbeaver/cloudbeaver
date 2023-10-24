@@ -42,7 +42,7 @@ export class OutputLogsService {
       order,
     };
 
-    state.outputLogsTab = { ...tab, selectedLogTypes: [...OUTPUT_LOG_TYPES] };
+    state.outputLogsTab = { ...tab, selectedLogTypes: [...OUTPUT_LOG_TYPES], wrapMode: true };
     state.tabs.push({ ...tab });
   }
 
