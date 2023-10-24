@@ -1279,7 +1279,7 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
         @Nullable String authProviderConfigurationId,
         @NotNull Map<String, Object> userCredentials
     ) throws DBException {
-        if (isProviderDisabled(authProviderId)) {
+        if (isProviderDisabled(authProviderId, authProviderConfigurationId)) {
             throw new SMException("Unsupported authentication provider: " + authProviderId);
         }
         var authProgressMonitor = new LoggingProgressMonitor(log);
@@ -2732,9 +2732,17 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
         return activeUserCredentials.getUserId();
     }
 
-    private boolean isProviderDisabled(@NotNull String providerId) {
+    private boolean isProviderDisabled(@NotNull String providerId, @Nullable String authConfigurationId) {
         WebAuthConfiguration appConfiguration = application.getAuthConfiguration();
-        return !appConfiguration.isAuthProviderEnabled(providerId);
+        if (!appConfiguration.isAuthProviderEnabled(providerId)) {
+            return true;
+        }
+        if (authConfigurationId != null) {
+            SMAuthProviderCustomConfiguration configuration =
+                appConfiguration.getAuthProviderConfiguration(authConfigurationId);
+            return configuration == null || configuration.isDisabled();
+        }
+        return false;
     }
 
     public void clearOldAuthAttemptInfo() throws DBException {
