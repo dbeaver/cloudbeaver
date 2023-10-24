@@ -1217,6 +1217,9 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
 
     @Override
     public SMAuthInfo authenticateAnonymousUser(@NotNull String appSessionId, @NotNull Map<String, Object> sessionParameters, @NotNull SMSessionType sessionType) throws DBException {
+        if (!application.getAppConfiguration().isAnonymousAccessEnabled()) {
+            throw new SMException("Anonymous access restricted");
+        }
         try (Connection dbCon = database.openConnection()) {
             try (JDBCTransaction txn = new JDBCTransaction(dbCon)) {
                 var smSessionId = createSmSession(appSessionId, null, sessionParameters, sessionType, dbCon);
@@ -1252,6 +1255,9 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
         @Nullable String authProviderConfigurationId,
         @NotNull Map<String, Object> userCredentials
     ) throws DBException {
+        if (isProviderDisabled(authProviderId)) {
+            throw new SMException("Unsupported authentication provider: " + authProviderId);
+        }
         var authProgressMonitor = new LoggingProgressMonitor(log);
         try (Connection dbCon = database.openConnection()) {
             try (JDBCTransaction txn = new JDBCTransaction(dbCon)) {
@@ -2586,9 +2592,9 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
         return activeUserCredentials.getUserId();
     }
 
-    private boolean isProviderEnabled(@NotNull String providerId) {
+    private boolean isProviderDisabled(@NotNull String providerId) {
         WebAuthConfiguration appConfiguration = application.getAuthConfiguration();
-        return appConfiguration.isAuthProviderEnabled(providerId);
+        return !appConfiguration.isAuthProviderEnabled(providerId);
     }
 
     public void clearOldAuthAttemptInfo() throws DBException {
