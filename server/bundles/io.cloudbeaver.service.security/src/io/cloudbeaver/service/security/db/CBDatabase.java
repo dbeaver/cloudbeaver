@@ -20,7 +20,6 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import io.cloudbeaver.auth.provider.local.LocalAuthProviderConstants;
 import io.cloudbeaver.model.app.WebApplication;
-import io.cloudbeaver.model.session.WebAuthInfo;
 import io.cloudbeaver.registry.WebAuthProviderDescriptor;
 import io.cloudbeaver.registry.WebAuthProviderRegistry;
 import io.cloudbeaver.utils.WebAppUtils;
@@ -32,6 +31,7 @@ import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBConstants;
+import org.jkiss.dbeaver.model.auth.AuthInfo;
 import org.jkiss.dbeaver.model.connection.DBPDriver;
 import org.jkiss.dbeaver.model.impl.jdbc.JDBCUtils;
 import org.jkiss.dbeaver.model.impl.jdbc.exec.JDBCTransaction;
@@ -247,7 +247,7 @@ public class CBDatabase {
     public void finishConfiguration(
         @NotNull String adminName,
         @Nullable String adminPassword,
-        @NotNull List<WebAuthInfo> authInfoList
+        @NotNull List<AuthInfo> authInfoList
     ) throws DBException {
         if (!application.isConfigurationMode()) {
             throw new DBException("Database is already configured");
@@ -265,12 +265,11 @@ public class CBDatabase {
         createAdminUser(adminName, adminPassword);
 
         // Associate all auth credentials with admin user
-        for (WebAuthInfo ai : authInfoList) {
+        for (AuthInfo ai : authInfoList) {
             if (!ai.getAuthProvider().equals(LocalAuthProviderConstants.PROVIDER_ID)) {
-                WebAuthProviderDescriptor authProvider = ai.getAuthProviderDescriptor();
                 Map<String, Object> userCredentials = ai.getUserCredentials();
                 if (!CommonUtils.isEmpty(userCredentials)) {
-                    adminSecurityController.setUserCredentials(adminName, authProvider.getId(), userCredentials);
+                    adminSecurityController.setUserCredentials(adminName, ai.getAuthProvider(), userCredentials);
                 }
             }
         }

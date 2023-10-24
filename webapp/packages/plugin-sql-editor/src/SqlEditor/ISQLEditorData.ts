@@ -59,6 +59,7 @@ export interface ISQLEditorData {
   executeScript(): Promise<void>;
   switchEditing(): Promise<void>;
   getHintProposals(position: number, simple: boolean): Promise<SQLProposal[]>;
+  getResolvedSegment(): Promise<ISQLScriptSegment | undefined>;
   executeQueryAction<T>(
     segment: ISQLScriptSegment | undefined,
     action: (query: ISQLScriptSegment) => Promise<T>,

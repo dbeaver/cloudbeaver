@@ -31,7 +31,7 @@
     "@cloudbeaver/plugin-sql-editor": "~0.1.0",
     "@cloudbeaver/plugin-top-app-bar": "~0.1.0",
     "react": "^18.2.0",
-    "reshadow": "~0.x.x"
+    "reshadow": "^0.0.1"
   },
   "peerDependencies": {},
   "devDependencies": {

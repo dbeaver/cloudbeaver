@@ -16,6 +16,7 @@ import type {
   IResultSetValue,
   ResultSetConstraintAction,
   ResultSetDataAction,
+  ResultSetDataContentAction,
   ResultSetEditAction,
   ResultSetFormatAction,
   ResultSetViewAction,
@@ -37,6 +38,7 @@ interface IColumnMetrics {
 
 export interface ITableData {
   format: ResultSetFormatAction;
+  dataContent: ResultSetDataContentAction;
   data: ResultSetDataAction;
   editor: ResultSetEditAction;
   view: ResultSetViewAction;

@@ -11,6 +11,7 @@ import { ColoredContainer, Container, FieldCheckbox, Group, GroupTitle, Placehol
 import { useService } from '@cloudbeaver/core-di';
 import { TabContainerPanelComponent, useTab, useTabState } from '@cloudbeaver/core-ui';
 
+import { AdministrationUsersManagementService } from '../../../../AdministrationUsersManagementService';
 import type { UserFormProps } from '../AdministrationUserFormService';
 import { UserFormInfoCredentials } from './UserFormInfoCredentials';
 import { UserFormInfoMetaParameters } from './UserFormInfoMetaParameters';
@@ -23,10 +24,12 @@ export const UserFormInfo: TabContainerPanelComponent<UserFormProps> = observer(
   const tab = useTab(tabId);
   const tabState = useTabState<UserFormInfoPart>();
   const userFormInfoPartService = useService(UserFormInfoPartService);
+  const administrationUsersManagementService = useService(AdministrationUsersManagementService);
 
-  useAutoLoad(UserFormInfo, tabState, tab.selected);
+  useAutoLoad(UserFormInfo, [tabState, ...administrationUsersManagementService.loaders], tab.selected);
 
   const disabled = tabState.isLoading();
+  const userManagementDisabled = administrationUsersManagementService.externalUserProviderEnabled;
   // let info: TLocalizationToken | null = null;
 
   // if (formState.mode === FormMode.Edit && tabState.isChanged()) {
@@ -43,7 +46,7 @@ export const UserFormInfo: TabContainerPanelComponent<UserFormProps> = observer(
         <Group small gap overflow>
           <Placeholder container={userFormInfoPartService.placeholderContainer} formState={formState} />
           <GroupTitle>{translate('authentication_user_status')}</GroupTitle>
-          <FieldCheckbox id={`${formState.id}_user_enabled`} name="enabled" state={tabState.state} disabled={disabled}>
+          <FieldCheckbox id={`${formState.id}_user_enabled`} name="enabled" state={tabState.state} disabled={disabled || userManagementDisabled}>
             {translate('authentication_user_enabled')}
           </FieldCheckbox>
           <UserFormInfoTeams formState={formState} tabState={tabState} tabSelected={tab.selected} disabled={disabled} />

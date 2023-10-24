@@ -5,17 +5,19 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
+import { observer } from 'mobx-react-lite';
+import type React from 'react';
 import { Button, ButtonProps } from 'reakit/Button';
 import styled from 'reshadow';
 
 import type { ComponentStyle } from '@cloudbeaver/core-theming';
 
 import { Icon } from './Icon';
+import IconButtonStyles from './IconButton.m.css';
 import { s } from './s';
 import { StaticImage } from './StaticImage';
 import { useS } from './useS';
 import { useStyles } from './useStyles';
-import IconButtonStyles from './IconButton.m.css';
 
 interface Props {
   name: string;
@@ -24,7 +26,9 @@ interface Props {
   style?: ComponentStyle;
 }
 
-export function IconButton({ name, img, viewBox, style, className, ...rest }: Props & ButtonProps) {
+export type IconButtonProps = Props & ButtonProps;
+
+export const IconButton: React.FC<IconButtonProps> = observer(function IconButton({ name, img, viewBox, style, className, ...rest }) {
   const styles = useS(IconButtonStyles);
 
   return styled(useStyles(style))(
@@ -33,4 +37,4 @@ export function IconButton({ name, img, viewBox, style, className, ...rest }: Pr
       {!img && <Icon className={s(styles, { icon: true })} name={name} viewBox={viewBox} />}
     </Button>,
   );
-}
+});

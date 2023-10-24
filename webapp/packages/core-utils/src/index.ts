@@ -8,7 +8,8 @@ export * from './Quadtree/index';
 
 export * from './underscore';
 
-export * from './blobToData';
+export * from './base64ToBlob';
+export * from './blobToBase64';
 export * from './bytesToSize';
 export * from './cacheValue';
 export * from './clsx';
@@ -67,3 +68,4 @@ export * from './createLastPromiseGetter';
 export * from './removeMetadataFromBase64';
 export * from './renamePathName';
 export * from './removeLineBreak';
+export * from './replaceSubstring';

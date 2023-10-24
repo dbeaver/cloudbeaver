@@ -29,6 +29,8 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URI;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.FileAttribute;
@@ -80,6 +82,7 @@ public class RMNIOFileSystemProvider extends NIOFileSystemProvider {
         }
         RMNIOFileSystem rmNioFileSystem = new RMNIOFileSystem(projectId, this);
         String resourcePath = uri.getPath();
+        resourcePath = URLDecoder.decode(resourcePath, StandardCharsets.UTF_8);
         if (CommonUtils.isNotEmpty(resourcePath) && projectId == null) {
             throw new IllegalArgumentException("Project is not specified in URI");
         }

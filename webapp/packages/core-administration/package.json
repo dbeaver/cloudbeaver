@@ -33,7 +33,7 @@
     "@cloudbeaver/core-theming": "~0.1.0",
     "@cloudbeaver/core-utils": "~0.1.0",
     "mobx": "^6.10.2",
-    "reshadow": "~0.x.x"
+    "reshadow": "^0.0.1"
   },
   "peerDependencies": {},
   "devDependencies": {

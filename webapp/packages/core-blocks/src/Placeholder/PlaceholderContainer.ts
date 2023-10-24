@@ -7,7 +7,7 @@
  */
 import { observable } from 'mobx';
 
-import { uuid } from '@cloudbeaver/core-utils';
+import { ILoadableState, uuid } from '@cloudbeaver/core-utils';
 
 export type PlaceholderComponent<T extends Record<string, any> = Record<string, any>> = React.FunctionComponent<T>;
 
@@ -16,6 +16,7 @@ export interface PlaceholderElement<T extends Record<string, any> = Record<strin
   component: PlaceholderComponent<T>;
   isHidden?: (props: T) => boolean;
   order?: number;
+  getLoaders?: (props: T) => ILoadableState[];
 }
 
 export class PlaceholderContainer<T extends Record<string, any> = Record<string, any>> {
@@ -29,12 +30,13 @@ export class PlaceholderContainer<T extends Record<string, any> = Record<string,
     return this.placeholders.filter(placeholder => !placeholder.isHidden?.(props));
   }
 
-  add(component: PlaceholderComponent<T>, order?: number, isHidden?: (props: T) => boolean): void {
+  add(component: PlaceholderComponent<T>, order?: number, isHidden?: (props: T) => boolean, getLoaders?: (props: T) => ILoadableState[]): void {
     const placeholder: PlaceholderElement<T> = {
       id: uuid(),
       component,
       order,
       isHidden,
+      getLoaders,
     };
 
     if (order === undefined) {

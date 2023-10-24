@@ -50,16 +50,31 @@ export class ResourceMetadata<TKey, TMetadata extends ICachedResourceMetadata> {
     return this.metadata.has(this.getMetadataKeyRef(key));
   }
 
-  every(param: ResourceKey<TKey>, predicate: (metadata: TMetadata) => boolean): boolean {
+  every(predicate: (metadata: TMetadata) => boolean): boolean;
+  every(param: ResourceKey<TKey>, predicate: (metadata: TMetadata) => boolean): boolean;
+  every(param: ResourceKey<TKey> | ((metadata: TMetadata) => boolean), predicate?: (metadata: TMetadata) => boolean): boolean {
+    if (!predicate) {
+      predicate = param as (metadata: TMetadata) => boolean;
+      for (const metadata of this.values()) {
+        if (!predicate(metadata)) {
+          return false;
+        }
+      }
+      return true;
+    }
+
+    param = param as ResourceKey<TKey>;
+    predicate = predicate as MetadataCallback<TMetadata, boolean>;
+
     if (!this.has(param)) {
       return false;
     }
 
-    return !this.some(param, key => !predicate(key));
+    return !this.some(param, key => !predicate!(key));
   }
+
   some(predicate: MetadataCallback<TMetadata, boolean>): boolean;
   some(param: ResourceKey<TKey>, predicate: MetadataCallback<TMetadata, boolean>): boolean;
-
   some(param: ResourceKey<TKey> | MetadataCallback<TMetadata, boolean>, predicate?: MetadataCallback<TMetadata, boolean>): boolean {
     if (!predicate) {
       predicate = param as (metadata: TMetadata) => boolean;

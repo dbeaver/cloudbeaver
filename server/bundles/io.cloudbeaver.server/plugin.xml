@@ -47,7 +47,6 @@
     <extension point="org.jkiss.dbeaver.ws.event.handler">
         <eventHandler class="io.cloudbeaver.server.events.WSDefaultEventHandler">
             <topic id="cb_config"/>
-            <topic id="cb_workspace_configuration"/>
         </eventHandler>
         <eventHandler class="io.cloudbeaver.server.events.WSDataSourceUpdatedEventHandlerImpl">
             <topic id="cb_datasource"/>
@@ -72,6 +71,12 @@
         </eventHandler>
         <eventHandler class="io.cloudbeaver.server.events.WSLogEventHandler">
             <topic id="cb_session_log"/>
+        </eventHandler>
+        <eventHandler class="io.cloudbeaver.server.events.WSEventHandlerWorkspaceConfigUpdate">
+            <topic id="cb_workspace_configuration"/>
+        </eventHandler>
+        <eventHandler class="io.cloudbeaver.server.events.WSDeleteTempFileHandler">
+            <topic id="cb_delete_temp_folder"/>
         </eventHandler>
     </extension>
 

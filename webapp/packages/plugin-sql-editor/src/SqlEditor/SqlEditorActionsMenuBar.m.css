@@ -1,3 +1,8 @@
+.sqlActions {
+  display: flex;
+  flex-direction: column;
+}
+
 .sqlActions.menuBar {
   height: unset;
   width: 32px;

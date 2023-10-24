@@ -8,7 +8,7 @@
 import { Connectable, connectable, filter, map, merge, Observable, Subject } from 'rxjs';
 
 import { ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
-import type { CachedResource } from '@cloudbeaver/core-resource';
+import type { IResource } from '@cloudbeaver/core-resource';
 import { compose } from '@cloudbeaver/core-utils';
 
 import type { IBaseServerEvent, IServerEventCallback, IServerEventEmitter, Subscription } from './IServerEventEmitter';
@@ -29,8 +29,8 @@ export abstract class TopicEventHandler<
   readonly eventsSubject: Connectable<TEvent>;
 
   private subscription: Subscription | null;
-  private readonly activeResources: Array<CachedResource<any, any, any, any, any>>;
-  private readonly subscribedResources: Map<CachedResource<any, any, any, any, any>, ISubscribedResourceInfo>;
+  private readonly activeResources: Array<IResource<any, any, any, any, any>>;
+  private readonly subscribedResources: Map<IResource<any, any, any, any, any>, ISubscribedResourceInfo>;
   private readonly serverSubject?: Observable<TEvent>;
   private readonly subject: Subject<TEvent>;
   constructor(private readonly topic: string, private readonly emitter: IServerEventEmitter<SourceEvent>) {
@@ -56,7 +56,7 @@ export abstract class TopicEventHandler<
     id: TEventID,
     callback: IServerEventCallback<T>,
     mapTo: (event: TEvent) => T = event => event as unknown as T,
-    resource?: CachedResource<any, any, any, any, any>,
+    resource?: IResource<any, any, any, any, any>,
   ): Subscription {
     if (resource) {
       this.registerResource(resource);
@@ -82,7 +82,7 @@ export abstract class TopicEventHandler<
     callback: IServerEventCallback<T>,
     mapTo: (param: TEvent) => T = event => event as unknown as T,
     filterFn: (param: TEvent) => boolean = () => true,
-    resource?: CachedResource<any, any, any, any, any>,
+    resource?: IResource<any, any, any, any, any>,
   ): Subscription {
     if (resource) {
       this.registerResource(resource);
@@ -104,7 +104,7 @@ export abstract class TopicEventHandler<
     return this;
   }
 
-  private resourceUseHandler(resource: CachedResource<any, any, any, any, any>) {
+  private resourceUseHandler(resource: IResource<any, any, any, any, any>) {
     const index = this.activeResources.indexOf(resource);
 
     if (index !== -1) {
@@ -124,7 +124,7 @@ export abstract class TopicEventHandler<
     }
   }
 
-  private removeActiveResource(resource: CachedResource<any, any, any, any, any>) {
+  private removeActiveResource(resource: IResource<any, any, any, any, any>) {
     this.activeResources.splice(this.activeResources.indexOf(resource), 1);
 
     if (this.activeResources.length === 0) {
@@ -134,7 +134,7 @@ export abstract class TopicEventHandler<
     }
   }
 
-  private registerResource(resource: CachedResource<any, any, any, any, any>): void {
+  private registerResource(resource: IResource<any, any, any, any, any>): void {
     let info = this.subscribedResources.get(resource);
 
     if (!info) {
@@ -150,7 +150,7 @@ export abstract class TopicEventHandler<
     info.listeners++;
   }
 
-  private removeResource(resource: CachedResource<any, any, any, any, any>): void {
+  private removeResource(resource: IResource<any, any, any, any, any>): void {
     const info = this.subscribedResources.get(resource);
 
     if (info) {

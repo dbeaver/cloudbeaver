@@ -267,7 +267,11 @@ export class ResultSetSelectAction extends DatabaseSelectAction<any, IDatabaseRe
       return;
     }
 
-    this.focusedElement = toJS(key);
+    if (key) {
+      key = JSON.parse(JSON.stringify(toJS(key)));
+    }
+
+    this.focusedElement = key;
     this.actions.execute({
       type: 'focus',
       resultId: this.result.id,

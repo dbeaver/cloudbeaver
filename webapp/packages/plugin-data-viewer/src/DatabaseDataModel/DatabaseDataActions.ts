@@ -7,6 +7,7 @@
  */
 import { action, makeObservable, runInAction } from 'mobx';
 
+import type { ResultDataFormat } from '@cloudbeaver/core-sdk';
 import { MetadataMap } from '@cloudbeaver/core-utils';
 
 import { getDependingDataActions } from './Actions/DatabaseDataActionDecorator';
@@ -40,13 +41,13 @@ export class DatabaseDataActions<TOptions, TResult extends IDatabaseDataResult> 
   }
 
   get<T extends IDatabaseDataAction<TOptions, TResult>>(result: TResult, Action: IDatabaseDataActionClass<TOptions, TResult, T>): T {
-    if (Action.dataFormat && !Action.dataFormat.includes(result.dataFormat)) {
+    if (!isActionSupportsFormat(Action, result.dataFormat)) {
       throw new Error('DataFormat unsupported');
     }
 
     const actions = this.actions.get(result.uniqueResultId);
 
-    let action = actions.find(action => action instanceof Action);
+    let action = actions.find(action => action instanceof Action && isActionSupportsFormat(action, result.dataFormat));
 
     if (!action) {
       runInAction(() => {
@@ -56,7 +57,7 @@ export class DatabaseDataActions<TOptions, TResult extends IDatabaseDataResult> 
 
         for (const dependency of allDeps) {
           if (isDatabaseDataAction(dependency)) {
-            depends.push(this.get<IDatabaseDataAction<TOptions, TResult>>(result, dependency));
+            depends.push(this.get(result, dependency));
           } else {
             depends.push(this.source.serviceInjector.getServiceByClass(dependency as any));
           }
@@ -68,7 +69,7 @@ export class DatabaseDataActions<TOptions, TResult extends IDatabaseDataResult> 
 
         action = new Action(this.source, ...depends);
         action.updateResult(result, this.source.results.indexOf(result));
-        this.actions.set(result.uniqueResultId, [...actions, action]);
+        this.actions.set(result.uniqueResultId, [...this.actions.get(result.uniqueResultId), action]);
       });
     }
 
@@ -80,7 +81,7 @@ export class DatabaseDataActions<TOptions, TResult extends IDatabaseDataResult> 
     Action: IDatabaseDataActionInterface<TOptions, TResult, T>,
   ): T | undefined {
     const actions = this.actions.get(result.uniqueResultId);
-    const action = actions?.find(action => action instanceof Action);
+    const action = actions?.find(action => action instanceof Action && isActionSupportsFormat(action, result.dataFormat));
 
     return action as T | undefined;
   }
@@ -92,11 +93,6 @@ export class DatabaseDataActions<TOptions, TResult extends IDatabaseDataResult> 
       const result = results.find(result => result.uniqueResultId === key);
 
       for (const action of actions) {
-        if (!(action.constructor as any).dataFormat.includes(result?.dataFormat)) {
-          this.actions.delete(key);
-          continue;
-        }
-
         action.updateResults(results);
 
         if (!result) {
@@ -119,4 +115,15 @@ export class DatabaseDataActions<TOptions, TResult extends IDatabaseDataResult> 
       }
     }
   }
+}
+
+function isActionSupportsFormat<TOptions, TResult extends IDatabaseDataResult>(
+  action: IDatabaseDataActionClass<TOptions, TResult, IDatabaseDataAction<TOptions, TResult>> | IDatabaseDataAction<TOptions, TResult>,
+  format: ResultDataFormat,
+): boolean {
+  if ('dataFormat' in action) {
+    return !action.dataFormat || action.dataFormat.includes(format);
+  }
+  const constructor = action.constructor as IDatabaseDataActionClass<TOptions, TResult, IDatabaseDataAction<TOptions, TResult>>;
+  return !constructor.dataFormat || constructor.dataFormat.includes(format);
 }

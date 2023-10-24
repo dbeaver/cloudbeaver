@@ -3,8 +3,8 @@ export default [
   ['administration_server_configuration_save_confirmation_message', 'You are about to change critical settings. Are you sure?'],
 
   ['administration_configuration_wizard_welcome', 'Welcome'],
-  ['administration_configuration_wizard_welcome_step_description', 'Welcome to CloudBeaver'],
-  ['administration_configuration_wizard_welcome_title', 'Welcome to CloudBeaver, cloud database management system!'],
+  ['administration_configuration_wizard_welcome_step_description', 'Welcome to {alias:product_full_name}'],
+  ['administration_configuration_wizard_welcome_title', 'Welcome to {alias:product_full_name}, cloud database management system!'],
   [
     'administration_configuration_wizard_welcome_message',
     'The easy configuration wizard will guide you through several simple steps to set up the CloudBeaver server. You will need to set server information and administrator credentials. You can set up additional server parameters once the easy configuration is completed.',

@@ -26,7 +26,6 @@ import io.cloudbeaver.auth.SMAutoAssign;
 import io.cloudbeaver.model.app.WebAppConfiguration;
 import io.cloudbeaver.model.app.WebAuthApplication;
 import io.cloudbeaver.model.app.WebAuthConfiguration;
-import io.cloudbeaver.model.session.WebAuthInfo;
 import io.cloudbeaver.registry.WebAuthProviderDescriptor;
 import io.cloudbeaver.registry.WebAuthProviderRegistry;
 import io.cloudbeaver.registry.WebMetaParametersRegistry;
@@ -67,7 +66,8 @@ import java.util.stream.Collectors;
 /**
  * Server controller
  */
-public class CBEmbeddedSecurityController implements SMAdminController, SMAuthenticationManager {
+public class CBEmbeddedSecurityController<T extends WebAuthApplication>
+    implements SMAdminController, SMAuthenticationManager {
 
     private static final Log log = Log.getLog(CBEmbeddedSecurityController.class);
 
@@ -80,14 +80,14 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
     }.getType();
     private static final Gson gson = new GsonBuilder().create();
 
-    protected final WebAuthApplication application;
+    protected final T application;
     protected final CBDatabase database;
     protected final SMCredentialsProvider credentialsProvider;
 
     protected final SMControllerConfiguration smConfig;
 
     public CBEmbeddedSecurityController(
-        WebAuthApplication application,
+        T application,
         CBDatabase database,
         SMCredentialsProvider credentialsProvider,
         SMControllerConfiguration smConfig
@@ -132,31 +132,42 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
         log.debug("Create user: " + userId);
         try (Connection dbCon = database.openConnection()) {
             try (JDBCTransaction txn = new JDBCTransaction(dbCon)) {
-                createAuthSubject(dbCon, userId, SUBJECT_USER);
-                try (PreparedStatement dbStat = dbCon.prepareStatement(
-                    database.normalizeTableNames("INSERT INTO {table_prefix}CB_USER" +
-                        "(USER_ID,IS_ACTIVE,CREATE_TIME,DEFAULT_AUTH_ROLE) VALUES(?,?,?,?)"))
-                ) {
-                    dbStat.setString(1, userId);
-                    dbStat.setString(2, enabled ? CHAR_BOOL_TRUE : CHAR_BOOL_FALSE);
-                    dbStat.setTimestamp(3, new Timestamp(System.currentTimeMillis()));
-                    if (CommonUtils.isEmpty(defaultAuthRole)) {
-                        dbStat.setNull(4, Types.VARCHAR);
-                    } else {
-                        dbStat.setString(4, defaultAuthRole);
-                    }
-                    dbStat.execute();
+                createUser(dbCon, userId, metaParameters, enabled, defaultAuthRole);
+                String defaultTeamName = application.getAppConfiguration().getDefaultUserTeam();
+                if (!CommonUtils.isEmpty(defaultTeamName)) {
+                    setUserTeams(dbCon, userId, new String[]{defaultTeamName}, userId);
                 }
-                saveSubjectMetas(dbCon, userId, metaParameters);
                 txn.commit();
-            }
-            String defaultTeamName = application.getAppConfiguration().getDefaultUserTeam();
-            if (!CommonUtils.isEmpty(defaultTeamName)) {
-                setUserTeams(userId, new String[]{defaultTeamName}, userId);
             }
         } catch (SQLException e) {
             throw new DBCException("Error saving user in database", e);
         }
+    }
+
+    public void createUser(
+        @NotNull Connection dbCon,
+        @NotNull String userId,
+        @Nullable Map<String, String> metaParameters,
+        boolean enabled,
+        @Nullable String defaultAuthRole
+    ) throws DBException, SQLException {
+        createAuthSubject(dbCon, userId, SUBJECT_USER);
+        try (PreparedStatement dbStat = dbCon.prepareStatement(
+            database.normalizeTableNames("INSERT INTO {table_prefix}CB_USER" +
+                "(USER_ID,IS_ACTIVE,CREATE_TIME,DEFAULT_AUTH_ROLE) VALUES(?,?,?,?)"))
+        ) {
+            dbStat.setString(1, userId);
+            dbStat.setString(2, enabled ? CHAR_BOOL_TRUE : CHAR_BOOL_FALSE);
+            dbStat.setTimestamp(3, new Timestamp(System.currentTimeMillis()));
+            if (CommonUtils.isEmpty(defaultAuthRole)) {
+                dbStat.setNull(4, Types.VARCHAR);
+            } else {
+                dbStat.setString(4, defaultAuthRole);
+            }
+            dbStat.execute();
+        }
+        saveSubjectMetas(dbCon, userId, metaParameters);
+
     }
 
     @Override
@@ -164,9 +175,23 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
         for (SMUserProvisioning user : userImportList.getUsers()) {
             if (isSubjectExists(user.getUserId())) {
                 log.info("Skip already exist user: " + user.getUserId());
+                setUserAuthRole(user.getUserId(), userImportList.getAuthRole());
                 continue;
             }
             createUser(user.getUserId(), user.getMetaParameters(), true, userImportList.getAuthRole());
+        }
+    }
+
+    protected void importUsers(@NotNull Connection connection, @NotNull SMUserImportList userImportList)
+        throws DBException, SQLException {
+        for (SMUserProvisioning user : userImportList.getUsers()) {
+            if (isSubjectExists(user.getUserId())) {
+                log.info("User already exist : " + user.getUserId());
+                setUserAuthRole(connection, user.getUserId(), userImportList.getAuthRole());
+                enableUser(connection, user.getUserId(), true);
+                continue;
+            }
+            createUser(connection, user.getUserId(), user.getMetaParameters(), true, userImportList.getAuthRole());
         }
     }
 
@@ -192,25 +217,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
     public void setUserTeams(String userId, String[] teamIds, String grantorId) throws DBCException {
         try (Connection dbCon = database.openConnection()) {
             try (JDBCTransaction txn = new JDBCTransaction(dbCon)) {
-                JDBCUtils.executeStatement(
-                    dbCon,
-                    database.normalizeTableNames("DELETE FROM {table_prefix}CB_USER_TEAM WHERE USER_ID=?"),
-                    userId
-                );
-                if (!ArrayUtils.isEmpty(teamIds)) {
-                    try (PreparedStatement dbStat = dbCon.prepareStatement(
-                        database.normalizeTableNames("INSERT INTO {table_prefix}CB_USER_TEAM" +
-                            "(USER_ID,TEAM_ID,GRANT_TIME,GRANTED_BY) VALUES(?,?,?,?)"))
-                    ) {
-                        for (String teamId : teamIds) {
-                            dbStat.setString(1, userId);
-                            dbStat.setString(2, teamId);
-                            dbStat.setTimestamp(3, new Timestamp(System.currentTimeMillis()));
-                            dbStat.setString(4, grantorId);
-                            dbStat.execute();
-                        }
-                    }
-                }
+                setUserTeams(dbCon, userId, teamIds, grantorId);
                 txn.commit();
             }
         } catch (SQLException e) {
@@ -219,6 +226,28 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
         addSubjectPermissionsUpdateEvent(userId, SMSubjectType.user);
     }
 
+    public void setUserTeams(@NotNull Connection dbCon, String userId, String[] teamIds, String grantorId)
+        throws SQLException {
+        JDBCUtils.executeStatement(
+            dbCon,
+            database.normalizeTableNames("DELETE FROM {table_prefix}CB_USER_TEAM WHERE USER_ID=?"),
+            userId
+        );
+        if (!ArrayUtils.isEmpty(teamIds)) {
+            try (PreparedStatement dbStat = dbCon.prepareStatement(
+                database.normalizeTableNames("INSERT INTO {table_prefix}CB_USER_TEAM" +
+                    "(USER_ID,TEAM_ID,GRANT_TIME,GRANTED_BY) VALUES(?,?,?,?)"))
+            ) {
+                for (String teamId : teamIds) {
+                    dbStat.setString(1, userId);
+                    dbStat.setString(2, teamId);
+                    dbStat.setTimestamp(3, new Timestamp(System.currentTimeMillis()));
+                    dbStat.setString(4, grantorId);
+                    dbStat.execute();
+                }
+            }
+        }
+    }
 
 
     @NotNull
@@ -565,14 +594,18 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
 
     public void enableUser(String userId, boolean enabled) throws DBException {
         try (Connection dbCon = database.openConnection()) {
-            try (PreparedStatement dbStat = dbCon.prepareStatement(
-                database.normalizeTableNames("UPDATE {table_prefix}CB_USER SET IS_ACTIVE=? WHERE USER_ID=?"))) {
-                dbStat.setString(1, enabled ? CHAR_BOOL_TRUE : CHAR_BOOL_FALSE);
-                dbStat.setString(2, userId);
-                dbStat.executeUpdate();
-            }
+            enableUser(dbCon, userId, enabled);
         } catch (SQLException e) {
             throw new DBCException("Error while updating user configuration", e);
+        }
+    }
+
+    public void enableUser(Connection dbCon, String userId, boolean enabled) throws SQLException {
+        try (PreparedStatement dbStat = dbCon.prepareStatement(database.normalizeTableNames(
+            "UPDATE {table_prefix}CB_USER SET IS_ACTIVE=? WHERE USER_ID=?"))) {
+            dbStat.setString(1, enabled ? CHAR_BOOL_TRUE : CHAR_BOOL_FALSE);
+            dbStat.setString(2, userId);
+            dbStat.executeUpdate();
         }
     }
 
@@ -584,20 +617,28 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
             throw new SMException("User cannot change his own role");
         }
         try (Connection dbCon = database.openConnection()) {
-            try (PreparedStatement dbStat = dbCon.prepareStatement(
-                database.normalizeTableNames("UPDATE {table_prefix}CB_USER SET DEFAULT_AUTH_ROLE=? WHERE USER_ID=?"))) {
-                dbStat.setString(1, authRole);
-                dbStat.setString(2, userId);
-                if (dbStat.executeUpdate() <= 0) {
-                    throw new SMException("User not found");
-                }
-            }
+            setUserAuthRole(dbCon, userId, authRole);
         } catch (SQLException e) {
             throw new DBCException("Error while updating user authentication role", e);
         }
         addSubjectPermissionsUpdateEvent(userId, SMSubjectType.user);
     }
 
+    public void setUserAuthRole(@NotNull Connection dbCon, @NotNull String userId, @Nullable String authRole)
+        throws DBException, SQLException {
+        try (PreparedStatement dbStat = dbCon.prepareStatement(
+            database.normalizeTableNames("UPDATE {table_prefix}CB_USER SET DEFAULT_AUTH_ROLE=? WHERE USER_ID=?"))) {
+            if (authRole == null) {
+                dbStat.setNull(1, Types.VARCHAR);
+            } else {
+                dbStat.setString(1, authRole);
+            }
+            dbStat.setString(2, userId);
+            if (dbStat.executeUpdate() <= 0) {
+                throw new SMException("User not found");
+            }
+        }
+    }
 
 
     ///////////////////////////////////////////
@@ -2585,7 +2626,7 @@ public class CBEmbeddedSecurityController implements SMAdminController, SMAuthen
     public void finishConfiguration(
         @NotNull String adminName,
         @Nullable String adminPassword,
-        @NotNull List<WebAuthInfo> authInfoList
+        @NotNull List<AuthInfo> authInfoList
     ) throws DBException {
         database.finishConfiguration(adminName, adminPassword, authInfoList);
     }
