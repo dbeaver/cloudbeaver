@@ -104,4 +104,9 @@ public class WebSQLQueryDataContainer implements DBSDataContainer, DBPContextPro
         return DBUtils.getDefaultContext(dataSource, false);
     }
 
+    @NotNull
+    public SQLScriptContext getScriptContext() {
+        return queryDataContainer.getScriptContext();
+    }
+
 }
