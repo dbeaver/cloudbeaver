@@ -30,9 +30,6 @@
     &.fixedWidth {
       width: 404px;
     }
-    &.freeHeight {
-      min-height: unset;
-    }
   }
   &.medium {
     min-width: 576px;
@@ -45,9 +42,6 @@
     }
     &.fixedWidth {
       width: 576px;
-    }
-    &.freeHeight {
-      min-height: unset;
     }
   }
   &.large {
@@ -62,9 +56,10 @@
     &.fixedWidth {
       width: 720px;
     }
-    &.freeHeight {
-      min-height: unset;
-    }
+  }
+
+  &.freeHeight {
+    min-height: unset;
   }
 }
 
