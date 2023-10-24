@@ -7,6 +7,7 @@
  */
 import type { PluginManifest } from '@cloudbeaver/core-di';
 
+import { LocaleService } from './LocaleService';
 import { ProductBootstrap } from './ProductBootstrap';
 import { ProductConfigService } from './ProductConfigService';
 
@@ -15,5 +16,5 @@ export const defaultProductManifest: PluginManifest = {
     name: 'Default Product',
   },
 
-  providers: [ProductBootstrap, ProductConfigService],
+  providers: [ProductBootstrap, ProductConfigService, LocaleService],
 };

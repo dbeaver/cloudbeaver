@@ -122,6 +122,10 @@ export abstract class Resource<
   getException(param: ResourceKeyList<TKey>): Error[] | null;
   getException(param: ResourceKey<TKey>): Error[] | Error | null;
   getException(param: ResourceKey<TKey>): Error[] | Error | null {
+    if (param === undefined) {
+      param = CachedResourceParamKey;
+    }
+
     if (isResourceKeyList(param)) {
       return this.metadata.map(param, metadata => metadata?.exception || null).filter<Error>((exception): exception is Error => exception !== null);
     }
