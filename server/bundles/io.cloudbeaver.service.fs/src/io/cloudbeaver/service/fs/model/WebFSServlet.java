@@ -23,6 +23,7 @@ import io.cloudbeaver.service.WebServiceServletBase;
 import io.cloudbeaver.service.fs.DBWServiceFS;
 import org.eclipse.jetty.server.Request;
 import org.jkiss.dbeaver.DBException;
+import org.jkiss.dbeaver.model.data.json.JSONUtils;
 import org.jkiss.dbeaver.model.navigator.DBNNode;
 import org.jkiss.dbeaver.model.navigator.fs.DBNPathBase;
 import org.jkiss.utils.CommonUtils;
@@ -36,6 +37,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Map;
 
 public class WebFSServlet extends WebServiceServletBase {
     private final DBWServiceFS fs;
@@ -47,7 +49,8 @@ public class WebFSServlet extends WebServiceServletBase {
 
     @Override
     protected void processServiceRequest(WebSession session, HttpServletRequest request, HttpServletResponse response) throws DBException, IOException {
-        String nodePath = request.getParameter("nodePath");
+        Map<String, Object> variables = getVariables(request);
+        String nodePath = JSONUtils.getString(variables,"nodePath");
         if (CommonUtils.isEmpty(nodePath)) {
             throw new DBWebException("Node path is not found");
         }
@@ -67,8 +70,12 @@ public class WebFSServlet extends WebServiceServletBase {
                 MultipartConfigElement MULTI_PART_CONFIG = new MultipartConfigElement(path.toString());
                 request.setAttribute(Request.__MULTIPART_CONFIG_ELEMENT, MULTI_PART_CONFIG);
                 for (Part part : request.getParts()) {
+                    String fileName = part.getSubmittedFileName();
+                    if (CommonUtils.isEmpty(fileName)) {
+                        continue;
+                    }
                     try (InputStream is = part.getInputStream()) {
-                        Files.copy(is, path.resolve(part.getSubmittedFileName()));
+                        Files.copy(is, path.resolve(fileName));
                     }
                 }
             } catch (Exception e) {
