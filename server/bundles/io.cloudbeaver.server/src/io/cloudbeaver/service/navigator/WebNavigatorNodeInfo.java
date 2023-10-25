@@ -32,7 +32,7 @@ import org.jkiss.dbeaver.model.edit.DBEObjectRenamer;
 import org.jkiss.dbeaver.model.meta.Association;
 import org.jkiss.dbeaver.model.meta.Property;
 import org.jkiss.dbeaver.model.navigator.*;
-import org.jkiss.dbeaver.model.navigator.fs.DBNPath;
+import org.jkiss.dbeaver.model.navigator.fs.DBNPathBase;
 import org.jkiss.dbeaver.model.rm.RMProject;
 import org.jkiss.dbeaver.model.rm.RMProjectPermission;
 import org.jkiss.dbeaver.model.struct.DBSEntity;
@@ -281,7 +281,7 @@ public class WebNavigatorNodeInfo {
 
     @Property
     public String getObjectId() {
-        if (node instanceof DBNPath dbnPath) {
+        if (node instanceof DBNPathBase dbnPath) {
             return dbnPath.getPath().toUri().toString();
         }
         return null;
