@@ -67,12 +67,12 @@ public class WebServiceBindingFS extends WebServiceBindingBase<DBWServiceFS> {
                     env.getArgument("projectId"),
                     URI.create(env.getArgument("folderURI")))
             )
-            .dataFetcher("fsDeleteFile",
+            .dataFetcher("fsDelete",
                 env -> getService(env).deleteFile(getWebSession(env),
                     env.getArgument("projectId"),
                     URI.create(env.getArgument("fileURI")))
             )
-            .dataFetcher("fsMoveFile",
+            .dataFetcher("fsMove",
                 env -> getService(env).moveFile(
                     getWebSession(env),
                     env.getArgument("projectId"),

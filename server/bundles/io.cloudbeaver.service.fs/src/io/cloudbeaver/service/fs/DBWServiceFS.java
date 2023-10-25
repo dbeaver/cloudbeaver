@@ -20,6 +20,7 @@ import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.service.DBWService;
 import io.cloudbeaver.service.fs.model.FSFile;
+import io.cloudbeaver.service.fs.model.FSFileSystem;
 import org.jkiss.code.NotNull;
 
 import java.net.URI;
@@ -29,7 +30,7 @@ import java.net.URI;
  */
 public interface DBWServiceFS extends DBWService {
     @NotNull
-    String[] getAvailableFileSystems(@NotNull WebSession webSession, @NotNull String projectId)
+    FSFileSystem[] getAvailableFileSystems(@NotNull WebSession webSession, @NotNull String projectId)
         throws DBWebException;
 
     @NotNull
@@ -53,7 +54,7 @@ public interface DBWServiceFS extends DBWService {
         @NotNull URI fileURI
     ) throws DBWebException;
 
-    boolean writeFileContent(
+    FSFile writeFileContent(
         @NotNull WebSession webSession,
         @NotNull String projectId,
         @NotNull URI fileURI,
