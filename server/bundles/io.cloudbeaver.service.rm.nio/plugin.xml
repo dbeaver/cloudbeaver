@@ -3,10 +3,10 @@
 
 <plugin>
 
-    <extension point="org.jkiss.dbeaver.fileSystem">
-        <fileSystemProvider id="rm-nio" label="RM NIO" class="io.cloudbeaver.service.rm.fs.RMVirtualFileSystemProvider">
+    <!--    <extension point="org.jkiss.dbeaver.fileSystem">-->
+    <!--        <fileSystemProvider id="rm-nio" label="RM NIO" class="io.cloudbeaver.service.rm.fs.RMVirtualFileSystemProvider">-->
 
-        </fileSystemProvider>
-    </extension>
+    <!--        </fileSystemProvider>-->
+    <!--    </extension>-->
 
 </plugin>
