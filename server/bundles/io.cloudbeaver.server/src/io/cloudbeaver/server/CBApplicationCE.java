@@ -16,9 +16,9 @@
  */
 package io.cloudbeaver.server;
 
+import org.jkiss.dbeaver.model.auth.AuthInfo;
 import io.cloudbeaver.auth.NoAuthCredentialsProvider;
 import io.cloudbeaver.model.rm.local.LocalResourceController;
-import io.cloudbeaver.model.session.WebAuthInfo;
 import io.cloudbeaver.service.security.CBEmbeddedSecurityController;
 import io.cloudbeaver.service.security.EmbeddedSecurityControllerFactory;
 import org.jkiss.code.NotNull;
@@ -31,7 +31,6 @@ import org.jkiss.dbeaver.model.auth.SMCredentialsProvider;
 import org.jkiss.dbeaver.model.rm.RMController;
 import org.jkiss.dbeaver.model.security.SMAdminController;
 import org.jkiss.dbeaver.model.security.SMController;
-import org.jkiss.dbeaver.registry.BasePlatformImpl;
 import org.jkiss.dbeaver.registry.LocalFileController;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
 
@@ -94,7 +93,7 @@ public class CBApplicationCE extends CBApplication {
     protected void finishSecurityServiceConfiguration(
         @NotNull String adminName,
         @Nullable String adminPassword,
-        @NotNull List<WebAuthInfo> authInfoList
+        @NotNull List<AuthInfo> authInfoList
     ) throws DBException {
         if (securityController instanceof CBEmbeddedSecurityController) {
             ((CBEmbeddedSecurityController) securityController).finishConfiguration(adminName, adminPassword, authInfoList);

@@ -68,6 +68,11 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
         if (CommonUtils.isEmpty(providerId)) {
             throw new DBWebException("Missing auth provider parameter");
         }
+        WebAuthProviderDescriptor authProviderDescriptor = WebAuthProviderRegistry.getInstance()
+            .getAuthProvider(providerId);
+        if (authProviderDescriptor.isTrusted()) {
+            throw new DBWebException(authProviderDescriptor.getLabel() + " not allowed for authorization via GQL API");
+        }
         if (authParameters == null) {
             authParameters = Map.of();
         }
