@@ -29,7 +29,8 @@ import java.net.URI;
  */
 public interface DBWServiceFS extends DBWService {
     @NotNull
-    String[] getAvailableFileSystems(@NotNull WebSession webSession, @NotNull String projectId) throws DBWebException;
+    String[] getAvailableFileSystems(@NotNull WebSession webSession, @NotNull String projectId)
+        throws DBWebException;
 
     @NotNull
     FSFile getFile(
