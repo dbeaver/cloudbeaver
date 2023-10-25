@@ -16,6 +16,7 @@
  */
 package io.cloudbeaver.service.fs.model;
 
+import io.cloudbeaver.DBWConstants;
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.server.CBApplication;
@@ -27,6 +28,7 @@ import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.data.json.JSONUtils;
 import org.jkiss.dbeaver.model.navigator.DBNNode;
 import org.jkiss.dbeaver.model.navigator.fs.DBNPathBase;
+import org.jkiss.dbeaver.model.rm.RMConstants;
 import org.jkiss.utils.CommonUtils;
 import org.jkiss.utils.IOUtils;
 
@@ -52,11 +54,13 @@ public class WebFSServlet extends WebServiceServletBase {
     @Override
     protected void processServiceRequest(WebSession session, HttpServletRequest request, HttpServletResponse response) throws DBException, IOException {
         if (request.getMethod().equals("POST")) {
+            // Hack for getting request params
+            request.setAttribute(Request.__MULTIPART_CONFIG_ELEMENT, new MultipartConfigElement(""));
             String nodePath = JSONUtils.getString(getVariables(request), NODE_PATH);
             Path path = getPath(session, nodePath);
+            // set the final location of parent folder
+            request.setAttribute(Request.__MULTIPART_CONFIG_ELEMENT, new MultipartConfigElement(path.toString()));
             try {
-                MultipartConfigElement MULTI_PART_CONFIG = new MultipartConfigElement(path.toString());
-                request.setAttribute(Request.__MULTIPART_CONFIG_ELEMENT, MULTI_PART_CONFIG);
                 for (Part part : request.getParts()) {
                     String fileName = part.getSubmittedFileName();
                     if (CommonUtils.isEmpty(fileName)) {
