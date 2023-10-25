@@ -311,9 +311,9 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
           return;
         }
 
-        if (this.state.tabs.length) {
-          const processableTabs = this.state.tabs.filter(tab => tab.id !== OUTPUT_LOGS_TAB_ID);
+        const processableTabs = this.state.tabs.filter(tab => tab.id !== OUTPUT_LOGS_TAB_ID);
 
+        if (processableTabs.length > 0) {
           const result = await this.commonDialogService.open(ConfirmationDialog, {
             title: 'sql_editor_close_result_tabs_dialog_title',
             message: `Do you want to close ${processableTabs.length} tabs before executing script?`,
