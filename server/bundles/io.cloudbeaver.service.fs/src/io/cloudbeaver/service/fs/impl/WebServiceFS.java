@@ -26,6 +26,7 @@ import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.registry.fs.FileSystemProviderRegistry;
 
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
@@ -86,8 +87,10 @@ public class WebServiceFS implements DBWServiceFS {
     public String readFileContent(@NotNull WebSession webSession, @NotNull String projectId, @NotNull URI fileUri)
         throws DBWebException {
         try {
-            Path filePath = webSession.getFileSystemManager(projectId).getPathFromURI(webSession.getProgressMonitor(), fileUri);
-            return Files.readString(filePath);
+            Path filePath = webSession.getFileSystemManager(projectId)
+                .getPathFromURI(webSession.getProgressMonitor(), fileUri);
+            var data = Files.readAllBytes(filePath);
+            return new String(data, StandardCharsets.UTF_8);
         } catch (Exception e) {
             throw new DBWebException("Failed to read file content: " + e.getMessage(), e);
         }
