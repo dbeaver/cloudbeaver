@@ -17,15 +17,12 @@ import { TaskScheduler } from '@cloudbeaver/core-executor';
 import type { ProjectInfoResource } from '@cloudbeaver/core-projects';
 import { isResourceAlias, ResourceKey, ResourceKeyUtils } from '@cloudbeaver/core-resource';
 import { getRmResourceKey, ResourceManagerResource } from '@cloudbeaver/core-resource-manager';
+import type { NetworkStateService } from '@cloudbeaver/core-root';
 import { debounce, getPathName, isArraysEqual, isNotNullDefined, isObjectsEqual, isValuesEqual } from '@cloudbeaver/core-utils';
 import { SCRIPTS_TYPE_ID } from '@cloudbeaver/plugin-resource-manager-scripts';
 import { BaseSqlDataSource, ESqlDataSourceFeatures, SqlEditorService } from '@cloudbeaver/plugin-sql-editor';
 
 import type { IResourceSqlDataSourceState } from './IResourceSqlDataSourceState';
-
-interface IResourceInfo {
-  isReadonly?: (dataSource: ResourceSqlDataSource) => boolean;
-}
 
 interface IResourceActions {
   rename(dataSource: ResourceSqlDataSource, key: string, name: string): Promise<string>;
@@ -103,7 +100,6 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
   }
 
   private actions?: IResourceActions;
-  private info?: IResourceInfo;
   private lastAction: (() => Promise<void>) | undefined;
   private state!: IResourceSqlDataSourceState;
 
@@ -112,6 +108,7 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
   private resourceUseKeyId: string | null;
 
   constructor(
+    private readonly networkStateService: NetworkStateService,
     private readonly projectInfoResource: ProjectInfoResource,
     private readonly connectionInfoResource: ConnectionInfoResource,
     private readonly resourceManagerResource: ResourceManagerResource,
@@ -144,10 +141,22 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
   }
 
   isReadonly(): boolean {
-    return !this.isLoaded() || this.info?.isReadonly?.(this) === true;
+    if (!this.projectId || !this.networkStateService.state) {
+      return true;
+    }
+
+    const project = this.projectInfoResource.get(this.projectId);
+
+    return !this.isLoaded() || !project?.canEditResources;
   }
 
   isOutdated(): boolean {
+    if (this.projectId) {
+      if (this.projectInfoResource.isOutdated(this.projectId)) {
+        return true;
+      }
+    }
+
     return this.resourceKey !== undefined && super.isOutdated();
   }
 
@@ -187,10 +196,6 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
 
   setActions(actions?: IResourceActions): void {
     this.actions = actions;
-  }
-
-  setInfo(info?: IResourceInfo): void {
-    this.info = info;
   }
 
   setName(name: string | null): void {
@@ -267,6 +272,11 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
     if (this.state.resourceKey && !this.resourceUseKeyId) {
       this.resourceUseKeyId = this.resourceManagerResource.useTracker.use(this.state.resourceKey);
     }
+
+    if (this.projectId) {
+      await this.projectInfoResource.load(this.projectId);
+    }
+
     await this.read();
   }
 
