@@ -84,6 +84,8 @@ public class CBJettyServer {
             if (sslPath != null && Files.exists(sslPath)) {
                 XmlConfiguration sslConfiguration = new XmlConfiguration(new PathResource(sslPath));
                 ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+                // method sslConfiguration.configure() does not see the context class of the Loader,
+                // so we have to configure it manually, then return the old classLoader.
                 Thread.currentThread().setContextClassLoader(this.getClass().getClassLoader());
                 sslConfiguration.configure(server);
                 Thread.currentThread().setContextClassLoader(classLoader);
