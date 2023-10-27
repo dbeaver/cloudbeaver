@@ -33,7 +33,9 @@ import org.eclipse.jetty.servlet.ErrorPageErrorHandler;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 import org.eclipse.jetty.servlet.ServletMapping;
+import org.eclipse.jetty.util.resource.PathResource;
 import org.eclipse.jetty.websocket.server.config.JettyWebSocketServletContainerInitializer;
+import org.eclipse.jetty.xml.XmlConfiguration;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
@@ -76,6 +78,15 @@ public class CBJettyServer {
             } else {
                 server = new JettyServer(
                     InetSocketAddress.createUnresolved(serverHost, serverPort));
+            }
+
+            Path sslPath = application.getSslConfigurationPath();
+            if (sslPath != null && Files.exists(sslPath)) {
+                XmlConfiguration sslConfiguration = new XmlConfiguration(new PathResource(sslPath));
+                ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+                Thread.currentThread().setContextClassLoader(this.getClass().getClassLoader());
+                sslConfiguration.configure(server);
+                Thread.currentThread().setContextClassLoader(classLoader);
             }
 
             {
@@ -205,7 +216,7 @@ public class CBJettyServer {
         servletContextHandler.setSessionHandler(sessionHandler);
     }
 
-    private static class JettyServer extends Server {
+    public static class JettyServer extends Server {
         public JettyServer(int serverPort) {
             super(serverPort);
         }
