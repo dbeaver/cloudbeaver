@@ -5,15 +5,13 @@ type FSFile @since(version: "23.2.2") {
     metaData: Object!
 }
 
-type FSFileSystem @since(version: "23.2.2") {
-    name: String!
-    length: Int!
-    folder: Boolean!
-    metaData: Object!
+type FSFileSystem @since(version: "23.2.4") {
+    id: ID!
+    requiredAuth: String
 }
 
 extend type Query @since(version: "23.2.2") {
-    fsListFileSystems(projectId: ID!): [String!]!
+    fsListFileSystems(projectId: ID!): [FSFileSystem!]!
 
     fsFile(projectId: ID!, fileURI: String!):  FSFile!
 
