@@ -33,6 +33,15 @@ public interface DBWServiceFS extends DBWService {
     FSFileSystem[] getAvailableFileSystems(@NotNull WebSession webSession, @NotNull String projectId)
         throws DBWebException;
 
+
+    @NotNull
+    FSFileSystem getFileSystem(
+        @NotNull WebSession webSession,
+        @NotNull String projectId,
+        @NotNull String fileSystemId,
+        @NotNull String fileSystemType
+    ) throws DBWebException;
+
     @NotNull
     FSFile getFile(
         @NotNull WebSession webSession,

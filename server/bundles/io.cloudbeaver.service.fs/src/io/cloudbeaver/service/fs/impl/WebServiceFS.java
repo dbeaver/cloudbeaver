@@ -46,12 +46,38 @@ public class WebServiceFS implements DBWServiceFS {
                 .stream()
                 .map(fs -> new FSFileSystem(
                         fs.getId(),
+                    fs.getType(),
                         fsRegistry.getProvider(fs.getProviderId()).getRequiredAuth()
                     )
                 )
                 .toArray(FSFileSystem[]::new);
         } catch (Exception e) {
             throw new DBWebException("Failed to load file systems: " + e.getMessage(), e);
+        }
+    }
+
+    @NotNull
+    @Override
+    public FSFileSystem getFileSystem(
+        @NotNull WebSession webSession,
+        @NotNull String projectId,
+        @NotNull String fileSystemId,
+        @NotNull String fileSystemType
+    ) throws DBWebException {
+        try {
+            var fsRegistry = FileSystemProviderRegistry.getInstance();
+            return webSession.getFileSystemManager(projectId)
+                .getVirtualFileSystems()
+                .stream()
+                .filter(fs -> fs.getId().equals(fileSystemId) && fs.getType().equals(fileSystemType))
+                .findFirst()
+                .map(fs -> new FSFileSystem(
+                    fs.getId(),
+                    fs.getType(),
+                    fsRegistry.getProvider(fs.getProviderId()).getRequiredAuth()
+                )).orElseThrow(() -> new DBWebException("File system not found"));
+        } catch (Exception e) {
+            throw new DBWebException("Failed to get file system: " + e.getMessage(), e);
         }
     }
 
