@@ -69,6 +69,12 @@ public class RMVirtualFileSystem implements DBFVirtualFileSystem {
         return rmProject.getId();
     }
 
+    @NotNull
+    @Override
+    public String getProviderId() {
+        return "rm-nio";
+    }
+
     @Override
     public Path getPathByURI(@NotNull DBRProgressMonitor monitor, @NotNull URI uri) {
         return rmNioFileSystemProvider.getPath(uri);

@@ -22,13 +22,17 @@ export interface CommonDialogWrapperProps {
   'aria-label'?: string;
   fixedSize?: boolean;
   fixedWidth?: boolean;
+  freeHeight?: boolean;
   className?: string;
   children?: React.ReactNode;
   style?: ComponentStyle;
 }
 
 export const CommonDialogWrapper = observer<CommonDialogWrapperProps, HTMLDivElement>(
-  forwardRef(function CommonDialogWrapper({ size = 'medium', fixedSize, fixedWidth, 'aria-label': ariaLabel, className, children, style }, ref) {
+  forwardRef(function CommonDialogWrapper(
+    { size = 'medium', fixedSize, fixedWidth, freeHeight, 'aria-label': ariaLabel, className, children, style },
+    ref,
+  ) {
     const computedStyles = useS(styles, style);
     const context = useContext(DialogContext);
     const dialogState = useDialogState({ visible: true });
@@ -52,7 +56,7 @@ export const CommonDialogWrapper = observer<CommonDialogWrapperProps, HTMLDivEle
         <dialog
           className={s(
             computedStyles,
-            { dialog: true, small: size === 'small', medium: size === 'medium', large: size === 'large', fixedSize, fixedWidth },
+            { dialog: true, small: size === 'small', medium: size === 'medium', large: size === 'large', fixedSize, fixedWidth, freeHeight },
             className,
           )}
         >

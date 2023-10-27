@@ -41,13 +41,11 @@ public class FSFile {
     }
 
     @Property
-
     public long getLength() throws IOException {
         return Files.size(path);
     }
 
     @Property
-
     public boolean isFolder() {
         return Files.isDirectory(path);
     }

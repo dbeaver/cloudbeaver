@@ -17,7 +17,6 @@
 
 package io.cloudbeaver.model.session;
 
-import io.cloudbeaver.DBWConstants;
 import io.cloudbeaver.DBWUserIdentity;
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.auth.SMAuthProviderExternal;
@@ -38,7 +37,6 @@ import org.jkiss.utils.CommonUtils;
 
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -113,15 +111,6 @@ public class WebSessionAuthProcessor {
                 SMAuthProvider<?> authProviderInstance = authProviderDescriptor.getInstance();
                 SMAuthProviderExternal<?> authProviderExternal = authProviderInstance instanceof SMAuthProviderExternal<?> ?
                     (SMAuthProviderExternal<?>) authProviderInstance : null;
-
-                boolean providerDisabled = !isProviderEnabled(providerId);
-                if (configMode || webSession.hasPermission(DBWConstants.PERMISSION_ADMIN)) {
-                    // 1. Admin can authorize in any providers
-                    // 2. When it authorizes in non-local provider for the first time we force linkUser flag
-                    if (providerDisabled && webSession.getUser() != null) {
-                        linkWithActiveUser = true;
-                    }
-                }
 
                 SMSession authSession;
 

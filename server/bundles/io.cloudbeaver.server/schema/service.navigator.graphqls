@@ -76,6 +76,10 @@ type NavigatorNodeInfo {
     # Associated object. Maybe null for non-database objects
     object: DatabaseObjectInfo
 
+    # Associated object. Return value depends on the node type - connectionId for connection node, resource path for resource node, etc.
+    # null - if node currently not support this property
+    objectId: String
+
     # Supported features: item, container, leaf
     # canDelete, canRename
     features: [ String! ]
