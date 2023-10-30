@@ -2,12 +2,12 @@ package io.cloudbeaver.service;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.reflect.TypeToken;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.server.CBApplication;
 import io.cloudbeaver.server.CBPlatform;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
+import org.jkiss.dbeaver.model.data.json.JSONUtils;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -20,7 +20,7 @@ import java.util.Map;
 public abstract class WebServiceServletBase extends HttpServlet {
 
     private static final Log log = Log.getLog(WebServiceServletBase.class);
-    private static final Type MAP_STRING_OBJECT_TYPE = new TypeToken<Map<String, Object>>() {}.getType();
+    private static final Type MAP_STRING_OBJECT_TYPE = JSONUtils.MAP_TYPE_TOKEN;
     private static final String REQUEST_PARAM_VARIABLES = "variables";
     private static final Gson gson = new GsonBuilder()
         .serializeNulls()
