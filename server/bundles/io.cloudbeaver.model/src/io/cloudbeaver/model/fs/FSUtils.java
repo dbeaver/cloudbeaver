@@ -14,10 +14,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.cloudbeaver.service.fs.model;
+package io.cloudbeaver.model.fs;
 
 import org.jkiss.code.NotNull;
-import org.jkiss.code.Nullable;
+import org.jkiss.dbeaver.model.fs.DBFVirtualFileSystem;
 
-public record FSFileSystem(@NotNull String id, @Nullable String requiredAuth) {
+public class FSUtils {
+    @NotNull
+    public static String makeUniqueFsId(@NotNull DBFVirtualFileSystem fileSystem) {
+        return fileSystem.getType() + ":" + fileSystem.getId();
+    }
 }

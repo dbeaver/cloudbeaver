@@ -38,8 +38,7 @@ public interface DBWServiceFS extends DBWService {
     FSFileSystem getFileSystem(
         @NotNull WebSession webSession,
         @NotNull String projectId,
-        @NotNull String fileSystemId,
-        @NotNull String fileSystemType
+        @NotNull String fileSystemId
     ) throws DBWebException;
 
     @NotNull

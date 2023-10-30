@@ -17,6 +17,7 @@
 package io.cloudbeaver.service.fs.impl;
 
 import io.cloudbeaver.DBWebException;
+import io.cloudbeaver.model.fs.FSUtils;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.service.fs.DBWServiceFS;
 import io.cloudbeaver.service.fs.model.FSFile;
@@ -45,8 +46,7 @@ public class WebServiceFS implements DBWServiceFS {
                 .getVirtualFileSystems()
                 .stream()
                 .map(fs -> new FSFileSystem(
-                        fs.getId(),
-                    fs.getType(),
+                    FSUtils.makeUniqueFsId(fs),
                         fsRegistry.getProvider(fs.getProviderId()).getRequiredAuth()
                     )
                 )
@@ -61,19 +61,17 @@ public class WebServiceFS implements DBWServiceFS {
     public FSFileSystem getFileSystem(
         @NotNull WebSession webSession,
         @NotNull String projectId,
-        @NotNull String fileSystemId,
-        @NotNull String fileSystemType
+        @NotNull String fileSystemId
     ) throws DBWebException {
         try {
             var fsRegistry = FileSystemProviderRegistry.getInstance();
             return webSession.getFileSystemManager(projectId)
                 .getVirtualFileSystems()
                 .stream()
-                .filter(fs -> fs.getId().equals(fileSystemId) && fs.getType().equals(fileSystemType))
+                .filter(fs -> FSUtils.makeUniqueFsId(fs).equals(fileSystemId))
                 .findFirst()
                 .map(fs -> new FSFileSystem(
-                    fs.getId(),
-                    fs.getType(),
+                    FSUtils.makeUniqueFsId(fs),
                     fsRegistry.getProvider(fs.getProviderId()).getRequiredAuth()
                 )).orElseThrow(() -> new DBWebException("File system not found"));
         } catch (Exception e) {
