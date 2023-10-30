@@ -89,6 +89,7 @@ export default [
   ['ui_close_all_to_the_left', 'Close all to the Left'],
   ['ui_or', 'Or'],
   ['ui_download', 'Download'],
+  ['ui_download_file', 'Download file'],
   ['ui_upload', 'Upload'],
   ['ui_import', 'Import'],
   ['ui_view', 'View'],
@@ -100,6 +101,7 @@ export default [
   ['ui_upload_file', 'Upload file'],
   ['ui_upload_files', 'Upload files'],
   ['ui_upload_files_duplicate_error', 'Files with the same name already exist'],
+  ['ui_upload_file_fail', 'Failed to upload file'],
 
   ['root_permission_denied', '您没有权限'],
   ['root_permission_no_permission', '您没有权限执行此操作'],
