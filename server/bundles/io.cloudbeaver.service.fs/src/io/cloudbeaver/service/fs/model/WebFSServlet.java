@@ -94,7 +94,7 @@ public class WebFSServlet extends WebServiceServletBase {
                 }
             }
         } catch (Exception e) {
-            throw new DBWebException("Servlet exception ", e);
+            throw new DBWebException("File Upload Failed: Unable to Save File to the File System", e);
         }
     }
 
