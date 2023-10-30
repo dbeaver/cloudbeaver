@@ -31,6 +31,7 @@ import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBPDataSource;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
+import org.jkiss.dbeaver.model.DBUtils;
 import org.jkiss.dbeaver.model.data.DBDAttributeBinding;
 import org.jkiss.dbeaver.model.exec.DBCException;
 import org.jkiss.dbeaver.model.exec.DBCLogicalOperator;
@@ -516,4 +517,36 @@ public class WebServiceSQL implements DBWServiceSQL {
             throw new DBWebException("Error on generating GROUP BY query", e);
         }
     }
+
+    @Override
+    public WebAsyncTaskInfo getRowDataCount(@NotNull WebSession webSession, @NotNull WebSQLContextInfo contextInfo, @NotNull String resultsId) throws DBWebException {
+        WebAsyncTaskProcessor<String> runnable = new WebAsyncTaskProcessor<String>() {
+            @Override
+            public void run(DBRProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
+                try {
+                    monitor.beginTask("Get row data count", 1);
+                    WebSQLResultsInfo results = contextInfo.getResults(resultsId);
+                    long rowCount = DBUtils.readRowCount(webSession.getProgressMonitor(), contextInfo.getProcessor().getExecutionContext(), results.getDataContainer(), null, this);
+                    this.result = "Row data count completed";
+                    this.extendedResults = rowCount;
+                } catch (Throwable e) {
+                    throw new InvocationTargetException(e);
+                } finally {
+                    monitor.done();
+                }
+            }
+        };
+        return contextInfo.getProcessor().getWebSession().createAndRunAsyncTask("SQL result set count rows", runnable);
+    }
+
+    @Override
+    @Nullable
+    public Long getRowDataCountResult(@NotNull WebSession webSession, @NotNull String taskId) throws DBWebException {
+        WebAsyncTaskInfo taskStatus = webSession.asyncTaskStatus(taskId, false);
+        if (taskStatus != null) {
+            return (Long) taskStatus.getExtendedResult();
+        }
+        return null;
+    }
+
 }

@@ -356,4 +356,12 @@ extend type Mutation {
     # Returns SQLExecutionPlan
     asyncSqlExplainExecutionPlanResult(taskId: ID!): SQLExecutionPlan !
 
+    asyncSqlRowDataCount(
+        projectId: ID,
+        connectionId: ID!,
+        contextId: ID!,
+        resultsId: ID!
+    ): AsyncTaskInfo!
+
+    asyncSqlRowDataCountResult(taskId: ID!): Int
 }
