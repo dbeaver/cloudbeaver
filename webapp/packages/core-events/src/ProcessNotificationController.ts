@@ -28,7 +28,7 @@ export class ProcessNotificationController implements IProcessNotificationState 
       error: observable,
       title: observable,
       status: observable,
-      message: observable,
+      message: observable.ref,
     });
   }
 
@@ -51,5 +51,9 @@ export class ProcessNotificationController implements IProcessNotificationState 
     this.title = title || errorDetails?.name || error.name;
     this.message = message || errorDetails?.message || error.message;
     this.error = error;
+  }
+
+  setMessage(message: string | null) {
+    this.message = message;
   }
 }

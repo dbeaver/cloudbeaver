@@ -22,7 +22,7 @@ export const SnackbarStatus: React.FC<SnackbarStatusProps> = function SnackbarSt
   const styles = useS(style);
   return status === ENotificationType.Loading ? (
     <div data-testid="loader-container" className={s(styles, { loaderContainer: true }, className)}>
-      <Loader className={styles.loader} fullSize hideMessage />
+      <Loader className={styles.loader} hideMessage />
     </div>
   ) : (
     <NotificationMark className={s(styles, { notificationMark: true }, className)} type={status} />
