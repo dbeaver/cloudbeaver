@@ -44,7 +44,6 @@ export interface IExecutionPlanTab {
 
 export interface IOutputLogsTab extends ISqlEditorResultTab {
   selectedLogTypes: IOutputLogType[];
-  wrapMode: boolean;
 }
 
 export interface ISqlEditorTabState {

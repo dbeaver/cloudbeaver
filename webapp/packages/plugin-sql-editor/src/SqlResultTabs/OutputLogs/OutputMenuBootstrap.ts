@@ -14,11 +14,11 @@ import { DATA_CONTEXT_SQL_EDITOR_STATE } from '../../DATA_CONTEXT_SQL_EDITOR_STA
 import { ESqlDataSourceFeatures } from '../../SqlDataSource/ESqlDataSourceFeatures';
 import { SqlDataSourceService } from '../../SqlDataSource/SqlDataSourceService';
 import { SQL_EDITOR_ACTIONS_MENU } from '../../SqlEditor/SQL_EDITOR_ACTIONS_MENU';
-import { ACTION_LOGS_WRAP_MODE } from './ACTION_LOGS_WRAP_MODE';
 import { ACTION_SHOW_OUTPUT_LOGS } from './ACTION_SHOW_OUTPUT_LOGS';
 import { OUTPUT_LOG_TYPES } from './IOutputLogTypes';
 import { OUTPUT_LOGS_FILTER_MENU } from './OUTPUT_LOGS_FILTER_MENU';
 import { OUTPUT_LOGS_MENU } from './OUTPUT_LOGS_MENU';
+import { OUTPUT_LOGS_SETTINGS_MENU } from './OUTPUT_LOGS_SETTINGS_MENU';
 import { OutputLogsService } from './OutputLogsService';
 
 @injectable()
@@ -37,13 +37,13 @@ export class OutputMenuBootstrap extends Bootstrap {
     this.menuService.addCreator({
       isApplicable: context => context.get(DATA_CONTEXT_MENU) === OUTPUT_LOGS_MENU,
       getItems(context, items) {
-        return [...items, ACTION_LOGS_WRAP_MODE, OUTPUT_LOGS_FILTER_MENU];
+        return [...items, OUTPUT_LOGS_FILTER_MENU, OUTPUT_LOGS_SETTINGS_MENU];
       },
     });
 
     this.menuService.addCreator({
       menus: [OUTPUT_LOGS_FILTER_MENU],
-      getItems: context => {
+      getItems: (context, items) => {
         const state = context.tryGet(DATA_CONTEXT_SQL_EDITOR_STATE);
 
         if (!state) {
@@ -51,10 +51,10 @@ export class OutputMenuBootstrap extends Bootstrap {
         }
 
         const outputLogsTabState = state?.outputLogsTab;
-        const items = [];
+        const result = [];
 
         for (const logType of OUTPUT_LOG_TYPES) {
-          items.push(
+          result.push(
             new MenuCheckboxItem(
               {
                 id: logType,
@@ -79,35 +79,36 @@ export class OutputMenuBootstrap extends Bootstrap {
           );
         }
 
-        return items;
+        return [...items, ...result];
       },
     });
 
-    this.actionService.addHandler({
-      id: 'plugin-sql-editor-output-logs-handler',
-      isActionApplicable(context, action) {
+    this.menuService.addCreator({
+      menus: [OUTPUT_LOGS_SETTINGS_MENU],
+      getItems: (context, items) => {
         const state = context.tryGet(DATA_CONTEXT_SQL_EDITOR_STATE);
 
-        if (!state?.outputLogsTab) {
-          return false;
+        if (!state) {
+          return [];
         }
 
-        return [ACTION_LOGS_WRAP_MODE].includes(action);
-      },
-      handler: context => {
-        const state = context.get(DATA_CONTEXT_SQL_EDITOR_STATE);
+        const wrapMode = new MenuCheckboxItem(
+          {
+            id: 'wrap-mode',
+            label: 'sql_editor_output_logs_wrap_mode',
+            tooltip: 'sql_editor_output_logs_wrap_mode',
+          },
+          {
+            onSelect: () => {
+              this.outputLogsService.toggleWrapMode();
+            },
+          },
+          {
+            isChecked: () => this.outputLogsService.settings.wrapMode,
+          },
+        );
 
-        if (state.outputLogsTab) {
-          state.outputLogsTab.wrapMode = !state.outputLogsTab.wrapMode;
-        }
-      },
-      getActionInfo: (_, action) => ({
-        ...action.info,
-        type: 'checkbox',
-      }),
-      isChecked: context => {
-        const state = context.get(DATA_CONTEXT_SQL_EDITOR_STATE);
-        return state.outputLogsTab?.wrapMode === true;
+        return [...items, wrapMode];
       },
     });
 

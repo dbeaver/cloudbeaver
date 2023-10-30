@@ -8,21 +8,30 @@
 import { observer } from 'mobx-react-lite';
 import React, { useEffect } from 'react';
 
-import { ActionIconButton, s, useS } from '@cloudbeaver/core-blocks';
-import { ContextMenu } from '@cloudbeaver/core-ui';
+import { SContext, StyleRegistry } from '@cloudbeaver/core-blocks';
+import { MenuBar, MenuBarItemStyles } from '@cloudbeaver/core-ui';
 import { useMenu } from '@cloudbeaver/core-view';
 
 import { DATA_CONTEXT_SQL_EDITOR_STATE } from '../../DATA_CONTEXT_SQL_EDITOR_STATE';
 import type { ISqlEditorTabState } from '../../ISqlEditorTabState';
 import { OUTPUT_LOGS_MENU } from './OUTPUT_LOGS_MENU';
-import style from './OutputLogTypesFilterMenu.m.css';
+import OutputLogsMenuItemStyles from './OutputLogsMenuItem.m.css';
 
 interface Props {
   sqlEditorTabState: ISqlEditorTabState;
 }
 
-export const OutputLogsFilterMenu = observer<Props>(function OutputLogsFilterMenu({ sqlEditorTabState }) {
-  const styles = useS(style);
+const registry: StyleRegistry = [
+  [
+    MenuBarItemStyles,
+    {
+      mode: 'append',
+      styles: [OutputLogsMenuItemStyles],
+    },
+  ],
+];
+
+export const OutputLogsMenu = observer<Props>(function OutputLogsMenu({ sqlEditorTabState }) {
   const menu = useMenu({
     menu: OUTPUT_LOGS_MENU,
   });
@@ -32,8 +41,8 @@ export const OutputLogsFilterMenu = observer<Props>(function OutputLogsFilterMen
   }, []);
 
   return (
-    <ContextMenu className={s(styles, { contextMenu: true })} menu={menu} modal>
-      <ActionIconButton name="/icons/settings_cog_sm.svg" viewBox="0 0 16 16" img />
-    </ContextMenu>
+    <SContext registry={registry}>
+      <MenuBar menu={menu} nestedMenuSettings={{ modal: true, placement: 'top-start' }} />
+    </SContext>
   );
 });

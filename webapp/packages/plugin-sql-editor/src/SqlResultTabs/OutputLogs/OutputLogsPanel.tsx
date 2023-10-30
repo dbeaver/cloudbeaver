@@ -27,14 +27,19 @@ export const OutputLogsPanel = observer<Props>(function SqlOutputLogsPanel({ sql
   const outputLogs = outputLogsService.getOutputLogs(data, sqlEditorTabState);
 
   const state = useOutputLogsPanelState(outputLogs, sqlEditorTabState);
-  const wrapMode = sqlEditorTabState.outputLogsTab?.wrapMode;
 
   return (
     <Container className="theme-background-secondary" overflow vertical noWrap dense parent gap>
       <OutputLogsToolbar state={state} sqlEditorTabState={sqlEditorTabState} />
       {data && (
         <Container overflow>
-          <EditorLoader value={state.resultValue} foldGutter={false} lineWrapping={wrapMode} highlightActiveLine={false} readonly />
+          <EditorLoader
+            value={state.resultValue}
+            foldGutter={false}
+            lineWrapping={outputLogsService.settings.wrapMode}
+            highlightActiveLine={false}
+            readonly
+          />
         </Container>
       )}
     </Container>
