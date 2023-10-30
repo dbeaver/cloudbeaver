@@ -7,7 +7,6 @@ type FSFile @since(version: "23.2.2") {
 
 type FSFileSystem @since(version: "23.2.4") {
     id: ID!
-    type: String!
     requiredAuth: String
 }
 
