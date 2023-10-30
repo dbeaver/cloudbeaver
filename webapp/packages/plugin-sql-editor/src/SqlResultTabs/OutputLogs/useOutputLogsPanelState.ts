@@ -38,9 +38,11 @@ export const useOutputLogsPanelState = (outputLogs: IOutputLog[], sqlEditorTabSt
           if (!selectedLogTypes.includes(log.severity)) {
             return false;
           }
-          if (this.searchValue.length > 0 && !log.message?.includes(this.searchValue)) {
+
+          if (this.searchValue.length > 0 && !log.message.toLowerCase().includes(this.searchValue.toLowerCase())) {
             return false;
           }
+
           return true;
         });
       },

@@ -40,6 +40,7 @@ import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
 import org.jkiss.dbeaver.model.app.DBPDataSourceRegistry;
 import org.jkiss.dbeaver.model.app.DBPProject;
+import org.jkiss.dbeaver.model.auth.AuthInfo;
 import org.jkiss.dbeaver.model.navigator.DBNBrowseSettings;
 import org.jkiss.dbeaver.model.preferences.DBPPropertyDescriptor;
 import org.jkiss.dbeaver.model.security.*;
@@ -514,6 +515,7 @@ public class WebServiceAdmin implements DBWServiceAdmin {
                 adminName = curUser == null ? null : curUser.getUserId();
                 adminPassword = null;
             }
+            List<AuthInfo> authInfos = new ArrayList<>();
             List<WebAuthInfo> authInfoList = webSession.getAllAuthInfo();
             if (CommonUtils.isEmpty(adminName)) {
                 // Try to get admin name from existing authentications (first one)
@@ -523,6 +525,11 @@ public class WebServiceAdmin implements DBWServiceAdmin {
             }
             if (CommonUtils.isEmpty(adminName)) {
                 adminName = CBConstants.DEFAULT_ADMIN_NAME;
+            }
+            for (WebAuthInfo webAuthInfo : authInfoList) {
+                authInfos.add(new AuthInfo(
+                    webAuthInfo.getAuthProviderDescriptor().getId(),
+                    webAuthInfo.getUserCredentials()));
             }
 
             // Patch configuration by services
@@ -541,7 +548,7 @@ public class WebServiceAdmin implements DBWServiceAdmin {
                 serverURL,
                 adminName,
                 adminPassword,
-                authInfoList,
+                authInfos,
                 sessionExpireTime,
                 appConfig,
                 webSession

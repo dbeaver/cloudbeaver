@@ -26,7 +26,6 @@ import io.cloudbeaver.auth.SMAutoAssign;
 import io.cloudbeaver.model.app.WebAppConfiguration;
 import io.cloudbeaver.model.app.WebAuthApplication;
 import io.cloudbeaver.model.app.WebAuthConfiguration;
-import io.cloudbeaver.model.session.WebAuthInfo;
 import io.cloudbeaver.registry.WebAuthProviderDescriptor;
 import io.cloudbeaver.registry.WebAuthProviderRegistry;
 import io.cloudbeaver.registry.WebMetaParametersRegistry;
@@ -1242,6 +1241,9 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
 
     @Override
     public SMAuthInfo authenticateAnonymousUser(@NotNull String appSessionId, @NotNull Map<String, Object> sessionParameters, @NotNull SMSessionType sessionType) throws DBException {
+        if (!application.getAppConfiguration().isAnonymousAccessEnabled()) {
+            throw new SMException("Anonymous access restricted");
+        }
         try (Connection dbCon = database.openConnection()) {
             try (JDBCTransaction txn = new JDBCTransaction(dbCon)) {
                 var smSessionId = createSmSession(appSessionId, null, sessionParameters, sessionType, dbCon);
@@ -1277,6 +1279,9 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
         @Nullable String authProviderConfigurationId,
         @NotNull Map<String, Object> userCredentials
     ) throws DBException {
+        if (isProviderDisabled(authProviderId, authProviderConfigurationId)) {
+            throw new SMException("Unsupported authentication provider: " + authProviderId);
+        }
         var authProgressMonitor = new LoggingProgressMonitor(log);
         try (Connection dbCon = database.openConnection()) {
             try (JDBCTransaction txn = new JDBCTransaction(dbCon)) {
@@ -1318,16 +1323,18 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
                 if (SMAuthProviderFederated.class.isAssignableFrom(authProviderInstance.getClass())) {
                     //async auth
                     var authProviderFederated = (SMAuthProviderFederated) authProviderInstance;
-                    var redirectUrl = buildRedirectLink(authProviderFederated.getSignInLink(authProviderConfigurationId, Map.of()),
+                    String signInLink = buildRedirectLink(authProviderFederated.getSignInLink(authProviderConfigurationId, Map.of()),
                         authAttemptId);
+                    String signOutLink = authProviderFederated.getSignOutLink(authProviderConfigurationId, Map.of());
                     Map<SMAuthConfigurationReference, Object> authData = Map.of(new SMAuthConfigurationReference(authProviderId,
                         authProviderConfigurationId), filteredUserCreds);
-                    return SMAuthInfo.inProgress(authAttemptId, redirectUrl, authData);
+                    return SMAuthInfo.inProgress(authAttemptId, signInLink, signOutLink, authData);
                 }
                 txn.commit();
                 return finishAuthentication(
                     SMAuthInfo.inProgress(
                         authAttemptId,
+                        null,
                         null,
                         Map.of(new SMAuthConfigurationReference(authProviderId, authProviderConfigurationId), securedUserIdentifyingCredentials)
                     ),
@@ -1521,7 +1528,8 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
                 }
             }
             Map<SMAuthConfigurationReference, Object> authData = new LinkedHashMap<>();
-            String redirectUrl = null;
+            String signInLink = null;
+            String signOutLink = null;
 
             try (PreparedStatement dbStat = dbCon.prepareStatement(
                 database.normalizeTableNames(
@@ -1540,7 +1548,10 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
                             WebAuthProviderDescriptor authProviderDescriptor = getAuthProvider(authProviderId);
                             var authProviderInstance = authProviderDescriptor.getInstance();
                             if (SMAuthProviderFederated.class.isAssignableFrom(authProviderInstance.getClass())) {
-                                redirectUrl = buildRedirectLink(((SMAuthProviderFederated) authProviderInstance).getRedirectLink(
+                                signInLink = buildRedirectLink(((SMAuthProviderFederated) authProviderInstance).getRedirectLink(
+                                    authProviderConfiguration,
+                                    Map.of()), authId);
+                                signOutLink = buildRedirectLink(((SMAuthProviderFederated) authProviderInstance).getSignOutLink(
                                     authProviderConfiguration,
                                     Map.of()), authId);
                             }
@@ -1554,7 +1565,7 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
             if (smAuthStatus != SMAuthStatus.SUCCESS) {
                 switch (smAuthStatus) {
                     case IN_PROGRESS:
-                        return SMAuthInfo.inProgress(authId, redirectUrl, authData);
+                        return SMAuthInfo.inProgress(authId, signInLink, signOutLink, authData);
                     case ERROR:
                         return SMAuthInfo.error(authId, authError);
                     case EXPIRED:
@@ -2625,7 +2636,7 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
     public void finishConfiguration(
         @NotNull String adminName,
         @Nullable String adminPassword,
-        @NotNull List<WebAuthInfo> authInfoList
+        @NotNull List<AuthInfo> authInfoList
     ) throws DBException {
         database.finishConfiguration(adminName, adminPassword, authInfoList);
     }
@@ -2727,9 +2738,17 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
         return activeUserCredentials.getUserId();
     }
 
-    private boolean isProviderEnabled(@NotNull String providerId) {
+    private boolean isProviderDisabled(@NotNull String providerId, @Nullable String authConfigurationId) {
         WebAuthConfiguration appConfiguration = application.getAuthConfiguration();
-        return appConfiguration.isAuthProviderEnabled(providerId);
+        if (!appConfiguration.isAuthProviderEnabled(providerId)) {
+            return true;
+        }
+        if (authConfigurationId != null) {
+            SMAuthProviderCustomConfiguration configuration =
+                appConfiguration.getAuthProviderConfiguration(authConfigurationId);
+            return configuration == null || configuration.isDisabled();
+        }
+        return false;
     }
 
     public void clearOldAuthAttemptInfo() throws DBException {
