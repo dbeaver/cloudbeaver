@@ -14,6 +14,7 @@ export interface IProcessNotificationState {
   init: (title: string, message?: string) => void;
   resolve: (title: string, message?: string) => void;
   reject: (error: Error, title?: string, message?: string) => void;
+  setMessage: (message: string | null) => void;
 }
 
 export enum ENotificationType {
