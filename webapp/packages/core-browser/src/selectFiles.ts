@@ -6,10 +6,15 @@
  * you may not use this file except in compliance with the License.
  */
 
-export function selectFiles(callback: (files: FileList | null) => any): void {
+export function selectFiles(callback: (files: FileList | null) => any, multiple?: boolean): void {
   let removed = false;
   const input = document.createElement('input');
   input.type = 'file';
+
+  if (multiple) {
+    input.multiple = true;
+  }
+
   input.onchange = () => {
     callback(input.files);
     removed = true;
