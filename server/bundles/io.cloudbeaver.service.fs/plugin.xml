@@ -8,7 +8,4 @@
                  class="io.cloudbeaver.service.fs.WebServiceBindingFS">
         </service>
     </extension>
-    <extension point="io.cloudbeaver.feature">
-        <feature id="fileSystems" label="File Systems" description="File Systems"/>
-    </extension>
 </plugin>

@@ -14,7 +14,7 @@ import { isResourceOfType, ProjectInfoResource, ProjectsService } from '@cloudbe
 import { CachedMapAllKey, CachedTreeChildrenKey } from '@cloudbeaver/core-resource';
 import { getRmResourcePath, NAV_NODE_TYPE_RM_RESOURCE, ResourceManagerResource, RESOURCES_NODE_PATH } from '@cloudbeaver/core-resource-manager';
 import { createPath, getPathName } from '@cloudbeaver/core-utils';
-import { ACTION_SAVE, ActionService, DATA_CONTEXT_MENU, KEY_BINDING_SAVE, KeyBindingService, MenuService } from '@cloudbeaver/core-view';
+import { ActionService, DATA_CONTEXT_MENU, MenuService } from '@cloudbeaver/core-view';
 import { NavigationTabsService } from '@cloudbeaver/plugin-navigation-tabs';
 import { getResourceKeyFromNodeId } from '@cloudbeaver/plugin-navigation-tree-rm';
 import { RESOURCE_NAME_REGEX, ResourceManagerService } from '@cloudbeaver/plugin-resource-manager';
@@ -55,7 +55,6 @@ export class PluginBootstrap extends Bootstrap {
     private readonly sqlEditorSettingsService: SqlEditorSettingsService,
     private readonly resourceManagerResource: ResourceManagerResource,
     private readonly resourceManagerScriptsService: ResourceManagerScriptsService,
-    private readonly keyBindingService: KeyBindingService,
   ) {
     super();
   }
@@ -81,10 +80,6 @@ export class PluginBootstrap extends Bootstrap {
 
         if (action === ACTION_SAVE_AS_SCRIPT) {
           return dataSource instanceof MemorySqlDataSource || dataSource instanceof LocalStorageSqlDataSource;
-        }
-
-        if (action === ACTION_SAVE) {
-          return dataSource?.isAutoSaveEnabled === false;
         }
 
         return false;
@@ -187,34 +182,9 @@ export class PluginBootstrap extends Bootstrap {
             }
           }
         }
-
-        if (action === ACTION_SAVE) {
-          const state = context.get(DATA_CONTEXT_SQL_EDITOR_STATE);
-          const source = this.sqlDataSourceService.get(state.editorId) as ResourceSqlDataSource | undefined;
-
-          if (!source) {
-            return;
-          }
-
-          await source.save();
-        }
-      },
-      isDisabled: (context, action) => {
-        if (action === ACTION_SAVE) {
-          const state = context.get(DATA_CONTEXT_SQL_EDITOR_STATE);
-          const source = this.sqlDataSourceService.get(state.editorId) as ResourceSqlDataSource | undefined;
-
-          if (!source) {
-            return true;
-          }
-
-          return source.isLoading() || source.isSaved;
-        }
-
-        return false;
       },
       getActionInfo: (context, action) => {
-        if (action === ACTION_SAVE_AS_SCRIPT || action === ACTION_SAVE) {
+        if (action === ACTION_SAVE_AS_SCRIPT) {
           return {
             ...action.info,
             label: '',
@@ -241,23 +211,7 @@ export class PluginBootstrap extends Bootstrap {
           !!dataSource?.hasFeature(ESqlDataSourceFeatures.script)
         );
       },
-      getItems: (context, items) => [...items, ACTION_SAVE_AS_SCRIPT, ACTION_SAVE],
-    });
-
-    this.keyBindingService.addKeyBindingHandler({
-      id: 'script-save',
-      binding: KEY_BINDING_SAVE,
-      isBindingApplicable: (context, action) => action === ACTION_SAVE,
-      handler: async context => {
-        const state = context.get(DATA_CONTEXT_SQL_EDITOR_STATE);
-        const source = this.sqlDataSourceService.get(state.editorId) as ResourceSqlDataSource | undefined;
-
-        if (!source) {
-          return;
-        }
-
-        await source.save();
-      },
+      getItems: (context, items) => [...items, ACTION_SAVE_AS_SCRIPT],
     });
   }
 

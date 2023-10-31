@@ -20,6 +20,7 @@ import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.WebProjectImpl;
 import io.cloudbeaver.WebServiceUtils;
 import io.cloudbeaver.model.WebPropertyInfo;
+import io.cloudbeaver.model.fs.FSUtils;
 import io.cloudbeaver.model.rm.DBNResourceManagerProject;
 import io.cloudbeaver.model.rm.DBNResourceManagerResource;
 import io.cloudbeaver.model.session.WebSession;
@@ -32,6 +33,7 @@ import org.jkiss.dbeaver.model.edit.DBEObjectRenamer;
 import org.jkiss.dbeaver.model.meta.Association;
 import org.jkiss.dbeaver.model.meta.Property;
 import org.jkiss.dbeaver.model.navigator.*;
+import org.jkiss.dbeaver.model.navigator.fs.DBNFileSystem;
 import org.jkiss.dbeaver.model.navigator.fs.DBNPathBase;
 import org.jkiss.dbeaver.model.rm.RMProject;
 import org.jkiss.dbeaver.model.rm.RMProjectPermission;
@@ -283,6 +285,8 @@ public class WebNavigatorNodeInfo {
     public String getObjectId() {
         if (node instanceof DBNPathBase dbnPath) {
             return dbnPath.getPath().toUri().toString();
+        } else if (node instanceof DBNFileSystem dbnFs) {
+            return FSUtils.makeUniqueFsId(dbnFs.getFileSystem());
         }
         return null;
     }
