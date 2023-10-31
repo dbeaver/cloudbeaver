@@ -5,7 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { action, makeObservable, observable, untracked } from 'mobx';
+import { action, makeObservable, observable } from 'mobx';
 
 import { ConfirmationDialog } from '@cloudbeaver/core-blocks';
 import { ConnectionInfoResource, IConnectionExecutionContextInfo } from '@cloudbeaver/core-connections';
@@ -13,11 +13,11 @@ import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { ProjectInfoResource } from '@cloudbeaver/core-projects';
-import { CachedMapAllKey, resourceKeyList, ResourceKeySimple, ResourceKeyUtils } from '@cloudbeaver/core-resource';
-import { getRmResourceKey, IResourceManagerMoveData, ResourceManagerResource } from '@cloudbeaver/core-resource-manager';
-import { NetworkStateService, WindowEventsService } from '@cloudbeaver/core-root';
+import { resourceKeyList, ResourceKeySimple, ResourceKeyUtils } from '@cloudbeaver/core-resource';
+import { IResourceManagerMoveData, ResourceManagerResource } from '@cloudbeaver/core-resource-manager';
+import { NetworkStateService } from '@cloudbeaver/core-root';
 import { LocalStorageSaveService } from '@cloudbeaver/core-settings';
-import { createPath, getPathParent, throttle } from '@cloudbeaver/core-utils';
+import { createPath, getPathParent } from '@cloudbeaver/core-utils';
 import { NavigationTabsService } from '@cloudbeaver/plugin-navigation-tabs';
 import { NavResourceNodeService } from '@cloudbeaver/plugin-navigation-tree-rm';
 import { ResourceManagerService } from '@cloudbeaver/plugin-resource-manager';
@@ -30,7 +30,6 @@ import { ResourceSqlDataSource } from './ResourceSqlDataSource';
 import { SqlEditorTabResourceService } from './SqlEditorTabResourceService';
 
 const RESOURCE_TAB_STATE = 'sql_editor_resource_tab_state';
-const SYNC_DELAY = 5 * 60 * 1000;
 
 @injectable()
 export class ResourceSqlDataSourceBootstrap extends Bootstrap {
@@ -49,14 +48,12 @@ export class ResourceSqlDataSourceBootstrap extends Bootstrap {
     private readonly resourceManagerResource: ResourceManagerResource,
     private readonly resourceManagerScriptsService: ResourceManagerScriptsService,
     private readonly projectInfoResource: ProjectInfoResource,
-    private readonly windowEventsService: WindowEventsService,
     private readonly sqlEditorTabResourceService: SqlEditorTabResourceService,
     private readonly sqlEditorService: SqlEditorService,
     localStorageSaveService: LocalStorageSaveService,
   ) {
     super();
     this.dataSourceStateState = new Map();
-    this.focusChangeHandler = throttle(this.focusChangeHandler.bind(this), SYNC_DELAY, false);
 
     makeObservable<this, 'dataSourceStateState' | 'createState'>(this, {
       createState: action,
@@ -87,7 +84,6 @@ export class ResourceSqlDataSourceBootstrap extends Bootstrap {
   }
 
   register(): void | Promise<void> {
-    this.windowEventsService.onFocusChange.addHandler(this.focusChangeHandler.bind(this));
     this.resourceManagerResource.onItemDelete.addHandler(this.resourceDeleteHandler.bind(this));
     this.resourceManagerResource.onMove.addHandler(this.resourceMoveHandler.bind(this));
 
@@ -95,6 +91,7 @@ export class ResourceSqlDataSourceBootstrap extends Bootstrap {
       key: ResourceSqlDataSource.key,
       getDataSource: (editorId, options) => {
         const dataSource = new ResourceSqlDataSource(
+          this.networkStateService,
           this.projectInfoResource,
           this.connectionInfoResource,
           this.resourceManagerResource,
@@ -116,20 +113,6 @@ export class ResourceSqlDataSourceBootstrap extends Bootstrap {
           write: this.write.bind(this),
           getProperties: this.getProperties.bind(this),
           setProperties: this.setProperties.bind(this),
-        });
-
-        dataSource.setInfo({
-          isReadonly: (dataSource: ResourceSqlDataSource) => {
-            if (!dataSource.resourceKey) {
-              return true;
-            }
-            const resourceKey = getRmResourceKey(dataSource.resourceKey);
-
-            untracked(() => this.projectInfoResource.load(CachedMapAllKey));
-            const project = this.projectInfoResource.get(resourceKey.projectId);
-
-            return !this.networkStateService.state || !project?.canEditResources;
-          },
         });
 
         return dataSource;
@@ -186,22 +169,6 @@ export class ResourceSqlDataSourceBootstrap extends Bootstrap {
 
   private deleteState(editorId: string): void {
     this.dataSourceStateState.delete(editorId);
-  }
-
-  private async focusChangeHandler(focused: boolean) {
-    if (!this.resourceManagerService.enabled) {
-      return;
-    }
-
-    if (focused) {
-      const dataSources = this.sqlDataSourceService.dataSources
-        .filter(([, dataSource]) => dataSource instanceof ResourceSqlDataSource)
-        .map(([, dataSource]) => dataSource as ResourceSqlDataSource);
-
-      for (const dataSource of dataSources) {
-        dataSource.markOutdated();
-      }
-    }
   }
 
   private resourceMoveHandler(data: IResourceManagerMoveData) {

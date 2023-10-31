@@ -78,7 +78,7 @@ type NavigatorNodeInfo {
 
     # Associated object. Return value depends on the node type - connectionId for connection node, resource path for resource node, etc.
     # null - if node currently not support this property
-    objectId: String
+    objectId: String @since(version: "23.2.4")
 
     # Supported features: item, container, leaf
     # canDelete, canRename

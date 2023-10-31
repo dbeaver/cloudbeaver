@@ -5,6 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
+import { UserDataService } from '@cloudbeaver/core-authentication';
 import { injectable } from '@cloudbeaver/core-di';
 
 import type { ISqlEditorTabState } from '../../ISqlEditorTabState';
@@ -13,9 +14,19 @@ import { OUTPUT_LOG_TYPES } from './IOutputLogTypes';
 import { OUTPUT_LOGS_TAB_ID } from './OUTPUT_LOGS_TAB_ID';
 import type { IOutputLog } from './OutputLogsResource';
 
+const OUTPUT_LOGS_KEY = 'output_logs';
+
+interface ISettings {
+  wrapMode: boolean;
+}
+
 @injectable()
 export class OutputLogsService {
-  constructor(private readonly sqlDataSourceService: SqlDataSourceService) {}
+  get settings() {
+    return this.userDataService.getUserData(OUTPUT_LOGS_KEY, getOutputLogsDefaultSettings);
+  }
+
+  constructor(private readonly sqlDataSourceService: SqlDataSourceService, private readonly userDataService: UserDataService) {}
 
   async showOutputLogs(editorState: ISqlEditorTabState): Promise<void> {
     this.createOutputLogsTab(editorState);
@@ -26,6 +37,10 @@ export class OutputLogsService {
     if (tabId === OUTPUT_LOGS_TAB_ID) {
       state.outputLogsTab = undefined;
     }
+  }
+
+  toggleWrapMode() {
+    this.settings.wrapMode = !this.settings.wrapMode;
   }
 
   private createOutputLogsTab(state: ISqlEditorTabState) {
@@ -51,4 +66,10 @@ export class OutputLogsService {
 
     return events.filter(event => event.contextId === dataSource?.executionContext?.id);
   }
+}
+
+function getOutputLogsDefaultSettings(): ISettings {
+  return {
+    wrapMode: true,
+  };
 }
