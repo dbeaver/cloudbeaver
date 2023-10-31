@@ -214,8 +214,6 @@ export class AuthenticationService extends Bootstrap {
     this.authProviderService.requestAuthProvider.addHandler(this.requestAuthProviderHandler);
   }
 
-  load(): void {}
-
   private async authSessionAction(data: ISessionAction | null, contexts: IExecutionContextProvider<ISessionAction | null>) {
     const action = contexts.getContext(sessionActionContext);
 

@@ -12,13 +12,14 @@ import { getComputed, IFolderExplorerContext, useExecutor, useObjectRef, useObse
 import { ConnectionInfoActiveProjectKey, ConnectionInfoResource } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
+import { ExecutorInterrupter, ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
 import { type NavNode, NavNodeInfoResource, NavTreeResource, ROOT_NODE_PATH } from '@cloudbeaver/core-navigation-tree';
 import { ProjectInfoResource, ProjectsService } from '@cloudbeaver/core-projects';
 import { CachedMapAllKey, CachedResourceOffsetPageKey, getNextPageOffset, ResourceKeyUtils } from '@cloudbeaver/core-resource';
 import type { IDNDData } from '@cloudbeaver/core-ui';
 import { ILoadableState, MetadataMap, throttle } from '@cloudbeaver/core-utils';
 
+import { ElementsTreeService } from './ElementsTreeService';
 import type { IElementsTreeAction } from './IElementsTreeAction';
 import type { INavTreeNodeInfo } from './INavTreeNodeInfo';
 import type { NavigationNodeRendererComponent } from './NavigationNodeComponent';
@@ -137,6 +138,7 @@ export function useElementsTree(options: IOptions): IElementsTree {
   const navNodeInfoResource = useService(NavNodeInfoResource);
   const navTreeResource = useService(NavTreeResource);
   const connectionInfoResource = useService(ConnectionInfoResource);
+  const elementsTreeService = useService(ElementsTreeService);
 
   const [localTreeNodesState] = useState(
     () =>
@@ -156,6 +158,12 @@ export function useElementsTree(options: IOptions): IElementsTree {
 
   async function handleLoadChildren(id: string, manual: boolean): Promise<boolean> {
     try {
+      const context = await elementsTreeService.onLoad.execute({ nodeId: id, manual });
+
+      if (ExecutorInterrupter.isInterrupted(context)) {
+        return false;
+      }
+
       return await options.loadChildren(id, manual);
     } catch (exception: any) {
       notificationService.logException(exception);
