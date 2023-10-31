@@ -87,6 +87,7 @@ export default [
   ['ui_upload_file', 'Upload file'],
   ['ui_upload_files', 'Upload files'],
   ['ui_upload_files_duplicate_error', 'Files with the same name already exist'],
+  ['ui_filter', 'Filter'],
 
   ['root_permission_denied', 'Non hai i permessi'],
   ['app_root_session_expire_warning_title', 'La sessione sta per scadere'],

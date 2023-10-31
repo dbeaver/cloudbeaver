@@ -1,3 +1,15 @@
 .menuBarItem {
   padding: 4px;
+  margin: 2px;
+  width: 24px;
+  height: 24px;
+  overflow: hidden;
+  flex-shrink: 0;
+  border-radius: var(--theme-form-element-radius);
+
+  & .menuBarItemIcon {
+    width: 16px;
+    height: 16px;
+    padding: 0px;
+  }
 }

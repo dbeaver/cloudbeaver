@@ -15,6 +15,7 @@ import { useMenu } from '@cloudbeaver/core-view';
 import { DATA_CONTEXT_SQL_EDITOR_STATE } from '../../DATA_CONTEXT_SQL_EDITOR_STATE';
 import type { ISqlEditorTabState } from '../../ISqlEditorTabState';
 import { OUTPUT_LOGS_MENU } from './OUTPUT_LOGS_MENU';
+import styles from './OutputLogsMenu.m.css';
 import OutputLogsMenuItemStyles from './OutputLogsMenuItem.m.css';
 
 interface Props {
@@ -42,7 +43,7 @@ export const OutputLogsMenu = observer<Props>(function OutputLogsMenu({ sqlEdito
 
   return (
     <SContext registry={registry}>
-      <MenuBar menu={menu} nestedMenuSettings={{ modal: true, placement: 'top-start' }} />
+      <MenuBar menu={menu} nestedMenuSettings={{ modal: true, placement: 'top-start' }} className={styles.menuBar} />
     </SContext>
   );
 });

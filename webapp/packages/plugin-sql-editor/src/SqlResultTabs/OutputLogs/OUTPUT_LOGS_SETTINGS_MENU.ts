@@ -7,4 +7,4 @@
  */
 import { createMenu } from '@cloudbeaver/core-view';
 
-export const OUTPUT_LOGS_SETTINGS_MENU = createMenu('output_logs_settings_menu', '', '/icons/settings_cog_sm.svg');
+export const OUTPUT_LOGS_SETTINGS_MENU = createMenu('output_logs_settings_menu', '', '/icons/settings_cog_sm.svg', 'ui_settings');

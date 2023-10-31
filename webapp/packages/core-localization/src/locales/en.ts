@@ -103,6 +103,7 @@ export default [
   ['ui_upload_file', 'Upload file'],
   ['ui_upload_files', 'Upload files'],
   ['ui_upload_files_duplicate_error', 'Files with the same name already exist'],
+  ['ui_filter', 'Filter'],
 
   ['root_permission_denied', "You don't have permissions"],
   ['root_permission_no_permission', "You don't have permission for this action"],
