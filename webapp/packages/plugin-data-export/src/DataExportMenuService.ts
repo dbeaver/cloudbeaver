@@ -5,11 +5,12 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
+import { EAdminPermission } from '@cloudbeaver/core-authentication';
 import { createConnectionParam, DATA_CONTEXT_CONNECTION } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService, IMenuContext } from '@cloudbeaver/core-dialogs';
-import { LocalizationService } from '@cloudbeaver/core-localization';
 import { DATA_CONTEXT_NAV_NODE, EObjectFeature } from '@cloudbeaver/core-navigation-tree';
+import { SessionPermissionsResource } from '@cloudbeaver/core-root';
 import { ACTION_EXPORT, ActionService, DATA_CONTEXT_MENU_NESTED, MenuService } from '@cloudbeaver/core-view';
 import { IDatabaseDataSource, IDataContainerOptions, ITableFooterMenuContext, TableFooterMenuService } from '@cloudbeaver/plugin-data-viewer';
 import type { IDataQueryOptions } from '@cloudbeaver/plugin-sql-editor';
@@ -25,7 +26,7 @@ export class DataExportMenuService {
     private readonly dataExportSettingsService: DataExportSettingsService,
     private readonly actionService: ActionService,
     private readonly menuService: MenuService,
-    private readonly localizationService: LocalizationService,
+    private readonly sessionPermissionsResource: SessionPermissionsResource,
   ) {}
 
   register(): void {
@@ -106,9 +107,14 @@ export class DataExportMenuService {
   }
 
   private isDisabled() {
+    if (this.sessionPermissionsResource.has(EAdminPermission.admin)) {
+      return false;
+    }
+
     if (this.dataExportSettingsService.settings.isValueDefault('disabled')) {
       return this.dataExportSettingsService.deprecatedSettings.getValue('disabled');
     }
+
     return this.dataExportSettingsService.settings.getValue('disabled');
   }
 }

@@ -5,6 +5,9 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { createMenu } from '@cloudbeaver/core-view';
+import { createAction } from '../createAction';
 
-export const OUTPUT_LOGS_FILTER_MENU = createMenu('output_logs_filter_menu', '', 'filter', 'ui_filter');
+export const ACTION_DOWNLOAD = createAction('download', {
+  label: 'ui_download',
+  icon: '/icons/export.svg',
+});
