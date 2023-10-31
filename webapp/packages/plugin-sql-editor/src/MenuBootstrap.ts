@@ -7,7 +7,21 @@
  */
 import type { IDataContextProvider } from '@cloudbeaver/core-data-context';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
-import { ACTION_REDO, ACTION_UNDO, ActionService, IAction, KEY_BINDING_REDO, KEY_BINDING_UNDO, KeyBindingService } from '@cloudbeaver/core-view';
+import { WindowEventsService } from '@cloudbeaver/core-root';
+import { throttle } from '@cloudbeaver/core-utils';
+import {
+  ACTION_REDO,
+  ACTION_SAVE,
+  ACTION_UNDO,
+  ActionService,
+  DATA_CONTEXT_MENU,
+  IAction,
+  KEY_BINDING_REDO,
+  KEY_BINDING_SAVE,
+  KEY_BINDING_UNDO,
+  KeyBindingService,
+  MenuService,
+} from '@cloudbeaver/core-view';
 
 import { ACTION_SQL_EDITOR_EXECUTE } from './actions/ACTION_SQL_EDITOR_EXECUTE';
 import { ACTION_SQL_EDITOR_EXECUTE_NEW } from './actions/ACTION_SQL_EDITOR_EXECUTE_NEW';
@@ -20,16 +34,114 @@ import { KEY_BINDING_SQL_EDITOR_EXECUTE_NEW } from './actions/bindings/KEY_BINDI
 import { KEY_BINDING_SQL_EDITOR_EXECUTE_SCRIPT } from './actions/bindings/KEY_BINDING_SQL_EDITOR_EXECUTE_SCRIPT';
 import { KEY_BINDING_SQL_EDITOR_FORMAT } from './actions/bindings/KEY_BINDING_SQL_EDITOR_FORMAT';
 import { KEY_BINDING_SQL_EDITOR_SHOW_EXECUTION_PLAN } from './actions/bindings/KEY_BINDING_SQL_EDITOR_SHOW_EXECUTION_PLAN';
+import { DATA_CONTEXT_SQL_EDITOR_STATE } from './DATA_CONTEXT_SQL_EDITOR_STATE';
 import { ESqlDataSourceFeatures } from './SqlDataSource/ESqlDataSourceFeatures';
+import { SqlDataSourceService } from './SqlDataSource/SqlDataSourceService';
 import { DATA_CONTEXT_SQL_EDITOR_DATA } from './SqlEditor/DATA_CONTEXT_SQL_EDITOR_DATA';
+import { SQL_EDITOR_TOOLS_MENU } from './SqlEditor/SQL_EDITOR_TOOLS_MENU';
+
+const SYNC_DELAY = 5 * 60 * 1000;
 
 @injectable()
 export class MenuBootstrap extends Bootstrap {
-  constructor(private readonly actionService: ActionService, private readonly keyBindingService: KeyBindingService) {
+  constructor(
+    private readonly menuService: MenuService,
+    private readonly actionService: ActionService,
+    private readonly keyBindingService: KeyBindingService,
+    private readonly sqlDataSourceService: SqlDataSourceService,
+    private readonly windowEventsService: WindowEventsService,
+  ) {
     super();
   }
 
   register(): void {
+    this.windowEventsService.onFocusChange.addHandler(throttle(this.focusChangeHandler.bind(this), SYNC_DELAY, false));
+    this.actionService.addHandler({
+      id: 'sql-editor-base-handler',
+      isActionApplicable: (context, action): boolean => {
+        const state = context.tryGet(DATA_CONTEXT_SQL_EDITOR_STATE);
+
+        if (!state) {
+          return false;
+        }
+
+        const dataSource = this.sqlDataSourceService.get(state.editorId);
+
+        if (action === ACTION_SAVE) {
+          return dataSource?.isAutoSaveEnabled === false;
+        }
+
+        return false;
+      },
+      handler: async (context, action) => {
+        if (action === ACTION_SAVE) {
+          const state = context.get(DATA_CONTEXT_SQL_EDITOR_STATE);
+          const source = this.sqlDataSourceService.get(state.editorId);
+
+          if (!source) {
+            return;
+          }
+
+          await source.save();
+        }
+      },
+      isDisabled: (context, action) => {
+        if (action === ACTION_SAVE) {
+          const state = context.get(DATA_CONTEXT_SQL_EDITOR_STATE);
+          const source = this.sqlDataSourceService.get(state.editorId);
+
+          if (!source) {
+            return true;
+          }
+
+          return source.isLoading() || source.isSaved || source.isReadonly();
+        }
+
+        return false;
+      },
+      getActionInfo: (context, action) => {
+        if (action === ACTION_SAVE) {
+          return {
+            ...action.info,
+            label: '',
+          };
+        }
+
+        return action.info;
+      },
+    });
+
+    this.menuService.addCreator({
+      isApplicable: context => {
+        const state = context.tryGet(DATA_CONTEXT_SQL_EDITOR_STATE);
+
+        if (!state) {
+          return false;
+        }
+
+        const dataSource = this.sqlDataSourceService.get(state.editorId);
+
+        return context.get(DATA_CONTEXT_MENU) === SQL_EDITOR_TOOLS_MENU && !!dataSource?.hasFeature(ESqlDataSourceFeatures.script);
+      },
+      getItems: (context, items) => [...items, ACTION_SAVE],
+    });
+
+    this.keyBindingService.addKeyBindingHandler({
+      id: 'sql-editor-save',
+      binding: KEY_BINDING_SAVE,
+      isBindingApplicable: (context, action) => action === ACTION_SAVE,
+      handler: async context => {
+        const state = context.get(DATA_CONTEXT_SQL_EDITOR_STATE);
+        const source = this.sqlDataSourceService.get(state.editorId);
+
+        if (!source) {
+          return;
+        }
+
+        await source.save();
+      },
+    });
+
     this.actionService.addHandler({
       id: 'sql-editor-actions',
       isActionApplicable: (contexts, action): boolean => {
@@ -179,5 +291,13 @@ export class MenuBootstrap extends Bootstrap {
     }
   }
 
-  load(): void | Promise<void> {}
+  private async focusChangeHandler(focused: boolean) {
+    if (focused) {
+      const dataSources = this.sqlDataSourceService.dataSources.values();
+
+      for (const [_, dataSource] of dataSources) {
+        dataSource.markOutdated();
+      }
+    }
+  }
 }

@@ -1,3 +1,6 @@
-.coloredContainer {
+.secondary {
   composes: theme-background-secondary theme-text-on-secondary from global;
+}
+.surface {
+  composes: theme-background-surface theme-text-on-surface from global;
 }

@@ -5,8 +5,15 @@ type FSFile @since(version: "23.2.2") {
     metaData: Object!
 }
 
+type FSFileSystem @since(version: "23.2.4") {
+    id: ID!
+    requiredAuth: String
+}
+
 extend type Query @since(version: "23.2.2") {
-    fsListFileSystems(projectId: ID!): [String!]!
+    fsListFileSystems(projectId: ID!): [FSFileSystem!]!
+
+    fsFileSystem(projectId: ID!, fileSystemId: ID!): FSFileSystem! @since(version: "23.2.4")
 
     fsFile(projectId: ID!, fileURI: String!):  FSFile!
 
@@ -21,14 +28,14 @@ extend type Mutation @since(version: "23.2.2") {
 
     fsCreateFolder(projectId: ID!, folderURI:String!): FSFile!
 
-    fsDeleteFile(projectId: ID!, fileURI:String!): Boolean!
+    fsDelete(projectId: ID!, fileURI:String!): Boolean!
 
-    fsMoveFile(projectId: ID!, fromURI: String!, toURI: String!): FSFile!
+    fsMove(projectId: ID!, fromURI: String!, toURI: String!): FSFile!
 
     fsWriteFileStringContent(
         projectId: ID!,
         fileURI:String!,
         data: String!,
         forceOverwrite: Boolean!
-    ): Boolean!
+    ): FSFile!
 }

@@ -8,5 +8,5 @@
 import type { ProjectInfoResourceType } from './ProjectInfoResource';
 
 export function isResourceOfType(resourceType: ProjectInfoResourceType, name: string): boolean {
-  return resourceType.fileExtensions.some(type => name.endsWith(`.${type}`));
+  return resourceType.fileExtensions.some(type => name.toLowerCase().endsWith(`.${type.toLowerCase()}`));
 }
