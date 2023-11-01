@@ -10,6 +10,7 @@ export default [
   ['sql_editor_output_logs_button_tooltip', 'Show server output (Shift + Ctrl + O)'],
   ['sql_editor_output_logs_tab_title', 'Output'],
   ['sql_editor_output_logs_input_placeholder', 'Enter a part of a message to search for here'],
+  ['sql_editor_output_logs_wrap_mode', 'Wrap mode'],
   ['sql_editor_sql_execution_button_tooltip', 'Execute SQL Statement (Ctrl + Enter)'],
   ['sql_editor_sql_execution_new_tab_button_tooltip', 'Execute SQL Statement in new tab (Ctrl + \\)(Shift + Ctrl + Enter)'],
   ['sql_editor_sql_execution_script_button_tooltip', 'Execute SQL Script (Alt + X)'],

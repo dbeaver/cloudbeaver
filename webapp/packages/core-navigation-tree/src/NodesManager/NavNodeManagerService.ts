@@ -322,13 +322,13 @@ export class NavNodeManagerService extends Bootstrap {
     let icon: string | undefined;
     let canOpen = false;
 
-    if (NodeManagerUtils.isDatabaseObject(nodeId)) {
-      const node = this.getNode(nodeId);
+    const node = this.getNode(nodeId);
+    if (node) {
+      name = node.name;
+      icon = node.icon;
+      projectId ||= node.projectId;
 
-      if (node) {
-        name = node.name;
-        icon = node.icon;
-
+      if (NodeManagerUtils.isDatabaseObject(nodeId)) {
         if (node.folder) {
           const parent = this.getParent(node);
           folderId = nodeId;

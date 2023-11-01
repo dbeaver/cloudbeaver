@@ -17,14 +17,17 @@
 package io.cloudbeaver.service.fs.impl;
 
 import io.cloudbeaver.DBWebException;
+import io.cloudbeaver.model.fs.FSUtils;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.service.fs.DBWServiceFS;
 import io.cloudbeaver.service.fs.model.FSFile;
+import io.cloudbeaver.service.fs.model.FSFileSystem;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.DBException;
-import org.jkiss.dbeaver.model.fs.DBFVirtualFileSystem;
+import org.jkiss.dbeaver.registry.fs.FileSystemProviderRegistry;
 
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
@@ -35,16 +38,44 @@ public class WebServiceFS implements DBWServiceFS {
 
     @NotNull
     @Override
-    public String[] getAvailableFileSystems(@NotNull WebSession webSession, @NotNull String projectId)
+    public FSFileSystem[] getAvailableFileSystems(@NotNull WebSession webSession, @NotNull String projectId)
         throws DBWebException {
         try {
+            var fsRegistry = FileSystemProviderRegistry.getInstance();
             return webSession.getFileSystemManager(projectId)
                 .getVirtualFileSystems()
                 .stream()
-                .map(DBFVirtualFileSystem::getType)
-                .toArray(String[]::new);
+                .map(fs -> new FSFileSystem(
+                    FSUtils.makeUniqueFsId(fs),
+                        fsRegistry.getProvider(fs.getProviderId()).getRequiredAuth()
+                    )
+                )
+                .toArray(FSFileSystem[]::new);
         } catch (Exception e) {
             throw new DBWebException("Failed to load file systems: " + e.getMessage(), e);
+        }
+    }
+
+    @NotNull
+    @Override
+    public FSFileSystem getFileSystem(
+        @NotNull WebSession webSession,
+        @NotNull String projectId,
+        @NotNull String fileSystemId
+    ) throws DBWebException {
+        try {
+            var fsRegistry = FileSystemProviderRegistry.getInstance();
+            return webSession.getFileSystemManager(projectId)
+                .getVirtualFileSystems()
+                .stream()
+                .filter(fs -> FSUtils.makeUniqueFsId(fs).equals(fileSystemId))
+                .findFirst()
+                .map(fs -> new FSFileSystem(
+                    FSUtils.makeUniqueFsId(fs),
+                    fsRegistry.getProvider(fs.getProviderId()).getRequiredAuth()
+                )).orElseThrow(() -> new DBWebException("File system not found"));
+        } catch (Exception e) {
+            throw new DBWebException("Failed to get file system: " + e.getMessage(), e);
         }
     }
 
@@ -80,15 +111,17 @@ public class WebServiceFS implements DBWServiceFS {
     public String readFileContent(@NotNull WebSession webSession, @NotNull String projectId, @NotNull URI fileUri)
         throws DBWebException {
         try {
-            Path filePath = webSession.getFileSystemManager(projectId).getPathFromURI(webSession.getProgressMonitor(), fileUri);
-            return Files.readString(filePath);
+            Path filePath = webSession.getFileSystemManager(projectId)
+                .getPathFromURI(webSession.getProgressMonitor(), fileUri);
+            var data = Files.readAllBytes(filePath);
+            return new String(data, StandardCharsets.UTF_8);
         } catch (Exception e) {
             throw new DBWebException("Failed to read file content: " + e.getMessage(), e);
         }
     }
 
     @Override
-    public boolean writeFileContent(
+    public FSFile writeFileContent(
         @NotNull WebSession webSession,
         @NotNull String projectId,
         @NotNull URI fileURI,
@@ -97,12 +130,13 @@ public class WebServiceFS implements DBWServiceFS {
     )
         throws DBWebException {
         try {
-            Path filePath = webSession.getFileSystemManager(projectId).getPathFromURI(webSession.getProgressMonitor(), fileURI);
+            Path filePath = webSession.getFileSystemManager(projectId)
+                .getPathFromURI(webSession.getProgressMonitor(), fileURI);
             if (!forceOverwrite && Files.exists(filePath)) {
                 throw new DBException("Cannot overwrite exist file");
             }
             Files.writeString(filePath, data);
-            return true;
+            return new FSFile(filePath);
         } catch (Exception e) {
             throw new DBWebException("Failed to write file content: " + e.getMessage(), e);
         }

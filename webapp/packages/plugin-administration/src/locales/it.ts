@@ -7,7 +7,7 @@ export default [
   ['administration_configuration_wizard_welcome_title', 'Benvenuto a CloudBeaver, il sistema di gestione database in cloud!'],
   [
     'administration_configuration_wizard_welcome_message',
-    'Il semplice wizard di configurazione ti guiderà per diversi semplici passi per configurare il tuo server CloudBeaver. Dovrai impostare informazioni sul server e le credenziali amministrative. Potrai inoltre aggiungere la tua prima connessione al database.',
+    'Il semplice wizard di configurazione ti guiderà per diversi semplici passi per configurare il tuo server. Dovrai impostare informazioni sul server e le credenziali amministrative. Potrai inoltre aggiungere la tua prima connessione al database.',
   ],
   [
     'administration_configuration_wizard_welcome_note',
@@ -75,7 +75,7 @@ export default [
   ['administration_configuration_wizard_finish_title', 'Ci siamo quasi.'],
   [
     'administration_configuration_wizard_finish_message',
-    'Premi il pulsante Conferma per completare la configurazione del server. Puoi tornare alle pagine precedenti se vuoi modificare o aggiungere qualcosa.\nQuando la configurazione è completa le impostazioni saranno applicate al tuo server CloudBeaver. Sarai portarto alla pagina principale.\nTi ricordiamo che puoi sempre fare login come amministratore e modificare i settaggi del server.',
+    'Premi il pulsante Conferma per completare la configurazione del server. Puoi tornare alle pagine precedenti se vuoi modificare o aggiungere qualcosa.\nQuando la configurazione è completa le impostazioni saranno applicate al tuo server. Sarai portarto alla pagina principale.\nTi ricordiamo che puoi sempre fare login come amministratore e modificare i settaggi del server.',
   ],
 
   ['administration_disabled_drivers_title', 'Disabled drivers'],

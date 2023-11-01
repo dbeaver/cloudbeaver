@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
-import { ActionService, KeyBindingService, MenuCheckboxItem, MenuService } from '@cloudbeaver/core-view';
+import { ActionService, DATA_CONTEXT_MENU, KeyBindingService, MenuCheckboxItem, MenuService } from '@cloudbeaver/core-view';
 
 import { ACTION_SQL_EDITOR_SHOW_OUTPUT } from '../../actions/ACTION_SQL_EDITOR_SHOW_OUTPUT';
 import { KEY_BINDING_SQL_EDITOR_SHOW_OUTPUT } from '../../actions/bindings/KEY_BINDING_SQL_EDITOR_SHOW_OUTPUT';
@@ -17,6 +17,8 @@ import { SQL_EDITOR_ACTIONS_MENU } from '../../SqlEditor/SQL_EDITOR_ACTIONS_MENU
 import { ACTION_SHOW_OUTPUT_LOGS } from './ACTION_SHOW_OUTPUT_LOGS';
 import { OUTPUT_LOG_TYPES } from './IOutputLogTypes';
 import { OUTPUT_LOGS_FILTER_MENU } from './OUTPUT_LOGS_FILTER_MENU';
+import { OUTPUT_LOGS_MENU } from './OUTPUT_LOGS_MENU';
+import { OUTPUT_LOGS_SETTINGS_MENU } from './OUTPUT_LOGS_SETTINGS_MENU';
 import { OutputLogsService } from './OutputLogsService';
 
 @injectable()
@@ -33,8 +35,15 @@ export class OutputMenuBootstrap extends Bootstrap {
 
   register(): void | Promise<void> {
     this.menuService.addCreator({
+      isApplicable: context => context.get(DATA_CONTEXT_MENU) === OUTPUT_LOGS_MENU,
+      getItems(context, items) {
+        return [...items, OUTPUT_LOGS_FILTER_MENU, OUTPUT_LOGS_SETTINGS_MENU];
+      },
+    });
+
+    this.menuService.addCreator({
       menus: [OUTPUT_LOGS_FILTER_MENU],
-      getItems: context => {
+      getItems: (context, items) => {
         const state = context.tryGet(DATA_CONTEXT_SQL_EDITOR_STATE);
 
         if (!state) {
@@ -42,10 +51,10 @@ export class OutputMenuBootstrap extends Bootstrap {
         }
 
         const outputLogsTabState = state?.outputLogsTab;
-        const items = [];
+        const result = [];
 
         for (const logType of OUTPUT_LOG_TYPES) {
-          items.push(
+          result.push(
             new MenuCheckboxItem(
               {
                 id: logType,
@@ -70,7 +79,36 @@ export class OutputMenuBootstrap extends Bootstrap {
           );
         }
 
-        return items;
+        return [...items, ...result];
+      },
+    });
+
+    this.menuService.addCreator({
+      menus: [OUTPUT_LOGS_SETTINGS_MENU],
+      getItems: (context, items) => {
+        const state = context.tryGet(DATA_CONTEXT_SQL_EDITOR_STATE);
+
+        if (!state) {
+          return [];
+        }
+
+        const wrapMode = new MenuCheckboxItem(
+          {
+            id: 'wrap-mode',
+            label: 'sql_editor_output_logs_wrap_mode',
+            tooltip: 'sql_editor_output_logs_wrap_mode',
+          },
+          {
+            onSelect: () => {
+              this.outputLogsService.toggleWrapMode();
+            },
+          },
+          {
+            isChecked: () => this.outputLogsService.settings.wrapMode,
+          },
+        );
+
+        return [...items, wrapMode];
       },
     });
 

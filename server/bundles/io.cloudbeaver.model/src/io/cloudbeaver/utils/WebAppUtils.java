@@ -16,9 +16,12 @@
  */
 package io.cloudbeaver.utils;
 
+import io.cloudbeaver.DBWebException;
+import io.cloudbeaver.WebProjectImpl;
 import io.cloudbeaver.auth.NoAuthCredentialsProvider;
 import io.cloudbeaver.model.app.WebApplication;
 import io.cloudbeaver.model.app.WebAuthApplication;
+import io.cloudbeaver.model.session.WebSession;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
@@ -207,6 +210,14 @@ public class WebAppUtils {
     public static String getGlobalProjectId() {
         String globalConfigurationName = getWebApplication().getDefaultProjectName();
         return RMProjectType.GLOBAL.getPrefix() + "_" + globalConfigurationName;
+    }
+
+    public static WebProjectImpl getProjectById(WebSession webSession, String projectId) throws DBWebException {
+        WebProjectImpl project = webSession.getProjectById(projectId);
+        if (project == null) {
+            throw new DBWebException("Project '" + projectId + "' not found");
+        }
+        return project;
     }
 
 }
