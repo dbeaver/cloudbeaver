@@ -33,7 +33,9 @@ import org.eclipse.jetty.servlet.ErrorPageErrorHandler;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 import org.eclipse.jetty.servlet.ServletMapping;
+import org.eclipse.jetty.util.resource.PathResource;
 import org.eclipse.jetty.websocket.server.config.JettyWebSocketServletContainerInitializer;
+import org.eclipse.jetty.xml.XmlConfiguration;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
@@ -71,11 +73,25 @@ public class CBJettyServer {
             JettyServer server;
             int serverPort = application.getServerPort();
             String serverHost = application.getServerHost();
-            if (CommonUtils.isEmpty(serverHost)) {
-                server = new JettyServer(serverPort);
+            Path sslPath = application.getSslConfigurationPath();
+
+            boolean sslConfigurationExists = sslPath != null && Files.exists(sslPath);
+            if (sslConfigurationExists) {
+                server = new JettyServer();
+                XmlConfiguration sslConfiguration = new XmlConfiguration(new PathResource(sslPath));
+                ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+                // method sslConfiguration.configure() does not see the context class of the Loader,
+                // so we have to configure it manually, then return the old classLoader.
+                Thread.currentThread().setContextClassLoader(this.getClass().getClassLoader());
+                sslConfiguration.configure(server);
+                Thread.currentThread().setContextClassLoader(classLoader);
             } else {
-                server = new JettyServer(
-                    InetSocketAddress.createUnresolved(serverHost, serverPort));
+                if (CommonUtils.isEmpty(serverHost)) {
+                    server = new JettyServer(serverPort);
+                } else {
+                    server = new JettyServer(
+                        InetSocketAddress.createUnresolved(serverHost, serverPort));
+                }
             }
 
             {
@@ -112,8 +128,6 @@ public class CBJettyServer {
 
                 server.setHandler(servletContextHandler);
 
-                var serverConnector = new ServerConnector(server);
-                server.addConnector(serverConnector);
                 JettyWebSocketServletContainerInitializer.configure(servletContextHandler,
                     (context, wsContainer) -> {
                         wsContainer.setIdleTimeout(Duration.ofMinutes(5));
@@ -205,11 +219,14 @@ public class CBJettyServer {
         servletContextHandler.setSessionHandler(sessionHandler);
     }
 
-    private static class JettyServer extends Server {
+    public static class JettyServer extends Server {
         public JettyServer(int serverPort) {
             super(serverPort);
         }
 
+        public JettyServer() {
+            super();
+        }
         public JettyServer(InetSocketAddress addr) {
             super(addr);
         }
