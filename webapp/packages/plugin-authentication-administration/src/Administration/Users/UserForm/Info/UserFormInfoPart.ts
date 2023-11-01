@@ -68,7 +68,8 @@ export class UserFormInfoPart extends FormPart<IUserFormInfoState, IUserFormStat
       !isValuesEqual(this.state.enabled, this.initialState.enabled, null) ||
       !isValuesEqual(this.state.password, this.initialState.password, null) ||
       !isObjectsEqual(this.state.metaParameters, this.initialState.metaParameters) ||
-      !isArraysEqual(this.state.teams, this.initialState.teams)
+      !isArraysEqual(this.state.teams, this.initialState.teams) ||
+      !isValuesEqual(this.state.authRole, this.initialState.authRole, '')
     );
   }
 
@@ -204,12 +205,12 @@ export class UserFormInfoPart extends FormPart<IUserFormInfoState, IUserFormStat
 
     this.setInitialState({
       userId: user?.userId || this.formState.state.userId || '',
-      enabled: user?.enabled || DEFAULT_ENABLED,
+      enabled: user?.enabled ?? DEFAULT_ENABLED,
       metaParameters: observable(user?.metaParameters || {}),
       teams: observable(user?.grantedTeams || [serverConfig?.defaultUserTeam].filter(isDefined)),
       password: '',
 
-      authRole: user?.authRole || serverConfig?.defaultAuthRole || '',
+      authRole: user?.authRole ?? serverConfig?.defaultAuthRole ?? '',
     });
   }
 }
