@@ -108,6 +108,7 @@ public abstract class CBApplication extends BaseWebApplication implements WebAut
     protected int serverPort = CBConstants.DEFAULT_SERVER_PORT;
     private String serverHost = null;
     private String serverName = null;
+    private String sslConfigurationPath = null;
     private String contentRoot = CBConstants.DEFAULT_CONTENT_ROOT;
     private String rootURI = CBConstants.DEFAULT_ROOT_URI;
     private String servicesURI = CBConstants.DEFAULT_SERVICES_URI;
@@ -554,6 +555,7 @@ public abstract class CBApplication extends BaseWebApplication implements WebAut
             }
 
             serverName = JSONUtils.getString(serverConfig, CBConstants.PARAM_SERVER_NAME, serverName);
+            sslConfigurationPath = JSONUtils.getString(serverConfig, CBConstants.PARAM_SSL_CONFIGURATION_PATH, sslConfigurationPath);
             contentRoot = WebAppUtils.getRelativePath(
                 JSONUtils.getString(serverConfig, CBConstants.PARAM_CONTENT_ROOT, contentRoot), homeFolder);
             rootURI = readRootUri(serverConfig);
@@ -1222,5 +1224,14 @@ public abstract class CBApplication extends BaseWebApplication implements WebAut
             containerId = System.getenv("HOSTNAME");
         }
         return containerId;
+    }
+
+    @Nullable
+    public Path getSslConfigurationPath() {
+        if (sslConfigurationPath == null) {
+            return null;
+        }
+        var sslConfiguration = Path.of(sslConfigurationPath);
+        return sslConfiguration.isAbsolute() ? sslConfiguration : getHomeDirectory().resolve(sslConfiguration);
     }
 }
