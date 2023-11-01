@@ -5,7 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { UsersResource } from '@cloudbeaver/core-authentication';
+import { AuthRolesResource, UsersResource } from '@cloudbeaver/core-authentication';
 import { createDataContext, DATA_CONTEXT_DI_PROVIDER } from '@cloudbeaver/core-data-context';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
 import { DATA_CONTEXT_FORM_STATE } from '@cloudbeaver/core-ui';
@@ -18,6 +18,7 @@ export const DATA_CONTEXT_USER_FORM_INFO_PART = createDataContext<UserFormInfoPa
   const di = context.get(DATA_CONTEXT_DI_PROVIDER);
   const usersResource = di.getServiceByClass(UsersResource);
   const serverConfigResource = di.getServiceByClass(ServerConfigResource);
+  const authRolesResource = di.getServiceByClass(AuthRolesResource);
 
-  return new UserFormInfoPart(serverConfigResource, form, usersResource);
+  return new UserFormInfoPart(authRolesResource, serverConfigResource, form, usersResource);
 });

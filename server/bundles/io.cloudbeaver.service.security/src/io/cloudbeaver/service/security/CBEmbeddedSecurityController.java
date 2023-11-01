@@ -1034,6 +1034,10 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
 
     @Override
     public void deleteTeam(String teamId, boolean force) throws DBCException {
+        String defaultUsersTeam = application.getAppConfiguration().getDefaultUserTeam();
+        if (CommonUtils.isNotEmpty(defaultUsersTeam) && defaultUsersTeam.equals(teamId)) {
+            throw new DBCException("Default users team cannot be deleted");
+        }
         try (Connection dbCon = database.openConnection()) {
             if (!force) {
                 try (PreparedStatement dbStat = dbCon.prepareStatement(

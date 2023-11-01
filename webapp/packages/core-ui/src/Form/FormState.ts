@@ -10,7 +10,7 @@ import { action, makeObservable, observable } from 'mobx';
 import { dataContextAddDIProvider, type IDataContext, TempDataContext } from '@cloudbeaver/core-data-context';
 import type { App } from '@cloudbeaver/core-di';
 import type { ENotificationType } from '@cloudbeaver/core-events';
-import { Executor, IExecutionContextProvider, type IExecutor } from '@cloudbeaver/core-executor';
+import { Executor, ExecutorInterrupter, IExecutionContextProvider, type IExecutor } from '@cloudbeaver/core-executor';
 import { isLoadableStateHasException, MetadataMap, uuid } from '@cloudbeaver/core-utils';
 import { DATA_CONTEXT_LOADABLE_STATE, loadableStateContext } from '@cloudbeaver/core-view';
 
@@ -193,7 +193,11 @@ export class FormState<TState> implements IFormState<TState> {
   async save(): Promise<boolean> {
     try {
       this.isDisabled = true;
-      await this.submitTask.execute(this);
+      const context = await this.submitTask.execute(this);
+
+      if (ExecutorInterrupter.isInterrupted(context)) {
+        return false;
+      }
 
       this.exception = null;
       return true;

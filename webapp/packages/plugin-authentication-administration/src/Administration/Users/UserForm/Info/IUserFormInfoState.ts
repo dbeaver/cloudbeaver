@@ -12,4 +12,6 @@ export interface IUserFormInfoState {
   password: string;
   metaParameters: Record<string, any>;
   teams: string[];
+
+  authRole: string; // used in TE product
 }
