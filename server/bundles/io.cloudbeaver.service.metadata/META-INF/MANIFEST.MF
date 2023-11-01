@@ -3,8 +3,8 @@ Bundle-ManifestVersion: 2
 Bundle-Vendor: DBeaver Corp
 Bundle-Name: Cloudbeaver Web Service - Metadata
 Bundle-SymbolicName: io.cloudbeaver.service.metadata;singleton:=true
-Bundle-Version: 1.0.87.qualifier
-Bundle-Release-Date: 20231023
+Bundle-Version: 1.0.88.qualifier
+Bundle-Release-Date: 20231106
 Bundle-RequiredExecutionEnvironment: JavaSE-17
 Bundle-ActivationPolicy: lazy
 Bundle-ClassPath: .
