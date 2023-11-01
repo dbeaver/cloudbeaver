@@ -113,7 +113,7 @@ export class UserFormInfoPart extends FormPart<IUserFormInfoState, IUserFormStat
 
     if (this.authRolesResource.data.length > 0) {
       const authRole = getTransformedAuthRole(this.state.authRole);
-      if (!authRole || this.authRolesResource.data.includes(authRole)) {
+      if (!authRole || !this.authRolesResource.data.includes(authRole)) {
         validation.error('authentication_user_role_not_set');
       }
     }
