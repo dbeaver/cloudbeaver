@@ -18,8 +18,14 @@ package io.cloudbeaver.model;
 
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.model.net.DBWHandlerConfiguration;
+import org.jkiss.dbeaver.model.net.DBWHandlerDescriptor;
 import org.jkiss.dbeaver.model.net.DBWHandlerType;
 import org.jkiss.dbeaver.model.net.ssh.SSHConstants;
+import org.jkiss.dbeaver.model.preferences.DBPPropertyDescriptor;
+import org.jkiss.dbeaver.model.preferences.DBPPropertySource;
+import org.jkiss.dbeaver.model.runtime.VoidProgressMonitor;
+import org.jkiss.dbeaver.registry.RegistryConstants;
+import org.jkiss.dbeaver.runtime.properties.PropertySourceMap;
 import org.jkiss.utils.CommonUtils;
 
 import java.util.LinkedHashMap;
@@ -83,8 +89,11 @@ public class WebNetworkHandlerConfig {
     @NotNull
     public Map<String, String> getSecureProperties() {
         Map<String, String> secureProperties = new LinkedHashMap<>(configuration.getSecureProperties());
-        for (Map.Entry<String, String> property : secureProperties.entrySet()) {
-            property.setValue(CommonUtils.isEmpty(property.getValue()) ? null : WebConnectionInfo.SECURED_VALUE);
+        DBPPropertyDescriptor[] descriptor = configuration.getHandlerDescriptor().getHandlerProperties();
+        for (DBPPropertyDescriptor p : descriptor) {
+            if (p.hasFeature(RegistryConstants.ATTR_PASSWORD)) {
+                secureProperties.computeIfPresent(p.getId(), (k, v) -> CommonUtils.isEmpty(v) ? null : WebConnectionInfo.SECURED_VALUE);
+            }
         }
         return secureProperties;
     }
