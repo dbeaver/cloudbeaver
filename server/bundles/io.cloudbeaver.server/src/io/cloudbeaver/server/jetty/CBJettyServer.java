@@ -73,15 +73,11 @@ public class CBJettyServer {
             JettyServer server;
             int serverPort = application.getServerPort();
             String serverHost = application.getServerHost();
-            if (CommonUtils.isEmpty(serverHost)) {
-                server = new JettyServer(serverPort);
-            } else {
-                server = new JettyServer(
-                    InetSocketAddress.createUnresolved(serverHost, serverPort));
-            }
-
             Path sslPath = application.getSslConfigurationPath();
-            if (sslPath != null && Files.exists(sslPath)) {
+
+            boolean sslConfigurationExists = sslPath != null && Files.exists(sslPath);
+            if (sslConfigurationExists) {
+                server = new JettyServer();
                 XmlConfiguration sslConfiguration = new XmlConfiguration(new PathResource(sslPath));
                 ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
                 // method sslConfiguration.configure() does not see the context class of the Loader,
@@ -89,6 +85,13 @@ public class CBJettyServer {
                 Thread.currentThread().setContextClassLoader(this.getClass().getClassLoader());
                 sslConfiguration.configure(server);
                 Thread.currentThread().setContextClassLoader(classLoader);
+            } else {
+                if (CommonUtils.isEmpty(serverHost)) {
+                    server = new JettyServer(serverPort);
+                } else {
+                    server = new JettyServer(
+                        InetSocketAddress.createUnresolved(serverHost, serverPort));
+                }
             }
 
             {
@@ -125,8 +128,6 @@ public class CBJettyServer {
 
                 server.setHandler(servletContextHandler);
 
-                var serverConnector = new ServerConnector(server);
-                server.addConnector(serverConnector);
                 JettyWebSocketServletContainerInitializer.configure(servletContextHandler,
                     (context, wsContainer) -> {
                         wsContainer.setIdleTimeout(Duration.ofMinutes(5));
@@ -223,6 +224,9 @@ public class CBJettyServer {
             super(serverPort);
         }
 
+        public JettyServer() {
+            super();
+        }
         public JettyServer(InetSocketAddress addr) {
             super(addr);
         }
