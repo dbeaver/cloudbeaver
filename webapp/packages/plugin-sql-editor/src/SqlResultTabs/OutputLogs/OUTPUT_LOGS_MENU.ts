@@ -5,13 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
+import { createMenu } from '@cloudbeaver/core-view';
 
-export interface IUserFormInfoState {
-  userId: string;
-  enabled: boolean;
-  password: string;
-  metaParameters: Record<string, any>;
-  teams: string[];
-
-  authRole: string; // used in TE product
-}
+export const OUTPUT_LOGS_MENU = createMenu('output_logs_menu', 'Output Logs');

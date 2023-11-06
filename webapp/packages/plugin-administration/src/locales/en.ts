@@ -7,7 +7,7 @@ export default [
   ['administration_configuration_wizard_welcome_title', 'Welcome to {alias:product_full_name}, cloud database management system!'],
   [
     'administration_configuration_wizard_welcome_message',
-    'The easy configuration wizard will guide you through several simple steps to set up the CloudBeaver server. You will need to set server information and administrator credentials. You can set up additional server parameters once the easy configuration is completed.',
+    'The easy configuration wizard will guide you through several simple steps to set up the server. You will need to set server information and administrator credentials. You can set up additional server parameters once the easy configuration is completed.',
   ],
   [
     'administration_configuration_wizard_welcome_note',
@@ -70,7 +70,7 @@ export default [
   ['administration_configuration_wizard_finish_title', 'That is almost it.'],
   [
     'administration_configuration_wizard_finish_message',
-    'Press the Finish button to complete the server configuration. You can return to the previous pages if you want to change or add something.\nWhen the configuration is completed all entered settings will be applied for your CloudBeaver server. You will be redirected to the main page to start working.\nYou can always login to the system as administrator to change the server settings.',
+    'Press the Finish button to complete the server configuration. You can return to the previous pages if you want to change or add something.\nWhen the configuration is completed all entered settings will be applied for your server. You will be redirected to the main page to start working.\nYou can always login to the system as administrator to change the server settings.',
   ],
 
   ['administration_disabled_drivers_title', 'Disabled drivers'],

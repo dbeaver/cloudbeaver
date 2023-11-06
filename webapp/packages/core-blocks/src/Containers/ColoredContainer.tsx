@@ -15,13 +15,14 @@ import { filterContainerFakeProps, getContainerProps } from './filterContainerFa
 import type { IContainerProps } from './IContainerProps';
 import elementsSizeStyles from './shared/ElementsSize.m.css';
 
-export const ColoredContainer = forwardRef<HTMLDivElement, IContainerProps & React.HTMLAttributes<HTMLDivElement>>(function ColoredContainer(
-  { className, ...rest },
-  ref,
-) {
+interface Props extends IContainerProps, React.HTMLAttributes<HTMLDivElement> {
+  surface?: boolean;
+}
+
+export const ColoredContainer = forwardRef<HTMLDivElement, Props>(function ColoredContainer({ className, surface, ...rest }, ref) {
   const styles = useS(coloredContainerStyles, containerStyles, elementsSizeStyles);
   const divProps = filterContainerFakeProps(rest);
   const containerProps = getContainerProps(rest);
 
-  return <div ref={ref} {...divProps} className={s(styles, { coloredContainer: true, container: true, ...containerProps }, className)} />;
+  return <div ref={ref} {...divProps} className={s(styles, { surface, secondary: !surface, container: true, ...containerProps }, className)} />;
 });

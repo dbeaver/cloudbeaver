@@ -5,13 +5,9 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
+import { createAction } from '../createAction';
 
-export interface IUserFormInfoState {
-  userId: string;
-  enabled: boolean;
-  password: string;
-  metaParameters: Record<string, any>;
-  teams: string[];
-
-  authRole: string; // used in TE product
-}
+export const ACTION_DOWNLOAD = createAction('download', {
+  label: 'ui_download',
+  icon: '/icons/export.svg',
+});

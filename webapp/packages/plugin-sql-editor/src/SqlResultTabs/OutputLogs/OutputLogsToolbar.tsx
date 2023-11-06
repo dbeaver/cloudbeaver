@@ -11,8 +11,8 @@ import React from 'react';
 import { Container, Icon, InputField, s, useS, useTranslate } from '@cloudbeaver/core-blocks';
 
 import type { ISqlEditorTabState } from '../../ISqlEditorTabState';
+import { OutputLogsMenu } from './OutputLogsMenu';
 import style from './OutputLogsToolbar.m.css';
-import { OutputLogsFilterMenu } from './OutputLogTypesFilterMenu';
 import type { SqlOutputLogsPanelState } from './useOutputLogsPanelState';
 
 interface Props {
@@ -20,7 +20,7 @@ interface Props {
   sqlEditorTabState: ISqlEditorTabState;
 }
 
-export const OutputLogsToolbar = observer<Props>(function SqlOutputLogsToolbar({ state, sqlEditorTabState }) {
+export const OutputLogsToolbar = observer<Props>(function OutputLogsToolbar({ state, sqlEditorTabState }) {
   const styles = useS(style);
   const translate = useTranslate();
 
@@ -38,7 +38,7 @@ export const OutputLogsToolbar = observer<Props>(function SqlOutputLogsToolbar({
         onChange={value => state.setSearchValue(value.toString())}
       />
       <Container keepSize>
-        <OutputLogsFilterMenu sqlEditorTabState={sqlEditorTabState} />
+        <OutputLogsMenu sqlEditorTabState={sqlEditorTabState} />
       </Container>
     </Container>
   );

@@ -35,29 +35,23 @@ export const MenuBarItem = observer<Props, HTMLButtonElement>(
     const title = translate(rest.title);
     return (
       <button ref={ref} className={s(styles, { menuBarItem: true, hidden }, className)} {...rest} title={title} aria-label={title}>
-        <div className={s(styles, { menuBarItemBox: true }, className)}>
+        <div className={s(styles, { menuBarItemBox: true })}>
           {loading ? (
-            <div className={s(styles, { menuBarItemIcon: true }, className)}>
-              <Loader className={s(styles, { loader: true }, className)} small fullSize />
+            <div className={s(styles, { menuBarItemIcon: true })}>
+              <Loader className={s(styles, { loader: true })} small fullSize />
             </div>
           ) : (
             icon && (
-              <div className={s(styles, { menuBarItemIcon: true }, className)}>
-                <Loader className={s(styles, { loader: true }, className)} suspense small fullSize>
-                  {typeof icon === 'string' ? (
-                    <IconOrImage className={s(styles, { iconOrImage: true }, className)} icon={icon} viewBox={viewBox} />
-                  ) : (
-                    icon
-                  )}
+              <div className={s(styles, { menuBarItemIcon: true })}>
+                <Loader className={s(styles, { loader: true })} suspense small fullSize>
+                  {typeof icon === 'string' ? <IconOrImage className={s(styles, { iconOrImage: true })} icon={icon} viewBox={viewBox} /> : icon}
                 </Loader>
               </div>
             )
           )}
-          {label && displayLabel && (
-            <div className={s(styles, { menuBarItemLabel: true }, className)}>{translate(label)}</div>
-          )}
+          {label && displayLabel && <div className={s(styles, { menuBarItemLabel: true })}>{translate(label)}</div>}
           {displaySubmenuMark && (
-            <div className={s(styles, { menuBarItemMark: true }, className)}>
+            <div className={s(styles, { menuBarItemMark: true })}>
               <Icon className={s(styles, { icon: true }, className)} name="angle" viewBox="0 0 15 8" />
             </div>
           )}
