@@ -26,6 +26,7 @@ export abstract class DatabaseDataSource<TOptions, TResult extends IDatabaseData
   results: TResult[];
   offset: number;
   count: number;
+  totalRowsCount: number | null;
   prevOptions: Readonly<TOptions> | null;
   options: TOptions | null;
   requestInfo: IRequestInfo;
@@ -50,6 +51,7 @@ export abstract class DatabaseDataSource<TOptions, TResult extends IDatabaseData
     this.results = [];
     this.offset = 0;
     this.count = 0;
+    this.totalRowsCount = null;
     this.prevOptions = null;
     this.options = null;
     this.disabled = false;
@@ -78,6 +80,7 @@ export abstract class DatabaseDataSource<TOptions, TResult extends IDatabaseData
       results: observable,
       offset: observable,
       count: observable,
+      totalRowsCount: observable.ref,
       prevOptions: observable,
       options: observable,
       requestInfo: observable,
@@ -234,6 +237,11 @@ export abstract class DatabaseDataSource<TOptions, TResult extends IDatabaseData
 
   setExecutionContext(context: IConnectionExecutionContext | null): this {
     this.executionContext = context;
+    return this;
+  }
+
+  setTotalRowsCount(count: number): this {
+    this.totalRowsCount = count;
     return this;
   }
 
