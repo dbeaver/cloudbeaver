@@ -22,6 +22,14 @@ You can see live demo of CloudBeaver here: https://demo.cloudbeaver.io
 
 ## Changelog
 
+### CloudBeaver 23.2.4 - 2023-11-06
+
+- Unauthorized access vulnerability was fixed;
+- Updated the version of the Clickhouse driver to 0.4.6;
+- Support for using custom delimiters has been added in MySQL;
+- Different bug fixes and enhancements have been made.
+
+
 ### CloudBeaver 23.2.3 - 2023-10-23
 
 - The SSL option is available for establishing a connection in SQL Server;
