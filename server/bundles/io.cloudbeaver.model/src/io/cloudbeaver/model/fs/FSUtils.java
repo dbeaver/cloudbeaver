@@ -22,6 +22,6 @@ import org.jkiss.dbeaver.model.fs.DBFVirtualFileSystem;
 public class FSUtils {
     @NotNull
     public static String makeUniqueFsId(@NotNull DBFVirtualFileSystem fileSystem) {
-        return fileSystem.getType() + ":" + fileSystem.getId();
+        return fileSystem.getType() + "://" + fileSystem.getId();
     }
 }
