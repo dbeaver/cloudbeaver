@@ -21,8 +21,8 @@ import org.jkiss.dbeaver.model.security.user.SMTeam;
 import java.util.List;
 
 class CBDatabaseInitialData {
-    private String adminName = "cbadmin";
-    private String adminPassword = "cbadmin20";
+    private String adminName;
+    private String adminPassword;
     private List<SMTeam> teams;
 
     public String getAdminName() {

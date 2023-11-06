@@ -254,13 +254,6 @@ public class CBDatabase {
         }
 
         log.info("Configure CB database security");
-        CBDatabaseInitialData initialData = getInitialData();
-        if (initialData != null && !CommonUtils.isEmpty(initialData.getAdminName())
-            && !CommonUtils.equalObjects(initialData.getAdminName(), adminName)
-        ) {
-            // Delete old admin user
-            adminSecurityController.deleteUser(initialData.getAdminName());
-        }
         // Create new admin user
         createAdminUser(adminName, adminPassword);
 
