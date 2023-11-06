@@ -98,6 +98,14 @@ public class WebServiceBindingFS extends WebServiceBindingBase<DBWServiceFS> imp
                     URI.create(env.getArgument("toURI"))
                 )
             )
+            .dataFetcher("fsCopy",
+                env -> getService(env).copyFile(
+                    getWebSession(env),
+                    env.getArgument("projectId"),
+                    URI.create(env.getArgument("fromURI")),
+                    URI.create(env.getArgument("toURI"))
+                )
+            )
             .dataFetcher("fsWriteFileStringContent",
                 env -> getService(env).writeFileContent(
                     getWebSession(env),

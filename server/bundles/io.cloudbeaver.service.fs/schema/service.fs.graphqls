@@ -32,6 +32,8 @@ extend type Mutation @since(version: "23.2.2") {
 
     fsMove(projectId: ID!, fromURI: String!, toURI: String!): FSFile!
 
+    fsCopy(projectId: ID!, fromURI: String!, toURI: String!): FSFile! @since(version: "23.2.5")
+
     fsWriteFileStringContent(
         projectId: ID!,
         fileURI:String!,

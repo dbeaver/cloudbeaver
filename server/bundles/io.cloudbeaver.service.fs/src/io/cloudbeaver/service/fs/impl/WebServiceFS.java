@@ -175,6 +175,24 @@ public class WebServiceFS implements DBWServiceFS {
         }
     }
 
+    @Override
+    public FSFile copyFile(
+        @NotNull WebSession webSession,
+        @NotNull String projectId,
+        @NotNull URI fromURI,
+        @NotNull URI toURI
+    ) throws DBWebException {
+        try {
+            Path from = webSession.getFileSystemManager(projectId)
+                .getPathFromURI(webSession.getProgressMonitor(), fromURI);
+            Path to = webSession.getFileSystemManager(projectId).getPathFromURI(webSession.getProgressMonitor(), toURI);
+            Files.copy(from, to);
+            return new FSFile(to);
+        } catch (Exception e) {
+            throw new DBWebException("Failed to copy file: " + e.getMessage(), e);
+        }
+    }
+
     @NotNull
     @Override
     public FSFile createFolder(

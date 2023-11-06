@@ -84,6 +84,13 @@ public interface DBWServiceFS extends DBWService {
         @NotNull URI toURI
     ) throws DBWebException;
 
+    FSFile copyFile(
+        @NotNull WebSession webSession,
+        @NotNull String projectId,
+        @NotNull URI fromURI,
+        @NotNull URI toURI
+    ) throws DBWebException;
+
     @NotNull
     FSFile createFolder(
         @NotNull WebSession webSession,
