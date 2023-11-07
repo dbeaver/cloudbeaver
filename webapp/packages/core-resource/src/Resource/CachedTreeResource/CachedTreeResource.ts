@@ -21,6 +21,7 @@ import { ResourceKeyUtils } from '../ResourceKeyUtils';
 import { CachedTreeMetadata } from './CachedTreeMetadata';
 import { CachedTreeUseTracker } from './CachedTreeUseTracker';
 import { deleteTreeValue } from './deleteTreeValue';
+import { getTreeParents } from './getTreeParents';
 import { getTreeValue } from './getTreeValue';
 import type { ICachedTreeData } from './ICachedTreeData';
 import type { ICachedTreeElement } from './ICachedTreeElement';
@@ -28,6 +29,7 @@ import type { ICachedTreeElement } from './ICachedTreeElement';
 export const CachedTreeRootValueKey = resourceKeyAlias('@cached-tree-resource/root-value');
 export const CachedTreeRootChildrenKey = resourceKeyListAlias('@cached-tree-resource/root-children');
 export const CachedTreeChildrenKey = resourceKeyListAliasFactory('@cached-tree-resource/children', (path: string) => ({ path }));
+export const CachedTreeParentsKey = resourceKeyListAliasFactory('@cached-tree-resource/parents', (path: string) => ({ path }));
 
 /**
  * CachedTreeResource is a resource that stores data that has tree structure.
@@ -76,6 +78,7 @@ export abstract class CachedTreeResource<
     this.aliases.add(CachedTreeRootValueKey, () => '');
     this.aliases.add(CachedTreeRootChildrenKey, () => resourceKeyList(this.dataGetKeyChildren('')));
     this.aliases.add(CachedTreeChildrenKey, key => resourceKeyList(this.dataGetKeyChildren(key.options.path)));
+    this.aliases.add(CachedTreeParentsKey, key => resourceKeyList(this.dataGetKeyParents(key.options.path)));
 
     makeObservable<this, 'dataSet' | 'dataDelete'>(this, {
       set: action,
@@ -118,6 +121,10 @@ export abstract class CachedTreeResource<
   get(key: ResourceKey<string>): Array<TValue | undefined> | TValue | undefined {
     key = this.aliases.transformToKey(key);
     return ResourceKeyUtils.map(key, key => this.dataGetValue(this.getKeyRef(key)));
+  }
+
+  getParentsId(key: string): string[] {
+    return this.dataGetKeyParents(key);
   }
 
   set(key: string | ResourceKeyAlias<string, any>, value: TValue): void;
@@ -241,6 +248,16 @@ export abstract class CachedTreeResource<
   protected dataGetKeyChildren(key: string): string[] {
     return Object.values(getTreeValue(this.data, key)?.children || {})
       .map(info => info?.key)
+      .filter((key): key is string => key !== undefined);
+  }
+
+  /**
+   * Use it to get parent ids
+   * This method can be override
+   */
+  protected dataGetKeyParents(key: string): string[] {
+    return getTreeParents(this.data, key)
+      .map(info => info.key)
       .filter((key): key is string => key !== undefined);
   }
 
