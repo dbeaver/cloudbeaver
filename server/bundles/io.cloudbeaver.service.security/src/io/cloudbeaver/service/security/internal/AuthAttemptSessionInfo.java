@@ -33,17 +33,20 @@ public class AuthAttemptSessionInfo {
     private final SMSessionType sessionType;
     @NotNull
     private final Map<String, Object> sessionParams;
+    private final boolean mainAuth;
 
     public AuthAttemptSessionInfo(
         @NotNull String appSessionId,
         @Nullable String smSessionId,
         @NotNull SMSessionType sessionType,
-        @NotNull Map<String, Object> sessionParams
+        @NotNull Map<String, Object> sessionParams,
+        boolean mainAuth
     ) {
         this.appSessionId = appSessionId;
         this.smSessionId = smSessionId;
         this.sessionType = sessionType;
         this.sessionParams = sessionParams;
+        this.mainAuth = mainAuth;
     }
 
     @NotNull
@@ -64,5 +67,9 @@ public class AuthAttemptSessionInfo {
     @Nullable
     public String getSmSessionId() {
         return smSessionId;
+    }
+
+    public boolean isMainAuth() {
+        return mainAuth;
     }
 }
