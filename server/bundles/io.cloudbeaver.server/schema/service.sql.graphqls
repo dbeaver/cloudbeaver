@@ -363,5 +363,5 @@ extend type Mutation {
         resultsId: ID!
     ): AsyncTaskInfo!
 
-    asyncSqlRowDataCountResult(taskId: ID!): Int
+    asyncSqlRowDataCountResult(taskId: ID!): Int!
 }
