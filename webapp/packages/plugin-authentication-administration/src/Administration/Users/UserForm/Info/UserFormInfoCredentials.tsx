@@ -7,8 +7,9 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import { isLocalUser, UsersResource } from '@cloudbeaver/core-authentication';
+import { AUTH_PROVIDER_LOCAL_ID, AuthProvidersResource, isLocalUser, UsersResource } from '@cloudbeaver/core-authentication';
 import { Container, GroupTitle, InputField, useCustomInputValidation, useResource, useTranslate } from '@cloudbeaver/core-blocks';
+import { ServerConfigResource } from '@cloudbeaver/core-root';
 import { FormMode } from '@cloudbeaver/core-ui';
 import { isValuesEqual } from '@cloudbeaver/core-utils';
 
@@ -32,7 +33,13 @@ export const UserFormInfoCredentials = observer<Props>(function UserFormInfoCred
     { key: tabState.initialState.userId, includes: ['includeMetaParameters'] },
     { active: tabSelected && editing },
   );
-  const local = !editing || (userInfo.data && isLocalUser(userInfo.data));
+  const serverConfigResource = useResource(UserFormInfoCredentials, ServerConfigResource, null);
+
+  let local = serverConfigResource.resource.enabledAuthProviders.includes(AUTH_PROVIDER_LOCAL_ID);
+
+  if (!local) {
+    local = !editing || (!!userInfo.data && isLocalUser(userInfo.data));
+  }
 
   const passwordRepeatRef = useCustomInputValidation<string>(value => {
     if (!isValuesEqual(value, tabState.state.password, null)) {
