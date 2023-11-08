@@ -27,8 +27,6 @@ import io.cloudbeaver.service.fs.model.WebFSServlet;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.utils.CommonUtils;
 
-import java.net.URI;
-
 /**
  * Web service implementation
  */
@@ -54,55 +52,56 @@ public class WebServiceBindingFS extends WebServiceBindingBase<DBWServiceFS> imp
             )
             .dataFetcher("fsFile",
                 env -> getService(env).getFile(getWebSession(env),
-                    env.getArgument("projectId"),
-                    URI.create(env.getArgument("fileURI"))
+                    env.getArgument("nodePath")
                 )
             )
             .dataFetcher("fsListFiles",
                 env -> getService(env).getFiles(getWebSession(env),
-                    env.getArgument("projectId"),
-                    URI.create(env.getArgument("folderURI"))
+                    env.getArgument("nodePath")
                 )
             )
             .dataFetcher("fsReadFileContentAsString",
                 env -> getService(env).readFileContent(getWebSession(env),
-                    env.getArgument("projectId"),
-                    URI.create(env.getArgument("fileURI"))
+                    env.getArgument("nodePath")
                 )
             )
         ;
         model.getMutationType()
             .dataFetcher("fsCreateFile",
                 env -> getService(env).createFile(getWebSession(env),
-                    env.getArgument("projectId"),
-                    URI.create(env.getArgument("fileURI"))
+                    env.getArgument("parentPath"),
+                    env.getArgument("fileName")
                 )
             )
             .dataFetcher("fsCreateFolder",
                 env -> getService(env).createFolder(getWebSession(env),
-                    env.getArgument("projectId"),
-                    URI.create(env.getArgument("folderURI"))
+                    env.getArgument("parentPath"),
+                    env.getArgument("folderName")
                     )
             )
             .dataFetcher("fsDelete",
                 env -> getService(env).deleteFile(getWebSession(env),
-                    env.getArgument("projectId"),
-                    URI.create(env.getArgument("fileURI"))
+                    env.getArgument("nodePath")
                 )
             )
             .dataFetcher("fsMove",
                 env -> getService(env).moveFile(
                     getWebSession(env),
-                    env.getArgument("projectId"),
-                    URI.create(env.getArgument("fromURI")),
-                    URI.create(env.getArgument("toURI"))
+                    env.getArgument("nodePath"),
+                    env.getArgument("toParentNodePath")
+                )
+            )
+            .dataFetcher("fsRename",
+                env -> getService(env).renameFile(
+                    getWebSession(env),
+                    env.getArgument("nodePath"),
+                    env.getArgument("newName")
                 )
             )
             .dataFetcher("fsWriteFileStringContent",
                 env -> getService(env).writeFileContent(
                     getWebSession(env),
-                    env.getArgument("projectId"),
-                    URI.create(env.getArgument("fileURI")),
+                    env.getArgument("nodePath"),
                     env.getArgument("data"),
                     CommonUtils.toBoolean(env.getArgument("forceOverwrite"))
                 )

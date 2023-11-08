@@ -17,6 +17,7 @@
 package io.cloudbeaver.service.fs.model;
 
 import org.jkiss.dbeaver.model.meta.Property;
+import org.jkiss.dbeaver.model.navigator.fs.DBNPathBase;
 import org.jkiss.utils.ArrayUtils;
 
 import java.io.IOException;
@@ -26,9 +27,11 @@ import java.util.Map;
 
 public class FSFile {
     private final Path path;
+    private final String nodePath;
 
-    public FSFile(Path path) {
-        this.path = path;
+    public FSFile(DBNPathBase node) {
+        this.path = node.getPath();
+        this.nodePath = node.getNodeItemPath();
     }
 
     @Property
@@ -53,5 +56,10 @@ public class FSFile {
     @Property
     public Map<String, String> getMetaData() {
         return Map.of();
+    }
+
+    @Property
+    public String getNodePath() {
+        return nodePath;
     }
 }
