@@ -6,7 +6,6 @@
  * you may not use this file except in compliance with the License.
  */
 import type { IServiceInjector } from '@cloudbeaver/core-di';
-import { AutoRunningTask } from '@cloudbeaver/core-executor';
 import type { AsyncTaskInfoService, GraphQLService } from '@cloudbeaver/core-sdk';
 
 import { DatabaseDataSource } from './DatabaseDataModel/DatabaseDataSource';
@@ -22,9 +21,10 @@ export abstract class ResultSetDataSource<TOptions> extends DatabaseDataSource<T
   }
 
   async loadTotalCount(resultIndex: number) {
-    const context = this.executionContext?.context;
+    const executionContext = this.executionContext;
+    const executionContextInfo = this.executionContext?.context;
 
-    if (!context) {
+    if (!executionContext || !executionContextInfo) {
       throw new Error('Context must be provided');
     }
 
@@ -37,33 +37,26 @@ export abstract class ResultSetDataSource<TOptions> extends DatabaseDataSource<T
     const task = this.asyncTaskInfoService.create(async () => {
       const { taskInfo } = await this.graphQLService.sdk.asyncSqlRowDataCount({
         resultsId: result.id!,
-        connectionId: context.connectionId,
-        contextId: context.id,
-        projectId: context.projectId,
+        connectionId: executionContextInfo.connectionId,
+        contextId: executionContextInfo.id,
+        projectId: executionContextInfo.projectId,
       });
 
       return taskInfo;
     });
 
-    const count = await this.runTask(
-      () =>
-        new AutoRunningTask(
-          async () => {
-            const info = await this.asyncTaskInfoService.run(task);
-
-            if (task.cancelled) {
-              return;
-            }
-
-            const { count } = await this.graphQLService.sdk.getSqlRowDataCountResult({ taskId: info.id });
-            return count;
-          },
-          async () => await this.asyncTaskInfoService.cancel(task.id),
-        ),
+    const count = await this.runTask(() =>
+      executionContext.run(
+        async () => {
+          const info = await this.asyncTaskInfoService.run(task);
+          const { count } = await this.graphQLService.sdk.getSqlRowDataCountResult({ taskId: info.id });
+          return count;
+        },
+        () => this.asyncTaskInfoService.cancel(task.id),
+        () => this.asyncTaskInfoService.remove(task.id),
+      ),
     );
 
-    if (count !== undefined) {
-      this.setTotalCount(resultIndex, count);
-    }
+    this.setTotalCount(resultIndex, count);
   }
 }

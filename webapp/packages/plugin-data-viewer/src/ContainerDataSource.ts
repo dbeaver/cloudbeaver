@@ -5,16 +5,12 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { computed, makeObservable, observable } from 'mobx';
-
 import type { ConnectionExecutionContextService, IConnectionExecutionContext, IConnectionExecutionContextInfo } from '@cloudbeaver/core-connections';
 import type { IServiceInjector } from '@cloudbeaver/core-di';
-import type { ITask } from '@cloudbeaver/core-executor';
 import {
   AsyncTaskInfoService,
   GraphQLService,
   ResultDataFormat,
-  SqlExecuteInfo,
   SqlQueryResults,
   UpdateResultsDataBatchMutationVariables,
 } from '@cloudbeaver/core-sdk';
@@ -32,16 +28,6 @@ export interface IDataContainerOptions extends IDatabaseDataOptions {
 }
 
 export class ContainerDataSource extends ResultSetDataSource<IDataContainerOptions> {
-  currentTask: ITask<SqlExecuteInfo> | null;
-
-  get canCancel(): boolean {
-    return this.currentTask?.cancellable || false;
-  }
-
-  get cancelled(): boolean {
-    return this.currentTask?.cancelled || false;
-  }
-
   constructor(
     serviceInjector: IServiceInjector,
     graphQLService: GraphQLService,
@@ -49,14 +35,6 @@ export class ContainerDataSource extends ResultSetDataSource<IDataContainerOptio
     private readonly connectionExecutionContextService: ConnectionExecutionContextService,
   ) {
     super(serviceInjector, graphQLService, asyncTaskInfoService);
-
-    this.currentTask = null;
-    this.executionContext = null;
-
-    makeObservable(this, {
-      currentTask: observable.ref,
-      canCancel: computed,
-    });
   }
 
   isReadonly(resultIndex: number): boolean {
@@ -65,12 +43,6 @@ export class ContainerDataSource extends ResultSetDataSource<IDataContainerOptio
 
   isDisabled(resultIndex: number): boolean {
     return !this.getResult(resultIndex)?.data && this.error === null;
-  }
-
-  async cancel(): Promise<void> {
-    if (this.currentTask) {
-      await this.currentTask.cancel();
-    }
   }
 
   async request(prevResults: IDatabaseResultSet[]): Promise<IDatabaseResultSet[]> {
@@ -114,19 +86,19 @@ export class ContainerDataSource extends ResultSetDataSource<IDataContainerOptio
       return taskInfo;
     });
 
-    this.currentTask = executionContext.run(
-      async () => {
-        const info = await this.asyncTaskInfoService.run(task);
-        const { result } = await this.graphQLService.sdk.getSqlExecuteTaskResults({ taskId: info.id });
-
-        return result;
-      },
-      () => this.asyncTaskInfoService.cancel(task.id),
-      () => this.asyncTaskInfoService.remove(task.id),
-    );
-
     try {
-      const response = await this.currentTask;
+      const response = await this.runTask(() =>
+        executionContext.run(
+          async () => {
+            const info = await this.asyncTaskInfoService.run(task);
+            const { result } = await this.graphQLService.sdk.getSqlExecuteTaskResults({ taskId: info.id });
+
+            return result;
+          },
+          () => this.asyncTaskInfoService.cancel(task.id),
+          () => this.asyncTaskInfoService.remove(task.id),
+        ),
+      );
 
       this.requestInfo = {
         originalQuery: response.fullQuery || '',
