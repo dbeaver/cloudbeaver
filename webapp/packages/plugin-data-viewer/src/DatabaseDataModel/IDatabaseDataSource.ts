@@ -37,7 +37,6 @@ export interface IDatabaseDataSource<TOptions, TResult extends IDatabaseDataResu
   readonly results: TResult[];
   readonly offset: number;
   readonly count: number;
-  readonly totalRowsCount: number | null;
   /** Options of the previous request */
   readonly prevOptions: Readonly<TOptions> | null;
   readonly options: TOptions | null;
@@ -82,7 +81,8 @@ export interface IDatabaseDataSource<TOptions, TResult extends IDatabaseDataResu
   setDataFormat: (dataFormat: ResultDataFormat) => this;
   setSupportedDataFormats: (dataFormats: ResultDataFormat[]) => this;
   setExecutionContext: (context: IConnectionExecutionContext | null) => this;
-  setTotalRowsCount: (count: number) => this;
+  setTotalCount: (resultIndex: number, count: number) => this;
+  loadTotalCount: (resultIndex: number) => Promise<void>;
 
   retry: () => Promise<void>;
   /** Allows to perform an asynchronous action on the data source, this action will wait previous action to finish and save or load requests.

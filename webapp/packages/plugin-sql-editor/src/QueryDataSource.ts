@@ -20,12 +20,12 @@ import {
 } from '@cloudbeaver/core-sdk';
 import { uuid } from '@cloudbeaver/core-utils';
 import {
-  DatabaseDataSource,
   DocumentEditAction,
   IDatabaseDataOptions,
   IDatabaseResultSet,
   IRequestInfo,
   IResultSetBlobValue,
+  ResultSetDataSource,
   ResultSetEditAction,
 } from '@cloudbeaver/plugin-data-viewer';
 
@@ -37,7 +37,7 @@ export interface IQueryRequestInfo extends IRequestInfo {
   query: string;
 }
 
-export class QueryDataSource<TOptions extends IDataQueryOptions = IDataQueryOptions> extends DatabaseDataSource<TOptions, IDatabaseResultSet> {
+export class QueryDataSource<TOptions extends IDataQueryOptions = IDataQueryOptions> extends ResultSetDataSource<TOptions> {
   currentTask: ITask<SqlExecuteInfo> | null;
   requestInfo: IQueryRequestInfo;
 
@@ -49,12 +49,8 @@ export class QueryDataSource<TOptions extends IDataQueryOptions = IDataQueryOpti
     return this.currentTask?.cancelled || false;
   }
 
-  constructor(
-    readonly serviceInjector: IServiceInjector,
-    protected readonly graphQLService: GraphQLService,
-    protected readonly asyncTaskInfoService: AsyncTaskInfoService,
-  ) {
-    super(serviceInjector);
+  constructor(readonly serviceInjector: IServiceInjector, graphQLService: GraphQLService, asyncTaskInfoService: AsyncTaskInfoService) {
+    super(serviceInjector, graphQLService, asyncTaskInfoService);
 
     this.currentTask = null;
     this.requestInfo = {
@@ -285,6 +281,8 @@ export class QueryDataSource<TOptions extends IDataQueryOptions = IDataQueryOpti
       dataFormat: result.dataFormat!,
       updateRowCount: result.updateRowCount || 0,
       loadedFully: (result.resultSet?.rows?.length || 0) < limit,
+      count: result.resultSet?.rows?.length || 0,
+      totalCount: null,
       // allays returns false
       // || !result.resultSet?.hasMoreData,
       data: result.resultSet,
