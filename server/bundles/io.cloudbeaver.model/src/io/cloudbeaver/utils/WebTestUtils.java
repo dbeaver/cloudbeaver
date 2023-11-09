@@ -55,6 +55,7 @@ public class WebTestUtils {
         HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
             .uri(URI.create(apiUrl))
             .POST(HttpRequest.BodyPublishers.ofString(input))
+            .header("TE-Client-Version", "23.2")
             .header("Content-Type", "application/json");
 
         if (!headers.isEmpty()) {
@@ -74,6 +75,7 @@ public class WebTestUtils {
     public static boolean getServerStatus(HttpClient client, String apiUrl) {
         HttpRequest request = HttpRequest.newBuilder()
             .uri(URI.create(apiUrl))
+            .setHeader("TE-Client-Version", "23.2")
             .GET()
             .build();
         try {
