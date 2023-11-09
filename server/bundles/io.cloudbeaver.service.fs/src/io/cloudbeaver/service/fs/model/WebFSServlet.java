@@ -17,11 +17,11 @@
 package io.cloudbeaver.service.fs.model;
 
 import io.cloudbeaver.DBWebException;
+import io.cloudbeaver.model.fs.FSUtils;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.server.CBApplication;
 import io.cloudbeaver.service.WebServiceServletBase;
 import io.cloudbeaver.service.fs.DBWServiceFS;
-import io.cloudbeaver.service.fs.WebFSUtils;
 import org.eclipse.jetty.server.Request;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.data.json.JSONUtils;
@@ -64,7 +64,7 @@ public class WebFSServlet extends WebServiceServletBase {
     }
 
     private void doGet(WebSession session, HttpServletRequest request, HttpServletResponse response) throws DBException, IOException {
-        Path path = WebFSUtils.getPathFromNode(session, request.getParameter("nodePath"));
+        Path path = FSUtils.getPathFromNode(session, request.getParameter("nodePath"));
         session.addInfoMessage("Download data ...");
         response.setHeader("Content-Type", "application/octet-stream");
         response.setHeader("Content-Disposition", "attachment; filename=\"" + path.getFileName() + "\"");
@@ -83,7 +83,7 @@ public class WebFSServlet extends WebServiceServletBase {
         if (CommonUtils.isEmpty(parentNodePath)) {
             throw new DBException("Parent node path parameter is not found");
         }
-        Path path = WebFSUtils.getPathFromNode(session, parentNodePath);
+        Path path = FSUtils.getPathFromNode(session, parentNodePath);
         try {
             for (Part part : request.getParts()) {
                 String fileName = part.getSubmittedFileName();
