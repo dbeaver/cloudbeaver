@@ -5,8 +5,11 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
+import { makeObservable, observable } from 'mobx';
+
 import type { IConnectionExecutionContextInfo } from '@cloudbeaver/core-connections';
 import type { IServiceInjector } from '@cloudbeaver/core-di';
+import type { ITask } from '@cloudbeaver/core-executor';
 import {
   AsyncTaskInfoService,
   GraphQLService,
@@ -35,11 +38,21 @@ export interface IQueryRequestInfo extends IRequestInfo {
 }
 
 export class QueryDataSource<TOptions extends IDataQueryOptions = IDataQueryOptions> extends ResultSetDataSource<TOptions> {
+  currentTask: ITask<SqlExecuteInfo> | null;
   requestInfo: IQueryRequestInfo;
+
+  get canCancel(): boolean {
+    return this.currentTask?.cancellable || false;
+  }
+
+  get cancelled(): boolean {
+    return this.currentTask?.cancelled || false;
+  }
 
   constructor(readonly serviceInjector: IServiceInjector, graphQLService: GraphQLService, asyncTaskInfoService: AsyncTaskInfoService) {
     super(serviceInjector, graphQLService, asyncTaskInfoService);
 
+    this.currentTask = null;
     this.requestInfo = {
       originalQuery: '',
       requestDuration: 0,
@@ -48,6 +61,10 @@ export class QueryDataSource<TOptions extends IDataQueryOptions = IDataQueryOpti
       source: null,
       query: '',
     };
+
+    makeObservable(this, {
+      currentTask: observable.ref,
+    });
   }
 
   isLoadable(): boolean {
@@ -60,6 +77,12 @@ export class QueryDataSource<TOptions extends IDataQueryOptions = IDataQueryOpti
 
   isDisabled(resultIndex: number): boolean {
     return (!this.getResult(resultIndex)?.data && this.error === null) || !this.executionContext?.context;
+  }
+
+  async cancel(): Promise<void> {
+    if (this.currentTask) {
+      await this.currentTask.cancel();
+    }
   }
 
   async save(prevResults: IDatabaseResultSet[]): Promise<IDatabaseResultSet[]> {
@@ -198,19 +221,19 @@ export class QueryDataSource<TOptions extends IDataQueryOptions = IDataQueryOpti
       return taskInfo;
     });
 
-    try {
-      const response = await this.runTask(() =>
-        executionContext.run(
-          async () => {
-            const info = await this.asyncTaskInfoService.run(task);
-            const { result } = await this.graphQLService.sdk.getSqlExecuteTaskResults({ taskId: info.id });
+    this.currentTask = executionContext.run(
+      async () => {
+        const info = await this.asyncTaskInfoService.run(task);
+        const { result } = await this.graphQLService.sdk.getSqlExecuteTaskResults({ taskId: info.id });
 
-            return result;
-          },
-          () => this.asyncTaskInfoService.cancel(task.id),
-          () => this.asyncTaskInfoService.remove(task.id),
-        ),
-      );
+        return result;
+      },
+      () => this.asyncTaskInfoService.cancel(task.id),
+      () => this.asyncTaskInfoService.remove(task.id),
+    );
+
+    try {
+      const response = await this.currentTask;
 
       const results = this.getResults(executionContextInfo, response, limit);
       this.clearError();

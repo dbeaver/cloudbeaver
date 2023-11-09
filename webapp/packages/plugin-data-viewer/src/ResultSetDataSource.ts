@@ -45,16 +45,14 @@ export abstract class ResultSetDataSource<TOptions> extends DatabaseDataSource<T
       return taskInfo;
     });
 
-    const count = await this.runTask(() =>
-      executionContext.run(
-        async () => {
-          const info = await this.asyncTaskInfoService.run(task);
-          const { count } = await this.graphQLService.sdk.getSqlRowDataCountResult({ taskId: info.id });
-          return count;
-        },
-        () => this.asyncTaskInfoService.cancel(task.id),
-        () => this.asyncTaskInfoService.remove(task.id),
-      ),
+    const count = await executionContext.run(
+      async () => {
+        const info = await this.asyncTaskInfoService.run(task);
+        const { count } = await this.graphQLService.sdk.getSqlRowDataCountResult({ taskId: info.id });
+        return count;
+      },
+      () => this.asyncTaskInfoService.cancel(task.id),
+      () => this.asyncTaskInfoService.remove(task.id),
     );
 
     this.setTotalCount(resultIndex, count);

@@ -6,9 +6,12 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
+import { useState } from 'react';
 import styled from 'reshadow';
 
 import { getComputed, ToolsAction } from '@cloudbeaver/core-blocks';
+import { useService } from '@cloudbeaver/core-di';
+import { NotificationService } from '@cloudbeaver/core-events';
 
 import type { IDatabaseDataModel } from '../../DatabaseDataModel/IDatabaseDataModel';
 import type { IDatabaseResultSet } from '../../DatabaseDataModel/IDatabaseResultSet';
@@ -21,6 +24,9 @@ interface Props {
 }
 
 export const TableFooterRowCount: React.FC<Props> = observer(function TableFooterRowCount({ resultIndex, model }) {
+  const notificationService = useService(NotificationService);
+  const [loading, setLoading] = useState(false);
+
   const result = model.getResult(resultIndex);
 
   if (!result) {
@@ -28,7 +34,14 @@ export const TableFooterRowCount: React.FC<Props> = observer(function TableFoote
   }
 
   async function loadTotalCount() {
-    await model.source.loadTotalCount(resultIndex);
+    try {
+      setLoading(true);
+      await model.source.loadTotalCount(resultIndex);
+    } catch (exception: any) {
+      notificationService.logException(exception);
+    } finally {
+      setLoading(false);
+    }
   }
 
   const currentCount = result.loadedFully ? result.count : `${result.count}+`;
@@ -37,7 +50,7 @@ export const TableFooterRowCount: React.FC<Props> = observer(function TableFoote
 
   return styled(tableFooterMenuStyles)(
     <div className={classes.wrapper}>
-      <ToolsAction disabled={disabled} icon="/icons/data_row_count.svg" viewBox="0 0 32 32" onClick={loadTotalCount}>
+      <ToolsAction disabled={disabled} loading={loading} icon="/icons/data_row_count.svg" viewBox="0 0 32 32" onClick={loadTotalCount}>
         <span>{count}</span>
       </ToolsAction>
     </div>,
