@@ -13,7 +13,7 @@ export default [
   ['authentication_identity_provider_search_placeholder', 'Search for configuration name or description...'],
   ['authentication_identity_provider_dialog_subtitle', 'Choose configuration you want to sign in with'],
 
-  ['authentication_user_name', 'User name'],
+  ['authentication_user_name', 'Username'],
   ['authentication_user_role', 'Role'],
   ['authentication_user_credentials', 'Credentials'],
   ['authentication_user_meta_parameters', 'Parameters'],

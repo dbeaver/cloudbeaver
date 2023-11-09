@@ -31,6 +31,24 @@ export default [
   ['authentication_administration_users_filters_status_disabled', 'ВЫКЛЮЧЕН'],
   ['authentication_administration_users_filters_status_all', 'ВСЕ'],
   ['authentication_administration_users_empty', 'Нет пользователей'],
+  ['authentication_administration_users_delete_user', 'Удалить пользователя'],
+  ['authentication_administration_users_delete_user_fail', 'Не удалось удалить пользователя'],
+  ['authentication_administration_users_delete_user_success', 'Пользователь удален'],
+  ['authentication_administration_users_disable_user_fail', 'Не удалось отключить пользователя'],
+  ['authentication_administration_users_disable_user_success', 'Пользователь отключен'],
+  [
+    'authentication_administration_users_delete_user_confirmation_input_description',
+    'Пожалуйста, введите имя пользователя учетной записи для подтверждения ее удаления.',
+  ],
+  ['authentication_administration_users_delete_user_confirmation_input_placeholder', 'Введите имя пользователя...'],
+  [
+    'authentication_administration_users_delete_user_disable_info',
+    'Вы уверены, что хотите удалить пользователя "{arg:username}"? Если вы хотите временно ограничить доступ, то вы можете отключить учетную запись.',
+  ],
+  [
+    'authentication_administration_users_delete_user_info',
+    'Удаление этой учетной записи навсегда уберет все связанные с ней пользовательские данные из системы. Пожалуйста, подтвердите, что вы хотите произвести удаление пользователя "{arg:username}"',
+  ],
 
   ['authentication_administration_user_remove_credentials_error', 'Не удалось удалить учетные данные пользователя'],
   ['authentication_administration_user_remove_credentials_success', 'Учетные данные пользователя удалены'],
@@ -97,7 +115,10 @@ export default [
   ['administration_teams_refresh_tooltip', 'Обновить список команд'],
   ['administration_teams_delete_tooltip', 'Удалить выбранные команды'],
   ['administration_teams_delete_confirmation', 'Вы собираетесь удалить следующие команды: '],
-  ['administration_teams_delete_confirmation_users_note', 'Обратите внимание, что пользователи потеряют принадлежность к команде и права полученные от этой команды'],
+  [
+    'administration_teams_delete_confirmation_users_note',
+    'Обратите внимание, что пользователи потеряют принадлежность к команде и права полученные от этой команды',
+  ],
 
   ['administration_teams_team_granted_users_tab_title', 'Пользователи'],
   ['administration_teams_team_granted_users_search_placeholder', 'Поиск по ID пользователя...'],
