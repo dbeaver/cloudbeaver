@@ -8,13 +8,14 @@ type FSFile @since(version: "23.2.2") {
 
 type FSFileSystem @since(version: "23.2.4") {
     id: ID!
+    nodePath: String!
     requiredAuth: String
 }
 
 extend type Query @since(version: "23.2.2") {
     fsListFileSystems(projectId: ID!): [FSFileSystem!]!
 
-    fsFileSystem(projectId: ID!, fileSystemId: ID!): FSFileSystem! @since(version: "23.2.4")
+    fsFileSystem(projectId: ID!, nodePath: ID!): FSFileSystem! @since(version: "23.2.4")
 
     fsFile(nodePath: String!):  FSFile!
 

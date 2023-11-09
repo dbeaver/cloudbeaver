@@ -24,6 +24,11 @@ import io.cloudbeaver.service.fs.model.FSFile;
 import io.cloudbeaver.service.fs.model.FSFileSystem;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.DBException;
+import org.jkiss.dbeaver.model.app.DBPProject;
+import org.jkiss.dbeaver.model.navigator.DBNModel;
+import org.jkiss.dbeaver.model.navigator.DBNProject;
+import org.jkiss.dbeaver.model.navigator.fs.DBNFileSystem;
+import org.jkiss.dbeaver.model.navigator.fs.DBNFileSystems;
 import org.jkiss.dbeaver.model.navigator.fs.DBNPathBase;
 import org.jkiss.dbeaver.registry.fs.FileSystemProviderRegistry;
 
@@ -43,13 +48,21 @@ public class WebServiceFS implements DBWServiceFS {
     public FSFileSystem[] getAvailableFileSystems(@NotNull WebSession webSession, @NotNull String projectId)
         throws DBWebException {
         try {
+            DBPProject project = webSession.getProjectById(projectId);
+            if (project == null) {
+                throw new DBException(MessageFormat.format("Project ''{0}'' is not found in session", projectId));
+            }
+            DBNProject projectNode = webSession.getNavigatorModel().getRoot().getProjectNode(project);
+            if (projectNode == null) {
+                throw new DBException(MessageFormat.format("Project ''{0}'' is not found in navigator model", projectId));
+            }
+            DBNFileSystems dbnFileSystems = projectNode.getExtraNode(DBNFileSystems.class);
             var fsRegistry = FileSystemProviderRegistry.getInstance();
-            return webSession.getFileSystemManager(projectId)
-                .getVirtualFileSystems()
-                .stream()
+            return Arrays.stream(dbnFileSystems.getChildren(webSession.getProgressMonitor()))
                 .map(fs -> new FSFileSystem(
-                    FSUtils.makeUniqueFsId(fs),
-                        fsRegistry.getProvider(fs.getProviderId()).getRequiredAuth()
+                        FSUtils.makeUniqueFsId(fs.getFileSystem()),
+                        fs.getNodeItemPath(),
+                        fsRegistry.getProvider(fs.getFileSystem().getProviderId()).getRequiredAuth()
                     )
                 )
                 .toArray(FSFileSystem[]::new);
@@ -63,19 +76,19 @@ public class WebServiceFS implements DBWServiceFS {
     public FSFileSystem getFileSystem(
         @NotNull WebSession webSession,
         @NotNull String projectId,
-        @NotNull String fileSystemId
+        @NotNull String nodePath
     ) throws DBWebException {
         try {
+            var node = webSession.getNavigatorModel().getNodeByPath(webSession.getProgressMonitor(), nodePath);
+            if (!(node instanceof DBNFileSystem fs)) {
+                throw new DBException(MessageFormat.format("Node ''{0}'' is not File System", nodePath));
+            }
             var fsRegistry = FileSystemProviderRegistry.getInstance();
-            return webSession.getFileSystemManager(projectId)
-                .getVirtualFileSystems()
-                .stream()
-                .filter(fs -> FSUtils.makeUniqueFsId(fs).equals(fileSystemId))
-                .findFirst()
-                .map(fs -> new FSFileSystem(
-                    FSUtils.makeUniqueFsId(fs),
-                    fsRegistry.getProvider(fs.getProviderId()).getRequiredAuth()
-                )).orElseThrow(() -> new DBWebException("File system not found"));
+            return new FSFileSystem(
+                FSUtils.makeUniqueFsId(fs.getFileSystem()),
+                fs.getNodeItemPath(),
+                fsRegistry.getProvider(fs.getFileSystem().getProviderId()).getRequiredAuth()
+            );
         } catch (Exception e) {
             throw new DBWebException("Failed to get file system: " + e.getMessage(), e);
         }

@@ -47,7 +47,7 @@ public class WebServiceBindingFS extends WebServiceBindingBase<DBWServiceFS> imp
                 env -> getService(env).getFileSystem(
                     getWebSession(env),
                     env.getArgument("projectId"),
-                    env.getArgument("fileSystemId")
+                    env.getArgument("nodePath")
                 )
             )
             .dataFetcher("fsFile",
@@ -57,7 +57,7 @@ public class WebServiceBindingFS extends WebServiceBindingBase<DBWServiceFS> imp
             )
             .dataFetcher("fsListFiles",
                 env -> getService(env).getFiles(getWebSession(env),
-                    env.getArgument("nodePath")
+                    env.getArgument("folderPath")
                 )
             )
             .dataFetcher("fsReadFileContentAsString",
