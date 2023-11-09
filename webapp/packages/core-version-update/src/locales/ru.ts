@@ -7,5 +7,4 @@ export default [
   ['version_update_versions_refresh_fail', 'Не удалось обновить список версий'],
   ['version_update_how_to_update', 'Как обновить версию'],
   ['version_update_info', 'Информация'],
-  ['version_update_recommendations', 'Рекомендации'],
 ];

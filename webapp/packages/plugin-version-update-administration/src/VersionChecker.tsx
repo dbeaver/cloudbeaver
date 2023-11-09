@@ -7,19 +7,19 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import { Cell, CellStyles, IconOrImage, s, SContext, StyleRegistry, useS, useTranslate } from '@cloudbeaver/core-blocks';
+import { Cell, CellStyles, IconOrImage, SContext, StyleRegistry, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { VersionResource, VersionService } from '@cloudbeaver/core-version';
 import { VersionUpdateService } from '@cloudbeaver/core-version-update';
 
-import VersionCheckCellStyles from './VersionCheckerCellStyles.m.css';
+import VersionCheckerCellStyles from './VersionCheckerCellStyles.m.css';
 
 const registry: StyleRegistry = [
   [
     CellStyles,
     {
       mode: 'append',
-      styles: [VersionCheckCellStyles],
+      styles: [VersionCheckerCellStyles],
     },
   ],
 ];
