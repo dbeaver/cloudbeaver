@@ -31,6 +31,11 @@
                                 <id>ch.qos.logback.classic</id>
                                 <versionRange>0.0.0</versionRange>
                             </requirement>
+                            <requirement>
+                                <type>eclipse-feature</type>
+                                <id>io.cloudbeaver.ws.feature</id>
+                                <versionRange>0.0.0</versionRange>
+                            </requirement>
                         </extraRequirements>
                     </dependency-resolution>
                 </configuration>
