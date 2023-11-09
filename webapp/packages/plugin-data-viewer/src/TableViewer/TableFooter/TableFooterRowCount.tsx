@@ -38,7 +38,7 @@ export const TableFooterRowCount: React.FC<Props> = observer(function TableFoote
       setLoading(true);
       await model.source.loadTotalCount(resultIndex);
     } catch (exception: any) {
-      notificationService.logException(exception);
+      notificationService.logException(exception, 'data_viewer_total_count_failed');
     } finally {
       setLoading(false);
     }

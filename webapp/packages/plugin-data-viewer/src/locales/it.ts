@@ -33,7 +33,7 @@ export default [
   ['data_viewer_presentation_value_content_value_size', 'Value size'],
   ['data_viewer_presentation_value_content_download_error', 'Download failed'],
   ['data_viewer_refresh_result_set', 'Refresh result set'],
-  ['data_viewer_total_rows_count_failed', 'Failed to get total rows count'],
+  ['data_viewer_total_count_failed', 'Failed to get total count'],
   ['settings_data_editor', 'Data Editor'],
   ['settings_data_editor_disable_edit_name', 'Disable Edit'],
   ['settings_data_editor_disable_edit_description', 'Disable Edit'],
