@@ -7,18 +7,8 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import { s } from './s';
-import classes from './Text.m.css';
-import { useS } from './useS';
-
-interface Props extends React.HTMLAttributes<HTMLParagraphElement> {}
+interface Props extends React.HTMLAttributes<HTMLDivElement> {}
 
 export const Text: React.FC<Props> = observer(function Text({ children, ...rest }) {
-  const styles = useS(classes);
-
-  return (
-    <p {...rest} className={s(styles, { paragraph: true }, rest.className)}>
-      {children}
-    </p>
-  );
+  return <div {...rest}>{children}</div>;
 });
