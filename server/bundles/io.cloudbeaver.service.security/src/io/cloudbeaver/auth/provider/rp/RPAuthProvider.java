@@ -42,7 +42,10 @@ public class RPAuthProvider implements SMAuthProviderExternal<SMSession> {
     private static final Log log = Log.getLog(RPAuthProvider.class);
 
     public static final String X_USER = "X-User";
+    @Deprecated // use X-Team
     public static final String X_ROLE = "X-Role";
+    public static final String X_TEAM = "X-Team";
+    public static final String X_ROLE_TE = "X-Role-TE";
     public static final String X_FIRST_NAME = "X-First-name";
     public static final String X_LAST_NAME = "X-Last-name";
     public static final String AUTH_PROVIDER = "reverseProxy";
