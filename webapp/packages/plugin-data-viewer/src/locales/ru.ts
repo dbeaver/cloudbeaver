@@ -36,6 +36,7 @@ export default [
   ['data_viewer_script_preview_dialog_title', 'Предпросмотр изменений'],
   ['data_viewer_script_preview_error_title', 'Не удалось получить скрипт'],
   ['data_viewer_refresh_result_set', 'Обновить резалт сет'],
+  ['data_viewer_total_count_tooltip', 'Получить значение'],
   ['data_viewer_total_count_failed', 'Не удалось получить значение'],
   ['settings_data_editor', 'Редактор данных'],
   ['settings_data_editor_disable_edit_name', 'Отключить редактирование'],
