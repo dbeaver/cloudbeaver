@@ -327,6 +327,8 @@ public class WebSQLProcessor implements WebSessionProvider {
         @Nullable List<WebSQLResultsRow> addedRows,
         @Nullable WebDataFormat dataFormat) throws DBException
     {
+        // we don't need to add same row several times
+        // (it can be when we update the row from RS with several tables)
         Set<Object[]> newResultSetRows = new LinkedHashSet<>();
         KeyDataReceiver keyReceiver = new KeyDataReceiver(contextInfo.getResults(resultsId));
         WebSQLResultsInfo resultsInfo = contextInfo.getResults(resultsId);
@@ -441,7 +443,7 @@ public class WebSQLProcessor implements WebSessionProvider {
                 }
                 DBDDataFilter filter = new DBDDataFilter(constraints);
                 DBSDataContainer dataContainer = resultsInfo.getDataContainer();
-                RowDataReceiver dataReceiver = new RowDataReceiver(resultsInfo.getAttributes(), row, dataFormat);
+                WebRowDataReceiver dataReceiver = new WebRowDataReceiver(resultsInfo.getAttributes(), row, dataFormat);
                 dataContainer.readData(
                     new AbstractExecutionSource(dataContainer, getExecutionContext(dataContainer), this),
                     session,
@@ -548,13 +550,7 @@ public class WebSQLProcessor implements WebSessionProvider {
                     }
 
                     Object[] rowValues = new Object[updateAttributes.length + keyAttributes.length];
-                    for (int i = 0; i < updateAttributes.length; i++) {
-                        DBDAttributeBinding updateAttribute = updateAttributes[i];
-                        Object value = updateValues.get(String.valueOf(updateAttribute.getOrdinalPosition()));
-                        Object realCellValue = setCellRowValue(value, webSession, session, updateAttribute, withoutExecution);
-                        rowValues[i] = realCellValue;
-                        finalRow[updateAttribute.getOrdinalPosition()] = realCellValue;
-                    }
+                    // put key values first in case of updating them
                     for (int i = 0; i < keyAttributes.length; i++) {
                         DBDAttributeBinding keyAttribute = keyAttributes[i];
                         boolean isDocumentValue = keyAttributes.length == 1 && keyAttribute.getDataKind() == DBPDataKind.DOCUMENT && dataContainer instanceof DBSDocumentLocator;
@@ -575,6 +571,13 @@ public class WebSQLProcessor implements WebSessionProvider {
                         } else if (!isDocumentValue) {
                             finalRow[keyAttribute.getOrdinalPosition()] = rowValues[updateAttributes.length + i];
                         }
+                    }
+                    for (int i = 0; i < updateAttributes.length; i++) {
+                        DBDAttributeBinding updateAttribute = updateAttributes[i];
+                        Object value = updateValues.get(String.valueOf(updateAttribute.getOrdinalPosition()));
+                        Object realCellValue = setCellRowValue(value, webSession, session, updateAttribute, withoutExecution);
+                        rowValues[i] = realCellValue;
+                        finalRow[updateAttribute.getOrdinalPosition()] = realCellValue;
                     }
 
                     DBSDataManipulator.ExecuteBatch updateBatch = dataManipulator.updateData(
@@ -987,59 +990,25 @@ public class WebSQLProcessor implements WebSessionProvider {
         }
     }
 
-    public class RowDataReceiver implements DBDDataReceiver {
-        private final DBDAttributeBinding[] curAttributes;
+    public class WebRowDataReceiver extends RowDataReceiver {
         private final WebDataFormat dataFormat;
-        private final Object[] row;
 
-        public RowDataReceiver(DBDAttributeBinding[] curAttributes, Object[] row, WebDataFormat dataFormat) {
-            this.curAttributes = curAttributes;
-            this.row = row;
+        public WebRowDataReceiver(DBDAttributeBinding[] curAttributes, Object[] rowValues, WebDataFormat dataFormat) {
+            super(curAttributes);
+            this.rowValues = rowValues;
             this.dataFormat = dataFormat;
         }
 
         @Override
-        public void fetchStart(DBCSession session, DBCResultSet resultSet, long offset, long maxRows) {
-
-        }
-
-        @Override
-        public void fetchRow(DBCSession session, DBCResultSet resultSet)
-            throws DBCException {
-            DBCResultSetMetaData rsMeta = resultSet.getMeta();
-            // Compare attributes with existing model attributes
-            List<DBCAttributeMetaData> attributes = rsMeta.getAttributes();
-            if (attributes.size() != curAttributes.length) {
-                log.debug("Wrong meta attributes count (" + attributes.size() + " <> " + curAttributes.length + ") - can't refresh");
-                return;
-            }
-            for (int i = 0; i < curAttributes.length; i++) {
-                DBCAttributeMetaData metaAttribute = curAttributes[i].getMetaAttribute();
-                if (metaAttribute == null ||
-                    !CommonUtils.equalObjects(metaAttribute.getName(), attributes.get(i).getName())) {
-                    log.debug("Attribute '" + metaAttribute + "' doesn't match '" + attributes.get(i).getName() + "'");
-                    return;
-                }
-            }
-
+        protected void fetchRowValues(DBCSession session, DBCResultSet resultSet) throws DBCException {
             for (int i = 0; i < curAttributes.length; i++) {
                 final DBDAttributeBinding attr = curAttributes[i];
                 DBDValueHandler valueHandler = attr.getValueHandler();
                 Object attrValue = valueHandler.fetchValueObject(session, resultSet, attr, i);
 
                 // Patch result rows (adapt to web format)
-                row[i] = WebSQLUtils.makeWebCellValue(webSession, attr, attrValue, dataFormat);
+                rowValues[i] = WebSQLUtils.makeWebCellValue(webSession, attr, attrValue, dataFormat);
             }
-
-        }
-
-        @Override
-        public void fetchEnd(DBCSession session, DBCResultSet resultSet) {
-
-        }
-
-        @Override
-        public void close() {
         }
 
     }
