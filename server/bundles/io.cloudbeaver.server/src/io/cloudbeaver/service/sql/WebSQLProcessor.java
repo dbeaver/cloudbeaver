@@ -327,7 +327,7 @@ public class WebSQLProcessor implements WebSessionProvider {
         @Nullable List<WebSQLResultsRow> addedRows,
         @Nullable WebDataFormat dataFormat) throws DBException
     {
-        List<Object[]> newResultSetRows = new ArrayList<>();
+        Set<Object[]> newResultSetRows = new LinkedHashSet<>();
         KeyDataReceiver keyReceiver = new KeyDataReceiver(contextInfo.getResults(resultsId));
         WebSQLResultsInfo resultsInfo = contextInfo.getResults(resultsId);
 
@@ -366,11 +366,6 @@ public class WebSQLProcessor implements WebSessionProvider {
                         keyReceiver.setRow(rowValues);
                         DBCStatistics statistics = batch.execute(session, options);
 
-                        // Patch result rows (adapt to web format)
-                        for (int i = 0; i < rowValues.length; i++) {
-                            rowValues[i] = WebSQLUtils.makeWebCellValue(webSession, resultsInfo.getAttributeByPosition(i), rowValues[i], dataFormat);
-                        }
-
                         totalUpdateCount += statistics.getRowsUpdated();
                         result.setDuration(result.getDuration() + statistics.getExecuteTime());
                         newResultSetRows.add(rowValues);
@@ -391,6 +386,7 @@ public class WebSQLProcessor implements WebSessionProvider {
                 }
             }
         }
+        getUpdatedRowsInfo(resultsInfo, newResultSetRows, dataFormat, monitor);
 
         WebSQLQueryResultSet updatedResultSet = new WebSQLQueryResultSet();
         updatedResultSet.setResultsInfo(resultsInfo);
@@ -406,6 +402,57 @@ public class WebSQLProcessor implements WebSessionProvider {
         result.setResults(queryResults.toArray(new WebSQLQueryResults[0]));
 
         return result;
+    }
+
+    private void getUpdatedRowsInfo(
+        @NotNull WebSQLResultsInfo resultsInfo,
+        @NotNull Set<Object[]> newResultSetRows,
+        @Nullable WebDataFormat dataFormat,
+        @NotNull DBRProgressMonitor monitor)
+        throws DBCException {
+        try (DBCSession session = getExecutionContext().openSession(
+            monitor,
+            DBCExecutionPurpose.UTIL,
+            "Refresh row(s) after insert/update")
+        ) {
+            for (Object[] row : newResultSetRows) {
+                if (row.length == 0) {
+                    continue;
+                }
+                List<DBDAttributeConstraint> constraints = new ArrayList<>();
+                boolean hasKey = true;
+                for (DBDAttributeBinding attr : resultsInfo.getAttributes()) {
+                    if (attr.getRowIdentifier() == null) {
+                        continue;
+                    }
+                    final Object keyValue = row[attr.getOrdinalPosition()];
+                    if (DBUtils.isNullValue(keyValue)) {
+                        hasKey = false;
+                        break;
+                    }
+                    final DBDAttributeConstraint constraint = new DBDAttributeConstraint(attr);
+                    constraint.setOperator(DBCLogicalOperator.EQUALS);
+                    constraint.setValue(keyValue);
+                    constraints.add(constraint);
+                }
+                if (!hasKey) {
+                    // No key value for this row
+                    continue;
+                }
+                DBDDataFilter filter = new DBDDataFilter(constraints);
+                DBSDataContainer dataContainer = resultsInfo.getDataContainer();
+                RowDataReceiver dataReceiver = new RowDataReceiver(resultsInfo.getAttributes(), row, dataFormat);
+                dataContainer.readData(
+                    new AbstractExecutionSource(dataContainer, getExecutionContext(dataContainer), this),
+                    session,
+                    dataReceiver,
+                    filter,
+                    0,
+                    0,
+                    DBSDataContainer.FLAG_REFRESH,
+                    0);
+            }
+        }
     }
 
     public String generateResultsDataUpdateScript(
@@ -484,15 +531,15 @@ public class WebSQLProcessor implements WebSessionProvider {
             if (!CommonUtils.isEmpty(updatedRows)) {
 
                 for (WebSQLResultsRow row : updatedRows) {
+                    Object[] finalRow = row.getData();
                     Map<String, Object> updateValues = row.getUpdateValues().entrySet().stream()
                         .filter(x -> CommonUtils.equalObjects(allAttributes[CommonUtils.toInt(x.getKey())].getRowIdentifier(), rowIdentifier))
                         .collect(HashMap::new, (m,v) -> m.put(v.getKey(), v.getValue()), HashMap::putAll);
-                    if (CommonUtils.isEmpty(row.getData()) || CommonUtils.isEmpty(updateValues)) {
+                    if (finalRow.length == 0 || CommonUtils.isEmpty(updateValues)) {
                         continue;
                     }
                     DBDAttributeBinding[] updateAttributes = new DBDAttributeBinding[updateValues.size()];
                     // Final row is what we return back
-                    Object[] finalRow = row.getData().toArray();
 
                     int index = 0;
                     for (String indexStr : updateValues.keySet()) {
@@ -519,7 +566,7 @@ public class WebSQLProcessor implements WebSessionProvider {
                                 session,
                                 keyAttribute,
                                 convertInputCellValue(session, keyAttribute,
-                                    row.getData().get(keyAttribute.getOrdinalPosition()), withoutExecution),
+                                    row.getData()[(keyAttribute.getOrdinalPosition())], withoutExecution),
                                 false,
                                 true);
                         }
@@ -540,44 +587,42 @@ public class WebSQLProcessor implements WebSessionProvider {
             // Add new rows
             if (!CommonUtils.isEmpty(addedRows)) {
                 for (WebSQLResultsRow row : addedRows) {
-                    List<?> addedValues = row.getData();
-                    if (CommonUtils.isEmpty(row.getData())) {
+                    Object[] addedValues = row.getData();
+                    if (addedValues.length == 0) {
                         continue;
                     }
                     Map<DBDAttributeBinding, Object> insertAttributes = new LinkedHashMap<>();
                     // Final row is what we return back
-                    Object[] finalRow = row.getData().toArray();
 
                     for (int i = 0; i < allAttributes.length; i++) {
-                        if (addedValues.get(i) != null) {
+                        if (addedValues[i] != null) {
                             Object realCellValue;
-                            if (addedValues.get(i) instanceof LinkedTreeMap) {
-                                LinkedTreeMap<String, Object> variables = (LinkedTreeMap<String, Object>) addedValues.get(i);
+                            if (addedValues[i] instanceof LinkedTreeMap variables) {
                                 realCellValue = setCellRowValue(variables, webSession, session, allAttributes[i], withoutExecution);
                             } else {
                                 realCellValue = convertInputCellValue(session, allAttributes[i],
-                                    addedValues.get(i), withoutExecution);
+                                    addedValues[i], withoutExecution);
                             }
                             insertAttributes.put(allAttributes[i], realCellValue);
-                            finalRow[i] = realCellValue;
+                            addedValues[i] = realCellValue;
                         }
                     }
 
                     DBSDataManipulator.ExecuteBatch insertBatch = dataManipulator.insertData(
                         session,
                         insertAttributes.keySet().toArray(new DBDAttributeBinding[0]),
-                        needKeys(keyAttributes, finalRow) ? keyReceiver : null,
+                        needKeys(keyAttributes, addedValues) ? keyReceiver : null,
                         executionSource,
                         new LinkedHashMap<>());
                     insertBatch.add(insertAttributes.values().toArray());
-                    resultBatches.put(insertBatch, finalRow);
+                    resultBatches.put(insertBatch, addedValues);
                 }
             }
 
             if (keyAttributes.length > 0 && !CommonUtils.isEmpty(deletedRows)) {
                 for (WebSQLResultsRow row : deletedRows) {
-                    List<?> keyData = row.getData();
-                    if (CommonUtils.isEmpty(row.getData())) {
+                    Object[] keyData = row.getData();
+                    if (keyData.length == 0) {
                         continue;
                     }
                     Map<DBDAttributeBinding, Object> delKeyAttributes = new LinkedHashMap<>();
@@ -587,7 +632,7 @@ public class WebSQLProcessor implements WebSessionProvider {
                     for (int i = 0; i < allAttributes.length; i++) {
                         if (isDocumentKey || ArrayUtils.contains(keyAttributes, allAttributes[i])) {
                             Object realCellValue = convertInputCellValue(session, allAttributes[i],
-                                keyData.get(i), withoutExecution);
+                                keyData[i], withoutExecution);
                             delKeyAttributes.put(allAttributes[i], realCellValue);
                         }
                     }
@@ -627,7 +672,7 @@ public class WebSQLProcessor implements WebSessionProvider {
         DBDAttributeBinding[] attributes = resultsInfo.getAttributes();
         for (int j = 0; j < attributes.length; j++) {
             DBDAttributeBinding attr = attributes[j];
-            Object plainValue = WebSQLUtils.makePlainCellValue(session, attr, row.getData().get(j));
+            Object plainValue = WebSQLUtils.makePlainCellValue(session, attr, row.getData()[j]);
             if (plainValue instanceof DBDDocument) {
                 // FIXME: Hack for DynamoDB. We pass entire document as a key
                 // FIXME: Let's just return it back for now
@@ -741,7 +786,7 @@ public class WebSQLProcessor implements WebSessionProvider {
                     rowValues[i] =
                         makeDocumentInputValue(session, (DBSDocumentLocator) dataContainer, resultsInfo, row);
                 } else {
-                    Object inputCellValue = row.getData().get(keyAttribute.getOrdinalPosition());
+                    Object inputCellValue = row.getData()[keyAttribute.getOrdinalPosition()];
 
                     rowValues[i] = keyAttribute.getValueHandler().getValueFromObject(
                         session,
@@ -941,6 +986,64 @@ public class WebSQLProcessor implements WebSessionProvider {
         public void close() {
         }
     }
+
+    public class RowDataReceiver implements DBDDataReceiver {
+        private final DBDAttributeBinding[] curAttributes;
+        private final WebDataFormat dataFormat;
+        private final Object[] row;
+
+        public RowDataReceiver(DBDAttributeBinding[] curAttributes, Object[] row, WebDataFormat dataFormat) {
+            this.curAttributes = curAttributes;
+            this.row = row;
+            this.dataFormat = dataFormat;
+        }
+
+        @Override
+        public void fetchStart(DBCSession session, DBCResultSet resultSet, long offset, long maxRows) {
+
+        }
+
+        @Override
+        public void fetchRow(DBCSession session, DBCResultSet resultSet)
+            throws DBCException {
+            DBCResultSetMetaData rsMeta = resultSet.getMeta();
+            // Compare attributes with existing model attributes
+            List<DBCAttributeMetaData> attributes = rsMeta.getAttributes();
+            if (attributes.size() != curAttributes.length) {
+                log.debug("Wrong meta attributes count (" + attributes.size() + " <> " + curAttributes.length + ") - can't refresh");
+                return;
+            }
+            for (int i = 0; i < curAttributes.length; i++) {
+                DBCAttributeMetaData metaAttribute = curAttributes[i].getMetaAttribute();
+                if (metaAttribute == null ||
+                    !CommonUtils.equalObjects(metaAttribute.getName(), attributes.get(i).getName())) {
+                    log.debug("Attribute '" + metaAttribute + "' doesn't match '" + attributes.get(i).getName() + "'");
+                    return;
+                }
+            }
+
+            for (int i = 0; i < curAttributes.length; i++) {
+                final DBDAttributeBinding attr = curAttributes[i];
+                DBDValueHandler valueHandler = attr.getValueHandler();
+                Object attrValue = valueHandler.fetchValueObject(session, resultSet, attr, i);
+
+                // Patch result rows (adapt to web format)
+                row[i] = WebSQLUtils.makeWebCellValue(webSession, attr, attrValue, dataFormat);
+            }
+
+        }
+
+        @Override
+        public void fetchEnd(DBCSession session, DBCResultSet resultSet) {
+
+        }
+
+        @Override
+        public void close() {
+        }
+
+    }
+
 
     ///////////////////////////////////////////////////////
     // Utils
