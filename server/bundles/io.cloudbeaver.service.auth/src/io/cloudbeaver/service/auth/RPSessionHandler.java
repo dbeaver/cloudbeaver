@@ -38,6 +38,7 @@ import org.jkiss.dbeaver.model.security.exception.SMException;
 import org.jkiss.utils.CommonUtils;
 
 import java.io.IOException;
+import java.text.MessageFormat;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -69,7 +70,12 @@ public class RPSessionHandler implements DBWSessionHandler {
         }
         SMAuthProviderExternal<?> authProviderExternal = (SMAuthProviderExternal<?>) authProvider.getInstance();
         String userName = request.getHeader(RPAuthProvider.X_USER);
-        String teams = request.getHeader(RPAuthProvider.X_ROLE);
+        String teams = request.getHeader(RPAuthProvider.X_TEAM);
+        if (CommonUtils.isEmpty(teams)) {
+            // backward compatibility
+            teams = request.getHeader(RPAuthProvider.X_ROLE);
+        }
+        String role = request.getHeader(RPAuthProvider.X_ROLE_TE);
         String firstName = request.getHeader(RPAuthProvider.X_FIRST_NAME);
         String lastName = request.getHeader(RPAuthProvider.X_LAST_NAME);
         List<String> userTeams = teams == null ? Collections.emptyList() : List.of(teams.split("\\|"));
@@ -85,16 +91,21 @@ public class RPSessionHandler implements DBWSessionHandler {
                 }
                 Map<String, Object> sessionParameters = webSession.getSessionParameters();
                 sessionParameters.put(SMConstants.SESSION_PARAM_TRUSTED_USER_TEAMS, userTeams);
+                sessionParameters.put(SMConstants.SESSION_PARAM_TRUSTED_USER_ROLE, role);
                 Map<String, Object> userCredentials = authProviderExternal.authExternalUser(
                     webSession.getProgressMonitor(), null, credentials);
                 String currentSmSessionId = webSession.getUser() == null ? null : webSession.getUserContext().getSmSessionId();
                 try {
+                    log.debug(MessageFormat.format(
+                        "Attempting to authenticate user ''{0}'' with teams {1} through reverse proxy", userName, userTeams));
                     SMAuthInfo smAuthInfo = securityController.authenticate(
                         webSession.getSessionId(),
                         currentSmSessionId,
                         sessionParameters,
                         WebSession.CB_SESSION_TYPE, authProvider.getId(), null, userCredentials);
                     new WebSessionAuthProcessor(webSession, smAuthInfo, false).authenticateSession();
+                    log.debug(MessageFormat.format(
+                        "Successful reverse proxy authentication: user ''{0}'' with teams {1}", userName, userTeams));
                 } catch (SMException e) {
                     log.debug("Error during user authentication", e);
                     throw e;

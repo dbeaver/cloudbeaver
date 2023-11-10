@@ -7,17 +7,17 @@
  */
 import { AdministrationItemService, AdministrationItemType } from '@cloudbeaver/core-administration';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
+import { VersionUpdateService } from '@cloudbeaver/core-version-update';
 
+import { DockerUpdateInstructions } from './DockerUpdateInstructions';
 import { VersionUpdate } from './VersionUpdate';
 import { VersionUpdateDrawerItem } from './VersionUpdateDrawerItem';
 
 @injectable()
 export class PluginBootstrap extends Bootstrap {
-  constructor(private readonly administrationItemService: AdministrationItemService) {
+  constructor(private readonly administrationItemService: AdministrationItemService, private readonly versionUpdateService: VersionUpdateService) {
     super();
   }
-
-  async load(): Promise<void> {}
 
   register(): void {
     this.administrationItemService.create({
@@ -26,5 +26,7 @@ export class PluginBootstrap extends Bootstrap {
       getContentComponent: () => VersionUpdate,
       getDrawerComponent: () => VersionUpdateDrawerItem,
     });
+
+    this.versionUpdateService.registerGeneralInstruction(() => DockerUpdateInstructions);
   }
 }
