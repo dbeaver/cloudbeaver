@@ -23,7 +23,7 @@ const style = css`
   }
 `;
 
-export const Instructions = observer(function Instructions() {
+export const DockerUpdateInstructions = observer(function DockerUpdateInstructions() {
   const translate = useTranslate();
   const styles = useStyles(style);
 
