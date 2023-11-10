@@ -2102,6 +2102,10 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
             userId = userIdFromCredentials;
         }
         if (authProvider.isTrusted()) {
+            Object reverseProxyUserRole = sessionParameters.get(SMConstants.SESSION_PARAM_TRUSTED_USER_ROLE);
+            if (reverseProxyUserRole instanceof String rpAuthRole) {
+                setUserAuthRole(userId, rpAuthRole);
+            }
             Object reverseProxyUserTeams = sessionParameters.get(SMConstants.SESSION_PARAM_TRUSTED_USER_TEAMS);
             if (reverseProxyUserTeams instanceof List) {
                 setUserTeams(userId, ((List<?>) reverseProxyUserTeams).stream().map(Object::toString).toArray(String[]::new), userId);
