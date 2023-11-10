@@ -56,7 +56,7 @@ public class WebTestUtils {
         HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
             .uri(URI.create(apiUrl))
             .POST(HttpRequest.BodyPublishers.ofString(input))
-            .header("TE-Client-Version", "23.2")
+            .setHeader("TE-Client-Version", GeneralUtils.getMajorVersion())
             .header("Content-Type", "application/json");
 
         if (!headers.isEmpty()) {
