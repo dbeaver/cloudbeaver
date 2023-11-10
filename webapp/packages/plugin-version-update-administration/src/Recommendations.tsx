@@ -23,9 +23,9 @@ export const Recommendations = observer(function Recommendations() {
   const translate = useTranslate();
   return styled(style)(
     <Group gap large>
-      <GroupTitle>{translate('version_update_recommendations')}</GroupTitle>
+      <GroupTitle>{translate('plugin_version_update_administration_recommendations_label')}</GroupTitle>
       <GroupItem>
-        <h4>We highly recommend avoiding product downgrade. We cannot guarantee the proper work of the application after this procedure.</h4>
+        <h4>{translate('plugin_version_update_administration_recommendations')}</h4>
       </GroupItem>
     </Group>,
   );
