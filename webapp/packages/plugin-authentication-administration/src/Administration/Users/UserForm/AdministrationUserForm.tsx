@@ -7,7 +7,6 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import { UsersResource } from '@cloudbeaver/core-authentication';
 import { Button, Container, Form, s, StatusMessage, useAutoLoad, useForm, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
@@ -23,11 +22,10 @@ import {
 } from '@cloudbeaver/core-ui';
 import { getFirstException } from '@cloudbeaver/core-utils';
 
-import { AdministrationUsersManagementService } from '../../../AdministrationUsersManagementService';
 import style from './AdministrationUserForm.m.css';
+import { AdministrationUserFormDeleteButton } from './AdministrationUserFormDeleteButton';
 import { AdministrationUserFormService, IUserFormState } from './AdministrationUserFormService';
 import { DATA_CONTEXT_USER_FORM_INFO_PART } from './Info/DATA_CONTEXT_USER_FORM_INFO_PART';
-import { useDeleteUser } from './useDeleteUser';
 
 interface Props {
   state: IFormState<IUserFormState>;
@@ -40,21 +38,14 @@ export const AdministrationUserForm = observer<Props>(function AdministrationUse
   const translate = useTranslate();
   const notificationService = useService(NotificationService);
   const administrationUserFormService = useService(AdministrationUserFormService);
-  const administrationUsersManagementService = useService(AdministrationUsersManagementService);
-  const usersResource = useService(UsersResource);
 
   const editing = state.mode === FormMode.Edit;
-  const userManagementDisabled = administrationUsersManagementService.externalUserProviderEnabled;
   const userFormInfoPart = state.dataContext.get(DATA_CONTEXT_USER_FORM_INFO_PART);
-  const deleteDisabled = usersResource.isActiveUser(userFormInfoPart.initialState.userId) || userManagementDisabled;
-
-  const deleteUser = useDeleteUser(userFormInfoPart.initialState.userId, userFormInfoPart.initialState.enabled);
 
   const form = useForm({
     async onSubmit() {
       const mode = state.mode;
       const saved = await state.save();
-      const userFormInfoPart = state.dataContext.get(DATA_CONTEXT_USER_FORM_INFO_PART);
 
       if (saved) {
         if (mode === FormMode.Create) {
@@ -90,10 +81,8 @@ export const AdministrationUserForm = observer<Props>(function AdministrationUse
               <TabList className={s(styles, { tabList: true })} style={deprecatedStyle} />
             </Container>
             <Container keepSize noWrap center gap compact>
-              {editing && !deleteDisabled && (
-                <Button disabled={state.isDisabled} mod={['outlined']} onClick={deleteUser}>
-                  {translate('ui_delete')}
-                </Button>
+              {editing && (
+                <AdministrationUserFormDeleteButton userId={userFormInfoPart.initialState.userId} enabled={userFormInfoPart.initialState.enabled} />
               )}
               <Button type="button" disabled={state.isDisabled} mod={['outlined']} onClick={onClose}>
                 {translate('ui_processing_cancel')}
