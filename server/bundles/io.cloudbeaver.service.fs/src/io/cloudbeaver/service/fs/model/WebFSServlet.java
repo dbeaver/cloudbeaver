@@ -25,6 +25,7 @@ import io.cloudbeaver.service.fs.DBWServiceFS;
 import org.eclipse.jetty.server.Request;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.data.json.JSONUtils;
+import org.jkiss.dbeaver.model.navigator.fs.DBNPathBase;
 import org.jkiss.utils.CommonUtils;
 import org.jkiss.utils.IOUtils;
 
@@ -83,7 +84,8 @@ public class WebFSServlet extends WebServiceServletBase {
         if (CommonUtils.isEmpty(parentNodePath)) {
             throw new DBException("Parent node path parameter is not found");
         }
-        Path path = FSUtils.getPathFromNode(session, parentNodePath);
+        DBNPathBase node = FSUtils.getNodeByPath(session, parentNodePath);
+        Path path = node.getPath();
         try {
             for (Part part : request.getParts()) {
                 String fileName = part.getSubmittedFileName();
@@ -92,6 +94,7 @@ public class WebFSServlet extends WebServiceServletBase {
                 }
                 try (InputStream is = part.getInputStream()) {
                     Files.copy(is, path.resolve(fileName));
+                    node.addChildResource(path.resolve(fileName));
                 }
             }
         } catch (Exception e) {
