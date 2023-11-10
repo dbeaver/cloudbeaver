@@ -5,7 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { getPathParts } from '@cloudbeaver/core-utils';
+import { createPath, getPathParts } from '@cloudbeaver/core-utils';
 
 import type { ICachedResourceMetadata } from '../ICachedResourceMetadata';
 import type { ICachedTreeElement } from './ICachedTreeElement';
@@ -30,6 +30,7 @@ export function getTreeParents<TValue, TMetadata extends ICachedResourceMetadata
     return parents;
   }
   const paths = getPathParts(path);
+  let currentNodePath = '';
 
   for (let i = 0; i < paths.length; ++i) {
     const current = parents[parents.length - 1];
@@ -38,14 +39,15 @@ export function getTreeParents<TValue, TMetadata extends ICachedResourceMetadata
       parents.shift();
     }
 
-    const path = paths[i];
-    let next = current.children[path];
+    const key = paths[i];
+    currentNodePath = createPath(currentNodePath, key);
+    let next = current.children[key];
     if (next === undefined) {
       if (getDefault) {
-        next = getDefault(path);
+        next = getDefault(currentNodePath);
         next.parent = current;
-        current.children[path] = next;
-        next = current.children[path]!;
+        current.children[key] = next;
+        next = current.children[key]!;
       } else {
         return parents;
       }

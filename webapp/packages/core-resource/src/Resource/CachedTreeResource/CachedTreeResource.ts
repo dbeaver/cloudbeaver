@@ -8,7 +8,7 @@
 import { action, makeObservable } from 'mobx';
 
 import { ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
-import { ILoadableState, isContainsException } from '@cloudbeaver/core-utils';
+import { getPathParent, ILoadableState, isContainsException } from '@cloudbeaver/core-utils';
 
 import { CachedResource } from '../CachedResource';
 import type { CachedResourceIncludeArgs, CachedResourceValueIncludes } from '../CachedResourceIncludes';
@@ -25,6 +25,7 @@ import { getTreeParents } from './getTreeParents';
 import { getTreeValue } from './getTreeValue';
 import type { ICachedTreeData } from './ICachedTreeData';
 import type { ICachedTreeElement } from './ICachedTreeElement';
+import type { ICachedTreeMoveData } from './ICachedTreeMoveData';
 
 export const CachedTreeRootValueKey = resourceKeyAlias('@cached-tree-resource/root-value');
 export const CachedTreeRootChildrenKey = resourceKeyListAlias('@cached-tree-resource/root-children');
@@ -41,6 +42,7 @@ export abstract class CachedTreeResource<
 > extends CachedResource<ICachedTreeData<TValue, TMetadata>, TValue, string, CachedResourceIncludeArgs<TValue, TContext>, TMetadata> {
   readonly onItemUpdate: ISyncExecutor<ResourceKeySimple<string>>;
   readonly onItemDelete: ISyncExecutor<ResourceKeySimple<string>>;
+  readonly onMove: ISyncExecutor<ICachedTreeMoveData>;
   readonly useTracker: CachedTreeUseTracker<TValue, TMetadata>;
   protected metadata: CachedTreeMetadata<TValue, TMetadata>;
 
@@ -72,6 +74,7 @@ export abstract class CachedTreeResource<
     );
     this.useTracker = new CachedTreeUseTracker(this.logger, this.aliases, this.metadata);
 
+    this.onMove = new SyncExecutor();
     this.onItemUpdate = new SyncExecutor<ResourceKeySimple<string>>(null);
     this.onItemDelete = new SyncExecutor<ResourceKeySimple<string>>(null);
 
@@ -150,7 +153,20 @@ export abstract class CachedTreeResource<
     this.markUpdated(key);
     this.markLoaded(key);
     this.cleanError(key);
-    this.onItemUpdate.execute(key);
+
+    const parents = ResourceKeyUtils.mapArray(key, getPathParent);
+    this.onItemUpdate.execute(ResourceKeyUtils.join(...parents, key));
+  }
+
+  protected moveSync(from: string, to: string, node: TValue): TValue {
+    // order is matter, we creating new node
+    this.set(to, node);
+    // and then we change links
+    this.onMove.execute({ from, to });
+    // and then we delete old node
+    this.delete(from);
+
+    return this.get(to)!;
   }
 
   delete(originalKey: ResourceKey<string>): void {
@@ -160,6 +176,7 @@ export abstract class CachedTreeResource<
       return;
     }
 
+    this.onItemUpdate.execute(ResourceKeyUtils.mapKey(key, getPathParent));
     this.onItemDelete.execute(key);
     ResourceKeyUtils.forEach(key, key => {
       this.dataDelete(this.getKeyRef(key));
