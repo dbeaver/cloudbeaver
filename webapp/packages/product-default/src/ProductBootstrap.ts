@@ -19,6 +19,6 @@ export class ProductBootstrap extends Bootstrap {
   async load() {}
 
   register() {
-    this.versionUpdateService.registerInstruction(() => UpdateInstruction);
+    this.versionUpdateService.registerVersionInstruction(() => UpdateInstruction);
   }
 }

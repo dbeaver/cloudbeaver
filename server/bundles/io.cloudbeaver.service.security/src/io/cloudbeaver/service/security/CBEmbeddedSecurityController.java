@@ -1289,9 +1289,9 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
             throw new SMException("Unsupported authentication provider: " + authProviderId);
         }
         var authProgressMonitor = new LoggingProgressMonitor(log);
+        boolean isMainSession = previousSmSessionId == null;
         try (Connection dbCon = database.openConnection()) {
             try (JDBCTransaction txn = new JDBCTransaction(dbCon)) {
-                boolean isMainSession = previousSmSessionId == null;
                 Map<String, Object> securedUserIdentifyingCredentials = userCredentials;
                 WebAuthProviderDescriptor authProviderDescriptor = getAuthProvider(authProviderId);
                 var authProviderInstance = authProviderDescriptor.getInstance();
@@ -1334,7 +1334,7 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
                     String signOutLink = authProviderFederated.getSignOutLink(authProviderConfigurationId, Map.of());
                     Map<SMAuthConfigurationReference, Object> authData = Map.of(new SMAuthConfigurationReference(authProviderId,
                         authProviderConfigurationId), filteredUserCreds);
-                    return SMAuthInfo.inProgress(authAttemptId, signInLink, signOutLink, authData);
+                    return SMAuthInfo.inProgress(authAttemptId, signInLink, signOutLink, authData, isMainSession);
                 }
                 txn.commit();
                 return finishAuthentication(
@@ -1342,7 +1342,9 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
                         authAttemptId,
                         null,
                         null,
-                        Map.of(new SMAuthConfigurationReference(authProviderId, authProviderConfigurationId), securedUserIdentifyingCredentials)
+                        Map.of(new SMAuthConfigurationReference(authProviderId, authProviderConfigurationId),
+                            securedUserIdentifyingCredentials),
+                        isMainSession
                     ),
                     true,
                     false
@@ -1385,8 +1387,9 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
                 try (PreparedStatement dbStat = dbCon.prepareStatement(
                     database.normalizeTableNames(
                         "INSERT INTO {table_prefix}CB_AUTH_ATTEMPT" +
-                            "(AUTH_ID,AUTH_STATUS,APP_SESSION_ID,SESSION_TYPE,APP_SESSION_STATE,SESSION_ID) " +
-                            "VALUES(?,?,?,?,?,?)"
+                            "(AUTH_ID,AUTH_STATUS,APP_SESSION_ID,SESSION_TYPE,APP_SESSION_STATE," +
+                            "SESSION_ID,IS_MAIN_AUTH) " +
+                            "VALUES(?,?,?,?,?,?,?)"
                     )
                 )) {
                     dbStat.setString(1, authAttemptId);
@@ -1399,6 +1402,7 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
                     } else {
                         dbStat.setNull(6, Types.VARCHAR);
                     }
+                    dbStat.setString(7, isMainSession ? CHAR_BOOL_TRUE : CHAR_BOOL_FALSE);
                     dbStat.execute();
                 }
 
@@ -1518,9 +1522,11 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
             SMAuthStatus smAuthStatus;
             String authError;
             String smSessionId;
+            boolean isMainAuth;
             try (PreparedStatement dbStat = dbCon.prepareStatement(
                 database.normalizeTableNames(
-                    "SELECT AUTH_STATUS,AUTH_ERROR,SESSION_ID FROM {table_prefix}CB_AUTH_ATTEMPT WHERE AUTH_ID=?"
+                    "SELECT AUTH_STATUS,AUTH_ERROR,SESSION_ID,IS_MAIN_AUTH FROM {table_prefix}CB_AUTH_ATTEMPT WHERE " +
+                        "AUTH_ID=?"
                 )
             )) {
                 dbStat.setString(1, authId);
@@ -1531,6 +1537,7 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
                     smAuthStatus = SMAuthStatus.valueOf(dbResult.getString(1));
                     authError = dbResult.getString(2);
                     smSessionId = dbResult.getString(3);
+                    isMainAuth = CHAR_BOOL_TRUE.equals(dbResult.getString(4));
                 }
             }
             Map<SMAuthConfigurationReference, Object> authData = new LinkedHashMap<>();
@@ -1571,11 +1578,11 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
             if (smAuthStatus != SMAuthStatus.SUCCESS) {
                 switch (smAuthStatus) {
                     case IN_PROGRESS:
-                        return SMAuthInfo.inProgress(authId, signInLink, signOutLink, authData);
+                        return SMAuthInfo.inProgress(authId, signInLink, signOutLink, authData, isMainAuth);
                     case ERROR:
-                        return SMAuthInfo.error(authId, authError);
+                        return SMAuthInfo.error(authId, authError, isMainAuth);
                     case EXPIRED:
-                        return SMAuthInfo.expired(authId, readExpiredData ? authData : Map.of());
+                        return SMAuthInfo.expired(authId, readExpiredData ? authData : Map.of(), isMainAuth);
                     default:
                         throw new SMException("Unknown auth status:" + smAuthStatus);
                 }
@@ -1583,16 +1590,21 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
 
             SMTokens smTokens = findTokenBySmSession(smSessionId);
             SMAuthPermissions authPermissions = getTokenPermissions(smTokens.getSmAccessToken());
-            String authRole = readTokenAuthRole(smTokens.getSmAccessToken());
-            var successAuthStatus = SMAuthInfo.successMainSession(
-                authId,
-                smTokens.getSmAccessToken(),
-                smTokens.getSmRefreshToken(),
-                authPermissions,
-                authData,
-                authRole
-            );
-            return successAuthStatus;
+
+            if (isMainAuth) {
+                String authRole = readTokenAuthRole(smTokens.getSmAccessToken());
+                return SMAuthInfo.successMainSession(
+                    authId,
+                    smTokens.getSmAccessToken(),
+                    smTokens.getSmRefreshToken(),
+                    authPermissions,
+                    authData,
+                    authRole
+                );
+            } else {
+                //TODO remove permissions from child session
+                return SMAuthInfo.successChildSession(authId, authPermissions, authData);
+            }
         } catch (SQLException e) {
             throw new DBException("Error while read auth info", e);
         }
@@ -1792,7 +1804,7 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
 
         DBRProgressMonitor finishAuthMonitor = new LoggingProgressMonitor(log);
         AuthAttemptSessionInfo authAttemptSessionInfo = readAuthAttemptSessionInfo(authId);
-        boolean isMainAuthSession = authAttemptSessionInfo.getSmSessionId() == null;
+        boolean isMainAuthSession = authAttemptSessionInfo.isMainAuth();
 
         SMTokens smTokens = null;
         SMAuthPermissions permissions = null;
@@ -1850,7 +1862,7 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
                 if (userIdFromCreds == null) {
                     var error = "Invalid user credentials";
                     updateAuthStatus(authId, SMAuthStatus.ERROR, storedUserData, error);
-                    return SMAuthInfo.error(authId, error);
+                    return SMAuthInfo.error(authId, error, isMainAuthSession);
                 }
 
                 if (autoAssign != null && !CommonUtils.isEmpty(autoAssign.getExternalTeamIds())) {
@@ -2036,8 +2048,9 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
     private AuthAttemptSessionInfo readAuthAttemptSessionInfo(@NotNull String authId) throws DBException {
         try (Connection dbCon = database.openConnection()) {
             try (PreparedStatement dbStat = dbCon.prepareStatement(
-                database.normalizeTableNames("SELECT APP_SESSION_ID,SESSION_TYPE,APP_SESSION_STATE,SESSION_ID FROM " +
-                    "{table_prefix}CB_AUTH_ATTEMPT WHERE AUTH_ID=?")
+                database.normalizeTableNames(
+                    "SELECT APP_SESSION_ID,SESSION_TYPE,APP_SESSION_STATE,SESSION_ID,IS_MAIN_AUTH " +
+                        "FROM {table_prefix}CB_AUTH_ATTEMPT WHERE AUTH_ID=?")
             )) {
                 dbStat.setString(1, authId);
                 try (ResultSet dbResult = dbStat.executeQuery()) {
@@ -2050,8 +2063,15 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
                         dbResult.getString(3), MAP_STRING_OBJECT_TYPE
                     );
                     String smSessionId = dbResult.getString(4);
+                    boolean isMainAuth = CHAR_BOOL_TRUE.equals(dbResult.getString(5));
 
-                    return new AuthAttemptSessionInfo(appSessionId, smSessionId, sessionType, sessionParams);
+                    return new AuthAttemptSessionInfo(
+                        appSessionId,
+                        smSessionId,
+                        sessionType,
+                        sessionParams,
+                        isMainAuth
+                    );
                 }
             }
         } catch (SQLException e) {

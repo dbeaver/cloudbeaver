@@ -72,7 +72,7 @@ public class CBDatabase {
     public static final String SCHEMA_UPDATE_SQL_PATH = "db/cb_schema_update_";
 
     private static final int LEGACY_SCHEMA_VERSION = 1;
-    private static final int CURRENT_SCHEMA_VERSION = 13;
+    private static final int CURRENT_SCHEMA_VERSION = 14;
 
     private static final String DEFAULT_DB_USER_NAME = "cb-data";
     private static final String DEFAULT_DB_PWD_FILE = ".database-credentials.dat";
@@ -426,11 +426,11 @@ public class CBDatabase {
                     // Create teams
                     for (SMTeam team : initialTeams) {
                         adminSecurityController.createTeam(team.getTeamId(), team.getName(), team.getDescription(), adminName);
-                        if (adminName != null && !application.isMultiNode()) {
+                        if (!application.isMultiNode()) {
                             adminSecurityController.setSubjectPermissions(
                                 team.getTeamId(),
                                 new ArrayList<>(team.getPermissions()),
-                                adminName
+                                "initial-data-configuration"
                             );
                         }
                     }
