@@ -26,14 +26,8 @@ import { ResourceManagerEventHandler } from './ResourceManagerEventHandler';
 export type ResourceInfoIncludes = Omit<GetResourceListQueryVariables, 'projectId'>;
 export type RmResourceInfo = RmResource;
 
-export interface IResourceManagerMoveData {
-  from: string;
-  to: string;
-}
-
 @injectable()
 export class ResourceManagerResource extends CachedTreeResource<RmResourceInfo, ResourceInfoIncludes> {
-  readonly onMove: IExecutor<IResourceManagerMoveData>;
   constructor(
     private readonly graphQLService: GraphQLService,
     private readonly projectsService: ProjectsService,
@@ -41,8 +35,6 @@ export class ResourceManagerResource extends CachedTreeResource<RmResourceInfo, 
     dataSynchronizationService: DataSynchronizationService,
   ) {
     super();
-
-    this.onMove = new Executor();
 
     this.projectsService.onActiveProjectChange.addHandler(data => {
       if (data.type === 'after') {
@@ -122,12 +114,11 @@ export class ResourceManagerResource extends CachedTreeResource<RmResourceInfo, 
         oldPath: fromResourceKey.path,
         newPath: toResourceKey.path,
       });
-
-      await this.onMove.execute({ from, to });
-      this.delete(from);
     });
 
-    await this.load(to);
+    const data = await this.load(to);
+
+    this.moveSync(from, to, data);
   }
 
   async setProperties(key: string, diff: Record<string, any>): Promise<Record<string, any>> {
