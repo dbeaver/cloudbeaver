@@ -14,8 +14,8 @@ import { ColoredContainer, useResource, useStyles } from '@cloudbeaver/core-bloc
 import { useService } from '@cloudbeaver/core-di';
 import { CachedMapAllKey } from '@cloudbeaver/core-resource';
 import { VersionResource, VersionService } from '@cloudbeaver/core-version';
+import { VersionUpdateService } from '@cloudbeaver/core-version-update';
 
-import { Instructions } from './Instructions';
 import { Recommendations } from './Recommendations';
 import { VersionChecker } from './VersionChecker';
 import { VersionSelector } from './VersionSelector';
@@ -30,10 +30,12 @@ const styles = css`
 export const VersionUpdate: AdministrationItemContentComponent = observer(function VersionUpdate() {
   const style = useStyles(styles);
   const versionService = useService(VersionService);
+  const versionUpdateService = useService(VersionUpdateService);
   const versionResource = useResource(VersionUpdate, VersionResource, CachedMapAllKey, {
     silent: true,
   });
 
+  const GeneralInstructions = versionUpdateService.generalInstructionsGetter?.();
   const versions = versionResource.resource.values.filter(v => gte(v.number, versionService.current));
 
   return styled(style)(
@@ -41,7 +43,7 @@ export const VersionUpdate: AdministrationItemContentComponent = observer(functi
       <VersionChecker />
       {versions.length > 0 && (
         <>
-          <Instructions />
+          {GeneralInstructions && <GeneralInstructions />}
           <VersionSelector versions={versions} />
         </>
       )}

@@ -9,7 +9,7 @@ import { observer } from 'mobx-react-lite';
 import { useEffect, useState } from 'react';
 import styled, { css } from 'reshadow';
 
-import { Combobox, Container, Group, GroupItem } from '@cloudbeaver/core-blocks';
+import { Combobox, Container, Group, GroupItem, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
 import { IVersion, VersionResource } from '@cloudbeaver/core-version';
@@ -34,6 +34,7 @@ export const VersionSelector = observer<Props>(function VersionSelector({ versio
   const versionUpdateService = useService(VersionUpdateService);
   const versionResource = useService(VersionResource);
   const serverConfigResource = useService(ServerConfigResource);
+  const translate = useTranslate();
 
   const [selected, setSelected] = useState('');
 
@@ -44,7 +45,7 @@ export const VersionSelector = observer<Props>(function VersionSelector({ versio
   }, [versionResource.latest?.number]);
 
   const version = versions.find(v => v.number === selected);
-  const Instruction = versionUpdateService.instructionGetter?.();
+  const Instruction = versionUpdateService.versionInstructionGetter?.();
 
   return styled(style)(
     <Container gap>
@@ -57,7 +58,7 @@ export const VersionSelector = observer<Props>(function VersionSelector({ versio
           tiny
           onSelect={value => setSelected(value)}
         >
-          Version
+          {translate('plugin_version_update_administration_version_selector_label')}
         </Combobox>
         {version && Instruction && (
           <GroupItem>
