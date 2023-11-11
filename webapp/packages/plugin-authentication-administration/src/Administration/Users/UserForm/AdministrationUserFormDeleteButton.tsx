@@ -8,7 +8,7 @@
 import { UsersResource } from '@cloudbeaver/core-authentication';
 import { Button, ButtonProps, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
+import { CommonDialogService } from '@cloudbeaver/core-dialogs';
 
 import { AdministrationUsersManagementService } from '../../../AdministrationUsersManagementService';
 import { DeleteUserDialog } from './DeleteUserDialog';
@@ -32,20 +32,21 @@ export const AdministrationUserFormDeleteButton: React.FC<Props> = function Admi
     return null;
   }
 
-  async function deleteUser() {
-    if (enabled) {
-      const result = await commonDialogService.open(DisableUserDialog, {
-        userId,
-      });
-
-      if (result === DialogueStateResult.Rejected) {
-        return;
-      }
-    }
-
+  async function openUserDeleteDialog() {
     await commonDialogService.open(DeleteUserDialog, {
       userId,
     });
+  }
+
+  async function deleteUser() {
+    if (enabled) {
+      await commonDialogService.open(DisableUserDialog, {
+        userId,
+        onDelete: openUserDeleteDialog,
+      });
+    } else {
+      await openUserDeleteDialog();
+    }
   }
 
   return (

@@ -24,6 +24,7 @@ import { NotificationService } from '@cloudbeaver/core-events';
 
 interface IPayload {
   userId: string;
+  onDelete: () => void;
 }
 
 export const DisableUserDialog: DialogComponent<IPayload> = function DisableUserDialog(props) {
@@ -31,14 +32,19 @@ export const DisableUserDialog: DialogComponent<IPayload> = function DisableUser
   const notificationService = useService(NotificationService);
   const usersResource = useResource(DisableUserDialog, UsersResource, null);
 
-  async function disableUser() {
+  async function disableHandler() {
     try {
       await usersResource.resource.enableUser(props.payload.userId, false);
       notificationService.logSuccess({ title: 'authentication_administration_users_disable_user_success', message: props.payload.userId });
-      props.rejectDialog();
+      props.resolveDialog();
     } catch (exception: any) {
       notificationService.logException(exception, 'authentication_administration_users_disable_user_fail');
     }
+  }
+
+  function deleteHandler() {
+    props.payload.onDelete();
+    props.rejectDialog();
   }
 
   return (
@@ -58,10 +64,10 @@ export const DisableUserDialog: DialogComponent<IPayload> = function DisableUser
         </Button>
         <Fill />
         <Container noWrap gap dense keepSize>
-          <Button mod={['outlined']} onClick={() => props.resolveDialog()}>
+          <Button mod={['outlined']} onClick={deleteHandler}>
             {translate('ui_delete')}
           </Button>
-          <Button mod={['raised']} onClick={disableUser}>
+          <Button mod={['raised']} onClick={disableHandler}>
             {translate('ui_disable')}
           </Button>
         </Container>
