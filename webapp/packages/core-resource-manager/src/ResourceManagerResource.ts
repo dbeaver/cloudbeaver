@@ -114,11 +114,11 @@ export class ResourceManagerResource extends CachedTreeResource<RmResourceInfo, 
         oldPath: fromResourceKey.path,
         newPath: toResourceKey.path,
       });
+
+      await this.loader(to, []);
+
+      this.moveSync(from, to, this.get(to)!);
     });
-
-    const data = await this.load(to);
-
-    this.moveSync(from, to, data);
   }
 
   async setProperties(key: string, diff: Record<string, any>): Promise<Record<string, any>> {
