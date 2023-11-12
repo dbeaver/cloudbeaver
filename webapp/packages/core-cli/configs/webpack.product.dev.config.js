@@ -14,7 +14,7 @@ const { getAssets } = require('./webpack.product.utils');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const HtmlReplaceWebpackPlugin = require('html-replace-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
-const ReactRefreshPlugin = require('@pmmmwh/react-refresh-webpack-plugin');
+const ReactRefreshWebpackPlugin = require('@pmmmwh/react-refresh-webpack-plugin');
 const HtmlInjectWebpackPlugin = require('../utils/HtmlInjectWebpackPlugin');
 
 
@@ -51,10 +51,10 @@ module.exports = (env, argv) => {
     },
     devServer: {
       allowedHosts: 'all',
-      host: '0.0.0.0',
-      // port: 8080,
+      host: 'localhost',
+      port: 8080,
       client: {
-        webSocketURL: 'auto://0.0.0.0:0/ws',
+        webSocketURL: 'auto://localhost:0/ws',
         overlay: false,
       },
       server,
@@ -69,16 +69,16 @@ module.exports = (env, argv) => {
           secure: false,
         },
       },
-      onListening: function (devServer, ...args) {
-        if (!devServer) {
-          throw new Error('webpack-dev-server is not defined');
-        }
-        const logger = devServer.compiler.getInfrastructureLogger('webpack-dev-server');
-        const port = devServer.server.address().port;
-        logger.info(`Proxy from http://localhost:8080 to http://127.0.0.1:${port}`);
-        httpProxy.createProxyServer({ target:`http://127.0.0.1:${port}`, secure: false }).listen(8080);
-      },
-    }, 
+      // onListening: function (devServer, ...args) {
+      //   if (!devServer) {
+      //     throw new Error('webpack-dev-server is not defined');
+      //   }
+      //   const logger = devServer.compiler.getInfrastructureLogger('webpack-dev-server');
+      //   const port = devServer.server.address().port;
+      //   logger.info(`Proxy from http://localhost:8080 to http://127.0.0.1:${port}`);
+      //   httpProxy.createProxyServer({ target:`http://127.0.0.1:${port}`, secure: false }).listen(8080);
+      // },
+    },
     plugins: [
       new CopyWebpackPlugin({
         patterns: getAssets(package, ''),
@@ -112,7 +112,7 @@ module.exports = (env, argv) => {
         },
       ]),
       new webpack.HotModuleReplacementPlugin(),
-      new ReactRefreshPlugin(),
+      new ReactRefreshWebpackPlugin({ overlay: false }),
     ],
   });
 };
