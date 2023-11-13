@@ -197,8 +197,6 @@ export class ProjectsService extends Dependency {
     }
     this.userProjectsSettings.activeProjectIds = ids;
 
-    this.projectInfoResource.markOutdated(resourceKeyList(ids));
-
     await this.onActiveProjectChange.execute({
       type: 'after',
       projects: ids,
