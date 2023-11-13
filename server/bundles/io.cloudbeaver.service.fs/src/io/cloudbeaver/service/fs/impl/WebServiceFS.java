@@ -220,16 +220,20 @@ public class WebServiceFS implements DBWServiceFS {
     @Override
     public FSFile copyFile(
         @NotNull WebSession webSession,
-        @NotNull String projectId,
-        @NotNull URI fromURI,
-        @NotNull URI toURI
+        @NotNull String oldNodePath,
+        @NotNull String parentNodePath
     ) throws DBWebException {
         try {
-            Path from = webSession.getFileSystemManager(projectId)
-                .getPathFromURI(webSession.getProgressMonitor(), fromURI);
-            Path to = webSession.getFileSystemManager(projectId).getPathFromURI(webSession.getProgressMonitor(), toURI);
-            Files.copy(from, to);
-            return new FSFile(to);
+            DBNPathBase oldNode = FSUtils.getNodeByPath(webSession, oldNodePath);
+            String fileName = oldNode.getName();
+            DBNPathBase parentNode = FSUtils.getNodeByPath(webSession, parentNodePath);
+            Path parentPath = parentNode.getPath();
+            if (!Files.isDirectory(parentPath)) {
+                throw new DBException(MessageFormat.format("Node ''{0}'' is not a directory", parentPath));
+            }
+            Path to = Files.copy(oldNode.getPath(), parentPath.resolve(fileName));
+            parentNode.addChildResource(to);
+            return new FSFile(parentNode.getChild(to));
         } catch (Exception e) {
             throw new DBWebException("Failed to copy file: " + e.getMessage(), e);
         }
