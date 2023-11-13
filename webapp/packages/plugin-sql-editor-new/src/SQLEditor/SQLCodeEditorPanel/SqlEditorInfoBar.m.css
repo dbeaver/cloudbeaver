@@ -1,0 +1,9 @@
+.container {
+  display: flex;
+  align-items: center;
+  padding: 0 6px;
+}
+.metadata {
+  composes: theme-typography--caption from global;
+  margin-left: auto;
+}

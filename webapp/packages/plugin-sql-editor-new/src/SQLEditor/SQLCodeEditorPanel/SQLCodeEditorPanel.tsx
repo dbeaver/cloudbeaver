@@ -23,7 +23,7 @@ import { useSQLCodeEditor } from '../SQLCodeEditor/useSQLCodeEditor';
 import { useSqlDialectAutocompletion } from '../useSqlDialectAutocompletion';
 import { useSqlDialectExtension } from '../useSqlDialectExtension';
 import style from './SQLCodeEditorPanel.m.css';
-import { SqlEditorStatusBar } from './SqlEditorStatusBar';
+import { SqlEditorInfoBar } from './SqlEditorInfoBar';
 import { useSQLCodeEditorPanel } from './useSQLCodeEditorPanel';
 
 interface ILocalSQLCodeEditorPanelState {
@@ -148,8 +148,12 @@ export const SQLCodeEditorPanel: TabContainerPanelComponent<ISqlEditorModeProps>
             </ReactCodemirrorPanel>
           </>
         )}
+        {editor.state && (
+          <ReactCodemirrorPanel>
+            <SqlEditorInfoBar state={editor.state} />
+          </ReactCodemirrorPanel>
+        )}
       </SQLCodeEditorLoader>
-      <SqlEditorStatusBar state={editor.state} dataSource={data.dataSource} />
     </div>
   );
 });

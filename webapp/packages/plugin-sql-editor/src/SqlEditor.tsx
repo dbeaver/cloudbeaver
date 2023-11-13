@@ -16,6 +16,7 @@ import { SqlDataSourceService } from './SqlDataSource/SqlDataSourceService';
 import style from './SqlEditor.m.css';
 import { SqlEditorLoader } from './SqlEditor/SqlEditorLoader';
 import { SqlEditorOverlay } from './SqlEditorOverlay';
+import { SqlEditorStatusBar } from './SqlEditorStatusBar';
 import { SqlEditorView } from './SqlEditorView';
 import { SqlResultTabs } from './SqlResultTabs/SqlResultTabs';
 import { useDataSource } from './useDataSource';
@@ -48,6 +49,7 @@ export const SqlEditor = observer<Props>(function SqlEditor({ state }) {
           </Pane>
         </Split>
         <SqlEditorOverlay state={state} />
+        <SqlEditorStatusBar dataSource={dataSource} />
       </CaptureView>
     </Loader>
   );
