@@ -210,13 +210,8 @@ public class WebServiceFS implements DBWServiceFS {
     ) throws DBWebException {
         try {
             DBNPathBase node = FSUtils.getNodeByPath(webSession, nodePath);
-            DBNPathBase parentNode = (DBNPathBase) node.getParentNode();
-            Path oldPath = node.getPath();
-            Path newPath = Files.move(oldPath, oldPath.resolveSibling(newName));
-            // apply changes in navigator node
-            parentNode.removeChildResource(oldPath);
-            parentNode.addChildResource(newPath);
-            return new FSFile(parentNode.getChild(newPath));
+            node.rename(webSession.getProgressMonitor(), newName);
+            return new FSFile(node);
         } catch (Exception e) {
             throw new DBWebException("Failed to move file: " + e.getMessage(), e);
         }
