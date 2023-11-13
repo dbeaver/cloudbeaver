@@ -19,5 +19,5 @@ package io.cloudbeaver.service.fs.model;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 
-public record FSFileSystem(@NotNull String id, @Nullable String requiredAuth) {
+public record FSFileSystem(@NotNull String id, @NotNull String nodePath, @Nullable String requiredAuth) {
 }

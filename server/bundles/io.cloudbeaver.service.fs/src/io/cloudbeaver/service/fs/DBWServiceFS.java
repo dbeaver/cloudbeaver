@@ -23,8 +23,6 @@ import io.cloudbeaver.service.fs.model.FSFile;
 import io.cloudbeaver.service.fs.model.FSFileSystem;
 import org.jkiss.code.NotNull;
 
-import java.net.URI;
-
 /**
  * Web service API
  */
@@ -44,28 +42,24 @@ public interface DBWServiceFS extends DBWService {
     @NotNull
     FSFile getFile(
         @NotNull WebSession webSession,
-        @NotNull String projectId,
-        @NotNull URI fileURI
+        @NotNull String nodePath
     ) throws DBWebException;
 
     @NotNull
     FSFile[] getFiles(
         @NotNull WebSession webSession,
-        @NotNull String projectId,
-        @NotNull URI folderURI
+        @NotNull String nodePath
     ) throws DBWebException;
 
     @NotNull
     String readFileContent(
         @NotNull WebSession webSession,
-        @NotNull String projectId,
-        @NotNull URI fileURI
+        @NotNull String nodePath
     ) throws DBWebException;
 
     FSFile writeFileContent(
         @NotNull WebSession webSession,
-        @NotNull String projectId,
-        @NotNull URI fileURI,
+        @NotNull String nodePath,
         @NotNull String data,
         boolean forceOverwrite
     ) throws DBWebException;
@@ -73,15 +67,20 @@ public interface DBWServiceFS extends DBWService {
     @NotNull
     FSFile createFile(
         @NotNull WebSession webSession,
-        @NotNull String projectId,
-        @NotNull URI fileURI
+        @NotNull String parentPath,
+        @NotNull String fileName
     ) throws DBWebException;
 
     FSFile moveFile(
         @NotNull WebSession webSession,
-        @NotNull String projectId,
-        @NotNull URI fromURI,
-        @NotNull URI toURI
+        @NotNull String nodePath,
+        @NotNull String parentNodePath
+    ) throws DBWebException;
+
+    FSFile renameFile(
+        @NotNull WebSession webSession,
+        @NotNull String nodePath,
+        @NotNull String newName
     ) throws DBWebException;
 
     FSFile copyFile(
@@ -94,14 +93,13 @@ public interface DBWServiceFS extends DBWService {
     @NotNull
     FSFile createFolder(
         @NotNull WebSession webSession,
-        @NotNull String projectId,
-        @NotNull URI folderURI
+        @NotNull String nodePath,
+        @NotNull String folderName
     ) throws DBWebException;
 
     boolean deleteFile(
         @NotNull WebSession webSession,
-        @NotNull String projectId,
-        @NotNull URI fileURI
+        @NotNull String nodePath
     ) throws DBWebException;
 
 }

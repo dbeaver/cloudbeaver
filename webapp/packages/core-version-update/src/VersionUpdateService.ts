@@ -21,7 +21,8 @@ export type InstructionComponent = React.FunctionComponent<IInstructionProps>;
 
 @injectable()
 export class VersionUpdateService {
-  instructionGetter: (() => InstructionComponent) | null;
+  generalInstructionsGetter: (() => React.FC) | null = null;
+  versionInstructionGetter: (() => InstructionComponent) | null;
 
   get newVersionAvailable() {
     if (!this.versionService.current || !this.versionResource.latest) {
@@ -32,14 +33,18 @@ export class VersionUpdateService {
   }
 
   constructor(private readonly versionService: VersionService, private readonly versionResource: VersionResource) {
-    this.instructionGetter = null;
+    this.versionInstructionGetter = null;
 
     makeObservable(this, {
       newVersionAvailable: computed,
     });
   }
 
-  registerInstruction(componentGetter: () => InstructionComponent): void {
-    this.instructionGetter = componentGetter;
+  registerVersionInstruction(componentGetter: () => InstructionComponent): void {
+    this.versionInstructionGetter = componentGetter;
+  }
+
+  registerGeneralInstruction(componentGetter: (() => React.FC) | null): void {
+    this.generalInstructionsGetter = componentGetter;
   }
 }
