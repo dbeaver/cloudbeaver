@@ -205,6 +205,10 @@ module.exports = (env, argv) => {
           test: /\.(png|jpg|gif)$/i,
           type: 'asset/inline',
         },
+        {
+          test: /\.(woff|woff2|eot|ttf|otf)$/i,
+          type: 'asset/resource',
+        },
       ],
     },
     ignoreWarnings: [/Failed to parse source map/],
