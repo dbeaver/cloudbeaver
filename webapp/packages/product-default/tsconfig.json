@@ -170,6 +170,15 @@
     },
     {
       "path": "../plugin-version-update-administration/tsconfig.json"
+    },
+    {
+      "path": "../core-localization/tsconfig.json"
+    },
+    {
+      "path": "../core-task-manager/tsconfig.json"
+    },
+    {
+      "path": "../plugin-task-manager/tsconfig.json"
     }
   ],
   "include": [
