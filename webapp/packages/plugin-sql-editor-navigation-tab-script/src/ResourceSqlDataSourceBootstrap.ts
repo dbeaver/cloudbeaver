@@ -13,8 +13,8 @@ import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { ProjectInfoResource } from '@cloudbeaver/core-projects';
-import { resourceKeyList, ResourceKeySimple, ResourceKeyUtils } from '@cloudbeaver/core-resource';
-import { IResourceManagerMoveData, ResourceManagerResource } from '@cloudbeaver/core-resource-manager';
+import { ICachedTreeMoveData, resourceKeyList, ResourceKeySimple, ResourceKeyUtils } from '@cloudbeaver/core-resource';
+import { ResourceManagerResource } from '@cloudbeaver/core-resource-manager';
 import { NetworkStateService } from '@cloudbeaver/core-root';
 import { LocalStorageSaveService } from '@cloudbeaver/core-settings';
 import { createPath, getPathParent } from '@cloudbeaver/core-utils';
@@ -171,7 +171,7 @@ export class ResourceSqlDataSourceBootstrap extends Bootstrap {
     this.dataSourceStateState.delete(editorId);
   }
 
-  private resourceMoveHandler(data: IResourceManagerMoveData) {
+  private resourceMoveHandler(data: ICachedTreeMoveData) {
     if (!this.resourceManagerService.enabled) {
       return;
     }

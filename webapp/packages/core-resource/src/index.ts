@@ -11,6 +11,7 @@ export {
   type ICachedResourceOffsetPageOptions,
 } from './Resource/CachedResourceOffsetPageKeys';
 export * from './Resource/CachedTreeResource/CachedTreeResource';
+export * from './Resource/CachedTreeResource/ICachedTreeMoveData';
 export * from './Resource/ICachedResourceMetadata';
 export * from './Resource/IResource';
 export * from './Resource/Resource';
