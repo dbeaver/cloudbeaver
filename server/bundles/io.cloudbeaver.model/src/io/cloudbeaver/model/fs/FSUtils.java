@@ -16,12 +16,43 @@
  */
 package io.cloudbeaver.model.fs;
 
+import io.cloudbeaver.DBWebException;
+import io.cloudbeaver.model.session.WebSession;
 import org.jkiss.code.NotNull;
+import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.fs.DBFVirtualFileSystem;
+import org.jkiss.dbeaver.model.navigator.DBNModel;
+import org.jkiss.dbeaver.model.navigator.DBNNode;
+import org.jkiss.dbeaver.model.navigator.fs.DBNPathBase;
+import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
+
+import java.nio.file.Path;
 
 public class FSUtils {
     @NotNull
     public static String makeUniqueFsId(@NotNull DBFVirtualFileSystem fileSystem) {
         return fileSystem.getType() + ":" + fileSystem.getId();
+    }
+
+    @NotNull
+    public static Path getPathFromNode(@NotNull WebSession webSession, @NotNull String nodePath) throws DBException {
+        DBNPathBase dbnPath = getNodeByPath(webSession, nodePath);
+        Path path = dbnPath.getPath();
+        if (path == null) {
+            throw new DBWebException("Path from node '" + nodePath + "' is empty");
+        }
+        return path;
+    }
+
+    @NotNull
+    public static DBNPathBase getNodeByPath(@NotNull WebSession webSession, @NotNull String nodePath) throws DBException {
+        DBRProgressMonitor monitor = webSession.getProgressMonitor();
+
+        DBNModel navigatorModel = webSession.getNavigatorModel();
+        DBNNode node = navigatorModel.getNodeByPath(monitor, nodePath);
+        if (!(node instanceof DBNPathBase dbnPath)) {
+            throw new DBWebException("Node '" + nodePath + "' is not found in File Systems");
+        }
+        return dbnPath;
     }
 }

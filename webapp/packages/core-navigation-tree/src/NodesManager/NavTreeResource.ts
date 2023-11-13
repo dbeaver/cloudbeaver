@@ -30,7 +30,7 @@ import {
 } from '@cloudbeaver/core-resource';
 import { SessionDataResource } from '@cloudbeaver/core-root';
 import { DetailsError, NavNodeChildrenQuery as fake, GraphQLService } from '@cloudbeaver/core-sdk';
-import { flat, isDefined, isUndefined, MetadataMap } from '@cloudbeaver/core-utils';
+import { flat, getPathName, getPathParent, isDefined, isUndefined, MetadataMap } from '@cloudbeaver/core-utils';
 
 import { NavTreeSettingsService } from '../NavTreeSettingsService';
 import type { NavNode } from './EntityTypes';
@@ -287,6 +287,25 @@ export class NavTreeResource extends CachedMapResource<string, string[], Record<
       newNodeId,
     });
     return newNodeId;
+  }
+
+  moveSync(from: string, to: string): void {
+    const toParent = getPathParent(to);
+    const fromParent = getPathParent(from);
+
+    this.pushToNode(toParent, [to]);
+
+    const node = this.navNodeInfoResource.get(from);
+    if (node) {
+      node.id = to;
+      node.name = getPathName(to);
+      node.parentId = toParent;
+      this.navNodeInfoResource.set(to, node);
+    }
+
+    this.deleteInNode(fromParent, [from]);
+
+    this.markOutdated(resourceKeyList([toParent, fromParent]));
   }
 
   moveToNode(key: string, target: string): void;
