@@ -55,7 +55,7 @@ public class AuthenticationTest {
 
     private Map<String, Object> doPostQuery(HttpClient client, String gqlScript) throws Exception {
         String input = WebTestUtils.readScriptTemplate(gqlScript, CEServerTestSuite.getScriptsPath());
-        List<String> headers = List.of(RPAuthProvider.X_USER, REVERSE_PROXY_TEST_USER, RPAuthProvider.X_ROLE, "user");
+        List<String> headers = List.of(RPAuthProvider.X_USER, REVERSE_PROXY_TEST_USER, RPAuthProvider.X_TEAM, "user");
         Map<String, Object> map = WebTestUtils.doPostWithHeaders(CEServerTestSuite.GQL_API_URL, input, client, headers);
         return JSONUtils.getObjectOrNull(map, "data");
     }

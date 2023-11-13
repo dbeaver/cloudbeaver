@@ -16,6 +16,8 @@
  */
 package io.cloudbeaver.model.app;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import io.cloudbeaver.DataSourceFilter;
 import io.cloudbeaver.WebProjectImpl;
 import io.cloudbeaver.WebSessionProjectImpl;
@@ -254,5 +256,11 @@ public abstract class BaseWebApplication extends BaseApplicationImpl implements 
     public WSEventController getEventController() {
         return null;
     }
+
+    protected Gson getGson() {
+        return getGsonBuilder().create();
+    }
+
+    protected abstract GsonBuilder getGsonBuilder();
 
 }
