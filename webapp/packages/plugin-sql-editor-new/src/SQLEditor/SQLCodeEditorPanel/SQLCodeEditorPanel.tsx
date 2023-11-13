@@ -128,7 +128,6 @@ export const SQLCodeEditorPanel: TabContainerPanelComponent<ISqlEditorModeProps>
         incomingValue={data.incomingValue}
         extensions={extensions}
         readonly={data.readonly}
-        className={styles.sqlCodeEditorLoader}
         autoFocus
         lineNumbers
         onChange={panel.onQueryChange}
