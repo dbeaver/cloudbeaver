@@ -17,14 +17,15 @@
 package io.cloudbeaver.service.fs.model;
 
 import io.cloudbeaver.DBWebException;
+import io.cloudbeaver.model.fs.FSUtils;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.server.CBApplication;
 import io.cloudbeaver.service.WebServiceServletBase;
 import io.cloudbeaver.service.fs.DBWServiceFS;
 import org.eclipse.jetty.server.Request;
-import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.data.json.JSONUtils;
+import org.jkiss.dbeaver.model.navigator.fs.DBNPathBase;
 import org.jkiss.utils.CommonUtils;
 import org.jkiss.utils.IOUtils;
 
@@ -64,8 +65,7 @@ public class WebFSServlet extends WebServiceServletBase {
     }
 
     private void doGet(WebSession session, HttpServletRequest request, HttpServletResponse response) throws DBException, IOException {
-        String projectId = request.getParameter(PARAM_PROJECT_ID);
-        Path path = getPath(session, projectId, request.getParameter("fileURI"));
+        Path path = FSUtils.getPathFromNode(session, request.getParameter("nodePath"));
         session.addInfoMessage("Download data ...");
         response.setHeader("Content-Type", "application/octet-stream");
         response.setHeader("Content-Disposition", "attachment; filename=\"" + path.getFileName() + "\"");
@@ -80,9 +80,12 @@ public class WebFSServlet extends WebServiceServletBase {
         // we need to set this attribute to get parts
         request.setAttribute(Request.__MULTIPART_CONFIG_ELEMENT, new MultipartConfigElement(""));
         Map<String, Object> variables = getVariables(request);
-        String projectId = JSONUtils.getString(variables, PARAM_PROJECT_ID);
-        String uri = JSONUtils.getString(variables, "toURI");
-        Path path = getPath(session, projectId, uri);
+        String parentNodePath = JSONUtils.getString(variables, "toParentNodePath");
+        if (CommonUtils.isEmpty(parentNodePath)) {
+            throw new DBException("Parent node path parameter is not found");
+        }
+        DBNPathBase node = FSUtils.getNodeByPath(session, parentNodePath);
+        Path path = node.getPath();
         try {
             for (Part part : request.getParts()) {
                 String fileName = part.getSubmittedFileName();
@@ -91,21 +94,11 @@ public class WebFSServlet extends WebServiceServletBase {
                 }
                 try (InputStream is = part.getInputStream()) {
                     Files.copy(is, path.resolve(fileName));
+                    node.addChildResource(path.resolve(fileName));
                 }
             }
         } catch (Exception e) {
             throw new DBWebException("File Upload Failed: Unable to Save File to the File System", e);
         }
-    }
-
-    @NotNull
-    private Path getPath(WebSession session, String projectId, String uri) throws DBException {
-        if (CommonUtils.isEmpty(projectId)) {
-            throw new DBWebException("Project ID is not found");
-        }
-        if (CommonUtils.isEmpty(uri)) {
-            throw new DBWebException("URI is not found");
-        }
-        return session.getFileSystemManager(projectId).getPathFromString(session.getProgressMonitor(), uri);
     }
 }

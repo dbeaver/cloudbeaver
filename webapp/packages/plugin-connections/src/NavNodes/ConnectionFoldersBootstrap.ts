@@ -162,7 +162,6 @@ export class ConnectionFoldersBootstrap extends Bootstrap {
       },
     });
   }
-  load(): void | Promise<void> {}
 
   private async moveConnectionToFolder({ type, targetNode, moveContexts }: INodeMoveData, contexts: IExecutionContextProvider<INodeMoveData>) {
     if (![NAV_NODE_TYPE_PROJECT, NAV_NODE_TYPE_FOLDER].includes(targetNode.nodeType!)) {

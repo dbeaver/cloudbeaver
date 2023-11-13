@@ -5,7 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import type { ResourceKey } from './ResourceKey';
+import type { ResourceKey, ResourceKeySimple } from './ResourceKey';
 import { isResourceKeyList, type ResourceKeyList, resourceKeyList } from './ResourceKeyList';
 
 interface MapFnc {
@@ -30,7 +30,7 @@ export interface ResourceKeyUtils {
   ) => boolean;
   map: MapFnc;
   filter: <TKey>(key: TKey | ResourceKeyList<TKey>, filter: (key: TKey) => boolean) => TKey[];
-  mapKey: <TKey, TValue>(key: TKey | ResourceKeyList<TKey>, selector: (key: TKey, index: number) => TValue) => ResourceKey<TValue>;
+  mapKey: <TKey, TValue>(key: TKey | ResourceKeyList<TKey>, selector: (key: TKey, index: number) => TValue) => ResourceKeySimple<TValue>;
   mapArray: <TKey, TValue>(key: TKey | ResourceKeyList<TKey>, selector: (key: TKey, index: number) => TValue) => TValue[];
   isIntersect: <TKey>(
     first: TKey | ResourceKeyList<TKey>,
@@ -85,7 +85,7 @@ export const ResourceKeyUtils: ResourceKeyUtils = {
   filter<TKey>(key: TKey | ResourceKeyList<TKey>, filter: (key: TKey) => boolean): TKey[] {
     return this.toArray(key).filter(filter);
   },
-  mapKey<TKey, TValue>(key: TKey | ResourceKeyList<TKey>, selector: (key: TKey, index: number) => TValue): ResourceKey<TValue> {
+  mapKey<TKey, TValue>(key: TKey | ResourceKeyList<TKey>, selector: (key: TKey, index: number) => TValue): ResourceKeySimple<TValue> {
     if (isResourceKeyList(key)) {
       return resourceKeyList(key.map(selector));
     } else {
