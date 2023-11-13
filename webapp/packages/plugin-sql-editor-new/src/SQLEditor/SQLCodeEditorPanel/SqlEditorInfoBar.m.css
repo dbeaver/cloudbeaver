@@ -3,7 +3,7 @@
   align-items: center;
   padding: 0 6px;
 }
-.metadata {
+.info {
   composes: theme-typography--caption from global;
   margin-left: auto;
 }

@@ -26,7 +26,7 @@ export const SqlEditorInfoBar = observer<Props>(function SqlEditorInfoBar({ stat
 
   return (
     <div className={s(styles, { container: true })}>
-      <div className={s(styles, { metadata: true })}>{`${line.number}:${cursorIndexInRow}:${cursorPos}`}</div>
+      <div className={s(styles, { info: true })}>{`Ln ${line.number}, Col ${cursorIndexInRow}, Pos ${cursorPos}`}</div>
     </div>
   );
 });
