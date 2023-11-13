@@ -10,28 +10,35 @@ import { createPath, getPathParts } from '@cloudbeaver/core-utils';
 import type { ICachedResourceMetadata } from '../ICachedResourceMetadata';
 import type { ICachedTreeElement } from './ICachedTreeElement';
 
-export function getTreeValue<TValue, TMetadata extends ICachedResourceMetadata = ICachedResourceMetadata>(
+export function getTreeParents<TValue, TMetadata extends ICachedResourceMetadata = ICachedResourceMetadata>(
   data: ICachedTreeElement<TValue, TMetadata>,
   path: string,
   getDefault: (path: string) => ICachedTreeElement<TValue, TMetadata>,
-): ICachedTreeElement<TValue, TMetadata>;
-export function getTreeValue<TValue, TMetadata extends ICachedResourceMetadata = ICachedResourceMetadata>(
+): Array<ICachedTreeElement<TValue, TMetadata>>;
+export function getTreeParents<TValue, TMetadata extends ICachedResourceMetadata = ICachedResourceMetadata>(
   data: ICachedTreeElement<TValue, TMetadata>,
   path: string,
-): ICachedTreeElement<TValue, TMetadata> | undefined;
-export function getTreeValue<TValue, TMetadata extends ICachedResourceMetadata = ICachedResourceMetadata>(
+): Array<ICachedTreeElement<TValue, TMetadata>>;
+export function getTreeParents<TValue, TMetadata extends ICachedResourceMetadata = ICachedResourceMetadata>(
   data: ICachedTreeElement<TValue, TMetadata>,
   path: string,
   getDefault?: (path: string) => ICachedTreeElement<TValue, TMetadata>,
-): ICachedTreeElement<TValue, TMetadata> | undefined {
+): Array<ICachedTreeElement<TValue, TMetadata>> {
+  const parents = [data];
+
   if (!path) {
-    return data;
+    return parents;
   }
   const paths = getPathParts(path);
-  let current = data;
   let currentNodePath = '';
 
   for (let i = 0; i < paths.length; ++i) {
+    const current = parents[parents.length - 1];
+
+    if (i === 0) {
+      parents.shift();
+    }
+
     const key = paths[i];
     currentNodePath = createPath(currentNodePath, key);
     let next = current.children[key];
@@ -42,10 +49,10 @@ export function getTreeValue<TValue, TMetadata extends ICachedResourceMetadata =
         current.children[key] = next;
         next = current.children[key]!;
       } else {
-        return undefined;
+        return parents;
       }
     }
-    current = next;
+    parents.push(next);
   }
-  return current;
+  return parents;
 }
