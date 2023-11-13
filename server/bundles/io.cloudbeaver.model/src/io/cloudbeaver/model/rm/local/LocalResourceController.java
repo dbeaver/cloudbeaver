@@ -56,6 +56,7 @@ import org.jkiss.utils.Pair;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
+import java.text.MessageFormat;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.util.*;
@@ -309,7 +310,8 @@ public class LocalResourceController implements RMController {
             RMProject project = makeProjectFromId(projectId, false);
             Path targetPath = getProjectPath(projectId);
             if (!Files.exists(targetPath)) {
-                throw new DBException("Project '" + project.getName() + "' doesn't exists");
+                log.debug(MessageFormat.format("Project folder ''{0}'' is not found", projectId));
+                return;
             }
             try {
                 log.debug("Deleting project '" + projectId + "'");
