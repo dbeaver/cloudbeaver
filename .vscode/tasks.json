@@ -54,7 +54,12 @@
       "label": "Yarn Install",
       "type": "shell",
       "command": "yarn install; yarn lerna bootstrap",
-      "args": []
+      "args": [],
+      "presentation": {
+        "reveal": "silent",
+        "close": true,
+        "clear": false
+      }
     }
   ],
   "inputs": [
@@ -62,8 +67,8 @@
       "type": "pickString",
       "id": "stage.ce",
       "description": "CE Stage servers",
-      "default": "http://127.0.0.1:8978/",
-      "options": ["http://127.0.0.1:8978/"]
+      "default": "http://localhost:8978/",
+      "options": ["http://localhost:8978/"]
     }
   ]
 }
