@@ -1,0 +1,16 @@
+.container {
+  display: flex;
+  min-height: 38px;
+  padding: 0 6px;
+  align-items: center;
+  box-sizing: border-box;
+  border-top: 1px solid var(--theme-background);
+}
+.loader {
+  composes: theme-background-surface theme-border-color-background from global;
+  padding-right: 8px;
+  box-sizing: border-box;
+}
+.metadata {
+  margin-left: auto;
+}

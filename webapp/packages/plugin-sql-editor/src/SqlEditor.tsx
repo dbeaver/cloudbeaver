@@ -7,7 +7,7 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import { Loader, Pane, ResizerControls, s, Split, useS, useSplitUserState, useStyles } from '@cloudbeaver/core-blocks';
+import { Loader, Pane, ResizerControls, s, Split, useS, useSplitUserState } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { CaptureView } from '@cloudbeaver/core-view';
 
@@ -16,10 +16,10 @@ import { SqlDataSourceService } from './SqlDataSource/SqlDataSourceService';
 import style from './SqlEditor.m.css';
 import { SqlEditorLoader } from './SqlEditor/SqlEditorLoader';
 import { SqlEditorOverlay } from './SqlEditorOverlay';
-import { SqlEditorStatusBar } from './SqlEditorStatusBar';
 import { SqlEditorView } from './SqlEditorView';
 import { SqlResultTabs } from './SqlResultTabs/SqlResultTabs';
 import { useDataSource } from './useDataSource';
+
 interface Props {
   state: ISqlEditorTabState;
 }
@@ -48,7 +48,6 @@ export const SqlEditor = observer<Props>(function SqlEditor({ state }) {
           </Pane>
         </Split>
         <SqlEditorOverlay state={state} />
-        <SqlEditorStatusBar dataSource={dataSource} />
       </CaptureView>
     </Loader>
   );

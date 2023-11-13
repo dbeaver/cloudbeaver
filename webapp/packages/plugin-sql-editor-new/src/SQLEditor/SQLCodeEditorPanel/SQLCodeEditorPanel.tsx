@@ -23,11 +23,13 @@ import { useSQLCodeEditor } from '../SQLCodeEditor/useSQLCodeEditor';
 import { useSqlDialectAutocompletion } from '../useSqlDialectAutocompletion';
 import { useSqlDialectExtension } from '../useSqlDialectExtension';
 import style from './SQLCodeEditorPanel.m.css';
+import { SqlEditorStatusBar } from './SqlEditorStatusBar';
 import { useSQLCodeEditorPanel } from './useSQLCodeEditorPanel';
 
 interface ILocalSQLCodeEditorPanelState {
   selection: { from: number; to: number };
-};
+}
+
 export const SQLCodeEditorPanel: TabContainerPanelComponent<ISqlEditorModeProps> = observer(function SQLCodeEditorPanel({ data }) {
   const notificationService = useService(NotificationService);
   const navNodeManagerService = useService(NavNodeManagerService);
@@ -40,7 +42,6 @@ export const SQLCodeEditorPanel: TabContainerPanelComponent<ISqlEditorModeProps>
   const editor = useSQLCodeEditor(editorRef);
 
   useEffect(() => {
-
     editorRef?.view?.dispatch({
       selection: { anchor: localState.selection.from, head: localState.selection.to },
       scrollIntoView: true,
@@ -127,6 +128,7 @@ export const SQLCodeEditorPanel: TabContainerPanelComponent<ISqlEditorModeProps>
         incomingValue={data.incomingValue}
         extensions={extensions}
         readonly={data.readonly}
+        className={styles.sqlCodeEditorLoader}
         autoFocus
         lineNumbers
         onChange={panel.onQueryChange}
@@ -147,6 +149,7 @@ export const SQLCodeEditorPanel: TabContainerPanelComponent<ISqlEditorModeProps>
           </>
         )}
       </SQLCodeEditorLoader>
+      <SqlEditorStatusBar state={editor.state} dataSource={data.dataSource} />
     </div>
   );
 });
