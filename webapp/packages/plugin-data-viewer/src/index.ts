@@ -65,6 +65,7 @@ export * from './TableViewer/TableFooter/TableFooterMenu/DATA_VIEWER_DATA_MODEL_
 export * from './TableViewer/TableFooter/TableFooterMenu/TableFooterMenuService';
 
 export * from './ContainerDataSource';
+export * from './ResultSetDataSource';
 export * from './DataPresentationService';
 export * from './DataViewerDataChangeConfirmationService';
 export * from './useDataModel';

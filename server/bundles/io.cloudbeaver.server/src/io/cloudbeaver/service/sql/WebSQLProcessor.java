@@ -171,7 +171,7 @@ public class WebSQLProcessor implements WebSessionProvider {
         long startTime = System.currentTimeMillis();
         WebSQLExecuteInfo executeInfo = new WebSQLExecuteInfo();
 
-        var dataContainer = new WebSQLQueryDataContainer(connection.getDataSource(), sql);
+        var dataContainer = new WebSQLQueryDataContainer(connection.getDataSource(), syntaxManager, sql);
 
         DBCExecutionContext context = getExecutionContext(dataContainer);
 

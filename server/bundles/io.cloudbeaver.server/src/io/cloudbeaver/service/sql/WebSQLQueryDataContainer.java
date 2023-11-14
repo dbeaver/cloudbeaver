@@ -18,6 +18,7 @@ package io.cloudbeaver.service.sql;
 
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
+import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBPContextProvider;
 import org.jkiss.dbeaver.model.DBPDataSource;
@@ -25,11 +26,14 @@ import org.jkiss.dbeaver.model.DBUtils;
 import org.jkiss.dbeaver.model.data.DBDDataFilter;
 import org.jkiss.dbeaver.model.data.DBDDataReceiver;
 import org.jkiss.dbeaver.model.exec.*;
+import org.jkiss.dbeaver.model.impl.sql.SQLQueryTransformerCount;
 import org.jkiss.dbeaver.model.sql.SQLQuery;
 import org.jkiss.dbeaver.model.sql.SQLScriptContext;
+import org.jkiss.dbeaver.model.sql.SQLSyntaxManager;
 import org.jkiss.dbeaver.model.sql.data.SQLQueryDataContainer;
 import org.jkiss.dbeaver.model.struct.DBSDataContainer;
 import org.jkiss.dbeaver.model.struct.DBSObject;
+import org.jkiss.utils.CommonUtils;
 
 import java.io.PrintWriter;
 
@@ -41,11 +45,13 @@ public class WebSQLQueryDataContainer implements DBSDataContainer, DBPContextPro
     private static final Log log = Log.getLog(WebSQLQueryDataContainer.class);
 
     private final DBPDataSource dataSource;
+    private final SQLSyntaxManager syntaxManager;
     private final String query;
     private final SQLQueryDataContainer queryDataContainer;
 
-    public WebSQLQueryDataContainer(DBPDataSource dataSource, String query) {
+    public WebSQLQueryDataContainer(DBPDataSource dataSource, SQLSyntaxManager syntaxManager, String query) {
         this.dataSource = dataSource;
+        this.syntaxManager = syntaxManager;
         this.query = query;
 
         SQLScriptContext scriptContext = new SQLScriptContext(null,
@@ -95,7 +101,12 @@ public class WebSQLQueryDataContainer implements DBSDataContainer, DBPContextPro
 
     @Override
     public long countData(@NotNull DBCExecutionSource source, @NotNull DBCSession session, @Nullable DBDDataFilter dataFilter, long flags) throws DBCException {
-        return queryDataContainer.countData(source, session, dataFilter, flags);
+        try {
+            SQLQuery countQuery = new SQLQueryTransformerCount().transformQuery(dataSource, syntaxManager, new SQLQuery(dataSource, query));
+            return DBUtils.countDataFromQuery(source, session, countQuery);
+        } catch (DBException e) {
+            throw new DBCException("Error executing row count", e);
+        }
     }
 
     @Nullable
