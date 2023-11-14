@@ -1,13 +1,4 @@
-FROM ubuntu:23.04
-
-MAINTAINER DBeaver Corp, devops@dbeaver.com
-
-ENV JAVA_HOME=/opt/java/openjdk
-COPY --from=eclipse-temurin:17 $JAVA_HOME $JAVA_HOME
-ENV PATH="${JAVA_HOME}/bin:${PATH}"
-
-### Patch java security
-COPY java.security* ${JAVA_HOME}/conf/security/java.security
+FROM eclipse-temurin:17.0.4.1_1-jre-focal
 
 COPY cloudbeaver /opt/cloudbeaver
 

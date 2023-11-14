@@ -15,7 +15,7 @@
   "scripts": {
     "build": "rimraf --glob lib && lerna run gql:gen --stream --parallel && tsc -b",
     "bundle": "yarn build && core-cli-build --mode=production --config ../core-cli/configs/webpack.product.config.js",
-    "dev": "yarn build && concurrently -P -k \"yarn tsc -b --watch --preserveWatchOutput\" \"lerna run gql:gen:dev --stream --parallel\" \"core-cli-build serve --mode=development --progress --config=../core-cli/configs/webpack.product.dev.config.js --port=3100 {@}\"",
+    "dev": "yarn build && concurrently -P -k \"yarn tsc -b --watch --preserveWatchOutput\" \"lerna run gql:gen:dev --stream --parallel\" \"core-cli-build serve --mode=development --progress --config=../core-cli/configs/webpack.product.dev.config.js {@}\"",
     "analyse": "yarn build && rimraf --glob lib && mkdir lib && core-cli-build --mode=production --config ../core-cli/configs/webpack.product.config.js --profile --json > ./lib/stats.json",
     "postanalyse": "core-cli-analyzer ./lib/stats.json",
     "lint": "eslint ./src/ --ext .ts,.tsx",
