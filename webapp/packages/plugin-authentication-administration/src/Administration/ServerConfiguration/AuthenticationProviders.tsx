@@ -37,8 +37,12 @@ export const AuthenticationProviders: PlaceholderComponent<IConfigurationPlaceho
       return false;
     }
 
-    if (configurationWizard && provider.configurable) {
-      return false;
+    if (configurationWizard) {
+      const disabledByFeature = provider.requiredFeatures.some(feat => !serverConfig.enabledFeatures?.includes(feat));
+
+      if (provider.configurable || disabledByFeature) {
+        return false;
+      }
     }
 
     return true;
