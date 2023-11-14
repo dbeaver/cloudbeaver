@@ -8,16 +8,11 @@
 import { observer } from 'mobx-react-lite';
 import React, { useContext } from 'react';
 
-import {
-  AUTH_PROVIDER_LOCAL_ID,
-  AuthProvider,
-  AuthProviderService,
-  AuthProvidersResource,
-  AuthSettingsService,
-} from '@cloudbeaver/core-authentication';
+import { AUTH_PROVIDER_LOCAL_ID, AuthProviderService, AuthProvidersResource, AuthSettingsService } from '@cloudbeaver/core-authentication';
 import { FormContext, Group, GroupTitle, PlaceholderComponent, Switch, useExecutor, useResource, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { CachedMapAllKey } from '@cloudbeaver/core-resource';
+import { isDefined } from '@cloudbeaver/core-utils';
 import type { IConfigurationPlaceholderProps } from '@cloudbeaver/plugin-administration';
 
 import { ServerConfigurationAdminForm } from './ServerConfigurationAdminForm';
@@ -36,17 +31,24 @@ export const AuthenticationProviders: PlaceholderComponent<IConfigurationPlaceho
     throw new Error('Form state should be provided');
   }
 
-  const providerList = providers.data.filter<AuthProvider>((provider): provider is AuthProvider => {
-    if (configurationWizard && (provider?.configurable || provider?.private)) {
+  const localProvider = providers.resource.get(AUTH_PROVIDER_LOCAL_ID);
+  const providerList = providers.data.filter(isDefined).filter(provider => {
+    if (provider.private) {
       return false;
+    }
+
+    if (configurationWizard) {
+      const disabledByFeature = provider.requiredFeatures.some(feat => !serverConfig.enabledFeatures?.includes(feat));
+
+      if (provider.configurable && disabledByFeature) {
+        return false;
+      }
     }
 
     return true;
   });
 
-  const localProvider = providers.resource.get(AUTH_PROVIDER_LOCAL_ID);
-  const primaryProvider = providers.resource.get(providers.resource.getPrimary());
-  const externalAuthentication = localProvider === undefined && providerList.length === 1;
+  const externalAuthentication = providerList.length === 0;
   const authenticationDisabled = serverConfig.enabledAuthProviders?.length === 0;
   const isAnonymousAccessDisabled = authSettingsService.settings.getValue('disableAnonymousAccess');
 
@@ -57,8 +59,6 @@ export const AuthenticationProviders: PlaceholderComponent<IConfigurationPlaceho
         if (serverConfig.enabledAuthProviders?.length === 0) {
           if (localProvider && !isAnonymousAccessDisabled) {
             serverConfig.anonymousAccessEnabled = true;
-          } else if (primaryProvider) {
-            serverConfig.enabledAuthProviders.push(primaryProvider.id);
           }
         }
 
@@ -97,21 +97,8 @@ export const AuthenticationProviders: PlaceholderComponent<IConfigurationPlaceho
 
         {providerList.map(provider => {
           const links = authProviderService.getServiceDescriptionLinks(provider);
-          let disabled = provider.requiredFeatures.some(feat => !serverConfig.enabledFeatures?.includes(feat));
+          const disabled = provider.requiredFeatures.some(feat => !serverConfig.enabledFeatures?.includes(feat));
           const tooltip = disabled ? `Following services need to be enabled: "${provider.requiredFeatures.join(', ')}"` : '';
-
-          if (
-            !localProvider &&
-            primaryProvider?.id === provider.id &&
-            serverConfig.enabledAuthProviders?.length === 1 &&
-            serverConfig.enabledAuthProviders.includes(provider.id)
-          ) {
-            disabled = true;
-          }
-
-          if (provider.private || (configurationWizard && (disabled || provider.id !== AUTH_PROVIDER_LOCAL_ID))) {
-            return null;
-          }
 
           return (
             <Switch
