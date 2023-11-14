@@ -19,12 +19,12 @@ package io.cloudbeaver.service.rm.fs;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.app.DBPProject;
-import org.jkiss.dbeaver.model.fs.DBFFileSystemProvider;
+import org.jkiss.dbeaver.model.fs.AbstractFileSystemProvider;
 import org.jkiss.dbeaver.model.fs.DBFVirtualFileSystem;
 import org.jkiss.dbeaver.model.rm.RMControllerProvider;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 
-public class RMVirtualFileSystemProvider implements DBFFileSystemProvider {
+public class RMVirtualFileSystemProvider extends AbstractFileSystemProvider {
     private static final Log log = Log.getLog(RMVirtualFileSystemProvider.class);
 
     @Override
