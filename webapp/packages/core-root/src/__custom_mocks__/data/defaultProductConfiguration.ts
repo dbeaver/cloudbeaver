@@ -23,9 +23,6 @@ export const defaultProductConfiguration: Record<string, any> = {
         maxFailedRequests: 3.0,
       },
     },
-    authentication: {
-      primaryAuthProvider: 'local',
-    },
   },
   plugin_data_export: {
     disabled: false,
