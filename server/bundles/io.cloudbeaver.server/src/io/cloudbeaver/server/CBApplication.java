@@ -750,18 +750,16 @@ public abstract class CBApplication extends BaseWebApplication implements WebAut
         }
     }
 
-    private Gson getGson() {
+    protected GsonBuilder getGsonBuilder() {
         // Stupid way to populate existing objects but ok google (https://github.com/google/gson/issues/431)
         InstanceCreator<CBAppConfig> appConfigCreator = type -> appConfiguration;
         InstanceCreator<DataSourceNavigatorSettings> navSettingsCreator = type -> (DataSourceNavigatorSettings) appConfiguration.getDefaultNavigatorSettings();
         InstanceCreator<SMControllerConfiguration> smConfigCreator = type -> securityManagerConfiguration;
-
         return new GsonBuilder()
             .setLenient()
             .registerTypeAdapter(CBAppConfig.class, appConfigCreator)
             .registerTypeAdapter(DataSourceNavigatorSettings.class, navSettingsCreator)
-            .registerTypeAdapter(SMControllerConfiguration.class, smConfigCreator)
-            .create();
+            .registerTypeAdapter(SMControllerConfiguration.class, smConfigCreator);
     }
 
     protected void readAdditionalConfiguration(Map<String, Object> rootConfig) throws DBException {

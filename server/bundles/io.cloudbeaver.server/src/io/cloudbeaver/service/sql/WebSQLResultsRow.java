@@ -26,18 +26,18 @@ import java.util.Map;
  */
 public class WebSQLResultsRow {
 
-    private List<?> data;
+    private Object[] data;
     private Map<String, Object> updateValues;
 
     public WebSQLResultsRow() {
     }
 
     public WebSQLResultsRow(Map<String, Object> map) {
-        data = JSONUtils.getObjectList(map, "data");
+        data = JSONUtils.getObjectList(map, "data").toArray();
         updateValues = JSONUtils.getObject(map, "updateValues");
     }
 
-    public List<?> getData() {
+    public Object[] getData() {
         return data;
     }
 

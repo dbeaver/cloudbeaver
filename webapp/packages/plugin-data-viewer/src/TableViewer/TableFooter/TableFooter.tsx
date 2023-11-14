@@ -17,6 +17,7 @@ import type { IDatabaseDataModel } from '../../DatabaseDataModel/IDatabaseDataMo
 import { DataViewerSettingsService } from '../../DataViewerSettingsService';
 import { AutoRefreshButton } from './AutoRefresh/AutoRefreshButton';
 import { TableFooterMenu } from './TableFooterMenu/TableFooterMenu';
+import { TableFooterRowCount } from './TableFooterRowCount';
 
 const tableFooterStyles = css`
   ToolsPanel {
@@ -122,6 +123,7 @@ export const TableFooter = observer<Props>(function TableFooter({ resultIndex, m
           />
         </Form>
       </count>
+      <TableFooterRowCount model={model} resultIndex={resultIndex} />
       <TableFooterMenu model={model} resultIndex={resultIndex} simple={simple} context={context} />
       {model.source.requestInfo.requestMessage.length > 0 && (
         <time>

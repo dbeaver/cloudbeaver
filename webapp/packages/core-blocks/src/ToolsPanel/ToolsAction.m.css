@@ -18,6 +18,7 @@
   font-weight: 700;
   font-size: 12px;
 }
-.iconOrImage + .buttonLabel {
+.iconOrImage + .buttonLabel,
+.loader + .buttonLabel {
   padding-left: 4px;
 }

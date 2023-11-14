@@ -7,7 +7,7 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import { Loader, Pane, ResizerControls, s, Split, useS, useSplitUserState, useStyles } from '@cloudbeaver/core-blocks';
+import { Loader, Pane, ResizerControls, s, Split, useS, useSplitUserState } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { CaptureView } from '@cloudbeaver/core-view';
 
@@ -20,6 +20,7 @@ import { SqlEditorStatusBar } from './SqlEditorStatusBar';
 import { SqlEditorView } from './SqlEditorView';
 import { SqlResultTabs } from './SqlResultTabs/SqlResultTabs';
 import { useDataSource } from './useDataSource';
+
 interface Props {
   state: ISqlEditorTabState;
 }

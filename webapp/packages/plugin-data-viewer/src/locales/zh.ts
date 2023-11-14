@@ -40,6 +40,8 @@ export default [
   ['data_viewer_script_preview_dialog_title', '预览更改'],
   ['data_viewer_script_preview_error_title', '无法获取脚本'],
   ['data_viewer_refresh_result_set', 'Refresh result set'],
+  ['data_viewer_total_count_failed', 'Failed to get total count'],
+  ['data_viewer_total_count_tooltip', 'Get total count'],
   ['settings_data_editor', 'Data Editor'],
   ['settings_data_editor_disable_edit_name', 'Disable Edit'],
   ['settings_data_editor_disable_edit_description', 'Disable Edit'],

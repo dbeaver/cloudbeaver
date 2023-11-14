@@ -9,6 +9,7 @@ import { action, makeObservable, observable, toJS } from 'mobx';
 
 import type { IConnectionExecutionContext } from '@cloudbeaver/core-connections';
 import type { IServiceInjector } from '@cloudbeaver/core-di';
+import { Task } from '@cloudbeaver/core-executor';
 import { ResultDataFormat } from '@cloudbeaver/core-sdk';
 
 import { DatabaseDataActions } from './DatabaseDataActions';
@@ -33,8 +34,21 @@ export abstract class DatabaseDataSource<TOptions, TResult extends IDatabaseData
   executionContext: IConnectionExecutionContext | null;
   outdated: boolean;
 
-  abstract get canCancel(): boolean;
-  abstract get cancelled(): boolean;
+  get canCancel(): boolean {
+    if (this.activeTask instanceof Task) {
+      return this.activeTask.cancellable;
+    }
+
+    return false;
+  }
+
+  get cancelled(): boolean {
+    if (this.activeTask instanceof Task) {
+      return this.activeTask.cancelled;
+    }
+
+    return false;
+  }
 
   readonly serviceInjector: IServiceInjector;
   protected disabled: boolean;
@@ -155,7 +169,11 @@ export abstract class DatabaseDataSource<TOptions, TResult extends IDatabaseData
     return this.actions.getImplementation(resultIndex, action);
   }
 
-  abstract cancel(): Promise<void> | void;
+  async cancel() {
+    if (this.activeTask instanceof Task) {
+      await this.activeTask.cancel();
+    }
+  }
 
   hasResult(resultIndex: number): boolean {
     return resultIndex < this.results.length;
@@ -234,6 +252,15 @@ export abstract class DatabaseDataSource<TOptions, TResult extends IDatabaseData
 
   setExecutionContext(context: IConnectionExecutionContext | null): this {
     this.executionContext = context;
+    return this;
+  }
+
+  setTotalCount(resultIndex: number, count: number): this {
+    const result = this.getResult(resultIndex);
+
+    if (result) {
+      result.totalCount = count;
+    }
     return this;
   }
 
@@ -346,6 +373,7 @@ export abstract class DatabaseDataSource<TOptions, TResult extends IDatabaseData
   abstract save(prevResults: TResult[]): Promise<TResult[]> | TResult[];
 
   abstract dispose(): Promise<void>;
+  abstract loadTotalCount(resultIndex: number): Promise<void>;
 
   async requestDataAction(): Promise<TResult[] | null> {
     this.prevOptions = toJS(this.options);

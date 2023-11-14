@@ -23,15 +23,15 @@ import { uuid } from '@cloudbeaver/core-utils';
 import { DocumentEditAction } from './DatabaseDataModel/Actions/Document/DocumentEditAction';
 import type { IResultSetBlobValue } from './DatabaseDataModel/Actions/ResultSet/IResultSetBlobValue';
 import { ResultSetEditAction } from './DatabaseDataModel/Actions/ResultSet/ResultSetEditAction';
-import { DatabaseDataSource } from './DatabaseDataModel/DatabaseDataSource';
 import type { IDatabaseDataOptions } from './DatabaseDataModel/IDatabaseDataOptions';
 import type { IDatabaseResultSet } from './DatabaseDataModel/IDatabaseResultSet';
+import { ResultSetDataSource } from './ResultSetDataSource';
 
 export interface IDataContainerOptions extends IDatabaseDataOptions {
   containerNodePath: string;
 }
 
-export class ContainerDataSource extends DatabaseDataSource<IDataContainerOptions, IDatabaseResultSet> {
+export class ContainerDataSource extends ResultSetDataSource<IDataContainerOptions> {
   currentTask: ITask<SqlExecuteInfo> | null;
 
   get canCancel(): boolean {
@@ -43,12 +43,12 @@ export class ContainerDataSource extends DatabaseDataSource<IDataContainerOption
   }
 
   constructor(
-    readonly serviceInjector: IServiceInjector,
-    private readonly graphQLService: GraphQLService,
-    private readonly asyncTaskInfoService: AsyncTaskInfoService,
+    serviceInjector: IServiceInjector,
+    graphQLService: GraphQLService,
+    asyncTaskInfoService: AsyncTaskInfoService,
     private readonly connectionExecutionContextService: ConnectionExecutionContextService,
   ) {
-    super(serviceInjector);
+    super(serviceInjector, graphQLService, asyncTaskInfoService);
 
     this.currentTask = null;
     this.executionContext = null;
@@ -256,6 +256,8 @@ export class ContainerDataSource extends DatabaseDataSource<IDataContainerOption
       dataFormat: result.dataFormat!,
       updateRowCount: result.updateRowCount || 0,
       loadedFully: (result.resultSet?.rows?.length || 0) < limit,
+      count: result.resultSet?.rows?.length || 0,
+      totalCount: null,
       data: result.resultSet,
     }));
   }
