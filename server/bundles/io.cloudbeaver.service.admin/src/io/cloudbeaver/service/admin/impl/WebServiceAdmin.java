@@ -180,11 +180,16 @@ public class WebServiceAdmin implements DBWServiceAdmin {
         webSession.addInfoMessage("Delete user - " + userName);
         try {
             webSession.getAdminSecurityController().deleteUser(userName);
-            webSession.getRmController().deleteProject(RMProjectType.USER + "_" + userName);
-            return true;
         } catch (Exception e) {
             throw new DBWebException("Error deleting user", e);
         }
+        try {
+            webSession.getRmController().deleteProject(RMProjectType.USER + "_" + userName);
+        } catch (DBException e) {
+            log.error("Error deleting user project", e);
+            webSession.addSessionError(e);
+        }
+        return true;
     }
 
     @NotNull
