@@ -184,7 +184,19 @@ public class WebServiceBindingSQL extends WebServiceBindingBase<DBWServiceSQL> i
             .dataFetcher("asyncSqlExplainExecutionPlanResult", env ->
                 getService(env).asyncSqlExplainExecutionPlanResult(
                     getWebSession(env), env.getArgument("taskId")
-                ));
+                ))
+            .dataFetcher("asyncSqlRowDataCount", env ->
+                getService(env).getRowDataCount(
+                    getWebSession(env),
+                    getSQLContext(env),
+                    env.getArgument("resultsId")
+                ))
+            .dataFetcher("asyncSqlRowDataCountResult", env ->
+                getService(env).getRowDataCountResult(
+                    getWebSession(env),
+                    env.getArgument("taskId")
+            )
+        );
     }
 
     @NotNull
