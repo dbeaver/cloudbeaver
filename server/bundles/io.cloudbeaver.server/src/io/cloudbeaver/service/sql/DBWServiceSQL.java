@@ -157,4 +157,11 @@ public interface DBWServiceSQL extends DBWService {
                                 @NotNull List<String> columnsList,
                                 @Nullable List<String> functions,
                                 @Nullable Boolean showDuplicatesOnly) throws DBWebException;
+
+    @WebAction
+    WebAsyncTaskInfo getRowDataCount(@NotNull WebSession webSession, @NotNull WebSQLContextInfo contextInfo, @NotNull String resultsId) throws DBWebException;
+
+    @Nullable
+    @WebAction
+    Long getRowDataCountResult(@NotNull WebSession webSession, @NotNull String taskId) throws DBWebException;
 }
