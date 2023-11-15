@@ -5,6 +5,8 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
+import { observer } from 'mobx-react-lite';
+
 import { UsersResource } from '@cloudbeaver/core-authentication';
 import {
   Button,
@@ -14,21 +16,26 @@ import {
   CommonDialogWrapper,
   Container,
   Fill,
+  s,
   Text,
   useResource,
+  useS,
   useTranslate,
 } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import type { DialogComponent } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
 
+import classes from './DisableUserDialog.m.css';
+
 interface IPayload {
   userId: string;
   onDelete: () => void;
 }
 
-export const DisableUserDialog: DialogComponent<IPayload> = function DisableUserDialog(props) {
+export const DisableUserDialog: DialogComponent<IPayload> = observer(function DisableUserDialog(props) {
   const translate = useTranslate();
+  const styles = useS(classes);
   const notificationService = useService(NotificationService);
   const usersResource = useResource(DisableUserDialog, UsersResource, null);
 
@@ -48,7 +55,7 @@ export const DisableUserDialog: DialogComponent<IPayload> = function DisableUser
   }
 
   return (
-    <CommonDialogWrapper size="small" fixedWidth>
+    <CommonDialogWrapper size="small" className={s(styles, { commonDialogWrapper: true })} fixedWidth>
       <CommonDialogHeader
         title={translate('authentication_administration_users_delete_user')}
         icon="/icons/error_icon.svg"
@@ -74,4 +81,4 @@ export const DisableUserDialog: DialogComponent<IPayload> = function DisableUser
       </CommonDialogFooter>
     </CommonDialogWrapper>
   );
-};
+});
