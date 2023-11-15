@@ -24,6 +24,6 @@ import org.jkiss.dbeaver.model.websocket.event.WSUserDeletedEvent;
 public class WSUserDeletedEventHandler<EVENT extends WSUserDeletedEvent> implements WSEventHandler<EVENT> {
     @Override
     public void handleEvent(@NotNull EVENT event) {
-        CBPlatform.getInstance().getSessionManager().closeUserSession(event.getUserId());
+        CBPlatform.getInstance().getSessionManager().closeUserSessions(event.getDeletedUserId());
     }
 }
