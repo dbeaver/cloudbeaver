@@ -74,7 +74,7 @@ export const DisableUserDialog: DialogComponent<IPayload> = observer(function Di
           <Button mod={['outlined']} onClick={deleteHandler}>
             {translate('ui_delete')}
           </Button>
-          <Button mod={['raised']} onClick={disableHandler}>
+          <Button mod={['unelevated']} onClick={disableHandler}>
             {translate('ui_disable')}
           </Button>
         </Container>

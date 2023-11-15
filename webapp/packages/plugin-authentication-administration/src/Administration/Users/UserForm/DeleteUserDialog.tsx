@@ -70,7 +70,7 @@ export const DeleteUserDialog: DialogComponent<IPayload> = function DeleteUserDi
           {translate('ui_processing_cancel')}
         </Button>
         <Fill />
-        <Button mod={['raised']} disabled={name !== props.payload.userId} onClick={deleteUser}>
+        <Button mod={['unelevated']} disabled={name !== props.payload.userId} onClick={deleteUser}>
           {translate('ui_delete')}
         </Button>
       </CommonDialogFooter>
