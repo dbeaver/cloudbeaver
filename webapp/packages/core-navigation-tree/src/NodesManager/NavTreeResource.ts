@@ -5,7 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { action, computed, makeObservable, runInAction } from 'mobx';
+import { action, computed, makeObservable, observable, runInAction } from 'mobx';
 
 import { CoreSettingsService } from '@cloudbeaver/core-app';
 import { AppAuthService, UserInfoResource } from '@cloudbeaver/core-authentication';
@@ -174,6 +174,7 @@ export class NavTreeResource extends CachedMapResource<string, string[], Record<
     this.metadata.update(list, metadata => {
       if (!metadata.withDetails && state) {
         metadata.outdated = true;
+        metadata.outdatedIncludes = observable([...metadata.includes]);
       }
       metadata.withDetails = state;
     });

@@ -62,10 +62,10 @@ export const NavigationNodeProjectControl: NavTreeControlComponent = observer<Na
     return (
       <TreeNodeControl
         ref={ref}
+        className={s(styles, { treeNodeControl: true, outdated, dragging: isDragging }, className)}
         onClick={handleClick}
         onDoubleClick={handleDbClick}
         onContextMenu={handleContextMenuOpen}
-        className={s(styles, { treeNodeControl: true, outdated, dragging: isDragging }, className)}
       >
         <TreeNodeName className={s(styles, { treeNodeName: true })} title={node.name}>
           <div className={s(styles, { nameBox: true })}>{node.name}</div>

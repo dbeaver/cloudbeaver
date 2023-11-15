@@ -6,6 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
+import { useMemo } from 'react';
 import styled, { css } from 'reshadow';
 
 import { Loader } from '@cloudbeaver/core-blocks';
@@ -38,8 +39,12 @@ export const ConnectionEdit = observer<Props>(function ConnectionEditNew({ item 
 
   const data = useConnectionFormState(connectionInfoResource, state => state.setOptions('edit', 'admin'));
 
-  data.config.connectionId = item.connectionId;
-  data.projectId = item.projectId;
+  const projectId = item.projectId;
+  const connectionId = item.connectionId;
+
+  useMemo(() => {
+    data.setConfig(projectId, { connectionId });
+  }, [data, projectId, connectionId]);
 
   return styled(styles)(
     <box>
