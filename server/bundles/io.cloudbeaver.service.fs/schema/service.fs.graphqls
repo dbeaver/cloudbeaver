@@ -36,6 +36,8 @@ extend type Mutation @since(version: "23.2.2") {
 
     fsRename(nodePath: String!, newName: String!): FSFile!
 
+    fsCopy(nodePath: String!, toParentNodePath: String!): FSFile! @since(version: "23.2.5")
+
     fsWriteFileStringContent(
         nodePath:String!,
         data: String!,

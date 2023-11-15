@@ -20,12 +20,12 @@ import { SnackbarFooter } from './SnackbarMarkups/SnackbarFooter';
 import { SnackbarStatus } from './SnackbarMarkups/SnackbarStatus';
 import { SnackbarWrapper } from './SnackbarMarkups/SnackbarWrapper';
 
-interface Props extends INotificationProcessExtraProps {
+export interface ProcessSnackbarProps extends INotificationProcessExtraProps {
   closeDelay?: number;
   displayDelay?: number;
 }
 
-export const ProcessSnackbar: NotificationComponent<Props> = observer(function ProcessSnackbar({
+export const ProcessSnackbar: NotificationComponent<ProcessSnackbarProps> = observer(function ProcessSnackbar({
   closeDelay = 3000,
   displayDelay = 750,
   notification,
