@@ -55,6 +55,9 @@
       "path": "../plugin-sql-editor/tsconfig.json"
     },
     {
+      "path": "../core-authentication/tsconfig.json"
+    },
+    {
       "path": "../core-administration/tsconfig.json"
     },
     {
