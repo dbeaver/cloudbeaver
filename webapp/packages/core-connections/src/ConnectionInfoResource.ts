@@ -494,7 +494,7 @@ export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoPar
 
     if (isResourceAlias(originalKey)) {
       const key = this.aliases.transformToKey(originalKey);
-      const outdated = ResourceKeyUtils.filter(key, key => this.isOutdated(key));
+      const outdated = ResourceKeyUtils.filter(key, key => this.isOutdated(key, includes));
 
       if (!refresh && outdated.length === 1) {
         originalKey = outdated[0]; // load only single connection
@@ -540,11 +540,18 @@ export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoPar
   }
 
   protected dataSet(key: IConnectionInfoParams, value: Connection): void {
-    const oldConnections = this.dataGet(key);
+    const oldConnection = this.dataGet(key);
     if (value.nodePath) {
       this.nodeIdMap.set(value.nodePath, key);
     }
-    super.dataSet(key, { ...oldConnections, ...value });
+    super.dataSet(key, {
+      ...oldConnection,
+      ...value,
+      networkHandlersConfig: value.networkHandlersConfig?.map(handler => ({
+        ...oldConnection?.networkHandlersConfig?.find(oldHandler => oldHandler.id === handler.id),
+        ...handler,
+      })),
+    });
   }
 
   protected dataDelete(key: IConnectionInfoParams): void {

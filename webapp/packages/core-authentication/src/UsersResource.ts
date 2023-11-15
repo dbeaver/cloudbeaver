@@ -35,7 +35,7 @@ const NEW_USER_SYMBOL = Symbol('new-user');
 export type AdminUser = AdminUserInfoFragment;
 
 type AdminUserNew = AdminUser & { [NEW_USER_SYMBOL]: boolean };
-type UserResourceIncludes = Omit<GetUsersListQueryVariables, 'userId' | 'page' | 'filter'>;
+export type UserResourceIncludes = Omit<GetUsersListQueryVariables, 'userId' | 'page' | 'filter'>;
 
 interface IUserResourceFilterOptions {
   userId?: string;

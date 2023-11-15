@@ -37,7 +37,7 @@ export interface IResource<
   isLoadable(param?: ResourceKey<TKey>, context?: TInclude): boolean;
   isLoaded(param?: ResourceKey<TKey>, includes?: TInclude): boolean;
   isLoading(key?: ResourceKey<TKey>): boolean;
-  isOutdated(param?: ResourceKey<TKey>): boolean;
+  isOutdated(param?: ResourceKey<TKey>, includes?: TInclude): boolean;
   isIntersect(key: ResourceKey<TKey>, nextKey: ResourceKey<TKey>): boolean;
 
   load(key?: ResourceKey<TKey>, context?: TInclude): Promise<TValue>;
