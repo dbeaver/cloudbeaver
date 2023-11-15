@@ -53,15 +53,10 @@ export function useAuthDialogState(accessRequest: boolean, providerId: string | 
   const authInfoService = useService(AuthInfoService);
   const notificationService = useService(NotificationService);
 
-  const primaryId = authProvidersResource.resource.getPrimary();
   const adminPageActive = administrationScreenService.isAdministrationPageActive;
   const providers = authProvidersResource.data.filter(notEmptyProvider).sort(compareProviders);
 
   const activeProviders = providers.filter(provider => {
-    if (provider.id === primaryId && adminPageActive && accessRequest) {
-      return true;
-    }
-
     if (provider.federated || provider.trusted || provider.private) {
       return false;
     }
@@ -170,9 +165,6 @@ export function useAuthDialogState(accessRequest: boolean, providerId: string | 
 
       get configure(): boolean {
         if (state.activeProvider) {
-          if (this.adminPageActive && authProvidersResource.resource.isPrimary(state.activeProvider.id)) {
-            return false;
-          }
           return !authProvidersResource.resource.isAuthEnabled(state.activeProvider.id);
         }
         return false;

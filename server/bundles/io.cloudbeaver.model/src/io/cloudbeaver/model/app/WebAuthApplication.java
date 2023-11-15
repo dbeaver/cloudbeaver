@@ -18,6 +18,7 @@
 package io.cloudbeaver.model.app;
 
 import io.cloudbeaver.auth.CBAuthConstants;
+import org.jkiss.dbeaver.DBException;
 
 public interface WebAuthApplication extends WebApplication {
     WebAuthConfiguration getAuthConfiguration();
@@ -27,4 +28,6 @@ public interface WebAuthApplication extends WebApplication {
     default long getMaxSessionIdleTime() {
         return CBAuthConstants.MAX_SESSION_IDLE_TIME;
     }
+
+    void flushConfiguration() throws DBException;
 }

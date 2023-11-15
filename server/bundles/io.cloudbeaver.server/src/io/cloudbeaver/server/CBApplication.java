@@ -16,12 +16,12 @@
  */
 package io.cloudbeaver.server;
 
-import org.jkiss.dbeaver.model.auth.AuthInfo;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.InstanceCreator;
 import io.cloudbeaver.WebServiceUtils;
 import io.cloudbeaver.auth.CBAuthConstants;
+import io.cloudbeaver.auth.NoAuthCredentialsProvider;
 import io.cloudbeaver.model.app.BaseWebApplication;
 import io.cloudbeaver.model.app.WebAuthApplication;
 import io.cloudbeaver.model.app.WebAuthConfiguration;
@@ -43,6 +43,7 @@ import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.ModelPreferences;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
 import org.jkiss.dbeaver.model.app.DBPApplication;
+import org.jkiss.dbeaver.model.auth.AuthInfo;
 import org.jkiss.dbeaver.model.auth.SMCredentialsProvider;
 import org.jkiss.dbeaver.model.data.json.JSONUtils;
 import org.jkiss.dbeaver.model.navigator.DBNBrowseSettings;
@@ -430,7 +431,14 @@ public abstract class CBApplication extends BaseWebApplication implements WebAut
     }
 
     protected void initializeServer() throws DBException {
-
+        for (DBWServiceServerConfigurator wsc : WebServiceRegistry.getInstance()
+            .getWebServices(DBWServiceServerConfigurator.class)) {
+            try {
+                wsc.migrateConfigurationIfNeeded(this);
+            } catch (Exception e) {
+                log.warn("Error migration configuration " + wsc.getClass().getName(), e);
+            }
+        }
     }
 
     private void determineLocalAddresses() {
@@ -889,8 +897,12 @@ public abstract class CBApplication extends BaseWebApplication implements WebAut
         @NotNull List<AuthInfo> authInfoList
     ) throws DBException;
 
-    public synchronized void flushConfiguration(SMCredentialsProvider credentialsProvider) throws DBException {
-        saveRuntimeConfig(serverName, serverURL, maxSessionIdleTime, appConfiguration, credentialsProvider);
+    public synchronized void flushConfiguration(SMCredentialsProvider webSession) throws DBException {
+        saveRuntimeConfig(serverName, serverURL, maxSessionIdleTime, appConfiguration, webSession);
+    }
+
+    public synchronized void flushConfiguration() throws DBException {
+        saveRuntimeConfig(serverName, serverURL, maxSessionIdleTime, appConfiguration, new NoAuthCredentialsProvider());
     }
 
 

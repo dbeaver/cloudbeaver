@@ -12,8 +12,6 @@ import { SettingsManagerService } from '@cloudbeaver/core-settings';
 import { AUTH_SETTINGS_GROUP, settings } from './AUTH_SETTINGS_GROUP';
 
 const defaultSettings = {
-  baseAuthProvider: undefined as undefined | string,
-  primaryAuthProvider: 'local',
   disableAnonymousAccess: false,
 };
 
