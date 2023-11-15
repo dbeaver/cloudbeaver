@@ -14,11 +14,6 @@
             <meta.element />
          </appInfo>
       </annotation>
-      <complexType>
-         <sequence>
-            <element ref="propertyGroup"/>
-         </sequence>
-      </complexType>
    </element>
 
    <element name="driver">
