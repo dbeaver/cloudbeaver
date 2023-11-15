@@ -12,6 +12,7 @@ export interface ICachedResourceMetadata {
   outdated: boolean;
   loading: boolean;
   includes: string[];
+  outdatedIncludes: string[];
   exception: Error | null;
   /** List of generated id's added each time resource is used and removed on release */
   dependencies: string[];

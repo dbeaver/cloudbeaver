@@ -196,10 +196,6 @@ export class ConnectionFormState implements IConnectionFormState {
   }
 
   reset(): void {
-    if (this.projectId && this.config.connectionId) {
-      const key = createConnectionParam(this.projectId, this.config.connectionId);
-      this.resource.markOutdated(key);
-    }
     this.configured = false;
     this.partsState.clear();
   }

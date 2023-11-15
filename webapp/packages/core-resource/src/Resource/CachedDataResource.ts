@@ -77,7 +77,7 @@ export function getCachedDataResourceLoaderState<TData, TKey = void, TContext ex
       return resource.isLoaded(param, context);
     },
     isOutdated() {
-      return resource.isOutdated(param);
+      return resource.isOutdated(param, context);
     },
     async load() {
       await resource.load(param, context);

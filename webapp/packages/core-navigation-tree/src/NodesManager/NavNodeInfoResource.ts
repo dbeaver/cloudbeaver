@@ -49,6 +49,7 @@ export class NavNodeInfoResource extends CachedMapResource<string, NavNode, Reco
     this.metadata.update(keyObject, metadata => {
       if (!metadata.withDetails && state) {
         metadata.outdated = true;
+        metadata.outdatedIncludes = observable([...metadata.includes]);
       }
       metadata.withDetails = state;
     });

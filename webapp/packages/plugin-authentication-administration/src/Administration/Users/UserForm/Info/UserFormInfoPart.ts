@@ -7,10 +7,11 @@
  */
 import { observable } from 'mobx';
 
-import type { AdminUser, AuthRolesResource, UsersResource } from '@cloudbeaver/core-authentication';
+import type { AdminUser, AuthRolesResource, UserResourceIncludes, UsersResource } from '@cloudbeaver/core-authentication';
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
-import { getCachedDataResourceLoaderState } from '@cloudbeaver/core-resource';
+import { CachedResourceIncludeArgs, getCachedDataResourceLoaderState } from '@cloudbeaver/core-resource';
 import type { ServerConfigResource } from '@cloudbeaver/core-root';
+import type { AdminUserInfoFragment } from '@cloudbeaver/core-sdk';
 import { FormMode, FormPart, formValidationContext, IFormState } from '@cloudbeaver/core-ui';
 import { isArraysEqual, isDefined, isObjectsEqual, isValuesEqual } from '@cloudbeaver/core-utils';
 import { DATA_CONTEXT_LOADABLE_STATE } from '@cloudbeaver/core-view';
@@ -22,6 +23,7 @@ import type { IUserFormInfoState } from './IUserFormInfoState';
 const DEFAULT_ENABLED = true;
 
 export class UserFormInfoPart extends FormPart<IUserFormInfoState, IUserFormState> {
+  private baseIncludes: CachedResourceIncludeArgs<AdminUserInfoFragment, UserResourceIncludes>;
   constructor(
     private readonly authRolesResource: AuthRolesResource,
     private readonly serverConfigResource: ServerConfigResource,
@@ -36,11 +38,12 @@ export class UserFormInfoPart extends FormPart<IUserFormInfoState, IUserFormStat
       teams: [],
       authRole: '',
     });
+    this.baseIncludes = ['includeMetaParameters'];
   }
 
   isOutdated(): boolean {
     if (this.formState.mode === FormMode.Edit && this.initialState.userId) {
-      return this.usersResource.isOutdated(this.initialState.userId);
+      return this.usersResource.isOutdated(this.initialState.userId, this.baseIncludes);
     }
 
     return false;
@@ -50,7 +53,7 @@ export class UserFormInfoPart extends FormPart<IUserFormInfoState, IUserFormStat
     if (
       this.formState.mode === FormMode.Edit &&
       this.initialState.userId &&
-      !this.usersResource.isLoaded(this.initialState.userId, ['includeMetaParameters'])
+      !this.usersResource.isLoaded(this.initialState.userId, this.baseIncludes)
     ) {
       return false;
     }
@@ -200,7 +203,7 @@ export class UserFormInfoPart extends FormPart<IUserFormInfoState, IUserFormStat
     const serverConfig = await this.serverConfigResource.load();
 
     if (this.formState.mode === FormMode.Edit && this.initialState.userId) {
-      user = await this.usersResource.load(this.initialState.userId, ['includeMetaParameters']);
+      user = await this.usersResource.load(this.initialState.userId, this.baseIncludes);
     }
 
     this.setInitialState({
