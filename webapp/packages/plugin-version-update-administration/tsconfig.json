@@ -29,6 +29,9 @@
     },
     {
       "path": "../core-version-update/tsconfig.json"
+    },
+    {
+      "path": "../core-localization/tsconfig.json"
     }
   ],
   "include": [
