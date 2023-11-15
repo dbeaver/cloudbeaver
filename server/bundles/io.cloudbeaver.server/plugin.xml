@@ -78,6 +78,9 @@
         <eventHandler class="io.cloudbeaver.server.events.WSDeleteTempFileHandler">
             <topic id="cb_delete_temp_folder"/>
         </eventHandler>
+        <eventHandler class="io.cloudbeaver.server.events.WSUserDeletedEventHandler">
+            <topic id="cb_user"/>
+        </eventHandler>
     </extension>
 
 </plugin>

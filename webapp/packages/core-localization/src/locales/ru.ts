@@ -102,6 +102,7 @@ export default [
   ['ui_upload_files_duplicate_error', 'Файлы с такими именами уже существуют'],
   ['ui_upload_file_fail', 'Не удалось загрузить файл'],
   ['ui_filter', 'Фильтр'],
+  ['ui_disable', 'Отключить'],
 
   ['root_permission_denied', 'Отказано в доступе'],
   ['root_permission_no_permission', 'У вас нет разрешения на это действие'],

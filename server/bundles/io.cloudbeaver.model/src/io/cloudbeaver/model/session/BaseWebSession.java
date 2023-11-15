@@ -167,7 +167,6 @@ public abstract class BaseWebSession extends AbstractSessionPersistent {
     public void close() {
         super.close();
         var sessionExpiredEvent = new WSSessionExpiredEvent();
-        application.getEventController().addEvent(sessionExpiredEvent);
         application.getEventController().addEvent(new WSEventDeleteTempFile(getSessionId()));
         synchronized (sessionEventHandlers) {
             for (CBWebSessionEventHandler sessionEventHandler : sessionEventHandlers) {
