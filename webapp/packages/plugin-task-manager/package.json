@@ -1,0 +1,29 @@
+{
+  "name": "@cloudbeaver/plugin-task-manager",
+  "sideEffects": [
+    "src/**/*.css",
+    "src/**/*.scss",
+    "public/**/*"
+  ],
+  "version": "0.1.0",
+  "description": "",
+  "license": "Apache-2.0",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc -b",
+    "lint": "eslint ./src/ --ext .ts,.tsx",
+    "lint-fix": "eslint ./src/ --ext .ts,.tsx --fix",
+    "validate-dependencies": "core-cli-validate-dependencies",
+    "update-ts-references": "rimraf --glob dist && typescript-resolve-references"
+  },
+  "dependencies": {
+    "@cloudbeaver/core-di": "~0.1.0",
+    "@cloudbeaver/core-events": "~0.1.0",
+    "@cloudbeaver/core-task-manager": "~0.1.0",
+    "@cloudbeaver/core-blocks": "~0.1.0"
+  },
+  "peerDependencies": {},
+  "devDependencies": {
+    "typescript": "^5.2.2"
+  }
+}

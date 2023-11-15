@@ -31,7 +31,7 @@ import java.nio.file.Path;
 public class FSUtils {
     @NotNull
     public static String makeUniqueFsId(@NotNull DBFVirtualFileSystem fileSystem) {
-        return fileSystem.getType() + ":" + fileSystem.getId();
+        return fileSystem.getType() + "://" + fileSystem.getId();
     }
 
     @NotNull

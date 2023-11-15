@@ -83,6 +83,12 @@ public interface DBWServiceFS extends DBWService {
         @NotNull String newName
     ) throws DBWebException;
 
+    FSFile copyFile(
+        @NotNull WebSession webSession,
+        @NotNull String nodePath,
+        @NotNull String parentNodePath
+    ) throws DBWebException;
+
     @NotNull
     FSFile createFolder(
         @NotNull WebSession webSession,
