@@ -73,6 +73,9 @@
       "path": "../plugin-object-viewer/tsconfig.json"
     },
     {
+      "path": "../core-browser/tsconfig.json"
+    },
+    {
       "path": "../core-administration/tsconfig.json"
     },
     {
