@@ -344,7 +344,13 @@ export function useResource<
         return getData();
       },
       get outdated(): boolean {
-        return propertiesRef.key === null || !this.preloaded || this.loading || !this.loaded || this.resource.isOutdated(propertiesRef.key);
+        return (
+          propertiesRef.key === null ||
+          !this.preloaded ||
+          this.loading ||
+          !this.loaded ||
+          this.resource.isOutdated(propertiesRef.key, propertiesRef.includes)
+        );
       },
       get loaded() {
         if (propertiesRef.key === null) {

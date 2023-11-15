@@ -284,7 +284,7 @@ export function getCachedMapResourceLoaderState<TKey, TValue, TContext extends R
       return isContainsException(this.exception);
     },
     isOutdated() {
-      return resource.isOutdated(getKey());
+      return resource.isOutdated(getKey(), getIncludes?.());
     },
     async load() {
       await resource.load(getKey(), getIncludes?.());

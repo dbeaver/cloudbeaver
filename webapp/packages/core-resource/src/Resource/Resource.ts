@@ -58,7 +58,7 @@ export abstract class Resource<
   }
 
   abstract isLoaded(param?: ResourceKey<TKey> | undefined, includes?: TInclude | undefined): boolean;
-  abstract isOutdated(param?: ResourceKey<TKey> | undefined): boolean;
+  abstract isOutdated(param?: ResourceKey<TKey> | undefined, includes?: TInclude | undefined): boolean;
 
   isLoadable(param?: ResourceKey<TKey> | undefined, context?: TInclude | undefined): boolean {
     if (param === undefined) {
@@ -69,7 +69,7 @@ export abstract class Resource<
       return false;
     }
 
-    return !this.isLoaded(param, context) || this.isOutdated(param);
+    return !this.isLoaded(param, context) || this.isOutdated(param, context);
   }
 
   isLoading(key?: ResourceKey<TKey>): boolean {
@@ -162,6 +162,7 @@ export abstract class Resource<
       loading: false,
       exception: null,
       includes: observable([...this.defaultIncludes]),
+      outdatedIncludes: observable([...this.defaultIncludes]),
       dependencies: observable([]),
     } as ICachedResourceMetadata as TMetadata;
   }

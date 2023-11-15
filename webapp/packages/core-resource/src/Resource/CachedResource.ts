@@ -285,7 +285,7 @@ export abstract class CachedResource<
     return this.scheduler.wait();
   }
 
-  isOutdated(param?: ResourceKey<TKey>): boolean {
+  isOutdated(param?: ResourceKey<TKey>, includes?: TInclude): boolean {
     if (param === undefined) {
       param = CachedResourceParamKey;
     }
@@ -299,7 +299,10 @@ export abstract class CachedResource<
       }
     }
 
-    return this.metadata.some(param, metadata => !metadata.loaded || metadata.outdated);
+    return this.metadata.some(
+      param,
+      metadata => !metadata.loaded || metadata.outdated || !!includes?.some(include => metadata.outdatedIncludes.includes(include)),
+    );
   }
 
   markLoading(param: ResourceKey<TKey>, state: boolean, context?: TInclude): void {
@@ -497,6 +500,7 @@ export abstract class CachedResource<
   protected resetIncludes(): void {
     this.metadata.update(metadata => {
       metadata.includes = observable([...this.defaultIncludes]);
+      metadata.outdatedIncludes = observable([...this.defaultIncludes]);
     });
   }
 
@@ -506,6 +510,7 @@ export abstract class CachedResource<
         metadata.includes.push(include);
       }
     }
+    metadata.outdatedIncludes = observable(metadata.outdatedIncludes.filter(include => !includes.includes(include)));
   }
 
   protected resetDataToDefault(): void {
@@ -524,6 +529,7 @@ export abstract class CachedResource<
     const pageKey = this.aliases.isAlias(key, CachedResourceOffsetPageKey) || this.aliases.isAlias(key, CachedResourceOffsetPageListKey);
     this.metadata.update(key, metadata => {
       metadata.outdated = true;
+      metadata.outdatedIncludes = observable([...metadata.includes]);
 
       if (pageKey) {
         metadata.offsetPage = observable({
@@ -542,6 +548,7 @@ export abstract class CachedResource<
 
       this.metadata.update(key, metadata => {
         metadata.outdated = true;
+        metadata.outdatedIncludes = observable([...metadata.includes]);
         metadata.offsetPage?.pages.forEach(page => {
           page.outdated = true;
         });
