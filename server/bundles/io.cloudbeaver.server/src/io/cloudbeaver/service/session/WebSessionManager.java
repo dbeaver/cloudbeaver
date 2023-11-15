@@ -340,4 +340,20 @@ public class WebSessionManager {
             }
         }
     }
+
+    public void closeUserSession(String userId) {
+        List<BaseWebSession> userSessionLise = new ArrayList<>();
+        synchronized (sessionMap) {
+            for (Iterator<BaseWebSession> iterator = sessionMap.values().iterator(); iterator.hasNext(); ) {
+                var session = iterator.next();
+                if (CommonUtils.equalObjects(session.getUserContext().getUserId(), userId)) {
+                    iterator.remove();
+                    userSessionLise.add(session);
+                }
+            }
+        }
+        for (var session : userSessionLise) {
+            session.close();
+        }
+    }
 }
