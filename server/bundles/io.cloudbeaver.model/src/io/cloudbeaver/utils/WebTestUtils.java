@@ -20,6 +20,7 @@ package io.cloudbeaver.utils;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import org.jkiss.dbeaver.model.data.json.JSONUtils;
+import org.jkiss.dbeaver.utils.GeneralUtils;
 
 import java.io.File;
 import java.net.URI;
@@ -55,6 +56,7 @@ public class WebTestUtils {
         HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
             .uri(URI.create(apiUrl))
             .POST(HttpRequest.BodyPublishers.ofString(input))
+            .setHeader("TE-Client-Version", GeneralUtils.getMajorVersion())
             .header("Content-Type", "application/json");
 
         if (!headers.isEmpty()) {
@@ -74,6 +76,7 @@ public class WebTestUtils {
     public static boolean getServerStatus(HttpClient client, String apiUrl) {
         HttpRequest request = HttpRequest.newBuilder()
             .uri(URI.create(apiUrl))
+            .setHeader("TE-Client-Version", GeneralUtils.getMajorVersion())
             .GET()
             .build();
         try {

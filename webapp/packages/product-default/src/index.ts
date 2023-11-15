@@ -2,6 +2,7 @@ import 'reflect-metadata';
 
 import { bootstrap } from '@cloudbeaver/core-bootstrap';
 import type { PluginManifest } from '@cloudbeaver/core-di';
+import { coreTaskManagerManifest } from '@cloudbeaver/core-task-manager';
 import administration from '@cloudbeaver/plugin-administration';
 import authentication from '@cloudbeaver/plugin-authentication';
 import authenticationAdministration from '@cloudbeaver/plugin-authentication-administration';
@@ -44,6 +45,7 @@ import sqlEditorNew from '@cloudbeaver/plugin-sql-editor-new';
 import sqlEditorScreen from '@cloudbeaver/plugin-sql-editor-screen';
 import { sqlGeneratorPlugin } from '@cloudbeaver/plugin-sql-generator';
 import { ssoPlugin } from '@cloudbeaver/plugin-sso';
+import { taskManagerPluginManifest } from '@cloudbeaver/plugin-task-manager';
 import theme from '@cloudbeaver/plugin-theme';
 import toolsPanel from '@cloudbeaver/plugin-tools-panel';
 import topAppBar from '@cloudbeaver/plugin-top-app-bar';
@@ -107,6 +109,8 @@ const PLUGINS: PluginManifest[] = [
   projects,
   browserPlugin,
   navigationTreeFilters,
+  coreTaskManagerManifest,
+  taskManagerPluginManifest,
 ];
 
 bootstrap(PLUGINS);
