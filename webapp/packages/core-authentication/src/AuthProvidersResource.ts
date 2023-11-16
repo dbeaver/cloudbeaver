@@ -67,24 +67,8 @@ export class AuthProvidersResource extends CachedMapResource<string, AuthProvide
     return this.get(resourceKeyList(this.serverConfigResource.enabledAuthProviders)) as AuthProvider[];
   }
 
-  getBase(): string | undefined {
-    return this.authSettingsService.settings.getValue('baseAuthProvider');
-  }
-
-  getPrimary(): string {
-    return this.authSettingsService.settings.getValue('primaryAuthProvider');
-  }
-
   isEnabled(id: string): boolean {
     return this.isAuthEnabled(id);
-  }
-
-  isBase(id: string): boolean {
-    return id === this.getBase();
-  }
-
-  isPrimary(id: string): boolean {
-    return id === this.getPrimary();
   }
 
   isAuthEnabled(id: string): boolean {

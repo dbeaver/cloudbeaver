@@ -14,20 +14,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package io.cloudbeaver.server.events;
 
-package io.cloudbeaver.model.app;
+import io.cloudbeaver.server.CBPlatform;
+import org.jkiss.code.NotNull;
+import org.jkiss.dbeaver.model.websocket.WSEventHandler;
+import org.jkiss.dbeaver.model.websocket.event.WSUserDeletedEvent;
 
-import io.cloudbeaver.auth.CBAuthConstants;
-import org.jkiss.dbeaver.DBException;
-
-public interface WebAuthApplication extends WebApplication {
-    WebAuthConfiguration getAuthConfiguration();
-
-    String getAuthServiceURL();
-
-    default long getMaxSessionIdleTime() {
-        return CBAuthConstants.MAX_SESSION_IDLE_TIME;
+public class WSUserDeletedEventHandler<EVENT extends WSUserDeletedEvent> implements WSEventHandler<EVENT> {
+    @Override
+    public void handleEvent(@NotNull EVENT event) {
+        CBPlatform.getInstance().getSessionManager().closeUserSessions(event.getDeletedUserId());
     }
-
-    void flushConfiguration() throws DBException;
 }

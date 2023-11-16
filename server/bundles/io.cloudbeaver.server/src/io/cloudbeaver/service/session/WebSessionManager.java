@@ -340,4 +340,16 @@ public class WebSessionManager {
             }
         }
     }
+
+    public void closeUserSessions(@NotNull String userId) {
+        synchronized (sessionMap) {
+            for (Iterator<BaseWebSession> iterator = sessionMap.values().iterator(); iterator.hasNext(); ) {
+                var session = iterator.next();
+                if (CommonUtils.equalObjects(session.getUserContext().getUserId(), userId)) {
+                    iterator.remove();
+                    session.close();
+                }
+            }
+        }
+    }
 }

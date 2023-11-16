@@ -23,6 +23,7 @@ import {
 import { getFirstException } from '@cloudbeaver/core-utils';
 
 import style from './AdministrationUserForm.m.css';
+import { AdministrationUserFormDeleteButton } from './AdministrationUserFormDeleteButton';
 import { AdministrationUserFormService, IUserFormState } from './AdministrationUserFormService';
 import { DATA_CONTEXT_USER_FORM_INFO_PART } from './Info/DATA_CONTEXT_USER_FORM_INFO_PART';
 
@@ -37,12 +38,14 @@ export const AdministrationUserForm = observer<Props>(function AdministrationUse
   const translate = useTranslate();
   const notificationService = useService(NotificationService);
   const administrationUserFormService = useService(AdministrationUserFormService);
+
   const editing = state.mode === FormMode.Edit;
+  const userFormInfoPart = state.dataContext.get(DATA_CONTEXT_USER_FORM_INFO_PART);
+
   const form = useForm({
     async onSubmit() {
       const mode = state.mode;
       const saved = await state.save();
-      const userFormInfoPart = state.dataContext.get(DATA_CONTEXT_USER_FORM_INFO_PART);
 
       if (saved) {
         if (mode === FormMode.Create) {
@@ -78,6 +81,9 @@ export const AdministrationUserForm = observer<Props>(function AdministrationUse
               <TabList className={s(styles, { tabList: true })} style={deprecatedStyle} />
             </Container>
             <Container keepSize noWrap center gap compact>
+              {editing && (
+                <AdministrationUserFormDeleteButton userId={userFormInfoPart.initialState.userId} enabled={userFormInfoPart.initialState.enabled} />
+              )}
               <Button type="button" disabled={state.isDisabled} mod={['outlined']} onClick={onClose}>
                 {translate('ui_processing_cancel')}
               </Button>

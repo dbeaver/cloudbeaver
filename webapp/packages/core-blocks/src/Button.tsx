@@ -18,7 +18,7 @@ import { useS } from './useS';
 
 type ButtonMod = Array<'raised' | 'unelevated' | 'outlined' | 'secondary'>;
 
-type ButtonProps = (React.ButtonHTMLAttributes<HTMLButtonElement | HTMLAnchorElement> &
+export type ButtonProps = (React.ButtonHTMLAttributes<HTMLButtonElement | HTMLAnchorElement> &
   React.LinkHTMLAttributes<HTMLLinkElement | HTMLButtonElement> &
   React.HTMLAttributes<HTMLDivElement>) & {
   loading?: boolean;

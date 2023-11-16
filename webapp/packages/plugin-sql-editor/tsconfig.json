@@ -70,6 +70,9 @@
       "path": "../plugin-navigation-tabs/tsconfig.json"
     },
     {
+      "path": "../core-authentication/tsconfig.json"
+    },
+    {
       "path": "../core-administration/tsconfig.json"
     },
     {
