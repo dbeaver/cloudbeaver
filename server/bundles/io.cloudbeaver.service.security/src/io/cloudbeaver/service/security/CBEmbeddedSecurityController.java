@@ -53,7 +53,6 @@ import org.jkiss.dbeaver.model.sql.SQLUtils;
 import org.jkiss.dbeaver.model.websocket.event.WSUserDeletedEvent;
 import org.jkiss.dbeaver.model.websocket.event.permissions.WSObjectPermissionEvent;
 import org.jkiss.dbeaver.model.websocket.event.permissions.WSSubjectPermissionEvent;
-import org.jkiss.dbeaver.model.websocket.event.session.WSSessionExpiredEvent;
 import org.jkiss.utils.ArrayUtils;
 import org.jkiss.utils.CommonUtils;
 import org.jkiss.utils.SecurityUtils;
@@ -1350,8 +1349,7 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
                             securedUserIdentifyingCredentials),
                         isMainSession
                     ),
-                    true,
-                    false
+                    true
                 );
             }
         } catch (SQLException e) {
@@ -1789,14 +1787,14 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
     @Override
     public SMAuthInfo finishAuthentication(@NotNull String authId) throws DBException {
         SMAuthInfo authInfo = getAuthStatus(authId);
-        return finishAuthentication(authInfo, false, true);
+        return finishAuthentication(authInfo, false);
     }
 
     private SMAuthInfo finishAuthentication(
         @NotNull SMAuthInfo authInfo,
-        boolean forceExpireAuthAfterSuccess,
-        boolean saveSecuredCreds
+        boolean isSyncAuth
     ) throws DBException {
+        boolean isAsyncAuth = !isSyncAuth;
         String authId = authInfo.getAuthAttemptId();
         if (authInfo.getAuthStatus() != SMAuthStatus.IN_PROGRESS) {
             throw new SMException("Authorization has already been completed with status: " + authInfo.getAuthStatus());
@@ -1820,11 +1818,14 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
             activeUserId = permissions.getUserId();
         }
 
-        Map<SMAuthConfigurationReference, Object> storedUserData = new LinkedHashMap<>();
+        // we don't want to store sensitive information in the database,
+        // but we can send it once to the user in sync auth
+        Map<SMAuthConfigurationReference, Object> dbStoredUserData = new LinkedHashMap<>();
+        Map<SMAuthConfigurationReference, Object> sentToUserAuthData = new LinkedHashMap<>();
+
         SMTeam[] allTeams = null;
         SMAuthProviderCustomConfiguration providerConfig = null;
         String detectedAuthRole = null;
-        Map<String, Object> userAuthData = new LinkedHashMap<>();
         for (SMAuthConfigurationReference authConfiguration : authProviderIds) {
             String authProviderId = authConfiguration.getAuthProviderId();
             WebAuthProviderDescriptor authProvider = getAuthProvider(authProviderId);
@@ -1843,11 +1844,14 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
                 }
             }
 
-            userAuthData.putAll((Map<String, Object>) authInfo.getAuthData().get(authConfiguration));
+            Map<String, Object> providerAuthData = new LinkedHashMap<>(
+                (Map<String, Object>) authInfo.getAuthData().get(authConfiguration)
+            );
+
 
             if (isMainAuthSession) {
                 SMAutoAssign autoAssign =
-                    getAutoAssignUserData(authProvider, providerConfig, userAuthData, finishAuthMonitor);
+                    getAutoAssignUserData(authProvider, providerConfig, providerAuthData, finishAuthMonitor);
                 if (autoAssign != null) {
                     detectedAuthRole = autoAssign.getAuthRole();
                 }
@@ -1855,7 +1859,7 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
                 var userIdFromCreds = findOrCreateExternalUserByCredentials(
                     authProvider,
                     authAttemptSessionInfo.getSessionParams(),
-                    userAuthData,
+                    providerAuthData,
                     finishAuthMonitor,
                     activeUserId,
                     activeUserId == null,
@@ -1865,7 +1869,7 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
 
                 if (userIdFromCreds == null) {
                     var error = "Invalid user credentials";
-                    updateAuthStatus(authId, SMAuthStatus.ERROR, storedUserData, error);
+                    updateAuthStatus(authId, SMAuthStatus.ERROR, dbStoredUserData, error);
                     return SMAuthInfo.error(authId, error, isMainAuthSession);
                 }
 
@@ -1880,8 +1884,18 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
                     activeUserId = userIdFromCreds;
                 }
             }
-            storedUserData.put(authConfiguration,
-                saveSecuredCreds ? userAuthData : filterSecuredUserData(userAuthData, getAuthProvider(authProviderId)));
+            dbStoredUserData.put(
+                authConfiguration,
+                isAsyncAuth
+                    ? providerAuthData
+                    : filterSecuredUserData(providerAuthData, getAuthProvider(authProviderId))
+            );
+            sentToUserAuthData.put(
+                authConfiguration,
+                isAsyncAuth || (authProvider.getInstance() instanceof SMAuthProviderExternal<?>)
+                    ? providerAuthData
+                    : filterSecuredUserData(providerAuthData, getAuthProvider(authProviderId))
+            );
         }
 
         String tokenAuthRole = updateUserAuthRoleIfNeeded(activeUserId, detectedAuthRole);
@@ -1909,12 +1923,12 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
                 }
             } catch (SQLException e) {
                 var error = "Error during token generation";
-                updateAuthStatus(authId, SMAuthStatus.ERROR, storedUserData, error);
+                updateAuthStatus(authId, SMAuthStatus.ERROR, dbStoredUserData, error);
                 throw new SMException(error, e);
             }
         }
-        var authStatus = forceExpireAuthAfterSuccess ? SMAuthStatus.EXPIRED : SMAuthStatus.SUCCESS;
-        updateAuthStatus(authId, authStatus, storedUserData, null, permissions.getSessionId());
+        var authStatus = isSyncAuth ? SMAuthStatus.EXPIRED : SMAuthStatus.SUCCESS;
+        updateAuthStatus(authId, authStatus, dbStoredUserData, null, permissions.getSessionId());
 
         if (isMainAuthSession) {
             return SMAuthInfo.successMainSession(
@@ -1923,14 +1937,14 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
                 //refresh token must be sent only from main session
                 smTokens.getSmRefreshToken(),
                 permissions,
-                authInfo.getAuthData(),
+                sentToUserAuthData,
                 tokenAuthRole
             );
         } else {
             return SMAuthInfo.successChildSession(
                 authId,
                 permissions,
-                authInfo.getAuthData()
+                sentToUserAuthData
             );
         }
     }
