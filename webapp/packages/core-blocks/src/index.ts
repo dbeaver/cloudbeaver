@@ -116,6 +116,7 @@ export * from './Tree/TreeNode/TreeNodeNested';
 export * from './Tree/TreeNode/TreeNodeNestedMessage';
 export * from './Tree/TreeNode/TreeNodeSelect';
 export * from './Button';
+export * from './Text';
 export { default as ButtonStyles } from './Button.m.css';
 export * from './ToolsPanel/ToolsAction';
 export * from './ToolsPanel/ToolsPanel';

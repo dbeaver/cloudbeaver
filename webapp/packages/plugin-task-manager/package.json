@@ -20,7 +20,8 @@
     "@cloudbeaver/core-di": "~0.1.0",
     "@cloudbeaver/core-events": "~0.1.0",
     "@cloudbeaver/core-task-manager": "~0.1.0",
-    "@cloudbeaver/core-blocks": "~0.1.0"
+    "@cloudbeaver/core-blocks": "~0.1.0",
+    "@cloudbeaver/core-localization": "~0.1.0"
   },
   "peerDependencies": {},
   "devDependencies": {

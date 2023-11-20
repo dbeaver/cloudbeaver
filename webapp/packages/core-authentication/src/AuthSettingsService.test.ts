@@ -49,8 +49,6 @@ beforeAll(() => app.init());
 const equalConfig = {
   core: {
     authentication: {
-      baseAuthProvider: 'sd',
-      primaryAuthProvider: 'sd',
       disableAnonymousAccess: true,
     } as AuthSettings,
   },
@@ -64,7 +62,5 @@ test('Read settings', async () => {
 
   await config.refresh();
 
-  expect(settings.settings.getValue('baseAuthProvider')).toBe('sd');
-  expect(settings.settings.getValue('primaryAuthProvider')).toBe('sd');
   expect(settings.settings.getValue('disableAnonymousAccess')).toBe(true);
 });

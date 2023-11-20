@@ -17,6 +17,9 @@
     },
     {
       "path": "../core-blocks/tsconfig.json"
+    },
+    {
+      "path": "../core-localization/tsconfig.json"
     }
   ],
   "include": [

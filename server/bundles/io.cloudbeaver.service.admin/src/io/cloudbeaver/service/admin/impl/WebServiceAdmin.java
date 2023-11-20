@@ -43,6 +43,9 @@ import org.jkiss.dbeaver.model.app.DBPProject;
 import org.jkiss.dbeaver.model.auth.AuthInfo;
 import org.jkiss.dbeaver.model.navigator.DBNBrowseSettings;
 import org.jkiss.dbeaver.model.preferences.DBPPropertyDescriptor;
+import org.jkiss.dbeaver.model.rm.RMProject;
+import org.jkiss.dbeaver.model.rm.RMProjectType;
+import org.jkiss.dbeaver.model.rm.RMUtils;
 import org.jkiss.dbeaver.model.security.*;
 import org.jkiss.dbeaver.model.security.user.SMTeam;
 import org.jkiss.dbeaver.model.security.user.SMUser;
@@ -177,10 +180,16 @@ public class WebServiceAdmin implements DBWServiceAdmin {
         webSession.addInfoMessage("Delete user - " + userName);
         try {
             webSession.getAdminSecurityController().deleteUser(userName);
-            return true;
         } catch (Exception e) {
             throw new DBWebException("Error deleting user", e);
         }
+        try {
+            webSession.getRmController().deleteProject(RMProjectType.USER + "_" + userName);
+        } catch (DBException e) {
+            log.error("Error deleting user project", e);
+            webSession.addSessionError(e);
+        }
+        return true;
     }
 
     @NotNull
