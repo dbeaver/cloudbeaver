@@ -26,6 +26,7 @@ import org.eclipse.jetty.server.Request;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.data.json.JSONUtils;
 import org.jkiss.dbeaver.model.navigator.fs.DBNPathBase;
+import org.jkiss.dbeaver.utils.GeneralUtils;
 import org.jkiss.utils.CommonUtils;
 import org.jkiss.utils.IOUtils;
 
@@ -98,7 +99,11 @@ public class WebFSServlet extends WebServiceServletBase {
                 }
             }
         } catch (Exception e) {
-            throw new DBWebException(e.getCause().getMessage());
+            String message = GeneralUtils.getRootCause(e).getMessage();
+            if (GeneralUtils.getRootCause(e).getMessage() != null) {
+                message = "File Upload Failed: Unable to Save File to the File System " + e.getMessage();
+            }
+            throw new DBWebException(message);
         }
     }
 }
