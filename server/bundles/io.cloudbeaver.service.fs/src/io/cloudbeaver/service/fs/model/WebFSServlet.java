@@ -99,11 +99,8 @@ public class WebFSServlet extends WebServiceServletBase {
                 }
             }
         } catch (Exception e) {
-            String message = GeneralUtils.getRootCause(e).getMessage();
-            if (GeneralUtils.getRootCause(e).getMessage() != null) {
-                message = "File Upload Failed: Unable to Save File to the File System " + e.getMessage();
-            }
-            throw new DBWebException(message);
+            throw new DBWebException("File Upload Failed: Unable to Save File to the File System",
+                GeneralUtils.getRootCause(e));
         }
     }
 }
