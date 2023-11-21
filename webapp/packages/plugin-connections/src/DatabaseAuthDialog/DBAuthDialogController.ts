@@ -100,9 +100,8 @@ export class DBAuthDialogController implements IInitializableController, IDestru
 
     if (Object.keys(this.config.credentials).length > 0) {
       config.credentials = this.config.credentials;
+      config.saveCredentials = this.config.saveCredentials;
     }
-
-    config.saveCredentials = this.config.saveCredentials;
 
     if (this.config.networkHandlersConfig.length > 0) {
       config.networkCredentials = this.config.networkHandlersConfig;
