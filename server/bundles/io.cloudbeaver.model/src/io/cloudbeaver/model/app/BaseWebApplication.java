@@ -144,6 +144,14 @@ public abstract class BaseWebApplication extends BaseApplicationImpl implements 
         return null;
     }
 
+    public Path getLogbackConfigPath() {
+        Path configFilePath = getMainConfigurationFilePath().toAbsolutePath();
+        Path configFolder = configFilePath.getParent();
+
+        // Configure logging
+        return getLogbackConfigPath(configFolder);
+    }
+
     private Path getMainConfigurationFilePath() {
         String configPath = DEFAULT_CONFIG_FILE_PATH;
 
