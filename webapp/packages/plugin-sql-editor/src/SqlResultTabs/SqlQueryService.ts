@@ -187,6 +187,7 @@ export class SqlQueryService {
       return;
     }
 
+    const groupNameOrder = this.sqlQueryResultService.getGroupNameOrder(editorState);
     const connectionKey = createConnectionParam(contextInfo.projectId, contextInfo.connectionId);
 
     const connectionInfo = await this.connectionInfoResource.load(connectionKey);
@@ -207,6 +208,7 @@ export class SqlQueryService {
 
     let source: QueryDataSource | undefined;
     let model: IDatabaseDataModel<IDataQueryOptions, IDatabaseResultSet> | undefined;
+    let resultCount = 0;
 
     for (let i = 0; i < queries.length; i++) {
       const query = queries[i];
@@ -248,10 +250,13 @@ export class SqlQueryService {
         }
 
         if (source.results.some(result => result.data)) {
-          const tabGroup = this.sqlQueryResultService.createGroup(editorState, model.id, query);
-          model.setName(this.sqlQueryResultService.getTabNameForOrder(tabGroup.nameOrder, 0, model.getResults().length, statisticsTab.order, i + 1));
+          resultCount = resultCount + 1;
+
+          const tabGroup = this.sqlQueryResultService.createGroup(editorState, model.id, query, groupNameOrder);
+          model.setName(this.sqlQueryResultService.getTabNameForOrder(tabGroup.nameOrder, 0, model.getResults().length, resultCount));
           this.switchTabToActiveRequest(editorState, tabGroup, model);
-          this.sqlQueryResultService.updateGroupTabs(editorState, model, tabGroup.groupId, false, statisticsTab.order, i + 1);
+
+          this.sqlQueryResultService.updateGroupTabs(editorState, model, tabGroup.groupId, false, resultCount);
 
           model = source = undefined;
         }
@@ -264,7 +269,7 @@ export class SqlQueryService {
       } catch (exception: any) {
         if (model) {
           const tabGroup = this.sqlQueryResultService.createGroup(editorState, model.id, query);
-          this.sqlQueryResultService.updateGroupTabs(editorState, model, tabGroup.groupId, true, statisticsTab.order, i + 1);
+          this.sqlQueryResultService.updateGroupTabs(editorState, model, tabGroup.groupId, true, resultCount);
 
           model = source = undefined;
         }
