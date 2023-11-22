@@ -115,7 +115,7 @@ export class ConnectionSSLTabService extends Bootstrap {
     configuration.include('includeNetworkHandlersConfig');
   }
 
-  private async prepareConfig({ state }: IConnectionFormSubmitData, contexts: IExecutionContextProvider<IConnectionFormSubmitData>) {
+  private async prepareConfig({ state, submitType }: IConnectionFormSubmitData, contexts: IExecutionContextProvider<IConnectionFormSubmitData>) {
     const config = contexts.getContext(connectionConfigContext);
     const credentialsState = contexts.getContext(connectionCredentialsStateContext);
 
@@ -168,12 +168,14 @@ export class ConnectionSSLTabService extends Bootstrap {
         }
       }
 
-      if (Object.keys(handlerConfig.secureProperties).length === 0) {
-        delete handlerConfig.secureProperties;
-      }
+      if (submitType === 'submit') {
+        if (Object.keys(handlerConfig.secureProperties).length === 0) {
+          delete handlerConfig.secureProperties;
+        }
 
-      if (Object.keys(handlerConfig.properties).length === 0) {
-        delete handlerConfig.properties;
+        if (Object.keys(handlerConfig.properties).length === 0) {
+          delete handlerConfig.properties;
+        }
       }
     }
 
