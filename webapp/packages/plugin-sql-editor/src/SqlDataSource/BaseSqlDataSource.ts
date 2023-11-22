@@ -251,7 +251,9 @@ export abstract class BaseSqlDataSource implements ISqlDataSource {
     this.markUpdated();
   }
 
-  load(): Promise<void> | void {}
+  load(): Promise<void> | void {
+    this.markUpdated();
+  }
 
   reset(): Promise<void> | void {
     this.setScript(this.baseScript);
