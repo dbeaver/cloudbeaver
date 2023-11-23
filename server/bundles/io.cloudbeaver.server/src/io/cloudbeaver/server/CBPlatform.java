@@ -58,8 +58,7 @@ import org.osgi.framework.Bundle;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -157,6 +156,8 @@ public class CBPlatform extends BasePlatformImpl {
         super.initialize();
 
         refreshApplicableDrivers();
+
+        refreshDisabledDriversConfig();
 
         new WebSessionMonitorJob(this)
             .scheduleMonitor();
@@ -326,6 +327,18 @@ public class CBPlatform extends BasePlatformImpl {
             }
         }
         log.info("Available drivers: " + applicableDrivers.stream().map(DBPDriver::getFullName).collect(Collectors.joining(",")));
+    }
+
+    private void refreshDisabledDriversConfig() {
+        CBAppConfig config = application.getAppConfiguration();
+        Set<String> disabledDrivers = new HashSet<>(Arrays.asList(config.getDisabledDrivers()));
+        for (DBPDriver driver : applicableDrivers) {
+            if (!driver.isEmbedded() || ConfigurationUtils.isEmbeddedDriverEnabled(driver)) {
+                continue;
+            }
+            disabledDrivers.add(driver.getFullId());
+        }
+        config.setDisabledDrivers(disabledDrivers.toArray(new String[0]));
     }
 
     @NotNull
