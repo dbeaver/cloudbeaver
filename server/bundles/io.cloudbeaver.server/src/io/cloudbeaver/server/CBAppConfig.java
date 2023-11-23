@@ -267,15 +267,15 @@ public class CBAppConfig extends BaseAuthWebAppConfiguration implements WebAuthC
     // we disable embedded drivers by default and enable it in enabled drivers list
     // that's why we need so complicated logic for disabling drivers
     public void updateDisabledDriversConfig(String[] disabledDriversConfig) {
-        Set<String> disabledDrivers = Arrays.stream(disabledDriversConfig).collect(Collectors.toSet());
+        Set<String> newDisabledDrivers = Arrays.stream(disabledDriversConfig).collect(Collectors.toSet());
         Set<String> enabledDrivers = Arrays.stream(this.enabledDrivers).collect(Collectors.toSet());
 
         // remove all disabled embedded drivers from enabled drivers list
-        enabledDrivers.removeAll(disabledDrivers);
+        enabledDrivers.removeAll(newDisabledDrivers);
 
         // enable embedded driver if it is not in disabled drivers list
         for (String driverId : this.disabledDrivers) {
-            if (disabledDrivers.contains(driverId)) {
+            if (newDisabledDrivers.contains(driverId)) {
                 // driver is also disabled
                 continue;
             }

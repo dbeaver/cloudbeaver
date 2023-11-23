@@ -333,7 +333,7 @@ public class CBPlatform extends BasePlatformImpl {
         CBAppConfig config = application.getAppConfiguration();
         Set<String> disabledDrivers = new HashSet<>(Arrays.asList(config.getDisabledDrivers()));
         for (DBPDriver driver : applicableDrivers) {
-            if (!driver.isEmbedded() || ConfigurationUtils.isEmbeddedDriverEnabled(driver)) {
+            if (!driver.isEmbedded() || ConfigurationUtils.isDriverForceEnabled(driver)) {
                 continue;
             }
             disabledDrivers.add(driver.getFullId());
