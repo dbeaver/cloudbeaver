@@ -41,7 +41,9 @@ cp -rp ../server/product/web-server/target/products/io.cloudbeaver.product/all/a
 cp -p ./scripts/* ./cloudbeaver
 mkdir cloudbeaver/samples
 
-if [[ ! -z "${SAMPLE_DATABASE_PATH}"  ]]; then
+if [[ -z "${SAMPLE_DATABASE_PATH}"  ]]; then
+  SAMPLE_DATABASE_PATH=""
+else  
   mkdir cloudbeaver/samples/db
   cp -rp "${SAMPLE_DATABASE_PATH}" cloudbeaver/samples/
 fi
