@@ -163,7 +163,7 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
                 return new WebUserInfo(webSession, webSession.getUser());
             }
         } catch (DBException e) {
-            if (SMUtils.isTokenExpiredExceptionWasHandled(e)) {
+            if (SMUtils.isRefreshTokenExpiredExceptionWasHandled(e)) {
                 try {
                     webSession.resetUserState();
                     return null;
