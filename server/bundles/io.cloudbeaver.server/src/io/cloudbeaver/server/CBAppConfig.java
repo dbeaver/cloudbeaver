@@ -30,12 +30,10 @@ import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.connection.DBPDriver;
 import org.jkiss.dbeaver.model.navigator.DBNBrowseSettings;
 import org.jkiss.dbeaver.registry.DataSourceNavigatorSettings;
+import org.jkiss.utils.ArrayUtils;
 import org.jkiss.utils.CommonUtils;
 
-import java.util.Arrays;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -264,18 +262,20 @@ public class CBAppConfig extends BaseAuthWebAppConfiguration implements WebAuthC
         return grantConnectionsAccessToAnonymousTeam;
     }
 
+
     // we disable embedded drivers by default and enable it in enabled drivers list
     // that's why we need so complicated logic for disabling drivers
+
     public void updateDisabledDriversConfig(String[] disabledDriversConfig) {
-        Set<String> newDisabledDrivers = Arrays.stream(disabledDriversConfig).collect(Collectors.toSet());
-        Set<String> enabledDrivers = Arrays.stream(this.enabledDrivers).collect(Collectors.toSet());
+        Set<String> disabledIds = new LinkedHashSet<>(Arrays.asList(disabledDriversConfig));
+        Set<String> enabledIds = new LinkedHashSet<>(Arrays.asList(this.enabledDrivers));
 
         // remove all disabled embedded drivers from enabled drivers list
-        enabledDrivers.removeAll(newDisabledDrivers);
+        enabledIds.removeAll(disabledIds);
 
         // enable embedded driver if it is not in disabled drivers list
         for (String driverId : this.disabledDrivers) {
-            if (newDisabledDrivers.contains(driverId)) {
+            if (disabledIds.contains(driverId)) {
                 // driver is also disabled
                 continue;
             }
@@ -284,14 +284,17 @@ public class CBAppConfig extends BaseAuthWebAppConfiguration implements WebAuthC
             try {
                 DBPDriver driver = WebServiceUtils.getDriverById(driverId);
                 if (driver.isEmbedded()) {
-                    enabledDrivers.add(driverId);
+                    enabledIds.add(driverId);
                 }
             } catch (DBWebException e) {
                 log.error("Failed to find driver by id", e);
             }
         }
         this.disabledDrivers = disabledDriversConfig;
-        this.enabledDrivers = enabledDrivers.toArray(String[]::new);
+        this.enabledDrivers = enabledIds.toArray(String[]::new);
     }
 
+    public boolean isDriverForceEnabled(@NotNull String driverId) {
+        return ArrayUtils.containsIgnoreCase(getEnabledDrivers(), driverId);
+    }
 }

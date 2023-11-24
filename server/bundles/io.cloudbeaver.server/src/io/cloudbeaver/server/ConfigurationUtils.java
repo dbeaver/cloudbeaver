@@ -25,7 +25,8 @@ public class ConfigurationUtils {
     }
 
     public static boolean isDriverEnabled(@NotNull DBPDriver driver) {
-        if (isDriverForceEnabled(driver)) {
+        String[] enabledDrivers = CBApplication.getInstance().getAppConfiguration().getEnabledDrivers();
+        if (ArrayUtils.contains(enabledDrivers, driver.getFullId())) {
             return true;
         }
         String[] disabledDrivers = CBApplication.getInstance().getAppConfiguration().getDisabledDrivers();
@@ -33,11 +34,6 @@ public class ConfigurationUtils {
             return false;
         }
         return !driver.isEmbedded();
-    }
-
-    public static boolean isDriverForceEnabled(@NotNull DBPDriver driver) {
-        String[] enabledDrivers = CBApplication.getInstance().getAppConfiguration().getEnabledDrivers();
-        return ArrayUtils.contains(enabledDrivers, driver.getFullId());
     }
 
 }

@@ -331,9 +331,9 @@ public class CBPlatform extends BasePlatformImpl {
 
     private void refreshDisabledDriversConfig() {
         CBAppConfig config = application.getAppConfiguration();
-        Set<String> disabledDrivers = new HashSet<>(Arrays.asList(config.getDisabledDrivers()));
+        Set<String> disabledDrivers = new LinkedHashSet<>(Arrays.asList(config.getDisabledDrivers()));
         for (DBPDriver driver : applicableDrivers) {
-            if (!driver.isEmbedded() || ConfigurationUtils.isDriverForceEnabled(driver)) {
+            if (!driver.isEmbedded() || config.isDriverForceEnabled(driver.getFullId())) {
                 continue;
             }
             disabledDrivers.add(driver.getFullId());
