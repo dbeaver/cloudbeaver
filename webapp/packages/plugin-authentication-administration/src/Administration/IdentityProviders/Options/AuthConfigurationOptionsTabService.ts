@@ -165,6 +165,9 @@ export class AuthConfigurationOptionsTabService extends Bootstrap {
     if (state.info.metadataLink) {
       state.config.metadataLink = state.info.metadataLink;
     }
+    if (state.info.acsLink) {
+      state.config.acsLink = state.info.acsLink;
+    }
     if (state.info.signInLink) {
       state.config.signInLink = state.info.signInLink;
     }

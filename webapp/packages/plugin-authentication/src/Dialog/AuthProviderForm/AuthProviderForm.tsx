@@ -17,7 +17,7 @@ interface Props {
   authenticate: boolean;
 }
 
-export const AuthProviderForm = observer<Props>(function AuthProviderForm({ provider, credentials, authenticate }) {
+export const AuthProviderForm = observer<Props>(function AuthProviderForm({ provider, configuration, credentials, authenticate }) {
   const [elementRef] = useFocus<HTMLDivElement>({ focusFirstChild: true });
 
   function handleProfileSelect() {
@@ -45,14 +45,14 @@ export const AuthProviderForm = observer<Props>(function AuthProviderForm({ prov
         parameter =>
           parameter.user && (
             <InputField
-              key={parameter.id}
+              key={`${provider.id}${configuration?.id ?? ''}${parameter.id}`}
               title={parameter.description}
               type={parameter.encryption === 'none' ? 'text' : 'password'}
               name={parameter.id}
               state={credentials.credentials}
               disabled={authenticate}
               canShowPassword={false}
-              autoComplete={`section-authentication section-${provider.id} ${parameter.id}`}
+              autoComplete={`section-authentication section-${provider.id} ${configuration?.id ?? ''} ${parameter.id}`}
             >
               {parameter.displayName}
             </InputField>

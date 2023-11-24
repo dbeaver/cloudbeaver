@@ -9,7 +9,7 @@ import { observer } from 'mobx-react-lite';
 import { useEffect, useState } from 'react';
 import styled, { css } from 'reshadow';
 
-import { Combobox, Container, Group, GroupItem, useTranslate } from '@cloudbeaver/core-blocks';
+import { Combobox, Container, Group, GroupItem, GroupTitle, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
 import { IVersion, VersionResource } from '@cloudbeaver/core-version';
@@ -27,6 +27,9 @@ const style = css`
   }
   Instruction {
     white-space: pre-line;
+  }
+  h4 {
+    margin: 0;
   }
 `;
 
@@ -65,6 +68,10 @@ export const VersionSelector = observer<Props>(function VersionSelector({ versio
             <Instruction version={version} containerId={serverConfigResource.data?.containerId} />
           </GroupItem>
         )}
+        <GroupTitle>{translate('plugin_version_update_administration_recommendations_label')}</GroupTitle>
+        <GroupItem>
+          <h4>{translate('plugin_version_update_administration_recommendations')}</h4>
+        </GroupItem>
       </Group>
       {version && <VersionInfo item={version.number} />}
     </Container>,
