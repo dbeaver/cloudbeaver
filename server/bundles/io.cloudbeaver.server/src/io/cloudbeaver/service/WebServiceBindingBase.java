@@ -34,13 +34,13 @@ import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.rm.RMProject;
 import org.jkiss.utils.ArrayUtils;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.lang.reflect.*;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 /**
  * Web service implementation
@@ -175,7 +175,7 @@ public abstract class WebServiceBindingBase<API_TYPE extends DBWService> impleme
                 }
             } catch (Throwable ex) {
                 log.error("Unexpected error during gql request", ex);
-                if (SMUtils.isTokenExpiredExceptionWasHandled(ex)) {
+                if (SMUtils.isRefreshTokenExpiredExceptionWasHandled(ex)) {
                     WebSession webSession = findWebSession(env);
                     if (webSession != null) {
                         webSession.resetUserState();
