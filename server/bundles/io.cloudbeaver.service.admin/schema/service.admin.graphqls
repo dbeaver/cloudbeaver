@@ -82,6 +82,7 @@ type AdminAuthProviderConfiguration {
     signOutLink: String
     redirectLink: String
     metadataLink: String
+    acsLink: String
 }
 
 type WebFeatureSet {

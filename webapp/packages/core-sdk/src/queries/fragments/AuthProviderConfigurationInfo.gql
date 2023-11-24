@@ -6,4 +6,5 @@ fragment AuthProviderConfigurationInfo on AuthProviderConfiguration {
   signInLink
   signOutLink
   metadataLink
+  acsLink
 }

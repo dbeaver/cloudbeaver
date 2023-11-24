@@ -135,7 +135,7 @@ export const AuthConfigurationOptions: TabContainerPanelComponent<IAuthConfigura
             ))}
           </>
         )}
-        {(state.config.metadataLink || state.config.signInLink || state.config.signOutLink) && (
+        {(state.config.metadataLink || state.config.signInLink || state.config.signOutLink || state.config.acsLink) && (
           <Group small gap>
             <GroupTitle>{translate('administration_identity_providers_provider_configuration_links')}</GroupTitle>
             <InputField
@@ -170,6 +170,17 @@ export const AuthConfigurationOptions: TabContainerPanelComponent<IAuthConfigura
               onCustomCopy={() => copy(state.config.redirectLink!, true)}
             >
               Redirect
+            </InputField>
+            <InputField
+              name="acsLink"
+              state={state.config}
+              title={state.config.acsLink}
+              disabled={state.disabled}
+              autoHide
+              readOnly
+              onCustomCopy={() => copy(state.config.acsLink!, true)}
+            >
+              ACS
             </InputField>
             {state.config.metadataLink && (
               <Link href={state.config.metadataLink} target="_blank" rel="noopener noreferrer">
