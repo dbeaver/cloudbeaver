@@ -43,7 +43,7 @@ export const DBAuthDialogFooter = observer<React.PropsWithChildren<Props>>(funct
   return styled(styles)(
     <footer-container className={className}>
       {children}
-      <Button type="button" mod={['unelevated']} disabled={isAuthenticating} onClick={onLogin}>
+      <Button type="button" mod={['unelevated']} disabled={isAuthenticating} loading={isAuthenticating} onClick={onLogin}>
         {translate('authentication_login')}
       </Button>
     </footer-container>,
