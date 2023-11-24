@@ -16,7 +16,6 @@ import { CachedMapAllKey } from '@cloudbeaver/core-resource';
 import { VersionResource, VersionService } from '@cloudbeaver/core-version';
 import { VersionUpdateService } from '@cloudbeaver/core-version-update';
 
-import { Recommendations } from './Recommendations';
 import { VersionChecker } from './VersionChecker';
 import { VersionSelector } from './VersionSelector';
 
@@ -47,7 +46,6 @@ export const VersionUpdate: AdministrationItemContentComponent = observer(functi
           <VersionSelector versions={versions} />
         </>
       )}
-      <Recommendations />
     </ColoredContainer>,
   );
 });
