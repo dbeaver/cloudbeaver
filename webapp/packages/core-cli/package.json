@@ -29,7 +29,7 @@
   },
   "dependencies": {
     "@babel/cli": "~7.22.15",
-    "@babel/core": "~7.22.15",
+    "@babel/core": "~7.23.2",
     "@babel/plugin-proposal-decorators": "~7.22.3",
     "@babel/plugin-transform-nullish-coalescing-operator": "^7.18.6",
     "@babel/plugin-transform-optional-chaining": "^7.21.0",
@@ -52,7 +52,7 @@
     "mini-css-extract-plugin": "~2.7.6",
     "peer-deps-externals-webpack-plugin": "~1.0.4",
     "pnp-webpack-plugin": "~1.7.0",
-    "postcss": "~8.4.29",
+    "postcss": "~8.4.31",
     "postcss-discard-comments": "~6.0.0",
     "postcss-loader": "~7.3.3",
     "postcss-preset-env": "~8.4.2",
