@@ -37,7 +37,10 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.nio.file.Path;
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 public class WebAppUtils {
     private static final Log log = Log.getLog(WebAppUtils.class);
@@ -179,12 +182,11 @@ public class WebAppUtils {
         String path = getWebApplication().getRootURI();
 
         if (sameSite != null) {
-            if (sameSite.toLowerCase() == "none" && request.isSecure() == false) {
+            if (!request.isSecure()) {
                 log.debug("Attempt to set Cookie `" + cookieName + "` with `SameSite=None` failed, it require a secure context/HTTPS");
-            } else {
-                sessionCookie.setSecure(true);
-                path = path.concat("; SameSite=" + sameSite);
             }
+            sessionCookie.setSecure(true);
+            path = path.concat("; SameSite=" + sameSite);
         }
 
         sessionCookie.setPath(path);
