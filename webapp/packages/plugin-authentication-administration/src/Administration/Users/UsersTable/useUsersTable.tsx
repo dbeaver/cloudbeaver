@@ -32,7 +32,7 @@ export function useUsersTable(filters: IUserFilters) {
   const translate = useTranslate();
   const usersResource = useService(UsersResource);
   const pagination = useOffsetPagination(UsersResource, {
-    key: UsersResourceFilterKey(filters.search, filters.status === 'true' ? true : filters.status === 'false' ? false : undefined),
+    key: UsersResourceFilterKey(filters.search.toLowerCase(), filters.status === 'true' ? true : filters.status === 'false' ? false : undefined),
   });
   const usersLoader = useResource(useUsersTable, usersResource, pagination.key);
   const notificationService = useService(NotificationService);
