@@ -1,0 +1,12 @@
+.wrapper {
+  composes: theme-background-surface theme-text-on-surface theme-border-color-background from global;
+  flex: 0 0 auto;
+}
+
+.groupItem {
+  white-space: pre-wrap;
+}
+
+.exceptionMessage {
+  padding: 24px;
+}

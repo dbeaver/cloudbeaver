@@ -11,7 +11,7 @@ import { Suspense, useContext, useEffect, useRef, useState } from 'react';
 import styled, { use } from 'reshadow';
 
 import type { ComponentStyle } from '@cloudbeaver/core-theming';
-import { ILoadableState, uuid } from '@cloudbeaver/core-utils';
+import { ILoadableState, uuid, clsx } from '@cloudbeaver/core-utils';
 
 import { Button } from '../Button';
 import { ErrorBoundary } from '../ErrorBoundary';
@@ -50,6 +50,7 @@ interface Props {
   inline?: boolean;
   loader?: boolean;
   className?: string;
+  exceptionMessageClassName?: string;
   fullSize?: boolean;
   state?: LoaderState | LoaderState[];
   style?: ComponentStyle;
@@ -79,6 +80,7 @@ export const Loader = observer<Props>(function Loader({
   loader,
   loading,
   inlineException,
+  exceptionMessageClassName,
   state,
   style,
   children,
@@ -251,7 +253,14 @@ export const Loader = observer<Props>(function Loader({
     if (hideException) {
       return null;
     }
-    return styled(style)(<ExceptionMessage exception={exception} inline={inline || inlineException} className={className} onRetry={reload} />);
+    return (
+      <ExceptionMessage 
+        exception={exception} 
+        inline={inline || inlineException} 
+        className={clsx(className, exceptionMessageClassName)} 
+        onRetry={reload}
+      />
+    );
   }
 
   if (children && (!loader || !loading) && !overlay) {

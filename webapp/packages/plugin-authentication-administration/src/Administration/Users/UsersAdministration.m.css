@@ -26,4 +26,7 @@
 
 .tabPanel {
   overflow: auto;
+  composes: theme-background-surface theme-text-on-surface theme-border-color-background from global;
+  border-bottom: solid 1px;
+  flex: 0 0 auto;
 }
