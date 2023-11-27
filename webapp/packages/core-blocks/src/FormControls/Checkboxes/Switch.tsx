@@ -72,12 +72,12 @@ export const Switch: SwitchType = observer(function Switch({
   }
 
   return (
-    <Field data-testid="field" title={rest.title}>
-      <div data-testid="switch-body" className={styles.switchBody}>
-        <div data-testid="switch-control" className={s(styles, { switchControl: true, disabled: disabled, checked: checkboxState.checked })}>
-          <div data-testid="switch-control-track" className={styles.switchControlTrack} />
-          <div data-testid="switch-control-underlay" className={styles.switchControlUnderlay}>
-            <div data-testid="switch-control-thumb" className={styles.switchControlThumb} />
+    <Field title={rest.title}>
+      <div className={styles.switchBody}>
+        <div className={s(styles, { switchControl: true, disabled: disabled, checked: checkboxState.checked })}>
+          <div className={styles.switchControlTrack} />
+          <div className={styles.switchControlUnderlay}>
+            <div className={styles.switchControlThumb} />
             <input
               {...rest}
               type="checkbox"
@@ -86,13 +86,12 @@ export const Switch: SwitchType = observer(function Switch({
               aria-checked={checkboxState.checked}
               checked={checkboxState.checked}
               disabled={disabled}
-              data-testid="switch-input"
               className={styles.switchInput}
               onChange={checkboxState.change}
             />
           </div>
         </div>
-        <FieldLabel htmlFor={id || value || name} data-testid="field-label" className={styles.fieldLabel}>
+        <FieldLabel htmlFor={id || value || name} className={styles.fieldLabel}>
           {children}
         </FieldLabel>
       </div>

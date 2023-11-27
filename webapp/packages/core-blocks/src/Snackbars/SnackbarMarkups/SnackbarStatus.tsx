@@ -21,7 +21,7 @@ interface SnackbarStatusProps {
 export const SnackbarStatus: React.FC<SnackbarStatusProps> = function SnackbarStatus({ status, className }) {
   const styles = useS(style);
   return status === ENotificationType.Loading ? (
-    <div data-testid="loader-container" className={s(styles, { loaderContainer: true }, className)}>
+    <div className={s(styles, { loaderContainer: true }, className)}>
       <Loader className={styles.loader} hideMessage />
     </div>
   ) : (

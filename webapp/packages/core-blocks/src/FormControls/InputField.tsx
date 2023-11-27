@@ -192,11 +192,7 @@ export const InputField: InputFieldType = observer<ControlledProps | ObjectProps
               <Icon name="copy" viewBox="0 0 32 32" className={styles.icon} />
             </div>
           )}
-          {icon && (
-            <div data-testid="icon-container" className={s(styles, { customIconContainer: true })}>
-              {icon}
-            </div>
-          )}
+          {icon && <div className={s(styles, { customIconContainer: true })}>{icon}</div>}
         </div>
         {(description || passwordType) && <FieldDescription invalid={error}>{description}</FieldDescription>}
       </Field>

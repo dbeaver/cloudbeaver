@@ -293,13 +293,7 @@ export const Combobox: ComboboxType = observer(function Combobox({
         <MenuButton {...menu} disabled={readOnly || disabled || hideMenu} className={styles.menuButton}>
           <Icon name="arrow" viewBox="0 0 16 16" className={s(styles, { icon: true, focus })} />
         </MenuButton>
-        <Menu
-          {...menu}
-          ref={menuRef}
-          aria-label={propertyName}
-          className={s(styles, { menu: true })}
-          modal
-        >
+        <Menu {...menu} ref={menuRef} aria-label={propertyName} className={s(styles, { menu: true })} modal>
           {!filteredItems.length ? (
             <MenuItem id="placeholder" disabled {...menu} className={s(styles, { menuItem: true })}>
               {translate('combobox_no_results_placeholder')}
@@ -322,11 +316,11 @@ export const Combobox: ComboboxType = observer(function Combobox({
                   onClick={event => handleSelect(event.currentTarget.id)}
                 >
                   {iconSelector && (
-                    <div data-testid="item-icon" className={s(styles, { itemIcon: true })}>
+                    <div className={s(styles, { itemIcon: true })}>
                       {icon && typeof icon === 'string' ? <IconOrImage icon={icon} className={s(styles, { iconOrImage: true })} /> : icon}
                     </div>
                   )}
-                  <div data-testid="item-value">{valueSelector(item)}</div>
+                  <div>{valueSelector(item)}</div>
                 </MenuItem>
               );
             })

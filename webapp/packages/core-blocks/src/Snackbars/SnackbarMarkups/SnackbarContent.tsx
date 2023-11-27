@@ -15,9 +15,5 @@ interface Props {
 
 export const SnackbarContent: React.FC<React.PropsWithChildren<Props>> = function SnackbarContent({ children, className }) {
   const styles = useS(style);
-  return (
-    <div data-testid="notification-content" className={s(styles, { notificationContent: true }, className)}>
-      {children}
-    </div>
-  );
+  return <div className={s(styles, { notificationContent: true }, className)}>{children}</div>;
 };

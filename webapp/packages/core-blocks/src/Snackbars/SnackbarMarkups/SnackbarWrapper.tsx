@@ -34,7 +34,7 @@ export const SnackbarWrapper: React.FC<React.PropsWithChildren<Props>> = functio
   }, []);
 
   return (
-    <div data-testid="notification" className={s(styles, { notification: true, mounted, closing }, className)}>
+    <div className={s(styles, { notification: true, mounted, closing }, className)}>
       {children}
       {!persistent && onClose && (
         <IconButton name="cross" viewBox="0 0 16 16" className={s(styles, { iconButton: true, large: true })} onClick={onClose} />

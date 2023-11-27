@@ -21,9 +21,6 @@
     "core-cli-validate-dependencies": "./bin/validate-dependencies.js",
     "typescript-resolve-references": "./bin/typescript-resolve-references.js"
   },
-  "scripts": {
-    "install": "tsc"
-  },
   "engines": {
     "node": ">=16.0.0"
   },
