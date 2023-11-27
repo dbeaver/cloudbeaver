@@ -14,7 +14,7 @@ import {
   NOT_INITIALIZED_CONTEXT_ID,
 } from '@cloudbeaver/core-connections';
 import { TaskScheduler } from '@cloudbeaver/core-executor';
-import type { ProjectInfoResource } from '@cloudbeaver/core-projects';
+import type { ProjectInfoResource, ProjectsService } from '@cloudbeaver/core-projects';
 import { isResourceAlias, ResourceKey, ResourceKeyUtils } from '@cloudbeaver/core-resource';
 import { getRmResourceKey, ResourceManagerResource } from '@cloudbeaver/core-resource-manager';
 import type { NetworkStateService } from '@cloudbeaver/core-root';
@@ -37,6 +37,7 @@ interface IResourceActions {
 }
 
 const VALUE_SYNC_DELAY = 1 * 1000;
+const DIFFERENT_PROJECT_MESSAGE_DISPLAY_DELAY = 10 * 1000;
 
 export class ResourceSqlDataSource extends BaseSqlDataSource {
   static key = 'resource';
@@ -113,6 +114,7 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
     private readonly connectionInfoResource: ConnectionInfoResource,
     private readonly resourceManagerResource: ResourceManagerResource,
     private readonly sqlEditorService: SqlEditorService,
+    private readonly projectsService: ProjectsService,
     state: IResourceSqlDataSourceState,
   ) {
     super();
@@ -233,12 +235,6 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
   setExecutionContext(executionContext: IConnectionExecutionContextInfo | undefined): void {
     if (executionContext) {
       executionContext = JSON.parse(JSON.stringify(toJS(executionContext) ?? {}));
-    }
-
-    const projectId = executionContext?.projectId;
-
-    if (this.resourceKey && isNotNullDefined(projectId) && getRmResourceKey(this.resourceKey).projectId !== projectId) {
-      throw new Error('Resource SQL Data Source and Execution context projects don\t match');
     }
 
     if (!isObjectsEqual(toJS(this.state.executionContext), executionContext)) {
@@ -370,6 +366,17 @@ export class ResourceSqlDataSource extends BaseSqlDataSource {
 
       try {
         this.exception = null;
+
+        const projectId = this.executionContext?.projectId;
+        const resourceProjectId = getRmResourceKey(this.resourceKey).projectId;
+        const userProjectId = this.projectsService.userProject?.id;
+
+        if (isNotNullDefined(projectId) && resourceProjectId !== projectId && resourceProjectId !== userProjectId) {
+          this.message = 'plugin_sql_editor_navigation_tab_script_state_different_project';
+
+          await new Promise(resolve => setTimeout(resolve, DIFFERENT_PROJECT_MESSAGE_DISPLAY_DELAY));
+          return;
+        }
 
         if (!this.isReadonly()) {
           this.message = 'plugin_sql_editor_navigation_tab_script_state_updating';
