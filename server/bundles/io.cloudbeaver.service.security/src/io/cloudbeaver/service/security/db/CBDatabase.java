@@ -458,7 +458,7 @@ public class CBDatabase {
     }
 
     private void checkInstanceRecord(Connection connection) throws SQLException, IOException {
-        InetAddress localHost = InetAddress.getLocalHost();
+        InetAddress localHost = RuntimeUtils.getLocalHostOrLoopback();
         String hostName = localHost.getHostName();
         byte[] hardwareAddress = RuntimeUtils.getLocalMacAddress();
         String macAddress = CommonUtils.toHexString(hardwareAddress);

@@ -58,10 +58,7 @@ import org.jkiss.dbeaver.registry.BaseApplicationImpl;
 import org.jkiss.dbeaver.registry.DataSourceNavigatorSettings;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.dbeaver.runtime.IVariableResolver;
-import org.jkiss.dbeaver.utils.ContentUtils;
-import org.jkiss.dbeaver.utils.GeneralUtils;
-import org.jkiss.dbeaver.utils.PrefUtils;
-import org.jkiss.dbeaver.utils.SystemVariablesResolver;
+import org.jkiss.dbeaver.utils.*;
 import org.jkiss.utils.ArrayUtils;
 import org.jkiss.utils.CommonUtils;
 import org.jkiss.utils.StandardConstants;
@@ -557,7 +554,7 @@ public abstract class CBApplication extends BaseWebApplication implements WebAut
             } else if (serverURL == null) {
                 String hostName = serverHost;
                 if (CommonUtils.isEmpty(hostName)) {
-                    hostName = InetAddress.getLocalHost().getHostName();
+                    hostName = RuntimeUtils.getLocalHostOrLoopback().getHostName();
                 }
                 serverURL = "http://" + hostName + ":" + serverPort;
             }
@@ -604,7 +601,7 @@ public abstract class CBApplication extends BaseWebApplication implements WebAut
                 }
             }
             parseAdditionalConfiguration(configProps);
-        } catch (IOException | DBException e) {
+        } catch (Exception e) {
             throw new DBException("Error parsing server configuration", e);
         }
 
