@@ -35,11 +35,11 @@ export const useOutputLogsPanelState = (outputLogs: IOutputLog[], sqlEditorTabSt
         }
 
         return outputLogs.filter(log => {
-          if (!selectedLogTypes.includes(log.severity)) {
+          if (log.severity && !selectedLogTypes.includes(log.severity)) {
             return false;
           }
 
-          if (this.searchValue.length > 0 && !log.message.toLowerCase().includes(this.searchValue.toLowerCase())) {
+          if (log.message && this.searchValue.length > 0 && !log.message.toLowerCase().includes(this.searchValue.toLowerCase())) {
             return false;
           }
 
@@ -47,7 +47,21 @@ export const useOutputLogsPanelState = (outputLogs: IOutputLog[], sqlEditorTabSt
         });
       },
       get resultValue() {
-        return this.filteredLogs.map(log => `[${log.severity}] ${log.message}`).join('\n');
+        return this.filteredLogs
+          .map(log => {
+            let result = '';
+
+            if (log.severity) {
+              result += `[${log.severity}] `;
+            }
+
+            if (log.message) {
+              result += log.message;
+            }
+
+            return result;
+          })
+          .join('\n');
       },
     }),
     {

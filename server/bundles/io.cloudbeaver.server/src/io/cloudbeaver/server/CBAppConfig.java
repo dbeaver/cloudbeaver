@@ -18,23 +18,29 @@ package io.cloudbeaver.server;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import io.cloudbeaver.DBWebException;
+import io.cloudbeaver.WebServiceUtils;
 import io.cloudbeaver.model.app.BaseAuthWebAppConfiguration;
 import io.cloudbeaver.model.app.WebAuthConfiguration;
 import io.cloudbeaver.registry.WebAuthProviderDescriptor;
 import io.cloudbeaver.registry.WebAuthProviderRegistry;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.DBException;
+import org.jkiss.dbeaver.Log;
+import org.jkiss.dbeaver.model.connection.DBPDriver;
 import org.jkiss.dbeaver.model.navigator.DBNBrowseSettings;
 import org.jkiss.dbeaver.registry.DataSourceNavigatorSettings;
+import org.jkiss.utils.ArrayUtils;
 import org.jkiss.utils.CommonUtils;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Application configuration
  */
 public class CBAppConfig extends BaseAuthWebAppConfiguration implements WebAuthConfiguration {
+    private static final Log log = Log.getLog(CBAppConfig.class);
     public static final DataSourceNavigatorSettings.Preset PRESET_WEB = new DataSourceNavigatorSettings.Preset("web", "Web", "Default view");
 
     public static final DataSourceNavigatorSettings DEFAULT_VIEW_SETTINGS = PRESET_WEB.getSettings();
@@ -161,10 +167,6 @@ public class CBAppConfig extends BaseAuthWebAppConfiguration implements WebAuthC
         return enabledDrivers;
     }
 
-    public void setEnabledDrivers(String[] enabledDrivers) {
-        this.enabledDrivers = enabledDrivers;
-    }
-
     public String[] getDisabledDrivers() {
         return disabledDrivers;
     }
@@ -260,4 +262,39 @@ public class CBAppConfig extends BaseAuthWebAppConfiguration implements WebAuthC
         return grantConnectionsAccessToAnonymousTeam;
     }
 
+
+    // we disable embedded drivers by default and enable it in enabled drivers list
+    // that's why we need so complicated logic for disabling drivers
+
+    public void updateDisabledDriversConfig(String[] disabledDriversConfig) {
+        Set<String> disabledIds = new LinkedHashSet<>(Arrays.asList(disabledDriversConfig));
+        Set<String> enabledIds = new LinkedHashSet<>(Arrays.asList(this.enabledDrivers));
+
+        // remove all disabled embedded drivers from enabled drivers list
+        enabledIds.removeAll(disabledIds);
+
+        // enable embedded driver if it is not in disabled drivers list
+        for (String driverId : this.disabledDrivers) {
+            if (disabledIds.contains(driverId)) {
+                // driver is also disabled
+                continue;
+            }
+            // driver is removed from disabled list
+            // we need to enable if it is embedded
+            try {
+                DBPDriver driver = WebServiceUtils.getDriverById(driverId);
+                if (driver.isEmbedded()) {
+                    enabledIds.add(driverId);
+                }
+            } catch (DBWebException e) {
+                log.error("Failed to find driver by id", e);
+            }
+        }
+        this.disabledDrivers = disabledDriversConfig;
+        this.enabledDrivers = enabledIds.toArray(String[]::new);
+    }
+
+    public boolean isDriverForceEnabled(@NotNull String driverId) {
+        return ArrayUtils.containsIgnoreCase(getEnabledDrivers(), driverId);
+    }
 }
