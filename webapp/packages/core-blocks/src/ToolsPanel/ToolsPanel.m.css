@@ -12,7 +12,5 @@
 .secondary {
   composes: theme-background-secondary theme-text-on-secondary theme-border-color-background from global;
   overflow: auto;
-  min-height: 32px;
   align-items: center;
-  height: initial;
 }
