@@ -25,18 +25,15 @@ public class ConfigurationUtils {
     }
 
     public static boolean isDriverEnabled(@NotNull DBPDriver driver) {
-        var driverId = driver.getFullId();
-
-        String[] disabledDrivers = CBApplication.getInstance().getAppConfiguration().getDisabledDrivers();
-        if (ArrayUtils.contains(disabledDrivers, driverId)) {
-            return false;
-        }
         String[] enabledDrivers = CBApplication.getInstance().getAppConfiguration().getEnabledDrivers();
-        if (enabledDrivers.length > 0 && !ArrayUtils.contains(enabledDrivers, driverId)) {
+        if (ArrayUtils.contains(enabledDrivers, driver.getFullId())) {
+            return true;
+        }
+        String[] disabledDrivers = CBApplication.getInstance().getAppConfiguration().getDisabledDrivers();
+        if (ArrayUtils.contains(disabledDrivers, driver.getFullId())) {
             return false;
         }
-
-        return true;
+        return !driver.isEmbedded();
     }
 
 }

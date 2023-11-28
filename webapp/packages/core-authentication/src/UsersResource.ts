@@ -72,7 +72,8 @@ export class UsersResource extends CachedMapResource<string, AdminUser, UserReso
         this.entries
           .filter(
             ([userId, user]) =>
-              userId.includes(key.options.userId ?? '') && (key.options.enabledState === undefined || user.enabled === key.options.enabledState),
+              userId.toLowerCase().includes((key.options.userId ?? '').toLowerCase()) &&
+              (key.options.enabledState === undefined || user.enabled === key.options.enabledState),
           )
           .map(([userId]) => userId),
       ),
