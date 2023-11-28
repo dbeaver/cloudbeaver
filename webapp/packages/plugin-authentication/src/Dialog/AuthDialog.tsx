@@ -86,8 +86,10 @@ export const AuthDialog: DialogComponent<IAuthOptions, null> = observer(function
   }
 
   async function login(linkUser: boolean, provider?: AuthProvider, configuration?: AuthProviderConfiguration) {
-    await dialogData.login(linkUser, provider, configuration);
-    rejectDialog();
+    try {
+      await dialogData.login(linkUser, provider, configuration);
+      rejectDialog();
+    } catch (e) {}
   }
 
   function navToSettings() {
