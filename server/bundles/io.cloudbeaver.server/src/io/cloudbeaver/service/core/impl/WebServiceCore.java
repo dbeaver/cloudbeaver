@@ -404,7 +404,7 @@ public class WebServiceCore implements DBWServiceCore {
         if (connectionConfig.isTemplate()) {
             connectionConfig.setSaveCredentials(false);
         }
-        DBPDataSourceContainer newDataSource = WebServiceUtils.createConnectionFromConfig(connectionConfig, sessionRegistry);
+        DBPDataSourceContainer newDataSource = WebServiceUtils.createConnectionFromConfig(connectionConfig, sessionRegistry, false);
         if (CommonUtils.isEmpty(newDataSource.getName())) {
             newDataSource.setName(CommonUtils.notNull(connectionConfig.getName(), "NewConnection"));
         }
@@ -664,7 +664,7 @@ public class WebServiceCore implements DBWServiceCore {
                 true
             );
         } else {
-            testDataSource = WebServiceUtils.createConnectionFromConfig(connectionConfig, sessionRegistry);
+            testDataSource = WebServiceUtils.createConnectionFromConfig(connectionConfig, sessionRegistry, true);
         }
         webSession.provideAuthParameters(webSession.getProgressMonitor(), testDataSource, testDataSource.getConnectionConfiguration());
         testDataSource.setSavePassword(true); // We need for test to avoid password callback

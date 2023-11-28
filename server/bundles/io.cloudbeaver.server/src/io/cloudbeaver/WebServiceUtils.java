@@ -99,7 +99,7 @@ public class WebServiceUtils extends WebCommonUtils {
     }
 
     @NotNull
-    public static DBPDataSourceContainer createConnectionFromConfig(WebConnectionConfig config, DBPDataSourceRegistry registry) throws DBWebException {
+    public static DBPDataSourceContainer createConnectionFromConfig(WebConnectionConfig config, DBPDataSourceRegistry registry, boolean isTest) throws DBWebException {
         DBPDataSourceContainer newDataSource;
         if (!CommonUtils.isEmpty(config.getTemplateId())) {
             DBPDataSourceContainer tpl = registry.getDataSource(config.getTemplateId());
@@ -142,7 +142,8 @@ public class WebServiceUtils extends WebCommonUtils {
             newDataSource.getConnectionConfiguration(),
             config.getCredentials(),
             config.isSaveCredentials(),
-            config.isSharedCredentials()
+            config.isSharedCredentials(),
+            isTest
         );
 
 
