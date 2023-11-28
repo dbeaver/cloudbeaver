@@ -161,7 +161,7 @@ public class WebUserContext implements SMCredentialsProvider {
         this.user = null;
         this.securityController = application.createSecurityController(this);
         this.adminSecurityController = null;
-        this.secretController = application.getSecretController(this);
+        this.secretController = application.getSecretController(this, workspace.getAuthContext());
     }
 
     @NotNull
