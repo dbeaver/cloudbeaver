@@ -43,10 +43,10 @@ export const SQLCodeEditorPanel: TabContainerPanelComponent<ISqlEditorModeProps>
 
   useEffect(() => {
     editorRef?.view?.dispatch({
-      selection: { anchor: localState.selection.from, head: localState.selection.to },
+      selection: { anchor: Math.min(localState.selection.to, data.value.length), head: Math.min(localState.selection.to, data.value.length) },
       scrollIntoView: true,
     });
-  }, [editorRef?.view, localState]);
+  }, [editorRef?.view, localState, data]);
 
   useEffect(() => {
     if (!editorRef?.selection) {
