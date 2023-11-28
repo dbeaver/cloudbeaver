@@ -37,7 +37,7 @@ interface IResourceActions {
 }
 
 const VALUE_SYNC_DELAY = 1 * 1000;
-const DIFFERENT_PROJECT_MESSAGE_DISPLAY_DELAY = 10 * 1000;
+const DIFFERENT_PROJECT_MESSAGE_DISPLAY_DELAY = 4 * 1000;
 
 export class ResourceSqlDataSource extends BaseSqlDataSource {
   static key = 'resource';
