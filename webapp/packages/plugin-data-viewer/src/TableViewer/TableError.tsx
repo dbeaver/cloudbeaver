@@ -14,6 +14,7 @@ import { ServerErrorType, ServerInternalError } from '@cloudbeaver/core-sdk';
 import { errorOf } from '@cloudbeaver/core-utils';
 
 import type { IDatabaseDataModel } from '../DatabaseDataModel/IDatabaseDataModel';
+import { useEffect } from 'react';
 
 const style = css`
   error {
@@ -110,11 +111,6 @@ export const TableError = observer<Props>(function TableError({ model, loading, 
     false,
   );
 
-  if (errorInfo.error !== model.source.error) {
-    errorInfo.error = model.source.error || null;
-    errorInfo.display = !!model.source.error;
-  }
-
   const internalServerError = errorOf(model.source.error, ServerInternalError);
   const error = useErrorDetails(model.source.error);
   const animated = useStateDelay(!!errorInfo.error && !loading, 1);
@@ -138,6 +134,13 @@ export const TableError = observer<Props>(function TableError({ model, loading, 
       await retry();
     };
   }
+
+  useEffect(() => {
+    if (errorInfo.error !== model.source.error) {
+      errorInfo.error = model.source.error || null;
+      errorInfo.display = !!model.source.error;
+    }
+  }, [errorInfo, model.source.error]);
 
   return styled(style)(
     <error {...use({ animated, collapsed: !errorInfo.display, errorHidden })} className={className}>
