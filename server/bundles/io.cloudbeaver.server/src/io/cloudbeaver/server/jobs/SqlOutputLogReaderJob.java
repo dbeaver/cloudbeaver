@@ -83,31 +83,31 @@ public class SqlOutputLogReaderJob extends AbstractJob {
 
     private void dumpOutput(DBRProgressMonitor monitor) {
         if (!monitor.isCanceled()) {
-            if (dbcServerOutputReader.isAsyncOutputReadSupported()) {
-                try {
-                    if (!dbcStatement.isStatementClosed()) {
-                        List<WSOutputLogInfo> messages = new ArrayList<>();
-                        dbcServerOutputReader.readServerOutput(monitor, dbcExecutionContext, null, dbcStatement, new DBCOutputWriter() {
-                            @Override
-                            public void println(@Nullable DBCOutputSeverity severity, @Nullable String message) {
-                                if (message != null && severity != null) {
-                                    messages.add(new WSOutputLogInfo(severity.getName(), message));
-                                }
-                            }
-
-                            @Override
-                            public void flush() {
-                                messages.clear();
-                            }
-                        });
-                        webSession.addSessionEvent(new WSOutputDBLogEvent(
-                            contextInfoId,
-                            messages,
-                            System.currentTimeMillis()));
+            List<WSOutputLogInfo> messages = new ArrayList<>();
+            final DBCOutputWriter writer = new DBCOutputWriter() {
+                @Override
+                public void println(@Nullable DBCOutputSeverity severity, @Nullable String message) {
+                    if (message != null) {
+                        messages.add(new WSOutputLogInfo(severity == null ? null : severity.getName(), message));
                     }
-                } catch (DBCException e) {
-                    log.error(e);
                 }
+
+                @Override
+                public void flush() {
+                    messages.clear();
+                }
+            };
+            try {
+                dbcServerOutputReader.readServerOutput(monitor, dbcExecutionContext, null, null, writer);
+                if (dbcServerOutputReader.isAsyncOutputReadSupported() && !dbcStatement.isStatementClosed()) {
+                    dbcServerOutputReader.readServerOutput(monitor, dbcExecutionContext, null, dbcStatement, writer);
+                }
+                webSession.addSessionEvent(new WSOutputDBLogEvent(
+                    contextInfoId,
+                    messages,
+                    System.currentTimeMillis()));
+            } catch (DBCException e) {
+                log.error(e);
             }
         }
     }
