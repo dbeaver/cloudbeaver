@@ -1,0 +1,15 @@
+.form {
+  flex: 1;
+  display: flex;
+  overflow: auto;
+  flex-direction: column;
+}
+
+.p {
+  white-space: pre-wrap;
+  line-height: 2;
+}
+
+.loader {
+  height: 100%;
+}

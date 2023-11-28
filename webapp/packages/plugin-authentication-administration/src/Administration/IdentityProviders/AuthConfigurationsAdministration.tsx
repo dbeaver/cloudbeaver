@@ -6,68 +6,64 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import styled, { css } from 'reshadow';
 
-import { ADMINISTRATION_TOOLS_PANEL_STYLES, AdministrationItemContentComponent } from '@cloudbeaver/core-administration';
-import { ColoredContainer, Container, Group, Loader, ToolsAction, ToolsPanel, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
+import type { AdministrationItemContentComponent } from '@cloudbeaver/core-administration';
+import { ColoredContainer, Container, ExceptionMessageStyles, Group, Loader, SContext, StyleRegistry, ToolsAction, ToolsPanel, s, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 
 import { AuthConfigurationsTable } from './AuthConfigurationsTable/AuthConfigurationsTable';
 import { useConfigurationsTable } from './AuthConfigurationsTable/useConfigurationsTable';
 import { CreateAuthConfiguration } from './CreateAuthConfiguration';
 import { CreateAuthConfigurationService } from './CreateAuthConfigurationService';
+import AuthConfigurationsAdministrationStyle from './AuthConfigurationsAdministration.m.css';
 
-const loaderStyle = css`
-  ExceptionMessage {
-    padding: 24px;
-  }
-`;
-
-const styles = css`
-  ToolsPanel {
-    border-bottom: none;
-  }
-`;
+const registry: StyleRegistry = [[
+  ExceptionMessageStyles,
+  {
+    mode: 'append',
+    styles: [AuthConfigurationsAdministrationStyle],
+  },
+]];
 
 export const AuthConfigurationsAdministration: AdministrationItemContentComponent = observer(function AuthConfigurationsAdministration({ sub }) {
   const translate = useTranslate();
-  const style = useStyles(styles, ADMINISTRATION_TOOLS_PANEL_STYLES);
   const service = useService(CreateAuthConfigurationService);
+  const styles = useS(AuthConfigurationsAdministrationStyle);
 
   const table = useConfigurationsTable();
 
-  return styled(style)(
+  return (
     <ColoredContainer wrap gap parent vertical>
       <Group box keepSize>
-        <ToolsPanel>
-          <ToolsAction
-            title={translate('administration_identity_providers_add_tooltip')}
-            icon="add"
-            viewBox="0 0 24 24"
-            disabled={!!sub || table.processing}
-            onClick={service.create}
-          >
-            {translate('ui_add')}
-          </ToolsAction>
-          <ToolsAction
-            title={translate('administration_identity_providers_refresh_tooltip')}
-            icon="refresh"
-            viewBox="0 0 24 24"
-            disabled={table.processing}
-            onClick={table.update}
-          >
-            {translate('ui_refresh')}
-          </ToolsAction>
-          <ToolsAction
-            title={translate('administration_identity_providers_delete_tooltip')}
-            icon="trash"
-            viewBox="0 0 24 24"
-            disabled={!table.tableState.itemsSelected || table.processing}
-            onClick={table.delete}
-          >
-            {translate('ui_delete')}
-          </ToolsAction>
-        </ToolsPanel>
+          <ToolsPanel className={s(styles, { toolsPanel: true })}>
+            <ToolsAction
+              title={translate('administration_identity_providers_add_tooltip')}
+              icon="add"
+              viewBox="0 0 24 24"
+              disabled={!!sub || table.processing}
+              onClick={service.create}
+            >
+              {translate('ui_add')}
+            </ToolsAction>
+            <ToolsAction
+              title={translate('administration_identity_providers_refresh_tooltip')}
+              icon="refresh"
+              viewBox="0 0 24 24"
+              disabled={table.processing}
+              onClick={table.update}
+            >
+              {translate('ui_refresh')}
+            </ToolsAction>
+            <ToolsAction
+              title={translate('administration_identity_providers_delete_tooltip')}
+              icon="trash"
+              viewBox="0 0 24 24"
+              disabled={!table.tableState.itemsSelected || table.processing}
+              onClick={table.delete}
+            >
+              {translate('ui_delete')}
+            </ToolsAction>
+          </ToolsPanel>
       </Group>
       <Container overflow gap>
         {sub && (
@@ -76,15 +72,17 @@ export const AuthConfigurationsAdministration: AdministrationItemContentComponen
           </Group>
         )}
         <Group boxNoOverflow>
-          <Loader style={loaderStyle} loading={table.processing} overlay>
-            <AuthConfigurationsTable
-              configurations={table.configurations}
-              selectedItems={table.tableState.selected}
-              expandedItems={table.tableState.expanded}
-            />
-          </Loader>
+          <SContext registry={registry}>
+            <Loader loading={table.processing} overlay>
+              <AuthConfigurationsTable
+                configurations={table.configurations}
+                selectedItems={table.tableState.selected}
+                expandedItems={table.tableState.expanded}
+              />
+            </Loader>
+          </SContext>
         </Group>
       </Container>
-    </ColoredContainer>,
+    </ColoredContainer>
   );
 });

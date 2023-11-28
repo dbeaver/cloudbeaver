@@ -6,20 +6,23 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import styled, { css } from 'reshadow';
 
-import { ADMINISTRATION_TOOLS_PANEL_STYLES, AdministrationItemContentProps } from '@cloudbeaver/core-administration';
+import type { AdministrationItemContentProps } from '@cloudbeaver/core-administration';
 import {
   ColoredContainer,
   Container,
+  ExceptionMessageStyles,
   Group,
   GroupItem,
   GroupTitle,
   Loader,
+  SContext,
+  StyleRegistry,
   ToolsAction,
   ToolsPanel,
+  s,
   useResource,
-  useStyles,
+  useS,
   useTranslate,
 } from '@cloudbeaver/core-blocks';
 import { ConnectionInfoActiveProjectKey, ConnectionInfoResource, DBDriverResource } from '@cloudbeaver/core-connections';
@@ -30,22 +33,15 @@ import { ConnectionsAdministrationController } from './ConnectionsAdministration
 import { ConnectionsTable } from './ConnectionsTable/ConnectionsTable';
 import { CreateConnection } from './CreateConnection/CreateConnection';
 import { CreateConnectionService } from './CreateConnectionService';
+import ConnectionsAdministrationStyle from './ConnectionsAdministration.m.css';
 
-const loaderStyle = css`
-  ExceptionMessage {
-    padding: 24px;
-  }
-`;
-
-const styles = css`
-  GroupItem {
-    white-space: pre-wrap;
-  }
-
-  ToolsPanel {
-    border-bottom: none;
-  }
-`;
+const registry: StyleRegistry = [[
+  ExceptionMessageStyles,
+  {
+    mode: 'append',
+    styles: [ConnectionsAdministrationStyle],
+  },
+]];
 
 export const ConnectionsAdministration = observer<AdministrationItemContentProps>(function ConnectionsAdministration({
   sub,
@@ -55,7 +51,7 @@ export const ConnectionsAdministration = observer<AdministrationItemContentProps
   const service = useService(CreateConnectionService);
   const controller = useController(ConnectionsAdministrationController);
   const translate = useTranslate();
-  const style = useStyles(styles, ADMINISTRATION_TOOLS_PANEL_STYLES);
+  const style = useS(ConnectionsAdministrationStyle);
 
   useResource(ConnectionsAdministration, ConnectionInfoResource, {
     key: ConnectionInfoActiveProjectKey,
@@ -63,10 +59,10 @@ export const ConnectionsAdministration = observer<AdministrationItemContentProps
   });
   useResource(ConnectionsAdministration, DBDriverResource, CachedMapAllKey);
 
-  return styled(style)(
+  return (
     <ColoredContainer vertical wrap parent gap>
       <Group box keepSize>
-        <ToolsPanel>
+        <ToolsPanel className={s(style, { toolsPanel: true })}>
           <ToolsAction
             title={translate('connections_administration_tools_add_tooltip')}
             icon="add"
@@ -100,7 +96,7 @@ export const ConnectionsAdministration = observer<AdministrationItemContentProps
         {configurationWizard && (
           <Group gap>
             <GroupTitle>{translate('connections_administration_configuration_wizard_title')}</GroupTitle>
-            <GroupItem>{translate('connections_administration_configuration_wizard_message')}</GroupItem>
+            <GroupItem className={s(style, { groupItem: true })}>{translate('connections_administration_configuration_wizard_message')}</GroupItem>
           </Group>
         )}
         {sub && (
@@ -109,16 +105,18 @@ export const ConnectionsAdministration = observer<AdministrationItemContentProps
           </Group>
         )}
         <Group boxNoOverflow>
-          <Loader style={loaderStyle} loading={controller.isProcessing} overlay>
-            <ConnectionsTable
-              keys={controller.keys}
-              connections={controller.connections}
-              selectedItems={controller.selectedItems}
-              expandedItems={controller.expandedItems}
-            />
-          </Loader>
+          <SContext registry={registry}>
+            <Loader loading={controller.isProcessing} overlay>
+              <ConnectionsTable
+                keys={controller.keys}
+                connections={controller.connections}
+                selectedItems={controller.selectedItems}
+                expandedItems={controller.expandedItems}
+              />
+            </Loader>
+          </SContext>
         </Group>
       </Container>
-    </ColoredContainer>,
+    </ColoredContainer>
   );
 });

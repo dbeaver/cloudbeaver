@@ -1,0 +1,11 @@
+.toolsPanel {
+  border-bottom: none;
+}
+
+.groupItem {
+  white-space: pre-wrap;
+}
+
+.error {
+  padding: 24px;
+}

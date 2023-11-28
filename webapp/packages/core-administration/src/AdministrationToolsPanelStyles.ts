@@ -7,6 +7,7 @@
  */
 import { css } from 'reshadow';
 
+// TODO in cloudeaver-ee remove all reshadow styles connected to this
 export const ADMINISTRATION_TOOLS_PANEL_STYLES = css`
   ToolsPanel {
     composes: theme-background-surface theme-text-on-surface theme-border-color-background from global;
