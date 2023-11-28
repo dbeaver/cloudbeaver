@@ -9,7 +9,7 @@ import { observer } from 'mobx-react-lite';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import styled, { css, use } from 'reshadow';
 
-import { Form, getComputed, SContext, StyleRegistry, ToolsPanel, ToolsPanelStyles } from '@cloudbeaver/core-blocks';
+import { Form, getComputed, ToolsPanel } from '@cloudbeaver/core-blocks';
 import type { IDataContext } from '@cloudbeaver/core-data-context';
 import { useService } from '@cloudbeaver/core-di';
 
@@ -18,7 +18,6 @@ import { DataViewerSettingsService } from '../../DataViewerSettingsService';
 import { AutoRefreshButton } from './AutoRefresh/AutoRefreshButton';
 import { TableFooterMenu } from './TableFooterMenu/TableFooterMenu';
 import { TableFooterRowCount } from './TableFooterRowCount';
-import newTableFooterStyles from './TableFooter.m.css';
 
 const tableFooterStyles = css`
   count input,
@@ -63,10 +62,6 @@ const tableFooterStyles = css`
   }
 `;
 
-const registry: StyleRegistry = [
-  [ToolsPanelStyles, { mode:'append', styles: [newTableFooterStyles] }],
-];
-
 interface Props {
   resultIndex: number;
   model: IDatabaseDataModel<any, any>;
@@ -101,35 +96,33 @@ export const TableFooter = observer<Props>(function TableFooter({ resultIndex, m
   const disabled = getComputed(() => model.isLoading() || model.isDisabled(resultIndex));
 
   return styled(tableFooterStyles)(
-    <SContext registry={registry}>
-      <ToolsPanel>
-        {/* <reload aria-disabled={disabled} onClick={() => model.refresh()}>
-          <IconOrImage icon='reload' viewBox="0 0 16 16" />
-        </reload> */}
-        <AutoRefreshButton model={model} disabled={disabled} />
-        <count>
-          <Form onSubmit={handleChange}>
-            <input
-              ref={ref}
-              type="number"
-              value={limit}
-              disabled={disabled}
-              min={dataViewerSettingsService.getMinFetchSize()}
-              max={dataViewerSettingsService.getMaxFetchSize()}
-              onChange={e => setLimit(e.target.value)}
-              onBlur={handleChange}
-              {...use({ mod: 'surface' })}
-            />
-          </Form>
-        </count>
-        <TableFooterRowCount model={model} resultIndex={resultIndex} />
-        <TableFooterMenu model={model} resultIndex={resultIndex} simple={simple} context={context} />
-        {model.source.requestInfo.requestMessage.length > 0 && (
-          <time>
-            {model.source.requestInfo.requestMessage} - {model.source.requestInfo.requestDuration}ms
-          </time>
-        )}
-      </ToolsPanel>
-    </SContext>,
+    <ToolsPanel type="secondary">
+      {/* <reload aria-disabled={disabled} onClick={() => model.refresh()}>
+        <IconOrImage icon='reload' viewBox="0 0 16 16" />
+      </reload> */}
+      <AutoRefreshButton model={model} disabled={disabled} />
+      <count>
+        <Form onSubmit={handleChange}>
+          <input
+            ref={ref}
+            type="number"
+            value={limit}
+            disabled={disabled}
+            min={dataViewerSettingsService.getMinFetchSize()}
+            max={dataViewerSettingsService.getMaxFetchSize()}
+            onChange={e => setLimit(e.target.value)}
+            onBlur={handleChange}
+            {...use({ mod: 'surface' })}
+          />
+        </Form>
+      </count>
+      <TableFooterRowCount model={model} resultIndex={resultIndex} />
+      <TableFooterMenu model={model} resultIndex={resultIndex} simple={simple} context={context} />
+      {model.source.requestInfo.requestMessage.length > 0 && (
+        <time>
+          {model.source.requestInfo.requestMessage} - {model.source.requestInfo.requestDuration}ms
+        </time>
+      )}
+    </ToolsPanel>
   );
 });

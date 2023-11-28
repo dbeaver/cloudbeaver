@@ -5,3 +5,14 @@
   display: flex;
   flex: 0 0 auto;
 }
+
+.toolsPanelSecondary {
+  composes: theme-background-secondary theme-text-on-secondary theme-border-color-background from global;
+  border-bottom: solid 1px;
+  display: flex;
+  flex: 0 0 auto;
+  overflow: auto;
+  min-height: 32px;
+  align-items: center;
+  height: initial;
+}
