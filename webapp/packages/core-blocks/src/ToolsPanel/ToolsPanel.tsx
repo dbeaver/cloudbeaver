@@ -9,19 +9,14 @@ import { s } from '../s';
 import { useS } from '../useS';
 import style from './ToolsPanel.m.css';
 
-type TType = 'surface' | 'secondary';
+type TType = 'primary' | 'secondary';
 interface Props {
   className?: string;
   type?: TType;
 }
 
-const types: Record<TType, string> = {
-  surface: 'toolsPanel',
-  secondary: 'toolsPanelSecondary',
-};
-
-export const ToolsPanel: React.FC<React.PropsWithChildren<Props>> = function ToolsPanel({ className, children, type = 'surface' }) {
+export const ToolsPanel: React.FC<React.PropsWithChildren<Props>> = function ToolsPanel({ className, children, type = 'primary' }) {
   const styles = useS(style);
 
-  return <div className={s(styles, { [types[type]]: true }, className)}>{children}</div>;
+  return <div className={s(styles, { toolsPanel: true, [type]: true }, className)}>{children}</div>;
 };
