@@ -59,7 +59,8 @@
     @include mdc-theme-prop(border-color, background, false);
   }
 
-  .cm-panels-top {
+  .cm-panels-top,
+  .cm-panels-bottom {
     @include mdc-theme-prop(border-color, background, false);
   }
 
