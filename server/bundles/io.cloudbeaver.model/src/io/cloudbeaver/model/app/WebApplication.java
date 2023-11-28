@@ -61,7 +61,10 @@ public interface WebApplication extends DBPApplication {
 
     SMAdminController getAdminSecurityController(@NotNull SMCredentialsProvider credentialsProvider) throws DBException;
 
-    DBSSecretController getSecretController(@NotNull SMCredentialsProvider credentialsProvider, SMSessionContext smSessionContext) throws DBException;
+    DBSSecretController getSecretController(
+        @NotNull SMCredentialsProvider credentialsProvider,
+        SMSessionContext smSessionContext
+    ) throws DBException;
 
     RMController createResourceController(
         @NotNull SMCredentialsProvider credentialsProvider,

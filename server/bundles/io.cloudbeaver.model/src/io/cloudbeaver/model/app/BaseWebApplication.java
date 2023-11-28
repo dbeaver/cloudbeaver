@@ -200,7 +200,10 @@ public abstract class BaseWebApplication extends BaseApplicationImpl implements 
      * Advanced apps may implement it differently.
      */
     @Override
-    public DBSSecretController getSecretController(@NotNull SMCredentialsProvider credentialsProvider, SMSessionContext smSessionContext)  throws DBException {
+    public DBSSecretController getSecretController(
+        @NotNull SMCredentialsProvider credentialsProvider,
+        SMSessionContext smSessionContext
+    ) throws DBException {
         return VoidSecretController.INSTANCE;
     }
 
