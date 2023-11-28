@@ -34,7 +34,7 @@ public interface DBWServiceServerConfigurator extends DBWServiceBinding {
         @NotNull WebAppConfiguration appConfig
     ) throws DBException;
 
-    default void migrateConfigurationIfNeeded(@NotNull WebApplication application) {
+    default void migrateConfigurationIfNeeded(@NotNull WebApplication application) throws DBException {
 
     }
 
