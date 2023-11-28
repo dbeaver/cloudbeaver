@@ -8,7 +8,7 @@
 import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
-import type { AdministrationItemContentComponent } from '@cloudbeaver/core-administration';
+import { ADMINISTRATION_TOOLS_PANEL_STYLES, AdministrationItemContentComponent } from '@cloudbeaver/core-administration';
 import { s, ToolsPanel, useS, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { BASE_TAB_STYLES, ITabData, Tab, TabList, TabPanel, TabsState, TabTitle, UNDERLINE_TAB_STYLES } from '@cloudbeaver/core-ui';
@@ -28,7 +28,7 @@ const tabsStyles = css`
   }
 `;
 
-const tabStyle = [BASE_TAB_STYLES, tabsStyles, UNDERLINE_TAB_STYLES];
+const tabStyle = [ADMINISTRATION_TOOLS_PANEL_STYLES, BASE_TAB_STYLES, tabsStyles, UNDERLINE_TAB_STYLES];
 
 export const UsersAdministration: AdministrationItemContentComponent = observer(function UsersAdministration({ sub, param }) {
   const translate = useTranslate();
@@ -59,10 +59,10 @@ export const UsersAdministration: AdministrationItemContentComponent = observer(
         </TabList>
       </ToolsPanel>
       <TabPanel className={s(styles, { tabPanel: true })} tabId={EUsersAdministrationSub.Users}>
-        <UsersPage param={param} />
+        <UsersPage sub={sub} param={param} />
       </TabPanel>
       <TabPanel className={s(styles, { tabPanel: true })} tabId={EUsersAdministrationSub.Teams}>
-        <TeamsPage param={param} />
+        <TeamsPage sub={sub} param={param} />
       </TabPanel>
     </TabsState>,
   );

@@ -6,28 +6,40 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
+import styled, { css } from 'reshadow';
 
-import type { AdministrationItemContentComponent } from '@cloudbeaver/core-administration';
-import { ColoredContainer, Container, Group, Loader, ToolsAction, ToolsPanel, s, useS, useTranslate } from '@cloudbeaver/core-blocks';
+import { ADMINISTRATION_TOOLS_PANEL_STYLES, AdministrationItemContentComponent } from '@cloudbeaver/core-administration';
+import { ColoredContainer, Container, Group, Loader, ToolsAction, ToolsPanel, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 
 import { AuthConfigurationsTable } from './AuthConfigurationsTable/AuthConfigurationsTable';
 import { useConfigurationsTable } from './AuthConfigurationsTable/useConfigurationsTable';
 import { CreateAuthConfiguration } from './CreateAuthConfiguration';
 import { CreateAuthConfigurationService } from './CreateAuthConfigurationService';
-import style from './AuthConfigurationsAdministration.m.css';
+
+const loaderStyle = css`
+  ExceptionMessage {
+    padding: 24px;
+  }
+`;
+
+const styles = css`
+  ToolsPanel {
+    border-bottom: none;
+  }
+`;
 
 export const AuthConfigurationsAdministration: AdministrationItemContentComponent = observer(function AuthConfigurationsAdministration({ sub }) {
   const translate = useTranslate();
-  const styles = useS(style);
+  const style = useStyles(styles, ADMINISTRATION_TOOLS_PANEL_STYLES);
   const service = useService(CreateAuthConfigurationService);
 
   const table = useConfigurationsTable();
 
-  return (
+  return styled(style)(
     <ColoredContainer wrap gap parent vertical>
       <Group box keepSize>
-        <ToolsPanel className={s(styles, { toolsPanel: true })}>
+        <ToolsPanel>
           <ToolsAction
             title={translate('administration_identity_providers_add_tooltip')}
             icon="add"
@@ -64,7 +76,7 @@ export const AuthConfigurationsAdministration: AdministrationItemContentComponen
           </Group>
         )}
         <Group boxNoOverflow>
-          <Loader exceptionMessageClassName={s(styles, { exceptionMessage: true })} loading={table.processing} overlay>
+          <Loader style={loaderStyle} loading={table.processing} overlay>
             <AuthConfigurationsTable
               configurations={table.configurations}
               selectedItems={table.tableState.selected}
@@ -73,6 +85,6 @@ export const AuthConfigurationsAdministration: AdministrationItemContentComponen
           </Loader>
         </Group>
       </Container>
-    </ColoredContainer>
+    </ColoredContainer>,
   );
 });

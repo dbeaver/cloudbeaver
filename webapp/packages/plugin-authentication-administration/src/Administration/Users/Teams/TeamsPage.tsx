@@ -6,8 +6,10 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
+import styled, { css } from 'reshadow';
 
-import { ColoredContainer, Container, Group, ToolsAction, ToolsPanel, s, useS, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
+import { ADMINISTRATION_TOOLS_PANEL_STYLES, IAdministrationItemSubItem } from '@cloudbeaver/core-administration';
+import { ColoredContainer, Container, Group, ToolsAction, ToolsPanel, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 
 import { CreateTeam } from './CreateTeam';
@@ -15,24 +17,29 @@ import { CreateTeamService } from './CreateTeamService';
 import { TeamsTable } from './TeamsTable/TeamsTable';
 import { useTeamsTable } from './TeamsTable/useTeamsTable';
 
-import style from './TeamsPage.m.css';
+const styles = css`
+  ToolsPanel {
+    border-bottom: none;
+  }
+`;
 
 interface Props {
+  sub?: IAdministrationItemSubItem;
   param?: string | null;
 }
 
-export const TeamsPage = observer<Props>(function TeamsPage({ param }) {
+export const TeamsPage = observer<Props>(function TeamsPage({ sub, param }) {
   const translate = useTranslate();
-  const styles = useS(style);
+  const style = useStyles(styles, ADMINISTRATION_TOOLS_PANEL_STYLES);
   const service = useService(CreateTeamService);
 
   const table = useTeamsTable();
   const create = param === 'create';
 
-  return (
+  return styled(style)(
     <ColoredContainer vertical wrap gap parent>
       <Group box keepSize>
-        <ToolsPanel className={s(styles, { toolsPanel: true })}>
+        <ToolsPanel>
           <ToolsAction
             title={translate('administration_teams_add_tooltip')}
             icon="add"
@@ -73,6 +80,6 @@ export const TeamsPage = observer<Props>(function TeamsPage({ param }) {
           <TeamsTable teams={table.teams} state={table.state} selectedItems={table.tableState.selected} expandedItems={table.tableState.expanded} />
         </Group>
       </Container>
-    </ColoredContainer>
+    </ColoredContainer>,
   );
 });

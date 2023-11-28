@@ -6,8 +6,9 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
+import styled, { css } from 'reshadow';
 
-import { AdministrationItemContentComponent, ConfigurationWizardService } from '@cloudbeaver/core-administration';
+import { ADMINISTRATION_TOOLS_PANEL_STYLES, AdministrationItemContentComponent, ConfigurationWizardService } from '@cloudbeaver/core-administration';
 import {
   ColoredContainer,
   ConfirmationDialog,
@@ -20,10 +21,9 @@ import {
   Placeholder,
   ToolsAction,
   ToolsPanel,
-  s,
   useFocus,
   useFormValidator,
-  useS,
+  useStyles,
   useTranslate,
 } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
@@ -37,11 +37,28 @@ import { ServerConfigurationNavigatorViewForm } from './Form/ServerConfiguration
 import { ServerConfigurationSecurityForm } from './Form/ServerConfigurationSecurityForm';
 import { ServerConfigurationDriversForm } from './ServerConfigurationDriversForm';
 import { ServerConfigurationService } from './ServerConfigurationService';
-import style from './ServerConfigurationPage.m.css';
+
+const styles = css`
+  Form {
+    flex: 1;
+    display: flex;
+    overflow: auto;
+    flex-direction: column;
+  }
+
+  p {
+    white-space: pre-wrap;
+    line-height: 2;
+  }
+
+  Loader {
+    height: 100%;
+  }
+`;
 
 export const ServerConfigurationPage: AdministrationItemContentComponent = observer(function ServerConfigurationPage({ configurationWizard }) {
   const translate = useTranslate();
-  const styles = useS(style);
+  const style = useStyles(styles, ADMINISTRATION_TOOLS_PANEL_STYLES);
   const [focusedRef, state] = useFocus<HTMLFormElement>({ focusFirstChild: true });
   const service = useService(ServerConfigurationService);
   const serverConfigResource = useService(ServerConfigResource);
@@ -80,10 +97,10 @@ export const ServerConfigurationPage: AdministrationItemContentComponent = obser
     }
   }
 
-  return (
-    <Form ref={focusedRef} className={s(styles, { form: true })} name="server_config" onChange={handleChange}>
+  return styled(style)(
+    <Form ref={focusedRef} name="server_config" onChange={handleChange}>
       {!configurationWizard && (
-        <ToolsPanel className={s(styles, { toolsPanel: true })}>
+        <ToolsPanel>
           <ToolsAction
             title={translate('administration_configuration_tools_save_tooltip')}
             icon="admin-save"
@@ -111,14 +128,14 @@ export const ServerConfigurationPage: AdministrationItemContentComponent = obser
               <h3>{translate('administration_configuration_wizard_configuration_title')}</h3>
             </GroupItem>
             <GroupItem>
-              <p className={s(styles, { p: true })}>{translate('administration_configuration_wizard_configuration_message')}</p>
+              <p>{translate('administration_configuration_wizard_configuration_message')}</p>
             </GroupItem>
           </Group>
         )}
-        <Loader className={s(styles, { loader: true })} state={service}>
+        <Loader state={service}>
           {() =>
-            (
-              <Loader className={s(styles, { loader: true })} suspense>
+            styled(style)(
+              <Loader suspense>
                 <Container wrap gap grid medium>
                   <ServerConfigurationInfoForm state={service.state} />
                   <Group form gap>
@@ -132,11 +149,11 @@ export const ServerConfigurationPage: AdministrationItemContentComponent = obser
                   <ServerConfigurationSecurityForm serverConfig={service.state.serverConfig} />
                   <ServerConfigurationDriversForm serverConfig={service.state.serverConfig} />
                 </Container>
-              </Loader>
+              </Loader>,
             )
           }
         </Loader>
       </ColoredContainer>
-    </Form>
+    </Form>,
   );
 });
