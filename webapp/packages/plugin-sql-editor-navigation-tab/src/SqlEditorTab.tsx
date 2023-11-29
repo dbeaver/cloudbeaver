@@ -52,7 +52,7 @@ export const SqlEditorTab: TabHandlerTabComponent<ISqlEditorTabState> = observer
   return styled(useStyles(style))(
     <Tab tabId={tab.id} style={style} title={name} menuContext={tabMenuContext} onOpen={handleSelect} onClose={handleClose}>
       <TabIcon icon={icon} />
-      {isReadonly && <IconOrImage title={translate('data_grid_table_readonly_tooltip')} icon="/icons/lock.png" className={s(sqlEditorTabStyles, { readonlyIcon: true })} />}
+      {isReadonly && <IconOrImage title={translate('ui_readonly')} icon="/icons/lock.png" className={s(sqlEditorTabStyles, { readonlyIcon: true })} />}
       <TabTitle>{name}</TabTitle>
       {!saved && <unsaved-mark className={s(sqlEditorTabStyles, { unsavedMark: true })} />}
     </Tab>,

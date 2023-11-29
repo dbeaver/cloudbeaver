@@ -104,6 +104,7 @@ export default [
   ['ui_upload_file_fail', 'Failed to upload file'],
   ['ui_filter', 'Filter'],
   ['ui_disable', 'Disable'],
+  ['ui_readonly', '只读'],
 
   ['root_permission_denied', '您没有权限'],
   ['root_permission_no_permission', '您没有权限执行此操作'],

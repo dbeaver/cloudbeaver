@@ -107,6 +107,7 @@ export default [
   ['ui_upload_file_fail', 'Failed to upload file'],
   ['ui_filter', 'Filter'],
   ['ui_disable', 'Disable'],
+  ['ui_readonly', 'Read-only'],
 
   ['root_permission_denied', "You don't have permissions"],
   ['root_permission_no_permission', "You don't have permission for this action"],

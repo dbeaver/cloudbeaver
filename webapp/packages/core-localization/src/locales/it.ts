@@ -91,6 +91,7 @@ export default [
   ['ui_upload_file_fail', 'Failed to upload file'],
   ['ui_filter', 'Filter'],
   ['ui_disable', 'Disable'],
+  ['ui_readonly', 'In sola lettura'],
 
   ['root_permission_denied', 'Non hai i permessi'],
   ['app_root_session_expire_warning_title', 'La sessione sta per scadere'],

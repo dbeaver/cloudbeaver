@@ -103,6 +103,7 @@ export default [
   ['ui_upload_file_fail', 'Не удалось загрузить файл'],
   ['ui_filter', 'Фильтр'],
   ['ui_disable', 'Отключить'],
+  ['ui_readonly', 'Доступно только для чтения'],
 
   ['root_permission_denied', 'Отказано в доступе'],
   ['root_permission_no_permission', 'У вас нет разрешения на это действие'],
