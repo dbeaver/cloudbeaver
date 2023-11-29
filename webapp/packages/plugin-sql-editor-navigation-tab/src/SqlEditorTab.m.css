@@ -9,3 +9,12 @@
   vertical-align: middle;
   flex-shrink: 0;
 }
+
+.readonlyIcon {
+  position: absolute;
+  cursor: auto;
+  width: 8px;
+  right: 8px;
+  top: 13px;
+  left: 12px;
+}

@@ -9,7 +9,7 @@ import { observer } from 'mobx-react-lite';
 import { useContext } from 'react';
 import styled from 'reshadow';
 
-import { s, useStyles } from '@cloudbeaver/core-blocks';
+import { IconOrImage, s, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
 import { Connection, ConnectionInfoResource, createConnectionParam } from '@cloudbeaver/core-connections';
 import { useDataContext } from '@cloudbeaver/core-data-context';
 import { useService } from '@cloudbeaver/core-di';
@@ -24,12 +24,14 @@ import sqlEditorTabStyles from './SqlEditorTab.m.css';
 export const SqlEditorTab: TabHandlerTabComponent<ISqlEditorTabState> = observer(function SqlEditorTab({ tab, onSelect, onClose, style }) {
   const viewContext = useContext(CaptureViewContext);
   const tabMenuContext = useDataContext(viewContext);
-
+  
   tabMenuContext.set(DATA_CONTEXT_SQL_EDITOR_TAB, true);
   tabMenuContext.set(DATA_CONTEXT_SQL_EDITOR_STATE, tab.handlerState);
-
+  
   const sqlDataSourceService = useService(SqlDataSourceService);
   const connectionInfo = useService(ConnectionInfoResource);
+  
+  const translate = useTranslate();
 
   const dataSource = sqlDataSourceService.get(tab.handlerState.editorId);
   let connection: Connection | undefined;
@@ -42,6 +44,7 @@ export const SqlEditorTab: TabHandlerTabComponent<ISqlEditorTabState> = observer
   const name = getSqlEditorName(tab.handlerState, dataSource, connection);
   const icon = dataSource?.icon ?? '/icons/sql_script_m.svg';
   const saved = dataSource?.isSaved !== false;
+  const isReadonly = Boolean(dataSource?.isReadonly());
 
   const handleSelect = ({ tabId }: ITabData<any>) => onSelect(tabId);
   const handleClose = onClose ? ({ tabId }: ITabData<any>) => onClose(tabId) : undefined;
@@ -49,6 +52,7 @@ export const SqlEditorTab: TabHandlerTabComponent<ISqlEditorTabState> = observer
   return styled(useStyles(style))(
     <Tab tabId={tab.id} style={style} title={name} menuContext={tabMenuContext} onOpen={handleSelect} onClose={handleClose}>
       <TabIcon icon={icon} />
+      {isReadonly && <IconOrImage title={translate('data_grid_table_readonly_tooltip')} icon="/icons/lock.png" className={s(sqlEditorTabStyles, { readonlyIcon: true })} />}
       <TabTitle>{name}</TabTitle>
       {!saved && <unsaved-mark className={s(sqlEditorTabStyles, { unsavedMark: true })} />}
     </Tab>,
