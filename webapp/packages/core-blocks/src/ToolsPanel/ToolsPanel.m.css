@@ -14,4 +14,6 @@
   overflow: auto;
   align-items: center;
   height: initial;
+  min-height: 32px;
+  border-bottom: none;
 }
