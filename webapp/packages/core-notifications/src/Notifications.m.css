@@ -1,0 +1,8 @@
+.notifications {
+  composes: theme-typography from global;
+  position: absolute;
+  height: 192px;
+  bottom: 0;
+  left: 0;
+  z-index: 1000; /* modal dialogs is 999, but more correct way is place notifications after dialogs in the dom */
+}
