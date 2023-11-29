@@ -9,7 +9,7 @@ import { observable } from 'mobx';
 
 import { injectable } from '@cloudbeaver/core-di';
 import { Executor, IExecutor } from '@cloudbeaver/core-executor';
-import { DetailsError, GQLError } from '@cloudbeaver/core-sdk';
+import { DetailsError, EServerErrorCode, GQLError } from '@cloudbeaver/core-sdk';
 import { errorOf, OrderedMap } from '@cloudbeaver/core-utils';
 
 import { EventsSettingsService } from './EventsSettingsService';
@@ -23,6 +23,8 @@ import {
   NotificationComponent,
 } from './INotification';
 import { ProcessNotificationController } from './ProcessNotificationController';
+
+type TException = Error | GQLError | undefined | null;
 
 export const DELAY_DELETING = 1000;
 const TIMESTAMP_DIFFERENCE_THRESHOLD = 100;
@@ -171,7 +173,18 @@ export class NotificationService {
     return this.notify(notification, ENotificationType.Error);
   }
 
-  logException(exception: Error | GQLError | undefined | null, title?: string, message?: string, silent?: boolean): void {
+  private isExcludedFromLogException(exception: TException) {
+    const isSessionException = String(exception).includes(EServerErrorCode.sessionExpired) || 
+      exception?.message.includes(EServerErrorCode.sessionExpired);
+
+    return isSessionException;
+  }
+
+  logException(exception: TException, title?: string, message?: string, silent?: boolean): void {
+    if (this.isExcludedFromLogException(exception)) {
+      return;
+    }
+    
     const errorDetails = errorOf(exception, DetailsError);
 
     if (!silent) {
@@ -198,7 +211,7 @@ export class NotificationService {
     console.error(exception);
   }
 
-  throwSilently(exception: Error | GQLError | undefined | null): void {
+  throwSilently(exception: TException): void {
     this.logError({
       title: '',
       details: exception,

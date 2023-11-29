@@ -501,27 +501,29 @@ export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoPar
       }
     }
 
-    await ResourceKeyUtils.forEachAsync(originalKey, async key => {
-      let connectionId: string | undefined;
-      if (!isResourceAlias(key)) {
-        projectId = key.projectId;
-        connectionId = key.connectionId;
-      }
-
-      const { connections } = await this.graphQLService.sdk.getUserConnections({
-        projectId,
-        connectionId,
-        projectIds,
-        ...this.getDefaultIncludes(),
-        ...this.getIncludesMap(key, includes),
+    try {
+      await ResourceKeyUtils.forEachAsync(originalKey, async key => {
+        let connectionId: string | undefined;
+        if (!isResourceAlias(key)) {
+          projectId = key.projectId;
+          connectionId = key.connectionId;
+        }
+  
+        const { connections } = await this.graphQLService.sdk.getUserConnections({
+          projectId,
+          connectionId,
+          projectIds,
+          ...this.getDefaultIncludes(),
+          ...this.getIncludesMap(key, includes),
+        });
+  
+        if (connectionId && !connections.some(connection => connection.id === connectionId)) {
+          throw new Error(`Connection is not found (${connectionId})`);
+        }
+  
+        connectionsList.push(...connections);
       });
-
-      if (connectionId && !connections.some(connection => connection.id === connectionId)) {
-        throw new Error(`Connection is not found (${connectionId})`);
-      }
-
-      connectionsList.push(...connections);
-    });
+    } catch {}
 
     runInAction(() => {
       if (isResourceAlias(originalKey)) {

@@ -59,21 +59,23 @@ export class DBDriverResource extends CachedMapResource<string, DBDriver, Driver
     const driversList: DBDriver[] = [];
     const all = this.aliases.isAlias(originalKey, CachedMapAllKey);
 
-    await ResourceKeyUtils.forEachAsync(originalKey, async key => {
-      const driverId = isResourceAlias(key) ? undefined : key;
-
-      const { drivers } = await this.graphQLService.sdk.driverList({
-        driverId,
-        ...this.getDefaultIncludes(),
-        ...this.getIncludesMap(driverId, all ? this.defaultIncludes : includes),
+    try {
+      await ResourceKeyUtils.forEachAsync(originalKey, async key => {
+        const driverId = isResourceAlias(key) ? undefined : key;
+  
+        const { drivers } = await this.graphQLService.sdk.driverList({
+          driverId,
+          ...this.getDefaultIncludes(),
+          ...this.getIncludesMap(driverId, all ? this.defaultIncludes : includes),
+        });
+  
+        if (driverId && !drivers.some(driver => driver.id === driverId)) {
+          throw new Error('Driver is not found');
+        }
+  
+        driversList.push(...drivers);
       });
-
-      if (driverId && !drivers.some(driver => driver.id === driverId)) {
-        throw new Error('Driver is not found');
-      }
-
-      driversList.push(...drivers);
-    });
+    } catch {}
 
     const key = resourceKeyList(driversList.map(driver => driver.id));
     if (all) {

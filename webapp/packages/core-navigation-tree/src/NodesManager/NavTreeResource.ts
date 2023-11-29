@@ -471,16 +471,18 @@ export class NavTreeResource extends CachedMapResource<string, string[], Record<
     const limit = pageKey?.options.limit ?? this.childrenLimit;
     const values: NavNodeChildrenQuery[] = [];
 
-    await ResourceKeyUtils.forEachAsync(originalKey, async key => {
-      const nodeId = pageKey?.target ?? key;
-      const navNodeChildren = await this.loadNodeChildren(nodeId, offset, limit);
-      values.push(navNodeChildren);
-
-      this.offsetPagination.setPageEnd(
-        CachedResourceOffsetPageKey(offset, navNodeChildren.navNodeChildren.length).setTarget(nodeId),
-        navNodeChildren.navNodeChildren.length === limit,
-      );
-    });
+    try {
+      await ResourceKeyUtils.forEachAsync(originalKey, async key => {
+        const nodeId = pageKey?.target ?? key;
+        const navNodeChildren = await this.loadNodeChildren(nodeId, offset, limit);
+        values.push(navNodeChildren);
+  
+        this.offsetPagination.setPageEnd(
+          CachedResourceOffsetPageKey(offset, navNodeChildren.navNodeChildren.length).setTarget(nodeId),
+          navNodeChildren.navNodeChildren.length === limit,
+        );
+      });
+    } catch {}
 
     this.setNavObject(values, offset, limit);
 

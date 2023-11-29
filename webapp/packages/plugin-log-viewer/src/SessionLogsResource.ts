@@ -59,23 +59,25 @@ export class SessionLogsResource extends CachedDataResource<ILogEntry[]> {
       ? this.coreSettingsService.settings.getValue('app.logViewer.logBatchSize')
       : this.logViewerSettingsService.settings.getValue('logBatchSize');
 
-    const { log } = await this.graphQLService.sdk.readSessionLog({
-      maxEntries: maxLogEntries,
-      clearEntries: true,
-    });
-
-    const logs = log.map<ILogEntry>(item => ({
-      ...item,
-      id: uuid(),
-    }));
-
-    runInAction(() => {
-      this.data.unshift(...logs.reverse());
-
-      if (this.data.length > maxLogEntries) {
-        this.data.splice(maxLogEntries, this.data.length - maxLogEntries);
-      }
-    });
+    try {
+      const { log } = await this.graphQLService.sdk.readSessionLog({
+        maxEntries: maxLogEntries,
+        clearEntries: true,
+      });
+  
+      const logs = log.map<ILogEntry>(item => ({
+        ...item,
+        id: uuid(),
+      }));
+  
+      runInAction(() => {
+        this.data.unshift(...logs.reverse());
+  
+        if (this.data.length > maxLogEntries) {
+          this.data.splice(maxLogEntries, this.data.length - maxLogEntries);
+        }
+      });
+    } catch {}
 
     return this.data;
   }
