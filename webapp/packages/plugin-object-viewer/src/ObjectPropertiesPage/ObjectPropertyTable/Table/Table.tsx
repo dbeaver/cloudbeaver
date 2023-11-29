@@ -9,7 +9,9 @@ import { observer } from 'mobx-react-lite';
 import { useCallback, useState } from 'react';
 import styled, { css } from 'reshadow';
 
-import { IScrollState, Link, useControlledScroll, useStyles, useTable, useTranslate } from '@cloudbeaver/core-blocks';
+import tableModuleStyles from './Table.m.css';
+
+import { IScrollState, Link, s, useControlledScroll, useStyles, useTable, useTranslate } from '@cloudbeaver/core-blocks';
 import type { DBObject } from '@cloudbeaver/core-navigation-tree';
 import type { ObjectPropertyInfo } from '@cloudbeaver/core-sdk';
 import { useTabLocalState } from '@cloudbeaver/core-ui';
@@ -155,7 +157,7 @@ export const Table = observer<TableProps>(function Table({ objects, hasNextPage,
             </Link>
           </data-info>
         )}
-        <ObjectPropertyTableFooter nodeIds={nodeIds} tableState={tableState} />
+        <ObjectPropertyTableFooter className={s(tableModuleStyles, { objectPropertyTableFooter: true })} nodeIds={nodeIds} tableState={tableState} />
       </wrapper>
     </TableContext.Provider>,
   );
