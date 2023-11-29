@@ -89,17 +89,14 @@ export class AuthProvidersResource extends CachedMapResource<string, AuthProvide
   protected async loader(originalKey: ResourceKey<string>): Promise<Map<string, AuthProvider>> {
     const all = this.aliases.isAlias(originalKey, CachedMapAllKey);
 
-    try {
-      const { providers } = await this.graphQLService.sdk.getAuthProviders();
+    const { providers } = await this.graphQLService.sdk.getAuthProviders();
 
-      const key = resourceKeyList(providers.map(provider => provider.id));
-      if (all) {
-        this.replace(key, providers);
-      } else {
-        this.set(key, providers);
-      }
-    } catch {};
-
+    const key = resourceKeyList(providers.map(provider => provider.id));
+    if (all) {
+      this.replace(key, providers);
+    } else {
+      this.set(key, providers);
+    }
     return this.data;
   }
 

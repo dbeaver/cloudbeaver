@@ -41,21 +41,17 @@ export class TemplateConnectionsResource extends CachedDataResource<Connection[]
   }
 
   protected async loader(): Promise<Connection[]> {
-    try {
-      const { connections } = await this.graphQLService.sdk.getTemplateConnections({
-        includeNetworkHandlersConfig: true,
-        customIncludeOriginDetails: false,
-        includeAuthProperties: true,
-        includeOrigin: false,
-        includeAuthNeeded: false,
-        includeCredentialsSaved: false,
-        includeProperties: false,
-        includeProviderProperties: false,
-        customIncludeOptions: false,
-      });
-      return connections;
-    } catch {}
-
-    return [];
+    const { connections } = await this.graphQLService.sdk.getTemplateConnections({
+      includeNetworkHandlersConfig: true,
+      customIncludeOriginDetails: false,
+      includeAuthProperties: true,
+      includeOrigin: false,
+      includeAuthNeeded: false,
+      includeCredentialsSaved: false,
+      includeProperties: false,
+      includeProviderProperties: false,
+      customIncludeOptions: false,
+    });
+    return connections;
   }
 }

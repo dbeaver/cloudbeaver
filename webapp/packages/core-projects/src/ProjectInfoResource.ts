@@ -80,11 +80,9 @@ export class ProjectInfoResource extends CachedMapResource<string, ProjectInfo> 
   }
 
   protected async loader(): Promise<Map<string, ProjectInfo>> {
-    try {
-      const { projects } = await this.graphQLService.sdk.getProjectList();
+    const { projects } = await this.graphQLService.sdk.getProjectList();
 
-      this.replace(resourceKeyList(projects.map(project => project.id)), projects);
-    } catch {}
+    this.replace(resourceKeyList(projects.map(project => project.id)), projects);
 
     return this.data;
   }
