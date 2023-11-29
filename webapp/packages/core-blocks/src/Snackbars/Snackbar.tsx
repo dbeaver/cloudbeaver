@@ -18,6 +18,9 @@ import { SnackbarContent } from './SnackbarMarkups/SnackbarContent';
 import { SnackbarFooter } from './SnackbarMarkups/SnackbarFooter';
 import { SnackbarStatus } from './SnackbarMarkups/SnackbarStatus';
 import { SnackbarWrapper } from './SnackbarMarkups/SnackbarWrapper';
+import { useS } from '../useS';
+import styles from './Snackbar.m.css';
+import { s } from '../s';
 
 interface SnackbarProps {
   type: ENotificationType;
@@ -44,11 +47,12 @@ export const Snackbar = observer<SnackbarProps>(function Snackbar({
   state,
   time,
 }) {
+  const style = useS(styles);
   const translate = useTranslate();
   useActivationDelay(closeDelay > 0, closeDelay, onClose);
 
   return (
-    <SnackbarWrapper closing={!!state?.deleteDelay} persistent={persistent} onClose={() => onClose(false)}>
+    <SnackbarWrapper className={s(style, { wrapper: true })} closing={!!state?.deleteDelay} persistent={persistent} onClose={() => onClose(false)}>
       <Loader suspense>
         <SnackbarStatus status={type} />
         <SnackbarContent>
