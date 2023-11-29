@@ -19,9 +19,6 @@ import { SnackbarContent } from './SnackbarMarkups/SnackbarContent';
 import { SnackbarFooter } from './SnackbarMarkups/SnackbarFooter';
 import { SnackbarStatus } from './SnackbarMarkups/SnackbarStatus';
 import { SnackbarWrapper } from './SnackbarMarkups/SnackbarWrapper';
-import styles from './ProcessSnackbar.m.css';
-import { useS } from '../useS';
-import { s } from '../s';
 
 export interface ProcessSnackbarProps extends INotificationProcessExtraProps {
   closeDelay?: number;
@@ -35,7 +32,6 @@ export const ProcessSnackbar: NotificationComponent<ProcessSnackbarProps> = obse
   state,
 }) {
   const { error, title, message, status } = state!;
-  const style = useS(styles);
 
   const translate = useTranslate();
   const details = useErrorDetails(error);
@@ -49,7 +45,6 @@ export const ProcessSnackbar: NotificationComponent<ProcessSnackbarProps> = obse
 
   return (
     <SnackbarWrapper
-      className={s(style, { wrapper: true })}
       closing={!!notification.state.deleteDelay}
       persistent={status === ENotificationType.Loading}
       onClose={() => notification.close(false)}
