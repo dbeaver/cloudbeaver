@@ -688,12 +688,12 @@ export function useElementsTree(options: IOptions): IElementsTree {
   );
 
   useEffect(() => {
-    functionsRef.loadTree(options.root);
+    functionsRef.loadTree(options.root).catch(() => ({}));
   }, [options.root]);
 
   const loadTreeThreshold = useCallback(
     throttle(function refreshRoot() {
-      functionsRef.loadTree(options.root);
+      functionsRef.loadTree(options.root).catch(() => ({}));
     }, 100),
     [],
   );
