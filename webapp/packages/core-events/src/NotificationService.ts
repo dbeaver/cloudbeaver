@@ -9,7 +9,7 @@ import { observable } from 'mobx';
 
 import { injectable } from '@cloudbeaver/core-di';
 import { Executor, IExecutor } from '@cloudbeaver/core-executor';
-import { DetailsError, GQLError, SessionError } from '@cloudbeaver/core-sdk';
+import { DetailsError, GQLError } from '@cloudbeaver/core-sdk';
 import { errorOf, OrderedMap } from '@cloudbeaver/core-utils';
 
 import { EventsSettingsService } from './EventsSettingsService';
@@ -171,7 +171,7 @@ export class NotificationService {
     return this.notify(notification, ENotificationType.Error);
   }
 
-  logException(exception: Error | SessionError | GQLError | undefined | null, title?: string, message?: string, silent?: boolean): void {
+  logException(exception: Error | GQLError | undefined | null, title?: string, message?: string, silent?: boolean): void {
     const errorDetails = errorOf(exception, DetailsError);
 
     if (!silent) {

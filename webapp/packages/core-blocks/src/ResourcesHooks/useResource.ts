@@ -470,7 +470,7 @@ export function useResource<
   useEffect(() => {
     refObj.use(loadKey);
     if (canLoad && !result.isError()) {
-      result.load().catch(() => ({}));
+      result.load();
     }
   }, [canLoad, loadKey]);
 
