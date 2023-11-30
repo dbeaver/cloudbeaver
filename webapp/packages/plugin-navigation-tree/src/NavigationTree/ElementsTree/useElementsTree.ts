@@ -373,9 +373,7 @@ export function useElementsTree(options: IOptions): IElementsTree {
 
       try {
         await functionsRef.loadTree(options.root);
-      } catch (e: any) {
-        notificationService.logException(e);
-      }
+      } catch (e: any) {}
     },
     data => typeof data === 'object' && typeof data.filter === 'string' && Array.isArray(data.nodeState),
   );
