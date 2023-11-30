@@ -135,6 +135,8 @@ export const TableError = observer<Props>(function TableError({ model, loading, 
     };
   }
 
+  // keep it like this or remove error another way:
+  // console goes with error that we cannot modify ref value in render method.
   useEffect(() => {
     if (errorInfo.error !== model.source.error) {
       errorInfo.error = model.source.error || null;

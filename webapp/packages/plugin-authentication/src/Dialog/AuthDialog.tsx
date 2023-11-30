@@ -37,6 +37,7 @@ import { AuthProviderForm } from './AuthProviderForm/AuthProviderForm';
 import { ConfigurationsList } from './AuthProviderForm/ConfigurationsList';
 import { FEDERATED_AUTH } from './FEDERATED_AUTH';
 import { getAuthProviderTabId, useAuthDialogState } from './useAuthDialogState';
+import { NotificationService } from '@cloudbeaver/core-events';
 
 export const AuthDialog: DialogComponent<IAuthOptions, null> = observer(function AuthDialog({
   payload: { providerId, configurationId, linkUser = false, accessRequest = false },
@@ -49,6 +50,7 @@ export const AuthDialog: DialogComponent<IAuthOptions, null> = observer(function
   const authenticationService = useService(AuthenticationService);
   const userInfo = useService(UserInfoResource);
   const commonDialogService = useService(CommonDialogService);
+  const notificationService = useService(NotificationService);
   const translate = useTranslate();
   const state = dialogData.state;
 
@@ -89,7 +91,9 @@ export const AuthDialog: DialogComponent<IAuthOptions, null> = observer(function
     try {
       await dialogData.login(linkUser, provider, configuration);
       rejectDialog();
-    } catch (e) {}
+    } catch (e: any) {
+      notificationService.logException(e);
+    }
   }
 
   function navToSettings() {

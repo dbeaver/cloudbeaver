@@ -9,7 +9,7 @@ import { observable } from 'mobx';
 
 import { injectable } from '@cloudbeaver/core-di';
 import { Executor, IExecutor } from '@cloudbeaver/core-executor';
-import { DetailsError, GQLError } from '@cloudbeaver/core-sdk';
+import { DetailsError, GQLError, SessionError } from '@cloudbeaver/core-sdk';
 import { errorOf, OrderedMap } from '@cloudbeaver/core-utils';
 
 import { EventsSettingsService } from './EventsSettingsService';
@@ -171,7 +171,17 @@ export class NotificationService {
     return this.notify(notification, ENotificationType.Error);
   }
 
-  logException(exception: Error | GQLError | undefined | null, title?: string, message?: string, silent?: boolean): void {
+  private shouldNotLog(exception: Error | SessionError | GQLError | undefined | null) {
+    const sessionError = errorOf(exception, SessionError) || exception instanceof SessionError || String(exception).includes('Session expired');
+
+    return Boolean(sessionError);
+  }
+
+  logException(exception: Error | SessionError | GQLError | undefined | null, title?: string, message?: string, silent?: boolean): void {
+    if (this.shouldNotLog(exception)) {
+      return;
+    }
+
     const errorDetails = errorOf(exception, DetailsError);
 
     if (!silent) {

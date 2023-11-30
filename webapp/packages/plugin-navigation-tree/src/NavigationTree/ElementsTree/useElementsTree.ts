@@ -371,7 +371,11 @@ export function useElementsTree(options: IOptions): IElementsTree {
 
       state.sync(data.nodeState);
 
-      await functionsRef.loadTree(options.root);
+      try {
+        await functionsRef.loadTree(options.root);
+      } catch (e: any) {
+        notificationService.logException(e);
+      }
     },
     data => typeof data === 'object' && typeof data.filter === 'string' && Array.isArray(data.nodeState),
   );
