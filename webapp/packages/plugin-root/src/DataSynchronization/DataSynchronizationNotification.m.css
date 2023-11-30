@@ -1,7 +1,3 @@
-.wrapper {
-  height: 176px;
-}
-
 .message {
   composes: theme-typography--caption from global;
   opacity: 0.8;

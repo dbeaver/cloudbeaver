@@ -31,7 +31,7 @@ export const DataSynchronizationNotification = observer<NotificationComponentPro
   }
 
   return (
-    <SnackbarWrapper className={s(style, { wrapper: true })} onClose={ignoreChanges}>
+    <SnackbarWrapper onClose={ignoreChanges}>
       <SnackbarStatus status={ENotificationType.Info} />
       <SnackbarContent>
         <SnackbarBody title={translate(notification.title)}>
