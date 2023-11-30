@@ -91,7 +91,7 @@ export const AuthDialog: DialogComponent<IAuthOptions, null> = observer(function
     try {
       await dialogData.login(linkUser, provider, configuration);
       rejectDialog();
-    } catch (e: any) {}
+    } catch {}
   }
 
   function navToSettings() {
