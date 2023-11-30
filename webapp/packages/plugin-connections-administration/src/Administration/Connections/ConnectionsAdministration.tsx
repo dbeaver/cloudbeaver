@@ -62,7 +62,7 @@ export const ConnectionsAdministration = observer<AdministrationItemContentProps
   return (
     <ColoredContainer vertical wrap parent gap>
       <Group box keepSize>
-        <ToolsPanel className={s(style, { toolsPanel: true })}>
+        <ToolsPanel>
           <ToolsAction
             title={translate('connections_administration_tools_add_tooltip')}
             icon="add"

@@ -83,7 +83,7 @@ export const ServerConfigurationPage: AdministrationItemContentComponent = obser
   return (
     <Form ref={focusedRef} className={s(styles, { form: true })} name="server_config" onChange={handleChange}>
       {!configurationWizard && (
-        <ToolsPanel>
+        <ToolsPanel hasBottomBorder>
           <ToolsAction
             title={translate('administration_configuration_tools_save_tooltip')}
             icon="admin-save"

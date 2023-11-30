@@ -8,7 +8,7 @@
 import { observer } from 'mobx-react-lite';
 
 import type { AdministrationItemContentComponent } from '@cloudbeaver/core-administration';
-import { ColoredContainer, Container, ExceptionMessageStyles, Group, Loader, SContext, StyleRegistry, ToolsAction, ToolsPanel, s, useS, useTranslate } from '@cloudbeaver/core-blocks';
+import { ColoredContainer, Container, ExceptionMessageStyles, Group, Loader, SContext, StyleRegistry, ToolsAction, ToolsPanel, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 
 import { AuthConfigurationsTable } from './AuthConfigurationsTable/AuthConfigurationsTable';
@@ -28,14 +28,13 @@ const registry: StyleRegistry = [[
 export const AuthConfigurationsAdministration: AdministrationItemContentComponent = observer(function AuthConfigurationsAdministration({ sub }) {
   const translate = useTranslate();
   const service = useService(CreateAuthConfigurationService);
-  const styles = useS(AuthConfigurationsAdministrationStyle);
 
   const table = useConfigurationsTable();
 
   return (
     <ColoredContainer wrap gap parent vertical>
       <Group box keepSize>
-          <ToolsPanel className={s(styles, { toolsPanel: true })}>
+          <ToolsPanel>
             <ToolsAction
               title={translate('administration_identity_providers_add_tooltip')}
               icon="add"

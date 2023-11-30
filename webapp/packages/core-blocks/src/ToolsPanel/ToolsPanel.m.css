@@ -1,5 +1,4 @@
 .toolsPanel {
-  border-bottom: solid 1px;
   height: 30px;
   display: flex;
   flex: 0 0 auto;
@@ -7,6 +6,10 @@
 
 .primary {
   composes: theme-background-surface theme-text-on-surface theme-border-color-background from global;
+}
+
+.bottomBorder: {
+  border-bottom: solid 1px;
 }
 
 .secondary {

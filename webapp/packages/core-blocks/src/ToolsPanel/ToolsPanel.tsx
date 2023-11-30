@@ -13,10 +13,11 @@ type TType = 'primary' | 'secondary';
 interface Props {
   className?: string;
   type?: TType;
+  hasBottomBorder?: boolean;
 }
 
-export const ToolsPanel: React.FC<React.PropsWithChildren<Props>> = function ToolsPanel({ className, children, type = 'primary' }) {
+export const ToolsPanel: React.FC<React.PropsWithChildren<Props>> = function ToolsPanel({ className, children, type = 'primary', hasBottomBorder = false }) {
   const styles = useS(style);
 
-  return <div className={s(styles, { toolsPanel: true, [type]: true }, className)}>{children}</div>;
+  return <div className={s(styles, { toolsPanel: true, [type]: true, bottomBorder: hasBottomBorder }, className)}>{children}</div>;
 };

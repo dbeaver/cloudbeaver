@@ -7,14 +7,13 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import { ColoredContainer, Container, Group, ToolsAction, ToolsPanel, s, useS, useTranslate } from '@cloudbeaver/core-blocks';
+import { ColoredContainer, Container, Group, ToolsAction, ToolsPanel, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 
 import { CreateTeam } from './CreateTeam';
 import { CreateTeamService } from './CreateTeamService';
 import { TeamsTable } from './TeamsTable/TeamsTable';
 import { useTeamsTable } from './TeamsTable/useTeamsTable';
-import teamsPageStyle from './TeamsPage.m.css';
 
 interface Props {
   param?: string | null;
@@ -23,7 +22,6 @@ interface Props {
 export const TeamsPage = observer<Props>(function TeamsPage({ param }) {
   const translate = useTranslate();
   const service = useService(CreateTeamService);
-  const styles = useS(teamsPageStyle);
 
   const table = useTeamsTable();
   const create = param === 'create';
@@ -31,7 +29,7 @@ export const TeamsPage = observer<Props>(function TeamsPage({ param }) {
   return (
     <ColoredContainer vertical wrap gap parent>
       <Group box keepSize>
-        <ToolsPanel className={s(styles, { toolsPanel: true })}>
+        <ToolsPanel>
           <ToolsAction
             title={translate('administration_teams_add_tooltip')}
             icon="add"
