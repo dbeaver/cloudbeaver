@@ -30,18 +30,18 @@ export const ExportNotification = observer<Props>(function ExportNotification({ 
       <SnackbarStatus status={status} />
       <SnackbarContent>
         <SnackbarBody title={translate(title)}>
-          {message && <message className={s(style, { message: true })}>{message}</message>}
-          <source-name className={s(style, { 'source-name': true })}>
+          {message && <div className={s(style, { message: true })}>{message}</div>}
+          <div className={s(style, { 'source-name': true })}>
             {controller.sourceName}
             {controller.task?.context.query && (
-              <pre 
+              <div 
                 className={s(style, { pre: true })} 
                 title={controller.task.context.query}
               >
                 {controller.task.context.query}
-              </pre>
+              </div>
             )}
-          </source-name>
+          </div>
         </SnackbarBody>
         <SnackbarFooter timestamp={notification.timestamp}>
           {status === ENotificationType.Info && controller.downloadUrl && (

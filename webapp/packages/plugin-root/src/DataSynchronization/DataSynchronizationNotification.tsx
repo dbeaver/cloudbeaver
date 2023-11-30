@@ -36,9 +36,9 @@ export const DataSynchronizationNotification = observer<NotificationComponentPro
       <SnackbarContent>
         <SnackbarBody title={translate(notification.title)}>
           {notification.message && translate(notification.message)}
-          <message className={s(style, { message: true })}>
+          <div className={s(style, { message: true })}>
             {groups.map((messages, index) => <DataSynchronizationNotificationMessages key={index} messages={messages} />)}
-          </message>
+          </div>
         </SnackbarBody>
         <SnackbarFooter timestamp={notification.timestamp}>
           <Button type="button" mod={['outlined']} onClick={ignoreChanges}>
