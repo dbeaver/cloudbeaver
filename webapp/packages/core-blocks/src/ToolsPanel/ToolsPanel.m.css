@@ -8,7 +8,7 @@
   composes: theme-background-surface theme-text-on-surface theme-border-color-background from global;
 }
 
-.bottomBorder: {
+.bottomBorder {
   border-bottom: solid 1px;
 }
 
