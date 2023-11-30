@@ -11,17 +11,13 @@ import type { ILoadableState } from '@cloudbeaver/core-utils';
 
 import { getComputed } from '../getComputed';
 
-export interface IAutoLoadable extends ILoadableState {
-  load: () => void;
-}
-
-export function useAutoLoad(component: { name: string }, state: IAutoLoadable | IAutoLoadable[], enabled = true, lazy = false) {
+export function useAutoLoad(component: { name: string }, state: ILoadableState | ILoadableState[], enabled = true, lazy = false) {
   const [loadFunctionName] = useState(`${component.name}.useAutoLoad(...)` as const);
   if (!Array.isArray(state)) {
     state = [state];
   }
 
-  for (const loader of state as IAutoLoadable[]) {
+  for (const loader of state as ILoadableState[]) {
     getComputed(
       // activate mobx subscriptions
       () => (!loader.isLoaded() || loader.isOutdated?.() === true) && !loader.isError(),
@@ -29,18 +25,20 @@ export function useAutoLoad(component: { name: string }, state: IAutoLoadable | 
   }
 
   const obj = {
-    [loadFunctionName]: () => {
+    [loadFunctionName]: async () => {
       if (!enabled) {
         return;
       }
 
-      for (const loader of state as IAutoLoadable[]) {
+      for (const loader of state as ILoadableState[]) {
         if (loader.isError() || (loader.lazy === true && !lazy)) {
           continue;
         }
 
         if (!loader.isLoaded() || loader.isOutdated?.() === true) {
-          loader.load();
+          try {
+            await loader.load();
+          } catch {}
         }
       }
     },

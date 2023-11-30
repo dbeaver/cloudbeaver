@@ -12,7 +12,6 @@ import {
   ColoredContainer,
   ExceptionMessage,
   Group,
-  IAutoLoadable,
   Loader,
   ObjectPropertyInfoForm,
   TextPlaceholder,
@@ -27,8 +26,9 @@ import { FormMode, TabContainerPanelComponent, useTab, useTabState } from '@clou
 
 import type { UserFormProps } from '../AdministrationUserFormService';
 import { getUserFormOriginTabId } from './getUserFormOriginTabId';
+import type { ILoadableState } from '@cloudbeaver/core-utils';
 
-interface IInnerState extends IAutoLoadable {
+interface IInnerState extends ILoadableState {
   state: IState;
   user: AdminUserInfo | undefined;
 }
