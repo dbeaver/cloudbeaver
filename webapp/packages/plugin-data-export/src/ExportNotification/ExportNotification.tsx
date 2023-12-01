@@ -35,12 +35,12 @@ export const ExportNotification = observer<Props>(function ExportNotification({ 
           <div className={s(style, { 'source-name': true })}>
             {controller.sourceName}
             {controller.task?.context.query && (
-              <div 
+              <pre 
                 className={s(style, { pre: true })} 
                 title={controller.task.context.query}
               >
                 {controller.task.context.query}
-              </div>
+              </pre>
             )}
           </div>
         </SnackbarBody>
