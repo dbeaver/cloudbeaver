@@ -34,7 +34,7 @@ public class FSFile {
 
     @Property
     public String getName() {
-        return node.getNodeName();
+        return node.getNodeDisplayName();
     }
 
     @Property
@@ -54,6 +54,6 @@ public class FSFile {
 
     @Property
     public String getNodePath() {
-        return node.getNodeItemPath();
+        return node.getNodeUri();
     }
 }
