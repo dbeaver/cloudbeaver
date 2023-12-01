@@ -17,17 +17,16 @@ import styles from './ExportNotification.m.css';
 
 type Props = NotificationComponentProps<{
   source: string;
-  className?: string;
 }>;
 
-export const ExportNotification = observer<Props>(function ExportNotification({ notification, className }) {
+export const ExportNotification = observer<Props>(function ExportNotification({ notification }) {
   const controller = useController(ExportNotificationController, notification);
   const translate = useTranslate();
   const style = useS(styles);
   const { title, status, message } = controller.status;
 
   return (
-    <SnackbarWrapper className={className} persistent={status === ENotificationType.Loading} onClose={controller.delete}>
+    <SnackbarWrapper persistent={status === ENotificationType.Loading} onClose={controller.delete}>
       <SnackbarStatus status={status} />
       <SnackbarContent>
         <SnackbarBody title={translate(title)}>

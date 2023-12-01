@@ -20,14 +20,13 @@ import { SnackbarWrapper } from './SnackbarMarkups/SnackbarWrapper';
 export interface ActionSnackbarProps extends INotificationExtraProps {
   onAction: () => void;
   actionText: string;
-  className?: string;
 }
 
-export const ActionSnackbar: NotificationComponent<ActionSnackbarProps> = observer(function ActionSnackbar({ notification, onAction, actionText, className }) {
+export const ActionSnackbar: NotificationComponent<ActionSnackbarProps> = observer(function ActionSnackbar({ notification, onAction, actionText }) {
   const translate = useTranslate();
 
   return (
-    <SnackbarWrapper className={className} persistent={notification.persistent} onClose={() => notification.close(false)}>
+    <SnackbarWrapper persistent={notification.persistent} onClose={() => notification.close(false)}>
       <SnackbarStatus status={notification.type} />
       <SnackbarContent>
         <SnackbarBody title={translate(notification.title)}>{notification.message && translate(notification.message)}</SnackbarBody>
