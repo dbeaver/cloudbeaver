@@ -15,18 +15,20 @@ import { NotificationItemController } from './NotificationItemController';
 
 interface Props {
   notification: INotification<any>;
+  className?: string;
 }
 
-export const NotificationsItem = observer<Props>(function Notification({ notification }) {
+export const NotificationsItem = observer<Props>(function Notification({ notification, className }) {
   const controller = useController(NotificationItemController, notification);
 
   if (notification.customComponent) {
     const Custom = notification.customComponent();
-    return <Custom notification={notification} {...notification.extraProps} />;
+    return <Custom className={className} notification={notification} {...notification.extraProps} />;
   }
 
   return (
     <Snackbar
+      className={className}
       title={notification.title}
       message={notification.message}
       persistent={notification.persistent}

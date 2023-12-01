@@ -15,7 +15,11 @@ import { groupBy, objectValues } from '@cloudbeaver/core-utils';
 import { DataSynchronizationNotificationMessages } from './DataSynchronizationNotificationMessages';
 import styles from './DataSynchronizationNotification.m.css';
 
-export const DataSynchronizationNotification = observer<NotificationComponentProps>(function DataSynchronizationNotification({ notification }) {
+interface DataSynchronizationNotification extends NotificationComponentProps {
+  className?: string;
+}
+
+export const DataSynchronizationNotification = observer<DataSynchronizationNotification>(function DataSynchronizationNotification({ notification, className }) {
   const dataSynchronizationService = useService(DataSynchronizationService);
   const translate = useTranslate();
   const groups = objectValues(groupBy(Array.from(dataSynchronizationService.queue.values()), message => message.label));
@@ -31,7 +35,7 @@ export const DataSynchronizationNotification = observer<NotificationComponentPro
   }
 
   return (
-    <SnackbarWrapper onClose={ignoreChanges}>
+    <SnackbarWrapper className={className} onClose={ignoreChanges}>
       <SnackbarStatus status={ENotificationType.Info} />
       <SnackbarContent>
         <SnackbarBody title={translate(notification.title)}>

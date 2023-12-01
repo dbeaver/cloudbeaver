@@ -23,7 +23,11 @@ export const Notifications = observer(function Notifications() {
     <Portal>
       <div className={s(style, { notifications: true })}>
         {notificationService.visibleNotifications.map(notification => (
-          <NotificationsItem key={notification.id} notification={notification} />
+          <NotificationsItem 
+            key={notification.id}
+            className={s(style, { notification: true })}
+            notification={notification}
+          />
         ))}
       </div>
     </Portal>

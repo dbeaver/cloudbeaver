@@ -23,11 +23,13 @@ import { SnackbarWrapper } from './SnackbarMarkups/SnackbarWrapper';
 export interface ProcessSnackbarProps extends INotificationProcessExtraProps {
   closeDelay?: number;
   displayDelay?: number;
+  className?: string;
 }
 
 export const ProcessSnackbar: NotificationComponent<ProcessSnackbarProps> = observer(function ProcessSnackbar({
   closeDelay = 3000,
   displayDelay = 750,
+  className,
   notification,
   state,
 }) {
@@ -45,6 +47,7 @@ export const ProcessSnackbar: NotificationComponent<ProcessSnackbarProps> = obse
 
   return (
     <SnackbarWrapper
+      className={className}
       closing={!!notification.state.deleteDelay}
       persistent={status === ENotificationType.Loading}
       onClose={() => notification.close(false)}
