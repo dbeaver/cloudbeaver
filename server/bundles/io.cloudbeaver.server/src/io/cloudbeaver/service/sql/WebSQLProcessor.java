@@ -58,6 +58,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 /**
  * Web SQL processor.
@@ -423,7 +424,11 @@ public class WebSQLProcessor implements WebSessionProvider {
                 }
                 List<DBDAttributeConstraint> constraints = new ArrayList<>();
                 boolean hasKey = true;
-                for (DBDAttributeBinding attr : resultsInfo.getAttributes()) {
+                // get attributes only from row identifiers
+                Set<DBDAttributeBinding> idAttributes = resultsInfo.getRowIdentifiers().stream()
+                    .flatMap(r -> r.getAttributes().stream())
+                    .collect(Collectors.toSet());
+                for (DBDAttributeBinding attr : idAttributes) {
                     if (attr.getRowIdentifier() == null) {
                         continue;
                     }
