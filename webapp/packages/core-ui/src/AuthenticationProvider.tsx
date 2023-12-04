@@ -6,8 +6,18 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import { Button, Container, GroupItem, useTranslate } from '@cloudbeaver/core-blocks';
+import styled, { css } from 'reshadow';
+
+import { Button, Container, GroupItem, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
+
 import { useAuthenticationAction } from './useAuthenticationAction';
+
+const styles = css`
+  Container {
+    justify-content: center;
+    align-items: center;
+  }
+`;
 
 export type Props = {
   providerId: string;
@@ -19,20 +29,21 @@ export type Props = {
 
 export const AuthenticationProvider = observer<Props>(function AuthenticationProvider(props) {
   const translate = useTranslate();
+  const style = useStyles(styles);
   const action = useAuthenticationAction(props);
 
   if (action.authorized) {
     return (props.children?.() as null) || null;
   }
 
-  return (
-    <Container className={props.className} center gap vertical>
+  return styled(style)(
+    <Container className={props.className} gap vertical>
       <GroupItem keepSize>{translate('authentication_request_token')}</GroupItem>
       <GroupItem keepSize>
         <Button type="button" mod={['unelevated']} loading={action.authenticating} onClick={action.auth}>
           {translate('authentication_authenticate')}
         </Button>
       </GroupItem>
-    </Container>
+    </Container>,
   );
 });
