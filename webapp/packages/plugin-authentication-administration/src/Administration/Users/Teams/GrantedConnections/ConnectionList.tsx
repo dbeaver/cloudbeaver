@@ -8,19 +8,19 @@
 import { observable } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import { useCallback, useState } from 'react';
-import styled, { css } from 'reshadow';
 
 import {
   Button,
   getComputed,
   getSelectedItems,
   Group,
+  s,
   Table,
   TableBody,
   TableColumnValue,
   TableItem,
   useObjectRef,
-  useStyles,
+  useS,
   useTranslate,
 } from '@cloudbeaver/core-blocks';
 import { Connection, DBDriverResource } from '@cloudbeaver/core-connections';
@@ -30,32 +30,7 @@ import { getFilteredConnections } from './getFilteredConnections';
 import { GrantedConnectionsTableHeader, IFilterState } from './GrantedConnectionsTableHeader/GrantedConnectionsTableHeader';
 import { GrantedConnectionsTableInnerHeader } from './GrantedConnectionsTableHeader/GrantedConnectionsTableInnerHeader';
 import { GrantedConnectionsTableItem } from './GrantedConnectionsTableItem';
-
-const styles = css`
-  Group {
-    position: relative;
-  }
-  Group,
-  container,
-  table-container {
-    height: 100%;
-  }
-  container {
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-  }
-  table-container {
-    overflow: auto;
-  }
-  GrantedConnectionsTableHeader {
-    flex: 0 0 auto;
-  }
-  Table {
-    composes: theme-background-surface theme-text-on-surface from global;
-    width: 100%;
-  }
-`;
+import styles from './ConnectionList.m.css';
 
 interface Props {
   connectionList: Connection[];
@@ -66,7 +41,7 @@ interface Props {
 
 export const ConnectionList = observer<Props>(function ConnectionList({ connectionList, grantedSubjects, disabled, onGrant }) {
   const props = useObjectRef({ onGrant });
-  const style = useStyles(styles);
+  const style = useS(styles);
   const translate = useTranslate();
 
   const driversResource = useService(DBDriverResource);
@@ -84,17 +59,17 @@ export const ConnectionList = observer<Props>(function ConnectionList({ connecti
   const connections = getFilteredConnections(connectionList, filterState.filterValue);
   const keys = connections.map(connection => connection.id);
 
-  return styled(style)(
-    <Group box medium overflow>
-      <container>
+  return (
+    <Group className={s(style, { group: true })} box medium overflow>
+      <div className={s(style, { container: true })}>
         <GrantedConnectionsTableHeader filterState={filterState} disabled={disabled}>
           <Button disabled={disabled || !selected} mod={['unelevated']} onClick={grant}>
             {translate('ui_add')}
           </Button>
         </GrantedConnectionsTableHeader>
-        <table-container>
-          <Table keys={keys} selectedItems={selectedSubjects} isItemSelectable={item => !grantedSubjects.includes(item)} size="big">
-            <GrantedConnectionsTableInnerHeader disabled={disabled} />
+        <div className={s(style, { tableContainer: true })}>
+          <Table className={s(style, { table: true })} keys={keys} selectedItems={selectedSubjects} isItemSelectable={item => !grantedSubjects.includes(item)} size="big">
+            <GrantedConnectionsTableInnerHeader className={s(style, { grantedConnectionsTableHeader: true })} disabled={disabled} />
             <TableBody>
               {!connections.length && filterState.filterValue && (
                 <TableItem item="tableInfo" selectDisabled>
@@ -117,8 +92,8 @@ export const ConnectionList = observer<Props>(function ConnectionList({ connecti
               })}
             </TableBody>
           </Table>
-        </table-container>
-      </container>
-    </Group>,
+        </div>
+      </div>
+    </Group>
   );
 });
