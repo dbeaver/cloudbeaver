@@ -22,7 +22,6 @@ import {
   useTranslate,
 } from '@cloudbeaver/core-blocks';
 import { createConnectionParam, DatabaseAuthModelsResource, DBDriverResource } from '@cloudbeaver/core-connections';
-import { useService } from '@cloudbeaver/core-di';
 import { TabContainerPanelComponent, useTab, useTabState } from '@cloudbeaver/core-ui';
 
 import type { IConnectionFormProps } from '../IConnectionFormProps';
@@ -46,7 +45,7 @@ export const OriginInfo: TabContainerPanelComponent<IConnectionFormProps> = obse
 }) {
   const tab = useTab(tabId);
   const translate = useTranslate();
-  const userInfoService = useService(UserInfoResource);
+  const userInfoLoader = useResource(OriginInfo, UserInfoResource, undefined);
   const state = useTabState<Record<string, any>>();
   const styles = useStyles(style);
   const driverLoader = useResource(OriginInfo, DBDriverResource, config.driverId ?? null);
@@ -57,7 +56,7 @@ export const OriginInfo: TabContainerPanelComponent<IConnectionFormProps> = obse
   );
 
   const providerId = authModeLoader.data?.requiredAuth ?? info?.requiredAuth ?? AUTH_PROVIDER_LOCAL_ID;
-  const isAuthenticated = userInfoService.hasToken(providerId);
+  const isAuthenticated = userInfoLoader.resource.hasToken(providerId);
   const providerLoader = useResource(OriginInfo, AuthProvidersResource, providerId);
 
   const connection = useResource(
