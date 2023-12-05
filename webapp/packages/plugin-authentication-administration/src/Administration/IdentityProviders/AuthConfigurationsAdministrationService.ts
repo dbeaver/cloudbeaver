@@ -56,7 +56,7 @@ export class AuthConfigurationsAdministrationService extends Bootstrap {
     });
     this.administrationItemService.create({
       name: 'auth-configurations',
-      type: AdministrationItemType.Administration,
+      type: AdministrationItemType.Default,
       order: 5,
       configurationWizardOptions: {
         description: 'administration_identity_providers_wizard_description',
