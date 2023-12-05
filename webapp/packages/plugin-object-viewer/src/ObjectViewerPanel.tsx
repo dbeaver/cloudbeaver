@@ -37,7 +37,6 @@ const styles = css`
 `;
 
 export const ObjectViewerPanel: TabHandlerPanelComponent<IObjectViewerTabState> = observer(function ObjectViewerPanel({ tab }) {
-  console.log('ObjectViewerPanel');
   const translate = useTranslate();
   const style = useStyles(BASE_TAB_STYLES, styles);
   const dbObjectPagesService = useService(DBObjectPageService);
