@@ -37,7 +37,7 @@ type ObjectPropertyInfo {
     # Supported configuration types (for driver properties)
     supportedConfigurationTypes: [ String! ]
     # Required parameters
-    required: Boolean @since(version: "23.3.1")
+    required: Boolean! @since(version: "23.3.1")
 }
 
 enum ObjectPropertyLength {
