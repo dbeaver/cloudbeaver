@@ -31,9 +31,11 @@ import io.cloudbeaver.WebServiceUtils;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.registry.WebServiceRegistry;
 import io.cloudbeaver.server.CBApplication;
+import io.cloudbeaver.server.HttpConstants;
 import io.cloudbeaver.service.DBWServiceBindingGraphQL;
 import io.cloudbeaver.service.WebServiceBindingBase;
 import org.jkiss.dbeaver.Log;
+import org.jkiss.utils.CommonUtils;
 import org.jkiss.utils.IOUtils;
 
 import javax.servlet.ServletException;
@@ -152,6 +154,14 @@ public class GraphQLEndpoint extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        String contentType = request.getContentType();
+        if (CommonUtils.isEmpty(contentType) || !contentType.startsWith(HttpConstants.TYPE_JSON)) {
+            String error = "Bad request," + (CommonUtils.isEmpty(contentType)
+                ? " content type is missing"
+                : " incorrect content type:" + contentType);
+            response.sendError(400, error);
+            return;
+        }
         String postBody = IOUtils.readToString(request.getReader());
         JsonElement json = gson.fromJson(postBody, JsonElement.class);
         if (json instanceof JsonArray) {
