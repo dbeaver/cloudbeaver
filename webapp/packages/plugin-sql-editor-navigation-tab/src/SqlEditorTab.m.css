@@ -7,4 +7,5 @@
   margin-left: -4px;
   display: inline-block;
   vertical-align: middle;
+  flex-shrink: 0;
 }

@@ -5,6 +5,7 @@
   & .fieldLabel {
     padding-right: 8px;
     padding-bottom: 0;
+    width: max-content;
   }
 }
 

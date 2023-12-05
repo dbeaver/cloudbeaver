@@ -12,7 +12,7 @@ import { ConnectionInfoResource, IConnectionExecutionContextInfo } from '@cloudb
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { ProjectInfoResource } from '@cloudbeaver/core-projects';
+import { ProjectInfoResource, ProjectsService } from '@cloudbeaver/core-projects';
 import { ICachedTreeMoveData, resourceKeyList, ResourceKeySimple, ResourceKeyUtils } from '@cloudbeaver/core-resource';
 import { ResourceManagerResource } from '@cloudbeaver/core-resource-manager';
 import { NetworkStateService } from '@cloudbeaver/core-root';
@@ -50,6 +50,7 @@ export class ResourceSqlDataSourceBootstrap extends Bootstrap {
     private readonly projectInfoResource: ProjectInfoResource,
     private readonly sqlEditorTabResourceService: SqlEditorTabResourceService,
     private readonly sqlEditorService: SqlEditorService,
+    private readonly projectsService: ProjectsService,
     localStorageSaveService: LocalStorageSaveService,
   ) {
     super();
@@ -96,6 +97,7 @@ export class ResourceSqlDataSourceBootstrap extends Bootstrap {
           this.connectionInfoResource,
           this.resourceManagerResource,
           this.sqlEditorService,
+          this.projectsService,
           this.createState(editorId, options?.script),
         );
 

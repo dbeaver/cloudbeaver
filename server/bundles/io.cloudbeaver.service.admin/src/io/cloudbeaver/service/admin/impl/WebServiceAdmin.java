@@ -43,9 +43,7 @@ import org.jkiss.dbeaver.model.app.DBPProject;
 import org.jkiss.dbeaver.model.auth.AuthInfo;
 import org.jkiss.dbeaver.model.navigator.DBNBrowseSettings;
 import org.jkiss.dbeaver.model.preferences.DBPPropertyDescriptor;
-import org.jkiss.dbeaver.model.rm.RMProject;
 import org.jkiss.dbeaver.model.rm.RMProjectType;
-import org.jkiss.dbeaver.model.rm.RMUtils;
 import org.jkiss.dbeaver.model.security.*;
 import org.jkiss.dbeaver.model.security.user.SMTeam;
 import org.jkiss.dbeaver.model.security.user.SMUser;
@@ -497,8 +495,8 @@ public class WebServiceAdmin implements DBWServiceAdmin {
                 appConfig.setPublicCredentialsSaveEnabled(config.isPublicCredentialsSaveEnabled());
                 appConfig.setAdminCredentialsSaveEnabled(config.isAdminCredentialsSaveEnabled());
                 appConfig.setEnabledFeatures(config.getEnabledFeatures().toArray(new String[0]));
-                appConfig.setEnabledDrivers(config.getEnabledDrivers());
-                appConfig.setDisabledDrivers(config.getDisabledDrivers());
+                // custom logic for enabling embedded drivers
+                appConfig.updateDisabledDriversConfig(config.getDisabledDrivers());
                 appConfig.setResourceManagerEnabled(config.isResourceManagerEnabled());
 
                 if (CommonUtils.isEmpty(config.getEnabledAuthProviders())) {

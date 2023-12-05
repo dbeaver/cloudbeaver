@@ -44,6 +44,11 @@ export class LocalStorageSqlDataSource extends BaseSqlDataSource {
     return true;
   }
 
+  get projectId(): string | null {
+    // we will be able to attach any connection from any project
+    return null;
+  }
+
   private state!: ILocalStorageSqlDataSourceState;
 
   constructor(state: ILocalStorageSqlDataSourceState) {

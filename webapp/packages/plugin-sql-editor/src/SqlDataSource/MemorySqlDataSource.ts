@@ -41,6 +41,11 @@ export class MemorySqlDataSource extends BaseSqlDataSource {
     return true;
   }
 
+  get projectId(): string | null {
+    // we will be able to attach any connection from any project
+    return null;
+  }
+
   private _name: string | null;
   private _script: string;
   private _executionContext?: IConnectionExecutionContextInfo;

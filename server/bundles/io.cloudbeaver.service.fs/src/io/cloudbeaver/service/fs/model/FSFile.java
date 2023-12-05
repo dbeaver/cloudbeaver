@@ -16,41 +16,35 @@
  */
 package io.cloudbeaver.service.fs.model;
 
+import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.model.meta.Property;
 import org.jkiss.dbeaver.model.navigator.fs.DBNPathBase;
-import org.jkiss.utils.ArrayUtils;
 
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.Map;
 
 public class FSFile {
-    private final Path path;
-    private final String nodePath;
+    @NotNull
+    private final DBNPathBase node;
 
-    public FSFile(DBNPathBase node) {
-        this.path = node.getPath();
-        this.nodePath = node.getNodeItemPath();
+    public FSFile(@NotNull DBNPathBase node) {
+        this.node = node;
     }
 
     @Property
     public String getName() {
-        String[] pathParts = path.getFileName().toString().split(path.getFileSystem().getSeparator());
-        if (ArrayUtils.isEmpty(pathParts)) {
-            return "";
-        }
-        return pathParts[pathParts.length - 1];
+        return node.getNodeName();
     }
 
     @Property
     public long getLength() throws IOException {
-        return Files.size(path);
+        return Files.size(node.getPath());
     }
 
     @Property
     public boolean isFolder() {
-        return Files.isDirectory(path);
+        return Files.isDirectory(node.getPath());
     }
 
     @Property
@@ -60,6 +54,6 @@ public class FSFile {
 
     @Property
     public String getNodePath() {
-        return nodePath;
+        return node.getNodeItemPath();
     }
 }

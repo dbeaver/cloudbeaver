@@ -26,7 +26,6 @@ import { SqlEditorService } from '../SqlEditorService';
 import { ISQLScriptSegment, SQLParser } from '../SQLParser';
 import { SqlExecutionPlanService } from '../SqlResultTabs/ExecutionPlan/SqlExecutionPlanService';
 import { OUTPUT_LOGS_TAB_ID } from '../SqlResultTabs/OutputLogs/OUTPUT_LOGS_TAB_ID';
-import { OutputLogsService } from '../SqlResultTabs/OutputLogs/OutputLogsService';
 import { SqlQueryService } from '../SqlResultTabs/SqlQueryService';
 import { SqlResultTabsService } from '../SqlResultTabs/SqlResultTabsService';
 import type { ICursor, ISQLEditorData } from './ISQLEditorData';
@@ -69,7 +68,6 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
   const sqlResultTabsService = useService(SqlResultTabsService);
   const commonDialogService = useService(CommonDialogService);
   const sqlDataSourceService = useService(SqlDataSourceService);
-  const sqlOutputLogsService = useService(OutputLogsService);
 
   const data = useObservableRef<ISQLEditorDataPrivate>(
     () => ({

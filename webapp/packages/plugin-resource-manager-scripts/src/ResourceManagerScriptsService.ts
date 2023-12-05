@@ -25,6 +25,7 @@ interface ISettings {
 }
 
 interface IResourceProperties {
+  'default-projectId'?: string;
   'default-datasource'?: string;
   'default-catalog'?: string;
   'default-schema'?: string;
@@ -86,6 +87,7 @@ export class ResourceManagerScriptsService {
     const resourceKey = getRmResourceKey(path);
 
     const properties: IResourceProperties = await this.resourceManagerResource.setProperties(path, {
+      'default-projectId': executionContext?.projectId,
       'default-datasource': executionContext?.connectionId,
       'default-catalog': executionContext?.defaultCatalog,
       'default-schema': executionContext?.defaultSchema,
@@ -97,7 +99,7 @@ export class ResourceManagerScriptsService {
 
     return {
       id: NOT_INITIALIZED_CONTEXT_ID,
-      projectId: resourceKey.projectId,
+      projectId: properties['default-projectId'] ?? resourceKey.projectId,
       connectionId: properties['default-datasource'],
       defaultCatalog: properties['default-catalog'],
       defaultSchema: properties['default-schema'],
@@ -115,7 +117,7 @@ export class ResourceManagerScriptsService {
 
     return {
       id: NOT_INITIALIZED_CONTEXT_ID,
-      projectId: resourceKey.projectId,
+      projectId: properties['default-projectId'] ?? resourceKey.projectId,
       connectionId: properties['default-datasource'],
       defaultCatalog: properties['default-catalog'],
       defaultSchema: properties['default-schema'],

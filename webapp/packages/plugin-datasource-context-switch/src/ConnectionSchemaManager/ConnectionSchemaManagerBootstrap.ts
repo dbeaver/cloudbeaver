@@ -18,6 +18,7 @@ import {
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { LocalizationService } from '@cloudbeaver/core-localization';
 import { EObjectFeature, NodeManagerUtils } from '@cloudbeaver/core-navigation-tree';
+import { ProjectsService } from '@cloudbeaver/core-projects';
 import { getCachedMapResourceLoaderState } from '@cloudbeaver/core-resource';
 import { OptionsPanelService } from '@cloudbeaver/core-ui';
 import { DATA_CONTEXT_MENU, MenuBaseItem, menuExtractItems, MenuSeparatorItem, MenuService } from '@cloudbeaver/core-view';
@@ -46,6 +47,7 @@ export class ConnectionSchemaManagerBootstrap extends Bootstrap {
     private readonly menuService: MenuService,
     private readonly connectionsSettingsService: ConnectionsSettingsService,
     private readonly localizationService: LocalizationService,
+    private readonly projectsService: ProjectsService,
   ) {
     super();
   }
@@ -105,13 +107,18 @@ export class ConnectionSchemaManagerBootstrap extends Bootstrap {
       isApplicable: () => this.connectionsManagerService.hasAnyConnection() && this.connectionSchemaManagerService.isConnectionChangeable,
       getItems: (context, items) => {
         items = [...items];
+        const userProjectId = this.projectsService.userProject?.id;
+        const activeProjectId = this.connectionSchemaManagerService.activeProjectId;
 
         const connections = this.connectionsManagerService.projectConnections
           .filter(connection => {
+            // we want to show connections from active project and user project
             if (
               !this.connectionSchemaManagerService.isProjectChangeable &&
-              this.connectionSchemaManagerService.activeProjectId &&
-              connection.projectId !== this.connectionSchemaManagerService.activeProjectId
+              activeProjectId &&
+              activeProjectId !== connection.projectId &&
+              activeProjectId !== userProjectId &&
+              connection.projectId !== userProjectId
             ) {
               return false;
             }

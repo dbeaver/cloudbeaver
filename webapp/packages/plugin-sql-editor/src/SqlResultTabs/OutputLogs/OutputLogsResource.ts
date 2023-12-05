@@ -9,14 +9,13 @@ import { ConnectionExecutionContextResource } from '@cloudbeaver/core-connection
 import { injectable } from '@cloudbeaver/core-di';
 import { CachedDataResource } from '@cloudbeaver/core-resource';
 import { ServerEventId } from '@cloudbeaver/core-root';
-import type { CbDatabaseOutputLogEvent } from '@cloudbeaver/core-sdk';
+import type { CbDatabaseOutputLogEvent, WsOutputLogInfo } from '@cloudbeaver/core-sdk';
 
 import type { IOutputLogType } from './IOutputLogTypes';
 import { OutputLogsEventHandler } from './OutputLogsEventHandler';
 
-export interface IOutputLog {
-  message: string;
-  severity: IOutputLogType;
+export interface IOutputLog extends WsOutputLogInfo {
+  severity?: IOutputLogType;
   contextId: string;
   timestamp: number;
 }
