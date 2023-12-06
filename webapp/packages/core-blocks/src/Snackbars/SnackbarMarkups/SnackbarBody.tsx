@@ -17,14 +17,12 @@ interface Props {
 export const SnackbarBody: React.FC<React.PropsWithChildren<Props>> = function SnackbarBody({ title, className, children }) {
   const styles = useS(style);
   return (
-    <div data-testid="notification-body" className={s(styles, { notificationBody: true }, className)}>
-      <div data-testid="body-text-block" className={styles.bodyTextBlock}>
-        <h2 data-testid="text-block-title" title={title} className={styles.textBlockTitle}>
+    <div className={s(styles, { notificationBody: true }, className)}>
+      <div className={styles.bodyTextBlock}>
+        <h2 title={title} className={styles.textBlockTitle}>
           {title}
         </h2>
-        <div data-testid="message" className={styles.message}>
-          {children}
-        </div>
+        <div className={styles.message}>{children}</div>
       </div>
     </div>
   );
