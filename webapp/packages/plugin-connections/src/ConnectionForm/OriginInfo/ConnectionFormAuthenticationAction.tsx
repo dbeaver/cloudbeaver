@@ -43,6 +43,7 @@ export const AuthenticationButton: PlaceholderComponent<IConnectionFormProps> = 
 
 export const ConnectionFormAuthenticationAction: PlaceholderComponent<IConnectionFormProps> = observer(function ConnectionFormAuthenticationAction({
   state,
+  actions,
 }) {
   const driverMap = useResource(ConnectionFormAuthenticationAction, DBDriverResource, state.config.driverId || null);
 
@@ -57,5 +58,5 @@ export const ConnectionFormAuthenticationAction: PlaceholderComponent<IConnectio
     return null;
   }
 
-  return <AuthenticationButton state={state} />;
+  return <AuthenticationButton actions={actions} state={state} />;
 });

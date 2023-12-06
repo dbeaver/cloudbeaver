@@ -52,8 +52,14 @@ export interface IConnectionFormState {
   readonly dispose: () => void;
 }
 
+export interface IConnectionFormActions {
+  save: VoidFunction;
+  test: VoidFunction;
+}
+
 export interface IConnectionFormProps {
   state: IConnectionFormState;
+  actions: IConnectionFormActions;
   onCancel?: () => void;
 }
 

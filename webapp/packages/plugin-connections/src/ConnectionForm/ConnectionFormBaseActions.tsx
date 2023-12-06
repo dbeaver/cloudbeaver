@@ -16,6 +16,7 @@ import type { IConnectionFormProps } from './IConnectionFormProps';
 
 export const ConnectionFormBaseActions: PlaceholderComponent<IConnectionFormProps> = observer(function ConnectionFormBaseActions({
   state,
+  actions,
   onCancel,
 }) {
   const translate = useTranslate();
@@ -40,10 +41,10 @@ export const ConnectionFormBaseActions: PlaceholderComponent<IConnectionFormProp
           {translate('ui_processing_cancel')}
         </Button>
       )}
-      <Button type="button" disabled={state.disabled || !authorized} mod={['outlined']} loader onClick={state.test}>
+      <Button type="button" disabled={state.disabled || !authorized} mod={['outlined']} loader onClick={actions.test}>
         {translate('connections_connection_test')}
       </Button>
-      <Button type="button" disabled={state.disabled || state.readonly} mod={['unelevated']} loader onClick={state.save}>
+      <Button type="button" disabled={state.disabled || state.readonly} mod={['unelevated']} loader onClick={actions.save}>
         {translate(state.mode === 'edit' ? 'ui_processing_save' : 'ui_processing_create')}
       </Button>
     </>
