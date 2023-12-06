@@ -38,7 +38,7 @@ const NavTreeLimitMessage: NavigationNodeRendererComponent = observer(function N
   }
 
   return (
-    <div className={s(styles, { loadMoreBox: true })} data-testid="load-more-box">
+    <div className={s(styles, { loadMoreBox: true })}>
       <Link title={translate('app_navigationTree_limited', undefined, { limit: limit })} onClick={loadMore}>
         {translate('ui_load_more')}
       </Link>
