@@ -59,7 +59,7 @@ export interface IConnectionFormActions {
 
 export interface IConnectionFormProps {
   state: IConnectionFormState;
-  actions: IConnectionFormActions;
+  actions?: IConnectionFormActions;
   onCancel?: () => void;
 }
 
