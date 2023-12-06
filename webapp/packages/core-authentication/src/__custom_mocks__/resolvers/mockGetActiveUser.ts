@@ -5,18 +5,12 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import type { GraphQLContext, GraphQLRequest, ResponseComposition } from 'msw';
+import { HttpResponse } from 'msw';
 
-import type { GetActiveUserQuery, GetActiveUserQueryVariables } from '@cloudbeaver/core-sdk';
-
-export function mockGetActiveUser(
-  req: GraphQLRequest<GetActiveUserQueryVariables>,
-  res: ResponseComposition<GetActiveUserQuery>,
-  ctx: GraphQLContext<GetActiveUserQuery>,
-): ReturnType<ResponseComposition<GetActiveUserQuery>> {
-  return res(
-    ctx.data({
-      user: null as unknown as undefined,
-    }),
-  );
+export function mockGetActiveUser() {
+  return HttpResponse.json({
+    data: {
+      user: null,
+    },
+  });
 }
