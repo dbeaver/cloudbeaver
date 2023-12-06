@@ -79,7 +79,7 @@ export const RenderField = observer<RenderFieldProps>(function RenderField({
   if (controlType === 'file' && state) {
     return (
       <InputFileTextContent
-        required={property.required}
+        required={!property.required}
         tooltip={property.description}
         labelTooltip={property.displayName || property.description}
         name={property.id!}
@@ -119,7 +119,7 @@ export const RenderField = observer<RenderFieldProps>(function RenderField({
     if (state !== undefined) {
       return (
         <FieldCheckbox
-          required={property.required}
+          required={!property.required}
           id={property.id}
           name={property.id!}
           state={state}
@@ -151,7 +151,7 @@ export const RenderField = observer<RenderFieldProps>(function RenderField({
     if (state !== undefined) {
       return (
         <Combobox
-          required={property.required}
+          required={!property.required}
           name={property.id!}
           state={state}
           items={property.validValues!}
@@ -171,7 +171,7 @@ export const RenderField = observer<RenderFieldProps>(function RenderField({
 
     return (
       <Combobox
-        required={property.required}
+        required={!property.required}
         name={property.id!}
         items={property.validValues!}
         keySelector={value => value}
@@ -192,7 +192,7 @@ export const RenderField = observer<RenderFieldProps>(function RenderField({
     if (state !== undefined) {
       return (
         <Textarea
-          required={property.required}
+          required={!property.required}
           title={state[property.id!]}
           labelTooltip={property.description || property.displayName}
           description={description}
@@ -209,7 +209,7 @@ export const RenderField = observer<RenderFieldProps>(function RenderField({
 
     return (
       <Textarea
-        required={property.required}
+        required={!property.required}
         title={value}
         labelTooltip={property.description || property.displayName}
         description={description}
@@ -227,7 +227,7 @@ export const RenderField = observer<RenderFieldProps>(function RenderField({
   if (state !== undefined) {
     return (
       <InputField
-        required={property.required}
+        required={!property.required}
         type={password ? 'password' : 'text'}
         title={password ? property.description || property.displayName : state[property.id!]}
         labelTooltip={property.description || property.displayName}
@@ -250,7 +250,7 @@ export const RenderField = observer<RenderFieldProps>(function RenderField({
 
   return (
     <InputField
-      required={property.required}
+      required={!property.required}
       type={password ? 'password' : 'text'}
       title={password ? property.description || property.displayName : value}
       labelTooltip={property.description || property.displayName}

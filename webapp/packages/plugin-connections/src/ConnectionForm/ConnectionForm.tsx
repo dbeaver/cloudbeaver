@@ -110,7 +110,6 @@ export const ConnectionForm = observer<ConnectionFormProps>(function ConnectionF
   const form = useForm({
     onSubmit: event => {
       if (event?.type === 'test') {
-        console.info('test');
         state.test();
       } else {
         state.save();
