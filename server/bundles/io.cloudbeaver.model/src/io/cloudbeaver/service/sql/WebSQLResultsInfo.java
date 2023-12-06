@@ -22,9 +22,7 @@ import org.jkiss.dbeaver.model.DBPDataSource;
 import org.jkiss.dbeaver.model.DBUtils;
 import org.jkiss.dbeaver.model.data.DBDAttributeBinding;
 import org.jkiss.dbeaver.model.data.DBDRowIdentifier;
-import org.jkiss.dbeaver.model.struct.DBSAttributeBase;
-import org.jkiss.dbeaver.model.struct.DBSDataContainer;
-import org.jkiss.dbeaver.model.struct.DBSTypedObject;
+import org.jkiss.dbeaver.model.struct.*;
 
 import java.util.HashSet;
 import java.util.List;
@@ -124,6 +122,14 @@ public class WebSQLResultsInfo {
             }
         }
         return null;
+    }
+
+    public boolean canRefreshResults() {
+        DBSEntity entity = getDefaultRowIdentifier().getEntity();
+        // FIXME: do not refresh documents for now. Can be solved by extracting document ID attributes
+        // FIXME: but it will require to provide dynamic document metadata.
+        return entity == null || entity.getDataSource() == null ||
+            (!(entity instanceof DBSDocumentContainer) && !entity.getDataSource().getInfo().isDynamicMetadata());
     }
 
 }
