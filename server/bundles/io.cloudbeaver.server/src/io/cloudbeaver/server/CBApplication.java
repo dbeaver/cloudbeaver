@@ -58,7 +58,10 @@ import org.jkiss.dbeaver.registry.BaseApplicationImpl;
 import org.jkiss.dbeaver.registry.DataSourceNavigatorSettings;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.dbeaver.runtime.IVariableResolver;
-import org.jkiss.dbeaver.utils.*;
+import org.jkiss.dbeaver.utils.ContentUtils;
+import org.jkiss.dbeaver.utils.GeneralUtils;
+import org.jkiss.dbeaver.utils.PrefUtils;
+import org.jkiss.dbeaver.utils.SystemVariablesResolver;
 import org.jkiss.utils.ArrayUtils;
 import org.jkiss.utils.CommonUtils;
 import org.jkiss.utils.StandardConstants;
@@ -90,6 +93,8 @@ public abstract class CBApplication extends BaseWebApplication implements WebAut
      * In configuration mode sessions expire after a week
      */
     private static final long CONFIGURATION_MODE_SESSION_IDLE_TIME = 60 * 60 * 1000 * 24 * 7;
+    public static final String HOST_LOCALHOST = "localhost";
+    public static final String HOST_127_0_0_1 = "127.0.0.1";
 
 
     static {
@@ -257,9 +262,9 @@ public abstract class CBApplication extends BaseWebApplication implements WebAut
         if (CommonUtils.isEmpty(localHostAddress)) {
             localHostAddress = System.getProperty(CBConstants.VAR_CB_LOCAL_HOST_ADDR);
         }
-        if (CommonUtils.isEmpty(localHostAddress) || "127.0.0.1".equals(localHostAddress) || "::0".equals(
+        if (CommonUtils.isEmpty(localHostAddress) || HOST_127_0_0_1.equals(localHostAddress) || "::0".equals(
             localHostAddress)) {
-            localHostAddress = "localhost";
+            localHostAddress = HOST_LOCALHOST;
         }
 
         final Runtime runtime = Runtime.getRuntime();
@@ -554,7 +559,12 @@ public abstract class CBApplication extends BaseWebApplication implements WebAut
             } else if (serverURL == null) {
                 String hostName = serverHost;
                 if (CommonUtils.isEmpty(hostName)) {
-                    hostName = RuntimeUtils.getLocalHostOrLoopback().getHostName();
+                    try {
+                        hostName = InetAddress.getLocalHost().getHostName();
+                    } catch (UnknownHostException e) {
+                        log.debug("Error resolving localhost address: " + e.getMessage());
+                        hostName = HOST_LOCALHOST;
+                    }
                 }
                 serverURL = "http://" + hostName + ":" + serverPort;
             }
