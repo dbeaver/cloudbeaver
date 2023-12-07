@@ -15,8 +15,9 @@ import { useService } from '@cloudbeaver/core-di';
 import { BASE_TAB_STYLES, TabList, TabPanelList, TabsState, UNDERLINE_TAB_BIG_STYLES, UNDERLINE_TAB_STYLES } from '@cloudbeaver/core-ui';
 
 import { teamContext } from './Contexts/teamContext';
-import type { ITeamFormActions, ITeamFormState } from './ITeamFormProps';
+import type { ITeamFormState } from './ITeamFormProps';
 import { TeamFormService } from './TeamFormService';
+import { ITeamFormActionsContext, TeamFormActionsContext } from './TeamFormActionsContext';
 
 const tabsStyles = css`
   TabList {
@@ -103,7 +104,7 @@ export const TeamForm = observer<Props>(function TeamForm({ state, onCancel, onS
   const form = useForm({
     onSubmit: state.save,
   });
-  const actions = useObjectRef<ITeamFormActions>({
+  const actions = useObjectRef<ITeamFormActionsContext>({
     save: async () => form.submit(),
   });
 
@@ -128,7 +129,7 @@ export const TeamForm = observer<Props>(function TeamForm({ state, onCancel, onS
 
   return styled(styles)(
     <Form context={form}>
-      <TabsState actions={actions} container={service.tabsContainer} localState={state.partsState} state={state} onCancel={onCancel}>
+      <TabsState container={service.tabsContainer} localState={state.partsState} state={state} onCancel={onCancel}>
       <box className={className}>
         <team-top-bar>
           <team-top-bar-tabs>
@@ -144,7 +145,9 @@ export const TeamForm = observer<Props>(function TeamForm({ state, onCancel, onS
           </team-top-bar-tabs>
           <team-top-bar-actions>
             <Loader suspense inline hideMessage hideException>
-              <Placeholder actions={actions} container={service.actionsContainer} state={state} onCancel={onCancel} />
+              <TeamFormActionsContext.Provider value={actions}>
+                <Placeholder container={service.actionsContainer} state={state} onCancel={onCancel} />
+              </TeamFormActionsContext.Provider>
             </Loader>
           </team-top-bar-actions>
         </team-top-bar>

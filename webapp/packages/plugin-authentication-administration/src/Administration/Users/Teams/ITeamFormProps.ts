@@ -31,13 +31,8 @@ export interface ITeamFormState {
   readonly setOptions: (mode: TeamFormMode) => this;
 }
 
-export interface ITeamFormActions {
-  save: ITeamFormState['save'];
-}
-
 export interface ITeamFormProps {
   state: ITeamFormState;
-  actions?: ITeamFormActions;
   onCancel?: () => void;
 }
 

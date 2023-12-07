@@ -23,7 +23,7 @@ const styles = css`
   }
 `;
 
-export const TeamOptions: TabContainerPanelComponent<ITeamFormProps> = observer(function TeamOptions({ state, actions }) {
+export const TeamOptions: TabContainerPanelComponent<ITeamFormProps> = observer(function TeamOptions({ state }) {
   const serverConfigResource = useResource(TeamOptions, ServerConfigResource, undefined);
   const style = useStyles(styles);
   const translate = useTranslate();
@@ -42,7 +42,7 @@ export const TeamOptions: TabContainerPanelComponent<ITeamFormProps> = observer(
           {translate('administration_teams_team_description')}
         </Textarea>
       </Group>
-      {!serverConfigResource.resource.distributed && <Permissions actions={actions} state={state} />}
+      {!serverConfigResource.resource.distributed && <Permissions state={state} />}
       <TeamMetaParameters state={state} />
     </ColoredContainer>
   );
