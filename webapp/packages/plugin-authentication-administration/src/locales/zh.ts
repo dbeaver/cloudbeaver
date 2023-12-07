@@ -10,6 +10,10 @@ export default [
   ['authentication_administration_user_connections_empty', '没有可用连接'],
   ['authentication_administration_user_origin_empty', '没有可用详情'],
   ['authentication_administration_user_info', '信息'],
+  ['authentication_administration_user_auth_method', 'Auth Method'],
+  ['authentication_administration_user_auth_methods', 'Auth Methods'],
+  ['authentication_administration_user_auth_methods_empty', 'No available auth methods'],
+  ['authentication_administration_user_auth_method_no_details', 'No details available'],
   ['authentication_administration_user_local', 'Local user'],
   ['authentication_administration_item', '访问管理'],
   ['authentication_administration_item_users', '用户'],
@@ -36,11 +40,11 @@ export default [
   ['authentication_administration_users_disable_user_fail', 'Failed to disable user'],
   ['authentication_administration_users_disable_user_success', 'User disabled'],
 
-  ['authentication_administration_user_remove_credentials_error', 'Failed to remove user credentials'],
-  ['authentication_administration_user_remove_credentials_success', 'User credentials were removed'],
+  ['authentication_administration_user_delete_credentials_error', 'Failed to remove user credentials'],
+  ['authentication_administration_user_delete_credentials_success', 'User credentials were removed'],
   [
-    'authentication_administration_user_remove_credentials_confirmation_message',
-    'Are you sure you want to delete "{arg:originName}" credentials from "{arg:userId}"?',
+    'authentication_administration_user_delete_credentials_confirmation_message',
+    'Are you sure you want to delete "{arg:originName}" auth method from "{arg:userId}"?',
   ],
 
   ['administration_configuration_wizard_configuration_admin', '管理员凭据'],

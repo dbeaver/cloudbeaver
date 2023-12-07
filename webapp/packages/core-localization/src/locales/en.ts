@@ -42,6 +42,7 @@ export default [
   ['ui_add', 'Add'],
   ['ui_refresh', 'Refresh'],
   ['ui_data_saving_error', 'Save error'],
+  ['ui_data_remove_confirmation', 'Remove confirmation'],
   ['ui_data_delete_confirmation', 'Delete confirmation'],
   ['ui_no_matches_placeholder', 'Your search returned no matches.'],
   ['ui_information', 'Information'],

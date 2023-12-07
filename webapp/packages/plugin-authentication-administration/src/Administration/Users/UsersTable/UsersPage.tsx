@@ -43,12 +43,16 @@ export const UsersPage = observer<Props>(function UsersPage({ sub, param }) {
   const userManagementDisabled = administrationUsersManagementService.externalUserProviderEnabled;
 
   return styled(style)(
-    <ColoredContainer vertical wrap gap parent>
-      <Group box keepSize>
+    <ColoredContainer vertical wrap gap parent maximum>
+      <Group keepSize box maximum>
         <UsersAdministrationToolsPanel onUpdate={table.update} />
       </Group>
 
-      <Container overflow gap>
+      <Group keepSize box maximum>
+        <UsersTableFilters filters={filters} />
+      </Group>
+
+      <Container overflow gap maximum>
         {create && createUserService.state && !userManagementDisabled && (
           <Group box>
             <CreateUser state={createUserService.state} onCancel={createUserService.cancelCreate} />
@@ -56,10 +60,6 @@ export const UsersPage = observer<Props>(function UsersPage({ sub, param }) {
         )}
 
         <Placeholder container={createUserService.toolsContainer} param={param} />
-
-        <Group box>
-          <UsersTableFilters filters={filters} />
-        </Group>
 
         <Group boxNoOverflow>
           <UsersTable

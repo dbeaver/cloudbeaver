@@ -39,6 +39,7 @@ export default [
   ['ui_add', 'Aggiungi'],
   ['ui_refresh', 'Aggiorna'],
   ['ui_data_saving_error', 'Errore di salvataggio'],
+  ['ui_data_remove_confirmation', 'Remove confirmation'],
   ['ui_data_delete_confirmation', 'Conferma di eliminazione'],
   ['ui_no_matches_placeholder', 'La tua ricerca non ha prodotto risultati.'],
   ['ui_information', 'Informazioni'],
