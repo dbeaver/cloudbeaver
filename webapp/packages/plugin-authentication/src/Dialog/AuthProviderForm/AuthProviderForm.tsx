@@ -17,8 +17,6 @@ interface Props {
   authenticate: boolean;
 }
 
-const REQUIRED_INPUT_IDS = ['user', 'password'];
-
 export const AuthProviderForm = observer<Props>(function AuthProviderForm({ provider, configuration, credentials, authenticate }) {
   const [elementRef] = useFocus<HTMLDivElement>({ focusFirstChild: true });
 
@@ -40,7 +38,6 @@ export const AuthProviderForm = observer<Props>(function AuthProviderForm({ prov
           titleSelector={value => value.description}
           defaultValue="0"
           disabled={authenticate}
-          required
           onSelect={handleProfileSelect}
         />
       )}
@@ -49,7 +46,6 @@ export const AuthProviderForm = observer<Props>(function AuthProviderForm({ prov
           parameter.user && (
             <InputField
               key={`${provider.id}${configuration?.id ?? ''}${parameter.id}`}
-              required={REQUIRED_INPUT_IDS.includes(parameter.id.toLowerCase())}
               title={parameter.description}
               type={parameter.encryption === 'none' ? 'text' : 'password'}
               name={parameter.id}
