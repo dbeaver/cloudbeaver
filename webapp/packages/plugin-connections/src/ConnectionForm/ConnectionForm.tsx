@@ -18,6 +18,7 @@ import { BASE_TAB_STYLES, TabList, TabPanelList, TabsState, UNDERLINE_TAB_BIG_ST
 import { ConnectionFormService } from './ConnectionFormService';
 import { connectionConfigContext } from './Contexts/connectionConfigContext';
 import type { IConnectionFormActions, IConnectionFormState } from './IConnectionFormProps';
+import connectionFormStyles from './ConnectionForm.m.css';
 
 const tabsStyles = css`
   TabList {
@@ -158,7 +159,7 @@ export const ConnectionForm = observer<ConnectionFormProps>(function ConnectionF
   }
 
   return styled(styles)(
-    <Form context={form} focusFirstChild>
+    <Form context={form} className={connectionFormStyles.form}>
       <TabsState actions={actionsContext} container={service.tabsContainer} localState={state.partsState} state={state} onCancel={onCancel}>
         <box className={className}>
           <connection-top-bar>
