@@ -86,6 +86,7 @@ export const Textarea: TextareaType = observer(function Textarea({
       </FieldLabel>
       <textarea
         {...rest}
+        required={required}
         className={s(styles, { textarea: true })}
         value={value ?? ''}
         name={name}
