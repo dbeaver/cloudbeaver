@@ -6,10 +6,9 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import { useRef } from 'react';
 import styled, { css } from 'reshadow';
 
-import { ColoredContainer, Form, Group, InputField, Textarea, useResource, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
+import { ColoredContainer, Group, InputField, Textarea, useResource, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
 import type { TabContainerPanelComponent } from '@cloudbeaver/core-ui';
 
@@ -24,30 +23,27 @@ const styles = css`
   }
 `;
 
-export const TeamOptions: TabContainerPanelComponent<ITeamFormProps> = observer(function TeamOptions({ state }) {
+export const TeamOptions: TabContainerPanelComponent<ITeamFormProps> = observer(function TeamOptions({ state, actions }) {
   const serverConfigResource = useResource(TeamOptions, ServerConfigResource, undefined);
   const style = useStyles(styles);
-  const formRef = useRef<HTMLFormElement>(null);
   const translate = useTranslate();
   const edit = state.mode === 'edit';
 
   return styled(style)(
-    <Form ref={formRef}>
-      <ColoredContainer parent gap overflow>
-        <Group small gap>
-          <InputField name="teamId" state={state.config} readOnly={state.readonly || edit} disabled={state.disabled} required tiny fill>
-            {translate('administration_teams_team_id')}
-          </InputField>
-          <InputField name="teamName" state={state.config} readOnly={state.readonly} disabled={state.disabled} tiny fill>
-            {translate('administration_teams_team_name')}
-          </InputField>
-          <Textarea name="description" state={state.config} readOnly={state.readonly} disabled={state.disabled} tiny fill>
-            {translate('administration_teams_team_description')}
-          </Textarea>
-        </Group>
-        {!serverConfigResource.resource.distributed && <Permissions state={state} />}
-        <TeamMetaParameters state={state} />
-      </ColoredContainer>
-    </Form>,
+    <ColoredContainer parent gap overflow>
+      <Group small gap>
+        <InputField name="teamId" state={state.config} readOnly={state.readonly || edit} disabled={state.disabled} required tiny fill>
+          {translate('administration_teams_team_id')}
+        </InputField>
+        <InputField name="teamName" state={state.config} readOnly={state.readonly} disabled={state.disabled} tiny fill>
+          {translate('administration_teams_team_name')}
+        </InputField>
+        <Textarea name="description" state={state.config} readOnly={state.readonly} disabled={state.disabled} tiny fill>
+          {translate('administration_teams_team_description')}
+        </Textarea>
+      </Group>
+      {!serverConfigResource.resource.distributed && <Permissions actions={actions} state={state} />}
+      <TeamMetaParameters state={state} />
+    </ColoredContainer>
   );
 });

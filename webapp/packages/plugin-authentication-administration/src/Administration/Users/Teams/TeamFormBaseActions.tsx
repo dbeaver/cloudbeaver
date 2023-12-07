@@ -11,7 +11,7 @@ import { Button, PlaceholderComponent, useTranslate } from '@cloudbeaver/core-bl
 
 import type { ITeamFormProps } from './ITeamFormProps';
 
-export const TeamFormBaseActions: PlaceholderComponent<ITeamFormProps> = observer(function TeamFormBaseActions({ state, onCancel }) {
+export const TeamFormBaseActions: PlaceholderComponent<ITeamFormProps> = observer(function TeamFormBaseActions({ state, onCancel, actions }) {
   const translate = useTranslate();
 
   return (
@@ -21,7 +21,7 @@ export const TeamFormBaseActions: PlaceholderComponent<ITeamFormProps> = observe
           {translate('ui_processing_cancel')}
         </Button>
       )}
-      <Button type="button" disabled={state.disabled || state.readonly} mod={['unelevated']} loader onClick={state.save}>
+      <Button type="button" disabled={state.disabled || state.readonly} mod={['unelevated']} loader onClick={actions?.save ?? state.save}>
         {translate(state.mode === 'edit' ? 'ui_processing_save' : 'ui_processing_create')}
       </Button>
     </>
