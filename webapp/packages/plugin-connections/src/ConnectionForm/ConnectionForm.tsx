@@ -17,8 +17,9 @@ import { BASE_TAB_STYLES, TabList, TabPanelList, TabsState, UNDERLINE_TAB_BIG_ST
 
 import { ConnectionFormService } from './ConnectionFormService';
 import { connectionConfigContext } from './Contexts/connectionConfigContext';
-import type { IConnectionFormActions, IConnectionFormState } from './IConnectionFormProps';
+import type { IConnectionFormState } from './IConnectionFormProps';
 import connectionFormStyles from './ConnectionForm.m.css';
+import { ConnectionFormActionsContext, IConnectionFormActionsContext } from './ConnectFormActionsContext';
 
 const tabsStyles = css`
   TabList {
@@ -118,13 +119,9 @@ export const ConnectionForm = observer<ConnectionFormProps>(function ConnectionF
     },
   });
 
-  const actionsContext = useObjectRef<IConnectionFormActions>(() => ({
-    save: () => {
-      form.submit(new SubmitEvent('submit'));
-    },
-    test: () => {
-      form.submit(new SubmitEvent('test'));
-    },
+  const actionsContext = useObjectRef<IConnectionFormActionsContext>(() => ({
+    save: async () => form.submit(new SubmitEvent('submit')),
+    test: async () => form.submit(new SubmitEvent('test')),
   }));
 
   useExecutor({
@@ -160,7 +157,7 @@ export const ConnectionForm = observer<ConnectionFormProps>(function ConnectionF
 
   return styled(styles)(
     <Form context={form} className={connectionFormStyles.form}>
-      <TabsState actions={actionsContext} container={service.tabsContainer} localState={state.partsState} state={state} onCancel={onCancel}>
+      <TabsState container={service.tabsContainer} localState={state.partsState} state={state} onCancel={onCancel}>
         <box className={className}>
           <connection-top-bar>
             <connection-top-bar-tabs>
@@ -171,7 +168,9 @@ export const ConnectionForm = observer<ConnectionFormProps>(function ConnectionF
             </connection-top-bar-tabs>
             <connection-top-bar-actions>
               <Loader suspense inline hideMessage hideException>
-                <Placeholder actions={actionsContext} container={service.actionsContainer} state={state} onCancel={onCancel} />
+                <ConnectionFormActionsContext.Provider value={actionsContext}>
+                  <Placeholder container={service.actionsContainer} state={state} onCancel={onCancel} />
+                </ConnectionFormActionsContext.Provider>
               </Loader>
             </connection-top-bar-actions>
           </connection-top-bar>
