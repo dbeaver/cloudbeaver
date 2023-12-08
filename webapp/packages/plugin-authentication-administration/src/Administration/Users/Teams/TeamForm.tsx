@@ -10,13 +10,14 @@ import { useEffect } from 'react';
 import styled, { css } from 'reshadow';
 
 import type { TeamInfo } from '@cloudbeaver/core-authentication';
-import { IconOrImage, Loader, Placeholder, useExecutor, useObjectRef, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
+import { Form, IconOrImage, Loader, Placeholder, useExecutor, useForm, useObjectRef, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { BASE_TAB_STYLES, TabList, TabPanelList, TabsState, UNDERLINE_TAB_BIG_STYLES, UNDERLINE_TAB_STYLES } from '@cloudbeaver/core-ui';
 
 import { teamContext } from './Contexts/teamContext';
 import type { ITeamFormState } from './ITeamFormProps';
 import { TeamFormService } from './TeamFormService';
+import { ITeamFormActionsContext, TeamFormActionsContext } from './TeamFormActionsContext';
 
 const tabsStyles = css`
   TabList {
@@ -100,6 +101,12 @@ export const TeamForm = observer<Props>(function TeamForm({ state, onCancel, onS
   const style = [BASE_TAB_STYLES, tabsStyles, UNDERLINE_TAB_STYLES, UNDERLINE_TAB_BIG_STYLES];
   const styles = useStyles(style, topBarStyles, formStyles);
   const service = useService(TeamFormService);
+  const form = useForm({
+    onSubmit: state.save,
+  });
+  const actions = useObjectRef<ITeamFormActionsContext>({
+    save: async () => form.submit(),
+  });
 
   useExecutor({
     executor: state.submittingTask,
@@ -121,7 +128,8 @@ export const TeamForm = observer<Props>(function TeamForm({ state, onCancel, onS
   }, []);
 
   return styled(styles)(
-    <TabsState container={service.tabsContainer} localState={state.partsState} state={state} onCancel={onCancel}>
+    <Form context={form}>
+      <TabsState container={service.tabsContainer} localState={state.partsState} state={state} onCancel={onCancel}>
       <box className={className}>
         <team-top-bar>
           <team-top-bar-tabs>
@@ -137,7 +145,9 @@ export const TeamForm = observer<Props>(function TeamForm({ state, onCancel, onS
           </team-top-bar-tabs>
           <team-top-bar-actions>
             <Loader suspense inline hideMessage hideException>
-              <Placeholder container={service.actionsContainer} state={state} onCancel={onCancel} />
+              <TeamFormActionsContext.Provider value={actions}>
+                <Placeholder container={service.actionsContainer} state={state} onCancel={onCancel} />
+              </TeamFormActionsContext.Provider>
             </Loader>
           </team-top-bar-actions>
         </team-top-bar>
@@ -145,6 +155,7 @@ export const TeamForm = observer<Props>(function TeamForm({ state, onCancel, onS
           <TabPanelList style={style} />
         </content-box>
       </box>
-    </TabsState>,
+      </TabsState>
+    </Form>,
   );
 });
