@@ -82,6 +82,7 @@ export function useForm(options?: IOptions): IFormContext {
         if (this.parent) {
           this.parent.keyDown(event);
         } else if (event.key === 'Enter' && this.disableEnterSubmit === false) {
+          event.preventDefault();
           this.submit();
         }
       },
