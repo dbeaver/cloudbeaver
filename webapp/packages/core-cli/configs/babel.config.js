@@ -5,8 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-/* eslint-disable @typescript-eslint/no-var-requires */
-const testingAttributes = require('../dist/babel-plugins/TestingAttributes.js');
 
 module.exports = api => {
   const devMode = !api.env('production');
@@ -28,6 +26,6 @@ module.exports = api => {
         },
       ],
     ],
-    plugins: [[testingAttributes, {}], [require('@reshadow/babel'), {}], devMode && require.resolve('react-refresh/babel')].filter(Boolean),
+    plugins: [[require('@reshadow/babel'), {}], devMode && require.resolve('react-refresh/babel')].filter(Boolean),
   };
 };
