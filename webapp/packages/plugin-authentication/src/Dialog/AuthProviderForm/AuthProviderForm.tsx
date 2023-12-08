@@ -46,6 +46,7 @@ export const AuthProviderForm = observer<Props>(function AuthProviderForm({ prov
           parameter.user && (
             <InputField
               key={`${provider.id}${configuration?.id ?? ''}${parameter.id}`}
+              required={provider.required}
               title={parameter.description}
               type={parameter.encryption === 'none' ? 'text' : 'password'}
               name={parameter.id}
