@@ -36,9 +36,10 @@ export const TabPanel: React.FC<TabPanelProps> = observer(function TabPanel({ ta
     }
 
     async function trackValidity(event: Event) {
-      if (selected || state?.context.get(DATA_CONTEXT_TABS_FORM_VALIDATION) !== null) {
+      if (selected) {
         return;
       }
+      
       state?.context.set(DATA_CONTEXT_TABS_FORM_VALIDATION, tabId);
       await state?.open(tabId);
     }
@@ -50,8 +51,7 @@ export const TabPanel: React.FC<TabPanelProps> = observer(function TabPanel({ ta
   });
 
   useEffect(() => {
-    if (selected && validationTabId === tabId) {
-      formContext?.validate();
+    if (selected && validationTabId === tabId && formContext?.validate()) {
       state?.context.set(DATA_CONTEXT_TABS_FORM_VALIDATION, null);
     }
   });
