@@ -11,7 +11,6 @@ import { TabPanel as BaseTabPanel, TabStateReturn } from 'reakit/Tab';
 
 import { FormContext, getComputed, Loader } from '@cloudbeaver/core-blocks';
 
-import { DATA_CONTEXT_TABS_FORM_VALIDATION } from './DATA_CONTEXT_TABS_FORM_VALIDATION';
 import { TabContext } from './TabContext';
 import type { TabPanelProps } from './TabPanelProps';
 import { TabsContext } from './TabsContext';
@@ -25,7 +24,6 @@ export const TabPanel: React.FC<TabPanelProps> = observer(function TabPanel({ ta
     throw new Error('Tabs context was not provided');
   }
 
-  const validationTabId = state.context.get(DATA_CONTEXT_TABS_FORM_VALIDATION);
   const tabContext = useMemo(() => ({ tabId }), [tabId]);
   const selected = getComputed(() => state.state.selectedId === tabId);
   const enabled = getComputed(() => (lazy || state.lazy) && !selected);
@@ -40,21 +38,15 @@ export const TabPanel: React.FC<TabPanelProps> = observer(function TabPanel({ ta
         return;
       }
       
-      state?.context.set(DATA_CONTEXT_TABS_FORM_VALIDATION, tabId);
       await state?.open(tabId);
+      formContext?.reportValidity();
     }
 
     panelRef.current?.addEventListener('invalid', trackValidity, true);
     return () => {
       panelRef.current?.removeEventListener('invalid', trackValidity, true);
     };
-  });
-
-  useEffect(() => {
-    if (selected && validationTabId === tabId && formContext?.validate()) {
-      state?.context.set(DATA_CONTEXT_TABS_FORM_VALIDATION, null);
-    }
-  });
+  }, [formContext, selected, state, tabId]);
 
   if (enabled) {
     return null;
