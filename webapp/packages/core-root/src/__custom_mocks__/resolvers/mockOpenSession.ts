@@ -5,10 +5,16 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { GraphQLVariables, HttpResponse } from 'msw';
+import { HttpResponse, ResponseResolverReturnType } from 'msw';
 
-export function mockOpenSession(variables: GraphQLVariables) {
+import type { OpenSessionMutation } from '@cloudbeaver/core-sdk';
+
+import type { GraphQLResponseBody } from './IGraphQLResponseBody';
+import type { IResponseResolverInfo } from './IResponseResolverInfo';
+
+export function mockOpenSession(info: IResponseResolverInfo): ResponseResolverReturnType<GraphQLResponseBody<OpenSessionMutation>> {
   const date = new Date().toISOString();
+
   return HttpResponse.json({
     data: {
       session: {
@@ -17,9 +23,9 @@ export function mockOpenSession(variables: GraphQLVariables) {
         createTime: date,
         lastAccessTime: date,
         cacheExpired: false,
-        locale: variables.defaultLocale ?? 'en',
+        locale: info.variables.defaultLocale ?? 'en',
         actionParameters: null,
       },
     },
-});
+  });
 }
