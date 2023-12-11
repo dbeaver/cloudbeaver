@@ -29,21 +29,20 @@ export const TabPanel: React.FC<TabPanelProps> = observer(function TabPanel({ ta
   const selected = getComputed(() => tabContextState.state.selectedId === tabId);
   const enabled = getComputed(() => (lazy || tabContextState.lazy) && !selected);
 
+  async function trackValidity(event: Event) {
+    tabPanelValidationHandlerContext?.validate(tabId);
+  }
+
   useEffect(() => {
     if (tabPanelValidationHandlerContext === null) {
       return;
     }
 
-    async function trackValidity(event: Event) {
-      tabPanelValidationHandlerContext?.addInvalidTab(tabId);
-    }
-
-    panelRef.current?.removeEventListener('invalid', trackValidity, true);
     panelRef.current?.addEventListener('invalid', trackValidity, true);
     return () => {
       panelRef.current?.removeEventListener('invalid', trackValidity, true);
     };
-  }, [tabId]);
+  }, []);
 
   if (enabled) {
     return null;

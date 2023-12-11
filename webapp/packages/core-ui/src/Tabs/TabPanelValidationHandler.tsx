@@ -1,5 +1,5 @@
 import { observer } from 'mobx-react-lite';
-import { useContext, useEffect, useRef, useState } from 'react';
+import { useCallback, useContext, useRef, useState } from 'react';
 import { TabsContext } from './TabsContext';
 import { FormContext, useExecutor, useObjectRef } from '@cloudbeaver/core-blocks';
 import { TabPanelValidationHandlerContext } from './TabPanelValidationHandlerContext';
@@ -20,17 +20,33 @@ export const TabPanelValidationHandler = observer(function TabPanelValidationHan
     throw new Error('TabsState should be defined');
   }
 
-  function addInvalidTab(tabId: string) {
-    invalidTabs.current.add(tabId);
-  };
-
   function resetInvalidTabs() {
     invalidTabs.current = new Set();
   }
 
+  const validate = useCallback((tabId: string) => {
+    invalidTabs.current.add(tabId);
+  
+    setTimeout(() => {
+      const next = Array.from(invalidTabs.current)[0];
+
+      if (
+        !selectedTab || 
+        !invalidTabs.current.size || 
+        invalidTabs.current.has(selectedTab)
+      ) {
+        return;
+      }
+
+      state.open(next);
+    }, 0);
+  }, [selectedTab, state]);
+
   useExecutor({
     executor: resetExecutor,
-    handlers: [resetInvalidTabs],
+    handlers: [() => {
+      resetInvalidTabs();
+    }],
   });
 
   useExecutor({
@@ -38,40 +54,7 @@ export const TabPanelValidationHandler = observer(function TabPanelValidationHan
     before: resetExecutor,
   });
 
-  useExecutor({
-    executor: formContext?.onValidate,
-    postHandlers: [() => formContext?.reportValidity()],
-  });
-
-  useEffect(() => {
-    async function goNextTab() {
-      const firstInvalidTab = invalidTabs.current.values().next().value;
-  
-      if (
-        (selectedTab && invalidTabs.current.has(selectedTab)) || 
-        invalidTabs.current.size === 0 ||
-        !firstInvalidTab
-      ) {
-        return;
-      }
-  
-      await state?.open(firstInvalidTab);
-      resetInvalidTabs();
-    }
-
-    if (formContext === null) {
-      return;
-    }
-
-    formContext?.parent?.ref?.removeEventListener('invalid', goNextTab, true);
-    formContext?.parent?.ref?.addEventListener('invalid', goNextTab, true);
-
-    return () => {
-      formContext?.parent?.ref?.removeEventListener('invalid', goNextTab, true);
-    };
-  }, [selectedTab, state, formContext]);
-
-  const value = useObjectRef(() => ({ addInvalidTab, invalidTabs }), { invalidTabs });
+  const value = useObjectRef(() => ({ validate, invalidTabs }), { invalidTabs, validate });
 
   return (
     <TabPanelValidationHandlerContext.Provider value={value}>
