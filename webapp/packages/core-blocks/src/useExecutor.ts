@@ -49,12 +49,12 @@ export function useExecutor<T>(options: IUseExecutorOptions<T>): void {
       }
     }
 
-    if (props.next) {
-      executor.next(props.next);
+    if (props.before) {
+      executor.before(props.before);
     }
 
-    if (props.before) {
-      executor.next(props.before);
+    if (props.next) {
+      executor.next(props.next);
     }
 
     return () => {
@@ -74,5 +74,9 @@ export function useExecutor<T>(options: IUseExecutorOptions<T>): void {
         executor.removeBefore(before);
       }
     };
-  }, [executor, props.handlers?.length, props.postHandlers?.length]);
+  }, [
+    executor, props.handlers?.length, props.postHandlers?.length, 
+    props.next, props.before, props.handlers, 
+    props.postHandlers,
+  ]);
 }
