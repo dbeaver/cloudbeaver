@@ -25,10 +25,6 @@ export const TabPanel: React.FC<TabPanelProps> = observer(function TabPanel({ ta
     throw new Error('Tabs context was not provided');
   }
 
-  if (!tabPanelValidationHandlerContext) {
-    throw new Error('TabPanelValidationHandlerContext context was not provided');
-  }
-
   const tabContext = useMemo(() => ({ tabId }), [tabId]);
   const selected = getComputed(() => tabContextState.state.selectedId === tabId);
   const enabled = getComputed(() => (lazy || tabContextState.lazy) && !selected);

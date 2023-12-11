@@ -1,7 +1,7 @@
 import { observer } from 'mobx-react-lite';
-import { useContext, useEffect, useMemo, useRef, useState } from 'react';
+import { useContext, useEffect, useRef, useState } from 'react';
 import { TabsContext } from './TabsContext';
-import { FormContext, useExecutor } from '@cloudbeaver/core-blocks';
+import { FormContext, useExecutor, useObjectRef } from '@cloudbeaver/core-blocks';
 import { TabPanelValidationHandlerContext } from './TabPanelValidationHandlerContext';
 import { SyncExecutor } from '@cloudbeaver/core-executor';
 
@@ -11,11 +11,14 @@ export interface ITabPanelHandlerProps {
 
 export const TabPanelValidationHandler = observer(function TabPanelValidationHandler({ children }: ITabPanelHandlerProps) {
   const state = useContext(TabsContext);
-  const containerRef = useRef<HTMLDivElement>(null);
   const formContext = useContext(FormContext);
   const selectedTab = state?.state.selectedId;
   const invalidTabs = useRef<Set<string>>(new Set());
   const [resetExecutor] = useState(() => new SyncExecutor());
+
+  if (!state) {
+    throw new Error('TabsState should be defined');
+  }
 
   function addInvalidTab(tabId: string) {
     invalidTabs.current.add(tabId);
@@ -55,22 +58,24 @@ export const TabPanelValidationHandler = observer(function TabPanelValidationHan
       await state?.open(firstInvalidTab);
       resetInvalidTabs();
     }
-    
+
+    if (formContext === null) {
+      return;
+    }
+
     formContext?.parent?.ref?.removeEventListener('invalid', goNextTab, true);
     formContext?.parent?.ref?.addEventListener('invalid', goNextTab, true);
 
     return () => {
       formContext?.parent?.ref?.removeEventListener('invalid', goNextTab, true);
     };
-  }, []);
+  }, [selectedTab, state, formContext]);
 
-  const value = useMemo(() => ({ addInvalidTab, invalidTabs }), []);
+  const value = useObjectRef(() => ({ addInvalidTab, invalidTabs }), { invalidTabs });
 
   return (
     <TabPanelValidationHandlerContext.Provider value={value}>
-      <div ref={containerRef}>
-        {children}
-      </div>
+      {children}
     </TabPanelValidationHandlerContext.Provider>
   );
 });

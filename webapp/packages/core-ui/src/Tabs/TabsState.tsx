@@ -17,6 +17,7 @@ import { isDefined, isNull, isUndefined, MetadataMap, MetadataValueGetter } from
 
 import type { ITabData, ITabInfo, ITabsContainer } from './TabsContainer/ITabsContainer';
 import { ITabsContext, type TabDirection, TabsContext } from './TabsContext';
+import { TabPanelValidationHandler } from './TabPanelValidationHandler';
 
 type ExtractContainerProps<T> = T extends void ? Record<string, any> : T;
 
@@ -292,5 +293,11 @@ export const TabsState = observer(function TabsState<T = Record<string, any>>({
     );
   }
 
-  return <TabsContext.Provider value={value}>{children}</TabsContext.Provider>;
+  return (
+    <TabsContext.Provider value={value}>
+      <TabPanelValidationHandler>
+        {children}
+      </TabPanelValidationHandler>
+    </TabsContext.Provider>
+  );
 });

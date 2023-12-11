@@ -17,7 +17,6 @@ import { BASE_TAB_STYLES } from './Tab/BASE_TAB_STYLES';
 import { TabPanel } from './TabPanel';
 import type { ITabInfo } from './TabsContainer/ITabsContainer';
 import { TabsContext } from './TabsContext';
-import { TabPanelValidationHandler } from './TabPanelValidationHandler';
 
 interface Props extends React.PropsWithChildren {
   style?: ComponentStyle;
@@ -43,7 +42,7 @@ export const TabPanelList = observer<Props>(function TabPanelList({ style, child
   const displayed = state.container.getDisplayed(state.props);
 
   return styled(styles)(
-    <TabPanelValidationHandler>
+    <>
       {displayed
         .map(
           generateTabElement(
@@ -57,6 +56,6 @@ export const TabPanelList = observer<Props>(function TabPanelList({ style, child
         )
         .flat()}
       {children}
-    </TabPanelValidationHandler>,
+    </>,
   );
 });
