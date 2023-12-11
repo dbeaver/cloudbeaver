@@ -75,6 +75,6 @@ export function useExecutor<T>(options: IUseExecutorOptions<T>): void {
       }
     };
   }, [
-    executor, props.handlers?.length, props.postHandlers?.length, props.handlers, before, next,
+    executor, props.handlers?.length, props.postHandlers?.length, before, next,
   ]);
 }
