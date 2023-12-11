@@ -4,6 +4,8 @@ import { TabsContext } from './TabsContext';
 import { FormContext, useExecutor, useObjectRef } from '@cloudbeaver/core-blocks';
 import { TabPanelValidationHandlerContext } from './TabPanelValidationHandlerContext';
 import { SyncExecutor } from '@cloudbeaver/core-executor';
+import { useService } from '@cloudbeaver/core-di';
+import { NotificationService } from '@cloudbeaver/core-events';
 
 export interface ITabPanelHandlerProps {
   children: React.ReactNode;
@@ -15,6 +17,7 @@ export const TabPanelValidationHandler = observer(function TabPanelValidationHan
   const selectedTab = state?.state.selectedId;
   const invalidTabs = useRef<Set<string>>(new Set());
   const [resetExecutor] = useState(() => new SyncExecutor());
+  const notificationService = useService(NotificationService);
 
   if (!state) {
     throw new Error('TabsState should be defined');
@@ -24,7 +27,7 @@ export const TabPanelValidationHandler = observer(function TabPanelValidationHan
     invalidTabs.current = new Set();
   }
 
-  const validate = useCallback((tabId: string) => {
+  const validate = useCallback(async (tabId: string) => {
     invalidTabs.current.add(tabId);
   
     setTimeout(() => {
@@ -38,9 +41,13 @@ export const TabPanelValidationHandler = observer(function TabPanelValidationHan
         return;
       }
 
-      state.open(next);
+      state.open(next).then(() => {
+        formContext?.reportValidity();
+      }).catch(() => {
+        notificationService.logError({ title: 'core_ui_form_save_error', message: 'core_ui_switch_tab_error' });
+      });
     }, 0);
-  }, [selectedTab, state]);
+  }, [selectedTab, state, formContext]);
 
   useExecutor({
     executor: resetExecutor,
