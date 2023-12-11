@@ -273,28 +273,22 @@ public class WebSession extends BaseWebSession
                 continue;
             }
             switch (type) {
-                case DATASOURCE_CREATED: {
+                case DATASOURCE_CREATED -> {
                     WebConnectionInfo connectionInfo = new WebConnectionInfo(this, ds);
                     this.connections.put(connectionInfo.getId(), connectionInfo);
                     sendDataSourceUpdatedEvent = true;
-                    break;
                 }
-                case DATASOURCE_UPDATED: {
-                    // if settings were changed we need to send event
+                case DATASOURCE_UPDATED -> // if settings were changed we need to send event
                     sendDataSourceUpdatedEvent |= !ds.equalSettings(oldDataSources.get(dsId));
-                    break;
-                }
-                case DATASOURCE_DELETED: {
+                case DATASOURCE_DELETED -> {
                     WebDataSourceUtils.disconnectDataSource(this, ds);
-                    if (registry instanceof DBPDataSourceRegistryCache) {
-                        ((DBPDataSourceRegistryCache) registry).removeDataSourceFromList(ds);
+                    if (registry instanceof DBPDataSourceRegistryCache dsrc) {
+                        dsrc.removeDataSourceFromList(ds);
                     }
                     this.connections.remove(ds.getId());
                     sendDataSourceUpdatedEvent = true;
-                    break;
                 }
-                default: {
-                    break;
+                default -> {
                 }
             }
         }
@@ -764,8 +758,8 @@ public class WebSession extends BaseWebSession
     public <T> T getAttribute(String name) {
         synchronized (attributes) {
             Object value = attributes.get(name);
-            if (value instanceof PersistentAttribute) {
-                value = ((PersistentAttribute) value).getValue();
+            if (value instanceof PersistentAttribute persistentAttribute) {
+                value = persistentAttribute.getValue();
             }
             return (T) value;
         }
@@ -780,8 +774,8 @@ public class WebSession extends BaseWebSession
     public <T> T getAttribute(String name, Function<T, T> creator, Function<T, T> disposer) {
         synchronized (attributes) {
             Object value = attributes.get(name);
-            if (value instanceof PersistentAttribute) {
-                value = ((PersistentAttribute) value).getValue();
+            if (value instanceof PersistentAttribute persistentAttribute) {
+                value = persistentAttribute.getValue();
             }
             if (value == null) {
                 value = creator.apply(null);
@@ -965,9 +959,7 @@ public class WebSession extends BaseWebSession
 
     private <T> boolean isAuthInfoInstanceOf(WebAuthInfo authInfo, Class<T> adapter) {
         if (authInfo != null && authInfo.getAuthSession() != null) {
-            if (adapter.isInstance(authInfo.getAuthSession())) {
-                return true;
-            }
+            return adapter.isInstance(authInfo.getAuthSession());
         }
         return false;
     }

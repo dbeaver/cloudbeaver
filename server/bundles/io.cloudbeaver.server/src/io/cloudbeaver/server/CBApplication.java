@@ -557,7 +557,12 @@ public abstract class CBApplication extends BaseWebApplication implements WebAut
             } else if (serverURL == null) {
                 String hostName = serverHost;
                 if (CommonUtils.isEmpty(hostName)) {
-                    hostName = InetAddress.getLocalHost().getHostName();
+                    try {
+                        hostName = InetAddress.getLocalHost().getHostName();
+                    } catch (UnknownHostException e) {
+                        log.debug("Error resolving localhost address: " + e.getMessage());
+                        hostName = "localhost";
+                    }
                 }
                 serverURL = "http://" + hostName + ":" + serverPort;
             }
@@ -604,7 +609,7 @@ public abstract class CBApplication extends BaseWebApplication implements WebAut
                 }
             }
             parseAdditionalConfiguration(configProps);
-        } catch (IOException | DBException e) {
+        } catch (DBException e) {
             throw new DBException("Error parsing server configuration", e);
         }
 
