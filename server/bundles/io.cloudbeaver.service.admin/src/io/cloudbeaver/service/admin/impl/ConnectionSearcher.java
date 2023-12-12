@@ -17,10 +17,10 @@
 package io.cloudbeaver.service.admin.impl;
 
 import io.cloudbeaver.model.session.WebSession;
+import io.cloudbeaver.model.utils.ConfigurationUtils;
 import io.cloudbeaver.server.CBAppConfig;
 import io.cloudbeaver.server.CBApplication;
 import io.cloudbeaver.server.CBPlatform;
-import io.cloudbeaver.model.utils.ConfigurationUtils;
 import io.cloudbeaver.service.admin.AdminConnectionSearchInfo;
 import org.jkiss.dbeaver.model.connection.DBPDriver;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;

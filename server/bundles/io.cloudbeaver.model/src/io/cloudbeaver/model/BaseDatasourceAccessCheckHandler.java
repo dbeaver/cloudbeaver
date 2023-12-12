@@ -7,7 +7,7 @@ import org.jkiss.dbeaver.model.DBPDataSourceHandler;
 import org.jkiss.dbeaver.model.connection.DBPDriver;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 
-abstract public class BaseDatasourceAccessCheckHandler implements DBPDataSourceHandler {
+public abstract class BaseDatasourceAccessCheckHandler implements DBPDataSourceHandler {
     @Override
     public void beforeConnect(
         DBRProgressMonitor monitor,

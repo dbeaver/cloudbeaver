@@ -22,7 +22,7 @@ import io.cloudbeaver.server.CBAppConfig;
 import io.cloudbeaver.server.CBApplication;
 import org.jkiss.dbeaver.model.connection.DBPDriver;
 
-public class WebDatasourceAccessCheckHandler extends BaseDatasourceAccessCheckHandler{
+public class WebDatasourceAccessCheckHandler extends BaseDatasourceAccessCheckHandler {
     @Override
     protected boolean isDriverDisabled(DBPDriver driver) {
         CBAppConfig config = CBApplication.getInstance().getAppConfiguration();
