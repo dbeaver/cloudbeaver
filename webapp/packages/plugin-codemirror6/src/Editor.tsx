@@ -43,7 +43,6 @@ export const Editor = observer<IEditorProps & IDefaultExtensions, IEditorRef>(
   ) {
     extensions = useCodemirrorExtensions(extensions);
 
-
     const defaultExtensions = useEditorDefaultExtensions({
       lineNumbers,
       tooltips,
