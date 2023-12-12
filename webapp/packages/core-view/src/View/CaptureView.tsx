@@ -8,9 +8,7 @@
 import { observer } from 'mobx-react-lite';
 import { useContext } from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
-import styled, { css } from 'reshadow';
-
-import { useFocus } from '@cloudbeaver/core-blocks';
+import { s, useFocus, useS } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { isObjectsEqual } from '@cloudbeaver/core-utils';
 
@@ -22,12 +20,7 @@ import type { IView } from './IView';
 import { parseHotkey } from './parseHotkey';
 import { useActiveView } from './useActiveView';
 import { useViewContext } from './useViewContext';
-
-const styles = css`
-  div {
-    outline: none;
-  }
-`;
+import styles from './CaptureView.m.css';
 
 interface Props {
   view: IView<any>;
@@ -40,6 +33,7 @@ export const CaptureView = observer<React.PropsWithChildren<Props>>(function Cap
   const actionService = useService(ActionService);
   const activeView = useActiveView(view);
   const [ref, state] = useFocus<HTMLDivElement>({ onFocus: activeView.focusView, onBlur: activeView.blurView });
+  const style = useS(styles);
 
   const actionItems = view.actions
     .map(action => actionService.getAction(viewContext, action))
@@ -85,11 +79,11 @@ export const CaptureView = observer<React.PropsWithChildren<Props>>(function Cap
     },
   );
 
-  return styled(styles)(
+  return (
     <CaptureViewContext.Provider value={viewContext}>
-      <div ref={ref} className={className} tabIndex={0}>
+      <div ref={ref} className={s(style, { container: true }, className)} tabIndex={0}>
         {children}
       </div>
-    </CaptureViewContext.Provider>,
+    </CaptureViewContext.Provider>
   );
 });

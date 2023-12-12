@@ -5,21 +5,14 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import styled, { css } from 'reshadow';
-
-import { Translate } from '@cloudbeaver/core-blocks';
-
-const styles = css`
-  wizard-title {
-    text-transform: uppercase;
-    font-weight: 700;
-  }
-`;
+import { Translate, s, useS } from '@cloudbeaver/core-blocks';
+import styles from './ConfigurationWizardTitle.m.css';
 
 export function ConfigurationWizardTitle() {
-  return styled(styles)(
-    <wizard-title as="div">
+  const style = useS(styles);
+  return (
+    <div  className={s(style, { wizardTitle : true })}>
       <Translate token="administration_configuration_wizard_title" />
-    </wizard-title>,
+    </div>
   );
 }
