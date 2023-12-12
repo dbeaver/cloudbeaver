@@ -13,6 +13,7 @@ interface Props {
   title?: string;
   min?: boolean;
   flex?: boolean;
+  heightBig?: boolean;
   centerContent?: boolean;
   className?: string;
 }
@@ -20,6 +21,7 @@ interface Props {
 export const TableColumnHeader: React.FC<React.PropsWithChildren<Props>> = function TableColumnHeader({
   title,
   min,
+  heightBig,
   flex,
   centerContent,
   className,
@@ -28,7 +30,7 @@ export const TableColumnHeader: React.FC<React.PropsWithChildren<Props>> = funct
   const styles = useS(style);
 
   return (
-    <th title={title} className={s(styles, { min, centerContent, columnHeader: true }, className)}>
+    <th title={title} className={s(styles, { min, heightBig, centerContent, columnHeader: true }, className)}>
       {flex ? <div className={s(styles, { thFlex: true }, className)}>{children}</div> : children}
     </th>
   );

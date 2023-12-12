@@ -1,6 +1,6 @@
 {
   "license": {
-    "scope": "typescript,typescriptreact,javascript,javascriptreact",
+    "scope": "typescript,typescriptreact,javascript,javascriptreact,css,scss",
     "prefix": "license",
     "body": [
       "/*",
