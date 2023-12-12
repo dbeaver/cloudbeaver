@@ -1,5 +1,7 @@
 /* eslint-disable */
 /// <reference path="../../node_modules/reshadow/elements.d.ts" />
+import { GraphQLError } from 'graphql';
+import msw from 'msw';
 
 declare module '*.scss?raw' {
   const classes: { readonly [key: string]: string };
@@ -81,4 +83,19 @@ declare module 'reshadow' {
   declare var jsx: typeof createElement;
 
   export default styled;
+}
+
+// types are not exported: https://github.com/mswjs/msw/pull/1826
+declare module 'msw' {
+  export type GraphQLResolverExtras<Variables extends msw.GraphQLVariables> = {
+    query: string;
+    operationName: string;
+    variables: Variables;
+    cookies: Record<string, string>;
+  };
+
+  export interface GraphQLResponseBody<BodyType extends msw.DefaultBodyType> {
+    data?: BodyType | null;
+    errors?: readonly Partial<GraphQLError>[] | null;
+  }
 }

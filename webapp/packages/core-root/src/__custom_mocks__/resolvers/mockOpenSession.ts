@@ -5,14 +5,15 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { HttpResponse, ResponseResolverReturnType } from 'msw';
+import { GraphQLResolverExtras, GraphQLResponseBody, HttpResponse, ResponseResolver } from 'msw';
 
-import type { OpenSessionMutation } from '@cloudbeaver/core-sdk';
+import type { OpenSessionMutation, OpenSessionMutationVariables } from '@cloudbeaver/core-sdk';
 
-import type { GraphQLResponseBody } from './IGraphQLResponseBody';
-import type { IResponseResolverInfo } from './IResponseResolverInfo';
-
-export function mockOpenSession(info: IResponseResolverInfo): ResponseResolverReturnType<GraphQLResponseBody<OpenSessionMutation>> {
+export const mockOpenSession: ResponseResolver<
+  GraphQLResolverExtras<OpenSessionMutationVariables>,
+  null,
+  GraphQLResponseBody<OpenSessionMutation>
+> = function mockOpenSession(info) {
   const date = new Date().toISOString();
 
   return HttpResponse.json({
@@ -28,4 +29,4 @@ export function mockOpenSession(info: IResponseResolverInfo): ResponseResolverRe
       },
     },
   });
-}
+};

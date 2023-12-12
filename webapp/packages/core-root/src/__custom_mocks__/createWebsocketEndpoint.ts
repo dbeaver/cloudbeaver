@@ -5,7 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { HttpResponse, http } from 'msw';
+import { http, HttpResponse } from 'msw';
 
 // TODO: use new msw API https://github.com/mswjs/msw/issues/156
 export function createWebsocketEndpoint(): ReturnType<typeof http.get> {
