@@ -16,6 +16,10 @@ import { isDefined, isNotNullDefined } from '@cloudbeaver/core-utils';
 import { TabsContext } from './TabsContext';
 import { TabsValidationContext } from './TabsValidationContext';
 
+export enum VALIDATION_SCHEDULE_TAB_SWITCH_STATUS {
+  NOT_ACTIVE = 1,
+}
+
 export const TabsValidation = observer(function TabsValidation({ children }: React.PropsWithChildren) {
   const tabsContext = useContext(TabsContext);
   const formContext = useContext(FormContext);
@@ -28,7 +32,7 @@ export const TabsValidation = observer(function TabsValidation({ children }: Rea
   const innerState = useObjectRef(
     () => ({
       invalidTabs: new Set<string>(),
-      scheduledTabSwitch: -1,
+      scheduledTabSwitch: VALIDATION_SCHEDULE_TAB_SWITCH_STATUS.NOT_ACTIVE,
       invalidate(tabId: string) {
         this.invalidTabs.add(tabId);
         this.scheduleTabSwitch();
@@ -51,21 +55,21 @@ export const TabsValidation = observer(function TabsValidation({ children }: Rea
         this.clearScheduledTabSwitch();
 
         this.scheduledTabSwitch = setTimeout(() => {
-          this.scheduledTabSwitch = -1;
+          this.scheduledTabSwitch = VALIDATION_SCHEDULE_TAB_SWITCH_STATUS.NOT_ACTIVE;
 
           this.selectNextInvalidTab();
           this.reset();
         }, 0) as any;
       },
       clearScheduledTabSwitch() {
-        if (this.scheduledTabSwitch !== -1) {
+        if (this.scheduledTabSwitch !== VALIDATION_SCHEDULE_TAB_SWITCH_STATUS.NOT_ACTIVE) {
           clearTimeout(this.scheduledTabSwitch);
-          this.scheduledTabSwitch = -1;
+          this.scheduledTabSwitch = VALIDATION_SCHEDULE_TAB_SWITCH_STATUS.NOT_ACTIVE;
         }
       },
     }),
     { tabsContext, formContext, notificationService },
-    ['invalidate'],
+    ['invalidate', 'reset'],
   );
 
   return <TabsValidationContext.Provider value={innerState}>{children}</TabsValidationContext.Provider>;

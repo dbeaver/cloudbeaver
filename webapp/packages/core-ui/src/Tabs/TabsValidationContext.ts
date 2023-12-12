@@ -9,6 +9,8 @@ import { createContext } from 'react';
 
 export interface ITabsValidationContext {
   invalidate: (tabId: string) => void;
+  reset: VoidFunction;
+  readonly scheduledTabSwitch: number;
 }
 
 export const TabsValidationContext = createContext<ITabsValidationContext | null>(null);
