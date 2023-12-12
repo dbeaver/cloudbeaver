@@ -40,7 +40,7 @@ export const TabList = observer<React.PropsWithChildren<Props>>(function TabList
         {...props}
         className={s(componentStyle, { tabList: true }, className)}
         {...state.state}
-        area-label={translate(props['aria-label'] ?? state.container.areaLabel)}
+        aria-label={translate(props['aria-label'] ?? state.container.areaLabel)}
       >
         {childrenFirst && children}
         {displayed
@@ -71,7 +71,7 @@ export const TabList = observer<React.PropsWithChildren<Props>>(function TabList
   }
 
   return (
-    <BaseTabList {...props} className={s(componentStyle, { tabList: true }, className)} {...state.state} area-label={translate(props['aria-label'])}>
+    <BaseTabList {...props} className={s(componentStyle, { tabList: true }, className)} {...state.state} aria-label={translate(props['aria-label'])}>
       {children}
     </BaseTabList>
   );
