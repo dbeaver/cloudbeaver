@@ -11,7 +11,6 @@ import { getComputed, useObjectRef } from '@cloudbeaver/core-blocks';
 
 import { TabsContext } from './TabsContext';
 import { TabsValidationContext } from './TabsValidationContext';
-import { VALIDATION_SCHEDULE_TAB_SWITCH_STATUS } from './TabsValidation';
 
 export function useTabsValidation(tabId: string): React.RefObject<HTMLDivElement> {
   const tabContextState = useContext(TabsContext);
@@ -20,23 +19,15 @@ export function useTabsValidation(tabId: string): React.RefObject<HTMLDivElement
   }
 
   const panelRef = useRef<HTMLDivElement>(null);
-  const tabsValidationContext = useContext(TabsValidationContext);
+  const tabPanelValidationHandlerContext = useContext(TabsValidationContext);
   const selected = getComputed(() => tabContextState.state.selectedId === tabId);
 
-  if (!tabsValidationContext) {
-    throw new Error('Tabs validation context was not provided');
-  }
-
-  const tabPropsRef = useObjectRef({ tabId, tabsValidationContext });
+  const tabPropsRef = useObjectRef({ tabId, tabPanelValidationHandlerContext });
   const validationState = useObjectRef(
     () => ({
       invalidElement: null as HTMLInputElement | null,
       invalidate(event: Event) {
-        if (tabsValidationContext?.scheduledTabSwitch === VALIDATION_SCHEDULE_TAB_SWITCH_STATUS.NOT_ACTIVE) {
-          tabsValidationContext.reset();
-        }
-
-        tabPropsRef.tabsValidationContext?.invalidate(tabPropsRef.tabId);
+        tabPropsRef.tabPanelValidationHandlerContext?.invalidate(tabPropsRef.tabId);
 
         if (this.invalidElement === null) {
           this.invalidElement = event.target as HTMLInputElement | null;
