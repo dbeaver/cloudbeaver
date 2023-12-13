@@ -34,8 +34,8 @@ import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.rm.RMProject;
 import org.jkiss.utils.ArrayUtils;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;

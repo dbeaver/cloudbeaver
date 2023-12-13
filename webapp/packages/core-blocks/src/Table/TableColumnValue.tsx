@@ -26,12 +26,16 @@ type Props = {
   ellipsis?: boolean;
   flex?: boolean;
   expand?: boolean;
+  nowrap?: boolean;
   onClick?: () => void;
   onDoubleClick?: () => void;
 } & React.DetailedHTMLProps<React.TdHTMLAttributes<HTMLTableCellElement>, HTMLTableCellElement>;
 
 export const TableColumnValue = observer<Props, HTMLTableCellElement>(
-  forwardRef(function TableColumnValue({ align, children, centerContent, ellipsis, flex, expand, className, onClick, onDoubleClick, ...rest }, ref) {
+  forwardRef(function TableColumnValue(
+    { align, children, centerContent, ellipsis, flex, expand, nowrap, className, onClick, onDoubleClick, ...rest },
+    ref,
+  ) {
     const tableContext = useContext(TableContext);
     const context = useContext(TableItemContext);
     const props = useObjectRef({ onClick, onDoubleClick });
@@ -67,7 +71,7 @@ export const TableColumnValue = observer<Props, HTMLTableCellElement>(
       <td
         ref={ref}
         align={align}
-        className={s(styles, { centerContent, ellipsis, cell: true }, className)}
+        className={s(styles, { centerContent, ellipsis, nowrap, cell: true }, className)}
         onClick={handleClick}
         onDoubleClick={handleDoubleClick}
         {...rest}
