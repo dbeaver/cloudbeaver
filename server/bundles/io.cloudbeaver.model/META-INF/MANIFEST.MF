@@ -18,7 +18,7 @@ Require-Bundle: org.jkiss.dbeaver.data.gis;visibility:=reexport,
  org.jkiss.bundle.graphql.java;visibility:=reexport,
  org.jkiss.bundle.apache.dbcp,
  com.google.gson;visibility:=reexport,
- jakarta.servlet-api;bundle-version="[5.0.0,5.0.0]";visibility:=reexport
+ jakarta.servlet;visibility:=reexport
 Export-Package: io.cloudbeaver,
  io.cloudbeaver.auth,
  io.cloudbeaver.auth.provider,
