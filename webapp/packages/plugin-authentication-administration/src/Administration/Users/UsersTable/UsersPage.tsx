@@ -6,11 +6,9 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import styled from 'reshadow';
 
-import { ADMINISTRATION_TOOLS_PANEL_STYLES, IAdministrationItemSubItem } from '@cloudbeaver/core-administration';
 import { AuthRolesResource } from '@cloudbeaver/core-authentication';
-import { ColoredContainer, Container, Group, Placeholder, useAutoLoad, useResource, useStyles } from '@cloudbeaver/core-blocks';
+import { ColoredContainer, Container, Group, Placeholder, useAutoLoad, useResource } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 
 import { AdministrationUsersManagementService } from '../../../AdministrationUsersManagementService';
@@ -23,12 +21,10 @@ import { UsersTable } from './UsersTable';
 import { useUsersTable } from './useUsersTable';
 
 interface Props {
-  sub?: IAdministrationItemSubItem;
   param?: string | null;
 }
 
-export const UsersPage = observer<Props>(function UsersPage({ sub, param }) {
-  const style = useStyles(ADMINISTRATION_TOOLS_PANEL_STYLES);
+export const UsersPage = observer<Props>(function UsersPage({ param }) {
   const createUserService = useService(CreateUserService);
   const authRolesResource = useResource(UsersPage, AuthRolesResource, undefined);
   const administrationUsersManagementService = useService(AdministrationUsersManagementService);
@@ -42,13 +38,17 @@ export const UsersPage = observer<Props>(function UsersPage({ sub, param }) {
   const loading = authRolesResource.isLoading() || table.loadableState.isLoading();
   const userManagementDisabled = administrationUsersManagementService.externalUserProviderEnabled;
 
-  return styled(style)(
-    <ColoredContainer vertical wrap gap parent>
-      <Group box keepSize>
+  return (
+    <ColoredContainer vertical wrap gap parent maximum>
+      <Group keepSize box maximum>
         <UsersAdministrationToolsPanel onUpdate={table.update} />
       </Group>
 
-      <Container overflow gap>
+      <Group keepSize box maximum>
+        <UsersTableFilters filters={filters} />
+      </Group>
+
+      <Container overflow gap maximum>
         {create && createUserService.state && !userManagementDisabled && (
           <Group box>
             <CreateUser state={createUserService.state} onCancel={createUserService.cancelCreate} />
@@ -56,10 +56,6 @@ export const UsersPage = observer<Props>(function UsersPage({ sub, param }) {
         )}
 
         <Placeholder container={createUserService.toolsContainer} param={param} />
-
-        <Group box>
-          <UsersTableFilters filters={filters} />
-        </Group>
 
         <Group boxNoOverflow>
           <UsersTable
@@ -73,6 +69,6 @@ export const UsersPage = observer<Props>(function UsersPage({ sub, param }) {
           />
         </Group>
       </Container>
-    </ColoredContainer>,
+    </ColoredContainer>
   );
 });
