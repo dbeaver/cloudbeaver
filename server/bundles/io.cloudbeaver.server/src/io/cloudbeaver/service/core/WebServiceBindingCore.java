@@ -31,8 +31,8 @@ import io.cloudbeaver.service.WebServiceBindingBase;
 import io.cloudbeaver.service.core.impl.WebServiceCore;
 import io.cloudbeaver.service.session.WebSessionManager;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;

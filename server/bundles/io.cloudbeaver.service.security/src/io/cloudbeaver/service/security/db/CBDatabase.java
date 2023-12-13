@@ -57,6 +57,7 @@ import org.jkiss.utils.SecurityUtils;
 
 import java.io.*;
 import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
 import java.sql.*;
 import java.util.*;
@@ -458,8 +459,12 @@ public class CBDatabase {
     }
 
     private void checkInstanceRecord(Connection connection) throws SQLException, IOException {
-        InetAddress localHost = InetAddress.getLocalHost();
-        String hostName = localHost.getHostName();
+        String hostName;
+        try {
+            hostName = InetAddress.getLocalHost().getHostName();
+        } catch (UnknownHostException e) {
+            hostName = "localhost";
+        }
         byte[] hardwareAddress = RuntimeUtils.getLocalMacAddress();
         String macAddress = CommonUtils.toHexString(hardwareAddress);
 

@@ -54,8 +54,8 @@ export const UsersTable = observer<Props>(function UsersTable({
         <TableColumnHeader>{translate('authentication_user_name')}</TableColumnHeader>
         {displayAuthRole && <TableColumnHeader>{translate('authentication_user_role')}</TableColumnHeader>}
         <TableColumnHeader>{translate('authentication_user_team')}</TableColumnHeader>
-        <TableColumnHeader>{translate('authentication_user_enabled')}</TableColumnHeader>
-        <TableColumnHeader>{translate('authentication_user_credentials')}</TableColumnHeader>
+        <TableColumnHeader min>{translate('authentication_user_enabled')}</TableColumnHeader>
+        <TableColumnHeader>{translate('authentication_administration_user_auth_methods')}</TableColumnHeader>
       </TableHeader>
       <TableBody>
         {users.map(user => (
