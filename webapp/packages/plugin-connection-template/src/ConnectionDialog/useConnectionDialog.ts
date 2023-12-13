@@ -164,7 +164,7 @@ export function useConnectionDialog(onConnect?: () => void) {
           }
         }
 
-        this.step = ConnectionStep.Connection;
+        this.setStep(ConnectionStep.Connection);
 
         if (!this.authModelId) {
           this.connect();

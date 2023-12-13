@@ -11,6 +11,7 @@ import { useMemo, useState } from 'react';
 import { ItemList, ItemListSearch, useResource } from '@cloudbeaver/core-blocks';
 import { DBDriverResource } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
+import { ProjectInfoResource } from '@cloudbeaver/core-projects';
 import { CachedMapAllKey } from '@cloudbeaver/core-resource';
 
 import { TemplateConnectionsResource } from '../../TemplateConnectionsResource';
@@ -23,7 +24,8 @@ interface Props {
 }
 
 export const TemplateConnectionSelector = observer<Props>(function TemplateConnectionSelector({ className, onSelect }) {
-  useResource(TemplateConnectionSelector, TemplateConnectionsResource, undefined);
+  useResource(TemplateConnectionSelector, ProjectInfoResource, CachedMapAllKey, { forceSuspense: true });
+  useResource(TemplateConnectionSelector, TemplateConnectionsResource, undefined, { forceSuspense: true });
   const dbDriverResource = useResource(TemplateConnectionSelector, DBDriverResource, CachedMapAllKey);
   const templateConnectionsService = useService(TemplateConnectionsService);
 
