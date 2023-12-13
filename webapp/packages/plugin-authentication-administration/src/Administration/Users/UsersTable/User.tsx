@@ -34,6 +34,9 @@ const styles = css`
   TableColumnValue[|gap] {
     gap: 16px;
   }
+  TableColumnValue[|overflow] {
+    overflow: auto !important;
+  }
 `;
 
 interface Props {
@@ -95,7 +98,7 @@ export const User = observer<Props>(function User({ user, displayAuthRole, selec
           onChange={handleEnabledCheckboxChange}
         />
       </TableColumnValue>
-      <TableColumnValue flex {...use({ gap: true })}>
+      <TableColumnValue flex {...use({ gap: true, overflow: true })} ellipsis>
         <Loader suspense small inline hideMessage>
           <Placeholder container={usersAdministrationService.userDetailsInfoPlaceholder} user={user} />
         </Loader>

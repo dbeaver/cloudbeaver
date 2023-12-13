@@ -20,13 +20,6 @@ import { TableFooterMenu } from './TableFooterMenu/TableFooterMenu';
 import { TableFooterRowCount } from './TableFooterRowCount';
 
 const tableFooterStyles = css`
-  ToolsPanel {
-    align-items: center;
-    flex: 0 0 auto;
-    overflow: auto;
-    min-height: 32px;
-    height: initial;
-  }
   count input,
   count placeholder {
     height: 26px;
@@ -103,7 +96,7 @@ export const TableFooter = observer<Props>(function TableFooter({ resultIndex, m
   const disabled = getComputed(() => model.isLoading() || model.isDisabled(resultIndex));
 
   return styled(tableFooterStyles)(
-    <ToolsPanel>
+    <ToolsPanel type="secondary">
       {/* <reload aria-disabled={disabled} onClick={() => model.refresh()}>
         <IconOrImage icon='reload' viewBox="0 0 16 16" />
       </reload> */}
@@ -130,6 +123,6 @@ export const TableFooter = observer<Props>(function TableFooter({ resultIndex, m
           {model.source.requestInfo.requestMessage} - {model.source.requestInfo.requestDuration}ms
         </time>
       )}
-    </ToolsPanel>,
+    </ToolsPanel>
   );
 });

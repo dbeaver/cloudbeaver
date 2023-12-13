@@ -7,11 +7,11 @@
  */
 import { Suspense } from 'react';
 import { createRoot, Root } from 'react-dom/client';
-import styled from 'reshadow';
 
 import { Body } from '@cloudbeaver/core-app';
-import { DisplayError, ErrorBoundary, Loader } from '@cloudbeaver/core-blocks';
+import { DisplayError, ErrorBoundary, Loader, s } from '@cloudbeaver/core-blocks';
 import { AppContext, IServiceInjector } from '@cloudbeaver/core-di';
+import styles from './renderLayout.m.css';
 
 interface IRender {
   initRoot(): Root;
@@ -46,18 +46,14 @@ export function renderLayout(serviceInjector: IServiceInjector): IRender {
     },
     renderApp() {
       this.initRoot().render(
-        styled`
-          Loader {
-            height: 100vh;
-          }
-        `(
+        (
           <AppContext app={serviceInjector}>
             <ErrorBoundary root>
-              <Suspense fallback={<Loader />}>
+              <Suspense fallback={<Loader className={s(styles, { loader: true })} />}>
                 <Body />
               </Suspense>
             </ErrorBoundary>
-          </AppContext>,
+          </AppContext>
         ),
       );
     },
