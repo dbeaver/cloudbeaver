@@ -6,11 +6,10 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import styled, { css } from 'reshadow';
 import { gte } from 'semver';
 
 import type { AdministrationItemContentComponent } from '@cloudbeaver/core-administration';
-import { ColoredContainer, useResource, useStyles } from '@cloudbeaver/core-blocks';
+import { ColoredContainer, s, useResource, useS, useStyles } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { CachedMapAllKey } from '@cloudbeaver/core-resource';
 import { VersionResource, VersionService } from '@cloudbeaver/core-version';
@@ -18,16 +17,10 @@ import { VersionUpdateService } from '@cloudbeaver/core-version-update';
 
 import { VersionChecker } from './VersionChecker';
 import { VersionSelector } from './VersionSelector';
-
-const styles = css`
-  ColoredContainer {
-    composes: theme-typography--body2 from global;
-    list-style-position: inside;
-  }
-`;
+import styles from './VersionUpdate.m.css';
 
 export const VersionUpdate: AdministrationItemContentComponent = observer(function VersionUpdate() {
-  const style = useStyles(styles);
+  const style = useS(styles);
   const versionService = useService(VersionService);
   const versionUpdateService = useService(VersionUpdateService);
   const versionResource = useResource(VersionUpdate, VersionResource, CachedMapAllKey, {
@@ -37,8 +30,8 @@ export const VersionUpdate: AdministrationItemContentComponent = observer(functi
   const GeneralInstructions = versionUpdateService.generalInstructionsGetter?.();
   const versions = versionResource.resource.values.filter(v => gte(v.number, versionService.current));
 
-  return styled(style)(
-    <ColoredContainer wrap gap overflow parent>
+  return (
+    <ColoredContainer className={s(style, { coloredContainer: true })} wrap gap overflow parent>
       <VersionChecker />
       {versions.length > 0 && (
         <>
@@ -46,6 +39,6 @@ export const VersionUpdate: AdministrationItemContentComponent = observer(functi
           <VersionSelector versions={versions} />
         </>
       )}
-    </ColoredContainer>,
+    </ColoredContainer>
   );
 });
