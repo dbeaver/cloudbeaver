@@ -17,5 +17,5 @@ export function filterContainerFakeProps<T extends IContainerProps>(props: T): O
 
 export function getContainerProps<T extends IContainerProps>(props: T): IContainerProps {
   const { hideEmpty, flexStart, flexEnd, baseline, center, vertical, wrap, overflow, parent, gap, grid, dense, compact, ...rest } = props;
-  return { hideEmpty, flexStart, flexEnd, baseline, center, vertical, wrap, overflow, parent, gap, grid, dense, compact, ...getLayoutProps(props) };
+  return { hideEmpty, flexStart, flexEnd, baseline, center, vertical, wrap, overflow, parent, gap, grid, dense, compact, ...getLayoutProps(rest) };
 }
