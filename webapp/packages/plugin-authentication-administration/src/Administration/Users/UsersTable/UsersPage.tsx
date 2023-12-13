@@ -6,6 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
+
 import { AuthRolesResource } from '@cloudbeaver/core-authentication';
 import { ColoredContainer, Container, Group, Placeholder, useAutoLoad, useResource } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
@@ -38,12 +39,16 @@ export const UsersPage = observer<Props>(function UsersPage({ param }) {
   const userManagementDisabled = administrationUsersManagementService.externalUserProviderEnabled;
 
   return (
-    <ColoredContainer vertical wrap gap parent>
-      <Group box keepSize>
+    <ColoredContainer vertical wrap gap parent maximum>
+      <Group keepSize box maximum>
         <UsersAdministrationToolsPanel onUpdate={table.update} />
       </Group>
 
-      <Container overflow gap>
+      <Group keepSize box maximum>
+        <UsersTableFilters filters={filters} />
+      </Group>
+
+      <Container overflow gap maximum>
         {create && createUserService.state && !userManagementDisabled && (
           <Group box>
             <CreateUser state={createUserService.state} onCancel={createUserService.cancelCreate} />
@@ -51,10 +56,6 @@ export const UsersPage = observer<Props>(function UsersPage({ param }) {
         )}
 
         <Placeholder container={createUserService.toolsContainer} param={param} />
-
-        <Group box>
-          <UsersTableFilters filters={filters} />
-        </Group>
 
         <Group boxNoOverflow>
           <UsersTable
