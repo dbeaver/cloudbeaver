@@ -4,16 +4,13 @@
   height: 8px;
   border-radius: 100%;
   margin-right: 4px;
-  margin-left: -4px;
   display: inline-block;
   vertical-align: middle;
   flex-shrink: 0;
 }
 
 .readonlyIcon {
-  position: absolute;
   cursor: auto;
   width: 10px;
-  bottom: 12px;
-  right: 12px;
+  margin-right: 4px;
 }
