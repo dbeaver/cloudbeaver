@@ -12,6 +12,10 @@ export default [
   ['authentication_administration_user_origin_empty', 'No available details'],
   ['authentication_administration_user_info', 'Info'],
   ['authentication_administration_user_local', 'Local user'],
+  ['authentication_administration_user_auth_method', 'Auth Method'],
+  ['authentication_administration_user_auth_methods', 'Auth Methods'],
+  ['authentication_administration_user_auth_methods_empty', 'No available auth methods'],
+  ['authentication_administration_user_auth_method_no_details', 'No details available'],
   ['authentication_administration_item', 'Access Management'],
   ['authentication_administration_item_users', 'Users'],
   ['authentication_administration_item_metaParameters', 'Meta Parameters'],
@@ -50,11 +54,11 @@ export default [
     'Deleting this account will permanently remove all associated user data from the system. Please confirm you want to proceed with deletion of "{arg:username}" user.',
   ],
 
-  ['authentication_administration_user_remove_credentials_error', 'Failed to remove user credentials'],
-  ['authentication_administration_user_remove_credentials_success', 'User credentials were removed'],
+  ['authentication_administration_user_delete_credentials_error', 'Failed to remove user credentials'],
+  ['authentication_administration_user_delete_credentials_success', 'User credentials were removed'],
   [
-    'authentication_administration_user_remove_credentials_confirmation_message',
-    'Are you sure you want to delete "{arg:originName}" credentials from "{arg:userId}"?',
+    'authentication_administration_user_delete_credentials_confirmation_message',
+    'Are you sure you want to delete "{arg:originName}" auth method from "{arg:userId}"?',
   ],
 
   ['administration_configuration_wizard_configuration_admin', 'Administrator Credentials'],
