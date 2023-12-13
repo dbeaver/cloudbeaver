@@ -19,8 +19,8 @@ package io.cloudbeaver.service;
 import io.cloudbeaver.model.session.WebSession;
 import org.jkiss.dbeaver.DBException;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 /**
