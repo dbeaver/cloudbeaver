@@ -5,13 +5,13 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { useContext, useEffect, useMemo, useRef } from 'react';
+import { useContext, useEffect, useRef } from 'react';
 
 import { FormContext, getComputed, useExecutor, useObjectRef } from '@cloudbeaver/core-blocks';
+import { ExecutorHandlersCollection } from '@cloudbeaver/core-executor';
 
 import { TabsContext } from './TabsContext';
 import { TabsValidationContext } from './TabsValidationContext';
-import { ExecutorHandlersCollection } from '@cloudbeaver/core-executor';
 
 export function useTabsValidation(tabId: string): React.RefObject<HTMLDivElement> {
   const tabContextState = useContext(TabsContext);
@@ -20,8 +20,6 @@ export function useTabsValidation(tabId: string): React.RefObject<HTMLDivElement
   if (!tabContextState) {
     throw new Error('Tabs context was not provided');
   }
-  
-  const resetCollection = useMemo(() => new ExecutorHandlersCollection(), []);
 
   const panelRef = useRef<HTMLDivElement>(null);
   const tabsValidationContext = useContext(TabsValidationContext);
@@ -30,10 +28,12 @@ export function useTabsValidation(tabId: string): React.RefObject<HTMLDivElement
   const tabPropsRef = useObjectRef({ tabId, tabsValidationContext });
   const validationState = useObjectRef(
     () => ({
+      beforeValidationCollection: new ExecutorHandlersCollection(),
       invalidElement: null as HTMLInputElement | null,
       invalidate(event: Event) {
         tabPropsRef.tabsValidationContext?.invalidate(tabPropsRef.tabId);
 
+        // we want to store only first element in order in the form
         if (this.invalidElement === null) {
           this.invalidElement = event.target as HTMLInputElement | null;
         }
@@ -71,12 +71,13 @@ export function useTabsValidation(tabId: string): React.RefObject<HTMLDivElement
     }
   }, [selected]);
 
-  useEffect(() => {
-    formContext?.onValidate.before(resetCollection);
-  }, []);
+  useExecutor({
+    executor: formContext?.onValidate,
+    before: validationState.beforeValidationCollection,
+  });
 
   useExecutor({
-    executor: resetCollection,
+    executor: validationState.beforeValidationCollection,
     handlers: [
       () => {
         validationState.reset();
