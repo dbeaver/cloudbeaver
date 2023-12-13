@@ -58,12 +58,6 @@ const styles = css`
   }
 `;
 
-const loaderStyle = css`
-  ExceptionMessage {
-    padding: 24px;
-  }
-`;
-
 interface IProviderConfiguration {
   provider: AuthProvider;
   configuration: AuthProviderConfiguration;
@@ -140,7 +134,7 @@ export const ConfigurationsList = observer<Props>(function ConfigurationsList({
   if (activeProvider && activeConfiguration) {
     return styled(style)(
       <container className={className}>
-        <Loader state={authTaskState} style={loaderStyle} message="authentication_authorizing" hideException>
+        <Loader state={authTaskState} message="authentication_authorizing" hideException>
           <center>
             {providerDisabled ? (
               <TextPlaceholder>
@@ -176,7 +170,7 @@ export const ConfigurationsList = observer<Props>(function ConfigurationsList({
           );
         })}
       </list>
-      <Loader state={authTaskState} style={loaderStyle} message="authentication_authorizing" overlay hideException />
+      <Loader state={authTaskState} message="authentication_authorizing" overlay hideException />
     </container>,
   );
 });
