@@ -39,6 +39,7 @@ export default [
   ['ui_add', '添加'],
   ['ui_refresh', '刷新'],
   ['ui_data_saving_error', '保存出错'],
+  ['ui_data_remove_confirmation', 'Remove confirmation'],
   ['ui_data_delete_confirmation', '删除确认'],
   ['ui_no_matches_placeholder', '您的搜索没有返回匹配项。'],
   ['ui_information', '信息'],
@@ -105,6 +106,7 @@ export default [
   ['ui_filter', 'Filter'],
   ['ui_disable', 'Disable'],
   ['ui_readonly', '只读'],
+  ['ui_test', 'Test'],
 
   ['root_permission_denied', '您没有权限'],
   ['root_permission_no_permission', '您没有权限执行此操作'],

@@ -12,6 +12,10 @@ export default [
   ['authentication_administration_user_origin_empty', 'Дополнительная информация не доступна'],
   ['authentication_administration_user_info', 'Общее'],
   ['authentication_administration_user_local', 'Локальный пользователь'],
+  ['authentication_administration_user_auth_method', 'Способ входа'],
+  ['authentication_administration_user_auth_methods', 'Способы входа'],
+  ['authentication_administration_user_auth_methods_empty', 'Нет доступных способов входа'],
+  ['authentication_administration_user_auth_method_no_details', 'Дополнительная информация не доступна'],
   ['authentication_administration_item', 'Управление доступом'],
   ['authentication_administration_item_users', 'Пользователи'],
   ['authentication_administration_item_metaParameters', 'Свойства Пользователей'],
@@ -50,11 +54,11 @@ export default [
     'Удаление этой учетной записи навсегда уберет все связанные с ней пользовательские данные из системы. Пожалуйста, подтвердите, что вы хотите произвести удаление пользователя "{arg:username}"',
   ],
 
-  ['authentication_administration_user_remove_credentials_error', 'Не удалось удалить учетные данные пользователя'],
-  ['authentication_administration_user_remove_credentials_success', 'Учетные данные пользователя удалены'],
+  ['authentication_administration_user_delete_credentials_error', 'Не удалось удалить учетные данные пользователя'],
+  ['authentication_administration_user_delete_credentials_success', 'Учетные данные пользователя удалены'],
   [
-    'authentication_administration_user_remove_credentials_confirmation_message',
-    'Вы уверены что хотите удалить "{arg:originName}" учетные данные у "{arg:userId}"?',
+    'authentication_administration_user_delete_credentials_confirmation_message',
+    'Вы уверены что хотите удалить "{arg:originName}" способ авторизации у "{arg:userId}"?',
   ],
 
   ['administration_configuration_wizard_configuration_admin', 'Учетные данные администратора'],
