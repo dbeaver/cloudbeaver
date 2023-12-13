@@ -45,6 +45,7 @@ export const SqlEditorTab: TabHandlerTabComponent<ISqlEditorTabState> = observer
   const icon = dataSource?.icon ?? '/icons/sql_script_m.svg';
   const saved = dataSource?.isSaved !== false;
   const isReadonly = Boolean(dataSource?.isReadonly());
+  const hasUnsavedMark = !saved && !isReadonly;
 
   const handleSelect = ({ tabId }: ITabData<any>) => onSelect(tabId);
   const handleClose = onClose ? ({ tabId }: ITabData<any>) => onClose(tabId) : undefined;
@@ -54,7 +55,7 @@ export const SqlEditorTab: TabHandlerTabComponent<ISqlEditorTabState> = observer
       <TabIcon icon={icon} />
       {isReadonly && <IconOrImage title={translate('ui_readonly')} icon="/icons/lock.png" className={s(sqlEditorTabStyles, { readonlyIcon: true })} />}
       <TabTitle>{name}</TabTitle>
-      {!saved && <unsaved-mark className={s(sqlEditorTabStyles, { unsavedMark: true })} />}
+      {hasUnsavedMark && <unsaved-mark className={s(sqlEditorTabStyles, { unsavedMark: true })} />}
     </Tab>,
   );
 });
