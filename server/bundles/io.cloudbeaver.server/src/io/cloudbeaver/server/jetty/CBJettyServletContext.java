@@ -22,7 +22,7 @@ import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 import org.jkiss.dbeaver.DBException;
 
-import javax.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServlet;
 
 public class CBJettyServletContext implements DBWServletContext {
     private final ServletContextHandler contextHandler;
