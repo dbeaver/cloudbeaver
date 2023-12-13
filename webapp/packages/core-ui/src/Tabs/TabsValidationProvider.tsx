@@ -8,7 +8,7 @@
 import { observer } from 'mobx-react-lite';
 import { useContext } from 'react';
 
-import { FormContext, useObjectRef } from '@cloudbeaver/core-blocks';
+import { useObjectRef } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { isDefined, isNotNullDefined } from '@cloudbeaver/core-utils';
@@ -16,9 +16,8 @@ import { isDefined, isNotNullDefined } from '@cloudbeaver/core-utils';
 import { TabsContext } from './TabsContext';
 import { TabsValidationContext } from './TabsValidationContext';
 
-export const TabsValidation = observer(function TabsValidation({ children }: React.PropsWithChildren) {
+export const TabsValidationProvider = observer(function TabsValidation({ children }: React.PropsWithChildren) {
   const tabsContext = useContext(TabsContext);
-  const formContext = useContext(FormContext);
   const notificationService = useService(NotificationService);
 
   if (!tabsContext) {
@@ -64,7 +63,7 @@ export const TabsValidation = observer(function TabsValidation({ children }: Rea
         }
       },
     }),
-    { tabsContext, formContext, notificationService },
+    { tabsContext, notificationService },
     ['invalidate'],
   );
 

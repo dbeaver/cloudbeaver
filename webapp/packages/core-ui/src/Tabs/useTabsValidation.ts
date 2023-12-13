@@ -5,29 +5,34 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { useContext, useEffect, useRef } from 'react';
+import { useContext, useEffect, useMemo, useRef } from 'react';
 
-import { getComputed, useObjectRef } from '@cloudbeaver/core-blocks';
+import { FormContext, getComputed, useExecutor, useObjectRef } from '@cloudbeaver/core-blocks';
 
 import { TabsContext } from './TabsContext';
 import { TabsValidationContext } from './TabsValidationContext';
+import { ExecutorHandlersCollection } from '@cloudbeaver/core-executor';
 
 export function useTabsValidation(tabId: string): React.RefObject<HTMLDivElement> {
   const tabContextState = useContext(TabsContext);
+  const formContext = useContext(FormContext);
+
   if (!tabContextState) {
     throw new Error('Tabs context was not provided');
   }
+  
+  const resetCollection = useMemo(() => new ExecutorHandlersCollection(), []);
 
   const panelRef = useRef<HTMLDivElement>(null);
-  const tabPanelValidationHandlerContext = useContext(TabsValidationContext);
+  const tabsValidationContext = useContext(TabsValidationContext);
   const selected = getComputed(() => tabContextState.state.selectedId === tabId);
 
-  const tabPropsRef = useObjectRef({ tabId, tabPanelValidationHandlerContext });
+  const tabPropsRef = useObjectRef({ tabId, tabsValidationContext });
   const validationState = useObjectRef(
     () => ({
       invalidElement: null as HTMLInputElement | null,
       invalidate(event: Event) {
-        tabPropsRef.tabPanelValidationHandlerContext?.invalidate(tabPropsRef.tabId);
+        tabPropsRef.tabsValidationContext?.invalidate(tabPropsRef.tabId);
 
         if (this.invalidElement === null) {
           this.invalidElement = event.target as HTMLInputElement | null;
@@ -65,6 +70,19 @@ export function useTabsValidation(tabId: string): React.RefObject<HTMLDivElement
       validationState.reportValidity();
     }
   }, [selected]);
+
+  useEffect(() => {
+    formContext?.onValidate.before(resetCollection);
+  }, []);
+
+  useExecutor({
+    executor: resetCollection,
+    handlers: [
+      () => {
+        validationState.reset();
+      },
+    ],
+  });
 
   return panelRef;
 }
