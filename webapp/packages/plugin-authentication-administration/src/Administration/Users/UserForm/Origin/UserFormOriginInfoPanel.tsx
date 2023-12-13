@@ -93,7 +93,7 @@ export const UserFormOriginInfoPanel: TabContainerPanelComponent<UserFormProps> 
           state={localState}
           name="selectedOrigin"
           items={origins}
-          keySelector={(o, i) => i + ''}
+          keySelector={(o, i) => String(i)}
           valueSelector={origin => origin.displayName}
           tiny
         >
