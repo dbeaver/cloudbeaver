@@ -462,6 +462,10 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
 
         return query;
       },
+      setModeId(tabId: string): void {
+        this.state.currentModeId = tabId;
+        this.onUpdate.execute();
+      },
     }),
     {
       formatScript: action.bound,
