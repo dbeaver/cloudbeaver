@@ -12,6 +12,7 @@ export default [
   ['ui_processing_reload', 'Перезагрузить'],
   ['ui_processing_retry', 'Повторить'],
   ['ui_processing_ok', 'Принять'],
+  ['ui_processing_create', 'Создать'],
   ['ui_processing_finish', 'Готово'],
   ['ui_processing_save', 'Сохранить'],
   ['ui_processing_saved', 'Сохранено'],
