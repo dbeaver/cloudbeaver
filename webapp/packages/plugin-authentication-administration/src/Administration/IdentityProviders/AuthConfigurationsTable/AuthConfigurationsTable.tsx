@@ -31,9 +31,9 @@ export const AuthConfigurationsTable = observer<Props>(function AuthConfiguratio
         <TableColumnHeader min />
         <TableColumnHeader min />
         <TableColumnHeader>{translate('administration_identity_providers_provider_configuration_name')}</TableColumnHeader>
-        <TableColumnHeader>{translate('administration_identity_providers_provider')}</TableColumnHeader>
+        <TableColumnHeader min>{translate('administration_identity_providers_provider')}</TableColumnHeader>
         <TableColumnHeader>{translate('administration_identity_providers_provider_configuration_description')}</TableColumnHeader>
-        <TableColumnHeader>{translate('administration_identity_providers_provider_configuration_disabled')}</TableColumnHeader>
+        <TableColumnHeader min>{translate('administration_identity_providers_provider_configuration_disabled')}</TableColumnHeader>
         <TableColumnHeader />
       </TableHeader>
       <TableBody>

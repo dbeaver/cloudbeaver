@@ -21,7 +21,6 @@ import {
 } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
 import { CachedMapAllKey } from '@cloudbeaver/core-resource';
 import { FEATURE_GIT_ID, ServerConfigResource } from '@cloudbeaver/core-root';
 import { GraphQLService, SqlCompletionProposal, SqlScriptInfoFragment } from '@cloudbeaver/core-sdk';
@@ -34,19 +33,11 @@ import { SqlEditorSettingsService } from './SqlEditorSettingsService';
 
 export type SQLProposal = SqlCompletionProposal;
 
-export interface IQueryChangeData {
-  prevQuery: string;
-  query: string;
-  state: ISqlEditorTabState;
-}
-
 @injectable()
 export class SqlEditorService {
   get autoSave() {
     return this.sqlEditorSettingsService.settings.getValue('autoSave') && !this.serverConfigResource.isFeatureEnabled(FEATURE_GIT_ID, true);
   }
-
-  readonly onQueryChange: ISyncExecutor<IQueryChangeData>;
 
   constructor(
     private readonly graphQLService: GraphQLService,
@@ -58,9 +49,7 @@ export class SqlEditorService {
     private readonly sqlDataSourceService: SqlDataSourceService,
     private readonly sqlEditorSettingsService: SqlEditorSettingsService,
     private readonly serverConfigResource: ServerConfigResource,
-  ) {
-    this.onQueryChange = new SyncExecutor();
-  }
+  ) {}
 
   getState(editorId: string, datasourceKey: string, order: number, source?: string): ISqlEditorTabState {
     return observable({
@@ -138,15 +127,10 @@ export class SqlEditorService {
     }
   }
 
-  setQuery(query: string, state: ISqlEditorTabState) {
+  setScript(script: string, state: ISqlEditorTabState) {
     const dataSource = this.sqlDataSourceService.get(state.editorId);
 
-    if (dataSource) {
-      const prevQuery = dataSource.script;
-
-      dataSource.setScript(query);
-      this.onQueryChange.execute({ prevQuery, query, state });
-    }
+    dataSource!.setScript(script);
   }
 
   async resetExecutionContext(state: ISqlEditorTabState) {
