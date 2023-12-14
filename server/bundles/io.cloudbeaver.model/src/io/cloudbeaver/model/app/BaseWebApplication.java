@@ -231,6 +231,7 @@ public abstract class BaseWebApplication extends BaseApplicationImpl implements 
 
     @Override
     public Object start(IApplicationContext context) {
+        initializeApplicationServices();
         try {
             startServer();
         } catch (Exception e) {

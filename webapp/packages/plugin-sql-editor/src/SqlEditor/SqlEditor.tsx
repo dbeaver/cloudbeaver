@@ -9,25 +9,19 @@ import { observer } from 'mobx-react-lite';
 import { useEffect, useMemo, useState } from 'react';
 import styled, { css } from 'reshadow';
 
-import { getComputed, preventFocusHandler, StaticImage, useSplit, useTranslate } from '@cloudbeaver/core-blocks';
+import { getComputed, useSplit } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { BASE_TAB_STYLES, ITabData, TabList, TabPanelList, TabsState, VERTICAL_ROTATED_TAB_STYLES } from '@cloudbeaver/core-ui';
 import { MetadataMap } from '@cloudbeaver/core-utils';
 import { useCaptureViewContext } from '@cloudbeaver/core-view';
 
-import { ESqlDataSourceFeatures } from '../SqlDataSource/ESqlDataSourceFeatures';
 import { ISqlEditorModeProps, SqlEditorModeService } from '../SqlEditorModeService';
 import { DATA_CONTEXT_SQL_EDITOR_DATA } from './DATA_CONTEXT_SQL_EDITOR_DATA';
 import type { ISqlEditorProps } from './ISqlEditorProps';
-import { SqlEditorActionsMenu } from './SqlEditorActionsMenu';
-import { SqlEditorTools } from './SqlEditorTools';
+import { SQLEditorActions } from './SQLEditorActions';
 import { useSqlEditor } from './useSqlEditor';
 
 const styles = css`
-  button,
-  upload {
-    composes: theme-ripple from global;
-  }
   sql-editor {
     position: relative;
     z-index: 0;
@@ -35,47 +29,6 @@ const styles = css`
     height: 100%;
     display: flex;
     overflow: auto;
-  }
-
-  container {
-    composes: theme-border-color-background from global;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    overflow: auto;
-    border-right: solid 1px;
-  }
-
-  actions {
-    width: 32px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    user-select: none;
-
-    &:empty {
-      width: initial;
-    }
-  }
-
-  button,
-  upload {
-    background: none;
-    padding: 0;
-    margin: 0;
-    height: 32px;
-    width: 32px;
-    cursor: pointer;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-shrink: 0;
-  }
-
-  StaticImage {
-    height: 16px;
-    width: 16px;
-    cursor: pointer;
   }
 `;
 
@@ -104,7 +57,6 @@ const tabStyles = css`
 const tabListStyles = [BASE_TAB_STYLES, VERTICAL_ROTATED_TAB_STYLES, tabStyles];
 
 export const SqlEditor = observer<ISqlEditorProps>(function SqlEditor({ state, className }) {
-  const translate = useTranslate();
   const split = useSplit();
   const sqlEditorModeService = useService(SqlEditorModeService);
   const data = useSqlEditor(state);
@@ -122,8 +74,6 @@ export const SqlEditor = observer<ISqlEditorProps>(function SqlEditor({ state, c
     state.currentModeId = tab.tabId;
   }
 
-  const disabled = getComputed(() => data.isLineScriptEmpty || data.isDisabled);
-  const isActiveSegmentMode = getComputed(() => data.activeSegmentMode.activeSegmentMode);
   const displayedEditors = getComputed(() => sqlEditorModeService.tabsContainer.getDisplayed({ state, data }).length);
 
   useEffect(() => {
@@ -134,9 +84,6 @@ export const SqlEditor = observer<ISqlEditorProps>(function SqlEditor({ state, c
       split.state.setSize(-1);
     }
   });
-
-  const isQuery = data.dataSource?.hasFeature(ESqlDataSourceFeatures.query);
-  const isExecutable = data.dataSource?.hasFeature(ESqlDataSourceFeatures.executable);
 
   return styled(
     styles,
@@ -154,43 +101,7 @@ export const SqlEditor = observer<ISqlEditorProps>(function SqlEditor({ state, c
       onChange={handleModeSelect}
     >
       <sql-editor className={className}>
-        <container>
-          <actions onMouseDown={preventFocusHandler}>
-            {isExecutable && (
-              <>
-                {isQuery && (
-                  <>
-                    <button disabled={disabled} title={translate('sql_editor_sql_execution_button_tooltip')} onClick={data.executeQuery}>
-                      <StaticImage icon="/icons/sql_exec.svg" />
-                    </button>
-                    <button
-                      disabled={disabled}
-                      title={translate('sql_editor_sql_execution_new_tab_button_tooltip')}
-                      onClick={data.executeQueryNewTab}
-                    >
-                      <StaticImage icon="/icons/sql_exec_new.svg" />
-                    </button>
-                  </>
-                )}
-                <button
-                  disabled={disabled}
-                  title={translate('sql_editor_sql_execution_script_button_tooltip')}
-                  hidden={isActiveSegmentMode}
-                  onClick={data.executeScript}
-                >
-                  <StaticImage icon="/icons/sql_script_exec.svg" />
-                </button>
-                {isQuery && data.dialect?.supportsExplainExecutionPlan && (
-                  <button disabled={disabled} title={translate('sql_editor_execution_plan_button_tooltip')} onClick={data.showExecutionPlan}>
-                    <StaticImage icon="/icons/sql_execution_plan.svg" />
-                  </button>
-                )}
-              </>
-            )}
-            <SqlEditorActionsMenu state={state} />
-          </actions>
-          <SqlEditorTools data={data} state={state} style={styles} />
-        </container>
+        <SQLEditorActions data={data} state={state} />
         <TabPanelList />
         {displayedEditors > 1 ? (
           <tabs>
