@@ -8,24 +8,29 @@
 import { observer } from 'mobx-react-lite';
 import { useMemo, useState } from 'react';
 
-import { ItemList, ItemListSearch } from '@cloudbeaver/core-blocks';
-import type { Connection, DBDriver } from '@cloudbeaver/core-connections';
+import { ItemList, ItemListSearch, useResource } from '@cloudbeaver/core-blocks';
+import { DBDriverResource } from '@cloudbeaver/core-connections';
+import { useService } from '@cloudbeaver/core-di';
+import { ProjectInfoResource } from '@cloudbeaver/core-projects';
+import { CachedMapAllKey } from '@cloudbeaver/core-resource';
 
+import { TemplateConnectionsResource } from '../../TemplateConnectionsResource';
+import { TemplateConnectionsService } from '../../TemplateConnectionsService';
 import { TemplateConnectionItem } from './TemplateConnectionItem';
 
 interface Props {
-  templateConnections: Connection[];
-  dbDrivers: Map<string, DBDriver>;
   className?: string;
   onSelect: (dbSourceId: string) => void;
 }
 
-export const TemplateConnectionSelector = observer<Props>(function TemplateConnectionSelector({
-  templateConnections,
-  dbDrivers,
-  className,
-  onSelect,
-}) {
+export const TemplateConnectionSelector = observer<Props>(function TemplateConnectionSelector({ className, onSelect }) {
+  useResource(TemplateConnectionSelector, ProjectInfoResource, CachedMapAllKey, { forceSuspense: true });
+  useResource(TemplateConnectionSelector, TemplateConnectionsResource, undefined, { forceSuspense: true });
+  const dbDriverResource = useResource(TemplateConnectionSelector, DBDriverResource, CachedMapAllKey);
+  const templateConnectionsService = useService(TemplateConnectionsService);
+
+  const templateConnections = templateConnectionsService.projectTemplates;
+
   const [search, setSearch] = useState('');
   const filteredTemplateConnections = useMemo(() => {
     if (!search) {
@@ -39,7 +44,12 @@ export const TemplateConnectionSelector = observer<Props>(function TemplateConne
       <ItemListSearch onChange={setSearch} />
       <ItemList className={className}>
         {filteredTemplateConnections.map(template => (
-          <TemplateConnectionItem key={template.id} template={template} dbDriver={dbDrivers.get(template.driverId)} onSelect={onSelect} />
+          <TemplateConnectionItem
+            key={template.id}
+            template={template}
+            dbDriver={dbDriverResource.resource.get(template.driverId)}
+            onSelect={onSelect}
+          />
         ))}
       </ItemList>
     </>
