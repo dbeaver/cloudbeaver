@@ -19,13 +19,13 @@
   },
   "dependencies": {
     "@cloudbeaver/core-executor": "~0.1.0",
-    "inversify": "^6.0.1",
+    "inversify": "^6.0.2",
     "react": "^18.2.0"
   },
   "peerDependencies": {},
   "devDependencies": {
-    "@types/react": "^18.2.25",
-    "typescript": "^5.2.2",
-    "@types/jest": "^29.5.5"
+    "@types/react": "^18.2.42",
+    "typescript": "^5.3.2",
+    "@types/jest": "^29.5.10"
   }
 }
