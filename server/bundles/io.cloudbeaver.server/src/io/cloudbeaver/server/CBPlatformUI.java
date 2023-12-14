@@ -25,4 +25,8 @@ public class CBPlatformUI extends ConsoleUserInterface {
 
     public static final CBPlatformUI INSTANCE = new CBPlatformUI();
 
+    protected void initialize() {
+        // just a placeholder for injection
+    }
+
 }
