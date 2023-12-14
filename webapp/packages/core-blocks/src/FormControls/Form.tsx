@@ -11,9 +11,6 @@ import { useCombinedRef } from '../useCombinedRef';
 import { useFocus } from '../useFocus';
 import { FormChangeHandler, FormContext, IFormContext } from './FormContext';
 import { useForm } from './useForm';
-import { s } from '../s';
-import { useS } from '../useS';
-import styles from './Form.m.css';
 
 type FormDetailedProps = Omit<React.DetailedHTMLProps<React.FormHTMLAttributes<HTMLFormElement>, HTMLFormElement>, 'onChange' | 'onSubmit'> & {
   context?: IFormContext;
@@ -30,7 +27,6 @@ export const Form = forwardRef<HTMLFormElement, FormDetailedProps>(function Form
 ) {
   const [focusedRef] = useFocus<HTMLFormElement>({ focusFirstChild });
   const [disabledLocal, setDisabledLocal] = useState(false);
-  const style = useS(styles);
 
   const disabled = disabledLocal || disabledProp || false;
 
@@ -61,8 +57,8 @@ export const Form = forwardRef<HTMLFormElement, FormDetailedProps>(function Form
   }
 
   return (
-    <form {...rest} ref={setFormRef} className={s(style, { form: true }, rest.className)}>
-      <fieldset disabled={disabled} className={s(style, { fieldset: true }, rest.className)}>
+    <form {...rest} ref={setFormRef}>
+      <fieldset disabled={disabled} className={rest.className}>
         <FormContext.Provider value={formContext}>{children}</FormContext.Provider>
       </fieldset>
       <button type="submit" disabled={disableEnterSubmit} aria-hidden={disableEnterSubmit} hidden />
