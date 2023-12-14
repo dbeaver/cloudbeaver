@@ -95,6 +95,8 @@ public abstract class CBApplication extends BaseWebApplication implements WebAut
      * In configuration mode sessions expire after a week
      */
     private static final long CONFIGURATION_MODE_SESSION_IDLE_TIME = 60 * 60 * 1000 * 24 * 7;
+    public static final String HOST_LOCALHOST = "localhost";
+    public static final String HOST_127_0_0_1 = "127.0.0.1";
 
 
     static {
@@ -262,9 +264,9 @@ public abstract class CBApplication extends BaseWebApplication implements WebAut
         if (CommonUtils.isEmpty(localHostAddress)) {
             localHostAddress = System.getProperty(CBConstants.VAR_CB_LOCAL_HOST_ADDR);
         }
-        if (CommonUtils.isEmpty(localHostAddress) || "127.0.0.1".equals(localHostAddress) || "::0".equals(
+        if (CommonUtils.isEmpty(localHostAddress) || HOST_127_0_0_1.equals(localHostAddress) || "::0".equals(
             localHostAddress)) {
-            localHostAddress = "localhost";
+            localHostAddress = HOST_LOCALHOST;
         }
 
         final Runtime runtime = Runtime.getRuntime();
@@ -563,7 +565,7 @@ public abstract class CBApplication extends BaseWebApplication implements WebAut
                         hostName = InetAddress.getLocalHost().getHostName();
                     } catch (UnknownHostException e) {
                         log.debug("Error resolving localhost address: " + e.getMessage());
-                        hostName = "localhost";
+                        hostName = HOST_LOCALHOST;
                     }
                 }
                 serverURL = "http://" + hostName + ":" + serverPort;
@@ -611,7 +613,7 @@ public abstract class CBApplication extends BaseWebApplication implements WebAut
                 }
             }
             parseAdditionalConfiguration(configProps);
-        } catch (DBException e) {
+        } catch (Exception e) {
             throw new DBException("Error parsing server configuration", e);
         }
 
