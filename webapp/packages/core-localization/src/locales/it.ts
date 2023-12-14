@@ -93,6 +93,7 @@ export default [
   ['ui_upload_file_fail', 'Failed to upload file'],
   ['ui_filter', 'Filter'],
   ['ui_disable', 'Disable'],
+  ['ui_readonly', 'In sola lettura'],
   ['ui_test', 'Test'],
 
   ['root_permission_denied', 'Non hai i permessi'],
