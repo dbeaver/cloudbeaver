@@ -1,0 +1,4 @@
+.coloredContainer {
+  composes: theme-typography--body2 from global;
+  list-style-position: inside;
+}
