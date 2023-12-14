@@ -3,7 +3,7 @@ const path = require('path');
 
 /** @type {import('ts-jest').JestConfigWithTsJest} */
 module.exports = {
-  testEnvironment: 'jsdom',
+  testEnvironment: require.resolve('../tests/test.environment.js'),
   rootDir: path.resolve('./dist'),
   moduleFileExtensions: ['js', 'jsx', 'json'],
   testMatch: ['**/?(*.)+(spec|test).js?(x)'],
@@ -27,5 +27,10 @@ module.exports = {
   setupFilesAfterEnv: ['@testing-library/jest-dom'],
   transform: {
     '\\.jsx?$': ['babel-jest', { configFile: require.resolve('./jest.babel.config.js') }],
+  },
+  testEnvironmentOptions: {
+    // This will force JSDOM to use the default export condition when importing msw/node, resulting in correct imports.
+    // https://mswjs.io/docs/migrations/1.x-to-2.x#cannot-find-module-mswnode-jsdom
+    customExportConditions: [''],
   },
 };
