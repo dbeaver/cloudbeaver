@@ -7,6 +7,7 @@
  */
 import { s } from '../s';
 import { useS } from '../useS';
+import tableStyles from './Table.m.css';
 import style from './TableColumnHeader.m.css';
 
 interface Props {
@@ -27,7 +28,7 @@ export const TableColumnHeader: React.FC<React.PropsWithChildren<Props>> = funct
   className,
   children,
 }) {
-  const styles = useS(style);
+  const styles = useS(style, tableStyles);
 
   return (
     <th title={title} className={s(styles, { min, heightBig, centerContent, columnHeader: true }, className)}>

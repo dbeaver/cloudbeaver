@@ -8,6 +8,10 @@ export * from './useEditorDefaultExtensions';
 export * from './useEditorAutocompletion';
 export * from './useCodemirrorExtensions';
 
+export * from './Hyperlink/HyperlinkLoader';
+export * from './Hyperlink/IHyperlinkInfo';
+export * from './Hyperlink/useHyperlink';
+
 export * from '@codemirror/view';
 export * from '@codemirror/state';
 export * from '@codemirror/autocomplete';

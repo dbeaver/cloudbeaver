@@ -5,10 +5,15 @@
   padding: 0 16px;
   transition: padding ease-in-out 0.24s;
 
+  &.nowrap,
+  &.ellipsis {
+    white-space: nowrap;
+  }
+
   &.ellipsis {
     overflow: hidden;
     text-overflow: ellipsis;
-    white-space: nowrap;
+    max-width: 0;
   }
 
   &.centerContent > .tdFlex {

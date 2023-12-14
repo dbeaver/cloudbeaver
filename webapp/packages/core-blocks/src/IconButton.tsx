@@ -7,8 +7,7 @@
  */
 import { observer } from 'mobx-react-lite';
 import type React from 'react';
-import { Button, ButtonProps } from 'reakit/Button';
-
+import { ButtonProps, Button as ReakitButton } from 'reakit/Button';
 import { Icon } from './Icon';
 import IconButtonStyles from './IconButton.m.css';
 import { s } from './s';
@@ -16,6 +15,7 @@ import { StaticImage } from './StaticImage';
 import { useS } from './useS';
 
 interface Props {
+  tag?: 'button' | 'a' | 'div';
   name: string;
   img?: boolean;
   viewBox?: string;
@@ -23,8 +23,10 @@ interface Props {
 
 export type IconButtonProps = Props & ButtonProps;
 
-export const IconButton: React.FC<IconButtonProps> = observer(function IconButton({ name, img, viewBox, className, ...rest }) {
+export const IconButton: React.FC<IconButtonProps> = observer(function IconButton({ tag, name, img, viewBox, style, className, ...rest }) {
   const styles = useS(IconButtonStyles);
+
+  const Button = tag ?? ReakitButton;
 
   return (
     <Button {...rest} className={s(styles, { iconButton: true }, className)}>

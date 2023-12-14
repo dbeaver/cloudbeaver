@@ -3,6 +3,7 @@
   flex-direction: row;
   align-content: baseline;
   position: relative;
+  box-sizing: border-box;
 
   flex-wrap: wrap;
   flex: 1 1 100%;
