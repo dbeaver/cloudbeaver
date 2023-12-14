@@ -17,9 +17,7 @@ export interface ISQLEditorMode {
 
 export const SQLEditorModeContext: ISyncContextLoader<ISQLEditorMode, ISQLEditorData> = function SQLEditorModeContext(context, data) {
   return {
-    get activeSegment() {
-      return data.parser.getSegment(data.cursor.begin, data.cursor.end);
-    },
+    activeSegment: data.parser.getSegment(data.cursor.begin, data.cursor.end),
     activeSegmentMode: false,
   };
 };
