@@ -9,7 +9,7 @@ import { action, computed, makeObservable, observable, toJS } from 'mobx';
 
 import type { IConnectionExecutionContextInfo } from '@cloudbeaver/core-connections';
 import { ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
-import { isContainsException, isObjectsEqual, isValuesEqual, staticImplements } from '@cloudbeaver/core-utils';
+import { isContainsException, isValuesEqual, staticImplements } from '@cloudbeaver/core-utils';
 import type { IDatabaseDataModel, IDatabaseResultSet } from '@cloudbeaver/plugin-data-viewer';
 
 import type { IDataQueryOptions } from '../QueryDataSource';
