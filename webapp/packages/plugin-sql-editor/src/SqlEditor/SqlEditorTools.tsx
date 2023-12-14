@@ -6,39 +6,25 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import styled, { css } from 'reshadow';
 
-import { getComputed, preventFocusHandler, StaticImage, UploadArea, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
-import type { ComponentStyle } from '@cloudbeaver/core-theming';
+import { ActionIconButton, getComputed, preventFocusHandler, s, UploadArea, useS, useTranslate } from '@cloudbeaver/core-blocks';
 
 import type { ISqlEditorTabState } from '../ISqlEditorTabState';
 import { ESqlDataSourceFeatures } from '../SqlDataSource/ESqlDataSourceFeatures';
 import type { ISQLEditorData } from './ISQLEditorData';
+import style from './SqlEditorTools.m.css';
 import { SqlEditorToolsMenu } from './SqlEditorToolsMenu';
 import { useTools } from './useTools';
-
-const styles = css`
-  tools {
-    width: 32px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-
-    &:empty {
-      display: none;
-    }
-  }
-`;
 
 interface Props {
   data: ISQLEditorData;
   state: ISqlEditorTabState;
-  style?: ComponentStyle;
   className?: string;
 }
 
-export const SqlEditorTools = observer<Props>(function SqlEditorTools({ data, state, style, className }) {
+export const SqlEditorTools = observer<Props>(function SqlEditorTools({ data, state, className }) {
   const translate = useTranslate();
+  const styles = useS(style);
   const tools = useTools(state);
   const scriptEmpty = getComputed(() => data.value.length === 0);
   const disabled = getComputed(() => data.isDisabled || data.isScriptEmpty);
@@ -55,7 +41,7 @@ export const SqlEditorTools = observer<Props>(function SqlEditorTools({ data, st
     const script = await tools.tryReadScript(file, prevScript);
 
     if (script) {
-      data.setQuery(script);
+      data.setScript(script);
     }
   }
 
@@ -65,27 +51,27 @@ export const SqlEditorTools = observer<Props>(function SqlEditorTools({ data, st
 
   const isScript = data.dataSource?.hasFeature(ESqlDataSourceFeatures.script);
 
-  return styled(useStyles(style, styles))(
-    <tools className={className} onMouseDown={preventFocusHandler}>
-      <SqlEditorToolsMenu state={state} />
+  return (
+    <div className={s(styles, { tools: true }, className)} onMouseDown={preventFocusHandler}>
+      <SqlEditorToolsMenu state={state} data={data} />
       {isScript && (
         <>
-          <button
+          <ActionIconButton
+            name="/icons/sql_format_sm.svg"
             disabled={disabled || data.readonly}
             title={translate('sql_editor_sql_format_button_tooltip')}
             hidden={isActiveSegmentMode}
+            img
             onClick={data.formatScript}
-          >
-            <StaticImage icon="/icons/sql_format_sm.svg" />
-          </button>
-          <button
+          />
+          <ActionIconButton
+            name="/icons/export.svg"
             disabled={scriptEmpty}
             title={translate('sql_editor_download_script_tooltip')}
             hidden={isActiveSegmentMode}
+            img
             onClick={downloadScriptHandler}
-          >
-            <StaticImage icon="/icons/export.svg" />
-          </button>
+          />
           {!isActiveSegmentMode && (
             <UploadArea
               accept=".sql"
@@ -94,20 +80,11 @@ export const SqlEditorTools = observer<Props>(function SqlEditorTools({ data, st
               reset
               onChange={handleScriptUpload}
             >
-              <upload disabled={data.readonly}>
-                <StaticImage icon="/icons/import.svg" />
-              </upload>
+              <ActionIconButton tag="div" name="/icons/import.svg" disabled={data.readonly} img />
             </UploadArea>
           )}
-          {/*<button
-              title={translate('sql_editor_sql_execution_script_lock_tooltip')}
-              hidden={data.dataSource?.isReadonly() ?? true}
-              onClick={data.switchEditing}
-            >
-              <StaticImage icon={data.editing ? '/icons/sql_unlock_sm.svg' : '/icons/sql_lock_sm.svg'} />
-            </button>*/}
         </>
       )}
-    </tools>,
+    </div>
   );
 });
