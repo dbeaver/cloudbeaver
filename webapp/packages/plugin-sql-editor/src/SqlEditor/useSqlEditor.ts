@@ -29,7 +29,7 @@ import { OUTPUT_LOGS_TAB_ID } from '../SqlResultTabs/OutputLogs/OUTPUT_LOGS_TAB_
 import { SqlQueryService } from '../SqlResultTabs/SqlQueryService';
 import { SqlResultTabsService } from '../SqlResultTabs/SqlResultTabsService';
 import type { ICursor, ISQLEditorData } from './ISQLEditorData';
-import { ISQLEditorMode, SQLEditorModeContext } from './SQLEditorModeContext';
+import { SQLEditorModeContext } from './SQLEditorModeContext';
 
 interface ISQLEditorDataPrivate extends ISQLEditorData {
   readonly sqlDialectInfoService: SqlDialectInfoService;
@@ -83,11 +83,9 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
         return this.sqlDialectInfoService.getDialectInfo(createConnectionParam(executionContext.projectId, executionContext.connectionId));
       },
 
-      get activeSegmentMode(): ISQLEditorMode {
-        const contexts = this.onMode.execute(this);
-        const mode = contexts.getContext(SQLEditorModeContext);
-
-        return mode;
+      activeSegmentMode: {
+        activeSegment: undefined,
+        activeSegmentMode: false,
       },
 
       get activeSegment(): ISQLScriptSegment | undefined {
@@ -228,7 +226,7 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
           const formatted = await this.sqlDialectInfoService.formatScript(this.dataSource.executionContext, script.query);
 
           this.onFormat.execute([script, formatted]);
-          this.setQuery(query.substring(0, script.begin) + formatted + query.substring(script.end));
+          this.setScript(query.substring(0, script.begin) + formatted + query.substring(script.end));
         } finally {
           this.readonlyState = false;
         }
@@ -361,9 +359,8 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
         }
       },
 
-      setQuery(query: string): void {
-        this.sqlEditorService.setQuery(query, this.state);
-        this.updateParserScriptsThrottle().catch(() => {});
+      setScript(query: string): void {
+        this.dataSource?.setScript(query);
       },
 
       updateParserScriptsThrottle: throttleAsync(async function updateParserScriptsThrottle() {
@@ -378,6 +375,8 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
         const script = this.parser.actualScript;
 
         if (!connectionId || !script) {
+          this.parser.setQueries([]);
+          this.onUpdate.execute();
           return;
         }
 
@@ -390,8 +389,10 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
           }
         });
 
+        // check if script was changed while we were waiting for response
         if (this.parser.actualScript === script) {
           this.parser.setQueries(queries);
+          this.onUpdate.execute();
         }
       },
 
@@ -470,12 +471,12 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
       executeScript: action.bound,
       switchEditing: action.bound,
       dialect: computed,
-      isLineScriptEmpty: computed,
       isDisabled: computed,
       value: computed,
       readonly: computed,
+      activeSegmentMode: observable.ref,
       hintsLimitIsMet: observable.ref,
-      cursor: observable,
+      cursor: observable.ref,
       readonlyState: observable,
       executingScript: observable,
     },
@@ -499,6 +500,7 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
     handlers: [
       function setScript({ script }) {
         data.parser.setScript(script);
+        data.updateParserScriptsThrottle().catch(() => {});
         data.onUpdate.execute();
       },
     ],
@@ -509,6 +511,20 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
     handlers: [
       function updateDatabaseModels() {
         data.loadDatabaseDataModels();
+      },
+    ],
+  });
+
+  useExecutor({
+    executor: data.onUpdate,
+    handlers: [
+      function updateActiveSegmentMode() {
+        // Probably we need to rework this logic
+        // we want to track active segment mode with mobx
+        // right now it's leads to bag when script changed from empty to not empty
+        // data.isLineScriptEmpty skips this change
+        const contexts = data.onMode.execute(data);
+        data.activeSegmentMode = contexts.getContext(SQLEditorModeContext);
       },
     ],
   });
