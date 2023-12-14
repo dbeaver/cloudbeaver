@@ -465,6 +465,7 @@ public class CBDatabase {
         } catch (UnknownHostException e) {
             hostName = "localhost";
         }
+
         byte[] hardwareAddress = RuntimeUtils.getLocalMacAddress();
         String macAddress = CommonUtils.toHexString(hardwareAddress);
 
