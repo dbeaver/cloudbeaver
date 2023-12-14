@@ -1,0 +1,22 @@
+.layoutGrid {
+  composes: layout-grid from global;
+  width: 100%;
+  flex: 1;
+}
+
+.layoutGridInner {
+  composes: layout-grid__inner from global;
+  min-height: 100%;
+}
+
+.layoutGridCell {
+  composes: theme-background-surface theme-text-on-surface theme-border-color-background from global;
+  position: relative;
+  border: solid 1px;
+  padding: 16px 24px;
+}
+
+.p {
+  line-height: 2;
+  white-space: pre;
+}
