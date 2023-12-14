@@ -14,11 +14,14 @@ import { useMenu } from '@cloudbeaver/core-view';
 
 import { DATA_CONTEXT_SQL_EDITOR_STATE } from '../DATA_CONTEXT_SQL_EDITOR_STATE';
 import type { ISqlEditorTabState } from '../ISqlEditorTabState';
+import { DATA_CONTEXT_SQL_EDITOR_DATA } from './DATA_CONTEXT_SQL_EDITOR_DATA';
+import type { ISQLEditorData } from './ISQLEditorData';
 import { SQL_EDITOR_TOOLS_MENU } from './SQL_EDITOR_TOOLS_MENU';
 import SqlEditorActionsMenuBarStyles from './SqlEditorActionsMenuBar.m.css';
 import SqlEditorActionsMenuBarItemStyles from './SqlEditorActionsMenuBarItem.m.css';
 
 interface Props {
+  data: ISQLEditorData;
   state: ISqlEditorTabState;
   context?: IDataContext;
   className?: string;
@@ -40,14 +43,15 @@ const registry: StyleRegistry = [
     },
   ],
 ];
-export const SqlEditorToolsMenu = observer<Props>(function SqlEditorToolsMenu({ state, context, className }) {
-  const styles = useS(SqlEditorActionsMenuBarStyles, SqlEditorActionsMenuBarItemStyles);
+export const SqlEditorToolsMenu = observer<Props>(function SqlEditorToolsMenu({ data, state, context, className }) {
+  const menuBarStyles = useS(SqlEditorActionsMenuBarStyles, SqlEditorActionsMenuBarItemStyles, MenuBarStyles, MenuBarItemStyles);
   const menu = useMenu({ menu: SQL_EDITOR_TOOLS_MENU, context });
   menu.context.set(DATA_CONTEXT_SQL_EDITOR_STATE, state);
+  context?.set(DATA_CONTEXT_SQL_EDITOR_DATA, data);
 
   return (
     <SContext registry={registry}>
-      <MenuBar menu={menu} className={s(styles, { sqlActions: true }, className)} />
+      <MenuBar menu={menu} className={s(menuBarStyles, { sqlActions: true, floating: true }, className)} />
     </SContext>
   );
 });
