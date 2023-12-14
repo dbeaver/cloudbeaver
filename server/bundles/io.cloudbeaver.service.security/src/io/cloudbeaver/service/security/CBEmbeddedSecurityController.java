@@ -2222,12 +2222,12 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
             dbStat.setString(1, token);
             try (var dbResult = dbStat.executeQuery()) {
                 if (!dbResult.next()) {
-                    throw new SMException("Invalid token");
+                    throw new SMException("Error reading permissions: input token not recognized.");
                 }
                 userId = dbResult.getString(1);
                 var expiredDate = dbResult.getTimestamp(2);
                 if (application.isMultiNode() && isTokenExpired(expiredDate)) {
-                    throw new SMAccessTokenExpiredException("Token expired");
+                    throw new SMAccessTokenExpiredException("Error reading permissions: token has expired");
                 }
                 sessionId = dbResult.getString(3);
                 authRole = dbResult.getString(4);
@@ -2296,7 +2296,7 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
 
                 dbStat.setString(6, sessionId);
                 if (dbStat.executeUpdate() <= 0) {
-                    throw new DBCException("Session not exists in database");
+                    throw new DBCException("Session '" + sessionId + "' not found in database");
                 }
             }
         } catch (SQLException e) {
@@ -2700,12 +2700,12 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
             dbStat.setString(1, smAccessToken);
             try (var dbResult = dbStat.executeQuery()) {
                 if (!dbResult.next()) {
-                    throw new SMException("Invalid token");
+                    throw new SMException("Error reading subject role: input token not recognized.");
                 }
                 return dbResult.getString(1);
             }
         } catch (SQLException e) {
-            throw new DBCException("Error reading lm role in database", e);
+            throw new DBCException("Error reading subject role in database", e);
         }
     }
 

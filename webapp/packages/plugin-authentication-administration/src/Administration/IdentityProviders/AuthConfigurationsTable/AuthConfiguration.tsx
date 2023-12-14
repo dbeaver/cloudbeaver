@@ -67,7 +67,7 @@ export const AuthConfiguration = observer<Props>(function AuthConfiguration({ co
       <TableColumnValue title={configuration.displayName} expand ellipsis>
         {configuration.displayName}
       </TableColumnValue>
-      <TableColumnValue>{configuration.providerId}</TableColumnValue>
+      <TableColumnValue nowrap>{configuration.providerId}</TableColumnValue>
       <TableColumnValue title={configuration.description} ellipsis>
         {configuration.description || ''}
       </TableColumnValue>

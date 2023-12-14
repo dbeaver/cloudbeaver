@@ -7,11 +7,8 @@
  */
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { Executor, IExecutor } from '@cloudbeaver/core-executor';
-import { EServerErrorCode, GQLError, GraphQLService } from '@cloudbeaver/core-sdk';
+import { EServerErrorCode, GQLError, GraphQLService, SessionError } from '@cloudbeaver/core-sdk';
 import { errorOf } from '@cloudbeaver/core-utils';
-
-import { SessionError } from './SessionError';
-
 @injectable()
 export class SessionExpireService extends Bootstrap {
   expired = false;

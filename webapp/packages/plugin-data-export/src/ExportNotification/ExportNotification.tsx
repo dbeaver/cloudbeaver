@@ -6,37 +6,14 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import styled, { css } from 'reshadow';
 
-import { Button, SnackbarBody, SnackbarContent, SnackbarFooter, SnackbarStatus, SnackbarWrapper, useTranslate } from '@cloudbeaver/core-blocks';
+import { Button, SnackbarBody, SnackbarContent, SnackbarFooter, SnackbarStatus, SnackbarWrapper, s, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import { useController } from '@cloudbeaver/core-di';
 import { ENotificationType, NotificationComponentProps } from '@cloudbeaver/core-events';
 import { EDeferredState } from '@cloudbeaver/core-utils';
 
 import { ExportNotificationController } from './ExportNotificationController';
-
-const styles = css`
-  message {
-    composes: theme-typography--body1 from global;
-    opacity: 0.8;
-    overflow: auto;
-    max-height: 100px;
-    word-break: break-word;
-    white-space: pre-line;
-  }
-  source-name {
-    composes: theme-typography--body2 from global;
-    padding-top: 16px;
-    max-height: 50px;
-    overflow: hidden;
-
-    & pre {
-      margin: 0;
-      text-overflow: ellipsis;
-      overflow: hidden;
-    }
-  }
-`;
+import styles from './ExportNotification.m.css';
 
 type Props = NotificationComponentProps<{
   source: string;
@@ -45,18 +22,26 @@ type Props = NotificationComponentProps<{
 export const ExportNotification = observer<Props>(function ExportNotification({ notification }) {
   const controller = useController(ExportNotificationController, notification);
   const translate = useTranslate();
+  const style = useS(styles);
   const { title, status, message } = controller.status;
 
-  return styled(styles)(
+  return (
     <SnackbarWrapper persistent={status === ENotificationType.Loading} onClose={controller.delete}>
       <SnackbarStatus status={status} />
       <SnackbarContent>
         <SnackbarBody title={translate(title)}>
-          {message && <message>{message}</message>}
-          <source-name>
+          {message && <div className={s(style, { message: true })}>{message}</div>}
+          <div className={s(style, { 'source-name': true })}>
             {controller.sourceName}
-            {controller.task?.context.query && <pre title={controller.task.context.query}>{controller.task.context.query}</pre>}
-          </source-name>
+            {controller.task?.context.query && (
+              <pre 
+                className={s(style, { pre: true })} 
+                title={controller.task.context.query}
+              >
+                {controller.task.context.query}
+              </pre>
+            )}
+          </div>
         </SnackbarBody>
         <SnackbarFooter timestamp={notification.timestamp}>
           {status === ENotificationType.Info && controller.downloadUrl && (
@@ -86,6 +71,6 @@ export const ExportNotification = observer<Props>(function ExportNotification({ 
           )}
         </SnackbarFooter>
       </SnackbarContent>
-    </SnackbarWrapper>,
+    </SnackbarWrapper>
   );
 });

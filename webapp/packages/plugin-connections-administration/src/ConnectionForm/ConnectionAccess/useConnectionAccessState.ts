@@ -7,17 +7,17 @@
  */
 import { action, computed, observable } from 'mobx';
 
-import { IAutoLoadable, useObservableRef } from '@cloudbeaver/core-blocks';
+import { useObservableRef } from '@cloudbeaver/core-blocks';
 import { ConnectionInfoResource, createConnectionParam } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import type { DatabaseConnectionFragment } from '@cloudbeaver/core-sdk';
 import { useTabState } from '@cloudbeaver/core-ui';
-import { isArraysEqual, isContainsException } from '@cloudbeaver/core-utils';
+import { ILoadableState, isArraysEqual, isContainsException } from '@cloudbeaver/core-utils';
 
 import type { IConnectionAccessTabState } from './IConnectionAccessTabState';
 
-interface State extends IAutoLoadable {
+interface State extends ILoadableState {
   state: IConnectionAccessTabState;
   changed: boolean;
   edit: () => void;

@@ -33,6 +33,7 @@ import type { IAuthCredentials } from './IAuthCredentials';
 const NEW_USER_SYMBOL = Symbol('new-user');
 
 export type AdminUser = AdminUserInfoFragment;
+export type AdminUserOrigin = AdminUserInfoFragment['origins'][number];
 
 type AdminUserNew = AdminUser & { [NEW_USER_SYMBOL]: boolean };
 export type UserResourceIncludes = Omit<GetUsersListQueryVariables, 'userId' | 'page' | 'filter'>;
