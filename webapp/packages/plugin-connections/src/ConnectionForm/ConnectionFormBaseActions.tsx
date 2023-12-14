@@ -40,7 +40,7 @@ export const ConnectionFormBaseActions: PlaceholderComponent<IConnectionFormProp
           {translate('ui_processing_cancel')}
         </Button>
       )}
-      <Button type="button" disabled={state.disabled || !authorized} mod={['outlined']} loader onClick={state.test}>
+      <Button title={translate('connections_connection_test_tooltip')} type="button" disabled={state.disabled || !authorized} mod={['outlined']} loader onClick={state.test}>
         {translate('connections_connection_test')}
       </Button>
       <Button type="button" disabled={state.disabled || state.readonly} mod={['unelevated']} loader onClick={state.save}>

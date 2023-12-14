@@ -49,6 +49,7 @@ export default [
   ['connections_connection_port', 'Porta'],
   ['connections_connection_template', 'Template'],
   ['connections_connection_test', 'Prova la connessione'],
+  ['connections_connection_test_tooltip', 'Test connection'],
   ['connections_connection_test_fail', 'Prova di connessione fallita'],
   ['connections_connection_create_fail', 'Errore di creazione connessione'],
   ['connections_connection_save_fail', 'Errore di salvataggio connessione'],
