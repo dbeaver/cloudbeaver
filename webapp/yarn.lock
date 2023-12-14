@@ -8724,6 +8724,11 @@ eslint-plugin-jsx-a11y@~6.7.1:
     object.fromentries "^2.0.6"
     semver "^6.3.0"
 
+eslint-plugin-local-rules@^2.0.1:
+  version "2.0.1"
+  resolved "https://registry.yarnpkg.com/eslint-plugin-local-rules/-/eslint-plugin-local-rules-2.0.1.tgz#b9245e5def0d4ce698d062fb058fe16571805aa5"
+  integrity sha512-AJhGd+GcI5r2dbjiGPixM8jnBl0XFxqoVbqzwKbYz+nTk+Cj5dNE3+OlhC176bl5r25KsGsIthLi1VqIW5Ga+A==
+
 eslint-plugin-node@~11.1.0:
   version "11.1.0"
   resolved "https://registry.yarnpkg.com/eslint-plugin-node/-/eslint-plugin-node-11.1.0.tgz#c95544416ee4ada26740a30474eefc5402dc671d"
@@ -17440,6 +17445,28 @@ typedarray@~0.0.5:
   version "0.0.7"
   resolved "https://registry.yarnpkg.com/typedarray/-/typedarray-0.0.7.tgz#799207136a37f3b3efb8c66c40010d032714dc73"
   integrity sha512-ueeb9YybpjhivjbHP2LdFDAjbS948fGEPj+ACAMs4xCMmh72OCOMQWBQKlaN4ZNQ04yfLSDLSx1tGRIoWimObQ==
+
+typescript-plugin-css-modules@*:
+  version "5.0.2"
+  resolved "https://registry.yarnpkg.com/typescript-plugin-css-modules/-/typescript-plugin-css-modules-5.0.2.tgz#7aed6350638f11a1318d393568ea87404c75528f"
+  integrity sha512-ej/Og4Y8mF+43P14P9Ik1MGqNXcXBVgO1TltkESegdnZsaaRXnaJ5CoJmTPRkg25ysQlOV6P94wNhI4VxIzlkw==
+  dependencies:
+    "@types/postcss-modules-local-by-default" "^4.0.0"
+    "@types/postcss-modules-scope" "^3.0.1"
+    dotenv "^16.0.3"
+    icss-utils "^5.1.0"
+    less "^4.1.3"
+    lodash.camelcase "^4.3.0"
+    postcss "^8.4.21"
+    postcss-load-config "^3.1.4"
+    postcss-modules-extract-imports "^3.0.0"
+    postcss-modules-local-by-default "^4.0.0"
+    postcss-modules-scope "^3.0.0"
+    reserved-words "^0.1.2"
+    sass "^1.58.3"
+    source-map-js "^1.0.2"
+    stylus "^0.59.0"
+    tsconfig-paths "^4.1.2"
 
 typescript-plugin-css-modules@^5.0.1:
   version "5.0.1"

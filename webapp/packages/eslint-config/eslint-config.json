@@ -1,6 +1,6 @@
 {
   "parser": "@typescript-eslint/parser",
-  "plugins": ["@typescript-eslint/eslint-plugin"],
+  "plugins": ["@typescript-eslint/eslint-plugin", "eslint-plugin-local-rules"],
   "overrides": [
     {
       "files": ["**/*.cjs"],
@@ -207,6 +207,7 @@
         "noSortAlphabetically": true,
         "reservedFirst": true
       }
-    ]
+    ],
+    "local-rules/no-deprecated-reshadow": "warn"
   }
 }
