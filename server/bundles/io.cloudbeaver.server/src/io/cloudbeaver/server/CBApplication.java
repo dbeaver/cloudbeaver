@@ -43,6 +43,7 @@ import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.ModelPreferences;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
 import org.jkiss.dbeaver.model.app.DBPApplication;
+import org.jkiss.dbeaver.model.app.DBPPlatform;
 import org.jkiss.dbeaver.model.auth.AuthInfo;
 import org.jkiss.dbeaver.model.auth.SMCredentialsProvider;
 import org.jkiss.dbeaver.model.data.json.JSONUtils;
@@ -58,6 +59,7 @@ import org.jkiss.dbeaver.registry.BaseApplicationImpl;
 import org.jkiss.dbeaver.registry.DataSourceNavigatorSettings;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.dbeaver.runtime.IVariableResolver;
+import org.jkiss.dbeaver.runtime.ui.DBPPlatformUI;
 import org.jkiss.dbeaver.utils.ContentUtils;
 import org.jkiss.dbeaver.utils.GeneralUtils;
 import org.jkiss.dbeaver.utils.PrefUtils;
@@ -1248,5 +1250,16 @@ public abstract class CBApplication extends BaseWebApplication implements WebAut
         }
         var sslConfiguration = Path.of(sslConfigurationPath);
         return sslConfiguration.isAbsolute() ? sslConfiguration : getHomeDirectory().resolve(sslConfiguration);
+    }
+
+    @NotNull
+    @Override
+    public Class<? extends DBPPlatform> getPlatformClass() {
+        return CBPlatform.class;
+    }
+
+    @Override
+    public Class<? extends DBPPlatformUI> getPlatformUIClass() {
+        return CBPlatformUI.class;
     }
 }

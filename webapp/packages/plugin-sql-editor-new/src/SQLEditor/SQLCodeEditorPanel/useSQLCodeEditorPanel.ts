@@ -33,7 +33,7 @@ export function useSQLCodeEditorPanel(data: ISQLEditorData, editor: IEditor) {
         }
       },
       onQueryChange(query: string) {
-        this.data.setQuery(query);
+        this.data.setScript(query);
       },
       onUpdate(update: ViewUpdate) {
         const transactions = update.transactions.filter(t => t.selection !== undefined);
