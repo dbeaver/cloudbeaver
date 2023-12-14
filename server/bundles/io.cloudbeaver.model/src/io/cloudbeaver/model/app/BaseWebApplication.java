@@ -207,7 +207,7 @@ public abstract class BaseWebApplication extends BaseApplicationImpl implements 
         return VoidSecretController.INSTANCE;
     }
 
-    protected Map<String, Object> getServerConfigProps(Map<String, Object> configProps) {
+    protected static Map<String, Object> getServerConfigProps(Map<String, Object> configProps) {
         return JSONUtils.getObject(configProps, "server");
     }
 
