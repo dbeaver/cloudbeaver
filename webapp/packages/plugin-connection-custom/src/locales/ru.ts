@@ -1,7 +1,7 @@
 export default [
   ['customConnection_connectionType_custom', 'Параметры'],
   ['customConnection_connectionType_url', 'URL'],
-  ['customConnection_options', 'Главное'],
+  ['customConnection_main', 'Главное'],
   ['customConnection_properties', 'Параметры драйвера'],
   ['customConnection_custom_name', 'Имя'],
   ['customConnection_custom_host', 'Хост'],

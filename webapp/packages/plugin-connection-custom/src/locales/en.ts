@@ -1,7 +1,7 @@
 export default [
   ['customConnection_connectionType_custom', 'Parameters'],
   ['customConnection_connectionType_url', 'URL'],
-  ['customConnection_options', 'Main'],
+  ['customConnection_main', 'Main'],
   ['customConnection_properties', 'Driver Properties'],
   ['customConnection_custom_name', 'Name'],
   ['customConnection_custom_host', 'Host'],
