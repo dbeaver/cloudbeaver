@@ -13,7 +13,7 @@ export default [
   ['ui_processing_canceling', '取消中...'],
   ['ui_processing_retry', '重试'],
   ['ui_processing_ok', '好'],
-  ['ui_processing_finish', 'Finish'],
+  ['ui_processing_create', 'Finish'],
   ['ui_processing_save', '保存'],
   ['ui_processing_saved', 'Saved'],
   ['ui_processing_stop', 'Stop'],
