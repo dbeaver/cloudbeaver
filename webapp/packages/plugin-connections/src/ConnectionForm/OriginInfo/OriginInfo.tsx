@@ -9,6 +9,7 @@ import { runInAction } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
+import { AUTH_PROVIDER_LOCAL_ID, AuthProvidersResource, UserInfoResource } from '@cloudbeaver/core-authentication';
 import {
   ColoredContainer,
   ExceptionMessage,
@@ -20,7 +21,7 @@ import {
   useStyles,
   useTranslate,
 } from '@cloudbeaver/core-blocks';
-import { createConnectionParam } from '@cloudbeaver/core-connections';
+import { createConnectionParam, DatabaseAuthModelsResource, DBDriverResource } from '@cloudbeaver/core-connections';
 import { TabContainerPanelComponent, useTab, useTabState } from '@cloudbeaver/core-ui';
 
 import type { IConnectionFormProps } from '../IConnectionFormProps';
@@ -38,12 +39,25 @@ const style = css`
   }
 `;
 
-export const OriginInfo: TabContainerPanelComponent<IConnectionFormProps> = observer(function OriginInfo({ tabId, state: { info, resource } }) {
+export const OriginInfo: TabContainerPanelComponent<IConnectionFormProps> = observer(function OriginInfo({
+  tabId,
+  state: { info, resource, config },
+}) {
   const tab = useTab(tabId);
   const translate = useTranslate();
-  // const userInfoService = useService(UserInfoResource);
+  const userInfoLoader = useResource(OriginInfo, UserInfoResource, undefined);
   const state = useTabState<Record<string, any>>();
   const styles = useStyles(style);
+  const driverLoader = useResource(OriginInfo, DBDriverResource, config.driverId ?? null);
+  const authModeLoader = useResource(
+    OriginInfo,
+    DatabaseAuthModelsResource,
+    config.authModelId ?? info?.authModel ?? driverLoader.data?.defaultAuthModel ?? null,
+  );
+
+  const providerId = authModeLoader.data?.requiredAuth ?? info?.requiredAuth ?? AUTH_PROVIDER_LOCAL_ID;
+  const isAuthenticated = userInfoLoader.resource.hasToken(providerId);
+  const providerLoader = useResource(OriginInfo, AuthProvidersResource, providerId);
 
   const connection = useResource(
     OriginInfo,
@@ -53,7 +67,7 @@ export const OriginInfo: TabContainerPanelComponent<IConnectionFormProps> = obse
       includes: ['includeOrigin', 'customIncludeOriginDetails'] as const,
     },
     {
-      // isActive: () => !info?.origin || userInfoService.hasOrigin(info.origin),
+      active: isAuthenticated,
       onData: connection => {
         runInAction(() => {
           if (!connection.origin.details) {
@@ -89,15 +103,17 @@ export const OriginInfo: TabContainerPanelComponent<IConnectionFormProps> = obse
     );
   }
 
-  // const authorized = !info?.origin || userInfoService.hasOrigin(info.origin);
-
-  // if (!authorized && info?.origin) {
-  //   return styled(styles)(
-  //     <ColoredContainer parent vertical>
-  //       <AuthenticationProvider origin={info.origin} onAuthenticate={connection.reload} />
-  //     </ColoredContainer>
-  //   );
-  // }
+  if (!isAuthenticated) {
+    return styled(styles)(
+      <ColoredContainer parent>
+        <TextPlaceholder>
+          {translate('connections_public_connection_cloud_auth_required', undefined, {
+            providerLabel: providerLoader.data?.label,
+          })}
+        </TextPlaceholder>
+      </ColoredContainer>,
+    );
+  }
 
   if (!connection.data?.origin.details || connection.data.origin.details.length === 0) {
     return styled(styles)(

@@ -58,6 +58,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 /**
  * Web SQL processor.
@@ -417,13 +418,22 @@ public class WebSQLProcessor implements WebSessionProvider {
             DBCExecutionPurpose.UTIL,
             "Refresh row(s) after insert/update")
         ) {
+            boolean canRefreshResults = resultsInfo.canRefreshResults();
             for (Object[] row : newResultSetRows) {
                 if (row.length == 0) {
                     continue;
                 }
+                if (!canRefreshResults) {
+                    makeWebCellRow(resultsInfo, row, dataFormat);
+                    continue;
+                }
                 List<DBDAttributeConstraint> constraints = new ArrayList<>();
                 boolean hasKey = true;
-                for (DBDAttributeBinding attr : resultsInfo.getAttributes()) {
+                // get attributes only from row identifiers
+                Set<DBDAttributeBinding> idAttributes = resultsInfo.getRowIdentifiers().stream()
+                    .flatMap(r -> r.getAttributes().stream())
+                    .collect(Collectors.toSet());
+                for (DBDAttributeBinding attr : idAttributes) {
                     if (attr.getRowIdentifier() == null) {
                         continue;
                     }
@@ -439,6 +449,7 @@ public class WebSQLProcessor implements WebSessionProvider {
                 }
                 if (!hasKey) {
                     // No key value for this row
+                    makeWebCellRow(resultsInfo, row, dataFormat);
                     continue;
                 }
                 DBDDataFilter filter = new DBDDataFilter(constraints);
@@ -454,6 +465,20 @@ public class WebSQLProcessor implements WebSessionProvider {
                     DBSDataContainer.FLAG_REFRESH,
                     0);
             }
+        }
+    }
+
+    private void makeWebCellRow(
+        @NotNull WebSQLResultsInfo resultsInfo,
+        @NotNull Object[] row,
+        @Nullable WebDataFormat dataFormat
+    ) throws DBCException {
+        for (int i = 0; i < row.length; i++) {
+            row[i] = WebSQLUtils.makeWebCellValue(
+                webSession,
+                resultsInfo.getAttributeByPosition(i),
+                row[i],
+                dataFormat);
         }
     }
 

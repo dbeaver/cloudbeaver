@@ -19,13 +19,9 @@ export const SnackbarFooter: React.FC<React.PropsWithChildren<Props>> = function
   const timeStringFromTimestamp = new Date(timestamp).toLocaleTimeString();
 
   return (
-    <div data-testid="notification-footer" className={s(styles, { notificationFooter: true }, className)}>
-      <span data-testid="footer-time" className={styles.footerTime}>
-        {timeStringFromTimestamp}
-      </span>
-      <div data-testid="actions" className={styles.actions}>
-        {children}
-      </div>
+    <div className={s(styles, { notificationFooter: true }, className)}>
+      <span className={styles.footerTime}>{timeStringFromTimestamp}</span>
+      <div className={styles.actions}>{children}</div>
     </div>
   );
 };

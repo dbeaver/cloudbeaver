@@ -6,7 +6,6 @@
  * you may not use this file except in compliance with the License.
  */
 import { useCallback, useRef, useState } from 'react';
-import { use } from 'reshadow';
 
 import { IconButton } from '../IconButton';
 import { useTranslate } from '../localization/useTranslate';
@@ -67,7 +66,6 @@ export const ItemListSearch: React.FC<IProps> = function ItemListSearch({ value,
           autoComplete="off"
           disabled={disabled}
           onChange={event => changeHandler(event.target.value)}
-          {...use({ mod: 'surface' })}
         />
         <div className={s(styles, { actionButton: true })}>
           {!onSearch && inputValue ? (

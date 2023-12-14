@@ -7,37 +7,26 @@
  */
 import { observer } from 'mobx-react-lite';
 import { useEffect, useState } from 'react';
-import styled, { css } from 'reshadow';
 
-import { Combobox, Container, Group, GroupItem, GroupTitle, useTranslate } from '@cloudbeaver/core-blocks';
+import { Combobox, Container, Group, GroupItem, GroupTitle, s, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
 import { IVersion, VersionResource } from '@cloudbeaver/core-version';
 import { VersionUpdateService } from '@cloudbeaver/core-version-update';
 
 import { VersionInfo } from './VersionInfo';
+import styles from './VersionSelector.m.css';
 
 interface Props {
   versions: IVersion[];
 }
-
-const style = css`
-  Group {
-    list-style-position: inside;
-  }
-  Instruction {
-    white-space: pre-line;
-  }
-  h4 {
-    margin: 0;
-  }
-`;
 
 export const VersionSelector = observer<Props>(function VersionSelector({ versions }) {
   const versionUpdateService = useService(VersionUpdateService);
   const versionResource = useService(VersionResource);
   const serverConfigResource = useService(ServerConfigResource);
   const translate = useTranslate();
+  const style = useS(styles);
 
   const [selected, setSelected] = useState('');
 
@@ -50,9 +39,9 @@ export const VersionSelector = observer<Props>(function VersionSelector({ versio
   const version = versions.find(v => v.number === selected);
   const Instruction = versionUpdateService.versionInstructionGetter?.();
 
-  return styled(style)(
+  return (
     <Container gap>
-      <Group gap large>
+      <Group className={s(style, { group: true })} gap large>
         <Combobox
           items={versions}
           keySelector={value => value.number}
@@ -65,15 +54,15 @@ export const VersionSelector = observer<Props>(function VersionSelector({ versio
         </Combobox>
         {version && Instruction && (
           <GroupItem>
-            <Instruction version={version} containerId={serverConfigResource.data?.containerId} />
+            <Instruction className={s(style, { instruction: true })} version={version} containerId={serverConfigResource.data?.containerId} />
           </GroupItem>
         )}
         <GroupTitle>{translate('plugin_version_update_administration_recommendations_label')}</GroupTitle>
         <GroupItem>
-          <h4>{translate('plugin_version_update_administration_recommendations')}</h4>
+          <h4 className={s(style, { h4: true })}>{translate('plugin_version_update_administration_recommendations')}</h4>
         </GroupItem>
       </Group>
       {version && <VersionInfo item={version.number} />}
-    </Container>,
+    </Container>
   );
 });
