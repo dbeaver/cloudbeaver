@@ -48,6 +48,14 @@
     border-left-color: $cursor;
   }
 
+  .editor .cm-link {
+    &.cm-link-loaded {
+      @include mdc-theme-prop(color, primary, false);
+      text-decoration: underline;
+      cursor: pointer;
+    }
+  }
+
   .editor .cm-dropCursor {
     border-left: 1.2px solid $cursor;
   }
