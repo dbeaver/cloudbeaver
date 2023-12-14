@@ -19,9 +19,9 @@ package io.cloudbeaver.server.jetty;
 import io.cloudbeaver.server.CBApplication;
 import io.cloudbeaver.server.CBConstants;
 
-import javax.servlet.ServletContextEvent;
-import javax.servlet.ServletContextListener;
-import javax.servlet.SessionCookieConfig;
+import jakarta.servlet.ServletContextEvent;
+import jakarta.servlet.ServletContextListener;
+import jakarta.servlet.SessionCookieConfig;
 
 public class CBServerContextListener implements ServletContextListener {
 
