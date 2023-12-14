@@ -155,7 +155,7 @@ export const ConfigurationsList = observer<Props>(function ConfigurationsList({
   return styled(style)(
     <container className={className}>
       {configurations.length >= 10 && (
-        <Filter placeholder={translate('authentication_identity_provider_search_placeholder')} value={search} max onFilter={setSearch} />
+        <Filter placeholder={translate('authentication_identity_provider_search_placeholder')} value={search} max onChange={setSearch} />
       )}
       <list>
         {filteredConfigurations.map(({ provider, configuration }) => {
