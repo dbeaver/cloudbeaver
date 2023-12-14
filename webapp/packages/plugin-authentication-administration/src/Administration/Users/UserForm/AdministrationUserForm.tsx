@@ -88,7 +88,7 @@ export const AdministrationUserForm = observer<Props>(function AdministrationUse
                 {translate('ui_processing_cancel')}
               </Button>
               <Button type="button" disabled={state.isDisabled} mod={['unelevated']} onClick={() => form.submit()}>
-                {translate(!editing ? 'ui_processing_create' : 'ui_processing_save')}
+                {translate(!editing ? 'ui_processing_finish' : 'ui_processing_save')}
               </Button>
             </Container>
           </Container>
