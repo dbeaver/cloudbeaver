@@ -66,4 +66,5 @@ export interface ISQLEditorData {
     passEmpty?: boolean,
     passDisabled?: boolean,
   ): Promise<T | undefined>;
+  setModeId(tabId: string): void;
 }
