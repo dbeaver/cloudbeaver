@@ -23,7 +23,6 @@ export * from './ItemList/ListItemIcon';
 export * from './ItemList/ListItemName';
 
 export * from './layout/AppLogo';
-export * from './layout/BASE_LAYOUT_GRID_STYLES';
 export * from './layout/TopAppBar';
 
 export * from './Loader/Loader';
@@ -184,6 +183,7 @@ export * from './IconButton';
 export * from './ActionIconButton';
 export { default as IconButtonStyles } from './IconButton.m.css';
 export { default as ActionIconButtonStyles } from './ActionIconButton.m.css';
+export { default as AdministrationToolsPanelStyles } from './AdministrationToolsPanelStyles.m.css';
 export * from './IconOrImage';
 export * from './s';
 export * from './SContext';
