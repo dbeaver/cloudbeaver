@@ -15291,7 +15291,7 @@ rc@^1.2.7:
     strip-json-comments "~2.0.1"
 
 "react-data-grid@file:packages/plugin-react-data-grid/react-data-grid-dist":
-  version "7.0.0-beta.37"
+  version "7.0.0-beta.41"
   dependencies:
     clsx "^2.0.0"
 
