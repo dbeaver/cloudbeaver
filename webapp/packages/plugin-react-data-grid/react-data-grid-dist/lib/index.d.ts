@@ -26,6 +26,7 @@ export declare interface CalculatedColumn<TRow, TSummaryRow = unknown> extends C
     readonly maxWidth: number | undefined;
     readonly resizable: boolean;
     readonly sortable: boolean;
+    readonly draggable: boolean;
     readonly frozen: boolean;
     readonly isLastFrozenColumn: boolean;
     readonly renderCell: (props: RenderCellProps<TRow, TSummaryRow>) => ReactNode;
@@ -73,6 +74,12 @@ export declare interface CellRendererProps<TRow, TSummaryRow> extends Pick<Rende
     onRowChange: (column: CalculatedColumn<TRow, TSummaryRow>, newRow: TRow) => void;
 }
 
+export declare interface CellSelectArgs<TRow, TSummaryRow = unknown> {
+    rowIdx: number;
+    row: TRow;
+    column: CalculatedColumn<TRow, TSummaryRow>;
+}
+
 export declare type ColSpanArgs<TRow, TSummaryRow> = {
     type: 'HEADER';
 } | {
@@ -116,6 +123,8 @@ export declare interface Column<TRow, TSummaryRow = unknown> {
     readonly resizable?: Maybe<boolean>;
     /** Enable sorting of a column */
     readonly sortable?: Maybe<boolean>;
+    /** Enable dragging of a column */
+    readonly draggable?: Maybe<boolean>;
     /** Sets the column sort order to be descending instead of ascending the first time the column is sorted */
     readonly sortDescendingFirst?: Maybe<boolean>;
     readonly editorOptions?: Maybe<{
@@ -196,8 +205,6 @@ export declare interface DataGridProps<R, SR = unknown, K extends Key = Key> ext
      */
     /** Set of selected row keys */
     selectedRows?: Maybe<ReadonlySet<K>>;
-    /** Function called whenever cell selection is changed */
-    onSelectedCellChange?: Maybe<(selectedCell: Position) => void>;
     /** Function called whenever row selection is changed */
     onSelectedRowsChange?: Maybe<(selectedRows: Set<K>) => void>;
     /** Used for multi column sorting */
@@ -217,10 +224,14 @@ export declare interface DataGridProps<R, SR = unknown, K extends Key = Key> ext
     /** Function called whenever a cell is right clicked */
     onCellContextMenu?: Maybe<(args: CellClickArgs<R, SR>, event: CellMouseEvent) => void>;
     onCellKeyDown?: Maybe<(args: CellKeyDownArgs<R, SR>, event: CellKeyboardEvent) => void>;
+    /** Function called whenever cell selection is changed */
+    onSelectedCellChange?: Maybe<(args: CellSelectArgs<R, SR>) => void>;
     /** Called when the grid is scrolled */
     onScroll?: Maybe<(event: React.UIEvent<HTMLDivElement>) => void>;
     /** Called when a column is resized */
     onColumnResize?: Maybe<(idx: number, width: number) => void>;
+    /** Called when a column is reordered */
+    onColumnsReorder?: Maybe<(sourceColumnKey: string, targetColumnKey: string) => void>;
     /**
      * Toggles and modes
      */
@@ -239,7 +250,7 @@ export declare interface DataGridProps<R, SR = unknown, K extends Key = Key> ext
 declare const _default: <R, SR = unknown, K extends Key = Key>(props: DataGridProps<R, SR, K> & RefAttributes<DataGridHandle>) => JSX.Element;
 export default _default;
 
-declare type DefaultColumnOptions<R, SR> = Pick<Column<R, SR>, 'renderCell' | 'width' | 'minWidth' | 'maxWidth' | 'resizable' | 'sortable'>;
+declare type DefaultColumnOptions<R, SR> = Pick<Column<R, SR>, 'renderCell' | 'width' | 'minWidth' | 'maxWidth' | 'resizable' | 'sortable' | 'draggable'>;
 
 declare type Direction = 'ltr' | 'rtl';
 
@@ -294,6 +305,7 @@ export declare interface Position {
 export declare interface RenderCellProps<TRow, TSummaryRow = unknown> {
     column: CalculatedColumn<TRow, TSummaryRow>;
     row: TRow;
+    rowIdx: number;
     isCellEditable: boolean;
     tabIndex: number;
     onRowChange: (row: TRow) => void;
