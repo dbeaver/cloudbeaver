@@ -95,6 +95,7 @@ export const UserFormOriginInfoPanel: TabContainerPanelComponent<UserFormProps> 
           items={origins}
           keySelector={(o, i) => String(i)}
           valueSelector={origin => origin.displayName}
+          disabled={origins.length === 0}
           tiny
         >
           {translate('authentication_administration_user_auth_method')}
