@@ -533,6 +533,19 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
     ],
   });
 
+  useEffect(() => {
+    const subscription = autorun(() => {
+      const contexts = data.onMode.execute(data);
+      const activeSegmentMode = contexts.getContext(SQLEditorModeContext);
+
+      action(() => {
+        data.activeSegmentMode = activeSegmentMode;
+      });
+    });
+
+    return subscription;
+  }, [data]);
+
   useEffect(() => () => data.destruct(), []);
 
   return data;
