@@ -8,7 +8,7 @@
 
 export const defaultProductConfiguration: Record<string, any> = {
   core_events: {
-    notificationsPool: 5.0,
+    notificationsPool: 20.0,
   },
   core: {
     user: {

@@ -22,14 +22,12 @@ import { TableDataContext } from '../TableDataContext';
 import { CellContext } from './CellContext';
 
 export const CellRenderer = observer<CellRendererProps<IResultSetRowKey, unknown>>(function CellRenderer(props) {
-  const { row, column, isCellSelected, onDoubleClick, selectCell } = props;
+  const { rowIdx, row, column, isCellSelected, onDoubleClick, selectCell } = props;
   const dataGridContext = useContext(DataGridContext);
   const tableDataContext = useContext(TableDataContext);
   const selectionContext = useContext(DataGridSelectionContext);
   const editingContext = useContext(EditingContext);
   const mouse = useMouse<HTMLDivElement>({});
-
-  const rowIdx = tableDataContext.getRowIndexFromKey(row);
 
   const cellContext = useObservableRef(
     () => ({
