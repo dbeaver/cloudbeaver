@@ -71,7 +71,7 @@ export const SqlEditor = observer<ISqlEditorProps>(function SqlEditor({ state, c
   });
 
   function handleModeSelect(tab: ITabData<ISqlEditorModeProps>) {
-    state.currentModeId = tab.tabId;
+    data.setModeId(tab.tabId);
   }
 
   const displayedEditors = getComputed(() => sqlEditorModeService.tabsContainer.getDisplayed({ state, data }).length);
