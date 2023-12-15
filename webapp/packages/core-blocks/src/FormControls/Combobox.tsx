@@ -264,7 +264,7 @@ export const Combobox: ComboboxType = observer(function Combobox({
         </FieldLabel>
       )}
       <div className={s(styles, { inputBox: true })}>
-        <input className={s(styles, { validationInput: true })} value={value} required={rest.required} />
+        <input className={s(styles, { validationInput: true })} value={inputValue} required={rest.required} />
         {(icon || loading) && (
           <div className={s(styles, { inputIcon: true })}>
             {loading ? (
