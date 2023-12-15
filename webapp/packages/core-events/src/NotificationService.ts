@@ -194,8 +194,6 @@ export class NotificationService {
         isSilent: silent,
       });
     }
-
-    console.error(exception);
   }
 
   throwSilently(exception: Error | GQLError | undefined | null): void {
