@@ -9,11 +9,12 @@ import { observer } from 'mobx-react-lite';
 import { useContext } from 'react';
 import { TabList as BaseTabList, TabListOptions, TabStateReturn } from 'reakit/Tab';
 
-import { useTranslate } from '@cloudbeaver/core-blocks';
+import { s, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import type { ComponentStyle } from '@cloudbeaver/core-theming';
 
 import { generateTabElement } from './generateTabElement';
 import { TabDefault } from './Tab/TabDefault';
+import styles from './TabList.m.css';
 import { TabsContext } from './TabsContext';
 
 interface Props extends Omit<TabListOptions, keyof TabStateReturn> {
@@ -23,9 +24,10 @@ interface Props extends Omit<TabListOptions, keyof TabStateReturn> {
   className?: string;
 }
 
-export const TabList = observer<React.PropsWithChildren<Props>>(function TabList({ style, children, childrenFirst, ...props }) {
+export const TabList = observer<React.PropsWithChildren<Props>>(function TabList({ style, className, children, childrenFirst, ...props }) {
   const state = useContext(TabsContext);
   const translate = useTranslate();
+  const componentStyle = useS(styles);
 
   if (!state) {
     throw new Error('Tabs context was not provided');
@@ -34,7 +36,12 @@ export const TabList = observer<React.PropsWithChildren<Props>>(function TabList
   if (state.container) {
     const displayed = state.container.getDisplayed(state.props);
     return (
-      <BaseTabList {...props} {...state.state} area-label={translate(props['aria-label'] ?? state.container.areaLabel)}>
+      <BaseTabList
+        {...props}
+        className={s(componentStyle, { tabList: true }, className)}
+        {...state.state}
+        aria-label={translate(props['aria-label'] ?? state.container.areaLabel)}
+      >
         {childrenFirst && children}
         {displayed
           .map(
@@ -64,7 +71,7 @@ export const TabList = observer<React.PropsWithChildren<Props>>(function TabList
   }
 
   return (
-    <BaseTabList {...props} {...state.state} area-label={translate(props['aria-label'])}>
+    <BaseTabList {...props} className={s(componentStyle, { tabList: true }, className)} {...state.state} aria-label={translate(props['aria-label'])}>
       {children}
     </BaseTabList>
   );

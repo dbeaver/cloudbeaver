@@ -22,10 +22,11 @@ import {
   IResultSetEditActionData,
   IResultSetElementKey,
   IResultSetPartialKey,
+  IResultSetRowKey,
   ResultSetDataKeysUtils,
   ResultSetSelectAction,
 } from '@cloudbeaver/plugin-data-viewer';
-import DataGrid, { type DataGridHandle, type Position } from '@cloudbeaver/plugin-react-data-grid';
+import DataGrid, { CellSelectArgs, type DataGridHandle, type Position } from '@cloudbeaver/plugin-react-data-grid';
 import '@cloudbeaver/plugin-react-data-grid/react-data-grid-dist/lib/styles.css';
 
 import { CellPosition, EditingContext } from '../Editing/EditingContext';
@@ -356,14 +357,17 @@ export const DataGridTable = observer<IDataPresentationProps<any, IDatabaseResul
     innerState.lastCount = model.source.count;
   }, [model.source.count]);
 
-  const handleFocusChange = (position: CellPosition) => {
-    if (focusSyncRef.current && focusSyncRef.current.idx === position.idx && focusSyncRef.current.rowIdx === position.rowIdx) {
+  const handleFocusChange = (event: CellSelectArgs<IResultSetRowKey>) => {
+    const columnIndex = event.column.idx;
+    const rowIndex = event.rowIdx;
+
+    if (focusSyncRef.current && focusSyncRef.current.idx === columnIndex && focusSyncRef.current.rowIdx === rowIndex) {
       focusSyncRef.current = null;
       return;
     }
 
-    const column = tableData.getColumn(position.idx);
-    const row = tableData.getRow(position.rowIdx);
+    const column = tableData.getColumn(columnIndex);
+    const row = tableData.getRow(rowIndex);
 
     if (column?.columnDataIndex && row) {
       selectionAction.focus({

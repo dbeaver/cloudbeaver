@@ -31,10 +31,28 @@ export class TemplateConnectionsResource extends CachedDataResource<Connection[]
         this.markOutdated();
       }
     });
-    connectionInfoResource.onItemDelete.addHandler(list => {
-      const isAnyTemplate = connectionInfoResource.get(ResourceKeyUtils.toList(list)).some(connection => connection?.template);
 
-      if (isAnyTemplate) {
+    connectionInfoResource.onDataOutdated.addHandler(key => {
+      const keyData = connectionInfoResource.get(key);
+      const connections = Array.isArray(keyData) ? keyData : [keyData];
+
+      if (connections.some(connection => connection?.template)) {
+        this.markOutdated();
+      }
+    });
+
+    connectionInfoResource.onItemUpdate.addHandler(list => {
+      const includesTemplate = connectionInfoResource.get(ResourceKeyUtils.toList(list)).some(connection => connection?.template);
+
+      if (includesTemplate) {
+        this.markOutdated();
+      }
+    });
+
+    connectionInfoResource.onItemDelete.addHandler(list => {
+      const includesTemplate = connectionInfoResource.get(ResourceKeyUtils.toList(list)).some(connection => connection?.template);
+
+      if (includesTemplate) {
         this.markOutdated();
       }
     });
@@ -46,7 +64,7 @@ export class TemplateConnectionsResource extends CachedDataResource<Connection[]
       customIncludeOriginDetails: false,
       includeAuthProperties: true,
       includeOrigin: false,
-      includeAuthNeeded: false,
+      includeAuthNeeded: true,
       includeCredentialsSaved: false,
       includeProperties: false,
       includeProviderProperties: false,
