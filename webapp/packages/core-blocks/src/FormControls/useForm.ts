@@ -109,10 +109,7 @@ export function useForm(options?: IOptions): IFormContext {
         } else {
           const validationContext = this.onValidate.execute();
           const interrupted = ExecutorInterrupter.isInterrupted(validationContext);
-
-          if (interrupted) {
-            context.ref?.reportValidity();
-          }
+          
           return interrupted === false;
         }
       },
