@@ -1,37 +1,37 @@
 // Product configuration. Customized web application behavior
 // It is in JSON5 format
 {
-    // Global properties
-    core: {
-        // User defaults
-        user: {
-            defaultTheme: "light",
-            defaultLanguage: "en"
-        }, 
-        app: {
-            // Log viewer config
-            logViewer: {
-                refreshTimeout: 3000,
-                logBatchSize: 1000,
-                maxLogRecords: 2000,
-                maxFailedRequests: 3
-            }
-        }
+  // Global properties
+  core: {
+    // User defaults
+    user: {
+      defaultTheme: 'light',
+      defaultLanguage: 'en',
     },
-    plugin: {
-        'sql-editor': {
-            // max size of the file that can be uploaded to the editor (in kilobytes)
-            maxFileSize: 10240
-        }
+    app: {
+      // Log viewer config
+      logViewer: {
+        refreshTimeout: 3000,
+        logBatchSize: 1000,
+        maxLogRecords: 2000,
+        maxFailedRequests: 3,
+      },
     },
-    plugin_data_spreadsheet_new: {
-        hidden: false
+  },
+  plugin: {
+    'sql-editor': {
+      // max size of the file that can be uploaded to the editor (in kilobytes)
+      maxFileSize: 10240,
     },
-    plugin_data_export: {
-        disabled: false
-    },
-    // Notifications config
-    core_events: {
-        notificationsPool: 5
-    }
+  },
+  plugin_data_spreadsheet_new: {
+    hidden: false,
+  },
+  plugin_data_export: {
+    disabled: false,
+  },
+  // Notifications config
+  core_events: {
+    notificationsPool: 20,
+  },
 }
