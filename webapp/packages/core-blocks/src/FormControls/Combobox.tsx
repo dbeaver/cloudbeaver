@@ -62,6 +62,7 @@ interface ComboboxType {
   <TValue, TKey extends keyof TState, TState>(props: ObjectProps<TValue, TKey, TState>): JSX.Element;
 }
 
+{/* TODO rewrite whole component to select attribute instead of input type text so it has an okay form validation */}
 export const Combobox: ComboboxType = observer(function Combobox({
   value: controlledValue,
   defaultValue,
@@ -263,6 +264,7 @@ export const Combobox: ComboboxType = observer(function Combobox({
         </FieldLabel>
       )}
       <div className={s(styles, { inputBox: true })}>
+        <input className={s(styles, { validationInput: true })} value={value} required={rest.required} />
         {(icon || loading) && (
           <div className={s(styles, { inputIcon: true })}>
             {loading ? (
@@ -276,6 +278,7 @@ export const Combobox: ComboboxType = observer(function Combobox({
         )}
         <input
           ref={setInputRef}
+          required={rest.required}
           autoComplete="off"
           name={name}
           title={title}
