@@ -45,12 +45,6 @@ const tableFooterStyles = css`
       height: 24px;
     }
   }
-  IconButton {
-    position: relative;
-    height: 24px;
-    width: 24px;
-    display: block;
-  }
   time {
     composes: theme-typography--caption from global;
     white-space: nowrap;
