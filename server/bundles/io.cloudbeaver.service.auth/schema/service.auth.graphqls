@@ -72,6 +72,8 @@ type AuthProviderInfo {
     credentialProfiles: [AuthProviderCredentialsProfile!]!
 
     requiredFeatures: [String!]!
+
+    required: Boolean!
 }
 
 type AuthInfo {

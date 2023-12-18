@@ -8,7 +8,6 @@
 import { observer } from 'mobx-react-lite';
 
 import { filterLayoutFakeProps, getLayoutProps } from '../../Containers/filterLayoutFakeProps';
-import elementsSizeStyles from '../../Containers/shared/ElementsSize.m.css';
 import { s } from '../../s';
 import { useS } from '../../useS';
 import { Field } from '../Field';

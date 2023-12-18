@@ -9,5 +9,6 @@ fragment UserConnectionAuthProperties on ObjectPropertyInfo {
   defaultValue
   length
   features
+  required
   order
 }
