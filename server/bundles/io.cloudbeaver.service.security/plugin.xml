@@ -9,8 +9,8 @@
                 icon="platform:/plugin/org.jkiss.dbeaver.model/icons/tree/key.png">
             <credentials>
                 <propertyGroup label="General">
-                    <property id="user" label="User name" type="string" description="User name" admin="true" user="true" identifying="true"/>
-                    <property id="password" label="User password" type="string" description="User password" encryption="hash" admin="true" user="true"/>
+                    <property id="user" label="User name" type="string" description="User name" admin="true" user="true" identifying="true" required="true"/>
+                    <property id="password" label="User password" type="string" description="User password" encryption="hash" admin="true" user="true" required="true"/>
                 </propertyGroup>
             </credentials>
 
