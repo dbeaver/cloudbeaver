@@ -34,9 +34,6 @@ const style = css`
     flex: 1;
     overflow: auto;
   }
-  ExceptionMessage {
-    padding: 16px;
-  }
 `;
 
 export const OriginInfo: TabContainerPanelComponent<IConnectionFormProps> = observer(function OriginInfo({

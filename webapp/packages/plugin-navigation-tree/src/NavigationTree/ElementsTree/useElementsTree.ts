@@ -371,7 +371,9 @@ export function useElementsTree(options: IOptions): IElementsTree {
 
       state.sync(data.nodeState);
 
-      await functionsRef.loadTree(options.root);
+      try {
+        await functionsRef.loadTree(options.root);
+      } catch {}
     },
     data => typeof data === 'object' && typeof data.filter === 'string' && Array.isArray(data.nodeState),
   );
@@ -684,12 +686,12 @@ export function useElementsTree(options: IOptions): IElementsTree {
   );
 
   useEffect(() => {
-    functionsRef.loadTree(options.root);
+    functionsRef.loadTree(options.root).catch(() => ({}));
   }, [options.root]);
 
   const loadTreeThreshold = useCallback(
     throttle(function refreshRoot() {
-      functionsRef.loadTree(options.root);
+      functionsRef.loadTree(options.root).catch(() => ({}));
     }, 100),
     [],
   );

@@ -7,7 +7,7 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import { Container, useResource } from '@cloudbeaver/core-blocks';
+import { Container, Group, useResource } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { EditorLoader } from '@cloudbeaver/plugin-codemirror6';
 
@@ -32,7 +32,7 @@ export const OutputLogsPanel = observer<Props>(function SqlOutputLogsPanel({ sql
     <Container className="theme-background-secondary" overflow vertical noWrap dense parent gap>
       <OutputLogsToolbar state={state} sqlEditorTabState={sqlEditorTabState} />
       {data && (
-        <Container overflow>
+        <Group box>
           <EditorLoader
             value={state.resultValue}
             foldGutter={false}
@@ -40,7 +40,7 @@ export const OutputLogsPanel = observer<Props>(function SqlOutputLogsPanel({ sql
             highlightActiveLine={false}
             readonly
           />
-        </Container>
+        </Group>
       )}
     </Container>
   );

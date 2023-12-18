@@ -13,4 +13,5 @@ export * from './isObjectPropertyInfoStateEqual';
 export * from './sdk';
 export * from './ServerInternalError';
 export * from './ServiceError';
+export * from './SessionError';
 export * from './manifest';
