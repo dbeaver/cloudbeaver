@@ -41,12 +41,12 @@ const registry: StyleRegistry = [
 ];
 
 export const SqlEditorActionsMenu = observer<Props>(function SqlEditorActionsMenu({ state, context, className }) {
-  const styles = useS(SqlEditorActionsMenuBarStyles, SqlEditorActionsMenuBarItemStyles);
+  const menuBarStyles = useS(SqlEditorActionsMenuBarStyles, SqlEditorActionsMenuBarItemStyles, MenuBarStyles, MenuBarItemStyles);
   const menu = useMenu({ menu: SQL_EDITOR_ACTIONS_MENU, context });
 
   return (
     <SContext registry={registry}>
-      <MenuBar menu={menu} className={s(styles, { sqlActions: true }, className)} />
+      <MenuBar menu={menu} className={s(menuBarStyles, { toolsMenu: true, floating: true, sqlActions: true }, className)} />
     </SContext>
   );
 });

@@ -13,6 +13,7 @@ import type { ObjectPropertyInfo } from '@cloudbeaver/core-sdk';
 import { getLayoutProps } from '../../Containers/filterLayoutFakeProps';
 import type { ILayoutSizeProps } from '../../Containers/ILayoutSizeProps';
 import elementsSizeStyles from '../../Containers/shared/ElementsSize.m.css';
+import { useTranslate } from '../../localization/useTranslate';
 import { s } from '../../s';
 import { TextPlaceholder } from '../../TextPlaceholder';
 import { useS } from '../../useS';
@@ -30,6 +31,7 @@ interface ObjectPropertyFormProps extends ILayoutSizeProps {
   autoHide?: boolean;
   showRememberTip?: boolean;
   hideEmptyPlaceholder?: boolean;
+  emptyPlaceholder?: string;
   canShowPassword?: boolean;
   isSaved?: (property: ObjectPropertyInfo) => boolean;
   geLayoutSize?: (property: ObjectPropertyInfo) => ILayoutSizeProps;
@@ -48,12 +50,14 @@ export const ObjectPropertyInfoForm = observer<ObjectPropertyFormProps>(function
   autoHide,
   showRememberTip,
   hideEmptyPlaceholder,
+  emptyPlaceholder = 'core_blocks_object_property_info_form_empty_placeholder',
   canShowPassword,
   isSaved,
   geLayoutSize,
   onFocus,
   ...rest
 }) {
+  const translate = useTranslate();
   const layoutProps = getLayoutProps(rest);
   const handleFocus = useCallback(
     (e: React.FocusEvent<HTMLInputElement>) => {
@@ -67,7 +71,7 @@ export const ObjectPropertyInfoForm = observer<ObjectPropertyFormProps>(function
   const sizeStyles = useS(elementsSizeStyles);
 
   if (properties.length === 0 && !hideEmptyPlaceholder) {
-    return <TextPlaceholder>Properties empty</TextPlaceholder>;
+    return <TextPlaceholder>{translate(emptyPlaceholder)}</TextPlaceholder>;
   }
 
   return (

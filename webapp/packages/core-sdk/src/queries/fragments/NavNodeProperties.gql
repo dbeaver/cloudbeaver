@@ -8,4 +8,5 @@ fragment NavNodeProperties on ObjectPropertyInfo {
   features
   value
   order
+  required
 }

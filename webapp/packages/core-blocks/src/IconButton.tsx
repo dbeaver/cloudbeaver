@@ -7,7 +7,7 @@
  */
 import { observer } from 'mobx-react-lite';
 import type React from 'react';
-import { Button, ButtonProps } from 'reakit/Button';
+import { ButtonProps, Button as ReakitButton } from 'reakit/Button';
 import styled from 'reshadow';
 
 import type { ComponentStyle } from '@cloudbeaver/core-theming';
@@ -20,6 +20,7 @@ import { useS } from './useS';
 import { useStyles } from './useStyles';
 
 interface Props {
+  tag?: 'button' | 'a' | 'div';
   name: string;
   img?: boolean;
   viewBox?: string;
@@ -28,8 +29,10 @@ interface Props {
 
 export type IconButtonProps = Props & ButtonProps;
 
-export const IconButton: React.FC<IconButtonProps> = observer(function IconButton({ name, img, viewBox, style, className, ...rest }) {
+export const IconButton: React.FC<IconButtonProps> = observer(function IconButton({ tag, name, img, viewBox, style, className, ...rest }) {
   const styles = useS(IconButtonStyles);
+
+  const Button = tag ?? ReakitButton;
 
   return styled(useStyles(style))(
     <Button {...rest} className={s(styles, { iconButton: true }, className)}>

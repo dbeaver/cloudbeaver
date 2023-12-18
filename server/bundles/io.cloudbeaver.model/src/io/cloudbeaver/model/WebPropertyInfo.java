@@ -173,6 +173,11 @@ public class WebPropertyInfo {
         return new String[0];
     }
 
+    @Property
+    public boolean isRequired() {
+        return property.isRequired();
+    }
+
     public boolean hasFeature(@NotNull String feature) {
         return property.hasFeature(feature);
     }

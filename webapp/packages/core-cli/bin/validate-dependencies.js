@@ -88,8 +88,9 @@ for (const sideEffect of sideEffects) {
 console.log('Analyzing dependencies...');
 
 const newDependencies = [...dependencies].sort(sortDependencies);
+const newAllDependencies = [...newDependencies, ...devDependencies].sort(sortDependencies);
 
-logUnmetAndExtraDependencies('dependencies', newDependencies, currentPackage.dependencies);
+logUnmetAndExtraDependencies('dependencies', newDependencies, currentPackage.dependencies, newAllDependencies);
 
 currentPackage.dependencies = newDependencies.reduce(
   (acc, dep) => ({
@@ -101,7 +102,7 @@ currentPackage.dependencies = newDependencies.reduce(
 
 const newDevDependencies = [...devDependencies].sort(sortDependencies);
 
-logUnmetAndExtraDependencies('dev dependencies', newDevDependencies, currentPackage.devDependencies);
+logUnmetAndExtraDependencies('dev dependencies', newDevDependencies, currentPackage.devDependencies, newAllDependencies);
 
 currentPackage.devDependencies = [...devDependencies].sort(sortDependencies).reduce(
   (acc, dep) => ({
@@ -153,17 +154,27 @@ function sortDependencies(a, b) {
   return a.localeCompare(b);
 }
 
-function logUnmetAndExtraDependencies(key, newDependencies, current) {
+function logUnmetAndExtraDependencies(key, newDependencies, current, allDependencies = []) {
   const unmetDependencies = newDependencies.filter(dep => !current?.[dep]);
-  const extraDependencies = Object.keys(current || {}).filter(dep => !newDependencies.includes(dep));
+  const extraDependencies = Object.keys(current || {}).filter(dep => {
+    if (newDependencies.includes(dep)) {
+      return false;
+    }
+
+    if (dep.startsWith('@types/') && allDependencies.includes(dep.replace('@types/', ''))) {
+      return false;
+    }
+
+    return true;
+  });
 
   if (unmetDependencies.length > 0) {
-    console.warn(`Unmet ${key} found:`, unmetDependencies);
+    console.warn('\x1b[90m%s\x1b[0m', `Unmet ${key} found:`, unmetDependencies);
     isSuccess = false;
   }
 
   if (extraDependencies.length > 0) {
-    console.warn(`Extra ${key} found:`, extraDependencies);
+    console.warn('\x1b[31m%s\x1b[0m', `Extra ${key} found:`, extraDependencies);
     isSuccess = false;
   }
 }

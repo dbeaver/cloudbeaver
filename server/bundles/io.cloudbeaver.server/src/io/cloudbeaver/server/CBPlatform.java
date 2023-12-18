@@ -125,7 +125,7 @@ public class CBPlatform extends BasePlatformImpl {
         return WebPlatformActivator.getInstance().getPreferences();
     }
 
-    private CBPlatform() {
+    CBPlatform() {
     }
 
     public static void setApplication(CBApplication application) {

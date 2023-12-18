@@ -7,17 +7,20 @@
  */
 import type { ThemeSelector } from '@cloudbeaver/core-theming';
 
+import type Dark from './dark.module.scss';
+import type Light from './light.module.scss';
+
 export const EDITOR_BASE_STYLES: ThemeSelector = async theme => {
-  let styles: any;
+  let styles: typeof Light & typeof Dark;
 
   switch (theme) {
     case 'dark':
-      styles = await import('./dark.module.scss');
+      styles = (await import('./dark.module.scss')).default;
       break;
     default:
-      styles = await import('./light.module.scss');
+      styles = (await import('./light.module.scss')).default;
       break;
   }
 
-  return styles.default;
+  return styles;
 };

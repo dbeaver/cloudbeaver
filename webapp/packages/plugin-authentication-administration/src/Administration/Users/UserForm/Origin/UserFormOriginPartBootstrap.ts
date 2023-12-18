@@ -7,13 +7,11 @@
  */
 import React from 'react';
 
-import { AUTH_PROVIDER_LOCAL_ID, UsersResource } from '@cloudbeaver/core-authentication';
+import { UsersResource } from '@cloudbeaver/core-authentication';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { FormMode } from '@cloudbeaver/core-ui';
 
 import { AdministrationUserFormService } from '../AdministrationUserFormService';
-import { DATA_CONTEXT_USER_FORM_INFO_PART } from '../Info/DATA_CONTEXT_USER_FORM_INFO_PART';
-import { getUserFormOriginTabId } from './getUserFormOriginTabId';
 
 const UserFormOriginInfoPanel = React.lazy(async () => {
   const { UserFormOriginInfoPanel } = await import('./UserFormOriginInfoPanel');
@@ -35,27 +33,7 @@ export class UserFormOriginPartBootstrap extends Bootstrap {
     this.administrationUserFormService.parts.add({
       key: 'origin',
       order: 2,
-      generator: (tabId, props) => {
-        const userFormInfoPart = props?.formState.dataContext.get(DATA_CONTEXT_USER_FORM_INFO_PART);
-        if (props?.formState?.mode === FormMode.Edit && userFormInfoPart?.initialState.userId) {
-          const user = this.usersResource.get(userFormInfoPart.initialState.userId);
-          const origins = user?.origins.filter(origin => origin.type !== AUTH_PROVIDER_LOCAL_ID);
-
-          if (origins && origins.length > 0) {
-            return origins.map(origin => getUserFormOriginTabId(tabId, origin));
-          }
-        }
-
-        return ['origin'];
-      },
-      isHidden: (tabId, props) => {
-        const userFormInfoPart = props?.formState.dataContext.get(DATA_CONTEXT_USER_FORM_INFO_PART);
-        if (props?.formState?.mode === FormMode.Edit && userFormInfoPart?.initialState.userId) {
-          const user = this.usersResource.get(userFormInfoPart.initialState.userId);
-          return !user?.origins.some(origin => origin.type !== AUTH_PROVIDER_LOCAL_ID);
-        }
-        return true;
-      },
+      isHidden: (tabId, props) => props?.formState?.mode !== FormMode.Edit,
       panel: () => UserFormOriginInfoPanel,
       tab: () => UserFormOriginInfoTab,
     });

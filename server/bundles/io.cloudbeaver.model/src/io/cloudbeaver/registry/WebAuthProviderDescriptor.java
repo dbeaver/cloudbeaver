@@ -55,6 +55,7 @@ public class WebAuthProviderDescriptor extends AbstractDescriptor {
     private final boolean trusted;
     private final boolean isPrivate;
     private final String[] requiredFeatures;
+    private final boolean isRequired;
 
     public WebAuthProviderDescriptor(IConfigurationElement cfg) {
         super(cfg);
@@ -64,6 +65,7 @@ public class WebAuthProviderDescriptor extends AbstractDescriptor {
         this.configurable = CommonUtils.toBoolean(cfg.getAttribute("configurable"));
         this.trusted = CommonUtils.toBoolean(cfg.getAttribute("trusted"));
         this.isPrivate = CommonUtils.toBoolean(cfg.getAttribute("private"));
+        this.isRequired = CommonUtils.toBoolean(cfg.getAttribute("required"));
 
         for (IConfigurationElement cfgElement : cfg.getChildren("configuration")) {
             for (IConfigurationElement propGroup : ArrayUtils.safeArray(cfgElement.getChildren(PropertyDescriptor.TAG_PROPERTY_GROUP))) {
@@ -122,6 +124,10 @@ public class WebAuthProviderDescriptor extends AbstractDescriptor {
 
     public boolean isPrivate() {
         return isPrivate;
+    }
+
+    public boolean isRequired() {
+        return isRequired;
     }
 
     public List<PropertyDescriptor> getConfigurationParameters() {

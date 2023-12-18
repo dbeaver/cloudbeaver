@@ -29,7 +29,6 @@ export interface ISQLScriptLine {
 
 export class SQLParser {
   get scripts(): ISQLScriptSegment[] {
-    this.update();
     return this._scripts;
   }
 
@@ -39,30 +38,25 @@ export class SQLParser {
 
   private _scripts: ISQLScriptSegment[];
   private script: string;
-  private parsedScript: string | null;
 
   constructor() {
     this._scripts = [];
     this.script = '';
-    this.parsedScript = null;
 
-    makeObservable<this, '_scripts' | 'script' | 'parsedScript' | 'update'>(this, {
+    makeObservable<this, '_scripts' | 'script'>(this, {
       actualScript: computed,
       _scripts: observable.ref,
       script: observable.ref,
-      parsedScript: observable.ref,
       getScriptSegment: action,
       getSegment: action,
       getQueryAtPos: action,
       setScript: action,
-      parse: action,
       setQueries: action,
-      update: action,
     });
   }
 
   getScriptSegment(): ISQLScriptSegment {
-    const script = this.parsedScript || '';
+    const script = this.script || '';
 
     return {
       query: script,
@@ -80,10 +74,8 @@ export class SQLParser {
       end = begin;
     }
 
-    this.update();
-
     return {
-      query: (this.parsedScript || '').substring(begin, end),
+      query: (this.script || '').substring(begin, end),
       begin,
       end,
     };
@@ -107,15 +99,9 @@ export class SQLParser {
 
   setScript(script: string): void {
     this.script = script;
-    this.update();
-  }
-
-  parse(script: string): void {
-    this.parsedScript = script;
   }
 
   setQueries(queries: IQueryInfo[]): this {
-    this.update();
     this._scripts = queries.map<ISQLScriptSegment>(query => ({
       query: this.script.substring(query.start, query.end),
       begin: query.start,
@@ -123,11 +109,5 @@ export class SQLParser {
     }));
 
     return this;
-  }
-
-  private update() {
-    if (this.parsedScript !== this.script) {
-      this.parse(this.script);
-    }
   }
 }

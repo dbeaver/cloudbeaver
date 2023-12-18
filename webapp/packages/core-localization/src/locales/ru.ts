@@ -39,6 +39,7 @@ export default [
   ['ui_refresh', 'Обновить'],
   ['ui_data_saving_error', 'Ошибка при сохранении изменений'],
   ['ui_no_matches_placeholder', 'По вашему запросу ничего не найдено.'],
+  ['ui_data_remove_confirmation', 'Подтвердите удаление'],
   ['ui_data_delete_confirmation', 'Подтвердите удаление'],
   ['ui_information', 'Информация'],
   ['ui_clipboard', 'Буфер обмена'],
@@ -103,6 +104,7 @@ export default [
   ['ui_upload_file_fail', 'Не удалось загрузить файл'],
   ['ui_filter', 'Фильтр'],
   ['ui_disable', 'Отключить'],
+  ['ui_readonly', 'Доступно только для чтения'],
   ['ui_test', 'Проверить'],
 
   ['root_permission_denied', 'Отказано в доступе'],

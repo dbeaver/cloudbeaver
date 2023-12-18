@@ -19,7 +19,7 @@ package io.cloudbeaver.service;
 
 import org.jkiss.dbeaver.DBException;
 
-import javax.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServlet;
 
 public interface DBWServletContext {
     void addServlet(String servletId, HttpServlet servlet, String mapping) throws DBException;
