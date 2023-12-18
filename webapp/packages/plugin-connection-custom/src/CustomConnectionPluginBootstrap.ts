@@ -14,8 +14,8 @@ import { ActionService, MenuService } from '@cloudbeaver/core-view';
 import { MENU_CONNECTIONS } from '@cloudbeaver/plugin-connections';
 
 import { ACTION_CONNECTION_CUSTOM } from './Actions/ACTION_CONNECTION_CUSTOM';
-import { CustomConnectionDialog } from './CustomConnection/CustomConnectionDialog';
 import { CustomConnectionSettingsService } from './CustomConnectionSettingsService';
+import { DriverSelectorDialog } from './DriverSelector/DriverSelectorDialog';
 
 @injectable()
 export class CustomConnectionPluginBootstrap extends Bootstrap {
@@ -67,6 +67,6 @@ export class CustomConnectionPluginBootstrap extends Bootstrap {
   load(): void | Promise<void> {}
 
   private async openConnectionsDialog() {
-    await this.commonDialogService.open(CustomConnectionDialog, null);
+    await this.commonDialogService.open(DriverSelectorDialog, null);
   }
 }
