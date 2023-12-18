@@ -12,7 +12,7 @@ import { Button, PlaceholderComponent, useTranslate } from '@cloudbeaver/core-bl
 import type { IAuthConfigurationFormProps } from './IAuthConfigurationFormProps';
 
 export const AuthConfigurationFormBaseActions: PlaceholderComponent<IAuthConfigurationFormProps> = observer(
-  function AuthConfigurationFormBaseActions({ state, onCancel }) {
+  function AuthConfigurationFormBaseActions({ state, onCancel, actions }) {
     const translate = useTranslate();
 
     return (
@@ -22,7 +22,7 @@ export const AuthConfigurationFormBaseActions: PlaceholderComponent<IAuthConfigu
             {translate('ui_processing_cancel')}
           </Button>
         )}
-        <Button type="button" disabled={state.disabled || state.readonly} mod={['unelevated']} loader onClick={state.save}>
+        <Button type="button" disabled={state.disabled || state.readonly} mod={['unelevated']} loader onClick={actions.save}>
           {translate(state.mode === 'edit' ? 'ui_processing_save' : 'ui_processing_finish')}
         </Button>
       </>

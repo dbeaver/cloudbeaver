@@ -95,7 +95,7 @@ export const SSH: TabContainerPanelComponent<Props> = observer(function SSH({ st
     <Form>
       <ColoredContainer parent>
         <Group form gap keepSize large>
-          <Switch name="enabled" state={handlerState} mod={['primary']} disabled={disabled || readonly}>
+          <Switch id="ssh-enable-switch" name="enabled" state={handlerState} mod={['primary']} disabled={disabled || readonly}>
             {translate('connections_network_handler_ssh_tunnel_enable')}
           </Switch>
           <Combobox

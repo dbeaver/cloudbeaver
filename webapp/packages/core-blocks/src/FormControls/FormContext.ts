@@ -21,7 +21,7 @@ export interface IChangeData {
 export interface IFormContext {
   ref: HTMLFormElement | null;
   onValidate: SyncExecutor;
-  onSubmit: SyncExecutor;
+  onSubmit: SyncExecutor<SubmitEvent | undefined>;
   onChange: IExecutor<IChangeData>;
   parent: IFormContext | null;
   disableEnterSubmit: boolean;

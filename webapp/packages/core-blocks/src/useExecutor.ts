@@ -22,6 +22,8 @@ interface IUseExecutorOptions<T> {
 export function useExecutor<T>(options: IUseExecutorOptions<T>): void {
   const props = useObjectRef(options);
   const executor = props.executor;
+  const next: IExecutorHandlersCollection<T> | undefined = props.next;
+  const before: IExecutorHandlersCollection<T> | undefined = props.before;
 
   useEffect(() => {
     if (!executor) {
@@ -30,8 +32,6 @@ export function useExecutor<T>(options: IUseExecutorOptions<T>): void {
 
     const handlers: Array<IExecutorHandler<T>> = [];
     const postHandlers: Array<IExecutorHandler<T>> = [];
-    const next: IExecutorHandlersCollection<T> | undefined = props.next;
-    const before: IExecutorHandlersCollection<T> | undefined = props.before;
 
     if (props.handlers) {
       for (let i = 0; i < props.handlers.length; i++) {
@@ -49,12 +49,12 @@ export function useExecutor<T>(options: IUseExecutorOptions<T>): void {
       }
     }
 
-    if (props.next) {
-      executor.next(props.next);
+    if (before) {
+      executor.before(before);
     }
 
-    if (props.before) {
-      executor.next(props.before);
+    if (next) {
+      executor.next(next);
     }
 
     return () => {
@@ -74,5 +74,7 @@ export function useExecutor<T>(options: IUseExecutorOptions<T>): void {
         executor.removeBefore(before);
       }
     };
-  }, [executor, props.handlers?.length, props.postHandlers?.length]);
+  }, [
+    executor, props.handlers?.length, props.postHandlers?.length, before, next,
+  ]);
 }

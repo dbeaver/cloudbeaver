@@ -10,4 +10,5 @@ fragment DriverProviderPropertyInfo on ObjectPropertyInfo {
   features
   order
   supportedConfigurationTypes
+  required
 }
