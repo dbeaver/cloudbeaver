@@ -7,23 +7,28 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import { CommonDialogBody, CommonDialogHeader, CommonDialogWrapper, Loader, s, useS } from '@cloudbeaver/core-blocks';
+import { CommonDialogBody, CommonDialogHeader, CommonDialogWrapper, s, useResource, useS } from '@cloudbeaver/core-blocks';
+import { CachedMapAllKey } from '@cloudbeaver/core-resource';
 import type { DataTransferProcessorInfo } from '@cloudbeaver/core-sdk';
 
+import { DataTransferProcessorsResource } from '../DataTransferProcessorsResource';
 import type { IExportContext } from '../IExportContext';
 import { ExportProcessorList } from './ExportProcessorList/ExportProcessorList';
 import style from './ProcessorSelectDialog.m.css';
 
 interface Props {
   context: IExportContext;
-  processors: DataTransferProcessorInfo[];
-  isLoading: boolean;
   onSelect: (processorId: string) => void;
   onClose: () => void;
 }
 
-export const ProcessorSelectDialog = observer<Props>(function ProcessorSelectDialog({ context, processors, isLoading, onSelect, onClose }) {
+export const ProcessorSelectDialog = observer<Props>(function ProcessorSelectDialog({ context, onSelect, onClose }) {
   const styles = useS(style);
+  const dataTransferProcessorsResource = useResource(ProcessorSelectDialog, DataTransferProcessorsResource, CachedMapAllKey, {
+    forceSuspense: true,
+  });
+
+  const processors = dataTransferProcessorsResource.resource.values.slice().sort(sortProcessors);
 
   return (
     <CommonDialogWrapper size="large" fixedSize>
@@ -36,9 +41,16 @@ export const ProcessorSelectDialog = observer<Props>(function ProcessorSelectDia
             </pre>
           </div>
         )}
-        {isLoading && <Loader />}
-        {!isLoading && <ExportProcessorList className={s(styles, { exportProcessorList: true })} processors={processors} onSelect={onSelect} />}
+        <ExportProcessorList className={s(styles, { exportProcessorList: true })} processors={processors} onSelect={onSelect} />
       </CommonDialogBody>
     </CommonDialogWrapper>
   );
 });
+
+function sortProcessors(processorA: DataTransferProcessorInfo, processorB: DataTransferProcessorInfo): number {
+  if (processorA.order === processorB.order) {
+    return (processorA.name || '').localeCompare(processorB.name || '');
+  }
+
+  return processorA.order - processorB.order;
+}
