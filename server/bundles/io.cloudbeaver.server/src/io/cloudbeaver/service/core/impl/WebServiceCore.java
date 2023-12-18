@@ -52,6 +52,7 @@ import org.jkiss.dbeaver.model.net.DBWTunnel;
 import org.jkiss.dbeaver.model.net.ssh.SSHImplementation;
 import org.jkiss.dbeaver.model.rm.RMProjectType;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
+import org.jkiss.dbeaver.model.secret.DBSSecretController;
 import org.jkiss.dbeaver.model.websocket.WSConstants;
 import org.jkiss.dbeaver.model.websocket.event.datasource.WSDataSourceProperty;
 import org.jkiss.dbeaver.registry.DataSourceDescriptor;
@@ -363,7 +364,9 @@ public class WebServiceCore implements DBWServiceCore {
             var project = dataSourceContainer.getProject();
             if (project.isUseSecretStorage()) {
                 try {
-                    dataSourceContainer.persistSecrets(webSession.getUserContext().getSecretController());
+                    dataSourceContainer.persistSecrets(
+                            DBSSecretController.getProjectSecretController(dataSourceContainer.getProject())
+                    );
                 } catch (DBException e) {
                     throw new DBWebException("Failed to save credentials", e);
                 }
