@@ -9,14 +9,14 @@ import { observer } from 'mobx-react-lite';
 import { useEffect } from 'react';
 import styled, { css } from 'reshadow';
 
-import { IconOrImage, Loader, Placeholder, useExecutor, useObjectRef, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
+import { Form, IconOrImage, Loader, Placeholder, useExecutor, useForm, useObjectRef, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import type { AdminAuthProviderConfiguration } from '@cloudbeaver/core-sdk';
 import { BASE_TAB_STYLES, TabList, TabPanelList, TabsState, UNDERLINE_TAB_BIG_STYLES, UNDERLINE_TAB_STYLES } from '@cloudbeaver/core-ui';
 
 import { AuthConfigurationFormService } from './AuthConfigurationFormService';
 import { authConfigurationContext } from './Contexts/authConfigurationContext';
-import type { IAuthConfigurationFormState } from './IAuthConfigurationFormProps';
+import type { IAuthConfigurationFormActions, IAuthConfigurationFormState } from './IAuthConfigurationFormProps';
 
 const tabsStyles = css`
   TabList {
@@ -100,6 +100,12 @@ export const AuthConfigurationForm = observer<Props>(function AuthConfigurationF
   const style = useStyles(BASE_TAB_STYLES, tabsStyles, UNDERLINE_TAB_STYLES, UNDERLINE_TAB_BIG_STYLES);
   const styles = useStyles(style, topBarStyles, formStyles);
   const service = useService(AuthConfigurationFormService);
+  const form = useForm({
+    onSubmit: async () => {
+      await state.save();
+    },
+  });
+  const actions = useObjectRef<IAuthConfigurationFormActions>({ save: form.submit });
 
   useExecutor({
     executor: state.submittingTask,
@@ -121,30 +127,33 @@ export const AuthConfigurationForm = observer<Props>(function AuthConfigurationF
   }, []);
 
   return styled(styles)(
-    <TabsState container={service.tabsContainer} state={state} onCancel={onCancel}>
-      <box className={className}>
-        <configuration-top-bar>
-          <configuration-top-bar-tabs>
-            <configuration-status-message>
-              {state.statusMessage && (
-                <>
-                  <IconOrImage icon="/icons/info_icon.svg" />
-                  {translate(state.statusMessage)}
-                </>
-              )}
-            </configuration-status-message>
-            <TabList style={style} disabled={false} />
-          </configuration-top-bar-tabs>
-          <configuration-top-bar-actions>
-            <Loader suspense inline hideMessage hideException>
-              <Placeholder container={service.actionsContainer} state={state} onCancel={onCancel} />
-            </Loader>
-          </configuration-top-bar-actions>
-        </configuration-top-bar>
-        <content-box>
-          <TabPanelList style={style} />
-        </content-box>
-      </box>
-    </TabsState>,
+    <Form context={form}>
+      <TabsState actions={actions} container={service.tabsContainer} state={state} onCancel={onCancel}>
+        <box className={className}>
+          <configuration-top-bar>
+            <configuration-top-bar-tabs>
+              <configuration-status-message>
+                {state.statusMessage && (
+                  <>
+                    <IconOrImage icon="/icons/info_icon.svg" />
+                    {translate(state.statusMessage)}
+                  </>
+                )}
+              </configuration-status-message>
+              <TabList style={style} disabled={false} />
+            </configuration-top-bar-tabs>
+            <configuration-top-bar-actions>
+              <Loader suspense inline hideMessage hideException>
+                <Placeholder actions={actions} container={service.actionsContainer} state={state} onCancel={onCancel} />
+              </Loader>
+            </configuration-top-bar-actions>
+          </configuration-top-bar>
+          <content-box>
+            <TabPanelList style={style} />
+          </content-box>
+        </box>
+      </TabsState>
+    </Form>
+    ,
   );
 });

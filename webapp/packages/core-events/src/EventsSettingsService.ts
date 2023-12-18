@@ -9,7 +9,7 @@ import { injectable } from '@cloudbeaver/core-di';
 import { PluginManagerService, PluginSettings } from '@cloudbeaver/core-plugin';
 
 const defaultSettings = {
-  notificationsPool: 5,
+  notificationsPool: 20,
   maxPersistentAllow: 5,
 };
 

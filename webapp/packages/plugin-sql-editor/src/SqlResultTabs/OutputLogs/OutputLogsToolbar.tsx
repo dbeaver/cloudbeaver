@@ -8,11 +8,10 @@
 import { observer } from 'mobx-react-lite';
 import React from 'react';
 
-import { Container, Icon, InputField, s, useS, useTranslate } from '@cloudbeaver/core-blocks';
+import { Container, Filter, useTranslate } from '@cloudbeaver/core-blocks';
 
 import type { ISqlEditorTabState } from '../../ISqlEditorTabState';
 import { OutputLogsMenu } from './OutputLogsMenu';
-import style from './OutputLogsToolbar.m.css';
 import type { SqlOutputLogsPanelState } from './useOutputLogsPanelState';
 
 interface Props {
@@ -21,20 +20,14 @@ interface Props {
 }
 
 export const OutputLogsToolbar = observer<Props>(function OutputLogsToolbar({ state, sqlEditorTabState }) {
-  const styles = useS(style);
   const translate = useTranslate();
 
   return (
     <Container noWrap center gap dense keepSize>
-      <InputField
+      <Filter
         value={state.searchValue}
         placeholder={translate('sql_editor_output_logs_input_placeholder')}
-        icon={
-          <div className={s(styles, { searchIcon: true })}>
-            <Icon name="search" viewBox="0 0 24 24" />
-          </div>
-        }
-        fill
+        max
         onChange={value => state.setSearchValue(value.toString())}
       />
       <Container keepSize>

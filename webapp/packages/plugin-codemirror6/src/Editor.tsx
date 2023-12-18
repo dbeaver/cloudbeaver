@@ -7,9 +7,8 @@
  */
 import { observer } from 'mobx-react-lite';
 import { forwardRef } from 'react';
-import styled from 'reshadow';
 
-import { clsx } from '@cloudbeaver/core-utils';
+import { s, useS } from '@cloudbeaver/core-blocks';
 
 import type { IEditorProps } from './IEditorProps';
 import type { IEditorRef } from './IEditorRef';
@@ -41,8 +40,8 @@ export const Editor = observer<IEditorProps & IDefaultExtensions, IEditorRef>(
     },
     ref,
   ) {
+    useS(EDITOR_BASE_STYLES);
     extensions = useCodemirrorExtensions(extensions);
-
 
     const defaultExtensions = useEditorDefaultExtensions({
       lineNumbers,
@@ -64,10 +63,11 @@ export const Editor = observer<IEditorProps & IDefaultExtensions, IEditorRef>(
 
     extensions.set(...defaultExtensions);
 
-    return styled(EDITOR_BASE_STYLES)(
-      <wrapper className={clsx('editor', rest.className)}>
+    return (
+      // all styles is global scoped so we can't get them from module
+      <div className={s({ editor: 'editor' }, { editor: true }, rest.className)}>
         <ReactCodemirror {...rest} ref={ref} extensions={extensions} />
-      </wrapper>,
+      </div>
     );
   }),
 );
