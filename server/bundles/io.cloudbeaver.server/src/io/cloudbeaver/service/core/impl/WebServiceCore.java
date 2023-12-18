@@ -32,6 +32,8 @@ import io.cloudbeaver.service.security.SMUtils;
 import io.cloudbeaver.utils.WebConnectionFolderUtils;
 import io.cloudbeaver.utils.WebDataSourceUtils;
 import io.cloudbeaver.utils.WebEventUtils;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
@@ -60,8 +62,6 @@ import org.jkiss.dbeaver.runtime.jobs.ConnectionTestJob;
 import org.jkiss.dbeaver.utils.RuntimeUtils;
 import org.jkiss.utils.CommonUtils;
 
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -415,7 +415,7 @@ public class WebServiceCore implements DBWServiceCore {
             sessionRegistry.checkForErrors();
         } catch (DBException e) {
             sessionRegistry.removeDataSource(newDataSource);
-            throw new DBWebException("Failed to create connection", e.getCause());
+            throw new DBWebException("Failed to create connection", e);
         }
 
         WebConnectionInfo connectionInfo = new WebConnectionInfo(webSession, newDataSource);
@@ -569,7 +569,7 @@ public class WebServiceCore implements DBWServiceCore {
 
             projectRegistry.checkForErrors();
         } catch (DBException e) {
-            throw new DBWebException(e.getMessage(), e.getCause());
+            throw new DBWebException(e.getMessage(), e);
         }
 
         WebConnectionInfo connectionInfo = new WebConnectionInfo(webSession, newDataSource);
