@@ -30,8 +30,13 @@ export interface IAuthConfigurationFormState {
   readonly setOptions: (mode: AuthConfigurationFormMode) => this;
 }
 
+export interface IAuthConfigurationFormActions {
+  save: () => void;
+}
+
 export interface IAuthConfigurationFormProps {
   state: IAuthConfigurationFormState;
+  actions: IAuthConfigurationFormActions;
   onCancel?: () => void;
 }
 

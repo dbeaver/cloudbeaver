@@ -22,7 +22,7 @@ interface IOptions {
 
 export function useForm(options?: IOptions): IFormContext {
   let parentForm = useContext(FormContext);
-  const [submittingExecutor] = useState(() => new SyncExecutor());
+  const [submittingExecutor] = useState(() => new SyncExecutor<SubmitEvent | undefined>());
   const [validationExecutor] = useState(() => new SyncExecutor());
   const [changeExecutor] = useState(() => new Executor<IChangeData>());
 
@@ -49,7 +49,7 @@ export function useForm(options?: IOptions): IFormContext {
 
   useExecutor({
     executor: submittingExecutor,
-    handlers: [() => options?.onSubmit?.()],
+    handlers: [event => options?.onSubmit?.(event)],
   });
 
   const context = useObjectRef<IFormContext>(
@@ -93,7 +93,7 @@ export function useForm(options?: IOptions): IFormContext {
           event?.preventDefault();
 
           if (this.validate()) {
-            this.onSubmit.execute();
+            this.onSubmit.execute(event);
           }
         }
       },
