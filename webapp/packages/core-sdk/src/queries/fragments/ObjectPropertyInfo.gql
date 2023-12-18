@@ -4,6 +4,7 @@ fragment ObjectPropertyInfo on ObjectPropertyInfo {
   description
   hint
   category
+  required
   dataType
   value
   validValues
