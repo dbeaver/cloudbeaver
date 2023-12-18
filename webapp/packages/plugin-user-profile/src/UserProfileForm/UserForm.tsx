@@ -59,7 +59,6 @@ export const UserForm = observer<Props>(function UserForm({ user, state, onClose
         <div className={s(moduleStyle, { contentBox: true })}>
           <UserInfoPanel user={user} style={style} />
           {localProvider && <AuthenticationPanel style={style} />}
-          {/* <UserAuthProviderPanel user={user} style={style} /> */}
         </div>
       </TabsState>
     </div>,
