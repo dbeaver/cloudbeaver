@@ -133,6 +133,11 @@ public abstract class BaseWebSession extends AbstractSessionPersistent {
         return workspace.getAuthContext();
     }
 
+    protected void clearSessionContext() {
+        this.workspace.getAuthContext().clear();
+        this.workspace.getAuthContext().addSession(this);
+    }
+
     @NotNull
     @Property
     public String getSessionId() {
@@ -180,6 +185,8 @@ public abstract class BaseWebSession extends AbstractSessionPersistent {
             sessionEventHandlers.clear();
 
             workspace.dispose();
+
+            clearSessionContext();
         }
     }
 
