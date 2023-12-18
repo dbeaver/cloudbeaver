@@ -11,7 +11,7 @@ import type { IAsyncContextLoader, IContextLoader, ISyncContextLoader } from './
 import type { IExecutorHandler } from './IExecutorHandler';
 import type { ExecutorDataFilter, ExecutorDataMap, IChainLink, IExecutorHandlersCollection } from './IExecutorHandlersCollection';
 
-export class ExecutorHandlersCollection<T = unknown, TResult = any | Promise<any>> implements IExecutorHandlersCollection<T, TResult> {
+export class ExecutorHandlersCollection<T = void, TResult = any | Promise<any>> implements IExecutorHandlersCollection<T, TResult> {
   handlers: Array<IExecutorHandler<T, TResult>>;
   postHandlers: Array<IExecutorHandler<T, TResult>>;
   chain: Array<IChainLink<T, TResult>>;

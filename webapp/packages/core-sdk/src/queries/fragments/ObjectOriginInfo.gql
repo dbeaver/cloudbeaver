@@ -6,6 +6,7 @@ fragment ObjectOriginInfo on ObjectOrigin {
 
   details @include(if: $customIncludeOriginDetails) {
     id
+    required
     displayName
     description
     category

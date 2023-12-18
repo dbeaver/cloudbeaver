@@ -14,7 +14,6 @@ import {
   ColoredContainer,
   Combobox,
   FieldCheckbox,
-  Form,
   Group,
   GroupTitle,
   InputField,
@@ -45,8 +44,6 @@ const emptyArray: AuthProviderConfigurationParametersFragment[] = [];
 export const AuthConfigurationOptions: TabContainerPanelComponent<IAuthConfigurationFormProps> = observer(function AuthConfigurationOptions({
   state,
 }) {
-  const formRef = useRef<HTMLFormElement>(null);
-
   const translate = useTranslate();
   const copy = useClipboard();
   const style = useStyles(styles);
@@ -63,133 +60,131 @@ export const AuthConfigurationOptions: TabContainerPanelComponent<IAuthConfigura
   }, [state]);
 
   return styled(style)(
-    <Form ref={formRef}>
-      <ColoredContainer parent gap overflow>
+    <ColoredContainer parent gap overflow>
+      <Group small gap>
+        <Combobox
+          name="providerId"
+          state={state.config}
+          items={providers.resource.configurable}
+          keySelector={provider => provider.id}
+          valueSelector={provider => provider.label}
+          iconSelector={provider => provider.icon}
+          titleSelector={provider => provider.description}
+          placeholder={translate('administration_identity_providers_choose_provider_placeholder')}
+          readOnly={state.readonly || edit}
+          disabled={state.disabled}
+          required
+          tiny
+          fill
+          onSelect={handleProviderSelect}
+        >
+          {translate('administration_identity_providers_provider')}
+        </Combobox>
+        <InputField name="id" state={state.config} readOnly={state.readonly || edit} disabled={state.disabled} required tiny fill>
+          {translate('administration_identity_providers_provider_id')}
+        </InputField>
+        <InputField name="displayName" state={state.config} minLength={1} disabled={state.disabled} readOnly={state.readonly} required tiny fill>
+          {translate('administration_identity_providers_provider_configuration_name')}
+        </InputField>
+        <Textarea name="description" state={state.config} disabled={state.disabled} readOnly={state.readonly}>
+          {translate('administration_identity_providers_provider_configuration_description')}
+        </Textarea>
+        <InputField name="iconURL" state={state.config} disabled={state.disabled} readOnly={state.readonly}>
+          {translate('administration_identity_providers_provider_configuration_icon_url')}
+        </InputField>
+        <FieldCheckbox
+          id={edit ? state.config.id : 'AuthConfigurationDisabled'}
+          name="disabled"
+          state={state.config}
+          disabled={state.disabled}
+          readOnly={state.readonly}
+        >
+          {translate('administration_identity_providers_provider_configuration_disabled')}
+        </FieldCheckbox>
+      </Group>
+      {parameters.isLoaded() && parameters.data && (
+        <>
+          {isUncategorizedExists && (
+            <Group small gap vertical>
+              <GroupTitle>{translate('administration_identity_providers_provider_configuration_parameters')}</GroupTitle>
+              <ObjectPropertyInfoForm
+                state={state.config.parameters}
+                properties={parameters.data}
+                category={null}
+                disabled={state.disabled}
+                readOnly={state.readonly}
+              />
+            </Group>
+          )}
+          {categories.map(category => (
+            <Group key={category} small gap vertical>
+              <GroupTitle keepSize>{category}</GroupTitle>
+              <ObjectPropertyInfoForm
+                state={state.config.parameters}
+                properties={parameters.data!}
+                category={category}
+                disabled={state.disabled}
+                readOnly={state.readonly}
+                keepSize
+              />
+            </Group>
+          ))}
+        </>
+      )}
+      {(state.config.metadataLink || state.config.signInLink || state.config.signOutLink || state.config.acsLink) && (
         <Group small gap>
-          <Combobox
-            name="providerId"
+          <GroupTitle>{translate('administration_identity_providers_provider_configuration_links')}</GroupTitle>
+          <InputField
+            name="signInLink"
             state={state.config}
-            items={providers.resource.configurable}
-            keySelector={provider => provider.id}
-            valueSelector={provider => provider.label}
-            iconSelector={provider => provider.icon}
-            titleSelector={provider => provider.description}
-            placeholder={translate('administration_identity_providers_choose_provider_placeholder')}
-            readOnly={state.readonly || edit}
+            title={state.config.signInLink}
             disabled={state.disabled}
-            required
-            tiny
-            fill
-            onSelect={handleProviderSelect}
+            autoHide
+            readOnly
+            onCustomCopy={() => copy(state.config.signInLink!, true)}
           >
-            {translate('administration_identity_providers_provider')}
-          </Combobox>
-          <InputField name="id" state={state.config} readOnly={state.readonly || edit} disabled={state.disabled} required tiny fill>
-            {translate('administration_identity_providers_provider_id')}
+            Sign in
           </InputField>
-          <InputField name="displayName" state={state.config} minLength={1} disabled={state.disabled} readOnly={state.readonly} required tiny fill>
-            {translate('administration_identity_providers_provider_configuration_name')}
-          </InputField>
-          <Textarea name="description" state={state.config} disabled={state.disabled} readOnly={state.readonly}>
-            {translate('administration_identity_providers_provider_configuration_description')}
-          </Textarea>
-          <InputField name="iconURL" state={state.config} disabled={state.disabled} readOnly={state.readonly}>
-            {translate('administration_identity_providers_provider_configuration_icon_url')}
-          </InputField>
-          <FieldCheckbox
-            id={edit ? state.config.id : 'AuthConfigurationDisabled'}
-            name="disabled"
+          <InputField
+            name="signOutLink"
             state={state.config}
+            title={state.config.signOutLink}
             disabled={state.disabled}
-            readOnly={state.readonly}
+            autoHide
+            readOnly
+            onCustomCopy={() => copy(state.config.signOutLink!, true)}
           >
-            {translate('administration_identity_providers_provider_configuration_disabled')}
-          </FieldCheckbox>
+            Sign out
+          </InputField>
+          <InputField
+            name="redirectLink"
+            state={state.config}
+            title={state.config.redirectLink}
+            disabled={state.disabled}
+            autoHide
+            readOnly
+            onCustomCopy={() => copy(state.config.redirectLink!, true)}
+          >
+            Redirect
+          </InputField>
+          <InputField
+            name="acsLink"
+            state={state.config}
+            title={state.config.acsLink}
+            disabled={state.disabled}
+            autoHide
+            readOnly
+            onCustomCopy={() => copy(state.config.acsLink!, true)}
+          >
+            ACS
+          </InputField>
+          {state.config.metadataLink && (
+            <Link href={state.config.metadataLink} target="_blank" rel="noopener noreferrer">
+              {translate('administration_identity_providers_provider_configuration_links_metadata')}
+            </Link>
+          )}
         </Group>
-        {parameters.isLoaded() && parameters.data && (
-          <>
-            {isUncategorizedExists && (
-              <Group small gap vertical>
-                <GroupTitle>{translate('administration_identity_providers_provider_configuration_parameters')}</GroupTitle>
-                <ObjectPropertyInfoForm
-                  state={state.config.parameters}
-                  properties={parameters.data}
-                  category={null}
-                  disabled={state.disabled}
-                  readOnly={state.readonly}
-                />
-              </Group>
-            )}
-            {categories.map(category => (
-              <Group key={category} small gap vertical>
-                <GroupTitle keepSize>{category}</GroupTitle>
-                <ObjectPropertyInfoForm
-                  state={state.config.parameters}
-                  properties={parameters.data!}
-                  category={category}
-                  disabled={state.disabled}
-                  readOnly={state.readonly}
-                  keepSize
-                />
-              </Group>
-            ))}
-          </>
-        )}
-        {(state.config.metadataLink || state.config.signInLink || state.config.signOutLink || state.config.acsLink) && (
-          <Group small gap>
-            <GroupTitle>{translate('administration_identity_providers_provider_configuration_links')}</GroupTitle>
-            <InputField
-              name="signInLink"
-              state={state.config}
-              title={state.config.signInLink}
-              disabled={state.disabled}
-              autoHide
-              readOnly
-              onCustomCopy={() => copy(state.config.signInLink!, true)}
-            >
-              Sign in
-            </InputField>
-            <InputField
-              name="signOutLink"
-              state={state.config}
-              title={state.config.signOutLink}
-              disabled={state.disabled}
-              autoHide
-              readOnly
-              onCustomCopy={() => copy(state.config.signOutLink!, true)}
-            >
-              Sign out
-            </InputField>
-            <InputField
-              name="redirectLink"
-              state={state.config}
-              title={state.config.redirectLink}
-              disabled={state.disabled}
-              autoHide
-              readOnly
-              onCustomCopy={() => copy(state.config.redirectLink!, true)}
-            >
-              Redirect
-            </InputField>
-            <InputField
-              name="acsLink"
-              state={state.config}
-              title={state.config.acsLink}
-              disabled={state.disabled}
-              autoHide
-              readOnly
-              onCustomCopy={() => copy(state.config.acsLink!, true)}
-            >
-              ACS
-            </InputField>
-            {state.config.metadataLink && (
-              <Link href={state.config.metadataLink} target="_blank" rel="noopener noreferrer">
-                {translate('administration_identity_providers_provider_configuration_links_metadata')}
-              </Link>
-            )}
-          </Group>
-        )}
-      </ColoredContainer>
-    </Form>,
+      )}
+    </ColoredContainer>
   );
 });
