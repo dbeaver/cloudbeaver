@@ -24,7 +24,7 @@ export const FinishPage = observer(function FinishPage() {
       <div className={s(style, { layoutGridInner: true })}>
         <div ref={focus} className={s(style, { layoutGridCell: true })} data-span="12">
           <h3>{translate('administration_configuration_wizard_finish_title')}</h3>
-          <p className={s(style, { p: true })}>{translate('administration_configuration_wizard_finish_message')}</p>
+          <p className={s(style, { message: true })}>{translate('administration_configuration_wizard_finish_message')}</p>
 
           <Button type="button" mod={['unelevated']} onClick={() => service.next()}>
             {translate('ui_stepper_finish')}
