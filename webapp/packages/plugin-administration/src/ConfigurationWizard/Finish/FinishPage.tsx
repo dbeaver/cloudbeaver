@@ -6,9 +6,11 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
+
 import { ConfigurationWizardService } from '@cloudbeaver/core-administration';
 import { Button, s, useFocus, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import { useController } from '@cloudbeaver/core-di';
+
 import styles from './FinishPage.m.css';
 
 export const FinishPage = observer(function FinishPage() {

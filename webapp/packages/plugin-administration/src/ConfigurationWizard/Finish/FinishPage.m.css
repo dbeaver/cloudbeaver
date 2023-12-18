@@ -18,6 +18,7 @@
 }
 
 .layoutGridCell {
+  composes: layout-grid__cell from global;
   composes: theme-background-surface theme-text-on-surface theme-border-color-background from global;
   position: relative;
   border: solid 1px;

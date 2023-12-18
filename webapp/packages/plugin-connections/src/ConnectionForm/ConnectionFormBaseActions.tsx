@@ -6,15 +6,15 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
+import { useContext } from 'react';
 
 import { AUTH_PROVIDER_LOCAL_ID } from '@cloudbeaver/core-authentication';
 import { Button, getComputed, PlaceholderComponent, useResource, useTranslate } from '@cloudbeaver/core-blocks';
 import { DatabaseAuthModelsResource, DBDriverResource } from '@cloudbeaver/core-connections';
 import { useAuthenticationAction } from '@cloudbeaver/core-ui';
 
-import type { IConnectionFormProps } from './IConnectionFormProps';
-import { useContext } from 'react';
 import { ConnectionFormActionsContext } from './ConnectFormActionsContext';
+import type { IConnectionFormProps } from './IConnectionFormProps';
 
 export const ConnectionFormBaseActions: PlaceholderComponent<IConnectionFormProps> = observer(function ConnectionFormBaseActions({
   state,
