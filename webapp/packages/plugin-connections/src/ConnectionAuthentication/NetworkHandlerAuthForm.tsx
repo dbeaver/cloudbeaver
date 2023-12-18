@@ -67,7 +67,7 @@ export const NetworkHandlerAuthForm = observer<Props>(function NetworkHandlerAut
       )}
       {allowSaveCredentials && (
         <FieldCheckbox
-          id={id + ' savePassword'}
+          id={id + '_savePassword'}
           name="savePassword"
           state={state}
           label={translate('connections_connection_edit_save_credentials')}
