@@ -19,9 +19,9 @@ import { useTranslate } from '../localization/useTranslate';
 import { SContext, StyleRegistry } from '../SContext';
 import { useObjectRef } from '../useObjectRef';
 import type { IProperty } from './IProperty';
+import PropertiesTableAddButtonStyles from './PropertiesTableAddButtonStyles.m.css';
 import PropertiesTableFilterStyles from './PropertiesTableFilterStyles.m.css';
 import PropertiesTableInputStyles from './PropertiesTableInputStyles.m.css';
-import PropertiesTableAddButtonStyles from './PropertiesTableAddButtonStyles.m.css';
 import { PropertyItem } from './PropertyItem';
 import { PROPERTIES_TABLE_STYLES } from './styles';
 
@@ -153,11 +153,7 @@ export const PropertiesTable = observer<Props>(function PropertiesTable(props) {
           <div>{translate('core_block_properties_table_name')}</div>
           {props.filterable ? (
             <SContext registry={registry}>
-              <Filter
-                value={filterValue}
-                placeholder={translate('core_block_properties_table_filter_name')}
-                onFilter={setFilterValue}
-              />
+              <Filter value={filterValue} placeholder={translate('core_block_properties_table_filter_name')} onChange={setFilterValue} />
             </SContext>
           ) : null}
         </properties-header-name>

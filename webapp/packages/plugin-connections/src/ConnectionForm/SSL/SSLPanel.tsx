@@ -10,7 +10,7 @@ import { observer } from 'mobx-react-lite';
 import { useResource } from '@cloudbeaver/core-blocks';
 import { DBDriverResource, NetworkHandlerResource } from '@cloudbeaver/core-connections';
 import { CachedMapAllKey } from '@cloudbeaver/core-resource';
-import { TabContainerTabComponent, useTab } from '@cloudbeaver/core-ui';
+import type { TabContainerTabComponent } from '@cloudbeaver/core-ui';
 
 import type { IConnectionFormProps } from '../IConnectionFormProps';
 import { getSSLDefaultConfig } from './getSSLDefaultConfig';
@@ -18,7 +18,6 @@ import { getSSLDriverHandler } from './getSSLDriverHandler';
 import { SSL } from './SSL';
 
 export const SSLPanel: TabContainerTabComponent<IConnectionFormProps> = observer(function SSLPanel(props) {
-  const tab = useTab(props.tabId);
   const networkHandlerResource = useResource(SSLPanel, NetworkHandlerResource, CachedMapAllKey);
   const dbDriverResource = useResource(SSLPanel, DBDriverResource, props.state.config.driverId ?? null);
 
@@ -30,7 +29,7 @@ export const SSLPanel: TabContainerTabComponent<IConnectionFormProps> = observer
 
   const handlerState = props.state.config.networkHandlersConfig?.find(h => h.id === handler?.id);
 
-  if (!handler || !handlerState || !tab.selected) {
+  if (!handler || !handlerState) {
     return null;
   }
 

@@ -9,6 +9,7 @@ query getDataTransferProcessors {
     order
     icon
     properties {
+      required
       id
       displayName
       description
