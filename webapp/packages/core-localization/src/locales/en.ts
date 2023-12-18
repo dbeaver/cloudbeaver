@@ -15,7 +15,6 @@ export default [
   ['ui_processing_retry', 'Retry'],
   ['ui_processing_ok', 'Ok'],
   ['ui_processing_create', 'Create'],
-  ['ui_processing_finish', 'Finish'],
   ['ui_processing_save', 'Save'],
   ['ui_processing_saved', 'Saved'],
   ['ui_processing_stop', 'Stop'],
