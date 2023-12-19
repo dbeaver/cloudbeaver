@@ -10,11 +10,11 @@ import { observer } from 'mobx-react-lite';
 import { useCallback } from 'react';
 import styled, { css } from 'reshadow';
 
-import { Button, getComputed, Loader, TextPlaceholder, useObservableRef, useResource, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
+import { Button, Loader, TextPlaceholder, useObservableRef, useResource, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
 import { ConnectionInfoResource, ConnectionsManagerService } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { NavNodeInfoResource, NavTreeResource } from '@cloudbeaver/core-navigation-tree';
+import { NavNodeInfoResource } from '@cloudbeaver/core-navigation-tree';
 import { BASE_TAB_STYLES, TabPanel, TabsBox, useTabLocalState } from '@cloudbeaver/core-ui';
 import { MetadataMap } from '@cloudbeaver/core-utils';
 import type { TabHandlerPanelComponent } from '@cloudbeaver/plugin-navigation-tabs';
@@ -61,18 +61,6 @@ export const ObjectViewerPanel: TabHandlerPanelComponent<IObjectViewerTabState> 
   );
 
   const connection = useResource(ObjectViewerPanel, ConnectionInfoResource, connectionKey);
-  const connected = getComputed(() => connection.data?.connected || false);
-
-  // After a session global update, connections and tree resources start loading concurrently,
-  // and there is a chance that the connection is already closed, but we are unaware of it.
-  // So we use isSessionUpdate to be sure that connected status of the connection is valid.
-  const children = useResource(ObjectViewerPanel, NavTreeResource, objectId, {
-    active: !connection.resource.isSessionUpdate() && connected,
-    // onData: data => {
-    //   state.notFound = !data.includes(objectId);
-    // },
-    preload: [connection],
-  });
 
   const node = useResource(ObjectViewerPanel, navNodeInfoResource, objectId, {
     onData(data) {
@@ -82,7 +70,6 @@ export const ObjectViewerPanel: TabHandlerPanelComponent<IObjectViewerTabState> 
       });
     },
     active: !state.notFound,
-    preload: [children],
   });
 
   const pages = dbObjectPagesService.orderedPages;
