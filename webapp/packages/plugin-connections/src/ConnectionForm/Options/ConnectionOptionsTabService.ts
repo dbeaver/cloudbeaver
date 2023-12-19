@@ -60,7 +60,7 @@ export class ConnectionOptionsTabService extends Bootstrap {
   register(): void {
     this.connectionFormService.tabsContainer.add({
       key: 'options',
-      name: 'customConnection_options',
+      name: 'customConnection_main',
       order: 1,
       panel: () => Options,
     });

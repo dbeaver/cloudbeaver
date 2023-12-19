@@ -47,6 +47,7 @@ export default [
   ['connections_connection_port', '端口'],
   ['connections_connection_template', '模板'],
   ['connections_connection_test', '测试连接'],
+  ['connections_connection_test_tooltip', 'Test connection'],
   ['connections_connection_test_fail', '连接测试失败'],
   ['connections_connection_create_fail', '无法创建连接'],
   ['connections_connection_save_fail', '无法保存连接'],
