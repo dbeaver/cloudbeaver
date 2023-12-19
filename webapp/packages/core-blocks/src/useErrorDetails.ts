@@ -15,12 +15,10 @@ import { errorOf, LoadingError } from '@cloudbeaver/core-utils';
 import { ErrorDetailsDialog } from './ErrorDetailsDialog/ErrorDetailsDialog';
 import { useTranslate } from './localization/useTranslate';
 
-type IError = Error | string | null;
-
 interface IErrorDetailsHook {
   name?: string;
   message?: string;
-  error: IError;
+  error: Error | string | null;
   details?: DetailsError;
   hasDetails: boolean;
   isOpen: boolean;
@@ -35,7 +33,7 @@ type HookType =
       error: Error;
     } & IErrorDetailsHook);
 
-export function useErrorDetails(error: IError): HookType {
+export function useErrorDetails(error: IErrorDetailsHook['error']): HookType {
   const translate = useTranslate();
   const service = useService(CommonDialogService);
   const [isOpen, setIsOpen] = useState(false);
