@@ -30,14 +30,14 @@ type ControlledProps = BaseProps & {
   name?: string;
   value?: string;
   state?: never;
-  onFilter?: (value: string, name?: string) => void;
+  onChange?: (value: string, name?: string) => void;
 };
 
 type ObjectsProps<TKey extends keyof TState, TState> = BaseProps & {
   name: TKey;
   state: TState;
   value?: never;
-  onFilter?: (value: TState[TKey], name: TKey) => void;
+  onChange?: (value: TState[TKey], name: TKey) => void;
 };
 
 export const Filter = observer<ControlledProps | ObjectsProps<any, any>>(function Filter({
@@ -49,7 +49,7 @@ export const Filter = observer<ControlledProps | ObjectsProps<any, any>>(functio
   disabled,
   max,
   className,
-  onFilter,
+  onChange,
   onToggle,
   onKeyDown,
   onClick,
@@ -66,11 +66,11 @@ export const Filter = observer<ControlledProps | ObjectsProps<any, any>>(functio
         state[name] = value;
       }
 
-      if (onFilter) {
-        onFilter(value, name);
+      if (onChange) {
+        onChange(value, name);
       }
     },
-    [onFilter, state],
+    [onChange, state],
   );
 
   const toggle = useCallback(() => {

@@ -462,6 +462,10 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
 
         return query;
       },
+      setModeId(tabId: string): void {
+        this.state.currentModeId = tabId;
+        this.onUpdate.execute();
+      },
     }),
     {
       formatScript: action.bound,
@@ -528,6 +532,19 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
       },
     ],
   });
+
+  useEffect(() => {
+    const subscription = autorun(() => {
+      const contexts = data.onMode.execute(data);
+      const activeSegmentMode = contexts.getContext(SQLEditorModeContext);
+
+      action(() => {
+        data.activeSegmentMode = activeSegmentMode;
+      });
+    });
+
+    return subscription;
+  }, [data]);
 
   useEffect(() => () => data.destruct(), []);
 

@@ -68,3 +68,10 @@
 .container > .noGrow {
   flex-grow: 0;
 }
+
+.zeroBasis,
+.field.zeroBasis,
+.container.zeroBasis,
+.container > .zeroBasis {
+  flex-basis: 0%;
+}

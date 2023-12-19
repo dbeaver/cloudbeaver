@@ -73,7 +73,7 @@ export const UsersTableFilters = observer<Props>(function UsersTableFilters({ fi
           placeholder={translate('authentication_administration_users_filters_search_placeholder')}
           value={filters.search}
           max
-          onFilter={filters.setSearch}
+          onChange={filters.setSearch}
         />
         <actions>
           <button {...use({ active: open })} onClick={() => setOpen(!open)}>

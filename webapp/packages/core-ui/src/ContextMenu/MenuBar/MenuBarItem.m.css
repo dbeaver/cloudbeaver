@@ -70,9 +70,21 @@
     flex-shrink: 0;
     border-radius: var(--theme-form-element-radius);
   }
+  & .menuBarItemLabel {
+    display: none;
+  }
   & .menuBarItemIcon {
     width: 16px;
     height: 16px;
     padding: 0px;
+  }
+
+  &.withLabel {
+    & .menuBarItem {
+      width: auto;
+    }
+    & .menuBarItemLabel {
+      display: block;
+    }
   }
 }
