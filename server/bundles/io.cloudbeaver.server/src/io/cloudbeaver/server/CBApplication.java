@@ -976,7 +976,8 @@ public abstract class CBApplication extends BaseWebApplication implements WebAut
         CBAppConfig appConfig,
         SMCredentialsProvider credentialsProvider
     ) throws DBException {
-        if (newServerName == null) {
+        // we can change auth provider configurations in easy-config
+        if (!isConfigurationMode() && newServerName == null) {
             throw new DBException("Invalid server configuration, server name cannot be empty");
         }
         Map<String, Object> configurationProperties = collectConfigurationProperties(newServerName,
