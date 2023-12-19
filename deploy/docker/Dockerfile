@@ -2,7 +2,7 @@ FROM alpine:3.19
 
 MAINTAINER DBeaver Corp, devops@dbeaver.com
 
-RUN apk update && apk --no-cache add bash nano
+RUN apk update && apk --no-cache add p11-kit ca-certificates openssh-client bash nano
 
 ENV LANG=en_US.UTF-8
 
