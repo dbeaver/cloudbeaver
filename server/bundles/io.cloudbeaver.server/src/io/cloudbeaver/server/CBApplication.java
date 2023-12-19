@@ -236,18 +236,11 @@ public abstract class CBApplication extends BaseWebApplication implements WebAut
     }
 
     @Override
-    public boolean isHeadlessMode() {
-        return true;
-    }
-
-    @Override
     protected void startServer() {
         CBPlatform.setApplication(this);
-
-        Path configPath;
+        initHomeFolder();
         try {
-            configPath = loadServerConfiguration();
-            if (configPath == null) {
+            if (!loadServerConfiguration()) {
                 return;
             }
         } catch (DBException e) {
@@ -348,7 +341,7 @@ public abstract class CBApplication extends BaseWebApplication implements WebAut
 
         if (configurationMode) {
             // Try to configure automatically
-            performAutoConfiguration(configPath.toFile().getParentFile());
+            performAutoConfiguration(getMainConfigurationFilePath().toFile().getParentFile());
         } else if (!isMultiNode()) {
             if (appConfiguration.isGrantConnectionsAccessToAnonymousTeam()) {
                 grantAnonymousAccessToConnections(appConfiguration, CBConstants.ADMIN_AUTO_GRANT);
@@ -512,21 +505,6 @@ public abstract class CBApplication extends BaseWebApplication implements WebAut
 
     protected abstract SMAdminController createGlobalSecurityController() throws DBException;
 
-    @Nullable
-    @Override
-    protected Path loadServerConfiguration() throws DBException {
-        Path path = super.loadServerConfiguration();
-
-
-        File runtimeConfigFile = getRuntimeAppConfigFile();
-        if (runtimeConfigFile.exists()) {
-            log.debug("Runtime configuration [" + runtimeConfigFile.getAbsolutePath() + "]");
-            parseConfiguration(runtimeConfigFile);
-        }
-
-        return path;
-    }
-
     @Override
     protected void loadConfiguration(Path configPath) throws DBException {
         log.debug("Using configuration [" + configPath + "]");
@@ -536,83 +514,25 @@ public abstract class CBApplication extends BaseWebApplication implements WebAut
         } else {
             parseConfiguration(configPath.toFile());
         }
+
+        // Try to load configuration from runtime app config file
+        File runtimeConfigFile = getRuntimeAppConfigFile();
+        if (runtimeConfigFile.exists()) {
+            log.debug("Runtime configuration [" + runtimeConfigFile.getAbsolutePath() + "]");
+            parseConfiguration(runtimeConfigFile);
+        }
+
         // Set default preferences
         PrefUtils.setDefaultPreferenceValue(ModelPreferences.getPreferences(),
             ModelPreferences.UI_DRIVERS_HOME,
             getDriversLocation());
     }
 
-    private void parseConfiguration(File configFile) throws DBException {
-        Map<String, Object> configProps = readConfiguration(configFile);
-        parseConfiguration(configProps);
-    }
-
-    protected void parseConfiguration(Map<String, Object> configProps) throws DBException {
-        String homeFolder = initHomeFolder();
-
+    protected void parseConfiguration(File configFile) throws DBException {
         CBAppConfig prevConfig = new CBAppConfig(appConfiguration);
-        Gson gson = getGson();
+        Map<String, Object> configProps = readConfiguration(configFile);
         try {
-            Map<String, Object> serverConfig = JSONUtils.getObject(configProps, "server");
-            serverPort = JSONUtils.getInteger(serverConfig, CBConstants.PARAM_SERVER_PORT, serverPort);
-            serverHost = JSONUtils.getString(serverConfig, CBConstants.PARAM_SERVER_HOST, serverHost);
-            if (serverConfig.containsKey(CBConstants.PARAM_SERVER_URL)) {
-                serverURL = JSONUtils.getString(serverConfig, CBConstants.PARAM_SERVER_URL, serverURL);
-            } else if (serverURL == null) {
-                String hostName = serverHost;
-                if (CommonUtils.isEmpty(hostName)) {
-                    try {
-                        hostName = InetAddress.getLocalHost().getHostName();
-                    } catch (UnknownHostException e) {
-                        log.debug("Error resolving localhost address: " + e.getMessage());
-                        hostName = HOST_LOCALHOST;
-                    }
-                }
-                serverURL = "http://" + hostName + ":" + serverPort;
-            }
-
-            serverName = JSONUtils.getString(serverConfig, CBConstants.PARAM_SERVER_NAME, serverName);
-            sslConfigurationPath = JSONUtils.getString(serverConfig, CBConstants.PARAM_SSL_CONFIGURATION_PATH, sslConfigurationPath);
-            contentRoot = WebAppUtils.getRelativePath(
-                JSONUtils.getString(serverConfig, CBConstants.PARAM_CONTENT_ROOT, contentRoot), homeFolder);
-            rootURI = readRootUri(serverConfig);
-            servicesURI = JSONUtils.getString(serverConfig, CBConstants.PARAM_SERVICES_URI, servicesURI);
-            driversLocation = WebAppUtils.getRelativePath(
-                JSONUtils.getString(serverConfig, CBConstants.PARAM_DRIVERS_LOCATION, driversLocation), homeFolder);
-            workspaceLocation = WebAppUtils.getRelativePath(
-                JSONUtils.getString(serverConfig, CBConstants.PARAM_WORKSPACE_LOCATION, workspaceLocation), homeFolder);
-
-            maxSessionIdleTime = JSONUtils.getLong(serverConfig,
-                CBConstants.PARAM_SESSION_EXPIRE_PERIOD,
-                maxSessionIdleTime);
-
-            develMode = JSONUtils.getBoolean(serverConfig, CBConstants.PARAM_DEVEL_MODE, develMode);
-            enableSecurityManager = JSONUtils.getBoolean(serverConfig,
-                CBConstants.PARAM_SECURITY_MANAGER,
-                enableSecurityManager);
-            //SM config
-            gson.fromJson(
-                gson.toJsonTree(JSONUtils.getObject(serverConfig, CBConstants.PARAM_SM_CONFIGURATION)),
-                SMControllerConfiguration.class
-            );
-            // App config
-            Map<String, Object> appConfig = JSONUtils.getObject(configProps, "app");
-            validateConfiguration(appConfig);
-            gson.fromJson(gson.toJsonTree(appConfig), CBAppConfig.class);
-
-            databaseConfiguration.putAll(JSONUtils.getObject(serverConfig, CBConstants.PARAM_DB_CONFIGURATION));
-
-            readProductConfiguration(serverConfig, gson, homeFolder);
-
-            String staticContentsFile = JSONUtils.getString(serverConfig, CBConstants.PARAM_STATIC_CONTENT);
-            if (!CommonUtils.isEmpty(staticContentsFile)) {
-                try {
-                    staticContent = Files.readString(Path.of(staticContentsFile));
-                } catch (IOException e) {
-                    log.error("Error reading static contents from " + staticContentsFile, e);
-                }
-            }
-            parseAdditionalConfiguration(configProps);
+            parseConfiguration(configProps);
         } catch (Exception e) {
             throw new DBException("Error parsing server configuration", e);
         }
@@ -624,6 +544,89 @@ public abstract class CBApplication extends BaseWebApplication implements WebAut
         mergeOldConfiguration(prevConfig);
 
         patchConfigurationWithProperties(productConfiguration);
+    }
+
+    protected void parseConfiguration(Map<String, Object> configProps) throws DBException {
+        Map<String, Object> serverConfig = JSONUtils.getObject(configProps, "server");
+
+        readExternalProperties(serverConfig);
+        patchConfigurationWithProperties(configProps); // patch again because properties can be changed
+
+        serverPort = JSONUtils.getInteger(serverConfig, CBConstants.PARAM_SERVER_PORT, serverPort);
+        serverHost = JSONUtils.getString(serverConfig, CBConstants.PARAM_SERVER_HOST, serverHost);
+        if (serverConfig.containsKey(CBConstants.PARAM_SERVER_URL)) {
+            serverURL = JSONUtils.getString(serverConfig, CBConstants.PARAM_SERVER_URL, serverURL);
+        } else if (serverURL == null) {
+            String hostName = serverHost;
+            if (CommonUtils.isEmpty(hostName)) {
+                try {
+                    hostName = InetAddress.getLocalHost().getHostName();
+                } catch (UnknownHostException e) {
+                    log.debug("Error resolving localhost address: " + e.getMessage());
+                    hostName = CBApplication.HOST_LOCALHOST;
+                }
+            }
+            serverURL = "http://" + hostName + ":" + serverPort;
+        }
+
+        serverName = JSONUtils.getString(serverConfig, CBConstants.PARAM_SERVER_NAME, serverName);
+        sslConfigurationPath = JSONUtils.getString(serverConfig, CBConstants.PARAM_SSL_CONFIGURATION_PATH, sslConfigurationPath);
+        contentRoot = WebAppUtils.getRelativePath(
+            JSONUtils.getString(serverConfig, CBConstants.PARAM_CONTENT_ROOT, contentRoot), homeDirectory.getPath());
+        rootURI = readRootUri(serverConfig);
+        servicesURI = JSONUtils.getString(serverConfig, CBConstants.PARAM_SERVICES_URI, servicesURI);
+        driversLocation = WebAppUtils.getRelativePath(
+            JSONUtils.getString(serverConfig, CBConstants.PARAM_DRIVERS_LOCATION, driversLocation), homeDirectory.getPath());
+        workspaceLocation = WebAppUtils.getRelativePath(
+            JSONUtils.getString(serverConfig, CBConstants.PARAM_WORKSPACE_LOCATION, workspaceLocation), homeDirectory.getPath());
+
+        maxSessionIdleTime = JSONUtils.getLong(serverConfig,
+            CBConstants.PARAM_SESSION_EXPIRE_PERIOD,
+            maxSessionIdleTime);
+
+        develMode = JSONUtils.getBoolean(serverConfig, CBConstants.PARAM_DEVEL_MODE, develMode);
+        enableSecurityManager = JSONUtils.getBoolean(serverConfig,
+            CBConstants.PARAM_SECURITY_MANAGER,
+            enableSecurityManager);
+
+        Gson gson = getGson();
+        //SM config
+        gson.fromJson(
+            gson.toJsonTree(JSONUtils.getObject(serverConfig, CBConstants.PARAM_SM_CONFIGURATION)),
+            SMControllerConfiguration.class
+        );
+        // App config
+        Map<String, Object> appConfig = JSONUtils.getObject(configProps, "app");
+        validateConfiguration(appConfig);
+        gson.fromJson(gson.toJsonTree(appConfig), CBAppConfig.class);
+
+        databaseConfiguration.putAll(JSONUtils.getObject(serverConfig, CBConstants.PARAM_DB_CONFIGURATION));
+
+        readProductConfiguration(serverConfig, gson);
+
+        String staticContentsFile = JSONUtils.getString(serverConfig, CBConstants.PARAM_STATIC_CONTENT);
+        if (!CommonUtils.isEmpty(staticContentsFile)) {
+            try {
+                staticContent = Files.readString(Path.of(staticContentsFile));
+            } catch (IOException e) {
+                log.error("Error reading static contents from " + staticContentsFile, e);
+            }
+        }
+    }
+
+    private void readExternalProperties(Map<String, Object> serverConfig) {
+        String externalPropertiesFile = JSONUtils.getString(serverConfig, CBConstants.PARAM_EXTERNAL_PROPERTIES);
+        if (!CommonUtils.isEmpty(externalPropertiesFile)) {
+            Properties props = new Properties();
+            try (InputStream is = Files.newInputStream(Path.of(externalPropertiesFile))) {
+                props.load(is);
+            } catch (IOException e) {
+                log.error("Error loading external properties from " + externalPropertiesFile, e);
+            }
+            for (String propName : props.stringPropertyNames()) {
+                this.externalProperties.put(propName, props.getProperty(propName));
+            }
+        }
     }
 
     private String readRootUri(Map<String, Object> serverConfig) {
@@ -671,7 +674,7 @@ public abstract class CBApplication extends BaseWebApplication implements WebAut
 
     }
 
-    protected void readProductConfiguration(Map<String, Object> serverConfig, Gson gson, String homeFolder)
+    protected void readProductConfiguration(Map<String, Object> serverConfig, Gson gson)
         throws DBException {
         String productConfigPath = WebAppUtils.getRelativePath(
             JSONUtils.getString(
@@ -679,7 +682,7 @@ public abstract class CBApplication extends BaseWebApplication implements WebAut
                 CBConstants.PARAM_PRODUCT_CONFIGURATION,
                 CBConstants.DEFAULT_PRODUCT_CONFIGURATION
             ),
-            homeFolder
+            homeDirectory.getPath()
         );
 
         if (!CommonUtils.isEmpty(productConfigPath)) {
@@ -735,27 +738,6 @@ public abstract class CBApplication extends BaseWebApplication implements WebAut
             configProps.putAll(readConfigurationFile(configFile));
             patchConfigurationWithProperties(configProps); // patch original properties
         }
-
-        readAdditionalConfiguration(configProps);
-        if (configProps.isEmpty()) {
-            return Map.of();
-        }
-
-        Map<String, Object> serverConfig = getServerConfigProps(configProps);
-        String externalPropertiesFile = JSONUtils.getString(serverConfig, CBConstants.PARAM_EXTERNAL_PROPERTIES);
-        if (!CommonUtils.isEmpty(externalPropertiesFile)) {
-            Properties props = new Properties();
-            try (InputStream is = Files.newInputStream(Path.of(externalPropertiesFile))) {
-                props.load(is);
-            } catch (IOException e) {
-                log.error("Error loading external properties from " + externalPropertiesFile, e);
-            }
-            for (String propName : props.stringPropertyNames()) {
-                this.externalProperties.put(propName, props.getProperty(propName));
-            }
-        }
-
-        patchConfigurationWithProperties(configProps); // patch again because properties can be changed
         return configProps;
     }
 
@@ -777,14 +759,6 @@ public abstract class CBApplication extends BaseWebApplication implements WebAut
             .registerTypeAdapter(CBAppConfig.class, appConfigCreator)
             .registerTypeAdapter(DataSourceNavigatorSettings.class, navSettingsCreator)
             .registerTypeAdapter(SMControllerConfiguration.class, smConfigCreator);
-    }
-
-    protected void readAdditionalConfiguration(Map<String, Object> rootConfig) throws DBException {
-
-    }
-
-    protected void parseAdditionalConfiguration(Map<String, Object> serverConfig) throws DBException {
-
     }
 
     private void runWebServer() {
@@ -863,14 +837,18 @@ public abstract class CBApplication extends BaseWebApplication implements WebAut
         if (appConfig.isGrantConnectionsAccessToAnonymousTeam()) {
             grantAnonymousAccessToConnections(appConfig, adminName);
         }
+        String sessionId = null;
+        if (credentialsProvider != null && credentialsProvider.getActiveUserCredentials() != null) {
+            sessionId = credentialsProvider.getActiveUserCredentials().getSmSessionId();
+        }
+        reloadConfiguration(sessionId);
+    }
 
+    public synchronized void reloadConfiguration(@Nullable String sessionId) throws DBException {
         // Re-load runtime configuration
         try {
             log.debug("Reloading application configuration");
-            Map<String, Object> runtimeConfigProps = readRuntimeConfigurationProperties();
-            if (!runtimeConfigProps.isEmpty()) {
-                parseConfiguration(runtimeConfigProps);
-            }
+            parseConfiguration(getRuntimeAppConfigFile());
         } catch (Exception e) {
             throw new DBException("Error parsing configuration", e);
         }
@@ -881,16 +859,12 @@ public abstract class CBApplication extends BaseWebApplication implements WebAut
         for (DBWServiceServerConfigurator wsc : WebServiceRegistry.getInstance()
             .getWebServices(DBWServiceServerConfigurator.class)) {
             try {
-                wsc.reloadConfiguration(appConfig);
+                wsc.reloadConfiguration(getAppConfiguration());
             } catch (Exception e) {
                 log.warn("Error reloading configuration by web service " + wsc.getClass().getName(), e);
             }
         }
 
-        String sessionId = null;
-        if (credentialsProvider != null && credentialsProvider.getActiveUserCredentials() != null) {
-            sessionId = credentialsProvider.getActiveUserCredentials().getSmSessionId();
-        }
         eventController.addEvent(new WSServerConfigurationChangedEvent(sessionId, null));
         eventController.setForceSkipEvents(isConfigurationMode());
     }

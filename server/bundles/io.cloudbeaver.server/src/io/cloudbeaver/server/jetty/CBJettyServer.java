@@ -68,7 +68,6 @@ public class CBJettyServer {
     }
 
     public void runServer() {
-        CBApplication application = CBApplication.getInstance();
         try {
             JettyServer server;
             int serverPort = application.getServerPort();

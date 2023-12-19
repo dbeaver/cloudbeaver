@@ -102,8 +102,7 @@ public abstract class BaseWebApplication extends BaseApplicationImpl implements 
         return true;
     }
 
-    @Nullable
-    protected Path loadServerConfiguration() throws DBException {
+    protected boolean loadServerConfiguration() throws DBException {
         Path configFilePath = getMainConfigurationFilePath().toAbsolutePath();
         Path configFolder = configFilePath.getParent();
 
@@ -123,10 +122,10 @@ public abstract class BaseWebApplication extends BaseApplicationImpl implements 
             loadConfiguration(configFilePath);
         } catch (Exception e) {
             log.error("Error parsing configuration", e);
-            return null;
+            return false;
         }
 
-        return configFilePath;
+        return true;
     }
 
     @Nullable
@@ -153,7 +152,7 @@ public abstract class BaseWebApplication extends BaseApplicationImpl implements 
         return getLogbackConfigPath(configFolder);
     }
 
-    private Path getMainConfigurationFilePath() {
+    protected Path getMainConfigurationFilePath() {
         String configPath = DEFAULT_CONFIG_FILE_PATH;
 
         String[] args = Platform.getCommandLineArgs();
@@ -207,7 +206,7 @@ public abstract class BaseWebApplication extends BaseApplicationImpl implements 
         return VoidSecretController.INSTANCE;
     }
 
-    protected static Map<String, Object> getServerConfigProps(Map<String, Object> configProps) {
+    public static Map<String, Object> getServerConfigProps(Map<String, Object> configProps) {
         return JSONUtils.getObject(configProps, "server");
     }
 
