@@ -50,7 +50,6 @@ interface IActions<TResource extends IResource<any, any, any, any>, TKey, TInclu
   silent?: boolean;
   onData?: (data: ResourceData<TResource, TKey, TIncludes>, resource: TResource) => Promise<any> | any;
   onError?: (exception: Error | Error[] | null) => void;
-  preload?: ILoadableState[];
 }
 
 interface IResourcePrivateState {
@@ -187,13 +186,6 @@ export function useResource<
   const preloaded = getComputed(() => {
     if (actions?.active === false) {
       return false;
-    }
-    if (actions?.preload) {
-      for (const preload of actions.preload) {
-        if (!preload.isLoaded() || preload.isOutdated?.() || preload.isLoading() || preload.isError()) {
-          return false;
-        }
-      }
     }
     return true;
   });

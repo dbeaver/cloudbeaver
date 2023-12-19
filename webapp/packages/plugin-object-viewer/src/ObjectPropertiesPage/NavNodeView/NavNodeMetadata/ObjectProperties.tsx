@@ -17,7 +17,7 @@ import {
   useResource,
   useTranslate,
 } from '@cloudbeaver/core-blocks';
-import { DBObjectResource, NavTreeResource } from '@cloudbeaver/core-navigation-tree';
+import { DBObjectResource } from '@cloudbeaver/core-navigation-tree';
 import type { ObjectPropertyInfo } from '@cloudbeaver/core-sdk';
 
 interface Props {
@@ -28,10 +28,7 @@ const emptyArray: ObjectPropertyInfo[] = [];
 
 export const ObjectProperties = observer<Props>(function ObjectProperties({ objectId }) {
   const translate = useTranslate();
-  const children = useResource(ObjectProperties, NavTreeResource, objectId);
-  const dbObject = useResource(ObjectProperties, DBObjectResource, objectId, {
-    preload: [children],
-  });
+  const dbObject = useResource(ObjectProperties, DBObjectResource, objectId);
   const { categories, isUncategorizedExists } = useObjectPropertyCategories(dbObject.data?.object?.properties ?? emptyArray);
   const properties = dbObject.data?.object?.properties;
 
