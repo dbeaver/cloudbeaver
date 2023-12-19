@@ -19,4 +19,9 @@
         </metaParameters>
     </extension>
 
+    <extension point="com.dbeaver.secretController">
+        <controller id="void-secret" class="io.cloudbeaver.model.app.VoidSecretController"
+                    label="Default secret controller" description="Default void secret controller"/>
+    </extension>
+
 </plugin>

@@ -83,6 +83,10 @@ public class WebAuthProviderInfo {
         return descriptor.isPrivate();
     }
 
+    public boolean isRequired() {
+        return descriptor.isRequired();
+    }
+
     public boolean isSupportProvisioning() {
         return descriptor.getInstance() instanceof SMProvisioner;
     }
