@@ -9,6 +9,8 @@ import { action, computed, observable, toJS } from 'mobx';
 
 import { IProperty, useObservableRef } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
+import { NotificationService } from '@cloudbeaver/core-events';
+import { LocalizationService } from '@cloudbeaver/core-localization';
 import type { DataTransferOutputSettings, DataTransferProcessorInfo } from '@cloudbeaver/core-sdk';
 
 import { DataExportService } from '../DataExportService';
@@ -31,6 +33,8 @@ interface State {
 }
 
 export function useDataExportDialog(context: IExportContext, onExport?: () => void) {
+  const notificationService = useService(NotificationService);
+  const localizationService = useService(LocalizationService);
   const dataExportService = useService(DataExportService);
   const defaultExportOutputSettingsResource = useService(DefaultExportOutputSettingsResource);
   const dataTransferProcessorsResource = useService(DataTransferProcessorsResource);
@@ -62,16 +66,20 @@ export function useDataExportDialog(context: IExportContext, onExport?: () => vo
         this.step = step;
       },
       async selectProcessor(processorId: string) {
-        this.processor = await this.dataTransferProcessorsResource.load(processorId);
-        const outputData = await defaultExportOutputSettingsResource.load();
+        try {
+          this.processor = await this.dataTransferProcessorsResource.load(processorId);
+          const outputData = await this.defaultExportOutputSettingsResource.load();
 
-        if (outputData) {
-          this.outputSettings = toJS(outputData.outputSettings);
+          if (outputData) {
+            this.outputSettings = toJS(outputData.outputSettings);
+          }
+
+          this.processorProperties = {};
+          this.setStep(EDataExportStep.Configure);
+          this.exception = null;
+        } catch (exception: any) {
+          this.notificationService.logException(exception, this.localizationService.translate('data_transfer_dialog_select_processor_fail'));
         }
-
-        this.processorProperties = {};
-        this.setStep(EDataExportStep.Configure);
-        this.exception = null;
       },
       async export() {
         if (!this.processor || this.processing) {
@@ -109,7 +117,15 @@ export function useDataExportDialog(context: IExportContext, onExport?: () => vo
       export: action.bound,
       selectProcessor: action.bound,
     },
-    { context, onExport, dataExportService, defaultExportOutputSettingsResource, dataTransferProcessorsResource },
+    {
+      context,
+      onExport,
+      notificationService,
+      dataExportService,
+      localizationService,
+      defaultExportOutputSettingsResource,
+      dataTransferProcessorsResource,
+    },
   );
 
   return state;
