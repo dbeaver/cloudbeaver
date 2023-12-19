@@ -16,7 +16,7 @@
  */
 package io.cloudbeaver.service.security.internal.utils;
 
-import io.cloudbeaver.service.security.db.CBDatabaseConfig;
+import io.cloudbeaver.service.security.db.WebDatabaseConfig;
 import org.jkiss.code.Nullable;
 import org.jkiss.utils.CommonUtils;
 
@@ -37,7 +37,7 @@ public class DBConfigurationUtils {
     static final String PARAM_DB_POOL_MAX_CONNECTIONS_CONFIGURATION = "maxConnections";
     static final String PARAM_DB_POOL_VALIDATION_QUERY_CONFIGURATION = "validationQuery";
 
-    public static Map<String, Object> databaseConfigToMap(@Nullable CBDatabaseConfig databaseConfiguration) {
+    public static Map<String, Object> databaseConfigToMap(@Nullable WebDatabaseConfig databaseConfiguration) {
         Map<String, Object> res = new LinkedHashMap<>();
         if (databaseConfiguration == null) {
             return res;
@@ -69,12 +69,12 @@ public class DBConfigurationUtils {
         return res;
     }
 
-    public static Map<String, Object> poolDatabaseConfigToMap(@Nullable CBDatabaseConfig databaseConfiguration) {
+    public static Map<String, Object> poolDatabaseConfigToMap(@Nullable WebDatabaseConfig databaseConfiguration) {
         Map<String, Object> res = new LinkedHashMap<>();
         if (databaseConfiguration == null) {
             return res;
         }
-        CBDatabaseConfig.Pool pool = databaseConfiguration.getPool();
+        WebDatabaseConfig.Pool pool = databaseConfiguration.getPool();
         if (pool == null) {
             return res;
         } else {

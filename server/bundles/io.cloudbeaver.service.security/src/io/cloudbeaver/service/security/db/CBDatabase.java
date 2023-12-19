@@ -81,7 +81,7 @@ public class CBDatabase {
     private static final String V2_DB_NAME = "cb.h2v2.dat";
 
     private final WebApplication application;
-    private final CBDatabaseConfig databaseConfiguration;
+    private final WebDatabaseConfig databaseConfiguration;
     private PoolingDataSource<PoolableConnection> cbDataSource;
     private transient volatile Connection exclusiveConnection;
 
@@ -89,7 +89,7 @@ public class CBDatabase {
     private SMAdminController adminSecurityController;
     private SQLDialect dialect;
 
-    public CBDatabase(WebApplication application, CBDatabaseConfig databaseConfiguration) {
+    public CBDatabase(WebApplication application, WebDatabaseConfig databaseConfiguration) {
         this.application = application;
         this.databaseConfiguration = databaseConfiguration;
     }

@@ -42,7 +42,6 @@ import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.ModelPreferences;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
-import org.jkiss.dbeaver.model.app.DBPApplication;
 import org.jkiss.dbeaver.model.app.DBPPlatform;
 import org.jkiss.dbeaver.model.auth.AuthInfo;
 import org.jkiss.dbeaver.model.auth.SMCredentialsProvider;
@@ -124,7 +123,6 @@ public abstract class CBApplication extends BaseWebApplication implements WebAut
 
     // Configurations
     protected final Map<String, Object> productConfiguration = new HashMap<>();
-    protected final Map<String, Object> databaseConfiguration = new HashMap<>();
     protected final SMControllerConfiguration securityManagerConfiguration = new SMControllerConfiguration();
     private final CBAppConfig appConfiguration = new CBAppConfig();
     private Map<String, String> externalProperties = new LinkedHashMap<>();
@@ -288,7 +286,7 @@ public abstract class CBApplication extends BaseWebApplication implements WebAut
         log.debug("\tGlobal workspace: '" + instanceLoc.getURL() + "'"); //$NON-NLS-1$ //$NON-NLS-2$
         log.debug("\tMemory available " + (runtime.totalMemory() / (1024 * 1024)) + "Mb/" + (runtime.maxMemory() / (1024 * 1024)) + "Mb");
 
-        DBPApplication application = DBWorkbench.getPlatform().getApplication();
+        DBWorkbench.getPlatform().getApplication();
 
         log.debug("\tContent root: " + new File(contentRoot).getAbsolutePath());
         log.debug("\tDrivers storage: " + new File(driversLocation).getAbsolutePath());
@@ -599,8 +597,6 @@ public abstract class CBApplication extends BaseWebApplication implements WebAut
         Map<String, Object> appConfig = JSONUtils.getObject(configProps, "app");
         validateConfiguration(appConfig);
         gson.fromJson(gson.toJsonTree(appConfig), CBAppConfig.class);
-
-        databaseConfiguration.putAll(JSONUtils.getObject(serverConfig, CBConstants.PARAM_DB_CONFIGURATION));
 
         readProductConfiguration(serverConfig, gson);
 
@@ -987,35 +983,9 @@ public abstract class CBApplication extends BaseWebApplication implements WebAut
     ) {
         Map<String, Object> rootConfig = new LinkedHashMap<>();
         {
-            var serverConfigProperties = new LinkedHashMap<String, Object>();
             var originServerConfig = getServerConfigProps(this.originalConfigurationProperties); // get server properties from original configuration file
+            var serverConfigProperties = collectServerConfigProperties(newServerName, newServerURL, sessionExpireTime, originServerConfig);
             rootConfig.put("server", serverConfigProperties);
-            if (!CommonUtils.isEmpty(newServerName)) {
-                copyConfigValue(originServerConfig,
-                    serverConfigProperties,
-                    CBConstants.PARAM_SERVER_NAME,
-                    newServerName);
-            }
-            if (!CommonUtils.isEmpty(newServerURL)) {
-                copyConfigValue(
-                    originServerConfig, serverConfigProperties, CBConstants.PARAM_SERVER_URL, newServerURL);
-            }
-            if (sessionExpireTime > 0) {
-                copyConfigValue(
-                    originServerConfig,
-                    serverConfigProperties,
-                    CBConstants.PARAM_SESSION_EXPIRE_PERIOD,
-                    sessionExpireTime);
-            }
-            var databaseConfigProperties = new LinkedHashMap<String, Object>();
-            Map<String, Object> oldRuntimeDBConfig = JSONUtils.getObject(originServerConfig,
-                CBConstants.PARAM_DB_CONFIGURATION);
-            if (!CommonUtils.isEmpty(databaseConfiguration) && !isDistributed()) {
-                for (Map.Entry<String, Object> mp : databaseConfiguration.entrySet()) {
-                    copyConfigValue(oldRuntimeDBConfig, databaseConfigProperties, mp.getKey(), mp.getValue());
-                }
-                serverConfigProperties.put(CBConstants.PARAM_DB_CONFIGURATION, databaseConfigProperties);
-            }
         }
         {
             var appConfigProperties = new LinkedHashMap<String, Object>();
@@ -1125,6 +1095,29 @@ public abstract class CBApplication extends BaseWebApplication implements WebAut
         return rootConfig;
     }
 
+    @NotNull
+    protected Map<String, Object> collectServerConfigProperties(String newServerName, String newServerURL, long sessionExpireTime, Map<String, Object> originServerConfig) {
+        var serverConfigProperties = new LinkedHashMap<String, Object>();
+        if (!CommonUtils.isEmpty(newServerName)) {
+            copyConfigValue(originServerConfig,
+                serverConfigProperties,
+                CBConstants.PARAM_SERVER_NAME,
+                newServerName);
+        }
+        if (!CommonUtils.isEmpty(newServerURL)) {
+            copyConfigValue(
+                originServerConfig, serverConfigProperties, CBConstants.PARAM_SERVER_URL, newServerURL);
+        }
+        if (sessionExpireTime > 0) {
+            copyConfigValue(
+                originServerConfig,
+                serverConfigProperties,
+                CBConstants.PARAM_SESSION_EXPIRE_PERIOD,
+                sessionExpireTime);
+        }
+        return serverConfigProperties;
+    }
+
     ////////////////////////////////////////////////////////////////////////
     // License management
 
@@ -1182,7 +1175,7 @@ public abstract class CBApplication extends BaseWebApplication implements WebAut
     }
 
     // gets info about patterns from original configuration file and saves it to runtime config
-    private void copyConfigValue(
+    protected void copyConfigValue(
         Map<String, Object> oldConfig,
         Map<String, Object> newConfig,
         String key,
