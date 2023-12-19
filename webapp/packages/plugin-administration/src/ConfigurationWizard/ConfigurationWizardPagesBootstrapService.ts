@@ -43,7 +43,7 @@ export class ConfigurationWizardPagesBootstrapService extends Bootstrap {
       type: AdministrationItemType.Default,
       configurationWizardOptions: {
         description: 'administration_configuration_wizard_configuration_step_description',
-        order: 1.5,
+        order: 1.3,
         onLoad: this.serverConfigurationService.loadConfig.bind(this.serverConfigurationService),
         isDone: this.serverConfigurationService.isDone.bind(this.serverConfigurationService),
         onFinish: this.serverConfigurationService.saveConfiguration.bind(this.serverConfigurationService, false),
