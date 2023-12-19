@@ -23,6 +23,4 @@ WORKDIR /opt/cloudbeaver/
 
 EXPOSE 8978
 
-RUN chmod +x run-server.sh
-
 ENTRYPOINT ["./run-server.sh"]
