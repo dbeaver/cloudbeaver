@@ -161,7 +161,7 @@ public class WebUserContext implements SMCredentialsProvider {
         this.user = null;
         this.securityController = application.createSecurityController(this);
         this.adminSecurityController = null;
-        this.secretController = application.getSecretController(this);
+        this.secretController = null;
     }
 
     @NotNull
@@ -220,7 +220,10 @@ public class WebUserContext implements SMCredentialsProvider {
         this.userPermissions = permissions;
     }
 
-    public DBSSecretController getSecretController() {
+    public DBSSecretController getSecretController() throws DBException {
+        if (this.securityController == null) {
+            this.secretController = application.getSecretController(this, workspace.getAuthContext());
+        }
         return secretController;
     }
 
