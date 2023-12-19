@@ -1,7 +1,7 @@
 export default [
   ['customConnection_connectionType_custom', '参数'],
   ['customConnection_connectionType_url', 'URL'],
-  ['customConnection_options', '选项'],
+  ['customConnection_main', 'Main'],
   ['customConnection_properties', '驱动属性'],
   ['customConnection_custom_name', '名称'],
   ['customConnection_custom_host', '主机'],
