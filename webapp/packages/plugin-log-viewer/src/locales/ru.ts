@@ -1,5 +1,5 @@
 export default [
-  ['plugin_log_viewer_action_enable_label', 'Просмотр лога'],
+  ['plugin_log_viewer_action_enable_label', 'Просмотр логов'],
   ['plugin_log_viewer_placeholder', 'Просмотр логов неактивен'],
   ['plugin_log_viewer_clear_log', 'Очистить лог'],
   ['plugin_log_viewer_entry_type', 'Тип'],

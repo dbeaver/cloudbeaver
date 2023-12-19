@@ -6,11 +6,11 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
+import { useContext } from 'react';
 
 import { Button, PlaceholderComponent, useTranslate } from '@cloudbeaver/core-blocks';
 
 import type { ITeamFormProps } from './ITeamFormProps';
-import { useContext } from 'react';
 import { TeamFormActionsContext } from './TeamFormActionsContext';
 
 export const TeamFormBaseActions: PlaceholderComponent<ITeamFormProps> = observer(function TeamFormBaseActions({ state, onCancel }) {
