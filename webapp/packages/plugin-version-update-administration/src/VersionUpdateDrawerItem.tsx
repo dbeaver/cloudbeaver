@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import styled from 'reshadow';
+import styled, { css } from 'reshadow';
 
 import type { AdministrationItemDrawerProps } from '@cloudbeaver/core-administration';
 import { s, Translate, useResource, useS, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
@@ -16,23 +16,23 @@ import { Tab, TabIcon, TabTitle } from '@cloudbeaver/core-ui';
 import { VersionResource } from '@cloudbeaver/core-version';
 import { VersionUpdateService } from '@cloudbeaver/core-version-update';
 
-import styles from './VersionUpdateDrawerItem.m.css';
+import moduleStyles from './VersionUpdateDrawerItem.m.css';
+
+const styles = css`
+  tab-container {
+    justify-content: space-between;
+  }
+`;
 
 export const VersionUpdateDrawerItem = observer<AdministrationItemDrawerProps>(function VersionUpdateDrawerItem({ item, onSelect, style, disabled }) {
   const translate = useTranslate();
   const versionUpdateService = useService(VersionUpdateService);
-  const moduleStyle = useS(styles);
+  const moduleStyle = useS(moduleStyles);
 
   useResource(VersionUpdateDrawerItem, VersionResource, CachedMapAllKey, { silent: true });
 
-  return styled(useStyles(style))(
-    <Tab
-      сontainerClassName={s(moduleStyle, { tabContainer: true })}
-      tabId={item.name}
-      disabled={disabled}
-      title="version_update"
-      onOpen={() => onSelect(item.name)}
-    >
+  return styled(useStyles(style, styles))(
+    <Tab tabId={item.name} disabled={disabled} title="version_update" onOpen={() => onSelect(item.name)}>
       <TabIcon className={s(moduleStyle, { iconOrImage: true })} icon="/icons/version_update.svg" />
       <TabTitle className={s(moduleStyle, { tabTitle: true })}>
         <Translate token="version_update" />

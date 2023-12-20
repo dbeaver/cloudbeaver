@@ -19,7 +19,6 @@ export type TabProps = PropsWithChildren<{
   selected?: boolean;
   disabled?: boolean;
   className?: string;
-  сontainerClassName?: string;
   style?: ComponentStyle;
   onOpen?: (tab: ITabData<any>) => void;
   onClose?: (tab: ITabData<any>) => void;

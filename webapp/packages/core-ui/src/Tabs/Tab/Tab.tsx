@@ -25,19 +25,7 @@ import { MENU_TAB } from './MENU_TAB';
 import type { TabProps } from './TabProps';
 import { useTab } from './useTab';
 
-export const Tab = observer<TabProps>(function Tab({
-  tabId,
-  title,
-  menuContext,
-  disabled,
-  className,
-  children,
-  style,
-  onOpen,
-  onClose,
-  onClick,
-  сontainerClassName,
-}) {
+export const Tab = observer<TabProps>(function Tab({ tabId, title, menuContext, disabled, className, children, style, onOpen, onClose, onClick }) {
   const translate = useTranslate();
   const tabContext = useMemo(() => ({ tabId }), [tabId]);
   const tab = useTab(tabId, onOpen, onClose, onClick);
@@ -66,7 +54,7 @@ export const Tab = observer<TabProps>(function Tab({
             disabled={disabled}
             onClick={tab.handleOpen}
           >
-            <tab-container className={сontainerClassName}>{children}</tab-container>
+            <tab-container>{children}</tab-container>
           </BaseTab>
         </tab-inner>
       </tab-outer>
