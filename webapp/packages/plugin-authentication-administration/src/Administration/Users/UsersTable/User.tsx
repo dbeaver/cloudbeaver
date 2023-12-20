@@ -6,7 +6,6 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import styled, { css, use } from 'reshadow';
 
 import { AdminUser, UsersResource } from '@cloudbeaver/core-authentication';
 import {
@@ -22,22 +21,12 @@ import {
 } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
+import { clsx } from '@cloudbeaver/core-utils';
 
 import { AdministrationUsersManagementService } from '../../../AdministrationUsersManagementService';
 import { UsersAdministrationService } from '../UsersAdministrationService';
+import style from './User.m.css';
 import { UserEdit } from './UserEdit';
-
-const styles = css`
-  TableColumnValue[expand] {
-    cursor: pointer;
-  }
-  TableColumnValue[|gap] {
-    gap: 16px;
-  }
-  TableColumnValue[|overflow] {
-    overflow: auto !important;
-  }
-`;
 
 interface Props {
   user: AdminUser;
@@ -69,7 +58,7 @@ export const User = observer<Props>(function User({ user, displayAuthRole, selec
 
   const userManagementDisabled = administrationUsersManagementService.externalUserProviderEnabled;
 
-  return styled(styles)(
+  return (
     <TableItem item={user.userId} expandElement={UserEdit} selectDisabled={!selectable}>
       {selectable && (
         <TableColumnValue centerContent flex>
@@ -79,11 +68,11 @@ export const User = observer<Props>(function User({ user, displayAuthRole, selec
       <TableColumnValue centerContent flex expand>
         <TableItemExpand />
       </TableColumnValue>
-      <TableColumnValue title={user.userId} expand ellipsis>
+      <TableColumnValue className={style.expand} title={user.userId} expand ellipsis>
         {user.userId}
       </TableColumnValue>
       {displayAuthRole && (
-        <TableColumnValue title={user.authRole} expand ellipsis>
+        <TableColumnValue className={style.expand} title={user.authRole} expand ellipsis>
           {user.authRole}
         </TableColumnValue>
       )}
@@ -98,11 +87,11 @@ export const User = observer<Props>(function User({ user, displayAuthRole, selec
           onChange={handleEnabledCheckboxChange}
         />
       </TableColumnValue>
-      <TableColumnValue flex {...use({ gap: true, overflow: true })} ellipsis>
+      <TableColumnValue className={clsx(style.gap, style.overflow)} flex ellipsis>
         <Loader suspense small inline hideMessage>
           <Placeholder container={usersAdministrationService.userDetailsInfoPlaceholder} user={user} />
         </Loader>
       </TableColumnValue>
-    </TableItem>,
+    </TableItem>
   );
 });

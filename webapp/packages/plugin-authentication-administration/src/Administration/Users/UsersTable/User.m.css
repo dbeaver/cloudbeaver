@@ -1,0 +1,11 @@
+.expand {
+  cursor: pointer;
+}
+
+.gap {
+  gap: 16px;
+}
+
+.overflow {
+  overflow: auto !important;
+}
