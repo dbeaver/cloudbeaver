@@ -7,22 +7,12 @@
  */
 import { observer } from 'mobx-react-lite';
 import { useCallback, useState } from 'react';
-import styled, { css } from 'reshadow';
 
-import { Form, ItemList, ItemListSearch, TextPlaceholder, useFocus, useTranslate } from '@cloudbeaver/core-blocks';
+import { Form, ItemList, ItemListSearch, s, TextPlaceholder, useFocus, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import type { AdminConnectionSearchInfo } from '@cloudbeaver/core-sdk';
 
 import { Database } from './Database';
-
-const styles = css`
-  Form {
-    composes: theme-background-surface theme-text-on-surface from global;
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    overflow: auto;
-  }
-`;
+import style from './DatabaseList.m.css';
 
 interface Props {
   databases: AdminConnectionSearchInfo[];
@@ -35,6 +25,7 @@ interface Props {
 }
 
 export const DatabaseList = observer<Props>(function DatabaseList({ databases, hosts, disabled, className, onSelect, onChange, onSearch }) {
+  const styles = useS(style);
   const [focusedRef] = useFocus<HTMLFormElement>({ focusFirstChild: true });
   const translate = useTranslate();
   const [isSearched, setIsSearched] = useState(false);
@@ -49,8 +40,8 @@ export const DatabaseList = observer<Props>(function DatabaseList({ databases, h
 
   const placeholderMessage = isSearched ? 'connections_not_found' : 'connections_administration_search_database_tip';
 
-  return styled(styles)(
-    <Form ref={focusedRef} className={className} onSubmit={onSearch}>
+  return (
+    <Form ref={focusedRef} className={s(styles, { form: true }, className)} onSubmit={onSearch}>
       <ItemListSearch
         value={hosts}
         placeholder={translate('connections_administration_search_database_tip')}
@@ -64,6 +55,6 @@ export const DatabaseList = observer<Props>(function DatabaseList({ databases, h
         ))}
       </ItemList>
       {!databases.length && <TextPlaceholder>{translate(placeholderMessage)}</TextPlaceholder>}
-    </Form>,
+    </Form>
   );
 });
