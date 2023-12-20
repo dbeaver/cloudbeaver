@@ -43,18 +43,10 @@
   align-items: center;
   gap: 8px;
 
-  & IconOrImage {
+  & .iconOrImage {
     height: 24px;
     width: 24px;
   }
-}
-
-.flexBox {
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-  height: 100%;
-  overflow: auto;
 }
 
 .contentBox {
