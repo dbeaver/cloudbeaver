@@ -23,7 +23,6 @@ export * from './ItemList/ListItemIcon';
 export * from './ItemList/ListItemName';
 
 export * from './layout/AppLogo';
-export * from './layout/BASE_LAYOUT_GRID_STYLES';
 export * from './layout/TopAppBar';
 
 export * from './Loader/Loader';
