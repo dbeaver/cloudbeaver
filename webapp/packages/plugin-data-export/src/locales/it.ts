@@ -11,6 +11,7 @@ export default [
   ['data_transfer_notification_delete', 'Elimina'],
   ['data_transfer_exporting_table', 'Tabella:'],
   ['data_transfer_exporting_sql', 'SQL:'],
+  ['data_transfer_dialog_select_processor_fail', 'Failed to select processor'],
 
   ['data_transfer_output_settings_compress', 'Compression'],
 ];
