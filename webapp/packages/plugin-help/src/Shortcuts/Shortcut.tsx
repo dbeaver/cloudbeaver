@@ -6,58 +6,31 @@
  * you may not use this file except in compliance with the License.
  */
 import React from 'react';
-import styled, { css } from 'reshadow';
 
-import { useTranslate } from '@cloudbeaver/core-blocks';
+import { s, useS, useTranslate } from '@cloudbeaver/core-blocks';
 
 import type { IShortcut } from './IShortcut';
+import styles from './Shortcut.m.css';
 
 interface Props {
   shortcut: IShortcut;
 }
 
-const style = css`
-  shortcut-container {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
-  shortcut-label {
-    margin-right: 8px;
-  }
-  shortcut-content {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-  }
-  shortcut-code {
-    composes: theme-form-element-radius theme-background-secondary theme-text-on-secondary from global;
-    flex-shrink: 0;
-    font-family: monospace;
-    font-weight: bold;
-    width: max-content;
-    padding: 4px 8px;
-  }
-  span {
-    white-space: nowrap;
-    text-transform: lowercase;
-  }
-`;
-
 export const Shortcut: React.FC<Props> = function Shortcut({ shortcut }) {
   const translate = useTranslate();
+  const style = useS(styles);
 
-  return styled(style)(
-    <shortcut-container>
-      <shortcut-label>{translate(shortcut.label)}</shortcut-label>
-      <shortcut-content>
+  return (
+    <div className={s(style, { shortcutContainer: true })}>
+      <div className={s(style, { shortcutLabel: true })}>{translate(shortcut.label)}</div>
+      <div className={s(style, { shortcutContent: true })}>
         {shortcut.code.map((code, index) => (
           <React.Fragment key={code}>
-            {index > 0 && <span>{translate('ui_or')}</span>}
-            <shortcut-code>{code}</shortcut-code>
+            {index > 0 && <span className={s(style, { span: true })}>{translate('ui_or')}</span>}
+            <div className={s(style, { shortcutCode: true })}>{code}</div>
           </React.Fragment>
         ))}
-      </shortcut-content>
-    </shortcut-container>,
+      </div>
+    </div>
   );
 };
