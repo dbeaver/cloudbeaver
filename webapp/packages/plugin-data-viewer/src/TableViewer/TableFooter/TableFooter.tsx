@@ -123,6 +123,6 @@ export const TableFooter = observer<Props>(function TableFooter({ resultIndex, m
           {model.source.requestInfo.requestMessage} - {model.source.requestInfo.requestDuration}ms
         </time>
       )}
-    </ToolsPanel>
+    </ToolsPanel>,
   );
 });

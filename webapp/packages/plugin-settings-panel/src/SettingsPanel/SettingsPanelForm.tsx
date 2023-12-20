@@ -7,31 +7,22 @@
  */
 import { observer } from 'mobx-react-lite';
 import React from 'react';
-import styled, { css } from 'reshadow';
 
-import { ColoredContainer, Container, useStyles } from '@cloudbeaver/core-blocks';
+import { ColoredContainer, Container, s, useS } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { SettingsManagerService } from '@cloudbeaver/core-settings';
 
 import { SettingsGroup } from './SettingsGroup';
-
-const styles = css`
-  content {
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    overflow: auto;
-  }
-`;
+import styles from './SettingsPanelForm.m.css';
 
 export const SettingsPanelForm = observer(function SettingsPanelForm() {
-  const style = useStyles(styles);
+  const style = useS(styles);
 
   const settingsManagerService = useService(SettingsManagerService);
   const groups = Array.from(settingsManagerService.groups.values());
 
-  return styled(style)(
-    <content>
+  return (
+    <div className={s(style, { content: true })}>
       <ColoredContainer gap overflow parent>
         <Container medium gap vertical overflow>
           {groups.map(group => (
@@ -39,6 +30,6 @@ export const SettingsPanelForm = observer(function SettingsPanelForm() {
           ))}
         </Container>
       </ColoredContainer>
-    </content>,
+    </div>
   );
 });

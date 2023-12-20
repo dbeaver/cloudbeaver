@@ -5,7 +5,7 @@
   flex-direction: column;
 }
 
-.p {
+.message {
   white-space: pre-wrap;
   line-height: 2;
 }
