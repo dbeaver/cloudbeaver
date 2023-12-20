@@ -192,30 +192,24 @@ export class ConnectionSSHTabService extends Bootstrap {
         config.networkHandlersConfig = [];
       }
 
+      this.trimSSHInputConfig(handlerConfig);
       config.networkHandlersConfig.push(handlerConfig);
     }
 
     if (config.networkHandlersConfig?.length) {
-      this.trimSSHInputConfig(config.networkHandlersConfig);
     }
   }
 
-  private trimSSHInputConfig(input: NetworkHandlerConfigInput[]) {
+  private trimSSHInputConfig(input: NetworkHandlerConfigInput) {
     const ATTRIBUTES_TO_TRIM: (keyof NetworkHandlerConfigInput)[] = ['userName', 'password', 'key'];
-    const sshConfigIndex = input.findIndex(handler => handler.id === SSH_TUNNEL_ID);
-    const sshConfig = input[sshConfigIndex];
 
-    if (sshConfigIndex === -1) {
-      return;
+    for (const key of ATTRIBUTES_TO_TRIM) {
+      if (key in input) {
+        input[key] = input[key]?.trim();
+      }
     }
 
-    ATTRIBUTES_TO_TRIM.forEach(attribute => {
-      if (sshConfigIndex !== undefined && sshConfigIndex >= 0) {
-        sshConfig[attribute] = sshConfig[attribute]?.trim();
-      }
-    });
-
-    sshConfig.properties.host = sshConfig.properties.host?.trim();
+    input.properties.host = input.properties.host?.trim();
   }
 
   private formState(data: IConnectionFormState, contexts: IExecutionContextProvider<IConnectionFormState>) {
