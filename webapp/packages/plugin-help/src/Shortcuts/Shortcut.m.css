@@ -1,0 +1,29 @@
+.shortcutContainer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.shortcutLabel {
+  margin-right: 8px;
+}
+
+.shortcutContent {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.shortcutCode {
+  composes: theme-form-element-radius theme-background-secondary theme-text-on-secondary from global;
+  flex-shrink: 0;
+  font-family: monospace;
+  font-weight: bold;
+  width: max-content;
+  padding: 4px 8px;
+}
+
+.span {
+  white-space: nowrap;
+  text-transform: lowercase;
+}
