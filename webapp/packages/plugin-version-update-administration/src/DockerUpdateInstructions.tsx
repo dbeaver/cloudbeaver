@@ -6,33 +6,21 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import styled, { css } from 'reshadow';
 
-import { Group, GroupItem, GroupTitle, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
+import { Group, GroupItem, GroupTitle, s, useS, useTranslate } from '@cloudbeaver/core-blocks';
 
-const style = css`
-  GroupItem {
-    white-space: pre-line;
-  }
-  h4 {
-    margin-top: 0;
-  }
-  ol {
-    margin: 0;
-    padding: 0;
-  }
-`;
+import styles from './DockerUpdateInstructions.m.css';
 
 export const DockerUpdateInstructions = observer(function DockerUpdateInstructions() {
   const translate = useTranslate();
-  const styles = useStyles(style);
+  const style = useS(styles);
 
-  return styled(styles)(
+  return (
     <Group gap large>
       <GroupTitle>{translate('version_update_how_to_update')}</GroupTitle>
-      <GroupItem>
-        <h4>The following instructions apply only when you run CloudBeaver in a Docker container.</h4>
-        <ol>
+      <GroupItem className={s(style, { groupItem: true })}>
+        <h4 className={s(style, { h4: true })}>The following instructions apply only when you run CloudBeaver in a Docker container.</h4>
+        <ol className={s(style, { ol: true })}>
           <li>
             Stop the existing container by running the <strong>docker stop</strong> command.
           </li>
@@ -47,6 +35,6 @@ export const DockerUpdateInstructions = observer(function DockerUpdateInstructio
           </li>
         </ol>
       </GroupItem>
-    </Group>,
+    </Group>
   );
 });
