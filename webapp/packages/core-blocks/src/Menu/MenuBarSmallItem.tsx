@@ -12,6 +12,9 @@ import type { ComponentStyle } from '@cloudbeaver/core-theming';
 
 import { IconButton } from '../IconButton';
 import { useStyles } from '../useStyles';
+import moduleStyles from './MenuBarSmallItem.m.css';
+import { useS } from '../useS';
+import { s } from '../s';
 
 export const styles = css`
   icon-box {
@@ -33,13 +36,6 @@ export const styles = css`
       text-transform: uppercase;
       font-weight: 500;
     }
-
-    & IconButton {
-      overflow: hidden;
-      padding: 0;
-      margin: 0;
-      flex-shrink: 0;
-    }
   }
 `;
 
@@ -59,11 +55,12 @@ export const MenuBarSmallItem: React.FC<React.PropsWithChildren<Props>> = functi
   onClick,
   ...rest
 }) {
+  const moduleStyle = useS(moduleStyles);
   // TODO: replace IconButton with StaticImage / Icon
   // TODO: use button for icon-box (maybe)
   return styled(useStyles(styles, style))(
     <icon-box className={className} tabIndex={0} onClick={onClick}>
-      {icon && <IconButton name={icon} viewBox={viewBox} {...rest} />}
+      {icon && <IconButton className={s(moduleStyle, { iconButton: true })} name={icon} viewBox={viewBox} {...rest} />}
       {children && <icon-label>{children}</icon-label>}
     </icon-box>,
   );
