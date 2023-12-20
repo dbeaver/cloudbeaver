@@ -36,29 +36,31 @@ export const UserForm = observer<Props>(function UserForm({ user, state, onClose
   const localProvider = user.linkedAuthProviders.includes(AUTH_PROVIDER_LOCAL_ID);
 
   return styled(styles)(
-    <TabsState>
-      <div className={s(moduleStyle, { topBar: true })}>
-        <div className={s(moduleStyle, { topBarTabs: true })}>
-          <div className={s(moduleStyle, { statusMessage: true })}>
-            <StatusMessage type={ENotificationType.Info} message={state.info.statusMessage} />
+    <div className={s(moduleStyle, { box: true })}>
+      <TabsState>
+        <div className={s(moduleStyle, { topBar: true })}>
+          <div className={s(moduleStyle, { topBarTabs: true })}>
+            <div className={s(moduleStyle, { statusMessage: true })}>
+              <StatusMessage type={ENotificationType.Info} message={state.info.statusMessage} />
+            </div>
+            <TabList className={s(moduleStyle, { tabList: true })} aria-label="User Settings" style={style} disabled={state.info.disabled}>
+              <UserInfoTab style={style} />
+              {localProvider && <AuthenticationTab style={style} />}
+            </TabList>
           </div>
-          <TabList className={s(moduleStyle, { tabList: true })} aria-label="User Settings" style={style} disabled={state.info.disabled}>
-            <UserInfoTab style={style} />
-            {localProvider && <AuthenticationTab style={style} />}
-          </TabList>
+          <div className={s(moduleStyle, { topBarActions: true })}>
+            {onClose && (
+              <Button type="button" mod={['outlined']} onClick={onClose}>
+                {translate('ui_processing_cancel')}
+              </Button>
+            )}
+          </div>
         </div>
-        <div className={s(moduleStyle, { topBarActions: true })}>
-          {onClose && (
-            <Button type="button" mod={['outlined']} onClick={onClose}>
-              {translate('ui_processing_cancel')}
-            </Button>
-          )}
+        <div className={s(moduleStyle, { contentBox: true })}>
+          <UserInfoPanel user={user} style={style} />
+          {localProvider && <AuthenticationPanel style={style} />}
         </div>
-      </div>
-      <div className={s(moduleStyle, { contentBox: true })}>
-        <UserInfoPanel user={user} style={style} />
-        {localProvider && <AuthenticationPanel style={style} />}
-      </div>
-    </TabsState>,
+      </TabsState>
+    </div>,
   );
 });

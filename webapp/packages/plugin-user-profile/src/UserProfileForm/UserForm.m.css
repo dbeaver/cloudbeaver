@@ -49,6 +49,14 @@
   }
 }
 
+.box {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  height: 100%;
+  overflow: auto;
+}
+
 .contentBox {
   composes: theme-background-secondary theme-border-color-background from global;
   position: relative;
