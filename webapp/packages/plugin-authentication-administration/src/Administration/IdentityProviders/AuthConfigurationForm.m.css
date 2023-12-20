@@ -47,6 +47,7 @@
   height: 100%;
   overflow: auto;
 }
+
 .contentBox {
   composes: theme-background-secondary theme-border-color-background from global;
   position: relative;

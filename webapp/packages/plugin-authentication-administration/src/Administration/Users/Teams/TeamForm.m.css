@@ -6,21 +6,23 @@
   flex-direction: column;
   overflow: auto;
 }
+
 .topBar {
   composes: theme-border-color-background theme-background-secondary theme-text-on-secondary from global;
   position: relative;
   display: flex;
   padding-top: 16px;
-
-  &:before {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    width: 100%;
-    border-bottom: solid 2px;
-    border-color: inherit;
-  }
 }
+
+.topBar:before {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  border-bottom: solid 2px;
+  border-color: inherit;
+}
+
 .topBarTabs {
   flex: 1;
 }
