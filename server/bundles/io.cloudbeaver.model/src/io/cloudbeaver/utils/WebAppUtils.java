@@ -179,7 +179,7 @@ public class WebAppUtils {
             sessionCookie.setMaxAge((int) (maxSessionIdleTime / 1000));
         }
 
-        String path = getWebApplication().getRootURI();
+        String path = getWebApplication().getServerConfiguration().getRootURI();
 
         if (sameSite != null) {
             if (!request.isSecure()) {

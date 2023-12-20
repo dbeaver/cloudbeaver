@@ -16,8 +16,6 @@
  */
 package io.cloudbeaver.model.app;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import io.cloudbeaver.DataSourceFilter;
 import io.cloudbeaver.WebProjectImpl;
 import io.cloudbeaver.WebSessionProjectImpl;
@@ -119,7 +117,7 @@ public abstract class BaseWebApplication extends BaseApplicationImpl implements 
         // Load config file
         log.debug("Loading configuration from " + configFilePath);
         try {
-            loadConfiguration(configFilePath);
+            getServerConfigurationController().loadServerConfiguration(configFilePath);
         } catch (Exception e) {
             log.error("Error parsing configuration", e);
             return false;
@@ -177,8 +175,6 @@ public abstract class BaseWebApplication extends BaseApplicationImpl implements 
         var customConfigPath = configPath.resolve(CUSTOM_CONFIG_FOLDER).resolve(fileName);
         return Files.exists(customConfigPath) ? customConfigPath : configPath.resolve(fileName);
     }
-
-    protected abstract void loadConfiguration(Path configPath) throws DBException;
 
     @Override
     public WebProjectImpl createProjectImpl(
@@ -269,10 +265,6 @@ public abstract class BaseWebApplication extends BaseApplicationImpl implements 
         return null;
     }
 
-    protected Gson getGson() {
-        return getGsonBuilder().create();
-    }
-
-    protected abstract GsonBuilder getGsonBuilder();
+    public abstract WebServerConfigurationController getServerConfigurationController();
 
 }

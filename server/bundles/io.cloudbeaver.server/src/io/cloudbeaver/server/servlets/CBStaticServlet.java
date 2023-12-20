@@ -29,6 +29,11 @@ import io.cloudbeaver.registry.WebServletHandlerDescriptor;
 import io.cloudbeaver.server.CBAppConfig;
 import io.cloudbeaver.server.CBApplication;
 import io.cloudbeaver.server.CBPlatform;
+import io.cloudbeaver.server.CBServerConfig;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.eclipse.jetty.http.HttpContent;
 import org.eclipse.jetty.http.HttpField;
 import org.eclipse.jetty.http.HttpHeader;
@@ -47,10 +52,6 @@ import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.Enumeration;
 import java.util.Map;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 
 @WebServlet(urlPatterns = "/")
 public class CBStaticServlet extends DefaultServlet {
@@ -212,9 +213,10 @@ public class CBStaticServlet extends DefaultServlet {
                 IOUtils.copyStream(fis, baos);
             }
             String indexContents = baos.toString(StandardCharsets.UTF_8);
+            CBServerConfig serverConfig = CBApplication.getInstance().getServerConfiguration();
             indexContents = indexContents
-                .replace("{ROOT_URI}", CBApplication.getInstance().getRootURI())
-                .replace("{STATIC_CONTENT}", CBApplication.getInstance().getStaticContent());
+                .replace("{ROOT_URI}", serverConfig.getRootURI())
+                .replace("{STATIC_CONTENT}", serverConfig.getStaticContent());
             byte[] indexBytes = indexContents.getBytes(StandardCharsets.UTF_8);
 
             putHeaders(response, content, indexBytes.length);
