@@ -54,8 +54,14 @@ public class DBNResourceManagerRoot extends DBNNode implements DBPHiddenObject, 
         return "rm";
     }
 
+    @NotNull
     @Override
-    public String getNodeName() {
+    public String getNodeId() {
+        return "rm";
+    }
+
+    @Override
+    public String getNodeDisplayName() {
         return "resources";
     }
 
@@ -103,21 +109,17 @@ public class DBNResourceManagerRoot extends DBNNode implements DBPHiddenObject, 
         return projects;
     }
 
+    @Deprecated(forRemoval = true)
     @Override
     public String getNodeItemPath() {
         // Path doesn't include project name
-        return NodePathType.ext.getPrefix() + getNodeName();
+        return NodePathType.ext.getPrefix() + getNodeDisplayName();
     }
 
     @Override
     public DBNNode refreshNode(DBRProgressMonitor monitor, Object source) throws DBException {
         projects = null;
         return this;
-    }
-
-    @Override
-    public String toString() {
-        return getNodeName();
     }
 
     @Override
