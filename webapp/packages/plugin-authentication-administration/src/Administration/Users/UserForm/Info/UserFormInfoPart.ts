@@ -76,7 +76,9 @@ export class UserFormInfoPart extends FormPart<IUserFormInfoState, IUserFormStat
     );
   }
 
-  protected override async saveChanges(): Promise<void> {
+  private async createUser() {
+    this.state.userId = this.state.userId.trim();
+
     if (this.formState.mode === FormMode.Create) {
       const user = await this.usersResource.create({
         userId: this.state.userId,
@@ -85,6 +87,10 @@ export class UserFormInfoPart extends FormPart<IUserFormInfoState, IUserFormStat
       this.initialState.userId = user.userId;
       this.formState.setMode(FormMode.Edit);
     }
+  }
+
+  protected override async saveChanges(): Promise<void> {
+    await this.createUser();
 
     // load actual data of user to prevent conflicts
     await this.usersResource.refresh(this.state.userId);
@@ -132,6 +138,8 @@ export class UserFormInfoPart extends FormPart<IUserFormInfoState, IUserFormStat
   }
 
   private async updateCredentials() {
+    this.state.password = this.state.password.trim();
+
     if (this.state.password) {
       await this.usersResource.updateCredentials(this.state.userId, {
         profile: '0',
@@ -189,6 +197,12 @@ export class UserFormInfoPart extends FormPart<IUserFormInfoState, IUserFormStat
   private async updateMetaParameters() {
     if (this.state.userId) {
       const user = this.usersResource.get(this.state.userId);
+
+      for (const key in this.state.metaParameters) {
+        if (typeof this.state.metaParameters[key] === 'string') {
+          this.state.metaParameters[key] = this.state.metaParameters[key].trim();
+        }
+      }
 
       if (user && isObjectsEqual(user.metaParameters, this.state.metaParameters)) {
         return;
