@@ -58,7 +58,7 @@ export class AuthConfigurationOptionsTabService extends Bootstrap {
   private async prepareConfig({ state }: IAuthConfigurationFormSubmitData, contexts: IExecutionContextProvider<IAuthConfigurationFormSubmitData>) {
     const config = contexts.getContext(authConfigurationContext);
 
-    config.id = state.config.id;
+    config.id = state.config.id.trim();
     config.providerId = state.config.providerId;
     config.disabled = state.config.disabled;
     config.displayName = state.config.displayName.trim();
@@ -70,14 +70,20 @@ export class AuthConfigurationOptionsTabService extends Bootstrap {
 
     if (Object.keys(state.config.parameters).length) {
       config.parameters = state.config.parameters;
+
+      for (const key of Object.keys(config.parameters)) {
+        if (typeof config.parameters[key] === 'string') {
+          config.parameters[key] = config.parameters[key].trim();
+        }
+      }
     }
 
     if (state.config.description) {
-      config.description = state.config.description;
+      config.description = state.config.description.trim();
     }
 
     if (state.config.iconURL) {
-      config.iconURL = state.config.iconURL;
+      config.iconURL = state.config.iconURL.trim();
     }
   }
 
