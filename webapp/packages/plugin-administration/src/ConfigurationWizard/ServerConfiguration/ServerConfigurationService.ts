@@ -204,6 +204,9 @@ export class ServerConfigurationService {
       return;
     }
 
+    data.state.serverConfig.serverName = data.state.serverConfig.serverName?.trim();
+    data.state.serverConfig.serverURL = data.state.serverConfig.serverURL?.trim();
+
     try {
       await this.serverConfigResource.save(data.configurationWizard);
 
