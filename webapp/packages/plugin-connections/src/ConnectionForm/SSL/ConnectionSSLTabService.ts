@@ -195,15 +195,16 @@ export class ConnectionSSLTabService extends Bootstrap {
 
   private trimSSLConfig(input: NetworkHandlerConfigInput) {
     const { secureProperties } = input;
-    const PROPERTIES_TO_TRIM = ['ssl.cipher.suites', 'ssl.client.key.value', 'ssl.client.cert.value', 'ssl.ca.cert.value'];
 
     if (!Object.keys(secureProperties).length) {
       return;
     }
 
-    for (const key of PROPERTIES_TO_TRIM) {
+    for (const key in secureProperties) {
       if (key in secureProperties) {
-        secureProperties[key] = secureProperties[key]?.trim();
+        if (typeof secureProperties[key] === 'string') {
+          secureProperties[key] = secureProperties[key]?.trim();
+        }
       }
     }
   }

@@ -201,15 +201,19 @@ export class ConnectionSSHTabService extends Bootstrap {
   }
 
   private trimSSHInputConfig(input: NetworkHandlerConfigInput) {
-    const ATTRIBUTES_TO_TRIM: (keyof NetworkHandlerConfigInput)[] = ['userName', 'password', 'key'];
+    const ATTRIBUTES_TO_TRIM: (keyof NetworkHandlerConfigInput)[] = Object.keys(input) as (keyof NetworkHandlerConfigInput)[];
 
     for (const key of ATTRIBUTES_TO_TRIM) {
-      if (key in input) {
+      if (typeof input[key] === 'string') {
         input[key] = input[key]?.trim();
       }
     }
 
-    input.properties.host = input.properties.host?.trim();
+    for (const key in input.properties) {
+      if (typeof input.properties[key] === 'string') {
+        input.properties[key] = input.properties[key]?.trim();
+      }
+    }
   }
 
   private formState(data: IConnectionFormState, contexts: IExecutionContextProvider<IConnectionFormState>) {

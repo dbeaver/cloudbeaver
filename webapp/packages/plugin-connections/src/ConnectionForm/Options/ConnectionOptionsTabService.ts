@@ -350,7 +350,9 @@ export class ConnectionOptionsTabService extends Bootstrap {
       tempConfig.providerProperties = providerProperties;
 
       for (const key of Object.keys(tempConfig.providerProperties)) {
-        tempConfig.providerProperties[key] = tempConfig.providerProperties[key]?.trim();
+        if (typeof tempConfig.providerProperties[key] === 'string') {
+          tempConfig.providerProperties[key] = tempConfig.providerProperties[key]?.trim();
+        }
       }
     }
 
