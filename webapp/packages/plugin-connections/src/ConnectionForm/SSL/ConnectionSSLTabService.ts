@@ -201,10 +201,8 @@ export class ConnectionSSLTabService extends Bootstrap {
     }
 
     for (const key in secureProperties) {
-      if (key in secureProperties) {
-        if (typeof secureProperties[key] === 'string') {
-          secureProperties[key] = secureProperties[key]?.trim();
-        }
+      if (typeof secureProperties[key] === 'string') {
+        secureProperties[key] = secureProperties[key]?.trim();
       }
     }
   }
