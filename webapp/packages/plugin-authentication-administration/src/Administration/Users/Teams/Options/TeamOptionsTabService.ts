@@ -73,7 +73,9 @@ export class TeamOptionsTabService extends Bootstrap {
       config.metaParameters = state.config.metaParameters;
 
       for (const key of Object.keys(config.metaParameters)) {
-        config.metaParameters[key] = config.metaParameters[key].trim();
+        if (typeof config.metaParameters[key] === 'string') {
+          config.metaParameters[key] = config.metaParameters[key].trim();
+        }
       }
     }
 
