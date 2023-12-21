@@ -54,7 +54,7 @@ export class TeamOptionsTabService extends Bootstrap {
   private async prepareConfig({ state }: ITeamFormSubmitData, contexts: IExecutionContextProvider<ITeamFormSubmitData>) {
     const config = contexts.getContext(teamContext);
 
-    config.teamId = state.config.teamId;
+    config.teamId = state.config.teamId.trim();
 
     if (state.config.teamName) {
       config.teamName = state.config.teamName.trim();
@@ -66,11 +66,15 @@ export class TeamOptionsTabService extends Bootstrap {
     }
 
     if (state.config.description) {
-      config.description = state.config.description;
+      config.description = state.config.description.trim();
     }
 
     if (state.config.metaParameters) {
       config.metaParameters = state.config.metaParameters;
+
+      for (const key of Object.keys(config.metaParameters)) {
+        config.metaParameters[key] = config.metaParameters[key].trim();
+      }
     }
 
     config.teamPermissions = [...state.config.teamPermissions];
