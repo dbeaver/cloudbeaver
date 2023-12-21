@@ -274,7 +274,7 @@ export class ConnectionOptionsTabService extends Bootstrap {
       tempConfig.name = getUniqueName(tempConfig.name, connectionNames);
     }
 
-    tempConfig.description = state.config.description;
+    tempConfig.description = state.config.description?.trim();
 
     tempConfig.template = state.config.template;
 
@@ -285,16 +285,16 @@ export class ConnectionOptionsTabService extends Bootstrap {
     }
 
     if (tempConfig.configurationType === DriverConfigurationType.Url) {
-      tempConfig.url = state.config.url;
+      tempConfig.url = state.config.url?.trim();
     } else {
       if (!driver.embedded) {
-        tempConfig.host = state.config.host;
-        tempConfig.port = state.config.port;
+        tempConfig.host = state.config.host?.trim();
+        tempConfig.port = state.config.port?.trim();
       }
       if (driver.requiresServerName) {
-        tempConfig.serverName = state.config.serverName;
+        tempConfig.serverName = state.config.serverName?.trim();
       }
-      tempConfig.databaseName = state.config.databaseName;
+      tempConfig.databaseName = state.config.databaseName?.trim();
     }
 
     if ((state.config.authModelId || driver.defaultAuthModel) && !driver.anonymousAccess) {
@@ -303,6 +303,20 @@ export class ConnectionOptionsTabService extends Bootstrap {
       tempConfig.sharedCredentials = state.config.sharedCredentials;
 
       const properties = await this.getConnectionAuthModelProperties(tempConfig.authModelId, state.info);
+
+      properties.forEach(property => {
+        if (property.dataType?.toLocaleLowerCase() !== 'string') {
+          return;
+        }
+
+        if (property.value) {
+          property.value = property.value?.trim();
+        }
+
+        if (property.defaultValue) {
+          property.defaultValue = property.defaultValue?.trim();
+        }
+      });
 
       if (this.isCredentialsChanged(properties, state.config.credentials)) {
         tempConfig.credentials = { ...state.config.credentials };
@@ -334,6 +348,10 @@ export class ConnectionOptionsTabService extends Bootstrap {
       }
 
       tempConfig.providerProperties = providerProperties;
+
+      for (const key of Object.keys(tempConfig.providerProperties)) {
+        tempConfig.providerProperties[key] = tempConfig.providerProperties[key]?.trim();
+      }
     }
 
     runInAction(() => {
