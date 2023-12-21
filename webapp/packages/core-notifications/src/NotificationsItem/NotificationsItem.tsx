@@ -41,7 +41,7 @@ export const NotificationsItem = observer<Props>(function Notification({ notific
       disableShowDetails={errorDetails.isOpen}
       closeDelay={closeDelay}
       onClose={notification.close}
-      onShowDetails={errorDetails.open}
+      onShowDetails={errorDetails.hasDetails ? errorDetails.open : undefined}
     />
   );
 });
