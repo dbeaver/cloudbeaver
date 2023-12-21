@@ -7,4 +7,3 @@ Bundle-Release-Date: 20231225
 Bundle-Vendor: DBeaver Corp
 Bundle-ActivationPolicy: lazy
 Automatic-Module-Name: io.cloudbeaver.resources.drivers.base
-Require-Bundle: io.cloudbeaver.server
