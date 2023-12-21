@@ -173,6 +173,9 @@ export function useAuthDialogState(accessRequest: boolean, providerId: string | 
         provider = (provider || state.activeProvider) ?? undefined;
         configuration = (configuration || state.activeConfiguration) ?? undefined;
 
+        state.credentials.credentials.user = state.credentials.credentials.user?.trim();
+        state.credentials.credentials.password = state.credentials.credentials.password?.trim();
+
         if (!provider || this.authenticating) {
           return;
         }
