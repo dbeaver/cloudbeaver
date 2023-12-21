@@ -34,7 +34,7 @@ public class FSFile {
 
     @Property
     public String getName() {
-        return node.getNodeName();
+        return node.getNodeDisplayName();
     }
 
     @Property
@@ -53,6 +53,7 @@ public class FSFile {
     }
 
     @Property
+    //TODO: node URI after finish migration to the new node path format
     public String getNodePath() {
         return node.getNodeItemPath();
     }
