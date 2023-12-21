@@ -80,6 +80,12 @@ export class ConnectionDriverPropertiesTabService extends Bootstrap {
     const config = contexts.getContext(connectionConfigContext);
 
     config.properties = { ...state.config.properties };
+
+    for (const key of Object.keys(config.properties)) {
+      const value = config.properties[key];
+      delete config.properties[key];
+      config.properties[key.trim()] = typeof value === 'string' ? value.trim() : value;
+    }
   }
 
   private formState(data: IConnectionFormState, contexts: IExecutionContextProvider<IConnectionFormState>) {
