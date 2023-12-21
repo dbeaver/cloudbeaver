@@ -7,34 +7,27 @@
  */
 import { observer } from 'mobx-react-lite';
 import { useCallback } from 'react';
-import styled, { css } from 'reshadow';
 
 import { ListItem, ListItemDescription, ListItemIcon, ListItemName, StaticImage } from '@cloudbeaver/core-blocks';
 import type { DataTransferProcessorInfo } from '@cloudbeaver/core-sdk';
+
+import style from './ProcessorItem.m.css';
 
 interface Props {
   processor: DataTransferProcessorInfo;
   onSelect: (processorId: string) => void;
 }
 
-const styles = css`
-  StaticImage {
-    box-sizing: border-box;
-    width: 24px;
-    max-height: 24px;
-  }
-`;
-
 export const ProcessorItem = observer<Props>(function ProcessorItem({ processor, onSelect }) {
   const select = useCallback(() => onSelect(processor.id), [processor]);
 
-  return styled(styles)(
+  return (
     <ListItem onClick={select}>
       <ListItemIcon>
-        <StaticImage icon={processor.icon} />
+        <StaticImage className={style.staticImage} icon={processor.icon} />
       </ListItemIcon>
       <ListItemName>{processor.name}</ListItemName>
       <ListItemDescription title={processor.description}>{processor.description}</ListItemDescription>
-    </ListItem>,
+    </ListItem>
   );
 });

@@ -111,7 +111,7 @@ export const ServerConfigurationPage: AdministrationItemContentComponent = obser
               <h3>{translate('administration_configuration_wizard_configuration_title')}</h3>
             </GroupItem>
             <GroupItem>
-              <p className={s(styles, { p: true })}>{translate('administration_configuration_wizard_configuration_message')}</p>
+              <p className={s(styles, { message: true })}>{translate('administration_configuration_wizard_configuration_message')}</p>
             </GroupItem>
           </Group>
         )}

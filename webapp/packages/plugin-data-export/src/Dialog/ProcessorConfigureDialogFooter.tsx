@@ -6,24 +6,10 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import styled, { css } from 'reshadow';
 
-import { Button, useTranslate } from '@cloudbeaver/core-blocks';
+import { Button, Fill, s, useS, useTranslate } from '@cloudbeaver/core-blocks';
 
-const styles = css`
-  controls {
-    display: flex;
-    flex: 1;
-    height: 100%;
-    align-items: center;
-    margin: auto;
-    gap: 24px;
-  }
-
-  fill {
-    flex: 1;
-  }
-`;
+import style from './ProcessorConfigureDialogFooter.m.css';
 
 interface Props {
   isExporting: boolean;
@@ -43,13 +29,14 @@ export const ProcessorConfigureDialogFooter = observer<Props>(function Processor
   onNext,
 }) {
   const translate = useTranslate();
+  const styles = useS(style);
 
-  return styled(styles)(
-    <controls as="div">
+  return (
+    <div className={s(styles, { controls: true })}>
       <Button type="button" mod={['outlined']} disabled={isExporting} onClick={onBack}>
         {translate('ui_stepper_back')}
       </Button>
-      <fill as="div" />
+      <Fill />
       <Button type="button" mod={['outlined']} disabled={isExporting} onClick={onCancel}>
         {translate('ui_processing_cancel')}
       </Button>
@@ -62,6 +49,6 @@ export const ProcessorConfigureDialogFooter = observer<Props>(function Processor
           {translate('ui_stepper_next')}
         </Button>
       )}
-    </controls>,
+    </div>
   );
 });

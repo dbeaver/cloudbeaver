@@ -1,5 +1,6 @@
 #!/bin/bash
 set -Eeo pipefail
+set +u
 
 # #command line arguments
 # CONFIGURATION_PATH=${1-"../config/sample-databases/DefaultConfiguration"}
@@ -29,7 +30,7 @@ cd cloudbeaver/deploy
 echo "Build CloudBeaver server"
 
 cd ../server/product/aggregate
-mvn clean verify -U -Dheadless-platform
+mvn clean verify $MAVEN_COMMON_OPTS -Dheadless-platform
 if [[ "$?" -ne 0 ]] ; then
   echo 'Could not perform package'; exit $rc
 fi
