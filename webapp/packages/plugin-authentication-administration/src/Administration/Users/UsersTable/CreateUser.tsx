@@ -7,7 +7,7 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import { Loader, s, Translate, useS } from '@cloudbeaver/core-blocks';
+import { Loader, s, Translate, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import type { IFormState } from '@cloudbeaver/core-ui';
 
 import { AdministrationUserForm } from '../UserForm/AdministrationUserForm';
@@ -20,10 +20,11 @@ interface Props {
 }
 
 export const CreateUser = observer<Props>(function CreateUser({ state, onCancel }) {
+  const translate = useTranslate();
   const styles = useS(style);
 
   return (
-    <div className={s(styles, { box: true })}>
+    <div aria-label={translate('authentication_administration_user_connections_user_add')} className={s(styles, { box: true })}>
       <div className={s(styles, { titleBar: true })}>
         <Translate token="authentication_administration_user_connections_user_add" />
       </div>

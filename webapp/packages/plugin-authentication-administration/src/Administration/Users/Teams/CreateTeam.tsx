@@ -7,7 +7,7 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import { Fill, IconButton, s, Translate, useS } from '@cloudbeaver/core-blocks';
+import { Fill, IconButton, s, Translate, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 
 import style from './CreateTeam.m.css';
@@ -15,6 +15,7 @@ import { CreateTeamService } from './CreateTeamService';
 import { TeamForm } from './TeamForm';
 
 export const CreateTeam: React.FC = observer(function CreateTeam() {
+  const translate = useTranslate();
   const styles = useS(style);
   const service = useService(CreateTeamService);
 
@@ -23,7 +24,7 @@ export const CreateTeam: React.FC = observer(function CreateTeam() {
   }
 
   return (
-    <div className={s(styles, { box: true })}>
+    <div aria-label={translate('administration_teams_team_creation')} className={s(styles, { box: true })}>
       <div className={s(styles, { titleBar: true })}>
         <Translate token="administration_teams_team_creation" />
         <Fill />
