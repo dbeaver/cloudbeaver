@@ -80,8 +80,14 @@ public class WebNavigatorNodeInfo {
     ///////////////////////////////////
 
     @Property
+    @Deprecated(forRemoval = true)
     public String getId() {
         return node.getNodeItemPath();
+    }
+
+    @Property
+    public String getUri() {
+        return node.getNodeUri();
     }
 
     @Property
@@ -303,6 +309,6 @@ public class WebNavigatorNodeInfo {
 
     @Override
     public String toString() {
-        return node.getNodeItemPath();
+        return node.getNodeUri();
     }
 }

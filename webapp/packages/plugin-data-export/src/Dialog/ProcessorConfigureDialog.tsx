@@ -18,6 +18,7 @@ import {
   IProperty,
   PropertiesTable,
   s,
+  useErrorDetails,
   useS,
   useStyles,
   useTranslate,
@@ -34,9 +35,8 @@ interface Props {
   properties: IProperty[];
   processorProperties: any;
   outputSettings: Partial<DataTransferOutputSettings>;
-  error: GQLErrorCatcher;
+  error: Error | null;
   isExporting: boolean;
-  onShowDetails: () => void;
   onClose: () => void;
   onBack: () => void;
   onExport: () => void;
@@ -54,7 +54,6 @@ export const ProcessorConfigureDialog = observer<Props>(function ProcessorConfig
   outputSettings,
   error,
   isExporting,
-  onShowDetails,
   onClose,
   onBack,
   onExport,
@@ -64,6 +63,7 @@ export const ProcessorConfigureDialog = observer<Props>(function ProcessorConfig
 
   const title = `${translate('data_transfer_dialog_configuration_title')} (${processor.name})`;
   const [currentTabId, setCurrentTabId] = useState(SETTINGS_TABS.EXTRACTION);
+  const errorDetails = useErrorDetails(error);
 
   function handleTabChange(tab: ITabData) {
     setCurrentTabId(tab.tabId as SETTINGS_TABS);
@@ -103,12 +103,12 @@ export const ProcessorConfigureDialog = observer<Props>(function ProcessorConfig
           <OutputOptionsForm outputSettings={outputSettings} />
         )}
 
-        {error.responseMessage && (
+        {error && (
           <ErrorMessage
             className={s(styles, { errorMessage: true })}
-            text={error.responseMessage}
-            hasDetails={error.hasDetails}
-            onShowDetails={onShowDetails}
+            text={errorDetails.message ?? translate('core_blocks_exception_message_error_message')}
+            hasDetails={errorDetails.hasDetails}
+            onShowDetails={errorDetails.open}
           />
         )}
       </CommonDialogBody>

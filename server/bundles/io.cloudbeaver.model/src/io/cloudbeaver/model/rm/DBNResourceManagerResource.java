@@ -55,7 +55,7 @@ public class DBNResourceManagerResource extends DBNAbstractResourceManagerNode {
     }
 
     @Override
-    public String getNodeName() {
+    public String getNodeDisplayName() {
         return resource.getName();
     }
 
@@ -80,7 +80,7 @@ public class DBNResourceManagerResource extends DBNAbstractResourceManagerNode {
             }
             return DBIcon.TREE_FOLDER;
         } else {
-            var fileExtension = IOUtils.getFileExtension(getNodeName());
+            var fileExtension = IOUtils.getFileExtension(getNodeDisplayName());
             if (!CommonUtils.isEmpty(fileExtension)) {
                 RMProject project = getProjectNode();
                 if (project != null) {
@@ -154,9 +154,10 @@ public class DBNResourceManagerResource extends DBNAbstractResourceManagerNode {
         throw new DBException("Can't detect resource root node");
     }
 
+    @Deprecated(forRemoval = true)
     @Override
     public String getNodeItemPath() {
-        return getParentNode().getNodeItemPath() + "/" + getNodeName();
+        return getParentNode().getNodeItemPath() + "/" + getNodeDisplayName();
     }
 
     @Override
@@ -174,7 +175,7 @@ public class DBNResourceManagerResource extends DBNAbstractResourceManagerNode {
         String resourceName = resource.getName();
         try {
             if (newName.indexOf('.') == -1) {
-                String ext = IOUtils.getFileExtension(getNodeName());
+                String ext = IOUtils.getFileExtension(getNodeDisplayName());
                 if (!CommonUtils.isEmpty(ext)) {
                     newName += "." + ext;
                 }
@@ -193,7 +194,7 @@ public class DBNResourceManagerResource extends DBNAbstractResourceManagerNode {
 
     @Override
     public String toString() {
-        return getNodeName();
+        return getNodeDisplayName();
     }
 
     @Nullable
