@@ -12,7 +12,7 @@ import { ActionSnackbar, ActionSnackbarProps, PlaceholderContainer } from '@clou
 import { DEFAULT_NAVIGATOR_VIEW_SETTINGS } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
 import { ENotificationType, INotification, NotificationService } from '@cloudbeaver/core-events';
-import { Executor, ExecutorInterrupter, IExecutor, IExecutorHandler } from '@cloudbeaver/core-executor';
+import { Executor, ExecutorInterrupter, IExecutionContextProvider, IExecutor, IExecutorHandler } from '@cloudbeaver/core-executor';
 import { ServerConfigResource, SessionDataResource } from '@cloudbeaver/core-root';
 
 import { ADMINISTRATION_SERVER_CONFIGURATION_ITEM } from './ADMINISTRATION_SERVER_CONFIGURATION_ITEM';
@@ -86,6 +86,7 @@ export class ServerConfigurationService {
         this.showUnsavedNotification(false);
       });
 
+    this.prepareConfigTask.addHandler(this.prepareConfig.bind(this));
     this.saveTask.before(this.validationTask).before(this.prepareConfigTask).addPostHandler(this.save);
 
     this.validationTask.addHandler(this.validateForm).addPostHandler(this.ensureValidation);
@@ -93,6 +94,16 @@ export class ServerConfigurationService {
     this.serverConfigResource.onDataUpdate.addPostHandler(this.showUnsavedNotification.bind(this, false));
 
     this.administrationScreenService.activationEvent.addHandler(this.unlinkState.bind(this));
+  }
+
+  private async prepareConfig(data: IServerConfigSaveData, contexts: IExecutionContextProvider<IServerConfigSaveData>) {
+    const config = contexts.getContext(serverConfigStateContext);
+
+    config.navigatorConfig = data.state.navigatorConfig;
+    config.serverConfig = data.state.serverConfig;
+
+    config.serverConfig.serverName = data.state.serverConfig.serverName?.trim();
+    config.serverConfig.serverURL = data.state.serverConfig.serverURL?.trim();
   }
 
   changed(): void {
@@ -199,13 +210,14 @@ export class ServerConfigurationService {
 
   private readonly save: IExecutorHandler<IServerConfigSaveData> = async (data, contexts) => {
     const validation = contexts.getContext(serverConfigValidationContext);
+    const config = contexts.getContext(serverConfigStateContext);
 
     if (!validation.getState()) {
       return;
     }
 
-    data.state.serverConfig.serverName = data.state.serverConfig.serverName?.trim();
-    data.state.serverConfig.serverURL = data.state.serverConfig.serverURL?.trim();
+    this.serverConfigResource.setDataUpdate(config.serverConfig);
+    this.serverConfigResource.setNavigatorSettingsUpdate(config.navigatorConfig);
 
     try {
       await this.serverConfigResource.save(data.configurationWizard);
