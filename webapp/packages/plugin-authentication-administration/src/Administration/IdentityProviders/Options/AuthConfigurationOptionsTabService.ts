@@ -72,8 +72,10 @@ export class AuthConfigurationOptionsTabService extends Bootstrap {
       config.parameters = state.config.parameters;
 
       for (const key of Object.keys(config.parameters)) {
-        if (typeof config.parameters[key] === 'string') {
-          config.parameters[key] = config.parameters[key].trim();
+        const value = config.parameters[key];
+
+        if (typeof value === 'string') {
+          config.parameters[key] = value.trim();
         }
       }
     }
