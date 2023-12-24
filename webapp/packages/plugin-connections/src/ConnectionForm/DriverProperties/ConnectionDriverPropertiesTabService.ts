@@ -81,7 +81,7 @@ export class ConnectionDriverPropertiesTabService extends Bootstrap {
 
     config.properties = { ...state.config.properties };
 
-    for (const key of Object.keys(config.properties)) {
+    for (const key in config.properties) {
       const value = config.properties[key];
       delete config.properties[key];
       config.properties[key.trim()] = typeof value === 'string' ? value.trim() : value;

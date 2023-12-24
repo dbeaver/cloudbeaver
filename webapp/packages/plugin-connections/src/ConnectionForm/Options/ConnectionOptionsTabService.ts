@@ -248,6 +248,19 @@ export class ConnectionOptionsTabService extends Bootstrap {
     configuration.include('includeOrigin', 'includeAuthProperties', 'includeCredentialsSaved', 'customIncludeOptions');
   }
 
+  private getTrimmedPropertiesConfig(authProperties: ObjectPropertyInfo[], credentials: Record<string, any>): Record<string, any> {
+    const trimmedProperties: Record<string, any> = toJS(credentials);
+    for (const property of authProperties) {
+      const value = credentials?.[property.id!];
+
+      if (typeof value === 'string' && value) {
+        trimmedProperties[property.id!] = value?.trim();
+      }
+    }
+
+    return trimmedProperties;
+  }
+
   private async prepareConfig({ state }: IConnectionFormSubmitData, contexts: IExecutionContextProvider<IConnectionFormSubmitData>) {
     const config = contexts.getContext(connectionConfigContext);
     const credentialsState = contexts.getContext(connectionCredentialsStateContext);
@@ -304,22 +317,8 @@ export class ConnectionOptionsTabService extends Bootstrap {
 
       const properties = await this.getConnectionAuthModelProperties(tempConfig.authModelId, state.info);
 
-      properties.forEach(property => {
-        if (property.dataType?.toLocaleLowerCase() !== 'string') {
-          return;
-        }
-
-        if (property.value) {
-          property.value = property.value?.trim();
-        }
-
-        if (property.defaultValue) {
-          property.defaultValue = property.defaultValue?.trim();
-        }
-      });
-
       if (this.isCredentialsChanged(properties, state.config.credentials)) {
-        tempConfig.credentials = { ...state.config.credentials };
+        tempConfig.credentials = this.getTrimmedPropertiesConfig(properties, { ...state.config.credentials });
       }
 
       if (!tempConfig.saveCredentials) {
