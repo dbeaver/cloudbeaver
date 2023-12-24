@@ -5,7 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { observable } from 'mobx';
+import { observable, toJS } from 'mobx';
 
 import type { AdminUser, AuthRolesResource, UserResourceIncludes, UsersResource } from '@cloudbeaver/core-authentication';
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
@@ -76,21 +76,19 @@ export class UserFormInfoPart extends FormPart<IUserFormInfoState, IUserFormStat
     );
   }
 
-  private async createUser() {
-    this.state.userId = this.state.userId.trim();
-
-    if (this.formState.mode === FormMode.Create) {
-      const user = await this.usersResource.create({
-        userId: this.state.userId,
-        authRole: getTransformedAuthRole(this.state.authRole),
-      });
-      this.initialState.userId = user.userId;
-      this.formState.setMode(FormMode.Edit);
-    }
+  private async createUser(): Promise<AdminUserInfoFragment> {
+    return this.usersResource.create({
+      userId: this.state.userId.trim(),
+      authRole: getTransformedAuthRole(this.state.authRole),
+    });
   }
 
   protected override async saveChanges(): Promise<void> {
-    await this.createUser();
+    if (this.formState.mode === FormMode.Create) {
+      const user = await this.createUser();
+      this.initialState.userId = user.userId;
+      this.formState.setMode(FormMode.Edit);
+    }
 
     // load actual data of user to prevent conflicts
     await this.usersResource.refresh(this.state.userId);
@@ -138,12 +136,12 @@ export class UserFormInfoPart extends FormPart<IUserFormInfoState, IUserFormStat
   }
 
   private async updateCredentials() {
-    this.state.password = this.state.password.trim();
+    const password = this.state.password.trim();
 
-    if (this.state.password) {
+    if (password) {
       await this.usersResource.updateCredentials(this.state.userId, {
         profile: '0',
-        credentials: { password: this.state.password },
+        credentials: { password },
       });
     }
   }
@@ -195,21 +193,25 @@ export class UserFormInfoPart extends FormPart<IUserFormInfoState, IUserFormStat
   }
 
   private async updateMetaParameters() {
+    const tempMetaParameters = toJS(this.state.metaParameters);
+
     if (this.state.userId) {
       const user = this.usersResource.get(this.state.userId);
 
-      for (const key in this.state.metaParameters) {
-        if (typeof this.state.metaParameters[key] === 'string') {
-          this.state.metaParameters[key] = this.state.metaParameters[key].trim();
-        }
-      }
-
-      if (user && isObjectsEqual(user.metaParameters, this.state.metaParameters)) {
+      if (user && isObjectsEqual(user.metaParameters, tempMetaParameters)) {
         return;
       }
     }
 
-    await this.usersResource.setMetaParameters(this.state.userId, this.state.metaParameters);
+    for (const key in tempMetaParameters) {
+      const value = tempMetaParameters[key];
+
+      if (typeof value === 'string') {
+        tempMetaParameters[key] = value.trim();
+      }
+    }
+
+    await this.usersResource.setMetaParameters(this.state.userId, tempMetaParameters);
   }
 
   protected override async loader() {
