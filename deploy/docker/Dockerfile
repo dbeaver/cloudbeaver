@@ -27,6 +27,13 @@ RUN set -eux; \
 
 ENV JAVA_VERSION jdk-17.0.9+9
 
+RUN wget https://github.com/xerial/sqlite-jdbc/releases/download/3.44.1.0/sqlite-jdbc-3.44.1.0.jar && \
+    unzip -j sqlite-jdbc-*.jar "org/sqlite/native/$(uname -s)/$(uname -m)/libsqlitejdbc.so" && \
+    mv libsqlitejdbc.so /usr/lib && \
+    rm -rf sqlite-jdbc-*.jar
+
+ENV JAVA_HOME=/opt/java/openjdk
+
 ENV JAVA_HOME=/opt/java/openjdk
 
 COPY --from=eclipse-temurin:17-alpine $JAVA_HOME $JAVA_HOME
