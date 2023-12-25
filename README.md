@@ -22,6 +22,17 @@ You can see live demo of CloudBeaver here: https://demo.cloudbeaver.io
 
 ## Changelog
 
+### 23.3.1, 2023-12-25
+- Performance:
+   - Upgraded to Jetty 11, delivering improved performance, enhanced features, and better alignment with the latest Java specifications.
+- Resource management:
+   - Read-only scripts now have a padlock icon.
+- UX improvement:
+   - Added validation for mandatory fields in all forms for creating and editing entities.
+- Driver management:
+   - Apache Derby driver has been removed because of the vulnerability issues.
+- Many small bug fixes, enhancements, and improvements have been made
+
 ### Changes since 23.2.0: 
 
 - Security:
