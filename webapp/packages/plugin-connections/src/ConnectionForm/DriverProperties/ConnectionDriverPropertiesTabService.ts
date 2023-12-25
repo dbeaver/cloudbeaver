@@ -81,10 +81,24 @@ export class ConnectionDriverPropertiesTabService extends Bootstrap {
 
     config.properties = { ...state.config.properties };
 
-    for (const key in config.properties) {
-      const value = config.properties[key];
-      delete config.properties[key];
-      config.properties[key.trim()] = typeof value === 'string' ? value.trim() : value;
+    if (config.driverId) {
+      const driver = this.dbDriverResource.get(config.driverId);
+
+      const driverMap = driver?.driverProperties?.reduce((acc, item) => {
+        acc.set(item.id, item.defaultValue);
+        return acc;
+      }, new Map());
+
+      for (const key in config.properties) {
+        // if it is default driver property (not custom)
+        if (driverMap?.has(key)) {
+          continue;
+        }
+
+        const value = config.properties[key];
+        delete config.properties[key];
+        config.properties[key.trim()] = typeof value === 'string' ? value.trim() : value;
+      }
     }
   }
 
