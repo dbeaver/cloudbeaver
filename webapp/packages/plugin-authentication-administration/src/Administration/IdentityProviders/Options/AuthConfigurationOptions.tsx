@@ -6,8 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import { useCallback, useRef } from 'react';
-import styled, { css } from 'reshadow';
+import { useCallback } from 'react';
 
 import { AuthConfigurationParametersResource, AuthProvidersResource } from '@cloudbeaver/core-authentication';
 import {
@@ -23,7 +22,6 @@ import {
   useClipboard,
   useObjectPropertyCategories,
   useResource,
-  useStyles,
   useTranslate,
 } from '@cloudbeaver/core-blocks';
 import { CachedMapAllKey } from '@cloudbeaver/core-resource';
@@ -32,13 +30,6 @@ import type { TabContainerPanelComponent } from '@cloudbeaver/core-ui';
 
 import type { IAuthConfigurationFormProps } from '../IAuthConfigurationFormProps';
 
-const styles = css`
-  Form {
-    flex: 1;
-    overflow: auto;
-  }
-`;
-
 const emptyArray: AuthProviderConfigurationParametersFragment[] = [];
 
 export const AuthConfigurationOptions: TabContainerPanelComponent<IAuthConfigurationFormProps> = observer(function AuthConfigurationOptions({
@@ -46,7 +37,6 @@ export const AuthConfigurationOptions: TabContainerPanelComponent<IAuthConfigura
 }) {
   const translate = useTranslate();
   const copy = useClipboard();
-  const style = useStyles(styles);
 
   const providers = useResource(AuthConfigurationOptions, AuthProvidersResource, CachedMapAllKey);
   const parameters = useResource(AuthConfigurationOptions, AuthConfigurationParametersResource, state.config.providerId || null);
@@ -59,7 +49,7 @@ export const AuthConfigurationOptions: TabContainerPanelComponent<IAuthConfigura
     state.config.parameters = {};
   }, [state]);
 
-  return styled(style)(
+  return (
     <ColoredContainer parent gap overflow>
       <Group small gap>
         <Combobox

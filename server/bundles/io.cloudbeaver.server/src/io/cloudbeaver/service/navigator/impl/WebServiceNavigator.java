@@ -121,7 +121,7 @@ public class WebServiceNavigator implements DBWServiceNavigator {
                             continue;
                         }
                     }
-                    var nodeId = node.getNodeItemPath();
+                    var nodeId = node.getNodeUri();
                     if (nodeIds.contains(nodeId)) {
                         session.addWarningMessage(
                             MessageFormat.format("Duplicate child node ''{0}'' was found in parent node ''{1}''",
@@ -130,7 +130,7 @@ public class WebServiceNavigator implements DBWServiceNavigator {
                         );
                         continue;
                     }
-                    nodeIds.add(node.getNodeItemPath());
+                    nodeIds.add(node.getNodeUri());
                     result.add(new WebNavigatorNodeInfo(session, node));
                 }
             }
@@ -433,9 +433,9 @@ public class WebServiceNavigator implements DBWServiceNavigator {
         if (siblings.contains(newName)) {
             throw new DBWebException("Name " + newName + " is unavailable or invalid");
         }
-        var oldNodePath = node.getNodeItemPath();
+        var oldNodePath = node.getNodeUri();
         node.rename(session.getProgressMonitor(), newName);
-        var newNodePath = node.getNodeItemPath();
+        var newNodePath = node.getNodeUri();
         addNavigatorNodeMoveEvent(session, node, oldNodePath, newNodePath);
         return node.getName();
     }
@@ -536,7 +536,7 @@ public class WebServiceNavigator implements DBWServiceNavigator {
                     ne.getValue().deleteObject(commandContext, object, options);
                     commandContext.saveChanges(session.getProgressMonitor(), options);
                 } else if (node instanceof DBNLocalFolder) {
-                    var nodePath = node.getNodeItemPath();
+                    var nodePath = node.getNodeUri();
                     node.getOwnerProject().getDataSourceRegistry().removeFolder(((DBNLocalFolder) node).getFolder(), false);
                     WebEventUtils.addNavigatorNodeUpdatedEvent(
                         session.getProjectById(projectId),
@@ -622,12 +622,12 @@ public class WebServiceNavigator implements DBWServiceNavigator {
                         }
                     }
                     DBNLocalFolder dbnLocalFolder = ((DBNLocalFolder) node);
-                    var oldNodePath = node.getNodeItemPath();
+                    var oldNodePath = node.getNodeUri();
                     node.getOwnerProject().getDataSourceRegistry().moveFolder(
                         dbnLocalFolder.getFolder().getFolderPath(),
-                        dbnLocalFolder.generateNewFolderPath(parentFolder, dbnLocalFolder.getNodeName())
+                        dbnLocalFolder.generateNewFolderPath(parentFolder, dbnLocalFolder.getNodeDisplayName())
                     );
-                    var newNodePath = node.getNodeItemPath();
+                    var newNodePath = node.getNodeUri();
                     WebServiceUtils.updateConfigAndRefreshDatabases(session, node.getOwnerProject().getId());
                     addNavigatorNodeMoveEvent(session, node, oldNodePath, newNodePath);
                 } else if (node instanceof DBNResourceManagerResource) {
@@ -677,7 +677,7 @@ public class WebServiceNavigator implements DBWServiceNavigator {
                 }
             }
         }
-        throw new DBException("Node " + node.getNodeItemPath() + " rename is not supported");
+        throw new DBException("Node " + node.getNodeUri() + " rename is not supported");
     }
 
     public DBCExecutionContext getCommandExecutionContext(DBSObject object) {
