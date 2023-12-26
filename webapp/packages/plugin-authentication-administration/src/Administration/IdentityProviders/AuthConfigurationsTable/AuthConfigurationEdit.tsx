@@ -7,31 +7,21 @@
  */
 import { observer } from 'mobx-react-lite';
 import { useCallback, useContext } from 'react';
-import styled, { css } from 'reshadow';
 
 import { AuthConfigurationsResource } from '@cloudbeaver/core-authentication';
-import { TableContext, useStyles } from '@cloudbeaver/core-blocks';
+import { s, TableContext, useS } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 
 import { AuthConfigurationForm } from '../AuthConfigurationForm';
 import { useAuthConfigurationFormState } from '../useAuthConfigurationFormState';
-
-const styles = css`
-  box {
-    composes: theme-background-secondary theme-text-on-secondary from global;
-    box-sizing: border-box;
-    padding-bottom: 24px;
-    display: flex;
-    flex-direction: column;
-    height: 664px;
-  }
-`;
+import style from './AuthConfigurationEdit.m.css';
 
 interface Props {
   item: string;
 }
 
 export const AuthConfigurationEdit = observer<Props>(function AuthConfigurationEdit({ item }) {
+  const styles = useS(style);
   const resource = useService(AuthConfigurationsResource);
   const tableContext = useContext(TableContext);
 
@@ -43,9 +33,9 @@ export const AuthConfigurationEdit = observer<Props>(function AuthConfigurationE
 
   data.config.id = item;
 
-  return styled(useStyles(styles))(
-    <box>
+  return (
+    <div className={s(styles, { box: true })}>
       <AuthConfigurationForm state={data} onCancel={collapse} />
-    </box>,
+    </div>
   );
 });

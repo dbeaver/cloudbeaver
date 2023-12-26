@@ -154,7 +154,7 @@ public class DBNResourceManagerResource extends DBNAbstractResourceManagerNode {
         throw new DBException("Can't detect resource root node");
     }
 
-    @Deprecated(forRemoval = true)
+    @Deprecated
     @Override
     public String getNodeItemPath() {
         return getParentNode().getNodeItemPath() + "/" + getNodeDisplayName();
