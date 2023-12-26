@@ -8,7 +8,6 @@
 import { observer } from 'mobx-react-lite';
 
 import { filterLayoutFakeProps, getLayoutProps } from '../../Containers/filterLayoutFakeProps';
-import { Group } from '../../Containers/Group';
 import { s } from '../../s';
 import { useS } from '../../useS';
 import { Field } from '../Field';
@@ -20,7 +19,6 @@ import fieldCheckboxStyles from './FieldCheckbox.m.css';
 export const FieldCheckbox: CheckboxType = observer(function FieldCheckbox({
   children,
   className,
-  hasFakeLabel,
   ...rest
 }: CheckboxBaseProps & (ICheckboxControlledProps | ICheckboxObjectProps<any>)) {
   const layoutProps = getLayoutProps(rest);
@@ -32,16 +30,13 @@ export const FieldCheckbox: CheckboxType = observer(function FieldCheckbox({
   }
 
   return (
-    <Group {...layoutProps} vertical boxNoOverflow>
-      {hasFakeLabel && children && <FieldLabel className={s(styles, { fakeLabel: true })}>{children}</FieldLabel>}
-      <Field className={s(styles, { field: true }, className)}>
-        <Checkbox {...(checkboxProps as CheckboxBaseProps & ICheckboxControlledProps)} className={s(styles, { checkbox: true })} />
-        {children && (
-          <FieldLabel htmlFor={checkboxProps.id || checkboxProps.name} title={checkboxProps.title} className={s(styles, { fieldLabel: true })}>
-            {children}
-          </FieldLabel>
-        )}
-      </Field>
-    </Group>
+    <Field {...layoutProps} className={s(styles, { field: true }, className)}>
+      <Checkbox {...(checkboxProps as CheckboxBaseProps & ICheckboxControlledProps)} className={s(styles, { checkbox: true })} />
+      {children && (
+        <FieldLabel htmlFor={checkboxProps.id || checkboxProps.name} title={checkboxProps.title} className={s(styles, { fieldLabel: true })}>
+          {children}
+        </FieldLabel>
+      )}
+    </Field>
   );
 });

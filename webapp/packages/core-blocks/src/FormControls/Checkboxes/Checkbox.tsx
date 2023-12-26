@@ -39,14 +39,12 @@ export interface ICheckboxControlledProps extends CheckboxInputProps {
   state?: never;
   checked?: boolean;
   onChange?: CheckboxOnChangeEvent<string | undefined>;
-  hasFakeLabel?: boolean;
   autoHide?: never;
 }
 
 export interface ICheckboxObjectProps<TKey extends string> extends CheckboxInputProps {
   state: Partial<Record<TKey, boolean | null | string | string[]>>;
   checked?: never;
-  hasFakeLabel?: boolean;
   onChange?: CheckboxOnChangeEvent<TKey>;
   autoHide?: boolean;
   name: TKey;
