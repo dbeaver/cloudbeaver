@@ -109,7 +109,7 @@ public class DBNResourceManagerRoot extends DBNNode implements DBPHiddenObject, 
         return projects;
     }
 
-    @Deprecated(forRemoval = true)
+    @Deprecated
     @Override
     public String getNodeItemPath() {
         // Path doesn't include project name
