@@ -72,7 +72,7 @@ const styles = css`
 `;
 
 export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelProps<any, IDatabaseResultSet>> = observer(
-  function TextValuePresentation({ model, resultIndex }) {
+  function TextValuePresentation({ model, resultIndex, dataFormat }) {
     const translate = useTranslate();
     const notificationService = useService(NotificationService);
     const quotasService = useService(QuotasService);
@@ -182,8 +182,11 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
       <container>
         <actions>
           <TabsState
+            dataFormat={dataFormat}
+            resultIndex={resultIndex}
             container={textValuePresentationService.tabs}
             currentTabId={state.currentContentType}
+            model={model}
             lazy
             onChange={tab => state.setContentType(tab.tabId)}
           >
