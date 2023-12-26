@@ -5,7 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { action, computed, observable, toJS, untracked } from 'mobx';
+import { action, computed, observable, untracked } from 'mobx';
 import { useEffect } from 'react';
 
 import { AdministrationScreenService } from '@cloudbeaver/core-administration';
@@ -173,10 +173,6 @@ export function useAuthDialogState(accessRequest: boolean, providerId: string | 
         provider = (provider || state.activeProvider) ?? undefined;
         configuration = (configuration || state.activeConfiguration) ?? undefined;
 
-        const tempCredentials = toJS(state.credentials);
-        tempCredentials.credentials.user = state.credentials.credentials.user?.trim();
-        tempCredentials.credentials.password = state.credentials.credentials.password?.trim();
-
         if (!provider || this.authenticating) {
           return;
         }
@@ -187,7 +183,14 @@ export function useAuthDialogState(accessRequest: boolean, providerId: string | 
 
           const loginTask = authInfoService.login(provider.id, {
             configurationId: configuration?.id,
-            credentials: tempCredentials,
+            credentials: {
+              ...state.credentials,
+              credentials: {
+                ...state.credentials.credentials,
+                user: state.credentials.credentials.user?.trim(),
+                password: state.credentials.credentials.password?.trim(),
+              },
+            },
             linkUser,
           });
           this.authTask = loginTask;

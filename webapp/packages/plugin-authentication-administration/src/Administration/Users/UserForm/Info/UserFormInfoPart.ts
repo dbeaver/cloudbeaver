@@ -193,25 +193,25 @@ export class UserFormInfoPart extends FormPart<IUserFormInfoState, IUserFormStat
   }
 
   private async updateMetaParameters() {
-    const tempMetaParameters = toJS(this.state.metaParameters);
+    const metaParameters = toJS(this.state.metaParameters);
 
     if (this.state.userId) {
       const user = this.usersResource.get(this.state.userId);
 
-      if (user && isObjectsEqual(user.metaParameters, tempMetaParameters)) {
+      if (user && isObjectsEqual(user.metaParameters, metaParameters)) {
         return;
       }
     }
 
-    for (const key in tempMetaParameters) {
-      const value = tempMetaParameters[key];
+    for (const key in metaParameters) {
+      const value = metaParameters[key];
 
       if (typeof value === 'string') {
-        tempMetaParameters[key] = value.trim();
+        metaParameters[key] = value.trim();
       }
     }
 
-    await this.usersResource.setMetaParameters(this.state.userId, tempMetaParameters);
+    await this.usersResource.setMetaParameters(this.state.userId, metaParameters);
   }
 
   protected override async loader() {
