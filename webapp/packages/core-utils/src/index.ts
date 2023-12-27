@@ -10,8 +10,7 @@ export * from './underscore';
 
 export * from './base64ToBlob';
 export * from './blobToBase64';
-export * from './blobToHex';
-export * from './hexToBlob';
+export * from './base64ToHex';
 export * from './bytesToSize';
 export * from './cacheValue';
 export * from './clsx';

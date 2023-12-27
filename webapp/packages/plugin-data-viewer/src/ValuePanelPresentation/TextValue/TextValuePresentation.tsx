@@ -24,14 +24,13 @@ import { ResultSetDataContentAction } from '../../DatabaseDataModel/Actions/Resu
 import { ResultSetEditAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetEditAction';
 import { ResultSetFormatAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetFormatAction';
 import { ResultSetSelectAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetSelectAction';
-import { ResultSetViewAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetViewAction';
 import type { IDatabaseResultSet } from '../../DatabaseDataModel/IDatabaseResultSet';
 import type { IDataValuePanelProps } from '../../TableViewer/ValuePanel/DataValuePanelService';
 import { QuotaPlaceholder } from '../QuotaPlaceholder';
 import { VALUE_PANEL_TOOLS_STYLES } from '../ValuePanelTools/VALUE_PANEL_TOOLS_STYLES';
 import { getTypeExtension } from './getTypeExtension';
 import { TextValuePresentationService } from './TextValuePresentationService';
-import { useAutoFormat } from './useAutoFormat';
+import { useTextValue } from './useTextValue';
 
 const styles = css`
   Tab {
@@ -106,7 +105,6 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
 
     const focusCell = selection.getFocusedElement();
 
-    let stringValue = '';
     let contentType = 'text/plain';
     let firstSelectedCell: IResultSetElementKey | undefined;
     let readonly = true;
@@ -120,7 +118,6 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
       firstSelectedCell = selection.elements[0] || focusCell;
 
       const value = format.get(firstSelectedCell);
-      stringValue = format.getText(firstSelectedCell);
       readonly = format.isReadOnly(firstSelectedCell) || format.isBinary(firstSelectedCell);
 
       if (isResultSetContentValue(value)) {
@@ -151,8 +148,6 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
       state.setDefaultContentType(contentType);
     }
 
-    const formatter = useAutoFormat();
-
     function handleChange(newValue: string) {
       if (firstSelectedCell && !readonly) {
         editor.set(firstSelectedCell, newValue);
@@ -171,12 +166,15 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
       }
     }
 
-    const autoFormat = !!firstSelectedCell && !editor.isElementEdited(firstSelectedCell);
     const canSave = !!firstSelectedCell && content.isDownloadable(firstSelectedCell);
     const typeExtension = useMemo(() => getTypeExtension(state.currentContentType) ?? [], [state.currentContentType]);
     const extensions = useCodemirrorExtensions(undefined, typeExtension);
 
-    const value = autoFormat ? formatter.format(state.currentContentType, stringValue) : stringValue;
+    const value = useTextValue({
+      model,
+      resultIndex,
+      currentContentType: state.currentContentType,
+    });
 
     return styled(style)(
       <container>
