@@ -21,7 +21,6 @@ export function useAutoFormat() {
             case 'text/xml':
             case 'text/html':
               return value;
-            case 'text/plain':
             default:
               return value;
           }
