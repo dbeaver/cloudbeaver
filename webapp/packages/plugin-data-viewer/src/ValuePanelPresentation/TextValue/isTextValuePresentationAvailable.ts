@@ -1,9 +1,8 @@
-import { isResultSetBlobValue } from '../../DatabaseDataModel/Actions/ResultSet/isResultSetBlobValue';
+import { isResultSetContentValue } from '../../DatabaseDataModel/Actions/ResultSet/isResultSetContentValue';
 import { ResultSetSelectAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetSelectAction';
 import { ResultSetViewAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetViewAction';
 import type { IDatabaseDataResult } from '../../DatabaseDataModel/IDatabaseDataResult';
 import type { IDataValuePanelProps } from '../../TableViewer/ValuePanel/DataValuePanelService';
-import { isImageValuePresentationAvailable } from '../ImageValue/isImageValuePresentationAvailable';
 
 export function isBlobPresentationAvailable(context: IDataValuePanelProps<any, IDatabaseDataResult> | undefined): boolean {
   if (!context?.model.source.hasResult(context.resultIndex)) {
@@ -21,7 +20,7 @@ export function isBlobPresentationAvailable(context: IDataValuePanelProps<any, I
 
     const cellValue = view.getCellValue(firstSelectedCell);
 
-    return isResultSetBlobValue(cellValue) && !isImageValuePresentationAvailable(cellValue);
+    return isResultSetContentValue(cellValue);
   }
 
   return true;
