@@ -89,8 +89,12 @@ export class DVResultSetGroupingPluginBootstrap extends Bootstrap {
             if (!model.source.hasResult(resultIndex)) {
               return true;
             }
-            const selectionAction = model.source.getAction(resultIndex, ResultSetSelectAction);
-            const dataAction = model.source.getAction(resultIndex, ResultSetDataAction);
+            const selectionAction = model.source.tryGetAction(resultIndex, ResultSetSelectAction);
+            const dataAction = model.source.tryGetAction(resultIndex, ResultSetDataAction);
+
+            if (!selectionAction || !dataAction) {
+              return true;
+            }
 
             return !grouping.getColumns().some(name => {
               const key = dataAction.findColumnKey(column => column.name === name);
