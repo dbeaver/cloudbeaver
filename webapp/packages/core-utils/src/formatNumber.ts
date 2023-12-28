@@ -6,7 +6,11 @@
  * you may not use this file except in compliance with the License.
  */
 
-export function formatNumber(n: number, d: number): string {
+export function formatNumber(n: number, d: number) {
+  if (n <= 1000) {
+    return n.toString();
+  }
+
   const numStr = n.toString();
   const exponent = numStr.length - (numStr.length % 3);
 
