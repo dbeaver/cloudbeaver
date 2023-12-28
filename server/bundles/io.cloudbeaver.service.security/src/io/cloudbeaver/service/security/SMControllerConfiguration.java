@@ -26,6 +26,7 @@ public class SMControllerConfiguration {
     private int accessTokenTtl = DEFAULT_ACCESS_TOKEN_TTL;
     private int refreshTokenTtl = DEFAULT_REFRESH_TOKEN_TTL;
     private int expiredAuthAttemptInfoTtl = DEFAULT_EXPIRED_AUTH_ATTEMPT_INFO_TTL;
+    private boolean checkBruteforce = false;
 
     public int getAccessTokenTtl() {
         return accessTokenTtl;
@@ -49,5 +50,13 @@ public class SMControllerConfiguration {
 
     public void setExpiredAuthAttemptInfoTtl(int expiredAuthAttemptInfoTtl) {
         this.expiredAuthAttemptInfoTtl = expiredAuthAttemptInfoTtl;
+    }
+
+    public void setCheckBruteforce(boolean checkBruteforce) {
+        this.checkBruteforce = checkBruteforce;
+    }
+
+    public boolean isCheckBruteforce() {
+        return checkBruteforce;
     }
 }

@@ -16,8 +16,7 @@
  */
 package io.cloudbeaver.service.security;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+import com.google.gson.*;
 import com.google.gson.reflect.TypeToken;
 import io.cloudbeaver.auth.SMAuthProviderAssigner;
 import io.cloudbeaver.auth.SMAuthProviderExternal;
@@ -29,6 +28,8 @@ import io.cloudbeaver.model.app.WebAuthConfiguration;
 import io.cloudbeaver.registry.WebAuthProviderDescriptor;
 import io.cloudbeaver.registry.WebAuthProviderRegistry;
 import io.cloudbeaver.registry.WebMetaParametersRegistry;
+import io.cloudbeaver.service.security.bruteforce.BruteforceProtectionService;
+import io.cloudbeaver.service.security.bruteforce.UserLoginDto;
 import io.cloudbeaver.service.security.db.CBDatabase;
 import io.cloudbeaver.service.security.internal.AuthAttemptSessionInfo;
 import io.cloudbeaver.service.security.internal.SMTokenInfo;
@@ -348,7 +349,7 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
     public int countUsers(@NotNull SMUserFilter filter) throws DBCException {
         try (Connection dbCon = database.openConnection()) {
             try (PreparedStatement dbStat = dbCon.prepareStatement(database.normalizeTableNames(
-                    "SELECT COUNT(*) FROM {table_prefix}CB_USER" + buildUsersFilter(filter)))) {
+                "SELECT COUNT(*) FROM {table_prefix}CB_USER" + buildUsersFilter(filter)))) {
                 setUsersFilterValues(dbStat, filter, 1);
                 try (ResultSet dbResult = dbStat.executeQuery()) {
                     if (dbResult.next()) {
@@ -445,7 +446,7 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
     }
 
     private int setUsersFilterValues(PreparedStatement dbStat, SMUserFilter filter, int parameterIndex)
-            throws SQLException {
+        throws SQLException {
         if (!CommonUtils.isEmpty(filter.getUserIdMask())) {
             dbStat.setString(parameterIndex++, "%" + filter.getUserIdMask() + "%");
         }
@@ -484,7 +485,7 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
     }
 
     private void readSubjectsMetas(Connection dbCon, SMSubjectType subjectType, String userIdMask,
-            Map<String, ? extends SMSubject> result) throws SQLException {
+                                   Map<String, ? extends SMSubject> result) throws SQLException {
         // Read metas
         try (PreparedStatement dbStat = dbCon.prepareStatement(
             database.normalizeTableNames("SELECT m.SUBJECT_ID,m.META_ID,m.META_VALUE FROM {table_prefix}CB_AUTH_SUBJECT s, " +
@@ -921,8 +922,8 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
                 }
                 try (ResultSet dbResult = dbStat.executeQuery(
                     database.normalizeTableNames("SELECT SUBJECT_ID,PERMISSION_ID\n" +
-                    "FROM {table_prefix}CB_AUTH_PERMISSIONS AP, {table_prefix}CB_TEAM R\n" +
-                    "WHERE AP.SUBJECT_ID=R.TEAM_ID\n"))) {
+                        "FROM {table_prefix}CB_AUTH_PERMISSIONS AP, {table_prefix}CB_TEAM R\n" +
+                        "WHERE AP.SUBJECT_ID=R.TEAM_ID\n"))) {
                     while (dbResult.next()) {
                         SMTeam team = teams.get(dbResult.getString(1));
                         if (team != null) {
@@ -1303,31 +1304,47 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
                     ? null
                     : application.getAuthConfiguration().getAuthProviderConfiguration(authProviderConfigurationId);
 
-                if (SMAuthProviderExternal.class.isAssignableFrom(authProviderInstance.getClass())) {
-                    var authProviderExternal = (SMAuthProviderExternal<?>) authProviderInstance;
-                    securedUserIdentifyingCredentials = authProviderExternal.authExternalUser(
-                        authProgressMonitor,
-                        providerConfig,
-                        userCredentials
-                    );
-                }
-
                 var filteredUserCreds = filterSecuredUserData(
                     securedUserIdentifyingCredentials,
                     authProviderDescriptor
                 );
+                String authAttemptId = null;
+                if (SMAuthProviderExternal.class.isAssignableFrom(authProviderInstance.getClass())) {
+                    var authProviderExternal = (SMAuthProviderExternal<?>) authProviderInstance;
+                    try {
+                        securedUserIdentifyingCredentials = authProviderExternal.authExternalUser(
+                            authProgressMonitor,
+                            providerConfig,
+                            userCredentials
+                        );
+                    } catch (DBException e) {
+                        authAttemptId = createNewAuthAttempt(
+                            SMAuthStatus.ERROR,
+                            authProviderId,
+                            authProviderConfigurationId,
+                            filteredUserCreds,
+                            appSessionId,
+                            previousSmSessionId,
+                            sessionType,
+                            sessionParameters,
+                            isMainSession
+                        );
+                    }
+                }
 
-                var authAttemptId = createNewAuthAttempt(
-                    SMAuthStatus.IN_PROGRESS,
-                    authProviderId,
-                    authProviderConfigurationId,
-                    filteredUserCreds,
-                    appSessionId,
-                    previousSmSessionId,
-                    sessionType,
-                    sessionParameters,
-                    isMainSession
-                );
+                if (authAttemptId == null) {
+                    authAttemptId = createNewAuthAttempt(
+                        SMAuthStatus.IN_PROGRESS,
+                        authProviderId,
+                        authProviderConfigurationId,
+                        filteredUserCreds,
+                        appSessionId,
+                        previousSmSessionId,
+                        sessionType,
+                        sessionParameters,
+                        isMainSession
+                    );
+                }
 
                 if (SMAuthProviderFederated.class.isAssignableFrom(authProviderInstance.getClass())) {
                     //async auth
@@ -1386,6 +1403,13 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
         String authAttemptId = UUID.randomUUID().toString();
         try (Connection dbCon = database.openConnection()) {
             try (JDBCTransaction txn = new JDBCTransaction(dbCon)) {
+                if (smConfig.isCheckBruteforce()) {
+                    String username = Optional.ofNullable(authData.get("user"))
+                        .map(Object::toString)
+                        .orElseGet(() -> Objects.toString(authData.get("access-key"), null));
+                    BruteforceProtectionService.checkBruteforce(username, getUserLoginDtos(dbCon, authProviderId), authProviderId);
+                }
+
                 try (PreparedStatement dbStat = dbCon.prepareStatement(
                     database.normalizeTableNames(
                         "INSERT INTO {table_prefix}CB_AUTH_ATTEMPT" +
@@ -1427,6 +1451,36 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
         } catch (SQLException e) {
             throw new DBException(e.getMessage(), e);
         }
+    }
+
+    private List<UserLoginDto> getUserLoginDtos(Connection dbCon, String authProviderId) throws SQLException {
+        List<UserLoginDto> userLoginDtos = new ArrayList<>();
+        try (PreparedStatement dbStat = dbCon.prepareStatement(
+            database.normalizeTableNames(
+                "SELECT" +
+                    "    attempt.*," +
+                    "    info.*" +
+                    " FROM" +
+                    "    {table_prefix}CB_AUTH_ATTEMPT attempt" +
+                    "        JOIN" +
+                    "    {table_prefix}CB_AUTH_ATTEMPT_INFO info ON attempt.AUTH_ID = info.AUTH_ID" +
+                    " WHERE AUTH_PROVIDER_ID = ?" +
+                    " ORDER BY attempt.CREATE_TIME DESC"
+            )
+        )) {
+            dbStat.setString(1, authProviderId);
+            try (ResultSet dbResult = dbStat.executeQuery()) {
+                while (dbResult.next()) {
+                    UserLoginDto loginDto = new UserLoginDto(
+                        dbResult.getString(13),
+                        dbResult.getString(2),
+                        dbResult.getString(14)
+                    );
+                    userLoginDtos.add(loginDto);
+                }
+            }
+        }
+        return userLoginDtos;
     }
 
     private boolean isSmSessionNotExpired(String prevSessionId) {
