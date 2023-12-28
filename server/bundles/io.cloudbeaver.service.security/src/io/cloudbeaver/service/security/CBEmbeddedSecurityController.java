@@ -88,6 +88,8 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
 
     protected final SMControllerConfiguration smConfig;
 
+    protected final BruteforceProtectionService service = new BruteforceProtectionService();
+
     public CBEmbeddedSecurityController(
         T application,
         CBDatabase database,
@@ -1405,13 +1407,9 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
         try (Connection dbCon = database.openConnection()) {
             try (JDBCTransaction txn = new JDBCTransaction(dbCon)) {
                 if (smConfig.isCheckBruteforce()) {
-                    String username = Optional.ofNullable(authData.get("user"))
-                        .map(Object::toString)
-                        .orElseGet(() -> Objects.toString(authData.get("access-key"), null));
-                    BruteforceProtectionService.checkBruteforce(
+                    service.checkBruteforce(
                         this.getAuthProvider(authProviderId), authData, getUserLoginDtos(dbCon, authProviderId), authProviderId);
                 }
-
                 try (PreparedStatement dbStat = dbCon.prepareStatement(
                     database.normalizeTableNames(
                         "INSERT INTO {table_prefix}CB_AUTH_ATTEMPT" +
