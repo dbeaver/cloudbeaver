@@ -20,7 +20,7 @@ export function isBlobPresentationAvailable(context: IDataValuePanelProps<any, I
 
     const cellValue = view.getCellValue(firstSelectedCell);
 
-    return isResultSetContentValue(cellValue);
+    return isResultSetContentValue(cellValue) && cellValue.contentType === 'application/octet-stream' && Boolean(cellValue?.binary);
   }
 
   return true;
