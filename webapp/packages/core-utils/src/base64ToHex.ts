@@ -6,6 +6,8 @@
  * you may not use this file except in compliance with the License.
  */
 
+// be careful with this when you calculate a big size blobs
+// it can block the main thread and cause freezes
 export function base64ToHex(base64String: string): string {
   const raw = atob(base64String);
   let result = '';

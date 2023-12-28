@@ -28,7 +28,7 @@ export function useAutoFormat() {
           return value;
         }
       },
-      async formatBlob(type: string, value: IResultSetContentValue) {
+      formatBlob(type: string, value: IResultSetContentValue) {
         if (!value.binary) {
           return value.text;
         }
