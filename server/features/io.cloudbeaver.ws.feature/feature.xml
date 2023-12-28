@@ -35,8 +35,6 @@
     <!-- 3rd party deps -->
     <plugin id="com.ibm.icu.base" download-size="0" install-size="0" version="0.0.0" unpack="false"/>
     <plugin id="com.google.gson" download-size="0" install-size="0" version="0.0.0" unpack="false"/>
-    <plugin id="org.jkiss.bundle.graphql.java" download-size="0" install-size="0" version="0.0.0" unpack="false"/>
-
     <!-- Logging -->
 
     <plugin id="io.cloudbeaver.slf4j" download-size="0" install-size="0" version="0.0.0" unpack="false"/>

@@ -8,7 +8,6 @@
 import { observable } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import { useCallback, useState } from 'react';
-import styled, { css } from 'reshadow';
 
 import { UsersResource } from '@cloudbeaver/core-authentication';
 import {
@@ -16,12 +15,13 @@ import {
   getComputed,
   getSelectedItems,
   Group,
+  s,
   Table,
   TableBody,
   TableColumnValue,
   TableItem,
   useObjectRef,
-  useStyles,
+  useS,
   useTranslate,
 } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
@@ -29,34 +29,10 @@ import type { TLocalizationToken } from '@cloudbeaver/core-localization';
 import type { AdminUserInfoFragment } from '@cloudbeaver/core-sdk';
 
 import { getFilteredUsers } from './getFilteredUsers';
+import style from './GrantedUserList.m.css';
 import { GrantedUsersTableHeader, IFilterState } from './GrantedUsersTableHeader/GrantedUsersTableHeader';
 import { GrantedUsersTableInnerHeader } from './GrantedUsersTableHeader/GrantedUsersTableInnerHeader';
 import { GrantedUsersTableItem } from './GrantedUsersTableItem';
-
-const styles = css`
-  Table {
-    composes: theme-background-surface theme-text-on-surface from global;
-  }
-  Group {
-    position: relative;
-  }
-  Group,
-  container,
-  table-container {
-    height: 100%;
-  }
-  container {
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-  }
-  GrantedUsersTableHeader {
-    flex: 0 0 auto;
-  }
-  table-container {
-    overflow: auto;
-  }
-`;
 
 interface Props {
   grantedUsers: AdminUserInfoFragment[];
@@ -66,8 +42,8 @@ interface Props {
 }
 
 export const GrantedUserList = observer<Props>(function GrantedUserList({ grantedUsers, disabled, onRevoke, onEdit }) {
+  const styles = useS(style);
   const props = useObjectRef({ onRevoke, onEdit });
-  const style = useStyles(styles);
   const translate = useTranslate();
 
   const usersResource = useService(UsersResource);
@@ -94,10 +70,10 @@ export const GrantedUserList = observer<Props>(function GrantedUserList({ grante
     }
   }
 
-  return styled(style)(
-    <Group box medium overflow>
-      <container>
-        <GrantedUsersTableHeader filterState={filterState} disabled={disabled}>
+  return (
+    <Group className={s(styles, { box: true })} box medium overflow>
+      <div className={s(styles, { innerBox: true })}>
+        <GrantedUsersTableHeader className={s(styles, { header: true })} filterState={filterState} disabled={disabled}>
           <Button disabled={disabled || !selected} mod={['outlined']} onClick={revoke}>
             {translate('ui_delete')}
           </Button>
@@ -105,8 +81,13 @@ export const GrantedUserList = observer<Props>(function GrantedUserList({ grante
             {translate('ui_edit')}
           </Button>
         </GrantedUsersTableHeader>
-        <table-container>
-          <Table keys={keys} selectedItems={selectedSubjects} isItemSelectable={item => !usersResource.isActiveUser(item)}>
+        <div className={s(styles, { tableBox: true })}>
+          <Table
+            className={s(styles, { table: true })}
+            keys={keys}
+            selectedItems={selectedSubjects}
+            isItemSelectable={item => !usersResource.isActiveUser(item)}
+          >
             <GrantedUsersTableInnerHeader disabled={disabled} />
             <TableBody>
               {tableInfoText && (
@@ -130,8 +111,8 @@ export const GrantedUserList = observer<Props>(function GrantedUserList({ grante
               })}
             </TableBody>
           </Table>
-        </table-container>
-      </container>
-    </Group>,
+        </div>
+      </div>
+    </Group>
   );
 });

@@ -1,0 +1,18 @@
+.header {
+  composes: theme-border-color-background theme-background-surface theme-text-on-surface from global;
+  overflow: hidden;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px;
+  gap: 16px;
+  border-bottom: 1px solid;
+}
+
+.buttons {
+  display: flex;
+  gap: 16px;
+}

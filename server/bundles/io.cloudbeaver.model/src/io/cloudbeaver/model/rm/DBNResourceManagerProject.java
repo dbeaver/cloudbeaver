@@ -111,7 +111,7 @@ public class DBNResourceManagerProject extends DBNAbstractResourceManagerNode {
         return ((DBNResourceManagerRoot) getParentNode()).getResourceController();
     }
 
-    @Deprecated(forRemoval = true)
+    @Deprecated
     @Override
     public String getNodeItemPath() {
         return getParentNode().getNodeItemPath() + "/" + getName();

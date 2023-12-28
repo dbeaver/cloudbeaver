@@ -19,7 +19,9 @@ package io.cloudbeaver.model;
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.WebServiceUtils;
 import io.cloudbeaver.model.session.WebSession;
-import io.cloudbeaver.server.ConfigurationUtils;
+import io.cloudbeaver.model.utils.ConfigurationUtils;
+import io.cloudbeaver.server.CBAppConfig;
+import io.cloudbeaver.server.CBApplication;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBConstants;
@@ -236,7 +238,12 @@ public class WebDatabaseDriverInfo {
 
     @Property
     public boolean isEnabled() {
-        return ConfigurationUtils.isDriverEnabled(driver);
+        CBAppConfig config = CBApplication.getInstance().getAppConfiguration();
+        return ConfigurationUtils.isDriverEnabled(
+            driver,
+            config.getEnabledDrivers(),
+            config.getDisabledDrivers()
+            );
     }
 
     @Property

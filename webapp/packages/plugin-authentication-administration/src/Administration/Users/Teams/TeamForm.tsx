@@ -7,92 +7,24 @@
  */
 import { observer } from 'mobx-react-lite';
 import { useEffect } from 'react';
-import styled, { css } from 'reshadow';
+import { css } from 'reshadow';
 
 import type { TeamInfo } from '@cloudbeaver/core-authentication';
-import { Form, IconOrImage, Loader, Placeholder, useExecutor, useForm, useObjectRef, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
+import { Form, IconOrImage, Loader, Placeholder, s, useExecutor, useForm, useObjectRef, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { BASE_TAB_STYLES, TabList, TabPanelList, TabsState, UNDERLINE_TAB_BIG_STYLES, UNDERLINE_TAB_STYLES } from '@cloudbeaver/core-ui';
 
 import { teamContext } from './Contexts/teamContext';
 import type { ITeamFormState } from './ITeamFormProps';
-import { TeamFormService } from './TeamFormService';
+import style from './TeamForm.m.css';
 import { ITeamFormActionsContext, TeamFormActionsContext } from './TeamFormActionsContext';
+import { TeamFormService } from './TeamFormService';
 
 const tabsStyles = css`
   TabList {
     position: relative;
     flex-shrink: 0;
     align-items: center;
-  }
-`;
-
-const topBarStyles = css`
-  team-top-bar {
-    composes: theme-border-color-background theme-background-secondary theme-text-on-secondary from global;
-    position: relative;
-    display: flex;
-    padding-top: 16px;
-
-    &:before {
-      content: '';
-      position: absolute;
-      bottom: 0;
-      width: 100%;
-      border-bottom: solid 2px;
-      border-color: inherit;
-    }
-  }
-  team-top-bar-tabs {
-    flex: 1;
-  }
-
-  team-top-bar-actions {
-    display: flex;
-    align-items: center;
-    padding: 0 24px;
-    gap: 16px;
-  }
-
-  team-status-message {
-    composes: theme-typography--caption from global;
-    height: 24px;
-    padding: 0 16px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-
-    & IconOrImage {
-      height: 24px;
-      width: 24px;
-    }
-  }
-`;
-
-const formStyles = css`
-  box {
-    composes: theme-background-secondary theme-text-on-secondary from global;
-    display: flex;
-    flex-direction: column;
-    flex: 1;
-    height: 100%;
-    overflow: auto;
-  }
-  content-box {
-    composes: theme-background-secondary theme-border-color-background from global;
-    position: relative;
-    display: flex;
-    flex: 1;
-    flex-direction: column;
-    overflow: auto;
-  }
-  Form {
-    width: 100%;
-    height: 100%;
-    display: flex;
-    flex: 1;
-    flex-direction: column;
-    overflow: auto;
   }
 `;
 
@@ -106,8 +38,8 @@ interface Props {
 export const TeamForm = observer<Props>(function TeamForm({ state, onCancel, onSave = () => {}, className }) {
   const translate = useTranslate();
   const props = useObjectRef({ onSave });
-  const style = [BASE_TAB_STYLES, tabsStyles, UNDERLINE_TAB_STYLES, UNDERLINE_TAB_BIG_STYLES];
-  const styles = useStyles(style, topBarStyles, formStyles);
+  const innerTabStyles = [BASE_TAB_STYLES, tabsStyles, UNDERLINE_TAB_STYLES, UNDERLINE_TAB_BIG_STYLES];
+  const styles = useS(style);
   const service = useService(TeamFormService);
   const form = useForm({
     onSubmit: state.save,
@@ -135,35 +67,35 @@ export const TeamForm = observer<Props>(function TeamForm({ state, onCancel, onS
     state.loadTeamInfo();
   }, []);
 
-  return styled(styles)(
-    <Form context={form}>
+  return (
+    <Form className={s(styles, { form: true })} context={form}>
       <TabsState container={service.tabsContainer} localState={state.partsState} state={state} onCancel={onCancel}>
-      <box className={className}>
-        <team-top-bar>
-          <team-top-bar-tabs>
-            <team-status-message>
-              {state.statusMessage && (
-                <>
-                  <IconOrImage icon="/icons/info_icon.svg" />
-                  {translate(state.statusMessage)}
-                </>
-              )}
-            </team-status-message>
-            <TabList style={style} disabled={false} />
-          </team-top-bar-tabs>
-          <team-top-bar-actions>
-            <Loader suspense inline hideMessage hideException>
-              <TeamFormActionsContext.Provider value={actions}>
-                <Placeholder container={service.actionsContainer} state={state} onCancel={onCancel} />
-              </TeamFormActionsContext.Provider>
-            </Loader>
-          </team-top-bar-actions>
-        </team-top-bar>
-        <content-box>
-          <TabPanelList style={style} />
-        </content-box>
-      </box>
+        <div className={s(styles, { box: true }, className)}>
+          <div className={s(styles, { topBar: true })}>
+            <div className={s(styles, { topBarTabs: true })}>
+              <div className={s(styles, { statusMessage: true })}>
+                {state.statusMessage && (
+                  <>
+                    <IconOrImage className={s(styles, { iconOrImage: true })} icon="/icons/info_icon.svg" />
+                    {translate(state.statusMessage)}
+                  </>
+                )}
+              </div>
+              <TabList style={innerTabStyles} disabled={false} />
+            </div>
+            <div className={s(styles, { topBarActions: true })}>
+              <Loader suspense inline hideMessage hideException>
+                <TeamFormActionsContext.Provider value={actions}>
+                  <Placeholder container={service.actionsContainer} state={state} onCancel={onCancel} />
+                </TeamFormActionsContext.Provider>
+              </Loader>
+            </div>
+          </div>
+          <div className={s(styles, { content: true })}>
+            <TabPanelList style={innerTabStyles} />
+          </div>
+        </div>
       </TabsState>
-    </Form>,
+    </Form>
   );
 });
