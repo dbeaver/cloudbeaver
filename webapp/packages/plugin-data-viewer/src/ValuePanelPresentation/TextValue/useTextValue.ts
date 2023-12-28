@@ -33,8 +33,6 @@ export function useTextValue({ model, resultIndex, currentContentType }: IUseTex
     if (value) {
       return value;
     }
-
-    return;
   }
 
   return formatter.format(currentContentType, format.getText(firstSelectedCell));
