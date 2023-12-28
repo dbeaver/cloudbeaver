@@ -29,7 +29,7 @@ import io.cloudbeaver.registry.WebAuthProviderDescriptor;
 import io.cloudbeaver.registry.WebAuthProviderRegistry;
 import io.cloudbeaver.registry.WebMetaParametersRegistry;
 import io.cloudbeaver.service.security.bruteforce.BruteforceProtectionService;
-import io.cloudbeaver.service.security.bruteforce.UserLoginDto;
+import io.cloudbeaver.service.security.bruteforce.UserLoginRecord;
 import io.cloudbeaver.service.security.db.CBDatabase;
 import io.cloudbeaver.service.security.internal.AuthAttemptSessionInfo;
 import io.cloudbeaver.service.security.internal.SMTokenInfo;
@@ -446,7 +446,8 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
     }
 
     private int setUsersFilterValues(PreparedStatement dbStat, SMUserFilter filter, int parameterIndex)
-        throws SQLException {
+            throws SQLException
+    {
         if (!CommonUtils.isEmpty(filter.getUserIdMask())) {
             dbStat.setString(parameterIndex++, "%" + filter.getUserIdMask() + "%");
         }
@@ -1407,7 +1408,8 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
                     String username = Optional.ofNullable(authData.get("user"))
                         .map(Object::toString)
                         .orElseGet(() -> Objects.toString(authData.get("access-key"), null));
-                    BruteforceProtectionService.checkBruteforce(username, getUserLoginDtos(dbCon, authProviderId), authProviderId);
+                    BruteforceProtectionService.checkBruteforce(
+                        this.getAuthProvider(authProviderId), authData, getUserLoginDtos(dbCon, authProviderId), authProviderId);
                 }
 
                 try (PreparedStatement dbStat = dbCon.prepareStatement(
@@ -1453,8 +1455,8 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
         }
     }
 
-    private List<UserLoginDto> getUserLoginDtos(Connection dbCon, String authProviderId) throws SQLException {
-        List<UserLoginDto> userLoginDtos = new ArrayList<>();
+    private List<UserLoginRecord> getUserLoginDtos(Connection dbCon, String authProviderId) throws SQLException {
+        List<UserLoginRecord> userLoginRecords = new ArrayList<>();
         try (PreparedStatement dbStat = dbCon.prepareStatement(
             database.normalizeTableNames(
                 "SELECT" +
@@ -1471,16 +1473,16 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
             dbStat.setString(1, authProviderId);
             try (ResultSet dbResult = dbStat.executeQuery()) {
                 while (dbResult.next()) {
-                    UserLoginDto loginDto = new UserLoginDto(
+                    UserLoginRecord loginDto = new UserLoginRecord(
                         dbResult.getString(13),
                         dbResult.getString(2),
                         dbResult.getString(14)
                     );
-                    userLoginDtos.add(loginDto);
+                    userLoginRecords.add(loginDto);
                 }
             }
         }
-        return userLoginDtos;
+        return userLoginRecords;
     }
 
     private boolean isSmSessionNotExpired(String prevSessionId) {

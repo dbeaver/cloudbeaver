@@ -3,6 +3,7 @@ package io.cloudbeaver.service.security.bruteforce;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import io.cloudbeaver.registry.WebAuthProviderDescriptor;
 import org.jkiss.dbeaver.model.security.exception.SMException;
 
 import java.time.LocalDateTime;
@@ -17,15 +18,22 @@ public class BruteforceProtectionService {
     private static final int MAX_ERRORS_COUNT = 10;
     private static final int BLOCK_TIME = 5;
 
-    public static void checkBruteforce(String username, List<UserLoginDto> userLoginDtos, String authProviderId) throws SMException {
+    public static void checkBruteforce(WebAuthProviderDescriptor webAuthProviderDescriptor,
+                                       Map<String, Object> data, List<UserLoginRecord> userLoginRecords,
+                                       String authProviderId) throws SMException
+    {
+        String username = ;
         if (username == null) {
             return;
         }
 
-        int errorsCount = checkErrorsCount(username, userLoginDtos);
+        int errorsCount = checkErrorsCount(username, userLoginRecords);
 
         BlockedUser blockEndTime = blockEndTimeMap.get(username);
-        if (blockEndTime != null && blockEndTime.authProviderId().equals(authProviderId) && blockEndTime.time().isAfter(LocalDateTime.now())) {
+        if (blockEndTime != null
+            && blockEndTime.authProviderId().equals(authProviderId)
+            && blockEndTime.time().isAfter(LocalDateTime.now())
+        ) {
             throw new SMException("User blocked for 5 minutes");
         }
 
@@ -53,13 +61,13 @@ public class BruteforceProtectionService {
         }
     }
 
-    private static int checkErrorsCount(String username, List<UserLoginDto> userLoginDtos) {
+    private static int checkErrorsCount(String username, List<UserLoginRecord> userLoginRecords) {
         int errorsCount = 0;
 
         consecutiveErrorsMap.putIfAbsent(username, LocalDateTime.now());
         LocalDateTime startTime = consecutiveErrorsMap.get(username);
 
-        for (UserLoginDto user : userLoginDtos) {
+        for (UserLoginRecord user : userLoginRecords) {
             int dotIndex = user.time().lastIndexOf('.');
             String dateTimeWithoutMicros = user.time().substring(0, dotIndex);
             LocalDateTime dateTime = LocalDateTime.parse(dateTimeWithoutMicros, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
@@ -78,13 +86,13 @@ public class BruteforceProtectionService {
         return errorsCount;
     }
 
-    private static boolean isUserError(UserLoginDto user, String username) {
-        return username.equals(getUsernameFromJsonInfo(user.jsonInfo())) &&
-            user.status() != null && "ERROR".equals(user.status());
-    }
-
     private static int checkErrorsCount(String username) {
         return checkErrorsCount(username, List.of());
+    }
+
+    private static boolean isUserError(UserLoginRecord user, String username) {
+        return username.equals(getUsernameFromJsonInfo(user.jsonInfo())) &&
+            user.status() != null && "ERROR".equals(user.status());
     }
 
     private static String getUsernameFromJsonInfo(String jsonInfo) {
@@ -92,5 +100,9 @@ public class BruteforceProtectionService {
         JsonObject jsonObject = jsonElement.getAsJsonObject();
         JsonElement userElement = jsonObject.get("user") != null ? jsonObject.get("user") : jsonObject.get("access-key");
         return userElement != null ? userElement.getAsString() : null;
+    }
+
+    private static String getUserParamName() {
+
     }
 }
