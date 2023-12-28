@@ -48,7 +48,7 @@ export const UserCredentialsList: PlaceholderComponent<IUserDetailsInfoProps> = 
   return styled(BASE_DROPDOWN_STYLES)(
     <Fragment key="user-credentials-list">
       {visibleCredentials.map(origin => (
-        <UserCredentials key={origin.type + origin.subType} origin={origin} />
+        <UserCredentials key={`${origin.type}${origin.subType ?? ''}`} origin={origin} />
       ))}
 
       {user.origins.length > MAX_VISIBLE_CREDENTIALS && (
@@ -65,7 +65,7 @@ export const UserCredentialsList: PlaceholderComponent<IUserDetailsInfoProps> = 
               const title = isLocal ? translate('authentication_administration_user_local') : origin.displayName;
 
               return (
-                <MenuItem key={origin.type + origin.subType} className={s(styles, { menuItem: true })} title={title}>
+                <MenuItem key={`${origin.type}${origin.subType ?? ''}`} className={s(styles, { menuItem: true })} title={title}>
                   <UserCredentials origin={origin} />
                 </MenuItem>
               );
