@@ -17,10 +17,10 @@ import { SessionPermissionsResource } from '@cloudbeaver/core-root';
 import { ScreenService } from '@cloudbeaver/core-routing';
 import { ThemeService } from '@cloudbeaver/core-theming';
 import { DNDProvider } from '@cloudbeaver/core-ui';
-import { throttle } from '@cloudbeaver/core-utils';
 import { useAppVersion } from '@cloudbeaver/core-version';
 
 import style from './Body.m.css';
+import { useAppHeight } from './useAppHeight';
 
 export const Body = observer(function Body() {
   // const serverConfigLoader = useResource(Body, ServerConfigResource, undefined);
@@ -35,12 +35,6 @@ export const Body = observer(function Body() {
   // TODO: must be loaded in place where it is used
   useResource(Body, ProjectInfoResource, CachedMapAllKey, { silent: true });
 
-  // we need it because 100vh cuts the bottom of the page on mobile devices
-  const handleBodyHeight = throttle(() => {
-    const doc = document.documentElement;
-    doc.style.setProperty('--app-height', `${window.innerHeight}px`);
-  }, 50);
-
   // sync classes from theme with body for popup components and etc
   useLayoutEffect(() => {
     if (ref.current) {
@@ -49,14 +43,7 @@ export const Body = observer(function Body() {
     document.documentElement.dataset.backendVersion = backendVersion;
   });
 
-  useLayoutEffect(() => {
-    handleBodyHeight();
-    window.addEventListener('resize', handleBodyHeight);
-
-    return () => {
-      window.removeEventListener('resize', handleBodyHeight);
-    };
-  }, []);
+  useAppHeight();
 
   return (
     <DNDProvider>
