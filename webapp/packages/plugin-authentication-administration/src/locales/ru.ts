@@ -102,7 +102,7 @@ export default [
 
   ['administration_teams_tab_title', 'Команды'],
   ['administration_teams_tab_description', 'Управление командами'],
-  ['administration_teams_team_creation', 'Создание команды'],
+  ['administration_teams_team_creation', 'Создание Команды'],
   ['administration_teams_team_id', 'ID Команды'],
   ['administration_teams_team_name', 'Название команды'],
   ['administration_teams_team_description', 'Описание'],

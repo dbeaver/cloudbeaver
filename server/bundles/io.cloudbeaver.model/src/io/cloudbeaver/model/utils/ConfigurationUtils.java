@@ -14,9 +14,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.cloudbeaver.server;
+package io.cloudbeaver.model.utils;
 
 import org.jkiss.code.NotNull;
+import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.model.connection.DBPDriver;
 import org.jkiss.utils.ArrayUtils;
 
@@ -24,12 +25,14 @@ public class ConfigurationUtils {
     private ConfigurationUtils() {
     }
 
-    public static boolean isDriverEnabled(@NotNull DBPDriver driver) {
-        String[] enabledDrivers = CBApplication.getInstance().getAppConfiguration().getEnabledDrivers();
+    public static boolean isDriverEnabled(
+        @NotNull DBPDriver driver,
+        @Nullable String[] enabledDrivers,
+        @Nullable String[] disabledDrivers
+    ) {
         if (ArrayUtils.contains(enabledDrivers, driver.getFullId())) {
             return true;
         }
-        String[] disabledDrivers = CBApplication.getInstance().getAppConfiguration().getDisabledDrivers();
         if (ArrayUtils.contains(disabledDrivers, driver.getFullId())) {
             return false;
         }

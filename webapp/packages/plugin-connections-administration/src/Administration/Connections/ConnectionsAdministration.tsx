@@ -14,6 +14,7 @@ import {
   ExceptionMessageStyles,
   Group,
   GroupItem,
+  GroupSubTitle,
   GroupTitle,
   Loader,
   SContext,
@@ -61,6 +62,9 @@ export const ConnectionsAdministration = observer<AdministrationItemContentProps
 
   return (
     <ColoredContainer vertical wrap parent gap>
+      <Group keepSize dense>
+        <GroupSubTitle>{translate('templates_administration_info_message')}</GroupSubTitle>
+      </Group>
       <Group box keepSize>
         <ToolsPanel>
           <ToolsAction
