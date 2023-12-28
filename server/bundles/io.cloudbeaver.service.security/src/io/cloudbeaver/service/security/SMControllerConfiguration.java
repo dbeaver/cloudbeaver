@@ -27,6 +27,9 @@ public class SMControllerConfiguration {
     private int refreshTokenTtl = DEFAULT_REFRESH_TOKEN_TTL;
     private int expiredAuthAttemptInfoTtl = DEFAULT_EXPIRED_AUTH_ATTEMPT_INFO_TTL;
     private boolean checkBruteforce = false;
+    private int maxFailed;
+    private int minimumTimeout;
+    private int blockPeriod;
 
     public int getAccessTokenTtl() {
         return accessTokenTtl;
@@ -58,5 +61,29 @@ public class SMControllerConfiguration {
 
     public boolean isCheckBruteforce() {
         return checkBruteforce;
+    }
+
+    public int getMaxFailed() {
+        return maxFailed;
+    }
+
+    public int getMinimumTimeout() {
+        return minimumTimeout;
+    }
+
+    public int getBlockPeriod() {
+        return blockPeriod;
+    }
+
+    public void setMaxFailed(int maxFailed) {
+        this.maxFailed = maxFailed;
+    }
+
+    public void setMinimumTimeout(int minimumTimeout) {
+        this.minimumTimeout = minimumTimeout;
+    }
+
+    public void setBlockPeriod(int blockPeriod) {
+        this.blockPeriod = blockPeriod;
     }
 }

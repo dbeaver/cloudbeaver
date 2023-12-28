@@ -127,4 +127,8 @@ public class LocalAuthProvider implements SMAuthProvider<LocalAuthSession>, Brut
         return true;
     }
 
+    @Override
+    public Object getSupposedUsername(@NotNull Map<String, Object> cred) {
+        return cred.get("user");
+    }
 }
