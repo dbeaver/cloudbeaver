@@ -7,7 +7,7 @@
  */
 
 export function formatNumber(n: number, d: number) {
-  if (n <= 1000) {
+  if (n < 1000) {
     return n.toString();
   }
 
