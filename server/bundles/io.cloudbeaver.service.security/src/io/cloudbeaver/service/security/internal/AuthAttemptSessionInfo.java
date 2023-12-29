@@ -38,9 +38,6 @@ public class AuthAttemptSessionInfo {
     private final boolean mainAuth;
 
     @NotNull
-    private final SMAuthStatus smAuthStatus;
-
-    @NotNull
     private final LocalDateTime createTime;
 
     public AuthAttemptSessionInfo(
@@ -49,7 +46,6 @@ public class AuthAttemptSessionInfo {
         @NotNull SMSessionType sessionType,
         @NotNull Map<String, Object> sessionParams,
         boolean mainAuth,
-        @NotNull SMAuthStatus smAuthStatus,
         @NotNull LocalDateTime createTime
     ) {
         this.appSessionId = appSessionId;
@@ -57,7 +53,6 @@ public class AuthAttemptSessionInfo {
         this.sessionType = sessionType;
         this.sessionParams = sessionParams;
         this.mainAuth = mainAuth;
-        this.smAuthStatus = smAuthStatus;
         this.createTime = createTime;
     }
 
@@ -83,11 +78,6 @@ public class AuthAttemptSessionInfo {
 
     public boolean isMainAuth() {
         return mainAuth;
-    }
-
-    @NotNull
-    public SMAuthStatus getSmAuthStatus() {
-        return smAuthStatus;
     }
 
     @NotNull

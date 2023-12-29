@@ -16,7 +16,7 @@
  */
 package io.cloudbeaver.auth.provider.local;
 
-import io.cloudbeaver.auth.SMBruteforceProtected;
+import io.cloudbeaver.auth.SMBruteForceProtected;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.registry.WebAuthProviderDescriptor;
 import io.cloudbeaver.registry.WebAuthProviderRegistry;
@@ -36,7 +36,7 @@ import java.util.Map;
 /**
  * Local auth provider
  */
-public class LocalAuthProvider implements SMAuthProvider<LocalAuthSession>, SMBruteforceProtected {
+public class LocalAuthProvider implements SMAuthProvider<LocalAuthSession>, SMBruteForceProtected {
 
     public static final String PROVIDER_ID = LocalAuthProviderConstants.PROVIDER_ID;
     public static final String CRED_USER = LocalAuthProviderConstants.CRED_USER;

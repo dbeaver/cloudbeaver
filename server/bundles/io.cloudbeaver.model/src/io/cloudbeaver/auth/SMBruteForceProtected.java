@@ -20,6 +20,6 @@ import org.jkiss.code.NotNull;
 
 import java.util.Map;
 
-public interface SMBruteforceProtected {
+public interface SMBruteForceProtected {
     Object getInputUsername(@NotNull Map<String, Object> cred);
 }

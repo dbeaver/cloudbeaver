@@ -25,7 +25,7 @@ import io.cloudbeaver.model.app.WebAuthConfiguration;
 import io.cloudbeaver.registry.WebAuthProviderDescriptor;
 import io.cloudbeaver.registry.WebAuthProviderRegistry;
 import io.cloudbeaver.registry.WebMetaParametersRegistry;
-import io.cloudbeaver.service.security.bruteforce.BruteforceProtectionService;
+import io.cloudbeaver.service.security.bruteforce.BruteForceUtils;
 import io.cloudbeaver.service.security.bruteforce.UserLoginRecord;
 import io.cloudbeaver.service.security.db.CBDatabase;
 import io.cloudbeaver.service.security.internal.AuthAttemptSessionInfo;
@@ -1401,8 +1401,8 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
         try (Connection dbCon = database.openConnection()) {
             try (JDBCTransaction txn = new JDBCTransaction(dbCon)) {
                 if (smConfig.isCheckBruteforce()
-                    && this.getAuthProvider(authProviderId).getInstance() instanceof SMBruteforceProtected bruteforceProtected) {
-                    BruteforceProtectionService.checkBruteforce(smConfig,
+                    && this.getAuthProvider(authProviderId).getInstance() instanceof SMBruteForceProtected bruteforceProtected) {
+                    BruteForceUtils.checkBruteforce(smConfig,
                         getLatestUserLogins(dbCon, authProviderId, bruteforceProtected.getInputUsername(authData).toString()));
                 }
                 try (PreparedStatement dbStat = dbCon.prepareStatement(
@@ -1424,7 +1424,7 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
                         dbStat.setNull(6, Types.VARCHAR);
                     }
                     dbStat.setString(7, isMainSession ? CHAR_BOOL_TRUE : CHAR_BOOL_FALSE);
-                    if (this.getAuthProvider(authProviderId).getInstance() instanceof SMBruteforceProtected bruteforceProtected) {
+                    if (this.getAuthProvider(authProviderId).getInstance() instanceof SMBruteForceProtected bruteforceProtected) {
                         dbStat.setString(8, bruteforceProtected.getInputUsername(authData).toString());
                     } else {
                         dbStat.setString(8, null);
@@ -2122,7 +2122,7 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
         try (Connection dbCon = database.openConnection()) {
             try (PreparedStatement dbStat = dbCon.prepareStatement(
                 database.normalizeTableNames(
-                    "SELECT APP_SESSION_ID,SESSION_TYPE,APP_SESSION_STATE,SESSION_ID,IS_MAIN_AUTH,AUTH_STATUS,CREATE_TIME " +
+                    "SELECT APP_SESSION_ID,SESSION_TYPE,APP_SESSION_STATE,SESSION_ID,IS_MAIN_AUTH,CREATE_TIME " +
                         "FROM {table_prefix}CB_AUTH_ATTEMPT WHERE AUTH_ID=?")
             )) {
                 dbStat.setString(1, authId);
@@ -2137,7 +2137,6 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
                     );
                     String smSessionId = dbResult.getString(4);
                     boolean isMainAuth = CHAR_BOOL_TRUE.equals(dbResult.getString(5));
-                    SMAuthStatus smAuthStatus = SMAuthStatus.valueOf(dbResult.getString(6));
                     LocalDateTime createDate = dbResult.getTimestamp(7).toLocalDateTime();
 
                     return new AuthAttemptSessionInfo(
@@ -2146,7 +2145,6 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
                         sessionType,
                         sessionParams,
                         isMainAuth,
-                        smAuthStatus,
                         createDate
                     );
                 }

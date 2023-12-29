@@ -27,7 +27,7 @@ public class SMControllerConfiguration {
     private int refreshTokenTtl = DEFAULT_REFRESH_TOKEN_TTL;
     private int expiredAuthAttemptInfoTtl = DEFAULT_EXPIRED_AUTH_ATTEMPT_INFO_TTL;
 
-    private boolean checkBruteforce = false;
+    private boolean enableBruteForce = false;
 
     //in seconds
     private int maxFailed;
@@ -59,11 +59,11 @@ public class SMControllerConfiguration {
     }
 
     public void setCheckBruteforce(boolean checkBruteforce) {
-        this.checkBruteforce = checkBruteforce;
+        this.enableBruteForce = checkBruteforce;
     }
 
     public boolean isCheckBruteforce() {
-        return checkBruteforce;
+        return enableBruteForce;
     }
 
     public int getMaxFailed() {

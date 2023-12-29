@@ -26,9 +26,9 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
 
-public class BruteforceProtectionService {
+public class BruteForceUtils {
 
-    private static final Log log = Log.getLog(BruteforceProtectionService.class);
+    private static final Log log = Log.getLog(BruteForceUtils.class);
 
     public static void checkBruteforce(SMControllerConfiguration smConfig, List<UserLoginRecord> latestLogins) throws DBException {
         if (latestLogins.isEmpty()) {
