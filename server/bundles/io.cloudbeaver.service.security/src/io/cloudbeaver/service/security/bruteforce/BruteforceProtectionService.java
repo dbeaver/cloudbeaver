@@ -18,6 +18,7 @@ package io.cloudbeaver.service.security.bruteforce;
 
 import io.cloudbeaver.service.security.SMControllerConfiguration;
 import org.jkiss.dbeaver.DBException;
+import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.auth.SMAuthStatus;
 import org.jkiss.dbeaver.model.security.exception.SMException;
 
@@ -26,6 +27,9 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public class BruteforceProtectionService {
+
+    private static final Log log = Log.getLog(BruteforceProtectionService.class);
+
     public static void checkBruteforce(SMControllerConfiguration smConfig, List<UserLoginRecord> latestLogins) throws DBException
     {
         if (latestLogins.isEmpty()) {
@@ -43,10 +47,15 @@ public class BruteforceProtectionService {
             int blockPeriod = smConfig.getBlockPeriod();
             LocalDateTime unblockTime = latestLogin.time().plusSeconds(blockPeriod);
 
-            shouldBlock = unblockTime.isAfter(LocalDateTime.now());
+            LocalDateTime now = LocalDateTime.now();
+            shouldBlock = unblockTime.isAfter(now);
 
             if (shouldBlock) {
-                throw new SMException("User blocked for 5 minutes");
+                log.error("Possible bruteforce attempt");
+                Duration lockDuration = Duration.ofSeconds(smConfig.getBlockPeriod());
+
+                throw new SMException("User blocked for " +
+                    lockDuration.minus(Duration.between(latestLogin.time(), now)).getSeconds() + " seconds");
             }
         }
     }

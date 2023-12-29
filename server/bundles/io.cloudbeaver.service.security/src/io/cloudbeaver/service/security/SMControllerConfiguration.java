@@ -26,7 +26,10 @@ public class SMControllerConfiguration {
     private int accessTokenTtl = DEFAULT_ACCESS_TOKEN_TTL;
     private int refreshTokenTtl = DEFAULT_REFRESH_TOKEN_TTL;
     private int expiredAuthAttemptInfoTtl = DEFAULT_EXPIRED_AUTH_ATTEMPT_INFO_TTL;
+
     private boolean checkBruteforce = false;
+
+    //in seconds
     private int maxFailed;
     private int minimumTimeout;
     private int blockPeriod;

@@ -1401,16 +1401,16 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
         String authAttemptId = UUID.randomUUID().toString();
         try (Connection dbCon = database.openConnection()) {
             try (JDBCTransaction txn = new JDBCTransaction(dbCon)) {
-                if (smConfig.isCheckBruteforce() && this.getAuthProvider(authProviderId).getInstance() instanceof BruteforceProtection) {
-                    BruteforceProtectionService
-                        .checkBruteforce(smConfig, getUserLoginDtos(dbCon, authProviderId, ((BruteforceProtection) this.getAuthProvider(authProviderId).getInstance()).getSupposedUsername(authData).toString()));
-//                        this.getAuthProvider(authProviderId), authData, getUserLoginDtos(dbCon, authProviderId), authProviderId);
+                if (smConfig.isCheckBruteforce()
+                    && this.getAuthProvider(authProviderId).getInstance() instanceof SMBruteforceProtected bruteforceProtected) {
+                    BruteforceProtectionService.checkBruteforce(smConfig,
+                        getLatestUserLogins(dbCon, authProviderId, bruteforceProtected.getInputUsername(authData).toString()));
                 }
                 try (PreparedStatement dbStat = dbCon.prepareStatement(
                     database.normalizeTableNames(
                         "INSERT INTO {table_prefix}CB_AUTH_ATTEMPT" +
                             "(AUTH_ID,AUTH_STATUS,APP_SESSION_ID,SESSION_TYPE,APP_SESSION_STATE," +
-                            "SESSION_ID,IS_MAIN_AUTH, SUPPOSED_USER_ID) " +
+                            "SESSION_ID,IS_MAIN_AUTH, INPUT_LOGIN) " +
                             "VALUES(?,?,?,?,?,?,?,?)"
                     )
                 )) {
@@ -1425,8 +1425,8 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
                         dbStat.setNull(6, Types.VARCHAR);
                     }
                     dbStat.setString(7, isMainSession ? CHAR_BOOL_TRUE : CHAR_BOOL_FALSE);
-                    if (this.getAuthProvider(authProviderId).getInstance() instanceof BruteforceProtection) {
-                        dbStat.setString(8, ((BruteforceProtection) this.getAuthProvider(authProviderId).getInstance()).getSupposedUsername(authData).toString());
+                    if (this.getAuthProvider(authProviderId).getInstance() instanceof SMBruteforceProtected bruteforceProtected) {
+                        dbStat.setString(8, bruteforceProtected.getInputUsername(authData).toString());
                     } else {
                         dbStat.setString(8, null);
                     }
@@ -1454,7 +1454,7 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
         }
     }
 
-    private List<UserLoginRecord> getUserLoginDtos(Connection dbCon, String authProviderId, String supposedName) throws SQLException {
+    private List<UserLoginRecord> getLatestUserLogins(Connection dbCon, String authProviderId, String inputLogin) throws SQLException {
         List<UserLoginRecord> userLoginRecords = new ArrayList<>();
         try (PreparedStatement dbStat = dbCon.prepareStatement(
             database.normalizeTableNames(
@@ -1465,13 +1465,13 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
                     "    {table_prefix}CB_AUTH_ATTEMPT attempt" +
                     "        JOIN" +
                     "    {table_prefix}CB_AUTH_ATTEMPT_INFO info ON attempt.AUTH_ID = info.AUTH_ID" +
-                    " WHERE AUTH_PROVIDER_ID = ? AND SUPPOSED_USER_ID = ?" +
+                    " WHERE AUTH_PROVIDER_ID = ? AND INPUT_LOGIN = ?" +
                     " ORDER BY attempt.CREATE_TIME DESC " +
                     database.getDialect().getOffsetLimitQueryPart(0, smConfig.getMaxFailed())
             )
         )) {
             dbStat.setString(1, authProviderId);
-            dbStat.setString(2, supposedName);
+            dbStat.setString(2, inputLogin);
             try (ResultSet dbResult = dbStat.executeQuery()) {
                 while (dbResult.next()) {
                     UserLoginRecord loginDto = new UserLoginRecord(
