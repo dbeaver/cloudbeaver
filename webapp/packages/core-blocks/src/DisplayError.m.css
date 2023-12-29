@@ -5,7 +5,7 @@
   overflow: auto;
 
   &.root {
-    height: 100vh;
+    height: var(--app-height);
   }
 }
 .errorInnerBlock {
