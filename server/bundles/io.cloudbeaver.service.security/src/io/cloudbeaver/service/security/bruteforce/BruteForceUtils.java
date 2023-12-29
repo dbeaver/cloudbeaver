@@ -36,14 +36,14 @@ public class BruteForceUtils {
         }
 
         var latestLogin = latestLogins.get(0);
-        checkLoginInterval(latestLogin.time(), smConfig.getMinimumTimeout());
+        checkLoginInterval(latestLogin.time(), smConfig.getMinimumLoginTimeout());
 
         long errorsCount = latestLogins.stream()
             .filter(authAttemptSessionInfo -> authAttemptSessionInfo.smAuthStatus() == SMAuthStatus.ERROR).count();
 
-        boolean shouldBlock = errorsCount >= smConfig.getMaxFailed();
+        boolean shouldBlock = errorsCount >= smConfig.getMaxFailedLogin();
         if (shouldBlock) {
-            int blockPeriod = smConfig.getBlockPeriod();
+            int blockPeriod = smConfig.getBlockLoginPeriod();
             LocalDateTime unblockTime = latestLogin.time().plusSeconds(blockPeriod);
 
             LocalDateTime now = LocalDateTime.now();
@@ -51,7 +51,7 @@ public class BruteForceUtils {
 
             if (shouldBlock) {
                 log.error("Possible bruteforce attempt");
-                Duration lockDuration = Duration.ofSeconds(smConfig.getBlockPeriod());
+                Duration lockDuration = Duration.ofSeconds(smConfig.getBlockLoginPeriod());
 
                 throw new SMException("User blocked for " +
                     lockDuration.minus(Duration.between(latestLogin.time(), now)).getSeconds() + " seconds");

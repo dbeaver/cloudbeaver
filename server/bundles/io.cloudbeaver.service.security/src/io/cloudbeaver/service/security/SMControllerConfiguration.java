@@ -30,9 +30,9 @@ public class SMControllerConfiguration {
     private boolean enableBruteForceProtection = false;
 
     //in seconds
-    private int maxFailed;
-    private int minimumTimeout;
-    private int blockPeriod;
+    private int maxFailedLogin;
+    private int minimumLoginTimeout;
+    private int blockLoginPeriod;
 
     public int getAccessTokenTtl() {
         return accessTokenTtl;
@@ -66,27 +66,27 @@ public class SMControllerConfiguration {
         return enableBruteForceProtection;
     }
 
-    public int getMaxFailed() {
-        return maxFailed;
+    public int getMaxFailedLogin() {
+        return maxFailedLogin;
     }
 
-    public int getMinimumTimeout() {
-        return minimumTimeout;
+    public int getMinimumLoginTimeout() {
+        return minimumLoginTimeout;
     }
 
-    public int getBlockPeriod() {
-        return blockPeriod;
+    public int getBlockLoginPeriod() {
+        return blockLoginPeriod;
     }
 
-    public void setMaxFailed(int maxFailed) {
-        this.maxFailed = maxFailed;
+    public void setMaxFailedLogin(int maxFailed) {
+        this.maxFailedLogin = maxFailed;
     }
 
-    public void setMinimumTimeout(int minimumTimeout) {
-        this.minimumTimeout = minimumTimeout;
+    public void setMinimumLoginTimeout(int minimumTimeout) {
+        this.minimumLoginTimeout = minimumTimeout;
     }
 
-    public void setBlockPeriod(int blockPeriod) {
-        this.blockPeriod = blockPeriod;
+    public void setBlockLoginPeriod(int blockPeriod) {
+        this.blockLoginPeriod = blockPeriod;
     }
 }
