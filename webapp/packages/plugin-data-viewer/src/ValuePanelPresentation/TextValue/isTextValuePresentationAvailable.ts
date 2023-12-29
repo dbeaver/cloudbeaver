@@ -5,6 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
+import { isResultSetBinaryFileValue } from '../../DatabaseDataModel/Actions/ResultSet/isResultSetBinaryFileValue';
 import { isResultSetContentValue } from '../../DatabaseDataModel/Actions/ResultSet/isResultSetContentValue';
 import { ResultSetSelectAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetSelectAction';
 import { ResultSetViewAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetViewAction';
@@ -27,7 +28,7 @@ export function isBlobPresentationAvailable(context: IDataValuePanelProps<any, I
 
     const cellValue = view.getCellValue(firstSelectedCell);
 
-    return isResultSetContentValue(cellValue) && cellValue.contentType === 'application/octet-stream' && Boolean(cellValue?.binary);
+    return isResultSetContentValue(cellValue) && isResultSetBinaryFileValue(cellValue);
   }
 
   return true;
