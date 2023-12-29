@@ -1410,7 +1410,7 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
                     database.normalizeTableNames(
                         "INSERT INTO {table_prefix}CB_AUTH_ATTEMPT" +
                             "(AUTH_ID,AUTH_STATUS,APP_SESSION_ID,SESSION_TYPE,APP_SESSION_STATE," +
-                            "SESSION_ID,IS_MAIN_AUTH, INPUT_LOGIN) " +
+                            "SESSION_ID,IS_MAIN_AUTH, AUTH_USERNAME) " +
                             "VALUES(?,?,?,?,?,?,?,?)"
                     )
                 )) {
@@ -1465,7 +1465,7 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
                     "    {table_prefix}CB_AUTH_ATTEMPT attempt" +
                     "        JOIN" +
                     "    {table_prefix}CB_AUTH_ATTEMPT_INFO info ON attempt.AUTH_ID = info.AUTH_ID" +
-                    " WHERE AUTH_PROVIDER_ID = ? AND INPUT_LOGIN = ?" +
+                    " WHERE AUTH_PROVIDER_ID = ? AND AUTH_USERNAME = ?" +
                     " ORDER BY attempt.CREATE_TIME DESC " +
                     database.getDialect().getOffsetLimitQueryPart(0, smConfig.getMaxFailed())
             )
