@@ -50,7 +50,7 @@ public class BruteForceUtils {
             shouldBlock = unblockTime.isAfter(now);
 
             if (shouldBlock) {
-                log.error("Possible bruteforce attempt");
+                log.error("User login is blocked due to exceeding the limit of incorrect password entry");
                 Duration lockDuration = Duration.ofSeconds(smConfig.getBlockLoginPeriod());
 
                 throw new SMException("User blocked for " +
