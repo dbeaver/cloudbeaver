@@ -37,23 +37,18 @@ public class AuthAttemptSessionInfo {
     private final Map<String, Object> sessionParams;
     private final boolean mainAuth;
 
-    @NotNull
-    private final LocalDateTime createTime;
-
     public AuthAttemptSessionInfo(
         @NotNull String appSessionId,
         @Nullable String smSessionId,
         @NotNull SMSessionType sessionType,
         @NotNull Map<String, Object> sessionParams,
-        boolean mainAuth,
-        @NotNull LocalDateTime createTime
+        boolean mainAuth
     ) {
         this.appSessionId = appSessionId;
         this.smSessionId = smSessionId;
         this.sessionType = sessionType;
         this.sessionParams = sessionParams;
         this.mainAuth = mainAuth;
-        this.createTime = createTime;
     }
 
     @NotNull
@@ -80,8 +75,4 @@ public class AuthAttemptSessionInfo {
         return mainAuth;
     }
 
-    @NotNull
-    public LocalDateTime getCreateTime() {
-        return createTime;
-    }
 }

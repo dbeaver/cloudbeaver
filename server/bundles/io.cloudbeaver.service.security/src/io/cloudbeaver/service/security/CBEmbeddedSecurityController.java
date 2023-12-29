@@ -2122,7 +2122,7 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
         try (Connection dbCon = database.openConnection()) {
             try (PreparedStatement dbStat = dbCon.prepareStatement(
                 database.normalizeTableNames(
-                    "SELECT APP_SESSION_ID,SESSION_TYPE,APP_SESSION_STATE,SESSION_ID,IS_MAIN_AUTH,CREATE_TIME " +
+                    "SELECT APP_SESSION_ID,SESSION_TYPE,APP_SESSION_STATE,SESSION_ID,IS_MAIN_AUTH " +
                         "FROM {table_prefix}CB_AUTH_ATTEMPT WHERE AUTH_ID=?")
             )) {
                 dbStat.setString(1, authId);
@@ -2137,15 +2137,13 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
                     );
                     String smSessionId = dbResult.getString(4);
                     boolean isMainAuth = CHAR_BOOL_TRUE.equals(dbResult.getString(5));
-                    LocalDateTime createDate = dbResult.getTimestamp(7).toLocalDateTime();
 
                     return new AuthAttemptSessionInfo(
                         appSessionId,
                         smSessionId,
                         sessionType,
                         sessionParams,
-                        isMainAuth,
-                        createDate
+                        isMainAuth
                     );
                 }
             }
