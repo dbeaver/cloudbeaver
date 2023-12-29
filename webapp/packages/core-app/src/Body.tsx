@@ -20,6 +20,7 @@ import { DNDProvider } from '@cloudbeaver/core-ui';
 import { useAppVersion } from '@cloudbeaver/core-version';
 
 import style from './Body.m.css';
+import { useAppHeight } from './useAppHeight';
 
 export const Body = observer(function Body() {
   // const serverConfigLoader = useResource(Body, ServerConfigResource, undefined);
@@ -41,6 +42,8 @@ export const Body = observer(function Body() {
     }
     document.documentElement.dataset.backendVersion = backendVersion;
   });
+
+  useAppHeight();
 
   return (
     <DNDProvider>
