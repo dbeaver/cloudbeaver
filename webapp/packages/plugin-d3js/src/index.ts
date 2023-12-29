@@ -17,5 +17,10 @@ export {
   interpolateRound,
   axisBottom,
   axisLeft,
+  scaleOrdinal,
+  pie,
+  arc,
+  schemeTableau10,
+  sum,
 } from 'd3';
-export type { Selection, ZoomBehavior, Line, DragBehavior, SubjectPosition } from 'd3';
+export type { Selection, ZoomBehavior, Line, DragBehavior, SubjectPosition, PieArcDatum, ScaleOrdinal } from 'd3';
