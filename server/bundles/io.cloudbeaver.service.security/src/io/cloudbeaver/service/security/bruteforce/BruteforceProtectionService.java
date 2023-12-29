@@ -30,8 +30,7 @@ public class BruteforceProtectionService {
 
     private static final Log log = Log.getLog(BruteforceProtectionService.class);
 
-    public static void checkBruteforce(SMControllerConfiguration smConfig, List<UserLoginRecord> latestLogins) throws DBException
-    {
+    public static void checkBruteforce(SMControllerConfiguration smConfig, List<UserLoginRecord> latestLogins) throws DBException {
         if (latestLogins.isEmpty()) {
             return;
         }

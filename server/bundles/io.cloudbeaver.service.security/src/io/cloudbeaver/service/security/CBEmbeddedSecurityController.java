@@ -443,8 +443,7 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
     }
 
     private int setUsersFilterValues(PreparedStatement dbStat, SMUserFilter filter, int parameterIndex)
-            throws SQLException
-    {
+            throws SQLException {
         if (!CommonUtils.isEmpty(filter.getUserIdMask())) {
             dbStat.setString(parameterIndex++, "%" + filter.getUserIdMask() + "%");
         }
