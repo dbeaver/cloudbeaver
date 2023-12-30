@@ -30,9 +30,12 @@ public class SMControllerConfiguration {
     private boolean enableBruteForceProtection = true;
 
     //in seconds
-    private int maxFailedLogin;
-    private int minimumLoginTimeout;
-    private int blockLoginPeriod;
+    public static final int DEFAULT_MAX_FAILED_LOGIN = 10;
+    public static final int DEFAULT_MINIMUM_LOGIN_TIMEOUT = 1; //1sec
+    public static final int DEFAULT_BLOCK_LOGIN_PERIOD = 300; //5min
+    private int maxFailedLogin = DEFAULT_MAX_FAILED_LOGIN;
+    private int minimumLoginTimeout = DEFAULT_MINIMUM_LOGIN_TIMEOUT;
+    private int blockLoginPeriod = DEFAULT_BLOCK_LOGIN_PERIOD;
 
     public int getAccessTokenTtl() {
         return accessTokenTtl;
