@@ -1459,7 +1459,7 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
             database.normalizeTableNames(
                 "SELECT" +
                     "    attempt.AUTH_STATUS," +
-                    "    attempt.CREATE_TIME," +
+                    "    attempt.CREATE_TIME" +
                     " FROM" +
                     "    {table_prefix}CB_AUTH_ATTEMPT attempt" +
                     "        JOIN" +
