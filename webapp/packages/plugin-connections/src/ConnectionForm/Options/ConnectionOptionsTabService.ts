@@ -248,6 +248,19 @@ export class ConnectionOptionsTabService extends Bootstrap {
     configuration.include('includeOrigin', 'includeAuthProperties', 'includeCredentialsSaved', 'customIncludeOptions');
   }
 
+  private getTrimmedPropertiesConfig(authProperties: ObjectPropertyInfo[], credentials: Record<string, any>): Record<string, any> {
+    const trimmedProperties: Record<string, any> = toJS(credentials);
+    for (const property of authProperties) {
+      const value = credentials?.[property.id!];
+
+      if (typeof value === 'string' && value) {
+        trimmedProperties[property.id!] = value?.trim();
+      }
+    }
+
+    return trimmedProperties;
+  }
+
   private async prepareConfig({ state }: IConnectionFormSubmitData, contexts: IExecutionContextProvider<IConnectionFormSubmitData>) {
     const config = contexts.getContext(connectionConfigContext);
     const credentialsState = contexts.getContext(connectionCredentialsStateContext);
@@ -274,7 +287,7 @@ export class ConnectionOptionsTabService extends Bootstrap {
       tempConfig.name = getUniqueName(tempConfig.name, connectionNames);
     }
 
-    tempConfig.description = state.config.description;
+    tempConfig.description = state.config.description?.trim();
 
     tempConfig.template = state.config.template;
 
@@ -285,16 +298,16 @@ export class ConnectionOptionsTabService extends Bootstrap {
     }
 
     if (tempConfig.configurationType === DriverConfigurationType.Url) {
-      tempConfig.url = state.config.url;
+      tempConfig.url = state.config.url?.trim();
     } else {
       if (!driver.embedded) {
-        tempConfig.host = state.config.host;
-        tempConfig.port = state.config.port;
+        tempConfig.host = state.config.host?.trim();
+        tempConfig.port = state.config.port?.trim();
       }
       if (driver.requiresServerName) {
-        tempConfig.serverName = state.config.serverName;
+        tempConfig.serverName = state.config.serverName?.trim();
       }
-      tempConfig.databaseName = state.config.databaseName;
+      tempConfig.databaseName = state.config.databaseName?.trim();
     }
 
     if ((state.config.authModelId || driver.defaultAuthModel) && !driver.anonymousAccess) {
@@ -305,7 +318,7 @@ export class ConnectionOptionsTabService extends Bootstrap {
       const properties = await this.getConnectionAuthModelProperties(tempConfig.authModelId, state.info);
 
       if (this.isCredentialsChanged(properties, state.config.credentials)) {
-        tempConfig.credentials = { ...state.config.credentials };
+        tempConfig.credentials = this.getTrimmedPropertiesConfig(properties, { ...state.config.credentials });
       }
 
       if (!tempConfig.saveCredentials) {
@@ -334,6 +347,12 @@ export class ConnectionOptionsTabService extends Bootstrap {
       }
 
       tempConfig.providerProperties = providerProperties;
+
+      for (const key of Object.keys(tempConfig.providerProperties)) {
+        if (typeof tempConfig.providerProperties[key] === 'string') {
+          tempConfig.providerProperties[key] = tempConfig.providerProperties[key]?.trim();
+        }
+      }
     }
 
     runInAction(() => {
