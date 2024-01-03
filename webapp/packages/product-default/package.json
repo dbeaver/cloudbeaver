@@ -5,7 +5,7 @@
     "src/**/*.scss",
     "public/**/*"
   ],
-  "version": "23.3.1",
+  "version": "23.3.2",
   "description": "CloudBeaver Community",
   "license": "Apache-2.0",
   "main": "dist/index.js",
