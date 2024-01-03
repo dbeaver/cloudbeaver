@@ -106,8 +106,9 @@ export class ResultSetFormatAction
     return this.view.columns.map(column => column.name!).filter(name => name !== undefined);
   }
 
-  getLongestCells(startColumn = 0, endColumn = this.view.columnKeys.length, rowsAmount = this.view.rows.length): string[] {
+  getLongestCells(startColumn = 0, endColumn = this.view.columnKeys.length): string[] {
     const cells: string[] = [];
+    const rowsAmount = this.view.rows.length;
 
     for (let rowIndex = 0; rowIndex < rowsAmount; rowIndex++) {
       for (let columnIndex = startColumn; columnIndex < endColumn; columnIndex++) {
