@@ -36,7 +36,7 @@ export default [
   ['connections_connection_edit_search_hosts', '主机名称'],
   ['connections_connection_address', '地址'],
   ['connections_connection_folder', 'Folder'],
-  ['connections_connection_folder_validation', 'Folder\'s name may contain the following symbols "_-$.()@" and can\'t start with a dot'],
+  ['connections_connection_folder_validation', "Folder's name may not contain the following symbols / : \" \\ and can't start with a dot"],
   ['connections_connection_name', '连接名称'],
   ['connections_connection_access_admin_info', '管理员查看所有连接。'],
   ['connections_connection_description', '描述'],
