@@ -5,7 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { isResultSetContentValue } from '../../DatabaseDataModel/Actions/ResultSet/isResultSetContentValue';
+import { isResultSetBinaryFileValue } from '../../DatabaseDataModel/Actions/ResultSet/isResultSetBinaryFileValue';
 import { ResultSetEditAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetEditAction';
 import { ResultSetFormatAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetFormatAction';
 import { ResultSetSelectAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetSelectAction';
@@ -34,7 +34,7 @@ export function useTextValue({ model, resultIndex, currentContentType }: IUseTex
 
   const blob = format.get(firstSelectedCell);
 
-  if (isResultSetContentValue(blob)) {
+  if (isResultSetBinaryFileValue(blob)) {
     const value = formatter.formatBlob(currentContentType, blob);
 
     if (value) {
