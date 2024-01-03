@@ -116,7 +116,7 @@ export class PluginBootstrap extends Bootstrap {
                 return false;
               }
 
-              if (!RESOURCE_NAME_REGEX.test(name)) {
+              if (!RESOURCE_NAME_REGEX.test(trimmedName)) {
                 setMessage('plugin_resource_manager_scripts_script_name_invalid_characters_message');
                 return false;
               }
