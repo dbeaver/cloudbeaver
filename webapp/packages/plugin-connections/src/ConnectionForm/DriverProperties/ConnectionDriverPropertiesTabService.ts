@@ -87,12 +87,13 @@ export class ConnectionDriverPropertiesTabService extends Bootstrap {
 
       const defaultDriverProperties = new Set(driver?.driverProperties?.map(property => property.id) ?? []);
 
-      for (const [key, value] of Object.entries(config.properties)) {
-        if (defaultDriverProperties?.has(key)) {
-          trimmedProperties[key] = config.properties[key];
+      for (let key of Object.keys(config.properties)) {
+        const value = config.properties[key];
+        if (!defaultDriverProperties?.has(key)) {
+          key = key.trim();
         }
 
-        trimmedProperties[key.trim()] = typeof value === 'string' ? value.trim() : value;
+        trimmedProperties[key] = typeof value === 'string' ? value.trim() : value;
       }
 
       config.properties = trimmedProperties;
