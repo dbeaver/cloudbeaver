@@ -80,6 +80,24 @@ export class ConnectionDriverPropertiesTabService extends Bootstrap {
     const config = contexts.getContext(connectionConfigContext);
 
     config.properties = { ...state.config.properties };
+
+    if (config.driverId) {
+      const driver = this.dbDriverResource.get(config.driverId);
+      const trimmedProperties: typeof config.properties = {};
+
+      const defaultDriverProperties = new Set(driver?.driverProperties?.map(property => property.id) ?? []);
+
+      for (let key of Object.keys(config.properties)) {
+        const value = config.properties[key];
+        if (!defaultDriverProperties?.has(key)) {
+          key = key.trim();
+        }
+
+        trimmedProperties[key] = typeof value === 'string' ? value.trim() : value;
+      }
+
+      config.properties = trimmedProperties;
+    }
   }
 
   private formState(data: IConnectionFormState, contexts: IExecutionContextProvider<IConnectionFormState>) {

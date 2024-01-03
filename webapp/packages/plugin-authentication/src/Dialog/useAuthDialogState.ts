@@ -183,7 +183,14 @@ export function useAuthDialogState(accessRequest: boolean, providerId: string | 
 
           const loginTask = authInfoService.login(provider.id, {
             configurationId: configuration?.id,
-            credentials: state.credentials,
+            credentials: {
+              ...state.credentials,
+              credentials: {
+                ...state.credentials.credentials,
+                user: state.credentials.credentials.user?.trim(),
+                password: state.credentials.credentials.password?.trim(),
+              },
+            },
             linkUser,
           });
           this.authTask = loginTask;
