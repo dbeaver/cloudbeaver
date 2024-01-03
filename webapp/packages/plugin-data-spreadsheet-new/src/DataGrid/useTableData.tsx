@@ -67,35 +67,18 @@ export function useTableData(
 
   const scheduleColumnsUpdate = (currentChunk = 0) => {
     const totalChunksAmount = Math.ceil(format.getHeaders().length / COLUMNS_PER_CHUNK);
-
     const columnNames = format.getHeaders();
     const start = currentChunk * COLUMNS_PER_CHUNK;
     const end = Math.min(COLUMNS_PER_CHUNK + start, columnNames.length);
-    const rowStrings = format.getLongestCells(start, end);
-
-    const columnsWidth = TextTools.getWidth({
-      font: FONT,
-      text: columnNames,
-    }).map(
-      width =>
-        width + COLUMN_PADDING + COLUMN_HEADER_ICON_WIDTH + COLUMN_HEADER_TEXT_PADDING + COLUMN_HEADER_ORDER_PADDING + COLUMN_HEADER_ORDER_WIDTH,
-    );
-
-    const cellsWidth = TextTools.getWidth({
-      font: FONT,
-      text: rowStrings,
-    }).map(width => width + COLUMN_PADDING);
 
     const newColumns = columnsRef.current.map((column, index) => {
       if (index < start || index >= end) {
         return column;
       }
 
-      const width = Math.min(300, Math.max(columnsWidth[index], cellsWidth[index] ?? 0));
-
       return {
         ...column,
-        width,
+        width: calculateWidth(index, start, end),
       };
     });
 
@@ -107,14 +90,9 @@ export function useTableData(
     }
   };
 
-  const getColumns = () => {
-    if (ref.columnKeys.length === 0) {
-      return [];
-    }
+  const calculateWidth = (index: number, start: number, end: number) => {
     const columnNames = format.getHeaders();
-    const columnsToProcess = Math.min(COLUMNS_PER_CHUNK, columnNames.length);
-    const rowStrings = format.getLongestCells(0, columnsToProcess);
-
+    const rowStrings = format.getLongestCells(start, end);
     const columnsWidth = TextTools.getWidth({
       font: FONT,
       text: columnNames,
@@ -127,22 +105,26 @@ export function useTableData(
       font: FONT,
       text: rowStrings,
     }).map(width => width + COLUMN_PADDING);
+    return Math.min(300, Math.max(columnsWidth[index], cellsWidth[index] ?? 0));
+  };
 
+  const getColumns = () => {
+    if (ref.columnKeys.length === 0) {
+      return [];
+    }
+
+    const columnNames = format.getHeaders();
+    const columnsToProcess = Math.min(COLUMNS_PER_CHUNK, columnNames.length);
     const newColumns: Array<Column<IResultSetRowKey, any>> = ref.columnKeys.map<Column<IResultSetRowKey, any>>((col, index) => ({
       key: ResultSetDataKeysUtils.serialize(col),
       columnDataIndex: col,
       name: ref.getColumnInfo(col)?.label || '?',
       editable: true,
-      width: Math.min(300, Math.max(columnsWidth[index], cellsWidth[index] ?? 0)),
+      width: calculateWidth(index, 0, columnsToProcess),
       renderHeaderCell: props => <TableColumnHeader {...props} />,
     }));
+
     newColumns.unshift(indexColumn);
-
-    columnsRef.current = newColumns;
-
-    if (ref.columnKeys.length > COLUMNS_PER_CHUNK) {
-      setTimeout(() => scheduleColumnsUpdate(1), 1);
-    }
 
     return newColumns;
   };
@@ -267,7 +249,13 @@ export function useTableData(
   };
 
   useEffect(() => {
-    setColumns(getColumns());
+    columnsRef.current = getColumns();
+
+    if (ref.columnKeys.length > COLUMNS_PER_CHUNK) {
+      setTimeout(() => scheduleColumnsUpdate(1), 0);
+    }
+
+    setColumns(columnsRef.current);
   }, []);
 
   return [ref, state];
