@@ -64,14 +64,21 @@ export function useTableData(
   const dataContent = model.source.getAction(resultIndex, ResultSetDataContentAction);
   const constraints = model.source.getAction(resultIndex, ResultSetConstraintAction);
   const columnsRef = useRef<Column<IResultSetRowKey, any>[]>([]);
+  const timers = useRef<(NodeJS.Timeout | null)[]>([]);
 
   const scheduleColumnsUpdate = (currentChunk = 0) => {
     const totalChunksAmount = Math.ceil(format.getHeaders().length / COLUMNS_PER_CHUNK);
-
     const columnNames = format.getHeaders();
     const start = currentChunk * COLUMNS_PER_CHUNK;
     const end = Math.min(COLUMNS_PER_CHUNK + start, columnNames.length);
     const rowStrings = format.getLongestCells(start, end);
+
+    const prevTimer = timers.current?.[currentChunk - 1];
+
+    if (prevTimer) {
+      clearTimeout(prevTimer);
+      timers.current[currentChunk - 1] = null;
+    }
 
     const columnsWidth = TextTools.getWidth({
       font: FONT,
@@ -141,7 +148,14 @@ export function useTableData(
     columnsRef.current = newColumns;
 
     if (ref.columnKeys.length > COLUMNS_PER_CHUNK) {
-      setTimeout(() => scheduleColumnsUpdate(1), 1);
+      timers.current[0] = setTimeout(() => {
+        scheduleColumnsUpdate(1);
+
+        if (timers.current[0]) {
+          clearTimeout(timers.current[0]);
+          timers.current[0] = null;
+        }
+      }, 1);
     }
 
     return newColumns;
