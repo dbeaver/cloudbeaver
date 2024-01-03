@@ -1305,7 +1305,7 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
                     securedUserIdentifyingCredentials,
                     authProviderDescriptor
                 );
-                String authAttemptId = null;
+                String authAttemptId;
                 if (SMAuthProviderExternal.class.isAssignableFrom(authProviderInstance.getClass())) {
                     var authProviderExternal = (SMAuthProviderExternal<?>) authProviderInstance;
                     try {
@@ -1315,7 +1315,7 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
                             userCredentials
                         );
                     } catch (DBException e) {
-                        authAttemptId = createNewAuthAttempt(
+                       createNewAuthAttempt(
                             SMAuthStatus.ERROR,
                             authProviderId,
                             authProviderConfigurationId,
@@ -1326,22 +1326,21 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
                             sessionParameters,
                             isMainSession
                         );
+                        throw e;
                     }
                 }
 
-                if (authAttemptId == null) {
-                    authAttemptId = createNewAuthAttempt(
-                        SMAuthStatus.IN_PROGRESS,
-                        authProviderId,
-                        authProviderConfigurationId,
-                        filteredUserCreds,
-                        appSessionId,
-                        previousSmSessionId,
-                        sessionType,
-                        sessionParameters,
-                        isMainSession
-                    );
-                }
+                authAttemptId = createNewAuthAttempt(
+                    SMAuthStatus.IN_PROGRESS,
+                    authProviderId,
+                    authProviderConfigurationId,
+                    filteredUserCreds,
+                    appSessionId,
+                    previousSmSessionId,
+                    sessionType,
+                    sessionParameters,
+                    isMainSession
+                );
 
                 if (SMAuthProviderFederated.class.isAssignableFrom(authProviderInstance.getClass())) {
                     //async auth
