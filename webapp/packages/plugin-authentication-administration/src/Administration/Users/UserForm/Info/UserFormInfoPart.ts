@@ -43,7 +43,6 @@ export class UserFormInfoPart extends FormPart<IUserFormInfoState, IUserFormStat
 
   protected format(data: IFormState<IUserFormState>, contexts: IExecutionContextProvider<IFormState<IUserFormState>>): void | Promise<void> {
     this.state.password = this.state.password.trim();
-    this.state.userId = this.state.userId.trim();
     const metaParameters = this.state.metaParameters;
 
     for (const key in metaParameters) {
@@ -93,7 +92,7 @@ export class UserFormInfoPart extends FormPart<IUserFormInfoState, IUserFormStat
   protected override async saveChanges(): Promise<void> {
     if (this.formState.mode === FormMode.Create) {
       const user = await this.usersResource.create({
-        userId: this.state.userId,
+        userId: this.state.userId.trim(),
         authRole: getTransformedAuthRole(this.state.authRole),
       });
       this.initialState.userId = user.userId;
