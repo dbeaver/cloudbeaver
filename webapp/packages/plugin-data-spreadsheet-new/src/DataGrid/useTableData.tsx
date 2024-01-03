@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 import { computed, observable } from 'mobx';
-import { useEffect, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 
 import { useObservableRef } from '@cloudbeaver/core-blocks';
 import { TextTools } from '@cloudbeaver/core-utils';
@@ -274,15 +274,9 @@ export function useTableData(
     },
   );
 
-  const [columns, setColumns] = useState<Column<IResultSetRowKey, any>[]>([]);
+  const [columns, setColumns] = useState<Column<IResultSetRowKey, any>[]>(getColumns());
 
-  const state = {
-    columns,
-  };
-
-  useEffect(() => {
-    setColumns(getColumns());
-  }, []);
-
-  return [ref, state];
+  return [ref, {
+    columns
+  }];
 }
