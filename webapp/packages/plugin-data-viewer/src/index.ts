@@ -17,6 +17,8 @@ export * from './DatabaseDataModel/Actions/ResultSet/IResultSetComplexValue';
 export * from './DatabaseDataModel/Actions/ResultSet/IResultSetFileValue';
 export * from './DatabaseDataModel/Actions/ResultSet/IResultSetContentValue';
 export * from './DatabaseDataModel/Actions/ResultSet/IResultSetGeometryValue';
+export * from './DatabaseDataModel/Actions/ResultSet/IResultSetBinaryFileValue';
+export * from './DatabaseDataModel/Actions/ResultSet/isResultSetBinaryFileValue';
 export * from './DatabaseDataModel/Actions/ResultSet/isResultSetBlobValue';
 export * from './DatabaseDataModel/Actions/ResultSet/isResultSetComplexValue';
 export * from './DatabaseDataModel/Actions/ResultSet/isResultSetContentValue';

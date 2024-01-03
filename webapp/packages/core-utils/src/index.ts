@@ -10,6 +10,7 @@ export * from './underscore';
 
 export * from './base64ToBlob';
 export * from './blobToBase64';
+export * from './base64ToHex';
 export * from './bytesToSize';
 export * from './cacheValue';
 export * from './clsx';
@@ -69,3 +70,4 @@ export * from './removeMetadataFromBase64';
 export * from './renamePathName';
 export * from './removeLineBreak';
 export * from './replaceSubstring';
+export * from './formatNumber';

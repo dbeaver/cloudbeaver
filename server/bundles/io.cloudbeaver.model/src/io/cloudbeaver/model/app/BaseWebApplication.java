@@ -276,4 +276,8 @@ public abstract class BaseWebApplication extends BaseApplicationImpl implements 
 
     protected abstract GsonBuilder getGsonBuilder();
 
+    @Override
+    public boolean isEnvironmentVariablesAccessible() {
+        return false;
+    }
 }
