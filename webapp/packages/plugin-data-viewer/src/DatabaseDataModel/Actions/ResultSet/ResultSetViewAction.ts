@@ -127,6 +127,10 @@ export class ResultSetViewAction extends DatabaseDataAction<any, IDatabaseResult
   }
 
   getCellValue(cell: IResultSetElementKey): IResultSetValue {
+    if (!cell?.row) {
+      return null;
+    }
+
     const edited = this.editor.get(cell);
 
     if (edited !== undefined) {

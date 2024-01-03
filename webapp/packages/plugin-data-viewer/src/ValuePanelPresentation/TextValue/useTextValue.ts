@@ -29,7 +29,7 @@ export function useTextValue({ model, resultIndex, currentContentType }: IUseTex
   const formatter = useAutoFormat();
 
   if (!autoFormat) {
-    return;
+    return format.getText(firstSelectedCell);
   }
 
   const blob = format.get(firstSelectedCell);
