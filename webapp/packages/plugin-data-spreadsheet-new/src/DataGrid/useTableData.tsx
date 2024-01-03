@@ -49,6 +49,7 @@ const COLUMN_HEADER_TEXT_PADDING = 8;
 const COLUMN_HEADER_ORDER_PADDING = 8;
 const COLUMN_HEADER_ORDER_WIDTH = 16;
 const COLUMNS_PER_CHUNK = 10;
+const MIN_COLUMN_WIDTH = 300;
 
 const FONT = '400 12px Roboto';
 
@@ -80,29 +81,16 @@ export function useTableData(
       timers.current[currentChunk - 1] = null;
     }
 
-    const columnsWidth = TextTools.getWidth({
-      font: FONT,
-      text: columnNames,
-    }).map(
-      width =>
-        width + COLUMN_PADDING + COLUMN_HEADER_ICON_WIDTH + COLUMN_HEADER_TEXT_PADDING + COLUMN_HEADER_ORDER_PADDING + COLUMN_HEADER_ORDER_WIDTH,
-    );
-
-    const cellsWidth = TextTools.getWidth({
-      font: FONT,
-      text: rowStrings,
-    }).map(width => width + COLUMN_PADDING);
+    const { columnsWidth, cellsWidth } = getWidths(rowStrings);
 
     const newColumns = columnsRef.current.map((column, index) => {
       if (index < start || index >= end) {
         return column;
       }
 
-      const width = Math.min(300, Math.max(columnsWidth[index], cellsWidth[index] ?? 0));
-
       return {
         ...column,
-        width,
+        width: Math.min(MIN_COLUMN_WIDTH, Math.max(columnsWidth[index], cellsWidth[index] ?? 0));,
       };
     });
 
@@ -114,13 +102,8 @@ export function useTableData(
     }
   };
 
-  const getColumns = () => {
-    if (ref.columnKeys.length === 0) {
-      return [];
-    }
+  const getWidths = (rowStrings: string[]) => {
     const columnNames = format.getHeaders();
-    const columnsToProcess = Math.min(COLUMNS_PER_CHUNK, columnNames.length);
-    const rowStrings = format.getLongestCells(0, columnsToProcess);
 
     const columnsWidth = TextTools.getWidth({
       font: FONT,
@@ -135,12 +118,29 @@ export function useTableData(
       text: rowStrings,
     }).map(width => width + COLUMN_PADDING);
 
+    return {
+      columnsWidth,
+      cellsWidth,
+    };
+  };
+
+  const getColumns = () => {
+    if (ref.columnKeys.length === 0) {
+      return [];
+    }
+
+    const columnNames = format.getHeaders();
+    const columnsToProcess = Math.min(COLUMNS_PER_CHUNK, columnNames.length);
+    const rowStrings = format.getLongestCells(0, columnsToProcess);
+
+    const { columnsWidth, cellsWidth } = getWidths(rowStrings);
+
     const newColumns: Array<Column<IResultSetRowKey, any>> = ref.columnKeys.map<Column<IResultSetRowKey, any>>((col, index) => ({
       key: ResultSetDataKeysUtils.serialize(col),
       columnDataIndex: col,
       name: ref.getColumnInfo(col)?.label || '?',
       editable: true,
-      width: Math.min(300, Math.max(columnsWidth[index], cellsWidth[index] ?? 0)),
+      width: Math.min(MIN_COLUMN_WIDTH, Math.max(columnsWidth[index], cellsWidth[index] ?? 0)),
       renderHeaderCell: props => <TableColumnHeader {...props} />,
     }));
     newColumns.unshift(indexColumn);
