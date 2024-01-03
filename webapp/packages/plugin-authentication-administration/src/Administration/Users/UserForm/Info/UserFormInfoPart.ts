@@ -43,6 +43,16 @@ export class UserFormInfoPart extends FormPart<IUserFormInfoState, IUserFormStat
 
   protected format(data: IFormState<IUserFormState>, contexts: IExecutionContextProvider<IFormState<IUserFormState>>): void | Promise<void> {
     this.state.password = this.state.password.trim();
+    this.state.userId = this.state.userId.trim();
+    const metaParameters = this.state.metaParameters;
+
+    for (const key in metaParameters) {
+      const value = metaParameters[key];
+
+      if (typeof value === 'string') {
+        metaParameters[key] = value.trim();
+      }
+    }
   }
 
   isOutdated(): boolean {
@@ -83,7 +93,7 @@ export class UserFormInfoPart extends FormPart<IUserFormInfoState, IUserFormStat
   protected override async saveChanges(): Promise<void> {
     if (this.formState.mode === FormMode.Create) {
       const user = await this.usersResource.create({
-        userId: this.state.userId.trim(),
+        userId: this.state.userId,
         authRole: getTransformedAuthRole(this.state.authRole),
       });
       this.initialState.userId = user.userId;
@@ -110,7 +120,7 @@ export class UserFormInfoPart extends FormPart<IUserFormInfoState, IUserFormStat
     const validation = contexts.getContext(formValidationContext);
 
     if (data.mode === FormMode.Create) {
-      if (!this.state.userId.trim()) {
+      if (!this.state.userId) {
         validation.error('authentication_user_login_not_set');
       }
 
@@ -200,14 +210,6 @@ export class UserFormInfoPart extends FormPart<IUserFormInfoState, IUserFormStat
 
       if (user && isObjectsEqual(user.metaParameters, metaParameters)) {
         return;
-      }
-    }
-
-    for (const key in metaParameters) {
-      const value = metaParameters[key];
-
-      if (typeof value === 'string') {
-        metaParameters[key] = value.trim();
       }
     }
 
