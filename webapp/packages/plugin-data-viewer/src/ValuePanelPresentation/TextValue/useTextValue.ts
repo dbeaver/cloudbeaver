@@ -5,6 +5,8 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
+import { isNotNullDefined } from '@cloudbeaver/core-utils';
+
 import { isResultSetBinaryFileValue } from '../../DatabaseDataModel/Actions/ResultSet/isResultSetBinaryFileValue';
 import { ResultSetEditAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetEditAction';
 import { ResultSetFormatAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetFormatAction';
@@ -25,10 +27,13 @@ export function useTextValue({ model, resultIndex, currentContentType }: IUseTex
   const selection = model.source.getAction(resultIndex, ResultSetSelectAction);
   const focusCell = selection.getFocusedElement();
   const firstSelectedCell = selection.elements?.[0] ?? focusCell;
-  const autoFormat = !!firstSelectedCell && !editor.isElementEdited(firstSelectedCell);
   const formatter = useAutoFormat();
 
-  if (!autoFormat) {
+  if (!isNotNullDefined(firstSelectedCell)) {
+    return '';
+  }
+
+  if (editor.isElementEdited(firstSelectedCell)) {
     return format.getText(firstSelectedCell);
   }
 
