@@ -123,8 +123,8 @@ export const DataGridTable = observer<IDataPresentationProps<any, IDatabaseResul
     },
   });
 
-  const tableData = useTableData(model, resultIndex, dataGridDivRef);
-  const gridSelectionContext = useGridSelectionContext(tableData, selectionAction);
+  const [tableData, tableState] = useTableData(model, resultIndex, dataGridDivRef);
+  const gridSelectionContext = useGridSelectionContext(tableData, tableState, selectionAction);
 
   function restoreFocus() {
     const gridDiv = gridContainerRef.current;
@@ -415,7 +415,7 @@ export const DataGridTable = observer<IDataPresentationProps<any, IDatabaseResul
     [model, actions, resultIndex, simple, editorRef, dataGridRef, gridContainerRef, restoreFocus],
   );
 
-  if (!tableData.columns.length) {
+  if (!tableState.columns.length) {
     return <TextPlaceholder>{translate('data_grid_table_empty_placeholder')}</TextPlaceholder>;
   }
 
@@ -435,7 +435,7 @@ export const DataGridTable = observer<IDataPresentationProps<any, IDatabaseResul
               <DataGrid
                 ref={dataGridRef}
                 className={`cb-react-grid-theme ${className}`}
-                columns={tableData.columns}
+                columns={tableState.columns}
                 defaultColumnOptions={{
                   minWidth: 80,
                   resizable: true,

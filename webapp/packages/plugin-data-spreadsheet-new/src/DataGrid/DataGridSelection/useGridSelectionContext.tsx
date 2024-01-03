@@ -17,7 +17,7 @@ import {
   ResultSetSelectAction,
 } from '@cloudbeaver/plugin-data-viewer';
 
-import type { ITableData } from '../TableDataContext';
+import type { ITableData, ITableState } from '../TableDataContext';
 import type { IDraggingPosition } from '../useGridDragging';
 import type { IDataGridSelectionContext } from './DataGridSelectionContext';
 
@@ -27,8 +27,12 @@ interface IGridSelectionState {
   lastSelectedCell: IDraggingPosition | null;
 }
 
-export function useGridSelectionContext(tableData: ITableData, selectionAction: ResultSetSelectAction): IDataGridSelectionContext {
-  const props = useObjectRef({ tableData, selectionAction });
+export function useGridSelectionContext(
+  tableData: ITableData,
+  tableState: ITableState,
+  selectionAction: ResultSetSelectAction,
+): IDataGridSelectionContext {
+  const props = useObjectRef({ tableData, tableState, selectionAction });
 
   const [state] = useState<IGridSelectionState>(() =>
     observable({
@@ -81,7 +85,7 @@ export function useGridSelectionContext(tableData: ITableData, selectionAction: 
       const rowSelection = columns;
 
       if (columns.length === 0) {
-        for (const column of props.tableData.columns) {
+        for (const column of props.tableState.columns) {
           if (column.columnDataIndex !== null) {
             rowSelection.push(column.columnDataIndex);
           }

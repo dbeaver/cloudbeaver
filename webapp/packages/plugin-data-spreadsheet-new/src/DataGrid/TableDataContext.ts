@@ -36,6 +36,10 @@ interface IColumnMetrics {
   right: number;
 }
 
+export interface ITableState {
+  columns: Array<Column<IResultSetRowKey, any>>;
+}
+
 export interface ITableData {
   format: ResultSetFormatAction;
   dataContent: ResultSetDataContentAction;
@@ -43,7 +47,6 @@ export interface ITableData {
   editor: ResultSetEditAction;
   view: ResultSetViewAction;
   constraints: ResultSetConstraintAction;
-  columns: Array<Column<IResultSetRowKey, any>>;
   columnKeys: IResultSetColumnKey[];
   rows: IResultSetRowKey[];
   gridDiv: HTMLDivElement | null;

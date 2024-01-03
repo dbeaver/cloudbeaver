@@ -15,7 +15,6 @@ import { DatabaseEditChangeType } from '../IDatabaseDataEditAction';
 import type { IDatabaseDataFormatAction } from '../IDatabaseDataFormatAction';
 import type { IResultSetComplexValue } from './IResultSetComplexValue';
 import type { IResultSetElementKey, IResultSetPartialKey } from './IResultSetDataKey';
-import { isResultSetBlobValue } from './isResultSetBlobValue';
 import { isResultSetComplexValue } from './isResultSetComplexValue';
 import { isResultSetContentValue } from './isResultSetContentValue';
 import { isResultSetFileValue } from './isResultSetFileValue';
@@ -107,13 +106,12 @@ export class ResultSetFormatAction
     return this.view.columns.map(column => column.name!).filter(name => name !== undefined);
   }
 
-  getLongestCells(offset = 0, count?: number): string[] {
+  getLongestCells(startColumn = 0, endColumn = this.view.columnKeys.length): string[] {
     const cells: string[] = [];
-    const columnsCount = this.view.columnKeys.length;
-    count ??= this.view.rowKeys.length;
+    const rowsAmount = this.view.rows.length;
 
-    for (let rowIndex = offset; rowIndex < offset + count; rowIndex++) {
-      for (let columnIndex = 0; columnIndex < columnsCount; columnIndex++) {
+    for (let rowIndex = 0; rowIndex < rowsAmount; rowIndex++) {
+      for (let columnIndex = startColumn; columnIndex < endColumn; columnIndex++) {
         const key = { row: this.view.rowKeys[rowIndex], column: this.view.columnKeys[columnIndex] };
         const displayString = this.getDisplayString(key);
         const current = cells[columnIndex] ?? '';
