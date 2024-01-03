@@ -30,7 +30,7 @@
         "request": "launch",
         "mainClass": "org.eclipse.equinox.launcher.Main",
         "classPaths": [
-          "${workspaceFolder}/../eclipse/eclipse/plugins/org.eclipse.equinox.launcher_1.6.500.v20230717-2134.jar"
+          "${workspaceFolder}/../eclipse/eclipse/plugins/org.eclipse.equinox.launcher_1.6.600.v20231106-1826.jar"
         ],
         "args": [
           "-product",
@@ -65,7 +65,7 @@
         "request": "launch",
         "mainClass": "org.eclipse.equinox.launcher.Main",
         "classPaths": [
-          "${workspaceFolder}/../eclipse/Eclipse.app/Contents/Eclipse/plugins/org.eclipse.equinox.launcher_1.6.500.v20230717-2134.jar"
+          "${workspaceFolder}/../eclipse/Eclipse.app/Contents/Eclipse/plugins/org.eclipse.equinox.launcher_1.6.600.v20231106-1826.jar"
         ],
         "args": [
           "-product",
