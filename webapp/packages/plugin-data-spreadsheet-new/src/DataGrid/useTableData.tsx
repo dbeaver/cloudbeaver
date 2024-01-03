@@ -65,7 +65,7 @@ export function useTableData(
   const dataContent = model.source.getAction(resultIndex, ResultSetDataContentAction);
   const constraints = model.source.getAction(resultIndex, ResultSetConstraintAction);
   const columnsRef = useRef<Column<IResultSetRowKey, any>[]>([]);
-  const timers = useRef<(NodeJS.Timeout | null)[]>([]);
+  const timers = useRef<(NodeJS.Timeout | undefined)[]>([]);
 
   const scheduleColumnsUpdate = (currentChunk = 0) => {
     const totalChunksAmount = Math.ceil(format.getHeaders().length / COLUMNS_PER_CHUNK);
@@ -73,13 +73,6 @@ export function useTableData(
     const start = currentChunk * COLUMNS_PER_CHUNK;
     const end = Math.min(COLUMNS_PER_CHUNK + start, columnNames.length);
     const rowStrings = format.getLongestCells(start, end);
-
-    const prevTimer = timers.current?.[currentChunk - 1];
-
-    if (prevTimer) {
-      clearTimeout(prevTimer);
-      timers.current[currentChunk - 1] = null;
-    }
 
     const { columnsWidth, cellsWidth } = getWidths(rowStrings);
 
@@ -90,7 +83,7 @@ export function useTableData(
 
       return {
         ...column,
-        width: Math.min(MIN_COLUMN_WIDTH, Math.max(columnsWidth[index], cellsWidth[index] ?? 0));,
+        width: Math.min(MIN_COLUMN_WIDTH, Math.max(columnsWidth[index], cellsWidth[index] ?? 0)),
       };
     });
 
@@ -98,7 +91,14 @@ export function useTableData(
     setColumns(newColumns);
 
     if (currentChunk < totalChunksAmount - 1) {
-      setTimeout(() => scheduleColumnsUpdate(currentChunk + 1), 0);
+      timers.current[currentChunk] = setTimeout(() => {
+        scheduleColumnsUpdate(currentChunk + 1);
+
+        if (timers.current[currentChunk]) {
+          clearTimeout(timers.current[currentChunk]);
+          timers.current[currentChunk] = undefined;
+        }
+      }, 0);
     }
   };
 
@@ -153,7 +153,7 @@ export function useTableData(
 
         if (timers.current[0]) {
           clearTimeout(timers.current[0]);
-          timers.current[0] = null;
+          timers.current[0] = undefined;
         }
       }, 1);
     }
@@ -276,7 +276,10 @@ export function useTableData(
 
   const [columns, setColumns] = useState<Column<IResultSetRowKey, any>[]>(getColumns());
 
-  return [ref, {
-    columns
-  }];
+  return [
+    ref,
+    {
+      columns,
+    },
+  ];
 }
