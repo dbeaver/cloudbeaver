@@ -41,6 +41,10 @@ export class UserFormInfoPart extends FormPart<IUserFormInfoState, IUserFormStat
     this.baseIncludes = ['includeMetaParameters'];
   }
 
+  protected format(data: IFormState<IUserFormState>, contexts: IExecutionContextProvider<IFormState<IUserFormState>>): void | Promise<void> {
+    this.state.password = this.state.password.trim();
+  }
+
   isOutdated(): boolean {
     if (this.formState.mode === FormMode.Edit && this.initialState.userId) {
       return this.usersResource.isOutdated(this.initialState.userId, this.baseIncludes);
@@ -76,16 +80,12 @@ export class UserFormInfoPart extends FormPart<IUserFormInfoState, IUserFormStat
     );
   }
 
-  private async createUser(): Promise<AdminUserInfoFragment> {
-    return this.usersResource.create({
-      userId: this.state.userId.trim(),
-      authRole: getTransformedAuthRole(this.state.authRole),
-    });
-  }
-
   protected override async saveChanges(): Promise<void> {
     if (this.formState.mode === FormMode.Create) {
-      const user = await this.createUser();
+      const user = await this.usersResource.create({
+        userId: this.state.userId.trim(),
+        authRole: getTransformedAuthRole(this.state.authRole),
+      });
       this.initialState.userId = user.userId;
       this.formState.setMode(FormMode.Edit);
     }
@@ -136,7 +136,7 @@ export class UserFormInfoPart extends FormPart<IUserFormInfoState, IUserFormStat
   }
 
   private async updateCredentials() {
-    const password = this.state.password.trim();
+    const password = this.state.password;
 
     if (password) {
       await this.usersResource.updateCredentials(this.state.userId, {
