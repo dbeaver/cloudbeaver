@@ -78,7 +78,9 @@ export const ValuePanel: DataPresentationComponent<any, IDatabaseResultSet> = ob
   const displayed = service.getDisplayed({ dataFormat, model, resultIndex });
   let currentTabId = state.currentTabId;
 
-  if (displayed.length > 0 && (!currentTabId || !displayed.some(tab => tab.key === currentTabId))) {
+  const hasCurrentTabCells = currentTabId && displayed.some(tab => tab.key === currentTabId);
+
+  if (displayed.length > 0 && !hasCurrentTabCells) {
     currentTabId = displayed[0].key;
   }
 
