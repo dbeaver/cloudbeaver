@@ -215,9 +215,8 @@ public class WebServiceDataTransfer implements DBWServiceDataTransfer {
                 super.fetchRow(session, resultSet);
                 if (fileSizeLimit != null && getBytesWritten() > fileSizeLimit.longValue()) {
                     throw new DBQuotaException(
-                        "Please increase the resourceQuotas parameters " +
-                        "if you need in the runtime conf file located at /workspace/.data. \n" +
-                        "Data export quota exceeded", QUOTA_PROP_FILE_LIMIT, fileSizeLimit.longValue(), getBytesWritten());
+                        "Data export quota exceeded", QUOTA_PROP_FILE_LIMIT, fileSizeLimit.longValue(), getBytesWritten() +
+                        "\n Please increase the resourceQuotas parameters in configuration");
                 }
             }
         };
