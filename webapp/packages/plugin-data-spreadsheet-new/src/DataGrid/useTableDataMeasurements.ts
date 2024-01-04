@@ -24,6 +24,8 @@ const COLUMN_HEADER_TEXT_PADDING = 8;
 const COLUMN_HEADER_ORDER_PADDING = 8;
 const COLUMN_HEADER_ORDER_WIDTH = 16;
 
+const COLUMN_HEADER_MAX_WIDTH = 300;
+
 const FONT = '400 12px Roboto';
 
 interface ITableDataMeasurements {
@@ -40,7 +42,7 @@ export function useTableDataMeasurements(model: IDatabaseDataModel<any, IDatabas
     () => ({
       cache: observable.map(),
       getColumnWidth(key: IResultSetColumnKey): number {
-        return this.cache.get(ResultSetDataKeysUtils.serialize(key)) ?? 300;
+        return this.cache.get(ResultSetDataKeysUtils.serialize(key)) ?? COLUMN_HEADER_MAX_WIDTH;
       },
       scheduleUpdate(key: IResultSetColumnKey) {
         if (this.cache.has(ResultSetDataKeysUtils.serialize(key))) {
@@ -67,7 +69,7 @@ export function useTableDataMeasurements(model: IDatabaseDataModel<any, IDatabas
           text: rowStrings,
         }).map(width => width + COLUMN_PADDING);
 
-        const width = Math.min(300, Math.max(columnsWidth[0], cellsWidth[0] ?? 0));
+        const width = Math.min(COLUMN_HEADER_MAX_WIDTH, Math.max(columnsWidth[0], cellsWidth[0] ?? 0));
 
         this.cache.set(serializedKey, width);
       },

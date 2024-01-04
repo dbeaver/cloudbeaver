@@ -69,7 +69,7 @@ export const TableColumnHeader = observer<RenderHeaderCellProps<any>>(function T
     if (calculatedColumn.columnDataIndex) {
       calculatedColumn.onRenderHeader?.(calculatedColumn.columnDataIndex);
     }
-  }, [calculatedColumn, calculatedColumn.columnDataIndex]);
+  }, [calculatedColumn]);
 
   return (
     <div ref={dnd.setRef} data-s-rearrange={dnd.side} className={s(styles, { header: true, dragging: dnd.data.state.isDragging })}>
