@@ -40,15 +40,12 @@ export class GISViewerBootstrap extends Bootstrap {
         const selection = context.model.source.getAction(context.resultIndex, ResultSetSelectAction);
         const gis = context.model.source.getAction(context.resultIndex, ResultSetGISAction);
 
-        const focusedElement = selection.getFocusedElement();
+        const activeElements = selection.getActiveElements();
 
-        if (selection.elements.length === 0) {
-          if (!focusedElement) {
-            return true;
-          }
-          return !gis.isGISFormat(focusedElement);
+        if (activeElements.length === 0) {
+          return true;
         } else {
-          return !gis.isGISFormat(selection.elements[0]);
+          return !gis.isGISFormat(activeElements[0]);
         }
       },
     });

@@ -25,8 +25,8 @@ export function useTextValue({ model, resultIndex, currentContentType }: IUseTex
   const format = model.source.getAction(resultIndex, ResultSetFormatAction);
   const editor = model.source.getAction(resultIndex, ResultSetEditAction);
   const selection = model.source.getAction(resultIndex, ResultSetSelectAction);
-  const focusCell = selection.getFocusedElement();
-  const firstSelectedCell = selection.elements?.[0] ?? focusCell;
+  const activeElements = selection.getActiveElements();
+  const firstSelectedCell = activeElements?.[0];
   const formatter = useAutoFormat();
 
   if (!isNotNullDefined(firstSelectedCell)) {

@@ -8,7 +8,10 @@
 import type { IDatabaseDataAction } from '../IDatabaseDataAction';
 import type { IDatabaseDataResult } from '../IDatabaseDataResult';
 
-export interface IDatabaseDataResultAction<TKey, TResult extends IDatabaseDataResult> extends IDatabaseDataAction<any, TResult> {
-  getIdentifier(key: TKey): string;
-  serialize(key: TKey): string;
+export interface IDatabaseDataMetadataAction<TKey, TResult extends IDatabaseDataResult> extends IDatabaseDataAction<any, TResult> {
+  get<T>(key: string): T | undefined;
+  get<T>(key: string, getDefaultValue: () => T): T;
+  set(key: string, value: any): void;
+  delete(key: string): void;
+  has(key: string): boolean;
 }

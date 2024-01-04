@@ -19,12 +19,12 @@ export function isBlobPresentationAvailable(context: IDataValuePanelProps<any, I
 
   const selection = context.model.source.getAction(context.resultIndex, ResultSetSelectAction);
 
-  const focusedElement = selection.getFocusedElement();
+  const activeElements = selection.getActiveElements();
 
-  if (selection.elements.length > 0 || focusedElement) {
+  if (activeElements.length > 0) {
     const view = context.model.source.getAction(context.resultIndex, ResultSetViewAction);
 
-    const firstSelectedCell = selection.elements[0] || focusedElement;
+    const firstSelectedCell = activeElements[0];
 
     const cellValue = view.getCellValue(firstSelectedCell);
 

@@ -47,6 +47,8 @@ export class ExceptionsCatcherService extends Bootstrap {
       });
     }
 
+    console.error(_error);
+
     if (this.baseCatcher) {
       return this.baseCatcher(event, source, lineno, colno, _error);
     }
