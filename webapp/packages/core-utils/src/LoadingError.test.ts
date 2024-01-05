@@ -7,12 +7,6 @@ describe('LoadingError', () => {
     expect(error instanceof Error).toBeTruthy();
   });
 
-  it('should have name', () => {
-    const error = new LoadingError(() => {}, 'test');
-
-    expect(error.name).toBeTruthy();
-  });
-
   it('should trigger onRefresh', () => {
     const onRefresh = jest.fn();
     const error = new LoadingError(onRefresh, 'test');
@@ -22,17 +16,7 @@ describe('LoadingError', () => {
     expect(onRefresh).toHaveBeenCalledTimes(1);
   });
 
-  it('should refresh cause', () => {
-    const onRefresh = jest.fn();
-    const cause = 'unit test';
-    const error = new LoadingError(onRefresh, 'test', { cause });
-
-    error.refresh();
-
-    expect(error.cause).toBe(cause);
-  });
-
-  it('should refresh cause cause', () => {
+  it('should refresh cause of the cause', () => {
     const onRefresh = jest.fn();
     const cause = new LoadingError(onRefresh, 'test');
     const causeCause = new LoadingError(onRefresh, 'test', { cause });

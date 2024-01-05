@@ -8,12 +8,11 @@
 
 type ThrottleAsync<TResult, TArguments extends any[]> = (...args: TArguments) => Promise<TResult>;
 
-export function throttle<T extends (...args: any[]) => void | Promise<void>>(f: T, delay: number, tail = true): T {
+export function throttle<T extends (...args: any[]) => void>(f: T, delay: number, tail = true): T {
   let throttle = false;
   let pending = false;
   let functionArgs: any[] = [];
   let thisObject: any;
-  let result: any;
 
   return function exec(this: any, ...args: any[]) {
     if (throttle) {
@@ -29,21 +28,21 @@ export function throttle<T extends (...args: any[]) => void | Promise<void>>(f: 
     throttle = true;
 
     try {
-      result = f.apply(this, args);
+      f.apply(this, args);
     } finally {
       setTimeout(() => {
         throttle = false;
 
         if (pending) {
-          f.apply(thisObject, functionArgs);
+          try {
+            f.apply(thisObject, functionArgs);
+          } catch {}
           thisObject = null;
           functionArgs = [];
           pending = false;
         }
       }, delay);
     }
-
-    return result;
   } as T;
 }
 

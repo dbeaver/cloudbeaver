@@ -1,8 +1,10 @@
 import { copyToClipboard } from './copyToClipboard';
 
-document.execCommand = jest.fn();
-
 describe('copyToClipboard', () => {
+  beforeAll(() => {
+    document.execCommand = jest.fn();
+  });
+
   it('should copy data to clipboard', () => {
     copyToClipboard('test');
 
