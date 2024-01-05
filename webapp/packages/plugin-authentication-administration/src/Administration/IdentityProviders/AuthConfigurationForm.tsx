@@ -79,30 +79,28 @@ export const AuthConfigurationForm = observer<Props>(function AuthConfigurationF
   }, []);
 
   return (
-    <Form context={form}>
+    <Form context={form} className={s(styles, { box: true }, className)}>
       <TabsState actions={actions} container={service.tabsContainer} state={state} onCancel={onCancel}>
-        <div className={s(styles, { box: true }, className)}>
-          <div className={s(styles, { topBar: true })}>
-            <div className={s(styles, { topBarTabs: true })}>
-              <div className={s(styles, { statusMessage: true })}>
-                {state.statusMessage && (
-                  <>
-                    <IconOrImage className={s(styles, { iconOrImage: true })} icon="/icons/info_icon.svg" />
-                    {translate(state.statusMessage)}
-                  </>
-                )}
-              </div>
-              <TabList style={tabsInnerStyles} disabled={false} />
+        <div className={s(styles, { topBar: true })}>
+          <div className={s(styles, { topBarTabs: true })}>
+            <div className={s(styles, { statusMessage: true })}>
+              {state.statusMessage && (
+                <>
+                  <IconOrImage className={s(styles, { iconOrImage: true })} icon="/icons/info_icon.svg" />
+                  {translate(state.statusMessage)}
+                </>
+              )}
             </div>
-            <div className={s(styles, { topBarActions: true })}>
-              <Loader suspense inline hideMessage hideException>
-                <Placeholder actions={actions} container={service.actionsContainer} state={state} onCancel={onCancel} />
-              </Loader>
-            </div>
+            <TabList style={tabsInnerStyles} disabled={false} />
           </div>
-          <div className={s(styles, { contentBox: true })}>
-            <TabPanelList style={tabsInnerStyles} />
+          <div className={s(styles, { topBarActions: true })}>
+            <Loader suspense inline hideMessage hideException>
+              <Placeholder actions={actions} container={service.actionsContainer} state={state} onCancel={onCancel} />
+            </Loader>
           </div>
+        </div>
+        <div className={s(styles, { contentBox: true })}>
+          <TabPanelList style={tabsInnerStyles} />
         </div>
       </TabsState>
     </Form>
