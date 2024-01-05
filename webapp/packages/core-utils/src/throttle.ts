@@ -13,6 +13,7 @@ export function throttle<T extends (...args: any[]) => void | Promise<void>>(f: 
   let pending = false;
   let functionArgs: any[] = [];
   let thisObject: any;
+  let result: any;
 
   return function exec(this: any, ...args: any[]) {
     if (throttle) {
@@ -28,7 +29,7 @@ export function throttle<T extends (...args: any[]) => void | Promise<void>>(f: 
     throttle = true;
 
     try {
-      f.apply(this, args);
+      result = f.apply(this, args);
     } finally {
       setTimeout(() => {
         throttle = false;
@@ -41,6 +42,8 @@ export function throttle<T extends (...args: any[]) => void | Promise<void>>(f: 
         }
       }, delay);
     }
+
+    return result;
   } as T;
 }
 
