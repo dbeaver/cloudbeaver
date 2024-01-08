@@ -1,0 +1,16 @@
+.staticImage {
+  display: flex;
+  width: 24px;
+}
+
+.staticImage:not(:last-child) {
+  margin-right: 16px;
+}
+
+.expand {
+  cursor: pointer;
+}
+
+.gap {
+  gap: 16px;
+}

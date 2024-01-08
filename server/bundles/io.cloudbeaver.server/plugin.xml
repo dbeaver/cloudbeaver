@@ -6,14 +6,6 @@
     <extension-point id="io.cloudbeaver.driver" name="Web drivers" schema="schema/io.cloudbeaver.driver.exsd"/>
     <extension-point id="io.cloudbeaver.handler" name="Web handlers" schema="schema/io.cloudbeaver.handler.exsd"/>
 
-    <extension point="org.eclipse.core.runtime.adapters">
-        <factory adaptableType="org.jkiss.dbeaver.runtime.DBWorkbench" class="io.cloudbeaver.server.WebPlatformAdapterFactory">
-            <adapter type="org.jkiss.dbeaver.model.app.DBPPlatform"/>
-            <adapter type="org.jkiss.dbeaver.runtime.ui.DBPPlatformUI"/>
-        </factory>
-    </extension>
-
-
     <!-- Needed to instantiate connections thru navigator model -->
     <extension point="org.jkiss.dbeaver.service">
         <service name="org.jkiss.dbeaver.runtime.DBServiceConnections" class="io.cloudbeaver.server.WebServiceConnectionsImpl"/>

@@ -19,8 +19,10 @@ package io.cloudbeaver.service.security.internal;
 
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
+import org.jkiss.dbeaver.model.auth.SMAuthStatus;
 import org.jkiss.dbeaver.model.auth.SMSessionType;
 
+import java.time.LocalDateTime;
 import java.util.Map;
 
 public class AuthAttemptSessionInfo {
@@ -72,4 +74,5 @@ public class AuthAttemptSessionInfo {
     public boolean isMainAuth() {
         return mainAuth;
     }
+
 }

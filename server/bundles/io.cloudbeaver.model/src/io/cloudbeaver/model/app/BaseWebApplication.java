@@ -35,6 +35,7 @@ import org.jkiss.dbeaver.model.DBFileController;
 import org.jkiss.dbeaver.model.app.DBPPlatform;
 import org.jkiss.dbeaver.model.app.DBPWorkspace;
 import org.jkiss.dbeaver.model.auth.SMCredentialsProvider;
+import org.jkiss.dbeaver.model.auth.SMSessionContext;
 import org.jkiss.dbeaver.model.data.json.JSONUtils;
 import org.jkiss.dbeaver.model.impl.app.ApplicationRegistry;
 import org.jkiss.dbeaver.model.rm.RMController;
@@ -199,11 +200,14 @@ public abstract class BaseWebApplication extends BaseApplicationImpl implements 
      * Advanced apps may implement it differently.
      */
     @Override
-    public DBSSecretController getSecretController(@NotNull SMCredentialsProvider credentialsProvider)  throws DBException {
+    public DBSSecretController getSecretController(
+        @NotNull SMCredentialsProvider credentialsProvider,
+        SMSessionContext smSessionContext
+    ) throws DBException {
         return VoidSecretController.INSTANCE;
     }
 
-    protected Map<String, Object> getServerConfigProps(Map<String, Object> configProps) {
+    protected static Map<String, Object> getServerConfigProps(Map<String, Object> configProps) {
         return JSONUtils.getObject(configProps, "server");
     }
 
@@ -231,6 +235,7 @@ public abstract class BaseWebApplication extends BaseApplicationImpl implements 
 
     @Override
     public Object start(IApplicationContext context) {
+        initializeApplicationServices();
         try {
             startServer();
         } catch (Exception e) {
@@ -271,4 +276,8 @@ public abstract class BaseWebApplication extends BaseApplicationImpl implements 
 
     protected abstract GsonBuilder getGsonBuilder();
 
+    @Override
+    public boolean isEnvironmentVariablesAccessible() {
+        return false;
+    }
 }

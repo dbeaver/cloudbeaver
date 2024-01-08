@@ -6,4 +6,4 @@
  * you may not use this file except in compliance with the License.
  */
 
-export const RESOURCE_NAME_REGEX = /^(?!\.)[\p{L}\w\-$.\s()@]+$/u;
+export const RESOURCE_NAME_REGEX = /^(?!\.)[^\\/:\\"]+$/u;

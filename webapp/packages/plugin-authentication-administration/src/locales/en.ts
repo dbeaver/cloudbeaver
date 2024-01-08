@@ -100,7 +100,7 @@ export default [
 
   ['administration_teams_tab_title', 'Teams'],
   ['administration_teams_tab_description', 'Team management'],
-  ['administration_teams_team_creation', 'Team creation'],
+  ['administration_teams_team_creation', 'Team Creation'],
   ['administration_teams_team_id', 'Team ID'],
   ['administration_teams_team_name', 'Team name'],
   ['administration_teams_team_description', 'Description'],

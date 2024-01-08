@@ -19,13 +19,13 @@ export interface ISegmentExecutionData {
 }
 
 export interface ICursor {
-  begin: number;
-  end: number;
+  readonly begin: number;
+  readonly end: number;
 }
 
 export interface ISQLEditorData {
   readonly cursor: ICursor;
-  readonly activeSegmentMode: ISQLEditorMode;
+  activeSegmentMode: ISQLEditorMode;
   readonly parser: SQLParser;
   readonly dialect: SqlDialectInfo | undefined;
   readonly activeSegment: ISQLScriptSegment | undefined;
@@ -48,7 +48,7 @@ export interface ISQLEditorData {
   readonly hintsLimitIsMet: boolean;
 
   updateParserScriptsThrottle(): Promise<void>;
-  setQuery(query: string): void;
+  setScript(query: string): void;
   init(): void;
   destruct(): void;
   setCursor(begin: number, end?: number): void;
@@ -66,4 +66,5 @@ export interface ISQLEditorData {
     passEmpty?: boolean,
     passDisabled?: boolean,
   ): Promise<T | undefined>;
+  setModeId(tabId: string): void;
 }

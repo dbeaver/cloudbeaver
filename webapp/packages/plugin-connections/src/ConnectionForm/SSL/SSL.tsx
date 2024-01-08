@@ -61,7 +61,14 @@ export const SSL: TabContainerPanelComponent<Props> = observer(function SSL({ st
     <Form>
       <ColoredContainer parent>
         <Group gap form large vertical>
-          <Switch name="enabled" state={handlerState} description={handler.description} mod={['primary']} disabled={disabled || readonly}>
+          <Switch
+            id="ssl-enable-switch"
+            name="enabled"
+            state={handlerState}
+            description={handler.description}
+            mod={['primary']}
+            disabled={disabled || readonly}
+          >
             {translate('connections_public_connection_ssl_enable')}
           </Switch>
           {isUncategorizedExists && (
@@ -97,7 +104,7 @@ export const SSL: TabContainerPanelComponent<Props> = observer(function SSL({ st
 
           {credentialsSavingEnabled && !formState.config.template && (
             <FieldCheckbox
-              id={handler.id + ' savePassword'}
+              id={handler.id + '_savePassword'}
               name="savePassword"
               state={handlerState}
               disabled={disabled || !enabled || readonly || formState.config.sharedCredentials}

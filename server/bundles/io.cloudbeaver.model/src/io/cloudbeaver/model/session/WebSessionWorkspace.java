@@ -22,7 +22,6 @@ import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.model.app.DBPPlatform;
 import org.jkiss.dbeaver.model.app.DBPProject;
 import org.jkiss.dbeaver.model.app.DBPWorkspace;
-import org.jkiss.dbeaver.model.auth.SMSessionContext;
 import org.jkiss.dbeaver.model.impl.auth.SessionContextImpl;
 import org.jkiss.dbeaver.model.rm.RMUtils;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
@@ -103,7 +102,7 @@ public class WebSessionWorkspace implements DBPWorkspace {
 
     @Nullable
     @Override
-    public WebProjectImpl getProjectById(String projectId) {
+    public WebProjectImpl getProjectById(@NotNull String projectId) {
         if (projectId == null) {
             return activeProject;
         }
@@ -117,19 +116,13 @@ public class WebSessionWorkspace implements DBPWorkspace {
 
     @NotNull
     @Override
-    public SMSessionContext getAuthContext() {
+    public SessionContextImpl getAuthContext() {
         return workspaceAuthContext;
     }
 
     @Override
     public void dispose() {
-        clearAuthData();
-
         clearProjects();
-    }
-
-    void clearAuthData() {
-        workspaceAuthContext.close();
     }
 
     public void setActiveProject(DBPProject activeProject) {

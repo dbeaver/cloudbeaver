@@ -21,7 +21,7 @@
   &.small {
     min-width: 404px;
     min-height: 262px;
-    max-height: max(100vh - 48px, 262px);
+    max-height: max(var(--app-height) - 48px, 262px);
 
     &.fixedSize {
       width: 404px;
@@ -34,7 +34,7 @@
   &.medium {
     min-width: 576px;
     min-height: 374px;
-    max-height: max(100vh - 48px, 374px);
+    max-height: max(var(--app-height) - 48px, 374px);
 
     &.fixedSize {
       width: 576px;
@@ -47,7 +47,7 @@
   &.large {
     min-width: 720px;
     min-height: 468px;
-    max-height: max(100vh - 48px, 468px);
+    max-height: max(var(--app-height) - 48px, 468px);
 
     &.fixedSize {
       width: 720px;

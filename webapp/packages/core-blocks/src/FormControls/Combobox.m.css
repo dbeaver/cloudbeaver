@@ -125,3 +125,11 @@
     }
   }
 }
+
+.validationInput {
+  z-index: -1;
+  opacity: 0;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+}

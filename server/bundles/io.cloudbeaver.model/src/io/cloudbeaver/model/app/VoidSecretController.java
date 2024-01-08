@@ -19,12 +19,15 @@ package io.cloudbeaver.model.app;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
+import org.jkiss.dbeaver.model.auth.SMCredentialsProvider;
+import org.jkiss.dbeaver.model.auth.SMSessionContext;
 import org.jkiss.dbeaver.model.secret.DBSSecretController;
+import org.jkiss.dbeaver.model.secret.DBSSecretControllerAuthorized;
 
 /**
  * Void secret controller.
  */
-public class VoidSecretController implements DBSSecretController {
+public class VoidSecretController implements DBSSecretController, DBSSecretControllerAuthorized {
 
     public static final VoidSecretController INSTANCE = new VoidSecretController();
 
@@ -47,4 +50,11 @@ public class VoidSecretController implements DBSSecretController {
     public void flushChanges() {
     }
 
+    @Override
+    public void authorize(
+        @Nullable SMCredentialsProvider credentialsProvider,
+        @Nullable SMSessionContext smSessionContext
+    ) throws DBException {
+
+    }
 }

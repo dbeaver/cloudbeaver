@@ -8,7 +8,6 @@
 import { computed } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import { useCallback, useMemo, useState } from 'react';
-import styled from 'reshadow';
 
 import { Button } from '../Button';
 import ButtonStyles from '../Button.m.css';
@@ -19,11 +18,13 @@ import { useTranslate } from '../localization/useTranslate';
 import { SContext, StyleRegistry } from '../SContext';
 import { useObjectRef } from '../useObjectRef';
 import type { IProperty } from './IProperty';
+import PropertiesTableAddButtonStyles from './PropertiesTableAddButtonStyles.m.css';
 import PropertiesTableFilterStyles from './PropertiesTableFilterStyles.m.css';
 import PropertiesTableInputStyles from './PropertiesTableInputStyles.m.css';
-import PropertiesTableAddButtonStyles from './PropertiesTableAddButtonStyles.m.css';
 import { PropertyItem } from './PropertyItem';
-import { PROPERTIES_TABLE_STYLES } from './styles';
+import { useS } from '../useS';
+import styles from './PropertiesTable.m.css';
+import { s } from '../s';
 
 type PropertiesState = Record<string, string | null>;
 
@@ -67,6 +68,7 @@ export const PropertiesTable = observer<Props>(function PropertiesTable(props) {
   const { className, onAdd, readOnly, propertiesState } = props;
   const translate = useTranslate();
   const propsRef = useObjectRef({ ...props });
+  const style = useS(styles);
 
   const [filterValue, setFilterValue] = useState('');
 
@@ -146,31 +148,27 @@ export const PropertiesTable = observer<Props>(function PropertiesTable(props) {
 
   const isKeyUnique = useCallback((key: string) => propsRef.properties.filter(property => property.key === key).length === 1, []);
 
-  return styled(PROPERTIES_TABLE_STYLES)(
-    <properties className={className}>
-      <properties-header>
-        <properties-header-name>
+  return (
+    <div className={s(style, { properties: true }, className)}>
+      <div className={s(style, { propertiesHeader: true })}>
+        <div className={s(style, { propertiesHeaderName: true })}>
           <div>{translate('core_block_properties_table_name')}</div>
           {props.filterable ? (
             <SContext registry={registry}>
-              <Filter
-                value={filterValue}
-                placeholder={translate('core_block_properties_table_filter_name')}
-                onFilter={setFilterValue}
-              />
+              <Filter value={filterValue} placeholder={translate('core_block_properties_table_filter_name')} onChange={setFilterValue} />
             </SContext>
           ) : null}
-        </properties-header-name>
-        <properties-header-value>{translate('core_block_properties_table_value')}</properties-header-value>
-      </properties-header>
-      <properties-list>
+        </div>
+        <div className={s(style, { propertiesHeaderValue: true })}>{translate('core_block_properties_table_value')}</div>
+      </div>
+      <div className={s(style, { propertiesList: true })}>
         {onAdd && !readOnly && (
           <SContext registry={registry}>
-            <properties-header-add>
+            <div className={s(style, { propertiesHeaderAdd: true })}>
               <Button icon="add_sm" viewBox="0 0 18 18" type="button" onClick={() => onAdd()}>
                 {translate('core_block_properties_table_add')}
               </Button>
-            </properties-header-add>
+            </div>
           </SContext>
         )}
         {sortedProperties.get().map(property => (
@@ -185,8 +183,8 @@ export const PropertiesTable = observer<Props>(function PropertiesTable(props) {
             onRemove={removeProperty}
           />
         ))}
-        <properties-list-overflow />
-      </properties-list>
-    </properties>,
+        <div className={s(style, { propertiesListOverflow: true })} />
+      </div>
+    </div>
   );
 });

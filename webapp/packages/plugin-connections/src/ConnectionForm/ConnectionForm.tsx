@@ -9,7 +9,7 @@ import { observer } from 'mobx-react-lite';
 import { useEffect } from 'react';
 import styled, { css } from 'reshadow';
 
-import { ExceptionMessage, Loader, Placeholder, StatusMessage, useExecutor, useObjectRef, useStyles } from '@cloudbeaver/core-blocks';
+import { ExceptionMessage, Form, Loader, Placeholder, StatusMessage, useExecutor, useForm, useObjectRef, useStyles } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { ENotificationType } from '@cloudbeaver/core-events';
 import type { ConnectionConfig } from '@cloudbeaver/core-sdk';
@@ -18,6 +18,8 @@ import { BASE_TAB_STYLES, TabList, TabPanelList, TabsState, UNDERLINE_TAB_BIG_ST
 import { ConnectionFormService } from './ConnectionFormService';
 import { connectionConfigContext } from './Contexts/connectionConfigContext';
 import type { IConnectionFormState } from './IConnectionFormProps';
+import connectionFormStyles from './ConnectionForm.m.css';
+import { ConnectionFormActionsContext, IConnectionFormActionsContext } from './ConnectFormActionsContext';
 
 const tabsStyles = css`
   TabList {
@@ -106,6 +108,21 @@ export const ConnectionForm = observer<ConnectionFormProps>(function ConnectionF
   const style = [BASE_TAB_STYLES, tabsStyles, UNDERLINE_TAB_STYLES, UNDERLINE_TAB_BIG_STYLES];
   const styles = useStyles(style, topBarStyles, formStyles);
   const service = useService(ConnectionFormService);
+  
+  const form = useForm({
+    onSubmit: event => {
+      if (event?.type === 'test') {
+        state.test();
+      } else {
+        state.save();
+      }
+    },
+  });
+
+  const actionsContext = useObjectRef<IConnectionFormActionsContext>(() => ({
+    save: async () => form.submit(new SubmitEvent('submit')),
+    test: async () => form.submit(new SubmitEvent('test')),
+  }));
 
   useExecutor({
     executor: state.submittingTask,
@@ -139,25 +156,29 @@ export const ConnectionForm = observer<ConnectionFormProps>(function ConnectionF
   }
 
   return styled(styles)(
-    <TabsState container={service.tabsContainer} localState={state.partsState} state={state} onCancel={onCancel}>
-      <box className={className}>
-        <connection-top-bar>
-          <connection-top-bar-tabs>
-            <connection-status-message>
-              <StatusMessage type={ENotificationType.Info} message={state.statusMessage} />
-            </connection-status-message>
-            <TabList style={style} disabled={state.disabled} />
-          </connection-top-bar-tabs>
-          <connection-top-bar-actions>
-            <Loader suspense inline hideMessage hideException>
-              <Placeholder container={service.actionsContainer} state={state} onCancel={onCancel} />
-            </Loader>
-          </connection-top-bar-actions>
-        </connection-top-bar>
-        <content-box>
-          <TabPanelList style={style} />
-        </content-box>
-      </box>
-    </TabsState>,
+    <Form context={form} className={connectionFormStyles.form}>
+      <TabsState container={service.tabsContainer} localState={state.partsState} state={state} onCancel={onCancel}>
+        <box className={className}>
+          <connection-top-bar>
+            <connection-top-bar-tabs>
+              <connection-status-message>
+                <StatusMessage type={ENotificationType.Info} message={state.statusMessage} />
+              </connection-status-message>
+              <TabList style={style} disabled={state.disabled} />
+            </connection-top-bar-tabs>
+            <connection-top-bar-actions>
+              <Loader suspense inline hideMessage hideException>
+                <ConnectionFormActionsContext.Provider value={actionsContext}>
+                  <Placeholder container={service.actionsContainer} state={state} onCancel={onCancel} />
+                </ConnectionFormActionsContext.Provider>
+              </Loader>
+            </connection-top-bar-actions>
+          </connection-top-bar>
+          <content-box>
+            <TabPanelList style={style} />
+          </content-box>
+        </box>
+      </TabsState>
+    </Form>,
   );
 });

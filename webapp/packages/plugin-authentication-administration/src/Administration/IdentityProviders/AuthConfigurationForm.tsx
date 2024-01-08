@@ -7,83 +7,35 @@
  */
 import { observer } from 'mobx-react-lite';
 import { useEffect } from 'react';
-import styled, { css } from 'reshadow';
+import { css } from 'reshadow';
 
-import { IconOrImage, Loader, Placeholder, useExecutor, useObjectRef, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
+import {
+  Form,
+  IconOrImage,
+  Loader,
+  Placeholder,
+  s,
+  useExecutor,
+  useForm,
+  useObjectRef,
+  useS,
+  useStyles,
+  useTranslate,
+} from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import type { AdminAuthProviderConfiguration } from '@cloudbeaver/core-sdk';
 import { BASE_TAB_STYLES, TabList, TabPanelList, TabsState, UNDERLINE_TAB_BIG_STYLES, UNDERLINE_TAB_STYLES } from '@cloudbeaver/core-ui';
 
+import style from './AuthConfigurationForm.m.css';
 import { AuthConfigurationFormService } from './AuthConfigurationFormService';
 import { authConfigurationContext } from './Contexts/authConfigurationContext';
-import type { IAuthConfigurationFormState } from './IAuthConfigurationFormProps';
+import type { IAuthConfigurationFormActions, IAuthConfigurationFormState } from './IAuthConfigurationFormProps';
 
 const tabsStyles = css`
   TabList {
     position: relative;
     flex-shrink: 0;
     align-items: center;
-  }
-`;
-
-const topBarStyles = css`
-  configuration-top-bar {
-    composes: theme-border-color-background theme-background-secondary theme-text-on-secondary from global;
-    position: relative;
-    display: flex;
-    padding-top: 16px;
-
-    &:before {
-      content: '';
-      position: absolute;
-      bottom: 0;
-      width: 100%;
-      border-bottom: solid 2px;
-      border-color: inherit;
-    }
-  }
-  configuration-top-bar-tabs {
-    flex: 1;
-  }
-
-  configuration-top-bar-actions {
-    display: flex;
-    align-items: center;
-    padding: 0 24px;
-    gap: 16px;
-  }
-
-  configuration-status-message {
-    composes: theme-typography--caption from global;
-    height: 24px;
-    padding: 0 16px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-
-    & IconOrImage {
-      height: 24px;
-      width: 24px;
-    }
-  }
-`;
-
-const formStyles = css`
-  box {
-    composes: theme-background-secondary theme-text-on-secondary from global;
-    display: flex;
-    flex-direction: column;
-    flex: 1;
-    height: 100%;
-    overflow: auto;
-  }
-  content-box {
-    composes: theme-background-secondary theme-border-color-background from global;
-    position: relative;
-    display: flex;
-    flex: 1;
-    flex-direction: column;
-    overflow: auto;
   }
 `;
 
@@ -97,9 +49,15 @@ interface Props {
 export const AuthConfigurationForm = observer<Props>(function AuthConfigurationForm({ state, onCancel, onSave = () => {}, className }) {
   const translate = useTranslate();
   const props = useObjectRef({ onSave });
-  const style = useStyles(BASE_TAB_STYLES, tabsStyles, UNDERLINE_TAB_STYLES, UNDERLINE_TAB_BIG_STYLES);
-  const styles = useStyles(style, topBarStyles, formStyles);
+  const tabsInnerStyles = useStyles(BASE_TAB_STYLES, tabsStyles, UNDERLINE_TAB_STYLES, UNDERLINE_TAB_BIG_STYLES);
+  const styles = useS(style);
   const service = useService(AuthConfigurationFormService);
+  const form = useForm({
+    onSubmit: async () => {
+      await state.save();
+    },
+  });
+  const actions = useObjectRef<IAuthConfigurationFormActions>({ save: form.submit });
 
   useExecutor({
     executor: state.submittingTask,
@@ -120,31 +78,33 @@ export const AuthConfigurationForm = observer<Props>(function AuthConfigurationF
     state.loadConfigurationInfo();
   }, []);
 
-  return styled(styles)(
-    <TabsState container={service.tabsContainer} state={state} onCancel={onCancel}>
-      <box className={className}>
-        <configuration-top-bar>
-          <configuration-top-bar-tabs>
-            <configuration-status-message>
-              {state.statusMessage && (
-                <>
-                  <IconOrImage icon="/icons/info_icon.svg" />
-                  {translate(state.statusMessage)}
-                </>
-              )}
-            </configuration-status-message>
-            <TabList style={style} disabled={false} />
-          </configuration-top-bar-tabs>
-          <configuration-top-bar-actions>
-            <Loader suspense inline hideMessage hideException>
-              <Placeholder container={service.actionsContainer} state={state} onCancel={onCancel} />
-            </Loader>
-          </configuration-top-bar-actions>
-        </configuration-top-bar>
-        <content-box>
-          <TabPanelList style={style} />
-        </content-box>
-      </box>
-    </TabsState>,
+  return (
+    <Form context={form}>
+      <TabsState actions={actions} container={service.tabsContainer} state={state} onCancel={onCancel}>
+        <div className={s(styles, { box: true }, className)}>
+          <div className={s(styles, { topBar: true })}>
+            <div className={s(styles, { topBarTabs: true })}>
+              <div className={s(styles, { statusMessage: true })}>
+                {state.statusMessage && (
+                  <>
+                    <IconOrImage className={s(styles, { iconOrImage: true })} icon="/icons/info_icon.svg" />
+                    {translate(state.statusMessage)}
+                  </>
+                )}
+              </div>
+              <TabList style={tabsInnerStyles} disabled={false} />
+            </div>
+            <div className={s(styles, { topBarActions: true })}>
+              <Loader suspense inline hideMessage hideException>
+                <Placeholder actions={actions} container={service.actionsContainer} state={state} onCancel={onCancel} />
+              </Loader>
+            </div>
+          </div>
+          <div className={s(styles, { contentBox: true })}>
+            <TabPanelList style={tabsInnerStyles} />
+          </div>
+        </div>
+      </TabsState>
+    </Form>
   );
 });

@@ -22,7 +22,7 @@ type FormDetailedProps = Omit<React.DetailedHTMLProps<React.FormHTMLAttributes<H
 };
 
 export const Form = forwardRef<HTMLFormElement, FormDetailedProps>(function Form(
-  { context, disabled: disabledProp, disableEnterSubmit, focusFirstChild, children, onSubmit, onChange, ...rest },
+  { context, disabled: disabledProp, disableEnterSubmit, focusFirstChild, children, style, onSubmit, onChange, ...rest },
   ref,
 ) {
   const [focusedRef] = useFocus<HTMLFormElement>({ focusFirstChild });
@@ -50,15 +50,15 @@ export const Form = forwardRef<HTMLFormElement, FormDetailedProps>(function Form
 
   if (formContext.parent && formContext.parent !== context) {
     return (
-      <fieldset disabled={disabled} className={rest.className}>
+      <fieldset disabled={disabled} className={rest.className} style={style}>
         <FormContext.Provider value={formContext}>{children}</FormContext.Provider>
       </fieldset>
     );
   }
 
   return (
-    <form {...rest} ref={setFormRef}>
-      <fieldset disabled={disabled} className={rest.className}>
+    <form style={style} {...rest} ref={setFormRef}>
+      <fieldset disabled={disabled} className={rest.className} style={style}>
         <FormContext.Provider value={formContext}>{children}</FormContext.Provider>
       </fieldset>
       <button type="submit" disabled={disableEnterSubmit} aria-hidden={disableEnterSubmit} hidden />
