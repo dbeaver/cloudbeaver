@@ -1,6 +1,6 @@
 {
   "parser": "@typescript-eslint/parser",
-  "plugins": ["@typescript-eslint/eslint-plugin", "eslint-plugin-local-rules"],
+  "plugins": ["@typescript-eslint/eslint-plugin", "@cloudbeaver/eslint-plugin"],
   "overrides": [
     {
       "files": ["**/*.cjs"],
@@ -14,6 +14,7 @@
     "plugin:react/recommended",
     "plugin:react-hooks/recommended",
     "plugin:@typescript-eslint/recommended",
+    "plugin:@cloudbeaver/recommended",
     "prettier"
   ],
   "settings": {
@@ -207,7 +208,6 @@
         "noSortAlphabetically": true,
         "reservedFirst": true
       }
-    ],
-    "local-rules/no-deprecated-reshadow": "warn"
+    ]
   }
 }

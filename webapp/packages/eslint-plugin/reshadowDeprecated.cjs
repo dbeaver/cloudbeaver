@@ -1,4 +1,12 @@
-const rule = {
+/*
+ * CloudBeaver - Cloud Database Manager
+ * Copyright (C) 2020-2023 DBeaver Corp and others
+ *
+ * Licensed under the Apache License, Version 2.0.
+ * you may not use this file except in compliance with the License.
+ */
+
+module.exports = {
   meta: {
     docs: {
       description: 'Reshadow package is deprecated',
@@ -17,8 +25,4 @@ const rule = {
       },
     };
   },
-};
-
-module.exports = {
-  'no-deprecated-reshadow': rule,
 };

@@ -8704,9 +8704,8 @@ eslint-plugin-jsx-a11y@~6.8.0:
     jsx-ast-utils "^3.3.5"
     language-tags "^1.0.9"
     minimatch "^3.1.2"
-    object.entries "^1.1.6"
-    object.fromentries "^2.0.6"
-    semver "^6.3.0"
+    object.entries "^1.1.7"
+    object.fromentries "^2.0.7"
 
 eslint-plugin-node@~11.1.0:
   version "11.1.0"
