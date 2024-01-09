@@ -48,6 +48,7 @@ import org.jkiss.dbeaver.model.websocket.event.WSEventType;
 import org.jkiss.dbeaver.model.websocket.event.WSSessionLogUpdatedEvent;
 import org.jkiss.dbeaver.registry.*;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
+import org.jkiss.dbeaver.utils.GeneralUtils;
 import org.jkiss.utils.ArrayUtils;
 import org.jkiss.utils.CommonUtils;
 import org.jkiss.utils.IOUtils;
@@ -281,7 +282,7 @@ public class LocalResourceController implements RMController {
                 throw new DBException("Error creating shared project path", e);
             }
         }
-        validateResourcePath(name, PROJECT_REGEX);
+        validateResourcePath(name);
         RMProject project;
         var projectPath = sharedProjectsPath.resolve(name);
         if (Files.exists(projectPath)) {
@@ -461,6 +462,7 @@ public class LocalResourceController implements RMController {
                     DBPDataSourceRegistry registry = project.getDataSourceRegistry();
                     var result = Path.of(folderPath);
                     var newName = result.getFileName().toString();
+                    GeneralUtils.validateResourceName(newName);
                     var parent = result.getParent();
                     var parentFolder = parent == null ? null : registry.getFolder(parent.toString().replace("\\", "/"));
                     DBPDataSourceFolder newFolder = registry.addFolder(parentFolder, newName);
@@ -835,19 +837,10 @@ public class LocalResourceController implements RMController {
     }
 
     private void validateResourcePath(String resourcePath) throws DBException {
-        validateResourcePath(resourcePath, FILE_REGEX);
-    }
-
-    private void validateResourcePath(String resourcePath, String regex) throws DBException {
         var fullPath = Paths.get(resourcePath);
         for (Path path : fullPath) {
-            if (path.toString().startsWith(".")) {
-                throw new DBException("Resource path '" + resourcePath + "' can't start with dot");
-            }
-        }
-        if (!resourcePath.matches(regex)) {
-            String illegalCharacters = resourcePath.replaceAll(regex, " ").strip();
-            throw new DBException("Resource path '" + resourcePath + "' contains illegal characters: " + illegalCharacters);
+            String fileName = IOUtils.getFileNameWithoutExtension(path);
+            GeneralUtils.validateResourceName(fileName);
         }
     }
 

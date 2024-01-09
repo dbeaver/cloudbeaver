@@ -26,6 +26,7 @@ export function getOS(): OperatingSystem {
   ];
 
   const userAgent = window.navigator.userAgent;
-  const OS = operatingSystemOptions.find(([testString]) => userAgent.includes(testString))?.[1] ?? OperatingSystem.windowsOS;
+  const OS =
+    operatingSystemOptions.find(([testString]) => userAgent.toLowerCase().includes(testString.toLowerCase()))?.[1] ?? OperatingSystem.windowsOS;
   return OS;
 }
