@@ -13,11 +13,29 @@ export function isArraysEqual<T>(first: T[], second: T[], isEqual: (a: T, b: T) 
     return false;
   }
 
-  return !first.some((b, index) => {
-    if (order) {
-      return !isEqual(second[index], b);
+  const map = new Map<T, number>();
+
+  for (let i = 0; i < first.length; i++) {
+    const currentFirst = first[i];
+    const currentSecond = second[i];
+
+    if (order && !isEqual(currentFirst, currentSecond)) {
+      return false;
     }
 
-    return !second.some(a => isEqual(a, b));
-  });
+    map.set(currentFirst, (map.get(currentFirst) ?? 0) + 1);
+  }
+
+  for (let i = 0; i < second.length; i++) {
+    const currentSecond = second[i];
+    const mapValue = map.get(currentSecond);
+
+    if (mapValue === undefined || mapValue === 0) {
+      return false;
+    }
+
+    map.set(currentSecond, Number(map.get(currentSecond)) - 1);
+  }
+
+  return true;
 }
