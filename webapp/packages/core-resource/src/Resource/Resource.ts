@@ -8,7 +8,7 @@
 import { makeObservable, observable, toJS } from 'mobx';
 
 import { Dependency } from '@cloudbeaver/core-di';
-import { isContainsException, isPrimitive, MetadataMap } from '@cloudbeaver/core-utils';
+import { isArraysEqual, isContainsException, isPrimitive, MetadataMap } from '@cloudbeaver/core-utils';
 
 import { CachedResourceParamKey } from './CachedResource';
 import type { ICachedResourceMetadata } from './ICachedResourceMetadata';
@@ -105,6 +105,35 @@ export abstract class Resource<
     }
 
     return ResourceKeyUtils.isIntersect(key, nextKey, this.isKeyEqual);
+  }
+
+  /**
+   * Checks
+   * @param param - Resource key
+   * @param second - Resource key
+   * @returns {boolean} Returns true if key can is the same by all key-values
+   */
+  isEqual(param: ResourceKey<TKey>, second: ResourceKey<TKey>): boolean {
+    if (param === second) {
+      return true;
+    }
+
+    if (isResourceAlias(param) && isResourceAlias(second)) {
+      param = this.aliases.transformToAlias(param);
+      second = this.aliases.transformToAlias(second);
+
+      return param.isEqual(second);
+    }
+
+    if (isResourceAlias(param) || isResourceAlias(second)) {
+      return false;
+    }
+
+    if (isResourceKeyList(param) && isResourceKeyList(second)) {
+      return isArraysEqual(param, second);
+    }
+
+    return false;
   }
 
   /**
