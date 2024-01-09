@@ -134,7 +134,7 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
   const { data: applicableAuthModels } = useResource(
     Options,
     DatabaseAuthModelsResource,
-    getComputed(() => (driver?.applicableAuthModels ? resourceKeyList(driver.applicableAuthModels) : CachedResourceListEmptyKey)),
+    driver?.applicableAuthModels ? resourceKeyList(driver.applicableAuthModels) : CachedResourceListEmptyKey,
   );
 
   const { data: authModel } = useResource(
