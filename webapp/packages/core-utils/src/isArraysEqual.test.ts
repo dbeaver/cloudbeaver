@@ -55,4 +55,12 @@ describe('Is array equals', () => {
   test('should use isEqual argument if passed and "order" argument is "true"', () => {
     expect(isArraysEqual([{ a: 1 }], [{ a: 1 }], (a, b) => a.a === b.a, true)).toBe(true);
   });
+
+  test('should pass with array of objects (length > 1)', () => {
+    expect(isArraysEqual([{ b: 3 }, { a: 1 }], [{ a: 1 }, { b: 3 }])).toBe(true);
+  });
+
+  test('should pass with primitive and non primitive in array', () => {
+    expect(isArraysEqual([1, 1, { a: 1 }, 2], [2, { a: 1 }, 1, 1])).toBe(true);
+  });
 });
