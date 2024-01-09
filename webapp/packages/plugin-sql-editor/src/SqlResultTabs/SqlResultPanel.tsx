@@ -6,13 +6,17 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
+import React from 'react';
 import styled, { css } from 'reshadow';
 
+import { importLazyComponent } from '@cloudbeaver/core-utils';
+
 import type { ISqlEditorTabState } from '../ISqlEditorTabState';
-import { SqlExecutionPlanPanel } from './ExecutionPlan/SqlExecutionPlanPanel';
-import { OutputLogsPanel } from './OutputLogs/OutputLogsPanel';
-import { SqlResultSetPanel } from './SqlResultSetPanel';
-import { SqlScriptStatisticsPanel } from './SqlScriptStatisticsPanel';
+
+const SqlExecutionPlanPanel = importLazyComponent(() => import('./ExecutionPlan/SqlExecutionPlanPanel').then(module => module.SqlExecutionPlanPanel));
+const OutputLogsPanel = importLazyComponent(() => import('./OutputLogs/OutputLogsPanel').then(module => module.OutputLogsPanel));
+const SqlResultSetPanel = importLazyComponent(() => import('./SqlResultSetPanel').then(module => module.SqlResultSetPanel));
+const SqlScriptStatisticsPanel = importLazyComponent(() => import('./SqlScriptStatisticsPanel').then(module => module.SqlScriptStatisticsPanel));
 
 const style = css`
   result-panel {

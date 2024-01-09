@@ -98,6 +98,8 @@ export const CellEditor = observer<Pick<RenderEditCellProps<IResultSetRowKey>, '
       event.stopPropagation();
     };
 
+    const editorPortal = dataGridContext.getEditorPortal();
+
     return (
       <div
         ref={setElementRef}
@@ -108,7 +110,7 @@ export const CellEditor = observer<Pick<RenderEditCellProps<IResultSetRowKey>, '
         onMouseDown={preventClick}
         onMouseUp={preventClick}
       >
-        {
+        {editorPortal &&
           createPortal(
             <div ref={setPopperRef} className={s(styles, { editor: true })} style={popper.styles.popper} {...popper.attributes.popper}>
               <InlineEditor
@@ -129,9 +131,8 @@ export const CellEditor = observer<Pick<RenderEditCellProps<IResultSetRowKey>, '
                 onUndo={handleUndo}
               />
             </div>,
-            dataGridContext.getEditorPortal()!,
-          ) as any
-        }
+            editorPortal,
+          )}
       </div>
     );
   }),

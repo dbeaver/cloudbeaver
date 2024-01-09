@@ -1,5 +1,11 @@
 module.exports = [
   'react-data-grid',
+  'react-markdown',
+  'react-virtualized',
+  'react-window',
+  'react-dnd',
+  'react-dnd-html5-backend',
+  '@popperjs',
   'leaflet',
   'react-leaflet',
   'wellknown',

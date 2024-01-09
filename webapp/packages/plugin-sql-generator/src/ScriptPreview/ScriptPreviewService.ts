@@ -9,9 +9,10 @@ import { injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { GraphQLService, ResultDataFormat, UpdateResultsDataBatchScriptMutationVariables } from '@cloudbeaver/core-sdk';
+import { importLazyComponent } from '@cloudbeaver/core-utils';
 import { DocumentEditAction, type IDatabaseDataModel, ResultSetEditAction } from '@cloudbeaver/plugin-data-viewer';
 
-import { ScriptPreviewDialog } from './ScriptPreviewDialog';
+const ScriptPreviewDialog = importLazyComponent(() => import('./ScriptPreviewDialog').then(m => m.ScriptPreviewDialog));
 
 @injectable()
 export class ScriptPreviewService {

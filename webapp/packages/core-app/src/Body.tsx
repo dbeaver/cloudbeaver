@@ -47,9 +47,11 @@ export const Body = observer(function Body() {
 
   return (
     <DNDProvider>
-      <Loader suspense>
+      <Loader className={s(styles, { loader: true })} suspense>
         <div ref={ref} className={s(styles, { bodyContent: true }, `theme-${themeService.currentTheme.id}`)}>
-          <Loader suspense>{Screen && <Screen {...screenService.routerService.params} />}</Loader>
+          <Loader className={s(styles, { loader: true })} suspense>
+            {Screen && <Screen {...screenService.routerService.params} />}
+          </Loader>
           <DialogsPortal />
           <Notifications />
         </div>
