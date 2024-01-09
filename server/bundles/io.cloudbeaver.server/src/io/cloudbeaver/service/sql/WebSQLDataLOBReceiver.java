@@ -87,7 +87,7 @@ public class WebSQLDataLOBReceiver implements DBDDataReceiver {
         if (binaryValue.length > fileSizeLimit.longValue()) {
             throw new DBQuotaException(
                     "Data export quota exceeded", CBConstants.QUOTA_PROP_FILE_LIMIT, fileSizeLimit.longValue(), binaryValue.length +
-                    "\n Please increase the resourceQuotas parameters in configuration"
+                    "\n Please increase the resourceQuotas parameter in configuration"
             );
         }
         Path file = DATA_EXPORT_FOLDER.resolve(exportFileName);
