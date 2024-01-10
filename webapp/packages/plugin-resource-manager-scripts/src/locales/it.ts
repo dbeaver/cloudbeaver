@@ -5,7 +5,7 @@ export default [
   ['plugin_resource_manager_scripts_save_script', 'Save script'],
   [
     'plugin_resource_manager_scripts_script_name_invalid_characters_message',
-    'Script\'s name may contain the following symbols "_-$.()@" and can\'t start with a dot',
+    "Script's name may not contain the following symbols / : \" \\ and can't start with a dot",
   ],
   [
     'plugin_resource_manager_scripts_save_script_project_restriction_descripion',

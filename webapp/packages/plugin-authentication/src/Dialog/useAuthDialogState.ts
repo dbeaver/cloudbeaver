@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2023 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -183,7 +183,14 @@ export function useAuthDialogState(accessRequest: boolean, providerId: string | 
 
           const loginTask = authInfoService.login(provider.id, {
             configurationId: configuration?.id,
-            credentials: state.credentials,
+            credentials: {
+              ...state.credentials,
+              credentials: {
+                ...state.credentials.credentials,
+                user: state.credentials.credentials.user?.trim(),
+                password: state.credentials.credentials.password?.trim(),
+              },
+            },
             linkUser,
           });
           this.authTask = loginTask;

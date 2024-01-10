@@ -1,11 +1,11 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2023 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { observable } from 'mobx';
+import { observable, toJS } from 'mobx';
 
 import type { AdminUser, AuthRolesResource, UserResourceIncludes, UsersResource } from '@cloudbeaver/core-authentication';
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
@@ -39,6 +39,23 @@ export class UserFormInfoPart extends FormPart<IUserFormInfoState, IUserFormStat
       authRole: '',
     });
     this.baseIncludes = ['includeMetaParameters'];
+  }
+
+  protected format(data: IFormState<IUserFormState>, contexts: IExecutionContextProvider<IFormState<IUserFormState>>): void | Promise<void> {
+    this.state.password = this.state.password.trim();
+    const metaParameters = this.state.metaParameters;
+
+    if (this.formState.mode === FormMode.Create) {
+      this.state.userId = this.state.userId.trim();
+    }
+
+    for (const key in metaParameters) {
+      const value = metaParameters[key];
+
+      if (typeof value === 'string') {
+        metaParameters[key] = value.trim();
+      }
+    }
   }
 
   isOutdated(): boolean {
@@ -106,7 +123,7 @@ export class UserFormInfoPart extends FormPart<IUserFormInfoState, IUserFormStat
     const validation = contexts.getContext(formValidationContext);
 
     if (data.mode === FormMode.Create) {
-      if (!this.state.userId.trim()) {
+      if (!this.state.userId) {
         validation.error('authentication_user_login_not_set');
       }
 
@@ -132,10 +149,12 @@ export class UserFormInfoPart extends FormPart<IUserFormInfoState, IUserFormStat
   }
 
   private async updateCredentials() {
-    if (this.state.password) {
+    const password = this.state.password;
+
+    if (password) {
       await this.usersResource.updateCredentials(this.state.userId, {
         profile: '0',
-        credentials: { password: this.state.password },
+        credentials: { password },
       });
     }
   }
@@ -187,15 +206,17 @@ export class UserFormInfoPart extends FormPart<IUserFormInfoState, IUserFormStat
   }
 
   private async updateMetaParameters() {
+    const metaParameters = toJS(this.state.metaParameters);
+
     if (this.state.userId) {
       const user = this.usersResource.get(this.state.userId);
 
-      if (user && isObjectsEqual(user.metaParameters, this.state.metaParameters)) {
+      if (user && isObjectsEqual(user.metaParameters, metaParameters)) {
         return;
       }
     }
 
-    await this.usersResource.setMetaParameters(this.state.userId, this.state.metaParameters);
+    await this.usersResource.setMetaParameters(this.state.userId, metaParameters);
   }
 
   protected override async loader() {

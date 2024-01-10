@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2023 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -116,7 +116,7 @@ export class PluginBootstrap extends Bootstrap {
                 return false;
               }
 
-              if (!RESOURCE_NAME_REGEX.test(name)) {
+              if (!RESOURCE_NAME_REGEX.test(trimmedName)) {
                 setMessage('plugin_resource_manager_scripts_script_name_invalid_characters_message');
                 return false;
               }

@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2023 DBeaver Corp and others
+ * Copyright (C) 2010-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,20 +16,20 @@
  */
 package io.cloudbeaver.service.core;
 
-import io.cloudbeaver.*;
+import io.cloudbeaver.DBWebException;
+import io.cloudbeaver.WebAction;
+import io.cloudbeaver.WebObjectId;
+import io.cloudbeaver.WebProjectAction;
 import io.cloudbeaver.model.*;
 import io.cloudbeaver.model.session.WebSession;
- import io.cloudbeaver.model.user.WebDataSourceProviderInfo;
 import io.cloudbeaver.service.DBWService;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.model.navigator.DBNBrowseSettings;
 import org.jkiss.dbeaver.model.rm.RMConstants;
 
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.Part;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
