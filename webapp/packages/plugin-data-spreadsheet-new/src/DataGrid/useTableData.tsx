@@ -8,7 +8,6 @@
 import { computed, observable } from 'mobx';
 
 import { useObservableRef } from '@cloudbeaver/core-blocks';
-import { TextTools } from '@cloudbeaver/core-utils';
 import {
   IDatabaseDataModel,
   IDatabaseResultSet,
@@ -29,6 +28,7 @@ import { IndexFormatter } from './Formatters/IndexFormatter';
 import { TableColumnHeader } from './TableColumnHeader/TableColumnHeader';
 import { TableIndexColumnHeader } from './TableColumnHeader/TableIndexColumnHeader';
 import type { ITableData } from './TableDataContext';
+import { useTableDataMeasurements } from './useTableDataMeasurements';
 
 export const indexColumn: Column<IResultSetRowKey, any> = {
   key: 'index',
@@ -42,19 +42,12 @@ export const indexColumn: Column<IResultSetRowKey, any> = {
   renderCell: props => <IndexFormatter {...props} />,
 };
 
-const COLUMN_PADDING = 16 + 2;
-const COLUMN_HEADER_ICON_WIDTH = 16;
-const COLUMN_HEADER_TEXT_PADDING = 8;
-const COLUMN_HEADER_ORDER_PADDING = 8;
-const COLUMN_HEADER_ORDER_WIDTH = 16;
-
-const FONT = '400 12px Roboto';
-
 export function useTableData(
   model: IDatabaseDataModel<any, IDatabaseResultSet>,
   resultIndex: number,
   gridDIVElement: React.RefObject<HTMLDivElement | null>,
 ): ITableData {
+  const measurements = useTableDataMeasurements(model, resultIndex);
   const format = model.source.getAction(resultIndex, ResultSetFormatAction);
   const data = model.source.getAction(resultIndex, ResultSetDataAction);
   const editor = model.source.getAction(resultIndex, ResultSetEditAction);
@@ -77,29 +70,15 @@ export function useTableData(
         if (this.columnKeys.length === 0) {
           return [];
         }
-        const columnNames = this.format.getHeaders();
-        const rowStrings = this.format.getLongestCells();
-
-        const columnsWidth = TextTools.getWidth({
-          font: FONT,
-          text: columnNames,
-        }).map(
-          width =>
-            width + COLUMN_PADDING + COLUMN_HEADER_ICON_WIDTH + COLUMN_HEADER_TEXT_PADDING + COLUMN_HEADER_ORDER_PADDING + COLUMN_HEADER_ORDER_WIDTH,
-        );
-
-        const cellsWidth = TextTools.getWidth({
-          font: FONT,
-          text: rowStrings,
-        }).map(width => width + COLUMN_PADDING);
 
         const columns: Array<Column<IResultSetRowKey, any>> = this.columnKeys.map<Column<IResultSetRowKey, any>>((col, index) => ({
           key: ResultSetDataKeysUtils.serialize(col),
           columnDataIndex: col,
           name: this.getColumnInfo(col)?.label || '?',
           editable: true,
-          width: Math.min(300, Math.max(columnsWidth[index], cellsWidth[index] ?? 0)),
+          width: measurements.getColumnWidth(col),
           renderHeaderCell: props => <TableColumnHeader {...props} />,
+          onRenderHeader: measurements.scheduleUpdate,
         }));
         columns.unshift(indexColumn);
 

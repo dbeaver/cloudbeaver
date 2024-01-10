@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import { useContext } from 'react';
+import { useContext, useMemo } from 'react';
 
 import { getComputed, s, StaticImage, useS } from '@cloudbeaver/core-blocks';
 import type { SqlResultColumn } from '@cloudbeaver/core-sdk';
@@ -64,6 +64,12 @@ export const TableColumnHeader = observer<RenderHeaderCellProps<any>>(function T
     gridSelectionContext.selectColumn(calculatedColumn.idx, event.ctrlKey || event.metaKey);
     dataGridContext.focus();
   }
+
+  useMemo(() => {
+    if (calculatedColumn.columnDataIndex) {
+      calculatedColumn.onRenderHeader?.(calculatedColumn.columnDataIndex);
+    }
+  }, [calculatedColumn]);
 
   return (
     <div ref={dnd.setRef} data-s-rearrange={dnd.side} className={s(styles, { header: true, dragging: dnd.data.state.isDragging })}>
