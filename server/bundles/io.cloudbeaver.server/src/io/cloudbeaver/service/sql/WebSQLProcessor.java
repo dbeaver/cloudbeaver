@@ -38,6 +38,9 @@ import org.jkiss.dbeaver.model.exec.output.DBCServerOutputReader;
 import org.jkiss.dbeaver.model.exec.plan.DBCPlan;
 import org.jkiss.dbeaver.model.exec.plan.DBCQueryPlanner;
 import org.jkiss.dbeaver.model.exec.plan.DBCQueryPlannerConfiguration;
+import org.jkiss.dbeaver.model.gis.DBGeometry;
+import org.jkiss.dbeaver.model.gis.GisConstants;
+import org.jkiss.dbeaver.model.gis.GisTransformUtils;
 import org.jkiss.dbeaver.model.impl.AbstractExecutionSource;
 import org.jkiss.dbeaver.model.impl.DefaultServerOutputReader;
 import org.jkiss.dbeaver.model.navigator.DBNDatabaseItem;
@@ -946,6 +949,28 @@ public class WebSQLProcessor implements WebSessionProvider {
             rowCount++;
         }
         dataReceiver.fetchEnd(session, dbResult);
+    }
+
+    public Object transformGisValue(
+        @NotNull WebSession webSession,
+        @NotNull WebSQLResultsInfo resultsInfo,
+        @NotNull Integer columnId,
+        @NotNull Object gisValue,
+        @NotNull Integer targetSrid) throws DBException {
+        DBDAttributeBinding attribute = (DBDAttributeBinding) resultsInfo.getAttributeByPosition(columnId);
+        DBCExecutionContext executionContext = getExecutionContext(resultsInfo.getDataContainer());
+        try (DBCSession session = executionContext.openSession(webSession.getProgressMonitor(), DBCExecutionPurpose.UTIL, "Convert GIS value")) {
+            Object value = convertInputCellValue(session, attribute, gisValue, false);
+            if (value instanceof DBGeometry geometry) {
+                geometry.setSRID(targetSrid);
+                return WebSQLUtils.makeWebCellValue(
+                    webSession,
+                    attribute,
+                    geometry,
+                    null);
+            }
+            throw new DBException("Attribute value is not a geometry");
+        }
     }
 
     /**

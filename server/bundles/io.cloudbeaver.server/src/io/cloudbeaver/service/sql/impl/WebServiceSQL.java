@@ -36,6 +36,7 @@ import org.jkiss.dbeaver.model.data.DBDAttributeBinding;
 import org.jkiss.dbeaver.model.exec.DBCException;
 import org.jkiss.dbeaver.model.exec.DBCLogicalOperator;
 import org.jkiss.dbeaver.model.exec.DBExecUtils;
+import org.jkiss.dbeaver.model.gis.GisTransformUtils;
 import org.jkiss.dbeaver.model.impl.sql.BasicSQLDialect;
 import org.jkiss.dbeaver.model.navigator.DBNNode;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
@@ -547,6 +548,23 @@ public class WebServiceSQL implements DBWServiceSQL {
             return (Long) taskStatus.getExtendedResult();
         }
         return null;
+    }
+
+    @Override
+    public Object transformGISValue(
+        @NotNull WebSession webSession,
+        @NotNull WebSQLContextInfo contextInfo,
+        @NotNull String resultsId,
+        @NotNull Integer columnId,
+        @NotNull Object gisValue,
+        @NotNull Integer srid
+    ) throws DBException {
+        return contextInfo.getProcessor().transformGisValue(
+            webSession,
+            contextInfo.getResults(resultsId),
+            columnId,
+            gisValue,
+            srid);
     }
 
 }

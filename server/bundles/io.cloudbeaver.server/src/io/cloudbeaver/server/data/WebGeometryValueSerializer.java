@@ -38,18 +38,20 @@ public class WebGeometryValueSerializer implements DBWValueSerializer<DBGeometry
         DBSTypedObject attribute,
         @NotNull Map<String, Object> webValue
     ) throws DBCException {
+        int srid = JSONUtils.getInteger(webValue, WebSQLConstants.ATTR_SRID);
         if (attribute instanceof DBDAttributeBinding) {
             Object tempValue = ((DBDAttributeBinding) attribute).getValueHandler().getValueFromObject(
                 session,
                 attribute,
                 webValue.get(WebSQLConstants.ATTR_TEXT), false, true);
-            if (tempValue instanceof DBGeometry) {
+            if (tempValue instanceof DBGeometry dbGeometry) {
+                dbGeometry.setSRID(srid);
                 return (DBGeometry) tempValue;
             }
         }
         return new DBGeometry(
             webValue.get(WebSQLConstants.ATTR_TEXT),
-            CommonUtils.toInt(webValue.get(WebSQLConstants.ATTR_SRID)),
+            srid,
             JSONUtils.getObject(webValue, WebSQLConstants.ATTR_PROPERTIES));
     }
 }

@@ -164,4 +164,13 @@ public interface DBWServiceSQL extends DBWService {
     @Nullable
     @WebAction
     Long getRowDataCountResult(@NotNull WebSession webSession, @NotNull String taskId) throws DBWebException;
+
+    @WebAction
+    Object transformGISValue(
+        @NotNull WebSession webSession,
+        @NotNull WebSQLContextInfo contextInfo,
+        @NotNull String resultsId,
+        @NotNull Integer columnId,
+        @NotNull Object gisValue,
+        @NotNull Integer srid) throws DBException;
 }

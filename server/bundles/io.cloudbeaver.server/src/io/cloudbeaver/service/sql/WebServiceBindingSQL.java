@@ -104,6 +104,15 @@ public class WebServiceBindingSQL extends WebServiceBindingBase<DBWServiceSQL> i
                 env.getArgument("functions"),
                 env.getArgument("showDuplicatesOnly"))
             )
+            .dataFetcher("sqlTransformGisValue", env ->
+                getService(env).transformGISValue(
+                    getWebSession(env),
+                    getSQLContext(env),
+                    env.getArgument("resultsId"),
+                    env.getArgument("columnIndex"),
+                    env.getArgument("gisValue"),
+                    env.getArgument("expectedSrid"))
+            )
         ;
 
         model.getMutationType()

@@ -272,6 +272,16 @@ extend type Query {
         functions: [String!],
         showDuplicatesOnly: Boolean
     ): String!
+
+    sqlTransformGisValue(
+        projectId: ID,
+        contextId: ID!,
+        connectionId: ID!,
+        resultsId: ID!,
+        columnIndex: Int!,
+        gisValue: Object!,
+        expectedSrid: Int!
+    ): Object!
 }
 
 extend type Mutation {
