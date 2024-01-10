@@ -81,7 +81,11 @@ export class AuthProviderService {
 
     for (const parameter of profile.credentialParameters) {
       if (parameter.encryption === 'hash' && parameter.id in credentialsProcessed.credentials) {
-        credentialsProcessed.credentials[parameter.id] = this.hashValue(credentialsProcessed.credentials[parameter.id]);
+        const value = credentialsProcessed.credentials[parameter.id];
+
+        if (typeof value === 'string') {
+          credentialsProcessed.credentials[parameter.id] = this.hashValue(value);
+        }
       }
     }
 
