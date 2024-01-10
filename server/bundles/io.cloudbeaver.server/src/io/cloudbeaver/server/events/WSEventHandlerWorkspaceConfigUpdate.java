@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2023 DBeaver Corp
+ * Copyright (C) 2010-2024 DBeaver Corp
  *
  * All Rights Reserved.
  *
@@ -19,7 +19,6 @@ package io.cloudbeaver.server.events;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.WorkspaceConfigEventManager;
-import org.jkiss.dbeaver.model.websocket.event.WSEventType;
 import org.jkiss.dbeaver.model.websocket.event.WSWorkspaceConfigurationChangedEvent;
 
 public class WSEventHandlerWorkspaceConfigUpdate extends WSDefaultEventHandler<WSWorkspaceConfigurationChangedEvent> {
