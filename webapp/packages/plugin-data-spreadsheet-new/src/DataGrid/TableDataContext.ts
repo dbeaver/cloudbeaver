@@ -26,6 +26,7 @@ import type { Column } from '@cloudbeaver/plugin-react-data-grid';
 declare module 'react-data-grid' {
   interface Column<TRow, TSummaryRow = unknown> {
     columnDataIndex: IResultSetColumnKey | null;
+    onRenderHeader?(key: IResultSetColumnKey): void;
     icon?: string;
   }
 }
