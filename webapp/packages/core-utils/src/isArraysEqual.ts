@@ -41,13 +41,17 @@ export function isArraysEqual<T>(first: T[], second: T[], isEqual: (a: T, b: T) 
           map.set(currentSecond, Number(map.get(currentSecond)) - 1);
           break;
         }
+
+        if (j === first.length - 1) {
+          return false;
+        }
       }
       continue;
     }
 
     const mapValue = map.get(currentSecond);
 
-    if (mapValue === undefined || mapValue === 0) {
+    if (mapValue === undefined || mapValue <= 0) {
       return false;
     }
 
