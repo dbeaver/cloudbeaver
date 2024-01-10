@@ -8,7 +8,7 @@
 import { makeObservable, observable, toJS } from 'mobx';
 
 import { Dependency } from '@cloudbeaver/core-di';
-import { isArraysEqual, isContainsException, isPrimitive, MetadataMap } from '@cloudbeaver/core-utils';
+import { isContainsException, isPrimitive, MetadataMap } from '@cloudbeaver/core-utils';
 
 import { CachedResourceParamKey } from './CachedResource';
 import type { ICachedResourceMetadata } from './ICachedResourceMetadata';
