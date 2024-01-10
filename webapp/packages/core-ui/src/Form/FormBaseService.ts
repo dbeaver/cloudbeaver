@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2023 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@ export class FormBaseService<TState, TProps extends IFormProps<TState> = IFormPr
   readonly onConfigure: IExecutorHandlersCollection<IFormState<TState>>;
   readonly onFillDefaultConfig: IExecutorHandlersCollection<IFormState<TState>>;
   readonly onPrepareConfig: IExecutorHandlersCollection<TState>;
+  readonly onFormat: IExecutorHandlersCollection<IFormState<TState>>;
   readonly onValidate: IExecutorHandlersCollection<IFormState<TState>>;
   readonly onSubmit: IExecutorHandlersCollection<IFormState<TState>>;
   readonly onState: IExecutorHandlersCollection<TState>;
@@ -33,6 +34,7 @@ export class FormBaseService<TState, TProps extends IFormProps<TState> = IFormPr
     this.onConfigure = new ExecutorHandlersCollection();
     this.onFillDefaultConfig = new ExecutorHandlersCollection();
     this.onPrepareConfig = new ExecutorHandlersCollection();
+    this.onFormat = new ExecutorHandlersCollection();
     this.onValidate = new ExecutorHandlersCollection();
     this.onSubmit = new ExecutorHandlersCollection();
     this.onState = new ExecutorHandlersCollection();

@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2023 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -188,7 +188,22 @@ export class ConnectionSSLTabService extends Bootstrap {
         config.networkHandlersConfig = [];
       }
 
+      this.trimSSLConfig(handlerConfig);
       config.networkHandlersConfig.push(handlerConfig);
+    }
+  }
+
+  private trimSSLConfig(input: NetworkHandlerConfigInput) {
+    const { secureProperties } = input;
+
+    if (!Object.keys(secureProperties).length) {
+      return;
+    }
+
+    for (const key in secureProperties) {
+      if (typeof secureProperties[key] === 'string') {
+        secureProperties[key] = secureProperties[key]?.trim();
+      }
     }
   }
 
