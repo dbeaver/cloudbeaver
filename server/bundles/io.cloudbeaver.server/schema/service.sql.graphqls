@@ -331,13 +331,23 @@ extend type Mutation {
         addedRows: [ SQLResultRow! ],
     ): String!
 
-    #Return BLOB name
+    # Returns BLOB name
     readLobValue(
         projectId: ID,
         connectionId: ID!,
         contextId: ID!,
         resultsId: ID!,
         lobColumnIndex: Int!,
+        row: [ SQLResultRow! ]!
+    ): String!
+
+    # Returns full string value
+    sqlReadStringValue(
+        projectId: ID,
+        connectionId: ID!,
+        contextId: ID!,
+        resultsId: ID!,
+        columnIndex: Int!,
         row: [ SQLResultRow! ]!
     ): String!
 
