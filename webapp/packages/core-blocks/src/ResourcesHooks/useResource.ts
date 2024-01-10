@@ -161,12 +161,7 @@ export function useResource<
       propertiesRef.includes = includes;
     }
 
-    if (
-      key === null ||
-      propertiesRef.key === null ||
-      !propertiesRef.resource.isIntersect(key, propertiesRef.key) ||
-      !propertiesRef.resource.isEqual(key, propertiesRef.key)
-    ) {
+    if (key === null || propertiesRef.key === null || !propertiesRef.resource.isEqual(key, propertiesRef.key)) {
       propertiesRef.key = key;
     }
   });

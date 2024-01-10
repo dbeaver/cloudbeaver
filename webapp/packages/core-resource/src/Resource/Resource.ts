@@ -44,6 +44,7 @@ export abstract class Resource<
     super();
     this.isKeyEqual = this.isKeyEqual.bind(this);
     this.isIntersect = this.isIntersect.bind(this);
+    this.isEqual = this.isEqual.bind(this);
 
     this.logger = new ResourceLogger(this.getName());
     this.aliases = new ResourceAliases(this.logger, this.validateKey.bind(this));
@@ -122,7 +123,7 @@ export abstract class Resource<
       param = this.aliases.transformToAlias(param);
       second = this.aliases.transformToAlias(second);
 
-      return param.isEqual(second);
+      return param.isEqual(second) && this.isEqual(param.target, second.target);
     }
 
     if (isResourceAlias(param) || isResourceAlias(second)) {
@@ -130,10 +131,10 @@ export abstract class Resource<
     }
 
     if (isResourceKeyList(param) && isResourceKeyList(second)) {
-      return isArraysEqual(param, second);
+      return ResourceKeyUtils.isEqual(param, second, this.isKeyEqual);
     }
 
-    return false;
+    return ResourceKeyUtils.isEqual(param, second, this.isKeyEqual);
   }
 
   /**
