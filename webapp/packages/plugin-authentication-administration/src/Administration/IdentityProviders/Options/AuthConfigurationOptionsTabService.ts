@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2023 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -58,7 +58,7 @@ export class AuthConfigurationOptionsTabService extends Bootstrap {
   private async prepareConfig({ state }: IAuthConfigurationFormSubmitData, contexts: IExecutionContextProvider<IAuthConfigurationFormSubmitData>) {
     const config = contexts.getContext(authConfigurationContext);
 
-    config.id = state.config.id;
+    config.id = state.config.id.trim();
     config.providerId = state.config.providerId;
     config.disabled = state.config.disabled;
     config.displayName = state.config.displayName.trim();
@@ -70,14 +70,22 @@ export class AuthConfigurationOptionsTabService extends Bootstrap {
 
     if (Object.keys(state.config.parameters).length) {
       config.parameters = state.config.parameters;
+
+      for (const key of Object.keys(config.parameters)) {
+        const value = config.parameters[key];
+
+        if (typeof value === 'string') {
+          config.parameters[key] = value.trim();
+        }
+      }
     }
 
     if (state.config.description) {
-      config.description = state.config.description;
+      config.description = state.config.description.trim();
     }
 
     if (state.config.iconURL) {
-      config.iconURL = state.config.iconURL;
+      config.iconURL = state.config.iconURL.trim();
     }
   }
 

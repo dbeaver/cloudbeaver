@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2023 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -8,7 +8,7 @@
 
 type ThrottleAsync<TResult, TArguments extends any[]> = (...args: TArguments) => Promise<TResult>;
 
-export function throttle<T extends (...args: any[]) => void | Promise<void>>(f: T, delay: number, tail = true): T {
+export function throttle<T extends (...args: any[]) => any>(f: T, delay: number, tail = true): (...args: Parameters<T>) => void {
   let throttle = false;
   let pending = false;
   let functionArgs: any[] = [];
@@ -34,14 +34,17 @@ export function throttle<T extends (...args: any[]) => void | Promise<void>>(f: 
         throttle = false;
 
         if (pending) {
-          f.apply(thisObject, functionArgs);
-          thisObject = null;
-          functionArgs = [];
-          pending = false;
+          try {
+            f.apply(thisObject, functionArgs);
+          } finally {
+            thisObject = null;
+            functionArgs = [];
+            pending = false;
+          }
         }
       }, delay);
     }
-  } as T;
+  };
 }
 
 export function throttleAsync<TResult, TArguments extends any[], T extends (...args: TArguments) => Promise<TResult>>(
