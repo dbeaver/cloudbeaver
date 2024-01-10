@@ -131,7 +131,7 @@ export abstract class Resource<
     }
 
     if (isResourceKeyList(param) && isResourceKeyList(second)) {
-      return ResourceKeyUtils.isEqual(param, second, this.isKeyEqual);
+      return param.isEqual(second, this.isKeyEqual);
     }
 
     return ResourceKeyUtils.isEqual(param, second, this.isKeyEqual);

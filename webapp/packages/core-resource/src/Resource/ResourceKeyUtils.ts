@@ -140,7 +140,7 @@ export const ResourceKeyUtils: ResourceKeyUtils = {
     }
 
     if (isResourceKeyList(param) && isResourceKeyList(key)) {
-      return param.length === key.length && param.every((keyA, index) => isEqualFn(keyA, key[index]));
+      return param.isEqual(key, isEqualFn);
     }
 
     if (isResourceKeyList(key) || isResourceKeyList(param)) {
