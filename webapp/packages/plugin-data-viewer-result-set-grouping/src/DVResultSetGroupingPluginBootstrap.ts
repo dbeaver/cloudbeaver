@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2023 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -89,18 +89,25 @@ export class DVResultSetGroupingPluginBootstrap extends Bootstrap {
             if (!model.source.hasResult(resultIndex)) {
               return true;
             }
-            const selectionAction = model.source.getAction(resultIndex, ResultSetSelectAction);
-            const dataAction = model.source.getAction(resultIndex, ResultSetDataAction);
 
-            return !grouping.getColumns().some(name => {
-              const key = dataAction.findColumnKey(column => column.name === name);
+            const format = model.source.getResult(resultIndex)?.dataFormat;
 
-              if (!key) {
-                return false;
-              }
+            if (format === ResultDataFormat.Resultset) {
+              const selectionAction = model.source.getAction(resultIndex, ResultSetSelectAction);
+              const dataAction = model.source.getAction(resultIndex, ResultSetDataAction);
 
-              return selectionAction.isElementSelected({ column: key });
-            });
+              return !grouping.getColumns().some(name => {
+                const key = dataAction.findColumnKey(column => column.name === name);
+
+                if (!key) {
+                  return false;
+                }
+
+                return selectionAction.isElementSelected({ column: key });
+              });
+            }
+
+            return true;
           }
         }
 

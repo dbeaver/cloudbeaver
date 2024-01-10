@@ -24,6 +24,8 @@ export default [
   ['data_viewer_presentation_value_text_html_title', 'HTML'],
   ['data_viewer_presentation_value_text_xml_title', 'XML'],
   ['data_viewer_presentation_value_text_json_title', 'JSON'],
+  ['data_viewer_presentation_value_text_hex_title', 'HEX'],
+  ['data_viewer_presentation_value_text_base64_title', 'Base64'],
   ['data_viewer_presentation_value_image_title', 'Immagine'],
   ['data_viewer_presentation_value_image_fit', 'Adatta alla Finestra'],
   ['data_viewer_presentation_value_image_original_size', 'Dimensioni Originali'],

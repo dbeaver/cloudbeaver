@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2023 DBeaver Corp and others
+ * Copyright (C) 2010-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,6 @@
  */
 package io.cloudbeaver.server;
 
-import org.jkiss.dbeaver.model.auth.AuthInfo;
 import io.cloudbeaver.auth.NoAuthCredentialsProvider;
 import io.cloudbeaver.model.rm.local.LocalResourceController;
 import io.cloudbeaver.service.security.CBEmbeddedSecurityController;
@@ -27,6 +26,7 @@ import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBFileController;
 import org.jkiss.dbeaver.model.app.DBPWorkspace;
+import org.jkiss.dbeaver.model.auth.AuthInfo;
 import org.jkiss.dbeaver.model.auth.SMCredentialsProvider;
 import org.jkiss.dbeaver.model.rm.RMController;
 import org.jkiss.dbeaver.model.security.SMAdminController;
