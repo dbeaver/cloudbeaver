@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2023 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -81,7 +81,11 @@ export class AuthProviderService {
 
     for (const parameter of profile.credentialParameters) {
       if (parameter.encryption === 'hash' && parameter.id in credentialsProcessed.credentials) {
-        credentialsProcessed.credentials[parameter.id] = this.hashValue(credentialsProcessed.credentials[parameter.id]);
+        const value = credentialsProcessed.credentials[parameter.id];
+
+        if (typeof value === 'string') {
+          credentialsProcessed.credentials[parameter.id] = this.hashValue(value);
+        }
       }
     }
 

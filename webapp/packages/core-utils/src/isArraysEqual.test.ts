@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2023 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -54,5 +54,23 @@ describe('Is array equals', () => {
 
   test('should use isEqual argument if passed and "order" argument is "true"', () => {
     expect(isArraysEqual([{ a: 1 }], [{ a: 1 }], (a, b) => a.a === b.a, true)).toBe(true);
+  });
+
+  test('should not pass with no equal fn and array of objects (length > 1)', () => {
+    expect(isArraysEqual([{ b: 3 }, { a: 1 }], [{ a: 1 }, { b: 3 }])).toBe(false);
+  });
+
+  test('should not pass with no equal fn and primitive and non primitive in array', () => {
+    expect(isArraysEqual([1, 1, { a: 1 }, 2], [2, { a: 1 }, 1, 1])).toBe(false);
+  });
+
+  test('should pass with equal fn and array of objects (length > 1)', () => {
+    const isEqual = jest.fn((a: { a: number }, b: { a: number }) => a.a === b.a);
+    expect(isArraysEqual([{ a: 3 }, { a: 1 }], [{ a: 1 }, { a: 3 }], isEqual)).toBe(true);
+  });
+
+  test('should pass with equal fn and primitive and non primitive in array', () => {
+    const isEqual = jest.fn((a: { a: number }, b: { a: number }) => a.a === b.a);
+    expect(isArraysEqual([1, { a: 3 }, { a: 1 }] as any, [1, { a: 1 }, { a: 3 }] as any, isEqual)).toBe(true);
   });
 });

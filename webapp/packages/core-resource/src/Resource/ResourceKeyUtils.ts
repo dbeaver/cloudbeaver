@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2023 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -36,6 +36,11 @@ export interface ResourceKeyUtils {
     first: TKey | ResourceKeyList<TKey>,
     second: TKey | ResourceKeyList<TKey>,
     isEqual?: (keyA: TKey, keyB: TKey) => boolean,
+  ) => boolean;
+  isEqual: <TKey>(
+    first: TKey | ResourceKeyList<TKey>,
+    second: TKey | ResourceKeyList<TKey>,
+    isEqualFn?: (keyA: TKey, keyB: TKey) => boolean,
   ) => boolean;
   join: <TKey>(...keys: Array<TKey | ResourceKeyList<TKey>>) => ResourceKeyList<TKey>;
   toArray: <TKey>(key: TKey | ResourceKeyList<TKey>) => TKey[];
@@ -124,6 +129,25 @@ export const ResourceKeyUtils: ResourceKeyUtils = {
     }
 
     return isEqual(param, key);
+  },
+  isEqual<TKey>(
+    param: TKey | ResourceKeyList<TKey>,
+    key: TKey | ResourceKeyList<TKey>,
+    isEqualFn = (keyA: TKey, keyB: TKey) => keyA === keyB,
+  ): boolean {
+    if (param === key) {
+      return true;
+    }
+
+    if (isResourceKeyList(param) && isResourceKeyList(key)) {
+      return param.isEqual(key, isEqualFn);
+    }
+
+    if (isResourceKeyList(key) || isResourceKeyList(param)) {
+      return false;
+    }
+
+    return isEqualFn(param, key);
   },
   join<TKey>(...keys: Array<TKey | ResourceKeyList<TKey>>): ResourceKeyList<TKey> {
     const list: TKey[] = [];

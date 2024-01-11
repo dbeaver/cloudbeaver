@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2023 DBeaver Corp and others
+ * Copyright (C) 2010-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -86,7 +86,9 @@ public class WebSQLDataLOBReceiver implements DBDDataReceiver {
         }
         if (binaryValue.length > fileSizeLimit.longValue()) {
             throw new DBQuotaException(
-                    "Data export quota exceeded", CBConstants.QUOTA_PROP_FILE_LIMIT, fileSizeLimit.longValue(), binaryValue.length);
+                    "Data export quota exceeded \n Please increase the resourceQuotas parameter in configuration",
+                CBConstants.QUOTA_PROP_FILE_LIMIT, fileSizeLimit.longValue(), binaryValue.length
+            );
         }
         Path file = DATA_EXPORT_FOLDER.resolve(exportFileName);
         Files.write(file, binaryValue);
