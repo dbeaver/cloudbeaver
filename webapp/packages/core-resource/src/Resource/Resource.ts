@@ -44,6 +44,7 @@ export abstract class Resource<
     super();
     this.isKeyEqual = this.isKeyEqual.bind(this);
     this.isIntersect = this.isIntersect.bind(this);
+    this.isEqual = this.isEqual.bind(this);
 
     this.logger = new ResourceLogger(this.getName());
     this.aliases = new ResourceAliases(this.logger, this.validateKey.bind(this));
@@ -105,6 +106,35 @@ export abstract class Resource<
     }
 
     return ResourceKeyUtils.isIntersect(key, nextKey, this.isKeyEqual);
+  }
+
+  /**
+   * Checks
+   * @param param - Resource key
+   * @param second - Resource key
+   * @returns {boolean} Returns true if key can is the same by all key-values
+   */
+  isEqual(param: ResourceKey<TKey>, second: ResourceKey<TKey>): boolean {
+    if (param === second) {
+      return true;
+    }
+
+    if (isResourceAlias(param) && isResourceAlias(second)) {
+      param = this.aliases.transformToAlias(param);
+      second = this.aliases.transformToAlias(second);
+
+      return param.isEqual(second) && this.isEqual(param.target, second.target);
+    }
+
+    if (isResourceAlias(param) || isResourceAlias(second)) {
+      return false;
+    }
+
+    if (isResourceKeyList(param) && isResourceKeyList(second)) {
+      return param.isEqual(second, this.isKeyEqual);
+    }
+
+    return ResourceKeyUtils.isEqual(param, second, this.isKeyEqual);
   }
 
   /**
