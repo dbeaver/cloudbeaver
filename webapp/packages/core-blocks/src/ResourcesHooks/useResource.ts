@@ -161,7 +161,7 @@ export function useResource<
       propertiesRef.includes = includes;
     }
 
-    if (key === null || propertiesRef.key === null || !propertiesRef.resource.isIntersect(key, propertiesRef.key)) {
+    if (key === null || propertiesRef.key === null || !propertiesRef.resource.isEqual(key, propertiesRef.key)) {
       propertiesRef.key = key;
     }
   });
@@ -209,7 +209,7 @@ export function useResource<
         key = toJS(key);
 
         if (this.useRef[0] !== null && propertiesRef.resource.useTracker.hasUseId(this.useRef[1])) {
-          if (key !== null && propertiesRef.resource.isIntersect(key, this.useRef[0])) {
+          if (key !== null && propertiesRef.resource.isEqual(key, this.useRef[0])) {
             return;
           }
 
