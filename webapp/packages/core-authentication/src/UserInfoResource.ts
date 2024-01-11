@@ -26,6 +26,8 @@ export interface ILoginOptions {
   linkUser?: boolean;
 }
 
+export const ANONYMOUS_USER_ID = 'anonymous';
+
 @injectable()
 export class UserInfoResource extends CachedDataResource<UserInfo | null, void, UserInfoIncludes> {
   readonly onUserChange: ISyncExecutor<string>;
@@ -66,7 +68,7 @@ export class UserInfoResource extends CachedDataResource<UserInfo | null, void, 
   }
 
   getId(): string {
-    return this.data?.userId || 'anonymous';
+    return this.data?.userId || ANONYMOUS_USER_ID;
   }
 
   hasToken(providerId: string): boolean {
