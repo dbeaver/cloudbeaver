@@ -60,6 +60,44 @@ export class ResultSetDataContentAction extends DatabaseDataAction<any, IDatabas
     return !!this.result.data?.hasRowIdentifier && isResultSetContentValue(this.format.get(element));
   }
 
+  private async loadFileFullText(result: IDatabaseResultSet, columnIndex: number, row: IResultSetValue[]) {
+    if (!result.id) {
+      throw new Error("Result's id must be provided");
+    }
+
+    const response = await this.graphQLService.sdk.getSqlReadStringValue({
+      resultsId: result.id,
+      connectionId: result.connectionId,
+      contextId: result.contextId,
+      columnIndex,
+      row: {
+        data: row,
+      },
+    });
+
+    return response.text;
+  }
+
+  async getFileFullText(element: IResultSetElementKey) {
+    const column = this.data.getColumn(element.column);
+    const row = this.data.getRowValue(element.row);
+
+    if (!row || !column) {
+      throw new Error('Failed to get value metadata information');
+    }
+
+    const text = await this.source.runTask(async () => {
+      try {
+        this.activeElement = element;
+        return await this.loadFileFullText(this.result, column.position, row);
+      } finally {
+        this.activeElement = null;
+      }
+    });
+
+    return text;
+  }
+
   async getFileDataUrl(element: IResultSetElementKey) {
     const column = this.data.getColumn(element.column);
     const row = this.data.getRowValue(element.row);
