@@ -190,7 +190,8 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
                 enableUser(connection, user.getUserId(), true);
                 continue;
             }
-            createUser(connection, user.getUserId(), user.getMetaParameters(), true, userImportList.getAuthRole());
+            String authRole = user.getAuthRole() == null ? userImportList.getAuthRole() : user.getAuthRole();
+            createUser(connection, user.getUserId(), user.getMetaParameters(), true, authRole);
         }
     }
 
