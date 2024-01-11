@@ -372,7 +372,7 @@ public class WebServiceSQL implements DBWServiceSQL {
                 processor.getConnection().getDataSource(),
                 monitor -> {
                     try {
-                        result.append(function);
+                        result.append(function.apply(monitor));
                     } catch (Exception e) {
                         throw new InvocationTargetException(e);
                     }
