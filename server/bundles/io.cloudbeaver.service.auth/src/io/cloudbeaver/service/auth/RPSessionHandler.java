@@ -33,6 +33,7 @@ import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.auth.SMAuthInfo;
+import org.jkiss.dbeaver.model.security.SMAuthProviderCustomConfiguration;
 import org.jkiss.dbeaver.model.security.SMConstants;
 import org.jkiss.dbeaver.model.security.SMController;
 import org.jkiss.dbeaver.model.security.SMStandardMeta;
@@ -62,22 +63,37 @@ public class RPSessionHandler implements DBWSessionHandler {
         return false;
     }
 
-    public void reverseProxyAuthentication(@NotNull HttpServletRequest request, @NotNull WebSession webSession) throws DBWebException {
+    public void reverseProxyAuthentication(@NotNull HttpServletRequest request, @NotNull WebSession webSession) throws DBException {
         SMController securityController = webSession.getSecurityController();
         WebAuthProviderDescriptor authProvider = WebAuthProviderRegistry.getInstance().getAuthProvider(RPAuthProvider.AUTH_PROVIDER);
         if (authProvider == null) {
             throw new DBWebException("Auth provider " + RPAuthProvider.AUTH_PROVIDER + " not found");
         }
         SMAuthProviderExternal<?> authProviderExternal = (SMAuthProviderExternal<?>) authProvider.getInstance();
-        String userName = request.getHeader(RPAuthProvider.X_USER);
-        String teams = request.getHeader(RPAuthProvider.X_TEAM);
+        SMAuthProviderCustomConfiguration configuration = WebAppUtils.getWebAuthApplication()
+            .getAuthConfiguration()
+            .getAuthCustomConfigurations()
+            .stream()
+            .filter(p -> p.getProvider().equals(authProvider.toString()))
+            .findFirst()
+            .orElse(null);
+        Map<String, Object> paramConfigMap = new HashMap<>();
+        if (configuration != null) {
+            authProvider.getConfigurationParameters().forEach(p ->
+                paramConfigMap.put(p.getId(), configuration.getParameters().get(p.getId())
+                ));
+        }
+        String userName = request.getHeader(
+            resolveParam(paramConfigMap.get(RPConstants.PARAM_USER), RPAuthProvider.X_USER)
+        );
+        String teams = request.getHeader(resolveParam(paramConfigMap.get(RPConstants.PARAM_TEAM), RPAuthProvider.X_TEAM));
         if (CommonUtils.isEmpty(teams)) {
             // backward compatibility
             teams = request.getHeader(RPAuthProvider.X_ROLE);
         }
-        String role = request.getHeader(RPAuthProvider.X_ROLE_TE);
-        String firstName = request.getHeader(RPAuthProvider.X_FIRST_NAME);
-        String lastName = request.getHeader(RPAuthProvider.X_LAST_NAME);
+        String role = request.getHeader(resolveParam(paramConfigMap.get(RPConstants.PARAM_ROLE_NAME), RPAuthProvider.X_ROLE_TE));
+        String firstName = request.getHeader(resolveParam(paramConfigMap.get(RPConstants.PARAM_FIRST_NAME), RPAuthProvider.X_FIRST_NAME));
+        String lastName = request.getHeader(resolveParam(paramConfigMap.get(RPConstants.PARAM_LAST_NAME), RPAuthProvider.X_LAST_NAME));
         List<String> userTeams = teams == null ? Collections.emptyList() : List.of(teams.split("\\|"));
         if (userName != null) {
             try {
@@ -119,5 +135,12 @@ public class RPSessionHandler implements DBWSessionHandler {
     @Override
     public boolean handleSessionClose(WebSession webSession) throws DBException, IOException {
         return false;
+    }
+
+    private String resolveParam(Object value, String defaultValue) {
+        if (value != null && !value.toString().isEmpty()) {
+            return value.toString();
+        }
+        return defaultValue;
     }
 }

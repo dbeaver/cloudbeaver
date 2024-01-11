@@ -18,6 +18,7 @@
         <authProvider id="reverseProxy" label="Reverse proxy"
                       description="Reverse proxy header based authentication"
                       trusted="true"
+                      configurable="true"
                       class="io.cloudbeaver.auth.provider.rp.RPAuthProvider"
                       icon="platform:/plugin/org.jkiss.dbeaver.model/icons/tree/key.png">
             <credentials>
@@ -25,6 +26,16 @@
                     <property id="user" label="User name" type="string" description="User name" admin="true" user="true" identifying="true"/>
                 </propertyGroup>
             </credentials>
+            <configuration>
+                <propertyGroup label="Configuration">
+                    <property id="logout-url" label="Logout url" type="string" description="Logout url"/>
+                    <property id="user-header" label="User header name" type="string" description="User header name"/>
+                    <property id="team-header" label="User header name" type="string" description="User header name"/>
+                    <property id="first-name-header" label="User header name" type="string" description="User header name"/>
+                    <property id="last-name-header" label="User header name" type="string" description="User header name"/>
+                    <property id="role-header" label="User header name" type="string" description="User header name" features="distributed"/>
+                </propertyGroup>
+            </configuration>
         </authProvider>
     </extension>
 </plugin>
