@@ -34,13 +34,6 @@ const MAX_KEEP_ALIVE_INTERVAL_IN_SECONDS = 32767;
 
 export const ProviderPropertiesForm = observer<Props>(function ProviderPropertiesForm({ config, properties, disabled, readonly }) {
   const translate = useTranslate();
-
-  const keepAliveRef = useCustomInputValidation<string>(value => {
-    if (Number(value) > MAX_KEEP_ALIVE_INTERVAL_IN_SECONDS) {
-      return translate('connections_connection_keep_alive_max_value_error', undefined, { keepAliveInterval: MAX_KEEP_ALIVE_INTERVAL_IN_SECONDS });
-    }
-    return null;
-  });
   const supportedProperties = properties.filter(property => property.supportedConfigurationTypes?.some(type => type === config.configurationType));
 
   const { categories, isUncategorizedExists } = useObjectPropertyCategories(supportedProperties);
@@ -85,7 +78,6 @@ export const ProviderPropertiesForm = observer<Props>(function ProviderPropertie
       )}
 
       <InputField
-        ref={keepAliveRef}
         type="number"
         minLength={1}
         min={0}
