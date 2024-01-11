@@ -8,4 +8,7 @@
 import type { IDatabaseDataAction } from '../IDatabaseDataAction';
 import type { IDatabaseDataResult } from '../IDatabaseDataResult';
 
-export type IDatabaseDataResultAction<TResult extends IDatabaseDataResult> = IDatabaseDataAction<any, TResult>;
+export interface IDatabaseDataResultAction<TKey, TResult extends IDatabaseDataResult> extends IDatabaseDataAction<any, TResult> {
+  getIdentifier(key: TKey): string;
+  serialize(key: TKey): string;
+}
