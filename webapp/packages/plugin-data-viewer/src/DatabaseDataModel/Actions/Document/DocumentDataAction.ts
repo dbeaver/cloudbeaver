@@ -9,15 +9,15 @@ import { computed, makeObservable } from 'mobx';
 
 import { ResultDataFormat } from '@cloudbeaver/core-sdk';
 
-import { DatabaseDataAction } from '../../DatabaseDataAction';
 import type { IDatabaseDataSource } from '../../IDatabaseDataSource';
 import type { IDatabaseResultSet } from '../../IDatabaseResultSet';
 import { databaseDataAction } from '../DatabaseDataActionDecorator';
-import type { IDatabaseDataResultAction } from '../IDatabaseDataResultAction';
+import { DatabaseDataResultAction } from '../DatabaseDataResultAction';
 import type { IDatabaseDataDocument } from './IDatabaseDataDocument';
+import type { IDocumentElementKey } from './IDocumentElementKey';
 
 @databaseDataAction()
-export class DocumentDataAction extends DatabaseDataAction<any, IDatabaseResultSet> implements IDatabaseDataResultAction<IDatabaseResultSet> {
+export class DocumentDataAction extends DatabaseDataResultAction<IDocumentElementKey, IDatabaseResultSet> {
   static dataFormat = [ResultDataFormat.Document];
 
   get documents(): IDatabaseDataDocument[] {
@@ -35,6 +35,14 @@ export class DocumentDataAction extends DatabaseDataAction<any, IDatabaseResultS
       documents: computed,
       count: computed,
     });
+  }
+
+  getIdentifier(key: IDocumentElementKey): string {
+    return key.index.toString();
+  }
+
+  serialize(key: IDocumentElementKey): string {
+    return key.index.toString();
   }
 
   get(index: number): IDatabaseDataDocument | undefined {
