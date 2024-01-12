@@ -10,7 +10,7 @@ import { observer } from 'mobx-react-lite';
 import { useMemo } from 'react';
 import styled, { css } from 'reshadow';
 
-import { Button, useObservableRef, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
+import { Button, s, useObservableRef, useS, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { QuotasService } from '@cloudbeaver/core-root';
@@ -31,6 +31,7 @@ import type { IDataValuePanelProps } from '../../TableViewer/ValuePanel/DataValu
 import { QuotaPlaceholder } from '../QuotaPlaceholder';
 import { VALUE_PANEL_TOOLS_STYLES } from '../ValuePanelTools/VALUE_PANEL_TOOLS_STYLES';
 import { getTypeExtension } from './getTypeExtension';
+import moduleStyles from './TextValuePresentation.m.css';
 import { TextValuePresentationService } from './TextValuePresentationService';
 import { useAutoFormat } from './useAutoFormat';
 
@@ -84,6 +85,7 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
     const textValuePresentationService = useService(TextValuePresentationService);
     const style = useStyles(styles, UNDERLINE_TAB_STYLES, VALUE_PANEL_TOOLS_STYLES);
     const formatter = useAutoFormat();
+    const moduleStyle = useS(moduleStyles);
 
     const state = useTabLocalState(() =>
       observable({
@@ -326,7 +328,7 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
           onChange={data.handleChange}
         />
         {data.canShowTruncatedQuota && <QuotaPlaceholder limit={data.limit} size={data.valueSize} />}
-        <tools-container>
+        <div className={s(moduleStyle, { toolsContainer: true })}>
           <Button disabled={model.isLoading()} onClick={data.save}>
             {translate('ui_download')}
           </Button>
@@ -335,7 +337,7 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
               {translate('data_viewer_presentation_value_content_full_text_button')}
             </Button>
           )}
-        </tools-container>
+        </div>
       </container>,
     );
   },
