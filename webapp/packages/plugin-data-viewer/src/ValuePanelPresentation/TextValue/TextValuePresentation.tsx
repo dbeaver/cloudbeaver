@@ -111,7 +111,6 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
 
     const data = useObservableRef(
       () => ({
-        // TODO do all reset cases
         fullTextCache: observable.map<string, string>(),
         get fullText() {
           return this.fullTextCache.get(this.fullTextIndex);
