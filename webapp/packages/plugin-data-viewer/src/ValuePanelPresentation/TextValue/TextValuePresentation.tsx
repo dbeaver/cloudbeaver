@@ -72,6 +72,10 @@ const styles = css`
   }
 `;
 
+const TEXT_PLAIN_TYPE = 'text/plain';
+const TEXT_JSON_TYPE = 'text/json';
+const APPLICATION_JSON_TYPE = 'application/json';
+
 export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelProps<any, IDatabaseResultSet>> = observer(
   function TextValuePresentation({ model, resultIndex, dataFormat }) {
     const translate = useTranslate();
@@ -83,15 +87,15 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
 
     const state = useTabLocalState(() =>
       observable({
-        currentContentType: 'text/plain',
+        currentContentType: TEXT_PLAIN_TYPE,
 
         setContentType(contentType: string) {
-          if (contentType === 'text/json') {
-            contentType = 'application/json';
+          if (contentType === TEXT_JSON_TYPE) {
+            contentType = APPLICATION_JSON_TYPE;
           }
 
           if (!data.activeTabs.some(tab => tab.key === contentType)) {
-            contentType = 'text/plain';
+            contentType = TEXT_PLAIN_TYPE;
           }
 
           this.currentContentType = contentType;
@@ -105,15 +109,18 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
       }),
     );
 
-    // TODO update value panel view when new text is loaded (it does not rerender after text being pasted)
     const data = useObservableRef(
       () => ({
-        fullTextCache: new Map<string, string>(),
+        // TODO do all reset cases
+        fullTextCache: observable.map<string, string>(),
         get fullText() {
-          return this.fullTextCache.get(`${this.firstSelectedCell?.row.index}:${this.firstSelectedCell?.column.index}`);
+          return this.fullTextCache.get(this.fullTextIndex);
+        },
+        get fullTextIndex() {
+          return `${this.firstSelectedCell?.row.index}:${this.firstSelectedCell?.column.index}`;
         },
         updateFullTextCache(value: string) {
-          this.fullTextCache.set(`${this.firstSelectedCell?.row.index}:${this.firstSelectedCell?.column.index}`, value);
+          this.fullTextCache.set(this.fullTextIndex, value);
         },
         get shouldShowPasteButton() {
           return this.isTextColumn && this.isValueTruncated && !this.fullText && this.fullText !== this.textValue;
@@ -270,6 +277,7 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
         limit: computed,
         formatAction: computed,
         canShowTruncatedQuota: computed,
+        fullTextIndex: computed,
         shouldShowPasteButton: computed,
         selectAction: computed,
         columnType: computed,
