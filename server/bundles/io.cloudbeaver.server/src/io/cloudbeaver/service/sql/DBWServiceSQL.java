@@ -122,7 +122,7 @@ public interface DBWServiceSQL extends DBWService {
             @NotNull WebSQLContextInfo contextInfo,
             @NotNull String resultsId,
             @NotNull Integer lobColumnIndex,
-            @Nullable List<WebSQLResultsRow> row) throws DBWebException;
+            @Nullable WebSQLResultsRow row) throws DBWebException;
 
     @NotNull
     @WebAction
@@ -130,7 +130,7 @@ public interface DBWServiceSQL extends DBWService {
         @NotNull WebSQLContextInfo contextInfo,
         @NotNull String resultsId,
         @NotNull Integer lobColumnIndex,
-        @Nullable List<WebSQLResultsRow> row) throws DBWebException;
+        @NotNull WebSQLResultsRow row) throws DBWebException;
 
     @WebAction
     String updateResultsDataBatchScript(

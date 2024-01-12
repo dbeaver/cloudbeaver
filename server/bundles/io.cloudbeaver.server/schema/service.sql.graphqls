@@ -332,6 +332,7 @@ extend type Mutation {
     ): String!
 
     # Returns BLOB name
+    @deprecated(reason: "23.3.3") # use sqlReadLobValue
     readLobValue(
         projectId: ID,
         connectionId: ID!,
@@ -341,14 +342,25 @@ extend type Mutation {
         row: [ SQLResultRow! ]!
     ): String!
 
-    # Returns full string value
+    @since(version: "23.3.3")
+    sqlReadLobValue(
+        projectId: ID,
+        connectionId: ID!,
+        contextId: ID!,
+        resultsId: ID!,
+        lobColumnIndex: Int!,
+        row: SQLResultRow!
+    ): String!
+
+    # Returns full string value ignoring any limits
+    @since(version: "23.3.3")
     sqlReadStringValue(
         projectId: ID,
         connectionId: ID!,
         contextId: ID!,
         resultsId: ID!,
         columnIndex: Int!,
-        row: [ SQLResultRow! ]!
+        row: SQLResultRow!
     ): String!
 
     # Returns SQLExecuteInfo

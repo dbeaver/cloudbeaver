@@ -332,13 +332,10 @@ public class WebServiceSQL implements DBWServiceSQL {
             @NotNull WebSQLContextInfo contextInfo,
             @NotNull String resultsId,
             @NotNull Integer lobColumnIndex,
-            @Nullable List<WebSQLResultsRow> row) throws DBWebException
+            @NotNull WebSQLResultsRow row) throws DBWebException
     {
-        if (row == null) {
-            throw new DBWebException("Results row is not found");
-        }
         ThrowableFunction<DBRProgressMonitor, String> function = monitor -> contextInfo.getProcessor().readLobValue(
-            monitor, contextInfo, resultsId, lobColumnIndex, row.get(0));
+            monitor, contextInfo, resultsId, lobColumnIndex, row);
         return readValue(function, contextInfo.getProcessor());
     }
 
@@ -348,14 +345,14 @@ public class WebServiceSQL implements DBWServiceSQL {
         @NotNull WebSQLContextInfo contextInfo,
         @NotNull String resultsId,
         @NotNull Integer lobColumnIndex,
-        @Nullable List<WebSQLResultsRow> row
+        @NotNull WebSQLResultsRow row
     ) throws DBWebException {
         if (row == null) {
             throw new DBWebException("Results row is not found");
         }
         WebSQLProcessor processor = contextInfo.getProcessor();
         ThrowableFunction<DBRProgressMonitor, String> function = monitor -> processor.readStringValue(
-            monitor, contextInfo, resultsId, lobColumnIndex, row.get(0));
+            monitor, contextInfo, resultsId, lobColumnIndex, row);
         return readValue(function, processor);
     }
 
