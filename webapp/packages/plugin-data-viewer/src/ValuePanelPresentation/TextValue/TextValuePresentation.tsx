@@ -5,12 +5,12 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { observable } from 'mobx';
+import { action, computed, observable } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import { useMemo } from 'react';
 import styled, { css } from 'reshadow';
 
-import { Button, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
+import { Button, useObservableRef, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { QuotasService } from '@cloudbeaver/core-root';
@@ -22,7 +22,7 @@ import type { IResultSetElementKey } from '../../DatabaseDataModel/Actions/Resul
 import { isResultSetContentValue } from '../../DatabaseDataModel/Actions/ResultSet/isResultSetContentValue';
 import { ResultSetDataContentAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetDataContentAction';
 import { ResultSetEditAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetEditAction';
-import { ResultSetFormatAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetFormatAction';
+import { IResultSetValue, ResultSetFormatAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetFormatAction';
 import { ResultSetSelectAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetSelectAction';
 import type { IDatabaseResultSet } from '../../DatabaseDataModel/IDatabaseResultSet';
 import type { IDataValuePanelProps } from '../../TableViewer/ValuePanel/DataValuePanelService';
@@ -93,85 +93,137 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
       }),
     );
 
-    const selection = model.source.getAction(resultIndex, ResultSetSelectAction);
-    const editor = model.source.getAction(resultIndex, ResultSetEditAction);
-    const content = model.source.getAction(resultIndex, ResultSetDataContentAction);
+    const data = useObservableRef(
+      () => ({
+        get selectAction(): ResultSetSelectAction {
+          return this.model.source.getAction(this.resultIndex, ResultSetSelectAction);
+        },
+        get firstSelectedCell(): IResultSetElementKey | undefined {
+          const activeElements = this.selectAction.getActiveElements();
 
-    const activeElements = selection.getActiveElements();
-    const activeTabs = textValuePresentationService.tabs.getDisplayed({ dataFormat, model, resultIndex });
+          if (activeElements.length === 0) {
+            return undefined;
+          }
+
+          return activeElements[0];
+        },
+        get editAction(): ResultSetEditAction {
+          return this.model.source.getAction(resultIndex, ResultSetEditAction);
+        },
+        get contentAction(): ResultSetDataContentAction {
+          return this.model.source.getAction(resultIndex, ResultSetDataContentAction);
+        },
+        get formatAction(): ResultSetFormatAction {
+          return this.model.source.getAction(resultIndex, ResultSetFormatAction);
+        },
+        get isValueTruncated(): boolean {
+          if (!this.firstSelectedCell) {
+            return false;
+          }
+
+          const value = this.formatAction.get(this.firstSelectedCell);
+
+          if (isResultSetContentValue(value)) {
+            return this.contentAction.isContentTruncated(value);
+          }
+
+          return false;
+        },
+        get isReadonly(): boolean {
+          let readonly = true;
+          if (this.firstSelectedCell) {
+            readonly = this.formatAction.isReadOnly(this.firstSelectedCell) || this.formatAction.isBinary(this.firstSelectedCell);
+          }
+
+          return this.model.isReadonly(this.resultIndex) || this.model.isDisabled(resultIndex) || readonly;
+        },
+        get value(): IResultSetValue | null {
+          if (this.firstSelectedCell) {
+            return this.formatAction.get(this.firstSelectedCell);
+          }
+
+          return null;
+        },
+        get limit(): string | undefined {
+          if (this.firstSelectedCell && isResultSetContentValue(this.value) && this.isValueTruncated) {
+            return bytesToSize(quotasService.getQuota('sqlBinaryPreviewMaxLength'));
+          }
+
+          return;
+        },
+        get valueSize(): string | undefined {
+          if (this.firstSelectedCell && isResultSetContentValue(this.value) && this.isValueTruncated) {
+            return bytesToSize(this.value.contentLength ?? 0);
+          }
+
+          return;
+        },
+        get activeTabs() {
+          return textValuePresentationService.tabs.getDisplayed({ dataFormat: this.dataFormat, model: this.model, resultIndex: this.resultIndex });
+        },
+        handleChange(newValue: string) {
+          if (this.firstSelectedCell && !this.isReadonly) {
+            this.editAction.set(this.firstSelectedCell, newValue);
+          }
+        },
+        async save() {
+          if (!this.firstSelectedCell) {
+            return;
+          }
+
+          try {
+            await this.contentAction.downloadFileData(this.firstSelectedCell);
+          } catch (exception) {
+            this.notificationService.logException(exception as any, 'data_viewer_presentation_value_content_download_error');
+          }
+        },
+      }),
+      {
+        limit: computed,
+        formatAction: computed,
+        selectAction: computed,
+        firstSelectedCell: computed,
+        editAction: computed,
+        isReadonly: computed,
+        value: computed,
+        activeTabs: computed,
+        contentAction: computed,
+        isValueTruncated: computed,
+        handleChange: action.bound,
+        save: action.bound,
+      },
+      { model, resultIndex, dataFormat, notificationService },
+    );
 
     let contentType = 'text/plain';
-    let firstSelectedCell: IResultSetElementKey | undefined;
-    let readonly = true;
-    let valueTruncated = false;
-    let limit: string | undefined;
-    let valueSize: string | undefined;
 
-    if (activeElements.length > 0) {
-      const format = model.source.getAction(resultIndex, ResultSetFormatAction);
+    if (data.firstSelectedCell && isResultSetContentValue(data.value) && data.value.contentType) {
+      contentType = data.value.contentType;
 
-      firstSelectedCell = activeElements[0];
+      if (contentType === 'text/json') {
+        contentType = 'application/json';
+      }
 
-      const value = format.get(firstSelectedCell);
-      readonly = format.isReadOnly(firstSelectedCell) || format.isBinary(firstSelectedCell);
-
-      if (isResultSetContentValue(value)) {
-        valueTruncated = content.isContentTruncated(value);
-
-        if (valueTruncated) {
-          limit = bytesToSize(quotasService.getQuota('sqlBinaryPreviewMaxLength'));
-          valueSize = bytesToSize(value.contentLength ?? 0);
-        }
-
-        if (value.contentType) {
-          contentType = value.contentType;
-
-          if (contentType === 'text/json') {
-            contentType = 'application/json';
-          }
-
-          if (!activeTabs.some(tab => tab.key === contentType)) {
-            contentType = 'text/plain';
-          }
-        }
+      if (!data.activeTabs.some(tab => tab.key === contentType)) {
+        contentType = 'text/plain';
       }
     }
-
-    readonly = model.isReadonly(resultIndex) || model.isDisabled(resultIndex) || readonly;
 
     if (contentType !== state.lastContentType) {
       state.setDefaultContentType(contentType);
     }
 
-    function handleChange(newValue: string) {
-      if (firstSelectedCell && !readonly) {
-        editor.set(firstSelectedCell, newValue);
-      }
-    }
-
-    async function save() {
-      if (!firstSelectedCell) {
-        return;
-      }
-
-      try {
-        await content.downloadFileData(firstSelectedCell);
-      } catch (exception) {
-        notificationService.logException(exception as any, 'data_viewer_presentation_value_content_download_error');
-      }
-    }
-
     let currentContentType = state.currentContentType;
 
-    if (activeTabs.length > 0 && !activeTabs.some(tab => tab.key === currentContentType)) {
-      currentContentType = activeTabs[0].key;
+    if (data.activeTabs.length > 0 && !data.activeTabs.some(tab => tab.key === currentContentType)) {
+      currentContentType = data.activeTabs[0].key;
     }
 
-    const canSave = !!firstSelectedCell && content.isDownloadable(firstSelectedCell);
+    const canSave = !!data.firstSelectedCell && data.contentAction.isDownloadable(data.firstSelectedCell);
     const typeExtension = useMemo(() => getTypeExtension(currentContentType) ?? [], [currentContentType]);
     const extensions = useCodemirrorExtensions(undefined, typeExtension);
 
-    const value = useTextValue({
+    const textValue = useTextValue({
       model,
       resultIndex,
       currentContentType,
@@ -199,11 +251,17 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
             <TabList style={[BASE_TAB_STYLES, styles, UNDERLINE_TAB_STYLES]} />
           </TabsState>
         </actions>
-        <EditorLoader key={readonly ? '1' : '0'} value={value} readonly={readonly} extensions={extensions} onChange={value => handleChange(value)} />
-        {valueTruncated && <QuotaPlaceholder limit={limit} size={valueSize} />}
+        <EditorLoader
+          key={data.isReadonly ? '1' : '0'}
+          value={textValue}
+          readonly={data.isReadonly}
+          extensions={extensions}
+          onChange={data.handleChange}
+        />
+        {data.isValueTruncated && <QuotaPlaceholder limit={data.limit} size={data.valueSize} />}
         {canSave && (
           <tools-container>
-            <Button disabled={model.isLoading()} onClick={save}>
+            <Button disabled={model.isLoading()} onClick={data.save}>
               {translate('ui_download')}
             </Button>
           </tools-container>
