@@ -104,6 +104,9 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
 
     const data = useObservableRef(
       () => ({
+        get canSave(): boolean {
+          return Boolean(this.firstSelectedCell && this.contentAction.isDownloadable(this.firstSelectedCell));
+        },
         get selectAction(): ResultSetSelectAction {
           return this.model.source.getAction(this.resultIndex, ResultSetSelectAction);
         },
@@ -188,6 +191,7 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
         },
       }),
       {
+        canSave: computed,
         limit: computed,
         formatAction: computed,
         selectAction: computed,
@@ -208,7 +212,6 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
       state.setContentType(data.activeTabs[0].key);
     }
 
-    const canSave = !!data.firstSelectedCell && data.contentAction.isDownloadable(data.firstSelectedCell);
     const typeExtension = useMemo(() => getTypeExtension(state.currentContentType) ?? [], [state.currentContentType]);
     const extensions = useCodemirrorExtensions(undefined, typeExtension);
     const textValue = useTextValue({
@@ -240,7 +243,7 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
           onChange={data.handleChange}
         />
         {data.isValueTruncated && <QuotaPlaceholder limit={data.limit} size={data.valueSize} />}
-        {canSave && (
+        {data && (
           <tools-container>
             <Button disabled={model.isLoading()} onClick={data.save}>
               {translate('ui_download')}
