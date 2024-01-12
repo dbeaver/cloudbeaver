@@ -172,12 +172,33 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
     @Override
     public void importUsers(@NotNull SMUserImportList userImportList) throws DBException {
         for (SMUserProvisioning user : userImportList.getUsers()) {
-            if (isSubjectExists(user.getUserId())) {
-                log.info("Skip already exist user: " + user.getUserId());
-                setUserAuthRole(user.getUserId(), userImportList.getAuthRole());
+            if (userImportList.getAuthRole() == null) {
+                importUserWithNullAuthRole(user, userImportList.getUsers());
+            } else {
+                importUserWithNonNullAuthRole(user, userImportList.getAuthRole());
+            }
+        }
+    }
+
+    private void importUserWithNullAuthRole(SMUserProvisioning user, List<SMUserProvisioning> userList) throws DBException {
+        for (SMUserProvisioning smUser : userList) {
+            String userId = user.getUserId();
+            if (isSubjectExists(userId)) {
+                log.info("Skip already exist user: " + userId);
+                setUserAuthRole(smUser.getUserId(), smUser.getAuthRole());
                 continue;
             }
-            createUser(user.getUserId(), user.getMetaParameters(), true, userImportList.getAuthRole());
+            createUser(userId, user.getMetaParameters(), true, smUser.getAuthRole());
+        }
+    }
+
+    private void importUserWithNonNullAuthRole(SMUserProvisioning user, String authRole) throws DBException {
+        String userId = user.getUserId();
+        if (isSubjectExists(userId)) {
+            log.info("Skip already exist user: " + userId);
+            setUserAuthRole(userId, authRole);
+        } else {
+            createUser(userId, user.getMetaParameters(), true, authRole);
         }
     }
 
