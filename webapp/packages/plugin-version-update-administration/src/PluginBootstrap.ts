@@ -7,11 +7,12 @@
  */
 import { AdministrationItemService, AdministrationItemType } from '@cloudbeaver/core-administration';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
+import { importLazyComponent } from '@cloudbeaver/core-utils';
 import { VersionUpdateService } from '@cloudbeaver/core-version-update';
 
-import { DockerUpdateInstructions } from './DockerUpdateInstructions';
-import { VersionUpdate } from './VersionUpdate';
-import { VersionUpdateDrawerItem } from './VersionUpdateDrawerItem';
+const DockerUpdateInstructions = importLazyComponent(() => import('./DockerUpdateInstructions').then(m => m.DockerUpdateInstructions));
+const VersionUpdate = importLazyComponent(() => import('./VersionUpdate').then(m => m.VersionUpdate));
+const VersionUpdateDrawerItem = importLazyComponent(() => import('./VersionUpdateDrawerItem').then(m => m.VersionUpdateDrawerItem));
 
 @injectable()
 export class PluginBootstrap extends Bootstrap {
