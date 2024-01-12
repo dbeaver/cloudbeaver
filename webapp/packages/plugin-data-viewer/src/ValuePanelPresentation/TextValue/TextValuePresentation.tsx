@@ -81,14 +81,23 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
     const state = useTabLocalState(() =>
       observable({
         currentContentType: 'text/plain',
-        lastContentType: 'text/plain',
 
-        setContentType(type: string) {
-          this.currentContentType = type;
+        setContentType(contentType: string) {
+          if (contentType === 'text/json') {
+            contentType = 'application/json';
+          }
+
+          if (!data.activeTabs.some(tab => tab.key === contentType)) {
+            contentType = 'text/plain';
+          }
+
+          this.currentContentType = contentType;
         },
-        setDefaultContentType(type: string) {
-          this.currentContentType = type;
-          this.lastContentType = type;
+        handleTabOpen(tabId: string) {
+          // currentContentType may be selected automatically we don't want to change state in this case
+          if (tabId !== state.currentContentType) {
+            state.setContentType(tabId);
+          }
         },
       }),
     );
@@ -195,46 +204,18 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
       { model, resultIndex, dataFormat, notificationService },
     );
 
-    let contentType = 'text/plain';
-
-    if (data.firstSelectedCell && isResultSetContentValue(data.value) && data.value.contentType) {
-      contentType = data.value.contentType;
-
-      if (contentType === 'text/json') {
-        contentType = 'application/json';
-      }
-
-      if (!data.activeTabs.some(tab => tab.key === contentType)) {
-        contentType = 'text/plain';
-      }
-    }
-
-    if (contentType !== state.lastContentType) {
-      state.setDefaultContentType(contentType);
-    }
-
-    let currentContentType = state.currentContentType;
-
-    if (data.activeTabs.length > 0 && !data.activeTabs.some(tab => tab.key === currentContentType)) {
-      currentContentType = data.activeTabs[0].key;
+    if (data.activeTabs.length > 0 && !data.activeTabs.some(tab => tab.key === state.currentContentType)) {
+      state.setContentType(data.activeTabs[0].key);
     }
 
     const canSave = !!data.firstSelectedCell && data.contentAction.isDownloadable(data.firstSelectedCell);
-    const typeExtension = useMemo(() => getTypeExtension(currentContentType) ?? [], [currentContentType]);
+    const typeExtension = useMemo(() => getTypeExtension(state.currentContentType) ?? [], [state.currentContentType]);
     const extensions = useCodemirrorExtensions(undefined, typeExtension);
-
     const textValue = useTextValue({
       model,
       resultIndex,
-      currentContentType,
+      currentContentType: state.currentContentType,
     });
-
-    function handleTabOpen(tabId: string) {
-      // currentContentType may be selected automatically we don't want to change state in this case
-      if (tabId !== currentContentType) {
-        state.setContentType(tabId);
-      }
-    }
 
     return styled(style)(
       <container>
@@ -243,10 +224,10 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
             dataFormat={dataFormat}
             resultIndex={resultIndex}
             container={textValuePresentationService.tabs}
-            currentTabId={currentContentType}
+            currentTabId={state.currentContentType}
             model={model}
             lazy
-            onChange={tab => handleTabOpen(tab.tabId)}
+            onChange={tab => state.handleTabOpen(tab.tabId)}
           >
             <TabList style={[BASE_TAB_STYLES, styles, UNDERLINE_TAB_STYLES]} />
           </TabsState>
