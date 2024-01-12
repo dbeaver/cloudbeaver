@@ -26,11 +26,16 @@ import { ResultSetViewAction } from './ResultSetViewAction';
 
 const RESULT_VALUE_PATH = 'sql-result-value';
 
+interface ICacheEntry {
+  url?: string;
+  fullText?: string;
+}
+
 @databaseDataAction()
 export class ResultSetDataContentAction extends DatabaseDataAction<any, IDatabaseResultSet> implements IResultSetDataContentAction {
   static dataFormat = [ResultDataFormat.Resultset];
 
-  private readonly cache: Map<string, string>;
+  private readonly cache: Map<string, Partial<ICacheEntry>>;
   activeElement: IResultSetElementKey | null;
 
   constructor(
@@ -82,11 +87,17 @@ export class ResultSetDataContentAction extends DatabaseDataAction<any, IDatabas
     const column = this.data.getColumn(element.column);
     const row = this.data.getRowValue(element.row);
 
+    const cachedFullText = this.retrieveFileFullTextFromCache(element);
+
+    if (cachedFullText) {
+      return cachedFullText;
+    }
+
     if (!row || !column) {
       throw new Error('Failed to get value metadata information');
     }
 
-    const text = await this.source.runTask(async () => {
+    const fullText = await this.source.runTask(async () => {
       try {
         this.activeElement = element;
         return await this.loadFileFullText(this.result, column.position, row);
@@ -95,7 +106,9 @@ export class ResultSetDataContentAction extends DatabaseDataAction<any, IDatabas
       }
     });
 
-    return text;
+    this.updateCache(element, { fullText });
+
+    return fullText;
   }
 
   async getFileDataUrl(element: IResultSetElementKey) {
@@ -120,21 +133,37 @@ export class ResultSetDataContentAction extends DatabaseDataAction<any, IDatabas
   }
 
   async resolveFileDataUrl(element: IResultSetElementKey) {
-    const cache = this.retrieveFileDataUrlFromCache(element);
+    const cachedUrl = this.retrieveFileDataUrlFromCache(element);
 
-    if (cache) {
-      return cache;
+    if (cachedUrl) {
+      return cachedUrl;
     }
 
     const url = await this.getFileDataUrl(element);
-    this.cache.set(this.getHash(element), url);
+    this.updateCache(element, { url });
 
     return url;
   }
 
+  private updateCache(element: IResultSetElementKey, partialCache: Partial<ICacheEntry>) {
+    const hash = this.getHash(element);
+    const cachedElement = this.cache.get(hash);
+
+    if (cachedElement) {
+      this.cache.set(hash, { ...cachedElement, ...partialCache });
+    }
+
+    this.cache.set(hash, partialCache);
+  }
+
+  retrieveFileFullTextFromCache(element: IResultSetElementKey) {
+    const hash = this.getHash(element);
+    return this.cache.get(hash)?.fullText;
+  }
+
   retrieveFileDataUrlFromCache(element: IResultSetElementKey) {
     const hash = this.getHash(element);
-    return this.cache.get(hash);
+    return this.cache.get(hash)?.url;
   }
 
   async downloadFileData(element: IResultSetElementKey) {
