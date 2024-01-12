@@ -38,6 +38,8 @@ export default [
   ['data_viewer_presentation_value_content_was_truncated', 'The value was truncated'],
   ['data_viewer_presentation_value_content_value_size', 'Value size'],
   ['data_viewer_presentation_value_content_download_error', 'Download failed'],
+  ['data_viewer_presentation_value_content_paste_error', 'Cannot load full text'],
+  ['data_viewer_presentation_value_content_full_text_button', 'Paste full text'],
   ['data_viewer_script_preview', 'Script'],
   ['data_viewer_script_preview_dialog_title', 'Preview changes'],
   ['data_viewer_script_preview_error_title', "Can't get the script"],
