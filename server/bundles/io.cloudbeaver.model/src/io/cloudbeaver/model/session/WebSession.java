@@ -614,7 +614,7 @@ public class WebSession extends BaseWebSession
         super.close();
     }
 
-    private void clearAuthTokens() throws DBException {
+    private List<WebAuthInfo> clearAuthTokens() throws DBException {
         ArrayList<WebAuthInfo> tokensCopy;
         synchronized (authTokens) {
             tokensCopy = new ArrayList<>(this.authTokens);
@@ -623,6 +623,7 @@ public class WebSession extends BaseWebSession
             removeAuthInfo(ai);
         }
         resetAuthToken();
+        return tokensCopy;
     }
 
     public DBRProgressMonitor getProgressMonitor() {
@@ -873,18 +874,23 @@ public class WebSession extends BaseWebSession
         }
     }
 
-    public void removeAuthInfo(String providerId) throws DBException {
+    public List<WebAuthInfo> removeAuthInfo(String providerId) throws DBException {
+        List<WebAuthInfo> oldInfo;
         if (providerId == null) {
-            clearAuthTokens();
+            oldInfo = clearAuthTokens();
         } else {
             WebAuthInfo authInfo = getAuthInfo(providerId);
             if (authInfo != null) {
                 removeAuthInfo(authInfo);
+                oldInfo = List.of(authInfo);
+            } else {
+                oldInfo = List.of();
             }
         }
         if (authTokens.isEmpty()) {
             resetUserState();
         }
+        return oldInfo;
     }
 
     public List<DBACredentialsProvider> getContextCredentialsProviders() {
