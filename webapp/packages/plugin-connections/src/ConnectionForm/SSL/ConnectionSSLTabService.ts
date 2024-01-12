@@ -196,6 +196,10 @@ export class ConnectionSSLTabService extends Bootstrap {
   private trimSSLConfig(input: NetworkHandlerConfigInput) {
     const { secureProperties } = input;
 
+    if (!secureProperties) {
+      return;
+    }
+
     if (!Object.keys(secureProperties).length) {
       return;
     }
