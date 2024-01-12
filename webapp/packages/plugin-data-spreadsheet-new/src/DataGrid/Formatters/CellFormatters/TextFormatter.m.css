@@ -23,6 +23,10 @@
       height: 12px;
     }
   }
+
+  & .loader {
+    height: 24px;
+  }
 }
 
 .textFormatterValue {
