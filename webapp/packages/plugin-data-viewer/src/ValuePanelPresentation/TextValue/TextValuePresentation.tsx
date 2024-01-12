@@ -113,15 +113,15 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
 
     const data = useObservableRef(
       () => ({
-        fullTextCache: observable.map<string, string>(),
         get fullText() {
-          return this.fullTextCache.get(this.fullTextIndex);
+          if (!this.firstSelectedCell) {
+            return '';
+          }
+
+          return this.contentAction.retrieveFileFullTextFromCache(this.firstSelectedCell);
         },
         get fullTextIndex() {
           return `${this.firstSelectedCell?.row.index}:${this.firstSelectedCell?.column.index}`;
-        },
-        updateFullTextCache(value: string) {
-          this.fullTextCache.set(this.fullTextIndex, value);
         },
         get shouldShowPasteButton() {
           return this.isTextColumn && this.isValueTruncated && !this.fullText && this.fullText !== this.textValue;
@@ -165,7 +165,7 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
           return Boolean(this.firstSelectedCell && this.contentAction.isDownloadable(this.firstSelectedCell));
         },
         get dataAction(): ResultSetDataAction {
-          return this.model.source.getAction(resultIndex, ResultSetDataAction);
+          return this.model.source.getAction(this.resultIndex, ResultSetDataAction);
         },
         get selectAction(): ResultSetSelectAction {
           return this.model.source.getAction(this.resultIndex, ResultSetSelectAction);
@@ -262,15 +262,13 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
           }
 
           try {
-            const text = await this.contentAction.getFileFullText(this.firstSelectedCell);
-            this.updateFullTextCache(text);
+            await this.contentAction.getFileFullText(this.firstSelectedCell);
           } catch (exception) {
             this.notificationService.logException(exception as any, 'data_viewer_presentation_value_content_paste_error');
           }
         },
       }),
       {
-        fullTextCache: observable.ref,
         fullText: computed,
         textValue: computed,
         canSave: computed,
@@ -290,7 +288,6 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
         contentAction: computed,
         dataAction: computed,
         isValueTruncated: computed,
-        updateFullTextCache: action.bound,
         handleChange: action.bound,
         save: action.bound,
         pasteFullText: action.bound,
