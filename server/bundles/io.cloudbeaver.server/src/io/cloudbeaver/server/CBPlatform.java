@@ -19,6 +19,7 @@ package io.cloudbeaver.server;
 
 import io.cloudbeaver.auth.NoAuthCredentialsProvider;
 import io.cloudbeaver.server.jobs.SessionStateJob;
+import io.cloudbeaver.server.jobs.WebDataSourceMonitorJob;
 import io.cloudbeaver.server.jobs.WebSessionMonitorJob;
 import io.cloudbeaver.service.session.WebSessionManager;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -163,6 +164,9 @@ public class CBPlatform extends BasePlatformImpl {
             .scheduleMonitor();
 
         new SessionStateJob(this)
+            .scheduleMonitor();
+
+        new WebDataSourceMonitorJob(this)
             .scheduleMonitor();
 
         new AbstractJob("Delete temp folder") {

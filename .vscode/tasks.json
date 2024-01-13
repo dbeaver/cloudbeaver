@@ -51,6 +51,19 @@
       }
     },
     {
+      "label": "Run Backend CE",
+      "type": "shell",
+      "windows": {
+        "command": "./run-server.bat"
+      },
+      "osx": {
+        "command": "./run-server.sh"
+      },
+      "options": {
+        "cwd": "${workspaceFolder}/deploy/cloudbeaver"
+      }
+    },
+    {
       "label": "Yarn Install",
       "type": "shell",
       "command": "yarn install; yarn lerna bootstrap",
