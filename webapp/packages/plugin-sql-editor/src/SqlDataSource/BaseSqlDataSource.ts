@@ -14,11 +14,9 @@ import type { IDatabaseDataModel, IDatabaseResultSet } from '@cloudbeaver/plugin
 
 import type { IDataQueryOptions } from '../QueryDataSource';
 import { ESqlDataSourceFeatures } from './ESqlDataSourceFeatures';
-import type { ISetScriptData, ISqlDataSource, ISqlDataSourceKey } from './ISqlDataSource';
+import type { ISetScriptData, ISqlDataSource, ISqlDataSourceKey, ScriptDataSourceType } from './ISqlDataSource';
 import type { ISqlDataSourceHistory } from './SqlDataSourceHistory/ISqlDataSourceHistory';
 import { SqlDataSourceHistory } from './SqlDataSourceHistory/SqlDataSourceHistory';
-
-const SOURCE_HISTORY = 'history';
 
 @staticImplements<ISqlDataSourceKey>()
 export abstract class BaseSqlDataSource implements ISqlDataSource {
@@ -96,13 +94,13 @@ export abstract class BaseSqlDataSource implements ISqlDataSource {
     this.onDatabaseModelUpdate.setInitialDataGetter(() => this.databaseModels);
     this.onSetScript.next(this.onUpdate);
     this.onSetScript.addHandler(({ script, source }) => {
-      if (source === SOURCE_HISTORY) {
+      if (source === 'history') {
         return;
       }
       this.history.add(script);
     });
 
-    this.history.onNavigate.addHandler(value => this.setScript(value, SOURCE_HISTORY));
+    this.history.onNavigate.addHandler(value => this.setScript(value, 'history'));
 
     makeObservable<this, 'outdated' | 'editing'>(this, {
       isSaved: computed,
@@ -132,7 +130,7 @@ export abstract class BaseSqlDataSource implements ISqlDataSource {
     });
   }
 
-  setScript(script: string, source?: string): void {
+  setScript(script: string, source?: ScriptDataSourceType): void {
     this.onSetScript.execute({ script, source });
   }
 

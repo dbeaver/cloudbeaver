@@ -11,6 +11,7 @@ import type { IConnectionExecutionContextInfo } from '@cloudbeaver/core-connecti
 
 import { BaseSqlDataSource } from '../BaseSqlDataSource';
 import { ESqlDataSourceFeatures } from '../ESqlDataSourceFeatures';
+import type { ScriptDataSourceType } from '../ISqlDataSource';
 import type { ILocalStorageSqlDataSourceState } from './ILocalStorageSqlDataSourceState';
 
 export class LocalStorageSqlDataSource extends BaseSqlDataSource {
@@ -75,9 +76,9 @@ export class LocalStorageSqlDataSource extends BaseSqlDataSource {
     return true;
   }
 
-  setScript(script: string): void {
+  setScript(script: string, source?: ScriptDataSourceType): void {
     this.state.script = script;
-    super.setScript(script);
+    super.setScript(script, source);
   }
 
   setExecutionContext(executionContext?: IConnectionExecutionContextInfo): void {

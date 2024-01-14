@@ -112,6 +112,64 @@ export const SQLCodeEditorPanel: TabContainerPanelComponent<ISqlEditorModeProps>
     ],
   });
 
+  useExecutor({
+    executor: data.onFormat,
+    handlers: [
+      function setCursor([script, formatted]) {
+        const view = editorRef?.view;
+
+        if (!view) {
+          return;
+        }
+
+        const selection = view.state.selection.main;
+
+        setTimeout(() => {
+          view.dispatch({
+            selection: {
+              anchor: selection.from,
+              head: selection.from,
+            },
+          });
+        });
+      },
+    ],
+  });
+
+  useExecutor({
+    executor: data.dataSource?.onSetScript,
+    postHandlers: [
+      function setScript({ script, source }) {
+        if (source === 'insert') {
+          // Note: Use setTimeout to ensure this runs after the current transaction is fully processed
+          setTimeout(() => {
+            const view = editorRef?.view;
+
+            if (!view) {
+              return;
+            }
+
+            const currentContent = view.state.doc.toString();
+            const startPos = currentContent.lastIndexOf(script);
+
+            if (startPos === -1) {
+              return;
+            }
+
+            const endPos = startPos + script.length;
+
+            view.dispatch({
+              selection: {
+                anchor: endPos,
+                head: endPos,
+              },
+            });
+          });
+        }
+      },
+    ],
+  });
+
   function applyIncoming() {
     data.dataSource?.applyIncoming();
   }

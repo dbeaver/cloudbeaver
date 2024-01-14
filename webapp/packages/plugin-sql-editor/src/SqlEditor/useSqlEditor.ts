@@ -225,8 +225,8 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
           this.readonlyState = true;
           const formatted = await this.sqlDialectInfoService.formatScript(this.dataSource.executionContext, script.query);
 
-          this.onFormat.execute([script, formatted]);
           this.setScript(query.substring(0, script.begin) + formatted + query.substring(script.end));
+          this.onFormat.execute([script, formatted]);
         } finally {
           this.readonlyState = false;
         }

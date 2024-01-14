@@ -18,9 +18,11 @@ export interface ISqlDataSourceKey {
   readonly key: string;
 }
 
+export type ScriptDataSourceType = 'history' | 'insert';
+
 export interface ISetScriptData {
   script: string;
-  source?: string;
+  source?: ScriptDataSourceType;
 }
 
 export interface ISqlDataSource extends ILoadableState {
@@ -54,7 +56,7 @@ export interface ISqlDataSource extends ILoadableState {
   canRename(name: string | null): boolean;
   setName(name: string | null): void;
   setProject(projectId: string | null): void;
-  setScript(script: string, source?: string): void;
+  setScript(script: string, source?: ScriptDataSourceType): void;
   setEditing(state: boolean): void;
   setExecutionContext(executionContext?: IConnectionExecutionContextInfo): void;
   setIncomingExecutionContext(executionContext?: IConnectionExecutionContextInfo): void;
