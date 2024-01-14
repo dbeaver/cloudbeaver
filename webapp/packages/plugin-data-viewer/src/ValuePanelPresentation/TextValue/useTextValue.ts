@@ -21,73 +21,52 @@ interface IUseTextValue {
   isTextColumn: boolean;
 }
 
-// TODO tell Ainur about extra space bug
-// TODO refactor the logic
-// TODO isFullText flag instead of fullTextValue
 export function useTextValue({ model, resultIndex, currentContentType }: IUseTextValueArgs): IUseTextValue {
   const { formatAction, editAction, contentAction, dataAction } = useResultActions({ model, resultIndex });
   const selection = model.source.getAction(resultIndex, ResultSetSelectAction);
   const activeElements = selection.getActiveElements();
   const firstSelectedCell = activeElements?.[0];
   const formatter = useAutoFormat();
+  const columnType = firstSelectedCell ? dataAction.getColumn(firstSelectedCell.column)?.dataKind : '';
+  const isTextColumn = columnType?.toLocaleLowerCase() === 'string';
+  const contentValue = firstSelectedCell ? formatAction.get(firstSelectedCell) : null;
+  const cachedFullText = firstSelectedCell ? contentAction.retrieveFileFullTextFromCache(firstSelectedCell) : '';
+  const blob = firstSelectedCell ? formatAction.get(firstSelectedCell) : null;
+  const result: IUseTextValue = {
+    textValue: '',
+    isFullTextValue: false,
+    isTruncated: false,
+    isTextColumn,
+  };
 
   if (!isNotNullDefined(firstSelectedCell)) {
-    return {
-      textValue: '',
-      isFullTextValue: false,
-      isTruncated: false,
-      isTextColumn: false,
-    };
+    return result;
   }
-
-  const contentValue = formatAction.get(firstSelectedCell);
-  let isTruncated = false;
 
   if (isResultSetContentValue(contentValue)) {
-    isTruncated = contentAction.isContentTruncated(contentValue);
+    result.isTruncated = contentAction.isContentTruncated(contentValue);
   }
 
-  const cachedFullText = contentAction.retrieveFileFullTextFromCache(firstSelectedCell);
-  const columnType = dataAction.getColumn(firstSelectedCell.column)?.dataKind;
-  const isTextColumn = columnType?.toLocaleLowerCase() === 'string';
-
   if (isTextColumn && cachedFullText) {
-    return {
-      textValue: cachedFullText,
-      isFullTextValue: true,
-      isTruncated,
-      isTextColumn,
-    };
+    result.textValue = cachedFullText;
+    result.isFullTextValue = true;
   }
 
   if (editAction.isElementEdited(firstSelectedCell)) {
-    return {
-      textValue: formatAction.getText(firstSelectedCell),
-      isFullTextValue: false,
-      isTruncated,
-      isTextColumn,
-    };
+    result.textValue = formatAction.getText(firstSelectedCell);
   }
-
-  const blob = formatAction.get(firstSelectedCell);
 
   if (isResultSetBinaryFileValue(blob)) {
     const value = formatter.formatBlob(currentContentType, blob);
 
     if (value) {
-      return {
-        textValue: value,
-        isFullTextValue: false,
-        isTruncated,
-        isTextColumn,
-      };
+      result.textValue = value;
     }
   }
 
-  return {
-    textValue: formatter.format(currentContentType, formatAction.getText(firstSelectedCell)),
-    isFullTextValue: false,
-    isTruncated,
-    isTextColumn,
-  };
+  if (!result.textValue) {
+    result.textValue = formatter.format(currentContentType, formatAction.getText(firstSelectedCell));
+  }
+
+  return result;
 }
