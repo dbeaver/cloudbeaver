@@ -70,7 +70,7 @@ export class ResultSetDataContentAction extends DatabaseDataAction<any, IDatabas
       throw new Error("Result's id must be provided");
     }
 
-    const response = await this.graphQLService.sdk.getSqlReadStringValue({
+    const response = await this.graphQLService.sdk.sqlReadStringValue({
       resultsId: result.id,
       connectionId: result.connectionId,
       contextId: result.contextId,
