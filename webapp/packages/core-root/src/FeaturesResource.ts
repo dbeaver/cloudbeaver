@@ -9,20 +9,16 @@ import { injectable } from '@cloudbeaver/core-di';
 import { CachedDataResource } from '@cloudbeaver/core-resource';
 import { GraphQLService, WebFeatureSet } from '@cloudbeaver/core-sdk';
 
-import { ServerConfigResource } from './ServerConfigResource';
+import { SessionPermissionsResource } from './SessionPermissionsResource';
 
 export type ApplicationFeature = WebFeatureSet;
 
 @injectable()
 export class FeaturesResource extends CachedDataResource<ApplicationFeature[]> {
-  constructor(private readonly graphQLService: GraphQLService, serverConfigResource: ServerConfigResource) {
+  constructor(private readonly graphQLService: GraphQLService, permissionsResource: SessionPermissionsResource) {
     super(() => []);
 
-    this.sync(
-      serverConfigResource,
-      () => {},
-      () => {},
-    );
+    permissionsResource.require(this, 'admin').outdateResource(this);
   }
 
   protected async loader(): Promise<ApplicationFeature[]> {
