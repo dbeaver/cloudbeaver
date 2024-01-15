@@ -22,6 +22,7 @@ import com.google.gson.InstanceCreator;
 import io.cloudbeaver.WebServiceUtils;
 import io.cloudbeaver.auth.CBAuthConstants;
 import io.cloudbeaver.auth.NoAuthCredentialsProvider;
+import io.cloudbeaver.model.WebPasswordPolicyConfiguration;
 import io.cloudbeaver.model.app.BaseWebApplication;
 import io.cloudbeaver.model.app.WebAuthApplication;
 import io.cloudbeaver.model.app.WebAuthConfiguration;
@@ -127,6 +128,7 @@ public abstract class CBApplication extends BaseWebApplication implements WebAut
     protected final Map<String, Object> databaseConfiguration = new HashMap<>();
     protected final SMControllerConfiguration securityManagerConfiguration = new SMControllerConfiguration();
     private final CBAppConfig appConfiguration = new CBAppConfig();
+    private final WebPasswordPolicyConfiguration passwordPolicyConfig = new WebPasswordPolicyConfiguration();
     private Map<String, String> externalProperties = new LinkedHashMap<>();
     private Map<String, Object> originalConfigurationProperties = new LinkedHashMap<>();
 
@@ -229,6 +231,10 @@ public abstract class CBApplication extends BaseWebApplication implements WebAut
 
     public Map<String, Object> getProductConfiguration() {
         return productConfiguration;
+    }
+
+    public WebPasswordPolicyConfiguration getPasswordPolicyConfiguration() {
+        return passwordPolicyConfig;
     }
 
     public SMAdminController getSecurityController() {
@@ -599,6 +605,11 @@ public abstract class CBApplication extends BaseWebApplication implements WebAut
             Map<String, Object> appConfig = JSONUtils.getObject(configProps, "app");
             validateConfiguration(appConfig);
             gson.fromJson(gson.toJsonTree(appConfig), CBAppConfig.class);
+            // Password policy config
+            gson.fromJson(
+                gson.toJsonTree(JSONUtils.getObject(serverConfig, CBConstants.PARAM_PASSWORD_POLICY_CONFIGURATION)),
+                WebPasswordPolicyConfiguration.class
+            );
 
             databaseConfiguration.putAll(JSONUtils.getObject(serverConfig, CBConstants.PARAM_DB_CONFIGURATION));
 
@@ -772,11 +783,13 @@ public abstract class CBApplication extends BaseWebApplication implements WebAut
         InstanceCreator<CBAppConfig> appConfigCreator = type -> appConfiguration;
         InstanceCreator<DataSourceNavigatorSettings> navSettingsCreator = type -> (DataSourceNavigatorSettings) appConfiguration.getDefaultNavigatorSettings();
         InstanceCreator<SMControllerConfiguration> smConfigCreator = type -> securityManagerConfiguration;
+        InstanceCreator<WebPasswordPolicyConfiguration> webPasswordPolicyConfigCreator = type -> passwordPolicyConfig;
         return new GsonBuilder()
             .setLenient()
             .registerTypeAdapter(CBAppConfig.class, appConfigCreator)
             .registerTypeAdapter(DataSourceNavigatorSettings.class, navSettingsCreator)
-            .registerTypeAdapter(SMControllerConfiguration.class, smConfigCreator);
+            .registerTypeAdapter(SMControllerConfiguration.class, smConfigCreator)
+            .registerTypeAdapter(WebPasswordPolicyConfiguration.class, webPasswordPolicyConfigCreator);
     }
 
     protected void readAdditionalConfiguration(Map<String, Object> rootConfig) throws DBException {

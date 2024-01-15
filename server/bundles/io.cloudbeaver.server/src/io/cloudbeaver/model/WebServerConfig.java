@@ -217,4 +217,9 @@ public class WebServerConfig {
     public String getDefaultUserTeam() {
         return application.getAppConfiguration().getDefaultUserTeam();
     }
+
+    @Property
+    public WebPasswordPolicyConfiguration getPasswordPolicyConfiguration() {
+        return application.getPasswordPolicyConfiguration();
+    }
 }
