@@ -7,6 +7,9 @@
         <service id="auth" label="User authentication" description="User authentication services" class="io.cloudbeaver.service.auth.WebServiceBindingAuth">
 
         </service>
+        <service id="reverse.configurator" label="Reverse Proxy Configurator" description="Reverse proxy configurator"
+                 class="io.cloudbeaver.service.auth.ReverseProxyConfigurator">
+        </service>
     </extension>
     <extension point="io.cloudbeaver.handler">
         <sessionHandler id="RPSessionHandler" class="io.cloudbeaver.service.auth.RPSessionHandler"/>
