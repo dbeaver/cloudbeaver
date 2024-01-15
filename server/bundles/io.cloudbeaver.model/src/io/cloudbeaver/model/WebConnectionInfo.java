@@ -443,4 +443,10 @@ public class WebConnectionInfo {
         closeListeners.add(listener);
     }
 
+    @Property
+    public int getKeepAliveInterval() {
+        return dataSourceContainer.getConnectionConfiguration().getKeepAliveInterval();
+    }
+
+
 }

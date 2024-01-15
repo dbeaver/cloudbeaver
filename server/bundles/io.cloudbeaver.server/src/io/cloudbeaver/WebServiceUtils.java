@@ -182,6 +182,9 @@ public class WebServiceUtils extends WebCommonUtils {
         if (config.getAuthModelId() != null) {
             dsConfig.setAuthModelId(config.getAuthModelId());
         }
+        if (config.getKeepAliveInterval() >= 0) {
+            dsConfig.setKeepAliveInterval(config.getKeepAliveInterval());
+        }
         // Save provider props
         if (config.getProviderProperties() != null) {
             dsConfig.setProviderProperties(new LinkedHashMap<>());
