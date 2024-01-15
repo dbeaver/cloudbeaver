@@ -22,7 +22,7 @@ import com.google.gson.InstanceCreator;
 import io.cloudbeaver.WebServiceUtils;
 import io.cloudbeaver.auth.CBAuthConstants;
 import io.cloudbeaver.auth.NoAuthCredentialsProvider;
-import io.cloudbeaver.model.WebPasswordPolicyConfiguration;
+import io.cloudbeaver.service.security.PasswordPolicyConfiguration;
 import io.cloudbeaver.model.app.BaseWebApplication;
 import io.cloudbeaver.model.app.WebAuthApplication;
 import io.cloudbeaver.model.app.WebAuthConfiguration;
@@ -128,7 +128,6 @@ public abstract class CBApplication extends BaseWebApplication implements WebAut
     protected final Map<String, Object> databaseConfiguration = new HashMap<>();
     protected final SMControllerConfiguration securityManagerConfiguration = new SMControllerConfiguration();
     private final CBAppConfig appConfiguration = new CBAppConfig();
-    private final WebPasswordPolicyConfiguration passwordPolicyConfig = new WebPasswordPolicyConfiguration();
     private Map<String, String> externalProperties = new LinkedHashMap<>();
     private Map<String, Object> originalConfigurationProperties = new LinkedHashMap<>();
 
@@ -233,8 +232,8 @@ public abstract class CBApplication extends BaseWebApplication implements WebAut
         return productConfiguration;
     }
 
-    public WebPasswordPolicyConfiguration getPasswordPolicyConfiguration() {
-        return passwordPolicyConfig;
+    public SMControllerConfiguration getSecurityManagerConfiguration() {
+        return securityManagerConfiguration;
     }
 
     public SMAdminController getSecurityController() {
@@ -608,7 +607,7 @@ public abstract class CBApplication extends BaseWebApplication implements WebAut
             // Password policy config
             gson.fromJson(
                 gson.toJsonTree(JSONUtils.getObject(serverConfig, CBConstants.PARAM_PASSWORD_POLICY_CONFIGURATION)),
-                WebPasswordPolicyConfiguration.class
+                PasswordPolicyConfiguration.class
             );
 
             databaseConfiguration.putAll(JSONUtils.getObject(serverConfig, CBConstants.PARAM_DB_CONFIGURATION));
@@ -783,13 +782,14 @@ public abstract class CBApplication extends BaseWebApplication implements WebAut
         InstanceCreator<CBAppConfig> appConfigCreator = type -> appConfiguration;
         InstanceCreator<DataSourceNavigatorSettings> navSettingsCreator = type -> (DataSourceNavigatorSettings) appConfiguration.getDefaultNavigatorSettings();
         InstanceCreator<SMControllerConfiguration> smConfigCreator = type -> securityManagerConfiguration;
-        InstanceCreator<WebPasswordPolicyConfiguration> webPasswordPolicyConfigCreator = type -> passwordPolicyConfig;
+        InstanceCreator<PasswordPolicyConfiguration> smPasswordPoliceConfigCreator =
+            type -> securityManagerConfiguration.getPasswordPolicyConfiguration();
         return new GsonBuilder()
             .setLenient()
             .registerTypeAdapter(CBAppConfig.class, appConfigCreator)
             .registerTypeAdapter(DataSourceNavigatorSettings.class, navSettingsCreator)
             .registerTypeAdapter(SMControllerConfiguration.class, smConfigCreator)
-            .registerTypeAdapter(WebPasswordPolicyConfiguration.class, webPasswordPolicyConfigCreator);
+            .registerTypeAdapter(PasswordPolicyConfiguration.class, smPasswordPoliceConfigCreator);
     }
 
     protected void readAdditionalConfiguration(Map<String, Object> rootConfig) throws DBException {
@@ -1055,6 +1055,7 @@ public abstract class CBApplication extends BaseWebApplication implements WebAut
                 }
                 serverConfigProperties.put(CBConstants.PARAM_DB_CONFIGURATION, databaseConfigProperties);
             }
+            savePasswordPolicyConfig(originServerConfig, serverConfigProperties);
         }
         {
             var appConfigProperties = new LinkedHashMap<String, Object>();
@@ -1162,6 +1163,30 @@ public abstract class CBApplication extends BaseWebApplication implements WebAut
             }
         }
         return rootConfig;
+    }
+
+    private void savePasswordPolicyConfig(Map<String, Object> originServerConfig, LinkedHashMap<String, Object> serverConfigProperties) {
+        // save password policy configuration
+        var passwordPolicyProperties = new LinkedHashMap<String, Object>();
+
+        var oldRuntimePasswordPolicyConfig = JSONUtils.getObject(
+            JSONUtils.getObject(originServerConfig, CBConstants.PARAM_SM_CONFIGURATION),
+            CBConstants.PARAM_PASSWORD_POLICY_CONFIGURATION
+        );
+        Gson gson = getGson();
+        Map<String, Object> passwordPolicyConfig = gson.fromJson(
+            gson.toJsonTree(securityManagerConfiguration.getPasswordPolicyConfiguration()),
+            JSONUtils.MAP_TYPE_TOKEN
+        );
+        if (!CommonUtils.isEmpty(passwordPolicyConfig) && !isDistributed()) {
+            for (Map.Entry<String, Object> mp : passwordPolicyConfig.entrySet()) {
+                copyConfigValue(oldRuntimePasswordPolicyConfig, passwordPolicyProperties, mp.getKey(), mp.getValue());
+            }
+            serverConfigProperties.put(
+                CBConstants.PARAM_SM_CONFIGURATION,
+                Map.of(CBConstants.PARAM_PASSWORD_POLICY_CONFIGURATION, passwordPolicyProperties)
+            );
+        }
     }
 
     ////////////////////////////////////////////////////////////////////////

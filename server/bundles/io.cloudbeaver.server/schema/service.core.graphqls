@@ -103,7 +103,7 @@ type PasswordPolicyConfig @since(version: "23.3.3") {
     minLength: Int!
     minDigits: Int!
     minSpecialCharacters: Int!
-    requiresUpperCase: Boolean!
+    requiresUpperLowerCase: Boolean!
 }
 
 type ProductInfo {

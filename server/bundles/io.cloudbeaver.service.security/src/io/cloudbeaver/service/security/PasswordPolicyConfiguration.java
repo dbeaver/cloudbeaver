@@ -14,15 +14,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.cloudbeaver.model;
+package io.cloudbeaver.service.security;
 
 import org.jkiss.dbeaver.model.meta.Property;
 
-public class WebPasswordPolicyConfiguration {
-    private int minLength;
-    private int minDigits;
-    private int minSpecialCharacters;
-    private boolean requiresUpperCase;
+public class PasswordPolicyConfiguration {
+    private static final int DEFAULT_MIN_LENGTH = 8;
+    private static final int DEFAULT_MIN_DIGITS = 1;
+    private static final int DEFAULT_MIN_SPECIAL_CHARACTERS = 0;
+    private static final boolean DEFAULT_REQUIRES_UPPER_LOWER_CASE = true;
+    private int minLength = DEFAULT_MIN_LENGTH;
+    private int minDigits = DEFAULT_MIN_DIGITS;
+    private int minSpecialCharacters = DEFAULT_MIN_SPECIAL_CHARACTERS;
+    private boolean requiresUpperLowerCase = DEFAULT_REQUIRES_UPPER_LOWER_CASE;
 
     @Property
     public int getMinLength() {
@@ -40,7 +44,7 @@ public class WebPasswordPolicyConfiguration {
     }
 
     @Property
-    public boolean isRequiresUpperCase() {
-        return requiresUpperCase;
+    public boolean isRequiresUpperLowerCase() {
+        return requiresUpperLowerCase;
     }
 }
