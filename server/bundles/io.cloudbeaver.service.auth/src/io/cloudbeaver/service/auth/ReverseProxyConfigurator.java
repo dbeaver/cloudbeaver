@@ -19,8 +19,11 @@ public class ReverseProxyConfigurator implements DBWServiceServerConfigurator {
     private static final Log log = Log.getLog(ReverseProxyConfigurator.class);
 
     @Override
-    public void configureServer(@NotNull WebApplication application, @Nullable WebSession session, @NotNull WebAppConfiguration appConfig) throws DBException {
-
+    public void configureServer(
+        @NotNull WebApplication application,
+        @Nullable WebSession session,
+        @NotNull WebAppConfiguration appConfig
+    ) throws DBException {
     }
 
     @Override
@@ -81,6 +84,11 @@ public class ReverseProxyConfigurator implements DBWServiceServerConfigurator {
 
         if (!authApplication.getAuthConfiguration().isAuthProviderEnabled(RPAuthProvider.AUTH_PROVIDER)) {
             log.debug("Reverse proxy provider disabled, migration not needed");
+            return true;
+        }
+
+        if (authApplication.getAuthConfiguration().getAuthProviderConfiguration(RPAuthProvider.AUTH_PROVIDER) != null) {
+            log.debug("Reverse proxy provider already exist, migration not needed");
             return true;
         }
         return false;
