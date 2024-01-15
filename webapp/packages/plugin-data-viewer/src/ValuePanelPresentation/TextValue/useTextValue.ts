@@ -1,3 +1,12 @@
+/*
+ * CloudBeaver - Cloud Database Manager
+ * Copyright (C) 2020-2024 DBeaver Corp and others
+ *
+ * Licensed under the Apache License, Version 2.0.
+ * you may not use this file except in compliance with the License.
+ */
+import { useService } from '@cloudbeaver/core-di';
+import { NotificationService } from '@cloudbeaver/core-events';
 import { isNotNullDefined } from '@cloudbeaver/core-utils';
 
 import { isResultSetBinaryFileValue } from '../../DatabaseDataModel/Actions/ResultSet/isResultSetBinaryFileValue';
@@ -19,6 +28,7 @@ interface IUseTextValue {
   isFullTextValue: boolean;
   isTruncated: boolean;
   isTextColumn: boolean;
+  pasteFullText(): Promise<void>;
 }
 
 export function useTextValue({ model, resultIndex, currentContentType }: IUseTextValueArgs): IUseTextValue {
@@ -32,11 +42,24 @@ export function useTextValue({ model, resultIndex, currentContentType }: IUseTex
   const contentValue = firstSelectedCell ? formatAction.get(firstSelectedCell) : null;
   const cachedFullText = firstSelectedCell ? contentAction.retrieveFileFullTextFromCache(firstSelectedCell) : '';
   const blob = firstSelectedCell ? formatAction.get(firstSelectedCell) : null;
+  const notificationService = useService(NotificationService);
+
   const result: IUseTextValue = {
     textValue: '',
     isFullTextValue: false,
     isTruncated: false,
     isTextColumn,
+    async pasteFullText() {
+      if (!firstSelectedCell) {
+        return;
+      }
+
+      try {
+        await contentAction.getFileFullText(firstSelectedCell);
+      } catch (exception) {
+        notificationService.logException(exception as any, 'data_viewer_presentation_value_content_paste_error');
+      }
+    },
   };
 
   if (!isNotNullDefined(firstSelectedCell)) {

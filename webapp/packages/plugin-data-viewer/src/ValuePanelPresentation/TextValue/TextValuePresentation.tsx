@@ -15,10 +15,9 @@ import { useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { QuotasService } from '@cloudbeaver/core-root';
 import { BASE_TAB_STYLES, TabContainerPanelComponent, TabList, TabsState, UNDERLINE_TAB_STYLES, useTabLocalState } from '@cloudbeaver/core-ui';
-import { bytesToSize } from '@cloudbeaver/core-utils';
+import { bytesToSize, isNotNullDefined } from '@cloudbeaver/core-utils';
 import { EditorLoader, useCodemirrorExtensions } from '@cloudbeaver/plugin-codemirror6';
 
-import type { IResultSetContentValue } from '../../DatabaseDataModel/Actions/ResultSet/IResultSetContentValue';
 import { isResultSetContentValue } from '../../DatabaseDataModel/Actions/ResultSet/isResultSetContentValue';
 import { ResultSetSelectAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetSelectAction';
 import { useResultActions } from '../../DatabaseDataModel/Actions/ResultSet/useResultActions';
@@ -103,21 +102,17 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
             contentType = APPLICATION_JSON_TYPE;
           }
 
-          if (!activeTabs.some(tab => tab.key === contentType)) {
-            contentType = TEXT_PLAIN_TYPE;
-          }
-
           this.currentContentType = contentType;
         },
         handleTabOpen(tabId: string) {
           // currentContentType may be selected automatically we don't want to change state in this case
-          if (tabId !== state.currentContentType) {
-            state.setContentType(tabId);
+          if (tabId !== this.currentContentType) {
+            this.setContentType(tabId);
           }
         },
       }),
     );
-    const { textValue, isFullTextValue, isTruncated, isTextColumn } = useTextValue({
+    const { textValue, isFullTextValue, isTruncated, isTextColumn, pasteFullText } = useTextValue({
       model,
       resultIndex,
       currentContentType: state.currentContentType,
@@ -125,7 +120,8 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
     const isSelectedCellReadonly = firstSelectedCell && (formatAction.isReadOnly(firstSelectedCell) || formatAction.isBinary(firstSelectedCell));
     const isReadonlyByResultIndex = model.isReadonly(resultIndex) || model.isDisabled(resultIndex) || !firstSelectedCell;
     const isReadonly = isSelectedCellReadonly || isReadonlyByResultIndex;
-    const valueSize = bytesToSize((contentValue as IResultSetContentValue)?.contentLength ?? 0);
+    const valueSize =
+      isResultSetContentValue(contentValue) && isNotNullDefined(contentValue.contentLength) ? bytesToSize(contentValue.contentLength) : undefined;
     const limit = bytesToSize(quotasService.getQuota('sqlBinaryPreviewMaxLength'));
     const canSave = firstSelectedCell && contentAction.isDownloadable(firstSelectedCell);
     const shouldShowPasteButton = isTextColumn && isTruncated && !isFullTextValue;
@@ -150,20 +146,9 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
       }
     }
 
-    async function pasteFullText() {
-      if (!firstSelectedCell) {
-        return;
-      }
-
-      try {
-        await contentAction.getFileFullText(firstSelectedCell);
-      } catch (exception) {
-        notificationService.logException(exception as any, 'data_viewer_presentation_value_content_paste_error');
-      }
-    }
-
-    if (activeTabs.length > 0 && !activeTabs.some(tab => tab.key === state.currentContentType)) {
-      state.setContentType(activeTabs[0].key);
+    if (!activeTabs.some(tab => tab.key === state.currentContentType)) {
+      const contentType = activeTabs.length > 0 && activeTabs[0].key ? activeTabs[0].key : TEXT_PLAIN_TYPE;
+      state.setContentType(contentType);
     }
 
     return styled(style)(

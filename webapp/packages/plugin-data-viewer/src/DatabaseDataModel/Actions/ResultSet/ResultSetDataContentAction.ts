@@ -147,13 +147,8 @@ export class ResultSetDataContentAction extends DatabaseDataAction<any, IDatabas
 
   private updateCache(element: IResultSetElementKey, partialCache: Partial<ICacheEntry>) {
     const hash = this.getHash(element);
-    const cachedElement = this.cache.get(hash);
-
-    if (cachedElement) {
-      this.cache.set(hash, { ...cachedElement, ...partialCache });
-    }
-
-    this.cache.set(hash, partialCache);
+    const cachedElement = this.cache.get(hash) ?? {};
+    this.cache.set(hash, { ...cachedElement, ...partialCache });
   }
 
   retrieveFileFullTextFromCache(element: IResultSetElementKey) {

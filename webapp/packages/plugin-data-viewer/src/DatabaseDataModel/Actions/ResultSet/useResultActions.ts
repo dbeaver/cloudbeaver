@@ -1,3 +1,7 @@
+import { computed, observable } from 'mobx';
+
+import { useObservableRef } from '@cloudbeaver/core-blocks';
+
 import type { IDatabaseDataModel } from '../../IDatabaseDataModel';
 import type { IDatabaseResultSet } from '../../IDatabaseResultSet';
 import { ResultSetConstraintAction } from './ResultSetConstraintAction';
@@ -14,27 +18,41 @@ interface IResultActionsArgs {
 }
 
 export function useResultActions({ model, resultIndex }: IResultActionsArgs) {
-  return {
-    get dataAction(): ResultSetDataAction {
-      return model.source.getAction(resultIndex, ResultSetDataAction);
+  return useObservableRef(
+    () => ({
+      get dataAction(): ResultSetDataAction {
+        return this.model.source.getAction(this.resultIndex, ResultSetDataAction);
+      },
+      get selectAction(): ResultSetSelectAction {
+        return this.model.source.getAction(this.resultIndex, ResultSetSelectAction);
+      },
+      get editAction(): ResultSetEditAction {
+        return this.model.source.getAction(this.resultIndex, ResultSetEditAction);
+      },
+      get contentAction(): ResultSetDataContentAction {
+        return this.model.source.getAction(this.resultIndex, ResultSetDataContentAction);
+      },
+      get formatAction(): ResultSetFormatAction {
+        return this.model.source.getAction(this.resultIndex, ResultSetFormatAction);
+      },
+      get constraintAction(): ResultSetConstraintAction {
+        return this.model.source.getAction(this.resultIndex, ResultSetConstraintAction);
+      },
+      get viewAction(): ResultSetViewAction {
+        return this.model.source.getAction(this.resultIndex, ResultSetViewAction);
+      },
+    }),
+    {
+      dataAction: computed,
+      selectAction: computed,
+      editAction: computed,
+      contentAction: computed,
+      formatAction: computed,
+      constraintAction: computed,
+      viewAction: computed,
+      model: observable.ref,
+      resultIndex: observable.ref,
     },
-    get selectAction(): ResultSetSelectAction {
-      return model.source.getAction(resultIndex, ResultSetSelectAction);
-    },
-    get editAction(): ResultSetEditAction {
-      return model.source.getAction(resultIndex, ResultSetEditAction);
-    },
-    get contentAction(): ResultSetDataContentAction {
-      return model.source.getAction(resultIndex, ResultSetDataContentAction);
-    },
-    get formatAction(): ResultSetFormatAction {
-      return model.source.getAction(resultIndex, ResultSetFormatAction);
-    },
-    get constraintAction(): ResultSetConstraintAction {
-      return model.source.getAction(resultIndex, ResultSetConstraintAction);
-    },
-    get viewAction(): ResultSetViewAction {
-      return model.source.getAction(resultIndex, ResultSetViewAction);
-    },
-  };
+    { model, resultIndex },
+  );
 }
