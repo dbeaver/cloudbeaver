@@ -8,8 +8,8 @@
 import { lazy } from 'react';
 
 import { AdministrationScreenService } from '@cloudbeaver/core-administration';
-import { EAdminPermission } from '@cloudbeaver/core-authentication';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
+import { EAdminPermission } from '@cloudbeaver/core-resource';
 import { PermissionsService } from '@cloudbeaver/core-root';
 import { ScreenService } from '@cloudbeaver/core-routing';
 import { DATA_CONTEXT_MENU, MenuBaseItem, MenuService } from '@cloudbeaver/core-view';

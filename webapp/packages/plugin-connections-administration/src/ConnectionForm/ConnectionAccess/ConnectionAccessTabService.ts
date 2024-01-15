@@ -8,11 +8,11 @@
 import React from 'react';
 
 import { AdministrationScreenService } from '@cloudbeaver/core-administration';
-import { EAdminPermission } from '@cloudbeaver/core-authentication';
 import { ConnectionInfoResource, createConnectionParam, IConnectionInfoParams } from '@cloudbeaver/core-connections';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { executorHandlerFilter, IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import { isGlobalProject, ProjectInfoResource } from '@cloudbeaver/core-projects';
+import { EAdminPermission } from '@cloudbeaver/core-resource';
 import { PermissionsService } from '@cloudbeaver/core-root';
 import { formStateContext } from '@cloudbeaver/core-ui';
 import type { MetadataValueGetter } from '@cloudbeaver/core-utils';

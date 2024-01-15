@@ -11,6 +11,7 @@ import { injectable } from '@cloudbeaver/core-di';
 import {
   CachedMapAllKey,
   CachedMapResource,
+  EAdminPermission,
   isResourceAlias,
   type ResourceKey,
   resourceKeyList,
@@ -21,7 +22,6 @@ import { SessionPermissionsResource } from '@cloudbeaver/core-root';
 import { AdminAuthProviderConfiguration, GetAuthProviderConfigurationsQueryVariables, GraphQLService } from '@cloudbeaver/core-sdk';
 
 import type { AuthProviderConfiguration } from './AuthProvidersResource';
-import { EAdminPermission } from './EAdminPermission';
 
 const NEW_CONFIGURATION_SYMBOL = Symbol('new-configuration');
 

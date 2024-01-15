@@ -9,9 +9,9 @@ import { observer } from 'mobx-react-lite';
 import { useCallback } from 'react';
 
 import { AdministrationItemService, AdministrationScreenService } from '@cloudbeaver/core-administration';
-import { EAdminPermission } from '@cloudbeaver/core-authentication';
 import { Translate, usePermission, useResource } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
+import { EAdminPermission } from '@cloudbeaver/core-resource';
 import { SessionPermissionsResource } from '@cloudbeaver/core-root';
 
 import { Administration } from '../../Administration/Administration';

@@ -8,7 +8,7 @@
 import { observer } from 'mobx-react-lite';
 import { useCallback, useRef } from 'react';
 
-import { AUTH_PROVIDER_LOCAL_ID, EAdminPermission } from '@cloudbeaver/core-authentication';
+import { AUTH_PROVIDER_LOCAL_ID } from '@cloudbeaver/core-authentication';
 import {
   ColoredContainer,
   Combobox,
@@ -34,7 +34,7 @@ import {
 } from '@cloudbeaver/core-blocks';
 import { DatabaseAuthModelsResource, DBDriverResource, isLocalConnection } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
-import { CachedResourceListEmptyKey, resourceKeyList } from '@cloudbeaver/core-resource';
+import { CachedResourceListEmptyKey, EAdminPermission, resourceKeyList } from '@cloudbeaver/core-resource';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
 import { DriverConfigurationType } from '@cloudbeaver/core-sdk';
 import { type TabContainerPanelComponent, useAuthenticationAction } from '@cloudbeaver/core-ui';

@@ -13,6 +13,7 @@ import {
   CachedMapResource,
   CachedResourceOffsetPageKey,
   CachedResourceOffsetPageListKey,
+  EAdminPermission,
   isResourceAlias,
   type ResourceKey,
   resourceKeyList,
@@ -27,7 +28,6 @@ import { AdminConnectionGrantInfo, AdminUserInfo, AdminUserInfoFragment, GetUser
 import { AUTH_PROVIDER_LOCAL_ID } from './AUTH_PROVIDER_LOCAL_ID';
 import { AuthInfoService } from './AuthInfoService';
 import { AuthProviderService } from './AuthProviderService';
-import { EAdminPermission } from './EAdminPermission';
 import type { IAuthCredentials } from './IAuthCredentials';
 
 const NEW_USER_SYMBOL = Symbol('new-user');

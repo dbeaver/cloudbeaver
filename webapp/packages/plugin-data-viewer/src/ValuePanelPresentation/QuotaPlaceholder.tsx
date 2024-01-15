@@ -8,8 +8,8 @@
 import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
-import { EAdminPermission } from '@cloudbeaver/core-authentication';
 import { Link, usePermission, useTranslate } from '@cloudbeaver/core-blocks';
+import { EAdminPermission } from '@cloudbeaver/core-resource';
 
 interface Props {
   limit?: string;

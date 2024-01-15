@@ -6,15 +6,13 @@
  * you may not use this file except in compliance with the License.
  */
 import { injectable } from '@cloudbeaver/core-di';
-import { CachedMapResource, isResourceAlias, type ResourceKey, ResourceKeyUtils } from '@cloudbeaver/core-resource';
+import { CachedMapResource, EAdminPermission, isResourceAlias, type ResourceKey, ResourceKeyUtils } from '@cloudbeaver/core-resource';
 import { SessionDataResource, SessionPermissionsResource } from '@cloudbeaver/core-root';
 import {
   AuthProviderConfigurationParametersFragment,
   GetAuthProviderConfigurationParametersQueryVariables,
   GraphQLService,
 } from '@cloudbeaver/core-sdk';
-
-import { EAdminPermission } from './EAdminPermission';
 
 @injectable()
 export class AuthConfigurationParametersResource extends CachedMapResource<

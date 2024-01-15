@@ -6,11 +6,9 @@
  * you may not use this file except in compliance with the License.
  */
 import { injectable } from '@cloudbeaver/core-di';
-import { CachedDataResource } from '@cloudbeaver/core-resource';
+import { CachedDataResource, EAdminPermission } from '@cloudbeaver/core-resource';
 import { SessionPermissionsResource } from '@cloudbeaver/core-root';
 import { GraphQLService } from '@cloudbeaver/core-sdk';
-
-import { EAdminPermission } from './EAdminPermission';
 
 @injectable()
 export class AuthRolesResource extends CachedDataResource<string[]> {

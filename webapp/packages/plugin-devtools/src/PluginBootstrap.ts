@@ -5,9 +5,8 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { EAdminPermission } from '@cloudbeaver/core-authentication';
 import { App, Bootstrap, DIService, injectable, IServiceConstructor } from '@cloudbeaver/core-di';
-import { CachedResource } from '@cloudbeaver/core-resource';
+import { CachedResource, EAdminPermission } from '@cloudbeaver/core-resource';
 import { PermissionsService } from '@cloudbeaver/core-root';
 import { ActionService, DATA_CONTEXT_MENU, DATA_CONTEXT_SUBMENU_ITEM, MenuBaseItem, MenuService } from '@cloudbeaver/core-view';
 import { TOP_NAV_BAR_SETTINGS_MENU } from '@cloudbeaver/plugin-settings-menu';

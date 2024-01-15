@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { EAdminPermission } from '@cloudbeaver/core-authentication';
 import {
   Connection,
   ConnectionInfoResource,
@@ -17,7 +16,7 @@ import {
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { DATA_CONTEXT_NAV_NODE, EObjectFeature, NavNodeManagerService } from '@cloudbeaver/core-navigation-tree';
-import { getCachedMapResourceLoaderState } from '@cloudbeaver/core-resource';
+import { EAdminPermission, getCachedMapResourceLoaderState } from '@cloudbeaver/core-resource';
 import {
   CONNECTION_NAVIGATOR_VIEW_SETTINGS,
   isNavigatorViewSettingsEqual,

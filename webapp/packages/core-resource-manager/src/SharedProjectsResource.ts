@@ -8,12 +8,12 @@
 import { runInAction } from 'mobx';
 
 import type { AdminObjectGrantInfo } from '@cloudbeaver/core-administration';
-import { EAdminPermission } from '@cloudbeaver/core-authentication';
 import { injectable } from '@cloudbeaver/core-di';
 import { ProjectInfoResource } from '@cloudbeaver/core-projects';
 import {
   CachedMapAllKey,
   CachedMapResource,
+  EAdminPermission,
   type ResourceKey,
   type ResourceKeyList,
   resourceKeyList,
