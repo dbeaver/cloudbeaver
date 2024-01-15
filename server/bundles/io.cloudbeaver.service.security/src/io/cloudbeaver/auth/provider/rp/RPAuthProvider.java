@@ -48,6 +48,7 @@ public class RPAuthProvider implements SMAuthProviderExternal<SMSession> {
     public static final String X_ROLE_TE = "X-Role-TE";
     public static final String X_FIRST_NAME = "X-First-name";
     public static final String X_LAST_NAME = "X-Last-name";
+    public static final String X_LOGOUT_URL = "X-logout-url";
     public static final String AUTH_PROVIDER = "reverseProxy";
 
     @NotNull
