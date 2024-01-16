@@ -31,4 +31,8 @@ public interface SMProvisioner {
         @NotNull SMAuthProviderCustomConfiguration customConfiguration,
         @NotNull SMProvisioningFilter filter
     ) throws DBException;
+
+    default boolean isAutoConfiguration(SMAuthProviderCustomConfiguration configuration) {
+        return false;
+    }
 }
