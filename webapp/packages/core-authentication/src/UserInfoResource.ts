@@ -155,16 +155,16 @@ export class UserInfoResource extends CachedDataResource<UserInfo | null, void, 
   }
 
   async logout(provider?: string, configuration?: string): Promise<void> {
-    const { authLogout } = await this.graphQLService.sdk.authLogout({
+    const { authLogoutExtended } = await this.graphQLService.sdk.authLogout({
       provider,
       configuration,
     });
 
     // TODO handle all redirect links once we know what to do with multiple popups issue
-    const redirectLinks = authLogout?.redirectLinks || [];
+    const redirectLinks = authLogoutExtended?.redirectLinks || [];
 
     if (redirectLinks.length) {
-      const oktaLink = authLogout?.redirectLinks[0];
+      const oktaLink = authLogoutExtended?.redirectLinks[0];
       const id = `okta-logout-id-${getUniqueId()}`;
 
       this.windowsService.open(id, {
