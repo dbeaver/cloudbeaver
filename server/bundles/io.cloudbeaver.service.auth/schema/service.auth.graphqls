@@ -143,7 +143,11 @@ extend type Query {
     authUpdateStatus(authId: ID!, linkUser: Boolean): AuthInfo!
 
     # Logouts user. If provider not specified then all authorizations are revoked from session.
-    authLogout(provider: ID, configuration: ID): LogoutInfo
+    @deprecated
+    authLogout(provider: ID, configuration: ID): Boolean!
+
+    # Same as #authLogout, but returns additional information
+    authLogoutExtended(provider: ID, configuration: ID): LogoutInfo!
 
     # Active user information. null is no user was authorized within session
     activeUser: UserInfo
