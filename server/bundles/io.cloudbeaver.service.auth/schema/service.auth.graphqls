@@ -145,7 +145,7 @@ extend type Query {
 
     # Logouts user. If provider not specified then all authorizations are revoked from session.
     @deprecated
-    authLogout(provider: ID, configuration: ID): Boolean!
+    authLogout(provider: ID, configuration: ID): Boolean
 
     # Same as #authLogout, but returns additional information
     @since(version: "23.3.3")
