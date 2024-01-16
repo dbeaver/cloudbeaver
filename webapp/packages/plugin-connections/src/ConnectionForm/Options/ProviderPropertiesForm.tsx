@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2023 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -13,7 +13,9 @@ import {
   getPropertyControlType,
   Group,
   GroupTitle,
+  InputField,
   ObjectPropertyInfoForm,
+  useCustomInputValidation,
   useObjectPropertyCategories,
   useTranslate,
 } from '@cloudbeaver/core-blocks';
@@ -28,9 +30,10 @@ interface Props {
   readonly?: boolean;
 }
 
+const MAX_KEEP_ALIVE_INTERVAL_IN_SECONDS = 32767;
+
 export const ProviderPropertiesForm = observer<Props>(function ProviderPropertiesForm({ config, properties, disabled, readonly }) {
   const translate = useTranslate();
-
   const supportedProperties = properties.filter(property => property.supportedConfigurationTypes?.some(type => type === config.configurationType));
 
   const { categories, isUncategorizedExists } = useObjectPropertyCategories(supportedProperties);
@@ -73,6 +76,21 @@ export const ProviderPropertiesForm = observer<Props>(function ProviderPropertie
           )}
         </>
       )}
+
+      <InputField
+        type="number"
+        minLength={1}
+        min={0}
+        max={MAX_KEEP_ALIVE_INTERVAL_IN_SECONDS}
+        name="keepAliveInterval"
+        disabled={disabled}
+        readOnly={readonly}
+        defaultValue={config?.keepAliveInterval ?? 0}
+        title={translate('connections_connection_keep_alive_tooltip')}
+        state={config}
+      >
+        {translate('connections_connection_keep_alive')}
+      </InputField>
 
       {categories.map((category, index) => (
         <Container key={`${category}_${config.driverId}`} gap>

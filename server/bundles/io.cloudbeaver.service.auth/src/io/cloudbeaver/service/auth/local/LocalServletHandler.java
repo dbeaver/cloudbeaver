@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2023 DBeaver Corp and others
+ * Copyright (C) 2010-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,12 +20,12 @@ import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.server.CBPlatform;
 import io.cloudbeaver.server.actions.AbstractActionServletHandler;
 import io.cloudbeaver.utils.WebAppUtils;
-import org.jkiss.dbeaver.DBException;
-import org.jkiss.dbeaver.Log;
-
 import jakarta.servlet.Servlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.jkiss.dbeaver.DBException;
+import org.jkiss.dbeaver.Log;
+
 import java.io.IOException;
 
 public class LocalServletHandler extends AbstractActionServletHandler {

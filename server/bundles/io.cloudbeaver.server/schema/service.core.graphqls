@@ -314,6 +314,8 @@ type ConnectionInfo {
     databaseName: String
     url: String
 
+    keepAliveInterval: Int!
+
     properties: Object
 
     template: Boolean!
@@ -464,6 +466,9 @@ input ConnectionConfig {
     url: String
     # Properties
     properties: Object
+
+    # Keep-Alive interval
+    keepAliveInterval: Int
 
     # Template connection
     template: Boolean

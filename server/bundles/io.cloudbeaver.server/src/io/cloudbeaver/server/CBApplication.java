@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2023 DBeaver Corp and others
+ * Copyright (C) 2010-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -515,6 +515,7 @@ public abstract class CBApplication extends BaseWebApplication implements WebAut
     @Nullable
     @Override
     protected Path loadServerConfiguration() throws DBException {
+        initHomeFolder();
         Path path = super.loadServerConfiguration();
 
 
@@ -548,8 +549,7 @@ public abstract class CBApplication extends BaseWebApplication implements WebAut
     }
 
     protected void parseConfiguration(Map<String, Object> configProps) throws DBException {
-        String homeFolder = initHomeFolder();
-
+        Path homeFolder = getHomeDirectory();
         CBAppConfig prevConfig = new CBAppConfig(appConfiguration);
         Gson gson = getGson();
         try {
@@ -602,7 +602,7 @@ public abstract class CBApplication extends BaseWebApplication implements WebAut
 
             databaseConfiguration.putAll(JSONUtils.getObject(serverConfig, CBConstants.PARAM_DB_CONFIGURATION));
 
-            readProductConfiguration(serverConfig, gson, homeFolder);
+            readProductConfiguration(serverConfig, gson, homeFolder.toString());
 
             String staticContentsFile = JSONUtils.getString(serverConfig, CBConstants.PARAM_STATIC_CONTENT);
             if (!CommonUtils.isEmpty(staticContentsFile)) {
