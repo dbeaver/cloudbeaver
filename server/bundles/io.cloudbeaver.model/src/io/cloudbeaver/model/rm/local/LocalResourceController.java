@@ -1155,6 +1155,11 @@ public class LocalResourceController implements RMController {
         return new Builder(workspace, credentialsProvider, smControllerSupplier);
     }
 
+    @Override
+    public String ping() {
+        return "pong (RM)";
+    }
+
     public static final class Builder {
         private final SMCredentialsProvider credentialsProvider;
         private final Supplier<SMController> smController;
