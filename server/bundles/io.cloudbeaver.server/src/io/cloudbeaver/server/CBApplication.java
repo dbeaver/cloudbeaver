@@ -597,7 +597,7 @@ public abstract class CBApplication extends BaseWebApplication implements WebAut
                 enableSecurityManager);
             //SM config
             gson.fromJson(
-                gson.toJsonTree(JSONUtils.getObject(serverConfig, CBConstants.PARAM_SM_CONFIGURATION)),
+                gson.toJson(JSONUtils.getObject(serverConfig, CBConstants.PARAM_SM_CONFIGURATION)),
                 SMControllerConfiguration.class
             );
             // App config
