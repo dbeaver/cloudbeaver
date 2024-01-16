@@ -50,19 +50,18 @@ public class ReverseProxyConfigurator implements DBWServiceServerConfigurator {
             authApplication.getAuthConfiguration().getAuthProviderConfiguration(RPAuthProvider.AUTH_PROVIDER);
         if (smReverseProxyProviderConfiguration  == null) {
             smReverseProxyProviderConfiguration  = new SMAuthProviderCustomConfiguration(RPAuthProvider.AUTH_PROVIDER);
-            smReverseProxyProviderConfiguration .setProvider(RPAuthProvider.AUTH_PROVIDER);
-            smReverseProxyProviderConfiguration .setDisplayName("Reverse Proxy");
-            smReverseProxyProviderConfiguration .setDescription(
+            smReverseProxyProviderConfiguration.setProvider(RPAuthProvider.AUTH_PROVIDER);
+            smReverseProxyProviderConfiguration.setDisplayName("Reverse Proxy");
+            smReverseProxyProviderConfiguration.setDescription(
                 "Automatically created provider after changing Reverse Proxy configuration way in 23.3.3 version"
             );
             smReverseProxyProviderConfiguration .setIconURL("");
             Map<String, Object> parameters = new HashMap<>();
             parameters.put(RPConstants.PARAM_USER, RPAuthProvider.X_USER);
-            parameters.put(RPConstants.PARAM_LOGOUT_URL, RPAuthProvider.X_LOGOUT_URL);
-            parameters.put(RPConstants.PARAM_TEAM, RPAuthProvider.X_LOGOUT_URL);
+            parameters.put(RPConstants.PARAM_TEAM, RPAuthProvider.X_TEAM);
             parameters.put(RPConstants.PARAM_FIRST_NAME, RPAuthProvider.X_FIRST_NAME);
             parameters.put(RPConstants.PARAM_LAST_NAME, RPAuthProvider.X_LAST_NAME);
-            smReverseProxyProviderConfiguration .setParameters(parameters);
+            smReverseProxyProviderConfiguration.setParameters(parameters);
             authApplication.getAuthConfiguration().addAuthProviderConfiguration(smReverseProxyProviderConfiguration );
             try {
                 authApplication.flushConfiguration();
