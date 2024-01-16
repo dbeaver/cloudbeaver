@@ -52,5 +52,11 @@ query serverConfig {
       releaseTime
       licenseInfo
     }
+    passwordPolicyConfiguration {
+      minLength
+      minDigits
+      minSpecialCharacters
+      requiresUpperLowerCase
+    }
   }
 }

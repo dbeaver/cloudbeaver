@@ -7,7 +7,7 @@
  */
 import { action, computed, observable } from 'mobx';
 
-import { UsersResource } from '@cloudbeaver/core-authentication';
+import { PasswordPolicyService, UsersResource } from '@cloudbeaver/core-authentication';
 import { useObservableRef } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
@@ -29,6 +29,7 @@ interface IState {
 export function useChangePassword(): IState {
   const usersResource = useService(UsersResource);
   const notificationService = useService(NotificationService);
+  const passwordPolicyService = useService(PasswordPolicyService);
 
   return useObservableRef(
     () => ({
@@ -42,6 +43,13 @@ export function useChangePassword(): IState {
         return this.config.password.length > 0 && this.config.oldPassword.length > 0 && this.config.repeatedPassword.length > 0;
       },
       async changePassword() {
+        const validation = this.passwordPolicyService.validatePassword(this.config.password);
+
+        if (!validation.isValid) {
+          this.notificationService.logError({ title: validation.errorMessage });
+          return;
+        }
+
         if (this.config.password !== this.config.repeatedPassword) {
           this.notificationService.logError({ title: 'plugin_user_profile_authentication_change_password_passwords_not_match' });
           return;
@@ -71,6 +79,6 @@ export function useChangePassword(): IState {
       changePassword: action.bound,
       resetConfig: action,
     },
-    { usersResource, notificationService },
+    { usersResource, notificationService, passwordPolicyService },
   );
 }
