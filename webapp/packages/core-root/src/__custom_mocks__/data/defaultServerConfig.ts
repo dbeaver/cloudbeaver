@@ -119,5 +119,11 @@ export const defaultServerConfig: (productConfiguration?: Record<string, any>) =
       releaseTime: 'July 11, 2022',
       licenseInfo: '',
     },
+    passwordPolicyConfiguration: {
+      minLength: 8,
+      minDigits: 0,
+      minSpecialCharacters: 0,
+      requiresUpperLowerCase: false,
+    },
   },
 });
