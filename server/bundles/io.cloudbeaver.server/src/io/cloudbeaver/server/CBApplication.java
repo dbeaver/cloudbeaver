@@ -604,11 +604,6 @@ public abstract class CBApplication extends BaseWebApplication implements WebAut
             Map<String, Object> appConfig = JSONUtils.getObject(configProps, "app");
             validateConfiguration(appConfig);
             gson.fromJson(gson.toJsonTree(appConfig), CBAppConfig.class);
-            // Password policy config
-            gson.fromJson(
-                gson.toJsonTree(JSONUtils.getObject(serverConfig, CBConstants.PARAM_PASSWORD_POLICY_CONFIGURATION)),
-                PasswordPolicyConfiguration.class
-            );
 
             databaseConfiguration.putAll(JSONUtils.getObject(serverConfig, CBConstants.PARAM_DB_CONFIGURATION));
 
