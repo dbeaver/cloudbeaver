@@ -28,7 +28,7 @@
             </credentials>
             <configuration>
                 <propertyGroup label="Configuration">
-                    <property id="logout-url-header" label="Logout url" type="string" description="Logout url"/>
+                    <property id="logout-url" label="Logout url" type="string" description="Logout url"/>
                     <property id="user-header" label="User header name" type="string" description="User header name"/>
                     <property id="team-header" label="Team name" type="string" description="Team header name"/>
                     <property id="first-name-header" label="First name header" type="string" description="First name header name"/>

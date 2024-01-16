@@ -40,10 +40,8 @@ import org.jkiss.utils.CommonUtils;
 
 import java.io.IOException;
 import java.text.MessageFormat;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
@@ -94,7 +92,7 @@ public class RPSessionHandler implements DBWSessionHandler {
         String role = request.getHeader(resolveParam(paramConfigMap.get(RPConstants.PARAM_ROLE_NAME), RPAuthProvider.X_ROLE_TE));
         String firstName = request.getHeader(resolveParam(paramConfigMap.get(RPConstants.PARAM_FIRST_NAME), RPAuthProvider.X_FIRST_NAME));
         String lastName = request.getHeader(resolveParam(paramConfigMap.get(RPConstants.PARAM_LAST_NAME), RPAuthProvider.X_LAST_NAME));
-        String logoutUrl = request.getHeader(resolveParam(paramConfigMap.get(RPConstants.PARAM_LOGOUT_URL), RPAuthProvider.X_LOGOUT_URL));
+        String logoutUrl = Objects.requireNonNull(configuration).getParameter(RPConstants.PARAM_LOGOUT_URL);
         List<String> userTeams = teams == null ? Collections.emptyList() : List.of(teams.split("\\|"));
         if (userName != null) {
             try {
@@ -105,6 +103,9 @@ public class RPSessionHandler implements DBWSessionHandler {
                 }
                 if (!CommonUtils.isEmpty(lastName)) {
                     credentials.put(SMStandardMeta.META_LAST_NAME, lastName);
+                }
+                if (!CommonUtils.isNotEmpty(logoutUrl)) {
+                    credentials.put("logoutUrl", logoutUrl);
                 }
                 Map<String, Object> sessionParameters = webSession.getSessionParameters();
                 sessionParameters.put(SMConstants.SESSION_PARAM_TRUSTED_USER_TEAMS, userTeams);
