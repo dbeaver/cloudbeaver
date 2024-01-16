@@ -8,6 +8,7 @@ export * from './Quadtree/index';
 
 export * from './underscore';
 
+export * from './importLazyComponent';
 export * from './base64ToBlob';
 export * from './blobToBase64';
 export * from './base64ToHex';

@@ -7,14 +7,18 @@
  */
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { EObjectFeature, NavNodeInfoResource } from '@cloudbeaver/core-navigation-tree';
+import { importLazyComponent } from '@cloudbeaver/core-utils';
 import { NavNodeViewService } from '@cloudbeaver/plugin-navigation-tree';
 
 import { DDLViewerFooterService } from './DdlViewer/DDLViewerFooterService';
-import { DDLViewerTab } from './DdlViewer/DDLViewerTab';
-import { DDLViewerTabPanel } from './DdlViewer/DDLViewerTabPanel';
-import { ExtendedDDLViewerTabPanel } from './ExtendedDDLViewer/ExtendedDDLViewerTabPanel';
 import { NAV_NODE_DDL_ID } from './NAV_NODE_DDL_ID';
 import { NAV_NODE_EXTENDED_DDL_ID } from './NAV_NODE_EXTENDED_DDL_ID';
+
+const DDLViewerTab = importLazyComponent(() => import('./DdlViewer/DDLViewerTab').then(m => m.DDLViewerTab));
+const DDLViewerTabPanel = importLazyComponent(() => import('./DdlViewer/DDLViewerTabPanel').then(m => m.DDLViewerTabPanel));
+const ExtendedDDLViewerTabPanel = importLazyComponent(() =>
+  import('./ExtendedDDLViewer/ExtendedDDLViewerTabPanel').then(m => m.ExtendedDDLViewerTabPanel),
+);
 
 @injectable()
 export class DdlViewerBootstrap extends Bootstrap {
