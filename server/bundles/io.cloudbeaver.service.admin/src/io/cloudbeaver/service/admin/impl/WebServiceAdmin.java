@@ -404,11 +404,20 @@ public class WebServiceAdmin implements DBWServiceAdmin {
         if (authProvider == null) {
             throw new DBWebException("Invalid provider ID " + providerId);
         }
+        var application = CBApplication.getInstance();
         return authProvider.getConfigurationParameters().stream().filter(p -> {
-            if (p.hasFeature("distributed")) {
-                return CBApplication.getInstance().isDistributed();
+            boolean allFeaturesEnabled = true;
+            for (String feature : p.getRequiredFeatures()) {
+                if (feature.equals("distributed")) {
+                    allFeaturesEnabled = CBApplication.getInstance().isDistributed();
+                } else {
+                    allFeaturesEnabled = application.getAppConfiguration().isFeatureEnabled(feature);
+                }
+                if (!allFeaturesEnabled) {
+                    break;
+                }
             }
-            return true;
+            return allFeaturesEnabled;
         }).map(p -> new WebPropertyInfo(webSession, p)).collect(Collectors.toList());
     }
 

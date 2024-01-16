@@ -49,7 +49,7 @@ public class WebAuthProviderDescriptor extends AbstractDescriptor {
     private final Map<SMSubjectType, List<DBPPropertyDescriptor>> metaParameters = new HashMap<>();
     private SMAuthProvider<?> instance;
     private final DBPImage icon;
-    private final Map<String, PropertyDescriptor> configurationParameters = new LinkedHashMap<>();
+    private final Map<String, WebAuthProviderProperty> configurationParameters = new LinkedHashMap<>();
     private final List<SMAuthCredentialsProfile> credentialProfiles = new ArrayList<>();
     private final boolean configurable;
     private final boolean trusted;
@@ -72,7 +72,7 @@ public class WebAuthProviderDescriptor extends AbstractDescriptor {
                 String category = propGroup.getAttribute(PropertyDescriptor.ATTR_LABEL);
                 IConfigurationElement[] propElements = propGroup.getChildren(PropertyDescriptor.TAG_PROPERTY);
                 for (IConfigurationElement prop : propElements) {
-                    PropertyDescriptor propertyDescriptor = new PropertyDescriptor(category, prop);
+                    WebAuthProviderProperty propertyDescriptor = new WebAuthProviderProperty(category, prop);
                     configurationParameters.put(CommonUtils.toString(propertyDescriptor.getId()), propertyDescriptor);
                 }
             }
@@ -130,7 +130,7 @@ public class WebAuthProviderDescriptor extends AbstractDescriptor {
         return isRequired;
     }
 
-    public List<PropertyDescriptor> getConfigurationParameters() {
+    public List<WebAuthProviderProperty> getConfigurationParameters() {
         return new ArrayList<>(configurationParameters.values());
     }
 
