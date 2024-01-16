@@ -171,47 +171,23 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
 
     @Override
     public void importUsers(@NotNull SMUserImportList userImportList) throws DBException {
-        for (SMUserProvisioning user : userImportList.getUsers()) {
-            if (userImportList.getAuthRole() == null) {
-                importUserWithNullAuthRole(user, userImportList.getUsers());
-            } else {
-                importUserWithNonNullAuthRole(user, userImportList.getAuthRole());
-            }
-        }
-    }
-
-    private void importUserWithNullAuthRole(SMUserProvisioning user, List<SMUserProvisioning> userList) throws DBException {
-        for (SMUserProvisioning smUser : userList) {
-            String userId = user.getUserId();
-            if (isSubjectExists(userId)) {
-                log.info("Skip already exist user: " + userId);
-                setUserAuthRole(smUser.getUserId(), smUser.getAuthRole());
-                continue;
-            }
-            createUser(userId, user.getMetaParameters(), true, smUser.getAuthRole());
-        }
-    }
-
-    private void importUserWithNonNullAuthRole(SMUserProvisioning user, String authRole) throws DBException {
-        String userId = user.getUserId();
-        if (isSubjectExists(userId)) {
-            log.info("Skip already exist user: " + userId);
-            setUserAuthRole(userId, authRole);
-        } else {
-            createUser(userId, user.getMetaParameters(), true, authRole);
-        }
+       try (var dbCon = database.openConnection()) {
+            importUsers(dbCon, userImportList);
+       } catch (SQLException e) {
+           log.error("Failed attempt import user: " + e.getMessage());
+       }
     }
 
     protected void importUsers(@NotNull Connection connection, @NotNull SMUserImportList userImportList)
         throws DBException, SQLException {
         for (SMUserProvisioning user : userImportList.getUsers()) {
+            String authRole = user.getAuthRole() == null ? userImportList.getAuthRole() : user.getAuthRole();
             if (isSubjectExists(user.getUserId())) {
                 log.info("User already exist : " + user.getUserId());
-                setUserAuthRole(connection, user.getUserId(), userImportList.getAuthRole());
+                setUserAuthRole(connection, user.getUserId(), authRole);
                 enableUser(connection, user.getUserId(), true);
                 continue;
             }
-            String authRole = user.getAuthRole() == null ? userImportList.getAuthRole() : user.getAuthRole();
             createUser(connection, user.getUserId(), user.getMetaParameters(), true, authRole);
         }
     }

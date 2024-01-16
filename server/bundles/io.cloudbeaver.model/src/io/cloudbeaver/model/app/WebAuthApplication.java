@@ -20,6 +20,8 @@ package io.cloudbeaver.model.app;
 import io.cloudbeaver.auth.CBAuthConstants;
 import org.jkiss.dbeaver.DBException;
 
+import java.util.List;
+
 public interface WebAuthApplication extends WebApplication {
     WebAuthConfiguration getAuthConfiguration();
 
@@ -30,4 +32,6 @@ public interface WebAuthApplication extends WebApplication {
     }
 
     void flushConfiguration() throws DBException;
+
+    String getDefaultAuthRole();
 }
