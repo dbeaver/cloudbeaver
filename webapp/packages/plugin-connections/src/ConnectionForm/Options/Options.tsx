@@ -1,13 +1,12 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2023 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
 import { useCallback, useRef } from 'react';
-import styled, { css } from 'reshadow';
 
 import { AUTH_PROVIDER_LOCAL_ID, EAdminPermission } from '@cloudbeaver/core-authentication';
 import {
@@ -24,11 +23,13 @@ import {
   ObjectPropertyInfoForm,
   Radio,
   RadioGroup,
+  s,
   Textarea,
   useAdministrationSettings,
   useFormValidator,
   usePermission,
   useResource,
+  useS,
   useTranslate,
 } from '@cloudbeaver/core-blocks';
 import { DatabaseAuthModelsResource, DBDriverResource, isLocalConnection } from '@cloudbeaver/core-connections';
@@ -43,18 +44,12 @@ import { ProjectSelect } from '@cloudbeaver/plugin-projects';
 import { ConnectionFormService } from '../ConnectionFormService';
 import type { IConnectionFormProps } from '../IConnectionFormProps';
 import { ConnectionOptionsTabService } from './ConnectionOptionsTabService';
+import styles from './Options.m.css';
 import { ParametersForm } from './ParametersForm';
 import { ProviderPropertiesForm } from './ProviderPropertiesForm';
 import { useOptions } from './useOptions';
 
 const PROFILE_AUTH_MODEL_ID = 'profile';
-
-const styles = css`
-  Form {
-    flex: 1;
-    overflow: auto;
-  }
-`;
 
 interface IDriverConfiguration {
   name: string;
@@ -81,6 +76,7 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
   const formRef = useRef<HTMLFormElement>(null);
   const translate = useTranslate();
   const { info, config, availableDrivers, submittingTask: submittingHandlers, disabled } = state;
+  const style = useS(styles);
 
   //@TODO it's here until the profile implementation in the CloudBeaver
   const readonly = state.readonly || info?.authModel === PROFILE_AUTH_MODEL_ID;
@@ -138,7 +134,7 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
   const { data: applicableAuthModels } = useResource(
     Options,
     DatabaseAuthModelsResource,
-    getComputed(() => (driver?.applicableAuthModels ? resourceKeyList(driver.applicableAuthModels) : CachedResourceListEmptyKey)),
+    driver?.applicableAuthModels ? resourceKeyList(driver.applicableAuthModels) : CachedResourceListEmptyKey,
   );
 
   const { data: authModel } = useResource(
@@ -167,8 +163,8 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
     properties = info.authProperties;
   }
 
-  return styled(styles)(
-    <Form ref={formRef} disabled={driverMap.isLoading()} onChange={handleFormChange}>
+  return (
+    <Form ref={formRef} className={s(style, { form: true })} disabled={driverMap.isLoading()} onChange={handleFormChange}>
       <ColoredContainer wrap overflow parent gap>
         <Container medium gap>
           <Group form gap>
@@ -354,6 +350,6 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
           )}
         </Container>
       </ColoredContainer>
-    </Form>,
+    </Form>
   );
 });

@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2023 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -47,9 +47,11 @@ export const Body = observer(function Body() {
 
   return (
     <DNDProvider>
-      <Loader suspense>
+      <Loader className={s(styles, { loader: true })} suspense>
         <div ref={ref} className={s(styles, { bodyContent: true }, `theme-${themeService.currentTheme.id}`)}>
-          <Loader suspense>{Screen && <Screen {...screenService.routerService.params} />}</Loader>
+          <Loader className={s(styles, { loader: true })} suspense>
+            {Screen && <Screen {...screenService.routerService.params} />}
+          </Loader>
           <DialogsPortal />
           <Notifications />
         </div>

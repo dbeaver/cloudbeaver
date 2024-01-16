@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2023 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -70,38 +70,29 @@ export const GISValuePresentation = observer<Props>(function GISValuePresentatio
   const gis = model.source.getAction(resultIndex, ResultSetGISAction);
   const view = model.source.getAction(resultIndex, ResultSetViewAction);
 
-  const focusedCell = selection.getFocusedElement();
-  const selectedCells = selection.elements.slice();
+  const activeElements = selection.getActiveElements();
 
-  if (selectedCells.length === 0 && focusedCell) {
-    selectedCells.push(focusedCell);
-  }
+  const parsedGISData: IGeoJSONFeature[] = [];
 
-  const parsedGISData = useMemo(() => {
-    const result: IGeoJSONFeature[] = [];
+  for (const cell of activeElements) {
+    const cellValue = gis.getCellValue(cell);
 
-    for (const cell of selectedCells) {
-      const cellValue = gis.getCellValue(cell);
+    if (!cellValue) {
+      continue;
+    }
 
-      if (!cellValue) {
+    try {
+      const parsedCellValue = wellknown.parse(cellValue.mapText || cellValue.text);
+      if (!parsedCellValue) {
         continue;
       }
 
-      try {
-        const parsedCellValue = wellknown.parse(cellValue.mapText || cellValue.text);
-        if (!parsedCellValue) {
-          continue;
-        }
-
-        result.push({ type: 'Feature', geometry: parsedCellValue, properties: { associatedCell: cell, srid: cellValue.srid } });
-      } catch (exception: any) {
-        console.error(`Failed to parse "${cellValue.mapText || cellValue.text}" value.`);
-        console.error(exception);
-      }
+      parsedGISData.push({ type: 'Feature', geometry: parsedCellValue, properties: { associatedCell: cell, srid: cellValue.srid } });
+    } catch (exception: any) {
+      console.error(`Failed to parse "${cellValue.mapText || cellValue.text}" value.`);
+      console.error(exception);
     }
-
-    return result;
-  }, [selectedCells, gis]);
+  }
 
   const getAssociatedValues = useCallback(
     (cell: IResultSetElementKey): IAssociatedValue[] => {

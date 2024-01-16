@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2023 DBeaver Corp and others
+ * Copyright (C) 2010-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -47,6 +47,7 @@ import org.jkiss.dbeaver.model.connection.DBPConnectionConfiguration;
 import org.jkiss.dbeaver.model.connection.DBPDriver;
 import org.jkiss.dbeaver.model.navigator.*;
 import org.jkiss.dbeaver.model.net.DBWHandlerConfiguration;
+import org.jkiss.dbeaver.model.net.DBWHandlerType;
 import org.jkiss.dbeaver.model.net.DBWNetworkHandler;
 import org.jkiss.dbeaver.model.net.DBWTunnel;
 import org.jkiss.dbeaver.model.net.ssh.SSHImplementation;
@@ -341,9 +342,12 @@ public class WebServiceCore implements DBWServiceCore {
 
         if (networkCredentials != null) {
             networkCredentials.forEach(c -> {
-                if (CommonUtils.toBoolean(c.isSavePassword()) && !CommonUtils.isEmpty(c.getUserName())) {
+                if (CommonUtils.toBoolean(c.isSavePassword())) {
                     DBWHandlerConfiguration handlerCfg = dataSourceContainer.getConnectionConfiguration().getHandler(c.getId());
-                    if (handlerCfg != null) {
+                    if (handlerCfg != null &&
+                        // check username param only for ssh config
+                        !(CommonUtils.isEmpty(c.getUserName()) && CommonUtils.equalObjects(handlerCfg.getType(), DBWHandlerType.TUNNEL))
+                    ) {
                         WebDataSourceUtils.updateHandlerCredentials(handlerCfg, c);
                         handlerCfg.setSavePassword(true);
                         saveConfig[0] = true;

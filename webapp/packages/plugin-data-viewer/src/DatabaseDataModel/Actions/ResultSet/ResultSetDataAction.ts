@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2023 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -9,18 +9,18 @@ import { computed, makeObservable } from 'mobx';
 
 import { DataTypeLogicalOperation, ResultDataFormat, SqlResultColumn } from '@cloudbeaver/core-sdk';
 
-import { DatabaseDataAction } from '../../DatabaseDataAction';
 import type { IDatabaseDataSource } from '../../IDatabaseDataSource';
 import type { IDatabaseResultSet } from '../../IDatabaseResultSet';
 import { databaseDataAction } from '../DatabaseDataActionDecorator';
-import type { IDatabaseDataResultAction } from '../IDatabaseDataResultAction';
+import { DatabaseDataResultAction } from '../DatabaseDataResultAction';
 import type { IResultSetContentValue } from './IResultSetContentValue';
 import type { IResultSetColumnKey, IResultSetElementKey, IResultSetRowKey } from './IResultSetDataKey';
 import { isResultSetContentValue } from './isResultSetContentValue';
+import { ResultSetDataKeysUtils } from './ResultSetDataKeysUtils';
 import type { IResultSetValue } from './ResultSetFormatAction';
 
 @databaseDataAction()
-export class ResultSetDataAction extends DatabaseDataAction<any, IDatabaseResultSet> implements IDatabaseDataResultAction<IDatabaseResultSet> {
+export class ResultSetDataAction extends DatabaseDataResultAction<IResultSetElementKey, IDatabaseResultSet> {
   static dataFormat = [ResultDataFormat.Resultset];
 
   get rows(): IResultSetValue[][] {
@@ -37,6 +37,14 @@ export class ResultSetDataAction extends DatabaseDataAction<any, IDatabaseResult
       rows: computed,
       columns: computed,
     });
+  }
+
+  getIdentifier(key: IResultSetElementKey): string {
+    return ResultSetDataKeysUtils.serialize(key.column);
+  }
+
+  serialize(key: IResultSetElementKey): string {
+    return ResultSetDataKeysUtils.serializeElementKey(key);
   }
 
   getDefaultKey(): IResultSetElementKey {

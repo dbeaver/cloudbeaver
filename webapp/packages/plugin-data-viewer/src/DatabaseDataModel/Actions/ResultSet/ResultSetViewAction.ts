@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2023 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -10,10 +10,10 @@ import { action, makeObservable, observable } from 'mobx';
 import { DataTypeLogicalOperation, ResultDataFormat, SqlResultColumn } from '@cloudbeaver/core-sdk';
 
 import { DatabaseDataAction } from '../../DatabaseDataAction';
+import type { IDatabaseDataAction } from '../../IDatabaseDataAction';
 import type { IDatabaseDataSource } from '../../IDatabaseDataSource';
 import type { IDatabaseResultSet } from '../../IDatabaseResultSet';
 import { databaseDataAction } from '../DatabaseDataActionDecorator';
-import type { IDatabaseDataResultAction } from '../IDatabaseDataResultAction';
 import { compareResultSetRowKeys } from './compareResultSetRowKeys';
 import type { IResultSetComplexValue } from './IResultSetComplexValue';
 import type { IResultSetColumnKey, IResultSetElementKey, IResultSetRowKey } from './IResultSetDataKey';
@@ -24,7 +24,7 @@ import { ResultSetEditAction } from './ResultSetEditAction';
 import type { IResultSetValue } from './ResultSetFormatAction';
 
 @databaseDataAction()
-export class ResultSetViewAction extends DatabaseDataAction<any, IDatabaseResultSet> implements IDatabaseDataResultAction<IDatabaseResultSet> {
+export class ResultSetViewAction extends DatabaseDataAction<any, IDatabaseResultSet> implements IDatabaseDataAction<any, IDatabaseResultSet> {
   static dataFormat = [ResultDataFormat.Resultset];
 
   get rowKeys(): IResultSetRowKey[] {

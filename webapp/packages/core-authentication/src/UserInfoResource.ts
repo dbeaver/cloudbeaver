@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2023 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,8 @@ export interface ILoginOptions {
   configurationId?: string;
   linkUser?: boolean;
 }
+
+export const ANONYMOUS_USER_ID = 'anonymous';
 
 @injectable()
 export class UserInfoResource extends CachedDataResource<UserInfo | null, void, UserInfoIncludes> {
@@ -66,7 +68,7 @@ export class UserInfoResource extends CachedDataResource<UserInfo | null, void, 
   }
 
   getId(): string {
-    return this.data?.userId || 'anonymous';
+    return this.data?.userId || ANONYMOUS_USER_ID;
   }
 
   hasToken(providerId: string): boolean {
