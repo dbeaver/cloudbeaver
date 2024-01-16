@@ -16,6 +16,8 @@ interface Props {
   notification: INotification<any>;
 }
 
+const MIN_CLOSE_DELAY = 2000;
+
 export const NotificationsItem = observer<Props>(function Notification({ notification }) {
   const errorDetails = useErrorDetails(notification.details ?? null);
 
@@ -24,7 +26,7 @@ export const NotificationsItem = observer<Props>(function Notification({ notific
     return <Custom notification={notification} {...notification.extraProps} />;
   }
 
-  let closeDelay = 0;
+  let closeDelay = MIN_CLOSE_DELAY;
 
   if (notification.type !== ENotificationType.Error && !notification.persistent && notification.autoClose !== false) {
     closeDelay = FADE_TIMEOUT;
