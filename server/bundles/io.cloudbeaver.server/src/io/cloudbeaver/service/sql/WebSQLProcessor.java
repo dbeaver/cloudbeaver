@@ -54,6 +54,7 @@ import org.jkiss.utils.CommonUtils;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
@@ -797,14 +798,27 @@ public class WebSQLProcessor implements WebSessionProvider {
 
         DBDRowIdentifier rowIdentifier = resultsInfo.getDefaultRowIdentifier();
         checkRowIdentifier(resultsInfo, rowIdentifier);
+        String tableName = rowIdentifier.getEntity().getName();
+        WebSQLDataLOBReceiver dataReceiver = new WebSQLDataLOBReceiver(tableName, resultsInfo.getDataContainer(), lobColumnIndex);
+        readCellDataValue(monitor, resultsInfo, row, dataReceiver);
+        try {
+            return dataReceiver.createLobFile(monitor);
+        } catch (Exception e) {
+            throw new DBWebException("Error creating temporary lob file ", e);
+        }
+    }
+
+    private void readCellDataValue(
+        @NotNull DBRProgressMonitor monitor,
+        @NotNull WebSQLResultsInfo resultsInfo,
+        @Nullable WebSQLResultsRow row,
+        @NotNull WebSQLCellValueReceiver dataReceiver) throws DBException {
         DBSDataContainer dataContainer = resultsInfo.getDataContainer();
         DBCExecutionContext executionContext = getExecutionContext(dataContainer);
-        String tableName = rowIdentifier.getEntity().getName();
-        WebSQLDataLOBReceiver dataReceiver = new WebSQLDataLOBReceiver(tableName, dataContainer, lobColumnIndex);
         try (DBCSession session = executionContext.openSession(monitor, DBCExecutionPurpose.USER, "Generate data update batches")) {
             WebExecutionSource executionSource = new WebExecutionSource(dataContainer, executionContext, this);
             DBDDataFilter dataFilter = new DBDDataFilter();
-            DBDAttributeBinding[] keyAttributes = rowIdentifier.getAttributes().toArray(new DBDAttributeBinding[0]);
+            DBDAttributeBinding[] keyAttributes = resultsInfo.getDefaultRowIdentifier().getAttributes().toArray(new DBDAttributeBinding[0]);
             Object[] rowValues = new Object[keyAttributes.length];
             List<DBDAttributeConstraint> constraints = new ArrayList<>();
             for (int i = 0; i < keyAttributes.length; i++) {
@@ -833,12 +847,23 @@ public class WebSQLProcessor implements WebSessionProvider {
             DBCStatistics statistics = dataContainer.readData(
                 executionSource, session, dataReceiver, dataFilter,
                 0, 1, DBSDataContainer.FLAG_NONE, 1);
-            try {
-                return dataReceiver.createLobFile(session);
-            } catch (Exception e) {
-                throw new DBWebException("Error creating temporary lob file ", e);
-            }
         }
+    }
+
+    @NotNull
+    public String readStringValue(
+        @NotNull DBRProgressMonitor monitor,
+        @NotNull WebSQLContextInfo contextInfo,
+        @NotNull String resultsId,
+        @NotNull Integer columnIndex,
+        @Nullable WebSQLResultsRow row
+    ) throws DBException {
+        WebSQLResultsInfo resultsInfo = contextInfo.getResults(resultsId);
+        DBDRowIdentifier rowIdentifier = resultsInfo.getDefaultRowIdentifier();
+        checkRowIdentifier(resultsInfo, rowIdentifier);
+        WebSQLCellValueReceiver dataReceiver = new WebSQLCellValueReceiver(resultsInfo.getDataContainer(), columnIndex);
+        readCellDataValue(monitor, resultsInfo, row, dataReceiver);
+        return new String(dataReceiver.getBinaryValue(monitor), StandardCharsets.UTF_8);
     }
 
     ////////////////////////////////////////////////
