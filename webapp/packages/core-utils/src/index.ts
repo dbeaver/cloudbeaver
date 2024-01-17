@@ -35,7 +35,6 @@ export * from './isPropertiesEqual';
 export * from './isSafari';
 export * from './isSameDay';
 export * from './isValuesEqual';
-export * from './getUniqueId';
 export * from './md5';
 export * from './MetadataMap';
 export * from './OrderedMap';
