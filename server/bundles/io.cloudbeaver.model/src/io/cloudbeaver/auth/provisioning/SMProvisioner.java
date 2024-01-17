@@ -32,7 +32,7 @@ public interface SMProvisioner {
         @NotNull SMProvisioningFilter filter
     ) throws DBException;
 
-    default boolean isAutoConfiguration(SMAuthProviderCustomConfiguration configuration) {
+    default boolean isAuthRoleProvided(SMAuthProviderCustomConfiguration configuration) {
         return false;
     }
 }
