@@ -112,7 +112,7 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
         },
       }),
     );
-    const { textValue, isFullTextValue, isTruncated, isTextColumn, pasteFullText } = useTextValue({
+    const { textValue, isTruncated, isTextColumn, pasteFullText } = useTextValue({
       model,
       resultIndex,
       currentContentType: state.currentContentType,
@@ -124,7 +124,7 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
       isResultSetContentValue(contentValue) && isNotNullDefined(contentValue.contentLength) ? bytesToSize(contentValue.contentLength) : undefined;
     const limit = bytesToSize(quotasService.getQuota('sqlBinaryPreviewMaxLength'));
     const canSave = firstSelectedCell && contentAction.isDownloadable(firstSelectedCell);
-    const shouldShowPasteButton = isTextColumn && isTruncated && !isFullTextValue;
+    const shouldShowPasteButton = isTextColumn && isTruncated;
     const typeExtension = useMemo(() => getTypeExtension(state.currentContentType) ?? [], [state.currentContentType]);
     const extensions = useCodemirrorExtensions(undefined, typeExtension);
 

@@ -25,7 +25,6 @@ interface IUseTextValueArgs {
 
 interface IUseTextValue {
   textValue: string;
-  isFullTextValue: boolean;
   isTruncated: boolean;
   isTextColumn: boolean;
   pasteFullText(): Promise<void>;
@@ -46,7 +45,6 @@ export function useTextValue({ model, resultIndex, currentContentType }: IUseTex
 
   const result: IUseTextValue = {
     textValue: '',
-    isFullTextValue: false,
     isTruncated: false,
     isTextColumn,
     async pasteFullText() {
@@ -72,7 +70,7 @@ export function useTextValue({ model, resultIndex, currentContentType }: IUseTex
 
   if (isTextColumn && cachedFullText) {
     result.textValue = cachedFullText;
-    result.isFullTextValue = true;
+    result.isTruncated = false;
   }
 
   if (editAction.isElementEdited(firstSelectedCell)) {
