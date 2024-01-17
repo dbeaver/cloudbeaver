@@ -48,7 +48,7 @@ export class PasswordPolicyService {
       };
     }
 
-    if (this.config.requireMixedCase && !(/[a-z]/.test(trimmedPassword) && /[A-Z]/.test(trimmedPassword))) {
+    if (this.config.requireMixedCase && !(/\p{Ll}/u.test(trimmedPassword) && /\p{Lu}/u.test(trimmedPassword))) {
       return { isValid: false, errorMessage: this.localizationService.translate('core_authentication_password_policy_upper_lower_case') };
     }
 
