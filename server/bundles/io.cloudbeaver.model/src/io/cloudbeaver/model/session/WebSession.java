@@ -927,7 +927,7 @@ public class WebSession extends BaseWebSession
                 .create();
 
             credGson.fromJson(credGson.toJsonTree(configuration.getAuthProperties()), credentials.getClass());
-            configuration.getAuthModel().saveCredentials(dataSourceContainer, configuration, credentials);
+            configuration.getAuthModel().provideCredentials(dataSourceContainer, configuration, credentials);
         } catch (DBException e) {
             addSessionError(e);
             log.error(e);
