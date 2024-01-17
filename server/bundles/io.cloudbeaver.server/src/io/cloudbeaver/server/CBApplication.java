@@ -520,6 +520,7 @@ public abstract class CBApplication extends BaseWebApplication implements WebAut
     @Nullable
     @Override
     protected Path loadServerConfiguration() throws DBException {
+        initHomeFolder();
         Path path = super.loadServerConfiguration();
 
 
@@ -553,8 +554,7 @@ public abstract class CBApplication extends BaseWebApplication implements WebAut
     }
 
     protected void parseConfiguration(Map<String, Object> configProps) throws DBException {
-        String homeFolder = initHomeFolder();
-
+        Path homeFolder = getHomeDirectory();
         CBAppConfig prevConfig = new CBAppConfig(appConfiguration);
         Gson gson = getGson();
         try {
@@ -597,22 +597,17 @@ public abstract class CBApplication extends BaseWebApplication implements WebAut
                 enableSecurityManager);
             //SM config
             gson.fromJson(
-                gson.toJsonTree(JSONUtils.getObject(serverConfig, CBConstants.PARAM_SM_CONFIGURATION)),
+                gson.toJson(JSONUtils.getObject(serverConfig, CBConstants.PARAM_SM_CONFIGURATION)),
                 SMControllerConfiguration.class
             );
             // App config
             Map<String, Object> appConfig = JSONUtils.getObject(configProps, "app");
             validateConfiguration(appConfig);
             gson.fromJson(gson.toJsonTree(appConfig), CBAppConfig.class);
-            // Password policy config
-            gson.fromJson(
-                gson.toJsonTree(JSONUtils.getObject(serverConfig, CBConstants.PARAM_PASSWORD_POLICY_CONFIGURATION)),
-                PasswordPolicyConfiguration.class
-            );
 
             databaseConfiguration.putAll(JSONUtils.getObject(serverConfig, CBConstants.PARAM_DB_CONFIGURATION));
 
-            readProductConfiguration(serverConfig, gson, homeFolder);
+            readProductConfiguration(serverConfig, gson, homeFolder.toString());
 
             String staticContentsFile = JSONUtils.getString(serverConfig, CBConstants.PARAM_STATIC_CONTENT);
             if (!CommonUtils.isEmpty(staticContentsFile)) {
