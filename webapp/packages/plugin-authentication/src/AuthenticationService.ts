@@ -11,11 +11,9 @@ import { AdministrationScreenService } from '@cloudbeaver/core-administration';
 import {
   AppAuthService,
   AUTH_PROVIDER_LOCAL_ID,
-  AuthInfoService,
   AuthProviderContext,
   AuthProviderService,
   AuthProvidersResource,
-  IUserAuthConfiguration,
   RequestedProvider,
   UserInfoResource,
 } from '@cloudbeaver/core-authentication';
@@ -55,7 +53,6 @@ export class AuthenticationService extends Bootstrap {
     private readonly authProviderService: AuthProviderService,
     private readonly authProvidersResource: AuthProvidersResource,
     private readonly sessionDataResource: SessionDataResource,
-    private readonly authInfoService: AuthInfoService,
     private readonly serverConfigResource: ServerConfigResource,
     private readonly windowsService: WindowsService,
     private readonly sessionActionService: SessionActionService,
@@ -92,20 +89,6 @@ export class AuthenticationService extends Bootstrap {
       return;
     }
 
-    let userAuthConfiguration: IUserAuthConfiguration | undefined = undefined;
-
-    if (providerId) {
-      userAuthConfiguration = this.authInfoService.userAuthConfigurations.find(
-        c => c.providerId === providerId && c.configuration.id === configurationId,
-      );
-    } else if (this.authInfoService.userAuthConfigurations.length > 0) {
-      userAuthConfiguration = this.authInfoService.userAuthConfigurations[0];
-    }
-
-    if (userAuthConfiguration?.configuration.signOutLink) {
-      this.logoutConfiguration(userAuthConfiguration);
-    }
-
     try {
       // TODO handle all redirect links once we know what to do with multiple popups issue
       const {
@@ -113,11 +96,11 @@ export class AuthenticationService extends Bootstrap {
       } = await this.userInfoResource.logout(providerId, configurationId);
 
       if (redirectLinks.length) {
-        const oktaLink = redirectLinks[0];
+        const url = redirectLinks[0];
         const id = `okta-logout-id-${uuid()}`;
 
         this.windowsService.open(id, {
-          url: oktaLink,
+          url,
           width: 400,
           height: 400,
         });
@@ -129,24 +112,7 @@ export class AuthenticationService extends Bootstrap {
 
       await this.onLogout.execute('after');
     } catch (exception: any) {
-      this.notificationService.logException(exception, "Can't logout");
-    }
-  }
-
-  private async logoutConfiguration(configuration: IUserAuthConfiguration): Promise<void> {
-    if (configuration.configuration.signOutLink) {
-      const id = `${configuration.configuration.id}-sign-out`;
-      const popup = this.windowsService.open(id, {
-        url: configuration.configuration.signOutLink,
-        target: id,
-        width: 600,
-        height: 700,
-      });
-
-      if (popup) {
-        popup.blur();
-        window.focus();
-      }
+      this.notificationService.logException(exception, 'authentication_logout_error');
     }
   }
 
