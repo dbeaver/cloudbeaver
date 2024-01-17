@@ -24,9 +24,9 @@ public class PasswordPolicyConfiguration {
     private static final int DEFAULT_MIN_SPECIAL_CHARACTERS = 0;
     private static final boolean DEFAULT_REQUIRES_UPPER_LOWER_CASE = true;
     private int minLength = DEFAULT_MIN_LENGTH;
-    private int minDigits = DEFAULT_MIN_DIGITS;
-    private int minSpecialCharacters = DEFAULT_MIN_SPECIAL_CHARACTERS;
-    private boolean requiresUpperLowerCase = DEFAULT_REQUIRES_UPPER_LOWER_CASE;
+    private int minNumberCount = DEFAULT_MIN_DIGITS;
+    private int minSymbolCount = DEFAULT_MIN_SPECIAL_CHARACTERS;
+    private boolean requireMixedCase = DEFAULT_REQUIRES_UPPER_LOWER_CASE;
 
     @Property
     public int getMinLength() {
@@ -34,17 +34,17 @@ public class PasswordPolicyConfiguration {
     }
 
     @Property
-    public int getMinDigits() {
-        return minDigits;
+    public int getMinNumberCount() {
+        return minNumberCount;
     }
 
     @Property
-    public int getMinSpecialCharacters() {
-        return minSpecialCharacters;
+    public int getMinSymbolCount() {
+        return minSymbolCount;
     }
 
     @Property
-    public boolean isRequiresUpperLowerCase() {
-        return requiresUpperLowerCase;
+    public boolean isRequireMixedCase() {
+        return requireMixedCase;
     }
 }

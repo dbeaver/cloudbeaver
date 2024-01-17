@@ -101,9 +101,9 @@ type WebServiceConfig {
 
 type PasswordPolicyConfig @since(version: "23.3.3") {
     minLength: Int!
-    minDigits: Int!
-    minSpecialCharacters: Int!
-    requiresUpperLowerCase: Boolean!
+    minNumberCount: Int!
+    minSymbolCount: Int!
+    requireMixedCase: Boolean!
 }
 
 type ProductInfo {
