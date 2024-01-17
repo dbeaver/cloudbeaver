@@ -20,6 +20,8 @@ import type { IAuthCredentials } from './IAuthCredentials';
 
 export type UserInfoIncludes = GetActiveUserQueryVariables;
 
+export type UserLogoutInfo = AuthLogoutQuery['result'];
+
 export interface ILoginOptions {
   credentials?: IAuthCredentials;
   configurationId?: string;

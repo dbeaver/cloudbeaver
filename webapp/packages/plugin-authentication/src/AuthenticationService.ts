@@ -16,6 +16,7 @@ import {
   AuthProvidersResource,
   RequestedProvider,
   UserInfoResource,
+  UserLogoutInfo,
 } from '@cloudbeaver/core-authentication';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import type { DialogueStateResult } from '@cloudbeaver/core-dialogs';
@@ -90,21 +91,9 @@ export class AuthenticationService extends Bootstrap {
     }
 
     try {
-      // TODO handle all redirect links once we know what to do with multiple popups issue
-      const {
-        authLogoutExtended: { redirectLinks },
-      } = await this.userInfoResource.logout(providerId, configurationId);
+      const logoutResult = await this.userInfoResource.logout(providerId, configurationId);
 
-      if (redirectLinks.length) {
-        const url = redirectLinks[0];
-        const id = `okta-logout-id-${uuid()}`;
-
-        this.windowsService.open(id, {
-          url,
-          width: 400,
-          height: 400,
-        });
-      }
+      this.handleRedirectLinks(logoutResult.result);
 
       if (!this.administrationScreenService.isConfigurationMode && !providerId) {
         this.screenService.navigateToRoot();
@@ -113,6 +102,28 @@ export class AuthenticationService extends Bootstrap {
       await this.onLogout.execute('after');
     } catch (exception: any) {
       this.notificationService.logException(exception, 'authentication_logout_error');
+    }
+  }
+
+  // TODO handle all redirect links once we know what to do with multiple popups issue
+  private handleRedirectLinks(userLogoutInfo: UserLogoutInfo) {
+    const redirectLinks = userLogoutInfo.redirectLinks;
+
+    if (redirectLinks.length) {
+      const url = redirectLinks[0];
+      const id = `okta-logout-id-${uuid()}`;
+
+      const popup = this.windowsService.open(id, {
+        url,
+        target: id,
+        width: 600,
+        height: 700,
+      });
+
+      if (popup) {
+        popup.blur();
+        window.focus();
+      }
     }
   }
 
