@@ -18,10 +18,20 @@ package io.cloudbeaver.auth;
 
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.DBException;
+import org.jkiss.dbeaver.model.security.SMAuthProviderCustomConfiguration;
 
 import java.util.Map;
 
 public interface SMSignOutLinkProvider {
+
+    /**
+     * @return a common link for logout, not related with the user context
+     */
     @NotNull
-    String getSignOutLink(String id, @NotNull Map<String, Object> providerConfig) throws DBException;
+    String getCommonSignOutLink(String id, @NotNull Map<String, Object> providerConfig) throws DBException;
+
+    String getUserSignOutLink(
+        @NotNull SMAuthProviderCustomConfiguration providerConfig,
+        @NotNull Map<String, Object> userCredentials
+    ) throws DBException;
 }
