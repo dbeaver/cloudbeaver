@@ -46,7 +46,10 @@ export function useChangePassword(): IState {
         const validation = this.passwordPolicyService.validatePassword(this.config.password);
 
         if (!validation.isValid) {
-          this.notificationService.logError({ title: validation.errorMessage });
+          this.notificationService.logError({
+            title: 'plugin_user_profile_authentication_change_password_password_validation_error',
+            message: validation.errorMessage,
+          });
           return;
         }
 
