@@ -53,6 +53,7 @@ public class RPAuthProvider implements SMAuthProviderExternal<SMSession>, SMSign
     public static final String X_FIRST_NAME = "X-First-name";
     public static final String X_LAST_NAME = "X-Last-name";
     public static final String AUTH_PROVIDER = "reverseProxy";
+    public static final String LOGOUT_URL = "logout-url";
 
     @NotNull
     @Override
@@ -129,8 +130,13 @@ public class RPAuthProvider implements SMAuthProviderExternal<SMSession>, SMSign
 
     @NotNull
     @Override
-    public String getSignOutLink(String id, @NotNull Map<String, Object> providerConfig) throws DBException {
-        return providerConfig.get("logout-url").toString();
+    public String getCommonSignOutLink(String id, @NotNull Map<String, Object> providerConfig) throws DBException {
+        return providerConfig.get(LOGOUT_URL).toString();
+    }
+
+    @Override
+    public String getUserSignOutLink(@NotNull SMAuthProviderCustomConfiguration providerConfig, @NotNull Map<String, Object> userCredentials) throws DBException {
+        return providerConfig.getParameters().get(LOGOUT_URL).toString();
     }
 
 }
