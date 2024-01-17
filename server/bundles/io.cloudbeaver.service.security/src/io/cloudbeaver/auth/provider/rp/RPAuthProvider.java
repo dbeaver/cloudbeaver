@@ -18,14 +18,18 @@ package io.cloudbeaver.auth.provider.rp;
 
 import io.cloudbeaver.DBWUserIdentity;
 import io.cloudbeaver.auth.SMAuthProviderExternal;
+import io.cloudbeaver.auth.SMAuthProviderFederated;
+import io.cloudbeaver.auth.SMSignOutLinkProvider;
 import io.cloudbeaver.auth.provider.local.LocalAuthSession;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.model.user.WebUser;
+import io.cloudbeaver.utils.WebAppUtils;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBPObject;
+import org.jkiss.dbeaver.model.auth.SMAuthProvider;
 import org.jkiss.dbeaver.model.auth.SMSession;
 import org.jkiss.dbeaver.model.data.json.JSONUtils;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
@@ -37,7 +41,7 @@ import org.jkiss.utils.CommonUtils;
 import java.util.HashMap;
 import java.util.Map;
 
-public class RPAuthProvider implements SMAuthProviderExternal<SMSession> {
+public class RPAuthProvider implements SMAuthProviderExternal<SMSession>, SMSignOutLinkProvider {
 
     private static final Log log = Log.getLog(RPAuthProvider.class);
 
@@ -122,4 +126,11 @@ public class RPAuthProvider implements SMAuthProviderExternal<SMSession> {
     public void refreshSession(@NotNull DBRProgressMonitor monitor, @NotNull SMSession mainSession, SMSession session) throws DBException {
 
     }
+
+    @NotNull
+    @Override
+    public String getSignOutLink(String id, @NotNull Map<String, Object> providerConfig) throws DBException {
+        return providerConfig.get("logout-url").toString();
+    }
+
 }

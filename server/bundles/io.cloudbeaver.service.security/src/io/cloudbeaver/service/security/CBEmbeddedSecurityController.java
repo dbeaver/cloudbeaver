@@ -1348,7 +1348,7 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
                     var authProviderFederated = (SMAuthProviderFederated) authProviderInstance;
                     String signInLink = buildRedirectLink(authProviderFederated.getSignInLink(authProviderConfigurationId, Map.of()),
                         authAttemptId);
-                    String signOutLink = authProviderFederated.getSignOutLink(authProviderConfigurationId, Map.of());
+                    String signOutLink = authProviderFederated.getSignOutLink(authProviderConfigurationId, providerConfig.getParameters());
                     Map<SMAuthConfigurationReference, Object> authData = Map.of(new SMAuthConfigurationReference(authProviderId,
                         authProviderConfigurationId), filteredUserCreds);
                     return SMAuthInfo.inProgress(authAttemptId, signInLink, signOutLink, authData, isMainSession);

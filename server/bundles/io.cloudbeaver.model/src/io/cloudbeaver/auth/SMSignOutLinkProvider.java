@@ -14,13 +14,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.cloudbeaver.service.auth;
+package io.cloudbeaver.auth;
 
-interface RPConstants {
-    String PARAM_LOGOUT_URL = "logout-url";
-    String PARAM_USER = "user-header";
-    String PARAM_TEAM = "team-header";
-    String PARAM_FIRST_NAME = "first-name-header";
-    String PARAM_LAST_NAME = "last-name-header";
-    String PARAM_ROLE_NAME = "role-header";
+import org.jkiss.code.NotNull;
+import org.jkiss.dbeaver.DBException;
+
+import java.util.Map;
+
+public interface SMSignOutLinkProvider {
+    @NotNull
+    String getSignOutLink(String id, @NotNull Map<String, Object> providerConfig) throws DBException;
 }

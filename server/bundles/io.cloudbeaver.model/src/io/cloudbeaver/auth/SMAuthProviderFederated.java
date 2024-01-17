@@ -26,17 +26,13 @@ import java.util.Map;
  * Federated auth provider.
  * Provides links to external auth resource
  */
-public interface SMAuthProviderFederated {
+public interface SMAuthProviderFederated extends SMSignOutLinkProvider {
 
     /**
      * Returns new identifying credentials which can be used to find/create user in database
      */
     @NotNull
     String getSignInLink(String id, @NotNull Map<String, Object> providerConfig) throws DBException;
-
-
-    @NotNull
-    String getSignOutLink(String id, @NotNull Map<String, Object> providerConfig) throws DBException;
 
     @Nullable
     String getMetadataLink(String id, @NotNull Map<String, Object> providerConfig) throws DBException;
