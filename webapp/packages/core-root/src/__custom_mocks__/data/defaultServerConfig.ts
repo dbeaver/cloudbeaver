@@ -121,9 +121,9 @@ export const defaultServerConfig: (productConfiguration?: Record<string, any>) =
     },
     passwordPolicyConfiguration: {
       minLength: 8,
-      minDigits: 0,
-      minSpecialCharacters: 0,
-      requiresUpperLowerCase: false,
+      minNumberCount: 0,
+      minSymbolCount: 0,
+      requireMixedCase: false,
     },
   },
 });

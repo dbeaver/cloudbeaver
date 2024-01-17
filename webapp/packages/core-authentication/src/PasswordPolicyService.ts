@@ -14,9 +14,9 @@ import type { PasswordPolicyConfig } from '@cloudbeaver/core-sdk';
 
 const DEFAULT_PASSWORD_POLICY: PasswordPolicyConfig = {
   minLength: 8,
-  requiresUpperLowerCase: false,
-  minDigits: 0,
-  minSpecialCharacters: 0,
+  minNumberCount: 0,
+  minSymbolCount: 0,
+  requireMixedCase: false,
 };
 
 type ValidationResult = { isValid: true; errorMessage: null } | { isValid: false; errorMessage: string };
@@ -26,11 +26,9 @@ export class PasswordPolicyService {
   get config(): PasswordPolicyConfig {
     return {
       minLength: this.serverConfigResource.data?.passwordPolicyConfiguration?.minLength || DEFAULT_PASSWORD_POLICY.minLength,
-      requiresUpperLowerCase:
-        this.serverConfigResource.data?.passwordPolicyConfiguration?.requiresUpperLowerCase || DEFAULT_PASSWORD_POLICY.requiresUpperLowerCase,
-      minDigits: this.serverConfigResource.data?.passwordPolicyConfiguration?.minDigits || DEFAULT_PASSWORD_POLICY.minDigits,
-      minSpecialCharacters:
-        this.serverConfigResource.data?.passwordPolicyConfiguration?.minSpecialCharacters || DEFAULT_PASSWORD_POLICY.minSpecialCharacters,
+      minNumberCount: this.serverConfigResource.data?.passwordPolicyConfiguration?.minNumberCount || DEFAULT_PASSWORD_POLICY.minNumberCount,
+      minSymbolCount: this.serverConfigResource.data?.passwordPolicyConfiguration?.minSymbolCount || DEFAULT_PASSWORD_POLICY.minSymbolCount,
+      requireMixedCase: this.serverConfigResource.data?.passwordPolicyConfiguration?.requireMixedCase || DEFAULT_PASSWORD_POLICY.requireMixedCase,
     };
   }
 
@@ -41,29 +39,33 @@ export class PasswordPolicyService {
   }
 
   validatePassword(password: string): ValidationResult {
-    if (password.length < this.config.minLength) {
+    const trimmedPassword = password.trim();
+
+    if (trimmedPassword.length < this.config.minLength) {
       return {
         isValid: false,
         errorMessage: this.localizationService.translate('core_authentication_password_policy_min_length', undefined, { min: this.config.minLength }),
       };
     }
 
-    if (this.config.requiresUpperLowerCase && !(/[a-z]/.test(password) && /[A-Z]/.test(password))) {
+    if (this.config.requireMixedCase && !(/[a-z]/.test(trimmedPassword) && /[A-Z]/.test(trimmedPassword))) {
       return { isValid: false, errorMessage: this.localizationService.translate('core_authentication_password_policy_upper_lower_case') };
     }
 
-    if ((password.match(/\d/g) || []).length < this.config.minDigits) {
+    if ((trimmedPassword.match(/\d/g) || []).length < this.config.minNumberCount) {
       return {
         isValid: false,
-        errorMessage: this.localizationService.translate('core_authentication_password_policy_min_digits', undefined, { min: this.config.minDigits }),
+        errorMessage: this.localizationService.translate('core_authentication_password_policy_min_digits', undefined, {
+          min: this.config.minNumberCount,
+        }),
       };
     }
 
-    if ((password.match(/[!@#$%^&*(),.?":{}|<>]/g) || []).length < this.config.minSpecialCharacters) {
+    if ((trimmedPassword.match(/[!@#$%^&*(),.?":{}|<>]/g) || []).length < this.config.minSymbolCount) {
       return {
         isValid: false,
         errorMessage: this.localizationService.translate('core_authentication_password_policy_min_special_characters', undefined, {
-          min: this.config.minSpecialCharacters,
+          min: this.config.minSymbolCount,
         }),
       };
     }

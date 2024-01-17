@@ -54,9 +54,9 @@ query serverConfig {
     }
     passwordPolicyConfiguration {
       minLength
-      minDigits
-      minSpecialCharacters
-      requiresUpperLowerCase
+      minNumberCount
+      minSymbolCount
+      requireMixedCase
     }
   }
 }
