@@ -12,8 +12,7 @@ import { ConnectionInfoResource, createConnectionParam, IConnectionInfoParams } 
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { executorHandlerFilter, IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import { isGlobalProject, ProjectInfoResource } from '@cloudbeaver/core-projects';
-import { EAdminPermission } from '@cloudbeaver/core-resource';
-import { PermissionsService } from '@cloudbeaver/core-root';
+import { PermissionsService, EAdminPermission } from '@cloudbeaver/core-root';
 import { formStateContext } from '@cloudbeaver/core-ui';
 import type { MetadataValueGetter } from '@cloudbeaver/core-utils';
 import {

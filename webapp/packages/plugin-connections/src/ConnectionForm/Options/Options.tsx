@@ -34,8 +34,8 @@ import {
 } from '@cloudbeaver/core-blocks';
 import { DatabaseAuthModelsResource, DBDriverResource, isLocalConnection } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
-import { CachedResourceListEmptyKey, EAdminPermission, resourceKeyList } from '@cloudbeaver/core-resource';
-import { ServerConfigResource } from '@cloudbeaver/core-root';
+import { CachedResourceListEmptyKey, resourceKeyList } from '@cloudbeaver/core-resource';
+import { EAdminPermission, ServerConfigResource } from '@cloudbeaver/core-root';
 import { DriverConfigurationType } from '@cloudbeaver/core-sdk';
 import { type TabContainerPanelComponent, useAuthenticationAction } from '@cloudbeaver/core-ui';
 import { isSafari } from '@cloudbeaver/core-utils';

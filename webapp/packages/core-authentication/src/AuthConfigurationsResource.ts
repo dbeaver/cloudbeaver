@@ -11,14 +11,13 @@ import { injectable } from '@cloudbeaver/core-di';
 import {
   CachedMapAllKey,
   CachedMapResource,
-  EAdminPermission,
   isResourceAlias,
   type ResourceKey,
   resourceKeyList,
   type ResourceKeySimple,
   ResourceKeyUtils,
 } from '@cloudbeaver/core-resource';
-import { SessionPermissionsResource } from '@cloudbeaver/core-root';
+import { EAdminPermission, SessionPermissionsResource } from '@cloudbeaver/core-root';
 import { AdminAuthProviderConfiguration, GetAuthProviderConfigurationsQueryVariables, GraphQLService } from '@cloudbeaver/core-sdk';
 
 import type { AuthProviderConfiguration } from './AuthProvidersResource';

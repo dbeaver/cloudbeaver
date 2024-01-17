@@ -21,6 +21,5 @@ export * from './Resource/ResourceKey';
 export * from './Resource/ResourceKeyAlias';
 export * from './Resource/ResourceKeyList';
 export * from './Resource/ResourceKeyListAlias';
-export * from './Resource/EAdminPermission';
 export * from './Resource/ResourceKeyUtils';
 export { coreResourceManifest } from './manifest';

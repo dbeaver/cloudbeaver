@@ -6,8 +6,8 @@
  * you may not use this file except in compliance with the License.
  */
 import { App, Bootstrap, DIService, injectable, IServiceConstructor } from '@cloudbeaver/core-di';
-import { CachedResource, EAdminPermission } from '@cloudbeaver/core-resource';
-import { PermissionsService } from '@cloudbeaver/core-root';
+import { CachedResource } from '@cloudbeaver/core-resource';
+import { PermissionsService, EAdminPermission } from '@cloudbeaver/core-root';
 import { ActionService, DATA_CONTEXT_MENU, DATA_CONTEXT_SUBMENU_ITEM, MenuBaseItem, MenuService } from '@cloudbeaver/core-view';
 import { TOP_NAV_BAR_SETTINGS_MENU } from '@cloudbeaver/plugin-settings-menu';
 import { MENU_USER_PROFILE } from '@cloudbeaver/plugin-user-profile';

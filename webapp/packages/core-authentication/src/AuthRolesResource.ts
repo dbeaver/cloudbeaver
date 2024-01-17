@@ -6,8 +6,8 @@
  * you may not use this file except in compliance with the License.
  */
 import { injectable } from '@cloudbeaver/core-di';
-import { CachedDataResource, EAdminPermission } from '@cloudbeaver/core-resource';
-import { SessionPermissionsResource } from '@cloudbeaver/core-root';
+import { CachedDataResource } from '@cloudbeaver/core-resource';
+import { EAdminPermission, SessionPermissionsResource } from '@cloudbeaver/core-root';
 import { GraphQLService } from '@cloudbeaver/core-sdk';
 
 @injectable()

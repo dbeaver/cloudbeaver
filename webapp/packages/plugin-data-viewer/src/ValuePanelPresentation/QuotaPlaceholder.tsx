@@ -9,7 +9,7 @@ import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
 import { Link, usePermission, useTranslate } from '@cloudbeaver/core-blocks';
-import { EAdminPermission } from '@cloudbeaver/core-resource';
+import { EAdminPermission } from '@cloudbeaver/core-root';
 
 interface Props {
   limit?: string;

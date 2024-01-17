@@ -6,9 +6,10 @@
  * you may not use this file except in compliance with the License.
  */
 import { injectable } from '@cloudbeaver/core-di';
-import { CachedDataResource, EAdminPermission } from '@cloudbeaver/core-resource';
+import { CachedDataResource } from '@cloudbeaver/core-resource';
 import { GraphQLService, WebFeatureSet } from '@cloudbeaver/core-sdk';
 
+import { EAdminPermission } from './EAdminPermission';
 import { SessionPermissionsResource } from './SessionPermissionsResource';
 
 export type ApplicationFeature = WebFeatureSet;

@@ -13,13 +13,12 @@ import { ProjectInfoResource } from '@cloudbeaver/core-projects';
 import {
   CachedMapAllKey,
   CachedMapResource,
-  EAdminPermission,
   type ResourceKey,
   type ResourceKeyList,
   resourceKeyList,
   ResourceKeyUtils,
 } from '@cloudbeaver/core-resource';
-import { SessionPermissionsResource } from '@cloudbeaver/core-root';
+import { EAdminPermission, SessionPermissionsResource } from '@cloudbeaver/core-root';
 import { GraphQLService, RmProject, RmProjectPermissions, RmSubjectProjectPermissions } from '@cloudbeaver/core-sdk';
 import { isArraysEqual } from '@cloudbeaver/core-utils';
 

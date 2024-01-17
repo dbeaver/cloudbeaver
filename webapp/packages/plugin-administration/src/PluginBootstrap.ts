@@ -9,8 +9,7 @@ import { lazy } from 'react';
 
 import { AdministrationScreenService } from '@cloudbeaver/core-administration';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
-import { EAdminPermission } from '@cloudbeaver/core-resource';
-import { PermissionsService } from '@cloudbeaver/core-root';
+import { PermissionsService, EAdminPermission } from '@cloudbeaver/core-root';
 import { ScreenService } from '@cloudbeaver/core-routing';
 import { DATA_CONTEXT_MENU, MenuBaseItem, MenuService } from '@cloudbeaver/core-view';
 import { TOP_NAV_BAR_SETTINGS_MENU } from '@cloudbeaver/plugin-settings-menu';

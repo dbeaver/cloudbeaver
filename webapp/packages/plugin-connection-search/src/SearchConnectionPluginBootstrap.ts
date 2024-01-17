@@ -8,8 +8,8 @@
 import { ConnectionsManagerService } from '@cloudbeaver/core-connections';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { ProjectInfoResource } from '@cloudbeaver/core-projects';
-import { CachedMapAllKey, EAdminPermission, getCachedMapResourceLoaderState } from '@cloudbeaver/core-resource';
-import { PermissionsService } from '@cloudbeaver/core-root';
+import { CachedMapAllKey, getCachedMapResourceLoaderState } from '@cloudbeaver/core-resource';
+import { EAdminPermission, PermissionsService } from '@cloudbeaver/core-root';
 import { ActionService, DATA_CONTEXT_MENU, MenuService } from '@cloudbeaver/core-view';
 import { MENU_CONNECTIONS } from '@cloudbeaver/plugin-connections';
 
