@@ -2,6 +2,7 @@ export default [
   ['authentication_login_dialog_title', 'Аутентификация'],
   ['authentication_login', 'Войти'],
   ['authentication_logout', 'Выйти'],
+  ['authentication_logout_error', 'Не удалось выйти'],
   ['authentication_authenticate', 'Аутентифицироваться'],
   ['authentication_authorizing', 'Авторизация...'],
   ['authentication_auth_federated', 'Федеративная'],

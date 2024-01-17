@@ -87,7 +87,7 @@ public class WebAuthProviderConfiguration {
     public String getSignOutLink() throws DBException {
         SMAuthProvider<?> instance = providerDescriptor.getInstance();
         return instance instanceof SMSignOutLinkProvider
-            ? ((SMSignOutLinkProvider) instance).getSignOutLink(getId(), config.getParameters())
+            ? ((SMSignOutLinkProvider) instance).getCommonSignOutLink(getId(), config.getParameters())
             : null;
     }
 

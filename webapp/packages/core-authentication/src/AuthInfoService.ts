@@ -25,31 +25,6 @@ export class AuthInfoService {
     return this.userInfoResource.data;
   }
 
-  get userAuthConfigurations(): IUserAuthConfiguration[] {
-    const tokens = this.userInfo?.authTokens;
-    const result: IUserAuthConfiguration[] = [];
-
-    if (!tokens) {
-      return result;
-    }
-
-    for (const token of tokens) {
-      if (token.authConfiguration) {
-        const provider = this.authProvidersResource.values.find(provider => provider.id === token.authProvider);
-
-        if (provider) {
-          const configuration = provider.configurations?.find(configuration => configuration.id === token.authConfiguration);
-
-          if (configuration) {
-            result.push({ providerId: provider.id, configuration });
-          }
-        }
-      }
-    }
-
-    return result;
-  }
-
   constructor(
     private readonly userInfoResource: UserInfoResource,
     private readonly authProvidersResource: AuthProvidersResource,

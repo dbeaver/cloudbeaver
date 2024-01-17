@@ -19,6 +19,7 @@ package io.cloudbeaver.auth;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
+import org.jkiss.dbeaver.model.security.SMAuthProviderCustomConfiguration;
 
 import java.util.Map;
 
@@ -28,11 +29,21 @@ import java.util.Map;
  */
 public interface SMAuthProviderFederated extends SMSignOutLinkProvider {
 
-    /**
-     * Returns new identifying credentials which can be used to find/create user in database
-     */
     @NotNull
     String getSignInLink(String id, @NotNull Map<String, Object> providerConfig) throws DBException;
+
+    /**
+     * @return a common link for logout, not related with the user context
+     */
+    @NotNull
+    String getCommonSignOutLink(String id, @NotNull Map<String, Object> providerConfig) throws DBException;
+
+    default String getUserSignOutLink(
+        @NotNull SMAuthProviderCustomConfiguration providerConfig,
+        @NotNull Map<String, Object> userCredentials
+    ) throws DBException {
+        return getCommonSignOutLink(providerConfig.getId(), providerConfig.getParameters());
+    }
 
     @Nullable
     String getMetadataLink(String id, @NotNull Map<String, Object> providerConfig) throws DBException;
