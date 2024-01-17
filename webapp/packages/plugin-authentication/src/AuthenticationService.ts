@@ -27,6 +27,7 @@ import { CachedMapAllKey } from '@cloudbeaver/core-resource';
 import { ISessionAction, ServerConfigResource, sessionActionContext, SessionActionService, SessionDataResource } from '@cloudbeaver/core-root';
 import { ScreenService, WindowsService } from '@cloudbeaver/core-routing';
 import { NavigationService } from '@cloudbeaver/core-ui';
+import { uuid } from '@cloudbeaver/core-utils';
 
 import { AuthDialogService } from './Dialog/AuthDialogService';
 import type { IAuthOptions } from './IAuthOptions';
@@ -106,7 +107,21 @@ export class AuthenticationService extends Bootstrap {
     }
 
     try {
-      await this.userInfoResource.logout(providerId, configurationId);
+      // TODO handle all redirect links once we know what to do with multiple popups issue
+      const {
+        authLogoutExtended: { redirectLinks },
+      } = await this.userInfoResource.logout(providerId, configurationId);
+
+      if (redirectLinks.length) {
+        const oktaLink = redirectLinks[0];
+        const id = `okta-logout-id-${uuid()}`;
+
+        this.windowsService.open(id, {
+          url: oktaLink,
+          width: 400,
+          height: 400,
+        });
+      }
 
       if (!this.administrationScreenService.isConfigurationMode && !providerId) {
         this.screenService.navigateToRoot();

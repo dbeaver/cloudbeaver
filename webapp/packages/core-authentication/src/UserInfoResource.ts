@@ -12,8 +12,7 @@ import { AutoRunningTask, ISyncExecutor, ITask, SyncExecutor, whileTask } from '
 import { CachedDataResource, type ResourceKeySimple, ResourceKeyUtils } from '@cloudbeaver/core-resource';
 import { SessionDataResource, SessionResource } from '@cloudbeaver/core-root';
 import { WindowsService } from '@cloudbeaver/core-routing';
-import { AuthInfo, AuthStatus, GetActiveUserQueryVariables, GraphQLService, UserInfo } from '@cloudbeaver/core-sdk';
-import { getUniqueId } from '@cloudbeaver/core-utils';
+import { AuthInfo, AuthLogoutQuery, AuthStatus, GetActiveUserQueryVariables, GraphQLService, UserInfo } from '@cloudbeaver/core-sdk';
 
 import { AUTH_PROVIDER_LOCAL_ID } from './AUTH_PROVIDER_LOCAL_ID';
 import { AuthProviderService } from './AuthProviderService';
@@ -154,29 +153,17 @@ export class UserInfoResource extends CachedDataResource<UserInfo | null, void, 
     );
   }
 
-  async logout(provider?: string, configuration?: string): Promise<void> {
-    const { authLogoutExtended } = await this.graphQLService.sdk.authLogout({
+  async logout(provider?: string, configuration?: string): Promise<AuthLogoutQuery> {
+    const result = await this.graphQLService.sdk.authLogout({
       provider,
       configuration,
     });
 
-    // TODO handle all redirect links once we know what to do with multiple popups issue
-    const redirectLinks = authLogoutExtended?.redirectLinks || [];
-
-    if (redirectLinks.length) {
-      const oktaLink = authLogoutExtended?.redirectLinks[0];
-      const id = `okta-logout-id-${getUniqueId()}`;
-
-      this.windowsService.open(id, {
-        url: oktaLink,
-        width: 400,
-        height: 400,
-      });
-    }
-
     this.resetIncludes();
     this.setData(await this.loader());
     this.sessionDataResource.markOutdated();
+
+    return result;
   }
 
   async setConfigurationParameter(key: string, value: any): Promise<UserInfo | null> {
