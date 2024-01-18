@@ -167,7 +167,10 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
             dbStat.execute();
         }
         saveSubjectMetas(dbCon, userId, metaParameters);
-
+        String defaultTeamName = application.getAppConfiguration().getDefaultUserTeam();
+        if (!CommonUtils.isEmpty(defaultTeamName)) {
+            setUserTeams(dbCon, userId, new String[]{defaultTeamName}, userId);
+        }
     }
 
     @Override
@@ -183,7 +186,6 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
         throws DBException, SQLException {
         for (SMUserProvisioning user : userImportList.getUsers()) {
             String authRole = user.getAuthRole() == null ? userImportList.getAuthRole() : user.getAuthRole();
-            String defaultTeamName = application.getAppConfiguration().getDefaultUserTeam();
             if (isSubjectExists(user.getUserId())) {
                 log.info("User already exist : " + user.getUserId());
                 setUserAuthRole(connection, user.getUserId(), authRole);
@@ -191,9 +193,6 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
                 continue;
             }
             createUser(connection, user.getUserId(), user.getMetaParameters(), true, authRole);
-            if (!CommonUtils.isEmpty(defaultTeamName)) {
-                setUserTeams(connection, user.getUserId(), new String[]{defaultTeamName}, user.getUserId());
-            }
         }
     }
 
