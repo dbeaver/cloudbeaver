@@ -37,13 +37,14 @@ export const ProcessSnackbar: NotificationComponent<ProcessSnackbarProps> = obse
   const translate = useTranslate();
   const details = useErrorDetails(error);
   const [delayState, setDelayState] = useState(false);
+  const displayedReal = notification.state.deleteDelay === 0;
   const displayed = useStateDelay(delayState, displayDelay);
 
   useEffect(() => {
-    if (notification.state.deleteDelay === 0) {
+    if (displayedReal) {
       setDelayState(true);
     }
-  }, [notification.state.deleteDelay]);
+  }, [displayedReal]);
 
   useActivationDelay(status === ENotificationType.Success, closeDelay, notification.close);
 
