@@ -149,6 +149,10 @@ export class ServerConfigResource extends CachedDataResource<ServerConfig | null
     return this.data?.resourceQuotas ?? {};
   }
 
+  get passwordPolicy() {
+    return this.data?.passwordPolicyConfiguration ?? {};
+  }
+
   get resourceManagerEnabled() {
     return this.update.resourceManagerEnabled ?? this.data?.resourceManagerEnabled ?? false;
   }
