@@ -133,10 +133,6 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
         try (Connection dbCon = database.openConnection()) {
             try (JDBCTransaction txn = new JDBCTransaction(dbCon)) {
                 createUser(dbCon, userId, metaParameters, enabled, defaultAuthRole);
-                String defaultTeamName = application.getAppConfiguration().getDefaultUserTeam();
-                if (!CommonUtils.isEmpty(defaultTeamName)) {
-                    setUserTeams(dbCon, userId, new String[]{defaultTeamName}, userId);
-                }
                 txn.commit();
             }
         } catch (SQLException e) {
