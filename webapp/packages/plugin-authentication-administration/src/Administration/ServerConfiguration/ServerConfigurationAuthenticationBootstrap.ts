@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 import { AdministrationScreenService } from '@cloudbeaver/core-administration';
-import { AUTH_PROVIDER_LOCAL_ID, AuthProvidersResource } from '@cloudbeaver/core-authentication';
+import { AUTH_PROVIDER_LOCAL_ID, AuthProvidersResource, PasswordPolicyService } from '@cloudbeaver/core-authentication';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { ExecutorInterrupter, IExecutorHandler } from '@cloudbeaver/core-executor';
@@ -27,6 +27,7 @@ export class ServerConfigurationAuthenticationBootstrap extends Bootstrap {
     private readonly authProvidersResource: AuthProvidersResource,
     private readonly serverConfigResource: ServerConfigResource,
     private readonly notificationService: NotificationService,
+    private readonly passwordPolicyService: PasswordPolicyService,
   ) {
     super();
   }
@@ -81,7 +82,12 @@ export class ServerConfigurationAuthenticationBootstrap extends Bootstrap {
     const validation = contexts.getContext(serverConfigValidationContext);
 
     if (!data.state.serverConfig.adminName || data.state.serverConfig.adminName.length < 6 || !data.state.serverConfig.adminPassword) {
-      validation.invalidate();
+      return validation.invalidate();
+    }
+
+    const passwordValidation = this.passwordPolicyService.validatePassword(data.state.serverConfig.adminPassword);
+    if (!passwordValidation.isValid) {
+      validation.error(passwordValidation.errorMessage);
     }
   };
 }
