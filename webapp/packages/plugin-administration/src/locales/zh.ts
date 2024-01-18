@@ -52,6 +52,8 @@ export default [
   ['administration_configuration_wizard_configuration_navigator_show_system_objects', '系统对象'],
   ['administration_configuration_wizard_configuration_navigator_show_utility_objects', '实用程序对象'],
 
+  ['administration_configuration_wizard_step_validation_message', 'Failed to proceed to the next step'],
+
   ['administration_configuration_wizard_finish', '确认'],
   ['administration_configuration_wizard_finish_step_description', '确认'],
   ['administration_configuration_wizard_finish_title', '差不多就这样。'],

@@ -2,6 +2,7 @@ export default [
   ['authentication_login_dialog_title', 'Autenticazione'],
   ['authentication_login', 'Login'],
   ['authentication_logout', 'Logout'],
+  ['authentication_logout_error', "Can't logout"],
   ['authentication_authenticate', 'Autentica'],
   ['authentication_authorizing', 'Authorizing...'],
   ['authentication_auth_federated', 'Federated'],

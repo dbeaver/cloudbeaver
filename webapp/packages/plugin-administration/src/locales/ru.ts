@@ -26,6 +26,8 @@ export default [
     'Все новые подключения, созданные пользователем, будут иметь только базовую информацию в дереве навигации',
   ],
 
+  ['administration_configuration_wizard_step_validation_message', 'Не удалось перейти к следующему шагу'],
+
   ['administration_configuration_wizard_configuration_security', 'Безопасность'],
   ['administration_configuration_wizard_configuration_security_admin_credentials', 'Позволить сохранять приватные данные'],
   ['administration_configuration_wizard_configuration_security_public_credentials', 'Позволить сохранять приватные данные для пользователей'],

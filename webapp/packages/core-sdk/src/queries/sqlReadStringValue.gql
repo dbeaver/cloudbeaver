@@ -1,0 +1,3 @@
+mutation sqlReadStringValue($connectionId: ID!, $contextId: ID!, $resultsId: ID!, $columnIndex: Int!, $row: SQLResultRow!) {
+  text: sqlReadStringValue(connectionId: $connectionId, contextId: $contextId, resultsId: $resultsId, columnIndex: $columnIndex, row: $row)
+}
