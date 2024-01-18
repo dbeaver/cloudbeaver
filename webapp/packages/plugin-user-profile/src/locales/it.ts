@@ -15,4 +15,5 @@ export default [
   ['plugin_user_profile_authentication_change_password_success', 'Password modificata con successo'],
   ['plugin_user_profile_authentication_change_password_submit_label', 'Modifica'],
   ['plugin_user_profile_authentication_change_password_passwords_not_match', 'Le Passwords non coincidono'],
+  ['plugin_user_profile_authentication_change_password_password_validation_error', 'Password validation failed'],
 ];

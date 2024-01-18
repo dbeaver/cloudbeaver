@@ -70,6 +70,8 @@ export default [
   ['administration_configuration_wizard_configuration_navigator_show_system_objects', 'Oggetti di Sistema'],
   ['administration_configuration_wizard_configuration_navigator_show_utility_objects', 'Oggetti di UtilitàUtility Objects'],
 
+  ['administration_configuration_wizard_step_validation_message', 'Failed to proceed to the next step'],
+
   ['administration_configuration_wizard_finish', 'Conferma'],
   ['administration_configuration_wizard_finish_step_description', 'Conferma'],
   ['administration_configuration_wizard_finish_title', 'Ci siamo quasi.'],

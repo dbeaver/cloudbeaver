@@ -2,6 +2,7 @@ export default [
   ['authentication_login_dialog_title', '认证'],
   ['authentication_login', '登录'],
   ['authentication_logout', '登出'],
+  ['authentication_logout_error', "Can't logout"],
   ['authentication_authenticate', '认证'],
   ['authentication_authorizing', 'Authorizing...'],
   ['authentication_auth_federated', '联合认证'],

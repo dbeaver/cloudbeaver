@@ -36,6 +36,7 @@ public class SMControllerConfiguration {
     private int maxFailedLogin = DEFAULT_MAX_FAILED_LOGIN;
     private int minimumLoginTimeout = DEFAULT_MINIMUM_LOGIN_TIMEOUT;
     private int blockLoginPeriod = DEFAULT_BLOCK_LOGIN_PERIOD;
+    private final PasswordPolicyConfiguration passwordPolicy = new PasswordPolicyConfiguration();
 
     public int getAccessTokenTtl() {
         return accessTokenTtl;
@@ -91,5 +92,9 @@ public class SMControllerConfiguration {
 
     public void setBlockLoginPeriod(int blockPeriod) {
         this.blockLoginPeriod = blockPeriod;
+    }
+
+    public PasswordPolicyConfiguration getPasswordPolicyConfiguration() {
+        return passwordPolicy;
     }
 }

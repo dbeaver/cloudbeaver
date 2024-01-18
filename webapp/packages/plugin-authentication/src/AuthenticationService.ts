@@ -11,13 +11,12 @@ import { AdministrationScreenService } from '@cloudbeaver/core-administration';
 import {
   AppAuthService,
   AUTH_PROVIDER_LOCAL_ID,
-  AuthInfoService,
   AuthProviderContext,
   AuthProviderService,
   AuthProvidersResource,
-  IUserAuthConfiguration,
   RequestedProvider,
   UserInfoResource,
+  UserLogoutInfo,
 } from '@cloudbeaver/core-authentication';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import type { DialogueStateResult } from '@cloudbeaver/core-dialogs';
@@ -27,6 +26,7 @@ import { CachedMapAllKey } from '@cloudbeaver/core-resource';
 import { ISessionAction, ServerConfigResource, sessionActionContext, SessionActionService, SessionDataResource } from '@cloudbeaver/core-root';
 import { ScreenService, WindowsService } from '@cloudbeaver/core-routing';
 import { NavigationService } from '@cloudbeaver/core-ui';
+import { uuid } from '@cloudbeaver/core-utils';
 
 import { AuthDialogService } from './Dialog/AuthDialogService';
 import type { IAuthOptions } from './IAuthOptions';
@@ -54,7 +54,6 @@ export class AuthenticationService extends Bootstrap {
     private readonly authProviderService: AuthProviderService,
     private readonly authProvidersResource: AuthProvidersResource,
     private readonly sessionDataResource: SessionDataResource,
-    private readonly authInfoService: AuthInfoService,
     private readonly serverConfigResource: ServerConfigResource,
     private readonly windowsService: WindowsService,
     private readonly sessionActionService: SessionActionService,
@@ -91,22 +90,10 @@ export class AuthenticationService extends Bootstrap {
       return;
     }
 
-    let userAuthConfiguration: IUserAuthConfiguration | undefined = undefined;
-
-    if (providerId) {
-      userAuthConfiguration = this.authInfoService.userAuthConfigurations.find(
-        c => c.providerId === providerId && c.configuration.id === configurationId,
-      );
-    } else if (this.authInfoService.userAuthConfigurations.length > 0) {
-      userAuthConfiguration = this.authInfoService.userAuthConfigurations[0];
-    }
-
-    if (userAuthConfiguration?.configuration.signOutLink) {
-      this.logoutConfiguration(userAuthConfiguration);
-    }
-
     try {
-      await this.userInfoResource.logout(providerId, configurationId);
+      const logoutResult = await this.userInfoResource.logout(providerId, configurationId);
+
+      this.handleRedirectLinks(logoutResult.result);
 
       if (!this.administrationScreenService.isConfigurationMode && !providerId) {
         this.screenService.navigateToRoot();
@@ -114,15 +101,20 @@ export class AuthenticationService extends Bootstrap {
 
       await this.onLogout.execute('after');
     } catch (exception: any) {
-      this.notificationService.logException(exception, "Can't logout");
+      this.notificationService.logException(exception, 'authentication_logout_error');
     }
   }
 
-  private async logoutConfiguration(configuration: IUserAuthConfiguration): Promise<void> {
-    if (configuration.configuration.signOutLink) {
-      const id = `${configuration.configuration.id}-sign-out`;
+  // TODO handle all redirect links once we know what to do with multiple popups issue
+  private handleRedirectLinks(userLogoutInfo: UserLogoutInfo) {
+    const redirectLinks = userLogoutInfo.redirectLinks;
+
+    if (redirectLinks.length) {
+      const url = redirectLinks[0];
+      const id = `okta-logout-id-${uuid()}`;
+
       const popup = this.windowsService.open(id, {
-        url: configuration.configuration.signOutLink,
+        url,
         target: id,
         width: 600,
         height: 700,
