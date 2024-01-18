@@ -8,7 +8,7 @@
 import { useEffect, useRef, useState } from 'react';
 
 export function useStateDelay(state: boolean, delay: number, callback?: () => void): boolean {
-  const [delayedState, setState] = useState(state);
+  const [delayedState, setState] = useState(false);
   const callbackRef = useRef(callback);
   const actualStateRef = useRef<NodeJS.Timeout | null>(null);
 
