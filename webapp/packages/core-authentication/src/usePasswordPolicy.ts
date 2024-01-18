@@ -14,7 +14,7 @@ export function usePasswordPolicy() {
   const passwordPolicyService = useService(PasswordPolicyService);
 
   const ref = useCustomInputValidation<string>(value => {
-    if (!value.trim()) {
+    if (!value) {
       return null;
     }
 
