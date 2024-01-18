@@ -15,4 +15,5 @@ export default [
   ['plugin_user_profile_authentication_change_password_success', 'Пароль был успешно изменен'],
   ['plugin_user_profile_authentication_change_password_submit_label', 'Сменить'],
   ['plugin_user_profile_authentication_change_password_passwords_not_match', 'Пароли не совпадают'],
+  ['plugin_user_profile_authentication_change_password_password_validation_error', 'Валидация пароля не удалась'],
 ];

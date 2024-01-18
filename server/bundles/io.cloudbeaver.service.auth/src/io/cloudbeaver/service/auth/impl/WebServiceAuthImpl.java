@@ -18,6 +18,7 @@ package io.cloudbeaver.service.auth.impl;
 
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.WebServiceUtils;
+import io.cloudbeaver.auth.SMAuthProviderFederated;
 import io.cloudbeaver.auth.provider.local.LocalAuthProvider;
 import io.cloudbeaver.model.WebPropertyInfo;
 import io.cloudbeaver.model.session.WebAuthInfo;
@@ -31,6 +32,7 @@ import io.cloudbeaver.registry.WebMetaParametersRegistry;
 import io.cloudbeaver.server.CBApplication;
 import io.cloudbeaver.service.auth.DBWServiceAuth;
 import io.cloudbeaver.service.auth.WebAuthStatus;
+import io.cloudbeaver.service.auth.WebLogoutInfo;
 import io.cloudbeaver.service.auth.WebUserInfo;
 import io.cloudbeaver.service.security.SMUtils;
 import org.jkiss.code.NotNull;
@@ -39,6 +41,7 @@ import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.auth.SMAuthInfo;
 import org.jkiss.dbeaver.model.auth.SMAuthStatus;
+import org.jkiss.dbeaver.model.auth.SMSessionExternal;
 import org.jkiss.dbeaver.model.preferences.DBPPropertyDescriptor;
 import org.jkiss.dbeaver.model.security.SMController;
 import org.jkiss.dbeaver.model.security.SMSubjectType;
@@ -131,7 +134,7 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
     }
 
     @Override
-    public void authLogout(
+    public WebLogoutInfo authLogout(
         @NotNull WebSession webSession,
         @Nullable String providerId,
         @Nullable String configurationId
@@ -140,7 +143,26 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
             throw new DBWebException("Not logged in");
         }
         try {
-            webSession.removeAuthInfo(providerId);
+            List<WebAuthInfo> removedInfos = webSession.removeAuthInfo(providerId);
+            List<String> logoutUrls = new ArrayList<>();
+            var cbApp = CBApplication.getInstance();
+            for (WebAuthInfo removedInfo : removedInfos) {
+                if (removedInfo.getAuthProviderDescriptor()
+                    .getInstance() instanceof SMAuthProviderFederated federatedProvider
+                    && removedInfo.getAuthSession() instanceof SMSessionExternal externalSession
+                ) {
+                    var providerConfig =
+                        cbApp.getAuthConfiguration().getAuthProviderConfiguration(removedInfo.getAuthConfiguration());
+                    if (providerConfig == null) {
+                        log.warn(removedInfo.getAuthConfiguration() + " provider configuration wasn't found");
+                        continue;
+                    }
+                    String logoutUrl = federatedProvider.getUserSignOutLink(providerConfig,
+                        externalSession.getAuthParameters());
+                    logoutUrls.add(logoutUrl);
+                }
+            }
+            return new WebLogoutInfo(logoutUrls);
         } catch (DBException e) {
             throw new DBWebException("User logout failed", e);
         }

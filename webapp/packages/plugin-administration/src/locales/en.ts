@@ -65,6 +65,8 @@ export default [
   ['administration_configuration_wizard_configuration_navigator_show_system_objects', 'System Objects'],
   ['administration_configuration_wizard_configuration_navigator_show_utility_objects', 'Utility Objects'],
 
+  ['administration_configuration_wizard_step_validation_message', 'Failed to proceed to the next step'],
+
   ['administration_configuration_wizard_finish', 'Confirmation'],
   ['administration_configuration_wizard_finish_step_description', 'Confirmation'],
   ['administration_configuration_wizard_finish_title', 'That is almost it.'],

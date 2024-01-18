@@ -1,9 +1,5 @@
-query authLogout(
-  $provider: ID
-  $configuration: ID
-) {
-  authLogout(
-    provider: $provider
-    configuration: $configuration
-  )
+query authLogout($provider: ID, $configuration: ID) {
+  result: authLogoutExtended(provider: $provider, configuration: $configuration) {
+    redirectLinks
+  }
 }
