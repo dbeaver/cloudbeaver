@@ -20,3 +20,4 @@ export * from './UsersResource';
 export * from './TeamMetaParametersResource';
 export * from './EAdminPermission';
 export * from './AUTH_SETTINGS_GROUP';
+export * from './PasswordPolicyService';

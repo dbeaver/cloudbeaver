@@ -119,10 +119,18 @@ public interface DBWServiceSQL extends DBWService {
 
     @WebAction
     String readLobValue(
-            @NotNull WebSQLContextInfo contextInfo,
-            @NotNull String resultsId,
-            @NotNull Integer lobColumnIndex,
-            @Nullable List<WebSQLResultsRow> row) throws DBWebException;
+        @NotNull WebSQLContextInfo contextInfo,
+        @NotNull String resultsId,
+        @NotNull Integer lobColumnIndex,
+        @NotNull WebSQLResultsRow row) throws DBWebException;
+
+    @NotNull
+    @WebAction
+    String getCellValue(
+        @NotNull WebSQLContextInfo contextInfo,
+        @NotNull String resultsId,
+        @NotNull Integer lobColumnIndex,
+        @NotNull WebSQLResultsRow row) throws DBWebException;
 
     @WebAction
     String updateResultsDataBatchScript(

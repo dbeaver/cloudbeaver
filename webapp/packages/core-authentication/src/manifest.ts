@@ -16,6 +16,7 @@ import { AuthProvidersResource } from './AuthProvidersResource';
 import { AuthRolesResource } from './AuthRolesResource';
 import { AuthSettingsService } from './AuthSettingsService';
 import { LocaleService } from './LocaleService';
+import { PasswordPolicyService } from './PasswordPolicyService';
 import { TeamMetaParametersResource } from './TeamMetaParametersResource';
 import { TeamsManagerService } from './TeamsManagerService';
 import { TeamsResource } from './TeamsResource';
@@ -47,6 +48,7 @@ export const coreAuthenticationManifest: PluginManifest = {
     UserConfigurationBootstrap,
     AuthRolesResource,
     TeamMetaParametersResource,
+    PasswordPolicyService,
     LocaleService,
   ],
 };
