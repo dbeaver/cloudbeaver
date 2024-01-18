@@ -13,9 +13,6 @@
       "path": "../core-di/tsconfig.json"
     },
     {
-      "path": "../core-dialogs/tsconfig.json"
-    },
-    {
       "path": "../core-events/tsconfig.json"
     }
   ],

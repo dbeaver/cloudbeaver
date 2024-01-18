@@ -34,9 +34,6 @@
       "path": "../core-resource/tsconfig.json"
     },
     {
-      "path": "../core-utils/tsconfig.json"
-    },
-    {
       "path": "../core-view/tsconfig.json"
     },
     {
