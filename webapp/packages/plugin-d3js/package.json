@@ -19,10 +19,12 @@
   },
   "dependencies": {
     "@cloudbeaver/core-di": "~0.1.0",
-    "d3": "^7.8.5"
+    "d3": "^7.8.5",
+    "d3-drag": "^3.0.0"
   },
   "devDependencies": {
     "@types/d3": "^7.4.3",
+    "@types/d3-drag": "^3.0.7",
     "typescript": "^5.3.2"
   },
   "peerDependencies": {}
