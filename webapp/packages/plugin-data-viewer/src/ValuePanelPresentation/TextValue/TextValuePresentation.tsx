@@ -5,12 +5,12 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { observable } from 'mobx';
+import { action, observable } from 'mobx';
 import { observer } from 'mobx-react-lite';
-import { useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import styled, { css } from 'reshadow';
 
-import { Button, s, useS, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
+import { Button, s, useObservableRef, useS, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { QuotasService } from '@cloudbeaver/core-root';
@@ -93,24 +93,33 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
       resultIndex,
     });
     const contentValue = firstSelectedCell ? formatAction.get(firstSelectedCell) : null;
-    const state = useTabLocalState(() =>
-      observable({
+    const defaultContentType = activeTabs.length > 0 && activeTabs[0].key ? activeTabs[0].key : TEXT_PLAIN_TYPE;
+    const state = useObservableRef(
+      () => ({
+        lastSelectedColumn: null as number | null,
         currentContentType: TEXT_PLAIN_TYPE,
-
         setContentType(contentType: string) {
+          if (contentType === this.currentContentType) {
+            return;
+          }
+
           if (contentType === TEXT_JSON_TYPE) {
             contentType = APPLICATION_JSON_TYPE;
           }
 
+          if (!this.textValuePresentationService.tabs.has(contentType)) {
+            contentType = this.defaultContentType;
+          }
+
           this.currentContentType = contentType;
         },
-        handleTabOpen(tabId: string) {
-          // currentContentType may be selected automatically we don't want to change state in this case
-          if (tabId !== this.currentContentType) {
-            this.setContentType(tabId);
-          }
-        },
       }),
+      {
+        lastSelectedColumn: observable.ref,
+        currentContentType: observable.ref,
+        setContentType: action.bound,
+      },
+      { textValuePresentationService, defaultContentType },
     );
     const { textValue, isTruncated, isTextColumn, pasteFullText } = useTextValue({
       model,
@@ -147,9 +156,24 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
     }
 
     if (!activeTabs.some(tab => tab.key === state.currentContentType)) {
-      const contentType = activeTabs.length > 0 && activeTabs[0].key ? activeTabs[0].key : TEXT_PLAIN_TYPE;
-      state.setContentType(contentType);
+      state.setContentType(defaultContentType);
     }
+
+    useEffect(() => {
+      if (!firstSelectedCell) {
+        return;
+      }
+
+      const isColumnChanged = firstSelectedCell.column.index !== state.lastSelectedColumn;
+
+      if (isResultSetContentValue(contentValue) && contentValue.contentType && isColumnChanged) {
+        state.setContentType(contentValue.contentType);
+      } else if (isColumnChanged) {
+        state.setContentType(defaultContentType);
+      }
+
+      state.lastSelectedColumn = firstSelectedCell.column.index;
+    }, [contentValue]);
 
     return styled(style)(
       <container>
@@ -161,7 +185,7 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
             currentTabId={state.currentContentType}
             model={model}
             lazy
-            onChange={tab => state.handleTabOpen(tab.tabId)}
+            onChange={tab => state.setContentType(tab.tabId)}
           >
             <TabList style={[BASE_TAB_STYLES, styles, UNDERLINE_TAB_STYLES]} />
           </TabsState>
