@@ -20,7 +20,6 @@ export * from './copyToClipboard';
 export * from './declensionOfNumber';
 export * from './isNotNullDefined';
 export * from './flat';
-export * from './generateFileName';
 export * from './getMIME';
 export * from './getOS';
 export * from './getPathName';

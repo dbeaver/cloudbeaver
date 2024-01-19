@@ -94,6 +94,7 @@ export default [
   ['ui_disable', 'Disable'],
   ['ui_readonly', 'In sola lettura'],
   ['ui_test', 'Test'],
+  ['ui_export', 'Export'],
 
   ['root_permission_denied', 'Non hai i permessi'],
   ['app_root_session_expire_warning_title', 'La sessione sta per scadere'],

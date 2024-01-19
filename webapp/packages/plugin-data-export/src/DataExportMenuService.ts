@@ -23,7 +23,6 @@ import {
 } from '@cloudbeaver/plugin-data-viewer';
 import type { IDataQueryOptions } from '@cloudbeaver/plugin-sql-editor';
 
-import { ACTION_EXPORT_DATA } from './ACTION_EXPORT_DATA';
 import { DataExportSettingsService } from './DataExportSettingsService';
 import { DataExportDialog } from './Dialog/DataExportDialog';
 
@@ -50,7 +49,7 @@ export class DataExportMenuService {
           return false;
         }
 
-        return [ACTION_EXPORT_DATA].includes(action);
+        return [ACTION_EXPORT].includes(action);
       },
       isDisabled(context) {
         const model = context.get(DATA_CONTEXT_DV_DDM);
@@ -58,11 +57,18 @@ export class DataExportMenuService {
 
         return model.isLoading() || model.isDisabled(resultIndex) || !model.getResult(resultIndex);
       },
+      getActionInfo(context, action) {
+        if (action === ACTION_EXPORT) {
+          return { ...action.info, icon: 'table-export' };
+        }
+
+        return action.info;
+      },
       handler: (context, action) => {
         const model = context.get(DATA_CONTEXT_DV_DDM);
         const resultIndex = context.get(DATA_CONTEXT_DV_DDM_RESULT_INDEX);
 
-        if (action === ACTION_EXPORT_DATA) {
+        if (action === ACTION_EXPORT) {
           const result = model.getResult(resultIndex);
 
           if (!result) {
@@ -95,10 +101,10 @@ export class DataExportMenuService {
       menus: [DATA_VIEWER_DATA_MODEL_ACTIONS_MENU],
       isApplicable: () => !this.isExportDisabled(),
       getItems(context, items) {
-        return [...items, ACTION_EXPORT_DATA];
+        return [...items, ACTION_EXPORT];
       },
       orderItems(context, items) {
-        const extracted = menuExtractItems(items, [ACTION_EXPORT_DATA]);
+        const extracted = menuExtractItems(items, [ACTION_EXPORT]);
         return [...items, ...extracted];
       },
     });
