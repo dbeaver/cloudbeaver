@@ -36,4 +36,12 @@ describe('cacheValue', () => {
     expect(cache.invalid).toBe(false);
     expect(fn).toHaveBeenCalledTimes(1);
   });
+
+  it('should cache value until it is invalidated', () => {
+    const cache = cacheValue();
+    expect(cache.value(() => 1)).toBe(1);
+    expect(cache.value(() => 2)).toBe(1);
+    cache.invalidate();
+    expect(cache.value(() => 3)).toBe(3);
+  });
 });
