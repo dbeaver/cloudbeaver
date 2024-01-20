@@ -96,13 +96,26 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
     const state = useTabLocalState(() =>
       observable({
         currentContentType: TEXT_PLAIN_TYPE,
-
-        setContentType(contentType: string) {
+        lastContentType: null as string | null,
+        getNormalizedContentType(contentType: string) {
           if (contentType === TEXT_JSON_TYPE) {
-            contentType = APPLICATION_JSON_TYPE;
+            return APPLICATION_JSON_TYPE;
           }
 
-          this.currentContentType = contentType;
+          if (!textValuePresentationService.tabs.has(contentType)) {
+            return TEXT_PLAIN_TYPE;
+          }
+
+          return contentType;
+        },
+        setDefaultContentType(type: string) {
+          type = this.getNormalizedContentType(type);
+
+          this.currentContentType = type;
+          this.lastContentType = type;
+        },
+        setContentType(contentType: string) {
+          this.currentContentType = this.getNormalizedContentType(contentType);
         },
         handleTabOpen(tabId: string) {
           // currentContentType may be selected automatically we don't want to change state in this case
@@ -112,10 +125,13 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
         },
       }),
     );
+    const contentType = state.getNormalizedContentType(
+      isResultSetContentValue(contentValue) && contentValue.contentType ? contentValue.contentType : state.currentContentType,
+    );
     const { textValue, isTruncated, isTextColumn, pasteFullText } = useTextValue({
       model,
       resultIndex,
-      currentContentType: state.currentContentType,
+      currentContentType: contentType,
     });
     const isSelectedCellReadonly = firstSelectedCell && (formatAction.isReadOnly(firstSelectedCell) || formatAction.isBinary(firstSelectedCell));
     const isReadonlyByResultIndex = model.isReadonly(resultIndex) || model.isDisabled(resultIndex) || !firstSelectedCell;
@@ -125,7 +141,7 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
     const limit = bytesToSize(quotasService.getQuota('sqlBinaryPreviewMaxLength'));
     const canSave = firstSelectedCell && contentAction.isDownloadable(firstSelectedCell);
     const shouldShowPasteButton = isTextColumn && isTruncated;
-    const typeExtension = useMemo(() => getTypeExtension(state.currentContentType) ?? [], [state.currentContentType]);
+    const typeExtension = useMemo(() => getTypeExtension(contentType) ?? [], [contentType]);
     const extensions = useCodemirrorExtensions(undefined, typeExtension);
 
     function handleChange(newValue: string) {
@@ -144,6 +160,10 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
       } catch (exception) {
         notificationService.logException(exception as any, 'data_viewer_presentation_value_content_download_error');
       }
+    }
+
+    if (contentType !== state.lastContentType) {
+      state.setDefaultContentType(contentType);
     }
 
     if (!activeTabs.some(tab => tab.key === state.currentContentType)) {
