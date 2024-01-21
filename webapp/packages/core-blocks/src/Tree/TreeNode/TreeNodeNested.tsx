@@ -13,7 +13,6 @@ import { useS } from '../../useS';
 import style from './TreeNodeNested.m.css';
 
 interface Props extends React.PropsWithChildren {
-  expanded?: boolean;
   root?: boolean;
   className?: string;
 }
