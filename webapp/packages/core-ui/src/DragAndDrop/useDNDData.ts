@@ -68,7 +68,7 @@ export function useDNDData(context: IDataContextProvider, options: IOptions = {}
         }
       }
 
-      state.isDragging = monitor.isDragging();
+      state.isDragging = dragging;
     },
   }));
 
