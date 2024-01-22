@@ -5,15 +5,19 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { useCustomInputValidation } from '@cloudbeaver/core-blocks';
+import { PasswordPolicyService } from '@cloudbeaver/core-authentication';
 import { useService } from '@cloudbeaver/core-di';
 
-import { PasswordPolicyService } from './PasswordPolicyService';
+import { useCustomInputValidation } from './FormControls/useCustomInputValidation';
 
-export function usePasswordPolicy() {
+export function usePasswordValidation() {
   const passwordPolicyService = useService(PasswordPolicyService);
 
   const ref = useCustomInputValidation<string>(value => {
+    if (!value) {
+      return null;
+    }
+
     const validation = passwordPolicyService.validatePassword(value);
     return validation.isValid ? null : validation.errorMessage;
   });
