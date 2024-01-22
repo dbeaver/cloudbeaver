@@ -22,21 +22,19 @@ You can see live demo of CloudBeaver here: https://demo.cloudbeaver.io
 
 ## Changelog
 
+
+### 23.3.2. 2024-01-22
+- Added password policy for the local authorization. Password parameters can be set in the configuration file;
+- The 'Keep alive' option has been added to the connection settings to keep the connection active even in case of inactivity;
+- Added ability to display full text for a string data type in value panel;
+- The DuckDB driver has been added;
+- Different bug fixes and enhancements have been made.
+
 ### 23.3.2. 2024-01-08
 - Added the ability to view decoded binary-type data in the Value panel;
 - Enhanced security for unauthorized access;
 - Different bug fixes and enhancements have been made.
 
-### 23.3.1. 2023-12-25
-- Performance:
-   - Upgraded to Jetty 11, delivering improved performance, enhanced features, and better alignment with the latest Java specifications.
-- Resource management:
-   - Read-only scripts now have a padlock icon.
-- UX improvement:
-   - Added validation for mandatory fields in all forms for creating and editing entities.
-- Driver management:
-   - Apache Derby driver has been removed because of the vulnerability issues.
-- Many small bug fixes, enhancements, and improvements have been made
 
 
 ### Old CloudBeaver releases

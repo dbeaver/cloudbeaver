@@ -12,7 +12,7 @@ import { Connection, ConnectionInfoResource, createConnectionParam } from '@clou
 import { useService } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { download, generateFileName, getTextFileReadingProcess } from '@cloudbeaver/core-utils';
+import { download, getTextFileReadingProcess, withTimestamp } from '@cloudbeaver/core-utils';
 
 import { getSqlEditorName } from '../getSqlEditorName';
 import type { ISqlEditorTabState } from '../ISqlEditorTabState';
@@ -110,7 +110,7 @@ export function useTools(state: ISqlEditorTabState): Readonly<State> {
 
         const name = getSqlEditorName(this.state, dataSource, connection);
 
-        download(blob, generateFileName(name, '.sql'));
+        download(blob, `${withTimestamp(name)}.sql`);
       },
     }),
     {

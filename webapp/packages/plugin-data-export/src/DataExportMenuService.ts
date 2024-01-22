@@ -8,11 +8,19 @@
 import { EAdminPermission } from '@cloudbeaver/core-authentication';
 import { createConnectionParam, DATA_CONTEXT_CONNECTION } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
-import { CommonDialogService, IMenuContext } from '@cloudbeaver/core-dialogs';
+import { CommonDialogService } from '@cloudbeaver/core-dialogs';
+import { LocalizationService } from '@cloudbeaver/core-localization';
 import { DATA_CONTEXT_NAV_NODE, EObjectFeature } from '@cloudbeaver/core-navigation-tree';
 import { SessionPermissionsResource } from '@cloudbeaver/core-root';
-import { ACTION_EXPORT, ActionService, DATA_CONTEXT_MENU_NESTED, MenuService } from '@cloudbeaver/core-view';
-import { IDatabaseDataSource, IDataContainerOptions, ITableFooterMenuContext, TableFooterMenuService } from '@cloudbeaver/plugin-data-viewer';
+import { withTimestamp } from '@cloudbeaver/core-utils';
+import { ACTION_EXPORT, ActionService, DATA_CONTEXT_MENU, DATA_CONTEXT_MENU_NESTED, menuExtractItems, MenuService } from '@cloudbeaver/core-view';
+import {
+  DATA_CONTEXT_DV_DDM,
+  DATA_CONTEXT_DV_DDM_RESULT_INDEX,
+  DATA_VIEWER_DATA_MODEL_ACTIONS_MENU,
+  IDatabaseDataSource,
+  IDataContainerOptions,
+} from '@cloudbeaver/plugin-data-viewer';
 import type { IDataQueryOptions } from '@cloudbeaver/plugin-sql-editor';
 
 import { DataExportSettingsService } from './DataExportSettingsService';
@@ -22,32 +30,83 @@ import { DataExportDialog } from './Dialog/DataExportDialog';
 export class DataExportMenuService {
   constructor(
     private readonly commonDialogService: CommonDialogService,
-    private readonly tableFooterMenuService: TableFooterMenuService,
     private readonly dataExportSettingsService: DataExportSettingsService,
     private readonly actionService: ActionService,
     private readonly menuService: MenuService,
     private readonly sessionPermissionsResource: SessionPermissionsResource,
+    private readonly localizationService: LocalizationService,
   ) {}
 
   register(): void {
-    this.tableFooterMenuService.registerMenuItem({
-      id: 'export ',
-      order: 5,
-      title: 'data_transfer_dialog_export',
-      tooltip: 'data_transfer_dialog_export_tooltip',
-      icon: 'table-export',
-      isPresent(context) {
-        return context.contextType === TableFooterMenuService.nodeContextType;
+    this.actionService.addHandler({
+      id: 'data-export-base-handler',
+      isActionApplicable(context, action) {
+        const menu = context.hasValue(DATA_CONTEXT_MENU, DATA_VIEWER_DATA_MODEL_ACTIONS_MENU);
+        const model = context.tryGet(DATA_CONTEXT_DV_DDM);
+        const resultIndex = context.tryGet(DATA_CONTEXT_DV_DDM_RESULT_INDEX);
+
+        if (!menu || !model || resultIndex === undefined) {
+          return false;
+        }
+
+        return [ACTION_EXPORT].includes(action);
       },
-      isHidden: () => this.isDisabled(),
       isDisabled(context) {
-        return (
-          context.data.model.isLoading() ||
-          context.data.model.isDisabled(context.data.resultIndex) ||
-          !context.data.model.getResult(context.data.resultIndex)
-        );
+        const model = context.get(DATA_CONTEXT_DV_DDM);
+        const resultIndex = context.get(DATA_CONTEXT_DV_DDM_RESULT_INDEX);
+
+        return model.isLoading() || model.isDisabled(resultIndex) || !model.getResult(resultIndex);
       },
-      onClick: this.exportData.bind(this),
+      getActionInfo(context, action) {
+        if (action === ACTION_EXPORT) {
+          return { ...action.info, icon: 'table-export' };
+        }
+
+        return action.info;
+      },
+      handler: (context, action) => {
+        const model = context.get(DATA_CONTEXT_DV_DDM);
+        const resultIndex = context.get(DATA_CONTEXT_DV_DDM_RESULT_INDEX);
+
+        if (action === ACTION_EXPORT) {
+          const result = model.getResult(resultIndex);
+
+          if (!result) {
+            throw new Error('Result must be provided');
+          }
+
+          const source = model.source as IDatabaseDataSource<IDataContainerOptions & IDataQueryOptions>;
+
+          if (!source.options) {
+            throw new Error('Source options must be provided');
+          }
+
+          this.commonDialogService.open(DataExportDialog, {
+            connectionKey: source.options.connectionKey,
+            contextId: source.executionContext?.context?.id,
+            containerNodePath: source.options.containerNodePath,
+            resultId: result.id,
+            name: model.name ?? undefined,
+            fileName: withTimestamp(model.name ?? this.localizationService.translate('data_transfer_dialog_title')),
+            query: source.options.query,
+            filter: {
+              constraints: source.options.constraints,
+              where: source.options.whereFilter,
+            },
+          });
+        }
+      },
+    });
+    this.menuService.addCreator({
+      menus: [DATA_VIEWER_DATA_MODEL_ACTIONS_MENU],
+      isApplicable: () => !this.isExportDisabled(),
+      getItems(context, items) {
+        return [...items, ACTION_EXPORT];
+      },
+      orderItems(context, items) {
+        const extracted = menuExtractItems(items, [ACTION_EXPORT]);
+        return [...items, ...extracted];
+      },
     });
 
     this.menuService.addCreator({
@@ -58,7 +117,7 @@ export class DataExportMenuService {
           return false;
         }
 
-        return !this.isDisabled() && context.has(DATA_CONTEXT_CONNECTION) && !context.has(DATA_CONTEXT_MENU_NESTED);
+        return !this.isExportDisabled() && context.has(DATA_CONTEXT_CONNECTION) && !context.has(DATA_CONTEXT_MENU_NESTED);
       },
       getItems: (context, items) => [...items, ACTION_EXPORT],
     });
@@ -69,44 +128,19 @@ export class DataExportMenuService {
       handler: async (context, action) => {
         const node = context.get(DATA_CONTEXT_NAV_NODE);
         const connection = context.get(DATA_CONTEXT_CONNECTION);
+        const fileName = withTimestamp(`${connection.name}${node?.name ? ` - ${node.name}` : ''}`);
 
         this.commonDialogService.open(DataExportDialog, {
           connectionKey: createConnectionParam(connection),
           name: node?.name,
+          fileName,
           containerNodePath: node?.id,
         });
       },
     });
   }
 
-  private exportData(context: IMenuContext<ITableFooterMenuContext>) {
-    const result = context.data.model.getResult(context.data.resultIndex);
-
-    if (!result) {
-      throw new Error('Result must be provided');
-    }
-
-    const source = context.data.model.source as IDatabaseDataSource<IDataContainerOptions & IDataQueryOptions>;
-
-    if (!source.options) {
-      throw new Error('Source options must be provided');
-    }
-
-    this.commonDialogService.open(DataExportDialog, {
-      connectionKey: source.options.connectionKey,
-      contextId: context.data.model.source.executionContext?.context?.id,
-      containerNodePath: source.options.containerNodePath,
-      resultId: result.id,
-      name: context.data.model.name ?? undefined,
-      query: source.options.query,
-      filter: {
-        constraints: source.options.constraints,
-        where: source.options.whereFilter,
-      },
-    });
-  }
-
-  private isDisabled() {
+  private isExportDisabled() {
     if (this.sessionPermissionsResource.has(EAdminPermission.admin)) {
       return false;
     }
