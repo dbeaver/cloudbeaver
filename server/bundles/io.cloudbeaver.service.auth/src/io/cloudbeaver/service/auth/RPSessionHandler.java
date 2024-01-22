@@ -112,7 +112,6 @@ public class RPSessionHandler implements DBWSessionHandler {
                 Map<String, Object> sessionParameters = webSession.getSessionParameters();
                 sessionParameters.put(SMConstants.SESSION_PARAM_TRUSTED_USER_TEAMS, userTeams);
                 sessionParameters.put(SMConstants.SESSION_PARAM_TRUSTED_USER_ROLE, role);
-                sessionParameters.put(SMConstants.SESSION_PARAM_LOGOUT_URL, logoutUrl);
                 Map<String, Object> userCredentials = authProviderExternal.authExternalUser(
                     webSession.getProgressMonitor(), null, credentials);
                 String currentSmSessionId = webSession.getUser() == null ? null : webSession.getUserContext().getSmSessionId();
