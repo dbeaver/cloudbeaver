@@ -207,11 +207,6 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
               </Button>
             </Container>
           )}
-          <Container keepSize>
-            <Button disabled={model.isLoading()} onClick={pasteFullText}>
-              {translate('data_viewer_presentation_value_content_full_text_button')}
-            </Button>
-          </Container>
         </Container>
       </Container>,
     );
