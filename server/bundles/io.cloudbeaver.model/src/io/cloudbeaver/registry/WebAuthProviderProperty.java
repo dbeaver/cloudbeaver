@@ -18,19 +18,28 @@ package io.cloudbeaver.registry;
 
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.jkiss.code.NotNull;
+import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.model.impl.PropertyDescriptor;
 
 public class WebAuthProviderProperty extends PropertyDescriptor {
     private final String[] requiredFeatures;
+    @Nullable
+    private final String type;
 
     public WebAuthProviderProperty(String category, IConfigurationElement config) {
         super(category, config);
         String featuresAttr = config.getAttribute("requiredFeatures");
         this.requiredFeatures = featuresAttr == null ? new String[0] : featuresAttr.split(",");
+        this.type = config.getAttribute("type");
     }
 
     @NotNull
     public String[] getRequiredFeatures() {
         return requiredFeatures;
+    }
+
+    @Nullable
+    public String getType() {
+        return type;
     }
 }

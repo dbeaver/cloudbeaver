@@ -56,6 +56,7 @@ public class WebAuthProviderDescriptor extends AbstractDescriptor {
     private final boolean isPrivate;
     private final String[] requiredFeatures;
     private final boolean isRequired;
+    private final String[] types;
 
     public WebAuthProviderDescriptor(IConfigurationElement cfg) {
         super(cfg);
@@ -68,13 +69,9 @@ public class WebAuthProviderDescriptor extends AbstractDescriptor {
         this.isRequired = CommonUtils.toBoolean(cfg.getAttribute("required"));
 
         for (IConfigurationElement cfgElement : cfg.getChildren("configuration")) {
-            for (IConfigurationElement propGroup : ArrayUtils.safeArray(cfgElement.getChildren(PropertyDescriptor.TAG_PROPERTY_GROUP))) {
-                String category = propGroup.getAttribute(PropertyDescriptor.ATTR_LABEL);
-                IConfigurationElement[] propElements = propGroup.getChildren(PropertyDescriptor.TAG_PROPERTY);
-                for (IConfigurationElement prop : propElements) {
-                    WebAuthProviderProperty propertyDescriptor = new WebAuthProviderProperty(category, prop);
-                    configurationParameters.put(CommonUtils.toString(propertyDescriptor.getId()), propertyDescriptor);
-                }
+            List<WebAuthProviderProperty> properties = WebAuthProviderRegistry.readProperties(cfgElement);
+            for (WebAuthProviderProperty property : properties) {
+                configurationParameters.put(CommonUtils.toString(property.getId()), property);
             }
         }
         for (IConfigurationElement credElement : cfg.getChildren("credentials")) {
@@ -90,11 +87,10 @@ public class WebAuthProviderDescriptor extends AbstractDescriptor {
         }
 
         String rfList = cfg.getAttribute("requiredFeatures");
-        if (!CommonUtils.isEmpty(rfList)) {
-            requiredFeatures = rfList.split(",");
-        } else {
-            requiredFeatures = null;
-        }
+        requiredFeatures = CommonUtils.isEmpty(rfList) ? null : rfList.split(",");
+
+        String typesAttr = cfg.getAttribute("categories");
+        this.types = CommonUtils.isEmpty(typesAttr) ? new String[0] : typesAttr.split(",");
     }
 
     @NotNull
@@ -198,4 +194,7 @@ public class WebAuthProviderDescriptor extends AbstractDescriptor {
         return metaParameters.get(subjectType);
     }
 
+    public String[] getTypes() {
+        return types;
+    }
 }
