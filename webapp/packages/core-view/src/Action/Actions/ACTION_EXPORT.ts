@@ -8,5 +8,6 @@
 import { createAction } from '../createAction';
 
 export const ACTION_EXPORT = createAction('export', {
-  label: 'data_transfer_dialog_export',
+  label: 'ui_export',
+  tooltip: 'ui_export',
 });

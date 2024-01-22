@@ -31,5 +31,5 @@ export function isBlobPresentationAvailable(context: IDataValuePanelProps<any, I
     return isResultSetContentValue(cellValue) && isResultSetBinaryFileValue(cellValue);
   }
 
-  return true;
+  return false;
 }
