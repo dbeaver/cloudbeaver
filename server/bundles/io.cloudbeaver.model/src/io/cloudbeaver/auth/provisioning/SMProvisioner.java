@@ -31,4 +31,8 @@ public interface SMProvisioner {
         @NotNull SMAuthProviderCustomConfiguration customConfiguration,
         @NotNull SMProvisioningFilter filter
     ) throws DBException;
+
+    default boolean isAuthRoleProvided(SMAuthProviderCustomConfiguration configuration) {
+        return false;
+    }
 }

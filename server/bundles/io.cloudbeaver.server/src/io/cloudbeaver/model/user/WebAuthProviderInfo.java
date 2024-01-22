@@ -86,6 +86,12 @@ public class WebAuthProviderInfo {
     public boolean isRequired() {
         return descriptor.isRequired();
     }
+    public boolean isAuthRoleProvided(SMAuthProviderCustomConfiguration configuration) {
+        if (descriptor.getInstance() instanceof SMProvisioner provisioner) {
+            return provisioner.isAuthRoleProvided(configuration);
+        }
+        return false;
+    }
 
     public boolean isSupportProvisioning() {
         return descriptor.getInstance() instanceof SMProvisioner;

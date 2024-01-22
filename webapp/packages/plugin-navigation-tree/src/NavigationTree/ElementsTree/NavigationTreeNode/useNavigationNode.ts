@@ -9,7 +9,6 @@ import React, { useContext, useEffect, useRef } from 'react';
 
 import { getComputed, useExecutor, useObjectRef } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { SyncExecutor } from '@cloudbeaver/core-executor';
 import { EObjectFeature, type NavNode, NavNodeInfoResource } from '@cloudbeaver/core-navigation-tree';
 import { resourceKeyList } from '@cloudbeaver/core-resource';
 import type { IDNDData } from '@cloudbeaver/core-ui';
@@ -17,7 +16,6 @@ import type { IDNDData } from '@cloudbeaver/core-ui';
 import { useChildren } from '../../../NodesManager/useChildren';
 import { useNode } from '../../../NodesManager/useNode';
 import { ElementsTreeContext } from '../ElementsTreeContext';
-import type { IElementsTreeAction } from '../IElementsTreeAction';
 import type { NavTreeControlComponent } from '../NavigationNodeComponent';
 import type { IElementsTree } from '../useElementsTree';
 
@@ -94,7 +92,7 @@ export function useNavigationNode(node: NavNode, path: string[]): INavigationNod
   }, []);
 
   useExecutor({
-    executor: contextRef.context?.tree.actions || new SyncExecutor<IElementsTreeAction>(),
+    executor: contextRef.context?.tree.actions,
     handlers: [
       function refreshRoot({ type, nodeId }) {
         if (type === 'show' && nodeId === node.id) {
