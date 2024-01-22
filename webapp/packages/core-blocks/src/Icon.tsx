@@ -14,7 +14,7 @@ export const Icon: React.FC<SVGAttributes<any>> = function Icon(props) {
   const cn = `icon ${className || ''}`;
   const url = GlobalConstants.absoluteUrl(name.startsWith('/') ? name : `/icons/icons.svg#${name}`);
   return (
-    <svg {...rest} className={cn} aria-hidden="true" focusable="false">
+    <svg {...rest} data-testid="Icon" className={cn} aria-hidden="true" focusable="false">
       <use href={url} />
     </svg>
   );
