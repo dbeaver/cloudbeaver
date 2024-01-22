@@ -14,6 +14,7 @@ export interface IExportContext {
   resultId?: string | null;
   containerNodePath?: string;
   name?: string;
+  fileName?: string;
   query?: string;
   filter?: SqlDataFilter;
 }
