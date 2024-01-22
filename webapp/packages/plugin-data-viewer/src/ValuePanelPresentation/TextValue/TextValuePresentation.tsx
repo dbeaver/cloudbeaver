@@ -10,7 +10,7 @@ import { observer } from 'mobx-react-lite';
 import { useMemo } from 'react';
 import styled, { css } from 'reshadow';
 
-import { Button, s, useS, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
+import { Button, Container, Group, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { QuotasService } from '@cloudbeaver/core-root';
@@ -26,32 +26,12 @@ import type { IDataValuePanelProps } from '../../TableViewer/ValuePanel/DataValu
 import { QuotaPlaceholder } from '../QuotaPlaceholder';
 import { VALUE_PANEL_TOOLS_STYLES } from '../ValuePanelTools/VALUE_PANEL_TOOLS_STYLES';
 import { getTypeExtension } from './getTypeExtension';
-import moduleStyles from './TextValuePresentation.m.css';
 import { TextValuePresentationService } from './TextValuePresentationService';
 import { useTextValue } from './useTextValue';
 
 const styles = css`
   Tab {
     composes: theme-ripple theme-background-surface theme-text-text-primary-on-light from global;
-  }
-  container {
-    display: flex;
-    gap: 8px;
-    flex-direction: column;
-    overflow: auto;
-    flex: 1;
-  }
-  actions {
-    display: flex;
-    justify-content: center;
-    flex: 0;
-  }
-  EditorLoader {
-    border-radius: var(--theme-group-element-radius);
-  }
-  EditorLoader {
-    flex: 1;
-    overflow: auto;
   }
   TabList {
     composes: theme-border-color-background theme-background-background from global;
@@ -68,9 +48,7 @@ const styles = css`
   }
 `;
 
-const TEXT_PLAIN_TYPE = 'text/plain';
-const TEXT_JSON_TYPE = 'text/json';
-const APPLICATION_JSON_TYPE = 'application/json';
+const DEFAULT_CONTENT_TYPE = 'text/plain';
 
 export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelProps<any, IDatabaseResultSet>> = observer(
   function TextValuePresentation({ model, resultIndex, dataFormat }) {
@@ -79,7 +57,6 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
     const quotasService = useService(QuotasService);
     const textValuePresentationService = useService(TextValuePresentationService);
     const style = useStyles(styles, UNDERLINE_TAB_STYLES, VALUE_PANEL_TOOLS_STYLES);
-    const moduleStyle = useS(moduleStyles);
     const selection = model.source.getAction(resultIndex, ResultSetSelectAction);
     const activeElements = selection.getActiveElements();
     const firstSelectedCell = activeElements?.[0];
@@ -95,27 +72,47 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
     const contentValue = firstSelectedCell ? formatAction.get(firstSelectedCell) : null;
     const state = useTabLocalState(() =>
       observable({
-        currentContentType: TEXT_PLAIN_TYPE,
+        currentContentType: null as string | null,
 
-        setContentType(contentType: string) {
-          if (contentType === TEXT_JSON_TYPE) {
-            contentType = APPLICATION_JSON_TYPE;
-          }
-
+        setContentType(contentType: string | null) {
           this.currentContentType = contentType;
-        },
-        handleTabOpen(tabId: string) {
-          // currentContentType may be selected automatically we don't want to change state in this case
-          if (tabId !== this.currentContentType) {
-            this.setContentType(tabId);
-          }
         },
       }),
     );
+
+    let contentType = state.currentContentType;
+    let autoContentType = DEFAULT_CONTENT_TYPE;
+    let lineWrapping = false;
+
+    if (isResultSetContentValue(contentValue)) {
+      if (contentValue.contentType) {
+        switch (contentValue.contentType) {
+          case 'text/json':
+            autoContentType = 'application/json';
+            break;
+          case 'application/octet-stream':
+            autoContentType = 'application/octet-stream;type=base64';
+            lineWrapping = true;
+            break;
+          default:
+            autoContentType = contentValue.contentType;
+            break;
+        }
+      }
+    }
+
+    if (contentType === null) {
+      contentType = autoContentType ?? DEFAULT_CONTENT_TYPE;
+    }
+
+    if (activeTabs.length > 0 && !activeTabs.some(tab => tab.key === contentType)) {
+      contentType = activeTabs[0].key;
+    }
+
     const { textValue, isTruncated, isTextColumn, pasteFullText } = useTextValue({
       model,
       resultIndex,
-      currentContentType: state.currentContentType,
+      currentContentType: contentType,
     });
     const isSelectedCellReadonly = firstSelectedCell && (formatAction.isReadOnly(firstSelectedCell) || formatAction.isBinary(firstSelectedCell));
     const isReadonlyByResultIndex = model.isReadonly(resultIndex) || model.isDisabled(resultIndex) || !firstSelectedCell;
@@ -125,7 +122,7 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
     const limit = bytesToSize(quotasService.getQuota('sqlBinaryPreviewMaxLength'));
     const canSave = firstSelectedCell && contentAction.isDownloadable(firstSelectedCell);
     const shouldShowPasteButton = isTextColumn && isTruncated;
-    const typeExtension = useMemo(() => getTypeExtension(state.currentContentType) ?? [], [state.currentContentType]);
+    const typeExtension = useMemo(() => getTypeExtension(contentType!) ?? [], [contentType]);
     const extensions = useCodemirrorExtensions(undefined, typeExtension);
 
     function handleChange(newValue: string) {
@@ -146,41 +143,58 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
       }
     }
 
-    if (!activeTabs.some(tab => tab.key === state.currentContentType)) {
-      const contentType = activeTabs.length > 0 && activeTabs[0].key ? activeTabs[0].key : TEXT_PLAIN_TYPE;
-      state.setContentType(contentType);
+    async function handleTabOpen(tabId: string) {
+      // currentContentType may be selected automatically we don't want to change state in this case
+      if (tabId !== contentType) {
+        state.setContentType(tabId);
+      }
     }
 
     return styled(style)(
-      <container>
-        <actions>
-          <TabsState
-            dataFormat={dataFormat}
-            resultIndex={resultIndex}
-            container={textValuePresentationService.tabs}
-            currentTabId={state.currentContentType}
-            model={model}
-            lazy
-            onChange={tab => state.handleTabOpen(tab.tabId)}
-          >
-            <TabList style={[BASE_TAB_STYLES, styles, UNDERLINE_TAB_STYLES]} />
-          </TabsState>
-        </actions>
-        <EditorLoader key={isReadonly ? '1' : '0'} value={textValue} readonly={isReadonly} extensions={extensions} onChange={handleChange} />
-        {isTruncated && <QuotaPlaceholder limit={limit} size={valueSize} />}
-        <div className={s(moduleStyle, { toolsContainer: true })}>
+      <Container vertical gap dense overflow>
+        <Container keepSize center overflow>
+          <Container keepSize>
+            <TabsState
+              dataFormat={dataFormat}
+              resultIndex={resultIndex}
+              container={textValuePresentationService.tabs}
+              currentTabId={contentType}
+              model={model}
+              lazy
+              onChange={tab => handleTabOpen(tab.tabId)}
+            >
+              <TabList style={[BASE_TAB_STYLES, styles, UNDERLINE_TAB_STYLES]} />
+            </TabsState>
+          </Container>
+        </Container>
+        <Group maximum box>
+          <EditorLoader
+            key={isReadonly ? '1' : '0'}
+            value={textValue}
+            lineWrapping={lineWrapping}
+            readonly={isReadonly}
+            extensions={extensions}
+            onChange={handleChange}
+          />
+          {isTruncated && <QuotaPlaceholder limit={limit} size={valueSize} />}
+        </Group>
+        <Container gap dense keepSize overflow>
           {canSave && (
-            <Button disabled={model.isLoading()} onClick={save}>
-              {translate('ui_download')}
-            </Button>
+            <Container keepSize>
+              <Button disabled={model.isLoading()} onClick={save}>
+                {translate('ui_download')}
+              </Button>
+            </Container>
           )}
           {shouldShowPasteButton && (
-            <Button disabled={model.isLoading()} onClick={pasteFullText}>
-              {translate('data_viewer_presentation_value_content_full_text_button')}
-            </Button>
+            <Container keepSize>
+              <Button disabled={model.isLoading()} onClick={pasteFullText}>
+                {translate('data_viewer_presentation_value_content_full_text_button')}
+              </Button>
+            </Container>
           )}
-        </div>
-      </container>,
+        </Container>
+      </Container>,
     );
   },
 );
