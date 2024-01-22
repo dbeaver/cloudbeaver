@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import { useCallback, useContext, useEffect, useRef } from 'react';
+import { useCallback, useContext, useLayoutEffect, useRef } from 'react';
 
 import { filterLayoutFakeProps, getLayoutProps } from '../Containers/filterLayoutFakeProps';
 import type { ILayoutSizeProps } from '../Containers/ILayoutSizeProps';
@@ -82,12 +82,12 @@ export const Textarea: TextareaType = observer(function Textarea({
 
   const value = state ? state[name] : controlledValue;
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (cursorInitiallyAtEnd && typeof value === 'string') {
-      const position = value.trim().length;
+      const position = value.length;
       textareaRef.current?.setSelectionRange(position, position);
     }
-  }, []);
+  }, [cursorInitiallyAtEnd]);
 
   return (
     <Field {...layoutProps} className={s(styles, { field: true, embedded }, className)}>
