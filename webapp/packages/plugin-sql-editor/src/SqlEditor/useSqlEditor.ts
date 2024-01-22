@@ -138,7 +138,6 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
       onExecute: new SyncExecutor(),
       onSegmentExecute: new SyncExecutor(),
       onUpdate: new SyncExecutor(),
-      onFormat: new SyncExecutor(),
       parser: new SQLParser(),
 
       cursor: { begin: 0, end: 0 },
@@ -226,7 +225,7 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
           const formatted = await this.sqlDialectInfoService.formatScript(this.dataSource.executionContext, script.query);
 
           this.setScript(query.substring(0, script.begin) + formatted + query.substring(script.end));
-          this.onFormat.execute([script, formatted]);
+          this.setCursor(script.begin + formatted.length);
         } finally {
           this.readonlyState = false;
         }

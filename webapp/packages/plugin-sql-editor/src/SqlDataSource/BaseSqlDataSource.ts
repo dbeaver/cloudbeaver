@@ -14,7 +14,7 @@ import type { IDatabaseDataModel, IDatabaseResultSet } from '@cloudbeaver/plugin
 
 import type { IDataQueryOptions } from '../QueryDataSource';
 import { ESqlDataSourceFeatures } from './ESqlDataSourceFeatures';
-import type { ISetScriptData, ISqlDataSource, ISqlDataSourceKey, ScriptDataSourceType } from './ISqlDataSource';
+import type { ISetScriptData, ISqlDataSource, ISqlDataSourceKey } from './ISqlDataSource';
 import type { ISqlDataSourceHistory } from './SqlDataSourceHistory/ISqlDataSourceHistory';
 import { SqlDataSourceHistory } from './SqlDataSourceHistory/SqlDataSourceHistory';
 
@@ -130,7 +130,7 @@ export abstract class BaseSqlDataSource implements ISqlDataSource {
     });
   }
 
-  setScript(script: string, source?: ScriptDataSourceType): void {
+  setScript(script: string, source?: string): void {
     this.onSetScript.execute({ script, source });
   }
 

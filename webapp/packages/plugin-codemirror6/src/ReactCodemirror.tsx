@@ -22,7 +22,7 @@ const External = Annotation.define<boolean>();
 
 export const ReactCodemirror = observer<IReactCodeMirrorProps, IEditorRef>(
   forwardRef(function ReactCodemirror(
-    { children, getValue, value, incomingValue, extensions = new Map<Compartment, Extension>(), readonly, autoFocus, onChange, onUpdate },
+    { children, getValue, value, cursor, incomingValue, extensions = new Map<Compartment, Extension>(), readonly, autoFocus, onChange, onUpdate },
     ref,
   ) {
     value = value ?? getValue?.();
@@ -34,6 +34,8 @@ export const ReactCodemirror = observer<IReactCodeMirrorProps, IEditorRef>(
     const [incomingView, setIncomingView] = useState<EditorView | null>(null);
     const callbackRef = useObjectRef({ onChange, onUpdate });
     const [selection, setSelection] = useState(view?.state.selection.main ?? null);
+
+    const memoizedCursor = useMemo(() => cursor, [cursor?.anchor, cursor?.head]);
 
     useLayoutEffect(() => {
       if (container) {
@@ -136,13 +138,26 @@ export const ReactCodemirror = observer<IReactCodeMirrorProps, IEditorRef>(
     });
 
     useLayoutEffect(() => {
-      if (value !== undefined && view && value !== view.state.doc.toString()) {
+      if (view && value !== undefined && value !== view.state.doc.toString()) {
         view.dispatch({
           changes: { from: 0, to: view.state.doc.length, insert: value },
           annotations: [External.of(true)],
         });
       }
     }, [value, view]);
+
+    useLayoutEffect(() => {
+      if (
+        view &&
+        memoizedCursor &&
+        (view.state.selection.main.anchor !== memoizedCursor.anchor || view.state.selection.main.head !== memoizedCursor.head)
+      ) {
+        view.dispatch({
+          selection: memoizedCursor,
+          annotations: [External.of(true)],
+        });
+      }
+    }, [view, memoizedCursor]);
 
     useLayoutEffect(() => {
       if (incomingValue !== undefined && incomingView && incomingValue !== incomingView.state.doc.toString()) {
