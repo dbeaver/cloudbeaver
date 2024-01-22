@@ -18,6 +18,8 @@ import type { ISetScriptData, ISqlDataSource, ISqlDataSourceKey } from './ISqlDa
 import type { ISqlDataSourceHistory } from './SqlDataSourceHistory/ISqlDataSourceHistory';
 import { SqlDataSourceHistory } from './SqlDataSourceHistory/SqlDataSourceHistory';
 
+const SOURCE_HISTORY = 'history';
+
 @staticImplements<ISqlDataSourceKey>()
 export abstract class BaseSqlDataSource implements ISqlDataSource {
   static key = 'base';
@@ -94,13 +96,13 @@ export abstract class BaseSqlDataSource implements ISqlDataSource {
     this.onDatabaseModelUpdate.setInitialDataGetter(() => this.databaseModels);
     this.onSetScript.next(this.onUpdate);
     this.onSetScript.addHandler(({ script, source }) => {
-      if (source === 'history') {
+      if (source === SOURCE_HISTORY) {
         return;
       }
       this.history.add(script);
     });
 
-    this.history.onNavigate.addHandler(value => this.setScript(value, 'history'));
+    this.history.onNavigate.addHandler(value => this.setScript(value, SOURCE_HISTORY));
 
     makeObservable<this, 'outdated' | 'editing'>(this, {
       isSaved: computed,
