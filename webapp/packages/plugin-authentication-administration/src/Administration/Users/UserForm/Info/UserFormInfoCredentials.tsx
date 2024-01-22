@@ -8,7 +8,15 @@
 import { observer } from 'mobx-react-lite';
 
 import { AUTH_PROVIDER_LOCAL_ID, AuthProvidersResource, isLocalUser, UsersResource } from '@cloudbeaver/core-authentication';
-import { Container, GroupTitle, InputField, useCustomInputValidation, useResource, useTranslate } from '@cloudbeaver/core-blocks';
+import {
+  Container,
+  GroupTitle,
+  InputField,
+  useCustomInputValidation,
+  usePasswordValidation,
+  useResource,
+  useTranslate,
+} from '@cloudbeaver/core-blocks';
 import { FormMode } from '@cloudbeaver/core-ui';
 import { isValuesEqual } from '@cloudbeaver/core-utils';
 
@@ -33,6 +41,7 @@ export const UserFormInfoCredentials = observer<Props>(function UserFormInfoCred
     { active: tabSelected && editing },
   );
   const authProvidersResource = useResource(UserFormInfoCredentials, AuthProvidersResource, null);
+  const passwordValidationRef = usePasswordValidation();
 
   let local = authProvidersResource.resource.isEnabled(AUTH_PROVIDER_LOCAL_ID);
 
@@ -56,6 +65,7 @@ export const UserFormInfoCredentials = observer<Props>(function UserFormInfoCred
       {local && (
         <>
           <InputField
+            ref={passwordValidationRef}
             type="password"
             name="password"
             state={tabState.state}

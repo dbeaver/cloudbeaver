@@ -4,6 +4,7 @@
     <extension point="org.jkiss.dbeaver.resources">
         <resource name="drivers/db2"/>
         <resource name="drivers/db2-jt400"/>
+        <resource name="drivers/duckdb"/>
         <resource name="drivers/mysql/mysql8"/>
         <resource name="drivers/mariadb"/>
         <resource name="drivers/oracle"/>
@@ -21,6 +22,7 @@
     <!-- Bundles  -->
     <extension point="org.jkiss.dbeaver.product.bundles">
         <bundle id="drivers.db2" label="DB2 drivers"/>
+        <bundle id="drivers.duckdb" label="DuckDB drivers"/>
         <bundle id="drivers.jt400" label="DB2 iSeries drivers"/>
         <bundle id="drivers.mysql" label="MySQL drivers"/>
         <bundle id="drivers.mariadb" label="MariaDB drivers"/>
@@ -52,6 +54,7 @@
         <driver id="sqlite:sqlite_jdbc"/>
         <driver id="sqlserver:microsoft"/>
         <driver id="generic:trino_jdbc"/>
+        <driver id="generic:duckdb_jdbc"/>
     </extension>
 
 

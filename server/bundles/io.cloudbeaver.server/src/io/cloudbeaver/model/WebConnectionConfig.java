@@ -43,6 +43,8 @@ public class WebConnectionConfig {
     private String databaseName;
     private String url;
 
+    private int keepAliveInterval;
+
     private String name;
     private String description;
     private String folder;
@@ -79,6 +81,8 @@ public class WebConnectionConfig {
             serverName = JSONUtils.getString(params, "serverName");
             databaseName = JSONUtils.getString(params, "databaseName");
             url = JSONUtils.getString(params, "url");
+
+            keepAliveInterval = JSONUtils.getInteger(params, "keepAliveInterval", -1);
 
             name = JSONUtils.getString(params, "name");
             description = JSONUtils.getString(params, "description");
@@ -221,5 +225,10 @@ public class WebConnectionConfig {
     @Property
     public Map<String, Object> getProviderProperties() {
         return providerProperties;
+    }
+
+    @Property
+    public Integer getKeepAliveInterval() {
+        return keepAliveInterval;
     }
 }

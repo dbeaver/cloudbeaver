@@ -131,8 +131,6 @@ public class WebAuthInfo implements SMSessionPrincipal {
                 authProviderInstance.closeSession(session, authSession);
             } catch (Exception e) {
                 log.error(e);
-            } finally {
-                authSession = null;
             }
         }
     }

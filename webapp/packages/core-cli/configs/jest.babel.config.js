@@ -7,5 +7,5 @@
  */
 module.exports = {
   presets: ['@babel/preset-env', ['@babel/preset-react', { runtime: 'automatic' }]],
-  plugins: ['../dist/babel-plugins/TestingAttributes.js', require('@reshadow/babel')],
+  plugins: [require('@reshadow/babel')],
 };

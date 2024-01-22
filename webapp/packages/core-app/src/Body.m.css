@@ -6,3 +6,7 @@
   flex-direction: column;
   overflow: hidden;
 }
+
+.loader {
+  height: var(--app-height);
+}

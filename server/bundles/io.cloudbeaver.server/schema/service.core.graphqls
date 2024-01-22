@@ -99,6 +99,13 @@ type WebServiceConfig {
     bundleVersion: String!
 }
 
+type PasswordPolicyConfig @since(version: "23.3.3") {
+    minLength: Int!
+    minNumberCount: Int!
+    minSymbolCount: Int!
+    requireMixedCase: Boolean!
+}
+
 type ProductInfo {
     id: ID!
     version: String!
@@ -152,6 +159,7 @@ type ServerConfig {
     defaultNavigatorSettings: NavigatorSettings!
     disabledDrivers: [ID!]!
     resourceQuotas: Object!
+    passwordPolicyConfiguration: PasswordPolicyConfig! @since(version: "23.3.3")
 }
 
 type SessionInfo {
@@ -314,6 +322,8 @@ type ConnectionInfo {
     databaseName: String
     url: String
 
+    keepAliveInterval: Int!
+
     properties: Object
 
     template: Boolean!
@@ -464,6 +474,9 @@ input ConnectionConfig {
     url: String
     # Properties
     properties: Object
+
+    # Keep-Alive interval
+    keepAliveInterval: Int
 
     # Template connection
     template: Boolean

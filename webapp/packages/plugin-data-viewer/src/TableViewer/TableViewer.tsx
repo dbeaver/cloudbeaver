@@ -191,6 +191,7 @@ export const TableViewer = observer<TableViewerProps, HTMLDivElement>(
       ? dataPresentationService.getSupported(DataPresentationType.toolsPanel, dataFormat, valuePresentationId, dataModel, resultIndex)
       : null;
 
+    const isStatistics = result?.loadedFully && !result.data;
     const resultExist = dataModel.source.hasResult(resultIndex);
     const overlay = dataModel.source.results.length > 0 && presentation.dataFormat === dataFormat;
     const valuePanelDisplayed =
@@ -203,16 +204,18 @@ export const TableViewer = observer<TableViewerProps, HTMLDivElement>(
     return (
       <div ref={ref} className={s(styles, { tableViewer: true }, className)}>
         <div className={s(styles, { tableContent: true })}>
-          <TablePresentationBar
-            className={s(styles, { tablePresentationBar: true })}
-            type={DataPresentationType.main}
-            presentationId={presentation.id}
-            dataFormat={dataFormat}
-            supportedDataFormat={dataModel.supportedDataFormats}
-            model={dataModel}
-            resultIndex={resultIndex}
-            onPresentationChange={dataTableActions.setPresentation}
-          />
+          {!isStatistics && (
+            <TablePresentationBar
+              className={s(styles, { tablePresentationBar: true })}
+              type={DataPresentationType.main}
+              presentationId={presentation.id}
+              dataFormat={dataFormat}
+              supportedDataFormat={dataModel.supportedDataFormats}
+              model={dataModel}
+              resultIndex={resultIndex}
+              onPresentationChange={dataTableActions.setPresentation}
+            />
+          )}
           <div className={s(styles, { tableData: true })}>
             <TableHeader model={dataModel} resultIndex={resultIndex} simple={simple} />
             <Split
@@ -233,6 +236,7 @@ export const TableViewer = observer<TableViewerProps, HTMLDivElement>(
                       presentation={presentation}
                       resultIndex={resultIndex}
                       simple={simple}
+                      isStatistics={isStatistics}
                     />
                   </Loader>
                   <TableError model={dataModel} loading={loading} />
@@ -263,7 +267,7 @@ export const TableViewer = observer<TableViewerProps, HTMLDivElement>(
               </Pane>
             </Split>
           </div>
-          {!simple && (
+          {!simple && !isStatistics && (
             <TablePresentationBar
               type={DataPresentationType.toolsPanel}
               className={s(styles, { tablePresentationBar: true })}

@@ -229,6 +229,8 @@ export class ConnectionOptionsTabService extends Bootstrap {
     state.config.saveCredentials = state.info.credentialsSaved;
     state.config.sharedCredentials = state.info.sharedCredentials;
 
+    state.config.keepAliveInterval = state.info.keepAliveInterval;
+
     if (state.info.authProperties) {
       for (const property of state.info.authProperties) {
         if (!property.features.includes('password')) {
@@ -292,6 +294,8 @@ export class ConnectionOptionsTabService extends Bootstrap {
     tempConfig.template = state.config.template;
 
     tempConfig.driverId = state.config.driverId;
+
+    tempConfig.keepAliveInterval = Number(state.config.keepAliveInterval);
 
     if (!state.config.template && state.config.folder) {
       tempConfig.folder = state.config.folder;
@@ -407,7 +411,8 @@ export class ConnectionOptionsTabService extends Bootstrap {
       (config.saveCredentials !== undefined && config.saveCredentials !== data.info.credentialsSaved) ||
       (config.sharedCredentials !== undefined && config.sharedCredentials !== data.info.sharedCredentials) ||
       (config.providerProperties !== undefined &&
-        !isObjectPropertyInfoStateEqual(driver.providerProperties, config.providerProperties, data.info.providerProperties))
+        !isObjectPropertyInfoStateEqual(driver.providerProperties, config.providerProperties, data.info.providerProperties)) ||
+      (config.keepAliveInterval !== undefined && !isValuesEqual(config.keepAliveInterval, data.info.keepAliveInterval))
     ) {
       stateContext.markEdited();
     }
