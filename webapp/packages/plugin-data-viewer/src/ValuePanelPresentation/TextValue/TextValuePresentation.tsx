@@ -10,7 +10,7 @@ import { observer } from 'mobx-react-lite';
 import { useMemo } from 'react';
 import styled, { css } from 'reshadow';
 
-import { Button, Container, Group, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
+import { ActionIconButton, Button, Container, Fill, Group, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { QuotasService } from '@cloudbeaver/core-root';
@@ -72,17 +72,21 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
     const contentValue = firstSelectedCell ? formatAction.get(firstSelectedCell) : null;
     const state = useTabLocalState(() =>
       observable({
+        lineWrapping: null as boolean | null,
         currentContentType: null as string | null,
 
         setContentType(contentType: string | null) {
           this.currentContentType = contentType;
+        },
+        setLineWrapping(lineWrapping: boolean | null) {
+          this.lineWrapping = lineWrapping;
         },
       }),
     );
 
     let contentType = state.currentContentType;
     let autoContentType = DEFAULT_CONTENT_TYPE;
-    let lineWrapping = false;
+    let autoLineWrapping = false;
 
     if (isResultSetContentValue(contentValue)) {
       if (contentValue.contentType) {
@@ -92,7 +96,7 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
             break;
           case 'application/octet-stream':
             autoContentType = 'application/octet-stream;type=base64';
-            lineWrapping = true;
+            autoLineWrapping = true;
             break;
           default:
             autoContentType = contentValue.contentType;
@@ -108,6 +112,8 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
     if (activeTabs.length > 0 && !activeTabs.some(tab => tab.key === contentType)) {
       contentType = activeTabs[0].key;
     }
+
+    const lineWrapping = state.lineWrapping ?? autoLineWrapping;
 
     const { textValue, isTruncated, isTextColumn, pasteFullText } = useTextValue({
       model,
@@ -125,13 +131,13 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
     const typeExtension = useMemo(() => getTypeExtension(contentType!) ?? [], [contentType]);
     const extensions = useCodemirrorExtensions(undefined, typeExtension);
 
-    function handleChange(newValue: string) {
+    function valueChangeHandler(newValue: string) {
       if (firstSelectedCell && !isReadonly) {
         editAction.set(firstSelectedCell, newValue);
       }
     }
 
-    async function save() {
+    async function saveHandler() {
       if (!firstSelectedCell) {
         return;
       }
@@ -143,11 +149,15 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
       }
     }
 
-    async function handleTabOpen(tabId: string) {
+    async function selectTabHandler(tabId: string) {
       // currentContentType may be selected automatically we don't want to change state in this case
       if (tabId !== contentType) {
         state.setContentType(tabId);
       }
+    }
+
+    function toggleLineWrappingHandler() {
+      state.setLineWrapping(!lineWrapping);
     }
 
     return styled(style)(
@@ -161,7 +171,7 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
               currentTabId={contentType}
               model={model}
               lazy
-              onChange={tab => handleTabOpen(tab.tabId)}
+              onChange={tab => selectTabHandler(tab.tabId)}
             >
               <TabList style={[BASE_TAB_STYLES, styles, UNDERLINE_TAB_STYLES]} />
             </TabsState>
@@ -174,18 +184,22 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
             lineWrapping={lineWrapping}
             readonly={isReadonly}
             extensions={extensions}
-            onChange={handleChange}
+            onChange={valueChangeHandler}
           />
           {isTruncated && <QuotaPlaceholder limit={limit} size={valueSize} />}
         </Group>
-        <Container gap dense keepSize overflow>
+        <Container keepSize center overflow>
           {canSave && (
-            <Container keepSize>
-              <Button disabled={model.isLoading()} onClick={save}>
-                {translate('ui_download')}
-              </Button>
-            </Container>
+            <ActionIconButton title={translate('ui_download')} name="/icons/export.svg" disabled={model.isLoading()} img onClick={saveHandler} />
           )}
+          <ActionIconButton
+            title={translate(
+              lineWrapping ? 'data_viewer_presentation_value_text_line_wrapping_no_wrap' : 'data_viewer_presentation_value_text_line_wrapping_wrap',
+            )}
+            name={lineWrapping ? 'img-original-size' : 'img-fit-size'}
+            onClick={toggleLineWrappingHandler}
+          />
+          <Fill />
           {shouldShowPasteButton && (
             <Container keepSize>
               <Button disabled={model.isLoading()} onClick={pasteFullText}>
@@ -193,6 +207,11 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
               </Button>
             </Container>
           )}
+          <Container keepSize>
+            <Button disabled={model.isLoading()} onClick={pasteFullText}>
+              {translate('data_viewer_presentation_value_content_full_text_button')}
+            </Button>
+          </Container>
         </Container>
       </Container>,
     );
