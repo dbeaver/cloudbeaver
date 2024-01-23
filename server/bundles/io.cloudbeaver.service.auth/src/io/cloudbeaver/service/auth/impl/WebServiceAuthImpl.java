@@ -19,6 +19,7 @@ package io.cloudbeaver.service.auth.impl;
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.WebServiceUtils;
 import io.cloudbeaver.auth.SMAuthProviderFederated;
+import io.cloudbeaver.auth.SMSignOutLinkProvider;
 import io.cloudbeaver.auth.provider.local.LocalAuthProvider;
 import io.cloudbeaver.model.WebPropertyInfo;
 import io.cloudbeaver.model.session.WebAuthInfo;
@@ -148,8 +149,8 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
             var cbApp = CBApplication.getInstance();
             for (WebAuthInfo removedInfo : removedInfos) {
                 if (removedInfo.getAuthProviderDescriptor()
-                    .getInstance() instanceof SMAuthProviderFederated federatedProvider
-                    && removedInfo.getAuthSession() instanceof SMSessionExternal externalSession
+                    .getInstance() instanceof SMSignOutLinkProvider federatedProvider
+                    && removedInfo.getAuthSession() != null
                 ) {
                     var providerConfig =
                         cbApp.getAuthConfiguration().getAuthProviderConfiguration(removedInfo.getAuthConfiguration());
@@ -157,9 +158,17 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
                         log.warn(removedInfo.getAuthConfiguration() + " provider configuration wasn't found");
                         continue;
                     }
-                    String logoutUrl = federatedProvider.getUserSignOutLink(providerConfig,
-                        externalSession.getAuthParameters());
-                    logoutUrls.add(logoutUrl);
+                    String logoutUrl;
+                    if (removedInfo.getAuthSession() instanceof SMSessionExternal externalSession) {
+                        logoutUrl = federatedProvider.getUserSignOutLink(providerConfig,
+                            externalSession.getAuthParameters());
+                    } else {
+                        logoutUrl = federatedProvider.getUserSignOutLink(providerConfig,
+                            Map.of());
+                    }
+                    if (CommonUtils.isNotEmpty(logoutUrl)) {
+                        logoutUrls.add(logoutUrl);
+                    }
                 }
             }
             return new WebLogoutInfo(logoutUrls);

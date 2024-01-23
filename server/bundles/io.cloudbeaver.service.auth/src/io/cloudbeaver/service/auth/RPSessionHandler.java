@@ -106,7 +106,7 @@ public class RPSessionHandler implements DBWSessionHandler {
                 if (!CommonUtils.isEmpty(lastName)) {
                     credentials.put(SMStandardMeta.META_LAST_NAME, lastName);
                 }
-                if (!CommonUtils.isNotEmpty(logoutUrl)) {
+                if (CommonUtils.isNotEmpty(logoutUrl)) {
                     credentials.put("logoutUrl", logoutUrl);
                 }
                 Map<String, Object> sessionParameters = webSession.getSessionParameters();
