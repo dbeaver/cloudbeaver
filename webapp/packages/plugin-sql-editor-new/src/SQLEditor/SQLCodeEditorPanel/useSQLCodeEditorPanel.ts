@@ -17,6 +17,7 @@ import type { IEditor } from '../SQLCodeEditor/useSQLCodeEditor';
 interface State {
   highlightActiveQuery: () => void;
   onQueryChange: (query: string) => void;
+  onCursorChange: (begin: number, end?: number) => void;
   onUpdate: (update: ViewUpdate) => void;
 }
 
@@ -34,6 +35,9 @@ export function useSQLCodeEditorPanel(data: ISQLEditorData, editor: IEditor) {
       },
       onQueryChange(query: string) {
         this.data.setScript(query);
+      },
+      onCursorChange(begin: number, end?: number) {
+        this.data.setCursor(begin, end);
       },
       onUpdate(update: ViewUpdate) {
         const transactions = update.transactions.filter(t => t.selection !== undefined);

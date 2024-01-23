@@ -135,6 +135,7 @@ export const SQLCodeEditorPanel: TabContainerPanelComponent<ISqlEditorModeProps>
         autoFocus
         lineNumbers
         onChange={panel.onQueryChange}
+        onCursorChange={selection => panel.onCursorChange(selection.anchor, selection.head)}
         onUpdate={panel.onUpdate}
       >
         {data.isIncomingChanges && (
