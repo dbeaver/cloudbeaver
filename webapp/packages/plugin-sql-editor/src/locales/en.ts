@@ -33,4 +33,6 @@ export default [
   ],
   ['sql_editor_upload_script_max_size_title', 'File size exceeds max size'],
   ['sql_editor_close_result_tabs_dialog_title', 'Confirm closing tabs'],
+  ['plugin_sql_editor_action_overlay_title', 'Action required'],
+  ['plugin_sql_editor_action_overlay_description', 'Please reopen editor to continue working.'],
 ];

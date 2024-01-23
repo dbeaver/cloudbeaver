@@ -32,6 +32,7 @@ export default [
   ['ui_clear', 'Очистить'],
   ['ui_remove', 'Убрать'],
   ['ui_close', 'Закрыть'],
+  ['ui_open', 'Открыть'],
   ['ui_errors_details', 'Информация'],
   ['ui_search', 'Поиск...'],
   ['ui_delete', 'Удалить'],

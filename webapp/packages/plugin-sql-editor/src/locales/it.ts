@@ -26,4 +26,6 @@ export default [
   ['sql_execution_plan_properties_panel_general', 'Generale'],
   ['sql_execution_plan_properties_panel_details', 'Dettagli'],
   ['sql_editor_close_result_tabs_dialog_title', 'Confirm closing tabs'],
+  ['plugin_sql_editor_action_overlay_title', 'Action required'],
+  ['plugin_sql_editor_action_overlay_description', 'Please reopen editor to continue working.'],
 ];
