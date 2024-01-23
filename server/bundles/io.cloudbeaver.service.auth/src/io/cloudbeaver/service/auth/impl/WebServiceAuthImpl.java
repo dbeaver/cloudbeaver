@@ -149,7 +149,7 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
             var cbApp = CBApplication.getInstance();
             for (WebAuthInfo removedInfo : removedInfos) {
                 if (removedInfo.getAuthProviderDescriptor()
-                    .getInstance() instanceof SMSignOutLinkProvider federatedProvider
+                    .getInstance() instanceof SMSignOutLinkProvider provider
                     && removedInfo.getAuthSession() != null
                 ) {
                     var providerConfig =
@@ -160,10 +160,10 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
                     }
                     String logoutUrl;
                     if (removedInfo.getAuthSession() instanceof SMSessionExternal externalSession) {
-                        logoutUrl = federatedProvider.getUserSignOutLink(providerConfig,
+                        logoutUrl = provider.getUserSignOutLink(providerConfig,
                             externalSession.getAuthParameters());
                     } else {
-                        logoutUrl = federatedProvider.getUserSignOutLink(providerConfig,
+                        logoutUrl = provider.getUserSignOutLink(providerConfig,
                             Map.of());
                     }
                     if (CommonUtils.isNotEmpty(logoutUrl)) {
