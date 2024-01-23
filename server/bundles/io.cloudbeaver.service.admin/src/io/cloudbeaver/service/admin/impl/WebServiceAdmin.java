@@ -450,7 +450,16 @@ public class WebServiceAdmin implements DBWServiceAdmin {
         providerConfig.setIconURL(iconURL);
         providerConfig.setDescription(description);
         providerConfig.setParameters(parameters);
-        CBApplication.getInstance().getAppConfiguration().addAuthProviderConfiguration(providerConfig);
+        var application = CBApplication.getInstance();
+        var appConfig = application.getAppConfiguration();
+        appConfig.addAuthProviderConfiguration(providerConfig);
+        if (application.isConfigurationMode()) {
+            Set<String> enabledProviders = new LinkedHashSet<>(Arrays.asList(appConfig.getEnabledAuthProviders()));
+            enabledProviders.add(providerId);
+            application.getAppConfiguration().setEnabledAuthProviders(
+                enabledProviders.toArray(String[]::new)
+            );
+        }
         try {
             CBApplication.getInstance().flushConfiguration(webSession);
         } catch (DBException e) {
