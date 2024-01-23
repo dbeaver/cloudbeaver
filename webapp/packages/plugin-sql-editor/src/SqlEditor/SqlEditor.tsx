@@ -81,10 +81,9 @@ export const SqlEditor = observer<ISqlEditorProps>(function SqlEditor({ state, c
       split.fixate('maximize', true);
     } else if (split.state.disable) {
       split.fixate('resize', false);
-      const size = Math.round(split.state.getContainerSize() / displayedEditors);
-      split.state.setSize(size);
+      split.state.setSize(-1);
     }
-  });
+  }, [displayedEditors]);
 
   return styled(
     styles,
