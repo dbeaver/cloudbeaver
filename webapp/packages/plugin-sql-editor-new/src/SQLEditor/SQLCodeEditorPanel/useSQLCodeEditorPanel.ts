@@ -5,6 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
+import { action } from 'mobx';
 import { useCallback } from 'react';
 
 import { useExecutor, useObservableRef } from '@cloudbeaver/core-blocks';
@@ -18,7 +19,6 @@ interface State {
   highlightActiveQuery: () => void;
   onQueryChange: (query: string) => void;
   onCursorChange: (begin: number, end?: number) => void;
-  onUpdate: (update: ViewUpdate) => void;
 }
 
 export function useSQLCodeEditorPanel(data: ISQLEditorData, editor: IEditor) {
@@ -39,21 +39,9 @@ export function useSQLCodeEditorPanel(data: ISQLEditorData, editor: IEditor) {
       onCursorChange(begin: number, end?: number) {
         this.data.setCursor(begin, end);
       },
-      onUpdate(update: ViewUpdate) {
-        const transactions = update.transactions.filter(t => t.selection !== undefined);
-        const lastTransaction = transactions[transactions.length - 1] as Transaction | undefined;
-
-        if (lastTransaction) {
-          const from = lastTransaction.selection?.main.from ?? update.state.selection.main.from;
-          const to = lastTransaction.selection?.main.to ?? update.state.selection.main.to;
-
-          this.data.setCursor(from, to);
-        }
-      },
     }),
-    {},
+    { onQueryChange: action.bound, onCursorChange: action.bound },
     { editor, data },
-    ['onQueryChange', 'onUpdate'],
   );
 
   const updateHighlight = useCallback(
