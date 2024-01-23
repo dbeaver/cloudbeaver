@@ -6,9 +6,9 @@
  * you may not use this file except in compliance with the License.
  */
 
-export function generateFileName(fileName: string, fileFormat: string) {
+export function withTimestamp(value: string) {
   const now = new Date();
-  return `${fileName} ${now.toISOString().slice(0, 10)} ${('0' + now.getHours()).slice(-2)}-${('0' + now.getMinutes()).slice(-2)}-${(
+  return `${value} ${now.toISOString().slice(0, 10)} ${('0' + now.getHours()).slice(-2)}-${('0' + now.getMinutes()).slice(-2)}-${(
     '0' + now.getSeconds()
-  ).slice(-2)}${fileFormat}`;
+  ).slice(-2)}`;
 }

@@ -19,6 +19,7 @@ input DataTransferOutputSettingsInput {
     encoding: String
     timestampPattern: String
     compress: Boolean
+    fileName: String
 }
 
 type DataTransferOutputSettings {
