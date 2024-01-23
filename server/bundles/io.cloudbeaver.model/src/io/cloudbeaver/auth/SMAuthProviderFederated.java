@@ -27,7 +27,7 @@ import java.util.Map;
  * Federated auth provider.
  * Provides links to external auth resource
  */
-public interface SMAuthProviderFederated {
+public interface SMAuthProviderFederated extends SMSignOutLinkProvider {
 
     @NotNull
     String getSignInLink(String id, @NotNull Map<String, Object> providerConfig) throws DBException;
