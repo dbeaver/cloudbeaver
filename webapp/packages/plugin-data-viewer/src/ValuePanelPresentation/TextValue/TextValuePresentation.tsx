@@ -186,8 +186,12 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
             extensions={extensions}
             onChange={valueChangeHandler}
           />
-          {isTruncated && <QuotaPlaceholder limit={limit} size={valueSize} />}
         </Group>
+        {isTruncated && (
+          <Container keepSize>
+            <QuotaPlaceholder limit={limit} size={valueSize} />
+          </Container>
+        )}
         <Container keepSize center overflow>
           {canSave && (
             <ActionIconButton title={translate('ui_download')} name="/icons/export.svg" disabled={model.isLoading()} img onClick={saveHandler} />
