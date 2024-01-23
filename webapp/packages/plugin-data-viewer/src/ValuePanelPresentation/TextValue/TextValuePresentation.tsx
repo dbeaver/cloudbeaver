@@ -25,6 +25,7 @@ import type { IDatabaseResultSet } from '../../DatabaseDataModel/IDatabaseResult
 import type { IDataValuePanelProps } from '../../TableViewer/ValuePanel/DataValuePanelService';
 import { QuotaPlaceholder } from '../QuotaPlaceholder';
 import { VALUE_PANEL_TOOLS_STYLES } from '../ValuePanelTools/VALUE_PANEL_TOOLS_STYLES';
+import { getDefaultLineWrapping } from './getDefaultLineWrapping';
 import { getTypeExtension } from './getTypeExtension';
 import { TextValuePresentationService } from './TextValuePresentationService';
 import { useTextValue } from './useTextValue';
@@ -86,7 +87,6 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
 
     let contentType = state.currentContentType;
     let autoContentType = DEFAULT_CONTENT_TYPE;
-    let autoLineWrapping = false;
 
     if (isResultSetContentValue(contentValue)) {
       if (contentValue.contentType) {
@@ -96,7 +96,6 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
             break;
           case 'application/octet-stream':
             autoContentType = 'application/octet-stream;type=base64';
-            autoLineWrapping = true;
             break;
           default:
             autoContentType = contentValue.contentType;
@@ -113,6 +112,7 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
       contentType = activeTabs[0].key;
     }
 
+    const autoLineWrapping = getDefaultLineWrapping(contentType);
     const lineWrapping = state.lineWrapping ?? autoLineWrapping;
 
     const { textValue, isTruncated, isTextColumn, pasteFullText } = useTextValue({
