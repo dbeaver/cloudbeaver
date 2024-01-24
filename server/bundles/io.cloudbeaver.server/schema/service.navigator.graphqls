@@ -57,7 +57,7 @@ type NavigatorNodeInfo {
     # Node ID - generally a full path to the node from root of tree
     id: ID!
     # Node URI - a unique path to a node including all parent nodes
-    uri: ID! @since(version: "23.3.1")
+    # uri: ID! @since(version: "23.3.1")
     # Node human readable name
     name: String
     #Node full name
