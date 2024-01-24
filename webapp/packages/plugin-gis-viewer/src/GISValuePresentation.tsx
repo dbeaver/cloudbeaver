@@ -6,9 +6,9 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import { useCallback, useMemo, useState } from 'react';
-import styled, { css } from 'reshadow';
-import wellknown from 'wellknown';
+import proj4 from 'proj4';
+import { useCallback, useState } from 'react';
+import wellknown, { GeoJSONGeometry } from 'wellknown';
 
 import { TextPlaceholder, useTranslate } from '@cloudbeaver/core-blocks';
 import {
@@ -21,42 +21,53 @@ import {
 } from '@cloudbeaver/plugin-data-viewer';
 
 import { CrsInput } from './CrsInput';
+import classes from './GISValuePresentation.m.css';
 import { CrsKey, IAssociatedValue, IGeoJSONFeature, LeafletMap } from './LeafletMap';
 import { ResultSetGISAction } from './ResultSetGISAction';
 
-function getCrsKey(feature?: IGeoJSONFeature): CrsKey {
-  switch (feature?.properties.srid) {
+proj4.defs('EPSG:3395', '+title=World Mercator +proj=merc +lon_0=0 +k=1 +x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs');
+
+function getCrsKey(srid: number): CrsKey {
+  switch (srid) {
     case 3857:
-      return 'EPSG3857';
+      return 'EPSG:3857';
     case 4326:
-      return 'EPSG4326';
+      return 'EPSG:4326';
     case 3395:
-      return 'EPSG3395';
+      return 'EPSG:3395';
     case 900913:
-      return 'EPSG900913';
+      return 'EPSG:900913';
     default:
-      return 'EPSG3857';
+      return 'EPSG:4326';
   }
 }
 
-const styles = css`
-  root {
-    display: flex;
-    flex-direction: column;
-    width: 100%;
+function getTransformedGeometry(from: CrsKey, to: CrsKey, geometry: GeoJSONGeometry): GeoJSONGeometry {
+  if (geometry.type === 'Point') {
+    return { ...geometry, coordinates: proj4(from, to, geometry.coordinates) };
   }
 
-  map {
-    flex: 1 1 auto;
-    border-radius: var(--theme-group-element-radius);
-    overflow: hidden;
+  if (geometry.type === 'MultiPoint' || geometry.type === 'LineString') {
+    return { ...geometry, coordinates: geometry.coordinates.map(point => proj4(from, to, point)) };
   }
 
-  toolbar {
-    margin-top: 8px;
-    flex: 0 0 auto;
+  if (geometry.type === 'MultiLineString' || geometry.type === 'Polygon') {
+    return { ...geometry, coordinates: geometry.coordinates.map(line => line.map(point => proj4(from, to, point))) };
   }
-`;
+
+  if (geometry.type === 'MultiPolygon') {
+    return {
+      ...geometry,
+      coordinates: geometry.coordinates.map(polygon => polygon.map(line => line.map(point => proj4(from, to, point)))),
+    };
+  }
+
+  if (geometry.type === 'GeometryCollection') {
+    return { ...geometry, geometries: geometry.geometries.map(geometry => getTransformedGeometry(from, to, geometry)) };
+  }
+
+  return geometry;
+}
 
 interface Props {
   model: IDatabaseDataModel<any, IDatabaseResultSet>;
@@ -70,9 +81,13 @@ export const GISValuePresentation = observer<Props>(function GISValuePresentatio
   const gis = model.source.getAction(resultIndex, ResultSetGISAction);
   const view = model.source.getAction(resultIndex, ResultSetViewAction);
 
-  const activeElements = selection.getActiveElements();
-
   const parsedGISData: IGeoJSONFeature[] = [];
+  const activeElements = selection.getActiveElements();
+  const firstActiveElement = activeElements[0];
+  const firstActiveCell = firstActiveElement ? gis.getCellValue(firstActiveElement) : null;
+  const defaultSrid = firstActiveCell?.srid ?? 3857;
+
+  const [crsKey, setCrsKey] = useState(getCrsKey(defaultSrid));
 
   for (const cell of activeElements) {
     const cellValue = gis.getCellValue(cell);
@@ -81,15 +96,25 @@ export const GISValuePresentation = observer<Props>(function GISValuePresentatio
       continue;
     }
 
+    const text = cellValue.mapText || cellValue.text;
+
     try {
-      const parsedCellValue = wellknown.parse(cellValue.mapText || cellValue.text);
+      const parsedCellValue = wellknown.parse(text);
+
       if (!parsedCellValue) {
         continue;
       }
 
-      parsedGISData.push({ type: 'Feature', geometry: parsedCellValue, properties: { associatedCell: cell, srid: cellValue.srid } });
+      const from = cellValue.srid === 0 ? 'EPSG:4326' : getCrsKey(cellValue.srid);
+      const to = crsKey === 'Simple' ? 'EPSG:4326' : crsKey;
+
+      parsedGISData.push({
+        type: 'Feature',
+        geometry: getTransformedGeometry(from, to, parsedCellValue),
+        properties: { associatedCell: cell, srid: cellValue.srid },
+      });
     } catch (exception: any) {
-      console.error(`Failed to parse "${cellValue.mapText || cellValue.text}" value.`);
+      console.error(`Failed to parse "${text}" value.`);
       console.error(exception);
     }
   }
@@ -119,21 +144,18 @@ export const GISValuePresentation = observer<Props>(function GISValuePresentatio
     [view],
   );
 
-  const defaultCrsKey = getCrsKey(parsedGISData[0]);
-  const [crsKey, setCrsKey] = useState(defaultCrsKey);
-
   if (!parsedGISData.length) {
     return <TextPlaceholder>{translate('gis_presentation_placeholder')}</TextPlaceholder>;
   }
 
-  return styled(styles)(
-    <root>
-      <map>
+  return (
+    <div className={classes.root}>
+      <div className={classes.map}>
         <LeafletMap key={crsKey} geoJSON={parsedGISData} crsKey={crsKey} getAssociatedValues={getAssociatedValues} />
-      </map>
-      <toolbar>
+      </div>
+      <div className={classes.toolbar}>
         <CrsInput value={crsKey} onChange={setCrsKey} />
-      </toolbar>
-    </root>,
+      </div>
+    </div>
   );
 });
