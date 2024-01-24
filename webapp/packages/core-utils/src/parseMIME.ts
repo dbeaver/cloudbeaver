@@ -5,7 +5,8 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-module.exports = {
-  presets: ['@babel/preset-env', ['@babel/preset-react', { runtime: 'automatic' }]],
-  plugins: [require('@reshadow/babel')],
-};
+import MIMEType from 'whatwg-mimetype';
+
+export function parseMIME(serialized: string): MIMEType {
+  return new MIMEType(serialized);
+}

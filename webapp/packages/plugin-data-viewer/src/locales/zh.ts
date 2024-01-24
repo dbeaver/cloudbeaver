@@ -23,6 +23,8 @@ export default [
   ['data_viewer_auto_refresh_settings', 'Auto refresh Settings'],
   ['data_viewer_auto_refresh_settings_stop_on_error', 'Stop on error'],
   ['data_viewer_presentation_value_title', '值'],
+  ['data_viewer_presentation_value_text_line_wrapping_wrap', 'Wrap lines'],
+  ['data_viewer_presentation_value_text_line_wrapping_no_wrap', "Don't wrap lines"],
   ['data_viewer_presentation_value_text_title', '文本'],
   ['data_viewer_presentation_value_text_plain_title', '文本'],
   ['data_viewer_presentation_value_text_html_title', 'HTML'],

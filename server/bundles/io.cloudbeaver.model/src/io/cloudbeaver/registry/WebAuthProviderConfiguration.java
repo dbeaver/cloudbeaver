@@ -18,6 +18,7 @@ package io.cloudbeaver.registry;
 
 import io.cloudbeaver.auth.CBAuthConstants;
 import io.cloudbeaver.auth.SMAuthProviderFederated;
+import io.cloudbeaver.auth.SMSignOutLinkProvider;
 import io.cloudbeaver.utils.WebAppUtils;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
@@ -85,8 +86,8 @@ public class WebAuthProviderConfiguration {
     @Property
     public String getSignOutLink() throws DBException {
         SMAuthProvider<?> instance = providerDescriptor.getInstance();
-        return instance instanceof SMAuthProviderFederated
-            ? ((SMAuthProviderFederated) instance).getCommonSignOutLink(getId(), config.getParameters())
+        return instance instanceof SMSignOutLinkProvider
+            ? ((SMSignOutLinkProvider) instance).getCommonSignOutLink(getId(), config.getParameters())
             : null;
     }
 
