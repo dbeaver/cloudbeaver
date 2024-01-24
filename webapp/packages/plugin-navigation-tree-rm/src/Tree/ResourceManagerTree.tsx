@@ -10,7 +10,7 @@ import { useMemo } from 'react';
 
 import { getComputed, s, useResource, useS, useUserData } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { EObjectFeature, NavNodeInfoResource, NavTreeResource, ProjectsNavNodeService } from '@cloudbeaver/core-navigation-tree';
+import { NavNodeInfoResource, NavTreeResource, ProjectsNavNodeService } from '@cloudbeaver/core-navigation-tree';
 import { ProjectInfoResource, ProjectsService } from '@cloudbeaver/core-projects';
 import { resourceKeyList } from '@cloudbeaver/core-resource';
 import { getRmResourcePath, ResourceManagerResource, RESOURCES_NODE_PATH } from '@cloudbeaver/core-resource-manager';
@@ -22,8 +22,6 @@ import {
   getNavigationTreeUserSettingsId,
   IElementsTreeSettings,
   NavigationTreeService,
-  Tree,
-  useTreeData,
   validateElementsTreeSettings,
 } from '@cloudbeaver/plugin-navigation-tree';
 import { ResourceManagerService } from '@cloudbeaver/plugin-resource-manager';
@@ -102,36 +100,9 @@ export const ResourceManagerTree: React.FC<Props> = observer(function ResourceMa
 
   const settingsElements = useMemo(() => [ProjectsSettingsPlaceholderElement], []);
 
-  const data = useTreeData({
-    rootId: '',
-    getNode(nodeId) {
-      const node = navNodeInfoResource.get(nodeId);
-      const outdated = navTreeResource.isOutdated(nodeId);
-      const children = navTreeResource.get(nodeId);
-
-      return {
-        name: node?.name ?? 'Unknown',
-        icon: node?.icon,
-        tooltip: node?.description,
-        leaf: node?.objectFeatures.includes(EObjectFeature.entity) || !node?.hasChildren || (children?.length === 0 && !outdated),
-      };
-    },
-    getChildren(nodeId) {
-      return navTreeService.getChildren(nodeId) ?? [];
-    },
-    async load(nodeId, manual) {
-      await navTreeService.loadNestedNodes(nodeId, manual);
-    },
-  });
-
-  function getNodeHeight(nodeId: string): number {
-    return nodeId === root ? 0 : 22;
-  }
-
   return (
     <CaptureView view={navTreeService} className={s(styles, { captureView: true })}>
       <ResourceManagerTreeCaptureViewContext resourceTypeId={resourceTypeId} />
-      <Tree data={data} getNodeHeight={getNodeHeight} />
       <ElementsTreeLoader
         root={root}
         getChildren={navTreeService.getChildren}

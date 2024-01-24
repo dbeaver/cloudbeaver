@@ -1,6 +1,5 @@
 fragment NavNodeInfo on NavigatorNodeInfo {
   id
-  uri
   name
   plainName
   hasChildren
