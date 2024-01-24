@@ -17,38 +17,21 @@
 package io.cloudbeaver.auth;
 
 import org.jkiss.code.NotNull;
-import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.security.SMAuthProviderCustomConfiguration;
 
 import java.util.Map;
 
-/**
- * Federated auth provider.
- * Provides links to external auth resource
- */
-public interface SMAuthProviderFederated extends SMSignOutLinkProvider {
+public interface SMSignOutLinkProvider {
 
+    /**
+     * @return a common link for logout, not related with the user context
+     */
     @NotNull
-    String getSignInLink(String id, @NotNull Map<String, Object> providerConfig) throws DBException;
+    String getCommonSignOutLink(String id, @NotNull Map<String, Object> providerConfig) throws DBException;
 
-    @Override
-    default String getUserSignOutLink(
+    String getUserSignOutLink(
         @NotNull SMAuthProviderCustomConfiguration providerConfig,
         @NotNull Map<String, Object> userCredentials
-    ) throws DBException {
-        return getCommonSignOutLink(providerConfig.getId(), providerConfig.getParameters());
-    }
-
-    @Nullable
-    String getMetadataLink(String id, @NotNull Map<String, Object> providerConfig) throws DBException;
-
-    @Nullable
-    String getAcsLink(String id, @NotNull Map<String, Object> providerConfig) throws DBException;
-
-    @Nullable
-    default String getRedirectLink(String id, @NotNull Map<String, Object> providerConfig) throws DBException {
-        return null;
-    }
-
+    ) throws DBException;
 }

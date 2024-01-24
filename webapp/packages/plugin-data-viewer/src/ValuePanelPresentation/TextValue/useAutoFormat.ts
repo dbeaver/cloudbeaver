@@ -34,9 +34,9 @@ export function useAutoFormat() {
         }
 
         switch (type) {
-          case 'text/base64':
+          case 'application/octet-stream;type=base64':
             return value.binary;
-          case 'text/hex':
+          case 'application/octet-stream;type=hex':
             return base64ToHex(value.binary);
           default:
             return value.text;
