@@ -23,7 +23,7 @@ You can see live demo of CloudBeaver here: https://demo.cloudbeaver.io
 ## Changelog
 
 
-### 23.3.2. 2024-01-22
+### 23.3.3. 2024-01-22
 - Added password policy for the local authorization. Password parameters can be set in the configuration file;
 - The 'Keep alive' option has been added to the connection settings to keep the connection active even in case of inactivity;
 - Added ability to display full text for a string data type in value panel;

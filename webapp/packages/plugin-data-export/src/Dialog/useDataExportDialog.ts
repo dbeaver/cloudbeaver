@@ -94,7 +94,10 @@ export function useDataExportDialog(context: IExportContext, onExport?: () => vo
             processorId: this.processor.id,
             processorProperties: this.processorProperties,
             filter: this.context.filter,
-            outputSettings: this.outputSettings,
+            outputSettings: {
+              ...this.outputSettings,
+              fileName: this.context.fileName,
+            },
           });
 
           this.onExport?.();
