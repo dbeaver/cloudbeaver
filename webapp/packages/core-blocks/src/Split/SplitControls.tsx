@@ -37,13 +37,13 @@ import { useSplit } from './useSplit';
 export const SplitControls: React.FC = function SplitControls() {
   const split = useSplit();
   const styles = useS(SplitControlsStyles);
+  const isResizeMode = split.state.mode === 'resize';
 
   const inverse = split.state.isMainSecond();
 
   let inverseMode = split.state.mode;
-  const isResizeMode = split.state.mode === 'resize';
 
-  if (split.state.size > split.state.getContainerSize()) {
+  if (split.state.size > split.state.getContainerSize() - split.state.maxSize) {
     inverseMode = 'maximize';
   }
 
