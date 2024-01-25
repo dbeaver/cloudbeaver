@@ -60,6 +60,12 @@ public class AdminUserInfo {
     }
 
     @Property
+    public String getCredentialsProfileId() {
+        return user.getCredentialsProfileId();
+    }
+
+
+    @Property
     public Map<String, String> getMetaParameters() {
         return user.getMetaParameters();
     }

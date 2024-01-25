@@ -76,6 +76,7 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
 
     private static final String SUBJECT_USER = "U";
     private static final String SUBJECT_TEAM = "R";
+    private static final String SUBJECT_PROFILE = "P";
     private static final Type MAP_STRING_OBJECT_TYPE = new TypeToken<Map<String, Object>>() {
     }.getType();
     private static final Gson gson = new GsonBuilder().create();
@@ -300,7 +301,9 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
         try (Connection dbCon = database.openConnection()) {
             SMUser user;
             try (PreparedStatement dbStat = dbCon.prepareStatement(
-                database.normalizeTableNames("SELECT USER_ID,IS_ACTIVE,DEFAULT_AUTH_ROLE FROM {table_prefix}CB_USER WHERE USER_ID=?")
+                database.normalizeTableNames(
+                    "SELECT USER_ID,IS_ACTIVE,DEFAULT_AUTH_ROLE,CREDENTIALS_PROFILE_ID FROM {table_prefix}CB_USER " +
+                        "WHERE USER_ID=?")
             )) {
                 dbStat.setString(1, userId);
                 try (ResultSet dbResult = dbStat.executeQuery()) {
@@ -308,7 +311,8 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
                         String userName = dbResult.getString(1);
                         String active = dbResult.getString(2);
                         String authRole = dbResult.getString(3);
-                        user = new SMUser(userName, CHAR_BOOL_TRUE.equals(active), authRole);
+                        String credentialsProfileId = dbResult.getString(4);
+                        user = new SMUser(userName, CHAR_BOOL_TRUE.equals(active), authRole, credentialsProfileId);
                     } else {
                         return null;
                     }
@@ -373,7 +377,8 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
             Map<String, SMUser> result = new LinkedHashMap<>();
             // Read users
             try (PreparedStatement dbStat = dbCon.prepareStatement(
-                database.normalizeTableNames("SELECT USER_ID,IS_ACTIVE,DEFAULT_AUTH_ROLE FROM {table_prefix}CB_USER"
+                database.normalizeTableNames("SELECT USER_ID,IS_ACTIVE,DEFAULT_AUTH_ROLE,CREDENTIALS_PROFILE_ID FROM " +
+                    "{table_prefix}CB_USER"
                     + buildUsersFilter(filter) + "\nORDER BY USER_ID " + getOffsetLimitPart(filter)))) {
                 int parameterIndex = setUsersFilterValues(dbStat, filter, 1);
 
@@ -382,7 +387,9 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
                         String userId = dbResult.getString(1);
                         String active = dbResult.getString(2);
                         String authRole = dbResult.getString(3);
-                        result.put(userId, new SMUser(userId, CHAR_BOOL_TRUE.equals(active), authRole));
+                        String credentialsProfileId = dbResult.getString(4);
+                        result.put(userId,
+                            new SMUser(userId, CHAR_BOOL_TRUE.equals(active), authRole, credentialsProfileId));
                     }
                 }
             }
@@ -971,7 +978,10 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
     }
 
     @Override
-    public void createTeam(String teamId, String name, String description, String grantor) throws DBCException {
+    public void createTeam(
+        @NotNull String teamId, @Nullable String name, @Nullable String description,
+        @NotNull String grantor
+    ) throws DBCException {
         if (CommonUtils.isEmpty(teamId)) {
             throw new DBCException("Empty team name is not allowed");
         }
@@ -1000,7 +1010,7 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
                 txn.commit();
             }
         } catch (SQLException e) {
-            throw new DBCException("Error saving tem in database", e);
+            throw new DBCException("Error saving team in database", e);
         }
     }
 
@@ -1075,6 +1085,104 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
         }
         if (force) {
             addSubjectPermissionsUpdateEvent(teamId, SMSubjectType.team);
+        }
+    }
+
+    @Override
+    @NotNull
+    public SMCredentialsProfile[] readAllCredentialsProfiles() throws DBCException {
+        List<SMCredentialsProfile> profiles = new ArrayList<>();
+        try (var dbCon = database.openConnection();
+             var dbStat = dbCon.prepareStatement(database.normalizeTableNames(
+                 "SELECT PROFILE_ID, PROFILE_NAME, PROFILE_DESCRIPTION, PARENT_PROFILE_ID FROM " +
+                     "{table_prefix}CB_CREDENTIALS_PROFILE ORDER BY PROFILE_ID"
+             ));
+             var dbResult = dbStat.executeQuery();
+        ) {
+            while (dbResult.next()) {
+                String profileId = dbResult.getString(1);
+                String name = dbResult.getString(2);
+                String description = dbResult.getString(3);
+                String parentProfile = dbResult.getString(4);
+                profiles.add(new SMCredentialsProfile(profileId, name, description, parentProfile));
+            }
+            return profiles.toArray(SMCredentialsProfile[]::new);
+        } catch (SQLException e) {
+            throw new DBCException("Error reading credentials profiles from database", e);
+        }
+    }
+
+    @Override
+    public void createCredentialsProfile(@NotNull SMCredentialsProfile credentialsProfile) throws DBCException {
+        if (isSubjectExists(credentialsProfile.getCredentialsProfileId())) {
+            throw new DBCException("User, team or credentials profile '" + credentialsProfile.getCredentialsProfileId() + "' already " +
+                "exists");
+        }
+
+        try (var dbCon = database.openConnection();
+             var txn = new JDBCTransaction(dbCon)) {
+            createAuthSubject(dbCon, credentialsProfile.getCredentialsProfileId(), SUBJECT_TEAM);
+            try (PreparedStatement dbStat = dbCon.prepareStatement(
+                database.normalizeTableNames("INSERT INTO {table_prefix}CB_CREDENTIALS_PROFILE" +
+                    "(PROFILE_ID,PROFILE_NAME,PROFILE_DESCRIPTION,PARENT_PROFILE_ID) VALUES(?,?,?,?)"))) {
+                dbStat.setString(1, credentialsProfile.getCredentialsProfileId());
+                dbStat.setString(2, CommonUtils.notEmpty(credentialsProfile.getName()));
+                dbStat.setString(3, CommonUtils.notEmpty(credentialsProfile.getProfileDescription()));
+                if (CommonUtils.isNotEmpty(credentialsProfile.getParentProfileId())) {
+                    dbStat.setString(4, credentialsProfile.getParentProfileId());
+                } else {
+                    dbStat.setNull(4, Types.VARCHAR);
+                }
+                dbStat.execute();
+            }
+            txn.commit();
+        } catch (SQLException e) {
+            throw new DBCException("Error saving credentials profile in database", e);
+        }
+    }
+
+    @Override
+    public void deleteCredentialsProfile(@NotNull String credentialsProfileId) throws DBCException {
+        String defaultUserCredentialsProfile = application.getAppConfiguration().getDefaultUserCredentialsProfile();
+        if (CommonUtils.isNotEmpty(defaultUserCredentialsProfile)
+            && defaultUserCredentialsProfile.equals(credentialsProfileId)) {
+            throw new DBCException("Default credentials profile cannot be deleted");
+        }
+
+        try (var dbCon = database.openConnection();
+             var txn = new JDBCTransaction(dbCon)) {
+            deleteAuthSubject(dbCon, credentialsProfileId);
+            JDBCUtils.executeStatement(
+                dbCon,
+                database.normalizeTableNames("DELETE FROM {table_prefix}CB_CREDENTIALS_PROFILE WHERE PROFILE_ID=?"),
+                credentialsProfileId
+            );
+            txn.commit();
+        } catch (SQLException e) {
+            throw new DBCException("Error deleting credentials profile from database", e);
+        }
+    }
+
+    @Override
+    public void setUserCredentialsProfile(@NotNull String userId, @Nullable String credentialsProfileId)
+        throws DBCException {
+        try (var dbCon = database.openConnection();
+             PreparedStatement dbStat = dbCon.prepareStatement(
+                 database.normalizeTableNames(
+                     "UPDATE {table_prefix}CB_USER SET CREDENTIALS_PROFILE_ID=? WHERE USER_ID=?"))
+        ) {
+            if (CommonUtils.isEmpty(credentialsProfileId)) {
+                String defaultCredentialsProfile = application.getAppConfiguration().getDefaultUserCredentialsProfile();
+                if (defaultCredentialsProfile == null) {
+                    dbStat.setNull(1, Types.VARCHAR);
+                } else {
+                    dbStat.setString(1, defaultCredentialsProfile);
+                }
+            } else {
+                dbStat.setString(1, credentialsProfileId);
+            }
+        } catch (SQLException e) {
+            throw new DBCException("Error saving credentials profile for user", e);
         }
     }
 

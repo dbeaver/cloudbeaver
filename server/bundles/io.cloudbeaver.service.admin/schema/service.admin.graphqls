@@ -43,6 +43,7 @@ type AdminUserInfo {
     linkedAuthProviders: [String!]!
     enabled: Boolean!
     authRole: String
+    credentialsProfileId: String @since(version: "23.3.4")
 }
 
 type AdminTeamInfo {

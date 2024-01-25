@@ -301,7 +301,7 @@ public class CBDatabase {
         SMUser adminUser = adminSecurityController.getUserById(adminName);
 
         if (adminUser == null) {
-            adminUser = new SMUser(adminName, true, "ADMINISTRATOR");
+            adminUser = new SMUser(adminName, true, "ADMINISTRATOR", null);
             adminSecurityController.createUser(adminUser.getUserId(), adminUser.getMetaParameters(), true, adminUser.getAuthRole());
         }
 

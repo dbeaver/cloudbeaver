@@ -30,6 +30,7 @@ public abstract class BaseWebAppConfiguration implements WebAppConfiguration {
 
     protected final Map<String, Object> plugins;
     protected String defaultUserTeam;
+    protected String defaultUserCredentialsProfile;
     protected boolean resourceManagerEnabled;
     protected boolean showReadOnlyConnectionInfo;
     protected String[] enabledFeatures;
@@ -104,5 +105,10 @@ public abstract class BaseWebAppConfiguration implements WebAppConfiguration {
 
     public boolean isShowReadOnlyConnectionInfo() {
         return showReadOnlyConnectionInfo;
+    }
+
+
+    public String getDefaultUserCredentialsProfile() {
+        return defaultUserCredentialsProfile;
     }
 }

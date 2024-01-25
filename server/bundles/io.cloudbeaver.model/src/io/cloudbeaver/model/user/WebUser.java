@@ -92,4 +92,9 @@ public class WebUser {
     public String getAuthRole() {
         return user.getAuthRole();
     }
+
+    public String getCredentialsProfileId() {
+        return user.getCredentialsProfileId();
+    }
+
 }

@@ -17,6 +17,7 @@
 package io.cloudbeaver.model.app;
 
 import org.jkiss.code.NotNull;
+import org.jkiss.code.Nullable;
 
 import java.util.Map;
 
@@ -31,6 +32,9 @@ public interface WebAppConfiguration {
     <T> T getResourceQuota(String quotaId);
 
     String getDefaultUserTeam();
+
+    @Nullable
+    String getDefaultUserCredentialsProfile();
 
     <T> T getPluginOption(@NotNull String pluginId, @NotNull String option);
 

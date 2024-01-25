@@ -16,6 +16,7 @@
  */
 package io.cloudbeaver.service.security.db;
 
+import org.jkiss.dbeaver.model.security.user.SMCredentialsProfile;
 import org.jkiss.dbeaver.model.security.user.SMTeam;
 
 import java.util.List;
@@ -24,6 +25,7 @@ class CBDatabaseInitialData {
     private String adminName;
     private String adminPassword;
     private List<SMTeam> teams;
+    private List<SMCredentialsProfile> credentialsProfiles;
 
     public String getAdminName() {
         return adminName;
@@ -35,6 +37,10 @@ class CBDatabaseInitialData {
 
     public List<SMTeam> getTeams() {
         return teams;
+    }
+
+    public List<SMCredentialsProfile> getCredentialsProfiles() {
+        return credentialsProfiles;
     }
 
     public void setTeams(List<SMTeam> teams) {
