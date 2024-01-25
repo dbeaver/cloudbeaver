@@ -5,12 +5,11 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { EAdminPermission } from '@cloudbeaver/core-authentication';
 import { ConnectionsManagerService } from '@cloudbeaver/core-connections';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { ProjectInfoResource } from '@cloudbeaver/core-projects';
 import { CachedMapAllKey, getCachedMapResourceLoaderState } from '@cloudbeaver/core-resource';
-import { PermissionsService } from '@cloudbeaver/core-root';
+import { EAdminPermission, PermissionsService } from '@cloudbeaver/core-root';
 import { ActionService, DATA_CONTEXT_MENU, MenuService } from '@cloudbeaver/core-view';
 import { MENU_CONNECTIONS } from '@cloudbeaver/plugin-connections';
 
@@ -52,9 +51,7 @@ export class SearchConnectionPluginBootstrap extends Bootstrap {
 
         return false;
       },
-      getLoader: (context, action) => {
-        return getCachedMapResourceLoaderState(this.projectInfoResource, () => CachedMapAllKey);
-      },
+      getLoader: (context, action) => getCachedMapResourceLoaderState(this.projectInfoResource, () => CachedMapAllKey),
       handler: async (context, action) => {
         switch (action) {
           case ACTION_CONNECTION_SEARCH: {

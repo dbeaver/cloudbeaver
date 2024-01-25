@@ -47,6 +47,9 @@
     },
     {
       "path": "../plugin-sql-editor-new/tsconfig.json"
+    },
+    {
+      "path": "../core-utils/tsconfig.json"
     }
   ],
   "include": [
