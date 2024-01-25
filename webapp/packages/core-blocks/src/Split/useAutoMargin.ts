@@ -33,7 +33,7 @@ export function useAutoMargin({ split, ref, disableAutoMargin, minSize, maxSize 
     return {
       // this case needed for initial render so divider also has a margin
       minSize: DEFAULT_MIN_SIZE,
-      maxSize,
+      maxSize: window.innerWidth - DEFAULT_MIN_SIZE,
     };
   }
 
