@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 import { MergeView } from '@codemirror/merge';
-import { Annotation, Compartment, Extension, StateEffect } from '@codemirror/state';
+import { Annotation, Compartment, Extension, StateEffect, TransactionSpec } from '@codemirror/state';
 import { EditorView, ViewUpdate } from '@codemirror/view';
 import { observer } from 'mobx-react-lite';
 import { forwardRef, useImperativeHandle, useLayoutEffect, useMemo, useRef, useState } from 'react';
@@ -22,7 +22,19 @@ const External = Annotation.define<boolean>();
 
 export const ReactCodemirror = observer<IReactCodeMirrorProps, IEditorRef>(
   forwardRef(function ReactCodemirror(
-    { children, getValue, value, incomingValue, extensions = new Map<Compartment, Extension>(), readonly, autoFocus, onChange, onUpdate },
+    {
+      children,
+      getValue,
+      value,
+      cursor,
+      incomingValue,
+      extensions = new Map<Compartment, Extension>(),
+      readonly,
+      autoFocus,
+      onChange,
+      onCursorChange,
+      onUpdate,
+    },
     ref,
   ) {
     value = value ?? getValue?.();
@@ -32,7 +44,7 @@ export const ReactCodemirror = observer<IReactCodeMirrorProps, IEditorRef>(
     const [container, setContainer] = useState<HTMLDivElement | null>(null);
     const [view, setView] = useState<EditorView | null>(null);
     const [incomingView, setIncomingView] = useState<EditorView | null>(null);
-    const callbackRef = useObjectRef({ onChange, onUpdate });
+    const callbackRef = useObjectRef({ onChange, onCursorChange, onUpdate });
     const [selection, setSelection] = useState(view?.state.selection.main ?? null);
 
     useLayoutEffect(() => {
@@ -48,6 +60,11 @@ export const ReactCodemirror = observer<IReactCodeMirrorProps, IEditorRef>(
             const value = doc.toString();
 
             callbackRef.onChange?.(value, update);
+          }
+
+          if (update.selectionSet && !remote) {
+            const selection = update.state.selection.main;
+            callbackRef.onCursorChange?.(selection, update);
           }
 
           callbackRef.onUpdate?.(update);
@@ -136,13 +153,22 @@ export const ReactCodemirror = observer<IReactCodeMirrorProps, IEditorRef>(
     });
 
     useLayoutEffect(() => {
-      if (value !== undefined && view && value !== view.state.doc.toString()) {
-        view.dispatch({
-          changes: { from: 0, to: view.state.doc.length, insert: value },
-          annotations: [External.of(true)],
-        });
+      if (view) {
+        const transaction: TransactionSpec = { annotations: [External.of(true)] };
+
+        if (value !== undefined && value !== view.state.doc.toString()) {
+          transaction.changes = { from: 0, to: view.state.doc.length, insert: value };
+        }
+
+        if (cursor && (view.state.selection.main.anchor !== cursor.anchor || view.state.selection.main.head !== cursor.head)) {
+          transaction.selection = cursor;
+        }
+
+        if (transaction.changes || transaction.selection) {
+          view.dispatch(transaction);
+        }
       }
-    }, [value, view]);
+    });
 
     useLayoutEffect(() => {
       if (incomingValue !== undefined && incomingView && incomingValue !== incomingView.state.doc.toString()) {

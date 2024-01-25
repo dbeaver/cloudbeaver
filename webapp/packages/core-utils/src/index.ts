@@ -40,6 +40,7 @@ export * from './MetadataMap';
 export * from './OrderedMap';
 export * from './parseJSONFlat';
 export * from './pathJoin';
+export * from './parseMIME';
 export * from './PriorityQueue';
 export * from './LoadingError';
 export * from './replaceMiddle';

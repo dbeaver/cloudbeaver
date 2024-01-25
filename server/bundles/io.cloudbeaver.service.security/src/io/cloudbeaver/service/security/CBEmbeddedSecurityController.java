@@ -1346,7 +1346,7 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
                     String signInLink = buildRedirectLink(authProviderFederated.getSignInLink(authProviderConfigurationId, Map.of()),
                         authAttemptId);
                     String signOutLink = authProviderFederated.getCommonSignOutLink(authProviderConfigurationId,
-                        Map.of());
+                        providerConfig.getParameters());
                     Map<SMAuthConfigurationReference, Object> authData = Map.of(new SMAuthConfigurationReference(authProviderId,
                         authProviderConfigurationId), filteredUserCreds);
                     return SMAuthInfo.inProgress(authAttemptId, signInLink, signOutLink, authData, isMainSession);
@@ -2858,12 +2858,13 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
     public void clearOldAuthAttemptInfo() throws DBException {
         try (Connection dbCon = database.openConnection()) {
             JDBCUtils.executeStatement(dbCon,
-                database.normalizeTableNames("DELETE FROM {table_prefix}CB_AUTH_ATTEMPT_INFO AAI " +
+                database.normalizeTableNames("DELETE FROM {table_prefix}CB_AUTH_ATTEMPT_INFO " +
                     "WHERE EXISTS " +
                     "(SELECT 1 FROM {table_prefix}CB_AUTH_ATTEMPT AA " +
                     "LEFT JOIN {table_prefix}CB_AUTH_TOKEN CAT ON AA.SESSION_ID = CAT.SESSION_ID " +
                     "WHERE (CAT.REFRESH_TOKEN_EXPIRATION_TIME < ? OR CAT.EXPIRATION_TIME IS NULL) " +
-                    "AND AA.AUTH_ID=AAI.AUTH_ID AND AUTH_STATUS='" + SMAuthStatus.EXPIRED + "') " +
+                    "AND AA.AUTH_ID={table_prefix}CB_AUTH_ATTEMPT_INFO.AUTH_ID " +
+                    "AND AUTH_STATUS='" + SMAuthStatus.EXPIRED + "') " +
                     "AND CREATE_TIME<?"),
                 Timestamp.valueOf(LocalDateTime.now()),
                 Timestamp.valueOf(LocalDateTime.now().minusMinutes(smConfig.getExpiredAuthAttemptInfoTtl()))
