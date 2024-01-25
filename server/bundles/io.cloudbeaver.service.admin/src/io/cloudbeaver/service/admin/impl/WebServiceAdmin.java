@@ -590,6 +590,17 @@ public class WebServiceAdmin implements DBWServiceAdmin {
         return true;
     }
 
+
+    @Override
+    public boolean updateProductConfiguration(WebSession webSession, Map<String, Object> productConfiguration) throws DBWebException {
+        try {
+            CBApplication.getInstance().saveProductConfiguration(productConfiguration);
+            return true;
+        } catch (DBException e) {
+            throw new DBWebException("Error updating product configuration", e);
+        }
+    }
+
     ////////////////////////////////////////////////////////////////////
     // Access management
 

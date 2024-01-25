@@ -992,11 +992,10 @@ public abstract class CBApplication extends BaseWebApplication implements WebAut
             sessionExpireTime,
             appConfig);
         validateConfiguration(configurationProperties);
-        writeRuntimeConfig(configurationProperties);
+        writeRuntimeConfig(getRuntimeAppConfigFile(), configurationProperties);
     }
 
-    private void writeRuntimeConfig(Map<String, Object> configurationProperties) throws DBException {
-        File runtimeConfigFile = getRuntimeAppConfigFile();
+    private void writeRuntimeConfig(File runtimeConfigFile, Map<String, Object> configurationProperties) throws DBException {
         if (runtimeConfigFile.exists()) {
             ContentUtils.makeFileBackup(runtimeConfigFile.toPath());
         }
@@ -1296,5 +1295,11 @@ public abstract class CBApplication extends BaseWebApplication implements WebAut
     @Override
     public Class<? extends DBPPlatformUI> getPlatformUIClass() {
         return CBPlatformUI.class;
+    }
+
+    public void saveProductConfiguration(Map<String, Object> productConfiguration) throws DBException {
+        Map<String, Object> mergedConfig = WebAppUtils.mergeConfigurations(this.productConfiguration, productConfiguration);
+        writeRuntimeConfig(getRuntimeProductConfigFilePath().toFile(), mergedConfig);
+        this.productConfiguration.putAll(mergedConfig);
     }
 }

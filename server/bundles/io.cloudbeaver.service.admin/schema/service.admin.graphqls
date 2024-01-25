@@ -205,4 +205,6 @@ extend type Query {
     # Changes default navigator settings
     setDefaultNavigatorSettings( settings: NavigatorSettingsInput!): Boolean!
 
+    adminUpdateProductConfiguration(configuration: Object!): Boolean!
+
 }
