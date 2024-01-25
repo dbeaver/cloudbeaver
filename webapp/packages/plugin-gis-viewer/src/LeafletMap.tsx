@@ -174,17 +174,8 @@ export const LeafletMap: React.FC<Props> = function LeafletMap({ geoJSON, crsKey
   useEffect(() => {
     if (mapRef) {
       mapRef.invalidateSize();
-
-      if (mapRef.options.crs?.code !== crs.code) {
-        const center = mapRef.getCenter();
-
-        if (crs === leaflet.CRS.Simple || crs === leaflet.CRS.EPSG3857) {
-          mapRef.options.crs = crs;
-        }
-        mapRef.setView(center);
-      }
     }
-  }, [split.state.isResizing, split.state.mode, crs, mapRef]);
+  }, [split.state.isResizing, split.state.mode, mapRef]);
 
   return styled(
     styles,

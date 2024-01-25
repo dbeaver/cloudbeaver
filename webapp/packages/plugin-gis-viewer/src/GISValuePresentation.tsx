@@ -85,9 +85,11 @@ export const GISValuePresentation = observer<Props>(function GISValuePresentatio
   const activeElements = selection.getActiveElements();
   const firstActiveElement = activeElements[0];
   const firstActiveCell = firstActiveElement ? gis.getCellValue(firstActiveElement) : null;
-  const defaultSrid = firstActiveCell?.srid ?? 3857;
+  const initialCrs: CrsKey = firstActiveCell?.srid ? getCrsKey(firstActiveCell.srid) : 'EPSG:3857';
 
-  const [crsKey, setCrsKey] = useState(getCrsKey(defaultSrid));
+  const [crs, setCrs] = useState<CrsKey | null>(null);
+
+  const currentCrs = crs ?? initialCrs;
 
   for (const cell of activeElements) {
     const cellValue = gis.getCellValue(cell);
@@ -106,11 +108,10 @@ export const GISValuePresentation = observer<Props>(function GISValuePresentatio
       }
 
       const from = cellValue.srid === 0 ? 'EPSG:4326' : getCrsKey(cellValue.srid);
-      const to = crsKey === 'Simple' ? 'EPSG:4326' : crsKey;
 
       parsedGISData.push({
         type: 'Feature',
-        geometry: getTransformedGeometry(from, to, parsedCellValue),
+        geometry: currentCrs === 'Simple' ? parsedCellValue : getTransformedGeometry(from, currentCrs, parsedCellValue),
         properties: { associatedCell: cell, srid: cellValue.srid },
       });
     } catch (exception: any) {
@@ -151,10 +152,10 @@ export const GISValuePresentation = observer<Props>(function GISValuePresentatio
   return (
     <div className={classes.root}>
       <div className={classes.map}>
-        <LeafletMap key={crsKey} geoJSON={parsedGISData} crsKey={crsKey} getAssociatedValues={getAssociatedValues} />
+        <LeafletMap key={currentCrs} geoJSON={parsedGISData} crsKey={currentCrs} getAssociatedValues={getAssociatedValues} />
       </div>
       <div className={classes.toolbar}>
-        <CrsInput value={crsKey} onChange={setCrsKey} />
+        <CrsInput value={currentCrs} onChange={setCrs} />
       </div>
     </div>
   );
