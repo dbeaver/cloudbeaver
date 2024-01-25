@@ -349,10 +349,6 @@ export function useResource<
           return true;
         }
 
-        if (this.isError()) {
-          return true;
-        }
-
         return this.resource.isLoaded(propertiesRef.key, propertiesRef.includes);
       },
       get loading(): boolean {
@@ -461,7 +457,7 @@ export function useResource<
 
   useEffect(() => {
     refObj.use(loadKey);
-    if (canLoad && !result.isError()) {
+    if (canLoad) {
       result.load();
     }
   }, [canLoad, loadKey]);

@@ -73,6 +73,14 @@
         "close": true,
         "clear": false
       }
+    },
+    {
+      "label": "Update TS references CE",
+      "type": "shell",
+      "command": "yarn lerna run update-ts-references --stream",
+      "options": {
+        "cwd": "${workspaceFolder}/webapp"
+      }
     }
   ],
   "inputs": [

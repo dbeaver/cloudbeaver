@@ -33,6 +33,7 @@ export default [
   ['ui_clear', 'Clear'],
   ['ui_remove', 'Remove'],
   ['ui_close', 'Chiudi'],
+  ['ui_open', 'Open'],
   ['ui_errors_details', 'Dettagli'],
   ['ui_search', 'Cerca...'],
   ['ui_delete', 'Elimina'],

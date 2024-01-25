@@ -55,16 +55,10 @@
       "path": "../plugin-sql-editor/tsconfig.json"
     },
     {
-      "path": "../core-authentication/tsconfig.json"
-    },
-    {
       "path": "../core-administration/tsconfig.json"
     },
     {
       "path": "../core-app/tsconfig.json"
-    },
-    {
-      "path": "../core-authentication/tsconfig.json"
     },
     {
       "path": "../core-browser/tsconfig.json"
@@ -131,6 +125,9 @@
     },
     {
       "path": "../tests-runner/tsconfig.json"
+    },
+    {
+      "path": "../core-authentication/tsconfig.json"
     }
   ],
   "include": [

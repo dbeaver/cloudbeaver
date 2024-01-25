@@ -7,11 +7,10 @@
  */
 import { computed, makeObservable, observable } from 'mobx';
 
-import { EAdminPermission } from '@cloudbeaver/core-authentication';
 import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { Executor, IExecutor } from '@cloudbeaver/core-executor';
-import { PermissionsService, ServerConfigResource, SessionPermissionsResource } from '@cloudbeaver/core-root';
+import { EAdminPermission, PermissionsService, ServerConfigResource, SessionPermissionsResource } from '@cloudbeaver/core-root';
 import { RouterState, ScreenService } from '@cloudbeaver/core-routing';
 import { LocalStorageSaveService } from '@cloudbeaver/core-settings';
 import { GlobalConstants } from '@cloudbeaver/core-utils';

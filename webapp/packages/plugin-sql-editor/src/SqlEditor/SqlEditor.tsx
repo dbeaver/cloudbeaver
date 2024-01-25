@@ -75,15 +75,16 @@ export const SqlEditor = observer<ISqlEditorProps>(function SqlEditor({ state, c
   }
 
   const displayedEditors = getComputed(() => sqlEditorModeService.tabsContainer.getDisplayed({ state, data }).length);
+  const isEditorEmpty = displayedEditors === 0;
 
   useEffect(() => {
-    if (displayedEditors === 0) {
+    if (isEditorEmpty) {
       split.fixate('maximize', true);
     } else if (split.state.disable) {
       split.fixate('resize', false);
       split.state.setSize(-1);
     }
-  });
+  }, [isEditorEmpty]);
 
   return styled(
     styles,

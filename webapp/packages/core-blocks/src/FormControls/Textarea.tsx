@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import { useCallback, useContext } from 'react';
+import { useCallback, useContext, useLayoutEffect, useRef } from 'react';
 
 import { filterLayoutFakeProps, getLayoutProps } from '../Containers/filterLayoutFakeProps';
 import type { ILayoutSizeProps } from '../Containers/ILayoutSizeProps';
@@ -23,6 +23,7 @@ type BaseProps = Omit<React.TextareaHTMLAttributes<HTMLTextAreaElement>, 'onChan
     description?: string;
     labelTooltip?: string;
     embedded?: boolean;
+    cursorInitiallyAtEnd?: boolean;
   };
 
 type ControlledProps = BaseProps & {
@@ -54,9 +55,11 @@ export const Textarea: TextareaType = observer(function Textarea({
   description,
   labelTooltip,
   embedded,
+  cursorInitiallyAtEnd,
   onChange = () => {},
   ...rest
 }: ControlledProps | ObjectProps<any, any>) {
+  const textareaRef = useRef<HTMLTextAreaElement | null>(null);
   const layoutProps = getLayoutProps(rest);
   rest = filterLayoutFakeProps(rest);
   const styles = useS(textareaStyle);
@@ -79,13 +82,21 @@ export const Textarea: TextareaType = observer(function Textarea({
 
   const value = state ? state[name] : controlledValue;
 
+  useLayoutEffect(() => {
+    if (cursorInitiallyAtEnd && typeof value === 'string') {
+      const position = value.length;
+      textareaRef.current?.setSelectionRange(position, position);
+    }
+  }, [cursorInitiallyAtEnd]);
+
   return (
     <Field {...layoutProps} className={s(styles, { field: true, embedded }, className)}>
-      <FieldLabel  className={s(styles, { fieldLabel: true })} title={labelTooltip || rest.title} required={required}>
+      <FieldLabel className={s(styles, { fieldLabel: true })} title={labelTooltip || rest.title} required={required}>
         {children}
       </FieldLabel>
       <textarea
         {...rest}
+        ref={textareaRef}
         required={required}
         className={s(styles, { textarea: true })}
         value={value ?? ''}

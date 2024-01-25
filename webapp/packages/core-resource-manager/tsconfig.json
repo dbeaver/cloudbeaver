@@ -10,9 +10,6 @@
       "path": "../core-administration/tsconfig.json"
     },
     {
-      "path": "../core-authentication/tsconfig.json"
-    },
-    {
       "path": "../core-di/tsconfig.json"
     },
     {

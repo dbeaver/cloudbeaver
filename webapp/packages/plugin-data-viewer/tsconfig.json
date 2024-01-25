@@ -7,9 +7,6 @@
   },
   "references": [
     {
-      "path": "../core-authentication/tsconfig.json"
-    },
-    {
       "path": "../core-blocks/tsconfig.json"
     },
     {
@@ -82,9 +79,6 @@
       "path": "../core-app/tsconfig.json"
     },
     {
-      "path": "../core-authentication/tsconfig.json"
-    },
-    {
       "path": "../core-browser/tsconfig.json"
     },
     {
@@ -146,6 +140,9 @@
     },
     {
       "path": "../tests-runner/tsconfig.json"
+    },
+    {
+      "path": "../core-authentication/tsconfig.json"
     }
   ],
   "include": [
