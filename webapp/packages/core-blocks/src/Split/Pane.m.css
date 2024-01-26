@@ -3,3 +3,8 @@
   overflow: auto;
   z-index: 0;
 }
+
+.hiddenContent {
+  opacity: 0;
+  pointer-events: none;
+}
