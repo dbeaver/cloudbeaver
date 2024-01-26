@@ -23,16 +23,19 @@ const SOURCE_HISTORY = 'history';
 @staticImplements<ISqlDataSourceKey>()
 export abstract class BaseSqlDataSource implements ISqlDataSource {
   static key = 'base';
+
   abstract get name(): string | null;
+  message?: string;
+
   abstract get script(): string;
   abstract get baseScript(): string;
+
   abstract get baseExecutionContext(): IConnectionExecutionContextInfo | undefined;
   abstract get executionContext(): IConnectionExecutionContextInfo | undefined;
   databaseModels: IDatabaseDataModel<IDataQueryOptions, IDatabaseResultSet>[];
-  exception?: Error | Error[] | null | undefined;
-  message?: string;
   incomingScript: string | undefined;
   incomingExecutionContext: IConnectionExecutionContextInfo | undefined | null;
+  exception?: Error | Error[] | null | undefined;
 
   get isIncomingChanges(): boolean {
     return this.incomingScript !== undefined || this.incomingExecutionContext !== null;
@@ -178,6 +181,10 @@ export abstract class BaseSqlDataSource implements ISqlDataSource {
     // }
   }
 
+  isOpened(): boolean {
+    return true;
+  }
+
   isError(): boolean {
     return isContainsException(this.exception);
   }
@@ -252,6 +259,10 @@ export abstract class BaseSqlDataSource implements ISqlDataSource {
   }
 
   load(): Promise<void> | void {
+    this.markUpdated();
+  }
+
+  open(): Promise<void> | void {
     this.markUpdated();
   }
 

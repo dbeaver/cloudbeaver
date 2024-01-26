@@ -18,6 +18,7 @@ export * from './SessionResource';
 export * from './ServerService';
 export * from './ServerSettingsService';
 export * from './SessionActionService';
+export * from './EAdminPermission';
 export * from './SessionDataResource';
 export * from './SessionSettingsService';
 export * from './SessionExpireService';

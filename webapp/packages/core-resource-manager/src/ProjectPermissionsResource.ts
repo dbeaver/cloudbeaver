@@ -8,19 +8,15 @@
 import type { PermissionInfo } from '@cloudbeaver/core-administration';
 import { injectable } from '@cloudbeaver/core-di';
 import { CachedDataResource } from '@cloudbeaver/core-resource';
-import { ServerConfigResource } from '@cloudbeaver/core-root';
+import { EAdminPermission, SessionPermissionsResource } from '@cloudbeaver/core-root';
 import { GraphQLService } from '@cloudbeaver/core-sdk';
 
 @injectable()
 export class ProjectPermissionsResource extends CachedDataResource<PermissionInfo[]> {
-  constructor(private readonly graphQLService: GraphQLService, serverConfigResource: ServerConfigResource) {
+  constructor(private readonly graphQLService: GraphQLService, permissionsResource: SessionPermissionsResource) {
     super(() => []);
 
-    this.sync(
-      serverConfigResource,
-      () => {},
-      () => {},
-    );
+    permissionsResource.require(this, EAdminPermission.admin).outdateResource(this);
   }
 
   protected async loader(): Promise<PermissionInfo[]> {
