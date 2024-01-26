@@ -30,7 +30,6 @@ export const Split = observer<ISplitProps>(function Split({ className, minSize, 
   }
 
   return (
-    // @ts-ignore
     <BaseSplit minSize={minSize} maxSize={maxSize} className={s(styles, { split: true, vertical, horizontal }, className)} split={split} {...rest} />
   );
 });
