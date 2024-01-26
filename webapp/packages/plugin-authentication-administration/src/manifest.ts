@@ -7,11 +7,6 @@
  */
 import type { PluginManifest } from '@cloudbeaver/core-di';
 
-import { AuthConfigurationFormService } from './Administration/IdentityProviders/AuthConfigurationFormService';
-import { AuthConfigurationsAdministrationNavService } from './Administration/IdentityProviders/AuthConfigurationsAdministrationNavService';
-import { AuthConfigurationsAdministrationService } from './Administration/IdentityProviders/AuthConfigurationsAdministrationService';
-import { CreateAuthConfigurationService } from './Administration/IdentityProviders/CreateAuthConfigurationService';
-import { AuthConfigurationOptionsTabService } from './Administration/IdentityProviders/Options/AuthConfigurationOptionsTabService';
 import { ServerConfigurationAuthenticationBootstrap } from './Administration/ServerConfiguration/ServerConfigurationAuthenticationBootstrap';
 import { CreateTeamService } from './Administration/Users/Teams/CreateTeamService';
 import { GrantedConnectionsTabService } from './Administration/Users/Teams/GrantedConnections/GrantedConnectionsTabService';
@@ -47,11 +42,6 @@ export const manifest: PluginManifest = {
     UsersAdministrationNavigationService,
     ServerConfigurationAuthenticationBootstrap,
     AdministrationUserFormService,
-    AuthConfigurationsAdministrationService,
-    CreateAuthConfigurationService,
-    AuthConfigurationsAdministrationNavService,
-    AuthConfigurationFormService,
-    AuthConfigurationOptionsTabService,
     TeamsAdministrationService,
     CreateTeamService,
     TeamsAdministrationNavService,

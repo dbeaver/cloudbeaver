@@ -11,8 +11,6 @@ import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { ServerConfigurationAdministrationNavService, ServerConfigurationService } from '@cloudbeaver/plugin-administration';
 import { AuthenticationService } from '@cloudbeaver/plugin-authentication';
 
-import { AuthConfigurationsAdministrationNavService } from './Administration/IdentityProviders/AuthConfigurationsAdministrationNavService';
-
 const AuthenticationProviders = React.lazy(async () => {
   const { AuthenticationProviders } = await import('./Administration/ServerConfiguration/AuthenticationProviders');
   return { default: AuthenticationProviders };
@@ -23,7 +21,6 @@ export class PluginBootstrap extends Bootstrap {
   constructor(
     private readonly serverConfigurationService: ServerConfigurationService,
     private readonly serverConfigurationAdministrationNavService: ServerConfigurationAdministrationNavService,
-    private readonly authConfigurationsAdministrationNavService: AuthConfigurationsAdministrationNavService,
     private readonly authenticationService: AuthenticationService,
   ) {
     super();
@@ -32,7 +29,6 @@ export class PluginBootstrap extends Bootstrap {
   register(): void {
     this.serverConfigurationService.configurationContainer.add(AuthenticationProviders, 0);
     this.authenticationService.setConfigureAuthProvider(() => this.serverConfigurationAdministrationNavService.navToSettings());
-    this.authenticationService.setConfigureIdentityProvider(() => this.authConfigurationsAdministrationNavService.navToCreate());
   }
 
   load(): void | Promise<void> {}

@@ -32,6 +32,9 @@
     },
     {
       "path": "../core-localization/tsconfig.json"
+    },
+    {
+      "path": "../core-utils/tsconfig.json"
     }
   ],
   "include": [

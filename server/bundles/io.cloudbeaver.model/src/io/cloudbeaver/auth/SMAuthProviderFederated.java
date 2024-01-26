@@ -27,17 +27,12 @@ import java.util.Map;
  * Federated auth provider.
  * Provides links to external auth resource
  */
-public interface SMAuthProviderFederated {
+public interface SMAuthProviderFederated extends SMSignOutLinkProvider {
 
     @NotNull
     String getSignInLink(String id, @NotNull Map<String, Object> providerConfig) throws DBException;
 
-    /**
-     * @return a common link for logout, not related with the user context
-     */
-    @NotNull
-    String getCommonSignOutLink(String id, @NotNull Map<String, Object> providerConfig) throws DBException;
-
+    @Override
     default String getUserSignOutLink(
         @NotNull SMAuthProviderCustomConfiguration providerConfig,
         @NotNull Map<String, Object> userCredentials

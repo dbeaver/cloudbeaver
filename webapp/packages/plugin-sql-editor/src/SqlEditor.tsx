@@ -15,6 +15,7 @@ import type { ISqlEditorTabState } from './ISqlEditorTabState';
 import { SqlDataSourceService } from './SqlDataSource/SqlDataSourceService';
 import style from './SqlEditor.m.css';
 import { SqlEditorLoader } from './SqlEditor/SqlEditorLoader';
+import { SqlEditorOpenOverlay } from './SqlEditorOpenOverlay';
 import { SqlEditorOverlay } from './SqlEditorOverlay';
 import { SqlEditorStatusBar } from './SqlEditorStatusBar';
 import { SqlEditorView } from './SqlEditorView';
@@ -34,6 +35,8 @@ export const SqlEditor = observer<Props>(function SqlEditor({ state }) {
   useDataSource(dataSource);
   const splitState = useSplitUserState(`sql-editor-${dataSource?.sourceKey ?? 'default'}`);
 
+  const opened = dataSource?.isOpened() || false;
+
   return (
     <Loader suspense>
       <CaptureView className={s(styles, { captureView: true })} view={sqlEditorView}>
@@ -48,7 +51,8 @@ export const SqlEditor = observer<Props>(function SqlEditor({ state }) {
             </Loader>
           </Pane>
         </Split>
-        <SqlEditorOverlay state={state} />
+        {opened && <SqlEditorOverlay state={state} />}
+        {!opened && <SqlEditorOpenOverlay dataSource={dataSource} />}
         <SqlEditorStatusBar dataSource={dataSource} />
       </CaptureView>
     </Loader>

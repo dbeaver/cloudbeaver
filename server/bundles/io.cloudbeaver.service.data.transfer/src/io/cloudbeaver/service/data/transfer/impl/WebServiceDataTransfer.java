@@ -173,12 +173,15 @@ public class WebServiceDataTransfer implements DBWServiceDataTransfer {
                         }
                         throw new DBException("Error exporting data", e);
                     }
-                    Path finallyExportFile = parameters.getOutputSettings().isCompress()
+                    var outputSettings = parameters.getOutputSettings();
+                    Path finallyExportFile = outputSettings.isCompress()
                         ? exportFile.resolveSibling(WebDataTransferUtils.normalizeFileName(
-                            exportFile.getFileName().toString(), parameters.getOutputSettings()))
+                            exportFile.getFileName().toString(), outputSettings))
                         : exportFile;
                     WebDataTransferTaskConfig taskConfig = new WebDataTransferTaskConfig(finallyExportFile, parameters);
-                    String exportFileName = CommonUtils.escapeFileName(CommonUtils.truncateString(dataContainer.getName(), 32));
+                    String exportFileName = CommonUtils.isEmpty(outputSettings.getFileName()) ?
+                        CommonUtils.escapeFileName(CommonUtils.truncateString(dataContainer.getName(), 32)) :
+                        outputSettings.getFileName();
                     taskConfig.setExportFileName(exportFileName);
                     WebDataTransferUtils.getSessionDataTransferConfig(sqlProcessor.getWebSession()).addTask(taskConfig);
 

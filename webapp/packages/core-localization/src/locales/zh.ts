@@ -33,6 +33,7 @@ export default [
   ['ui_clear', 'Clear'],
   ['ui_remove', 'Remove'],
   ['ui_close', '关闭'],
+  ['ui_open', 'Open'],
   ['ui_errors_details', '详情'],
   ['ui_search', '搜索...'],
   ['ui_delete', '删除'],
@@ -107,6 +108,7 @@ export default [
   ['ui_disable', 'Disable'],
   ['ui_readonly', '只读'],
   ['ui_test', 'Test'],
+  ['ui_export', 'Export'],
 
   ['root_permission_denied', '您没有权限'],
   ['root_permission_no_permission', '您没有权限执行此操作'],
