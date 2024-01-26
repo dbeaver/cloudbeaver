@@ -16,11 +16,7 @@ import { useSplit } from './useSplit';
 export const Pane = observer<PaneProps>(function Pane({ className, ...rest }) {
   const styles = useS(style);
   const split = useSplit();
-  let hiddenContent = false;
-
-  if (rest.main && split.state.mode === 'minimize') {
-    hiddenContent = true;
-  }
+  const hiddenContent = rest.main && split.state.mode === 'minimize';
 
   return <BasePane className={s(styles, { pane: true, hiddenContent }, className)} {...rest} />;
 });
