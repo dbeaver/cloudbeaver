@@ -7,16 +7,22 @@
  */
 import { Pane as BasePane, PaneProps } from 'go-split';
 import { observer } from 'mobx-react-lite';
+import { useMemo } from 'react';
 
 import { s } from '../s';
 import { useS } from '../useS';
 import style from './Pane.m.css';
 import { useSplit } from './useSplit';
 
-export const Pane = observer<PaneProps>(function Pane({ className, ...rest }) {
+export const Pane = observer<PaneProps>(function Pane({ className, children, ...rest }) {
   const styles = useS(style);
   const split = useSplit();
-  const hiddenContent = rest.main && split.state.mode === 'minimize';
+  const shouldHideContent = rest.main && split.state.mode === 'minimize';
+  const childrenMemo = useMemo(() => (shouldHideContent ? null : children), [shouldHideContent, children]);
 
-  return <BasePane className={s(styles, { pane: true, hiddenContent }, className)} {...rest} />;
+  return (
+    <BasePane className={s(styles, { pane: true }, className)} {...rest}>
+      {childrenMemo}
+    </BasePane>
+  );
 });
