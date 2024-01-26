@@ -44,6 +44,9 @@
     },
     {
       "path": "../core-version/tsconfig.json"
+    },
+    {
+      "path": "../core-utils/tsconfig.json"
     }
   ],
   "include": [

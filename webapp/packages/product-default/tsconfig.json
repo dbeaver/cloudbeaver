@@ -16,7 +16,13 @@
       "path": "../core-di/tsconfig.json"
     },
     {
+      "path": "../core-localization/tsconfig.json"
+    },
+    {
       "path": "../core-product/tsconfig.json"
+    },
+    {
+      "path": "../core-task-manager/tsconfig.json"
     },
     {
       "path": "../core-version-update/tsconfig.json"
@@ -148,6 +154,9 @@
       "path": "../plugin-sso/tsconfig.json"
     },
     {
+      "path": "../plugin-task-manager/tsconfig.json"
+    },
+    {
       "path": "../plugin-theme/tsconfig.json"
     },
     {
@@ -170,15 +179,6 @@
     },
     {
       "path": "../plugin-version-update-administration/tsconfig.json"
-    },
-    {
-      "path": "../core-localization/tsconfig.json"
-    },
-    {
-      "path": "../core-task-manager/tsconfig.json"
-    },
-    {
-      "path": "../plugin-task-manager/tsconfig.json"
     }
   ],
   "include": [
