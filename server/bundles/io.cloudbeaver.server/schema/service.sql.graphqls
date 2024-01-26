@@ -112,6 +112,7 @@ type SQLResultSet {
     hasMoreData: Boolean!
     # can't update data or load LOB file if hasRowIdentifier = false
     hasRowIdentifier: Boolean!
+    hasChildrenCollection: Boolean!
 }
 
 type SQLQueryResults {
@@ -386,4 +387,12 @@ extend type Mutation {
     ): AsyncTaskInfo!
 
     asyncSqlRowDataCountResult(taskId: ID!): Int!
+
+    getChildrenCollection(
+        projectId: ID,
+        connectionId: ID,
+        contextId: ID!,
+        resultsId: ID!,
+        row: SQLResultRow!
+    ): Object
 }

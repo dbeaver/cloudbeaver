@@ -33,9 +33,7 @@ import org.jkiss.dbeaver.model.DBPDataSource;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
 import org.jkiss.dbeaver.model.DBUtils;
 import org.jkiss.dbeaver.model.data.DBDAttributeBinding;
-import org.jkiss.dbeaver.model.exec.DBCException;
-import org.jkiss.dbeaver.model.exec.DBCLogicalOperator;
-import org.jkiss.dbeaver.model.exec.DBExecUtils;
+import org.jkiss.dbeaver.model.exec.*;
 import org.jkiss.dbeaver.model.impl.sql.BasicSQLDialect;
 import org.jkiss.dbeaver.model.navigator.DBNNode;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
@@ -581,6 +579,21 @@ public class WebServiceSQL implements DBWServiceSQL {
             return (Long) taskStatus.getExtendedResult();
         }
         return null;
+    }
+
+    @Nullable
+    @Override
+    public List<WebSQLDatabaseDocument> getChildrenCollection(
+            @NotNull WebSQLContextInfo contextInfo,
+            @NotNull WebSession webSession,
+            @NotNull String resultsId,
+            @NotNull WebSQLResultsRow value
+    ) throws DBException {
+        return contextInfo.getProcessor().transformChildSubCollectionValue(
+                webSession,
+                contextInfo.getResults(resultsId),
+                value
+        );
     }
 
 }

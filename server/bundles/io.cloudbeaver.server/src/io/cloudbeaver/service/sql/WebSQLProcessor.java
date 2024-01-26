@@ -897,6 +897,51 @@ public class WebSQLProcessor implements WebSessionProvider {
         return type.cast(object);
     }
 
+    public List<WebSQLDatabaseDocument> transformChildSubCollectionValue(
+            @NotNull WebSession webSession,
+            @NotNull WebSQLResultsInfo resultsInfo,
+            @NotNull WebSQLResultsRow value
+    ) throws DBException {
+        DBCExecutionContext executionContext = getExecutionContext(resultsInfo.getDataContainer());
+        DBSDataContainer dataContainer = resultsInfo.getDataContainer();
+        DBDAttributeBinding[] keyAttributes = resultsInfo.getDefaultRowIdentifier().getAttributes().toArray(new DBDAttributeBinding[0]);
+        Object[] rowValues = new Object[keyAttributes.length];
+        List<Object> documents1 = new ArrayList<>();
+        try (DBCSession session = executionContext.openSession(webSession.getProgressMonitor(), DBCExecutionPurpose.UTIL, "Convert value")) {
+            for (int i = 0; i < keyAttributes.length; i++) {
+                DBDAttributeBinding keyAttribute = keyAttributes[i];
+                boolean isDocumentValue = keyAttributes.length == 1 && keyAttribute.getDataKind() == DBPDataKind.DOCUMENT;
+                if (isDocumentValue) {
+                    rowValues[i] =
+                            makeDocumentInputValue(session, (DBSDocumentLocator) dataContainer, resultsInfo, value);
+                } else {
+                    Object inputCellValue = value.getData();
+
+                    documents1.add(keyAttribute.getValueHandler().getValueFromObject(
+                             session,
+                            keyAttribute,
+                            convertInputCellValue(session, keyAttribute,
+                                    inputCellValue, false),
+                            false,
+                            true));
+                }
+            }
+            if (dataContainer instanceof DBCDocumentHierarchical dbcDocumentHierarchical) {
+                List<WebSQLDatabaseDocument> documents = new ArrayList<>();
+
+                List<?> childrenList = dbcDocumentHierarchical.listChildrenEntities(webSession.getProgressMonitor());
+                childrenList.forEach(child -> documents.add(new WebSQLDatabaseDocument(webSession, (DBDDocument) child)));
+
+                return documents;
+            } else {
+                throw new DBException("Attribute value is not a subcollection");
+            }
+        } catch (Exception e) {
+            throw new DBException("Error transforming child subcollection value", e);
+        }
+    }
+
+
 
     private void fillQueryResults(
         @NotNull WebSQLContextInfo contextInfo,

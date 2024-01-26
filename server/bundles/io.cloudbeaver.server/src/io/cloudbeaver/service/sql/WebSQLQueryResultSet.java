@@ -34,6 +34,8 @@ public class WebSQLQueryResultSet {
     private boolean singleEntity = true;
     private boolean hasRowIdentifier;
 
+    private boolean hasChildrenCollection;
+
     public WebSQLQueryResultSet() {
     }
 
@@ -101,5 +103,14 @@ public class WebSQLQueryResultSet {
 
     public void setHasRowIdentifier(boolean hasRowIdentifier) {
         this.hasRowIdentifier = hasRowIdentifier;
+    }
+
+    @Property
+    public boolean isHasChildrenCollection() {
+        return hasChildrenCollection;
+    }
+
+    public void setHasChildrenCollection(boolean hasSuCollection) {
+        this.hasChildrenCollection = hasSuCollection;
     }
 }
