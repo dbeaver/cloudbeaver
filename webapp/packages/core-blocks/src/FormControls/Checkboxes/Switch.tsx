@@ -8,6 +8,7 @@
 import { observer } from 'mobx-react-lite';
 
 import { filterLayoutFakeProps } from '../../Containers/filterLayoutFakeProps';
+import type { ILayoutSizeProps } from '../../Containers/ILayoutSizeProps';
 import { s } from '../../s';
 import { useS } from '../../useS';
 import { Field } from '../Field';
@@ -32,8 +33,8 @@ interface IBaseProps {
 }
 
 interface SwitchType {
-  (props: IBaseProps & ICheckboxControlledProps): React.ReactElement<any, any> | null;
-  <TKey extends string>(props: IBaseProps & ICheckboxObjectProps<TKey>): React.ReactElement<any, any> | null;
+  (props: IBaseProps & ICheckboxControlledProps & ILayoutSizeProps): React.ReactElement<any, any> | null;
+  <TKey extends string>(props: IBaseProps & ICheckboxObjectProps<TKey> & ILayoutSizeProps): React.ReactElement<any, any> | null;
 }
 
 export const Switch: SwitchType = observer(function Switch({
@@ -53,7 +54,7 @@ export const Switch: SwitchType = observer(function Switch({
   disabled,
   onChange,
   ...rest
-}: IBaseProps & (ICheckboxControlledProps | ICheckboxObjectProps<any>)) {
+}: IBaseProps & (ICheckboxControlledProps | ICheckboxObjectProps<any>) & ILayoutSizeProps) {
   const checkboxState = useCheckboxState({
     value,
     defaultValue,
