@@ -388,11 +388,4 @@ extend type Mutation {
 
     asyncSqlRowDataCountResult(taskId: ID!): Int!
 
-    getChildrenCollection(
-        projectId: ID,
-        connectionId: ID,
-        contextId: ID!,
-        resultsId: ID!,
-        row: SQLResultRow!
-    ): Object
 }

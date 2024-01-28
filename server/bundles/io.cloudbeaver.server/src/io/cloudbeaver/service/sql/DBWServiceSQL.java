@@ -172,13 +172,4 @@ public interface DBWServiceSQL extends DBWService {
     @Nullable
     @WebAction
     Long getRowDataCountResult(@NotNull WebSession webSession, @NotNull String taskId) throws DBWebException;
-
-    @Nullable
-    @WebAction
-    List<WebSQLDatabaseDocument> getChildrenCollection(
-            @NotNull WebSQLContextInfo contextInfo,
-            @NotNull WebSession webSession,
-            @NotNull String resultsId,
-            @NotNull WebSQLResultsRow value
-    ) throws DBException;
 }
