@@ -581,19 +581,4 @@ public class WebServiceSQL implements DBWServiceSQL {
         return null;
     }
 
-    @Nullable
-    @Override
-    public List<WebSQLDatabaseDocument> getChildrenCollection(
-            @NotNull WebSQLContextInfo contextInfo,
-            @NotNull WebSession webSession,
-            @NotNull String resultsId,
-            @NotNull WebSQLResultsRow value
-    ) throws DBException {
-        return contextInfo.getProcessor().transformChildSubCollectionValue(
-                webSession,
-                contextInfo.getResults(resultsId),
-                value
-        );
-    }
-
 }
