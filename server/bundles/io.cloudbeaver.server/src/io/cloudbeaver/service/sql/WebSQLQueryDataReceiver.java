@@ -84,7 +84,7 @@ class WebSQLQueryDataReceiver implements DBDDataReceiver {
                     i);
                 row[i] = cellValue;
 
-                metData.add(Map.of());
+//                metData.add(Map.of());
             } catch (Throwable e) {
                 row[i] = new DBDValueError(e);
             }
