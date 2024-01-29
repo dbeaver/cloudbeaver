@@ -433,9 +433,9 @@ public class WebServiceNavigator implements DBWServiceNavigator {
         if (siblings.contains(newName)) {
             throw new DBWebException("Name " + newName + " is unavailable or invalid");
         }
-        var oldNodePath = node.getNodeUri();
+        var oldNodePath = node.getNodeItemPath();
         node.rename(session.getProgressMonitor(), newName);
-        var newNodePath = node.getNodeUri();
+        var newNodePath = node.getNodeItemPath();
         addNavigatorNodeMoveEvent(session, node, oldNodePath, newNodePath);
         return node.getName();
     }
@@ -536,7 +536,7 @@ public class WebServiceNavigator implements DBWServiceNavigator {
                     ne.getValue().deleteObject(commandContext, object, options);
                     commandContext.saveChanges(session.getProgressMonitor(), options);
                 } else if (node instanceof DBNLocalFolder) {
-                    var nodePath = node.getNodeUri();
+                    var nodePath = node.getNodeItemPath();
                     node.getOwnerProject().getDataSourceRegistry().removeFolder(((DBNLocalFolder) node).getFolder(), false);
                     WebEventUtils.addNavigatorNodeUpdatedEvent(
                         session.getProjectById(projectId),
@@ -622,12 +622,12 @@ public class WebServiceNavigator implements DBWServiceNavigator {
                         }
                     }
                     DBNLocalFolder dbnLocalFolder = ((DBNLocalFolder) node);
-                    var oldNodePath = node.getNodeUri();
+                    var oldNodePath = node.getNodeItemPath();
                     node.getOwnerProject().getDataSourceRegistry().moveFolder(
                         dbnLocalFolder.getFolder().getFolderPath(),
                         dbnLocalFolder.generateNewFolderPath(parentFolder, dbnLocalFolder.getNodeDisplayName())
                     );
-                    var newNodePath = node.getNodeUri();
+                    var newNodePath = node.getNodeItemPath();
                     WebServiceUtils.updateConfigAndRefreshDatabases(session, node.getOwnerProject().getId());
                     addNavigatorNodeMoveEvent(session, node, oldNodePath, newNodePath);
                 } else if (node instanceof DBNResourceManagerResource) {
