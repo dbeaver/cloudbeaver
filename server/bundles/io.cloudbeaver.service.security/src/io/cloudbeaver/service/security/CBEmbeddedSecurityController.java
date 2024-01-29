@@ -2217,8 +2217,12 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
             }
             Object reverseProxyUserTeams = sessionParameters.get(SMConstants.SESSION_PARAM_TRUSTED_USER_TEAMS);
             if (reverseProxyUserTeams instanceof List) {
-                ((List<String>) reverseProxyUserTeams).add(application.getAppConfiguration().getDefaultUserTeam());
-                setUserTeams(userId, ((List<?>) reverseProxyUserTeams).stream().map(Object::toString).toArray(String[]::new), userId);
+                List<String> reverseProxyUserTeamsList = (List<String>) reverseProxyUserTeams;
+                String defaultUserTeam = application.getAppConfiguration().getDefaultUserTeam();
+                if (!reverseProxyUserTeamsList.contains(defaultUserTeam)) {
+                    reverseProxyUserTeamsList.add(defaultUserTeam);
+                }
+                setUserTeams(userId, reverseProxyUserTeamsList.toArray(new String[0]), userId);
             }
         }
         return userId;
