@@ -563,16 +563,27 @@ public class WebSQLProcessor implements WebSessionProvider {
                     Map<String, Object> updateValues = row.getUpdateValues().entrySet().stream()
                         .filter(x -> CommonUtils.equalObjects(allAttributes[CommonUtils.toInt(x.getKey())].getRowIdentifier(), rowIdentifier))
                         .collect(HashMap::new, (m,v) -> m.put(v.getKey(), v.getValue()), HashMap::putAll);
+
+                    Map<String, Object> metaData = row.getMetaData().entrySet().stream()
+                            .filter(x -> CommonUtils.equalObjects(allAttributes[CommonUtils.toInt(x.getKey())].getRowIdentifier(), rowIdentifier))
+                            .collect(HashMap::new, (m,v) -> m.put(v.getKey(), v.getValue()), HashMap::putAll);
+
                     if (finalRow.length == 0 || CommonUtils.isEmpty(updateValues)) {
                         continue;
                     }
                     DBDAttributeBinding[] updateAttributes = new DBDAttributeBinding[updateValues.size()];
+                    DBDAttributeBinding[] metaDataAttributes = new DBDAttributeBinding[metaData.size()];
                     // Final row is what we return back
 
                     int index = 0;
                     for (String indexStr : updateValues.keySet()) {
                         int attrIndex = CommonUtils.toInt(indexStr, -1);
                         updateAttributes[index++] = allAttributes[attrIndex];
+                    }
+
+                    for (String indexStr : metaData.keySet()) {
+                        int attrIndex = CommonUtils.toInt(indexStr, -1);
+                        metaDataAttributes[index++] = allAttributes[attrIndex];
                     }
 
                     Object[] rowValues = new Object[updateAttributes.length + keyAttributes.length];

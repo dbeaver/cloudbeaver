@@ -203,13 +203,6 @@ public class WebServiceBindingSQL extends WebServiceBindingBase<DBWServiceSQL> i
                     getSQLContext(env),
                     env.getArgument("resultsId")
                 ))
-                .dataFetcher("getChildrenCollection", env ->
-                        getService(env).getChildrenCollection(
-                                getSQLContext(env),
-                                getWebSession(env),
-                                env.getArgument("resultsId"),
-                                new WebSQLResultsRow(env.getArgument("row")))
-                )
             .dataFetcher("asyncSqlRowDataCountResult", env ->
                 getService(env).getRowDataCountResult(
                     getWebSession(env),

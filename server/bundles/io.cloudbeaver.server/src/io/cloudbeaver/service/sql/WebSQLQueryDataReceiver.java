@@ -32,6 +32,7 @@ import org.jkiss.utils.CommonUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 class WebSQLQueryDataReceiver implements DBDDataReceiver {
     private static final Log log = Log.getLog(WebSQLQueryDataReceiver.class);
@@ -43,6 +44,7 @@ class WebSQLQueryDataReceiver implements DBDDataReceiver {
 
     private DBDAttributeBinding[] bindings;
     private List<Object[]> rows = new ArrayList<>();
+    private List<Object[]> metData = new ArrayList<>();
     private final Number rowLimit;
 
     WebSQLQueryDataReceiver(WebSQLContextInfo contextInfo, DBSDataContainer dataContainer, WebDataFormat dataFormat) {
@@ -81,6 +83,8 @@ class WebSQLQueryDataReceiver implements DBDDataReceiver {
                     binding.getMetaAttribute(),
                     i);
                 row[i] = cellValue;
+
+                metData.add(Map.of());
             } catch (Throwable e) {
                 row[i] = new DBDValueError(e);
             }
