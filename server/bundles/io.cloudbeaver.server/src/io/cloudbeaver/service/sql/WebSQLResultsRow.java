@@ -16,6 +16,7 @@
  */
 package io.cloudbeaver.service.sql;
 
+import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.model.data.json.JSONUtils;
 
 import java.util.Map;
@@ -28,12 +29,16 @@ public class WebSQLResultsRow {
     private Object[] data;
     private Map<String, Object> updateValues;
 
+    @Nullable
+    private Map<String, Object> metaData;
+
     public WebSQLResultsRow() {
     }
 
     public WebSQLResultsRow(Map<String, Object> map) {
         data = JSONUtils.getObjectList(map, "data").toArray();
         updateValues = JSONUtils.getObject(map, "updateValues");
+        updateValues = JSONUtils.getObjectOrNull(map, "metaData");
     }
 
     public Object[] getData() {
@@ -42,5 +47,10 @@ public class WebSQLResultsRow {
 
     public Map<String, Object> getUpdateValues() {
         return updateValues;
+    }
+
+    @Nullable
+    public Map<String, Object> getMetaData() {
+        return metaData;
     }
 }
