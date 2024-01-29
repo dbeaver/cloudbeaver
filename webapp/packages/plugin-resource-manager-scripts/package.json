@@ -29,6 +29,7 @@
     "@cloudbeaver/core-resource-manager": "~0.1.0",
     "@cloudbeaver/core-root": "~0.1.0",
     "@cloudbeaver/core-ui": "~0.1.0",
+    "@cloudbeaver/core-utils": "~0.1.0",
     "@cloudbeaver/core-view": "~0.1.0",
     "@cloudbeaver/plugin-navigation-tree-rm": "~0.1.0",
     "@cloudbeaver/plugin-projects": "~0.1.0",

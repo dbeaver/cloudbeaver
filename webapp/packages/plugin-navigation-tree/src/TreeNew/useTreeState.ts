@@ -5,7 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { observable } from 'mobx';
+import { action, observable } from 'mobx';
 import { useState } from 'react';
 
 import { useObservableRef } from '@cloudbeaver/core-blocks';
@@ -17,6 +17,7 @@ import type { TreeState } from './TreeState';
 export interface ITreeState {
   getState(id: string): Readonly<INodeState>;
   updateState(id: string, state: Partial<INodeState>): void;
+  updateAllState(state: Partial<INodeState>): void;
 }
 
 export function useTreeState(externalState?: TreeState): ITreeState {
@@ -41,9 +42,16 @@ export function useTreeState(externalState?: TreeState): ITreeState {
       updateState(id: string, state: Partial<INodeState>): void {
         Object.assign(this.getState(id), state);
       },
+      updateAllState(state: Partial<INodeState>): void {
+        for (const nodeState of this.state.values()) {
+          Object.assign(nodeState, state);
+        }
+      },
     }),
     {
       state: observable.ref,
+      updateState: action.bound,
+      updateAllState: action.bound,
     },
     { state },
   );

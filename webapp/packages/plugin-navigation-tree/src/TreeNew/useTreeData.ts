@@ -38,6 +38,7 @@ export interface ITreeData {
   getChildren: (node: string) => string[];
   getState(id: string): Readonly<INodeState>;
 
+  updateAllState(state: Partial<INodeState>): void;
   updateState(id: string, state: Partial<INodeState>): void;
   load(nodeId: string, manual: boolean): Promise<void>;
   update(): Promise<void>;
@@ -95,6 +96,9 @@ export function useTreeData(options: IOptions): ITreeData {
       },
       updateState(id: string, state: Partial<INodeState>) {
         this.state.updateState(id, state);
+      },
+      updateAllState(state: Partial<INodeState>) {
+        this.state.updateAllState(state);
       },
       async load(nodeId: string, manual: boolean) {
         await options.load(nodeId, manual);

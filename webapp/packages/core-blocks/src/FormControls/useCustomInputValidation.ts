@@ -16,6 +16,31 @@ export function useCustomInputValidation<T = void>(validation: (value: T) => str
   const context = useContext(FormContext);
   const inputRef = useRef<HTMLInputElement>(null);
 
+  function validate(element: HTMLInputElement): boolean {
+    let value: T = undefined as unknown as T;
+
+    if (element instanceof HTMLInputElement) {
+      value = element.value as unknown as T;
+    }
+
+    const valid = element.validity.valid;
+    const result = validation(value);
+
+    try {
+      if (typeof result === 'string') {
+        element.setCustomValidity(result);
+        return false;
+      } else {
+        element.setCustomValidity('');
+        return true;
+      }
+    } finally {
+      if (valid !== element.validity.valid) {
+        element.reportValidity();
+      }
+    }
+  }
+
   useExecutor({
     executor: context?.onValidate,
     handlers: [
@@ -24,19 +49,8 @@ export function useCustomInputValidation<T = void>(validation: (value: T) => str
           return;
         }
 
-        let value: T = undefined as unknown as T;
-
-        if (inputRef.current instanceof HTMLInputElement) {
-          value = inputRef.current.value as unknown as T;
-        }
-
-        const result = validation(value);
-
-        if (typeof result === 'string') {
-          inputRef.current.setCustomValidity(result);
+        if (!validate(inputRef.current)) {
           ExecutorInterrupter.interrupt(context);
-        } else {
-          inputRef.current?.setCustomValidity('');
         }
       },
     ],
@@ -48,14 +62,29 @@ export function useCustomInputValidation<T = void>(validation: (value: T) => str
       return;
     }
 
-    function resetValidationMessage() {
-      element?.setCustomValidity('');
+    function handleInput(event: Event) {
+      const target = event.target as HTMLInputElement;
+      if (target.validity.valid === false) {
+        validate(target);
+      }
     }
 
-    element.addEventListener('input', resetValidationMessage);
+    function handleBlur(event: Event) {
+      const target = event.target as HTMLInputElement;
+      if (target.value === '') {
+        return;
+      }
+      if (target.validity.valid === true) {
+        validate(target);
+      }
+    }
+
+    element.addEventListener('input', handleInput);
+    element.addEventListener('blur', handleBlur);
 
     return () => {
-      element?.removeEventListener('input', resetValidationMessage);
+      element?.removeEventListener('input', handleInput);
+      element?.removeEventListener('blur', handleBlur);
     };
   });
 

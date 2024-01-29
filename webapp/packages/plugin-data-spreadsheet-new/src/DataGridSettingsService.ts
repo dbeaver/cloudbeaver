@@ -5,23 +5,52 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { injectable } from '@cloudbeaver/core-di';
-import { PluginManagerService, PluginSettings } from '@cloudbeaver/core-plugin';
+import { Dependency, injectable } from '@cloudbeaver/core-di';
+import {
+  createSettingsAliasResolver,
+  ESettingsValueType,
+  PluginManagerService,
+  PluginSettings,
+  SettingsManagerService,
+} from '@cloudbeaver/core-plugin';
+import { ServerSettingsResolverService, ServerSettingsService } from '@cloudbeaver/core-root';
+import { schema } from '@cloudbeaver/core-utils';
+import { DATA_EDITOR_SETTINGS_GROUP } from '@cloudbeaver/plugin-data-viewer';
 
-const defaultSettings = {
-  hidden: false,
-};
+const defaultSettings = schema.object({
+  hidden: schema.coerce.boolean().default(false),
+});
 
-export type DataGridSettings = typeof defaultSettings;
+export type DataGridSettings = schema.infer<typeof defaultSettings>;
 
 @injectable()
-export class DataGridSettingsService {
-  readonly settings: PluginSettings<DataGridSettings>;
-  /** @deprecated Use settings instead, will be removed in 23.0.0 */
-  readonly deprecatedSettings: PluginSettings<typeof defaultSettings>;
+export class DataGridSettingsService extends Dependency {
+  readonly settings: PluginSettings<typeof defaultSettings>;
 
-  constructor(private readonly pluginManagerService: PluginManagerService) {
+  constructor(
+    private readonly pluginManagerService: PluginManagerService,
+    private readonly settingsManagerService: SettingsManagerService,
+    private readonly serverSettingsService: ServerSettingsService,
+    private readonly serverSettingsResolverService: ServerSettingsResolverService,
+  ) {
+    super();
     this.settings = this.pluginManagerService.createSettings('data-spreadsheet', 'plugin', defaultSettings);
-    this.deprecatedSettings = this.pluginManagerService.getDeprecatedPluginSettings('plugin_data_spreadsheet_new', defaultSettings);
+    this.serverSettingsResolverService.addResolver(
+      /** @deprecated Use settings instead, will be removed in 23.0.0 */
+      createSettingsAliasResolver(this.serverSettingsService, this.settings, 'plugin_data_spreadsheet_new'),
+    );
+
+    this.registerSettings();
+  }
+
+  private registerSettings() {
+    this.settingsManagerService.registerSettings(this.settings, () => [
+      {
+        group: DATA_EDITOR_SETTINGS_GROUP,
+        key: 'hidden',
+        type: ESettingsValueType.Checkbox,
+        name: 'Disable data grid presentation',
+      },
+    ]);
   }
 }

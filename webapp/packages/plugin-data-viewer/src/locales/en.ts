@@ -1,4 +1,5 @@
 export default [
+  ['plugin_data_viewer_data_viewer_settings_group', 'Data Viewer'],
   ['table_header_sql_expression', 'Enter a SQL expression to filter results, e.g. column_name=10'],
   ['table_header_sql_expression_not_supported', 'Data filter is not supported'],
   ['data_viewer_tab_title', 'Data'],
