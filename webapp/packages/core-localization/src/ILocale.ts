@@ -6,4 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-export const DEFAULT_LOCALE_NAME = 'en';
+export interface ILocale {
+  isoCode: string;
+  displayName: string;
+}

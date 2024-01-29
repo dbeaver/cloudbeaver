@@ -8,13 +8,13 @@
 import { computed, makeObservable, reaction } from 'mobx';
 
 import { Dependency, injectable } from '@cloudbeaver/core-di';
-import { DEFAULT_LOCALE_NAME, LocalizationService } from '@cloudbeaver/core-localization';
+import { DEFAULT_LOCALE, LocalizationService } from '@cloudbeaver/core-localization';
 import { createSettingsAliasResolver, PluginManagerService, PluginSettings } from '@cloudbeaver/core-plugin';
 import { ServerSettingsResolverService, ServerSettingsService } from '@cloudbeaver/core-root';
 import { schema } from '@cloudbeaver/core-utils';
 
 const settingsSchema = schema.object({
-  defaultLanguage: schema.string().default(DEFAULT_LOCALE_NAME),
+  defaultLanguage: schema.string().default(DEFAULT_LOCALE.isoCode),
 });
 
 export type ILocalizationSettings = schema.infer<typeof settingsSchema>;

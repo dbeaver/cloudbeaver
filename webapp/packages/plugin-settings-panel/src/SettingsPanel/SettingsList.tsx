@@ -6,17 +6,15 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import { useEffect, useRef } from 'react';
 
-import { Container, Form, Group, GroupTitle, useTranslate } from '@cloudbeaver/core-blocks';
+import { Container, Group, GroupTitle, useTranslate } from '@cloudbeaver/core-blocks';
 import { type ISettingDescriptionWithScope, ROOT_SETTINGS_GROUP, type SettingsGroup } from '@cloudbeaver/core-plugin';
 import type { ISettingsSource } from '@cloudbeaver/core-settings';
 import type { ITreeData } from '@cloudbeaver/plugin-navigation-tree';
 
 import { getSettingGroupId } from './getSettingGroupId';
-import { getSettingGroupIdFromElementId } from './getSettingGroupIdFromElementId';
-import { querySettingsGroups } from './querySettingsGroups';
 import { Setting } from './Setting';
+import { useTreeScrollSync } from './useTreeScrollSync';
 
 interface Props {
   treeData: ITreeData;
@@ -26,10 +24,10 @@ interface Props {
 }
 
 export const SettingsList = observer<Props>(function SettingsList({ treeData, source, settings, onSettingsOpen }) {
-  const ref = useRef<HTMLDivElement>(null);
   const translate = useTranslate();
   const list = [];
   const groups = [...treeData.getChildren(treeData.rootId)];
+  const ref = useTreeScrollSync(treeData, onSettingsOpen);
 
   while (groups.length) {
     const groupId = groups[0];
@@ -40,38 +38,6 @@ export const SettingsList = observer<Props>(function SettingsList({ treeData, so
 
     list.push({ group, settings: groupSettings || [] });
   }
-
-  useEffect(() => {
-    if (ref.current) {
-      ref.current.addEventListener('scroll', e => {
-        const container = e.target as HTMLDivElement;
-
-        const elements = querySettingsGroups(container);
-        let firstVisibleElement: HTMLElement | undefined;
-
-        for (const element of elements) {
-          if (element.offsetTop + element.offsetHeight > container.scrollTop) {
-            firstVisibleElement = element;
-            break;
-          }
-        }
-
-        if (firstVisibleElement) {
-          const groupId = getSettingGroupIdFromElementId(firstVisibleElement.id);
-          let group = ROOT_SETTINGS_GROUP.get(groupId)!;
-
-          treeData.updateAllState({ selected: false, expanded: false });
-          treeData.updateState(groupId, { selected: true });
-
-          while (group.parent && group.parent !== ROOT_SETTINGS_GROUP) {
-            treeData.updateState(group.parent.id, { expanded: true });
-            group = group.parent;
-          }
-          onSettingsOpen?.(groupId);
-        }
-      });
-    }
-  });
 
   return (
     <Container ref={ref} style={{ height: '100%' }} gap overflow>

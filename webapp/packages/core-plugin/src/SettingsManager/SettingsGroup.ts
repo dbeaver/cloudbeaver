@@ -9,13 +9,16 @@ import { uuid } from '@cloudbeaver/core-utils';
 
 export class SettingsGroup {
   readonly id: string;
-  readonly subGroups: SettingsGroup[];
+  get subGroups(): ReadonlyArray<SettingsGroup> {
+    return this.#subGroups;
+  }
 
   protected groups: Map<string, SettingsGroup>;
+  #subGroups: SettingsGroup[];
 
   constructor(readonly name: string, readonly parent?: SettingsGroup) {
     this.id = uuid();
-    this.subGroups = [];
+    this.#subGroups = [];
     this.groups = parent?.groups || new Map();
 
     this.groups.set(this.id, this);
@@ -28,7 +31,7 @@ export class SettingsGroup {
   createSubGroup(name: string): SettingsGroup {
     const subGroup = new SettingsGroup(name, this);
 
-    this.subGroups.push(subGroup);
+    this.#subGroups.push(subGroup);
 
     return subGroup;
   }

@@ -11,16 +11,12 @@ import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
 import { SettingsService } from '@cloudbeaver/core-settings';
 
-import { DEFAULT_LOCALE_NAME } from './DEFAULT_LOCALE_NAME';
+import { DEFAULT_LOCALE } from './DEFAULT_LOCALE';
+import type { ILocale } from './ILocale';
 import type { ILocaleProvider } from './ILocaleProvider';
 import type { TLocalizationToken } from './TLocalizationToken';
 
 const LANG_SETTINGS_KEY = 'langSettings';
-
-export interface ILocale {
-  isoCode: string;
-  displayName: string;
-}
 
 interface ISettings {
   language: string | null;
@@ -29,7 +25,17 @@ interface ISettings {
 @injectable()
 export class LocalizationService extends Bootstrap {
   get currentLanguage(): string {
-    return this.settings.language ?? this.defaultLanguage;
+    const lang = this.settings.language;
+
+    if (lang !== null && this.isLanguageSupported(lang)) {
+      return lang;
+    }
+
+    if (this.isLanguageSupported(this.defaultLanguage)) {
+      return this.defaultLanguage;
+    }
+
+    return this.supportedLanguages[0].isoCode;
   }
 
   settings: ISettings;
@@ -44,8 +50,8 @@ export class LocalizationService extends Bootstrap {
     super();
 
     this.settings = getDefaultLocalizationSettings();
-    this.supportedLanguages = [];
-    this.defaultLanguage = DEFAULT_LOCALE_NAME;
+    this.supportedLanguages = [DEFAULT_LOCALE];
+    this.defaultLanguage = DEFAULT_LOCALE.isoCode;
     this.onChange = new SyncExecutor();
 
     makeObservable<LocalizationService, 'localeMap' | 'setCurrentLocale' | 'supportedLanguages' | 'defaultLanguage'>(this, {
@@ -67,6 +73,9 @@ export class LocalizationService extends Bootstrap {
 
   setSupportedLanguages(locales: ILocale[]) {
     this.supportedLanguages = locales;
+    if (this.supportedLanguages.length === 0) {
+      this.supportedLanguages = [DEFAULT_LOCALE];
+    }
   }
 
   setDefaultLanguage(lang: string) {
@@ -81,7 +90,7 @@ export class LocalizationService extends Bootstrap {
     let translation = this.localeMap.get(this.currentLanguage)?.get(token as TLocalizationToken);
 
     if (!translation) {
-      translation = this.localeMap.get(DEFAULT_LOCALE_NAME)?.get(token as TLocalizationToken);
+      translation = this.localeMap.get(this.defaultLanguage)?.get(token as TLocalizationToken);
     }
 
     if (typeof translation === 'string') {
@@ -125,7 +134,7 @@ export class LocalizationService extends Bootstrap {
   }
 
   async load(): Promise<void> {
-    await this.loadLocaleAsync(DEFAULT_LOCALE_NAME);
+    await this.loadLocaleAsync(this.defaultLanguage);
     await this.autoLoadCurrentLanguage();
   }
 
@@ -150,7 +159,7 @@ export class LocalizationService extends Bootstrap {
     }
   }
 
-  private setCurrentLocale(lang: string) {
+  private setCurrentLocale(lang: string | null) {
     this.settings.language = lang;
   }
 

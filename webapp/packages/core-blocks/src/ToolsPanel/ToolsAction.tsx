@@ -14,11 +14,12 @@ import { useS } from '../useS';
 import { useStateDelay } from '../useStateDelay';
 import style from './ToolsAction.m.css';
 
-interface Props extends ButtonHTMLAttributes<any> {
+interface Props extends Omit<ButtonHTMLAttributes<any>, 'onClick'> {
   icon?: string;
   viewBox?: string;
   loading?: boolean;
   className?: string;
+  onClick?: (event: React.MouseEvent<HTMLButtonElement>) => Promise<any> | any;
 }
 
 export const ToolsAction: React.FC<Props> = function ToolsAction({ icon, viewBox, disabled, loading, children, className, onClick, ...rest }) {

@@ -35,7 +35,7 @@ export class LocalizationSettingsManagerService extends Bootstrap {
         options: this.localizationService.supportedLanguages.map(language => ({
           id: language.isoCode,
           name: language.displayName,
-        })) || [{ id: 'en', name: 'English' }],
+        })),
       },
     ]);
   }

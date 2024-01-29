@@ -9,12 +9,14 @@ import { useContext, useEffect, useRef } from 'react';
 
 import { ExecutorInterrupter } from '@cloudbeaver/core-executor';
 
+import { useTranslate } from '../localization/useTranslate';
 import { useExecutor } from '../useExecutor';
 import { FormContext } from './FormContext';
 
 export function useCustomInputValidation<T = void>(validation: (value: T) => string | null): React.RefObject<HTMLInputElement> {
   const context = useContext(FormContext);
   const inputRef = useRef<HTMLInputElement>(null);
+  const translate = useTranslate();
 
   function validate(element: HTMLInputElement): boolean {
     let value: T = undefined as unknown as T;
@@ -28,12 +30,11 @@ export function useCustomInputValidation<T = void>(validation: (value: T) => str
 
     try {
       if (typeof result === 'string') {
-        element.setCustomValidity(result);
+        element.setCustomValidity(result || translate('core_blocks_custom_input_validation_error'));
         return false;
-      } else {
-        element.setCustomValidity('');
-        return true;
       }
+      element.setCustomValidity('');
+      return true;
     } finally {
       if (valid !== element.validity.valid) {
         element.reportValidity();

@@ -19,17 +19,21 @@ interface ScopeSettingsItem<T = any> {
 
 @injectable()
 export class SettingsManagerService {
-  settings: ScopeSettingsItem[];
+  get settings(): ReadonlyArray<ScopeSettingsItem> {
+    return this.#settings;
+  }
+
+  #settings: ScopeSettingsItem[];
 
   constructor() {
-    this.settings = [];
+    this.#settings = [];
   }
 
   registerSettings<TSchema extends schema.SomeZodObject>(
     settingsSource: PluginSettings<TSchema>,
     settingsGetter: SettingsDescriptionGetter<schema.infer<TSchema>>,
   ) {
-    this.settings.push({
+    this.#settings.push({
       scope: settingsSource.scope,
       schema: settingsSource.schema,
       settingsGetter,

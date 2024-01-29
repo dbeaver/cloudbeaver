@@ -5,14 +5,15 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
+import type { TLocalizationToken } from '@cloudbeaver/core-localization';
 import type { schema } from '@cloudbeaver/core-utils';
 
 import type { ESettingsValueType } from './ESettingsValueType';
 import type { SettingsGroup } from './SettingsGroup';
 
 export interface ISettingOptions {
-  id: string | number;
-  name: string;
+  id: string;
+  name: TLocalizationToken;
 }
 
 export interface ISettingDescription<T = object> {
@@ -21,8 +22,8 @@ export interface ISettingDescription<T = object> {
   type: ESettingsValueType;
 
   group: SettingsGroup;
-  name: string;
-  description?: string;
+  name: TLocalizationToken;
+  description?: TLocalizationToken;
   options?: ISettingOptions[];
 }
 
