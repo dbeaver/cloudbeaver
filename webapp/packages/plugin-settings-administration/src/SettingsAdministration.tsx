@@ -8,16 +8,19 @@
 import { observer } from 'mobx-react-lite';
 
 import type { AdministrationItemContentProps } from '@cloudbeaver/core-administration';
-import { ColoredContainer, Form, Group, ToolsAction, ToolsPanel, useForm, useTranslate } from '@cloudbeaver/core-blocks';
+import { ColoredContainer, Form, Group, s, ToolsAction, ToolsPanel, useForm, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { ServerSettingsService } from '@cloudbeaver/core-root';
 import { Settings } from '@cloudbeaver/plugin-settings-panel';
 
+import style from './SettingsAdministration.m.css';
+
 export const SettingsAdministration = observer<AdministrationItemContentProps>(function SettingsAdministration() {
   const translate = useTranslate();
   const serverSettingsService = useService(ServerSettingsService);
   const notificationService = useService(NotificationService);
+  const styles = useS(style);
 
   async function handleSave() {
     if (!serverSettingsService.isChanged) {
@@ -44,7 +47,7 @@ export const SettingsAdministration = observer<AdministrationItemContentProps>(f
   const changed = serverSettingsService.isChanged;
 
   return (
-    <Form context={form} style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+    <Form context={form} className={s(styles, { form: true })}>
       <ColoredContainer parent vertical wrap gap>
         <Group box keepSize>
           <ToolsPanel>
