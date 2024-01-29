@@ -60,6 +60,7 @@ import java.util.stream.Collectors;
 public class WebServiceAdmin implements DBWServiceAdmin {
 
     private static final Log log = Log.getLog(WebServiceAdmin.class);
+    public static final String All_USERS_TEAM = "all_users";
 
     private final Map<String, WebPermissionDescriptor> permissionDescriptorByName = WebServiceRegistry.getInstance()
         .getWebServices()
@@ -216,6 +217,9 @@ public class WebServiceAdmin implements DBWServiceAdmin {
         webSession.addInfoMessage("Update team - " + teamId);
 
         try {
+            if (teamId.equals(All_USERS_TEAM)) {
+                throw new DBWebException("You can not update all_users team");
+            }
             webSession.getAdminSecurityController().updateTeam(teamId, teamName, description);
             SMTeam newTeam = webSession.getAdminSecurityController().findTeam(teamId);
             return new AdminTeamInfo(webSession, newTeam);
@@ -231,6 +235,9 @@ public class WebServiceAdmin implements DBWServiceAdmin {
 
             var adminSecurityController = webSession.getAdminSecurityController();
             SMTeam[] userTeams = adminSecurityController.getUserTeams(webSession.getUser().getUserId());
+            if (Arrays.stream(userTeams).anyMatch(team -> team.getTeamId().equals(All_USERS_TEAM))) {
+                throw new DBWebException("You can not delete all_users team");
+            }
             if (Arrays.stream(userTeams).anyMatch(team -> team.getTeamId().equals(teamId))) {
                 throw new DBWebException("You can not delete your own team");
             }

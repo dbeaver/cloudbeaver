@@ -79,6 +79,7 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
     private static final Type MAP_STRING_OBJECT_TYPE = new TypeToken<Map<String, Object>>() {
     }.getType();
     private static final Gson gson = new GsonBuilder().create();
+    public static final String ALL_USERS_ROLE = "all_users";
 
     protected final T application;
     protected final CBDatabase database;
@@ -216,14 +217,28 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
     public void setUserTeams(String userId, String[] teamIds, String grantorId) throws DBCException {
         try (Connection dbCon = database.openConnection()) {
             try (JDBCTransaction txn = new JDBCTransaction(dbCon)) {
-                setUserTeams(dbCon, userId, teamIds, grantorId);
-                txn.commit();
+                if (containsAllUsers(teamIds)) {
+                    setUserTeams(dbCon, userId, teamIds, grantorId);
+                    txn.commit();
+                } else {
+                    throw new DBCException(application.getAppConfiguration().getDefaultUserTeam() + " role not editable");
+                }
             }
         } catch (SQLException e) {
             throw new DBCException("Error saving user teams in database", e);
         }
         addSubjectPermissionsUpdateEvent(userId, SMSubjectType.user);
     }
+
+    private boolean containsAllUsers(String[] array) {
+        for (String element : array) {
+            if (application.getAppConfiguration().getDefaultUserTeam().equals(element)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
 
     public void setUserTeams(@NotNull Connection dbCon, String userId, String[] teamIds, String grantorId)
         throws SQLException {
@@ -2202,6 +2217,7 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
             }
             Object reverseProxyUserTeams = sessionParameters.get(SMConstants.SESSION_PARAM_TRUSTED_USER_TEAMS);
             if (reverseProxyUserTeams instanceof List) {
+                ((List<String>) reverseProxyUserTeams).add(application.getAppConfiguration().getDefaultUserTeam());
                 setUserTeams(userId, ((List<?>) reverseProxyUserTeams).stream().map(Object::toString).toArray(String[]::new), userId);
             }
         }
