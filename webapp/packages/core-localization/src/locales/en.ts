@@ -36,6 +36,7 @@ export default [
   ['ui_clear', 'Clear'],
   ['ui_remove', 'Remove'],
   ['ui_close', 'Close'],
+  ['ui_open', 'Open'],
   ['ui_errors_details', 'Details'],
   ['ui_search', 'Search...'],
   ['ui_delete', 'Delete'],

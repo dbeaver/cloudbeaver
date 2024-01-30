@@ -30,4 +30,6 @@ export default [
   ['sql_editor_upload_script_unsaved_changes_dialog_message', 'Текущий скрипт будет перезаписан загруженным. Сохранить текущий?'],
   ['sql_editor_upload_script_max_size_title', 'Размер файла превышает максимально допустимый'],
   ['sql_editor_close_result_tabs_dialog_title', 'Подтвердить закрытие вкладок'],
+  ['plugin_sql_editor_action_overlay_title', 'Требуется действие'],
+  ['plugin_sql_editor_action_overlay_description', 'Пожалуйста, перезапустите редактор для продолжения работы.'],
 ];

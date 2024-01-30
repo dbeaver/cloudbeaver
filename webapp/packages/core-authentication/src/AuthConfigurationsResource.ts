@@ -17,11 +17,10 @@ import {
   type ResourceKeySimple,
   ResourceKeyUtils,
 } from '@cloudbeaver/core-resource';
-import { SessionPermissionsResource } from '@cloudbeaver/core-root';
+import { EAdminPermission, SessionPermissionsResource } from '@cloudbeaver/core-root';
 import { AdminAuthProviderConfiguration, GetAuthProviderConfigurationsQueryVariables, GraphQLService } from '@cloudbeaver/core-sdk';
 
 import type { AuthProviderConfiguration } from './AuthProvidersResource';
-import { EAdminPermission } from './EAdminPermission';
 
 const NEW_CONFIGURATION_SYMBOL = Symbol('new-configuration');
 
