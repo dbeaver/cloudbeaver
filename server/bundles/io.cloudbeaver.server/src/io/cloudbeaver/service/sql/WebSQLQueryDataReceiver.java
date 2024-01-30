@@ -25,14 +25,16 @@ import org.jkiss.dbeaver.model.DBUtils;
 import org.jkiss.dbeaver.model.data.*;
 import org.jkiss.dbeaver.model.exec.*;
 import org.jkiss.dbeaver.model.impl.data.DBDValueError;
+import org.jkiss.dbeaver.model.meta.MetaData;
 import org.jkiss.dbeaver.model.sql.DBQuotaException;
 import org.jkiss.dbeaver.model.struct.DBSDataContainer;
 import org.jkiss.dbeaver.model.struct.DBSEntity;
 import org.jkiss.utils.CommonUtils;
+import org.jkiss.utils.Pair;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.lang.reflect.Method;
+import java.util.*;
+import java.util.stream.Collectors;
 
 class WebSQLQueryDataReceiver implements DBDDataReceiver {
     private static final Log log = Log.getLog(WebSQLQueryDataReceiver.class);
@@ -43,8 +45,7 @@ class WebSQLQueryDataReceiver implements DBDDataReceiver {
     private final WebSQLQueryResultSet webResultSet = new WebSQLQueryResultSet();
 
     private DBDAttributeBinding[] bindings;
-    private List<Object[]> rows = new ArrayList<>();
-    private List<Object[]> metData = new ArrayList<>();
+    private List<WebSQLQueryResultSetRow> rows = new ArrayList<>(); //new Class WebSQLQueryResultSetRow
     private final Number rowLimit;
 
     WebSQLQueryDataReceiver(WebSQLContextInfo contextInfo, DBSDataContainer dataContainer, WebDataFormat dataFormat) {
@@ -72,6 +73,7 @@ class WebSQLQueryDataReceiver implements DBDDataReceiver {
     @Override
     public void fetchRow(DBCSession session, DBCResultSet resultSet) throws DBCException {
 
+        Map<String, Object> metaDataMap = null;
         Object[] row = new Object[bindings.length];
 
         for (int i = 0; i < bindings.length; i++) {
@@ -83,14 +85,23 @@ class WebSQLQueryDataReceiver implements DBDDataReceiver {
                     binding.getMetaAttribute(),
                     i);
                 row[i] = cellValue;
+                Method[] methods = Objects.requireNonNull(cellValue).getClass().getMethods();
+                for (Method method : methods) {
+                    if (method.isAnnotationPresent(MetaData.class)){
+                        if (metaDataMap == null) {
+                            metaDataMap = new HashMap<>();
+                        }
+                        Object value = method.invoke(cellValue);
+                        metaDataMap.put(method.getAnnotation(MetaData.class).name(), value);
+                    }
+                }
 
-//                metData.add(Map.of());
             } catch (Throwable e) {
                 row[i] = new DBDValueError(e);
             }
         }
 
-        rows.add(row);
+        rows.add(new WebSQLQueryResultSetRow(row, metaDataMap));
 
         if (rowLimit != null && rows.size() > rowLimit.longValue()) {
             throw new DBQuotaException(
@@ -105,7 +116,7 @@ class WebSQLQueryDataReceiver implements DBDDataReceiver {
         DBSEntity entity = dataContainer instanceof DBSEntity ? (DBSEntity) dataContainer : null;
 
         try {
-            DBExecUtils.bindAttributes(session, entity, resultSet, bindings, rows);
+            DBExecUtils.bindAttributes(session, entity, resultSet, bindings, rows.stream().map(WebSQLQueryResultSetRow::getData).collect(Collectors.toList()));
         } catch (DBException e) {
             log.error("Error binding attributes", e);
         }
@@ -126,15 +137,15 @@ class WebSQLQueryDataReceiver implements DBDDataReceiver {
         }
 
         // Convert row values
-        for (Object[] row : rows) {
+        for (WebSQLQueryResultSetRow row : rows) {
             for (int i = 0; i < bindings.length; i++) {
                 DBDAttributeBinding binding = bindings[i];
-                row[i] = WebSQLUtils.makeWebCellValue(webSession, binding, row[i], dataFormat);
+                row.getData()[i] = WebSQLUtils.makeWebCellValue(webSession, binding, row.getData()[i], dataFormat);
             }
         }
 
         webResultSet.setColumns(bindings);
-        webResultSet.setRows(rows.toArray(new Object[0][]));
+        webResultSet.setRows(List.of(rows.toArray(new WebSQLQueryResultSetRow[0])));
         webResultSet.setHasChildrenCollection(resultSet instanceof DBDSubCollectionResultSet);
 
         WebSQLResultsInfo resultsInfo = contextInfo.saveResult(dataContainer, bindings);
@@ -162,14 +173,14 @@ class WebSQLQueryDataReceiver implements DBDDataReceiver {
         // Convert original rows into new rows with leaf attributes
         // Extract values for leaf attributes from original row
         DBDAttributeBinding[] leafAttributes = leafBindings.toArray(new DBDAttributeBinding[0]);
-        List<Object[]> newRows = new ArrayList<>();
-        for (Object[] row : rows) {
+        List<WebSQLQueryResultSetRow> newRows = new ArrayList<>();
+        for (WebSQLQueryResultSetRow row : rows) {
             Object[] newRow = new Object[leafBindings.size()];
             for (int i = 0; i < leafBindings.size(); i++) {
                 DBDAttributeBinding leafAttr = leafBindings.get(i);
                 try {
                     //Object topValue = row[leafAttr.getTopParent().getOrdinalPosition()];
-                    Object cellValue = DBUtils.getAttributeValue(leafAttr, leafAttributes, row);
+                    Object cellValue = DBUtils.getAttributeValue(leafAttr, leafAttributes, row.getData());
 /*
                     Object cellValue = leafAttr.getValueHandler().getValueFromObject(
                         session,
@@ -183,7 +194,7 @@ class WebSQLQueryDataReceiver implements DBDDataReceiver {
                     newRow[i] = new DBDValueError(e);
                 }
             }
-            newRows.add(newRow);
+            newRows.add(new WebSQLQueryResultSetRow(newRow, row.getMetaData()));
         }
         this.bindings = leafAttributes;
         this.rows = newRows;

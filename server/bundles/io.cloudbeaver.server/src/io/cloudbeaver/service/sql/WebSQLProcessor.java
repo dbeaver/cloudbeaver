@@ -51,6 +51,7 @@ import org.jkiss.dbeaver.model.struct.*;
 import org.jkiss.dbeaver.utils.GeneralUtils;
 import org.jkiss.utils.ArrayUtils;
 import org.jkiss.utils.CommonUtils;
+import org.jkiss.utils.Pair;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
@@ -331,7 +332,7 @@ public class WebSQLProcessor implements WebSessionProvider {
     {
         // we don't need to add same row several times
         // (it can be when we update the row from RS with several tables)
-        Set<Object[]> newResultSetRows = new LinkedHashSet<>();
+        Set<WebSQLQueryResultSetRow> newResultSetRows = new LinkedHashSet<>();
         KeyDataReceiver keyReceiver = new KeyDataReceiver(contextInfo.getResults(resultsId));
         WebSQLResultsInfo resultsInfo = contextInfo.getResults(resultsId);
 
@@ -372,7 +373,7 @@ public class WebSQLProcessor implements WebSessionProvider {
 
                         totalUpdateCount += statistics.getRowsUpdated();
                         result.setDuration(result.getDuration() + statistics.getExecuteTime());
-                        newResultSetRows.add(rowValues);
+                        newResultSetRows.add(new WebSQLQueryResultSetRow(rowValues, null));
                     }
 
                     if (txnManager != null && txnManager.isSupportsTransactions()) {
@@ -399,7 +400,7 @@ public class WebSQLProcessor implements WebSessionProvider {
         WebSQLQueryResults updateResults = new WebSQLQueryResults(webSession, dataFormat);
         updateResults.setUpdateRowCount(totalUpdateCount);
         updateResults.setResultSet(updatedResultSet);
-        updatedResultSet.setRows(newResultSetRows.toArray(new Object[0][]));
+        updatedResultSet.setRows(List.of(newResultSetRows.toArray(new WebSQLQueryResultSetRow[0])));
 
         queryResults.add(updateResults);
 
@@ -410,7 +411,7 @@ public class WebSQLProcessor implements WebSessionProvider {
 
     private void getUpdatedRowsInfo(
         @NotNull WebSQLResultsInfo resultsInfo,
-        @NotNull Set<Object[]> newResultSetRows,
+        @NotNull Set<WebSQLQueryResultSetRow> newResultSetRows,
         @Nullable WebDataFormat dataFormat,
         @NotNull DBRProgressMonitor monitor)
         throws DBCException {
@@ -420,8 +421,8 @@ public class WebSQLProcessor implements WebSessionProvider {
             "Refresh row(s) after insert/update")
         ) {
             boolean canRefreshResults = resultsInfo.canRefreshResults();
-            for (Object[] row : newResultSetRows) {
-                if (row.length == 0) {
+            for (WebSQLQueryResultSetRow row : newResultSetRows) {
+                if (row.getData().length == 0) {
                     continue;
                 }
                 if (!canRefreshResults) {
@@ -438,7 +439,7 @@ public class WebSQLProcessor implements WebSessionProvider {
                     if (attr.getRowIdentifier() == null) {
                         continue;
                     }
-                    final Object keyValue = row[attr.getOrdinalPosition()];
+                    final Object keyValue = row.getData()[attr.getOrdinalPosition()];
                     if (DBUtils.isNullValue(keyValue)) {
                         hasKey = false;
                         break;
@@ -455,7 +456,7 @@ public class WebSQLProcessor implements WebSessionProvider {
                 }
                 DBDDataFilter filter = new DBDDataFilter(constraints);
                 DBSDataContainer dataContainer = resultsInfo.getDataContainer();
-                WebRowDataReceiver dataReceiver = new WebRowDataReceiver(resultsInfo.getAttributes(), row, dataFormat);
+                WebRowDataReceiver dataReceiver = new WebRowDataReceiver(resultsInfo.getAttributes(), row.getData(), dataFormat);
                 dataContainer.readData(
                     new AbstractExecutionSource(dataContainer, getExecutionContext(dataContainer), this),
                     session,
@@ -471,14 +472,14 @@ public class WebSQLProcessor implements WebSessionProvider {
 
     private void makeWebCellRow(
         @NotNull WebSQLResultsInfo resultsInfo,
-        @NotNull Object[] row,
+        @NotNull WebSQLQueryResultSetRow row,
         @Nullable WebDataFormat dataFormat
     ) throws DBCException {
-        for (int i = 0; i < row.length; i++) {
-            row[i] = WebSQLUtils.makeWebCellValue(
+        for (int i = 0; i < row.getData().length; i++) {
+            row.getData()[i] = WebSQLUtils.makeWebCellValue(
                 webSession,
                 resultsInfo.getAttributeByPosition(i),
-                row[i],
+                row.getData()[i],
                 dataFormat);
         }
     }
