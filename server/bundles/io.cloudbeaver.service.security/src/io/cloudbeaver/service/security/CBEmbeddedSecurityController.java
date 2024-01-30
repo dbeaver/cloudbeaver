@@ -19,6 +19,7 @@ package io.cloudbeaver.service.security;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
+import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.auth.*;
 import io.cloudbeaver.model.app.WebAppConfiguration;
 import io.cloudbeaver.model.app.WebAuthApplication;
@@ -79,7 +80,6 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
     private static final Type MAP_STRING_OBJECT_TYPE = new TypeToken<Map<String, Object>>() {
     }.getType();
     private static final Gson gson = new GsonBuilder().create();
-    public static final String ALL_USERS_ROLE = "all_users";
 
     protected final T application;
     protected final CBDatabase database;
@@ -213,15 +213,27 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
         application.getEventController().addEvent(event);
     }
 
-    @Override
     public void setUserTeams(String userId, String[] teamIds, String grantorId) throws DBCException {
         try (Connection dbCon = database.openConnection()) {
             try (JDBCTransaction txn = new JDBCTransaction(dbCon)) {
-                if (containsAllUsers(teamIds)) {
-                    setUserTeams(dbCon, userId, teamIds, grantorId);
-                    txn.commit();
+                String defaultUserTeam = application.getAppConfiguration().getDefaultUserTeam();
+                if (!Arrays.asList(teamIds).contains(defaultUserTeam)) {
+                    String[] updatedTeamIds = Arrays.copyOf(teamIds, teamIds.length + 1);
+                    updatedTeamIds[teamIds.length] = defaultUserTeam;
+
+                    if (containsAllUsers(updatedTeamIds)) {
+                        setUserTeams(dbCon, userId, updatedTeamIds, grantorId);
+                        txn.commit();
+                    } else {
+                        throw new DBCException(application.getAppConfiguration().getDefaultUserTeam() + " role not editable");
+                    }
                 } else {
-                    throw new DBCException(application.getAppConfiguration().getDefaultUserTeam() + " role not editable");
+                    if (containsAllUsers(teamIds)) {
+                        setUserTeams(dbCon, userId, teamIds, grantorId);
+                        txn.commit();
+                    } else {
+                        throw new DBCException(application.getAppConfiguration().getDefaultUserTeam() + " role not editable");
+                    }
                 }
             }
         } catch (SQLException e) {
@@ -1051,6 +1063,9 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
         String defaultUsersTeam = application.getAppConfiguration().getDefaultUserTeam();
         if (CommonUtils.isNotEmpty(defaultUsersTeam) && defaultUsersTeam.equals(teamId)) {
             throw new DBCException("Default users team cannot be deleted");
+        }
+        if (teamId.equals(defaultUsersTeam)) {
+            throw new DBCException("You can not delete all_users team");
         }
         try (Connection dbCon = database.openConnection()) {
             if (!force) {
@@ -2218,10 +2233,6 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
             Object reverseProxyUserTeams = sessionParameters.get(SMConstants.SESSION_PARAM_TRUSTED_USER_TEAMS);
             if (reverseProxyUserTeams instanceof List) {
                 List<String> reverseProxyUserTeamsList = (List<String>) reverseProxyUserTeams;
-                String defaultUserTeam = application.getAppConfiguration().getDefaultUserTeam();
-                if (!reverseProxyUserTeamsList.contains(defaultUserTeam)) {
-                    reverseProxyUserTeamsList.add(defaultUserTeam);
-                }
                 setUserTeams(userId, reverseProxyUserTeamsList.toArray(new String[0]), userId);
             }
         }
