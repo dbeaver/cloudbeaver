@@ -95,7 +95,7 @@ type SQLResultColumn {
 
 type SQLResultRowMetaData {
     data: [Object]
-    metaData: [Object!]
+    metaData: Object
 }
 
 type DatabaseDocument {
@@ -151,6 +151,11 @@ type SQLExecuteInfo {
 input SQLResultRow {
     data: [ Object ]!
     updateValues: Object
+}
+
+input SQLResultRowMetaDataInput {
+    data: [Object]
+    metaData: [Object!]
 }
 
 type DataTypeLogicalOperation {
