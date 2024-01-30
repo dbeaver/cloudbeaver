@@ -11,6 +11,8 @@
   <version>1.0.0-SNAPSHOT</version>
 
   <modules>
+    <!-- dbeaver common -->
+    <module>../../../../dbeaver-common</module>
     <!-- dbeaver ce -->
     <module>../../../../dbeaver</module>
     <!-- cloudbeaver -->
