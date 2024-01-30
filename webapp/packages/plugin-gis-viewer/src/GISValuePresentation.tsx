@@ -42,6 +42,9 @@ function getCrsKey(srid: number): CrsKey {
   }
 }
 
+const DEFAULT_CRS = 'EPSG:3857';
+const DEFAULT_TRANSFORM_CRS = 'EPSG:4326';
+
 function getTransformedGeometry(from: CrsKey, to: CrsKey, geometry: GeoJSONGeometry): GeoJSONGeometry {
   if (geometry.type === 'Point') {
     return { ...geometry, coordinates: proj4(from, to, geometry.coordinates) };
@@ -85,7 +88,7 @@ export const GISValuePresentation = observer<Props>(function GISValuePresentatio
   const activeElements = selection.getActiveElements();
   const firstActiveElement = activeElements[0];
   const firstActiveCell = firstActiveElement ? gis.getCellValue(firstActiveElement) : null;
-  const initialCrs: CrsKey = firstActiveCell?.srid ? getCrsKey(firstActiveCell.srid) : 'EPSG:3857';
+  const initialCrs: CrsKey = firstActiveCell?.srid ? getCrsKey(firstActiveCell.srid) : DEFAULT_CRS;
 
   const [crs, setCrs] = useState<CrsKey | null>(null);
 
@@ -107,7 +110,7 @@ export const GISValuePresentation = observer<Props>(function GISValuePresentatio
         continue;
       }
 
-      const from = cellValue.srid === 0 ? 'EPSG:4326' : getCrsKey(cellValue.srid);
+      const from = cellValue.srid === 0 ? DEFAULT_TRANSFORM_CRS : getCrsKey(cellValue.srid);
 
       parsedGISData.push({
         type: 'Feature',
