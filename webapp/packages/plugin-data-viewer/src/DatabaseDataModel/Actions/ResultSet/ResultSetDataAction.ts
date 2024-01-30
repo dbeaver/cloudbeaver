@@ -27,6 +27,10 @@ export class ResultSetDataAction extends DatabaseDataResultAction<IResultSetElem
     return this.result.data?.rows || [];
   }
 
+  get rowsWithMetadata() {
+    return this.result.data?.rowsWithMetaData || [];
+  }
+
   get columns(): SqlResultColumn[] {
     return this.result.data?.columns || [];
   }
@@ -35,6 +39,7 @@ export class ResultSetDataAction extends DatabaseDataResultAction<IResultSetElem
     super(source);
     makeObservable(this, {
       rows: computed,
+      rowsWithMetadata: computed,
       columns: computed,
     });
   }
@@ -92,6 +97,14 @@ export class ResultSetDataAction extends DatabaseDataResultAction<IResultSetElem
     }
 
     return this.rows[row.index];
+  }
+
+  getRowMetadata(row: IResultSetRowKey) {
+    if (row.index >= this.rowsWithMetadata.length) {
+      return undefined;
+    }
+
+    return this.rowsWithMetadata[row.index].metaData;
   }
 
   getCellValue(cell: IResultSetElementKey): IResultSetValue | undefined {

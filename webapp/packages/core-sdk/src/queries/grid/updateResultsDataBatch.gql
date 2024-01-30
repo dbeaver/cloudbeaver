@@ -24,6 +24,10 @@ mutation updateResultsDataBatch(
       resultSet {
         id
         rows
+        rowsWithMetaData {
+          data
+          metaData
+        }
         singleEntity
         hasMoreData
         hasRowIdentifier

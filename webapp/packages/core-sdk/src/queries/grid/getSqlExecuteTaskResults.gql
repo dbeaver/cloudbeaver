@@ -33,6 +33,10 @@ mutation getSqlExecuteTaskResults($taskId: ID!) {
           }
         }
         rows
+        rowsWithMetaData {
+          data
+          metaData
+        }
         singleEntity
         hasMoreData
         hasRowIdentifier
