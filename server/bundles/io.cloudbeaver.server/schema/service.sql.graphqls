@@ -94,8 +94,8 @@ type SQLResultColumn {
 }
 
 type SQLResultRowMetaData {
-    first: [Object]
-    second: [Object!]
+    data: [Object]
+    metaData: [Object!]
 }
 
 type DatabaseDocument {
