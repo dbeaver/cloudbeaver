@@ -69,7 +69,7 @@ export const ObjectViewerPanel: TabHandlerPanelComponent<IObjectViewerTabState> 
         tab.handlerState.tabTitle = data.name;
       });
     },
-    active: !state.notFound,
+    active: !state.notFound && connection.data?.connected,
   });
 
   const pages = dbObjectPagesService.orderedPages;

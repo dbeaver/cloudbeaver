@@ -36,6 +36,9 @@ export { default as NavigationNodeControlRendererStyles } from './NavigationTree
 export { default as NavigationNodeControlStyles } from './NavigationTree/ElementsTree/NavigationTreeNode/NavigationNode/NavigationNodeControl.m.css';
 
 export * from './NavigationTree/NavigationTreeLoader';
+export * from './TreeNew/TreeLazy';
+export * from './TreeNew/useTreeData';
+export * from './TreeNew/INode';
 
 export * from './NavigationTree/getNavigationTreeUserSettingsId';
 export * from './NodesManager/NavNodeView/IFolderTransform';

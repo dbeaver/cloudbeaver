@@ -5,6 +5,7 @@ export * from './NodesManager/extensions/IObjectNavNodeProvider';
 export * from './NodesManager/DBObjectResource';
 export * from './NodesManager/DATA_CONTEXT_ACTIVE_NODE';
 export * from './NodesManager/DATA_CONTEXT_NAV_NODE';
+export * from './NodesManager/DATA_CONTEXT_NAV_NODE_ID';
 export * from './NodesManager/DATA_CONTEXT_NAV_NODES';
 export * from './NodesManager/NavNodeInfoResource';
 export * from './NodesManager/NavNodeManagerService';
