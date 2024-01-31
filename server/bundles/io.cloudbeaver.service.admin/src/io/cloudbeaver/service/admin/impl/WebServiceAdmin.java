@@ -53,6 +53,7 @@ import java.text.MessageFormat;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Web service implementation
@@ -404,12 +405,30 @@ public class WebServiceAdmin implements DBWServiceAdmin {
         if (authProvider == null) {
             throw new DBWebException("Invalid provider ID " + providerId);
         }
-        return authProvider.getConfigurationParameters().stream().filter(p -> {
-            if (p.hasFeature("distributed")) {
-                return CBApplication.getInstance().isDistributed();
-            }
-            return true;
-        }).map(p -> new WebPropertyInfo(webSession, p)).collect(Collectors.toList());
+        var application = CBApplication.getInstance();
+
+
+        Stream<WebAuthProviderProperty> commonPropertiesStream = WebAuthProviderRegistry.getInstance()
+            .getCommonProperties()
+            .stream()
+            .filter(commonProperties -> commonProperties.isApplicableFor(authProvider))
+            .flatMap(commonProperties -> commonProperties.getConfigurationParameters().stream());
+
+        return Stream.concat(authProvider.getConfigurationParameters().stream(), commonPropertiesStream)
+            .filter(p -> {
+                boolean allFeaturesEnabled = true;
+                for (String feature : p.getRequiredFeatures()) {
+                    if (feature.equals("distributed")) {
+                        allFeaturesEnabled = CBApplication.getInstance().isDistributed();
+                    } else {
+                        allFeaturesEnabled = application.getAppConfiguration().isFeatureEnabled(feature);
+                    }
+                    if (!allFeaturesEnabled) {
+                        break;
+                    }
+                }
+                return allFeaturesEnabled;
+            }).map(p -> new WebPropertyInfo(webSession, p)).collect(Collectors.toList());
     }
 
     @Override
