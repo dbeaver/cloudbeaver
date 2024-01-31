@@ -155,7 +155,7 @@ input SQLResultRow {
 
 input SQLResultRowMetaDataInput {
     data: [Object]
-    metaData: [Object!]
+    metaData: Object!
 }
 
 type DataTypeLogicalOperation {
