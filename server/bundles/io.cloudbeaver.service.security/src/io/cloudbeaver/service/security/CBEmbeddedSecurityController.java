@@ -255,7 +255,7 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
         if (application.isConfigurationMode()) {
             return;
         }
-        if (application.getAppConfiguration().getDefaultUserTeam().isEmpty()) {
+        if (CommonUtils.isEmpty(application.getAppConfiguration().getDefaultUserTeam())) {
             return;
         }
         List<String> usersIds = new ArrayList<>();
