@@ -7,10 +7,16 @@
   },
   "references": [
     {
+      "path": "../core-browser/tsconfig.json"
+    },
+    {
       "path": "../core-data-context/tsconfig.json"
     },
     {
       "path": "../core-di/tsconfig.json"
+    },
+    {
+      "path": "../core-events/tsconfig.json"
     },
     {
       "path": "../core-events/tsconfig.json"
@@ -22,10 +28,22 @@
       "path": "../core-localization/tsconfig.json"
     },
     {
+      "path": "../core-localization/tsconfig.json"
+    },
+    {
       "path": "../core-plugin/tsconfig.json"
     },
     {
+      "path": "../core-plugin/tsconfig.json"
+    },
+    {
+      "path": "../core-product/tsconfig.json"
+    },
+    {
       "path": "../core-resource/tsconfig.json"
+    },
+    {
+      "path": "../core-root/tsconfig.json"
     },
     {
       "path": "../core-root/tsconfig.json"
@@ -37,6 +55,12 @@
       "path": "../core-sdk/tsconfig.json"
     },
     {
+      "path": "../core-sdk/tsconfig.json"
+    },
+    {
+      "path": "../core-settings/tsconfig.json"
+    },
+    {
       "path": "../core-settings/tsconfig.json"
     },
     {
@@ -44,30 +68,6 @@
     },
     {
       "path": "../core-utils/tsconfig.json"
-    },
-    {
-      "path": "../core-browser/tsconfig.json"
-    },
-    {
-      "path": "../core-events/tsconfig.json"
-    },
-    {
-      "path": "../core-localization/tsconfig.json"
-    },
-    {
-      "path": "../core-plugin/tsconfig.json"
-    },
-    {
-      "path": "../core-product/tsconfig.json"
-    },
-    {
-      "path": "../core-root/tsconfig.json"
-    },
-    {
-      "path": "../core-sdk/tsconfig.json"
-    },
-    {
-      "path": "../core-settings/tsconfig.json"
     },
     {
       "path": "../tests-runner/tsconfig.json"

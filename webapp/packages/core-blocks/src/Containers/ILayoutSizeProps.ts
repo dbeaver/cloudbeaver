@@ -17,4 +17,5 @@ export interface ILayoutSizeProps {
   fill?: boolean;
   noGrow?: boolean;
   zeroBasis?: boolean;
+  groupGap?: boolean;
 }

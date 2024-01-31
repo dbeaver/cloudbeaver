@@ -6,35 +6,33 @@
  * you may not use this file except in compliance with the License.
  */
 import { injectable } from '@cloudbeaver/core-di';
-import { ProductManagerService } from '@cloudbeaver/core-product';
+import { ProductSettingsService } from '@cloudbeaver/core-product';
 import type { SettingsScopeType } from '@cloudbeaver/core-settings';
+import type { schema } from '@cloudbeaver/core-utils';
 
 import { PluginSettings } from './PluginSettings';
 
 @injectable()
 export class PluginManagerService {
-  store: Map<string, PluginSettings<any>>;
-  constructor(private readonly productManagerService: ProductManagerService) {
+  readonly store: Map<string, PluginSettings>;
+  constructor(private readonly productSettingsService: ProductSettingsService) {
     this.store = new Map();
   }
 
-  createSettings<T>(scope: string, scopeType: SettingsScopeType, defaults: T) {
+  createSettings<TSchema extends schema.SomeZodObject = schema.AnyZodObject>(scope: string, scopeType: SettingsScopeType, schema: TSchema) {
     const key = scopeType + '.' + scope;
-    const settings = new PluginSettings(this.productManagerService.settings, key, defaults);
+    const settings = new PluginSettings(this.productSettingsService, key, schema);
 
     this.store.set(key, settings);
     return settings;
   }
 
-  getSettings(scope: string, scopeType: SettingsScopeType): PluginSettings<any> | undefined {
+  getSettings(id: string): PluginSettings<any> | undefined;
+  getSettings(scope: string, scopeType: SettingsScopeType): PluginSettings<any> | undefined;
+  getSettings(scope: string, scopeType?: SettingsScopeType): PluginSettings<any> | undefined {
+    if (scopeType === undefined) {
+      return this.store.get(scope);
+    }
     return this.store.get(scopeType + '.' + scope);
-  }
-
-  /**
-   * Please use createSettings instead
-   * @deprecated Please use createSettings instead, will be removed in 23.0.0
-   */
-  getDeprecatedPluginSettings<T>(scope: string, defaults: T) {
-    return new PluginSettings(this.productManagerService.settings, scope, defaults);
   }
 }

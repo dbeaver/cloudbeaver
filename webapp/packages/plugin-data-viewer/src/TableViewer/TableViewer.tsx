@@ -21,6 +21,7 @@ import {
   useObservableRef,
   useS,
   useSplitUserState,
+  useTranslate,
 } from '@cloudbeaver/core-blocks';
 import type { IDataContext } from '@cloudbeaver/core-data-context';
 import { useService } from '@cloudbeaver/core-di';
@@ -66,6 +67,7 @@ export const TableViewer = observer<TableViewerProps, HTMLDivElement>(
     },
     ref,
   ) {
+    const translate = useTranslate();
     const styles = useS(style);
     const dataPresentationService = useService(DataPresentationService);
     const tableViewerStorageService = useService(TableViewerStorageService);
@@ -184,7 +186,7 @@ export const TableViewer = observer<TableViewerProps, HTMLDivElement>(
     const presentation = dataPresentationService.getSupported(DataPresentationType.main, dataFormat, presentationId, dataModel, resultIndex);
 
     if (!presentation) {
-      return <TextPlaceholder>There are no available presentation for data format: {dataFormat}</TextPlaceholder>;
+      return <TextPlaceholder>{translate('plugin_data_viewer_no_available_presentation')}</TextPlaceholder>;
     }
 
     const valuePresentation = valuePresentationId

@@ -1,4 +1,1 @@
-export default [
-  ['settings_panel', 'Настройки'],
-  ['settings_panel_empty_fields', 'Поля пустые'],
-];
+export default [['plugin_settings_panel_empty', 'Настройки недоступны']];

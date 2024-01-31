@@ -1,5 +1,4 @@
 // Services
-export * from './CoreSettingsService';
 export * from './AppScreen/AppScreenService';
 export * from './AppScreen/AppScreenBootstrap';
 

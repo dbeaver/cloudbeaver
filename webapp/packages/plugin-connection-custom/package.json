@@ -26,6 +26,7 @@
     "@cloudbeaver/core-plugin": "~0.1.0",
     "@cloudbeaver/core-projects": "~0.1.0",
     "@cloudbeaver/core-resource": "~0.1.0",
+    "@cloudbeaver/core-utils": "~0.1.0",
     "@cloudbeaver/core-view": "~0.1.0",
     "@cloudbeaver/plugin-connections": "~0.1.0",
     "mobx": "^6.12.0",

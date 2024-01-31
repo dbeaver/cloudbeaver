@@ -9,6 +9,7 @@ import type { ISettingsSource } from './ISettingsSource';
 
 export interface ISettingsResolverSource extends ISettingsSource {
   hasResolver: (resolver: ISettingsSource) => boolean;
-  addResolver: (resolver: ISettingsSource) => void;
+  addResolver: (...resolvers: ISettingsSource[]) => void;
   removeResolver: (resolver: ISettingsSource) => void;
+  clearResolvers: () => void;
 }

@@ -7,9 +7,6 @@
   },
   "references": [
     {
-      "path": "../core-app/tsconfig.json"
-    },
-    {
       "path": "../core-blocks/tsconfig.json"
     },
     {
@@ -49,6 +46,9 @@
       "path": "../core-theming/tsconfig.json"
     },
     {
+      "path": "../core-theming/tsconfig.json"
+    },
+    {
       "path": "../core-ui/tsconfig.json"
     },
     {
@@ -65,9 +65,6 @@
     },
     {
       "path": "../plugin-react-data-grid/tsconfig.json"
-    },
-    {
-      "path": "../core-theming/tsconfig.json"
     }
   ],
   "include": [

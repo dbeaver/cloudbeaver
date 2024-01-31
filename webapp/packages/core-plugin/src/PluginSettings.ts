@@ -5,44 +5,62 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { ISettingsSource, SettingsResolverSource } from '@cloudbeaver/core-settings';
+import type { ISettingsSource } from '@cloudbeaver/core-settings';
+import type { schema } from '@cloudbeaver/core-utils';
 
-export class PluginSettings<T> extends SettingsResolverSource implements ISettingsSource {
-  constructor(private readonly source: ISettingsSource, private readonly scope: string, private readonly defaults: T) {
-    super();
+export class PluginSettings<TSchema extends schema.SomeZodObject = schema.AnyZodObject> implements ISettingsSource {
+  constructor(private readonly source: ISettingsSource, readonly scope: string, readonly schema: TSchema) {}
+
+  isReadOnly<TKey extends keyof schema.infer<TSchema>>(key: TKey): boolean {
+    return this.source.has(key) || false;
   }
 
-  has<TKey extends keyof T>(key: TKey): boolean {
+  has<TKey extends keyof schema.infer<TSchema>>(key: TKey): boolean {
     return true;
   }
 
-  isValueDefault<TKey extends keyof T>(key: TKey): boolean {
-    return !super.has(key) && !this.source.has(this.scopedKey(key));
+  isValueDefault<TKey extends keyof schema.infer<TSchema>>(key: TKey): boolean {
+    return !this.source.has(this.scopedKey(key));
   }
 
-  getValue<TKey extends keyof T>(key: TKey): T[TKey] {
-    if (super.has(key)) {
-      return super.getValue(key);
+  getDefaultValue<TKey extends keyof schema.infer<TSchema>>(key: TKey): schema.infer<TSchema>[TKey] {
+    const value = this.source.getDefaultValue(this.scopedKey(key));
+    const schema = this.schema.shape[key as any];
+    const result = schema.safeParse(value);
+
+    if (result.success) {
+      return result.data;
     }
+
+    return schema.parse(undefined);
+  }
+
+  getValue<TKey extends keyof schema.infer<TSchema>>(key: TKey): schema.infer<TSchema>[TKey] {
+    let value = undefined;
 
     if (this.source.has(this.scopedKey(key))) {
-      return this.source.getValue(this.scopedKey(key));
+      value = this.source.getValue(this.scopedKey(key));
     }
 
-    return this.defaults[key];
+    const schema = this.schema.shape[key as any];
+    const result = schema.safeParse(value);
+
+    if (result.success) {
+      return result.data;
+    }
+
+    return schema.parse(undefined);
   }
 
-  setValue<TKey extends keyof T>(key: TKey, value: T[TKey]): void {
-    super.setValue(key, value);
-    this.source.setValue(this.scopedKey(key), value);
+  setValue<TKey extends keyof schema.infer<TSchema>>(key: TKey, value: schema.infer<TSchema>[TKey]): void {
+    throw new Error(`Can't set value for key ${String(this.scopedKey(key))}`);
+  }
+
+  clear(): void {
+    throw new Error("Can't clear settings");
   }
 
   private scopedKey(key: string | number | symbol): string {
     return `${this.scope}.${String(key)}`;
-  }
-
-  clear(): void {
-    super.clear();
-    this.source.clear();
   }
 }
