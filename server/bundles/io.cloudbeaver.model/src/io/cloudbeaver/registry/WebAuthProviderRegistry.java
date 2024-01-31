@@ -20,7 +20,9 @@ import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.Platform;
 import org.jkiss.dbeaver.Log;
+import org.jkiss.dbeaver.model.impl.PropertyDescriptor;
 import org.jkiss.dbeaver.registry.RegistryConstants;
+import org.jkiss.utils.ArrayUtils;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -33,6 +35,7 @@ public class WebAuthProviderRegistry {
 
     private static final String TAG_AUTH_PROVIDER = "authProvider"; //$NON-NLS-1$
     private static final String TAG_AUTH_PROVIDER_DISABLE = "authProviderDisable"; //$NON-NLS-1$
+    private static final String TAG_COMMON_PROVIDER_PROPERTIES = "commonProviderProperties"; //$NON-NLS-1$
 
     private static WebAuthProviderRegistry instance = null;
 
@@ -45,6 +48,7 @@ public class WebAuthProviderRegistry {
     }
 
     private final Map<String, WebAuthProviderDescriptor> authProviders = new LinkedHashMap<>();
+    private final List<WebCommonAuthProviderPropertyDescriptor> commonProperties = new ArrayList<>();
 
     private WebAuthProviderRegistry() {
     }
@@ -57,6 +61,9 @@ public class WebAuthProviderRegistry {
                 if (TAG_AUTH_PROVIDER.equals(ext.getName())) {
                     WebAuthProviderDescriptor providerDescriptor = new WebAuthProviderDescriptor(ext);
                     this.authProviders.put(providerDescriptor.getId(), providerDescriptor);
+                } else if (TAG_COMMON_PROVIDER_PROPERTIES.equals(ext.getName())) {
+                    var commonProperties = new WebCommonAuthProviderPropertyDescriptor(ext);
+                    this.commonProperties.add(commonProperties);
                 }
             }
 
@@ -72,6 +79,23 @@ public class WebAuthProviderRegistry {
                 }
             }
         }
+    }
+
+    static List<WebAuthProviderProperty> readProperties(IConfigurationElement root) {
+        List<WebAuthProviderProperty> properties = new ArrayList<>();
+        for (IConfigurationElement propGroup : ArrayUtils.safeArray(root.getChildren(PropertyDescriptor.TAG_PROPERTY_GROUP))) {
+            String category = propGroup.getAttribute(PropertyDescriptor.ATTR_LABEL);
+            IConfigurationElement[] propElements = propGroup.getChildren(PropertyDescriptor.TAG_PROPERTY);
+            for (IConfigurationElement prop : propElements) {
+                WebAuthProviderProperty propertyDescriptor = new WebAuthProviderProperty(category, prop);
+                properties.add(propertyDescriptor);
+            }
+        }
+        return properties;
+    }
+
+    public List<WebCommonAuthProviderPropertyDescriptor> getCommonProperties() {
+        return commonProperties;
     }
 
     public List<WebAuthProviderDescriptor> getAuthProviders() {
