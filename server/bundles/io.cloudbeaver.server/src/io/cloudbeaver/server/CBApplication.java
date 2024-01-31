@@ -895,11 +895,7 @@ public abstract class CBApplication extends BaseWebApplication implements WebAut
             }
         }
 
-        String sessionId = null;
-        if (credentialsProvider != null && credentialsProvider.getActiveUserCredentials() != null) {
-            sessionId = credentialsProvider.getActiveUserCredentials().getSmSessionId();
-        }
-        eventController.addEvent(new WSServerConfigurationChangedEvent(sessionId, null));
+        sendConfigChangedEvent(credentialsProvider);
         eventController.setForceSkipEvents(isConfigurationMode());
     }
 
@@ -1311,5 +1307,14 @@ public abstract class CBApplication extends BaseWebApplication implements WebAut
         Map<String, Object> mergedConfig = WebAppUtils.mergeConfigurations(this.productConfiguration, productConfiguration);
         writeRuntimeConfig(getRuntimeProductConfigFilePath().toFile(), mergedConfig);
         this.productConfiguration.putAll(mergedConfig);
+        sendConfigChangedEvent(credentialsProvider);
+    }
+
+    protected void sendConfigChangedEvent(SMCredentialsProvider credentialsProvider) {
+        String sessionId = null;
+        if (credentialsProvider != null && credentialsProvider.getActiveUserCredentials() != null) {
+            sessionId = credentialsProvider.getActiveUserCredentials().getSmSessionId();
+        }
+        eventController.addEvent(new WSServerConfigurationChangedEvent(sessionId, null));
     }
 }
