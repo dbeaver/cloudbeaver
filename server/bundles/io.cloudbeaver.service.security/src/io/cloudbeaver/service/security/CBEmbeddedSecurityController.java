@@ -19,7 +19,6 @@ package io.cloudbeaver.service.security;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
-import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.auth.*;
 import io.cloudbeaver.model.app.WebAppConfiguration;
 import io.cloudbeaver.model.app.WebAuthApplication;
@@ -229,16 +228,6 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
         addSubjectPermissionsUpdateEvent(userId, SMSubjectType.user);
     }
 
-    private boolean containsAllUsers(String[] array) {
-        for (String element : array) {
-            if (application.getAppConfiguration().getDefaultUserTeam().equals(element)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-
     public void setUserTeams(@NotNull Connection dbCon, String userId, String[] teamIds, String grantorId)
         throws SQLException {
         JDBCUtils.executeStatement(
@@ -262,7 +251,7 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
         }
     }
 
-    public void setDefaultUserTeam() throws DBCException {
+    public void addAllUsersToDefaultTeam() throws DBCException {
         if (application.isConfigurationMode()) {
             return;
         }
@@ -272,10 +261,11 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
                     database.normalizeTableNames("SELECT USER_ID \n" +
                             "FROM {table_prefix}CB_USER\n" +
                             "WHERE USER_ID NOT IN (\n" +
-                            "    SELECT USER_ID FROM {table_prefix}CB_USER_TEAM\n" +
+                            "    SELECT USER_ID FROM {table_prefix}CB_USER_TEAM CUT WHERE CUT.TEAM_ID = ? \n" +
                             ")")
             )
             ) {
+                dbStat.setString(1, application.getAppConfiguration().getDefaultUserTeam());
                 try (ResultSet dbResult = dbStat.executeQuery()) {
                     while (dbResult.next()) {
                         String userId = dbResult.getString(1);
@@ -293,7 +283,8 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
                     dbStat.setString(1, usersId);
                     dbStat.setString(2, application.getAppConfiguration().getDefaultUserTeam());
                     dbStat.setTimestamp(3,  new Timestamp(System.currentTimeMillis()));
-                    dbStat.setString(4,  usersId);
+                    dbStat.setString(4,  "Application");
+                    dbStat.executeQuery();
                 }
             }
         } catch (SQLException e) {
