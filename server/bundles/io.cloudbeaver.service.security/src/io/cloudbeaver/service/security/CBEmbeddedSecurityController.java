@@ -217,24 +217,11 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
         try (Connection dbCon = database.openConnection()) {
             try (JDBCTransaction txn = new JDBCTransaction(dbCon)) {
                 String defaultUserTeam = application.getAppConfiguration().getDefaultUserTeam();
-                if (!Arrays.asList(teamIds).contains(defaultUserTeam)) {
-                    String[] updatedTeamIds = Arrays.copyOf(teamIds, teamIds.length + 1);
-                    updatedTeamIds[teamIds.length] = defaultUserTeam;
-
-                    if (containsAllUsers(updatedTeamIds)) {
-                        setUserTeams(dbCon, userId, updatedTeamIds, grantorId);
-                        txn.commit();
-                    } else {
-                        throw new DBCException(application.getAppConfiguration().getDefaultUserTeam() + " role not editable");
-                    }
-                } else {
-                    if (containsAllUsers(teamIds)) {
-                        setUserTeams(dbCon, userId, teamIds, grantorId);
-                        txn.commit();
-                    } else {
-                        throw new DBCException(application.getAppConfiguration().getDefaultUserTeam() + " role not editable");
-                    }
+                if (CommonUtils.isNotEmpty(defaultUserTeam) && !ArrayUtils.contains(teamIds, defaultUserTeam)) {
+                    ArrayUtils.add(String.class, teamIds, defaultUserTeam);
                 }
+                setUserTeams(dbCon, userId, teamIds, grantorId);
+                txn.commit();
             }
         } catch (SQLException e) {
             throw new DBCException("Error saving user teams in database", e);
@@ -274,6 +261,17 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
             }
         }
     }
+
+//    public void setDefaultUserTeam() throws DBCException {
+//        try (Connection dbCon = database.openConnection()) {
+//            try (PreparedStatement dbStat = dbCon.prepareStatement(
+//                    database.normalizeTableNames("SELECT R.* FROM {table_prefix}CB_USER_TEAM UR, {table_prefix}CB_TEAM R " +
+//                            "WHERE UR.USER_ID=? AND UR.TEAM_ID=R.TEAM_ID"))
+//            )
+//        } catch (SQLException e) {
+//            throw new DBCException("Error while reading user teams", e);
+//        }
+//    }
 
 
     @NotNull

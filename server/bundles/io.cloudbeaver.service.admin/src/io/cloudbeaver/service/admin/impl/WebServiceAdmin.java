@@ -60,7 +60,6 @@ import java.util.stream.Collectors;
 public class WebServiceAdmin implements DBWServiceAdmin {
 
     private static final Log log = Log.getLog(WebServiceAdmin.class);
-    public static final String All_USERS_TEAM = "all_users";
 
     private final Map<String, WebPermissionDescriptor> permissionDescriptorByName = WebServiceRegistry.getInstance()
         .getWebServices()
