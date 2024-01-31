@@ -74,8 +74,6 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
     protected static final String CHAR_BOOL_TRUE = "Y";
     protected static final String CHAR_BOOL_FALSE = "N";
 
-    private static final String SUBJECT_USER = "U";
-    private static final String SUBJECT_TEAM = "R";
     private static final Type MAP_STRING_OBJECT_TYPE = new TypeToken<Map<String, Object>>() {
     }.getType();
     private static final Gson gson = new GsonBuilder().create();
@@ -147,7 +145,7 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
         boolean enabled,
         @Nullable String defaultAuthRole
     ) throws DBException, SQLException {
-        createAuthSubject(dbCon, userId, SUBJECT_USER);
+        createAuthSubject(dbCon, userId, SMSubjectType.user, true);
         try (PreparedStatement dbStat = dbCon.prepareStatement(
             database.normalizeTableNames("INSERT INTO {table_prefix}CB_USER" +
                 "(USER_ID,IS_ACTIVE,CREATE_TIME,DEFAULT_AUTH_ROLE) VALUES(?,?,?,?)"))
@@ -254,9 +252,10 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
     public SMTeam[] getUserTeams(String userId) throws DBException {
         Map<String, SMTeam> teams = new LinkedHashMap<>();
         try (Connection dbCon = database.openConnection()) {
-            try (PreparedStatement dbStat = dbCon.prepareStatement(
-                database.normalizeTableNames("SELECT R.* FROM {table_prefix}CB_USER_TEAM UR, {table_prefix}CB_TEAM R " +
-                    "WHERE UR.USER_ID=? AND UR.TEAM_ID=R.TEAM_ID"))
+            try (PreparedStatement dbStat = dbCon.prepareStatement(database.normalizeTableNames(
+                "SELECT R.*,S.IS_SECRET_STORAGE FROM {table_prefix}CB_USER_TEAM UR, {table_prefix}CB_TEAM R, " +
+                    "{table_prefix}CB_AUTH_SUBJECT S " +
+                    "WHERE UR.USER_ID=? AND UR.TEAM_ID=R.TEAM_ID AND S.SUBJECT_ID=R.TEAM_ID"))
             ) {
                 dbStat.setString(1, userId);
                 try (ResultSet dbResult = dbStat.executeQuery()) {
@@ -300,15 +299,15 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
         try (Connection dbCon = database.openConnection()) {
             SMUser user;
             try (PreparedStatement dbStat = dbCon.prepareStatement(
-                database.normalizeTableNames("SELECT USER_ID,IS_ACTIVE,DEFAULT_AUTH_ROLE FROM {table_prefix}CB_USER WHERE USER_ID=?")
+                database.normalizeTableNames(
+                    "SELECT U.USER_ID,U.IS_ACTIVE,U.DEFAULT_AUTH_ROLE,S.IS_SECRET_STORAGE FROM " +
+                        "{table_prefix}CB_USER U, {table_prefix}CB_AUTH_SUBJECT S " +
+                        "WHERE U.USER_ID=? AND U.USER_ID=S.SUBJECT_ID")
             )) {
                 dbStat.setString(1, userId);
                 try (ResultSet dbResult = dbStat.executeQuery()) {
                     if (dbResult.next()) {
-                        String userName = dbResult.getString(1);
-                        String active = dbResult.getString(2);
-                        String authRole = dbResult.getString(3);
-                        user = new SMUser(userName, CHAR_BOOL_TRUE.equals(active), authRole);
+                        user = fetchUser(dbResult);
                     } else {
                         return null;
                     }
@@ -909,7 +908,9 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
             Map<String, SMTeam> teams = new LinkedHashMap<>();
             try (Statement dbStat = dbCon.createStatement()) {
                 try (ResultSet dbResult = dbStat.executeQuery(
-                    database.normalizeTableNames("SELECT * FROM {table_prefix}CB_TEAM ORDER BY TEAM_ID"))) {
+                    database.normalizeTableNames("SELECT T.*,S.IS_SECRET_STORAGE FROM {table_prefix}CB_TEAM T," +
+                        "{table_prefix}CB_AUTH_SUBJECT S " +
+                        "WHERE T.TEAM_ID=S.SUBJECT_ID ORDER BY TEAM_ID"))) {
                     while (dbResult.next()) {
                         SMTeam team = fetchTeam(dbResult);
                         teams.put(team.getTeamId(), team);
@@ -966,7 +967,18 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
         return new SMTeam(
             dbResult.getString("TEAM_ID"),
             dbResult.getString("TEAM_NAME"),
-            dbResult.getString("TEAM_DESCRIPTION")
+            dbResult.getString("TEAM_DESCRIPTION"),
+            stringToBoolean(dbResult.getString("IS_SECRET_STORAGE"))
+        );
+    }
+
+    @NotNull
+    private SMUser fetchUser(ResultSet dbResult) throws SQLException {
+        return new SMUser(
+            dbResult.getString("USER_ID"),
+            stringToBoolean(dbResult.getString("IS_ACTIVE")),
+            dbResult.getString("DEFAULT_AUTH_ROLE"),
+            stringToBoolean(dbResult.getString("IS_SECRET_STORAGE"))
         );
     }
 
@@ -980,7 +992,7 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
         }
         try (Connection dbCon = database.openConnection()) {
             try (JDBCTransaction txn = new JDBCTransaction(dbCon)) {
-                createAuthSubject(dbCon, teamId, SUBJECT_TEAM);
+                createAuthSubject(dbCon, teamId, SMSubjectType.team, true);
                 try (PreparedStatement dbStat = dbCon.prepareStatement(
                     database.normalizeTableNames("INSERT INTO {table_prefix}CB_TEAM" +
                         "(TEAM_ID,TEAM_NAME,TEAM_DESCRIPTION,CREATE_TIME) VALUES(?,?,?,?)"))) {
@@ -2794,13 +2806,29 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
         }
     }
 
-    private void createAuthSubject(Connection dbCon, String subjectId, String subjectType) throws SQLException {
+    private void createAuthSubject(
+        Connection dbCon,
+        String subjectId,
+        SMSubjectType subjectType,
+        boolean secretStorage
+    ) throws SQLException {
         try (PreparedStatement dbStat = dbCon.prepareStatement(
-            database.normalizeTableNames("INSERT INTO {table_prefix}CB_AUTH_SUBJECT(SUBJECT_ID,SUBJECT_TYPE) VALUES(?,?)"))) {
+            database.normalizeTableNames(
+                "INSERT INTO {table_prefix}CB_AUTH_SUBJECT(SUBJECT_ID,SUBJECT_TYPE,IS_SECRET_STORAGE) " +
+                    "VALUES (?,?,?)"))) {
             dbStat.setString(1, subjectId);
-            dbStat.setString(2, subjectType);
+            dbStat.setString(2, subjectType.getCode());
+            dbStat.setString(3, booleanToString(secretStorage));
             dbStat.execute();
         }
+    }
+
+    public static String booleanToString(boolean value) {
+        return value ? CHAR_BOOL_TRUE : CHAR_BOOL_FALSE;
+    }
+
+    public static boolean stringToBoolean(@Nullable String value) {
+        return CHAR_BOOL_TRUE.equals(value);
     }
 
     private void deleteAuthSubject(Connection dbCon, String subjectId) throws SQLException {
