@@ -37,7 +37,7 @@ public class WebSQLDatabaseDocument {
     @Nullable
     private DBDDocument document;
 
-    WebSQLDatabaseDocument(@NotNull WebSession webSession, @Nullable DBDDocument document) {
+    public WebSQLDatabaseDocument(@NotNull WebSession webSession, @Nullable DBDDocument document) {
         this.webSession = webSession;
         this.document = document;
     }

@@ -38,7 +38,7 @@ public class WebSQLResultsRow {
     public WebSQLResultsRow(Map<String, Object> map) {
         data = JSONUtils.getObjectList(map, "data").toArray();
         updateValues = JSONUtils.getObject(map, "updateValues");
-        metaData = JSONUtils.getObjectOrNull(map, "metaData");
+        metaData = JSONUtils.getObjectList(map, "metaData").get(0);
     }
 
     public Object[] getData() {
