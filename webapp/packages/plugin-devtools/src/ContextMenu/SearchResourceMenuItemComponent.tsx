@@ -35,6 +35,7 @@ export const SearchResourceMenuItemComponent: ICustomMenuItemComponent<IContextM
   return styled(useStyles(style, styles))(
     <search-box dir="ltr" className={className}>
       <input
+        type="search"
         name="search"
         placeholder="Search for resource..."
         value={value}
