@@ -1,4 +1,4 @@
 {
-  "projects": ["../dbeaver", "../cloudbeaver/server"],
+  "projects": ["../dbeaver-common", "../dbeaver", "../cloudbeaver/server"],
   "targetPlatform": "./org.jkiss.cloudbeaver.tp.target"
 }
