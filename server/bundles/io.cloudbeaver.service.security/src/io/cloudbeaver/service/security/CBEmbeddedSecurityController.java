@@ -255,7 +255,10 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
         if (application.isConfigurationMode()) {
             return;
         }
-        String[] usersIds = new String[0];
+        if (application.getAppConfiguration().getDefaultUserTeam().isEmpty()) {
+            return;
+        }
+        List<String> usersIds = new ArrayList<>();
         try (Connection dbCon = database.openConnection()) {
             try (PreparedStatement dbStat = dbCon.prepareStatement(
                     database.normalizeTableNames("SELECT USER_ID \n" +
@@ -269,11 +272,11 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
                 try (ResultSet dbResult = dbStat.executeQuery()) {
                     while (dbResult.next()) {
                         String userId = dbResult.getString(1);
-                        usersIds = ArrayUtils.add(String.class, usersIds, userId);
+                        usersIds.add(userId);
                     }
                 }
             }
-            if (ArrayUtils.isEmpty(usersIds)){
+            if (usersIds.isEmpty()){
                 return;
             }
             for (String usersId : usersIds) {
@@ -283,12 +286,12 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
                     dbStat.setString(1, usersId);
                     dbStat.setString(2, application.getAppConfiguration().getDefaultUserTeam());
                     dbStat.setTimestamp(3,  new Timestamp(System.currentTimeMillis()));
-                    dbStat.setString(4,  "Application");
+                    dbStat.setString(4,  "CloudBeaver Application");
                     dbStat.executeQuery();
                 }
             }
         } catch (SQLException e) {
-            throw new DBCException("Error while reading user teams", e);
+            throw new DBCException("Error while set default user teams", e);
         }
     }
 
