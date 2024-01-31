@@ -15,7 +15,7 @@
 
 .button {
   composes: theme-button theme-button_unelevated theme-button_background theme-elevation-z3 from global;
-  opacity: 0;
+  opacity: 1;
   transition-property: opacity, box-shadow !important;
   transition: opacity 0.3s ease-in-out;
 }
@@ -24,8 +24,12 @@
   composes: theme-button_ripple from global;
 }
 
-.container:hover .button {
+.container:hover .resizeButton {
   opacity: 1;
+}
+
+.resizeButton {
+  opacity: 0;
 }
 
 .container[data-s-split='vertical'] {

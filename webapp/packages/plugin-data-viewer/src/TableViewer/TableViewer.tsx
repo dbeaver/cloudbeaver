@@ -227,6 +227,7 @@ export const TableViewer = observer<TableViewerProps, HTMLDivElement>(
               mode={valuePanelDisplayed ? splitState.mode : 'minimize'}
               disable={!valuePanelDisplayed}
               keepRatio
+              disableAutoMargin
             >
               <Pane className={s(styles, { pane: true })}>
                 <div className={s(styles, { paneContent: true, grid: true })}>
