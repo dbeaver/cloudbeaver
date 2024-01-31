@@ -138,7 +138,7 @@ export const SSH: TabContainerPanelComponent<Props> = observer(function SSH({ st
               state={handlerState}
               disabled={disabled || !enabled}
               readOnly={readonly}
-              required={!keyAuth && handlerState.savePassword}
+              required={!passwordSaved && !keyAuth && handlerState.savePassword}
               description={passwordSaved ? translate('ui_processing_saved') : undefined}
               tiny
               fill
