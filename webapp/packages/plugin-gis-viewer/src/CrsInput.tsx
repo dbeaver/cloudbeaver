@@ -1,40 +1,26 @@
-import styled, { css } from 'reshadow';
-
+/*
+ * CloudBeaver - Cloud Database Manager
+ * Copyright (C) 2020-2024 DBeaver Corp and others
+ *
+ * Licensed under the Apache License, Version 2.0.
+ * you may not use this file except in compliance with the License.
+ */
 import { Combobox } from '@cloudbeaver/core-blocks';
 
+import classes from './CrsInput.m.css';
 import type { CrsKey } from './LeafletMap';
-
-const styles = css`
-  root {
-    display: inline-flex;
-    align-items: center;
-    font-size: 12px;
-  }
-
-  label {
-    margin-right: 4px;
-    flex-grow: 0;
-    flex-shrink: 1;
-  }
-
-  Combobox {
-    width: 120px;
-    flex: 0 0 auto;
-  }
-`;
 
 interface Props {
   value: CrsKey;
   onChange: (value: CrsKey) => void;
 }
 
-const items: CrsKey[] = ['Simple', 'EPSG3395', 'EPSG3857', 'EPSG4326', 'EPSG900913'];
+const items: CrsKey[] = ['Simple', 'EPSG:3395', 'EPSG:3857', 'EPSG:4326', 'EPSG:900913'];
 
 export function CrsInput(props: Props) {
-  return styled(styles)(
-    <root>
-      <label>CRS:</label>
-      <Combobox items={items} value={props.value} onSelect={props.onChange} />
-    </root>,
+  return (
+    <div className={classes.root}>
+      <Combobox className={classes.combobox} items={items} value={props.value} onSelect={props.onChange} />
+    </div>
   );
 }
