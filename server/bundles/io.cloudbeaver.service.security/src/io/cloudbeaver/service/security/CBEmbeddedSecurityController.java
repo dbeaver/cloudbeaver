@@ -218,7 +218,7 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
             try (JDBCTransaction txn = new JDBCTransaction(dbCon)) {
                 String defaultUserTeam = application.getAppConfiguration().getDefaultUserTeam();
                 if (CommonUtils.isNotEmpty(defaultUserTeam) && !ArrayUtils.contains(teamIds, defaultUserTeam)) {
-                    ArrayUtils.add(String.class, teamIds, defaultUserTeam);
+                    teamIds = ArrayUtils.add(String.class, teamIds, defaultUserTeam);
                 }
                 setUserTeams(dbCon, userId, teamIds, grantorId);
                 txn.commit();
@@ -262,17 +262,44 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
         }
     }
 
-//    public void setDefaultUserTeam() throws DBCException {
-//        try (Connection dbCon = database.openConnection()) {
-//            try (PreparedStatement dbStat = dbCon.prepareStatement(
-//                    database.normalizeTableNames("SELECT R.* FROM {table_prefix}CB_USER_TEAM UR, {table_prefix}CB_TEAM R " +
-//                            "WHERE UR.USER_ID=? AND UR.TEAM_ID=R.TEAM_ID"))
-//            )
-//        } catch (SQLException e) {
-//            throw new DBCException("Error while reading user teams", e);
-//        }
-//    }
-
+    public void setDefaultUserTeam() throws DBCException {
+        if (application.isConfigurationMode()) {
+            return;
+        }
+        String[] usersIds = new String[0];
+        try (Connection dbCon = database.openConnection()) {
+            try (PreparedStatement dbStat = dbCon.prepareStatement(
+                    database.normalizeTableNames("SELECT USER_ID \n" +
+                            "FROM {table_prefix}CB_USER\n" +
+                            "WHERE USER_ID NOT IN (\n" +
+                            "    SELECT USER_ID FROM {table_prefix}CB_USER_TEAM\n" +
+                            ")")
+            )
+            ) {
+                try (ResultSet dbResult = dbStat.executeQuery()) {
+                    while (dbResult.next()) {
+                        String userId = dbResult.getString(1);
+                        usersIds = ArrayUtils.add(String.class, usersIds, userId);
+                    }
+                }
+            }
+            if (ArrayUtils.isEmpty(usersIds)){
+                return;
+            }
+            for (String usersId : usersIds) {
+                try (PreparedStatement dbStat = dbCon.prepareStatement(
+                        database.normalizeTableNames("INSERT INTO {table_prefix}CB_USER_TEAM(USER_ID, TEAM_ID, GRANT_TIME, GRANTED_BY)" +
+                                " VALUES(?,?,?,?)"))) {
+                    dbStat.setString(1, usersId);
+                    dbStat.setString(2, application.getAppConfiguration().getDefaultUserTeam());
+                    dbStat.setTimestamp(3,  new Timestamp(System.currentTimeMillis()));
+                    dbStat.setString(4,  usersId);
+                }
+            }
+        } catch (SQLException e) {
+            throw new DBCException("Error while reading user teams", e);
+        }
+    }
 
     @NotNull
     @Override
@@ -1061,9 +1088,6 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
         String defaultUsersTeam = application.getAppConfiguration().getDefaultUserTeam();
         if (CommonUtils.isNotEmpty(defaultUsersTeam) && defaultUsersTeam.equals(teamId)) {
             throw new DBCException("Default users team cannot be deleted");
-        }
-        if (teamId.equals(defaultUsersTeam)) {
-            throw new DBCException("You can not delete all_users team");
         }
         try (Connection dbCon = database.openConnection()) {
             if (!force) {
@@ -2230,8 +2254,7 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
             }
             Object reverseProxyUserTeams = sessionParameters.get(SMConstants.SESSION_PARAM_TRUSTED_USER_TEAMS);
             if (reverseProxyUserTeams instanceof List) {
-                List<String> reverseProxyUserTeamsList = (List<String>) reverseProxyUserTeams;
-                setUserTeams(userId, reverseProxyUserTeamsList.toArray(new String[0]), userId);
+                setUserTeams(userId, ((List<?>) reverseProxyUserTeams).stream().map(Object::toString).toArray(String[]::new), userId);
             }
         }
         return userId;
