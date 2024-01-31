@@ -82,7 +82,7 @@ export const ProcessorConfigureDialog = observer<Props>(function ProcessorConfig
   }
 
   return styled(useStyles(UNDERLINE_TAB_STYLES))(
-    <CommonDialogWrapper size="large" fixedSize>
+    <CommonDialogWrapper className={s(styles, { container: true })} size="large" fixedSize>
       <CommonDialogHeader title={title} onReject={onClose} />
       <CommonDialogBody noOverflow noBodyPadding>
         {!processor.isBinary ? (
