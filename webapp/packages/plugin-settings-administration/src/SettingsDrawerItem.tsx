@@ -22,7 +22,7 @@ export const SettingsDrawerItem: React.FC<AdministrationItemDrawerProps> = funct
     <Tab tabId={item.name} disabled={disabled} onOpen={() => onSelect(item.name)}>
       <TabIcon icon="/icons/cog-outline.svg" />
       <TabTitle>
-        <Translate token={'Settings'} />
+        <Translate token={'plugin_settings_administration_drawer_item_title'} />
       </TabTitle>
     </Tab>,
   );
