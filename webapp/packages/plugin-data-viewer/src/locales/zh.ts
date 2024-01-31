@@ -51,11 +51,12 @@ export default [
   ['data_viewer_total_count_tooltip', 'Get total count'],
   ['settings_data_editor', 'Data Editor'],
   ['settings_data_editor_disable_edit_name', 'Disable Edit'],
-  ['settings_data_editor_disable_edit_description', 'Disable Edit'],
+  ['settings_data_editor_disable_edit_description', 'Disable editing of data in Data Viewer'],
   ['settings_data_editor_fetch_min_name', 'Minimum fetch size'],
   ['settings_data_editor_fetch_min_description', 'Minimum number of rows to fetch'],
   ['settings_data_editor_fetch_max_name', 'Maximum fetch size'],
   ['settings_data_editor_fetch_max_description', 'Maximum number of rows to fetch'],
   ['settings_data_editor_fetch_default_name', 'Default fetch size'],
   ['settings_data_editor_fetch_default_description', 'Default number of rows to fetch'],
+  ['plugin_data_viewer_no_available_presentation', 'No available presentation'],
 ];

@@ -46,9 +46,17 @@ export const Setting = observer<Props>(function Setting({ source, setting }) {
 
   if (setting.type === ESettingsValueType.Checkbox) {
     return (
-      <FieldCheckbox id={key} checked={value} title={description} disabled={disabled} readOnly={readOnly} groupGap onChange={handleChange}>
-        {name}
-      </FieldCheckbox>
+      <FieldCheckbox
+        id={key}
+        checked={value}
+        label={name}
+        title={name}
+        caption={description}
+        disabled={disabled}
+        readOnly={readOnly}
+        groupGap
+        onChange={handleChange}
+      />
     );
   }
 

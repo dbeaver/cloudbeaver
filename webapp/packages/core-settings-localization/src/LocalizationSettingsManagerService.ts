@@ -30,7 +30,8 @@ export class LocalizationSettingsManagerService extends Bootstrap {
       {
         group: INTERFACE_SETTINGS_GROUP,
         key: 'defaultLanguage',
-        name: 'Default language',
+        name: 'core_settings_localization_settings_default_locale_label',
+        description: 'core_settings_localization_settings_default_locale_description',
         type: ESettingsValueType.Select,
         options: this.localizationService.supportedLanguages.map(language => ({
           id: language.isoCode,

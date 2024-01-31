@@ -72,9 +72,6 @@ export function useCustomInputValidation<T = void>(validation: (value: T) => str
 
     function handleBlur(event: Event) {
       const target = event.target as HTMLInputElement;
-      if (target.value === '') {
-        return;
-      }
       if (target.validity.valid === true) {
         validate(target);
       }

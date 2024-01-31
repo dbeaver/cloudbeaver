@@ -34,7 +34,8 @@ export class ToolsPanelSettingsService extends Dependency {
         group: TOOLS_PANEL_SETTINGS_GROUP,
         key: 'disabled',
         type: ESettingsValueType.Checkbox,
-        name: 'Disable Tools',
+        name: 'plugin_tools_panel_settings_disable_label',
+        description: 'plugin_tools_panel_settings_disable_description',
       },
     ]);
   }

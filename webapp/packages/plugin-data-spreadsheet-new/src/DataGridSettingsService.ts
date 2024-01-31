@@ -49,7 +49,7 @@ export class DataGridSettingsService extends Dependency {
         group: DATA_EDITOR_SETTINGS_GROUP,
         key: 'hidden',
         type: ESettingsValueType.Checkbox,
-        name: 'Disable data grid presentation',
+        name: 'plugin_data_spreadsheet_new_settings_disable',
       },
     ]);
   }

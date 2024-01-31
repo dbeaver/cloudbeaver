@@ -7,6 +7,7 @@
  */
 import type { PluginManifest } from '@cloudbeaver/core-di';
 
+import { LocaleService } from './LocaleService';
 import { LocalizationSettingsManagerService } from './LocalizationSettingsManagerService';
 import { SettingsLocalizationService } from './SettingsLocalizationService';
 
@@ -15,5 +16,5 @@ export const coreSettingsLocalizationManifest: PluginManifest = {
     name: 'Core Settings Localization',
   },
 
-  providers: [SettingsLocalizationService, LocalizationSettingsManagerService],
+  providers: [SettingsLocalizationService, LocalizationSettingsManagerService, LocaleService],
 };
