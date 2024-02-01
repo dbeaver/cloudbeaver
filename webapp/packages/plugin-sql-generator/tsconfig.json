@@ -34,6 +34,9 @@
       "path": "../core-sdk/tsconfig.json"
     },
     {
+      "path": "../core-utils/tsconfig.json"
+    },
+    {
       "path": "../core-view/tsconfig.json"
     },
     {
@@ -43,13 +46,10 @@
       "path": "../plugin-data-viewer/tsconfig.json"
     },
     {
-      "path": "../plugin-sql-editor/tsconfig.json"
-    },
-    {
       "path": "../plugin-sql-editor-new/tsconfig.json"
     },
     {
-      "path": "../core-utils/tsconfig.json"
+      "path": "../plugin-sql-editor/tsconfig.json"
     }
   ],
   "include": [

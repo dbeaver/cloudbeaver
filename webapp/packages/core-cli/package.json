@@ -41,7 +41,6 @@
     "css-loader": "~6.8.1",
     "declaration-bundler-webpack-plugin": "~1.0.3",
     "extra-watch-webpack-plugin": "~1.0.3",
-    "fork-ts-checker-webpack-plugin": "~8.0.0",
     "html-loader": "~4.2.0",
     "html-replace-webpack-plugin": "~2.6.0",
     "html-webpack-plugin": "~5.5.3",

@@ -71,9 +71,7 @@ export function useTools(state: ISqlEditorTabState): Readonly<State> {
       },
 
       checkFileValidity(file: File) {
-        const maxSize = this.sqlEditorSettingsService.settings.isValueDefault('maxFileSize')
-          ? this.sqlEditorSettingsService.deprecatedSettings.getValue('maxFileSize')
-          : this.sqlEditorSettingsService.settings.getValue('maxFileSize');
+        const maxSize = this.sqlEditorSettingsService.settings.getValue('maxFileSize');
 
         const size = Math.round(file.size / 1024); // kilobyte
         const aboveMaxSize = size > maxSize;

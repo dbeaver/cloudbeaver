@@ -19,7 +19,7 @@ export const ServerConfigurationDrawerItem: React.FC<AdministrationItemDrawerPro
 }) {
   return styled(useStyles(style))(
     <Tab tabId={item.name} disabled={disabled} onOpen={() => onSelect(item.name)}>
-      <TabIcon icon="/icons/cog-outline.svg" />
+      <TabIcon icon="/icons/server-configuration.svg" />
       <TabTitle>
         <Translate token="administration_configuration_wizard_configuration" />
       </TabTitle>

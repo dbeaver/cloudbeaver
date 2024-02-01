@@ -44,21 +44,14 @@ beforeAll(() => app.init());
 const testValueA = 'light';
 const testValueB = 'dark';
 
-const equalConfigA = {
+const deprecatedSettings = {
   'core.user': {
     defaultTheme: testValueA,
   } as IThemeSettings,
-  core: {
-    theming: {
-      defaultTheme: testValueA,
-    } as IThemeSettings,
-  },
 };
 
-const equalConfigB = {
-  'core.user': {
-    defaultTheme: testValueB,
-  } as IThemeSettings,
+const newSettings = {
+  ...deprecatedSettings,
   core: {
     theming: {
       defaultTheme: testValueB,
@@ -66,26 +59,24 @@ const equalConfigB = {
   },
 };
 
-test('New settings equal deprecated settings "light"', async () => {
+test('New Settings override deprecated settings', async () => {
   const settings = app.injector.getServiceByClass(ThemeSettingsService);
   const config = app.injector.getServiceByClass(ServerConfigResource);
 
-  server.use(endpoint.query('serverConfig', mockServerConfig(equalConfigA)));
-
-  await config.refresh();
-
-  expect(settings.settings.getValue('defaultTheme')).toBe(testValueA);
-  expect(settings.deprecatedSettings.getValue('defaultTheme')).toBe(testValueA);
-});
-
-test('New settings equal deprecated settings "dark"', async () => {
-  const settings = app.injector.getServiceByClass(ThemeSettingsService);
-  const config = app.injector.getServiceByClass(ServerConfigResource);
-
-  server.use(endpoint.query('serverConfig', mockServerConfig(equalConfigB)));
+  server.use(endpoint.query('serverConfig', mockServerConfig(newSettings)));
 
   await config.refresh();
 
   expect(settings.settings.getValue('defaultTheme')).toBe(testValueB);
-  expect(settings.deprecatedSettings.getValue('defaultTheme')).toBe(testValueB);
+});
+
+test('Deprecated settings are used if new settings are not defined', async () => {
+  const settings = app.injector.getServiceByClass(ThemeSettingsService);
+  const config = app.injector.getServiceByClass(ServerConfigResource);
+
+  server.use(endpoint.query('serverConfig', mockServerConfig(deprecatedSettings)));
+
+  await config.refresh();
+
+  expect(settings.settings.getValue('defaultTheme')).toBe(testValueA);
 });

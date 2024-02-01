@@ -14,6 +14,7 @@ import { useSplit } from './useSplit';
 export const SplitControls: React.FC = function SplitControls() {
   const split = useSplit();
   const styles = useS(SplitControlsStyles);
+  const isResizeMode = split.state.mode === 'resize';
 
   const inverse = split.state.isMainSecond();
 
@@ -64,12 +65,16 @@ export const SplitControls: React.FC = function SplitControls() {
       onDoubleClick={split.state.onDoubleClick}
     >
       {split.state.mode !== 'minimize' && (
-        <button className={s(styles, { button: true, primary: !inverse })} type="button" onClick={handlers.handleCollapse}>
+        <button
+          className={s(styles, { button: true, primary: !inverse, resizeButton: isResizeMode })}
+          type="button"
+          onClick={handlers.handleCollapse}
+        >
           <div className={s(styles, { ripple: true })} />
         </button>
       )}
       {split.state.mode !== 'maximize' && (
-        <button className={s(styles, { button: true, primary: inverse })} type="button" onClick={handlers.handleExpand}>
+        <button className={s(styles, { button: true, primary: inverse, resizeButton: isResizeMode })} type="button" onClick={handlers.handleExpand}>
           <div className={s(styles, { ripple: true })} />
         </button>
       )}

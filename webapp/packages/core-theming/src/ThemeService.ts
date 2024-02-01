@@ -20,8 +20,8 @@ import './styles/main/elevation.pure.scss';
 import './styles/main/fonts.pure.css';
 import './styles/main/normalize.pure.css';
 import './styles/main/typography.pure.scss';
-import { themes } from './themes';
-import { defaultThemeSettings, ThemeSettingsService } from './ThemeSettingsService';
+import { DEFAULT_THEME_ID, themes } from './themes';
+import { ThemeSettingsService } from './ThemeSettingsService';
 import type { ClassCollection } from './themeUtils';
 
 const COMMON_STYLES: any[] = [];
@@ -50,10 +50,6 @@ export class ThemeService extends Bootstrap {
   }
 
   get defaultThemeId(): string {
-    if (this.themeSettingsService.settings.isValueDefault('defaultTheme')) {
-      return this.themeSettingsService.deprecatedSettings.getValue('defaultTheme');
-    }
-
     return this.themeSettingsService.settings.getValue('defaultTheme');
   }
 
@@ -65,7 +61,7 @@ export class ThemeService extends Bootstrap {
     let theme = this.themeMap.get(this.currentThemeId);
 
     if (!theme) {
-      theme = this.themeMap.get(defaultThemeSettings.defaultTheme)!;
+      theme = this.themeMap.get(DEFAULT_THEME_ID)!;
     }
 
     return theme;
@@ -136,7 +132,9 @@ export class ThemeService extends Bootstrap {
   async load(): Promise<void> {
     await this.serverConfigResource.load();
     this.setCurrentThemeId(this.defaultThemeId); // set default app theme
-    this.settingsService.registerSettings(THEME_SETTINGS_KEY, this.settings, getDefaultThemeSettings, () => this.setTheme(this.currentThemeId)); // load user state theme
+    this.settingsService.registerSettings(THEME_SETTINGS_KEY, this.settings, getDefaultThemeSettings, undefined, () =>
+      this.setTheme(this.currentThemeId),
+    ); // load user state theme
     await this.setTheme(this.currentThemeId);
   }
 
@@ -166,8 +164,8 @@ export class ThemeService extends Bootstrap {
     try {
       await this.loadThemeStylesAsync(themeId);
     } catch (e: any) {
-      if (themeId !== defaultThemeSettings.defaultTheme) {
-        return this.tryChangeTheme(defaultThemeSettings.defaultTheme); // try to fallback to default theme
+      if (themeId !== DEFAULT_THEME_ID) {
+        return this.tryChangeTheme(DEFAULT_THEME_ID); // try to fallback to default theme
       }
       throw e;
     }
@@ -199,6 +197,6 @@ export class ThemeService extends Bootstrap {
 
 function getDefaultThemeSettings(): ISettings {
   return {
-    currentThemeId: defaultThemeSettings.defaultTheme,
+    currentThemeId: DEFAULT_THEME_ID,
   };
 }

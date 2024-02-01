@@ -11,8 +11,15 @@ export interface INodeComponentBaseProps {
   offsetHeight: number;
 }
 
+export interface INodeControlBaseProps extends React.RefAttributes<HTMLDivElement> {
+  nodeId: string;
+}
+
+export type NodeControlComponent = React.FC<INodeControlBaseProps>;
+
 export interface INodeComponentProps extends INodeComponentBaseProps {
   childrenRenderer: React.FC<INodeComponentBaseProps>;
+  controlRenderer?: NodeControlComponent;
 }
 
 export type NodeComponent = React.FC<INodeComponentProps>;

@@ -5,4 +5,5 @@ export default [
   ['core_blocks_properties_table_item_reset', 'Reset to default'],
   ['core_blocks_object_property_info_form_empty_placeholder', 'Properties empty'],
   ['core_blocks_properties_table_item_remove', 'Remove property'],
+  ['core_blocks_custom_input_validation_error', 'Field value is not valid'],
 ];

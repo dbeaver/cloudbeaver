@@ -37,10 +37,10 @@
       "path": "../core-projects/tsconfig.json"
     },
     {
-      "path": "../core-resource/tsconfig.json"
+      "path": "../core-resource-manager/tsconfig.json"
     },
     {
-      "path": "../core-resource-manager/tsconfig.json"
+      "path": "../core-resource/tsconfig.json"
     },
     {
       "path": "../core-root/tsconfig.json"
@@ -61,16 +61,16 @@
       "path": "../plugin-navigation-tree-rm/tsconfig.json"
     },
     {
-      "path": "../plugin-resource-manager/tsconfig.json"
-    },
-    {
       "path": "../plugin-resource-manager-scripts/tsconfig.json"
     },
     {
-      "path": "../plugin-sql-editor/tsconfig.json"
+      "path": "../plugin-resource-manager/tsconfig.json"
     },
     {
       "path": "../plugin-sql-editor-navigation-tab/tsconfig.json"
+    },
+    {
+      "path": "../plugin-sql-editor/tsconfig.json"
     }
   ],
   "include": [

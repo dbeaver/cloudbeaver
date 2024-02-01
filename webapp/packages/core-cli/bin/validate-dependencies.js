@@ -92,24 +92,28 @@ const newAllDependencies = [...newDependencies, ...devDependencies].sort(sortDep
 
 logUnmetAndExtraDependencies('dependencies', newDependencies, currentPackage.dependencies, newAllDependencies);
 
-currentPackage.dependencies = newDependencies.reduce(
-  (acc, dep) => ({
-    ...acc,
-    [dep]: getVersion(dep, acc?.[dep]),
-  }),
-  currentPackage.dependencies,
+currentPackage.dependencies = sortObjectKeys(
+  newDependencies.reduce(
+    (acc, dep) => ({
+      ...acc,
+      [dep]: getVersion(dep, acc?.[dep]),
+    }),
+    currentPackage.dependencies,
+  ),
 );
 
 const newDevDependencies = [...devDependencies].sort(sortDependencies);
 
 logUnmetAndExtraDependencies('dev dependencies', newDevDependencies, currentPackage.devDependencies, newAllDependencies);
 
-currentPackage.devDependencies = [...devDependencies].sort(sortDependencies).reduce(
-  (acc, dep) => ({
-    ...acc,
-    [dep]: getVersion(dep, acc?.[dep]),
-  }),
-  currentPackage.devDependencies,
+currentPackage.devDependencies = sortObjectKeys(
+  [...devDependencies].sort(sortDependencies).reduce(
+    (acc, dep) => ({
+      ...acc,
+      [dep]: getVersion(dep, acc?.[dep]),
+    }),
+    currentPackage.devDependencies,
+  ),
 );
 
 if (isSuccess) {
@@ -177,4 +181,13 @@ function logUnmetAndExtraDependencies(key, newDependencies, current, allDependen
     console.warn('\x1b[31m%s\x1b[0m', `Extra ${key} found:`, extraDependencies);
     isSuccess = false;
   }
+}
+
+function sortObjectKeys(object) {
+  return Object.keys(object)
+    .sort()
+    .reduce((obj, key) => {
+      obj[key] = object[key];
+      return obj;
+    }, {});
 }

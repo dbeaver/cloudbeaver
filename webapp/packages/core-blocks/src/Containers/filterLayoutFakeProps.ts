@@ -8,12 +8,12 @@
 import type { ILayoutSizeProps } from './ILayoutSizeProps';
 
 export function filterLayoutFakeProps<T extends ILayoutSizeProps>(props: T): Omit<T, keyof ILayoutSizeProps> {
-  const { noWrap, keepSize, tiny, small, medium, large, maximum, fill, noGrow, zeroBasis, ...rest } = props;
+  const { noWrap, keepSize, tiny, small, medium, large, maximum, fill, noGrow, zeroBasis, groupGap, ...rest } = props;
 
   return rest;
 }
 
 export function getLayoutProps<T extends ILayoutSizeProps>(props: T): ILayoutSizeProps {
-  const { noWrap, keepSize, tiny, small, medium, large, maximum, fill, noGrow, zeroBasis } = props;
-  return { noWrap, keepSize, tiny, small, medium, large, maximum, fill, noGrow, zeroBasis };
+  const { noWrap, keepSize, tiny, small, medium, large, maximum, fill, noGrow, zeroBasis, groupGap } = props;
+  return { noWrap, keepSize, tiny, small, medium, large, maximum, fill, noGrow, zeroBasis, groupGap };
 }
