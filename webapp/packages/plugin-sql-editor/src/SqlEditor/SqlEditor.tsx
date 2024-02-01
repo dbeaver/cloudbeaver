@@ -90,15 +90,15 @@ export const SqlEditor = observer<ISqlEditorProps>(function SqlEditor({ state, c
       lazy
       onChange={handleModeSelect}
     >
-      {displayedEditors > 1 ? (
-        <sql-editor className={className}>
-          <SQLEditorActions data={data} state={state} />
-          <TabPanelList />
+      <sql-editor className={className}>
+        <SQLEditorActions data={data} state={state} />
+        <TabPanelList />
+        {displayedEditors > 1 ? (
           <tabs>
             <TabList style={tabListStyles} />
           </tabs>
-        </sql-editor>
-      ) : null}
+        ) : null}
+      </sql-editor>
     </TabsState>,
   );
 });
