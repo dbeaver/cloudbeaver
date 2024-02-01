@@ -37,12 +37,12 @@ public class VoidSecretController implements DBSSecretController, DBSSecretContr
 
     @Nullable
     @Override
-    public String getSecretValue(@NotNull String secretId) {
+    public String getPrivateSecretValue(@NotNull String secretId) {
         return null;
     }
 
     @Override
-    public void setSecretValue(@NotNull String secretId, @Nullable String secretValue) throws DBException {
+    public void setPrivateSecretValue(@NotNull String secretId, @Nullable String secretValue) throws DBException {
         throw new DBException("Secret controller is read-only");
     }
 
