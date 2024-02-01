@@ -113,7 +113,7 @@ const ProjectRenderer: NavigationNodeRendererComponent = observer(function Manag
     );
   }
 
-  const project = node.nodeType === NAV_NODE_TYPE_RM_PROJECT && singleProject && !isDragging;
+  const project = node.nodeType === NAV_NODE_TYPE_RM_PROJECT && singleProject;
 
   return (
     <SContext registry={registry}>
