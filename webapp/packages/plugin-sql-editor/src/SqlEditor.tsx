@@ -6,8 +6,9 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
+import { useEffect } from 'react';
 
-import { getComputed, Loader, Pane, ResizerControls, s, Split, useS, useSplitUserState } from '@cloudbeaver/core-blocks';
+import { getComputed, Loader, Pane, ResizerControls, s, Split, useS, useSplit, useSplitUserState } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { CaptureView } from '@cloudbeaver/core-view';
 
@@ -39,10 +40,20 @@ export const SqlEditor = observer<Props>(function SqlEditor({ state }) {
 
   const opened = dataSource?.isOpened() || false;
 
+  const split = useSplit();
   const data = useSqlEditor(state);
   const sqlEditorModeService = useService(SqlEditorModeService);
   const displayedEditors = getComputed(() => sqlEditorModeService.tabsContainer.getDisplayed({ state, data }).length);
   const isEditorEmpty = displayedEditors === 0;
+
+  useEffect(() => {
+    if (isEditorEmpty) {
+      split.fixate('maximize', true);
+    } else if (split.state.disable) {
+      split.fixate('resize', false);
+      split.state.setSize(-1);
+    }
+  }, [isEditorEmpty]);
 
   return (
     <Loader suspense>
