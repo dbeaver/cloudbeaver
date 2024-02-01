@@ -6,10 +6,10 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import styled, { css } from 'reshadow';
 
-import { getComputed } from '@cloudbeaver/core-blocks';
+import { getComputed, useSplit } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { BASE_TAB_STYLES, ITabData, TabList, TabPanelList, TabsState, VERTICAL_ROTATED_TAB_STYLES } from '@cloudbeaver/core-ui';
 import { MetadataMap } from '@cloudbeaver/core-utils';
@@ -57,6 +57,7 @@ const tabStyles = css`
 const tabListStyles = [BASE_TAB_STYLES, VERTICAL_ROTATED_TAB_STYLES, tabStyles];
 
 export const SqlEditor = observer<ISqlEditorProps>(function SqlEditor({ state, className }) {
+  const split = useSplit();
   const sqlEditorModeService = useService(SqlEditorModeService);
   const data = useSqlEditor(state);
   const [modesState] = useState(() => new MetadataMap<string, any>());
@@ -74,6 +75,16 @@ export const SqlEditor = observer<ISqlEditorProps>(function SqlEditor({ state, c
   }
 
   const displayedEditors = getComputed(() => sqlEditorModeService.tabsContainer.getDisplayed({ state, data }).length);
+  const isEditorEmpty = displayedEditors === 0;
+
+  useEffect(() => {
+    if (isEditorEmpty) {
+      split.fixate('maximize', true);
+    } else if (split.state.disable) {
+      split.fixate('resize', false);
+      split.state.setSize(-1);
+    }
+  }, [isEditorEmpty]);
 
   return styled(
     styles,

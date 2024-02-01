@@ -55,7 +55,7 @@ export const RightArea = observer<Props>(function RightArea({ className }) {
             </Loader>
           </Pane>
           <ResizerControls />
-          <Pane className={s(styles, { pane: true })} main>
+          <Pane className={s(styles, { pane: true })} basis="30%" main>
             <Loader className={s(styles, { loader: true })} suspense>
               <Placeholder container={appScreenService.rightAreaBottom} />
             </Loader>
