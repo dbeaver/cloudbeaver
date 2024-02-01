@@ -236,6 +236,10 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
             userId
         );
         if (!ArrayUtils.isEmpty(teamIds)) {
+            String defaultUserTeam = application.getAppConfiguration().getDefaultUserTeam();
+            if (CommonUtils.isNotEmpty(defaultUserTeam) && !ArrayUtils.contains(teamIds, defaultUserTeam)) {
+                teamIds = ArrayUtils.add(String.class, teamIds, defaultUserTeam);
+            }
             try (PreparedStatement dbStat = dbCon.prepareStatement(
                 database.normalizeTableNames("INSERT INTO {table_prefix}CB_USER_TEAM" +
                     "(USER_ID,TEAM_ID,GRANT_TIME,GRANTED_BY) VALUES(?,?,?,?)"))
@@ -258,7 +262,7 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
         if (CommonUtils.isEmpty(application.getAppConfiguration().getDefaultUserTeam())) {
             return;
         }
-        List<String> usersIds = new ArrayList<>();
+
         try (Connection dbCon = database.openConnection()) {
             try (PreparedStatement dbStat = dbCon.prepareStatement(
                     database.normalizeTableNames("SELECT USER_ID \n" +
@@ -266,34 +270,36 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
                             "WHERE USER_ID NOT IN (\n" +
                             "    SELECT USER_ID FROM {table_prefix}CB_USER_TEAM CUT WHERE CUT.TEAM_ID = ? \n" +
                             ")")
-            )
-            ) {
+            )) {
                 dbStat.setString(1, application.getAppConfiguration().getDefaultUserTeam());
-                try (ResultSet dbResult = dbStat.executeQuery()) {
-                    while (dbResult.next()) {
-                        String userId = dbResult.getString(1);
-                        usersIds.add(userId);
+                ResultSet dbResult = dbStat.executeQuery();
+                List<String> usersIds = new ArrayList<>();
+                while (dbResult.next()) {
+                    String userId = dbResult.getString(1);
+                    usersIds.add(userId);
+                }
+
+                if (usersIds.isEmpty()) {
+                    return;
+                }
+
+                for (String usersId : usersIds) {
+                    try (PreparedStatement insertStat = dbCon.prepareStatement(
+                            database.normalizeTableNames("INSERT INTO {table_prefix}CB_USER_TEAM(USER_ID, TEAM_ID, GRANT_TIME, GRANTED_BY)" +
+                                    " VALUES(?,?,?,?)"))) {
+                        insertStat.setString(1, usersId);
+                        insertStat.setString(2, application.getAppConfiguration().getDefaultUserTeam());
+                        insertStat.setTimestamp(3,  new Timestamp(System.currentTimeMillis()));
+                        insertStat.setString(4,  "CloudBeaver Application");
+                        insertStat.executeUpdate();
                     }
                 }
             }
-            if (usersIds.isEmpty()){
-                return;
-            }
-            for (String usersId : usersIds) {
-                try (PreparedStatement dbStat = dbCon.prepareStatement(
-                        database.normalizeTableNames("INSERT INTO {table_prefix}CB_USER_TEAM(USER_ID, TEAM_ID, GRANT_TIME, GRANTED_BY)" +
-                                " VALUES(?,?,?,?)"))) {
-                    dbStat.setString(1, usersId);
-                    dbStat.setString(2, application.getAppConfiguration().getDefaultUserTeam());
-                    dbStat.setTimestamp(3,  new Timestamp(System.currentTimeMillis()));
-                    dbStat.setString(4,  "CloudBeaver Application");
-                    dbStat.executeQuery();
-                }
-            }
         } catch (SQLException e) {
-            throw new DBCException("Error while set default user teams", e);
+            throw new DBCException("Error while setting default user teams", e);
         }
     }
+
 
     @NotNull
     @Override
