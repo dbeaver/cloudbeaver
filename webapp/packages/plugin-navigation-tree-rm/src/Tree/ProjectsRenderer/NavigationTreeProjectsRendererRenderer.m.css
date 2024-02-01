@@ -1,7 +1,6 @@
 .projectNode {
   margin-top: 8px;
 
-  &.project,
   &.hideProjects {
     margin-top: 0px;
   }
