@@ -29,6 +29,7 @@ import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
+import org.jkiss.dbeaver.model.DBCHierarchicalDocumentProvider;
 import org.jkiss.dbeaver.model.DBPDataSource;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
 import org.jkiss.dbeaver.model.DBUtils;
@@ -48,6 +49,7 @@ import org.jkiss.dbeaver.model.sql.parser.SQLScriptParser;
 import org.jkiss.dbeaver.model.sql.registry.SQLGeneratorConfigurationRegistry;
 import org.jkiss.dbeaver.model.sql.registry.SQLGeneratorDescriptor;
 import org.jkiss.dbeaver.model.struct.DBSDataContainer;
+import org.jkiss.dbeaver.model.struct.DBSEntity;
 import org.jkiss.dbeaver.model.struct.DBSObject;
 import org.jkiss.dbeaver.model.struct.DBSWrapper;
 import org.jkiss.dbeaver.utils.RuntimeUtils;
@@ -454,6 +456,54 @@ public class WebServiceSQL implements DBWServiceSQL {
             }
         };
         return contextInfo.getProcessor().getWebSession().createAndRunAsyncTask("Read data from container " + nodePath, runnable);
+    }
+
+    @Override
+    public WebAsyncTaskInfo asyncReadDataFromChildEntity(
+            @NotNull WebSQLContextInfo contextInfo,
+            @Nullable String path,
+            @Nullable String resultId,
+            @Nullable WebSQLDataFilter filter,
+            @Nullable WebDataFormat dataFormat) throws DBWebException {
+        WebAsyncTaskProcessor<String> runnable = new WebAsyncTaskProcessor<>() {
+            @Override
+            public void run(DBRProgressMonitor monitor) throws InvocationTargetException {
+                try {
+                    monitor.beginTask("Read data", 1);
+                    monitor.subTask("Extra data from " + path);
+
+                    DBPDataSource dataSource = contextInfo.getProcessor().getConnection().getDataSource();
+                    DBSDataContainer dataContainer = null;
+
+                    if (dataSource instanceof DBCHierarchicalDocumentProvider provider) {
+                        DBSEntity childrenEntityInstance =
+                                provider.getChildrenEntityInstance(path, monitor, true, true);
+                        if (childrenEntityInstance instanceof DBSDataContainer container) {
+                            dataContainer = container;
+                        }
+                    }
+
+                    if (dataContainer == null) {
+                        throw new DBException("Container not found: " + path);
+                    }
+
+                    WebSQLExecuteInfo executeResults = contextInfo.getProcessor().readDataFromContainer(
+                            contextInfo,
+                            monitor,
+                            dataContainer,
+                            resultId,
+                            filter != null ? filter : new WebSQLDataFilter(),
+                            dataFormat);
+                    this.result = executeResults.getStatusMessage();
+                    this.extendedResults = executeResults;
+                } catch (Throwable e) {
+                    throw new InvocationTargetException(e);
+                } finally {
+                    monitor.done();
+                }
+            }
+        };
+        return contextInfo.getProcessor().getWebSession().createAndRunAsyncTask("Read data from container " + path, runnable);
     }
 
     @Override

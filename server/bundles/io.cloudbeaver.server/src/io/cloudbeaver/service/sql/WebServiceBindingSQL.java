@@ -183,6 +183,14 @@ public class WebServiceBindingSQL extends WebServiceBindingBase<DBWServiceSQL> i
                     getDataFilter(env),
                     getDataFormat(env)
                 ))
+            .dataFetcher("asyncReadDataFromChildEntity", env ->
+                    getService(env).asyncReadDataFromChildEntity(
+                            getSQLContext(env),
+                            env.getArgument("path"),
+                            env.getArgument("resultId"),
+                            getDataFilter(env),
+                            getDataFormat(env)
+                    ))
             .dataFetcher("asyncSqlExecuteResults", env ->
                 getService(env).asyncGetQueryResults(
                     getWebSession(env), env.getArgument("taskId")

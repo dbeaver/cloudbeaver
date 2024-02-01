@@ -924,6 +924,21 @@ public class WebSQLProcessor implements WebSessionProvider {
             }
     }
 
+    public DBSEntity getChildEntity(
+            @NotNull WebSQLResultsInfo resultsInfo,
+            @NotNull WebSQLResultsRow value
+    ) throws DBException {
+        DBSDataContainer dataContainer = resultsInfo.getDataContainer();
+        if (dataContainer.getDataSource() instanceof DBCHierarchicalDocumentProvider documentProvider) {
+            return documentProvider
+                    .getChildrenEntityInstance((String) Objects.requireNonNull(value.getMetaData()).get("path"),
+                            getWebSession().getProgressMonitor(),
+                            true, true);
+        } else {
+            throw new DBException("Attribute value is not a subcollection");
+        }
+    }
+
 
 
     private void fillQueryResults(
