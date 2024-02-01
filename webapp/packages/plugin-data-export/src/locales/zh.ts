@@ -1,4 +1,5 @@
 export default [
+  ['plugin_data_export_data_export_settings_group', 'Data export'],
   ['data_transfer_dialog_title', '导出数据'],
   ['data_transfer_dialog_export', '导出'],
   ['data_transfer_dialog_export_tooltip', '将结果集导出为文件'],

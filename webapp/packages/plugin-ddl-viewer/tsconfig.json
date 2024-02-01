@@ -43,13 +43,13 @@
       "path": "../plugin-navigation-tree/tsconfig.json"
     },
     {
-      "path": "../plugin-sql-editor/tsconfig.json"
-    },
-    {
       "path": "../plugin-sql-editor-navigation-tab/tsconfig.json"
     },
     {
       "path": "../plugin-sql-editor-new/tsconfig.json"
+    },
+    {
+      "path": "../plugin-sql-editor/tsconfig.json"
     }
   ],
   "include": [

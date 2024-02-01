@@ -75,3 +75,15 @@
 .container > .zeroBasis {
   flex-basis: 0%;
 }
+
+.container.gap > .groupGap + .groupGap {
+  margin-top: -12px;
+}
+
+.container.gap.compact > .groupGap + .groupGap {
+  margin-top: -8px;
+}
+
+.container.gap.dense > .groupGap + .groupGap {
+  margin-top: -4px;
+}

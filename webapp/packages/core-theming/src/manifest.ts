@@ -9,6 +9,7 @@ import type { PluginManifest } from '@cloudbeaver/core-di';
 
 import { LocaleService } from './LocaleService';
 import { ThemeService } from './ThemeService';
+import { ThemeSettingsManagementService } from './ThemeSettingsManagementService';
 import { ThemeSettingsService } from './ThemeSettingsService';
 
 export const coreThemingManifest: PluginManifest = {
@@ -16,5 +17,5 @@ export const coreThemingManifest: PluginManifest = {
     name: 'Core Theming',
   },
 
-  providers: [ThemeService, ThemeSettingsService, LocaleService],
+  providers: [ThemeService, ThemeSettingsService, LocaleService, ThemeSettingsManagementService],
 };

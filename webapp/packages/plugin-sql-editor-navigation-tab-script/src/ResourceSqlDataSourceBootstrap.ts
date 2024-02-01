@@ -16,7 +16,7 @@ import { ProjectInfoResource, ProjectsService } from '@cloudbeaver/core-projects
 import { ICachedTreeMoveData, resourceKeyList, ResourceKeySimple, ResourceKeyUtils } from '@cloudbeaver/core-resource';
 import { ResourceManagerResource } from '@cloudbeaver/core-resource-manager';
 import { NetworkStateService } from '@cloudbeaver/core-root';
-import { LocalStorageSaveService } from '@cloudbeaver/core-settings';
+import { SettingsService } from '@cloudbeaver/core-settings';
 import { createPath, getPathParent } from '@cloudbeaver/core-utils';
 import { NavigationTabsService } from '@cloudbeaver/plugin-navigation-tabs';
 import { NavResourceNodeService } from '@cloudbeaver/plugin-navigation-tree-rm';
@@ -51,7 +51,7 @@ export class ResourceSqlDataSourceBootstrap extends Bootstrap {
     private readonly sqlEditorTabResourceService: SqlEditorTabResourceService,
     private readonly sqlEditorService: SqlEditorService,
     private readonly projectsService: ProjectsService,
-    localStorageSaveService: LocalStorageSaveService,
+    settingsService: SettingsService,
   ) {
     super();
     this.dataSourceStateState = new Map();
@@ -61,7 +61,7 @@ export class ResourceSqlDataSourceBootstrap extends Bootstrap {
       dataSourceStateState: observable,
     });
 
-    localStorageSaveService.withAutoSave(
+    settingsService.registerSettings(
       RESOURCE_TAB_STATE,
       this.dataSourceStateState,
       () => new Map(),

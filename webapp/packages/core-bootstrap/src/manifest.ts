@@ -26,7 +26,10 @@ import { resourceManagerManifest } from '@cloudbeaver/core-resource-manager';
 import { coreRootManifest } from '@cloudbeaver/core-root';
 import { coreRoutingManifest } from '@cloudbeaver/core-routing';
 import { coreSDKManifest } from '@cloudbeaver/core-sdk';
+import { coreServerLocalization } from '@cloudbeaver/core-server-localization';
+import { coreSessionLocalization } from '@cloudbeaver/core-session-localization';
 import { coreSettingsManifest } from '@cloudbeaver/core-settings';
+import { coreSettingsLocalizationManifest } from '@cloudbeaver/core-settings-localization';
 import { coreThemingManifest } from '@cloudbeaver/core-theming';
 import { coreUIManifest } from '@cloudbeaver/core-ui';
 import { coreVersionManifest } from '@cloudbeaver/core-version';
@@ -46,6 +49,9 @@ export const coreManifests: PluginManifest[] = [
   coreRoutingManifest, // important, should be first because the router starts in load phase first after all plugins register phase
   coreThemingManifest,
   coreLocalizationManifest,
+  coreSettingsLocalizationManifest,
+  coreSessionLocalization,
+  coreServerLocalization,
   coreBlocksManifest,
   coreSettingsManifest,
   coreEventsManifest,

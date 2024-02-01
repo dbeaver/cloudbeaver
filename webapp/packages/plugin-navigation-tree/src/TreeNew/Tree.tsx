@@ -25,15 +25,24 @@ import { useTreeVirtualization } from './useTreeVirtualization';
 export interface NavigationTreeNewProps {
   data: ITreeData;
   nodeRenderers?: INodeRenderer[];
+  onNodeClick?(id: string): void | Promise<void>;
   onNodeDoubleClick?(id: string): void | Promise<void>;
   getNodeDnDContext?(id: string, context: IDataContext): void;
   getNodeHeight(id: string): number;
 }
 
-export const Tree = observer<NavigationTreeNewProps>(function Tree({ data, nodeRenderers, onNodeDoubleClick, getNodeDnDContext, getNodeHeight }) {
+export const Tree = observer<NavigationTreeNewProps>(function Tree({
+  data,
+  nodeRenderers,
+  onNodeClick,
+  onNodeDoubleClick,
+  getNodeDnDContext,
+  getNodeHeight,
+}) {
   const tree = useTree({
     data,
     nodeRenderers,
+    onNodeClick,
     onNodeDoubleClick,
     getNodeHeight,
   });

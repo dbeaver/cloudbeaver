@@ -7,16 +7,18 @@
  */
 import { AppScreenService } from '@cloudbeaver/core-app';
 import { ActionSnackbar } from '@cloudbeaver/core-blocks';
+import { LocalStorageSaveService } from '@cloudbeaver/core-browser';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
 import { ENotificationType, INotification, NotificationService } from '@cloudbeaver/core-events';
 import { ScreenService } from '@cloudbeaver/core-routing';
-import { LocalStorageSaveService } from '@cloudbeaver/core-settings';
+import { importLazyComponent } from '@cloudbeaver/core-utils';
 import { ActionService, menuExtractItems, MenuService } from '@cloudbeaver/core-view';
 import { MENU_APP_STATE } from '@cloudbeaver/plugin-top-app-bar';
 
 import { ACTION_APP_HELP } from './actions/ACTION_APP_HELP';
-import { ShortcutsDialog } from './Shortcuts/ShortcutsDialog';
+
+const ShortcutsDialog = importLazyComponent(() => import('./Shortcuts/ShortcutsDialog').then(m => m.ShortcutsDialog));
 
 @injectable()
 export class PluginBootstrap extends Bootstrap {

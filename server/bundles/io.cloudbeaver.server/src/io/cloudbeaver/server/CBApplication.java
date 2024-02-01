@@ -895,11 +895,7 @@ public abstract class CBApplication extends BaseWebApplication implements WebAut
             }
         }
 
-        String sessionId = null;
-        if (credentialsProvider != null && credentialsProvider.getActiveUserCredentials() != null) {
-            sessionId = credentialsProvider.getActiveUserCredentials().getSmSessionId();
-        }
-        eventController.addEvent(new WSServerConfigurationChangedEvent(sessionId, null));
+        sendConfigChangedEvent(credentialsProvider);
         eventController.setForceSkipEvents(isConfigurationMode());
     }
 
@@ -992,11 +988,10 @@ public abstract class CBApplication extends BaseWebApplication implements WebAut
             sessionExpireTime,
             appConfig);
         validateConfiguration(configurationProperties);
-        writeRuntimeConfig(configurationProperties);
+        writeRuntimeConfig(getRuntimeAppConfigFile(), configurationProperties);
     }
 
-    private void writeRuntimeConfig(Map<String, Object> configurationProperties) throws DBException {
-        File runtimeConfigFile = getRuntimeAppConfigFile();
+    private void writeRuntimeConfig(File runtimeConfigFile, Map<String, Object> configurationProperties) throws DBException {
         if (runtimeConfigFile.exists()) {
             ContentUtils.makeFileBackup(runtimeConfigFile.toPath());
         }
@@ -1024,33 +1019,7 @@ public abstract class CBApplication extends BaseWebApplication implements WebAut
             var serverConfigProperties = new LinkedHashMap<String, Object>();
             var originServerConfig = getServerConfigProps(this.originalConfigurationProperties); // get server properties from original configuration file
             rootConfig.put("server", serverConfigProperties);
-            if (!CommonUtils.isEmpty(newServerName)) {
-                copyConfigValue(originServerConfig,
-                    serverConfigProperties,
-                    CBConstants.PARAM_SERVER_NAME,
-                    newServerName);
-            }
-            if (!CommonUtils.isEmpty(newServerURL)) {
-                copyConfigValue(
-                    originServerConfig, serverConfigProperties, CBConstants.PARAM_SERVER_URL, newServerURL);
-            }
-            if (sessionExpireTime > 0) {
-                copyConfigValue(
-                    originServerConfig,
-                    serverConfigProperties,
-                    CBConstants.PARAM_SESSION_EXPIRE_PERIOD,
-                    sessionExpireTime);
-            }
-            var databaseConfigProperties = new LinkedHashMap<String, Object>();
-            Map<String, Object> oldRuntimeDBConfig = JSONUtils.getObject(originServerConfig,
-                CBConstants.PARAM_DB_CONFIGURATION);
-            if (!CommonUtils.isEmpty(databaseConfiguration) && !isDistributed()) {
-                for (Map.Entry<String, Object> mp : databaseConfiguration.entrySet()) {
-                    copyConfigValue(oldRuntimeDBConfig, databaseConfigProperties, mp.getKey(), mp.getValue());
-                }
-                serverConfigProperties.put(CBConstants.PARAM_DB_CONFIGURATION, databaseConfigProperties);
-            }
-            savePasswordPolicyConfig(originServerConfig, serverConfigProperties);
+            collectServerConfigProperties(newServerName, newServerURL, sessionExpireTime, originServerConfig, serverConfigProperties);
         }
         {
             var appConfigProperties = new LinkedHashMap<String, Object>();
@@ -1160,7 +1129,43 @@ public abstract class CBApplication extends BaseWebApplication implements WebAut
         return rootConfig;
     }
 
-    private void savePasswordPolicyConfig(Map<String, Object> originServerConfig, LinkedHashMap<String, Object> serverConfigProperties) {
+    protected void collectServerConfigProperties(
+        String newServerName,
+        String newServerURL,
+        long sessionExpireTime,
+        Map<String, Object> originServerConfig,
+        Map<String, Object> serverConfigProperties
+    ) {
+        if (!CommonUtils.isEmpty(newServerName)) {
+            copyConfigValue(originServerConfig,
+                serverConfigProperties,
+                CBConstants.PARAM_SERVER_NAME,
+                newServerName);
+        }
+        if (!CommonUtils.isEmpty(newServerURL)) {
+            copyConfigValue(
+                originServerConfig, serverConfigProperties, CBConstants.PARAM_SERVER_URL, newServerURL);
+        }
+        if (sessionExpireTime > 0) {
+            copyConfigValue(
+                originServerConfig,
+                serverConfigProperties,
+                CBConstants.PARAM_SESSION_EXPIRE_PERIOD,
+                sessionExpireTime);
+        }
+        var databaseConfigProperties = new LinkedHashMap<String, Object>();
+        Map<String, Object> oldRuntimeDBConfig = JSONUtils.getObject(originServerConfig,
+            CBConstants.PARAM_DB_CONFIGURATION);
+        if (!CommonUtils.isEmpty(databaseConfiguration) && !isDistributed()) {
+            for (Map.Entry<String, Object> mp : databaseConfiguration.entrySet()) {
+                copyConfigValue(oldRuntimeDBConfig, databaseConfigProperties, mp.getKey(), mp.getValue());
+            }
+            serverConfigProperties.put(CBConstants.PARAM_DB_CONFIGURATION, databaseConfigProperties);
+        }
+        savePasswordPolicyConfig(originServerConfig, serverConfigProperties);
+    }
+
+    private void savePasswordPolicyConfig(Map<String, Object> originServerConfig, Map<String, Object> serverConfigProperties) {
         // save password policy configuration
         var passwordPolicyProperties = new LinkedHashMap<String, Object>();
 
@@ -1296,5 +1301,20 @@ public abstract class CBApplication extends BaseWebApplication implements WebAut
     @Override
     public Class<? extends DBPPlatformUI> getPlatformUIClass() {
         return CBPlatformUI.class;
+    }
+
+    public void saveProductConfiguration(SMCredentialsProvider credentialsProvider, Map<String, Object> productConfiguration) throws DBException {
+        Map<String, Object> mergedConfig = WebAppUtils.mergeConfigurations(this.productConfiguration, productConfiguration);
+        writeRuntimeConfig(getRuntimeProductConfigFilePath().toFile(), mergedConfig);
+        this.productConfiguration.putAll(mergedConfig);
+        sendConfigChangedEvent(credentialsProvider);
+    }
+
+    protected void sendConfigChangedEvent(SMCredentialsProvider credentialsProvider) {
+        String sessionId = null;
+        if (credentialsProvider != null && credentialsProvider.getActiveUserCredentials() != null) {
+            sessionId = credentialsProvider.getActiveUserCredentials().getSmSessionId();
+        }
+        eventController.addEvent(new WSServerConfigurationChangedEvent(sessionId, null));
     }
 }

@@ -27,6 +27,7 @@
     "@cloudbeaver/core-navigation-tree": "~0.1.0",
     "@cloudbeaver/core-resource": "~0.1.0",
     "@cloudbeaver/core-sdk": "~0.1.0",
+    "@cloudbeaver/core-utils": "~0.1.0",
     "@cloudbeaver/core-view": "~0.1.0",
     "@cloudbeaver/plugin-codemirror6": "~0.1.0",
     "@cloudbeaver/plugin-data-viewer": "~0.1.0",
@@ -34,8 +35,7 @@
     "@cloudbeaver/plugin-sql-editor-new": "~0.1.0",
     "mobx": "^6.12.0",
     "mobx-react-lite": "^4.0.5",
-    "react": "^18.2.0",
-    "@cloudbeaver/core-utils": "~0.1.0"
+    "react": "^18.2.0"
   },
   "peerDependencies": {},
   "devDependencies": {

@@ -10,10 +10,16 @@
       "path": "../core-di/tsconfig.json"
     },
     {
+      "path": "../core-localization/tsconfig.json"
+    },
+    {
       "path": "../core-product/tsconfig.json"
     },
     {
       "path": "../core-settings/tsconfig.json"
+    },
+    {
+      "path": "../core-utils/tsconfig.json"
     }
   ],
   "include": [

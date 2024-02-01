@@ -40,10 +40,10 @@
       "path": "../core-view/tsconfig.json"
     },
     {
-      "path": "../plugin-sql-editor/tsconfig.json"
+      "path": "../plugin-sql-editor-navigation-tab/tsconfig.json"
     },
     {
-      "path": "../plugin-sql-editor-navigation-tab/tsconfig.json"
+      "path": "../plugin-sql-editor/tsconfig.json"
     }
   ],
   "include": [

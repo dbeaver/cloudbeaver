@@ -1,4 +1,1 @@
-export default [
-  ['settings_panel', 'Settings'],
-  ['settings_panel_empty_fields', 'Fields are empty'],
-];
+export default [['plugin_settings_panel_empty', 'No settings available']];

@@ -12,12 +12,9 @@ import { TreeNodeControl, TreeNodeExpand, TreeNodeIcon, TreeNodeName } from '@cl
 
 import { TreeContext } from './contexts/TreeContext';
 import { TreeDataContext } from './contexts/TreeDataContext';
+import type { NodeControlComponent } from './INodeRenderer';
 
-interface Props {
-  nodeId: string;
-}
-
-export const NodeControl = observer<Props, HTMLDivElement>(
+export const NodeControl: NodeControlComponent = observer(
   forwardRef(function NodeControl({ nodeId }, ref) {
     const data = useContext(TreeDataContext)!;
     const tree = useContext(TreeContext)!;

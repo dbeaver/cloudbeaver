@@ -1,4 +1,5 @@
 export * from './manifest';
+export * from './NAVIGATION_TREE_SETTINGS_GROUP';
 export * from './NavTreeSettingsService';
 
 export * from './NodesManager/extensions/IObjectNavNodeProvider';
