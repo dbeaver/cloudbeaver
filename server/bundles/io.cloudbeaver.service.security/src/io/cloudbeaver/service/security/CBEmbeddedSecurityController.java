@@ -213,10 +213,6 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
     public void setUserTeams(String userId, String[] teamIds, String grantorId) throws DBCException {
         try (Connection dbCon = database.openConnection()) {
             try (JDBCTransaction txn = new JDBCTransaction(dbCon)) {
-                String defaultUserTeam = application.getAppConfiguration().getDefaultUserTeam();
-                if (CommonUtils.isNotEmpty(defaultUserTeam) && !ArrayUtils.contains(teamIds, defaultUserTeam)) {
-                    teamIds = ArrayUtils.add(String.class, teamIds, defaultUserTeam);
-                }
                 setUserTeams(dbCon, userId, teamIds, grantorId);
                 txn.commit();
             }
