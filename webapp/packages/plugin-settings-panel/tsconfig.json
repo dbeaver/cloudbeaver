@@ -7,9 +7,6 @@
   },
   "references": [
     {
-      "path": "../core-authentication/tsconfig.json"
-    },
-    {
       "path": "../core-blocks/tsconfig.json"
     },
     {
@@ -25,13 +22,10 @@
       "path": "../core-settings/tsconfig.json"
     },
     {
-      "path": "../core-ui/tsconfig.json"
+      "path": "../core-utils/tsconfig.json"
     },
     {
-      "path": "../core-view/tsconfig.json"
-    },
-    {
-      "path": "../plugin-settings-menu/tsconfig.json"
+      "path": "../plugin-navigation-tree/tsconfig.json"
     }
   ],
   "include": [

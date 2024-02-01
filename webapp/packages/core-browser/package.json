@@ -22,6 +22,7 @@
     "@cloudbeaver/core-executor": "~0.1.0",
     "@cloudbeaver/core-utils": "~0.1.0",
     "dexie": "^3.2.4",
+    "mobx": "^6.12.0",
     "workbox-core": "~7.x.x",
     "workbox-precaching": "~7.x.x",
     "workbox-window": "~7.x.x"

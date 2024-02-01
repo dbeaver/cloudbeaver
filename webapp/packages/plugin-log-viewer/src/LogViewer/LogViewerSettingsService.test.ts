@@ -7,7 +7,7 @@
  */
 import '@testing-library/jest-dom';
 
-import { coreAppManifest, CoreSettingsService } from '@cloudbeaver/core-app';
+import { coreAppManifest } from '@cloudbeaver/core-app';
 import { coreAuthenticationManifest } from '@cloudbeaver/core-authentication';
 import { mockAuthentication } from '@cloudbeaver/core-authentication/dist/__custom_mocks__/mockAuthentication';
 import { coreBrowserManifest } from '@cloudbeaver/core-browser';
@@ -54,7 +54,7 @@ const server = mockGraphQL(...mockAppInit(endpoint), ...mockAuthentication(endpo
 
 beforeAll(() => app.init());
 
-const equalConfig = {
+const deprecatedSettings = {
   core: {
     app: {
       logViewer: {
@@ -62,26 +62,45 @@ const equalConfig = {
         maxLogRecords: 2,
         logBatchSize: 3,
         maxFailedRequests: 4,
+        disabled: true,
       } as LogViewerSettings,
     },
   },
+};
+
+const newSettings = {
+  ...deprecatedSettings,
   plugin: {
     'log-viewer': {
-      refreshTimeout: 1,
-      maxLogRecords: 2,
-      logBatchSize: 3,
-      maxFailedRequests: 4,
+      refreshTimeout: 5,
+      maxLogRecords: 6,
+      logBatchSize: 7,
+      maxFailedRequests: 8,
       disabled: false,
     } as LogViewerSettings,
   },
 };
 
-test('New settings equal deprecated settings', async () => {
+test('New settings override deprecated settings', async () => {
   const settings = app.injector.getServiceByClass(LogViewerSettingsService);
-  const coreSettings = app.injector.getServiceByClass(CoreSettingsService);
   const config = app.injector.getServiceByClass(ServerConfigResource);
 
-  server.use(endpoint.query('serverConfig', mockServerConfig(equalConfig)));
+  server.use(endpoint.query('serverConfig', mockServerConfig(newSettings)));
+
+  await config.refresh();
+
+  expect(settings.settings.getValue('refreshTimeout')).toBe(5);
+  expect(settings.settings.getValue('maxLogRecords')).toBe(6);
+  expect(settings.settings.getValue('logBatchSize')).toBe(7);
+  expect(settings.settings.getValue('maxFailedRequests')).toBe(8);
+  expect(settings.settings.getValue('disabled')).toBe(false);
+});
+
+test('Deprecated settings are used if new settings are not defined', async () => {
+  const settings = app.injector.getServiceByClass(LogViewerSettingsService);
+  const config = app.injector.getServiceByClass(ServerConfigResource);
+
+  server.use(endpoint.query('serverConfig', mockServerConfig(deprecatedSettings)));
 
   await config.refresh();
 
@@ -89,9 +108,5 @@ test('New settings equal deprecated settings', async () => {
   expect(settings.settings.getValue('maxLogRecords')).toBe(2);
   expect(settings.settings.getValue('logBatchSize')).toBe(3);
   expect(settings.settings.getValue('maxFailedRequests')).toBe(4);
-  expect(settings.settings.getValue('disabled')).toBe(false);
-  expect(coreSettings.settings.getValue('app.logViewer.refreshTimeout')).toBe(1);
-  expect(coreSettings.settings.getValue('app.logViewer.maxLogRecords')).toBe(2);
-  expect(coreSettings.settings.getValue('app.logViewer.logBatchSize')).toBe(3);
-  expect(coreSettings.settings.getValue('app.logViewer.maxFailedRequests')).toBe(4);
+  expect(settings.settings.getValue('disabled')).toBe(true);
 });

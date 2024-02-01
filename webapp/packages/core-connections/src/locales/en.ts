@@ -1,4 +1,5 @@
 export default [
+  ['core_connections_connections_settings_group', 'Connections'],
   ['connections_administration_item', 'Connection Templates'],
   ['connections_administration_connection_create', 'Add Database Template'],
   ['connections_administration_search_database_tip', "Type your hosts here, e.g. 'localhost host1.myhost.com 192.168.0.1' and press Enter"],

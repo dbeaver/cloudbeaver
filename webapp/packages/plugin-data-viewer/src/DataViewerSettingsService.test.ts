@@ -72,27 +72,20 @@ const server = mockGraphQL(...mockAppInit(endpoint), ...mockAuthentication(endpo
 
 beforeAll(() => app.init());
 
-const testValueA = true;
-const testValueB = false;
+const testValueDeprecated = true;
+const testValueNew = false;
 
-const equalConfigA = {
+const deprecatedSettings = {
   'core.app.dataViewer': {
-    disableEdit: testValueA,
+    disableEdit: testValueDeprecated,
   } as DataViewerSettings,
-  plugin: {
-    'data-viewer': {
-      disableEdit: testValueA,
-    } as DataViewerSettings,
-  },
 };
 
-const equalConfigB = {
-  'core.app.dataViewer': {
-    disableEdit: testValueB,
-  } as DataViewerSettings,
+const newSettings = {
+  ...deprecatedSettings,
   plugin: {
     'data-viewer': {
-      disableEdit: testValueB,
+      disableEdit: testValueNew,
     } as DataViewerSettings,
   },
 };
@@ -108,18 +101,16 @@ async function setupSettingsService(mockConfig: any = {}) {
   return settings;
 }
 
-test('New settings equal deprecated settings A', async () => {
-  const settingsService = await setupSettingsService(equalConfigA);
+test('New settings override deprecated settings', async () => {
+  const settingsService = await setupSettingsService(newSettings);
 
-  expect(settingsService.settings.getValue('disableEdit')).toBe(testValueA);
-  expect(settingsService.deprecatedSettings.getValue('disableEdit')).toBe(testValueA);
+  expect(settingsService.settings.getValue('disableEdit')).toBe(testValueNew);
 });
 
-test('New settings equal deprecated settings B', async () => {
-  const settingsService = await setupSettingsService(equalConfigB);
+test('Deprecated settings are used if new settings are not defined', async () => {
+  const settingsService = await setupSettingsService(deprecatedSettings);
 
-  expect(settingsService.settings.getValue('disableEdit')).toBe(testValueB);
-  expect(settingsService.deprecatedSettings.getValue('disableEdit')).toBe(testValueB);
+  expect(settingsService.settings.getValue('disableEdit')).toBe(testValueDeprecated);
 });
 
 describe('DataViewerSettingsService.getDefaultRowsCount', () => {

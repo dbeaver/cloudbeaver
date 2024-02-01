@@ -8,7 +8,7 @@
 import { makeObservable, observable } from 'mobx';
 
 import { injectable } from '@cloudbeaver/core-di';
-import { LocalStorageSaveService } from '@cloudbeaver/core-settings';
+import { SettingsService } from '@cloudbeaver/core-settings';
 import { TempMap } from '@cloudbeaver/core-utils';
 
 import { UserInfoResource } from './UserInfoResource';
@@ -18,7 +18,7 @@ export class UserDataService {
   private readonly userData: Map<string, Record<string, any>>;
   private readonly tempData: TempMap<string, Record<string, any>>;
 
-  constructor(private readonly userInfoResource: UserInfoResource, private readonly autoSaveService: LocalStorageSaveService) {
+  constructor(private readonly userInfoResource: UserInfoResource, private readonly settingsService: SettingsService) {
     this.userData = new Map();
 
     makeObservable<this, 'userData'>(this, {
@@ -27,7 +27,7 @@ export class UserDataService {
 
     this.tempData = new TempMap(this.userData);
 
-    this.autoSaveService.withAutoSave('user_data', this.userData, () => new Map());
+    this.settingsService.registerSettings('user_data', this.userData, () => new Map());
   }
 
   getUserData<T extends Record<any, any>>(key: string, defaultValue: () => T, validate?: (data: T) => boolean): T {

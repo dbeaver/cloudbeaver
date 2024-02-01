@@ -20,18 +20,18 @@
     "@cloudbeaver/core-administration": "~0.1.0",
     "@cloudbeaver/core-blocks": "~0.1.0",
     "@cloudbeaver/core-di": "~0.1.0",
+    "@cloudbeaver/core-localization": "~0.1.0",
     "@cloudbeaver/core-resource": "~0.1.0",
     "@cloudbeaver/core-root": "~0.1.0",
     "@cloudbeaver/core-ui": "~0.1.0",
+    "@cloudbeaver/core-utils": "~0.1.0",
     "@cloudbeaver/core-version": "~0.1.0",
     "@cloudbeaver/core-version-update": "~0.1.0",
     "mobx-react-lite": "^4.0.5",
     "react": "^18.2.0",
     "react-markdown": "^9.0.1",
     "reshadow": "^0.0.1",
-    "semver": "^7.5.4",
-    "@cloudbeaver/core-localization": "~0.1.0",
-    "@cloudbeaver/core-utils": "~0.1.0"
+    "semver": "^7.5.4"
   },
   "peerDependencies": {},
   "devDependencies": {

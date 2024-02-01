@@ -1,4 +1,5 @@
 export default [
+  ['plugin_sql_editor_sql_editor_settings_group', 'SQL Editor'],
   ['sql_editor_menu', 'SQL Editor'],
   ['sql_editor_script_editor', 'SQL Editor'],
   ['sql_editor_alias_loading_error', 'Error occurred while loading node alias'],
