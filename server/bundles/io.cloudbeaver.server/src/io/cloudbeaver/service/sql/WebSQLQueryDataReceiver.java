@@ -30,7 +30,6 @@ import org.jkiss.dbeaver.model.sql.DBQuotaException;
 import org.jkiss.dbeaver.model.struct.DBSDataContainer;
 import org.jkiss.dbeaver.model.struct.DBSEntity;
 import org.jkiss.utils.CommonUtils;
-import org.jkiss.utils.Pair;
 
 import java.lang.reflect.Method;
 import java.util.*;
@@ -45,7 +44,7 @@ class WebSQLQueryDataReceiver implements DBDDataReceiver {
     private final WebSQLQueryResultSet webResultSet = new WebSQLQueryResultSet();
 
     private DBDAttributeBinding[] bindings;
-    private List<WebSQLQueryResultSetRow> rows = new ArrayList<>(); //new Class WebSQLQueryResultSetRow
+    private List<WebSQLQueryResultSetRow> rows = new ArrayList<>();
     private final Number rowLimit;
 
     WebSQLQueryDataReceiver(WebSQLContextInfo contextInfo, DBSDataContainer dataContainer, WebDataFormat dataFormat) {
