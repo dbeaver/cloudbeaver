@@ -115,7 +115,13 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
     const autoLineWrapping = getDefaultLineWrapping(contentType);
     const lineWrapping = state.lineWrapping ?? autoLineWrapping;
 
-    const { textValue, isTruncated, isTextColumn, pasteFullText } = useTextValue({
+    const {
+      textValue,
+      isTruncated,
+      isTextColumn,
+      pasteFullText,
+      limitString: limit,
+    } = useTextValue({
       model,
       resultIndex,
       currentContentType: contentType,
@@ -125,7 +131,6 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
     const isReadonly = isSelectedCellReadonly || isReadonlyByResultIndex;
     const valueSize =
       isResultSetContentValue(contentValue) && isNotNullDefined(contentValue.contentLength) ? bytesToSize(contentValue.contentLength) : undefined;
-    const limit = bytesToSize(quotasService.getQuota('sqlBinaryPreviewMaxLength'));
     const canSave = firstSelectedCell && contentAction.isDownloadable(firstSelectedCell);
     const shouldShowPasteButton = isTextColumn && isTruncated;
     const typeExtension = useMemo(() => getTypeExtension(contentType!) ?? [], [contentType]);

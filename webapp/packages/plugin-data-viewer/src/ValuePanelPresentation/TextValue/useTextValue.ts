@@ -7,14 +7,14 @@
  */
 import { useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { isNotNullDefined } from '@cloudbeaver/core-utils';
+import { bytesToSize, isNotNullDefined } from '@cloudbeaver/core-utils';
 
 import { isResultSetBinaryFileValue } from '../../DatabaseDataModel/Actions/ResultSet/isResultSetBinaryFileValue';
 import { isResultSetContentValue } from '../../DatabaseDataModel/Actions/ResultSet/isResultSetContentValue';
-import { ResultSetSelectAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetSelectAction';
 import { useResultActions } from '../../DatabaseDataModel/Actions/ResultSet/useResultActions';
 import type { IDatabaseDataModel } from '../../DatabaseDataModel/IDatabaseDataModel';
 import type { IDatabaseResultSet } from '../../DatabaseDataModel/IDatabaseResultSet';
+import { useContentLimit } from '../useContentLimit';
 import { useAutoFormat } from './useAutoFormat';
 
 interface IUseTextValueArgs {
@@ -27,13 +27,13 @@ interface IUseTextValue {
   textValue: string;
   isTruncated: boolean;
   isTextColumn: boolean;
+  limitString: string | undefined;
   pasteFullText(): Promise<void>;
 }
 
 export function useTextValue({ model, resultIndex, currentContentType }: IUseTextValueArgs): IUseTextValue {
-  const { formatAction, editAction, contentAction, dataAction } = useResultActions({ model, resultIndex });
-  const selection = model.source.getAction(resultIndex, ResultSetSelectAction);
-  const activeElements = selection.getActiveElements();
+  const { formatAction, editAction, contentAction, dataAction, selectAction } = useResultActions({ model, resultIndex });
+  const activeElements = selectAction.getActiveElements();
   const firstSelectedCell = activeElements?.[0];
   const formatter = useAutoFormat();
   const columnType = firstSelectedCell ? dataAction.getColumn(firstSelectedCell.column)?.dataKind : '';
@@ -42,11 +42,13 @@ export function useTextValue({ model, resultIndex, currentContentType }: IUseTex
   const cachedFullText = firstSelectedCell ? contentAction.retrieveFileFullTextFromCache(firstSelectedCell) : '';
   const blob = firstSelectedCell ? formatAction.get(firstSelectedCell) : null;
   const notificationService = useService(NotificationService);
+  const { limit, shouldShowLimit } = useContentLimit({ model, resultIndex });
 
   const result: IUseTextValue = {
     textValue: '',
     isTruncated: false,
     isTextColumn,
+    limitString: limit && shouldShowLimit ? bytesToSize(limit) : undefined,
     async pasteFullText() {
       if (!firstSelectedCell) {
         return;
@@ -64,8 +66,8 @@ export function useTextValue({ model, resultIndex, currentContentType }: IUseTex
     return result;
   }
 
-  if (isResultSetContentValue(contentValue)) {
-    result.isTruncated = contentAction.isContentTruncated(contentValue);
+  if (isResultSetContentValue(contentValue) && limit) {
+    result.isTruncated = (contentValue?.contentLength ?? 0) > limit;
   }
 
   if (isTextColumn && cachedFullText) {
