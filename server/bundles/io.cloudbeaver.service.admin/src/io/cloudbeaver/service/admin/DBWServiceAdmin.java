@@ -138,6 +138,9 @@ public interface DBWServiceAdmin extends DBWService {
     @WebAction(requirePermissions = DBWConstants.PERMISSION_ADMIN)
     boolean setDefaultNavigatorSettings(WebSession webSession, DBNBrowseSettings settings) throws DBWebException;
 
+    @WebAction(requirePermissions = DBWConstants.PERMISSION_ADMIN)
+    boolean updateProductConfiguration(WebSession webSession, Map<String, Object> productConfiguration) throws DBWebException;
+
     ////////////////////////////////////////////////////////////////////
     // Permissions
 
@@ -179,6 +182,7 @@ public interface DBWServiceAdmin extends DBWService {
         DBWebException;
 
     ////////////////////////////////////////////////////////////////////
+
     // User meta parameters
 
     @WebAction(requirePermissions = DBWConstants.PERMISSION_ADMIN)
@@ -187,11 +191,11 @@ public interface DBWServiceAdmin extends DBWService {
 
     @WebAction(requirePermissions = DBWConstants.PERMISSION_ADMIN)
     Boolean deleteUserMetaParameter(WebSession webSession, String id) throws DBWebException;
-
     @WebAction(requirePermissions = DBWConstants.PERMISSION_ADMIN)
     Boolean setUserMetaParameterValues(WebSession webSession, String userId, Map<String, String> parameters) throws DBWebException;
     @WebAction(requirePermissions = DBWConstants.PERMISSION_ADMIN)
     Boolean setTeamMetaParameterValues(WebSession webSession, String teamId, Map<String, String> parameters) throws DBWebException;
+
     @WebAction(requirePermissions = DBWConstants.PERMISSION_ADMIN)
     Boolean enableUser(WebSession webSession, String userId, Boolean enabled) throws DBWebException;
 

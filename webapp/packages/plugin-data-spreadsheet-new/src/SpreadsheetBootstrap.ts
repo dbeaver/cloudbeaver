@@ -8,6 +8,7 @@
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { ExceptionsCatcherService } from '@cloudbeaver/core-events';
 import { ResultDataFormat } from '@cloudbeaver/core-sdk';
+import { importLazyComponent } from '@cloudbeaver/core-utils';
 import { DataPresentationService } from '@cloudbeaver/plugin-data-viewer';
 
 import { DataGridContextMenuCellEditingService } from './DataGrid/DataGridContextMenu/DataGridContextMenuCellEditingService';
@@ -16,7 +17,8 @@ import { DataGridContextMenuOrderService } from './DataGrid/DataGridContextMenu/
 import { DataGridContextMenuSaveContentService } from './DataGrid/DataGridContextMenu/DataGridContextMenuSaveContentService';
 import { DataGridContextMenuService } from './DataGrid/DataGridContextMenu/DataGridContextMenuService';
 import { DataGridSettingsService } from './DataGridSettingsService';
-import { SpreadsheetGrid } from './SpreadsheetGrid';
+
+const SpreadsheetGrid = importLazyComponent(() => import('./SpreadsheetGrid').then(m => m.SpreadsheetGrid));
 
 @injectable()
 export class SpreadsheetBootstrap extends Bootstrap {
@@ -39,10 +41,7 @@ export class SpreadsheetBootstrap extends Bootstrap {
       id: 'spreadsheet_grid',
       dataFormat: ResultDataFormat.Resultset,
       getPresentationComponent: () => SpreadsheetGrid,
-      hidden: () =>
-        this.dataGridSettingsService.settings.isValueDefault('hidden')
-          ? this.dataGridSettingsService.deprecatedSettings.getValue('hidden')
-          : this.dataGridSettingsService.settings.getValue('hidden'),
+      hidden: () => this.dataGridSettingsService.settings.getValue('hidden'),
       title: 'Table',
       icon: 'table-icon-sm',
     });

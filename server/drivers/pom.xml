@@ -11,7 +11,6 @@
     </properties>
 
     <modules>
-        <module>clickhouse</module>
         <module>clickhouse_com</module>
         <module>db2</module>
         <module>db2-jt400</module>

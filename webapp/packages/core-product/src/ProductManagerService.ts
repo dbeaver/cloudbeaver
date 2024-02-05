@@ -6,20 +6,15 @@
  * you may not use this file except in compliance with the License.
  */
 import { injectable } from '@cloudbeaver/core-di';
-import { ServerService } from '@cloudbeaver/core-root';
 import { parseJSONFlat } from '@cloudbeaver/core-utils';
 
 import { ProductSettingsService } from './ProductSettingsService';
 
 @injectable()
 export class ProductManagerService {
-  readonly settings: ProductSettingsService;
-
-  constructor(private readonly serverService: ServerService) {
-    this.settings = new ProductSettingsService(this.serverService.settings);
-  }
+  constructor(private readonly productSettingsService: ProductSettingsService) {}
 
   setSettings(object: any) {
-    parseJSONFlat(object, this.settings.setSelfValue.bind(this.settings), undefined);
+    parseJSONFlat(object, this.productSettingsService.setValue.bind(this.productSettingsService), undefined);
   }
 }

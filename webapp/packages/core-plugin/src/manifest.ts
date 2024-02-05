@@ -7,12 +7,14 @@
  */
 import type { PluginManifest } from '@cloudbeaver/core-di';
 
+import { LocaleService } from './LocaleService';
 import { PluginManagerService } from './PluginManagerService';
+import { SettingsManagerService } from './SettingsManager/SettingsManagerService';
 
 export const corePluginManifest: PluginManifest = {
   info: {
     name: 'Core Plugin',
   },
 
-  providers: [PluginManagerService],
+  providers: [PluginManagerService, SettingsManagerService, LocaleService],
 };

@@ -1,4 +1,5 @@
 export default [
+  ['plugin_data_viewer_data_viewer_settings_group', 'Просмотр данных'],
   ['table_header_sql_expression', 'Введите SQL выражение чтобы отфильтровать результаты, например, column_name=10'],
   ['table_header_sql_expression_not_supported', 'Фильтрация данных недоступна'],
   ['data_viewer_tab_title', 'Данные'],
@@ -45,11 +46,12 @@ export default [
   ['data_viewer_model_not_loaded', 'Не удалось загрузить модель таблицы'],
   ['settings_data_editor', 'Редактор данных'],
   ['settings_data_editor_disable_edit_name', 'Отключить редактирование'],
-  ['settings_data_editor_disable_edit_description', 'Отключить редактирование'],
+  ['settings_data_editor_disable_edit_description', 'Отключить редактирование данных'],
   ['settings_data_editor_fetch_min_name', 'Минимальный размер выборки'],
   ['settings_data_editor_fetch_min_description', 'Минимальное количество строк для выборки'],
   ['settings_data_editor_fetch_max_name', 'Максимальный размер выборки'],
   ['settings_data_editor_fetch_max_description', 'Максимальное количество строк для выборки'],
   ['settings_data_editor_fetch_default_name', 'Размер выборки по умолчанию'],
   ['settings_data_editor_fetch_default_description', 'Количество строк для выборки по умолчанию'],
+  ['plugin_data_viewer_no_available_presentation', 'Нет доступных представлений'],
 ];

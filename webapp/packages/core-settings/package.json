@@ -20,7 +20,6 @@
     "@cloudbeaver/core-browser": "~0.1.0",
     "@cloudbeaver/core-di": "~0.1.0",
     "@cloudbeaver/core-executor": "~0.1.0",
-    "@cloudbeaver/core-utils": "~0.1.0",
     "mobx": "^6.12.0"
   },
   "peerDependencies": {},

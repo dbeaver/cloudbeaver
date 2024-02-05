@@ -6,20 +6,33 @@
  * you may not use this file except in compliance with the License.
  */
 import { injectable } from '@cloudbeaver/core-di';
-import { SettingsSource } from '@cloudbeaver/core-settings';
+import type { ISettingsSource } from '@cloudbeaver/core-settings';
+
+import { ServerSettingsResolverService } from './ServerSettingsResolverService';
 
 @injectable()
-export class SessionSettingsService extends SettingsSource {
-  constructor(private readonly localStorageKey: string) {
-    super();
-    const state = localStorage.getItem(this.localStorageKey);
-    if (state) {
-      this.store = JSON.parse(state);
-    }
+export class SessionSettingsService implements ISettingsSource {
+  constructor(private readonly serverSettingsResolverService: ServerSettingsResolverService) {}
+
+  has(key: any): boolean {
+    return this.serverSettingsResolverService.has(key);
   }
 
-  setValue(key: string, value: string): void {
-    super.setValue(key, value);
-    localStorage.setItem(this.localStorageKey, JSON.stringify(this.store));
+  isReadOnly(key: any): boolean {
+    return true;
+  }
+
+  getDefaultValue(key: any): any {
+    return this.serverSettingsResolverService.getDefaultValue(key);
+  }
+
+  getValue(key: any): any {
+    return this.serverSettingsResolverService.getValue(key);
+  }
+  setValue(key: any, value: any): void {
+    throw new Error('Method not implemented.');
+  }
+  clear(): void {
+    throw new Error('Method not implemented.');
   }
 }

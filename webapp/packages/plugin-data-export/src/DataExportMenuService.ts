@@ -11,7 +11,7 @@ import { CommonDialogService } from '@cloudbeaver/core-dialogs';
 import { LocalizationService } from '@cloudbeaver/core-localization';
 import { DATA_CONTEXT_NAV_NODE, EObjectFeature } from '@cloudbeaver/core-navigation-tree';
 import { EAdminPermission, SessionPermissionsResource } from '@cloudbeaver/core-root';
-import { withTimestamp } from '@cloudbeaver/core-utils';
+import { importLazyComponent, withTimestamp } from '@cloudbeaver/core-utils';
 import { ACTION_EXPORT, ActionService, DATA_CONTEXT_MENU, DATA_CONTEXT_MENU_NESTED, menuExtractItems, MenuService } from '@cloudbeaver/core-view';
 import {
   DATA_CONTEXT_DV_DDM,
@@ -23,7 +23,8 @@ import {
 import type { IDataQueryOptions } from '@cloudbeaver/plugin-sql-editor';
 
 import { DataExportSettingsService } from './DataExportSettingsService';
-import { DataExportDialog } from './Dialog/DataExportDialog';
+
+const DataExportDialog = importLazyComponent(() => import('./Dialog/DataExportDialog').then(module => module.DataExportDialog));
 
 @injectable()
 export class DataExportMenuService {
@@ -142,10 +143,6 @@ export class DataExportMenuService {
   private isExportDisabled() {
     if (this.sessionPermissionsResource.has(EAdminPermission.admin)) {
       return false;
-    }
-
-    if (this.dataExportSettingsService.settings.isValueDefault('disabled')) {
-      return this.dataExportSettingsService.deprecatedSettings.getValue('disabled');
     }
 
     return this.dataExportSettingsService.settings.getValue('disabled');

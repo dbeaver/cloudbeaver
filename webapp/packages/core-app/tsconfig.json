@@ -22,9 +22,6 @@
       "path": "../core-notifications/tsconfig.json"
     },
     {
-      "path": "../core-plugin/tsconfig.json"
-    },
-    {
       "path": "../core-projects/tsconfig.json"
     },
     {
@@ -43,10 +40,10 @@
       "path": "../core-ui/tsconfig.json"
     },
     {
-      "path": "../core-version/tsconfig.json"
+      "path": "../core-utils/tsconfig.json"
     },
     {
-      "path": "../core-utils/tsconfig.json"
+      "path": "../core-version/tsconfig.json"
     }
   ],
   "include": [

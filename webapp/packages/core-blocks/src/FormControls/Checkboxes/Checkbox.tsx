@@ -9,8 +9,6 @@ import { observer } from 'mobx-react-lite';
 
 import type { ComponentStyle } from '@cloudbeaver/core-theming';
 
-import { filterLayoutFakeProps } from '../../Containers/filterLayoutFakeProps';
-import type { ILayoutSizeProps } from '../../Containers/ILayoutSizeProps';
 import { isControlPresented } from '../isControlPresented';
 import { CheckboxMarkup, CheckboxMod } from './CheckboxMarkup';
 import { CheckboxOnChangeEvent, useCheckboxState } from './useCheckboxState';
@@ -27,13 +25,12 @@ export interface CheckboxBaseProps {
 export type CheckboxInputProps = Omit<
   React.InputHTMLAttributes<HTMLInputElement>,
   'onChange' | 'type' | 'value' | 'defaultValue' | 'checked' | 'defaultChecked' | 'style'
-> &
-  ILayoutSizeProps & {
-    value?: string;
-    defaultValue?: string;
-    defaultChecked?: boolean;
-    label?: string;
-  };
+> & {
+  value?: string;
+  defaultValue?: string;
+  defaultChecked?: boolean;
+  label?: string;
+};
 
 export interface ICheckboxControlledProps extends CheckboxInputProps {
   state?: never;
@@ -50,9 +47,9 @@ export interface ICheckboxObjectProps<TKey extends string> extends CheckboxInput
   name: TKey;
 }
 
-export interface CheckboxType {
-  (props: CheckboxBaseProps & ICheckboxControlledProps): React.ReactElement<any, any> | null;
-  <TKey extends string>(props: CheckboxBaseProps & ICheckboxObjectProps<TKey>): React.ReactElement<any, any> | null;
+export interface CheckboxType<P = NonNullable<unknown>> {
+  (props: CheckboxBaseProps & ICheckboxControlledProps & P): React.ReactElement<any, any> | null;
+  <TKey extends string>(props: CheckboxBaseProps & ICheckboxObjectProps<TKey> & P): React.ReactElement<any, any> | null;
 }
 
 export const Checkbox: CheckboxType = observer(function Checkbox({
@@ -72,7 +69,6 @@ export const Checkbox: CheckboxType = observer(function Checkbox({
   onChange,
   ...rest
 }: CheckboxBaseProps & (ICheckboxControlledProps | ICheckboxObjectProps<any>)) {
-  rest = filterLayoutFakeProps(rest);
   const checkboxState = useCheckboxState({
     value,
     defaultValue,

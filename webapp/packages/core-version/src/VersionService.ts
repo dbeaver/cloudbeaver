@@ -8,7 +8,7 @@
 import { computed, makeObservable } from 'mobx';
 
 import { injectable } from '@cloudbeaver/core-di';
-import { ServerService } from '@cloudbeaver/core-root';
+import { ServerConfigResource } from '@cloudbeaver/core-root';
 import { GlobalConstants } from '@cloudbeaver/core-utils';
 
 const VERSION_REGEX = /(\d+\.\d+\.\d+)/;
@@ -24,7 +24,7 @@ export class VersionService {
     return this.getProductVersion(true).frontendVersion;
   }
 
-  constructor(private readonly serverService: ServerService) {
+  constructor(private readonly serverConfigResource: ServerConfigResource) {
     makeObservable(this, {
       current: computed,
     });
@@ -32,7 +32,7 @@ export class VersionService {
 
   getProductVersion(short = false): IProductVersion {
     let frontendVersion = GlobalConstants.version || '';
-    let backendVersion = this.serverService.config.data?.version || '';
+    let backendVersion = this.serverConfigResource.data?.version || '';
 
     if (short) {
       frontendVersion = VERSION_REGEX.exec(frontendVersion)?.[1] ?? frontendVersion;

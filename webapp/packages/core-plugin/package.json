@@ -18,8 +18,10 @@
   },
   "dependencies": {
     "@cloudbeaver/core-di": "~0.1.0",
+    "@cloudbeaver/core-localization": "~0.1.0",
     "@cloudbeaver/core-product": "~0.1.0",
-    "@cloudbeaver/core-settings": "~0.1.0"
+    "@cloudbeaver/core-settings": "~0.1.0",
+    "@cloudbeaver/core-utils": "~0.1.0"
   },
   "peerDependencies": {},
   "devDependencies": {

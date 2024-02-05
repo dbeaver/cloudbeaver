@@ -41,27 +41,20 @@ const server = mockGraphQL(...mockAppInit(endpoint));
 
 beforeAll(() => app.init());
 
-const testValueA = true;
-const testValueB = false;
+const testValueDeprecated = true;
+const testValueNew = false;
 
-const equalAConfig = {
+const deprecatedSettings = {
   plugin_resource_manager: {
-    disabled: testValueA,
+    disabled: testValueDeprecated,
   } as ResourceManagerSettings,
-  plugin: {
-    'resource-manager': {
-      disabled: testValueA,
-    } as ResourceManagerSettings,
-  },
 };
 
-const equalBConfig = {
-  plugin_resource_manager: {
-    disabled: testValueB,
-  } as ResourceManagerSettings,
+const newSettings = {
+  ...deprecatedSettings,
   plugin: {
     'resource-manager': {
-      disabled: testValueB,
+      disabled: testValueNew,
     } as ResourceManagerSettings,
   },
 };
@@ -70,22 +63,20 @@ test('New settings equal deprecated settings A', async () => {
   const settings = app.injector.getServiceByClass(ResourceManagerSettingsService);
   const config = app.injector.getServiceByClass(ServerConfigResource);
 
-  server.use(endpoint.query('serverConfig', mockServerConfig(equalAConfig)));
+  server.use(endpoint.query('serverConfig', mockServerConfig(newSettings)));
 
   await config.refresh();
 
-  expect(settings.settings.getValue('disabled')).toBe(testValueA);
-  expect(settings.deprecatedSettings.getValue('disabled')).toBe(testValueA);
+  expect(settings.settings.getValue('disabled')).toBe(testValueNew);
 });
 
 test('New settings equal deprecated settings B', async () => {
   const settings = app.injector.getServiceByClass(ResourceManagerSettingsService);
   const config = app.injector.getServiceByClass(ServerConfigResource);
 
-  server.use(endpoint.query('serverConfig', mockServerConfig(equalBConfig)));
+  server.use(endpoint.query('serverConfig', mockServerConfig(deprecatedSettings)));
 
   await config.refresh();
 
-  expect(settings.settings.getValue('disabled')).toBe(testValueB);
-  expect(settings.deprecatedSettings.getValue('disabled')).toBe(testValueB);
+  expect(settings.settings.getValue('disabled')).toBe(testValueDeprecated);
 });

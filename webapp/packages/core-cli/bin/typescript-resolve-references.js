@@ -33,6 +33,7 @@ for (const dependency of dependencies) {
   typescriptConfig.references.push({
     path: upath.relative(currentDir, dependencyPath),
   });
+  typescriptConfig.references.sort((a, b) => a.path.localeCompare(b.path));
 
   // const relativePath = relative(tsRootPath, dependencyPath);
 

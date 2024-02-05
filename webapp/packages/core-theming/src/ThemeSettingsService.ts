@@ -6,31 +6,31 @@
  * you may not use this file except in compliance with the License.
  */
 import { injectable } from '@cloudbeaver/core-di';
-import { PluginManagerService, PluginSettings } from '@cloudbeaver/core-plugin';
-import { SettingsManagerService } from '@cloudbeaver/core-settings';
+import { createSettingsAliasResolver, PluginManagerService, PluginSettings } from '@cloudbeaver/core-plugin';
+import { ServerSettingsResolverService, ServerSettingsService } from '@cloudbeaver/core-root';
+import { schema } from '@cloudbeaver/core-utils';
 
-import { settings, THEME_SETTINGS_GROUP } from './THEME_SETTINGS_GROUP';
-import { themes } from './themes';
+import { DEFAULT_THEME_ID } from './themes';
 
-export interface IThemeSettings {
-  defaultTheme: string;
-}
+const settingsSchema = schema.object({
+  defaultTheme: schema.string().default(DEFAULT_THEME_ID),
+});
 
-export const defaultThemeSettings: IThemeSettings = {
-  defaultTheme: themes[0].id,
-};
+export type IThemeSettings = schema.infer<typeof settingsSchema>;
 
 @injectable()
 export class ThemeSettingsService {
-  readonly settings: PluginSettings<IThemeSettings>;
-  /** @deprecated Use settings instead, will be removed in 23.0.0 */
-  readonly deprecatedSettings: PluginSettings<IThemeSettings>;
+  readonly settings: PluginSettings<typeof settingsSchema>;
 
-  constructor(private readonly pluginManagerService: PluginManagerService, settingsManagerService: SettingsManagerService) {
-    this.settings = this.pluginManagerService.createSettings('theming', 'core', defaultThemeSettings);
-    this.deprecatedSettings = this.pluginManagerService.createSettings('user', 'core', defaultThemeSettings);
-
-    settingsManagerService.addGroup(THEME_SETTINGS_GROUP);
-    settingsManagerService.addSettings(settings.scopeType, settings.scope, settings.settingsData);
+  constructor(
+    private readonly pluginManagerService: PluginManagerService,
+    private readonly serverSettingsService: ServerSettingsService,
+    private readonly serverSettingsResolverService: ServerSettingsResolverService,
+  ) {
+    this.settings = this.pluginManagerService.createSettings('theming', 'core', settingsSchema);
+    this.serverSettingsResolverService.addResolver(
+      /** @deprecated Use settings instead, will be removed in 23.0.0 */
+      createSettingsAliasResolver(this.serverSettingsService, this.settings, 'core.user'),
+    );
   }
 }

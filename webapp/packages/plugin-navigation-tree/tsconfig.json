@@ -7,13 +7,25 @@
   },
   "references": [
     {
+      "path": "../core-administration/tsconfig.json"
+    },
+    {
       "path": "../core-app/tsconfig.json"
     },
     {
       "path": "../core-authentication/tsconfig.json"
     },
     {
+      "path": "../core-authentication/tsconfig.json"
+    },
+    {
       "path": "../core-blocks/tsconfig.json"
+    },
+    {
+      "path": "../core-browser/tsconfig.json"
+    },
+    {
+      "path": "../core-connections/tsconfig.json"
     },
     {
       "path": "../core-connections/tsconfig.json"
@@ -28,6 +40,12 @@
       "path": "../core-dialogs/tsconfig.json"
     },
     {
+      "path": "../core-dialogs/tsconfig.json"
+    },
+    {
+      "path": "../core-events/tsconfig.json"
+    },
+    {
       "path": "../core-events/tsconfig.json"
     },
     {
@@ -37,58 +55,16 @@
       "path": "../core-localization/tsconfig.json"
     },
     {
-      "path": "../core-navigation-tree/tsconfig.json"
-    },
-    {
-      "path": "../core-plugin/tsconfig.json"
-    },
-    {
-      "path": "../core-projects/tsconfig.json"
-    },
-    {
-      "path": "../core-resource/tsconfig.json"
-    },
-    {
-      "path": "../core-theming/tsconfig.json"
-    },
-    {
-      "path": "../core-ui/tsconfig.json"
-    },
-    {
-      "path": "../core-utils/tsconfig.json"
-    },
-    {
-      "path": "../core-view/tsconfig.json"
-    },
-    {
-      "path": "../plugin-datasource-context-switch/tsconfig.json"
-    },
-    {
-      "path": "../core-administration/tsconfig.json"
-    },
-    {
-      "path": "../core-app/tsconfig.json"
-    },
-    {
-      "path": "../core-authentication/tsconfig.json"
-    },
-    {
-      "path": "../core-browser/tsconfig.json"
-    },
-    {
-      "path": "../core-connections/tsconfig.json"
-    },
-    {
-      "path": "../core-dialogs/tsconfig.json"
-    },
-    {
-      "path": "../core-events/tsconfig.json"
-    },
-    {
       "path": "../core-localization/tsconfig.json"
     },
     {
       "path": "../core-navigation-tree/tsconfig.json"
+    },
+    {
+      "path": "../core-navigation-tree/tsconfig.json"
+    },
+    {
+      "path": "../core-plugin/tsconfig.json"
     },
     {
       "path": "../core-plugin/tsconfig.json"
@@ -98,6 +74,12 @@
     },
     {
       "path": "../core-projects/tsconfig.json"
+    },
+    {
+      "path": "../core-projects/tsconfig.json"
+    },
+    {
+      "path": "../core-resource/tsconfig.json"
     },
     {
       "path": "../core-root/tsconfig.json"
@@ -115,10 +97,25 @@
       "path": "../core-theming/tsconfig.json"
     },
     {
+      "path": "../core-theming/tsconfig.json"
+    },
+    {
       "path": "../core-ui/tsconfig.json"
     },
     {
+      "path": "../core-ui/tsconfig.json"
+    },
+    {
+      "path": "../core-utils/tsconfig.json"
+    },
+    {
       "path": "../core-view/tsconfig.json"
+    },
+    {
+      "path": "../core-view/tsconfig.json"
+    },
+    {
+      "path": "../plugin-datasource-context-switch/tsconfig.json"
     },
     {
       "path": "../plugin-datasource-context-switch/tsconfig.json"

@@ -35,6 +35,7 @@ import resourceManagerAdministration from '@cloudbeaver/plugin-resource-manager-
 import resourceManagerScripts from '@cloudbeaver/plugin-resource-manager-scripts';
 import root from '@cloudbeaver/plugin-root';
 import { sessionExpirationPlugin } from '@cloudbeaver/plugin-session-expiration';
+import { settingsAdministrationPlugin } from '@cloudbeaver/plugin-settings-administration';
 import settingsMenu from '@cloudbeaver/plugin-settings-menu';
 import settingsMenuAdministration from '@cloudbeaver/plugin-settings-menu-administration';
 import settingsPanelPlugin from '@cloudbeaver/plugin-settings-panel';
@@ -82,7 +83,6 @@ const PLUGINS: PluginManifest[] = [
   sqlGeneratorPlugin,
   userProfile,
   userProfileAdministration,
-  defaultProductManifest,
   connectionPlugin,
   connectionAdministration,
   versionUpdate,
@@ -111,6 +111,9 @@ const PLUGINS: PluginManifest[] = [
   navigationTreeFilters,
   coreTaskManagerManifest,
   taskManagerPluginManifest,
+  settingsAdministrationPlugin,
+  // must be las one to override all
+  defaultProductManifest,
 ];
 
 bootstrap(PLUGINS);
