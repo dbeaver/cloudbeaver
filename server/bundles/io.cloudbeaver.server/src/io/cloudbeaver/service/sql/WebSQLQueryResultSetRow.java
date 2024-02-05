@@ -1,7 +1,5 @@
 package io.cloudbeaver.service.sql;
 
-import org.jkiss.utils.Pair;
-
 import java.util.Map;
 
 public class WebSQLQueryResultSetRow {

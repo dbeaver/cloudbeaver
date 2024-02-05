@@ -33,6 +33,7 @@ import org.jkiss.dbeaver.model.DBCHierarchicalDocumentProvider;
 import org.jkiss.dbeaver.model.DBPDataSource;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
 import org.jkiss.dbeaver.model.DBUtils;
+import org.jkiss.dbeaver.model.data.DBCCollectionHierarchical;
 import org.jkiss.dbeaver.model.data.DBDAttributeBinding;
 import org.jkiss.dbeaver.model.exec.*;
 import org.jkiss.dbeaver.model.impl.sql.BasicSQLDialect;
