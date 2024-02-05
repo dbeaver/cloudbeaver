@@ -152,6 +152,7 @@ type SQLExecuteInfo {
 input SQLResultRow {
     data: [ Object ]!
     updateValues: Object
+    metaData: Object
 }
 
 input SQLResultRowMetaDataInput {

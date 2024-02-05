@@ -573,18 +573,12 @@ public class WebSQLProcessor implements WebSessionProvider {
                         continue;
                     }
                     DBDAttributeBinding[] updateAttributes = new DBDAttributeBinding[updateValues.size()];
-                    DBDAttributeBinding[] metaDataAttributes = new DBDAttributeBinding[metaData.size()];
                     // Final row is what we return back
 
                     int index = 0;
                     for (String indexStr : updateValues.keySet()) {
                         int attrIndex = CommonUtils.toInt(indexStr, -1);
                         updateAttributes[index++] = allAttributes[attrIndex];
-                    }
-
-                    for (String indexStr : metaData.keySet()) {
-                        int attrIndex = CommonUtils.toInt(indexStr, -1);
-                        metaDataAttributes[index++] = allAttributes[attrIndex];
                     }
 
                     Object[] rowValues = new Object[updateAttributes.length + keyAttributes.length];
@@ -594,7 +588,7 @@ public class WebSQLProcessor implements WebSessionProvider {
                         boolean isDocumentValue = keyAttributes.length == 1 && keyAttribute.getDataKind() == DBPDataKind.DOCUMENT && dataContainer instanceof DBSDocumentLocator;
                         if (isDocumentValue) {
                             rowValues[updateAttributes.length + i] =
-                                makeDocumentInputValue(session, (DBSDocumentLocator) dataContainer, resultsInfo, row);
+                                makeDocumentInputValue(session, (DBSDocumentLocator) dataContainer, resultsInfo, row, metaData);
                         } else {
                             rowValues[updateAttributes.length + i] = keyAttribute.getValueHandler().getValueFromObject(
                                 session,
@@ -705,7 +699,8 @@ public class WebSQLProcessor implements WebSessionProvider {
         DBCSession session,
         DBSDocumentLocator dataContainer,
         WebSQLResultsInfo resultsInfo,
-        WebSQLResultsRow row) throws DBException
+        WebSQLResultsRow row,
+        Map<String, Object> metaData) throws DBException
     {
         // Document reference
         DBDDocument document = null;
@@ -723,7 +718,7 @@ public class WebSQLProcessor implements WebSessionProvider {
             keyMap.put(attr.getName(), plainValue);
         }
         if (document == null) {
-            document = dataContainer.findDocument(session.getProgressMonitor(), keyMap);
+            document = dataContainer.findDocument(session.getProgressMonitor(), keyMap, metaData);
             if (document == null) {
                 throw new DBCException("Error finding document by key " + keyMap);
             }
@@ -838,7 +833,7 @@ public class WebSQLProcessor implements WebSessionProvider {
                 boolean isDocumentValue = keyAttributes.length == 1 && keyAttribute.getDataKind() == DBPDataKind.DOCUMENT && dataContainer instanceof DBSDocumentLocator;
                 if (isDocumentValue) {
                     rowValues[i] =
-                        makeDocumentInputValue(session, (DBSDocumentLocator) dataContainer, resultsInfo, row);
+                        makeDocumentInputValue(session, (DBSDocumentLocator) dataContainer, resultsInfo, row, null);
                 } else {
                     Object inputCellValue = row.getData()[keyAttribute.getOrdinalPosition()];
 
