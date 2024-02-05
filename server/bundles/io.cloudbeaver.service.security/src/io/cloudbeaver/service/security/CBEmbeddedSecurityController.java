@@ -229,11 +229,11 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
             database.normalizeTableNames("DELETE FROM {table_prefix}CB_USER_TEAM WHERE USER_ID=?"),
             userId
         );
+        String defaultUserTeam = application.getAppConfiguration().getDefaultUserTeam();
+        if (CommonUtils.isNotEmpty(defaultUserTeam) && !ArrayUtils.contains(teamIds, defaultUserTeam)) {
+            teamIds = ArrayUtils.add(String.class, teamIds, defaultUserTeam);
+        }
         if (!ArrayUtils.isEmpty(teamIds)) {
-            String defaultUserTeam = application.getAppConfiguration().getDefaultUserTeam();
-            if (CommonUtils.isNotEmpty(defaultUserTeam) && !ArrayUtils.contains(teamIds, defaultUserTeam)) {
-                teamIds = ArrayUtils.add(String.class, teamIds, defaultUserTeam);
-            }
             try (PreparedStatement dbStat = dbCon.prepareStatement(
                 database.normalizeTableNames("INSERT INTO {table_prefix}CB_USER_TEAM" +
                     "(USER_ID,TEAM_ID,GRANT_TIME,GRANTED_BY) VALUES(?,?,?,?)"))
