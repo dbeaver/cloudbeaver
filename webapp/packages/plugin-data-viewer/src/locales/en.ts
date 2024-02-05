@@ -49,6 +49,7 @@ export default [
   ['data_viewer_refresh_result_set', 'Refresh result set'],
   ['data_viewer_total_count_tooltip', 'Get total count'],
   ['data_viewer_total_count_failed', 'Failed to get total count'],
+  ['data_viewer_model_not_loaded', 'Table model is not loaded'],
   ['settings_data_editor', 'Data Editor'],
   ['settings_data_editor_disable_edit_name', 'Disable Edit'],
   ['settings_data_editor_disable_edit_description', 'Disable editing of data in Data Viewer'],
