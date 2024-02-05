@@ -226,7 +226,7 @@ export const ImageValuePresentation: TabContainerPanelComponent<IDataValuePanelP
       return (
         <Container vertical>
           <Container fill overflow center>
-            <QuotaPlaceholder limit={limit} size={valueSize}>
+            <QuotaPlaceholder limit={limit}>
               {data.selectedCell && data.contentAction.isDownloadable(data.selectedCell) && (
                 <Button
                   disabled={loading}
@@ -236,7 +236,7 @@ export const ImageValuePresentation: TabContainerPanelComponent<IDataValuePanelP
                   }
                   onClick={load}
                 >
-                  {translate('ui_view')}
+                  {`${translate('ui_view')} (${valueSize})`}
                 </Button>
               )}
             </QuotaPlaceholder>

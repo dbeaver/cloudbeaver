@@ -95,6 +95,7 @@ export default [
   ['ui_upload', 'Upload'],
   ['ui_import', 'Import'],
   ['ui_view', 'View'],
+  ['ui_show_more', 'Show more'],
   ['ui_limit', 'Limit'],
   ['ui_file_size', 'File size'],
   ['ui_processing_synchronization', 'Synchronization...'],

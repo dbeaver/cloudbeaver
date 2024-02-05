@@ -42,7 +42,6 @@ export default [
   ['data_viewer_presentation_value_content_value_size', 'Value size'],
   ['data_viewer_presentation_value_content_download_error', 'Download failed'],
   ['data_viewer_presentation_value_content_paste_error', 'Cannot load full text'],
-  ['data_viewer_presentation_value_content_full_text_button', 'View full text'],
   ['data_viewer_script_preview', '脚本'],
   ['data_viewer_script_preview_dialog_title', '预览更改'],
   ['data_viewer_script_preview_error_title', '无法获取脚本'],

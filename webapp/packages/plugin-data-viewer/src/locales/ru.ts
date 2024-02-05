@@ -36,7 +36,6 @@ export default [
   ['data_viewer_presentation_value_content_value_size', 'Размер значения'],
   ['data_viewer_presentation_value_content_download_error', 'Не удалось загрузить файл'],
   ['data_viewer_presentation_value_content_paste_error', 'Не удалось загрузить весь текст'],
-  ['data_viewer_presentation_value_content_full_text_button', 'Посмотреть весь текст'],
   ['data_viewer_script_preview', 'Скрипт'],
   ['data_viewer_script_preview_dialog_title', 'Предпросмотр изменений'],
   ['data_viewer_script_preview_error_title', 'Не удалось получить скрипт'],
