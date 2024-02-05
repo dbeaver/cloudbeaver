@@ -13,7 +13,6 @@ import styled, { css } from 'reshadow';
 import { ActionIconButton, Button, Container, Fill, Group, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { QuotasService } from '@cloudbeaver/core-root';
 import { BASE_TAB_STYLES, TabContainerPanelComponent, TabList, TabsState, UNDERLINE_TAB_STYLES, useTabLocalState } from '@cloudbeaver/core-ui';
 import { bytesToSize, isNotNullDefined } from '@cloudbeaver/core-utils';
 import { EditorLoader, useCodemirrorExtensions } from '@cloudbeaver/plugin-codemirror6';
@@ -55,7 +54,6 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
   function TextValuePresentation({ model, resultIndex, dataFormat }) {
     const translate = useTranslate();
     const notificationService = useService(NotificationService);
-    const quotasService = useService(QuotasService);
     const textValuePresentationService = useService(TextValuePresentationService);
     const style = useStyles(styles, UNDERLINE_TAB_STYLES, VALUE_PANEL_TOOLS_STYLES);
     const selection = model.source.getAction(resultIndex, ResultSetSelectAction);
@@ -115,16 +113,11 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
     const autoLineWrapping = getDefaultLineWrapping(contentType);
     const lineWrapping = state.lineWrapping ?? autoLineWrapping;
 
-    const {
-      textValue,
-      isTruncated,
-      isTextColumn,
-      pasteFullText,
-      limitString: limit,
-    } = useTextValue({
+    const textValueData = useTextValue({
       model,
       resultIndex,
       currentContentType: contentType,
+      elementKey: firstSelectedCell,
     });
     const isSelectedCellReadonly = firstSelectedCell && (formatAction.isReadOnly(firstSelectedCell) || formatAction.isBinary(firstSelectedCell));
     const isReadonlyByResultIndex = model.isReadonly(resultIndex) || model.isDisabled(resultIndex) || !firstSelectedCell;
@@ -132,7 +125,7 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
     const valueSize =
       isResultSetContentValue(contentValue) && isNotNullDefined(contentValue.contentLength) ? bytesToSize(contentValue.contentLength) : undefined;
     const canSave = firstSelectedCell && contentAction.isDownloadable(firstSelectedCell);
-    const shouldShowPasteButton = isTextColumn && isTruncated;
+    const shouldShowPasteButton = textValueData.isTextColumn && textValueData.isTruncated;
     const typeExtension = useMemo(() => getTypeExtension(contentType!) ?? [], [contentType]);
     const extensions = useCodemirrorExtensions(undefined, typeExtension);
 
@@ -185,16 +178,16 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
         <Group maximum box>
           <EditorLoader
             key={isReadonly ? '1' : '0'}
-            value={textValue}
+            value={textValueData.textValue}
             lineWrapping={lineWrapping}
             readonly={isReadonly}
             extensions={extensions}
             onChange={valueChangeHandler}
           />
         </Group>
-        {isTruncated && (
+        {textValueData.isTruncated && (
           <Container keepSize>
-            <QuotaPlaceholder limit={limit} size={valueSize} />
+            <QuotaPlaceholder limit={textValueData.limitString} size={valueSize} />
           </Container>
         )}
         <Container keepSize center overflow>
@@ -211,7 +204,7 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
           <Fill />
           {shouldShowPasteButton && (
             <Container keepSize>
-              <Button disabled={model.isLoading()} onClick={pasteFullText}>
+              <Button disabled={model.isLoading()} onClick={textValueData.pasteFullText}>
                 {translate('data_viewer_presentation_value_content_full_text_button')}
               </Button>
             </Container>

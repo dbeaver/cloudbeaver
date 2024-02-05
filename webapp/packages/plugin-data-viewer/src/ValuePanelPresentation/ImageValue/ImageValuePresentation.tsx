@@ -29,6 +29,7 @@ import { ResultSetSelectAction } from '../../DatabaseDataModel/Actions/ResultSet
 import type { IDatabaseResultSet } from '../../DatabaseDataModel/IDatabaseResultSet';
 import type { IDataValuePanelProps } from '../../TableViewer/ValuePanel/DataValuePanelService';
 import { QuotaPlaceholder } from '../QuotaPlaceholder';
+import { useResultSetValueLimitInfo } from '../useResultSetValueLimitInfo';
 import styles from './ImageValuePresentation.m.css';
 
 interface IToolsProps {
@@ -66,7 +67,6 @@ export const ImageValuePresentation: TabContainerPanelComponent<IDataValuePanelP
   function ImageValuePresentation({ model, resultIndex }) {
     const translate = useTranslate();
     const notificationService = useService(NotificationService);
-    const quotasService = useService(QuotasService);
     const style = useS(styles);
 
     const state = useTabLocalState(() =>
@@ -205,9 +205,10 @@ export const ImageValuePresentation: TabContainerPanelComponent<IDataValuePanelP
     const upload = data.canUpload ? data.upload : undefined;
     const loading = model.isLoading();
     const value = data.cellValue;
+    const limitInfo = useResultSetValueLimitInfo({ model, resultIndex, elementKey: data.selectedCell });
 
     if (data.truncated && !data.savedSrc && isResultSetContentValue(value)) {
-      const limit = bytesToSize(quotasService.getQuota('sqlBinaryPreviewMaxLength'));
+      const limit = limitInfo.limit ? bytesToSize(limitInfo.limit) : undefined;
       const valueSize = bytesToSize(value.contentLength ?? 0);
 
       const load = async () => {

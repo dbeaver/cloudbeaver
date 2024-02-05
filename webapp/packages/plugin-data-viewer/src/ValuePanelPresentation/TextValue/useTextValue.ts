@@ -9,18 +9,20 @@ import { useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { bytesToSize, isNotNullDefined } from '@cloudbeaver/core-utils';
 
+import type { IResultSetElementKey } from '../../DatabaseDataModel/Actions/ResultSet/IResultSetDataKey';
 import { isResultSetBinaryFileValue } from '../../DatabaseDataModel/Actions/ResultSet/isResultSetBinaryFileValue';
 import { isResultSetContentValue } from '../../DatabaseDataModel/Actions/ResultSet/isResultSetContentValue';
 import { useResultActions } from '../../DatabaseDataModel/Actions/ResultSet/useResultActions';
 import type { IDatabaseDataModel } from '../../DatabaseDataModel/IDatabaseDataModel';
 import type { IDatabaseResultSet } from '../../DatabaseDataModel/IDatabaseResultSet';
-import { useContentLimit } from '../useContentLimit';
+import { useResultSetValueLimitInfo } from '../useResultSetValueLimitInfo';
 import { useAutoFormat } from './useAutoFormat';
 
 interface IUseTextValueArgs {
   resultIndex: number;
   model: IDatabaseDataModel<any, IDatabaseResultSet>;
   currentContentType: string;
+  elementKey: IResultSetElementKey;
 }
 
 interface IUseTextValue {
@@ -31,18 +33,16 @@ interface IUseTextValue {
   pasteFullText(): Promise<void>;
 }
 
-export function useTextValue({ model, resultIndex, currentContentType }: IUseTextValueArgs): IUseTextValue {
-  const { formatAction, editAction, contentAction, dataAction, selectAction } = useResultActions({ model, resultIndex });
-  const activeElements = selectAction.getActiveElements();
-  const firstSelectedCell = activeElements?.[0];
+export function useTextValue({ model, resultIndex, currentContentType, elementKey }: IUseTextValueArgs): IUseTextValue {
+  const { formatAction, editAction, contentAction, dataAction } = useResultActions({ model, resultIndex });
   const formatter = useAutoFormat();
-  const columnType = firstSelectedCell ? dataAction.getColumn(firstSelectedCell.column)?.dataKind : '';
+  const columnType = elementKey ? dataAction.getColumn(elementKey.column)?.dataKind : null;
   const isTextColumn = columnType?.toLocaleLowerCase() === 'string';
-  const contentValue = firstSelectedCell ? formatAction.get(firstSelectedCell) : null;
-  const cachedFullText = firstSelectedCell ? contentAction.retrieveFileFullTextFromCache(firstSelectedCell) : '';
-  const blob = firstSelectedCell ? formatAction.get(firstSelectedCell) : null;
+  const contentValue = elementKey ? formatAction.get(elementKey) : null;
+  const cachedFullText = elementKey ? contentAction.retrieveFileFullTextFromCache(elementKey) : '';
+  const blob = elementKey ? formatAction.get(elementKey) : null;
   const notificationService = useService(NotificationService);
-  const { limit, shouldShowLimit } = useContentLimit({ model, resultIndex });
+  const { limit, shouldShowLimit } = useResultSetValueLimitInfo({ model, resultIndex, elementKey });
 
   const result: IUseTextValue = {
     textValue: '',
@@ -50,19 +50,19 @@ export function useTextValue({ model, resultIndex, currentContentType }: IUseTex
     isTextColumn,
     limitString: limit && shouldShowLimit ? bytesToSize(limit) : undefined,
     async pasteFullText() {
-      if (!firstSelectedCell) {
+      if (!elementKey) {
         return;
       }
 
       try {
-        await contentAction.getFileFullText(firstSelectedCell);
+        await contentAction.getFileFullText(elementKey);
       } catch (exception) {
         notificationService.logException(exception as any, 'data_viewer_presentation_value_content_paste_error');
       }
     },
   };
 
-  if (!isNotNullDefined(firstSelectedCell)) {
+  if (!isNotNullDefined(elementKey)) {
     return result;
   }
 
@@ -75,8 +75,8 @@ export function useTextValue({ model, resultIndex, currentContentType }: IUseTex
     result.isTruncated = false;
   }
 
-  if (editAction.isElementEdited(firstSelectedCell)) {
-    result.textValue = formatAction.getText(firstSelectedCell);
+  if (editAction.isElementEdited(elementKey)) {
+    result.textValue = formatAction.getText(elementKey);
   }
 
   if (isResultSetBinaryFileValue(blob)) {
@@ -88,7 +88,7 @@ export function useTextValue({ model, resultIndex, currentContentType }: IUseTex
   }
 
   if (!result.textValue) {
-    result.textValue = formatter.format(currentContentType, formatAction.getText(firstSelectedCell));
+    result.textValue = formatter.format(currentContentType, formatAction.getText(elementKey));
   }
 
   return result;
