@@ -40,6 +40,7 @@ public class WebSQLQueryResultSet {
     private boolean hasRowIdentifier;
 
     private boolean hasChildrenCollection;
+    private boolean isSupportsDataFilter;
 
     public WebSQLQueryResultSet() {
     }
@@ -123,5 +124,14 @@ public class WebSQLQueryResultSet {
 
     public void setHasChildrenCollection(boolean hasSuCollection) {
         this.hasChildrenCollection = hasSuCollection;
+    }
+
+    @Property
+    public boolean isSupportsDataFilter() {
+        return isSupportsDataFilter;
+    }
+
+    public void setSupportsDataFilter(boolean supportsDataFilter) {
+        isSupportsDataFilter = supportsDataFilter;
     }
 }
