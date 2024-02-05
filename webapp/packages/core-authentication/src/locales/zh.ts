@@ -1,5 +1,5 @@
 export default [
-  ['settings_authentication', 'Authentication'],
+  ['core_authentication_auth_settings_group', 'Authentication'],
   ['settings_authentication_disable_anonymous_access_name', 'Disable anonymous access'],
   ['settings_authentication_disable_anonymous_access_description', 'Disable anonymous access function'],
 

@@ -15,7 +15,7 @@ import { QuotasService } from './QuotasService';
 import { ServerConfigEventHandler } from './ServerConfigEventHandler';
 import { ServerConfigResource } from './ServerConfigResource';
 import { ServerNodeService } from './ServerNodeService';
-import { ServerService } from './ServerService';
+import { ServerSettingsResolverService } from './ServerSettingsResolverService';
 import { ServerSettingsService } from './ServerSettingsService';
 import { SessionActionService } from './SessionActionService';
 import { SessionDataResource } from './SessionDataResource';
@@ -26,7 +26,6 @@ import { SessionInfoEventHandler } from './SessionInfoEventHandler';
 import { SessionPermissionEventHandler } from './SessionPermissionEventHandler';
 import { SessionPermissionsResource } from './SessionPermissionsResource';
 import { SessionResource } from './SessionResource';
-import { SessionService } from './SessionService';
 import { SessionSettingsService } from './SessionSettingsService';
 import { WindowEventsService } from './WindowEventsService';
 
@@ -41,7 +40,6 @@ export const coreRootManifest: PluginManifest = {
     SessionPermissionsResource,
     PermissionsService,
     ServerConfigResource,
-    ServerService,
     ServerSettingsService,
     SessionActionService,
     SessionDataResource,
@@ -49,7 +47,6 @@ export const coreRootManifest: PluginManifest = {
     SessionExpireEventService,
     ServerNodeService,
     SessionResource,
-    SessionService,
     SessionSettingsService,
     WindowEventsService,
     QuotasService,
@@ -58,5 +55,6 @@ export const coreRootManifest: PluginManifest = {
     SessionInfoEventHandler,
     DataSynchronizationService,
     SessionPermissionEventHandler,
+    ServerSettingsResolverService,
   ],
 };

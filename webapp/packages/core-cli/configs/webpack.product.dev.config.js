@@ -45,9 +45,18 @@ module.exports = (env, argv) => {
       index,
       sso,
     },
+    watchOptions: {
+      aggregateTimeout: 3000,
+      ignored: ['**/node_modules', '**/packages/*/src/**/*.{ts,tsx}'],
+    },
     optimization: {
       minimize: false,
       moduleIds: 'named',
+
+      // improve performance
+      removeAvailableModules: false,
+      removeEmptyChunks: false,
+      splitChunks: false,
     },
     devServer: {
       allowedHosts: 'all',

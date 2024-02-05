@@ -228,6 +228,13 @@ export class ServerConfigResource extends CachedDataResource<ServerConfig | null
     }
   }
 
+  async updateProductConfiguration(configuration: any) {
+    await this.performUpdate(undefined, undefined, async () => {
+      await this.graphQLService.sdk.updateProductConfiguration({ configuration });
+      this.setData(await this.loader());
+    });
+  }
+
   async save(skipConfigUpdate = false): Promise<void> {
     await this.performUpdate(
       undefined,

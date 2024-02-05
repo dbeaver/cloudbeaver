@@ -49,6 +49,9 @@
       "path": "../core-ui/tsconfig.json"
     },
     {
+      "path": "../core-utils/tsconfig.json"
+    },
+    {
       "path": "../core-view/tsconfig.json"
     },
     {
@@ -56,9 +59,6 @@
     },
     {
       "path": "../plugin-top-app-bar/tsconfig.json"
-    },
-    {
-      "path": "../core-utils/tsconfig.json"
     }
   ],
   "include": [

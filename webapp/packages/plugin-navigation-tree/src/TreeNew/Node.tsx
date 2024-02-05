@@ -16,7 +16,7 @@ import type { NodeComponent } from './INodeRenderer';
 import { NodeControl } from './NodeControl';
 import { useNodeDnD } from './useNodeDnD';
 
-export const Node: NodeComponent = observer(function Node({ nodeId, offsetHeight, childrenRenderer }) {
+export const Node: NodeComponent = observer(function Node({ nodeId, offsetHeight, controlRenderer, childrenRenderer }) {
   const tree = useContext(TreeContext)!;
   const data = useContext(TreeDataContext)!;
 
@@ -40,12 +40,17 @@ export const Node: NodeComponent = observer(function Node({ nodeId, offsetHeight
     tree.selectNode(nodeId, !selected);
   }
 
-  const NavigationTreeChildrenNew = childrenRenderer;
+  function handleClick() {
+    tree.clickNode(nodeId);
+  }
+
+  const ControlRenderer = controlRenderer || NodeControl;
+  const ChildrenRenderer = childrenRenderer;
 
   return (
-    <TreeNode selected={selected} expanded={expanded} onExpand={handleToggleExpand} onOpen={handleOpen} onSelect={handleSelect}>
-      <NodeControl ref={dndData.setTargetRef} nodeId={nodeId} />
-      {expanded && <NavigationTreeChildrenNew nodeId={nodeId} offsetHeight={offsetHeight + tree.getNodeHeight(nodeId)} />}
+    <TreeNode selected={selected} expanded={expanded} onExpand={handleToggleExpand} onOpen={handleOpen} onSelect={handleSelect} onClick={handleClick}>
+      <ControlRenderer ref={dndData.setTargetRef} nodeId={nodeId} />
+      {expanded && <ChildrenRenderer nodeId={nodeId} offsetHeight={offsetHeight + tree.getNodeHeight(nodeId)} />}
     </TreeNode>
   );
 });

@@ -13,10 +13,10 @@
       "path": "../core-theming/tsconfig.json"
     },
     {
-      "path": "../core-utils/tsconfig.json"
+      "path": "../core-theming/tsconfig.json"
     },
     {
-      "path": "../core-theming/tsconfig.json"
+      "path": "../core-utils/tsconfig.json"
     }
   ],
   "include": [

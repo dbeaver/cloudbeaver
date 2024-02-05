@@ -6,12 +6,14 @@
  * you may not use this file except in compliance with the License.
  */
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
+import { importLazyComponent } from '@cloudbeaver/core-utils';
 import { ActionService, DATA_CONTEXT_MENU, menuExtractItems, MenuService } from '@cloudbeaver/core-view';
 import { MENU_TOOLS, ToolsPanelService } from '@cloudbeaver/plugin-tools-panel';
 
 import { ACTION_LOG_VIEWER_ENABLE } from '../Actions/ACTION_LOG_VIEWER_ENABLE';
-import { LogViewer } from './LogViewer';
 import { LogViewerService } from './LogViewerService';
+
+const LogViewer = importLazyComponent(() => import('./LogViewer').then(m => m.LogViewer));
 
 @injectable()
 export class LogViewerBootstrap extends Bootstrap {

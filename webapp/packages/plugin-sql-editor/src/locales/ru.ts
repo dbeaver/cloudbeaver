@@ -1,4 +1,5 @@
 export default [
+  ['plugin_sql_editor_sql_editor_settings_group', 'SQL Редактор'],
   ['sql_editor_menu', 'SQL Редактор'],
   ['sql_editor_script_editor', 'Редактор SQL'],
   ['sql_editor_alias_loading_error', 'Возникла ошибка при загрузке псевдонима'],

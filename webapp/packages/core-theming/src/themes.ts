@@ -27,3 +27,5 @@ export const themes: ITheme[] = [
     },
   },
 ];
+
+export const DEFAULT_THEME_ID = themes[0].id;
