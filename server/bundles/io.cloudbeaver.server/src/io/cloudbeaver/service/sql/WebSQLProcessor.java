@@ -718,7 +718,7 @@ public class WebSQLProcessor implements WebSessionProvider {
             keyMap.put(attr.getName(), plainValue);
         }
         if (document == null) {
-            document = dataContainer.findDocument(session.getProgressMonitor(), keyMap, metaData);
+            document = dataContainer.findDocument(session, keyMap, metaData);
             if (document == null) {
                 throw new DBCException("Error finding document by key " + keyMap);
             }
