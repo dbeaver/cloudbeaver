@@ -1458,10 +1458,12 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
         String authAttemptId = UUID.randomUUID().toString();
         try (Connection dbCon = database.openConnection()) {
             try (JDBCTransaction txn = new JDBCTransaction(dbCon)) {
-                if (smConfig.isCheckBruteforce()
-                    && this.getAuthProvider(authProviderId).getInstance() instanceof SMBruteForceProtected bruteforceProtected) {
-                    BruteForceUtils.checkBruteforce(smConfig,
-                        getLatestUserLogins(dbCon, authProviderId, bruteforceProtected.getInputUsername(authData).toString()));
+                if (smConfig.isCheckBruteforce() && this.getAuthProvider(authProviderId).getInstance() instanceof SMBruteForceProtected bruteforceProtected) {
+                    Object inputUsername = bruteforceProtected.getInputUsername(authData);
+                    if (inputUsername != null) {
+                        BruteForceUtils.checkBruteforce(smConfig,
+                            getLatestUserLogins(dbCon, authProviderId, inputUsername.toString()));
+                    }
                 }
                 try (PreparedStatement dbStat = dbCon.prepareStatement(
                     database.normalizeTableNames(
@@ -1483,7 +1485,12 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
                     }
                     dbStat.setString(7, isMainSession ? CHAR_BOOL_TRUE : CHAR_BOOL_FALSE);
                     if (this.getAuthProvider(authProviderId).getInstance() instanceof SMBruteForceProtected bruteforceProtected) {
-                        dbStat.setString(8, bruteforceProtected.getInputUsername(authData).toString());
+                        Object inputUsername = bruteforceProtected.getInputUsername(authData);
+                        if (inputUsername != null) {
+                            dbStat.setString(8, inputUsername.toString());
+                        } else {
+                            dbStat.setString(8, null);
+                        }
                     } else {
                         dbStat.setString(8, null);
                     }
