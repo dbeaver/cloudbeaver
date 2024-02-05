@@ -12,13 +12,24 @@ import { s } from '../s';
 import { useS } from '../useS';
 import style from './Split.m.css';
 
-export type ISplitProps = SplitProps;
+export type ISplitProps = SplitProps & {
+  disableAutoMargin?: boolean;
+};
 
-export const Split = observer<ISplitProps>(function Split({ className, split, ...rest }) {
+const AUTO_MARGIN = 22;
+
+export const Split = observer<ISplitProps>(function Split({ className, minSize, maxSize, split, disableAutoMargin = false, ...rest }) {
   const styles = useS(style);
 
   const vertical = split === 'vertical' || split === undefined;
   const horizontal = split === 'horizontal';
 
-  return <BaseSplit className={s(styles, { split: true, vertical, horizontal }, className)} split={split} {...rest} />;
+  if (!disableAutoMargin) {
+    minSize = AUTO_MARGIN;
+    maxSize = -AUTO_MARGIN;
+  }
+
+  return (
+    <BaseSplit minSize={minSize} maxSize={maxSize} className={s(styles, { split: true, vertical, horizontal }, className)} split={split} {...rest} />
+  );
 });

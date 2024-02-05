@@ -74,51 +74,42 @@ const server = mockGraphQL(...mockAppInit(endpoint), ...mockAuthentication(endpo
 
 beforeAll(() => app.init());
 
-const testValueA = true;
-const testValueB = false;
+const testValueDeprecated = true;
+const testValueNew = false;
 
-const equalConfigA = {
+const deprecatedSettings = {
   plugin_data_spreadsheet_new: {
-    hidden: testValueA,
+    hidden: testValueDeprecated,
   } as DataGridSettings,
+};
+
+const newSettings = {
+  ...deprecatedSettings,
   plugin: {
     'data-spreadsheet': {
-      hidden: testValueA,
+      hidden: testValueNew,
     } as DataGridSettings,
   },
 };
 
-const equalConfigB = {
-  plugin_data_spreadsheet_new: {
-    hidden: testValueB,
-  } as DataGridSettings,
-  plugin: {
-    'data-spreadsheet': {
-      hidden: testValueB,
-    } as DataGridSettings,
-  },
-};
-
-test('New settings equal deprecated settings A', async () => {
+test('New settings override deprecated', async () => {
   const settings = app.injector.getServiceByClass(DataGridSettingsService);
   const config = app.injector.getServiceByClass(ServerConfigResource);
 
-  server.use(endpoint.query('serverConfig', mockServerConfig(equalConfigA)));
+  server.use(endpoint.query('serverConfig', mockServerConfig(newSettings)));
 
   await config.refresh();
 
-  expect(settings.settings.getValue('hidden')).toBe(testValueA);
-  expect(settings.deprecatedSettings.getValue('hidden')).toBe(testValueA);
+  expect(settings.settings.getValue('hidden')).toBe(testValueNew);
 });
 
-test('New settings equal deprecated settings B', async () => {
+test('Deprecated settings are used if new settings are not defined', async () => {
   const settings = app.injector.getServiceByClass(DataGridSettingsService);
   const config = app.injector.getServiceByClass(ServerConfigResource);
 
-  server.use(endpoint.query('serverConfig', mockServerConfig(equalConfigB)));
+  server.use(endpoint.query('serverConfig', mockServerConfig(deprecatedSettings)));
 
   await config.refresh();
 
-  expect(settings.settings.getValue('hidden')).toBe(testValueB);
-  expect(settings.deprecatedSettings.getValue('hidden')).toBe(testValueB);
+  expect(settings.settings.getValue('hidden')).toBe(testValueDeprecated);
 });

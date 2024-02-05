@@ -11,9 +11,6 @@ import { injectable } from '@cloudbeaver/core-di';
 @injectable()
 export class CookiesService {
   get cookiesEnabled() {
-    if (this.browserSettingsService.settings.isValueDefault('cookies.disabled')) {
-      return !this.browserSettingsService.deprecatedSettings.getValue('disabled');
-    }
     return !this.browserSettingsService.settings.getValue('cookies.disabled');
   }
 

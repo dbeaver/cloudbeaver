@@ -185,6 +185,9 @@ public class WebServiceBindingAdmin extends WebServiceBindingBase<DBWServiceAdmi
         .dataFetcher("setDefaultNavigatorSettings",
             env -> getService(env).setDefaultNavigatorSettings(getWebSession(env), WebServiceUtils.parseNavigatorSettings(env.getArgument("settings"))))
         ;
+        model.getMutationType()
+            .dataFetcher("adminUpdateProductConfiguration",
+                env -> getService(env).updateProductConfiguration(getWebSession(env), env.getArgument("configuration")));
     }
 
     @Override

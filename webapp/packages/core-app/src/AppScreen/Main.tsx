@@ -28,12 +28,7 @@ export const Main = observer(function Main() {
   return (
     <Loader className={s(styles, { loader: true })} suspense>
       <main className={s(styles, { space: true })}>
-        <Split
-          {...splitMainState}
-          sticky={30}
-          mode={leftBarDisabled ? 'minimize' : splitMainState.mode}
-          disable={leftBarDisabled}
-        >
+        <Split {...splitMainState} sticky={30} mode={leftBarDisabled ? 'minimize' : splitMainState.mode} disable={leftBarDisabled}>
           <Pane className={s(styles, { pane: true })} basis="250px" main>
             <Loader suspense>
               <SideBarPanel container={leftBarPanelService.tabsContainer} />

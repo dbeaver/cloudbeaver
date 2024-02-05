@@ -19,12 +19,12 @@
   "dependencies": {
     "@cloudbeaver/core-app": "~0.1.0",
     "@cloudbeaver/core-blocks": "~0.1.0",
+    "@cloudbeaver/core-browser": "~0.1.0",
     "@cloudbeaver/core-di": "~0.1.0",
     "@cloudbeaver/core-dialogs": "~0.1.0",
     "@cloudbeaver/core-events": "~0.1.0",
     "@cloudbeaver/core-localization": "~0.1.0",
     "@cloudbeaver/core-routing": "~0.1.0",
-    "@cloudbeaver/core-settings": "~0.1.0",
     "@cloudbeaver/core-utils": "~0.1.0",
     "@cloudbeaver/core-view": "~0.1.0",
     "@cloudbeaver/plugin-navigation-tree": "~0.1.0",

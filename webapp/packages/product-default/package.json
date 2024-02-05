@@ -64,6 +64,7 @@
     "@cloudbeaver/plugin-resource-manager-scripts": "~0.1.0",
     "@cloudbeaver/plugin-root": "~0.1.0",
     "@cloudbeaver/plugin-session-expiration": "~0.1.0",
+    "@cloudbeaver/plugin-settings-administration": "~0.1.0",
     "@cloudbeaver/plugin-settings-menu": "~0.1.0",
     "@cloudbeaver/plugin-settings-menu-administration": "~0.1.0",
     "@cloudbeaver/plugin-settings-panel": "~0.1.0",

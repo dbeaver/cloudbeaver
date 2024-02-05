@@ -40,11 +40,6 @@
     @include mdc-theme-prop(color, input-color, false);
     @include mdc-theme-prop(border-color, input-border, false);
     @include mdc-theme-prop(background-color, input-background, false);
-
-    &:focus,
-    &[data-focus=true] {
-      @include mdc-theme-prop(border-color, primary, false);
-    }
     // we use box-shadow to overlap internal background-color style, we can't override it due to chrome bug
     &:-internal-autofill-selected,
     &:-internal-autofill-previewed {
@@ -52,7 +47,16 @@
       box-shadow: 0 0 0 50px $input-background inset;
     }
 
-    &:not([data-select=true])[readonly] {
+    &:user-invalid {
+      @include mdc-theme-prop(border-color, negative, false);
+    }
+
+    &:focus,
+    &[data-focus='true'] {
+      @include mdc-theme-prop(border-color, primary, false);
+    }
+
+    &:not([data-select='true'])[readonly] {
       @include mdc-theme-prop(color, input-color-readonly, false);
       @include mdc-theme-prop(border-color, input-border-readonly, false);
       @include mdc-theme-prop(background-color, input-background-readonly, false);
@@ -72,9 +76,9 @@
         box-shadow: 0 0 0 50px $input-background-disabled inset;
       }
     }
-    &[data-embedded=true] {
+    &[data-embedded='true'] {
       &[disabled],
-      &:not([data-select=true])[readonly] {
+      &:not([data-select='true'])[readonly] {
         @include mdc-theme-prop(border-color, background, false);
         @include mdc-theme-prop(background-color, input-background, false);
       }

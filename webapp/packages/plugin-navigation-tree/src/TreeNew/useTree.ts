@@ -15,6 +15,7 @@ import type { ITreeData } from './useTreeData';
 interface IOptions {
   data: ITreeData;
   nodeRenderers?: INodeRenderer[];
+  onNodeClick?(id: string): void | Promise<void>;
   onNodeDoubleClick?(id: string): void | Promise<void>;
   getNodeHeight(id: string): number;
 }
@@ -24,6 +25,7 @@ export interface ITree {
   getNodeHeight(id: string): number;
 
   openNode(id: string): Promise<void>;
+  clickNode(id: string): Promise<void>;
   expandNode(id: string, state: boolean): Promise<void>;
   selectNode(id: string, state: boolean): void;
 }
@@ -32,6 +34,7 @@ export function useTree(options: IOptions): ITree {
   options = useObservableRef(options, {
     data: observable.ref,
     nodeRenderers: observable.ref,
+    onNodeClick: observable.ref,
     onNodeDoubleClick: observable.ref,
     getNodeHeight: observable.ref,
   });
@@ -55,6 +58,9 @@ export function useTree(options: IOptions): ITree {
       },
       getNodeHeight(id: string): number {
         return options.getNodeHeight(id);
+      },
+      async clickNode(id: string) {
+        await options.onNodeClick?.(id);
       },
       async openNode(id: string) {
         await options.onNodeDoubleClick?.(id);

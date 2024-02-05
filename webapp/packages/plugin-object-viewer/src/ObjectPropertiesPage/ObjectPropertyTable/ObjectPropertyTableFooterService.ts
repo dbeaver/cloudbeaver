@@ -5,10 +5,9 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { CoreSettingsService } from '@cloudbeaver/core-app';
 import type { TableState } from '@cloudbeaver/core-blocks';
 import { injectable } from '@cloudbeaver/core-di';
-import { CommonDialogService, ContextMenuService, IContextMenuItem, IMenuContext, IMenuItem } from '@cloudbeaver/core-dialogs';
+import { ContextMenuService, IContextMenuItem, IMenuContext, IMenuItem } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { ENodeFeature, type NavNode, NavNodeInfoResource, NavTreeResource, NavTreeSettingsService } from '@cloudbeaver/core-navigation-tree';
 import { resourceKeyList } from '@cloudbeaver/core-resource';
@@ -28,8 +27,6 @@ export class ObjectPropertyTableFooterService {
     private readonly navTreeResource: NavTreeResource,
     private readonly navNodeInfoResource: NavNodeInfoResource,
     private readonly notificationService: NotificationService,
-    private readonly commonDialogService: CommonDialogService,
-    private readonly coreSettingsService: CoreSettingsService,
     private readonly navTreeSettingsService: NavTreeSettingsService,
   ) {
     this.contextMenuService.addPanel(this.objectPropertyTableFooterToken);
@@ -43,10 +40,7 @@ export class ObjectPropertyTableFooterService {
       isPresent(context) {
         return context.contextType === ObjectPropertyTableFooterService.objectPropertyContextType;
       },
-      isHidden: () =>
-        !(this.navTreeSettingsService.settings.isValueDefault('deleting')
-          ? this.coreSettingsService.settings.getValue('app.metadata.deleting')
-          : this.navTreeSettingsService.settings.getValue('deleting')),
+      isHidden: () => this.navTreeSettingsService.settings.getValue('deleting'),
       isDisabled: context => {
         if (context.data.tableState.selectedList.length === 0) {
           return true;

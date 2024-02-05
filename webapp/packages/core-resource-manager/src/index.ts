@@ -1,3 +1,4 @@
+export * from './RESOURCE_MANAGER_SETTINGS_GROUP';
 export * from './SharedProjectsResource';
 export * from './ProjectPermissionsResource';
 export * from './ResourceManagerEventHandler';

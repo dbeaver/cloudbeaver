@@ -7,7 +7,6 @@
  */
 import { runInAction } from 'mobx';
 
-import { CoreSettingsService } from '@cloudbeaver/core-app';
 import { AppAuthService } from '@cloudbeaver/core-authentication';
 import { injectable } from '@cloudbeaver/core-di';
 import { CachedDataResource } from '@cloudbeaver/core-resource';
@@ -26,7 +25,6 @@ export interface ILogEntry extends LogEntry {
 export class SessionLogsResource extends CachedDataResource<ILogEntry[]> {
   constructor(
     private readonly graphQLService: GraphQLService,
-    private readonly coreSettingsService: CoreSettingsService,
     private readonly logViewerSettingsService: LogViewerSettingsService,
     sessionDataResource: SessionDataResource,
     appAuthService: AppAuthService,
@@ -55,9 +53,7 @@ export class SessionLogsResource extends CachedDataResource<ILogEntry[]> {
   }
 
   protected async loader(): Promise<ILogEntry[]> {
-    const maxLogEntries = this.logViewerSettingsService.settings.isValueDefault('logBatchSize')
-      ? this.coreSettingsService.settings.getValue('app.logViewer.logBatchSize')
-      : this.logViewerSettingsService.settings.getValue('logBatchSize');
+    const maxLogEntries = this.logViewerSettingsService.settings.getValue('logBatchSize');
 
     const { log } = await this.graphQLService.sdk.readSessionLog({
       maxEntries: maxLogEntries,

@@ -74,31 +74,46 @@ const server = mockGraphQL(...mockAppInit(endpoint), ...mockAuthentication(endpo
 
 beforeAll(() => app.init());
 
-const testValue = 1;
+const testValueNew = 1;
+const testValueDeprecated = 2;
 
-const equalConfig = {
+const deprecatedSettings = {
   core: {
     app: {
       sqlEditor: {
-        maxFileSize: testValue,
+        maxFileSize: testValueDeprecated,
       } as SqlEditorSettings,
     },
   },
+};
+
+const newSettings = {
+  ...deprecatedSettings,
   plugin: {
     'sql-editor': {
-      maxFileSize: testValue,
+      maxFileSize: testValueNew,
     } as SqlEditorSettings,
   },
 };
 
-test('New settings equal deprecated settings', async () => {
+test('New settings override deprecated settings', async () => {
   const settings = app.injector.getServiceByClass(SqlEditorSettingsService);
   const config = app.injector.getServiceByClass(ServerConfigResource);
 
-  server.use(endpoint.query('serverConfig', mockServerConfig(equalConfig)));
+  server.use(endpoint.query('serverConfig', mockServerConfig(newSettings)));
 
   await config.refresh();
 
-  expect(settings.settings.getValue('maxFileSize')).toBe(testValue);
-  expect(settings.deprecatedSettings.getValue('maxFileSize')).toBe(testValue);
+  expect(settings.settings.getValue('maxFileSize')).toBe(testValueNew);
+});
+
+test('Deprecated settings are used if new settings are not defined', async () => {
+  const settings = app.injector.getServiceByClass(SqlEditorSettingsService);
+  const config = app.injector.getServiceByClass(ServerConfigResource);
+
+  server.use(endpoint.query('serverConfig', mockServerConfig(deprecatedSettings)));
+
+  await config.refresh();
+
+  expect(settings.settings.getValue('maxFileSize')).toBe(testValueDeprecated);
 });

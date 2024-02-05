@@ -77,10 +77,14 @@ beforeAll(() => app.init());
 const testValueA = true;
 const testValueB = true;
 
-const equalConfigA = {
+const deprecatedSettings = {
   plugin_data_export: {
-    disabled: testValueA,
+    disabled: testValueB,
   } as DataExportSettings,
+};
+
+const newSettings = {
+  ...deprecatedSettings,
   plugin: {
     'data-export': {
       disabled: testValueA,
@@ -88,37 +92,24 @@ const equalConfigA = {
   },
 };
 
-const equalConfigB = {
-  plugin_data_export: {
-    disabled: testValueB,
-  } as DataExportSettings,
-  plugin: {
-    'data-export': {
-      disabled: testValueB,
-    } as DataExportSettings,
-  },
-};
-
-test('New settings equal deprecated settings A', async () => {
+test('New settings override deprecated', async () => {
   const settings = app.injector.getServiceByClass(DataExportSettingsService);
   const config = app.injector.getServiceByClass(ServerConfigResource);
 
-  server.use(endpoint.query('serverConfig', mockServerConfig(equalConfigA)));
+  server.use(endpoint.query('serverConfig', mockServerConfig(newSettings)));
 
   await config.refresh();
 
   expect(settings.settings.getValue('disabled')).toBe(testValueA);
-  expect(settings.deprecatedSettings.getValue('disabled')).toBe(testValueA);
 });
 
-test('New settings equal deprecated settings B', async () => {
+test('Deprecated settings are used if new settings are not defined', async () => {
   const settings = app.injector.getServiceByClass(DataExportSettingsService);
   const config = app.injector.getServiceByClass(ServerConfigResource);
 
-  server.use(endpoint.query('serverConfig', mockServerConfig(equalConfigB)));
+  server.use(endpoint.query('serverConfig', mockServerConfig(deprecatedSettings)));
 
   await config.refresh();
 
   expect(settings.settings.getValue('disabled')).toBe(testValueB);
-  expect(settings.deprecatedSettings.getValue('disabled')).toBe(testValueB);
 });
