@@ -39,7 +39,7 @@ export function useTextValue({ model, resultIndex, currentContentType, elementKe
   const isBinary = elementKey ? formatAction.isBinary(elementKey) : false;
   const cachedFullText = elementKey ? contentAction.retrieveFileFullTextFromCache(elementKey) : '';
   const notificationService = useService(NotificationService);
-  const { limit } = useResultSetValueLimitInfo({ model, resultIndex, elementKey });
+  const limitInfo = useResultSetValueLimitInfo({ model, resultIndex, elementKey });
 
   const result: IUseTextValue = {
     textValue: '',
@@ -62,8 +62,8 @@ export function useTextValue({ model, resultIndex, currentContentType, elementKe
     return result;
   }
 
-  if (isResultSetContentValue(contentValue) && limit) {
-    result.isTruncated = (contentValue?.contentLength ?? 0) > limit;
+  if (isResultSetContentValue(contentValue) && limitInfo.limit) {
+    result.isTruncated = (contentValue?.contentLength ?? 0) > limitInfo.limit;
   }
 
   if (isTextColumn && cachedFullText) {

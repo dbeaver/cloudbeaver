@@ -120,7 +120,7 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
       currentContentType: contentType,
       elementKey: firstSelectedCell,
     });
-    const { limitWithSize } = useResultSetValueLimitInfo({ model, resultIndex, elementKey: firstSelectedCell });
+    const limitInfo = useResultSetValueLimitInfo({ model, resultIndex, elementKey: firstSelectedCell });
     const isSelectedCellReadonly = firstSelectedCell && (formatAction.isReadOnly(firstSelectedCell) || formatAction.isBinary(firstSelectedCell));
     const isReadonlyByResultIndex = model.isReadonly(resultIndex) || model.isDisabled(resultIndex) || !firstSelectedCell;
     const isReadonly = isSelectedCellReadonly || isReadonlyByResultIndex;
@@ -189,7 +189,7 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
         </Group>
         {textValueData.isTruncated && (
           <Container keepSize>
-            <QuotaPlaceholder limit={limitWithSize}>
+            <QuotaPlaceholder limit={limitInfo.limitWithSize}>
               {shouldShowPasteButton && (
                 <Container keepSize>
                   <Button disabled={model.isLoading()} onClick={textValueData.pasteFullText}>
