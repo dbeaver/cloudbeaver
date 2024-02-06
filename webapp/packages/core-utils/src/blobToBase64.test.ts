@@ -30,5 +30,5 @@ describe('blobToBase64', () => {
     blobToBase64(blob);
 
     expect(readAsDataURL).toHaveBeenCalledWith(blob);
-  }, 30000);
+  });
 });
