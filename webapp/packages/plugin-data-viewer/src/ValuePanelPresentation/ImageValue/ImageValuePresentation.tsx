@@ -17,6 +17,7 @@ import { bytesToSize, download, getMIME, isImageFormat, isValidUrl } from '@clou
 
 import { createResultSetBlobValue } from '../../DatabaseDataModel/Actions/ResultSet/createResultSetBlobValue';
 import type { IResultSetElementKey } from '../../DatabaseDataModel/Actions/ResultSet/IResultSetDataKey';
+import { isResultSetBinaryValue } from '../../DatabaseDataModel/Actions/ResultSet/isResultSetBinaryValue';
 import { isResultSetBlobValue } from '../../DatabaseDataModel/Actions/ResultSet/isResultSetBlobValue';
 import { isResultSetContentValue } from '../../DatabaseDataModel/Actions/ResultSet/isResultSetContentValue';
 import { isResultSetFileValue } from '../../DatabaseDataModel/Actions/ResultSet/isResultSetFileValue';
@@ -121,7 +122,7 @@ export const ImageValuePresentation: TabContainerPanelComponent<IDataValuePanelP
             return URL.createObjectURL(this.cellValue.blob);
           }
 
-          if (isResultSetContentValue(this.cellValue) && this.cellValue.binary) {
+          if (isResultSetBinaryValue(this.cellValue)) {
             return `data:${getMIME(this.cellValue.binary)};base64,${this.cellValue.binary}`;
           } else if (typeof this.cellValue === 'string' && isValidUrl(this.cellValue) && isImageFormat(this.cellValue)) {
             return this.cellValue;
@@ -153,7 +154,7 @@ export const ImageValuePresentation: TabContainerPanelComponent<IDataValuePanelP
             return false;
           }
 
-          if (this.selectedCell) {
+          if (this.selectedCell && this.formatAction.isBinary(this.selectedCell)) {
             return this.contentAction.isContentTruncated(this.selectedCell);
           }
 

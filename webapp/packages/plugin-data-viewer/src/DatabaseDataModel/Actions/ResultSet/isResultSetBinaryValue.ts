@@ -5,9 +5,9 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import type { IResultSetBinaryFileValue } from './IResultSetBinaryFileValue';
+import type { IResultSetBinaryValue } from './IResultSetBinaryValue';
 import { isResultSetContentValue } from './isResultSetContentValue';
 
-export function isResultSetBinaryFileValue(value: any): value is IResultSetBinaryFileValue {
-  return isResultSetContentValue(value) && value?.contentType === 'application/octet-stream' && 'binary' in value;
+export function isResultSetBinaryValue(value: any): value is IResultSetBinaryValue {
+  return isResultSetContentValue(value) && 'binary' in value;
 }
