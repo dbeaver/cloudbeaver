@@ -41,7 +41,7 @@ export function useTextValue({ model, resultIndex, currentContentType, elementKe
 
   const result: IUseTextValue = {
     textValue: '',
-    isTruncated: false,
+    isTruncated: elementKey ? contentAction.isContentTruncated(elementKey) : false,
     isTextColumn,
     async pasteFullText() {
       if (!elementKey) {
@@ -58,10 +58,6 @@ export function useTextValue({ model, resultIndex, currentContentType, elementKe
 
   if (!isNotNullDefined(elementKey)) {
     return result;
-  }
-
-  if (isResultSetContentValue(contentValue)) {
-    result.isTruncated = contentAction.isContentTruncated(elementKey);
   }
 
   if (isTextColumn && cachedFullText) {

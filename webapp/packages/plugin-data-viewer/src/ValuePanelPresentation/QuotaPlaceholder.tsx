@@ -45,7 +45,7 @@ export const QuotaPlaceholder: React.FC<React.PropsWithChildren<Props>> = observ
           </Container>
         </Container>
       </Container>
-      {children}
+      <Container>{children}</Container>
     </Container>
   );
 });
