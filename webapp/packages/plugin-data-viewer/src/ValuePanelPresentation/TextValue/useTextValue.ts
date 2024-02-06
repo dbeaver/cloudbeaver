@@ -7,7 +7,7 @@
  */
 import { useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { bytesToSize, isNotNullDefined } from '@cloudbeaver/core-utils';
+import { isNotNullDefined } from '@cloudbeaver/core-utils';
 
 import type { IResultSetElementKey } from '../../DatabaseDataModel/Actions/ResultSet/IResultSetDataKey';
 import { isResultSetContentValue } from '../../DatabaseDataModel/Actions/ResultSet/isResultSetContentValue';
@@ -28,7 +28,6 @@ interface IUseTextValue {
   textValue: string;
   isTruncated: boolean;
   isTextColumn: boolean;
-  limitString: string | undefined;
   pasteFullText(): Promise<void>;
 }
 
@@ -40,13 +39,12 @@ export function useTextValue({ model, resultIndex, currentContentType, elementKe
   const isBinary = elementKey ? formatAction.isBinary(elementKey) : false;
   const cachedFullText = elementKey ? contentAction.retrieveFileFullTextFromCache(elementKey) : '';
   const notificationService = useService(NotificationService);
-  const limit = useResultSetValueLimitInfo({ model, resultIndex, elementKey });
+  const { limit } = useResultSetValueLimitInfo({ model, resultIndex, elementKey });
 
   const result: IUseTextValue = {
     textValue: '',
     isTruncated: false,
     isTextColumn,
-    limitString: limit ? bytesToSize(limit) : undefined,
     async pasteFullText() {
       if (!elementKey) {
         return;

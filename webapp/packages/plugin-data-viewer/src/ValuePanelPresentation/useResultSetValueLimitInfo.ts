@@ -7,6 +7,7 @@
  */
 import { useService } from '@cloudbeaver/core-di';
 import { QuotasService } from '@cloudbeaver/core-root';
+import { bytesToSize } from '@cloudbeaver/core-utils';
 
 import type { IResultSetElementKey } from '../DatabaseDataModel/Actions/ResultSet/IResultSetDataKey';
 import { useResultActions } from '../DatabaseDataModel/Actions/ResultSet/useResultActions';
@@ -25,19 +26,22 @@ export function useResultSetValueLimitInfo({ resultIndex, model, elementKey }: I
   const isBlob = elementKey ? formatAction.isBinary(elementKey) : false;
   const isImage = elementKey ? formatAction.isImage(elementKey) : false;
   const quotasService = useService(QuotasService);
-  let limit: number | undefined = undefined;
+  const result = {
+    limit: undefined as number | undefined,
+    limitWithSize: undefined as string | undefined,
+  };
 
   if (isTextColumn) {
-    limit = quotasService.getQuota('sqlTextPreviewMaxLength');
+    result.limit = quotasService.getQuota('sqlTextPreviewMaxLength');
   }
 
-  if (isImage) {
-    limit = quotasService.getQuota('sqlBinaryPreviewMaxLength');
+  if (isImage || isBlob) {
+    result.limit = quotasService.getQuota('sqlBinaryPreviewMaxLength');
   }
 
-  if (isBlob) {
-    limit = quotasService.getQuota('sqlBinaryPreviewMaxLength');
+  if (result.limit) {
+    result.limitWithSize = bytesToSize(result.limit);
   }
 
-  return limit;
+  return result;
 }

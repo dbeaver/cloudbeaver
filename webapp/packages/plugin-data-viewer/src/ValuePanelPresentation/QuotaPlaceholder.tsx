@@ -54,11 +54,10 @@ export const QuotaPlaceholder: React.FC<React.PropsWithChildren<Props>> = observ
                 {translate('ui_limit')}
               </Link>
             ) : (
-              <span title={limit}>{translate('ui_limit')}</span>
+              translate('ui_limit')
             )}
           </limit-word>
         </reason>
-        <br />
       </p>
       {children}
     </container>,
