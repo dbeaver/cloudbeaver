@@ -9,13 +9,12 @@ import { makeObservable, observable } from 'mobx';
 
 import { QuotasService } from '@cloudbeaver/core-root';
 import { GraphQLService, ResultDataFormat } from '@cloudbeaver/core-sdk';
-import { download, GlobalConstants } from '@cloudbeaver/core-utils';
+import { bytesToSize, download, GlobalConstants, isNotNullDefined } from '@cloudbeaver/core-utils';
 
 import { DatabaseDataAction } from '../../DatabaseDataAction';
 import type { IDatabaseDataSource } from '../../IDatabaseDataSource';
 import type { IDatabaseResultSet } from '../../IDatabaseResultSet';
 import { databaseDataAction } from '../DatabaseDataActionDecorator';
-import type { IResultSetContentValue } from './IResultSetContentValue';
 import type { IResultSetDataContentAction } from './IResultSetDataContentAction';
 import type { IResultSetElementKey } from './IResultSetDataKey';
 import { isResultSetContentValue } from './isResultSetContentValue';
@@ -57,8 +56,38 @@ export class ResultSetDataContentAction extends DatabaseDataAction<any, IDatabas
     });
   }
 
-  isContentTruncated(content: IResultSetContentValue) {
-    return (content.contentLength ?? 0) > this.quotasService.getQuota('sqlBinaryPreviewMaxLength');
+  getLimitInfo(elementKey: IResultSetElementKey) {
+    const isTextColumn = elementKey ? this.format.isText(elementKey) : false;
+    const isBlob = elementKey ? this.format.isBinary(elementKey) : false;
+    const result = {
+      limit: undefined as number | undefined,
+      limitWithSize: undefined as string | undefined,
+    };
+
+    if (isTextColumn) {
+      result.limit = this.quotasService.getQuota('sqlTextPreviewMaxLength');
+    }
+
+    if (isBlob) {
+      result.limit = this.quotasService.getQuota('sqlBinaryPreviewMaxLength');
+    }
+
+    if (result.limit) {
+      result.limitWithSize = bytesToSize(result.limit);
+    }
+
+    return result;
+  }
+
+  isContentTruncated(elementKey: IResultSetElementKey) {
+    const limit = this.getLimitInfo(elementKey).limit;
+    const content = elementKey ? this.format.get(elementKey) : null;
+
+    if (!isNotNullDefined(limit) || !isResultSetContentValue(content)) {
+      return false;
+    }
+
+    return (content.contentLength ?? 0) > limit;
   }
 
   isDownloadable(element: IResultSetElementKey) {

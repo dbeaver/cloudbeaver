@@ -28,7 +28,6 @@ import { ResultSetSelectAction } from '../../DatabaseDataModel/Actions/ResultSet
 import type { IDatabaseResultSet } from '../../DatabaseDataModel/IDatabaseResultSet';
 import type { IDataValuePanelProps } from '../../TableViewer/ValuePanel/DataValuePanelService';
 import { QuotaPlaceholder } from '../QuotaPlaceholder';
-import { useResultSetValueLimitInfo } from '../useResultSetValueLimitInfo';
 import styles from './ImageValuePresentation.m.css';
 
 interface IToolsProps {
@@ -153,11 +152,11 @@ export const ImageValuePresentation: TabContainerPanelComponent<IDataValuePanelP
           if (isResultSetFileValue(this.cellValue)) {
             return false;
           }
-          if (isResultSetContentValue(this.cellValue)) {
-            if (this.cellValue.binary) {
-              return this.contentAction.isContentTruncated(this.cellValue);
-            }
+
+          if (this.selectedCell) {
+            return this.contentAction.isContentTruncated(this.selectedCell);
           }
+
           return false;
         },
         async save() {
@@ -204,7 +203,7 @@ export const ImageValuePresentation: TabContainerPanelComponent<IDataValuePanelP
     const upload = data.canUpload ? data.upload : undefined;
     const loading = model.isLoading();
     const value = data.cellValue;
-    const limitInfo = useResultSetValueLimitInfo({ model, resultIndex, elementKey: data.selectedCell });
+    const limitInfo = data.selectedCell ? data.contentAction.getLimitInfo(data.selectedCell) : null;
 
     if (data.truncated && !data.savedSrc && isResultSetContentValue(value)) {
       const valueSize = bytesToSize(value.contentLength ?? 0);
@@ -224,7 +223,7 @@ export const ImageValuePresentation: TabContainerPanelComponent<IDataValuePanelP
       return (
         <Container vertical>
           <Container fill overflow center>
-            <QuotaPlaceholder limit={limitInfo.limitWithSize}>
+            <QuotaPlaceholder limit={limitInfo?.limitWithSize}>
               {data.selectedCell && data.contentAction.isDownloadable(data.selectedCell) && (
                 <Button
                   disabled={loading}

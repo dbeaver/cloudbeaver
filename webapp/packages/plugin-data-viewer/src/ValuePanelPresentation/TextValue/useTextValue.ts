@@ -14,7 +14,6 @@ import { isResultSetContentValue } from '../../DatabaseDataModel/Actions/ResultS
 import { useResultActions } from '../../DatabaseDataModel/Actions/ResultSet/useResultActions';
 import type { IDatabaseDataModel } from '../../DatabaseDataModel/IDatabaseDataModel';
 import type { IDatabaseResultSet } from '../../DatabaseDataModel/IDatabaseResultSet';
-import { useResultSetValueLimitInfo } from '../useResultSetValueLimitInfo';
 import { useAutoFormat } from './useAutoFormat';
 
 interface IUseTextValueArgs {
@@ -39,7 +38,6 @@ export function useTextValue({ model, resultIndex, currentContentType, elementKe
   const isBinary = elementKey ? formatAction.isBinary(elementKey) : false;
   const cachedFullText = elementKey ? contentAction.retrieveFileFullTextFromCache(elementKey) : '';
   const notificationService = useService(NotificationService);
-  const limitInfo = useResultSetValueLimitInfo({ model, resultIndex, elementKey });
 
   const result: IUseTextValue = {
     textValue: '',
@@ -62,8 +60,8 @@ export function useTextValue({ model, resultIndex, currentContentType, elementKe
     return result;
   }
 
-  if (isResultSetContentValue(contentValue) && limitInfo.limit) {
-    result.isTruncated = (contentValue?.contentLength ?? 0) > limitInfo.limit;
+  if (isResultSetContentValue(contentValue)) {
+    result.isTruncated = contentAction.isContentTruncated(elementKey);
   }
 
   if (isTextColumn && cachedFullText) {

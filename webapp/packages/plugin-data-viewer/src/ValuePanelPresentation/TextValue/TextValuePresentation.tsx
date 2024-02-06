@@ -23,7 +23,6 @@ import { useResultActions } from '../../DatabaseDataModel/Actions/ResultSet/useR
 import type { IDatabaseResultSet } from '../../DatabaseDataModel/IDatabaseResultSet';
 import type { IDataValuePanelProps } from '../../TableViewer/ValuePanel/DataValuePanelService';
 import { QuotaPlaceholder } from '../QuotaPlaceholder';
-import { useResultSetValueLimitInfo } from '../useResultSetValueLimitInfo';
 import { VALUE_PANEL_TOOLS_STYLES } from '../ValuePanelTools/VALUE_PANEL_TOOLS_STYLES';
 import { getDefaultLineWrapping } from './getDefaultLineWrapping';
 import { getTypeExtension } from './getTypeExtension';
@@ -120,7 +119,7 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
       currentContentType: contentType,
       elementKey: firstSelectedCell,
     });
-    const limitInfo = useResultSetValueLimitInfo({ model, resultIndex, elementKey: firstSelectedCell });
+    const limitInfo = firstSelectedCell ? contentAction.getLimitInfo(firstSelectedCell) : null;
     const isSelectedCellReadonly = firstSelectedCell && (formatAction.isReadOnly(firstSelectedCell) || formatAction.isBinary(firstSelectedCell));
     const isReadonlyByResultIndex = model.isReadonly(resultIndex) || model.isDisabled(resultIndex) || !firstSelectedCell;
     const isReadonly = isSelectedCellReadonly || isReadonlyByResultIndex;
@@ -189,7 +188,7 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
         </Group>
         {textValueData.isTruncated && (
           <Container keepSize>
-            <QuotaPlaceholder limit={limitInfo.limitWithSize}>
+            <QuotaPlaceholder limit={limitInfo?.limitWithSize}>
               {shouldShowPasteButton && (
                 <Container keepSize>
                   <Button disabled={model.isLoading()} onClick={textValueData.pasteFullText}>
