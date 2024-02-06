@@ -35,7 +35,6 @@ export default [
   ['data_viewer_presentation_value_boolean_placeholder', 'Non posso rappresentare il valore corrente come booleano'],
   ['data_viewer_presentation_value_content_truncated_placeholder', 'The size of the value exceeds the'],
   ['data_viewer_presentation_value_content_was_truncated', 'The value was truncated'],
-  ['data_viewer_presentation_value_content_value_size', 'Value size'],
   ['data_viewer_presentation_value_content_download_error', 'Download failed'],
   ['data_viewer_presentation_value_content_paste_error', 'Cannot load full text'],
   ['data_viewer_refresh_result_set', 'Refresh result set'],

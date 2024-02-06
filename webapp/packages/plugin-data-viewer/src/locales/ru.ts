@@ -33,7 +33,6 @@ export default [
   ['data_viewer_presentation_value_boolean_placeholder', 'Не удалось отобразить текущее значение как boolean'],
   ['data_viewer_presentation_value_content_truncated_placeholder', 'Размер значения превышает'],
   ['data_viewer_presentation_value_content_was_truncated', 'Значение было обрезано'],
-  ['data_viewer_presentation_value_content_value_size', 'Размер значения'],
   ['data_viewer_presentation_value_content_download_error', 'Не удалось загрузить файл'],
   ['data_viewer_presentation_value_content_paste_error', 'Не удалось загрузить весь текст'],
   ['data_viewer_script_preview', 'Скрипт'],

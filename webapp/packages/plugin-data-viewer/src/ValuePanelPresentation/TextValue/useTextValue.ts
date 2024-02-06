@@ -10,7 +10,6 @@ import { NotificationService } from '@cloudbeaver/core-events';
 import { bytesToSize, isNotNullDefined } from '@cloudbeaver/core-utils';
 
 import type { IResultSetElementKey } from '../../DatabaseDataModel/Actions/ResultSet/IResultSetDataKey';
-import { isResultSetBinaryFileValue } from '../../DatabaseDataModel/Actions/ResultSet/isResultSetBinaryFileValue';
 import { isResultSetContentValue } from '../../DatabaseDataModel/Actions/ResultSet/isResultSetContentValue';
 import { useResultActions } from '../../DatabaseDataModel/Actions/ResultSet/useResultActions';
 import type { IDatabaseDataModel } from '../../DatabaseDataModel/IDatabaseDataModel';
@@ -22,7 +21,7 @@ interface IUseTextValueArgs {
   resultIndex: number;
   model: IDatabaseDataModel<any, IDatabaseResultSet>;
   currentContentType: string;
-  elementKey: IResultSetElementKey;
+  elementKey?: IResultSetElementKey;
 }
 
 interface IUseTextValue {
@@ -34,21 +33,20 @@ interface IUseTextValue {
 }
 
 export function useTextValue({ model, resultIndex, currentContentType, elementKey }: IUseTextValueArgs): IUseTextValue {
-  const { formatAction, editAction, contentAction, dataAction } = useResultActions({ model, resultIndex });
+  const { formatAction, editAction, contentAction } = useResultActions({ model, resultIndex });
   const formatter = useAutoFormat();
-  const columnType = elementKey ? dataAction.getColumn(elementKey.column)?.dataKind : null;
-  const isTextColumn = columnType?.toLocaleLowerCase() === 'string';
+  const isTextColumn = elementKey ? formatAction.isText(elementKey) : false;
   const contentValue = elementKey ? formatAction.get(elementKey) : null;
+  const isBinary = elementKey ? formatAction.isBinary(elementKey) : false;
   const cachedFullText = elementKey ? contentAction.retrieveFileFullTextFromCache(elementKey) : '';
-  const blob = elementKey ? formatAction.get(elementKey) : null;
   const notificationService = useService(NotificationService);
-  const { limit, shouldShowLimit } = useResultSetValueLimitInfo({ model, resultIndex, elementKey });
+  const limit = useResultSetValueLimitInfo({ model, resultIndex, elementKey });
 
   const result: IUseTextValue = {
     textValue: '',
     isTruncated: false,
     isTextColumn,
-    limitString: limit && shouldShowLimit ? bytesToSize(limit) : undefined,
+    limitString: limit ? bytesToSize(limit) : undefined,
     async pasteFullText() {
       if (!elementKey) {
         return;
@@ -79,8 +77,8 @@ export function useTextValue({ model, resultIndex, currentContentType, elementKe
     result.textValue = formatAction.getText(elementKey);
   }
 
-  if (isResultSetBinaryFileValue(blob)) {
-    const value = formatter.formatBlob(currentContentType, blob);
+  if (isBinary && isResultSetContentValue(contentValue)) {
+    const value = formatter.formatBlob(currentContentType, contentValue);
 
     if (value) {
       result.textValue = value;

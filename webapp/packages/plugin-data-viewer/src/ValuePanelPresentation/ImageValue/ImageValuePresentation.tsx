@@ -12,7 +12,6 @@ import { ActionIconButton, Button, Container, Fill, s, useObservableRef, useS, u
 import { selectFiles } from '@cloudbeaver/core-browser';
 import { useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { QuotasService } from '@cloudbeaver/core-root';
 import { type TabContainerPanelComponent, useTabLocalState } from '@cloudbeaver/core-ui';
 import { bytesToSize, download, getMIME, isImageFormat, isValidUrl } from '@cloudbeaver/core-utils';
 
@@ -208,7 +207,7 @@ export const ImageValuePresentation: TabContainerPanelComponent<IDataValuePanelP
     const limitInfo = useResultSetValueLimitInfo({ model, resultIndex, elementKey: data.selectedCell });
 
     if (data.truncated && !data.savedSrc && isResultSetContentValue(value)) {
-      const limit = limitInfo.limit ? bytesToSize(limitInfo.limit) : undefined;
+      const limit = limitInfo ? bytesToSize(limitInfo) : undefined;
       const valueSize = bytesToSize(value.contentLength ?? 0);
 
       const load = async () => {

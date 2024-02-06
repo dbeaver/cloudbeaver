@@ -9,7 +9,6 @@ import { useService } from '@cloudbeaver/core-di';
 import { QuotasService } from '@cloudbeaver/core-root';
 
 import type { IResultSetElementKey } from '../DatabaseDataModel/Actions/ResultSet/IResultSetDataKey';
-import { isResultSetBinaryFileValue } from '../DatabaseDataModel/Actions/ResultSet/isResultSetBinaryFileValue';
 import { useResultActions } from '../DatabaseDataModel/Actions/ResultSet/useResultActions';
 import type { IDatabaseDataModel } from '../DatabaseDataModel/IDatabaseDataModel';
 import type { IDatabaseResultSet } from '../DatabaseDataModel/IDatabaseResultSet';
@@ -21,38 +20,26 @@ interface IArgs {
   elementKey?: IResultSetElementKey;
 }
 
-interface IResultSetLimitInfo {
-  limit?: number;
-  shouldShowLimit: boolean;
-}
-
 export function useResultSetValueLimitInfo({ resultIndex, model, elementKey }: IArgs) {
-  const { formatAction, dataAction } = useResultActions({ model, resultIndex });
-  const columnType = elementKey ? dataAction.getColumn(elementKey.column)?.dataKind : null;
-  const isTextColumn = columnType?.toLocaleLowerCase() === 'string';
+  const { formatAction } = useResultActions({ model, resultIndex });
+  const isTextColumn = elementKey ? formatAction.isText(elementKey) : null;
   const resultSetValue = elementKey ? formatAction.get(elementKey) : null;
-  const isBlob = isResultSetBinaryFileValue(resultSetValue);
+  const isBlob = elementKey ? formatAction.isBinary(elementKey) : null;
   const isImage = isImageValuePresentationAvailable(resultSetValue);
   const quotasService = useService(QuotasService);
-  const result: IResultSetLimitInfo = {
-    limit: undefined,
-    shouldShowLimit: false,
-  };
+  let limit: number | undefined = undefined;
 
   if (isTextColumn) {
-    result.limit = quotasService.getQuota('sqlTextPreviewMaxLength');
-    result.shouldShowLimit = true;
+    limit = quotasService.getQuota('sqlTextPreviewMaxLength');
   }
 
   if (isImage) {
-    result.limit = quotasService.getQuota('sqlBinaryPreviewMaxLength');
-    result.shouldShowLimit = true;
+    limit = quotasService.getQuota('sqlBinaryPreviewMaxLength');
   }
 
   if (isBlob) {
-    result.limit = quotasService.getQuota('sqlBinaryPreviewMaxLength');
-    result.shouldShowLimit = false;
+    limit = quotasService.getQuota('sqlBinaryPreviewMaxLength');
   }
 
-  return result;
+  return limit;
 }

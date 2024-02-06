@@ -58,7 +58,7 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
     const style = useStyles(styles, UNDERLINE_TAB_STYLES, VALUE_PANEL_TOOLS_STYLES);
     const selection = model.source.getAction(resultIndex, ResultSetSelectAction);
     const activeElements = selection.getActiveElements();
-    const firstSelectedCell = activeElements?.[0];
+    const firstSelectedCell = activeElements.length ? activeElements[0] : undefined;
     const activeTabs = textValuePresentationService.tabs.getDisplayed({
       dataFormat: dataFormat,
       model: model,
@@ -187,7 +187,7 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
         </Group>
         {textValueData.isTruncated && (
           <Container keepSize>
-            <QuotaPlaceholder limit={textValueData.limitString} size={!shouldShowPasteButton ? valueSize : undefined} />
+            <QuotaPlaceholder limit={textValueData.limitString} />
           </Container>
         )}
         <Container keepSize center overflow>

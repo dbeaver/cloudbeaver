@@ -13,7 +13,6 @@ import { EAdminPermission } from '@cloudbeaver/core-root';
 
 interface Props {
   limit?: string;
-  size?: string;
   className?: string;
 }
 
@@ -39,7 +38,7 @@ const style = css`
   }
 `;
 
-export const QuotaPlaceholder: React.FC<React.PropsWithChildren<Props>> = observer(function QuotaPlaceholder({ limit, size, className, children }) {
+export const QuotaPlaceholder: React.FC<React.PropsWithChildren<Props>> = observer(function QuotaPlaceholder({ limit, className, children }) {
   const translate = useTranslate();
   const admin = usePermission(EAdminPermission.admin);
 
@@ -51,17 +50,15 @@ export const QuotaPlaceholder: React.FC<React.PropsWithChildren<Props>> = observ
           {translate('data_viewer_presentation_value_content_truncated_placeholder') + ' '}
           <limit-word>
             {admin ? (
-              <Link href="https://dbeaver.com/docs/cloudbeaver/Server-configuration/#resource-quotas" target="_blank" indicator>
+              <Link title={limit} href="https://dbeaver.com/docs/cloudbeaver/Server-configuration/#resource-quotas" target="_blank" indicator>
                 {translate('ui_limit')}
               </Link>
             ) : (
-              translate('ui_limit')
+              <span title={limit}>{translate('ui_limit')}</span>
             )}
           </limit-word>
         </reason>
-        {limit && `${translate('ui_limit')}: ${limit}`}
         <br />
-        {size && `${translate('data_viewer_presentation_value_content_value_size')}: ${size}`}
       </p>
       {children}
     </container>,
