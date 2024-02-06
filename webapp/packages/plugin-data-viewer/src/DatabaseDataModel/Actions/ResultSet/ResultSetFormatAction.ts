@@ -7,6 +7,7 @@
  */
 import { ResultDataFormat } from '@cloudbeaver/core-sdk';
 
+import { isImageValuePresentationAvailable } from '../../../ValuePanelPresentation/ImageValue/isImageValuePresentationAvailable';
 import { DatabaseDataAction } from '../../DatabaseDataAction';
 import type { IDatabaseDataSource } from '../../IDatabaseDataSource';
 import type { IDatabaseResultSet } from '../../IDatabaseResultSet';
@@ -75,6 +76,12 @@ export class ResultSetFormatAction
   }
   isNull(key: IResultSetElementKey): boolean {
     return this.get(key) === null;
+  }
+
+  isImage(key: IResultSetElementKey): boolean {
+    const value = this.get(key);
+
+    return isImageValuePresentationAvailable(value);
   }
 
   isBinary(key: IResultSetPartialKey): boolean {

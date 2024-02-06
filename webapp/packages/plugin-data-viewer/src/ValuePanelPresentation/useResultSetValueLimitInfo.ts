@@ -12,7 +12,6 @@ import type { IResultSetElementKey } from '../DatabaseDataModel/Actions/ResultSe
 import { useResultActions } from '../DatabaseDataModel/Actions/ResultSet/useResultActions';
 import type { IDatabaseDataModel } from '../DatabaseDataModel/IDatabaseDataModel';
 import type { IDatabaseResultSet } from '../DatabaseDataModel/IDatabaseResultSet';
-import { isImageValuePresentationAvailable } from './ImageValue/isImageValuePresentationAvailable';
 
 interface IArgs {
   resultIndex: number;
@@ -22,10 +21,9 @@ interface IArgs {
 
 export function useResultSetValueLimitInfo({ resultIndex, model, elementKey }: IArgs) {
   const { formatAction } = useResultActions({ model, resultIndex });
-  const isTextColumn = elementKey ? formatAction.isText(elementKey) : null;
-  const resultSetValue = elementKey ? formatAction.get(elementKey) : null;
-  const isBlob = elementKey ? formatAction.isBinary(elementKey) : null;
-  const isImage = isImageValuePresentationAvailable(resultSetValue);
+  const isTextColumn = elementKey ? formatAction.isText(elementKey) : false;
+  const isBlob = elementKey ? formatAction.isBinary(elementKey) : false;
+  const isImage = elementKey ? formatAction.isImage(elementKey) : false;
   const quotasService = useService(QuotasService);
   let limit: number | undefined = undefined;
 
