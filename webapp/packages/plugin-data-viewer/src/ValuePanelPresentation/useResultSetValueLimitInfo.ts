@@ -24,7 +24,6 @@ export function useResultSetValueLimitInfo({ resultIndex, model, elementKey }: I
   const { formatAction } = useResultActions({ model, resultIndex });
   const isTextColumn = elementKey ? formatAction.isText(elementKey) : false;
   const isBlob = elementKey ? formatAction.isBinary(elementKey) : false;
-  const isImage = elementKey ? formatAction.isImage(elementKey) : false;
   const quotasService = useService(QuotasService);
   const result = {
     limit: undefined as number | undefined,
@@ -35,7 +34,7 @@ export function useResultSetValueLimitInfo({ resultIndex, model, elementKey }: I
     result.limit = quotasService.getQuota('sqlTextPreviewMaxLength');
   }
 
-  if (isImage || isBlob) {
+  if (isBlob) {
     result.limit = quotasService.getQuota('sqlBinaryPreviewMaxLength');
   }
 

@@ -188,15 +188,16 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
           />
         </Group>
         {textValueData.isTruncated && (
-          <Container keepSize center>
-            <QuotaPlaceholder limit={limitWithSize} />
-            {shouldShowPasteButton && (
-              <Container keepSize>
-                <Button disabled={model.isLoading()} onClick={textValueData.pasteFullText}>
-                  {`${translate('ui_show_more')} (${valueSize})`}
-                </Button>
-              </Container>
-            )}
+          <Container keepSize>
+            <QuotaPlaceholder limit={limitWithSize}>
+              {shouldShowPasteButton && (
+                <Container keepSize>
+                  <Button disabled={model.isLoading()} onClick={textValueData.pasteFullText}>
+                    {`${translate('ui_show_more')} (${valueSize})`}
+                  </Button>
+                </Container>
+              )}
+            </QuotaPlaceholder>
           </Container>
         )}
         <Container keepSize center overflow>
