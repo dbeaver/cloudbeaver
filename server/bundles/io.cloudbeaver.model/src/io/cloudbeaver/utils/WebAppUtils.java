@@ -183,10 +183,12 @@ public class WebAppUtils {
 
         if (sameSite != null) {
             if (!request.isSecure()) {
-                log.debug("Attempt to set Cookie `" + cookieName + "` with `SameSite=None` failed, it require a secure context/HTTPS");
+                log.debug("Attempt to set Cookie `" + cookieName + "` with `SameSite=" + sameSite + "` failed, it " +
+                    "require a secure context/HTTPS");
+            } else {
+                sessionCookie.setSecure(true);
+                path = path.concat("; SameSite=" + sameSite);
             }
-            sessionCookie.setSecure(true);
-            path = path.concat("; SameSite=" + sameSite);
         }
 
         sessionCookie.setPath(path);
