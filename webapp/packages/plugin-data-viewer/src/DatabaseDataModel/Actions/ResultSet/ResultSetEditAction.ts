@@ -498,6 +498,7 @@ export class ResultSetEditAction extends DatabaseEditAction<IResultSetElementKey
                 }
                 return obj;
               }, {}),
+              metaData: this.data.getRowMetadata(update.row),
             });
           }
           break;
