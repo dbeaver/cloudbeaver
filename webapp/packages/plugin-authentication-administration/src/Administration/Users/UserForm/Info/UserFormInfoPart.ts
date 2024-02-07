@@ -174,7 +174,7 @@ export class UserFormInfoPart extends FormPart<IUserFormInfoState, IUserFormStat
     let grantedTeams: string[] = [];
 
     if (this.state.userId) {
-      grantedTeams = this.usersResource.get(this.state.userId)?.grantedTeams ?? [];
+      grantedTeams = toJS(this.usersResource.get(this.state.userId)?.grantedTeams ?? []);
     }
 
     if (isArraysEqual(this.state.teams, grantedTeams)) {
