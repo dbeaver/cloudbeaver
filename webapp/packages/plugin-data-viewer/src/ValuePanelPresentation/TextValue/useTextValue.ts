@@ -11,7 +11,7 @@ import { isNotNullDefined } from '@cloudbeaver/core-utils';
 
 import type { IResultSetElementKey } from '../../DatabaseDataModel/Actions/ResultSet/IResultSetDataKey';
 import { isResultSetContentValue } from '../../DatabaseDataModel/Actions/ResultSet/isResultSetContentValue';
-import { useResultActions } from '../../DatabaseDataModel/Actions/ResultSet/useResultActions';
+import { useResultSetActions } from '../../DatabaseDataModel/Actions/ResultSet/useResultSetActions';
 import type { IDatabaseDataModel } from '../../DatabaseDataModel/IDatabaseDataModel';
 import type { IDatabaseResultSet } from '../../DatabaseDataModel/IDatabaseResultSet';
 import { useAutoFormat } from './useAutoFormat';
@@ -31,7 +31,7 @@ interface IUseTextValue {
 }
 
 export function useTextValue({ model, resultIndex, currentContentType, elementKey }: IUseTextValueArgs): IUseTextValue {
-  const { formatAction, editAction, contentAction } = useResultActions({ model, resultIndex });
+  const { formatAction, editAction, contentAction } = useResultSetActions({ model, resultIndex });
   const formatter = useAutoFormat();
   const isTextColumn = elementKey ? formatAction.isText(elementKey) : false;
   const contentValue = elementKey ? formatAction.get(elementKey) : null;

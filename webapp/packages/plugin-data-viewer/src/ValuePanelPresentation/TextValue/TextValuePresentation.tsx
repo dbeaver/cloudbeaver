@@ -19,7 +19,7 @@ import { EditorLoader, useCodemirrorExtensions } from '@cloudbeaver/plugin-codem
 
 import { isResultSetContentValue } from '../../DatabaseDataModel/Actions/ResultSet/isResultSetContentValue';
 import { ResultSetSelectAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetSelectAction';
-import { useResultActions } from '../../DatabaseDataModel/Actions/ResultSet/useResultActions';
+import { useResultSetActions } from '../../DatabaseDataModel/Actions/ResultSet/useResultSetActions';
 import type { IDatabaseResultSet } from '../../DatabaseDataModel/IDatabaseResultSet';
 import type { IDataValuePanelProps } from '../../TableViewer/ValuePanel/DataValuePanelService';
 import { QuotaPlaceholder } from '../QuotaPlaceholder';
@@ -64,7 +64,7 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
       model: model,
       resultIndex: resultIndex,
     });
-    const { contentAction, editAction, formatAction } = useResultActions({
+    const { contentAction, editAction, formatAction } = useResultSetActions({
       model,
       resultIndex,
     });
@@ -119,7 +119,6 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
       currentContentType: contentType,
       elementKey: firstSelectedCell,
     });
-    const limitInfo = firstSelectedCell ? contentAction.getLimitInfo(firstSelectedCell) : null;
     const isSelectedCellReadonly = firstSelectedCell && (formatAction.isReadOnly(firstSelectedCell) || formatAction.isBinary(firstSelectedCell));
     const isReadonlyByResultIndex = model.isReadonly(resultIndex) || model.isDisabled(resultIndex) || !firstSelectedCell;
     const isReadonly = isSelectedCellReadonly || isReadonlyByResultIndex;
@@ -188,7 +187,7 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
         </Group>
         {textValueData.isTruncated && (
           <Container keepSize>
-            <QuotaPlaceholder limit={limitInfo?.limitWithSize}>
+            <QuotaPlaceholder model={model} resultIndex={resultIndex} elementKey={firstSelectedCell}>
               {shouldShowPasteButton && (
                 <Container keepSize>
                   <Button disabled={model.isLoading()} onClick={textValueData.pasteFullText}>

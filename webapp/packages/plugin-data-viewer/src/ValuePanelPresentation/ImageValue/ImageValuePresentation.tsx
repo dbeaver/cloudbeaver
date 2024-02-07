@@ -204,7 +204,6 @@ export const ImageValuePresentation: TabContainerPanelComponent<IDataValuePanelP
     const upload = data.canUpload ? data.upload : undefined;
     const loading = model.isLoading();
     const value = data.cellValue;
-    const limitInfo = data.selectedCell ? data.contentAction.getLimitInfo(data.selectedCell) : null;
 
     if (data.truncated && !data.savedSrc && isResultSetContentValue(value)) {
       const valueSize = bytesToSize(value.contentLength ?? 0);
@@ -224,7 +223,7 @@ export const ImageValuePresentation: TabContainerPanelComponent<IDataValuePanelP
       return (
         <Container vertical>
           <Container fill overflow center>
-            <QuotaPlaceholder limit={limitInfo?.limitWithSize}>
+            <QuotaPlaceholder model={data.model} resultIndex={data.resultIndex} elementKey={data.selectedCell}>
               {data.selectedCell && data.contentAction.isDownloadable(data.selectedCell) && (
                 <Button
                   disabled={loading}
