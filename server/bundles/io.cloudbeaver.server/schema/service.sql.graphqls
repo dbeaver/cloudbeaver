@@ -318,17 +318,6 @@ extend type Mutation {
         dataFormat: ResultDataFormat
     ): AsyncTaskInfo!
 
-    # Read data from subcollection
-    asyncReadDataFromChildEntity(
-        projectId: ID,
-        connectionId: ID!,
-        contextId: ID!,
-        path: ID,
-        resultId: ID,
-        filter: SQLDataFilter,
-        dataFormat: ResultDataFormat
-    ): AsyncTaskInfo!
-
     # Close results (free resources)
     sqlResultClose(projectId: ID, connectionId: ID!, contextId: ID!, resultId: ID!): Boolean!
 

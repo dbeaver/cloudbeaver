@@ -107,14 +107,6 @@ public interface DBWServiceSQL extends DBWService {
         @Nullable WebDataFormat dataFormat) throws DBWebException;
 
     @WebAction
-    WebAsyncTaskInfo asyncReadDataFromChildEntity(
-            @NotNull WebSQLContextInfo contextInfo,
-            @NotNull String path,
-            @Nullable String resultId,
-            @Nullable WebSQLDataFilter filter,
-            @Nullable WebDataFormat dataFormat) throws DBWebException;
-
-    @WebAction
     Boolean closeResult(@NotNull WebSQLContextInfo sqlContext, @NotNull String resultId) throws DBWebException;
 
     @WebAction
