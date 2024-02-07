@@ -79,10 +79,9 @@ export const SqlEditor = observer<ISqlEditorProps>(function SqlEditor({ state, c
 
   useEffect(() => {
     if (isEditorEmpty) {
-      split.fixate('maximize', true);
+      split.state.setDisable(true);
     } else if (split.state.disable) {
-      split.fixate('resize', false);
-      split.state.setSize(-1);
+      split.state.setDisable(false);
     }
   }, [isEditorEmpty]);
 
