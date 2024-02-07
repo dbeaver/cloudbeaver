@@ -7,6 +7,8 @@
  */
 import type { IResultSetColumnKey, IResultSetElementKey, IResultSetRowKey } from './IResultSetDataKey';
 
+export type SerializableKey = IResultSetColumnKey | IResultSetRowKey;
+
 export const ResultSetDataKeysUtils = {
   serializeElementKey(elementKey: IResultSetElementKey): string {
     return this.serialize(elementKey.column) + this.serialize(elementKey.row);
@@ -14,7 +16,7 @@ export const ResultSetDataKeysUtils = {
   isElementsKeyEqual(a: IResultSetElementKey, b: IResultSetElementKey) {
     return this.isEqual(a.column, b.column) && this.isEqual(a.row, b.row);
   },
-  serialize(key: IResultSetColumnKey | IResultSetRowKey): string {
+  serialize(key: SerializableKey): string {
     let base = `${key.index}`;
 
     if ('subIndex' in key) {

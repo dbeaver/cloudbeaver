@@ -36,8 +36,8 @@ export class DataViewerTableService {
     return this.tableViewerStorageService.has(tableId);
   }
 
-  get(modelId: string): IDatabaseDataModel<any, any> | undefined {
-    return this.tableViewerStorageService.get(modelId);
+  get(tableId: string): IDatabaseDataModel<any, any> | undefined {
+    return this.tableViewerStorageService.get(tableId);
   }
 
   async removeTableModel(tableId: string): Promise<void> {
