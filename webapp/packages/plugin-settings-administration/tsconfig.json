@@ -28,9 +28,6 @@
       "path": "../core-ui/tsconfig.json"
     },
     {
-      "path": "../core-utils/tsconfig.json"
-    },
-    {
       "path": "../plugin-settings-panel/tsconfig.json"
     }
   ],
