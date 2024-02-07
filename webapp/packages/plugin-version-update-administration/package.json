@@ -24,7 +24,6 @@
     "@cloudbeaver/core-resource": "~0.1.0",
     "@cloudbeaver/core-root": "~0.1.0",
     "@cloudbeaver/core-ui": "~0.1.0",
-    "@cloudbeaver/core-utils": "~0.1.0",
     "@cloudbeaver/core-version": "~0.1.0",
     "@cloudbeaver/core-version-update": "~0.1.0",
     "mobx-react-lite": "^4.0.5",
