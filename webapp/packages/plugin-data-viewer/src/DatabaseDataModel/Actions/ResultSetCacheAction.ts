@@ -7,20 +7,20 @@
  */
 import { makeObservable, observable } from 'mobx';
 
-import { ResultDataFormat } from '@cloudbeaver/core-sdk';
+import type { ResultDataFormat } from '@cloudbeaver/core-sdk';
 
 import { DatabaseDataAction } from '../DatabaseDataAction';
 import type { IDatabaseDataSource } from '../IDatabaseDataSource';
 import type { IDatabaseResultSet } from '../IDatabaseResultSet';
 import { databaseDataAction } from './DatabaseDataActionDecorator';
-import type { IResultSetCacheAction } from './IResultSetCacheAction';
+import type { IDatabaseDataCacheAction } from './IDatabaseDataCacheAction';
 import { ResultSetDataKeysUtils, type SerializableKey } from './ResultSet/ResultSetDataKeysUtils';
 
 @databaseDataAction()
-export class ResultSetCacheAction extends DatabaseDataAction<any, IDatabaseResultSet> implements IResultSetCacheAction {
-  static dataFormat = [ResultDataFormat.Resultset];
+export class ResultSetCacheAction extends DatabaseDataAction<any, IDatabaseResultSet> implements IDatabaseDataCacheAction<SerializableKey> {
+  static dataFormat: ResultDataFormat[] | null = null;
 
-  private readonly cache: Map<string, Map<string, any>>;
+  private readonly cache: Map<symbol, Map<string, any>>;
 
   constructor(source: IDatabaseDataSource<any, IDatabaseResultSet>) {
     super(source);
@@ -32,10 +32,9 @@ export class ResultSetCacheAction extends DatabaseDataAction<any, IDatabaseResul
     });
   }
 
-  get<T>(key: SerializableKey, scope: string): T | undefined {
+  get<T>(key: SerializableKey, scope: symbol): T | undefined {
     const hash = this.getHash(key);
     const scopedCache = this.cache.get(scope);
-
     if (!scopedCache) {
       return;
     }
@@ -43,7 +42,7 @@ export class ResultSetCacheAction extends DatabaseDataAction<any, IDatabaseResul
     return scopedCache.get(hash);
   }
 
-  has(key: SerializableKey, scope: string) {
+  has(key: SerializableKey, scope: symbol) {
     const hash = this.getHash(key);
     const scopedCache = this.cache.get(scope);
 
@@ -54,25 +53,29 @@ export class ResultSetCacheAction extends DatabaseDataAction<any, IDatabaseResul
     return scopedCache.has(hash);
   }
 
-  set<T>(key: SerializableKey, value: T, scope: string) {
+  set<T>(key: SerializableKey, value: T, scope: symbol) {
     const hash = this.getHash(key);
     let scopedCache = this.cache.get(scope);
 
     if (!scopedCache) {
-      scopedCache = new Map();
+      scopedCache = observable(new Map());
       this.cache.set(scope, scopedCache);
     }
 
     scopedCache.set(hash, value);
   }
 
-  delete(key: SerializableKey, scope: string) {
-    const hash = ResultSetDataKeysUtils.serialize(key);
+  delete(key: SerializableKey, scope: symbol) {
+    const hash = this.getHash(key);
     const scopedCache = this.cache.get(scope);
 
     if (scopedCache) {
       scopedCache.delete(hash);
     }
+  }
+
+  dispose(): void {
+    this.cache.clear();
   }
 
   private getHash(key: SerializableKey) {

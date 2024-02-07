@@ -21,11 +21,11 @@ export class DocumentDataAction extends DatabaseDataResultAction<IDocumentElemen
   static dataFormat = [ResultDataFormat.Document];
 
   get documents(): IDatabaseDataDocument[] {
-    return this.result.data?.rows?.map(row => row[0]) || [];
+    return this.result.data?.rowsWithMetaData?.map(row => row.data?.[0]) || [];
   }
 
   get count(): number {
-    return this.result.data?.rows?.length || 0;
+    return this.result.data?.rowsWithMetaData?.length || 0;
   }
 
   constructor(source: IDatabaseDataSource<any, IDatabaseResultSet>) {
@@ -54,8 +54,12 @@ export class DocumentDataAction extends DatabaseDataResultAction<IDocumentElemen
   }
 
   set(index: number, value: IDatabaseDataDocument): void {
-    if (this.result.data?.rows) {
-      this.result.data.rows[index][0] = value;
+    if (this.result.data?.rowsWithMetaData) {
+      const row = this.result.data.rowsWithMetaData[index];
+
+      if (row.data) {
+        row.data[0] = value;
+      }
     }
   }
 }

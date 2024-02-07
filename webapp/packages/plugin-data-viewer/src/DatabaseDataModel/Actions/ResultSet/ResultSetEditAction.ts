@@ -316,7 +316,7 @@ export class ResultSetEditAction extends DatabaseEditAction<IResultSetElementKey
   }
 
   applyPartialUpdate(result: IDatabaseResultSet): void {
-    if (result.data?.rows?.length !== this.updates.length) {
+    if (result.data?.rowsWithMetaData?.length !== this.updates.length) {
       console.warn('ResultSetEditAction: returned data differs from performed update');
     }
 
@@ -340,7 +340,7 @@ export class ResultSetEditAction extends DatabaseEditAction<IResultSetElementKey
     }, 0);
 
     for (const update of tempUpdates) {
-      const value = result.data?.rows?.[update.rowIndex];
+      const value = result.data?.rowsWithMetaData?.[update.rowIndex].data;
       const row = update.update.row;
       const type = update.update.type;
 

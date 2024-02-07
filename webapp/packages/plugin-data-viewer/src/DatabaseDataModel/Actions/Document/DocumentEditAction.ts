@@ -125,7 +125,8 @@ export class DocumentEditAction extends DatabaseEditAction<IDocumentElementKey, 
     let rowIndex = 0;
 
     for (const [id, document] of this.editedElements) {
-      const value = result.data?.rows?.[rowIndex];
+      const row = result.data?.rowsWithMetaData?.[rowIndex];
+      const value = row?.data;
 
       if (value !== undefined) {
         this.data.set(id, value[0]);
@@ -138,7 +139,8 @@ export class DocumentEditAction extends DatabaseEditAction<IDocumentElementKey, 
     let rowIndex = 0;
 
     for (const [id, document] of this.editedElements) {
-      const value = result.data?.rows?.[rowIndex];
+      const row = result.data?.rowsWithMetaData?.[rowIndex];
+      const value = row?.data;
 
       if (value !== undefined) {
         this.data.set(id, value[0]);
