@@ -57,8 +57,8 @@ export class ResultSetDataContentAction extends DatabaseDataAction<any, IDatabas
   }
 
   getLimitInfo(elementKey: IResultSetElementKey) {
-    const isTextColumn = elementKey ? this.format.isText(elementKey) : false;
-    const isBlob = elementKey ? this.format.isBinary(elementKey) : false;
+    const isTextColumn = this.format.isText(elementKey);
+    const isBlob = this.format.isBinary(elementKey);
     const result = {
       limit: undefined as number | undefined,
       limitWithSize: undefined as string | undefined,
@@ -81,7 +81,7 @@ export class ResultSetDataContentAction extends DatabaseDataAction<any, IDatabas
 
   isContentTruncated(elementKey: IResultSetElementKey) {
     const limit = this.getLimitInfo(elementKey).limit;
-    const content = elementKey ? this.format.get(elementKey) : null;
+    const content = this.format.get(elementKey);
 
     if (!isNotNullDefined(limit) || !isResultSetContentValue(content)) {
       return false;
