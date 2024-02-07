@@ -1012,7 +1012,7 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
                 txn.commit();
             }
         } catch (SQLException e) {
-            throw new DBCException("Error saving tem in database", e);
+            throw new DBCException("Error saving team in database", e);
         }
     }
 
