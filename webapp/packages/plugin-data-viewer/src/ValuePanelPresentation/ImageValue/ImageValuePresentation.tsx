@@ -160,6 +160,12 @@ export const ImageValuePresentation: TabContainerPanelComponent<IDataValuePanelP
 
           return false;
         },
+        get shouldShowImage() {
+          const isFullImage = !this.truncated && this.savedSrc;
+          const isImage = this.src && !this.truncated && !this.savedSrc;
+
+          return isFullImage || isImage;
+        },
         async save() {
           try {
             if (this.truncated && this.selectedCell) {
@@ -205,48 +211,38 @@ export const ImageValuePresentation: TabContainerPanelComponent<IDataValuePanelP
     const loading = model.isLoading();
     const value = data.cellValue;
 
-    if (data.truncated && !data.savedSrc && isResultSetContentValue(value)) {
-      const valueSize = bytesToSize(value.contentLength ?? 0);
+    const load = async () => {
+      if (!data.selectedCell) {
+        return;
+      }
 
-      const load = async () => {
-        if (!data.selectedCell) {
-          return;
-        }
+      try {
+        await data.contentAction.resolveFileDataUrl(data.selectedCell);
+      } catch (exception: any) {
+        notificationService.logException(exception, 'data_viewer_presentation_value_content_download_error');
+      }
+    };
 
-        try {
-          await data.contentAction.resolveFileDataUrl(data.selectedCell);
-        } catch (exception: any) {
-          notificationService.logException(exception, 'data_viewer_presentation_value_content_download_error');
-        }
-      };
-
-      return (
-        <Container vertical>
-          <Container fill overflow center>
-            <QuotaPlaceholder model={data.model} resultIndex={data.resultIndex} elementKey={data.selectedCell}>
-              {data.selectedCell && data.contentAction.isDownloadable(data.selectedCell) && (
-                <Button
-                  disabled={loading}
-                  loading={
-                    !!data.contentAction.activeElement &&
-                    ResultSetDataKeysUtils.isElementsKeyEqual(data.contentAction.activeElement, data.selectedCell)
-                  }
-                  onClick={load}
-                >
-                  {`${translate('ui_view')} (${valueSize})`}
-                </Button>
-              )}
-            </QuotaPlaceholder>
-          </Container>
-          <Tools loading={loading} onSave={save} onUpload={upload} />
-        </Container>
-      );
-    }
+    const valueSize = bytesToSize(isResultSetContentValue(value) ? value.contentLength ?? 0 : 0);
+    const isDownloadable = data.selectedCell && data.contentAction.isDownloadable(data.selectedCell);
 
     return (
       <Container vertical>
         <Container fill overflow center>
-          <img src={data.src} className={s(style, { img: true, stretch: state.stretch })} />
+          {data.shouldShowImage && <img src={data.src} className={s(style, { img: true, stretch: state.stretch })} />}
+          <QuotaPlaceholder model={data.model} resultIndex={data.resultIndex} elementKey={data.selectedCell}>
+            {isDownloadable && (
+              <Button
+                disabled={loading}
+                loading={
+                  !!data.contentAction.activeElement && ResultSetDataKeysUtils.isElementsKeyEqual(data.contentAction.activeElement, data.selectedCell)
+                }
+                onClick={load}
+              >
+                {`${translate('ui_view')} (${valueSize})`}
+              </Button>
+            )}
+          </QuotaPlaceholder>
         </Container>
         <Tools loading={loading} stretch={state.stretch} onToggleStretch={state.toggleStretch} onSave={save} onUpload={upload} />
       </Container>

@@ -21,11 +21,13 @@ interface Props {
   elementKey: IResultSetElementKey | undefined;
   model: IDatabaseDataModel<any, IDatabaseResultSet>;
   resultIndex: number;
+  keepSize?: boolean;
 }
 
 export const QuotaPlaceholder: React.FC<React.PropsWithChildren<Props>> = observer(function QuotaPlaceholder({
   className,
   children,
+  keepSize = false,
   elementKey,
   model,
   resultIndex,
@@ -36,8 +38,12 @@ export const QuotaPlaceholder: React.FC<React.PropsWithChildren<Props>> = observ
   const { contentAction } = useResultSetActions({ model, resultIndex });
   const limitInfo = elementKey ? contentAction.getLimitInfo(elementKey) : null;
 
+  if (!elementKey || (elementKey && !contentAction.isContentTruncated(elementKey))) {
+    return null;
+  }
+
   return (
-    <Container className={className} vertical center>
+    <Container className={className} keepSize={keepSize} vertical center>
       <Container center vertical>
         {translate('data_viewer_presentation_value_content_was_truncated')}
         <Container noWrap center>
