@@ -23,7 +23,6 @@ mutation updateResultsDataBatch(
       updateRowCount
       resultSet {
         id
-        rows
         rowsWithMetaData {
           data
           metaData

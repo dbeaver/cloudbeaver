@@ -32,7 +32,6 @@ mutation getSqlExecuteTaskResults($taskId: ID!) {
             argumentCount
           }
         }
-        rows
         rowsWithMetaData {
           data
           metaData

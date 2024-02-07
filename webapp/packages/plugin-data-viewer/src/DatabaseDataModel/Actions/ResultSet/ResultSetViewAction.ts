@@ -35,7 +35,7 @@ export class ResultSetViewAction extends DatabaseDataAction<any, IDatabaseResult
     return this.columns.map(c => ({ index: this.data.columns.indexOf(c) }));
   }
 
-  get rows(): IResultSetValue[][] {
+  get rows() {
     return this.data.rows;
   }
 
@@ -137,7 +137,7 @@ export class ResultSetViewAction extends DatabaseDataAction<any, IDatabaseResult
       throw new Error('Cell is out of range');
     }
 
-    return this.rows[cell.row.index][cell.column.index];
+    return this.rows[cell.row.index].data?.[cell.column.index];
   }
 
   getContent(cell: IResultSetElementKey): IResultSetComplexValue | null {

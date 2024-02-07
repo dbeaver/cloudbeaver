@@ -23,11 +23,7 @@ import type { IResultSetValue } from './ResultSetFormatAction';
 export class ResultSetDataAction extends DatabaseDataResultAction<IResultSetElementKey, IDatabaseResultSet> {
   static dataFormat = [ResultDataFormat.Resultset];
 
-  get rows(): IResultSetValue[][] {
-    return this.result.data?.rows || [];
-  }
-
-  get rowsWithMetadata() {
+  get rows() {
     return this.result.data?.rowsWithMetaData || [];
   }
 
@@ -39,7 +35,6 @@ export class ResultSetDataAction extends DatabaseDataResultAction<IResultSetElem
     super(source);
     makeObservable(this, {
       rows: computed,
-      rowsWithMetadata: computed,
       columns: computed,
     });
   }
@@ -96,15 +91,15 @@ export class ResultSetDataAction extends DatabaseDataResultAction<IResultSetElem
       return undefined;
     }
 
-    return this.rows[row.index];
+    return this.rows[row.index].data;
   }
 
   getRowMetadata(row: IResultSetRowKey) {
-    if (row.index >= this.rowsWithMetadata.length) {
+    if (row.index >= this.rows.length) {
       return undefined;
     }
 
-    return this.rowsWithMetadata[row.index].metaData;
+    return this.rows[row.index].metaData;
   }
 
   getCellValue(cell: IResultSetElementKey): IResultSetValue | undefined {
@@ -112,7 +107,7 @@ export class ResultSetDataAction extends DatabaseDataResultAction<IResultSetElem
       return undefined;
     }
 
-    return this.rows[cell.row.index][cell.column.index];
+    return this.rows[cell.row.index].data?.[cell.column.index];
   }
 
   getContent(cell: IResultSetElementKey): IResultSetContentValue | null {
