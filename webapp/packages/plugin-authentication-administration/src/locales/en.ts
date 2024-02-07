@@ -129,4 +129,7 @@ export default [
   ['administration_teams_team_granted_connections_tab_title', 'Connections'],
   ['administration_teams_team_granted_connections_search_placeholder', 'Search for connection name...'],
   ['administration_teams_team_granted_connections_empty', 'No available connections'],
+
+  ['plugin_authentication_administration_user_team_default_readonly_tooltip', "Default team. Can't be revoked"],
+  ['plugin_authentication_administration_team_default_users_tooltip', 'Default team. Contains all users'],
 ];

@@ -210,7 +210,6 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
         application.getEventController().addEvent(event);
     }
 
-    @Override
     public void setUserTeams(String userId, String[] teamIds, String grantorId) throws DBCException {
         try (Connection dbCon = database.openConnection()) {
             try (JDBCTransaction txn = new JDBCTransaction(dbCon)) {
@@ -230,6 +229,10 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
             database.normalizeTableNames("DELETE FROM {table_prefix}CB_USER_TEAM WHERE USER_ID=?"),
             userId
         );
+        String defaultUserTeam = application.getAppConfiguration().getDefaultUserTeam();
+        if (CommonUtils.isNotEmpty(defaultUserTeam) && !ArrayUtils.contains(teamIds, defaultUserTeam)) {
+            teamIds = ArrayUtils.add(String.class, teamIds, defaultUserTeam);
+        }
         if (!ArrayUtils.isEmpty(teamIds)) {
             try (PreparedStatement dbStat = dbCon.prepareStatement(
                 database.normalizeTableNames("INSERT INTO {table_prefix}CB_USER_TEAM" +
@@ -243,6 +246,51 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
                     dbStat.execute();
                 }
             }
+        }
+    }
+
+    public void addAllUsersToDefaultTeam() throws DBCException {
+        if (application.isConfigurationMode()) {
+            return;
+        }
+        if (CommonUtils.isEmpty(application.getAppConfiguration().getDefaultUserTeam())) {
+            return;
+        }
+
+        try (Connection dbCon = database.openConnection()) {
+            try (PreparedStatement dbStat = dbCon.prepareStatement(
+                    database.normalizeTableNames("SELECT USER_ID \n" +
+                            "FROM {table_prefix}CB_USER\n" +
+                            "WHERE USER_ID NOT IN (\n" +
+                            "    SELECT USER_ID FROM {table_prefix}CB_USER_TEAM CUT WHERE CUT.TEAM_ID = ? \n" +
+                            ")")
+            )) {
+                dbStat.setString(1, application.getAppConfiguration().getDefaultUserTeam());
+                ResultSet dbResult = dbStat.executeQuery();
+                List<String> usersIds = new ArrayList<>();
+                while (dbResult.next()) {
+                    String userId = dbResult.getString(1);
+                    usersIds.add(userId);
+                }
+
+                if (usersIds.isEmpty()) {
+                    return;
+                }
+
+                for (String usersId : usersIds) {
+                    try (PreparedStatement insertStat = dbCon.prepareStatement(
+                            database.normalizeTableNames("INSERT INTO {table_prefix}CB_USER_TEAM(USER_ID, TEAM_ID, GRANT_TIME, GRANTED_BY)" +
+                                    " VALUES(?,?,?,?)"))) {
+                        insertStat.setString(1, usersId);
+                        insertStat.setString(2, application.getAppConfiguration().getDefaultUserTeam());
+                        insertStat.setTimestamp(3,  new Timestamp(System.currentTimeMillis()));
+                        insertStat.setString(4,  "CloudBeaver Application");
+                        insertStat.executeUpdate();
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            throw new DBCException("Error while setting default user teams", e);
         }
     }
 
