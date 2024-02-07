@@ -38,10 +38,6 @@ export const QuotaPlaceholder: React.FC<React.PropsWithChildren<Props>> = observ
   const { contentAction } = useResultSetActions({ model, resultIndex });
   const limitInfo = elementKey ? contentAction.getLimitInfo(elementKey) : null;
 
-  if (!elementKey || (elementKey && !contentAction.isContentTruncated(elementKey))) {
-    return null;
-  }
-
   return (
     <Container className={className} keepSize={keepSize} vertical center>
       <Container center vertical>

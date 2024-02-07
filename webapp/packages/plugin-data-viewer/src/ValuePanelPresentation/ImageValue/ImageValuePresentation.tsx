@@ -154,11 +154,7 @@ export const ImageValuePresentation: TabContainerPanelComponent<IDataValuePanelP
             return false;
           }
 
-          if (this.selectedCell && this.formatAction.isBinary(this.selectedCell)) {
-            return this.contentAction.isContentTruncated(this.selectedCell);
-          }
-
-          return false;
+          return this.selectedCell && this.contentAction.isImageTruncated(this.selectedCell);
         },
         get shouldShowImage() {
           const isFullImage = !this.truncated && this.savedSrc;
@@ -230,19 +226,22 @@ export const ImageValuePresentation: TabContainerPanelComponent<IDataValuePanelP
       <Container vertical>
         <Container fill overflow center>
           {data.shouldShowImage && <img src={data.src} className={s(style, { img: true, stretch: state.stretch })} />}
-          <QuotaPlaceholder model={data.model} resultIndex={data.resultIndex} elementKey={data.selectedCell}>
-            {isDownloadable && (
-              <Button
-                disabled={loading}
-                loading={
-                  !!data.contentAction.activeElement && ResultSetDataKeysUtils.isElementsKeyEqual(data.contentAction.activeElement, data.selectedCell)
-                }
-                onClick={load}
-              >
-                {`${translate('ui_view')} (${valueSize})`}
-              </Button>
-            )}
-          </QuotaPlaceholder>
+          {data.truncated ? (
+            <QuotaPlaceholder model={data.model} resultIndex={data.resultIndex} elementKey={data.selectedCell}>
+              {isDownloadable && (
+                <Button
+                  disabled={loading}
+                  loading={
+                    !!data.contentAction.activeElement &&
+                    ResultSetDataKeysUtils.isElementsKeyEqual(data.contentAction.activeElement, data.selectedCell)
+                  }
+                  onClick={load}
+                >
+                  {`${translate('ui_view')} (${valueSize})`}
+                </Button>
+              )}
+            </QuotaPlaceholder>
+          ) : null}
         </Container>
         <Tools loading={loading} stretch={state.stretch} onToggleStretch={state.toggleStretch} onSave={save} onUpload={upload} />
       </Container>
