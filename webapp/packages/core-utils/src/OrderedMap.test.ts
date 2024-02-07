@@ -6,10 +6,25 @@ describe('OrderedMap', () => {
     map.add(1, 'one');
     map.add(2, 'two');
     map.add(3, 'three');
+    map.add(Infinity, 'infinity');
+    map.add(NaN, 'nan');
 
     expect(map.get(1)).toBe('one');
     expect(map.get(2)).toBe('two');
     expect(map.get(3)).toBe('three');
+    expect(map.get(Infinity)).toBe('infinity');
+    expect(map.get(NaN)).toBe('nan');
+  });
+
+  it('should not get not exist item and return undefined', () => {
+    const map = new OrderedMap<number, string>();
+    map.add(1, 'one');
+    map.add(2, 'two');
+    map.add(3, 'three');
+
+    expect(map.get(4)).toBeUndefined();
+    expect(map.get(Infinity)).toBeUndefined();
+    expect(map.get(NaN)).toBeUndefined();
   });
 
   it('should addValue and get items', () => {
@@ -55,18 +70,28 @@ describe('OrderedMap', () => {
     map.add(1, 'one');
     map.add(2, 'two');
     map.add(3, 'three');
+    map.add(Infinity, 'infinity');
+    map.add(NaN, 'nan');
 
     expect(map.has(1)).toBeTruthy();
     expect(map.has(2)).toBeTruthy();
     expect(map.has(3)).toBeTruthy();
+    expect(map.has(Infinity)).toBeTruthy();
+    expect(map.has(NaN)).toBeTruthy();
   });
 
   it('should not override items', () => {
     const map = new OrderedMap<number, string>();
     map.add(1, 'one');
     map.add(1, 'two');
+    map.add(Infinity, 'infinity');
+    map.add(Infinity, 'infinity2');
+    map.add(NaN, 'nan');
+    map.add(NaN, 'nan2');
 
     expect(map.get(1)).toBe('one');
+    expect(map.get(Infinity)).toBe('infinity');
+    expect(map.get(NaN)).toBe('nan');
   });
 
   it('should remove items', () => {
@@ -82,14 +107,16 @@ describe('OrderedMap', () => {
     expect(map.values).toEqual(['one', 'three']);
   });
 
-  it('should not remove non-existing items', () => {
+  it('should not have non-existing items after removal', () => {
     const map = new OrderedMap<number, string>();
     map.add(1, 'one');
     map.add(2, 'two');
     map.add(3, 'three');
 
+    expect(map.has(4)).toBeFalsy();
+    expect(map.get(4)).toBeUndefined();
     map.remove(4);
-
+    expect(map.has(4)).toBeFalsy();
     expect(map.get(4)).toBeUndefined();
   });
 
