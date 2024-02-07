@@ -28,7 +28,6 @@ import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
-import org.jkiss.dbeaver.model.DBCHierarchicalDocumentProvider;
 import org.jkiss.dbeaver.model.DBPDataKind;
 import org.jkiss.dbeaver.model.DBPDataSource;
 import org.jkiss.dbeaver.model.DBUtils;
@@ -903,37 +902,6 @@ public class WebSQLProcessor implements WebSessionProvider {
         }
         return type.cast(object);
     }
-
-    public List<?> transformChildSubCollectionValue(
-            @NotNull WebSQLResultsInfo resultsInfo,
-            @NotNull WebSQLResultsRow value
-    ) throws DBException {
-        DBSDataContainer dataContainer = resultsInfo.getDataContainer();
-            if (dataContainer.getDataSource() instanceof DBCHierarchicalDocumentProvider documentProvider) {
-                return (List<?>) documentProvider
-                        .listChildrenEntities((String) Objects.requireNonNull(value.getMetaData()).get("path"),
-                                getWebSession().getProgressMonitor(),
-                                true);
-            } else {
-                throw new DBException("Attribute value is not a subcollection");
-            }
-    }
-
-    public DBSEntity getChildEntity(
-            @NotNull WebSQLResultsInfo resultsInfo,
-            @NotNull WebSQLResultsRow value
-    ) throws DBException {
-        DBSDataContainer dataContainer = resultsInfo.getDataContainer();
-        if (dataContainer.getDataSource() instanceof DBCHierarchicalDocumentProvider documentProvider) {
-            return documentProvider
-                    .getChildrenEntityInstance((String) Objects.requireNonNull(value.getMetaData()).get("path"),
-                            getWebSession().getProgressMonitor(),
-                            true, true);
-        } else {
-            throw new DBException("Attribute value is not a subcollection");
-        }
-    }
-
 
 
     private void fillQueryResults(
