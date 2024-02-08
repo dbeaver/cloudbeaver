@@ -6,13 +6,12 @@
  * you may not use this file except in compliance with the License.
  */
 import { AppScreenService } from '@cloudbeaver/core-app';
-import { ActionSnackbar } from '@cloudbeaver/core-blocks';
+import { ActionSnackbar, importLazyComponent } from '@cloudbeaver/core-blocks';
 import { LocalStorageSaveService } from '@cloudbeaver/core-browser';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
 import { ENotificationType, INotification, NotificationService } from '@cloudbeaver/core-events';
 import { ScreenService } from '@cloudbeaver/core-routing';
-import { importLazyComponent } from '@cloudbeaver/core-utils';
 import { ActionService, menuExtractItems, MenuService } from '@cloudbeaver/core-view';
 import { MENU_APP_STATE } from '@cloudbeaver/plugin-top-app-bar';
 

@@ -9,7 +9,7 @@ import { observer } from 'mobx-react-lite';
 import React from 'react';
 import styled, { css } from 'reshadow';
 
-import { importLazyComponent } from '@cloudbeaver/core-utils';
+import { importLazyComponent } from '@cloudbeaver/core-blocks';
 
 import type { ISqlEditorTabState } from '../ISqlEditorTabState';
 

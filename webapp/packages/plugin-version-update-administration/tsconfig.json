@@ -28,9 +28,6 @@
       "path": "../core-ui/tsconfig.json"
     },
     {
-      "path": "../core-utils/tsconfig.json"
-    },
-    {
       "path": "../core-version-update/tsconfig.json"
     },
     {
