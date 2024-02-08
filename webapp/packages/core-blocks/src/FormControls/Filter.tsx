@@ -20,8 +20,7 @@ interface BaseProps {
   disabled?: boolean;
   max?: boolean;
   className?: string;
-  onFilter?: (value: string) => void;
-  onClean?: () => void;
+  onApply?: (value: string) => void;
   onKeyDown?: (event: React.KeyboardEvent<HTMLInputElement>) => void;
   onClick?: (event: React.MouseEvent<HTMLDivElement>) => void;
 }
@@ -48,8 +47,7 @@ export const Filter = observer<ControlledProps | ObjectsProps<any, any>>(functio
   disabled,
   max,
   className,
-  onFilter,
-  onClean,
+  onApply,
   onChange,
   onKeyDown,
   onClick,
@@ -79,8 +77,8 @@ export const Filter = observer<ControlledProps | ObjectsProps<any, any>>(functio
   }
 
   function handleKeyDown(event: React.KeyboardEvent<HTMLInputElement>) {
-    if (event.key === 'Enter' && onFilter) {
-      onFilter(value);
+    if (event.key === 'Enter' && onApply) {
+      onApply(value);
     }
 
     onKeyDown?.(event);
@@ -88,12 +86,13 @@ export const Filter = observer<ControlledProps | ObjectsProps<any, any>>(functio
 
   function clean() {
     filter('', name);
-    if (onClean) {
-      onClean();
+
+    if (onApply) {
+      onApply('');
     }
   }
 
-  const manualMode = !!onFilter;
+  const manualMode = !!onApply;
   const edited = !!String(value);
 
   return (
@@ -116,7 +115,7 @@ export const Filter = observer<ControlledProps | ObjectsProps<any, any>>(functio
           className={s(styles, { iconButton: true, manualMode })}
           name="search"
           disabled={disabled}
-          onClick={onFilter ? () => onFilter(value) : undefined}
+          onClick={onApply ? () => onApply(value) : undefined}
         />
       )}
     </div>
