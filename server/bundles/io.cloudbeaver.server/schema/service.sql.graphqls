@@ -94,7 +94,7 @@ type SQLResultColumn {
 }
 
 type SQLResultRowMetaData {
-    data: [Object]
+    data: [Object]!
     metaData: Object
 }
 

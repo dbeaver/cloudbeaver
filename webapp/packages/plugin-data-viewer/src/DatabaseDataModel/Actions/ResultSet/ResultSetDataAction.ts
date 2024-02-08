@@ -47,6 +47,10 @@ export class ResultSetDataAction extends DatabaseDataResultAction<IResultSetElem
     return ResultSetDataKeysUtils.serializeElementKey(key);
   }
 
+  serializeRowKey(key: IResultSetRowKey): string {
+    return ResultSetDataKeysUtils.serialize(key);
+  }
+
   getDefaultKey(): IResultSetElementKey {
     return {
       row: {

@@ -11,7 +11,7 @@ export type SerializableKey = IResultSetColumnKey | IResultSetRowKey;
 
 export const ResultSetDataKeysUtils = {
   serializeElementKey(elementKey: IResultSetElementKey): string {
-    return this.serialize(elementKey.column) + this.serialize(elementKey.row);
+    return this.serialize(elementKey.column) + '.' + this.serialize(elementKey.row);
   },
   isElementsKeyEqual(a: IResultSetElementKey, b: IResultSetElementKey) {
     return this.isEqual(a.column, b.column) && this.isEqual(a.row, b.row);
@@ -25,7 +25,7 @@ export const ResultSetDataKeysUtils = {
 
     return base;
   },
-  isEqual<T extends IResultSetColumnKey | IResultSetRowKey>(a: T, b: T): boolean {
+  isEqual<T extends SerializableKey>(a: T, b: T): boolean {
     if (a.index !== b.index) {
       return false;
     }
