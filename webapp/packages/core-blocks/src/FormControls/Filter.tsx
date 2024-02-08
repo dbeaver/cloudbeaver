@@ -79,7 +79,7 @@ export const Filter = observer<ControlledProps | ObjectsProps<any, any>>(functio
   }
 
   function handleKeyDown(event: React.KeyboardEvent<HTMLInputElement>) {
-    if (event.key === 'Enter' && onApply) {
+    if (event.key === 'Enter' && onApply && !applyDisabled) {
       onApply(value);
     }
 
