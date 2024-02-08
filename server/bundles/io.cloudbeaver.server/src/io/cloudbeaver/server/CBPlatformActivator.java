@@ -1,5 +1,3 @@
-package io.cloudbeaver.server;
-
 /*
  * DBeaver - Universal Database Manager
  * Copyright (C) 2010-2024 DBeaver Corp and others
@@ -17,6 +15,10 @@ package io.cloudbeaver.server;
  * limitations under the License.
  */
 
+package io.cloudbeaver.server;
+
+import org.jkiss.dbeaver.runtime.DBWorkbench;
+
 /**
  * The activator class controls the plug-in life cycle
  */
@@ -26,8 +28,8 @@ public class CBPlatformActivator extends WebPlatformActivator {
     protected void shutdownPlatform() {
         try {
             // Dispose core
-            if (CBPlatform.instance != null) {
-                CBPlatform.instance.dispose();
+            if (DBWorkbench.getPlatform() instanceof CBPlatform cbPlatform) {
+                cbPlatform.dispose();
             }
         } catch (Throwable e) {
             e.printStackTrace();
