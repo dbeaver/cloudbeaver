@@ -45,7 +45,6 @@ public class WebDataSourceMonitorJob extends DataSourceMonitorJob {
 
     }
 
-
     @Override
     public long getLastUserActivityTime(long lastUserActivityTime) {
         return lastUserActivityTime;
