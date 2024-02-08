@@ -564,9 +564,12 @@ public class WebSQLProcessor implements WebSessionProvider {
                         .filter(x -> CommonUtils.equalObjects(allAttributes[CommonUtils.toInt(x.getKey())].getRowIdentifier(), rowIdentifier))
                         .collect(HashMap::new, (m,v) -> m.put(v.getKey(), v.getValue()), HashMap::putAll);
 
-                    Map<String, Object> metaData = row.getMetaData().entrySet().stream()
-                            .filter(x -> CommonUtils.equalObjects(allAttributes[CommonUtils.toInt(x.getKey())].getRowIdentifier(), rowIdentifier))
-                            .collect(HashMap::new, (m,v) -> m.put(v.getKey(), v.getValue()), HashMap::putAll);
+                    Map<String, Object> metaData;
+                    if (row.getMetaData() != null) {
+                        metaData = new HashMap<>(row.getMetaData());
+                    } else {
+                        metaData = new HashMap<>();
+                    }
 
                     if (finalRow.length == 0 || CommonUtils.isEmpty(updateValues)) {
                         continue;
@@ -656,6 +659,7 @@ public class WebSQLProcessor implements WebSessionProvider {
             if (keyAttributes.length > 0 && !CommonUtils.isEmpty(deletedRows)) {
                 for (WebSQLResultsRow row : deletedRows) {
                     Object[] keyData = row.getData();
+                    Map<String, Object> keyMetaData = row.getMetaData();
                     if (keyData.length == 0) {
                         continue;
                     }
@@ -663,20 +667,37 @@ public class WebSQLProcessor implements WebSessionProvider {
 
                     boolean isDocumentKey = keyAttributes.length == 1 && keyAttributes[0].getDataKind() == DBPDataKind.DOCUMENT;
 
-                    for (int i = 0; i < allAttributes.length; i++) {
-                        if (isDocumentKey || ArrayUtils.contains(keyAttributes, allAttributes[i])) {
-                            Object realCellValue = convertInputCellValue(session, allAttributes[i],
-                                keyData[i], withoutExecution);
-                            delKeyAttributes.put(allAttributes[i], realCellValue);
+                    if (dataContainer instanceof DBSDocumentLocator dataLocator) {
+                        Map<String, Object> keyMap = new LinkedHashMap<>();
+                        DBDAttributeBinding[] attributes = resultsInfo.getAttributes();
+                        for (int j = 0; j < attributes.length; j++) {
+                            DBDAttributeBinding attr = attributes[j];
+                            Object plainValue = WebSQLUtils.makePlainCellValue(session, attr, row.getData()[j]);
+                            keyMap.put(attr.getName(), plainValue);
                         }
-                    }
+                        DBDDocument document = dataLocator.findDocument(session, keyMap, keyMetaData);
 
-                    DBSDataManipulator.ExecuteBatch deleteBatch = dataManipulator.deleteData(
-                        session,
-                        delKeyAttributes.keySet().toArray(new DBSAttributeBase[0]),
-                        executionSource);
-                    deleteBatch.add(delKeyAttributes.values().toArray());
-                    resultBatches.put(deleteBatch, new Object[0]);
+                        DBSDataManipulator.ExecuteBatch deleteBatch = dataManipulator.deleteData(
+                                session,
+                                keyAttributes,
+                                executionSource);
+                        deleteBatch.add(new Object[] {document});
+                        resultBatches.put(deleteBatch, new Object[0]);
+                    } else {
+                        for (int i = 0; i < allAttributes.length; i++) {
+                            if (isDocumentKey || ArrayUtils.contains(keyAttributes, allAttributes[i])) {
+                                Object realCellValue = convertInputCellValue(session, allAttributes[i],
+                                        keyData[i], withoutExecution);
+                                delKeyAttributes.put(allAttributes[i], realCellValue);
+                            }
+                        }
+                        DBSDataManipulator.ExecuteBatch deleteBatch = dataManipulator.deleteData(
+                                session,
+                                delKeyAttributes.keySet().toArray(new DBSAttributeBase[0]),
+                                executionSource);
+                        deleteBatch.add(delKeyAttributes.values().toArray());
+                        resultBatches.put(deleteBatch, new Object[0]);
+                    }
                 }
             }
         }
@@ -711,8 +732,10 @@ public class WebSQLProcessor implements WebSessionProvider {
             if (plainValue instanceof DBDDocument) {
                 // FIXME: Hack for DynamoDB. We pass entire document as a key
                 // FIXME: Let's just return it back for now
-                document = (DBDDocument) plainValue;
-                break;
+                if (((DBDDocument) plainValue).getDocumentId() != null) {
+                    document = (DBDDocument) plainValue;
+                    break;
+                }
             }
             keyMap.put(attr.getName(), plainValue);
         }
