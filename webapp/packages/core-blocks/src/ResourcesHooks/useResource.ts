@@ -162,7 +162,9 @@ export function useResource<
     }
 
     if (key === null || propertiesRef.key === null || !propertiesRef.resource.isEqual(key, propertiesRef.key)) {
-      propertiesRef.key = key;
+      if (propertiesRef.key !== key) {
+        propertiesRef.key = key;
+      }
     }
   });
 

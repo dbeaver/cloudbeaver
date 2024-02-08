@@ -22,6 +22,7 @@ import com.google.gson.InstanceCreator;
 import io.cloudbeaver.WebServiceUtils;
 import io.cloudbeaver.auth.CBAuthConstants;
 import io.cloudbeaver.auth.NoAuthCredentialsProvider;
+import io.cloudbeaver.service.security.CBEmbeddedSecurityController;
 import io.cloudbeaver.service.security.PasswordPolicyConfiguration;
 import io.cloudbeaver.model.app.BaseWebApplication;
 import io.cloudbeaver.model.app.WebAuthApplication;
@@ -370,6 +371,11 @@ public abstract class CBApplication extends BaseWebApplication implements WebAut
             });
             System.setSecurityManager(new SecurityManager());
         }
+        try {
+            addAllUsersToDefaultTeam();
+        } catch (DBException e) {
+            log.error("Failed insert default teams");
+        }
 
         eventController.scheduleCheckJob();
 
@@ -378,6 +384,12 @@ public abstract class CBApplication extends BaseWebApplication implements WebAut
         log.debug("Shutdown");
 
         return;
+    }
+
+    private void addAllUsersToDefaultTeam() throws DBException {
+        if (securityController instanceof CBEmbeddedSecurityController<?> controller) {
+            controller.addAllUsersToDefaultTeam();
+        }
     }
 
     protected void initializeAdditionalConfiguration() {
