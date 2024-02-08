@@ -22,7 +22,6 @@ interface Props {
   model: IDatabaseDataModel<any, IDatabaseResultSet>;
   resultIndex: number;
   keepSize?: boolean;
-  tabId: string;
 }
 
 export const QuotaPlaceholder: React.FC<React.PropsWithChildren<Props>> = observer(function QuotaPlaceholder({
@@ -32,17 +31,12 @@ export const QuotaPlaceholder: React.FC<React.PropsWithChildren<Props>> = observ
   elementKey,
   model,
   resultIndex,
-  tabId,
 }) {
   const translate = useTranslate();
   const admin = usePermission(EAdminPermission.admin);
   const style = useS(styles);
   const { contentAction } = useResultSetActions({ model, resultIndex });
   const limitInfo = elementKey ? contentAction.getLimitInfo(elementKey) : null;
-
-  if (!elementKey || (elementKey && !contentAction.isContentTruncated(elementKey, tabId))) {
-    return null;
-  }
 
   return (
     <Container className={className} keepSize={keepSize} vertical center>

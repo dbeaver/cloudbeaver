@@ -79,15 +79,26 @@ export class ResultSetDataContentAction extends DatabaseDataAction<any, IDatabas
     return result;
   }
 
-  isContentTruncated(elementKey: IResultSetElementKey, presentationId: string) {
+  isBlobTruncated(elementKey: IResultSetElementKey) {
+    const limit = this.getLimitInfo(elementKey).limit;
+    const content = this.format.get(elementKey);
+    const cachedImage = this.retrieveFileDataUrlFromCache(elementKey);
+    const isLoadedFullImage = Boolean(cachedImage) && this.format.isBinary(elementKey);
+
+    if (!isNotNullDefined(limit) || !isResultSetContentValue(content) || isLoadedFullImage || !this.format.isBinary(elementKey)) {
+      return false;
+    }
+
+    return (content.contentLength ?? 0) > limit;
+  }
+
+  isTextTruncated(elementKey: IResultSetElementKey) {
     const limit = this.getLimitInfo(elementKey).limit;
     const content = this.format.get(elementKey);
     const cachedFullText = this.retrieveFileFullTextFromCache(elementKey);
-    const isLoadedFullText = Boolean(cachedFullText) && this.format.isText(elementKey) && presentationId === 'text-presentation';
-    const cachedImage = elementKey ? this.retrieveFileDataUrlFromCache(elementKey) : '';
-    const isLoadedFullImage = Boolean(cachedImage) && this.format.isBinary(elementKey) && presentationId === 'image-presentation';
+    const isLoadedFullText = Boolean(cachedFullText) && this.format.isText(elementKey);
 
-    if (!isNotNullDefined(limit) || !isResultSetContentValue(content) || isLoadedFullText || isLoadedFullImage) {
+    if (!isNotNullDefined(limit) || !isResultSetContentValue(content) || isLoadedFullText) {
       return false;
     }
 
