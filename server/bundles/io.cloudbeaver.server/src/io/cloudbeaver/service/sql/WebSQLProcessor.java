@@ -729,10 +729,10 @@ public class WebSQLProcessor implements WebSessionProvider {
         for (int j = 0; j < attributes.length; j++) {
             DBDAttributeBinding attr = attributes[j];
             Object plainValue = WebSQLUtils.makePlainCellValue(session, attr, row.getData()[j]);
-            if (plainValue instanceof DBDDocument) {
+            if (plainValue instanceof DBDDocument dbdDocument) {
                 // FIXME: Hack for DynamoDB. We pass entire document as a key
                 // FIXME: Let's just return it back for now
-                if (((DBDDocument) plainValue).getDocumentId() != null) {
+                if (dataContainer.isDocumentValid(dbdDocument)) {
                     document = (DBDDocument) plainValue;
                     break;
                 }
