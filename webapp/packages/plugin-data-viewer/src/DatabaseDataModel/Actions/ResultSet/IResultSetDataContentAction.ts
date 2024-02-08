@@ -9,7 +9,7 @@ import type { IResultSetElementKey } from './IResultSetDataKey';
 
 export interface IResultSetDataContentAction {
   activeElement: IResultSetElementKey | null;
-  isContentTruncated: (element: IResultSetElementKey) => boolean;
+  isContentTruncated: (element: IResultSetElementKey, presentationId: string) => boolean;
   isDownloadable: (element: IResultSetElementKey) => boolean;
   getFileDataUrl: (element: IResultSetElementKey) => Promise<string>;
   resolveFileDataUrl: (element: IResultSetElementKey) => Promise<string>;

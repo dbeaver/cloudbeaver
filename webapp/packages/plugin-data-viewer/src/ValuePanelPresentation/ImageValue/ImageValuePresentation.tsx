@@ -68,9 +68,10 @@ export const ImageValuePresentation: TabContainerPanelComponent<IDataValuePanelP
     const notificationService = useService(NotificationService);
     const style = useS(styles);
 
-    const state = useTabLocalState(() =>
+    const state = useTabLocalState(tabId =>
       observable(
         {
+          tabId,
           stretch: false,
           toggleStretch() {
             this.stretch = !this.stretch;
@@ -155,7 +156,7 @@ export const ImageValuePresentation: TabContainerPanelComponent<IDataValuePanelP
           }
 
           if (this.selectedCell && this.formatAction.isBinary(this.selectedCell)) {
-            return this.contentAction.isContentTruncated(this.selectedCell);
+            return this.contentAction.isContentTruncated(this.selectedCell, state.tabId);
           }
 
           return false;
@@ -230,7 +231,7 @@ export const ImageValuePresentation: TabContainerPanelComponent<IDataValuePanelP
       <Container vertical>
         <Container fill overflow center>
           {data.shouldShowImage && <img src={data.src} className={s(style, { img: true, stretch: state.stretch })} />}
-          <QuotaPlaceholder model={data.model} resultIndex={data.resultIndex} elementKey={data.selectedCell}>
+          <QuotaPlaceholder tabId={state.tabId} model={data.model} resultIndex={data.resultIndex} elementKey={data.selectedCell}>
             {isDownloadable && (
               <Button
                 disabled={loading}

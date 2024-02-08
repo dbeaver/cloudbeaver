@@ -69,8 +69,9 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
       resultIndex,
     });
     const contentValue = firstSelectedCell ? formatAction.get(firstSelectedCell) : null;
-    const state = useTabLocalState(() =>
+    const state = useTabLocalState(tabId =>
       observable({
+        tabId,
         lineWrapping: null as boolean | null,
         currentContentType: null as string | null,
 
@@ -125,7 +126,7 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
     const valueSize =
       isResultSetContentValue(contentValue) && isNotNullDefined(contentValue.contentLength) ? bytesToSize(contentValue.contentLength) : undefined;
     const canSave = firstSelectedCell && contentAction.isDownloadable(firstSelectedCell);
-    const shouldShowPasteButton = textValueData.isTextColumn && firstSelectedCell && contentAction.isContentTruncated(firstSelectedCell);
+    const shouldShowPasteButton = textValueData.isTextColumn && firstSelectedCell && contentAction.isContentTruncated(firstSelectedCell, state.tabId);
     const typeExtension = useMemo(() => getTypeExtension(contentType!) ?? [], [contentType]);
     const extensions = useCodemirrorExtensions(undefined, typeExtension);
 
@@ -185,7 +186,7 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
             onChange={valueChangeHandler}
           />
         </Group>
-        <QuotaPlaceholder model={model} resultIndex={resultIndex} elementKey={firstSelectedCell} keepSize>
+        <QuotaPlaceholder tabId={state.tabId} model={model} resultIndex={resultIndex} elementKey={firstSelectedCell} keepSize>
           {shouldShowPasteButton && (
             <Container keepSize>
               <Button disabled={model.isLoading()} onClick={textValueData.pasteFullText}>
