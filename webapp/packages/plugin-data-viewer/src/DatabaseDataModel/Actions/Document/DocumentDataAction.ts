@@ -37,6 +37,11 @@ export class DocumentDataAction extends DatabaseDataResultAction<IDocumentElemen
     });
   }
 
+  getMetadataForDocument(documentId: string) {
+    const row = this.result.data?.rowsWithMetaData?.find(row => row.data[0]?.id === documentId);
+    return row?.metaData;
+  }
+
   getIdentifier(key: IDocumentElementKey): string {
     return key.index.toString();
   }

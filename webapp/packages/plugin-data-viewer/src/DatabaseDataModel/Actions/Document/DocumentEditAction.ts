@@ -181,6 +181,7 @@ export class DocumentEditAction extends DatabaseEditAction<IDocumentElementKey, 
 
       updatedRows.push({
         data: [this.data.get(id)],
+        metaData: this.data.getMetadataForDocument(document.id),
         updateValues: {
           // TODO: remove, place new document in data field
           0: document,
