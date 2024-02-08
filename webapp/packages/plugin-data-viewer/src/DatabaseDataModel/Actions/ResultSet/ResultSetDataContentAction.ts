@@ -79,26 +79,15 @@ export class ResultSetDataContentAction extends DatabaseDataAction<any, IDatabas
     return result;
   }
 
-  isImageTruncated(elementKey: IResultSetElementKey) {
-    const limit = this.getLimitInfo(elementKey).limit;
-    const content = this.format.get(elementKey);
-    const cachedImage = this.retrieveFileDataUrlFromCache(elementKey);
-    const isLoadedFullImage = Boolean(cachedImage) && this.format.isBinary(elementKey);
-
-    if (!isNotNullDefined(limit) || !isResultSetContentValue(content) || isLoadedFullImage) {
-      return false;
-    }
-
-    return (content.contentLength ?? 0) > limit;
-  }
-
-  isTextTruncated(elementKey: IResultSetElementKey) {
+  isContentTruncated(elementKey: IResultSetElementKey) {
     const limit = this.getLimitInfo(elementKey).limit;
     const content = this.format.get(elementKey);
     const cachedFullText = this.retrieveFileFullTextFromCache(elementKey);
     const isLoadedFullText = Boolean(cachedFullText) && this.format.isText(elementKey);
+    const cachedImage = elementKey ? this.retrieveFileDataUrlFromCache(elementKey) : '';
+    const isLoadedFullImage = Boolean(cachedImage) && this.format.isBinary(elementKey);
 
-    if (!isNotNullDefined(limit) || !isResultSetContentValue(content) || isLoadedFullText) {
+    if (!isNotNullDefined(limit) || !isResultSetContentValue(content) || isLoadedFullText || isLoadedFullImage) {
       return false;
     }
 

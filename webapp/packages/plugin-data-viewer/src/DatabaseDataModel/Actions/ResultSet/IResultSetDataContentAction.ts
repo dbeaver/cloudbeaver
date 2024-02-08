@@ -9,8 +9,7 @@ import type { IResultSetElementKey } from './IResultSetDataKey';
 
 export interface IResultSetDataContentAction {
   activeElement: IResultSetElementKey | null;
-  isImageTruncated: (element: IResultSetElementKey) => boolean;
-  isTextTruncated: (element: IResultSetElementKey) => boolean;
+  isContentTruncated: (element: IResultSetElementKey) => boolean;
   isDownloadable: (element: IResultSetElementKey) => boolean;
   getFileDataUrl: (element: IResultSetElementKey) => Promise<string>;
   resolveFileDataUrl: (element: IResultSetElementKey) => Promise<string>;

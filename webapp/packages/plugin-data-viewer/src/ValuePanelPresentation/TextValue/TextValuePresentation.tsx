@@ -125,7 +125,7 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
     const valueSize =
       isResultSetContentValue(contentValue) && isNotNullDefined(contentValue.contentLength) ? bytesToSize(contentValue.contentLength) : undefined;
     const canSave = firstSelectedCell && contentAction.isDownloadable(firstSelectedCell);
-    const shouldShowPasteButton = textValueData.isTextColumn && firstSelectedCell && contentAction.isTextTruncated(firstSelectedCell);
+    const shouldShowPasteButton = textValueData.isTextColumn && firstSelectedCell && contentAction.isContentTruncated(firstSelectedCell);
     const typeExtension = useMemo(() => getTypeExtension(contentType!) ?? [], [contentType]);
     const extensions = useCodemirrorExtensions(undefined, typeExtension);
 
@@ -185,17 +185,15 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
             onChange={valueChangeHandler}
           />
         </Group>
-        {firstSelectedCell && contentAction.isTextTruncated(firstSelectedCell) ? (
-          <QuotaPlaceholder model={model} resultIndex={resultIndex} elementKey={firstSelectedCell} keepSize>
-            {shouldShowPasteButton && (
-              <Container keepSize>
-                <Button disabled={model.isLoading()} onClick={textValueData.pasteFullText}>
-                  {`${translate('ui_show_more')} (${valueSize})`}
-                </Button>
-              </Container>
-            )}
-          </QuotaPlaceholder>
-        ) : null}
+        <QuotaPlaceholder model={model} resultIndex={resultIndex} elementKey={firstSelectedCell} keepSize>
+          {shouldShowPasteButton && (
+            <Container keepSize>
+              <Button disabled={model.isLoading()} onClick={textValueData.pasteFullText}>
+                {`${translate('ui_show_more')} (${valueSize})`}
+              </Button>
+            </Container>
+          )}
+        </QuotaPlaceholder>
         <Container keepSize center overflow>
           {canSave && (
             <ActionIconButton title={translate('ui_download')} name="/icons/export.svg" disabled={model.isLoading()} img onClick={saveHandler} />
