@@ -69,9 +69,8 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
       resultIndex,
     });
     const contentValue = firstSelectedCell ? formatAction.get(firstSelectedCell) : null;
-    const state = useTabLocalState(tabId =>
+    const state = useTabLocalState(() =>
       observable({
-        tabId,
         lineWrapping: null as boolean | null,
         currentContentType: null as string | null,
 

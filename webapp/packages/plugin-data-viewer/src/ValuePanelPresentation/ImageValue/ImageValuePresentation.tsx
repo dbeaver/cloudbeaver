@@ -68,10 +68,9 @@ export const ImageValuePresentation: TabContainerPanelComponent<IDataValuePanelP
     const notificationService = useService(NotificationService);
     const style = useS(styles);
 
-    const state = useTabLocalState(tabId =>
+    const state = useTabLocalState(() =>
       observable(
         {
-          tabId,
           stretch: false,
           toggleStretch() {
             this.stretch = !this.stretch;
