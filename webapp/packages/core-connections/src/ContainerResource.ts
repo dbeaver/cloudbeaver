@@ -12,8 +12,8 @@ import { CachedMapResource, isResourceAlias, type ResourceKey, resourceKeyList, 
 import { GraphQLService, NavNodeInfoFragment } from '@cloudbeaver/core-sdk';
 import { isNull } from '@cloudbeaver/core-utils';
 
+import type { IConnectionInfoParams } from './CONNECTION_INFO_PARAM_SCHEMA';
 import { ConnectionInfoActiveProjectKey, ConnectionInfoResource } from './ConnectionInfoResource';
-import type { IConnectionInfoParams } from './IConnectionsResource';
 
 export type ObjectContainer = NavNodeInfoFragment;
 export interface ICatalogData {

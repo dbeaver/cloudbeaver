@@ -36,9 +36,9 @@ import {
   UserConnectionAuthPropertiesFragment,
 } from '@cloudbeaver/core-sdk';
 
+import { CONNECTION_INFO_PARAM_SCHEMA, type IConnectionInfoParams } from './CONNECTION_INFO_PARAM_SCHEMA';
 import { ConnectionInfoEventHandler, IConnectionInfoEvent } from './ConnectionInfoEventHandler';
 import type { DatabaseConnection } from './DatabaseConnection';
-import type { IConnectionInfoParams } from './IConnectionsResource';
 
 export type Connection = DatabaseConnection & {
   authProperties?: UserConnectionAuthPropertiesFragment[];
@@ -582,7 +582,7 @@ export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoPar
   }
 
   protected validateKey(key: IConnectionInfoParams): boolean {
-    return typeof key === 'object' && typeof key.projectId === 'string' && typeof key.connectionId === 'string';
+    return CONNECTION_INFO_PARAM_SCHEMA.safeParse(key).success;
   }
 }
 

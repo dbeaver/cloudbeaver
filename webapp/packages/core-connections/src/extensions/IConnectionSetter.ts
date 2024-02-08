@@ -7,7 +7,7 @@
  */
 import { createExtension, IExtension, isExtension } from '@cloudbeaver/core-extensions';
 
-import type { IConnectionInfoParams } from '../IConnectionsResource';
+import type { IConnectionInfoParams } from '../CONNECTION_INFO_PARAM_SCHEMA';
 
 const connectionSetterSymbol = Symbol('@extension/ConnectionSetter');
 
