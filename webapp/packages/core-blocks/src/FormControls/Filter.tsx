@@ -18,6 +18,7 @@ import { InputField } from './InputField';
 interface BaseProps {
   placeholder?: string;
   disabled?: boolean;
+  applyDisabled?: boolean;
   max?: boolean;
   className?: string;
   onApply?: (value: string) => void;
@@ -45,6 +46,7 @@ export const Filter = observer<ControlledProps | ObjectsProps<any, any>>(functio
   value: valueControlled,
   placeholder,
   disabled,
+  applyDisabled,
   max,
   className,
   onApply,
@@ -114,7 +116,7 @@ export const Filter = observer<ControlledProps | ObjectsProps<any, any>>(functio
         <IconButton
           className={s(styles, { iconButton: true, manualMode })}
           name="search"
-          disabled={disabled}
+          disabled={disabled || applyDisabled}
           onClick={onApply ? () => onApply(value) : undefined}
         />
       )}
