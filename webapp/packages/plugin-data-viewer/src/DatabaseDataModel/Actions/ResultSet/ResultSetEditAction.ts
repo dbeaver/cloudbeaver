@@ -520,7 +520,7 @@ export class ResultSetEditAction extends DatabaseEditAction<IResultSetElementKey
           }
           const deletedRows = batch.deletedRows as SqlResultRow[];
 
-          deletedRows.push({ data: replaceBlobsWithNull(update.update) });
+          deletedRows.push({ data: replaceBlobsWithNull(update.update), metaData: this.data.getRowMetadata(update.row) });
           break;
         }
       }
