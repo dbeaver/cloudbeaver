@@ -5,13 +5,14 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
+import { importLazyComponent } from '@cloudbeaver/core-blocks';
 import { createConnectionParam, DATA_CONTEXT_CONNECTION } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
 import { LocalizationService } from '@cloudbeaver/core-localization';
 import { DATA_CONTEXT_NAV_NODE, EObjectFeature } from '@cloudbeaver/core-navigation-tree';
 import { EAdminPermission, SessionPermissionsResource } from '@cloudbeaver/core-root';
-import { importLazyComponent, withTimestamp } from '@cloudbeaver/core-utils';
+import { withTimestamp } from '@cloudbeaver/core-utils';
 import { ACTION_EXPORT, ActionService, DATA_CONTEXT_MENU, DATA_CONTEXT_MENU_NESTED, menuExtractItems, MenuService } from '@cloudbeaver/core-view';
 import {
   DATA_CONTEXT_DV_DDM,

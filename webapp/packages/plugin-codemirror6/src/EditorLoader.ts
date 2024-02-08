@@ -5,6 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { importLazyComponent } from '@cloudbeaver/core-utils';
+import { importLazyComponent } from '@cloudbeaver/core-blocks';
 
 export const EditorLoader = importLazyComponent(() => import('./Editor').then(m => m.Editor));
