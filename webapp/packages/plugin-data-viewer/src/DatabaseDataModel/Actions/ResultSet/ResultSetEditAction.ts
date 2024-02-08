@@ -340,7 +340,7 @@ export class ResultSetEditAction extends DatabaseEditAction<IResultSetElementKey
     }, 0);
 
     for (const update of tempUpdates) {
-      const value = result.data?.rowsWithMetaData?.[update.rowIndex].data;
+      const value = result.data?.rowsWithMetaData?.[update.rowIndex]?.data;
       const row = update.update.row;
       const type = update.update.type;
 
