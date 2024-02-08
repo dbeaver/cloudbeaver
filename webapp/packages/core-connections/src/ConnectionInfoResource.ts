@@ -5,7 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { action, makeObservable, observable, runInAction } from 'mobx';
+import { action, makeObservable, observable, runInAction, toJS } from 'mobx';
 
 import { AppAuthService, UserInfoResource } from '@cloudbeaver/core-authentication';
 import { injectable } from '@cloudbeaver/core-di';
@@ -35,6 +35,7 @@ import {
   TestConnectionMutation,
   UserConnectionAuthPropertiesFragment,
 } from '@cloudbeaver/core-sdk';
+import { schemaValidationError } from '@cloudbeaver/core-utils';
 
 import { CONNECTION_INFO_PARAM_SCHEMA, type IConnectionInfoParams } from './CONNECTION_INFO_PARAM_SCHEMA';
 import { ConnectionInfoEventHandler, IConnectionInfoEvent } from './ConnectionInfoEventHandler';
@@ -582,7 +583,11 @@ export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoPar
   }
 
   protected validateKey(key: IConnectionInfoParams): boolean {
-    return CONNECTION_INFO_PARAM_SCHEMA.safeParse(key).success;
+    const parse = CONNECTION_INFO_PARAM_SCHEMA.safeParse(toJS(key));
+    if (!parse.success) {
+      this.logger.warn(`Invalid resource key ${schemaValidationError(parse.error).toString()}`);
+    }
+    return parse.success;
   }
 }
 
