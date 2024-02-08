@@ -22,8 +22,6 @@ import com.google.gson.InstanceCreator;
 import io.cloudbeaver.WebServiceUtils;
 import io.cloudbeaver.auth.CBAuthConstants;
 import io.cloudbeaver.auth.NoAuthCredentialsProvider;
-import io.cloudbeaver.service.security.CBEmbeddedSecurityController;
-import io.cloudbeaver.service.security.PasswordPolicyConfiguration;
 import io.cloudbeaver.model.app.BaseWebApplication;
 import io.cloudbeaver.model.app.WebAuthApplication;
 import io.cloudbeaver.model.app.WebAuthConfiguration;
@@ -32,6 +30,8 @@ import io.cloudbeaver.registry.WebServiceRegistry;
 import io.cloudbeaver.server.jetty.CBJettyServer;
 import io.cloudbeaver.service.DBWServiceInitializer;
 import io.cloudbeaver.service.DBWServiceServerConfigurator;
+import io.cloudbeaver.service.security.CBEmbeddedSecurityController;
+import io.cloudbeaver.service.security.PasswordPolicyConfiguration;
 import io.cloudbeaver.service.security.SMControllerConfiguration;
 import io.cloudbeaver.service.session.WebSessionManager;
 import io.cloudbeaver.utils.WebAppUtils;
@@ -555,7 +555,7 @@ public abstract class CBApplication extends BaseWebApplication implements WebAut
             parseConfiguration(configPath.toFile());
         }
         // Set default preferences
-        PrefUtils.setDefaultPreferenceValue(ModelPreferences.getPreferences(),
+        PrefUtils.setDefaultPreferenceValue(DBWorkbench.getPlatform().getPreferenceStore(),
             ModelPreferences.UI_DRIVERS_HOME,
             getDriversLocation());
     }
