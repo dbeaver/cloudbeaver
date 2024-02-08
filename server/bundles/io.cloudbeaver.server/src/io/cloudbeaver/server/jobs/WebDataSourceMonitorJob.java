@@ -16,6 +16,7 @@
  */
 package io.cloudbeaver.server.jobs;
 
+import io.cloudbeaver.auth.CBAuthConstants;
 import io.cloudbeaver.model.session.BaseWebSession;
 import io.cloudbeaver.server.CBPlatform;
 import org.jkiss.dbeaver.model.app.DBPApplicationDesktop;
@@ -39,7 +40,7 @@ public class WebDataSourceMonitorJob extends DataSourceMonitorJob {
         Collection<BaseWebSession> allSessions = CBPlatform.getInstance().getSessionManager().getAllActiveSessions();
         allSessions.parallelStream().forEach(s -> {
             checkDataSourceAliveInWorkspace(s.getWorkspace());
-            getLastUserActivityTime(s.getLastAccessTimeMillis());
+            getLastUserActivityTime(s.getRemainingTime());
         });
 
     }
@@ -47,6 +48,6 @@ public class WebDataSourceMonitorJob extends DataSourceMonitorJob {
 
     @Override
     public long getLastUserActivityTime(long lastUserActivityTime) {
-        return lastUserActivityTime - System.currentTimeMillis();
+        return lastUserActivityTime;
     }
 }
