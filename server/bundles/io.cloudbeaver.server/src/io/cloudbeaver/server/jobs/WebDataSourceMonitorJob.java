@@ -16,10 +16,16 @@
  */
 package io.cloudbeaver.server.jobs;
 
+import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.model.session.BaseWebSession;
 import io.cloudbeaver.server.CBApplication;
 import io.cloudbeaver.server.CBPlatform;
+import org.jkiss.dbeaver.DBException;
+import org.jkiss.dbeaver.model.DBPDataSource;
+import org.jkiss.dbeaver.model.DBPDataSourceContainer;
 import org.jkiss.dbeaver.model.app.DBPPlatform;
+import org.jkiss.dbeaver.model.websocket.event.WSEventType;
+import org.jkiss.dbeaver.model.websocket.event.datasource.WSDataSourceDisconnectEvent;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.dbeaver.runtime.jobs.DataSourceMonitorJob;
 
@@ -50,5 +56,12 @@ public class WebDataSourceMonitorJob extends DataSourceMonitorJob {
             lastUserActivityTime = app.getMaxSessionIdleTime();
         }
         return lastUserActivityTime;
+    }
+
+    @Override
+    public void showNotification (DBPDataSource dataSource, DBPDataSourceContainer dsDescriptor) {
+        if (DBWorkbench.getPlatform().getApplication() instanceof CBApplication app) {
+            app.getEventController().addEvent(new WSDataSourceDisconnectEvent(WSEventType.DATASOURCE_DISCONNECTED, dataSource.getName()));
+        }
     }
 }
