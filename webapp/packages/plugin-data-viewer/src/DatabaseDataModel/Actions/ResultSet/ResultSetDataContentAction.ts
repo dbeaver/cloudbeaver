@@ -82,10 +82,10 @@ export class ResultSetDataContentAction extends DatabaseDataAction<any, IDatabas
   isBlobTruncated(elementKey: IResultSetElementKey) {
     const limit = this.getLimitInfo(elementKey).limit;
     const content = this.format.get(elementKey);
-    const cachedImage = this.retrieveFileDataUrlFromCache(elementKey);
-    const isLoadedFullImage = Boolean(cachedImage) && this.format.isBinary(elementKey);
+    const cachedBlobUrl = this.retrieveFileDataUrlFromCache(elementKey);
+    const isLoadedFullBlob = Boolean(cachedBlobUrl) && this.format.isBinary(elementKey);
 
-    if (!isNotNullDefined(limit) || !isResultSetContentValue(content) || isLoadedFullImage || !this.format.isBinary(elementKey)) {
+    if (!isNotNullDefined(limit) || !isResultSetContentValue(content) || isLoadedFullBlob || !this.format.isBinary(elementKey)) {
       return false;
     }
 
