@@ -1,5 +1,5 @@
 import type { IResultSetContentValue } from './IResultSetContentValue';
 
-export interface IResultSetBinaryFileValue extends IResultSetContentValue {
+export interface IResultSetBinaryValue extends IResultSetContentValue {
   binary: string;
 }
