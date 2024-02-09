@@ -74,7 +74,6 @@ public class CBPlatform extends BasePlatformImpl {
 
     @Nullable
     private static CBApplication application = null;
-    private final DBPPreferenceStore preferenceStore = new CBPreferenceStore(this);
 
     private Path tempFolder;
 
@@ -82,7 +81,7 @@ public class CBPlatform extends BasePlatformImpl {
     private QMLogFileWriter qmLogWriter;
     private DBACertificateStorage certificateStorage;
     private WebGlobalWorkspace workspace;
-
+    private CBPreferenceStore preferenceStore;
     private final List<DBPDriver> applicableDrivers = new ArrayList<>();
 
     public static CBPlatform getInstance() {
@@ -100,7 +99,7 @@ public class CBPlatform extends BasePlatformImpl {
     protected synchronized void initialize() {
         long startTime = System.currentTimeMillis();
         log.info("Initialize web platform...: ");
-
+        this.preferenceStore = new CBPreferenceStore(this, WebPlatformActivator.getInstance().getPreferences());
         // Register BC security provider
         SecurityProviderUtils.registerSecurityProvider();
 

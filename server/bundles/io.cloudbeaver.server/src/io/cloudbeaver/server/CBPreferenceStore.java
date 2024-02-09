@@ -18,18 +18,22 @@ package io.cloudbeaver.server;
 
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.model.impl.preferences.AbstractPreferenceStore;
+import org.jkiss.dbeaver.model.preferences.DBPPreferenceStore;
 
 import java.io.IOException;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 public class CBPreferenceStore extends AbstractPreferenceStore {
     @NotNull
     private final CBPlatform cbPlatform;
-    private final Map<String, String> defaultProperties = new ConcurrentHashMap<>();
+    private final DBPPreferenceStore parentStore;
 
-    public CBPreferenceStore(@NotNull CBPlatform cbPlatform) {
+    public CBPreferenceStore(
+        @NotNull CBPlatform cbPlatform,
+        @NotNull DBPPreferenceStore parentStore
+    ) {
         this.cbPlatform = cbPlatform;
+        this.parentStore = parentStore;
     }
 
     @Override
@@ -64,7 +68,7 @@ public class CBPreferenceStore extends AbstractPreferenceStore {
 
     @Override
     public String getString(String name) {
-        Object value = productConf().getOrDefault(name, defaultProperties.get(name));
+        Object value = productConf().getOrDefault(name, parentStore.getString(name));
         if (value == null) {
             return null;
         }
@@ -134,7 +138,7 @@ public class CBPreferenceStore extends AbstractPreferenceStore {
 
     @Override
     public void setDefault(String name, String defaultObject) {
-        this.defaultProperties.put(name, defaultObject);
+        this.parentStore.setDefault(name, defaultObject);
     }
 
     @Override
@@ -144,37 +148,37 @@ public class CBPreferenceStore extends AbstractPreferenceStore {
 
     @Override
     public void setToDefault(String name) {
-        throw new RuntimeException("Not Implemented");
+        parentStore.setToDefault(name);
     }
 
     @Override
     public void setValue(String name, double value) {
-        throw new RuntimeException("Not Implemented");
+        parentStore.setValue(name, value);
     }
 
     @Override
     public void setValue(String name, float value) {
-        throw new RuntimeException("Not Implemented");
+        parentStore.setValue(name, value);
     }
 
     @Override
     public void setValue(String name, int value) {
-        throw new RuntimeException("Not Implemented");
+        parentStore.setValue(name, value);
     }
 
     @Override
     public void setValue(String name, long value) {
-        throw new RuntimeException("Not Implemented");
+        parentStore.setValue(name, value);
     }
 
     @Override
     public void setValue(String name, String value) {
-        throw new RuntimeException("Not Implemented");
+        parentStore.setValue(name, value);
     }
 
     @Override
     public void setValue(String name, boolean value) {
-        throw new RuntimeException("Not Implemented");
+        parentStore.setValue(name, value);
     }
 
     @Override
