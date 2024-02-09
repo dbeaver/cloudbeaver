@@ -23,6 +23,7 @@ import {
   useTranslate,
 } from '@cloudbeaver/core-blocks';
 import { CachedResourceOffsetPageListKey } from '@cloudbeaver/core-resource';
+import { ServerConfigResource } from '@cloudbeaver/core-root';
 import { TabContainerPanelComponent, useTab } from '@cloudbeaver/core-ui';
 
 import type { ITeamFormProps } from '../ITeamFormProps';
@@ -38,18 +39,31 @@ export const GrantedUsers: TabContainerPanelComponent<ITeamFormProps> = observer
   const state = useGrantedUsers(formState.config, formState.mode);
   const { selected } = useTab(tabId);
 
+  const serverConfigResource = useResource(UserList, ServerConfigResource, undefined, { active: selected });
+  const isDefaultTeam = formState.config.teamId === serverConfigResource.data?.defaultUserTeam;
+
   const users = useResource(GrantedUsers, UsersResource, CachedResourceOffsetPageListKey(0, 1000).setTarget(UsersResourceFilterKey()), {
-    active: selected,
+    active: selected && !isDefaultTeam,
   });
 
   const grantedUsers = getComputed(() =>
     users.data.filter<AdminUser>((user): user is AdminUser => !!user && state.state.grantedUsers.includes(user.userId)),
   );
 
-  useAutoLoad(GrantedUsers, state, selected && !state.state.loaded);
+  useAutoLoad(GrantedUsers, state, selected && !state.state.loaded && !isDefaultTeam);
 
   if (!selected) {
     return null;
+  }
+
+  if (isDefaultTeam) {
+    return (
+      <ColoredContainer className={s(styles, { box: true })} parent gap vertical>
+        <Group className={s(styles, { placeholderBox: true })} keepSize large>
+          <TextPlaceholder>{translate('plugin_authentication_administration_team_default_users_tooltip')}</TextPlaceholder>
+        </Group>
+      </ColoredContainer>
+    );
   }
 
   return (

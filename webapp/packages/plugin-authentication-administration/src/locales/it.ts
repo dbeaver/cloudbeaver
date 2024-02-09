@@ -74,4 +74,7 @@ export default [
     'administration_configuration_wizard_configuration_authentication_description',
     "Permetti agli utenti di autenticarsi. In alternativa solo l'accesso anonimo sarà attivo",
   ],
+
+  ['plugin_authentication_administration_user_team_default_readonly_tooltip', "Default team. Can't be revoked"],
+  ['plugin_authentication_administration_team_default_users_tooltip', 'Default team. Contains all users'],
 ];

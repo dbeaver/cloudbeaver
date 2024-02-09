@@ -27,7 +27,6 @@
     "@cloudbeaver/core-navigation-tree": "~0.1.0",
     "@cloudbeaver/core-resource": "~0.1.0",
     "@cloudbeaver/core-sdk": "~0.1.0",
-    "@cloudbeaver/core-utils": "~0.1.0",
     "@cloudbeaver/core-view": "~0.1.0",
     "@cloudbeaver/plugin-codemirror6": "~0.1.0",
     "@cloudbeaver/plugin-data-viewer": "~0.1.0",
