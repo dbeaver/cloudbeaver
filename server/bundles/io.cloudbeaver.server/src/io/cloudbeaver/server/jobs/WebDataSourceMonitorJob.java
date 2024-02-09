@@ -24,6 +24,7 @@ import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.dbeaver.runtime.jobs.DataSourceMonitorJob;
 
 import java.util.Collection;
+import java.util.function.Supplier;
 
 /**
  * Web data source monitor job.
@@ -38,7 +39,7 @@ public class WebDataSourceMonitorJob extends DataSourceMonitorJob {
     protected void doJob() {
         Collection<BaseWebSession> allSessions = CBPlatform.getInstance().getSessionManager().getAllActiveSessions();
         allSessions.parallelStream().forEach(s -> {
-            checkDataSourceAliveInWorkspace(s.getWorkspace());
+            checkDataSourceAliveInWorkspace(s.getWorkspace(), s::getLastAccessTimeMillis);
         });
 
     }
@@ -46,10 +47,7 @@ public class WebDataSourceMonitorJob extends DataSourceMonitorJob {
     @Override
     public long getLastUserActivityTime(long lastUserActivityTime) {
         if (DBWorkbench.getPlatform().getApplication() instanceof CBApplication app) {
-            long currentTime = System.currentTimeMillis();
-            long elapsedTime = currentTime - lastUserActivityTime;
-
-            lastUserActivityTime = app.getMaxSessionIdleTime() - elapsedTime;
+            lastUserActivityTime = app.getMaxSessionIdleTime();
         }
         return lastUserActivityTime;
     }
