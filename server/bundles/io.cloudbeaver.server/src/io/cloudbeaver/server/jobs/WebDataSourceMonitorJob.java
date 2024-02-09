@@ -30,7 +30,6 @@ import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.dbeaver.runtime.jobs.DataSourceMonitorJob;
 
 import java.util.Collection;
-import java.util.function.Supplier;
 
 /**
  * Web data source monitor job.
