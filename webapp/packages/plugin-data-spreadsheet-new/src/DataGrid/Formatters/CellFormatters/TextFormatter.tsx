@@ -8,8 +8,8 @@
 import { observer } from 'mobx-react-lite';
 import { useCallback, useContext, useEffect, useRef } from 'react';
 
-import { getComputed, IconOrImage, Loader, s, useS } from '@cloudbeaver/core-blocks';
-import { importLazyComponent, isValidUrl } from '@cloudbeaver/core-utils';
+import { getComputed, IconOrImage, importLazyComponent, Loader, s, useS } from '@cloudbeaver/core-blocks';
+import { isValidUrl } from '@cloudbeaver/core-utils';
 import type { IResultSetRowKey } from '@cloudbeaver/plugin-data-viewer';
 import type { RenderCellProps } from '@cloudbeaver/plugin-react-data-grid';
 
