@@ -13,14 +13,13 @@ import styled, { css } from 'reshadow';
 import { ActionIconButton, Button, Container, Fill, Group, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { QuotasService } from '@cloudbeaver/core-root';
 import { BASE_TAB_STYLES, TabContainerPanelComponent, TabList, TabsState, UNDERLINE_TAB_STYLES, useTabLocalState } from '@cloudbeaver/core-ui';
 import { bytesToSize, isNotNullDefined } from '@cloudbeaver/core-utils';
 import { EditorLoader, useCodemirrorExtensions } from '@cloudbeaver/plugin-codemirror6';
 
 import { isResultSetContentValue } from '../../DatabaseDataModel/Actions/ResultSet/isResultSetContentValue';
 import { ResultSetSelectAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetSelectAction';
-import { useResultActions } from '../../DatabaseDataModel/Actions/ResultSet/useResultActions';
+import { useResultSetActions } from '../../DatabaseDataModel/Actions/ResultSet/useResultSetActions';
 import type { IDatabaseResultSet } from '../../DatabaseDataModel/IDatabaseResultSet';
 import type { IDataValuePanelProps } from '../../TableViewer/ValuePanel/DataValuePanelService';
 import { QuotaPlaceholder } from '../QuotaPlaceholder';
@@ -55,18 +54,17 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
   function TextValuePresentation({ model, resultIndex, dataFormat }) {
     const translate = useTranslate();
     const notificationService = useService(NotificationService);
-    const quotasService = useService(QuotasService);
     const textValuePresentationService = useService(TextValuePresentationService);
     const style = useStyles(styles, UNDERLINE_TAB_STYLES, VALUE_PANEL_TOOLS_STYLES);
     const selection = model.source.getAction(resultIndex, ResultSetSelectAction);
     const activeElements = selection.getActiveElements();
-    const firstSelectedCell = activeElements?.[0];
+    const firstSelectedCell = activeElements.length ? activeElements[0] : undefined;
     const activeTabs = textValuePresentationService.tabs.getDisplayed({
       dataFormat: dataFormat,
       model: model,
       resultIndex: resultIndex,
     });
-    const { contentAction, editAction, formatAction } = useResultActions({
+    const { contentAction, editAction, formatAction } = useResultSetActions({
       model,
       resultIndex,
     });
@@ -115,19 +113,19 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
     const autoLineWrapping = getDefaultLineWrapping(contentType);
     const lineWrapping = state.lineWrapping ?? autoLineWrapping;
 
-    const { textValue, isTruncated, isTextColumn, pasteFullText } = useTextValue({
+    const textValueData = useTextValue({
       model,
       resultIndex,
       currentContentType: contentType,
+      elementKey: firstSelectedCell,
     });
     const isSelectedCellReadonly = firstSelectedCell && (formatAction.isReadOnly(firstSelectedCell) || formatAction.isBinary(firstSelectedCell));
     const isReadonlyByResultIndex = model.isReadonly(resultIndex) || model.isDisabled(resultIndex) || !firstSelectedCell;
     const isReadonly = isSelectedCellReadonly || isReadonlyByResultIndex;
     const valueSize =
       isResultSetContentValue(contentValue) && isNotNullDefined(contentValue.contentLength) ? bytesToSize(contentValue.contentLength) : undefined;
-    const limit = bytesToSize(quotasService.getQuota('sqlBinaryPreviewMaxLength'));
     const canSave = firstSelectedCell && contentAction.isDownloadable(firstSelectedCell);
-    const shouldShowPasteButton = isTextColumn && isTruncated;
+    const shouldShowPasteButton = textValueData.isTextColumn && firstSelectedCell && contentAction.isTextTruncated(firstSelectedCell);
     const typeExtension = useMemo(() => getTypeExtension(contentType!) ?? [], [contentType]);
     const extensions = useCodemirrorExtensions(undefined, typeExtension);
 
@@ -180,18 +178,24 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
         <Group maximum box>
           <EditorLoader
             key={isReadonly ? '1' : '0'}
-            value={textValue}
+            value={textValueData.textValue}
             lineWrapping={lineWrapping}
             readonly={isReadonly}
             extensions={extensions}
             onChange={valueChangeHandler}
           />
         </Group>
-        {isTruncated && (
-          <Container keepSize>
-            <QuotaPlaceholder limit={limit} size={valueSize} />
-          </Container>
-        )}
+        {firstSelectedCell && contentAction.isTextTruncated(firstSelectedCell) ? (
+          <QuotaPlaceholder model={model} resultIndex={resultIndex} elementKey={firstSelectedCell} keepSize>
+            {shouldShowPasteButton && (
+              <Container keepSize>
+                <Button disabled={model.isLoading()} onClick={textValueData.pasteFullText}>
+                  {`${translate('ui_show_more')} (${valueSize})`}
+                </Button>
+              </Container>
+            )}
+          </QuotaPlaceholder>
+        ) : null}
         <Container keepSize center overflow>
           {canSave && (
             <ActionIconButton title={translate('ui_download')} name="/icons/export.svg" disabled={model.isLoading()} img onClick={saveHandler} />
@@ -204,13 +208,6 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
             onClick={toggleLineWrappingHandler}
           />
           <Fill />
-          {shouldShowPasteButton && (
-            <Container keepSize>
-              <Button disabled={model.isLoading()} onClick={pasteFullText}>
-                {translate('data_viewer_presentation_value_content_full_text_button')}
-              </Button>
-            </Container>
-          )}
         </Container>
       </Container>,
     );

@@ -17,7 +17,7 @@ interface IResultActionsArgs {
   model: IDatabaseDataModel<any, IDatabaseResultSet>;
 }
 
-export function useResultActions({ model, resultIndex }: IResultActionsArgs) {
+export function useResultSetActions({ model, resultIndex }: IResultActionsArgs) {
   return useObservableRef(
     () => ({
       get dataAction(): ResultSetDataAction {

@@ -102,6 +102,16 @@ export class ResultSetFormatAction
     return false;
   }
 
+  isText(key: IResultSetPartialKey): boolean {
+    if (!key?.column) {
+      return false;
+    }
+
+    const column = this.view.getColumn(key.column);
+
+    return column?.dataKind?.toLocaleLowerCase() === 'string';
+  }
+
   getHeaders(): string[] {
     return this.view.columns.map(column => column.name!).filter(name => name !== undefined);
   }
