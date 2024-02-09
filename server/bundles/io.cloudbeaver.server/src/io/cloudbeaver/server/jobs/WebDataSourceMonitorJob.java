@@ -50,14 +50,6 @@ public class WebDataSourceMonitorJob extends DataSourceMonitorJob {
     }
 
     @Override
-    public long getLastUserActivityTime(long lastUserActivityTime) {
-        if (DBWorkbench.getPlatform().getApplication() instanceof CBApplication app) {
-            lastUserActivityTime = app.getMaxSessionIdleTime();
-        }
-        return lastUserActivityTime;
-    }
-
-    @Override
     public void showNotification (DBPDataSource dataSource, DBPDataSourceContainer dsDescriptor) {
         if (DBWorkbench.getPlatform().getApplication() instanceof CBApplication app) {
             app.getEventController().addEvent(new WSDataSourceDisconnectEvent(WSEventType.DATASOURCE_DISCONNECTED, dataSource.getName()));
