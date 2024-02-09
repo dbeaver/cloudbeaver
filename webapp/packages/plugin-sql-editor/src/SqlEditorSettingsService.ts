@@ -47,7 +47,6 @@ export class SqlEditorSettingsService extends Dependency {
     this.serverSettingsResolverService.addResolver(
       /** @deprecated Use settings instead, will be removed in 23.0.0 */
       createSettingsAliasResolver(this.serverSettingsService, this.settings, 'core.app.sqlEditor'),
-      createSettingsAliasResolver(this.serverSettingsService, this.proposalInsertTableSettings, 'proposals.insert.table'),
     );
     this.registerSettings();
   }
