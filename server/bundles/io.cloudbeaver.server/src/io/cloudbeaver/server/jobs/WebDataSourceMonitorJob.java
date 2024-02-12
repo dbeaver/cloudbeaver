@@ -16,20 +16,22 @@
  */
 package io.cloudbeaver.server.jobs;
 
-import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.model.session.BaseWebSession;
+import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.server.CBApplication;
 import io.cloudbeaver.server.CBPlatform;
-import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.DBPDataSource;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
 import org.jkiss.dbeaver.model.app.DBPPlatform;
+import org.jkiss.dbeaver.model.auth.SMSession;
 import org.jkiss.dbeaver.model.websocket.event.WSEventType;
-import org.jkiss.dbeaver.model.websocket.event.datasource.WSDataSourceDisconnectEvent;
+import org.jkiss.dbeaver.model.websocket.event.datasource.WSDataSourceEvent;
+import org.jkiss.dbeaver.model.websocket.event.datasource.WSDataSourceProperty;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.dbeaver.runtime.jobs.DataSourceMonitorJob;
 
 import java.util.Collection;
+import java.util.List;
 
 /**
  * Web data source monitor job.
@@ -50,9 +52,17 @@ public class WebDataSourceMonitorJob extends DataSourceMonitorJob {
     }
 
     @Override
-    public void showNotification (DBPDataSource dataSource, DBPDataSourceContainer dsDescriptor) {
-        if (DBWorkbench.getPlatform().getApplication() instanceof CBApplication app) {
-            app.getEventController().addEvent(new WSDataSourceDisconnectEvent(WSEventType.DATASOURCE_DISCONNECTED, dataSource.getName()));
+    public void showNotification(DBPDataSource dataSource, DBPDataSourceContainer dsDescriptor, SMSession smSession) {
+        BaseWebSession session = CBApplication.getInstance().getSessionManager().getSession(smSession.getSessionId());
+        if (session instanceof WebSession webSession) {
+            webSession.addSessionEvent( //TODO: Add new event for disconnect datasource
+                    WSDataSourceEvent.update(
+                        webSession.getSessionId(),
+                        webSession.getUserId(),
+                        dsDescriptor.getProject().getId(),
+                        List.of(dsDescriptor.getId()),
+                        WSDataSourceProperty.CONFIGURATION)
+            );
         }
     }
 }
