@@ -94,6 +94,7 @@ export default [
   ['ui_upload', 'Загрузить'],
   ['ui_import', 'Импортировать'],
   ['ui_view', 'Смотреть'],
+  ['ui_show_more', 'Показать больше'],
   ['ui_limit', 'Лимит'],
   ['ui_file_size', 'Размер файла'],
   ['ui_processing_synchronization', 'Синхронизация...'],
