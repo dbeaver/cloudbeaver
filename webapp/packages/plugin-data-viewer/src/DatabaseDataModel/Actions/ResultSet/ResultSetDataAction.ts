@@ -86,7 +86,7 @@ export class ResultSetDataAction extends DatabaseDataResultAction<IResultSetElem
 
   setRowValue(row: IResultSetRowKey, value: IResultSetValue[], shift = 0): void {
     if (this.result.data?.rowsWithMetaData) {
-      this.result.data.rowsWithMetaData[row.index + shift] = { data: value, metaData: {} };
+      this.result.data.rowsWithMetaData[row.index + shift] = { data: value, metaData: this.getRowMetadata(row) };
     }
   }
 
