@@ -12,6 +12,10 @@ import { DataViewerSettingsService } from './DataViewerSettingsService';
 
 @injectable()
 export class DataViewerService {
+  get canCopyData() {
+    return !this.dataViewerSettingsService.settings.getValue('disableCopyData');
+  }
+
   constructor(private readonly dataViewerSettingsService: DataViewerSettingsService) {}
 
   isDataEditable(connection: Connection) {
