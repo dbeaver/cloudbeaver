@@ -177,6 +177,16 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
       },
 
       setCursor(begin: number, end = begin): void {
+        if (begin > end) {
+          throw new Error('Cursor begin can not be greater than the end of it');
+        }
+
+        const script = this.parser.actualScript;
+
+        if (end > script.length) {
+          end = script.length;
+        }
+
         this.cursor = {
           begin,
           end,
@@ -502,6 +512,10 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
     executor: data.dataSource?.onSetScript,
     handlers: [
       function setScript({ script }) {
+        if (data.cursor.end > script.length) {
+          data.setCursor(script.length);
+        }
+
         data.parser.setScript(script);
         data.updateParserScriptsThrottle().catch(() => {});
         data.onUpdate.execute();
