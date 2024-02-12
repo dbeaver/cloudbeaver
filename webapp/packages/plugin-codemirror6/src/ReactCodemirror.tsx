@@ -155,10 +155,12 @@ export const ReactCodemirror = observer<IReactCodeMirrorProps, IEditorRef>(
     useLayoutEffect(() => {
       if (view) {
         const transaction: TransactionSpec = { annotations: [External.of(true)] };
-        const isCursorInDoc = cursor && cursor.anchor > 0 && cursor.anchor < view.state.doc.length;
+
+        let isCursorInDoc = cursor && cursor.anchor > 0 && cursor.anchor < view.state.doc.length;
 
         if (value !== undefined && value !== view.state.doc.toString()) {
           transaction.changes = { from: 0, to: view.state.doc.length, insert: value };
+          isCursorInDoc = cursor && cursor.anchor > 0 && cursor.anchor < value.length;
         }
 
         if (cursor && isCursorInDoc && (view.state.selection.main.anchor !== cursor.anchor || view.state.selection.main.head !== cursor.head)) {

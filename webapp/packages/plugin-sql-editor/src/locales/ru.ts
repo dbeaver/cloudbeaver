@@ -1,7 +1,7 @@
 export default [
   ['plugin_sql_editor_sql_editor_settings_group', 'SQL Редактор'],
   ['sql_editor_settings_insert_table_aliases_name', 'Вставлять алиасы таблиц (в FROM условии)'],
-  ['sql_editor_settings_insert_table_aliases_desc', 'Automatically inserts table aliases'],
+  ['sql_editor_settings_insert_table_aliases_desc', 'Автоматически вставляет алиасы для таблиц'],
   ['sql_editor_menu', 'SQL Редактор'],
   ['sql_editor_script_editor', 'Редактор SQL'],
   ['sql_editor_alias_loading_error', 'Возникла ошибка при загрузке псевдонима'],

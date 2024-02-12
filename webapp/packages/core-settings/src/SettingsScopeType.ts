@@ -6,4 +6,4 @@
  * you may not use this file except in compliance with the License.
  */
 
-export type SettingsScopeType = 'plugin' | 'core' | 'sql';
+export type SettingsScopeType = 'plugin' | 'core' | string;
