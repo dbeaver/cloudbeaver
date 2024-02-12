@@ -12,12 +12,12 @@ import { ActionIconButton, Button, Container, Fill, s, useObservableRef, useS, u
 import { selectFiles } from '@cloudbeaver/core-browser';
 import { useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { QuotasService } from '@cloudbeaver/core-root';
 import { type TabContainerPanelComponent, useTabLocalState } from '@cloudbeaver/core-ui';
 import { bytesToSize, download, getMIME, isImageFormat, isValidUrl } from '@cloudbeaver/core-utils';
 
 import { createResultSetBlobValue } from '../../DatabaseDataModel/Actions/ResultSet/createResultSetBlobValue';
 import type { IResultSetElementKey } from '../../DatabaseDataModel/Actions/ResultSet/IResultSetDataKey';
+import { isResultSetBinaryValue } from '../../DatabaseDataModel/Actions/ResultSet/isResultSetBinaryValue';
 import { isResultSetBlobValue } from '../../DatabaseDataModel/Actions/ResultSet/isResultSetBlobValue';
 import { isResultSetContentValue } from '../../DatabaseDataModel/Actions/ResultSet/isResultSetContentValue';
 import { isResultSetFileValue } from '../../DatabaseDataModel/Actions/ResultSet/isResultSetFileValue';
@@ -66,7 +66,6 @@ export const ImageValuePresentation: TabContainerPanelComponent<IDataValuePanelP
   function ImageValuePresentation({ model, resultIndex }) {
     const translate = useTranslate();
     const notificationService = useService(NotificationService);
-    const quotasService = useService(QuotasService);
     const style = useS(styles);
 
     const state = useTabLocalState(() =>
@@ -123,7 +122,7 @@ export const ImageValuePresentation: TabContainerPanelComponent<IDataValuePanelP
             return URL.createObjectURL(this.cellValue.blob);
           }
 
-          if (isResultSetContentValue(this.cellValue) && this.cellValue.binary) {
+          if (isResultSetBinaryValue(this.cellValue)) {
             return `data:${getMIME(this.cellValue.binary)};base64,${this.cellValue.binary}`;
           } else if (typeof this.cellValue === 'string' && isValidUrl(this.cellValue) && isImageFormat(this.cellValue)) {
             return this.cellValue;
@@ -154,12 +153,14 @@ export const ImageValuePresentation: TabContainerPanelComponent<IDataValuePanelP
           if (isResultSetFileValue(this.cellValue)) {
             return false;
           }
-          if (isResultSetContentValue(this.cellValue)) {
-            if (this.cellValue.binary) {
-              return this.contentAction.isContentTruncated(this.cellValue);
-            }
-          }
-          return false;
+
+          return this.selectedCell && this.contentAction.isBlobTruncated(this.selectedCell);
+        },
+        get shouldShowImage() {
+          const isFullImage = !this.truncated && this.savedSrc;
+          const isImage = this.src && !this.truncated && !this.savedSrc;
+
+          return isFullImage || isImage;
         },
         async save() {
           try {
@@ -206,27 +207,28 @@ export const ImageValuePresentation: TabContainerPanelComponent<IDataValuePanelP
     const loading = model.isLoading();
     const value = data.cellValue;
 
-    if (data.truncated && !data.savedSrc && isResultSetContentValue(value)) {
-      const limit = bytesToSize(quotasService.getQuota('sqlBinaryPreviewMaxLength'));
-      const valueSize = bytesToSize(value.contentLength ?? 0);
+    const load = async () => {
+      if (!data.selectedCell) {
+        return;
+      }
 
-      const load = async () => {
-        if (!data.selectedCell) {
-          return;
-        }
+      try {
+        await data.contentAction.resolveFileDataUrl(data.selectedCell);
+      } catch (exception: any) {
+        notificationService.logException(exception, 'data_viewer_presentation_value_content_download_error');
+      }
+    };
 
-        try {
-          await data.contentAction.resolveFileDataUrl(data.selectedCell);
-        } catch (exception: any) {
-          notificationService.logException(exception, 'data_viewer_presentation_value_content_download_error');
-        }
-      };
+    const valueSize = bytesToSize(isResultSetContentValue(value) ? value.contentLength ?? 0 : 0);
+    const isDownloadable = data.selectedCell && data.contentAction.isDownloadable(data.selectedCell);
 
-      return (
-        <Container vertical>
-          <Container fill overflow center>
-            <QuotaPlaceholder limit={limit} size={valueSize}>
-              {data.selectedCell && data.contentAction.isDownloadable(data.selectedCell) && (
+    return (
+      <Container vertical>
+        <Container fill overflow center>
+          {data.shouldShowImage && <img src={data.src} className={s(style, { img: true, stretch: state.stretch })} />}
+          {data.truncated ? (
+            <QuotaPlaceholder model={data.model} resultIndex={data.resultIndex} elementKey={data.selectedCell}>
+              {isDownloadable && (
                 <Button
                   disabled={loading}
                   loading={
@@ -235,20 +237,11 @@ export const ImageValuePresentation: TabContainerPanelComponent<IDataValuePanelP
                   }
                   onClick={load}
                 >
-                  {translate('ui_view')}
+                  {`${translate('ui_view')} (${valueSize})`}
                 </Button>
               )}
             </QuotaPlaceholder>
-          </Container>
-          <Tools loading={loading} onSave={save} onUpload={upload} />
-        </Container>
-      );
-    }
-
-    return (
-      <Container vertical>
-        <Container fill overflow center>
-          <img src={data.src} className={s(style, { img: true, stretch: state.stretch })} />
+          ) : null}
         </Container>
         <Tools loading={loading} stretch={state.stretch} onToggleStretch={state.toggleStretch} onSave={save} onUpload={upload} />
       </Container>
