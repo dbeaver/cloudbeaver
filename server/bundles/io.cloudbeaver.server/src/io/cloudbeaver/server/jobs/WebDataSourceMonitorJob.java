@@ -53,8 +53,7 @@ public class WebDataSourceMonitorJob extends DataSourceMonitorJob {
 
     @Override
     public void showNotification(DBPDataSource dataSource, DBPDataSourceContainer dsDescriptor, SMSession smSession) {
-        BaseWebSession session = CBApplication.getInstance().getSessionManager().getSession(smSession.getSessionId());
-        if (session instanceof WebSession webSession) {
+        if (smSession instanceof WebSession webSession) {
             webSession.addSessionEvent( //TODO: Add new event for disconnect datasource
                     WSDataSourceEvent.update(
                         webSession.getSessionId(),
