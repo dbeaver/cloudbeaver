@@ -93,12 +93,11 @@ public class WebSessionManager {
     }
 
     @NotNull
-    public WebSession getWebSession(@NotNull HttpServletRequest request, @NotNull HttpServletResponse response, boolean errorOnNoFound) throws DBWebException {
-        return getWebSession(request, response, true, errorOnNoFound);
-    }
-
-    @NotNull
-    public WebSession getWebSession(@NotNull HttpServletRequest request, @NotNull HttpServletResponse response, boolean updateInfo, boolean errorOnNoFound) throws DBWebException {
+    public WebSession getWebSession(
+        @NotNull HttpServletRequest request,
+        @NotNull HttpServletResponse response,
+        boolean errorOnNoFound
+    ) throws DBWebException {
         HttpSession httpSession = request.getSession(true);
         String sessionId = httpSession.getId();
         WebSession webSession;
@@ -139,13 +138,6 @@ public class WebSessionManager {
                     throw new DBWebException("Unexpected session type: " + baseWebSession.getClass().getName());
                 }
                 webSession = (WebSession) baseWebSession;
-                if (updateInfo) {
-                    // Update only once per request
-                    if (!CommonUtils.toBoolean(request.getAttribute("sessionUpdated"))) {
-                        webSession.updateInfo(request, response);
-                        request.setAttribute("sessionUpdated", true);
-                    }
-                }
             }
         }
 
