@@ -84,14 +84,16 @@ class WebSQLQueryDataReceiver implements DBDDataReceiver {
                     binding.getMetaAttribute(),
                     i);
                 row[i] = cellValue;
-                Method[] methods = Objects.requireNonNull(cellValue).getClass().getMethods();
-                for (Method method : methods) {
-                    if (method.isAnnotationPresent(MetaData.class)){
-                        if (metaDataMap == null) {
-                            metaDataMap = new HashMap<>();
+                if (cellValue != null) {
+                    Method[] methods = cellValue.getClass().getMethods();
+                    for (Method method : methods) {
+                        if (method.isAnnotationPresent(MetaData.class)) {
+                            if (metaDataMap == null) {
+                                metaDataMap = new HashMap<>();
+                            }
+                            Object value = method.invoke(cellValue);
+                            metaDataMap.put(method.getAnnotation(MetaData.class).name(), value);
                         }
-                        Object value = method.invoke(cellValue);
-                        metaDataMap.put(method.getAnnotation(MetaData.class).name(), value);
                     }
                 }
 
