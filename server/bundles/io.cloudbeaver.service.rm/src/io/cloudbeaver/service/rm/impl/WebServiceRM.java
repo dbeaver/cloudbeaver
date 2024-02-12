@@ -31,6 +31,7 @@ import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.rm.RMController;
 import org.jkiss.dbeaver.model.rm.RMProject;
 import org.jkiss.dbeaver.model.rm.RMResource;
+import org.jkiss.dbeaver.model.secret.DBSSecretController;
 import org.jkiss.dbeaver.model.security.*;
 import org.jkiss.dbeaver.model.websocket.WSConstants;
 import org.jkiss.dbeaver.model.websocket.event.WSProjectUpdateEvent;
@@ -265,6 +266,14 @@ public class WebServiceRM implements DBWServiceRM {
     @Override
     public boolean deleteProject(@NotNull WebSession session, @NotNull String projectId) throws DBWebException {
         try {
+            var project = session.getProjectById(projectId);
+            if (project == null) {
+                throw new DBException("Project not found: " + projectId);
+            }
+            if (project.isUseSecretStorage()) {
+                var secretController = DBSSecretController.getProjectSecretController(project);
+                secretController.deleteProjectSecrets(project.getId());
+            }
             getResourceController(session).deleteProject(projectId);
             session.removeSessionProject(projectId);
             WebAppUtils.getWebApplication().getEventController().addEvent(
