@@ -102,6 +102,10 @@ export class ResultSetCacheAction
     }
   }
 
+  afterResultUpdate() {
+    this.cache.clear();
+  }
+
   dispose(): void {
     this.cache.clear();
   }
