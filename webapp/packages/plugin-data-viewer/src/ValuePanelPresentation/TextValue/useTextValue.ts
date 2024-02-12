@@ -9,10 +9,9 @@ import { useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { isNotNullDefined } from '@cloudbeaver/core-utils';
 
-import { isResultSetBinaryFileValue } from '../../DatabaseDataModel/Actions/ResultSet/isResultSetBinaryFileValue';
+import type { IResultSetElementKey } from '../../DatabaseDataModel/Actions/ResultSet/IResultSetDataKey';
 import { isResultSetContentValue } from '../../DatabaseDataModel/Actions/ResultSet/isResultSetContentValue';
-import { ResultSetSelectAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetSelectAction';
-import { useResultActions } from '../../DatabaseDataModel/Actions/ResultSet/useResultActions';
+import { useResultSetActions } from '../../DatabaseDataModel/Actions/ResultSet/useResultSetActions';
 import type { IDatabaseDataModel } from '../../DatabaseDataModel/IDatabaseDataModel';
 import type { IDatabaseResultSet } from '../../DatabaseDataModel/IDatabaseResultSet';
 import { useAutoFormat } from './useAutoFormat';
@@ -21,64 +20,54 @@ interface IUseTextValueArgs {
   resultIndex: number;
   model: IDatabaseDataModel<any, IDatabaseResultSet>;
   currentContentType: string;
+  elementKey?: IResultSetElementKey;
 }
 
 interface IUseTextValue {
   textValue: string;
-  isTruncated: boolean;
   isTextColumn: boolean;
   pasteFullText(): Promise<void>;
 }
 
-export function useTextValue({ model, resultIndex, currentContentType }: IUseTextValueArgs): IUseTextValue {
-  const { formatAction, editAction, contentAction, dataAction } = useResultActions({ model, resultIndex });
-  const selection = model.source.getAction(resultIndex, ResultSetSelectAction);
-  const activeElements = selection.getActiveElements();
-  const firstSelectedCell = activeElements?.[0];
+export function useTextValue({ model, resultIndex, currentContentType, elementKey }: IUseTextValueArgs): IUseTextValue {
+  const { formatAction, editAction, contentAction } = useResultSetActions({ model, resultIndex });
   const formatter = useAutoFormat();
-  const columnType = firstSelectedCell ? dataAction.getColumn(firstSelectedCell.column)?.dataKind : '';
-  const isTextColumn = columnType?.toLocaleLowerCase() === 'string';
-  const contentValue = firstSelectedCell ? formatAction.get(firstSelectedCell) : null;
-  const cachedFullText = firstSelectedCell ? contentAction.retrieveFileFullTextFromCache(firstSelectedCell) : '';
-  const blob = firstSelectedCell ? formatAction.get(firstSelectedCell) : null;
+  const isTextColumn = elementKey ? formatAction.isText(elementKey) : false;
+  const contentValue = elementKey ? formatAction.get(elementKey) : null;
+  const isBinary = elementKey ? formatAction.isBinary(elementKey) : false;
+  const cachedFullText = elementKey ? contentAction.retrieveFileFullTextFromCache(elementKey) : '';
   const notificationService = useService(NotificationService);
 
   const result: IUseTextValue = {
     textValue: '',
-    isTruncated: false,
     isTextColumn,
     async pasteFullText() {
-      if (!firstSelectedCell) {
+      if (!elementKey) {
         return;
       }
 
       try {
-        await contentAction.getFileFullText(firstSelectedCell);
+        await contentAction.getFileFullText(elementKey);
       } catch (exception) {
         notificationService.logException(exception as any, 'data_viewer_presentation_value_content_paste_error');
       }
     },
   };
 
-  if (!isNotNullDefined(firstSelectedCell)) {
+  if (!isNotNullDefined(elementKey)) {
     return result;
-  }
-
-  if (isResultSetContentValue(contentValue)) {
-    result.isTruncated = contentAction.isContentTruncated(contentValue);
   }
 
   if (isTextColumn && cachedFullText) {
     result.textValue = cachedFullText;
-    result.isTruncated = false;
   }
 
-  if (editAction.isElementEdited(firstSelectedCell)) {
-    result.textValue = formatAction.getText(firstSelectedCell);
+  if (editAction.isElementEdited(elementKey)) {
+    result.textValue = formatAction.getText(elementKey);
   }
 
-  if (isResultSetBinaryFileValue(blob)) {
-    const value = formatter.formatBlob(currentContentType, blob);
+  if (isBinary && isResultSetContentValue(contentValue)) {
+    const value = formatter.formatBlob(currentContentType, contentValue);
 
     if (value) {
       result.textValue = value;
@@ -86,7 +75,7 @@ export function useTextValue({ model, resultIndex, currentContentType }: IUseTex
   }
 
   if (!result.textValue) {
-    result.textValue = formatter.format(currentContentType, formatAction.getText(firstSelectedCell));
+    result.textValue = formatter.format(currentContentType, formatAction.getText(elementKey));
   }
 
   return result;
