@@ -204,7 +204,8 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
             title={translate(
               lineWrapping ? 'data_viewer_presentation_value_text_line_wrapping_no_wrap' : 'data_viewer_presentation_value_text_line_wrapping_wrap',
             )}
-            name={lineWrapping ? 'img-original-size' : 'img-fit-size'}
+            name={`/icons/plugin_data_viewer_${lineWrapping ? 'no_wrap' : 'wrap'}_lines.svg`}
+            img
             onClick={toggleLineWrappingHandler}
           />
           <Fill />
