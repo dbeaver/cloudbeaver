@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback } from 'react';
 
 import { IconButton } from '../IconButton';
 import { s } from '../s';
@@ -16,12 +16,13 @@ import filterStyle from './Filter.m.css';
 import { InputField } from './InputField';
 
 interface BaseProps {
-  toggleMode?: boolean;
   placeholder?: string;
   disabled?: boolean;
+  disableActions?: boolean;
+  applyDisabled?: boolean;
   max?: boolean;
   className?: string;
-  onToggle?: (status: boolean) => void;
+  onApply?: (value: string) => void;
   onKeyDown?: (event: React.KeyboardEvent<HTMLInputElement>) => void;
   onClick?: (event: React.MouseEvent<HTMLDivElement>) => void;
 }
@@ -44,19 +45,19 @@ export const Filter = observer<ControlledProps | ObjectsProps<any, any>>(functio
   state,
   name,
   value: valueControlled,
-  toggleMode,
   placeholder,
   disabled,
+  disableActions,
+  applyDisabled,
   max,
   className,
+  onApply,
   onChange,
-  onToggle,
   onKeyDown,
   onClick,
 }) {
   const styles = useS(filterStyle);
-  const [inputRef, ref] = useFocus<HTMLInputElement>({});
-  const [toggled, setToggled] = useState(!toggleMode);
+  const [inputRef] = useFocus<HTMLInputElement>({});
 
   const filter = useCallback(
     (value: string | number, name?: string) => {
@@ -73,55 +74,60 @@ export const Filter = observer<ControlledProps | ObjectsProps<any, any>>(functio
     [onChange, state],
   );
 
-  const toggle = useCallback(() => {
-    if (!toggleMode) {
-      return;
-    }
-
-    if (toggled) {
-      filter('');
-    }
-
-    setToggled(!toggled);
-
-    if (onToggle) {
-      onToggle(!toggled);
-    }
-  }, [toggleMode, toggled, onToggle, filter]);
-
-  useEffect(() => {
-    if (toggled && toggleMode) {
-      ref.reference?.focus();
-    }
-  }, [toggled, toggleMode, ref.reference]);
-
   let value: any = valueControlled;
 
   if (state && name !== undefined && name in state) {
     value = state[name];
   }
 
+  function handleKeyDown(event: React.KeyboardEvent<HTMLInputElement>) {
+    if (event.key === 'Enter' && onApply && !applyDisabled) {
+      onApply(value);
+    }
+
+    onKeyDown?.(event);
+  }
+
+  function clean() {
+    filter('', name);
+
+    if (onApply) {
+      onApply('');
+    }
+  }
+
+  const manualMode = !!onApply;
+  const edited = !!String(value);
+
   return (
     <div className={s(styles, { filterContainer: true }, className)} onClick={onClick}>
       <InputField
         ref={inputRef}
-        className={s(styles, { inputField: true, max, toggled })}
+        className={s(styles, { inputField: true, max })}
         placeholder={placeholder}
         disabled={disabled}
         name={name}
         value={value}
         onChange={filter}
-        onKeyDown={onKeyDown}
+        onKeyDown={handleKeyDown}
       />
-      {String(value) ? (
+
+      {edited && (
         <IconButton
-          className={s(styles, { iconButton: true, cross: true, toggleMode })}
+          className={s(styles, { iconButton: true, cross: true, manualMode })}
           name="cross"
-          disabled={disabled}
-          onClick={() => filter('', name)}
+          disabled={disabled || disableActions}
+          onClick={clean}
         />
-      ) : (
-        <IconButton className={s(styles, { iconButton: true, toggled, toggleMode })} name="search" disabled={disabled} onClick={toggle} />
+      )}
+
+      {(!edited || manualMode) && (
+        <IconButton
+          className={s(styles, { iconButton: true, manualMode })}
+          name="search"
+          disabled={disabled || applyDisabled || disableActions}
+          onClick={onApply ? () => onApply(value) : undefined}
+        />
       )}
     </div>
   );

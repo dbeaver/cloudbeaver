@@ -44,6 +44,7 @@ import org.jkiss.dbeaver.model.auth.AuthInfo;
 import org.jkiss.dbeaver.model.navigator.DBNBrowseSettings;
 import org.jkiss.dbeaver.model.preferences.DBPPropertyDescriptor;
 import org.jkiss.dbeaver.model.rm.RMProjectType;
+import org.jkiss.dbeaver.model.secret.DBSSecretController;
 import org.jkiss.dbeaver.model.security.*;
 import org.jkiss.dbeaver.model.security.user.SMTeam;
 import org.jkiss.dbeaver.model.security.user.SMUser;
@@ -178,6 +179,10 @@ public class WebServiceAdmin implements DBWServiceAdmin {
         }
         webSession.addInfoMessage("Delete user - " + userName);
         try {
+            var secretController = DBSSecretController.getSessionSecretControllerOrNull(webSession);
+            if (secretController != null) {
+                secretController.deleteSubjectSecrets(userName);
+            }
             webSession.getAdminSecurityController().deleteUser(userName);
         } catch (Exception e) {
             throw new DBWebException("Error deleting user", e);
@@ -234,6 +239,10 @@ public class WebServiceAdmin implements DBWServiceAdmin {
             SMTeam[] userTeams = adminSecurityController.getUserTeams(webSession.getUser().getUserId());
             if (Arrays.stream(userTeams).anyMatch(team -> team.getTeamId().equals(teamId))) {
                 throw new DBWebException("You can not delete your own team");
+            }
+            var secretController = DBSSecretController.getSessionSecretControllerOrNull(webSession);
+            if (secretController != null) {
+                secretController.deleteSubjectSecrets(teamId);
             }
             adminSecurityController.deleteTeam(teamId, force);
             return true;

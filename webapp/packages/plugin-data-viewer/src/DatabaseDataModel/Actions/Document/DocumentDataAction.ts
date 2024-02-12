@@ -21,7 +21,7 @@ export class DocumentDataAction extends DatabaseDataResultAction<IDocumentElemen
   static dataFormat = [ResultDataFormat.Document];
 
   get documents(): IDatabaseDataDocument[] {
-    return this.result.data?.rowsWithMetaData?.map(row => row.data?.[0]) || [];
+    return this.result.data?.rowsWithMetaData?.map(row => row.data[0]) || [];
   }
 
   get count(): number {
