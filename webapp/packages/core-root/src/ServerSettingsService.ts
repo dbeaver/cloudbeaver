@@ -85,10 +85,10 @@ export class ServerSettingsService extends Dependency implements ISettingsSource
   }
 
   async save() {
-    const changes = {};
+    const changes: Record<string, any> = {};
 
     for (const [key, value] of this.changes) {
-      setByPath(changes, key, value);
+      changes[key] = value;
     }
 
     await this.serverConfigResource.updateProductConfiguration(changes);
