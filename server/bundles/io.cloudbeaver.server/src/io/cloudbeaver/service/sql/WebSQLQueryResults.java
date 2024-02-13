@@ -25,9 +25,11 @@ import org.jkiss.dbeaver.model.DBPDataKind;
 import org.jkiss.dbeaver.model.data.DBDDocument;
 import org.jkiss.dbeaver.model.exec.DBCException;
 import org.jkiss.dbeaver.model.meta.Property;
+import org.jkiss.utils.Pair;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Web SQL query results.
@@ -86,16 +88,16 @@ public class WebSQLQueryResults {
         }
 
         List<WebSQLDatabaseDocument> documents = new ArrayList<>();
-        for (Object[] row : resultSet.getRows()) {
-            if (row.length != 1) {
+        for (WebSQLQueryResultSetRow row : resultSet.getRowsWithMetaData()) {
+            if (row.getData().length != 1) {
                 log.debug("Non-document row content");
             }
-            if (row[0] == null) {
+            if (row.getData()[0] == null) {
                 documents.add(null);
-            } else if (row[0] instanceof DBDDocument) {
-                documents.add(new WebSQLDatabaseDocument(webSession, (DBDDocument) row[0]));
+            } else if (row.getData()[0] instanceof DBDDocument) {
+                documents.add(new WebSQLDatabaseDocument(webSession, (DBDDocument) row.getData()[0]));
             } else {
-                log.debug("Non-document row value: " + row[0].getClass().getName());
+                log.debug("Non-document row value: " + row.getData()[0].getClass().getName());
             }
         }
 
