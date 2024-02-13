@@ -19,7 +19,6 @@ export class ClientActivityService {
   private timer: NodeJS.Timeout | null;
   public isActive = false;
   public onActiveStateChange: IExecutor<boolean>;
-  public readonly sessionTouchTimePeriod = SESSION_TOUCH_TIME_PERIOD;
 
   constructor(private readonly sessionResource: SessionResource, private graphqlService: GraphQLService) {
     this.timer = null;
@@ -35,6 +34,15 @@ export class ClientActivityService {
     this.isActive = value;
   };
 
+  private resetActivity() {
+    this.onActiveStateChange.execute(false);
+
+    if (this.timer !== null) {
+      clearTimeout(this.timer);
+    }
+    this.timer = null;
+  }
+
   updateActivity(force?: boolean) {
     if (!this.isActive || force) {
       if (this.timer !== null) {
@@ -43,14 +51,7 @@ export class ClientActivityService {
 
       this.onActiveStateChange.execute(true);
       this.sessionResource.touchSession();
-      this.timer = setTimeout(() => {
-        this.onActiveStateChange.execute(false);
-
-        if (this.timer !== null) {
-          clearTimeout(this.timer);
-        }
-        this.timer = null;
-      }, SESSION_TOUCH_TIME_PERIOD);
+      this.timer = setTimeout(this.resetActivity, SESSION_TOUCH_TIME_PERIOD);
     }
   }
 }
