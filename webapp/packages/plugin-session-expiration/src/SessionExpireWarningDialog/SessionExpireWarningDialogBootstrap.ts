@@ -7,6 +7,7 @@
  */
 import React from 'react';
 
+import { ClientActivityService } from '@cloudbeaver/core-activity';
 import { UserInfoResource } from '@cloudbeaver/core-authentication';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
@@ -30,6 +31,7 @@ export class SessionExpireWarningDialogBootstrap extends Bootstrap {
     private readonly sessionResource: SessionResource,
     private readonly userInfoResource: UserInfoResource,
     private readonly graphQLService: GraphQLService,
+    private readonly clientActivityService: ClientActivityService,
   ) {
     super();
     this.dialogInternalPromise = null;
@@ -72,7 +74,7 @@ export class SessionExpireWarningDialogBootstrap extends Bootstrap {
   private async open(): Promise<void> {
     if (!this.dialogInternalPromise) {
       this.dialogInternalPromise = this.commonDialogService.open(SessionExpireWarningDialog, {
-        touchSession: this.sessionResource.touchSession.bind(this),
+        updateActivity: () => this.clientActivityService.updateActivity(true),
       });
       await this.dialogInternalPromise;
       this.dialogInternalPromise = null;
@@ -81,7 +83,7 @@ export class SessionExpireWarningDialogBootstrap extends Bootstrap {
         const { sessionState } = await this.graphQLService.sdk.sessionState();
 
         if (sessionState.valid) {
-          this.sessionResource.touchSession();
+          this.clientActivityService.updateActivity();
         } else {
           this.sessionExpireService.sessionExpired();
         }

@@ -92,6 +92,8 @@ export class SessionResource extends CachedDataResource<SessionState | null> {
     if (this.data?.valid) {
       return this.graphQLService.sdk.touchSession();
     }
+
+    return;
   }
 
   protected setData(data: SessionState | null) {

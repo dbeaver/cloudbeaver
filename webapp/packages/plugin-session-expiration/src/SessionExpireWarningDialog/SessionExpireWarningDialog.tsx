@@ -18,11 +18,10 @@ import {
   useTranslate,
 } from '@cloudbeaver/core-blocks';
 import type { DialogComponent } from '@cloudbeaver/core-dialogs';
-import type { TouchSessionMutation } from '@cloudbeaver/core-sdk';
 import { ServerNodeChangedDialogStyles } from '@cloudbeaver/plugin-root';
 
 interface Payload {
-  touchSession: () => Promise<TouchSessionMutation | undefined>;
+  updateActivity: VoidFunction;
 }
 
 export const SessionExpireWarningDialog: DialogComponent<Payload, null> = observer(function SessionExpireWarningDialog({ rejectDialog, payload }) {
@@ -30,7 +29,7 @@ export const SessionExpireWarningDialog: DialogComponent<Payload, null> = observ
   const styles = useS(ServerNodeChangedDialogStyles);
 
   function onContinueClick() {
-    payload.touchSession();
+    payload.updateActivity();
     rejectDialog();
   }
 

@@ -5,6 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
+import { coreActivityManifest } from '@cloudbeaver/core-activity';
 import { coreAdministrationManifest } from '@cloudbeaver/core-administration';
 import { coreAppManifest } from '@cloudbeaver/core-app';
 import { coreAuthenticationManifest } from '@cloudbeaver/core-authentication';
@@ -74,5 +75,6 @@ export const coreManifests: PluginManifest[] = [
   coreDialogsManifest,
   resourceManagerManifest,
   coreAppManifest,
+  coreActivityManifest,
   coreNavigationTree,
 ];
