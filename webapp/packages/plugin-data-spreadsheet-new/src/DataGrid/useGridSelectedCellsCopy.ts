@@ -8,9 +8,16 @@
 import { useCallback } from 'react';
 
 import { useObjectRef } from '@cloudbeaver/core-blocks';
+import { useService } from '@cloudbeaver/core-di';
 import { EventContext, EventStopPropagationFlag } from '@cloudbeaver/core-events';
 import { copyToClipboard } from '@cloudbeaver/core-utils';
-import { IResultSetColumnKey, IResultSetElementKey, ResultSetDataKeysUtils, ResultSetSelectAction } from '@cloudbeaver/plugin-data-viewer';
+import {
+  DataViewerService,
+  IResultSetColumnKey,
+  IResultSetElementKey,
+  ResultSetDataKeysUtils,
+  ResultSetSelectAction,
+} from '@cloudbeaver/plugin-data-viewer';
 
 import type { IDataGridSelectionContext } from './DataGridSelection/DataGridSelectionContext';
 import type { ITableData } from './TableDataContext';
@@ -62,23 +69,26 @@ export function useGridSelectedCellsCopy(
   resultSetSelectAction: ResultSetSelectAction,
   selectionContext: IDataGridSelectionContext,
 ) {
+  const dataViewerService = useService(DataViewerService);
   const props = useObjectRef({ tableData, selectionContext, resultSetSelectAction });
 
   const onKeydownHandler = useCallback((event: React.KeyboardEvent) => {
     if ((event.ctrlKey || event.metaKey) && event.nativeEvent.code === EVENT_KEY_CODE.C) {
       EventContext.set(event, EventStopPropagationFlag);
 
-      const focusedElement = props.resultSetSelectAction.getFocusedElement();
-      let value: string | null = null;
+      if (dataViewerService.canCopyData) {
+        const focusedElement = props.resultSetSelectAction.getFocusedElement();
+        let value: string | null = null;
 
-      if (Array.from(props.selectionContext.selectedCells.keys()).length > 0) {
-        value = getSelectedCellsValue(props.tableData, props.selectionContext.selectedCells);
-      } else if (focusedElement) {
-        value = getCellCopyValue(tableData, focusedElement);
-      }
+        if (Array.from(props.selectionContext.selectedCells.keys()).length > 0) {
+          value = getSelectedCellsValue(props.tableData, props.selectionContext.selectedCells);
+        } else if (focusedElement) {
+          value = getCellCopyValue(tableData, focusedElement);
+        }
 
-      if (value !== null) {
-        copyToClipboard(value);
+        if (value !== null) {
+          copyToClipboard(value);
+        }
       }
     }
   }, []);
