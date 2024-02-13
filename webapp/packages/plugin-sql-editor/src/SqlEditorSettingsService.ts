@@ -6,9 +6,17 @@
  * you may not use this file except in compliance with the License.
  */
 import { Dependency, injectable } from '@cloudbeaver/core-di';
-import { createSettingsAliasResolver, PluginManagerService, PluginSettings, SettingsManagerService } from '@cloudbeaver/core-plugin';
+import {
+  createSettingsAliasResolver,
+  ESettingsValueType,
+  PluginManagerService,
+  PluginSettings,
+  SettingsManagerService,
+} from '@cloudbeaver/core-plugin';
 import { ServerSettingsResolverService, ServerSettingsService } from '@cloudbeaver/core-root';
 import { schema } from '@cloudbeaver/core-utils';
+
+import { SQL_EDITOR_SETTINGS_GROUP } from './SQL_EDITOR_SETTINGS_GROUP';
 
 const defaultSettings = schema.object({
   maxFileSize: schema.coerce.number().default(10 * 1024), // kilobyte
@@ -16,11 +24,16 @@ const defaultSettings = schema.object({
   autoSave: schema.coerce.boolean().default(true),
 });
 
+const defaultProposalInsertTableSettings = schema.object({
+  alias: schema.coerce.boolean().default(true),
+});
+
 export type SqlEditorSettings = schema.infer<typeof defaultSettings>;
 
 @injectable()
 export class SqlEditorSettingsService extends Dependency {
   readonly settings: PluginSettings<typeof defaultSettings>;
+  readonly proposalInsertTableSettings: PluginSettings<typeof defaultProposalInsertTableSettings>;
 
   constructor(
     private readonly pluginManagerService: PluginManagerService,
@@ -30,11 +43,11 @@ export class SqlEditorSettingsService extends Dependency {
   ) {
     super();
     this.settings = this.pluginManagerService.createSettings('sql-editor', 'plugin', defaultSettings);
+    this.proposalInsertTableSettings = this.pluginManagerService.createSettings('proposals.insert.table', 'sql', defaultProposalInsertTableSettings);
     this.serverSettingsResolverService.addResolver(
       /** @deprecated Use settings instead, will be removed in 23.0.0 */
       createSettingsAliasResolver(this.serverSettingsService, this.settings, 'core.app.sqlEditor'),
     );
-
     this.registerSettings();
   }
 
@@ -60,6 +73,16 @@ export class SqlEditorSettingsService extends Dependency {
       //   name: 'Auto save',
       //   description: 'Auto save SQL editor content',
       // },
+    ]);
+
+    this.settingsManagerService.registerSettings(this.proposalInsertTableSettings, () => [
+      {
+        group: SQL_EDITOR_SETTINGS_GROUP,
+        key: 'alias',
+        type: ESettingsValueType.Checkbox,
+        name: 'sql_editor_settings_insert_table_aliases_name',
+        description: 'sql_editor_settings_insert_table_aliases_desc',
+      },
     ]);
   }
 }

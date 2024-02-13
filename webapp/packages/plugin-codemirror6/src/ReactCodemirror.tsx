@@ -30,6 +30,7 @@ export const ReactCodemirror = observer<IReactCodeMirrorProps, IEditorRef>(
       incomingValue,
       extensions = new Map<Compartment, Extension>(),
       readonly,
+      disableCopy,
       autoFocus,
       onChange,
       onCursorChange,
@@ -40,7 +41,16 @@ export const ReactCodemirror = observer<IReactCodeMirrorProps, IEditorRef>(
     value = value ?? getValue?.();
     const currentExtensions = useRef<Map<Compartment, Extension>>(new Map());
     const readOnlyFacet = useMemo(() => EditorView.editable.of(!readonly), [readonly]);
-    extensions = useCodemirrorExtensions(extensions, readOnlyFacet);
+    const eventHandlers = useMemo(
+      () =>
+        EditorView.domEventHandlers({
+          copy() {
+            return disableCopy;
+          },
+        }),
+      [disableCopy],
+    );
+    extensions = useCodemirrorExtensions(extensions, [readOnlyFacet, eventHandlers]);
     const [container, setContainer] = useState<HTMLDivElement | null>(null);
     const [view, setView] = useState<EditorView | null>(null);
     const [incomingView, setIncomingView] = useState<EditorView | null>(null);
@@ -156,11 +166,14 @@ export const ReactCodemirror = observer<IReactCodeMirrorProps, IEditorRef>(
       if (view) {
         const transaction: TransactionSpec = { annotations: [External.of(true)] };
 
+        let isCursorInDoc = cursor && cursor.anchor > 0 && cursor.anchor < view.state.doc.length;
+
         if (value !== undefined && value !== view.state.doc.toString()) {
           transaction.changes = { from: 0, to: view.state.doc.length, insert: value };
+          isCursorInDoc = cursor && cursor.anchor > 0 && cursor.anchor < value.length;
         }
 
-        if (cursor && (view.state.selection.main.anchor !== cursor.anchor || view.state.selection.main.head !== cursor.head)) {
+        if (cursor && isCursorInDoc && (view.state.selection.main.anchor !== cursor.anchor || view.state.selection.main.head !== cursor.head)) {
           transaction.selection = cursor;
         }
 

@@ -21,6 +21,7 @@ import { isResultSetContentValue } from '../../DatabaseDataModel/Actions/ResultS
 import { ResultSetSelectAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetSelectAction';
 import { useResultSetActions } from '../../DatabaseDataModel/Actions/ResultSet/useResultSetActions';
 import type { IDatabaseResultSet } from '../../DatabaseDataModel/IDatabaseResultSet';
+import { DataViewerService } from '../../DataViewerService';
 import type { IDataValuePanelProps } from '../../TableViewer/ValuePanel/DataValuePanelService';
 import { QuotaPlaceholder } from '../QuotaPlaceholder';
 import { VALUE_PANEL_TOOLS_STYLES } from '../ValuePanelTools/VALUE_PANEL_TOOLS_STYLES';
@@ -53,6 +54,7 @@ const DEFAULT_CONTENT_TYPE = 'text/plain';
 export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelProps<any, IDatabaseResultSet>> = observer(
   function TextValuePresentation({ model, resultIndex, dataFormat }) {
     const translate = useTranslate();
+    const dataViewerService = useService(DataViewerService);
     const notificationService = useService(NotificationService);
     const textValuePresentationService = useService(TextValuePresentationService);
     const style = useStyles(styles, UNDERLINE_TAB_STYLES, VALUE_PANEL_TOOLS_STYLES);
@@ -182,6 +184,7 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
             lineWrapping={lineWrapping}
             readonly={isReadonly}
             extensions={extensions}
+            disableCopy={!dataViewerService.canCopyData}
             onChange={valueChangeHandler}
           />
         </Group>

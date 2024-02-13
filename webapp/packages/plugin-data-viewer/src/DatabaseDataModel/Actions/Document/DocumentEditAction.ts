@@ -125,7 +125,8 @@ export class DocumentEditAction extends DatabaseEditAction<IDocumentElementKey, 
     let rowIndex = 0;
 
     for (const [id, document] of this.editedElements) {
-      const value = result.data?.rows?.[rowIndex];
+      const row = result.data?.rowsWithMetaData?.[rowIndex];
+      const value = row?.data;
 
       if (value !== undefined) {
         this.data.set(id, value[0]);
@@ -138,7 +139,8 @@ export class DocumentEditAction extends DatabaseEditAction<IDocumentElementKey, 
     let rowIndex = 0;
 
     for (const [id, document] of this.editedElements) {
-      const value = result.data?.rows?.[rowIndex];
+      const row = result.data?.rowsWithMetaData?.[rowIndex];
+      const value = row?.data;
 
       if (value !== undefined) {
         this.data.set(id, value[0]);
@@ -179,6 +181,7 @@ export class DocumentEditAction extends DatabaseEditAction<IDocumentElementKey, 
 
       updatedRows.push({
         data: [this.data.get(id)],
+        metaData: this.data.getMetadataForDocument(document.id),
         updateValues: {
           // TODO: remove, place new document in data field
           0: document,

@@ -36,7 +36,7 @@ export class ResultSetViewAction extends DatabaseDataAction<any, IDatabaseResult
   }
 
   get rows(): IResultSetValue[][] {
-    return this.data.rows;
+    return this.data.rows.map(row => row.data || []);
   }
 
   get columns(): SqlResultColumn[] {
