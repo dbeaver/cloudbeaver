@@ -10,7 +10,6 @@ import { makeObservable, observable } from 'mobx';
 import { injectable } from '@cloudbeaver/core-di';
 import { Executor, IExecutor, IExecutorHandler } from '@cloudbeaver/core-executor';
 import { SessionResource } from '@cloudbeaver/core-root';
-import { GraphQLService } from '@cloudbeaver/core-sdk';
 
 const SESSION_TOUCH_TIME_PERIOD = 1000 * 60;
 
@@ -20,7 +19,7 @@ export class ClientActivityService {
   public isActive = false;
   public onActiveStateChange: IExecutor<boolean>;
 
-  constructor(private readonly sessionResource: SessionResource, private graphqlService: GraphQLService) {
+  constructor(private readonly sessionResource: SessionResource) {
     this.timer = null;
     this.onActiveStateChange = new Executor();
     this.onActiveStateChange.addHandler(this.onActiveStateChangeHandler.bind(this));
