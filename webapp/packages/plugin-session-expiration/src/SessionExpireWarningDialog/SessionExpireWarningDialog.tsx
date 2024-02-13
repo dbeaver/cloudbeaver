@@ -21,7 +21,7 @@ import type { DialogComponent } from '@cloudbeaver/core-dialogs';
 import { ServerNodeChangedDialogStyles } from '@cloudbeaver/plugin-root';
 
 interface Payload {
-  updateActivity: VoidFunction;
+  onButtonClick: VoidFunction;
 }
 
 export const SessionExpireWarningDialog: DialogComponent<Payload, null> = observer(function SessionExpireWarningDialog({ rejectDialog, payload }) {
@@ -29,7 +29,7 @@ export const SessionExpireWarningDialog: DialogComponent<Payload, null> = observ
   const styles = useS(ServerNodeChangedDialogStyles);
 
   function onContinueClick() {
-    payload.updateActivity();
+    payload.onButtonClick();
     rejectDialog();
   }
 

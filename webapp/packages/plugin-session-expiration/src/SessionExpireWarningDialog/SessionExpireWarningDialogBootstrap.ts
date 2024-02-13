@@ -74,7 +74,7 @@ export class SessionExpireWarningDialogBootstrap extends Bootstrap {
   private async open(): Promise<void> {
     if (!this.dialogInternalPromise) {
       this.dialogInternalPromise = this.commonDialogService.open(SessionExpireWarningDialog, {
-        updateActivity: () => this.clientActivityService.updateActivity(true),
+        onButtonClick: () => this.clientActivityService.updateActivity(true),
       });
       await this.dialogInternalPromise;
       this.dialogInternalPromise = null;
