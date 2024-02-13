@@ -43,6 +43,8 @@ export default [
   ['settings_data_editor', 'Data Editor'],
   ['settings_data_editor_disable_edit_name', 'Disable Edit'],
   ['settings_data_editor_disable_edit_description', 'Disable editing of data in Data Viewer'],
+  ['settings_data_editor_disable_data_copy_name', 'Disable Copy'],
+  ['settings_data_editor_disable_data_copy_description', 'Disable copying of data in Data Viewer'],
   ['settings_data_editor_fetch_min_name', 'Minimum fetch size'],
   ['settings_data_editor_fetch_min_description', 'Minimum number of rows to fetch'],
   ['settings_data_editor_fetch_max_name', 'Maximum fetch size'],

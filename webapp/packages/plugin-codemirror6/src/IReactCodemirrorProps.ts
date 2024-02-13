@@ -22,6 +22,7 @@ export interface IReactCodeMirrorProps extends React.PropsWithChildren {
   getValue?: () => string;
   extensions?: Map<Compartment, Extension>;
   readonly?: boolean;
+  disableCopy?: boolean;
   autoFocus?: boolean;
   onChange?: (value: string, update: ViewUpdate) => void;
   onCursorChange?: (selection: SelectionRange, update: ViewUpdate) => void;
