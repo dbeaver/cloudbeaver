@@ -11,7 +11,7 @@ import { injectable } from '@cloudbeaver/core-di';
 import { Executor, IExecutor } from '@cloudbeaver/core-executor';
 import { SessionResource } from '@cloudbeaver/core-root';
 
-const SESSION_TOUCH_TIME_PERIOD = 1000 * 60;
+const INACTIVE_PERIOD_TIME = 1000 * 60;
 
 @injectable()
 export class ClientActivityService {
@@ -41,21 +41,20 @@ export class ClientActivityService {
   resetActivity() {
     this.setActivity(false);
 
-    if (this.timer !== null) {
+    if (this.timer) {
       clearTimeout(this.timer);
+      this.timer = null;
     }
-    this.timer = null;
   }
 
-  updateActivity(force?: boolean) {
-    if (!this.isActive || force) {
-      if (this.timer !== null) {
-        clearTimeout(this.timer);
-      }
+  async updateActivity() {
+    this.setActivity(true);
+    this.sessionResource.touchSession();
 
-      this.setActivity(true);
-      this.sessionResource.touchSession();
-      this.timer = setTimeout(this.resetActivity, SESSION_TOUCH_TIME_PERIOD);
+    if (this.timer) {
+      clearTimeout(this.timer);
     }
+
+    this.timer = setTimeout(this.resetActivity, INACTIVE_PERIOD_TIME);
   }
 }

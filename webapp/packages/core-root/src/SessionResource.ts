@@ -25,10 +25,13 @@ interface SessionStateData {
   remainingTime: number;
 }
 
+const SESSION_TOUCH_TIME_PERIOD = 1000 * 60;
+
 @injectable()
 export class SessionResource extends CachedDataResource<SessionState | null> {
   private action: ISessionAction | null;
   private defaultLocale: string | undefined;
+  private touchSessionTimer: NodeJS.Timeout | null;
   readonly onStatusUpdate: ISyncExecutor<SessionStateData>;
 
   constructor(
@@ -48,6 +51,7 @@ export class SessionResource extends CachedDataResource<SessionState | null> {
       this,
     );
 
+    this.touchSessionTimer = null;
     this.action = null;
     this.sync(
       serverConfigResource,
@@ -88,13 +92,22 @@ export class SessionResource extends CachedDataResource<SessionState | null> {
     return session;
   }
 
-  async touchSession() {
-    if (this.data?.valid) {
-      return this.graphQLService.sdk.touchSession();
+  touchSession = () => {
+    if (this.touchSessionTimer) {
+      return;
     }
 
-    return;
-  }
+    if (this.data?.valid) {
+      this.graphQLService.sdk.touchSession();
+    }
+
+    this.touchSessionTimer = setTimeout(() => {
+      if (this.touchSessionTimer) {
+        clearTimeout(this.touchSessionTimer);
+        this.touchSessionTimer = null;
+      }
+    }, SESSION_TOUCH_TIME_PERIOD);
+  };
 
   protected setData(data: SessionState | null) {
     if (!this.action) {
