@@ -690,10 +690,9 @@ public class WebServiceCore implements DBWServiceCore {
                             connectionConfig.getSelectedSecretId(),
                             dataSource
                         );
-                    if (secretValue == null) {
-                        throw new DBWebException("Secret not found: " + connectionConfig.getSelectedSecretId());
+                    if (secretValue != null) {
+                        testDataSource.loadFromSecret(secretValue.getValue());
                     }
-                    testDataSource.loadFromSecret(secretValue.getValue());
                 } catch (DBException e) {
                     throw new DBWebException("Failed to load secret value: " + connectionConfig.getSelectedSecretId());
                 }
