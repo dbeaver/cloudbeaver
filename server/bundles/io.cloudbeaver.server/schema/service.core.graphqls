@@ -495,7 +495,7 @@ input ConnectionConfig {
     saveCredentials: Boolean
     sharedCredentials: Boolean
     authModelId: ID
-    selectedSecretId: ID
+    selectedSecretId: ID @since(version: "23.3.5")
     credentials: Object
 
     # Map of provider properties (name/value)
@@ -592,7 +592,7 @@ extend type Mutation {
     copyConnectionFromNode( nodePath: String!, config: ConnectionConfig, projectId: ID ): ConnectionInfo!
 
     # Test connection configuration. Returns remote server version
-    testConnection( config: ConnectionConfig!, projectId: ID, selectedSecretId: ID): ConnectionInfo!
+    testConnection( config: ConnectionConfig!, projectId: ID): ConnectionInfo!
 
     # Test connection configuration. Returns remote server version
     testNetworkHandler( config: NetworkHandlerConfigInput! ): NetworkEndpointInfo!

@@ -682,16 +682,14 @@ public class WebServiceCore implements DBWServiceCore {
             );
             if (connectionConfig.getSelectedSecretId() != null) {
                 try {
-                    var secretController = DBSSecretController.getProjectSecretController(
-                        webSession.getAccessibleProjectById(projectId)
-                    );
-                    DBSSecretValue secretValue =
-                        secretController.getSubjectSecretValue(
-                            connectionConfig.getSelectedSecretId(),
-                            dataSource
-                        );
+                    DBSSecretValue secretValue = dataSource.listSharedCredentials()
+                        .stream()
+                        .filter(secret -> connectionConfig.getSelectedSecretId().equals(secret.getSubjectId()))
+                        .findFirst()
+                        .orElse(null);
+
                     if (secretValue != null) {
-                        testDataSource.loadFromSecret(secretValue.getValue());
+                        testDataSource.setSelectedSharedCredentials(secretValue);
                     }
                 } catch (DBException e) {
                     throw new DBWebException("Failed to load secret value: " + connectionConfig.getSelectedSecretId());
