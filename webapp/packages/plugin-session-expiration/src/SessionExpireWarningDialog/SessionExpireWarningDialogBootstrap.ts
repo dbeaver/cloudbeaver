@@ -5,13 +5,18 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
+import React from 'react';
+
 import { UserInfoResource } from '@cloudbeaver/core-authentication';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { ServerConfigResource, SessionExpireService, SessionResource } from '@cloudbeaver/core-root';
 import { GraphQLService } from '@cloudbeaver/core-sdk';
 
-import { SessionExpireWarningDialog } from './SessionExpireWarningDialog';
+const SessionExpireWarningDialog = React.lazy(async () => {
+  const { SessionExpireWarningDialog } = await import('./SessionExpireWarningDialog');
+  return { default: SessionExpireWarningDialog };
+});
 
 const WARN_IN = 5 * 1000 * 60;
 
@@ -57,7 +62,7 @@ export class SessionExpireWarningDialogBootstrap extends Bootstrap {
       return;
     }
 
-    if (remainingTime !== undefined && remainingTime < WARN_IN) {
+    if (remainingTime !== undefined && remainingTime <= WARN_IN) {
       this.open();
     } else {
       this.close();
@@ -66,7 +71,9 @@ export class SessionExpireWarningDialogBootstrap extends Bootstrap {
 
   private async open(): Promise<void> {
     if (!this.dialogInternalPromise) {
-      this.dialogInternalPromise = this.commonDialogService.open(SessionExpireWarningDialog, null);
+      this.dialogInternalPromise = this.commonDialogService.open(SessionExpireWarningDialog, {
+        touchSession: this.sessionResource.touchSession.bind(this),
+      });
       await this.dialogInternalPromise;
       this.dialogInternalPromise = null;
 
@@ -74,7 +81,7 @@ export class SessionExpireWarningDialogBootstrap extends Bootstrap {
         const { sessionState } = await this.graphQLService.sdk.sessionState();
 
         if (sessionState.valid) {
-          await this.sessionResource.refreshSilent();
+          this.sessionResource.touchSession();
         } else {
           this.sessionExpireService.sessionExpired();
         }

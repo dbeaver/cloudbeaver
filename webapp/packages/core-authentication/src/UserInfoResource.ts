@@ -43,6 +43,10 @@ export class UserInfoResource extends CachedDataResource<UserInfo | null, void, 
     return this.data !== null;
   }
 
+  get isAuthorized(): boolean {
+    return Boolean(this.data?.userId && this.data.userId !== ANONYMOUS_USER_ID);
+  }
+
   constructor(
     private readonly graphQLService: GraphQLService,
     private readonly authProviderService: AuthProviderService,

@@ -18,11 +18,21 @@ import {
   useTranslate,
 } from '@cloudbeaver/core-blocks';
 import type { DialogComponent } from '@cloudbeaver/core-dialogs';
+import type { TouchSessionMutation } from '@cloudbeaver/core-sdk';
 import { ServerNodeChangedDialogStyles } from '@cloudbeaver/plugin-root';
 
-export const SessionExpireWarningDialog: DialogComponent<null, null> = observer(function SessionExpireWarningDialog({ rejectDialog }) {
+interface Payload {
+  touchSession: () => Promise<TouchSessionMutation | undefined>;
+}
+
+export const SessionExpireWarningDialog: DialogComponent<Payload, null> = observer(function SessionExpireWarningDialog({ rejectDialog, payload }) {
   const translate = useTranslate();
   const styles = useS(ServerNodeChangedDialogStyles);
+
+  function onContinueClick() {
+    payload.touchSession();
+    rejectDialog();
+  }
 
   return (
     <CommonDialogWrapper size="small" fixedSize>
@@ -31,7 +41,7 @@ export const SessionExpireWarningDialog: DialogComponent<null, null> = observer(
         <p className={s(styles, { text: true })}>{translate('app_root_session_expire_warning_message')}</p>
       </CommonDialogBody>
       <CommonDialogFooter className={s(styles, { footer: true })}>
-        <Button type="button" mod={['unelevated']} onClick={rejectDialog}>
+        <Button type="button" mod={['unelevated']} onClick={onContinueClick}>
           {translate('app_root_session_expire_warning_button')}
         </Button>
       </CommonDialogFooter>
