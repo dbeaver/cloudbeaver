@@ -14,7 +14,9 @@ export function useClientActivity() {
   const clientActivityService = useService(ClientActivityService);
   const isSubscribed = useRef(false);
 
-  const updateActivity = () => clientActivityService.updateActivity();
+  function updateActivity() {
+    clientActivityService.updateActivity();
+  }
 
   function subscribeEvents() {
     if (!isSubscribed.current) {

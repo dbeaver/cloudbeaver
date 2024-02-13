@@ -20,9 +20,13 @@ export class ClientActivityService {
   public onActiveStateChange: IExecutor<boolean>;
 
   constructor(private readonly sessionResource: SessionResource) {
+    this.onActiveStateChangeHandler.bind(this);
+    this.updateActivity = this.updateActivity.bind(this);
+    this.resetActivity = this.resetActivity.bind(this);
+
     this.timer = null;
     this.onActiveStateChange = new Executor();
-    this.onActiveStateChange.addHandler(this.onActiveStateChangeHandler.bind(this));
+    this.onActiveStateChange.addHandler(this.onActiveStateChangeHandler);
 
     makeObservable(this, {
       isActive: observable,
@@ -33,7 +37,7 @@ export class ClientActivityService {
     this.isActive = value;
   };
 
-  private resetActivity() {
+  resetActivity() {
     this.onActiveStateChange.execute(false);
 
     if (this.timer !== null) {
