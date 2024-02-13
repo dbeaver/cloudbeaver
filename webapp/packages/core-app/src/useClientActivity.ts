@@ -12,30 +12,23 @@ import { useService } from '@cloudbeaver/core-di';
 
 export function useClientActivity() {
   const clientActivityService = useService(ClientActivityService);
-  const isSubscribed = useRef(false);
 
   function updateActivity() {
     clientActivityService.updateActivity();
   }
 
   function subscribeEvents() {
-    if (!isSubscribed.current) {
-      document.addEventListener('mousemove', updateActivity);
-      document.addEventListener('click', updateActivity);
-      document.addEventListener('keydown', updateActivity);
-      document.addEventListener('scroll', updateActivity);
-      isSubscribed.current = true;
-    }
+    document.addEventListener('mousemove', updateActivity);
+    document.addEventListener('click', updateActivity);
+    document.addEventListener('keydown', updateActivity);
+    document.addEventListener('scroll', updateActivity);
   }
 
   function unsubscribeEvents() {
-    if (isSubscribed.current) {
-      document.removeEventListener('mousemove', updateActivity);
-      document.removeEventListener('click', updateActivity);
-      document.removeEventListener('keydown', updateActivity);
-      document.removeEventListener('scroll', updateActivity);
-      isSubscribed.current = false;
-    }
+    document.removeEventListener('mousemove', updateActivity);
+    document.removeEventListener('click', updateActivity);
+    document.removeEventListener('keydown', updateActivity);
+    document.removeEventListener('scroll', updateActivity);
   }
 
   useEffect(() => {
