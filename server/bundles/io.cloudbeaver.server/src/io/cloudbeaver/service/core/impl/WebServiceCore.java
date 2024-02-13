@@ -343,7 +343,7 @@ public class WebServiceCore implements DBWServiceCore {
             if (selectedSecret == null) {
                 throw new DBWebException("Secret not found:" + selectedSecretId);
             }
-            dataSourceContainer.loadFromSecret(selectedSecret.getValue());
+            dataSourceContainer.setSelectedSharedCredentials(selectedSecret);
         }
 
         boolean oldSavePassword = dataSourceContainer.isSavePassword();
