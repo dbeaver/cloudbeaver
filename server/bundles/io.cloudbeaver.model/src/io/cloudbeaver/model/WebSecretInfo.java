@@ -33,6 +33,6 @@ public class WebSecretInfo {
 
     @Property
     public String getSecretId() {
-        return secretValue.getDisplayName();
+        return secretValue.getSubjectId();
     }
 }

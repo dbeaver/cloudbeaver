@@ -338,7 +338,7 @@ public class WebServiceCore implements DBWServiceCore {
             }
             DBSSecretValue selectedSecret =
                 allSecrets.stream()
-                    .filter(secret -> secret.getId().equals(selectedSecretId))
+                    .filter(secret -> selectedSecretId.equals(secret.getSubjectId()))
                     .findFirst().orElse(null);
             if (selectedSecret == null) {
                 throw new DBWebException("Secret not found:" + selectedSecretId);
