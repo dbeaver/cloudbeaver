@@ -19,6 +19,11 @@ import type { IConnectionInfoParams } from './CONNECTION_INFO_PARAM_SCHEMA';
 import { Connection, ConnectionInfoResource, createConnectionParam, isConnectionInfoParamEqual } from './ConnectionInfoResource';
 import { ContainerResource, IStructContainers, ObjectContainer } from './ContainerResource';
 
+export interface IRequireConnectionExecutorData {
+  key: IConnectionInfoParams;
+  resetCredentials?: boolean;
+}
+
 export interface IConnectionExecutorData {
   connections: IConnectionInfoParams[];
   state: 'before' | 'after';
@@ -32,7 +37,7 @@ export class ConnectionsManagerService {
   get createConnectionProjects(): ProjectInfo[] {
     return this.projectsService.activeProjects.filter(project => project.canEditDataSources).sort(projectInfoSortByName);
   }
-  readonly connectionExecutor: IExecutor<IConnectionInfoParams>;
+  readonly connectionExecutor: IExecutor<IRequireConnectionExecutorData>;
   readonly onDisconnect: IExecutor<IConnectionExecutorData>;
   readonly onDelete: IExecutor<IConnectionExecutorData>;
 
@@ -47,11 +52,11 @@ export class ConnectionsManagerService {
   ) {
     this.disconnecting = false;
 
-    this.connectionExecutor = new Executor<IConnectionInfoParams>(null, isConnectionInfoParamEqual);
+    this.connectionExecutor = new Executor<IRequireConnectionExecutorData>(null, (a, b) => isConnectionInfoParamEqual(a.key, b.key));
     this.onDisconnect = new Executor();
     this.onDelete = new Executor();
 
-    this.connectionExecutor.addHandler(key => connectionInfo.load(key));
+    this.connectionExecutor.addHandler(data => connectionInfo.load(data.key));
     this.onDelete.before(this.onDisconnect);
 
     makeObservable(this, {
@@ -64,8 +69,8 @@ export class ConnectionsManagerService {
     });
   }
 
-  async requireConnection(key: IConnectionInfoParams): Promise<Connection | null> {
-    const context = await this.connectionExecutor.execute(key);
+  async requireConnection(key: IConnectionInfoParams, resetCredentials?: boolean): Promise<Connection | null> {
+    const context = await this.connectionExecutor.execute({ key, resetCredentials });
     const connection = context.getContext(this.connectionContext);
 
     return connection.connection;

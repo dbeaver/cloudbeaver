@@ -6,20 +6,21 @@
  * you may not use this file except in compliance with the License.
  */
 import { AuthProviderService } from '@cloudbeaver/core-authentication';
+import { importLazyComponent } from '@cloudbeaver/core-blocks';
 import {
   Connection,
   ConnectionInfoResource,
   ConnectionsManagerService,
   createConnectionParam,
   IConnectionInfoParams,
+  IRequireConnectionExecutorData,
 } from '@cloudbeaver/core-connections';
 import { Dependency, injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
-import { NotificationService } from '@cloudbeaver/core-events';
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import { AuthenticationService } from '@cloudbeaver/plugin-authentication';
 
-import { DatabaseAuthDialog } from './DatabaseAuthDialog/DatabaseAuthDialog';
+const DatabaseAuthDialog = importLazyComponent(() => import('./DatabaseAuthDialog/DatabaseAuthDialog').then(m => m.DatabaseAuthDialog));
 
 @injectable()
 export class ConnectionAuthService extends Dependency {
@@ -28,7 +29,6 @@ export class ConnectionAuthService extends Dependency {
     private readonly commonDialogService: CommonDialogService,
     private readonly authProviderService: AuthProviderService,
     private readonly connectionsManagerService: ConnectionsManagerService,
-    private readonly notificationService: NotificationService,
     private readonly authenticationService: AuthenticationService,
   ) {
     super();
@@ -40,10 +40,10 @@ export class ConnectionAuthService extends Dependency {
     }));
   }
 
-  private async connectionDialog(connectionKey: IConnectionInfoParams, context: IExecutionContextProvider<IConnectionInfoParams | null>) {
+  private async connectionDialog(data: IRequireConnectionExecutorData, context: IExecutionContextProvider<IRequireConnectionExecutorData | null>) {
     const connection = context.getContext(this.connectionsManagerService.connectionContext);
 
-    const newConnection = await this.auth(connectionKey);
+    const newConnection = await this.auth(data.key, data.resetCredentials);
 
     if (!newConnection?.connected) {
       return;
@@ -51,7 +51,7 @@ export class ConnectionAuthService extends Dependency {
     connection.connection = newConnection;
   }
 
-  async auth(key: IConnectionInfoParams, resetCredentials?: boolean): Promise<Connection | null> {
+  private async auth(key: IConnectionInfoParams, resetCredentials?: boolean): Promise<Connection | null> {
     if (!this.connectionInfoResource.has(key)) {
       return null;
     }
@@ -77,13 +77,20 @@ export class ConnectionAuthService extends Dependency {
       }
     }
 
-    connection = await this.connectionInfoResource.load(key, ['includeAuthNeeded', 'includeNetworkHandlersConfig', 'includeCredentialsSaved']);
+    connection = await this.connectionInfoResource.load(key, [
+      'includeAuthNeeded',
+      'includeSharedSecrets',
+      'includeNetworkHandlersConfig',
+      'includeCredentialsSaved',
+    ]);
+
+    const sharedSecrets = connection.sharedSecrets || [];
 
     const networkHandlers = connection
       .networkHandlersConfig!.filter(handler => handler.enabled && (!handler.savePassword || resetCredentials))
       .map(handler => handler.id);
 
-    if (connection.authNeeded || (connection.credentialsSaved && resetCredentials) || networkHandlers.length > 0) {
+    if (connection.authNeeded || (connection.credentialsSaved && resetCredentials) || networkHandlers.length > 0 || sharedSecrets.length > 1) {
       const result = await this.commonDialogService.open(DatabaseAuthDialog, {
         connection: key,
         networkHandlers,

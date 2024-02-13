@@ -28,7 +28,6 @@ import {
 import { ACTION_DELETE, ActionService, DATA_CONTEXT_MENU, DATA_CONTEXT_MENU_NESTED, MenuSeparatorItem, MenuService } from '@cloudbeaver/core-view';
 import { MENU_APP_ACTIONS } from '@cloudbeaver/plugin-top-app-bar';
 
-import { ConnectionAuthService } from '../ConnectionAuthService';
 import { PluginConnectionsSettingsService } from '../PluginConnectionsSettingsService';
 import { PublicConnectionFormService } from '../PublicConnectionForm/PublicConnectionFormService';
 import { ACTION_CONNECTION_CHANGE_CREDENTIALS } from './Actions/ACTION_CONNECTION_CHANGE_CREDENTIALS';
@@ -54,7 +53,6 @@ export class ConnectionMenuBootstrap extends Bootstrap {
     private readonly connectionsSettingsService: ConnectionsSettingsService,
     private readonly pluginConnectionsSettingsService: PluginConnectionsSettingsService,
     private readonly permissionsService: PermissionsService,
-    private readonly connectionAuthService: ConnectionAuthService,
     private readonly serverConfigResource: ServerConfigResource,
   ) {
     super();
@@ -245,7 +243,7 @@ export class ConnectionMenuBootstrap extends Bootstrap {
             break;
           }
           case ACTION_CONNECTION_CHANGE_CREDENTIALS: {
-            await this.connectionAuthService.auth({ connectionId: connection.id, projectId: connection.projectId }, true);
+            await this.connectionsManagerService.requireConnection({ connectionId: connection.id, projectId: connection.projectId }, true);
             break;
           }
         }
