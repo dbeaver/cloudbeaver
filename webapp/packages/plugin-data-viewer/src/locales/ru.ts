@@ -45,6 +45,8 @@ export default [
   ['settings_data_editor', 'Редактор данных'],
   ['settings_data_editor_disable_edit_name', 'Отключить редактирование'],
   ['settings_data_editor_disable_edit_description', 'Отключить редактирование данных'],
+  ['settings_data_editor_disable_data_copy_name', 'Отключить копирование'],
+  ['settings_data_editor_disable_data_copy_description', 'Отключить копирование данных'],
   ['settings_data_editor_fetch_min_name', 'Минимальный размер выборки'],
   ['settings_data_editor_fetch_min_description', 'Минимальное количество строк для выборки'],
   ['settings_data_editor_fetch_max_name', 'Максимальный размер выборки'],
