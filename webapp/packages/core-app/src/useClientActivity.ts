@@ -5,7 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { useEffect, useRef } from 'react';
+import { useEffect } from 'react';
 
 import { ClientActivityService } from '@cloudbeaver/core-activity';
 import { useService } from '@cloudbeaver/core-di';
