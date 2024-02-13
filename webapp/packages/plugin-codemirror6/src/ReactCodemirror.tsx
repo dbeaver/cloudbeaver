@@ -30,6 +30,7 @@ export const ReactCodemirror = observer<IReactCodeMirrorProps, IEditorRef>(
       incomingValue,
       extensions = new Map<Compartment, Extension>(),
       readonly,
+      disableCopy,
       autoFocus,
       onChange,
       onCursorChange,
@@ -40,7 +41,16 @@ export const ReactCodemirror = observer<IReactCodeMirrorProps, IEditorRef>(
     value = value ?? getValue?.();
     const currentExtensions = useRef<Map<Compartment, Extension>>(new Map());
     const readOnlyFacet = useMemo(() => EditorView.editable.of(!readonly), [readonly]);
-    extensions = useCodemirrorExtensions(extensions, readOnlyFacet);
+    const eventHandlers = useMemo(
+      () =>
+        EditorView.domEventHandlers({
+          copy() {
+            return disableCopy;
+          },
+        }),
+      [disableCopy],
+    );
+    extensions = useCodemirrorExtensions(extensions, [readOnlyFacet, eventHandlers]);
     const [container, setContainer] = useState<HTMLDivElement | null>(null);
     const [view, setView] = useState<EditorView | null>(null);
     const [incomingView, setIncomingView] = useState<EditorView | null>(null);
