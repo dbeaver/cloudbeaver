@@ -19,4 +19,7 @@ export default [
   ['settings_connections_hide_connections_view_description', 'Показывать подключения только администраторам'],
 
   ['connections_public_connection_ssl_enable', 'Включить SSL'],
+
+  ['plugin_connections_connection_form_shared_credentials_manage_info', 'Вы можете указать учетные данные в '],
+  ['plugin_connections_connection_form_shared_credentials_manage_info_tab_link', 'табе "Учетные данные"'],
 ];

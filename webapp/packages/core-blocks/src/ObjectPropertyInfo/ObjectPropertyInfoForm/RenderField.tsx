@@ -13,7 +13,7 @@ import { removeMetadataFromBase64 } from '@cloudbeaver/core-utils';
 import { FieldCheckbox } from '../../FormControls/Checkboxes/FieldCheckbox';
 import { Combobox } from '../../FormControls/Combobox';
 import { FormFieldDescription } from '../../FormControls/FormFieldDescription';
-import { InputField } from '../../FormControls/InputField';
+import { InputField } from '../../FormControls/InputField/InputField';
 import { InputFileTextContent } from '../../FormControls/InputFileTextContent';
 import { isControlPresented } from '../../FormControls/isControlPresented';
 import { Textarea } from '../../FormControls/Textarea';
@@ -26,6 +26,7 @@ const RESERVED_KEYWORDS = ['no', 'off', 'new-password'];
 interface RenderFieldProps {
   property: ObjectPropertyInfo;
   state?: Record<string, any>;
+  defaultState?: Record<string, any>;
   editable?: boolean;
   autofillToken?: string;
   disabled?: boolean;
@@ -55,6 +56,7 @@ function getValue(value: any, controlType: ControlType) {
 export const RenderField = observer<RenderFieldProps>(function RenderField({
   property,
   state,
+  defaultState,
   editable = true,
   autofillToken = '',
   disabled,
@@ -128,6 +130,7 @@ export const RenderField = observer<RenderFieldProps>(function RenderField({
           title={property.description}
           disabled={disabled || readOnly}
           className={className}
+          groupGap
         >
           {property.displayName ?? ''}
         </FieldCheckbox>
@@ -142,6 +145,7 @@ export const RenderField = observer<RenderFieldProps>(function RenderField({
         title={property.description}
         disabled={disabled || readOnly}
         className={className}
+        groupGap
       >
         {property.displayName ?? ''}
       </FieldCheckbox>
@@ -234,6 +238,7 @@ export const RenderField = observer<RenderFieldProps>(function RenderField({
         labelTooltip={property.description || property.displayName}
         name={property.id!}
         state={state}
+        defaultState={defaultState}
         defaultValue={defaultValue}
         description={description ?? property.hint}
         disabled={disabled}

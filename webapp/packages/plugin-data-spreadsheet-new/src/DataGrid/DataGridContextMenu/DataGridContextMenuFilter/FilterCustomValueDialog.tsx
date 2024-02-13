@@ -61,7 +61,7 @@ export const FilterCustomValueDialog: DialogComponent<IPayload, string | number>
     <CommonDialogWrapper size="small">
       <CommonDialogHeader title="data_grid_table_context_menu_filter_dialog_title" onReject={rejectDialog} />
       <CommonDialogBody noOverflow>
-        <InputField ref={inputRef} name="customValue" value={value} onChange={setValue}>
+        <InputField ref={inputRef} name="customValue" value={String(value)} onChange={setValue}>
           {payload.inputTitle}
         </InputField>
       </CommonDialogBody>

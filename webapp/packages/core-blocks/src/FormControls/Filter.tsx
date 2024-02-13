@@ -13,7 +13,7 @@ import { s } from '../s';
 import { useFocus } from '../useFocus';
 import { useS } from '../useS';
 import filterStyle from './Filter.m.css';
-import { InputField } from './InputField';
+import { InputField } from './InputField/InputField';
 
 interface BaseProps {
   placeholder?: string;

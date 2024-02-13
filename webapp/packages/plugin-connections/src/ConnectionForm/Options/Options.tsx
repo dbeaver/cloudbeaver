@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import { useCallback, useRef } from 'react';
+import { useContext, useRef } from 'react';
 
 import { AUTH_PROVIDER_LOCAL_ID } from '@cloudbeaver/core-authentication';
 import {
@@ -20,29 +20,29 @@ import {
   Group,
   GroupTitle,
   InputField,
-  ObjectPropertyInfoForm,
+  Link,
   Radio,
   RadioGroup,
   s,
   Textarea,
   useAdministrationSettings,
   useFormValidator,
-  usePermission,
   useResource,
   useS,
   useTranslate,
 } from '@cloudbeaver/core-blocks';
 import { DatabaseAuthModelsResource, DBDriverResource, isLocalConnection } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
-import { CachedResourceListEmptyKey, resourceKeyList } from '@cloudbeaver/core-resource';
-import { EAdminPermission, ServerConfigResource } from '@cloudbeaver/core-root';
+import { ServerConfigResource } from '@cloudbeaver/core-root';
 import { DriverConfigurationType } from '@cloudbeaver/core-sdk';
-import { type TabContainerPanelComponent, useAuthenticationAction } from '@cloudbeaver/core-ui';
-import { isSafari } from '@cloudbeaver/core-utils';
+import { type TabContainerPanelComponent, TabsContext, useAuthenticationAction } from '@cloudbeaver/core-ui';
 import { ProjectSelect } from '@cloudbeaver/plugin-projects';
 
+import { ConnectionAuthModelCredentialsForm } from '../ConnectionAuthModelCredentials/ConnectionAuthModelCredentialsForm';
+import { ConnectionAuthModelSelector } from '../ConnectionAuthModelCredentials/ConnectionAuthModelSelector';
 import { ConnectionFormService } from '../ConnectionFormService';
 import type { IConnectionFormProps } from '../IConnectionFormProps';
+import { CONNECTION_FORM_SHARED_CREDENTIALS_TAB_ID } from '../SharedCredentials/CONNECTION_FORM_SHARED_CREDENTIALS_TAB_ID';
 import { ConnectionOptionsTabService } from './ConnectionOptionsTabService';
 import styles from './Options.m.css';
 import { ParametersForm } from './ParametersForm';
@@ -77,25 +77,14 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
   const translate = useTranslate();
   const { info, config, availableDrivers, submittingTask: submittingHandlers, disabled } = state;
   const style = useS(styles);
+  const tabsState = useContext(TabsContext);
 
   //@TODO it's here until the profile implementation in the CloudBeaver
   const readonly = state.readonly || info?.authModel === PROFILE_AUTH_MODEL_ID;
 
-  const adminPermission = usePermission(EAdminPermission.admin);
-
   useFormValidator(submittingHandlers.for(service.formValidationTask), formRef.current);
   const optionsHook = useOptions(state);
   const { credentialsSavingEnabled } = useAdministrationSettings();
-
-  const handleAuthModelSelect = useCallback(async (value?: string, name?: string, prev?: string) => {
-    const model = applicableAuthModels.find(model => model?.id === value);
-
-    if (!model) {
-      return;
-    }
-
-    optionsHook.setAuthModel(model);
-  }, []);
 
   const driverMap = useResource(
     Options,
@@ -131,13 +120,9 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
     }
   }
 
-  const { data: applicableAuthModels } = useResource(
-    Options,
-    DatabaseAuthModelsResource,
-    driver?.applicableAuthModels ? resourceKeyList(driver.applicableAuthModels) : CachedResourceListEmptyKey,
-  );
+  const applicableAuthModels = driver?.applicableAuthModels ?? [];
 
-  const { data: authModel } = useResource(
+  const authModelLoader = useResource(
     Options,
     DatabaseAuthModelsResource,
     getComputed(() => config.authModelId || info?.authModel || driver?.defaultAuthModel || null),
@@ -145,6 +130,22 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
       onData: data => optionsHook.setAuthModel(data),
     },
   );
+
+  const authModel = authModelLoader.data;
+
+  async function handleAuthModelSelect(id: string | undefined) {
+    if (!id) {
+      return;
+    }
+
+    const model = await authModelLoader.resource.load(id);
+
+    if (!model) {
+      return;
+    }
+
+    optionsHook.setAuthModel(model);
+  }
 
   const authentication = useAuthenticationAction({
     providerId: authModel?.requiredAuth ?? info?.requiredAuth ?? AUTH_PROVIDER_LOCAL_ID,
@@ -154,13 +155,19 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
   const edit = state.mode === 'edit';
   const originLocal = !info || isLocalConnection(info);
 
-  const availableAuthModels = applicableAuthModels.filter(model => !!model && (adminPermission || !model.requiresLocalConfiguration));
   const drivers = driverMap.resource.enabledDrivers.filter(({ id }) => availableDrivers.includes(id));
 
   let properties = authModel?.properties;
 
   if (info?.authProperties && info.authProperties.length > 0 && config.authModelId === info.authModel) {
     properties = info.authProperties;
+  }
+
+  const sharedCredentials = config.sharedCredentials && serverConfigResource.data?.distributed;
+
+  function openCredentialsTab(event: React.MouseEvent<HTMLAnchorElement>) {
+    event.preventDefault();
+    tabsState?.open(CONNECTION_FORM_SHARED_CREDENTIALS_TAB_ID);
   }
 
   return (
@@ -285,63 +292,52 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
           {!driver?.anonymousAccess && (authentication.authorized || !edit) && (
             <Group form gap>
               <GroupTitle>{translate('connections_connection_edit_authentication')}</GroupTitle>
-              {availableAuthModels.length > 1 && (
-                <Combobox
-                  name="authModelId"
+              {serverConfigResource.resource.distributed && connectionOptionsTabService.isProjectShared(state) && (
+                <FieldCheckbox
+                  id={config.connectionId + 'isShared'}
+                  name="sharedCredentials"
+                  title={translate('connections_connection_share_credentials_tooltip')}
                   state={config}
-                  items={availableAuthModels}
-                  keySelector={model => model!.id}
-                  valueSelector={model => model!.displayName}
-                  titleSelector={model => model?.description}
-                  searchable={availableAuthModels.length > 10}
-                  readOnly={readonly || !originLocal}
-                  disabled={disabled}
-                  tiny
-                  fill
-                  onSelect={handleAuthModelSelect}
-                />
+                  disabled={disabled || readonly}
+                  keepSize
+                >
+                  {translate('connections_connection_share_credentials')}
+                </FieldCheckbox>
               )}
-              {authModel && properties && (
-                <>
-                  <Container wrap gap hideEmpty>
-                    <ObjectPropertyInfoForm
-                      autofillToken={isSafari ? 'section-connection-authentication section-options' : 'new-password'}
-                      properties={properties}
-                      state={config.credentials}
-                      disabled={disabled}
-                      readOnly={readonly}
-                      showRememberTip
-                      hideEmptyPlaceholder
-                      tiny
-                    />
-                  </Container>
-                  {credentialsSavingEnabled && !config.template && (
-                    <Container wrap gap>
-                      <FieldCheckbox
-                        id={config.connectionId + 'authNeeded'}
-                        name="saveCredentials"
-                        state={config}
-                        disabled={disabled || readonly || config.sharedCredentials}
-                        mod={['primary']}
-                        keepSize
-                      >
-                        {translate('connections_connection_edit_save_credentials')}
-                      </FieldCheckbox>
-                      {serverConfigResource.resource.distributed && connectionOptionsTabService.isProjectShared(state) && (
-                        <FieldCheckbox
-                          id={config.connectionId + 'isShared'}
-                          name="sharedCredentials"
-                          title={translate('connections_connection_share_credentials_tooltip')}
-                          state={config}
-                          disabled={disabled || readonly}
-                          keepSize
-                        >
-                          {translate('connections_connection_share_credentials')}
-                        </FieldCheckbox>
-                      )}
-                    </Container>
-                  )}
-                </>
+              <ConnectionAuthModelSelector
+                authModelCredentialsState={config}
+                applicableAuthModels={applicableAuthModels}
+                readonlyAuthModelId={!originLocal}
+                readonly={readonly}
+                disabled={disabled}
+                onAuthModelChange={handleAuthModelSelect}
+              />
+              {!sharedCredentials ? (
+                <ConnectionAuthModelCredentialsForm
+                  credentials={config.credentials}
+                  properties={properties}
+                  readonly={readonly}
+                  disabled={disabled}
+                />
+              ) : (
+                <FormFieldDescription>
+                  {translate('plugin_connections_connection_form_shared_credentials_manage_info')}
+                  <Link inline onClick={openCredentialsTab}>
+                    {translate('plugin_connections_connection_form_shared_credentials_manage_info_tab_link')}
+                  </Link>
+                </FormFieldDescription>
+              )}
+              {!sharedCredentials && authModel && credentialsSavingEnabled && !config.template && (
+                <FieldCheckbox
+                  id={config.connectionId + 'authNeeded'}
+                  name="saveCredentials"
+                  state={config}
+                  disabled={disabled || readonly || config.sharedCredentials}
+                  mod={['primary']}
+                  keepSize
+                >
+                  {translate('connections_connection_edit_save_credentials')}
+                </FieldCheckbox>
               )}
             </Group>
           )}

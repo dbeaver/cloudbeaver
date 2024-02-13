@@ -23,7 +23,15 @@ export const ChangePassword = observer(function ChangePassword() {
     <Form context={form}>
       <Group form gap>
         <GroupTitle>{translate('plugin_user_profile_authentication_change_password')}</GroupTitle>
-        <InputField type="password" name="oldPassword" state={state.config} disabled={disabled} mapValue={value => value.trim()} small required>
+        <InputField
+          type="password"
+          name="oldPassword"
+          state={state.config}
+          disabled={disabled}
+          mapValue={(value: string) => value.trim()}
+          small
+          required
+        >
           {translate('plugin_user_profile_authentication_change_password_current_password')}
         </InputField>
         <InputField
@@ -32,17 +40,31 @@ export const ChangePassword = observer(function ChangePassword() {
           autoComplete="new-password"
           state={state.config}
           disabled={disabled}
-          mapValue={value => value.trim()}
+          mapValue={(value: string) => value.trim()}
           small
           required
         >
           {translate('plugin_user_profile_authentication_change_password_new_password')}
         </InputField>
-        <InputField type="password" name="repeatedPassword" state={state.config} disabled={disabled} mapValue={value => value.trim()} small required>
+        <InputField
+          type="password"
+          name="repeatedPassword"
+          state={state.config}
+          disabled={disabled}
+          mapValue={(value: string) => value.trim()}
+          small
+          required
+        >
           {translate('plugin_user_profile_authentication_change_password_repeat_password')}
         </InputField>
         <GroupItem>
-          <Button disabled={disabled || !state.formFilled} loading={state.submitting} type="button" mod={['unelevated']} onClick={() => form.submit()}>
+          <Button
+            disabled={disabled || !state.formFilled}
+            loading={state.submitting}
+            type="button"
+            mod={['unelevated']}
+            onClick={() => form.submit()}
+          >
             {translate('plugin_user_profile_authentication_change_password_submit_label')}
           </Button>
         </GroupItem>

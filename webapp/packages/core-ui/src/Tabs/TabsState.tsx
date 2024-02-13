@@ -13,7 +13,7 @@ import { useTabState } from 'reakit/Tab';
 import { useAutoLoad, useExecutor, useObjectRef, useObservableRef } from '@cloudbeaver/core-blocks';
 import { useDataContext } from '@cloudbeaver/core-data-context';
 import { Executor, ExecutorInterrupter } from '@cloudbeaver/core-executor';
-import { isDefined, isNull, isUndefined, MetadataMap, MetadataValueGetter } from '@cloudbeaver/core-utils';
+import { isDefined, isNotNullDefined, MetadataMap, MetadataValueGetter } from '@cloudbeaver/core-utils';
 
 import type { ITabData, ITabInfo, ITabsContainer } from './TabsContainer/ITabsContainer';
 import { ITabsContext, type TabDirection, TabsContext } from './TabsContext';
@@ -65,12 +65,6 @@ export const TabsState = observer(function TabsState<T = Record<string, any>>({
     displayed = tabList;
   }
 
-  if (!selectedId && (currentTabId === undefined || currentTabId === null) && autoSelect) {
-    if (displayed.length > 0) {
-      selectedId = displayed[0];
-    }
-  }
-
   const closable = !!onClose;
 
   const [localTabsState] = useState(() => new MetadataMap<string, any>());
@@ -86,7 +80,7 @@ export const TabsState = observer(function TabsState<T = Record<string, any>>({
 
   const dynamic = useObjectRef(
     () => ({
-      selectedId: selectedId || currentTabId,
+      selectedId: state.selectedId,
     }),
     {
       canClose,
@@ -100,28 +94,20 @@ export const TabsState = observer(function TabsState<T = Record<string, any>>({
     },
   );
 
-  if ((!isNull(currentTabId) && !isUndefined(currentTabId)) || !autoSelect) {
+  if (isNotNullDefined(currentTabId)) {
     state.selectedId = currentTabId;
-    dynamic.selectedId = currentTabId;
   }
 
-  if (
-    displayed.length > 0 &&
-    !isNull(dynamic.selectedId) &&
-    !isUndefined(dynamic.selectedId) &&
-    !isNull(selectedId) &&
-    !isUndefined(selectedId) &&
-    autoSelect
-  ) {
-    const tabExists = displayed.includes(dynamic.selectedId);
+  if (displayed.length > 0 && autoSelect) {
+    const tabExists = isNotNullDefined(state.selectedId) && displayed.includes(state.selectedId);
 
     if (!tabExists) {
-      if (displayed.includes(selectedId)) {
-        state.selectedId = selectedId;
-      } else {
-        state.selectedId = displayed[0];
-      }
+      state.selectedId = displayed[0];
     }
+  }
+
+  if (isNotNullDefined(currentTabId)) {
+    dynamic.selectedId = state.selectedId;
   }
 
   useExecutor({
@@ -134,7 +120,10 @@ export const TabsState = observer(function TabsState<T = Record<string, any>>({
           return;
         }
         dynamic.selectedId = data.tabId;
-        dynamic.state.setSelectedId(data.tabId);
+        if (dynamic.state.selectedId !== data.tabId) {
+          dynamic.state.setCurrentId(data.tabId);
+          dynamic.state.setSelectedId(data.tabId);
+        }
       },
     ],
   });
@@ -148,25 +137,18 @@ export const TabsState = observer(function TabsState<T = Record<string, any>>({
     ],
   });
 
+  const currentSelectedId = state.selectedId;
+
   useEffect(() => {
-    if ((!isNull(currentTabId) && !isUndefined(currentTabId)) || !autoSelect) {
+    if (!isNotNullDefined(currentSelectedId) || dynamic.selectedId === currentSelectedId) {
       return;
     }
 
     openExecutor.execute({
-      tabId: state.selectedId!,
+      tabId: currentSelectedId,
       props,
     });
-  }, [currentTabId, state.selectedId, autoSelect]);
-
-  useEffect(() => {
-    if (!isNull(state.selectedId) && !isUndefined(state.selectedId)) {
-      openExecutor.execute({
-        tabId: state.selectedId,
-        props,
-      });
-    }
-  }, [!isNull(state.selectedId) && !isUndefined(state.selectedId)]);
+  }, [currentSelectedId]);
 
   const value = useObservableRef<ITabsContext<T>>(
     () => ({

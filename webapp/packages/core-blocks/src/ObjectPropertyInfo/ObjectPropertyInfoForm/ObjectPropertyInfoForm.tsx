@@ -22,6 +22,7 @@ import { RenderField } from './RenderField';
 interface ObjectPropertyFormProps extends ILayoutSizeProps {
   properties: ObjectPropertyInfo[];
   state?: Record<string, any>;
+  defaultState?: Record<string, any>;
   category?: string | null;
   editable?: boolean;
   autofillToken?: string;
@@ -41,6 +42,7 @@ interface ObjectPropertyFormProps extends ILayoutSizeProps {
 export const ObjectPropertyInfoForm = observer<ObjectPropertyFormProps>(function ObjectPropertyInfoForm({
   properties,
   state,
+  defaultState,
   category,
   editable = true,
   className,
@@ -86,6 +88,7 @@ export const ObjectPropertyInfoForm = observer<ObjectPropertyFormProps>(function
             className={s(sizeStyles, { ...(geLayoutSize ? geLayoutSize(property) : layoutProps) }, className)}
             property={property}
             state={state}
+            defaultState={defaultState}
             editable={editable}
             autofillToken={autofillToken}
             disabled={disabled}

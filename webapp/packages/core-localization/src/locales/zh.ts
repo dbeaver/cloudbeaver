@@ -75,6 +75,7 @@ export default [
   ['ui_reconnect', '重新连接'],
   ['ui_forget', '忘记'],
   ['ui_set', '设置'],
+  ['ui_restore', 'Restore'],
   ['ui_are_you_sure', '您确定吗?'],
   ['ui_options', '选项'],
   ['ui_changes_might_be_lost', '您的更改可能会丢失'],
