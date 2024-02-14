@@ -9,13 +9,14 @@ import { useEffect } from 'react';
 
 import { ClientActivityService } from '@cloudbeaver/core-activity';
 import { useService } from '@cloudbeaver/core-di';
+import { throttle } from '@cloudbeaver/core-utils';
 
 export function useClientActivity() {
   const clientActivityService = useService(ClientActivityService);
 
-  function updateActivity() {
+  const updateActivity = throttle(() => {
     clientActivityService.updateActivity();
-  }
+  }, 300);
 
   function subscribeEvents() {
     document.addEventListener('mousemove', updateActivity);
