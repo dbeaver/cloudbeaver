@@ -88,6 +88,16 @@ export class SessionResource extends CachedDataResource<SessionState | null> {
     return session;
   }
 
+  async touchSession(): Promise<void> {
+    if (!this.data?.valid) {
+      return;
+    }
+
+    await this.graphQLService.sdk.touchSession();
+    const session = await this.loader();
+    this.setData(session);
+  }
+
   protected setData(data: SessionState | null) {
     if (!this.action) {
       this.action = data?.actionParameters;

@@ -5,20 +5,14 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import React from 'react';
-
-import { ClientActivityService } from '@cloudbeaver/core-activity';
 import { UserInfoResource } from '@cloudbeaver/core-authentication';
+import { importLazyComponent } from '@cloudbeaver/core-blocks';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { ServerConfigResource, SESSION_EXPIRE_WARN_IN_TIME, SessionExpireService, SessionResource } from '@cloudbeaver/core-root';
 import { GraphQLService } from '@cloudbeaver/core-sdk';
 
-const SessionExpireWarningDialog = React.lazy(async () => {
-  const { SessionExpireWarningDialog } = await import('./SessionExpireWarningDialog');
-  return { default: SessionExpireWarningDialog };
-});
-
+const SessionExpireWarningDialogLoader = importLazyComponent(() => import('./SessionExpireWarningDialog').then(m => m.SessionExpireWarningDialog));
 @injectable()
 export class SessionExpireWarningDialogBootstrap extends Bootstrap {
   private dialogInternalPromise: Promise<DialogueStateResult | null> | null;
@@ -29,7 +23,6 @@ export class SessionExpireWarningDialogBootstrap extends Bootstrap {
     private readonly sessionResource: SessionResource,
     private readonly userInfoResource: UserInfoResource,
     private readonly graphQLService: GraphQLService,
-    private readonly clientActivityService: ClientActivityService,
   ) {
     super();
     this.dialogInternalPromise = null;
@@ -71,9 +64,7 @@ export class SessionExpireWarningDialogBootstrap extends Bootstrap {
 
   private async open(): Promise<void> {
     if (!this.dialogInternalPromise) {
-      this.dialogInternalPromise = this.commonDialogService.open(SessionExpireWarningDialog, {
-        onButtonClick: () => this.clientActivityService.updateActivity(),
-      });
+      this.dialogInternalPromise = this.commonDialogService.open(SessionExpireWarningDialogLoader, null);
       await this.dialogInternalPromise;
       this.dialogInternalPromise = null;
 
@@ -81,7 +72,7 @@ export class SessionExpireWarningDialogBootstrap extends Bootstrap {
         const { sessionState } = await this.graphQLService.sdk.sessionState();
 
         if (sessionState.valid) {
-          this.clientActivityService.updateActivity();
+          this.sessionExpireService.touchSession(true);
         } else {
           this.sessionExpireService.sessionExpired();
         }

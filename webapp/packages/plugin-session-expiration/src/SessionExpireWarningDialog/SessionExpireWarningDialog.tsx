@@ -20,18 +20,9 @@ import {
 import type { DialogComponent } from '@cloudbeaver/core-dialogs';
 import { ServerNodeChangedDialogStyles } from '@cloudbeaver/plugin-root';
 
-interface Payload {
-  onButtonClick: VoidFunction;
-}
-
-export const SessionExpireWarningDialog: DialogComponent<Payload, null> = observer(function SessionExpireWarningDialog({ rejectDialog, payload }) {
+export const SessionExpireWarningDialog: DialogComponent<null, null> = observer(function SessionExpireWarningDialog({ rejectDialog }) {
   const translate = useTranslate();
   const styles = useS(ServerNodeChangedDialogStyles);
-
-  function onContinueClick() {
-    payload.onButtonClick();
-    rejectDialog();
-  }
 
   return (
     <CommonDialogWrapper size="small" fixedSize>
@@ -40,7 +31,7 @@ export const SessionExpireWarningDialog: DialogComponent<Payload, null> = observ
         <p className={s(styles, { text: true })}>{translate('app_root_session_expire_warning_message')}</p>
       </CommonDialogBody>
       <CommonDialogFooter className={s(styles, { footer: true })}>
-        <Button type="button" mod={['unelevated']} onClick={onContinueClick}>
+        <Button type="button" mod={['unelevated']} onClick={rejectDialog}>
           {translate('app_root_session_expire_warning_button')}
         </Button>
       </CommonDialogFooter>
