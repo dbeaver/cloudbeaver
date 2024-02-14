@@ -16,7 +16,7 @@ const UPDATE_THROTTLE = 300;
 export function useClientActivity() {
   const clientActivityService = useService(ClientActivityService);
 
-  const updateActivity = throttle(() => {
+  const updateActivity = throttle(function updateActivity() {
     clientActivityService.updateActivity();
   }, UPDATE_THROTTLE);
 
