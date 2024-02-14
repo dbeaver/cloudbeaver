@@ -11,12 +11,14 @@ import { ClientActivityService } from '@cloudbeaver/core-activity';
 import { useService } from '@cloudbeaver/core-di';
 import { throttle } from '@cloudbeaver/core-utils';
 
+const UPDATE_THROTTLE = 300;
+
 export function useClientActivity() {
   const clientActivityService = useService(ClientActivityService);
 
   const updateActivity = throttle(() => {
     clientActivityService.updateActivity();
-  }, 300);
+  }, UPDATE_THROTTLE);
 
   function subscribeEvents() {
     document.addEventListener('mousemove', updateActivity);

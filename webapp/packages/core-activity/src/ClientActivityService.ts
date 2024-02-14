@@ -46,7 +46,7 @@ export class ClientActivityService {
     }
   }
 
-  async updateActivity() {
+  updateActivity() {
     this.setActivity(true);
 
     if (this.timer) {

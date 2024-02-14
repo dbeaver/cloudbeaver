@@ -28,8 +28,12 @@ export class SessionExpireService extends Bootstrap {
     private readonly sessionResource: SessionResource,
   ) {
     super();
+
+    this.touchSession = this.touchSession.bind(this);
+    this.sessionExpired = this.sessionExpired.bind(this);
+
     this.onSessionExpire = new Executor();
-    this.clientActivityService.onActiveStateChange.addHandler(this.touchSession.bind(this));
+    this.clientActivityService.onActiveStateChange.addHandler(this.touchSession);
   }
 
   register(): void {
@@ -49,7 +53,7 @@ export class SessionExpireService extends Bootstrap {
     this.onSessionExpire.execute();
   }
 
-  async touchSession(force?: boolean): Promise<void> {
+  touchSession(force?: boolean): void {
     if (this.touchSessionTimer || !this.clientActivityService.isActive || !force) {
       return;
     }
