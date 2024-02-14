@@ -9,6 +9,7 @@ export * from './FeaturesResource';
 export * from './NetworkError';
 export * from './NetworkStateService';
 export * from './SessionPermissionsResource';
+export * from './SessionExpireSource';
 export * from './PermissionsService';
 export * from './ServerConfigResource';
 export * from './SessionEventSource';

@@ -9,7 +9,13 @@ import { UserInfoResource } from '@cloudbeaver/core-authentication';
 import { importLazyComponent } from '@cloudbeaver/core-blocks';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
-import { ServerConfigResource, SESSION_EXPIRE_WARN_IN_TIME, SessionExpireService, SessionResource } from '@cloudbeaver/core-root';
+import {
+  ServerConfigResource,
+  SESSION_EXPIRE_WARN_IN_TIME,
+  SessionExpireService,
+  SessionExpireSource,
+  SessionResource,
+} from '@cloudbeaver/core-root';
 import { GraphQLService } from '@cloudbeaver/core-sdk';
 
 const SessionExpireWarningDialogLoader = importLazyComponent(() => import('./SessionExpireWarningDialog').then(m => m.SessionExpireWarningDialog));
@@ -19,6 +25,7 @@ export class SessionExpireWarningDialogBootstrap extends Bootstrap {
   constructor(
     private readonly commonDialogService: CommonDialogService,
     private readonly sessionExpireService: SessionExpireService,
+    private readonly sessionExpireSource: SessionExpireSource,
     private readonly serverConfigResource: ServerConfigResource,
     private readonly sessionResource: SessionResource,
     private readonly userInfoResource: UserInfoResource,
@@ -50,7 +57,7 @@ export class SessionExpireWarningDialogBootstrap extends Bootstrap {
 
     const sessionDuration = this.serverConfigResource.data?.sessionExpireTime;
 
-    if (this.sessionExpireService.expired || !sessionDuration || sessionDuration < SESSION_EXPIRE_WARN_IN_TIME) {
+    if (this.sessionExpireSource.expired || !sessionDuration || sessionDuration < SESSION_EXPIRE_WARN_IN_TIME) {
       this.close();
       return;
     }
@@ -68,11 +75,12 @@ export class SessionExpireWarningDialogBootstrap extends Bootstrap {
       await this.dialogInternalPromise;
       this.dialogInternalPromise = null;
 
-      if (!this.sessionExpireService.expired) {
+      if (!this.sessionExpireSource.expired) {
         const { sessionState } = await this.graphQLService.sdk.sessionState();
 
         if (sessionState.valid) {
-          this.sessionExpireService.touchSession(true);
+          await this.sessionExpireService.touchSession(true);
+          await this.sessionResource.refreshSilent();
         } else {
           this.sessionExpireService.sessionExpired();
         }

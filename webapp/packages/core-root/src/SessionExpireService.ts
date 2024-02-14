@@ -11,6 +11,7 @@ import { Executor, IExecutor } from '@cloudbeaver/core-executor';
 import { EServerErrorCode, GQLError, GraphQLService, SessionError } from '@cloudbeaver/core-sdk';
 import { errorOf } from '@cloudbeaver/core-utils';
 
+import { SessionExpireSource } from './SessionExpireSource';
 import { SessionResource } from './SessionResource';
 
 export const SESSION_EXPIRE_WARN_IN_TIME = 5 * 1000 * 60;
@@ -18,7 +19,6 @@ export const SESSION_TOUCH_TIME_PERIOD = 1000 * 60;
 
 @injectable()
 export class SessionExpireService extends Bootstrap {
-  expired = false;
   private touchSessionTimer: ReturnType<typeof setTimeout> | null = null;
 
   onSessionExpire: IExecutor;
@@ -26,6 +26,7 @@ export class SessionExpireService extends Bootstrap {
     private readonly graphQLService: GraphQLService,
     private readonly clientActivityService: ClientActivityService,
     private readonly sessionResource: SessionResource,
+    private readonly sessionExpireSource: SessionExpireSource,
   ) {
     super();
 
@@ -43,22 +44,22 @@ export class SessionExpireService extends Bootstrap {
   load(): void {}
 
   sessionExpired(): void {
-    if (this.expired) {
+    if (this.sessionExpireSource.expired) {
       return;
     }
 
     const e = new SessionError('Session expired');
     this.graphQLService.blockRequests(e);
-    this.expired = true;
+    this.sessionExpireSource.setExpired(true);
     this.onSessionExpire.execute();
   }
 
-  touchSession(force?: boolean): void {
+  async touchSession(force?: boolean) {
     if (this.touchSessionTimer || !this.clientActivityService.isActive || !force) {
       return;
     }
 
-    this.sessionResource.touchSession();
+    await this.sessionResource.touchSession();
 
     this.touchSessionTimer = setTimeout(() => {
       if (this.touchSessionTimer) {
