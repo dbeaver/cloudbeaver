@@ -7,9 +7,6 @@
   },
   "references": [
     {
-      "path": "../core-activity/tsconfig.json"
-    },
-    {
       "path": "../core-authentication/tsconfig.json"
     },
     {
