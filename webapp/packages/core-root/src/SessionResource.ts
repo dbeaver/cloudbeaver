@@ -95,12 +95,12 @@ export class SessionResource extends CachedDataResource<SessionState | null> {
     return session;
   }
 
-  async touchSession(): Promise<void> {
+  async touchSession() {
     if (!this.data?.valid) {
       return;
     }
 
-    await this.graphQLService.sdk.touchSession();
+    return this.graphQLService.sdk.touchSession();
   }
 
   protected setData(data: SessionState | null) {
