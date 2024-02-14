@@ -80,7 +80,6 @@ export class SessionExpireWarningDialogBootstrap extends Bootstrap {
 
         if (sessionState.valid) {
           await this.sessionExpireService.touchSession(true);
-          await this.sessionResource.refreshSilent();
         } else {
           this.sessionExpireService.sessionExpired();
         }

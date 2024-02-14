@@ -68,13 +68,6 @@ export class SessionResource extends CachedDataResource<SessionState | null> {
     this.defaultLocale = defaultLocale;
   }
 
-  //! this method results in onDataUpdate handler skipping
-  async refreshSilent(): Promise<void> {
-    const session = await this.loader();
-
-    this.setData(session);
-  }
-
   async changeLanguage(locale: string): Promise<void> {
     if (this.data?.locale === locale) {
       return;
@@ -100,7 +93,16 @@ export class SessionResource extends CachedDataResource<SessionState | null> {
       return;
     }
 
-    return this.graphQLService.sdk.touchSession();
+    const valid = await this.graphQLService.sdk.touchSession();
+
+    if (!valid) {
+      this.setData({
+        ...this.data,
+        valid,
+      });
+    }
+
+    return valid;
   }
 
   protected setData(data: SessionState | null) {
