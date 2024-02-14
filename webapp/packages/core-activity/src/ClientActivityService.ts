@@ -9,18 +9,17 @@ import { makeObservable, observable } from 'mobx';
 
 import { injectable } from '@cloudbeaver/core-di';
 import { Executor, IExecutor } from '@cloudbeaver/core-executor';
-import { SessionResource } from '@cloudbeaver/core-root';
 
 const INACTIVE_PERIOD_TIME = 1000 * 60;
 
 @injectable()
 export class ClientActivityService {
-  private timer: NodeJS.Timeout | null;
+  private timer: ReturnType<typeof setTimeout> | null;
   public isActive: boolean;
   public onActiveStateChange: IExecutor<boolean>;
 
-  constructor(private readonly sessionResource: SessionResource) {
-    this.setActivity.bind(this);
+  constructor() {
+    this.setActivity = this.setActivity.bind(this);
     this.updateActivity = this.updateActivity.bind(this);
     this.resetActivity = this.resetActivity.bind(this);
 
@@ -49,7 +48,6 @@ export class ClientActivityService {
 
   async updateActivity() {
     this.setActivity(true);
-    this.sessionResource.touchSession();
 
     if (this.timer) {
       clearTimeout(this.timer);

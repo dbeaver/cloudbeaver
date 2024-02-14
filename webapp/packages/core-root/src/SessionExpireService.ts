@@ -5,20 +5,25 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
+import { ClientActivityService } from '@cloudbeaver/core-activity';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { Executor, IExecutor } from '@cloudbeaver/core-executor';
 import { EServerErrorCode, GQLError, GraphQLService, SessionError } from '@cloudbeaver/core-sdk';
 import { errorOf } from '@cloudbeaver/core-utils';
 
 export const SESSION_EXPIRE_WARN_IN_TIME = 5 * 1000 * 60;
+export const SESSION_TOUCH_TIME_PERIOD = 1000 * 60;
+
 @injectable()
 export class SessionExpireService extends Bootstrap {
   expired = false;
+  private touchSessionTimer: ReturnType<typeof setTimeout> | null = null;
 
   onSessionExpire: IExecutor;
-  constructor(private readonly graphQLService: GraphQLService) {
+  constructor(private readonly graphQLService: GraphQLService, private readonly clientActivityService: ClientActivityService) {
     super();
     this.onSessionExpire = new Executor();
+    this.clientActivityService.onActiveStateChange.addHandler(this.touchSession.bind(this));
   }
 
   register(): void {
@@ -36,6 +41,22 @@ export class SessionExpireService extends Bootstrap {
     this.graphQLService.blockRequests(e);
     this.expired = true;
     this.onSessionExpire.execute();
+  }
+
+  async touchSession(): Promise<void> {
+    if (this.touchSessionTimer || !this.clientActivityService.isActive) {
+      return;
+    }
+
+    this.clientActivityService.updateActivity();
+    this.graphQLService.sdk.touchSession(); // TODO move to SessionResource? check if valid?
+
+    this.touchSessionTimer = setTimeout(() => {
+      if (this.touchSessionTimer) {
+        clearTimeout(this.touchSessionTimer);
+        this.touchSessionTimer = null;
+      }
+    }, SESSION_TOUCH_TIME_PERIOD);
   }
 
   private async sessionExpiredInterceptor(request: Promise<any>): Promise<any> {
