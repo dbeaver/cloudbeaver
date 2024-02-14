@@ -32,10 +32,10 @@ export class ClientActivityService {
     });
   }
 
-  private setActivity = (value: boolean) => {
+  private setActivity(value: boolean) {
     this.isActive = value;
     this.onActiveStateChange.execute(value);
-  };
+  }
 
   resetActivity() {
     this.setActivity(false);
