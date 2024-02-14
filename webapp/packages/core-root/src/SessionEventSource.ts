@@ -21,7 +21,7 @@ import {
 
 import { NetworkStateService } from './NetworkStateService';
 import type { IBaseServerEvent, IServerEventCallback, IServerEventEmitter, Subscription } from './ServerEventEmitter/IServerEventEmitter';
-import { SessionExpireSource } from './SessionExpireSource';
+import { SessionExpireService } from './SessionExpireService';
 
 export { ServerEventId, SessionEventTopic, ClientEventId };
 
@@ -55,7 +55,7 @@ export class SessionEventSource implements IServerEventEmitter<ISessionEvent, IS
 
   constructor(
     private readonly networkStateService: NetworkStateService,
-    private readonly sessionExpireSource: SessionExpireSource,
+    private readonly sessionExpireService: SessionExpireService,
     private readonly environmentService: EnvironmentService,
     private readonly graphQLService: GraphQLService,
   ) {
@@ -66,7 +66,7 @@ export class SessionEventSource implements IServerEventEmitter<ISessionEvent, IS
     this.errorSubject = new Subject();
     this.disconnected = false;
     this.retryTimer = interval(RETRY_INTERVAL).pipe(
-      filter(() => !this.sessionExpireSource.expired && networkStateService.state && !this.disconnected),
+      filter(() => !this.sessionExpireService.expired && networkStateService.state && !this.disconnected),
     );
     this.subject = webSocket({
       url: environmentService.wsEndpoint,

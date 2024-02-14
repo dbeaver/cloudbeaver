@@ -22,7 +22,6 @@ import { SessionDataResource } from './SessionDataResource';
 import { SessionEventSource } from './SessionEventSource';
 import { SessionExpireEventService } from './SessionExpireEventService';
 import { SessionExpireService } from './SessionExpireService';
-import { SessionExpireSource } from './SessionExpireSource';
 import { SessionInfoEventHandler } from './SessionInfoEventHandler';
 import { SessionPermissionEventHandler } from './SessionPermissionEventHandler';
 import { SessionPermissionsResource } from './SessionPermissionsResource';
@@ -47,7 +46,6 @@ export const coreRootManifest: PluginManifest = {
     SessionExpireService,
     SessionExpireEventService,
     ServerNodeService,
-    SessionExpireSource,
     SessionResource,
     SessionSettingsService,
     WindowEventsService,
