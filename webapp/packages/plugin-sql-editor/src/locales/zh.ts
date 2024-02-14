@@ -1,5 +1,7 @@
 export default [
   ['plugin_sql_editor_sql_editor_settings_group', 'SQL Editor'],
+  ['sql_editor_settings_insert_table_aliases_name', 'Insert table aliases (in FROM clause)'],
+  ['sql_editor_settings_insert_table_aliases_desc', 'Automatically inserts table aliases'],
   ['sql_editor_menu', 'SQL编辑器'],
   ['sql_editor_script_editor', 'SQL Editor'],
   ['sql_editor_alias_loading_error', 'Error occurred while loading node alias'],

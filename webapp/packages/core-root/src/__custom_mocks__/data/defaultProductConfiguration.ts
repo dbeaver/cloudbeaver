@@ -30,4 +30,5 @@ export const defaultProductConfiguration: Record<string, any> = {
   plugin_data_spreadsheet_new: {
     hidden: false,
   },
+  'sql.proposals.insert.table.alias': true,
 };

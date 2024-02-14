@@ -19,6 +19,11 @@ package io.cloudbeaver.service.sql;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.data.DBDAttributeBinding;
 import org.jkiss.dbeaver.model.meta.Property;
+import org.jkiss.utils.Pair;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Web SQL query resultset.
@@ -28,11 +33,14 @@ public class WebSQLQueryResultSet {
     private static final Log log = Log.getLog(WebSQLQueryResultSet.class);
 
     private WebSQLQueryResultColumn[] columns;
-    private Object[][] rows;
+    private List<WebSQLQueryResultSetRow> rows;
     private boolean hasMoreData;
     private WebSQLResultsInfo resultsInfo;
     private boolean singleEntity = true;
     private boolean hasRowIdentifier;
+
+    private boolean hasChildrenCollection;
+    private boolean isSupportsDataFilter;
 
     public WebSQLQueryResultSet() {
     }
@@ -60,11 +68,17 @@ public class WebSQLQueryResultSet {
     }
 
     @Property
+    @Deprecated
     public Object[][] getRows() {
+        return rows.stream().map(WebSQLQueryResultSetRow::getData).toArray(x -> new Object[x][1]);
+    }
+
+    @Property
+    public List<WebSQLQueryResultSetRow> getRowsWithMetaData() {
         return rows;
     }
 
-    public void setRows(Object[][] rows) {
+    public void setRows(List<WebSQLQueryResultSetRow> rows) {
         this.rows = rows;
     }
 
@@ -101,5 +115,23 @@ public class WebSQLQueryResultSet {
 
     public void setHasRowIdentifier(boolean hasRowIdentifier) {
         this.hasRowIdentifier = hasRowIdentifier;
+    }
+
+    @Property
+    public boolean isHasChildrenCollection() {
+        return hasChildrenCollection;
+    }
+
+    public void setHasChildrenCollection(boolean hasSuCollection) {
+        this.hasChildrenCollection = hasSuCollection;
+    }
+
+    @Property
+    public boolean isSupportsDataFilter() {
+        return isSupportsDataFilter;
+    }
+
+    public void setSupportsDataFilter(boolean supportsDataFilter) {
+        isSupportsDataFilter = supportsDataFilter;
     }
 }

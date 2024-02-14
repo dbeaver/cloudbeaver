@@ -43,6 +43,7 @@ export * from './DatabaseDataModel/Actions/IDatabaseDataFormatAction';
 export * from './DatabaseDataModel/Actions/IDatabaseDataMetadataAction';
 export * from './DatabaseDataModel/Actions/IDatabaseDataResultAction';
 export * from './DatabaseDataModel/Actions/IDatabaseDataSelectAction';
+export * from './DatabaseDataModel/Actions/ResultSet/ResultSetCacheAction';
 export * from './DatabaseDataModel/DatabaseDataAction';
 export * from './DatabaseDataModel/DatabaseDataActions';
 export * from './DatabaseDataModel/DatabaseDataFormat';
