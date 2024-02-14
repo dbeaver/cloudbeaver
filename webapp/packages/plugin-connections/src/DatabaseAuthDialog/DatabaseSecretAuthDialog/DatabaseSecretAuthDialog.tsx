@@ -11,18 +11,15 @@ import { observer } from 'mobx-react-lite';
 import {
   CommonDialogBody,
   CommonDialogFooter,
-  ErrorMessage,
+  ExceptionMessage,
+  Group,
   ItemList,
   ListItem,
   ListItemName,
   Loader,
-  s,
-  useErrorDetails,
-  useFocus,
   useObservableRef,
   useResource,
   useS,
-  useTranslate,
 } from '@cloudbeaver/core-blocks';
 import { ConnectionInfoResource, type IConnectionInfoParams } from '@cloudbeaver/core-connections';
 
@@ -35,8 +32,6 @@ interface Props {
 
 export const DatabaseSecretAuthDialog = observer<Props>(function DatabaseSecretAuthDialog({ connectionKey, onLogin }) {
   const styles = useS(style);
-  const translate = useTranslate();
-  const [focusedRef] = useFocus<HTMLDivElement>({ focusFirstChild: true });
   const connectionInfoLoader = useResource(DatabaseSecretAuthDialog, ConnectionInfoResource, {
     key: connectionKey,
     includes: ['includeAuthNeeded', 'includeSharedSecrets', 'includeNetworkHandlersConfig', 'includeCredentialsSaved'],
@@ -52,7 +47,6 @@ export const DatabaseSecretAuthDialog = observer<Props>(function DatabaseSecretA
     },
     false,
   );
-  const errorDetails = useErrorDetails(state.exception);
   const secrets = connectionInfoLoader.data?.sharedSecrets || [];
 
   async function handleSecretSelect(secretId: string) {
@@ -62,6 +56,7 @@ export const DatabaseSecretAuthDialog = observer<Props>(function DatabaseSecretA
         ...connectionKey,
         selectedSecretId: secretId,
       });
+      state.exception = null;
       onLogin?.();
     } catch (exception: any) {
       state.exception = exception;
@@ -76,26 +71,19 @@ export const DatabaseSecretAuthDialog = observer<Props>(function DatabaseSecretA
 
   return (
     <>
-      <CommonDialogBody>
-        <div ref={focusedRef} className={s(styles, { wrapper: true })}>
-          <ItemList>
-            {secrets.map(secret => (
-              <ListItem key={secret.secretId} onClick={() => handleSecretSelect(secret.secretId)}>
-                <ListItemName>{secret.displayName}</ListItemName>
-              </ListItem>
-            ))}
-          </ItemList>
-        </div>
+      <CommonDialogBody noBodyPadding>
+        <ItemList>
+          {secrets.map(secret => (
+            <ListItem key={secret.secretId} onClick={() => handleSecretSelect(secret.secretId)}>
+              <ListItemName>{secret.displayName}</ListItemName>
+            </ListItem>
+          ))}
+        </ItemList>
       </CommonDialogBody>
       <CommonDialogFooter>
-        {errorDetails.error && (
-          <ErrorMessage
-            text={errorDetails.message ?? translate('core_blocks_exception_message_error_message')}
-            hasDetails={errorDetails.hasDetails}
-            className={style.errorMessage}
-            onShowDetails={errorDetails.open}
-          />
-        )}
+        <Group className={styles.errorMessageGroup} secondary vertical dense>
+          <ExceptionMessage exception={state.exception} inline />
+        </Group>
       </CommonDialogFooter>
     </>
   );

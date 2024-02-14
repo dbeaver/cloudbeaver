@@ -100,6 +100,9 @@ export const InputFieldBase = observer<InputFieldBaseProps, HTMLInputElement>(
     }
 
     uncontrolled ||= value === undefined;
+    if (!value) {
+      canShowPassword = false;
+    }
 
     useLayoutEffect(() => {
       if (uncontrolled && isNotNullDefined(value) && inputRef.current) {

@@ -190,7 +190,7 @@ export class ConnectionMenuBootstrap extends Bootstrap {
         }
 
         if (action === ACTION_CONNECTION_CHANGE_CREDENTIALS) {
-          return this.serverConfigResource.distributed;
+          return this.serverConfigResource.distributed && !connection.sharedCredentials;
         }
 
         return false;

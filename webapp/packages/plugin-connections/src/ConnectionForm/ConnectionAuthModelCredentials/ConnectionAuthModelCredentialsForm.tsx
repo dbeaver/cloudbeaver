@@ -33,7 +33,7 @@ export const ConnectionAuthModelCredentialsForm = observer<Props>(function Conne
   return (
     <Container wrap gap hideEmpty>
       <ObjectPropertyInfoForm
-        autofillToken={isSafari ? 'section-connection-authentication section-options' : 'new-password'}
+        autofillToken={isSafari ? 'section-connection-authentication section-secrets' : 'new-password'}
         properties={properties}
         state={credentials}
         defaultState={defaultCredentials}

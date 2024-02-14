@@ -77,20 +77,13 @@ export class ConnectionAuthService extends Dependency {
       }
     }
 
-    connection = await this.connectionInfoResource.load(key, [
-      'includeAuthNeeded',
-      'includeSharedSecrets',
-      'includeNetworkHandlersConfig',
-      'includeCredentialsSaved',
-    ]);
-
-    const sharedSecrets = connection.sharedSecrets || [];
+    connection = await this.connectionInfoResource.load(key, ['includeAuthNeeded', 'includeNetworkHandlersConfig', 'includeCredentialsSaved']);
 
     const networkHandlers = connection
       .networkHandlersConfig!.filter(handler => handler.enabled && (!handler.savePassword || resetCredentials))
       .map(handler => handler.id);
 
-    if (connection.authNeeded || (connection.credentialsSaved && resetCredentials) || networkHandlers.length > 0 || sharedSecrets.length > 1) {
+    if (connection.authNeeded || (connection.credentialsSaved && resetCredentials) || networkHandlers.length > 0) {
       const result = await this.commonDialogService.open(DatabaseAuthDialog, {
         connection: key,
         networkHandlers,
