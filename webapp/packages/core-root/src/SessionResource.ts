@@ -25,7 +25,7 @@ interface SessionStateData {
   remainingTime: number;
 }
 
-const SESSION_TOUCH_TIME_PERIOD = 1000 * 60;
+export const SESSION_TOUCH_TIME_PERIOD = 1000 * 60;
 
 @injectable()
 export class SessionResource extends CachedDataResource<SessionState | null> {

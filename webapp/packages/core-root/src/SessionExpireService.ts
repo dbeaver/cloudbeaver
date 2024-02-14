@@ -9,6 +9,8 @@ import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { Executor, IExecutor } from '@cloudbeaver/core-executor';
 import { EServerErrorCode, GQLError, GraphQLService, SessionError } from '@cloudbeaver/core-sdk';
 import { errorOf } from '@cloudbeaver/core-utils';
+
+export const SESSION_EXPIRE_WARN_IN_TIME = 5 * 1000 * 60;
 @injectable()
 export class SessionExpireService extends Bootstrap {
   expired = false;

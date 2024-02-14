@@ -11,15 +11,13 @@ import { ClientActivityService } from '@cloudbeaver/core-activity';
 import { UserInfoResource } from '@cloudbeaver/core-authentication';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
-import { ServerConfigResource, SessionExpireService, SessionResource } from '@cloudbeaver/core-root';
+import { ServerConfigResource, SESSION_EXPIRE_WARN_IN_TIME, SessionExpireService, SessionResource } from '@cloudbeaver/core-root';
 import { GraphQLService } from '@cloudbeaver/core-sdk';
 
 const SessionExpireWarningDialog = React.lazy(async () => {
   const { SessionExpireWarningDialog } = await import('./SessionExpireWarningDialog');
   return { default: SessionExpireWarningDialog };
 });
-
-const WARN_IN = 5 * 1000 * 60;
 
 @injectable()
 export class SessionExpireWarningDialogBootstrap extends Bootstrap {
@@ -59,12 +57,12 @@ export class SessionExpireWarningDialogBootstrap extends Bootstrap {
 
     const sessionDuration = this.serverConfigResource.data?.sessionExpireTime;
 
-    if (this.sessionExpireService.expired || !sessionDuration || sessionDuration < WARN_IN) {
+    if (this.sessionExpireService.expired || !sessionDuration || sessionDuration < SESSION_EXPIRE_WARN_IN_TIME) {
       this.close();
       return;
     }
 
-    if (remainingTime !== undefined && remainingTime <= WARN_IN) {
+    if (remainingTime !== undefined && remainingTime <= SESSION_EXPIRE_WARN_IN_TIME) {
       this.open();
     } else {
       this.close();
