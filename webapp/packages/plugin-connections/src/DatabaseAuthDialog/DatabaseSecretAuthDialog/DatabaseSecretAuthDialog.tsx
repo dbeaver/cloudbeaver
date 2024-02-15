@@ -20,6 +20,7 @@ import {
   useObservableRef,
   useResource,
   useS,
+  useTranslate,
 } from '@cloudbeaver/core-blocks';
 import { ConnectionInfoResource, type IConnectionInfoParams } from '@cloudbeaver/core-connections';
 
@@ -32,6 +33,7 @@ interface Props {
 
 export const DatabaseSecretAuthDialog = observer<Props>(function DatabaseSecretAuthDialog({ connectionKey, onLogin }) {
   const styles = useS(style);
+  const translate = useTranslate();
   const connectionInfoLoader = useResource(DatabaseSecretAuthDialog, ConnectionInfoResource, {
     key: connectionKey,
     includes: ['includeAuthNeeded', 'includeSharedSecrets', 'includeNetworkHandlersConfig', 'includeCredentialsSaved'],
@@ -82,6 +84,7 @@ export const DatabaseSecretAuthDialog = observer<Props>(function DatabaseSecretA
       </CommonDialogBody>
       <CommonDialogFooter>
         <Group className={styles.errorMessageGroup} secondary vertical dense>
+          {!state.exception && translate('plugin_connections_connection_auth_secret_description')}
           <ExceptionMessage exception={state.exception} inline />
         </Group>
       </CommonDialogFooter>

@@ -325,7 +325,7 @@ export class ConnectionOptionsTabService extends Bootstrap {
         tempConfig.credentials = this.getTrimmedPropertiesConfig(properties, { ...state.config.credentials });
       }
 
-      if (!tempConfig.saveCredentials) {
+      if (!tempConfig.saveCredentials && !tempConfig.sharedCredentials) {
         credentialsState.requireAuthModel(tempConfig.authModelId);
       }
     }

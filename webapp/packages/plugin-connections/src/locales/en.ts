@@ -23,4 +23,5 @@ export default [
 
   ['plugin_connections_connection_form_shared_credentials_manage_info', 'You can manage credentials in the '],
   ['plugin_connections_connection_form_shared_credentials_manage_info_tab_link', 'Credentials tab'],
+  ['plugin_connections_connection_auth_secret_description', 'Please select credentials provided by one of your teams'],
 ];

@@ -108,16 +108,6 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
     if (config.template) {
       config.folder = undefined;
     }
-
-    if (name === 'sharedCredentials' && value) {
-      config.saveCredentials = true;
-
-      for (const handler of config.networkHandlersConfig ?? []) {
-        if (!handler.savePassword) {
-          handler.savePassword = true;
-        }
-      }
-    }
   }
 
   const applicableAuthModels = driver?.applicableAuthModels ?? [];
