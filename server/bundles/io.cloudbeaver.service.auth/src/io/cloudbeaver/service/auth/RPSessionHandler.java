@@ -95,7 +95,7 @@ public class RPSessionHandler implements DBWSessionHandler {
         String firstName = request.getHeader(resolveParam(paramConfigMap.get(RPConstants.PARAM_FIRST_NAME), RPAuthProvider.X_FIRST_NAME));
         String lastName = request.getHeader(resolveParam(paramConfigMap.get(RPConstants.PARAM_LAST_NAME), RPAuthProvider.X_LAST_NAME));
         String logoutUrl = Objects.requireNonNull(configuration).getParameter(RPConstants.PARAM_LOGOUT_URL);
-        List<String> userTeams = teams == null ? Collections.emptyList() : List.of(teams.split("\\|"));
+        List<String> userTeams = teams == null ? Collections.emptyList() : List.of(teams.split(","));
         if (userName != null) {
             try {
                 Map<String, Object> credentials = new HashMap<>();
