@@ -87,9 +87,10 @@ public class RPSessionHandler implements DBWSessionHandler {
             resolveParam(paramConfigMap.get(RPConstants.PARAM_USER), RPAuthProvider.X_USER)
         );
         String teams = request.getHeader(resolveParam(paramConfigMap.get(RPConstants.PARAM_TEAM), RPAuthProvider.X_TEAM));
-        if (CommonUtils.isEmpty(teams)) {
-            // backward compatibility
-            teams = request.getHeader(RPAuthProvider.X_ROLE);
+        // backward compatibility
+        String deprecatedRoles = request.getHeader(RPAuthProvider.X_ROLE);
+        if (CommonUtils.isEmpty(teams) && CommonUtils.isNotEmpty(deprecatedRoles)) {
+            teams = deprecatedRoles;
         }
         String role = request.getHeader(resolveParam(paramConfigMap.get(RPConstants.PARAM_ROLE_NAME), RPAuthProvider.X_ROLE_TE));
         String firstName = request.getHeader(resolveParam(paramConfigMap.get(RPConstants.PARAM_FIRST_NAME), RPAuthProvider.X_FIRST_NAME));
