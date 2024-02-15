@@ -136,6 +136,7 @@ export class ConnectionSSLTabService extends Bootstrap {
 
     const initial = state.info?.networkHandlersConfig?.find(h => h.id === handler.id);
     const handlerConfig: NetworkHandlerConfigInput = toJS(handler);
+    handlerConfig.savePassword = handler.savePassword || config.sharedCredentials;
 
     const changed = this.isChanged(handlerConfig, initial);
 
