@@ -7,7 +7,7 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import { CommonDialogHeader, CommonDialogWrapper, useResource } from '@cloudbeaver/core-blocks';
+import { CommonDialogHeader, CommonDialogWrapper, useResource, useTranslate } from '@cloudbeaver/core-blocks';
 import { ConnectionInfoResource, DBDriverResource, type IConnectionInfoParams } from '@cloudbeaver/core-connections';
 import type { DialogComponent } from '@cloudbeaver/core-dialogs';
 
@@ -25,14 +25,21 @@ export const DatabaseAuthDialog: DialogComponent<Payload> = observer(function Da
     key: payload.connection,
     includes: ['includeAuthNeeded', 'includeSharedSecrets', 'includeNetworkHandlersConfig', 'includeCredentialsSaved'],
   });
+  const translate = useTranslate();
   const driverLoader = useResource(DatabaseAuthDialog, DBDriverResource, connectionInfoLoader.data?.driverId || null);
   const useSharedCredentials = connectionInfoLoader.data?.sharedSecrets?.length || 0 > 1;
+
+  let subtitle = connectionInfoLoader.data?.name;
+
+  if (useSharedCredentials) {
+    subtitle = [subtitle, translate('plugin_connections_connection_auth_secret_description')].join(' | ');
+  }
 
   return (
     <CommonDialogWrapper size="large">
       <CommonDialogHeader
         title="connections_database_authentication"
-        subTitle={connectionInfoLoader.data?.name}
+        subTitle={subtitle}
         icon={driverLoader.data?.icon}
         onReject={options?.persistent ? undefined : rejectDialog}
       />
