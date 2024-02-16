@@ -33,6 +33,7 @@ import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.auth.SMAuthInfo;
+import org.jkiss.dbeaver.model.data.json.JSONUtils;
 import org.jkiss.dbeaver.model.security.SMAuthProviderCustomConfiguration;
 import org.jkiss.dbeaver.model.security.SMConstants;
 import org.jkiss.dbeaver.model.security.SMController;
@@ -50,6 +51,7 @@ import jakarta.servlet.http.HttpServletResponse;
 public class RPSessionHandler implements DBWSessionHandler {
 
     private static final Log log = Log.getLog(RPSessionHandler.class);
+    public static final String DEFAULT_TEAM_DELIMITER = "\\|";
 
     @Override
     public boolean handleSessionOpen(WebSession webSession, HttpServletRequest request, HttpServletResponse response) throws DBException, IOException {
@@ -95,7 +97,9 @@ public class RPSessionHandler implements DBWSessionHandler {
         String firstName = request.getHeader(resolveParam(paramConfigMap.get(RPConstants.PARAM_FIRST_NAME), RPAuthProvider.X_FIRST_NAME));
         String lastName = request.getHeader(resolveParam(paramConfigMap.get(RPConstants.PARAM_LAST_NAME), RPAuthProvider.X_LAST_NAME));
         String logoutUrl = Objects.requireNonNull(configuration).getParameter(RPConstants.PARAM_LOGOUT_URL);
-        List<String> userTeams = teams == null ? Collections.emptyList() : List.of(teams.split(","));
+        String teamDelimiter = JSONUtils.getString(configuration.getParameters(),
+                RPConstants.PARAM_TEAM_DELIMITER, "\\|");
+        List<String> userTeams = teams == null ? Collections.emptyList() : List.of(teams.split(teamDelimiter));
         if (userName != null) {
             try {
                 Map<String, Object> credentials = new HashMap<>();
