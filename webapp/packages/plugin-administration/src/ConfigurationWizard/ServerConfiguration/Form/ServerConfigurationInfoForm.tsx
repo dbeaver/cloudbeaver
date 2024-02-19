@@ -8,7 +8,7 @@
 import { observer } from 'mobx-react-lite';
 
 import { Group, GroupTitle, InputField, useResource, useTranslate } from '@cloudbeaver/core-blocks';
-import { ServerConfigResource, SESSION_EXPIRE_WARN_IN_TIME, SESSION_TOUCH_TIME_PERIOD } from '@cloudbeaver/core-root';
+import { ServerConfigResource, SESSION_EXPIRE_MIN_TIME, SESSION_TOUCH_TIME_PERIOD } from '@cloudbeaver/core-root';
 
 import type { IServerConfigurationPageState } from '../IServerConfigurationPageState';
 
@@ -16,7 +16,7 @@ interface Props {
   state: IServerConfigurationPageState;
 }
 
-const MIN_SESSION_EXPIRE_TIME = Math.ceil((SESSION_EXPIRE_WARN_IN_TIME + SESSION_TOUCH_TIME_PERIOD) / 60000) + 1;
+const INPUT_MIN_SESSION_EXPIRE_TIME = Math.ceil((SESSION_EXPIRE_MIN_TIME + SESSION_TOUCH_TIME_PERIOD) / 60000) + 1;
 
 export const ServerConfigurationInfoForm = observer<Props>(function ServerConfigurationInfoForm({ state }) {
   const serverConfigLoader = useResource(ServerConfigurationInfoForm, ServerConfigResource, undefined);
@@ -43,7 +43,7 @@ export const ServerConfigurationInfoForm = observer<Props>(function ServerConfig
         type="number"
         name="sessionExpireTime"
         state={state.serverConfig}
-        min={MIN_SESSION_EXPIRE_TIME}
+        min={INPUT_MIN_SESSION_EXPIRE_TIME}
         mapState={v => (v === 0 ? 60000 : v ?? 1800000) / 1000 / 60}
         mapValue={v => (v === undefined ? 30 : Number(v) || 1) * 1000 * 60}
         required

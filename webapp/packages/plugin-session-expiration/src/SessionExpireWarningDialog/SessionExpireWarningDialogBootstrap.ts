@@ -9,7 +9,7 @@ import { UserInfoResource } from '@cloudbeaver/core-authentication';
 import { importLazyComponent } from '@cloudbeaver/core-blocks';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
-import { ServerConfigResource, SESSION_EXPIRE_WARN_IN_TIME, SessionExpireService, SessionResource } from '@cloudbeaver/core-root';
+import { ServerConfigResource, SESSION_EXPIRE_MIN_TIME, SessionExpireService, SessionResource } from '@cloudbeaver/core-root';
 import { GraphQLService } from '@cloudbeaver/core-sdk';
 
 const SessionExpireWarningDialog = importLazyComponent(() => import('./SessionExpireWarningDialog').then(m => m.SessionExpireWarningDialog));
@@ -50,12 +50,12 @@ export class SessionExpireWarningDialogBootstrap extends Bootstrap {
 
     const sessionDuration = this.serverConfigResource.data?.sessionExpireTime;
 
-    if (this.sessionExpireService.expired || !sessionDuration || sessionDuration < SESSION_EXPIRE_WARN_IN_TIME) {
+    if (this.sessionExpireService.expired || !sessionDuration || sessionDuration < SESSION_EXPIRE_MIN_TIME) {
       this.close();
       return;
     }
 
-    if (remainingTime !== undefined && remainingTime <= SESSION_EXPIRE_WARN_IN_TIME) {
+    if (remainingTime !== undefined && remainingTime <= SESSION_EXPIRE_MIN_TIME) {
       this.open();
     } else {
       this.close();
