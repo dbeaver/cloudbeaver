@@ -37,7 +37,7 @@ export type InputFieldBaseProps = Omit<React.InputHTMLAttributes<HTMLInputElemen
     canShowPassword?: boolean;
     icon?: React.ReactElement;
     onCustomCopy?: () => void;
-    onChange?: (value: string | number, name?: string) => any;
+    onChange?: (value: string, name?: string) => any;
   };
 
 export const InputFieldBase = observer<InputFieldBaseProps, HTMLInputElement>(
@@ -81,10 +81,7 @@ export const InputFieldBase = observer<InputFieldBaseProps, HTMLInputElement>(
 
     const handleChange = useCallback(
       (event: React.ChangeEvent<HTMLInputElement>) => {
-        const value = event.target.value;
-        if (onChange) {
-          onChange(value, name);
-        }
+        onChange?.(event.target.value, name);
       },
       [name, onChange],
     );

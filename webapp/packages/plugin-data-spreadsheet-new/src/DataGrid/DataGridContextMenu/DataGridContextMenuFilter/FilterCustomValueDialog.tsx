@@ -27,7 +27,7 @@ import style from './FilterCustomValueDialog.m.css';
 
 interface IPayload {
   inputTitle: string;
-  defaultValue: string | number;
+  defaultValue: string;
 }
 
 export const FilterCustomValueDialog: DialogComponent<IPayload, string | number> = observer(function FilterCustomValueDialog({
@@ -39,7 +39,7 @@ export const FilterCustomValueDialog: DialogComponent<IPayload, string | number>
   const styles = useS(style);
   const inputRef = useRef<HTMLInputElement | null>(null);
 
-  const [value, setValue] = useState<string | number>(payload.defaultValue);
+  const [value, setValue] = useState(payload.defaultValue);
   const handleApply = useCallback(() => resolveDialog(value), [value, resolveDialog]);
   const translate = useTranslate();
 
@@ -61,7 +61,7 @@ export const FilterCustomValueDialog: DialogComponent<IPayload, string | number>
     <CommonDialogWrapper size="small">
       <CommonDialogHeader title="data_grid_table_context_menu_filter_dialog_title" onReject={rejectDialog} />
       <CommonDialogBody noOverflow>
-        <InputField ref={inputRef} name="customValue" value={String(value)} onChange={setValue}>
+        <InputField ref={inputRef} name="customValue" value={value} onChange={setValue}>
           {payload.inputTitle}
         </InputField>
       </CommonDialogBody>

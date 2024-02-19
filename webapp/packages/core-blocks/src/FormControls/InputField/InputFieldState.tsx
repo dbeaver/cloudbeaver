@@ -9,7 +9,6 @@ import { observer } from 'mobx-react-lite';
 import React, { forwardRef } from 'react';
 
 import type { IFormStateControl } from '../IFormStateControl';
-import { isControlPresented } from '../isControlPresented';
 import { useFormStateControl } from '../useFormStateControl';
 import { InputFieldBase, InputFieldBaseProps } from './InputFieldBase';
 
@@ -21,13 +20,21 @@ interface InputFieldType {
 }
 
 export const InputFieldState: InputFieldType = observer<InputFieldStateProps<any, any>, HTMLInputElement>(
-  forwardRef(function InputFieldState({ name, defaultValue, state, defaultState, mapState, mapValue, autoHide, onChange, ...rest }, ref) {
-    const controlState = useFormStateControl({ name, defaultState, state, mapState, mapValue, onChange });
+  forwardRef(function InputFieldState({ name, state, defaultState, mapState, mapValue, autoHide, onChange, ...rest }, ref) {
+    const controlState = useFormStateControl({ name, defaultState, state, autoHide, mapState, mapValue, onChange });
 
-    if (autoHide && !isControlPresented(name, state, defaultValue)) {
+    if (controlState.hide) {
       return null;
     }
 
-    return <InputFieldBase ref={ref} name={name} value={controlState.value ?? ''} onChange={controlState.setValue} {...rest} />;
+    return (
+      <InputFieldBase
+        ref={ref}
+        name={name}
+        value={controlState.stringValue ?? controlState.defaultValue ?? ''}
+        onChange={controlState.onChange}
+        {...rest}
+      />
+    );
   }),
 ) as InputFieldType;

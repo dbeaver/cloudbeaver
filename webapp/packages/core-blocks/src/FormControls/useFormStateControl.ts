@@ -5,64 +5,54 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { action, computed, observable } from 'mobx';
+import { isNotNullDefined, isObject } from '@cloudbeaver/core-utils';
 
-import { isNotNullDefined } from '@cloudbeaver/core-utils';
-
-import { useObservableRef } from '../useObservableRef';
+import { useCombinedHandler } from '../useCombinedHandler';
 import type { IFormStateControl } from './IFormStateControl';
+import { isControlPresented } from './isControlPresented';
 
 export function useFormStateControl<TState extends Record<string, any>, TKey extends keyof TState>({
   name,
-  defaultState,
-  state,
-  mapState,
-  mapValue,
+  state: value,
+  defaultState: defaultValue,
+  mapState: mapToString,
+  mapValue: mapToValue,
   onChange,
+  ...rest
 }: IFormStateControl<TState, TKey>) {
-  return useObservableRef(
-    () => ({
-      get value() {
-        let value: any = undefined;
+  const originalValue = value;
+  const handleChange = useCombinedHandler(function handleChange(inputValue: string) {
+    if (mapToValue) {
+      inputValue = mapToValue(inputValue);
+    }
 
-        if (this.defaultState && this.name in this.defaultState && isNotNullDefined(this.defaultState[this.name])) {
-          value = this.defaultState[this.name];
-        }
+    if (isNotNullDefined(originalValue) && isObject(originalValue)) {
+      (originalValue as any)[name] = inputValue;
+    }
 
-        if (this.state && this.name in this.state && isNotNullDefined(this.state[this.name])) {
-          value = this.state[this.name];
-        }
+    if (onChange) {
+      onChange(inputValue as any, name as any);
+    }
+  });
+  if (isNotNullDefined(defaultValue) && isObject(defaultValue)) {
+    defaultValue = defaultValue[name];
+  }
 
-        if (this.mapState) {
-          value = this.mapState(value);
-        }
+  if (isNotNullDefined(value) && isObject(value)) {
+    value = value[name];
+  }
 
-        return value;
-      },
-      setValue(value: TState[TKey]) {
-        if (this.mapValue) {
-          value = this.mapValue(value as any) as any;
-        }
+  let stringValue: string | typeof value;
+  let defaultStringValue: string | typeof defaultValue;
+  if (mapToString) {
+    stringValue = mapToString(value as any);
+    defaultStringValue = mapToString(defaultValue as any);
+  } else {
+    stringValue = value;
+    defaultStringValue = defaultValue;
+  }
 
-        if (this.state) {
-          this.state[this.name] = value as any;
-        }
+  const hide = 'autoHide' in rest && !!rest.autoHide && !isControlPresented(String(name), stringValue, defaultStringValue);
 
-        if (this.onChange) {
-          this.onChange(value, this.name);
-        }
-      },
-    }),
-    {
-      value: computed,
-      setValue: action.bound,
-      name: observable,
-      defaultState: observable.ref,
-      state: observable.ref,
-      mapState: observable.ref,
-      mapValue: observable.ref,
-      onChange: observable.ref,
-    },
-    { name, defaultState, state, mapState, mapValue, onChange },
-  );
+  return { name, value, stringValue, defaultValue, defaultStringValue, hide, onChange: handleChange };
 }

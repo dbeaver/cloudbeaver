@@ -11,6 +11,7 @@ import { Combobox, usePermission, useResource } from '@cloudbeaver/core-blocks';
 import { DatabaseAuthModelsResource } from '@cloudbeaver/core-connections';
 import { CachedResourceListEmptyKey, resourceKeyList } from '@cloudbeaver/core-resource';
 import { EAdminPermission } from '@cloudbeaver/core-root';
+import { isNotNullDefined } from '@cloudbeaver/core-utils';
 
 interface Props {
   authModelCredentialsState: { authModelId?: string };
@@ -37,7 +38,7 @@ export const ConnectionAuthModelSelector = observer<Props>(function ConnectionAu
     applicableAuthModels.length ? resourceKeyList(applicableAuthModels) : CachedResourceListEmptyKey,
   );
 
-  const availableAuthModels = authModelsLoader.data.filter(model => !!model && (adminPermission || !model.requiresLocalConfiguration));
+  const availableAuthModels = authModelsLoader.data.filter(isNotNullDefined).filter(model => adminPermission || !model.requiresLocalConfiguration);
 
   if (availableAuthModels.length <= 1) {
     return null;
@@ -48,9 +49,9 @@ export const ConnectionAuthModelSelector = observer<Props>(function ConnectionAu
       name="authModelId"
       state={authModelCredentialsState}
       items={availableAuthModels}
-      keySelector={model => model!.id}
-      valueSelector={model => model!.displayName}
-      titleSelector={model => model?.description}
+      keySelector={model => model.id}
+      valueSelector={model => model.displayName}
+      titleSelector={model => model.description}
       searchable={availableAuthModels.length > 10}
       readOnly={readonly || readonlyAuthModelId}
       disabled={disabled}

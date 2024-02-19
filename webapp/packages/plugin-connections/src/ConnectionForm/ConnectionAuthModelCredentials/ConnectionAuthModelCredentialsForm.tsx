@@ -14,7 +14,7 @@ import { isSafari } from '@cloudbeaver/core-utils';
 interface Props {
   credentials?: Record<string, any>;
   defaultCredentials?: Record<string, any>;
-  properties?: ObjectPropertyInfo[];
+  properties: ObjectPropertyInfo[];
   readonly?: boolean;
   disabled?: boolean;
 }
@@ -26,10 +26,6 @@ export const ConnectionAuthModelCredentialsForm = observer<Props>(function Conne
   readonly,
   disabled,
 }) {
-  if (!properties) {
-    return null;
-  }
-
   return (
     <Container wrap gap hideEmpty>
       <ObjectPropertyInfoForm

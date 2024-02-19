@@ -19,11 +19,8 @@ import {
   Loader,
   useObservableRef,
   useResource,
-  useS,
 } from '@cloudbeaver/core-blocks';
 import { ConnectionInfoResource, type IConnectionInfoParams } from '@cloudbeaver/core-connections';
-
-import style from './DatabaseSecretAuthDialog.m.css';
 
 interface Props {
   connectionKey: IConnectionInfoParams;
@@ -31,7 +28,6 @@ interface Props {
 }
 
 export const DatabaseSecretAuthDialog = observer<Props>(function DatabaseSecretAuthDialog({ connectionKey, onLogin }) {
-  const styles = useS(style);
   const connectionInfoLoader = useResource(DatabaseSecretAuthDialog, ConnectionInfoResource, {
     key: connectionKey,
     includes: ['includeAuthNeeded', 'includeSharedSecrets', 'includeNetworkHandlersConfig', 'includeCredentialsSaved'],
@@ -80,11 +76,13 @@ export const DatabaseSecretAuthDialog = observer<Props>(function DatabaseSecretA
           ))}
         </ItemList>
       </CommonDialogBody>
-      <CommonDialogFooter>
-        <Group className={styles.errorMessageGroup} secondary vertical dense>
-          <ExceptionMessage exception={state.exception} inline />
-        </Group>
-      </CommonDialogFooter>
+      {state.exception && (
+        <CommonDialogFooter>
+          <Group secondary vertical dense>
+            <ExceptionMessage exception={state.exception} inline />
+          </Group>
+        </CommonDialogFooter>
+      )}
     </>
   );
 });

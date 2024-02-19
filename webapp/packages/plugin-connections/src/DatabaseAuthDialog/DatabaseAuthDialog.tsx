@@ -27,7 +27,7 @@ export const DatabaseAuthDialog: DialogComponent<Payload> = observer(function Da
   });
   const translate = useTranslate();
   const driverLoader = useResource(DatabaseAuthDialog, DBDriverResource, connectionInfoLoader.data?.driverId || null);
-  const useSharedCredentials = connectionInfoLoader.data?.sharedSecrets?.length || 0 > 1;
+  const useSharedCredentials = (connectionInfoLoader.data?.sharedSecrets?.length || 0) > 1;
 
   let subtitle = connectionInfoLoader.data?.name;
 
@@ -36,7 +36,7 @@ export const DatabaseAuthDialog: DialogComponent<Payload> = observer(function Da
   }
 
   return (
-    <CommonDialogWrapper size="large">
+    <CommonDialogWrapper size="large" fixedSize={useSharedCredentials}>
       <CommonDialogHeader
         title="connections_database_authentication"
         subTitle={subtitle}

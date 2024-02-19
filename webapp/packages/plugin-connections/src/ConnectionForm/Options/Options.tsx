@@ -303,12 +303,16 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
                 onAuthModelChange={handleAuthModelSelect}
               />
               {!sharedCredentials ? (
-                <ConnectionAuthModelCredentialsForm
-                  credentials={config.credentials}
-                  properties={properties}
-                  readonly={readonly}
-                  disabled={disabled}
-                />
+                <>
+                  {properties && (
+                    <ConnectionAuthModelCredentialsForm
+                      credentials={config.credentials}
+                      properties={properties}
+                      readonly={readonly}
+                      disabled={disabled}
+                    />
+                  )}
+                </>
               ) : (
                 <FormFieldDescription>
                   {translate('plugin_connections_connection_form_shared_credentials_manage_info')}

@@ -6,6 +6,5 @@
  * you may not use this file except in compliance with the License.
  */
 
-.errorMessageGroup:empty {
-  display: none;
-}
+export const EMPTY_ARRAY: ReadonlyArray<any> = Object.freeze([]);
+export const EMPTY_OBJECT: Readonly<Record<any, any>> = Object.freeze({});

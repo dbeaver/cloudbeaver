@@ -28,7 +28,7 @@ export const ChangePassword = observer(function ChangePassword() {
           name="oldPassword"
           state={state.config}
           disabled={disabled}
-          mapValue={(value: string) => value.trim()}
+          mapValue={(value?: string) => value?.trim() ?? ''}
           small
           required
         >
@@ -40,7 +40,7 @@ export const ChangePassword = observer(function ChangePassword() {
           autoComplete="new-password"
           state={state.config}
           disabled={disabled}
-          mapValue={(value: string) => value.trim()}
+          mapValue={(value?: string) => value?.trim() ?? ''}
           small
           required
         >
@@ -51,7 +51,7 @@ export const ChangePassword = observer(function ChangePassword() {
           name="repeatedPassword"
           state={state.config}
           disabled={disabled}
-          mapValue={(value: string) => value.trim()}
+          mapValue={(value?: string) => value?.trim() ?? ''}
           small
           required
         >
