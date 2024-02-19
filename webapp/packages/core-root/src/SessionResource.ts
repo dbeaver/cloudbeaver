@@ -99,8 +99,8 @@ export class SessionResource extends CachedDataResource<SessionState | null> {
     return session;
   }
 
-  async touchSession(force?: boolean) {
-    if (!this.data?.valid || this.touchSessionTimer || !this.clientActivityService.isActive || !force) {
+  async touchSession() {
+    if (!this.data?.valid || this.touchSessionTimer || !this.clientActivityService.isActive) {
       return;
     }
 
