@@ -13,7 +13,7 @@ import { useService } from '@cloudbeaver/core-di';
 import { Notifications } from '@cloudbeaver/core-notifications';
 import { ProjectInfoResource } from '@cloudbeaver/core-projects';
 import { CachedMapAllKey } from '@cloudbeaver/core-resource';
-import { SessionPermissionsResource, SessionTouchService } from '@cloudbeaver/core-root';
+import { SessionPermissionsResource } from '@cloudbeaver/core-root';
 import { ScreenService } from '@cloudbeaver/core-routing';
 import { ThemeService } from '@cloudbeaver/core-theming';
 import { DNDProvider } from '@cloudbeaver/core-ui';
@@ -46,7 +46,6 @@ export const Body = observer(function Body() {
 
   useAppHeight();
   useClientActivity();
-  useService(SessionTouchService);
 
   return (
     <DNDProvider>

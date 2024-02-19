@@ -6,17 +6,18 @@
  * you may not use this file except in compliance with the License.
  */
 import { ClientActivityService } from '@cloudbeaver/core-client-activity';
-import { injectable } from '@cloudbeaver/core-di';
+import { Dependency, injectable } from '@cloudbeaver/core-di';
 
 import { SessionResource } from './SessionResource';
 
 export const SESSION_TOUCH_TIME_PERIOD = 1000 * 60;
 
 @injectable()
-export class SessionTouchService {
+export class SessionTouchService extends Dependency {
   private touchSessionTimer: ReturnType<typeof setTimeout> | null = null;
 
   constructor(private readonly clientActivityService: ClientActivityService, private readonly sessionResource: SessionResource) {
+    super();
     this.touchSession = this.touchSession.bind(this);
     this.clientActivityService.onActiveStateChange.addHandler(this.touchSession);
   }
