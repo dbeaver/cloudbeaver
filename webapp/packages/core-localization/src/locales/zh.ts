@@ -110,6 +110,7 @@ export default [
   ['ui_readonly', '只读'],
   ['ui_test', 'Test'],
   ['ui_export', 'Export'],
+  ['ui_you', 'You'],
 
   ['root_permission_denied', '您没有权限'],
   ['root_permission_no_permission', '您没有权限执行此操作'],
