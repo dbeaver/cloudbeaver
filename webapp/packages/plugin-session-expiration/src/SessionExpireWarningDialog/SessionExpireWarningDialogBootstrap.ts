@@ -12,7 +12,7 @@ import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dial
 import { ServerConfigResource, SESSION_EXPIRE_WARN_IN_TIME, SessionExpireService, SessionResource } from '@cloudbeaver/core-root';
 import { GraphQLService } from '@cloudbeaver/core-sdk';
 
-const SessionExpireWarningDialogLoader = importLazyComponent(() => import('./SessionExpireWarningDialog').then(m => m.SessionExpireWarningDialog));
+const SessionExpireWarningDialog = importLazyComponent(() => import('./SessionExpireWarningDialog').then(m => m.SessionExpireWarningDialog));
 @injectable()
 export class SessionExpireWarningDialogBootstrap extends Bootstrap {
   private dialogInternalPromise: Promise<DialogueStateResult | null> | null;
@@ -64,7 +64,7 @@ export class SessionExpireWarningDialogBootstrap extends Bootstrap {
 
   private async open(): Promise<void> {
     if (!this.dialogInternalPromise) {
-      this.dialogInternalPromise = this.commonDialogService.open(SessionExpireWarningDialogLoader, null);
+      this.dialogInternalPromise = this.commonDialogService.open(SessionExpireWarningDialog, null);
       await this.dialogInternalPromise;
       this.dialogInternalPromise = null;
 
