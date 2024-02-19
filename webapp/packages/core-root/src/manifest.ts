@@ -27,6 +27,7 @@ import { SessionPermissionEventHandler } from './SessionPermissionEventHandler';
 import { SessionPermissionsResource } from './SessionPermissionsResource';
 import { SessionResource } from './SessionResource';
 import { SessionSettingsService } from './SessionSettingsService';
+import { SessionTouchService } from './SessionTouchService';
 import { WindowEventsService } from './WindowEventsService';
 
 export const coreRootManifest: PluginManifest = {
@@ -53,6 +54,7 @@ export const coreRootManifest: PluginManifest = {
     ServerConfigEventHandler,
     SessionEventSource,
     SessionInfoEventHandler,
+    SessionTouchService,
     DataSynchronizationService,
     SessionPermissionEventHandler,
     ServerSettingsResolverService,

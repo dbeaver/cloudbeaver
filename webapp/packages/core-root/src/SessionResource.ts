@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { ClientActivityService } from '@cloudbeaver/core-client-activity';
 import { injectable } from '@cloudbeaver/core-di';
 import { ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
 import { CachedDataResource } from '@cloudbeaver/core-resource';
@@ -21,8 +20,6 @@ export interface ISessionAction {
   [key: string]: any;
 }
 
-export const SESSION_TOUCH_TIME_PERIOD = 1000 * 60;
-
 interface SessionStateData {
   isValid?: boolean;
   remainingTime: number;
@@ -33,13 +30,11 @@ export class SessionResource extends CachedDataResource<SessionState | null> {
   private action: ISessionAction | null;
   private defaultLocale: string | undefined;
   readonly onStatusUpdate: ISyncExecutor<SessionStateData>;
-  private touchSessionTimer: ReturnType<typeof setTimeout> | null = null;
 
   constructor(
     private readonly graphQLService: GraphQLService,
     sessionInfoEventHandler: SessionInfoEventHandler,
     serverConfigResource: ServerConfigResource,
-    private readonly clientActivityService: ClientActivityService,
   ) {
     super(() => null);
 
@@ -58,7 +53,6 @@ export class SessionResource extends CachedDataResource<SessionState | null> {
     this.setDefaultLocale = this.setDefaultLocale.bind(this);
     this.changeLanguage = this.changeLanguage.bind(this);
 
-    this.clientActivityService.onActiveStateChange.addHandler(this.touchSession);
     this.action = null;
     this.sync(
       serverConfigResource,
@@ -100,7 +94,7 @@ export class SessionResource extends CachedDataResource<SessionState | null> {
   }
 
   async touchSession() {
-    if (!this.data?.valid || this.touchSessionTimer || !this.clientActivityService.isActive) {
+    if (!this.data?.valid) {
       return;
     }
 
@@ -112,13 +106,6 @@ export class SessionResource extends CachedDataResource<SessionState | null> {
         valid,
       });
     }
-
-    this.touchSessionTimer = setTimeout(() => {
-      if (this.touchSessionTimer) {
-        clearTimeout(this.touchSessionTimer);
-        this.touchSessionTimer = null;
-      }
-    }, SESSION_TOUCH_TIME_PERIOD);
 
     return valid;
   }
