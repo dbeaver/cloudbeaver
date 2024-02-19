@@ -18,6 +18,7 @@ import { ServerNodeService } from './ServerNodeService';
 import { ServerSettingsResolverService } from './ServerSettingsResolverService';
 import { ServerSettingsService } from './ServerSettingsService';
 import { SessionActionService } from './SessionActionService';
+import { SessionActivityService } from './SessionActivityService';
 import { SessionDataResource } from './SessionDataResource';
 import { SessionEventSource } from './SessionEventSource';
 import { SessionExpireEventService } from './SessionExpireEventService';
@@ -27,7 +28,6 @@ import { SessionPermissionEventHandler } from './SessionPermissionEventHandler';
 import { SessionPermissionsResource } from './SessionPermissionsResource';
 import { SessionResource } from './SessionResource';
 import { SessionSettingsService } from './SessionSettingsService';
-import { SessionTouchService } from './SessionTouchService';
 import { WindowEventsService } from './WindowEventsService';
 
 export const coreRootManifest: PluginManifest = {
@@ -54,7 +54,7 @@ export const coreRootManifest: PluginManifest = {
     ServerConfigEventHandler,
     SessionEventSource,
     SessionInfoEventHandler,
-    SessionTouchService,
+    SessionActivityService,
     DataSynchronizationService,
     SessionPermissionEventHandler,
     ServerSettingsResolverService,

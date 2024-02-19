@@ -13,21 +13,25 @@ import { SessionResource } from './SessionResource';
 export const SESSION_TOUCH_TIME_PERIOD = 1000 * 60;
 
 @injectable()
-export class SessionTouchService extends Dependency {
+export class SessionActivityService extends Dependency {
   private touchSessionTimer: ReturnType<typeof setTimeout> | null = null;
 
   constructor(private readonly clientActivityService: ClientActivityService, private readonly sessionResource: SessionResource) {
     super();
-    this.touchSession = this.touchSession.bind(this);
-    this.clientActivityService.onActiveStateChange.addHandler(this.touchSession);
+    this.notifyClientActivity = this.notifyClientActivity.bind(this);
+    this.clientActivityService.onActiveStateChange.addHandler(this.notifyClientActivity);
   }
 
-  private touchSession = () => {
+  private async notifyClientActivity() {
     if (this.touchSessionTimer || !this.clientActivityService.isActive) {
       return;
     }
 
-    this.sessionResource.touchSession();
+    try {
+      await this.sessionResource.touchSession();
+    } catch (e) {
+      console.error('Session touch error', e);
+    }
 
     this.touchSessionTimer = setTimeout(() => {
       if (this.touchSessionTimer) {
@@ -35,5 +39,5 @@ export class SessionTouchService extends Dependency {
         this.touchSessionTimer = null;
       }
     }, SESSION_TOUCH_TIME_PERIOD);
-  };
+  }
 }

@@ -34,7 +34,7 @@ export class SessionResource extends CachedDataResource<SessionState | null> {
   constructor(
     private readonly graphQLService: GraphQLService,
     sessionInfoEventHandler: SessionInfoEventHandler,
-    serverConfigResource: ServerConfigResource,
+    private readonly serverConfigResource: ServerConfigResource,
   ) {
     super(() => null);
 
@@ -47,11 +47,6 @@ export class SessionResource extends CachedDataResource<SessionState | null> {
       undefined,
       this,
     );
-
-    this.touchSession = this.touchSession.bind(this);
-    this.processAction = this.processAction.bind(this);
-    this.setDefaultLocale = this.setDefaultLocale.bind(this);
-    this.changeLanguage = this.changeLanguage.bind(this);
 
     this.action = null;
     this.sync(
@@ -98,14 +93,15 @@ export class SessionResource extends CachedDataResource<SessionState | null> {
       return;
     }
 
-    const valid = await this.graphQLService.sdk.touchSession();
+    const valid = Boolean((await this.graphQLService.sdk.touchSession()).touchSession);
+    const sessionExpireTime = this.serverConfigResource.data?.sessionExpireTime;
+    const remainingTime = valid && sessionExpireTime ? sessionExpireTime : 0;
 
-    if (!valid) {
-      this.setData({
-        ...this.data,
-        valid,
-      });
-    }
+    this.setData({
+      ...this.data,
+      valid,
+      remainingTime,
+    });
 
     return valid;
   }
