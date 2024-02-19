@@ -9,9 +9,9 @@ import type { PluginManifest } from '@cloudbeaver/core-di';
 
 import { ClientActivityService } from './ClientActivityService';
 
-export const coreActivityManifest: PluginManifest = {
+export const coreClientActivityManifest: PluginManifest = {
   info: {
-    name: 'Core Activity',
+    name: 'Core Client Activity',
   },
 
   providers: [ClientActivityService],

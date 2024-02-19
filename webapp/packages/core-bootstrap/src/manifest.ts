@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { coreActivityManifest } from '@cloudbeaver/core-activity';
 import { coreAdministrationManifest } from '@cloudbeaver/core-administration';
 import { coreAppManifest } from '@cloudbeaver/core-app';
 import { coreAuthenticationManifest } from '@cloudbeaver/core-authentication';
@@ -13,6 +12,7 @@ import { coreBlocksManifest } from '@cloudbeaver/core-blocks';
 import { coreBrowserManifest } from '@cloudbeaver/core-browser';
 import { coreBrowserCookiesManifest } from '@cloudbeaver/core-browser-cookies';
 import { coreBrowserSettingsManifest } from '@cloudbeaver/core-browser-settings';
+import { coreClientActivityManifest } from '@cloudbeaver/core-client-activity';
 import { coreConnectionsManifest } from '@cloudbeaver/core-connections';
 import { coreDIManifest, PluginManifest } from '@cloudbeaver/core-di';
 import { coreDialogsManifest } from '@cloudbeaver/core-dialogs';
@@ -75,6 +75,6 @@ export const coreManifests: PluginManifest[] = [
   coreDialogsManifest,
   resourceManagerManifest,
   coreAppManifest,
-  coreActivityManifest,
+  coreClientActivityManifest,
   coreNavigationTree,
 ];

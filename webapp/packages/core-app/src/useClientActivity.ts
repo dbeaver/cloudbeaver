@@ -7,7 +7,7 @@
  */
 import { useEffect } from 'react';
 
-import { ClientActivityService } from '@cloudbeaver/core-activity';
+import { ClientActivityService } from '@cloudbeaver/core-client-activity';
 import { useService } from '@cloudbeaver/core-di';
 import { throttle } from '@cloudbeaver/core-utils';
 

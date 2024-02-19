@@ -1,5 +1,5 @@
 {
-  "name": "@cloudbeaver/core-activity",
+  "name": "@cloudbeaver/core-client-activity",
   "sideEffects": [
     "src/**/*.css",
     "src/**/*.scss",

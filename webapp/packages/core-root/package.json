@@ -17,7 +17,7 @@
     "update-ts-references": "rimraf --glob dist && typescript-resolve-references"
   },
   "dependencies": {
-    "@cloudbeaver/core-activity": "~0.1.0",
+    "@cloudbeaver/core-client-activity": "~0.1.0",
     "@cloudbeaver/core-di": "~0.1.0",
     "@cloudbeaver/core-executor": "~0.1.0",
     "@cloudbeaver/core-resource": "~0.1.0",

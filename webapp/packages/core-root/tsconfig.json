@@ -12,7 +12,7 @@
   },
   "references": [
     {
-      "path": "../core-activity/tsconfig.json"
+      "path": "../core-client-activity/tsconfig.json"
     },
     {
       "path": "../core-di/tsconfig.json"
