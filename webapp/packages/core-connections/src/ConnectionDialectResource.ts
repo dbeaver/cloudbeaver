@@ -11,6 +11,7 @@ import { ProjectsService } from '@cloudbeaver/core-projects';
 import { CachedMapAllKey, CachedMapResource, type ResourceKey, resourceKeyList, ResourceKeyUtils } from '@cloudbeaver/core-resource';
 import { GraphQLService, SqlDialectInfo } from '@cloudbeaver/core-sdk';
 
+import type { IConnectionInfoParams } from './CONNECTION_INFO_PARAM_SCHEMA';
 import type { IConnectionExecutionContextInfo } from './ConnectionExecutionContext/ConnectionExecutionContextResource';
 import {
   ConnectionInfoActiveProjectKey,
@@ -18,7 +19,6 @@ import {
   ConnectionInfoResource,
   isConnectionInfoParamEqual,
 } from './ConnectionInfoResource';
-import type { IConnectionInfoParams } from './IConnectionsResource';
 
 export type ConnectionDialect = SqlDialectInfo;
 

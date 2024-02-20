@@ -143,8 +143,8 @@ export class UserFormInfoPart extends FormPart<IUserFormInfoState, IUserFormStat
     const loadableStateContext = this.formState.dataContext.get(DATA_CONTEXT_LOADABLE_STATE);
 
     loadableStateContext.getState('user-info', () => [
-      getCachedDataResourceLoaderState(this.serverConfigResource, undefined),
-      getCachedDataResourceLoaderState(this.authRolesResource, undefined),
+      getCachedDataResourceLoaderState(this.serverConfigResource, () => undefined),
+      getCachedDataResourceLoaderState(this.authRolesResource, () => undefined),
     ]);
   }
 
