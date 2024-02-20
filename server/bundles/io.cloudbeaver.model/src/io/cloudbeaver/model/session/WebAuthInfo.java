@@ -22,6 +22,7 @@ import io.cloudbeaver.model.user.WebUserOriginInfo;
 import io.cloudbeaver.registry.WebAuthProviderDescriptor;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.Log;
+import org.jkiss.dbeaver.model.auth.SMAuthInfo;
 import org.jkiss.dbeaver.model.auth.SMAuthProvider;
 import org.jkiss.dbeaver.model.auth.SMSession;
 import org.jkiss.dbeaver.model.auth.SMSessionPrincipal;
@@ -41,7 +42,10 @@ public class WebAuthInfo implements SMSessionPrincipal {
     private final WebUser user;
     private final WebAuthProviderDescriptor authProvider;
     private String authProviderConfigurationId;
-    private SMSession authSession;
+    @NotNull
+    private final SMAuthInfo authInfo;
+    @NotNull
+    private final SMSession authSession;
     private final OffsetDateTime loginTime;
     private final DBWUserIdentity userIdentity;
     private String message;
@@ -54,12 +58,14 @@ public class WebAuthInfo implements SMSessionPrincipal {
         @NotNull WebAuthProviderDescriptor authProvider,
         @NotNull DBWUserIdentity userIdentity,
         @NotNull SMSession authSession,
+        @NotNull SMAuthInfo authInfo,
         @NotNull OffsetDateTime loginTime
     ) {
         this.session = session;
         this.user = user;
         this.authProvider = authProvider;
         this.userIdentity = userIdentity;
+        this.authInfo = authInfo;
         this.authSession = authSession;
         this.loginTime = loginTime;
     }
@@ -120,8 +126,14 @@ public class WebAuthInfo implements SMSessionPrincipal {
         return authProvider;
     }
 
+    @NotNull
     public SMSession getAuthSession() {
         return authSession;
+    }
+
+    @NotNull
+    public SMAuthInfo getAuthInfo() {
+        return authInfo;
     }
 
     void closeAuth() {
