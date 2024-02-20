@@ -22,6 +22,11 @@ You can see live demo of CloudBeaver here: https://demo.cloudbeaver.io
 
 ## Changelog
 
+### 23.3.5. 2024-02-19
+- Default user group was added to the product. This group includes all users. You cannot delete users from this group;
+- Added the ability to disable alias autocomplete for all users in the admin panel;
+- Different bug fixes and enhancements have been made.
+
 ### 23.3.4. 2024-02-05
 - Text wrap is activated by default for texts and BLOBs in the Values panel for better visibility. User can switch to the one-line mode using a button on the toolbar;
 - Added the ability to edit the default preferences of the following parts: interface, tools and data viewer in the settings panel in the administrative part;
