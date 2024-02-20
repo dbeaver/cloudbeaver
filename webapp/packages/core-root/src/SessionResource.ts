@@ -93,11 +93,11 @@ export class SessionResource extends CachedDataResource<SessionState | null> {
       return;
     }
 
-    const session = (await this.graphQLService.sdk.updateSession()).updateSession;
+    const { updateSession } = await this.graphQLService.sdk.updateSession();
 
-    this.setData(session);
+    this.setData(updateSession);
 
-    return session;
+    return updateSession;
   }
 
   protected setData(data: SessionState | null) {
