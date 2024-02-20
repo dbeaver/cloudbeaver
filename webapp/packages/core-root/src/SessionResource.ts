@@ -88,22 +88,16 @@ export class SessionResource extends CachedDataResource<SessionState | null> {
     return session;
   }
 
-  async touchSession() {
+  async updateSession() {
     if (!this.data?.valid) {
       return;
     }
 
-    const valid = Boolean((await this.graphQLService.sdk.touchSession()).touchSession);
-    const sessionExpireTime = this.serverConfigResource.data?.sessionExpireTime;
-    const remainingTime = valid && sessionExpireTime ? sessionExpireTime : 0;
+    const session = (await this.graphQLService.sdk.updateSession()).updateSession;
 
-    this.setData({
-      ...this.data,
-      valid,
-      remainingTime,
-    });
+    this.setData(session);
 
-    return valid;
+    return session;
   }
 
   protected setData(data: SessionState | null) {

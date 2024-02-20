@@ -28,9 +28,9 @@ export class SessionActivityService extends Dependency {
     }
 
     try {
-      await this.sessionResource.touchSession();
+      await this.sessionResource.updateSession();
     } catch (e) {
-      console.error('Session touch error', e);
+      console.error('Session update error', e);
     }
 
     this.touchSessionTimer = setTimeout(() => {

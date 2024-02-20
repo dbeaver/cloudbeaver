@@ -75,9 +75,9 @@ export class SessionExpireWarningDialogBootstrap extends Bootstrap {
 
         if (sessionState.valid) {
           try {
-            await this.sessionResource.touchSession();
+            await this.sessionResource.updateSession();
           } catch (e: any) {
-            this.notificationService.logException(e, 'plugin_session_expiration_session_touch_error');
+            this.notificationService.logException(e, 'plugin_session_expiration_session_update_error');
           }
         } else {
           this.sessionExpireService.sessionExpired();
