@@ -8,6 +8,7 @@ query getTemplateConnections(
   $includeAuthNeeded: Boolean!
   $includeProperties: Boolean!
   $includeProviderProperties: Boolean!
+  $includeSharedSecrets: Boolean!
   $customIncludeOptions: Boolean!
 ) {
   connections: templateConnections(projectId: $projectId) {

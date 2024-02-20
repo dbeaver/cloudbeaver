@@ -1008,6 +1008,17 @@ public class WebSession extends BaseWebSession
         return getWorkspace().getProjectById(projectId);
     }
 
+    public WebProjectImpl getAccessibleProjectById(@Nullable String projectId) throws DBWebException {
+        WebProjectImpl project = null;
+        if (projectId != null) {
+            project = getWorkspace().getProjectById(projectId);
+        }
+        if (project == null) {
+            throw new DBWebException("Project not found: " + projectId);
+        }
+        return project;
+    }
+
     public List<WebProjectImpl> getAccessibleProjects() {
         return getWorkspace().getProjects();
     }
