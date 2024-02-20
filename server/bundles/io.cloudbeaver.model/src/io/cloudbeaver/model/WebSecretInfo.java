@@ -16,7 +16,6 @@
  */
 package io.cloudbeaver.model;
 
-import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.model.meta.Property;
 import org.jkiss.dbeaver.model.secret.DBSSecretValue;
 
@@ -34,10 +33,6 @@ public class WebSecretInfo {
 
     @Property
     public String getSecretId() {
-        return buildComplexSecretId(secretValue);
-    }
-
-    public static String buildComplexSecretId(@NotNull DBSSecretValue secretValue) {
-        return secretValue.getId() + "_" + secretValue.getSubjectId();
+        return secretValue.getUniqueId();
     }
 }
