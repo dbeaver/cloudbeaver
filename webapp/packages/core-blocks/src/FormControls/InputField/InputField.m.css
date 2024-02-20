@@ -32,10 +32,13 @@
 
 .customIconContainer {
   composes: iconContainer;
-  right: 4px;
+  right: 6px;
   width: 24px;
   height: 24px;
   cursor: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .input[disabled] + .iconContainer {

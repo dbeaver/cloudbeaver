@@ -23,8 +23,8 @@ export class AppAuthService extends Bootstrap {
 
   get loaders(): ILoadableState[] {
     return [
-      getCachedDataResourceLoaderState(this.userInfoResource, undefined),
-      getCachedDataResourceLoaderState(this.serverConfigResource, undefined),
+      getCachedDataResourceLoaderState(this.userInfoResource, () => undefined),
+      getCachedDataResourceLoaderState(this.serverConfigResource, () => undefined),
     ];
   }
 

@@ -21,7 +21,7 @@ import { useService } from '@cloudbeaver/core-di';
 import { NetworkHandlerAuthType } from '@cloudbeaver/core-sdk';
 import type { ILoadableState } from '@cloudbeaver/core-utils';
 
-import type { IConnectionAuthenticationConfig } from '../ConnectionAuthentication/IConnectionAuthenticationConfig';
+import type { IConnectionAuthenticationConfig } from '../../ConnectionAuthentication/IConnectionAuthenticationConfig';
 
 interface IState extends ILoadableState {
   readonly authModelId: string | null;
@@ -38,7 +38,12 @@ interface IState extends ILoadableState {
   getConfig: () => ConnectionInitConfig;
 }
 
-export function useDatabaseAuthDialog(key: IConnectionInfoParams, networkHandlers: string[], resetCredentials?: boolean, onInit?: () => void) {
+export function useDatabaseCredentialsAuthDialog(
+  key: IConnectionInfoParams,
+  networkHandlers: string[],
+  resetCredentials?: boolean,
+  onInit?: () => void,
+) {
   const connectionInfoResource = useService(ConnectionInfoResource);
   const dbDriverResource = useService(DBDriverResource);
 
