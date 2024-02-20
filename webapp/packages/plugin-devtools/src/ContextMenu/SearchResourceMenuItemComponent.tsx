@@ -6,34 +6,28 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import styled, { css } from 'reshadow';
 
-import { useStyles } from '@cloudbeaver/core-blocks';
+import { s, useS } from '@cloudbeaver/core-blocks';
 import type { IContextMenuItemProps } from '@cloudbeaver/core-ui';
 import type { ICustomMenuItemComponent } from '@cloudbeaver/core-view';
 
 import { DATA_CONTEXT_MENU_SEARCH } from './DATA_CONTEXT_MENU_SEARCH';
-
-const styles = css`
-  search-box {
-    padding: 8px 12px;
-  }
-`;
+import styles from './SearchResourceMenuItemComponent.m.css';
 
 export const SearchResourceMenuItemComponent: ICustomMenuItemComponent<IContextMenuItemProps> = observer(function SearchResourceMenuItemComponent({
   item,
   onClick,
   menuData,
   className,
-  style,
 }) {
+  const style = useS(styles);
   const value = menuData.context.tryGet(DATA_CONTEXT_MENU_SEARCH) ?? '';
   function handleChange(value: string) {
     menuData.context.set(DATA_CONTEXT_MENU_SEARCH, value);
   }
 
-  return styled(useStyles(style, styles))(
-    <search-box dir="ltr" className={className}>
+  return (
+    <div dir="ltr" className={s(style, { searchBox: true }, className)}>
       <input
         name="search"
         type="search"
@@ -42,6 +36,6 @@ export const SearchResourceMenuItemComponent: ICustomMenuItemComponent<IContextM
         autoComplete="off"
         onChange={event => handleChange(event.target.value)}
       />
-    </search-box>,
+    </div>
   );
 });
