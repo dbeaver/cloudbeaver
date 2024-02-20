@@ -91,7 +91,7 @@ public class RPSessionHandler implements DBWSessionHandler {
         String teams = request.getHeader(resolveParam(paramConfigMap.get(RPConstants.PARAM_TEAM), RPAuthProvider.X_TEAM));
         // backward compatibility
         String deprecatedRoles = request.getHeader(RPAuthProvider.X_ROLE);
-        if (CommonUtils.isEmpty(teams) && CommonUtils.isNotEmpty(deprecatedRoles)) {
+        if (teams == null && deprecatedRoles != null) {
             teams = deprecatedRoles;
         }
         String role = request.getHeader(resolveParam(paramConfigMap.get(RPConstants.PARAM_ROLE_NAME), RPAuthProvider.X_ROLE_TE));
@@ -100,7 +100,7 @@ public class RPSessionHandler implements DBWSessionHandler {
         String logoutUrl = Objects.requireNonNull(configuration).getParameter(RPConstants.PARAM_LOGOUT_URL);
         String teamDelimiter = JSONUtils.getString(configuration.getParameters(),
                 RPConstants.PARAM_TEAM_DELIMITER, "\\|");
-        List<String> userTeams = teams == null ? Collections.emptyList() : List.of(teams.split(teamDelimiter));
+        List<String> userTeams = CommonUtils.isEmpty(teams) ? null : List.of(teams.split(teamDelimiter));
         if (userName != null) {
             try {
                 Map<String, Object> credentials = new HashMap<>();
