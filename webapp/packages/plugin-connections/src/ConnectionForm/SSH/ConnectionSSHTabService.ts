@@ -176,6 +176,7 @@ export class ConnectionSSHTabService extends Bootstrap {
     if (this.isChanged(handler, initial) || passwordChanged || keyChanged) {
       handlerConfig = {
         ...handler,
+        savePassword: handler.savePassword || config.sharedCredentials,
         key: handler.authType === NetworkHandlerAuthType.PublicKey && keyChanged ? handler.key : undefined,
         password: passwordChanged ? handler.password : undefined,
       };

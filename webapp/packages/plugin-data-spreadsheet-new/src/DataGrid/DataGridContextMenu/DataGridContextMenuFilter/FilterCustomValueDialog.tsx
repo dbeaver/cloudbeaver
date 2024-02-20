@@ -27,7 +27,7 @@ import style from './FilterCustomValueDialog.m.css';
 
 interface IPayload {
   inputTitle: string;
-  defaultValue: string | number;
+  defaultValue: string;
 }
 
 export const FilterCustomValueDialog: DialogComponent<IPayload, string | number> = observer(function FilterCustomValueDialog({
@@ -39,7 +39,7 @@ export const FilterCustomValueDialog: DialogComponent<IPayload, string | number>
   const styles = useS(style);
   const inputRef = useRef<HTMLInputElement | null>(null);
 
-  const [value, setValue] = useState<string | number>(payload.defaultValue);
+  const [value, setValue] = useState(payload.defaultValue);
   const handleApply = useCallback(() => resolveDialog(value), [value, resolveDialog]);
   const translate = useTranslate();
 

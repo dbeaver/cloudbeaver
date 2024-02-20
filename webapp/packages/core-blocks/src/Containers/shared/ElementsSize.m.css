@@ -51,6 +51,7 @@
 .field.fill,
 .container.fill,
 .container > .fill {
+  flex-grow: 1;
   max-width: none;
 }
 
