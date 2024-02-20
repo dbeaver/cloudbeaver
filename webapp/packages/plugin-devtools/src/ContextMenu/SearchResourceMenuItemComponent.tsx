@@ -36,6 +36,7 @@ export const SearchResourceMenuItemComponent: ICustomMenuItemComponent<IContextM
     <search-box dir="ltr" className={className}>
       <input
         name="search"
+        type="search"
         placeholder="Search for resource..."
         value={value}
         autoComplete="off"
