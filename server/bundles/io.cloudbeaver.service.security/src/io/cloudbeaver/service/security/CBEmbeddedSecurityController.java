@@ -230,9 +230,7 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
             userId
         );
         String defaultUserTeam = application.getAppConfiguration().getDefaultUserTeam();
-        if (CommonUtils.isNotEmpty(defaultUserTeam) && teamIds == null) {
-            teamIds = new String[] {defaultUserTeam};
-        } else if (CommonUtils.isNotEmpty(defaultUserTeam) && !ArrayUtils.contains(teamIds, defaultUserTeam)) {
+        if (CommonUtils.isNotEmpty(defaultUserTeam) && !ArrayUtils.contains(teamIds, defaultUserTeam)) {
             teamIds = ArrayUtils.add(String.class, teamIds, defaultUserTeam);
         }
         if (!ArrayUtils.isEmpty(teamIds)) {

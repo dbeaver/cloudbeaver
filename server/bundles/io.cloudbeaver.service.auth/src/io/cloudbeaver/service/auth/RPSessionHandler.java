@@ -100,7 +100,7 @@ public class RPSessionHandler implements DBWSessionHandler {
         String logoutUrl = Objects.requireNonNull(configuration).getParameter(RPConstants.PARAM_LOGOUT_URL);
         String teamDelimiter = JSONUtils.getString(configuration.getParameters(),
                 RPConstants.PARAM_TEAM_DELIMITER, "\\|");
-        List<String> userTeams = teams == null || teams.isEmpty() ? null : List.of(teams.split(teamDelimiter));
+        List<String> userTeams = teams == null ? null : (teams.isEmpty() ? List.of() : List.of(teams.split(teamDelimiter)));
         if (userName != null) {
             try {
                 Map<String, Object> credentials = new HashMap<>();
