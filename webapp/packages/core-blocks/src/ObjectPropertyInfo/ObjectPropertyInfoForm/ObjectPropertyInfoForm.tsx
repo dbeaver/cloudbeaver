@@ -20,7 +20,7 @@ import { useS } from '../../useS';
 import { RenderField } from './RenderField';
 
 interface ObjectPropertyFormProps extends ILayoutSizeProps {
-  properties: ObjectPropertyInfo[];
+  properties: ReadonlyArray<ObjectPropertyInfo>;
   state?: Record<string, any>;
   defaultState?: Record<string, any>;
   category?: string | null;

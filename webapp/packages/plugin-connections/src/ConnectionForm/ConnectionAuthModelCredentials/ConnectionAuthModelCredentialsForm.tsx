@@ -14,7 +14,7 @@ import { isSafari } from '@cloudbeaver/core-utils';
 interface Props {
   credentials?: Record<string, any>;
   defaultCredentials?: Record<string, any>;
-  properties: ObjectPropertyInfo[];
+  properties: ReadonlyArray<ObjectPropertyInfo>;
   readonly?: boolean;
   disabled?: boolean;
 }
