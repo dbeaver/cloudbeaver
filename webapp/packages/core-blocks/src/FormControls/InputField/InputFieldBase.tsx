@@ -70,6 +70,7 @@ export const InputFieldBase = observer<InputFieldBaseProps, HTMLInputElement>(
     rest = filterLayoutFakeProps(rest);
     const styles = useS(inputFieldStyle);
     loading = useStateDelay(loading ?? false, 300);
+    const type = passwordRevealed ? 'text' : rest.type;
 
     const revealPassword = useCallback(() => {
       if (rest.disabled) {
@@ -116,9 +117,10 @@ export const InputFieldBase = observer<InputFieldBaseProps, HTMLInputElement>(
           <input
             ref={mergedRef}
             {...rest}
-            type={passwordRevealed ? 'text' : rest.type}
+            type={type}
             name={name}
             value={uncontrolled ? undefined : value}
+            autoComplete={type === 'password' ? 'new-password' : rest.autoComplete}
             defaultValue={defaultValue}
             className={s(styles, { input: true })}
             required={required}
