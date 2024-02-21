@@ -33,7 +33,7 @@ export * from './createConnectionFolderParam';
 export * from './DatabaseAuthModelsResource';
 export * from './DatabaseConnection';
 export * from './DBDriverResource';
-export * from './IConnectionsResource';
+export * from './CONNECTION_INFO_PARAM_SCHEMA';
 export * from './isJDBCConnection';
 export * from './NetworkHandlerResource';
 export * from './useConnectionInfo';

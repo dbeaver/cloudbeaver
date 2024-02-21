@@ -1,7 +1,6 @@
 mutation closeConnection(
   $projectId: ID!
   $connectionId: ID!
-
   $includeOrigin: Boolean!
   $customIncludeOriginDetails: Boolean!
   $includeAuthProperties: Boolean!
@@ -10,6 +9,7 @@ mutation closeConnection(
   $includeAuthNeeded: Boolean!
   $includeProperties: Boolean!
   $includeProviderProperties: Boolean!
+  $includeSharedSecrets: Boolean!
   $customIncludeOptions: Boolean!
 ) {
   connection: closeConnection(projectId: $projectId, id: $connectionId) {

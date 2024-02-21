@@ -655,10 +655,14 @@ export abstract class CachedResource<
             this.dataUpdate(key);
           }
         },
-        error: exception => {
-          this.markOutdatedSync(key);
-          this.markError(exception, key, include);
-        },
+        // TODO: must rethink how to handle exceptions form performUpdate
+        //       probably we need to handle this exceptions at the place
+        //       where performUpdate is called
+        //       because performUpdate is like an transaction
+        // error: exception => {
+        //   this.markOutdatedSync(key);
+        //   this.markError(exception, key, include);
+        // },
         after: () => {
           this.flushOutdatedWaitList();
         },

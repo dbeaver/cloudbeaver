@@ -17,13 +17,14 @@ import elementsSizeStyles from './shared/ElementsSize.m.css';
 
 interface Props extends IContainerProps {
   form?: boolean;
+  secondary?: boolean;
   center?: boolean;
   box?: boolean;
   boxNoOverflow?: boolean;
 }
 
 export const Group = forwardRef<HTMLDivElement, Props & React.HTMLAttributes<HTMLDivElement>>(function Group(
-  { form, center, box, boxNoOverflow, className, ...rest },
+  { form, center, box, secondary, boxNoOverflow, className, ...rest },
   ref,
 ) {
   const styles = useS(style, containerStyles, elementsSizeStyles);
@@ -40,6 +41,8 @@ export const Group = forwardRef<HTMLDivElement, Props & React.HTMLAttributes<HTM
           ...containerProps,
           group: true,
           container: true,
+          secondary,
+          surface: !secondary,
           form,
           center,
           boxNoOverflow,
