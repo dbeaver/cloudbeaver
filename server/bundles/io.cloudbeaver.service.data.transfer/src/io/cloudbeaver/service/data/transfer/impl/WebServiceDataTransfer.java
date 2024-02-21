@@ -107,7 +107,10 @@ public class WebServiceDataTransfer implements DBWServiceDataTransfer {
     }
 
     @NotNull
-    private String makeUniqueFileName(WebSQLProcessor sqlProcessor, DataTransferProcessorDescriptor processor) {
+    private String makeUniqueFileName(WebSQLProcessor sqlProcessor, DataTransferProcessorDescriptor processor, Map<String, Object> processorProperties) {
+        if (processorProperties != null && processorProperties.get(StreamConsumerSettings.PROP_FILE_EXTENSION) != null) {
+            return sqlProcessor.getWebSession().getSessionId() + "_" + UUID.randomUUID() + "." + processorProperties.get(StreamConsumerSettings.PROP_FILE_EXTENSION);
+        }
         return sqlProcessor.getWebSession().getSessionId() + "_" + UUID.randomUUID() + "." + WebDataTransferUtils.getProcessorFileExtension(processor);
     }
 
@@ -157,7 +160,7 @@ public class WebServiceDataTransfer implements DBWServiceDataTransfer {
                 monitor.beginTask("Export data", 1);
                 try {
                     monitor.subTask("Export data using " + processor.getName());
-                    Path exportFile = dataExportFolder.resolve(makeUniqueFileName(sqlProcessor, processor));
+                    Path exportFile = dataExportFolder.resolve(makeUniqueFileName(sqlProcessor, processor, parameters.getProcessorProperties()));
                     try {
                         exportData(monitor, processor, dataContainer, parameters, resultsInfo, exportFile);
                     } catch (Exception e) {
