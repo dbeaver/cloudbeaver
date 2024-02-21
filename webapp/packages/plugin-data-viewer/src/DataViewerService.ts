@@ -27,7 +27,13 @@ export class DataViewerService {
   ) {}
 
   isDataEditable(connection: Connection) {
+    const isAdmin = this.sessionPermissionsResource.has(EAdminPermission.admin);
     const disabled = this.dataViewerSettingsService.settings.getValue('disableEdit');
-    return !disabled && !connection.readOnly;
+
+    if (disabled) {
+      return isAdmin;
+    }
+
+    return !connection.readOnly;
   }
 }
