@@ -9,7 +9,7 @@ import { isNotNullDefined } from '@cloudbeaver/core-utils';
 
 export function isControlPresented(name: string | undefined, state: any, defaultValue?: any): boolean {
   if (isNotNullDefined(state) && isNotNullDefined(name)) {
-    if (name in state) {
+    if (typeof state === 'object' && name in state) {
       return isNotNullDefined(state[name]);
     }
     return defaultValue !== undefined;

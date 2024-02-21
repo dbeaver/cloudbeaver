@@ -91,7 +91,7 @@ import java.util.stream.Collectors;
  * Is the main source of data in web application
  */
 public class WebSession extends BaseWebSession
-    implements SMSession, SMCredentialsProvider, DBACredentialsProvider, IAdaptable {
+    implements SMSessionWithAuth, SMCredentialsProvider, DBACredentialsProvider, IAdaptable {
 
     private static final Log log = Log.getLog(WebSession.class);
 
@@ -812,6 +812,14 @@ public class WebSession extends BaseWebSession
             return authTokens.isEmpty() ? null : authTokens.get(0);
         }
     }
+
+    @Override
+    public List<SMAuthInfo> getAuthInfos() {
+        synchronized (authTokens) {
+            return authTokens.stream().map(WebAuthInfo::getAuthInfo).toList();
+        }
+    }
+
 
     public List<WebAuthInfo> getAllAuthInfo() {
         synchronized (authTokens) {
