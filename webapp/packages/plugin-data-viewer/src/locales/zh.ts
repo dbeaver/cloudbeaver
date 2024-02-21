@@ -50,7 +50,7 @@ export default [
   ['data_viewer_model_not_loaded', 'Table model is not loaded'],
   ['settings_data_editor', 'Data Editor'],
   ['settings_data_editor_disable_edit_name', 'Disable Edit'],
-  ['settings_data_editor_disable_edit_description', 'Disable editing of data in Data Viewer'],
+  ['settings_data_editor_disable_edit_description', 'Disable editing of data in Data Viewer for non-admin users'],
   ['settings_data_editor_disable_data_copy_name', 'Disable Copy'],
   ['settings_data_editor_disable_data_copy_description', 'Disable copying of data in Data Viewer for non-admin users'],
   ['settings_data_editor_fetch_min_name', 'Minimum fetch size'],

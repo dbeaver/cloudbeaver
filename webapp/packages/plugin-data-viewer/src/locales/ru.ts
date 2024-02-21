@@ -44,7 +44,7 @@ export default [
   ['data_viewer_model_not_loaded', 'Не удалось загрузить модель таблицы'],
   ['settings_data_editor', 'Редактор данных'],
   ['settings_data_editor_disable_edit_name', 'Отключить редактирование'],
-  ['settings_data_editor_disable_edit_description', 'Отключить редактирование данных'],
+  ['settings_data_editor_disable_edit_description', 'Отключить редактирование данных для пользователей без прав администратора'],
   ['settings_data_editor_disable_data_copy_name', 'Отключить копирование'],
   ['settings_data_editor_disable_data_copy_description', 'Отключить копирование данных для пользователей без прав администратора'],
   ['settings_data_editor_fetch_min_name', 'Минимальный размер выборки'],
