@@ -39,6 +39,7 @@ import java.util.Map;
 public class WebDataTransferServlet extends WebServiceServletBase {
 
     private static final Log log = Log.getLog(WebDataTransferServlet.class);
+    public static final String EXTENSION = "extension";
 
     private final DBWServiceDataTransfer dtManager;
 
@@ -69,8 +70,8 @@ public class WebDataTransferServlet extends WebServiceServletBase {
         String fileName = taskInfo.getExportFileName();
         if (!CommonUtils.isEmpty(fileName)) {
             Map<String, Object> processorProperties = taskInfo.getParameters().getProcessorProperties();
-            if (processorProperties != null && processorProperties.get("extension") != null) {
-                fileName += "." + processorProperties.get("extension");
+            if (processorProperties != null && processorProperties.get(EXTENSION) != null) {
+                fileName += "." + processorProperties.get(EXTENSION);
             } else {
                 fileName += "." + WebDataTransferUtils.getProcessorFileExtension(processor);
             }
