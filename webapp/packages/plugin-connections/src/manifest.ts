@@ -13,13 +13,13 @@ import { ConnectionDriverPropertiesTabService } from './ConnectionForm/DriverPro
 import { ConnectionOptionsTabService } from './ConnectionForm/Options/ConnectionOptionsTabService';
 import { ConnectionOriginInfoTabService } from './ConnectionForm/OriginInfo/ConnectionOriginInfoTabService';
 import { ConnectionSSHTabService } from './ConnectionForm/SSH/ConnectionSSHTabService';
+import { ConnectionSSLTabService } from './ConnectionForm/SSL/ConnectionSSLTabService';
 import { ConnectionMenuBootstrap } from './ContextMenu/ConnectionMenuBootstrap';
 import { LocaleService } from './LocaleService';
 import { ConnectionFoldersBootstrap } from './NavNodes/ConnectionFoldersBootstrap';
 import { PluginBootstrap } from './PluginBootstrap';
 import { PluginConnectionsSettingsService } from './PluginConnectionsSettingsService';
 import { PublicConnectionFormService } from './PublicConnectionForm/PublicConnectionFormService';
-import { ConnectionSSLTabService } from './ConnectionForm/SSL/ConnectionSSLTabService';
 
 export const connectionPlugin: PluginManifest = {
   info: {

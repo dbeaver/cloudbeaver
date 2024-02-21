@@ -18,14 +18,15 @@ export interface IconOrImageProps {
   title?: string;
   onClick?: () => void;
   viewBox?: string;
+  width?: number;
 }
 
-export const IconOrImage: React.FC<IconOrImageProps> = function IconOrImage({ icon, className, title, onClick, viewBox }) {
+export const IconOrImage: React.FC<IconOrImageProps> = function IconOrImage({ icon, className, title, onClick, viewBox, width }) {
   const isStaticIcon = useMemo(() => icon && (icon.startsWith('platform:') || icon.startsWith('/')), [icon]);
 
   if (isStaticIcon || isValidUrl(icon)) {
-    return <StaticImage title={title} icon={icon} className={className} onClick={onClick} />;
+    return <StaticImage title={title} icon={icon} width={width} className={className} onClick={onClick} />;
   }
 
-  return <Icon name={icon} className={className} viewBox={viewBox || '0 0 32 32'} onClick={onClick} />;
+  return <Icon name={icon} className={className} viewBox={viewBox || '0 0 32 32'} width={width} height={width} onClick={onClick} />;
 };
