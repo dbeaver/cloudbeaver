@@ -6,6 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 import { AppAuthService } from '@cloudbeaver/core-authentication';
+import { importLazyComponent } from '@cloudbeaver/core-blocks';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
 import { ProjectInfoResource, ProjectsService } from '@cloudbeaver/core-projects';
@@ -14,9 +15,10 @@ import { ActionService, DATA_CONTEXT_MENU, MenuService } from '@cloudbeaver/core
 import { MENU_CONNECTIONS } from '@cloudbeaver/plugin-connections';
 
 import { ACTION_CONNECTION_TEMPLATE } from './Actions/ACTION_CONNECTION_TEMPLATE';
-import { ConnectionDialog } from './ConnectionDialog/ConnectionDialog';
 import { TemplateConnectionsResource } from './TemplateConnectionsResource';
 import { TemplateConnectionsService } from './TemplateConnectionsService';
+
+const ConnectionDialog = importLazyComponent(() => import('./ConnectionDialog/ConnectionDialog').then(m => m.ConnectionDialog));
 
 @injectable()
 export class TemplateConnectionPluginBootstrap extends Bootstrap {
@@ -46,13 +48,15 @@ export class TemplateConnectionPluginBootstrap extends Bootstrap {
         !this.appAuthService.authenticated ||
         !this.projectsService.userProject?.canEditDataSources ||
         !this.templateConnectionsService.projectTemplates.length,
-      getLoader: (context, action) => {
-        return [
-          ...this.appAuthService.loaders,
-          getCachedMapResourceLoaderState(this.projectInfoResource, () => CachedMapAllKey),
-          getCachedDataResourceLoaderState(this.templateConnectionsResource, undefined, undefined),
-        ];
-      },
+      getLoader: () => [
+        ...this.appAuthService.loaders,
+        getCachedMapResourceLoaderState(this.projectInfoResource, () => CachedMapAllKey),
+        getCachedDataResourceLoaderState(
+          this.templateConnectionsResource,
+          () => undefined,
+          () => undefined,
+        ),
+      ],
       handler: async (context, action) => {
         switch (action) {
           case ACTION_CONNECTION_TEMPLATE: {

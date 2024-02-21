@@ -32,7 +32,7 @@ export interface Props {
   className?: string;
 }
 
-export const DBAuthDialogFooter = observer<React.PropsWithChildren<Props>>(function DBAuthDialogFooter({
+export const DatabaseCredentialsAuthDialogFooter = observer<React.PropsWithChildren<Props>>(function DatabaseCredentialsAuthDialogFooter({
   isAuthenticating,
   onLogin,
   className,

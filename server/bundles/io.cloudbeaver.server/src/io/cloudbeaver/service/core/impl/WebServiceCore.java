@@ -54,6 +54,7 @@ import org.jkiss.dbeaver.model.net.ssh.SSHImplementation;
 import org.jkiss.dbeaver.model.rm.RMProjectType;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.secret.DBSSecretController;
+import org.jkiss.dbeaver.model.secret.DBSSecretValue;
 import org.jkiss.dbeaver.model.websocket.WSConstants;
 import org.jkiss.dbeaver.model.websocket.event.datasource.WSDataSourceProperty;
 import org.jkiss.dbeaver.registry.DataSourceDescriptor;
@@ -318,14 +319,31 @@ public class WebServiceCore implements DBWServiceCore {
         @NotNull Map<String, Object> authProperties,
         @Nullable List<WebNetworkHandlerConfigInput> networkCredentials,
         @Nullable Boolean saveCredentials,
-        @Nullable Boolean sharedCredentials
+        @Nullable Boolean sharedCredentials,
+        @Nullable String selectedSecretId
     ) throws DBWebException {
         WebConnectionInfo connectionInfo = webSession.getWebConnectionInfo(projectId, connectionId);
         connectionInfo.setSavedCredentials(authProperties, networkCredentials);
 
-        DBPDataSourceContainer dataSourceContainer = connectionInfo.getDataSourceContainer();
+        var dataSourceContainer = (DataSourceDescriptor) connectionInfo.getDataSourceContainer();
         if (dataSourceContainer.isConnected()) {
             throw new DBWebException("Datasource '" + dataSourceContainer.getName() + "' is already connected");
+        }
+        if (dataSourceContainer.isSharedCredentials() && selectedSecretId != null) {
+            List<DBSSecretValue> allSecrets;
+            try {
+                allSecrets = dataSourceContainer.listSharedCredentials();
+            } catch (DBException e) {
+                throw new DBWebException("Error loading connection secret", e);
+            }
+            DBSSecretValue selectedSecret =
+                allSecrets.stream()
+                    .filter(secret -> selectedSecretId.equals(secret.getUniqueId()))
+                    .findFirst().orElse(null);
+            if (selectedSecret == null) {
+                throw new DBWebException("Secret not found:" + selectedSecretId);
+            }
+            dataSourceContainer.setSelectedSharedCredentials(selectedSecret);
         }
 
         boolean oldSavePassword = dataSourceContainer.isSavePassword();
@@ -642,12 +660,12 @@ public class WebServiceCore implements DBWServiceCore {
 
         connectionConfig.setSaveCredentials(true); // It is used in createConnectionFromConfig
 
-        DBPDataSourceContainer dataSource = WebDataSourceUtils.getLocalOrGlobalDataSource(
+        DataSourceDescriptor dataSource = (DataSourceDescriptor) WebDataSourceUtils.getLocalOrGlobalDataSource(
             CBApplication.getInstance(), webSession, projectId, connectionId);
 
         WebProjectImpl project = getProjectById(webSession, projectId);
         DBPDataSourceRegistry sessionRegistry = project.getDataSourceRegistry();
-        DBPDataSourceContainer testDataSource;
+        DataSourceDescriptor testDataSource;
         if (dataSource != null) {
             try {
                 // Check that creds are saved to trigger secrets resolve
@@ -656,12 +674,27 @@ public class WebServiceCore implements DBWServiceCore {
                 throw new DBWebException("Can't determine whether datasource credentials are saved", e);
             }
 
-            testDataSource = dataSource.createCopy(dataSource.getRegistry());
+            testDataSource = (DataSourceDescriptor) dataSource.createCopy(dataSource.getRegistry());
             WebServiceUtils.setConnectionConfiguration(
                 testDataSource.getDriver(),
                 testDataSource.getConnectionConfiguration(),
                 connectionConfig
             );
+            if (connectionConfig.getSelectedSecretId() != null) {
+                try {
+                    DBSSecretValue secretValue = dataSource.listSharedCredentials()
+                        .stream()
+                        .filter(secret -> connectionConfig.getSelectedSecretId().equals(secret.getSubjectId()))
+                        .findFirst()
+                        .orElse(null);
+
+                    if (secretValue != null) {
+                        testDataSource.setSelectedSharedCredentials(secretValue);
+                    }
+                } catch (DBException e) {
+                    throw new DBWebException("Failed to load secret value: " + connectionConfig.getSelectedSecretId());
+                }
+            }
             WebServiceUtils.saveAuthProperties(
                 testDataSource,
                 testDataSource.getConnectionConfiguration(),
@@ -671,7 +704,8 @@ public class WebServiceCore implements DBWServiceCore {
                 true
             );
         } else {
-            testDataSource = WebServiceUtils.createConnectionFromConfig(connectionConfig, sessionRegistry);
+            testDataSource = (DataSourceDescriptor) WebServiceUtils.createConnectionFromConfig(connectionConfig,
+                sessionRegistry);
         }
         webSession.provideAuthParameters(webSession.getProgressMonitor(), testDataSource, testDataSource.getConnectionConfiguration());
         testDataSource.setSavePassword(true); // We need for test to avoid password callback

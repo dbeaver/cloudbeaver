@@ -16,7 +16,7 @@ import { Button } from '../Button';
 import { Container } from '../Containers/Container';
 import { Fill } from '../Fill';
 import { Form } from '../FormControls/Form';
-import { InputField } from '../FormControls/InputField';
+import { InputField } from '../FormControls/InputField/InputField';
 import { useTranslate } from '../localization/useTranslate';
 import { s } from '../s';
 import { useFocus } from '../useFocus';

@@ -6,7 +6,4 @@
  * you may not use this file except in compliance with the License.
  */
 
-export interface IConnectionInfoParams {
-  projectId: string;
-  connectionId: string;
-}
+export const CONNECTION_FORM_SHARED_CREDENTIALS_TAB_ID = 'shared_credentials';
