@@ -88,7 +88,7 @@ export const RenderField = observer<RenderFieldProps>(function RenderField({
   }
 
   if (!editable) {
-    if (autoHide && !isControlPresented(property.id!, state)) {
+    if (autoHide && !isControlPresented(property.id, state)) {
       return null;
     }
     return (

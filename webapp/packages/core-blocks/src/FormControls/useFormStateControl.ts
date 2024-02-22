@@ -38,10 +38,10 @@ export function useFormStateControl<TState extends Record<string, any>, TKey ext
   let presented = true;
 
   if (isNotNullDefined(value) && isObject(value)) {
-    presented = isControlPresented(String(name), value, defaultValue);
+    presented = isControlPresented(name, value, defaultValue);
     value = value[name];
   } else if (isNotNullDefined(defaultValue) && isObject(defaultValue)) {
-    presented = isControlPresented(String(name), defaultValue);
+    presented = isControlPresented(name, defaultValue);
     defaultValue = defaultValue[name];
   }
 
