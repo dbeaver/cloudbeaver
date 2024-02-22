@@ -185,15 +185,13 @@ export class UsersResource extends CachedMapResource<string, AdminUser, UserReso
   }
 
   async setAuthRole(userId: string, authRole?: string, skipUpdate?: boolean): Promise<void> {
-    await this.performUpdate(userId, undefined, async () => {
-      await this.graphQLService.sdk.setUserAuthRole({ userId, authRole });
+    await this.graphQLService.sdk.setUserAuthRole({ userId, authRole });
 
-      const user = this.get(userId);
+    const user = this.get(userId);
 
-      if (user) {
-        user.authRole = authRole;
-      }
-    });
+    if (user) {
+      user.authRole = authRole;
+    }
 
     if (!skipUpdate) {
       this.markOutdated(userId);
