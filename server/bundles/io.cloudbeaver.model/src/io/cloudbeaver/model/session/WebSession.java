@@ -521,6 +521,7 @@ public class WebSession extends BaseWebSession
         HttpServletRequest request,
         HttpServletResponse response
     ) throws DBWebException {
+        log.debug("Update session lifetime " + getSessionId() + " for user " + getUserId());
         touchSession();
         HttpSession httpSession = request.getSession();
         this.lastRemoteAddr = request.getRemoteAddr();
