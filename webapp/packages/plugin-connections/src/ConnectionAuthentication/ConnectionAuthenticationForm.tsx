@@ -72,6 +72,7 @@ export const ConnectionAuthenticationForm = observer<ConnectionAuthenticationFor
                 state={config.credentials}
                 disabled={disabled}
                 canShowPassword={false}
+                disableAutoCompleteForPasswords
               />
               {allowSaveCredentials && (
                 <FieldCheckbox
