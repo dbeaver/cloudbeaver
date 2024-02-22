@@ -15,11 +15,11 @@ import { ENotificationType } from '@cloudbeaver/core-events';
 import type { ConnectionConfig } from '@cloudbeaver/core-sdk';
 import { BASE_TAB_STYLES, TabList, TabPanelList, TabsState, UNDERLINE_TAB_BIG_STYLES, UNDERLINE_TAB_STYLES } from '@cloudbeaver/core-ui';
 
+import { ConnectionFormActionsContext, IConnectionFormActionsContext } from './ConnectFormActionsContext';
+import connectionFormStyles from './ConnectionForm.m.css';
 import { ConnectionFormService } from './ConnectionFormService';
 import { connectionConfigContext } from './Contexts/connectionConfigContext';
 import type { IConnectionFormState } from './IConnectionFormProps';
-import connectionFormStyles from './ConnectionForm.m.css';
-import { ConnectionFormActionsContext, IConnectionFormActionsContext } from './ConnectFormActionsContext';
 
 const tabsStyles = css`
   TabList {
@@ -108,7 +108,7 @@ export const ConnectionForm = observer<ConnectionFormProps>(function ConnectionF
   const style = [BASE_TAB_STYLES, tabsStyles, UNDERLINE_TAB_STYLES, UNDERLINE_TAB_BIG_STYLES];
   const styles = useStyles(style, topBarStyles, formStyles);
   const service = useService(ConnectionFormService);
-  
+
   const form = useForm({
     onSubmit: event => {
       if (event?.type === 'test') {

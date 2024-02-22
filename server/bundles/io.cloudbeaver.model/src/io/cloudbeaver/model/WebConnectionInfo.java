@@ -448,5 +448,12 @@ public class WebConnectionInfo {
         return dataSourceContainer.getConnectionConfiguration().getKeepAliveInterval();
     }
 
+    @Property
+    public List<WebSecretInfo> getSharedSecrets() throws DBException {
+        return dataSourceContainer.listSharedCredentials()
+            .stream()
+            .map(WebSecretInfo::new)
+            .collect(Collectors.toList());
+    }
 
 }

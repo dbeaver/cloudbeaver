@@ -44,8 +44,8 @@ export const ServerConfigurationInfoForm = observer<Props>(function ServerConfig
         name="sessionExpireTime"
         state={state.serverConfig}
         min={INPUT_MIN_SESSION_EXPIRE_TIME}
-        mapState={v => (v === 0 ? 60000 : v ?? 1800000) / 1000 / 60}
-        mapValue={v => (v === undefined ? 30 : Number(v) || 1) * 1000 * 60}
+        mapState={(v: number | undefined) => String((v === 0 ? 60000 : v ?? 1800000) / 1000 / 60)}
+        mapValue={(v?: string) => (v === undefined ? 30 : Number(v) || 1) * 1000 * 60}
         required
         tiny
       >

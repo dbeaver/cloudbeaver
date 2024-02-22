@@ -91,7 +91,7 @@ import java.util.stream.Collectors;
  * Is the main source of data in web application
  */
 public class WebSession extends BaseWebSession
-    implements SMSession, SMCredentialsProvider, DBACredentialsProvider, IAdaptable {
+    implements SMSessionWithAuth, SMCredentialsProvider, DBACredentialsProvider, IAdaptable {
 
     private static final Log log = Log.getLog(WebSession.class);
 
@@ -814,6 +814,14 @@ public class WebSession extends BaseWebSession
         }
     }
 
+    @Override
+    public List<SMAuthInfo> getAuthInfos() {
+        synchronized (authTokens) {
+            return authTokens.stream().map(WebAuthInfo::getAuthInfo).toList();
+        }
+    }
+
+
     public List<WebAuthInfo> getAllAuthInfo() {
         synchronized (authTokens) {
             return new ArrayList<>(authTokens);
@@ -1007,6 +1015,17 @@ public class WebSession extends BaseWebSession
     @Nullable
     public WebProjectImpl getProjectById(@Nullable String projectId) {
         return getWorkspace().getProjectById(projectId);
+    }
+
+    public WebProjectImpl getAccessibleProjectById(@Nullable String projectId) throws DBWebException {
+        WebProjectImpl project = null;
+        if (projectId != null) {
+            project = getWorkspace().getProjectById(projectId);
+        }
+        if (project == null) {
+            throw new DBWebException("Project not found: " + projectId);
+        }
+        return project;
     }
 
     public List<WebProjectImpl> getAccessibleProjects() {

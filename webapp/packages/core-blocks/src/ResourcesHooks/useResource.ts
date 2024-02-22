@@ -48,7 +48,7 @@ interface IActions<TResource extends IResource<any, any, any, any>, TKey, TInclu
   active?: boolean;
   forceSuspense?: boolean;
   silent?: boolean;
-  onData?: (data: ResourceData<TResource, TKey, TIncludes>, resource: TResource) => Promise<any> | any;
+  onData?: (data: ResourceData<TResource, TKey, TIncludes>, resource: TResource) => any;
   onError?: (exception: Error | Error[] | null) => void;
 }
 
