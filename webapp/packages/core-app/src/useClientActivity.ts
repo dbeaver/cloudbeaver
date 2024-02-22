@@ -25,6 +25,7 @@ export function useClientActivity() {
     document.addEventListener('click', updateActivity);
     document.addEventListener('keydown', updateActivity);
     document.addEventListener('scroll', updateActivity);
+    document.addEventListener('touchstart', updateActivity);
   }
 
   function unsubscribeEvents() {
@@ -32,6 +33,7 @@ export function useClientActivity() {
     document.removeEventListener('click', updateActivity);
     document.removeEventListener('keydown', updateActivity);
     document.removeEventListener('scroll', updateActivity);
+    document.removeEventListener('touchstart', updateActivity);
   }
 
   useEffect(() => {
