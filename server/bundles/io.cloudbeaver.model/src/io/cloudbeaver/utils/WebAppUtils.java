@@ -224,4 +224,26 @@ public class WebAppUtils {
         return project;
     }
 
+    public static Map<String, Object> flattenMap(Map<String, Object> nestedMap) {
+        Map<String, Object> result = new HashMap<>();
+        flattenMapHelper(nestedMap, result, "");
+        return result;
+    }
+
+    private static void flattenMapHelper(Map<String, Object> nestedMap, Map<String, Object> result, String prefix) {
+        for (Map.Entry<String, Object> entry : nestedMap.entrySet()) {
+            String key = entry.getKey();
+            Object value = entry.getValue();
+
+            if (value instanceof Map) {
+                flattenMapHelper((Map<String, Object>) value, result, prefix + key + ".");
+            } else {
+                String fullKey = prefix + key;
+                if (!result.containsKey(fullKey)) {
+                    result.put(fullKey, value);
+                }
+            }
+        }
+    }
+
 }
