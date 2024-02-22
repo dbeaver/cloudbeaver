@@ -89,9 +89,10 @@ public class RPSessionHandler implements DBWSessionHandler {
             resolveParam(paramConfigMap.get(RPConstants.PARAM_USER), RPAuthProvider.X_USER)
         );
         String teams = request.getHeader(resolveParam(paramConfigMap.get(RPConstants.PARAM_TEAM), RPAuthProvider.X_TEAM));
-        if (CommonUtils.isEmpty(teams)) {
-            // backward compatibility
-            teams = request.getHeader(RPAuthProvider.X_ROLE);
+        // backward compatibility
+        String deprecatedTeams = request.getHeader(RPAuthProvider.X_ROLE);
+        if (teams == null && deprecatedTeams != null) {
+            teams = deprecatedTeams;
         }
         String role = request.getHeader(resolveParam(paramConfigMap.get(RPConstants.PARAM_ROLE_NAME), RPAuthProvider.X_ROLE_TE));
         String firstName = request.getHeader(resolveParam(paramConfigMap.get(RPConstants.PARAM_FIRST_NAME), RPAuthProvider.X_FIRST_NAME));
@@ -99,7 +100,7 @@ public class RPSessionHandler implements DBWSessionHandler {
         String logoutUrl = Objects.requireNonNull(configuration).getParameter(RPConstants.PARAM_LOGOUT_URL);
         String teamDelimiter = JSONUtils.getString(configuration.getParameters(),
                 RPConstants.PARAM_TEAM_DELIMITER, "\\|");
-        List<String> userTeams = teams == null ? Collections.emptyList() : List.of(teams.split(teamDelimiter));
+        List<String> userTeams = teams == null ? null : (teams.isEmpty() ? List.of() : List.of(teams.split(teamDelimiter)));
         if (userName != null) {
             try {
                 Map<String, Object> credentials = new HashMap<>();
