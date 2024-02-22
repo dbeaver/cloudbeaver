@@ -34,7 +34,7 @@ export class SessionResource extends CachedDataResource<SessionState | null> {
   constructor(
     private readonly graphQLService: GraphQLService,
     sessionInfoEventHandler: SessionInfoEventHandler,
-    private readonly serverConfigResource: ServerConfigResource,
+    serverConfigResource: ServerConfigResource,
   ) {
     super(() => null);
 
@@ -42,6 +42,11 @@ export class SessionResource extends CachedDataResource<SessionState | null> {
     sessionInfoEventHandler.onEvent(
       ServerEventId.CbSessionState,
       event => {
+        if (this.data) {
+          this.data.valid = event.isValid ?? this.data.valid;
+          this.data.remainingTime = event.remainingTime;
+          // TODO: probably we want to call here this.dataUpdate
+        }
         this.onStatusUpdate.execute(event);
       },
       undefined,
