@@ -320,16 +320,21 @@ public class WebSessionManager {
      */
     public void sendSessionsStates() {
         synchronized (sessionMap) {
-            for (var session : sessionMap.values()) {
-                if (session instanceof WebHeadlessSession) {
-                    continue;
-                }
-                try {
-                    session.addSessionEvent(new WSSessionStateEvent(session.getRemainingTime(), session.isValid()));
-                } catch (Exception e) {
-                    log.error("Failed to refresh session state: " + session.getSessionId(), e);
-                }
-            }
+            sessionMap.values()
+                .parallelStream()
+                .filter(session -> {
+                    if (session instanceof WebSession webSession) {
+                        return webSession.isAuthorizedInSecurityManager();
+                    }
+                    return false;
+                })
+                .forEach(session -> {
+                    try {
+                        session.addSessionEvent(new WSSessionStateEvent(session.getRemainingTime(), session.isValid()));
+                    } catch (Exception e) {
+                        log.error("Failed to refresh session state: " + session.getSessionId(), e);
+                    }
+                });
         }
     }
 
