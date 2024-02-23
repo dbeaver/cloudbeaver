@@ -61,7 +61,7 @@ export const SqlScriptStatisticsPanel = observer<IProps>(function SqlScriptStati
     <statistics>
       {translate('sql_editor_sql_execution_executed_queries')} {statistics.executedQueries} / {statistics.queries}
       <br />
-      {translate('data_viewer_statistics_duration')} {statistics.executeTime} ms
+      {translate('data_viewer_statistics_duration')} {statistics.executeTime} {translate('ui_ms')}
       <br />
       {translate('data_viewer_statistics_updated_rows')} {statistics.updatedRows}
       <br />

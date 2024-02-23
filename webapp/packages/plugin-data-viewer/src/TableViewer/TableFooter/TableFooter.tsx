@@ -9,7 +9,7 @@ import { observer } from 'mobx-react-lite';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import styled, { css, use } from 'reshadow';
 
-import { Form, getComputed, ToolsPanel } from '@cloudbeaver/core-blocks';
+import { Form, getComputed, ToolsPanel, useTranslate } from '@cloudbeaver/core-blocks';
 import type { IDataContext } from '@cloudbeaver/core-data-context';
 import { useService } from '@cloudbeaver/core-di';
 
@@ -70,6 +70,7 @@ interface Props {
 }
 
 export const TableFooter = observer<Props>(function TableFooter({ resultIndex, model, simple, context }) {
+  const translate = useTranslate();
   const ref = useRef<HTMLInputElement>(null);
   const [limit, setLimit] = useState(model.countGain + '');
   const dataViewerSettingsService = useService(DataViewerSettingsService);
@@ -120,7 +121,8 @@ export const TableFooter = observer<Props>(function TableFooter({ resultIndex, m
       <TableFooterMenu model={model} resultIndex={resultIndex} simple={simple} context={context} />
       {model.source.requestInfo.requestMessage.length > 0 && (
         <time>
-          {model.source.requestInfo.requestMessage} - {model.source.requestInfo.requestDuration}ms
+          {translate(model.source.requestInfo.requestMessage)} - {model.source.requestInfo.requestDuration}
+          {translate('ui_ms')}
         </time>
       )}
     </ToolsPanel>,
