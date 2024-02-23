@@ -40,6 +40,7 @@
   "peerDependencies": {},
   "devDependencies": {
     "@cloudbeaver/core-browser": "~0.1.0",
+    "@cloudbeaver/core-client-activity": "~0.1.0",
     "@cloudbeaver/core-events": "~0.1.0",
     "@cloudbeaver/core-localization": "~0.1.0",
     "@cloudbeaver/core-plugin": "~0.1.0",
