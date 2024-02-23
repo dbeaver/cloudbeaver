@@ -1321,9 +1321,7 @@ public abstract class CBApplication extends BaseWebApplication implements WebAut
     public void saveProductConfiguration(SMCredentialsProvider credentialsProvider, Map<String, Object> productConfiguration) throws DBException {
         Map<String, Object> mergedConfig = WebAppUtils.mergeConfigurations(this.productConfiguration, productConfiguration);
         writeRuntimeConfig(getRuntimeProductConfigFilePath().toFile(), mergedConfig);
-        Map<String, Object> flattenConfig = WebAppUtils.flattenMap(this.productConfiguration);
         this.productConfiguration.clear();
-        this.productConfiguration.putAll(flattenConfig);
         this.productConfiguration.putAll(WebAppUtils.flattenMap(mergedConfig));
         sendConfigChangedEvent(credentialsProvider);
     }
