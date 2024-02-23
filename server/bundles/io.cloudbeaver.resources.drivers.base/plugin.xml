@@ -37,7 +37,7 @@
         <bundle id="drivers.sqlite.xerial" label="SQLite drivers"/>
         <bundle id="drivers.mssql.new" label="SQL Server drivers"/>
         <bundle id="drivers.trino" label="Trino drivers"/>
-        <bundle id="drivers.kyuubi" label="Apache Kyuubi (Incubating) drivers"/>
+        <bundle id="drivers.kyuubi" label="Apache Kyuubi drivers"/>
     </extension>
 
     <!-- Enabled drivers -->
