@@ -21,7 +21,7 @@ interface Props {
 
 export const SqlResultSetPanel = observer<Props>(function SqlResultSetPanel({ state, resultTab }) {
   const sqlQueryResultService = useService(SqlQueryResultService);
-  const group = state.resultGroups.find(group => group.groupId === resultTab.groupId)!;
+  const group = state.resultGroups.find(group => group.groupId === resultTab.groupId);
 
   function onPresentationChange(presentationId: string) {
     sqlQueryResultService.updateResultTab(state, resultTab.tabId, {
@@ -33,6 +33,10 @@ export const SqlResultSetPanel = observer<Props>(function SqlResultSetPanel({ st
     sqlQueryResultService.updateResultTab(state, resultTab.tabId, {
       valuePresentationId,
     });
+  }
+
+  if (!group) {
+    throw new Error('Result group not found');
   }
 
   return (
