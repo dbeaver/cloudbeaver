@@ -9,7 +9,7 @@
 export interface IFormStateControl<TState extends Record<string, any>, TKey extends keyof TState> {
   name: TKey;
   state: TState;
-  defaultState?: TState;
+  defaultState?: Readonly<Partial<TState>>;
   autoHide?: boolean;
   mapState?: (value: TState[TKey]) => string;
   mapValue?: (value: string) => TState[TKey];
