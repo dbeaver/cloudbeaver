@@ -103,6 +103,7 @@ export const Filter = observer<ControlledProps | ObjectsProps<any, any>>(functio
     <div className={s(styles, { filterContainer: true }, className)} onClick={onClick}>
       <InputField
         ref={inputRef}
+        type="search"
         className={s(styles, { inputField: true, max })}
         placeholder={placeholder}
         disabled={disabled}

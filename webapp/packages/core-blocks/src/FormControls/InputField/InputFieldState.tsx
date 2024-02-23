@@ -31,7 +31,7 @@ export const InputFieldState: InputFieldType = observer<InputFieldStateProps<any
       <InputFieldBase
         ref={ref}
         name={name}
-        value={controlState.stringValue ?? controlState.defaultValue ?? ''}
+        value={(controlState.stringValue || controlState.defaultValue) ?? ''}
         onChange={controlState.onChange}
         {...rest}
       />

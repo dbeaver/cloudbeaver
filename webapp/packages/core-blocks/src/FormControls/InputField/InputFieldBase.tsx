@@ -61,6 +61,7 @@ export const InputFieldBase = observer<InputFieldBaseProps, HTMLInputElement>(
     },
     ref,
   ) {
+    const [uncontrolledInputValue, setUncontrolledInputValue] = useState(value);
     const inputRef = useRef<HTMLInputElement | null>(null);
     const mergedRef = useCombinedRef(inputRef, ref);
     const capsLock = useCapsLockTracker();
@@ -81,6 +82,7 @@ export const InputFieldBase = observer<InputFieldBaseProps, HTMLInputElement>(
 
     const handleChange = useCallback(
       (event: React.ChangeEvent<HTMLInputElement>) => {
+        setUncontrolledInputValue(event.target.value);
         onChange?.(event.target.value, name);
       },
       [name, onChange],
@@ -97,15 +99,20 @@ export const InputFieldBase = observer<InputFieldBaseProps, HTMLInputElement>(
     }
 
     uncontrolled ||= value === undefined;
-    if (!value) {
-      canShowPassword = false;
-    }
 
     useLayoutEffect(() => {
       if (uncontrolled && isNotNullDefined(value) && inputRef.current) {
         inputRef.current.value = value;
+
+        if (uncontrolledInputValue !== value) {
+          setUncontrolledInputValue(value);
+        }
       }
     });
+
+    if (!uncontrolledInputValue) {
+      canShowPassword = false;
+    }
 
     return (
       <Field {...layoutProps} className={s(styles, {}, className)}>
