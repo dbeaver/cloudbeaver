@@ -35,14 +35,16 @@ export function useFormStateControl<TState extends Record<string, any>, TKey ext
     }
   });
 
-  let presented = true;
+  let presented: boolean | undefined;
 
-  if (isNotNullDefined(value) && isObject(value)) {
-    presented = isControlPresented(name, value, defaultValue);
-    value = value[name];
-  } else if (isNotNullDefined(defaultValue) && isObject(defaultValue)) {
+  if (isNotNullDefined(defaultValue) && isObject(defaultValue)) {
     presented = isControlPresented(name, defaultValue);
     defaultValue = defaultValue[name];
+  }
+
+  if (isNotNullDefined(value) && isObject(value)) {
+    presented = presented || isControlPresented(name, value, defaultValue);
+    value = value[name];
   }
 
   let stringValue: string | typeof value;
@@ -55,7 +57,7 @@ export function useFormStateControl<TState extends Record<string, any>, TKey ext
     defaultStringValue = isNotNullDefined(defaultValue) ? String(defaultValue) : '';
   }
 
-  const hide = 'autoHide' in rest && !!rest.autoHide && !presented;
+  const hide = 'autoHide' in rest && !!rest.autoHide && presented === false;
 
   return { name, value, stringValue, defaultValue, defaultStringValue, hide, onChange: handleChange };
 }
