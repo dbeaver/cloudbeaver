@@ -88,7 +88,7 @@ export const RenderField = observer<RenderFieldProps>(function RenderField({
   }
 
   if (!editable) {
-    if (autoHide && !isControlPresented(property.id!, state)) {
+    if (autoHide && !isControlPresented(property.id, state)) {
       return null;
     }
     return (
@@ -239,9 +239,8 @@ export const RenderField = observer<RenderFieldProps>(function RenderField({
         labelTooltip={property.description || property.displayName}
         name={property.id!}
         state={state}
-        defaultState={defaultState}
+        defaultState={defaultState || { [property.id!]: defaultValue }}
         autoHide={autoHide}
-        defaultValue={defaultValue}
         description={property.hint}
         placeholder={passwordSavedMessage}
         disabled={disabled}
