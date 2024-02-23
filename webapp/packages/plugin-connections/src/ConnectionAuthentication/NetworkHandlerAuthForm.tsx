@@ -56,7 +56,7 @@ export const NetworkHandlerAuthForm = observer<Props>(function NetworkHandlerAut
           <InputField type="text" name="userName" state={state} disabled={disabled}>
             {translate(`connections_network_handler_${id}_user`, 'connections_network_handler_default_user')}
           </InputField>
-          <InputField autoComplete="new-password" type="password" name="password" canShowPassword={false} state={state} disabled={disabled}>
+          <InputField type="password" name="password" canShowPassword={false} state={state} disabled={disabled} autoComplete="new-password">
             {passwordLabel}
           </InputField>
         </>
