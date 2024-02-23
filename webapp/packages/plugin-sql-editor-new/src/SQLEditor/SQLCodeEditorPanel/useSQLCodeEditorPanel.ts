@@ -10,7 +10,6 @@ import { useCallback } from 'react';
 
 import { useExecutor, useObservableRef } from '@cloudbeaver/core-blocks';
 import { throttle } from '@cloudbeaver/core-utils';
-import type { Transaction, ViewUpdate } from '@cloudbeaver/plugin-codemirror6';
 import type { ISQLEditorData } from '@cloudbeaver/plugin-sql-editor';
 
 import type { IEditor } from '../SQLCodeEditor/useSQLCodeEditor';

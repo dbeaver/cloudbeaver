@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 import { MergeView } from '@codemirror/merge';
-import { Annotation, Compartment, Extension, StateEffect, TransactionSpec } from '@codemirror/state';
+import { Annotation, Compartment, EditorState, Extension, StateEffect, TransactionSpec } from '@codemirror/state';
 import { EditorView, ViewUpdate } from '@codemirror/view';
 import { observer } from 'mobx-react-lite';
 import { forwardRef, useImperativeHandle, useLayoutEffect, useMemo, useRef, useState } from 'react';
@@ -17,6 +17,7 @@ import type { IEditorRef } from './IEditorRef';
 import type { IReactCodeMirrorProps } from './IReactCodemirrorProps';
 import { type IReactCodemirrorContext, ReactCodemirrorContext } from './ReactCodemirrorContext';
 import { useCodemirrorExtensions } from './useCodemirrorExtensions';
+import { validateCursorBoundaries } from './validateCursorBoundaries';
 
 const External = Annotation.define<boolean>();
 
@@ -55,15 +56,11 @@ export const ReactCodemirror = observer<IReactCodeMirrorProps, IEditorRef>(
     const [view, setView] = useState<EditorView | null>(null);
     const [incomingView, setIncomingView] = useState<EditorView | null>(null);
     const callbackRef = useObjectRef({ onChange, onCursorChange, onUpdate });
-    const [selection, setSelection] = useState(view?.state.selection.main ?? null);
 
     useLayoutEffect(() => {
       if (container) {
         const updateListener = EditorView.updateListener.of((update: ViewUpdate) => {
           const remote = update.transactions.some(tr => tr.annotation(External));
-          if (update.selectionSet) {
-            setSelection(update.state.selection.main);
-          }
 
           if (update.docChanged && !remote) {
             const doc = update.state.doc;
@@ -89,9 +86,15 @@ export const ReactCodemirror = observer<IReactCodeMirrorProps, IEditorRef>(
           effects.push(compartment.of(extension));
         }
 
+        const tempState = EditorState.create({
+          doc: value,
+        });
+
         if (incomingValue !== undefined) {
           merge = new MergeView({
             a: {
+              doc: value,
+              selection: cursor && validateCursorBoundaries(cursor, tempState.doc.length),
               extensions: [updateListener, ...effects],
             },
             b: {
@@ -104,10 +107,18 @@ export const ReactCodemirror = observer<IReactCodeMirrorProps, IEditorRef>(
           incomingView = merge.b;
         } else {
           editorView = new EditorView({
+            state: EditorState.create({
+              doc: value,
+              selection: cursor && validateCursorBoundaries(cursor, tempState.doc.length),
+              extensions: [updateListener, ...effects],
+            }),
             parent: container,
-            extensions: [updateListener, ...effects],
           });
         }
+
+        editorView.dispatch({
+          scrollIntoView: true,
+        });
 
         if (incomingView) {
           setIncomingView(incomingView);
@@ -210,9 +221,8 @@ export const ReactCodemirror = observer<IReactCodeMirrorProps, IEditorRef>(
       () => ({
         container,
         view,
-        selection,
       }),
-      [container, view, selection],
+      [container, view],
     );
 
     const context = useMemo<IReactCodemirrorContext>(
