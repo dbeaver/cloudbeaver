@@ -9,7 +9,6 @@ import { observer } from 'mobx-react-lite';
 
 import type { AuthProvider, AuthProviderConfiguration, IAuthCredentials } from '@cloudbeaver/core-authentication';
 import { Combobox, Group, InputField, useFocus } from '@cloudbeaver/core-blocks';
-import { isNotNullDefined } from '@cloudbeaver/core-utils';
 
 interface Props {
   provider: AuthProvider;
@@ -18,25 +17,8 @@ interface Props {
   authenticate: boolean;
 }
 
-type GenerateAutoCompleteArgs = {
-  parameterId: string;
-  isPassword: boolean;
-  isLocalAuth: boolean;
-  providerId: string;
-  configurationId: string | undefined;
-};
-
-function generateAutoComplete({ parameterId, isPassword, isLocalAuth, providerId, configurationId }: GenerateAutoCompleteArgs) {
-  if (isLocalAuth) {
-    return;
-  }
-
-  return isPassword ? 'new-password' : `section-authentication-section-${providerId}-${parameterId}${configurationId ? `-${configurationId}` : ''}`;
-}
-
 export const AuthProviderForm = observer<Props>(function AuthProviderForm({ provider, configuration, credentials, authenticate }) {
   const [elementRef] = useFocus<HTMLDivElement>({ focusFirstChild: true });
-  const isLocalAuth = !isNotNullDefined(configuration);
 
   function handleProfileSelect() {
     credentials.credentials = {};
@@ -59,33 +41,24 @@ export const AuthProviderForm = observer<Props>(function AuthProviderForm({ prov
           onSelect={handleProfileSelect}
         />
       )}
-      {profile.credentialParameters.map(parameter => {
-        const isPassword = parameter.encryption !== 'none';
-
-        return (
+      {profile.credentialParameters.map(
+        parameter =>
           parameter.user && (
             <InputField
               key={`${provider.id}${configuration?.id ?? ''}${parameter.id}`}
               required={provider.required}
               title={parameter.description}
-              type={isPassword ? 'password' : 'text'}
+              type={parameter.encryption === 'none' ? 'text' : 'password'}
               name={parameter.id}
               state={credentials.credentials}
               disabled={authenticate}
               canShowPassword={false}
-              autoComplete={generateAutoComplete({
-                parameterId: parameter.id,
-                isPassword,
-                isLocalAuth,
-                providerId: provider.id,
-                configurationId: configuration?.id,
-              })}
+              autoComplete={`section-authentication section-${provider.id} ${configuration?.id ?? ''} ${parameter.id}`}
             >
               {parameter.displayName}
             </InputField>
-          )
-        );
-      })}
+          ),
+      )}
     </Group>
   );
 });
