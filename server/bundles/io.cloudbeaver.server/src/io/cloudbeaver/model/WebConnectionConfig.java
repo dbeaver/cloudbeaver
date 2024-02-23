@@ -16,6 +16,7 @@
  */
 package io.cloudbeaver.model;
 
+import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.model.connection.DBPDriverConfigurationType;
 import org.jkiss.dbeaver.model.data.json.JSONUtils;
 import org.jkiss.dbeaver.model.meta.Property;
@@ -59,6 +60,7 @@ public class WebConnectionConfig {
     private Map<String, Object> providerProperties;
     private List<WebNetworkHandlerConfigInput> networkHandlersConfig;
     private DBPDriverConfigurationType configurationType;
+    private String selectedSecretId;
 
     public WebConnectionConfig() {
     }
@@ -91,6 +93,7 @@ public class WebConnectionConfig {
             properties = JSONUtils.getObjectOrNull(params, "properties");
             userName = JSONUtils.getString(params, "userName");
             userPassword = JSONUtils.getString(params, "userPassword");
+            selectedSecretId = JSONUtils.getString(params, "selectedSecretId");
 
             authModelId = JSONUtils.getString(params, "authModelId");
             credentials = JSONUtils.getObjectOrNull(params, "credentials");
@@ -230,5 +233,10 @@ public class WebConnectionConfig {
     @Property
     public Integer getKeepAliveInterval() {
         return keepAliveInterval;
+    }
+
+    @Nullable
+    public String getSelectedSecretId() {
+        return selectedSecretId;
     }
 }

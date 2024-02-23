@@ -93,11 +93,14 @@
   font-weight: 500;
   min-width: 250px;
   padding: 8px 24px 8px 8px;
-  border-right: 1px solid;
 
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+
+  &:not(:last-child) {
+    border-right: 1px solid;
+  }
 }
 .listItemDescription {
   composes: theme-typography--body2 from global;

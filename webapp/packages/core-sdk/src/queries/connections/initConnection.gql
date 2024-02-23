@@ -2,10 +2,10 @@ mutation initConnection(
   $projectId: ID!
   $connectionId: ID!
   $credentials: Object
-  $networkCredentials: [NetworkHandlerConfigInput!] 
+  $networkCredentials: [NetworkHandlerConfigInput!]
   $saveCredentials: Boolean
   $sharedCredentials: Boolean
-
+  $selectedSecretId: String
   $includeOrigin: Boolean!
   $customIncludeOriginDetails: Boolean!
   $includeAuthProperties: Boolean!
@@ -14,6 +14,7 @@ mutation initConnection(
   $includeAuthNeeded: Boolean!
   $includeProperties: Boolean!
   $includeProviderProperties: Boolean!
+  $includeSharedSecrets: Boolean!
   $customIncludeOptions: Boolean!
 ) {
   connection: initConnection(
@@ -21,8 +22,9 @@ mutation initConnection(
     id: $connectionId
     credentials: $credentials
     networkCredentials: $networkCredentials
-    saveCredentials: $saveCredentials,
-    sharedCredentials: $sharedCredentials,
+    saveCredentials: $saveCredentials
+    sharedCredentials: $sharedCredentials
+    selectedSecretId: $selectedSecretId
   ) {
     ...DatabaseConnection
   }

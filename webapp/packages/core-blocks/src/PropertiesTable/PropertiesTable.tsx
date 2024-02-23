@@ -13,18 +13,18 @@ import { Button } from '../Button';
 import ButtonStyles from '../Button.m.css';
 import { Filter } from '../FormControls/Filter';
 import FilterStyles from '../FormControls/Filter.m.css';
-import InputFieldStyles from '../FormControls/InputField.m.css';
+import InputFieldStyles from '../FormControls/InputField/InputField.m.css';
 import { useTranslate } from '../localization/useTranslate';
+import { s } from '../s';
 import { SContext, StyleRegistry } from '../SContext';
 import { useObjectRef } from '../useObjectRef';
+import { useS } from '../useS';
 import type { IProperty } from './IProperty';
+import styles from './PropertiesTable.m.css';
 import PropertiesTableAddButtonStyles from './PropertiesTableAddButtonStyles.m.css';
 import PropertiesTableFilterStyles from './PropertiesTableFilterStyles.m.css';
 import PropertiesTableInputStyles from './PropertiesTableInputStyles.m.css';
 import { PropertyItem } from './PropertyItem';
-import { useS } from '../useS';
-import styles from './PropertiesTable.m.css';
-import { s } from '../s';
 
 type PropertiesState = Record<string, string | null>;
 

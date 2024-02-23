@@ -8,8 +8,6 @@
 import { observer } from 'mobx-react-lite';
 import { forwardRef, useContext, useEffect, useState } from 'react';
 
-import type { ComponentStyle } from '@cloudbeaver/core-theming';
-
 import { Button } from '../Button';
 import { filterLayoutFakeProps, getLayoutProps } from '../Containers/filterLayoutFakeProps';
 import type { ILayoutSizeProps } from '../Containers/ILayoutSizeProps';

@@ -74,6 +74,7 @@ export default [
   ['ui_reconnect', 'Переподключиться'],
   ['ui_forget', 'Забыть'],
   ['ui_set', 'Установить'],
+  ['ui_restore', 'Восстановить'],
   ['ui_are_you_sure', 'Вы уверены?'],
   ['ui_options', 'Параметры'],
   ['ui_changes_might_be_lost', 'Ваши изменения могут быть потеряны'],

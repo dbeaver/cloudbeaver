@@ -10,11 +10,11 @@ import type { IExtension } from '@cloudbeaver/core-extensions';
 import { NavNodeInfoResource, NavNodeManagerService } from '@cloudbeaver/core-navigation-tree';
 import { projectProvider } from '@cloudbeaver/core-projects';
 
+import type { IConnectionInfoParams } from '../CONNECTION_INFO_PARAM_SCHEMA';
 import { ConnectionInfoResource, createConnectionParam } from '../ConnectionInfoResource';
 import { connectionProvider } from '../extensions/IConnectionProvider';
 import { objectCatalogProvider } from '../extensions/IObjectCatalogProvider';
 import { objectSchemaProvider } from '../extensions/IObjectSchemaProvider';
-import type { IConnectionInfoParams } from '../IConnectionsResource';
 
 @injectable()
 export class NavNodeExtensionsService {
