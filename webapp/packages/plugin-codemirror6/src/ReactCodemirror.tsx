@@ -188,10 +188,14 @@ export const ReactCodemirror = observer<IReactCodeMirrorProps, IEditorRef>(
     });
 
     useLayoutEffect(() => {
-      if (incomingValue !== undefined && incomingView && incomingValue !== incomingView.state.doc.toString()) {
-        incomingView.dispatch({
-          changes: { from: 0, to: incomingView.state.doc.length, insert: incomingValue },
-        });
+      if (incomingValue !== undefined && incomingView) {
+        const newValue = incomingView.state.toText(incomingValue);
+
+        if (!newValue.eq(incomingView.state.doc)) {
+          incomingView.dispatch({
+            changes: { from: 0, to: incomingView.state.doc.length, insert: newValue },
+          });
+        }
       }
     }, [incomingValue, incomingView]);
 
