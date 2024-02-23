@@ -6,13 +6,11 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import { useContext, useState } from 'react';
+import { useState } from 'react';
 
-import { CaptureViewContext } from '@cloudbeaver/core-view';
 import { TableViewerLoader } from '@cloudbeaver/plugin-data-viewer';
 
 import type { IResultGroup, IResultTab } from '../ISqlEditorTabState';
-import { DATA_CONTEXT_SQL_EDITOR_RESULT_SET_PRESENTATION } from './DATA_CONTEXT_SQL_EDITOR_RESULT_SET_PRESENTATION';
 import style from './SqlResultSetPanel.m.css';
 
 interface Props {
@@ -21,19 +19,8 @@ interface Props {
 }
 
 export const SqlResultSetPanel = observer<Props>(function SqlResultSetPanel({ group, resultTab }) {
-  const viewContext = useContext(CaptureViewContext);
-  if (!viewContext) {
-    throw new Error('View context not found');
-  }
-
-  const presentationContext = viewContext.get(DATA_CONTEXT_SQL_EDITOR_RESULT_SET_PRESENTATION);
-  const [presentationId, setPresentation] = useState(presentationContext.presentationId);
-  const [valuePresentationId, setValuePresentation] = useState<string | null>(presentationContext.valuePresentationId);
-
-  viewContext.set(DATA_CONTEXT_SQL_EDITOR_RESULT_SET_PRESENTATION, {
-    presentationId,
-    valuePresentationId,
-  });
+  const [presentationId, setPresentation] = useState('');
+  const [valuePresentationId, setValuePresentation] = useState<string | null>(null);
 
   return (
     <TableViewerLoader

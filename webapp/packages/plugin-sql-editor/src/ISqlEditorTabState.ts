@@ -35,11 +35,6 @@ export interface ISqlEditorResultTab {
   icon: string;
 }
 
-export interface ISqlEditorResultSetPresentation {
-  presentationId: string;
-  valuePresentationId: string | null;
-}
-
 export interface IExecutionPlanTab {
   tabId: string;
   order: number;
