@@ -13,6 +13,8 @@ export interface IResultTab {
   // new group id generates every time you execute query in new tab
   groupId: string;
   indexInResultSet: number;
+  presentationId: string;
+  valuePresentationId: string | null;
 }
 
 export interface IStatisticsTab {
