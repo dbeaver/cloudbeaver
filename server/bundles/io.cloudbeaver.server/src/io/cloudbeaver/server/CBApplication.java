@@ -720,6 +720,9 @@ public abstract class CBApplication extends BaseWebApplication implements WebAut
             log.debug("Load product runtime configuration from '" + rtConfig.getAbsolutePath() + "'");
             try (Reader reader = new InputStreamReader(new FileInputStream(rtConfig), StandardCharsets.UTF_8)) {
                 productConfiguration.putAll(JSONUtils.parseMap(gson, reader));
+                Map<String, Object> flattenConfig = WebAppUtils.flattenMap(this.productConfiguration);
+                this.productConfiguration.clear();
+                this.productConfiguration.putAll(flattenConfig);
             } catch (Exception e) {
                 throw new DBException("Error reading product runtime configuration", e);
             }
