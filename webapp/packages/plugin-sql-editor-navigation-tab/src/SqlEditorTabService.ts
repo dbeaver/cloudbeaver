@@ -7,7 +7,7 @@
  */
 import { computed, makeObservable, observable, untracked } from 'mobx';
 
-import { ConfirmationDialog } from '@cloudbeaver/core-blocks';
+import { ConfirmationDialog, importLazyComponent } from '@cloudbeaver/core-blocks';
 import {
   ConnectionExecutionContextResource,
   ConnectionExecutionContextService,
@@ -40,16 +40,17 @@ import {
   ESqlDataSourceFeatures,
   ISQLDatasourceUpdateData,
   ISqlEditorTabState,
+  SQL_EDITOR_TAB_STATE_SCHEME,
   SqlDataSourceService,
   SqlEditorService,
   SqlResultTabsService,
 } from '@cloudbeaver/plugin-sql-editor';
 
 import { isSQLEditorTab } from './isSQLEditorTab';
-import { SqlEditorPanel } from './SqlEditorPanel';
-import { SqlEditorTab } from './SqlEditorTab';
 import { sqlEditorTabHandlerKey } from './sqlEditorTabHandlerKey';
-import { SQL_EDITOR_TAB_STATE_SCHEME } from './zod.scheme';
+
+const SqlEditorPanel = importLazyComponent(() => import('./SqlEditorPanel').then(m => m.SqlEditorPanel));
+const SqlEditorTab = importLazyComponent(() => import('./SqlEditorTab').then(m => m.SqlEditorTab));
 
 @injectable()
 export class SqlEditorTabService extends Bootstrap {
