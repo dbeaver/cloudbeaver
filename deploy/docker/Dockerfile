@@ -22,6 +22,7 @@ RUN set -eux; \
         # locales ensures proper character encoding and locale-specific behaviors using en_US.UTF-8
         locales \
         nano \
+        certbot \
     ; \
     echo "en_US.UTF-8 UTF-8" >> /etc/locale.gen; \
     locale-gen en_US.UTF-8; \
