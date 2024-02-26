@@ -49,6 +49,7 @@ import { isSQLEditorTab } from './isSQLEditorTab';
 import { SqlEditorPanel } from './SqlEditorPanel';
 import { SqlEditorTab } from './SqlEditorTab';
 import { sqlEditorTabHandlerKey } from './sqlEditorTabHandlerKey';
+import { SQL_EDITOR_TAB_STATE_SCHEME } from './zod.scheme';
 
 @injectable()
 export class SqlEditorTabService extends Bootstrap {
@@ -273,20 +274,7 @@ export class SqlEditorTabService extends Bootstrap {
   }
 
   private async handleTabRestore(tab: ITab<ISqlEditorTabState>): Promise<boolean> {
-    if (
-      typeof tab.handlerState.editorId !== 'string' ||
-      typeof tab.handlerState.editorId !== 'string' ||
-      typeof tab.handlerState.order !== 'number' ||
-      !['string', 'undefined'].includes(typeof tab.handlerState.currentTabId) ||
-      !['string', 'undefined'].includes(typeof tab.handlerState.source) ||
-      !['string', 'undefined'].includes(typeof tab.handlerState.currentModeId) ||
-      !Array.isArray(tab.handlerState.modeState) ||
-      !Array.isArray(tab.handlerState.tabs) ||
-      !Array.isArray(tab.handlerState.executionPlanTabs) ||
-      !Array.isArray(tab.handlerState.resultGroups) ||
-      !Array.isArray(tab.handlerState.resultTabs) ||
-      !Array.isArray(tab.handlerState.statisticsTabs)
-    ) {
+    if (!SQL_EDITOR_TAB_STATE_SCHEME.safeParse(tab.handlerState).success) {
       await this.sqlDataSourceService.destroy(tab.handlerState.editorId);
       return false;
     }
