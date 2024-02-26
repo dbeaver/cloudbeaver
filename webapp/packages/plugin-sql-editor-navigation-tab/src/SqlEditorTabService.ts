@@ -40,7 +40,7 @@ import {
   ESqlDataSourceFeatures,
   ISQLDatasourceUpdateData,
   ISqlEditorTabState,
-  SQL_EDITOR_TAB_STATE_SCHEME,
+  SQL_EDITOR_TAB_STATE_SCHEMA,
   SqlDataSourceService,
   SqlEditorService,
   SqlResultTabsService,
@@ -275,7 +275,7 @@ export class SqlEditorTabService extends Bootstrap {
   }
 
   private async handleTabRestore(tab: ITab<ISqlEditorTabState>): Promise<boolean> {
-    if (!SQL_EDITOR_TAB_STATE_SCHEME.safeParse(tab.handlerState).success) {
+    if (!SQL_EDITOR_TAB_STATE_SCHEMA.safeParse(tab.handlerState).success) {
       await this.sqlDataSourceService.destroy(tab.handlerState.editorId);
       return false;
     }
