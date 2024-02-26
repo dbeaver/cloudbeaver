@@ -56,6 +56,7 @@ export * from './isMapsEqual';
 export * from './isObjectsEqual';
 export * from './openCenteredPopup';
 export * from './download';
+export * from './downloadFromURL';
 export * from './getTextFileReadingProcess';
 export * from './getTextBetween';
 export * from './timestampToDate';

@@ -127,7 +127,6 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
     const valueSize =
       isResultSetContentValue(contentValue) && isNotNullDefined(contentValue.contentLength) ? bytesToSize(contentValue.contentLength) : undefined;
     const canSave = firstSelectedCell && contentAction.isDownloadable(firstSelectedCell);
-    const shouldShowPasteButton = textValueData.isTextColumn && firstSelectedCell && contentAction.isTextTruncated(firstSelectedCell);
     const typeExtension = useMemo(() => getTypeExtension(contentType!) ?? [], [contentType]);
     const extensions = useCodemirrorExtensions(undefined, typeExtension);
 
@@ -188,9 +187,9 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
             onChange={valueChangeHandler}
           />
         </Group>
-        {firstSelectedCell && contentAction.isTextTruncated(firstSelectedCell) ? (
+        {textValueData.isTruncated ? (
           <QuotaPlaceholder model={model} resultIndex={resultIndex} elementKey={firstSelectedCell} keepSize>
-            {shouldShowPasteButton && (
+            {textValueData.isTextColumn && (
               <Container keepSize>
                 <Button disabled={model.isLoading()} onClick={textValueData.pasteFullText}>
                   {`${translate('ui_show_more')} (${valueSize})`}

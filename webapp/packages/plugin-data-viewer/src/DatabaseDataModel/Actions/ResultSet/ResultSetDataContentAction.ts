@@ -9,7 +9,7 @@ import { makeObservable, observable } from 'mobx';
 
 import { QuotasService } from '@cloudbeaver/core-root';
 import { GraphQLService, ResultDataFormat } from '@cloudbeaver/core-sdk';
-import { bytesToSize, download, GlobalConstants, isNotNullDefined } from '@cloudbeaver/core-utils';
+import { bytesToSize, download, downloadFromURL, GlobalConstants, isNotNullDefined } from '@cloudbeaver/core-utils';
 
 import { DatabaseDataAction } from '../../DatabaseDataAction';
 import type { IDatabaseDataSource } from '../../IDatabaseDataSource';
@@ -18,15 +18,15 @@ import { databaseDataAction } from '../DatabaseDataActionDecorator';
 import type { IResultSetDataContentAction } from './IResultSetDataContentAction';
 import type { IResultSetElementKey } from './IResultSetDataKey';
 import { isResultSetContentValue } from './isResultSetContentValue';
+import { ResultSetCacheAction } from './ResultSetCacheAction';
 import { ResultSetDataAction } from './ResultSetDataAction';
-import { ResultSetDataKeysUtils } from './ResultSetDataKeysUtils';
 import { IResultSetValue, ResultSetFormatAction } from './ResultSetFormatAction';
-import { ResultSetViewAction } from './ResultSetViewAction';
 
 const RESULT_VALUE_PATH = 'sql-result-value';
+const CONTENT_CACHE_KEY = Symbol('content-cache-key');
 
 interface ICacheEntry {
-  url?: string;
+  blob?: Blob;
   fullText?: string;
 }
 
@@ -34,20 +34,18 @@ interface ICacheEntry {
 export class ResultSetDataContentAction extends DatabaseDataAction<any, IDatabaseResultSet> implements IResultSetDataContentAction {
   static dataFormat = [ResultDataFormat.Resultset];
 
-  private readonly cache: Map<string, Partial<ICacheEntry>>;
   activeElement: IResultSetElementKey | null;
 
   constructor(
     source: IDatabaseDataSource<any, IDatabaseResultSet>,
-    private readonly view: ResultSetViewAction,
     private readonly data: ResultSetDataAction,
     private readonly format: ResultSetFormatAction,
     private readonly graphQLService: GraphQLService,
     private readonly quotasService: QuotasService,
+    private readonly cache: ResultSetCacheAction,
   ) {
     super(source);
 
-    this.cache = new Map();
     this.activeElement = null;
 
     makeObservable<this, 'cache'>(this, {
@@ -82,10 +80,8 @@ export class ResultSetDataContentAction extends DatabaseDataAction<any, IDatabas
   isBlobTruncated(elementKey: IResultSetElementKey) {
     const limit = this.getLimitInfo(elementKey).limit;
     const content = this.format.get(elementKey);
-    const cachedBlobUrl = this.retrieveFileDataUrlFromCache(elementKey);
-    const isLoadedFullBlob = Boolean(cachedBlobUrl) && this.format.isBinary(elementKey);
 
-    if (!isNotNullDefined(limit) || !isResultSetContentValue(content) || isLoadedFullBlob || !this.format.isBinary(elementKey)) {
+    if (!isNotNullDefined(limit) || !isResultSetContentValue(content) || !this.format.isBinary(elementKey)) {
       return false;
     }
 
@@ -95,10 +91,8 @@ export class ResultSetDataContentAction extends DatabaseDataAction<any, IDatabas
   isTextTruncated(elementKey: IResultSetElementKey) {
     const limit = this.getLimitInfo(elementKey).limit;
     const content = this.format.get(elementKey);
-    const cachedFullText = this.retrieveFileFullTextFromCache(elementKey);
-    const isLoadedFullText = Boolean(cachedFullText) && this.format.isText(elementKey);
 
-    if (!isNotNullDefined(limit) || !isResultSetContentValue(content) || isLoadedFullText) {
+    if (!isNotNullDefined(limit) || !isResultSetContentValue(content)) {
       return false;
     }
 
@@ -109,29 +103,19 @@ export class ResultSetDataContentAction extends DatabaseDataAction<any, IDatabas
     return !!this.result.data?.hasRowIdentifier && isResultSetContentValue(this.format.get(element));
   }
 
-  private async loadFileFullText(result: IDatabaseResultSet, columnIndex: number, row: IResultSetValue[]) {
-    if (!result.id) {
-      throw new Error("Result's id must be provided");
-    }
+  retrieveFullTextFromCache(element: IResultSetElementKey) {
+    return this.getCache(element)?.fullText;
+  }
 
-    const response = await this.graphQLService.sdk.sqlReadStringValue({
-      resultsId: result.id,
-      connectionId: result.connectionId,
-      contextId: result.contextId,
-      columnIndex,
-      row: {
-        data: row,
-      },
-    });
-
-    return response.text;
+  retrieveBlobFromCache(element: IResultSetElementKey) {
+    return this.getCache(element)?.blob;
   }
 
   async getFileFullText(element: IResultSetElementKey) {
     const column = this.data.getColumn(element.column);
     const row = this.data.getRowValue(element.row);
 
-    const cachedFullText = this.retrieveFileFullTextFromCache(element);
+    const cachedFullText = this.retrieveFullTextFromCache(element);
 
     if (cachedFullText) {
       return cachedFullText;
@@ -166,8 +150,7 @@ export class ResultSetDataContentAction extends DatabaseDataAction<any, IDatabas
     const url = await this.source.runTask(async () => {
       try {
         this.activeElement = element;
-        const fileName = await this.loadFileName(this.result, column.position, row);
-        return this.generateFileDataUrl(fileName);
+        return await this.loadDataURL(this.result, column.position, row);
       } finally {
         this.activeElement = null;
       }
@@ -177,32 +160,18 @@ export class ResultSetDataContentAction extends DatabaseDataAction<any, IDatabas
   }
 
   async resolveFileDataUrl(element: IResultSetElementKey) {
-    const cachedUrl = this.retrieveFileDataUrlFromCache(element);
+    const cachedUrl = this.retrieveBlobFromCache(element);
 
     if (cachedUrl) {
       return cachedUrl;
     }
 
     const url = await this.getFileDataUrl(element);
-    this.updateCache(element, { url });
+    const blob = await downloadFromURL(url);
 
-    return url;
-  }
+    this.updateCache(element, { blob });
 
-  private updateCache(element: IResultSetElementKey, partialCache: Partial<ICacheEntry>) {
-    const hash = this.getHash(element);
-    const cachedElement = this.cache.get(hash) ?? {};
-    this.cache.set(hash, { ...cachedElement, ...partialCache });
-  }
-
-  retrieveFileFullTextFromCache(element: IResultSetElementKey) {
-    const hash = this.getHash(element);
-    return this.cache.get(hash)?.fullText;
-  }
-
-  retrieveFileDataUrlFromCache(element: IResultSetElementKey) {
-    const hash = this.getHash(element);
-    return this.cache.get(hash)?.url;
+    return blob;
   }
 
   async downloadFileData(element: IResultSetElementKey) {
@@ -211,23 +180,50 @@ export class ResultSetDataContentAction extends DatabaseDataAction<any, IDatabas
   }
 
   clearCache() {
-    this.cache.clear();
+    this.cache.deleteAll(CONTENT_CACHE_KEY);
   }
 
-  private generateFileDataUrl(fileName: string) {
-    return `${GlobalConstants.serviceURI}/${RESULT_VALUE_PATH}/${fileName}`;
+  dispose(): void {
+    this.clearCache();
   }
 
-  private getHash(element: IResultSetElementKey) {
-    return ResultSetDataKeysUtils.serializeElementKey(element);
-  }
-
-  private async loadFileName(result: IDatabaseResultSet, columnIndex: number, row: IResultSetValue[]) {
+  private async loadFileFullText(result: IDatabaseResultSet, columnIndex: number, row: IResultSetValue[]) {
     if (!result.id) {
       throw new Error("Result's id must be provided");
     }
 
-    const response = await this.graphQLService.sdk.getResultsetDataURL({
+    const response = await this.graphQLService.sdk.sqlReadStringValue({
+      resultsId: result.id,
+      connectionId: result.connectionId,
+      contextId: result.contextId,
+      columnIndex,
+      row: {
+        data: row,
+      },
+    });
+
+    return response.text;
+  }
+
+  private updateCache(element: IResultSetElementKey, partialCache: Partial<ICacheEntry>) {
+    const cachedElement = this.getCache(element) ?? {};
+    this.setCache(element, { ...cachedElement, ...partialCache });
+  }
+
+  private getCache(element: IResultSetElementKey) {
+    return this.cache.get<ICacheEntry>(element, CONTENT_CACHE_KEY);
+  }
+
+  private setCache(element: IResultSetElementKey, value: ICacheEntry) {
+    this.cache.set(element, CONTENT_CACHE_KEY, value);
+  }
+
+  private async loadDataURL(result: IDatabaseResultSet, columnIndex: number, row: IResultSetValue[]) {
+    if (!result.id) {
+      throw new Error("Result's id must be provided");
+    }
+
+    const { url } = await this.graphQLService.sdk.getResultsetDataURL({
       resultsId: result.id,
       connectionId: result.connectionId,
       contextId: result.contextId,
@@ -237,6 +233,6 @@ export class ResultSetDataContentAction extends DatabaseDataAction<any, IDatabas
       },
     });
 
-    return response.url;
+    return `${GlobalConstants.serviceURI}/${RESULT_VALUE_PATH}/${url}`;
   }
 }
