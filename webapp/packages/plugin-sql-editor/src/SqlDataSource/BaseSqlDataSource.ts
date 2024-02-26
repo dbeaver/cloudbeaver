@@ -239,10 +239,10 @@ export abstract class BaseSqlDataSource implements ISqlDataSource {
 
     const scriptLength = this.script.length;
 
-    this.innerCursorState = {
+    this.innerCursorState = Object.freeze({
       begin: Math.min(begin, scriptLength),
       end: Math.min(end, scriptLength),
-    };
+    });
     this.onUpdate.execute();
   }
 

@@ -5,7 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { action, autorun, computed, IReactionDisposer, observable, untracked } from 'mobx';
+import { action, autorun, computed, IReactionDisposer, observable, runInAction, untracked } from 'mobx';
 import { useEffect } from 'react';
 
 import { ConfirmationDialog, useExecutor, useObservableRef } from '@cloudbeaver/core-blocks';
@@ -538,7 +538,7 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
       const contexts = data.onMode.execute(data);
       const activeSegmentMode = contexts.getContext(SQLEditorModeContext);
 
-      action(() => {
+      runInAction(() => {
         data.activeSegmentMode = activeSegmentMode;
       });
     });
