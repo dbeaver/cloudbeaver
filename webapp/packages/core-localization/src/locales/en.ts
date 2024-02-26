@@ -114,6 +114,7 @@ export default [
   ['ui_readonly', 'Read-only'],
   ['ui_test', 'Test'],
   ['ui_export', 'Export'],
+  ['ui_you', 'You'],
 
   ['root_permission_denied', "You don't have permissions"],
   ['root_permission_no_permission', "You don't have permission for this action"],
