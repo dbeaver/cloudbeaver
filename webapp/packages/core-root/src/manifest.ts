@@ -18,6 +18,7 @@ import { ServerNodeService } from './ServerNodeService';
 import { ServerSettingsResolverService } from './ServerSettingsResolverService';
 import { ServerSettingsService } from './ServerSettingsService';
 import { SessionActionService } from './SessionActionService';
+import { SessionActivityService } from './SessionActivityService';
 import { SessionDataResource } from './SessionDataResource';
 import { SessionEventSource } from './SessionEventSource';
 import { SessionExpireEventService } from './SessionExpireEventService';
@@ -53,6 +54,7 @@ export const coreRootManifest: PluginManifest = {
     ServerConfigEventHandler,
     SessionEventSource,
     SessionInfoEventHandler,
+    SessionActivityService,
     DataSynchronizationService,
     SessionPermissionEventHandler,
     ServerSettingsResolverService,

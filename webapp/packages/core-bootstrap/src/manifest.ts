@@ -12,6 +12,7 @@ import { coreBlocksManifest } from '@cloudbeaver/core-blocks';
 import { coreBrowserManifest } from '@cloudbeaver/core-browser';
 import { coreBrowserCookiesManifest } from '@cloudbeaver/core-browser-cookies';
 import { coreBrowserSettingsManifest } from '@cloudbeaver/core-browser-settings';
+import { coreClientActivityManifest } from '@cloudbeaver/core-client-activity';
 import { coreConnectionsManifest } from '@cloudbeaver/core-connections';
 import { coreDIManifest, PluginManifest } from '@cloudbeaver/core-di';
 import { coreDialogsManifest } from '@cloudbeaver/core-dialogs';
@@ -74,5 +75,6 @@ export const coreManifests: PluginManifest[] = [
   coreDialogsManifest,
   resourceManagerManifest,
   coreAppManifest,
+  coreClientActivityManifest,
   coreNavigationTree,
 ];

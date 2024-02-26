@@ -21,6 +21,7 @@ import { useAppVersion } from '@cloudbeaver/core-version';
 
 import style from './Body.m.css';
 import { useAppHeight } from './useAppHeight';
+import { useClientActivity } from './useClientActivity';
 
 export const Body = observer(function Body() {
   // const serverConfigLoader = useResource(Body, ServerConfigResource, undefined);
@@ -44,6 +45,7 @@ export const Body = observer(function Body() {
   });
 
   useAppHeight();
+  useClientActivity();
 
   return (
     <DNDProvider>
