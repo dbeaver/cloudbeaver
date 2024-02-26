@@ -131,7 +131,6 @@ public class WebSessionManager {
                 log.debug((restored ? "Restored " : "New ") + "web session '" + webSession.getSessionId() + "'");
 
                 webSession.setCacheExpired(!httpSession.isNew());
-                webSession.updateInfo(request, response);
 
                 sessionMap.put(sessionId, webSession);
             } else {
