@@ -132,6 +132,12 @@ public class WebSession extends BaseWebSession
         this.lastAccessTime = this.createTime;
         setLocale(CommonUtils.toString(httpSession.getAttribute(ATTR_LOCALE), this.locale));
         this.sessionHandlers = sessionHandlers;
+        //force authorization of anonymous session to avoid access error,
+        //because before authorization could be called by any request,
+        //but now 'updateInfo' is called only in special requests,
+        //and the order of requests is not guaranteed.
+        //look at CB-4747
+        refreshSessionAuth();
     }
 
     @Override
