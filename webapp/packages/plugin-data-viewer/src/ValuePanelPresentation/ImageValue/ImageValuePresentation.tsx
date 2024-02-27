@@ -7,13 +7,14 @@
  */
 import { action, computed, observable } from 'mobx';
 import { observer } from 'mobx-react-lite';
+import { useMemo } from 'react';
 
 import { ActionIconButton, Button, Container, Fill, s, useObservableRef, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import { selectFiles } from '@cloudbeaver/core-browser';
 import { useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { type TabContainerPanelComponent, useTabLocalState } from '@cloudbeaver/core-ui';
-import { bytesToSize, download, getMIME, isImageFormat, isValidUrl } from '@cloudbeaver/core-utils';
+import { bytesToSize, download, getMIME, isImageFormat, isValidUrl, throttle } from '@cloudbeaver/core-utils';
 
 import { createResultSetBlobValue } from '../../DatabaseDataModel/Actions/ResultSet/createResultSetBlobValue';
 import type { IResultSetElementKey } from '../../DatabaseDataModel/Actions/ResultSet/IResultSetDataKey';
@@ -22,7 +23,6 @@ import { isResultSetBlobValue } from '../../DatabaseDataModel/Actions/ResultSet/
 import { isResultSetContentValue } from '../../DatabaseDataModel/Actions/ResultSet/isResultSetContentValue';
 import { isResultSetFileValue } from '../../DatabaseDataModel/Actions/ResultSet/isResultSetFileValue';
 import { ResultSetDataContentAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetDataContentAction';
-import { ResultSetDataKeysUtils } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetDataKeysUtils';
 import { ResultSetEditAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetEditAction';
 import { ResultSetFormatAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetFormatAction';
 import { ResultSetSelectAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetSelectAction';
@@ -92,8 +92,8 @@ export const ImageValuePresentation: TabContainerPanelComponent<IDataValuePanelP
             return this.staticSrc;
           }
 
-          if (this.cacheSrc) {
-            return URL.createObjectURL(this.cacheSrc);
+          if (this.cacheBlob) {
+            return URL.createObjectURL(this.cacheBlob);
           }
 
           return null;
@@ -113,7 +113,7 @@ export const ImageValuePresentation: TabContainerPanelComponent<IDataValuePanelP
 
           return null;
         },
-        get cacheSrc() {
+        get cacheBlob() {
           if (!this.selectedCell) {
             return null;
           }
@@ -181,7 +181,7 @@ export const ImageValuePresentation: TabContainerPanelComponent<IDataValuePanelP
         cellValue: computed,
         canUpload: computed,
         src: computed,
-        cacheSrc: computed,
+        cacheBlob: computed,
         canSave: computed,
         truncated: computed,
         model: observable.ref,
@@ -196,12 +196,11 @@ export const ImageValuePresentation: TabContainerPanelComponent<IDataValuePanelP
     const loading = model.isLoading();
 
     const valueSize = bytesToSize(isResultSetContentValue(data.cellValue) ? data.cellValue.contentLength ?? 0 : 0);
-    const isTruncatedMessageDisplay = data.truncated && !data.src;
-    const isDownloadable = isTruncatedMessageDisplay && data.selectedCell && data.contentAction.isDownloadable(data.selectedCell);
-    const isCacheDownloading =
-      !!data.selectedCell &&
-      !!data.contentAction.activeElement &&
-      ResultSetDataKeysUtils.isElementsKeyEqual(data.contentAction.activeElement, data.selectedCell);
+    const isTruncatedMessageDisplay = !!data.truncated && !data.src;
+    const isDownloadable = isTruncatedMessageDisplay && !!data.selectedCell && data.contentAction.isDownloadable(data.selectedCell);
+    const isCacheDownloading = isDownloadable && data.contentAction.isLoading(data.selectedCell);
+
+    const debouncedDownload = useMemo(() => throttle(() => data.download(), 1000, false), []);
 
     return (
       <Container vertical>
@@ -220,7 +219,7 @@ export const ImageValuePresentation: TabContainerPanelComponent<IDataValuePanelP
         <Container gap dense keepSize>
           <Container keepSize flexStart center>
             {data.canSave && (
-              <ActionIconButton title={translate('ui_download')} name="/icons/export.svg" disabled={loading} img onClick={data.download} />
+              <ActionIconButton title={translate('ui_download')} name="/icons/export.svg" disabled={loading} img onClick={debouncedDownload} />
             )}
             {data.canUpload && (
               <ActionIconButton title={translate('ui_upload')} name="/icons/import.svg" disabled={loading} img onClick={data.upload} />

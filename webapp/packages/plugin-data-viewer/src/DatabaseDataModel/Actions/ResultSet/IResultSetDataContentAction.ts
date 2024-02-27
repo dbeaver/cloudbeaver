@@ -8,7 +8,7 @@
 import type { IResultSetElementKey } from './IResultSetDataKey';
 
 export interface IResultSetDataContentAction {
-  activeElement: IResultSetElementKey | null;
+  isLoading: (element: IResultSetElementKey) => boolean;
   isBlobTruncated: (element: IResultSetElementKey) => boolean;
   isTextTruncated: (element: IResultSetElementKey) => boolean;
   isDownloadable: (element: IResultSetElementKey) => boolean;

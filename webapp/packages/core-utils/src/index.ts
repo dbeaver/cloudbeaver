@@ -71,7 +71,7 @@ export * from './TempMap';
 export * from './uriToBlob';
 export * from './utf8ToBase64';
 export * from './createLastPromiseGetter';
-export * from './removeMetadataFromBase64';
+export * from './removeMetadataFromDataURL';
 export * from './renamePathName';
 export * from './removeLineBreak';
 export * from './replaceSubstring';

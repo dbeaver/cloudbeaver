@@ -28,13 +28,12 @@ const CONTENT_CACHE_KEY = Symbol('content-cache-key');
 interface ICacheEntry {
   blob?: Blob;
   fullText?: string;
+  loading?: boolean;
 }
 
 @databaseDataAction()
 export class ResultSetDataContentAction extends DatabaseDataAction<any, IDatabaseResultSet> implements IResultSetDataContentAction {
   static dataFormat = [ResultDataFormat.Resultset];
-
-  activeElement: IResultSetElementKey | null;
 
   constructor(
     source: IDatabaseDataSource<any, IDatabaseResultSet>,
@@ -46,11 +45,8 @@ export class ResultSetDataContentAction extends DatabaseDataAction<any, IDatabas
   ) {
     super(source);
 
-    this.activeElement = null;
-
     makeObservable<this, 'cache'>(this, {
       cache: observable,
-      activeElement: observable.ref,
     });
   }
 
@@ -75,6 +71,10 @@ export class ResultSetDataContentAction extends DatabaseDataAction<any, IDatabas
     }
 
     return result;
+  }
+
+  isLoading(element: IResultSetElementKey) {
+    return this.getCache(element)?.loading ?? false;
   }
 
   isBlobTruncated(elementKey: IResultSetElementKey) {
@@ -127,10 +127,10 @@ export class ResultSetDataContentAction extends DatabaseDataAction<any, IDatabas
 
     const fullText = await this.source.runTask(async () => {
       try {
-        this.activeElement = element;
+        this.updateCache(element, { loading: true });
         return await this.loadFileFullText(this.result, column.position, row);
       } finally {
-        this.activeElement = null;
+        this.updateCache(element, { loading: false });
       }
     });
 
@@ -149,10 +149,10 @@ export class ResultSetDataContentAction extends DatabaseDataAction<any, IDatabas
 
     const url = await this.source.runTask(async () => {
       try {
-        this.activeElement = element;
+        this.updateCache(element, { loading: true });
         return await this.loadDataURL(this.result, column.position, row);
       } finally {
-        this.activeElement = null;
+        this.updateCache(element, { loading: false });
       }
     });
 
