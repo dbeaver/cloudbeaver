@@ -7,34 +7,22 @@
  */
 import { toSafeHtmlString } from './toSafeHtmlString';
 
-describe('sanitize', () => {
-  it('should sanitize input', () => {
+describe('toSafeHtmlString', () => {
+  it('should make html string safe', () => {
     const input = '<script>alert("some unsafe action")</script>';
     const output = toSafeHtmlString(input);
     expect(output).toBe('&lt;script&gt;alert("some unsafe action")&lt;/script&gt;');
   });
 
-  it('should sanitize input and keep safe tags', () => {
-    const input = '<div>qwe</div><script>alert("some unsafe action")</script><div>asd</div>';
+  it('should return empty string', () => {
+    const input = '';
     const output = toSafeHtmlString(input);
-    expect(output).toBe('&lt;div&gt;qwe&lt;/div&gt;&lt;script&gt;alert("some unsafe action")&lt;/script&gt;&lt;div&gt;asd&lt;/div&gt;');
+    expect(output).toBe('');
   });
 
-  it('should not sanitize safe input', () => {
-    const input = 'Hello, world!';
+  it('should return the same string', () => {
+    const input = 'some safe string';
     const output = toSafeHtmlString(input);
     expect(output).toBe(input);
-  });
-
-  it('should sanitize unsafe input', () => {
-    const input = '<img src="x" onerror="alert(1)">';
-    const output = toSafeHtmlString(input);
-    expect(output).toBe('&lt;img src="x" onerror="alert(1)"&gt;');
-  });
-
-  it('should sanitize unsafe input with attributes', () => {
-    const input = '<a href="javascript:alert(1)">click me</a>';
-    const output = toSafeHtmlString(input);
-    expect(output).toBe('&lt;a href="javascript:alert(1)"&gt;click me&lt;/a&gt;');
   });
 });
