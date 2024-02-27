@@ -25,6 +25,7 @@ import org.jkiss.dbeaver.model.rm.RMConstants;
 public interface DBWConstants {
 
     String PERMISSION_ADMIN = DBAPermissionRealm.PERMISSION_ADMIN;
+    String PERMISSION_DEVELOPER = RMConstants.PERMISSION_DATABASE_DEVELOPER;
 
     String PERMISSION_CONFIGURATION_MANAGER = RMConstants.PERMISSION_CONFIGURATION_MANAGER;
     String PERMISSION_PRIVATE_PROJECT_ACCESS = "private-project-access";
