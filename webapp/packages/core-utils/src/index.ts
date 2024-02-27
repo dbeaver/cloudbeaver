@@ -76,4 +76,4 @@ export * from './removeLineBreak';
 export * from './replaceSubstring';
 export * from './formatNumber';
 export * from './withTimestamp';
-export * from './sanitizeHtml';
+export * from './toSafeHtmlString';

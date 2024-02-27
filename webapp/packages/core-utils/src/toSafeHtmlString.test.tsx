@@ -5,38 +5,36 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { sanitizeHtml } from './sanitizeHtml';
+import { toSafeHtmlString } from './toSafeHtmlString';
 
 describe('sanitize', () => {
   it('should sanitize input', () => {
     const input = '<script>alert("some unsafe action")</script>';
-    const output = sanitizeHtml(input);
-    expect(output).toBe('');
+    const output = toSafeHtmlString(input);
+    expect(output).toBe('&lt;script&gt;alert("some unsafe action")&lt;/script&gt;');
   });
 
   it('should sanitize input and keep safe tags', () => {
     const input = '<div>qwe</div><script>alert("some unsafe action")</script><div>asd</div>';
-    const output = sanitizeHtml(input);
-    expect(output).toBe('<div>qwe</div><div>asd</div>');
+    const output = toSafeHtmlString(input);
+    expect(output).toBe('&lt;div&gt;qwe&lt;/div&gt;&lt;script&gt;alert("some unsafe action")&lt;/script&gt;&lt;div&gt;asd&lt;/div&gt;');
   });
 
   it('should not sanitize safe input', () => {
     const input = 'Hello, world!';
-    const output = sanitizeHtml(input);
+    const output = toSafeHtmlString(input);
     expect(output).toBe(input);
   });
 
   it('should sanitize unsafe input', () => {
     const input = '<img src="x" onerror="alert(1)">';
-    const output = sanitizeHtml(input);
-    expect(output).toBe('<img src="x">');
+    const output = toSafeHtmlString(input);
+    expect(output).toBe('&lt;img src="x" onerror="alert(1)"&gt;');
   });
 
   it('should sanitize unsafe input with attributes', () => {
     const input = '<a href="javascript:alert(1)">click me</a>';
-    const output = sanitizeHtml(input);
-    expect(output).toBe('<a>click me</a>');
+    const output = toSafeHtmlString(input);
+    expect(output).toBe('&lt;a href="javascript:alert(1)"&gt;click me&lt;/a&gt;');
   });
-
-  it('should sanitize unsafe input with attributes', () => {});
 });
