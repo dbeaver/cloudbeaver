@@ -93,6 +93,9 @@ export const ImageValuePresentation: TabContainerPanelComponent<IDataValuePanelP
           }
 
           if (this.cacheBlob) {
+            // TODO: this object must be released with URL.revokeObjectURL()
+            // it also can be released by the browser after some time
+            // what leads to image not accessible
             return URL.createObjectURL(this.cacheBlob);
           }
 

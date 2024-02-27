@@ -12,7 +12,6 @@ export interface IResultSetDataContentAction {
   isBlobTruncated: (element: IResultSetElementKey) => boolean;
   isTextTruncated: (element: IResultSetElementKey) => boolean;
   isDownloadable: (element: IResultSetElementKey) => boolean;
-  getFileDataUrl: (element: IResultSetElementKey) => Promise<string>;
   resolveFileDataUrl: (element: IResultSetElementKey) => Promise<Blob>;
   retrieveBlobFromCache: (element: IResultSetElementKey) => Blob | undefined;
   downloadFileData: (element: IResultSetElementKey) => Promise<void>;

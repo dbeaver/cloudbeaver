@@ -139,26 +139,6 @@ export class ResultSetDataContentAction extends DatabaseDataAction<any, IDatabas
     return fullText;
   }
 
-  async getFileDataUrl(element: IResultSetElementKey) {
-    const column = this.data.getColumn(element.column);
-    const row = this.data.getRowValue(element.row);
-
-    if (!row || !column) {
-      throw new Error('Failed to get value metadata information');
-    }
-
-    const url = await this.source.runTask(async () => {
-      try {
-        this.updateCache(element, { loading: true });
-        return await this.loadDataURL(this.result, column.position, row);
-      } finally {
-        this.updateCache(element, { loading: false });
-      }
-    });
-
-    return url;
-  }
-
   async resolveFileDataUrl(element: IResultSetElementKey) {
     const cachedUrl = this.retrieveBlobFromCache(element);
 
@@ -185,6 +165,26 @@ export class ResultSetDataContentAction extends DatabaseDataAction<any, IDatabas
 
   dispose(): void {
     this.clearCache();
+  }
+
+  private async getFileDataUrl(element: IResultSetElementKey) {
+    const column = this.data.getColumn(element.column);
+    const row = this.data.getRowValue(element.row);
+
+    if (!row || !column) {
+      throw new Error('Failed to get value metadata information');
+    }
+
+    const url = await this.source.runTask(async () => {
+      try {
+        this.updateCache(element, { loading: true });
+        return await this.loadDataURL(this.result, column.position, row);
+      } finally {
+        this.updateCache(element, { loading: false });
+      }
+    });
+
+    return url;
   }
 
   private async loadFileFullText(result: IDatabaseResultSet, columnIndex: number, row: IResultSetValue[]) {
