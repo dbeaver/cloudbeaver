@@ -46,10 +46,7 @@ export class DataGridContextMenuSaveContentService {
       isDisabled: context => {
         const content = context.data.model.source.getAction(context.data.resultIndex, ResultSetDataContentAction);
 
-        return (
-          context.data.model.isLoading() ||
-          (!!content.activeElement && ResultSetDataKeysUtils.isElementsKeyEqual(context.data.key, content.activeElement))
-        );
+        return context.data.model.isLoading() || content.isLoading(context.data.key);
       },
     });
     this.dataGridContextMenuService.add(this.dataGridContextMenuService.getMenuToken(), {
@@ -76,10 +73,7 @@ export class DataGridContextMenuSaveContentService {
       isDisabled: context => {
         const content = context.data.model.source.getAction(context.data.resultIndex, ResultSetDataContentAction);
 
-        return (
-          context.data.model.isLoading() ||
-          (!!content.activeElement && ResultSetDataKeysUtils.isElementsKeyEqual(context.data.key, content.activeElement))
-        );
+        return context.data.model.isLoading() || content.isLoading(context.data.key);
       },
     });
   }

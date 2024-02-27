@@ -6,12 +6,14 @@
  * you may not use this file except in compliance with the License.
  */
 
-export function removeMetadataFromBase64(base64: string) {
-  const parts = base64.split(',');
+const dataUrlFilter = /data:(.*?)\/(.*?);base64,(.*)/;
 
-  if (parts[1]) {
-    return parts[1];
+export function removeMetadataFromDataURL(base64: string) {
+  const matches = base64.match(dataUrlFilter);
+
+  if (!matches) {
+    return base64;
   }
 
-  return parts[0];
+  return matches[3];
 }
