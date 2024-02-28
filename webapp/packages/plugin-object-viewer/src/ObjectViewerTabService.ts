@@ -80,14 +80,6 @@ export class ObjectViewerTabService {
     });
   }
 
-  private handleNodeRename(data: INavNodeRenameData, contexts: IExecutionContextProvider<INavNodeRenameData>) {
-    const context = contexts.getContext(this.objectViewerTabContext);
-
-    if (context.tab) {
-      context.tab.handlerState.objectId = data.newNodeId;
-    }
-  }
-
   registerTabHandler(): void {
     this.navNodeManagerService.onCanOpen.addHandler(this.canOpenHandler.bind(this));
     this.navNodeManagerService.navigator.addHandler(this.navigationHandler.bind(this));
@@ -97,6 +89,14 @@ export class ObjectViewerTabService {
     this.connectionInfoResource.onItemDelete.addHandler(this.closeConnectionTabs.bind(this));
     this.navNodeManagerService.navTree.onItemDelete.addHandler(this.removeTabs.bind(this));
     this.navTreeResource.onNodeRename.addHandler(this.handleNodeRename.bind(this));
+  }
+
+  private handleNodeRename(data: INavNodeRenameData, contexts: IExecutionContextProvider<INavNodeRenameData>) {
+    const context = contexts.getContext(this.objectViewerTabContext);
+
+    if (context.tab) {
+      context.tab.handlerState.objectId = data.newNodeId;
+    }
   }
 
   isPageActive(tab: ITab<IObjectViewerTabState>, page: ObjectPage): boolean {
