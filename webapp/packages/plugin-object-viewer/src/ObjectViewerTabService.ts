@@ -92,11 +92,13 @@ export class ObjectViewerTabService {
   }
 
   private handleNodeRename(data: INavNodeRenameData, contexts: IExecutionContextProvider<INavNodeRenameData>) {
-    const context = contexts.getContext(this.objectViewerTabContext);
+    runInAction(() => {
+      const context = contexts.getContext(this.objectViewerTabContext);
 
-    if (context.tab) {
-      context.tab.handlerState.objectId = data.newNodeId;
-    }
+      if (context.tab) {
+        context.tab.handlerState.objectId = data.newNodeId;
+      }
+    });
   }
 
   isPageActive(tab: ITab<IObjectViewerTabState>, page: ObjectPage): boolean {
