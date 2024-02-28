@@ -1216,6 +1216,11 @@ public abstract class CBApplication extends BaseWebApplication implements WebAut
         return false;
     }
 
+    @Nullable
+    public String getLicenseStatus() {
+        return null;
+    }
+
     /**
      *
      */
