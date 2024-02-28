@@ -41,25 +41,22 @@ export const QuotaPlaceholder: React.FC<React.PropsWithChildren<Props>> = observ
   return (
     <Container className={className} keepSize={keepSize} vertical center>
       <Container center vertical>
-        {translate('data_viewer_presentation_value_content_was_truncated')}
-        <Container noWrap center>
-          <Container>{translate('data_viewer_presentation_value_content_truncated_placeholder')}</Container>
-          <Container className={s(style, { limitWord: true })} zeroBasis>
-            {admin ? (
-              <Link
-                className={s(style, { link: true })}
-                title={limitInfo?.limitWithSize}
-                href="https://dbeaver.com/docs/cloudbeaver/Server-configuration/#resource-quotas"
-                target="_blank"
-                indicator
-              >
-                {translate('ui_limit')}
-              </Link>
-            ) : (
-              translate('ui_limit')
-            )}
-          </Container>
-        </Container>
+        {translate('data_viewer_presentation_value_content_truncated_placeholder')}
+        &nbsp;
+        <span className={s(style, { limitWord: true })}>
+          {admin ? (
+            <Link
+              title={limitInfo?.limitWithSize}
+              href="https://dbeaver.com/docs/cloudbeaver/Server-configuration/#resource-quotas"
+              target="_blank"
+              indicator
+            >
+              {translate('ui_limit')}
+            </Link>
+          ) : (
+            translate('ui_limit')
+          )}
+        </span>
       </Container>
       <Container>{children}</Container>
     </Container>
