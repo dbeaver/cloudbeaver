@@ -8,7 +8,6 @@
 import { action, computed, makeObservable, observable } from 'mobx';
 
 import { DataTypeLogicalOperation, ResultDataFormat, SqlResultColumn } from '@cloudbeaver/core-sdk';
-import { EMPTY_ARRAY } from '@cloudbeaver/core-utils';
 
 import { DatabaseDataAction } from '../../DatabaseDataAction';
 import type { IDatabaseDataAction } from '../../IDatabaseDataAction';
