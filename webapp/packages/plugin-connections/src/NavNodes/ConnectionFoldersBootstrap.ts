@@ -43,7 +43,7 @@ import {
   ROOT_NODE_PATH,
 } from '@cloudbeaver/core-navigation-tree';
 import { getProjectNodeId, NAV_NODE_TYPE_PROJECT, ProjectInfoResource } from '@cloudbeaver/core-projects';
-import { CachedMapAllKey, ResourceKeyAlias, resourceKeyList, ResourceKeySimple, ResourceKeyUtils } from '@cloudbeaver/core-resource';
+import { CachedMapAllKey, resourceKeyList, ResourceKeySimple, ResourceKeyUtils } from '@cloudbeaver/core-resource';
 import { createPath } from '@cloudbeaver/core-utils';
 import { ACTION_NEW_FOLDER, ActionService, DATA_CONTEXT_MENU, IAction, MenuService } from '@cloudbeaver/core-view';
 import { DATA_CONTEXT_ELEMENTS_TREE, type IElementsTree, MENU_ELEMENTS_TREE_TOOLS } from '@cloudbeaver/plugin-navigation-tree';
@@ -259,6 +259,8 @@ export class ConnectionFoldersBootstrap extends Bootstrap {
           parentFolderParam = getConnectionFolderIdFromNodeId(targetNode.folderId);
         }
 
+        await this.connectionFolderResource.load(CachedMapAllKey);
+
         const result = await this.commonDialogService.open(FolderDialog, {
           value: this.localizationService.translate('ui_folder_new'),
           projectId: targetNode.projectId,
@@ -275,22 +277,7 @@ export class ConnectionFoldersBootstrap extends Bootstrap {
               return false;
             }
 
-            let parentKey:
-              | ResourceKeyAlias<
-                  any,
-                  {
-                    projectId: string;
-                  }
-                >
-              | IConnectionFolderParam = ConnectionFolderProjectKey(projectId);
-
-            if (folder) {
-              parentKey = createConnectionFolderParam(projectId, folder);
-            }
-
             try {
-              await this.connectionFolderResource.load(parentKey);
-
               return !this.connectionFolderResource.has(createConnectionFolderParam(projectId, createPath(folder, trimmed)));
             } catch (exception: any) {
               setMessage('connections_connection_folder_validation');
