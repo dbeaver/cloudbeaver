@@ -39,6 +39,7 @@ import org.jkiss.dbeaver.registry.DataSourceRegistry;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -249,6 +250,11 @@ public class WebDataSourceRegistryProxy implements DBPDataSourceRegistry, DataSo
     @Override
     public void updateAuthProfile(DBAAuthProfile profile) {
         dataSourceRegistry.updateAuthProfile(profile);
+    }
+
+    @Override
+    public void addAuthProfiles(Collection<DBAAuthProfile> profiles) {
+        dataSourceRegistry.addAuthProfiles(profiles);
     }
 
     @Override
