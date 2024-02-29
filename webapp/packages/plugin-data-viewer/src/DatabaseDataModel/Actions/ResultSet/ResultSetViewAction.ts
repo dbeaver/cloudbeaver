@@ -37,7 +37,7 @@ export class ResultSetViewAction extends DatabaseDataAction<any, IDatabaseResult
   }
 
   get rows(): IResultSetValue[][] {
-    return this.data.rows.map(row => row.data || EMPTY_ARRAY);
+    return this.data.rows.map(row => row.data || []);
   }
 
   get columns(): SqlResultColumn[] {
@@ -57,7 +57,9 @@ export class ResultSetViewAction extends DatabaseDataAction<any, IDatabaseResult
       columnsOrder: observable,
       setColumnOrder: action,
       rows: computed,
+      rowKeys: computed,
       columns: computed,
+      columnKeys: computed,
     });
   }
 
