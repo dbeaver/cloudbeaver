@@ -259,8 +259,6 @@ export class ConnectionFoldersBootstrap extends Bootstrap {
           parentFolderParam = getConnectionFolderIdFromNodeId(targetNode.folderId);
         }
 
-        await this.connectionFolderResource.load(CachedMapAllKey);
-
         const result = await this.commonDialogService.open(FolderDialog, {
           value: this.localizationService.translate('ui_folder_new'),
           projectId: targetNode.projectId,
@@ -278,6 +276,8 @@ export class ConnectionFoldersBootstrap extends Bootstrap {
             }
 
             try {
+              await this.connectionFolderResource.load(ConnectionFolderProjectKey(projectId));
+
               return !this.connectionFolderResource.has(createConnectionFolderParam(projectId, createPath(folder, trimmed)));
             } catch (exception: any) {
               setMessage('connections_connection_folder_validation');
