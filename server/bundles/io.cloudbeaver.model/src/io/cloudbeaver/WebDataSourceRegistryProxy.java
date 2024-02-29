@@ -252,8 +252,8 @@ public class WebDataSourceRegistryProxy implements DBPDataSourceRegistry, DataSo
     }
 
     @Override
-    public void addAuthProfiles(Collection<DBAAuthProfile> profiles) {
-        dataSourceRegistry.addAuthProfiles(profiles);
+    public void setAuthProfiles(Collection<DBAAuthProfile> profiles) {
+        dataSourceRegistry.setAuthProfiles(profiles);
     }
 
     @Override
