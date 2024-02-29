@@ -5,9 +5,10 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { action, makeObservable, observable } from 'mobx';
+import { action, computed, makeObservable, observable } from 'mobx';
 
 import { DataTypeLogicalOperation, ResultDataFormat, SqlResultColumn } from '@cloudbeaver/core-sdk';
+import { EMPTY_ARRAY } from '@cloudbeaver/core-utils';
 
 import { DatabaseDataAction } from '../../DatabaseDataAction';
 import type { IDatabaseDataAction } from '../../IDatabaseDataAction';
@@ -36,7 +37,7 @@ export class ResultSetViewAction extends DatabaseDataAction<any, IDatabaseResult
   }
 
   get rows(): IResultSetValue[][] {
-    return this.data.rows.map(row => row.data || []);
+    return this.data.rows.map(row => row.data || EMPTY_ARRAY);
   }
 
   get columns(): SqlResultColumn[] {
@@ -55,6 +56,8 @@ export class ResultSetViewAction extends DatabaseDataAction<any, IDatabaseResult
     makeObservable<this, 'columnsOrder'>(this, {
       columnsOrder: observable,
       setColumnOrder: action,
+      rows: computed,
+      columns: computed,
     });
   }
 

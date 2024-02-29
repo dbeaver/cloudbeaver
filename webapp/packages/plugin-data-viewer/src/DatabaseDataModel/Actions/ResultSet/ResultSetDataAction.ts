@@ -8,6 +8,7 @@
 import { computed, makeObservable } from 'mobx';
 
 import { DataTypeLogicalOperation, ResultDataFormat, SqlResultColumn } from '@cloudbeaver/core-sdk';
+import { EMPTY_ARRAY } from '@cloudbeaver/core-utils';
 
 import type { IDatabaseDataSource } from '../../IDatabaseDataSource';
 import type { IDatabaseResultSet } from '../../IDatabaseResultSet';
@@ -24,11 +25,11 @@ export class ResultSetDataAction extends DatabaseDataResultAction<IResultSetElem
   static dataFormat = [ResultDataFormat.Resultset];
 
   get rows() {
-    return this.result.data?.rowsWithMetaData || [];
+    return this.result.data?.rowsWithMetaData || EMPTY_ARRAY;
   }
 
   get columns(): SqlResultColumn[] {
-    return this.result.data?.columns || [];
+    return this.result.data?.columns || (EMPTY_ARRAY as SqlResultColumn[]);
   }
 
   constructor(source: IDatabaseDataSource<any, IDatabaseResultSet>) {
