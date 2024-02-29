@@ -5,7 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { computed, makeObservable, runInAction } from 'mobx';
+import { computed, makeObservable, observable, runInAction } from 'mobx';
 
 import { injectable } from '@cloudbeaver/core-di';
 import { AutoRunningTask, ISyncExecutor, ITask, SyncExecutor, whileTask } from '@cloudbeaver/core-executor';
@@ -34,6 +34,7 @@ export const ANONYMOUS_USER_ID = 'anonymous';
 export class UserInfoResource extends CachedDataResource<UserInfo | null, void, UserInfoIncludes> {
   readonly onUserChange: ISyncExecutor<string>;
   readonly onException: ISyncExecutor<Error>;
+  isLoggingOut = false;
 
   get authRole(): ELMRole | undefined {
     return this.data?.authRole as ELMRole | undefined;
@@ -62,6 +63,7 @@ export class UserInfoResource extends CachedDataResource<UserInfo | null, void, 
 
     makeObservable(this, {
       parametersAvailable: computed,
+      isLoggingOut: observable.ref,
     });
   }
 
@@ -154,16 +156,20 @@ export class UserInfoResource extends CachedDataResource<UserInfo | null, void, 
   }
 
   async logout(provider?: string, configuration?: string): Promise<AuthLogoutQuery> {
-    const result = await this.graphQLService.sdk.authLogout({
-      provider,
-      configuration,
-    });
+    try {
+      this.isLoggingOut = true;
+      const result = await this.graphQLService.sdk.authLogout({
+        provider,
+        configuration,
+      });
 
-    this.resetIncludes();
-    this.setData(await this.loader());
-    this.sessionDataResource.markOutdated();
-
-    return result;
+      this.resetIncludes();
+      this.setData(await this.loader());
+      this.sessionDataResource.markOutdated();
+      return result;
+    } finally {
+      this.isLoggingOut = false;
+    }
   }
 
   async setConfigurationParameter(key: string, value: any): Promise<UserInfo | null> {

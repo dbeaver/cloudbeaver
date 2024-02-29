@@ -7,6 +7,7 @@
  */
 import { observable } from 'mobx';
 
+import { AppAuthService, UserInfoResource } from '@cloudbeaver/core-authentication';
 import { useObjectRef, useObservableRef, useResource } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 
@@ -20,8 +21,13 @@ interface Props {
 }
 
 export function useLogViewer() {
-  const sessionLogsLoader = useResource(useLogViewer, SessionLogsResource, undefined);
   const logViewerService = useService(LogViewerService);
+  const appAuthService = useService(AppAuthService);
+  const userInfoResource = useService(UserInfoResource);
+
+  const sessionLogsLoader = useResource(useLogViewer, SessionLogsResource, undefined, {
+    active: logViewerService.isActive && appAuthService.authenticated && !logViewerService.disabled && !userInfoResource.isLoggingOut,
+  });
 
   const props: Props = useObservableRef(() => ({ selectedItem: null }), { selectedItem: observable.ref }, { logViewerService });
 
