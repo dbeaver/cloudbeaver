@@ -25,9 +25,10 @@ export function useLogViewer() {
   const logViewerService = useService(LogViewerService);
   const appAuthService = useService(AppAuthService);
   const userInfoResource = useService(UserInfoResource);
+  const isLogViewerAvailable = logViewerService.isActive && !logViewerService.disabled;
 
   const sessionLogsLoader = useResource(useLogViewer, SessionLogsResource, undefined, {
-    active: logViewerService.isActive && appAuthService.authenticated && !logViewerService.disabled && userInfoResource.isUserInfoAvailable,
+    active: isLogViewerAvailable && appAuthService.authenticated && userInfoResource.isUserInfoAvailable,
   });
 
   const props: Props = useObservableRef(() => ({ selectedItem: null }), { selectedItem: observable.ref }, { logViewerService });

@@ -164,9 +164,11 @@ export class UserInfoResource extends CachedDataResource<UserInfo | null, void, 
       provider,
       configuration,
     });
+
     this.resetIncludes();
     this.setData(await this.loader());
     this.sessionDataResource.markOutdated();
+
     return result;
   }
 
