@@ -133,11 +133,7 @@ export function useTextValue({ model, dataFormat, resultIndex, currentContentTyp
     } else if (isResultSetBlobValue(contentValue)) {
       value = parsedBlobValueGetter() ?? '';
     } else {
-      if (cachedFullText) {
-        value = cachedFullText;
-      } else {
-        value = formatAction.getText(elementKey);
-      }
+      value = cachedFullText || formatAction.getText(elementKey);
     }
 
     if (!editAction.isElementEdited(elementKey)) {
