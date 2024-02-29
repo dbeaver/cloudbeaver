@@ -6,12 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-export function removeMetadataFromBase64(base64: string) {
-  const parts = base64.split(',');
-
-  if (parts[1]) {
-    return parts[1];
-  }
-
-  return parts[0];
+.tableViewerLoader {
+  padding: 8px;
+  padding-bottom: 0;
 }

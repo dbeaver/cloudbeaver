@@ -7,7 +7,7 @@
  */
 import { computed, makeObservable, observable, untracked } from 'mobx';
 
-import { ConfirmationDialog } from '@cloudbeaver/core-blocks';
+import { ConfirmationDialog, importLazyComponent } from '@cloudbeaver/core-blocks';
 import {
   ConnectionExecutionContextResource,
   ConnectionExecutionContextService,
@@ -40,15 +40,17 @@ import {
   ESqlDataSourceFeatures,
   ISQLDatasourceUpdateData,
   ISqlEditorTabState,
+  SQL_EDITOR_TAB_STATE_SCHEMA,
   SqlDataSourceService,
   SqlEditorService,
   SqlResultTabsService,
 } from '@cloudbeaver/plugin-sql-editor';
 
 import { isSQLEditorTab } from './isSQLEditorTab';
-import { SqlEditorPanel } from './SqlEditorPanel';
-import { SqlEditorTab } from './SqlEditorTab';
 import { sqlEditorTabHandlerKey } from './sqlEditorTabHandlerKey';
+
+const SqlEditorPanel = importLazyComponent(() => import('./SqlEditorPanel').then(m => m.SqlEditorPanel));
+const SqlEditorTab = importLazyComponent(() => import('./SqlEditorTab').then(m => m.SqlEditorTab));
 
 @injectable()
 export class SqlEditorTabService extends Bootstrap {
@@ -273,20 +275,7 @@ export class SqlEditorTabService extends Bootstrap {
   }
 
   private async handleTabRestore(tab: ITab<ISqlEditorTabState>): Promise<boolean> {
-    if (
-      typeof tab.handlerState.editorId !== 'string' ||
-      typeof tab.handlerState.editorId !== 'string' ||
-      typeof tab.handlerState.order !== 'number' ||
-      !['string', 'undefined'].includes(typeof tab.handlerState.currentTabId) ||
-      !['string', 'undefined'].includes(typeof tab.handlerState.source) ||
-      !['string', 'undefined'].includes(typeof tab.handlerState.currentModeId) ||
-      !Array.isArray(tab.handlerState.modeState) ||
-      !Array.isArray(tab.handlerState.tabs) ||
-      !Array.isArray(tab.handlerState.executionPlanTabs) ||
-      !Array.isArray(tab.handlerState.resultGroups) ||
-      !Array.isArray(tab.handlerState.resultTabs) ||
-      !Array.isArray(tab.handlerState.statisticsTabs)
-    ) {
+    if (!SQL_EDITOR_TAB_STATE_SCHEMA.safeParse(tab.handlerState).success) {
       await this.sqlDataSourceService.destroy(tab.handlerState.editorId);
       return false;
     }

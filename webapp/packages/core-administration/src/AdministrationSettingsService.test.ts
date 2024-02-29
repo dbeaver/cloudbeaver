@@ -8,6 +8,7 @@
 import '@testing-library/jest-dom';
 
 import { coreBrowserManifest } from '@cloudbeaver/core-browser';
+import { coreClientActivityManifest } from '@cloudbeaver/core-client-activity';
 import { coreEventsManifest } from '@cloudbeaver/core-events';
 import { coreLocalizationManifest } from '@cloudbeaver/core-localization';
 import { corePluginManifest } from '@cloudbeaver/core-plugin';
@@ -37,6 +38,7 @@ const app = createApp(
   // coreRoutingManifest,
   // coreThemingManifest,
   coreLocalizationManifest,
+  coreClientActivityManifest,
 );
 
 const server = mockGraphQL(...mockAppInit(endpoint));
