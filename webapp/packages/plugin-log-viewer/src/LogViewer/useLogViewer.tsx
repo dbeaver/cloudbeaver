@@ -20,9 +20,8 @@ interface Props {
 }
 
 export function useLogViewer() {
-  const logViewerService = useService(LogViewerService);
-
   const sessionLogsLoader = useResource(useLogViewer, SessionLogsResource, undefined);
+  const logViewerService = useService(LogViewerService);
 
   const props: Props = useObservableRef(() => ({ selectedItem: null }), { selectedItem: observable.ref }, { logViewerService });
 
