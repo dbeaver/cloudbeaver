@@ -5,13 +5,14 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { computed, makeObservable, observable, runInAction } from 'mobx';
+import { computed, makeObservable, runInAction } from 'mobx';
 
 import { injectable } from '@cloudbeaver/core-di';
 import { AutoRunningTask, ISyncExecutor, ITask, SyncExecutor, whileTask } from '@cloudbeaver/core-executor';
 import { CachedDataResource, type ResourceKeySimple, ResourceKeyUtils } from '@cloudbeaver/core-resource';
 import { SessionDataResource, SessionResource } from '@cloudbeaver/core-root';
 import { AuthInfo, AuthLogoutQuery, AuthStatus, GetActiveUserQueryVariables, GraphQLService, UserInfo } from '@cloudbeaver/core-sdk';
+import { isNotNullDefined } from '@cloudbeaver/core-utils';
 
 import { AUTH_PROVIDER_LOCAL_ID } from './AUTH_PROVIDER_LOCAL_ID';
 import { AuthProviderService } from './AuthProviderService';
@@ -34,7 +35,6 @@ export const ANONYMOUS_USER_ID = 'anonymous';
 export class UserInfoResource extends CachedDataResource<UserInfo | null, void, UserInfoIncludes> {
   readonly onUserChange: ISyncExecutor<string>;
   readonly onException: ISyncExecutor<Error>;
-  isLoggingOut = false;
 
   get authRole(): ELMRole | undefined {
     return this.data?.authRole as ELMRole | undefined;
@@ -42,6 +42,10 @@ export class UserInfoResource extends CachedDataResource<UserInfo | null, void, 
 
   get parametersAvailable() {
     return this.data !== null;
+  }
+
+  get isUserInfoAvailable() {
+    return isNotNullDefined(this.data) && !this.isLoading() && !this.isOutdated();
   }
 
   constructor(
@@ -63,7 +67,6 @@ export class UserInfoResource extends CachedDataResource<UserInfo | null, void, 
 
     makeObservable(this, {
       parametersAvailable: computed,
-      isLoggingOut: observable.ref,
     });
   }
 
@@ -156,20 +159,15 @@ export class UserInfoResource extends CachedDataResource<UserInfo | null, void, 
   }
 
   async logout(provider?: string, configuration?: string): Promise<AuthLogoutQuery> {
-    try {
-      this.isLoggingOut = true;
-      const result = await this.graphQLService.sdk.authLogout({
-        provider,
-        configuration,
-      });
-
-      this.resetIncludes();
-      this.setData(await this.loader());
-      this.sessionDataResource.markOutdated();
-      return result;
-    } finally {
-      this.isLoggingOut = false;
-    }
+    this.markOutdated();
+    const result = await this.graphQLService.sdk.authLogout({
+      provider,
+      configuration,
+    });
+    this.resetIncludes();
+    this.setData(await this.loader());
+    this.sessionDataResource.markOutdated();
+    return result;
   }
 
   async setConfigurationParameter(key: string, value: any): Promise<UserInfo | null> {

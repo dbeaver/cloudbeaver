@@ -10,6 +10,7 @@ import { observable } from 'mobx';
 import { AppAuthService, UserInfoResource } from '@cloudbeaver/core-authentication';
 import { useObjectRef, useObservableRef, useResource } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
+import { isNotNullDefined } from '@cloudbeaver/core-utils';
 
 import { SessionLogsResource } from '../SessionLogsResource';
 import type { ILogEntry } from './ILogEntry';
@@ -26,7 +27,7 @@ export function useLogViewer() {
   const userInfoResource = useService(UserInfoResource);
 
   const sessionLogsLoader = useResource(useLogViewer, SessionLogsResource, undefined, {
-    active: logViewerService.isActive && appAuthService.authenticated && !logViewerService.disabled && !userInfoResource.isLoggingOut,
+    active: logViewerService.isActive && appAuthService.authenticated && !logViewerService.disabled && userInfoResource.isUserInfoAvailable,
   });
 
   const props: Props = useObservableRef(() => ({ selectedItem: null }), { selectedItem: observable.ref }, { logViewerService });
