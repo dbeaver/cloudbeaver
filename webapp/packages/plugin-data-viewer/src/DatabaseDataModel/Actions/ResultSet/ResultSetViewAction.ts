@@ -5,7 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { action, makeObservable, observable } from 'mobx';
+import { action, computed, makeObservable, observable } from 'mobx';
 
 import { DataTypeLogicalOperation, ResultDataFormat, SqlResultColumn } from '@cloudbeaver/core-sdk';
 
@@ -55,6 +55,10 @@ export class ResultSetViewAction extends DatabaseDataAction<any, IDatabaseResult
     makeObservable<this, 'columnsOrder'>(this, {
       columnsOrder: observable,
       setColumnOrder: action,
+      rows: computed,
+      rowKeys: computed,
+      columns: computed,
+      columnKeys: computed,
     });
   }
 
