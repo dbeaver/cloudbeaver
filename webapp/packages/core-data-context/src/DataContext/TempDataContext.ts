@@ -20,7 +20,7 @@ export class TempDataContext implements IDataContext {
   target: IDataContext;
   fallback?: IDataContextProvider;
   private flushTimeout: any;
-  atom: IAtom;
+  private atom: IAtom;
 
   constructor(fallback?: IDataContextProvider) {
     this.map = new Map();
