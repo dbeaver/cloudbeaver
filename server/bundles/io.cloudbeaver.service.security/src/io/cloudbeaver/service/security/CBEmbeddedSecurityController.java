@@ -249,61 +249,17 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
         }
     }
 
-    public void addAllUsersToDefaultTeam() throws DBCException {
-        if (application.isConfigurationMode()) {
-            return;
-        }
-        if (CommonUtils.isEmpty(application.getAppConfiguration().getDefaultUserTeam())) {
-            return;
-        }
-
-        try (Connection dbCon = database.openConnection()) {
-            try (PreparedStatement dbStat = dbCon.prepareStatement(
-                    database.normalizeTableNames("SELECT USER_ID \n" +
-                            "FROM {table_prefix}CB_USER\n" +
-                            "WHERE USER_ID NOT IN (\n" +
-                            "    SELECT USER_ID FROM {table_prefix}CB_USER_TEAM CUT WHERE CUT.TEAM_ID = ? \n" +
-                            ")")
-            )) {
-                dbStat.setString(1, application.getAppConfiguration().getDefaultUserTeam());
-                ResultSet dbResult = dbStat.executeQuery();
-                List<String> usersIds = new ArrayList<>();
-                while (dbResult.next()) {
-                    String userId = dbResult.getString(1);
-                    usersIds.add(userId);
-                }
-
-                if (usersIds.isEmpty()) {
-                    return;
-                }
-
-                for (String usersId : usersIds) {
-                    try (PreparedStatement insertStat = dbCon.prepareStatement(
-                            database.normalizeTableNames("INSERT INTO {table_prefix}CB_USER_TEAM(USER_ID, TEAM_ID, GRANT_TIME, GRANTED_BY)" +
-                                    " VALUES(?,?,?,?)"))) {
-                        insertStat.setString(1, usersId);
-                        insertStat.setString(2, application.getAppConfiguration().getDefaultUserTeam());
-                        insertStat.setTimestamp(3,  new Timestamp(System.currentTimeMillis()));
-                        insertStat.setString(4,  "CloudBeaver Application");
-                        insertStat.executeUpdate();
-                    }
-                }
-            }
-        } catch (SQLException e) {
-            throw new DBCException("Error while setting default user teams", e);
-        }
-    }
-
-
     @NotNull
     @Override
     public SMTeam[] getUserTeams(String userId) throws DBException {
         Map<String, SMTeam> teams = new LinkedHashMap<>();
         try (Connection dbCon = database.openConnection()) {
+            String defaultUserTeam = application.getAppConfiguration().getDefaultUserTeam();
             try (PreparedStatement dbStat = dbCon.prepareStatement(database.normalizeTableNames(
                 "SELECT R.*,S.IS_SECRET_STORAGE FROM {table_prefix}CB_USER_TEAM UR, {table_prefix}CB_TEAM R, " +
                     "{table_prefix}CB_AUTH_SUBJECT S " +
-                    "WHERE UR.USER_ID=? AND UR.TEAM_ID=R.TEAM_ID AND S.SUBJECT_ID=R.TEAM_ID"))
+                    "WHERE UR.USER_ID=? AND UR.TEAM_ID IN (R.TEAM_ID," + defaultUserTeam +
+                        ") AND S.SUBJECT_ID IN (R.TEAM_ID," + defaultUserTeam + ")"))
             ) {
                 dbStat.setString(1, userId);
                 try (ResultSet dbResult = dbStat.executeQuery()) {
@@ -955,10 +911,11 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
         try (Connection dbCon = database.openConnection()) {
             Map<String, SMTeam> teams = new LinkedHashMap<>();
             try (Statement dbStat = dbCon.createStatement()) {
+                String defaultUserTeam = application.getAppConfiguration().getDefaultUserTeam();
                 try (ResultSet dbResult = dbStat.executeQuery(
                     database.normalizeTableNames("SELECT T.*,S.IS_SECRET_STORAGE FROM {table_prefix}CB_TEAM T," +
                         "{table_prefix}CB_AUTH_SUBJECT S " +
-                        "WHERE T.TEAM_ID=S.SUBJECT_ID ORDER BY TEAM_ID"))) {
+                        "WHERE T.TEAM_ID IN (S.SUBJECT_ID," + defaultUserTeam + ") ORDER BY TEAM_ID"))) {
                     while (dbResult.next()) {
                         SMTeam team = fetchTeam(dbResult);
                         teams.put(team.getTeamId(), team);
@@ -967,7 +924,7 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
                 try (ResultSet dbResult = dbStat.executeQuery(
                     database.normalizeTableNames("SELECT SUBJECT_ID,PERMISSION_ID\n" +
                         "FROM {table_prefix}CB_AUTH_PERMISSIONS AP, {table_prefix}CB_TEAM R\n" +
-                        "WHERE AP.SUBJECT_ID=R.TEAM_ID\n"))) {
+                        "WHERE AP.SUBJECT_ID IN (R.TEAM_ID," + defaultUserTeam + ")\n"))) {
                     while (dbResult.next()) {
                         SMTeam team = teams.get(dbResult.getString(1));
                         if (team != null) {
@@ -1215,10 +1172,11 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
     public Set<String> getUserPermissions(String userId) throws DBException {
         try (Connection dbCon = database.openConnection()) {
             Set<String> permissions = new HashSet<>();
+            String defaultUserTeam = application.getAppConfiguration().getDefaultUserTeam();
             try (PreparedStatement dbStat = dbCon.prepareStatement(
                 database.normalizeTableNames(
                     "SELECT DISTINCT AP.PERMISSION_ID FROM {table_prefix}CB_AUTH_PERMISSIONS AP, {table_prefix}CB_USER_TEAM UR\n" +
-                        "WHERE UR.TEAM_ID=AP.SUBJECT_ID AND UR.USER_ID=?"
+                        "WHERE UR.TEAM_ID IN (AP.SUBJECT_ID," + defaultUserTeam + ") AND UR.USER_ID=?"
                 )
             )) {
                 dbStat.setString(1, userId);
