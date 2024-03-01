@@ -29,8 +29,8 @@
             <configuration>
                 <propertyGroup label="Configuration">
                     <property id="logout-url" label="Logout url" type="string" description="Logout url"/>
-                    <property id="user-header" label="User header name" type="string" description="User header name"/>
-                    <property id="team-header" label="Team name" type="string" description="Team header name"/>
+                    <property id="user-header" label="Username header" type="string" description="Username header"/>
+                    <property id="team-header" label="Team header" type="string" description="Team header"/>
                     <property id="team-delimiter" label="Team delimiter symbol" type="string" description="Team delimiter symbol, default: |"/>
                     <property id="first-name-header" label="First name header" type="string" description="First name header name"/>
                     <property id="last-name-header" label="Last name header" type="string" description="Last name header name"/>
