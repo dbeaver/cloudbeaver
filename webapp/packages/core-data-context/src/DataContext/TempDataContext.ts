@@ -101,11 +101,13 @@ export class TempDataContext implements IDataContext {
 
   getOwn<T>(context: DataContextGetter<T>): T | undefined {
     this.atom.reportObserved();
+    const targetOwn = this.target.getOwn(context);
+
     if (this.map.has(context)) {
       return this.map.get(context);
     }
 
-    return this.target.getOwn(context);
+    return targetOwn;
   }
 
   set<T>(context: DataContextGetter<T>, value: T): DeleteVersionedContextCallback {
@@ -178,6 +180,8 @@ export class TempDataContext implements IDataContext {
     for (const [key, value] of this.map) {
       this.target.set(key, value);
     }
+
+    this.atom.reportChanged();
   }
 
   private planFlush(): void {
