@@ -100,6 +100,7 @@ export class TempDataContext implements IDataContext {
   }
 
   getOwn<T>(context: DataContextGetter<T>): T | undefined {
+    this.atom.reportObserved();
     if (this.map.has(context)) {
       return this.map.get(context);
     }
