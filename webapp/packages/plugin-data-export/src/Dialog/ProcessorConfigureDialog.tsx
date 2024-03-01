@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2023 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -82,7 +82,7 @@ export const ProcessorConfigureDialog = observer<Props>(function ProcessorConfig
   }
 
   return styled(useStyles(UNDERLINE_TAB_STYLES))(
-    <CommonDialogWrapper size="large" fixedSize>
+    <CommonDialogWrapper className={s(styles, { container: true })} size="large" fixedSize>
       <CommonDialogHeader title={title} onReject={onClose} />
       <CommonDialogBody noOverflow noBodyPadding>
         {!processor.isBinary ? (

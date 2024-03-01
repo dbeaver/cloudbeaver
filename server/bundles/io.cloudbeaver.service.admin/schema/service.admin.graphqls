@@ -206,3 +206,8 @@ extend type Query {
     setDefaultNavigatorSettings( settings: NavigatorSettingsInput!): Boolean!
 
 }
+
+extend type Mutation {
+    # Updates product configuration
+    adminUpdateProductConfiguration(configuration: Object!): Boolean! @since(version: "23.3.4")
+}

@@ -43,10 +43,10 @@
       "path": "../plugin-data-viewer/tsconfig.json"
     },
     {
-      "path": "../plugin-sql-editor/tsconfig.json"
+      "path": "../plugin-sql-editor-new/tsconfig.json"
     },
     {
-      "path": "../plugin-sql-editor-new/tsconfig.json"
+      "path": "../plugin-sql-editor/tsconfig.json"
     }
   ],
   "include": [

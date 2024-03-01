@@ -1,23 +1,39 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2023 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
 import type { Connection } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
+import { EAdminPermission, SessionPermissionsResource } from '@cloudbeaver/core-root';
 
 import { DataViewerSettingsService } from './DataViewerSettingsService';
 
 @injectable()
 export class DataViewerService {
-  constructor(private readonly dataViewerSettingsService: DataViewerSettingsService) {}
+  get canCopyData() {
+    if (this.sessionPermissionsResource.has(EAdminPermission.admin)) {
+      return true;
+    }
+
+    return !this.dataViewerSettingsService.settings.getValue('disableCopyData');
+  }
+
+  constructor(
+    private readonly dataViewerSettingsService: DataViewerSettingsService,
+    private readonly sessionPermissionsResource: SessionPermissionsResource,
+  ) {}
 
   isDataEditable(connection: Connection) {
-    const disabled = this.dataViewerSettingsService.settings.isValueDefault('disableEdit')
-      ? this.dataViewerSettingsService.deprecatedSettings.getValue('disableEdit')
-      : this.dataViewerSettingsService.settings.getValue('disableEdit');
-    return !disabled && !connection.readOnly;
+    if (connection.readOnly) {
+      return false;
+    }
+
+    const isAdmin = this.sessionPermissionsResource.has(EAdminPermission.admin);
+    const disabled = this.dataViewerSettingsService.settings.getValue('disableEdit');
+
+    return isAdmin || !disabled;
   }
 }

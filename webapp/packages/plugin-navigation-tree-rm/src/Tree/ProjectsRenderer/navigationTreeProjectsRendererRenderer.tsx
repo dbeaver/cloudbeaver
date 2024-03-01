@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2023 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -103,7 +103,6 @@ const ProjectRenderer: NavigationNodeRendererComponent = observer(function Manag
   });
 
   const hideProjects = elementsTreeContext?.tree.settings?.projects === false && !isDragging;
-  const singleProject = projectsService.activeProjects.length === 1;
 
   if (!node) {
     return (
@@ -113,8 +112,6 @@ const ProjectRenderer: NavigationNodeRendererComponent = observer(function Manag
     );
   }
 
-  const project = node.nodeType === NAV_NODE_TYPE_RM_PROJECT && singleProject && !isDragging;
-
   return (
     <SContext registry={registry}>
       <NavigationNodeRendererLoader
@@ -122,7 +119,7 @@ const ProjectRenderer: NavigationNodeRendererComponent = observer(function Manag
         path={path}
         expanded={expanded}
         dragging={dragging}
-        className={s(styles, { projectNode: true, hideProjects, project }, className)}
+        className={s(styles, { projectNode: true, hideProjects }, className)}
         control={NavigationNodeProjectControl}
         component={component}
       />

@@ -1,16 +1,16 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2023 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import { useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import styled, { css } from 'reshadow';
 
 import { UserInfoResource } from '@cloudbeaver/core-authentication';
-import { TextPlaceholder, useExecutor, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
+import { Loader, TextPlaceholder, useExecutor, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { BASE_TAB_STYLES, ITabData, TabPanel, TabsBox } from '@cloudbeaver/core-ui';
 import { CaptureView } from '@cloudbeaver/core-view';
@@ -47,6 +47,7 @@ export const NavigationTabsBar = observer<Props>(function NavigationTabsBar({ cl
   // TODO: we get exception when after closing the restored page trying to open another
   //       it's related to hooks order and state restoration
   const style = useStyles(BASE_TAB_STYLES, styles);
+  const [restoring, setRestoring] = useState(false);
   const translate = useTranslate();
 
   const handleSelect = useCallback((tabId: string) => navigation.selectTab(tabId), [navigation]);
@@ -57,7 +58,12 @@ export const NavigationTabsBar = observer<Props>(function NavigationTabsBar({ cl
   }
 
   async function restoreTabs() {
-    await navigation.restoreTabs();
+    setRestoring(true);
+    try {
+      await navigation.restoreTabs();
+    } finally {
+      setRestoring(false);
+    }
   }
 
   function handleTabChange(tab: ITabData<any>) {
@@ -85,24 +91,26 @@ export const NavigationTabsBar = observer<Props>(function NavigationTabsBar({ cl
 
   return styled(style)(
     <CaptureView view={navigation} className={className}>
-      <TabsBox
-        currentTabId={navigation.currentTabId}
-        tabs={navigation.tabIdList.map(tabId => (
-          <TabHandlerTab key={tabId} tabId={tabId} style={styles} onSelect={handleSelect} onClose={handleClose} />
-        ))}
-        tabList={navigation.tabIdList}
-        style={styles}
-        tabIndex={0}
-        autoSelect
-        enabledBaseActions
-        onChange={handleTabChange}
-      >
-        {navigation.tabIdList.map(tabId => (
-          <TabPanel key={tabId} tabId={tabId} lazy>
-            {() => <TabHandlerPanel tabId={tabId} />}
-          </TabPanel>
-        ))}
-      </TabsBox>
+      <Loader loading={restoring}>
+        <TabsBox
+          currentTabId={navigation.currentTabId}
+          tabs={navigation.tabIdList.map(tabId => (
+            <TabHandlerTab key={tabId} tabId={tabId} style={styles} onSelect={handleSelect} onClose={handleClose} />
+          ))}
+          tabList={navigation.tabIdList}
+          style={styles}
+          tabIndex={0}
+          autoSelect
+          enabledBaseActions
+          onChange={handleTabChange}
+        >
+          {navigation.tabIdList.map(tabId => (
+            <TabPanel key={tabId} tabId={tabId} lazy>
+              {() => <TabHandlerPanel tabId={tabId} />}
+            </TabPanel>
+          ))}
+        </TabsBox>
+      </Loader>
     </CaptureView>,
   );
 });

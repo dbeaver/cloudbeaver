@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2023 DBeaver Corp and others
+ * Copyright (C) 2010-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,6 +27,17 @@ public class SMControllerConfiguration {
     private int refreshTokenTtl = DEFAULT_REFRESH_TOKEN_TTL;
     private int expiredAuthAttemptInfoTtl = DEFAULT_EXPIRED_AUTH_ATTEMPT_INFO_TTL;
 
+    private boolean enableBruteForceProtection = true;
+
+    //in seconds
+    public static final int DEFAULT_MAX_FAILED_LOGIN = 10;
+    public static final int DEFAULT_MINIMUM_LOGIN_TIMEOUT = 1; //1sec
+    public static final int DEFAULT_BLOCK_LOGIN_PERIOD = 300; //5min
+    private int maxFailedLogin = DEFAULT_MAX_FAILED_LOGIN;
+    private int minimumLoginTimeout = DEFAULT_MINIMUM_LOGIN_TIMEOUT;
+    private int blockLoginPeriod = DEFAULT_BLOCK_LOGIN_PERIOD;
+    private final PasswordPolicyConfiguration passwordPolicy = new PasswordPolicyConfiguration();
+
     public int getAccessTokenTtl() {
         return accessTokenTtl;
     }
@@ -49,5 +60,41 @@ public class SMControllerConfiguration {
 
     public void setExpiredAuthAttemptInfoTtl(int expiredAuthAttemptInfoTtl) {
         this.expiredAuthAttemptInfoTtl = expiredAuthAttemptInfoTtl;
+    }
+
+    public void setCheckBruteforce(boolean checkBruteforce) {
+        this.enableBruteForceProtection = checkBruteforce;
+    }
+
+    public boolean isCheckBruteforce() {
+        return enableBruteForceProtection;
+    }
+
+    public int getMaxFailedLogin() {
+        return maxFailedLogin;
+    }
+
+    public int getMinimumLoginTimeout() {
+        return minimumLoginTimeout;
+    }
+
+    public int getBlockLoginPeriod() {
+        return blockLoginPeriod;
+    }
+
+    public void setMaxFailedLogin(int maxFailed) {
+        this.maxFailedLogin = maxFailed;
+    }
+
+    public void setMinimumLoginTimeout(int minimumTimeout) {
+        this.minimumLoginTimeout = minimumTimeout;
+    }
+
+    public void setBlockLoginPeriod(int blockPeriod) {
+        this.blockLoginPeriod = blockPeriod;
+    }
+
+    public PasswordPolicyConfiguration getPasswordPolicyConfiguration() {
+        return passwordPolicy;
     }
 }

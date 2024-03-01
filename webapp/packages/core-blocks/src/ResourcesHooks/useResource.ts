@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2023 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -48,7 +48,7 @@ interface IActions<TResource extends IResource<any, any, any, any>, TKey, TInclu
   active?: boolean;
   forceSuspense?: boolean;
   silent?: boolean;
-  onData?: (data: ResourceData<TResource, TKey, TIncludes>, resource: TResource) => Promise<any> | any;
+  onData?: (data: ResourceData<TResource, TKey, TIncludes>, resource: TResource) => any;
   onError?: (exception: Error | Error[] | null) => void;
 }
 
@@ -161,8 +161,10 @@ export function useResource<
       propertiesRef.includes = includes;
     }
 
-    if (key === null || propertiesRef.key === null || !propertiesRef.resource.isIntersect(key, propertiesRef.key)) {
-      propertiesRef.key = key;
+    if (key === null || propertiesRef.key === null || !propertiesRef.resource.isEqual(key, propertiesRef.key)) {
+      if (propertiesRef.key !== key) {
+        propertiesRef.key = key;
+      }
     }
   });
 
@@ -209,7 +211,7 @@ export function useResource<
         key = toJS(key);
 
         if (this.useRef[0] !== null && propertiesRef.resource.useTracker.hasUseId(this.useRef[1])) {
-          if (key !== null && propertiesRef.resource.isIntersect(key, this.useRef[0])) {
+          if (key !== null && propertiesRef.resource.isEqual(key, this.useRef[0])) {
             return;
           }
 
@@ -349,10 +351,6 @@ export function useResource<
           return true;
         }
 
-        if (this.isError()) {
-          return true;
-        }
-
         return this.resource.isLoaded(propertiesRef.key, propertiesRef.includes);
       },
       get loading(): boolean {
@@ -461,7 +459,7 @@ export function useResource<
 
   useEffect(() => {
     refObj.use(loadKey);
-    if (canLoad && !result.isError()) {
+    if (canLoad) {
       result.load();
     }
   }, [canLoad, loadKey]);

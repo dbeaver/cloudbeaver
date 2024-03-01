@@ -1,29 +1,22 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2023 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { computed, makeObservable, observable } from 'mobx';
+import { makeObservable, observable } from 'mobx';
 
 import type { ISettingsResolverSource } from './ISettingsResolverSource';
 import type { ISettingsSource } from './ISettingsSource';
 
 export abstract class SettingsResolverSource implements ISettingsResolverSource {
-  protected get mainResolver(): ISettingsSource | undefined {
-    if (this.resolvers.length === 0) {
-      return undefined;
-    }
-    return this.resolvers[0];
-  }
   protected resolvers: ISettingsSource[];
 
   constructor() {
     this.resolvers = [];
-    makeObservable<this, 'resolvers' | 'mainResolver'>(this, {
+    makeObservable<this, 'resolvers'>(this, {
       resolvers: observable.shallow,
-      mainResolver: computed,
     });
   }
 
@@ -39,16 +32,28 @@ export abstract class SettingsResolverSource implements ISettingsResolverSource 
     }
   }
 
-  addResolver(resolver: ISettingsSource): void {
-    if (this.hasResolver(resolver)) {
+  addResolver(...resolvers: ISettingsSource[]): void {
+    if (resolvers.some(this.hasResolver.bind(this))) {
       return;
     }
 
-    this.resolvers.unshift(resolver);
+    this.resolvers.push(...resolvers);
+  }
+
+  clearResolvers(): void {
+    this.resolvers = [];
+  }
+
+  isReadOnly(key: any): boolean {
+    return this.resolvers.every(r => r.isReadOnly(key));
   }
 
   has(key: any): boolean {
     return this.resolvers.some(r => r.has(key));
+  }
+
+  getDefaultValue(key: any): any {
+    return this.resolvers.find(r => r.getDefaultValue(key) !== undefined)?.getDefaultValue(key);
   }
 
   getValue(key: any): any {
@@ -56,10 +61,19 @@ export abstract class SettingsResolverSource implements ISettingsResolverSource 
   }
 
   setValue(key: any, value: any): void {
-    this.mainResolver?.setValue(key, value);
+    for (const resolver of this.resolvers) {
+      if (!resolver.isReadOnly(key)) {
+        resolver.setValue(key, value);
+        return;
+      }
+    }
+
+    throw new Error(`Can't set value for key ${key}`);
   }
 
   clear(): void {
-    this.resolvers = [];
+    for (const resolver of this.resolvers) {
+      resolver.clear();
+    }
   }
 }

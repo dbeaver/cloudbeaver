@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2023 DBeaver Corp and others
+ * Copyright (C) 2010-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -107,7 +107,15 @@ public class WebServiceDataTransfer implements DBWServiceDataTransfer {
     }
 
     @NotNull
-    private String makeUniqueFileName(WebSQLProcessor sqlProcessor, DataTransferProcessorDescriptor processor) {
+    private String makeUniqueFileName(
+            WebSQLProcessor sqlProcessor,
+            DataTransferProcessorDescriptor processor,
+            Map<String, Object> processorProperties
+    ) {
+        if (processorProperties != null && processorProperties.get(StreamConsumerSettings.PROP_FILE_EXTENSION) != null) {
+            return sqlProcessor.getWebSession().getSessionId() + "_" + UUID.randomUUID() +
+                    "." + processorProperties.get(StreamConsumerSettings.PROP_FILE_EXTENSION);
+        }
         return sqlProcessor.getWebSession().getSessionId() + "_" + UUID.randomUUID() + "." + WebDataTransferUtils.getProcessorFileExtension(processor);
     }
 
@@ -157,7 +165,8 @@ public class WebServiceDataTransfer implements DBWServiceDataTransfer {
                 monitor.beginTask("Export data", 1);
                 try {
                     monitor.subTask("Export data using " + processor.getName());
-                    Path exportFile = dataExportFolder.resolve(makeUniqueFileName(sqlProcessor, processor));
+                    Path exportFile = dataExportFolder.resolve(
+                            makeUniqueFileName(sqlProcessor, processor, parameters.getProcessorProperties()));
                     try {
                         exportData(monitor, processor, dataContainer, parameters, resultsInfo, exportFile);
                     } catch (Exception e) {
@@ -173,12 +182,15 @@ public class WebServiceDataTransfer implements DBWServiceDataTransfer {
                         }
                         throw new DBException("Error exporting data", e);
                     }
-                    Path finallyExportFile = parameters.getOutputSettings().isCompress()
+                    var outputSettings = parameters.getOutputSettings();
+                    Path finallyExportFile = outputSettings.isCompress()
                         ? exportFile.resolveSibling(WebDataTransferUtils.normalizeFileName(
-                            exportFile.getFileName().toString(), parameters.getOutputSettings()))
+                            exportFile.getFileName().toString(), outputSettings))
                         : exportFile;
                     WebDataTransferTaskConfig taskConfig = new WebDataTransferTaskConfig(finallyExportFile, parameters);
-                    String exportFileName = CommonUtils.escapeFileName(CommonUtils.truncateString(dataContainer.getName(), 32));
+                    String exportFileName = CommonUtils.isEmpty(outputSettings.getFileName()) ?
+                        CommonUtils.escapeFileName(CommonUtils.truncateString(dataContainer.getName(), 32)) :
+                        outputSettings.getFileName();
                     taskConfig.setExportFileName(exportFileName);
                     WebDataTransferUtils.getSessionDataTransferConfig(sqlProcessor.getWebSession()).addTask(taskConfig);
 
@@ -215,7 +227,9 @@ public class WebServiceDataTransfer implements DBWServiceDataTransfer {
                 super.fetchRow(session, resultSet);
                 if (fileSizeLimit != null && getBytesWritten() > fileSizeLimit.longValue()) {
                     throw new DBQuotaException(
-                        "Data export quota exceeded", QUOTA_PROP_FILE_LIMIT, fileSizeLimit.longValue(), getBytesWritten());
+                        "Data export quota exceeded \n Please increase the resourceQuotas parameter in configuration",
+                        QUOTA_PROP_FILE_LIMIT, fileSizeLimit.longValue(), getBytesWritten()
+                    );
                 }
             }
         };

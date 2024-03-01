@@ -13,6 +13,9 @@
       "path": "../core-blocks/tsconfig.json"
     },
     {
+      "path": "../core-browser/tsconfig.json"
+    },
+    {
       "path": "../core-di/tsconfig.json"
     },
     {
@@ -26,9 +29,6 @@
     },
     {
       "path": "../core-routing/tsconfig.json"
-    },
-    {
-      "path": "../core-settings/tsconfig.json"
     },
     {
       "path": "../core-utils/tsconfig.json"

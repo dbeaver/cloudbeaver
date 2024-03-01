@@ -1,11 +1,10 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2023 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { EAdminPermission } from '@cloudbeaver/core-authentication';
 import {
   Connection,
   ConnectionInfoResource,
@@ -20,6 +19,7 @@ import { DATA_CONTEXT_NAV_NODE, EObjectFeature, NavNodeManagerService } from '@c
 import { getCachedMapResourceLoaderState } from '@cloudbeaver/core-resource';
 import {
   CONNECTION_NAVIGATOR_VIEW_SETTINGS,
+  EAdminPermission,
   isNavigatorViewSettingsEqual,
   NavigatorViewSettings,
   PermissionsService,
@@ -28,7 +28,6 @@ import {
 import { ACTION_DELETE, ActionService, DATA_CONTEXT_MENU, DATA_CONTEXT_MENU_NESTED, MenuSeparatorItem, MenuService } from '@cloudbeaver/core-view';
 import { MENU_APP_ACTIONS } from '@cloudbeaver/plugin-top-app-bar';
 
-import { ConnectionAuthService } from '../ConnectionAuthService';
 import { PluginConnectionsSettingsService } from '../PluginConnectionsSettingsService';
 import { PublicConnectionFormService } from '../PublicConnectionForm/PublicConnectionFormService';
 import { ACTION_CONNECTION_CHANGE_CREDENTIALS } from './Actions/ACTION_CONNECTION_CHANGE_CREDENTIALS';
@@ -54,7 +53,6 @@ export class ConnectionMenuBootstrap extends Bootstrap {
     private readonly connectionsSettingsService: ConnectionsSettingsService,
     private readonly pluginConnectionsSettingsService: PluginConnectionsSettingsService,
     private readonly permissionsService: PermissionsService,
-    private readonly connectionAuthService: ConnectionAuthService,
     private readonly serverConfigResource: ServerConfigResource,
   ) {
     super();
@@ -192,7 +190,7 @@ export class ConnectionMenuBootstrap extends Bootstrap {
         }
 
         if (action === ACTION_CONNECTION_CHANGE_CREDENTIALS) {
-          return this.serverConfigResource.distributed;
+          return this.serverConfigResource.distributed && !connection.sharedCredentials;
         }
 
         return false;
@@ -245,7 +243,7 @@ export class ConnectionMenuBootstrap extends Bootstrap {
             break;
           }
           case ACTION_CONNECTION_CHANGE_CREDENTIALS: {
-            await this.connectionAuthService.auth({ connectionId: connection.id, projectId: connection.projectId }, true);
+            await this.connectionsManagerService.requireConnection({ connectionId: connection.id, projectId: connection.projectId }, true);
             break;
           }
         }

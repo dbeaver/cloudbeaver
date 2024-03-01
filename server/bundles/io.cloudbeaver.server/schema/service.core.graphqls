@@ -99,6 +99,13 @@ type WebServiceConfig {
     bundleVersion: String!
 }
 
+type PasswordPolicyConfig @since(version: "23.3.3") {
+    minLength: Int!
+    minNumberCount: Int!
+    minSymbolCount: Int!
+    requireMixedCase: Boolean!
+}
+
 type ProductInfo {
     id: ID!
     version: String!
@@ -152,6 +159,7 @@ type ServerConfig {
     defaultNavigatorSettings: NavigatorSettings!
     disabledDrivers: [ID!]!
     resourceQuotas: Object!
+    passwordPolicyConfiguration: PasswordPolicyConfig! @since(version: "23.3.3")
 }
 
 type SessionInfo {
@@ -300,6 +308,11 @@ type NetworkHandlerConfig {
     secureProperties: Object!
 }
 
+type SecretInfo {
+    displayName: String!
+    secretId: String!
+}
+
 # Connection instance
 type ConnectionInfo {
     id: ID!
@@ -314,6 +327,8 @@ type ConnectionInfo {
     databaseName: String
     url: String
 
+    keepAliveInterval: Int!
+
     properties: Object
 
     template: Boolean!
@@ -327,6 +342,8 @@ type ConnectionInfo {
     saveCredentials: Boolean!
     # Shared credentials - the same for all users, stored in secure storage.
     sharedCredentials: Boolean!
+
+    sharedSecrets: [SecretInfo!]! @since(version: "23.3.5")
     # Determines that credentials were saved for current user.
     # This field read is slow, it should be read only when it really needed
     credentialsSaved: Boolean!
@@ -465,6 +482,9 @@ input ConnectionConfig {
     # Properties
     properties: Object
 
+    # Keep-Alive interval
+    keepAliveInterval: Int
+
     # Template connection
     template: Boolean
     # Read-onyl connection
@@ -475,6 +495,7 @@ input ConnectionConfig {
     saveCredentials: Boolean
     sharedCredentials: Boolean
     authModelId: ID
+    selectedSecretId: ID @since(version: "23.3.5")
     credentials: Object
 
     # Map of provider properties (name/value)
@@ -545,7 +566,9 @@ extend type Mutation {
     closeSession: Boolean
 
     # Refreshes session on server and returns its state
-    touchSession: Boolean
+    touchSession: Boolean  @deprecated(reason: "use updateSession instead")
+    # Refreshes session on server and returns session state
+    updateSession: SessionInfo! @since(version: "24.0.0")
 
     # Refresh session connection list
     refreshSessionConnections: Boolean
@@ -571,14 +594,14 @@ extend type Mutation {
     copyConnectionFromNode( nodePath: String!, config: ConnectionConfig, projectId: ID ): ConnectionInfo!
 
     # Test connection configuration. Returns remote server version
-    testConnection( config: ConnectionConfig!, projectId: ID ): ConnectionInfo!
+    testConnection( config: ConnectionConfig!, projectId: ID): ConnectionInfo!
 
     # Test connection configuration. Returns remote server version
     testNetworkHandler( config: NetworkHandlerConfigInput! ): NetworkEndpointInfo!
 
     # Initiate existing connection
     initConnection( id: ID!, projectId: ID, credentials: Object, networkCredentials: [NetworkHandlerConfigInput!],
-        saveCredentials:Boolean, sharedCredentials: Boolean ): ConnectionInfo!
+        saveCredentials:Boolean, sharedCredentials: Boolean, selectedSecretId:String ): ConnectionInfo!
 
     # Disconnect from database
     closeConnection( id: ID!, projectId: ID ): ConnectionInfo!

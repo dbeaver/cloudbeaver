@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2023 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -21,13 +21,12 @@ import {
   type ResourceKeySimple,
   ResourceKeyUtils,
 } from '@cloudbeaver/core-resource';
-import { ServerConfigResource, SessionPermissionsResource } from '@cloudbeaver/core-root';
+import { EAdminPermission, ServerConfigResource, SessionPermissionsResource } from '@cloudbeaver/core-root';
 import { AdminConnectionGrantInfo, AdminUserInfo, AdminUserInfoFragment, GetUsersListQueryVariables, GraphQLService } from '@cloudbeaver/core-sdk';
 
 import { AUTH_PROVIDER_LOCAL_ID } from './AUTH_PROVIDER_LOCAL_ID';
 import { AuthInfoService } from './AuthInfoService';
 import { AuthProviderService } from './AuthProviderService';
-import { EAdminPermission } from './EAdminPermission';
 import type { IAuthCredentials } from './IAuthCredentials';
 
 const NEW_USER_SYMBOL = Symbol('new-user');

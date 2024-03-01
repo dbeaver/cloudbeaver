@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2023 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@ import {
   useObservableRef,
   useS,
   useSplitUserState,
+  useTranslate,
 } from '@cloudbeaver/core-blocks';
 import type { IDataContext } from '@cloudbeaver/core-data-context';
 import { useService } from '@cloudbeaver/core-di';
@@ -66,6 +67,7 @@ export const TableViewer = observer<TableViewerProps, HTMLDivElement>(
     },
     ref,
   ) {
+    const translate = useTranslate();
     const styles = useS(style);
     const dataPresentationService = useService(DataPresentationService);
     const tableViewerStorageService = useService(TableViewerStorageService);
@@ -184,13 +186,14 @@ export const TableViewer = observer<TableViewerProps, HTMLDivElement>(
     const presentation = dataPresentationService.getSupported(DataPresentationType.main, dataFormat, presentationId, dataModel, resultIndex);
 
     if (!presentation) {
-      return <TextPlaceholder>There are no available presentation for data format: {dataFormat}</TextPlaceholder>;
+      return <TextPlaceholder>{translate('plugin_data_viewer_no_available_presentation')}</TextPlaceholder>;
     }
 
     const valuePresentation = valuePresentationId
       ? dataPresentationService.getSupported(DataPresentationType.toolsPanel, dataFormat, valuePresentationId, dataModel, resultIndex)
       : null;
 
+    const isStatistics = result?.loadedFully && !result.data;
     const resultExist = dataModel.source.hasResult(resultIndex);
     const overlay = dataModel.source.results.length > 0 && presentation.dataFormat === dataFormat;
     const valuePanelDisplayed =
@@ -203,16 +206,18 @@ export const TableViewer = observer<TableViewerProps, HTMLDivElement>(
     return (
       <div ref={ref} className={s(styles, { tableViewer: true }, className)}>
         <div className={s(styles, { tableContent: true })}>
-          <TablePresentationBar
-            className={s(styles, { tablePresentationBar: true })}
-            type={DataPresentationType.main}
-            presentationId={presentation.id}
-            dataFormat={dataFormat}
-            supportedDataFormat={dataModel.supportedDataFormats}
-            model={dataModel}
-            resultIndex={resultIndex}
-            onPresentationChange={dataTableActions.setPresentation}
-          />
+          {!isStatistics && (
+            <TablePresentationBar
+              className={s(styles, { tablePresentationBar: true })}
+              type={DataPresentationType.main}
+              presentationId={presentation.id}
+              dataFormat={dataFormat}
+              supportedDataFormat={dataModel.supportedDataFormats}
+              model={dataModel}
+              resultIndex={resultIndex}
+              onPresentationChange={dataTableActions.setPresentation}
+            />
+          )}
           <div className={s(styles, { tableData: true })}>
             <TableHeader model={dataModel} resultIndex={resultIndex} simple={simple} />
             <Split
@@ -222,6 +227,7 @@ export const TableViewer = observer<TableViewerProps, HTMLDivElement>(
               mode={valuePanelDisplayed ? splitState.mode : 'minimize'}
               disable={!valuePanelDisplayed}
               keepRatio
+              disableAutoMargin
             >
               <Pane className={s(styles, { pane: true })}>
                 <div className={s(styles, { paneContent: true, grid: true })}>
@@ -233,6 +239,7 @@ export const TableViewer = observer<TableViewerProps, HTMLDivElement>(
                       presentation={presentation}
                       resultIndex={resultIndex}
                       simple={simple}
+                      isStatistics={isStatistics}
                     />
                   </Loader>
                   <TableError model={dataModel} loading={loading} />
@@ -263,7 +270,7 @@ export const TableViewer = observer<TableViewerProps, HTMLDivElement>(
               </Pane>
             </Split>
           </div>
-          {!simple && (
+          {!simple && !isStatistics && (
             <TablePresentationBar
               type={DataPresentationType.toolsPanel}
               className={s(styles, { tablePresentationBar: true })}

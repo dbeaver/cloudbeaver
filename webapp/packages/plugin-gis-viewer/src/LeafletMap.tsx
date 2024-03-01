@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2023 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -10,8 +10,7 @@
 import type geojson from 'geojson';
 import leaflet from 'leaflet';
 import { useCallback, useEffect, useState } from 'react';
-import { GeoJSON, LayersControl, MapContainer, TileLayer } from 'react-leaflet';
-import type { TileLayerProps } from 'react-leaflet';
+import { GeoJSON, LayersControl, MapContainer, TileLayer, type TileLayerProps } from 'react-leaflet';
 import styled, { css } from 'reshadow';
 
 import { useSplit, useTranslate } from '@cloudbeaver/core-blocks';
@@ -39,7 +38,7 @@ interface IBaseTile extends TileLayerProps {
   checked?: boolean;
 }
 
-export type CrsKey = 'Simple' | 'EPSG3857' | 'EPSG4326' | 'EPSG3395' | 'EPSG900913';
+export type CrsKey = 'Simple' | 'EPSG:3857' | 'EPSG:4326' | 'EPSG:3395' | 'EPSG:900913';
 
 interface Props {
   geoJSON: IGeoJSONFeature[];
@@ -92,13 +91,13 @@ function getCRS(crsKey: CrsKey): leaflet.CRS {
   switch (crsKey) {
     case 'Simple':
       return leaflet.CRS.Simple;
-    case 'EPSG3857':
+    case 'EPSG:3857':
       return leaflet.CRS.EPSG3857;
-    case 'EPSG4326':
+    case 'EPSG:4326':
       return leaflet.CRS.EPSG4326;
-    case 'EPSG3395':
+    case 'EPSG:3395':
       return leaflet.CRS.EPSG3395;
-    case 'EPSG900913':
+    case 'EPSG:900913':
       return leaflet.CRS.EPSG900913;
     default:
       return leaflet.CRS.EPSG3857;
@@ -175,20 +174,14 @@ export const LeafletMap: React.FC<Props> = function LeafletMap({ geoJSON, crsKey
   useEffect(() => {
     if (mapRef) {
       mapRef.invalidateSize();
-
-      if (mapRef.options.crs?.code !== crs.code) {
-        const center = mapRef.getCenter();
-        mapRef.options.crs = crs;
-        mapRef.setView(center);
-      }
     }
-  }, [split.state.isResizing, split.state.mode, crs, mapRef]);
+  }, [split.state.isResizing, split.state.mode, mapRef]);
 
   return styled(
     styles,
     baseStyles,
   )(
-    <MapContainer ref={setMapRef} crs={crs} zoom={12}>
+    <MapContainer ref={setMapRef} crs={leaflet.CRS.EPSG3857} zoom={12}>
       <GeoJSON
         // data is not optional property, see react-leaflet.d.ts
         // data={[]}

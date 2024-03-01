@@ -1,18 +1,22 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2023 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
+import React from 'react';
 import styled, { css } from 'reshadow';
 
+import { importLazyComponent } from '@cloudbeaver/core-blocks';
+
 import type { ISqlEditorTabState } from '../ISqlEditorTabState';
-import { SqlExecutionPlanPanel } from './ExecutionPlan/SqlExecutionPlanPanel';
-import { OutputLogsPanel } from './OutputLogs/OutputLogsPanel';
-import { SqlResultSetPanel } from './SqlResultSetPanel';
-import { SqlScriptStatisticsPanel } from './SqlScriptStatisticsPanel';
+
+const SqlExecutionPlanPanel = importLazyComponent(() => import('./ExecutionPlan/SqlExecutionPlanPanel').then(module => module.SqlExecutionPlanPanel));
+const OutputLogsPanel = importLazyComponent(() => import('./OutputLogs/OutputLogsPanel').then(module => module.OutputLogsPanel));
+const SqlResultSetPanel = importLazyComponent(() => import('./SqlResultSetPanel').then(module => module.SqlResultSetPanel));
+const SqlScriptStatisticsPanel = importLazyComponent(() => import('./SqlScriptStatisticsPanel').then(module => module.SqlScriptStatisticsPanel));
 
 const style = css`
   result-panel {
@@ -31,11 +35,9 @@ export const SqlResultPanel = observer<Props>(function SqlResultPanel({ state, i
   const resultTab = state.resultTabs.find(tab => tab.tabId === id);
 
   if (resultTab) {
-    const group = state.resultGroups.find(group => group.groupId === resultTab.groupId)!;
-
     return styled(style)(
       <result-panel>
-        <SqlResultSetPanel resultTab={resultTab} group={group} />
+        <SqlResultSetPanel resultTab={resultTab} state={state} />
       </result-panel>,
     );
   }

@@ -10,6 +10,9 @@
       "path": "../core-blocks/tsconfig.json"
     },
     {
+      "path": "../core-client-activity/tsconfig.json"
+    },
+    {
       "path": "../core-di/tsconfig.json"
     },
     {
@@ -20,9 +23,6 @@
     },
     {
       "path": "../core-notifications/tsconfig.json"
-    },
-    {
-      "path": "../core-plugin/tsconfig.json"
     },
     {
       "path": "../core-projects/tsconfig.json"
@@ -41,6 +41,9 @@
     },
     {
       "path": "../core-ui/tsconfig.json"
+    },
+    {
+      "path": "../core-utils/tsconfig.json"
     },
     {
       "path": "../core-version/tsconfig.json"

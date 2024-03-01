@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2023 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -153,7 +153,7 @@ export class ServerConfigurationService {
 
     const validation = contexts.getContext(serverConfigValidationContext);
 
-    return validation.getState();
+    return validation.valid;
   }
 
   private readonly loadServerConfig: IExecutorHandler<ILoadConfigData> = async (data, contexts) => {
@@ -200,7 +200,7 @@ export class ServerConfigurationService {
   private readonly save: IExecutorHandler<IServerConfigSaveData> = async (data, contexts) => {
     const validation = contexts.getContext(serverConfigValidationContext);
 
-    if (!validation.getState()) {
+    if (!validation.valid) {
       return;
     }
 
@@ -221,8 +221,18 @@ export class ServerConfigurationService {
   private readonly ensureValidation: IExecutorHandler<IServerConfigSaveData> = (data, contexts) => {
     const validation = contexts.getContext(serverConfigValidationContext);
 
-    if (!validation.getState()) {
+    if (!validation.valid) {
       ExecutorInterrupter.interrupt(contexts);
+
+      if (validation.messages.length > 0) {
+        this.notificationService.notify(
+          {
+            title: 'administration_configuration_wizard_step_validation_message',
+            message: validation.messages.join('\n'),
+          },
+          validation.valid ? ENotificationType.Info : ENotificationType.Error,
+        );
+      }
       this.done = false;
     } else {
       this.done = true;
@@ -295,21 +305,27 @@ export class ServerConfigurationService {
 }
 
 export interface IValidationStatusContext {
-  getState: () => boolean;
+  valid: boolean;
+  messages: string[];
   invalidate: () => void;
+  info: (message: string) => void;
+  error: (message: string) => void;
 }
 
 export function serverConfigValidationContext(): IValidationStatusContext {
-  let state = true;
-
-  const invalidate = () => {
-    state = false;
-  };
-  const getState = () => state;
-
   return {
-    getState,
-    invalidate,
+    valid: true,
+    messages: [],
+    invalidate() {
+      this.valid = false;
+    },
+    info(message: string) {
+      this.messages.push(message);
+    },
+    error(message: string) {
+      this.messages.push(message);
+      this.valid = false;
+    },
   };
 }
 

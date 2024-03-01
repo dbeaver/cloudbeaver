@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2023 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@ interface Props {
   presentation: IDataPresentationOptions;
   resultIndex: number;
   simple: boolean;
+  isStatistics: boolean;
 }
 
 const styles = css`
@@ -32,7 +33,7 @@ const styles = css`
   }
 `;
 
-export const TableGrid = observer<Props>(function TableGrid({ model, actions, dataFormat, presentation, resultIndex, simple }) {
+export const TableGrid = observer<Props>(function TableGrid({ model, actions, dataFormat, presentation, resultIndex, simple, isStatistics }) {
   if ((presentation.dataFormat !== undefined && dataFormat !== presentation.dataFormat) || !model.source.hasResult(resultIndex)) {
     if (model.isLoading()) {
       return null;
@@ -42,11 +43,9 @@ export const TableGrid = observer<Props>(function TableGrid({ model, actions, da
     return <TextPlaceholder>Current data can't be displayed by selected presentation</TextPlaceholder>;
   }
 
-  const result = model.getResult(resultIndex);
-
   const Presentation = presentation.getPresentationComponent();
 
-  if (result?.loadedFully && !result.data) {
+  if (isStatistics) {
     return <TableStatistics model={model} resultIndex={resultIndex} />;
   }
 

@@ -12,6 +12,9 @@
   },
   "references": [
     {
+      "path": "../core-client-activity/tsconfig.json"
+    },
+    {
       "path": "../core-di/tsconfig.json"
     },
     {
@@ -24,13 +27,13 @@
       "path": "../core-sdk/tsconfig.json"
     },
     {
+      "path": "../core-sdk/tsconfig.json"
+    },
+    {
       "path": "../core-settings/tsconfig.json"
     },
     {
       "path": "../core-utils/tsconfig.json"
-    },
-    {
-      "path": "../core-sdk/tsconfig.json"
     }
   ],
   "include": [

@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2023 DBeaver Corp and others
+ * Copyright (C) 2010-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,10 +27,14 @@ import io.cloudbeaver.registry.WebAuthProviderRegistry;
 import io.cloudbeaver.server.CBApplication;
 import io.cloudbeaver.service.DBWSessionHandler;
 import io.cloudbeaver.utils.WebAppUtils;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.auth.SMAuthInfo;
+import org.jkiss.dbeaver.model.data.json.JSONUtils;
+import org.jkiss.dbeaver.model.security.SMAuthProviderCustomConfiguration;
 import org.jkiss.dbeaver.model.security.SMConstants;
 import org.jkiss.dbeaver.model.security.SMController;
 import org.jkiss.dbeaver.model.security.SMStandardMeta;
@@ -39,16 +43,15 @@ import org.jkiss.utils.CommonUtils;
 
 import java.io.IOException;
 import java.text.MessageFormat;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 public class RPSessionHandler implements DBWSessionHandler {
 
     private static final Log log = Log.getLog(RPSessionHandler.class);
+    public static final String DEFAULT_TEAM_DELIMITER = "\\|";
 
     @Override
     public boolean handleSessionOpen(WebSession webSession, HttpServletRequest request, HttpServletResponse response) throws DBException, IOException {
@@ -62,23 +65,42 @@ public class RPSessionHandler implements DBWSessionHandler {
         return false;
     }
 
-    public void reverseProxyAuthentication(@NotNull HttpServletRequest request, @NotNull WebSession webSession) throws DBWebException {
+    public void reverseProxyAuthentication(@NotNull HttpServletRequest request, @NotNull WebSession webSession) throws DBException {
         SMController securityController = webSession.getSecurityController();
         WebAuthProviderDescriptor authProvider = WebAuthProviderRegistry.getInstance().getAuthProvider(RPAuthProvider.AUTH_PROVIDER);
         if (authProvider == null) {
             throw new DBWebException("Auth provider " + RPAuthProvider.AUTH_PROVIDER + " not found");
         }
         SMAuthProviderExternal<?> authProviderExternal = (SMAuthProviderExternal<?>) authProvider.getInstance();
-        String userName = request.getHeader(RPAuthProvider.X_USER);
-        String teams = request.getHeader(RPAuthProvider.X_TEAM);
-        if (CommonUtils.isEmpty(teams)) {
-            // backward compatibility
-            teams = request.getHeader(RPAuthProvider.X_ROLE);
+        SMAuthProviderCustomConfiguration configuration = WebAppUtils.getWebAuthApplication()
+            .getAuthConfiguration()
+            .getAuthCustomConfigurations()
+            .stream()
+            .filter(p -> p.getProvider().equals(authProvider.toString()))
+            .findFirst()
+            .orElse(null);
+        Map<String, Object> paramConfigMap = new HashMap<>();
+        if (configuration != null) {
+            authProvider.getConfigurationParameters().forEach(p ->
+                paramConfigMap.put(p.getId(), configuration.getParameters().get(p.getId())
+                ));
         }
-        String role = request.getHeader(RPAuthProvider.X_ROLE_TE);
-        String firstName = request.getHeader(RPAuthProvider.X_FIRST_NAME);
-        String lastName = request.getHeader(RPAuthProvider.X_LAST_NAME);
-        List<String> userTeams = teams == null ? Collections.emptyList() : List.of(teams.split("\\|"));
+        String userName = request.getHeader(
+            resolveParam(paramConfigMap.get(RPConstants.PARAM_USER), RPAuthProvider.X_USER)
+        );
+        String teams = request.getHeader(resolveParam(paramConfigMap.get(RPConstants.PARAM_TEAM), RPAuthProvider.X_TEAM));
+        // backward compatibility
+        String deprecatedTeams = request.getHeader(RPAuthProvider.X_ROLE);
+        if (teams == null && deprecatedTeams != null) {
+            teams = deprecatedTeams;
+        }
+        String role = request.getHeader(resolveParam(paramConfigMap.get(RPConstants.PARAM_ROLE_NAME), RPAuthProvider.X_ROLE_TE));
+        String firstName = request.getHeader(resolveParam(paramConfigMap.get(RPConstants.PARAM_FIRST_NAME), RPAuthProvider.X_FIRST_NAME));
+        String lastName = request.getHeader(resolveParam(paramConfigMap.get(RPConstants.PARAM_LAST_NAME), RPAuthProvider.X_LAST_NAME));
+        String logoutUrl = Objects.requireNonNull(configuration).getParameter(RPConstants.PARAM_LOGOUT_URL);
+        String teamDelimiter = JSONUtils.getString(configuration.getParameters(),
+                RPConstants.PARAM_TEAM_DELIMITER, "\\|");
+        List<String> userTeams = teams == null ? null : (teams.isEmpty() ? List.of() : List.of(teams.split(teamDelimiter)));
         if (userName != null) {
             try {
                 Map<String, Object> credentials = new HashMap<>();
@@ -88,6 +110,9 @@ public class RPSessionHandler implements DBWSessionHandler {
                 }
                 if (!CommonUtils.isEmpty(lastName)) {
                     credentials.put(SMStandardMeta.META_LAST_NAME, lastName);
+                }
+                if (CommonUtils.isNotEmpty(logoutUrl)) {
+                    credentials.put("logoutUrl", logoutUrl);
                 }
                 Map<String, Object> sessionParameters = webSession.getSessionParameters();
                 sessionParameters.put(SMConstants.SESSION_PARAM_TRUSTED_USER_TEAMS, userTeams);
@@ -102,7 +127,7 @@ public class RPSessionHandler implements DBWSessionHandler {
                         webSession.getSessionId(),
                         currentSmSessionId,
                         sessionParameters,
-                        WebSession.CB_SESSION_TYPE, authProvider.getId(), null, userCredentials);
+                        WebSession.CB_SESSION_TYPE, authProvider.getId(), configuration.getId(), userCredentials);
                     new WebSessionAuthProcessor(webSession, smAuthInfo, false).authenticateSession();
                     log.debug(MessageFormat.format(
                         "Successful reverse proxy authentication: user ''{0}'' with teams {1}", userName, userTeams));
@@ -119,5 +144,12 @@ public class RPSessionHandler implements DBWSessionHandler {
     @Override
     public boolean handleSessionClose(WebSession webSession) throws DBException, IOException {
         return false;
+    }
+
+    private String resolveParam(Object value, String defaultValue) {
+        if (value != null && !value.toString().isEmpty()) {
+            return value.toString();
+        }
+        return defaultValue;
     }
 }

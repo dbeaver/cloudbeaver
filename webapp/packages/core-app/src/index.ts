@@ -1,12 +1,11 @@
 // Services
-export * from './CoreSettingsService';
 export * from './AppScreen/AppScreenService';
 export * from './AppScreen/AppScreenBootstrap';
 
 export * from './AppLocaleService';
 
 // components
-export * from './Body';
+export * from './BodyLazy';
 
 // Interfaces
 export * from './manifest';

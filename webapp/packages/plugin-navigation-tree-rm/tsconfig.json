@@ -40,10 +40,10 @@
       "path": "../core-projects/tsconfig.json"
     },
     {
-      "path": "../core-resource/tsconfig.json"
+      "path": "../core-resource-manager/tsconfig.json"
     },
     {
-      "path": "../core-resource-manager/tsconfig.json"
+      "path": "../core-resource/tsconfig.json"
     },
     {
       "path": "../core-utils/tsconfig.json"

@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2023 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -11,6 +11,7 @@ import { ProjectsService } from '@cloudbeaver/core-projects';
 import { CachedMapAllKey, CachedMapResource, type ResourceKey, resourceKeyList, ResourceKeyUtils } from '@cloudbeaver/core-resource';
 import { GraphQLService, SqlDialectInfo } from '@cloudbeaver/core-sdk';
 
+import type { IConnectionInfoParams } from './CONNECTION_INFO_PARAM_SCHEMA';
 import type { IConnectionExecutionContextInfo } from './ConnectionExecutionContext/ConnectionExecutionContextResource';
 import {
   ConnectionInfoActiveProjectKey,
@@ -18,7 +19,6 @@ import {
   ConnectionInfoResource,
   isConnectionInfoParamEqual,
 } from './ConnectionInfoResource';
-import type { IConnectionInfoParams } from './IConnectionsResource';
 
 export type ConnectionDialect = SqlDialectInfo;
 

@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2023 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -12,7 +12,7 @@ import { Connection, ConnectionInfoResource, createConnectionParam } from '@clou
 import { useService } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { download, generateFileName, getTextFileReadingProcess } from '@cloudbeaver/core-utils';
+import { download, getTextFileReadingProcess, withTimestamp } from '@cloudbeaver/core-utils';
 
 import { getSqlEditorName } from '../getSqlEditorName';
 import type { ISqlEditorTabState } from '../ISqlEditorTabState';
@@ -71,9 +71,7 @@ export function useTools(state: ISqlEditorTabState): Readonly<State> {
       },
 
       checkFileValidity(file: File) {
-        const maxSize = this.sqlEditorSettingsService.settings.isValueDefault('maxFileSize')
-          ? this.sqlEditorSettingsService.deprecatedSettings.getValue('maxFileSize')
-          : this.sqlEditorSettingsService.settings.getValue('maxFileSize');
+        const maxSize = this.sqlEditorSettingsService.settings.getValue('maxFileSize');
 
         const size = Math.round(file.size / 1024); // kilobyte
         const aboveMaxSize = size > maxSize;
@@ -110,7 +108,7 @@ export function useTools(state: ISqlEditorTabState): Readonly<State> {
 
         const name = getSqlEditorName(this.state, dataSource, connection);
 
-        download(blob, generateFileName(name, '.sql'));
+        download(blob, `${withTimestamp(name)}.sql`);
       },
     }),
     {

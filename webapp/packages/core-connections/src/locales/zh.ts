@@ -1,4 +1,5 @@
 export default [
+  ['core_connections_connections_settings_group', 'Connections'],
   ['connections_administration_item', 'Connection Templates'],
   ['connections_administration_connection_create', 'Add Database Template'],
   ['connections_administration_search_database_tip', '在此处输入您的主机，例如“localhost host1.myhost.com 192.168.0.1”然后按 Enter'],
@@ -36,7 +37,7 @@ export default [
   ['connections_connection_edit_search_hosts', '主机名称'],
   ['connections_connection_address', '地址'],
   ['connections_connection_folder', 'Folder'],
-  ['connections_connection_folder_validation', 'Folder\'s name may contain the following symbols "_-$.()@" and can\'t start with a dot'],
+  ['connections_connection_folder_validation', "Folder's name may not contain the following symbols / : \" \\ and can't start with a dot"],
   ['connections_connection_name', '连接名称'],
   ['connections_connection_access_admin_info', '管理员查看所有连接。'],
   ['connections_connection_description', '描述'],
@@ -51,6 +52,8 @@ export default [
   ['connections_connection_test_fail', '连接测试失败'],
   ['connections_connection_create_fail', '无法创建连接'],
   ['connections_connection_save_fail', '无法保存连接'],
+  ['connections_connection_keep_alive', 'Keep alive (in seconds)'],
+  ['connections_connection_keep_alive_tooltip', 'No auto disconnect'],
   ['connections_network_handler_test', '测试隧道'],
   ['connections_network_handler_test_fail', '隧道测试失败'],
   ['connections_network_handler_test_success', '隧道测试成功'],

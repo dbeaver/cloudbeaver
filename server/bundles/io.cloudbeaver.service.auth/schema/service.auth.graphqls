@@ -30,6 +30,7 @@ type AuthProviderConfiguration {
     id: ID!
     displayName: String!
     disabled: Boolean!
+    authRoleProvided: Boolean
 
     iconURL: String
     description: String
@@ -86,6 +87,11 @@ type AuthInfo {
     userTokens: [UserAuthToken!]
 }
 
+
+type LogoutInfo @since(version: "23.3.3") {
+    redirectLinks: [String!]!
+}
+
 type UserAuthToken {
     # Auth provider used for authorization
     authProvider: ID!
@@ -139,7 +145,12 @@ extend type Query {
     authUpdateStatus(authId: ID!, linkUser: Boolean): AuthInfo!
 
     # Logouts user. If provider not specified then all authorizations are revoked from session.
+    @deprecated
     authLogout(provider: ID, configuration: ID): Boolean
+
+    # Same as #authLogout, but returns additional information
+    @since(version: "23.3.3")
+    authLogoutExtended(provider: ID, configuration: ID): LogoutInfo!
 
     # Active user information. null is no user was authorized within session
     activeUser: UserInfo

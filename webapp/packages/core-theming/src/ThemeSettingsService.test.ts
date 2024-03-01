@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2023 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -8,6 +8,7 @@
 import '@testing-library/jest-dom';
 
 import { coreBrowserManifest } from '@cloudbeaver/core-browser';
+import { coreClientActivityManifest } from '@cloudbeaver/core-client-activity';
 import { coreEventsManifest } from '@cloudbeaver/core-events';
 import { coreLocalizationManifest } from '@cloudbeaver/core-localization';
 import { corePluginManifest } from '@cloudbeaver/core-plugin';
@@ -35,6 +36,7 @@ const app = createApp(
   coreSettingsManifest,
   coreBrowserManifest,
   coreLocalizationManifest,
+  coreClientActivityManifest,
 );
 
 const server = mockGraphQL(...mockAppInit(endpoint));
@@ -44,21 +46,14 @@ beforeAll(() => app.init());
 const testValueA = 'light';
 const testValueB = 'dark';
 
-const equalConfigA = {
+const deprecatedSettings = {
   'core.user': {
     defaultTheme: testValueA,
   } as IThemeSettings,
-  core: {
-    theming: {
-      defaultTheme: testValueA,
-    } as IThemeSettings,
-  },
 };
 
-const equalConfigB = {
-  'core.user': {
-    defaultTheme: testValueB,
-  } as IThemeSettings,
+const newSettings = {
+  ...deprecatedSettings,
   core: {
     theming: {
       defaultTheme: testValueB,
@@ -66,26 +61,24 @@ const equalConfigB = {
   },
 };
 
-test('New settings equal deprecated settings "light"', async () => {
+test('New Settings override deprecated settings', async () => {
   const settings = app.injector.getServiceByClass(ThemeSettingsService);
   const config = app.injector.getServiceByClass(ServerConfigResource);
 
-  server.use(endpoint.query('serverConfig', mockServerConfig(equalConfigA)));
-
-  await config.refresh();
-
-  expect(settings.settings.getValue('defaultTheme')).toBe(testValueA);
-  expect(settings.deprecatedSettings.getValue('defaultTheme')).toBe(testValueA);
-});
-
-test('New settings equal deprecated settings "dark"', async () => {
-  const settings = app.injector.getServiceByClass(ThemeSettingsService);
-  const config = app.injector.getServiceByClass(ServerConfigResource);
-
-  server.use(endpoint.query('serverConfig', mockServerConfig(equalConfigB)));
+  server.use(endpoint.query('serverConfig', mockServerConfig(newSettings)));
 
   await config.refresh();
 
   expect(settings.settings.getValue('defaultTheme')).toBe(testValueB);
-  expect(settings.deprecatedSettings.getValue('defaultTheme')).toBe(testValueB);
+});
+
+test('Deprecated settings are used if new settings are not defined', async () => {
+  const settings = app.injector.getServiceByClass(ThemeSettingsService);
+  const config = app.injector.getServiceByClass(ServerConfigResource);
+
+  server.use(endpoint.query('serverConfig', mockServerConfig(deprecatedSettings)));
+
+  await config.refresh();
+
+  expect(settings.settings.getValue('defaultTheme')).toBe(testValueA);
 });

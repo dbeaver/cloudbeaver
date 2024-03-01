@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2023 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@ import type { IDatabaseDataModel, IDatabaseResultSet } from '@cloudbeaver/plugin
 
 import type { IDataQueryOptions } from '../QueryDataSource';
 import { ESqlDataSourceFeatures } from './ESqlDataSourceFeatures';
-import type { ISetScriptData, ISqlDataSource, ISqlDataSourceKey } from './ISqlDataSource';
+import type { ISetScriptData, ISqlDataSource, ISqlDataSourceKey, ISqlEditorCursor } from './ISqlDataSource';
 import type { ISqlDataSourceHistory } from './SqlDataSourceHistory/ISqlDataSourceHistory';
 import { SqlDataSourceHistory } from './SqlDataSourceHistory/SqlDataSourceHistory';
 
@@ -23,16 +23,23 @@ const SOURCE_HISTORY = 'history';
 @staticImplements<ISqlDataSourceKey>()
 export abstract class BaseSqlDataSource implements ISqlDataSource {
   static key = 'base';
+
   abstract get name(): string | null;
+  message?: string;
+
   abstract get script(): string;
   abstract get baseScript(): string;
+
   abstract get baseExecutionContext(): IConnectionExecutionContextInfo | undefined;
   abstract get executionContext(): IConnectionExecutionContextInfo | undefined;
   databaseModels: IDatabaseDataModel<IDataQueryOptions, IDatabaseResultSet>[];
-  exception?: Error | Error[] | null | undefined;
-  message?: string;
   incomingScript: string | undefined;
   incomingExecutionContext: IConnectionExecutionContextInfo | undefined | null;
+  exception?: Error | Error[] | null | undefined;
+
+  get cursor(): ISqlEditorCursor {
+    return this.innerCursorState;
+  }
 
   get isIncomingChanges(): boolean {
     return this.incomingScript !== undefined || this.incomingExecutionContext !== null;
@@ -78,6 +85,7 @@ export abstract class BaseSqlDataSource implements ISqlDataSource {
 
   protected outdated: boolean;
   protected editing: boolean;
+  protected innerCursorState: ISqlEditorCursor;
 
   constructor(icon = '/icons/sql_script_m.svg') {
     this.icon = icon;
@@ -88,6 +96,7 @@ export abstract class BaseSqlDataSource implements ISqlDataSource {
     this.message = undefined;
     this.outdated = true;
     this.editing = true;
+    this.innerCursorState = { begin: 0, end: 0 };
     this.history = new SqlDataSourceHistory();
     this.onUpdate = new SyncExecutor();
     this.onSetScript = new SyncExecutor();
@@ -104,7 +113,7 @@ export abstract class BaseSqlDataSource implements ISqlDataSource {
 
     this.history.onNavigate.addHandler(value => this.setScript(value, SOURCE_HISTORY));
 
-    makeObservable<this, 'outdated' | 'editing'>(this, {
+    makeObservable<this, 'outdated' | 'editing' | 'innerCursorState'>(this, {
       isSaved: computed,
       isIncomingChanges: computed,
       isAutoSaveEnabled: computed,
@@ -127,6 +136,7 @@ export abstract class BaseSqlDataSource implements ISqlDataSource {
       outdated: observable.ref,
       message: observable.ref,
       editing: observable.ref,
+      innerCursorState: observable.ref,
       incomingScript: observable.ref,
       incomingExecutionContext: observable.ref,
     });
@@ -178,6 +188,10 @@ export abstract class BaseSqlDataSource implements ISqlDataSource {
     // }
   }
 
+  isOpened(): boolean {
+    return true;
+  }
+
   isError(): boolean {
     return isContainsException(this.exception);
   }
@@ -218,6 +232,20 @@ export abstract class BaseSqlDataSource implements ISqlDataSource {
     return this.features.includes(feature);
   }
 
+  setCursor(begin: number, end = begin): void {
+    if (begin > end) {
+      throw new Error('Cursor begin can not be greater than the end of it');
+    }
+
+    const scriptLength = this.script.length;
+
+    this.innerCursorState = Object.freeze({
+      begin: Math.min(begin, scriptLength),
+      end: Math.min(end, scriptLength),
+    });
+    this.onUpdate.execute();
+  }
+
   setEditing(state: boolean): void {
     this.editing = state;
   }
@@ -252,6 +280,10 @@ export abstract class BaseSqlDataSource implements ISqlDataSource {
   }
 
   load(): Promise<void> | void {
+    this.markUpdated();
+  }
+
+  open(): Promise<void> | void {
     this.markUpdated();
   }
 

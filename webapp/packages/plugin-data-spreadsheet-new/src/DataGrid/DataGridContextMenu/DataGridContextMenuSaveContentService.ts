@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2023 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -46,10 +46,7 @@ export class DataGridContextMenuSaveContentService {
       isDisabled: context => {
         const content = context.data.model.source.getAction(context.data.resultIndex, ResultSetDataContentAction);
 
-        return (
-          context.data.model.isLoading() ||
-          (!!content.activeElement && ResultSetDataKeysUtils.isElementsKeyEqual(context.data.key, content.activeElement))
-        );
+        return context.data.model.isLoading() || content.isLoading(context.data.key);
       },
     });
     this.dataGridContextMenuService.add(this.dataGridContextMenuService.getMenuToken(), {
@@ -76,10 +73,7 @@ export class DataGridContextMenuSaveContentService {
       isDisabled: context => {
         const content = context.data.model.source.getAction(context.data.resultIndex, ResultSetDataContentAction);
 
-        return (
-          context.data.model.isLoading() ||
-          (!!content.activeElement && ResultSetDataKeysUtils.isElementsKeyEqual(context.data.key, content.activeElement))
-        );
+        return context.data.model.isLoading() || content.isLoading(context.data.key);
       },
     });
   }

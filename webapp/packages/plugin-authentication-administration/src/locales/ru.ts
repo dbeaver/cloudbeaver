@@ -102,7 +102,7 @@ export default [
 
   ['administration_teams_tab_title', 'Команды'],
   ['administration_teams_tab_description', 'Управление командами'],
-  ['administration_teams_team_creation', 'Создание команды'],
+  ['administration_teams_team_creation', 'Создание Команды'],
   ['administration_teams_team_id', 'ID Команды'],
   ['administration_teams_team_name', 'Название команды'],
   ['administration_teams_team_description', 'Описание'],
@@ -134,4 +134,7 @@ export default [
   ['administration_teams_team_granted_connections_tab_title', 'Подключения'],
   ['administration_teams_team_granted_connections_search_placeholder', 'Поиск по названию подключения...'],
   ['administration_teams_team_granted_connections_empty', 'Нет доступных подключений'],
+
+  ['plugin_authentication_administration_user_team_default_readonly_tooltip', 'Команда по умолчанию. Не может быть отозвана'],
+  ['plugin_authentication_administration_team_default_users_tooltip', 'Команда по умолчанию. Содержит всех пользователей'],
 ];

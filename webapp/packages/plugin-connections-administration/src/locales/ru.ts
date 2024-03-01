@@ -6,4 +6,8 @@ export default [
   ['connections_public_connection_edit_reconnect_failed', 'Не удалось переподключиться'],
 
   ['connections_administration_deactivate_message', 'Настройки вашего подключения будут потеряны. Вы хотите продолжить?'],
+  [
+    'templates_administration_info_message',
+    'Шаблоны позволяют администраторам определять различные параметры подключения, а затем позволяют пользователям создавать несколько подключений на основе этих шаблонов.',
+  ],
 ];

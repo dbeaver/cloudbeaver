@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2023 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,13 @@ import { useService } from '@cloudbeaver/core-di';
 import { ITabData, Tab, TabIcon, TabTitle } from '@cloudbeaver/core-ui';
 import { CaptureViewContext } from '@cloudbeaver/core-view';
 import type { TabHandlerTabComponent } from '@cloudbeaver/plugin-navigation-tabs';
-import { DATA_CONTEXT_SQL_EDITOR_STATE, getSqlEditorName, ISqlEditorTabState, SqlDataSourceService } from '@cloudbeaver/plugin-sql-editor';
+import {
+  DATA_CONTEXT_SQL_EDITOR_STATE,
+  ESqlDataSourceFeatures,
+  getSqlEditorName,
+  ISqlEditorTabState,
+  SqlDataSourceService,
+} from '@cloudbeaver/plugin-sql-editor';
 
 import { DATA_CONTEXT_SQL_EDITOR_TAB } from './DATA_CONTEXT_SQL_EDITOR_TAB';
 import sqlEditorTabStyles from './SqlEditorTab.m.css';
@@ -24,13 +30,13 @@ import sqlEditorTabStyles from './SqlEditorTab.m.css';
 export const SqlEditorTab: TabHandlerTabComponent<ISqlEditorTabState> = observer(function SqlEditorTab({ tab, onSelect, onClose, style }) {
   const viewContext = useContext(CaptureViewContext);
   const tabMenuContext = useDataContext(viewContext);
-  
+
   tabMenuContext.set(DATA_CONTEXT_SQL_EDITOR_TAB, true);
   tabMenuContext.set(DATA_CONTEXT_SQL_EDITOR_STATE, tab.handlerState);
-  
+
   const sqlDataSourceService = useService(SqlDataSourceService);
   const connectionInfo = useService(ConnectionInfoResource);
-  
+
   const translate = useTranslate();
 
   const dataSource = sqlDataSourceService.get(tab.handlerState.editorId);
@@ -44,6 +50,7 @@ export const SqlEditorTab: TabHandlerTabComponent<ISqlEditorTabState> = observer
   const name = getSqlEditorName(tab.handlerState, dataSource, connection);
   const icon = dataSource?.icon ?? '/icons/sql_script_m.svg';
   const saved = dataSource?.isSaved !== false;
+  const isScript = dataSource?.hasFeature(ESqlDataSourceFeatures.script);
   const isReadonly = Boolean(dataSource?.isReadonly());
   const hasUnsavedMark = !saved && !isReadonly;
 
@@ -54,7 +61,9 @@ export const SqlEditorTab: TabHandlerTabComponent<ISqlEditorTabState> = observer
     <Tab tabId={tab.id} style={style} title={name} menuContext={tabMenuContext} onOpen={handleSelect} onClose={handleClose}>
       <TabIcon icon={icon} />
       <TabTitle>{name}</TabTitle>
-      {isReadonly && <IconOrImage title={translate('ui_readonly')} icon="/icons/lock.png" className={s(sqlEditorTabStyles, { readonlyIcon: true })} />}
+      {isReadonly && isScript && (
+        <IconOrImage title={translate('ui_readonly')} icon="/icons/lock.png" className={s(sqlEditorTabStyles, { readonlyIcon: true })} />
+      )}
       {hasUnsavedMark && <unsaved-mark className={s(sqlEditorTabStyles, { unsavedMark: true })} />}
     </Tab>,
   );

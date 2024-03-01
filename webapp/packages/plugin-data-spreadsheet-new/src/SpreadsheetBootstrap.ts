@@ -1,10 +1,11 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2023 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
+import { importLazyComponent } from '@cloudbeaver/core-blocks';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { ExceptionsCatcherService } from '@cloudbeaver/core-events';
 import { ResultDataFormat } from '@cloudbeaver/core-sdk';
@@ -16,7 +17,8 @@ import { DataGridContextMenuOrderService } from './DataGrid/DataGridContextMenu/
 import { DataGridContextMenuSaveContentService } from './DataGrid/DataGridContextMenu/DataGridContextMenuSaveContentService';
 import { DataGridContextMenuService } from './DataGrid/DataGridContextMenu/DataGridContextMenuService';
 import { DataGridSettingsService } from './DataGridSettingsService';
-import { SpreadsheetGrid } from './SpreadsheetGrid';
+
+const SpreadsheetGrid = importLazyComponent(() => import('./SpreadsheetGrid').then(m => m.SpreadsheetGrid));
 
 @injectable()
 export class SpreadsheetBootstrap extends Bootstrap {
@@ -39,10 +41,7 @@ export class SpreadsheetBootstrap extends Bootstrap {
       id: 'spreadsheet_grid',
       dataFormat: ResultDataFormat.Resultset,
       getPresentationComponent: () => SpreadsheetGrid,
-      hidden: () =>
-        this.dataGridSettingsService.settings.isValueDefault('hidden')
-          ? this.dataGridSettingsService.deprecatedSettings.getValue('hidden')
-          : this.dataGridSettingsService.settings.getValue('hidden'),
+      hidden: () => this.dataGridSettingsService.settings.getValue('hidden'),
       title: 'Table',
       icon: 'table-icon-sm',
     });

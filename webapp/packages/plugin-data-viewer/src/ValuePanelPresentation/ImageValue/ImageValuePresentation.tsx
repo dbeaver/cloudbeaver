@@ -1,27 +1,28 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2023 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
 import { action, computed, observable } from 'mobx';
 import { observer } from 'mobx-react-lite';
+import { useMemo } from 'react';
 
 import { ActionIconButton, Button, Container, Fill, s, useObservableRef, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import { selectFiles } from '@cloudbeaver/core-browser';
 import { useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { QuotasService } from '@cloudbeaver/core-root';
-import type { TabContainerPanelComponent } from '@cloudbeaver/core-ui';
-import { bytesToSize, download, getMIME, isImageFormat, isValidUrl } from '@cloudbeaver/core-utils';
+import { type TabContainerPanelComponent, useTabLocalState } from '@cloudbeaver/core-ui';
+import { bytesToSize, download, getMIME, isImageFormat, isValidUrl, throttle } from '@cloudbeaver/core-utils';
 
 import { createResultSetBlobValue } from '../../DatabaseDataModel/Actions/ResultSet/createResultSetBlobValue';
+import type { IResultSetElementKey } from '../../DatabaseDataModel/Actions/ResultSet/IResultSetDataKey';
+import { isResultSetBinaryValue } from '../../DatabaseDataModel/Actions/ResultSet/isResultSetBinaryValue';
 import { isResultSetBlobValue } from '../../DatabaseDataModel/Actions/ResultSet/isResultSetBlobValue';
 import { isResultSetContentValue } from '../../DatabaseDataModel/Actions/ResultSet/isResultSetContentValue';
 import { isResultSetFileValue } from '../../DatabaseDataModel/Actions/ResultSet/isResultSetFileValue';
 import { ResultSetDataContentAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetDataContentAction';
-import { ResultSetDataKeysUtils } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetDataKeysUtils';
 import { ResultSetEditAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetEditAction';
 import { ResultSetFormatAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetFormatAction';
 import { ResultSetSelectAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetSelectAction';
@@ -30,45 +31,28 @@ import type { IDataValuePanelProps } from '../../TableViewer/ValuePanel/DataValu
 import { QuotaPlaceholder } from '../QuotaPlaceholder';
 import styles from './ImageValuePresentation.m.css';
 
-interface IToolsProps {
-  loading?: boolean;
-  stretch?: boolean;
-  onToggleStretch?: () => void;
-  onSave?: () => void;
-  onUpload?: () => void;
-}
-
-const Tools = observer<IToolsProps>(function Tools({ loading, stretch, onToggleStretch, onSave, onUpload }) {
-  const translate = useTranslate();
-
-  return (
-    <Container gap dense keepSize>
-      <Container keepSize flexStart center>
-        {onSave && <ActionIconButton title={translate('ui_download')} name="/icons/export.svg" disabled={loading} img onClick={onSave} />}
-        {onUpload && <ActionIconButton title={translate('ui_upload')} name="/icons/import.svg" disabled={loading} img onClick={onUpload} />}
-      </Container>
-      <Fill />
-      {onToggleStretch && (
-        <Container keepSize flexEnd center>
-          <ActionIconButton
-            title={translate(stretch ? 'data_viewer_presentation_value_image_original_size' : 'data_viewer_presentation_value_image_fit')}
-            name={stretch ? 'img-original-size' : 'img-fit-size'}
-            onClick={onToggleStretch}
-          />
-        </Container>
-      )}
-    </Container>
-  );
-});
-
 export const ImageValuePresentation: TabContainerPanelComponent<IDataValuePanelProps<any, IDatabaseResultSet>> = observer(
   function ImageValuePresentation({ model, resultIndex }) {
     const translate = useTranslate();
     const notificationService = useService(NotificationService);
-    const quotasService = useService(QuotasService);
     const style = useS(styles);
 
-    const state = useObservableRef(
+    const state = useTabLocalState(() =>
+      observable(
+        {
+          stretch: false,
+          toggleStretch() {
+            this.stretch = !this.stretch;
+          },
+        },
+        {
+          stretch: observable.ref,
+          toggleStretch: action.bound,
+        },
+      ),
+    );
+
+    const data = useObservableRef(
       () => ({
         get editAction(): ResultSetEditAction {
           return this.model.source.getAction(this.resultIndex, ResultSetEditAction);
@@ -82,65 +66,90 @@ export const ImageValuePresentation: TabContainerPanelComponent<IDataValuePanelP
         get formatAction(): ResultSetFormatAction {
           return this.model.source.getAction(this.resultIndex, ResultSetFormatAction);
         },
-        get selectedCell() {
-          const focusCell = this.selectAction.getFocusedElement();
+        get selectedCell(): IResultSetElementKey | undefined {
+          const activeElements = this.selectAction.getActiveElements();
 
-          return this.selectAction.elements[0] || focusCell;
-        },
-        get cellValue() {
-          return this.formatAction.get(this.selectedCell);
-        },
-        get src() {
-          if (this.savedSrc) {
-            return this.savedSrc;
+          if (activeElements.length === 0) {
+            return undefined;
           }
 
+          return activeElements[0];
+        },
+        get cellValue() {
+          if (this.selectedCell === undefined) {
+            return null;
+          }
+
+          return this.formatAction.get(this.selectedCell);
+        },
+        get src(): string | null {
           if (isResultSetBlobValue(this.cellValue)) {
+            // uploaded file preview
             return URL.createObjectURL(this.cellValue.blob);
           }
 
-          if (isResultSetContentValue(this.cellValue) && this.cellValue.binary) {
+          if (this.staticSrc) {
+            return this.staticSrc;
+          }
+
+          if (this.cacheBlob) {
+            // TODO: this object must be released with URL.revokeObjectURL()
+            // it also can be released by the browser after some time
+            // what leads to image not accessible
+            return URL.createObjectURL(this.cacheBlob);
+          }
+
+          return null;
+        },
+        get staticSrc(): string | null {
+          if (this.truncated) {
+            return null;
+          }
+
+          if (isResultSetBinaryValue(this.cellValue)) {
             return `data:${getMIME(this.cellValue.binary)};base64,${this.cellValue.binary}`;
-          } else if (typeof this.cellValue === 'string' && isValidUrl(this.cellValue) && isImageFormat(this.cellValue)) {
+          }
+
+          if (typeof this.cellValue === 'string' && isValidUrl(this.cellValue) && isImageFormat(this.cellValue)) {
             return this.cellValue;
           }
 
-          return '';
+          return null;
         },
-        get savedSrc() {
-          return this.contentAction.retrieveFileDataUrlFromCache(this.selectedCell);
+        get cacheBlob() {
+          if (!this.selectedCell) {
+            return null;
+          }
+          return this.contentAction.retrieveBlobFromCache(this.selectedCell);
         },
         get canSave() {
-          if (this.truncated) {
+          if (this.truncated && this.selectedCell) {
             return this.contentAction.isDownloadable(this.selectedCell);
           }
 
-          return !!this.src;
+          return this.staticSrc && !this.truncated;
         },
         get canUpload() {
+          if (!this.selectedCell) {
+            return false;
+          }
           return this.formatAction.isBinary(this.selectedCell);
         },
         get truncated() {
           if (isResultSetFileValue(this.cellValue)) {
             return false;
           }
-          if (isResultSetContentValue(this.cellValue)) {
-            if (this.cellValue.binary) {
-              return this.contentAction.isContentTruncated(this.cellValue);
-            }
-          }
-          return false;
+
+          return this.selectedCell && this.contentAction.isBlobTruncated(this.selectedCell);
         },
-        stretch: false,
-        toggleStretch() {
-          this.stretch = !this.stretch;
-        },
-        async save() {
+        async download() {
           try {
-            if (this.truncated) {
+            if (this.src) {
+              download(this.src, '', true);
+            } else if (this.selectedCell) {
               await this.contentAction.downloadFileData(this.selectedCell);
             } else {
-              download(this.src, '', true);
+              throw new Error("Can't save image");
             }
           } catch (exception: any) {
             this.notificationService.logException(exception, 'data_viewer_presentation_value_content_download_error');
@@ -149,10 +158,21 @@ export const ImageValuePresentation: TabContainerPanelComponent<IDataValuePanelP
         async upload() {
           selectFiles(files => {
             const file = files?.item(0) ?? undefined;
-            if (file) {
+            if (file && this.selectedCell) {
               this.editAction.set(this.selectedCell, createResultSetBlobValue(file));
             }
           });
+        },
+        async loadFullImage() {
+          if (!this.selectedCell) {
+            return;
+          }
+
+          try {
+            await this.contentAction.resolveFileDataUrl(this.selectedCell);
+          } catch (exception: any) {
+            this.notificationService.logException(exception, 'data_viewer_presentation_value_content_download_error');
+          }
         },
       }),
       {
@@ -164,65 +184,59 @@ export const ImageValuePresentation: TabContainerPanelComponent<IDataValuePanelP
         cellValue: computed,
         canUpload: computed,
         src: computed,
-        savedSrc: computed,
+        cacheBlob: computed,
         canSave: computed,
         truncated: computed,
-        stretch: observable.ref,
         model: observable.ref,
         resultIndex: observable.ref,
-        toggleStretch: action.bound,
-        save: action.bound,
+        download: action.bound,
         upload: action.bound,
+        loadFullImage: action.bound,
       },
       { model, resultIndex, notificationService },
     );
 
-    const save = state.canSave ? state.save : undefined;
-    const upload = state.canUpload ? state.upload : undefined;
     const loading = model.isLoading();
-    const value = state.cellValue;
 
-    if (state.truncated && !state.savedSrc && isResultSetContentValue(value)) {
-      const limit = bytesToSize(quotasService.getQuota('sqlBinaryPreviewMaxLength'));
-      const valueSize = bytesToSize(value.contentLength ?? 0);
+    const valueSize = bytesToSize(isResultSetContentValue(data.cellValue) ? data.cellValue.contentLength ?? 0 : 0);
+    const isTruncatedMessageDisplay = !!data.truncated && !data.src;
+    const isDownloadable = isTruncatedMessageDisplay && !!data.selectedCell && data.contentAction.isDownloadable(data.selectedCell);
+    const isCacheDownloading = isDownloadable && data.contentAction.isLoading(data.selectedCell);
 
-      const load = async () => {
-        try {
-          await state.contentAction.resolveFileDataUrl(state.selectedCell);
-        } catch (exception: any) {
-          notificationService.logException(exception, 'data_viewer_presentation_value_content_download_error');
-        }
-      };
-
-      return (
-        <Container vertical>
-          <Container fill overflow center>
-            <QuotaPlaceholder limit={limit} size={valueSize}>
-              {state.contentAction.isDownloadable(state.selectedCell) && (
-                <Button
-                  disabled={loading}
-                  loading={
-                    !!state.contentAction.activeElement &&
-                    ResultSetDataKeysUtils.isElementsKeyEqual(state.contentAction.activeElement, state.selectedCell)
-                  }
-                  onClick={load}
-                >
-                  {translate('ui_view')}
-                </Button>
-              )}
-            </QuotaPlaceholder>
-          </Container>
-          <Tools loading={loading} onSave={save} onUpload={upload} />
-        </Container>
-      );
-    }
+    const debouncedDownload = useMemo(() => throttle(() => data.download(), 1000, false), []);
 
     return (
       <Container vertical>
         <Container fill overflow center>
-          <img src={state.src} className={s(style, { img: true, stretch: state.stretch })} />
+          {data.src && <img src={data.src} className={s(style, { img: true, stretch: state.stretch })} />}
+          {isTruncatedMessageDisplay && (
+            <QuotaPlaceholder model={data.model} resultIndex={data.resultIndex} elementKey={data.selectedCell}>
+              {isDownloadable && (
+                <Button disabled={loading} loading={isCacheDownloading} onClick={data.loadFullImage}>
+                  {`${translate('ui_view')} (${valueSize})`}
+                </Button>
+              )}
+            </QuotaPlaceholder>
+          )}
         </Container>
-        <Tools loading={loading} stretch={state.stretch} onToggleStretch={state.toggleStretch} onSave={save} onUpload={upload} />
+        <Container gap dense keepSize>
+          <Container keepSize flexStart center>
+            {data.canSave && (
+              <ActionIconButton title={translate('ui_download')} name="/icons/export.svg" disabled={loading} img onClick={debouncedDownload} />
+            )}
+            {data.canUpload && (
+              <ActionIconButton title={translate('ui_upload')} name="/icons/import.svg" disabled={loading} img onClick={data.upload} />
+            )}
+          </Container>
+          <Fill />
+          <Container keepSize flexEnd center>
+            <ActionIconButton
+              title={translate(state.stretch ? 'data_viewer_presentation_value_image_original_size' : 'data_viewer_presentation_value_image_fit')}
+              name={state.stretch ? 'img-original-size' : 'img-fit-size'}
+              onClick={state.toggleStretch}
+            />
+          </Container>
+        </Container>
       </Container>
     );
   },

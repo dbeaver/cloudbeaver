@@ -1,53 +1,37 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2023 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import styled, { css, use } from 'reshadow';
 
 import type { TeamInfo } from '@cloudbeaver/core-authentication';
-import { Loader, Placeholder, TableColumnValue, TableItem, TableItemExpand, TableItemSelect, useStyles } from '@cloudbeaver/core-blocks';
+import { Loader, Placeholder, s, TableColumnValue, TableItem, TableItemExpand, TableItemSelect, useS } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 
 import { TeamsAdministrationService } from '../TeamsAdministrationService';
+import style from './Team.m.css';
 import { TeamEdit } from './TeamEdit';
-
-const styles = css`
-  StaticImage {
-    display: flex;
-    width: 24px;
-
-    &:not(:last-child) {
-      margin-right: 16px;
-    }
-  }
-  TableColumnValue[expand] {
-    cursor: pointer;
-  }
-  TableColumnValue[|gap] {
-    gap: 16px;
-  }
-`;
 
 interface Props {
   team: TeamInfo;
 }
 
 export const Team = observer<Props>(function Team({ team }) {
+  const styles = useS(style);
   const service = useService(TeamsAdministrationService);
 
-  return styled(useStyles(styles))(
+  return (
     <TableItem item={team.teamId} expandElement={TeamEdit}>
       <TableColumnValue centerContent flex>
         <TableItemSelect />
       </TableColumnValue>
-      <TableColumnValue centerContent flex expand>
+      <TableColumnValue className={s(styles, { expand: true })} centerContent flex expand>
         <TableItemExpand />
       </TableColumnValue>
-      <TableColumnValue title={team.teamId} ellipsis expand>
+      <TableColumnValue className={s(styles, { expand: true })} title={team.teamId} ellipsis expand>
         {team.teamId}
       </TableColumnValue>
       <TableColumnValue title={team.teamName} ellipsis>
@@ -56,11 +40,11 @@ export const Team = observer<Props>(function Team({ team }) {
       <TableColumnValue title={team.description} ellipsis>
         {team.description || ''}
       </TableColumnValue>
-      <TableColumnValue flex {...use({ gap: true })}>
+      <TableColumnValue className={s(styles, { gap: true })} flex>
         <Loader suspense small inline hideMessage>
           <Placeholder container={service.teamDetailsInfoPlaceholder} team={team} />
         </Loader>
       </TableColumnValue>
-    </TableItem>,
+    </TableItem>
   );
 });

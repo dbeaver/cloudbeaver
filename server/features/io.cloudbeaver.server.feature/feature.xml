@@ -2,7 +2,7 @@
 <feature
         id="io.cloudbeaver.server.feature"
         label="%featureName"
-        version="23.3.1.qualifier"
+        version="24.0.0.qualifier"
         provider-name="%providerName"
         plugin="io.cloudbeaver.server">
 
@@ -46,5 +46,6 @@
     <plugin id="org.jkiss.bundle.apache.poi" download-size="0" install-size="0" version="0.0.0"/>
     <plugin id="org.jkiss.dbeaver.net.ssh" download-size="0" install-size="0" version="0.0.0" unpack="false"/>
     <plugin id="org.jkiss.dbeaver.net.ssh.sshj" download-size="0" install-size="0" version="0.0.0" unpack="false"/>
+    <plugin id="org.jkiss.bundle.graphql.java" download-size="0" install-size="0" version="0.0.0" unpack="false"/>
 
 </feature>

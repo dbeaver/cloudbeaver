@@ -1,4 +1,5 @@
 export default [
+  ['core_connections_connections_settings_group', 'Connections'],
   ['connections_administration_item', 'Connection Templates'],
   ['connections_administration_connection_create', 'Add Database Template'],
   ['connections_administration_search_database_tip', "Type your hosts here, e.g. 'localhost host1.myhost.com 192.168.0.1' and press Enter"],
@@ -38,7 +39,7 @@ export default [
   ['connections_connection_edit_search_hosts', 'Host names'],
   ['connections_connection_address', 'Address'],
   ['connections_connection_folder', 'Folder'],
-  ['connections_connection_folder_validation', 'Folder\'s name may contain the following symbols "_-$.()@" and can\'t start with a dot'],
+  ['connections_connection_folder_validation', "Folder's name may not contain the following symbols / : \" \\ and can't start with a dot"],
   ['connections_connection_name', 'Connection name'],
   ['connections_connection_access_user_or_team_name', 'User or Team name'],
   ['connections_connection_access_filter_placeholder', 'Search for user or team name'],
@@ -55,6 +56,8 @@ export default [
   ['connections_connection_test_fail', 'Connection test failed'],
   ['connections_connection_create_fail', 'Fail to create connection'],
   ['connections_connection_save_fail', 'Fail to save connection'],
+  ['connections_connection_keep_alive', 'Keep alive (in seconds)'],
+  ['connections_connection_keep_alive_tooltip', 'No auto disconnect'],
   ['connections_network_handler_test', 'Test Tunnel'],
   ['connections_network_handler_test_fail', 'Tunnel test failed'],
   ['connections_network_handler_test_success', 'Tunnel test success'],

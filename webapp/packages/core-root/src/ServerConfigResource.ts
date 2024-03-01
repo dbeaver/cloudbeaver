@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2023 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -149,6 +149,10 @@ export class ServerConfigResource extends CachedDataResource<ServerConfig | null
     return this.data?.resourceQuotas ?? {};
   }
 
+  get passwordPolicy() {
+    return this.data?.passwordPolicyConfiguration ?? {};
+  }
+
   get resourceManagerEnabled() {
     return this.update.resourceManagerEnabled ?? this.data?.resourceManagerEnabled ?? false;
   }
@@ -222,6 +226,13 @@ export class ServerConfigResource extends CachedDataResource<ServerConfig | null
         showUtilityObjects: false,
       };
     }
+  }
+
+  async updateProductConfiguration(configuration: any) {
+    await this.performUpdate(undefined, undefined, async () => {
+      await this.graphQLService.sdk.updateProductConfiguration({ configuration });
+      this.setData(await this.loader());
+    });
   }
 
   async save(skipConfigUpdate = false): Promise<void> {

@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2023 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -35,6 +35,7 @@ export abstract class FormPart<TPartState, TFormState = any> implements IFormPar
 
     this.formState.submitTask.addHandler(executorHandlerFilter(() => this.isLoaded(), this.save.bind(this)));
     this.formState.configureTask.addHandler(executorHandlerFilter(() => this.isLoaded(), this.configure.bind(this)));
+    this.formState.formatTask.addHandler(executorHandlerFilter(() => this.isLoaded(), this.format.bind(this)));
     this.formState.validationTask.addHandler(executorHandlerFilter(() => this.isLoaded(), this.validate.bind(this)));
 
     makeObservable<this, 'loaded' | 'loading' | 'setInitialState'>(this, {
@@ -141,6 +142,7 @@ export abstract class FormPart<TPartState, TFormState = any> implements IFormPar
   }
 
   protected configure(data: IFormState<TFormState>, contexts: IExecutionContextProvider<IFormState<TFormState>>): void | Promise<void> {}
+  protected format(data: IFormState<TFormState>, contexts: IExecutionContextProvider<IFormState<TFormState>>): void | Promise<void> {}
   protected validate(data: IFormState<TFormState>, contexts: IExecutionContextProvider<IFormState<TFormState>>): void | Promise<void> {}
 
   protected abstract loader(): Promise<void>;

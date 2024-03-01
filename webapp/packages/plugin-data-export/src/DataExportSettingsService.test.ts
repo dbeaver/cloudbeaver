@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2023 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -12,6 +12,7 @@ import { coreAppManifest } from '@cloudbeaver/core-app';
 import { coreAuthenticationManifest } from '@cloudbeaver/core-authentication';
 import { mockAuthentication } from '@cloudbeaver/core-authentication/dist/__custom_mocks__/mockAuthentication';
 import { coreBrowserManifest } from '@cloudbeaver/core-browser';
+import { coreClientActivityManifest } from '@cloudbeaver/core-client-activity';
 import { coreConnectionsManifest } from '@cloudbeaver/core-connections';
 import { coreDialogsManifest } from '@cloudbeaver/core-dialogs';
 import { coreEventsManifest } from '@cloudbeaver/core-events';
@@ -68,6 +69,7 @@ const app = createApp(
   navigationTabsPlugin,
   objectViewerManifest,
   dataViewerManifest,
+  coreClientActivityManifest,
 );
 
 const server = mockGraphQL(...mockAppInit(endpoint), ...mockAuthentication(endpoint));
@@ -77,10 +79,14 @@ beforeAll(() => app.init());
 const testValueA = true;
 const testValueB = true;
 
-const equalConfigA = {
+const deprecatedSettings = {
   plugin_data_export: {
-    disabled: testValueA,
+    disabled: testValueB,
   } as DataExportSettings,
+};
+
+const newSettings = {
+  ...deprecatedSettings,
   plugin: {
     'data-export': {
       disabled: testValueA,
@@ -88,37 +94,24 @@ const equalConfigA = {
   },
 };
 
-const equalConfigB = {
-  plugin_data_export: {
-    disabled: testValueB,
-  } as DataExportSettings,
-  plugin: {
-    'data-export': {
-      disabled: testValueB,
-    } as DataExportSettings,
-  },
-};
-
-test('New settings equal deprecated settings A', async () => {
+test('New settings override deprecated', async () => {
   const settings = app.injector.getServiceByClass(DataExportSettingsService);
   const config = app.injector.getServiceByClass(ServerConfigResource);
 
-  server.use(endpoint.query('serverConfig', mockServerConfig(equalConfigA)));
+  server.use(endpoint.query('serverConfig', mockServerConfig(newSettings)));
 
   await config.refresh();
 
   expect(settings.settings.getValue('disabled')).toBe(testValueA);
-  expect(settings.deprecatedSettings.getValue('disabled')).toBe(testValueA);
 });
 
-test('New settings equal deprecated settings B', async () => {
+test('Deprecated settings are used if new settings are not defined', async () => {
   const settings = app.injector.getServiceByClass(DataExportSettingsService);
   const config = app.injector.getServiceByClass(ServerConfigResource);
 
-  server.use(endpoint.query('serverConfig', mockServerConfig(equalConfigB)));
+  server.use(endpoint.query('serverConfig', mockServerConfig(deprecatedSettings)));
 
   await config.refresh();
 
   expect(settings.settings.getValue('disabled')).toBe(testValueB);
-  expect(settings.deprecatedSettings.getValue('disabled')).toBe(testValueB);
 });

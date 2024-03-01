@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2023 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@ import { useErrorDetails } from './useErrorDetails';
 import { useS } from './useS';
 
 interface Props {
-  exception?: Error;
+  exception?: Error | null;
   icon?: boolean;
   inline?: boolean;
   className?: string;
@@ -39,6 +39,10 @@ export const ExceptionMessage = observer<Props>(function ExceptionMessage({ exce
     };
   }
 
+  if (!exception) {
+    return null;
+  }
+
   return (
     <div className={s(styles, { error: true, icon, inline }, className)}>
       <div className={s(styles, { errorIcon: true })} title={error.message}>
@@ -51,7 +55,8 @@ export const ExceptionMessage = observer<Props>(function ExceptionMessage({ exce
               <span>{translate('core_blocks_exception_message_error_title')}</span>
             </h2>
             <div className={s(styles, { errorMessage: true })}>
-              {translate('core_blocks_exception_message_error_message')} {onRetry && translate('ui_please_retry')}
+              {(error.hasDetails && error.message) || translate('core_blocks_exception_message_error_message')}{' '}
+              {onRetry && translate('ui_please_retry')}
             </div>
             <div className={s(styles, { errorActions: true })}>
               <Button type="button" mod={['outlined']} disabled={error.isOpen} onClick={error.open}>

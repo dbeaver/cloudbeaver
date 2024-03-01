@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2023 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -27,7 +27,7 @@ import style from './FilterCustomValueDialog.m.css';
 
 interface IPayload {
   inputTitle: string;
-  defaultValue: string | number;
+  defaultValue: string;
 }
 
 export const FilterCustomValueDialog: DialogComponent<IPayload, string | number> = observer(function FilterCustomValueDialog({
@@ -39,7 +39,7 @@ export const FilterCustomValueDialog: DialogComponent<IPayload, string | number>
   const styles = useS(style);
   const inputRef = useRef<HTMLInputElement | null>(null);
 
-  const [value, setValue] = useState<string | number>(payload.defaultValue);
+  const [value, setValue] = useState(payload.defaultValue);
   const handleApply = useCallback(() => resolveDialog(value), [value, resolveDialog]);
   const translate = useTranslate();
 

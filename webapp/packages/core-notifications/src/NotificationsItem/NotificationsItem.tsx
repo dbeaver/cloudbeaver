@@ -1,28 +1,33 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2023 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
 
-import { Snackbar } from '@cloudbeaver/core-blocks';
-import { useController } from '@cloudbeaver/core-di';
-import type { INotification } from '@cloudbeaver/core-events';
+import { Snackbar, useErrorDetails } from '@cloudbeaver/core-blocks';
+import { ENotificationType, type INotification } from '@cloudbeaver/core-events';
 
-import { NotificationItemController } from './NotificationItemController';
+import { FADE_TIMEOUT } from './FADE_TIMEOUT';
 
 interface Props {
   notification: INotification<any>;
 }
 
 export const NotificationsItem = observer<Props>(function Notification({ notification }) {
-  const controller = useController(NotificationItemController, notification);
+  const errorDetails = useErrorDetails(notification.details ?? null);
 
   if (notification.customComponent) {
     const Custom = notification.customComponent();
     return <Custom notification={notification} {...notification.extraProps} />;
+  }
+
+  let closeDelay = 0;
+
+  if (notification.type !== ENotificationType.Error && !notification.persistent && notification.autoClose !== false) {
+    closeDelay = FADE_TIMEOUT;
   }
 
   return (
@@ -33,10 +38,10 @@ export const NotificationsItem = observer<Props>(function Notification({ notific
       type={notification.type}
       time={notification.timestamp}
       state={notification.state}
-      disableShowDetails={controller.isDetailsDialogOpen}
-      closeDelay={controller.closeAfter}
+      disableShowDetails={errorDetails.isOpen}
+      closeDelay={closeDelay}
       onClose={notification.close}
-      onShowDetails={controller.handleShowDetails}
+      onShowDetails={errorDetails.hasDetails ? errorDetails.open : undefined}
     />
   );
 });

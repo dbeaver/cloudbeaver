@@ -1,21 +1,18 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2023 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { ResultDataFormat } from '@cloudbeaver/core-sdk';
-import { getMIME, isImageFormat, isValidUrl } from '@cloudbeaver/core-utils';
 
-import { isResultSetBlobValue } from '../../DatabaseDataModel/Actions/ResultSet/isResultSetBlobValue';
-import { isResultSetContentValue } from '../../DatabaseDataModel/Actions/ResultSet/isResultSetContentValue';
-import type { IResultSetValue } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetFormatAction';
 import { ResultSetSelectAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetSelectAction';
 import { ResultSetViewAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetViewAction';
 import { DataValuePanelService } from '../../TableViewer/ValuePanel/DataValuePanelService';
 import { ImageValuePresentation } from './ImageValuePresentation';
+import { isImageValuePresentationAvailable } from './isImageValuePresentationAvailable';
 
 @injectable()
 export class ImageValuePresentationBootstrap extends Bootstrap {
@@ -37,16 +34,16 @@ export class ImageValuePresentationBootstrap extends Bootstrap {
 
         const selection = context.model.source.getAction(context.resultIndex, ResultSetSelectAction);
 
-        const focusedElement = selection.getFocusedElement();
+        const activeElements = selection.getActiveElements();
 
-        if (selection.elements.length > 0 || focusedElement) {
+        if (activeElements.length > 0) {
           const view = context.model.source.getAction(context.resultIndex, ResultSetViewAction);
 
-          const firstSelectedCell = selection.elements[0] || focusedElement;
+          const firstSelectedCell = activeElements[0];
 
           const cellValue = view.getCellValue(firstSelectedCell);
 
-          return !this.isImage(cellValue);
+          return !isImageValuePresentationAvailable(cellValue);
         }
 
         return true;
@@ -55,19 +52,4 @@ export class ImageValuePresentationBootstrap extends Bootstrap {
   }
 
   load(): void {}
-
-  private isImage(value: IResultSetValue) {
-    if (isResultSetContentValue(value) && value?.binary) {
-      return getMIME(value.binary || '') !== null;
-    }
-    if (isResultSetContentValue(value) || isResultSetBlobValue(value)) {
-      return value?.contentType?.startsWith('image/') ?? false;
-    }
-
-    if (typeof value !== 'string') {
-      return false;
-    }
-
-    return isValidUrl(value) && isImageFormat(value);
-  }
 }

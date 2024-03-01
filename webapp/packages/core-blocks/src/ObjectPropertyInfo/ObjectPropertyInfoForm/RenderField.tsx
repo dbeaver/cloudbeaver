@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2023 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -8,12 +8,12 @@
 import { observer } from 'mobx-react-lite';
 
 import type { ObjectPropertyInfo } from '@cloudbeaver/core-sdk';
-import { removeMetadataFromBase64 } from '@cloudbeaver/core-utils';
+import { removeMetadataFromDataURL } from '@cloudbeaver/core-utils';
 
 import { FieldCheckbox } from '../../FormControls/Checkboxes/FieldCheckbox';
 import { Combobox } from '../../FormControls/Combobox';
 import { FormFieldDescription } from '../../FormControls/FormFieldDescription';
-import { InputField } from '../../FormControls/InputField';
+import { InputField } from '../../FormControls/InputField/InputField';
 import { InputFileTextContent } from '../../FormControls/InputFileTextContent';
 import { isControlPresented } from '../../FormControls/isControlPresented';
 import { Textarea } from '../../FormControls/Textarea';
@@ -26,6 +26,7 @@ const RESERVED_KEYWORDS = ['no', 'off', 'new-password'];
 interface RenderFieldProps {
   property: ObjectPropertyInfo;
   state?: Record<string, any>;
+  defaultState?: Record<string, any>;
   editable?: boolean;
   autofillToken?: string;
   disabled?: boolean;
@@ -55,6 +56,7 @@ function getValue(value: any, controlType: ControlType) {
 export const RenderField = observer<RenderFieldProps>(function RenderField({
   property,
   state,
+  defaultState,
   editable = true,
   autofillToken = '',
   disabled,
@@ -74,26 +76,6 @@ export const RenderField = observer<RenderFieldProps>(function RenderField({
 
   const value = getValue(property.value, controlType);
   const defaultValue = getValue(property.defaultValue, controlType);
-  const passwordSaved = showRememberTip && ((password && !!property.value) || saved);
-  const description = passwordSaved ? translate('ui_processing_saved') : undefined;
-
-  if (controlType === 'file' && state) {
-    return (
-      <InputFileTextContent
-        required={required}
-        tooltip={property.description}
-        labelTooltip={property.displayName || property.description}
-        name={property.id!}
-        state={state}
-        disabled={disabled}
-        fileName={description}
-        className={className}
-        mapValue={removeMetadataFromBase64}
-      >
-        {property.displayName}
-      </InputFileTextContent>
-    );
-  }
 
   if (controlType === 'link') {
     return (
@@ -106,7 +88,7 @@ export const RenderField = observer<RenderFieldProps>(function RenderField({
   }
 
   if (!editable) {
-    if (autoHide && !isControlPresented(property.id!, state)) {
+    if (autoHide && !isControlPresented(property.id, state)) {
       return null;
     }
     return (
@@ -128,6 +110,7 @@ export const RenderField = observer<RenderFieldProps>(function RenderField({
           title={property.description}
           disabled={disabled || readOnly}
           className={className}
+          groupGap
         >
           {property.displayName ?? ''}
         </FieldCheckbox>
@@ -142,6 +125,7 @@ export const RenderField = observer<RenderFieldProps>(function RenderField({
         title={property.description}
         disabled={disabled || readOnly}
         className={className}
+        groupGap
       >
         {property.displayName ?? ''}
       </FieldCheckbox>
@@ -189,6 +173,27 @@ export const RenderField = observer<RenderFieldProps>(function RenderField({
     );
   }
 
+  const passwordSaved = showRememberTip && ((password && !!property.value) || saved);
+  const passwordSavedMessage = passwordSaved ? translate('core_blocks_object_property_info_password_saved') : undefined;
+
+  if (controlType === 'file' && state) {
+    return (
+      <InputFileTextContent
+        required={required}
+        tooltip={property.description}
+        labelTooltip={property.displayName || property.description}
+        name={property.id!}
+        state={state}
+        disabled={disabled}
+        fileName={passwordSavedMessage}
+        className={className}
+        mapValue={removeMetadataFromDataURL}
+      >
+        {property.displayName}
+      </InputFileTextContent>
+    );
+  }
+
   if (controlType === 'textarea') {
     if (state !== undefined) {
       return (
@@ -196,7 +201,7 @@ export const RenderField = observer<RenderFieldProps>(function RenderField({
           required={required}
           title={state[property.id!]}
           labelTooltip={property.description || property.displayName}
-          description={description}
+          placeholder={passwordSavedMessage}
           name={property.id!}
           state={state}
           disabled={disabled}
@@ -213,7 +218,7 @@ export const RenderField = observer<RenderFieldProps>(function RenderField({
         required={required}
         title={value}
         labelTooltip={property.description || property.displayName}
-        description={description}
+        placeholder={passwordSavedMessage}
         name={property.id!}
         value={value}
         disabled={disabled}
@@ -230,15 +235,16 @@ export const RenderField = observer<RenderFieldProps>(function RenderField({
       <InputField
         required={required}
         type={password ? 'password' : 'text'}
-        title={password ? property.description || property.displayName : state[property.id!]}
+        title={password ? property.description || property.displayName : undefined}
         labelTooltip={property.description || property.displayName}
         name={property.id!}
         state={state}
-        defaultValue={defaultValue}
-        description={description ?? property.hint}
+        defaultState={defaultState || { [property.id!]: defaultValue }}
+        autoHide={autoHide}
+        description={property.hint}
+        placeholder={passwordSavedMessage}
         disabled={disabled}
         readOnly={readOnly}
-        autoHide={autoHide}
         autoComplete={RESERVED_KEYWORDS.includes(autofillToken) ? autofillToken : `${autofillToken} ${property.id}`}
         className={className}
         canShowPassword={canShowPassword}
@@ -253,12 +259,13 @@ export const RenderField = observer<RenderFieldProps>(function RenderField({
     <InputField
       required={required}
       type={password ? 'password' : 'text'}
-      title={password ? property.description || property.displayName : value}
+      title={password ? property.description || property.displayName : undefined}
       labelTooltip={property.description || property.displayName}
       name={property.id!}
       value={value}
       defaultValue={defaultValue}
-      description={description ?? property.hint}
+      description={property.hint}
+      placeholder={passwordSavedMessage}
       disabled={disabled}
       readOnly={readOnly}
       autoComplete={RESERVED_KEYWORDS.includes(autofillToken) ? autofillToken : `${autofillToken} ${property.id}`}

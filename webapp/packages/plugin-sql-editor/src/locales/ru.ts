@@ -1,4 +1,7 @@
 export default [
+  ['plugin_sql_editor_sql_editor_settings_group', 'SQL Редактор'],
+  ['sql_editor_settings_insert_table_aliases_name', 'Вставлять алиасы таблиц (в FROM условии)'],
+  ['sql_editor_settings_insert_table_aliases_desc', 'Автоматически вставляет алиасы для таблиц'],
   ['sql_editor_menu', 'SQL Редактор'],
   ['sql_editor_script_editor', 'Редактор SQL'],
   ['sql_editor_alias_loading_error', 'Возникла ошибка при загрузке псевдонима'],
@@ -30,4 +33,6 @@ export default [
   ['sql_editor_upload_script_unsaved_changes_dialog_message', 'Текущий скрипт будет перезаписан загруженным. Сохранить текущий?'],
   ['sql_editor_upload_script_max_size_title', 'Размер файла превышает максимально допустимый'],
   ['sql_editor_close_result_tabs_dialog_title', 'Подтвердить закрытие вкладок'],
+  ['plugin_sql_editor_action_overlay_title', 'Требуется действие'],
+  ['plugin_sql_editor_action_overlay_description', 'Пожалуйста, перезапустите редактор для продолжения работы.'],
 ];

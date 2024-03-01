@@ -1,11 +1,12 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2023 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
+import { useEffect, useState } from 'react';
 
 import { ENotificationType, INotificationProcessExtraProps, NotificationComponent } from '@cloudbeaver/core-events';
 
@@ -35,7 +36,15 @@ export const ProcessSnackbar: NotificationComponent<ProcessSnackbarProps> = obse
 
   const translate = useTranslate();
   const details = useErrorDetails(error);
-  const displayed = useStateDelay(notification.state.deleteDelay === 0, displayDelay);
+  const [delayState, setDelayState] = useState(false);
+  const displayedReal = notification.state.deleteDelay === 0;
+  const displayed = useStateDelay(delayState, displayDelay);
+
+  useEffect(() => {
+    if (displayedReal) {
+      setDelayState(true);
+    }
+  }, [displayedReal]);
 
   useActivationDelay(status === ENotificationType.Success, closeDelay, notification.close);
 

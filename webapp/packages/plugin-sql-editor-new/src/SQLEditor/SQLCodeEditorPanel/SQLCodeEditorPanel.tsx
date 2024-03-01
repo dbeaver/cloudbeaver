@@ -1,18 +1,18 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2023 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 import { MenuBarSmallItem, useExecutor, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { DATA_CONTEXT_NAV_NODE, getNodesFromContext, NavNodeManagerService } from '@cloudbeaver/core-navigation-tree';
-import { TabContainerPanelComponent, useDNDBox, useTabLocalState } from '@cloudbeaver/core-ui';
+import { TabContainerPanelComponent, useDNDBox } from '@cloudbeaver/core-ui';
 import { closeCompletion, IEditorRef, Prec, ReactCodemirrorPanel, useCodemirrorExtensions } from '@cloudbeaver/plugin-codemirror6';
 import type { ISqlEditorModeProps } from '@cloudbeaver/plugin-sql-editor';
 
@@ -26,35 +26,15 @@ import style from './SQLCodeEditorPanel.m.css';
 import { SqlEditorInfoBar } from './SqlEditorInfoBar';
 import { useSQLCodeEditorPanel } from './useSQLCodeEditorPanel';
 
-interface ILocalSQLCodeEditorPanelState {
-  selection: { from: number; to: number };
-}
-
 export const SQLCodeEditorPanel: TabContainerPanelComponent<ISqlEditorModeProps> = observer(function SQLCodeEditorPanel({ data }) {
   const notificationService = useService(NotificationService);
   const navNodeManagerService = useService(NavNodeManagerService);
   const translate = useTranslate();
-  const localState = useTabLocalState<ILocalSQLCodeEditorPanelState>(() => ({ selection: { from: 0, to: 0 } }));
 
   const styles = useS(style);
   const [editorRef, setEditorRef] = useState<IEditorRef | null>(null);
 
   const editor = useSQLCodeEditor(editorRef);
-
-  useEffect(() => {
-    editorRef?.view?.dispatch({
-      selection: { anchor: Math.min(localState.selection.to, data.value.length), head: Math.min(localState.selection.to, data.value.length) },
-      scrollIntoView: true,
-    });
-  }, [editorRef?.view, localState, data]);
-
-  useEffect(() => {
-    if (!editorRef?.selection) {
-      return;
-    }
-
-    localState.selection = { ...editorRef?.selection };
-  }, [editorRef?.selection]);
 
   const panel = useSQLCodeEditorPanel(data, editor);
   const extensions = useCodemirrorExtensions(undefined, [ACTIVE_QUERY_EXTENSION, Prec.lowest(QUERY_STATUS_GUTTER_EXTENSION)]);
@@ -125,13 +105,17 @@ export const SQLCodeEditorPanel: TabContainerPanelComponent<ISqlEditorModeProps>
       <SQLCodeEditorLoader
         ref={setEditorRef}
         getValue={() => data.value}
+        cursor={{
+          anchor: data.cursor.begin,
+          head: data.cursor.end,
+        }}
         incomingValue={data.incomingValue}
         extensions={extensions}
         readonly={data.readonly}
         autoFocus
         lineNumbers
         onChange={panel.onQueryChange}
-        onUpdate={panel.onUpdate}
+        onCursorChange={selection => panel.onCursorChange(selection.from, selection.to)}
       >
         {data.isIncomingChanges && (
           <>

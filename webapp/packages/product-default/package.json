@@ -5,7 +5,7 @@
     "src/**/*.scss",
     "public/**/*"
   ],
-  "version": "23.3.1",
+  "version": "24.0.0",
   "description": "CloudBeaver Community",
   "license": "Apache-2.0",
   "main": "dist/index.js",
@@ -64,6 +64,7 @@
     "@cloudbeaver/plugin-resource-manager-scripts": "~0.1.0",
     "@cloudbeaver/plugin-root": "~0.1.0",
     "@cloudbeaver/plugin-session-expiration": "~0.1.0",
+    "@cloudbeaver/plugin-settings-administration": "~0.1.0",
     "@cloudbeaver/plugin-settings-menu": "~0.1.0",
     "@cloudbeaver/plugin-settings-menu-administration": "~0.1.0",
     "@cloudbeaver/plugin-settings-panel": "~0.1.0",

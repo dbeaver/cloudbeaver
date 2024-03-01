@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2023 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -11,7 +11,7 @@ import { AppAuthService } from '@cloudbeaver/core-authentication';
 import { injectable } from '@cloudbeaver/core-di';
 import { CachedMapAllKey, CachedMapResource, isResourceAlias, type ResourceKey, resourceKeyList, ResourceKeyUtils } from '@cloudbeaver/core-resource';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
-import { DatabaseDriverFragment, DriverListQueryVariables, GraphQLService } from '@cloudbeaver/core-sdk';
+import { DatabaseDriverFragment, DriverConfigurationType, DriverListQueryVariables, GraphQLService } from '@cloudbeaver/core-sdk';
 import { isArraysEqual } from '@cloudbeaver/core-utils';
 
 export type DBDriver = DatabaseDriverFragment;
@@ -19,10 +19,10 @@ export type DBDriver = DatabaseDriverFragment;
 export const NEW_DRIVER_SYMBOL = Symbol('new-driver');
 
 export type NewDBDriver = DBDriver & { [NEW_DRIVER_SYMBOL]: boolean; timestamp: number };
-type DriverResourceIncludes = Omit<DriverListQueryVariables, 'driverId'>;
+export type DBDriverResourceIncludes = Omit<DriverListQueryVariables, 'driverId'>;
 
 @injectable()
-export class DBDriverResource extends CachedMapResource<string, DBDriver, DriverListQueryVariables> {
+export class DBDriverResource extends CachedMapResource<string, DBDriver, DBDriverResourceIncludes> {
   get enabledDrivers() {
     return this.values.filter(driver => driver.enabled).sort(this.compare);
   }
@@ -107,7 +107,7 @@ export class DBDriverResource extends CachedMapResource<string, DBDriver, Driver
     }
   }
 
-  getDefaultIncludes(): DriverResourceIncludes {
+  getDefaultIncludes(): DBDriverResourceIncludes {
     return {
       includeDriverLibraries: false,
       includeDriverParameters: false,
@@ -139,4 +139,20 @@ export function compareNewDrivers(a: DBDriver, b: DBDriver): number {
   }
 
   return 0;
+}
+
+export function getDBDriverDefaultAuthModelId(driver: DBDriver | undefined): string | undefined {
+  return driver?.defaultAuthModel || driver?.applicableAuthModels[0];
+}
+
+export function getDBDriverDefaultConfigurationType(driver: DBDriver | undefined): DriverConfigurationType {
+  return driver?.configurationTypes[0] || DriverConfigurationType.Manual;
+}
+
+export function getDBDriverDefaultServerName(driver: DBDriver | undefined): string | undefined {
+  return driver?.requiresServerName ? '' : undefined;
+}
+
+export function getDBDriverDefaultServer(driver: DBDriver | undefined): string | undefined {
+  return driver?.defaultServer || 'localhost';
 }

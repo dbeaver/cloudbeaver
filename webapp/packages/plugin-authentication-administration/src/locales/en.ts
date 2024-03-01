@@ -100,7 +100,7 @@ export default [
 
   ['administration_teams_tab_title', 'Teams'],
   ['administration_teams_tab_description', 'Team management'],
-  ['administration_teams_team_creation', 'Team creation'],
+  ['administration_teams_team_creation', 'Team Creation'],
   ['administration_teams_team_id', 'Team ID'],
   ['administration_teams_team_name', 'Team name'],
   ['administration_teams_team_description', 'Description'],
@@ -129,4 +129,7 @@ export default [
   ['administration_teams_team_granted_connections_tab_title', 'Connections'],
   ['administration_teams_team_granted_connections_search_placeholder', 'Search for connection name...'],
   ['administration_teams_team_granted_connections_empty', 'No available connections'],
+
+  ['plugin_authentication_administration_user_team_default_readonly_tooltip', "Default team. Can't be revoked"],
+  ['plugin_authentication_administration_team_default_users_tooltip', 'Default team. Contains all users'],
 ];

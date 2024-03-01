@@ -1,24 +1,39 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2023 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { injectable } from '@cloudbeaver/core-di';
-import { PluginManagerService, PluginSettings } from '@cloudbeaver/core-plugin';
+import { Dependency, injectable } from '@cloudbeaver/core-di';
+import { PluginManagerService, PluginSettings, SettingsManagerService } from '@cloudbeaver/core-plugin';
+import { schema } from '@cloudbeaver/core-utils';
 
-const settings = {
-  disabled: false,
-};
+const settingsSchema = schema.object({
+  disabled: schema.coerce.boolean().default(false),
+});
 
-type Settings = typeof settings;
+type Settings = typeof settingsSchema;
 
 @injectable()
-export class ResourceManagerScriptsSettingsService {
+export class ResourceManagerScriptsSettingsService extends Dependency {
   readonly settings: PluginSettings<Settings>;
 
-  constructor(private readonly pluginManagerService: PluginManagerService) {
-    this.settings = this.pluginManagerService.createSettings('resource-manager-scripts', 'plugin', settings);
+  constructor(private readonly pluginManagerService: PluginManagerService, private readonly settingsManagerService: SettingsManagerService) {
+    super();
+    this.settings = this.pluginManagerService.createSettings('resource-manager-scripts', 'plugin', settingsSchema);
+
+    this.registerSettings();
+  }
+
+  private registerSettings() {
+    this.settingsManagerService.registerSettings(this.settings, () => [
+      // {
+      //   group: RESOURCE_MANAGER_SETTINGS_GROUP,
+      //   key: 'disabled',
+      //   type: ESettingsValueType.Checkbox,
+      //   name: 'Disable resource manager scripts',
+      // },
+    ]);
   }
 }

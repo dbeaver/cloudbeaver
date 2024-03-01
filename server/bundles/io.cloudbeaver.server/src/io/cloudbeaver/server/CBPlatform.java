@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2023 DBeaver Corp and others
+ * Copyright (C) 2010-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,11 +19,11 @@ package io.cloudbeaver.server;
 
 import io.cloudbeaver.auth.NoAuthCredentialsProvider;
 import io.cloudbeaver.server.jobs.SessionStateJob;
+import io.cloudbeaver.server.jobs.WebDataSourceMonitorJob;
 import io.cloudbeaver.server.jobs.WebSessionMonitorJob;
 import io.cloudbeaver.service.session.WebSessionManager;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Plugin;
 import org.eclipse.core.runtime.Status;
 import org.jkiss.code.NotNull;
@@ -51,9 +51,7 @@ import org.jkiss.dbeaver.runtime.SecurityProviderUtils;
 import org.jkiss.dbeaver.runtime.qm.QMLogFileWriter;
 import org.jkiss.dbeaver.runtime.qm.QMRegistryImpl;
 import org.jkiss.dbeaver.utils.ContentUtils;
-import org.jkiss.dbeaver.utils.GeneralUtils;
 import org.jkiss.utils.IOUtils;
-import org.osgi.framework.Bundle;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -74,8 +72,6 @@ public class CBPlatform extends BasePlatformImpl {
 
     public static final String WORK_DATA_FOLDER_NAME = ".work-data";
 
-    static CBPlatform instance;
-
     @Nullable
     private static CBApplication application = null;
 
@@ -85,44 +81,11 @@ public class CBPlatform extends BasePlatformImpl {
     private QMLogFileWriter qmLogWriter;
     private DBACertificateStorage certificateStorage;
     private WebGlobalWorkspace workspace;
-
+    private CBPreferenceStore preferenceStore;
     private final List<DBPDriver> applicableDrivers = new ArrayList<>();
 
     public static CBPlatform getInstance() {
-        if (instance == null) {
-            synchronized (CBPlatform.class) {
-                if (instance == null) {
-                    // Initialize CB platform
-                    CBPlatform.createInstance();
-                }
-            }
-        }
-        return instance;
-    }
-
-    private static CBPlatform createInstance() {
-        log.debug("Initializing product: " + GeneralUtils.getProductTitle());
-        if (Platform.getProduct() != null) {
-            Bundle definingBundle = Platform.getProduct().getDefiningBundle();
-            if (definingBundle != null) {
-                log.debug("Host plugin: " + definingBundle.getSymbolicName() + " " + definingBundle.getVersion());
-            } else {
-                log.debug("!!! No product bundle found");
-            }
-        }
-
-        try {
-            instance = new CBPlatform();
-            instance.initialize();
-            return instance;
-        } catch (Throwable e) {
-            log.error("Error initializing CBPlatform", e);
-            throw new IllegalStateException("Error initializing CBPlatform", e);
-        }
-    }
-
-    public static DBPPreferenceStore getGlobalPreferenceStore() {
-        return WebPlatformActivator.getInstance().getPreferences();
+        return (CBPlatform) DBWorkbench.getPlatform();
     }
 
     CBPlatform() {
@@ -133,10 +96,10 @@ public class CBPlatform extends BasePlatformImpl {
     }
 
     @Override
-    protected void initialize() {
+    protected synchronized void initialize() {
         long startTime = System.currentTimeMillis();
-        log.info("Initialize web platform...");
-
+        log.info("Initialize web platform...: ");
+        this.preferenceStore = new CBPreferenceStore(this, WebPlatformActivator.getInstance().getPreferences());
         // Register BC security provider
         SecurityProviderUtils.registerSecurityProvider();
 
@@ -152,7 +115,6 @@ public class CBPlatform extends BasePlatformImpl {
 
         this.certificateStorage = new DefaultCertificateStorage(
             WebPlatformActivator.getInstance().getStateLocation().toFile().toPath().resolve("security"));
-
         super.initialize();
 
         refreshApplicableDrivers();
@@ -163,6 +125,9 @@ public class CBPlatform extends BasePlatformImpl {
             .scheduleMonitor();
 
         new SessionStateJob(this)
+            .scheduleMonitor();
+
+        new WebDataSourceMonitorJob(this)
             .scheduleMonitor();
 
         new AbstractJob("Delete temp folder") {
@@ -214,7 +179,6 @@ public class CBPlatform extends BasePlatformImpl {
         }
 
         CBPlatform.application = null;
-        CBPlatform.instance = null;
         System.gc();
         log.debug("Shutdown completed in " + (System.currentTimeMillis() - startTime) + "ms");
     }
@@ -249,7 +213,7 @@ public class CBPlatform extends BasePlatformImpl {
     @NotNull
     @Override
     public DBPPreferenceStore getPreferenceStore() {
-        return WebPlatformActivator.getInstance().getPreferences();
+        return preferenceStore;
     }
 
     @NotNull

@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2023 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -655,10 +655,14 @@ export abstract class CachedResource<
             this.dataUpdate(key);
           }
         },
-        error: exception => {
-          this.markOutdatedSync(key);
-          this.markError(exception, key, include);
-        },
+        // TODO: must rethink how to handle exceptions form performUpdate
+        //       probably we need to handle this exceptions at the place
+        //       where performUpdate is called
+        //       because performUpdate is like an transaction
+        // error: exception => {
+        //   this.markOutdatedSync(key);
+        //   this.markError(exception, key, include);
+        // },
         after: () => {
           this.flushOutdatedWaitList();
         },

@@ -1,11 +1,11 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2023 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { action, autorun, computed, IReactionDisposer, observable, untracked } from 'mobx';
+import { action, autorun, computed, IReactionDisposer, observable, runInAction, untracked } from 'mobx';
 import { useEffect } from 'react';
 
 import { ConfirmationDialog, useExecutor, useObservableRef } from '@cloudbeaver/core-blocks';
@@ -19,7 +19,7 @@ import { createLastPromiseGetter, LastPromiseGetter, throttleAsync } from '@clou
 
 import type { ISqlEditorTabState } from '../ISqlEditorTabState';
 import { ESqlDataSourceFeatures } from '../SqlDataSource/ESqlDataSourceFeatures';
-import type { ISqlDataSource } from '../SqlDataSource/ISqlDataSource';
+import type { ISqlDataSource, ISqlEditorCursor } from '../SqlDataSource/ISqlDataSource';
 import { SqlDataSourceService } from '../SqlDataSource/SqlDataSourceService';
 import { SqlDialectInfoService } from '../SqlDialectInfoService';
 import { SqlEditorService } from '../SqlEditorService';
@@ -28,7 +28,7 @@ import { SqlExecutionPlanService } from '../SqlResultTabs/ExecutionPlan/SqlExecu
 import { OUTPUT_LOGS_TAB_ID } from '../SqlResultTabs/OutputLogs/OUTPUT_LOGS_TAB_ID';
 import { SqlQueryService } from '../SqlResultTabs/SqlQueryService';
 import { SqlResultTabsService } from '../SqlResultTabs/SqlResultTabsService';
-import type { ICursor, ISQLEditorData } from './ISQLEditorData';
+import type { ISQLEditorData } from './ISQLEditorData';
 import { SQLEditorModeContext } from './SQLEditorModeContext';
 
 interface ISQLEditorDataPrivate extends ISQLEditorData {
@@ -44,7 +44,7 @@ interface ISQLEditorDataPrivate extends ISQLEditorData {
   readonly getLastAutocomplete: LastPromiseGetter<SqlCompletionProposal[]>;
   readonly parseScript: LastPromiseGetter<SqlScriptInfoFragment>;
 
-  cursor: ICursor;
+  cursor: ISqlEditorCursor;
   readonlyState: boolean;
   executingScript: boolean;
   state: ISqlEditorTabState;
@@ -126,6 +126,10 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
         return this.dataSource?.isIncomingChanges ?? false;
       },
 
+      get cursor(): ISqlEditorCursor {
+        return this.dataSource?.cursor ?? { begin: 0, end: 0 };
+      },
+
       get value(): string {
         return this.dataSource?.script ?? '';
       },
@@ -138,10 +142,8 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
       onExecute: new SyncExecutor(),
       onSegmentExecute: new SyncExecutor(),
       onUpdate: new SyncExecutor(),
-      onFormat: new SyncExecutor(),
       parser: new SQLParser(),
 
-      cursor: { begin: 0, end: 0 },
       readonlyState: false,
       executingScript: false,
       reactionDisposer: null,
@@ -178,11 +180,7 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
       },
 
       setCursor(begin: number, end = begin): void {
-        this.cursor = {
-          begin,
-          end,
-        };
-        this.onUpdate.execute();
+        this.dataSource?.setCursor(begin, end);
       },
 
       getLastAutocomplete: createLastPromiseGetter(),
@@ -225,8 +223,8 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
           this.readonlyState = true;
           const formatted = await this.sqlDialectInfoService.formatScript(this.dataSource.executionContext, script.query);
 
-          this.onFormat.execute([script, formatted]);
           this.setScript(query.substring(0, script.begin) + formatted + query.substring(script.end));
+          this.setCursor(script.begin + formatted.length);
         } finally {
           this.readonlyState = false;
         }
@@ -478,9 +476,9 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
       isDisabled: computed,
       value: computed,
       readonly: computed,
+      cursor: computed,
       activeSegmentMode: observable.ref,
       hintsLimitIsMet: observable.ref,
-      cursor: observable.ref,
       readonlyState: observable,
       executingScript: observable,
     },
@@ -503,6 +501,8 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
     executor: data.dataSource?.onSetScript,
     handlers: [
       function setScript({ script }) {
+        // ensure that cursor is in script boundaries
+        data.setCursor(data.cursor.begin, data.cursor.end);
         data.parser.setScript(script);
         data.updateParserScriptsThrottle().catch(() => {});
         data.onUpdate.execute();
@@ -538,7 +538,7 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
       const contexts = data.onMode.execute(data);
       const activeSegmentMode = contexts.getContext(SQLEditorModeContext);
 
-      action(() => {
+      runInAction(() => {
         data.activeSegmentMode = activeSegmentMode;
       });
     });

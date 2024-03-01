@@ -37,8 +37,7 @@
     "mobx": "^6.12.0",
     "mobx-react-lite": "^4.0.5",
     "react": "^18.2.0",
-    "reshadow": "^0.0.1",
-    "@cloudbeaver/core-authentication": "~0.1.0"
+    "reshadow": "^0.0.1"
   },
   "peerDependencies": {},
   "devDependencies": {
@@ -46,6 +45,7 @@
     "@cloudbeaver/core-app": "~0.1.0",
     "@cloudbeaver/core-authentication": "~0.1.0",
     "@cloudbeaver/core-browser": "~0.1.0",
+    "@cloudbeaver/core-client-activity": "~0.1.0",
     "@cloudbeaver/core-connections": "~0.1.0",
     "@cloudbeaver/core-dialogs": "~0.1.0",
     "@cloudbeaver/core-events": "~0.1.0",

@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2023 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -8,8 +8,8 @@
 import { action, makeObservable, observable } from 'mobx';
 
 import { UserInfoResource } from '@cloudbeaver/core-authentication';
-import { ConfirmationDialog } from '@cloudbeaver/core-blocks';
-import { ConnectionInfoResource, createConnectionParam, IConnectionInfoParams } from '@cloudbeaver/core-connections';
+import { ConfirmationDialog, importLazyComponent } from '@cloudbeaver/core-blocks';
+import { ConnectionInfoResource, ConnectionsManagerService, createConnectionParam, IConnectionInfoParams } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
@@ -20,11 +20,11 @@ import type { ConnectionConfig } from '@cloudbeaver/core-sdk';
 import { OptionsPanelService } from '@cloudbeaver/core-ui';
 import { AuthenticationService } from '@cloudbeaver/plugin-authentication';
 
-import { ConnectionAuthService } from '../ConnectionAuthService';
 import { ConnectionFormService } from '../ConnectionForm/ConnectionFormService';
 import { ConnectionFormState } from '../ConnectionForm/ConnectionFormState';
 import type { IConnectionFormState } from '../ConnectionForm/IConnectionFormProps';
-import { PublicConnectionForm } from './PublicConnectionForm';
+
+const PublicConnectionForm = importLazyComponent(() => import('./PublicConnectionForm').then(m => m.PublicConnectionForm));
 
 const formGetter = () => PublicConnectionForm;
 
@@ -38,7 +38,7 @@ export class PublicConnectionFormService {
     private readonly optionsPanelService: OptionsPanelService,
     private readonly connectionFormService: ConnectionFormService,
     private readonly connectionInfoResource: ConnectionInfoResource,
-    private readonly connectionAuthService: ConnectionAuthService,
+    private readonly connectionsManagerService: ConnectionsManagerService,
     private readonly userInfoResource: UserInfoResource,
     private readonly authenticationService: AuthenticationService,
     private readonly projectsService: ProjectsService,
@@ -203,7 +203,7 @@ export class PublicConnectionFormService {
 
     try {
       await this.connectionInfoResource.close(connectionKey);
-      await this.connectionAuthService.auth(connectionKey);
+      await this.connectionsManagerService.requireConnection(connectionKey);
     } catch (exception: any) {
       this.notificationService.logException(exception, 'connections_public_connection_edit_reconnect_failed');
     }

@@ -1,19 +1,18 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2023 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
 import { computed, makeObservable, observable } from 'mobx';
 
-import { EAdminPermission } from '@cloudbeaver/core-authentication';
 import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { Executor, IExecutor } from '@cloudbeaver/core-executor';
-import { PermissionsService, ServerConfigResource, SessionPermissionsResource } from '@cloudbeaver/core-root';
+import { EAdminPermission, PermissionsService, ServerConfigResource, SessionPermissionsResource } from '@cloudbeaver/core-root';
 import { RouterState, ScreenService } from '@cloudbeaver/core-routing';
-import { LocalStorageSaveService } from '@cloudbeaver/core-settings';
+import { SettingsService } from '@cloudbeaver/core-settings';
 import { GlobalConstants } from '@cloudbeaver/core-utils';
 
 import { AdministrationItemService } from '../AdministrationItem/AdministrationItemService';
@@ -70,7 +69,7 @@ export class AdministrationScreenService {
     private readonly permissionsService: PermissionsService,
     private readonly screenService: ScreenService,
     private readonly administrationItemService: AdministrationItemService,
-    private readonly autoSaveService: LocalStorageSaveService,
+    private readonly settingsService: SettingsService,
     private readonly serverConfigResource: ServerConfigResource,
     private readonly notificationService: NotificationService,
   ) {
@@ -85,8 +84,8 @@ export class AdministrationScreenService {
       activeScreen: computed,
     });
 
-    this.autoSaveService.withAutoSave(ADMINISTRATION_ITEMS_STATE, this.itemState, () => new Map());
-    this.autoSaveService.withAutoSave(ADMINISTRATION_INFO, this.info, getDefaultAdministrationScreenInfo);
+    this.settingsService.registerSettings(ADMINISTRATION_ITEMS_STATE, this.itemState, () => new Map());
+    this.settingsService.registerSettings(ADMINISTRATION_INFO, this.info, getDefaultAdministrationScreenInfo);
     this.permissionsResource.onDataUpdate.addPostHandler(() => {
       this.checkPermissions(this.screenService.routerService.state);
     });

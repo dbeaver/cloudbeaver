@@ -31,16 +31,19 @@
       "path": "../core-projects/tsconfig.json"
     },
     {
-      "path": "../core-resource/tsconfig.json"
+      "path": "../core-resource-manager/tsconfig.json"
     },
     {
-      "path": "../core-resource-manager/tsconfig.json"
+      "path": "../core-resource/tsconfig.json"
     },
     {
       "path": "../core-root/tsconfig.json"
     },
     {
       "path": "../core-ui/tsconfig.json"
+    },
+    {
+      "path": "../core-utils/tsconfig.json"
     },
     {
       "path": "../core-view/tsconfig.json"

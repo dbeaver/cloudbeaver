@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2023 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -8,19 +8,19 @@
 import { observable } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import { useCallback, useState } from 'react';
-import styled, { css } from 'reshadow';
 
 import {
   Button,
   getComputed,
   getSelectedItems,
   Group,
+  s,
   Table,
   TableBody,
   TableColumnValue,
   TableItem,
   useObjectRef,
-  useStyles,
+  useS,
   useTranslate,
 } from '@cloudbeaver/core-blocks';
 import { Connection, DBDriverResource } from '@cloudbeaver/core-connections';
@@ -28,35 +28,10 @@ import { useService } from '@cloudbeaver/core-di';
 import type { TLocalizationToken } from '@cloudbeaver/core-localization';
 
 import { getFilteredConnections } from './getFilteredConnections';
+import style from './GrantedConnectionsList.m.css';
 import { GrantedConnectionsTableHeader, IFilterState } from './GrantedConnectionsTableHeader/GrantedConnectionsTableHeader';
 import { GrantedConnectionsTableInnerHeader } from './GrantedConnectionsTableHeader/GrantedConnectionsTableInnerHeader';
 import { GrantedConnectionsTableItem } from './GrantedConnectionsTableItem';
-
-const styles = css`
-  Group {
-    position: relative;
-  }
-  Group,
-  container,
-  table-container {
-    height: 100%;
-  }
-  container {
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-  }
-  GrantedConnectionsTableHeader {
-    flex: 0 0 auto;
-  }
-  table-container {
-    overflow: auto;
-  }
-  Table {
-    composes: theme-background-surface theme-text-on-surface from global;
-    width: 100%;
-  }
-`;
 
 interface Props {
   grantedConnections: Connection[];
@@ -67,7 +42,7 @@ interface Props {
 
 export const GrantedConnectionList = observer<Props>(function GrantedConnectionList({ grantedConnections, disabled, onRevoke, onEdit }) {
   const props = useObjectRef({ onRevoke, onEdit });
-  const style = useStyles(styles);
+  const styles = useS(style);
   const translate = useTranslate();
 
   const driversResource = useService(DBDriverResource);
@@ -94,10 +69,10 @@ export const GrantedConnectionList = observer<Props>(function GrantedConnectionL
     }
   }
 
-  return styled(style)(
-    <Group box medium overflow>
-      <container>
-        <GrantedConnectionsTableHeader filterState={filterState} disabled={disabled}>
+  return (
+    <Group className={s(styles, { box: true })} box medium overflow>
+      <div className={s(styles, { innerBox: true })}>
+        <GrantedConnectionsTableHeader className={s(styles, { header: true })} filterState={filterState} disabled={disabled}>
           <Button disabled={disabled || !selected} mod={['outlined']} onClick={revoke}>
             {translate('ui_delete')}
           </Button>
@@ -105,8 +80,8 @@ export const GrantedConnectionList = observer<Props>(function GrantedConnectionL
             {translate('ui_edit')}
           </Button>
         </GrantedConnectionsTableHeader>
-        <table-container>
-          <Table keys={keys} selectedItems={selectedSubjects} size="big">
+        <div className={s(styles, { tableBox: true })}>
+          <Table className={s(styles, { table: true })} keys={keys} selectedItems={selectedSubjects} size="big">
             <GrantedConnectionsTableInnerHeader disabled={disabled} />
             <TableBody>
               {tableInfoText && (
@@ -130,8 +105,8 @@ export const GrantedConnectionList = observer<Props>(function GrantedConnectionL
               })}
             </TableBody>
           </Table>
-        </table-container>
-      </container>
-    </Group>,
+        </div>
+      </div>
+    </Group>
   );
 });

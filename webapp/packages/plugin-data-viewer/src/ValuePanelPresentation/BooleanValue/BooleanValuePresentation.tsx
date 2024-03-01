@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2023 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -33,9 +33,9 @@ export const BooleanValuePresentation: TabContainerPanelComponent<IDataValuePane
   function BooleanValuePresentation({ model, resultIndex }) {
     const translate = useTranslate();
     const selection = model.source.getAction(resultIndex, ResultSetSelectAction);
-    const focusCell = selection.getFocusedElement();
+    const activeElements = selection.getActiveElements();
 
-    if (!selection.elements.length && !focusCell) {
+    if (activeElements.length === 0) {
       return null;
     }
 
@@ -44,7 +44,7 @@ export const BooleanValuePresentation: TabContainerPanelComponent<IDataValuePane
     const view = model.source.getAction(resultIndex, ResultSetViewAction);
     const editor = model.source.getAction(resultIndex, ResultSetEditAction);
 
-    const firstSelectedCell = selection.elements[0] || focusCell;
+    const firstSelectedCell = activeElements[0];
     const cellValue = view.getCellValue(firstSelectedCell);
 
     if (typeof cellValue === 'string' && isStringifiedBoolean(cellValue)) {

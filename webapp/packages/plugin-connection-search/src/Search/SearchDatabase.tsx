@@ -1,14 +1,13 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2023 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import styled, { css } from 'reshadow';
 
-import { Loader, useResource } from '@cloudbeaver/core-blocks';
+import { Loader, s, useResource, useS } from '@cloudbeaver/core-blocks';
 import { DBDriverResource } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
 import { ProjectInfoResource } from '@cloudbeaver/core-projects';
@@ -18,14 +17,10 @@ import { ConnectionFormLoader } from '@cloudbeaver/plugin-connections';
 
 import { ConnectionSearchService } from './ConnectionSearchService';
 import { DatabaseList } from './DatabaseList';
-
-const styles = css`
-  Loader {
-    height: 100%;
-  }
-`;
+import style from './SearchDatabase.m.css';
 
 export const SearchDatabase: React.FC = observer(function SearchDatabase() {
+  const styles = useS(style);
   const connectionSearchService = useService(ConnectionSearchService);
 
   useResource(SearchDatabase, ProjectInfoResource, CachedMapAllKey);
@@ -36,14 +31,14 @@ export const SearchDatabase: React.FC = observer(function SearchDatabase() {
   }
 
   if (connectionSearchService.formState) {
-    return styled(styles)(
-      <Loader suspense>
+    return (
+      <Loader className={s(styles, { loader: true })} suspense>
         <ConnectionFormLoader
           state={connectionSearchService.formState}
           onSave={() => connectionSearchService.saveConnection()}
           onCancel={() => connectionSearchService.goBack()}
         />
-      </Loader>,
+      </Loader>
     );
   }
 

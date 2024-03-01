@@ -7,9 +7,6 @@
   },
   "references": [
     {
-      "path": "../core-authentication/tsconfig.json"
-    },
-    {
       "path": "../core-blocks/tsconfig.json"
     },
     {
@@ -47,6 +44,9 @@
     },
     {
       "path": "../core-ui/tsconfig.json"
+    },
+    {
+      "path": "../core-utils/tsconfig.json"
     },
     {
       "path": "../core-view/tsconfig.json"

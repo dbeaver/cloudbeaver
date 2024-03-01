@@ -1,4 +1,5 @@
 export default [
+  ['core_connections_connections_settings_group', 'Подключения'],
   ['connections_administration_item', 'Шаблоны подключений'],
   ['connections_administration_connection_create', 'Создание шаблона подключения'],
   ['connections_administration_search_database_tip', "Укажите ваши хосты, например 'localhost host1.myhost.com 192.168.0.1' и нажмите Enter"],
@@ -35,7 +36,7 @@ export default [
   ['connections_connection_edit_search_hosts', 'Названия хостов'],
   ['connections_connection_address', 'Адрес'],
   ['connections_connection_folder', 'Папка'],
-  ['connections_connection_folder_validation', 'Имя папки может содержать следующие символы "_-$.()@" и не может начинаться с точки'],
+  ['connections_connection_folder_validation', 'Имя папки не может содержать следующие символы / : " \\ и не может начинаться с точки'],
   ['connections_connection_name', 'Название подключения'],
   ['connections_connection_access_user_or_team_name', 'Имя пользователя или команды'],
   ['connections_connection_access_filter_placeholder', 'Поиск по имени пользователя или команде'],
@@ -52,6 +53,8 @@ export default [
   ['connections_connection_test_fail', 'Не удалось выполнить подключение'],
   ['connections_connection_create_fail', 'Не удалось создать подключение'],
   ['connections_connection_save_fail', 'Не удалось сохранить подключение'],
+  ['connections_connection_keep_alive', 'Поддерживать соединение (в секундах)'],
+  ['connections_connection_keep_alive_tooltip', 'Не отключать соединение'],
   ['connections_network_handler_test', 'Проверить подключение'],
   ['connections_network_handler_test_fail', 'Не удалось установить соединение'],
   ['connections_network_handler_test_success', 'Соединение установлено'],

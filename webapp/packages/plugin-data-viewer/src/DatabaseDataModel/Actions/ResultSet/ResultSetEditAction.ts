@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2023 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -316,7 +316,7 @@ export class ResultSetEditAction extends DatabaseEditAction<IResultSetElementKey
   }
 
   applyPartialUpdate(result: IDatabaseResultSet): void {
-    if (result.data?.rows?.length !== this.updates.length) {
+    if (result.data?.rowsWithMetaData?.length !== this.updates.length) {
       console.warn('ResultSetEditAction: returned data differs from performed update');
     }
 
@@ -340,7 +340,7 @@ export class ResultSetEditAction extends DatabaseEditAction<IResultSetElementKey
     }, 0);
 
     for (const update of tempUpdates) {
-      const value = result.data?.rows?.[update.rowIndex];
+      const value = result.data?.rowsWithMetaData?.[update.rowIndex]?.data;
       const row = update.update.row;
       const type = update.update.type;
 
@@ -498,6 +498,7 @@ export class ResultSetEditAction extends DatabaseEditAction<IResultSetElementKey
                 }
                 return obj;
               }, {}),
+              metaData: this.data.getRowMetadata(update.row),
             });
           }
           break;
@@ -519,7 +520,7 @@ export class ResultSetEditAction extends DatabaseEditAction<IResultSetElementKey
           }
           const deletedRows = batch.deletedRows as SqlResultRow[];
 
-          deletedRows.push({ data: replaceBlobsWithNull(update.update) });
+          deletedRows.push({ data: replaceBlobsWithNull(update.update), metaData: this.data.getRowMetadata(update.row) });
           break;
         }
       }

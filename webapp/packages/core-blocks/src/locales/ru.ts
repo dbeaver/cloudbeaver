@@ -7,4 +7,5 @@ export default [
   ['core_blocks_object_property_info_form_empty_placeholder', 'Параметры отсутствуют'],
   ['core_blocks_properties_table_item_remove', 'Удалить параметр'],
   ['combobox_no_results_placeholder', 'Нет совпадений'],
+  ['core_blocks_custom_input_validation_error', 'Значение не валидно'],
 ];

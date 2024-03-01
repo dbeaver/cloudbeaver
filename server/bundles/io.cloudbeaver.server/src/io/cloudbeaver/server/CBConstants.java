@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2023 DBeaver Corp and others
+ * Copyright (C) 2010-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -50,6 +50,7 @@ public class CBConstants {
     public static final String PARAM_DEVEL_MODE = "develMode";
     public static final String PARAM_SECURITY_MANAGER = "enableSecurityManager";
     public static final String PARAM_SM_CONFIGURATION = "sm";
+    public static final String PARAM_PASSWORD_POLICY_CONFIGURATION = "passwordPolicy";
 
     public static final int DEFAULT_SERVER_PORT = 8080;
     //public static final String DEFAULT_SERVER_NAME = "CloudBeaver Web Server";

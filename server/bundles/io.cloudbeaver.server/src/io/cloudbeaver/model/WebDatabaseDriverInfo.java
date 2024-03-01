@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2023 DBeaver Corp and others
+ * Copyright (C) 2010-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,11 +19,16 @@ package io.cloudbeaver.model;
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.WebServiceUtils;
 import io.cloudbeaver.model.session.WebSession;
-import io.cloudbeaver.server.ConfigurationUtils;
+import io.cloudbeaver.model.utils.ConfigurationUtils;
+import io.cloudbeaver.server.CBAppConfig;
+import io.cloudbeaver.server.CBApplication;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBConstants;
-import org.jkiss.dbeaver.model.connection.*;
+import org.jkiss.dbeaver.model.connection.DBPAuthModelDescriptor;
+import org.jkiss.dbeaver.model.connection.DBPConnectionConfiguration;
+import org.jkiss.dbeaver.model.connection.DBPDriver;
+import org.jkiss.dbeaver.model.connection.DBPDriverConfigurationType;
 import org.jkiss.dbeaver.model.impl.auth.AuthModelDatabaseNative;
 import org.jkiss.dbeaver.model.meta.Property;
 import org.jkiss.dbeaver.model.preferences.DBPPropertyDescriptor;
@@ -236,7 +241,12 @@ public class WebDatabaseDriverInfo {
 
     @Property
     public boolean isEnabled() {
-        return ConfigurationUtils.isDriverEnabled(driver);
+        CBAppConfig config = CBApplication.getInstance().getAppConfiguration();
+        return ConfigurationUtils.isDriverEnabled(
+            driver,
+            config.getEnabledDrivers(),
+            config.getDisabledDrivers()
+            );
     }
 
     @Property

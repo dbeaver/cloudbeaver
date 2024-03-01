@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2023 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@ import type { ISqlEditorTabState } from './ISqlEditorTabState';
 import { SqlDataSourceService } from './SqlDataSource/SqlDataSourceService';
 import style from './SqlEditor.m.css';
 import { SqlEditorLoader } from './SqlEditor/SqlEditorLoader';
+import { SqlEditorOpenOverlay } from './SqlEditorOpenOverlay';
 import { SqlEditorOverlay } from './SqlEditorOverlay';
 import { SqlEditorStatusBar } from './SqlEditorStatusBar';
 import { SqlEditorView } from './SqlEditorView';
@@ -34,21 +35,24 @@ export const SqlEditor = observer<Props>(function SqlEditor({ state }) {
   useDataSource(dataSource);
   const splitState = useSplitUserState(`sql-editor-${dataSource?.sourceKey ?? 'default'}`);
 
+  const opened = dataSource?.isOpened() || false;
+
   return (
     <Loader suspense>
       <CaptureView className={s(styles, { captureView: true })} view={sqlEditorView}>
         <Split {...splitState} split="horizontal" sticky={30}>
-          <Pane className={s(styles, { pane: true })}>
+          <Pane className={s(styles, { pane: true })} basis="50%" main>
             <SqlEditorLoader state={state} />
           </Pane>
           <ResizerControls />
-          <Pane className={s(styles, { pane: true })} basis="50%" main>
+          <Pane className={s(styles, { pane: true })}>
             <Loader suspense>
               <SqlResultTabs state={state} />
             </Loader>
           </Pane>
         </Split>
-        <SqlEditorOverlay state={state} />
+        {opened && <SqlEditorOverlay state={state} />}
+        {!opened && <SqlEditorOpenOverlay dataSource={dataSource} />}
         <SqlEditorStatusBar dataSource={dataSource} />
       </CaptureView>
     </Loader>

@@ -1,11 +1,10 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2023 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { CoreSettingsService } from '@cloudbeaver/core-app';
 import { ConfirmationDialogDelete, RenameDialog } from '@cloudbeaver/core-blocks';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
@@ -55,7 +54,6 @@ export class NavNodeContextMenuService extends Bootstrap {
     private readonly navTreeResource: NavTreeResource,
     private readonly actionService: ActionService,
     private readonly menuService: MenuService,
-    private readonly coreSettingsService: CoreSettingsService,
     private readonly localizationService: LocalizationService,
     private readonly navNodeInfoResource: NavNodeInfoResource,
     private readonly navTreeSettingsService: NavTreeSettingsService,
@@ -189,13 +187,9 @@ export class NavNodeContextMenuService extends Bootstrap {
     this.menuService.addCreator({
       isApplicable: context => context.has(DATA_CONTEXT_NAV_NODE) && !context.has(DATA_CONTEXT_MENU_NESTED),
       getItems: (context, items) => {
-        const editingGlobalPermission = this.navTreeSettingsService.settings.isValueDefault('editing')
-          ? this.coreSettingsService.settings.getValue('app.metadata.editing')
-          : this.navTreeSettingsService.settings.getValue('editing');
+        const editingGlobalPermission = this.navTreeSettingsService.settings.getValue('editing');
 
-        const deleteGlobalPermission = this.navTreeSettingsService.settings.isValueDefault('deleting')
-          ? this.coreSettingsService.settings.getValue('app.metadata.deleting')
-          : this.navTreeSettingsService.settings.getValue('deleting');
+        const deleteGlobalPermission = this.navTreeSettingsService.settings.getValue('deleting');
 
         items = [ACTION_OPEN, ACTION_REFRESH, ...items];
 

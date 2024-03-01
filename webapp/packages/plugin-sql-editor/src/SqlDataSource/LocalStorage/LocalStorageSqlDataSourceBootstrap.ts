@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2023 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -8,7 +8,7 @@
 import { action, makeObservable, observable } from 'mobx';
 
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
-import { LocalStorageSaveService } from '@cloudbeaver/core-settings';
+import { SettingsService } from '@cloudbeaver/core-settings';
 
 import { createSqlDataSourceHistoryInitialState } from '../SqlDataSourceHistory/createSqlDataSourceHistoryInitialState';
 import { validateSqlDataSourceHistoryState } from '../SqlDataSourceHistory/validateSqlDataSourceHistoryState';
@@ -22,7 +22,7 @@ const localStorageKey = 'local-storage-sql-data-source';
 export class LocalStorageSqlDataSourceBootstrap extends Bootstrap {
   private readonly dataSourceStateState = new Map<string, ILocalStorageSqlDataSourceState>();
 
-  constructor(private readonly sqlDataSourceService: SqlDataSourceService, localStorageSaveService: LocalStorageSaveService) {
+  constructor(private readonly sqlDataSourceService: SqlDataSourceService, settingsService: SettingsService) {
     super();
     this.dataSourceStateState = new Map();
 
@@ -31,7 +31,7 @@ export class LocalStorageSqlDataSourceBootstrap extends Bootstrap {
       dataSourceStateState: observable.deep,
     });
 
-    localStorageSaveService.withAutoSave(
+    settingsService.registerSettings(
       localStorageKey,
       this.dataSourceStateState,
       () => new Map(),

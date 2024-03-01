@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2023 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -265,32 +265,68 @@ export abstract class CachedMapResource<
 
 export function getCachedMapResourceLoaderState<TKey, TValue, TContext extends Record<string, any> = Record<string, never>>(
   resource: CachedMapResource<TKey, TValue, TContext>,
-  getKey: () => ResourceKey<TKey>,
+  getKey: () => ResourceKey<TKey> | null,
   getIncludes?: () => CachedResourceIncludeArgs<TValue, TContext> | undefined,
   lazy?: boolean,
 ): ILoadableState {
   return {
     lazy,
     get exception() {
-      return resource.getException(getKey());
+      const key = getKey();
+
+      if (key === null) {
+        return null;
+      }
+
+      return resource.getException(key);
     },
     isLoading() {
-      return resource.isLoading(getKey());
+      const key = getKey();
+
+      if (key === null) {
+        return false;
+      }
+
+      return resource.isLoading(key);
     },
     isLoaded() {
-      return resource.isLoaded(getKey(), getIncludes?.());
+      const key = getKey();
+
+      if (key === null) {
+        return true;
+      }
+
+      return resource.isLoaded(key, getIncludes?.());
     },
     isError() {
       return isContainsException(this.exception);
     },
     isOutdated() {
-      return resource.isOutdated(getKey(), getIncludes?.());
+      const key = getKey();
+
+      if (key === null) {
+        return false;
+      }
+
+      return resource.isOutdated(key, getIncludes?.());
     },
     async load() {
-      await resource.load(getKey(), getIncludes?.());
+      const key = getKey();
+
+      if (key === null) {
+        return;
+      }
+
+      await resource.load(key, getIncludes?.());
     },
     async reload() {
-      await resource.refresh(getKey(), getIncludes?.());
+      const key = getKey();
+
+      if (key === null) {
+        return;
+      }
+
+      await resource.refresh(key, getIncludes?.());
     },
   };
 }

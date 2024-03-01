@@ -1,12 +1,12 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2023 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import { useMemo, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { Tab as BaseTab } from 'reakit/Tab';
 import styled, { use } from 'reshadow';
 
@@ -27,6 +27,7 @@ import { useTab } from './useTab';
 
 export const Tab = observer<TabProps>(function Tab({ tabId, title, menuContext, disabled, className, children, style, onOpen, onClose, onClick }) {
   const translate = useTranslate();
+  const ref = useRef<HTMLButtonElement>(null);
   const tabContext = useMemo(() => ({ tabId }), [tabId]);
   const tab = useTab(tabId, onOpen, onClose, onClick);
   const info = tab.getInfo();
@@ -46,6 +47,7 @@ export const Tab = observer<TabProps>(function Tab({ tabId, title, menuContext, 
             <TabMenu tabId={tabId} state={tab.state} menuContext={menuContext} style={style} />
           </tab-actions>
           <BaseTab
+            ref={ref}
             {...tab.state.state}
             type="button"
             title={translate(title ?? info?.title)}

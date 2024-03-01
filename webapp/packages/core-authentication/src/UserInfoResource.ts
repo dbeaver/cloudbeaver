@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2023 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -11,7 +11,7 @@ import { injectable } from '@cloudbeaver/core-di';
 import { AutoRunningTask, ISyncExecutor, ITask, SyncExecutor, whileTask } from '@cloudbeaver/core-executor';
 import { CachedDataResource, type ResourceKeySimple, ResourceKeyUtils } from '@cloudbeaver/core-resource';
 import { SessionDataResource, SessionResource } from '@cloudbeaver/core-root';
-import { AuthInfo, AuthStatus, GetActiveUserQueryVariables, GraphQLService, UserInfo } from '@cloudbeaver/core-sdk';
+import { AuthInfo, AuthLogoutQuery, AuthStatus, GetActiveUserQueryVariables, GraphQLService, UserInfo } from '@cloudbeaver/core-sdk';
 
 import { AUTH_PROVIDER_LOCAL_ID } from './AUTH_PROVIDER_LOCAL_ID';
 import { AuthProviderService } from './AuthProviderService';
@@ -20,11 +20,15 @@ import type { IAuthCredentials } from './IAuthCredentials';
 
 export type UserInfoIncludes = GetActiveUserQueryVariables;
 
+export type UserLogoutInfo = AuthLogoutQuery['result'];
+
 export interface ILoginOptions {
   credentials?: IAuthCredentials;
   configurationId?: string;
   linkUser?: boolean;
 }
+
+export const ANONYMOUS_USER_ID = 'anonymous';
 
 @injectable()
 export class UserInfoResource extends CachedDataResource<UserInfo | null, void, UserInfoIncludes> {
@@ -66,7 +70,7 @@ export class UserInfoResource extends CachedDataResource<UserInfo | null, void, 
   }
 
   getId(): string {
-    return this.data?.userId || 'anonymous';
+    return this.data?.userId || ANONYMOUS_USER_ID;
   }
 
   hasToken(providerId: string): boolean {
@@ -149,8 +153,8 @@ export class UserInfoResource extends CachedDataResource<UserInfo | null, void, 
     );
   }
 
-  async logout(provider?: string, configuration?: string): Promise<void> {
-    await this.graphQLService.sdk.authLogout({
+  async logout(provider?: string, configuration?: string): Promise<AuthLogoutQuery> {
+    const result = await this.graphQLService.sdk.authLogout({
       provider,
       configuration,
     });
@@ -158,6 +162,8 @@ export class UserInfoResource extends CachedDataResource<UserInfo | null, void, 
     this.resetIncludes();
     this.setData(await this.loader());
     this.sessionDataResource.markOutdated();
+
+    return result;
   }
 
   async setConfigurationParameter(key: string, value: any): Promise<UserInfo | null> {

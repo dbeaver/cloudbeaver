@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2023 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -229,6 +229,8 @@ export class ConnectionOptionsTabService extends Bootstrap {
     state.config.saveCredentials = state.info.credentialsSaved;
     state.config.sharedCredentials = state.info.sharedCredentials;
 
+    state.config.keepAliveInterval = state.info.keepAliveInterval;
+
     if (state.info.authProperties) {
       for (const property of state.info.authProperties) {
         if (!property.features.includes('password')) {
@@ -246,6 +248,19 @@ export class ConnectionOptionsTabService extends Bootstrap {
     const configuration = contexts.getContext(connectionFormConfigureContext);
 
     configuration.include('includeOrigin', 'includeAuthProperties', 'includeCredentialsSaved', 'customIncludeOptions');
+  }
+
+  private getTrimmedPropertiesConfig(authProperties: ObjectPropertyInfo[], credentials: Record<string, any>): Record<string, any> {
+    const trimmedProperties: Record<string, any> = toJS(credentials);
+    for (const property of authProperties) {
+      const value = credentials?.[property.id!];
+
+      if (typeof value === 'string' && value) {
+        trimmedProperties[property.id!] = value?.trim();
+      }
+    }
+
+    return trimmedProperties;
   }
 
   private async prepareConfig({ state }: IConnectionFormSubmitData, contexts: IExecutionContextProvider<IConnectionFormSubmitData>) {
@@ -274,38 +289,40 @@ export class ConnectionOptionsTabService extends Bootstrap {
       tempConfig.name = getUniqueName(tempConfig.name, connectionNames);
     }
 
-    tempConfig.description = state.config.description;
+    tempConfig.description = state.config.description?.trim();
 
     tempConfig.template = state.config.template;
 
     tempConfig.driverId = state.config.driverId;
+
+    tempConfig.keepAliveInterval = Number(state.config.keepAliveInterval);
 
     if (!state.config.template && state.config.folder) {
       tempConfig.folder = state.config.folder;
     }
 
     if (tempConfig.configurationType === DriverConfigurationType.Url) {
-      tempConfig.url = state.config.url;
+      tempConfig.url = state.config.url?.trim();
     } else {
       if (!driver.embedded) {
-        tempConfig.host = state.config.host;
-        tempConfig.port = state.config.port;
+        tempConfig.host = state.config.host?.trim();
+        tempConfig.port = state.config.port?.trim();
       }
       if (driver.requiresServerName) {
-        tempConfig.serverName = state.config.serverName;
+        tempConfig.serverName = state.config.serverName?.trim();
       }
-      tempConfig.databaseName = state.config.databaseName;
+      tempConfig.databaseName = state.config.databaseName?.trim();
     }
 
     if ((state.config.authModelId || driver.defaultAuthModel) && !driver.anonymousAccess) {
       tempConfig.authModelId = state.config.authModelId || driver.defaultAuthModel;
-      tempConfig.saveCredentials = state.config.saveCredentials;
       tempConfig.sharedCredentials = state.config.sharedCredentials;
+      tempConfig.saveCredentials = state.config.saveCredentials || tempConfig.sharedCredentials;
 
       const properties = await this.getConnectionAuthModelProperties(tempConfig.authModelId, state.info);
 
       if (this.isCredentialsChanged(properties, state.config.credentials)) {
-        tempConfig.credentials = { ...state.config.credentials };
+        tempConfig.credentials = this.getTrimmedPropertiesConfig(properties, { ...state.config.credentials });
       }
 
       if (!tempConfig.saveCredentials) {
@@ -334,6 +351,12 @@ export class ConnectionOptionsTabService extends Bootstrap {
       }
 
       tempConfig.providerProperties = providerProperties;
+
+      for (const key of Object.keys(tempConfig.providerProperties)) {
+        if (typeof tempConfig.providerProperties[key] === 'string') {
+          tempConfig.providerProperties[key] = tempConfig.providerProperties[key]?.trim();
+        }
+      }
     }
 
     runInAction(() => {
@@ -388,7 +411,8 @@ export class ConnectionOptionsTabService extends Bootstrap {
       (config.saveCredentials !== undefined && config.saveCredentials !== data.info.credentialsSaved) ||
       (config.sharedCredentials !== undefined && config.sharedCredentials !== data.info.sharedCredentials) ||
       (config.providerProperties !== undefined &&
-        !isObjectPropertyInfoStateEqual(driver.providerProperties, config.providerProperties, data.info.providerProperties))
+        !isObjectPropertyInfoStateEqual(driver.providerProperties, config.providerProperties, data.info.providerProperties)) ||
+      (config.keepAliveInterval !== undefined && !isValuesEqual(config.keepAliveInterval, data.info.keepAliveInterval))
     ) {
       stateContext.markEdited();
     }

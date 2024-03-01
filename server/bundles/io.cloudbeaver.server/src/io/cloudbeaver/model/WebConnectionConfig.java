@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2023 DBeaver Corp and others
+ * Copyright (C) 2010-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
  */
 package io.cloudbeaver.model;
 
+import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.model.connection.DBPDriverConfigurationType;
 import org.jkiss.dbeaver.model.data.json.JSONUtils;
 import org.jkiss.dbeaver.model.meta.Property;
@@ -43,6 +44,8 @@ public class WebConnectionConfig {
     private String databaseName;
     private String url;
 
+    private int keepAliveInterval;
+
     private String name;
     private String description;
     private String folder;
@@ -57,6 +60,7 @@ public class WebConnectionConfig {
     private Map<String, Object> providerProperties;
     private List<WebNetworkHandlerConfigInput> networkHandlersConfig;
     private DBPDriverConfigurationType configurationType;
+    private String selectedSecretId;
 
     public WebConnectionConfig() {
     }
@@ -80,6 +84,8 @@ public class WebConnectionConfig {
             databaseName = JSONUtils.getString(params, "databaseName");
             url = JSONUtils.getString(params, "url");
 
+            keepAliveInterval = JSONUtils.getInteger(params, "keepAliveInterval", -1);
+
             name = JSONUtils.getString(params, "name");
             description = JSONUtils.getString(params, "description");
             folder = JSONUtils.getString(params, "folder");
@@ -87,6 +93,7 @@ public class WebConnectionConfig {
             properties = JSONUtils.getObjectOrNull(params, "properties");
             userName = JSONUtils.getString(params, "userName");
             userPassword = JSONUtils.getString(params, "userPassword");
+            selectedSecretId = JSONUtils.getString(params, "selectedSecretId");
 
             authModelId = JSONUtils.getString(params, "authModelId");
             credentials = JSONUtils.getObjectOrNull(params, "credentials");
@@ -221,5 +228,15 @@ public class WebConnectionConfig {
     @Property
     public Map<String, Object> getProviderProperties() {
         return providerProperties;
+    }
+
+    @Property
+    public Integer getKeepAliveInterval() {
+        return keepAliveInterval;
+    }
+
+    @Nullable
+    public String getSelectedSecretId() {
+        return selectedSecretId;
     }
 }

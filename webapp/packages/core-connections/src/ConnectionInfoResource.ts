@@ -1,11 +1,11 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2023 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { action, makeObservable, observable, runInAction } from 'mobx';
+import { action, makeObservable, observable, runInAction, toJS } from 'mobx';
 
 import { AppAuthService, UserInfoResource } from '@cloudbeaver/core-authentication';
 import { injectable } from '@cloudbeaver/core-di';
@@ -35,10 +35,11 @@ import {
   TestConnectionMutation,
   UserConnectionAuthPropertiesFragment,
 } from '@cloudbeaver/core-sdk';
+import { schemaValidationError } from '@cloudbeaver/core-utils';
 
+import { CONNECTION_INFO_PARAM_SCHEMA, type IConnectionInfoParams } from './CONNECTION_INFO_PARAM_SCHEMA';
 import { ConnectionInfoEventHandler, IConnectionInfoEvent } from './ConnectionInfoEventHandler';
 import type { DatabaseConnection } from './DatabaseConnection';
-import type { IConnectionInfoParams } from './IConnectionsResource';
 
 export type Connection = DatabaseConnection & {
   authProperties?: UserConnectionAuthPropertiesFragment[];
@@ -53,6 +54,7 @@ export type ConnectionInitConfig = Omit<
   | 'includeCredentialsSaved'
   | 'includeProperties'
   | 'includeProviderProperties'
+  | 'includeSharedSecrets'
   | 'customIncludeOptions'
 >;
 export type ConnectionInfoIncludes = Omit<GetUserConnectionsQueryVariables, 'id'>;
@@ -577,12 +579,17 @@ export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoPar
       includeCredentialsSaved: false,
       includeProperties: false,
       includeProviderProperties: false,
+      includeSharedSecrets: false,
       customIncludeOptions: false,
     };
   }
 
   protected validateKey(key: IConnectionInfoParams): boolean {
-    return typeof key === 'object' && typeof key.projectId === 'string' && typeof key.connectionId === 'string';
+    const parse = CONNECTION_INFO_PARAM_SCHEMA.safeParse(toJS(key));
+    if (!parse.success) {
+      this.logger.warn(`Invalid resource key ${schemaValidationError(parse.error).toString()}`);
+    }
+    return parse.success;
   }
 }
 

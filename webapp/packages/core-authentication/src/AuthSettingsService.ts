@@ -1,30 +1,39 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2023 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
 import { injectable } from '@cloudbeaver/core-di';
-import { PluginManagerService, PluginSettings } from '@cloudbeaver/core-plugin';
-import { SettingsManagerService } from '@cloudbeaver/core-settings';
+import { PluginManagerService, PluginSettings, SettingsManagerService } from '@cloudbeaver/core-plugin';
+import { schema } from '@cloudbeaver/core-utils';
 
-import { AUTH_SETTINGS_GROUP, settings } from './AUTH_SETTINGS_GROUP';
+const settingsSchema = schema.object({
+  disableAnonymousAccess: schema.coerce.boolean().default(false),
+});
 
-const defaultSettings = {
-  disableAnonymousAccess: false,
-};
-
-export type AuthSettings = typeof defaultSettings;
+export type AuthSettings = schema.infer<typeof settingsSchema>;
 
 @injectable()
 export class AuthSettingsService {
-  readonly settings: PluginSettings<AuthSettings>;
+  readonly settings: PluginSettings<typeof settingsSchema>;
 
-  constructor(private readonly pluginManagerService: PluginManagerService, settingsManagerService: SettingsManagerService) {
-    this.settings = this.pluginManagerService.createSettings('authentication', 'core', defaultSettings);
+  constructor(private readonly pluginManagerService: PluginManagerService, private readonly settingsManagerService: SettingsManagerService) {
+    this.settings = this.pluginManagerService.createSettings('authentication', 'core', settingsSchema);
 
-    settingsManagerService.addGroup(AUTH_SETTINGS_GROUP);
-    settingsManagerService.addSettings(settings.scopeType, settings.scope, settings.settingsData);
+    this.registerSettings();
+  }
+
+  private registerSettings() {
+    this.settingsManagerService.registerSettings(this.settings, () => [
+      // {
+      //   key: 'disableAnonymousAccess',
+      //   type: ESettingsValueType.Checkbox,
+      //   name: 'settings_authentication_disable_anonymous_access_name',
+      //   description: 'settings_authentication_disable_anonymous_access_description',
+      //   group: AUTH_SETTINGS_GROUP,
+      // },
+    ]);
   }
 }

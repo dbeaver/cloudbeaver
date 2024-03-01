@@ -1,13 +1,12 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2023 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
 import { action, computed, makeObservable, observable, runInAction } from 'mobx';
 
-import { CoreSettingsService } from '@cloudbeaver/core-app';
 import { AppAuthService, UserInfoResource } from '@cloudbeaver/core-authentication';
 import { injectable } from '@cloudbeaver/core-di';
 import { Executor, ExecutorInterrupter, IExecutionContext, IExecutor } from '@cloudbeaver/core-executor';
@@ -66,15 +65,12 @@ export class NavTreeResource extends CachedMapResource<string, string[], Record<
   readonly onNodeMove: IExecutor<INavNodeMoveData>;
 
   get childrenLimit(): number {
-    return this.navTreeSettingsService.settings.isValueDefault('childrenLimit')
-      ? this.coreSettingsService.settings.getValue('app.navigationTree.childrenLimit')
-      : this.navTreeSettingsService.settings.getValue('childrenLimit');
+    return this.navTreeSettingsService.settings.getValue('childrenLimit');
   }
 
   constructor(
     private readonly graphQLService: GraphQLService,
     private readonly navNodeInfoResource: NavNodeInfoResource,
-    private readonly coreSettingsService: CoreSettingsService,
     private readonly navTreeSettingsService: NavTreeSettingsService,
     private readonly sessionDataResource: SessionDataResource,
     private readonly userInfoResource: UserInfoResource,

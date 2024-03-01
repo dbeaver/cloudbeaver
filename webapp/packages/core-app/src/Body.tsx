@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2023 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,8 @@ import { DNDProvider } from '@cloudbeaver/core-ui';
 import { useAppVersion } from '@cloudbeaver/core-version';
 
 import style from './Body.m.css';
+import { useAppHeight } from './useAppHeight';
+import { useClientActivity } from './useClientActivity';
 
 export const Body = observer(function Body() {
   // const serverConfigLoader = useResource(Body, ServerConfigResource, undefined);
@@ -42,11 +44,16 @@ export const Body = observer(function Body() {
     document.documentElement.dataset.backendVersion = backendVersion;
   });
 
+  useAppHeight();
+  useClientActivity();
+
   return (
     <DNDProvider>
-      <Loader suspense>
+      <Loader className={s(styles, { loader: true })} suspense>
         <div ref={ref} className={s(styles, { bodyContent: true }, `theme-${themeService.currentTheme.id}`)}>
-          <Loader suspense>{Screen && <Screen {...screenService.routerService.params} />}</Loader>
+          <Loader className={s(styles, { loader: true })} suspense>
+            {Screen && <Screen {...screenService.routerService.params} />}
+          </Loader>
           <DialogsPortal />
           <Notifications />
         </div>

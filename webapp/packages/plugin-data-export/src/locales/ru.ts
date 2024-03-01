@@ -1,4 +1,5 @@
 export default [
+  ['plugin_data_export_data_export_settings_group', 'Экспорт данных'],
   ['data_transfer_dialog_title', 'Экспорт данных'],
   ['data_transfer_dialog_export', 'Экспортировать'],
   ['data_transfer_dialog_export_tooltip', 'Экспортировать резалт сет как файл'],

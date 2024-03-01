@@ -16,7 +16,13 @@
       "path": "../core-di/tsconfig.json"
     },
     {
+      "path": "../core-localization/tsconfig.json"
+    },
+    {
       "path": "../core-product/tsconfig.json"
+    },
+    {
+      "path": "../core-task-manager/tsconfig.json"
     },
     {
       "path": "../core-version-update/tsconfig.json"
@@ -25,10 +31,10 @@
       "path": "../plugin-administration/tsconfig.json"
     },
     {
-      "path": "../plugin-authentication/tsconfig.json"
+      "path": "../plugin-authentication-administration/tsconfig.json"
     },
     {
-      "path": "../plugin-authentication-administration/tsconfig.json"
+      "path": "../plugin-authentication/tsconfig.json"
     },
     {
       "path": "../plugin-browser/tsconfig.json"
@@ -43,10 +49,10 @@
       "path": "../plugin-connection-template/tsconfig.json"
     },
     {
-      "path": "../plugin-connections/tsconfig.json"
+      "path": "../plugin-connections-administration/tsconfig.json"
     },
     {
-      "path": "../plugin-connections-administration/tsconfig.json"
+      "path": "../plugin-connections/tsconfig.json"
     },
     {
       "path": "../plugin-data-export/tsconfig.json"
@@ -55,10 +61,10 @@
       "path": "../plugin-data-spreadsheet-new/tsconfig.json"
     },
     {
-      "path": "../plugin-data-viewer/tsconfig.json"
+      "path": "../plugin-data-viewer-result-set-grouping/tsconfig.json"
     },
     {
-      "path": "../plugin-data-viewer-result-set-grouping/tsconfig.json"
+      "path": "../plugin-data-viewer/tsconfig.json"
     },
     {
       "path": "../plugin-datasource-context-switch/tsconfig.json"
@@ -85,13 +91,13 @@
       "path": "../plugin-navigation-tabs/tsconfig.json"
     },
     {
-      "path": "../plugin-navigation-tree/tsconfig.json"
-    },
-    {
       "path": "../plugin-navigation-tree-filters/tsconfig.json"
     },
     {
       "path": "../plugin-navigation-tree-rm/tsconfig.json"
+    },
+    {
+      "path": "../plugin-navigation-tree/tsconfig.json"
     },
     {
       "path": "../plugin-object-viewer/tsconfig.json"
@@ -103,13 +109,13 @@
       "path": "../plugin-projects/tsconfig.json"
     },
     {
-      "path": "../plugin-resource-manager/tsconfig.json"
-    },
-    {
       "path": "../plugin-resource-manager-administration/tsconfig.json"
     },
     {
       "path": "../plugin-resource-manager-scripts/tsconfig.json"
+    },
+    {
+      "path": "../plugin-resource-manager/tsconfig.json"
     },
     {
       "path": "../plugin-root/tsconfig.json"
@@ -118,22 +124,22 @@
       "path": "../plugin-session-expiration/tsconfig.json"
     },
     {
-      "path": "../plugin-settings-menu/tsconfig.json"
+      "path": "../plugin-settings-administration/tsconfig.json"
     },
     {
       "path": "../plugin-settings-menu-administration/tsconfig.json"
     },
     {
+      "path": "../plugin-settings-menu/tsconfig.json"
+    },
+    {
       "path": "../plugin-settings-panel/tsconfig.json"
     },
     {
-      "path": "../plugin-sql-editor/tsconfig.json"
+      "path": "../plugin-sql-editor-navigation-tab-script/tsconfig.json"
     },
     {
       "path": "../plugin-sql-editor-navigation-tab/tsconfig.json"
-    },
-    {
-      "path": "../plugin-sql-editor-navigation-tab-script/tsconfig.json"
     },
     {
       "path": "../plugin-sql-editor-new/tsconfig.json"
@@ -142,10 +148,16 @@
       "path": "../plugin-sql-editor-screen/tsconfig.json"
     },
     {
+      "path": "../plugin-sql-editor/tsconfig.json"
+    },
+    {
       "path": "../plugin-sql-generator/tsconfig.json"
     },
     {
       "path": "../plugin-sso/tsconfig.json"
+    },
+    {
+      "path": "../plugin-task-manager/tsconfig.json"
     },
     {
       "path": "../plugin-theme/tsconfig.json"
@@ -154,31 +166,22 @@
       "path": "../plugin-tools-panel/tsconfig.json"
     },
     {
-      "path": "../plugin-top-app-bar/tsconfig.json"
-    },
-    {
       "path": "../plugin-top-app-bar-administration/tsconfig.json"
     },
     {
-      "path": "../plugin-user-profile/tsconfig.json"
+      "path": "../plugin-top-app-bar/tsconfig.json"
     },
     {
       "path": "../plugin-user-profile-administration/tsconfig.json"
     },
     {
-      "path": "../plugin-version/tsconfig.json"
+      "path": "../plugin-user-profile/tsconfig.json"
     },
     {
       "path": "../plugin-version-update-administration/tsconfig.json"
     },
     {
-      "path": "../core-localization/tsconfig.json"
-    },
-    {
-      "path": "../core-task-manager/tsconfig.json"
-    },
-    {
-      "path": "../plugin-task-manager/tsconfig.json"
+      "path": "../plugin-version/tsconfig.json"
     }
   ],
   "include": [

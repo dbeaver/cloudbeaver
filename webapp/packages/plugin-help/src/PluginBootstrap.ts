@@ -1,22 +1,23 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2023 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
 import { AppScreenService } from '@cloudbeaver/core-app';
-import { ActionSnackbar } from '@cloudbeaver/core-blocks';
+import { ActionSnackbar, importLazyComponent } from '@cloudbeaver/core-blocks';
+import { LocalStorageSaveService } from '@cloudbeaver/core-browser';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
 import { ENotificationType, INotification, NotificationService } from '@cloudbeaver/core-events';
 import { ScreenService } from '@cloudbeaver/core-routing';
-import { LocalStorageSaveService } from '@cloudbeaver/core-settings';
 import { ActionService, menuExtractItems, MenuService } from '@cloudbeaver/core-view';
 import { MENU_APP_STATE } from '@cloudbeaver/plugin-top-app-bar';
 
 import { ACTION_APP_HELP } from './actions/ACTION_APP_HELP';
-import { ShortcutsDialog } from './Shortcuts/ShortcutsDialog';
+
+const ShortcutsDialog = importLazyComponent(() => import('./Shortcuts/ShortcutsDialog').then(m => m.ShortcutsDialog));
 
 @injectable()
 export class PluginBootstrap extends Bootstrap {

@@ -19,13 +19,16 @@
       "path": "../core-blocks/tsconfig.json"
     },
     {
-      "path": "../core-browser/tsconfig.json"
-    },
-    {
       "path": "../core-browser-cookies/tsconfig.json"
     },
     {
       "path": "../core-browser-settings/tsconfig.json"
+    },
+    {
+      "path": "../core-browser/tsconfig.json"
+    },
+    {
+      "path": "../core-client-activity/tsconfig.json"
     },
     {
       "path": "../core-connections/tsconfig.json"
@@ -58,10 +61,10 @@
       "path": "../core-projects/tsconfig.json"
     },
     {
-      "path": "../core-resource/tsconfig.json"
+      "path": "../core-resource-manager/tsconfig.json"
     },
     {
-      "path": "../core-resource-manager/tsconfig.json"
+      "path": "../core-resource/tsconfig.json"
     },
     {
       "path": "../core-root/tsconfig.json"
@@ -73,6 +76,15 @@
       "path": "../core-sdk/tsconfig.json"
     },
     {
+      "path": "../core-server-localization/tsconfig.json"
+    },
+    {
+      "path": "../core-session-localization/tsconfig.json"
+    },
+    {
+      "path": "../core-settings-localization/tsconfig.json"
+    },
+    {
       "path": "../core-settings/tsconfig.json"
     },
     {
@@ -82,10 +94,10 @@
       "path": "../core-ui/tsconfig.json"
     },
     {
-      "path": "../core-version/tsconfig.json"
+      "path": "../core-version-update/tsconfig.json"
     },
     {
-      "path": "../core-version-update/tsconfig.json"
+      "path": "../core-version/tsconfig.json"
     },
     {
       "path": "../core-view/tsconfig.json"

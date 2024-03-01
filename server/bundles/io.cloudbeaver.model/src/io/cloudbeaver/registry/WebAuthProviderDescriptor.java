@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2023 DBeaver Corp and others
+ * Copyright (C) 2010-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -49,13 +49,14 @@ public class WebAuthProviderDescriptor extends AbstractDescriptor {
     private final Map<SMSubjectType, List<DBPPropertyDescriptor>> metaParameters = new HashMap<>();
     private SMAuthProvider<?> instance;
     private final DBPImage icon;
-    private final Map<String, PropertyDescriptor> configurationParameters = new LinkedHashMap<>();
+    private final Map<String, WebAuthProviderProperty> configurationParameters = new LinkedHashMap<>();
     private final List<SMAuthCredentialsProfile> credentialProfiles = new ArrayList<>();
     private final boolean configurable;
     private final boolean trusted;
     private final boolean isPrivate;
     private final String[] requiredFeatures;
     private final boolean isRequired;
+    private final String[] types;
 
     public WebAuthProviderDescriptor(IConfigurationElement cfg) {
         super(cfg);
@@ -68,13 +69,9 @@ public class WebAuthProviderDescriptor extends AbstractDescriptor {
         this.isRequired = CommonUtils.toBoolean(cfg.getAttribute("required"));
 
         for (IConfigurationElement cfgElement : cfg.getChildren("configuration")) {
-            for (IConfigurationElement propGroup : ArrayUtils.safeArray(cfgElement.getChildren(PropertyDescriptor.TAG_PROPERTY_GROUP))) {
-                String category = propGroup.getAttribute(PropertyDescriptor.ATTR_LABEL);
-                IConfigurationElement[] propElements = propGroup.getChildren(PropertyDescriptor.TAG_PROPERTY);
-                for (IConfigurationElement prop : propElements) {
-                    PropertyDescriptor propertyDescriptor = new PropertyDescriptor(category, prop);
-                    configurationParameters.put(CommonUtils.toString(propertyDescriptor.getId()), propertyDescriptor);
-                }
+            List<WebAuthProviderProperty> properties = WebAuthProviderRegistry.readProperties(cfgElement);
+            for (WebAuthProviderProperty property : properties) {
+                configurationParameters.put(CommonUtils.toString(property.getId()), property);
             }
         }
         for (IConfigurationElement credElement : cfg.getChildren("credentials")) {
@@ -90,11 +87,10 @@ public class WebAuthProviderDescriptor extends AbstractDescriptor {
         }
 
         String rfList = cfg.getAttribute("requiredFeatures");
-        if (!CommonUtils.isEmpty(rfList)) {
-            requiredFeatures = rfList.split(",");
-        } else {
-            requiredFeatures = null;
-        }
+        requiredFeatures = CommonUtils.isEmpty(rfList) ? null : rfList.split(",");
+
+        String typesAttr = cfg.getAttribute("categories");
+        this.types = CommonUtils.isEmpty(typesAttr) ? new String[0] : typesAttr.split(",");
     }
 
     @NotNull
@@ -130,7 +126,7 @@ public class WebAuthProviderDescriptor extends AbstractDescriptor {
         return isRequired;
     }
 
-    public List<PropertyDescriptor> getConfigurationParameters() {
+    public List<WebAuthProviderProperty> getConfigurationParameters() {
         return new ArrayList<>(configurationParameters.values());
     }
 
@@ -198,4 +194,7 @@ public class WebAuthProviderDescriptor extends AbstractDescriptor {
         return metaParameters.get(subjectType);
     }
 
+    public String[] getTypes() {
+        return types;
+    }
 }

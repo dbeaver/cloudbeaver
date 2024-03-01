@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2023 DBeaver Corp and others
+ * Copyright (C) 2010-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,19 +22,21 @@ import org.jkiss.dbeaver.model.rm.RMConstants;
 /**
  * General constants
  */
-public class DBWConstants {
+public interface DBWConstants {
 
-    public static final String PERMISSION_ADMIN = DBAPermissionRealm.PERMISSION_ADMIN;
+    String PERMISSION_ADMIN = DBAPermissionRealm.PERMISSION_ADMIN;
 
-    public static final String PERMISSION_CONFIGURATION_MANAGER = RMConstants.PERMISSION_CONFIGURATION_MANAGER;
-    public static final String PERMISSION_PRIVATE_PROJECT_ACCESS = "private-project-access";
+    String PERMISSION_CONFIGURATION_MANAGER = RMConstants.PERMISSION_CONFIGURATION_MANAGER;
+    String PERMISSION_PRIVATE_PROJECT_ACCESS = "private-project-access";
+    String PERMISSION_SECRET_MANAGER = "secret-manager";
 
-    public static final String PERMISSION_EDIT_STRUCTURE = "edit-meta";
-    public static final String PERMISSION_EDIT_DATA = "edit-data";
 
-    public static final String STATE_ATTR_SIGN_IN_STATE = "state.signin";
+    String PERMISSION_EDIT_STRUCTURE = "edit-meta";
+    String PERMISSION_EDIT_DATA = "edit-data";
 
-    public enum SignInState {
+    String STATE_ATTR_SIGN_IN_STATE = "state.signin";
+
+    enum SignInState {
         GLOBAL,
         EMBEDDED
     }

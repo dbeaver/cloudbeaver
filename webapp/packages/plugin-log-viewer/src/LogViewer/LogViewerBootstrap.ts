@@ -1,17 +1,19 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2023 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
+import { importLazyComponent } from '@cloudbeaver/core-blocks';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { ActionService, DATA_CONTEXT_MENU, menuExtractItems, MenuService } from '@cloudbeaver/core-view';
 import { MENU_TOOLS, ToolsPanelService } from '@cloudbeaver/plugin-tools-panel';
 
 import { ACTION_LOG_VIEWER_ENABLE } from '../Actions/ACTION_LOG_VIEWER_ENABLE';
-import { LogViewer } from './LogViewer';
 import { LogViewerService } from './LogViewerService';
+
+const LogViewer = importLazyComponent(() => import('./LogViewer').then(m => m.LogViewer));
 
 @injectable()
 export class LogViewerBootstrap extends Bootstrap {

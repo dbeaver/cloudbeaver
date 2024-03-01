@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2023 DBeaver Corp and others
+ * Copyright (C) 2010-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -91,7 +91,7 @@ import java.util.stream.Collectors;
  * Is the main source of data in web application
  */
 public class WebSession extends BaseWebSession
-    implements SMSession, SMCredentialsProvider, DBACredentialsProvider, IAdaptable {
+    implements SMSessionWithAuth, SMCredentialsProvider, DBACredentialsProvider, IAdaptable {
 
     private static final Log log = Log.getLog(WebSession.class);
 
@@ -132,6 +132,12 @@ public class WebSession extends BaseWebSession
         this.lastAccessTime = this.createTime;
         setLocale(CommonUtils.toString(httpSession.getAttribute(ATTR_LOCALE), this.locale));
         this.sessionHandlers = sessionHandlers;
+        //force authorization of anonymous session to avoid access error,
+        //because before authorization could be called by any request,
+        //but now 'updateInfo' is called only in special requests,
+        //and the order of requests is not guaranteed.
+        //look at CB-4747
+        refreshSessionAuth();
     }
 
     @Override
@@ -521,6 +527,7 @@ public class WebSession extends BaseWebSession
         HttpServletRequest request,
         HttpServletResponse response
     ) throws DBWebException {
+        log.debug("Update session lifetime " + getSessionId() + " for user " + getUserId());
         touchSession();
         HttpSession httpSession = request.getSession();
         this.lastRemoteAddr = request.getRemoteAddr();
@@ -614,7 +621,7 @@ public class WebSession extends BaseWebSession
         super.close();
     }
 
-    private void clearAuthTokens() throws DBException {
+    private List<WebAuthInfo> clearAuthTokens() throws DBException {
         ArrayList<WebAuthInfo> tokensCopy;
         synchronized (authTokens) {
             tokensCopy = new ArrayList<>(this.authTokens);
@@ -623,6 +630,7 @@ public class WebSession extends BaseWebSession
             removeAuthInfo(ai);
         }
         resetAuthToken();
+        return tokensCopy;
     }
 
     public DBRProgressMonitor getProgressMonitor() {
@@ -812,6 +820,14 @@ public class WebSession extends BaseWebSession
         }
     }
 
+    @Override
+    public List<SMAuthInfo> getAuthInfos() {
+        synchronized (authTokens) {
+            return authTokens.stream().map(WebAuthInfo::getAuthInfo).toList();
+        }
+    }
+
+
     public List<WebAuthInfo> getAllAuthInfo() {
         synchronized (authTokens) {
             return new ArrayList<>(authTokens);
@@ -873,18 +889,23 @@ public class WebSession extends BaseWebSession
         }
     }
 
-    public void removeAuthInfo(String providerId) throws DBException {
+    public List<WebAuthInfo> removeAuthInfo(String providerId) throws DBException {
+        List<WebAuthInfo> oldInfo;
         if (providerId == null) {
-            clearAuthTokens();
+            oldInfo = clearAuthTokens();
         } else {
             WebAuthInfo authInfo = getAuthInfo(providerId);
             if (authInfo != null) {
                 removeAuthInfo(authInfo);
+                oldInfo = List.of(authInfo);
+            } else {
+                oldInfo = List.of();
             }
         }
         if (authTokens.isEmpty()) {
             resetUserState();
         }
+        return oldInfo;
     }
 
     public List<DBACredentialsProvider> getContextCredentialsProviders() {
@@ -921,7 +942,7 @@ public class WebSession extends BaseWebSession
                 .create();
 
             credGson.fromJson(credGson.toJsonTree(configuration.getAuthProperties()), credentials.getClass());
-            configuration.getAuthModel().saveCredentials(dataSourceContainer, configuration, credentials);
+            configuration.getAuthModel().provideCredentials(dataSourceContainer, configuration, credentials);
         } catch (DBException e) {
             addSessionError(e);
             log.error(e);
@@ -1000,6 +1021,17 @@ public class WebSession extends BaseWebSession
     @Nullable
     public WebProjectImpl getProjectById(@Nullable String projectId) {
         return getWorkspace().getProjectById(projectId);
+    }
+
+    public WebProjectImpl getAccessibleProjectById(@Nullable String projectId) throws DBWebException {
+        WebProjectImpl project = null;
+        if (projectId != null) {
+            project = getWorkspace().getProjectById(projectId);
+        }
+        if (project == null) {
+            throw new DBWebException("Project not found: " + projectId);
+        }
+        return project;
     }
 
     public List<WebProjectImpl> getAccessibleProjects() {

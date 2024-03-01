@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2023 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -42,6 +42,11 @@ export class SessionResource extends CachedDataResource<SessionState | null> {
     sessionInfoEventHandler.onEvent(
       ServerEventId.CbSessionState,
       event => {
+        if (this.data) {
+          this.data.valid = event.isValid ?? this.data.valid;
+          this.data.remainingTime = event.remainingTime;
+          // TODO: probably we want to call here this.dataUpdate
+        }
         this.onStatusUpdate.execute(event);
       },
       undefined,
@@ -68,13 +73,6 @@ export class SessionResource extends CachedDataResource<SessionState | null> {
     this.defaultLocale = defaultLocale;
   }
 
-  //! this method results in onDataUpdate handler skipping
-  async refreshSilent(): Promise<void> {
-    const session = await this.loader();
-
-    this.setData(session);
-  }
-
   async changeLanguage(locale: string): Promise<void> {
     if (this.data?.locale === locale) {
       return;
@@ -93,6 +91,18 @@ export class SessionResource extends CachedDataResource<SessionState | null> {
     const { session } = await this.graphQLService.sdk.openSession({ defaultLocale: this.defaultLocale });
 
     return session;
+  }
+
+  async updateSession() {
+    if (!this.data?.valid) {
+      return;
+    }
+
+    const { updateSession } = await this.graphQLService.sdk.updateSession();
+
+    this.setData(updateSession);
+
+    return updateSession;
   }
 
   protected setData(data: SessionState | null) {

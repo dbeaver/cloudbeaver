@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2023 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,7 @@ export class TempMap<TKey, TValue> implements Map<TKey, TValue> {
     return 'TempMap';
   }
 
-  private readonly deleted: TKey[];
+  private readonly deleted: Map<TKey, boolean>;
   private readonly temp: Map<TKey, TValue>;
   private flushTask: NodeJS.Timeout | null;
   private readonly keysTemp: ICachedValueObject<TKey[]>;
@@ -33,7 +33,7 @@ export class TempMap<TKey, TValue> implements Map<TKey, TValue> {
   constructor(private readonly target: Map<TKey, TValue>, private readonly onSync?: () => void) {
     this.temp = new Map();
     this.flushTask = null;
-    this.deleted = [];
+    this.deleted = new Map();
     this.keysTemp = cacheValue();
     this.entriesTemp = cacheValue();
     this.valuesTemp = cacheValue();
@@ -45,7 +45,7 @@ export class TempMap<TKey, TValue> implements Map<TKey, TValue> {
   }
 
   isDeleted(key: TKey): boolean {
-    return this.deleted.includes(key);
+    return this.deleted.get(key) || false;
   }
 
   /**
@@ -56,7 +56,7 @@ export class TempMap<TKey, TValue> implements Map<TKey, TValue> {
       clearTimeout(this.flushTask);
       this.flushTask = null;
     }
-    this.deleted.splice(0, this.deleted.length);
+    this.deleted.clear();
     this.temp.clear();
     this.keysTemp.invalidate();
     this.valuesTemp.invalidate();
@@ -65,7 +65,7 @@ export class TempMap<TKey, TValue> implements Map<TKey, TValue> {
 
   delete(key: TKey): boolean {
     this.temp.delete(key);
-    this.deleted.push(key);
+    this.deleted.set(key, true);
     this.scheduleFlush();
     return this.has(key);
   }
@@ -105,10 +105,7 @@ export class TempMap<TKey, TValue> implements Map<TKey, TValue> {
   set(key: TKey, value: TValue): this {
     this.temp.set(key, value);
 
-    const indexOfDeleted = this.deleted.indexOf(key);
-    if (indexOfDeleted !== -1) {
-      this.deleted.splice(indexOfDeleted, 1);
-    }
+    this.deleted.delete(key);
 
     this.scheduleFlush();
     return this;
@@ -139,10 +136,10 @@ export class TempMap<TKey, TValue> implements Map<TKey, TValue> {
 
     this.flushTask = setTimeout(
       action(() => {
-        for (const deleted of this.deleted) {
+        for (const [deleted] of this.deleted) {
           this.target.delete(deleted);
         }
-        this.deleted.splice(0, this.deleted.length);
+        this.deleted.clear();
 
         for (const [key, value] of this.temp) {
           this.target.set(key, value);

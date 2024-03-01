@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2023 DBeaver Corp and others
+ * Copyright (C) 2010-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,6 +33,7 @@ import io.cloudbeaver.server.CBPlatform;
 import io.cloudbeaver.service.DBWServiceServerConfigurator;
 import io.cloudbeaver.service.admin.*;
 import io.cloudbeaver.service.security.SMUtils;
+import io.cloudbeaver.utils.WebAppUtils;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
@@ -44,6 +45,7 @@ import org.jkiss.dbeaver.model.auth.AuthInfo;
 import org.jkiss.dbeaver.model.navigator.DBNBrowseSettings;
 import org.jkiss.dbeaver.model.preferences.DBPPropertyDescriptor;
 import org.jkiss.dbeaver.model.rm.RMProjectType;
+import org.jkiss.dbeaver.model.secret.DBSSecretController;
 import org.jkiss.dbeaver.model.security.*;
 import org.jkiss.dbeaver.model.security.user.SMTeam;
 import org.jkiss.dbeaver.model.security.user.SMUser;
@@ -53,6 +55,7 @@ import java.text.MessageFormat;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Web service implementation
@@ -177,6 +180,10 @@ public class WebServiceAdmin implements DBWServiceAdmin {
         }
         webSession.addInfoMessage("Delete user - " + userName);
         try {
+            var secretController = DBSSecretController.getSessionSecretControllerOrNull(webSession);
+            if (secretController != null) {
+                secretController.deleteSubjectSecrets(userName);
+            }
             webSession.getAdminSecurityController().deleteUser(userName);
         } catch (Exception e) {
             throw new DBWebException("Error deleting user", e);
@@ -234,6 +241,10 @@ public class WebServiceAdmin implements DBWServiceAdmin {
             if (Arrays.stream(userTeams).anyMatch(team -> team.getTeamId().equals(teamId))) {
                 throw new DBWebException("You can not delete your own team");
             }
+            var secretController = DBSSecretController.getSessionSecretControllerOrNull(webSession);
+            if (secretController != null) {
+                secretController.deleteSubjectSecrets(teamId);
+            }
             adminSecurityController.deleteTeam(teamId, force);
             return true;
         } catch (Exception e) {
@@ -247,7 +258,9 @@ public class WebServiceAdmin implements DBWServiceAdmin {
         if (grantor == null) {
             throw new DBWebException("Cannot grant team in anonymous mode");
         }
-        if (CommonUtils.equalObjects(user, webSession.getUser().getUserId())) {
+        if (!WebAppUtils.getWebApplication().isDistributed()
+            && CommonUtils.equalObjects(user, webSession.getUser().getUserId())
+        ) {
             throw new DBWebException("You cannot edit your own permissions");
         }
         try {
@@ -271,7 +284,9 @@ public class WebServiceAdmin implements DBWServiceAdmin {
         if (grantor == null) {
             throw new DBWebException("Cannot revoke team in anonymous mode");
         }
-        if (CommonUtils.equalObjects(user, webSession.getUser().getUserId())) {
+        if (!WebAppUtils.getWebApplication().isDistributed() &&
+            CommonUtils.equalObjects(user, webSession.getUser().getUserId())
+        ) {
             throw new DBWebException("You cannot edit your own permissions");
         }
         try {
@@ -404,12 +419,30 @@ public class WebServiceAdmin implements DBWServiceAdmin {
         if (authProvider == null) {
             throw new DBWebException("Invalid provider ID " + providerId);
         }
-        return authProvider.getConfigurationParameters().stream().filter(p -> {
-            if (p.hasFeature("distributed")) {
-                return CBApplication.getInstance().isDistributed();
-            }
-            return true;
-        }).map(p -> new WebPropertyInfo(webSession, p)).collect(Collectors.toList());
+        var application = CBApplication.getInstance();
+
+
+        Stream<WebAuthProviderProperty> commonPropertiesStream = WebAuthProviderRegistry.getInstance()
+            .getCommonProperties()
+            .stream()
+            .filter(commonProperties -> commonProperties.isApplicableFor(authProvider))
+            .flatMap(commonProperties -> commonProperties.getConfigurationParameters().stream());
+
+        return Stream.concat(authProvider.getConfigurationParameters().stream(), commonPropertiesStream)
+            .filter(p -> {
+                boolean allFeaturesEnabled = true;
+                for (String feature : p.getRequiredFeatures()) {
+                    if (feature.equals("distributed")) {
+                        allFeaturesEnabled = CBApplication.getInstance().isDistributed();
+                    } else {
+                        allFeaturesEnabled = application.getAppConfiguration().isFeatureEnabled(feature);
+                    }
+                    if (!allFeaturesEnabled) {
+                        break;
+                    }
+                }
+                return allFeaturesEnabled;
+            }).map(p -> new WebPropertyInfo(webSession, p)).collect(Collectors.toList());
     }
 
     @Override
@@ -588,6 +621,17 @@ public class WebServiceAdmin implements DBWServiceAdmin {
             throw new DBWebException("Error saving server configuration", e);
         }
         return true;
+    }
+
+
+    @Override
+    public boolean updateProductConfiguration(WebSession webSession, Map<String, Object> productConfiguration) throws DBWebException {
+        try {
+            CBApplication.getInstance().saveProductConfiguration(webSession, productConfiguration);
+            return true;
+        } catch (DBException e) {
+            throw new DBWebException("Error updating product configuration", e);
+        }
     }
 
     ////////////////////////////////////////////////////////////////////

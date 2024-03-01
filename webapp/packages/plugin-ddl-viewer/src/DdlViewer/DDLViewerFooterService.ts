@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2023 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -8,7 +8,7 @@
 import { ConnectionInfoResource, createConnectionParam } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
 import { NavNodeManagerService } from '@cloudbeaver/core-navigation-tree';
-import { download, generateFileName } from '@cloudbeaver/core-utils';
+import { download, withTimestamp } from '@cloudbeaver/core-utils';
 import { ACTION_SAVE, ActionService, DATA_CONTEXT_MENU, MenuService } from '@cloudbeaver/core-view';
 import { LocalStorageSqlDataSource } from '@cloudbeaver/plugin-sql-editor';
 import { ACTION_SQL_EDITOR_OPEN, SqlEditorNavigatorService } from '@cloudbeaver/plugin-sql-editor-navigation-tab';
@@ -58,7 +58,7 @@ export class DDLViewerFooterService {
             const node = nodeId ? this.navNodeManagerService.getNode(nodeId) : undefined;
             const name = node?.name ? `DDL_${node.nodeType ? node.nodeType + '_' : ''}${node.name}` : 'DDL';
 
-            download(blob, generateFileName(name, '.sql'));
+            download(blob, `${withTimestamp(name)}.sql`);
             break;
           }
           case ACTION_SQL_EDITOR_OPEN: {

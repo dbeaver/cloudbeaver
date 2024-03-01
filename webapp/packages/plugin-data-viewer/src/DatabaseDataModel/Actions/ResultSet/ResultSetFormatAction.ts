@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2023 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -14,8 +14,7 @@ import { databaseDataAction } from '../DatabaseDataActionDecorator';
 import { DatabaseEditChangeType } from '../IDatabaseDataEditAction';
 import type { IDatabaseDataFormatAction } from '../IDatabaseDataFormatAction';
 import type { IResultSetComplexValue } from './IResultSetComplexValue';
-import type { IResultSetElementKey, IResultSetPartialKey } from './IResultSetDataKey';
-import { isResultSetBlobValue } from './isResultSetBlobValue';
+import type { IResultSetColumnKey, IResultSetElementKey, IResultSetPartialKey } from './IResultSetDataKey';
 import { isResultSetComplexValue } from './isResultSetComplexValue';
 import { isResultSetContentValue } from './isResultSetContentValue';
 import { isResultSetFileValue } from './isResultSetFileValue';
@@ -103,18 +102,28 @@ export class ResultSetFormatAction
     return false;
   }
 
+  isText(key: IResultSetPartialKey): boolean {
+    if (!key?.column) {
+      return false;
+    }
+
+    const column = this.view.getColumn(key.column);
+
+    return column?.dataKind?.toLocaleLowerCase() === 'string';
+  }
+
   getHeaders(): string[] {
     return this.view.columns.map(column => column.name!).filter(name => name !== undefined);
   }
 
-  getLongestCells(offset = 0, count?: number): string[] {
+  getLongestCells(column?: IResultSetColumnKey, offset = 0, count?: number): string[] {
     const cells: string[] = [];
-    const columnsCount = this.view.columnKeys.length;
+    const columns = column ? [column] : this.view.columnKeys;
     count ??= this.view.rowKeys.length;
 
     for (let rowIndex = offset; rowIndex < offset + count; rowIndex++) {
-      for (let columnIndex = 0; columnIndex < columnsCount; columnIndex++) {
-        const key = { row: this.view.rowKeys[rowIndex], column: this.view.columnKeys[columnIndex] };
+      for (let columnIndex = 0; columnIndex < columns.length; columnIndex++) {
+        const key = { row: this.view.rowKeys[rowIndex], column: columns[columnIndex] };
         const displayString = this.getDisplayString(key);
         const current = cells[columnIndex] ?? '';
 

@@ -51,6 +51,19 @@
       }
     },
     {
+      "label": "Run Backend CE",
+      "type": "shell",
+      "windows": {
+        "command": "./run-server.bat"
+      },
+      "osx": {
+        "command": "./run-server.sh"
+      },
+      "options": {
+        "cwd": "${workspaceFolder}/deploy/cloudbeaver"
+      }
+    },
+    {
       "label": "Yarn Install",
       "type": "shell",
       "command": "yarn install; yarn lerna bootstrap",
@@ -59,6 +72,14 @@
         "reveal": "silent",
         "close": true,
         "clear": false
+      }
+    },
+    {
+      "label": "Update TS references CE",
+      "type": "shell",
+      "command": "yarn lerna run update-ts-references --stream",
+      "options": {
+        "cwd": "${workspaceFolder}/webapp"
       }
     }
   ],

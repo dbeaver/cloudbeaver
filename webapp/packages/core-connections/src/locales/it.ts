@@ -1,4 +1,5 @@
 export default [
+  ['core_connections_connections_settings_group', 'Connections'],
   ['connections_administration_item', 'Connection Templates'],
   ['connections_administration_connection_create', 'Add Database Template'],
   ['connections_administration_search_database_tip', "Digita gli hosts qui, p.e. 'localhost host1.myhost.com 192.168.0.1' e premi Invio"],
@@ -35,7 +36,7 @@ export default [
   ['connections_connection_edit_search_hosts', 'Host names'],
   ['connections_connection_address', 'Indirizzo'],
   ['connections_connection_folder', 'Folder'],
-  ['connections_connection_folder_validation', 'Folder\'s name may contain the following symbols "_-$.()@" and can\'t start with a dot'],
+  ['connections_connection_folder_validation', "Folder's name may not contain the following symbols / : \" \\ and can't start with a dot"],
   ['connections_connection_name', 'Nome della connessione'],
   ['connections_connection_access_revoke', 'Revoca'],
   ['connections_connection_access_grant', 'Permetti'],
@@ -53,6 +54,8 @@ export default [
   ['connections_connection_test_fail', 'Prova di connessione fallita'],
   ['connections_connection_create_fail', 'Errore di creazione connessione'],
   ['connections_connection_save_fail', 'Errore di salvataggio connessione'],
+  ['connections_connection_keep_alive', 'Keep alive (in seconds)'],
+  ['connections_connection_keep_alive_tooltip', 'No auto disconnect'],
   ['connections_network_handler_test', 'Prova il Tunnel'],
   ['connections_network_handler_test_fail', 'Prova del Tunnel fallita'],
   ['connections_network_handler_test_success', 'Prova del Tunnel terminata con successo'],

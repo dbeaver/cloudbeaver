@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2023 DBeaver Corp and others
+ * Copyright (C) 2010-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,9 +33,7 @@ import org.jkiss.dbeaver.model.DBPDataSource;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
 import org.jkiss.dbeaver.model.DBUtils;
 import org.jkiss.dbeaver.model.data.DBDAttributeBinding;
-import org.jkiss.dbeaver.model.exec.DBCException;
-import org.jkiss.dbeaver.model.exec.DBCLogicalOperator;
-import org.jkiss.dbeaver.model.exec.DBExecUtils;
+import org.jkiss.dbeaver.model.exec.*;
 import org.jkiss.dbeaver.model.impl.sql.BasicSQLDialect;
 import org.jkiss.dbeaver.model.navigator.DBNNode;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
@@ -50,6 +48,7 @@ import org.jkiss.dbeaver.model.sql.parser.SQLScriptParser;
 import org.jkiss.dbeaver.model.sql.registry.SQLGeneratorConfigurationRegistry;
 import org.jkiss.dbeaver.model.sql.registry.SQLGeneratorDescriptor;
 import org.jkiss.dbeaver.model.struct.DBSDataContainer;
+import org.jkiss.dbeaver.model.struct.DBSEntity;
 import org.jkiss.dbeaver.model.struct.DBSObject;
 import org.jkiss.dbeaver.model.struct.DBSWrapper;
 import org.jkiss.dbeaver.utils.RuntimeUtils;
@@ -319,31 +318,62 @@ public class WebServiceSQL implements DBWServiceSQL {
         }
     }
 
+    @FunctionalInterface
+    private interface ThrowableFunction<T, R> {
+        R apply(T obj) throws Exception;
+    }
+
     @Override
     public String readLobValue(
             @NotNull WebSQLContextInfo contextInfo,
             @NotNull String resultsId,
             @NotNull Integer lobColumnIndex,
-            @Nullable List<WebSQLResultsRow> row) throws DBWebException
+            @NotNull WebSQLResultsRow row) throws DBWebException
     {
+        ThrowableFunction<DBRProgressMonitor, String> function = monitor -> contextInfo.getProcessor().readLobValue(
+            monitor, contextInfo, resultsId, lobColumnIndex, row);
+        return readValue(function, contextInfo.getProcessor());
+    }
+
+    @NotNull
+    @Override
+    public String getCellValue(
+        @NotNull WebSQLContextInfo contextInfo,
+        @NotNull String resultsId,
+        @NotNull Integer lobColumnIndex,
+        @NotNull WebSQLResultsRow row
+    ) throws DBWebException {
+        if (row == null) {
+            throw new DBWebException("Results row is not found");
+        }
+        WebSQLProcessor processor = contextInfo.getProcessor();
+        ThrowableFunction<DBRProgressMonitor, String> function = monitor -> processor.readStringValue(
+            monitor, contextInfo, resultsId, lobColumnIndex, row);
+        return readValue(function, processor);
+    }
+
+    @NotNull
+    private String readValue(
+        @NotNull ThrowableFunction<DBRProgressMonitor, String> function,
+        @NotNull WebSQLProcessor processor
+    ) throws DBWebException {
         try {
             var result = new StringBuilder();
 
             DBExecUtils.tryExecuteRecover(
-                    contextInfo.getProcessor().getWebSession().getProgressMonitor(),
-                    contextInfo.getProcessor().getConnection().getDataSource(),
-                    monitor -> {
-                        try {
-                            result.append(contextInfo.getProcessor().readLobValue(
-                            monitor, contextInfo, resultsId, lobColumnIndex, row.get(0)));
-                        } catch (Exception e) {
-                            throw new InvocationTargetException(e);
-                        }
+                processor.getWebSession().getProgressMonitor(),
+                processor.getConnection().getDataSource(),
+                monitor -> {
+                    try {
+                        result.append(function.apply(monitor));
+                    } catch (Exception e) {
+                        throw new InvocationTargetException(e);
                     }
+                }
             );
             return result.toString();
         } catch (DBException e) {
-            throw new DBWebException("Error reading LOB value ", e);
+            throw new DBWebException("Error reading value ", e);
         }
     }
 

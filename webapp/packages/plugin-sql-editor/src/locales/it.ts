@@ -1,4 +1,7 @@
 export default [
+  ['plugin_sql_editor_sql_editor_settings_group', 'SQL Editor'],
+  ['sql_editor_settings_insert_table_aliases_name', 'Insert table aliases (in FROM clause)'],
+  ['sql_editor_settings_insert_table_aliases_desc', 'Automatically inserts table aliases'],
   ['sql_editor_menu', 'SQL Editor'],
   ['sql_editor_script_editor', 'SQL Editor'],
   ['sql_editor_alias_loading_error', 'Error occurred while loading node alias'],
@@ -26,4 +29,6 @@ export default [
   ['sql_execution_plan_properties_panel_general', 'Generale'],
   ['sql_execution_plan_properties_panel_details', 'Dettagli'],
   ['sql_editor_close_result_tabs_dialog_title', 'Confirm closing tabs'],
+  ['plugin_sql_editor_action_overlay_title', 'Action required'],
+  ['plugin_sql_editor_action_overlay_description', 'Please reopen editor to continue working.'],
 ];

@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2023 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -12,6 +12,7 @@ import { coreAppManifest } from '@cloudbeaver/core-app';
 import { coreAuthenticationManifest } from '@cloudbeaver/core-authentication';
 import { mockAuthentication } from '@cloudbeaver/core-authentication/dist/__custom_mocks__/mockAuthentication';
 import { coreBrowserManifest } from '@cloudbeaver/core-browser';
+import { coreClientActivityManifest } from '@cloudbeaver/core-client-activity';
 import { coreConnectionsManifest } from '@cloudbeaver/core-connections';
 import { coreDialogsManifest } from '@cloudbeaver/core-dialogs';
 import { coreEventsManifest } from '@cloudbeaver/core-events';
@@ -68,37 +69,53 @@ const app = createApp(
   navigationTabsPlugin,
   objectViewerManifest,
   dataViewerManifest,
+  coreClientActivityManifest,
 );
 
 const server = mockGraphQL(...mockAppInit(endpoint), ...mockAuthentication(endpoint));
 
 beforeAll(() => app.init());
 
-const testValue = 1;
+const testValueNew = 1;
+const testValueDeprecated = 2;
 
-const equalConfig = {
+const deprecatedSettings = {
   core: {
     app: {
       sqlEditor: {
-        maxFileSize: testValue,
+        maxFileSize: testValueDeprecated,
       } as SqlEditorSettings,
     },
   },
+};
+
+const newSettings = {
+  ...deprecatedSettings,
   plugin: {
     'sql-editor': {
-      maxFileSize: testValue,
+      maxFileSize: testValueNew,
     } as SqlEditorSettings,
   },
 };
 
-test('New settings equal deprecated settings', async () => {
+test('New settings override deprecated settings', async () => {
   const settings = app.injector.getServiceByClass(SqlEditorSettingsService);
   const config = app.injector.getServiceByClass(ServerConfigResource);
 
-  server.use(endpoint.query('serverConfig', mockServerConfig(equalConfig)));
+  server.use(endpoint.query('serverConfig', mockServerConfig(newSettings)));
 
   await config.refresh();
 
-  expect(settings.settings.getValue('maxFileSize')).toBe(testValue);
-  expect(settings.deprecatedSettings.getValue('maxFileSize')).toBe(testValue);
+  expect(settings.settings.getValue('maxFileSize')).toBe(testValueNew);
+});
+
+test('Deprecated settings are used if new settings are not defined', async () => {
+  const settings = app.injector.getServiceByClass(SqlEditorSettingsService);
+  const config = app.injector.getServiceByClass(ServerConfigResource);
+
+  server.use(endpoint.query('serverConfig', mockServerConfig(deprecatedSettings)));
+
+  await config.refresh();
+
+  expect(settings.settings.getValue('maxFileSize')).toBe(testValueDeprecated);
 });
