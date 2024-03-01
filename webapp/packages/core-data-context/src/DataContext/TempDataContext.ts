@@ -5,7 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { action, makeObservable, observable } from 'mobx';
+import { action, createAtom, IAtom, makeObservable, observable } from 'mobx';
 
 import { MetadataMap } from '@cloudbeaver/core-utils';
 
@@ -20,12 +20,14 @@ export class TempDataContext implements IDataContext {
   target: IDataContext;
   fallback?: IDataContextProvider;
   private flushTimeout: any;
+  atom: IAtom;
 
   constructor(fallback?: IDataContextProvider) {
     this.map = new Map();
     this.versions = new MetadataMap(() => 0);
     this.target = new DataContext(fallback);
     this.fallback = fallback;
+    this.atom = createAtom('TempDataContextAtom');
 
     makeObservable<this>(this, {
       target: observable.ref,
@@ -42,6 +44,7 @@ export class TempDataContext implements IDataContext {
   }
 
   hasOwn(context: DataContextGetter<any>): boolean {
+    this.atom.reportObserved();
     const isTargetHasOwn = this.target.hasOwn(context);
     return this.map.has(context) || isTargetHasOwn;
   }
