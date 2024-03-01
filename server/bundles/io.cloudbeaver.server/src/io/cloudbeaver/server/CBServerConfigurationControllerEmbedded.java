@@ -115,7 +115,33 @@ public class CBServerConfigurationControllerEmbedded extends CBServerConfigurati
             }
             serverConfigProperties.put(CBConstants.PARAM_DB_CONFIGURATION, databaseConfigProperties);
         }
+        savePasswordPolicyConfig(originServerConfig, serverConfigProperties);
         return serverConfigProperties;
+    }
+
+
+    private void savePasswordPolicyConfig(Map<String, Object> originServerConfig, Map<String, Object> serverConfigProperties) {
+        // save password policy configuration
+        var passwordPolicyProperties = new LinkedHashMap<String, Object>();
+
+        var oldRuntimePasswordPolicyConfig = JSONUtils.getObject(
+            JSONUtils.getObject(originServerConfig, CBConstants.PARAM_SM_CONFIGURATION),
+            CBConstants.PARAM_PASSWORD_POLICY_CONFIGURATION
+        );
+        Gson gson = getGson();
+        Map<String, Object> passwordPolicyConfig = gson.fromJson(
+            gson.toJsonTree(securityManagerConfiguration.getPasswordPolicyConfiguration()),
+            JSONUtils.MAP_TYPE_TOKEN
+        );
+        if (!CommonUtils.isEmpty(passwordPolicyConfig)) {
+            for (Map.Entry<String, Object> mp : passwordPolicyConfig.entrySet()) {
+                copyConfigValue(oldRuntimePasswordPolicyConfig, passwordPolicyProperties, mp.getKey(), mp.getValue());
+            }
+            serverConfigProperties.put(
+                CBConstants.PARAM_SM_CONFIGURATION,
+                Map.of(CBConstants.PARAM_PASSWORD_POLICY_CONFIGURATION, passwordPolicyProperties)
+            );
+        }
     }
 
     @Override

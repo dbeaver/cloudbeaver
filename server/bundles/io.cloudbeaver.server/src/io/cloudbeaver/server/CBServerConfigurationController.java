@@ -21,6 +21,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.InstanceCreator;
 import io.cloudbeaver.model.app.BaseServerConfigurationController;
 import io.cloudbeaver.model.app.BaseWebApplication;
+import io.cloudbeaver.service.security.PasswordPolicyConfiguration;
 import io.cloudbeaver.service.security.SMControllerConfiguration;
 import io.cloudbeaver.utils.WebAppUtils;
 import org.jkiss.code.NotNull;
@@ -198,6 +199,9 @@ public abstract class CBServerConfigurationController extends BaseServerConfigur
             log.debug("Load product runtime configuration from '" + rtConfig.getAbsolutePath() + "'");
             try (Reader reader = new InputStreamReader(new FileInputStream(rtConfig), StandardCharsets.UTF_8)) {
                 productConfiguration.putAll(JSONUtils.parseMap(gson, reader));
+                Map<String, Object> flattenConfig = WebAppUtils.flattenMap(this.productConfiguration);
+                this.productConfiguration.clear();
+                this.productConfiguration.putAll(flattenConfig);
             } catch (Exception e) {
                 throw new DBException("Error reading product runtime configuration", e);
             }
@@ -246,11 +250,14 @@ public abstract class CBServerConfigurationController extends BaseServerConfigur
         InstanceCreator<CBAppConfig> appConfigCreator = type -> appConfiguration;
         InstanceCreator<DataSourceNavigatorSettings> navSettingsCreator = type -> (DataSourceNavigatorSettings) appConfiguration.getDefaultNavigatorSettings();
         InstanceCreator<SMControllerConfiguration> smConfigCreator = type -> securityManagerConfiguration;
+        InstanceCreator<PasswordPolicyConfiguration> smPasswordPoliceConfigCreator =
+            type -> securityManagerConfiguration.getPasswordPolicyConfiguration();
         return new GsonBuilder()
             .setLenient()
             .registerTypeAdapter(CBAppConfig.class, appConfigCreator)
             .registerTypeAdapter(DataSourceNavigatorSettings.class, navSettingsCreator)
-            .registerTypeAdapter(SMControllerConfiguration.class, smConfigCreator);
+            .registerTypeAdapter(SMControllerConfiguration.class, smConfigCreator)
+            .registerTypeAdapter(PasswordPolicyConfiguration.class, smPasswordPoliceConfigCreator);
     }
 
     protected void saveRuntimeConfig(SMCredentialsProvider credentialsProvider) throws DBException {
@@ -277,11 +284,10 @@ public abstract class CBServerConfigurationController extends BaseServerConfigur
             newServerURL,
             sessionExpireTime,
             appConfig);
-        writeRuntimeConfig(configurationProperties);
+        writeRuntimeConfig(getRuntimeAppConfigPath(), configurationProperties);
     }
 
-    private void writeRuntimeConfig(Map<String, Object> configurationProperties) throws DBException {
-        Path runtimeConfigPath = getRuntimeAppConfigPath();
+    private void writeRuntimeConfig(Path runtimeConfigPath, Map<String, Object> configurationProperties) throws DBException {
         if (Files.exists(runtimeConfigPath)) {
             ContentUtils.makeFileBackup(runtimeConfigPath);
         }
@@ -503,6 +509,13 @@ public abstract class CBServerConfigurationController extends BaseServerConfigur
             }
         }
         return dataDir.toPath();
+    }
+
+    public void saveProductConfiguration(Map<String, Object> productConfiguration) throws DBException {
+        Map<String, Object> mergedConfig = WebAppUtils.mergeConfigurations(this.productConfiguration, productConfiguration);
+        writeRuntimeConfig(getRuntimeProductConfigFilePath(), mergedConfig);
+        this.productConfiguration.clear();
+        this.productConfiguration.putAll(WebAppUtils.flattenMap(mergedConfig));
     }
 
     public CBServerConfig getServerConfiguration() {

@@ -183,4 +183,8 @@ public class CBServerConfig implements WebServerConfiguration {
         return maxSessionIdleTime;
     }
 
+    public boolean isEnableSecurityManager() {
+        return enableSecurityManager;
+    }
+
 }
