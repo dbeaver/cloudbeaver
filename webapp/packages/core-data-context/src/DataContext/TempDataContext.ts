@@ -42,7 +42,8 @@ export class TempDataContext implements IDataContext {
   }
 
   hasOwn(context: DataContextGetter<any>): boolean {
-    return this.map.has(context) || this.target.hasOwn(context);
+    const isTargetHasOwn = this.target.hasOwn(context);
+    return this.map.has(context) || isTargetHasOwn;
   }
 
   has(context: DataContextGetter<any>, nested = true): boolean {
