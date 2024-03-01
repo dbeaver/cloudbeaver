@@ -24,7 +24,6 @@ export class DynamicDataContext implements IDataContext {
     this.contexts = new Map();
 
     makeObservable(this, {
-      contexts: observable.shallow,
       fallback: observable.ref,
       set: action,
       clear: action,
