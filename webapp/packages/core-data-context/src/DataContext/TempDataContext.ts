@@ -28,7 +28,6 @@ export class TempDataContext implements IDataContext {
     this.fallback = fallback;
 
     makeObservable<this>(this, {
-      map: observable.shallow,
       target: observable.ref,
       set: action,
       delete: action,
