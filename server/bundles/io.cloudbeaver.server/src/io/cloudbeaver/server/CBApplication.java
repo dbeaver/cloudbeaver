@@ -373,11 +373,6 @@ public abstract class CBApplication extends BaseWebApplication implements WebAut
             });
             System.setSecurityManager(new SecurityManager());
         }
-        try {
-            addAllUsersToDefaultTeam();
-        } catch (DBException e) {
-            log.error("Failed insert default teams");
-        }
 
         eventController.scheduleCheckJob();
 
@@ -386,12 +381,6 @@ public abstract class CBApplication extends BaseWebApplication implements WebAut
         log.debug("Shutdown");
 
         return;
-    }
-
-    private void addAllUsersToDefaultTeam() throws DBException {
-        if (securityController instanceof CBEmbeddedSecurityController<?> controller) {
-            controller.addAllUsersToDefaultTeam();
-        }
     }
 
     protected void initializeAdditionalConfiguration() {
