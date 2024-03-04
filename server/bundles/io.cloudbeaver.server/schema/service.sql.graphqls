@@ -44,6 +44,7 @@ type SQLContextInfo {
     id: ID!
     projectId: ID!
     connectionId: ID!
+    autoCommit: Boolean
     defaultCatalog: String
     defaultSchema: String
 
@@ -400,5 +401,27 @@ extend type Mutation {
     ): AsyncTaskInfo!
 
     asyncSqlRowDataCountResult(taskId: ID!): Int!
+
+    @since(version: "24.0.1")
+    asyncSqlSetAutoCommit(
+        projectId: ID,
+        connectionId: ID!,
+        contextId: ID!,
+        autoCommit: Boolean!
+    ): AsyncTaskInfo!
+
+    @since(version: "24.0.1")
+    asyncSqlCommitTransaction(
+        projectId: ID,
+        connectionId: ID!,
+        contextId: ID!
+    ): AsyncTaskInfo!
+
+    @since(version: "24.0.1")
+    asyncSqlRollbackTransaction(
+        projectId: ID,
+        connectionId: ID!,
+        contextId: ID!
+    ): AsyncTaskInfo!
 
 }
