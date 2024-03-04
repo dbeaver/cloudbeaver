@@ -11,7 +11,6 @@ import { AdministrationItemService } from './AdministrationItem/AdministrationIt
 import { AdministrationLocaleService } from './AdministrationLocaleService';
 import { AdministrationScreenService } from './AdministrationScreen/AdministrationScreenService';
 import { ConfigurationWizardService } from './AdministrationScreen/ConfigurationWizard/ConfigurationWizardService';
-import { AdministrationSettingsService } from './AdministrationSettingsService';
 import { PermissionsResource } from './PermissionsResource';
 
 export const coreAdministrationManifest: PluginManifest = {
@@ -19,12 +18,5 @@ export const coreAdministrationManifest: PluginManifest = {
     name: 'Core Administration',
   },
 
-  providers: [
-    AdministrationItemService,
-    PermissionsResource,
-    AdministrationScreenService,
-    ConfigurationWizardService,
-    AdministrationLocaleService,
-    AdministrationSettingsService,
-  ],
+  providers: [AdministrationItemService, PermissionsResource, AdministrationScreenService, ConfigurationWizardService, AdministrationLocaleService],
 };
