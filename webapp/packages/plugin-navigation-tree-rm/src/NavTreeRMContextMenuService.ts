@@ -103,7 +103,7 @@ export class NavTreeRMContextMenuService extends Bootstrap {
               actions.rename(save);
             } else {
               const result = await this.commonDialogService.open(RenameDialog, {
-                value: key.name ?? '',
+                name: key.name ?? '',
                 subTitle: key.name,
                 objectName: node.nodeType || 'Object',
                 icon: node.icon,
