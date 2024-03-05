@@ -8,14 +8,13 @@
 import { observable, runInAction } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import { useCallback } from 'react';
-import styled, { css } from 'reshadow';
 
-import { Button, Loader, TextPlaceholder, useObservableRef, useResource, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
+import { Button, Loader, SContext, StyleRegistry, TextPlaceholder, useObservableRef, useResource, useTranslate } from '@cloudbeaver/core-blocks';
 import { ConnectionInfoResource, ConnectionsManagerService } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { NavNodeInfoResource } from '@cloudbeaver/core-navigation-tree';
-import { BASE_TAB_STYLES, TabPanel, TabsBox, useTabLocalState } from '@cloudbeaver/core-ui';
+import { baseTabStyles, TabPanel, TabsBox, tabsBoxStyles, useTabLocalState } from '@cloudbeaver/core-ui';
 import { MetadataMap } from '@cloudbeaver/core-utils';
 import type { TabHandlerPanelComponent } from '@cloudbeaver/plugin-navigation-tabs';
 
@@ -23,22 +22,27 @@ import type { IObjectViewerTabState } from './IObjectViewerTabState';
 import { DBObjectPagePanel } from './ObjectPage/DBObjectPagePanel';
 import { DBObjectPageService } from './ObjectPage/DBObjectPageService';
 import { DBObjectPageTab } from './ObjectPage/DBObjectPageTab';
+import styles from './ObjectViewerPanel.m.css';
 
-const styles = css`
-  Tab {
-    composes: theme-ripple theme-background-surface theme-text-text-primary-on-light from global;
-  }
-  tabs {
-    composes: theme-background-background theme-text-text-primary-on-light from global;
-  }
-  tab-outer:only-child {
-    display: none;
-  }
-`;
+const objectViewerPanelRegistry: StyleRegistry = [
+  [
+    tabsBoxStyles,
+    {
+      mode: 'append',
+      styles: [baseTabStyles],
+    },
+  ],
+  [
+    baseTabStyles,
+    {
+      mode: 'append',
+      styles: [styles],
+    },
+  ],
+];
 
 export const ObjectViewerPanel: TabHandlerPanelComponent<IObjectViewerTabState> = observer(function ObjectViewerPanel({ tab }) {
   const translate = useTranslate();
-  const style = useStyles(BASE_TAB_STYLES, styles);
   const dbObjectPagesService = useService(DBObjectPageService);
   const connectionsManagerService = useService(ConnectionsManagerService);
   const navNodeInfoResource = useService(NavNodeInfoResource);
@@ -108,8 +112,8 @@ export const ObjectViewerPanel: TabHandlerPanelComponent<IObjectViewerTabState> 
     return <TextPlaceholder>{translate('plugin_object_viewer_error')}</TextPlaceholder>;
   }
 
-  return styled(style)(
-    <>
+  return (
+    <SContext registry={objectViewerPanelRegistry}>
       {node.data ? (
         <TabsBox
           currentTabId={tab.handlerState.pageId}
@@ -117,7 +121,6 @@ export const ObjectViewerPanel: TabHandlerPanelComponent<IObjectViewerTabState> 
             <DBObjectPageTab key={page.key} tab={tab} page={page} style={styles} onSelect={dbObjectPagesService.selectPage} />
           ))}
           localState={innerTabState}
-          style={styles}
         >
           {pages.map(page => (
             <TabPanel key={page.key} tabId={page.key} lazy>
@@ -128,6 +131,6 @@ export const ObjectViewerPanel: TabHandlerPanelComponent<IObjectViewerTabState> 
       ) : (
         <TextPlaceholder>{translate('plugin_object_viewer_table_no_items')}</TextPlaceholder>
       )}
-    </>,
+    </SContext>
   );
 });

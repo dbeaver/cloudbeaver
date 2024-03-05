@@ -1,0 +1,19 @@
+.baseTab {
+  composes: theme-ripple theme-background-background theme-text-text-primary-on-light from global;
+  height: 38px !important;
+}
+
+.tabs {
+  composes: theme-background-secondary theme-text-on-secondary from global;
+}
+
+.tabsBox {
+  // TODO check it. was bug here. background was white instead of gray
+  composes: theme-background-secondary theme-text-on-secondary from global;
+}
+
+.captureView {
+  flex: 1;
+  display: flex;
+  overflow: auto;
+}

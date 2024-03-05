@@ -1,0 +1,11 @@
+.baseTab {
+  composes: theme-ripple theme-background-surface theme-text-text-primary-on-light from global;
+}
+
+.tabs {
+  composes: theme-background-background theme-text-text-primary-on-light from global;
+}
+
+.tabOuter:only-child {
+  display: none;
+}

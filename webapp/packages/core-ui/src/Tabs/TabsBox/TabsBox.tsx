@@ -6,41 +6,23 @@
  * you may not use this file except in compliance with the License.
  */
 import { forwardRef, PropsWithChildren, ReactNode } from 'react';
-import styled, { css } from 'reshadow';
 
-import { useStyles } from '@cloudbeaver/core-blocks';
-import type { ComponentStyle } from '@cloudbeaver/core-theming';
+import { s, SContext, StyleRegistry, useS } from '@cloudbeaver/core-blocks';
 import type { MetadataMap } from '@cloudbeaver/core-utils';
 
+import { tabPanelStyles, tabsBoxStyles } from '../..';
 import type { ITabData } from '../TabsContainer/ITabsContainer';
 import { TabsState } from '../TabsState';
 
-const styles = css`
-  tabs-box {
-    display: flex;
-    flex-direction: column;
-    flex: 1;
-    overflow: hidden;
-  }
-  tabs {
-    display: flex;
-    flex-direction: row;
-    flex: 0 0 auto;
-    overflow: auto;
-  }
-  tab-panels {
-    flex: 1;
-    display: flex;
-    overflow: hidden;
-  }
-  tab-panel {
-    flex: 1;
-    display: flex;
-    overflow: hidden;
-    outline: none;
-    position: relative;
-  }
-`;
+const tabsBoxRegistry: StyleRegistry = [
+  [
+    tabPanelStyles,
+    {
+      mode: 'append',
+      styles: [tabsBoxStyles],
+    },
+  ],
+];
 
 type TabsBoxProps = PropsWithChildren<{
   currentTabId: string | null;
@@ -52,17 +34,15 @@ type TabsBoxProps = PropsWithChildren<{
   autoSelect?: boolean;
   className?: string;
   onChange?: (tab: ITabData<any>) => void;
-  style?: ComponentStyle;
 }>;
 
 export const TabsBox = forwardRef<HTMLDivElement, TabsBoxProps>(function TabsBox(
-  { currentTabId, tabs, tabIndex, localState, tabList, enabledBaseActions, autoSelect, children, className, onChange, style },
+  { currentTabId, tabs, tabIndex, localState, tabList, enabledBaseActions, autoSelect, children, className, onChange },
   ref,
 ) {
-  return styled(
-    styles,
-    useStyles(style),
-  )(
+  const moduleStyles = useS(tabsBoxStyles);
+
+  return (
     <TabsState
       currentTabId={currentTabId}
       localState={localState}
@@ -71,10 +51,12 @@ export const TabsBox = forwardRef<HTMLDivElement, TabsBoxProps>(function TabsBox
       enabledBaseActions={enabledBaseActions}
       onChange={onChange}
     >
-      <tabs-box ref={ref} as="div" className={className} tabIndex={tabIndex}>
-        {tabs && <tabs>{tabs}</tabs>}
-        <tab-panels>{children}</tab-panels>
-      </tabs-box>
-    </TabsState>,
+      <SContext registry={tabsBoxRegistry}>
+        <div ref={ref} className={s(moduleStyles, { tabsBox: true }, className)} tabIndex={tabIndex}>
+          {tabs && <div className={s(moduleStyles, { tabs: true })}>{tabs}</div>}
+          <div className={s(moduleStyles, { tabPanels: true })}>{children}</div>
+        </div>
+      </SContext>
+    </TabsState>
   );
 });

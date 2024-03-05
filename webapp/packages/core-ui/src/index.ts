@@ -48,6 +48,8 @@ export * from './Tabs/useTabLocalState';
 export { default as baseTabStyles } from './Tabs/Tab/baseTab.m.css';
 export { default as baseTabActionStyles } from './Tabs/Tab/baseTabAction.m.css';
 export { default as verticalRotatedTabStyles } from './Tabs/Tab/verticalRotatedTab.m.css';
+export { default as tabsBoxStyles } from './Tabs/TabsBox/TabsBox.m.css';
+export { default as tabPanelStyles } from './Tabs/TabPanel.m.css';
 
 export * from './Tabs/Tab/BASE_TAB_STYLES';
 export * from './Tabs/Tab/BorderTabStyles';
@@ -67,7 +69,6 @@ export * from './Tabs/Tab/verticalTabStyles';
 export * from './Tabs/TabsBootstrap';
 
 export * from './Tabs/TabsBox/TabsBox';
-export * from './Tabs/TabsBox/TabsBoxFromArray';
 
 export * from './SideBarPanel/LeftBarPanelService';
 export * from './SideBarPanel/SideBarPanel';

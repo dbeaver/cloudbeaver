@@ -1,0 +1,27 @@
+.tabsBox {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  overflow: hidden;
+}
+
+.tabs {
+  display: flex;
+  flex-direction: row;
+  flex: 0 0 auto;
+  overflow: auto;
+}
+
+.tabPanels {
+  flex: 1;
+  display: flex;
+  overflow: hidden;
+}
+
+.tabPanel {
+  flex: 1;
+  display: flex;
+  overflow: hidden;
+  outline: none;
+  position: relative;
+}
