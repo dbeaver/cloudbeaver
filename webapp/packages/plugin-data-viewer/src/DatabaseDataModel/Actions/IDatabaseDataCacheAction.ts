@@ -13,4 +13,5 @@ export interface IDatabaseDataCacheAction<TKey, TResult extends IDatabaseDataRes
   get<T>(key: TKey, scope: symbol): T | undefined;
   set<T>(key: TKey, scope: symbol, value: T): void;
   delete(key: TKey, scope: symbol): void;
+  deleteAll(scope: symbol): void;
 }

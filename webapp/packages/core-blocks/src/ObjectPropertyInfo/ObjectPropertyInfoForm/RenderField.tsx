@@ -8,7 +8,7 @@
 import { observer } from 'mobx-react-lite';
 
 import type { ObjectPropertyInfo } from '@cloudbeaver/core-sdk';
-import { removeMetadataFromBase64 } from '@cloudbeaver/core-utils';
+import { removeMetadataFromDataURL } from '@cloudbeaver/core-utils';
 
 import { FieldCheckbox } from '../../FormControls/Checkboxes/FieldCheckbox';
 import { Combobox } from '../../FormControls/Combobox';
@@ -187,7 +187,7 @@ export const RenderField = observer<RenderFieldProps>(function RenderField({
         disabled={disabled}
         fileName={passwordSavedMessage}
         className={className}
-        mapValue={removeMetadataFromBase64}
+        mapValue={removeMetadataFromDataURL}
       >
         {property.displayName}
       </InputFileTextContent>
