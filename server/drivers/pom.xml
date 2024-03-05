@@ -11,12 +11,12 @@
     </properties>
 
     <modules>
-        <module>clickhouse</module>
         <module>clickhouse_com</module>
         <module>db2</module>
         <module>db2-jt400</module>
-        <module>derby</module>
+        <module>duckdb</module>
         <module>h2</module>
+        <module>h2_v2</module>
         <module>jaybird</module>
         <module>mysql</module>
         <module>mariadb</module>

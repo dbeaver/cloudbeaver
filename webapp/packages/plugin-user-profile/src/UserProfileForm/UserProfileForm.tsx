@@ -1,27 +1,20 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2022 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observer } from 'mobx-react-lite';
 import { useCallback } from 'react';
-import styled, { css } from 'reshadow';
 
 import { UserInfoResource } from '@cloudbeaver/core-authentication';
-import { Loader, useResource } from '@cloudbeaver/core-blocks';
+import { Loader, s, useResource } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 
 import { UserProfileService } from '../UserProfileService';
 import { UserForm } from './UserForm';
-
-const style = css`
-  Loader {
-    height: 100%;
-  }
-`;
+import style from './UserProfileForm.m.css';
 
 export const UserProfileForm = observer(function UserProfileForm() {
   const userProfileService = useService(UserProfileService);
@@ -36,8 +29,8 @@ export const UserProfileForm = observer(function UserProfileForm() {
     return null;
   }
 
-  return styled(style)(
-    <Loader state={userInfo}>
+  return (
+    <Loader className={s(style, { loader: true })} state={userInfo}>
       {() => userInfo.data && <UserForm user={userInfo.data} state={userProfileService.formState!} onClose={close} />}
     </Loader>
   );

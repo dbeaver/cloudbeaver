@@ -9,18 +9,34 @@
                 icon="platform:/plugin/org.jkiss.dbeaver.model/icons/tree/key.png">
             <credentials>
                 <propertyGroup label="General">
-                    <property id="user" label="User name" type="string" description="User name" admin="true" user="true" identifying="true"/>
-                    <property id="password" label="User password" type="string" description="User password" encryption="hash" admin="true" user="true"/>
+                    <property id="user" label="User name" type="string" description="User name" admin="true" user="true" identifying="true" required="true"/>
+                    <property id="password" label="User password" type="string" description="User password" encryption="hash" admin="true" user="true" required="true"/>
                 </propertyGroup>
             </credentials>
 
         </authProvider>
-        <authProvider id="reverseProxy" label="Reverse proxy" description="Reverse proxy header based authentication" trusted="true" class="io.cloudbeaver.auth.provider.rp.RPAuthProvider">
+        <authProvider id="reverseProxy" label="Reverse proxy"
+                      description="Reverse proxy header based authentication"
+                      trusted="true"
+                      configurable="true"
+                      class="io.cloudbeaver.auth.provider.rp.RPAuthProvider"
+                      icon="platform:/plugin/org.jkiss.dbeaver.model/icons/tree/key.png">
             <credentials>
                 <propertyGroup label="General">
                     <property id="user" label="User name" type="string" description="User name" admin="true" user="true" identifying="true"/>
                 </propertyGroup>
             </credentials>
+            <configuration>
+                <propertyGroup label="Configuration">
+                    <property id="logout-url" label="Logout url" type="string" description="Logout url"/>
+                    <property id="user-header" label="Username header" type="string" description="Username header"/>
+                    <property id="team-header" label="Team header" type="string" description="Team header"/>
+                    <property id="team-delimiter" label="Team delimiter symbol" type="string" description="Team delimiter symbol, default: |"/>
+                    <property id="first-name-header" label="First name header" type="string" description="First name header name"/>
+                    <property id="last-name-header" label="Last name header" type="string" description="Last name header name"/>
+                    <property id="role-header" label="Role header" type="string" description="Role header name" requiredFeatures="distributed"/>
+                </propertyGroup>
+            </configuration>
         </authProvider>
     </extension>
 </plugin>

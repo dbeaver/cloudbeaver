@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2022 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -14,6 +14,7 @@ export interface IProcessNotificationState {
   init: (title: string, message?: string) => void;
   resolve: (title: string, message?: string) => void;
   reject: (error: Error, title?: string, message?: string) => void;
+  setMessage: (message: string | null) => void;
 }
 
 export enum ENotificationType {
@@ -21,7 +22,7 @@ export enum ENotificationType {
   Error = 'Error',
   Success = 'Success',
   Loading = 'Loading',
-  Custom = ' Custom'
+  Custom = ' Custom',
 }
 
 export interface INotificationExtraProps<T = never> {
@@ -36,15 +37,13 @@ export interface IProcessNotificationContainer<TProps extends INotificationExtra
   notification: INotification<TProps>;
 }
 
-export type NotificationComponentProps<
-  TProps extends INotificationExtraProps<any> = INotificationExtraProps
-> = TProps & {
+export type NotificationComponentProps<TProps extends INotificationExtraProps<any> = INotificationExtraProps> = TProps & {
   notification: INotification<TProps>;
 };
 
-export type NotificationComponent<
-  TProps extends INotificationExtraProps<any> = INotificationExtraProps,
-> = React.FunctionComponent<NotificationComponentProps<TProps>>;
+export type NotificationComponent<TProps extends INotificationExtraProps<any> = INotificationExtraProps> = React.FunctionComponent<
+  NotificationComponentProps<TProps>
+>;
 
 export interface INotification<TProps extends INotificationExtraProps<any> = INotificationExtraProps> {
   readonly id: number;

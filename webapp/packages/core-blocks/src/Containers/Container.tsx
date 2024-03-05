@@ -1,18 +1,39 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2022 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { forwardRef } from 'react';
 
-import { filterContainerFakeProps } from './filterContainerFakeProps';
+import { s } from '../s';
+import { useS } from '../useS';
+import style from './Container.m.css';
+import { filterContainerFakeProps, getContainerProps } from './filterContainerFakeProps';
 import type { IContainerProps } from './IContainerProps';
+import elementsSizeStyle from './shared/ElementsSize.m.css';
 
-export const Container = forwardRef<HTMLDivElement, IContainerProps & React.HTMLAttributes<HTMLDivElement>>(function Container(props, ref) {
-  const divProps = filterContainerFakeProps(props);
+export const Container = forwardRef<HTMLDivElement, IContainerProps & React.HTMLAttributes<HTMLDivElement>>(function Container(
+  { className, ...rest },
+  ref,
+) {
+  const styles = useS(style, elementsSizeStyle);
+  const divProps = filterContainerFakeProps(rest);
+  const containerProps = getContainerProps(rest);
 
-  return <div ref={ref} {...divProps} />;
+  return (
+    <div
+      ref={ref}
+      {...divProps}
+      className={s(
+        styles,
+        {
+          container: true,
+          ...containerProps,
+        },
+        className,
+      )}
+    />
+  );
 });

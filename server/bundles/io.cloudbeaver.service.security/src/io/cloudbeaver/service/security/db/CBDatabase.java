@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2023 DBeaver Corp and others
+ * Copyright (C) 2010-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,6 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import io.cloudbeaver.auth.provider.local.LocalAuthProviderConstants;
 import io.cloudbeaver.model.app.WebApplication;
-import io.cloudbeaver.model.session.WebAuthInfo;
 import io.cloudbeaver.registry.WebAuthProviderDescriptor;
 import io.cloudbeaver.registry.WebAuthProviderRegistry;
 import io.cloudbeaver.utils.WebAppUtils;
@@ -32,7 +31,9 @@ import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBConstants;
+import org.jkiss.dbeaver.model.auth.AuthInfo;
 import org.jkiss.dbeaver.model.connection.DBPDriver;
+import org.jkiss.dbeaver.model.impl.app.ApplicationRegistry;
 import org.jkiss.dbeaver.model.impl.jdbc.JDBCUtils;
 import org.jkiss.dbeaver.model.impl.jdbc.exec.JDBCTransaction;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
@@ -40,10 +41,13 @@ import org.jkiss.dbeaver.model.runtime.LoggingProgressMonitor;
 import org.jkiss.dbeaver.model.security.SMAdminController;
 import org.jkiss.dbeaver.model.security.user.SMTeam;
 import org.jkiss.dbeaver.model.security.user.SMUser;
+import org.jkiss.dbeaver.model.sql.SQLDialect;
+import org.jkiss.dbeaver.model.sql.SQLDialectSchemaController;
 import org.jkiss.dbeaver.model.sql.schema.ClassLoaderScriptSource;
 import org.jkiss.dbeaver.model.sql.schema.SQLSchemaManager;
 import org.jkiss.dbeaver.model.sql.schema.SQLSchemaVersionManager;
 import org.jkiss.dbeaver.registry.DataSourceProviderRegistry;
+import org.jkiss.dbeaver.registry.storage.H2Migrator;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.dbeaver.utils.GeneralUtils;
 import org.jkiss.dbeaver.utils.RuntimeUtils;
@@ -54,9 +58,11 @@ import org.jkiss.utils.SecurityUtils;
 
 import java.io.*;
 import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
 import java.sql.*;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Database management
@@ -68,10 +74,12 @@ public class CBDatabase {
     public static final String SCHEMA_UPDATE_SQL_PATH = "db/cb_schema_update_";
 
     private static final int LEGACY_SCHEMA_VERSION = 1;
-    private static final int CURRENT_SCHEMA_VERSION = 13;
+    private static final int CURRENT_SCHEMA_VERSION = 16;
 
     private static final String DEFAULT_DB_USER_NAME = "cb-data";
     private static final String DEFAULT_DB_PWD_FILE = ".database-credentials.dat";
+    private static final String V1_DB_NAME = "cb.h2.dat";
+    private static final String V2_DB_NAME = "cb.h2v2.dat";
 
     private final WebApplication application;
     private final CBDatabaseConfig databaseConfiguration;
@@ -80,6 +88,7 @@ public class CBDatabase {
 
     private String instanceId;
     private SMAdminController adminSecurityController;
+    private SQLDialect dialect;
 
     public CBDatabase(WebApplication application, CBDatabaseConfig databaseConfiguration) {
         this.application = application;
@@ -110,7 +119,8 @@ public class CBDatabase {
         if (CommonUtils.isEmpty(databaseConfiguration.getDriver())) {
             throw new DBException("No database driver configured for CloudBeaver database");
         }
-        DBPDriver driver = DataSourceProviderRegistry.getInstance().findDriver(databaseConfiguration.getDriver());
+        var dataSourceProviderRegistry = DataSourceProviderRegistry.getInstance();
+        DBPDriver driver = dataSourceProviderRegistry.findDriver(databaseConfiguration.getDriver());
         if (driver == null) {
             throw new DBException("Driver '" + databaseConfiguration.getDriver() + "' not found");
         }
@@ -144,10 +154,7 @@ public class CBDatabase {
             }
         }
 
-        Driver driverInstance = driver.getDriverInstance(monitor);
-
-        SystemVariablesResolver variablesResolver = new SystemVariablesResolver();
-        String dbURL = GeneralUtils.replaceVariables(databaseConfiguration.getUrl(), variablesResolver);
+        String dbURL = GeneralUtils.replaceVariables(databaseConfiguration.getUrl(), SystemVariablesResolver.INSTANCE);
         Properties dbProperties = new Properties();
         if (!CommonUtils.isEmpty(dbUser)) {
             dbProperties.put(DBConstants.DATA_SOURCE_PROPERTY_USER, dbUser);
@@ -156,6 +163,77 @@ public class CBDatabase {
             }
         }
 
+        if (H2Migrator.isH2Database(databaseConfiguration)) {
+            var migrator = new H2Migrator(monitor,
+                dataSourceProviderRegistry,
+                databaseConfiguration,
+                dbURL,
+                dbProperties);
+            migrator.migrateDatabaseIfNeeded(V1_DB_NAME, V2_DB_NAME);
+        }
+
+        // reload the driver and url due to a possible configuration update
+        driver = dataSourceProviderRegistry.findDriver(databaseConfiguration.getDriver());
+        if (driver == null) {
+            throw new DBException("Driver '" + databaseConfiguration.getDriver() + "' not found");
+        }
+        Driver driverInstance = driver.getDriverInstance(monitor);
+        dbURL = GeneralUtils.replaceVariables(databaseConfiguration.getUrl(), SystemVariablesResolver.INSTANCE);
+
+        try {
+            this.cbDataSource = initConnectionPool(driver, dbURL, dbProperties, driverInstance);
+        } catch (SQLException e) {
+            throw new DBException("Error initializing connection pool");
+        }
+        dialect = driver.getScriptDialect().createInstance();
+
+        try (Connection connection = cbDataSource.getConnection()) {
+            DatabaseMetaData metaData = connection.getMetaData();
+            log.debug("\tConnected to " + metaData.getDatabaseProductName() + " " + metaData.getDatabaseProductVersion());
+
+            var schemaName = databaseConfiguration.getSchema();
+            if (dialect instanceof SQLDialectSchemaController && CommonUtils.isNotEmpty(schemaName)) {
+                var dialectSchemaController = (SQLDialectSchemaController) dialect;
+                var schemaExistQuery = dialectSchemaController.getSchemaExistQuery(schemaName);
+                boolean schemaExist = JDBCUtils.executeQuery(connection, schemaExistQuery) != null;
+                if (!schemaExist) {
+                    log.info("Schema " + schemaName + " not exist, create new one");
+                    String createSchemaQuery = dialectSchemaController.getCreateSchemaQuery(
+                        schemaName
+                    );
+                    JDBCUtils.executeStatement(connection, createSchemaQuery);
+                }
+            }
+            SQLSchemaManager schemaManager = new SQLSchemaManager(
+                "CB",
+                new ClassLoaderScriptSource(
+                    CBDatabase.class.getClassLoader(),
+                    SCHEMA_CREATE_SQL_PATH,
+                    SCHEMA_UPDATE_SQL_PATH
+                ),
+                monitor1 -> connection,
+                new CBSchemaVersionManager(),
+                dialect,
+                null,
+                schemaName,
+                CURRENT_SCHEMA_VERSION,
+                0
+            );
+            schemaManager.updateSchema(monitor);
+
+            validateInstancePersistentState(connection);
+        } catch (Exception e) {
+            throw new DBException("Error updating management database schema", e);
+        }
+        log.debug("\tManagement database connection established");
+    }
+
+    protected PoolingDataSource<PoolableConnection> initConnectionPool(
+        DBPDriver driver,
+        String dbURL,
+        Properties dbProperties,
+        Driver driverInstance
+    ) throws SQLException, DBException {
         // Create connection pool with custom connection factory
         log.debug("\tInitiate connection pool with management database (" + driver.getFullName() + "; " + dbURL + ")");
         DriverConnectionFactory conFactory = new DriverConnectionFactory(driverInstance, dbURL, dbProperties);
@@ -168,38 +246,14 @@ public class CBDatabase {
         config.setMaxTotal(databaseConfiguration.getPool().getMaxConnections());
         GenericObjectPool<PoolableConnection> connectionPool = new GenericObjectPool<>(pcf, config);
         pcf.setPool(connectionPool);
-        cbDataSource = new PoolingDataSource<>(connectionPool);
-
-        try (Connection connection = cbDataSource.getConnection()) {
-            DatabaseMetaData metaData = connection.getMetaData();
-            log.debug("\tConnected to " + metaData.getDatabaseProductName() + " " + metaData.getDatabaseProductVersion());
-
-            SQLSchemaManager schemaManager = new SQLSchemaManager(
-                "CB",
-                new ClassLoaderScriptSource(
-                    CBDatabase.class.getClassLoader(),
-                    SCHEMA_CREATE_SQL_PATH,
-                    SCHEMA_UPDATE_SQL_PATH),
-                monitor1 -> connection,
-                new CBSchemaVersionManager(),
-                driver.getScriptDialect().createInstance(),
-                null,
-                CURRENT_SCHEMA_VERSION,
-                0);
-            schemaManager.updateSchema(monitor);
-
-            validateInstancePersistentState(connection);
-        } catch (Exception e) {
-            throw new DBException("Error updating management database schema", e);
-        }
-        log.debug("\tManagement database connection established");
+        return new PoolingDataSource<>(connectionPool);
     }
 
     //TODO move out
     public void finishConfiguration(
         @NotNull String adminName,
         @Nullable String adminPassword,
-        @NotNull List<WebAuthInfo> authInfoList
+        @NotNull List<AuthInfo> authInfoList
     ) throws DBException {
         if (!application.isConfigurationMode()) {
             throw new DBException("Database is already configured");
@@ -217,19 +271,18 @@ public class CBDatabase {
         createAdminUser(adminName, adminPassword);
 
         // Associate all auth credentials with admin user
-        for (WebAuthInfo ai : authInfoList) {
+        for (AuthInfo ai : authInfoList) {
             if (!ai.getAuthProvider().equals(LocalAuthProviderConstants.PROVIDER_ID)) {
-                WebAuthProviderDescriptor authProvider = ai.getAuthProviderDescriptor();
                 Map<String, Object> userCredentials = ai.getUserCredentials();
                 if (!CommonUtils.isEmpty(userCredentials)) {
-                    adminSecurityController.setUserCredentials(adminName, authProvider.getId(), userCredentials);
+                    adminSecurityController.setUserCredentials(adminName, ai.getAuthProvider(), userCredentials);
                 }
             }
         }
     }
 
     @Nullable
-    CBDatabaseInitialData getInitialData() {
+    CBDatabaseInitialData getInitialData() throws DBException {
         String initialDataPath = databaseConfiguration.getInitialDataConfiguration();
         if (CommonUtils.isEmpty(initialDataPath)) {
             return null;
@@ -241,8 +294,7 @@ public class CBDatabase {
             Gson gson = new GsonBuilder().setLenient().create();
             return gson.fromJson(reader, CBDatabaseInitialData.class);
         } catch (Exception e) {
-            log.error("Error loading initial data configuration", e);
-            return null;
+            throw new DBException("Error loading initial data configuration", e);
         }
     }
 
@@ -255,7 +307,10 @@ public class CBDatabase {
 
         if (adminUser == null) {
             adminUser = new SMUser(adminName, true, "ADMINISTRATOR");
-            adminSecurityController.createUser(adminUser.getUserId(), adminUser.getMetaParameters(), true, adminUser.getAuthRole());
+            adminSecurityController.createUser(adminUser.getUserId(),
+                adminUser.getMetaParameters(),
+                true,
+                adminUser.getAuthRole());
         }
 
         if (!CommonUtils.isEmpty(adminPassword)) {
@@ -266,7 +321,8 @@ public class CBDatabase {
             credentials.put(LocalAuthProviderConstants.CRED_USER, adminUser.getUserId());
             credentials.put(LocalAuthProviderConstants.CRED_PASSWORD, clientPassword);
 
-            WebAuthProviderDescriptor authProvider = WebAuthProviderRegistry.getInstance().getAuthProvider(LocalAuthProviderConstants.PROVIDER_ID);
+            WebAuthProviderDescriptor authProvider = WebAuthProviderRegistry.getInstance()
+                .getAuthProvider(LocalAuthProviderConstants.PROVIDER_ID);
             if (authProvider != null) {
                 adminSecurityController.setUserCredentials(adminUser.getUserId(), authProvider.getId(), credentials);
             }
@@ -300,16 +356,17 @@ public class CBDatabase {
     private class CBSchemaVersionManager implements SQLSchemaVersionManager {
 
         @Override
-        public int getCurrentSchemaVersion(DBRProgressMonitor monitor, Connection connection, String schemaName) throws DBException, SQLException {
+        public int getCurrentSchemaVersion(DBRProgressMonitor monitor, Connection connection, String schemaName)
+            throws DBException, SQLException {
             // Check and update schema
             try {
                 int version = CommonUtils.toInt(JDBCUtils.executeQuery(connection,
-                    "SELECT VERSION FROM CB_SCHEMA_INFO"));
+                    normalizeTableNames("SELECT VERSION FROM {table_prefix}CB_SCHEMA_INFO")));
                 return version == 0 ? 1 : version;
             } catch (SQLException e) {
                 try {
                     Object legacyVersion = CommonUtils.toInt(JDBCUtils.executeQuery(connection,
-                        "SELECT SCHEMA_VERSION FROM CB_SERVER"));
+                        normalizeTableNames("SELECT SCHEMA_VERSION FROM {table_prefix}CB_SERVER")));
                     // Table CB_SERVER exist - this is a legacy schema
                     return LEGACY_SCHEMA_VERSION;
                 } catch (SQLException ex) {
@@ -320,21 +377,36 @@ public class CBDatabase {
         }
 
         @Override
-        public void updateCurrentSchemaVersion(DBRProgressMonitor monitor, Connection connection, String schemaName) throws DBException, SQLException {
-            if (JDBCUtils.executeUpdate(
+        public int getLatestSchemaVersion() {
+            return CURRENT_SCHEMA_VERSION;
+        }
+
+        @Override
+        public void updateCurrentSchemaVersion(
+            DBRProgressMonitor monitor,
+            @NotNull Connection connection,
+            @NotNull String schemaName,
+            int version
+        ) throws DBException, SQLException {
+            var updateCount = JDBCUtils.executeUpdate(
                 connection,
-                "UPDATE CB_SCHEMA_INFO SET VERSION=?,UPDATE_TIME=CURRENT_TIMESTAMP",
-                CURRENT_SCHEMA_VERSION) <= 0) {
+                normalizeTableNames("UPDATE {table_prefix}CB_SCHEMA_INFO SET VERSION=?,UPDATE_TIME=CURRENT_TIMESTAMP"),
+                version
+            );
+            if (updateCount <= 0) {
                 JDBCUtils.executeSQL(
                     connection,
-                    "INSERT INTO CB_SCHEMA_INFO (VERSION,UPDATE_TIME) VALUES(?,CURRENT_TIMESTAMP)",
-                    CURRENT_SCHEMA_VERSION);
+                    normalizeTableNames(
+                        "INSERT INTO {table_prefix}CB_SCHEMA_INFO (VERSION,UPDATE_TIME) VALUES(?,CURRENT_TIMESTAMP)"),
+                    version
+                );
             }
         }
 
         @Override
         //TODO move out
-        public void fillInitialSchemaData(DBRProgressMonitor monitor, Connection connection) throws DBException, SQLException {
+        public void fillInitialSchemaData(DBRProgressMonitor monitor, Connection connection)
+            throws DBException, SQLException {
             // Set exclusive connection. Otherwise security controller will open a new one and won't see new schema objects.
             exclusiveConnection = new DelegatingConnection<Connection>(connection) {
                 @Override
@@ -353,15 +425,29 @@ public class CBDatabase {
 
                 String adminName = initialData.getAdminName();
                 String adminPassword = initialData.getAdminPassword();
-
-                if (!CommonUtils.isEmpty(initialData.getTeams())) {
+                List<SMTeam> initialTeams = initialData.getTeams();
+                String defaultTeam = application.getAppConfiguration().getDefaultUserTeam();
+                if (CommonUtils.isNotEmpty(defaultTeam)) {
+                    Set<String> initialTeamNames = initialTeams == null
+                        ? Set.of()
+                        : initialTeams.stream().map(SMTeam::getTeamId).collect(Collectors.toSet());
+                    if (!initialTeamNames.contains(defaultTeam)) {
+                        throw new DBException("Initial teams configuration doesn't contain default team " + defaultTeam);
+                    }
+                }
+                if (!CommonUtils.isEmpty(initialTeams)) {
                     // Create teams
-                    for (SMTeam team : initialData.getTeams()) {
-                        adminSecurityController.createTeam(team.getTeamId(), team.getName(), team.getDescription(), adminName);
-                        if (adminName != null && !application.isMultiNode()) {
-                            adminSecurityController.setSubjectPermissions(team.getTeamId(),
+                    for (SMTeam team : initialTeams) {
+                        adminSecurityController.createTeam(team.getTeamId(),
+                            team.getName(),
+                            team.getDescription(),
+                            adminName);
+                        if (!application.isMultiNode()) {
+                            adminSecurityController.setSubjectPermissions(
+                                team.getTeamId(),
                                 new ArrayList<>(team.getPermissions()),
-                                adminName);
+                                "initial-data-configuration"
+                            );
                         }
                     }
                 }
@@ -380,16 +466,30 @@ public class CBDatabase {
     // Persistence
 
 
-    private void validateInstancePersistentState(Connection connection) throws IOException, SQLException {
+    private void validateInstancePersistentState(Connection connection) throws IOException, SQLException, DBException {
         try (JDBCTransaction txn = new JDBCTransaction(connection)) {
             checkInstanceRecord(connection);
+            var defaultTeamId = application.getAppConfiguration().getDefaultUserTeam();
+            if (CommonUtils.isNotEmpty(defaultTeamId)) {
+                var team = adminSecurityController.findTeam(defaultTeamId);
+                if (team == null) {
+                    log.warn("Default users team not found, create :" + defaultTeamId);
+                    adminSecurityController.createTeam(defaultTeamId, defaultTeamId, null,
+                        ApplicationRegistry.getInstance().getApplication().getName());
+                }
+            }
             txn.commit();
         }
     }
 
     private void checkInstanceRecord(Connection connection) throws SQLException, IOException {
-        InetAddress localHost = InetAddress.getLocalHost();
-        String hostName = localHost.getHostName();
+        String hostName;
+        try {
+            hostName = InetAddress.getLocalHost().getHostName();
+        } catch (UnknownHostException e) {
+            hostName = "localhost";
+        }
+
         byte[] hardwareAddress = RuntimeUtils.getLocalMacAddress();
         String macAddress = CommonUtils.toHexString(hardwareAddress);
 
@@ -399,11 +499,14 @@ public class CBDatabase {
         String versionName = CommonUtils.truncateString(GeneralUtils.getProductVersion().toString(), 32);
 
         boolean hasInstanceRecord = JDBCUtils.queryString(connection,
-            "SELECT HOST_NAME FROM CB_INSTANCE WHERE INSTANCE_ID=?", instanceId) != null;
+            normalizeTableNames("SELECT HOST_NAME FROM {table_prefix}CB_INSTANCE WHERE INSTANCE_ID=?"),
+            instanceId) != null;
         if (!hasInstanceRecord) {
             JDBCUtils.executeSQL(
                 connection,
-                "INSERT INTO CB_INSTANCE (INSTANCE_ID,MAC_ADDRESS,HOST_NAME,PRODUCT_NAME,PRODUCT_VERSION,UPDATE_TIME) VALUES(?,?,?,?,?,CURRENT_TIMESTAMP)",
+                normalizeTableNames("INSERT INTO {table_prefix}CB_INSTANCE " +
+                    "(INSTANCE_ID,MAC_ADDRESS,HOST_NAME,PRODUCT_NAME,PRODUCT_VERSION,UPDATE_TIME)" +
+                    " VALUES(?,?,?,?,?,CURRENT_TIMESTAMP)"),
                 instanceId,
                 macAddress,
                 hostName,
@@ -412,13 +515,18 @@ public class CBDatabase {
         } else {
             JDBCUtils.executeSQL(
                 connection,
-                "UPDATE CB_INSTANCE SET HOST_NAME=?,PRODUCT_NAME=?,PRODUCT_VERSION=?,UPDATE_TIME=CURRENT_TIMESTAMP WHERE INSTANCE_ID=?",
+                normalizeTableNames("UPDATE {table_prefix}CB_INSTANCE " +
+                    "SET HOST_NAME=?,PRODUCT_NAME=?,PRODUCT_VERSION=?,UPDATE_TIME=CURRENT_TIMESTAMP " +
+                    "WHERE INSTANCE_ID=?"),
                 hostName,
                 productName,
                 versionName,
                 instanceId);
         }
-        JDBCUtils.executeSQL(connection, "DELETE FROM CB_INSTANCE_DETAILS WHERE INSTANCE_ID=?", instanceId);
+        JDBCUtils.executeSQL(
+            connection,
+            normalizeTableNames("DELETE FROM {table_prefix}CB_INSTANCE_DETAILS WHERE INSTANCE_ID=?"),
+            instanceId);
 
         Map<String, String> instanceDetails = new LinkedHashMap<>();
         for (Map.Entry<Object, Object> spe : System.getProperties().entrySet()) {
@@ -427,7 +535,10 @@ public class CBDatabase {
                 CommonUtils.truncateString(CommonUtils.toString(spe.getValue()), 255));
         }
 
-        try (PreparedStatement dbStat = connection.prepareStatement("INSERT INTO CB_INSTANCE_DETAILS(INSTANCE_ID,FIELD_NAME,FIELD_VALUE) VALUES(?,?,?)")) {
+        try (PreparedStatement dbStat = connection.prepareStatement(
+            normalizeTableNames(
+                "INSERT INTO {table_prefix}CB_INSTANCE_DETAILS(INSTANCE_ID,FIELD_NAME,FIELD_VALUE) VALUES(?,?,?)"))
+        ) {
             dbStat.setString(1, instanceId);
             for (Map.Entry<String, String> ide : instanceDetails.entrySet()) {
                 dbStat.setString(2, ide.getKey());
@@ -453,6 +564,19 @@ public class CBDatabase {
             id.append("X");
         }
         return id.toString();
+    }
+
+    /**
+     * Replaces all predefined prefixes in sql query.
+     */
+    @NotNull
+    public String normalizeTableNames(@NotNull String sql) {
+        return CommonUtils.normalizeTableNames(sql, databaseConfiguration.getSchema());
+    }
+
+    @NotNull
+    public SQLDialect getDialect() {
+        return dialect;
     }
 
 }

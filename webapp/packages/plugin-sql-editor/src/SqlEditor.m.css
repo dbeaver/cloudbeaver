@@ -1,0 +1,12 @@
+.captureView {
+  flex: 1;
+  display: flex;
+  overflow: auto;
+  position: relative;
+}
+.pane {
+  composes: theme-typography--body2 from global;
+}
+.pane:first-child {
+  flex-direction: column;
+}

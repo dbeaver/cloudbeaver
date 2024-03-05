@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2023 DBeaver Corp and others
+ * Copyright (C) 2010-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
  */
 package io.cloudbeaver.auth.provider.local;
 
+import io.cloudbeaver.auth.SMBruteForceProtected;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.registry.WebAuthProviderDescriptor;
 import io.cloudbeaver.registry.WebAuthProviderRegistry;
@@ -26,6 +27,7 @@ import org.jkiss.dbeaver.model.auth.AuthPropertyEncryption;
 import org.jkiss.dbeaver.model.auth.SMAuthProvider;
 import org.jkiss.dbeaver.model.auth.SMSession;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
+import org.jkiss.dbeaver.model.security.SMAuthProviderCustomConfiguration;
 import org.jkiss.dbeaver.model.security.SMController;
 import org.jkiss.utils.CommonUtils;
 
@@ -34,7 +36,7 @@ import java.util.Map;
 /**
  * Local auth provider
  */
-public class LocalAuthProvider implements SMAuthProvider<LocalAuthSession> {
+public class LocalAuthProvider implements SMAuthProvider<LocalAuthSession>, SMBruteForceProtected {
 
     public static final String PROVIDER_ID = LocalAuthProviderConstants.PROVIDER_ID;
     public static final String CRED_USER = LocalAuthProviderConstants.CRED_USER;
@@ -44,7 +46,7 @@ public class LocalAuthProvider implements SMAuthProvider<LocalAuthSession> {
     @Override
     public String validateLocalAuth(@NotNull DBRProgressMonitor monitor,
                                     @NotNull SMController securityController,
-                                    @NotNull Map<String, Object> providerConfig,
+                                    @NotNull SMAuthProviderCustomConfiguration providerConfig,
                                     @NotNull Map<String, Object> userCredentials,
                                     @Nullable String activeUserId) throws DBException {
 
@@ -74,7 +76,12 @@ public class LocalAuthProvider implements SMAuthProvider<LocalAuthSession> {
     }
 
     @Override
-    public LocalAuthSession openSession(@NotNull DBRProgressMonitor monitor, @NotNull SMSession mainSession, @NotNull Map<String, Object> providerConfig, @NotNull Map<String, Object> userCredentials) throws DBException {
+    public LocalAuthSession openSession(
+        @NotNull DBRProgressMonitor monitor,
+        @NotNull SMSession mainSession,
+        @Nullable SMAuthProviderCustomConfiguration customConfiguration,
+        @NotNull Map<String, Object> userCredentials
+    ) throws DBException {
         String userName = CommonUtils.toString(userCredentials.get(CRED_USER));
         if (CommonUtils.isEmpty(userName)) {
             throw new DBException("Invalid user name");
@@ -95,9 +102,10 @@ public class LocalAuthProvider implements SMAuthProvider<LocalAuthSession> {
     public static boolean changeUserPassword(@NotNull WebSession webSession, @NotNull String oldPassword, @NotNull String newPassword) throws DBException {
         String userName = webSession.getUser().getUserId();
 
+        SMController smController = webSession.getSecurityController();
         WebAuthProviderDescriptor authProvider = WebAuthProviderRegistry.getInstance().getAuthProvider(PROVIDER_ID);
-        Map<String, Object> storedCredentials = webSession.getSecurityController().getUserCredentials(userName, authProvider.getId());
-        if (storedCredentials == null) {
+        Map<String, Object> storedCredentials = smController.getCurrentUserCredentials(authProvider.getId());
+        if (CommonUtils.isEmpty(storedCredentials)) {
             throw new DBException("Invalid user name or password");
         }
         String storedPasswordHash = CommonUtils.toString(storedCredentials.get(CRED_PASSWORD), null);
@@ -115,8 +123,12 @@ public class LocalAuthProvider implements SMAuthProvider<LocalAuthSession> {
         //String newPasswordHash = WebAuthProviderPropertyEncryption.hash.encrypt(userName, newPassword);
 
         storedCredentials.put(CRED_PASSWORD, newPassword);
-        webSession.getSecurityController().setCurrentUserCredentials(authProvider.getId(), storedCredentials);
+        smController.setCurrentUserCredentials(authProvider.getId(), storedCredentials);
         return true;
     }
 
+    @Override
+    public Object getInputUsername(@NotNull Map<String, Object> cred) {
+        return cred.get("user");
+    }
 }

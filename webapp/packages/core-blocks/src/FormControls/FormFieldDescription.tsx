@@ -1,28 +1,18 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2022 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
-import styled, { css } from 'reshadow';
-
-import { filterLayoutFakeProps } from '../Containers/filterLayoutFakeProps';
+import { filterLayoutFakeProps, getLayoutProps } from '../Containers/filterLayoutFakeProps';
 import type { ILayoutSizeProps } from '../Containers/ILayoutSizeProps';
-import { useStyles } from '../useStyles';
-import { baseFormControlStyles, baseValidFormControlStyles } from './baseFormControlStyles';
-
-const style = css`
-  field-label {
-    composes: theme-typography--body1 from global;
-    font-weight: 500;
-    padding-bottom: 10px;
-  }
-  field-description {
-    padding: 0;
-  }
-`;
+import { s } from '../s';
+import { useS } from '../useS';
+import { Field } from './Field';
+import { FieldDescription } from './FieldDescription';
+import { FieldLabel } from './FieldLabel';
+import style from './FormFieldDescription.m.css';
 
 interface Props extends ILayoutSizeProps {
   label?: string;
@@ -37,15 +27,14 @@ export const FormFieldDescription: React.FC<React.PropsWithChildren<Props>> = fu
   className,
   ...rest
 }) {
+  const layoutProps = getLayoutProps(rest);
   rest = filterLayoutFakeProps(rest);
-  const styles = useStyles(baseFormControlStyles, baseValidFormControlStyles, style);
+  const styles = useS(style);
 
-  return styled(styles)(
-    <field title={title} className={className} {...rest}>
-      {label && <field-label as='label'>{label}</field-label>}
-      <field-description>
-        {children}
-      </field-description>
-    </field>
+  return (
+    <Field title={title} className={className} {...rest} {...layoutProps}>
+      {label && <FieldLabel className={s(styles, { fieldLabel: true })}>{label}</FieldLabel>}
+      <FieldDescription className={s(styles, { fieldDescription: true })}>{children}</FieldDescription>
+    </Field>
   );
 };

@@ -1,19 +1,23 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2022 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { action, makeObservable } from 'mobx';
 
-import { ConnectionInfoResource, ConnectionsManagerService, createConnectionParam, IConnectionInfoParams, NavNodeExtensionsService } from '@cloudbeaver/core-connections';
+import {
+  ConnectionInfoResource,
+  ConnectionsManagerService,
+  createConnectionParam,
+  IConnectionInfoParams,
+  NavNodeExtensionsService,
+} from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
-import { NotificationService } from '@cloudbeaver/core-events';
 import { ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
-import { NavNodeManagerService, NavTreeResource, ROOT_NODE_PATH, EObjectFeature } from '@cloudbeaver/core-navigation-tree';
-import { ResourceKey, resourceKeyList } from '@cloudbeaver/core-sdk';
+import { EObjectFeature, NavNodeInfoResource, NavNodeManagerService, NavTreeResource, ROOT_NODE_PATH } from '@cloudbeaver/core-navigation-tree';
+import { CACHED_RESOURCE_DEFAULT_PAGE_OFFSET, CachedResourceOffsetPageKey, ResourceKey, resourceKeyList } from '@cloudbeaver/core-resource';
 import { MetadataMap } from '@cloudbeaver/core-utils';
 import { ACTION_COLLAPSE_ALL, ACTION_FILTER, IActiveView, View } from '@cloudbeaver/core-view';
 
@@ -32,15 +36,15 @@ export class NavigationTreeService extends View<string> {
 
   constructor(
     private readonly navNodeManagerService: NavNodeManagerService,
-    private readonly notificationService: NotificationService,
     private readonly connectionsManagerService: ConnectionsManagerService,
     private readonly connectionInfoResource: ConnectionInfoResource,
     private readonly navNodeExtensionsService: NavNodeExtensionsService,
-    private readonly navTreeResource: NavTreeResource
+    private readonly navNodeInfoResource: NavNodeInfoResource,
+    private readonly navTreeResource: NavTreeResource,
   ) {
     super();
 
-    this.treeState = new MetadataMap(() => ({
+    this.treeState = new MetadataMap<string, ITreeNodeState>(() => ({
       showInFilter: false,
       expanded: false,
       selected: false,
@@ -62,49 +66,49 @@ export class NavigationTreeService extends View<string> {
     return this.navNodeManagerService.getTree(id);
   }
 
-  async navToNode(id: string, parentId: string): Promise<void> {
+  async navToNode(id: string, parentId?: string): Promise<void> {
     await this.navNodeManagerService.navToNode(id, parentId);
   }
 
-  async loadNestedNodes(id = ROOT_NODE_PATH, tryConnect?: boolean, notify = true): Promise<boolean> {
-    try {
-      if (this.isConnectionNode(id)) {
-        let connection = this.connectionInfoResource.getConnectionForNode(id);
+  async loadNestedNodes(id = ROOT_NODE_PATH, tryConnect?: boolean): Promise<boolean> {
+    if (this.isConnectionNode(id)) {
+      let connection = this.connectionInfoResource.getConnectionForNode(id);
 
-        if (connection) {
-          connection = await this.connectionInfoResource.load(createConnectionParam(connection));
-        } else {
-          return false;
-        }
-
-        if (!connection.connected && !tryConnect) {
-          return false;
-        }
-
-        try {
-          const connected = await this.tryInitConnection(createConnectionParam(connection));
-          if (!connected) {
-            return false;
-          }
-        } catch {
-          return false;
-        }
+      if (connection) {
+        connection = await this.connectionInfoResource.load(createConnectionParam(connection));
+      } else {
+        return false;
       }
 
-      await this.navTreeResource.waitLoad();
+      if (!connection.connected) {
+        if (!tryConnect) {
+          return false;
+        }
 
-      if (tryConnect && this.navTreeResource.getException(id)) {
-        this.navTreeResource.markOutdated(id);
-      }
-
-      await this.navTreeResource.load(id);
-      return true;
-    } catch (exception: any) {
-      if (notify) {
-        this.notificationService.logException(exception);
+        const connected = await this.tryInitConnection(createConnectionParam(connection));
+        if (!connected) {
+          return false;
+        }
       }
     }
-    return false;
+
+    await this.navTreeResource.waitLoad();
+
+    if (tryConnect && this.navTreeResource.getException(id)) {
+      this.navTreeResource.markOutdated(id);
+    }
+
+    const parents = this.navNodeInfoResource.getParents(id);
+
+    if (parents.length > 0 && !this.navNodeInfoResource.has(id)) {
+      return false;
+    }
+
+    await this.navTreeResource.load(
+      CachedResourceOffsetPageKey(CACHED_RESOURCE_DEFAULT_PAGE_OFFSET, this.navTreeResource.childrenLimit).setTarget(id),
+    );
+
+    return true;
   }
 
   selectNode(id: string, multiple?: boolean): void {

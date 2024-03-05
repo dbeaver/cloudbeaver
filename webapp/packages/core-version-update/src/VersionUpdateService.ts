@@ -1,11 +1,10 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2022 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { computed, makeObservable } from 'mobx';
 import { compare } from 'semver';
 
@@ -14,7 +13,7 @@ import { IVersion, VersionResource, VersionService } from '@cloudbeaver/core-ver
 
 interface IInstructionProps {
   version: IVersion;
-  hostName?: string;
+  containerId?: string;
   className?: string;
 }
 
@@ -22,7 +21,8 @@ export type InstructionComponent = React.FunctionComponent<IInstructionProps>;
 
 @injectable()
 export class VersionUpdateService {
-  instructionGetter: (() => InstructionComponent) | null;
+  generalInstructionsGetter: (() => React.FC) | null = null;
+  versionInstructionGetter: (() => InstructionComponent) | null;
 
   get newVersionAvailable() {
     if (!this.versionService.current || !this.versionResource.latest) {
@@ -32,18 +32,19 @@ export class VersionUpdateService {
     return compare(this.versionResource.latest.number, this.versionService.current) === 1;
   }
 
-  constructor(
-    private readonly versionService: VersionService,
-    private readonly versionResource: VersionResource,
-  ) {
-    this.instructionGetter = null;
+  constructor(private readonly versionService: VersionService, private readonly versionResource: VersionResource) {
+    this.versionInstructionGetter = null;
 
     makeObservable(this, {
       newVersionAvailable: computed,
     });
   }
 
-  registerInstruction(componentGetter: () => InstructionComponent): void {
-    this.instructionGetter = componentGetter;
+  registerVersionInstruction(componentGetter: () => InstructionComponent): void {
+    this.versionInstructionGetter = componentGetter;
+  }
+
+  registerGeneralInstruction(componentGetter: (() => React.FC) | null): void {
+    this.generalInstructionsGetter = componentGetter;
   }
 }

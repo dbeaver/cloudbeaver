@@ -1,4 +1,5 @@
 export default [
+  ['plugin_navigation_tree_explorer_tab_title', 'Explorer'],
   ['app_navigationTree_openNodeTab', 'Open'],
   ['app_navigationTree_search', 'Search elements...'],
   ['app_navigationTree_limited', 'Elements are limited to {arg:limit} items'],
@@ -28,6 +29,7 @@ export default [
   ['app_navigationTree_refresh_error', 'Failed to refresh node'],
   ['app_navigationTree_node_change_name_error', 'Error occurred while changing name'],
   ['app_navigationTree_context_disconnect', 'Disconnect'],
+  ['app_navigationTree_context_change_credentials', 'Change Credentials'],
   ['app_navigationTree_connection_group_user', 'User Connections'],
   ['app_navigationTree_connection_group_shared', 'Shared Connections'],
   ['app_navigationTree_empty_placeholder', 'No Connections.\nUse the top menu to setup connection to your database.'],

@@ -1,11 +1,10 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2022 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
@@ -25,10 +24,6 @@ const tabsStyles = css`
     flex-shrink: 0;
     align-items: center;
     overflow: auto;
-  }
-  Tab {
-    height: 36px!important;
-    font-weight: 500 !important;
   }
   TabPanel {
     display: flex;
@@ -74,6 +69,6 @@ export const SideBarPanel = observer<Props>(function SideBarPanel({ container })
           <TabPanelList style={tabStyle} />
         </content-box>
       </box>
-    </TabsState>
+    </TabsState>,
   );
 });

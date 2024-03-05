@@ -1,0 +1,19 @@
+.footerContainer {
+  display: flex;
+  width: min-content;
+  flex: 1;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 24px;
+}
+.buttons {
+  flex: 1;
+  display: flex;
+  gap: 24px;
+}
+.wrapper {
+  display: flex;
+  height: 100%;
+  width: 100%;
+  overflow: auto;
+}

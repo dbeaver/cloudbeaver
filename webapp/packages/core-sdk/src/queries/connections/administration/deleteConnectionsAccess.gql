@@ -1,0 +1,3 @@
+query deleteConnectionsAccess($projectId: ID!, $connectionIds: [ID!]!, $subjects: [ID!]!) {
+  deleteConnectionsAccess(projectId: $projectId, connectionIds: $connectionIds, subjects: $subjects)
+}

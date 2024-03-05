@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2023 DBeaver Corp and others
+ * Copyright (C) 2010-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@ package io.cloudbeaver.auth;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
+import org.jkiss.dbeaver.model.security.SMAuthProviderCustomConfiguration;
 
 import java.util.Map;
 
@@ -26,20 +27,24 @@ import java.util.Map;
  * Federated auth provider.
  * Provides links to external auth resource
  */
-public interface SMAuthProviderFederated {
+public interface SMAuthProviderFederated extends SMSignOutLinkProvider {
 
-    /**
-     * Returns new identifying credentials which can be used to find/create user in database
-     */
     @NotNull
     String getSignInLink(String id, @NotNull Map<String, Object> providerConfig) throws DBException;
 
-
-    @NotNull
-    String getSignOutLink(String id, @NotNull Map<String, Object> providerConfig) throws DBException;
+    @Override
+    default String getUserSignOutLink(
+        @NotNull SMAuthProviderCustomConfiguration providerConfig,
+        @NotNull Map<String, Object> userCredentials
+    ) throws DBException {
+        return getCommonSignOutLink(providerConfig.getId(), providerConfig.getParameters());
+    }
 
     @Nullable
     String getMetadataLink(String id, @NotNull Map<String, Object> providerConfig) throws DBException;
+
+    @Nullable
+    String getAcsLink(String id, @NotNull Map<String, Object> providerConfig) throws DBException;
 
     @Nullable
     default String getRedirectLink(String id, @NotNull Map<String, Object> providerConfig) throws DBException {

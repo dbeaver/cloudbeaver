@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2023 DBeaver Corp and others
+ * Copyright (C) 2010-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,9 +17,8 @@
 
 package io.cloudbeaver.service;
 
+import jakarta.servlet.http.HttpServlet;
 import org.jkiss.dbeaver.DBException;
-
-import javax.servlet.http.HttpServlet;
 
 public interface DBWServletContext {
     void addServlet(String servletId, HttpServlet servlet, String mapping) throws DBException;

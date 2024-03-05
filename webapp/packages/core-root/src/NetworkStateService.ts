@@ -1,16 +1,16 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2022 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { makeObservable, observable } from 'mobx';
 
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { Executor, IExecutor } from '@cloudbeaver/core-executor';
 import { GraphQLService } from '@cloudbeaver/core-sdk';
+import { errorOf } from '@cloudbeaver/core-utils';
 
 import { NetworkError } from './NetworkError';
 
@@ -23,9 +23,7 @@ export class NetworkStateService extends Bootstrap {
   readonly networkStateExecutor: IExecutor<boolean>;
   private networkState: boolean;
 
-  constructor(
-    private readonly graphQLService: GraphQLService
-  ) {
+  constructor(private readonly graphQLService: GraphQLService) {
     super();
 
     this.networkState = true;
@@ -54,7 +52,7 @@ export class NetworkStateService extends Bootstrap {
     }
 
     if (state) {
-      if (this.graphQLService.client.blockReason instanceof NetworkError) {
+      if (errorOf(this.graphQLService.client.blockReason, NetworkError)) {
         this.graphQLService.enableRequests();
       }
     } else {
@@ -68,11 +66,8 @@ export class NetworkStateService extends Bootstrap {
     try {
       return await request;
     } catch (exception: any) {
-      if (
-        exception instanceof TypeError
-        && exception.message === 'Failed to fetch'
-      ) {
-        throw new NetworkError('Error while processing request');
+      if (exception instanceof TypeError && exception.message === 'Failed to fetch') {
+        throw new NetworkError('Error while processing request', { cause: exception });
       }
       throw exception;
     }

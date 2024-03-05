@@ -1,11 +1,10 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2022 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { injectable } from '@cloudbeaver/core-di';
 import type { ResultDataFormat } from '@cloudbeaver/core-sdk';
 import type { TabProps } from '@cloudbeaver/core-ui';
@@ -14,26 +13,23 @@ import type { IDatabaseDataModel } from './DatabaseDataModel/IDatabaseDataModel'
 import type { IDatabaseDataResult } from './DatabaseDataModel/IDatabaseDataResult';
 import type { IDataTableActions } from './TableViewer/IDataTableActions';
 
-export interface IDataPresentationProps<
-  TOptions = any,
-  TResult extends IDatabaseDataResult = IDatabaseDataResult
-> {
+export interface IDataPresentationProps<TOptions = any, TResult extends IDatabaseDataResult = IDatabaseDataResult> {
   dataFormat: ResultDataFormat;
   model: IDatabaseDataModel<TOptions, TResult>;
   actions: IDataTableActions;
   resultIndex: number;
+  simple: boolean;
   className?: string;
 }
 
 export enum DataPresentationType {
   main,
-  toolsPanel
+  toolsPanel,
 }
 
-export type DataPresentationComponent<
-  TOptions = any,
-  TResult extends IDatabaseDataResult = IDatabaseDataResult
-> = React.FunctionComponent<IDataPresentationProps<TOptions, TResult>>;
+export type DataPresentationComponent<TOptions = any, TResult extends IDatabaseDataResult = IDatabaseDataResult> = React.FunctionComponent<
+  IDataPresentationProps<TOptions, TResult>
+>;
 
 export type PresentationTabProps = TabProps & {
   presentation: IDataPresentationOptions;
@@ -48,11 +44,7 @@ export interface IDataPresentationOptions {
   type?: DataPresentationType;
   title?: string;
   icon?: string;
-  hidden?: (
-    dataFormat: ResultDataFormat | null,
-    model: IDatabaseDataModel,
-    resultIndex: number
-  ) => boolean;
+  hidden?: (dataFormat: ResultDataFormat | null, model: IDatabaseDataModel, resultIndex: number) => boolean;
   getPresentationComponent: () => DataPresentationComponent;
   getTabComponent?: () => PresentationTabComponent;
   onActivate?: () => void;
@@ -82,10 +74,7 @@ export class DataPresentationService {
     resultIndex: number,
   ): IDataPresentation[] {
     return Array.from(this.dataPresentations.values()).filter(presentation => {
-      if (
-        presentation.dataFormat !== undefined
-        && !supportedDataFormats.includes(presentation.dataFormat)
-      ) {
+      if (presentation.dataFormat !== undefined && !supportedDataFormats.includes(presentation.dataFormat)) {
         return false;
       }
 
@@ -117,9 +106,9 @@ export class DataPresentationService {
 
     for (const presentation of this.dataPresentations.values()) {
       if (
-        (presentation.dataFormat === undefined || presentation.dataFormat === dataFormat)
-        && presentation.type === type
-        && !presentation.hidden?.(dataFormat, model, resultIndex)
+        (presentation.dataFormat === undefined || presentation.dataFormat === dataFormat) &&
+        presentation.type === type &&
+        !presentation.hidden?.(dataFormat, model, resultIndex)
       ) {
         return presentation;
       }
@@ -129,12 +118,9 @@ export class DataPresentationService {
   }
 
   add(options: IDataPresentationOptions): void {
-    this.dataPresentations.set(
-      options.id,
-      {
-        ...options,
-        type: options.type || DataPresentationType.main,
-      }
-    );
+    this.dataPresentations.set(options.id, {
+      ...options,
+      type: options.type || DataPresentationType.main,
+    });
   }
 }

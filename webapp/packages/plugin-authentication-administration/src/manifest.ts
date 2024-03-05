@@ -1,20 +1,13 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2022 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import type { PluginManifest } from '@cloudbeaver/core-di';
 
-import { AuthConfigurationFormService } from './Administration/IdentityProviders/AuthConfigurationFormService';
-import { AuthConfigurationsAdministrationNavService } from './Administration/IdentityProviders/AuthConfigurationsAdministrationNavService';
-import { AuthConfigurationsAdministrationService } from './Administration/IdentityProviders/AuthConfigurationsAdministrationService';
-import { CreateAuthConfigurationService } from './Administration/IdentityProviders/CreateAuthConfigurationService';
-import { AuthConfigurationOptionsTabService } from './Administration/IdentityProviders/Options/AuthConfigurationOptionsTabService';
 import { ServerConfigurationAuthenticationBootstrap } from './Administration/ServerConfiguration/ServerConfigurationAuthenticationBootstrap';
-import { CreateMetaParameterService } from './Administration/Users/MetaParameters/CreateMetaParameterService';
 import { CreateTeamService } from './Administration/Users/Teams/CreateTeamService';
 import { GrantedConnectionsTabService } from './Administration/Users/Teams/GrantedConnections/GrantedConnectionsTabService';
 import { GrantedUsersTabService } from './Administration/Users/Teams/GrantedUsers/GrantedUsersTabService';
@@ -22,12 +15,17 @@ import { TeamOptionsTabService } from './Administration/Users/Teams/Options/Team
 import { TeamFormService } from './Administration/Users/Teams/TeamFormService';
 import { TeamsAdministrationNavService } from './Administration/Users/Teams/TeamsAdministrationNavService';
 import { TeamsAdministrationService } from './Administration/Users/Teams/TeamsAdministrationService';
-import { ConnectionAccessTabBootstrap } from './Administration/Users/UserForm/ConnectionAccess/ConnectionAccessTabBootstrap';
+import { AdministrationUserFormService } from './Administration/Users/UserForm/AdministrationUserFormService';
+import { UserFormConnectionAccessPartBootstrap } from './Administration/Users/UserForm/ConnectionAccess/UserFormConnectionAccessPartBootstrap';
+import { UserFormInfoPartBootstrap } from './Administration/Users/UserForm/Info/UserFormInfoPartBootstrap';
+import { UserFormInfoPartService } from './Administration/Users/UserForm/Info/UserFormInfoPartService';
+import { UserFormOriginPartBootstrap } from './Administration/Users/UserForm/Origin/UserFormOriginPartBootstrap';
 import { UserFormBaseBootstrap } from './Administration/Users/UserForm/UserFormBaseBootstrap';
-import { UserFormService } from './Administration/Users/UserForm/UserFormService';
 import { UsersAdministrationNavigationService } from './Administration/Users/UsersAdministrationNavigationService';
 import { UsersAdministrationService } from './Administration/Users/UsersAdministrationService';
+import { CreateUserBootstrap } from './Administration/Users/UsersTable/CreateUserBootstrap';
 import { CreateUserService } from './Administration/Users/UsersTable/CreateUserService';
+import { AdministrationUsersManagementService } from './AdministrationUsersManagementService';
 import { AuthenticationLocaleService } from './AuthenticationLocaleService';
 import { PluginBootstrap } from './PluginBootstrap';
 
@@ -43,14 +41,7 @@ export const manifest: PluginManifest = {
     CreateUserService,
     UsersAdministrationNavigationService,
     ServerConfigurationAuthenticationBootstrap,
-    UserFormService,
-    CreateMetaParameterService,
-    UserFormBaseBootstrap,
-    AuthConfigurationsAdministrationService,
-    CreateAuthConfigurationService,
-    AuthConfigurationsAdministrationNavService,
-    AuthConfigurationFormService,
-    AuthConfigurationOptionsTabService,
+    AdministrationUserFormService,
     TeamsAdministrationService,
     CreateTeamService,
     TeamsAdministrationNavService,
@@ -58,6 +49,12 @@ export const manifest: PluginManifest = {
     TeamOptionsTabService,
     GrantedUsersTabService,
     GrantedConnectionsTabService,
-    ConnectionAccessTabBootstrap,
+    CreateUserBootstrap,
+    UserFormBaseBootstrap,
+    UserFormInfoPartBootstrap,
+    UserFormOriginPartBootstrap,
+    UserFormConnectionAccessPartBootstrap,
+    UserFormInfoPartService,
+    AdministrationUsersManagementService,
   ],
 };

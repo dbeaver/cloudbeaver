@@ -1,0 +1,8 @@
+.treeNodeNested {
+  box-sizing: border-box;
+  padding-left: 8px;
+
+  &.root {
+    padding: 0;
+  }
+}

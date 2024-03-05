@@ -6,14 +6,6 @@
     <extension-point id="io.cloudbeaver.driver" name="Web drivers" schema="schema/io.cloudbeaver.driver.exsd"/>
     <extension-point id="io.cloudbeaver.handler" name="Web handlers" schema="schema/io.cloudbeaver.handler.exsd"/>
 
-    <extension point="org.eclipse.core.runtime.adapters">
-        <factory adaptableType="org.jkiss.dbeaver.runtime.DBWorkbench" class="io.cloudbeaver.server.WebPlatformAdapterFactory">
-            <adapter type="org.jkiss.dbeaver.model.app.DBPPlatform"/>
-            <adapter type="org.jkiss.dbeaver.runtime.ui.DBPPlatformUI"/>
-        </factory>
-    </extension>
-
-
     <!-- Needed to instantiate connections thru navigator model -->
     <extension point="org.jkiss.dbeaver.service">
         <service name="org.jkiss.dbeaver.runtime.DBServiceConnections" class="io.cloudbeaver.server.WebServiceConnectionsImpl"/>
@@ -45,10 +37,42 @@
     </extension>
 
     <extension point="org.jkiss.dbeaver.ws.event.handler">
-        <eventHandler class="io.cloudbeaver.server.events.WSConfigurationChangedEventHandler"/>
-        <eventHandler class="io.cloudbeaver.server.events.WSDataSourceUpdatedEventHandlerImpl"/>
-        <eventHandler class="io.cloudbeaver.server.events.WSFolderUpdatedEventHandlerImpl"/>
-        <eventHandler class="io.cloudbeaver.server.events.WSRmResourceUpdatedEventHandlerImpl"/>
+        <eventHandler class="io.cloudbeaver.server.events.WSDefaultEventHandler">
+            <topic id="cb_config"/>
+        </eventHandler>
+        <eventHandler class="io.cloudbeaver.server.events.WSDataSourceUpdatedEventHandlerImpl">
+            <topic id="cb_datasource"/>
+        </eventHandler>
+        <eventHandler class="io.cloudbeaver.server.events.WSFolderUpdatedEventHandlerImpl">
+            <topic id="cb_datasource_folder"/>
+        </eventHandler>
+        <eventHandler class="io.cloudbeaver.server.events.WSRmResourceUpdatedEventHandlerImpl">
+            <topic id="cb_scripts"/>
+        </eventHandler>
+        <eventHandler class="io.cloudbeaver.server.events.WSObjectPermissionUpdatedEventHandler">
+            <topic id="cb_object_permissions"/>
+        </eventHandler>
+        <eventHandler class="io.cloudbeaver.server.events.WSSubjectPermissionUpdatedEventHandler">
+            <topic id="cb_subject_permissions"/>
+        </eventHandler>
+        <eventHandler class="io.cloudbeaver.server.events.WSProjectUpdatedEventHandler">
+            <topic id="cb_projects"/>
+        </eventHandler>
+        <eventHandler class="io.cloudbeaver.server.events.WSUserSecretEventHandlerImpl">
+            <topic id="cb_user_secret"/>
+        </eventHandler>
+        <eventHandler class="io.cloudbeaver.server.events.WSLogEventHandler">
+            <topic id="cb_session_log"/>
+        </eventHandler>
+        <eventHandler class="io.cloudbeaver.server.events.WSEventHandlerWorkspaceConfigUpdate">
+            <topic id="cb_workspace_configuration"/>
+        </eventHandler>
+        <eventHandler class="io.cloudbeaver.server.events.WSDeleteTempFileHandler">
+            <topic id="cb_delete_temp_folder"/>
+        </eventHandler>
+        <eventHandler class="io.cloudbeaver.server.events.WSUserDeletedEventHandler">
+            <topic id="cb_user"/>
+        </eventHandler>
     </extension>
 
 </plugin>

@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2023 DBeaver Corp and others
+ * Copyright (C) 2010-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -61,7 +61,7 @@ public class WebSQLUtils {
             return cellValue;
         }
         if (cellValue instanceof Date) {
-            return CBModelConstants.ISO_DATE_FORMAT.format(cellValue);
+            return CBModelConstants.ISO_DATE_FORMAT.format(((Date) cellValue).toInstant());
         } else if (cellValue instanceof Number) {
             if (cellValue instanceof Double) {
                 return CommonUtils.niceFormatDouble((Double) cellValue);
@@ -208,7 +208,7 @@ public class WebSQLUtils {
     public static Object serializeStringValue(Object value) {
         int textPreviewMaxLength = CommonUtils.toInt(
             CBApplication.getInstance().getAppConfiguration().getResourceQuota(
-                WebSQLConstants.QUOTA_PROP_BINARY_PREVIEW_MAX_LENGTH,
+                WebSQLConstants.QUOTA_PROP_TEXT_PREVIEW_MAX_LENGTH,
                 WebSQLConstants.TEXT_PREVIEW_MAX_LENGTH));
         String stringValue = value.toString();
         if (stringValue.length() < textPreviewMaxLength) {

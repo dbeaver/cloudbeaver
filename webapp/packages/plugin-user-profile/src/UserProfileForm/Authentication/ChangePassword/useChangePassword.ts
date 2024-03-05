@@ -1,14 +1,13 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2022 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { action, computed, observable } from 'mobx';
 
-import { UsersResource } from '@cloudbeaver/core-authentication';
+import { PasswordPolicyService, UsersResource } from '@cloudbeaver/core-authentication';
 import { useObservableRef } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
@@ -30,47 +29,59 @@ interface IState {
 export function useChangePassword(): IState {
   const usersResource = useService(UsersResource);
   const notificationService = useService(NotificationService);
+  const passwordPolicyService = useService(PasswordPolicyService);
 
-  return useObservableRef(() => ({
-    config: {
-      oldPassword: '',
-      password: '',
-      repeatedPassword: '',
-    },
-    submitting: false,
-    get formFilled() {
-      return this.config.password.length > 0 && this.config.oldPassword.length > 0
-        && this.config.repeatedPassword.length > 0;
-    },
-    async changePassword() {
-      if (this.config.password !== this.config.repeatedPassword) {
-        this.notificationService.logError({ title: 'plugin_user_profile_authentication_change_password_passwords_not_match' });
-        return;
-      }
+  return useObservableRef(
+    () => ({
+      config: {
+        oldPassword: '',
+        password: '',
+        repeatedPassword: '',
+      },
+      submitting: false,
+      get formFilled() {
+        return this.config.password.length > 0 && this.config.oldPassword.length > 0 && this.config.repeatedPassword.length > 0;
+      },
+      async changePassword() {
+        const validation = this.passwordPolicyService.validatePassword(this.config.password);
 
-      try {
-        this.submitting = true;
-        await usersResource.updateLocalPassword(this.config.oldPassword, this.config.password);
-        notificationService.logSuccess({ title: 'plugin_user_profile_authentication_change_password_success' });
-        this.resetConfig();
-      } catch (exception: any) {
-        notificationService.logException(exception);
-      } finally {
-        this.submitting = false;
-      }
+        if (!validation.isValid) {
+          this.notificationService.logError({
+            title: 'plugin_user_profile_authentication_change_password_password_validation_error',
+            message: validation.errorMessage,
+          });
+          return;
+        }
+
+        if (this.config.password !== this.config.repeatedPassword) {
+          this.notificationService.logError({ title: 'plugin_user_profile_authentication_change_password_passwords_not_match' });
+          return;
+        }
+
+        try {
+          this.submitting = true;
+          await usersResource.updateLocalPassword(this.config.oldPassword, this.config.password);
+          notificationService.logSuccess({ title: 'plugin_user_profile_authentication_change_password_success' });
+          this.resetConfig();
+        } catch (exception: any) {
+          notificationService.logException(exception);
+        } finally {
+          this.submitting = false;
+        }
+      },
+      resetConfig() {
+        this.config.oldPassword = '';
+        this.config.password = '';
+        this.config.repeatedPassword = '';
+      },
+    }),
+    {
+      config: observable,
+      submitting: observable.ref,
+      formFilled: computed,
+      changePassword: action.bound,
+      resetConfig: action,
     },
-    resetConfig() {
-      this.config.oldPassword = '';
-      this.config.password = '';
-      this.config.repeatedPassword = '';
-    },
-  }),
-  {
-    config: observable,
-    submitting: observable.ref,
-    formFilled: computed,
-    changePassword: action.bound,
-    resetConfig: action,
-  },
-  { usersResource, notificationService });
+    { usersResource, notificationService, passwordPolicyService },
+  );
 }

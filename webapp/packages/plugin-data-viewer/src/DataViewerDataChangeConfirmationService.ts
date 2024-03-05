@@ -1,13 +1,13 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2022 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
+import { ConfirmationDialog } from '@cloudbeaver/core-blocks';
 import { injectable } from '@cloudbeaver/core-di';
-import { CommonDialogService, ConfirmationDialog, DialogueStateResult } from '@cloudbeaver/core-dialogs';
+import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { ExecutorInterrupter, IExecutionContextProvider } from '@cloudbeaver/core-executor';
 
@@ -20,7 +20,7 @@ export class DataViewerDataChangeConfirmationService {
   constructor(
     private readonly commonDialogService: CommonDialogService,
     private readonly dataViewerTableService: TableViewerStorageService,
-    private readonly notificationService: NotificationService
+    private readonly notificationService: NotificationService,
   ) {
     this.checkUnsavedData = this.checkUnsavedData.bind(this);
   }
@@ -28,17 +28,12 @@ export class DataViewerDataChangeConfirmationService {
   trackTableDataUpdate(modelId: string) {
     const model = this.dataViewerTableService.get(modelId);
 
-    if (model && !model.onRequest.addHandler(this.checkUnsavedData)) {
+    if (model && !model.onRequest.hasHandler(this.checkUnsavedData)) {
       model.onRequest.addHandler(this.checkUnsavedData);
     }
   }
 
-  private async checkUnsavedData({
-    type,
-    model,
-  }: IRequestEventData<any, any>,
-  contexts: IExecutionContextProvider<IRequestEventData<any, any>>
-  ) {
+  private async checkUnsavedData({ type, model }: IRequestEventData<any, any>, contexts: IExecutionContextProvider<IRequestEventData<any, any>>) {
     if (type === 'before') {
       const confirmationContext = contexts.getContext(SaveConfirmedContext);
 
@@ -50,10 +45,7 @@ export class DataViewerDataChangeConfirmationService {
 
       try {
         for (let resultIndex = 0; resultIndex < results.length; resultIndex++) {
-          const editor = model.source.getActionImplementation(
-            resultIndex,
-            DatabaseEditAction
-          );
+          const editor = model.source.getActionImplementation(resultIndex, DatabaseEditAction);
 
           if (editor?.isEdited() && model.source.executionContext?.context) {
             if (confirmationContext.confirmed) {
@@ -85,7 +77,7 @@ export class DataViewerDataChangeConfirmationService {
   }
 }
 
-interface ISaveConfirmedContext{
+interface ISaveConfirmedContext {
   confirmed: boolean | null;
   setConfirmed: (state: boolean) => void;
 }

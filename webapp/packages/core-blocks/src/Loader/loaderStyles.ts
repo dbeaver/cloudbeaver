@@ -1,11 +1,10 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2022 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { css } from 'reshadow';
 
 export const loaderStyles = css`
@@ -16,10 +15,49 @@ export const loaderStyles = css`
     justify-content: center;
     align-items: center;
     opacity: 0;
-    transition: opacity cubic-bezier(0.4, 0.0, 0.2, 1) 0.3s;
+    transition: opacity cubic-bezier(0.4, 0, 0.2, 1) 0.3s;
 
     &:global(.animate) {
       opacity: 1;
+    }
+
+    & StaticImage {
+      height: 100%;
+      width: 100%;
+      display: none;
+    }
+
+    &[|secondary],
+    &[|overlay],
+    &:global(.secondary),
+    &:global(.overlay) {
+      &:not([|small]):not(:global(.small)) {
+        & StaticImage[|secondaryIcon] {
+          display: block;
+        }
+      }
+
+      &[|small],
+      &:global(.small) {
+        & StaticImage[|secondarySmallIcon] {
+          display: block;
+        }
+      }
+    }
+
+    &:not([|secondary]):not([|overlay]):not(:global(.secondary)):not(:global(.overlay)) {
+      &:not([|small]):not(:global(.small)) {
+        & StaticImage[|primaryIcon] {
+          display: block;
+        }
+      }
+
+      &[|small],
+      &:global(.small) {
+        & StaticImage[|primarySmallIcon] {
+          display: block;
+        }
+      }
     }
   }
 
@@ -30,11 +68,6 @@ export const loaderStyles = css`
     width: 40px;
     height: 40px;
     animation: rotation 2s infinite linear;
-
-    & StaticImage {
-      width: 100%;
-      content: url(/icons/spinner-primary.svg);
-    }
   }
 
   message {
@@ -45,29 +78,12 @@ export const loaderStyles = css`
     padding-top: 42px;
   }
 
-  loader[|small] {
-    & icon {
-      width: 16px;
-      height: 16px;
-    }
-    & message {
-      display: none;
-    }
-  }
-
-  loader[|fullSize] {
-    & icon {
-      width: 100%;
-      height: 100%;
-    }
-  }
-
   loader[|inline] {
     height: 38px;
     flex-direction: row;
     margin: 0;
     justify-content: left;
-    
+
     & icon {
       width: 24px;
       height: 24px;
@@ -81,42 +97,42 @@ export const loaderStyles = css`
     }
   }
 
-  loader[|small] StaticImage,
-  loader:global(.small) StaticImage {
-    content: url(/icons/spinner-primary-small.svg);
+  loader[|small] {
+    & icon {
+      width: 16px;
+      height: 16px;
+    }
+    & message {
+      display: none;
+    }
   }
 
-  loader[|secondary],
-  loader[|overlay],
-  loader:global(.secondary),
-  loader:global(.overlay) {
-    & StaticImage {
-      content: url(/icons/spinner.svg);
-    }
+  loader[|fullSize] {
+    height: 100%;
 
-    &[|small] StaticImage,
-    &:global(.small) StaticImage {
-      content: url(/icons/spinner-small.svg);
+    & icon {
+      width: 100%;
+      height: 100%;
     }
   }
 
   @keyframes rotation {
     from {
-        transform: rotate(0deg);
+      transform: rotate(0deg);
     }
     to {
-        transform: rotate(359deg);
+      transform: rotate(359deg);
     }
   }
 `;
 export const overlayStyles = css`
-    loader {
-      composes: theme-text-on-primary from global;
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background-color: rgba(0, 0, 0, 0.4);
-    }
-  `;
+  loader {
+    composes: theme-text-on-primary from global;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.4);
+  }
+`;

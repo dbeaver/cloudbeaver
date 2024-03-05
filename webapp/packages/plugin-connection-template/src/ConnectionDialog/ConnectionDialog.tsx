@@ -1,109 +1,91 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2022 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observer } from 'mobx-react-lite';
-import styled, { css } from 'reshadow';
 
-import { useAdministrationSettings } from '@cloudbeaver/core-administration';
 import {
+  CommonDialogBody,
+  CommonDialogFooter,
+  CommonDialogHeader,
+  CommonDialogWrapper,
   ErrorMessage,
-  SubmittingForm,
-  Loader,
+  Form,
+  s,
+  useAdministrationSettings,
+  useErrorDetails,
   useFocus,
+  useS,
   useTranslate,
 } from '@cloudbeaver/core-blocks';
-import { useController } from '@cloudbeaver/core-di';
-import { CommonDialogWrapper, DialogComponent } from '@cloudbeaver/core-dialogs';
-import { ConnectionAuthenticationForm } from '@cloudbeaver/plugin-connections';
+import type { DialogComponent } from '@cloudbeaver/core-dialogs';
+import { ConnectionAuthenticationFormLoader } from '@cloudbeaver/plugin-connections';
 
-import { ConnectionController, ConnectionStep } from './ConnectionController';
+import style from './ConnectionDialog.m.css';
 import { ConnectionDialogFooter } from './ConnectionDialogFooter';
+import { ConnectionStep } from './EConnectionStep';
 import { TemplateConnectionSelector } from './TemplateConnectionSelector/TemplateConnectionSelector';
+import { useConnectionDialog } from './useConnectionDialog';
 
-const styles = css`
-    SubmittingForm, center {
-      display: flex;
-      flex: 1;
-      margin: auto;
-    }
-    center {
-      box-sizing: border-box;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-    }
-    ErrorMessage {
-      composes: theme-background-secondary theme-text-on-secondary from global;
-    }
-`;
-
-export const ConnectionDialog: DialogComponent<null, null> = observer(function ConnectionDialog({
-  rejectDialog,
-}) {
-  const [focusedRef] = useFocus<HTMLFormElement>({ focusFirstChild: true });
-  const controller = useController(ConnectionController, rejectDialog);
+export const ConnectionDialog: DialogComponent<null, null> = observer(function ConnectionDialog({ rejectDialog }) {
+  const styles = useS(style);
   const translate = useTranslate();
+  const [focusedRef] = useFocus<HTMLFormElement>({ focusFirstChild: true });
   const { credentialsSavingEnabled } = useAdministrationSettings();
+  const dialog = useConnectionDialog(rejectDialog);
+  const errorDetails = useErrorDetails(dialog.connectException);
 
-  let subtitle: string | undefined;
+  const subTitle = dialog.step === ConnectionStep.Connection ? dialog.template?.name : undefined;
 
-  if (controller.step === ConnectionStep.Connection && controller.template?.name) {
-    subtitle = controller.template.name;
-  }
-
-  return styled(styles)(
-    <CommonDialogWrapper
-      size='large'
-      title="basicConnection_connectionDialog_newConnection"
-      subTitle={subtitle}
-      icon={controller.dbDriver?.icon}
-      footer={controller.step === ConnectionStep.Connection && (
-        <ConnectionDialogFooter
-          isConnecting={controller.isConnecting}
-          onBack={() => controller.onStep(ConnectionStep.ConnectionTemplateSelect)}
-          onConnect={controller.onConnect}
-        />
-      )}
-      noBodyPadding={controller.step === ConnectionStep.ConnectionTemplateSelect}
-      fixedSize
-      noOverflow
-      onReject={rejectDialog}
-    >
-      {controller.isLoading && <Loader />}
-      {!controller.isLoading && controller.step === ConnectionStep.ConnectionTemplateSelect && (
-        <TemplateConnectionSelector
-          templateConnections={controller.templateConnections}
-          dbDrivers={controller.dbDrivers}
-          onSelect={controller.onTemplateSelect}
-        />
-      )}
-      {controller.step === ConnectionStep.Connection && (!controller.authModel ? (
-        <center>
-          {controller.isConnecting && translate('basicConnection_connectionDialog_connecting_message')}
-        </center>
-      ) : (
-        <SubmittingForm ref={focusedRef} onSubmit={controller.onConnect}>
-          <ConnectionAuthenticationForm
-            config={controller.config}
-            authModelId={controller.authModel.id}
-            networkHandlers={controller.networkHandlers}
-            formId={controller.template?.id}
-            allowSaveCredentials={credentialsSavingEnabled}
-            disabled={controller.isConnecting}
+  return (
+    <CommonDialogWrapper size="large" fixedSize={dialog.step === ConnectionStep.ConnectionTemplateSelect}>
+      <CommonDialogHeader
+        title="basicConnection_connectionDialog_newConnection"
+        subTitle={subTitle}
+        icon={dialog.driver?.icon}
+        onReject={rejectDialog}
+      />
+      <CommonDialogBody noBodyPadding={dialog.step === ConnectionStep.ConnectionTemplateSelect} noOverflow>
+        {dialog.step === ConnectionStep.ConnectionTemplateSelect && <TemplateConnectionSelector onSelect={dialog.selectTemplate} />}
+        {dialog.step === ConnectionStep.Connection &&
+          (!dialog.authModelId ? (
+            <center className={s(styles, { center: true })}>
+              {dialog.processing && translate('basicConnection_connectionDialog_connecting_message')}
+            </center>
+          ) : (
+            <Form ref={focusedRef} className={s(styles, { submittingForm: true })} onSubmit={dialog.connect}>
+              <ConnectionAuthenticationFormLoader
+                config={dialog.config}
+                authModelId={dialog.authModelId}
+                networkHandlers={dialog.networkHandlers}
+                formId={dialog.template?.id}
+                allowSaveCredentials={credentialsSavingEnabled}
+                disabled={dialog.processing}
+                hideFeatures={['nonSecuredProperty']}
+                className={s(styles, { connectionAuthenticationFormLoader: true })}
+              />
+            </Form>
+          ))}
+      </CommonDialogBody>
+      {dialog.step === ConnectionStep.Connection && (
+        <CommonDialogFooter>
+          {dialog.connectException && (
+            <ErrorMessage
+              text={errorDetails.message ?? translate('core_blocks_exception_message_error_message')}
+              hasDetails={errorDetails.hasDetails}
+              className={s(styles, { errorMessage: true })}
+              onShowDetails={errorDetails.open}
+            />
+          )}
+          <ConnectionDialogFooter
+            isConnecting={dialog.processing}
+            onBack={() => dialog.setStep(ConnectionStep.ConnectionTemplateSelect)}
+            onConnect={dialog.connect}
           />
-        </SubmittingForm>
-      ))}
-      {controller.responseMessage && (
-        <ErrorMessage
-          text={controller.responseMessage}
-          hasDetails={controller.hasDetails}
-          onShowDetails={controller.onShowDetails}
-        />
+        </CommonDialogFooter>
       )}
     </CommonDialogWrapper>
   );

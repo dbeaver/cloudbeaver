@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2023 DBeaver Corp and others
+ * Copyright (C) 2010-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,13 +23,13 @@ import io.cloudbeaver.WebProjectAction;
 import io.cloudbeaver.model.*;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.service.DBWService;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.model.navigator.DBNBrowseSettings;
 import org.jkiss.dbeaver.model.rm.RMConstants;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 import java.util.Map;
 
@@ -42,7 +42,7 @@ public interface DBWServiceCore extends DBWService {
     WebServerConfig getServerConfig() throws DBWebException;
 
     @WebAction
-    List<WebDatabaseDriverConfig> getDriverList(@NotNull WebSession webSession, String driverId) throws DBWebException;
+    List<WebDatabaseDriverInfo> getDriverList(@NotNull WebSession webSession, String driverId) throws DBWebException;
 
     @WebAction
     List<WebDatabaseAuthModel> getAuthModels(@NotNull WebSession webSession);
@@ -90,8 +90,13 @@ public interface DBWServiceCore extends DBWService {
     @WebAction(authRequired = false)
     boolean closeSession(HttpServletRequest request) throws DBWebException;
 
+    @Deprecated
     @WebAction(authRequired = false)
     boolean touchSession(@NotNull HttpServletRequest request, @NotNull HttpServletResponse servletResponse) throws DBWebException;
+
+    @WebAction(authRequired = false)
+    WebSession updateSession(@NotNull HttpServletRequest request, @NotNull HttpServletResponse response)
+        throws DBWebException;
 
     @WebAction(authRequired = false)
     boolean refreshSessionConnections(@NotNull HttpServletRequest request, @NotNull HttpServletResponse response) throws DBWebException;
@@ -113,7 +118,8 @@ public interface DBWServiceCore extends DBWService {
         @NotNull Map<String, Object> authProperties,
         @Nullable List<WebNetworkHandlerConfigInput> networkCredentials,
         @Nullable Boolean saveCredentials,
-        @Nullable Boolean sharedCredentials
+        @Nullable Boolean sharedCredentials,
+        @Nullable String selectedCredentials
     ) throws DBWebException;
 
     @WebProjectAction(requireProjectPermissions = {RMConstants.PERMISSION_PROJECT_DATASOURCES_EDIT})

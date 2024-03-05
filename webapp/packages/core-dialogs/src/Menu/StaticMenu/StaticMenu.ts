@@ -1,15 +1,12 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2022 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import type { IMenuPanel } from '../IMenuPanel';
-import {
-  ComputedMenuItemModel, IComputedMenuItemOptions
-} from '../models/ComputedMenuItemModel';
+import { ComputedMenuItemModel, IComputedMenuItemOptions } from '../models/ComputedMenuItemModel';
 import { ComputedMenuPanelModel } from '../models/ComputedMenuPanelModel';
 import { MenuOptionsStore } from '../models/MenuOptionsStore';
 
@@ -18,8 +15,8 @@ import { MenuOptionsStore } from '../models/MenuOptionsStore';
  * and create IMenuPanel from this tree
  */
 export class StaticMenu {
-  private menuStore = new MenuOptionsStore<IComputedMenuItemOptions>();
-  private menuModels = new Map<string, IMenuPanel>();
+  private readonly menuStore = new MenuOptionsStore<IComputedMenuItemOptions>();
+  private readonly menuModels = new Map<string, IMenuPanel>();
 
   addRootPanel(panelId: string): void {
     this.menuStore.addRootPanel(panelId);

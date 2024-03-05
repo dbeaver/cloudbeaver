@@ -1,36 +1,39 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2022 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { action, computed, makeObservable, observable, runInAction } from 'mobx';
 
-import { CoreSettingsService } from '@cloudbeaver/core-app';
 import { AppAuthService, UserInfoResource } from '@cloudbeaver/core-authentication';
 import { injectable } from '@cloudbeaver/core-di';
-import { Executor, ExecutorInterrupter, IExecutor } from '@cloudbeaver/core-executor';
+import { Executor, ExecutorInterrupter, IExecutionContext, IExecutor } from '@cloudbeaver/core-executor';
 import { ProjectInfoResource } from '@cloudbeaver/core-projects';
-import { SessionDataResource } from '@cloudbeaver/core-root';
 import {
-  GraphQLService,
+  CACHED_RESOURCE_DEFAULT_PAGE_OFFSET,
+  CachedMapAllKey,
   CachedMapResource,
-  ResourceKey,
+  CachedResourceOffsetPageKey,
+  CachedResourceOffsetPageListKey,
+  type ICachedResourceMetadata,
+  isResourceAlias,
   isResourceKeyList,
-  ResourceKeyList,
+  ResourceError,
+  type ResourceKey,
   resourceKeyList,
-  NavNodeChildrenQuery as fake,
+  type ResourceKeyList,
+  type ResourceKeySimple,
   ResourceKeyUtils,
-  ICachedMapResourceMetadata,
-  CachedMapAllKey
-} from '@cloudbeaver/core-sdk';
-import { MetadataMap } from '@cloudbeaver/core-utils';
+} from '@cloudbeaver/core-resource';
+import { SessionDataResource } from '@cloudbeaver/core-root';
+import { DetailsError, NavNodeChildrenQuery as fake, GraphQLService } from '@cloudbeaver/core-sdk';
+import { flat, getPathName, getPathParent, isDefined, isUndefined, MetadataMap } from '@cloudbeaver/core-utils';
 
 import { NavTreeSettingsService } from '../NavTreeSettingsService';
 import type { NavNode } from './EntityTypes';
-import { NavNodeInfoResource } from './NavNodeInfoResource';
+import { NavNodeInfoResource, ROOT_NODE_PATH } from './NavNodeInfoResource';
 
 // TODO: so much dirty
 export interface NodePath {
@@ -39,7 +42,7 @@ export interface NodePath {
 
 type NavNodeChildrenQuery = fake & NodePath;
 
-interface INodeMetadata extends ICachedMapResourceMetadata {
+interface INodeMetadata extends ICachedResourceMetadata {
   withDetails: boolean;
 }
 
@@ -55,25 +58,19 @@ export interface INavNodeRenameData {
 }
 
 @injectable()
-export class NavTreeResource extends CachedMapResource<string, string[]> {
-  readonly beforeNodeDelete: IExecutor<ResourceKey<string>>;
+export class NavTreeResource extends CachedMapResource<string, string[], Record<string, unknown>, INodeMetadata> {
+  readonly beforeNodeDelete: IExecutor<ResourceKeySimple<string>>;
   readonly onNodeRefresh: IExecutor<string>;
   readonly onNodeRename: IExecutor<INavNodeRenameData>;
   readonly onNodeMove: IExecutor<INavNodeMoveData>;
-  protected metadata: MetadataMap<string, INodeMetadata>;
 
   get childrenLimit(): number {
-    return (
-      this.navTreeSettingsService.settings.isValueDefault('childrenLimit')
-        ? this.coreSettingsService.settings.getValue('app.navigationTree.childrenLimit')
-        : this.navTreeSettingsService.settings.getValue('childrenLimit')
-    );
+    return this.navTreeSettingsService.settings.getValue('childrenLimit');
   }
 
   constructor(
     private readonly graphQLService: GraphQLService,
     private readonly navNodeInfoResource: NavNodeInfoResource,
-    private readonly coreSettingsService: CoreSettingsService,
     private readonly navTreeSettingsService: NavTreeSettingsService,
     private readonly sessionDataResource: SessionDataResource,
     private readonly userInfoResource: UserInfoResource,
@@ -96,15 +93,6 @@ export class NavTreeResource extends CachedMapResource<string, string[]> {
       pushToNode: action,
     });
 
-    this.metadata = new MetadataMap<string, INodeMetadata>(() => ({
-      outdated: true,
-      loading: false,
-      withDetails: false,
-      exception: null,
-      includes: observable([]),
-      dependencies: observable([]),
-    }));
-
     appAuthService.requireAuthentication(this);
     // this.preloadResource(connectionInfo, () => CachedMapAllKey);
 
@@ -114,36 +102,46 @@ export class NavTreeResource extends CachedMapResource<string, string[]> {
     navNodeInfoResource.connect(this);
     this.outdateResource(navNodeInfoResource);
     this.updateResource(navNodeInfoResource);
-    this.sync(this.projectInfoResource, () => CachedMapAllKey, () => CachedMapAllKey);
-    this.sessionDataResource.outdateResource(this);
-    this.userInfoResource.onUserChange.addHandler(action(() => {
-      this.clear();
-      this.navNodeInfoResource.clear(); // TODO: need more convenient way
-    }));
+    this.sync(
+      this.projectInfoResource,
+      () => CachedMapAllKey,
+      () => CachedMapAllKey,
+    );
+    this.projectInfoResource.onDataOutdated.addHandler(() => this.markTreeOutdated(resourceKeyList(this.keys)));
+    this.sessionDataResource.onDataOutdated.addHandler(() => this.markTreeOutdated(resourceKeyList(this.keys)));
+    this.userInfoResource.onUserChange.addHandler(
+      action(() => {
+        this.clear();
+        this.navNodeInfoResource.clear(); // TODO: need more convenient way
+      }),
+    );
   }
 
-  async preloadNodeParents(
-    parents: string[],
-    nextNode?: string
-  ): Promise<boolean> {
+  async preloadNodeParents(parents: string[], nextNode?: string): Promise<boolean> {
     if (parents.length === 0) {
       return true;
     }
+    parents = [...parents];
 
-    const first = parents[0];
-    await this.load(first);
+    let parent: string | undefined;
+    let children: string[] = [];
 
-    for (const nodeId of parents) {
-      await this.waitLoad();
-
-      if (!this.navNodeInfoResource.has(nodeId)) {
+    while (parents.length > 0) {
+      const next = parents.shift()!;
+      if (parent !== undefined && !children.includes(next)) {
         return false;
       }
+      await this.scheduler.waitRelease(next);
 
-      await this.load(nodeId);
+      if (this.isLoadable(next)) {
+        children = await this.load(next);
+      } else {
+        children = this.get(next) || [];
+      }
+      parent = next;
     }
 
-    if (nextNode && !this.navNodeInfoResource.has(nextNode)) {
+    if (nextNode && !children.includes(nextNode)) {
       return false;
     }
 
@@ -161,34 +159,31 @@ export class NavTreeResource extends CachedMapResource<string, string[]> {
     await this.onNodeRefresh.execute(navNodeId);
   }
 
-  markTreeOutdated(navNodeId: ResourceKey<string>): void {
+  markTreeOutdated(navNodeId: ResourceKeySimple<string>): void {
     this.markOutdated(resourceKeyList(this.getNestedChildren(navNodeId)));
   }
 
-  setDetails(keyObject: ResourceKey<string>, state: boolean): void {
-    ResourceKeyUtils.forEach(keyObject, key => {
-      const children = resourceKeyList(this.getNestedChildren(key));
-      this.navNodeInfoResource.setDetails(children, state);
+  setDetails(keyObject: ResourceKeySimple<string>, state: boolean): void {
+    const list = resourceKeyList(ResourceKeyUtils.mapArray(keyObject, key => this.getNestedChildren(key)).flat());
+    this.navNodeInfoResource.setDetails(list, state);
 
-      ResourceKeyUtils.forEach(children, key => {
-        const metadata = this.metadata.get(key);
-
-        if (!metadata.withDetails && state) {
-          metadata.outdated = true;
-        }
-        metadata.withDetails = state;
-      });
+    this.metadata.update(list, metadata => {
+      if (!metadata.withDetails && state) {
+        metadata.outdated = true;
+        metadata.outdatedIncludes = observable([...metadata.includes]);
+      }
+      metadata.withDetails = state;
     });
   }
 
-  async deleteNode(key: ResourceKey<string>): Promise<void> {
+  async deleteNode(key: ResourceKeySimple<string>): Promise<void> {
     const contexts = await this.beforeNodeDelete.execute(key);
 
     if (ExecutorInterrupter.isInterrupted(contexts)) {
       return;
     }
 
-    const nodePaths = isResourceKeyList(key) ? key.list : [key];
+    const nodePaths = ResourceKeyUtils.toArray(key);
 
     await this.performUpdate(key, [], async () => {
       const deletedPaths: string[] = [];
@@ -200,36 +195,37 @@ export class NavTreeResource extends CachedMapResource<string, string[]> {
         }
       } finally {
         runInAction(() => {
+          const deletedNodes: string[] = [];
           const deletionMap = new Map<string, string[]>();
 
           for (const path of deletedPaths) {
             const node = this.navNodeInfoResource.get(path);
 
             if (node) {
-              const deletedIds = deletionMap.get(node.parentId) ?? [];
-              deletedIds.push(path);
-              deletionMap.set(node.parentId, deletedIds);
+              deletedNodes.push(path);
+
+              if (node.parentId !== undefined) {
+                const deletedIds = deletionMap.get(node.parentId) ?? [];
+                deletionMap.set(node.parentId, deletedIds);
+              }
             }
           }
 
           const keys = resourceKeyList([...deletionMap.keys()]);
           const nodes = [...deletionMap.values()];
 
+          this.delete(resourceKeyList(deletedNodes));
           this.deleteInNode(keys, nodes);
         });
       }
     });
   }
 
-  async moveTo(key: ResourceKey<string>, target: string): Promise<void> {
-    const parents = Array.from(new Set(
-      ResourceKeyUtils
-        .mapArray(key, key => this.navNodeInfoResource.get(key)?.parentId)
-        .filter<string>(((id: string | undefined) => id !== undefined) as any)
-    ));
+  async moveTo(key: ResourceKeySimple<string>, target: string): Promise<void> {
+    const parents = Array.from(new Set(ResourceKeyUtils.mapArray(key, key => this.navNodeInfoResource.get(key)?.parentId).filter(isDefined)));
 
     await this.performUpdate(resourceKeyList(parents), [], async () => {
-      this.markDataLoading(target);
+      this.markLoading(target, true);
 
       try {
         await this.graphQLService.sdk.navMoveTo({
@@ -238,8 +234,9 @@ export class NavTreeResource extends CachedMapResource<string, string[]> {
         });
 
         this.moveToNode(key, target);
+        this.markLoaded(target);
       } finally {
-        this.markDataLoaded(target);
+        this.markLoading(target, false);
       }
     });
 
@@ -247,9 +244,23 @@ export class NavTreeResource extends CachedMapResource<string, string[]> {
     await this.onNodeMove.execute({ key, target });
   }
 
+  async setFilter(nodePath: string, include?: string[], exclude?: string[]) {
+    await this.graphQLService.sdk.navSetFolderFilter({
+      nodePath,
+      exclude,
+      include,
+    });
+
+    this.refreshTree(nodePath);
+  }
+
   async changeName(node: NavNode, name: string): Promise<string> {
-    const newNodeId = await this.performUpdate(node.parentId, [], async () => {
-      this.markDataLoading(node.id);
+    const parentId = node.parentId;
+    if (isUndefined(parentId)) {
+      throw new Error("Root node can't be renamed");
+    }
+    const newNodeId = await this.performUpdate(parentId, [], async () => {
+      this.markLoading(node.id, true);
       try {
         await this.graphQLService.sdk.navRenameNode({
           nodePath: node.id,
@@ -259,13 +270,14 @@ export class NavTreeResource extends CachedMapResource<string, string[]> {
         const parts = node.id.split('/');
         parts.splice(parts.length - 1, 1, name);
 
+        this.markTreeOutdated(parentId);
+        this.markLoaded(node.id);
         return parts.join('/');
       } finally {
-        this.markDataLoaded(node.id);
+        this.markLoading(node.id, false);
       }
     });
 
-    this.markOutdated(node.parentId);
     await this.onNodeRename.execute({
       projectId: node.projectId,
       nodeId: node.id,
@@ -274,10 +286,29 @@ export class NavTreeResource extends CachedMapResource<string, string[]> {
     return newNodeId;
   }
 
+  moveSync(from: string, to: string): void {
+    const toParent = getPathParent(to);
+    const fromParent = getPathParent(from);
+
+    this.pushToNode(toParent, [to]);
+
+    const node = this.navNodeInfoResource.get(from);
+    if (node) {
+      node.id = to;
+      node.name = getPathName(to);
+      node.parentId = toParent;
+      this.navNodeInfoResource.set(to, node);
+    }
+
+    this.deleteInNode(fromParent, [from]);
+
+    this.markOutdated(resourceKeyList([toParent, fromParent]));
+  }
+
   moveToNode(key: string, target: string): void;
   moveToNode(key: ResourceKeyList<string>, target: string): void;
-  moveToNode(keyObject: ResourceKey<string>, target: string): void;
-  moveToNode(keyObject: ResourceKey<string>, target: string): void {
+  moveToNode(keyObject: ResourceKeySimple<string>, target: string): void;
+  moveToNode(keyObject: ResourceKeySimple<string>, target: string): void {
     ResourceKeyUtils.forEach(keyObject, key => {
       const parentId = this.navNodeInfoResource.getParent(key);
 
@@ -294,15 +325,14 @@ export class NavTreeResource extends CachedMapResource<string, string[]> {
     });
 
     this.pushToNode(target, ResourceKeyUtils.toArray(keyObject));
-    this.markUpdated(target);
-    this.markUpdated(keyObject);
-    this.onItemAdd.execute(keyObject);
+    this.markUpdated(ResourceKeyUtils.join(target, keyObject));
+    this.onItemUpdate.execute(keyObject);
   }
 
   deleteInNode(key: string, value: string[]): void;
   deleteInNode(key: ResourceKeyList<string>, value: string[][]): void;
-  deleteInNode(keyObject: ResourceKey<string>, valueObject: string[] | string[][]): void;
-  deleteInNode(keyObject: ResourceKey<string>, valueObject: string[] | string[][]): void {
+  deleteInNode(keyObject: ResourceKeySimple<string>, valueObject: string[] | string[][]): void;
+  deleteInNode(keyObject: ResourceKeySimple<string>, valueObject: string[] | string[][]): void {
     const deletedKeys: string[] = [];
 
     ResourceKeyUtils.forEach(keyObject, (key, i) => {
@@ -319,12 +349,12 @@ export class NavTreeResource extends CachedMapResource<string, string[]> {
 
     this.delete(resourceKeyList(deletedKeys));
     this.markOutdated(keyObject);
-    this.onItemAdd.execute(keyObject);
+    this.onItemUpdate.execute(keyObject);
   }
 
   unshiftToNode(key: string, value: string[]): void;
   unshiftToNode(key: ResourceKeyList<string>, value: string[][]): void;
-  unshiftToNode(keyObject: ResourceKey<string>, valueObject: string[] | string[][]): void {
+  unshiftToNode(keyObject: ResourceKeySimple<string>, valueObject: string[] | string[][]): void {
     ResourceKeyUtils.forEach(keyObject, (key, i) => {
       const values = i === -1 ? (valueObject as string[]) : (valueObject as string[][])[i];
       const currentValue = this.data.get(key) || [];
@@ -334,12 +364,12 @@ export class NavTreeResource extends CachedMapResource<string, string[]> {
     });
 
     this.markUpdated(keyObject);
-    this.onItemAdd.execute(keyObject);
+    this.onItemUpdate.execute(keyObject);
   }
 
   pushToNode(key: string, value: string[]): void;
   pushToNode(key: ResourceKeyList<string>, value: string[][]): void;
-  pushToNode(keyObject: ResourceKey<string>, valueObject: string[] | string[][]): void {
+  pushToNode(keyObject: ResourceKeySimple<string>, valueObject: string[] | string[][]): void {
     ResourceKeyUtils.forEach(keyObject, (key, i) => {
       const values = i === -1 ? (valueObject as string[]) : (valueObject as string[][])[i];
       const currentValue = this.data.get(key) || [];
@@ -349,7 +379,7 @@ export class NavTreeResource extends CachedMapResource<string, string[]> {
     });
 
     this.markUpdated(keyObject);
-    this.onItemAdd.execute(keyObject);
+    this.onItemUpdate.execute(keyObject);
   }
 
   insertToNode(nodeId: string, index: number, ...nodes: string[]): void {
@@ -359,69 +389,106 @@ export class NavTreeResource extends CachedMapResource<string, string[]> {
     this.dataSet(nodeId, currentValue);
 
     this.markUpdated(nodeId);
-    this.onItemAdd.execute(nodeId);
+    this.onItemUpdate.execute(nodeId);
   }
 
   set(key: string, value: string[]): void;
   set(key: ResourceKeyList<string>, value: string[][]): void;
-  set(keyObject: ResourceKey<string>, valueObject: string[] | string[][]): void {
+  set(keyObject: ResourceKeySimple<string>, valueObject: string[] | string[][]): void {
     const childrenToRemove: string[] = [];
-    ResourceKeyUtils.forEach(keyObject, (key, i) => {
-      const value = i === -1 ? (valueObject as string[]) : (valueObject as string[][])[i];
-      const children = this.data.get(key) || [];
-      childrenToRemove.push(...children.filter(navNodeId => !value.includes(navNodeId)));
-      this.dataSet(key, value);
-    });
+    const children: string[] = [];
+
+    if (isResourceKeyList(keyObject)) {
+      valueObject = valueObject as string[][];
+      children.push(...flat(valueObject));
+
+      const oldChildren = flat(this.get(keyObject));
+      childrenToRemove.push(
+        ...oldChildren.filter<string>((navNodeId): navNodeId is string => navNodeId !== undefined && !children.includes(navNodeId)),
+      );
+    } else {
+      valueObject = valueObject as string[];
+      children.push(...valueObject);
+
+      const oldChildren = this.get(keyObject) || [];
+      childrenToRemove.push(...oldChildren.filter(navNodeId => !children.includes(navNodeId)));
+    }
 
     this.delete(resourceKeyList(childrenToRemove));
-    this.markUpdated(keyObject);
-    this.onItemAdd.execute(keyObject);
+    this.cleanError(resourceKeyList(children));
+    super.set(keyObject, valueObject);
   }
 
   delete(key: string): void;
   delete(key: ResourceKeyList<string>): void;
-  delete(key: ResourceKey<string>): void;
-  delete(key: ResourceKey<string>): void {
-    const items = this.getNestedChildren(key);
+  delete(key: ResourceKeySimple<string>): void;
+  delete(key: ResourceKeySimple<string>): void {
+    const items = resourceKeyList(this.getNestedChildren(key));
 
     if (items.length === 0) {
       return;
     }
 
-    const allKeys = resourceKeyList(items);
-
-    this.onItemDelete.execute(allKeys);
-    ResourceKeyUtils.forEach(allKeys, key => {
-      this.dataDelete(key);
-      this.metadata.delete(key);
-    });
-    // rewrites pending outdate
-    // this.markUpdated(allKeys);
-
-    this.navNodeInfoResource.delete(ResourceKeyUtils.exclude(allKeys, key));
+    super.delete(items);
+    this.navNodeInfoResource.delete(items.exclude(key));
   }
 
-  protected async loader(key: ResourceKey<string>): Promise<Map<string, string[]>> {
-    const limit = this.childrenLimit + 1;
-    if (isResourceKeyList(key)) {
-      const values: NavNodeChildrenQuery[] = [];
-      for (const nodePath of key.list) {
-        values.push(await this.loadNodeChildren(nodePath, 0, limit));
+  protected async preLoadData(key: ResourceKey<string>, contexts: IExecutionContext<ResourceKey<string>>): Promise<void> {
+    await ResourceKeyUtils.forEachAsync(key, async nodeId => {
+      if (isResourceAlias(nodeId)) {
+        return;
       }
-      this.setNavObject(values);
-    } else {
-      this.setNavObject(await this.loadNodeChildren(key, 0, limit));
+
+      if (!this.navNodeInfoResource.has(nodeId) && nodeId !== ROOT_NODE_PATH) {
+        await this.navNodeInfoResource.loadNodeParents(nodeId);
+      }
+      const parents = this.navNodeInfoResource.getParents(nodeId);
+      const preloaded = await this.preloadNodeParents(parents, nodeId);
+
+      if (!preloaded) {
+        const cause = new DetailsError(`Entity not found:\n"${nodeId}"\nPath:\n${parents.map(parent => `"${parent}"`).join('\n')}`);
+        const error = new ResourceError(this, key, undefined, 'Entity not found', { cause });
+        ExecutorInterrupter.interrupt(contexts);
+        throw this.markError(error, key);
+      }
+    });
+  }
+
+  protected async loader(originalKey: ResourceKey<string>): Promise<Map<string, string[]>> {
+    const pageKey =
+      this.aliases.isAlias(originalKey, CachedResourceOffsetPageKey) || this.aliases.isAlias(originalKey, CachedResourceOffsetPageListKey);
+    const allKey = this.aliases.isAlias(originalKey, CachedMapAllKey);
+
+    if (allKey) {
+      throw new Error('Loading all nodes is prohibited');
     }
+
+    const offset = pageKey?.options.offset ?? CACHED_RESOURCE_DEFAULT_PAGE_OFFSET;
+    const limit = pageKey?.options.limit ?? this.childrenLimit;
+    const values: NavNodeChildrenQuery[] = [];
+
+    await ResourceKeyUtils.forEachAsync(originalKey, async key => {
+      const nodeId = pageKey?.target ?? key;
+      const navNodeChildren = await this.loadNodeChildren(nodeId, offset, limit);
+      values.push(navNodeChildren);
+
+      this.offsetPagination.setPageEnd(
+        CachedResourceOffsetPageKey(offset, navNodeChildren.navNodeChildren.length).setTarget(nodeId),
+        navNodeChildren.navNodeChildren.length === limit,
+      );
+    });
+
+    this.setNavObject(values, offset, limit);
 
     return this.data;
   }
 
-  getNestedChildren(navNode: ResourceKey<string>): string[] {
+  getNestedChildren(navNode: ResourceKeySimple<string>): string[] {
     const nestedChildren: string[] = [];
     let prevChildren: string[];
 
     if (isResourceKeyList(navNode)) {
-      prevChildren = navNode.list.concat();
+      prevChildren = navNode.concat();
     } else {
       prevChildren = [navNode, ...(this.get(navNode) || [])];
     }
@@ -438,98 +505,78 @@ export class NavTreeResource extends CachedMapResource<string, string[]> {
     return nestedChildren;
   }
 
-  private setNavObject(data: NavNodeChildrenQuery | NavNodeChildrenQuery[]) {
+  private setNavObject(data: NavNodeChildrenQuery | NavNodeChildrenQuery[], offset: number, limit: number): void {
     if (Array.isArray(data)) {
+      if (data.length === 0) {
+        return;
+      }
+
       for (const node of data) {
         const metadata = this.metadata.get(node.parentPath);
 
-        this.setDetails(resourceKeyList([
-          node.navNodeInfo.id,
-          ...node.navNodeChildren.map(node => node.id),
-        ]), metadata.withDetails);
+        this.setDetails(resourceKeyList([node.navNodeInfo.id, ...node.navNodeChildren.map(node => node.id)]), metadata.withDetails);
       }
 
-      this.navNodeInfoResource.updateNode(
-        resourceKeyList([
-          ...data.map(data => data.parentPath),
-          ...data.map(data => data.navNodeChildren.map(node => node.id)).flat(),
-        ]), [
-          ...data.map(data => this.navNodeInfoResource.navNodeInfoToNavNode(
-            data.navNodeInfo,
-            undefined,
-            data.parentPath
-          )).flat(),
-          ...data.map(
-            data => data.navNodeChildren.map(
-              node => this.navNodeInfoResource.navNodeInfoToNavNode(node, data.parentPath)
-            )
-          ).flat(),
-        ]);
+      this.navNodeInfoResource.set(
+        resourceKeyList([...data.map(data => data.parentPath), ...data.map(data => data.navNodeChildren.map(node => node.id)).flat()]),
+        [
+          ...data.map(data => this.navNodeInfoResource.navNodeInfoToNavNode(data.navNodeInfo)).flat(),
+          ...data.map(data => data.navNodeChildren.map(node => this.navNodeInfoResource.navNodeInfoToNavNode(node, data.parentPath))).flat(),
+        ],
+      );
 
       this.set(
         resourceKeyList(data.map(data => data.parentPath)),
-        data.map(data => data.navNodeChildren.map(node => node.id))
+        data.map(data => this.insertSlice(data, offset, limit)),
       );
     } else {
       const metadata = this.metadata.get(data.parentPath);
 
-      this.setDetails(resourceKeyList([
-        data.navNodeInfo.id,
-        ...data.navNodeChildren.map(node => node.id),
-      ]), metadata.withDetails);
+      this.setDetails(resourceKeyList([data.navNodeInfo.id, ...data.navNodeChildren.map(node => node.id)]), metadata.withDetails);
 
-      this.navNodeInfoResource.updateNode(
-        resourceKeyList([
-          data.parentPath,
-          ...data.navNodeChildren.map(node => node.id),
-        ]), [
-          this.navNodeInfoResource.navNodeInfoToNavNode(
-            data.navNodeInfo,
-            undefined,
-            data.parentPath
-          ),
-          ...data.navNodeChildren.map(node => this.navNodeInfoResource.navNodeInfoToNavNode(node, data.parentPath)),
-        ]
-      );
+      this.navNodeInfoResource.set(resourceKeyList([data.parentPath, ...data.navNodeChildren.map(node => node.id)]), [
+        this.navNodeInfoResource.navNodeInfoToNavNode(data.navNodeInfo),
+        ...data.navNodeChildren.map(node => this.navNodeInfoResource.navNodeInfoToNavNode(node, data.parentPath)),
+      ]);
 
-      this.set(data.parentPath, data.navNodeChildren.map(node => node.id));
+      this.set(data.parentPath, this.insertSlice(data, offset, limit));
     }
   }
 
-  protected dataSet(key: string, value: string[]): void {
-    key = this.getKeyRef(key);
-    const currentValue = this.dataGet(key) || [];
+  private insertSlice(data: NavNodeChildrenQuery, offset: number, limit: number): string[] {
+    let children = [...(this.get(data.parentPath) || [])];
 
-    const deleted = currentValue.filter(r => !value.some(v => v === r));
+    children.splice(offset, limit, ...data.navNodeChildren.map(node => node.id));
 
-    if (deleted.length > 0) {
-      this.delete(resourceKeyList(deleted));
+    if (data.navNodeChildren.length < limit) {
+      children.splice(offset + data.navNodeChildren.length, children.length - offset - data.navNodeChildren.length);
     }
 
-    this.data.set(key, value);
-    this.navNodeInfoResource.markUpdated(resourceKeyList(value));
+    children = children.filter((value, index, self) => self.indexOf(value) === index);
+
+    return children;
   }
 
-  private async loadNodeChildren(
-    parentPath: string,
-    offset: number,
-    limit: number
-  ): Promise<NavNodeChildrenQuery> {
+  private async loadNodeChildren(parentPath: string, offset: number, limit: number): Promise<NavNodeChildrenQuery> {
     const metadata = this.metadata.get(parentPath);
     const { navNodeChildren, navNodeInfo } = await this.graphQLService.sdk.navNodeChildren({
       parentPath,
       offset,
       limit,
       withDetails: metadata.withDetails,
+      withFilters: false,
     });
 
     return { navNodeChildren, navNodeInfo, parentPath };
   }
 
-  protected validateParam(param: ResourceKey<string>): boolean {
-    return (
-      super.validateParam(param)
-      || typeof param === 'string'
-    );
+  protected getDefaultMetadata(key: string, metadata: MetadataMap<string, INodeMetadata>): INodeMetadata {
+    return Object.assign(super.getDefaultMetadata(key, metadata), {
+      withDetails: false,
+    });
+  }
+
+  protected validateKey(key: string): boolean {
+    return typeof key === 'string';
   }
 }

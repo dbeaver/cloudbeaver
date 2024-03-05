@@ -1,15 +1,15 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2022 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observer } from 'mobx-react-lite';
 import styled, { css, use } from 'reshadow';
 
-import { BASE_TABLE_STYLES, IconOrImage, Link, TableColumnValue, TableItem, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
+import { IconOrImage, Link, TableColumnValue, TableItem, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
+import { isSameDay } from '@cloudbeaver/core-utils';
 
 import type { ILogEntry } from './ILogEntry';
 
@@ -57,17 +57,15 @@ const style = css`
   }
 `;
 
-export const LogEntry = observer<Props>(function LogEntry({
-  item,
-  onSelect,
-  selected = false,
-  className,
-}) {
+export const LogEntry = observer<Props>(function LogEntry({ item, onSelect, selected = false, className }) {
   const translate = useTranslate();
 
   const isError = !!item.stackTrace;
   const message = isError ? item.message || translate('ui_error') : item.message;
   let icon: string | null = null;
+  const time = new Date(item.time);
+  const fullTime = time.toLocaleString();
+  const displayTime = isSameDay(time, new Date()) ? time.toLocaleTimeString() : fullTime;
 
   switch (item.type) {
     case 'ERROR':
@@ -78,23 +76,19 @@ export const LogEntry = observer<Props>(function LogEntry({
       break;
   }
 
-  return styled(useStyles(BASE_TABLE_STYLES, style))(
+  return styled(useStyles(style))(
     <TableItem item={item.id} className={className} {...use({ selected })}>
       <TableColumnValue title={item.type} centerContent flex {...use({ icon: true })}>
         <icon-box>{icon && <IconOrImage icon={icon} />}</icon-box>
       </TableColumnValue>
-      <TableColumnValue title={item.time} ellipsis>{item.time}</TableColumnValue>
+      <TableColumnValue title={fullTime} ellipsis>
+        {displayTime}
+      </TableColumnValue>
       <TableColumnValue>
         <message-cell>
-          <message title={message}>
-            {isError ? (
-              <Link onClick={() => onSelect(item)}>
-                {message}
-              </Link>
-            ) : message}
-          </message>
+          <message title={message}>{isError ? <Link onClick={() => onSelect(item)}>{message}</Link> : message}</message>
         </message-cell>
       </TableColumnValue>
-    </TableItem>
+    </TableItem>,
   );
 });

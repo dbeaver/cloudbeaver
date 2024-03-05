@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2023 DBeaver Corp and others
+ * Copyright (C) 2010-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -182,6 +182,9 @@ public class WebServiceUtils extends WebCommonUtils {
         if (config.getAuthModelId() != null) {
             dsConfig.setAuthModelId(config.getAuthModelId());
         }
+        if (config.getKeepAliveInterval() >= 0) {
+            dsConfig.setKeepAliveInterval(config.getKeepAliveInterval());
+        }
         // Save provider props
         if (config.getProviderProperties() != null) {
             dsConfig.setProviderProperties(new LinkedHashMap<>());
@@ -223,6 +226,17 @@ public class WebServiceUtils extends WebCommonUtils {
         boolean saveCredentials,
         boolean sharedCredentials
     ) {
+        saveAuthProperties(dataSourceContainer, configuration, authProperties, saveCredentials, sharedCredentials, false);
+    }
+
+    public static void saveAuthProperties(
+        @NotNull DBPDataSourceContainer dataSourceContainer,
+        @NotNull DBPConnectionConfiguration configuration,
+        @Nullable Map<String, Object> authProperties,
+        boolean saveCredentials,
+        boolean sharedCredentials,
+        boolean isTest
+    ) {
         dataSourceContainer.setSavePassword(saveCredentials);
         dataSourceContainer.setSharedCredentials(sharedCredentials);
         if (!saveCredentials) {
@@ -231,19 +245,25 @@ public class WebServiceUtils extends WebCommonUtils {
                 authProperties = new LinkedHashMap<>();
             }
             authProperties.replace(AuthModelDatabaseNativeCredentials.PROP_USER_PASSWORD, null);
+            dataSourceContainer.resetPassword();
         } else {
             if (authProperties == null) {
                 // No changes
                 return;
             }
         }
-        if (!saveCredentials) {
-            configuration.setUserPassword(null);
-        }
         {
             // Read save credentials
             DBAAuthCredentials credentials = configuration.getAuthModel().loadCredentials(dataSourceContainer, configuration);
 
+            if (isTest) {
+                var currentAuthProps = new HashMap<String, String>();
+                for (Map.Entry<String, Object> stringObjectEntry : authProperties.entrySet()) {
+                    var value = stringObjectEntry.getValue() == null ? null : stringObjectEntry.getValue().toString();
+                    currentAuthProps.put(stringObjectEntry.getKey(), value);
+                }
+                configuration.setAuthProperties(currentAuthProps);
+            }
             if (!authProperties.isEmpty()) {
 
                 // Make new Gson parser with type adapters to deserialize into existing credentials
@@ -258,25 +278,6 @@ public class WebServiceUtils extends WebCommonUtils {
 
             configuration.getAuthModel().saveCredentials(dataSourceContainer, configuration, credentials);
         }
-    }
-
-    public static void updateConnectionFromConfig(DBPDataSourceContainer dataSource, WebConnectionConfig config) throws DBWebException {
-        setConnectionConfiguration(dataSource.getDriver(), dataSource.getConnectionConfiguration(), config);
-        dataSource.setName(config.getName());
-        dataSource.setDescription(config.getDescription());
-        if (config.getFolder() != null) {
-            dataSource.setFolder(dataSource.getRegistry().getFolder(config.getFolder()));
-        } else {
-            dataSource.setFolder(null);
-        }
-        getGlobalDataSourceRegistry().getAllFolders().clear();
-        saveAuthProperties(
-            dataSource,
-            dataSource.getConnectionConfiguration(),
-            config.getCredentials(),
-            config.isSaveCredentials(),
-            config.isSharedCredentials()
-        );
     }
 
     public static DBNBrowseSettings parseNavigatorSettings(Map<String, Object> settingsMap) {

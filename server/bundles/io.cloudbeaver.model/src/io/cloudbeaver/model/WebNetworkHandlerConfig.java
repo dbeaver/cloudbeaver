@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2023 DBeaver Corp and others
+ * Copyright (C) 2010-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,8 +20,11 @@ import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.model.net.DBWHandlerConfiguration;
 import org.jkiss.dbeaver.model.net.DBWHandlerType;
 import org.jkiss.dbeaver.model.net.ssh.SSHConstants;
+import org.jkiss.dbeaver.model.preferences.DBPPropertyDescriptor;
+import org.jkiss.dbeaver.registry.RegistryConstants;
 import org.jkiss.utils.CommonUtils;
 
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -52,6 +55,7 @@ public class WebNetworkHandlerConfig {
         return configuration.isEnabled();
     }
 
+    @Deprecated
     public SSHConstants.AuthType getAuthType() {
         return CommonUtils.valueOf(SSHConstants.AuthType.class, configuration.getStringProperty(SSHConstants.PROP_AUTH_TYPE), SSHConstants.AuthType.PASSWORD);
     }
@@ -64,7 +68,7 @@ public class WebNetworkHandlerConfig {
         return CommonUtils.isEmpty(configuration.getPassword()) ? null : "";
     }
 
-
+    @Deprecated // use secure properties
     public String getKey() {
         return CommonUtils.isEmpty(configuration.getSecureProperty(SSHConstants.PROP_KEY_VALUE)) ? null : "";
     }
@@ -76,6 +80,18 @@ public class WebNetworkHandlerConfig {
     @NotNull
     public Map<String, Object> getProperties() {
         return configuration.getProperties();
+    }
+
+    @NotNull
+    public Map<String, String> getSecureProperties() {
+        Map<String, String> secureProperties = new LinkedHashMap<>(configuration.getSecureProperties());
+        DBPPropertyDescriptor[] descriptor = configuration.getHandlerDescriptor().getHandlerProperties();
+        for (DBPPropertyDescriptor p : descriptor) {
+            if (p.hasFeature(RegistryConstants.ATTR_PASSWORD)) {
+                secureProperties.computeIfPresent(p.getId(), (k, v) -> CommonUtils.isEmpty(v) ? null : WebConnectionInfo.SECURED_VALUE);
+            }
+        }
+        return secureProperties;
     }
 
 }

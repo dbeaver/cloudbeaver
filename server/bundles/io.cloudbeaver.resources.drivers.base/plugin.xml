@@ -4,15 +4,16 @@
     <extension point="org.jkiss.dbeaver.resources">
         <resource name="drivers/db2"/>
         <resource name="drivers/db2-jt400"/>
+        <resource name="drivers/duckdb"/>
         <resource name="drivers/mysql/mysql8"/>
         <resource name="drivers/mariadb"/>
         <resource name="drivers/oracle"/>
         <resource name="drivers/postgresql"/>
         <resource name="drivers/clickhouse"/>
         <resource name="drivers/clickhouse_com"/>
-        <resource name="drivers/derby"/>
         <resource name="drivers/jaybird"/>
         <resource name="drivers/h2"/>
+        <resource name="drivers/h2_v2"/>
         <resource name="drivers/sqlite/xerial"/>
         <resource name="drivers/mssql/new"/>
         <resource name="drivers/trino"/>
@@ -21,6 +22,7 @@
     <!-- Bundles  -->
     <extension point="org.jkiss.dbeaver.product.bundles">
         <bundle id="drivers.db2" label="DB2 drivers"/>
+        <bundle id="drivers.duckdb" label="DuckDB drivers"/>
         <bundle id="drivers.jt400" label="DB2 iSeries drivers"/>
         <bundle id="drivers.mysql" label="MySQL drivers"/>
         <bundle id="drivers.mariadb" label="MariaDB drivers"/>
@@ -28,9 +30,9 @@
         <bundle id="drivers.postgresql" label="PostgreSQL drivers"/>
         <bundle id="drivers.clickhouse" label="Clickhouse (legacy) drivers"/>
         <bundle id="drivers.clickhouse_com" label="Clickhouse drivers"/>
-        <bundle id="drivers.derby" label="Derby drivers"/>
         <bundle id="drivers.firebird" label="Firebird drivers"/>
         <bundle id="drivers.h2" label="H2 drivers"/>
+        <bundle id="drivers.h2_v2" label="H2 v2 drivers"/>
         <bundle id="drivers.sqlite.xerial" label="SQLite drivers"/>
         <bundle id="drivers.mssql.new" label="SQL Server drivers"/>
         <bundle id="drivers.trino" label="Trino drivers"/>
@@ -47,11 +49,12 @@
         <driver id="jaybird:jaybird"/>
         <driver id="clickhouse:yandex_clickhouse"/>
         <driver id="clickhouse:com_clickhouse"/>
-        <driver id="generic:derby_server"/>
         <driver id="h2:h2_embedded"/>
+        <driver id="h2:h2_embedded_v2"/>
         <driver id="sqlite:sqlite_jdbc"/>
         <driver id="sqlserver:microsoft"/>
         <driver id="generic:trino_jdbc"/>
+        <driver id="generic:duckdb_jdbc"/>
     </extension>
 
 

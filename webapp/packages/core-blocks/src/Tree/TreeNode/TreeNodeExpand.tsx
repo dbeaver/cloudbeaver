@@ -1,31 +1,24 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2022 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observer } from 'mobx-react-lite';
 import { useContext } from 'react';
-import styled, { css } from 'reshadow';
 
 import { EventContext } from '@cloudbeaver/core-events';
 
 import { getComputed } from '../../getComputed';
 import { Icon } from '../../Icon';
 import { Loader } from '../../Loader/Loader';
+import { s } from '../../s';
+import { useS } from '../../useS';
 import { useStateDelay } from '../../useStateDelay';
 import { EventTreeNodeExpandFlag } from './EventTreeNodeExpandFlag';
 import { TreeNodeContext } from './TreeNodeContext';
-
-const styles = css`
-  Icon {
-    cursor: pointer;
-    height: 100%;
-    width: 100%;
-  }
-`;
+import style from './TreeNodeExpand.m.css';
 
 interface Props {
   leaf?: boolean;
@@ -35,13 +28,8 @@ interface Props {
   className?: string;
 }
 
-export const TreeNodeExpand = observer<Props>(function TreeNodeExpand({
-  leaf,
-  big,
-  filterActive,
-  disabled,
-  className,
-}) {
+export const TreeNodeExpand = observer<Props>(function TreeNodeExpand({ leaf, big, filterActive, disabled, className }) {
+  const styles = useS(style);
   const context = useContext(TreeNodeContext);
 
   if (!context) {
@@ -51,7 +39,10 @@ export const TreeNodeExpand = observer<Props>(function TreeNodeExpand({
   const showInFilter = context.showInFilter;
   disabled = getComputed(() => context.externalExpanded || context.disabled) || disabled;
   leaf = context.leaf || leaf;
-  const loading = useStateDelay(getComputed(() => context.loading || context.processing), 300);
+  const loading = useStateDelay(
+    getComputed(() => context.loading || context.processing),
+    300,
+  );
   const expandable = getComputed(() => !loading && (!leaf || context.externalExpanded));
 
   async function handleExpand(event: React.MouseEvent<HTMLDivElement>) {
@@ -94,10 +85,14 @@ export const TreeNodeExpand = observer<Props>(function TreeNodeExpand({
     }
   }
 
-  return styled(styles)(
-    <arrow className={className} onClick={handleExpand} onDoubleClick={handleDbClick}>
+  return (
+    <div
+      className={s(styles, { treeNodeExpand: true, expanded: context.expanded, big }, className)}
+      onClick={handleExpand}
+      onDoubleClick={handleDbClick}
+    >
       {loading && <Loader small fullSize />}
-      {expandable && <Icon name={iconName} viewBox={viewBox} />}
-    </arrow>
+      {expandable && <Icon name={iconName} className={s(styles, { icon: true })} viewBox={viewBox} />}
+    </div>
   );
 });

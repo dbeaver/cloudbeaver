@@ -1,34 +1,47 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2022 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observable } from 'mobx';
 
-import { Connection, ConnectionExecutionContextProjectKey, ConnectionExecutionContextResource, ConnectionExecutionContextService, ConnectionInfoResource, ConnectionsManagerService, createConnectionParam, IConnectionExecutionContext, IConnectionExecutionContextInfo, IConnectionInfoParams } from '@cloudbeaver/core-connections';
+import {
+  Connection,
+  ConnectionExecutionContextProjectKey,
+  ConnectionExecutionContextResource,
+  ConnectionExecutionContextService,
+  ConnectionInfoResource,
+  ConnectionsManagerService,
+  createConnectionParam,
+  IConnectionExecutionContext,
+  IConnectionExecutionContextInfo,
+  IConnectionInfoParams,
+} from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
+import { CachedMapAllKey } from '@cloudbeaver/core-resource';
+import { FEATURE_GIT_ID, ServerConfigResource } from '@cloudbeaver/core-root';
 import { GraphQLService, SqlCompletionProposal, SqlScriptInfoFragment } from '@cloudbeaver/core-sdk';
-import { SqlDataSourceService, ISqlEditorTabState } from '@cloudbeaver/plugin-sql-editor';
 
 import { getSqlEditorName } from './getSqlEditorName';
+import type { ISqlEditorTabState } from './ISqlEditorTabState';
 import { ESqlDataSourceFeatures } from './SqlDataSource/ESqlDataSourceFeatures';
+import { SqlDataSourceService } from './SqlDataSource/SqlDataSourceService';
+import { SqlEditorSettingsService } from './SqlEditorSettingsService';
 
 export type SQLProposal = SqlCompletionProposal;
 
-export interface IQueryChangeData {
-  prevQuery: string;
-  query: string;
-  state: ISqlEditorTabState;
-}
-
 @injectable()
 export class SqlEditorService {
-  readonly onQueryChange: ISyncExecutor<IQueryChangeData>;
+  get autoSave() {
+    return this.sqlEditorSettingsService.settings.getValue('autoSave') && !this.serverConfigResource.isFeatureEnabled(FEATURE_GIT_ID, true);
+  }
+
+  get canInsertAlias() {
+    return this.sqlEditorSettingsService.proposalInsertTableSettings.getValue('alias');
+  }
 
   constructor(
     private readonly graphQLService: GraphQLService,
@@ -37,36 +50,29 @@ export class SqlEditorService {
     private readonly connectionExecutionContextService: ConnectionExecutionContextService,
     private readonly connectionExecutionContextResource: ConnectionExecutionContextResource,
     private readonly connectionInfoResource: ConnectionInfoResource,
-    private readonly sqlDataSourceService: SqlDataSourceService
-  ) {
-    this.onQueryChange = new SyncExecutor();
-  }
+    private readonly sqlDataSourceService: SqlDataSourceService,
+    private readonly sqlEditorSettingsService: SqlEditorSettingsService,
+    private readonly serverConfigResource: ServerConfigResource,
+  ) {}
 
-  getState(
-    editorId: string,
-    datasourceKey: string,
-    order: number,
-    source?: string,
-  ): ISqlEditorTabState {
+  getState(editorId: string, datasourceKey: string, order: number, source?: string): ISqlEditorTabState {
     return observable({
       editorId,
       datasourceKey,
       source,
       order,
-      tabs: [],
-      resultGroups: [],
-      resultTabs: [],
-      executionPlanTabs: [],
-      statisticsTabs: [],
+      tabs: observable([]),
+      resultGroups: observable([]),
+      resultTabs: observable([]),
+      executionPlanTabs: observable([]),
+      statisticsTabs: observable([]),
+      outputLogsTab: undefined,
       currentModeId: undefined,
-      modeState: [],
+      modeState: observable([]),
     });
   }
 
-  async parseSQLScript(
-    connectionId: string,
-    script: string
-  ): Promise<SqlScriptInfoFragment> {
+  async parseSQLScript(connectionId: string, script: string): Promise<SqlScriptInfoFragment> {
     const result = await this.graphQLService.sdk.parseSQLScript({
       connectionId,
       script,
@@ -75,11 +81,7 @@ export class SqlEditorService {
     return result.scriptInfo;
   }
 
-  async parseSQLQuery(
-    connectionId: string,
-    script: string,
-    position: number,
-  ) {
+  async parseSQLQuery(connectionId: string, script: string, position: number) {
     const result = await this.graphQLService.sdk.parseSQLQuery({
       connectionId,
       script,
@@ -111,13 +113,11 @@ export class SqlEditorService {
 
   getName(tabState: ISqlEditorTabState): string {
     const dataSource = this.sqlDataSourceService.get(tabState.editorId);
+    const executionContext = dataSource?.executionContext;
     let connection: Connection | undefined;
 
-    if (dataSource?.executionContext) {
-      connection = this.connectionInfoResource.get({
-        projectId: dataSource.executionContext.projectId,
-        connectionId: dataSource.executionContext.connectionId,
-      });
+    if (executionContext) {
+      connection = this.connectionInfoResource.get(createConnectionParam(executionContext.projectId, executionContext.connectionId));
     }
 
     return getSqlEditorName(tabState, dataSource, connection);
@@ -126,20 +126,15 @@ export class SqlEditorService {
   setName(name: string, state: ISqlEditorTabState) {
     const dataSource = this.sqlDataSourceService.get(state.editorId);
 
-    if (dataSource && dataSource.features.includes(ESqlDataSourceFeatures.setName)) {
+    if (dataSource && dataSource.hasFeature(ESqlDataSourceFeatures.setName)) {
       dataSource.setName(name);
     }
   }
 
-  setQuery(query: string, state: ISqlEditorTabState) {
+  setScript(script: string, state: ISqlEditorTabState) {
     const dataSource = this.sqlDataSourceService.get(state.editorId);
 
-    if (dataSource) {
-      const prevQuery = dataSource.script;
-
-      dataSource.setScript(query);
-      this.onQueryChange.execute({ prevQuery, query, state });
-    }
+    dataSource!.setScript(script);
   }
 
   async resetExecutionContext(state: ISqlEditorTabState) {
@@ -152,12 +147,7 @@ export class SqlEditorService {
     }
   }
 
-  async setConnection(
-    state: ISqlEditorTabState,
-    connectionKey: IConnectionInfoParams,
-    catalogId?: string,
-    schemaId?: string
-  ): Promise<boolean> {
+  async setConnection(state: ISqlEditorTabState, connectionKey: IConnectionInfoParams, catalogId?: string, schemaId?: string): Promise<boolean> {
     try {
       const executionContext = await this.initContext(connectionKey, catalogId, schemaId);
       const dataSource = this.sqlDataSourceService.get(state.editorId);
@@ -184,26 +174,22 @@ export class SqlEditorService {
     return this.sqlDataSourceService.executeAction(
       state.editorId,
       async dataSource => {
-        if (!dataSource.executionContext) {
+        const executionContext = dataSource?.executionContext;
+        if (!executionContext) {
           console.error('executeEditorQuery executionContext is not provided');
           return;
         }
 
-        await this.connectionExecutionContextResource.load(
-          ConnectionExecutionContextProjectKey(dataSource.executionContext.projectId)
-        );
+        await this.connectionExecutionContextResource.load(ConnectionExecutionContextProjectKey(executionContext.projectId));
 
-        if (this.connectionExecutionContextResource.has(dataSource.executionContext.id)) {
-          return this.connectionExecutionContextService.get(dataSource.executionContext.id);
+        if (this.connectionExecutionContextResource.has(executionContext.id)) {
+          return this.connectionExecutionContextService.get(executionContext.id);
         }
 
         const context = await this.initContext(
-          createConnectionParam(
-            dataSource.executionContext.projectId,
-            dataSource.executionContext.connectionId
-          ),
-          dataSource.executionContext.defaultCatalog,
-          dataSource.executionContext.defaultSchema
+          createConnectionParam(executionContext.projectId, executionContext.connectionId),
+          executionContext.defaultCatalog,
+          executionContext.defaultSchema,
         );
 
         if (!context?.context) {
@@ -217,9 +203,8 @@ export class SqlEditorService {
       },
       () => {
         console.error('executeEditorQuery executionContext is not provided');
-      }
+      },
     );
-
   }
 
   async canDestroy(state: ISqlEditorTabState): Promise<boolean> {
@@ -230,11 +215,7 @@ export class SqlEditorService {
     await this.sqlDataSourceService.destroy(state.editorId);
   }
 
-  async initContext(
-    connectionKey: IConnectionInfoParams,
-    catalogId?: string,
-    schemaId?: string
-  ): Promise<IConnectionExecutionContext | null> {
+  async initContext(connectionKey: IConnectionInfoParams, catalogId?: string, schemaId?: string): Promise<IConnectionExecutionContext | null> {
     const connection = await this.connectionsManagerService.requireConnection(connectionKey);
 
     if (!connection) {
@@ -244,16 +225,13 @@ export class SqlEditorService {
     try {
       return await this.connectionExecutionContextService.create(connectionKey, catalogId, schemaId);
     } catch (exception: any) {
-      this.notificationService.logException(
-        exception,
-        `Failed to create context for ${connection.name} connection`,
-      );
+      this.notificationService.logException(exception, `Failed to create context for ${connection.name} connection`);
       return null;
     }
   }
 
   async destroyContext(contextInfo: IConnectionExecutionContextInfo) {
-    await this.connectionExecutionContextResource.loadAll();
+    await this.connectionExecutionContextResource.load(CachedMapAllKey);
 
     const executionContext = this.connectionExecutionContextService.get(contextInfo.id);
 

@@ -1,23 +1,21 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2022 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import type { SqlResultColumn } from '@cloudbeaver/core-sdk';
-import type { IResultSetValue } from '@cloudbeaver/plugin-data-viewer';
+
+import type { IResultSetValue } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetFormatAction';
 
 export function isStringifiedBoolean(value: string): boolean {
   return ['false', 'true'].includes(value.toLowerCase());
 }
 
 export function isBooleanValuePresentationAvailable(cellValue: IResultSetValue, column: SqlResultColumn): boolean {
-  return column?.dataKind?.toLowerCase() === 'boolean'
-    && (
-      typeof cellValue === 'boolean'
-      || cellValue === null
-      || (typeof cellValue === 'string' && isStringifiedBoolean(cellValue))
-    );
+  return (
+    column.dataKind?.toLowerCase() === 'boolean' &&
+    (typeof cellValue === 'boolean' || cellValue === null || (typeof cellValue === 'string' && isStringifiedBoolean(cellValue)))
+  );
 }

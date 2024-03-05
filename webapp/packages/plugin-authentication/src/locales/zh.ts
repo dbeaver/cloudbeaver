@@ -2,9 +2,11 @@ export default [
   ['authentication_login_dialog_title', '认证'],
   ['authentication_login', '登录'],
   ['authentication_logout', '登出'],
+  ['authentication_logout_error', "Can't logout"],
   ['authentication_authenticate', '认证'],
   ['authentication_authorizing', 'Authorizing...'],
   ['authentication_auth_federated', '联合认证'],
+  ['authentication_auth_additional', 'Additional'],
   ['authentication_select_provider', '选择可用提供者'],
   ['authentication_configure', '请配置认证方法'],
   ['authentication_provider_disabled', '认证方法已禁用'],
@@ -28,4 +30,10 @@ export default [
   ['authentication_user_login_already_exists', '同名用户已存在'],
   ['authentication_user_login_cant_be_used', '抱歉，不能使用该名称'],
   ['authentication_user_icon_tooltip', '用户'],
+
+  ['plugin_authentication_user_loading_error', "Can't load user data"],
+  ['plugin_authentication_loading_error_dialog_title', 'Authentication error'],
+  ['plugin_authentication_loading_error_dialog_message', 'An error occurred while loading user data. Do you want to logout?'],
+
+  ['plugin_authentication_authentication_method_disabled', 'Authentication method is disabled, please configure authentication methods in settings'],
 ];

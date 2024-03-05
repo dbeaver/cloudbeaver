@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2022 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -11,10 +11,10 @@ function parent(i: number): number {
   return ((i + 1) >>> 1) - 1;
 }
 function left(i: number): number {
-  return  (i << 1) + 1;
+  return (i << 1) + 1;
 }
 function right(i: number): number {
-  return  (i + 1) << 1;
+  return (i + 1) << 1;
 }
 
 type Comparator<T> = (a: T, b: T) => boolean;
@@ -86,11 +86,8 @@ export class PriorityQueue<T = number> {
 
   private siftDown() {
     let node = top;
-    while (
-      (left(node) < this.size() && this.greater(left(node), node))
-      || (right(node) < this.size() && this.greater(right(node), node))
-    ) {
-      const maxChild = (right(node) < this.size() && this.greater(right(node), left(node))) ? right(node) : left(node);
+    while ((left(node) < this.size() && this.greater(left(node), node)) || (right(node) < this.size() && this.greater(right(node), node))) {
+      const maxChild = right(node) < this.size() && this.greater(right(node), left(node)) ? right(node) : left(node);
       this.swap(node, maxChild);
       node = maxChild;
     }

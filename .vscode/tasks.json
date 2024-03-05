@@ -1,0 +1,95 @@
+{
+  "version": "2.0.0",
+  "problemMatcher": [],
+  "presentation": {
+    "clear": true
+  },
+  "options": {
+    "cwd": "${workspaceFolder}/webapp",
+    "env": {
+      "NODE_OPTIONS": "--max-old-space-size=8192",
+      "MAVEN_OPTS": "-Xmx8192m"
+    }
+  },
+  "tasks": [
+    {
+      "label": "Run Tests CE",
+      "type": "shell",
+      "command": "yarn",
+      "group": "test",
+      "args": ["lerna", "run", "test", "--no-bail", "--stream", "--"]
+    },
+    {
+      "label": "Run DevServer CE",
+      "group": "build",
+      "isBackground": true,
+      "type": "shell",
+      "command": "yarn",
+      "args": ["dev"],
+      "options": {
+        "env": {
+          "server": "${input:stage.ce}"
+        },
+        "cwd": "${workspaceFolder}/webapp/packages/product-default"
+      }
+    },
+    {
+      "label": "Build CE",
+      "type": "shell",
+      "windows": {
+        "command": "./build-sqlite.bat"
+      },
+      "osx": {
+        "command": "./build-sqlite.sh"
+      },
+      "options": {
+        "cwd": "${workspaceFolder}/deploy"
+      },
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      }
+    },
+    {
+      "label": "Run Backend CE",
+      "type": "shell",
+      "windows": {
+        "command": "./run-server.bat"
+      },
+      "osx": {
+        "command": "./run-server.sh"
+      },
+      "options": {
+        "cwd": "${workspaceFolder}/deploy/cloudbeaver"
+      }
+    },
+    {
+      "label": "Yarn Install",
+      "type": "shell",
+      "command": "yarn install; yarn lerna bootstrap",
+      "args": [],
+      "presentation": {
+        "reveal": "silent",
+        "close": true,
+        "clear": false
+      }
+    },
+    {
+      "label": "Update TS references CE",
+      "type": "shell",
+      "command": "yarn lerna run update-ts-references --stream",
+      "options": {
+        "cwd": "${workspaceFolder}/webapp"
+      }
+    }
+  ],
+  "inputs": [
+    {
+      "type": "pickString",
+      "id": "stage.ce",
+      "description": "CE Stage servers",
+      "default": "http://localhost:8978/",
+      "options": ["http://localhost:8978/"]
+    }
+  ]
+}

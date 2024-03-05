@@ -1,48 +1,39 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2022 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observer } from 'mobx-react-lite';
 import { useState } from 'react';
 
-import { useService } from '@cloudbeaver/core-di';
-import { EventContext, EventStopPropagationFlag, NotificationService } from '@cloudbeaver/core-events';
-import { type NavNode, NavTreeResource } from '@cloudbeaver/core-navigation-tree';
+import { s, useS } from '@cloudbeaver/core-blocks';
+import { EventContext, EventStopPropagationFlag } from '@cloudbeaver/core-events';
 import { InlineEditor } from '@cloudbeaver/core-ui';
 
+import style from './NavigationNodeEditor.m.css';
 
-interface Props {
-  node: NavNode;
+export interface NavigationNodeEditorProps {
+  name: string;
+  disabled?: boolean;
+  onSave: (name: string) => void;
   onClose: () => void;
 }
 
-export const NavigationNodeEditor = observer<Props>(function NavigationNodeEditor({ node, onClose }) {
-  const navTreeResource = useService(NavTreeResource);
-  const notificationService = useService(NotificationService);
+export const NavigationNodeEditor = observer<NavigationNodeEditorProps>(function NavigationNodeEditor({
+  name: initialName,
+  disabled,
+  onSave,
+  onClose,
+}) {
+  const styles = useS(style);
+  const [name, setName] = useState(initialName);
+  const isNameChanged = initialName !== name;
+  const isDisabledSave = disabled || !isNameChanged;
 
-  const [loading, setLoading] = useState(false);
-  const [name, setName] = useState(node.name || '');
-
-  async function save() {
-    if (loading) {
-      return;
-    }
-
-    try {
-      if (node.name !== name && name.trim().length) {
-        setLoading(true);
-        await navTreeResource.changeName(node, name);
-      }
-    } catch (exception: any) {
-      notificationService.logException(exception, 'app_navigationTree_node_change_name_error');
-    } finally {
-      setLoading(false);
-      onClose();
-    }
+  function save() {
+    onSave(name);
   }
 
   function stopPropagation(event: React.MouseEvent<HTMLDivElement>) {
@@ -52,16 +43,18 @@ export const NavigationNodeEditor = observer<Props>(function NavigationNodeEdito
   return (
     <InlineEditor
       value={name}
-      disabled={loading}
-      controlsPosition='inside'
+      disabled={disabled}
+      disableSave={isDisabledSave}
+      controlsPosition="inside"
+      className={s(styles, { inlineEditor: true })}
       simple
       autofocus
       onChange={setName}
       onSave={save}
+      onDoubleClick={stopPropagation}
       onReject={onClose}
       onBlur={onClose}
       onClick={stopPropagation}
-      onDoubleClick={stopPropagation}
     />
   );
 });

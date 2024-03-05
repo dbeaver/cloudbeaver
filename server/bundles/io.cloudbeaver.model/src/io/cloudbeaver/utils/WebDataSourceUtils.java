@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2023 DBeaver Corp and others
+ * Copyright (C) 2010-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,8 @@ import io.cloudbeaver.model.app.WebApplication;
 import io.cloudbeaver.model.session.WebSession;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
+import org.jkiss.dbeaver.DBException;
+import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
 import org.jkiss.dbeaver.model.app.DBPDataSourceRegistry;
 import org.jkiss.dbeaver.model.app.DBPProject;
@@ -37,6 +39,9 @@ import java.util.List;
 import java.util.Map;
 
 public class WebDataSourceUtils {
+
+    private static final Log log = Log.getLog(WebDataSourceUtils.class);
+
     private WebDataSourceUtils() {
     }
 
@@ -83,8 +88,22 @@ public class WebDataSourceUtils {
         if (cfgInput.getPassword() != null) {
             handlerConfig.setPassword(cfgInput.getPassword());
         }
-        if (cfgInput.getKey() != null) {
+        setSecureProperties(handlerConfig, cfgInput, true);
+        if (cfgInput.getKey() != null) { // backward compatibility
             handlerConfig.setSecureProperty(SSHConstants.PROP_KEY_VALUE, cfgInput.getKey());
+        }
+    }
+
+    private static void setSecureProperties(DBWHandlerConfiguration handlerConfig, WebNetworkHandlerConfigInput cfgInput, boolean ignoreNulls) {
+        var secureProperties = cfgInput.getSecureProperties();
+        if (secureProperties == null) {
+            return;
+        }
+        for (var pr : secureProperties.entrySet()) {
+            if (ignoreNulls && pr.getValue() == null) {
+                continue;
+            }
+            handlerConfig.setSecureProperty(pr.getKey(), pr.getValue());
         }
     }
 
@@ -116,6 +135,22 @@ public class WebDataSourceUtils {
     public static void updateHandlerCredentials(DBWHandlerConfiguration handlerCfg, WebNetworkHandlerConfigInput webConfig) {
         handlerCfg.setUserName(webConfig.getUserName());
         handlerCfg.setPassword(webConfig.getPassword());
-        handlerCfg.setSecureProperty(SSHConstants.PROP_KEY_VALUE, webConfig.getKey());
+        setSecureProperties(handlerCfg, webConfig, false);
+        handlerCfg.setSecureProperty(SSHConstants.PROP_KEY_VALUE, webConfig.getKey()); // backward compatibility
+    }
+
+
+    public static boolean disconnectDataSource(@NotNull WebSession webSession, @NotNull DBPDataSourceContainer dataSource) {
+        if (dataSource.isConnected()) {
+            try {
+                dataSource.disconnect(webSession.getProgressMonitor());
+                return true;
+            } catch (DBException e) {
+                log.error("Error closing connection", e);
+            }
+            // Disconnect in async mode?
+            //new DisconnectJob(connectionInfo.getDataSource()).schedule();
+        }
+        return false;
     }
 }

@@ -1,4 +1,5 @@
 export default [
+  ['plugin_data_export_data_export_settings_group', 'Data export'],
   ['data_transfer_dialog_title', 'Export data'],
   ['data_transfer_dialog_export', 'Export'],
   ['data_transfer_dialog_export_tooltip', 'Export result set as a file'],
@@ -13,5 +14,8 @@ export default [
   ['data_transfer_exporting_table', 'Table:'],
   ['data_transfer_exporting_sql', 'SQL:'],
   ['data_transfer_format_settings', 'Format'],
+  ['data_transfer_dialog_select_processor_fail', 'Failed to select processor'],
+
   ['data_transfer_output_settings', 'Output'],
+  ['data_transfer_output_settings_compress', 'Compression'],
 ];

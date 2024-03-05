@@ -1,0 +1,221 @@
+/*
+ * CloudBeaver - Cloud Database Manager
+ * Copyright (C) 2020-2024 DBeaver Corp and others
+ *
+ * Licensed under the Apache License, Version 2.0.
+ * you may not use this file except in compliance with the License.
+ */
+
+@mixin base-code-editor() {
+  .editor,
+  .cm-editor,
+  .cm-mergeView,
+  .cm-mergeViewEditors,
+  .cm-scroller,
+  .ReactCodemirror {
+    width: 100%;
+    height: 100% !important;
+  }
+
+  .editor,
+  .ReactCodemirror,
+  .cm-mergeView,
+  .cm-mergeViewEditors,
+  .cm-editor {
+    @include mdc-typography('body2');
+  }
+
+  .cm-mergeViewEditor:first-child {
+    border-right: 1px solid;
+    @include mdc-theme-prop(border-color, background, false);
+  }
+
+  .editor {
+    @include mdc-theme-prop(background-color, surface, false);
+    @include mdc-theme-prop(color, on-surface, false);
+  }
+
+  .editor .cm-scroller {
+    outline: none;
+    line-height: unset;
+  }
+
+  .editor .cm-content {
+    caret-color: $cursor;
+  }
+
+  .editor .cm-cursor {
+    border-left-color: $cursor;
+  }
+
+  .editor .cm-link {
+    &.cm-link-loaded {
+      @include mdc-theme-prop(color, primary, false);
+      text-decoration: underline;
+      cursor: pointer;
+    }
+  }
+
+  .editor .cm-dropCursor {
+    border-left: 1.2px solid $cursor;
+  }
+
+  .editor .cm-gutters,
+  .cm-panel {
+    @include mdc-theme-prop(background-color, surface, false);
+    @include mdc-theme-prop(color, text-hint-on-light, false);
+    @include mdc-theme-prop(border-color, background, false);
+  }
+
+  .cm-panels-top,
+  .cm-panels-bottom {
+    @include mdc-theme-prop(border-color, background, false);
+  }
+
+  .editor .cm-activeLine {
+    box-shadow: 0 0 0 2px $mdc-theme-sub-secondary;
+  }
+
+  .editor .cm-activeLineGutter {
+    @include mdc-theme-prop(color, on-surface, false);
+  }
+
+  .ͼ2 .cm-activeLine:not(.cm-changedLine, .cm-deletedLine),
+  .ͼ2 .cm-activeLineGutter:not(.cm-changedLineGutter, .cm-deletedLineGutter) {
+    background-color: unset;
+  }
+
+  .editor .active-query {
+    /* disable because look too ugly */
+    /*
+    display: inline-block;
+    @include mdc-theme-prop(background, secondary, false);
+    */
+  }
+
+  .editor .cm-content ::selection {
+    @include mdc-theme-prop(background, primary, false);
+    color: white;
+  }
+
+  .editor .cm-lineNumbers .cm-gutterElement {
+    min-width: 3ch;
+    box-sizing: content-box;
+  }
+
+  .editor .cm-gutters .cm-foldGutter .cm-gutterElement {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    user-select: none;
+  }
+
+  .editor .cm-gutters .cm-foldGutter .cm-gutterElement-icon {
+    padding: 0 3px 0 5px;
+    width: 12px;
+    height: 12px;
+    display: flex;
+
+    &.cm-foldGutter-folded :global(svg) {
+      transform: rotate(-90deg);
+    }
+  }
+
+  .editor .cm-gutters .query-status .cm-gutterElement {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 14px;
+
+    .running-query-line {
+      display: flex;
+      height: 8px;
+      width: 8px;
+      border-radius: 100%;
+      @include mdc-theme-prop(background, primary, false);
+    }
+
+    .running-query-error-line {
+      display: flex;
+      height: 8px;
+      width: 8px;
+      border-radius: 100%;
+      @include mdc-theme-prop(background, negative, false);
+    }
+  }
+
+  .editor .tok-keyword {
+    color: $keyword;
+    font-weight: bold;
+  }
+
+  .editor .tok-operator {
+    color: $operator;
+  }
+
+  .editor .tok-variable-2 {
+    color: $variable-2;
+  }
+
+  .editor .tok-variable-3,
+  .editor .tok-type {
+    color: $variable-3;
+  }
+
+  .editor .tok-builtin {
+    color: $builtin;
+  }
+
+  .editor .tok-atom {
+    color: $atom;
+  }
+
+  .editor .tok-number {
+    color: $number;
+  }
+
+  .editor .tok-def {
+    color: $def;
+  }
+
+  .editor .tok-string {
+    color: $string;
+  }
+
+  .editor .tok-string2 {
+    color: $string-2;
+  }
+
+  .editor .tok-comment {
+    color: $comment;
+  }
+
+  .editor .tok-variable {
+    color: $variable;
+  }
+
+  .editor .tok-tag {
+    color: $tag;
+  }
+
+  .editor .tok-meta {
+    color: $meta;
+  }
+
+  .editor .tok-attribute {
+    color: $attribute;
+  }
+
+  .editor .tok-property {
+    color: $property;
+  }
+
+  .editor .tok-qualifier {
+    color: $qualifier;
+  }
+
+  .editor .tok-variable-3,
+  .editor .tok-type {
+    color: $variable-3;
+  }
+}

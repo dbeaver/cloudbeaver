@@ -1,20 +1,17 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2022 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
-import {
-  useState, useCallback, useContext, useRef
-} from 'react';
-import styled, { use } from 'reshadow';
+import { useCallback, useRef, useState } from 'react';
 
 import { IconButton } from '../IconButton';
 import { useTranslate } from '../localization/useTranslate';
-import { useStyles } from '../useStyles';
-import { Styles } from './styles';
+import { s } from '../s';
+import { useS } from '../useS';
+import style from './ItemList.m.css';
 
 interface IProps {
   value?: string;
@@ -25,21 +22,22 @@ interface IProps {
   className?: string;
 }
 
-export const ItemListSearch: React.FC<IProps> = function ItemListSearch({
-  value, placeholder, disabled, onChange, onSearch, className,
-}) {
+export const ItemListSearch: React.FC<IProps> = function ItemListSearch({ value, placeholder, disabled, onChange, onSearch, className }) {
   const inputRef = useRef<HTMLInputElement>(null);
-  const styles = useContext(Styles);
+  const styles = useS(style);
   const [search, setSearch] = useState(value ?? '');
   const translate = useTranslate();
-  const changeHandler = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
-    if (value === undefined) {
-      setSearch(event.target.value);
-    }
-    if (onChange) {
-      onChange(event.target.value);
-    }
-  }, [value, onChange]);
+  const changeHandler = useCallback(
+    (changeValue: string) => {
+      if (value === undefined) {
+        setSearch(changeValue);
+      }
+      if (onChange) {
+        onChange(changeValue);
+      }
+    },
+    [value, onChange],
+  );
 
   const searchHandler = useCallback(() => {
     if (!inputRef.current) {
@@ -54,23 +52,30 @@ export const ItemListSearch: React.FC<IProps> = function ItemListSearch({
     }
   }, [value, onSearch]);
 
-  const ListSearchButton = IconButton;
+  const inputValue = value ?? search;
 
-  return styled(useStyles(styles || []))(
-    <list-search className={className}>
-      <input-box>
+  return (
+    <div className={s(styles, { listSearch: true })}>
+      <div className={s(styles, { inputBox: true })}>
         <input
           ref={inputRef}
-          name='search'
+          name="search"
+          type="search"
+          className={s(styles, { input: true }, className)}
           placeholder={translate(placeholder || 'ui_search')}
-          value={value ?? search}
+          value={inputValue}
           autoComplete="off"
           disabled={disabled}
-          onChange={changeHandler}
-          {...use({ mod: 'surface' })}
+          onChange={event => changeHandler(event.target.value)}
         />
-        <search-button as='div' onClick={searchHandler}><ListSearchButton name='search' /></search-button>
-      </input-box>
-    </list-search>
+        <div className={s(styles, { actionButton: true })}>
+          {!onSearch && inputValue ? (
+            <IconButton className={s(styles, { iconButton: true, crossIcon: true })} name="cross" onClick={() => changeHandler('')} />
+          ) : (
+            <IconButton className={s(styles, { iconButton: true })} name="search" onClick={searchHandler} />
+          )}
+        </div>
+      </div>
+    </div>
   );
 };

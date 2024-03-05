@@ -1,29 +1,31 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2022 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observer } from 'mobx-react-lite';
 
 import type { ComponentStyle } from '@cloudbeaver/core-theming';
 
-import { filterLayoutFakeProps } from '../../Containers/filterLayoutFakeProps';
-import type { ILayoutSizeProps } from '../../Containers/ILayoutSizeProps';
 import { isControlPresented } from '../isControlPresented';
 import { CheckboxMarkup, CheckboxMod } from './CheckboxMarkup';
 import { CheckboxOnChangeEvent, useCheckboxState } from './useCheckboxState';
 
 export interface CheckboxBaseProps {
+  caption?: string;
   mod?: CheckboxMod[];
   ripple?: boolean;
   indeterminate?: boolean;
+  inverse?: boolean;
   style?: ComponentStyle;
 }
 
-export type CheckboxInputProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'type' | 'value' | 'defaultValue' | 'checked' | 'defaultChecked' | 'style'> & ILayoutSizeProps & {
+export type CheckboxInputProps = Omit<
+  React.InputHTMLAttributes<HTMLInputElement>,
+  'onChange' | 'type' | 'value' | 'defaultValue' | 'checked' | 'defaultChecked' | 'style'
+> & {
   value?: string;
   defaultValue?: string;
   defaultChecked?: boolean;
@@ -45,9 +47,9 @@ export interface ICheckboxObjectProps<TKey extends string> extends CheckboxInput
   name: TKey;
 }
 
-export interface CheckboxType {
-  (props: CheckboxBaseProps & ICheckboxControlledProps): React.ReactElement<any, any> | null;
-  <TKey extends string>(props: CheckboxBaseProps & ICheckboxObjectProps<TKey>): React.ReactElement<any, any> | null;
+export interface CheckboxType<P = NonNullable<unknown>> {
+  (props: CheckboxBaseProps & ICheckboxControlledProps & P): React.ReactElement<any, any> | null;
+  <TKey extends string>(props: CheckboxBaseProps & ICheckboxObjectProps<TKey> & P): React.ReactElement<any, any> | null;
 }
 
 export const Checkbox: CheckboxType = observer(function Checkbox({
@@ -59,6 +61,7 @@ export const Checkbox: CheckboxType = observer(function Checkbox({
   checked,
   defaultChecked,
   children,
+  inverse,
   mod,
   ripple,
   className,
@@ -66,7 +69,6 @@ export const Checkbox: CheckboxType = observer(function Checkbox({
   onChange,
   ...rest
 }: CheckboxBaseProps & (ICheckboxControlledProps | ICheckboxObjectProps<any>)) {
-  rest = filterLayoutFakeProps(rest);
   const checkboxState = useCheckboxState({
     value,
     defaultValue,
@@ -74,6 +76,7 @@ export const Checkbox: CheckboxType = observer(function Checkbox({
     defaultChecked,
     state,
     name,
+    inverse,
     onChange,
   });
 

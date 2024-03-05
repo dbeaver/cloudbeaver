@@ -1,12 +1,14 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2022 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
+import { action, makeObservable, runInAction } from 'mobx';
 
-import { action, makeObservable, observable, runInAction } from 'mobx';
+import type { ResultDataFormat } from '@cloudbeaver/core-sdk';
+import { MetadataMap } from '@cloudbeaver/core-utils';
 
 import { getDependingDataActions } from './Actions/DatabaseDataActionDecorator';
 import { isDatabaseDataAction } from './DatabaseDataAction';
@@ -17,26 +19,20 @@ import type { IDatabaseDataSource } from './IDatabaseDataSource';
 
 type ActionsList<TOptions, TResult extends IDatabaseDataResult> = Array<IDatabaseDataAction<TOptions, TResult>>;
 
-export class DatabaseDataActions<TOptions, TResult extends IDatabaseDataResult>
-implements IDatabaseDataActions<TOptions, TResult> {
-  private readonly actions: Map<string, ActionsList<TOptions, TResult>>;
+export class DatabaseDataActions<TOptions, TResult extends IDatabaseDataResult> implements IDatabaseDataActions<TOptions, TResult> {
+  private readonly actions: MetadataMap<string, ActionsList<TOptions, TResult>>;
   private readonly source: IDatabaseDataSource<TOptions, TResult>;
 
   constructor(source: IDatabaseDataSource<TOptions, TResult>) {
-    this.actions = new Map();
+    this.actions = new MetadataMap(() => []);
     this.source = source;
 
-    makeObservable<this, 'actions' | 'createActionsList'>(this, {
-      actions: observable.shallow,
+    makeObservable<this>(this, {
       updateResults: action,
-      createActionsList: action,
     });
   }
 
-  tryGet<T extends IDatabaseDataAction<TOptions, TResult>>(
-    result: TResult,
-    Action: IDatabaseDataActionClass<TOptions, TResult, T>
-  ): T | undefined {
+  tryGet<T extends IDatabaseDataAction<TOptions, TResult>>(result: TResult, Action: IDatabaseDataActionClass<TOptions, TResult, T>): T | undefined {
     if (Action.dataFormat && !Action.dataFormat.includes(result.dataFormat)) {
       return undefined;
     }
@@ -44,28 +40,24 @@ implements IDatabaseDataActions<TOptions, TResult> {
     return this.get(result, Action);
   }
 
-  get<T extends IDatabaseDataAction<TOptions, TResult>>(
-    result: TResult,
-    Action: IDatabaseDataActionClass<TOptions, TResult, T>
-  ): T {
-    if (Action.dataFormat && !Action.dataFormat.includes(result.dataFormat)) {
+  get<T extends IDatabaseDataAction<TOptions, TResult>>(result: TResult, Action: IDatabaseDataActionClass<TOptions, TResult, T>): T {
+    if (!isActionSupportsFormat(Action, result.dataFormat)) {
       throw new Error('DataFormat unsupported');
     }
 
-    const actions = this.getOrCreateActionsList(result.uniqueResultId);
+    const actions = this.actions.get(result.uniqueResultId);
 
-    return runInAction(() => {
-      let action = actions.find(action => action instanceof Action);
+    let action = actions.find(action => action instanceof Action && isActionSupportsFormat(action, result.dataFormat));
 
-      if (!action) {
-        const allDeps = getDependingDataActions(Action)
-          .slice(2); // skip source and result arguments
+    if (!action) {
+      runInAction(() => {
+        const allDeps = getDependingDataActions(Action).slice(1); // skip source argument
 
         const depends: any[] = [];
 
         for (const dependency of allDeps) {
           if (isDatabaseDataAction(dependency)) {
-            depends.push(this.get<IDatabaseDataAction<TOptions, TResult>>(result, dependency));
+            depends.push(this.get(result, dependency));
           } else {
             depends.push(this.source.serviceInjector.getServiceByClass(dependency as any));
           }
@@ -75,19 +67,21 @@ implements IDatabaseDataActions<TOptions, TResult> {
           throw new Error('Unsupported inject in: ' + Action.name);
         }
 
-        action = new Action(this.source, result, ...depends);
-        this.addActionToList(result.uniqueResultId, actions, action);
-      }
-      return action as T;
-    });
+        action = new Action(this.source, ...depends);
+        action.updateResult(result, this.source.results.indexOf(result));
+        this.actions.set(result.uniqueResultId, [...this.actions.get(result.uniqueResultId), action]);
+      });
+    }
+
+    return action as T;
   }
 
   getImplementation<T extends IDatabaseDataAction<TOptions, TResult>>(
     result: TResult,
-    Action: IDatabaseDataActionInterface<TOptions, TResult, T>
+    Action: IDatabaseDataActionInterface<TOptions, TResult, T>,
   ): T | undefined {
-    const actions = this.getActionsList(result.uniqueResultId);
-    const action = actions?.find(action => action instanceof Action);
+    const actions = this.actions.get(result.uniqueResultId);
+    const action = actions?.find(action => action instanceof Action && isActionSupportsFormat(action, result.dataFormat));
 
     return action as T | undefined;
   }
@@ -104,7 +98,7 @@ implements IDatabaseDataActions<TOptions, TResult> {
         if (!result) {
           action.dispose();
         } else {
-          action.updateResult(result);
+          action.updateResult(result, results.indexOf(result));
         }
       }
 
@@ -121,32 +115,15 @@ implements IDatabaseDataActions<TOptions, TResult> {
       }
     }
   }
+}
 
-  private addActionToList(
-    resultId: string,
-    actions: ActionsList<TOptions, TResult>,
-    action: IDatabaseDataAction<TOptions, TResult>
-  ) {
-    actions.push(action);
+function isActionSupportsFormat<TOptions, TResult extends IDatabaseDataResult>(
+  action: IDatabaseDataActionClass<TOptions, TResult, IDatabaseDataAction<TOptions, TResult>> | IDatabaseDataAction<TOptions, TResult>,
+  format: ResultDataFormat,
+): boolean {
+  if ('dataFormat' in action) {
+    return !action.dataFormat || action.dataFormat.includes(format);
   }
-
-  private getOrCreateActionsList(resultId: string): ActionsList<TOptions, TResult> {
-    let actions = this.getActionsList(resultId);
-
-    if (!actions) {
-      actions = this.createActionsList(resultId);
-    }
-
-    return actions;
-  }
-
-  private createActionsList(resultId: string): ActionsList<TOptions, TResult> {
-    const actions: ActionsList<TOptions, TResult> = observable.array([], { deep: false });
-    this.actions.set(resultId, actions);
-    return actions;
-  }
-
-  private getActionsList(resultId: string): ActionsList<TOptions, TResult> | undefined {
-    return this.actions.get(resultId);
-  }
+  const constructor = action.constructor as IDatabaseDataActionClass<TOptions, TResult, IDatabaseDataAction<TOptions, TResult>>;
+  return !constructor.dataFormat || constructor.dataFormat.includes(format);
 }

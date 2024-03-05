@@ -1,22 +1,42 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2022 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
-import { untracked } from 'mobx';
-
-import { CoreSettingsService } from '@cloudbeaver/core-app';
+import { ConfirmationDialogDelete, RenameDialog } from '@cloudbeaver/core-blocks';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
-import { CommonDialogService, ConfirmationDialogDelete, DialogueStateResult, RenameDialog } from '@cloudbeaver/core-dialogs';
+import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { ExecutorInterrupter } from '@cloudbeaver/core-executor';
 import { LocalizationService } from '@cloudbeaver/core-localization';
-import { type NavNode, type INodeActions, NavNodeManagerService, NavTreeResource, NavNodeInfoResource, NavTreeSettingsService, nodeDeleteContext, DATA_CONTEXT_NAV_NODE, ENodeFeature, getNodeDisplayName } from '@cloudbeaver/core-navigation-tree';
-import { ResourceKeyUtils } from '@cloudbeaver/core-sdk';
-import { ActionService, ACTION_DELETE, ACTION_OPEN, ACTION_REFRESH, ACTION_RENAME, DATA_CONTEXT_MENU_NESTED, menuExtractItems, MenuSeparatorItem, MenuService } from '@cloudbeaver/core-view';
+import {
+  DATA_CONTEXT_NAV_NODE,
+  ENodeFeature,
+  getNodePlainName,
+  type INodeActions,
+  NAV_NODE_TYPE_FOLDER,
+  type NavNode,
+  NavNodeInfoResource,
+  NavNodeManagerService,
+  NavTreeResource,
+  NavTreeSettingsService,
+  nodeDeleteContext,
+  NodeManagerUtils,
+} from '@cloudbeaver/core-navigation-tree';
+import { ResourceKeyUtils } from '@cloudbeaver/core-resource';
+import {
+  ACTION_DELETE,
+  ACTION_OPEN,
+  ACTION_REFRESH,
+  ACTION_RENAME,
+  ActionService,
+  DATA_CONTEXT_MENU_NESTED,
+  menuExtractItems,
+  MenuSeparatorItem,
+  MenuService,
+} from '@cloudbeaver/core-view';
 
 import { DATA_CONTEXT_NAV_NODE_ACTIONS } from '../NavigationTree/ElementsTree/NavigationTreeNode/TreeNodeMenu/DATA_CONTEXT_NAV_NODE_ACTIONS';
 
@@ -34,10 +54,9 @@ export class NavNodeContextMenuService extends Bootstrap {
     private readonly navTreeResource: NavTreeResource,
     private readonly actionService: ActionService,
     private readonly menuService: MenuService,
-    private readonly coreSettingsService: CoreSettingsService,
     private readonly localizationService: LocalizationService,
     private readonly navNodeInfoResource: NavNodeInfoResource,
-    private readonly navTreeSettingsService: NavTreeSettingsService
+    private readonly navTreeSettingsService: NavTreeSettingsService,
   ) {
     super();
   }
@@ -54,9 +73,7 @@ export class NavNodeContextMenuService extends Bootstrap {
         return;
       }
 
-      const nodes = ResourceKeyUtils
-        .mapArray(data, nodeId => this.navNodeInfoResource.get(nodeId))
-        .filter<NavNode>(Boolean as any);
+      const nodes = ResourceKeyUtils.mapArray(data, nodeId => this.navNodeInfoResource.get(nodeId)).filter<NavNode>(Boolean as any);
 
       const name = nodes.map(node => node.name).join(', ');
       const folder = nodes.some(node => node.folder);
@@ -87,51 +104,25 @@ export class NavNodeContextMenuService extends Bootstrap {
           return false;
         }
 
-        if (action === ACTION_RENAME) {
-          const globalPermission = this.navTreeSettingsService.settings.isValueDefault('editing')
-            ? this.coreSettingsService.settings.getValue('app.metadata.editing')
-            : this.navTreeSettingsService.settings.getValue('editing');
-
-          if (!globalPermission || !node.features) {
-            return false;
+        if (NodeManagerUtils.isDatabaseObject(node.id) || node.nodeType === NAV_NODE_TYPE_FOLDER) {
+          if (action === ACTION_RENAME) {
+            return node.features?.includes(ENodeFeature.canRename) ?? false;
           }
 
-          return node.features.includes(ENodeFeature.canRename);
-        }
-
-        if (action === ACTION_DELETE) {
-          const globalPermission = this.navTreeSettingsService.settings.isValueDefault('deleting')
-            ? this.coreSettingsService.settings.getValue('app.metadata.deleting')
-            : this.navTreeSettingsService.settings.getValue('deleting');
-
-          if (!globalPermission || !node.features) {
-            return false;
+          if (action === ACTION_DELETE) {
+            return node.features?.includes(ENodeFeature.canDelete) ?? false;
           }
-
-          return node.features.includes(ENodeFeature.canDelete);
         }
-
-        return [
-          ACTION_OPEN,
-          ACTION_REFRESH,
-        ].includes(action);
-      },
-      isHidden: (context, action) => {
-        const node = context.get(DATA_CONTEXT_NAV_NODE);
 
         if (action === ACTION_OPEN) {
-          untracked(() => {
-            this.navNodeManagerService.canOpen(node.id, node.parentId); // trigger info
-          });
-
-          return !this.navNodeManagerService.getNavNodeCache(node.id).canOpen;
+          return this.navNodeManagerService.canOpen(node.id, node.parentId);
         }
 
-        return false;
+        return [ACTION_OPEN, ACTION_REFRESH].includes(action);
       },
       handler: async (context, action) => {
         const node = context.get(DATA_CONTEXT_NAV_NODE);
-        const name = getNodeDisplayName(node);
+        const name = getNodePlainName(node);
 
         switch (action) {
           case ACTION_OPEN: {
@@ -149,8 +140,20 @@ export class NavNodeContextMenuService extends Bootstrap {
           case ACTION_RENAME: {
             const actions = context.tryGet(DATA_CONTEXT_NAV_NODE_ACTIONS);
 
+            const save = async (newName: string) => {
+              if (name !== newName && newName.trim().length) {
+                try {
+                  await this.navTreeResource.changeName(node, newName);
+                } catch (exception: any) {
+                  this.notificationService.logException(exception, 'app_navigationTree_node_rename_error');
+                  return false;
+                }
+              }
+              return true;
+            };
+
             if (actions?.rename) {
-              actions.rename();
+              actions.rename(save);
             } else {
               const result = await this.commonDialogService.open(RenameDialog, {
                 value: name,
@@ -161,13 +164,7 @@ export class NavNodeContextMenuService extends Bootstrap {
               });
 
               if (result !== DialogueStateResult.Rejected && result !== DialogueStateResult.Resolved) {
-                if (name !== result && result.trim().length) {
-                  try {
-                    await this.navTreeResource.changeName(node, result);
-                  } catch (exception: any) {
-                    this.notificationService.logException(exception, 'app_navigationTree_node_rename_error');
-                  }
-                }
+                save(result);
               }
             }
             break;
@@ -176,7 +173,10 @@ export class NavNodeContextMenuService extends Bootstrap {
             try {
               await this.navTreeResource.deleteNode(node.id);
             } catch (exception: any) {
-              this.notificationService.logException(exception, this.localizationService.translate('app_navigationTree_node_delete_error', undefined, { name }));
+              this.notificationService.logException(
+                exception,
+                this.localizationService.translate('app_navigationTree_node_delete_error', undefined, { name }),
+              );
             }
             break;
           }
@@ -186,30 +186,29 @@ export class NavNodeContextMenuService extends Bootstrap {
 
     this.menuService.addCreator({
       isApplicable: context => context.has(DATA_CONTEXT_NAV_NODE) && !context.has(DATA_CONTEXT_MENU_NESTED),
-      getItems: (context, items) => [
-        ...items,
-        ACTION_OPEN,
-        ACTION_RENAME,
-        ACTION_DELETE,
-        ACTION_REFRESH,
-      ],
+      getItems: (context, items) => {
+        const editingGlobalPermission = this.navTreeSettingsService.settings.getValue('editing');
 
+        const deleteGlobalPermission = this.navTreeSettingsService.settings.getValue('deleting');
+
+        items = [ACTION_OPEN, ACTION_REFRESH, ...items];
+
+        if (editingGlobalPermission) {
+          items.push(ACTION_RENAME);
+        }
+
+        if (deleteGlobalPermission) {
+          items.push(ACTION_DELETE);
+        }
+
+        return items;
+      },
       orderItems: (context, items) => {
-        const actionsOpen = menuExtractItems(items, [
-          ACTION_OPEN,
-        ]);
-
-        const actionsManage = menuExtractItems(items, [
-          ACTION_RENAME,
-          ACTION_DELETE,
-        ]);
-
-        const actionsRefresh = menuExtractItems(items, [
-          ACTION_REFRESH,
-        ]);
+        const actionsOpen = menuExtractItems(items, [ACTION_OPEN]);
+        const actionsManage = menuExtractItems(items, [ACTION_RENAME, ACTION_DELETE]);
+        const actionsRefresh = menuExtractItems(items, [ACTION_REFRESH]);
 
         items.unshift(...actionsOpen);
-
         items.push(...actionsManage);
 
         if (actionsRefresh.length > 0) {
@@ -224,5 +223,5 @@ export class NavNodeContextMenuService extends Bootstrap {
     });
   }
 
-  load(): void { }
+  load(): void {}
 }

@@ -1,7 +1,8 @@
+import { logViewerPlugin } from './manifest';
+
 export * from './LogViewer/LogViewerBootstrap';
 export * from './LogViewer/LogViewerService';
-
-import { logViewerPlugin } from './manifest';
+export * from './LogViewer/LogViewerSettingsService';
 
 export { logViewerPlugin };
 export default logViewerPlugin;

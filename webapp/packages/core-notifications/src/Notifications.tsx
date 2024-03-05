@@ -1,41 +1,31 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2022 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observer } from 'mobx-react-lite';
 import { Portal } from 'reakit/Portal';
-import styled, { css } from 'reshadow';
 
 import { useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 
-
 import { NotificationsItem } from './NotificationsItem/NotificationsItem';
-
-const styles = css`
-    notifications {
-      composes: theme-typography from global;
-      position: absolute;
-      bottom:0;
-      left: 0;
-      z-index: 1000; /* modal dialogs is 999, but more correct way is place notifications after dialogs in the dom */
-    }
- `;
+import { s, useS } from '@cloudbeaver/core-blocks';
+import styles from './Notifications.m.css';
 
 export const Notifications = observer(function Notifications() {
   const notificationService = useService(NotificationService);
+  const style = useS(styles);
 
-  return styled(styles)(
+  return (
     <Portal>
-      <notifications as="div">
+      <div className={s(style, { notifications: true })}>
         {notificationService.visibleNotifications.map(notification => (
           <NotificationsItem key={notification.id} notification={notification} />
         ))}
-      </notifications>
+      </div>
     </Portal>
   );
 });

@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2023 DBeaver Corp and others
+ * Copyright (C) 2010-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,10 @@
 
 package io.cloudbeaver.test.platform;
 
+import io.cloudbeaver.model.rm.RMNIOTest;
+import io.cloudbeaver.model.rm.lock.RMLockTest;
 import io.cloudbeaver.server.CBApplication;
+import io.cloudbeaver.server.CBApplicationCE;
 import io.cloudbeaver.utils.WebTestUtils;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -29,7 +32,15 @@ import java.net.http.HttpClient;
 import java.nio.file.Path;
 
 @RunWith(Suite.class)
-@Suite.SuiteClasses({PlatformTest.class, AuthenticationTest.class, ResourceManagerTest.class })
+@Suite.SuiteClasses(
+    {
+        ConnectionsTest.class,
+        AuthenticationTest.class,
+        ResourceManagerTest.class,
+        RMLockTest.class,
+        RMNIOTest.class
+    }
+)
 public class CEServerTestSuite {
 
     public static final String GQL_API_URL = "http://localhost:18978/api/gql";
@@ -49,15 +60,12 @@ public class CEServerTestSuite {
             return;
         } else {
             System.out.println("Start CBApplication");
-            testApp = new CBApplication();
+            testApp = new CBApplicationCE();
             thread = new Thread(() -> {
                 testApp.start(null);
             });
             thread.start();
-            client = HttpClient.newBuilder()
-                .cookieHandler(new CookieManager())
-                .version(HttpClient.Version.HTTP_2)
-                .build();
+            client = createClient();
             long startTime = System.currentTimeMillis();
             long endTime = 0;
             while (true) {
@@ -80,8 +88,19 @@ public class CEServerTestSuite {
         testApp.stop();
     }
 
+    public static CBApplication getTestApp() {
+        return testApp;
+    }
+
     public static HttpClient getClient() {
         return client;
+    }
+
+    public static HttpClient createClient() {
+        return HttpClient.newBuilder()
+            .cookieHandler(new CookieManager())
+            .version(HttpClient.Version.HTTP_2)
+            .build();
     }
 
     public static Path getScriptsPath() {

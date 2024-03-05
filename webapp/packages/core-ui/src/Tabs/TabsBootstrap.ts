@@ -1,11 +1,10 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2022 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { ActionService, DATA_CONTEXT_MENU, menuExtractItems, MenuSeparatorItem, MenuService } from '@cloudbeaver/core-view';
 
@@ -20,10 +19,7 @@ import { MENU_TAB } from './Tab/MENU_TAB';
 
 @injectable()
 export class TabsBootstrap extends Bootstrap {
-  constructor(
-    private readonly actionService: ActionService,
-    private readonly menuService: MenuService
-  ) {
+  constructor(private readonly actionService: ActionService, private readonly menuService: MenuService) {
     super();
   }
 
@@ -87,8 +83,9 @@ export class TabsBootstrap extends Bootstrap {
 
     this.menuService.addCreator({
       isApplicable: context => {
+        const tab = context.tryGet(DATA_CONTEXT_TAB_ID);
         const state = context.tryGet(DATA_CONTEXT_TABS_CONTEXT);
-        return !!state?.enabledBaseActions && context.get(DATA_CONTEXT_MENU) === MENU_TAB;
+        return !!tab && !!state?.enabledBaseActions && context.get(DATA_CONTEXT_MENU) === MENU_TAB && state.canClose(tab);
       },
       getItems: (context, items) => [
         ...items,
@@ -119,5 +116,5 @@ export class TabsBootstrap extends Bootstrap {
     });
   }
 
-  load(): void | Promise<void> { }
+  load(): void | Promise<void> {}
 }

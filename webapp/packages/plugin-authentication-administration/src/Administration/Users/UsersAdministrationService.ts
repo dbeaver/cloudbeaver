@@ -1,22 +1,35 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2022 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
+import React from 'react';
 
 import { AdministrationItemService } from '@cloudbeaver/core-administration';
-import { AdminUser, TeamsResource } from '@cloudbeaver/core-authentication';
+import { AdminUser, TeamsResource, UsersResource } from '@cloudbeaver/core-authentication';
 import { PlaceholderContainer } from '@cloudbeaver/core-blocks';
-import { injectable, Bootstrap } from '@cloudbeaver/core-di';
+import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 
 import { CreateTeamService } from './Teams/CreateTeamService';
-import { UsersAdministration } from './UsersAdministration';
 import { EUsersAdministrationSub, UsersAdministrationNavigationService } from './UsersAdministrationNavigationService';
-import { UsersDrawerItem } from './UsersDrawerItem';
 import { CreateUserService } from './UsersTable/CreateUserService';
-import { Origin } from './UsersTable/UserDetailsInfo/Origin';
+
+const UserCredentialsList = React.lazy(async () => {
+  const { UserCredentialsList } = await import('./UsersTable/UserCredentialsList');
+  return { default: UserCredentialsList };
+});
+
+const UsersDrawerItem = React.lazy(async () => {
+  const { UsersDrawerItem } = await import('./UsersDrawerItem');
+  return { default: UsersDrawerItem };
+});
+
+const UsersAdministration = React.lazy(async () => {
+  const { UsersAdministration } = await import('./UsersAdministration');
+  return { default: UsersAdministration };
+});
 
 export interface IUserDetailsInfoProps {
   user: AdminUser;
@@ -31,6 +44,7 @@ export class UsersAdministrationService extends Bootstrap {
     private readonly createUserService: CreateUserService,
     private readonly teamsResource: TeamsResource,
     private readonly createTeamService: CreateTeamService,
+    private readonly usersResource: UsersResource,
   ) {
     super();
   }
@@ -50,7 +64,7 @@ export class UsersAdministrationService extends Bootstrap {
         {
           name: EUsersAdministrationSub.Teams,
           onActivate: this.loadTeams.bind(this),
-          onDeActivate: (configurationWizard, outside) => {
+          onDeActivate: (param, configurationWizard, outside) => {
             if (outside) {
               this.teamsResource.cleanNewFlags();
             }
@@ -61,14 +75,18 @@ export class UsersAdministrationService extends Bootstrap {
       getContentComponent: () => UsersAdministration,
       getDrawerComponent: () => UsersDrawerItem,
     });
-    this.userDetailsInfoPlaceholder.add(Origin, 0);
+    this.userDetailsInfoPlaceholder.add(UserCredentialsList, 0);
   }
 
-  load(): void | Promise<void> { }
+  load(): void | Promise<void> {}
 
-  private async cancelCreate(param: string | null) {
+  private async cancelCreate(param: string | null, configurationWizard: boolean, outside: boolean) {
     if (param === 'create') {
       this.createUserService.close();
+    }
+
+    if (outside) {
+      this.usersResource.cleanNewFlags();
     }
   }
 

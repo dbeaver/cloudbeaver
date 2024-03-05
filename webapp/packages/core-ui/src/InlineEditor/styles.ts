@@ -1,16 +1,16 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2022 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { css } from 'reshadow';
 
 export const InlineEditorStyles = css`
   input {
-    composes: theme-text-text-primary-on-light from global;
+    composes: theme-typography--body2 theme-text-text-primary-on-light from global;
+    font: inherit;
   }
 
   editor {
@@ -23,7 +23,8 @@ export const InlineEditorStyles = css`
     border: solid 1px;
   }
 
-  editor:focus-within, editor[|active] {
+  editor:focus-within,
+  editor[|active] {
     border-color: #52c41a !important;
   }
 
@@ -32,8 +33,11 @@ export const InlineEditorStyles = css`
     height: 100%;
     flex: 1;
     display: flex;
+    box-sizing: border-box;
 
-    & input, & input[disabled], & input[readonly] {
+    & input,
+    & input[disabled],
+    & input[readonly] {
       border: none;
       border-radius: unset;
       width: 100%;
@@ -42,7 +46,7 @@ export const InlineEditorStyles = css`
       padding: 0 8px;
     }
   }
-  
+
   editor-actions {
     composes: theme-background-surface theme-text-on-surface theme-border-color-background from global;
     position: absolute;
@@ -52,46 +56,51 @@ export const InlineEditorStyles = css`
     display: flex;
     flex-direction: row;
     border: solid 1px;
+    box-sizing: border-box;
 
     &:empty {
       display: none;
     }
   }
 
-  editor:focus-within, editor[|active] {
+  editor:focus-within,
+  editor[|active] {
     & editor-actions {
-      border-top-color:  #52c41a !important;
+      border-top-color: #52c41a !important;
       border-right-color: #52c41a !important;
       border-bottom-color: #52c41a !important;
     }
   }
 
-  editor-actions[|position=inside] {
+  editor-actions[|position='inside'] {
     position: relative;
     flex: 0 0 auto;
-    bottom: auto;
+    top: 0;
     left: auto;
     border-right: none !important;
+    border-top: none;
+    border-bottom: none;
   }
 
-  editor-actions[|position=bottom],
-  editor-actions[|position=top] {
+  editor-actions[|position='bottom'],
+  editor-actions[|position='top'] {
     right: -1px;
     left: auto;
   }
 
-  editor:focus-within, editor[|active] {
-    & editor-actions[|position=bottom],
-    & editor-actions[|position=top] {
+  editor:focus-within,
+  editor[|active] {
+    & editor-actions[|position='bottom'],
+    & editor-actions[|position='top'] {
       border-left-color: #52c41a !important;
     }
   }
 
-  editor-actions[|position=bottom] {
+  editor-actions[|position='bottom'] {
     top: 100%;
   }
 
-  editor-actions[|position=top] {
+  editor-actions[|position='top'] {
     bottom: 100%;
     top: auto;
   }

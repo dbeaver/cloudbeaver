@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2023 DBeaver Corp and others
+ * Copyright (C) 2010-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -96,6 +96,13 @@ public class WebServiceBindingSQL extends WebServiceBindingBase<DBWServiceSQL> i
                     getWebConnection(env),
                     env.getArgument("script"),
                     env.getArgument("position"))
+            ).dataFetcher("sqlGenerateGroupingQuery", env ->
+            getService(env).generateGroupByQuery(
+                getSQLContext(env),
+                env.getArgument("resultsId"),
+                env.getArgument("columnNames"),
+                env.getArgument("functions"),
+                env.getArgument("showDuplicatesOnly"))
             )
         ;
 
@@ -124,12 +131,24 @@ public class WebServiceBindingSQL extends WebServiceBindingBase<DBWServiceSQL> i
                         getSQLContext(env),
                         env.getArgument("resultId"));
                 })
-            .dataFetcher("readLobValue", env ->
-                    getService(env).readLobValue(
-                            getSQLContext(env),
-                            env.getArgument("resultsId"),
-                            env.getArgument("lobColumnIndex"),
-                            getResultsRow(env, "row")))
+            .dataFetcher("readLobValue", env -> // deprecated
+                getService(env).readLobValue(
+                    getSQLContext(env),
+                    env.getArgument("resultsId"),
+                    env.getArgument("lobColumnIndex"),
+                    getResultsRow(env, "row").get(0)))
+            .dataFetcher("sqlReadLobValue", env ->
+                getService(env).readLobValue(
+                    getSQLContext(env),
+                    env.getArgument("resultsId"),
+                    env.getArgument("lobColumnIndex"),
+                    new WebSQLResultsRow(env.getArgument("row"))))
+            .dataFetcher("sqlReadStringValue", env ->
+                getService(env).getCellValue(
+                    getSQLContext(env),
+                    env.getArgument("resultsId"),
+                    env.getArgument("columnIndex"),
+                    new WebSQLResultsRow(env.getArgument("row"))))
             .dataFetcher("updateResultsDataBatch", env ->
                 getService(env).updateResultsDataBatch(
                     getSQLContext(env),
@@ -153,7 +172,9 @@ public class WebServiceBindingSQL extends WebServiceBindingBase<DBWServiceSQL> i
                     env.getArgument("sql"),
                     env.getArgument("resultId"),
                     getDataFilter(env),
-                    getDataFormat(env)))
+                    getDataFormat(env),
+                    CommonUtils.toBoolean(env.getArgument("readLogs")),
+                    getWebSession(env)))
             .dataFetcher("asyncReadDataFromContainer", env ->
                 getService(env).asyncReadDataFromContainer(
                     getSQLContext(env),
@@ -175,7 +196,19 @@ public class WebServiceBindingSQL extends WebServiceBindingBase<DBWServiceSQL> i
             .dataFetcher("asyncSqlExplainExecutionPlanResult", env ->
                 getService(env).asyncSqlExplainExecutionPlanResult(
                     getWebSession(env), env.getArgument("taskId")
-                ));
+                ))
+            .dataFetcher("asyncSqlRowDataCount", env ->
+                getService(env).getRowDataCount(
+                    getWebSession(env),
+                    getSQLContext(env),
+                    env.getArgument("resultsId")
+                ))
+            .dataFetcher("asyncSqlRowDataCountResult", env ->
+                getService(env).getRowDataCountResult(
+                    getWebSession(env),
+                    env.getArgument("taskId")
+            )
+        );
     }
 
     @NotNull
@@ -246,10 +279,18 @@ public class WebServiceBindingSQL extends WebServiceBindingBase<DBWServiceSQL> i
             new WebSQLResultServlet(application, getServiceImpl()),
             application.getServicesURI() + "sql-result-value/*"
         );
+        servletContext.addServlet(
+            "sqlUploadFile",
+            new WebSQLFileLoaderServlet(application),
+            application.getServicesURI() + "resultset/blob/*"
+        );
     }
 
     private static class WebSQLConfiguration {
         private final Map<WebConnectionInfo, WebSQLProcessor> processors = new HashMap<>();
+
+        public WebSQLConfiguration() {
+        }
 
         WebSQLProcessor getSQLProcessor(WebConnectionInfo connectionInfo) throws DBWebException {
             return WebServiceBindingSQL.getSQLProcessor(connectionInfo, true);
@@ -270,6 +311,7 @@ public class WebServiceBindingSQL extends WebServiceBindingBase<DBWServiceSQL> i
                 WebSQLProcessor processor = processors.get(connectionInfo);
                 if (processor == null) {
                     processor = new WebSQLProcessor(connectionInfo.getSession(), connectionInfo);
+                    connectionInfo.addCloseListener(processors::remove);
                     processors.put(connectionInfo, processor);
                 }
                 return processor;

@@ -1,3 +1,10 @@
+export * from './SettingsManager/ESettingsValueType';
+export * from './SettingsManager/ISettingDescription';
+export * from './SettingsManager/SettingsGroup';
+export * from './SettingsManager/SettingsManagerService';
+export * from './SettingsManager/SettingsGroups/INTERFACE_SETTINGS_GROUP';
+export * from './SettingsManager/SettingsGroups/ROOT_SETTINGS_GROUP';
 export * from './PluginSettings';
 export * from './PluginManagerService';
-export { manifest as corePluginManifest } from './manifest';
+export * from './createDeprecatedResolver';
+export * from './manifest';

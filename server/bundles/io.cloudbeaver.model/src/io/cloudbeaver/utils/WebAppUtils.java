@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2023 DBeaver Corp and others
+ * Copyright (C) 2010-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,9 +16,15 @@
  */
 package io.cloudbeaver.utils;
 
+import io.cloudbeaver.DBWebException;
+import io.cloudbeaver.WebProjectImpl;
 import io.cloudbeaver.auth.NoAuthCredentialsProvider;
 import io.cloudbeaver.model.app.WebApplication;
 import io.cloudbeaver.model.app.WebAuthApplication;
+import io.cloudbeaver.model.session.WebSession;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
@@ -30,9 +36,6 @@ import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.dbeaver.utils.GeneralUtils;
 import org.jkiss.utils.CommonUtils;
 
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.nio.file.Path;
 import java.util.*;
 
@@ -52,6 +55,14 @@ public class WebAppUtils {
 
     public static WebApplication getWebApplication() {
         return (WebApplication) DBWorkbench.getPlatform().getApplication();
+    }
+
+    public static WebAuthApplication getWebAuthApplication() throws DBException {
+        WebApplication application = getWebApplication();
+        if (!WebAuthApplication.class.isAssignableFrom(application.getClass())) {
+            throw new DBException("The current application doesn't contain authorization configuration");
+        }
+        return  (WebAuthApplication) application;
     }
 
     public static SMAuthenticationManager getAuthManager(WebApplication application) throws DBException {
@@ -144,12 +155,7 @@ public class WebAppUtils {
 
     @NotNull
     public static StringBuilder getAuthApiPrefix(String serviceId) throws DBException {
-        WebApplication application = getWebApplication();
-        if (!WebAuthApplication.class.isAssignableFrom(application.getClass())) {
-            throw new DBException("The current application doesn't contain authorization configuration");
-        }
-        WebAuthApplication webAuthApplication = (WebAuthApplication) application;
-        return getAuthApiPrefix(webAuthApplication, serviceId);
+        return getAuthApiPrefix(getWebAuthApplication(), serviceId);
     }
 
     @NotNull
@@ -173,8 +179,9 @@ public class WebAppUtils {
         String path = getWebApplication().getRootURI();
 
         if (sameSite != null) {
-            if (sameSite.toLowerCase() == "none" && request.isSecure() == false) {
-                log.debug("Attempt to set Cookie `" + cookieName + "` with `SameSite=None` failed, it require a secure context/HTTPS");
+            if (!request.isSecure()) {
+                log.debug("Attempt to set Cookie `" + cookieName + "` with `SameSite=" + sameSite + "` failed, it " +
+                    "require a secure context/HTTPS");
             } else {
                 sessionCookie.setSecure(true);
                 path = path.concat("; SameSite=" + sameSite);
@@ -204,6 +211,50 @@ public class WebAppUtils {
     public static String getGlobalProjectId() {
         String globalConfigurationName = getWebApplication().getDefaultProjectName();
         return RMProjectType.GLOBAL.getPrefix() + "_" + globalConfigurationName;
+    }
+
+    public static WebProjectImpl getProjectById(WebSession webSession, String projectId) throws DBWebException {
+        WebProjectImpl project = webSession.getProjectById(projectId);
+        if (project == null) {
+            throw new DBWebException("Project '" + projectId + "' not found");
+        }
+        return project;
+    }
+
+    public static Map<String, Object> flattenMap(Map<String, Object> nestedMap) {
+        Map<String, Object> result = new LinkedHashMap<>();
+        flattenMapHelper(nestedMap, result, "");
+        return result;
+    }
+
+    private static void flattenMapHelper(Map<String, Object> nestedMap, Map<String, Object> result, String prefix) {
+        for (Map.Entry<String, Object> entry : nestedMap.entrySet()) {
+            String key = entry.getKey();
+            Object value = entry.getValue();
+            flattenResult(result, prefix, key, value);
+        }
+    }
+
+    private static void flattenResult(Map<String, Object> result, String prefix, String key, Object value) {
+        if (value instanceof Map) {
+            flattenMapHelper((Map<String, Object>) value, result, prefix + key + ".");
+        } else if (value instanceof Object[]) {
+            flattenArray((Object[]) value, result, prefix + key + ".");
+        } else {
+            String fullKey = prefix + key;
+            if (!result.containsKey(fullKey)) {
+                result.put(fullKey, value);
+            }
+        }
+    }
+
+    private static void flattenArray(Object[] array, Map<String, Object> result, String prefix) {
+        for (int i = 0; i < array.length; i++) {
+            String key = String.valueOf(i);
+            Object value = array[i];
+
+            flattenResult(result, prefix, key, value);
+        }
     }
 
 }

@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2023 DBeaver Corp and others
+ * Copyright (C) 2010-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@ import org.jkiss.dbeaver.model.*;
 import org.jkiss.dbeaver.model.access.DBAAuthProfile;
 import org.jkiss.dbeaver.model.access.DBACredentialsProvider;
 import org.jkiss.dbeaver.model.app.DBPDataSourceRegistry;
+import org.jkiss.dbeaver.model.app.DBPDataSourceRegistryCache;
 import org.jkiss.dbeaver.model.app.DBPProject;
 import org.jkiss.dbeaver.model.connection.DBPConnectionConfiguration;
 import org.jkiss.dbeaver.model.connection.DBPDriver;
@@ -41,7 +42,7 @@ import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-public class WebDataSourceRegistryProxy implements DBPDataSourceRegistry, DataSourcePersistentRegistry {
+public class WebDataSourceRegistryProxy implements DBPDataSourceRegistry, DataSourcePersistentRegistry, DBPDataSourceRegistryCache {
     private final DataSourceFilter dataSourceFilter;
     private final DataSourceRegistry dataSourceRegistry;
 
@@ -137,6 +138,16 @@ public class WebDataSourceRegistryProxy implements DBPDataSourceRegistry, DataSo
     }
 
     @Override
+    public void addDataSourceToList(@NotNull DBPDataSourceContainer dataSource) {
+        dataSourceRegistry.addDataSourceToList(dataSource);
+    }
+
+    @Override
+    public void removeDataSourceFromList(@NotNull DBPDataSourceContainer dataSource) {
+        dataSourceRegistry.removeDataSourceFromList(dataSource);
+    }
+
+    @Override
     public void updateDataSource(@NotNull DBPDataSourceContainer dataSource) throws DBException {
         dataSourceRegistry.updateDataSource(dataSource);
     }
@@ -197,8 +208,8 @@ public class WebDataSourceRegistryProxy implements DBPDataSourceRegistry, DataSo
 
     @Nullable
     @Override
-    public DBWNetworkProfile getNetworkProfile(String name) {
-        return dataSourceRegistry.getNetworkProfile(name);
+    public DBWNetworkProfile getNetworkProfile(String source, String name) {
+        return dataSourceRegistry.getNetworkProfile(source, name);
     }
 
     @NotNull

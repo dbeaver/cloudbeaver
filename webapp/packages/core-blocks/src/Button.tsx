@@ -1,113 +1,35 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2022 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observable } from 'mobx';
 import { observer } from 'mobx-react-lite';
-import styled, { css, use } from 'reshadow';
 
-import type { ComponentStyle } from '@cloudbeaver/core-theming';
-
+import style from './Button.m.css';
 import { IconOrImage } from './IconOrImage';
 import { Loader } from './Loader/Loader';
+import { s } from './s';
+import { useObjectRef } from './useObjectRef';
 import { useObservableRef } from './useObservableRef';
-import { useStyles } from './useStyles';
+import { useS } from './useS';
 
-const buttonStyles = css`
-    button-label {
-      composes: theme-button__label from global;
-    }
-    button-icon {
-      composes: theme-button__icon from global;
-    }
-    ripple {
-      composes: theme-button_ripple from global;
-    }
-    Button {
-      composes: theme-button from global;
-      display: flex;
+type ButtonMod = Array<'raised' | 'unelevated' | 'outlined' | 'secondary'>;
 
-      & IconOrImage {
-        width: 100%;
-      }
-
-      &[disabled] IconOrImage {
-        opacity: 0.5;
-      }
-
-      & Loader, & button-label {
-        transition: opacity cubic-bezier(0.4, 0.0, 0.2, 1) 0.3s;
-      }
-
-      & Loader {
-        position: absolute;
-        opacity: 0;
-      }
-
-      & button-label {
-        opacity: 1;
-      }
-
-      &[|loading] {
-        & Loader {
-          opacity: 1;
-        }
-
-        & button-label {
-          opacity: 0;
-        }
-      }
-
-      &[href] {
-        text-decoration: none;
-      }
-    }
-  `;
-
-const buttonMod = {
-  raised: css`
-    Button {
-      composes: theme-button_raised from global;
-    }
-    `,
-  unelevated: css`
-    Button {
-      composes: theme-button_unelevated from global;
-    }
-    `,
-  outlined: css`
-    Button {
-      composes: theme-button_outlined from global;
-    }
-    `,
-  secondary: css`
-    Button {
-      composes: theme-button_secondary from global;
-    }
-    `,
-};
-
-type ButtonProps = (
-  React.ButtonHTMLAttributes<HTMLButtonElement | HTMLAnchorElement>
-  & React.LinkHTMLAttributes<HTMLLinkElement | HTMLButtonElement>
-  & React.HTMLAttributes<HTMLDivElement>
-) & {
+export type ButtonProps = (React.ButtonHTMLAttributes<HTMLButtonElement | HTMLAnchorElement> &
+  React.LinkHTMLAttributes<HTMLLinkElement | HTMLButtonElement> &
+  React.HTMLAttributes<HTMLDivElement>) & {
   loading?: boolean;
   icon?: string;
   viewBox?: string;
-  styles?: ComponentStyle;
-  mod?: Array<keyof typeof buttonMod>;
+  mod?: ButtonMod;
   tag?: 'button' | 'a' | 'div';
   href?: string;
   target?: '_blank' | '_self' | '_parent' | '_top';
   loader?: boolean;
-  onClick?: React.MouseEventHandler<
-  HTMLButtonElement | HTMLAnchorElement | HTMLLinkElement | HTMLDivElement
-  > | (() => Promise<any>);
+  onClick?: React.MouseEventHandler<HTMLButtonElement | HTMLAnchorElement | HTMLLinkElement | HTMLDivElement> | (() => Promise<any>);
   download?: boolean;
 };
 
@@ -116,7 +38,6 @@ export const Button = observer<ButtonProps>(function Button({
   icon,
   viewBox,
   mod,
-  styles,
   tag = 'button',
   type = 'button',
   disabled = false,
@@ -126,24 +47,30 @@ export const Button = observer<ButtonProps>(function Button({
   className,
   ...rest
 }) {
-  const state = useObservableRef(() => ({
-    loading: false,
-  }), {
-    loading: observable.ref,
-  }, {
-    click(e: React.MouseEvent<HTMLButtonElement | HTMLAnchorElement | HTMLLinkElement | HTMLDivElement>) {
-      const returnValue = onClick?.(e);
+  const styles = useS(style);
+  const handlersRef = useObjectRef({ onClick });
+  const state = useObservableRef(
+    () => ({
+      loading: false,
+      click(e: React.MouseEvent<HTMLButtonElement | HTMLAnchorElement | HTMLLinkElement | HTMLDivElement>) {
+        const returnValue = handlersRef.onClick?.(e);
 
-      if (returnValue instanceof Promise) {
-        if (loader) {
-          this.loading = true;
-          returnValue.finally(() => {
-            this.loading = false;
-          });
+        if (returnValue instanceof Promise) {
+          if (loader) {
+            this.loading = true;
+            returnValue.finally(() => {
+              this.loading = false;
+            });
+          }
         }
-      }
+      },
+    }),
+    {
+      loading: observable.ref,
     },
-  }, ['click']);
+    false,
+    ['click'],
+  );
 
   loading = state.loading || loading;
 
@@ -152,19 +79,33 @@ export const Button = observer<ButtonProps>(function Button({
   }
 
   const Button = tag;
-  return styled(useStyles(styles, buttonStyles, ...(mod || []).map(mod => buttonMod[mod])))(
+  return (
     <Button
       {...rest}
       type={type}
       disabled={disabled}
-      {...use({ loading })}
-      className={className}
+      className={s(
+        styles,
+        {
+          button: true,
+          raised: mod?.includes('raised'),
+          outlined: mod?.includes('outlined'),
+          secondary: mod?.includes('secondary'),
+          unelevated: mod?.includes('unelevated'),
+          loading,
+        },
+        className,
+      )}
       onClick={state.click}
     >
-      <ripple />
-      {icon && <button-icon><IconOrImage icon={icon} viewBox={viewBox} /></button-icon>}
-      <button-label as='span'>{children}</button-label>
-      <Loader small />
+      <div className={s(styles, { ripple: true })} />
+      {icon && (
+        <div className={s(styles, { buttonIcon: true, disabled })}>
+          <IconOrImage icon={icon} viewBox={viewBox} />
+        </div>
+      )}
+      <span className={s(styles, { buttonLabel: true })}>{children}</span>
+      <Loader className={s(styles, { loader: true })} small />
     </Button>
   );
 });

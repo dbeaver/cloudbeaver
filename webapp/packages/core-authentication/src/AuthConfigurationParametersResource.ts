@@ -1,26 +1,25 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2022 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
-import { EAdminPermission } from '@cloudbeaver/core-administration';
 import { injectable } from '@cloudbeaver/core-di';
-import { SessionPermissionsResource, SessionDataResource } from '@cloudbeaver/core-root';
+import { CachedMapResource, isResourceAlias, type ResourceKey, ResourceKeyUtils } from '@cloudbeaver/core-resource';
+import { EAdminPermission, SessionDataResource, SessionPermissionsResource } from '@cloudbeaver/core-root';
 import {
-  AuthProviderConfigurationParametersFragment, CachedMapResource, GetAuthProviderConfigurationParametersQueryVariables,
-  GraphQLService, isResourceKeyList, ResourceKey, ResourceKeyUtils
+  AuthProviderConfigurationParametersFragment,
+  GetAuthProviderConfigurationParametersQueryVariables,
+  GraphQLService,
 } from '@cloudbeaver/core-sdk';
 
 @injectable()
-export class AuthConfigurationParametersResource
-  extends CachedMapResource<
+export class AuthConfigurationParametersResource extends CachedMapResource<
   string,
   AuthProviderConfigurationParametersFragment[],
   GetAuthProviderConfigurationParametersQueryVariables
-  > {
+> {
   constructor(
     private readonly graphQLService: GraphQLService,
     private readonly sessionDataResource: SessionDataResource,
@@ -32,9 +31,11 @@ export class AuthConfigurationParametersResource
     permissionsResource.require(this, EAdminPermission.admin);
   }
 
-  protected async loader(
-    key: ResourceKey<string>
-  ): Promise<Map<string, AuthProviderConfigurationParametersFragment[]>> {
+  protected async loader(key: ResourceKey<string>): Promise<Map<string, AuthProviderConfigurationParametersFragment[]>> {
+    if (isResourceAlias(key)) {
+      throw new Error('Aliases not supported by this resource.');
+    }
+
     const values: AuthProviderConfigurationParametersFragment[][] = [];
     await ResourceKeyUtils.forEachAsync(key, async key => {
       const { parameters } = await this.graphQLService.sdk.getAuthProviderConfigurationParameters({ providerId: key });
@@ -42,15 +43,12 @@ export class AuthConfigurationParametersResource
       values.push(parameters);
     });
 
-    this.set(key, isResourceKeyList(key) ? values : values[0]);
+    this.set(ResourceKeyUtils.toList(key), values);
 
     return this.data;
   }
 
-  protected validateParam(param: ResourceKey<string>): boolean {
-    return (
-      super.validateParam(param)
-      || typeof param === 'string'
-    );
+  protected validateKey(key: string): boolean {
+    return typeof key === 'string';
   }
 }

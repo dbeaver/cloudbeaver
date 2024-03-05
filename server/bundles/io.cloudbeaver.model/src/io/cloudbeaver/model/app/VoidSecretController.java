@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2023 DBeaver Corp and others
+ * Copyright (C) 2010-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,12 +19,20 @@ package io.cloudbeaver.model.app;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
+import org.jkiss.dbeaver.model.auth.SMCredentialsProvider;
+import org.jkiss.dbeaver.model.auth.SMSessionContext;
+import org.jkiss.dbeaver.model.exec.DBCFeatureNotSupportedException;
 import org.jkiss.dbeaver.model.secret.DBSSecretController;
+import org.jkiss.dbeaver.model.secret.DBSSecretControllerAuthorized;
+import org.jkiss.dbeaver.model.secret.DBSSecretObject;
+import org.jkiss.dbeaver.model.secret.DBSSecretValue;
+
+import java.util.List;
 
 /**
  * Void secret controller.
  */
-public class VoidSecretController implements DBSSecretController {
+public class VoidSecretController implements DBSSecretController, DBSSecretControllerAuthorized {
 
     public static final VoidSecretController INSTANCE = new VoidSecretController();
 
@@ -34,17 +42,30 @@ public class VoidSecretController implements DBSSecretController {
 
     @Nullable
     @Override
-    public String getSecretValue(@NotNull String secretId) {
+    public String getPrivateSecretValue(@NotNull String secretId) {
         return null;
     }
 
     @Override
-    public void setSecretValue(@NotNull String secretId, @Nullable String secretValue) throws DBException {
+    public void setPrivateSecretValue(@NotNull String secretId, @Nullable String secretValue) throws DBException {
         throw new DBException("Secret controller is read-only");
+    }
+
+    @NotNull
+    @Override
+    public List<DBSSecretValue> discoverCurrentUserSecrets(@NotNull DBSSecretObject secretObject) throws DBException {
+        throw new DBCFeatureNotSupportedException("Secrets discovery not supported");
     }
 
     @Override
     public void flushChanges() {
     }
 
+    @Override
+    public void authorize(
+        @Nullable SMCredentialsProvider credentialsProvider,
+        @Nullable SMSessionContext smSessionContext
+    ) throws DBException {
+
+    }
 }

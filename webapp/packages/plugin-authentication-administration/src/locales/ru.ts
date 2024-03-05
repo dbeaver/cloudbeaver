@@ -11,10 +11,15 @@ export default [
   ['authentication_administration_user_connections_empty', 'Нет доступных коннекшенов'],
   ['authentication_administration_user_origin_empty', 'Дополнительная информация не доступна'],
   ['authentication_administration_user_info', 'Общее'],
+  ['authentication_administration_user_local', 'Локальный пользователь'],
+  ['authentication_administration_user_auth_method', 'Способ входа'],
+  ['authentication_administration_user_auth_methods', 'Способы входа'],
+  ['authentication_administration_user_auth_methods_empty', 'Нет доступных способов входа'],
+  ['authentication_administration_user_auth_method_no_details', 'Дополнительная информация не доступна'],
   ['authentication_administration_item', 'Управление доступом'],
   ['authentication_administration_item_users', 'Пользователи'],
   ['authentication_administration_item_metaParameters', 'Свойства Пользователей'],
-  ['authentication_administration_tools_add_tooltip', 'Добавить нового пользователя'],
+  ['authentication_administration_tools_add_tooltip', 'Создать нового пользователя'],
   ['authentication_administration_tools_refresh_tooltip', 'Обновить список пользователей'],
   ['authentication_administration_tools_delete_tooltip', 'Удалить выбранных пользователей'],
   ['authentication_administration_tools_refresh_success', 'Список пользователей обновлен'],
@@ -29,16 +34,48 @@ export default [
   ['authentication_administration_users_filters_status_enabled', 'ВКЛЮЧЕН'],
   ['authentication_administration_users_filters_status_disabled', 'ВЫКЛЮЧЕН'],
   ['authentication_administration_users_filters_status_all', 'ВСЕ'],
+  ['authentication_administration_users_empty', 'Нет пользователей'],
+  ['authentication_administration_users_delete_user', 'Удалить пользователя'],
+  ['authentication_administration_users_delete_user_fail', 'Не удалось удалить пользователя'],
+  ['authentication_administration_users_delete_user_success', 'Пользователь удален'],
+  ['authentication_administration_users_disable_user_fail', 'Не удалось отключить пользователя'],
+  ['authentication_administration_users_disable_user_success', 'Пользователь отключен'],
+  [
+    'authentication_administration_users_delete_user_confirmation_input_description',
+    'Пожалуйста, введите имя пользователя учетной записи для подтверждения ее удаления.',
+  ],
+  ['authentication_administration_users_delete_user_confirmation_input_placeholder', 'Введите имя пользователя...'],
+  [
+    'authentication_administration_users_delete_user_disable_info',
+    'Вы уверены, что хотите удалить пользователя "{arg:username}"? Если вы хотите временно ограничить доступ, то вы можете отключить учетную запись.',
+  ],
+  [
+    'authentication_administration_users_delete_user_info',
+    'Удаление этой учетной записи навсегда уберет все связанные с ней пользовательские данные из системы. Пожалуйста, подтвердите, что вы хотите произвести удаление пользователя "{arg:username}"',
+  ],
+
+  ['authentication_administration_user_delete_credentials_error', 'Не удалось удалить учетные данные пользователя'],
+  ['authentication_administration_user_delete_credentials_success', 'Учетные данные пользователя удалены'],
+  [
+    'authentication_administration_user_delete_credentials_confirmation_message',
+    'Вы уверены что хотите удалить "{arg:originName}" способ авторизации у "{arg:userId}"?',
+  ],
 
   ['administration_configuration_wizard_configuration_admin', 'Учетные данные администратора'],
   ['administration_configuration_wizard_configuration_admin_name', 'Логин'],
   ['administration_configuration_wizard_configuration_admin_password', 'Пароль'],
   ['administration_configuration_wizard_configuration_anonymous_access', 'Разрешить анонимный доступ'],
-  ['administration_configuration_wizard_configuration_anonymous_access_description', 'Позволяет работать с CloudBeaver без пользовательской аутентификации'],
+  [
+    'administration_configuration_wizard_configuration_anonymous_access_description',
+    'Позволяет работать с CloudBeaver без пользовательской аутентификации',
+  ],
   ['administration_configuration_wizard_configuration_authentication_group', 'Настройки аутентификации'],
   ['administration_configuration_wizard_configuration_services_group', 'Сервисы'],
   ['administration_configuration_wizard_configuration_authentication', 'Включить пользовательскую аутентификацию'],
-  ['administration_configuration_wizard_configuration_authentication_description', 'Позволяет пользователям аутентифицироваться. Иначе будет включен анонимный доступ'],
+  [
+    'administration_configuration_wizard_configuration_authentication_description',
+    'Позволяет пользователям аутентифицироваться. Иначе будет включен анонимный доступ',
+  ],
 
   ['administration_identity_providers_tab_title', 'Провайдеры идентификации'],
   ['administration_identity_providers_provider', 'Провайдер'],
@@ -65,7 +102,7 @@ export default [
 
   ['administration_teams_tab_title', 'Команды'],
   ['administration_teams_tab_description', 'Управление командами'],
-  ['administration_teams_team_creation', 'Создание команды'],
+  ['administration_teams_team_creation', 'Создание Команды'],
   ['administration_teams_team_id', 'ID Команды'],
   ['administration_teams_team_name', 'Название команды'],
   ['administration_teams_team_description', 'Описание'],
@@ -82,6 +119,10 @@ export default [
   ['administration_teams_refresh_tooltip', 'Обновить список команд'],
   ['administration_teams_delete_tooltip', 'Удалить выбранные команды'],
   ['administration_teams_delete_confirmation', 'Вы собираетесь удалить следующие команды: '],
+  [
+    'administration_teams_delete_confirmation_users_note',
+    'Обратите внимание, что пользователи потеряют принадлежность к команде и права полученные от этой команды',
+  ],
 
   ['administration_teams_team_granted_users_tab_title', 'Пользователи'],
   ['administration_teams_team_granted_users_search_placeholder', 'Поиск по ID пользователя...'],
@@ -93,4 +134,7 @@ export default [
   ['administration_teams_team_granted_connections_tab_title', 'Подключения'],
   ['administration_teams_team_granted_connections_search_placeholder', 'Поиск по названию подключения...'],
   ['administration_teams_team_granted_connections_empty', 'Нет доступных подключений'],
+
+  ['plugin_authentication_administration_user_team_default_readonly_tooltip', 'Команда по умолчанию. Не может быть отозвана'],
+  ['plugin_authentication_administration_team_default_users_tooltip', 'Команда по умолчанию. Содержит всех пользователей'],
 ];

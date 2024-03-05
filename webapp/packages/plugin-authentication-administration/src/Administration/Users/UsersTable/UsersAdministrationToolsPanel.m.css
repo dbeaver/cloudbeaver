@@ -1,0 +1,7 @@
+.toolsPanel {
+  border-radius: inherit;
+
+  & .menuBar {
+    height: initial;
+  }
+}

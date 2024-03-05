@@ -1,0 +1,9 @@
+.groupClose {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+  display: flex;
+  position: absolute;
+  right: 24px;
+  margin-right: 0 !important;
+}

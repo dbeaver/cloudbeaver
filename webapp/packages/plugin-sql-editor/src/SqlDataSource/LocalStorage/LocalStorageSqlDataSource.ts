@@ -1,12 +1,11 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2022 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
-import { computed, makeObservable } from 'mobx';
+import { computed, makeObservable, observable } from 'mobx';
 
 import type { IConnectionExecutionContextInfo } from '@cloudbeaver/core-connections';
 
@@ -15,6 +14,14 @@ import { ESqlDataSourceFeatures } from '../ESqlDataSourceFeatures';
 import type { ILocalStorageSqlDataSourceState } from './ILocalStorageSqlDataSourceState';
 
 export class LocalStorageSqlDataSource extends BaseSqlDataSource {
+  get baseScript(): string {
+    return this.state.script;
+  }
+
+  get baseExecutionContext(): IConnectionExecutionContextInfo | undefined {
+    return this.state.executionContext;
+  }
+
   static key = 'local-storage';
 
   get name(): string | null {
@@ -30,17 +37,26 @@ export class LocalStorageSqlDataSource extends BaseSqlDataSource {
   }
 
   get features(): ESqlDataSourceFeatures[] {
-    return [ESqlDataSourceFeatures.setName];
+    return [ESqlDataSourceFeatures.script, ESqlDataSourceFeatures.query, ESqlDataSourceFeatures.executable, ESqlDataSourceFeatures.setName];
   }
 
-  private readonly state: ILocalStorageSqlDataSourceState;
+  get isSaved(): boolean {
+    return true;
+  }
+
+  get projectId(): string | null {
+    // we will be able to attach any connection from any project
+    return null;
+  }
+
+  private state!: ILocalStorageSqlDataSourceState;
 
   constructor(state: ILocalStorageSqlDataSourceState) {
     super();
-    this.state = state;
-    this.outdated = false;
+    this.bindState(state);
 
-    makeObservable(this, {
+    makeObservable<this, 'state'>(this, {
+      state: observable.ref,
       script: computed,
       executionContext: computed,
     });
@@ -52,6 +68,7 @@ export class LocalStorageSqlDataSource extends BaseSqlDataSource {
 
   setName(name: string | null): void {
     this.state.name = name ?? undefined;
+    super.setName(name);
   }
 
   canRename(name: string | null): boolean {
@@ -64,6 +81,21 @@ export class LocalStorageSqlDataSource extends BaseSqlDataSource {
   }
 
   setExecutionContext(executionContext?: IConnectionExecutionContextInfo): void {
+    this.state.executionContext = executionContext;
+    super.setExecutionContext(executionContext);
+  }
+
+  bindState(state: ILocalStorageSqlDataSourceState): void {
+    this.state = state;
+    this.outdated = false;
+    this.history.restore(state.history);
+  }
+
+  protected setBaseScript(script: string): void {
+    this.state.script = script;
+  }
+
+  protected setBaseExecutionContext(executionContext: IConnectionExecutionContextInfo | undefined): void {
     this.state.executionContext = executionContext;
   }
 }

@@ -1,7 +1,7 @@
 export default [
   ['authentication_administration_user_connections_user_add', 'User Creation'],
   ['authentication_administration_user_connections_user_new', 'New user'],
-  ['authentication_administration_user_connections_access_load_fail', 'User\'s granted connections loading failed'],
+  ['authentication_administration_user_connections_access_load_fail', "User's granted connections loading failed"],
   ['authentication_administration_user_connections_access_connections_load_fail', 'Connections loading failed'],
   ['authentication_administration_user_connections_access', 'Connections Access'],
   ['authentication_administration_user_connections_access_granted_by', 'Granted by'],
@@ -11,10 +11,15 @@ export default [
   ['authentication_administration_user_connections_empty', 'No available connections'],
   ['authentication_administration_user_origin_empty', 'No available details'],
   ['authentication_administration_user_info', 'Info'],
+  ['authentication_administration_user_local', 'Local user'],
+  ['authentication_administration_user_auth_method', 'Auth Method'],
+  ['authentication_administration_user_auth_methods', 'Auth Methods'],
+  ['authentication_administration_user_auth_methods_empty', 'No available auth methods'],
+  ['authentication_administration_user_auth_method_no_details', 'No details available'],
   ['authentication_administration_item', 'Access Management'],
   ['authentication_administration_item_users', 'Users'],
   ['authentication_administration_item_metaParameters', 'Meta Parameters'],
-  ['authentication_administration_tools_add_tooltip', 'Add new user'],
+  ['authentication_administration_tools_add_tooltip', 'Create new user'],
   ['authentication_administration_tools_refresh_tooltip', 'Refresh user list'],
   ['authentication_administration_tools_delete_tooltip', 'Delete selected users'],
   ['authentication_administration_tools_refresh_success', 'User list was refreshed'],
@@ -29,6 +34,32 @@ export default [
   ['authentication_administration_users_filters_status_enabled', 'ENABLED'],
   ['authentication_administration_users_filters_status_disabled', 'DISABLED'],
   ['authentication_administration_users_filters_status_all', 'ALL'],
+  ['authentication_administration_users_empty', 'There are no users'],
+  ['authentication_administration_users_delete_user', 'Delete user'],
+  ['authentication_administration_users_delete_user_fail', 'Failed to delete user'],
+  ['authentication_administration_users_delete_user_success', 'User deleted'],
+  ['authentication_administration_users_disable_user_fail', 'Failed to disable user'],
+  ['authentication_administration_users_disable_user_success', 'User disabled'],
+  [
+    'authentication_administration_users_delete_user_confirmation_input_description',
+    'Please type in the username of the account to confirm its deletion.',
+  ],
+  ['authentication_administration_users_delete_user_confirmation_input_placeholder', 'Type username here...'],
+  [
+    'authentication_administration_users_delete_user_disable_info',
+    'Are you sure you want to delete "{arg:username}"? If you just want to prevent access temporarily, you can choose to disable the account instead.',
+  ],
+  [
+    'authentication_administration_users_delete_user_info',
+    'Deleting this account will permanently remove all associated user data from the system. Please confirm you want to proceed with deletion of "{arg:username}" user.',
+  ],
+
+  ['authentication_administration_user_delete_credentials_error', 'Failed to remove user credentials'],
+  ['authentication_administration_user_delete_credentials_success', 'User credentials were removed'],
+  [
+    'authentication_administration_user_delete_credentials_confirmation_message',
+    'Are you sure you want to delete "{arg:originName}" auth method from "{arg:userId}"?',
+  ],
 
   ['administration_configuration_wizard_configuration_admin', 'Administrator Credentials'],
   ['administration_configuration_wizard_configuration_admin_name', 'Login'],
@@ -39,7 +70,10 @@ export default [
   ['administration_configuration_wizard_configuration_services_group', 'Services'],
   ['administration_configuration_wizard_configuration_services', 'Services'],
   ['administration_configuration_wizard_configuration_authentication', 'Enable users authentication'],
-  ['administration_configuration_wizard_configuration_authentication_description', 'Allows users to authenticate. Otherwise only anonymous access is enabled'],
+  [
+    'administration_configuration_wizard_configuration_authentication_description',
+    'Allows users to authenticate. Otherwise only anonymous access is enabled',
+  ],
 
   ['administration_identity_providers_tab_title', 'Identity Providers'],
   ['administration_identity_providers_provider', 'Provider'],
@@ -66,7 +100,7 @@ export default [
 
   ['administration_teams_tab_title', 'Teams'],
   ['administration_teams_tab_description', 'Team management'],
-  ['administration_teams_team_creation', 'Team creation'],
+  ['administration_teams_team_creation', 'Team Creation'],
   ['administration_teams_team_id', 'Team ID'],
   ['administration_teams_team_name', 'Team name'],
   ['administration_teams_team_description', 'Description'],
@@ -83,6 +117,7 @@ export default [
   ['administration_teams_refresh_tooltip', 'Refresh team list'],
   ['administration_teams_delete_tooltip', 'Delete selected teams'],
   ['administration_teams_delete_confirmation', "You're going to delete these teams: "],
+  ['administration_teams_delete_confirmation_users_note', 'Note that users will lose their team affiliation and all associated permissions'],
 
   ['administration_teams_team_granted_users_tab_title', 'Users'],
   ['administration_teams_team_granted_users_search_placeholder', 'Search for user ID...'],
@@ -94,4 +129,7 @@ export default [
   ['administration_teams_team_granted_connections_tab_title', 'Connections'],
   ['administration_teams_team_granted_connections_search_placeholder', 'Search for connection name...'],
   ['administration_teams_team_granted_connections_empty', 'No available connections'],
+
+  ['plugin_authentication_administration_user_team_default_readonly_tooltip', "Default team. Can't be revoked"],
+  ['plugin_authentication_administration_team_default_users_tooltip', 'Default team. Contains all users'],
 ];

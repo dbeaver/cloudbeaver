@@ -2,9 +2,11 @@ export default [
   ['authentication_login_dialog_title', 'Аутентификация'],
   ['authentication_login', 'Войти'],
   ['authentication_logout', 'Выйти'],
+  ['authentication_logout_error', 'Не удалось выйти'],
   ['authentication_authenticate', 'Аутентифицироваться'],
   ['authentication_authorizing', 'Авторизация...'],
   ['authentication_auth_federated', 'Федеративная'],
+  ['authentication_auth_additional', 'Дополнительная'],
   ['authentication_select_provider', 'Выберите способ аутентификации'],
   ['authentication_configure', 'Пожалуйста настройте способы аутентификации'],
   ['authentication_provider_disabled', 'Способ аутентификации отключен'],
@@ -31,4 +33,13 @@ export default [
   ['authentication_user_login_cant_be_used', 'Данное имя нельзя использовать'],
   ['authentication_user_icon_tooltip', 'Пользователь'],
   ['authentication_team_icon_tooltip', 'Команда'],
+
+  ['plugin_authentication_user_loading_error', 'Не удалось загрузить данные пользователя'],
+  ['plugin_authentication_loading_error_dialog_title', 'Ошибка аутентификации'],
+  ['plugin_authentication_loading_error_dialog_message', 'Произошла ошибка при загрузке данных пользователя. Выйти?'],
+
+  [
+    'plugin_authentication_authentication_method_disabled',
+    'Способ аутентификации отключен, пожалуйста настройте способы аутентификации в настройках',
+  ],
 ];

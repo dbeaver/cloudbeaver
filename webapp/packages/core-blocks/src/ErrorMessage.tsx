@@ -1,49 +1,18 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2022 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observer } from 'mobx-react-lite';
-import styled, { css } from 'reshadow';
-
 import { Button } from './Button';
 import { IconOrImage } from './IconOrImage';
 import { useTranslate } from './localization/useTranslate';
+import { useS } from './useS';
 
-const styles = css`
-  message {
-    box-sizing: border-box;
-    display: flex;
-    align-items: center;
-    border-radius: 4px;
-    height: 50px;
-    padding: 8px 12px;  
-  }
-
-  IconOrImage {
-    width: 24px;
-    height: 24px;
-    margin-right: 8px;
-  }
-
-  message-body {
-    composes: theme-typography--body2 from global;
-    max-height: 100%;
-    line-height: 1.2;
-    box-sizing: border-box;
-    flex: 1;
-    -webkit-line-clamp: 2;
-    display: -webkit-box;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-  }
-  message-actions {
-    margin-left: 16px;
-  }
-`;
+import styles from './ErrorMessage.m.css';
+import { s } from './s';
 
 interface Props {
   hasDetails?: boolean;
@@ -52,27 +21,21 @@ interface Props {
   onShowDetails?: () => void;
 }
 
-export const ErrorMessage = observer<Props>(function ErrorMessage({
-  text,
-  className,
-  hasDetails,
-  onShowDetails,
-}) {
+export const ErrorMessage = observer<Props>(function ErrorMessage({ text, className, hasDetails, onShowDetails }) {
   const translate = useTranslate();
+  const style = useS(styles);
 
-  return styled(styles)(
-    <message className={className}>
-      <IconOrImage icon="/icons/error_icon_sm.svg" />
-      <message-body title={text}>
-        {text}
-      </message-body>
-      <message-actions>
+  return (
+    <div className={s(style, { message: true }, className)}>
+      <IconOrImage className={s(style, { errorIcon: true })} icon="/icons/error_icon_sm.svg" />
+      <div className={s(style, { messageBody: true })} title={text}>{text}</div>
+      <div className={s(style, { messageActions: true })}>
         {hasDetails && (
-          <Button type='button' mod={['outlined']} onClick={onShowDetails}>
+          <Button type="button" mod={['outlined']} onClick={onShowDetails}>
             {translate('ui_errors_details')}
           </Button>
         )}
-      </message-actions>
-    </message>
+      </div>
+    </div>
   );
 });

@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2023 DBeaver Corp
+ * Copyright (C) 2010-2024 DBeaver Corp
  *
  * All Rights Reserved.
  *
@@ -20,7 +20,6 @@ package io.cloudbeaver.model.rm;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
-import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBIcon;
 import org.jkiss.dbeaver.model.DBPImage;
 import org.jkiss.dbeaver.model.DBPObject;
@@ -30,14 +29,18 @@ import org.jkiss.dbeaver.model.navigator.DBNNode;
 import org.jkiss.dbeaver.model.rm.RMController;
 import org.jkiss.dbeaver.model.rm.RMProject;
 import org.jkiss.dbeaver.model.rm.RMResource;
+import org.jkiss.dbeaver.model.rm.RMResourceType;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
+import org.jkiss.dbeaver.registry.ResourceTypeDescriptor;
+import org.jkiss.dbeaver.registry.ResourceTypeRegistry;
+import org.jkiss.utils.ArrayUtils;
 import org.jkiss.utils.CommonUtils;
+import org.jkiss.utils.IOUtils;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class DBNResourceManagerResource extends DBNAbstractResourceManagerNode {
-    private static final Log log = Log.getLog(DBNResourceManagerResource.class);
 
     private final RMResource resource;
 
@@ -52,7 +55,7 @@ public class DBNResourceManagerResource extends DBNAbstractResourceManagerNode {
     }
 
     @Override
-    public String getNodeName() {
+    public String getNodeDisplayName() {
         return resource.getName();
     }
 
@@ -63,7 +66,42 @@ public class DBNResourceManagerResource extends DBNAbstractResourceManagerNode {
 
     @Override
     public DBPImage getNodeIcon() {
-        return resource.isFolder() ? DBIcon.TREE_FOLDER : DBIcon.TREE_FILE;
+        if (resource.isFolder()) {
+            if (getParentNode() instanceof DBNResourceManagerResource) {
+                return DBIcon.TREE_FOLDER;
+            }
+            // It may be a special folder
+            ResourceTypeDescriptor folderResType = ResourceTypeRegistry.getInstance().getResourceTypeByRootPath(
+                getOwnerProject(),
+                getName()
+            );
+            if (folderResType != null) {
+                return folderResType.getFolderIcon();
+            }
+            return DBIcon.TREE_FOLDER;
+        } else {
+            var fileExtension = IOUtils.getFileExtension(getNodeDisplayName());
+            if (!CommonUtils.isEmpty(fileExtension)) {
+                RMProject project = getProjectNode();
+                if (project != null) {
+                    for (RMResourceType rt : project.getResourceTypes()) {
+                        if (ArrayUtils.contains(rt.getFileExtensions(), fileExtension)) {
+                            return new DBIcon(null, rt.getIcon());
+                        }
+                    }
+                }
+            }
+            return DBIcon.TREE_PAGE;
+        }
+    }
+
+    private RMProject getProjectNode() {
+        for (DBNNode node = this; node != null; node = node.getParentNode()) {
+            if (node instanceof DBNResourceManagerProject) {
+                return  ((DBNResourceManagerProject) node).getProject();
+            }
+        }
+        return null;
     }
 
     @Override
@@ -116,9 +154,10 @@ public class DBNResourceManagerResource extends DBNAbstractResourceManagerNode {
         throw new DBException("Can't detect resource root node");
     }
 
+    @Deprecated
     @Override
     public String getNodeItemPath() {
-        return getParentNode().getNodeItemPath() + "/" + getNodeName();
+        return getParentNode().getNodeItemPath() + "/" + getNodeDisplayName();
     }
 
     @Override
@@ -136,12 +175,9 @@ public class DBNResourceManagerResource extends DBNAbstractResourceManagerNode {
         String resourceName = resource.getName();
         try {
             if (newName.indexOf('.') == -1) {
-                int indexOfExt = resourceName.indexOf('.');
-                if (indexOfExt > 0) {
-                    String ext = resourceName.substring(indexOfExt + 1);
-                    if (!CommonUtils.isEmpty(ext)) {
-                        newName += "." + ext;
-                    }
+                String ext = IOUtils.getFileExtension(getNodeDisplayName());
+                if (!CommonUtils.isEmpty(ext)) {
+                    newName += "." + ext;
                 }
             }
             if (!newName.equals(resource.getName())) {
@@ -158,7 +194,7 @@ public class DBNResourceManagerResource extends DBNAbstractResourceManagerNode {
 
     @Override
     public String toString() {
-        return getNodeName();
+        return getNodeDisplayName();
     }
 
     @Nullable

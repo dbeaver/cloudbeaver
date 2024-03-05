@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2023 DBeaver Corp and others
+ * Copyright (C) 2010-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@ import org.jkiss.dbeaver.model.auth.SMAuthStatus;
 import org.jkiss.dbeaver.model.data.json.JSONUtils;
 import org.jkiss.utils.CommonUtils;
 import org.junit.Assert;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.net.CookieManager;
@@ -33,24 +34,42 @@ import java.util.Map;
 public class ResourceManagerTest {
 
     public static final String GQL_TEMPLATE_RM_WRITE_RESOURCE = "rmWriteResource.json";
-    public static final String GQL_TEMPLATE_RM_DELETE_RESOURCE = "navDeleteNode.json";
+    public static final String GQL_TEMPLATE_RM_DELETE_RESOURCE = "rmDeleteResource.json";
+    public static final String GQL_READ_EMPTY_PROJECT_ID_RESOURCES = "rmReadEmptyProjectIdResources.json";
 
-    @Test
-    public void createDeleteResourceTest() throws Exception {
+    private static HttpClient client;
+
+    @BeforeClass
+    public static void init() throws Exception {
         Assert.assertTrue(CBApplication.getInstance().getAppConfiguration().isResourceManagerEnabled());
-        HttpClient client = HttpClient.newBuilder()
+        client = HttpClient.newBuilder()
             .cookieHandler(new CookieManager())
             .version(HttpClient.Version.HTTP_2)
             .build();
         Map<String, Object> authInfo = WebTestUtils.authenticateUser(
             client, CEServerTestSuite.getScriptsPath(), CEServerTestSuite.GQL_API_URL);
         Assert.assertEquals(SMAuthStatus.SUCCESS.name(), JSONUtils.getString(authInfo, "authStatus"));
+
+    }
+
+    @Test
+    public void createDeleteResourceTest() throws Exception {
         Assert.assertTrue(createResource(client, false));
         Assert.assertFalse(createResource(client, false));
         Assert.assertTrue(createResource(client, true));
-        Assert.assertEquals(1, deleteResource(client));
+        Assert.assertTrue(deleteResource(client));
     }
 
+    @Test
+    public void listResourcesWithInvalidProjectId() throws Exception {
+        String input = WebTestUtils.readScriptTemplate(GQL_READ_EMPTY_PROJECT_ID_RESOURCES, CEServerTestSuite.getScriptsPath());
+        Map<String, Object> map = WebTestUtils.doPost(CEServerTestSuite.GQL_API_URL, input, client);
+        var errors = JSONUtils.getObjectList(map, "errors");
+        Assert.assertFalse("No errors happened with empty project id request", errors.isEmpty());
+        var rmError = errors.get(0);
+        //FIXME stupid way to validate error
+        Assert.assertTrue(JSONUtils.getString(rmError, "message", "").contains("Project id is empty"));
+    }
 
     private boolean createResource(HttpClient client, boolean forceOverwrite) throws Exception {
         String input = WebTestUtils.readScriptTemplate(
@@ -64,14 +83,17 @@ public class ResourceManagerTest {
         return false;
     }
 
-    private int deleteResource(HttpClient client) throws Exception {
+    private boolean deleteResource(HttpClient client) throws Exception {
         String input = WebTestUtils.readScriptTemplate(GQL_TEMPLATE_RM_DELETE_RESOURCE, CEServerTestSuite.getScriptsPath());
         Map<String, Object> map = WebTestUtils.doPost(CEServerTestSuite.GQL_API_URL, input, client);
         Map<String, Object> data = JSONUtils.getObjectOrNull(map, "data");
-        if (data != null) {
-            return JSONUtils.getInteger(data, "navDeleteNodes");
+        if (map.containsKey("errors")) {
+            return false;
         }
-        return -1;
+        if (data != null) {
+            return data.containsKey("rmDeleteResource");
+        }
+        return false;
     }
 
 }

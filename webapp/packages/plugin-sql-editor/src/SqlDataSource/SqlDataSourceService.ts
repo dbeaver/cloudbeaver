@@ -1,11 +1,10 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2022 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { action, computed, makeObservable, observable } from 'mobx';
 
 import type { IConnectionExecutionContextInfo } from '@cloudbeaver/core-connections';
@@ -22,10 +21,7 @@ export interface ISqlDataSourceOptions {
   executionContext?: IConnectionExecutionContextInfo;
 }
 
-type ISqlDataSourceFactory = (
-  editorId: string,
-  options?: ISqlDataSourceOptions
-) => ISqlDataSource;
+type ISqlDataSourceFactory = (editorId: string, options?: ISqlDataSourceOptions) => ISqlDataSource;
 
 interface ISqlDataSourceFabric {
   key: string;
@@ -41,29 +37,35 @@ interface ISqlDataSourceProvider {
   isActionActive: boolean;
 }
 
+export interface ISQLDatasourceUpdateData {
+  editorId: string;
+  datasource: ISqlDataSource;
+}
+
 @injectable()
 export class SqlDataSourceService {
   get dataSources(): [string, ISqlDataSource][] {
-    return Array.from(this.providers.entries())
-      .map(([editorId, provider]) => [editorId, provider.dataSource]);
+    return Array.from(this.providers.entries()).map(([editorId, provider]) => [editorId, provider.dataSource]);
   }
 
   readonly onCreate: ISyncExecutor<[string, string]>;
+  readonly onUpdate: ISyncExecutor<ISQLDatasourceUpdateData>;
   private readonly dataSourceProviders: Map<string, ISqlDataSourceFabric>;
   private readonly providers: Map<string, ISqlDataSourceProvider>;
 
   constructor() {
     this.dataSourceProviders = new Map();
     this.providers = new Map();
-    this.onCreate  = new SyncExecutor();
+    this.onCreate = new SyncExecutor();
+    this.onUpdate = new SyncExecutor();
+    this.onCreate.next<ISQLDatasourceUpdateData>(this.onUpdate, ([editorId]) => ({
+      editorId,
+      datasource: this.get(editorId)!,
+    }));
 
     this.register({
       key: MemorySqlDataSource.key,
-      getDataSource: (editorId, options) => new MemorySqlDataSource(
-        options?.name,
-        options?.script,
-        options?.executionContext
-      ),
+      getDataSource: (editorId, options) => new MemorySqlDataSource(options?.name, options?.script, options?.executionContext),
     });
 
     makeObservable<this, 'providers'>(this, {
@@ -78,11 +80,7 @@ export class SqlDataSourceService {
     return this.providers.get(editorId)?.dataSource;
   }
 
-  create(
-    state: ISqlEditorTabState,
-    key: string,
-    options?: ISqlDataSourceOptions
-  ): ISqlDataSource {
+  create(state: ISqlEditorTabState, key: string, options?: ISqlDataSourceOptions): ISqlDataSource {
     const editorId = state.editorId;
     const provider = this.dataSourceProviders.get(key);
 
@@ -103,6 +101,10 @@ export class SqlDataSourceService {
         isActionActive: false,
       };
 
+      activeProvider.dataSource.onUpdate.next<ISQLDatasourceUpdateData>(this.onUpdate, () => ({
+        editorId,
+        datasource: activeProvider!.dataSource,
+      }));
       this.providers.set(editorId, activeProvider);
       state.datasourceKey = key;
       this.onCreate.execute([editorId, key]);
@@ -111,11 +113,7 @@ export class SqlDataSourceService {
     return activeProvider.dataSource;
   }
 
-  async executeAction<T>(
-    editorId: string,
-    action: (dataSource: ISqlDataSource) => (Promise<T> | T),
-    notFound: () => void
-  ): Promise<T | undefined> {
+  async executeAction<T>(editorId: string, action: (dataSource: ISqlDataSource) => Promise<T> | T, notFound: () => void): Promise<T | undefined> {
     const provider = this.providers.get(editorId);
 
     if (!provider) {

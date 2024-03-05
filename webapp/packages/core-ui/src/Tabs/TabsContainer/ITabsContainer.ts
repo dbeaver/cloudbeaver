@@ -1,12 +1,12 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2022 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
-import type { MetadataMap, MetadataValueGetter } from '@cloudbeaver/core-utils';
+import type { IDataContextProvider } from '@cloudbeaver/core-data-context';
+import type { ILoadableState, MetadataMap, MetadataValueGetter } from '@cloudbeaver/core-utils';
 
 import type { TabProps } from '../Tab/TabProps';
 
@@ -16,7 +16,7 @@ export interface ITabData<T = void> {
 }
 
 export type TabContainerTabComponent<TProps = void> = React.FC<TabProps & TProps>;
-export type TabContainerPanelComponent<TProps = void> = React.FC<{ tabId: string } & TProps>;
+export type TabContainerPanelComponent<TProps = void> = React.FC<{ tabId: string; className?: string } & TProps>;
 
 export interface ITabInfoOptions<TProps = void, TOptions extends Record<string, any> = never> {
   key: string;
@@ -28,10 +28,11 @@ export interface ITabInfoOptions<TProps = void, TOptions extends Record<string, 
 
   generator?: (tabId: string, props?: TProps) => string[];
 
-  tab?: () => (TabContainerTabComponent<TProps> | React.ExoticComponent);
-  panel: () => (TabContainerPanelComponent<TProps> | React.ExoticComponent);
+  tab?: () => TabContainerTabComponent<TProps> | React.ExoticComponent;
+  panel: () => TabContainerPanelComponent<TProps> | React.ExoticComponent;
 
   stateGetter?: (props: TProps) => MetadataValueGetter<string, any>;
+  getLoader?: (context: IDataContextProvider, props?: TProps) => ILoadableState[] | ILoadableState;
 
   isHidden?: (tabId: string, props?: TProps) => boolean;
   isDisabled?: (tabId: string, props?: TProps) => boolean;
@@ -40,10 +41,7 @@ export interface ITabInfoOptions<TProps = void, TOptions extends Record<string, 
   onOpen?: (tab: ITabData<TProps>) => void;
 }
 
-export interface ITabInfo<
-  TProps = void,
-  TOptions extends Record<string, any> = never
-> extends ITabInfoOptions<TProps, TOptions> {
+export interface ITabInfo<TProps = void, TOptions extends Record<string, any> = never> extends ITabInfoOptions<TProps, TOptions> {
   order: number;
 }
 
@@ -53,12 +51,8 @@ export interface ITabsContainer<TProps = void, TOptions extends Record<string, a
   readonly selectedId: string | null;
   has: (tabId: string) => boolean;
   getTabInfo: (tabId: string) => ITabInfo<TProps, TOptions> | undefined;
-  getTabState: <T>(
-    state: MetadataMap<string, any>,
-    tabId: string,
-    props: TProps,
-    valueGetter?: MetadataValueGetter<string, T>
-  ) => T;
+  getDisplayedTabInfo: (tabId: string, props?: TProps) => ITabInfo<TProps, TOptions> | undefined;
+  getTabState: <T>(state: MetadataMap<string, any>, tabId: string, props: TProps, valueGetter?: MetadataValueGetter<string, T>) => T;
   getDisplayed: (props?: TProps) => Array<ITabInfo<TProps, TOptions>>;
   getIdList: (props?: TProps) => string[];
 }

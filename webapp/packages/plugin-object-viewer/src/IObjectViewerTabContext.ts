@@ -1,13 +1,12 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2022 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import type { INodeNavigationContext } from '@cloudbeaver/core-navigation-tree';
-import type { ITabNavigationContext, ITab } from '@cloudbeaver/plugin-navigation-tabs';
+import type { ITab, ITabNavigationContext } from '@cloudbeaver/plugin-navigation-tabs';
 
 import type { IObjectViewerTabState } from './IObjectViewerTabState';
 import type { ObjectPage } from './ObjectPage/ObjectPage';
@@ -19,7 +18,7 @@ export interface IObjectViewerTabContext {
   tabInfo: ITabNavigationContext;
   nodeInfo: INodeNavigationContext;
 
-  initTab(): ITab<IObjectViewerTabState> | null;
+  initTab(): Promise<ITab<IObjectViewerTabState> | null>;
   isPageActive: (page: ObjectPage<any>) => boolean;
   canSwitchPage: (page: ObjectPage<any>) => boolean;
   trySwitchPage: <T>(page: ObjectPage<T>, state?: T) => boolean;

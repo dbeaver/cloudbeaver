@@ -1,19 +1,18 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2022 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { injectable } from '@cloudbeaver/core-di';
-import {
-  GraphQLService,
-  CachedDataResource,
-  SessionStateFragment
-} from '@cloudbeaver/core-sdk';
+import { ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
+import { CachedDataResource } from '@cloudbeaver/core-resource';
+import { GraphQLService, SessionStateFragment } from '@cloudbeaver/core-sdk';
 
 import { ServerConfigResource } from './ServerConfigResource';
+import { ServerEventId } from './SessionEventSource';
+import { SessionInfoEventHandler } from './SessionInfoEventHandler';
 
 export type SessionState = SessionStateFragment;
 export interface ISessionAction {
@@ -21,19 +20,45 @@ export interface ISessionAction {
   [key: string]: any;
 }
 
+interface SessionStateData {
+  isValid?: boolean;
+  remainingTime: number;
+}
+
 @injectable()
 export class SessionResource extends CachedDataResource<SessionState | null> {
   private action: ISessionAction | null;
   private defaultLocale: string | undefined;
+  readonly onStatusUpdate: ISyncExecutor<SessionStateData>;
 
   constructor(
     private readonly graphQLService: GraphQLService,
-    serverConfigResource: ServerConfigResource
+    sessionInfoEventHandler: SessionInfoEventHandler,
+    serverConfigResource: ServerConfigResource,
   ) {
-    super(null);
+    super(() => null);
+
+    this.onStatusUpdate = new SyncExecutor();
+    sessionInfoEventHandler.onEvent(
+      ServerEventId.CbSessionState,
+      event => {
+        if (this.data) {
+          this.data.valid = event.isValid ?? this.data.valid;
+          this.data.remainingTime = event.remainingTime;
+          // TODO: probably we want to call here this.dataUpdate
+        }
+        this.onStatusUpdate.execute(event);
+      },
+      undefined,
+      this,
+    );
 
     this.action = null;
-    this.sync(serverConfigResource, () => {}, () => {});
+    this.sync(
+      serverConfigResource,
+      () => {},
+      () => {},
+    );
   }
 
   processAction(): ISessionAction | null {
@@ -48,22 +73,18 @@ export class SessionResource extends CachedDataResource<SessionState | null> {
     this.defaultLocale = defaultLocale;
   }
 
-  //! this method results in onDataUpdate handler skipping
-  async refreshSilent(): Promise<void> {
-    const session = await this.loader();
-
-    this.setData(session);
-  }
-
   async changeLanguage(locale: string): Promise<void> {
-    await this.performUpdate(undefined, undefined, async () => {
-      await this.graphQLService.sdk.changeSessionLanguage({ locale });
+    if (this.data?.locale === locale) {
+      return;
+    }
+    await this.graphQLService.sdk.changeSessionLanguage({ locale });
 
-      this.defaultLocale = locale;
-      if (this.data) {
-        this.data.locale = locale;
-      }
-    });
+    this.defaultLocale = locale;
+    if (this.data) {
+      this.data.locale = locale;
+    }
+
+    this.markOutdated();
   }
 
   protected async loader(): Promise<SessionState> {
@@ -72,11 +93,23 @@ export class SessionResource extends CachedDataResource<SessionState | null> {
     return session;
   }
 
+  async updateSession() {
+    if (!this.data?.valid) {
+      return;
+    }
+
+    const { updateSession } = await this.graphQLService.sdk.updateSession();
+
+    this.setData(updateSession);
+
+    return updateSession;
+  }
+
   protected setData(data: SessionState | null) {
     if (!this.action) {
       this.action = data?.actionParameters;
     }
 
-    this.data = data;
+    super.setData(data);
   }
 }

@@ -1,19 +1,19 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2022 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observer } from 'mobx-react-lite';
 import { useContext } from 'react';
-import styled from 'reshadow';
 
 import { Icon } from '../Icon';
 import { Link } from '../Link';
+import { s } from '../s';
+import { useS } from '../useS';
 import { FolderExplorerContext } from './FolderExplorerContext';
-import { folderExplorerStyles } from './folderExplorerStyles';
+import style from './FolderName.m.css';
 
 interface BaseProps {
   folder?: string;
@@ -36,14 +36,8 @@ interface ShortProps extends BaseProps {
   short: boolean;
 }
 
-export const FolderName = observer<FolderProps | ShortProps>(function FolderName({
-  folder,
-  path,
-  title,
-  short,
-  last,
-  getName,
-}) {
+export const FolderName = observer<FolderProps | ShortProps>(function FolderName({ folder, path, title, short, last, getName }) {
+  const styles = useS(style);
   const context = useContext(FolderExplorerContext);
 
   if (!context) {
@@ -65,16 +59,12 @@ export const FolderName = observer<FolderProps | ShortProps>(function FolderName
     path = path.slice(0, path.length - 1);
   }
 
-  return styled(folderExplorerStyles)(
-    <folder-explorer-path-element title={title || name}>
-      <folder-explorer-path-element-arrow>
+  return (
+    <div className={s(styles, { pathElement: true })} title={title || name}>
+      <div className={s(styles, { pathElementArrow: true })}>
         <Icon name="arrow" viewBox="0 0 16 16" />
-      </folder-explorer-path-element-arrow>
-      <folder-explorer-path-element-name>
-        {last
-          ? name
-          : <Link onClick={() => context.open(path, folder!)}>{name}</Link>}
-      </folder-explorer-path-element-name>
-    </folder-explorer-path-element>
+      </div>
+      <div className={s(styles, { pathElementName: true })}>{last ? name : <Link onClick={() => context.open(path, folder!)}>{name}</Link>}</div>
+    </div>
   );
 });

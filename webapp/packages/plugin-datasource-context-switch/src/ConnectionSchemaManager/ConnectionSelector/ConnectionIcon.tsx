@@ -1,69 +1,62 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2022 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observer } from 'mobx-react-lite';
-import styled, { css, use } from 'reshadow';
 
-import { ConnectionMark, IconOrImage, useResource, useStyles } from '@cloudbeaver/core-blocks';
-import { DBDriverResource, ConnectionInfoResource } from '@cloudbeaver/core-connections';
-import type { ComponentStyle } from '@cloudbeaver/core-theming';
+import { ConnectionImageWithMask, ConnectionImageWithMaskSvgStyles, s, SContext, StyleRegistry, useResource, useS } from '@cloudbeaver/core-blocks';
+import { ConnectionInfoResource, DBDriverResource } from '@cloudbeaver/core-connections';
+import { CachedMapAllKey } from '@cloudbeaver/core-resource';
 
+import styles from './ConnectionIcon.m.css';
+import ConnectionImageWithMaskSvgBackgroundStyles from './ConnectionImageWithMask.m.css';
 import type { IConnectionSelectorExtraProps } from './IConnectionSelectorExtraProps';
 
-const connectionIconStyle = css`
-  icon {
-    position: relative;
-    display: flex;
-
-    & IconOrImage {
-      background-color: #fff;
-      padding: 2px;
-      border-radius: var(--theme-form-element-radius);
-
-      &[|small] {
-        box-sizing: border-box;
-      }
-    }
-  }
-`;
-
-interface Props extends IConnectionSelectorExtraProps {
-  style?: ComponentStyle;
+export interface ConnectionIconProps extends IConnectionSelectorExtraProps {
+  size?: number;
   className?: string;
 }
 
-export const ConnectionIcon: React.FC<Props> = observer(function ConnectionIcon({
-  connectionKey,
-  small,
-  style,
-  className,
-}) {
-  const styles = useStyles(style, connectionIconStyle);
+const registry: StyleRegistry = [
+  [
+    ConnectionImageWithMaskSvgStyles,
+    {
+      mode: 'append',
+      styles: [ConnectionImageWithMaskSvgBackgroundStyles],
+    },
+  ],
+];
 
-  const connection = useResource(
-    ConnectionIcon,
-    ConnectionInfoResource,
-    connectionKey ?? null
-  );
-  const driverId = connection.data?.driverId;
+export const ConnectionIcon = observer<ConnectionIconProps>(function ConnectionIcon({ connectionKey, size = 24, small = true, className }) {
+  const connection = useResource(ConnectionIcon, ConnectionInfoResource, connectionKey ?? null);
+  const drivers = useResource(ConnectionIcon, DBDriverResource, CachedMapAllKey);
+  const style = useS(styles, ConnectionImageWithMaskSvgBackgroundStyles);
 
-  const driver = useResource(ConnectionIcon, DBDriverResource, driverId!, {
-    active: driverId !== undefined,
-  });
-
-  if (!driver.data?.icon) {
+  if (!connection.data?.driverId) {
     return null;
   }
 
-  return styled(styles)(
-    <icon className={className}>
-      <IconOrImage icon={driver.data.icon} {...use({ small })} />
-      <ConnectionMark connected={connection.data?.connected ?? false} />
-    </icon>
+  const driver = drivers.resource.get(connection.data.driverId);
+
+  if (!driver?.icon) {
+    return null;
+  }
+
+  return (
+    <div className={s(style, { connectionIcon: true }, className)}>
+      <SContext registry={registry}>
+        <ConnectionImageWithMask
+          className={s(style, { connectionImageWithMask: true, small })}
+          icon={driver.icon}
+          connected={connection.data.connected}
+          maskId="connection-icon"
+          size={size}
+          paddingSize={0}
+        />
+      </SContext>
+    </div>
   );
 });

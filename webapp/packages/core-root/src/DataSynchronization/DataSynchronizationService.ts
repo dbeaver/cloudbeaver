@@ -1,15 +1,14 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2022 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { makeObservable, observable } from 'mobx';
 
 import { injectable } from '@cloudbeaver/core-di';
-import { SyncExecutor, ISyncExecutor } from '@cloudbeaver/core-executor';
+import { ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
 
 import type { ISynchronizationMessage, ISynchronizationMessageResolveCallback } from './ISynchronizationMessage';
 import { SynchronizationMessage } from './SynchronizationMessage';
@@ -28,11 +27,7 @@ export class DataSynchronizationService {
     });
   }
 
-  requestSynchronization(
-    label: string,
-    message: string,
-    onResolve?: ISynchronizationMessageResolveCallback
-  ): ISynchronizationMessage {
+  requestSynchronization(label: string, message: string, onResolve?: ISynchronizationMessageResolveCallback): ISynchronizationMessage {
     const synchronizationMessage = new SynchronizationMessage(label, message);
 
     if (onResolve) {

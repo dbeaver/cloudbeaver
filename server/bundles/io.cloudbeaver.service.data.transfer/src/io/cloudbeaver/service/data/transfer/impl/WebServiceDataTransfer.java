@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2023 DBeaver Corp and others
+ * Copyright (C) 2010-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -107,7 +107,15 @@ public class WebServiceDataTransfer implements DBWServiceDataTransfer {
     }
 
     @NotNull
-    private String makeUniqueFileName(WebSQLProcessor sqlProcessor, DataTransferProcessorDescriptor processor) {
+    private String makeUniqueFileName(
+            WebSQLProcessor sqlProcessor,
+            DataTransferProcessorDescriptor processor,
+            Map<String, Object> processorProperties
+    ) {
+        if (processorProperties != null && processorProperties.get(StreamConsumerSettings.PROP_FILE_EXTENSION) != null) {
+            return sqlProcessor.getWebSession().getSessionId() + "_" + UUID.randomUUID() +
+                    "." + processorProperties.get(StreamConsumerSettings.PROP_FILE_EXTENSION);
+        }
         return sqlProcessor.getWebSession().getSessionId() + "_" + UUID.randomUUID() + "." + WebDataTransferUtils.getProcessorFileExtension(processor);
     }
 
@@ -157,7 +165,8 @@ public class WebServiceDataTransfer implements DBWServiceDataTransfer {
                 monitor.beginTask("Export data", 1);
                 try {
                     monitor.subTask("Export data using " + processor.getName());
-                    Path exportFile = dataExportFolder.resolve(makeUniqueFileName(sqlProcessor, processor));
+                    Path exportFile = dataExportFolder.resolve(
+                            makeUniqueFileName(sqlProcessor, processor, parameters.getProcessorProperties()));
                     try {
                         exportData(monitor, processor, dataContainer, parameters, resultsInfo, exportFile);
                     } catch (Exception e) {
@@ -173,12 +182,19 @@ public class WebServiceDataTransfer implements DBWServiceDataTransfer {
                         }
                         throw new DBException("Error exporting data", e);
                     }
-                    WebDataTransferTaskConfig taskConfig = new WebDataTransferTaskConfig(exportFile, parameters);
-                    String exportFileName = CommonUtils.escapeFileName(CommonUtils.truncateString(dataContainer.getName(), 32));
+                    var outputSettings = parameters.getOutputSettings();
+                    Path finallyExportFile = outputSettings.isCompress()
+                        ? exportFile.resolveSibling(WebDataTransferUtils.normalizeFileName(
+                            exportFile.getFileName().toString(), outputSettings))
+                        : exportFile;
+                    WebDataTransferTaskConfig taskConfig = new WebDataTransferTaskConfig(finallyExportFile, parameters);
+                    String exportFileName = CommonUtils.isEmpty(outputSettings.getFileName()) ?
+                        CommonUtils.escapeFileName(CommonUtils.truncateString(dataContainer.getName(), 32)) :
+                        outputSettings.getFileName();
                     taskConfig.setExportFileName(exportFileName);
                     WebDataTransferUtils.getSessionDataTransferConfig(sqlProcessor.getWebSession()).addTask(taskConfig);
 
-                    result = exportFile.getFileName().toString();
+                    result = finallyExportFile.getFileName().toString();
                 } catch (Throwable e) {
                     throw new InvocationTargetException(e);
                 } finally {
@@ -211,7 +227,9 @@ public class WebServiceDataTransfer implements DBWServiceDataTransfer {
                 super.fetchRow(session, resultSet);
                 if (fileSizeLimit != null && getBytesWritten() > fileSizeLimit.longValue()) {
                     throw new DBQuotaException(
-                        "Data export quota exceeded", QUOTA_PROP_FILE_LIMIT, fileSizeLimit.longValue(), getBytesWritten());
+                        "Data export quota exceeded \n Please increase the resourceQuotas parameter in configuration",
+                        QUOTA_PROP_FILE_LIMIT, fileSizeLimit.longValue(), getBytesWritten()
+                    );
                 }
             }
         };
@@ -223,6 +241,7 @@ public class WebServiceDataTransfer implements DBWServiceDataTransfer {
 
         WebDataTransferOutputSettings outputSettings = parameters.getOutputSettings();
         settings.setOutputEncodingBOM(outputSettings.isInsertBom());
+        settings.setCompressResults(outputSettings.isCompress());
         if (!CommonUtils.isEmpty(outputSettings.getEncoding())) {
             settings.setOutputEncoding(outputSettings.getEncoding());
         }
@@ -241,12 +260,6 @@ public class WebServiceDataTransfer implements DBWServiceDataTransfer {
         // Remove extension property (we specify file name directly)
         properties.remove(StreamConsumerSettings.PROP_FILE_EXTENSION);
 
-        consumer.initTransfer(
-            dataContainer,
-            settings,
-            new IDataTransferConsumer.TransferParameters(processor.isBinaryFormat(), processor.isHTMLFormat()),
-            exporter,
-            properties);
 
         DatabaseTransferProducer producer = new DatabaseTransferProducer(
             dataContainer,
@@ -255,6 +268,14 @@ public class WebServiceDataTransfer implements DBWServiceDataTransfer {
         producerSettings.setExtractType(DatabaseProducerSettings.ExtractType.SINGLE_QUERY);
         producerSettings.setQueryRowCount(false);
         producerSettings.setOpenNewConnections(CommonUtils.getOption(parameters.getDbProducerSettings(), "openNewConnection"));
+
+        consumer.initTransfer(
+            dataContainer,
+            settings,
+            new IDataTransferConsumer.TransferParameters(processor.isBinaryFormat(), processor.isHTMLFormat()),
+            exporter,
+            properties,
+            producer.getProject());
 
         producer.transferData(monitor, consumer, null, producerSettings, null);
 

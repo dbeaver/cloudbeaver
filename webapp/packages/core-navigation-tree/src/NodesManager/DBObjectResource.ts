@@ -1,62 +1,128 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2022 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
+import { runInAction } from 'mobx';
 
 import { injectable } from '@cloudbeaver/core-di';
+import { ExecutorInterrupter } from '@cloudbeaver/core-executor';
 import {
-  GraphQLService, CachedMapResource, ResourceKey, isResourceKeyList, resourceKeyList, ResourceKeyUtils, ResourceKeyList
-} from '@cloudbeaver/core-sdk';
+  CACHED_RESOURCE_DEFAULT_PAGE_OFFSET,
+  CachedMapResource,
+  CachedResourceOffsetPageKey,
+  CachedResourceOffsetPageListKey,
+  isResourceAlias,
+  type ResourceKey,
+  resourceKeyList,
+  resourceKeyListAliasFactory,
+  ResourceKeyUtils,
+} from '@cloudbeaver/core-resource';
+import { DetailsError, GraphQLService } from '@cloudbeaver/core-sdk';
 
 import type { DBObject } from './EntityTypes';
 import { NavNodeInfoResource } from './NavNodeInfoResource';
 import { NavTreeResource } from './NavTreeResource';
 
-const dbObjectParentKeySymbol = Symbol('@db-object/parent') as unknown as string;
-export const DBObjectParentKey = (parentId: string) => resourceKeyList<string>(
-  [dbObjectParentKeySymbol],
-  parentId
-);
+export const DBObjectParentKey = resourceKeyListAliasFactory('@db-object/parent', (parentId: string) => ({ parentId }));
 
 @injectable()
 export class DBObjectResource extends CachedMapResource<string, DBObject> {
   constructor(
     private readonly graphQLService: GraphQLService,
     private readonly navNodeInfoResource: NavNodeInfoResource,
-    private readonly navTreeResource: NavTreeResource
+    private readonly navTreeResource: NavTreeResource,
   ) {
     super();
 
-    this.addAlias(
-      isDBObjectParentKey,
-      param => resourceKeyList(navTreeResource.get(param.mark) || []),
-      (a, b) => a.mark === b.mark
-    );
+    this.aliases.add(DBObjectParentKey, param => resourceKeyList(navTreeResource.get(param.options.parentId) || []));
     // this.preloadResource(this.navNodeInfoResource);
     this.navNodeInfoResource.outdateResource(this);
     this.navNodeInfoResource.deleteInResource(this);
-    this.navNodeInfoResource.onDataOutdated.addHandler(this.outdateChildren.bind(this));
+
+    this.navTreeResource.onDataOutdated.addHandler(key => {
+      ResourceKeyUtils.forEach(key, nodeId => {
+        const pageAlias = this.aliases.isAlias(nodeId, CachedResourceOffsetPageKey) || this.aliases.isAlias(nodeId, CachedResourceOffsetPageListKey);
+
+        if (pageAlias) {
+          this.markOutdated(DBObjectParentKey(pageAlias.target));
+        }
+
+        if (!isResourceAlias(nodeId)) {
+          this.markOutdated(DBObjectParentKey(nodeId));
+        }
+      });
+    });
+
+    this.beforeLoad.addHandler(async (originalKey, context) => {
+      await this.navTreeResource.waitLoad();
+      const parentKey = this.aliases.isAlias(originalKey, DBObjectParentKey);
+      const pageKey =
+        this.aliases.isAlias(originalKey, CachedResourceOffsetPageKey) || this.aliases.isAlias(originalKey, CachedResourceOffsetPageListKey);
+      let limit = this.navTreeResource.childrenLimit;
+      let offset = CACHED_RESOURCE_DEFAULT_PAGE_OFFSET;
+
+      if (pageKey) {
+        limit = pageKey.options.limit;
+        offset = pageKey.options.offset;
+      }
+
+      if (parentKey) {
+        await this.navTreeResource.load(CachedResourceOffsetPageKey(offset, limit).setTarget(parentKey.options.parentId));
+        return;
+      }
+
+      const key = ResourceKeyUtils.toList(this.aliases.transformToKey(originalKey));
+      const parents = [
+        ...new Set(
+          key.map(nodeId => this.navNodeInfoResource.get(nodeId)?.parentId).filter<string>((nodeId): nodeId is string => nodeId !== undefined),
+        ),
+      ];
+
+      await this.navTreeResource.load(resourceKeyList(parents));
+
+      if (key.length > 0 && !navNodeInfoResource.has(key)) {
+        ExecutorInterrupter.interrupt(context);
+        const cause = new DetailsError(`Entity not found: ${key.toString()}`);
+        throw this.markError(cause, key);
+      }
+    });
   }
 
   protected async loader(originalKey: ResourceKey<string>): Promise<Map<string, DBObject>> {
-    const key = this.transformParam(originalKey);
+    let limit = this.navTreeResource.childrenLimit;
+    let offset = CACHED_RESOURCE_DEFAULT_PAGE_OFFSET;
+    const parentKey = this.aliases.isAlias(originalKey, DBObjectParentKey);
+    const pageKey =
+      this.aliases.isAlias(originalKey, CachedResourceOffsetPageKey) || this.aliases.isAlias(originalKey, CachedResourceOffsetPageListKey);
 
-    if (isDBObjectParentKey(originalKey)) {
-      await this.loadFromChildren(originalKey.mark, 0, this.navTreeResource.childrenLimit + 1);
+    if (pageKey) {
+      limit = pageKey.options.limit;
+      offset = pageKey.options.offset;
+    }
+
+    if (parentKey) {
+      const nodeId = parentKey.options.parentId;
+      await this.loadFromChildren(nodeId, offset, limit);
+
+      runInAction(() => {
+        this.offsetPagination.setPageEnd(
+          CachedResourceOffsetPageKey(offset, limit).setTarget(originalKey),
+          this.navTreeResource.offsetPagination.hasNextPage(CachedResourceOffsetPageKey(offset, limit).setTarget(nodeId)),
+        );
+      });
       return this.data;
     }
 
-    if (isResourceKeyList(key)) {
+    if (!isResourceAlias(originalKey)) {
       const values: DBObject[] = [];
-      for (const navNodeId of key.list) {
+      originalKey = ResourceKeyUtils.toList(originalKey);
+      await ResourceKeyUtils.forEachAsync(originalKey, async navNodeId => {
         values.push(await this.loadDBObjectInfo(navNodeId));
-      }
-      this.set(key, values);
-    } else {
-      this.set(key, await this.loadDBObjectInfo(key));
+      });
+      this.set(originalKey, values);
     }
 
     return this.data;
@@ -80,35 +146,7 @@ export class DBObjectResource extends CachedMapResource<string, DBObject> {
     return objectInfo;
   }
 
-  private outdateChildren(key: ResourceKey<string> | undefined): void {
-    if (!key) {
-      this.markOutdated();
-      return;
-    }
-
-    const childrenToOutdate: string[] = [];
-
-    ResourceKeyUtils.forEach(key, key => {
-      childrenToOutdate.push(...this.navTreeResource.get(key) || []);
-    });
-
-    const outdateKey = resourceKeyList(childrenToOutdate);
-
-    // if (!this.isOutdated(outdateKey)) {
-    this.markOutdated(outdateKey);
-    // }
+  protected validateKey(key: string): boolean {
+    return typeof key === 'string';
   }
-
-  protected validateParam(param: ResourceKey<string>): boolean {
-    return (
-      super.validateParam(param)
-      || typeof param === 'string'
-    );
-  }
-}
-
-function isDBObjectParentKey(
-  param: ResourceKey<string>
-): param is ResourceKeyList<string> {
-  return isResourceKeyList(param) && param.list.includes(dbObjectParentKeySymbol);
 }

@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2023 DBeaver Corp and others
+ * Copyright (C) 2010-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,8 @@
 package io.cloudbeaver.model.user;
 
 import io.cloudbeaver.WebServiceUtils;
+import io.cloudbeaver.auth.SMAuthProviderFederated;
+import io.cloudbeaver.auth.provisioning.SMProvisioner;
 import io.cloudbeaver.registry.WebAuthProviderConfiguration;
 import io.cloudbeaver.registry.WebAuthProviderDescriptor;
 import io.cloudbeaver.server.CBApplication;
@@ -69,8 +71,30 @@ public class WebAuthProviderInfo {
         return descriptor.isConfigurable();
     }
 
+    public boolean isFederated() {
+        return descriptor.getInstance() instanceof SMAuthProviderFederated;
+    }
+
     public boolean isTrusted() {
         return descriptor.isTrusted();
+    }
+
+    public boolean isPrivate() {
+        return descriptor.isPrivate();
+    }
+
+    public boolean isRequired() {
+        return descriptor.isRequired();
+    }
+    public boolean isAuthRoleProvided(SMAuthProviderCustomConfiguration configuration) {
+        if (descriptor.getInstance() instanceof SMProvisioner provisioner) {
+            return provisioner.isAuthRoleProvided(configuration);
+        }
+        return false;
+    }
+
+    public boolean isSupportProvisioning() {
+        return descriptor.getInstance() instanceof SMProvisioner;
     }
 
     public List<WebAuthProviderConfiguration> getConfigurations() {

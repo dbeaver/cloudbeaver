@@ -1,4 +1,5 @@
 export default [
+  ['plugin_data_export_data_export_settings_group', 'Экспорт данных'],
   ['data_transfer_dialog_title', 'Экспорт данных'],
   ['data_transfer_dialog_export', 'Экспортировать'],
   ['data_transfer_dialog_export_tooltip', 'Экспортировать резалт сет как файл'],
@@ -12,4 +13,7 @@ export default [
   ['data_transfer_notification_delete', 'Удалить'],
   ['data_transfer_exporting_table', 'Таблица:'],
   ['data_transfer_exporting_sql', 'SQL:'],
+  ['data_transfer_dialog_select_processor_fail', 'Не удалось выбрать обработчик данных'],
+
+  ['data_transfer_output_settings_compress', 'Сжатие'],
 ];

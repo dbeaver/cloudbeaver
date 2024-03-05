@@ -1,11 +1,10 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2022 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
@@ -30,22 +29,25 @@ const style = css`
 `;
 
 export const ConnectionAccessTableItem = observer<Props>(function ConnectionAccessTableItem({
-  id, name, description, icon, iconTooltip, tooltip, disabled, className,
+  id,
+  name,
+  description,
+  icon,
+  iconTooltip,
+  tooltip,
+  disabled,
+  className,
 }) {
   return styled(style)(
-    <TableItem
-      item={id}
-      title={tooltip}
-      disabled={disabled}
-      selectDisabled={disabled}
-      className={className}
-    >
+    <TableItem item={id} title={tooltip} disabled={disabled} selectDisabled={disabled} className={className}>
       <TableColumnValue centerContent flex>
         <TableItemSelect disabled={disabled} />
       </TableColumnValue>
-      <TableColumnValue><StaticImage icon={icon} title={iconTooltip} /></TableColumnValue>
+      <TableColumnValue>
+        <StaticImage icon={icon} title={iconTooltip} />
+      </TableColumnValue>
       <TableColumnValue>{name}</TableColumnValue>
       <TableColumnValue>{description}</TableColumnValue>
-    </TableItem>
+    </TableItem>,
   );
 });

@@ -5,8 +5,9 @@ query serverConfig {
     workspaceId
     serverURL
     rootURI
-    hostName
+    containerId
     defaultAuthRole
+    defaultUserTeam
     productConfiguration
     supportsCustomConnections
     supportsConnectionBrowser
@@ -50,6 +51,12 @@ query serverConfig {
       buildTime
       releaseTime
       licenseInfo
+    }
+    passwordPolicyConfiguration {
+      minLength
+      minNumberCount
+      minSymbolCount
+      requireMixedCase
     }
   }
 }

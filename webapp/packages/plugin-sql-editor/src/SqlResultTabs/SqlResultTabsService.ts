@@ -1,26 +1,27 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2022 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { action, makeObservable } from 'mobx';
 
 import { injectable } from '@cloudbeaver/core-di';
 
-import type { ISqlEditorTabState, ISqlEditorResultTab } from '../ISqlEditorTabState';
+import type { ISqlEditorResultTab, ISqlEditorTabState } from '../ISqlEditorTabState';
 import { SqlExecutionPlanService } from './ExecutionPlan/SqlExecutionPlanService';
+import { OutputLogsService } from './OutputLogs/OutputLogsService';
 import { SqlQueryResultService } from './SqlQueryResultService';
 import { SqlQueryService } from './SqlQueryService';
 
 @injectable()
 export class SqlResultTabsService {
   constructor(
-    private sqlQueryService: SqlQueryService,
-    private sqlQueryResultService: SqlQueryResultService,
-    private sqlExecutionPlanService: SqlExecutionPlanService,
+    private readonly sqlQueryService: SqlQueryService,
+    private readonly sqlQueryResultService: SqlQueryResultService,
+    private readonly sqlExecutionPlanService: SqlExecutionPlanService,
+    private readonly sqlOutputLogsService: OutputLogsService,
   ) {
     makeObservable(this, {
       removeResultTabs: action,
@@ -63,8 +64,13 @@ export class SqlResultTabsService {
     return true;
   }
 
-  removeResultTabs(state: ISqlEditorTabState): void {
-    for (const tab of state.tabs.slice()) {
+  removeResultTabs(state: ISqlEditorTabState, excludedTabIds?: string[]): void {
+    const tabs = state.tabs.slice();
+
+    for (const tab of tabs) {
+      if (excludedTabIds?.includes(tab.id)) {
+        continue;
+      }
       this.removeTab(state, tab);
     }
   }
@@ -75,6 +81,7 @@ export class SqlResultTabsService {
     this.sqlQueryService.removeStatisticsTab(state, tab.id);
     this.sqlQueryResultService.removeResultTab(state, tab.id);
     this.sqlExecutionPlanService.removeExecutionPlanTab(state, tab.id);
+    this.sqlOutputLogsService.removeOutputLogsTab(state, tab.id);
 
     if (state.currentTabId === tab.id) {
       if (state.tabs.length > 0) {

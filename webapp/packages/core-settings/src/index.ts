@@ -1,5 +1,7 @@
-export { manifest as coreSettingsManifest } from './manifest';
+export * from './manifest';
+export * from './SettingsScopeType';
 export * from './SettingsService';
-export * from './LocalStorageSaveService';
-export * from './SettingsSource';
+export * from './SettingsResolverSource';
+export * from './ISettingsResolverSource';
 export * from './ISettingsSource';
+export * from './SettingsResolverService';

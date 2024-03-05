@@ -1,42 +1,48 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2022 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { action, observable } from 'mobx';
 import { observer } from 'mobx-react-lite';
-import styled, { css } from 'reshadow';
 
-import { BASE_CONTAINERS_STYLES, Button, Container, InputField, SubmittingForm, Translate, useFocus, useObservableRef, useTranslate } from '@cloudbeaver/core-blocks';
-import { CommonDialogWrapper, DialogComponent } from '@cloudbeaver/core-dialogs';
+import {
+  Button,
+  CommonDialogBody,
+  CommonDialogFooter,
+  CommonDialogHeader,
+  CommonDialogWrapper,
+  Container,
+  Fill,
+  Form,
+  InputField,
+  Translate,
+  useFocus,
+  useObservableRef,
+  useTranslate,
+} from '@cloudbeaver/core-blocks';
+import type { DialogComponent } from '@cloudbeaver/core-dialogs';
 import { ProjectSelect } from '@cloudbeaver/plugin-projects';
-
-const style = css`
-  fill {
-    flex: 1;
-  }
-`;
-
-interface Payload {
-  defaultScriptName?: string;
-  projectId?: string | null;
-}
 
 export interface ISaveScriptDialogResult {
   name: string;
   projectId: string | null;
 }
 
-interface State extends ISaveScriptDialogResult {
-  errorMessage: string | null;
-  validate: () => void;
-  submit: () => Promise<void>;
+interface Payload {
+  defaultScriptName?: string;
+  projectId?: string | null;
+  validation?: (result: ISaveScriptDialogResult, setMessage: (message: string) => void) => Promise<boolean> | boolean;
 }
 
-const regex = /^(?!\.)[\p{L}\w\-$.\s()@]+$/u;
+interface State extends ISaveScriptDialogResult {
+  message: string | null;
+  valid: boolean;
+  validate: () => Promise<void>;
+  submit: () => Promise<void>;
+}
 
 export const SaveScriptDialog: DialogComponent<Payload, ISaveScriptDialogResult> = observer(function SaveScriptDialog({
   payload,
@@ -47,83 +53,86 @@ export const SaveScriptDialog: DialogComponent<Payload, ISaveScriptDialogResult>
   const translate = useTranslate();
   const [focusedRef] = useFocus<HTMLFormElement>({ focusFirstChild: true });
 
-  const state = useObservableRef<State>(() => ({
-    name: payload.defaultScriptName ?? '',
-    projectId: payload.projectId ?? null,
-    errorMessage: null,
-    validate() {
-      this.errorMessage = null;
+  const state = useObservableRef<State>(
+    () => ({
+      name: payload.defaultScriptName ?? '',
+      projectId: payload.projectId ?? null,
+      message: null,
+      valid: true,
+      async validate() {
+        this.message = null;
 
-      const valid = regex.test(this.name.trim());
+        let valid: boolean | undefined;
 
-      if (!valid) {
-        this.errorMessage = translate('plugin_resource_manager_scripts_script_name_invalid_characters_message');
-      }
+        try {
+          valid = await payload.validation?.({ name: this.name, projectId: this.projectId }, (message: string) => {
+            this.message = message;
+          });
+        } catch {}
+
+        this.valid = valid ?? true;
+      },
+      async submit() {
+        await this.validate();
+
+        if (state.valid) {
+          resolveDialog(this);
+        }
+      },
+    }),
+    {
+      name: observable.ref,
+      projectId: observable.ref,
+      message: observable.ref,
+      valid: observable.ref,
+      submit: action.bound,
+      validate: action.bound,
     },
-    async submit() {
-      this.validate();
+    false,
+  );
 
-      if (!this.errorMessage) {
-        resolveDialog(this);
-      }
-    },
-  }), {
-    name: observable.ref,
-    projectId: observable.ref,
-    errorMessage: observable.ref,
-    validate: action.bound,
-    submit: action.bound,
-  }, false);
+  const errorMessage = state.valid ? ' ' : translate(state.message ?? 'ui_rename_taken_or_invalid');
 
-  return styled(style, BASE_CONTAINERS_STYLES)(
-    <CommonDialogWrapper
-      size='small'
-      title={translate('plugin_resource_manager_scripts_save_script')}
-      icon='/icons/sql_script_m.svg'
-      className={className}
-      style={style}
-      footer={(
-        <>
-          <Button
-            type="button"
-            mod={['outlined']}
-            onClick={rejectDialog}
-          >
-            <Translate token='ui_processing_cancel' />
-          </Button>
-          <fill />
-          <Button
-            type="button"
-            mod={['unelevated']}
-            disabled={!state.name.trim() || state.projectId === null}
-            onClick={state.submit}
-          >
-            <Translate token='ui_processing_save' />
-          </Button>
-        </>
-      )}
-      fixedWidth
-      onReject={rejectDialog}
-    >
-      <SubmittingForm ref={focusedRef} onSubmit={state.submit}>
-        <Container center gap>
-          <InputField
-            name='name'
-            state={state}
-            error={!!state.errorMessage}
-            description={state.errorMessage ?? undefined}
-          >
-            {translate('ui_name') + ':'}
-          </InputField>
-          <ProjectSelect
-            value={state.projectId}
-            filter={p => (p.canEditResources && p.id === (payload.projectId ?? p.id))}
-            descriptionGetter={(_, options) => options.length <= 1 ? translate('plugin_resource_manager_scripts_save_script_project_restriction_descripion') : undefined}
-            autoHide
-            onChange={projectId => { state.projectId = projectId; }}
-          />
-        </Container>
-      </SubmittingForm>
+  return (
+    <CommonDialogWrapper size="small" className={className} fixedWidth>
+      <CommonDialogHeader title={translate('plugin_resource_manager_scripts_save_script')} icon="/icons/sql_script_m.svg" onReject={rejectDialog} />
+      <CommonDialogBody>
+        <Form ref={focusedRef} onSubmit={state.submit}>
+          <Container center gap>
+            <ProjectSelect
+              value={state.projectId}
+              filter={p => p.canEditResources && p.id === (payload.projectId ?? p.id)}
+              descriptionGetter={(_, options) =>
+                options.length <= 1 ? translate('plugin_resource_manager_scripts_save_script_project_restriction_descripion') : undefined
+              }
+              autoHide
+              onChange={projectId => {
+                state.projectId = projectId;
+                state.validate();
+              }}
+            />
+            <InputField
+              name="name"
+              state={state}
+              error={!state.valid}
+              disabled={state.projectId === null}
+              description={errorMessage}
+              onChange={state.validate}
+            >
+              {translate('ui_name') + ':'}
+            </InputField>
+          </Container>
+        </Form>
+      </CommonDialogBody>
+      <CommonDialogFooter>
+        <Button type="button" mod={['outlined']} onClick={rejectDialog}>
+          <Translate token="ui_processing_cancel" />
+        </Button>
+        <Fill />
+        <Button type="button" mod={['unelevated']} disabled={!state.valid} onClick={state.submit}>
+          <Translate token="ui_processing_save" />
+        </Button>
+      </CommonDialogFooter>
     </CommonDialogWrapper>
   );
 });

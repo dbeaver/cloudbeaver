@@ -1,87 +1,87 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2022 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observer } from 'mobx-react-lite';
 import { useContext } from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
-import styled, { css } from 'reshadow';
-
-import { useFocus } from '@cloudbeaver/core-blocks';
+import { s, useFocus, useS } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
+import { isObjectsEqual } from '@cloudbeaver/core-utils';
 
 import { ActionService } from '../Action/ActionService';
 import type { IActionItem } from '../Action/IActionItem';
+import { getCommonAndOSSpecificKeys } from '../Action/KeyBinding/getCommonAndOSSpecificKeys';
 import { CaptureViewContext } from './CaptureViewContext';
 import type { IView } from './IView';
+import { parseHotkey } from './parseHotkey';
 import { useActiveView } from './useActiveView';
 import { useViewContext } from './useViewContext';
-
-const styles = css`
-  div {
-    outline: none;
-  }
-`;
+import styles from './CaptureView.m.css';
 
 interface Props {
   view: IView<any>;
   className?: string;
 }
 
-export const CaptureView = observer<React.PropsWithChildren<Props>>(function CaptureView({
-  view,
-  children,
-  className,
-}) {
+export const CaptureView = observer<React.PropsWithChildren<Props>>(function CaptureView({ view, children, className }) {
   const parentContext = useContext(CaptureViewContext);
   const viewContext = useViewContext(view, parentContext);
   const actionService = useService(ActionService);
-  const [onFocus, onBlur] = useActiveView(view);
-  const [ref, state] = useFocus<HTMLDivElement>({ onFocus, onBlur });
+  const activeView = useActiveView(view);
+  const [ref, state] = useFocus<HTMLDivElement>({ onFocus: activeView.focusView, onBlur: activeView.blurView });
+  const style = useS(styles);
 
-  const actionItems = (
-    view.actions
-      .map(action => actionService.getAction(viewContext, action))
-      .filter(action => action?.binding && !action.isDisabled())
-      .filter(Boolean) as IActionItem[]
+  const actionItems = view.actions
+    .map(action => actionService.getAction(viewContext, action))
+    .filter(action => action?.binding && !action.isDisabled())
+    .filter(Boolean) as IActionItem[];
+
+  const keys = actionItems.map(item => getCommonAndOSSpecificKeys(item.binding?.binding)).flat();
+
+  useHotkeys(
+    keys,
+    (event, handler) => {
+      if (!state.reference?.contains(document.activeElement)) {
+        return;
+      }
+
+      const action = actionItems.find(action => {
+        const commonAndSpecificKeys = getCommonAndOSSpecificKeys(action.binding?.binding);
+        return commonAndSpecificKeys.some(key => {
+          const hotkey = parseHotkey(key);
+
+          return isObjectsEqual(hotkey, handler);
+        });
+      });
+
+      action?.activate(true);
+    },
+    {
+      enabled: keys.length > 0,
+      enableOnFormTags: ['INPUT', 'SELECT', 'TEXTAREA'],
+      preventDefault(event, handler) {
+        const action = actionItems.find(action => {
+          const commonAndSpecificKeys = getCommonAndOSSpecificKeys(action.binding?.binding);
+          return commonAndSpecificKeys.some(key => {
+            const hotkey = parseHotkey(key);
+
+            return isObjectsEqual(hotkey, handler);
+          });
+        });
+
+        return action?.binding?.binding.preventDefault === true;
+      },
+      enableOnContentEditable: true,
+    },
   );
 
-  let keys = actionItems
-    .map(item => item.binding?.binding.keys)
-    .flat()
-    .join(', ');
-
-  if (keys === '') {
-    keys = '*';
-  }
-
-  useHotkeys(keys, (event, handler) => {
-    if (!state.reference?.contains(document.activeElement)) {
-      return;
-    }
-
-    const action = actionItems.find(action => (
-      action.binding?.binding.keys === handler.key
-      || action.binding?.binding.keys.includes(handler.key)
-    ));
-
-    if (action?.binding?.binding.preventDefault) {
-      event.preventDefault();
-    }
-
-    action?.activate(true);
-  }, {
-    enabled: keys !== '*',
-    enableOnTags: ['INPUT', 'SELECT', 'TEXTAREA'],
-  });
-
-  return styled(styles)(
+  return (
     <CaptureViewContext.Provider value={viewContext}>
-      <div ref={ref} className={className} tabIndex={0}>
+      <div ref={ref} className={s(style, { container: true }, className)} tabIndex={0}>
         {children}
       </div>
     </CaptureViewContext.Provider>

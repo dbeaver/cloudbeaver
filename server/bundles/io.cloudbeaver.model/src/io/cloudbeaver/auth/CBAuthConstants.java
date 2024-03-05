@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2023 DBeaver Corp and others
+ * Copyright (C) 2010-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,13 @@ package io.cloudbeaver.auth;
 
 public interface CBAuthConstants {
     String CB_AUTH_ID_COOKIE_NAME = "cb-auth-id";
-    
-    String CB_AUTH_ID_REQUEST_PARAM = "authId";
 
+    String CB_REDIRECT_URL_COOKIE_NAME = "cb-redirect-url";
+
+    String CB_AUTH_ID_REQUEST_PARAM = "authId";
+    String CB_AUTO_LOGIN_REQUEST_PARAM = "autoLogin";
+    String CB_REDIRECT_URL_REQUEST_PARAM = "redirectUrl";
+
+    // Default max idle time (10 minutes)
+    long MAX_SESSION_IDLE_TIME = 10 * 60 * 1000;
 }

@@ -1,23 +1,29 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2022 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observer } from 'mobx-react-lite';
-import styled from 'reshadow';
 
-import { BASE_CONTAINERS_STYLES, Container, FieldCheckbox, Group, GroupTitle, ObjectPropertyInfoForm, TextPlaceholder, useResource, useTranslate, useStyles } from '@cloudbeaver/core-blocks';
+import {
+  Container,
+  FieldCheckbox,
+  Group,
+  GroupTitle,
+  ObjectPropertyInfoForm,
+  TextPlaceholder,
+  useResource,
+  useTranslate,
+} from '@cloudbeaver/core-blocks';
 import { DatabaseAuthModelsResource } from '@cloudbeaver/core-connections';
 import type { ObjectPropertyInfo } from '@cloudbeaver/core-sdk';
-
 
 import type { IConnectionAuthenticationConfig } from './IConnectionAuthenticationConfig';
 import { NetworkHandlers } from './NetworkHandlers';
 
-interface Props {
+export interface ConnectionAuthenticationFormProps {
   config: Partial<IConnectionAuthenticationConfig>;
   authModelId: string | null;
   authProperties?: ObjectPropertyInfo[];
@@ -29,7 +35,7 @@ interface Props {
   hideFeatures?: string[];
 }
 
-export const ConnectionAuthenticationForm = observer<Props>(function ConnectionAuthenticationForm({
+export const ConnectionAuthenticationForm = observer<ConnectionAuthenticationFormProps>(function ConnectionAuthenticationForm({
   config,
   networkHandlers,
   authProperties,
@@ -53,7 +59,7 @@ export const ConnectionAuthenticationForm = observer<Props>(function ConnectionA
     properties = properties.filter(property => !property.features.some(feature => hideFeatures.includes(feature)));
   }
 
-  return styled(useStyles(BASE_CONTAINERS_STYLES))(
+  return (
     <Container className={className}>
       {authModelId && (
         <Group gap small>
@@ -65,6 +71,7 @@ export const ConnectionAuthenticationForm = observer<Props>(function ConnectionA
                 properties={properties}
                 state={config.credentials}
                 disabled={disabled}
+                canShowPassword={false}
               />
               {allowSaveCredentials && (
                 <FieldCheckbox

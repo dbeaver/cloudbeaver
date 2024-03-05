@@ -1,17 +1,17 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2022 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
-import { runInAction } from 'mobx';
-
 import { AppAuthService, UserInfoResource } from '@cloudbeaver/core-authentication';
 import { injectable } from '@cloudbeaver/core-di';
-import { SharedProjectsResource } from '@cloudbeaver/core-resource-manager';
-import { GraphQLService, ProjectInfo as SchemaProjectInfo, CachedMapResource, CachedMapAllKey, ResourceKey, ResourceKeyUtils, resourceKeyList, RmResourceType } from '@cloudbeaver/core-sdk';
+import { CachedMapAllKey, CachedMapResource, resourceKeyList } from '@cloudbeaver/core-resource';
+import { ServerConfigResource } from '@cloudbeaver/core-root';
+import { GraphQLService, RmResourceType, ProjectInfo as SchemaProjectInfo } from '@cloudbeaver/core-sdk';
+
+import { createResourceOfType } from './createResourceOfType';
 
 export type ProjectInfo = SchemaProjectInfo;
 export type ProjectInfoResourceType = RmResourceType;
@@ -20,54 +20,75 @@ export type ProjectInfoResourceType = RmResourceType;
 export class ProjectInfoResource extends CachedMapResource<string, ProjectInfo> {
   constructor(
     private readonly graphQLService: GraphQLService,
-    private readonly sharedProjectsResource: SharedProjectsResource,
     private readonly userInfoResource: UserInfoResource,
+    serverConfigResource: ServerConfigResource,
     appAuthService: AppAuthService,
   ) {
-    super(new Map(), []);
+    super(() => new Map(), []);
 
-    this.sync(this.userInfoResource, () => {}, () => CachedMapAllKey);
-    this.sharedProjectsResource.connect(this);
+    this.sync(
+      this.userInfoResource,
+      () => {},
+      () => CachedMapAllKey,
+    );
     appAuthService.requireAuthentication(this);
-    this.sharedProjectsResource.onDataOutdated.addHandler(this.markOutdated.bind(this));
-    this.sharedProjectsResource.onItemAdd.addHandler(() => this.markOutdated());
-    this.sharedProjectsResource.onItemDelete.addHandler(() => this.markOutdated());
+    serverConfigResource.requirePublic(this);
     this.userInfoResource.onUserChange.addPostHandler(() => {
       this.clear();
     });
+  }
+
+  getNameWithoutExtension(projectId: string, resourceTypeId: string, fileName: string): string {
+    const project = this.get(projectId);
+
+    if (project) {
+      const resourceType = this.getResourceType(project, resourceTypeId);
+
+      for (let ext of resourceType?.fileExtensions || []) {
+        ext = `.${ext}`;
+        if (fileName.toLowerCase().endsWith(ext)) {
+          return fileName.slice(0, fileName.length - ext.length);
+        }
+      }
+    }
+
+    return fileName;
+  }
+
+  getNameWithExtension(projectId: string, resourceTypeId: string, fileName: string): string {
+    const project = this.get(projectId);
+
+    if (project) {
+      const resourceType = this.getResourceType(project, resourceTypeId);
+
+      if (resourceType?.fileExtensions.length) {
+        return createResourceOfType(resourceType, fileName);
+      }
+    }
+
+    return fileName;
   }
 
   getUserProject(userId: string): ProjectInfo | undefined {
     return this.get(`u_${userId}`);
   }
 
-  getResourceType(project: ProjectInfo, resourceTypeId: string) {
+  getResourceType(project: ProjectInfo, resourceTypeId: string): ProjectInfoResourceType | undefined {
     const resourceType = project.resourceTypes.find(type => type.id === resourceTypeId);
 
     return resourceType;
   }
 
-  protected async loader(key: ResourceKey<string>): Promise<Map<string, ProjectInfo>> {
-    const all = ResourceKeyUtils.includes(key, CachedMapAllKey);
-
+  protected async loader(): Promise<Map<string, ProjectInfo>> {
     const { projects } = await this.graphQLService.sdk.getProjectList();
 
-    runInAction(() => {
-      if (all) {
-        this.delete(resourceKeyList(this.keys.filter(id => !projects.some(project => project.id === id))));
-      }
-
-      this.set(resourceKeyList(projects.map(project => project.id)), projects);
-    });
+    this.replace(resourceKeyList(projects.map(project => project.id)), projects);
 
     return this.data;
   }
 
-  protected validateParam(param: ResourceKey<string>): boolean {
-    return (
-      super.validateParam(param)
-      || typeof param === 'string'
-    );
+  protected validateKey(key: string): boolean {
+    return typeof key === 'string';
   }
 }
 

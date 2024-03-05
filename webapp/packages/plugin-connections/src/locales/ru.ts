@@ -9,8 +9,18 @@ export default [
   ['connections_public_connection_folder_move_duplication', 'Выбранные папки или папка назначения содержит папки с таким же названием ({arg:name})'],
   ['plugin_connections_connection_form_project_invalid', 'У вас нет разрешения создавать коннекшены в выбранном проекте'],
   ['plugin_connections_connection_form_host_configuration_invalid', 'Конфигурация хоста не поддерживается'],
-  ['plugin_connections_connection_form_name_invalid', 'Поле \'Название\' не может быть пустым'],
+  ['plugin_connections_connection_form_name_invalid', "Поле 'Название подключения' не может быть пустым"],
+  ['plugin_connections_connection_form_host_invalid', "Поле 'Хост' не может быть пустым"],
   ['connections_public_connection_folder_delete_confirmation', 'Вы удаляете "{arg:name}". Подключения не будут удалены. Вы уверены?'],
   ['plugin_connections_menu_connections_label', 'Подключение'],
   ['plugin_connections_action_disconnect_all_label', 'Отключить все'],
+  ['settings_connections', 'Подключения'],
+  ['settings_connections_hide_connections_view_name', 'Показывать подключения только администраторам'],
+  ['settings_connections_hide_connections_view_description', 'Показывать подключения только администраторам'],
+
+  ['connections_public_connection_ssl_enable', 'Включить SSL'],
+
+  ['plugin_connections_connection_form_shared_credentials_manage_info', 'Вы можете указать учетные данные в '],
+  ['plugin_connections_connection_form_shared_credentials_manage_info_tab_link', 'во вкладке "Учетные данные"'],
+  ['plugin_connections_connection_auth_secret_description', 'Выберете учетные данные, предоставленные одной из ваших команд'],
 ];

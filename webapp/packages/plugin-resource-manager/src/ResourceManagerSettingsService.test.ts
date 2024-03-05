@@ -1,59 +1,62 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2022 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import '@testing-library/jest-dom';
 
-import { mockAuthentication } from '@cloudbeaver/core-authentication/mocks/mockAuthentication';
-import { createApp } from '@cloudbeaver/core-cli/tests/utils/createApp';
-import { ServerConfigResource } from '@cloudbeaver/core-root';
-import { createGQLEndpoint } from '@cloudbeaver/core-root/mocks/createGQLEndpoint';
-import { mockAppInit } from '@cloudbeaver/core-root/mocks/mockAppInit';
-import { mockGraphQL } from '@cloudbeaver/core-root/mocks/mockGraphQL';
-import { mockServerConfig } from '@cloudbeaver/core-root/mocks/resolvers/mockServerConfig';
-import topAppBar from '@cloudbeaver/plugin-top-app-bar';
+import { coreBrowserManifest } from '@cloudbeaver/core-browser';
+import { coreClientActivityManifest } from '@cloudbeaver/core-client-activity';
+import { coreEventsManifest } from '@cloudbeaver/core-events';
+import { coreLocalizationManifest } from '@cloudbeaver/core-localization';
+import { corePluginManifest } from '@cloudbeaver/core-plugin';
+import { coreProductManifest } from '@cloudbeaver/core-product';
+import { coreRootManifest, ServerConfigResource } from '@cloudbeaver/core-root';
+import { createGQLEndpoint } from '@cloudbeaver/core-root/dist/__custom_mocks__/createGQLEndpoint';
+import { mockAppInit } from '@cloudbeaver/core-root/dist/__custom_mocks__/mockAppInit';
+import { mockGraphQL } from '@cloudbeaver/core-root/dist/__custom_mocks__/mockGraphQL';
+import { mockServerConfig } from '@cloudbeaver/core-root/dist/__custom_mocks__/resolvers/mockServerConfig';
+import { coreSDKManifest } from '@cloudbeaver/core-sdk';
+import { coreSettingsManifest } from '@cloudbeaver/core-settings';
+import { createApp } from '@cloudbeaver/tests-runner';
 
 import { resourceManagerPlugin } from './manifest';
 import { ResourceManagerSettings, ResourceManagerSettingsService } from './ResourceManagerSettingsService';
 
 const endpoint = createGQLEndpoint();
 const app = createApp(
-  topAppBar,
-  resourceManagerPlugin
+  resourceManagerPlugin,
+  coreEventsManifest,
+  corePluginManifest,
+  coreProductManifest,
+  coreRootManifest,
+  coreSDKManifest,
+  coreSettingsManifest,
+  coreBrowserManifest,
+  coreLocalizationManifest,
+  coreClientActivityManifest,
 );
 
-const server = mockGraphQL(
-  ...mockAppInit(endpoint),
-  ...mockAuthentication(endpoint)
-);
+const server = mockGraphQL(...mockAppInit(endpoint));
 
 beforeAll(() => app.init());
 
-const testValueA = true;
-const testValueB = false;
+const testValueDeprecated = true;
+const testValueNew = false;
 
-const equalAConfig = {
+const deprecatedSettings = {
   plugin_resource_manager: {
-    disabled: testValueA,
+    disabled: testValueDeprecated,
   } as ResourceManagerSettings,
-  plugin: {
-    'resource-manager': {
-      disabled: testValueA,
-    } as ResourceManagerSettings,
-  },
 };
 
-const equalBConfig = {
-  plugin_resource_manager: {
-    disabled: testValueB,
-  } as ResourceManagerSettings,
+const newSettings = {
+  ...deprecatedSettings,
   plugin: {
     'resource-manager': {
-      disabled: testValueB,
+      disabled: testValueNew,
     } as ResourceManagerSettings,
   },
 };
@@ -62,26 +65,20 @@ test('New settings equal deprecated settings A', async () => {
   const settings = app.injector.getServiceByClass(ResourceManagerSettingsService);
   const config = app.injector.getServiceByClass(ServerConfigResource);
 
-  server.use(
-    endpoint.query('serverConfig', mockServerConfig(equalAConfig)),
-  );
+  server.use(endpoint.query('serverConfig', mockServerConfig(newSettings)));
 
   await config.refresh();
 
-  expect(settings.settings.getValue('disabled')).toBe(testValueA);
-  expect(settings.deprecatedSettings.getValue('disabled')).toBe(testValueA);
+  expect(settings.settings.getValue('disabled')).toBe(testValueNew);
 });
 
 test('New settings equal deprecated settings B', async () => {
   const settings = app.injector.getServiceByClass(ResourceManagerSettingsService);
   const config = app.injector.getServiceByClass(ServerConfigResource);
 
-  server.use(
-    endpoint.query('serverConfig', mockServerConfig(equalBConfig)),
-  );
+  server.use(endpoint.query('serverConfig', mockServerConfig(deprecatedSettings)));
 
   await config.refresh();
 
-  expect(settings.settings.getValue('disabled')).toBe(testValueB);
-  expect(settings.deprecatedSettings.getValue('disabled')).toBe(testValueB);
+  expect(settings.settings.getValue('disabled')).toBe(testValueDeprecated);
 });

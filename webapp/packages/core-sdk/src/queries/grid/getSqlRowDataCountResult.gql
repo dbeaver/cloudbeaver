@@ -1,0 +1,3 @@
+mutation getSqlRowDataCountResult($taskId: ID!) {
+  count: asyncSqlRowDataCountResult(taskId: $taskId)
+}

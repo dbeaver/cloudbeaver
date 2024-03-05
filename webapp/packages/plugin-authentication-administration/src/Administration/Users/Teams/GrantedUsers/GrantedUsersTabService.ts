@@ -1,10 +1,11 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2022 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
+import React from 'react';
 
 import { TeamsResource, UsersResource } from '@cloudbeaver/core-authentication';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
@@ -15,8 +16,12 @@ import { isArraysEqual, MetadataValueGetter } from '@cloudbeaver/core-utils';
 import { teamContext } from '../Contexts/teamContext';
 import type { ITeamFormProps, ITeamFormSubmitData } from '../ITeamFormProps';
 import { TeamFormService } from '../TeamFormService';
-import { GrantedUsers } from './GrantedUsers';
 import type { IGrantedUsersTabState } from './IGrantedUsersTabState';
+
+const GrantedUsers = React.lazy(async () => {
+  const { GrantedUsers } = await import('./GrantedUsers');
+  return { default: GrantedUsers };
+});
 
 @injectable()
 export class GrantedUsersTabService extends Bootstrap {
@@ -26,7 +31,7 @@ export class GrantedUsersTabService extends Bootstrap {
     private readonly teamFormService: TeamFormService,
     private readonly usersResource: UsersResource,
     private readonly teamsResource: TeamsResource,
-    private readonly notificationService: NotificationService
+    private readonly notificationService: NotificationService,
   ) {
     super();
     this.key = 'granted-users';
@@ -45,7 +50,7 @@ export class GrantedUsersTabService extends Bootstrap {
     this.teamFormService.afterFormSubmittingTask.addHandler(this.save.bind(this));
   }
 
-  load(): void { }
+  load(): void {}
 
   private stateGetter(context: ITeamFormProps): MetadataValueGetter<string, IGrantedUsersTabState> {
     return () => ({
@@ -57,10 +62,7 @@ export class GrantedUsersTabService extends Bootstrap {
     });
   }
 
-  private async save(
-    data: ITeamFormSubmitData,
-    contexts: IExecutionContextProvider<ITeamFormSubmitData>
-  ) {
+  private async save(data: ITeamFormSubmitData, contexts: IExecutionContextProvider<ITeamFormSubmitData>) {
     const config = contexts.getContext(teamContext);
     const status = contexts.getContext(this.teamFormService.configurationStatusContext);
 
@@ -68,11 +70,7 @@ export class GrantedUsersTabService extends Bootstrap {
       return;
     }
 
-    const state = this.teamFormService.tabsContainer.getTabState<IGrantedUsersTabState>(
-      data.state.partsState,
-      this.key,
-      { state: data.state }
-    );
+    const state = this.teamFormService.tabsContainer.getTabState<IGrantedUsersTabState>(data.state.partsState, this.key, { state: data.state });
 
     if (!config.teamId || !state.loaded) {
       return;

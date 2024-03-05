@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2023 DBeaver Corp and others
+ * Copyright (C) 2010-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -50,6 +50,13 @@ public interface DBWServiceNavigator extends DBWService {
         @NotNull String nodePath) throws DBWebException;
 
     @WebAction
+    boolean setNavigatorNodeFilter(
+        @NotNull WebSession webSession,
+        @NotNull String nodePath,
+        @Nullable List<String> include,
+        @Nullable List<String> exclude) throws DBWebException;
+
+    @WebAction
     boolean refreshNavigatorNode(
         @NotNull WebSession session,
         @NotNull String nodePath) throws DBWebException;
@@ -77,4 +84,5 @@ public interface DBWServiceNavigator extends DBWService {
         @NotNull WebSession session,
         @NotNull List<String> nodePaths,
         @NotNull String folderPath) throws DBWebException;
+
 }

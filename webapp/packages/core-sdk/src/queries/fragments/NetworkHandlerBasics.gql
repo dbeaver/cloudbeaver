@@ -1,0 +1,4 @@
+fragment NetworkHandlerBasics on NetworkHandlerConfig {
+  id
+  enabled
+}

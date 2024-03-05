@@ -1,12 +1,13 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2022 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
+import { action, makeObservable, observable } from 'mobx';
 
-import { observable, action, makeObservable } from 'mobx';
+import { errorOf } from '@cloudbeaver/core-utils';
 
 import { DetailsError } from './DetailsError';
 
@@ -26,10 +27,11 @@ export class GQLErrorCatcher {
   }
 
   catch(exception: any): boolean {
-    if (exception instanceof DetailsError) {
-      this.responseMessage = exception.errorMessage;
-      this.hasDetails = exception.hasDetails();
-      this.exception = exception;
+    const detailsError = errorOf(exception, DetailsError);
+    if (detailsError) {
+      this.responseMessage = detailsError.message;
+      this.hasDetails = detailsError.hasDetails();
+      this.exception = detailsError;
       return true;
     }
     this.clear();

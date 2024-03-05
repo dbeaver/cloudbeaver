@@ -1,0 +1,14 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Vendor: DBeaver Corp
+Bundle-Name: CloudBeaver SLF4j Binding
+Bundle-SymbolicName: io.cloudbeaver.slf4j;singleton:=true
+Bundle-Version: 1.0.8.qualifier
+Bundle-Release-Date: 20240304
+Bundle-RequiredExecutionEnvironment: JavaSE-17
+Bundle-ActivationPolicy: lazy
+Bundle-ClassPath: .
+Fragment-Host: slf4j.api
+Require-Bundle: org.jkiss.bundle.logback
+Automatic-Module-Name: io.cloudbeaver.slf4j
+Provide-Capability: osgi.serviceloader;osgi.serviceloader="org.slf4j.spi.SLF4JServiceProvider"

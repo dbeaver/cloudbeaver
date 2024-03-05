@@ -1,14 +1,13 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2022 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
+import type { IDataContextProvider } from '@cloudbeaver/core-data-context';
 import { injectable } from '@cloudbeaver/core-di';
 
-import type { IDataContextProvider } from '../DataContext/IDataContextProvider';
 import { ActionItem } from './ActionItem';
 import type { IAction } from './IAction';
 import type { IActionHandler } from './IActionHandler';
@@ -19,16 +18,12 @@ import { KeyBindingService } from './KeyBinding/KeyBindingService';
 export class ActionService {
   private readonly handlers: Map<string, IActionHandler>;
 
-  constructor(
-    private readonly keyBindingService: KeyBindingService
-  ) {
+  constructor(private readonly keyBindingService: KeyBindingService) {
     this.handlers = new Map();
   }
 
   activateAction(context: IDataContextProvider, action: IAction) {
-    this
-      .getAction(context, action)
-      ?.activate();
+    this.getAction(context, action)?.activate();
   }
 
   addHandler(handler: IActionHandler): void {
@@ -54,12 +49,7 @@ export class ActionService {
     if (handler) {
       const binding = this.keyBindingService.getKeyBindingHandler(context, action);
 
-      return new ActionItem(
-        action,
-        handler,
-        binding,
-        context
-      );
+      return new ActionItem(action, handler, binding, context);
     }
 
     return null;

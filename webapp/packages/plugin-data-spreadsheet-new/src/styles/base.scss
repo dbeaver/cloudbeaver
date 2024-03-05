@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2022 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -12,40 +12,27 @@
   flex-direction: column;
   flex: 1;
   overflow: auto;
+  user-select: none;
+  -webkit-user-select: none;
 
   .cb-react-grid-theme {
-    font-family: inherit;
-    outline: 0;
-    height: 100%;
-    background-color: inherit;
-    border: none;
+    outline: 0 !important;
+    height: 100% !important;
+    background-color: inherit !important;
+    border: none !important;
+    font-family: inherit !important;
+    font-size: inherit !important;
 
     .rdg-header-row,
     .rdg-row {
-      background-color: transparent;
+      background-color: var(--theme-surface) !important;
     }
-
-    .text-formatter {
-      display: flex;
-      align-items: center;
-      & a {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        min-width: 16px;
-        height: 24px;
-        margin-right: 8px;
-      }
-      & svg {
-        width: 12px;
-        height: 12px;
-      }
+    * {
+      font-size: inherit !important;
+      font-family: inherit !important;
     }
-
-    .text-formatter__value {
-      overflow: hidden;
-      white-space: nowrap;
-      text-overflow: ellipsis;
+    .rdg-cell.rdg-cell-frozen {
+      box-shadow: none !important;
     }
 
     .rdg-cell-editing {

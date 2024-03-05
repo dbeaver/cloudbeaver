@@ -1,51 +1,48 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2022 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
-import type { ButtonHTMLAttributes } from 'react';
-import styled, { css } from 'reshadow';
+import { type ButtonHTMLAttributes, useState } from 'react';
 
 import { IconOrImage } from '../IconOrImage';
+import { Loader } from '../Loader/Loader';
+import { s } from '../s';
+import { useS } from '../useS';
+import { useStateDelay } from '../useStateDelay';
+import style from './ToolsAction.m.css';
 
-const styles = css`
-    button {
-      composes: theme-ripple from global;
-      padding: 0 16px;
-      display: flex;
-      align-items: center;
-      cursor: pointer;
-      background: transparent;
-      outline: none;
-      color: inherit;
-    }
-    IconOrImage {
-      display: block;
-      width: 24px;
-    }
-    button-label {
-      display: block;
-      text-transform: uppercase;
-      font-weight: 700;
-    }
-    IconOrImage + button-label {
-      padding-left: 8px
-    }
-  `;
-
-interface Props extends ButtonHTMLAttributes<any> {
+interface Props extends Omit<ButtonHTMLAttributes<any>, 'onClick'> {
   icon?: string;
   viewBox?: string;
+  loading?: boolean;
+  className?: string;
+  onClick?: (event: React.MouseEvent<HTMLButtonElement>) => Promise<any> | any;
 }
 
-export const ToolsAction: React.FC<Props> = function ToolsAction({ icon, viewBox, children, ...rest }) {
-  return styled(styles)(
-    <button type='button' {...rest}>
-      {icon && <IconOrImage icon={icon} viewBox={viewBox} />}
-      {children && <button-label>{children}</button-label>}
+export const ToolsAction: React.FC<Props> = function ToolsAction({ icon, viewBox, disabled, loading, children, className, onClick, ...rest }) {
+  const styles = useS(style);
+  const [loadingState, setLoadingState] = useState(false);
+
+  async function handleClick(event: React.MouseEvent<HTMLButtonElement>) {
+    try {
+      setLoadingState(true);
+      await onClick?.(event);
+    } finally {
+      setLoadingState(false);
+    }
+  }
+
+  loading = useStateDelay(loading || loadingState, 300);
+  disabled = disabled || loadingState;
+
+  return (
+    <button type="button" disabled={disabled} onClick={handleClick} {...rest} className={s(styles, { button: true }, className)}>
+      {loading && <Loader className={s(styles, { loader: true })} small />}
+      {!loading && icon && <IconOrImage className={s(styles, { iconOrImage: true })} icon={icon} viewBox={viewBox} />}
+      {children && <div className={s(styles, { buttonLabel: true })}>{children}</div>}
     </button>
   );
 };

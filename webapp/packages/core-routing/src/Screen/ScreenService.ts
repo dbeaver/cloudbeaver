@@ -1,11 +1,10 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2022 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { computed, makeObservable } from 'mobx';
 import type { SubscribeState } from 'router5';
 
@@ -23,13 +22,13 @@ export class ScreenService {
 
   readonly routeChange: IExecutor;
 
-  private screens = new Map<string, IScreen<any>>();
-  private routeScreenMap = new Map<string, string>();
+  private readonly screens: Map<string, IScreen<any>>;
+  private readonly routeScreenMap: Map<string, string>;
 
-  constructor(
-    readonly routerService: RouterService
-  ) {
+  constructor(readonly routerService: RouterService) {
     this.routeChange = new Executor();
+    this.screens = new Map<string, IScreen<any>>();
+    this.routeScreenMap = new Map<string, string>();
     this.routerService.subscribe(this.onRouteChange.bind(this));
     this.routerService.transitionTask.addHandler(this.routeTransition.bind(this));
 
@@ -39,8 +38,7 @@ export class ScreenService {
   }
 
   navigateToRoot(): void {
-    const screen = Array.from(this.screens.values())
-      .find(screen => screen.root);
+    const screen = Array.from(this.screens.values()).find(screen => screen.root);
 
     if (screen) {
       this.routerService.router.navigate(screen.name);
@@ -95,10 +93,7 @@ export class ScreenService {
     return this.screens.get(screen);
   }
 
-  private async routeTransition(
-    data: RouterTransitionData,
-    contexts: IExecutionContextProvider<RouterTransitionData>
-  ): Promise<void> {
+  private async routeTransition(data: RouterTransitionData, contexts: IExecutionContextProvider<RouterTransitionData>): Promise<void> {
     if (!data.fromState) {
       return;
     }

@@ -1,6 +1,7 @@
 {
-  "query": "\n    mutation createConnection($config: ConnectionConfig!) {\n createConnection(config: $config) {\n    id\n  }\n}     ",
+  "query": "\n    mutation createConnection($projectId:ID!, $config: ConnectionConfig!) {\n createConnection(projectId:$projectId, config: $config) {\n    id\n  }\n}     ",
   "variables": {
+    "projectId": "u_test",
     "config": {
       "name": "PostgreSQL@localhost (1)",
       "driverId": "postgresql:postgres-jdbc",

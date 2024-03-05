@@ -1,10 +1,11 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2022 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
+import React from 'react';
 
 import { TeamsResource } from '@cloudbeaver/core-authentication';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
@@ -15,14 +16,18 @@ import { getUniqueName } from '@cloudbeaver/core-utils';
 import { teamContext } from '../Contexts/teamContext';
 import type { ITeamFormFillConfigData, ITeamFormSubmitData } from '../ITeamFormProps';
 import { TeamFormService } from '../TeamFormService';
-import { TeamOptions } from './TeamOptions';
+
+const TeamOptions = React.lazy(async () => {
+  const { TeamOptions } = await import('./TeamOptions');
+  return { default: TeamOptions };
+});
 
 @injectable()
 export class TeamOptionsTabService extends Bootstrap {
   constructor(
     private readonly teamFormService: TeamFormService,
     private readonly teamResource: TeamsResource,
-    private readonly localizationService: LocalizationService
+    private readonly localizationService: LocalizationService,
   ) {
     super();
   }
@@ -35,30 +40,21 @@ export class TeamOptionsTabService extends Bootstrap {
       panel: () => TeamOptions,
     });
 
-    this.teamFormService.prepareConfigTask
-      .addHandler(this.prepareConfig.bind(this));
+    this.teamFormService.prepareConfigTask.addHandler(this.prepareConfig.bind(this));
 
-    this.teamFormService.formValidationTask
-      .addHandler(this.validate.bind(this));
+    this.teamFormService.formValidationTask.addHandler(this.validate.bind(this));
 
-    this.teamFormService.formSubmittingTask
-      .addHandler(this.save.bind(this));
+    this.teamFormService.formSubmittingTask.addHandler(this.save.bind(this));
 
-    this.teamFormService.fillConfigTask
-      .addHandler(this.fillConfig.bind(this));
+    this.teamFormService.fillConfigTask.addHandler(this.fillConfig.bind(this));
   }
 
-  load(): void { }
+  load(): void {}
 
-  private async prepareConfig(
-    {
-      state,
-    }: ITeamFormSubmitData,
-    contexts: IExecutionContextProvider<ITeamFormSubmitData>
-  ) {
+  private async prepareConfig({ state }: ITeamFormSubmitData, contexts: IExecutionContextProvider<ITeamFormSubmitData>) {
     const config = contexts.getContext(teamContext);
 
-    config.teamId = state.config.teamId;
+    config.teamId = state.config.teamId.trim();
 
     if (state.config.teamName) {
       config.teamName = state.config.teamName.trim();
@@ -70,22 +66,23 @@ export class TeamOptionsTabService extends Bootstrap {
     }
 
     if (state.config.description) {
-      config.description = state.config.description;
+      config.description = state.config.description.trim();
     }
 
     if (state.config.metaParameters) {
       config.metaParameters = state.config.metaParameters;
+
+      for (const key of Object.keys(config.metaParameters)) {
+        if (typeof config.metaParameters[key] === 'string') {
+          config.metaParameters[key] = config.metaParameters[key].trim();
+        }
+      }
     }
 
     config.teamPermissions = [...state.config.teamPermissions];
   }
 
-  private async validate(
-    {
-      state,
-    }: ITeamFormSubmitData,
-    contexts: IExecutionContextProvider<ITeamFormSubmitData>
-  ) {
+  private async validate({ state }: ITeamFormSubmitData, contexts: IExecutionContextProvider<ITeamFormSubmitData>) {
     const validation = contexts.getContext(this.teamFormService.configurationValidationContext);
 
     if (state.mode === 'create') {
@@ -94,19 +91,16 @@ export class TeamOptionsTabService extends Bootstrap {
       }
 
       if (this.teamResource.has(state.config.teamId)) {
-        validation.error(this.localizationService.translate('administration_teams_team_info_exists', undefined, {
-          teamId: state.config.teamId,
-        }));
+        validation.error(
+          this.localizationService.translate('administration_teams_team_info_exists', undefined, {
+            teamId: state.config.teamId,
+          }),
+        );
       }
     }
   }
 
-  private async save(
-    {
-      state,
-    }: ITeamFormSubmitData,
-    contexts: IExecutionContextProvider<ITeamFormSubmitData>
-  ) {
+  private async save({ state }: ITeamFormSubmitData, contexts: IExecutionContextProvider<ITeamFormSubmitData>) {
     const status = contexts.getContext(this.teamFormService.configurationStatusContext);
     const config = contexts.getContext(teamContext);
 
@@ -132,10 +126,7 @@ export class TeamOptionsTabService extends Bootstrap {
     }
   }
 
-  private fillConfig(
-    { state, updated }: ITeamFormFillConfigData,
-    contexts: IExecutionContextProvider<ITeamFormFillConfigData>
-  ) {
+  private fillConfig({ state, updated }: ITeamFormFillConfigData, contexts: IExecutionContextProvider<ITeamFormFillConfigData>) {
     if (!updated) {
       return;
     }

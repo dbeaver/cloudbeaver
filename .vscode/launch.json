@@ -1,0 +1,98 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "chrome",
+      "request": "launch",
+      "name": "Chrome",
+      "url": "http://localhost:8080",
+      "webRoot": "${workspaceFolder}/..",
+      "sourceMaps": true,
+      "sourceMapPathOverrides": {
+        "webpack:///*": "${workspaceFolder}/../*"
+      },
+      "skipFiles": [
+        "<node_internals>/**",
+        "**/node_modules/**",
+        "${workspaceFolder}/webapp/**/node_modules/**/*.js",
+        "${workspaceFolder}/webapp/**/dist/**/*.js"
+      ]
+    },
+    {
+      "type": "java",
+      "name": "CloudBeaver CE",
+      "cwd": "${workspaceFolder}/../opt/cbce",
+      "request": "launch",
+      "mainClass": "org.eclipse.equinox.launcher.Main",
+      "windows": {
+        "type": "java",
+        "name": "CloudBeaver CE",
+        "request": "launch",
+        "mainClass": "org.eclipse.equinox.launcher.Main",
+        "classPaths": [
+          "${workspaceFolder}/../eclipse/eclipse/plugins/org.eclipse.equinox.launcher_1.6.600.v20231106-1826.jar"
+        ],
+        "args": [
+          "-product",
+          "io.cloudbeaver.product.ce.product",
+          "-configuration",
+          "file:${workspaceFolder}/../eclipse/workspace/.metadata/.plugins/org.eclipse.pde.core/CloudbeaverServer.product/",
+          "-dev",
+          "file:${workspaceFolder}/../eclipse/workspace/.metadata/.plugins/org.eclipse.pde.core/CloudbeaverServer.product/dev.properties",
+          "-os",
+          "win32",
+          "-ws",
+          "win32",
+          "-arch",
+          "x86_64",
+          "-nl",
+          "en",
+          "-showsplash",
+          "-web-config",
+          "conf/cloudbeaver.conf"
+        ],
+        "vmArgs": [
+          "-XX:+IgnoreUnrecognizedVMOptions",
+          "--add-modules=ALL-SYSTEM",
+          "-Xms64m",
+          "-Xmx1024m",
+          "-Declipse.pde.launch=true"
+        ]
+      },
+      "osx": {
+        "type": "java",
+        "name": "CloudBeaver CE",
+        "request": "launch",
+        "mainClass": "org.eclipse.equinox.launcher.Main",
+        "classPaths": [
+          "${workspaceFolder}/../eclipse/Eclipse.app/Contents/Eclipse/plugins/org.eclipse.equinox.launcher_1.6.600.v20231106-1826.jar"
+        ],
+        "args": [
+          "-product",
+          "io.cloudbeaver.product.ce.product",
+          "-configuration",
+          "file:${workspaceFolder}/../eclipse/workspace/.metadata/.plugins/org.eclipse.pde.core/CloudbeaverServer.product/",
+          "-dev",
+          "file:${workspaceFolder}/../eclipse/workspace/.metadata/.plugins/org.eclipse.pde.core/CloudbeaverServer.product/dev.properties",
+          "-os",
+          "macosx",
+          "-ws",
+          "cocoa",
+          "-arch",
+          "aarch64",
+          "-nl",
+          "en_US",
+          "-showsplash"
+        ],
+        "vmArgs": [
+          "-XX:+IgnoreUnrecognizedVMOptions",
+          "--add-modules=ALL-SYSTEM",
+          "-Xms64m",
+          "-Xmx1024m",
+          "-Declipse.pde.launch=true",
+          "-XstartOnFirstThread"
+        ]
+      }
+    }
+  ]
+}

@@ -1,11 +1,11 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Vendor: %Bundle-Vendor
-Bundle-Name: %Bundle-Name
+Bundle-Vendor: DBeaver Corp
+Bundle-Name: Cloudbeaver Web Service - Metadata
 Bundle-SymbolicName: io.cloudbeaver.service.metadata;singleton:=true
-Bundle-Version: 1.0.70.qualifier
-Bundle-Release-Date: 20230306
-Bundle-RequiredExecutionEnvironment: JavaSE-11
+Bundle-Version: 1.0.96.qualifier
+Bundle-Release-Date: 20240304
+Bundle-RequiredExecutionEnvironment: JavaSE-17
 Bundle-ActivationPolicy: lazy
 Bundle-ClassPath: .
 Require-Bundle: io.cloudbeaver.server

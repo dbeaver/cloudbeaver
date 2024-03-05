@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2023 DBeaver Corp and others
+ * Copyright (C) 2010-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,7 +33,10 @@ import org.eclipse.jetty.servlet.ErrorPageErrorHandler;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 import org.eclipse.jetty.servlet.ServletMapping;
+import org.eclipse.jetty.util.resource.PathResource;
 import org.eclipse.jetty.websocket.server.config.JettyWebSocketServletContainerInitializer;
+import org.eclipse.jetty.xml.XmlConfiguration;
+import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
@@ -58,7 +61,10 @@ public class CBJettyServer {
         System.setProperty("org.eclipse.jetty.LEVEL", "WARN");
     }
 
-    public CBJettyServer() {
+    private final CBApplication application;
+
+    public CBJettyServer(@NotNull CBApplication application) {
+        this.application = application;
     }
 
     public void runServer() {
@@ -67,11 +73,25 @@ public class CBJettyServer {
             JettyServer server;
             int serverPort = application.getServerPort();
             String serverHost = application.getServerHost();
-            if (CommonUtils.isEmpty(serverHost)) {
-                server = new JettyServer(serverPort);
+            Path sslPath = application.getSslConfigurationPath();
+
+            boolean sslConfigurationExists = sslPath != null && Files.exists(sslPath);
+            if (sslConfigurationExists) {
+                server = new JettyServer();
+                XmlConfiguration sslConfiguration = new XmlConfiguration(new PathResource(sslPath));
+                ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+                // method sslConfiguration.configure() does not see the context class of the Loader,
+                // so we have to configure it manually, then return the old classLoader.
+                Thread.currentThread().setContextClassLoader(this.getClass().getClassLoader());
+                sslConfiguration.configure(server);
+                Thread.currentThread().setContextClassLoader(classLoader);
             } else {
-                server = new JettyServer(
-                    InetSocketAddress.createUnresolved(serverHost, serverPort));
+                if (CommonUtils.isEmpty(serverHost)) {
+                    server = new JettyServer(serverPort);
+                } else {
+                    server = new JettyServer(
+                        InetSocketAddress.createUnresolved(serverHost, serverPort));
+                }
             }
 
             {
@@ -104,12 +124,10 @@ public class CBJettyServer {
                     }
                 }
 
-                initSessionManager(server, servletContextHandler);
+                initSessionManager(this.application, servletContextHandler);
 
                 server.setHandler(servletContextHandler);
 
-                var serverConnector = new ServerConnector(server);
-                server.addConnector(serverConnector);
                 JettyWebSocketServletContainerInitializer.configure(servletContextHandler,
                     (context, wsContainer) -> {
                         wsContainer.setIdleTimeout(Duration.ofMinutes(5));
@@ -154,7 +172,10 @@ public class CBJettyServer {
         }
     }
 
-    private void initSessionManager(Server server, ServletContextHandler servletContextHandler) {
+    private void initSessionManager(
+        @NotNull CBApplication application,
+        @NotNull ServletContextHandler servletContextHandler
+    ) {
         // Init sessions persistence
         Path metadataFolder = GeneralUtils.getMetadataFolder(DBWorkbench.getPlatform().getWorkspace().getAbsolutePath());
         Path sessionCacheFolder = metadataFolder.resolve(SESSION_CACHE_DIR);
@@ -179,6 +200,16 @@ public class CBJettyServer {
                 return 1;
             }
         }*/;
+        var maxIdleSeconds = application.getMaxSessionIdleTime();
+        int intMaxIdleSeconds;
+        if (maxIdleSeconds > Integer.MAX_VALUE) {
+            log.warn("Max session idle time value is greater than Integer.MAX_VALUE. Integer.MAX_VALUE will be used instead");
+            intMaxIdleSeconds = Integer.MAX_VALUE;
+        } else {
+            intMaxIdleSeconds = (int) maxIdleSeconds;
+        }
+        sessionHandler.setMaxInactiveInterval(intMaxIdleSeconds);
+
         DefaultSessionCache sessionCache = new DefaultSessionCache(sessionHandler);
         FileSessionDataStore sessionStore = new FileSessionDataStore();
 
@@ -188,11 +219,14 @@ public class CBJettyServer {
         servletContextHandler.setSessionHandler(sessionHandler);
     }
 
-    private static class JettyServer extends Server {
+    public static class JettyServer extends Server {
         public JettyServer(int serverPort) {
             super(serverPort);
         }
 
+        public JettyServer() {
+            super();
+        }
         public JettyServer(InetSocketAddress addr) {
             super(addr);
         }

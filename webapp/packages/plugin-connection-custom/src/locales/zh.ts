@@ -1,7 +1,7 @@
 export default [
   ['customConnection_connectionType_custom', '参数'],
   ['customConnection_connectionType_url', 'URL'],
-  ['customConnection_options', '选项'],
+  ['customConnection_main', 'Main'],
   ['customConnection_properties', '驱动属性'],
   ['customConnection_custom_name', '名称'],
   ['customConnection_custom_host', '主机'],
@@ -17,5 +17,5 @@ export default [
   ['customConnection_test', '测试连接'],
   ['customConnection_create', '创建'],
   ['customConnection_create_error', '创建连接失败'],
-  ['plugin_connection_custom_action_custom_label', '手动'],
+  ['plugin_connection_custom_action_custom_label', 'New Connection'],
 ];

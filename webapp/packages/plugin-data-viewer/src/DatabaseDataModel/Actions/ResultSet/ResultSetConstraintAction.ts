@@ -1,11 +1,10 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2022 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { computed, makeObservable } from 'mobx';
 
 import { DataTypeLogicalOperation, ResultDataFormat, SqlDataFilterConstraint } from '@cloudbeaver/core-sdk';
@@ -22,8 +21,10 @@ export const IS_NULL_ID = 'IS_NULL';
 export const IS_NOT_NULL_ID = 'IS_NOT_NULL';
 
 @databaseDataAction()
-export class ResultSetConstraintAction extends DatabaseDataAction<IDatabaseDataOptions, IDatabaseResultSet>
-  implements IDatabaseDataConstraintAction<IDatabaseResultSet> {
+export class ResultSetConstraintAction
+  extends DatabaseDataAction<IDatabaseDataOptions, IDatabaseResultSet>
+  implements IDatabaseDataConstraintAction<IDatabaseResultSet>
+{
   static dataFormat = [ResultDataFormat.Resultset, ResultDataFormat.Document];
 
   get supported(): boolean {
@@ -46,8 +47,8 @@ export class ResultSetConstraintAction extends DatabaseDataAction<IDatabaseDataO
     return this.source.options.constraints.filter(isFilterConstraint);
   }
 
-  constructor(source: IDatabaseDataSource<any, IDatabaseResultSet>, result: IDatabaseResultSet) {
-    super(source, result);
+  constructor(source: IDatabaseDataSource<any, IDatabaseResultSet>) {
+    super(source);
     makeObservable(this, {
       orderConstraints: computed,
       filterConstraints: computed,
@@ -59,8 +60,7 @@ export class ResultSetConstraintAction extends DatabaseDataAction<IDatabaseDataO
       return;
     }
 
-    this.source.options.constraints = this.source.options.constraints
-      .filter(constraint => constraint.attributePosition !== attributePosition);
+    this.source.options.constraints = this.source.options.constraints.filter(constraint => constraint.attributePosition !== attributePosition);
   }
 
   private deleteEmptyConstraint(attributePosition: number) {
@@ -72,8 +72,7 @@ export class ResultSetConstraintAction extends DatabaseDataAction<IDatabaseDataO
   }
 
   private getMaxOrderPosition() {
-    return Math.max(0, ...this.orderConstraints
-      .map(constraint => constraint.orderPosition !== undefined ? constraint.orderPosition + 1 : -1));
+    return Math.max(0, ...this.orderConstraints.map(constraint => (constraint.orderPosition !== undefined ? constraint.orderPosition + 1 : -1)));
   }
 
   get(attributePosition: number): SqlDataFilterConstraint | undefined {
@@ -148,7 +147,7 @@ export class ResultSetConstraintAction extends DatabaseDataAction<IDatabaseDataO
     }
 
     this.deleteFilters();
-    this.source.options.whereFilter = '';
+    this.resetWhereFilter();
   }
 
   deleteData(): void {
@@ -157,7 +156,19 @@ export class ResultSetConstraintAction extends DatabaseDataAction<IDatabaseDataO
     }
 
     this.deleteAll();
-    this.source.options.whereFilter = '';
+    this.resetWhereFilter();
+  }
+
+  setWhereFilter(value: string) {
+    if (!this.source.options) {
+      throw new Error('Options must be provided');
+    }
+
+    this.source.options.whereFilter = value;
+  }
+
+  resetWhereFilter() {
+    this.setWhereFilter('');
   }
 
   setFilter(attributePosition: number, operator: string, value?: any): void {
@@ -242,11 +253,10 @@ export class ResultSetConstraintAction extends DatabaseDataAction<IDatabaseDataO
   }
 
   updateResults(results: IDatabaseResultSet[]): void {
-    if (!this.source.options || results.length !== this.source.results.length) {
+    const nextResult = results[this.resultIndex];
+    if (!this.source.options || results.length !== this.source.results.length || !nextResult) {
       return;
     }
-
-    const nextResult = results[this.resultIndex];
 
     for (const constraint of this.source.options.constraints) {
       const prevColumn = this.result.data?.columns?.find(column => column.position === constraint.attributePosition);
@@ -262,8 +272,9 @@ export class ResultSetConstraintAction extends DatabaseDataAction<IDatabaseDataO
       }
 
       if (column && prevColumn.position !== column.position) {
-        const prevConstraint = this.source.prevOptions?.constraints
-          .find(prevConstraint => prevConstraint.attributePosition === constraint.attributePosition);
+        const prevConstraint = this.source.prevOptions?.constraints.find(
+          prevConstraint => prevConstraint.attributePosition === constraint.attributePosition,
+        );
 
         constraint.attributePosition = column.position;
 

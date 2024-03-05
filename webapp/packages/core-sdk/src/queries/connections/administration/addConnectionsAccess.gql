@@ -1,0 +1,3 @@
+query addConnectionsAccess($projectId: ID!, $connectionIds: [ID!]!, $subjects: [ID!]!) {
+  addConnectionsAccess(projectId: $projectId, connectionIds: $connectionIds, subjects: $subjects)
+}

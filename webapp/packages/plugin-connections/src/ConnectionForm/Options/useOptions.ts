@@ -1,45 +1,38 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2022 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { runInAction } from 'mobx';
 
 import { useObjectRef } from '@cloudbeaver/core-blocks';
-import { DBDriver, isJDBCConnection } from '@cloudbeaver/core-connections';
+import { DBDriver, DBDriverResource, isJDBCConnection } from '@cloudbeaver/core-connections';
+import { useService } from '@cloudbeaver/core-di';
 import { DatabaseAuthModel, DriverConfigurationType } from '@cloudbeaver/core-sdk';
 
 import type { IConnectionFormState } from '../IConnectionFormProps';
-
-const MAX_HOST_LENGTH = 20;
+import { getConnectionName } from './getConnectionName';
 
 export function useOptions(state: IConnectionFormState) {
-  const refObject = useObjectRef(() => ({
-    prevName: null as string | null,
-  }), {
-    state,
-  });
+  const dbDriverResource = useService(DBDriverResource);
+  const refObject = useObjectRef(
+    () => ({
+      prevName: null as string | null,
+      prevDriverId: null as string | null,
+    }),
+    {
+      state,
+    },
+  );
 
   return useObjectRef({
     updateNameTemplate(driver: DBDriver | undefined) {
       runInAction(() => {
         const {
-          prevName,
-          state: {
-            config,
-            info,
-            mode,
-          },
+          state: { config, info },
         } = refObject;
-
-        const isAutoFill = config.name === prevName || prevName === null;
-
-        if (mode === 'edit' || !isAutoFill) {
-          return;
-        }
 
         if (isJDBCConnection(driver, info)) {
           refObject.prevName = config.url || '';
@@ -52,36 +45,35 @@ export function useOptions(state: IConnectionFormState) {
           return;
         }
 
-        let name = driver.name || '';
-        if (config.host) {
-          name += '@' + config.host.slice(0, MAX_HOST_LENGTH);
-          if (config.port && config.port !== driver.defaultPort) {
-            name += ':' + config.port;
-          }
-        }
+        const name = getConnectionName(driver.name || '', config.host, config.port, driver.defaultPort);
+
         refObject.prevName = name;
         config.name = name;
       });
     },
-    setDefaults(driver: DBDriver | undefined, prevDriver?: DBDriver) {
+    setDefaults(driver: DBDriver | undefined) {
       runInAction(() => {
         const {
-          state: {
-            config,
-            info,
-          },
+          state: { config, info },
+          prevDriverId,
         } = refObject;
 
         if (info || driver?.id !== config.driverId) {
           return;
         }
 
+        let prevDriver: DBDriver | undefined;
+
+        if (prevDriverId) {
+          prevDriver = dbDriverResource.get(prevDriverId);
+        }
+
+        refObject.prevDriverId = driver?.id || null;
+
         if (!config.configurationType || !driver?.configurationTypes.includes(config.configurationType)) {
-          config.configurationType = (
-            driver?.configurationTypes.includes(DriverConfigurationType.Manual)
-              ? DriverConfigurationType.Manual
-              : DriverConfigurationType.Url
-          );
+          config.configurationType = driver?.configurationTypes.includes(DriverConfigurationType.Manual)
+            ? DriverConfigurationType.Manual
+            : DriverConfigurationType.Url;
         }
 
         if ((!prevDriver && config.host === undefined) || config.host === prevDriver?.defaultServer) {
@@ -100,7 +92,9 @@ export function useOptions(state: IConnectionFormState) {
           config.url = driver?.sampleURL;
         }
 
-        this.updateNameTemplate(driver);
+        if (this.isNameAutoFill()) {
+          this.updateNameTemplate(driver);
+        }
 
         if (driver?.id !== prevDriver?.id) {
           config.credentials = {};
@@ -111,10 +105,7 @@ export function useOptions(state: IConnectionFormState) {
     },
     setAuthModel(model: DatabaseAuthModel) {
       const {
-        state: {
-          config,
-          info,
-        },
+        state: { config, info },
       } = refObject;
 
       config.credentials = {};
@@ -130,6 +121,17 @@ export function useOptions(state: IConnectionFormState) {
       }
 
       refObject.state.checkFormState();
+    },
+
+    isNameAutoFill() {
+      const {
+        prevName,
+        state: { config, mode },
+      } = refObject;
+
+      const isAutoFill = config.name === prevName || prevName === null;
+
+      return isAutoFill && mode === 'create';
     },
   });
 }

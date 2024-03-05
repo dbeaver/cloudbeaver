@@ -1,11 +1,10 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2022 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { makeObservable, observable } from 'mobx';
 
 import { injectable } from '@cloudbeaver/core-di';
@@ -21,18 +20,17 @@ export class OptionsPanelService {
   panelComponent: (() => React.FC) | null;
   private basePanelComponent: (() => React.FC) | null;
 
-  constructor(
-    private navigationService: NavigationService
-  ) {
-    makeObservable(this, {
-      active: observable,
-      panelComponent: observable,
-    });
+  constructor(private readonly navigationService: NavigationService) {
     this.active = false;
     this.panelComponent = null;
     this.basePanelComponent = null;
     this.closeTask = new Executor();
     this.navigationService.navigationTask.addHandler(this.navigationHandler);
+
+    makeObservable(this, {
+      active: observable,
+      panelComponent: observable,
+    });
   }
 
   isOpen(component: () => React.FC): boolean {
@@ -76,7 +74,7 @@ export class OptionsPanelService {
     return true;
   }
 
-  private navigationHandler: IExecutorHandler<any> = async (data, contexts) => {
+  private readonly navigationHandler: IExecutorHandler<any> = async (data, contexts) => {
     const state = await this.close();
 
     if (!state) {

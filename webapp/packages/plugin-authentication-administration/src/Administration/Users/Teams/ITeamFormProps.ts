@@ -1,11 +1,10 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2022 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import type { TeamInfo, TeamsResource } from '@cloudbeaver/core-authentication';
 import type { IExecutorHandlersCollection } from '@cloudbeaver/core-executor';
 import type { MetadataMap } from '@cloudbeaver/core-utils';
@@ -29,9 +28,7 @@ export interface ITeamFormState {
   readonly load: () => Promise<void>;
   readonly loadTeamInfo: () => Promise<TeamInfo | undefined>;
   readonly save: () => Promise<void>;
-  readonly setOptions: (
-    mode: TeamFormMode,
-  ) => this;
+  readonly setOptions: (mode: TeamFormMode) => this;
 }
 
 export interface ITeamFormProps {

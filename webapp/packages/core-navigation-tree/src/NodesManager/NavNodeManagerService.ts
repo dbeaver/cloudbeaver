@@ -1,21 +1,21 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2022 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
+import { action } from 'mobx';
 
-import { makeObservable, observable } from 'mobx';
-
-import { injectable, Bootstrap } from '@cloudbeaver/core-di';
-import { IExecutor, Executor, IExecutionContextProvider, ISyncContextLoader } from '@cloudbeaver/core-executor';
-import { resourceKeyList } from '@cloudbeaver/core-sdk';
+import type { IDataContextProvider } from '@cloudbeaver/core-data-context';
+import { Bootstrap, injectable } from '@cloudbeaver/core-di';
+import { Executor, IExecutionContextProvider, IExecutor, ISyncContextLoader, ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
+import { resourceKeyList, ResourceKeyUtils } from '@cloudbeaver/core-resource';
 import { NavigationService } from '@cloudbeaver/core-ui';
-import type { IDataContextProvider } from '@cloudbeaver/core-view';
+import { MetadataMap } from '@cloudbeaver/core-utils';
 
 import { ENodeFeature } from './ENodeFeature';
-import type { NavNodeInfo, NavNode } from './EntityTypes';
+import type { NavNode, NavNodeInfo } from './EntityTypes';
 import { EObjectFeature } from './EObjectFeature';
 import { NavNodeInfoResource, ROOT_NODE_PATH } from './NavNodeInfoResource';
 import { navNodeMoveContext } from './navNodeMoveContext';
@@ -23,14 +23,9 @@ import { NavTreeResource } from './NavTreeResource';
 import { NodeManagerUtils } from './NodeManagerUtils';
 import { ProjectsNavNodeService } from './ProjectsNavNodeService';
 
-export enum NavigationType {
-  open,
-  canOpen
-}
-
 export interface NavNodeKey {
   nodeId: string;
-  parentId: string;
+  parentId?: string;
 }
 
 export interface NavNodeValue {
@@ -39,7 +34,8 @@ export interface NavNodeValue {
 }
 
 export interface INodeContainerInfo {
-  connectionId?: string;
+  projectId?: string;
+  connectionNodeId?: string;
   catalogId?: string;
   schemaId?: string;
 }
@@ -66,10 +62,9 @@ export interface INavNodeId {
 }
 
 export interface INodeNavigationContext {
-  type: NavigationType;
   projectId: string | undefined;
   nodeId: string;
-  parentId: string;
+  parentId?: string;
   folderId: string;
   name?: string;
   icon?: string;
@@ -81,16 +76,15 @@ export interface INodeNavigationContext {
 }
 
 export interface INodeNavigationData {
-  type: NavigationType;
   projectId?: string;
   nodeId: string;
-  parentId: string;
+  parentId?: string;
   folderId?: string;
 }
 
 export enum ENodeMoveType {
   CanDrop,
-  Drop
+  Drop,
 }
 
 export interface INodeMoveData {
@@ -104,52 +98,51 @@ export interface INavNodeCache {
   canMove: boolean;
 }
 
-
 @injectable()
 export class NavNodeManagerService extends Bootstrap {
-  readonly syncNodeInfoCache: Map<string, INavNodeCache>;
-
+  readonly onCanOpen: ISyncExecutor<INodeNavigationData>;
   readonly navigator: IExecutor<INodeNavigationData>;
   readonly onMove: IExecutor<INodeMoveData>;
+  private readonly syncNodeInfoCache: MetadataMap<string, INavNodeCache>;
 
   constructor(
     readonly navTree: NavTreeResource,
     readonly navNodeInfoResource: NavNodeInfoResource,
     private readonly projectsNavNodeService: ProjectsNavNodeService,
-    navigationService: NavigationService
+    navigationService: NavigationService,
   ) {
     super();
-    this.syncNodeInfoCache = new Map();
-    this.onMove = new Executor<INodeMoveData>(null, (current, next) => (
-      current.type === next.type
-      && current.targetNode === next.targetNode
-    ));
+    this.syncNodeInfoCache = new MetadataMap(() => ({ canOpen: false, canMove: false }));
+    this.onMove = new Executor<INodeMoveData>(null, (current, next) => current.type === next.type && current.targetNode === next.targetNode);
+    this.onCanOpen = new SyncExecutor<INodeNavigationData>({
+      nodeId: ROOT_NODE_PATH,
+      parentId: ROOT_NODE_PATH,
+    });
     this.navigator = new Executor<INodeNavigationData>(
       {
-        type: NavigationType.open,
         nodeId: ROOT_NODE_PATH,
         parentId: ROOT_NODE_PATH,
       },
-      (active, current) => (
-        active.projectId === current.projectId
-        && active.nodeId === current.nodeId
-        && active.type === current.type
-      )
+      (active, current) => active.projectId === current.projectId && active.nodeId === current.nodeId,
     )
-      .before(navigationService.navigationTask, undefined, data => data.type === NavigationType.open)
+      .before(navigationService.navigationTask)
       .addHandler(this.navigateHandler.bind(this));
 
-    makeObservable(this, {
-      syncNodeInfoCache: observable,
-    });
+    this.navNodeInfoResource.onItemDelete.addHandler(
+      action(key => {
+        ResourceKeyUtils.forEach(key, key => {
+          this.syncNodeInfoCache.delete(key);
+        });
+      }),
+    );
   }
 
-  register(): void { }
+  register(): void {}
 
-  load(): void { }
+  load(): void {}
 
   getNavNodeCache(nodeId: string): INavNodeCache {
-    return this.syncNodeInfoCache.get(nodeId) || { canOpen: false, canMove: false };
+    return this.syncNodeInfoCache.get(nodeId);
   }
 
   async canMove(targetNode: NavNode, moveContexts: IDataContextProvider): Promise<boolean> {
@@ -161,25 +154,18 @@ export class NavNodeManagerService extends Bootstrap {
 
     const move = contexts.getContext(navNodeMoveContext);
 
-    let cache = this.syncNodeInfoCache.get(targetNode.id);
-
-    if (!cache) {
-      cache = observable<INavNodeCache>({ canOpen: false, canMove: move.canMove });
-      this.syncNodeInfoCache.set(targetNode.id, cache);
-    }
-
+    const cache = this.syncNodeInfoCache.get(targetNode.id);
     cache.canMove = move.canMove;
 
     return move.canMove;
   }
 
-  async canOpen(nodeId: string, parentId: string, folderId?: string): Promise<boolean> {
+  canOpen(nodeId: string, parentId?: string, folderId?: string): boolean {
     if (!this.navNodeInfoResource.has(nodeId)) {
       return false;
     }
 
-    const contexts = await this.navigator.execute({
-      type: NavigationType.canOpen,
+    const contexts = this.onCanOpen.execute({
       nodeId,
       parentId,
       folderId,
@@ -187,21 +173,14 @@ export class NavNodeManagerService extends Bootstrap {
 
     const data = contexts.getContext(this.navigationNavNodeContext);
 
-    let cache = this.syncNodeInfoCache.get(nodeId);
-
-    if (!cache) {
-      cache = observable<INavNodeCache>({ canOpen: data.canOpen, canMove: false });
-      this.syncNodeInfoCache.set(nodeId, cache);
-    }
-
+    const cache = this.syncNodeInfoCache.get(nodeId);
     cache.canOpen = data.canOpen;
 
     return data.canOpen;
   }
 
-  async navToNode(nodeId: string, parentId: string, folderId?: string): Promise<void> {
+  async navToNode(nodeId: string, parentId?: string, folderId?: string): Promise<void> {
     await this.navigator.execute({
-      type: NavigationType.open,
       nodeId,
       parentId,
       folderId,
@@ -271,6 +250,9 @@ export class NavNodeManagerService extends Bootstrap {
   }
 
   getParent(node: NavNode): NavNode | undefined {
+    if (node.parentId === undefined) {
+      return undefined;
+    }
     return this.navNodeInfoResource.get(node.parentId);
   }
 
@@ -283,10 +265,7 @@ export class NavNodeManagerService extends Bootstrap {
       return false;
     }
 
-    return (
-      node.objectFeatures.includes(ENodeFeature.dataContainer)
-      || node.objectFeatures.includes(ENodeFeature.container)
-    );
+    return node.objectFeatures.includes(ENodeFeature.dataContainer) || node.objectFeatures.includes(ENodeFeature.container);
   }
 
   async getNodeDatabaseAlias(nodeId: string): Promise<string> {
@@ -304,8 +283,7 @@ export class NavNodeManagerService extends Bootstrap {
   getNodeContainerInfo(nodeId: string): INodeContainerInfo {
     const initial: INodeContainerInfo = {};
 
-    const scanParents = (res: INodeContainerInfo,
-      nodeId?: string): INodeContainerInfo => {
+    const scanParents = (res: INodeContainerInfo, nodeId?: string): INodeContainerInfo => {
       if (!nodeId) {
         return res;
       }
@@ -313,8 +291,11 @@ export class NavNodeManagerService extends Bootstrap {
       if (!object) {
         return res;
       }
+      if (object.projectId && res.projectId !== object.projectId) {
+        res.projectId = object.projectId;
+      }
       if (object.objectFeatures.includes(EObjectFeature.dataSource)) {
-        res.connectionId = object.id;
+        res.connectionNodeId = object.id;
       }
       if (object.objectFeatures.includes(EObjectFeature.catalog)) {
         res.catalogId = object.name; // note that catalogId is node name
@@ -322,16 +303,17 @@ export class NavNodeManagerService extends Bootstrap {
       if (object.objectFeatures.includes(EObjectFeature.schema)) {
         res.schemaId = object.name; // note that schemaId is node name
       }
+
+      if (object.parentId === nodeId) {
+        return res;
+      }
       return scanParents(res, object.parentId);
     };
 
     return scanParents(initial, nodeId);
   }
 
-  navigationNavNodeContext: ISyncContextLoader<INodeNavigationContext, INodeNavigationData> = (
-    contexts,
-    data
-  ) => {
+  navigationNavNodeContext: ISyncContextLoader<INodeNavigationContext, INodeNavigationData> = (contexts, data) => {
     let nodeId = data.nodeId;
     let projectId = data.projectId;
     let parentId = data.parentId;
@@ -340,15 +322,15 @@ export class NavNodeManagerService extends Bootstrap {
     let icon: string | undefined;
     let canOpen = false;
 
-    if (NodeManagerUtils.isDatabaseObject(nodeId)) {
-      const node = this.getNode(nodeId);
+    const node = this.getNode(nodeId);
+    if (node) {
+      name = node.name;
+      icon = node.icon;
+      projectId ||= node.projectId;
 
-      if (node) {
-        name = node.name;
-        icon = node.icon;
-
+      if (NodeManagerUtils.isDatabaseObject(nodeId)) {
         if (node.folder) {
-          const parent = this.getNode(node.parentId);
+          const parent = this.getParent(node);
           folderId = nodeId;
           if (parent && !parent.folder) {
             nodeId = parent.id;
@@ -361,11 +343,11 @@ export class NavNodeManagerService extends Bootstrap {
         if (data.folderId) {
           folderId = data.folderId;
         }
-
-        if (!projectId) {
-          projectId = this.projectsNavNodeService.getProject(node.id)?.id;
-        }
       }
+    }
+
+    if (!projectId) {
+      projectId = this.projectsNavNodeService.getProject(nodeId)?.id;
     }
 
     const markOpen = () => {
@@ -390,7 +372,6 @@ export class NavNodeManagerService extends Bootstrap {
         return canOpen;
       },
 
-      type: data.type,
       projectId,
       nodeId,
       parentId,
@@ -406,13 +387,9 @@ export class NavNodeManagerService extends Bootstrap {
 
   private async navigateHandler(
     data: INodeNavigationData,
-    contexts: IExecutionContextProvider<INodeNavigationData>
+    contexts: IExecutionContextProvider<INodeNavigationData>,
     // eslint-disable-next-line @typescript-eslint/no-invalid-void-type
-  ): Promise<void> {
-    if (data.type !== NavigationType.open) {
-      return;
-    }
-  }
+  ): Promise<void> {}
 }
 
 export function parseNodeParentId(nodeId: string): string {

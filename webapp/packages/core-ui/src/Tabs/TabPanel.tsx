@@ -1,59 +1,50 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2022 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observer } from 'mobx-react-lite';
 import { useContext, useMemo } from 'react';
-import { TabPanel as BaseTabPanel, TabStateReturn } from 'reakit/Tab';
+import { TabPanel as BaseTabPanel } from 'reakit/Tab';
 
-import { ErrorBoundary, getComputed } from '@cloudbeaver/core-blocks';
+import { getComputed, Loader } from '@cloudbeaver/core-blocks';
 
 import { TabContext } from './TabContext';
 import type { TabPanelProps } from './TabPanelProps';
 import { TabsContext } from './TabsContext';
+import { useTabsValidation } from './useTabsValidation';
 
-export const TabPanel: React.FC<TabPanelProps> = observer(function TabPanel({
-  tabId,
-  children,
-  className,
-  lazy,
-}) {
-  const state = useContext(TabsContext);
+export const TabPanel: React.FC<TabPanelProps> = observer(function TabPanel({ tabId, children, className, lazy }) {
+  const tabContextState = useContext(TabsContext);
 
-  if (!state) {
+  if (!tabContextState) {
     throw new Error('Tabs context was not provided');
   }
 
+  const panelRef = useTabsValidation(tabId);
   const tabContext = useMemo(() => ({ tabId }), [tabId]);
-  const enabled = getComputed(() => (lazy || state.lazy) && state.state.selectedId !== tabId);
+  const selected = getComputed(() => tabContextState.state.selectedId === tabId);
+  const enabled = getComputed(() => (lazy || tabContextState.lazy) && !selected);
 
   if (enabled) {
     return null;
   }
 
-  if (typeof children === 'function') {
-    return (
-      <ErrorBoundary remount>
-        <TabContext.Provider value={tabContext}>
-          <BaseTabPanel {...state.state} tabId={tabId} className={className}>
-            {(children as (state: TabStateReturn) => React.ReactNode)(state.state)}
-          </BaseTabPanel>
-        </TabContext.Provider>
-      </ErrorBoundary>
-    );
+  function renderChildren() {
+    if (typeof children === 'function') {
+      return children(tabContextState!.state);
+    }
+
+    return children;
   }
 
   return (
-    <ErrorBoundary remount>
-      <TabContext.Provider value={tabContext}>
-        <BaseTabPanel {...state.state} tabId={tabId} className={className}>
-          {children}
-        </BaseTabPanel>
-      </TabContext.Provider>
-    </ErrorBoundary>
+    <TabContext.Provider value={tabContext}>
+      <BaseTabPanel ref={panelRef} {...tabContextState.state} tabId={tabId} className={className}>
+        <Loader suspense>{renderChildren()}</Loader>
+      </BaseTabPanel>
+    </TabContext.Provider>
   );
 });

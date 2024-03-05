@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2023 DBeaver Corp and others
+ * Copyright (C) 2010-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,7 +31,8 @@ import org.jkiss.utils.CommonUtils;
 /**
  * Web service implementation
  */
-public class WebServiceBindingAdmin extends WebServiceBindingBase<DBWServiceAdmin> implements DBWServiceBindingServlet<CBApplication> {
+public class WebServiceBindingAdmin extends WebServiceBindingBase<DBWServiceAdmin>
+                implements DBWServiceBindingServlet<CBApplication> {
 
     private static final String SCHEMA_FILE_NAME = "schema/service.admin.graphqls";
 
@@ -42,8 +43,17 @@ public class WebServiceBindingAdmin extends WebServiceBindingBase<DBWServiceAdmi
     @Override
     public void bindWiring(DBWBindingContext model) throws DBWebException {
         model.getQueryType()
-            .dataFetcher("listUsers",
-                env -> getService(env).listUsers(getWebSession(env), env.getArgument("userId")))
+            .dataFetcher(
+                "adminUserInfo",
+                env -> getService(env).getUserById(getWebSession(env), env.getArgument("userId"))
+            )
+            .dataFetcher(
+                "listUsers",
+                env -> getService(env).listUsers(
+                    getWebSession(env),
+                    new AdminUserInfoFilter(env.getArgument("filter"), env.getArgument("page"))
+                )
+            )
             .dataFetcher("listTeams",
                 env -> getService(env).listTeams(getWebSession(env), env.getArgument("teamId")))
             .dataFetcher("listPermissions",
@@ -74,7 +84,10 @@ public class WebServiceBindingAdmin extends WebServiceBindingBase<DBWServiceAdmi
                     env.getArgument("teamName"),
                     env.getArgument("description")))
             .dataFetcher("deleteTeam",
-                env -> getService(env).deleteTeam(getWebSession(env), env.getArgument("teamId")))
+                env -> getService(env).deleteTeam(
+                    getWebSession(env),
+                    env.getArgument("teamId"),
+                    CommonUtils.toBoolean(env.getArgument("force"))))
 
             .dataFetcher("grantUserTeam",
                 env -> getService(env).grantUserTeam(getWebSession(env), env.getArgument("userId"), env.getArgument("teamId")))
@@ -82,25 +95,41 @@ public class WebServiceBindingAdmin extends WebServiceBindingBase<DBWServiceAdmi
                 env -> getService(env).revokeUserTeam(getWebSession(env), env.getArgument("userId"), env.getArgument("teamId")))
             .dataFetcher("setSubjectPermissions",
                 env -> getService(env).setSubjectPermissions(getWebSession(env), env.getArgument("subjectId"), env.getArgument("permissions")))
-        .dataFetcher("setUserCredentials",
-            env -> getService(env).setUserCredentials(getWebSession(env), env.getArgument("userId"), env.getArgument("providerId"), env.getArgument("credentials")))
-        .dataFetcher("enableUser",
-            env -> getService(env).enableUser(getWebSession(env), env.getArgument("userId"), env.getArgument("enabled")))
-        .dataFetcher("setUserAuthRole",
-            env -> getService(env).setUserAuthRole(getWebSession(env), env.getArgument("userId"), env.getArgument("authRole")))
-        .dataFetcher("searchConnections", env -> getService(env).searchConnections(getWebSession(env), env.getArgument("hostNames")))
-
-        .dataFetcher("getConnectionSubjectAccess",
-            env -> getService(env).getConnectionSubjectAccess(
-                getWebSession(env),
-                getProjectReference(env),
-                env.getArgument("connectionId")))
-        .dataFetcher("setConnectionSubjectAccess",
-            env -> getService(env).setConnectionSubjectAccess(
-                getWebSession(env),
-                getProjectReference(env),
-                env.getArgument("connectionId"),
-                env.getArgument("subjects")))
+            .dataFetcher("setUserCredentials",
+                env -> getService(env).setUserCredentials(getWebSession(env),
+                    env.getArgument("userId"),
+                    env.getArgument("providerId"),
+                    env.getArgument("credentials")))
+            .dataFetcher("deleteUserCredentials",
+                env -> getService(env).deleteUserCredentials(getWebSession(env), env.getArgument("userId"), env.getArgument("providerId")))
+            .dataFetcher("enableUser",
+                env -> getService(env).enableUser(getWebSession(env), env.getArgument("userId"), env.getArgument("enabled")))
+            .dataFetcher("setUserAuthRole",
+                env -> getService(env).setUserAuthRole(getWebSession(env), env.getArgument("userId"), env.getArgument("authRole")))
+            .dataFetcher("searchConnections", env -> getService(env).searchConnections(getWebSession(env), env.getArgument("hostNames")))
+            .dataFetcher("getConnectionSubjectAccess",
+                env -> getService(env).getConnectionSubjectAccess(
+                    getWebSession(env),
+                    getProjectReference(env),
+                    env.getArgument("connectionId")))
+            .dataFetcher("setConnectionSubjectAccess",
+                env -> getService(env).setConnectionSubjectAccess(
+                    getWebSession(env),
+                    getProjectReference(env),
+                    env.getArgument("connectionId"),
+                    env.getArgument("subjects")))
+            .dataFetcher("addConnectionsAccess",
+                env -> getService(env).addConnectionsAccess(
+                    getWebSession(env),
+                    getProjectReference(env),
+                    env.getArgument("connectionIds"),
+                    env.getArgument("subjects")))
+            .dataFetcher("deleteConnectionsAccess",
+                env -> getService(env).deleteConnectionsAccess(
+                    getWebSession(env),
+                    getProjectReference(env),
+                    env.getArgument("connectionIds"),
+                    env.getArgument("subjects")))
 
         .dataFetcher("getSubjectConnectionAccess",
             env -> getService(env).getSubjectConnectionAccess(getWebSession(env), env.getArgument("subjectId")))
@@ -156,6 +185,9 @@ public class WebServiceBindingAdmin extends WebServiceBindingBase<DBWServiceAdmi
         .dataFetcher("setDefaultNavigatorSettings",
             env -> getService(env).setDefaultNavigatorSettings(getWebSession(env), WebServiceUtils.parseNavigatorSettings(env.getArgument("settings"))))
         ;
+        model.getMutationType()
+            .dataFetcher("adminUpdateProductConfiguration",
+                env -> getService(env).updateProductConfiguration(getWebSession(env), env.getArgument("configuration")));
     }
 
     @Override

@@ -1,18 +1,16 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2022 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observer } from 'mobx-react-lite';
-import { useState, useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import styled, { css } from 'reshadow';
 
-import { ItemListSearch, ItemList, useFocus, useTranslate } from '@cloudbeaver/core-blocks';
+import { ItemList, ItemListSearch, useFocus, useTranslate } from '@cloudbeaver/core-blocks';
 import type { DBDriver } from '@cloudbeaver/core-connections';
-
 
 import { Driver } from './Driver';
 
@@ -45,8 +43,10 @@ export const DriverList = observer<Props>(function DriverList({ drivers, classNa
     <div ref={focusedRef}>
       <ItemListSearch value={search} placeholder={translate('connections_driver_search_placeholder')} onChange={setSearch} />
       <ItemList className={className}>
-        {filteredDrivers.map(driver => <Driver key={driver.id} driver={driver} onSelect={onSelect} />)}
+        {filteredDrivers.map(driver => (
+          <Driver key={driver.id} driver={driver} onSelect={onSelect} />
+        ))}
       </ItemList>
-    </div>
+    </div>,
   );
 });

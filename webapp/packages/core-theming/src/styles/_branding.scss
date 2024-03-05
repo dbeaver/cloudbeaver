@@ -1,12 +1,12 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2022 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
 
-@mixin stripes-background($color) {
+@mixin stripes-background($color, $important: false) {
   // background-image: linear-gradient(
   //   45deg,
   //   transparent 37.5%,
@@ -18,7 +18,7 @@
   //   $color 100%
   // );
   // background-size: 8px 8px;
-  background-color: $color;
+  background-color: $color #{if($important, '!important', '')};
 }
 
 @mixin delimiter($color) {

@@ -1,14 +1,13 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2022 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import styled, { css } from 'reshadow';
 
-import { BASE_CONTAINERS_STYLES, ColoredContainer, Group, GroupItem, Translate } from '@cloudbeaver/core-blocks';
+import { ColoredContainer, Group, GroupItem, Translate } from '@cloudbeaver/core-blocks';
 
 const styles = css`
   p {
@@ -22,15 +21,21 @@ const styles = css`
 `;
 
 export const WelcomePage: React.FC = function WelcomePage() {
-  return styled(styles, BASE_CONTAINERS_STYLES)(
+  return styled(styles)(
     <ColoredContainer wrap gap overflow parent>
       <Group form>
-        <h3><Translate token='administration_configuration_wizard_welcome_title' /></h3>
+        <h3>
+          <Translate token="administration_configuration_wizard_welcome_title" />
+        </h3>
         <GroupItem>
-          <p><Translate token='administration_configuration_wizard_welcome_message' /></p>
-          <note as='div'><Translate token='administration_configuration_wizard_welcome_note' /></note>
+          <p>
+            <Translate token="administration_configuration_wizard_welcome_message" />
+          </p>
+          <note as="div">
+            <Translate token="administration_configuration_wizard_welcome_note" />
+          </note>
         </GroupItem>
       </Group>
-    </ColoredContainer>
+    </ColoredContainer>,
   );
 };

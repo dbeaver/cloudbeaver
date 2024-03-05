@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2023 DBeaver Corp and others
+ * Copyright (C) 2010-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,43 +16,38 @@
  */
 package io.cloudbeaver.server.websockets;
 
-import com.google.gson.Gson;
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.model.session.BaseWebSession;
 import io.cloudbeaver.websocket.CBWebSessionEventHandler;
 import org.eclipse.jetty.websocket.api.Session;
-import org.eclipse.jetty.websocket.api.WebSocketAdapter;
 import org.eclipse.jetty.websocket.api.WriteCallback;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.Log;
-import org.jkiss.dbeaver.model.websocket.WSConstants;
-import org.jkiss.dbeaver.model.websocket.WSUtils;
 import org.jkiss.dbeaver.model.websocket.event.WSClientEvent;
 import org.jkiss.dbeaver.model.websocket.event.WSClientEventType;
 import org.jkiss.dbeaver.model.websocket.event.WSEvent;
 import org.jkiss.dbeaver.model.websocket.event.client.WSUpdateActiveProjectsClientEvent;
+import org.jkiss.dbeaver.model.websocket.event.session.WSSocketConnectedEvent;
 
-import java.io.IOException;
-
-public class CBEventsWebSocket extends WebSocketAdapter implements CBWebSessionEventHandler {
-    private static final Gson gson = WSUtils.gson;
+public class CBEventsWebSocket extends CBAbstractWebSocket implements CBWebSessionEventHandler {
     private static final Log log = Log.getLog(CBEventsWebSocket.class);
 
     @NotNull
     private final BaseWebSession webSession;
-
     @NotNull
     private final WriteCallback callback;
 
     public CBEventsWebSocket(@NotNull BaseWebSession webSession) {
         this.webSession = webSession;
-        this.callback = new WebSocketPingPongCallback(webSession);
+
+        callback = new WebSocketPingPongCallback(webSession);
     }
 
     @Override
     public void onWebSocketConnect(Session session) {
         super.onWebSocketConnect(session);
         this.webSession.addEventHandler(this);
+        handleEvent(new WSSocketConnectedEvent(webSession.getApplication().getApplicationRunId()));
         log.debug("EventWebSocket connected to the " + webSession.getSessionId() + " session");
     }
 
@@ -102,27 +97,14 @@ public class CBEventsWebSocket extends WebSocketAdapter implements CBWebSessionE
         webSession.addSessionError(cause);
     }
 
-    public void awaitClosure() throws InterruptedException {
-        log.debug("Awaiting closure from remote");
-    }
-
     @Override
-    public void handeWebSessionEvent(WSEvent event) {
-        if (isNotConnected()) {
-            return;
-        }
-        try {
-            getRemote().sendString(gson.toJson(event));
-        } catch (IOException e) {
-            log.error("Failed to send websocket message", e);
-            webSession.addSessionError(e);
-        }
+    public void handleWebSessionEvent(WSEvent event) {
+        super.handleEvent(event);
     }
-
     @Override
-    public void close() {
-        getSession().close();
-        onWebSocketClose(WSConstants.NORMAL_STATUS, "Closed by web session");
+    protected void handleEventException(Exception e) {
+        super.handleEventException(e);
+        webSession.addSessionError(e);
     }
 
     @NotNull

@@ -1,12 +1,10 @@
-
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2022 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { action, computed, makeObservable, observable } from 'mobx';
 
 import { Executor, IExecutor } from '@cloudbeaver/core-executor';
@@ -29,15 +27,13 @@ export class TableState {
   }
 
   get selectedList(): string[] {
-    return Array
-      .from(this.selected)
+    return Array.from(this.selected)
       .filter(([_, value]) => value)
       .map(([key]) => key);
   }
 
   get expandedList(): string[] {
-    return Array
-      .from(this.expanded)
+    return Array.from(this.expanded)
       .filter(([_, value]) => value)
       .map(([key]) => key);
   }
@@ -55,13 +51,8 @@ export class TableState {
       selectedList: computed,
       expandedList: computed,
       unselect: action,
-      unexpand: action,
+      collapse: action,
     });
-  }
-
-  expand(key: string, value: boolean) {
-    this.expanded.set(key, value);
-    this.onExpand.execute({ key, value });
   }
 
   unselect(key?: Key): Map<string, boolean> {
@@ -80,7 +71,12 @@ export class TableState {
     return this.selected;
   }
 
-  unexpand(key?: Key): Map<string, boolean> {
+  expand(key: string, value: boolean) {
+    this.expanded.set(key, value);
+    this.onExpand.execute({ key, value });
+  }
+
+  collapse(key?: Key): Map<string, boolean> {
     if (key === undefined) {
       this.expanded.clear();
     } else {
@@ -97,7 +93,7 @@ export class TableState {
   }
 
   reset() {
-    this.unexpand();
+    this.collapse();
     this.unselect();
   }
 }

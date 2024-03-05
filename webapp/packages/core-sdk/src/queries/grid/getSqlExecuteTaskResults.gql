@@ -1,45 +1,47 @@
-mutation getSqlExecuteTaskResults(
-    $taskId: ID!
-) {
-    result: asyncSqlExecuteResults(
-        taskId: $taskId
-    ) {
-        duration
-        statusMessage
-        filterText
-        results {
-            title
-            updateRowCount
-            sourceQuery
-            dataFormat
-            resultSet {
-                id
-                columns {
-                    dataKind
-                    entityName
-                    fullTypeName
-                    icon
-                    label
-                    maxLength
-                    name
-                    position
-                    precision
-                    required
-                    readOnly
-                    readOnlyStatus
-                    scale
-                    typeName
-                    supportedOperations {
-                        id
-                        expression
-                        argumentCount
-                    }
-                }
-                rows
-                singleEntity
-                hasMoreData
-                hasRowIdentifier
-            }
+mutation getSqlExecuteTaskResults($taskId: ID!) {
+  result: asyncSqlExecuteResults(taskId: $taskId) {
+    duration
+    statusMessage
+    filterText
+    fullQuery
+    results {
+      title
+      updateRowCount
+      sourceQuery
+      dataFormat
+      resultSet {
+        id
+        columns {
+          dataKind
+          entityName
+          fullTypeName
+          icon
+          label
+          maxLength
+          name
+          position
+          precision
+          required
+          readOnly
+          readOnlyStatus
+          scale
+          typeName
+          supportedOperations {
+            id
+            expression
+            argumentCount
+          }
         }
+        rowsWithMetaData {
+          data
+          metaData
+        }
+        singleEntity
+        hasMoreData
+        hasRowIdentifier
+        isSupportsDataFilter
+        hasChildrenCollection
+      }
     }
+  }
 }

@@ -1,5 +1,5 @@
-query getUsersList($userId: ID, $includeMetaParameters: Boolean!, $customIncludeOriginDetails: Boolean!) {
-  users: listUsers(userId: $userId) {
+query getUsersList($page: PageInput!, $filter: AdminUserFilterInput!, $includeMetaParameters: Boolean!, $customIncludeOriginDetails: Boolean!) {
+  users: listUsers(page: $page, filter: $filter) {
     ...AdminUserInfo
-  } 
+  }
 }

@@ -1,0 +1,8 @@
+.control {
+  transition: opacity 0.3s ease;
+  opacity: 1;
+
+  &.outdated {
+    opacity: 0.5;
+  }
+}

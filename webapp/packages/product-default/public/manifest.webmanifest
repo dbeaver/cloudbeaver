@@ -1,0 +1,40 @@
+{
+  "short_name": "CloudBeaver CE",
+  "name": "CloudBeaver Community Edition",
+  "icons": [
+    {
+      "src": "favicon.ico",
+      "sizes": "48x48"
+    },
+    {
+      "src": "favicon-32x32.png",
+      "sizes": "32x32",
+      "type": "image/png"
+    },
+    {
+      "src": "favicon.png",
+      "sizes": "104x104",
+      "type": "image/png"
+    },
+    {
+      "src": "favicon.svg",
+      "sizes": "150x150"
+    },
+    {
+      "src": "apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    }
+  ],
+  "id": "/?source=pwa",
+  "start_url": "/?source=pwa",
+  "scope": "/",
+  "display": "fullscreen",
+  "background_color": "#fff",
+  "description": "Database management tool.",
+  "related_applications": [
+    {
+      "platform": "web"
+    }
+  ]
+}

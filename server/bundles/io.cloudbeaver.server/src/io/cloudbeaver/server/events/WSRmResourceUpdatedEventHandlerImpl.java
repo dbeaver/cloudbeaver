@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2023 DBeaver Corp and others
+ * Copyright (C) 2010-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,76 +22,45 @@ import io.cloudbeaver.WebProjectImpl;
 import io.cloudbeaver.model.session.BaseWebSession;
 import io.cloudbeaver.model.session.WebSession;
 import org.jkiss.code.NotNull;
+import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.rm.RMEvent;
 import org.jkiss.dbeaver.model.rm.RMEventManager;
-import org.jkiss.dbeaver.model.rm.RMResource;
-import org.jkiss.dbeaver.model.websocket.event.WSEvent;
-import org.jkiss.dbeaver.model.websocket.event.WSEventTopic;
 import org.jkiss.dbeaver.model.websocket.event.WSEventType;
 import org.jkiss.dbeaver.model.websocket.event.resource.WSResourceUpdatedEvent;
-
-import java.util.Arrays;
-import java.util.List;
 
 /**
  * Notify all active user session that rm resource has been updated
  */
-public class WSRmResourceUpdatedEventHandlerImpl extends WSProjectUpdatedEventHandler {
+public class WSRmResourceUpdatedEventHandlerImpl extends WSAbstractProjectEventHandler<WSResourceUpdatedEvent> {
 
+    private static final Log log = Log.getLog(WSRmResourceUpdatedEventHandlerImpl.class);
     private static final Gson gson = new GsonBuilder().create();
 
-    @NotNull
     @Override
-    public String getSupportedTopicId() {
-        return WSEventTopic.RM_SCRIPTS.getTopicId();
-    }
-
-    @Override
-    protected void updateSessionData(BaseWebSession activeUserSession, WSEvent event) {
-        if (!(event instanceof WSResourceUpdatedEvent)) {
-            return;
-        }
-        var resourceUpdateEvent = (WSResourceUpdatedEvent) event;
-        String projectId = resourceUpdateEvent.getProjectId();
-        if (!activeUserSession.isProjectAccessible(projectId)) {
-            return;
-        }
-        if (resourceUpdateEvent.getResourcePath() == null) {
-            return;
-        }
-        Object parsedResourcePath = resourceUpdateEvent.getResourceParsedPath();
-        RMResource[] resourceParsedPath;
-        if (parsedResourcePath instanceof RMResource[]) {
-            resourceParsedPath = (RMResource[]) parsedResourcePath;
-        } else {
-            resourceParsedPath = gson.fromJson(gson.toJson(parsedResourcePath), RMResource[].class);
-        }
-        var eventType = WSEventType.valueById(resourceUpdateEvent.getId());
-        if (eventType == null) {
-            return;
-        }
+    protected void updateSessionData(@NotNull BaseWebSession activeUserSession, @NotNull WSResourceUpdatedEvent event) {
         if (activeUserSession instanceof WebSession) {
             var webSession = (WebSession) activeUserSession;
-            acceptChangesInNavigatorTree(eventType, resourceParsedPath, webSession.getProjectById(projectId));
+            acceptChangesInNavigatorTree(
+                WSEventType.valueById(event.getId()),
+                event.getResourcePath(),
+                webSession.getProjectById(event.getProjectId())
+            );
         }
         activeUserSession.addSessionEvent(event);
     }
 
-    private void acceptChangesInNavigatorTree(WSEventType eventType,
-                                              RMResource[] resourceParsedPath,
-                                              WebProjectImpl project) {
-        List<RMResource> rmResourcePath = Arrays.asList(resourceParsedPath);
+    private void acceptChangesInNavigatorTree(WSEventType eventType, String resourcePath, WebProjectImpl project) {
         if (eventType == WSEventType.RM_RESOURCE_CREATED) {
             RMEventManager.fireEvent(
                 new RMEvent(RMEvent.Action.RESOURCE_ADD,
                     project.getRmProject(),
-                    rmResourcePath)
+                    resourcePath)
             );
         } else if (eventType == WSEventType.RM_RESOURCE_DELETED) {
             RMEventManager.fireEvent(
                 new RMEvent(RMEvent.Action.RESOURCE_DELETE,
                     project.getRmProject(),
-                    rmResourcePath)
+                    resourcePath)
             );
         }
     }

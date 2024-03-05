@@ -1,11 +1,10 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2022 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
@@ -26,10 +25,7 @@ export class ProductBootstrap extends Bootstrap {
 
   register(): void | Promise<void> {
     this.menuService.addCreator({
-      isApplicable: context => (
-        context.get(DATA_CONTEXT_MENU) === TOP_NAV_BAR_SETTINGS_MENU
-        && !!this.serverConfigResource.data?.productInfo
-      ),
+      isApplicable: context => context.get(DATA_CONTEXT_MENU) === TOP_NAV_BAR_SETTINGS_MENU && !!this.serverConfigResource.data?.productInfo,
       getItems: (context, items) => [
         ...items,
         new MenuBaseItem(
@@ -40,12 +36,11 @@ export class ProductBootstrap extends Bootstrap {
           },
           {
             onSelect: () => this.commonDialogService.open(ProductInfoDialog, null),
-          }
+          },
         ),
       ],
-
     });
   }
 
-  load(): void | Promise<void> { }
+  load(): void | Promise<void> {}
 }

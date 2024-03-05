@@ -2,7 +2,7 @@
 <feature
         id="io.cloudbeaver.server.feature"
         label="%featureName"
-        version="22.3.4.qualifier"
+        version="24.0.0.qualifier"
         provider-name="%providerName"
         plugin="io.cloudbeaver.server">
 
@@ -36,7 +36,9 @@
     <plugin id="io.cloudbeaver.service.auth" download-size="0" install-size="0" version="0.0.0" unpack="false"/>
     <plugin id="io.cloudbeaver.service.data.transfer" download-size="0" install-size="0" version="0.0.0" unpack="false"/>
     <plugin id="io.cloudbeaver.service.metadata" download-size="0" install-size="0" version="0.0.0" unpack="false"/>
+    <plugin id="io.cloudbeaver.service.fs" download-size="0" install-size="0" version="0.0.0" unpack="false"/>
     <plugin id="io.cloudbeaver.service.rm" download-size="0" install-size="0" version="0.0.0" unpack="false"/>
+    <plugin id="io.cloudbeaver.service.rm.nio" download-size="0" install-size="0" version="0.0.0" unpack="false"/>
     <plugin id="io.cloudbeaver.service.security" download-size="0" install-size="0" version="0.0.0" unpack="false"/>
 
     <!-- Extra plugins -->
@@ -44,10 +46,6 @@
     <plugin id="org.jkiss.bundle.apache.poi" download-size="0" install-size="0" version="0.0.0"/>
     <plugin id="org.jkiss.dbeaver.net.ssh" download-size="0" install-size="0" version="0.0.0" unpack="false"/>
     <plugin id="org.jkiss.dbeaver.net.ssh.sshj" download-size="0" install-size="0" version="0.0.0" unpack="false"/>
-
-    <!-- 3rd party deps -->
-    <plugin id="org.eclipse.jetty.server" download-size="0" install-size="0" version="0.0.0" unpack="false"/>
-    <plugin id="org.eclipse.jetty.servlet" download-size="0" install-size="0" version="0.0.0" unpack="false"/>
-    <plugin id="org.eclipse.jetty.util" download-size="0" install-size="0" version="0.0.0" unpack="false"/>
+    <plugin id="org.jkiss.bundle.graphql.java" download-size="0" install-size="0" version="0.0.0" unpack="false"/>
 
 </feature>

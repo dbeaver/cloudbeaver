@@ -1,0 +1,5 @@
+mutation asyncSqlRowDataCount($projectId: ID, $connectionId: ID!, $contextId: ID!, $resultsId: ID!) {
+  taskInfo: asyncSqlRowDataCount(projectId: $projectId, connectionId: $connectionId, contextId: $contextId, resultsId: $resultsId) {
+    ...AsyncTaskInfo
+  }
+}

@@ -1,11 +1,10 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2022 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { injectable } from '@cloudbeaver/core-di';
 import { Executor, IExecutor } from '@cloudbeaver/core-executor';
 import { md5, uuid } from '@cloudbeaver/core-utils';
@@ -30,6 +29,7 @@ interface IServiceDescriptionLink extends IServiceDescriptionLinkOptions {
 
 export interface RequestedProvider {
   providerId: string;
+  configurationId?: string;
 }
 
 @injectable()
@@ -38,9 +38,7 @@ export class AuthProviderService {
 
   private readonly serviceDescriptionLinker: IServiceDescriptionLink[]; // TODO: probably should be replaced by PlaceholderContainer
 
-  constructor(
-    private readonly authProvidersResource: AuthProvidersResource
-  ) {
+  constructor(private readonly authProvidersResource: AuthProvidersResource) {
     this.requestAuthProvider = new Executor();
     this.serviceDescriptionLinker = [];
   }
@@ -56,8 +54,8 @@ export class AuthProviderService {
     });
   }
 
-  async requireProvider(providerId: string): Promise<boolean> {
-    const contexts = await this.requestAuthProvider.execute({ providerId });
+  async requireProvider(providerId: string, configurationId?: string): Promise<boolean> {
+    const contexts = await this.requestAuthProvider.execute({ providerId, configurationId });
     const provider = contexts.getContext(AuthProviderContext);
 
     return provider.get();
@@ -83,7 +81,11 @@ export class AuthProviderService {
 
     for (const parameter of profile.credentialParameters) {
       if (parameter.encryption === 'hash' && parameter.id in credentialsProcessed.credentials) {
-        credentialsProcessed.credentials[parameter.id] = this.hashValue(credentialsProcessed.credentials[parameter.id]);
+        const value = credentialsProcessed.credentials[parameter.id];
+
+        if (typeof value === 'string') {
+          credentialsProcessed.credentials[parameter.id] = this.hashValue(value);
+        }
       }
     }
 

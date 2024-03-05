@@ -1,60 +1,39 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2022 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observer } from 'mobx-react-lite';
-import { useContext, useCallback, useEffect, useRef } from 'react';
-import styled, { css } from 'reshadow';
+import { useState } from 'react';
 
-import {
-  Loader,
-  TableContext
-} from '@cloudbeaver/core-blocks';
-import { useController } from '@cloudbeaver/core-di';
+import { Loader, s, TableItemExpandProps, useS } from '@cloudbeaver/core-blocks';
+import { App, useService } from '@cloudbeaver/core-di';
+import { FormMode } from '@cloudbeaver/core-ui';
 
+import { AdministrationUserForm } from '../UserForm/AdministrationUserForm';
+import { AdministrationUserFormService } from '../UserForm/AdministrationUserFormService';
+import { AdministrationUserFormState } from '../UserForm/AdministrationUserFormState';
+import style from './UserEdit.m.css';
 
-import { UserForm } from '../UserForm/UserForm';
-import { UserEditController } from './UserEditController';
-
-const styles = css`
-    box {
-      composes: theme-background-secondary theme-text-on-secondary from global;
-      box-sizing: border-box;
-      padding-bottom: 24px;
-      height: 560px;
-      display: flex;
-      flex-direction: column;
-    }
-  `;
-
-interface Props {
-  item: string;
-}
-
-export const UserEdit = observer<Props>(function UserEdit({
-  item,
-}) {
-  const boxRef = useRef<HTMLDivElement>(null);
-  const controller = useController(UserEditController, item);
-  const tableContext = useContext(TableContext);
-  const collapse = useCallback(() => tableContext?.setItemExpand(item, false), [tableContext]);
-
-  useEffect(() => {
-    boxRef.current?.scrollIntoView({
-      behavior: 'smooth',
-      block: 'nearest',
+export const UserEdit = observer<TableItemExpandProps<string>>(function UserEdit({ item, onClose }) {
+  const styles = useS(style);
+  const administrationUserFormService = useService(AdministrationUserFormService);
+  const app = useService(App);
+  const [state] = useState(() => {
+    const state = new AdministrationUserFormState(app, administrationUserFormService, {
+      userId: item,
     });
-  }, []);
+    state.setMode(FormMode.Edit);
+    return state;
+  });
 
-  return styled(styles)(
-    <box ref={boxRef} as='div'>
-      {controller.user ? (
-        <UserForm user={controller.user} editing onCancel={collapse} />
-      ) : <Loader />}
-    </box>
+  return (
+    <div className={s(styles, { box: true })}>
+      <Loader suspense>
+        <AdministrationUserForm state={state} onClose={onClose} />
+      </Loader>
+    </div>
   );
 });

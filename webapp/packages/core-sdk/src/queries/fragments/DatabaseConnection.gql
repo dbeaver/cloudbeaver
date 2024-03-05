@@ -4,11 +4,12 @@ fragment DatabaseConnection on ConnectionInfo {
   name
   description
   driverId
+  keepAliveInterval
 
   template
   connected
   readOnly
-  
+
   saveCredentials
   credentialsSaved @include(if: $includeCredentialsSaved)
   sharedCredentials
@@ -36,6 +37,10 @@ fragment DatabaseConnection on ConnectionInfo {
     ...ObjectOriginInfo
   }
 
+  sharedSecrets @include(if: $includeSharedSecrets) {
+    displayName
+    secretId
+  }
   authNeeded @include(if: $includeAuthNeeded)
   authModel
 
@@ -43,15 +48,19 @@ fragment DatabaseConnection on ConnectionInfo {
     ...UserConnectionAuthProperties
   }
 
+  networkHandlersConfig @skip(if: $includeNetworkHandlersConfig) {
+    ...NetworkHandlerBasics
+  }
+
   networkHandlersConfig @include(if: $includeNetworkHandlersConfig) {
-    id
-    enabled
+    ...NetworkHandlerBasics
     authType
     userName
     password
     key
     savePassword
     properties
+    secureProperties
   }
 
   navigatorSettings {

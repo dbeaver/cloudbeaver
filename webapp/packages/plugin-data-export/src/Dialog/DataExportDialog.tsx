@@ -1,51 +1,42 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2022 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observer } from 'mobx-react-lite';
 
-import { useController } from '@cloudbeaver/core-di';
+import { useResource } from '@cloudbeaver/core-blocks';
 import type { DialogComponent } from '@cloudbeaver/core-dialogs';
 
 import type { IExportContext } from '../IExportContext';
-import { DataExportController, DataExportStep } from './DataExportController';
+import { DefaultExportOutputSettingsResource } from './DefaultExportOutputSettingsResource';
+import { EDataExportStep } from './EDataExportStep';
 import { ProcessorConfigureDialog } from './ProcessorConfigureDialog';
 import { ProcessorSelectDialog } from './ProcessorSelectDialog';
+import { useDataExportDialog } from './useDataExportDialog';
 
-export const DataExportDialog: DialogComponent<IExportContext> = observer(function DataExportDialog({
-  payload,
-  rejectDialog,
-}) {
-  const controller = useController(DataExportController, payload, rejectDialog);
+export const DataExportDialog: DialogComponent<IExportContext> = observer(function DataExportDialog({ payload, rejectDialog }) {
+  useResource(DataExportDialog, DefaultExportOutputSettingsResource, undefined, { forceSuspense: true });
 
-  if (controller.step === DataExportStep.Configure && controller.processor) {
+  const dialog = useDataExportDialog(payload, rejectDialog);
+
+  if (dialog.step === EDataExportStep.Configure && dialog.processor) {
     return (
       <ProcessorConfigureDialog
-        processor={controller.processor}
-        properties={controller.properties}
-        processorProperties={controller.processorProperties}
-        error={controller.error}
-        isExporting={controller.isExporting}
-        outputSettings={controller.outputSettings}
-        onShowDetails={controller.showDetails}
-        onBack={() => controller.setStep(DataExportStep.DataTransferProcessor)}
+        processor={dialog.processor}
+        properties={dialog.properties}
+        processorProperties={dialog.processorProperties}
+        error={dialog.exception}
+        isExporting={dialog.processing}
+        outputSettings={dialog.outputSettings}
+        onBack={() => dialog.setStep(EDataExportStep.DataTransferProcessor)}
         onClose={rejectDialog}
-        onExport={controller.prepareExport}
+        onExport={dialog.export}
       />
     );
   }
 
-  return (
-    <ProcessorSelectDialog
-      context={payload}
-      processors={controller.processors}
-      isLoading={controller.isLoading}
-      onSelect={controller.selectProcessor}
-      onClose={rejectDialog}
-    />
-  );
+  return <ProcessorSelectDialog context={payload} onSelect={dialog.selectProcessor} onClose={rejectDialog} />;
 });

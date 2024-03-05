@@ -1,25 +1,26 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2022 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { computed, makeObservable } from 'mobx';
 
-import { UserDataService, UserInfoResource } from '@cloudbeaver/core-authentication';
+import { ANONYMOUS_USER_ID, UserDataService, UserInfoResource } from '@cloudbeaver/core-authentication';
 import { Dependency, injectable } from '@cloudbeaver/core-di';
 import { Executor, ExecutorInterrupter, IExecutor, ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
-import { CachedMapAllKey, resourceKeyList } from '@cloudbeaver/core-sdk';
+import { CachedMapAllKey, resourceKeyList, ResourceKeyUtils } from '@cloudbeaver/core-resource';
+import { DataSynchronizationService, ServerConfigResource, ServerEventId } from '@cloudbeaver/core-root';
 import { NavigationService } from '@cloudbeaver/core-ui';
 import { isArraysEqual } from '@cloudbeaver/core-utils';
 
 import { activeProjectsContext } from './activeProjectsContext';
-import { ProjectInfoEventHandler } from './ProjectInfoEventHandler';
+import { IProjectInfoEvent, ProjectInfoEventHandler } from './ProjectInfoEventHandler';
 import { ProjectInfo, ProjectInfoResource } from './ProjectInfoResource';
 
 interface IActiveProjectData {
+  projects: string[];
   type: 'before' | 'after';
 }
 
@@ -33,9 +34,9 @@ export class ProjectsService extends Dependency {
     let project: ProjectInfo | undefined;
 
     if (this.userInfoResource.data) {
-      project =  this.projectInfoResource.getUserProject(this.userInfoResource.data.userId);
+      project = this.projectInfoResource.getUserProject(this.userInfoResource.data.userId);
     } else {
-      project = this.projectInfoResource.get('anonymous');
+      project = this.projectInfoResource.get(ANONYMOUS_USER_ID);
     }
 
     return project;
@@ -44,10 +45,8 @@ export class ProjectsService extends Dependency {
   get activeProjects(): ProjectInfo[] {
     let activeProjects: ProjectInfo[] = [];
 
-    if (activeProjects.length === 0 && this.activeProjectIds.length > 0) {
-      activeProjects =  this.projectInfoResource
-        .get(resourceKeyList(this.activeProjectIds))
-        .filter(Boolean) as ProjectInfo[];
+    if (this.activeProjectIds.length > 0) {
+      activeProjects = this.projectInfoResource.get(resourceKeyList(this.activeProjectIds)).filter(Boolean) as ProjectInfo[];
     }
 
     if (activeProjects.length === 0) {
@@ -77,24 +76,34 @@ export class ProjectsService extends Dependency {
   }
 
   get activeProjectIds(): string[] {
+    if (!this.serverConfigResource.distributed) {
+      return [];
+    }
+
     return this.userProjectsSettings.activeProjectIds;
   }
 
   get userProjectsSettings(): IProjectsUserSettings {
-    return this.userDataService.getUserData('projects-settings', () => ({
-      activeProjectIds: [],
-    }), data => Array.isArray(data.activeProjectIds));
+    return this.userDataService.getUserData(
+      'projects-settings',
+      () => ({
+        activeProjectIds: [],
+      }),
+      data => Array.isArray(data.activeProjectIds),
+    );
   }
 
   readonly onActiveProjectChange: IExecutor<IActiveProjectData>;
   readonly getActiveProjectTask: ISyncExecutor;
 
   constructor(
+    private readonly serverConfigResource: ServerConfigResource,
     private readonly projectInfoResource: ProjectInfoResource,
     private readonly userInfoResource: UserInfoResource,
     private readonly userDataService: UserDataService,
     private readonly projectInfoEventHandler: ProjectInfoEventHandler,
-    navigationService: NavigationService
+    private readonly dataSynchronizationService: DataSynchronizationService,
+    navigationService: NavigationService,
   ) {
     super();
     this.getActiveProjectTask = new SyncExecutor();
@@ -105,12 +114,14 @@ export class ProjectsService extends Dependency {
     this.userInfoResource.onUserChange.addHandler(() => {
       this.onActiveProjectChange.execute({
         type: 'after',
+        projects: this.activeProjectIds,
       });
     });
 
     this.projectInfoResource.onDataUpdate.addHandler(() => {
       this.onActiveProjectChange.execute({
         type: 'after',
+        projects: this.activeProjectIds,
       });
     });
 
@@ -123,6 +134,42 @@ export class ProjectsService extends Dependency {
     this.projectInfoEventHandler.onInit.addHandler(() => {
       this.projectInfoEventHandler.setActiveProjects(this.activeProjects.map(project => project.id));
     });
+
+    this.projectInfoResource.onItemDelete.addHandler(async data => {
+      const ids = ResourceKeyUtils.toArray(data);
+      const wasActive = ids.some(id => this.activeProjectIds.includes(id));
+      if (wasActive) {
+        await this.setActiveProjects(this.activeProjects.filter(project => !ids.includes(project.id)));
+      }
+    });
+
+    this.projectInfoEventHandler.onEvent<IProjectInfoEvent>(
+      ServerEventId.CbRmProjectAdded,
+      () => {
+        this.projectInfoResource.markOutdated();
+      },
+      undefined,
+      this.projectInfoResource,
+    );
+
+    this.projectInfoEventHandler.onEvent<IProjectInfoEvent>(
+      ServerEventId.CbRmProjectRemoved,
+      key => {
+        if (this.activeProjectIds.includes(key.projectId)) {
+          const project = this.projectInfoResource.get(key.projectId);
+
+          this.dataSynchronizationService.requestSynchronization('project', project?.name ?? '').then(state => {
+            if (state) {
+              this.projectInfoResource.delete(key.projectId);
+            }
+          });
+        } else {
+          this.projectInfoResource.delete(key.projectId);
+        }
+      },
+      undefined,
+      this.projectInfoResource,
+    );
 
     makeObservable(this, {
       userProject: computed,
@@ -142,6 +189,7 @@ export class ProjectsService extends Dependency {
 
     const context = await this.onActiveProjectChange.execute({
       type: 'before',
+      projects: ids,
     });
 
     if (ExecutorInterrupter.isInterrupted(context)) {
@@ -149,8 +197,11 @@ export class ProjectsService extends Dependency {
     }
     this.userProjectsSettings.activeProjectIds = ids;
 
+    this.projectInfoResource.markOutdated(resourceKeyList(ids));
+
     await this.onActiveProjectChange.execute({
       type: 'after',
+      projects: ids,
     });
 
     return true;

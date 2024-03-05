@@ -1,20 +1,20 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2022 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observable } from 'mobx';
 import { observer } from 'mobx-react-lite';
-import { useState, useEffect, useContext, useRef } from 'react';
+import { Suspense, useContext, useEffect, useRef, useState } from 'react';
 import styled, { use } from 'reshadow';
 
 import type { ComponentStyle } from '@cloudbeaver/core-theming';
 import { ILoadableState, uuid } from '@cloudbeaver/core-utils';
 
 import { Button } from '../Button';
+import { ErrorBoundary } from '../ErrorBoundary';
 import { ExceptionMessage } from '../ExceptionMessage';
 import { Translate } from '../localization/Translate';
 import { StaticImage } from '../StaticImage';
@@ -22,9 +22,11 @@ import { useStyles } from '../useStyles';
 import { ILoaderContext, LoaderContext } from './LoaderContext';
 import { loaderStyles, overlayStyles } from './loaderStyles';
 
-type LoaderState = ILoadableState | {
-  loading: boolean;
-};
+type LoaderState =
+  | ILoadableState
+  | {
+      loading: boolean;
+    };
 
 interface Props {
   /** if false, nothing will be rendered, by default true */
@@ -39,6 +41,8 @@ interface Props {
   hideException?: boolean;
   /** render loader as overlay with white spinner */
   overlay?: boolean;
+  /** render loader as suspense */
+  suspense?: boolean;
   /** loader with white spinner */
   secondary?: boolean;
   /** smallest spinner icon and hide loading message */
@@ -63,6 +67,7 @@ const spinnerType = {
 export const Loader = observer<Props>(function Loader({
   cancelDisabled,
   overlay,
+  suspense,
   message,
   hideMessage,
   hideException,
@@ -101,11 +106,7 @@ export const Loader = observer<Props>(function Loader({
     for (let i = 0; i < state.length; i++) {
       const element = state[i];
 
-      if (
-        'isLoaded' in element
-        && 'isLoading' in element
-      ) {
-
+      if ('isLoaded' in element && 'isLoading' in element) {
         if (i === 0 && loadingUndefined) {
           loaded = element.isLoaded();
           loading = element.isLoading();
@@ -155,10 +156,19 @@ export const Loader = observer<Props>(function Loader({
         }
 
         if ('reload' in element) {
-          reload = element.reload;
+          const reloadLink = element.reload;
+          const reloadCopy = reload;
+          reload = () => {
+            reloadCopy?.();
+            reloadLink?.();
+          };
         }
       }
     }
+  }
+
+  if (suspense) {
+    loading = false;
   }
 
   style = useStyles(loaderStyles, style, overlay && overlayStyles);
@@ -191,11 +201,14 @@ export const Loader = observer<Props>(function Loader({
     }
   });
 
-  useEffect(() => () => {
-    if (context) {
-      context.state.delete(loaderId);
-    }
-  }, []);
+  useEffect(
+    () => () => {
+      if (context) {
+        context.state.delete(loaderId);
+      }
+    },
+    [],
+  );
 
   useEffect(() => {
     if (loaderRef.current) {
@@ -203,24 +216,47 @@ export const Loader = observer<Props>(function Loader({
     }
   });
 
-  if (exception && !loading && !hideException) {
-    return styled(style)(
-      <ExceptionMessage
-        exception={exception}
-        inline={inline || inlineException}
-        className={className}
-        onRetry={reload}
-      />
+  function renderWrappedChildren() {
+    return (
+      <LoaderContext.Provider value={contextState}>
+        <ErrorBoundary icon={small} inline={inline} remount>
+          <Suspense
+            fallback={
+              <Loader
+                message={message}
+                hideMessage={hideMessage}
+                hideException={hideException}
+                secondary={secondary}
+                small={small}
+                inline={inline}
+                fullSize={fullSize}
+                className={className}
+                inlineException={inlineException}
+                style={style}
+              />
+            }
+          >
+            {typeof children === 'function' ? children() : children}
+          </Suspense>
+        </ErrorBoundary>
+      </LoaderContext.Provider>
     );
+  }
+
+  if (suspense) {
+    return renderWrappedChildren();
+  }
+
+  if (exception && !loading) {
+    if (hideException) {
+      return null;
+    }
+    return styled(style)(<ExceptionMessage exception={exception} inline={inline || inlineException} className={className} onRetry={reload} />);
   }
 
   if (children && (!loader || !loading) && !overlay) {
     if (loaded) {
-      if (typeof children === 'function') {
-        return <LoaderContext.Provider value={contextState}>{children()}</LoaderContext.Provider>;
-      } else {
-        return <LoaderContext.Provider value={contextState}>{children}</LoaderContext.Provider>;
-      }
+      return renderWrappedChildren();
     }
 
     if (!loading) {
@@ -230,11 +266,7 @@ export const Loader = observer<Props>(function Loader({
 
   if ((!isVisible && overlay) || !loading) {
     if (overlay) {
-      if (typeof children === 'function') {
-        return <LoaderContext.Provider value={contextState}>{children()}</LoaderContext.Provider>;
-      } else {
-        return <LoaderContext.Provider value={contextState}>{children}</LoaderContext.Provider>;
-      }
+      return renderWrappedChildren();
     }
 
     return null;
@@ -242,35 +274,31 @@ export const Loader = observer<Props>(function Loader({
 
   refLoaderDisplayed.state = true;
 
-  let spinnerURL: string;
-
-  if (secondary || overlay) {
-    spinnerURL = small ? spinnerType.secondarySmall : spinnerType.secondary;
-  } else {
-    spinnerURL = small ? spinnerType.primarySmall : spinnerType.primary;
-  }
-
   return styled(style)(
     <LoaderContext.Provider value={contextState}>
       <>
-        {overlay && children}
+        {overlay && renderWrappedChildren()}
         <loader ref={loaderRef} className={className} {...use({ small, fullSize, inline, secondary, overlay })}>
-          <icon><StaticImage icon={spinnerURL} /></icon>
-          {!hideMessage && <message><Translate token={message || 'ui_processing_loading'} /></message>}
+          <icon>
+            <StaticImage icon={spinnerType.primary} {...use({ primaryIcon: true })} />
+            <StaticImage icon={spinnerType.primarySmall} {...use({ primarySmallIcon: true })} />
+            <StaticImage icon={spinnerType.secondary} {...use({ secondaryIcon: true })} />
+            <StaticImage icon={spinnerType.secondarySmall} {...use({ secondarySmallIcon: true })} />
+          </icon>
+          {!hideMessage && (
+            <message>
+              <Translate token={message || 'ui_processing_loading'} />
+            </message>
+          )}
           {onCancel && (
             <actions>
-              <Button
-                type="button"
-                mod={['unelevated']}
-                disabled={cancelDisabled}
-                onClick={onCancel}
-              >
-                <Translate token='ui_processing_cancel' />
+              <Button type="button" mod={['unelevated']} disabled={cancelDisabled} onClick={onCancel}>
+                <Translate token="ui_processing_cancel" />
               </Button>
             </actions>
           )}
         </loader>
       </>
-    </LoaderContext.Provider>
+    </LoaderContext.Provider>,
   );
 });

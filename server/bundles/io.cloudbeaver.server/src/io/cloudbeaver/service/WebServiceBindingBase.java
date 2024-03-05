@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2023 DBeaver Corp and others
+ * Copyright (C) 2010-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,21 +27,20 @@ import io.cloudbeaver.server.CBApplication;
 import io.cloudbeaver.server.CBPlatform;
 import io.cloudbeaver.server.graphql.GraphQLEndpoint;
 import io.cloudbeaver.service.security.SMUtils;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.jkiss.code.NotNull;
+import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.rm.RMProject;
 import org.jkiss.utils.ArrayUtils;
-import org.jkiss.utils.CommonUtils;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.lang.reflect.*;
-import java.util.Set;
 
 /**
  * Web service implementation
@@ -121,6 +120,10 @@ public abstract class WebServiceBindingBase<API_TYPE extends DBWService> impleme
         return getWebConnection(getWebSession(env), getProjectReference(env), env.getArgument("connectionId"));
     }
 
+    /**
+     * Returns WebSession from cache or null
+     */
+    @Nullable
     public static WebSession findWebSession(DataFetchingEnvironment env) {
         return CBPlatform.getInstance().getSessionManager().findWebSession(
             getServletRequest(env));
@@ -171,7 +174,8 @@ public abstract class WebServiceBindingBase<API_TYPE extends DBWService> impleme
                     throw e.getTargetException();
                 }
             } catch (Throwable ex) {
-                if (SMUtils.isTokenExpiredExceptionWasHandled(ex)) {
+                log.error("Unexpected error during gql request", ex);
+                if (SMUtils.isRefreshTokenExpiredExceptionWasHandled(ex)) {
                     WebSession webSession = findWebSession(env);
                     if (webSession != null) {
                         webSession.resetUserState();
@@ -244,7 +248,7 @@ public abstract class WebServiceBindingBase<API_TYPE extends DBWService> impleme
 
         private void checkActionPermissions(@NotNull Method method, @NotNull WebAction webAction) throws DBWebException {
             String[] reqPermissions = webAction.requirePermissions();
-            if (reqPermissions.length == 0) {
+            if (reqPermissions.length == 0 && !webAction.authRequired()) {
                 return;
             }
             WebSession session = findWebSession(env);
@@ -261,8 +265,13 @@ public abstract class WebServiceBindingBase<API_TYPE extends DBWService> impleme
                 // Check license
                 if (application.isLicenseRequired() && !application.isLicenseValid()) {
                     if (!ArrayUtils.contains(reqPermissions, DBWConstants.PERMISSION_ADMIN)) {
+                        String errorMessage = "Invalid server license";
+                        String licenseStatus = application.getLicenseStatus();
+                        if (licenseStatus != null) {
+                            errorMessage = errorMessage + ": " + licenseStatus;
+                        }
                         // Only admin permissions are allowed
-                        throw new DBWebExceptionLicenseRequired("Invalid server license");
+                        throw new DBWebExceptionLicenseRequired(errorMessage);
                     }
                 }
                 // Check permissions

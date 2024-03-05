@@ -1,17 +1,17 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2022 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observer } from 'mobx-react-lite';
 import { useContext } from 'react';
-import styled from 'reshadow';
 
+import { s } from '../s';
+import { useS } from '../useS';
 import { FolderExplorerContext } from './FolderExplorerContext';
-import { folderExplorerStyles } from './folderExplorerStyles';
+import style from './FolderExplorerPath.m.css';
 import { FolderName } from './FolderName';
 
 interface Props {
@@ -20,11 +20,8 @@ interface Props {
   className?: string;
 }
 
-export const FolderExplorerPath = observer<Props>(function FolderExplorerPath({
-  getName,
-  canSkip,
-  className,
-}) {
+export const FolderExplorerPath = observer<Props>(function FolderExplorerPath({ getName, canSkip, className }) {
+  const styles = useS(style);
   const context = useContext(FolderExplorerContext);
 
   if (!context) {
@@ -46,25 +43,10 @@ export const FolderExplorerPath = observer<Props>(function FolderExplorerPath({
 
     if (i === 0 || i === context.state.fullPath.length - 1 || !skipFolder || context.state.fullPath.length < 5) {
       if (skip) {
-        pathElements.push(
-          <FolderName
-            key={i - 1}
-            path={path}
-            title={skipTitle}
-            short
-          />
-        );
+        pathElements.push(<FolderName key={i - 1} path={path} title={skipTitle} short />);
       }
 
-      pathElements.push(
-        <FolderName
-          key={i}
-          folder={folder}
-          path={path}
-          last={i === context.state.fullPath.length - 1}
-          getName={getName}
-        />
-      );
+      pathElements.push(<FolderName key={i} folder={folder} path={path} last={i === context.state.fullPath.length - 1} getName={getName} />);
       skip = false;
       skipTitle = '';
       continue;
@@ -74,15 +56,11 @@ export const FolderExplorerPath = observer<Props>(function FolderExplorerPath({
       if (skipTitle !== '') {
         skipTitle += ' > ';
       }
-      skipTitle += (getName?.(folder) || folder);
+      skipTitle += getName?.(folder) || folder;
       skip = true;
       continue;
     }
   }
 
-  return styled(folderExplorerStyles)(
-    <folder-explorer-path className={className}>
-      {pathElements}
-    </folder-explorer-path>
-  );
+  return <div className={s(styles, { folderExplorerPath: true }, className)}>{pathElements}</div>;
 });

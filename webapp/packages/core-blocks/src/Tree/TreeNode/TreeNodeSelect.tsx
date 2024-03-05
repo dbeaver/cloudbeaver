@@ -1,28 +1,22 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2022 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observer } from 'mobx-react-lite';
 import { useContext } from 'react';
-import styled, { css } from 'reshadow';
 
 import { EventContext } from '@cloudbeaver/core-events';
 
 import { Checkbox } from '../../FormControls/Checkboxes/Checkbox';
 import { Loader } from '../../Loader/Loader';
+import { s } from '../../s';
+import { useS } from '../../useS';
 import { EventTreeNodeSelectFlag } from './EventTreeNodeSelectFlag';
 import { TreeNodeContext } from './TreeNodeContext';
-
-const styles = css`
-  Loader {
-    width: 40px;
-    height: 40px;
-  }
-`;
+import style from './TreeNodeSelect.m.css';
 
 interface Props {
   group?: boolean;
@@ -43,6 +37,7 @@ export const TreeNodeSelect = observer<Props>(function TreeNodeSelect({
   loadIndicator,
   className,
 }) {
+  const styles = useS(style);
   const context = useContext(TreeNodeContext);
 
   if (!context) {
@@ -68,18 +63,13 @@ export const TreeNodeSelect = observer<Props>(function TreeNodeSelect({
     EventContext.set(event, EventTreeNodeSelectFlag);
   }
 
-  return styled(styles)(
+  return (
     <div className={className} onClick={handleClick} onDoubleClick={handleDbClick}>
-      {loading
-        ? <Loader small />
-        : (
-          <Checkbox
-            checked={selected}
-            indeterminate={indeterminate}
-            disabled={disabled}
-            onChange={handleSelect}
-          />
-        )}
+      {loading ? (
+        <Loader className={s(styles, { loader: true })} small />
+      ) : (
+        <Checkbox checked={selected} indeterminate={indeterminate} disabled={disabled} onChange={handleSelect} />
+      )}
     </div>
   );
 });

@@ -1,11 +1,10 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2022 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observer } from 'mobx-react-lite';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import styled from 'reshadow';
@@ -16,11 +15,19 @@ import { EventContext, EventStopPropagationFlag } from '@cloudbeaver/core-events
 import { Executor } from '@cloudbeaver/core-executor';
 import { ClipboardService } from '@cloudbeaver/core-ui';
 import {
-  DatabaseDataSelectActionsData, DatabaseEditChangeType, IDatabaseResultSet, IDataPresentationProps,
-  IResultSetEditActionData, IResultSetElementKey, IResultSetPartialKey, ResultSetDataKeysUtils, ResultSetSelectAction
+  DatabaseDataSelectActionsData,
+  DatabaseEditChangeType,
+  IDatabaseResultSet,
+  IDataPresentationProps,
+  IResultSetEditActionData,
+  IResultSetElementKey,
+  IResultSetPartialKey,
+  IResultSetRowKey,
+  ResultSetDataKeysUtils,
+  ResultSetSelectAction,
 } from '@cloudbeaver/plugin-data-viewer';
-import type { DataGridHandle, Position } from '@cloudbeaver/plugin-react-data-grid';
-import DataGrid from '@cloudbeaver/plugin-react-data-grid';
+import DataGrid, { CellSelectArgs, type DataGridHandle, type Position } from '@cloudbeaver/plugin-react-data-grid';
+import '@cloudbeaver/plugin-react-data-grid/react-data-grid-dist/lib/styles.css';
 
 import { CellPosition, EditingContext } from '../Editing/EditingContext';
 import { useEditing } from '../Editing/useEditing';
@@ -49,7 +56,13 @@ function isAtBottom(event: React.UIEvent<HTMLDivElement>): boolean {
 const rowHeight = 25;
 const headerHeight = 28;
 
-export const DataGridTable = observer<IDataPresentationProps<any, IDatabaseResultSet>>(function DataGridTable({ model, actions, resultIndex, className }) {
+export const DataGridTable = observer<IDataPresentationProps<any, IDatabaseResultSet>>(function DataGridTable({
+  model,
+  actions,
+  resultIndex,
+  simple,
+  className,
+}) {
   const translate = useTranslate();
 
   const clipboardService = useService(ClipboardService);
@@ -57,10 +70,13 @@ export const DataGridTable = observer<IDataPresentationProps<any, IDatabaseResul
   const editorRef = useRef<HTMLDivElement>(null);
   const dataGridDivRef = useRef<HTMLDivElement | null>(null);
   const dataGridRef = useRef<DataGridHandle>(null);
-  const innerState = useObjectRef<IInnerState>(() => ({
-    lastCount: 0,
-    lastScrollTop: 0,
-  }), false);
+  const innerState = useObjectRef<IInnerState>(
+    () => ({
+      lastCount: 0,
+      lastScrollTop: 0,
+    }),
+    false,
+  );
   const styles = useStyles(reactGridStyles, baseStyles);
   const [columnResize] = useState(() => new Executor<IColumnResizeInfo>());
 
@@ -145,11 +161,7 @@ export const DataGridTable = observer<IDataPresentationProps<any, IDatabaseResul
 
   const hamdlers = useObjectRef(() => ({
     selectCell(pos: Position, scroll = false): void {
-      if (
-        dataGridRef.current?.selectedCell.idx !== pos.idx
-        || dataGridRef.current.selectedCell.rowIdx !== pos.rowIdx
-        || scroll
-      ) {
+      if (dataGridRef.current?.selectedCell.idx !== pos.idx || dataGridRef.current.selectedCell.rowIdx !== pos.rowIdx || scroll) {
         dataGridRef.current?.selectCell(pos);
       }
     },
@@ -212,8 +224,7 @@ export const DataGridTable = observer<IDataPresentationProps<any, IDatabaseResul
 
     switch (event.nativeEvent.code) {
       case 'Delete': {
-        const filteredRows = activeRows
-          .filter(cell => tableData.editor.getElementState(cell) !== DatabaseEditChangeType.delete);
+        const filteredRows = activeRows.filter(cell => tableData.editor.getElementState(cell) !== DatabaseEditChangeType.delete);
 
         if (filteredRows.length > 0) {
           const editor = tableData.editor;
@@ -264,12 +275,7 @@ export const DataGridTable = observer<IDataPresentationProps<any, IDatabaseResul
   useEffect(() => {
     function syncEditor(data: IResultSetEditActionData) {
       const editor = tableData.editor;
-      if (
-        data.resultId !== editor.result.id
-        || !data.value
-        || data.value.length === 0
-        || data.type === DatabaseEditChangeType.delete
-      ) {
+      if (data.resultId !== editor.result.id || !data.value || data.value.length === 0 || data.type === DatabaseEditChangeType.delete) {
         return;
       }
 
@@ -288,7 +294,7 @@ export const DataGridTable = observer<IDataPresentationProps<any, IDatabaseResul
       if (selectionAction.isFocused(key)) {
         const rowTop = rowIdx * rowHeight;
         const gridDiv = dataGridDivRef.current;
-        dataGridRef.current?.scrollToColumn(idx);
+        dataGridRef.current?.scrollToCell({ idx });
 
         if (gridDiv) {
           if (rowTop < gridDiv.scrollTop - rowHeight + headerHeight) {
@@ -310,9 +316,11 @@ export const DataGridTable = observer<IDataPresentationProps<any, IDatabaseResul
     tableData.editor.action.addHandler(syncEditor);
 
     function syncFocus(data: DatabaseDataSelectActionsData<IResultSetPartialKey>) {
-      setTimeout(() => { // TODO: update focus after render rows update
+      setTimeout(() => {
+        // TODO: update focus after render rows update
         if (data.type === 'focus') {
           if (!data.key?.column || !data.key.row) {
+            focusSyncRef.current = null;
             return;
           }
 
@@ -337,9 +345,9 @@ export const DataGridTable = observer<IDataPresentationProps<any, IDatabaseResul
     const gridDiv = dataGridDivRef.current;
 
     if (
-      gridDiv
-      && innerState.lastCount > model.source.count
-      && model.source.count * rowHeight < gridDiv.scrollTop + gridDiv.clientHeight - headerHeight
+      gridDiv &&
+      innerState.lastCount > model.source.count &&
+      model.source.count * rowHeight < gridDiv.scrollTop + gridDiv.clientHeight - headerHeight
     ) {
       gridDiv.scrollTo({
         top: model.source.count * rowHeight - gridDiv.clientHeight + headerHeight - 1,
@@ -349,24 +357,25 @@ export const DataGridTable = observer<IDataPresentationProps<any, IDatabaseResul
     innerState.lastCount = model.source.count;
   }, [model.source.count]);
 
-  const handleFocusChange = (position: CellPosition) => {
-    if (
-      focusSyncRef.current
-      && focusSyncRef.current.idx === position.idx
-      && focusSyncRef.current.rowIdx === position.rowIdx
-    ) {
+  const handleFocusChange = (event: CellSelectArgs<IResultSetRowKey>) => {
+    const columnIndex = event.column.idx;
+    const rowIndex = event.rowIdx;
+
+    if (focusSyncRef.current && focusSyncRef.current.idx === columnIndex && focusSyncRef.current.rowIdx === rowIndex) {
       focusSyncRef.current = null;
       return;
     }
 
-    const column = tableData.getColumn(position.idx);
-    const row = tableData.getRow(position.rowIdx);
+    const column = tableData.getColumn(columnIndex);
+    const row = tableData.getRow(rowIndex);
 
-    if (column && row) {
+    if (column?.columnDataIndex && row) {
       selectionAction.focus({
         row,
-        column: { index: 0, ...column.columnDataIndex },
+        column: { ...column.columnDataIndex },
       });
+    } else {
+      selectionAction.focus(null);
     }
   };
 
@@ -388,19 +397,23 @@ export const DataGridTable = observer<IDataPresentationProps<any, IDatabaseResul
 
       await model.requestDataPortion(0, model.countGain + model.source.count);
     },
-    [model, resultIndex]
+    [model, resultIndex],
   );
 
-  const gridContext = useMemo<IDataGridContext>(() => ({
-    model,
-    actions,
-    columnResize,
-    resultIndex,
-    isGridInFocus,
-    getEditorPortal: () => editorRef.current,
-    getDataGridApi: () => dataGridRef.current,
-    focus: restoreFocus,
-  }), [model, actions, resultIndex, editorRef, dataGridRef, gridContainerRef, restoreFocus]);
+  const gridContext = useMemo<IDataGridContext>(
+    () => ({
+      model,
+      actions,
+      columnResize,
+      resultIndex,
+      simple,
+      isGridInFocus,
+      getEditorPortal: () => editorRef.current,
+      getDataGridApi: () => dataGridRef.current,
+      focus: restoreFocus,
+    }),
+    [model, actions, resultIndex, simple, editorRef, dataGridRef, gridContainerRef, restoreFocus],
+  );
 
   if (!tableData.columns.length) {
     return <TextPlaceholder>{translate('data_grid_table_empty_placeholder')}</TextPlaceholder>;
@@ -424,16 +437,16 @@ export const DataGridTable = observer<IDataPresentationProps<any, IDatabaseResul
                 className={`cb-react-grid-theme ${className}`}
                 columns={tableData.columns}
                 defaultColumnOptions={{
-                  minWidth: 50,
+                  minWidth: 80,
                   resizable: true,
-                  formatter: CellFormatter,
+                  renderCell: props => <CellFormatter {...props} />,
                 }}
                 rows={tableData.rows}
                 rowKeyGetter={ResultSetDataKeysUtils.serialize}
                 headerRowHeight={headerHeight}
                 rowHeight={rowHeight}
-                components={{
-                  cellRenderer: CellRenderer,
+                renderers={{
+                  renderCell: (key, props) => <CellRenderer key={key} {...props} />,
                 }}
                 onSelectedCellChange={handleFocusChange}
                 onColumnResize={(idx, width) => columnResize.execute({ column: idx, width })}
@@ -444,6 +457,6 @@ export const DataGridTable = observer<IDataPresentationProps<any, IDatabaseResul
           </TableDataContext.Provider>
         </EditingContext.Provider>
       </DataGridSelectionContext.Provider>
-    </DataGridContext.Provider>
+    </DataGridContext.Provider>,
   );
 });

@@ -1,76 +1,28 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2022 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observer } from 'mobx-react-lite';
-import { useCallback, useEffect, useState } from 'react';
-import styled, { css, use } from 'reshadow';
-
-import type { ComponentStyle } from '@cloudbeaver/core-theming';
+import { useCallback } from 'react';
 
 import { IconButton } from '../IconButton';
+import { s } from '../s';
 import { useFocus } from '../useFocus';
-import { useStyles } from '../useStyles';
-import { InputField } from './InputField';
-
-const filterStyles = css`
-  filter-container {
-    position: relative;
-    min-width: 24px;
-    min-height: 24px;
-  }
-  InputField {
-    display: none;
-    width: 300px;
-    &[|max] {
-      width: 100%;
-    }
-    &[|toggled] {
-      display: block;
-    }
-  }
-  IconButton {
-    position: absolute;
-    right: 0;
-    top: 0;
-    margin: 0;
-    width: 24px;
-    height: 24px;
-    border-radius: 2px;
-    cursor: auto;
-
-    &[|toggled] {
-      right: 4px;
-      top: 4px;
-    }
-  }
-`;
-
-const toggleModeButtonStyle = css`
-    IconButton {
-      composes: theme-background-primary theme-text-on-primary from global;
-      cursor: pointer;
-    }
-`;
-
-const innerInputStyle = css`
-  input {
-    padding-right: 40px !important;
-  }
-`;
+import { useS } from '../useS';
+import filterStyle from './Filter.m.css';
+import { InputField } from './InputField/InputField';
 
 interface BaseProps {
-  toggleMode?: boolean;
   placeholder?: string;
   disabled?: boolean;
+  disableActions?: boolean;
+  applyDisabled?: boolean;
   max?: boolean;
   className?: string;
-  style?: ComponentStyle;
-  onToggle?: (status: boolean) => void;
+  onApply?: (value: string) => void;
   onKeyDown?: (event: React.KeyboardEvent<HTMLInputElement>) => void;
   onClick?: (event: React.MouseEvent<HTMLDivElement>) => void;
 }
@@ -79,68 +31,48 @@ type ControlledProps = BaseProps & {
   name?: string;
   value?: string;
   state?: never;
-  onFilter?: (value: string, name?: string) => void;
+  onChange?: (value: string, name?: string) => void;
 };
 
 type ObjectsProps<TKey extends keyof TState, TState> = BaseProps & {
   name: TKey;
   state: TState;
   value?: never;
-  onFilter?: (value: TState[TKey], name: TKey) => void;
+  onChange?: (value: TState[TKey], name: TKey) => void;
 };
 
 export const Filter = observer<ControlledProps | ObjectsProps<any, any>>(function Filter({
   state,
   name,
   value: valueControlled,
-  toggleMode,
   placeholder,
   disabled,
+  disableActions,
+  applyDisabled,
   max,
   className,
-  style,
-  onFilter,
-  onToggle,
+  onApply,
+  onChange,
   onKeyDown,
   onClick,
 }) {
-  const styles = useStyles(filterStyles, style, toggleMode && toggleModeButtonStyle);
-  const [inputRef, ref] = useFocus<HTMLInputElement>({});
-  const [toggled, setToggled] = useState(!toggleMode);
+  const styles = useS(filterStyle);
+  const [inputRef] = useFocus<HTMLInputElement>({});
 
-  const filter = useCallback((value: string | number, name?: string) => {
-    value = String(value);
+  const filter = useCallback(
+    (value: string | number, name?: string) => {
+      value = String(value);
 
-    if (state && name) {
-      state[name] = value;
-    }
+      if (state && name) {
+        state[name] = value;
+      }
 
-    if (onFilter) {
-      onFilter(value, name);
-    }
-  }, [onFilter, state]);
-
-  const toggle = useCallback(() => {
-    if (!toggleMode) {
-      return;
-    }
-
-    if (toggled) {
-      filter('');
-    }
-
-    setToggled(!toggled);
-
-    if (onToggle) {
-      onToggle(!toggled);
-    }
-  }, [toggleMode, toggled, onToggle, filter]);
-
-  useEffect(() => {
-    if (toggled && toggleMode) {
-      ref.reference?.focus();
-    }
-  }, [toggled, toggleMode, ref.reference]);
+      if (onChange) {
+        onChange(value, name);
+      }
+    },
+    [onChange, state],
+  );
 
   let value: any = valueControlled;
 
@@ -148,25 +80,56 @@ export const Filter = observer<ControlledProps | ObjectsProps<any, any>>(functio
     value = state[name];
   }
 
-  return styled(styles)(
-    <filter-container className={className} onClick={onClick}>
+  function handleKeyDown(event: React.KeyboardEvent<HTMLInputElement>) {
+    if (event.key === 'Enter' && onApply && !applyDisabled) {
+      onApply(value);
+    }
+
+    onKeyDown?.(event);
+  }
+
+  function clean() {
+    filter('', name);
+
+    if (onApply) {
+      onApply('');
+    }
+  }
+
+  const manualMode = !!onApply;
+  const edited = !!String(value);
+
+  return (
+    <div className={s(styles, { filterContainer: true }, className)} onClick={onClick}>
       <InputField
         ref={inputRef}
-        style={[innerInputStyle, style]}
+        type="search"
+        className={s(styles, { inputField: true, max })}
         placeholder={placeholder}
         disabled={disabled}
         name={name}
         value={value}
         onChange={filter}
-        onKeyDown={onKeyDown}
-        {...use({ toggled, max })}
+        onKeyDown={handleKeyDown}
       />
-      <IconButton
-        name='search'
-        disabled={disabled}
-        onClick={toggle}
-        {...use({ toggled })}
-      />
-    </filter-container>
+
+      {edited && (
+        <IconButton
+          className={s(styles, { iconButton: true, cross: true, manualMode })}
+          name="cross"
+          disabled={disabled || disableActions}
+          onClick={clean}
+        />
+      )}
+
+      {(!edited || manualMode) && (
+        <IconButton
+          className={s(styles, { iconButton: true, manualMode })}
+          name="search"
+          disabled={disabled || applyDisabled || disableActions}
+          onClick={onApply ? () => onApply(value) : undefined}
+        />
+      )}
+    </div>
   );
 });

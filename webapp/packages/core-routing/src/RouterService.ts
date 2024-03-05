@@ -1,19 +1,16 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2022 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
-import { observable, makeObservable, runInAction } from 'mobx';
-import createRouter, {
-  State, Router, SubscribeFn, SubscribeState
-} from 'router5';
+import { makeObservable, observable, runInAction } from 'mobx';
+import createRouter, { Router, State, SubscribeFn, SubscribeState } from 'router5';
 import browserPlugin from 'router5-plugin-browser';
 import type { DoneFn } from 'router5/dist/types/base';
 
-import { injectable, Bootstrap } from '@cloudbeaver/core-di';
+import { App, Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { Executor, ExecutorInterrupter, IExecutor } from '@cloudbeaver/core-executor';
 import { GlobalConstants } from '@cloudbeaver/core-utils';
 
@@ -46,7 +43,7 @@ export class RouterService extends Bootstrap {
   private currentRoute = '';
   private currentParams: Record<string, any> = {};
 
-  constructor() {
+  constructor(private readonly app: App) {
     super();
 
     this.transitionTask = new Executor();
@@ -70,23 +67,37 @@ export class RouterService extends Bootstrap {
     return this.router.subscribe(subscriber);
   }
 
-  register(): void | Promise<void> { }
+  register(): void | Promise<void> {}
   load(): void | Promise<void> {
     this.start();
   }
 
+  reload(): void {
+    this.app.start();
+    // this.router.navigate(
+    //   this.route,
+    //   this.params,
+    //   {
+    //     reload: true,
+    //   }
+    // );
+  }
+
   private configure() {
-    this.router.usePlugin(browserPlugin({
-      useHash: true,
-      base: GlobalConstants.rootURI,
-    }));
+    let root = GlobalConstants.rootURI;
+    if (!root.endsWith('/')) {
+      root = root + '/';
+    }
+
+    this.router.usePlugin(
+      browserPlugin({
+        useHash: true,
+        base: root,
+      }),
+    );
 
     this.router.subscribe(this.onRouteChange.bind(this));
-    this.router.useMiddleware(() => async (
-      fromState,
-      toState,
-      done
-    ) => {
+    this.router.useMiddleware(() => async (fromState, toState, done) => {
       const contexts = await this.transitionTask.execute({ fromState: toState, toState: fromState, done });
 
       if (ExecutorInterrupter.isInterrupted(contexts)) {
@@ -95,8 +106,7 @@ export class RouterService extends Bootstrap {
       }
 
       return Promise.resolve();
-    }
-    );
+    });
   }
 
   private onRouteChange(state: SubscribeState) {

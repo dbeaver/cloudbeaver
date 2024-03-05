@@ -1,16 +1,15 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2022 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
-import { computed, makeObservable, observable, runInAction } from 'mobx';
+import { computed, makeObservable, observable } from 'mobx';
 
 import { injectable } from '@cloudbeaver/core-di';
+import { CachedMapResource, resourceKeyList } from '@cloudbeaver/core-resource';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
-import { CachedMapAllKey, CachedMapResource, ResourceKey } from '@cloudbeaver/core-sdk';
 
 export interface IVersion {
   number: string;
@@ -31,23 +30,16 @@ export class VersionResource extends CachedMapResource<string, IVersion> {
     return this.values.find(v => v.number === this.latestVersionNumber);
   }
 
-  constructor(
-    private readonly serverConfigResource: ServerConfigResource,
-  ) {
+  constructor(private readonly serverConfigResource: ServerConfigResource) {
     super();
 
     this.latestVersionNumber = null;
-    this.preloadResource(this.serverConfigResource, () => { });
+    this.preloadResource(this.serverConfigResource, () => {});
 
     makeObservable<this, 'latestVersionNumber'>(this, {
       latestVersionNumber: observable.ref,
       latest: computed,
     });
-  }
-
-  async refreshAll(): Promise<Map<string, IVersion>> {
-    await this.refresh(CachedMapAllKey);
-    return this.data;
   }
 
   protected async loader(): Promise<Map<string, IVersion>> {
@@ -61,35 +53,25 @@ export class VersionResource extends CachedMapResource<string, IVersion> {
         cache: 'no-cache',
       });
 
-      const json = await response.json() as IVersions;
+      const json = (await response.json()) as IVersions;
 
       if (json.latestVersion) {
         this.latestVersionNumber = json.latestVersion;
       }
 
-
       if (!json.versions) {
         return this.data;
       }
 
-      runInAction(() => {
-        this.data.clear();
-        for (const version of json.versions!) {
-          this.data.set(version.number, version);
-        }
-      });
-
-    } catch {
-      throw new Error('versions_load_fail');
+      this.replace(resourceKeyList(json.versions.map(version => version.number)), json.versions);
+    } catch (exception: any) {
+      throw new Error('versions_load_fail', { cause: exception });
     }
 
     return this.data;
   }
 
-  protected validateParam(param: ResourceKey<string>): boolean {
-    return (
-      super.validateParam(param)
-      || typeof param === 'string'
-    );
+  protected validateKey(key: string): boolean {
+    return typeof key === 'string';
   }
 }

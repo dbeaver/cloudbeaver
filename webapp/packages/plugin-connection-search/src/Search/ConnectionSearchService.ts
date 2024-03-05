@@ -1,16 +1,16 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2022 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
+import { makeObservable, observable } from 'mobx';
 
-import { observable, makeObservable } from 'mobx';
-
+import { ConfirmationDialog } from '@cloudbeaver/core-blocks';
 import { ConnectionInfoResource, ConnectionsManagerService, createConnectionParam } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
-import { CommonDialogService, ConfirmationDialog, DialogueStateResult } from '@cloudbeaver/core-dialogs';
+import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { ExecutorInterrupter, IExecutorHandler } from '@cloudbeaver/core-executor';
 import { ProjectInfoResource, ProjectsService } from '@cloudbeaver/core-projects';
@@ -106,16 +106,11 @@ export class ConnectionSearchService {
 
   private async showUnsavedChangesDialog(): Promise<boolean> {
     if (
-      !this.formState
-      || !this.optionsPanelService.isOpen(formGetter)
-      || (
-        this.formState.config.connectionId
-        && this.formState.projectId !== null
-        && !this.connectionInfoResource.has(createConnectionParam(
-          this.formState.projectId,
-          this.formState.config.connectionId
-        ))
-      )
+      !this.formState ||
+      !this.optionsPanelService.isOpen(formGetter) ||
+      (this.formState.config.connectionId &&
+        this.formState.projectId !== null &&
+        !this.connectionInfoResource.has(createConnectionParam(this.formState.projectId, this.formState.config.connectionId)))
     ) {
       return true;
     }
@@ -160,26 +155,20 @@ export class ConnectionSearchService {
         this.projectsService,
         this.projectInfoResource,
         this.connectionFormService,
-        this.connectionInfoResource
+        this.connectionInfoResource,
       );
 
       this.formState.closeTask.addHandler(this.goBack.bind(this));
     }
 
     this.formState
-      .setOptions(
-        'create',
-        'public'
-      )
-      .setConfig(
-        projects[0].id,
-        {
-          ...this.connectionInfoResource.getEmptyConfig(),
-          driverId: database.defaultDriver,
-          host: database.host,
-          port: `${database.port}`,
-        }
-      )
+      .setOptions('create', 'public')
+      .setConfig(projects[0].id, {
+        ...this.connectionInfoResource.getEmptyConfig(),
+        driverId: database.defaultDriver,
+        host: database.host,
+        port: `${database.port}`,
+      })
       .setAvailableDrivers(database.possibleDrivers);
 
     this.formState.load();

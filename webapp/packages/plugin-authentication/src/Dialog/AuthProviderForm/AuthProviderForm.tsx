@@ -1,29 +1,23 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2022 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observer } from 'mobx-react-lite';
-import styled from 'reshadow';
 
-import type { AuthProvider, IAuthCredentials } from '@cloudbeaver/core-authentication';
-import { BASE_CONTAINERS_STYLES, Combobox, Group, InputField, useFocus, useStyles } from '@cloudbeaver/core-blocks';
-
+import type { AuthProvider, AuthProviderConfiguration, IAuthCredentials } from '@cloudbeaver/core-authentication';
+import { Combobox, Group, InputField, useFocus } from '@cloudbeaver/core-blocks';
 
 interface Props {
   provider: AuthProvider;
+  configuration: AuthProviderConfiguration | null;
   credentials: IAuthCredentials;
   authenticate: boolean;
 }
 
-export const AuthProviderForm = observer<Props>(function AuthProviderForm({
-  provider,
-  credentials,
-  authenticate,
-}) {
+export const AuthProviderForm = observer<Props>(function AuthProviderForm({ provider, configuration, credentials, authenticate }) {
   const [elementRef] = useFocus<HTMLDivElement>({ focusFirstChild: true });
 
   function handleProfileSelect() {
@@ -32,7 +26,7 @@ export const AuthProviderForm = observer<Props>(function AuthProviderForm({
 
   const profile = provider.credentialProfiles[credentials.profile as any as number];
 
-  return styled(useStyles(BASE_CONTAINERS_STYLES))(
+  return (
     <Group ref={elementRef} gap small center>
       {provider.credentialProfiles.length > 1 && (
         <Combobox
@@ -47,20 +41,24 @@ export const AuthProviderForm = observer<Props>(function AuthProviderForm({
           onSelect={handleProfileSelect}
         />
       )}
-      {profile.credentialParameters.map(parameter => parameter.user && (
-        <InputField
-          key={parameter.id}
-          title={parameter.description}
-          type={parameter.encryption === 'none' ? 'text' : 'password'}
-          name={parameter.id}
-          state={credentials.credentials}
-          disabled={authenticate}
-          autoComplete={`section-authentication section-${provider.id} ${parameter.id}`}
-          mod='surface'
-        >
-          {parameter.displayName}
-        </InputField>
-      ))}
+      {profile.credentialParameters.map(
+        parameter =>
+          parameter.user && (
+            <InputField
+              key={`${provider.id}${configuration?.id ?? ''}${parameter.id}`}
+              required={provider.required}
+              title={parameter.description}
+              type={parameter.encryption === 'none' ? 'text' : 'password'}
+              name={parameter.id}
+              state={credentials.credentials}
+              disabled={authenticate}
+              canShowPassword={false}
+              autoComplete={`section-authentication section-${provider.id} ${configuration?.id ?? ''} ${parameter.id}`}
+            >
+              {parameter.displayName}
+            </InputField>
+          ),
+      )}
     </Group>
   );
 });

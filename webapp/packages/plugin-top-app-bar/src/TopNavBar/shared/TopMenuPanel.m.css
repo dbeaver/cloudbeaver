@@ -1,0 +1,10 @@
+.menuBox {
+  composes: theme-text-on-primary from global;
+  background-color: #338ecc !important;
+}
+
+.menu:not(.submenu) .menuBox {
+  clip-path: inset(0px -16px -16px -16px); /* clip shadow from top edge of menu */
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+}

@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2023 DBeaver Corp and others
+ * Copyright (C) 2010-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,11 +16,14 @@
  */
 package io.cloudbeaver.model.app;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import io.cloudbeaver.DataSourceFilter;
 import io.cloudbeaver.WebProjectImpl;
+import io.cloudbeaver.WebSessionProjectImpl;
 import io.cloudbeaver.model.log.SLF4JLogHandler;
 import io.cloudbeaver.model.session.WebSession;
-import io.cloudbeaver.server.WebWorkspace;
+import io.cloudbeaver.server.WebGlobalWorkspace;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.equinox.app.IApplicationContext;
@@ -28,9 +31,11 @@ import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
+import org.jkiss.dbeaver.model.DBFileController;
 import org.jkiss.dbeaver.model.app.DBPPlatform;
 import org.jkiss.dbeaver.model.app.DBPWorkspace;
 import org.jkiss.dbeaver.model.auth.SMCredentialsProvider;
+import org.jkiss.dbeaver.model.auth.SMSessionContext;
 import org.jkiss.dbeaver.model.data.json.JSONUtils;
 import org.jkiss.dbeaver.model.impl.app.ApplicationRegistry;
 import org.jkiss.dbeaver.model.rm.RMController;
@@ -54,7 +59,9 @@ import java.util.Map;
 public abstract class BaseWebApplication extends BaseApplicationImpl implements WebApplication {
 
     public static final String DEFAULT_CONFIG_FILE_PATH = "/etc/cloudbeaver.conf";
+    public static final String CUSTOM_CONFIG_FOLDER = "custom";
     public static final String CLI_PARAM_WEB_CONFIG = "-web-config";
+    public static final String LOGBACK_FILE_NAME = "logback.xml";
 
 
     private static final Log log = Log.getLog(BaseWebApplication.class);
@@ -62,12 +69,21 @@ public abstract class BaseWebApplication extends BaseApplicationImpl implements 
     @NotNull
     @Override
     public DBPWorkspace createWorkspace(@NotNull DBPPlatform platform, @NotNull IWorkspace eclipseWorkspace) {
-        return new WebWorkspace(platform, eclipseWorkspace);
+        return new WebGlobalWorkspace(platform, eclipseWorkspace);
     }
 
     @Override
-    public RMController createResourceController(@NotNull SMCredentialsProvider credentialsProvider) {
+    public RMController createResourceController(
+        @NotNull SMCredentialsProvider credentialsProvider,
+        @NotNull DBPWorkspace workspace
+    ) throws DBException {
         throw new IllegalStateException("Resource controller is not supported by " + getClass().getSimpleName());
+    }
+
+    @NotNull
+    @Override
+    public DBFileController createFileController(@NotNull SMCredentialsProvider credentialsProvider) {
+        throw new IllegalStateException("File controller is not supported by " + getClass().getSimpleName());
     }
 
     @Nullable
@@ -88,6 +104,56 @@ public abstract class BaseWebApplication extends BaseApplicationImpl implements 
 
     @Nullable
     protected Path loadServerConfiguration() throws DBException {
+        Path configFilePath = getMainConfigurationFilePath().toAbsolutePath();
+        Path configFolder = configFilePath.getParent();
+
+        // Configure logging
+        Path logbackConfigPath = getLogbackConfigPath(configFolder);
+
+        if (logbackConfigPath == null) {
+            System.err.println("Can't find slf4j configuration file in " + configFilePath.getParent());
+        } else {
+            System.setProperty("logback.configurationFile", logbackConfigPath.toString());
+        }
+        Log.setLogHandler(new SLF4JLogHandler());
+
+        // Load config file
+        log.debug("Loading configuration from " + configFilePath);
+        try {
+            loadConfiguration(configFilePath);
+        } catch (Exception e) {
+            log.error("Error parsing configuration", e);
+            return null;
+        }
+
+        return configFilePath;
+    }
+
+    @Nullable
+    private Path getLogbackConfigPath(Path path) {
+        // try to find custom logback.xml file
+        Path logbackConfigPath = getCustomConfigPath(path, LOGBACK_FILE_NAME);
+        if (Files.exists(logbackConfigPath)) {
+            return logbackConfigPath;
+        }
+        for (Path confFolder = path; confFolder != null; confFolder = confFolder.getParent()) {
+            Path lbFile = confFolder.resolve(LOGBACK_FILE_NAME);
+            if (Files.exists(lbFile)) {
+                return lbFile;
+            }
+        }
+        return null;
+    }
+
+    public Path getLogbackConfigPath() {
+        Path configFilePath = getMainConfigurationFilePath().toAbsolutePath();
+        Path configFolder = configFilePath.getParent();
+
+        // Configure logging
+        return getLogbackConfigPath(configFolder);
+    }
+
+    private Path getMainConfigurationFilePath() {
         String configPath = DEFAULT_CONFIG_FILE_PATH;
 
         String[] args = Platform.getCommandLineArgs();
@@ -97,38 +163,23 @@ public abstract class BaseWebApplication extends BaseApplicationImpl implements 
                 break;
             }
         }
-        Path path = Path.of(configPath).toAbsolutePath();
+        // try fo find custom config path (it is used mostly for docker volumes)
+        Path configFilePath = Path.of(configPath);
 
-        // Configure logging
-        Path logbackConfigPath = null;
-        for (Path confFolder = path.getParent(); confFolder != null; confFolder = confFolder.getParent()) {
-            Path lbFile = confFolder.resolve("logback.xml");
-            if (Files.exists(lbFile)) {
-                logbackConfigPath = lbFile;
-                break;
-            }
+        Path customConfigPath = getCustomConfigPath(configFilePath.getParent(), configFilePath.getFileName().toString());
+        if (Files.exists(customConfigPath)) {
+            return customConfigPath;
         }
-
-        if (logbackConfigPath == null) {
-            System.err.println("Can't find slf4j configuration file in " + path.getParent());
-        } else {
-            System.setProperty("logback.configurationFile", logbackConfigPath.toString());
-        }
-        Log.setLogHandler(new SLF4JLogHandler());
-
-        // Load config file
-        log.debug("Loading configuration from " + path);
-        try {
-            loadConfiguration(configPath);
-        } catch (Exception e) {
-            log.error("Error parsing configuration", e);
-            return null;
-        }
-
-        return path;
+        return configFilePath;
     }
 
-    protected abstract void loadConfiguration(String configPath) throws DBException;
+    @NotNull
+    private Path getCustomConfigPath(Path configPath, String fileName) {
+        var customConfigPath = configPath.resolve(CUSTOM_CONFIG_FOLDER).resolve(fileName);
+        return Files.exists(customConfigPath) ? customConfigPath : configPath.resolve(fileName);
+    }
+
+    protected abstract void loadConfiguration(Path configPath) throws DBException;
 
     @Override
     public WebProjectImpl createProjectImpl(
@@ -136,9 +187,8 @@ public abstract class BaseWebApplication extends BaseApplicationImpl implements 
         @NotNull RMProject project,
         @NotNull DataSourceFilter dataSourceFilter
     ) {
-        return new WebProjectImpl(
-            webSession.getRmController(),
-            webSession.getSessionContext(),
+        return new WebSessionProjectImpl(
+            webSession,
             project,
             dataSourceFilter
         );
@@ -150,11 +200,14 @@ public abstract class BaseWebApplication extends BaseApplicationImpl implements 
      * Advanced apps may implement it differently.
      */
     @Override
-    public DBSSecretController getSecretController(@NotNull SMCredentialsProvider credentialsProvider)  throws DBException {
+    public DBSSecretController getSecretController(
+        @NotNull SMCredentialsProvider credentialsProvider,
+        SMSessionContext smSessionContext
+    ) throws DBException {
         return VoidSecretController.INSTANCE;
     }
 
-    protected Map<String, Object> getServerConfigProps(Map<String, Object> configProps) {
+    protected static Map<String, Object> getServerConfigProps(Map<String, Object> configProps) {
         return JSONUtils.getObject(configProps, "server");
     }
 
@@ -182,6 +235,7 @@ public abstract class BaseWebApplication extends BaseApplicationImpl implements 
 
     @Override
     public Object start(IApplicationContext context) {
+        initializeApplicationServices();
         try {
             startServer();
         } catch (Exception e) {
@@ -214,5 +268,16 @@ public abstract class BaseWebApplication extends BaseApplicationImpl implements 
     @Override
     public WSEventController getEventController() {
         return null;
+    }
+
+    protected Gson getGson() {
+        return getGsonBuilder().create();
+    }
+
+    protected abstract GsonBuilder getGsonBuilder();
+
+    @Override
+    public boolean isEnvironmentVariablesAccessible() {
+        return false;
     }
 }

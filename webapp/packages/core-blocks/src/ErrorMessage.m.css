@@ -1,0 +1,30 @@
+.message {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  border-radius: var(--theme-group-element-radius);
+  height: 50px;
+  padding: 8px 12px;
+}
+
+.errorIcon {
+  width: 24px;
+  height: 24px;
+  margin-right: 8px;
+}
+
+.messageBody {
+  composes: theme-typography--body2 from global;
+  max-height: 100%;
+  line-height: 1.2;
+  box-sizing: border-box;
+  flex: 1;
+  -webkit-line-clamp: 2;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.messageActions {
+  margin-left: 16px;
+}

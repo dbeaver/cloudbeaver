@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2023 DBeaver Corp and others
+ * Copyright (C) 2010-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,25 +17,19 @@
 package io.cloudbeaver.model;
 
 import io.cloudbeaver.utils.CBModelConstants;
+import org.jkiss.dbeaver.model.websocket.event.MessageType;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.time.Instant;
 
 /**
  * Web server message
  */
 public class WebServerMessage {
 
-
-    public enum MessageType {
-        DEBUG,
-        INFO,
-        WARNING,
-        ERROR
-    }
-
     private final MessageType type;
-    private final long time;
+    private final Instant time;
     private final String message;
     private final Throwable error;
 
@@ -50,7 +44,7 @@ public class WebServerMessage {
 
     public WebServerMessage(MessageType type, String message, Throwable error) {
         this.type = type;
-        this.time = System.currentTimeMillis();
+        this.time = Instant.now();
         this.message = message;
         this.error = error;
     }

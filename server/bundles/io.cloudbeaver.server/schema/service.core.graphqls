@@ -12,6 +12,8 @@ type ObjectPropertyInfo {
     displayName: String
     # Property description
     description: String
+    # Property hint
+    hint: String @since(version: "23.2.3")
     # Property category (may be used if object has a lot of properties)
     category: String
     # Property data type (int, String, etc)
@@ -32,6 +34,10 @@ type ObjectPropertyInfo {
     features: [ String! ]!
     # Order position
     order: Int!
+    # Supported configuration types (for driver properties)
+    supportedConfigurationTypes: [ String! ]
+    # Required parameters
+    required: Boolean! @since(version: "23.3.1")
 }
 
 enum ObjectPropertyLength {
@@ -93,6 +99,13 @@ type WebServiceConfig {
     bundleVersion: String!
 }
 
+type PasswordPolicyConfig @since(version: "23.3.3") {
+    minLength: Int!
+    minNumberCount: Int!
+    minSymbolCount: Int!
+    requireMixedCase: Boolean!
+}
+
 type ProductInfo {
     id: ID!
     version: String!
@@ -112,8 +125,10 @@ type ServerConfig {
 
     serverURL: String!
     rootURI: String!
-    hostName: String!
+    hostName: String! @deprecated # use container id instead
+    containerId: String!
     defaultAuthRole: String
+    defaultUserTeam: String # [23.2.2]
 
     anonymousAccessEnabled: Boolean!
     supportsCustomConnections: Boolean!
@@ -144,6 +159,7 @@ type ServerConfig {
     defaultNavigatorSettings: NavigatorSettings!
     disabledDrivers: [ID!]!
     resourceQuotas: Object!
+    passwordPolicyConfiguration: PasswordPolicyConfig! @since(version: "23.3.3")
 }
 
 type SessionInfo {
@@ -233,6 +249,14 @@ type DriverInfo {
     applicableNetworkHandlers: [ID]!
 
     configurationTypes: [DriverConfigurationType]!
+
+    driverLibraries: [DriverLibraryInfo!]!
+}
+
+type DriverLibraryInfo {
+    id: ID!
+    name: String!
+    icon: String
 }
 
 enum ResultDataFormat {
@@ -271,15 +295,22 @@ type NetworkHandlerDescriptor {
     properties: [ObjectPropertyInfo!]!
 }
 
+# SSH network handler config. Name without prefix only for backward compatibility
 type NetworkHandlerConfig {
     id: ID!
     enabled: Boolean!
-    authType: NetworkHandlerAuthType!
+    authType: NetworkHandlerAuthType! @deprecated # use properties
     userName: String
     password: String
-    key: String
+    key: String @deprecated # use secured properties
     savePassword: Boolean!
     properties: Object!
+    secureProperties: Object!
+}
+
+type SecretInfo {
+    displayName: String!
+    secretId: String!
 }
 
 # Connection instance
@@ -296,6 +327,8 @@ type ConnectionInfo {
     databaseName: String
     url: String
 
+    keepAliveInterval: Int!
+
     properties: Object
 
     template: Boolean!
@@ -309,6 +342,8 @@ type ConnectionInfo {
     saveCredentials: Boolean!
     # Shared credentials - the same for all users, stored in secure storage.
     sharedCredentials: Boolean!
+
+    sharedSecrets: [SecretInfo!]! @since(version: "23.3.5")
     # Determines that credentials were saved for current user.
     # This field read is slow, it should be read only when it really needed
     credentialsSaved: Boolean!
@@ -415,12 +450,13 @@ input NavigatorSettingsInput {
 input NetworkHandlerConfigInput {
     id: ID!
     enabled: Boolean
-    authType: NetworkHandlerAuthType
+    authType: NetworkHandlerAuthType @deprecated # use properties
     userName: String
     password: String
-    key: String
+    key: String @deprecated # use secured properties
     savePassword: Boolean
     properties: Object
+    secureProperties: Object
 }
 
 # Configuration of particular connection. Used for new connection create. Includes auth info
@@ -446,6 +482,9 @@ input ConnectionConfig {
     # Properties
     properties: Object
 
+    # Keep-Alive interval
+    keepAliveInterval: Int
+
     # Template connection
     template: Boolean
     # Read-onyl connection
@@ -456,6 +495,7 @@ input ConnectionConfig {
     saveCredentials: Boolean
     sharedCredentials: Boolean
     authModelId: ID
+    selectedSecretId: ID @since(version: "23.3.5")
     credentials: Object
 
     # Map of provider properties (name/value)
@@ -526,7 +566,9 @@ extend type Mutation {
     closeSession: Boolean
 
     # Refreshes session on server and returns its state
-    touchSession: Boolean
+    touchSession: Boolean  @deprecated(reason: "use updateSession instead")
+    # Refreshes session on server and returns session state
+    updateSession: SessionInfo! @since(version: "24.0.0")
 
     # Refresh session connection list
     refreshSessionConnections: Boolean
@@ -552,14 +594,14 @@ extend type Mutation {
     copyConnectionFromNode( nodePath: String!, config: ConnectionConfig, projectId: ID ): ConnectionInfo!
 
     # Test connection configuration. Returns remote server version
-    testConnection( config: ConnectionConfig!, projectId: ID ): ConnectionInfo!
+    testConnection( config: ConnectionConfig!, projectId: ID): ConnectionInfo!
 
     # Test connection configuration. Returns remote server version
     testNetworkHandler( config: NetworkHandlerConfigInput! ): NetworkEndpointInfo!
 
     # Initiate existing connection
     initConnection( id: ID!, projectId: ID, credentials: Object, networkCredentials: [NetworkHandlerConfigInput!],
-        saveCredentials:Boolean, sharedCredentials: Boolean ): ConnectionInfo!
+        saveCredentials:Boolean, sharedCredentials: Boolean, selectedSecretId:String ): ConnectionInfo!
 
     # Disconnect from database
     closeConnection( id: ID!, projectId: ID ): ConnectionInfo!
@@ -572,6 +614,5 @@ extend type Mutation {
     asyncTaskCancel(id: String!): Boolean
 
     asyncTaskInfo(id: String!, removeOnFinish: Boolean!): AsyncTaskInfo!
-
 }
 

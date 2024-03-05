@@ -1,13 +1,14 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2022 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
+
+import { useStyles } from '@cloudbeaver/core-blocks';
 
 import { additionalProps, getValue, matchType } from '../helpers';
 import type { ObjectPropertyProps } from './ObjectPropertyProps';
@@ -47,20 +48,13 @@ export const ObjectPropertyInput = observer<ObjectPropertyProps>(function Object
   return styled(style)(
     <form-input>
       <label-wrapper>
-        <label
-          htmlFor={objectProperty.id}
-          title={objectProperty.displayName}
-        >{objectProperty.displayName}
+        <label htmlFor={objectProperty.id} title={objectProperty.displayName}>
+          {objectProperty.displayName}
         </label>
       </label-wrapper>
       <input-wrapper>
-        <input
-          type={matchType(objectProperty.dataType)}
-          value={getValue(objectProperty.value)}
-          {...additionalProps(objectProperty)}
-          readOnly
-        />
+        <input type={matchType(objectProperty.dataType)} value={getValue(objectProperty.value)} {...additionalProps(objectProperty)} readOnly />
       </input-wrapper>
-    </form-input>
+    </form-input>,
   );
 });

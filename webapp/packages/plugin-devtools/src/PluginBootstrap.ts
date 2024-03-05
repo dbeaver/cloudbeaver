@@ -1,20 +1,20 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2022 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
-import { EAdminPermission } from '@cloudbeaver/core-administration';
 import { App, Bootstrap, DIService, injectable, IServiceConstructor } from '@cloudbeaver/core-di';
-import { PermissionsService } from '@cloudbeaver/core-root';
-import { CachedResource } from '@cloudbeaver/core-sdk';
+import { CachedResource } from '@cloudbeaver/core-resource';
+import { PermissionsService, EAdminPermission } from '@cloudbeaver/core-root';
 import { ActionService, DATA_CONTEXT_MENU, DATA_CONTEXT_SUBMENU_ITEM, MenuBaseItem, MenuService } from '@cloudbeaver/core-view';
 import { TOP_NAV_BAR_SETTINGS_MENU } from '@cloudbeaver/plugin-settings-menu';
 import { MENU_USER_PROFILE } from '@cloudbeaver/plugin-user-profile';
 
 import { ACTION_DEVTOOLS } from './actions/ACTION_DEVTOOLS';
+import { ACTION_DEVTOOLS_MODE_CONFIGURATION } from './actions/ACTION_DEVTOOLS_MODE_CONFIGURATION';
+import { ACTION_DEVTOOLS_MODE_DISTRIBUTED } from './actions/ACTION_DEVTOOLS_MODE_DISTRIBUTED';
 import { DATA_CONTEXT_MENU_SEARCH } from './ContextMenu/DATA_CONTEXT_MENU_SEARCH';
 import { SearchResourceMenuItem } from './ContextMenu/SearchResourceMenuItem';
 import { DevToolsService } from './DevToolsService';
@@ -34,7 +34,7 @@ export class PluginBootstrap extends Bootstrap {
     private readonly menuService: MenuService,
     private readonly actionService: ActionService,
     private readonly devToolsService: DevToolsService,
-    private readonly permissionsService: PermissionsService
+    private readonly permissionsService: PermissionsService,
   ) {
     super();
   }
@@ -47,12 +47,8 @@ export class PluginBootstrap extends Bootstrap {
         }
         return context.get(DATA_CONTEXT_MENU) === TOP_NAV_BAR_SETTINGS_MENU;
       },
-      getItems: (context, items) => [
-        ACTION_DEVTOOLS,
-        ...items,
-      ],
+      getItems: (context, items) => [ACTION_DEVTOOLS, ...items],
     });
-
 
     // this.actionService.addHandler({
     //   id: 'devtools',
@@ -86,10 +82,7 @@ export class PluginBootstrap extends Bootstrap {
         }
         return context.get(DATA_CONTEXT_MENU) === MENU_USER_PROFILE;
       },
-      getItems: (context, items) => [
-        MENU_DEVTOOLS,
-        ...items,
-      ],
+      getItems: (context, items) => [MENU_DEVTOOLS, ...items],
     });
 
     this.menuService.addCreator({
@@ -98,20 +91,31 @@ export class PluginBootstrap extends Bootstrap {
         const search = context.tryGet(DATA_CONTEXT_MENU_SEARCH);
 
         if (search) {
-
           return [
             new SearchResourceMenuItem(),
-            ...this.getResources(this.app
-              .getServices()
-              .filter(service => service.name.toLocaleLowerCase().includes(search.toLocaleLowerCase()))),
+            ...this.getResources(this.app.getServices().filter(service => service.name.toLocaleLowerCase().includes(search.toLocaleLowerCase()))),
           ];
         }
 
-        return [
-          new SearchResourceMenuItem(),
-          MENU_PLUGINS,
-          ...items,
-        ];
+        return [new SearchResourceMenuItem(), ACTION_DEVTOOLS_MODE_DISTRIBUTED, ACTION_DEVTOOLS_MODE_CONFIGURATION, MENU_PLUGINS, ...items];
+      },
+    });
+
+    this.actionService.addHandler({
+      id: 'devtools-mode-configuration',
+      isActionApplicable: (context, action) => action === ACTION_DEVTOOLS_MODE_CONFIGURATION,
+      isChecked: () => this.devToolsService.isConfiguration,
+      handler: () => {
+        this.devToolsService.setConfigurationMode(!this.devToolsService.isConfiguration);
+      },
+    });
+
+    this.actionService.addHandler({
+      id: 'devtools-mode-distributed',
+      isActionApplicable: (context, action) => action === ACTION_DEVTOOLS_MODE_DISTRIBUTED,
+      isChecked: () => this.devToolsService.isDistributed,
+      handler: () => {
+        this.devToolsService.setDistributedMode(!this.devToolsService.isDistributed);
       },
     });
 
@@ -139,17 +143,11 @@ export class PluginBootstrap extends Bootstrap {
 
         return false;
       },
-      getItems: (_, items) => [
-        MENU_RESOURCES,
-        ...items,
-      ],
+      getItems: (_, items) => [MENU_RESOURCES, ...items],
     });
 
     this.menuService.addCreator({
-      isApplicable: context => (
-        context.get(DATA_CONTEXT_MENU) === MENU_RESOURCES
-        && context.has(DATA_CONTEXT_SUBMENU_ITEM)
-      ),
+      isApplicable: context => context.get(DATA_CONTEXT_MENU) === MENU_RESOURCES && context.has(DATA_CONTEXT_SUBMENU_ITEM),
       getItems: (context, items) => {
         const item = context.find(DATA_CONTEXT_SUBMENU_ITEM, item => item instanceof PluginSubMenuItem);
 
@@ -157,26 +155,19 @@ export class PluginBootstrap extends Bootstrap {
           return items;
         }
 
-        const plugin = this.app
-          .getPlugins()
-          .find(plugin => plugin.info.name === item.id);
+        const plugin = this.app.getPlugins().find(plugin => plugin.info.name === item.id);
 
         if (!plugin) {
           return items;
         }
 
-        return [
-          ...this.getResources(plugin.providers),
-          ...items,
-        ];
+        return [...this.getResources(plugin.providers), ...items];
       },
     });
 
     this.menuService.addCreator({
-      isApplicable: context => (
-        context.get(DATA_CONTEXT_MENU) === MENU_RESOURCE
-        && context.get(DATA_CONTEXT_SUBMENU_ITEM) instanceof ResourceSubMenuItem
-      ),
+      isApplicable: context =>
+        context.get(DATA_CONTEXT_MENU) === MENU_RESOURCE && context.get(DATA_CONTEXT_SUBMENU_ITEM) instanceof ResourceSubMenuItem,
       getItems: (context, items) => {
         const item = context.get(DATA_CONTEXT_SUBMENU_ITEM) as ResourceSubMenuItem;
 
@@ -189,13 +180,10 @@ export class PluginBootstrap extends Bootstrap {
             },
             {
               onSelect: () => {
-                const instance = this.diService.serviceInjector
-                  .getServiceByClass<CachedResource<any, any, any, any, any>>(
-                  item.resource
-                );
+                const instance = this.diService.serviceInjector.getServiceByClass<CachedResource<any, any, any, any, any>>(item.resource);
                 instance.markOutdated(undefined);
               },
-            }
+            },
           ),
           ...items,
         ];
@@ -203,8 +191,7 @@ export class PluginBootstrap extends Bootstrap {
     });
   }
 
-  load(): void | Promise<void> {
-  }
+  load(): void | Promise<void> {}
 
   private getResources(providers: IServiceConstructor<any>[]): ResourceSubMenuItem[] {
     return providers

@@ -1,29 +1,24 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2022 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
-import { runInAction } from 'mobx';
-
 import { injectable } from '@cloudbeaver/core-di';
 import { ExecutorInterrupter } from '@cloudbeaver/core-executor';
-import {
-  GraphQLService,
-  CachedMapResource,
-  ResourceKey,
-  ResourceKeyUtils,
-  CachedMapAllKey,
-  resourceKeyList,
-  SqlDialectInfo,
-  isResourceKeyList
-} from '@cloudbeaver/core-sdk';
+import { ProjectsService } from '@cloudbeaver/core-projects';
+import { CachedMapAllKey, CachedMapResource, type ResourceKey, resourceKeyList, ResourceKeyUtils } from '@cloudbeaver/core-resource';
+import { GraphQLService, SqlDialectInfo } from '@cloudbeaver/core-sdk';
 
-import type { IConnectionExecutionContextInfo } from './ConnectionExecutionContext/IConnectionExecutionContextInfo';
-import { ConnectionInfoResource, isConnectionInfoParamEqual } from './ConnectionInfoResource';
-import type { IConnectionInfoParams } from './IConnectionsResource';
+import type { IConnectionInfoParams } from './CONNECTION_INFO_PARAM_SCHEMA';
+import type { IConnectionExecutionContextInfo } from './ConnectionExecutionContext/ConnectionExecutionContextResource';
+import {
+  ConnectionInfoActiveProjectKey,
+  ConnectionInfoProjectKey,
+  ConnectionInfoResource,
+  isConnectionInfoParamEqual,
+} from './ConnectionInfoResource';
 
 export type ConnectionDialect = SqlDialectInfo;
 
@@ -31,11 +26,19 @@ export type ConnectionDialect = SqlDialectInfo;
 export class ConnectionDialectResource extends CachedMapResource<IConnectionInfoParams, ConnectionDialect> {
   constructor(
     private readonly graphQLService: GraphQLService,
+    private readonly projectsService: ProjectsService,
     connectionInfoResource: ConnectionInfoResource,
   ) {
     super();
     this.sync(connectionInfoResource);
-    this.addAlias(CachedMapAllKey, () => resourceKeyList(connectionInfoResource.keys));
+    this.aliases.add(ConnectionInfoProjectKey, param =>
+      resourceKeyList(connectionInfoResource.keys.filter(key => param.options.projectIds.includes(key.projectId))),
+    );
+
+    this.aliases.add(ConnectionInfoActiveProjectKey, () =>
+      resourceKeyList(connectionInfoResource.keys.filter(key => projectsService.activeProjects.some(({ id }) => id === key.projectId))),
+    );
+    this.aliases.replace(CachedMapAllKey, () => resourceKeyList(connectionInfoResource.keys));
     this.before(ExecutorInterrupter.interrupter(key => !connectionInfoResource.isConnected(key)));
   }
 
@@ -49,21 +52,14 @@ export class ConnectionDialectResource extends CachedMapResource<IConnectionInfo
     return result.query;
   }
 
-  async loadAll(): Promise<Map<IConnectionInfoParams, ConnectionDialect>> {
-    await this.load(CachedMapAllKey);
-    return this.data;
-  }
-
   protected async loader(
-    key: ResourceKey<IConnectionInfoParams>,
-    includes: string[]
+    originalKey: ResourceKey<IConnectionInfoParams>,
+    includes: string[],
   ): Promise<Map<IConnectionInfoParams, ConnectionDialect>> {
-    const all = this.includes(key, CachedMapAllKey);
-    key = this.transformParam(key);
+    const dialects: ConnectionDialect[] = [];
+    const keys = ResourceKeyUtils.toList(this.aliases.transformToKey(originalKey));
 
-    const dialects: Map<IConnectionInfoParams, ConnectionDialect> = new Map();
-
-    await ResourceKeyUtils.forEachAsync(key, async key => {
+    for (const key of keys) {
       const { dialect } = await this.graphQLService.sdk.querySqlDialectInfo({
         ...key,
         ...this.getIncludesMap(key, includes),
@@ -73,19 +69,10 @@ export class ConnectionDialectResource extends CachedMapResource<IConnectionInfo
         throw new Error('Dialect not found');
       }
 
-      dialects.set(key, dialect);
-    });
+      dialects.push(dialect);
+    }
 
-    runInAction(() => {
-      if (all) {
-        this.resetIncludes();
-        this.clear();
-      }
-
-      for (const [key, dialect] of dialects) {
-        this.dataSet(key, dialect);
-      }
-    });
+    this.set(keys, dialects);
 
     return this.data;
   }
@@ -94,28 +81,7 @@ export class ConnectionDialectResource extends CachedMapResource<IConnectionInfo
     return isConnectionInfoParamEqual(param, second);
   }
 
-  getKeyRef(key: IConnectionInfoParams): IConnectionInfoParams {
-    if (this.keys.includes(key)) {
-      return key;
-    }
-
-    const ref = this.keys.find(k => this.isKeyEqual(k, key));
-
-    if (ref) {
-      return ref;
-    }
-
-    return key;
-  }
-
-  protected validateParam(param: ResourceKey<IConnectionInfoParams>): boolean {
-    return (
-      super.validateParam(param)
-      || (
-        typeof param === 'object' && !isResourceKeyList(param)
-        && typeof param.projectId === 'string'
-        && ['string'].includes(typeof param.connectionId)
-      )
-    );
+  protected validateKey(key: IConnectionInfoParams): boolean {
+    return typeof key === 'object' && typeof key.projectId === 'string' && ['string'].includes(typeof key.connectionId);
   }
 }

@@ -8,6 +8,10 @@ enum CBServerEventId {
 
     cb_session_log_updated,
 
+    cb_session_websocket_connected,
+    cb_session_state,
+    cb_session_expired,
+
     cb_datasource_created,
     cb_datasource_updated,
     cb_datasource_deleted,
@@ -16,9 +20,17 @@ enum CBServerEventId {
     cb_datasource_folder_updated,
     cb_datasource_folder_deleted,
 
-    cb_rm_resource_created
-    cb_rm_resource_updated
-    cb_rm_resource_deleted
+    cb_rm_resource_created,
+    cb_rm_resource_updated,
+    cb_rm_resource_deleted,
+
+    cb_rm_project_added,
+    cb_rm_project_removed,
+
+    cb_object_permissions_updated,
+    cb_subject_permissions_updated,
+
+    cb_database_output_log_updated
 }
 
 # Events sent by client
@@ -32,10 +44,15 @@ enum CBClientEventId {
 enum CBEventTopic {
     cb_config,
     cb_session_log,
+    cb_session,
     cb_datasource,
     cb_datasource_folder,
     cb_scripts,
-    cb_projects
+    cb_projects,
+    cb_object_permissions,
+    cb_subject_permissions,
+    cb_database_output_log,
+    cb_delete_temp_folder
 }
 
 # Base server event interface
@@ -86,10 +103,51 @@ type CBSessionLogEvent implements CBServerEvent {
     topicId: CBEventTopic
 }
 
+# WebSocket connected event
+type WSSocketConnectedEvent implements CBServerEvent {
+    id: CBServerEventId!
+    topicId: CBEventTopic
+    applicationRunId: String!
+}
+
+# Session state info event
+type WSSessionStateEvent implements CBServerEvent {
+    id: CBServerEventId!
+    topicId: CBEventTopic
+    remainingTime: Int!
+    isValid: Boolean
+}
+
+# Session expired event
+type WSSessionExpiredEvent implements CBServerEvent {
+    id: CBServerEventId!
+    topicId: CBEventTopic
+}
+
+# RM project update event
+type CBProjectUpdateEvent implements CBServerEvent {
+    id: CBServerEventId!
+    topicId: CBEventTopic
+    projectId: String!
+}
+
+# Subject permission update event
+type CBSubjectPermissionUpdateEvent implements CBServerEvent {
+    id: CBServerEventId!
+    topicId: CBEventTopic
+}
+
 # Topic subscription event
 type CBTopicEvent implements CBClientEvent {
     id: CBClientEventId!
     topicId: CBEventTopic! # topic to subscribe / unsubscribe
+}
+
+# Project event
+type CBProjectEvent implements CBClientEvent {
+    id: CBClientEventId!
+    topicId: CBEventTopic
+    projectId: String!
 }
 
 # Active projects event
@@ -97,6 +155,22 @@ type CBProjectsActiveEvent implements CBClientEvent {
     id: CBClientEventId!
     topicId: CBEventTopic
     projectIds: [String!]! # list of active projects
+}
+
+# Database output log event
+type CBDatabaseOutputLogEvent implements CBServerEvent {
+    id: CBServerEventId!
+    topicId: CBEventTopic
+    contextId: String!
+    messages: [WSOutputLogInfo!]!
+    eventTimestamp: Int!
+}
+
+# Define the type for WSOutputLogInfo
+type WSOutputLogInfo {
+    severity: String
+    message: String
+    # Add more fields as needed
 }
 
 extend type Query {

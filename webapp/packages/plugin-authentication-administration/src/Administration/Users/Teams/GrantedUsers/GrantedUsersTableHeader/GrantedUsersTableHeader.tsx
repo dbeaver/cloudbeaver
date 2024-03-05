@@ -1,17 +1,15 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2022 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observer } from 'mobx-react-lite';
-import styled, { css } from 'reshadow';
 
-import { Filter, useTranslate, useStyles } from '@cloudbeaver/core-blocks';
+import { Filter, s, useS, useTranslate } from '@cloudbeaver/core-blocks';
 
-
+import style from './GrantedUsersTableHeader.m.css';
 
 export interface IFilterState {
   filterValue: string;
@@ -23,39 +21,19 @@ interface Props extends React.PropsWithChildren {
   className?: string;
 }
 
-const styles = css`
-    buttons {
-      display: flex;
-      gap: 16px;
-    }
-    header {
-      composes: theme-border-color-background theme-background-surface theme-text-on-surface from global;
-      overflow: hidden;
-      position: sticky;
-      top: 0;
-      z-index: 1;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 16px;
-      gap: 16px;
-      border-bottom: 1px solid;
-    }
-  `;
-
 export const GrantedUsersTableHeader = observer<Props>(function GrantedUsersTableHeader({ filterState, disabled, className, children }) {
+  const styles = useS(style);
   const translate = useTranslate();
-  return styled(useStyles(styles))(
-    <header className={className}>
+
+  return (
+    <header className={s(styles, { header: true }, className)}>
       <Filter
         disabled={disabled}
         placeholder={translate('administration_teams_team_granted_users_search_placeholder')}
-        name='filterValue'
+        name="filterValue"
         state={filterState}
       />
-      <buttons>
-        {children}
-      </buttons>
+      <div className={s(styles, { buttons: true })}>{children}</div>
     </header>
   );
 });

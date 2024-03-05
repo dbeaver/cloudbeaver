@@ -15,11 +15,14 @@
     <modules>
         <module>io.cloudbeaver.model</module>
         <module>io.cloudbeaver.server</module>
+        <module>io.cloudbeaver.slf4j</module>
 
         <module>io.cloudbeaver.service.admin</module>
         <module>io.cloudbeaver.service.auth</module>
         <module>io.cloudbeaver.service.metadata</module>
+        <module>io.cloudbeaver.service.fs</module>
         <module>io.cloudbeaver.service.rm</module>
+        <module>io.cloudbeaver.service.rm.nio</module>
         <module>io.cloudbeaver.service.data.transfer</module>
         <module>io.cloudbeaver.service.security</module>
 

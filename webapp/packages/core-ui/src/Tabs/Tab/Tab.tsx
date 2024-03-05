@@ -1,19 +1,19 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2022 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observer } from 'mobx-react-lite';
-import { useMemo, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { Tab as BaseTab } from 'reakit/Tab';
 import styled, { use } from 'reshadow';
 
-import { getComputed, Icon, useTranslate, useStyles } from '@cloudbeaver/core-blocks';
+import { getComputed, Icon, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
+import type { IDataContext } from '@cloudbeaver/core-data-context';
 import type { ComponentStyle } from '@cloudbeaver/core-theming';
-import { IDataContext, useMenu } from '@cloudbeaver/core-view';
+import { useMenu } from '@cloudbeaver/core-view';
 
 import { ContextMenu } from '../../ContextMenu/ContextMenu';
 import { TabContext } from '../TabContext';
@@ -25,24 +25,14 @@ import { MENU_TAB } from './MENU_TAB';
 import type { TabProps } from './TabProps';
 import { useTab } from './useTab';
 
-export const Tab = observer<TabProps>(function Tab({
-  tabId,
-  title,
-  menuContext,
-  disabled,
-  className,
-  children,
-  style,
-  onOpen,
-  onClose,
-  onClick,
-}) {
+export const Tab = observer<TabProps>(function Tab({ tabId, title, menuContext, disabled, className, children, style, onOpen, onClose, onClick }) {
   const translate = useTranslate();
+  const ref = useRef<HTMLButtonElement>(null);
   const tabContext = useMemo(() => ({ tabId }), [tabId]);
   const tab = useTab(tabId, onOpen, onClose, onClick);
   const info = tab.getInfo();
 
-  const canClose = getComputed(() => !!onClose || tab.state.closable);
+  const canClose = getComputed(() => !!onClose || (tab.closable && tab.state.closable));
 
   return styled(useStyles(BASE_TAB_STYLES, BASE_TAB_ACTION_STYLES, style))(
     <TabContext.Provider value={tabContext}>
@@ -54,14 +44,10 @@ export const Tab = observer<TabProps>(function Tab({
                 <Icon name="cross-bold" viewBox="0 0 7 8" />
               </tab-action>
             )}
-            <TabMenu
-              tabId={tabId}
-              state={tab.state}
-              menuContext={menuContext}
-              style={style}
-            />
+            <TabMenu tabId={tabId} state={tab.state} menuContext={menuContext} style={style} />
           </tab-actions>
           <BaseTab
+            ref={ref}
             {...tab.state.state}
             type="button"
             title={translate(title ?? info?.title)}
@@ -70,13 +56,11 @@ export const Tab = observer<TabProps>(function Tab({
             disabled={disabled}
             onClick={tab.handleOpen}
           >
-            <tab-container>
-              {children}
-            </tab-container>
+            <tab-container>{children}</tab-container>
           </BaseTab>
         </tab-inner>
       </tab-outer>
-    </TabContext.Provider>
+    </TabContext.Provider>,
   );
 });
 
@@ -87,12 +71,7 @@ interface TabMenuProps {
   style?: ComponentStyle;
 }
 
-const TabMenu = observer<TabMenuProps>(function TabMenu({
-  tabId,
-  state,
-  menuContext,
-  style,
-}) {
+const TabMenu = observer<TabMenuProps>(function TabMenu({ tabId, state, menuContext, style }) {
   const styles = useStyles(BASE_TAB_STYLES, BASE_TAB_ACTION_STYLES, style);
 
   const [menuOpened, switchState] = useState(false);
@@ -112,11 +91,11 @@ const TabMenu = observer<TabMenuProps>(function TabMenu({
 
   return styled(styles)(
     <portal {...use({ menuOpened })}>
-      <ContextMenu menu={menu} placement='bottom-start' modal disclosure onVisibleSwitch={switchState}>
+      <ContextMenu menu={menu} placement="bottom-start" modal disclosure onVisibleSwitch={switchState}>
         <tab-action>
           <Icon name="dots" viewBox="0 0 32 32" />
         </tab-action>
       </ContextMenu>
-    </portal>
+    </portal>,
   );
 });

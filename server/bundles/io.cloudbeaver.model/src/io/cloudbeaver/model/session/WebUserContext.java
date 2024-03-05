@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2023 DBeaver Corp and others
+ * Copyright (C) 2010-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,13 +17,14 @@
 
 package io.cloudbeaver.model.session;
 
-import io.cloudbeaver.DBWConstants;
 import io.cloudbeaver.model.app.WebApplication;
 import io.cloudbeaver.model.user.WebUser;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
+import org.jkiss.dbeaver.model.DBFileController;
+import org.jkiss.dbeaver.model.app.DBPWorkspace;
 import org.jkiss.dbeaver.model.auth.SMAuthInfo;
 import org.jkiss.dbeaver.model.auth.SMAuthStatus;
 import org.jkiss.dbeaver.model.auth.SMCredentials;
@@ -51,6 +52,7 @@ public class WebUserContext implements SMCredentialsProvider {
     private static final Log log = Log.getLog(WebUserContext.class);
 
     private final WebApplication application;
+    private final DBPWorkspace workspace;
 
     private WebUser user;
     private Set<String> userPermissions;
@@ -62,12 +64,15 @@ public class WebUserContext implements SMCredentialsProvider {
     private SMAdminController adminSecurityController;
     private DBSSecretController secretController;
     private RMController rmController;
+    private DBFileController fileController;
     private Set<String> accessibleProjectIds = new HashSet<>();
 
-    public WebUserContext(WebApplication application) throws DBException {
+    public WebUserContext(WebApplication application, DBPWorkspace workspace) throws DBException {
         this.application = application;
+        this.workspace = workspace;
         this.securityController = application.createSecurityController(this);
-        this.rmController = application.createResourceController(this);
+        this.rmController = application.createResourceController(this, workspace);
+        this.fileController = application.createFileController(this);
         setUserPermissions(getDefaultPermissions());
     }
 
@@ -75,16 +80,21 @@ public class WebUserContext implements SMCredentialsProvider {
      * refresh context state based on new token from security manager
      *
      * @param smAuthInfo - auth info from security manager
+     * @return - true if context changed
      * @throws DBException - if user already authorized and new token come from another user
      */
     public synchronized boolean refresh(SMAuthInfo smAuthInfo) throws DBException {
-        if (smAuthInfo.getAuthStatus() != SMAuthStatus.SUCCESS || smAuthInfo.getSmAccessToken() == null) {
-            throw new DBCException("Authorization did not complete successfully");
-        }
-        if (smAuthInfo.getAuthPermissions() == null) {
+        if (smAuthInfo.getAuthPermissions() == null && !isAuthorizedInSecurityManager()) {
             throw new DBCException("Required information about session permissions is missing");
         }
-        return refresh(smAuthInfo.getSmAccessToken(), smAuthInfo.getSmRefreshToken(), smAuthInfo.getAuthPermissions());
+        boolean sessionChanged = !CommonUtils.equalObjects(smSessionId, smAuthInfo.getAuthPermissions().getSessionId());
+        if (smAuthInfo.getAuthStatus() != SMAuthStatus.SUCCESS || (sessionChanged && smAuthInfo.getSmAccessToken() == null)) {
+            throw new DBCException("Authorization did not complete successfully");
+        }
+        if (sessionChanged) {
+            return refresh(smAuthInfo.getSmAccessToken(), smAuthInfo.getSmRefreshToken(), smAuthInfo.getAuthPermissions());
+        }
+        return false;
     }
 
     public synchronized boolean refresh(
@@ -92,7 +102,7 @@ public class WebUserContext implements SMCredentialsProvider {
         @Nullable String smRefreshToken,
         @NotNull SMAuthPermissions smAuthPermissions
     ) throws DBException {
-        var isNonAnonymousUserAuthorized = isAuthorizedInSecurityManager() && getUser() != null;
+        var isNonAnonymousUserAuthorized = isNonAnonymousUserAuthorizedInSM();
         var isSessionChanged = !CommonUtils.equalObjects(smSessionId, smAuthPermissions.getSessionId());
         if (isNonAnonymousUserAuthorized && isSessionChanged && !Objects.equals(getUserId(), smAuthPermissions.getUserId())) {
             throw new DBCException("Another user is already logged in");
@@ -103,21 +113,22 @@ public class WebUserContext implements SMCredentialsProvider {
             smAuthPermissions.getSessionId(),
             smAuthPermissions.getPermissions()
         );
-        this.refreshToken = smRefreshToken;
+        setRefreshToken(smRefreshToken);
         setUserPermissions(smAuthPermissions.getPermissions());
-        this.securityController = application.createSecurityController(this);
         this.adminSecurityController = application.getAdminSecurityController(this);
-        this.secretController = application.getSecretController(this);
-        this.rmController = application.createResourceController(this);
         if (isSessionChanged) {
             this.smSessionId = smAuthPermissions.getSessionId();
             setUser(smAuthPermissions.getUserId() == null ? null : new WebUser(securityController.getCurrentUser()));
-            this.accessibleProjectIds.clear();
-            this.accessibleProjectIds.addAll(
-                Arrays.stream(rmController.listAccessibleProjects()).map(RMProject::getId).collect(Collectors.toSet())
-            );
+            refreshAccessibleProjects();
         }
         return isSessionChanged;
+    }
+
+    public synchronized void refreshAccessibleProjects() throws DBException {
+        this.accessibleProjectIds.clear();
+        this.accessibleProjectIds.addAll(
+            Arrays.stream(rmController.listAccessibleProjects()).map(RMProject::getId).collect(Collectors.toSet())
+        );
     }
 
     public synchronized void refreshSMSession() throws DBException {
@@ -125,7 +136,7 @@ public class WebUserContext implements SMCredentialsProvider {
             return;
         }
         var newTokens = securityController.refreshSession(refreshToken);
-        this.refreshToken = newTokens.getSmRefreshToken();
+        setRefreshToken(newTokens.getSmRefreshToken());
         this.smCredentials = new SMCredentials(
             newTokens.getSmAccessToken(),
             smCredentials.getUserId(),
@@ -150,7 +161,7 @@ public class WebUserContext implements SMCredentialsProvider {
         this.user = null;
         this.securityController = application.createSecurityController(this);
         this.adminSecurityController = null;
-        this.secretController = application.getSecretController(this);
+        this.secretController = null;
     }
 
     @NotNull
@@ -166,6 +177,10 @@ public class WebUserContext implements SMCredentialsProvider {
 
     public synchronized boolean isAuthorizedInSecurityManager() {
         return smCredentials != null;
+    }
+
+    public synchronized boolean isNonAnonymousUserAuthorizedInSM() {
+        return isAuthorizedInSecurityManager() && getUser() != null;
     }
 
     @Nullable
@@ -194,6 +209,7 @@ public class WebUserContext implements SMCredentialsProvider {
      */
     public synchronized void refreshPermissions() throws DBException {
         if (isAuthorizedInSecurityManager()) {
+            log.debug("refresh permissions " + getUserId() + " " + getSmSessionId());
             setUserPermissions(securityController.getTokenPermissions().getPermissions());
         } else {
             setUserPermissions(getDefaultPermissions());
@@ -204,7 +220,10 @@ public class WebUserContext implements SMCredentialsProvider {
         this.userPermissions = permissions;
     }
 
-    public DBSSecretController getSecretController() {
+    public DBSSecretController getSecretController() throws DBException {
+        if (this.securityController == null) {
+            this.secretController = application.getSecretController(this, workspace.getAuthContext());
+        }
         return secretController;
     }
 
@@ -220,8 +239,16 @@ public class WebUserContext implements SMCredentialsProvider {
         return rmController;
     }
 
+    public DBFileController getFileController() {
+        return fileController;
+    }
+
     @NotNull
     public Set<String> getAccessibleProjectIds() {
         return accessibleProjectIds;
+    }
+
+    private void setRefreshToken(@Nullable String refreshToken) {
+        this.refreshToken = refreshToken;
     }
 }

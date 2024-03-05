@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2023 DBeaver Corp and others
+ * Copyright (C) 2010-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,9 +16,9 @@
  */
 package io.cloudbeaver.service.sql;
 
+import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.model.data.json.JSONUtils;
 
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -26,22 +26,31 @@ import java.util.Map;
  */
 public class WebSQLResultsRow {
 
-    private List<?> data;
+    private Object[] data;
     private Map<String, Object> updateValues;
+
+    @Nullable
+    private Map<String, Object> metaData;
 
     public WebSQLResultsRow() {
     }
 
     public WebSQLResultsRow(Map<String, Object> map) {
-        data = JSONUtils.getObjectList(map, "data");
+        data = JSONUtils.getObjectList(map, "data").toArray();
         updateValues = JSONUtils.getObject(map, "updateValues");
+        metaData = JSONUtils.getObject(map, "metaData");
     }
 
-    public List<?> getData() {
+    public Object[] getData() {
         return data;
     }
 
     public Map<String, Object> getUpdateValues() {
         return updateValues;
+    }
+
+    @Nullable
+    public Map<String, Object> getMetaData() {
+        return metaData;
     }
 }

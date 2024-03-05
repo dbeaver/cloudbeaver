@@ -1,17 +1,16 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2022 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observer } from 'mobx-react-lite';
 import { useState } from 'react';
 import styled, { css, use } from 'reshadow';
 
 import { AuthRolesResource } from '@cloudbeaver/core-authentication';
-import { BASE_CONTAINERS_STYLES, Combobox, Filter, Group, IconOrImage, useResource, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
+import { Combobox, Filter, Group, IconOrImage, useResource, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
 
 import { IUserFilters, USER_ROLE_ALL, USER_STATUSES } from './useUsersTableFilters';
 
@@ -62,7 +61,7 @@ interface Props {
 
 export const UsersTableFilters = observer<Props>(function UsersTableFilters({ filters }) {
   const translate = useTranslate();
-  const style = useStyles(BASE_CONTAINERS_STYLES, styles);
+  const style = useStyles(styles);
   const authRolesResource = useResource(UsersTableFilters, AuthRolesResource, undefined);
 
   const [open, setOpen] = useState(false);
@@ -74,14 +73,11 @@ export const UsersTableFilters = observer<Props>(function UsersTableFilters({ fi
           placeholder={translate('authentication_administration_users_filters_search_placeholder')}
           value={filters.search}
           max
-          onFilter={filters.setSearch}
+          onChange={filters.setSearch}
         />
         <actions>
-          <button
-            {...use({ active: open })}
-            onClick={() => setOpen(!open)}
-          >
-            <IconOrImage icon='filter' />
+          <button {...use({ active: open })} onClick={() => setOpen(!open)}>
+            <IconOrImage icon="filter" />
           </button>
         </actions>
       </filter-container>
@@ -99,17 +95,12 @@ export const UsersTableFilters = observer<Props>(function UsersTableFilters({ fi
             {translate('authentication_user_status')}
           </Combobox>
           {!!authRolesResource.data.length && (
-            <Combobox
-              items={[...authRolesResource.data, USER_ROLE_ALL]}
-              value={filters.role}
-              keepSize
-              onSelect={filters.setRole}
-            >
+            <Combobox items={[...authRolesResource.data, USER_ROLE_ALL]} value={filters.role} keepSize onSelect={filters.setRole}>
               {translate('authentication_user_role')}
             </Combobox>
           )}
         </Group>
       )}
-    </Group>
+    </Group>,
   );
 });

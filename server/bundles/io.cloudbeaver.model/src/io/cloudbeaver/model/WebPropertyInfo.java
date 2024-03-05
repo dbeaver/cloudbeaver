@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2023 DBeaver Corp and others
+ * Copyright (C) 2010-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,8 @@ import io.cloudbeaver.model.session.WebSession;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.*;
+import org.jkiss.dbeaver.model.connection.DBPDriverConfigurationType;
+import org.jkiss.dbeaver.model.impl.ProviderPropertyDescriptor;
 import org.jkiss.dbeaver.model.meta.IPropertyValueListProvider;
 import org.jkiss.dbeaver.model.meta.Property;
 import org.jkiss.dbeaver.model.meta.PropertyLength;
@@ -87,6 +89,11 @@ public class WebPropertyInfo {
     }
 
     @Property
+    public String getHint() {
+        return property.getHint();
+    }
+
+    @Property
     public int getOrder() {
         return property instanceof ObjectPropertyDescriptor ? ((ObjectPropertyDescriptor) property).getOrderNumber() : -1;
     }
@@ -114,14 +121,15 @@ public class WebPropertyInfo {
 
     @Property
     public Object getDefaultValue() throws DBException {
-        return property.getDefaultValue();
+        var defaultValue = property.getDefaultValue();
+        return defaultValue == null ? getValue() : defaultValue;
     }
 
     @Property
     public Object getValue() throws DBException {
         Object value = propertySource == null ? null : propertySource.getPropertyValue(session.getProgressMonitor(), property.getId());
         if (property instanceof ObjectPropertyDescriptor) {
-            ObjectPropertyDescriptor opd = (ObjectPropertyDescriptor)property;
+            ObjectPropertyDescriptor opd = (ObjectPropertyDescriptor) property;
             if (!showProtected && opd.isPassword() || opd.isHidden()) {
                 if (value == null || value.toString().isEmpty()) {
                     return "";
@@ -153,6 +161,21 @@ public class WebPropertyInfo {
     public String[] getFeatures() {
         String[] features = property.getFeatures();
         return features == null ? new String[0] : features;
+    }
+
+    @Property
+    public String[] getSupportedConfigurationTypes() {
+        if (property instanceof ProviderPropertyDescriptor) {
+            return ((ProviderPropertyDescriptor) property).getConfigurationTypes().stream()
+                .map(DBPDriverConfigurationType::toString)
+                .toArray(String[]::new);
+        }
+        return new String[0];
+    }
+
+    @Property
+    public boolean isRequired() {
+        return property.isRequired();
     }
 
     public boolean hasFeature(@NotNull String feature) {

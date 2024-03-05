@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2023 DBeaver Corp and others
+ * Copyright (C) 2010-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,12 +16,12 @@
  */
 package io.cloudbeaver.service.sql;
 
-import io.cloudbeaver.service.DBWService;
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.WebAction;
 import io.cloudbeaver.model.WebAsyncTaskInfo;
 import io.cloudbeaver.model.WebConnectionInfo;
 import io.cloudbeaver.model.session.WebSession;
+import io.cloudbeaver.service.DBWService;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
@@ -94,7 +94,9 @@ public interface DBWServiceSQL extends DBWService {
         @NotNull String sql,
         @Nullable String resultId,
         @Nullable WebSQLDataFilter filter,
-        @Nullable WebDataFormat dataFormat) throws DBException;
+        @Nullable WebDataFormat dataFormat,
+        boolean readLogs,
+        @NotNull WebSession webSession) throws DBException;
 
     @WebAction
     WebAsyncTaskInfo asyncReadDataFromContainer(
@@ -117,10 +119,18 @@ public interface DBWServiceSQL extends DBWService {
 
     @WebAction
     String readLobValue(
-            @NotNull WebSQLContextInfo contextInfo,
-            @NotNull String resultsId,
-            @NotNull Integer lobColumnIndex,
-            @Nullable List<WebSQLResultsRow> row) throws DBWebException;
+        @NotNull WebSQLContextInfo contextInfo,
+        @NotNull String resultsId,
+        @NotNull Integer lobColumnIndex,
+        @NotNull WebSQLResultsRow row) throws DBWebException;
+
+    @NotNull
+    @WebAction
+    String getCellValue(
+        @NotNull WebSQLContextInfo contextInfo,
+        @NotNull String resultsId,
+        @NotNull Integer lobColumnIndex,
+        @NotNull WebSQLResultsRow row) throws DBWebException;
 
     @WebAction
     String updateResultsDataBatchScript(
@@ -148,4 +158,18 @@ public interface DBWServiceSQL extends DBWService {
 
     @WebAction
     WebSQLQueryInfo parseSqlQuery(@NotNull WebConnectionInfo connectionInfo, @NotNull String sqlScript, int cursorPosition) throws DBWebException;
+
+    @WebAction
+    String generateGroupByQuery(@NotNull WebSQLContextInfo contextInfo,
+                                @NotNull String resultsId,
+                                @NotNull List<String> columnsList,
+                                @Nullable List<String> functions,
+                                @Nullable Boolean showDuplicatesOnly) throws DBWebException;
+
+    @WebAction
+    WebAsyncTaskInfo getRowDataCount(@NotNull WebSession webSession, @NotNull WebSQLContextInfo contextInfo, @NotNull String resultsId) throws DBWebException;
+
+    @Nullable
+    @WebAction
+    Long getRowDataCountResult(@NotNull WebSession webSession, @NotNull String taskId) throws DBWebException;
 }

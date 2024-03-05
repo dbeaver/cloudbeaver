@@ -1,21 +1,18 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2022 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
-import { observable, makeObservable } from 'mobx';
+import { makeObservable, observable } from 'mobx';
 
 import { injectable } from '@cloudbeaver/core-di';
 import { Executor, IExecutor, IExecutorHandler } from '@cloudbeaver/core-executor';
 import type { RouterState } from '@cloudbeaver/core-routing';
 
 import { filterConfigurationWizard } from './filterConfigurationWizard';
-import {
-  IAdministrationItem, IAdministrationItemOptions, IAdministrationItemSubItem, AdministrationItemType
-} from './IAdministrationItem';
+import { AdministrationItemType, IAdministrationItem, IAdministrationItemOptions, IAdministrationItemSubItem } from './IAdministrationItem';
 import type { IAdministrationItemRoute } from './IAdministrationItemRoute';
 import { orderAdministrationItems } from './orderAdministrationItems';
 
@@ -37,32 +34,41 @@ export class AdministrationItemService {
   private deActivationTask: IExecutor<IActivationData>;
 
   constructor() {
+    this.itemActivating = false;
+    this.itemDeactivating = false;
+    this.activationTask = new Executor();
+    this.deActivationTask = new Executor();
+
     makeObservable(this, {
       items: observable,
       itemActivating: observable,
       itemDeactivating: observable,
     });
 
-    this.itemActivating = false;
-    this.itemDeactivating = false;
-    this.activationTask = new Executor();
-    this.deActivationTask = new Executor();
-
     this.activationTask
-      .addHandler(() => { this.itemActivating = true; })
+      .addHandler(() => {
+        this.itemActivating = true;
+      })
       .addHandler(this.activateHandler)
-      .addPostHandler(() => { this.itemActivating = false; });
+      .addPostHandler(() => {
+        this.itemActivating = false;
+      });
 
     this.deActivationTask
-      .addHandler(() => { this.itemDeactivating = true; })
+      .addHandler(() => {
+        this.itemDeactivating = true;
+      })
       .addHandler(this.deActivateHandler)
-      .addPostHandler(() => { this.itemDeactivating = false; });
+      .addPostHandler(() => {
+        this.itemDeactivating = false;
+      });
   }
 
   getUniqueItems(configurationWizard: boolean): IAdministrationItem[] {
     const items: IAdministrationItem[] = [];
 
-    const orderedByPriority = this.items.slice()
+    const orderedByPriority = this.items
+      .slice()
       .sort((a, b) => {
         if (a.name !== b.name) {
           return a.name.localeCompare(b.name);
@@ -88,10 +94,9 @@ export class AdministrationItemService {
   }
 
   getActiveItems(configurationWizard: boolean): IAdministrationItem[] {
-    return this.getUniqueItems(configurationWizard).filter(item =>
-      filterHiddenAdministrationItem(configurationWizard)(item)
-      && filterConfigurationWizard(configurationWizard)(item)
-    ).sort(orderAdministrationItems(configurationWizard));
+    return this.getUniqueItems(configurationWizard)
+      .filter(item => filterHiddenAdministrationItem(configurationWizard)(item) && filterConfigurationWizard(configurationWizard)(item))
+      .sort(orderAdministrationItems(configurationWizard));
   }
 
   getDefaultItem(configurationWizard: boolean): string | null {
@@ -140,11 +145,10 @@ export class AdministrationItemService {
   create(options: IAdministrationItemOptions): void {
     const type = options.type ?? AdministrationItemType.Administration;
 
-    const existedIndex = this.items.findIndex(item => item.name === options.name && (
-      item.type === type
-      || item.type === AdministrationItemType.Default
-      || type === AdministrationItemType.Default
-    ));
+    const existedIndex = this.items.findIndex(
+      item =>
+        item.name === options.name && (item.type === type || item.type === AdministrationItemType.Default || type === AdministrationItemType.Default),
+    );
 
     if (!options.replace && existedIndex !== -1) {
       throw new Error(`Administration item "${options.name}" already exists in the same visibility scope`);
@@ -159,36 +163,31 @@ export class AdministrationItemService {
     this.items.push(item);
   }
 
-  async activate(
-    screen: IAdministrationItemRoute,
-    configurationWizard: boolean,
-    outside: boolean,
-    outsideAdminPage: boolean
-  ): Promise<void> {
+  async activate(screen: IAdministrationItemRoute, configurationWizard: boolean, outside: boolean, outsideAdminPage: boolean): Promise<void> {
     await this.activationTask.execute({ screen, configurationWizard, outside, outsideAdminPage });
   }
 
-  async deActivate(
-    screen: IAdministrationItemRoute,
-    configurationWizard: boolean,
-    outside: boolean,
-    outsideAdminPage: boolean
-  ): Promise<void> {
+  async deActivate(screen: IAdministrationItemRoute, configurationWizard: boolean, outside: boolean, outsideAdminPage: boolean): Promise<void> {
     await this.deActivationTask.execute({ screen, configurationWizard, outside, outsideAdminPage });
   }
 
   async canDeActivate(
     screen: IAdministrationItemRoute,
+    toScreen: IAdministrationItemRoute | null,
     configurationWizard: boolean,
-    outside: boolean
+    outside: boolean,
   ): Promise<boolean> {
     const item = this.getItem(screen.item, configurationWizard);
+    let nextItem = null;
+    if (toScreen) {
+      nextItem = this.getItem(toScreen.item, configurationWizard);
+    }
 
     if (!item) {
       return true;
     }
 
-    if (item.canDeActivate && !(await item.canDeActivate(configurationWizard, outside))) {
+    if (item.canDeActivate && !(await item.canDeActivate(configurationWizard, outside, nextItem))) {
       return false;
     }
 
@@ -202,11 +201,7 @@ export class AdministrationItemService {
     return true;
   }
 
-  async canActivate(
-    screen: IAdministrationItemRoute,
-    configurationWizard: boolean,
-    outside: boolean
-  ): Promise<boolean> {
+  async canActivate(screen: IAdministrationItemRoute, configurationWizard: boolean, outside: boolean): Promise<boolean> {
     const item = this.getItem(screen.item, configurationWizard);
     if (!item) {
       return false;
@@ -226,12 +221,7 @@ export class AdministrationItemService {
     return true;
   }
 
-  private activateHandler: IExecutorHandler<IActivationData> = async ({
-    screen,
-    configurationWizard,
-    outside,
-    outsideAdminPage,
-  }) => {
+  private activateHandler: IExecutorHandler<IActivationData> = async ({ screen, configurationWizard, outside, outsideAdminPage }) => {
     let lastItem = 0;
     while (true) {
       const items = this.getActiveItems(configurationWizard);
@@ -266,12 +256,7 @@ export class AdministrationItemService {
     }
   };
 
-  private deActivateHandler: IExecutorHandler<IActivationData> = async ({
-    screen,
-    configurationWizard,
-    outside,
-    outsideAdminPage,
-  }) => {
+  private deActivateHandler: IExecutorHandler<IActivationData> = async ({ screen, configurationWizard, outside, outsideAdminPage }) => {
     const item = this.getItem(screen.item, configurationWizard);
     if (!item) {
       return;

@@ -1,24 +1,28 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2022 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { computed, makeObservable } from 'mobx';
 
-import { ProcessSnackbar } from '@cloudbeaver/core-blocks';
+import { ConfirmationDialogDelete, ProcessSnackbar } from '@cloudbeaver/core-blocks';
 import { injectable } from '@cloudbeaver/core-di';
-import { CommonDialogService, ConfirmationDialogDelete, DialogueStateResult } from '@cloudbeaver/core-dialogs';
+import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { Executor, ExecutorInterrupter, IExecutor } from '@cloudbeaver/core-executor';
 import { ProjectInfo, projectInfoSortByName, ProjectsService } from '@cloudbeaver/core-projects';
 import { isArraysEqual } from '@cloudbeaver/core-utils';
 
-import { ConnectionInfoResource, Connection, createConnectionParam } from './ConnectionInfoResource';
+import type { IConnectionInfoParams } from './CONNECTION_INFO_PARAM_SCHEMA';
+import { Connection, ConnectionInfoResource, createConnectionParam, isConnectionInfoParamEqual } from './ConnectionInfoResource';
 import { ContainerResource, IStructContainers, ObjectContainer } from './ContainerResource';
-import type { IConnectionInfoParams } from './IConnectionsResource';
+
+export interface IRequireConnectionExecutorData {
+  key: IConnectionInfoParams;
+  resetCredentials?: boolean;
+}
 
 export interface IConnectionExecutorData {
   connections: IConnectionInfoParams[];
@@ -28,15 +32,12 @@ export interface IConnectionExecutorData {
 @injectable()
 export class ConnectionsManagerService {
   get projectConnections(): Connection[] {
-    return this.connectionInfo.values
-      .filter(connection => this.projectsService.activeProjects.some(project => project.id === connection.projectId));
+    return this.connectionInfo.values.filter(connection => this.projectsService.activeProjects.some(project => project.id === connection.projectId));
   }
   get createConnectionProjects(): ProjectInfo[] {
-    return this.projectsService.activeProjects
-      .filter(project => project.canEditDataSources)
-      .sort(projectInfoSortByName);
+    return this.projectsService.activeProjects.filter(project => project.canEditDataSources).sort(projectInfoSortByName);
   }
-  readonly connectionExecutor: IExecutor<IConnectionInfoParams>;
+  readonly connectionExecutor: IExecutor<IRequireConnectionExecutorData>;
   readonly onDisconnect: IExecutor<IConnectionExecutorData>;
   readonly onDelete: IExecutor<IConnectionExecutorData>;
 
@@ -51,13 +52,11 @@ export class ConnectionsManagerService {
   ) {
     this.disconnecting = false;
 
-    this.connectionExecutor = new Executor<IConnectionInfoParams>(null, (active, current) => (
-      connectionInfo.includes(active, current)
-    ));
+    this.connectionExecutor = new Executor<IRequireConnectionExecutorData>(null, (a, b) => isConnectionInfoParamEqual(a.key, b.key));
     this.onDisconnect = new Executor();
     this.onDelete = new Executor();
 
-    this.connectionExecutor.addHandler(key => connectionInfo.load(key));
+    this.connectionExecutor.addHandler(data => connectionInfo.load(data.key));
     this.onDelete.before(this.onDisconnect);
 
     makeObservable(this, {
@@ -70,26 +69,18 @@ export class ConnectionsManagerService {
     });
   }
 
-  async requireConnection(key: IConnectionInfoParams): Promise<Connection | null> {
-    try {
-      const context = await this.connectionExecutor.execute(key);
-      const connection = context.getContext(this.connectionContext);
+  async requireConnection(key: IConnectionInfoParams, resetCredentials?: boolean): Promise<Connection | null> {
+    const context = await this.connectionExecutor.execute({ key, resetCredentials });
+    const connection = context.getContext(this.connectionContext);
 
-      return connection.connection;
-    } catch {
-      return null;
-    }
+    return connection.connection;
   }
 
   addOpenedConnection(connection: Connection): void {
     this.connectionInfo.add(connection);
   }
 
-  getObjectContainerById(
-    connectionKey: IConnectionInfoParams,
-    objectCatalogId?: string,
-    objectSchemaId?: string
-  ): ObjectContainer | undefined {
+  getObjectContainerById(connectionKey: IConnectionInfoParams, objectCatalogId?: string, objectSchemaId?: string): ObjectContainer | undefined {
     if (objectCatalogId) {
       const objectContainers = this.containerContainers.getCatalogData(connectionKey, objectCatalogId);
 
@@ -101,9 +92,7 @@ export class ConnectionsManagerService {
         return objectContainers.catalog;
       }
 
-      return objectContainers.schemaList.find(
-        objectContainer => objectContainer.name === objectSchemaId
-      );
+      return objectContainers.schemaList.find(objectContainer => objectContainer.name === objectSchemaId);
     }
 
     if (objectSchemaId) {
@@ -155,7 +144,7 @@ export class ConnectionsManagerService {
 
   connectionContext() {
     return {
-      connection: null as (Connection | null),
+      connection: null as Connection | null,
     };
   }
 

@@ -1,0 +1,11 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<schema targetNamespace="org.jkiss.dbeaver.core" xmlns="http://www.w3.org/2001/XMLSchema">
+<annotation>
+      <appInfo>
+         <meta.schema plugin="io.cloudbeaver.rm.file.handler" id="io.cloudbeaver.rm.file.handler" name="RM file operations handler"/>
+      </appInfo>
+      <documentation>
+         RM file operations handler
+      </documentation>
+   </annotation>
+</schema>

@@ -1,15 +1,14 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2022 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
-import type { IFormStateInfo } from '@cloudbeaver/core-blocks';
 import type { ConnectionInfoResource, DatabaseConnection } from '@cloudbeaver/core-connections';
 import type { IExecutor, IExecutorHandlersCollection } from '@cloudbeaver/core-executor';
 import type { ConnectionConfig } from '@cloudbeaver/core-sdk';
+import type { IFormStateInfo } from '@cloudbeaver/core-ui';
 import type { MetadataMap } from '@cloudbeaver/core-utils';
 
 export type ConnectionFormMode = 'edit' | 'create';
@@ -26,7 +25,7 @@ export interface IConnectionFormState {
 
   readonly id: string;
   readonly initError: Error | null;
-  readonly statusMessage: string | null;
+  readonly statusMessage: string | string[] | null;
   readonly disabled: boolean;
   readonly loading: boolean;
   readonly configured: boolean;
@@ -42,10 +41,7 @@ export interface IConnectionFormState {
   readonly loadConnectionInfo: () => Promise<DatabaseConnection | undefined>;
   readonly reset: () => void;
   readonly setPartsState: (state: MetadataMap<string, any>) => this;
-  readonly setOptions: (
-    mode: ConnectionFormMode,
-    type: ConnectionFormType
-  ) => this;
+  readonly setOptions: (mode: ConnectionFormMode, type: ConnectionFormType) => this;
   readonly setConfig: (projectId: string, config: ConnectionConfig) => this;
   readonly setProject: (projectId: string) => this;
   readonly setAvailableDrivers: (drivers: string[]) => this;

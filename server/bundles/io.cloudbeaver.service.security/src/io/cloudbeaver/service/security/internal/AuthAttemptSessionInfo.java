@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2023 DBeaver Corp and others
+ * Copyright (C) 2010-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,17 +33,20 @@ public class AuthAttemptSessionInfo {
     private final SMSessionType sessionType;
     @NotNull
     private final Map<String, Object> sessionParams;
+    private final boolean mainAuth;
 
     public AuthAttemptSessionInfo(
         @NotNull String appSessionId,
         @Nullable String smSessionId,
         @NotNull SMSessionType sessionType,
-        @NotNull Map<String, Object> sessionParams
+        @NotNull Map<String, Object> sessionParams,
+        boolean mainAuth
     ) {
         this.appSessionId = appSessionId;
         this.smSessionId = smSessionId;
         this.sessionType = sessionType;
         this.sessionParams = sessionParams;
+        this.mainAuth = mainAuth;
     }
 
     @NotNull
@@ -65,4 +68,9 @@ public class AuthAttemptSessionInfo {
     public String getSmSessionId() {
         return smSessionId;
     }
+
+    public boolean isMainAuth() {
+        return mainAuth;
+    }
+
 }

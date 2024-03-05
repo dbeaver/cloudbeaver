@@ -1,127 +1,81 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2022 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observer } from 'mobx-react-lite';
-import styled, { css, use } from 'reshadow';
 
 import { Button } from './Button';
+import style from './ExceptionMessage.m.css';
+import { Icon } from './Icon';
 import { IconOrImage } from './IconOrImage';
 import { useTranslate } from './localization/useTranslate';
+import { s } from './s';
 import { useErrorDetails } from './useErrorDetails';
-
-const styles = css`
-  error {
-    flex: 1;
-    display: flex;
-  }
-
-  error-name {
-    composes: theme-typography--headline6 from global;
-    height: 40px;
-    text-overflow: ellipsis;
-    overflow: hidden;
-    white-space: nowrap;
-
-    & span {
-      display: inline-block;
-      vertical-align: middle;
-      line-height: normal;
-    }
-  }
-
-  error-data {
-    padding: 0 16px;
-  }
-
-  error-message {
-    flex: 1;
-    overflow: auto;
-    white-space: pre-wrap;
-  }
-
-  error-actions {
-    display: flex;
-    flex-shrink: 0;
-    align-items: center;
-    margin-top: 16px;
-    gap: 16px;
-  }
-
-  error[|inline] {
-    align-items: center;
-    height: 38px;
-
-    & error-data {
-      display: flex;
-      align-items: center;
-      padding: 0;
-    }
-    & error-icon {
-      display: flex;
-      align-items: center;
-      align-content: center;
-
-      & IconOrImage {
-        height: 24px;
-        width: 24px;
-      }
-    }
-    & error-message {
-      line-height: 1.2;
-      -webkit-line-clamp: 2;
-      display: -webkit-box;
-      -webkit-box-orient: vertical;
-      overflow: hidden;
-      padding: 0 16px;
-    }
-    & error-name {
-      display: none;
-    }
-    & error-actions {
-      margin-top: 0;
-    }
-  }
-`;
+import { useS } from './useS';
 
 interface Props {
-  name?: string;
-  message?: string;
-  exception?: Error;
+  exception?: Error | null;
+  icon?: boolean;
   inline?: boolean;
   className?: string;
   onRetry?: () => void;
+  onClose?: () => void;
 }
 
-export const ExceptionMessage = observer<Props>(function ExceptionMessage({
-  name, message, exception = null, inline, className, onRetry,
-}) {
+export const ExceptionMessage = observer<Props>(function ExceptionMessage({ exception = null, icon, inline, className, onRetry, onClose }) {
+  const styles = useS(style);
   const translate = useTranslate();
   const error = useErrorDetails(exception);
 
-  return styled(styles)(
-    <error {...use({ inline })} className={className}>
-      <error-icon><IconOrImage icon={inline ? '/icons/error_icon_sm.svg' : '/icons/error_icon.svg'} /></error-icon>
-      <error-data>
-        <error-name><span>{name || error.details?.name}</span></error-name>
-        <error-message>{message || error.details?.message}</error-message>
-        <error-actions>
-          {exception && error.details?.hasDetails && (
-            <Button type='button' mod={['outlined']} disabled={error.isOpen} onClick={error.open}>
-              {translate('ui_errors_details')}
-            </Button>
+  if (error.refresh) {
+    const retry = onRetry;
+    const refresh = error.refresh;
+    onRetry = () => {
+      retry?.();
+      refresh();
+    };
+  }
+
+  if (!exception) {
+    return null;
+  }
+
+  return (
+    <div className={s(styles, { error: true, icon, inline }, className)}>
+      <div className={s(styles, { errorIcon: true })} title={error.message}>
+        <IconOrImage className={s(styles, { iconOrImage: true })} icon={inline || icon ? '/icons/error_icon_sm.svg' : '/icons/error_icon.svg'} />
+      </div>
+      {!icon && (
+        <>
+          <div className={s(styles, { errorData: true })}>
+            <h2 className={s(styles, { errorName: true })}>
+              <span>{translate('core_blocks_exception_message_error_title')}</span>
+            </h2>
+            <div className={s(styles, { errorMessage: true })}>
+              {(error.hasDetails && error.message) || translate('core_blocks_exception_message_error_message')}{' '}
+              {onRetry && translate('ui_please_retry')}
+            </div>
+            <div className={s(styles, { errorActions: true })}>
+              <Button type="button" mod={['outlined']} disabled={error.isOpen} onClick={error.open}>
+                {translate('ui_errors_details')}
+              </Button>
+              {onRetry && (
+                <Button type="button" mod={['unelevated']} onClick={onRetry}>
+                  {translate('ui_processing_retry')}
+                </Button>
+              )}
+            </div>
+          </div>
+          {onClose && (
+            <div className={s(styles, { errorActionClose: true })}>
+              <Icon name="cross" viewBox="0 0 16 16" onClick={onClose} />
+            </div>
           )}
-          {onRetry && (
-            <Button type='button' mod={['unelevated']} onClick={onRetry}>
-              {translate('ui_processing_retry')}
-            </Button>
-          )}
-        </error-actions>
-      </error-data>
-    </error>
+        </>
+      )}
+    </div>
   );
 });

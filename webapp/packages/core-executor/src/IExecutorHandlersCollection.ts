@@ -1,11 +1,10 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2022 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import type { IAsyncContextLoader, IContextLoader, IExecutionContextProvider, ISyncContextLoader } from './IExecutionContext';
 import type { IExecutorHandler } from './IExecutorHandler';
 
@@ -21,6 +20,7 @@ export interface IChainLink<T, TResult> {
 }
 
 export interface IExecutorHandlersCollection<T = unknown, TResult = any | Promise<any>> {
+  readonly isEmpty: boolean;
   readonly handlers: Array<IExecutorHandler<T, TResult>>;
   readonly postHandlers: Array<IExecutorHandler<T, TResult>>;
   readonly chain: Array<IChainLink<T, TResult>>;
@@ -29,17 +29,13 @@ export interface IExecutorHandlersCollection<T = unknown, TResult = any | Promis
 
   setInitialDataGetter(getter: () => T): this;
 
-  addContextCreator<TContext>(
-    context: ISyncContextLoader<TContext, T>,
-    creator: ISyncContextLoader<TContext, T>
-  ): this;
-  addContextCreator<TContext>(
-    context: IAsyncContextLoader<TContext, T>,
-    creator: IAsyncContextLoader<TContext, T>
-  ): this;
+  addContextCreator<TContext>(context: ISyncContextLoader<TContext, T>, creator: ISyncContextLoader<TContext, T>): this;
+  addContextCreator<TContext>(context: IAsyncContextLoader<TContext, T>, creator: IAsyncContextLoader<TContext, T>): this;
 
   before: <TNext>(executor: IExecutorHandlersCollection<TNext, TResult>, map?: ExecutorDataMap<T, TNext>) => this;
+  removeBefore: (executor: IExecutorHandlersCollection<any, TResult>) => void;
   next: <TNext>(executor: IExecutorHandlersCollection<TNext, TResult>, map?: ExecutorDataMap<T, TNext>) => this;
+  removeNext: (executor: IExecutorHandlersCollection<any, TResult>) => void;
   addCollection: (collection: IExecutorHandlersCollection<T, TResult>) => this;
   hasHandler: (handler: IExecutorHandler<T, TResult>) => boolean;
   addHandler: (handler: IExecutorHandler<T, TResult>) => this;
@@ -48,7 +44,5 @@ export interface IExecutorHandlersCollection<T = unknown, TResult = any | Promis
   removePostHandler: (handler: IExecutorHandler<T, TResult>) => void;
 
   for: (link: IExecutorHandlersCollection<any, TResult>) => IExecutorHandlersCollection<T, TResult>;
-  getLinkHandlers: (
-    link: IExecutorHandlersCollection<any, TResult>
-  ) => IExecutorHandlersCollection<T, TResult> | undefined;
+  getLinkHandlers: (link: IExecutorHandlersCollection<any, TResult>) => IExecutorHandlersCollection<T, TResult> | undefined;
 }

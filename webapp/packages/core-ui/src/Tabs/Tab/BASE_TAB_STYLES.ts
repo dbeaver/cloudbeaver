@@ -1,104 +1,110 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2022 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { css } from 'reshadow';
 
 export const BASE_TAB_STYLES = css`
-placeholder {
-  composes: placeholder from global;
-}
-BaseTab {
-  position: relative;
-  outline: none;
-  font-weight: normal;
-  cursor: pointer;
-  padding: 0;
-  white-space: nowrap;
+  placeholder {
+    composes: placeholder from global;
+  }
+  BaseTab {
+    position: relative;
+    outline: none;
+    font-weight: normal;
+    cursor: pointer;
+    padding: 0;
+    white-space: nowrap;
 
-  height: 48px;
-  border-top: solid 2px transparent;
+    height: 32px;
+    border-top: solid 2px transparent;
 
-  &:global([aria-selected="true"]) {
-    font-weight: 500;
-    cursor: auto;
-    border-top-color: var(--theme-negative);
-    opacity: 1;
+    &:global([aria-selected='true']) {
+      font-weight: 500;
+      cursor: auto;
+      border-top-color: var(--theme-negative);
+      opacity: 1;
 
-    &:before {
-      display: none;
+      &:before {
+        display: none;
+      }
+    }
+
+    &:not(:global([aria-selected='true'])) {
+      background-color: transparent !important;
     }
   }
 
-  &:not(:global([aria-selected="true"])) {
-    background-color: transparent !important;
+  tab-inner {
+    composes: theme-typography--body2 tab from global;
+    display: grid;
+    position: relative;
   }
-}
 
-tab-inner {
-  composes: theme-typography--body2 tab from global;
-  display: grid;
-  position: relative;
-}
+  tab-inner[|selected] portal,
+  tab-inner portal[|menuOpened],
+  tab-inner:hover portal,
+  tab-inner:focus-within portal,
+  tab-inner[|selected] tab-action,
+  tab-inner:hover tab-action,
+  tab-inner:focus-within tab-action {
+    visibility: visible;
+  }
 
-tab-inner[|selected] portal,
-tab-inner portal[|menuOpened],
-tab-inner:hover portal,
-tab-inner:focus-within portal {
-  visibility: visible;
-}
+  tab-container {
+    max-width: 240px;
+    height: 100%;
+    display: flex;
+    flex-shrink: 0;
+    text-align: left;
+    align-items: center;
 
-tab-container {
-  max-width: 240px;
-  height: 100%;
-  display: flex;
-  flex-shrink: 0;
-  text-align: left;
-  align-items: center;
-
-  & tab-icon {
-    height: 24px;
-    padding-left: 12px;
-
-    & StaticImage,
-    & IconOrImage,
-    & img {
-      width: 24px;
-    }
-
-    & placeholder {
-      width: 24px;
+    & tab-icon {
+      display: flex;
       height: 24px;
+      padding-left: 8px;
+      justify-content: center;
+      align-items: center;
+
+      & StaticImage,
+      & IconOrImage,
+      & img {
+        width: 16px;
+        height: 16px;
+      }
+
+      & placeholder {
+        width: 16px;
+        height: 16px;
+      }
+    }
+
+    & tab-title {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      padding: 0 8px;
+    }
+
+    & tab-title placeholder {
+      width: 80px;
+      height: 16px;
     }
   }
 
-  & tab-title {
+  TabList {
+    box-sizing: border-box;
+  }
+
+  TabPanel {
+    flex: 1;
+    display: flex;
     overflow: hidden;
-    text-overflow: ellipsis;
-    padding: 0 12px;
+    outline: none;
+    position: relative;
   }
-
-  & tab-title placeholder {
-    width: 80px;
-    height: 16px;
-  }
-}
-
-TabList {
-  box-sizing: border-box;
-}
-
-TabPanel {
-  flex: 1;
-  display: flex;
-  overflow: hidden;
-  outline: none;
-  position: relative;
-}
 `;
 
 export const BASE_TAB_ACTION_STYLES = css`
@@ -130,13 +136,14 @@ export const BASE_TAB_ACTION_STYLES = css`
     flex-shrink: 0;
     padding: 4px;
     padding-left: 0;
+    visibility: hidden;
 
     &:hover {
       opacity: 0.8;
     }
 
     &:before {
-      content: "";
+      content: '';
       display: block;
       left: -4px;
       top: 0;
@@ -153,9 +160,5 @@ export const BASE_TAB_ACTION_STYLES = css`
 
   portal {
     visibility: hidden;
-    & tab-action {
-      width: 10px;
-      height: 10px;
-    }
   }
 `;

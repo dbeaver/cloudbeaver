@@ -1,0 +1,58 @@
+.header {
+  position: relative;
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  flex-shrink: 0;
+  padding: 24px;
+
+  &.noPadding {
+    padding: 0px;
+  }
+}
+
+.headerTitleContainer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+  min-height: 24px;
+  overflow: hidden;
+}
+
+.headerTitle {
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.iconContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.icon {
+  width: 24px;
+  height: 24px;
+  margin-right: 16px;
+  &.bigIcon {
+    width: 40px;
+    height: 40px;
+  }
+}
+
+.subTitle {
+  composes: theme-typography--caption from global;
+  grid-column: 2;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.reject {
+  cursor: pointer;
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}

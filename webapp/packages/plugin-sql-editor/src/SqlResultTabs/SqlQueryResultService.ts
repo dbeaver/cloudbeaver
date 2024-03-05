@@ -1,23 +1,20 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2022 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { injectable } from '@cloudbeaver/core-di';
 import { uuid } from '@cloudbeaver/core-utils';
 import { IDatabaseDataModel, IDatabaseResultSet, TableViewerStorageService } from '@cloudbeaver/plugin-data-viewer';
 
-import type { IResultGroup, ISqlEditorTabState, IStatisticsTab } from '../ISqlEditorTabState';
+import type { IResultGroup, IResultTab, ISqlEditorTabState, IStatisticsTab } from '../ISqlEditorTabState';
 import type { IDataQueryOptions } from '../QueryDataSource';
 
 @injectable()
 export class SqlQueryResultService {
-  constructor(
-    private tableViewerStorageService: TableViewerStorageService
-  ) { }
+  constructor(private readonly tableViewerStorageService: TableViewerStorageService) {}
 
   getSelectedGroup(editorState: ISqlEditorTabState): IResultGroup | null {
     const currentTab = editorState.tabs.find(tab => tab.id === editorState.currentTabId);
@@ -27,17 +24,19 @@ export class SqlQueryResultService {
       return null;
     }
 
-    return editorState.resultGroups
-      .find(group => group.groupId === resultTab.groupId)
-    || null;
+    return editorState.resultGroups.find(group => group.groupId === resultTab.groupId) || null;
   }
 
-  getGroup(
-    editorState: ISqlEditorTabState,
-    groupId: string
-  ): IResultGroup | undefined {
-    return editorState.resultGroups
-      .find(group => group.groupId === groupId);
+  getGroups(editorState: ISqlEditorTabState): IResultGroup[] {
+    return editorState.resultGroups;
+  }
+
+  getGroup(editorState: ISqlEditorTabState, groupId: string): IResultGroup | undefined {
+    return editorState.resultGroups.find(group => group.groupId === groupId);
+  }
+
+  getModelGroup(editorState: ISqlEditorTabState, modelId: string): IResultGroup | undefined {
+    return editorState.resultGroups.find(group => group.modelId === modelId);
   }
 
   updateGroupTabs(
@@ -45,8 +44,7 @@ export class SqlQueryResultService {
     model: IDatabaseDataModel<IDataQueryOptions, IDatabaseResultSet>,
     groupId: string,
     selectFirstResult?: boolean,
-    statisticsIndex?: number,
-    queryIndex?: number
+    resultCount?: number,
   ): void {
     const group = this.getGroup(editorState, groupId);
 
@@ -54,41 +52,31 @@ export class SqlQueryResultService {
       return;
     }
 
-    this.createTabsForGroup(editorState, group, model, statisticsIndex, queryIndex);
+    this.createTabsForGroup(editorState, group, model, resultCount);
 
     const tabsToRemove = editorState.resultTabs
       .filter(
-        resultTab => resultTab.groupId === groupId
-          && resultTab.indexInResultSet !== 0
-          && resultTab.indexInResultSet >= model.source.results.length
-
+        resultTab => resultTab.groupId === groupId && resultTab.indexInResultSet !== 0 && resultTab.indexInResultSet >= model.source.results.length,
       )
       .map(tab => tab.tabId);
 
-    editorState.tabs = editorState.tabs
-      .filter(resultTab => !tabsToRemove.includes(resultTab.id));
-    editorState.resultTabs = editorState.resultTabs
-      .filter(resultTab => !tabsToRemove.includes(resultTab.tabId));
+    editorState.tabs = editorState.tabs.filter(resultTab => !tabsToRemove.includes(resultTab.id));
+    editorState.resultTabs = editorState.resultTabs.filter(resultTab => !tabsToRemove.includes(resultTab.tabId));
 
     if (selectFirstResult) {
       this.selectFirstResult(editorState, groupId);
     }
   }
 
-  createGroup(
-    tabState: ISqlEditorTabState,
-    modelId: string,
-    query: string,
-  ): IResultGroup {
-    const nameOrder = Math.max(1, ...tabState.resultGroups.map(group => group.nameOrder + 1));
-    const order = Math.max(0, ...tabState.tabs.map(tab => tab.order + 1));
+  createGroup(tabState: ISqlEditorTabState, modelId: string, query: string, nameOrder?: number): IResultGroup {
     const groupId = uuid();
+    const order = Math.max(0, ...tabState.tabs.map(tab => tab.order + 1));
 
     tabState.resultGroups.push({
       groupId,
       modelId,
       order,
-      nameOrder,
+      nameOrder: nameOrder ?? this.getGroupNameOrder(tabState),
       query,
     });
 
@@ -96,7 +84,7 @@ export class SqlQueryResultService {
   }
 
   createStatisticsTab(tabState: ISqlEditorTabState): IStatisticsTab {
-    const nameOrder = Math.max(1, ...tabState.statisticsTabs.map(group => group.order + 1));
+    const nameOrder = this.getGroupNameOrder(tabState);
     const order = Math.max(0, ...tabState.tabs.map(tab => tab.order + 1));
     const id = uuid();
 
@@ -134,6 +122,10 @@ export class SqlQueryResultService {
     tabState.resultTabs = tabState.resultTabs.filter(tab => tab.groupId !== groupId);
     tabState.currentTabId = tabState.tabs[0]?.id;
     this.tableViewerStorageService.remove(group.modelId);
+  }
+
+  getGroupNameOrder(tabState: ISqlEditorTabState) {
+    return Math.max(1, ...tabState.resultGroups.map(group => group.nameOrder + 1), ...tabState.statisticsTabs.map(tab => tab.order + 1));
   }
 
   async canCloseResultTab(state: ISqlEditorTabState, tabId: string): Promise<boolean> {
@@ -182,11 +174,21 @@ export class SqlQueryResultService {
     }
   }
 
+  selectResult(editorState: ISqlEditorTabState, groupId: string, resultIndex: number) {
+    const resultTab = editorState.resultTabs
+      .filter(resultTab => resultTab.groupId === groupId)
+      .sort((a, b) => {
+        if (a.indexInResultSet === resultIndex) {
+          return -1;
+        }
+        return a.indexInResultSet - b.indexInResultSet;
+      });
+
+    editorState.currentTabId = resultTab[0].tabId;
+  }
+
   selectFirstResult(editorState: ISqlEditorTabState, groupId: string) {
-    const mainTab = editorState.resultTabs.filter(
-      resultTab => resultTab.groupId === groupId
-    )
-      .sort((a, b) => a.indexInResultSet - b.indexInResultSet);
+    const mainTab = editorState.resultTabs.filter(resultTab => resultTab.groupId === groupId).sort((a, b) => a.indexInResultSet - b.indexInResultSet);
 
     editorState.currentTabId = mainTab[0].tabId;
   }
@@ -195,93 +197,69 @@ export class SqlQueryResultService {
     state: ISqlEditorTabState,
     group: IResultGroup,
     model: IDatabaseDataModel<IDataQueryOptions, IDatabaseResultSet>,
-    statisticsIndex?: number,
-    queryIndex?: number
+    resultCount?: number,
   ) {
-    this.updateResultTab(state, group, model, 0, statisticsIndex, queryIndex);
+    this.createResultTabForGroup(state, group, model, 0, resultCount);
 
     for (let i = 1; i < model.source.results.length; i++) {
-      this.updateResultTab(state, group, model, i, statisticsIndex, queryIndex);
+      this.createResultTabForGroup(state, group, model, i, resultCount);
     }
   }
 
-  private updateResultTab(
+  private createResultTabForGroup(
     state: ISqlEditorTabState,
     group: IResultGroup,
     model: IDatabaseDataModel<IDataQueryOptions, IDatabaseResultSet>,
     indexInResultSet: number,
-    statisticsIndex?: number,
-    queryIndex?: number
+    resultCount?: number,
   ) {
-    const resultTab = state.resultTabs.find(
-      tab => tab.groupId === group.groupId && tab.indexInResultSet === indexInResultSet
-    );
+    const resultTab = state.resultTabs.find(tab => tab.groupId === group.groupId && tab.indexInResultSet === indexInResultSet);
 
     if (!resultTab) {
-      this.createResultTab(
-        state,
-        group,
-        indexInResultSet,
-        model.source.results.length,
-        statisticsIndex,
-        queryIndex
-      );
+      this.createResultTab(state, group, indexInResultSet, model.source.results.length, resultCount);
     } else {
       const tab = state.tabs.find(tab => tab.id === resultTab.tabId);
 
       if (tab) {
-        tab.name = this.getTabNameForOrder(
-          group.nameOrder,
-          indexInResultSet,
-          model.source.results.length,
-          statisticsIndex,
-          queryIndex
-        );
+        tab.name = this.getTabNameForOrder(group.nameOrder, indexInResultSet, model.source.results.length, resultCount);
       }
     }
   }
 
-  private createResultTab(
-    state: ISqlEditorTabState,
-    group: IResultGroup,
-    indexInResultSet: number,
-    results: number,
-    statisticsIndex?: number,
-    queryIndex?: number
-  ) {
+  updateResultTab(state: ISqlEditorTabState, id: string, resultTab: Partial<IResultTab>) {
+    const index = state.resultTabs.findIndex(tab => tab.tabId === id);
+
+    if (index === -1) {
+      return;
+    }
+
+    state.resultTabs[index] = { ...state.resultTabs[index], ...resultTab };
+  }
+
+  private createResultTab(state: ISqlEditorTabState, group: IResultGroup, indexInResultSet: number, results: number, resultCount?: number) {
     const id = uuid();
 
     state.resultTabs.push({
       tabId: id,
       groupId: group.groupId,
       indexInResultSet,
+      presentationId: '',
+      valuePresentationId: null,
     });
 
     state.tabs.push({
       id,
-      name: this.getTabNameForOrder(
-        group.nameOrder,
-        indexInResultSet,
-        results,
-        statisticsIndex,
-        queryIndex
-      ),
+      name: this.getTabNameForOrder(group.nameOrder, indexInResultSet, results, resultCount),
       icon: 'table-icon',
       order: group.order,
     });
   }
 
-  getTabNameForOrder(
-    order: number,
-    indexInResultSet: number,
-    results: number,
-    statisticsIndex?: number,
-    queryIndex?: number
-  ) {
-    let name = `Result - ${statisticsIndex ?? order}`;
+  getTabNameForOrder(order: number, indexInResultSet: number, results: number, resultCount?: number) {
+    let name = `Result - ${order}`;
 
-    if (queryIndex) {
-      name += ` <${queryIndex}>`;
+    if (resultCount) {
+      name += ` <${resultCount}>`;
     }
 
     if (results > 1) {

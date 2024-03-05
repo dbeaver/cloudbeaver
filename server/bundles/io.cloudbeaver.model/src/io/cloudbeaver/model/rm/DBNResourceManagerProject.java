@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2023 DBeaver Corp
+ * Copyright (C) 2010-2024 DBeaver Corp
  *
  * All Rights Reserved.
  *
@@ -56,19 +56,25 @@ public class DBNResourceManagerProject extends DBNAbstractResourceManagerNode {
         return project.getId();
     }
 
+    @NotNull
+    @Override
+    public String getNodeId() {
+        return project.getId();
+    }
+
     @Override
     public String getNodeType() {
         return "rm.project";
     }
 
     @Override
-    public String getNodeName() {
+    public String getNodeDisplayName() {
         return project.getDisplayName();
     }
 
     @Override
     public String getLocalizedName(String locale) {
-        return getNodeName();
+        return getNodeDisplayName();
     }
 
     @Override
@@ -101,10 +107,11 @@ public class DBNResourceManagerProject extends DBNAbstractResourceManagerNode {
         return children;
     }
 
-    public RMController getResourceController() {
+    protected RMController getResourceController() {
         return ((DBNResourceManagerRoot) getParentNode()).getResourceController();
     }
 
+    @Deprecated
     @Override
     public String getNodeItemPath() {
         return getParentNode().getNodeItemPath() + "/" + getName();
@@ -118,7 +125,7 @@ public class DBNResourceManagerProject extends DBNAbstractResourceManagerNode {
 
     @Override
     public String toString() {
-        return getNodeName();
+        return getNodeDisplayName();
     }
 
 

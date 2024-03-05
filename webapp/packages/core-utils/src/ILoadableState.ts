@@ -1,19 +1,21 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2022 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
 
 export interface ILoadableState {
+  lazy?: boolean;
   isLoading: () => boolean;
   isLoaded: () => boolean;
   isError: () => boolean;
   readonly exception?: (Error | null)[] | Error | null;
-  load: () => void;
-  reload?: () => void;
+  load: () => void | Promise<void>;
+  reload?: () => void | Promise<void>;
 
+  promise?: Promise<any> | null;
   isOutdated?: () => boolean;
   isCancelled?: () => boolean;
   cancel?: () => void;
@@ -33,4 +35,12 @@ export function isContainsException(exception?: (Error | null)[] | Error | null)
   }
 
   return !!exception;
+}
+
+export function getFirstException(exception?: (Error | null)[] | Error | null): Error | null {
+  if (Array.isArray(exception)) {
+    return exception.find(Boolean) || null;
+  }
+
+  return exception || null;
 }

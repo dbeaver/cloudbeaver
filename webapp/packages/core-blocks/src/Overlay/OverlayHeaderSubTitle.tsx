@@ -1,21 +1,20 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2022 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
-import styled from 'reshadow';
-
-import { OVERLAY_BASE_STYLES } from './OVERLAY_BASE_STYLES';
+import { s } from '../s';
+import { useS } from '../useS';
+import style from './OverlayHeaderSubTitle.m.css';
 
 interface Props {
   className?: string;
 }
 
 export const OverlayHeaderSubTitle: React.FC<React.PropsWithChildren<Props>> = function OverlayHeaderSubTitle({ className, children }) {
-  return styled(OVERLAY_BASE_STYLES)(
-    <sub-title className={className}>{children}</sub-title>
-  );
+  const styles = useS(style);
+
+  return <div className={s(styles, { subTitle: true }, className)}>{children}</div>;
 };

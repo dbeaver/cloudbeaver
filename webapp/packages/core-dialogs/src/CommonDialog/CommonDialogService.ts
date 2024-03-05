@@ -1,14 +1,14 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2022 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
-import { observable } from 'mobx';
+import { observable, runInAction } from 'mobx';
 
 import { injectable } from '@cloudbeaver/core-di';
+import { uuid } from '@cloudbeaver/core-utils';
 
 export interface DialogOptions {
   persistent?: boolean;
@@ -23,16 +23,15 @@ export interface DialogComponentProps<TPayload, TResult = DialogueStateResult> {
   className?: string;
 }
 
-export type DialogComponent<TPayload, TResult = DialogueStateResult> = React.FC<
-DialogComponentProps<TPayload, TResult>
->;
+export type DialogComponent<TPayload, TResult = DialogueStateResult> = React.FC<DialogComponentProps<TPayload, TResult>>;
 
 export enum DialogueStateResult {
   Resolved,
-  Rejected
+  Rejected,
 }
 
 export interface DialogInternal<TResult> {
+  id: string;
   component: DialogComponent<any, any>;
   payload: any;
   options?: DialogOptions;
@@ -48,7 +47,7 @@ export class CommonDialogService {
   open<TPayload, TResult>(
     component: DialogComponent<TPayload, TResult>,
     payload: TPayload,
-    options?: DialogOptions
+    options?: DialogOptions,
   ): Promise<TResult | DialogueStateResult> {
     let _resolve: (value: TResult | DialogueStateResult) => void;
     let _reject: (reason?: any) => void;
@@ -59,6 +58,7 @@ export class CommonDialogService {
     });
 
     const dialogInternal: DialogInternal<TResult> = {
+      id: uuid(),
       component,
       payload,
       resolve: _resolve!,
@@ -77,6 +77,15 @@ export class CommonDialogService {
       dialog.resolve(DialogueStateResult.Rejected);
       this.removeDialog(dialog);
     }
+  }
+
+  /** Please avoid using this function, it can lead to the unpredictable behavior */
+  rejectAll() {
+    runInAction(() => {
+      for (const dialog of this.dialogs.slice()) {
+        this.rejectDialog(dialog.promise);
+      }
+    });
   }
 
   resolveDialog<TResult>(promise: Promise<TResult | DialogueStateResult>, result?: TResult): void {

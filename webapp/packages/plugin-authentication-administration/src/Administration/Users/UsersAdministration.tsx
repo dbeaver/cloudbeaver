@@ -1,50 +1,40 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2022 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
-import { AdministrationItemContentComponent, ADMINISTRATION_TOOLS_PANEL_STYLES } from '@cloudbeaver/core-administration';
-import { ToolsPanel, useTranslate, useStyles } from '@cloudbeaver/core-blocks';
+import type { AdministrationItemContentComponent } from '@cloudbeaver/core-administration';
+import { s, ToolsPanel, useS, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { BASE_TAB_STYLES, ITabData, Tab, TabList, TabPanel, TabsState, UNDERLINE_TAB_STYLES } from '@cloudbeaver/core-ui';
+import { BASE_TAB_STYLES, ITabData, Tab, TabList, TabPanel, TabsState, TabTitle, UNDERLINE_TAB_STYLES } from '@cloudbeaver/core-ui';
 
-import { MetaParameters } from './MetaParameters/MetaParameters';
 import { TeamsPage } from './Teams/TeamsPage';
+import style from './UsersAdministration.m.css';
 import { EUsersAdministrationSub, UsersAdministrationNavigationService } from './UsersAdministrationNavigationService';
-import { UsersTable } from './UsersTable/UsersTable';
+import { UsersPage } from './UsersTable/UsersPage';
 
 const tabsStyles = css`
-  TabList {
-    position: relative;
-    flex-shrink: 0;
-    align-items: center;
-    height: 51px;
+  tab-inner {
+    height: 100%;
   }
-  Tab {
-    height: 46px!important;
-    text-transform: uppercase;
-    font-weight: 500 !important;
-  }
-  TabPanel {
-    flex-direction: column;
+
+  tab-outer {
+    height: 100%;
   }
 `;
 
-export const UsersAdministration: AdministrationItemContentComponent = observer(function UsersAdministration({
-  sub, param,
-}) {
+const tabStyle = [BASE_TAB_STYLES, tabsStyles, UNDERLINE_TAB_STYLES];
+
+export const UsersAdministration: AdministrationItemContentComponent = observer(function UsersAdministration({ sub, param }) {
   const translate = useTranslate();
   const usersAdministrationNavigationService = useService(UsersAdministrationNavigationService);
   const subName = sub?.name || EUsersAdministrationSub.Users;
-
-  const tabStyle = [BASE_TAB_STYLES, tabsStyles, UNDERLINE_TAB_STYLES];
-  const style = useStyles(ADMINISTRATION_TOOLS_PANEL_STYLES, tabStyle);
+  const styles = useS(style);
 
   function openSub({ tabId }: ITabData) {
     if (subName === tabId) {
@@ -56,29 +46,24 @@ export const UsersAdministration: AdministrationItemContentComponent = observer(
     usersAdministrationNavigationService.navToSub(tabId as EUsersAdministrationSub, param || undefined);
   }
 
-  return styled(style)(
+  return styled(useStyles(tabStyle))(
     <TabsState selectedId={subName} lazy onChange={openSub}>
-      <ToolsPanel>
-        <TabList aria-label='User Administration pages' style={style}>
-          <Tab tabId={EUsersAdministrationSub.Users} style={style}>{translate('authentication_administration_item_users')}</Tab>
-          <Tab tabId={EUsersAdministrationSub.Teams} style={style}>{translate('administration_teams_tab_title')}</Tab>
-          {/* <Tab
-            tabId={EUsersAdministrationSub.MetaProperties}
-            style={style}
-          >
-            {translate('authentication_administration_item_metaParameters')}
-          </Tab> */}
+      <ToolsPanel className={s(styles, { tabPanel: true })} hasBottomBorder>
+        <TabList className={s(styles, { tabList: true })} aria-label="User Administration pages" style={tabStyle}>
+          <Tab className={s(styles, { tab: true })} tabId={EUsersAdministrationSub.Users} style={tabStyle}>
+            <TabTitle className={s(styles, { tabTitle: true })}>{translate('authentication_administration_item_users')}</TabTitle>
+          </Tab>
+          <Tab className={s(styles, { tab: true })} tabId={EUsersAdministrationSub.Teams} style={tabStyle}>
+            <TabTitle className={s(styles, { tabTitle: true })}>{translate('administration_teams_tab_title')}</TabTitle>
+          </Tab>
         </TabList>
       </ToolsPanel>
-      <TabPanel tabId={EUsersAdministrationSub.Users}>
-        <UsersTable sub={sub} param={param} />
+      <TabPanel className={s(styles, { tabPanel: true })} tabId={EUsersAdministrationSub.Users}>
+        <UsersPage param={param} />
       </TabPanel>
-      <TabPanel tabId={EUsersAdministrationSub.Teams}>
-        <TeamsPage sub={sub} param={param} />
+      <TabPanel className={s(styles, { tabPanel: true })} tabId={EUsersAdministrationSub.Teams}>
+        <TeamsPage param={param} />
       </TabPanel>
-      <TabPanel tabId={EUsersAdministrationSub.MetaProperties}>
-        <MetaParameters />
-      </TabPanel>
-    </TabsState>
+    </TabsState>,
   );
 });

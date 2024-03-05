@@ -1,33 +1,37 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2022 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
-import { action, makeObservable } from 'mobx';
+import { action, makeObservable, toJS } from 'mobx';
+import React from 'react';
 
 import { DBDriverResource, SSH_TUNNEL_ID } from '@cloudbeaver/core-connections';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
-import { NetworkHandlerAuthType, NetworkHandlerConfigInput } from '@cloudbeaver/core-sdk';
+import { DriverConfigurationType, NetworkHandlerAuthType, NetworkHandlerConfigInput } from '@cloudbeaver/core-sdk';
+import { formStateContext } from '@cloudbeaver/core-ui';
 
 import { connectionFormConfigureContext } from '../connectionFormConfigureContext';
 import { ConnectionFormService } from '../ConnectionFormService';
 import { connectionConfigContext } from '../Contexts/connectionConfigContext';
 import { connectionCredentialsStateContext } from '../Contexts/connectionCredentialsStateContext';
-import { connectionFormStateContext } from '../Contexts/connectionFormStateContext';
 import type { IConnectionFormFillConfigData, IConnectionFormState, IConnectionFormSubmitData } from '../IConnectionFormProps';
-import { SSHPanel } from './SSHPanel';
-import { SSHTab } from './SSHTab';
+
+export const SSHTab = React.lazy(async () => {
+  const { SSHTab } = await import('./SSHTab');
+  return { default: SSHTab };
+});
+export const SSHPanel = React.lazy(async () => {
+  const { SSHPanel } = await import('./SSHPanel');
+  return { default: SSHPanel };
+});
 
 @injectable()
 export class ConnectionSSHTabService extends Bootstrap {
-  constructor(
-    private readonly connectionFormService: ConnectionFormService,
-    private readonly dbDriverResource: DBDriverResource
-  ) {
+  constructor(private readonly connectionFormService: ConnectionFormService, private readonly dbDriverResource: DBDriverResource) {
     super();
 
     makeObservable<this, 'fillConfig' | 'prepareConfig'>(this, {
@@ -39,42 +43,36 @@ export class ConnectionSSHTabService extends Bootstrap {
   register(): void {
     this.connectionFormService.tabsContainer.add({
       key: 'ssh',
-      name: 'customConnection_options',
+      name: 'customConnection_main',
       order: 3,
       tab: () => SSHTab,
       panel: () => SSHPanel,
       isHidden: (tabId, props) => {
         if (props?.state.config.driverId) {
           const driver = this.dbDriverResource.get(props.state.config.driverId);
+          const urlType = props.state.config.configurationType === DriverConfigurationType.Url;
 
-          return !driver?.applicableNetworkHandlers.includes(SSH_TUNNEL_ID);
+          return urlType || !driver?.applicableNetworkHandlers.includes(SSH_TUNNEL_ID);
         }
+
         return true;
       },
     });
 
-    this.connectionFormService.prepareConfigTask
-      .addHandler(this.prepareConfig.bind(this));
+    this.connectionFormService.prepareConfigTask.addHandler(this.prepareConfig.bind(this));
 
-    this.connectionFormService.formValidationTask
-      .addHandler(this.validate.bind(this));
+    this.connectionFormService.formValidationTask.addHandler(this.validate.bind(this));
 
-    this.connectionFormService.formStateTask
-      .addHandler(this.formState.bind(this));
+    this.connectionFormService.formStateTask.addHandler(this.formState.bind(this));
 
-    this.connectionFormService.configureTask
-      .addHandler(this.configure.bind(this));
+    this.connectionFormService.configureTask.addHandler(this.configure.bind(this));
 
-    this.connectionFormService.fillConfigTask
-      .addHandler(this.fillConfig.bind(this));
+    this.connectionFormService.fillConfigTask.addHandler(this.fillConfig.bind(this));
   }
 
-  load(): void { }
+  load(): void {}
 
-  private fillConfig(
-    { state, updated }: IConnectionFormFillConfigData,
-    contexts: IExecutionContextProvider<IConnectionFormFillConfigData>
-  ) {
+  private fillConfig({ state, updated }: IConnectionFormFillConfigData, contexts: IExecutionContextProvider<IConnectionFormFillConfigData>) {
     if (!updated) {
       return;
     }
@@ -111,97 +109,118 @@ export class ConnectionSSHTabService extends Bootstrap {
     configuration.include('includeNetworkHandlersConfig');
   }
 
-  private validate(
-    {
-      state: {
-        config,
-        info,
-      },
-    }: IConnectionFormSubmitData,
-    contexts: IExecutionContextProvider<IConnectionFormSubmitData>
-  ) {
+  private validate({ state: { config, info } }: IConnectionFormSubmitData, contexts: IExecutionContextProvider<IConnectionFormSubmitData>) {
     const validation = contexts.getContext(this.connectionFormService.connectionValidationContext);
 
     if (!config.networkHandlersConfig) {
       return;
     }
 
-    for (const handler of config.networkHandlersConfig) {
-      if (handler.enabled) {
-        const initial = info?.networkHandlersConfig?.find(h => h.id === handler.id);
-        if (this.isChanged(handler, initial)) {
-          if (handler.savePassword && !handler.userName?.length) {
-            validation.error("Field SSH 'User' can't be empty");
-          }
+    const handler = config.networkHandlersConfig.find(handler => handler.id === SSH_TUNNEL_ID);
 
-          if (!handler.properties?.host?.length) {
-            validation.error("Field SSH 'Host' can't be empty");
-          }
-
-          const port = Number(handler.properties?.port);
-          if (Number.isNaN(port) || port < 1) {
-            validation.error("Field SSH 'Port' can't be empty");
-          }
-        }
-
-        const keyAuth = handler.authType === NetworkHandlerAuthType.PublicKey;
-        const keySaved = initial?.key === '';
-        if (keyAuth && handler.savePassword && !keySaved && !handler.key?.length) {
-          validation.error("Field SSH 'Private key' can't be empty");
-        }
-
-        const passwordSaved = initial?.password === '' && initial.authType === handler.authType;
-        if (!keyAuth && handler.savePassword && !passwordSaved && !handler.password?.length) {
-          validation.error("Field SSH 'Password' can't be empty");
-        }
-      }
-    }
-  }
-
-  private prepareConfig(
-    {
-      state,
-    }: IConnectionFormSubmitData,
-    contexts: IExecutionContextProvider<IConnectionFormSubmitData>
-  ) {
-    const config = contexts.getContext(connectionConfigContext);
-    const credentialsState = contexts.getContext(connectionCredentialsStateContext);
-
-    if (!state.config.networkHandlersConfig || state.config.networkHandlersConfig.length === 0) {
+    if (!handler) {
       return;
     }
 
-    const configs: NetworkHandlerConfigInput[] = [];
+    if (handler.enabled) {
+      const initial = info?.networkHandlersConfig?.find(h => h.id === handler.id);
+      if (this.isChanged(handler, initial)) {
+        if (handler.savePassword && !handler.userName?.length) {
+          validation.error("Field SSH 'User' can't be empty");
+        }
 
-    for (const handler of state.config.networkHandlersConfig) {
-      const initial = state.info?.networkHandlersConfig?.find(h => h.id === handler.id);
-      const passwordChanged = this.isPasswordChanged(handler, initial);
-      const keyChanged = this.isKeyChanged(handler, initial);
+        if (!handler.properties?.host?.length) {
+          validation.error("Field SSH 'Host' can't be empty");
+        }
 
-      if (this.isChanged(handler, initial) || passwordChanged || keyChanged) {
-        configs.push({
-          ...handler,
-          key: handler.authType === NetworkHandlerAuthType.PublicKey && keyChanged ? handler.key : undefined,
-          password: passwordChanged ? handler.password : undefined,
-        });
+        const port = Number(handler.properties?.port);
+        if (Number.isNaN(port) || port < 1) {
+          validation.error("Field SSH 'Port' can't be empty");
+        }
       }
-      if (handler.enabled && !handler.savePassword) {
-        credentialsState.requireNetworkHandler(handler.id);
-      }
-    }
 
-    if (configs.length > 0) {
-      config.networkHandlersConfig = configs;
+      const keyAuth = handler.authType === NetworkHandlerAuthType.PublicKey;
+      const keySaved = initial?.key === '';
+      if (keyAuth && handler.savePassword && !keySaved && !handler.key?.length) {
+        validation.error("Field SSH 'Private key' can't be empty");
+      }
+
+      const passwordSaved = initial?.password === '' && initial.authType === handler.authType;
+      if (!keyAuth && handler.savePassword && !passwordSaved && !handler.password?.length) {
+        validation.error("Field SSH 'Password' can't be empty");
+      }
     }
   }
 
-  private formState(
-    data: IConnectionFormState,
-    contexts: IExecutionContextProvider<IConnectionFormState>
-  ) {
+  private prepareConfig({ state }: IConnectionFormSubmitData, contexts: IExecutionContextProvider<IConnectionFormSubmitData>) {
+    const config = contexts.getContext(connectionConfigContext);
+    const credentialsState = contexts.getContext(connectionCredentialsStateContext);
+    const urlType = state.config.configurationType === DriverConfigurationType.Url;
+
+    if (urlType || !state.config.networkHandlersConfig || state.config.networkHandlersConfig.length === 0) {
+      return;
+    }
+
+    let handlerConfig: NetworkHandlerConfigInput | undefined;
+
+    const handler = state.config.networkHandlersConfig.find(handler => handler.id === SSH_TUNNEL_ID);
+
+    if (!handler) {
+      return;
+    }
+
+    const initial = state.info?.networkHandlersConfig?.find(h => h.id === handler.id);
+    const passwordChanged = this.isPasswordChanged(handler, initial);
+    const keyChanged = this.isKeyChanged(handler, initial);
+
+    if (this.isChanged(handler, initial) || passwordChanged || keyChanged) {
+      handlerConfig = {
+        ...handler,
+        savePassword: handler.savePassword || config.sharedCredentials,
+        key: handler.authType === NetworkHandlerAuthType.PublicKey && keyChanged ? handler.key : undefined,
+        password: passwordChanged ? handler.password : undefined,
+      };
+
+      delete handlerConfig.secureProperties;
+    }
+
+    if (handler.enabled && !handler.savePassword) {
+      credentialsState.requireNetworkHandler(handler.id);
+    }
+
+    if (handlerConfig) {
+      if (!config.networkHandlersConfig) {
+        config.networkHandlersConfig = [];
+      }
+
+      handlerConfig = this.getTrimmedSSHConfig(handlerConfig);
+      config.networkHandlersConfig.push(handlerConfig);
+    }
+  }
+
+  private getTrimmedSSHConfig(input: NetworkHandlerConfigInput): NetworkHandlerConfigInput {
+    const trimmedInput = toJS(input);
+    const attributesToTrim = Object.keys(input) as (keyof NetworkHandlerConfigInput)[];
+
+    for (const key of attributesToTrim) {
+      if (typeof trimmedInput[key] === 'string') {
+        trimmedInput[key] = trimmedInput[key]?.trim();
+      }
+    }
+
+    for (const key in trimmedInput.properties) {
+      if (typeof trimmedInput.properties[key] === 'string') {
+        trimmedInput.properties[key] = trimmedInput.properties[key]?.trim();
+      }
+    }
+
+    return trimmedInput;
+  }
+
+  private formState(data: IConnectionFormState, contexts: IExecutionContextProvider<IConnectionFormState>) {
     const config = contexts.getContext(connectionConfigContext);
     if (config.networkHandlersConfig !== undefined) {
-      const stateContext = contexts.getContext(connectionFormStateContext);
+      const stateContext = contexts.getContext(formStateContext);
 
       stateContext.markEdited();
     }
@@ -215,14 +234,16 @@ export class ConnectionSSHTabService extends Bootstrap {
     const port = Number(initial?.properties?.port);
     const formPort = Number(handler.properties?.port);
 
-    if (handler.enabled !== initial?.enabled
-      || handler.authType !== initial?.authType
-      || handler.savePassword !== initial?.savePassword
-      || handler.userName !== initial?.userName
-      || handler.properties?.host !== initial?.properties?.host
-      || port !== formPort
-      || handler.properties?.aliveInterval !== initial?.properties?.aliveInterval
-      || handler.properties?.sshConnectTimeout !== initial?.properties?.sshConnectTimeout) {
+    if (
+      handler.enabled !== initial?.enabled ||
+      handler.authType !== initial?.authType ||
+      handler.savePassword !== initial?.savePassword ||
+      handler.userName !== initial?.userName ||
+      handler.properties?.host !== initial?.properties?.host ||
+      port !== formPort ||
+      handler.properties?.aliveInterval !== initial?.properties?.aliveInterval ||
+      handler.properties?.sshConnectTimeout !== initial?.properties?.sshConnectTimeout
+    ) {
       return true;
     }
 
@@ -235,8 +256,8 @@ export class ConnectionSSHTabService extends Bootstrap {
     }
 
     return (
-      (((initial?.password === null && handler.password !== null) || initial?.password === '') && handler.password !== '')
-      || !!handler.password?.length
+      (((initial?.password === null && handler.password !== null) || initial?.password === '') && handler.password !== '') ||
+      !!handler.password?.length
     );
   }
 
@@ -245,9 +266,6 @@ export class ConnectionSSHTabService extends Bootstrap {
       return false;
     }
 
-    return (
-      (((initial?.key === null && handler.key !== null) || initial?.key === '') && handler.key !== '')
-      || !!handler.key?.length
-    );
+    return (((initial?.key === null && handler.key !== null) || initial?.key === '') && handler.key !== '') || !!handler.key?.length;
   }
 }

@@ -1,32 +1,39 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2022 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
+import { makeObservable, observable } from 'mobx';
 
-import { observable, makeObservable } from 'mobx';
+import { PlaceholderContainer } from '@cloudbeaver/core-blocks';
+import { App, injectable } from '@cloudbeaver/core-di';
 
-import { UsersResource } from '@cloudbeaver/core-authentication';
-import { injectable } from '@cloudbeaver/core-di';
-import type { AdminUserInfo } from '@cloudbeaver/core-sdk';
-
+import { AdministrationUserFormService } from '../UserForm/AdministrationUserFormService';
+import { AdministrationUserFormState } from '../UserForm/AdministrationUserFormState';
 import { UsersAdministrationNavigationService } from '../UsersAdministrationNavigationService';
+
+export interface IToolsContainerProps {
+  param: string | null | undefined;
+}
 
 @injectable()
 export class CreateUserService {
-  user: AdminUserInfo | null = null;
+  state: AdministrationUserFormState | null;
+  readonly toolsContainer: PlaceholderContainer<IToolsContainerProps>;
 
   constructor(
+    private readonly app: App,
+    private readonly administrationUserFormService: AdministrationUserFormService,
     private readonly usersAdministrationNavigationService: UsersAdministrationNavigationService,
-    private readonly usersResource: UsersResource,
   ) {
-    makeObservable(this, {
-      user: observable,
-    });
+    this.toolsContainer = new PlaceholderContainer();
+    this.state = null;
 
-    this.user = null;
+    makeObservable(this, {
+      state: observable,
+    });
 
     this.clearUserTemplate = this.clearUserTemplate.bind(this);
     this.cancelCreate = this.cancelCreate.bind(this);
@@ -39,16 +46,16 @@ export class CreateUserService {
   }
 
   create(): void {
-    if (this.user) {
+    if (this.state) {
       return;
     }
 
-    this.user = this.usersResource.getEmptyUser();
+    this.state = new AdministrationUserFormState(this.app, this.administrationUserFormService, { userId: null });
     this.usersAdministrationNavigationService.navToCreate();
   }
 
   clearUserTemplate(): void {
-    this.user = null;
+    this.state = null;
   }
 
   close(): void {

@@ -1,15 +1,17 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2022 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
-import { makeObservable, computed } from 'mobx';
+import { computed, makeObservable } from 'mobx';
 
 import { UserDataService } from '@cloudbeaver/core-authentication';
 import { injectable } from '@cloudbeaver/core-di';
+import { ToolsPanelService } from '@cloudbeaver/plugin-tools-panel';
+
+import { LogViewerSettingsService } from './LogViewerSettingsService';
 
 const logViewerSettingsKey = 'log-viewer';
 
@@ -27,14 +29,19 @@ export class LogViewerService {
     return this.settings.active;
   }
 
+  get disabled() {
+    return this.toolsPanelService.disabled || this.logViewerSettingsService.settings.getValue('disabled');
+  }
+
   constructor(
     private readonly userDataService: UserDataService,
+    private readonly toolsPanelService: ToolsPanelService,
+    private readonly logViewerSettingsService: LogViewerSettingsService,
   ) {
-
     makeObservable<LogViewerService>(this, {
       settings: computed,
+      disabled: computed,
     });
-
   }
 
   toggle(): void {

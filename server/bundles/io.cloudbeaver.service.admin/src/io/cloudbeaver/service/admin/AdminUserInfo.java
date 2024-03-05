@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2023 DBeaver Corp and others
+ * Copyright (C) 2010-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,7 +26,7 @@ import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.meta.Property;
 import org.jkiss.dbeaver.model.security.SMDataSourceGrant;
-import org.jkiss.dbeaver.model.security.SMObjects;
+import org.jkiss.dbeaver.model.security.SMObjectType;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -82,7 +82,7 @@ public class AdminUserInfo {
     @Property
     public SMDataSourceGrant[] getGrantedConnections() throws DBException {
         return session.getAdminSecurityController()
-            .getSubjectObjectPermissionGrants(getUserId(), SMObjects.DATASOURCE)
+            .getSubjectObjectPermissionGrants(getUserId(), SMObjectType.datasource)
             .stream()
             .map(objectPermission -> new SMDataSourceGrant(
                 objectPermission.getObjectPermissions().getObjectId(),
@@ -94,16 +94,16 @@ public class AdminUserInfo {
 
     @Property
     public WebUserOriginInfo[] getOrigins() throws DBWebException {
-        List<WebUserOriginInfo> result = new ArrayList<>();
+        List<AdminOriginInfo> result = new ArrayList<>();
         for (String provider : getUserLinkedProviders()) {
             WebAuthProviderDescriptor authProvider = WebAuthProviderRegistry.getInstance().getAuthProvider(provider);
             if (authProvider == null) {
                 log.error("Auth provider '" + provider + "' not found");
             } else {
-                result.add(new WebUserOriginInfo(session, user, authProvider, false));
+                result.add(new AdminOriginInfo(session, user, authProvider));
             }
         }
-        return result.toArray(new WebUserOriginInfo[0]);
+        return result.toArray(new AdminOriginInfo[0]);
     }
 
     @Property

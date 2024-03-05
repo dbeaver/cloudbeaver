@@ -1,11 +1,10 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2022 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import type { ITypedConstructor } from './ITypedConstructor';
 
 /**
@@ -18,9 +17,7 @@ export type ValueToken<T> = () => T;
  */
 export type InjectionToken<T> = ITypedConstructor<T> | ValueToken<T>;
 
-export function createValueToken<T extends Record<string, any>>(
-  obj: string | ITypedConstructor<T> | T
-): ValueToken<T> {
+export function createValueToken<T extends Record<string, any>>(obj: string | ITypedConstructor<T> | T): ValueToken<T> {
   // just fake function to keep type T
   const token = () => null as unknown as T;
   const name = getName(obj);

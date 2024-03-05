@@ -1,39 +1,32 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2022 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observer } from 'mobx-react-lite';
-import styled, { css } from 'reshadow';
 
-import { TableItem, TableColumnValue, TableItemExpand, useStyles } from '@cloudbeaver/core-blocks';
+import { s, TableColumnValue, TableItem, TableItemExpand, useS } from '@cloudbeaver/core-blocks';
 import type { IVersion } from '@cloudbeaver/core-version';
 
+import styles from './Version.m.css';
 import { VersionInfo } from './VersionInfo';
-
-const styles = css`
-  TableColumnValue[expand] {
-    cursor: pointer;
-  }
-  TableColumnValue[|gap] {
-    gap: 16px;
-  }
-`;
 
 interface Props {
   version: IVersion;
 }
 
 export const Version = observer<Props>(function Version({ version }) {
-  return styled(useStyles(styles))(
+  const style = useS(styles);
+  return (
     <TableItem item={version.number} expandElement={VersionInfo}>
-      <TableColumnValue centerContent flex expand>
+      <TableColumnValue className={s(style, { tableColumnValueExpand: true })} centerContent flex expand>
         <TableItemExpand />
       </TableColumnValue>
-      <TableColumnValue expand>{version.number}</TableColumnValue>
+      <TableColumnValue className={s(style, { tableColumnValueExpand: true })} expand>
+        {version.number}
+      </TableColumnValue>
       <TableColumnValue>{version.date}</TableColumnValue>
     </TableItem>
   );

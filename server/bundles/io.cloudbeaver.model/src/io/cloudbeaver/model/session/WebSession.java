@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2023 DBeaver Corp and others
+ * Copyright (C) 2010-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,13 +26,16 @@ import io.cloudbeaver.WebProjectImpl;
 import io.cloudbeaver.model.WebAsyncTaskInfo;
 import io.cloudbeaver.model.WebConnectionInfo;
 import io.cloudbeaver.model.WebServerMessage;
-import io.cloudbeaver.model.app.WebApplication;
-import io.cloudbeaver.model.rm.RMUtils;
+import io.cloudbeaver.model.app.WebAuthApplication;
 import io.cloudbeaver.model.user.WebUser;
 import io.cloudbeaver.service.DBWSessionHandler;
 import io.cloudbeaver.service.sql.WebSQLConstants;
 import io.cloudbeaver.utils.CBModelConstants;
+import io.cloudbeaver.utils.WebAppUtils;
 import io.cloudbeaver.utils.WebDataSourceUtils;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -40,20 +43,25 @@ import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
+import org.jkiss.dbeaver.model.DBFileController;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
+import org.jkiss.dbeaver.model.DBPEvent;
 import org.jkiss.dbeaver.model.access.DBAAuthCredentials;
 import org.jkiss.dbeaver.model.access.DBACredentialsProvider;
 import org.jkiss.dbeaver.model.app.DBPDataSourceRegistry;
+import org.jkiss.dbeaver.model.app.DBPDataSourceRegistryCache;
 import org.jkiss.dbeaver.model.app.DBPProject;
 import org.jkiss.dbeaver.model.auth.*;
 import org.jkiss.dbeaver.model.connection.DBPConnectionConfiguration;
 import org.jkiss.dbeaver.model.exec.DBCException;
+import org.jkiss.dbeaver.model.fs.DBFFileSystemManager;
 import org.jkiss.dbeaver.model.meta.Association;
 import org.jkiss.dbeaver.model.meta.Property;
 import org.jkiss.dbeaver.model.navigator.DBNModel;
 import org.jkiss.dbeaver.model.rm.RMController;
 import org.jkiss.dbeaver.model.rm.RMProject;
 import org.jkiss.dbeaver.model.rm.RMProjectType;
+import org.jkiss.dbeaver.model.rm.RMUtils;
 import org.jkiss.dbeaver.model.runtime.AbstractJob;
 import org.jkiss.dbeaver.model.runtime.BaseProgressMonitor;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
@@ -61,42 +69,39 @@ import org.jkiss.dbeaver.model.runtime.ProxyProgressMonitor;
 import org.jkiss.dbeaver.model.security.SMAdminController;
 import org.jkiss.dbeaver.model.security.SMConstants;
 import org.jkiss.dbeaver.model.security.SMController;
-import org.jkiss.dbeaver.model.security.SMObjects;
+import org.jkiss.dbeaver.model.security.SMObjectType;
 import org.jkiss.dbeaver.model.security.user.SMObjectPermissions;
 import org.jkiss.dbeaver.model.sql.DBQuotaException;
+import org.jkiss.dbeaver.model.websocket.event.MessageType;
 import org.jkiss.dbeaver.model.websocket.event.WSEventType;
 import org.jkiss.dbeaver.model.websocket.event.WSSessionLogUpdatedEvent;
+import org.jkiss.dbeaver.registry.DataSourceDescriptor;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.dbeaver.runtime.jobs.DisconnectJob;
 import org.jkiss.utils.CommonUtils;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 import java.lang.reflect.InvocationTargetException;
+import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-
 /**
  * Web session.
  * Is the main source of data in web application
  */
 public class WebSession extends BaseWebSession
-    implements SMSession, SMCredentialsProvider, DBACredentialsProvider, IAdaptable {
+    implements SMSessionWithAuth, SMCredentialsProvider, DBACredentialsProvider, IAdaptable {
 
     private static final Log log = Log.getLog(WebSession.class);
 
     public static final SMSessionType CB_SESSION_TYPE = new SMSessionType("CloudBeaver");
     private static final String WEB_SESSION_AUTH_CONTEXT_TYPE = "web-session";
     private static final String ATTR_LOCALE = "locale";
-
     private static final AtomicInteger TASK_ID = new AtomicInteger();
 
     private final AtomicInteger taskCount = new AtomicInteger();
 
-    private long maxSessionIdleTime;
     private String lastRemoteAddr;
     private String lastRemoteUserAgent;
 
@@ -116,21 +121,23 @@ public class WebSession extends BaseWebSession
 
     private DBNModel navigatorModel;
     private final DBRProgressMonitor progressMonitor = new SessionProgressMonitor();
-    private WebProjectImpl defaultProject;
-    private final List<WebProjectImpl> accessibleProjects = new ArrayList<>();
     private final Map<String, DBWSessionHandler> sessionHandlers;
 
     public WebSession(
         @NotNull HttpSession httpSession,
-        @NotNull WebApplication application,
-        @NotNull Map<String, DBWSessionHandler> sessionHandlers,
-        long maxSessionIdleTime
+        @NotNull WebAuthApplication application,
+        @NotNull Map<String, DBWSessionHandler> sessionHandlers
     ) throws DBException {
         super(httpSession.getId(), application);
         this.lastAccessTime = this.createTime;
-        this.locale = CommonUtils.toString(httpSession.getAttribute(ATTR_LOCALE), this.locale);
+        setLocale(CommonUtils.toString(httpSession.getAttribute(ATTR_LOCALE), this.locale));
         this.sessionHandlers = sessionHandlers;
-        this.maxSessionIdleTime = maxSessionIdleTime;
+        //force authorization of anonymous session to avoid access error,
+        //because before authorization could be called by any request,
+        //but now 'updateInfo' is called only in special requests,
+        //and the order of requests is not guaranteed.
+        //look at CB-4747
+        refreshSessionAuth();
     }
 
     @Override
@@ -143,23 +150,19 @@ public class WebSession extends BaseWebSession
         }
     }
 
-    public WebApplication getApplication() {
-        return application;
-    }
-
     @NotNull
     public DBPProject getSingletonProject() {
-        return defaultProject;
+        return getWorkspace().getActiveProject();
     }
 
     @Property
     public String getCreateTime() {
-        return CBModelConstants.ISO_DATE_FORMAT.format(createTime);
+        return CBModelConstants.ISO_DATE_FORMAT.format(Instant.ofEpochMilli(createTime));
     }
 
     @Property
     public synchronized String getLastAccessTime() {
-        return CBModelConstants.ISO_DATE_FORMAT.format(lastAccessTime);
+        return CBModelConstants.ISO_DATE_FORMAT.format(Instant.ofEpochMilli(lastAccessTime));
     }
 
     public String getLastRemoteAddr() {
@@ -233,43 +236,69 @@ public class WebSession extends BaseWebSession
         return userContext.getRmController();
     }
 
+    public synchronized DBFileController getFileController() {
+        return userContext.getFileController();
+    }
+
+    @Override
     public synchronized void refreshUserData() {
+        super.refreshUserData();
         refreshSessionAuth();
 
         initNavigatorModel();
     }
 
     /**
-     * updates connections based on event in web session
+     * updates data sources based on event in web session
      *
      * @param project       project of connection
-     * @param connectionIds list of updated connections
+     * @param dataSourceIds list of updated connections
      * @param type          type of event
      */
-    public synchronized void updateProjectConnection(
+    public synchronized boolean updateProjectDataSources(
         DBPProject project,
-        List<String> connectionIds,
+        List<String> dataSourceIds,
         WSEventType type
     ) {
+        var sendDataSourceUpdatedEvent = false;
         DBPDataSourceRegistry registry = project.getDataSourceRegistry();
-        registry.refreshConfig();
-        for (String connectionId : connectionIds) {
+        // save old connections
+        var oldDataSources = dataSourceIds.stream()
+            .map(registry::getDataSource)
+            .filter(Objects::nonNull)
+            .collect(Collectors.toMap(
+                DBPDataSourceContainer::getId,
+                ds -> new DataSourceDescriptor((DataSourceDescriptor) ds, ds.getRegistry())
+            ));
+        if (type == WSEventType.DATASOURCE_CREATED || type == WSEventType.DATASOURCE_UPDATED) {
+            registry.refreshConfig(dataSourceIds);
+        }
+        for (String dsId : dataSourceIds) {
+            DataSourceDescriptor ds = (DataSourceDescriptor) registry.getDataSource(dsId);
+            if (ds == null) {
+                continue;
+            }
             switch (type) {
-                case DATASOURCE_CREATED:
-                    DBPDataSourceContainer container = registry.getDataSource(connectionId);
-                    if (container == null) {
-                        break;
-                    }
-                    WebConnectionInfo connectionInfo = new WebConnectionInfo(this, registry.getDataSource(connectionId));
+                case DATASOURCE_CREATED -> {
+                    WebConnectionInfo connectionInfo = new WebConnectionInfo(this, ds);
                     this.connections.put(connectionInfo.getId(), connectionInfo);
-                    break;
-                case DATASOURCE_DELETED:
-                    this.connections.remove(connectionId);
-                    break;
-                default:
-                    break;
+                    sendDataSourceUpdatedEvent = true;
+                }
+                case DATASOURCE_UPDATED -> // if settings were changed we need to send event
+                    sendDataSourceUpdatedEvent |= !ds.equalSettings(oldDataSources.get(dsId));
+                case DATASOURCE_DELETED -> {
+                    WebDataSourceUtils.disconnectDataSource(this, ds);
+                    if (registry instanceof DBPDataSourceRegistryCache dsrc) {
+                        dsrc.removeDataSourceFromList(ds);
+                    }
+                    this.connections.remove(ds.getId());
+                    sendDataSourceUpdatedEvent = true;
+                }
+                default -> {
+                }
             }
         }
+        return sendDataSourceUpdatedEvent;
     }
 
     // Note: for admin use only
@@ -282,6 +311,7 @@ public class WebSession extends BaseWebSession
             log.error(e);
         }
         refreshUserData();
+        clearSessionContext();
     }
 
     private void initNavigatorModel() {
@@ -291,35 +321,21 @@ public class WebSession extends BaseWebSession
             this.navigatorModel.dispose();
             this.navigatorModel = null;
         }
-
-        if (!this.accessibleProjects.isEmpty()) {
-            for (WebProjectImpl project : accessibleProjects) {
-                if (project.equals(DBWorkbench.getPlatform().getWorkspace().getActiveProject())) {
-                    continue;
-                }
-                project.dispose();
-            }
-            this.defaultProject = null;
-            this.accessibleProjects.clear();
-        }
+        this.connections.clear();
 
         loadProjects();
 
-        this.navigatorModel = new DBNModel(DBWorkbench.getPlatform(), this.accessibleProjects);
-        this.navigatorModel.setModelAuthContext(sessionAuthContext);
+        this.navigatorModel = new DBNModel(DBWorkbench.getPlatform(), getWorkspace().getProjects());
+        this.navigatorModel.setModelAuthContext(getWorkspace().getAuthContext());
         this.navigatorModel.initialize();
 
         this.locale = Locale.getDefault().getLanguage();
-
-        try {
-            this.refreshConnections();
-        } catch (Exception e) {
-            addSessionError(e);
-            log.error("Error getting connection list", e);
-        }
     }
 
     private void loadProjects() {
+        WebSessionWorkspace workspace = getWorkspace();
+        workspace.clearProjects();
+
         WebUser user = userContext.getUser();
         if (user == null && DBWorkbench.isDistributed()) {
             // No anonymous mode in distributed apps
@@ -336,6 +352,9 @@ public class WebSession extends BaseWebSession
                 WebProjectImpl anonymousProject = createWebProject(RMUtils.createAnonymousProject());
                 anonymousProject.setInMemory(true);
             }
+            if (workspace.getActiveProject() == null && !workspace.getProjects().isEmpty()) {
+                workspace.setActiveProject(workspace.getProjects().get(0));
+            }
         } catch (DBException e) {
             addSessionError(e);
             log.error("Error getting accessible projects list", e);
@@ -348,39 +367,25 @@ public class WebSession extends BaseWebSession
             ? this::isDataSourceAccessible
             : x -> true;
         WebProjectImpl sessionProject = application.createProjectImpl(this, project, filter);
+        // do not load data sources for anonymous project
+        if (project.getType() == RMProjectType.USER && userContext.getUser() == null) {
+            sessionProject.setInMemory(true);
+        }
         DBPDataSourceRegistry dataSourceRegistry = sessionProject.getDataSourceRegistry();
         dataSourceRegistry.setAuthCredentialsProvider(this);
         addSessionProject(sessionProject);
         if (!project.isShared() || application.isConfigurationMode()) {
-            this.defaultProject = sessionProject;
+            getWorkspace().setActiveProject(sessionProject);
+        }
+        for (DBPDataSourceContainer ds : dataSourceRegistry.getDataSources()) {
+            addConnection(new WebConnectionInfo(this, ds));
+        }
+        Throwable lastError = dataSourceRegistry.getLastError();
+        if (lastError != null) {
+            addSessionError(lastError);
+            log.error("Error refreshing connections from project '" + project.getId() + "'", lastError);
         }
         return sessionProject;
-    }
-
-    public void refreshConnections() {
-
-        // Add all provided datasources to the session
-        List<WebConnectionInfo> connList = new ArrayList<>();
-        for (DBPProject project : accessibleProjects) {
-            DBPDataSourceRegistry registry = project.getDataSourceRegistry();
-
-            for (DBPDataSourceContainer ds : registry.getDataSources()) {
-                connList.add(new WebConnectionInfo(this, ds));
-            }
-            Throwable lastError = registry.getLastError();
-            if (lastError != null) {
-                addSessionError(lastError);
-                log.error("Error refreshing connections from project '" + project.getId() + "'", lastError);
-            }
-        }
-
-        // Add all provided datasources to the session
-        synchronized (connections) {
-            connections.clear();
-            for (WebConnectionInfo connectionInfo : connList) {
-                connections.put(connectionInfo.getId(), connectionInfo);
-            }
-        }
     }
 
     public void filterAccessibleConnections(List<WebConnectionInfo> connections) {
@@ -396,11 +401,9 @@ public class WebSession extends BaseWebSession
 
     @NotNull
     private Set<String> readAccessibleConnectionIds() {
-        WebUser user = getUser();
-
         try {
             return getSecurityController()
-                .getAllAvailableObjectsPermissions(SMObjects.DATASOURCE)
+                .getAllAvailableObjectsPermissions(SMObjectType.datasource)
                 .stream()
                 .map(SMObjectPermissions::getObjectId)
                 .collect(Collectors.toSet());
@@ -446,7 +449,6 @@ public class WebSession extends BaseWebSession
 
     private synchronized void refreshSessionAuth() {
         try {
-
             if (!isAuthorizedInSecurityManager()) {
                 authAsAnonymousUser();
             } else if (getUserId() != null) {
@@ -464,12 +466,36 @@ public class WebSession extends BaseWebSession
         this.accessibleConnectionIds = readAccessibleConnectionIds();
     }
 
+    public synchronized void addAccessibleConnectionToCache(@NotNull String dsId) {
+        this.accessibleConnectionIds.add(dsId);
+        var registry = getProjectById(WebAppUtils.getGlobalProjectId()).getDataSourceRegistry();
+        var dataSource = registry.getDataSource(dsId);
+        if (dataSource != null) {
+            connections.put(dsId, new WebConnectionInfo(this, dataSource));
+            // reflect changes is navigator model
+            registry.notifyDataSourceListeners(new DBPEvent(DBPEvent.Action.OBJECT_ADD, dataSource, true));
+        }
+    }
+
+    public synchronized void removeAccessibleConnectionFromCache(@NotNull String dsId) {
+        var registry = getProjectById(WebAppUtils.getGlobalProjectId()).getDataSourceRegistry();
+        var dataSource = registry.getDataSource(dsId);
+        if (dataSource != null) {
+            this.accessibleConnectionIds.remove(dsId);
+            connections.remove(dsId);
+            // reflect changes is navigator model
+            registry.notifyDataSourceListeners(new DBPEvent(DBPEvent.Action.OBJECT_REMOVE, dataSource));
+            dataSource.dispose();
+        }
+    }
+
     private synchronized void authAsAnonymousUser() throws DBException {
         if (!application.getAppConfiguration().isAnonymousAccessEnabled()) {
             return;
         }
         SMAuthInfo authInfo = getSecurityController().authenticateAnonymousUser(this.id, getSessionParameters(), CB_SESSION_TYPE);
         updateSMSession(authInfo);
+        notifySessionAuthChange();
     }
 
     @NotNull
@@ -499,14 +525,13 @@ public class WebSession extends BaseWebSession
 
     public synchronized void updateInfo(
         HttpServletRequest request,
-        HttpServletResponse response,
-        long maxSessionIdleTime
+        HttpServletResponse response
     ) throws DBWebException {
+        log.debug("Update session lifetime " + getSessionId() + " for user " + getUserId());
         touchSession();
         HttpSession httpSession = request.getSession();
         this.lastRemoteAddr = request.getRemoteAddr();
         this.lastRemoteUserAgent = request.getHeader("User-Agent");
-        this.maxSessionIdleTime = maxSessionIdleTime;
         this.cacheExpired = false;
         if (!httpSession.isNew()) {
             try {
@@ -542,7 +567,11 @@ public class WebSession extends BaseWebSession
             connectionInfo = connections.get(connectionID);
         }
         if (connectionInfo == null) {
-            DBPDataSourceContainer dataSource = getProjectById(projectId).getDataSourceRegistry().getDataSource(connectionID);
+            WebProjectImpl project = getProjectById(projectId);
+            if (project == null) {
+                throw new DBWebException("Project '" + projectId + "' not found in web workspace");
+            }
+            DBPDataSourceContainer dataSource = project.getDataSourceRegistry().getDataSource(connectionID);
             if (dataSource != null) {
                 connectionInfo = new WebConnectionInfo(this, dataSource);
                 synchronized (connections) {
@@ -569,6 +598,7 @@ public class WebSession extends BaseWebSession
     }
 
     public void removeConnection(WebConnectionInfo connectionInfo) {
+        connectionInfo.clearCache();
         synchronized (connections) {
             connections.remove(connectionInfo.getId());
         }
@@ -587,18 +617,11 @@ public class WebSession extends BaseWebSession
         } catch (Exception e) {
             log.error("Error closing web session tokens");
         }
-        this.sessionAuthContext.close();
         this.userContext.setUser(null);
-
-        if (this.defaultProject != null) {
-            this.defaultProject.dispose();
-            this.defaultProject = null;
-        }
-
         super.close();
     }
 
-    private void clearAuthTokens() throws DBException {
+    private List<WebAuthInfo> clearAuthTokens() throws DBException {
         ArrayList<WebAuthInfo> tokensCopy;
         synchronized (authTokens) {
             tokensCopy = new ArrayList<>(this.authTokens);
@@ -607,6 +630,7 @@ public class WebSession extends BaseWebSession
             removeAuthInfo(ai);
         }
         resetAuthToken();
+        return tokensCopy;
     }
 
     public DBRProgressMonitor getProgressMonitor() {
@@ -704,11 +728,20 @@ public class WebSession extends BaseWebSession
         synchronized (sessionMessages) {
             sessionMessages.add(message);
         }
-        addSessionEvent(new WSSessionLogUpdatedEvent());
+        addSessionEvent(new WSSessionLogUpdatedEvent(
+            WSEventType.SESSION_LOG_UPDATED,
+            this.userContext.getSmSessionId(),
+            this.userContext.getUserId(),
+            MessageType.ERROR,
+            message.getMessage()));
     }
 
     public void addInfoMessage(String message) {
-        addSessionMessage(new WebServerMessage(WebServerMessage.MessageType.INFO, message));
+        addSessionMessage(new WebServerMessage(MessageType.INFO, message));
+    }
+
+    public void addWarningMessage(String message) {
+        addSessionMessage(new WebServerMessage(MessageType.WARNING, message));
     }
 
     public List<WebServerMessage> readLog(Integer maxEntries, Boolean clearLog) {
@@ -734,8 +767,8 @@ public class WebSession extends BaseWebSession
     public <T> T getAttribute(String name) {
         synchronized (attributes) {
             Object value = attributes.get(name);
-            if (value instanceof PersistentAttribute) {
-                value = ((PersistentAttribute) value).getValue();
+            if (value instanceof PersistentAttribute persistentAttribute) {
+                value = persistentAttribute.getValue();
             }
             return (T) value;
         }
@@ -750,8 +783,8 @@ public class WebSession extends BaseWebSession
     public <T> T getAttribute(String name, Function<T, T> creator, Function<T, T> disposer) {
         synchronized (attributes) {
             Object value = attributes.get(name);
-            if (value instanceof PersistentAttribute) {
-                value = ((PersistentAttribute) value).getValue();
+            if (value instanceof PersistentAttribute persistentAttribute) {
+                value = persistentAttribute.getValue();
             }
             if (value == null) {
                 value = creator.apply(null);
@@ -786,6 +819,14 @@ public class WebSession extends BaseWebSession
             return authTokens.isEmpty() ? null : authTokens.get(0);
         }
     }
+
+    @Override
+    public List<SMAuthInfo> getAuthInfos() {
+        synchronized (authTokens) {
+            return authTokens.stream().map(WebAuthInfo::getAuthInfo).toList();
+        }
+    }
+
 
     public List<WebAuthInfo> getAllAuthInfo() {
         synchronized (authTokens) {
@@ -848,18 +889,23 @@ public class WebSession extends BaseWebSession
         }
     }
 
-    public void removeAuthInfo(String providerId) throws DBException {
+    public List<WebAuthInfo> removeAuthInfo(String providerId) throws DBException {
+        List<WebAuthInfo> oldInfo;
         if (providerId == null) {
-            clearAuthTokens();
+            oldInfo = clearAuthTokens();
         } else {
             WebAuthInfo authInfo = getAuthInfo(providerId);
             if (authInfo != null) {
                 removeAuthInfo(authInfo);
+                oldInfo = List.of(authInfo);
+            } else {
+                oldInfo = List.of();
             }
         }
         if (authTokens.isEmpty()) {
             resetUserState();
         }
+        return oldInfo;
     }
 
     public List<DBACredentialsProvider> getContextCredentialsProviders() {
@@ -869,7 +915,11 @@ public class WebSession extends BaseWebSession
     // Auth credentials provider
     // Adds auth properties passed from web (by user)
     @Override
-    public boolean provideAuthParameters(@NotNull DBRProgressMonitor monitor, @NotNull DBPDataSourceContainer dataSourceContainer, @NotNull DBPConnectionConfiguration configuration) {
+    public boolean provideAuthParameters(
+        @NotNull DBRProgressMonitor monitor,
+        @NotNull DBPDataSourceContainer dataSourceContainer,
+        @NotNull DBPConnectionConfiguration configuration
+    ) {
         try {
             // Properties from nested auth sessions
             for (DBACredentialsProvider contextCredentialsProvider : getContextCredentialsProviders()) {
@@ -892,7 +942,7 @@ public class WebSession extends BaseWebSession
                 .create();
 
             credGson.fromJson(credGson.toJsonTree(configuration.getAuthProperties()), credentials.getClass());
-            configuration.getAuthModel().saveCredentials(dataSourceContainer, configuration, credentials);
+            configuration.getAuthModel().provideCredentials(dataSourceContainer, configuration, credentials);
         } catch (DBException e) {
             addSessionError(e);
             log.error(e);
@@ -931,9 +981,7 @@ public class WebSession extends BaseWebSession
 
     private <T> boolean isAuthInfoInstanceOf(WebAuthInfo authInfo, Class<T> adapter) {
         if (authInfo != null && authInfo.getAuthSession() != null) {
-            if (adapter.isInstance(authInfo.getAuthSession())) {
-                return true;
-            }
+            return adapter.isInstance(authInfo.getAuthSession());
         }
         return false;
     }
@@ -972,53 +1020,70 @@ public class WebSession extends BaseWebSession
 
     @Nullable
     public WebProjectImpl getProjectById(@Nullable String projectId) {
-        if (projectId == null) {
-            return defaultProject;
+        return getWorkspace().getProjectById(projectId);
+    }
+
+    public WebProjectImpl getAccessibleProjectById(@Nullable String projectId) throws DBWebException {
+        WebProjectImpl project = null;
+        if (projectId != null) {
+            project = getWorkspace().getProjectById(projectId);
         }
-        for (WebProjectImpl project : accessibleProjects) {
-            if (project.getId().equals(projectId)) {
-                return project;
-            }
+        if (project == null) {
+            throw new DBWebException("Project not found: " + projectId);
         }
-        return null;
+        return project;
     }
 
     public List<WebProjectImpl> getAccessibleProjects() {
-        return accessibleProjects;
+        return getWorkspace().getProjects();
     }
 
-    public void addSessionProject(WebProjectImpl project) {
-        synchronized (accessibleProjects) {
-            accessibleProjects.add(project);
-        }
+    public void addSessionProject(@NotNull WebProjectImpl project) {
+        getWorkspace().addProject(project);
         if (navigatorModel != null) {
             navigatorModel.getRoot().addProject(project, false);
         }
     }
 
-    public void deleteSessionProject(DBPProject project) {
-        synchronized (accessibleProjects) {
-            accessibleProjects.remove(project);
+    public void deleteSessionProject(@Nullable WebProjectImpl project) {
+        if (project != null) {
+            project.dispose();
         }
+        getWorkspace().removeProject(project);
         if (navigatorModel != null) {
             navigatorModel.getRoot().removeProject(project);
         }
     }
 
-    @Property
-    public boolean isValid() {
-        return getSessionActiveTimeLeft() > 0;
+    @Override
+    public void addSessionProject(@NotNull String projectId) throws DBException {
+        super.addSessionProject(projectId);
+        var rmProject = getRmController().getProject(projectId, false, false);
+        createWebProject(rmProject);
     }
 
-    @Property
-    public long getRemainingTime() {
-        return getSessionActiveTimeLeft();
+    @Override
+    public void removeSessionProject(@Nullable String projectId) throws DBException {
+        super.removeSessionProject(projectId);
+        var project = getProjectById(projectId);
+        if (project == null) {
+            return;
+        }
+        deleteSessionProject(project);
+        var projectConnections = project.getDataSourceRegistry().getDataSources();
+        for (DBPDataSourceContainer c : projectConnections) {
+            removeConnection(new WebConnectionInfo(this, c));
+        }
     }
 
-    private long getSessionActiveTimeLeft() {
-        return maxSessionIdleTime + lastAccessTime - System.currentTimeMillis();
+    @NotNull
+    public DBFFileSystemManager getFileSystemManager(String projectId) throws DBException {
+        var project = getProjectById(projectId);
+        if (project == null) {
+            throw new DBException("Project not found: " + projectId);
+        }
+        return project.getFileSystemManager();
     }
-
 
     private class SessionProgressMonitor extends BaseProgressMonitor {
         @Override
@@ -1032,7 +1097,7 @@ public class WebSession extends BaseWebSession
         }
     }
 
-    private class TaskProgressMonitor extends ProxyProgressMonitor {
+    private static class TaskProgressMonitor extends ProxyProgressMonitor {
 
         private final WebAsyncTaskInfo asyncTask;
 
@@ -1054,7 +1119,7 @@ public class WebSession extends BaseWebSession
         }
     }
 
-    private class PersistentAttribute {
+    private static class PersistentAttribute {
         private final Object value;
 
         public PersistentAttribute(Object value) {

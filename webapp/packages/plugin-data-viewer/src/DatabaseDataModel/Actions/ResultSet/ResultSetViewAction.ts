@@ -1,21 +1,21 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2022 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
-import { computed, makeObservable } from 'mobx';
+import { action, computed, makeObservable, observable } from 'mobx';
 
 import { DataTypeLogicalOperation, ResultDataFormat, SqlResultColumn } from '@cloudbeaver/core-sdk';
 
 import { DatabaseDataAction } from '../../DatabaseDataAction';
+import type { IDatabaseDataAction } from '../../IDatabaseDataAction';
 import type { IDatabaseDataSource } from '../../IDatabaseDataSource';
 import type { IDatabaseResultSet } from '../../IDatabaseResultSet';
 import { databaseDataAction } from '../DatabaseDataActionDecorator';
-import type { IDatabaseDataResultAction } from '../IDatabaseDataResultAction';
-import type { IResultSetContentValue } from './IResultSetContentValue';
+import { compareResultSetRowKeys } from './compareResultSetRowKeys';
+import type { IResultSetComplexValue } from './IResultSetComplexValue';
 import type { IResultSetColumnKey, IResultSetElementKey, IResultSetRowKey } from './IResultSetDataKey';
 import { isResultSetContentValue } from './isResultSetContentValue';
 import { ResultSetDataAction } from './ResultSetDataAction';
@@ -24,47 +24,41 @@ import { ResultSetEditAction } from './ResultSetEditAction';
 import type { IResultSetValue } from './ResultSetFormatAction';
 
 @databaseDataAction()
-export class ResultSetViewAction extends DatabaseDataAction<any, IDatabaseResultSet>
-  implements IDatabaseDataResultAction<IDatabaseResultSet> {
+export class ResultSetViewAction extends DatabaseDataAction<any, IDatabaseResultSet> implements IDatabaseDataAction<any, IDatabaseResultSet> {
   static dataFormat = [ResultDataFormat.Resultset];
 
   get rowKeys(): IResultSetRowKey[] {
-    return [
-      ...this.editor.addRows,
-      ...this.data.rows.map((c, index) => ({ index })),
-    ].sort((a, b) => a.index - b.index);
+    return [...this.editor.addRows, ...this.data.rows.map((c, index) => ({ index, subIndex: 0 }))].sort(compareResultSetRowKeys);
   }
 
   get columnKeys(): IResultSetColumnKey[] {
-    return this.data.columns.map((c, index) => ({ index }));
+    return this.columns.map(c => ({ index: this.data.columns.indexOf(c) }));
   }
 
   get rows(): IResultSetValue[][] {
-    return this.result.data?.rows || [];
+    return this.data.rows.map(row => row.data || []);
   }
 
   get columns(): SqlResultColumn[] {
-    return this.result.data?.columns || [];
+    return this.columnsOrder.map(i => this.data.columns[i]);
   }
 
+  private columnsOrder: number[] = [];
   private readonly data: ResultSetDataAction;
   private readonly editor: ResultSetEditAction;
 
-  constructor(
-    source: IDatabaseDataSource<any, IDatabaseResultSet>,
-    result: IDatabaseResultSet,
-    data: ResultSetDataAction,
-    editor: ResultSetEditAction
-  ) {
-    super(source, result);
+  constructor(source: IDatabaseDataSource<any, IDatabaseResultSet>, data: ResultSetDataAction, editor: ResultSetEditAction) {
+    super(source);
     this.data = data;
     this.editor = editor;
 
-    makeObservable(this, {
-      rowKeys: computed,
-      columnKeys: computed,
+    makeObservable<this, 'columnsOrder'>(this, {
+      columnsOrder: observable,
+      setColumnOrder: action,
       rows: computed,
+      rowKeys: computed,
       columns: computed,
+      columnKeys: computed,
     });
   }
 
@@ -88,8 +82,23 @@ export class ResultSetViewAction extends DatabaseDataAction<any, IDatabaseResult
     return this.rowKeys.findIndex(row => ResultSetDataKeysUtils.isEqual(row, key));
   }
 
+  setColumnOrder(key: IResultSetColumnKey, index: number): void {
+    const columnIndex = this.columnDataIndex(key);
+
+    if (columnIndex === -1) {
+      return;
+    }
+
+    this.columnsOrder.splice(this.columnsOrder.indexOf(columnIndex), 1);
+    this.columnsOrder.splice(index, 0, columnIndex);
+  }
+
   columnIndex(key: IResultSetColumnKey): number {
     return this.columnKeys.findIndex(column => ResultSetDataKeysUtils.isEqual(column, key));
+  }
+
+  columnDataIndex(key: IResultSetColumnKey): number {
+    return this.data.columns.findIndex((column, index) => ResultSetDataKeysUtils.isEqual({ index }, key));
   }
 
   nextKey(key: IResultSetElementKey): IResultSetElementKey | null {
@@ -121,24 +130,21 @@ export class ResultSetViewAction extends DatabaseDataAction<any, IDatabaseResult
     return { row, column };
   }
 
-  getCellValue(cell: IResultSetElementKey): IResultSetValue | undefined {
+  getCellValue(cell: IResultSetElementKey): IResultSetValue {
     const edited = this.editor.get(cell);
 
     if (edited !== undefined) {
       return edited;
     }
 
-    if (
-      cell.row.index >= this.rows.length
-      || cell.column.index >= this.columns.length
-    ) {
-      return undefined;
+    if (cell.row.index >= this.rows.length || cell.column.index >= this.columns.length) {
+      throw new Error('Cell is out of range');
     }
 
     return this.rows[cell.row.index][cell.column.index];
   }
 
-  getContent(cell: IResultSetElementKey): IResultSetContentValue | null {
+  getContent(cell: IResultSetElementKey): IResultSetComplexValue | null {
     const value = this.getCellValue(cell);
 
     if (isResultSetContentValue(value)) {
@@ -163,7 +169,13 @@ export class ResultSetViewAction extends DatabaseDataAction<any, IDatabaseResult
       return [];
     }
 
-    return column.supportedOperations
-      .filter(operation => operation.argumentCount === 1 || operation.argumentCount === 0);
+    return column.supportedOperations.filter(operation => operation.argumentCount === 1 || operation.argumentCount === 0);
+  }
+
+  updateResult(result: IDatabaseResultSet, index: number): void {
+    super.updateResult(result, index);
+    if (this.columnsOrder.length !== this.data.columns.length) {
+      this.columnsOrder = this.data.columns.map((key, index) => index);
+    }
   }
 }

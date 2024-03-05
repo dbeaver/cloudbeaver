@@ -1,22 +1,21 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2022 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { computed, observable } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import { forwardRef } from 'react';
-import styled, { use } from 'reshadow';
 
-import { getComputed } from '../../getComputed';
+import { s } from '../../s';
 import { useObjectRef } from '../../useObjectRef';
 import { useObservableRef } from '../../useObservableRef';
+import { useS } from '../../useS';
 import type { ITreeNodeState } from './ITreeNodeState';
+import style from './TreeNode.m.css';
 import { ITreeNodeContext, TreeNodeContext } from './TreeNodeContext';
-import { TREE_NODE_STYLES } from './TreeNodeStyles';
 
 interface Props extends ITreeNodeState {
   className?: string;
@@ -31,88 +30,94 @@ interface IInnerTreeNodeContext extends ITreeNodeContext {
   inProgress: number;
 }
 
-export const TreeNode = observer<Props, HTMLDivElement | null>(forwardRef(function TreeNode({
-  group = false,
-  loading = false,
-  selected = false,
-  indeterminateSelected = false,
-  disabled = false,
-  expanded = false,
-  showInFilter = false,
-  externalExpanded,
-  leaf = false,
-  className,
-  children,
-  ...handlers
-}, ref) {
-  const handlersRef = useObjectRef(handlers);
+export const TreeNode = observer<Props, HTMLDivElement | null>(
+  forwardRef(function TreeNode(
+    {
+      group = false,
+      loading = false,
+      selected = false,
+      indeterminateSelected = false,
+      disabled = false,
+      expanded = false,
+      showInFilter = false,
+      externalExpanded,
+      leaf = false,
+      className,
+      children,
+      ...handlers
+    },
+    ref,
+  ) {
+    const styles = useS(style);
+    const handlersRef = useObjectRef(handlers);
 
-  async function processAction(action: () => Promise<void>) {
-    nodeContext.inProgress++;
+    async function processAction(action: () => Promise<void>) {
+      nodeContext.inProgress++;
 
-    try {
-      await action();
-    } finally {
-      nodeContext.inProgress--;
+      try {
+        await action();
+      } finally {
+        nodeContext.inProgress--;
+      }
     }
-  }
 
-  const nodeContext = useObservableRef<IInnerTreeNodeContext>(() => ({
-    get processing() {
-      return this.inProgress > 0;
-    },
-    inProgress: 0,
-    async click() {
-      await processAction(async () => {
-        await handlersRef.onClick?.(this.leaf);
-      });
-    },
-    async expand() {
-      await processAction(async () => {
-        await handlersRef.onExpand?.();
-      });
-    },
-    async select(multiple?: boolean, nested?: boolean) {
-      await processAction(async () => {
-        await handlersRef.onSelect?.(multiple, nested);
-      });
-    },
-    async open() {
-      await processAction(async () => {
-        await handlersRef.onOpen?.(this.leaf);
-      });
-    },
-  }), {
-    group: observable.ref,
-    disabled: observable.ref,
-    processing: computed,
-    inProgress: observable.ref,
-    loading: observable.ref,
-    selected: observable.ref,
-    indeterminateSelected: observable.ref,
-    expanded: observable.ref,
-    externalExpanded: observable.ref,
-    showInFilter: observable.ref,
-    leaf: observable.ref,
-  }, {
-    group,
-    disabled,
-    loading,
-    selected,
-    indeterminateSelected,
-    expanded,
-    showInFilter,
-    externalExpanded,
-    leaf,
-  });
+    const nodeContext = useObservableRef<IInnerTreeNodeContext>(
+      () => ({
+        get processing() {
+          return this.inProgress > 0;
+        },
+        inProgress: 0,
+        async click() {
+          await processAction(async () => {
+            await handlersRef.onClick?.(this.leaf);
+          });
+        },
+        async expand() {
+          await processAction(async () => {
+            await handlersRef.onExpand?.();
+          });
+        },
+        async select(multiple?: boolean, nested?: boolean) {
+          await processAction(async () => {
+            await handlersRef.onSelect?.(multiple, nested);
+          });
+        },
+        async open() {
+          await processAction(async () => {
+            await handlersRef.onOpen?.(this.leaf);
+          });
+        },
+      }),
+      {
+        group: observable.ref,
+        disabled: observable.ref,
+        processing: computed,
+        inProgress: observable.ref,
+        loading: observable.ref,
+        selected: observable.ref,
+        indeterminateSelected: observable.ref,
+        expanded: observable.ref,
+        externalExpanded: observable.ref,
+        showInFilter: observable.ref,
+        leaf: observable.ref,
+      },
+      {
+        group,
+        disabled,
+        loading,
+        selected,
+        indeterminateSelected,
+        expanded,
+        showInFilter,
+        externalExpanded,
+        leaf,
+      },
+    );
 
-  const elementExpanded = getComputed(() => nodeContext.externalExpanded ?? nodeContext.expanded);
-
-  return styled(TREE_NODE_STYLES)(
-    <node {...use({ expanded: elementExpanded })} ref={ref} className={className}>
-      <TreeNodeContext.Provider value={nodeContext}>
-        {children}
-      </TreeNodeContext.Provider>
-    </node>
-  );
-}));
+    return (
+      <div ref={ref} className={s(styles, { node: true }, className)}>
+        <TreeNodeContext.Provider value={nodeContext}>{children}</TreeNodeContext.Provider>
+      </div>
+    );
+  }),
+);

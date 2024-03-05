@@ -1,0 +1,8 @@
+.label {
+  cursor: pointer;
+  width: fit-content;
+
+  &.disabled {
+    cursor: default;
+  }
+}

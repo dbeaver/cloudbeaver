@@ -1,19 +1,18 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2022 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { ConnectionInfoResource, ConnectionsManagerService, IConnectionExecutorData } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { ExecutorInterrupter, IExecutionContextProvider } from '@cloudbeaver/core-executor';
-import { INodeNavigationData, NavigationType, NavNodeManagerService } from '@cloudbeaver/core-navigation-tree';
-import { resourceKeyList } from '@cloudbeaver/core-sdk';
+import { INodeNavigationData, NavNodeManagerService } from '@cloudbeaver/core-navigation-tree';
+import { resourceKeyList } from '@cloudbeaver/core-resource';
 import { ITab, NavigationTabsService } from '@cloudbeaver/plugin-navigation-tabs';
-import { DBObjectPageService, ObjectPage, ObjectViewerTabService, IObjectViewerTabState, isObjectViewerTab } from '@cloudbeaver/plugin-object-viewer';
+import { DBObjectPageService, IObjectViewerTabState, isObjectViewerTab, ObjectPage, ObjectViewerTabService } from '@cloudbeaver/plugin-object-viewer';
 
 import { DataViewerPanel } from './DataViewerPage/DataViewerPanel';
 import { DataViewerTab } from './DataViewerPage/DataViewerTab';
@@ -32,7 +31,7 @@ export class DataViewerTabService {
     private readonly notificationService: NotificationService,
     private readonly connectionsManagerService: ConnectionsManagerService,
     private readonly navigationTabsService: NavigationTabsService,
-    private readonly connectionInfoResource: ConnectionInfoResource
+    private readonly connectionInfoResource: ConnectionInfoResource,
   ) {
     this.page = this.dbObjectPageService.register({
       key: 'data_viewer_data',
@@ -54,20 +53,19 @@ export class DataViewerTabService {
     this.navNodeManagerService.navigator.addHandler(this.navigationHandler.bind(this));
   }
 
-  private async disconnectHandler(
-    data: IConnectionExecutorData,
-    contexts: IExecutionContextProvider<IConnectionExecutorData>
-  ) {
+  private async disconnectHandler(data: IConnectionExecutorData, contexts: IExecutionContextProvider<IConnectionExecutorData>) {
     const connectionsKey = resourceKeyList(data.connections);
     if (data.state === 'before') {
-      const tabs = Array.from(this.navigationTabsService.findTabs(
-        isObjectViewerTab(tab => {
-          if (!tab.handlerState.connectionKey) {
-            return false;
-          }
-          return this.connectionInfoResource.includes(connectionsKey, tab.handlerState.connectionKey);
-        })
-      ));
+      const tabs = Array.from(
+        this.navigationTabsService.findTabs(
+          isObjectViewerTab(tab => {
+            if (!tab.handlerState.connectionKey) {
+              return false;
+            }
+            return this.connectionInfoResource.isIntersect(connectionsKey, tab.handlerState.connectionKey);
+          }),
+        ),
+      );
 
       for (const tab of tabs) {
         const canDisconnect = await this.handleTabCanClose(tab);
@@ -81,17 +79,8 @@ export class DataViewerTabService {
   }
 
   private async navigationHandler(data: INodeNavigationData, contexts: IExecutionContextProvider<INodeNavigationData>) {
-    if (data.type !== NavigationType.open) {
-      return;
-    }
-
     try {
-      const {
-        nodeInfo,
-        tabInfo,
-        initTab,
-        trySwitchPage,
-      } = await contexts.getContext(this.objectViewerTabService.objectViewerTabContext);
+      const { nodeInfo, tabInfo, initTab, trySwitchPage } = contexts.getContext(this.objectViewerTabService.objectViewerTabContext);
 
       const node = await this.navNodeManagerService.loadNode(nodeInfo);
 
@@ -99,7 +88,7 @@ export class DataViewerTabService {
         return;
       }
 
-      initTab();
+      await initTab();
 
       if (tabInfo.isNewlyCreated) {
         trySwitchPage(this.page);
@@ -122,7 +111,7 @@ export class DataViewerTabService {
         await model.requestDataAction(() => {
           canClose = true;
         });
-      } catch { }
+      } catch {}
 
       return canClose;
     }

@@ -1,143 +1,165 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2022 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import { useCallback, useMemo, useState } from 'react';
-import styled, { css } from 'reshadow';
-import wellknown from 'wellknown';
+import proj4 from 'proj4';
+import { useCallback, useState } from 'react';
+import wellknown, { GeoJSONGeometry } from 'wellknown';
 
 import { TextPlaceholder, useTranslate } from '@cloudbeaver/core-blocks';
-import { IDatabaseResultSet, ResultSetSelectAction, IResultSetElementKey, IDatabaseDataModel, ResultSetViewAction, ResultSetDataKeysUtils } from '@cloudbeaver/plugin-data-viewer';
+import {
+  IDatabaseDataModel,
+  IDatabaseResultSet,
+  IResultSetElementKey,
+  ResultSetDataKeysUtils,
+  ResultSetSelectAction,
+  ResultSetViewAction,
+} from '@cloudbeaver/plugin-data-viewer';
 
 import { CrsInput } from './CrsInput';
-import { IGeoJSONFeature, IAssociatedValue, LeafletMap, CrsKey } from './LeafletMap';
+import classes from './GISValuePresentation.m.css';
+import { CrsKey, IAssociatedValue, IGeoJSONFeature, LeafletMap } from './LeafletMap';
 import { ResultSetGISAction } from './ResultSetGISAction';
 
-function getCrsKey(feature?: IGeoJSONFeature): CrsKey {
-  switch (feature?.properties.srid) {
+proj4.defs('EPSG:3395', '+title=World Mercator +proj=merc +lon_0=0 +k=1 +x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs');
+
+function getCrsKey(srid: number): CrsKey {
+  switch (srid) {
     case 3857:
-      return 'EPSG3857';
+      return 'EPSG:3857';
     case 4326:
-      return 'EPSG4326';
+      return 'EPSG:4326';
     case 3395:
-      return 'EPSG3395';
+      return 'EPSG:3395';
     case 900913:
-      return 'EPSG900913';
+      return 'EPSG:900913';
     default:
-      return 'EPSG3857';
+      return 'EPSG:4326';
   }
 }
 
-const styles = css`
-  root {
-    display: flex;
-    flex-direction: column;
-    width: 100%;
+const DEFAULT_CRS = 'EPSG:3857';
+const DEFAULT_TRANSFORM_CRS = 'EPSG:4326';
+
+function getTransformedGeometry(from: CrsKey, to: CrsKey, geometry: GeoJSONGeometry): GeoJSONGeometry {
+  if (geometry.type === 'Point') {
+    return { ...geometry, coordinates: proj4(from, to, geometry.coordinates) };
   }
 
-  map {
-    flex: 1 1 auto;
+  if (geometry.type === 'MultiPoint' || geometry.type === 'LineString') {
+    return { ...geometry, coordinates: geometry.coordinates.map(point => proj4(from, to, point)) };
   }
 
-  toolbar {
-    margin-top: 8px;
-    flex: 0 0 auto;
+  if (geometry.type === 'MultiLineString' || geometry.type === 'Polygon') {
+    return { ...geometry, coordinates: geometry.coordinates.map(line => line.map(point => proj4(from, to, point))) };
   }
-`;
+
+  if (geometry.type === 'MultiPolygon') {
+    return {
+      ...geometry,
+      coordinates: geometry.coordinates.map(polygon => polygon.map(line => line.map(point => proj4(from, to, point)))),
+    };
+  }
+
+  if (geometry.type === 'GeometryCollection') {
+    return { ...geometry, geometries: geometry.geometries.map(geometry => getTransformedGeometry(from, to, geometry)) };
+  }
+
+  return geometry;
+}
 
 interface Props {
   model: IDatabaseDataModel<any, IDatabaseResultSet>;
   resultIndex: number;
 }
 
-export const GISValuePresentation = observer<Props>(function GISValuePresentation({
-  model,
-  resultIndex,
-}) {
+export const GISValuePresentation = observer<Props>(function GISValuePresentation({ model, resultIndex }) {
   const translate = useTranslate();
 
   const selection = model.source.getAction(resultIndex, ResultSetSelectAction);
   const gis = model.source.getAction(resultIndex, ResultSetGISAction);
   const view = model.source.getAction(resultIndex, ResultSetViewAction);
 
-  const focusedCell = selection.getFocusedElement();
-  const selectedCells = selection.elements.slice();
+  const parsedGISData: IGeoJSONFeature[] = [];
+  const activeElements = selection.getActiveElements();
+  const firstActiveElement = activeElements[0];
+  const firstActiveCell = firstActiveElement ? gis.getCellValue(firstActiveElement) : null;
+  const initialCrs: CrsKey = firstActiveCell?.srid ? getCrsKey(firstActiveCell.srid) : DEFAULT_CRS;
 
-  if (selectedCells.length === 0 && focusedCell) {
-    selectedCells.push(focusedCell);
-  }
+  const [crs, setCrs] = useState<CrsKey | null>(null);
 
-  const parsedGISData = useMemo(() => {
-    const result: IGeoJSONFeature[] = [];
+  const currentCrs = crs ?? initialCrs;
 
-    for (const cell of selectedCells) {
-      const cellValue = gis.getCellValue(cell);
+  for (const cell of activeElements) {
+    const cellValue = gis.getCellValue(cell);
 
-      if (!cellValue) {
+    if (!cellValue) {
+      continue;
+    }
+
+    const text = cellValue.mapText || cellValue.text;
+
+    try {
+      const parsedCellValue = wellknown.parse(text);
+
+      if (!parsedCellValue) {
         continue;
       }
 
-      try {
-        const parsedCellValue = wellknown.parse(cellValue.mapText || cellValue.text);
-        if (!parsedCellValue) {
+      const from = cellValue.srid === 0 ? DEFAULT_TRANSFORM_CRS : getCrsKey(cellValue.srid);
+
+      parsedGISData.push({
+        type: 'Feature',
+        geometry: currentCrs === 'Simple' ? parsedCellValue : getTransformedGeometry(from, currentCrs, parsedCellValue),
+        properties: { associatedCell: cell, srid: cellValue.srid },
+      });
+    } catch (exception: any) {
+      console.error(`Failed to parse "${text}" value.`);
+      console.error(exception);
+    }
+  }
+
+  const getAssociatedValues = useCallback(
+    (cell: IResultSetElementKey): IAssociatedValue[] => {
+      const values: IAssociatedValue[] = [];
+
+      for (const column of view.columnKeys) {
+        if (ResultSetDataKeysUtils.isEqual(column, cell.column)) {
           continue;
         }
 
-        result.push({ type: 'Feature', geometry: parsedCellValue, properties: { associatedCell: cell, srid: cellValue.srid } });
-      } catch (exception: any) {
-        console.error(`Failed to parse "${cellValue.mapText || cellValue.text}" value.`);
-        console.error(exception);
-      }
-    }
+        const value = view.getCellValue({ ...cell, column });
+        const columnInfo = view.getColumn(column);
 
-    return result;
-  }, [selectedCells, gis]);
-
-  const getAssociatedValues = useCallback((cell: IResultSetElementKey): IAssociatedValue[] => {
-    const values: IAssociatedValue[] = [];
-
-    for (const column of view.columnKeys) {
-      if (ResultSetDataKeysUtils.isEqual(column, cell.column)) {
-        continue;
+        if (value && columnInfo?.name) {
+          values.push({
+            key: columnInfo.name,
+            value,
+          });
+        }
       }
 
-      const value = view.getCellValue({ ...cell, column });
-      const columnInfo = view.getColumn(column);
-
-      if (value && columnInfo?.name) {
-        values.push({
-          key: columnInfo.name,
-          value,
-        });
-      }
-    }
-
-    return values;
-  }, [view]);
-
-
-  const defaultCrsKey = getCrsKey(parsedGISData[0]);
-  const [crsKey, setCrsKey] = useState(defaultCrsKey);
+      return values;
+    },
+    [view],
+  );
 
   if (!parsedGISData.length) {
     return <TextPlaceholder>{translate('gis_presentation_placeholder')}</TextPlaceholder>;
   }
 
-  return styled(styles)(
-    <root>
-      <map>
-        <LeafletMap key={crsKey} geoJSON={parsedGISData} crsKey={crsKey} getAssociatedValues={getAssociatedValues} />
-      </map>
-      <toolbar>
-        <CrsInput
-          value={crsKey}
-          onChange={setCrsKey}
-        />
-      </toolbar>
-    </root>
+  return (
+    <div className={classes.root}>
+      <div className={classes.map}>
+        <LeafletMap key={currentCrs} geoJSON={parsedGISData} crsKey={currentCrs} getAssociatedValues={getAssociatedValues} />
+      </div>
+      <div className={classes.toolbar}>
+        <CrsInput value={currentCrs} onChange={setCrs} />
+      </div>
+    </div>
   );
 });

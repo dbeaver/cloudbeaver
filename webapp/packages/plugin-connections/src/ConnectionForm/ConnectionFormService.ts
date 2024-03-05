@@ -1,11 +1,10 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2022 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observable, runInAction, toJS } from 'mobx';
 
 import { PlaceholderContainer } from '@cloudbeaver/core-blocks';
@@ -13,13 +12,14 @@ import { injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { ENotificationType, NotificationService } from '@cloudbeaver/core-events';
 import { ExecutorHandlersCollection, ExecutorInterrupter, IExecutorHandler, IExecutorHandlersCollection } from '@cloudbeaver/core-executor';
+import { LocalizationService } from '@cloudbeaver/core-localization';
 import { TabsContainer } from '@cloudbeaver/core-ui';
 
-import { ConnectionAuthenticationDialog } from '../ConnectionAuthentication/ConnectionAuthenticationDialog';
-import { ConnectionFormBaseActions } from './ConnectionFormBaseActions';
+import { ConnectionAuthenticationDialogLoader } from '../ConnectionAuthentication/ConnectionAuthenticationDialogLoader';
+import { ConnectionFormBaseActionsLoader } from './ConnectionFormBaseActionsLoader';
 import { connectionConfigContext } from './Contexts/connectionConfigContext';
 import { connectionCredentialsStateContext } from './Contexts/connectionCredentialsStateContext';
-import type { IConnectionFormProps, IConnectionFormState, IConnectionFormFillConfigData, IConnectionFormSubmitData } from './IConnectionFormProps';
+import type { IConnectionFormFillConfigData, IConnectionFormProps, IConnectionFormState, IConnectionFormSubmitData } from './IConnectionFormProps';
 
 export interface IConnectionFormValidation {
   valid: boolean;
@@ -51,6 +51,7 @@ export class ConnectionFormService {
   constructor(
     private readonly notificationService: NotificationService,
     private readonly commonDialogService: CommonDialogService,
+    private readonly localizationService: LocalizationService,
   ) {
     this.tabsContainer = new TabsContainer('Connection settings');
     this.actionsContainer = new PlaceholderContainer();
@@ -61,18 +62,15 @@ export class ConnectionFormService {
     this.formValidationTask = new ExecutorHandlersCollection();
     this.formStateTask = new ExecutorHandlersCollection();
 
-    this.formSubmittingTask
-      .before(this.formValidationTask)
-      .before(this.prepareConfigTask);
+    this.formSubmittingTask.before(this.formValidationTask).before(this.prepareConfigTask);
 
-    this.formStateTask
-      .before<IConnectionFormSubmitData>(this.prepareConfigTask, state => ({ state, submitType: 'submit' }));
+    this.formStateTask.before<IConnectionFormSubmitData>(this.prepareConfigTask, state => ({ state, submitType: 'submit' }));
 
     this.prepareConfigTask.addPostHandler(this.askCredentials);
     this.formSubmittingTask.addPostHandler(this.showSubmittingStatusMessage);
     this.formValidationTask.addPostHandler(this.ensureValidation);
 
-    this.actionsContainer.add(ConnectionFormBaseActions);
+    this.actionsContainer.add(ConnectionFormBaseActionsLoader);
   }
 
   connectionValidationContext = (): IConnectionFormValidation => ({
@@ -110,16 +108,15 @@ export class ConnectionFormService {
 
     if (status.messages.length > 0) {
       if (status.exception) {
-        this.notificationService.logException(
-          status.exception,
-          status.messages[0],
-          status.messages.slice(1).join('\n')
-        );
+        this.notificationService.logException(status.exception, status.messages[0], status.messages.slice(1).join('\n'));
       } else {
-        this.notificationService.notify({
-          title: status.messages[0],
-          message: status.messages.slice(1).join('\n'),
-        }, status.saved ? ENotificationType.Success : ENotificationType.Error);
+        this.notificationService.notify(
+          {
+            title: status.messages[0],
+            message: status.messages.slice(1).join('\n'),
+          },
+          status.saved ? ENotificationType.Success : ENotificationType.Error,
+        );
       }
     }
   };
@@ -151,7 +148,7 @@ export class ConnectionFormService {
       }
     });
 
-    const result = await this.commonDialogService.open(ConnectionAuthenticationDialog, {
+    const result = await this.commonDialogService.open(ConnectionAuthenticationDialogLoader, {
       config,
       authModelId: credentialsState.authModelId,
       networkHandlers: credentialsState.networkHandlers,
@@ -171,12 +168,15 @@ export class ConnectionFormService {
     }
 
     if (validation.messages.length > 0) {
-      this.notificationService.notify({
-        title: data.state.mode === 'edit'
-          ? 'connections_administration_connection_save_error'
-          : 'connections_administration_connection_create_error',
-        message: validation.messages.join('\n'),
-      }, validation.valid ? ENotificationType.Info : ENotificationType.Error);
+      const messages = validation.messages.map(message => this.localizationService.translate(message));
+      this.notificationService.notify(
+        {
+          title:
+            data.state.mode === 'edit' ? 'connections_administration_connection_save_error' : 'connections_administration_connection_create_error',
+          message: messages.join('\n'),
+        },
+        validation.valid ? ENotificationType.Info : ENotificationType.Error,
+      );
     }
   };
 }

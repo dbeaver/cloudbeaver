@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2023 DBeaver Corp and others
+ * Copyright (C) 2010-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,6 +26,7 @@ import org.jkiss.dbeaver.model.DBPObject;
 import org.jkiss.dbeaver.model.auth.SMAuthProvider;
 import org.jkiss.dbeaver.model.auth.SMSession;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
+import org.jkiss.dbeaver.model.security.SMAuthProviderCustomConfiguration;
 
 import java.util.Map;
 
@@ -39,17 +40,19 @@ public interface SMAuthProviderExternal<AUTH_SESSION extends SMSession> extends 
      * Returns new identifying credentials which can be used to find/create user in database
      */
     @NotNull
-    Map<String, Object> authExternalUser(
+    default Map<String, Object> authExternalUser(
         @NotNull DBRProgressMonitor monitor,
-        @NotNull Map<String, Object> providerConfig, // Auth provider configuration (e.g. 3rd party auth server address)
+        @Nullable SMAuthProviderCustomConfiguration providerConfig, // Auth provider configuration (e.g. 3rd party auth server address)
         @NotNull Map<String, Object> authParameters // Passed auth parameters (e.g. user name or password)
-    ) throws DBException;
+    ) throws DBException {
+        return authParameters;
+    }
 
 
     @NotNull
     DBWUserIdentity getUserIdentity(
         @NotNull DBRProgressMonitor monitor,
-        @NotNull Map<String, Object> providerConfig,
+        @Nullable SMAuthProviderCustomConfiguration customConfiguration,
         @NotNull Map<String, Object> authParameters) throws DBException;
 
     /**

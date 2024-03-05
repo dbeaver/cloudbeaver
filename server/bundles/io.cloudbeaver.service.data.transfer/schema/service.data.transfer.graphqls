@@ -18,12 +18,15 @@ input DataTransferOutputSettingsInput {
     insertBom: Boolean
     encoding: String
     timestampPattern: String
+    compress: Boolean
+    fileName: String
 }
 
 type DataTransferOutputSettings {
     insertBom: Boolean!
     encoding: String!
     timestampPattern: String!
+    compress: Boolean!
 }
 
 type DataTransferDefaultExportSettings {

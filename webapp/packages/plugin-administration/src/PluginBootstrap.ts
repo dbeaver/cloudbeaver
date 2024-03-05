@@ -1,20 +1,23 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2022 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
+import { lazy } from 'react';
 
-import { EAdminPermission, AdministrationScreenService, AdministrationTopAppBarService } from '@cloudbeaver/core-administration';
+import { AdministrationScreenService } from '@cloudbeaver/core-administration';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
-import { PermissionsService } from '@cloudbeaver/core-root';
+import { PermissionsService, EAdminPermission } from '@cloudbeaver/core-root';
 import { ScreenService } from '@cloudbeaver/core-routing';
 import { DATA_CONTEXT_MENU, MenuBaseItem, MenuService } from '@cloudbeaver/core-view';
 import { TOP_NAV_BAR_SETTINGS_MENU } from '@cloudbeaver/plugin-settings-menu';
-import { AppStateMenu } from '@cloudbeaver/plugin-top-app-bar';
 
-import { AdministrationMenu } from './AdministrationMenu/AdministrationMenu';
+import { AdministrationTopAppBarService } from './AdministrationScreen/AdministrationTopAppBar/AdministrationTopAppBarService';
+
+const AdministrationMenu = lazy(() => import('./AdministrationMenu/AdministrationMenu').then(m => ({ default: m.AdministrationMenu })));
+const AppStateMenu = lazy(() => import('@cloudbeaver/plugin-top-app-bar').then(m => ({ default: m.AppStateMenu })));
 
 @injectable()
 export class PluginBootstrap extends Bootstrap {
@@ -23,7 +26,7 @@ export class PluginBootstrap extends Bootstrap {
     private readonly screenService: ScreenService,
     private readonly administrationScreenService: AdministrationScreenService,
     private readonly administrationTopAppBarService: AdministrationTopAppBarService,
-    private readonly menuService: MenuService
+    private readonly menuService: MenuService,
   ) {
     super();
   }
@@ -46,7 +49,7 @@ export class PluginBootstrap extends Bootstrap {
                 label: 'administration_menu_enter',
                 tooltip: 'administration_menu_enter',
               },
-              { onSelect: () => this.administrationScreenService.navigateToRoot() }
+              { onSelect: () => this.administrationScreenService.navigateToRoot() },
             ),
           ];
         }
@@ -60,7 +63,7 @@ export class PluginBootstrap extends Bootstrap {
                 label: 'administration_menu_back',
                 tooltip: 'administration_menu_back',
               },
-              { onSelect: () => this.screenService.navigateToRoot() }
+              { onSelect: () => this.screenService.navigateToRoot() },
             ),
           ];
         }
@@ -80,5 +83,5 @@ export class PluginBootstrap extends Bootstrap {
     });
   }
 
-  load(): void { }
+  load(): void {}
 }

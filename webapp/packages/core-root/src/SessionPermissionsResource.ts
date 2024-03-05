@@ -1,32 +1,54 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2022 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { injectable } from '@cloudbeaver/core-di';
 import { ExecutorInterrupter } from '@cloudbeaver/core-executor';
-import { GraphQLService, CachedDataResource, CachedResource } from '@cloudbeaver/core-sdk';
+import { CachedDataResource, CachedResource } from '@cloudbeaver/core-resource';
+import { GraphQLService } from '@cloudbeaver/core-sdk';
 
+import { DataSynchronizationService } from './DataSynchronization/DataSynchronizationService';
 import { SessionDataResource } from './SessionDataResource';
+import { ServerEventId } from './SessionEventSource';
+import { ISessionPermissionEvent, SessionPermissionEventHandler } from './SessionPermissionEventHandler';
+import { SessionResource } from './SessionResource';
 
 @injectable()
 export class SessionPermissionsResource extends CachedDataResource<Set<string>> {
   constructor(
     private readonly graphQLService: GraphQLService,
-    sessionDataResource: SessionDataResource
+    private readonly dataSynchronizationService: DataSynchronizationService,
+    sessionDataResource: SessionDataResource,
+    sessionResource: SessionResource,
+    sessionPermissionEventHandler: SessionPermissionEventHandler,
   ) {
-    super(new Set());
+    super(() => new Set());
 
-    this.sync(sessionDataResource, () => {}, () => {});
+    this.sync(
+      sessionDataResource,
+      () => {},
+      () => {},
+    );
+
+    sessionPermissionEventHandler.onEvent<ISessionPermissionEvent>(
+      ServerEventId.CbSubjectPermissionsUpdated,
+      () => {
+        this.dataSynchronizationService.requestSynchronization('permissions', 'app_root_event_permissions_changed_message').then(state => {
+          if (state) {
+            sessionResource.markOutdated();
+          }
+        });
+      },
+      undefined,
+      sessionResource,
+    );
   }
 
   require(resource: CachedResource<any, any, any, any, any>, ...permissions: string[]): this {
-    resource
-      .preloadResource(this, () => undefined)
-      .before(ExecutorInterrupter.interrupter(() => !this.has(...permissions)));
+    resource.preloadResource(this, () => undefined).before(ExecutorInterrupter.interrupter(() => !this.has(...permissions)));
 
     return this;
   }

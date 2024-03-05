@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2022 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -21,14 +21,22 @@ export function pathJoin(...segments: string[]): string {
   for (const part of parts) {
     // Remove leading and trailing slashes
     // Also remove "." segments
-    if (!part || part === '.') {continue;}
+    if (!part || part === '.') {
+      continue;
+    }
     // Interpret ".." to pop the last segment
-    if (part === '..') {newParts.pop();}
+    if (part === '..') {
+      newParts.pop();
+    }
     // Push new path segments.
-    else {newParts.push(part);}
+    else {
+      newParts.push(part);
+    }
   }
   // Preserve the initial slash if there was one.
-  if (parts[0] === '') {newParts.unshift('');}
+  if (parts[0] === '') {
+    newParts.unshift('');
+  }
   // Turn back into a single string path.
   return newParts.join('/') || (newParts.length ? '/' : '.');
 }

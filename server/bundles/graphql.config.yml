@@ -1,0 +1,9 @@
+projects:
+  schema:
+    include: ./**/*.graphqls
+schema: "gql.ce"
+extensions:
+  endpoints:
+    Default GraphQL Endpoint:
+      url: http://localhost:8080/api/gql
+      introspect: false

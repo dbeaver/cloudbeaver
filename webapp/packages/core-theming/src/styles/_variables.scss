@@ -1,12 +1,14 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2022 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
 
 $mdc-theme-extra-property-values: (
+  sub-secondary: $mdc-theme-sub-secondary,
+  on-sub-secondary: $mdc-theme-on-sub-secondary,
   positive: $color-positive,
   on-positive: $color-on-positive,
   negative: $color-negative,
@@ -24,13 +26,27 @@ $mdc-theme-extra-property-values: (
 
 $mdc-theme-property-values: map-merge($mdc-theme-property-values, $mdc-theme-extra-property-values);
 
-$theme-class: "theme-#{$theme-name}";
+$theme-class: 'theme-#{$theme-name}';
 $theme-form-element-radius: 3px !default;
+$theme-group-element-radius: 4px !default;
+$theme-menu-bar-small-action-radius: 3px !default;
+$app-height: 100vh !default;
 
 @mixin css-variables {
+  --app-height: #{$app-height};
   .theme-form-element-radius {
     border-radius: $theme-form-element-radius;
   }
 
+  .theme-group-element-radius {
+    border-radius: $theme-group-element-radius;
+  }
+
+  .theme-menu-bar-small-action-radius {
+    border-radius: $theme-menu-bar-small-action-radius;
+  }
+
   --theme-form-element-radius: #{$theme-form-element-radius};
+  --theme-group-element-radius: #{$theme-group-element-radius};
+  --theme-menu-bar-small-action-radius: #{$theme-menu-bar-small-action-radius};
 }

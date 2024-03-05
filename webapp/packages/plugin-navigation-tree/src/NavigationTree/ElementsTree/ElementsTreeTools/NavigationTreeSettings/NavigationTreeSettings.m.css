@@ -1,0 +1,15 @@
+.settings {
+  display: flex;
+  flex-direction: row;
+  overflow: auto;
+}
+
+.group {
+  min-width: fit-content;
+  margin-right: 0;
+  width: 100%;
+}
+
+.settings > .groupPadding {
+  padding: 12px;
+}

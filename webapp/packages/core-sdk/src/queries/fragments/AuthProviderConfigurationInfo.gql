@@ -1,9 +1,11 @@
 fragment AuthProviderConfigurationInfo on AuthProviderConfiguration {
   id
   displayName
+  authRoleProvided
   iconURL
   description
   signInLink
   signOutLink
   metadataLink
+  acsLink
 }

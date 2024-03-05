@@ -15,6 +15,7 @@ mutation getSqlExecutionPlanResult(
           description
           properties {
             id
+            required
             category
             dataType
             description

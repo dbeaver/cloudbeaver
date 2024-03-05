@@ -1,26 +1,22 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2022 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { injectable } from '@cloudbeaver/core-di';
-import { SessionEventSource, TopicEventHandler, ISessionEvent, ClientEventId, SessionEventTopic, IBaseServerEvent, SessionEventId } from '@cloudbeaver/core-root';
-import type { CbProjectsActiveEvent } from '@cloudbeaver/core-sdk';
+import { ClientEventId, ISessionEvent, SessionEventId, SessionEventSource, SessionEventTopic, TopicEventHandler } from '@cloudbeaver/core-root';
+import type { CbProjectsActiveEvent, CbProjectUpdateEvent as IProjectInfoEvent } from '@cloudbeaver/core-sdk';
 import { isArraysEqual } from '@cloudbeaver/core-utils';
 
-export type IProjectInfoEvent = IBaseServerEvent<SessionEventId, SessionEventTopic>;
+export type { IProjectInfoEvent };
 
 @injectable()
-export class ProjectInfoEventHandler
-  extends TopicEventHandler<IProjectInfoEvent, ISessionEvent, SessionEventId, SessionEventTopic> {
+export class ProjectInfoEventHandler extends TopicEventHandler<IProjectInfoEvent, ISessionEvent, SessionEventId, SessionEventTopic> {
   private lastActiveProjects: string[];
 
-  constructor(
-    sessionEventSource: SessionEventSource
-  ) {
+  constructor(sessionEventSource: SessionEventSource) {
     super(SessionEventTopic.CbProjects, sessionEventSource);
     this.lastActiveProjects = [];
 
@@ -38,7 +34,7 @@ export class ProjectInfoEventHandler
     this.lastActiveProjects = projectIds;
   }
 
-  map(event: ISessionEvent): IProjectInfoEvent {
+  map(event: any): IProjectInfoEvent {
     return event;
   }
 }

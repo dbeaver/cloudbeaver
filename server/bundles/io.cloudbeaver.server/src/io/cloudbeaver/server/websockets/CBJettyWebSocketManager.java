@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2023 DBeaver Corp and others
+ * Copyright (C) 2010-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,71 +17,91 @@
 package io.cloudbeaver.server.websockets;
 
 import io.cloudbeaver.model.session.BaseWebSession;
+import io.cloudbeaver.model.session.WebHeadlessSession;
 import io.cloudbeaver.server.CBPlatform;
 import io.cloudbeaver.service.session.WebSessionManager;
+import jakarta.servlet.http.HttpServletRequest;
 import org.eclipse.jetty.websocket.server.JettyServerUpgradeRequest;
 import org.eclipse.jetty.websocket.server.JettyServerUpgradeResponse;
 import org.eclipse.jetty.websocket.server.JettyWebSocketCreator;
+import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
+import org.jkiss.dbeaver.model.security.exception.SMAccessTokenExpiredException;
 
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class CBJettyWebSocketManager implements JettyWebSocketCreator {
     private static final Log log = Log.getLog(CBJettyWebSocketManager.class);
-    private final Map<String, CBEventsWebSocket> socketBySessionId = new ConcurrentHashMap<>();
+    private final Map<String, List<CBEventsWebSocket>> socketBySessionId = new ConcurrentHashMap<>();
     private final WebSessionManager webSessionManager;
 
-    public CBJettyWebSocketManager(WebSessionManager webSessionManager) {
+    public CBJettyWebSocketManager(@NotNull WebSessionManager webSessionManager) {
         this.webSessionManager = webSessionManager;
+
         new WebSocketPingPongJob(CBPlatform.getInstance(), this).scheduleMonitor();
     }
 
+    @Nullable
     @Override
-    public Object createWebSocket(JettyServerUpgradeRequest request, JettyServerUpgradeResponse resp) {
-        BaseWebSession webSession;
+    public Object createWebSocket(@NotNull JettyServerUpgradeRequest request, JettyServerUpgradeResponse resp) {
+        var httpRequest = request.getHttpServletRequest();
+        var webSession = webSessionManager.getOrRestoreSession(httpRequest);
+        if (webSession != null) {
+            // web client session
+            return createNewEventsWebSocket(webSession);
+        }
+        // possible desktop client session
         try {
-            webSession = resolveWebSession(request);
+            var headlessSession = createHeadlessSession(httpRequest);
+            if (headlessSession == null) {
+                log.debug("Couldn't create headless session");
+                return null;
+            }
+            return createNewEventsWebSocket(headlessSession);
+        } catch (SMAccessTokenExpiredException e) {
+            return new CBExpiredSessionWebSocket();
         } catch (DBException e) {
             log.error("Error resolve websocket session", e);
             return null;
         }
-        if (webSession == null) {
-            log.error("CloudBeaver session not found");
-            return null;
-        }
-        var webSessionId = webSession.getSessionId();
-        var oldWebSocket = socketBySessionId.get(webSessionId);
-        if (oldWebSocket != null) {
-            oldWebSocket.close();
-        }
+    }
+
+    @NotNull
+    private CBEventsWebSocket createNewEventsWebSocket(@NotNull BaseWebSession webSession) {
+        var sessionId = webSession.getSessionId();
         var newWebSocket = new CBEventsWebSocket(webSession);
-        socketBySessionId.put(webSessionId, newWebSocket);
-        log.info("Websocket created for session: " + webSessionId);
+        socketBySessionId.computeIfAbsent(sessionId, key -> new CopyOnWriteArrayList<>())
+            .add(newWebSocket);
+        log.info("Websocket created for session: " + sessionId);
         return newWebSocket;
     }
 
     @Nullable
-    private BaseWebSession resolveWebSession(JettyServerUpgradeRequest request) throws DBException {
-        if (request.getHttpServletRequest().getSession() == null) {
-            return webSessionManager.getHeadlessSession(request.getHttpServletRequest(), true);
+    private WebHeadlessSession createHeadlessSession(@NotNull HttpServletRequest request) throws DBException {
+        var httpSession = request.getSession(false);
+        if (httpSession == null) {
+            log.debug("CloudBeaver web session not exist, try to create headless session");
+        } else {
+            log.debug("CloudBeaver session not found with id " + httpSession.getId() + ", try to create headless session");
         }
-        var webSessionId = request.getHttpServletRequest().getSession().getId();
-        var webSession = webSessionManager.getSession(webSessionId);
-        return webSession != null
-            ? webSession
-            : webSessionManager.getHeadlessSession(request.getHttpServletRequest(), true);
+        return webSessionManager.getHeadlessSession(request, true);
     }
 
     public void sendPing() {
         //remove expired sessions
         socketBySessionId.entrySet()
-            .removeIf(entry ->
-                entry.getValue().isNotConnected() || webSessionManager.getSession(entry.getKey()) == null
+            .removeIf(entry -> {
+                    entry.getValue().removeIf(ws -> !ws.isConnected());
+                    return webSessionManager.getSession(entry.getKey()) == null ||
+                        entry.getValue().isEmpty();
+                }
             );
 
         socketBySessionId.entrySet()
@@ -90,14 +110,16 @@ public class CBJettyWebSocketManager implements JettyWebSocketCreator {
             .forEach(
                 entry -> {
                     var sessionId = entry.getKey();
-                    var webSocket = entry.getValue();
-                    try {
-                        webSocket.getRemote().sendPing(
-                            ByteBuffer.wrap("cb-ping".getBytes(StandardCharsets.UTF_8)),
-                            webSocket.getCallback()
-                        );
-                    } catch (Exception e) {
-                        log.error("Failed to send ping in web socket: " + sessionId);
+                    var webSockets = entry.getValue();
+                    for (CBEventsWebSocket webSocket : webSockets) {
+                        try {
+                            webSocket.getRemote().sendPing(
+                                ByteBuffer.wrap("cb-ping".getBytes(StandardCharsets.UTF_8)),
+                                webSocket.getCallback()
+                            );
+                        } catch (Exception e) {
+                            log.error("Failed to send ping in web socket: " + sessionId);
+                        }
                     }
                 }
             );

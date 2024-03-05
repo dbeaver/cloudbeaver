@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2023 DBeaver Corp and others
+ * Copyright (C) 2010-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@ import io.cloudbeaver.model.user.WebUserOriginInfo;
 import io.cloudbeaver.registry.WebAuthProviderDescriptor;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.Log;
+import org.jkiss.dbeaver.model.auth.SMAuthInfo;
 import org.jkiss.dbeaver.model.auth.SMAuthProvider;
 import org.jkiss.dbeaver.model.auth.SMSession;
 import org.jkiss.dbeaver.model.auth.SMSessionPrincipal;
@@ -41,7 +42,10 @@ public class WebAuthInfo implements SMSessionPrincipal {
     private final WebUser user;
     private final WebAuthProviderDescriptor authProvider;
     private String authProviderConfigurationId;
-    private SMSession authSession;
+    @NotNull
+    private final SMAuthInfo authInfo;
+    @NotNull
+    private final SMSession authSession;
     private final OffsetDateTime loginTime;
     private final DBWUserIdentity userIdentity;
     private String message;
@@ -54,11 +58,14 @@ public class WebAuthInfo implements SMSessionPrincipal {
         @NotNull WebAuthProviderDescriptor authProvider,
         @NotNull DBWUserIdentity userIdentity,
         @NotNull SMSession authSession,
-        @NotNull OffsetDateTime loginTime) {
+        @NotNull SMAuthInfo authInfo,
+        @NotNull OffsetDateTime loginTime
+    ) {
         this.session = session;
         this.user = user;
         this.authProvider = authProvider;
         this.userIdentity = userIdentity;
+        this.authInfo = authInfo;
         this.authSession = authSession;
         this.loginTime = loginTime;
     }
@@ -80,7 +87,7 @@ public class WebAuthInfo implements SMSessionPrincipal {
 
     @Property
     public WebUserOriginInfo getOrigin() {
-        return new WebUserOriginInfo(session, user, authProvider, true);
+        return new WebUserOriginInfo(session, user, authProvider);
     }
 
     @Property
@@ -119,8 +126,14 @@ public class WebAuthInfo implements SMSessionPrincipal {
         return authProvider;
     }
 
+    @NotNull
     public SMSession getAuthSession() {
         return authSession;
+    }
+
+    @NotNull
+    public SMAuthInfo getAuthInfo() {
+        return authInfo;
     }
 
     void closeAuth() {
@@ -130,8 +143,6 @@ public class WebAuthInfo implements SMSessionPrincipal {
                 authProviderInstance.closeSession(session, authSession);
             } catch (Exception e) {
                 log.error(e);
-            } finally {
-                authSession = null;
             }
         }
     }

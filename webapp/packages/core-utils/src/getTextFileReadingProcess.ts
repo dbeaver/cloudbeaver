@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2022 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -28,7 +28,7 @@ export function getTextFileReadingProcess(file: File): UploadProcess<string> {
     };
 
     reader.onerror = event => {
-      reject(new Error(`Error occurred reading file: "${file.name}"`));
+      reject(new Error(`Error occurred reading file: "${file.name}"`, { cause: event.target?.error }));
       if (event.target?.error) {
         console.error(event.target.error);
       }

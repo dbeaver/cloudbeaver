@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2023 DBeaver Corp and others
+ * Copyright (C) 2010-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,7 +40,7 @@ public class WebServiceMetadata implements DBWServiceMetadata {
         validateDatabaseNode(dbNode);
         DBSObject object = ((DBNDatabaseNode) dbNode).getObject();
         if (!(object instanceof DBPScriptObject)) {
-            throw new DBWebException("Object '" + dbNode.getNodeItemPath() + "' doesn't support DDL");
+            throw new DBWebException("Object '" + dbNode.getNodeUri() + "' doesn't support DDL");
         }
         if (options == null) {
             options = new LinkedHashMap<>();
@@ -57,7 +57,7 @@ public class WebServiceMetadata implements DBWServiceMetadata {
         validateDatabaseNode(dbNode);
         DBSObject object = ((DBNDatabaseNode) dbNode).getObject();
         if (!(object instanceof DBPScriptObjectExt)) {
-            throw new DBWebException("Object '" + dbNode.getNodeItemPath() + "' doesn't support extended DDL");
+            throw new DBWebException("Object '" + dbNode.getNodeUri() + "' doesn't support extended DDL");
         }
         try {
             return ((DBPScriptObjectExt) object).getExtendedDefinitionText(webSession.getProgressMonitor());
@@ -68,7 +68,7 @@ public class WebServiceMetadata implements DBWServiceMetadata {
 
     private void validateDatabaseNode(DBNNode dbNode) throws DBWebException {
         if (!(dbNode instanceof DBNDatabaseNode)) {
-            throw new DBWebException("Node '" + dbNode.getNodeItemPath() + "' is not database node");
+            throw new DBWebException("Node '" + dbNode.getNodeUri() + "' is not database node");
         }
     }
 }

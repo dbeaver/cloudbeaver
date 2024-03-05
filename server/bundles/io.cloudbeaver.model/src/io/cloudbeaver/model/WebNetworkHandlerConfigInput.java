@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2023 DBeaver Corp and others
+ * Copyright (C) 2010-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@ import org.jkiss.dbeaver.model.data.json.JSONUtils;
 import org.jkiss.dbeaver.model.net.DBWHandlerType;
 import org.jkiss.utils.CommonUtils;
 
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -61,6 +62,7 @@ public class WebNetworkHandlerConfigInput {
         return JSONUtils.getString(cfg, "password");
     }
 
+    @Deprecated // use secured properties
     public String getKey() {
         return JSONUtils.getString(cfg, "key");
     }
@@ -75,6 +77,18 @@ public class WebNetworkHandlerConfigInput {
 
     public Map<String, Object> getProperties() {
         return JSONUtils.getObjectOrNull(cfg, "properties");
+    }
+
+    public Map<String, String> getSecureProperties() {
+        var secureProperties = JSONUtils.getObjectOrNull(cfg, "secureProperties");
+        if (secureProperties == null) {
+            return null;
+        }
+        var result = new LinkedHashMap<String, String>();
+        for (Map.Entry<String, Object> property : secureProperties.entrySet()) {
+            result.put(property.getKey(), CommonUtils.toString(property.getValue()));
+        }
+        return result;
     }
 
 }

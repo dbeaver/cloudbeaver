@@ -1,19 +1,19 @@
 query saveAuthProviderConfiguration(
-  $providerId: ID!,
-  $id: ID!,
-  $displayName: String,
-  $disabled: Boolean,
+  $providerId: ID!
+  $id: ID!
+  $displayName: String
+  $disabled: Boolean
   $iconURL: String
   $description: String
   $parameters: Object
 ) {
   configuration: saveAuthProviderConfiguration(
-    providerId: $providerId,
-    id: $id,
-    displayName: $displayName,
-    disabled: $disabled,
-    iconURL: $iconURL,
-    description: $description,
+    providerId: $providerId
+    id: $id
+    displayName: $displayName
+    disabled: $disabled
+    iconURL: $iconURL
+    description: $description
     parameters: $parameters
   ) {
     providerId
@@ -27,5 +27,6 @@ query saveAuthProviderConfiguration(
     signOutLink
     redirectLink
     metadataLink
+    acsLink
   }
 }

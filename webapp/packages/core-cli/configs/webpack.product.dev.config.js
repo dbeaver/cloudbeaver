@@ -6,15 +6,17 @@ const fs = require('fs');
 const { URL } = require('url');
 
 const commonConfig = require('./webpack.config.js');
-const main = resolve('src/index.ts');
-const sso = require.resolve('@cloudbeaver/plugin-sso/src/index.ts');
+const index = resolve('dist/index.js');
+const sso = require.resolve('@cloudbeaver/plugin-sso/dist/index.js');
 const ssoHtmlTemplate = require.resolve('@cloudbeaver/plugin-sso/src/index.html.ejs');
+const { getAssets } = require('./webpack.product.utils');
 
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const HtmlReplaceWebpackPlugin = require('html-replace-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
+const ReactRefreshWebpackPlugin = require('@pmmmwh/react-refresh-webpack-plugin');
+const HtmlInjectWebpackPlugin = require('../utils/HtmlInjectWebpackPlugin');
 
-const HtmlInjectWebpackPlugin = require('./HtmlInjectWebpackPlugin');
-const { getAssets } = require('./webpack.product.utils');
 
 const package = require(resolve('package.json'));
 
@@ -33,44 +35,59 @@ if (fs.existsSync(certPath) && fs.existsSync(keyPath)) {
 }
 
 module.exports = (env, argv) => {
-  const urlObject = new URL(env.server);
+  const envServer = env.server ?? process.env.server;
+  const urlObject = new URL(envServer);
 
   return merge(commonConfig(env, argv), {
+    mode: 'development',
+    context: resolve(__dirname, '../../../../../'),
     entry: {
-      main,
+      index,
       sso,
     },
-    mode: 'development',
+    watchOptions: {
+      aggregateTimeout: 3000,
+      ignored: ['**/node_modules', '**/packages/*/src/**/*.{ts,tsx}'],
+    },
+    optimization: {
+      minimize: false,
+      moduleIds: 'named',
+
+      // improve performance
+      removeAvailableModules: false,
+      removeEmptyChunks: false,
+      splitChunks: false,
+    },
     devServer: {
       allowedHosts: 'all',
-      // port: 8080,
+      host: 'localhost',
+      port: 8080,
       client: {
-        webSocketURL: 'auto://0.0.0.0:0/ws',
+        webSocketURL: 'auto://localhost:0/ws',
+        overlay: false,
       },
       server,
       proxy: {
         '/api': {
-          target: env.server,
+          target: envServer,
+          secure: false,
         },
         '/api/ws': {
-          target: `ws://${urlObject.hostname}:${urlObject.port}/api/ws`,
+          target: `${urlObject.protocol === 'https:' ? 'wss:' : 'ws:'}//${urlObject.hostname}:${urlObject.port}/api/ws`,
           ws: true,
+          secure: false,
         },
       },
-      onListening: function (devServer, ...args) {
-        if (!devServer) {
-          throw new Error('webpack-dev-server is not defined');
-        }
-        const logger = devServer.compiler.getInfrastructureLogger('webpack-dev-server');
-        const port = devServer.server.address().port;
-        logger.info(`Proxy from http://localhost:8080 to http://127.0.0.1:${port}`);
-        httpProxy.createProxyServer({ target:`http://127.0.0.1:${port}` }).listen(8080);
-      },
+      // onListening: function (devServer, ...args) {
+      //   if (!devServer) {
+      //     throw new Error('webpack-dev-server is not defined');
+      //   }
+      //   const logger = devServer.compiler.getInfrastructureLogger('webpack-dev-server');
+      //   const port = devServer.server.address().port;
+      //   logger.info(`Proxy from http://localhost:8080 to http://127.0.0.1:${port}`);
+      //   httpProxy.createProxyServer({ target:`http://127.0.0.1:${port}`, secure: false }).listen(8080);
+      // },
     },
-    devtool: 'eval-source-map',
-    // optimization: {
-    //   moduleIds: 'named',
-    // },
     plugins: [
       new CopyWebpackPlugin({
         patterns: getAssets(package, ''),
@@ -82,7 +99,7 @@ module.exports = (env, argv) => {
       new HtmlWebpackPlugin({
         template: resolve('src/index.html.ejs'),
         inject: 'body',
-        chunks: ['main'],
+        chunks: ['index'],
         version: package.version,
         title: package.product?.name,
       }),
@@ -97,7 +114,14 @@ module.exports = (env, argv) => {
       new HtmlInjectWebpackPlugin({
         body: [{ attributes: { hidden: true }, tagName: 'object', innerHTML: '{STATIC_CONTENT}', voidTag: false }],
       }),
+      new HtmlReplaceWebpackPlugin([
+        {
+          pattern: '{ROOT_URI}',
+          replacement: '/',
+        },
+      ]),
       new webpack.HotModuleReplacementPlugin(),
+      new ReactRefreshWebpackPlugin({ overlay: false }),
     ],
   });
 };

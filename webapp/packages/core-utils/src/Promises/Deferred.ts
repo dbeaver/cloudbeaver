@@ -1,13 +1,13 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2022 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
+import { action, computed, makeObservable, observable } from 'mobx';
 
-import { action, computed, observable, makeObservable } from 'mobx';
-
+import { errorOf } from '../errorOf';
 import { PromiseCancelledError } from './PromiseCancelledError';
 import { PromiseExecutor } from './PromiseExecutor';
 
@@ -27,21 +27,27 @@ export class Deferred<T> {
   private rejectionReason: any;
   private state: EDeferredState = EDeferredState.PENDING;
 
-  private promiseExecutor = new PromiseExecutor<T>();
+  private readonly promiseExecutor = new PromiseExecutor<T>();
 
   constructor() {
-    makeObservable<Deferred<T>, 'payload' | 'rejectionReason' | 'state' | 'toResolved' | 'toRejected' | 'toCancelled' | 'toCancelling' | 'toPending'>(this, {
-      payload: observable,
-      rejectionReason: observable,
-      state: observable,
-      isInProgress: computed,
-      isFinished: computed,
-      toResolved: action,
-      toRejected: action,
-      toCancelled: action,
-      toCancelling: action,
-      toPending: action,
-    });
+    this.payload = undefined;
+    this.rejectionReason = undefined;
+
+    makeObservable<Deferred<T>, 'payload' | 'rejectionReason' | 'state' | 'toResolved' | 'toRejected' | 'toCancelled' | 'toCancelling' | 'toPending'>(
+      this,
+      {
+        payload: observable,
+        rejectionReason: observable,
+        state: observable,
+        isInProgress: computed,
+        isFinished: computed,
+        toResolved: action,
+        toRejected: action,
+        toCancelled: action,
+        toCancelling: action,
+        toPending: action,
+      },
+    );
   }
 
   get promise(): Promise<T> {
@@ -56,8 +62,8 @@ export class Deferred<T> {
     return !this.isInProgress;
   }
 
-  getPayload(defaultValue: T): T
-  getPayload(): T | undefined
+  getPayload(defaultValue: T): T;
+  getPayload(): T | undefined;
   getPayload(defaultValue?: T): T | undefined {
     if (this.state === EDeferredState.RESOLVED) {
       return this.payload;
@@ -112,12 +118,13 @@ export class DeferredFromPromise<T> extends Deferred<T> {
     promise.then(
       value => this.toResolved(value),
       err => {
-        if (err instanceof PromiseCancelledError) {
-          this.toCancelled(err.reason);
+        const promiseCancelledError = errorOf(err, PromiseCancelledError);
+        if (promiseCancelledError) {
+          this.toCancelled(promiseCancelledError.cause);
         } else {
           this.toRejected(err);
         }
-      }
+      },
     );
   }
 }

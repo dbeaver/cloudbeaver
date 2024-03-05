@@ -1,13 +1,12 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2022 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import type { ClientError } from 'graphql-request';
-import type { GraphQLRequestContext, GraphQLResponse } from 'graphql-request/dist/types';
+import type { GraphQLRequestContext, GraphQLResponse } from 'graphql-request/build/cjs/types';
 
 import { getTextBetween } from '@cloudbeaver/core-utils';
 
@@ -23,7 +22,7 @@ export class PlainGQLError extends DetailsError {
       message = getTextBetween(clientError.response.error, '<title>', '</title>');
     }
 
-    super(message);
+    super(message, { cause: clientError });
     this.name = 'GQL Error';
     this.response = clientError.response;
     this.request = clientError.request;

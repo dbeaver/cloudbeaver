@@ -1,54 +1,48 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2022 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
+import { observer } from 'mobx-react-lite';
 import type React from 'react';
-import styled, { css, use } from 'reshadow';
 
 import { ENotificationType } from '@cloudbeaver/core-events';
 
+import { AppRefreshButton } from './AppRefreshButton';
+import style from './DisplayError.m.css';
+import { s } from './s';
 import { NotificationMark } from './Snackbars/NotificationMark';
-
-const style = css`
-  container {
-    width: 100%;
-    height: 100%;
-    display: flex;
-    overflow: auto;
-
-    &[|root] {
-      height: 100vh;
-    }
-  }
-  container-inner-block {
-    display: flex;
-    margin: auto;
-    padding: 16px 24px;
-    flex-direction: column;
-    align-items: center;
-  }
-  NotificationMark {
-    width: 40px;
-    height: 40px;
-  }
-`;
+import { useS } from './useS';
 
 interface Props {
   root?: boolean;
+  error?: Error;
+  errorInfo?: React.ErrorInfo;
+  className?: string;
+  children?: React.ReactNode;
 }
 
-export const DisplayError: React.FC<React.PropsWithChildren<Props>> = function DisplayError({ root, children }) {
-  return styled(style)(
-    <container {...use({ root })}>
-      <container-inner-block>
-        <NotificationMark type={ENotificationType.Error} />
+export const DisplayError = observer<Props>(function DisplayError({ root, children, error, errorInfo, className }) {
+  const styles = useS(style);
+  const stack = errorInfo?.componentStack || error?.stack;
+
+  return (
+    <div className={s(styles, { error: true, root }, className)}>
+      <div className={s(styles, { errorInnerBlock: true })}>
+        <NotificationMark className={s(styles, { notificationMark: true })} type={ENotificationType.Error} />
         <p>Something went wrong.</p>
+        {root && <AppRefreshButton />}
         {children}
-      </container-inner-block>
-    </container>
+        {error && (
+          <div className={s(styles, { details: true })}>
+            {error.toString()}
+            {stack && <br />}
+            {stack}
+          </div>
+        )}
+      </div>
+    </div>
   );
-};
+});

@@ -1,13 +1,12 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2022 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
-import { type NavNode, ENodeFeature, EObjectFeature, type NavNodeInfoResource, ROOT_NODE_PATH } from '@cloudbeaver/core-navigation-tree';
-import { resourceKeyList } from '@cloudbeaver/core-sdk';
+import { ENodeFeature, EObjectFeature, type NavNode, type NavNodeInfoResource, ROOT_NODE_PATH } from '@cloudbeaver/core-navigation-tree';
+import { resourceKeyList } from '@cloudbeaver/core-resource';
 
 import type { IElementsTreeFilter } from '../ElementsTree/useElementsTree';
 
@@ -23,7 +22,6 @@ function isDefined<T>(val: T | undefined | null): val is T {
 
 function sortManageable(): (nodeA: NavNode, nodeB: NavNode) => number {
   return (nodeA: NavNode, nodeB: NavNode): number => {
-
     const nodeAShared = nodeA.features?.includes(ENodeFeature.shared);
     const nodeBShared = nodeB.features?.includes(ENodeFeature.shared);
 
@@ -43,18 +41,13 @@ function sortManageable(): (nodeA: NavNode, nodeB: NavNode) => number {
   };
 }
 
-export function navigationTreeConnectionGroupFilter(
-  resource: NavNodeInfoResource
-): IElementsTreeFilter {
-  return (filter: string, node: NavNode, children: string[]) => {
+export function navigationTreeConnectionGroupFilter(resource: NavNodeInfoResource): IElementsTreeFilter {
+  return (tree, filter, node, children) => {
     if (node.id !== ROOT_NODE_PATH) {
       return children;
     }
 
-    const nodes = resource
-      .get(resourceKeyList(children))
-      .filter(isDefined)
-      .sort(sortManageable());
+    const nodes = resource.get(resourceKeyList(children)).filter(isDefined).sort(sortManageable());
 
     let groupedChildren: string[] = [];
     let lastGroup = NAVIGATION_TREE_CONNECTION_GROUPS.unsorted;
@@ -82,9 +75,8 @@ export function navigationTreeConnectionGroupFilter(
     }
 
     if (groups === 1) {
-      groupedChildren = groupedChildren.filter(id =>
-        id !== NAVIGATION_TREE_CONNECTION_GROUPS.manageable
-        && id !== NAVIGATION_TREE_CONNECTION_GROUPS.unmanageable
+      groupedChildren = groupedChildren.filter(
+        id => id !== NAVIGATION_TREE_CONNECTION_GROUPS.manageable && id !== NAVIGATION_TREE_CONNECTION_GROUPS.unmanageable,
       );
     }
 

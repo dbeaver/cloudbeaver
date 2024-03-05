@@ -1,11 +1,10 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2022 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { css } from 'reshadow';
 
 export const SQL_EDITOR_ACTIONS_MENU_STYLES = css`
@@ -33,7 +32,8 @@ export const SQL_EDITOR_ACTIONS_MENU_STYLES = css`
       display: none;
     }
 
-    & IconOrImage, & StaticImage {
+    & IconOrImage,
+    & StaticImage {
       height: 16px;
       width: 16px;
       cursor: pointer;
@@ -44,13 +44,12 @@ export const SQL_EDITOR_ACTIONS_MENU_STYLES = css`
     }
 
     & menu-bar-item-label {
-        display: block;
-        text-transform: uppercase;
-        font-weight: 700;
+      display: none;
     }
 
-    & IconOrImage + menu-bar-item-label, & Loader + menu-bar-item-label {
-        padding-left: 8px
+    & IconOrImage + menu-bar-item-label,
+    & Loader + menu-bar-item-label {
+      padding-left: 8px;
     }
   }
 
@@ -60,7 +59,8 @@ export const SQL_EDITOR_ACTIONS_MENU_STYLES = css`
     margin: 0;
     border: 1px solid !important;
 
-    &:first-child, &:last-child {
+    &:first-child,
+    &:last-child {
       display: none;
     }
   }

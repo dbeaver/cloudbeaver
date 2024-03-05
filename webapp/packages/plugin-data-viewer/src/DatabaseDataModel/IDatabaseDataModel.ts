@@ -1,11 +1,10 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2022 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import type { IExecutor } from '@cloudbeaver/core-executor';
 import type { ResultDataFormat } from '@cloudbeaver/core-sdk';
 
@@ -17,16 +16,20 @@ export interface IRequestEventData<TOptions = any, TResult extends IDatabaseData
   model: IDatabaseDataModel<TOptions, TResult>;
 }
 
+/** Represents an interface for interacting with a database. It is used for managing and requesting data. */
 export interface IDatabaseDataModel<TOptions = any, TResult extends IDatabaseDataResult = IDatabaseDataResult> {
   readonly id: string;
   readonly name: string | null;
   readonly source: IDatabaseDataSource<TOptions, TResult>;
+  /** Holds metadata about a data request. */
   readonly requestInfo: IRequestInfo;
   readonly supportedDataFormats: ResultDataFormat[];
+  /** Represents the value by which the number of loaded rows will be increased when loading the next data portion */
   readonly countGain: number;
 
   readonly onOptionsChange: IExecutor;
   readonly onRequest: IExecutor<IRequestEventData<TOptions, TResult>>;
+  readonly onDispose: IExecutor;
 
   setName: (name: string | null) => this;
   isReadonly: (resultIndex: number) => boolean;

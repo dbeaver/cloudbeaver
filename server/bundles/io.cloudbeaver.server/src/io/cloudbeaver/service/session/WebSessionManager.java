@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2023 DBeaver Corp and others
+ * Copyright (C) 2010-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,8 +25,10 @@ import io.cloudbeaver.model.session.WebSessionAuthProcessor;
 import io.cloudbeaver.registry.WebHandlerRegistry;
 import io.cloudbeaver.registry.WebSessionHandlerDescriptor;
 import io.cloudbeaver.server.CBApplication;
-import io.cloudbeaver.server.CBPlatform;
 import io.cloudbeaver.service.DBWSessionHandler;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
@@ -34,12 +36,9 @@ import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.auth.SMAuthInfo;
 import org.jkiss.dbeaver.model.security.user.SMAuthPermissions;
 import org.jkiss.dbeaver.model.websocket.WSConstants;
-import org.jkiss.dbeaver.runtime.DBWorkbench;
+import org.jkiss.dbeaver.model.websocket.event.session.WSSessionStateEvent;
 import org.jkiss.utils.CommonUtils;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -57,7 +56,10 @@ public class WebSessionManager {
         this.application = application;
     }
 
-    public BaseWebSession closeSession(@NotNull HttpServletRequest request) throws DBException {
+    /**
+     * Closes Web Session, associated to HttpSession from {@code request}
+     */
+    public BaseWebSession closeSession(@NotNull HttpServletRequest request) {
         HttpSession session = request.getSession();
         if (session != null) {
             BaseWebSession webSession;
@@ -80,8 +82,7 @@ public class WebSessionManager {
     public boolean touchSession(@NotNull HttpServletRequest request,
                                 @NotNull HttpServletResponse response) throws DBWebException {
         WebSession webSession = getWebSession(request, response, false);
-        long maxSessionIdleTime = CBApplication.getInstance().getMaxSessionIdleTime();
-        webSession.updateInfo(request, response, maxSessionIdleTime);
+        webSession.updateInfo(request, response);
         return true;
     }
 
@@ -92,69 +93,123 @@ public class WebSessionManager {
     }
 
     @NotNull
-    public WebSession getWebSession(@NotNull HttpServletRequest request, @NotNull HttpServletResponse response, boolean errorOnNoFound) throws DBWebException {
-        return getWebSession(request, response, true, errorOnNoFound);
-    }
-
-    @NotNull
-    public WebSession getWebSession(@NotNull HttpServletRequest request, @NotNull HttpServletResponse response, boolean updateInfo, boolean errorOnNoFound) throws DBWebException {
+    public WebSession getWebSession(
+        @NotNull HttpServletRequest request,
+        @NotNull HttpServletResponse response,
+        boolean errorOnNoFound
+    ) throws DBWebException {
         HttpSession httpSession = request.getSession(true);
         String sessionId = httpSession.getId();
         WebSession webSession;
         synchronized (sessionMap) {
             var baseWebSession = sessionMap.get(sessionId);
-            if (baseWebSession == null) {
+            if (baseWebSession == null && CBApplication.getInstance().isConfigurationMode()) {
                 try {
                     webSession = createWebSessionImpl(httpSession);
                 } catch (DBException e) {
                     throw new DBWebException("Failed to create web session", e);
                 }
                 sessionMap.put(sessionId, webSession);
-
-                if (!CBApplication.getInstance().isConfigurationMode()) {
-                    if (!httpSession.isNew()) {
-                        webSession.setCacheExpired(true);
-                        if (errorOnNoFound) {
-                            throw new DBWebException("Session has expired", DBWebException.ERROR_CODE_SESSION_EXPIRED);
-                        }
-                    }
-                    tryToRestorePreviousUserSession(webSession);
-                    log.debug("> New web session '" + webSession.getSessionId() + "'");
+            } else if (baseWebSession == null) {
+                try {
+                    webSession = createWebSessionImpl(httpSession);
+                } catch (DBException e) {
+                    throw new DBWebException("Failed to create web session", e);
                 }
+
+                boolean restored = false;
+                try {
+                    restored = restorePreviousUserSession(webSession);
+                } catch (DBException e) {
+                    log.error("Failed to restore previous user session", e);
+                }
+
+                if (!restored && errorOnNoFound && !httpSession.isNew()) {
+                    throw new DBWebException("Session has expired", DBWebException.ERROR_CODE_SESSION_EXPIRED);
+                }
+
+                log.debug((restored ? "Restored " : "New ") + "web session '" + webSession.getSessionId() + "'");
+
+                webSession.setCacheExpired(!httpSession.isNew());
+
+                sessionMap.put(sessionId, webSession);
             } else {
                 if (!(baseWebSession instanceof WebSession)) {
                     throw new DBWebException("Unexpected session type: " + baseWebSession.getClass().getName());
                 }
                 webSession = (WebSession) baseWebSession;
-                if (updateInfo) {
-                    // Update only once per request
-                    if (!CommonUtils.toBoolean(request.getAttribute("sessionUpdated"))) {
-                        webSession.updateInfo(request, response, application.getMaxSessionIdleTime());
-                        request.setAttribute("sessionUpdated", true);
-                    }
-                }
             }
         }
 
         return webSession;
     }
 
-    private void tryToRestorePreviousUserSession(WebSession webSession) {
-        try {
-            SMAuthInfo oldAuthInfo = webSession.getSecurityController().restoreUserSession(webSession.getSessionId());
-            if (oldAuthInfo == null) {
-                return;
-            }
-            boolean linkWithActiveUser = false; // because it's old credentials and should already be linked if needed
-            new WebSessionAuthProcessor(webSession, oldAuthInfo, linkWithActiveUser).authenticateSession();
-        } catch (DBException e) {
-            log.error("Failed to restore previous user session", e);
+    /**
+     * Returns not expired session from cache, or restore it.
+     *
+     * @return WebSession object or null, if session expired or invalid
+     */
+    @Nullable
+    public WebSession getOrRestoreSession(@NotNull HttpServletRequest request) {
+        var httpSession = request.getSession();
+        if (httpSession == null) {
+            log.debug("Http session is null. No Web Session returned");
+            return null;
         }
+        var sessionId = httpSession.getId();
+        WebSession webSession;
+        synchronized (sessionMap) {
+            if (sessionMap.containsKey(sessionId)) {
+                var cachedWebSession = sessionMap.get(sessionId);
+                if (!(cachedWebSession instanceof WebSession)) {
+                    log.warn("Unexpected session type: " + cachedWebSession.getClass().getName());
+                    return null;
+                }
+                return (WebSession) cachedWebSession;
+            } else {
+                try {
+                    var oldAuthInfo = getApplication().getSecurityController().restoreUserSession(sessionId);
+                    if (oldAuthInfo == null) {
+                        log.debug("Couldn't restore previous user session '" + sessionId + "'");
+                        return null;
+                    }
+
+                    webSession = createWebSessionImpl(httpSession);
+                    restorePreviousUserSession(webSession, oldAuthInfo);
+
+                    sessionMap.put(sessionId, webSession);
+                    log.debug("Web session restored");
+                    return webSession;
+                } catch (DBException e) {
+                    log.error("Failed to restore previous user session", e);
+                    return null;
+                }
+            }
+        }
+    }
+
+    private boolean restorePreviousUserSession(@NotNull WebSession webSession) throws DBException {
+        var oldAuthInfo = webSession.getSecurityController().restoreUserSession(webSession.getSessionId());
+        if (oldAuthInfo == null) {
+            return false;
+        }
+
+        restorePreviousUserSession(webSession, oldAuthInfo);
+        return true;
+    }
+
+    private void restorePreviousUserSession(
+        @NotNull WebSession webSession,
+        @NotNull SMAuthInfo authInfo
+    ) throws DBException {
+        var linkWithActiveUser = false; // because its old credentials and should already be linked if needed
+        new WebSessionAuthProcessor(webSession, authInfo, linkWithActiveUser)
+            .authenticateSession();
     }
 
     @NotNull
     protected WebSession createWebSessionImpl(@NotNull HttpSession httpSession) throws DBException {
-        return new WebSession(httpSession, application, getSessionHandlers(), application.getMaxSessionIdleTime());
+        return new WebSession(httpSession, application, getSessionHandlers());
     }
 
     @NotNull
@@ -195,11 +250,7 @@ public class WebSessionManager {
     }
 
     public void expireIdleSessions() {
-        long maxSessionIdleTime = DBWorkbench.getPlatform(CBPlatform.class).getApplication().getMaxSessionIdleTime();
-        if (CBApplication.getInstance().isConfigurationMode()) {
-            // In configuration mode sessions expire after a week
-            maxSessionIdleTime = 60 * 60 * 1000 * 24 * 7;
-        }
+        long maxSessionIdleTime = application.getMaxSessionIdleTime();
 
         List<BaseWebSession> expiredList = new ArrayList<>();
         synchronized (sessionMap) {
@@ -261,6 +312,41 @@ public class WebSessionManager {
             );
             sessionMap.put(sessionId, headlessSession);
             return headlessSession;
+        }
+    }
+
+    /**
+     * Send session state with remaining alive time to all cached session
+     */
+    public void sendSessionsStates() {
+        synchronized (sessionMap) {
+            sessionMap.values()
+                .parallelStream()
+                .filter(session -> {
+                    if (session instanceof WebSession webSession) {
+                        return webSession.isAuthorizedInSecurityManager();
+                    }
+                    return false;
+                })
+                .forEach(session -> {
+                    try {
+                        session.addSessionEvent(new WSSessionStateEvent(session.getRemainingTime(), session.isValid()));
+                    } catch (Exception e) {
+                        log.error("Failed to refresh session state: " + session.getSessionId(), e);
+                    }
+                });
+        }
+    }
+
+    public void closeUserSessions(@NotNull String userId) {
+        synchronized (sessionMap) {
+            for (Iterator<BaseWebSession> iterator = sessionMap.values().iterator(); iterator.hasNext(); ) {
+                var session = iterator.next();
+                if (CommonUtils.equalObjects(session.getUserContext().getUserId(), userId)) {
+                    iterator.remove();
+                    session.close();
+                }
+            }
         }
     }
 }

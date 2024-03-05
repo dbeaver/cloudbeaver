@@ -1,75 +1,56 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2022 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observer } from 'mobx-react-lite';
-import styled, { css } from 'reshadow';
 
-import { Loader, useTranslate } from '@cloudbeaver/core-blocks';
-import { CommonDialogWrapper } from '@cloudbeaver/core-dialogs';
+import { CommonDialogBody, CommonDialogHeader, CommonDialogWrapper, s, useResource, useS } from '@cloudbeaver/core-blocks';
+import { CachedMapAllKey } from '@cloudbeaver/core-resource';
 import type { DataTransferProcessorInfo } from '@cloudbeaver/core-sdk';
-import { useNode } from '@cloudbeaver/plugin-navigation-tree';
 
+import { DataTransferProcessorsResource } from '../DataTransferProcessorsResource';
 import type { IExportContext } from '../IExportContext';
 import { ExportProcessorList } from './ExportProcessorList/ExportProcessorList';
-
-const styles = css`
-  ExportProcessorList {
-    flex: 1;
-  }
-  export-object {
-    composes: theme-typography--body2 from global;
-    flex-shrink: 0;
-    padding: 16px 24px;
-    max-height: 50px;
-    overflow: hidden;
-
-    & pre {
-      margin: 0;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-  }
-`;
+import style from './ProcessorSelectDialog.m.css';
 
 interface Props {
   context: IExportContext;
-  processors: DataTransferProcessorInfo[];
-  isLoading: boolean;
   onSelect: (processorId: string) => void;
   onClose: () => void;
 }
 
-export const ProcessorSelectDialog = observer<Props>(function ProcessorSelectDialog({
-  context,
-  processors,
-  isLoading,
-  onSelect,
-  onClose,
-}) {
-  const translate = useTranslate();
-  const { node } = useNode(context.containerNodePath || '');
+export const ProcessorSelectDialog = observer<Props>(function ProcessorSelectDialog({ context, onSelect, onClose }) {
+  const styles = useS(style);
+  const dataTransferProcessorsResource = useResource(ProcessorSelectDialog, DataTransferProcessorsResource, CachedMapAllKey, {
+    forceSuspense: true,
+  });
 
-  return styled(styles)(
-    <CommonDialogWrapper
-      size='large'
-      title="data_transfer_dialog_title"
-      fixedSize
-      noBodyPadding
-      noOverflow
-      onReject={onClose}
-    >
-      <export-object>
-        {context.sourceName ? translate('data_transfer_exporting_sql') : `${translate('data_transfer_exporting_table')} ${node?.name}`}
-        <pre title={context.sourceName}>{context.sourceName}</pre>
-      </export-object>
-      {isLoading && <Loader />}
-      {!isLoading && <ExportProcessorList processors={processors} onSelect={onSelect} />}
+  const processors = dataTransferProcessorsResource.resource.values.slice().sort(sortProcessors);
+
+  return (
+    <CommonDialogWrapper size="large" fixedSize>
+      <CommonDialogHeader title="data_transfer_dialog_title" subTitle={context.name} onReject={onClose} />
+      <CommonDialogBody noBodyPadding noOverflow>
+        {context.query && (
+          <div className={s(styles, { exportObject: true })}>
+            <pre className={s(styles, { pre: true })} title={context.query}>
+              {context.query}
+            </pre>
+          </div>
+        )}
+        <ExportProcessorList className={s(styles, { exportProcessorList: true })} processors={processors} onSelect={onSelect} />
+      </CommonDialogBody>
     </CommonDialogWrapper>
   );
+});
+
+function sortProcessors(processorA: DataTransferProcessorInfo, processorB: DataTransferProcessorInfo): number {
+  if (processorA.order === processorB.order) {
+    return (processorA.name || '').localeCompare(processorB.name || '');
+  }
+
+  return processorA.order - processorB.order;
 }
-);

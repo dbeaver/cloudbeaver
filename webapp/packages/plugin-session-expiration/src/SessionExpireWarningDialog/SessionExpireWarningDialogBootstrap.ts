@@ -1,0 +1,94 @@
+/*
+ * CloudBeaver - Cloud Database Manager
+ * Copyright (C) 2020-2024 DBeaver Corp and others
+ *
+ * Licensed under the Apache License, Version 2.0.
+ * you may not use this file except in compliance with the License.
+ */
+import { UserInfoResource } from '@cloudbeaver/core-authentication';
+import { importLazyComponent } from '@cloudbeaver/core-blocks';
+import { Bootstrap, injectable } from '@cloudbeaver/core-di';
+import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
+import { NotificationService } from '@cloudbeaver/core-events';
+import { ServerConfigResource, SESSION_EXPIRE_MIN_TIME, SessionExpireService, SessionResource } from '@cloudbeaver/core-root';
+import { GraphQLService } from '@cloudbeaver/core-sdk';
+
+const SessionExpireWarningDialog = importLazyComponent(() => import('./SessionExpireWarningDialog').then(m => m.SessionExpireWarningDialog));
+@injectable()
+export class SessionExpireWarningDialogBootstrap extends Bootstrap {
+  private dialogInternalPromise: Promise<DialogueStateResult | null> | null;
+  constructor(
+    private readonly commonDialogService: CommonDialogService,
+    private readonly sessionExpireService: SessionExpireService,
+    private readonly serverConfigResource: ServerConfigResource,
+    private readonly sessionResource: SessionResource,
+    private readonly userInfoResource: UserInfoResource,
+    private readonly graphQLService: GraphQLService,
+    private readonly notificationService: NotificationService,
+  ) {
+    super();
+    this.dialogInternalPromise = null;
+  }
+
+  register(): void {
+    this.sessionExpireService.onSessionExpire.addHandler(this.close.bind(this));
+    this.sessionResource.onStatusUpdate.addHandler((data, contexts) => {
+      this.handleStateChange(data.isValid, data.remainingTime);
+    });
+  }
+
+  load(): void {}
+
+  private handleStateChange(isValid?: boolean, remainingTime?: number) {
+    if (!this.serverConfigResource.anonymousAccessEnabled && !this.userInfoResource.data && !this.serverConfigResource.configurationMode) {
+      return;
+    }
+
+    if (!isValid) {
+      this.close();
+      this.sessionExpireService.sessionExpired();
+      return;
+    }
+
+    const sessionDuration = this.serverConfigResource.data?.sessionExpireTime;
+
+    if (this.sessionExpireService.expired || !sessionDuration || sessionDuration < SESSION_EXPIRE_MIN_TIME) {
+      this.close();
+      return;
+    }
+
+    if (remainingTime !== undefined && remainingTime <= SESSION_EXPIRE_MIN_TIME) {
+      this.open();
+    } else {
+      this.close();
+    }
+  }
+
+  private async open(): Promise<void> {
+    if (!this.dialogInternalPromise) {
+      this.dialogInternalPromise = this.commonDialogService.open(SessionExpireWarningDialog, null);
+      await this.dialogInternalPromise;
+      this.dialogInternalPromise = null;
+
+      if (!this.sessionExpireService.expired) {
+        const { sessionState } = await this.graphQLService.sdk.sessionState();
+
+        if (sessionState.valid) {
+          try {
+            await this.sessionResource.updateSession();
+          } catch (e: any) {
+            this.notificationService.logException(e, 'plugin_session_expiration_session_update_error');
+          }
+        } else {
+          this.sessionExpireService.sessionExpired();
+        }
+      }
+    }
+  }
+
+  private close(): void {
+    if (this.dialogInternalPromise) {
+      this.commonDialogService.rejectDialog(this.dialogInternalPromise);
+    }
+  }
+}

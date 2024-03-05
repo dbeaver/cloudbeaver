@@ -1,12 +1,11 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2022 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
-import { PropsWithChildren, ReactNode, forwardRef } from 'react';
+import { forwardRef, PropsWithChildren, ReactNode } from 'react';
 import styled, { css } from 'reshadow';
 
 import { useStyles } from '@cloudbeaver/core-blocks';
@@ -56,20 +55,14 @@ type TabsBoxProps = PropsWithChildren<{
   style?: ComponentStyle;
 }>;
 
-export const TabsBox = forwardRef<HTMLDivElement, TabsBoxProps>(function TabsBox({
-  currentTabId,
-  tabs,
-  tabIndex,
-  localState,
-  tabList,
-  enabledBaseActions,
-  autoSelect,
-  children,
-  className,
-  onChange,
-  style,
-}, ref) {
-  return styled(styles, useStyles(style))(
+export const TabsBox = forwardRef<HTMLDivElement, TabsBoxProps>(function TabsBox(
+  { currentTabId, tabs, tabIndex, localState, tabList, enabledBaseActions, autoSelect, children, className, onChange, style },
+  ref,
+) {
+  return styled(
+    styles,
+    useStyles(style),
+  )(
     <TabsState
       currentTabId={currentTabId}
       localState={localState}
@@ -80,10 +73,8 @@ export const TabsBox = forwardRef<HTMLDivElement, TabsBoxProps>(function TabsBox
     >
       <tabs-box ref={ref} as="div" className={className} tabIndex={tabIndex}>
         {tabs && <tabs>{tabs}</tabs>}
-        <tab-panels>
-          {children}
-        </tab-panels>
+        <tab-panels>{children}</tab-panels>
       </tabs-box>
-    </TabsState>
+    </TabsState>,
   );
 });

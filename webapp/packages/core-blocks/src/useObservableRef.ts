@@ -1,53 +1,52 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2022 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
-import { AnnotationsMap, makeObservable, runInAction, untracked } from 'mobx';
-import { useState } from 'react';
+import { action, AnnotationsMap, makeObservable, runInAction, untracked } from 'mobx';
+import { useLayoutEffect, useState } from 'react';
 
 export function useObservableRef<T extends Record<any, any>>(
   init: () => T & ThisType<T>,
   observed: AnnotationsMap<T, never>,
   update: false,
-  name?: string
+  name?: string,
 ): T;
 export function useObservableRef<T extends Record<any, any>>(
   init: () => T & ThisType<T>,
   observed: AnnotationsMap<T, never>,
   update: false,
   bind?: Array<keyof T>,
-  name?: string
+  name?: string,
 ): T;
 export function useObservableRef<T extends Record<any, any>, U extends Record<any, any>>(
   init: () => T & ThisType<T & U>,
   observed: AnnotationsMap<T & U, never>,
   update: U & ThisType<T & U>,
   bind?: Array<keyof (T & U)>,
-  name?: string
+  name?: string,
 ): T & U;
 export function useObservableRef<T extends Record<any, any>>(
   init: T & ThisType<T>,
   observed: AnnotationsMap<T, never>,
   bind?: Array<keyof T>,
-  name?: string
+  name?: string,
 ): T;
 export function useObservableRef<T extends Record<any, any>>(
   init: () => Partial<T> & ThisType<T>,
   observed: AnnotationsMap<T, never>,
   update: Partial<T> & ThisType<T>,
   bind?: Array<keyof T>,
-  name?: string
+  name?: string,
 ): T;
 export function useObservableRef<T extends Record<any, any>>(
   init: T | (() => T),
   observed: AnnotationsMap<T, never>,
   update?: Array<keyof T> | T | false,
   bind?: Array<keyof T> | string,
-  name?: string
+  name?: string,
 ): T {
   if (typeof bind === 'string') {
     name = bind;
@@ -67,7 +66,7 @@ export function useObservableRef<T extends Record<any, any>>(
     let state: T = typeof init === 'function' ? untracked(init as any) : init;
 
     if (update) {
-      Object.assign(state, update);
+      runInAction(() => assign(state, update));
       update = undefined;
     }
 
@@ -80,19 +79,21 @@ export function useObservableRef<T extends Record<any, any>>(
     return state;
   });
 
-  if (update) {
-    runInAction(() => {
-      Object.assign(state, update);
+  useLayoutEffect(
+    action(() => {
+      if (update) {
+        assign(state, update);
 
-      if (Array.isArray(bind)) {
-        bind = bind.filter(key => (key as any) in (update as T));
+        if (Array.isArray(bind)) {
+          bind = bind.filter(key => (key as any) in (update as T));
 
-        if (bind.length > 0) {
-          bindFunctions(state, bind);
+          if (bind.length > 0) {
+            bindFunctions(state, bind);
+          }
         }
       }
-    });
-  }
+    }),
+  );
 
   return state;
 }
@@ -103,6 +104,14 @@ function bindFunctions<T>(object: T, keys: Array<keyof T>): void {
 
     if (typeof value === 'function') {
       object[key] = value.bind(object);
+    }
+  }
+}
+
+function assign(object: any, update: any): void {
+  for (const [key, value] of Object.entries(update)) {
+    if (!(key in object) || object[key] !== value) {
+      object[key] = value;
     }
   }
 }

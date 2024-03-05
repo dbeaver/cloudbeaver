@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2023 DBeaver Corp and others
+ * Copyright (C) 2010-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@ import com.google.gson.InstanceCreator;
 import io.cloudbeaver.model.app.WebAuthApplication;
 import io.cloudbeaver.service.security.db.CBDatabase;
 import io.cloudbeaver.service.security.db.CBDatabaseConfig;
+import io.cloudbeaver.service.security.internal.ClearAuthAttemptInfoJob;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.auth.SMCredentialsProvider;
 
@@ -30,7 +31,7 @@ import java.util.Map;
 /**
  * Embedded Security Controller Factory
  */
-public class EmbeddedSecurityControllerFactory {
+public class EmbeddedSecurityControllerFactory<T extends WebAuthApplication> {
     private static volatile CBDatabase DB_INSTANCE;
 
     public static CBDatabase getDbInstance() {
@@ -41,7 +42,7 @@ public class EmbeddedSecurityControllerFactory {
      * Create new security controller instance with custom configuration
      */
     public CBEmbeddedSecurityController createSecurityService(
-        WebAuthApplication application,
+        T application,
         Map<String, Object> databaseConfig,
         SMCredentialsProvider credentialsProvider,
         SMControllerConfiguration smConfig
@@ -63,6 +64,10 @@ public class EmbeddedSecurityControllerFactory {
             DB_INSTANCE.setAdminSecurityController(securityController);
             DB_INSTANCE.initialize();
             securityController.initializeMetaInformation();
+            if (application.isLicenseRequired()) {
+                // delete expired auth info job in enterprise products
+                new ClearAuthAttemptInfoJob(securityController).schedule();
+            }
         }
         return securityController;
     }
@@ -81,7 +86,7 @@ public class EmbeddedSecurityControllerFactory {
     }
 
     protected CBEmbeddedSecurityController createEmbeddedSecurityController(
-        WebAuthApplication application,
+        T application,
         CBDatabase database,
         SMCredentialsProvider credentialsProvider,
         SMControllerConfiguration smConfig

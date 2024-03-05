@@ -1,29 +1,26 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2022 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observer } from 'mobx-react-lite';
-import styled from 'reshadow';
 
-import { OVERLAY_BASE_STYLES } from './OVERLAY_BASE_STYLES';
+import { s } from '../s';
+import { useS } from '../useS';
+import style from './OverlayMessage.m.css';
 
 interface Props {
   className?: string;
 }
 
-export const OverlayMessage = observer<React.PropsWithChildren<Props>>(function OverlayMessage({
-  className,
-  children,
-}) {
-  return styled(OVERLAY_BASE_STYLES)(
-    <message className={className}>
-      <message-box>
-        {children}
-      </message-box>
-    </message>
+export const OverlayMessage = observer<React.PropsWithChildren<Props>>(function OverlayMessage({ className, children }) {
+  const styles = useS(style);
+
+  return (
+    <div className={s(styles, { message: true }, className)}>
+      <div className={s(styles, { messageBox: true })}>{children}</div>
+    </div>
   );
 });

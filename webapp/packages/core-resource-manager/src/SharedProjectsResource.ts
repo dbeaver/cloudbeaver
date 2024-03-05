@@ -1,17 +1,25 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2022 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { runInAction } from 'mobx';
 
-import { AdminObjectGrantInfo, EAdminPermission } from '@cloudbeaver/core-administration';
+import type { AdminObjectGrantInfo } from '@cloudbeaver/core-administration';
 import { injectable } from '@cloudbeaver/core-di';
-import { SessionPermissionsResource } from '@cloudbeaver/core-root';
-import { GraphQLService, CachedMapResource, CachedMapAllKey, ResourceKey, ResourceKeyUtils, resourceKeyList, RmProject, ResourceKeyList, RmProjectPermissions, RmSubjectProjectPermissions } from '@cloudbeaver/core-sdk';
+import { ProjectInfoResource } from '@cloudbeaver/core-projects';
+import {
+  CachedMapAllKey,
+  CachedMapResource,
+  type ResourceKey,
+  type ResourceKeyList,
+  resourceKeyList,
+  ResourceKeyUtils,
+} from '@cloudbeaver/core-resource';
+import { EAdminPermission, SessionPermissionsResource } from '@cloudbeaver/core-root';
+import { GraphQLService, RmProject, RmProjectPermissions, RmSubjectProjectPermissions } from '@cloudbeaver/core-sdk';
 import { isArraysEqual } from '@cloudbeaver/core-utils';
 
 const newSymbol = Symbol('new-project');
@@ -31,13 +39,18 @@ interface IProjectConfig {
 export class SharedProjectsResource extends CachedMapResource<string, SharedProject> {
   constructor(
     private readonly graphQLService: GraphQLService,
+    projectInfoResource: ProjectInfoResource,
     sessionPermissionsResource: SessionPermissionsResource,
   ) {
-    super(new Map(), []);
+    super(() => new Map(), []);
 
-    sessionPermissionsResource
-      .require(this, EAdminPermission.admin);
+    sessionPermissionsResource.require(this, EAdminPermission.admin);
     this.sync(sessionPermissionsResource, () => {});
+
+    this.connect(projectInfoResource);
+    this.onDataOutdated.addHandler(() => projectInfoResource.markOutdated());
+    this.onItemUpdate.addHandler(() => projectInfoResource.markOutdated());
+    this.onItemDelete.addHandler(() => projectInfoResource.markOutdated());
   }
 
   isNew(id: string): boolean {
@@ -53,16 +66,18 @@ export class SharedProjectsResource extends CachedMapResource<string, SharedProj
     }
   }
 
-  async setAccessSubjects(projectId: string, permissions: ProjectPermission[]): Promise<void> {
-    await this.graphQLService.sdk.setProjectPermissions({
-      projectId,
+  async addProjectPermissions(projectIds: string[], subjectIds: string[], permissions: string[]): Promise<void> {
+    await this.graphQLService.sdk.addProjectsPermissions({
+      projectIds,
+      subjectIds,
       permissions,
     });
   }
 
-  async setSubjectProjectsAccess(subjectId: string, permissions: ProjectSubjectPermission[]): Promise<void> {
-    await this.graphQLService.sdk.setSubjectProjectsPermissions({
-      subjectId,
+  async deleteProjectPermissions(projectIds: string[], subjectIds: string[], permissions: string[]): Promise<void> {
+    await this.graphQLService.sdk.deleteProjectsPermissions({
+      projectIds,
+      subjectIds,
       permissions,
     });
   }
@@ -104,7 +119,7 @@ export class SharedProjectsResource extends CachedMapResource<string, SharedProj
 
     try {
       await this.performUpdate(key, undefined, async key => {
-        await ResourceKeyUtils.forEachAsync(this.transformParam(key), async projectId => {
+        await ResourceKeyUtils.forEachAsync(this.aliases.transformToKey(key), async projectId => {
           await this.graphQLService.sdk.deleteProject({
             projectId,
           });
@@ -120,7 +135,7 @@ export class SharedProjectsResource extends CachedMapResource<string, SharedProj
   }
 
   protected async loader(key: ResourceKey<string>): Promise<Map<string, SharedProject>> {
-    const all = ResourceKeyUtils.includes(key, CachedMapAllKey);
+    const all = this.aliases.isAlias(key, CachedMapAllKey);
 
     if (all) {
       const { projects } = await this.graphQLService.sdk.getSharedProjects();
@@ -131,7 +146,7 @@ export class SharedProjectsResource extends CachedMapResource<string, SharedProj
         this.set(resourceKeyList(projects.map(project => project.id)), projects as SharedProject[]);
       });
     } else {
-      await ResourceKeyUtils.forEachAsync(this.transformParam(key), async projectId => {
+      await ResourceKeyUtils.forEachAsync(this.aliases.transformToKey(key), async projectId => {
         const { project } = await this.graphQLService.sdk.getProject({
           projectId,
         });
@@ -150,19 +165,16 @@ export class SharedProjectsResource extends CachedMapResource<string, SharedProj
     this.data.set(key, Object.assign(data ?? {}, value));
   }
 
-  protected validateParam(param: ResourceKey<string>): boolean {
-    return (
-      super.validateParam(param)
-      || typeof param === 'string'
-    );
+  protected validateKey(key: string): boolean {
+    return typeof key === 'string';
   }
 }
 
 export function isEqualSharedProjectGrantInfo(a: AdminObjectGrantInfo, b: AdminObjectGrantInfo): boolean {
   return (
-    a.subjectId === b.subjectId
-    && a.subjectType === b.subjectType
-    && a.objectPermissions.objectId === b.objectPermissions.objectId
-    && isArraysEqual(a.objectPermissions.permissions, b.objectPermissions.permissions)
+    a.subjectId === b.subjectId &&
+    a.subjectType === b.subjectType &&
+    a.objectPermissions.objectId === b.objectPermissions.objectId &&
+    isArraysEqual(a.objectPermissions.permissions, b.objectPermissions.permissions)
   );
 }

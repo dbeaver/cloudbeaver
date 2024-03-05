@@ -1,11 +1,10 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2022 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { makeObservable, observable } from 'mobx';
 
 import { ResultDataFormat, SqlResultRow, UpdateResultsDataBatchMutationVariables } from '@cloudbeaver/core-sdk';
@@ -20,19 +19,14 @@ import type { IDatabaseDataDocument } from './IDatabaseDataDocument';
 import type { IDocumentElementKey } from './IDocumentElementKey';
 
 @databaseDataAction()
-export class DocumentEditAction
-  extends DatabaseEditAction<IDocumentElementKey, IDatabaseDataDocument, IDatabaseResultSet> {
+export class DocumentEditAction extends DatabaseEditAction<IDocumentElementKey, IDatabaseDataDocument, IDatabaseResultSet> {
   static dataFormat = [ResultDataFormat.Document];
 
   readonly editedElements: Map<number, IDatabaseDataDocument>;
-  private data: DocumentDataAction;
+  private readonly data: DocumentDataAction;
 
-  constructor(
-    source: IDatabaseDataSource<any, IDatabaseResultSet>,
-    result: IDatabaseResultSet,
-    data: DocumentDataAction
-  ) {
-    super(source, result);
+  constructor(source: IDatabaseDataSource<any, IDatabaseResultSet>, data: DocumentDataAction) {
+    super(source);
     this.editedElements = new Map();
     this.data = data;
 
@@ -82,11 +76,13 @@ export class DocumentEditAction
       type: DatabaseEditChangeType.update,
       revert: false,
       resultId: this.result.id,
-      value: [{
-        key: key,
-        prevValue,
-        value,
-      }],
+      value: [
+        {
+          key: key,
+          prevValue,
+          value,
+        },
+      ],
     });
 
     this.removeUnchanged(key);
@@ -121,15 +117,30 @@ export class DocumentEditAction
         ...previousValue,
         data: value,
       },
-      previousValue
+      previousValue,
     );
+  }
+
+  applyPartialUpdate(result: IDatabaseResultSet): void {
+    let rowIndex = 0;
+
+    for (const [id, document] of this.editedElements) {
+      const row = result.data?.rowsWithMetaData?.[rowIndex];
+      const value = row?.data;
+
+      if (value !== undefined) {
+        this.data.set(id, value[0]);
+      }
+      rowIndex++;
+    }
   }
 
   applyUpdate(result: IDatabaseResultSet): void {
     let rowIndex = 0;
 
     for (const [id, document] of this.editedElements) {
-      const value = result.data?.rows?.[rowIndex];
+      const row = result.data?.rowsWithMetaData?.[rowIndex];
+      const value = row?.data;
 
       if (value !== undefined) {
         this.data.set(id, value[0]);
@@ -170,7 +181,9 @@ export class DocumentEditAction
 
       updatedRows.push({
         data: [this.data.get(id)],
-        updateValues: { // TODO: remove, place new document in data field
+        metaData: this.data.getMetadataForDocument(document.id),
+        updateValues: {
+          // TODO: remove, place new document in data field
           0: document,
         },
       });

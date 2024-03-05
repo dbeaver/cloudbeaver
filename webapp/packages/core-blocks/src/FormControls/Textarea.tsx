@@ -1,56 +1,30 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2022 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observer } from 'mobx-react-lite';
-import { useCallback, useContext } from 'react';
-import styled, { css, use } from 'reshadow';
+import { useCallback, useContext, useLayoutEffect, useRef } from 'react';
 
-import type { ComponentStyle } from '@cloudbeaver/core-theming';
-
+import { filterLayoutFakeProps, getLayoutProps } from '../Containers/filterLayoutFakeProps';
 import type { ILayoutSizeProps } from '../Containers/ILayoutSizeProps';
-import { useStyles } from '../useStyles';
-import { baseFormControlStyles, baseValidFormControlStyles } from './baseFormControlStyles';
+import { s } from '../s';
+import { useS } from '../useS';
+import { Field } from './Field';
+import { FieldDescription } from './FieldDescription';
+import { FieldLabel } from './FieldLabel';
 import { FormContext } from './FormContext';
+import textareaStyle from './Textarea.m.css';
 
-const styles = css`
-  textarea {
-    line-height: 19px;
-  }
-  field[|embedded] {
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    
-    & textarea {
-      border-radius: 0 !important;
-      height: 100%;
-      resize: none !important;
-    }
-  }
-  field-label {
-    display: block;
-    padding-bottom: 10px;
-    composes: theme-typography--body1 from global;
-    font-weight: 500;
-
-    &:empty {
-      display: none;
-    }
-  }
-`;
-
-type BaseProps = Omit<React.TextareaHTMLAttributes<HTMLTextAreaElement>, 'onChange' | 'style'> & ILayoutSizeProps & {
-  description?: string;
-  labelTooltip?: string;
-  mod?: 'surface';
-  style?: ComponentStyle;
-  embedded?: boolean;
-};
+type BaseProps = Omit<React.TextareaHTMLAttributes<HTMLTextAreaElement>, 'onChange' | 'style'> &
+  ILayoutSizeProps & {
+    description?: string;
+    labelTooltip?: string;
+    embedded?: boolean;
+    cursorInitiallyAtEnd?: boolean;
+  };
 
 type ControlledProps = BaseProps & {
   name?: string;
@@ -73,60 +47,64 @@ interface TextareaType {
 
 export const Textarea: TextareaType = observer(function Textarea({
   name,
-  style,
   value: controlledValue,
   state,
   required,
   children,
   className,
-  fill,
-  tiny,
-  small,
-  medium,
-  large,
   description,
   labelTooltip,
-  mod,
   embedded,
-  onChange = () => { },
+  cursorInitiallyAtEnd,
+  onChange = () => {},
   ...rest
 }: ControlledProps | ObjectProps<any, any>) {
+  const textareaRef = useRef<HTMLTextAreaElement | null>(null);
+  const layoutProps = getLayoutProps(rest);
+  rest = filterLayoutFakeProps(rest);
+  const styles = useS(textareaStyle);
   const context = useContext(FormContext);
 
-  const handleChange = useCallback((event: React.ChangeEvent<HTMLTextAreaElement>) => {
-    if (state) {
-      state[name] = event.target.value;
-    }
-    if (onChange) {
-      onChange(event.target.value, name);
-    }
-    if (context) {
-      context.change(event.target.value, name);
-    }
-  }, [state, name, onChange]);
+  const handleChange = useCallback(
+    (event: React.ChangeEvent<HTMLTextAreaElement>) => {
+      if (state) {
+        state[name] = event.target.value;
+      }
+      if (onChange) {
+        onChange(event.target.value, name);
+      }
+      if (context) {
+        context.change(event.target.value, name);
+      }
+    },
+    [state, name, onChange],
+  );
 
   const value = state ? state[name] : controlledValue;
 
-  return styled(useStyles(baseFormControlStyles, baseValidFormControlStyles, styles, style))(
-    <field className={className} {...use({ tiny, small, medium, large, embedded })}>
-      <field-label
-        title={labelTooltip || rest.title}
-      >
-        {children}{required && ' *'}
-      </field-label>
+  useLayoutEffect(() => {
+    if (cursorInitiallyAtEnd && typeof value === 'string') {
+      const position = value.length;
+      textareaRef.current?.setSelectionRange(position, position);
+    }
+  }, [cursorInitiallyAtEnd]);
+
+  return (
+    <Field {...layoutProps} className={s(styles, { field: true, embedded }, className)}>
+      <FieldLabel className={s(styles, { fieldLabel: true })} title={labelTooltip || rest.title} required={required}>
+        {children}
+      </FieldLabel>
       <textarea
         {...rest}
+        ref={textareaRef}
+        required={required}
+        className={s(styles, { textarea: true })}
         value={value ?? ''}
         name={name}
         data-embedded={embedded}
         onChange={handleChange}
-        {...use({ mod })}
       />
-      {description && (
-        <field-description>
-          {description}
-        </field-description>
-      )}
-    </field>
+      {description && <FieldDescription>{description}</FieldDescription>}
+    </Field>
   );
 });

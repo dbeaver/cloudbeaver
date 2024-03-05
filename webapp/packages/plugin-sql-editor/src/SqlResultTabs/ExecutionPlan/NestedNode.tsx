@@ -1,15 +1,14 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2022 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { useCallback, useState } from 'react';
 import styled, { css } from 'reshadow';
 
-import { TableItem, TableColumnValue, EventTableItemSelectionFlag } from '@cloudbeaver/core-blocks';
+import { EventTableItemSelectionFlag, TableColumnValue, TableItem } from '@cloudbeaver/core-blocks';
 import { EventContext } from '@cloudbeaver/core-events';
 import type { ObjectPropertyInfo } from '@cloudbeaver/core-sdk';
 
@@ -44,7 +43,7 @@ interface Props {
 export const NestedNode: React.FC<Props> = function NestedNode({ columns, node, depth, className }) {
   const [expanded, setExpanded] = useState(true);
 
-  const expand = useCallback((event: React.MouseEvent<any, MouseEvent>) => {
+  const expand = useCallback((event: React.MouseEvent<any>) => {
     EventContext.set(event, EventTableItemSelectionFlag);
     setExpanded(prev => !prev);
   }, []);
@@ -63,11 +62,7 @@ export const NestedNode: React.FC<Props> = function NestedNode({ columns, node, 
                 {idx === 0 && (
                   <>
                     <span>{`${'\t'.repeat(depth)}`}</span>
-                    <expand-container>
-                      {hasChildren && (
-                        <Expand expanded={expanded} onClick={expand} />
-                      )}
-                    </expand-container>
+                    <expand-container>{hasChildren && <Expand expanded={expanded} onClick={expand} />}</expand-container>
                   </>
                 )}
                 {value}
@@ -76,14 +71,7 @@ export const NestedNode: React.FC<Props> = function NestedNode({ columns, node, 
           );
         })}
       </TableItem>
-      {expanded && node.children.map(child => (
-        <NestedNode
-          key={child.id}
-          columns={columns}
-          node={child}
-          depth={depth + 1}
-        />
-      ))}
-    </>
+      {expanded && node.children.map(child => <NestedNode key={child.id} columns={columns} node={child} depth={depth + 1} />)}
+    </>,
   );
 };

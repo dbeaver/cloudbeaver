@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2023 DBeaver Corp and others
+ * Copyright (C) 2010-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,44 +20,36 @@ import io.cloudbeaver.WebProjectImpl;
 import io.cloudbeaver.model.session.BaseWebSession;
 import io.cloudbeaver.model.session.WebSession;
 import org.jkiss.code.NotNull;
-import org.jkiss.dbeaver.model.websocket.event.WSEvent;
-import org.jkiss.dbeaver.model.websocket.event.WSEventTopic;
+import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.websocket.event.WSEventType;
 import org.jkiss.dbeaver.model.websocket.event.datasource.WSDataSourceEvent;
 
 /**
  * Notify all active user session that datasource has been updated
  */
-public class WSDataSourceUpdatedEventHandlerImpl extends WSProjectUpdatedEventHandler {
-    @NotNull
-    @Override
-    public String getSupportedTopicId() {
-        return WSEventTopic.DATASOURCE.getTopicId();
-    }
+public class WSDataSourceUpdatedEventHandlerImpl extends WSAbstractProjectEventHandler<WSDataSourceEvent> {
+
+    public static final Log log = Log.getLog(WSDataSourceUpdatedEventHandlerImpl.class);
 
     @Override
-    protected void updateSessionData(BaseWebSession activeUserSession, WSEvent event) {
-        if (!(event instanceof WSDataSourceEvent)) {
-            return;
-        }
-        var dsUpdateEvent = (WSDataSourceEvent) event;
-        if (!activeUserSession.isProjectAccessible(dsUpdateEvent.getProjectId())) {
-            return;
-        }
-        var eventType = WSEventType.valueById(event.getId());
-        if (eventType == null) {
-            return;
-        }
+    protected void updateSessionData(@NotNull BaseWebSession activeUserSession, @NotNull WSDataSourceEvent event) {
+        var sendEvent = true;
         if (activeUserSession instanceof WebSession) {
             var webSession = (WebSession) activeUserSession;
-            WebProjectImpl project = webSession.getProjectById(dsUpdateEvent.getProjectId());
-            webSession.updateProjectConnection(
+            WebProjectImpl project = webSession.getProjectById(event.getProjectId());
+            if (project == null) {
+                log.debug("Project " + event.getProjectId() + " is not found in session " + webSession.getSessionId());
+                return;
+            }
+            sendEvent = webSession.updateProjectDataSources(
                 project,
-                dsUpdateEvent.getDataSourceIds(),
-                eventType
+                event.getDataSourceIds(),
+                WSEventType.valueById(event.getId())
             );
         }
-        activeUserSession.addSessionEvent(event);
+        if (sendEvent) {
+            activeUserSession.addSessionEvent(event);
+        }
     }
 }
 

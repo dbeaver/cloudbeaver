@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2023 DBeaver Corp and others
+ * Copyright (C) 2010-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,27 +17,27 @@
 package io.cloudbeaver.service;
 
 import io.cloudbeaver.model.session.WebSession;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.jkiss.dbeaver.DBException;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 /**
  * DBWSessionHandler
  */
-public interface DBWSessionHandler {
+public interface DBWSessionHandler<SESSION extends WebSession> {
 
-    boolean handleSessionOpen(WebSession webSession, HttpServletRequest request, HttpServletResponse response)
+    boolean handleSessionOpen(SESSION webSession, HttpServletRequest request, HttpServletResponse response)
         throws DBException, IOException;
 
-    default boolean handleSessionAuth(WebSession webSession)
+    default boolean handleSessionAuth(SESSION webSession)
         throws DBException, IOException
     {
         return false;
     }
 
-    boolean handleSessionClose(WebSession webSession)
+    boolean handleSessionClose(SESSION webSession)
         throws DBException, IOException;
 
 }

@@ -1,0 +1,12 @@
+.bodyContent {
+  composes: theme-background-surface theme-text-on-surface theme-typography from global;
+  height: var(--app-height);
+  display: flex;
+  padding: 0 !important;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.loader {
+  height: var(--app-height);
+}

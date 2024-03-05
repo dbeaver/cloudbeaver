@@ -1,4 +1,5 @@
-export { manifest as coreAuthenticationManifest } from './manifest';
+export * from './manifest';
+export * from './ELMRole';
 export * from './AppAuthService';
 export * from './AUTH_PROVIDER_LOCAL_ID';
 export * from './AuthInfoService';
@@ -17,3 +18,5 @@ export * from './UserInfoResource';
 export * from './UserMetaParametersResource';
 export * from './UsersResource';
 export * from './TeamMetaParametersResource';
+export * from './AUTH_SETTINGS_GROUP';
+export * from './PasswordPolicyService';

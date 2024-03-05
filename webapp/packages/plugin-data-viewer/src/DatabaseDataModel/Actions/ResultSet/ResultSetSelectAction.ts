@@ -1,11 +1,10 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2022 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { action, computed, IReactionDisposer, makeObservable, observable, reaction, toJS } from 'mobx';
 
 import { ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
@@ -41,14 +40,8 @@ export class ResultSetSelectAction extends DatabaseSelectAction<any, IDatabaseRe
   private readonly data: ResultSetDataAction;
   private readonly validationDisposer: IReactionDisposer;
 
-  constructor(
-    source: IDatabaseDataSource<any, IDatabaseResultSet>,
-    result: IDatabaseResultSet,
-    view: ResultSetViewAction,
-    edit: ResultSetEditAction,
-    data: ResultSetDataAction
-  ) {
-    super(source, result);
+  constructor(source: IDatabaseDataSource<any, IDatabaseResultSet>, view: ResultSetViewAction, edit: ResultSetEditAction, data: ResultSetDataAction) {
+    super(source);
     this.view = view;
     this.edit = edit;
     this.data = data;
@@ -65,46 +58,49 @@ export class ResultSetSelectAction extends DatabaseSelectAction<any, IDatabaseRe
       clear: action,
     });
 
-    this.validationDisposer = reaction(() => this.view.rowKeys, (current, previous) => {
-      if (this.focusedElement) {
-        const focus = this.focusedElement;
-        const currentIndex = current.findIndex(key => ResultSetDataKeysUtils.isEqual(key, focus.row));
+    this.validationDisposer = reaction(
+      () => this.view.rowKeys,
+      (current, previous) => {
+        if (this.focusedElement) {
+          const focus = this.focusedElement;
+          const currentIndex = current.findIndex(key => ResultSetDataKeysUtils.isEqual(key, focus.row));
 
-        const focusIndex = previous.findIndex(key => ResultSetDataKeysUtils.isEqual(key, focus.row));
+          const focusIndex = previous.findIndex(key => ResultSetDataKeysUtils.isEqual(key, focus.row));
 
-        if (currentIndex >= 0 && focusIndex === -1) {
-          return;
-        }
-
-        if (focusIndex === -1 || current.length === 0) {
-          this.focus(null);
-          return;
-        }
-
-        if (!current.some(key => ResultSetDataKeysUtils.isEqual(key, focus.row))) {
-          for (let index = focusIndex; index >= 0; index--) {
-            const previousElement = previous[index];
-            const row = current.find(key => ResultSetDataKeysUtils.isEqual(key, previousElement));
-
-            if (row) {
-              this.focus({ ...this.focusedElement, row });
-              return;
-            }
-          }
-          for (let index = focusIndex; index <= previous.length; index++) {
-            const nextElement = previous[index];
-            const row = current.find(key => ResultSetDataKeysUtils.isEqual(key, nextElement));
-
-            if (row) {
-              this.focus({ ...this.focusedElement, row });
-              return;
-            }
+          if (currentIndex >= 0 && focusIndex === -1) {
+            return;
           }
 
-          this.focus({ ...this.focusedElement, row: current[current.length - 1] });
+          if (focusIndex === -1 || current.length === 0) {
+            this.focus(null);
+            return;
+          }
+
+          if (!current.some(key => ResultSetDataKeysUtils.isEqual(key, focus.row))) {
+            for (let index = focusIndex; index >= 0; index--) {
+              const previousElement = previous[index];
+              const row = current.find(key => ResultSetDataKeysUtils.isEqual(key, previousElement));
+
+              if (row) {
+                this.focus({ ...this.focusedElement, row });
+                return;
+              }
+            }
+            for (let index = focusIndex; index <= previous.length; index++) {
+              const nextElement = previous[index];
+              const row = current.find(key => ResultSetDataKeysUtils.isEqual(key, nextElement));
+
+              if (row) {
+                this.focus({ ...this.focusedElement, row });
+                return;
+              }
+            }
+
+            this.focus({ ...this.focusedElement, row: current[current.length - 1] });
+          }
         }
-      }
-    });
+      },
+    );
 
     this.edit.action.addHandler(this.syncFocus.bind(this));
     this.edit.applyAction.addHandler(this.syncFocusOnUpdate.bind(this));
@@ -118,10 +114,7 @@ export class ResultSetSelectAction extends DatabaseSelectAction<any, IDatabaseRe
     if (!this.focusedElement) {
       return false;
     }
-    return (
-      ResultSetDataKeysUtils.isEqual(key.column, this.focusedElement.column)
-      && ResultSetDataKeysUtils.isEqual(key.row, this.focusedElement.row)
-    );
+    return ResultSetDataKeysUtils.isEqual(key.column, this.focusedElement.column) && ResultSetDataKeysUtils.isEqual(key.row, this.focusedElement.row);
   }
 
   isElementSelected(key: IResultSetPartialKey): boolean {
@@ -270,14 +263,15 @@ export class ResultSetSelectAction extends DatabaseSelectAction<any, IDatabaseRe
       key = null;
     }
 
-    if (
-      (key && this.isFocused(key))
-      || key === this.focusedElement
-    ) {
+    if ((key && this.isFocused(key)) || key === this.focusedElement) {
       return;
     }
 
-    this.focusedElement = toJS(key);
+    if (key) {
+      key = JSON.parse(JSON.stringify(toJS(key)));
+    }
+
+    this.focusedElement = key;
     this.actions.execute({
       type: 'focus',
       resultId: this.result.id,
@@ -308,20 +302,21 @@ export class ResultSetSelectAction extends DatabaseSelectAction<any, IDatabaseRe
       focusedElement = null;
     }
 
-    const removeKeys: string[] = [];
+    const removeKeys: IResultSetElementKey[] = [];
     const selectedElements = this.selectedElements.entries();
 
     for (const [key, rowSelection] of selectedElements) {
-      const element = rowSelection[0];
-      if (element && !this.view.has(element)) {
-        removeKeys.push(key);
+      for (const element of rowSelection) {
+        if (element && !this.view.has(element)) {
+          removeKeys.push(element);
+        }
       }
     }
 
     this.focus(focusedElement);
 
     for (const key of removeKeys) {
-      this.selectedElements.delete(key);
+      this.set(key, false, true);
     }
   }
 

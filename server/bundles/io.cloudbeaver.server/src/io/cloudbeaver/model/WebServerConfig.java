@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2023 DBeaver Corp and others
+ * Copyright (C) 2010-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@ import io.cloudbeaver.registry.WebServiceDescriptor;
 import io.cloudbeaver.registry.WebServiceRegistry;
 import io.cloudbeaver.server.CBApplication;
 import io.cloudbeaver.server.CBPlatform;
+import io.cloudbeaver.service.security.PasswordPolicyConfiguration;
 import org.jkiss.dbeaver.model.meta.Property;
 import org.jkiss.dbeaver.model.navigator.DBNBrowseSettings;
 import org.jkiss.dbeaver.registry.language.PlatformLanguageDescriptor;
@@ -68,9 +69,15 @@ public class WebServerConfig {
         return CommonUtils.notEmpty(application.getRootURI());
     }
 
+    @Deprecated
     @Property
     public String getHostName() {
-        return CommonUtils.notEmpty(System.getenv("HOSTNAME"));
+        return getContainerId();
+    }
+
+    @Property
+    public String getContainerId() {
+        return CommonUtils.notEmpty(application.getContainerId());
     }
 
     @Property
@@ -135,7 +142,7 @@ public class WebServerConfig {
 
     @Property
     public long getSessionExpireTime() {
-        return application.getMaxSessionIdleTime();
+        return application.getConfiguredMaxSessionIdleTime();
     }
 
     @Property
@@ -204,6 +211,16 @@ public class WebServerConfig {
 
     @Property
     public String getDefaultAuthRole() {
-        return application.getSecurityManagerConfiguration().getDefaultAuthRole();
+        return application.getDefaultAuthRole();
+    }
+
+    @Property
+    public String getDefaultUserTeam() {
+        return application.getAppConfiguration().getDefaultUserTeam();
+    }
+
+    @Property
+    public PasswordPolicyConfiguration getPasswordPolicyConfiguration() {
+        return application.getSecurityManagerConfiguration().getPasswordPolicyConfiguration();
     }
 }

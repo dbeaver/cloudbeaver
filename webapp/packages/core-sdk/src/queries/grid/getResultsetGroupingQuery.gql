@@ -1,0 +1,19 @@
+query getResultsetGroupingQuery(
+  $projectId: ID!
+  $contextId: ID!
+  $connectionId: ID!
+  $resultsId: ID!
+  $columnNames: [ String! ]!
+  $functions: [ String! ]
+  $showDuplicatesOnly: Boolean
+) {
+  query: sqlGenerateGroupingQuery(
+    projectId: $projectId,
+    contextId: $contextId,
+    connectionId: $connectionId, 
+    resultsId: $resultsId,
+    columnNames: $columnNames
+    functions: $functions
+    showDuplicatesOnly: $showDuplicatesOnly
+  )
+}

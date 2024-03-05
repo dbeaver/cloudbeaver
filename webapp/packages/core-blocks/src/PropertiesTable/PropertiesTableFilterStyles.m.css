@@ -1,0 +1,18 @@
+.iconButton {
+  right: 0px;
+  top: 0px;
+  width: 20px;
+  height: 20px;
+
+  &.toggled {
+    right: 0px;
+    top: 0px;
+  }
+
+  &.cross {
+    width: 14px;
+    height: 14px;
+    top: 5px;
+    right: 0;
+  }
+}

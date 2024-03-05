@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2023 DBeaver Corp and others
+ * Copyright (C) 2010-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,6 @@
 
 package io.cloudbeaver.model.session;
 
-import io.cloudbeaver.DBWConstants;
 import io.cloudbeaver.DBWUserIdentity;
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.auth.SMAuthProviderExternal;
@@ -38,7 +37,6 @@ import org.jkiss.utils.CommonUtils;
 
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -66,7 +64,9 @@ public class WebSessionAuthProcessor {
                 case SUCCESS:
                     return finishWebSessionAuthorization(smAuthInfo);
                 case ERROR:
-                    throw new DBException("Authentication failed: " + smAuthInfo.getError());
+                    var e = new DBException(smAuthInfo.getError());
+                    webSession.addSessionError(e);
+                    throw e;
                 case IN_PROGRESS:
                     throw new DBException("Authorization didn't complete");
                 default:
@@ -101,7 +101,6 @@ public class WebSessionAuthProcessor {
             String userId = curUser.getUserId();
 
             var securityController = webSession.getSecurityController();
-            Map<String, Object> providerConfig = Collections.emptyMap();
             var newAuthInfos = new ArrayList<WebAuthInfo>();
             for (Map.Entry<SMAuthConfigurationReference, Object> entry : authInfo.getAuthData().entrySet()) {
                 SMAuthConfigurationReference authConfiguration = entry.getKey();
@@ -112,15 +111,6 @@ public class WebSessionAuthProcessor {
                 SMAuthProvider<?> authProviderInstance = authProviderDescriptor.getInstance();
                 SMAuthProviderExternal<?> authProviderExternal = authProviderInstance instanceof SMAuthProviderExternal<?> ?
                     (SMAuthProviderExternal<?>) authProviderInstance : null;
-
-                boolean providerDisabled = !isProviderEnabled(providerId);
-                if (configMode || webSession.hasPermission(DBWConstants.PERMISSION_ADMIN)) {
-                    // 1. Admin can authorize in any providers
-                    // 2. When it authorizes in non-local provider for the first time we force linkUser flag
-                    if (providerDisabled && webSession.getUser() != null) {
-                        linkWithActiveUser = true;
-                    }
-                }
 
                 SMSession authSession;
 
@@ -136,7 +126,10 @@ public class WebSessionAuthProcessor {
                 }
 
                 DBWUserIdentity userIdentity = null;
-
+                var providerConfigId = authConfiguration.getAuthProviderConfigurationId();
+                var providerConfig = WebAppUtils.getWebAuthApplication()
+                    .getAuthConfiguration()
+                    .getAuthProviderConfiguration(providerConfigId);
                 if (authProviderExternal != null) {
                     try {
                         userIdentity =
@@ -171,6 +164,7 @@ public class WebSessionAuthProcessor {
                     authProviderDescriptor,
                     userIdentity,
                     authSession,
+                    authInfo,
                     OffsetDateTime.now()
                 );
                 webAuthInfo.setAuthProviderConfigurationId(authConfiguration.getAuthProviderConfigurationId());

@@ -1,15 +1,13 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2022 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
-
 import { NavNode, NavNodeInfoResource, NavTreeResource, ProjectsNavNodeService, ROOT_NODE_PATH } from '@cloudbeaver/core-navigation-tree';
 import { NAV_NODE_TYPE_PROJECT, ProjectsService } from '@cloudbeaver/core-projects';
-import { resourceKeyList } from '@cloudbeaver/core-sdk';
+import { resourceKeyList } from '@cloudbeaver/core-resource';
 
 import type { IElementsTreeFilter } from '../ElementsTree/useElementsTree';
 
@@ -19,7 +17,7 @@ export function navigationTreeProjectFilter(
   navNodeInfoResource: NavNodeInfoResource,
   navTreeResource: NavTreeResource,
 ): IElementsTreeFilter {
-  return (filter: string, node: NavNode, children: string[]) => {
+  return (tree, filter, node, children) => {
     if (node.id !== ROOT_NODE_PATH) {
       return children;
     }

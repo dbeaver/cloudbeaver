@@ -22,69 +22,36 @@ You can see live demo of CloudBeaver here: https://demo.cloudbeaver.io
 
 ## Changelog
 
-### CloudBeaver 22.3.3 - 2023-01-23
 
-- Download button is added on a Value panel of Blob and JSON data
-- The body of packages in Oracle databases now is displayed
-- different bugs have been fixed.
+### 24.0.0. 2024-03-04
+  - Changes since 23.3.0:
 
-### CloudBeaver 22.3.2 - 2023-01-09
-
-- Administration menu:
-  - the User dialog displays available connections in alphabetical order.
-- Connection dialog:
-  - users can now add new driver properties with the applied filter in the Driver Properties tab.
-- Data Editor:
-  - edit shortcuts are no longer available for read-only tables.
-
-### CloudBeaver 22.3.1 - 2022-12-26
-
-- Administrators can grant access to all shared connections to the User team by changing one parameter in the configuration file;
-- The shared project is now selected by default in the Create connection dialog in the Administration;
-- Different bugs have been fixed.
-
-### CloudBeaver 22.3.0 - 2022-12-05
-
-Changes since 22.2.0
-- Users receive notifications about any changes in:
-  - the server configuration,
-  - connections and scripts they are currently working with.
-- The main menu has become more compact thanks to the new design.
-- SQL scripts Manager:
-  - Users can specify the connection for the saved script. This connection will be selected by default when a user opens this script next time.
-  - The Settings button opens the new menu that allows users to:
-    - filter scripts,
-    - collapse all expanded folders,
-    - keep the tree view after refreshing the browser page,
-    - show the tree view as the path to the script,
-    - remove grouping of scripts by projects.
+- Main updates:
+  - Have enhanced security for unauthorised access;
+  - Have added a password policy for the local authorization. Password parameters can be set in the configuration file;
+  - Have added validation for mandatory fields in all forms to create and edit entities;
+  - Have added an ability to edit the default preferences of the following parts: interface, tools and data viewer in the settings panel in the administrative part;
+- Performance:
+  - Have improved the performance of the server.
+- Administration:
+  - Have added the ability to configure reverse proxy header name and redirect URL at logout. Now the administrator can configure all settings. The delimiter symbol for the reverse proxy team headers is configurable;
+- Preferences:
+  - Have added the ability in the admin panel to customise copying in the Tables and Values panel for all users except the administrator;
+  - Have added the ability to disable alias autocomplete for all users.
+- Access Management:
+  - A default user group was added to the product. This group includes all users which could not be deleted.
 - Connections:
-  - new filter in connection driver properties simplifies search for driver settings;
-  - the connection configuration through URL has been added for drivers, that support it;
-  - only administrators have:
-    - access to the connection edit dialog of shared connections,
-    - permission to create connections in both projects, Shared and Private, when it’s restricted for other users,
-    - the search tool for local connections in the Connection menu on the public page.
-- Authentication:
-  - Administrators can enable a reverse proxy for user authentication in the Server Settings.
-- User administration:
-  - administrators can filter enabled and disabled users on the Access Management tab;
-  - the application saves all user history: users can be deactivated, but not deleted.
-- The Value Panel:
-  - the size of displayed JSON values is limited to improve CloudBeaver performance;
-  - big JSON values can be saved to an external file.
-- Table data export:
-  - character encoding can be changed for table data;
-  - the new setting (BOM) allows users to export specific Unicode characters correctly.
-- Update to SSHJ library allows users to use more private key formats for SSH authentication.
-- Local configuration:
-  - changing of a default view of the Navigation tree, Simple or Advanced, can be restricted;
-  - the edit connection dialog of shared connections can be made visible to all users;
-  - the size limit of displayed JSON values can be changed.
-- A lot of small bug fixes, enhancements and improvements have been made.
-
-
-### Old CloudBeaver releases
-
-You can find information about earlier releases on the CloudBeaver wiki https://github.com/dbeaver/cloudbeaver/wiki/Releases.
-
+  - The 'Keep alive' option has been added to the connection settings to keep the connection active even in case of inactivity.
+- Data Editor: 
+  - Have added the ability to view decoded binary-type data in the Value panel;
+  - Text wrap is activated by default for texts and BLOBs in the Values panel for better visibility. The user can switch to the one-line mode using a button on the toolbar;
+  - Have added the ability to display full text for a string data type in the Value panel;
+  - Have added the ability to display the OpenStreetMap layer with the coordinate system ESPG 4326.
+- Resource management:
+  - Read-only scripts now have a padlock icon.
+- Databases:
+  - The DuckDB driver has been added;
+  - Updated PostgreSQL driver to 42.5.2;
+  - ClickHouse Legacy driver has been removed to prevent potential vulnerability issues;
+  - Updated MariaDB driver to version 3.3.2.
+- Different bug fixes and enhancements have been made.

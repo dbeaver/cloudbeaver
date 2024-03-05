@@ -1,30 +1,13 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2022 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
-import styled, { css } from 'reshadow';
-
-const SNACKBAR_FOOTER_STYLES = css`
-  notification-footer {
-    display: flex;
-    align-items: flex-end;
-    justify-content: space-between;
-  }
-  footer-time {
-    composes: theme-typography--caption from global;
-    opacity: 0.7;
-  }
-  actions:empty {
-    display: none;
-  }
-  actions > *:not(:first-child) {
-    margin-left: 16px;
-  }
-`;
+import { s } from '../../s';
+import { useS } from '../../useS';
+import style from './SnackbarFooter.m.css';
 
 interface Props {
   timestamp: number;
@@ -32,14 +15,13 @@ interface Props {
 }
 
 export const SnackbarFooter: React.FC<React.PropsWithChildren<Props>> = function SnackbarFooter({ timestamp, className, children }) {
+  const styles = useS(style);
   const timeStringFromTimestamp = new Date(timestamp).toLocaleTimeString();
 
-  return styled(SNACKBAR_FOOTER_STYLES)(
-    <notification-footer as='div' className={className}>
-      <footer-time as='span'>{timeStringFromTimestamp}</footer-time>
-      <actions as="div">
-        {children}
-      </actions>
-    </notification-footer>
+  return (
+    <div className={s(styles, { notificationFooter: true }, className)}>
+      <span className={styles.footerTime}>{timeStringFromTimestamp}</span>
+      <div className={styles.actions}>{children}</div>
+    </div>
   );
 };

@@ -1,42 +1,54 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2022 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { computed, makeObservable, observable } from 'mobx';
 
 import type { ConnectionExecutionContextService, IConnectionExecutionContext, IConnectionExecutionContextInfo } from '@cloudbeaver/core-connections';
 import type { IServiceInjector } from '@cloudbeaver/core-di';
 import type { ITask } from '@cloudbeaver/core-executor';
-import { AsyncTaskInfoService, GraphQLService, ResultDataFormat, SqlExecuteInfo, SqlQueryResults, UpdateResultsDataBatchMutationVariables } from '@cloudbeaver/core-sdk';
+import {
+  AsyncTaskInfoService,
+  GraphQLService,
+  ResultDataFormat,
+  SqlExecuteInfo,
+  SqlQueryResults,
+  UpdateResultsDataBatchMutationVariables,
+} from '@cloudbeaver/core-sdk';
+import { uuid } from '@cloudbeaver/core-utils';
 
 import { DocumentEditAction } from './DatabaseDataModel/Actions/Document/DocumentEditAction';
+import type { IResultSetBlobValue } from './DatabaseDataModel/Actions/ResultSet/IResultSetBlobValue';
 import { ResultSetEditAction } from './DatabaseDataModel/Actions/ResultSet/ResultSetEditAction';
-import { DatabaseDataSource } from './DatabaseDataModel/DatabaseDataSource';
 import type { IDatabaseDataOptions } from './DatabaseDataModel/IDatabaseDataOptions';
 import type { IDatabaseResultSet } from './DatabaseDataModel/IDatabaseResultSet';
+import { ResultSetDataSource } from './ResultSetDataSource';
 
 export interface IDataContainerOptions extends IDatabaseDataOptions {
   containerNodePath: string;
 }
 
-export class ContainerDataSource extends DatabaseDataSource<IDataContainerOptions, IDatabaseResultSet> {
+export class ContainerDataSource extends ResultSetDataSource<IDataContainerOptions> {
   currentTask: ITask<SqlExecuteInfo> | null;
 
   get canCancel(): boolean {
     return this.currentTask?.cancellable || false;
   }
 
+  get cancelled(): boolean {
+    return this.currentTask?.cancelled || false;
+  }
+
   constructor(
-    readonly serviceInjector: IServiceInjector,
-    private readonly graphQLService: GraphQLService,
-    private readonly asyncTaskInfoService: AsyncTaskInfoService,
+    serviceInjector: IServiceInjector,
+    graphQLService: GraphQLService,
+    asyncTaskInfoService: AsyncTaskInfoService,
     private readonly connectionExecutionContextService: ConnectionExecutionContextService,
   ) {
-    super(serviceInjector);
+    super(serviceInjector, graphQLService, asyncTaskInfoService);
 
     this.currentTask = null;
     this.executionContext = null;
@@ -61,9 +73,7 @@ export class ContainerDataSource extends DatabaseDataSource<IDataContainerOption
     }
   }
 
-  async request(
-    prevResults: IDatabaseResultSet[]
-  ): Promise<IDatabaseResultSet[]> {
+  async request(prevResults: IDatabaseResultSet[]): Promise<IDatabaseResultSet[]> {
     const options = this.options;
 
     if (!options) {
@@ -71,24 +81,25 @@ export class ContainerDataSource extends DatabaseDataSource<IDataContainerOption
     }
 
     const executionContext = await this.ensureContextCreated();
+    const context = executionContext.context!;
     const offset = this.offset;
     const limit = this.count;
 
     let firstResultId: string | undefined;
 
     if (
-      prevResults.length === 1
-      && prevResults[0].contextId === executionContext.context!.id
-      && prevResults[0].connectionId === executionContext.context?.connectionId
-      && prevResults[0].id !== null
+      prevResults.length === 1 &&
+      prevResults[0].contextId === context.id &&
+      prevResults[0].connectionId === context.connectionId &&
+      prevResults[0].id !== null
     ) {
       firstResultId = prevResults[0].id;
     }
 
     const task = this.asyncTaskInfoService.create(async () => {
       const { taskInfo } = await this.graphQLService.sdk.asyncReadDataFromContainer({
-        connectionId: executionContext.context!.connectionId,
-        contextId: executionContext.context!.id,
+        connectionId: context.connectionId,
+        contextId: context.id,
         containerNodePath: options.containerNodePath,
         resultId: firstResultId,
         filter: {
@@ -111,13 +122,14 @@ export class ContainerDataSource extends DatabaseDataSource<IDataContainerOption
         return result;
       },
       () => this.asyncTaskInfoService.cancel(task.id),
-      () => this.asyncTaskInfoService.remove(task.id)
+      () => this.asyncTaskInfoService.remove(task.id),
     );
 
     try {
       const response = await this.currentTask;
 
       this.requestInfo = {
+        originalQuery: response.fullQuery || '',
         requestDuration: response.duration || 0,
         requestMessage: response.statusMessage || '',
         requestFilter: response.filterText || '',
@@ -135,9 +147,7 @@ export class ContainerDataSource extends DatabaseDataSource<IDataContainerOption
     }
   }
 
-  async save(
-    prevResults: IDatabaseResultSet[]
-  ): Promise<IDatabaseResultSet[]> {
+  async save(prevResults: IDatabaseResultSet[]): Promise<IDatabaseResultSet[]> {
     const executionContext = await this.ensureContextCreated();
 
     try {
@@ -146,23 +156,51 @@ export class ContainerDataSource extends DatabaseDataSource<IDataContainerOption
           continue;
         }
         const executionContextInfo = executionContext.context!;
+        const projectId = executionContextInfo.projectId;
+        const connectionId = executionContextInfo.connectionId;
+        const contextId = executionContextInfo.id;
+        const resultsId = result.id;
+
         const updateVariables: UpdateResultsDataBatchMutationVariables = {
-          projectId: executionContextInfo.projectId,
-          connectionId: executionContextInfo.connectionId,
-          contextId: executionContextInfo.id,
-          resultsId: result.id,
+          projectId,
+          connectionId,
+          contextId,
+          resultsId,
         };
         let editor: ResultSetEditAction | DocumentEditAction | undefined;
 
         if (result.dataFormat === ResultDataFormat.Resultset) {
           editor = this.actions.get(result, ResultSetEditAction);
-          editor.fillBatch(updateVariables);
         } else if (result.dataFormat === ResultDataFormat.Document) {
           editor = this.actions.get(result, DocumentEditAction);
+        }
+
+        let blobs: IResultSetBlobValue[] = [];
+        if (editor instanceof ResultSetEditAction) {
+          blobs = editor.getBlobsToUpload();
+        }
+
+        for (const blob of blobs) {
+          const fileId = uuid();
+          await this.graphQLService.sdk.uploadBlobResultSet(fileId, blob.blob);
+          blob.fileId = fileId;
+        }
+
+        if (editor) {
           editor.fillBatch(updateVariables);
         }
 
         const response = await this.graphQLService.sdk.updateResultsDataBatch(updateVariables);
+
+        if (editor) {
+          const responseResult = this.transformResults(executionContextInfo, response.result.results, 0).find(
+            newResult => newResult.id === result.id,
+          );
+
+          if (responseResult) {
+            editor.applyUpdate(responseResult);
+          }
+        }
 
         this.requestInfo = {
           ...this.requestInfo,
@@ -170,16 +208,8 @@ export class ContainerDataSource extends DatabaseDataSource<IDataContainerOption
           requestMessage: 'Saved successfully',
           source: null,
         };
-
-        if (editor) {
-          const responseResult = this.transformResults(executionContextInfo, response.result.results, 0)
-            .find(newResult => newResult.id === result.id);
-
-          if (responseResult) {
-            editor.applyUpdate(responseResult);
-          }
-        }
       }
+
       this.clearError();
     } catch (exception: any) {
       this.error = exception;
@@ -217,30 +247,37 @@ export class ContainerDataSource extends DatabaseDataSource<IDataContainerOption
     }
   }
 
-  private transformResults(
-    executionContextInfo: IConnectionExecutionContextInfo,
-    results: SqlQueryResults[],
-    limit: number
-  ): IDatabaseResultSet[] {
-    return results.map<IDatabaseResultSet>(result => ({
+  private transformResults(executionContextInfo: IConnectionExecutionContextInfo, results: SqlQueryResults[], limit: number): IDatabaseResultSet[] {
+    return results.map<IDatabaseResultSet>((result, index) => ({
       id: result.resultSet?.id || '0',
-      uniqueResultId: `${executionContextInfo.connectionId}_${executionContextInfo.id}_${result.resultSet?.id || '0'}`,
+      uniqueResultId: `${executionContextInfo.connectionId}_${executionContextInfo.id}_${index}`,
       connectionId: executionContextInfo.connectionId,
       contextId: executionContextInfo.id,
       dataFormat: result.dataFormat!,
       updateRowCount: result.updateRowCount || 0,
-      loadedFully: (result.resultSet?.rows?.length || 0) < limit,
+      loadedFully: (result.resultSet?.rowsWithMetaData?.length || 0) < limit,
+      count: result.resultSet?.rowsWithMetaData?.length || 0,
+      totalCount: null,
       data: result.resultSet,
     }));
   }
 
   private async ensureContextCreated(): Promise<IConnectionExecutionContext> {
-    if (!this.executionContext?.context) {
+    const currentContext = this.executionContext?.context;
+
+    if (!currentContext) {
       if (!this.options) {
         throw new Error('Options must be provided');
       }
-      this.executionContext = await this.connectionExecutionContextService.create(this.options.connectionKey);
+
+      const executionContext = await this.connectionExecutionContextService.create(
+        this.options.connectionKey,
+        this.options.catalog,
+        this.options.schema,
+      );
+
+      this.setExecutionContext(executionContext);
     }
-    return this.executionContext;
+    return this.executionContext!;
   }
 }

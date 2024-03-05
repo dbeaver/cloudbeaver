@@ -1,0 +1,32 @@
+.main {
+  position: relative;
+  display: flex;
+  align-items: center;
+  padding: 8px;
+}
+.before {
+  margin-right: 16px;
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+}
+.after {
+  margin-left: 16px;
+  flex-shrink: 0;
+}
+.info {
+  composes: theme-typography--body2 from global;
+  flex: 1;
+  line-height: 1.4;
+  display: flex;
+  flex-direction: column;
+  font-weight: 500;
+}
+.description {
+  composes: theme-typography--caption from global;
+  line-height: 1.2;
+}
+
+.ripple {
+  composes: theme-ripple from global;
+}

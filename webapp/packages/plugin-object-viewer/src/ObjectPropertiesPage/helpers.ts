@@ -1,11 +1,10 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2022 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import type { ObjectPropertyInfo } from '@cloudbeaver/core-sdk';
 
 type Value = string | null | undefined | { displayName: string } | string[];
@@ -32,6 +31,7 @@ export function matchType(type?: string) {
     case 'int':
     case 'double':
     case 'long':
+    case 'Integer':
       return 'number';
     default:
       return 'text';

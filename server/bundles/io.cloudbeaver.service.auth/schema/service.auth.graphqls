@@ -30,6 +30,7 @@ type AuthProviderConfiguration {
     id: ID!
     displayName: String!
     disabled: Boolean!
+    authRoleProvided: Boolean
 
     iconURL: String
     description: String
@@ -40,6 +41,7 @@ type AuthProviderConfiguration {
     signInLink: String
     signOutLink: String
     metadataLink: String
+    acsLink: String
 }
 
 type AuthProviderCredentialsProfile {
@@ -57,9 +59,13 @@ type AuthProviderInfo {
 
     defaultProvider: Boolean!
     trusted: Boolean!
+    private: Boolean!
+    supportProvisioning: Boolean!
 
     # Configurable providers must be configured first. See configurations field.
     configurable: Boolean!
+    # Federated providers means authorization must occur asynchronously through redirects.
+    federated: Boolean!
 
     # Provider configurations (applicable only if configurable=true)
     configurations: [AuthProviderConfiguration!]
@@ -67,6 +73,8 @@ type AuthProviderInfo {
     credentialProfiles: [AuthProviderCredentialsProfile!]!
 
     requiredFeatures: [String!]!
+
+    required: Boolean!
 }
 
 type AuthInfo {
@@ -77,6 +85,11 @@ type AuthInfo {
     authStatus: AuthStatus!
 
     userTokens: [UserAuthToken!]
+}
+
+
+type LogoutInfo @since(version: "23.3.3") {
+    redirectLinks: [String!]!
 }
 
 type UserAuthToken {
@@ -132,7 +145,12 @@ extend type Query {
     authUpdateStatus(authId: ID!, linkUser: Boolean): AuthInfo!
 
     # Logouts user. If provider not specified then all authorizations are revoked from session.
+    @deprecated
     authLogout(provider: ID, configuration: ID): Boolean
+
+    # Same as #authLogout, but returns additional information
+    @since(version: "23.3.3")
+    authLogoutExtended(provider: ID, configuration: ID): LogoutInfo!
 
     # Active user information. null is no user was authorized within session
     activeUser: UserInfo

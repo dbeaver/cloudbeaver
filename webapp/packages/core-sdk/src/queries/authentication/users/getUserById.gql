@@ -1,0 +1,5 @@
+query getAdminUserInfo($userId: ID!, $includeMetaParameters: Boolean!, $customIncludeOriginDetails: Boolean!) {
+  user: adminUserInfo(userId: $userId) {
+    ...AdminUserInfo
+  }
+}

@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2023 DBeaver Corp and others
+ * Copyright (C) 2010-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,10 @@
  */
 package io.cloudbeaver.registry;
 
+import io.cloudbeaver.auth.CBAuthConstants;
 import io.cloudbeaver.auth.SMAuthProviderFederated;
+import io.cloudbeaver.auth.SMSignOutLinkProvider;
+import io.cloudbeaver.utils.WebAppUtils;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.auth.SMAuthProvider;
@@ -71,13 +74,21 @@ public class WebAuthProviderConfiguration {
     @Property
     public String getSignInLink() throws DBException {
         SMAuthProvider<?> instance = providerDescriptor.getInstance();
-        return instance instanceof SMAuthProviderFederated ? ((SMAuthProviderFederated) instance).getSignInLink(getId(), config.getParameters()) : null;
+        return instance instanceof SMAuthProviderFederated ?
+            buildRedirectUrl(((SMAuthProviderFederated) instance).getSignInLink(getId(), config.getParameters()))
+            : null;
+    }
+
+    private String buildRedirectUrl(String baseUrl) {
+        return baseUrl + "?" + CBAuthConstants.CB_REDIRECT_URL_REQUEST_PARAM + "=" + WebAppUtils.getWebApplication().getServerURL();
     }
 
     @Property
     public String getSignOutLink() throws DBException {
         SMAuthProvider<?> instance = providerDescriptor.getInstance();
-        return instance instanceof SMAuthProviderFederated ? ((SMAuthProviderFederated) instance).getSignOutLink(getId(), config.getParameters()) : null;
+        return instance instanceof SMSignOutLinkProvider
+            ? ((SMSignOutLinkProvider) instance).getCommonSignOutLink(getId(), config.getParameters())
+            : null;
     }
 
     @Property
@@ -90,6 +101,12 @@ public class WebAuthProviderConfiguration {
     public String getMetadataLink() throws DBException {
         SMAuthProvider<?> instance = providerDescriptor.getInstance();
         return instance instanceof SMAuthProviderFederated ? ((SMAuthProviderFederated) instance).getMetadataLink(getId(), config.getParameters()) : null;
+    }
+
+    @Property
+    public String getAcsLink() throws DBException {
+        SMAuthProvider<?> instance = providerDescriptor.getInstance();
+        return instance instanceof SMAuthProviderFederated ? ((SMAuthProviderFederated) instance).getAcsLink(getId(), config.getParameters()) : null;
     }
 
     @Override

@@ -1,36 +1,22 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2022 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observer } from 'mobx-react-lite';
-import { useCallback } from 'react';
-import styled, { css } from 'reshadow';
+import { useCallback, useEffect } from 'react';
 
-import { Pane, ResizerControls, Split, splitStyles, TextPlaceholder, useSplitUserState, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
+import { Pane, ResizerControls, s, Split, TextPlaceholder, useS, useSplitUserState, useTranslate } from '@cloudbeaver/core-blocks';
 
+import style from './LogViewer.m.css';
 import { LogViewerInfoPanel } from './LogViewerInfoPanel';
 import { LogViewerTable } from './LogViewerTable';
 import { useLogViewer } from './useLogViewer';
 
-const styles = css`
-    Pane {
-      composes: theme-background-surface theme-text-on-surface from global;
-    }
-    log-view-wrapper, Pane {
-      position: relative;
-      display: flex;
-      flex: 1;
-      flex-direction: column;
-      overflow: hidden;
-    }
-`;
-
 export const LogViewer = observer(function LogViewer() {
-  const style = useStyles(styles, splitStyles);
+  const styles = useS(style);
   const translate = useTranslate();
   const logViewerState = useLogViewer();
   const splitState = useSplitUserState('log-viewer');
@@ -39,19 +25,23 @@ export const LogViewer = observer(function LogViewer() {
     logViewerState.selectItem(null);
   }, [logViewerState]);
 
+  useEffect(() => {
+    logViewerState.update();
+  }, []);
+
   if (!logViewerState.isActive) {
     return <TextPlaceholder>{translate('plugin_log_viewer_placeholder')}</TextPlaceholder>;
   }
 
-  return styled(style)(
-    <log-view-wrapper>
+  return (
+    <div className={s(styles, { logViewWrapper: true })}>
       <Split
         {...splitState}
-        mode={logViewerState.selectedItem ? splitState.mode : 'maximize'}
+        mode={logViewerState.selectedItem ? splitState.mode : 'minimize'}
         disable={!logViewerState.selectedItem}
         keepRatio
       >
-        <Pane>
+        <Pane className={s(styles, { pane: true })}>
           <LogViewerTable
             items={logViewerState.logItems}
             selectedItem={logViewerState.selectedItem}
@@ -60,15 +50,10 @@ export const LogViewer = observer(function LogViewer() {
           />
         </Pane>
         <ResizerControls />
-        <Pane basis='40%' main>
-          {logViewerState.selectedItem && (
-            <LogViewerInfoPanel
-              selectedItem={logViewerState.selectedItem}
-              onClose={closeInfoPanel}
-            />
-          )}
+        <Pane className={s(styles, { pane: true })} basis="40%" main>
+          {logViewerState.selectedItem && <LogViewerInfoPanel selectedItem={logViewerState.selectedItem} onClose={closeInfoPanel} />}
         </Pane>
       </Split>
-    </log-view-wrapper>
+    </div>
   );
 });

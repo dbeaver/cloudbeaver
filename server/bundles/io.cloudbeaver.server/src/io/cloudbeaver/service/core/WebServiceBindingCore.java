@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2023 DBeaver Corp and others
+ * Copyright (C) 2010-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,9 +30,9 @@ import io.cloudbeaver.service.DBWBindingContext;
 import io.cloudbeaver.service.WebServiceBindingBase;
 import io.cloudbeaver.service.core.impl.WebServiceCore;
 import io.cloudbeaver.service.session.WebSessionManager;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -99,6 +99,8 @@ public class WebServiceBindingCore extends WebServiceBindingBase<DBWServiceCore>
             .dataFetcher("closeSession", env -> getService(env).closeSession(GraphQLEndpoint.getServletRequest(env)))
             .dataFetcher("touchSession", env -> getService(env).touchSession(
                 GraphQLEndpoint.getServletRequest(env), GraphQLEndpoint.getServletResponse(env)))
+            .dataFetcher("updateSession", env -> getService(env).updateSession(
+                GraphQLEndpoint.getServletRequest(env), GraphQLEndpoint.getServletResponse(env)))
             .dataFetcher("refreshSessionConnections", env -> getService(env).refreshSessionConnections(
                 GraphQLEndpoint.getServletRequest(env), GraphQLEndpoint.getServletResponse(env)))
             .dataFetcher("changeSessionLanguage", env -> getService(env).changeSessionLanguage(getWebSession(env), env.getArgument("locale")))
@@ -132,7 +134,8 @@ public class WebServiceBindingCore extends WebServiceBindingBase<DBWServiceCore>
                         env.getArgument("credentials"),
                         nhc,
                         env.getArgument("saveCredentials"),
-                        env.getArgument("sharedCredentials")
+                        env.getArgument("sharedCredentials"),
+                        env.getArgument("selectedSecretId")
                     );
                 }
             )
@@ -184,5 +187,4 @@ public class WebServiceBindingCore extends WebServiceBindingBase<DBWServiceCore>
     private WebConnectionConfig getConnectionConfig(DataFetchingEnvironment env) {
         return new WebConnectionConfig(env.getArgument("config"));
     }
-
 }

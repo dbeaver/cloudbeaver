@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2023 DBeaver Corp and others
+ * Copyright (C) 2010-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,11 +17,11 @@
 package io.cloudbeaver.service;
 
 import io.cloudbeaver.model.app.WebAppConfiguration;
+import io.cloudbeaver.model.app.WebApplication;
 import io.cloudbeaver.model.session.WebSession;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
-import org.jkiss.dbeaver.model.app.DBPApplication;
 
 /**
  * Web service implementation
@@ -29,10 +29,14 @@ import org.jkiss.dbeaver.model.app.DBPApplication;
 public interface DBWServiceServerConfigurator extends DBWServiceBinding {
 
     void configureServer(
-        @NotNull DBPApplication application,
+        @NotNull WebApplication application,
         @Nullable WebSession session,
         @NotNull WebAppConfiguration appConfig
     ) throws DBException;
+
+    default void migrateConfigurationIfNeeded(@NotNull WebApplication application) throws DBException {
+
+    }
 
     void reloadConfiguration(@NotNull WebAppConfiguration appConfig) throws DBException;
 

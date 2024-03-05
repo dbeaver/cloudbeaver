@@ -1,51 +1,40 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2022 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observer } from 'mobx-react-lite';
-import { useEffect } from 'react';
-import styled, { css } from 'reshadow';
 
 import {
-  BASE_CONTAINERS_STYLES, ColoredContainer, Container, getComputed, Group,
-  InfoItem, Loader, TextPlaceholder, useResource, useStyles, useTranslate
+  ColoredContainer,
+  Container,
+  getComputed,
+  Group,
+  InfoItem,
+  Loader,
+  s,
+  TextPlaceholder,
+  useAutoLoad,
+  useResource,
+  useS,
+  useTranslate,
 } from '@cloudbeaver/core-blocks';
 import { Connection, ConnectionInfoProjectKey, ConnectionInfoResource, DBDriverResource, isCloudConnection } from '@cloudbeaver/core-connections';
 import type { TLocalizationToken } from '@cloudbeaver/core-localization';
 import { isGlobalProject, ProjectInfo, ProjectInfoResource } from '@cloudbeaver/core-projects';
-import { CachedMapAllKey } from '@cloudbeaver/core-sdk';
+import { CachedMapAllKey } from '@cloudbeaver/core-resource';
 import { TabContainerPanelComponent, useTab } from '@cloudbeaver/core-ui';
 
 import type { ITeamFormProps } from '../ITeamFormProps';
 import { ConnectionList } from './ConnectionList';
+import style from './GrantedConnections.m.css';
 import { GrantedConnectionList } from './GrantedConnectionsList';
 import { useGrantedConnections } from './useGrantedConnections';
 
-const styles = css`
-  ColoredContainer {
-    flex: 1;
-    height: 100%;
-    box-sizing: border-box;
-  }
-  Group {
-    max-height: 100%;
-    position: relative;
-    overflow: auto !important;
-  }
-  Loader {
-    z-index: 2;
-  }
-`;
-
-export const GrantedConnections: TabContainerPanelComponent<ITeamFormProps> = observer(function GrantedConnections({
-  tabId,
-  state: formState,
-}) {
-  const style = useStyles(BASE_CONTAINERS_STYLES, styles);
+export const GrantedConnections: TabContainerPanelComponent<ITeamFormProps> = observer(function GrantedConnections({ tabId, state: formState }) {
+  const styles = useS(style);
   const translate = useTranslate();
 
   const state = useGrantedConnections(formState.config, formState.mode);
@@ -55,36 +44,18 @@ export const GrantedConnections: TabContainerPanelComponent<ITeamFormProps> = ob
   const projects = useResource(GrantedConnections, ProjectInfoResource, CachedMapAllKey);
 
   const globalConnectionsKey = ConnectionInfoProjectKey(
-    ...(projects.data as Array<ProjectInfo | undefined>)
-      .filter(isGlobalProject)
-      .map(project => project.id)
+    ...(projects.data as Array<ProjectInfo | undefined>).filter(isGlobalProject).map(project => project.id),
   );
 
-  const dbDriverResource = useResource(
-    GrantedConnections,
-    DBDriverResource,
-    CachedMapAllKey,
-    { active: selected }
-  );
+  useResource(GrantedConnections, DBDriverResource, CachedMapAllKey, { active: selected });
 
-  const connectionsLoader = useResource(
-    GrantedConnections,
-    ConnectionInfoResource,
-    globalConnectionsKey,
-    { active: selected }
-  );
+  const connectionsLoader = useResource(GrantedConnections, ConnectionInfoResource, globalConnectionsKey, { active: selected });
 
   const connections = connectionsLoader.data as Connection[];
 
-  const grantedConnections = getComputed(() => connections
-    .filter(connection => state.state.grantedSubjects.includes(connection.id))
-  );
+  const grantedConnections = getComputed(() => connections.filter(connection => state.state.grantedSubjects.includes(connection.id)));
 
-  useEffect(() => {
-    if (selected && !loaded) {
-      state.load();
-    }
-  });
+  useAutoLoad(GrantedConnections, state, selected && !loaded);
 
   if (!selected) {
     return null;
@@ -102,12 +73,12 @@ export const GrantedConnections: TabContainerPanelComponent<ITeamFormProps> = ob
     info = 'ui_save_reminder';
   }
 
-  return styled(style)(
-    <Loader state={[connectionsLoader, dbDriverResource, projects, state.state]}>
-      {() => styled(style)(
-        <ColoredContainer parent gap vertical>
+  return (
+    <Loader className={s(styles, { loader: true })} state={[state.state]}>
+      {() => (
+        <ColoredContainer className={s(styles, { box: true })} parent gap vertical>
           {!connections.length ? (
-            <Group large>
+            <Group className={s(styles, { placeholderBox: true })} large>
               <TextPlaceholder>{translate('administration_teams_team_granted_connections_empty')}</TextPlaceholder>
             </Group>
           ) : (

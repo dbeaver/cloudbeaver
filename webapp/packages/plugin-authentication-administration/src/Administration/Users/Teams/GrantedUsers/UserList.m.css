@@ -1,0 +1,27 @@
+.box {
+  position: relative;
+}
+
+.box,
+.innerBox,
+.tableBox {
+  height: 100%;
+}
+
+.innerBox {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.header {
+  flex: 0 0 auto;
+}
+
+.tableBox {
+  overflow: auto;
+}
+
+.table {
+  composes: theme-background-surface theme-text-on-surface from global;
+}

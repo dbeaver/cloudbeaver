@@ -1,46 +1,20 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2022 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 import { observer } from 'mobx-react-lite';
-import styled, { css } from 'reshadow';
 
 import { AuthProviderConfiguration, AuthProvidersResource } from '@cloudbeaver/core-authentication';
-import { IconOrImage, Link, Cell, useResource, Loader, Button, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
+import { Button, Cell, IconOrImage, Link, Loader, s, useResource, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { CachedMapAllKey, UserInfo } from '@cloudbeaver/core-sdk';
+import { CachedMapAllKey } from '@cloudbeaver/core-resource';
+import type { UserInfo } from '@cloudbeaver/core-sdk';
 import { AuthenticationService } from '@cloudbeaver/plugin-authentication';
 
-const styles = css`
-    container {
-      display: flex;
-      flex-direction: column;
-      overflow: auto;
-    }
-    list {
-      overflow: auto;
-    }
-    Cell {
-      composes: theme-border-color-secondary from global;
-      border-bottom: 1px solid;
-      padding: 0 16px;
-    }
-    IconOrImage {
-      width: 100%;
-      height: 100%;
-    }
-    provider-login-icon {
-      width: 24px;
-      height: 24px;
-    }
-    time {
-      composes: theme-typography--caption from global;
-    }
-`;
+import styles from './AuthTokenList.m.css';
 
 interface Props {
   user: UserInfo;
@@ -50,13 +24,13 @@ interface Props {
 export const AuthTokenList = observer<Props>(function AuthTokenList({ user, className }) {
   const providersResource = useResource(AuthTokenList, AuthProvidersResource, CachedMapAllKey);
   const authenticationService = useService(AuthenticationService);
-  const style = useStyles(styles);
+  const style = useS(styles);
   const translate = useTranslate();
 
-  return styled(style)(
-    <container className={className}>
+  return (
+    <div className={s(style, { container: true }, className)}>
       <Loader state={providersResource}>
-        <list>
+        <div className={s(style, { list: true })}>
           {user.authTokens.map(token => {
             const provider = providersResource.resource.get(token.authProvider);
 
@@ -70,9 +44,7 @@ export const AuthTokenList = observer<Props>(function AuthTokenList({ user, clas
             let icon = provider.icon;
 
             if (token.authConfiguration) {
-              configuration = provider.configurations?.find(
-                configuration => configuration.id === token.authConfiguration
-              );
+              configuration = provider.configurations?.find(configuration => configuration.id === token.authConfiguration);
 
               if (configuration) {
                 name = configuration.displayName;
@@ -88,44 +60,40 @@ export const AuthTokenList = observer<Props>(function AuthTokenList({ user, clas
             const title = `${name}\n${description || ''}`;
 
             return (
-              <Link
-                key={provider.id + '_' + token.authConfiguration}
-                title={title}
-                wrapper
-              >
+              <Link key={provider.id + '_' + token.authConfiguration} title={title} wrapper>
                 <Cell
-                  before={icon ? <IconOrImage icon={icon} /> : undefined}
-                  after={(
-                    <Button
-                      mod={['outlined']}
-                      onClick={() => authenticationService.logout(provider.id, configuration?.id)}
-                    >
+                  className={s(style, { cell: true })}
+                  before={icon ? <IconOrImage className={s(style, { iconOrImage: true })} icon={icon} /> : undefined}
+                  after={
+                    <Button mod={['outlined']} onClick={() => authenticationService.logout(provider.id, configuration?.id)}>
                       {translate('authentication_logout')}
                     </Button>
-                  )}
-                  // after={activeProviders.includes(provider.id) && false ? (
-                  //   <provider-login-icon>
-                  //     <IconOrImage
-                  //       icon='/icons/success_sm.svg'
-                  //       title={translate('plugin_user_profile_auth_providers_active')}
-                  //     />
-                  //   </provider-login-icon>
-                  // ) : undefined}
-                  description={(
+                  }
+                  description={
                     <>
-                      {description}<br />
-                      {token.userId && (<>{token.userId}<br /></>)}
-                      {date ? <time dateTime={date.toLocaleString()}>{date.toLocaleString()}</time> : undefined}
+                      {description}
+                      <br />
+                      {token.userId && (
+                        <>
+                          {token.userId}
+                          <br />
+                        </>
+                      )}
+                      {date ? (
+                        <time className={s(style, { time: true })} dateTime={date.toLocaleString()}>
+                          {date.toLocaleString()}
+                        </time>
+                      ) : undefined}
                     </>
-                  )}
+                  }
                 >
                   {name}
                 </Cell>
               </Link>
             );
           })}
-        </list>
+        </div>
       </Loader>
-    </container>
+    </div>
   );
 });

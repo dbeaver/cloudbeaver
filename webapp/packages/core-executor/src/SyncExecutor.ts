@@ -1,13 +1,10 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2022 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
-import { flat } from '@cloudbeaver/core-utils';
-
 import { ExecutionContext } from './ExecutionContext';
 import { executionExceptionContext } from './executionExceptionContext';
 import { ExecutorHandlersCollection } from './ExecutorHandlersCollection';
@@ -18,43 +15,49 @@ import type { ChainLinkType, IExecutorHandlersCollection } from './IExecutorHand
 import type { ISyncExecutor } from './ISyncExecutor';
 
 export class SyncExecutor<T = void> extends ExecutorHandlersCollection<T> implements ISyncExecutor<T> {
-  constructor(
-    private readonly defaultData: T | null = null
-  ) {
+  constructor(private readonly defaultData: T | null = null) {
     super();
   }
 
   execute(
     data: T,
     context?: IExecutionContext<T>,
-    scope?: IExecutorHandlersCollection<T> | Array<IExecutorHandlersCollection<T>>
+    scope?: IExecutorHandlersCollection<T> | Array<IExecutorHandlersCollection<T>>,
   ): IExecutionContextProvider<T> {
+    if (context && ExecutorInterrupter.isInterrupted(context)) {
+      return context;
+    }
+
     data = this.getDefaultData(data);
 
     if (!context) {
       context = new ExecutionContext(data);
     }
-    return this.executeHandlersCollection<T>(this, data, context, flat([(scope || [])]));
+    return this.executeHandlersCollection<T>(this, data, context, [scope || []].flat());
   }
 
   executeScope(
     data: T,
     scope?: IExecutorHandlersCollection<T> | Array<IExecutorHandlersCollection<T>>,
-    context?: IExecutionContext<T>
+    context?: IExecutionContext<T>,
   ): IExecutionContextProvider<T> {
+    if (context && ExecutorInterrupter.isInterrupted(context)) {
+      return context;
+    }
+
     data = this.getDefaultData(data);
 
     if (!context) {
       context = new ExecutionContext(data);
     }
-    return this.executeHandlersCollection<T>(this, data, context, flat([(scope || [])]));
+    return this.executeHandlersCollection<T>(this, data, context, [scope || []].flat());
   }
 
   private executeHandlersCollection<T>(
     collection: IExecutorHandlersCollection<T>,
     data: T,
     context: IExecutionContext<T>,
-    scoped: Array<IExecutorHandlersCollection<T>>
+    scoped: Array<IExecutorHandlersCollection<T>>,
   ): IExecutionContextProvider<T> {
     scoped = [...collection.collections, ...scoped];
 
@@ -98,12 +101,7 @@ export class SyncExecutor<T = void> extends ExecutorHandlersCollection<T> implem
     return context;
   }
 
-  private executeChain<T>(
-    collection: IExecutorHandlersCollection<T>,
-    data: T,
-    context: IExecutionContext<T>,
-    type: ChainLinkType
-  ): void {
+  private executeChain<T>(collection: IExecutorHandlersCollection<T>, data: T, context: IExecutionContext<T>, type: ChainLinkType): void {
     const interrupter = context.getContext(ExecutorInterrupter.interruptContext);
 
     for (const link of collection.chain.filter(link => link.type === type)) {
@@ -118,12 +116,7 @@ export class SyncExecutor<T = void> extends ExecutorHandlersCollection<T> implem
       const mappedData = link.map ? link.map(data, context) : data;
       const chainedContext = new ExecutionContext(mappedData, context);
 
-      this.executeHandlersCollection(
-        link.executor,
-        mappedData,
-        chainedContext,
-        flat([(collection.getLinkHandlers(link.executor) || [])])
-      );
+      this.executeHandlersCollection(link.executor, mappedData, chainedContext, [collection.getLinkHandlers(link.executor) || []].flat());
     }
   }
 
@@ -131,7 +124,7 @@ export class SyncExecutor<T = void> extends ExecutorHandlersCollection<T> implem
     data: T,
     context: IExecutionContext<T>,
     handlers: Array<IExecutorHandler<any>>,
-    interrupter?: IExecutorInterrupter
+    interrupter?: IExecutorInterrupter,
   ): void {
     for (const handler of handlers) {
       if (interrupter?.interrupted) {

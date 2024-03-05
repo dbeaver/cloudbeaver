@@ -4,8 +4,8 @@ export * from './Clipboard/ClipboardService';
 export * from './ContextMenu/ContextMenu';
 export * from './ContextMenu/IContextMenuItemProps';
 export * from './ContextMenu/MenuBar/MenuBar';
-export * from './ContextMenu/MenuBar/MENU_BAR_DEFAULT_STYLES';
-export * from './ContextMenu/MenuBar/MENU_BAR_SMALL_STYLES';
+export { default as MenuBarStyles } from './ContextMenu/MenuBar/MenuBar.m.css';
+export { default as MenuBarItemStyles } from './ContextMenu/MenuBar/MenuBarItem.m.css';
 
 export * from './DragAndDrop/DND_ELEMENT_TYPE';
 export * from './DragAndDrop/DND_NATIVE_TYPE';
@@ -14,6 +14,19 @@ export * from './DragAndDrop/DNDPreview';
 export * from './DragAndDrop/DNDProvider';
 export * from './DragAndDrop/useDNDBox';
 export * from './DragAndDrop/useDNDData';
+
+export * from './Form/DATA_CONTEXT_FORM_STATE';
+export * from './Form/FormBaseService';
+export * from './Form/FormMode';
+export * from './Form/FormState';
+export * from './Form/FormPart';
+export * from './Form/formStateContext';
+export * from './Form/formStatusContext';
+export * from './Form/formValidationContext';
+export * from './Form/IFormPart';
+export * from './Form/IFormProps';
+export * from './Form/IFormState';
+export * from './Form/IFormStateInfo';
 
 export * from './InlineEditor/InlineEditor';
 
@@ -53,11 +66,11 @@ export * from './Tabs/TabsBootstrap';
 export * from './Tabs/TabsBox/TabsBox';
 export * from './Tabs/TabsBox/TabsBoxFromArray';
 
+export * from './SideBarPanel/LeftBarPanelService';
 export * from './SideBarPanel/SideBarPanel';
 export * from './SideBarPanel/SideBarPanelService';
 
 export * from './AuthenticationProvider';
 export * from './useAuthenticationAction';
-export * from './WindowsService';
 
 export { manifest as coreUIManifest } from './manifest';

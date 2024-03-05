@@ -1,0 +1,3 @@
+{
+  "query": "query {\n  rmListResources(projectId: \"\") {\n  name\n  folder\n}\n}"
+}
