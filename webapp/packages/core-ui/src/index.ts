@@ -45,6 +45,9 @@ export * from './Tabs/TabsContext';
 export * from './Tabs/TabsState';
 export * from './Tabs/useTabState';
 export * from './Tabs/useTabLocalState';
+export { default as baseTabStyles } from './Tabs/Tab/baseTab.m.css';
+export { default as baseTabActionStyles } from './Tabs/Tab/baseTabAction.m.css';
+export { default as verticalRotatedTabStyles } from './Tabs/Tab/verticalRotatedTab.m.css';
 
 export * from './Tabs/Tab/BASE_TAB_STYLES';
 export * from './Tabs/Tab/BorderTabStyles';
@@ -52,7 +55,7 @@ export * from './Tabs/Tab/DATA_CONTEXT_TAB_ID';
 export * from './Tabs/Tab/DATA_CONTEXT_TABS_CONTEXT';
 export * from './Tabs/Tab/MENU_TAB';
 export * from './Tabs/Tab/Tab';
-export * from './Tabs/Tab/Tab';
+export * from './Tabs/Tab/TabNew';
 export * from './Tabs/Tab/TabDefault';
 export * from './Tabs/Tab/TabIcon';
 export * from './Tabs/Tab/TabProps';

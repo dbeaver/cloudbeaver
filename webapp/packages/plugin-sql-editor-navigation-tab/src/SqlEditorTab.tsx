@@ -7,13 +7,12 @@
  */
 import { observer } from 'mobx-react-lite';
 import { useContext } from 'react';
-import styled from 'reshadow';
 
-import { IconOrImage, s, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
+import { IconOrImage, s, useTranslate } from '@cloudbeaver/core-blocks';
 import { Connection, ConnectionInfoResource, createConnectionParam } from '@cloudbeaver/core-connections';
 import { useDataContext } from '@cloudbeaver/core-data-context';
 import { useService } from '@cloudbeaver/core-di';
-import { ITabData, Tab, TabIcon, TabTitle } from '@cloudbeaver/core-ui';
+import { ITabData, TabIcon, TabNew, TabTitle } from '@cloudbeaver/core-ui';
 import { CaptureViewContext } from '@cloudbeaver/core-view';
 import type { TabHandlerTabComponent } from '@cloudbeaver/plugin-navigation-tabs';
 import {
@@ -57,14 +56,14 @@ export const SqlEditorTab: TabHandlerTabComponent<ISqlEditorTabState> = observer
   const handleSelect = ({ tabId }: ITabData<any>) => onSelect(tabId);
   const handleClose = onClose ? ({ tabId }: ITabData<any>) => onClose(tabId) : undefined;
 
-  return styled(useStyles(style))(
-    <Tab tabId={tab.id} style={style} title={name} menuContext={tabMenuContext} onOpen={handleSelect} onClose={handleClose}>
+  return (
+    <TabNew tabId={tab.id} style={style} title={name} menuContext={tabMenuContext} onOpen={handleSelect} onClose={handleClose}>
       <TabIcon icon={icon} />
       <TabTitle>{name}</TabTitle>
       {isReadonly && isScript && (
         <IconOrImage title={translate('ui_readonly')} icon="/icons/lock.png" className={s(sqlEditorTabStyles, { readonlyIcon: true })} />
       )}
-      {hasUnsavedMark && <unsaved-mark className={s(sqlEditorTabStyles, { unsavedMark: true })} />}
-    </Tab>,
+      {hasUnsavedMark && <div className={s(sqlEditorTabStyles, { unsavedMark: true })} />}
+    </TabNew>
   );
 });

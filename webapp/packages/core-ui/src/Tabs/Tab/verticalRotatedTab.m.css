@@ -1,0 +1,36 @@
+.tabOuter {
+  display: table;
+}
+.tabInner {
+  padding: 50% 0;
+  height: 0;
+
+  & .baseTab {
+    transform-origin: top left;
+    display: block;
+    box-sizing: border-box;
+    transform: rotate(-90deg) translate(-100%);
+    margin-top: -50%;
+    height: 32px;
+    border: none;
+    border-radius: var(--theme-group-element-radius);
+
+    &::before {
+      border-radius: var(--theme-group-element-radius);
+    }
+
+    & .tabIcon {
+      padding-left: 6px;
+    }
+    & .tabTitle {
+      padding: 0 6px;
+    }
+  }
+}
+.tabList {
+  display: flex;
+  gap: 4px;
+  outline: none;
+  max-width: 32px;
+  flex-direction: column;
+}

@@ -1,0 +1,98 @@
+.placeholder {
+  composes: placeholder from global;
+}
+
+.baseTab {
+  position: relative;
+  outline: none;
+  font-weight: normal;
+  cursor: pointer;
+  padding: 0;
+  white-space: nowrap;
+
+  height: 32px;
+  border-top: solid 2px transparent;
+
+  &:global([aria-selected='true']) {
+    font-weight: 500;
+    cursor: auto;
+    border-top-color: var(--theme-negative);
+    opacity: 1;
+
+    &:before {
+      display: none;
+    }
+  }
+
+  &:not(:global([aria-selected='true'])) {
+    background-color: transparent !important;
+  }
+}
+
+.tabInner {
+  composes: theme-typography--body2 tab from global;
+  display: grid;
+  position: relative;
+}
+
+.tabInnerSelected .portal,
+.tabInner .portalMenuOpened,
+.tabInner:hover .portal,
+.tabInner:focus-within .portal,
+.tabInnerSelected .tabAction,
+.tabInner:hover .tabAction,
+.tabInner:focus-within .tabAction {
+  visibility: visible;
+}
+
+.tabContainer {
+  max-width: 240px;
+  height: 100%;
+  display: flex;
+  flex-shrink: 0;
+  text-align: left;
+  align-items: center;
+
+  & .tabIcon {
+    display: flex;
+    height: 24px;
+    padding-left: 8px;
+    justify-content: center;
+    align-items: center;
+
+    & .staticImage,
+    & .iconOrImage,
+    & img {
+      width: 16px;
+      height: 16px;
+    }
+
+    & .placeholder {
+      width: 16px;
+      height: 16px;
+    }
+  }
+
+  & .tabTitle {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    padding: 0 8px;
+  }
+
+  & .tabTitle .placeholder {
+    width: 80px;
+    height: 16px;
+  }
+}
+
+.tabList {
+  box-sizing: border-box;
+}
+
+.tabPanel {
+  flex: 1;
+  display: flex;
+  overflow: hidden;
+  outline: none;
+  position: relative;
+}

@@ -6,11 +6,10 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import styled from 'reshadow';
 
-import { useStyles, useTranslate } from '@cloudbeaver/core-blocks';
+import { SContext, StyleRegistry, useTranslate } from '@cloudbeaver/core-blocks';
 import type { ComponentStyle } from '@cloudbeaver/core-theming';
-import { BASE_TAB_STYLES, Tab, TabIcon, TabTitle, VERTICAL_ROTATED_TAB_STYLES } from '@cloudbeaver/core-ui';
+import { baseTabStyles, TabIcon, TabNew, TabTitle, verticalRotatedTabStyles } from '@cloudbeaver/core-ui';
 
 import type { IDatabaseDataModel } from '../../DatabaseDataModel/IDatabaseDataModel';
 import type { IDataPresentationOptions } from '../../DataPresentationService';
@@ -24,30 +23,35 @@ interface Props {
   onClick: (tabId: string) => void;
 }
 
+const presentationTabRegistry: StyleRegistry = [
+  [
+    baseTabStyles,
+    {
+      mode: 'append',
+      styles: [verticalRotatedTabStyles],
+    },
+  ],
+];
+
 export const PresentationTab = observer<Props>(function PresentationTab({ model, presentation, className, style, onClick }) {
   const translate = useTranslate();
-  const styles = useStyles(BASE_TAB_STYLES, VERTICAL_ROTATED_TAB_STYLES, style);
 
   if (presentation.getTabComponent) {
     const Tab = presentation.getTabComponent();
 
     return (
-      <Tab
-        tabId={presentation.id}
-        className={className}
-        style={[BASE_TAB_STYLES, VERTICAL_ROTATED_TAB_STYLES]}
-        model={model}
-        presentation={presentation}
-        disabled={model.isLoading()}
-        onClick={onClick}
-      />
+      <SContext registry={presentationTabRegistry}>
+        <Tab tabId={presentation.id} className={className} model={model} presentation={presentation} disabled={model.isLoading()} onClick={onClick} />
+      </SContext>
     );
   }
 
-  return styled(styles)(
-    <Tab tabId={presentation.id} style={[BASE_TAB_STYLES, VERTICAL_ROTATED_TAB_STYLES, style]} disabled={model.isLoading()} onClick={onClick}>
-      {presentation.icon && <TabIcon icon={presentation.icon} />}
-      {presentation.title && <TabTitle>{translate(presentation.title)}</TabTitle>}
-    </Tab>,
+  return (
+    <SContext registry={presentationTabRegistry}>
+      <TabNew tabId={presentation.id} disabled={model.isLoading()} onClick={onClick}>
+        {presentation.icon && <TabIcon icon={presentation.icon} />}
+        {presentation.title && <TabTitle>{translate(presentation.title)}</TabTitle>}
+      </TabNew>
+    </SContext>
   );
 });

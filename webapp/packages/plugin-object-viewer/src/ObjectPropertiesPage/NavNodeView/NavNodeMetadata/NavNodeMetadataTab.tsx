@@ -6,15 +6,13 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import styled from 'reshadow';
 
-import { useStyles, useTranslate } from '@cloudbeaver/core-blocks';
-import { Tab, TabIcon, TabTitle } from '@cloudbeaver/core-ui';
+import { useTranslate } from '@cloudbeaver/core-blocks';
+import { TabIcon, TabNew, TabTitle } from '@cloudbeaver/core-ui';
 import { type NavNodeTransformViewComponent, useNode } from '@cloudbeaver/plugin-navigation-tree';
 
 export const NavNodeMetadataTab: NavNodeTransformViewComponent = observer(function NavNodeMetadataTab({ folderId, nodeId, style }) {
   const translate = useTranslate();
-  const styles = useStyles(style);
   const nodeInfo = useNode(nodeId);
   const title = translate('plugin_object_viewer_object_info_tab');
 
@@ -24,10 +22,10 @@ export const NavNodeMetadataTab: NavNodeTransformViewComponent = observer(functi
 
   const icon = 'platform:/plugin/org.jkiss.dbeaver.model/icons/tree/info.png';
 
-  return styled(styles)(
-    <Tab tabId={folderId} title={title}>
+  return (
+    <TabNew tabId={folderId} title={title}>
       <TabIcon icon={icon} />
       <TabTitle>{title}</TabTitle>
-    </Tab>,
+    </TabNew>
   );
 });

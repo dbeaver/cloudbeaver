@@ -7,18 +7,17 @@
  */
 import { observer } from 'mobx-react-lite';
 import { useContext } from 'react';
-import styled from 'reshadow';
 
-import { useStyles } from '@cloudbeaver/core-blocks';
 import { useDataContext } from '@cloudbeaver/core-data-context';
-import { ITabData, Tab, TabIcon, TabTitle } from '@cloudbeaver/core-ui';
+import { ITabData, TabIcon, TabNew, TabTitle } from '@cloudbeaver/core-ui';
 import { CaptureViewContext } from '@cloudbeaver/core-view';
 import type { TabHandlerTabComponent } from '@cloudbeaver/plugin-navigation-tabs';
 import { useNode } from '@cloudbeaver/plugin-navigation-tree';
 
 import type { IObjectViewerTabState } from './IObjectViewerTabState';
 
-export const ObjectViewerTab: TabHandlerTabComponent<IObjectViewerTabState> = observer(function ObjectViewerTab({ tab, onSelect, onClose, style }) {
+// TODO check wether we need style here?
+export const ObjectViewerTab: TabHandlerTabComponent<IObjectViewerTabState> = observer(function ObjectViewerTab({ tab, onSelect, onClose }) {
   // const connectionsInfoResource = useService(ConnectionInfoResource);
   const viewContext = useContext(CaptureViewContext);
   const tabMenuContext = useDataContext(viewContext);
@@ -36,10 +35,10 @@ export const ObjectViewerTab: TabHandlerTabComponent<IObjectViewerTabState> = ob
   //   }
   // }
 
-  return styled(useStyles(style))(
-    <Tab tabId={tab.id} style={style} title={title} menuContext={tabMenuContext} onOpen={handleSelect} onClose={handleClose}>
+  return (
+    <TabNew tabId={tab.id} title={title} menuContext={tabMenuContext} onOpen={handleSelect} onClose={handleClose}>
       <TabIcon icon={node?.icon || tab.handlerState.tabIcon} />
       <TabTitle>{title}</TabTitle>
-    </Tab>,
+    </TabNew>
   );
 });
