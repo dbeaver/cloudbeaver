@@ -14,7 +14,7 @@ import { ACTION_COMMIT_MODE_TOGGLE } from './actions/ACTION_COMMIT_MODE_TOGGLE';
 import { ACTION_ROLLBACK } from './actions/ACTION_ROLLBACK';
 
 @injectable()
-export class CommitModeManagerBootstrap extends Bootstrap {
+export class TransactionManagerBootstrap extends Bootstrap {
   constructor(private readonly menuService: MenuService, private readonly actionService: ActionService) {
     super();
   }

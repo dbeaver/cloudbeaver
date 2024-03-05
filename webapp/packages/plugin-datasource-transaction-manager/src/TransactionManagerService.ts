@@ -8,6 +8,6 @@
 import { injectable } from '@cloudbeaver/core-di';
 
 @injectable()
-export class CommitModeManagerService {
+export class TransactionManagerService {
   constructor() {}
 }

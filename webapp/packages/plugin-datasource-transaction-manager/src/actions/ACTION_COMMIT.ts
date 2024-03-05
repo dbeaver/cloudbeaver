@@ -7,8 +7,8 @@
  */
 import { createAction } from '@cloudbeaver/core-view';
 
-export const ACTION_COMMIT_MODE_TOGGLE = createAction('commit-mode-toggle', {
-  label: 'plugin_datasource_commit_mode_switch_to_manual_commit_mode',
-  tooltip: 'plugin_datasource_commit_mode_switch_to_manual_commit_mode',
-  icon: '/icons/commit_mode_auto.png',
+export const ACTION_COMMIT = createAction('commit', {
+  label: 'plugin_datasource_transaction_manager_commit',
+  tooltip: 'plugin_datasource_transaction_manager_commit',
+  icon: '/icons/commit.png',
 });

@@ -1,5 +1,5 @@
 {
-  "name": "@cloudbeaver/plugin-datasource-commit-mode",
+  "name": "@cloudbeaver/plugin-datasource-transaction-manager",
   "sideEffects": [
     "src/**/*.css",
     "src/**/*.scss",
