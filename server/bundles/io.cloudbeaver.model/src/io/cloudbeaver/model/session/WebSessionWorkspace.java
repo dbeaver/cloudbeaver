@@ -85,11 +85,13 @@ public class WebSessionWorkspace implements DBPWorkspace {
         return accessibleProjects;
     }
 
+    @Nullable
     @Override
     public DBPProject getActiveProject() {
         return activeProject;
     }
 
+    @Nullable
     @Override
     public WebProjectImpl getProject(@NotNull String projectName) {
         for (WebProjectImpl project : accessibleProjects) {
@@ -148,12 +150,12 @@ public class WebSessionWorkspace implements DBPWorkspace {
     }
 
     @Override
-    public boolean hasRealmPermission(String permission) {
+    public boolean hasRealmPermission(@NotNull String permission) {
         return false;
     }
 
     @Override
-    public boolean supportsRealmFeature(String feature) {
+    public boolean supportsRealmFeature(@NotNull String feature) {
         return false;
     }
 
