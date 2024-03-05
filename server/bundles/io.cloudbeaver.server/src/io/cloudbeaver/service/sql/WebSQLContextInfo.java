@@ -29,6 +29,7 @@ import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBUtils;
 import org.jkiss.dbeaver.model.data.DBDAttributeBinding;
 import org.jkiss.dbeaver.model.exec.*;
+import org.jkiss.dbeaver.model.meta.Property;
 import org.jkiss.dbeaver.model.qm.QMTransactionState;
 import org.jkiss.dbeaver.model.qm.QMUtils;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
@@ -264,5 +265,19 @@ public class WebSQLContextInfo implements WebSessionProvider {
         };
 
         return getWebSession().createAndRunAsyncTask("Rollback transaction", runnable);
+    }
+
+    @Property
+    public Boolean isAutoCommit() throws DBWebException {
+        DBCExecutionContext context = processor.getExecutionContext();
+        DBCTransactionManager txnManager = DBUtils.getTransactionManager(context);
+        if (txnManager == null) {
+            return null;
+        }
+        try {
+            return txnManager.isAutoCommit();
+        } catch (DBException e) {
+            throw new DBWebException("Error getting auto-commit parameter from context", e);
+        }
     }
 }
