@@ -1,0 +1,1 @@
+export { datasourceCommitModePlugin } from './manifest';
