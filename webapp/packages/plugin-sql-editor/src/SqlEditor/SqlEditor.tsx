@@ -7,57 +7,25 @@
  */
 import { observer } from 'mobx-react-lite';
 import { useEffect, useMemo, useState } from 'react';
-import styled, { css } from 'reshadow';
 
-import { getComputed, useSplit } from '@cloudbeaver/core-blocks';
+import { getComputed, s, SContext, StyleRegistry, useS, useSplit } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { BASE_TAB_STYLES, ITabData, TabList, TabPanelList, TabsState, VERTICAL_ROTATED_TAB_STYLES } from '@cloudbeaver/core-ui';
+import { baseTabStyles, ITabData, TabList, TabPanelList, TabsState, verticalRotatedTabStyles } from '@cloudbeaver/core-ui';
 import { MetadataMap } from '@cloudbeaver/core-utils';
 import { useCaptureViewContext } from '@cloudbeaver/core-view';
 
 import { ISqlEditorModeProps, SqlEditorModeService } from '../SqlEditorModeService';
 import { DATA_CONTEXT_SQL_EDITOR_DATA } from './DATA_CONTEXT_SQL_EDITOR_DATA';
 import type { ISqlEditorProps } from './ISqlEditorProps';
+import styles from './SqlEditor.m.css';
 import { SQLEditorActions } from './SQLEditorActions';
 import { useSqlEditor } from './useSqlEditor';
 
-const styles = css`
-  sql-editor {
-    position: relative;
-    z-index: 0;
-    flex: 1 auto;
-    height: 100%;
-    display: flex;
-    overflow: auto;
-  }
-`;
-
-const tabStyles = css`
-  tabs {
-    composes: theme-background-secondary theme-text-on-secondary from global;
-    overflow-x: hidden;
-    padding-top: 4px;
-  }
-  Tab {
-    composes: theme-ripple theme-background-background theme-text-text-primary-on-light theme-typography--body2 from global;
-    text-transform: uppercase;
-    font-weight: normal;
-
-    &:global([aria-selected='true']) {
-      font-weight: normal !important;
-    }
-  }
-  TabList {
-    composes: theme-background-secondary theme-text-on-secondary from global;
-    margin-right: 8px;
-    margin-left: 4px;
-  }
-`;
-
-const tabListStyles = [BASE_TAB_STYLES, VERTICAL_ROTATED_TAB_STYLES, tabStyles];
+const sqlEditorRegistry: StyleRegistry = [[baseTabStyles, { mode: 'append', styles: [verticalRotatedTabStyles, styles] }]];
 
 export const SqlEditor = observer<ISqlEditorProps>(function SqlEditor({ state, className }) {
   const split = useSplit();
+  const style = useS(baseTabStyles, verticalRotatedTabStyles, styles);
   const sqlEditorModeService = useService(SqlEditorModeService);
   const data = useSqlEditor(state);
   const [modesState] = useState(() => new MetadataMap<string, any>());
@@ -85,30 +53,27 @@ export const SqlEditor = observer<ISqlEditorProps>(function SqlEditor({ state, c
     }
   }, [isEditorEmpty]);
 
-  return styled(
-    styles,
-    BASE_TAB_STYLES,
-    VERTICAL_ROTATED_TAB_STYLES,
-    tabStyles,
-  )(
-    <TabsState
-      currentTabId={state.currentModeId}
-      container={sqlEditorModeService.tabsContainer}
-      localState={modesState}
-      state={state}
-      data={data}
-      lazy
-      onChange={handleModeSelect}
-    >
-      <sql-editor className={className}>
-        <SQLEditorActions data={data} state={state} />
-        <TabPanelList />
-        {displayedEditors > 1 ? (
-          <tabs>
-            <TabList style={tabListStyles} />
-          </tabs>
-        ) : null}
-      </sql-editor>
-    </TabsState>,
+  return (
+    <SContext registry={sqlEditorRegistry}>
+      <TabsState
+        currentTabId={state.currentModeId}
+        container={sqlEditorModeService.tabsContainer}
+        localState={modesState}
+        state={state}
+        data={data}
+        lazy
+        onChange={handleModeSelect}
+      >
+        <div className={s(style, { sqlEditor: true }, className)}>
+          <SQLEditorActions data={data} state={state} />
+          <TabPanelList />
+          {displayedEditors > 1 ? (
+            <div className={s(style, { tabs: true })}>
+              <TabList className={s(style, { tabList: true })} />
+            </div>
+          ) : null}
+        </div>
+      </TabsState>
+    </SContext>
   );
 });

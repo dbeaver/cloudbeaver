@@ -19,7 +19,7 @@ interface Props {
   resultIndex: number;
   presentation: IDataPresentationOptions;
   className?: string;
-  style?: ComponentStyle;
+  style?: ComponentStyle; // TODO remove it
   onClick: (tabId: string) => void;
 }
 
