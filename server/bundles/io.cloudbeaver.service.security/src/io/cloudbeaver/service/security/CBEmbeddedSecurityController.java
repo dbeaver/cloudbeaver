@@ -258,10 +258,12 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
             try (PreparedStatement dbStat = dbCon.prepareStatement(database.normalizeTableNames(
                 "SELECT R.*,S.IS_SECRET_STORAGE FROM {table_prefix}CB_USER_TEAM UR, {table_prefix}CB_TEAM R, " +
                     "{table_prefix}CB_AUTH_SUBJECT S " +
-                    "WHERE UR.USER_ID=? AND UR.TEAM_ID IN (R.TEAM_ID," + defaultUserTeam +
-                        ") AND S.SUBJECT_ID IN (R.TEAM_ID," + defaultUserTeam + ")"))
+                    "WHERE UR.USER_ID=? AND UR.TEAM_ID IN (R.TEAM_ID,?) " +
+                        "AND S.SUBJECT_ID IN (R.TEAM_ID,?)"))
             ) {
                 dbStat.setString(1, userId);
+                dbStat.setString(2, defaultUserTeam);
+                dbStat.setString(3, defaultUserTeam);
                 try (ResultSet dbResult = dbStat.executeQuery()) {
                     while (dbResult.next()) {
                         var team = fetchTeam(dbResult);
@@ -909,22 +911,27 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
     @Override
     public SMTeam[] readAllTeams() throws DBCException {
         try (Connection dbCon = database.openConnection()) {
+            String defaultUserTeam = application.getAppConfiguration().getDefaultUserTeam();
             Map<String, SMTeam> teams = new LinkedHashMap<>();
-            try (Statement dbStat = dbCon.createStatement()) {
-                String defaultUserTeam = application.getAppConfiguration().getDefaultUserTeam();
-                try (ResultSet dbResult = dbStat.executeQuery(
-                    database.normalizeTableNames("SELECT T.*,S.IS_SECRET_STORAGE FROM {table_prefix}CB_TEAM T," +
-                        "{table_prefix}CB_AUTH_SUBJECT S " +
-                        "WHERE T.TEAM_ID IN (S.SUBJECT_ID," + defaultUserTeam + ") ORDER BY TEAM_ID"))) {
+            String query = database.normalizeTableNames(
+                    "SELECT T.*, S.IS_SECRET_STORAGE FROM {table_prefix}CB_TEAM T, " +
+                            "{table_prefix}CB_AUTH_SUBJECT S " +
+                            "WHERE T.TEAM_ID IN (S.SUBJECT_ID, ?) ORDER BY TEAM_ID");
+            try (PreparedStatement dbPreparedStatement = dbCon.prepareStatement(query)) {
+                dbPreparedStatement.setString(1, defaultUserTeam);
+                try (ResultSet dbResult = dbPreparedStatement.executeQuery()) {
                     while (dbResult.next()) {
                         SMTeam team = fetchTeam(dbResult);
                         teams.put(team.getTeamId(), team);
                     }
                 }
-                try (ResultSet dbResult = dbStat.executeQuery(
-                    database.normalizeTableNames("SELECT SUBJECT_ID,PERMISSION_ID\n" +
-                        "FROM {table_prefix}CB_AUTH_PERMISSIONS AP, {table_prefix}CB_TEAM R\n" +
-                        "WHERE AP.SUBJECT_ID IN (R.TEAM_ID," + defaultUserTeam + ")\n"))) {
+            }
+            query = database.normalizeTableNames("SELECT SUBJECT_ID,PERMISSION_ID\n" +
+                    "FROM {table_prefix}CB_AUTH_PERMISSIONS AP, {table_prefix}CB_TEAM R\n" +
+                    "WHERE AP.SUBJECT_ID IN (R.TEAM_ID,?)\n");
+            try (PreparedStatement dbPreparedStatement = dbCon.prepareStatement(query)) {
+                dbPreparedStatement.setString(1, defaultUserTeam);
+                try (ResultSet dbResult = dbPreparedStatement.executeQuery()) {
                     while (dbResult.next()) {
                         SMTeam team = teams.get(dbResult.getString(1));
                         if (team != null) {
@@ -1176,10 +1183,11 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
             try (PreparedStatement dbStat = dbCon.prepareStatement(
                 database.normalizeTableNames(
                     "SELECT DISTINCT AP.PERMISSION_ID FROM {table_prefix}CB_AUTH_PERMISSIONS AP, {table_prefix}CB_USER_TEAM UR\n" +
-                        "WHERE UR.TEAM_ID IN (AP.SUBJECT_ID," + defaultUserTeam + ") AND UR.USER_ID=?"
+                        "WHERE UR.TEAM_ID IN (AP.SUBJECT_ID,?) AND UR.USER_ID=?"
                 )
             )) {
-                dbStat.setString(1, userId);
+                dbStat.setString(1, defaultUserTeam);
+                dbStat.setString(2, userId);
                 try (ResultSet dbResult = dbStat.executeQuery()) {
                     while (dbResult.next()) {
                         permissions.add(dbResult.getString(1));
