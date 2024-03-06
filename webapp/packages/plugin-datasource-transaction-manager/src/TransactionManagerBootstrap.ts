@@ -48,7 +48,41 @@ export class TransactionManagerBootstrap extends Bootstrap {
 
         return action.info;
       },
-      isHidden: (context, action) => {
+      isDisabled: (_, action) => {
+        const context = this.transactionManagerService.currentContext;
+
+        if (!context) {
+          return false;
+        }
+
+        const state = this.transactionManagerService.processState.get(context.connectionId);
+
+        if (!state) {
+          return false;
+        }
+
+        return state.mode || state.commit || state.rollback;
+      },
+      isLoading: (_, action) => {
+        const context = this.transactionManagerService.currentContext;
+
+        if (!context) {
+          return false;
+        }
+
+        const state = this.transactionManagerService.processState.get(context.connectionId);
+
+        if (!state) {
+          return false;
+        }
+
+        if (action === ACTION_COMMIT_MODE_TOGGLE) {
+          return state.mode;
+        }
+
+        return action === ACTION_COMMIT ? state.commit : state.rollback;
+      },
+      isHidden: (_, action) => {
         if (action === ACTION_COMMIT || action === ACTION_ROLLBACK) {
           return this.transactionManagerService.autoCommitMode;
         }
