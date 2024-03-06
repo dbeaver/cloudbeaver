@@ -6,19 +6,18 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import styled from 'reshadow';
 
-import { Translate, useStyles } from '@cloudbeaver/core-blocks';
-import { Tab, TabContainerTabComponent, TabTitle } from '@cloudbeaver/core-ui';
+import { Translate } from '@cloudbeaver/core-blocks';
+import { TabContainerTabComponent, TabNew, TabTitle } from '@cloudbeaver/core-ui';
 
 import type { UserFormProps } from '../AdministrationUserFormService';
 
-export const UserFormOriginInfoTab: TabContainerTabComponent<UserFormProps> = observer(function UserFormOriginInfoTab({ tabId, style, ...rest }) {
-  return styled(useStyles(style))(
-    <Tab {...rest} tabId={tabId} style={style}>
+export const UserFormOriginInfoTab: TabContainerTabComponent<UserFormProps> = observer(function UserFormOriginInfoTab({ tabId, ...rest }) {
+  return (
+    <TabNew {...rest} tabId={tabId}>
       <TabTitle>
         <Translate token="authentication_administration_user_auth_methods" />
       </TabTitle>
-    </Tab>,
+    </TabNew>
   );
 });

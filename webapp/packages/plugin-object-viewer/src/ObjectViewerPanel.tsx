@@ -118,7 +118,7 @@ export const ObjectViewerPanel: TabHandlerPanelComponent<IObjectViewerTabState> 
         <TabsBox
           currentTabId={tab.handlerState.pageId}
           tabs={pages.map(page => (
-            <DBObjectPageTab key={page.key} tab={tab} page={page} style={styles} onSelect={dbObjectPagesService.selectPage} />
+            <DBObjectPageTab key={page.key} tab={tab} page={page} onSelect={dbObjectPagesService.selectPage} />
           ))}
           localState={innerTabState}
         >

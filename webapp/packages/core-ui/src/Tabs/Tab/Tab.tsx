@@ -25,7 +25,18 @@ import { MENU_TAB } from './MENU_TAB';
 import type { TabProps } from './TabProps';
 import { useTab } from './useTab';
 
-export const Tab = observer<TabProps>(function Tab({ tabId, title, menuContext, disabled, className, children, style, onOpen, onClose, onClick }) {
+export const Tab = observer<TabProps & { style: ComponentStyle }>(function Tab({
+  tabId,
+  title,
+  style,
+  menuContext,
+  disabled,
+  className,
+  children,
+  onOpen,
+  onClose,
+  onClick,
+}) {
   const translate = useTranslate();
   const ref = useRef<HTMLButtonElement>(null);
   const tabContext = useMemo(() => ({ tabId }), [tabId]);

@@ -8,7 +8,6 @@
 import { useContext, useMemo } from 'react';
 
 import { Translate } from '@cloudbeaver/core-blocks';
-import type { ComponentStyle } from '@cloudbeaver/core-theming';
 
 import { TabContext } from '../TabContext';
 import type { ITabData } from '../TabsContainer/ITabsContainer';
@@ -24,7 +23,6 @@ interface Props<T = Record<string, any>> {
   name?: string;
   component?: React.FC<TabProps & T>;
   className?: string;
-  style?: ComponentStyle;
   disabled?: boolean;
   onOpen?: (tab: ITabData<any>) => void;
   onClose?: (tab: ITabData<any>) => void;
@@ -36,7 +34,6 @@ export function TabDefault<T = Record<string, any>>({
   name,
   component,
   className,
-  style, // TODO remove it
   disabled,
   onOpen,
   onClose,
@@ -54,7 +51,6 @@ export function TabDefault<T = Record<string, any>>({
           tabId={tabId}
           className={className}
           {...(rest as unknown as T)}
-          style={style}
           selected={selected}
           disabled={disabled}
           onOpen={onOpen}
@@ -65,7 +61,7 @@ export function TabDefault<T = Record<string, any>>({
   }
 
   return (
-    <TabNew tabId={tabId} className={className} style={style} selected={selected} disabled={disabled} onOpen={onOpen} onClose={onClose}>
+    <TabNew tabId={tabId} className={className} selected={selected} disabled={disabled} onOpen={onOpen} onClose={onClose}>
       {icon && <TabIcon icon={icon} />}
       {name && (
         <TabTitle>

@@ -15,7 +15,7 @@ import type { ObjectPageTabComponent } from '@cloudbeaver/plugin-object-viewer';
 
 import type { IDataViewerPageState } from '../IDataViewerPageState';
 
-export const DataViewerTab: ObjectPageTabComponent<IDataViewerPageState> = observer(function DataViewerTab({ tab, page, onSelect, style }) {
+export const DataViewerTab: ObjectPageTabComponent<IDataViewerPageState> = observer(function DataViewerTab({ tab, page, onSelect }) {
   const navNodeManagerService = useService(NavNodeManagerService);
 
   if (!navNodeManagerService.isNodeHasData(tab.handlerState.objectId)) {
@@ -23,7 +23,7 @@ export const DataViewerTab: ObjectPageTabComponent<IDataViewerPageState> = obser
   }
 
   return (
-    <TabNew tabId={page.key} style={style} onOpen={onSelect}>
+    <TabNew tabId={page.key} onOpen={onSelect}>
       <TabIcon icon="table-icon" />
       <TabTitle>
         <Translate token="data_viewer_tab_title" />

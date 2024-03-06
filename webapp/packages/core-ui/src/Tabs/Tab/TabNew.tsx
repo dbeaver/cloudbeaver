@@ -11,7 +11,6 @@ import { Tab as BaseTab } from 'reakit/Tab';
 
 import { getComputed, Icon, s, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import type { IDataContext } from '@cloudbeaver/core-data-context';
-import type { ComponentStyle } from '@cloudbeaver/core-theming';
 import { useMenu } from '@cloudbeaver/core-view';
 
 import { baseTabActionStyles, baseTabStyles } from '../..';
@@ -24,18 +23,7 @@ import { MENU_TAB } from './MENU_TAB';
 import type { TabProps } from './TabProps';
 import { useTab } from './useTab';
 
-export const TabNew = observer<TabProps>(function TabNew({
-  tabId,
-  title,
-  menuContext,
-  disabled,
-  className,
-  children,
-  style, // TODO remove this style and use context instead
-  onOpen,
-  onClose,
-  onClick,
-}) {
+export const TabNew = observer<TabProps>(function TabNew({ tabId, title, menuContext, disabled, className, children, onOpen, onClose, onClick }) {
   const translate = useTranslate();
   const ref = useRef<HTMLButtonElement>(null);
   const tabContext = useMemo(() => ({ tabId }), [tabId]);
@@ -55,7 +43,7 @@ export const TabNew = observer<TabProps>(function TabNew({
                 <Icon className={s(styles, { tabIcon: true })} name="cross-bold" viewBox="0 0 7 8" />
               </div>
             )}
-            <TabMenuNew tabId={tabId} state={tab.state} menuContext={menuContext} style={style as any} />
+            <TabMenuNew tabId={tabId} state={tab.state} menuContext={menuContext} />
           </div>
           <BaseTab
             ref={ref}
@@ -79,10 +67,9 @@ interface TabMenuProps {
   tabId: string;
   state: ITabsContext<any>;
   menuContext?: IDataContext;
-  style?: ComponentStyle;
 }
 
-const TabMenuNew = observer<TabMenuProps>(function TabMenuNew({ tabId, state, menuContext, style }) {
+const TabMenuNew = observer<TabMenuProps>(function TabMenuNew({ tabId, state, menuContext }) {
   const styles = useS(baseTabStyles, baseTabActionStyles);
 
   const [menuOpened, switchState] = useState(false);

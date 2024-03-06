@@ -6,23 +6,21 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import styled from 'reshadow';
 
-import { Translate, useResource, useStyles } from '@cloudbeaver/core-blocks';
+import { Translate, useResource } from '@cloudbeaver/core-blocks';
 import { NetworkHandlerResource, SSH_TUNNEL_ID } from '@cloudbeaver/core-connections';
-import { Tab, TabContainerTabComponent, TabTitle } from '@cloudbeaver/core-ui';
+import { TabContainerTabComponent, TabNew, TabTitle } from '@cloudbeaver/core-ui';
 
 import type { IConnectionFormProps } from '../IConnectionFormProps';
 
-export const SSHTab: TabContainerTabComponent<IConnectionFormProps> = observer(function SSHTab({ style, ...rest }) {
-  const styles = useStyles(style);
+export const SSHTab: TabContainerTabComponent<IConnectionFormProps> = observer(function SSHTab(props) {
   const handler = useResource(SSHTab, NetworkHandlerResource, SSH_TUNNEL_ID);
 
-  return styled(styles)(
-    <Tab {...rest} title={handler.data?.description} style={style}>
+  return (
+    <TabNew {...props} title={handler.data?.description}>
       <TabTitle>
         <Translate token={handler.data?.label || 'connections_network_handler_ssh_tunnel_title'} />
       </TabTitle>
-    </Tab>,
+    </TabNew>
   );
 });

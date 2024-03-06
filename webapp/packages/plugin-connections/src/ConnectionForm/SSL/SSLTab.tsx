@@ -6,20 +6,18 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import styled from 'reshadow';
 
-import { Translate, useResource, useStyles } from '@cloudbeaver/core-blocks';
+import { Translate, useResource } from '@cloudbeaver/core-blocks';
 import { DBDriverResource, NetworkHandlerResource } from '@cloudbeaver/core-connections';
 import { CachedMapAllKey } from '@cloudbeaver/core-resource';
-import { Tab, TabContainerTabComponent, TabTitle } from '@cloudbeaver/core-ui';
+import { TabContainerTabComponent, TabNew, TabTitle } from '@cloudbeaver/core-ui';
 
 import type { IConnectionFormProps } from '../IConnectionFormProps';
 import { getSSLDriverHandler } from './getSSLDriverHandler';
 
-export const SSLTab: TabContainerTabComponent<IConnectionFormProps> = observer(function SSLTab({ style, ...rest }) {
-  const styles = useStyles(style);
+export const SSLTab: TabContainerTabComponent<IConnectionFormProps> = observer(function SSLTab(props) {
   const networkHandlerResource = useResource(SSLTab, NetworkHandlerResource, CachedMapAllKey);
-  const dbDriverResource = useResource(SSLTab, DBDriverResource, rest.state.config.driverId ?? null);
+  const dbDriverResource = useResource(SSLTab, DBDriverResource, props.state.config.driverId ?? null);
 
   const handler = getSSLDriverHandler(networkHandlerResource.resource.values, dbDriverResource.data?.applicableNetworkHandlers ?? []);
 
@@ -27,11 +25,11 @@ export const SSLTab: TabContainerTabComponent<IConnectionFormProps> = observer(f
     return null;
   }
 
-  return styled(styles)(
-    <Tab {...rest} title={handler.description} style={style}>
+  return (
+    <TabNew {...props} title={handler.description}>
       <TabTitle>
         <Translate token={handler.label} />
       </TabTitle>
-    </Tab>,
+    </TabNew>
   );
 });

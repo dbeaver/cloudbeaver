@@ -6,19 +6,18 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import styled from 'reshadow';
 
-import { Translate, useStyles } from '@cloudbeaver/core-blocks';
-import { Tab, TabContainerTabComponent, TabTitle } from '@cloudbeaver/core-ui';
+import { Translate } from '@cloudbeaver/core-blocks';
+import { TabContainerTabComponent, TabNew, TabTitle } from '@cloudbeaver/core-ui';
 
 import type { IConnectionFormProps } from '../IConnectionFormProps';
 
-export const OriginInfoTab: TabContainerTabComponent<IConnectionFormProps> = observer(function OriginInfoTab({ state: { info }, style, ...rest }) {
-  return styled(useStyles(style))(
-    <Tab {...rest} style={style}>
+export const OriginInfoTab: TabContainerTabComponent<IConnectionFormProps> = observer(function OriginInfoTab({ state: { info }, ...rest }) {
+  return (
+    <TabNew {...rest}>
       <TabTitle>
         <Translate token={info?.origin?.displayName || 'Origin'} />
       </TabTitle>
-    </Tab>,
+    </TabNew>
   );
 });
