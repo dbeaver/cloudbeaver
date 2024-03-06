@@ -8,11 +8,19 @@
 import { action, untracked } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import { useRef } from 'react';
-import styled from 'reshadow';
 
-import { s, useS, useStyles, useUserData } from '@cloudbeaver/core-blocks';
+import { s, SContext, StyleRegistry, useS, useUserData } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { BASE_TAB_STYLES, ITabData, TabList, TabPanelList, TabsState, UNDERLINE_TAB_STYLES } from '@cloudbeaver/core-ui';
+import {
+  BASE_TAB_STYLES,
+  baseTabStyles,
+  ITabData,
+  TabList,
+  TabPanelListNew,
+  TabsState,
+  UNDERLINE_TAB_STYLES,
+  underlineTabStyles,
+} from '@cloudbeaver/core-ui';
 import { isArraysEqual } from '@cloudbeaver/core-utils';
 
 import styles from './ToolsPanel.m.css';
@@ -22,9 +30,11 @@ interface IToolsState {
   selectedTabId: string | undefined;
 }
 
+const ToolsPanelRegistry: StyleRegistry = [[baseTabStyles, { mode: 'append', styles: [underlineTabStyles, styles] }]];
+
 export const ToolsPanel = observer(function ToolsPanel() {
   const toolsPanelService = useService(ToolsPanelService);
-  const style = useS(styles);
+  const style = useS(baseTabStyles, underlineTabStyles, styles);
 
   const state = useUserData<IToolsState>('tools', () => ({ selectedTabId: undefined }));
   const tabStyle = [BASE_TAB_STYLES, UNDERLINE_TAB_STYLES];
@@ -61,14 +71,16 @@ export const ToolsPanel = observer(function ToolsPanel() {
     state.selectedTabId = tab.tabId;
   }
 
-  return styled(useStyles(tabStyle))(
-    <TabsState currentTabId={state.selectedTabId} container={toolsPanelService.tabsContainer} lazy onChange={handleTabChange}>
-      <div className={s(style, { box: true })}>
-        <TabList className={s(style, { tabList: true })} style={tabStyle} />
-        <div className={s(style, { contentBox: true })}>
-          <TabPanelList style={tabStyle} />
+  return (
+    <SContext registry={ToolsPanelRegistry}>
+      <TabsState currentTabId={state.selectedTabId} container={toolsPanelService.tabsContainer} lazy onChange={handleTabChange}>
+        <div className={s(style, { box: true })}>
+          <TabList className={s(style, { tabList: true })} style={tabStyle} />
+          <div className={s(style, { contentBox: true })}>
+            <TabPanelListNew />
+          </div>
         </div>
-      </div>
-    </TabsState>,
+      </TabsState>
+    </SContext>
   );
 });
