@@ -22,7 +22,7 @@ import {
   useStyles,
 } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { BASE_TAB_STYLES, OptionsPanelService, TabList, TabsState, verticalTabStyles } from '@cloudbeaver/core-ui';
+import { BASE_TAB_STYLES, OptionsPanelService, TabList, TabsState, verticalTabStylesDeprecated } from '@cloudbeaver/core-ui';
 import { CaptureView } from '@cloudbeaver/core-view';
 
 import { AdministrationCaptureViewContext } from './AdministrationCaptureViewContext';
@@ -119,7 +119,7 @@ export const Administration = observer<React.PropsWithChildren<Props>>(function 
     contentRef.current?.scrollTo({ top: 0, left: 0 });
   }, [activeScreen?.item]);
 
-  return styled(useStyles(BASE_TAB_STYLES, verticalTabStyles, administrationStyles, tabsStyles))(
+  return styled(useStyles(BASE_TAB_STYLES, verticalTabStylesDeprecated, administrationStyles, tabsStyles))(
     <CaptureView view={administrationViewService}>
       <SContext registry={registry}>
         <AdministrationCaptureViewContext />
@@ -130,7 +130,7 @@ export const Administration = observer<React.PropsWithChildren<Props>>(function 
                 key={item.name}
                 item={item}
                 configurationWizard={configurationWizard}
-                style={[BASE_TAB_STYLES, verticalTabStyles, tabsStyles]}
+                style={[BASE_TAB_STYLES, verticalTabStylesDeprecated, tabsStyles]}
                 disabled={!!(onlyActiveItem && onlyActiveItem.filterOnlyActive?.(configurationWizard, item) !== true)}
                 onSelect={onItemSelect}
               />

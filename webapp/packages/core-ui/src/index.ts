@@ -50,6 +50,7 @@ export { default as baseTabActionStyles } from './Tabs/Tab/baseTabAction.m.css';
 export { default as verticalRotatedTabStyles } from './Tabs/Tab/verticalRotatedTab.m.css';
 export { default as tabsBoxStyles } from './Tabs/TabsBox/TabsBox.m.css';
 export { default as tabPanelStyles } from './Tabs/TabPanel.m.css';
+export { default as verticalTabStyles } from './Tabs/Tab/verticalTabStyles.m.css';
 
 export * from './Tabs/Tab/BASE_TAB_STYLES';
 export * from './Tabs/Tab/BorderTabStyles';
@@ -65,7 +66,7 @@ export * from './Tabs/Tab/TabTitle';
 export * from './Tabs/Tab/useTab';
 export * from './Tabs/Tab/VERTICAL_ROTATED_TAB_STYLES';
 export * from './Tabs/Tab/UnderlineTabStyles';
-export * from './Tabs/Tab/verticalTabStyles';
+export * from './Tabs/Tab/verticalTabStylesDeprecated';
 export * from './Tabs/TabsBootstrap';
 
 export * from './Tabs/TabsBox/TabsBox';

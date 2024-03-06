@@ -1,0 +1,31 @@
+.baseTab {
+  composes: theme-ripple theme-background-background theme-ripple-selectable from global;
+  color: inherit;
+}
+
+.verticalTabs {
+  composes: theme-border-color-background from global;
+  border-top: 1px solid;
+  flex: 1;
+}
+
+.tabPanel {
+  overflow: auto !important;
+}
+
+.tabList {
+  composes: theme-background-surface theme-text-on-surface theme-border-color-background from global;
+  border-right: 1px solid;
+}
+
+.tabTitle {
+  flex: 1;
+}
+
+.tabLoader {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  margin-right: 16px;
+  overflow: hidden;
+}

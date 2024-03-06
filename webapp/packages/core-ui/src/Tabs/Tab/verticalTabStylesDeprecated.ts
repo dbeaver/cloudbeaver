@@ -7,7 +7,7 @@
  */
 import { css } from 'reshadow';
 
-export const verticalTabStyles = css`
+export const verticalTabStylesDeprecated = css`
   Tab {
     overflow: auto;
     border: none !important;

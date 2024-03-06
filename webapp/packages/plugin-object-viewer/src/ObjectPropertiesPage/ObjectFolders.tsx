@@ -7,61 +7,56 @@
  */
 import { observer } from 'mobx-react-lite';
 import { useEffect } from 'react';
-import styled, { css } from 'reshadow';
 
-import { TextPlaceholder, useResource, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
+import { s, SContext, StyleRegistry, TextPlaceholder, useResource, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { NavNodeManagerService, NavTreeResource } from '@cloudbeaver/core-navigation-tree';
-import { BASE_TAB_STYLES, ITabData, TabList, TabPanel, TabsState, useTabLocalState, verticalTabStyles } from '@cloudbeaver/core-ui';
+import { baseTabStyles, ITabData, TabList, TabPanel, TabsState, useTabLocalState, verticalTabStyles } from '@cloudbeaver/core-ui';
 import { MetadataMap } from '@cloudbeaver/core-utils';
 import type { ITab } from '@cloudbeaver/plugin-navigation-tabs';
 import { NavNodeViewService } from '@cloudbeaver/plugin-navigation-tree';
 
+import { navNodeTabStyle } from '..';
 import type { IObjectViewerTabState } from '../IObjectViewerTabState';
 import { FolderPanelRenderer } from './FolderPanelRenderer';
 import { FolderTabRenderer } from './FolderTabRenderer';
-
-const styles = css`
-  Tab {
-    composes: theme-ripple theme-background-background theme-ripple-selectable from global;
-    color: inherit;
-  }
-  vertical-tabs {
-    composes: theme-border-color-background from global;
-    border-top: 1px solid;
-    flex: 1;
-  }
-  TabPanel {
-    overflow: auto !important;
-  }
-  TabList {
-    composes: theme-background-surface theme-text-on-surface theme-border-color-background from global;
-    border-right: 1px solid;
-  }
-  TabTitle {
-    flex: 1;
-  }
-  tab-loader {
-    width: 16px;
-    height: 16px;
-    flex-shrink: 0;
-    margin-right: 16px;
-    overflow: hidden;
-  }
-`;
-
-const tabStyles = [BASE_TAB_STYLES, verticalTabStyles, styles];
+import styles from './ObjectFolders.m.css';
 
 interface IProps {
   tab: ITab<IObjectViewerTabState>;
 }
 
+// TODO fix incorrect background on select
+const objectFoldersRegistry: StyleRegistry = [
+  [
+    navNodeTabStyle,
+    {
+      mode: 'append',
+      styles: [styles],
+    },
+  ],
+  [
+    baseTabStyles,
+    {
+      mode: 'append',
+      styles: [styles],
+    },
+  ],
+  [
+    styles,
+    {
+      mode: 'append',
+      styles: [verticalTabStyles],
+    },
+  ],
+];
+
 export const ObjectFolders = observer<IProps>(function ObjectFolders({ tab }) {
   const translate = useTranslate();
-  const style = useStyles(BASE_TAB_STYLES, verticalTabStyles, styles);
   const navNodeManagerService = useService(NavNodeManagerService);
   const navNodeViewService = useService(NavNodeViewService);
   const innerTabState = useTabLocalState(() => new MetadataMap<string, any>());
+  const style = useS(baseTabStyles, styles, verticalTabStyles);
 
   const nodeId = tab.handlerState.objectId;
   const parentId = tab.handlerState.parentId;
@@ -91,26 +86,26 @@ export const ObjectFolders = observer<IProps>(function ObjectFolders({ tab }) {
     }
   });
 
-  return styled(style)(
-    <>
+  return (
+    <SContext registry={objectFoldersRegistry}>
       {folders.length > 0 ? (
         <TabsState currentTabId={folderId} orientation="vertical" localState={innerTabState} lazy onChange={openFolder}>
-          <vertical-tabs>
-            <TabList aria-label="Object folders">
+          <div className={s(style, { verticalTabs: true })}>
+            <TabList className={s(style, { tabList: true })} aria-label="Object folders">
               {folders.map(folderId => (
-                <FolderTabRenderer key={folderId} nodeId={nodeId} folderId={folderId} parents={parents} style={tabStyles} />
+                <FolderTabRenderer key={folderId} nodeId={nodeId} folderId={folderId} parents={parents} />
               ))}
             </TabList>
             {folders.map(folderId => (
-              <TabPanel key={folderId} tabId={folderId}>
-                <FolderPanelRenderer key={folderId} nodeId={nodeId} folderId={folderId} parents={parents} style={tabStyles} />
+              <TabPanel key={folderId} className={s(style, { tabPanel: true })} tabId={folderId}>
+                <FolderPanelRenderer key={folderId} nodeId={nodeId} folderId={folderId} parents={parents} />
               </TabPanel>
             ))}
-          </vertical-tabs>
+          </div>
         </TabsState>
       ) : (
         <TextPlaceholder>{translate('plugin_object_viewer_table_no_items')}</TextPlaceholder>
       )}
-    </>,
+    </SContext>
   );
 });
