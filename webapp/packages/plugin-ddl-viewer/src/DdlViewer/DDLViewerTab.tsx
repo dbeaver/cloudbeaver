@@ -12,7 +12,7 @@ import type { NavNodeTransformViewComponent } from '@cloudbeaver/plugin-navigati
 
 import { NAV_NODE_DDL_ID } from '../NAV_NODE_DDL_ID';
 
-export const DDLViewerTab: NavNodeTransformViewComponent = observer(function DDLViewerTab({ folderId, style }) {
+export const DDLViewerTab: NavNodeTransformViewComponent = observer(function DDLViewerTab({ folderId }) {
   const title = folderId.startsWith(NAV_NODE_DDL_ID) ? 'DDL' : 'Body';
 
   return (

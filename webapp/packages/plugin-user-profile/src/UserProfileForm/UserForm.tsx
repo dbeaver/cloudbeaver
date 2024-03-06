@@ -44,8 +44,8 @@ export const UserForm = observer<Props>(function UserForm({ user, state, onClose
               <StatusMessage type={ENotificationType.Info} message={state.info.statusMessage} />
             </div>
             <TabList className={s(moduleStyle, { tabList: true })} aria-label="User Settings" style={style} disabled={state.info.disabled}>
-              <UserInfoTab style={style} />
-              {localProvider && <AuthenticationTab style={style} />}
+              <UserInfoTab />
+              {localProvider && <AuthenticationTab />}
             </TabList>
           </div>
           <div className={s(moduleStyle, { topBarActions: true })}>

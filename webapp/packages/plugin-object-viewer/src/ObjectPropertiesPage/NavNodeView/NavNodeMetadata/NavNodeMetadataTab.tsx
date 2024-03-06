@@ -11,7 +11,7 @@ import { useTranslate } from '@cloudbeaver/core-blocks';
 import { TabIcon, TabNew, TabTitle } from '@cloudbeaver/core-ui';
 import { type NavNodeTransformViewComponent, useNode } from '@cloudbeaver/plugin-navigation-tree';
 
-export const NavNodeMetadataTab: NavNodeTransformViewComponent = observer(function NavNodeMetadataTab({ folderId, nodeId, style }) {
+export const NavNodeMetadataTab: NavNodeTransformViewComponent = observer(function NavNodeMetadataTab({ folderId, nodeId }) {
   const translate = useTranslate();
   const nodeInfo = useNode(nodeId);
   const title = translate('plugin_object_viewer_object_info_tab');
