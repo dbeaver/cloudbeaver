@@ -257,6 +257,9 @@ public abstract class CBApplication extends BaseWebApplication implements WebAut
             if (configPath == null) {
                 return;
             }
+            if (CommonUtils.isEmpty(this.appConfiguration.getDefaultUserTeam())) {
+                throw new DBException("Default user team must be specified");
+            }
         } catch (DBException e) {
             log.error(e);
             return;
