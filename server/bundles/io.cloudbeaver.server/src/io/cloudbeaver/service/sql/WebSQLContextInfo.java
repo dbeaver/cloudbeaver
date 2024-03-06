@@ -222,9 +222,7 @@ public class WebSQLContextInfo implements WebSessionProvider {
                     }
                     result = """
                     Transaction has been committed
-                    
                     Query count: %s
-                    
                     Duration: %s
                     """.formatted(
                         txnInfo.getUpdateCount(),
@@ -252,9 +250,7 @@ public class WebSQLContextInfo implements WebSessionProvider {
                     }
                     result = """
                     Transaction has been rolled back
-                    
                     Query count: %s
-                    
                     Duration: %s
                     """.formatted(
                         txnInfo.getUpdateCount(),
