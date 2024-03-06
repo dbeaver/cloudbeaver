@@ -8,9 +8,7 @@
 import { observer } from 'mobx-react-lite';
 import { useContext } from 'react';
 
-import { AdministrationSettingsService } from '@cloudbeaver/core-administration';
 import { FormContext, GroupTitle, PlaceholderComponent, Switch, useResource, useTranslate } from '@cloudbeaver/core-blocks';
-import { useService } from '@cloudbeaver/core-di';
 import { FeaturesResource } from '@cloudbeaver/core-root';
 
 import type { IConfigurationPlaceholderProps } from '../ServerConfigurationService';
@@ -23,7 +21,6 @@ export const ServerConfigurationFeaturesForm: PlaceholderComponent<IConfiguratio
       throw new Error('Form state should be provided');
     }
 
-    const administrationSettingsService = useService(AdministrationSettingsService);
     const features = useResource(ServerConfigurationFeaturesForm, FeaturesResource, configurationWizard ? null : undefined);
     const translate = useTranslate();
 
@@ -41,7 +38,7 @@ export const ServerConfigurationFeaturesForm: PlaceholderComponent<IConfiguratio
             name="enabledFeatures"
             state={serverConfig}
             description={feature.description}
-            disabled={administrationSettingsService.isBase(feature.id)}
+            disabled={features.resource.isBase(feature.id)}
             mod={['primary']}
             small
           >
