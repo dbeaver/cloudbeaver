@@ -56,7 +56,6 @@ export { default as underlineTabStyles } from './Tabs/Tab/underlineTabStyles.m.c
 export { default as underlineTabBigStyles } from './Tabs/Tab/underlineTabBigStyles.m.css';
 
 export * from './Tabs/Tab/BASE_TAB_STYLES';
-export * from './Tabs/Tab/BorderTabStyles';
 export * from './Tabs/Tab/DATA_CONTEXT_TAB_ID';
 export * from './Tabs/Tab/DATA_CONTEXT_TABS_CONTEXT';
 export * from './Tabs/Tab/MENU_TAB';
