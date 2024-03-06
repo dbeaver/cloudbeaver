@@ -37,6 +37,7 @@ export * from './Tabs/ITab';
 export * from './Tabs/TabContext';
 export * from './Tabs/TabList';
 export * from './Tabs/TabPanel';
+export * from './Tabs/TabPanelListNew';
 export * from './Tabs/TabPanelList';
 export * from './Tabs/TabPanelProps';
 export * from './Tabs/TabsContainer/ITabsContainer';
@@ -51,6 +52,8 @@ export { default as verticalRotatedTabStyles } from './Tabs/Tab/verticalRotatedT
 export { default as tabsBoxStyles } from './Tabs/TabsBox/TabsBox.m.css';
 export { default as tabPanelStyles } from './Tabs/TabPanel.m.css';
 export { default as verticalTabStyles } from './Tabs/Tab/verticalTabStyles.m.css';
+export { default as underlineTabStyles } from './Tabs/Tab/underlineTabStyles.m.css';
+export { default as underlineTabBigStyles } from './Tabs/Tab/underlineTabBigStyles.m.css';
 
 export * from './Tabs/Tab/BASE_TAB_STYLES';
 export * from './Tabs/Tab/BorderTabStyles';

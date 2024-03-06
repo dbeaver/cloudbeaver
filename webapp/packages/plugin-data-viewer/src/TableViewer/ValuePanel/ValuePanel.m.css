@@ -1,0 +1,30 @@
+.tableLeftBar {
+  display: flex;
+}
+.tabList {
+  composes: theme-border-color-background from global;
+  position: relative;
+
+  &:before {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    border-bottom: solid 2px;
+    border-color: inherit;
+  }
+}
+.tabList .tabOuter:only-child {
+  display: none;
+}
+
+.tabPanel {
+  padding-top: 8px;
+}
+
+.tabList,
+.tabPanel {
+  composes: theme-background-secondary theme-text-on-secondary from global;
+}
+
+// TODO delete selected tab background. only underline styles should remain
