@@ -140,6 +140,7 @@ public class WebSession extends BaseWebSession
         refreshSessionAuth();
     }
 
+    @Nullable
     @Override
     public SMSessionPrincipal getSessionPrincipal() {
         synchronized (authTokens) {
