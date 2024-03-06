@@ -7,18 +7,30 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import { Button, Container, Form, s, StatusMessage, useAutoLoad, useForm, useS, useTranslate } from '@cloudbeaver/core-blocks';
+import {
+  Button,
+  Container,
+  Form,
+  s,
+  SContext,
+  StatusMessage,
+  StyleRegistry,
+  useAutoLoad,
+  useForm,
+  useS,
+  useTranslate,
+} from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import {
-  BASE_TAB_STYLES,
+  baseTabStyles,
   FormMode,
   IFormState,
   TabList,
-  TabPanelList,
+  TabPanelListNew,
   TabsState,
-  UNDERLINE_TAB_BIG_STYLES,
-  UNDERLINE_TAB_STYLES,
+  underlineTabBigStyles,
+  underlineTabStyles,
 } from '@cloudbeaver/core-ui';
 import { getFirstException } from '@cloudbeaver/core-utils';
 
@@ -32,7 +44,8 @@ interface Props {
   onClose: () => void;
 }
 
-const deprecatedStyle = [BASE_TAB_STYLES, UNDERLINE_TAB_STYLES, UNDERLINE_TAB_BIG_STYLES];
+const userFormRegistry: StyleRegistry = [[baseTabStyles, { mode: 'append', styles: [underlineTabStyles, underlineTabBigStyles] }]];
+
 export const AdministrationUserForm = observer<Props>(function AdministrationUserForm({ state, onClose }) {
   const styles = useS(style);
   const translate = useTranslate();
@@ -73,30 +86,32 @@ export const AdministrationUserForm = observer<Props>(function AdministrationUse
 
   return (
     <Form context={form} className={s(styles, { submittingForm: true })} disabled={state.isDisabled} focusFirstChild>
-      <TabsState container={administrationUserFormService.parts} localState={state.parts} formState={state}>
-        <Container compact parent noWrap vertical>
-          <Container className={s(styles, { bar: true })} gap keepSize noWrap>
-            <Container fill>
-              <StatusMessage exception={getFirstException(state.exception)} type={state.statusType} message={state.statusMessage} />
-              <TabList className={s(styles, { tabList: true })} style={deprecatedStyle} />
+      <SContext registry={userFormRegistry}>
+        <TabsState container={administrationUserFormService.parts} localState={state.parts} formState={state}>
+          <Container compact parent noWrap vertical>
+            <Container className={s(styles, { bar: true })} gap keepSize noWrap>
+              <Container fill>
+                <StatusMessage exception={getFirstException(state.exception)} type={state.statusType} message={state.statusMessage} />
+                <TabList className={s(styles, { tabList: true })} />
+              </Container>
+              <Container keepSize noWrap center gap compact>
+                {editing && (
+                  <AdministrationUserFormDeleteButton userId={userFormInfoPart.initialState.userId} enabled={userFormInfoPart.initialState.enabled} />
+                )}
+                <Button type="button" disabled={state.isDisabled} mod={['outlined']} onClick={onClose}>
+                  {translate('ui_processing_cancel')}
+                </Button>
+                <Button type="button" disabled={state.isDisabled} mod={['unelevated']} onClick={() => form.submit()}>
+                  {translate(!editing ? 'ui_processing_create' : 'ui_processing_save')}
+                </Button>
+              </Container>
             </Container>
-            <Container keepSize noWrap center gap compact>
-              {editing && (
-                <AdministrationUserFormDeleteButton userId={userFormInfoPart.initialState.userId} enabled={userFormInfoPart.initialState.enabled} />
-              )}
-              <Button type="button" disabled={state.isDisabled} mod={['outlined']} onClick={onClose}>
-                {translate('ui_processing_cancel')}
-              </Button>
-              <Button type="button" disabled={state.isDisabled} mod={['unelevated']} onClick={() => form.submit()}>
-                {translate(!editing ? 'ui_processing_create' : 'ui_processing_save')}
-              </Button>
+            <Container vertical>
+              <TabPanelListNew />
             </Container>
           </Container>
-          <Container vertical>
-            <TabPanelList />
-          </Container>
-        </Container>
-      </TabsState>
+        </TabsState>
+      </SContext>
     </Form>
   );
 });
