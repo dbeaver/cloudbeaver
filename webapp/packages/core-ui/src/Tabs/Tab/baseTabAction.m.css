@@ -51,8 +51,7 @@
     cursor: pointer;
   }
 
-  // tabIcon???
-  & .icon {
+  & .tabIcon {
     display: block;
   }
 }
