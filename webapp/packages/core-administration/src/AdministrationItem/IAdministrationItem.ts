@@ -24,7 +24,6 @@ export interface AdministrationItemDrawerProps {
   item: IAdministrationItem;
   configurationWizard: boolean;
   onSelect: (id: string) => void;
-  style: ComponentStyle;
   disabled?: boolean;
 }
 export type AdministrationItemDrawerComponent = React.FunctionComponent<AdministrationItemDrawerProps>;

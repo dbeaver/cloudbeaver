@@ -69,7 +69,6 @@ export * from './Tabs/Tab/TabTitle';
 export * from './Tabs/Tab/useTab';
 export * from './Tabs/Tab/VERTICAL_ROTATED_TAB_STYLES';
 export * from './Tabs/Tab/UnderlineTabStyles';
-export * from './Tabs/Tab/verticalTabStylesDeprecated';
 export * from './Tabs/TabsBootstrap';
 
 export * from './Tabs/TabsBox/TabsBox';
