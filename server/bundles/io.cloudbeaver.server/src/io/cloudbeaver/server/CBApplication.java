@@ -261,6 +261,7 @@ public abstract class CBApplication extends BaseWebApplication implements WebAut
             log.error(e);
             return;
         }
+        refreshDisabledDriversConfig();
 
         configurationMode = CommonUtils.isEmpty(serverName);
 
@@ -542,7 +543,6 @@ public abstract class CBApplication extends BaseWebApplication implements WebAut
             log.debug("Runtime configuration [" + runtimeConfigFile.getAbsolutePath() + "]");
             parseConfiguration(runtimeConfigFile);
         }
-        refreshDisabledDriversConfig();
         return path;
     }
 
