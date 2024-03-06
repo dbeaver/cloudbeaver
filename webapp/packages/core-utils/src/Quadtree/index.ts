@@ -1,3 +1,1 @@
-import { Quadtree, Rectangle } from '@timohausmann/quadtree-ts';
-
-export { Quadtree, Rectangle };
+export { Quadtree, Rectangle } from '@timohausmann/quadtree-ts';
