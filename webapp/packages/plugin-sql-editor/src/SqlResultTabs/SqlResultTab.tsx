@@ -7,12 +7,9 @@
  */
 import { observer } from 'mobx-react-lite';
 import { useContext } from 'react';
-import styled from 'reshadow';
 
-import { useStyles } from '@cloudbeaver/core-blocks';
 import { useDataContext } from '@cloudbeaver/core-data-context';
-import type { ComponentStyle } from '@cloudbeaver/core-theming';
-import { ITabData, Tab, TabIcon, TabTitle } from '@cloudbeaver/core-ui';
+import { ITabData, TabIcon, TabNew, TabTitle } from '@cloudbeaver/core-ui';
 import { CaptureViewContext } from '@cloudbeaver/core-view';
 
 import type { ISqlEditorResultTab } from '../ISqlEditorTabState';
@@ -21,20 +18,19 @@ import { DATA_CONTEXT_SQL_EDITOR_RESULT_ID } from './DATA_CONTEXT_SQL_EDITOR_RES
 interface Props {
   result: ISqlEditorResultTab;
   className?: string;
-  style?: ComponentStyle;
   onClose?: (tab: ITabData) => Promise<void>;
 }
 
-export const SqlResultTab = observer<Props>(function SqlResultTab({ result, className, style, onClose }) {
+export const SqlResultTab = observer<Props>(function SqlResultTab({ result, className, onClose }) {
   const viewContext = useContext(CaptureViewContext);
   const tabMenuContext = useDataContext(viewContext);
 
   tabMenuContext.set(DATA_CONTEXT_SQL_EDITOR_RESULT_ID, result);
 
-  return styled(useStyles(style))(
-    <Tab key={result.id} tabId={result.id} style={style} title={result.name} menuContext={tabMenuContext} className={className} onClose={onClose}>
+  return (
+    <TabNew key={result.id} tabId={result.id} title={result.name} menuContext={tabMenuContext} className={className} onClose={onClose}>
       <TabIcon icon={result.icon} />
       <TabTitle>{result.name}</TabTitle>
-    </Tab>,
+    </TabNew>
   );
 });
