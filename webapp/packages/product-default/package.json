@@ -85,14 +85,14 @@
     "@cloudbeaver/plugin-version": "~0.1.0",
     "@cloudbeaver/plugin-version-update-administration": "~0.1.0",
     "react": "^18.2.0",
-    "reflect-metadata": "^0.1.13"
+    "reflect-metadata": "^0.2.1"
   },
   "peerDependencies": {},
   "product": {
     "name": "CloudBeaver Community"
   },
   "devDependencies": {
-    "@types/react": "^18.2.42",
-    "typescript": "^5.3.2"
+    "@types/react": "^18.2.63",
+    "typescript": "^5.3.3"
   }
 }
