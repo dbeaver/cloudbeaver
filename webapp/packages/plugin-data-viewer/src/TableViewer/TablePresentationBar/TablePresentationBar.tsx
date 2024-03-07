@@ -72,7 +72,6 @@ export const TablePresentationBar = observer<Props>(function TablePresentationBa
                 presentation={presentation}
                 model={model}
                 resultIndex={resultIndex}
-                style={styles}
                 onClick={handleClick}
               />
             ))}

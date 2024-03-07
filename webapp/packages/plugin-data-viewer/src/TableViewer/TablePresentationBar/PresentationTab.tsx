@@ -8,8 +8,7 @@
 import { observer } from 'mobx-react-lite';
 
 import { SContext, StyleRegistry, useTranslate } from '@cloudbeaver/core-blocks';
-import type { ComponentStyle } from '@cloudbeaver/core-theming';
-import { baseTabStyles, TabIcon, Tab, TabTitle, verticalRotatedTabStyles } from '@cloudbeaver/core-ui';
+import { baseTabStyles, Tab, TabIcon, TabTitle, verticalRotatedTabStyles } from '@cloudbeaver/core-ui';
 
 import type { IDatabaseDataModel } from '../../DatabaseDataModel/IDatabaseDataModel';
 import type { IDataPresentationOptions } from '../../DataPresentationService';
@@ -19,7 +18,6 @@ interface Props {
   resultIndex: number;
   presentation: IDataPresentationOptions;
   className?: string;
-  style?: ComponentStyle; // TODO remove it
   onClick: (tabId: string) => void;
 }
 
@@ -33,7 +31,7 @@ const presentationTabRegistry: StyleRegistry = [
   ],
 ];
 
-export const PresentationTab = observer<Props>(function PresentationTab({ model, presentation, className, style, onClick }) {
+export const PresentationTab = observer<Props>(function PresentationTab({ model, presentation, className, onClick }) {
   const translate = useTranslate();
 
   if (presentation.getTabComponent) {
