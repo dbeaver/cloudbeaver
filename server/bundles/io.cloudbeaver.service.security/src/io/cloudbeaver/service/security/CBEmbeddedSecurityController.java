@@ -960,7 +960,7 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
         try (Connection dbCon = database.openConnection()) {
             if (application.getAppConfiguration().getDefaultUserTeam().equals(teamId)) {
                 try (PreparedStatement dbStat = dbCon.prepareStatement(
-                        database.normalizeTableNames("SELECT USER_ID FROM {table_prefix}CB_USER_TEAM"))) {
+                        database.normalizeTableNames("SELECT USER_ID FROM {table_prefix}CB_USER"))) {
                     List<String> subjects = new ArrayList<>();
                     try (ResultSet dbResult = dbStat.executeQuery()) {
                         while (dbResult.next()) {
