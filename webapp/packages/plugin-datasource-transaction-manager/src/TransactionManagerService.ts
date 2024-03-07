@@ -7,7 +7,7 @@
  */
 import { computed, makeAutoObservable } from 'mobx';
 
-import { ConnectionExecutionContextResource } from '@cloudbeaver/core-connections';
+import { Connection, ConnectionExecutionContextResource } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { TaskScheduler } from '@cloudbeaver/core-executor';
@@ -96,14 +96,16 @@ export class TransactionManagerService {
       return taskInfo;
     });
 
+    let connection: Connection | undefined;
+
     try {
+      connection = this.connectionSchemaManagerService.currentConnection;
       const info = await transaction.run(
         async () => await this.asyncTaskInfoService.run(task),
         () => this.asyncTaskInfoService.cancel(task.id),
         () => this.asyncTaskInfoService.remove(task.id),
       );
 
-      const connection = this.connectionSchemaManagerService.currentConnection;
       const message = typeof info.taskResult === 'string' ? info.taskResult : '';
 
       this.notificationService.logInfo({ title: connection?.name ?? info.name ?? '', message });
@@ -124,13 +126,16 @@ export class TransactionManagerService {
       return taskInfo;
     });
 
+    let connection: Connection | undefined;
+
     try {
+      connection = this.connectionSchemaManagerService.currentConnection;
       const info = await transaction.run(
         async () => await this.asyncTaskInfoService.run(task),
         () => this.asyncTaskInfoService.cancel(task.id),
         () => this.asyncTaskInfoService.remove(task.id),
       );
-      const connection = this.connectionSchemaManagerService.currentConnection;
+
       const message = typeof info.taskResult === 'string' ? info.taskResult : '';
 
       this.notificationService.logInfo({ title: connection?.name ?? info.name ?? '', message });
