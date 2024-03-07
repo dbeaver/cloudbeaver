@@ -7,7 +7,7 @@
  */
 import { computed, makeAutoObservable } from 'mobx';
 
-import { Connection, ConnectionExecutionContextResource } from '@cloudbeaver/core-connections';
+import { ConnectionExecutionContextResource, ConnectionInfoResource, createConnectionParam } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { TaskScheduler } from '@cloudbeaver/core-executor';
@@ -44,6 +44,7 @@ export class TransactionManagerService {
     private readonly asyncTaskInfoService: AsyncTaskInfoService,
     private readonly connectionExecutionContextResource: ConnectionExecutionContextResource,
     private readonly connectionSchemaManagerService: ConnectionSchemaManagerService,
+    private readonly connectionInfoResource: ConnectionInfoResource,
   ) {
     this.scheduler = new TaskScheduler((a, b) => a === b);
     this.transactions = new MetadataMap(
@@ -73,9 +74,7 @@ export class TransactionManagerService {
       await transaction.run(
         async () => await this.asyncTaskInfoService.run(task),
         () => this.asyncTaskInfoService.cancel(task.id),
-        () => {
-          this.asyncTaskInfoService.remove(task.id);
-        },
+        () => this.asyncTaskInfoService.remove(task.id),
       );
 
       this.connectionExecutionContextResource.markOutdated();
@@ -96,16 +95,15 @@ export class TransactionManagerService {
       return taskInfo;
     });
 
-    let connection: Connection | undefined;
-
     try {
-      connection = this.connectionSchemaManagerService.currentConnection;
       const info = await transaction.run(
         async () => await this.asyncTaskInfoService.run(task),
         () => this.asyncTaskInfoService.cancel(task.id),
         () => this.asyncTaskInfoService.remove(task.id),
       );
 
+      const connectionParam = createConnectionParam(transaction.context!.projectId, transaction.context!.connectionId);
+      const connection = this.connectionInfoResource.get(connectionParam);
       const message = typeof info.taskResult === 'string' ? info.taskResult : '';
 
       this.notificationService.logInfo({ title: connection?.name ?? info.name ?? '', message });
@@ -126,16 +124,15 @@ export class TransactionManagerService {
       return taskInfo;
     });
 
-    let connection: Connection | undefined;
-
     try {
-      connection = this.connectionSchemaManagerService.currentConnection;
       const info = await transaction.run(
         async () => await this.asyncTaskInfoService.run(task),
         () => this.asyncTaskInfoService.cancel(task.id),
         () => this.asyncTaskInfoService.remove(task.id),
       );
 
+      const connectionParam = createConnectionParam(transaction.context!.projectId, transaction.context!.connectionId);
+      const connection = this.connectionInfoResource.get(connectionParam);
       const message = typeof info.taskResult === 'string' ? info.taskResult : '';
 
       this.notificationService.logInfo({ title: connection?.name ?? info.name ?? '', message });
