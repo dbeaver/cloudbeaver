@@ -1,0 +1,87 @@
+.titleBar {
+  composes: theme-border-color-background from global;
+}
+
+.connectionCreate {
+  display: flex;
+  flex-direction: column;
+  height: 800px;
+  overflow: hidden;
+}
+
+.connectionCreateContent {
+  composes: theme-background-secondary theme-text-on-secondary from global;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  overflow: auto;
+}
+
+.baseTab {
+  composes: theme-background-secondary theme-text-on-secondary from global;
+}
+
+.tabList {
+  composes: theme-border-color-background theme-background-secondary theme-text-on-secondary from global;
+  border-top: solid 1px;
+  position: relative;
+  flex-shrink: 0;
+  align-items: center;
+
+  &:before {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    border-bottom: solid 2px;
+    border-color: inherit;
+  }
+}
+
+.tabPanel,
+.customConnection,
+.searchDatabase {
+  flex-direction: column;
+  height: 100%;
+  overflow: auto;
+}
+
+.loader {
+  z-index: 1;
+  height: 100%;
+}
+
+.titleBar {
+  composes: theme-typography--headline6 from global;
+  padding: 16px 24px;
+  align-items: center;
+  display: flex;
+  font-weight: 400;
+  flex: auto 0 0;
+}
+
+.staticImage {
+  width: 32px;
+  max-height: 32px;
+  margin-right: 16px;
+}
+
+.fill {
+  flex: 1;
+}
+
+.backButton {
+  position: relative;
+  box-sizing: border-box;
+  margin-right: 16px;
+  display: flex;
+
+  & .icon {
+    box-sizing: border-box;
+    transform: rotate(90deg);
+    cursor: pointer;
+    height: 16px;
+    width: 16px;
+  }
+}
