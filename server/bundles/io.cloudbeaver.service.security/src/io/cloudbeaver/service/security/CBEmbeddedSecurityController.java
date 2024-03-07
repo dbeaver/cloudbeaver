@@ -980,16 +980,29 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
     @Override
     public String[] getTeamMembers(String teamId) throws DBCException {
         try (Connection dbCon = database.openConnection()) {
-            try (PreparedStatement dbStat = dbCon.prepareStatement(
-                database.normalizeTableNames("SELECT USER_ID FROM {table_prefix}CB_USER_TEAM WHERE TEAM_ID=?"))) {
-                dbStat.setString(1, teamId);
-                List<String> subjects = new ArrayList<>();
-                try (ResultSet dbResult = dbStat.executeQuery()) {
-                    while (dbResult.next()) {
-                        subjects.add(dbResult.getString(1));
+            if (application.getAppConfiguration().getDefaultUserTeam().equals(teamId)) {
+                try (PreparedStatement dbStat = dbCon.prepareStatement(
+                        database.normalizeTableNames("SELECT USER_ID FROM {table_prefix}CB_USER_TEAM"))) {
+                    List<String> subjects = new ArrayList<>();
+                    try (ResultSet dbResult = dbStat.executeQuery()) {
+                        while (dbResult.next()) {
+                            subjects.add(dbResult.getString(1));
+                        }
                     }
+                    return subjects.toArray(new String[0]);
                 }
-                return subjects.toArray(new String[0]);
+            } else {
+                try (PreparedStatement dbStat = dbCon.prepareStatement(
+                        database.normalizeTableNames("SELECT USER_ID FROM {table_prefix}CB_USER_TEAM WHERE TEAM_ID=?"))) {
+                    dbStat.setString(1, teamId);
+                    List<String> subjects = new ArrayList<>();
+                    try (ResultSet dbResult = dbStat.executeQuery()) {
+                        while (dbResult.next()) {
+                            subjects.add(dbResult.getString(1));
+                        }
+                    }
+                    return subjects.toArray(new String[0]);
+                }
             }
         } catch (SQLException e) {
             throw new DBCException("Error while reading team members", e);
