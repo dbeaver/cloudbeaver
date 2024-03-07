@@ -17,6 +17,7 @@
 package io.cloudbeaver;
 
 import org.jkiss.code.NotNull;
+import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.app.DBPDataSourceRegistry;
@@ -40,6 +41,7 @@ public abstract class WebProjectImpl extends BaseWebProjectImpl {
         super(workspace, resourceController, sessionContext, project, dataSourceFilter);
     }
 
+    @Nullable
     @Override
     public Object getProjectProperty(String propName) {
         try {
@@ -51,7 +53,7 @@ public abstract class WebProjectImpl extends BaseWebProjectImpl {
     }
 
     @Override
-    public void setProjectProperty(String propName, Object propValue) {
+    public void setProjectProperty(@NotNull String propName, @Nullable Object propValue) {
         try {
             getResourceController().setProjectProperty(getId(), propName, propValue);
         } catch (DBException e) {

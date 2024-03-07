@@ -29,7 +29,7 @@ import { CommonDialogWrapper } from './CommonDialog/CommonDialogWrapper';
 import style from './RenameDialog.m.css';
 
 interface IRenameDialogState {
-  value: string;
+  name: string;
   message: string | undefined;
   valid: boolean;
   payload: RenameDialogPayload;
@@ -38,7 +38,7 @@ interface IRenameDialogState {
 }
 
 export interface RenameDialogPayload {
-  value: string;
+  name: string;
   objectName?: string;
   icon?: string;
   subTitle?: string;
@@ -60,7 +60,7 @@ export const RenameDialog: DialogComponent<RenameDialogPayload, string> = observ
   const [focusedRef] = useFocus<HTMLFormElement>({ focusFirstChild: true });
   const styles = useS(style);
 
-  const { icon, subTitle, bigIcon, viewBox, value, objectName, create, confirmActionText } = payload;
+  const { icon, subTitle, bigIcon, viewBox, name, objectName, create, confirmActionText } = payload;
   let { title } = payload;
 
   if (!title) {
@@ -75,19 +75,19 @@ export const RenameDialog: DialogComponent<RenameDialogPayload, string> = observ
 
   const state = useObservableRef<IRenameDialogState>(
     () => ({
-      value,
+      name,
       message: undefined,
       valid: true,
       validate: throttleAsync(async () => {
         state.message = undefined;
-        state.valid = (await state.payload.validation?.(state.value, state.setMessage.bind(state))) ?? true;
+        state.valid = (await state.payload.validation?.(state.name, state.setMessage.bind(state))) ?? true;
       }, 300),
       setMessage(message) {
         this.message = message;
       },
     }),
     {
-      value: observable.ref,
+      name: observable.ref,
       valid: observable.ref,
       message: observable.ref,
     },
@@ -98,7 +98,7 @@ export const RenameDialog: DialogComponent<RenameDialogPayload, string> = observ
 
   useEffect(() => {
     state.validate();
-  }, [value]);
+  }, [name]);
 
   const errorMessage = state.valid ? ' ' : translate(state.message ?? 'ui_rename_taken_or_invalid');
 
@@ -106,9 +106,9 @@ export const RenameDialog: DialogComponent<RenameDialogPayload, string> = observ
     <CommonDialogWrapper size="small" className={className} fixedWidth>
       <CommonDialogHeader title={title} subTitle={subTitle} icon={icon} viewBox={viewBox} bigIcon={bigIcon} onReject={rejectDialog} />
       <CommonDialogBody>
-        <Form ref={focusedRef} onSubmit={() => resolveDialog(state.value)}>
+        <Form ref={focusedRef} onSubmit={() => resolveDialog(state.name)}>
           <Container center>
-            <InputField name="value" state={state} error={!state.valid} description={errorMessage} onChange={() => state.validate()}>
+            <InputField name="name" state={state} error={!state.valid} description={errorMessage} onChange={() => state.validate()}>
               {translate('ui_name') + ':'}
             </InputField>
           </Container>
@@ -119,7 +119,7 @@ export const RenameDialog: DialogComponent<RenameDialogPayload, string> = observ
           {translate('ui_processing_cancel')}
         </Button>
         <Fill />
-        <Button type="button" mod={['unelevated']} disabled={!state.valid} onClick={() => resolveDialog(state.value)}>
+        <Button type="button" mod={['unelevated']} disabled={!state.valid} onClick={() => resolveDialog(state.name)}>
           {translate(confirmActionText || (create ? 'ui_create' : 'ui_rename'))}
         </Button>
       </CommonDialogFooter>
