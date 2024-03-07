@@ -25,7 +25,7 @@ import {
 import { useService } from '@cloudbeaver/core-di';
 import { ENotificationType } from '@cloudbeaver/core-events';
 import type { ConnectionConfig } from '@cloudbeaver/core-sdk';
-import { baseTabStyles, TabList, TabPanelListNew, TabsState, underlineTabBigStyles, underlineTabStyles } from '@cloudbeaver/core-ui';
+import { baseTabStyles, TabList, TabPanelList, TabsState, underlineTabBigStyles, underlineTabStyles } from '@cloudbeaver/core-ui';
 
 import { ConnectionFormActionsContext, IConnectionFormActionsContext } from './ConnectFormActionsContext';
 import style from './ConnectionForm.m.css';
@@ -114,7 +114,7 @@ export const ConnectionForm = observer<ConnectionFormProps>(function ConnectionF
               </div>
             </div>
             <div className={s(styles, { contentBox: true })}>
-              <TabPanelListNew />
+              <TabPanelList />
             </div>
           </div>
         </SContext>

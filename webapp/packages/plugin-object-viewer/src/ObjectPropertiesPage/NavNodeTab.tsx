@@ -11,7 +11,7 @@ import { getComputed, Loader, s, useS, useStateDelay } from '@cloudbeaver/core-b
 import { useService } from '@cloudbeaver/core-di';
 import { DBObjectResource } from '@cloudbeaver/core-navigation-tree';
 import { resourceKeyList } from '@cloudbeaver/core-resource';
-import { TabIcon, TabNew, TabTitle } from '@cloudbeaver/core-ui';
+import { TabIcon, Tab, TabTitle } from '@cloudbeaver/core-ui';
 import { useChildren, useNode } from '@cloudbeaver/plugin-navigation-tree';
 
 import { navNodeTabStyle } from '..';
@@ -38,12 +38,12 @@ export const NavNodeTab = observer<INavNodeTabProps>(function NavNodeTab({ nodeI
   );
 
   return (
-    <TabNew tabId={nodeId} title={nodeInfo.node?.name}>
+    <Tab tabId={nodeId} title={nodeInfo.node?.name}>
       {nodeInfo.node?.icon && <TabIcon icon={nodeInfo.node.icon} />}
       <TabTitle>{nodeInfo.node?.name}</TabTitle>
       <div className={s(styles, { tabLoader: true })}>
         <Loader loading={loading} small />
       </div>
-    </TabNew>
+    </Tab>
   );
 });

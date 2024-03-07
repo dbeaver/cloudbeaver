@@ -10,7 +10,7 @@ import { observer } from 'mobx-react-lite';
 import { Translate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { NavNodeManagerService } from '@cloudbeaver/core-navigation-tree';
-import { TabIcon, TabNew, TabTitle } from '@cloudbeaver/core-ui';
+import { Tab, TabIcon, TabTitle } from '@cloudbeaver/core-ui';
 import type { ObjectPageTabComponent } from '@cloudbeaver/plugin-object-viewer';
 
 import type { IDataViewerPageState } from '../IDataViewerPageState';
@@ -23,11 +23,11 @@ export const DataViewerTab: ObjectPageTabComponent<IDataViewerPageState> = obser
   }
 
   return (
-    <TabNew tabId={page.key} onOpen={onSelect}>
+    <Tab tabId={page.key} onOpen={onSelect}>
       <TabIcon icon="table-icon" />
       <TabTitle>
         <Translate token="data_viewer_tab_title" />
       </TabTitle>
-    </TabNew>
+    </Tab>
   );
 });

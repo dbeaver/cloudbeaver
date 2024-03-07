@@ -11,7 +11,7 @@ import type { AdministrationItemDrawerProps } from '@cloudbeaver/core-administra
 import { s, Translate, useResource, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { CachedMapAllKey } from '@cloudbeaver/core-resource';
-import { TabIcon, TabNew, TabTitle } from '@cloudbeaver/core-ui';
+import { TabIcon, Tab, TabTitle } from '@cloudbeaver/core-ui';
 import { VersionResource } from '@cloudbeaver/core-version';
 import { VersionUpdateService } from '@cloudbeaver/core-version-update';
 
@@ -25,7 +25,7 @@ export const VersionUpdateDrawerItem = observer<AdministrationItemDrawerProps>(f
   useResource(VersionUpdateDrawerItem, VersionResource, CachedMapAllKey, { silent: true });
 
   return (
-    <TabNew tabId={item.name} disabled={disabled} title="version_update" onOpen={() => onSelect(item.name)}>
+    <Tab tabId={item.name} disabled={disabled} title="version_update" onOpen={() => onSelect(item.name)}>
       <TabIcon className={s(moduleStyle, { iconOrImage: true })} icon="/icons/version_update.svg" />
       <TabTitle className={s(moduleStyle, { tabTitle: true })}>
         <Translate token="version_update" />
@@ -33,6 +33,6 @@ export const VersionUpdateDrawerItem = observer<AdministrationItemDrawerProps>(f
       {versionUpdateService.newVersionAvailable && (
         <div className={s(moduleStyle, { icon: true })} title={translate('version_update_new_version_available')} />
       )}
-    </TabNew>
+    </Tab>
   );
 });

@@ -12,8 +12,8 @@ import { Translate } from '@cloudbeaver/core-blocks';
 import { TabContext } from '../TabContext';
 import type { ITabData } from '../TabsContainer/ITabsContainer';
 import { TabsContext } from '../TabsContext';
+import { Tab } from './Tab';
 import { TabIcon } from './TabIcon';
-import { TabNew } from './TabNew';
 import type { TabProps } from './TabProps';
 import { TabTitle } from './TabTitle';
 
@@ -61,13 +61,13 @@ export function TabDefault<T = Record<string, any>>({
   }
 
   return (
-    <TabNew tabId={tabId} className={className} selected={selected} disabled={disabled} onOpen={onOpen} onClose={onClose}>
+    <Tab tabId={tabId} className={className} selected={selected} disabled={disabled} onOpen={onOpen} onClose={onClose}>
       {icon && <TabIcon icon={icon} />}
       {name && (
         <TabTitle>
           <Translate token={name} />
         </TabTitle>
       )}
-    </TabNew>
+    </Tab>
   );
 }

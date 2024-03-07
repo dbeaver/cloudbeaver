@@ -7,15 +7,15 @@
  */
 import type { AdministrationItemDrawerProps } from '@cloudbeaver/core-administration';
 import { Translate } from '@cloudbeaver/core-blocks';
-import { TabIcon, TabNew, TabTitle } from '@cloudbeaver/core-ui';
+import { TabIcon, Tab, TabTitle } from '@cloudbeaver/core-ui';
 
 export const WelcomeDrawerItem: React.FC<AdministrationItemDrawerProps> = function WelcomeDrawerItem({ item, onSelect, disabled }) {
   return (
-    <TabNew tabId={item.name} disabled={disabled} onOpen={() => onSelect(item.name)}>
+    <Tab tabId={item.name} disabled={disabled} onOpen={() => onSelect(item.name)}>
       <TabIcon icon="/icons/welcome_bold.svg" viewBox="0 0 16 16" />
       <TabTitle>
         <Translate token="administration_configuration_wizard_welcome" />
       </TabTitle>
-    </TabNew>
+    </Tab>
   );
 };

@@ -9,7 +9,7 @@ import { observer } from 'mobx-react-lite';
 import { useContext } from 'react';
 
 import { useDataContext } from '@cloudbeaver/core-data-context';
-import { ITabData, TabIcon, TabNew, TabTitle } from '@cloudbeaver/core-ui';
+import { ITabData, TabIcon, Tab, TabTitle } from '@cloudbeaver/core-ui';
 import { CaptureViewContext } from '@cloudbeaver/core-view';
 import type { TabHandlerTabComponent } from '@cloudbeaver/plugin-navigation-tabs';
 import { useNode } from '@cloudbeaver/plugin-navigation-tree';
@@ -36,9 +36,9 @@ export const ObjectViewerTab: TabHandlerTabComponent<IObjectViewerTabState> = ob
   // }
 
   return (
-    <TabNew tabId={tab.id} title={title} menuContext={tabMenuContext} onOpen={handleSelect} onClose={handleClose}>
+    <Tab tabId={tab.id} title={title} menuContext={tabMenuContext} onOpen={handleSelect} onClose={handleClose}>
       <TabIcon icon={node?.icon || tab.handlerState.tabIcon} />
       <TabTitle>{title}</TabTitle>
-    </TabNew>
+    </Tab>
   );
 });

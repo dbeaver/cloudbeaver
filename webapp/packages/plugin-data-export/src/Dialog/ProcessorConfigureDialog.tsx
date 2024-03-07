@@ -24,7 +24,7 @@ import {
   useTranslate,
 } from '@cloudbeaver/core-blocks';
 import type { DataTransferOutputSettings, DataTransferProcessorInfo } from '@cloudbeaver/core-sdk';
-import { baseTabStyles, ITabData, TabList, TabNew, TabsState, TabTitle, underlineTabStyles } from '@cloudbeaver/core-ui';
+import { baseTabStyles, ITabData, Tab, TabList, TabsState, TabTitle, underlineTabStyles } from '@cloudbeaver/core-ui';
 
 import { OutputOptionsForm } from './OutputOptionsForm';
 import style from './ProcessorConfigureDialog.m.css';
@@ -91,12 +91,12 @@ export const ProcessorConfigureDialog = observer<Props>(function ProcessorConfig
           <TabsState currentTabId={currentTabId} onChange={handleTabChange}>
             <SContext registry={tabsRegistry}>
               <TabList className={s(styles, { tabList: true })} aria-label="Export Settings tabs">
-                <TabNew tabId={SETTINGS_TABS.EXTRACTION}>
+                <Tab tabId={SETTINGS_TABS.EXTRACTION}>
                   <TabTitle>{translate('data_transfer_format_settings')}</TabTitle>
-                </TabNew>
-                <TabNew tabId={SETTINGS_TABS.OUTPUT}>
+                </Tab>
+                <Tab tabId={SETTINGS_TABS.OUTPUT}>
                   <TabTitle>{translate('data_transfer_output_settings')}</TabTitle>
-                </TabNew>
+                </Tab>
               </TabList>
             </SContext>
           </TabsState>

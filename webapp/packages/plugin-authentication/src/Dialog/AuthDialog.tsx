@@ -27,7 +27,7 @@ import {
 } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogComponent } from '@cloudbeaver/core-dialogs';
-import { baseTabStyles, TabList, TabNew, TabsState, TabTitle, underlineTabBigStyles, underlineTabStyles } from '@cloudbeaver/core-ui';
+import { baseTabStyles, TabList, Tab, TabsState, TabTitle, underlineTabBigStyles, underlineTabStyles } from '@cloudbeaver/core-ui';
 
 import { AuthenticationService } from '../AuthenticationService';
 import type { IAuthOptions } from '../IAuthOptions';
@@ -167,7 +167,7 @@ export const AuthDialog: DialogComponent<IAuthOptions, null> = observer(function
                       return provider.configurations?.map(configuration => {
                         const tabId = getAuthProviderTabId(provider, configuration);
                         return (
-                          <TabNew
+                          <Tab
                             key={tabId}
                             tabId={tabId}
                             title={configuration.displayName}
@@ -178,12 +178,12 @@ export const AuthDialog: DialogComponent<IAuthOptions, null> = observer(function
                             }}
                           >
                             <TabTitle>{configuration.displayName}</TabTitle>
-                          </TabNew>
+                          </Tab>
                         );
                       });
                     }
                     return (
-                      <TabNew
+                      <Tab
                         key={provider.id}
                         tabId={provider.id}
                         title={provider.description || provider.label}
@@ -194,12 +194,12 @@ export const AuthDialog: DialogComponent<IAuthOptions, null> = observer(function
                         }}
                       >
                         <TabTitle>{provider.label}</TabTitle>
-                      </TabNew>
+                      </Tab>
                     );
                   })
                   .flat()}
                 {dialogData.federatedProviders.length > 0 && (
-                  <TabNew
+                  <Tab
                     key={FEDERATED_AUTH}
                     tabId={FEDERATED_AUTH}
                     title={translate('authentication_auth_federated')}
@@ -211,7 +211,7 @@ export const AuthDialog: DialogComponent<IAuthOptions, null> = observer(function
                     }}
                   >
                     <TabTitle>{translate('authentication_auth_federated')}</TabTitle>
-                  </TabNew>
+                  </Tab>
                 )}
               </TabList>
             )}

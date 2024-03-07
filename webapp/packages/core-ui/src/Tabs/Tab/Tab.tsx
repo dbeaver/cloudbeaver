@@ -8,70 +8,58 @@
 import { observer } from 'mobx-react-lite';
 import { useMemo, useRef, useState } from 'react';
 import { Tab as BaseTab } from 'reakit/Tab';
-import styled, { use } from 'reshadow';
 
-import { getComputed, Icon, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
+import { getComputed, Icon, s, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import type { IDataContext } from '@cloudbeaver/core-data-context';
-import type { ComponentStyle } from '@cloudbeaver/core-theming';
 import { useMenu } from '@cloudbeaver/core-view';
 
+import { baseTabActionStyles, baseTabStyles } from '../..';
 import { ContextMenu } from '../../ContextMenu/ContextMenu';
 import { TabContext } from '../TabContext';
 import type { ITabsContext } from '../TabsContext';
-import { BASE_TAB_ACTION_STYLES, BASE_TAB_STYLES } from './BASE_TAB_STYLES';
 import { DATA_CONTEXT_TAB_ID } from './DATA_CONTEXT_TAB_ID';
 import { DATA_CONTEXT_TABS_CONTEXT } from './DATA_CONTEXT_TABS_CONTEXT';
 import { MENU_TAB } from './MENU_TAB';
 import type { TabProps } from './TabProps';
 import { useTab } from './useTab';
 
-export const Tab = observer<TabProps & { style: ComponentStyle }>(function Tab({
-  tabId,
-  title,
-  style,
-  menuContext,
-  disabled,
-  className,
-  children,
-  onOpen,
-  onClose,
-  onClick,
-}) {
+export const Tab = observer<TabProps>(function Tab({ tabId, title, menuContext, disabled, className, children, onOpen, onClose, onClick }) {
   const translate = useTranslate();
   const ref = useRef<HTMLButtonElement>(null);
   const tabContext = useMemo(() => ({ tabId }), [tabId]);
   const tab = useTab(tabId, onOpen, onClose, onClick);
   const info = tab.getInfo();
+  const styles = useS(baseTabStyles, baseTabActionStyles);
 
   const canClose = getComputed(() => !!onClose || (tab.closable && tab.state.closable));
 
-  return styled(useStyles(BASE_TAB_STYLES, BASE_TAB_ACTION_STYLES, style))(
+  return (
     <TabContext.Provider value={tabContext}>
-      <tab-outer>
-        <tab-inner {...use({ selected: tab.selected })}>
-          <tab-actions>
+      <div className={s(styles, { tabOuter: true })}>
+        <div className={s(styles, { tabInner: true, tabInnerSelected: tab.selected })}>
+          <div className={s(styles, { tabActions: true })}>
             {canClose && (
-              <tab-action title={translate('ui_close')} onClick={tab.handleClose}>
-                <Icon name="cross-bold" viewBox="0 0 7 8" />
-              </tab-action>
+              <div className={s(styles, { tabAction: true })} title={translate('ui_close')} onClick={tab.handleClose}>
+                <Icon className={s(styles, { tabIcon: true })} name="cross-bold" viewBox="0 0 7 8" />
+              </div>
             )}
-            <TabMenu tabId={tabId} state={tab.state} menuContext={menuContext} style={style} />
-          </tab-actions>
+            <TabMenuNew tabId={tabId} state={tab.state} menuContext={menuContext} />
+          </div>
           <BaseTab
             ref={ref}
             {...tab.state.state}
             type="button"
             title={translate(title ?? info?.title)}
             id={tabId}
-            className={className}
+            className={s(styles, { baseTab: true }, className)}
             disabled={disabled}
             onClick={tab.handleOpen}
           >
-            <tab-container>{children}</tab-container>
+            <div className={s(styles, { tabContainer: true })}>{children}</div>
           </BaseTab>
-        </tab-inner>
-      </tab-outer>
-    </TabContext.Provider>,
+        </div>
+      </div>
+    </TabContext.Provider>
   );
 });
 
@@ -79,11 +67,10 @@ interface TabMenuProps {
   tabId: string;
   state: ITabsContext<any>;
   menuContext?: IDataContext;
-  style?: ComponentStyle;
 }
 
-const TabMenu = observer<TabMenuProps>(function TabMenu({ tabId, state, menuContext, style }) {
-  const styles = useStyles(BASE_TAB_STYLES, BASE_TAB_ACTION_STYLES, style);
+const TabMenuNew = observer<TabMenuProps>(function TabMenuNew({ tabId, state, menuContext }) {
+  const styles = useS(baseTabStyles, baseTabActionStyles);
 
   const [menuOpened, switchState] = useState(false);
   const menu = useMenu({
@@ -100,13 +87,13 @@ const TabMenu = observer<TabMenuProps>(function TabMenu({ tabId, state, menuCont
     return null;
   }
 
-  return styled(styles)(
-    <portal {...use({ menuOpened })}>
+  return (
+    <div className={s(styles, { portal: true, portalMenuOpened: menuOpened })}>
       <ContextMenu menu={menu} placement="bottom-start" modal disclosure onVisibleSwitch={switchState}>
-        <tab-action>
-          <Icon name="dots" viewBox="0 0 32 32" />
-        </tab-action>
+        <div className={s(styles, { tabAction: true })}>
+          <Icon className={s(styles, { tabIcon: true })} name="dots" viewBox="0 0 32 32" />
+        </div>
       </ContextMenu>
-    </portal>,
+    </div>
   );
 });

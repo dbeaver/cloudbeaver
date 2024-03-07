@@ -9,7 +9,7 @@ import { observer } from 'mobx-react-lite';
 
 import { s, SContext, type StyleRegistry, useS } from '@cloudbeaver/core-blocks';
 
-import { baseTabStyles, TabPanelListNew, underlineTabStyles } from '..';
+import { baseTabStyles, TabPanelList, underlineTabStyles } from '..';
 import { TabList } from '../Tabs/TabList';
 import type { TabsContainer } from '../Tabs/TabsContainer/TabsContainer';
 import { TabsState } from '../Tabs/TabsState';
@@ -38,7 +38,7 @@ export const SideBarPanel = observer<Props>(function SideBarPanel({ container })
         <div className={s(style, { box: true })}>
           <TabList className={s(style, { tabList: true })} />
           <div className={s(style, { contentBox: true })}>
-            <TabPanelListNew />
+            <TabPanelList />
           </div>
         </div>
       </TabsState>

@@ -11,7 +11,7 @@ import { useRef } from 'react';
 
 import { s, SContext, StyleRegistry, useS, useUserData } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { baseTabStyles, ITabData, TabList, TabPanelListNew, TabsState, underlineTabStyles } from '@cloudbeaver/core-ui';
+import { baseTabStyles, ITabData, TabList, TabPanelList, TabsState, underlineTabStyles } from '@cloudbeaver/core-ui';
 import { isArraysEqual } from '@cloudbeaver/core-utils';
 
 import styles from './ToolsPanel.m.css';
@@ -67,7 +67,7 @@ export const ToolsPanel = observer(function ToolsPanel() {
         <div className={s(style, { box: true })}>
           <TabList className={s(style, { tabList: true })} />
           <div className={s(style, { contentBox: true })}>
-            <TabPanelListNew />
+            <TabPanelList />
           </div>
         </div>
       </TabsState>

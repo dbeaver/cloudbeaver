@@ -12,7 +12,7 @@ import { IconOrImage, s, useTranslate } from '@cloudbeaver/core-blocks';
 import { Connection, ConnectionInfoResource, createConnectionParam } from '@cloudbeaver/core-connections';
 import { useDataContext } from '@cloudbeaver/core-data-context';
 import { useService } from '@cloudbeaver/core-di';
-import { ITabData, TabIcon, TabNew, TabTitle } from '@cloudbeaver/core-ui';
+import { ITabData, TabIcon, Tab, TabTitle } from '@cloudbeaver/core-ui';
 import { CaptureViewContext } from '@cloudbeaver/core-view';
 import type { TabHandlerTabComponent } from '@cloudbeaver/plugin-navigation-tabs';
 import {
@@ -57,13 +57,13 @@ export const SqlEditorTab: TabHandlerTabComponent<ISqlEditorTabState> = observer
   const handleClose = onClose ? ({ tabId }: ITabData<any>) => onClose(tabId) : undefined;
 
   return (
-    <TabNew tabId={tab.id} title={name} menuContext={tabMenuContext} onOpen={handleSelect} onClose={handleClose}>
+    <Tab tabId={tab.id} title={name} menuContext={tabMenuContext} onOpen={handleSelect} onClose={handleClose}>
       <TabIcon icon={icon} />
       <TabTitle>{name}</TabTitle>
       {isReadonly && isScript && (
         <IconOrImage title={translate('ui_readonly')} icon="/icons/lock.png" className={s(sqlEditorTabStyles, { readonlyIcon: true })} />
       )}
       {hasUnsavedMark && <div className={s(sqlEditorTabStyles, { unsavedMark: true })} />}
-    </TabNew>
+    </Tab>
   );
 });

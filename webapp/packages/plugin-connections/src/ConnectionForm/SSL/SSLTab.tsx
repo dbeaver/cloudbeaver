@@ -10,7 +10,7 @@ import { observer } from 'mobx-react-lite';
 import { Translate, useResource } from '@cloudbeaver/core-blocks';
 import { DBDriverResource, NetworkHandlerResource } from '@cloudbeaver/core-connections';
 import { CachedMapAllKey } from '@cloudbeaver/core-resource';
-import { TabContainerTabComponent, TabNew, TabTitle } from '@cloudbeaver/core-ui';
+import { Tab, TabContainerTabComponent, TabTitle } from '@cloudbeaver/core-ui';
 
 import type { IConnectionFormProps } from '../IConnectionFormProps';
 import { getSSLDriverHandler } from './getSSLDriverHandler';
@@ -26,10 +26,10 @@ export const SSLTab: TabContainerTabComponent<IConnectionFormProps> = observer(f
   }
 
   return (
-    <TabNew {...props} title={handler.description}>
+    <Tab {...props} title={handler.description}>
       <TabTitle>
         <Translate token={handler.label} />
       </TabTitle>
-    </TabNew>
+    </Tab>
   );
 });

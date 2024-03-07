@@ -8,7 +8,7 @@
 import { observer } from 'mobx-react-lite';
 
 import { useTranslate } from '@cloudbeaver/core-blocks';
-import { TabIcon, TabNew, TabTitle } from '@cloudbeaver/core-ui';
+import { TabIcon, Tab, TabTitle } from '@cloudbeaver/core-ui';
 import { type NavNodeTransformViewComponent, useNode } from '@cloudbeaver/plugin-navigation-tree';
 
 export const NavNodeMetadataTab: NavNodeTransformViewComponent = observer(function NavNodeMetadataTab({ folderId, nodeId }) {
@@ -23,9 +23,9 @@ export const NavNodeMetadataTab: NavNodeTransformViewComponent = observer(functi
   const icon = 'platform:/plugin/org.jkiss.dbeaver.model/icons/tree/info.png';
 
   return (
-    <TabNew tabId={folderId} title={title}>
+    <Tab tabId={folderId} title={title}>
       <TabIcon icon={icon} />
       <TabTitle>{title}</TabTitle>
-    </TabNew>
+    </Tab>
   );
 });

@@ -7,7 +7,7 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import { TabIcon, TabNew, TabTitle } from '@cloudbeaver/core-ui';
+import { TabIcon, Tab, TabTitle } from '@cloudbeaver/core-ui';
 import type { NavNodeTransformViewComponent } from '@cloudbeaver/plugin-navigation-tree';
 
 import { NAV_NODE_DDL_ID } from '../NAV_NODE_DDL_ID';
@@ -16,9 +16,9 @@ export const DDLViewerTab: NavNodeTransformViewComponent = observer(function DDL
   const title = folderId.startsWith(NAV_NODE_DDL_ID) ? 'DDL' : 'Body';
 
   return (
-    <TabNew tabId={folderId} title={title}>
+    <Tab tabId={folderId} title={title}>
       <TabIcon icon="/icons/DDL.svg" />
       <TabTitle>{title}</TabTitle>
-    </TabNew>
+    </Tab>
   );
 });

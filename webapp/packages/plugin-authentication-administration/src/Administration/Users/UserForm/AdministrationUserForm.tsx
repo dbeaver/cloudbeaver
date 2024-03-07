@@ -27,7 +27,7 @@ import {
   FormMode,
   IFormState,
   TabList,
-  TabPanelListNew,
+  TabPanelList,
   TabsState,
   underlineTabBigStyles,
   underlineTabStyles,
@@ -107,7 +107,7 @@ export const AdministrationUserForm = observer<Props>(function AdministrationUse
               </Container>
             </Container>
             <Container vertical>
-              <TabPanelListNew />
+              <TabPanelList />
             </Container>
           </Container>
         </TabsState>

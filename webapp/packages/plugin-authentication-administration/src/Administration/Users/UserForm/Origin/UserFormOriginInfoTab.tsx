@@ -8,16 +8,16 @@
 import { observer } from 'mobx-react-lite';
 
 import { Translate } from '@cloudbeaver/core-blocks';
-import { TabContainerTabComponent, TabNew, TabTitle } from '@cloudbeaver/core-ui';
+import { Tab, TabContainerTabComponent, TabTitle } from '@cloudbeaver/core-ui';
 
 import type { UserFormProps } from '../AdministrationUserFormService';
 
 export const UserFormOriginInfoTab: TabContainerTabComponent<UserFormProps> = observer(function UserFormOriginInfoTab({ tabId, ...rest }) {
   return (
-    <TabNew {...rest} tabId={tabId}>
+    <Tab {...rest} tabId={tabId}>
       <TabTitle>
         <Translate token="authentication_administration_user_auth_methods" />
       </TabTitle>
-    </TabNew>
+    </Tab>
   );
 });

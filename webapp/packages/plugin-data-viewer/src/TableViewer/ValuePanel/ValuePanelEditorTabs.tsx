@@ -8,7 +8,7 @@
 import { observer } from 'mobx-react-lite';
 
 import { SContext, StyleRegistry } from '@cloudbeaver/core-blocks';
-import { baseTabStyles, TabPanelListNew, tabPanelStyles, underlineTabStyles } from '@cloudbeaver/core-ui';
+import { baseTabStyles, TabPanelList, tabPanelStyles, underlineTabStyles } from '@cloudbeaver/core-ui';
 
 import styles from './ValuePanelEditorTabs.m.css';
 
@@ -20,7 +20,7 @@ const tabListPanelRegistry: StyleRegistry = [
 export const ValuePanelEditorTabs = observer(function ValuePanelEditorTabs() {
   return (
     <SContext registry={tabListPanelRegistry}>
-      <TabPanelListNew />
+      <TabPanelList />
     </SContext>
   );
 });

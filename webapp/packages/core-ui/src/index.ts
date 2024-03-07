@@ -37,7 +37,6 @@ export * from './Tabs/ITab';
 export * from './Tabs/TabContext';
 export * from './Tabs/TabList';
 export * from './Tabs/TabPanel';
-export * from './Tabs/TabPanelListNew';
 export * from './Tabs/TabPanelList';
 export * from './Tabs/TabPanelProps';
 export * from './Tabs/TabsContainer/ITabsContainer';
@@ -55,19 +54,15 @@ export { default as verticalTabStyles } from './Tabs/Tab/verticalTabStyles.m.css
 export { default as underlineTabStyles } from './Tabs/Tab/underlineTabStyles.m.css';
 export { default as underlineTabBigStyles } from './Tabs/Tab/underlineTabBigStyles.m.css';
 
-export * from './Tabs/Tab/BASE_TAB_STYLES';
 export * from './Tabs/Tab/DATA_CONTEXT_TAB_ID';
 export * from './Tabs/Tab/DATA_CONTEXT_TABS_CONTEXT';
 export * from './Tabs/Tab/MENU_TAB';
 export * from './Tabs/Tab/Tab';
-export * from './Tabs/Tab/TabNew';
 export * from './Tabs/Tab/TabDefault';
 export * from './Tabs/Tab/TabIcon';
 export * from './Tabs/Tab/TabProps';
 export * from './Tabs/Tab/TabTitle';
 export * from './Tabs/Tab/useTab';
-export * from './Tabs/Tab/VERTICAL_ROTATED_TAB_STYLES';
-export * from './Tabs/Tab/UnderlineTabStyles';
 export * from './Tabs/TabsBootstrap';
 
 export * from './Tabs/TabsBox/TabsBox';

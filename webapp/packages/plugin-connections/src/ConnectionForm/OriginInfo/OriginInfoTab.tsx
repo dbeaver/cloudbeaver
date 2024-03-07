@@ -8,16 +8,16 @@
 import { observer } from 'mobx-react-lite';
 
 import { Translate } from '@cloudbeaver/core-blocks';
-import { TabContainerTabComponent, TabNew, TabTitle } from '@cloudbeaver/core-ui';
+import { Tab, TabContainerTabComponent, TabTitle } from '@cloudbeaver/core-ui';
 
 import type { IConnectionFormProps } from '../IConnectionFormProps';
 
 export const OriginInfoTab: TabContainerTabComponent<IConnectionFormProps> = observer(function OriginInfoTab({ state: { info }, ...rest }) {
   return (
-    <TabNew {...rest}>
+    <Tab {...rest}>
       <TabTitle>
         <Translate token={info?.origin?.displayName || 'Origin'} />
       </TabTitle>
-    </TabNew>
+    </Tab>
   );
 });

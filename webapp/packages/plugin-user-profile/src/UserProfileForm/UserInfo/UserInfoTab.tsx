@@ -8,7 +8,7 @@
 import { observer } from 'mobx-react-lite';
 
 import { useTranslate } from '@cloudbeaver/core-blocks';
-import { TabNew, TabTitle } from '@cloudbeaver/core-ui';
+import { Tab, TabTitle } from '@cloudbeaver/core-ui';
 
 interface Props {
   className?: string;
@@ -18,8 +18,8 @@ export const UserInfoTab = observer<Props>(function UserInfoTab({ className }) {
   const translate = useTranslate();
 
   return (
-    <TabNew tabId="info" className={className}>
+    <Tab tabId="info" className={className}>
       <TabTitle>{translate('plugin_user_profile_info')}</TabTitle>
-    </TabNew>
+    </Tab>
   );
 });

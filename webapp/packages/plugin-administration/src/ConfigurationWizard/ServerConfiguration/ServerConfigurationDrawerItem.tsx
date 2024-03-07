@@ -7,7 +7,7 @@
  */
 import type { AdministrationItemDrawerProps } from '@cloudbeaver/core-administration';
 import { Translate } from '@cloudbeaver/core-blocks';
-import { TabIcon, TabNew, TabTitle } from '@cloudbeaver/core-ui';
+import { TabIcon, Tab, TabTitle } from '@cloudbeaver/core-ui';
 
 export const ServerConfigurationDrawerItem: React.FC<AdministrationItemDrawerProps> = function ServerConfigurationDrawerItem({
   item,
@@ -15,11 +15,11 @@ export const ServerConfigurationDrawerItem: React.FC<AdministrationItemDrawerPro
   disabled,
 }) {
   return (
-    <TabNew tabId={item.name} disabled={disabled} onOpen={() => onSelect(item.name)}>
+    <Tab tabId={item.name} disabled={disabled} onOpen={() => onSelect(item.name)}>
       <TabIcon icon="/icons/server-configuration.svg" />
       <TabTitle>
         <Translate token="administration_configuration_wizard_configuration" />
       </TabTitle>
-    </TabNew>
+    </Tab>
   );
 };

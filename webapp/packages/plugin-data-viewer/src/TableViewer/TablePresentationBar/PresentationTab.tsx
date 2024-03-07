@@ -9,7 +9,7 @@ import { observer } from 'mobx-react-lite';
 
 import { SContext, StyleRegistry, useTranslate } from '@cloudbeaver/core-blocks';
 import type { ComponentStyle } from '@cloudbeaver/core-theming';
-import { baseTabStyles, TabIcon, TabNew, TabTitle, verticalRotatedTabStyles } from '@cloudbeaver/core-ui';
+import { baseTabStyles, TabIcon, Tab, TabTitle, verticalRotatedTabStyles } from '@cloudbeaver/core-ui';
 
 import type { IDatabaseDataModel } from '../../DatabaseDataModel/IDatabaseDataModel';
 import type { IDataPresentationOptions } from '../../DataPresentationService';
@@ -48,10 +48,10 @@ export const PresentationTab = observer<Props>(function PresentationTab({ model,
 
   return (
     <SContext registry={presentationTabRegistry}>
-      <TabNew tabId={presentation.id} disabled={model.isLoading()} onClick={onClick}>
+      <Tab tabId={presentation.id} disabled={model.isLoading()} onClick={onClick}>
         {presentation.icon && <TabIcon icon={presentation.icon} />}
         {presentation.title && <TabTitle>{translate(presentation.title)}</TabTitle>}
-      </TabNew>
+      </Tab>
     </SContext>
   );
 });

@@ -24,7 +24,7 @@ import {
   useTranslate,
 } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { baseTabStyles, TabList, TabPanelListNew, TabsState, underlineTabBigStyles, underlineTabStyles } from '@cloudbeaver/core-ui';
+import { baseTabStyles, TabList, TabPanelList, TabsState, underlineTabBigStyles, underlineTabStyles } from '@cloudbeaver/core-ui';
 
 import { teamContext } from './Contexts/teamContext';
 import type { ITeamFormState } from './ITeamFormProps';
@@ -98,7 +98,7 @@ export const TeamForm = observer<Props>(function TeamForm({ state, onCancel, onS
               </div>
             </div>
             <div className={s(styles, { content: true })}>
-              <TabPanelListNew />
+              <TabPanelList />
             </div>
           </div>
         </TabsState>

@@ -10,7 +10,7 @@ import { observer } from 'mobx-react-lite';
 import { Icon, IconButton, Loader, SContext, StaticImage, StyleRegistry, s, useResource, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import { DBDriverResource } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
-import { TabPanelListNew, TabsState, baseTabStyles, underlineTabStyles } from '@cloudbeaver/core-ui';
+import { TabPanelList, TabsState, baseTabStyles, underlineTabStyles } from '@cloudbeaver/core-ui';
 import { ConnectionFormLoader } from '@cloudbeaver/plugin-connections';
 
 import { CreateConnectionService } from '../CreateConnectionService';
@@ -72,7 +72,7 @@ export const CreateConnection = observer<Props>(function CreateConnection({ meth
           <IconButton name="cross" viewBox="0 0 16 16" onClick={createConnectionService.cancelCreate} />
         </div>
         <div className={s(style, { connectionCreateContent: true })}>
-          <TabPanelListNew />
+          <TabPanelList />
           {createConnectionService.disabled && <Loader overlay />}
         </div>
         </SContext>

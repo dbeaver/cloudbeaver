@@ -7,15 +7,15 @@
  */
 import type { AdministrationItemDrawerProps } from '@cloudbeaver/core-administration';
 import { Translate } from '@cloudbeaver/core-blocks';
-import { TabIcon, TabNew, TabTitle } from '@cloudbeaver/core-ui';
+import { TabIcon, Tab, TabTitle } from '@cloudbeaver/core-ui';
 
 export const UsersDrawerItem: React.FC<AdministrationItemDrawerProps> = function UsersDrawerItem({ item, onSelect, disabled }) {
   return (
-    <TabNew tabId={item.name} disabled={disabled} title="authentication_administration_item" onOpen={() => onSelect(item.name)}>
+    <Tab tabId={item.name} disabled={disabled} title="authentication_administration_item" onOpen={() => onSelect(item.name)}>
       <TabIcon icon="/icons/account.svg" />
       <TabTitle>
         <Translate token="authentication_administration_item" />
       </TabTitle>
-    </TabNew>
+    </Tab>
   );
 };
