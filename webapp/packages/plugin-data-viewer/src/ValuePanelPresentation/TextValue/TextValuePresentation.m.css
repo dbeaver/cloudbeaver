@@ -1,0 +1,17 @@
+.baseTab {
+  composes: theme-ripple theme-background-surface theme-text-text-primary-on-light from global;
+}
+
+.tabList {
+  composes: theme-border-color-background theme-background-background from global;
+  overflow: auto;
+  border-radius: var(--theme-group-element-radius);
+
+  & .baseTab {
+    border-bottom: 0;
+
+    &:global([aria-selected='false']) {
+      border-bottom: 0 !important;
+    }
+  }
+}
