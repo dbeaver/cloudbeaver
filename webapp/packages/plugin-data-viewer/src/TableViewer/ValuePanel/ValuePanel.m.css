@@ -6,14 +6,13 @@
  * you may not use this file except in compliance with the License.
  */
 
-
 .tableLeftBar {
   display: flex;
 }
+
 .tabList {
   composes: theme-border-color-background from global;
   position: relative;
-
   &:before {
     content: '';
     position: absolute;
@@ -23,6 +22,7 @@
     border-color: inherit;
   }
 }
+
 .tabList .tabOuter:only-child {
   display: none;
 }
@@ -36,4 +36,6 @@
   composes: theme-background-secondary theme-text-on-secondary from global;
 }
 
-// TODO delete selected tab background. only underline styles should remain
+.baseTab {
+  background: none !important;
+}
