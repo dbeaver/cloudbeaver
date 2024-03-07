@@ -16,7 +16,6 @@
 }
 
 .tabsBox {
-  // TODO check it. was bug here. background was white instead of gray
   composes: theme-background-secondary theme-text-on-secondary from global;
 }
 
