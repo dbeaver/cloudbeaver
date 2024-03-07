@@ -7,13 +7,31 @@
   },
   "references": [
     {
+      "path": "../core-connections/tsconfig.json"
+    },
+    {
       "path": "../core-di/tsconfig.json"
+    },
+    {
+      "path": "../core-events/tsconfig.json"
+    },
+    {
+      "path": "../core-executor/tsconfig.json"
     },
     {
       "path": "../core-localization/tsconfig.json"
     },
     {
+      "path": "../core-sdk/tsconfig.json"
+    },
+    {
+      "path": "../core-utils/tsconfig.json"
+    },
+    {
       "path": "../core-view/tsconfig.json"
+    },
+    {
+      "path": "../plugin-datasource-context-switch/tsconfig.json"
     },
     {
       "path": "../plugin-top-app-bar/tsconfig.json"

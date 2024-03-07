@@ -69,14 +69,19 @@ export class TransactionManagerService {
       return taskInfo;
     });
 
-    await transaction.run(
-      async () => await this.asyncTaskInfoService.run(task),
-      () => this.asyncTaskInfoService.cancel(task.id),
-      () => {
-        this.asyncTaskInfoService.remove(task.id);
-        this.connectionExecutionContextResource.markOutdated();
-      },
-    );
+    try {
+      await transaction.run(
+        async () => await this.asyncTaskInfoService.run(task),
+        () => this.asyncTaskInfoService.cancel(task.id),
+        () => {
+          this.asyncTaskInfoService.remove(task.id);
+        },
+      );
+
+      this.connectionExecutionContextResource.markOutdated();
+    } catch (exception: any) {
+      this.notificationService.logException(exception, 'plugin_datasource_transaction_manager_commit_mode_fail');
+    }
   }
 
   async commit(connectionId: string, contextId: string) {
@@ -91,11 +96,20 @@ export class TransactionManagerService {
       return taskInfo;
     });
 
-    const info = await transaction.run(async () => await this.asyncTaskInfoService.run(task));
-    const connection = this.connectionSchemaManagerService.currentConnection;
-    const message = typeof info.taskResult === 'string' ? info.taskResult : '';
+    try {
+      const info = await transaction.run(
+        async () => await this.asyncTaskInfoService.run(task),
+        () => this.asyncTaskInfoService.cancel(task.id),
+        () => this.asyncTaskInfoService.remove(task.id),
+      );
 
-    this.notificationService.logInfo({ title: connection?.name ?? info.name ?? '', message });
+      const connection = this.connectionSchemaManagerService.currentConnection;
+      const message = typeof info.taskResult === 'string' ? info.taskResult : '';
+
+      this.notificationService.logInfo({ title: connection?.name ?? info.name ?? '', message });
+    } catch (exception: any) {
+      this.notificationService.logException(exception, 'plugin_datasource_transaction_manager_commit_fail');
+    }
   }
 
   async rollback(connectionId: string, contextId: string) {
@@ -110,10 +124,18 @@ export class TransactionManagerService {
       return taskInfo;
     });
 
-    const info = await transaction.run(async () => await this.asyncTaskInfoService.run(task));
-    const connection = this.connectionSchemaManagerService.currentConnection;
-    const message = typeof info.taskResult === 'string' ? info.taskResult : '';
+    try {
+      const info = await transaction.run(
+        async () => await this.asyncTaskInfoService.run(task),
+        () => this.asyncTaskInfoService.cancel(task.id),
+        () => this.asyncTaskInfoService.remove(task.id),
+      );
+      const connection = this.connectionSchemaManagerService.currentConnection;
+      const message = typeof info.taskResult === 'string' ? info.taskResult : '';
 
-    this.notificationService.logInfo({ title: connection?.name ?? info.name ?? '', message });
+      this.notificationService.logInfo({ title: connection?.name ?? info.name ?? '', message });
+    } catch (exception: any) {
+      this.notificationService.logException(exception, 'plugin_datasource_transaction_manager_rollback_fail');
+    }
   }
 }
