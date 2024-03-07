@@ -112,25 +112,25 @@ export const ObjectViewerPanel: TabHandlerPanelComponent<IObjectViewerTabState> 
     return <TextPlaceholder>{translate('plugin_object_viewer_error')}</TextPlaceholder>;
   }
 
-  return (
-    <SContext registry={objectViewerPanelRegistry}>
-      {node.data ? (
-        <TabsBox
-          currentTabId={tab.handlerState.pageId}
-          tabs={pages.map(page => (
+  return node.data ? (
+    <TabsBox
+      currentTabId={tab.handlerState.pageId}
+      tabs={
+        <SContext registry={objectViewerPanelRegistry}>
+          {pages.map(page => (
             <DBObjectPageTab key={page.key} tab={tab} page={page} onSelect={dbObjectPagesService.selectPage} />
           ))}
-          localState={innerTabState}
-        >
-          {pages.map(page => (
-            <TabPanel key={page.key} tabId={page.key} lazy>
-              <DBObjectPagePanel tab={tab} page={page} />
-            </TabPanel>
-          ))}
-        </TabsBox>
-      ) : (
-        <TextPlaceholder>{translate('plugin_object_viewer_table_no_items')}</TextPlaceholder>
-      )}
-    </SContext>
+        </SContext>
+      }
+      localState={innerTabState}
+    >
+      {pages.map(page => (
+        <TabPanel key={page.key} tabId={page.key} lazy>
+          <DBObjectPagePanel tab={tab} page={page} />
+        </TabPanel>
+      ))}
+    </TabsBox>
+  ) : (
+    <TextPlaceholder>{translate('plugin_object_viewer_table_no_items')}</TextPlaceholder>
   );
 });

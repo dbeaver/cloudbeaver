@@ -26,7 +26,6 @@ interface IProps {
   tab: ITab<IObjectViewerTabState>;
 }
 
-// TODO fix incorrect background on select
 const objectFoldersRegistry: StyleRegistry = [
   [
     navNodeTabStyle,
