@@ -296,8 +296,6 @@ public class WebServiceAdmin implements DBWServiceAdmin {
             if (teamIds.contains(team)) {
                 teamIds.remove(team);
                 adminSecurityController.setUserTeams(user, teamIds.toArray(new String[0]), grantor.getUserId());
-            } else if (team.equals(webSession.getApplication().getAppConfiguration().getDefaultUserTeam())) {
-                throw new DBWebException("You cannot edit default team");
             } else {
                 throw new DBWebException("User '" + user + "' doesn't have team '" + team + "'");
             }
