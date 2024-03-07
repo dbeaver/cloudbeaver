@@ -40,7 +40,7 @@ export class TransactionManagerBootstrap extends Bootstrap {
       getActionInfo: (_, action) => {
         if (action === ACTION_COMMIT_MODE_TOGGLE) {
           const auto = this.transactionManagerService.autoCommitMode;
-          const icon = `/icons/commit_mode_${auto ? 'auto' : 'manual'}.png`;
+          const icon = `/icons/commit_mode_${auto ? 'auto' : 'manual'}.svg`;
           const label = `plugin_datasource_transaction_manager_commit_mode_switch_to_${auto ? 'manual' : 'auto'}`;
 
           return { ...action.info, icon, label, tooltip: label };
@@ -55,32 +55,8 @@ export class TransactionManagerBootstrap extends Bootstrap {
           return false;
         }
 
-        const state = this.transactionManagerService.processState.get(context.connectionId);
-
-        if (!state) {
-          return false;
-        }
-
-        return state.mode || state.commit || state.rollback;
-      },
-      isLoading: (_, action) => {
-        const context = this.transactionManagerService.currentContext;
-
-        if (!context) {
-          return false;
-        }
-
-        const state = this.transactionManagerService.processState.get(context.connectionId);
-
-        if (!state) {
-          return false;
-        }
-
-        if (action === ACTION_COMMIT_MODE_TOGGLE) {
-          return state.mode;
-        }
-
-        return action === ACTION_COMMIT ? state.commit : state.rollback;
+        const transaction = this.transactionManagerService.transactions.get(context.id);
+        return transaction.executing;
       },
       isHidden: (_, action) => {
         if (action === ACTION_COMMIT || action === ACTION_ROLLBACK) {
