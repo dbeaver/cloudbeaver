@@ -119,8 +119,6 @@ public class CBPlatform extends BasePlatformImpl {
 
         refreshApplicableDrivers();
 
-        refreshDisabledDriversConfig();
-
         new WebSessionMonitorJob(this)
             .scheduleMonitor();
 
@@ -291,18 +289,6 @@ public class CBPlatform extends BasePlatformImpl {
             }
         }
         log.info("Available drivers: " + applicableDrivers.stream().map(DBPDriver::getFullName).collect(Collectors.joining(",")));
-    }
-
-    private void refreshDisabledDriversConfig() {
-        CBAppConfig config = application.getAppConfiguration();
-        Set<String> disabledDrivers = new LinkedHashSet<>(Arrays.asList(config.getDisabledDrivers()));
-        for (DBPDriver driver : applicableDrivers) {
-            if (!driver.isEmbedded() || config.isDriverForceEnabled(driver.getFullId())) {
-                continue;
-            }
-            disabledDrivers.add(driver.getFullId());
-        }
-        config.setDisabledDrivers(disabledDrivers.toArray(new String[0]));
     }
 
     @NotNull

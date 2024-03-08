@@ -26,14 +26,13 @@ import { FieldLabel } from '../FieldLabel';
 import { useCapsLockTracker } from '../useCapsLockTracker';
 import inputFieldStyle from './InputField.m.css';
 
-export type InputFieldBaseProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'value' | 'onChange' | 'style'> &
+export type InputFieldBaseProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'value' | 'onChange' | 'style' | 'ref'> &
   ILayoutSizeProps & {
     value?: string;
     error?: boolean;
     loading?: boolean;
     description?: string;
     labelTooltip?: string;
-    ref?: React.ForwardedRef<HTMLInputElement>;
     canShowPassword?: boolean;
     icon?: React.ReactElement;
     onCustomCopy?: () => void;
