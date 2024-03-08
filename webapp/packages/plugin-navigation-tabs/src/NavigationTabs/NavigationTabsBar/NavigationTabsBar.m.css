@@ -16,7 +16,7 @@
 }
 
 .tabsBox {
-  composes: theme-background-secondary theme-text-on-secondary from global;
+  outline: none;
 }
 
 .captureView {
