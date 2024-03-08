@@ -18,4 +18,4 @@ echo "Copy static content"
 
 cp -rp ../webapp/packages/product-default/lib/* cloudbeaver/web
 
-echo "Cloudbeaver is ready. Run run-server.bat in cloudbeaver folder to start the server."
+echo "Cloudbeaver is ready. Run run-server.sh in cloudbeaver folder to start the server."

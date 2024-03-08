@@ -5,6 +5,8 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
+import { observer } from 'mobx-react-lite';
+
 import {
   CheckboxMarkupStyles,
   MenuItemElementStyles,
@@ -14,9 +16,11 @@ import {
   MenuStyles,
   Placeholder,
   PlaceholderContainer,
+  s,
   SContext,
   StyleRegistry,
   TopAppBar,
+  useS,
 } from '@cloudbeaver/core-blocks';
 import { MenuBarItemStyles, MenuBarStyles } from '@cloudbeaver/core-ui';
 
@@ -93,12 +97,13 @@ const registry: StyleRegistry = [
   ],
 ];
 
-export const TopNavBar: React.FC<Props> = function TopNavBar({ container, className }) {
+export const TopNavBar: React.FC<Props> = observer(function TopNavBar({ container, className }) {
+  const styles = useS(TopMenuStyles, TopMenuBarStyles, TopMenuBarItemStyles);
   return (
-    <TopAppBar className={className}>
+    <TopAppBar className={s(styles, { topMenuBar: true }, className)}>
       <SContext registry={registry}>
         <Placeholder container={container} />
       </SContext>
     </TopAppBar>
   );
-};
+});

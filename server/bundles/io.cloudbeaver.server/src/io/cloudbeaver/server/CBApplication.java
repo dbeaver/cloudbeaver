@@ -40,6 +40,7 @@ import org.jkiss.dbeaver.model.DBPDataSourceContainer;
 import org.jkiss.dbeaver.model.app.DBPPlatform;
 import org.jkiss.dbeaver.model.auth.AuthInfo;
 import org.jkiss.dbeaver.model.auth.SMCredentialsProvider;
+import org.jkiss.dbeaver.model.connection.DBPDriver;
 import org.jkiss.dbeaver.model.data.json.JSONUtils;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.security.SMAdminController;
@@ -203,6 +204,7 @@ public abstract class CBApplication extends BaseWebApplication implements WebAut
             log.error(e);
             return;
         }
+        refreshDisabledDriversConfig();
 
         configurationMode = CommonUtils.isEmpty(getServerConfiguration().getServerName());
 
@@ -739,4 +741,16 @@ public abstract class CBApplication extends BaseWebApplication implements WebAut
 
     @Override
     public abstract CBServerConfigurationController getServerConfigurationController();
+
+    private void refreshDisabledDriversConfig() {
+        CBAppConfig config = getAppConfiguration();
+        Set<String> disabledDrivers = new LinkedHashSet<>(Arrays.asList(config.getDisabledDrivers()));
+        for (DBPDriver driver : CBPlatform.getInstance().getApplicableDrivers()) {
+            if (!driver.isEmbedded() || config.isDriverForceEnabled(driver.getFullId())) {
+                continue;
+            }
+            disabledDrivers.add(driver.getFullId());
+        }
+        config.setDisabledDrivers(disabledDrivers.toArray(new String[0]));
+    }
 }
