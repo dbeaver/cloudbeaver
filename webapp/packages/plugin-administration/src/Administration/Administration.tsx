@@ -12,6 +12,7 @@ import styled, { css } from 'reshadow';
 import { AdministrationItemService, filterOnlyActive, IAdministrationItemRoute } from '@cloudbeaver/core-administration';
 import {
   Loader,
+  s,
   SContext,
   SlideBox,
   SlideElement,
@@ -19,6 +20,7 @@ import {
   StyleRegistry,
   ToolsActionStyles,
   ToolsPanelStyles,
+  useS,
   useStyles,
 } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
@@ -106,6 +108,7 @@ export const Administration = observer<React.PropsWithChildren<Props>>(function 
   onItemSelect,
   children,
 }) {
+  const styles = useS(AdministrationToolbarStyles);
   const contentRef = useRef<HTMLDivElement>(null);
   const administrationViewService = useService(AdministrationViewService);
   const administrationItemService = useService(AdministrationItemService);
@@ -120,7 +123,7 @@ export const Administration = observer<React.PropsWithChildren<Props>>(function 
   }, [activeScreen?.item]);
 
   return styled(useStyles(BASE_TAB_STYLES, verticalTabStyles, administrationStyles, tabsStyles))(
-    <CaptureView view={administrationViewService}>
+    <CaptureView view={administrationViewService} className={s(styles, { administration: true })}>
       <SContext registry={registry}>
         <AdministrationCaptureViewContext />
         <TabsState currentTabId={activeScreen?.item} orientation="vertical">
