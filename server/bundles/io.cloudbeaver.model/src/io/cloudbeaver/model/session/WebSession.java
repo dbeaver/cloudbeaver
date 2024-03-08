@@ -524,17 +524,10 @@ public class WebSession extends BaseWebSession
         }
     }
 
-    public synchronized void updateInfo(
-        HttpServletRequest request,
-        HttpServletResponse response
-    ) throws DBWebException {
+    public synchronized void updateInfo(boolean isOldHttpSessionUsed) {
         log.debug("Update session lifetime " + getSessionId() + " for user " + getUserId());
         touchSession();
-        HttpSession httpSession = request.getSession();
-        this.lastRemoteAddr = request.getRemoteAddr();
-        this.lastRemoteUserAgent = request.getHeader("User-Agent");
-        this.cacheExpired = false;
-        if (!httpSession.isNew()) {
+        if (isOldHttpSessionUsed) {
             try {
                 // Persist session
                 if (!isAuthorizedInSecurityManager()) {
@@ -552,6 +545,12 @@ public class WebSession extends BaseWebSession
                 log.error("Error persisting web session", e);
             }
         }
+    }
+
+    public synchronized void updateSessionParameters(HttpServletRequest request) {
+        this.lastRemoteAddr = request.getRemoteAddr();
+        this.lastRemoteUserAgent = request.getHeader("User-Agent");
+        this.cacheExpired = false;
     }
 
     @Association

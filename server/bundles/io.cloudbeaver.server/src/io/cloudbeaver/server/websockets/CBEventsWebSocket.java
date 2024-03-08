@@ -18,6 +18,7 @@ package io.cloudbeaver.server.websockets;
 
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.model.session.BaseWebSession;
+import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.websocket.CBWebSessionEventHandler;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.WriteCallback;
@@ -74,6 +75,12 @@ public class CBEventsWebSocket extends CBAbstractWebSocket implements CBWebSessi
             case ACTIVE_PROJECTS: {
                 var projectEvent = (WSUpdateActiveProjectsClientEvent) clientEvent;
                 this.webSession.getEventsFilter().setSubscribedProjects(projectEvent.getProjectIds());
+                break;
+            }
+            case TOUCH_SESSION: {
+                if (webSession instanceof WebSession session) {
+                    session.updateInfo(true);
+                }
                 break;
             }
             default:

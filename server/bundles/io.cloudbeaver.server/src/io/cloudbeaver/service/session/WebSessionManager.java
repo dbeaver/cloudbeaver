@@ -82,7 +82,8 @@ public class WebSessionManager {
     public boolean touchSession(@NotNull HttpServletRequest request,
                                 @NotNull HttpServletResponse response) throws DBWebException {
         WebSession webSession = getWebSession(request, response, false);
-        webSession.updateInfo(request, response);
+        webSession.updateSessionParameters(request);
+        webSession.updateInfo(!request.getSession().isNew());
         return true;
     }
 
