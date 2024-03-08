@@ -39,8 +39,8 @@ export const UsersAdministration: AdministrationItemContentComponent = observer(
   }
 
   return (
-    <TabsState selectedId={subName} lazy onChange={openSub}>
-      <SContext registry={registry}>
+    <SContext registry={registry}>
+      <TabsState selectedId={subName} lazy onChange={openSub}>
         <ToolsPanel className={s(styles, { toolsPanel: true })} hasBottomBorder>
           <TabList className={s(styles, { tabList: true })} aria-label="User Administration pages">
             <Tab tabId={EUsersAdministrationSub.Users}>
@@ -57,7 +57,7 @@ export const UsersAdministration: AdministrationItemContentComponent = observer(
         <TabPanel className={s(styles, { tabPanel: true })} tabId={EUsersAdministrationSub.Teams}>
           <TeamsPage param={param} />
         </TabPanel>
-      </SContext>
-    </TabsState>
+      </TabsState>
+    </SContext>
   );
 });

@@ -87,8 +87,8 @@ export const Administration = observer<React.PropsWithChildren<Props>>(function 
   return (
     <CaptureView view={administrationViewService} className={s(styles, { administration: true, captureView: true })}>
       <AdministrationCaptureViewContext />
-      <TabsState currentTabId={activeScreen?.item} orientation="vertical">
-        <SContext registry={adminPageRegistry}>
+      <SContext registry={adminPageRegistry}>
+        <TabsState currentTabId={activeScreen?.item} orientation="vertical">
           <SContext registry={sidebarRegistry}>
             <TabList className={s(styles, { tabList: true })} aria-label="Administration items">
               {items.map(item => (
@@ -120,8 +120,8 @@ export const Administration = observer<React.PropsWithChildren<Props>>(function 
               </SlideElement>
             </SlideBox>
           </div>
-        </SContext>
-      </TabsState>
+        </TabsState>
+      </SContext>
     </CaptureView>
   );
 });

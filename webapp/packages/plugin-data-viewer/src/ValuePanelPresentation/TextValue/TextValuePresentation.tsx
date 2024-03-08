@@ -145,19 +145,19 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
       <Container vertical gap dense overflow>
         <Container keepSize center overflow>
           <Container keepSize>
-            <TabsState
-              dataFormat={dataFormat}
-              resultIndex={resultIndex}
-              container={textValuePresentationService.tabs}
-              currentTabId={contentType}
-              model={model}
-              lazy
-              onChange={tab => selectTabHandler(tab.tabId)}
-            >
-              <SContext registry={tabRegistry}>
+            <SContext registry={tabRegistry}>
+              <TabsState
+                dataFormat={dataFormat}
+                resultIndex={resultIndex}
+                container={textValuePresentationService.tabs}
+                currentTabId={contentType}
+                model={model}
+                lazy
+                onChange={tab => selectTabHandler(tab.tabId)}
+              >
                 <TabList className={s(style, { tabList: true })} />
-              </SContext>
-            </TabsState>
+              </TabsState>
+            </SContext>
           </Container>
         </Container>
         <Group maximum box>

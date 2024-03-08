@@ -7,10 +7,10 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import { Icon, IconButton, Loader, SContext, StaticImage, StyleRegistry, s, useResource, useS, useTranslate } from '@cloudbeaver/core-blocks';
+import { Icon, IconButton, Loader, s, SContext, StaticImage, StyleRegistry, useResource, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import { DBDriverResource } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
-import { TabPanelList, TabsState, baseTabStyles, underlineTabStyles } from '@cloudbeaver/core-ui';
+import { baseTabStyles, TabPanelList, TabsState, underlineTabStyles } from '@cloudbeaver/core-ui';
 import { ConnectionFormLoader } from '@cloudbeaver/plugin-connections';
 
 import { CreateConnectionService } from '../CreateConnectionService';
@@ -21,9 +21,7 @@ interface Props {
   configurationWizard: boolean;
 }
 
-const tabsRegistry: StyleRegistry = [
-  [baseTabStyles, { mode: 'append', styles: [styles, underlineTabStyles] }],
-];
+const tabsRegistry: StyleRegistry = [[baseTabStyles, { mode: 'append', styles: [styles, underlineTabStyles] }]];
 
 export const CreateConnection = observer<Props>(function CreateConnection({ method }) {
   const style = useS(styles);
@@ -57,26 +55,26 @@ export const CreateConnection = observer<Props>(function CreateConnection({ meth
   }
 
   return (
-    <div className={s(style, { connectionCreate: true })}>
-      <TabsState
-        currentTabId={method}
-        container={createConnectionService.tabsContainer}
-        manual
-        lazy
-        onChange={({ tabId }) => createConnectionService.setCreateMethod(tabId)}
-      >
-        <SContext registry={tabsRegistry}>
-        <div className={s(style, { titleBar: true })}>
-          {translate('connections_administration_connection_create')}
-          <div className={s(style, { fill: true })} />
-          <IconButton name="cross" viewBox="0 0 16 16" onClick={createConnectionService.cancelCreate} />
-        </div>
-        <div className={s(style, { connectionCreateContent: true })}>
-          <TabPanelList />
-          {createConnectionService.disabled && <Loader overlay />}
-        </div>
-        </SContext>
-      </TabsState>
-    </div>
+    <SContext registry={tabsRegistry}>
+      <div className={s(style, { connectionCreate: true })}>
+        <TabsState
+          currentTabId={method}
+          container={createConnectionService.tabsContainer}
+          manual
+          lazy
+          onChange={({ tabId }) => createConnectionService.setCreateMethod(tabId)}
+        >
+          <div className={s(style, { titleBar: true })}>
+            {translate('connections_administration_connection_create')}
+            <div className={s(style, { fill: true })} />
+            <IconButton name="cross" viewBox="0 0 16 16" onClick={createConnectionService.cancelCreate} />
+          </div>
+          <div className={s(style, { connectionCreateContent: true })}>
+            <TabPanelList />
+            {createConnectionService.disabled && <Loader overlay />}
+          </div>
+        </TabsState>
+      </div>
+    </SContext>
   );
 });

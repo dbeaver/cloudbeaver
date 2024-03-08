@@ -94,9 +94,9 @@ export const ConnectionForm = observer<ConnectionFormProps>(function ConnectionF
   }
 
   return (
-    <Form context={form} className={s(styles, { form: true })}>
-      <TabsState container={service.tabsContainer} localState={state.partsState} state={state} onCancel={onCancel}>
-        <SContext registry={connectionFormRegistry}>
+    <SContext registry={connectionFormRegistry}>
+      <Form context={form} className={s(styles, { form: true })}>
+        <TabsState container={service.tabsContainer} localState={state.partsState} state={state} onCancel={onCancel}>
           <div className={s(styles, { box: true }, className)}>
             <div className={s(styles, { connectionTopBar: true })}>
               <div className={s(styles, { connectionTopBarTabs: true })}>
@@ -117,8 +117,8 @@ export const ConnectionForm = observer<ConnectionFormProps>(function ConnectionF
               <TabPanelList />
             </div>
           </div>
-        </SContext>
-      </TabsState>
-    </Form>
+        </TabsState>
+      </Form>
+    </SContext>
   );
 });

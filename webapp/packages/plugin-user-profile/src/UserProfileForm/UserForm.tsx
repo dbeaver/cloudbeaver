@@ -35,9 +35,9 @@ export const UserForm = observer<Props>(function UserForm({ user, state, onClose
   const localProvider = user.linkedAuthProviders.includes(AUTH_PROVIDER_LOCAL_ID);
 
   return (
-    <div className={s(moduleStyle, { box: true })}>
-      <TabsState>
-        <SContext registry={registry}>
+    <SContext registry={registry}>
+      <div className={s(moduleStyle, { box: true })}>
+        <TabsState>
           <div className={s(moduleStyle, { topBar: true })}>
             <div className={s(moduleStyle, { topBarTabs: true })}>
               <div className={s(moduleStyle, { statusMessage: true })}>
@@ -60,8 +60,8 @@ export const UserForm = observer<Props>(function UserForm({ user, state, onClose
             <UserInfoPanel user={user} />
             {localProvider && <AuthenticationPanel />}
           </div>
-        </SContext>
-      </TabsState>
-    </div>
+        </TabsState>
+      </div>
+    </SContext>
   );
 });
