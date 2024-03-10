@@ -22,7 +22,7 @@ import {
   useS,
 } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { baseTabStyles, OptionsPanelService, TabList, TabsState, verticalTabStyles } from '@cloudbeaver/core-ui';
+import { baseTabStyles, OptionsPanelService, TabList, tabListStyles, TabsState, verticalTabStyles } from '@cloudbeaver/core-ui';
 import { CaptureView } from '@cloudbeaver/core-view';
 
 import { AdministrationCaptureViewContext } from './AdministrationCaptureViewContext';
@@ -62,6 +62,13 @@ const tabsRegistry: StyleRegistry = [
       styles: [verticalTabStyles, AdministrationToolbarStyles],
     },
   ],
+  [
+    tabListStyles,
+    {
+      mode: 'append',
+      styles: [verticalTabStyles, AdministrationToolbarStyles],
+    },
+  ],
 ];
 
 export const Administration = observer<React.PropsWithChildren<Props>>(function Administration({
@@ -70,7 +77,7 @@ export const Administration = observer<React.PropsWithChildren<Props>>(function 
   onItemSelect,
   children,
 }) {
-  const styles = useS(baseTabStyles, verticalTabStyles, AdministrationToolbarStyles);
+  const styles = useS(AdministrationToolbarStyles);
   const contentRef = useRef<HTMLDivElement>(null);
   const administrationViewService = useService(AdministrationViewService);
   const administrationItemService = useService(AdministrationItemService);
@@ -89,7 +96,7 @@ export const Administration = observer<React.PropsWithChildren<Props>>(function 
       <AdministrationCaptureViewContext />
       <TabsState currentTabId={activeScreen?.item} orientation="vertical">
         <SContext registry={tabsRegistry}>
-          <TabList className={s(styles, { tabList: true })} aria-label="Administration items">
+          <TabList aria-label="Administration items">
             {items.map(item => (
               <DrawerItem
                 key={item.name}

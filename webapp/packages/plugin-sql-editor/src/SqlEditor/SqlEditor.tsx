@@ -10,7 +10,7 @@ import { useEffect, useMemo, useState } from 'react';
 
 import { getComputed, s, SContext, StyleRegistry, useS, useSplit } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { baseTabStyles, ITabData, TabList, TabPanelList, TabsState, verticalRotatedTabStyles } from '@cloudbeaver/core-ui';
+import { baseTabStyles, ITabData, TabList, tabListStyles, TabPanelList, TabsState, verticalRotatedTabStyles } from '@cloudbeaver/core-ui';
 import { MetadataMap } from '@cloudbeaver/core-utils';
 import { useCaptureViewContext } from '@cloudbeaver/core-view';
 
@@ -21,11 +21,14 @@ import styles from './SqlEditor.m.css';
 import { SQLEditorActions } from './SQLEditorActions';
 import { useSqlEditor } from './useSqlEditor';
 
-const sqlEditorRegistry: StyleRegistry = [[baseTabStyles, { mode: 'append', styles: [verticalRotatedTabStyles, styles] }]];
+const sqlEditorRegistry: StyleRegistry = [
+  [tabListStyles, { mode: 'append', styles: [verticalRotatedTabStyles, styles] }],
+  [baseTabStyles, { mode: 'append', styles: [verticalRotatedTabStyles, styles] }],
+];
 
 export const SqlEditor = observer<ISqlEditorProps>(function SqlEditor({ state, className }) {
   const split = useSplit();
-  const style = useS(baseTabStyles, verticalRotatedTabStyles, styles);
+  const style = useS(verticalRotatedTabStyles, styles);
   const sqlEditorModeService = useService(SqlEditorModeService);
   const data = useSqlEditor(state);
   const [modesState] = useState(() => new MetadataMap<string, any>());
@@ -69,7 +72,7 @@ export const SqlEditor = observer<ISqlEditorProps>(function SqlEditor({ state, c
           <TabPanelList />
           {displayedEditors > 1 ? (
             <div className={s(style, { tabs: true })}>
-              <TabList className={s(style, { tabList: true })} />
+              <TabList />
             </div>
           ) : null}
         </div>

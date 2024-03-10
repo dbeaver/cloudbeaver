@@ -11,7 +11,7 @@ import { useEffect } from 'react';
 import { s, SContext, StyleRegistry, TextPlaceholder, useResource, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { NavNodeManagerService, NavTreeResource } from '@cloudbeaver/core-navigation-tree';
-import { baseTabStyles, ITabData, TabList, TabPanel, TabsState, useTabLocalState, verticalTabStyles } from '@cloudbeaver/core-ui';
+import { baseTabStyles, ITabData, TabList, tabListStyles, TabPanel, TabsState, useTabLocalState, verticalTabStyles } from '@cloudbeaver/core-ui';
 import { MetadataMap } from '@cloudbeaver/core-utils';
 import type { ITab } from '@cloudbeaver/plugin-navigation-tabs';
 import { NavNodeViewService } from '@cloudbeaver/plugin-navigation-tree';
@@ -38,14 +38,14 @@ const objectFoldersRegistry: StyleRegistry = [
     baseTabStyles,
     {
       mode: 'append',
-      styles: [styles],
+      styles: [verticalTabStyles, styles],
     },
   ],
   [
-    styles,
+    tabListStyles,
     {
       mode: 'append',
-      styles: [verticalTabStyles],
+      styles: [verticalTabStyles, styles],
     },
   ],
 ];
@@ -55,7 +55,7 @@ export const ObjectFolders = observer<IProps>(function ObjectFolders({ tab }) {
   const navNodeManagerService = useService(NavNodeManagerService);
   const navNodeViewService = useService(NavNodeViewService);
   const innerTabState = useTabLocalState(() => new MetadataMap<string, any>());
-  const style = useS(baseTabStyles, styles, verticalTabStyles);
+  const style = useS(styles, verticalTabStyles);
 
   const nodeId = tab.handlerState.objectId;
   const parentId = tab.handlerState.parentId;
@@ -90,7 +90,7 @@ export const ObjectFolders = observer<IProps>(function ObjectFolders({ tab }) {
       {folders.length > 0 ? (
         <TabsState currentTabId={folderId} orientation="vertical" localState={innerTabState} lazy onChange={openFolder}>
           <div className={s(style, { verticalTabs: true })}>
-            <TabList className={s(style, { tabList: true })} aria-label="Object folders">
+            <TabList aria-label="Object folders">
               {folders.map(folderId => (
                 <FolderTabRenderer key={folderId} nodeId={nodeId} folderId={folderId} parents={parents} />
               ))}
