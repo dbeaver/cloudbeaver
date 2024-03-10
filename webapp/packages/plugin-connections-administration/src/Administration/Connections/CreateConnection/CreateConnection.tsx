@@ -31,28 +31,26 @@ export const CreateConnection = observer<Props>(function CreateConnection({ meth
 
   if (createConnectionService.data) {
     return (
-      <SContext registry={tabsRegistry}>
-        <div className={s(style, { connectionCreate: true })}>
-          <div className={s(style, { titleBar: true })}>
-            <div className={s(style, { backButton: true })}>
-              <Icon className={s(style, { icon: true })} name="angle" viewBox="0 0 15 8" onClick={createConnectionService.clearConnectionTemplate} />
-            </div>
-            {driver.data?.icon && <StaticImage className={s(style, { staticImage: true })} icon={driver.data.icon} />}
-            {driver.data?.name ?? translate('connections_administration_connection_create')}
-            <div className={s(style, { fill: true })} />
-            <IconButton name="cross" viewBox="0 0 24 24" onClick={createConnectionService.cancelCreate} />
+      <div className={s(style, { connectionCreate: true })}>
+        <div className={s(style, { titleBar: true })}>
+          <div className={s(style, { backButton: true })}>
+            <Icon className={s(style, { icon: true })} name="angle" viewBox="0 0 15 8" onClick={createConnectionService.clearConnectionTemplate} />
           </div>
-          <div className={s(style, { connectionCreateContent: true })}>
-            <Loader className={s(style, { loader: true })} suspense>
-              <ConnectionFormLoader
-                state={createConnectionService.data}
-                onCancel={createConnectionService.clearConnectionTemplate}
-                onSave={createConnectionService.clearConnectionTemplate}
-              />
-            </Loader>
-          </div>
+          {driver.data?.icon && <StaticImage className={s(style, { staticImage: true })} icon={driver.data.icon} />}
+          {driver.data?.name ?? translate('connections_administration_connection_create')}
+          <div className={s(style, { fill: true })} />
+          <IconButton name="cross" viewBox="0 0 24 24" onClick={createConnectionService.cancelCreate} />
         </div>
-      </SContext>
+        <div className={s(style, { connectionCreateContent: true })}>
+          <Loader className={s(style, { loader: true })} suspense>
+            <ConnectionFormLoader
+              state={createConnectionService.data}
+              onCancel={createConnectionService.clearConnectionTemplate}
+              onSave={createConnectionService.clearConnectionTemplate}
+            />
+          </Loader>
+        </div>
+      </div>
     );
   }
 
