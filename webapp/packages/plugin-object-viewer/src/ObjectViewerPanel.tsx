@@ -9,12 +9,23 @@ import { observable, runInAction } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import { useCallback } from 'react';
 
-import { Button, Loader, SContext, StyleRegistry, TextPlaceholder, useObservableRef, useResource, useTranslate } from '@cloudbeaver/core-blocks';
+import {
+  Button,
+  Loader,
+  s,
+  SContext,
+  StyleRegistry,
+  TextPlaceholder,
+  useObservableRef,
+  useResource,
+  useS,
+  useTranslate,
+} from '@cloudbeaver/core-blocks';
 import { ConnectionInfoResource, ConnectionsManagerService } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { NavNodeInfoResource } from '@cloudbeaver/core-navigation-tree';
-import { baseTabStyles, TabPanel, TabsBox, tabsBoxStyles, useTabLocalState } from '@cloudbeaver/core-ui';
+import { baseTabStyles, TabPanel, TabsBox, useTabLocalState } from '@cloudbeaver/core-ui';
 import { MetadataMap } from '@cloudbeaver/core-utils';
 import type { TabHandlerPanelComponent } from '@cloudbeaver/plugin-navigation-tabs';
 
@@ -24,14 +35,7 @@ import { DBObjectPageService } from './ObjectPage/DBObjectPageService';
 import { DBObjectPageTab } from './ObjectPage/DBObjectPageTab';
 import styles from './ObjectViewerPanel.m.css';
 
-const objectViewerPanelRegistry: StyleRegistry = [
-  [
-    tabsBoxStyles,
-    {
-      mode: 'append',
-      styles: [baseTabStyles],
-    },
-  ],
+const tabsRegistry: StyleRegistry = [
   [
     baseTabStyles,
     {
@@ -48,6 +52,7 @@ export const ObjectViewerPanel: TabHandlerPanelComponent<IObjectViewerTabState> 
   const navNodeInfoResource = useService(NavNodeInfoResource);
   const notificationService = useService(NotificationService);
   const innerTabState = useTabLocalState(() => new MetadataMap<string, any>());
+  const style = useS(styles);
 
   const objectId = tab.handlerState.objectId;
   const connectionKey = tab.handlerState.connectionKey || null;
@@ -115,8 +120,9 @@ export const ObjectViewerPanel: TabHandlerPanelComponent<IObjectViewerTabState> 
   return node.data ? (
     <TabsBox
       currentTabId={tab.handlerState.pageId}
+      tabsClassName={s(style, { tabs: true })}
       tabs={
-        <SContext registry={objectViewerPanelRegistry}>
+        <SContext registry={tabsRegistry}>
           {pages.map(page => (
             <DBObjectPageTab key={page.key} tab={tab} page={page} onSelect={dbObjectPagesService.selectPage} />
           ))}

@@ -48,7 +48,6 @@ export * from './Tabs/useTabLocalState';
 export { default as baseTabStyles } from './Tabs/Tab/baseTab.m.css';
 export { default as baseTabActionStyles } from './Tabs/Tab/baseTabAction.m.css';
 export { default as verticalRotatedTabStyles } from './Tabs/Tab/verticalRotatedTab.m.css';
-export { default as tabsBoxStyles } from './Tabs/TabsBox/TabsBox.m.css';
 export { default as tabPanelStyles } from './Tabs/TabPanel.m.css';
 export { default as verticalTabStyles } from './Tabs/Tab/verticalTabStyles.m.css';
 export { default as underlineTabStyles } from './Tabs/Tab/underlineTabStyles.m.css';

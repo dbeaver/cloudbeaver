@@ -10,16 +10,17 @@ import { forwardRef, PropsWithChildren, ReactNode } from 'react';
 import { s, SContext, StyleRegistry, useS } from '@cloudbeaver/core-blocks';
 import type { MetadataMap } from '@cloudbeaver/core-utils';
 
-import { tabPanelStyles, tabsBoxStyles } from '../..';
+import { tabPanelStyles } from '../..';
 import type { ITabData } from '../TabsContainer/ITabsContainer';
 import { TabsState } from '../TabsState';
+import styles from './TabsBox.m.css';
 
 const tabsBoxRegistry: StyleRegistry = [
   [
     tabPanelStyles,
     {
       mode: 'append',
-      styles: [tabsBoxStyles],
+      styles: [styles],
     },
   ],
 ];
@@ -30,6 +31,7 @@ type TabsBoxProps = PropsWithChildren<{
   tabIndex?: number;
   localState?: MetadataMap<string, any>;
   tabList?: string[];
+  tabsClassName?: string;
   enabledBaseActions?: boolean;
   autoSelect?: boolean;
   className?: string;
@@ -37,26 +39,26 @@ type TabsBoxProps = PropsWithChildren<{
 }>;
 
 export const TabsBox = forwardRef<HTMLDivElement, TabsBoxProps>(function TabsBox(
-  { currentTabId, tabs, tabIndex, localState, tabList, enabledBaseActions, autoSelect, children, className, onChange },
+  { currentTabId, tabs, tabIndex, localState, tabsClassName, tabList, enabledBaseActions, autoSelect, children, className, onChange },
   ref,
 ) {
-  const moduleStyles = useS(tabsBoxStyles);
+  const style = useS(styles);
 
   return (
-    <TabsState
-      currentTabId={currentTabId}
-      localState={localState}
-      tabList={tabList}
-      autoSelect={autoSelect}
-      enabledBaseActions={enabledBaseActions}
-      onChange={onChange}
-    >
-      <SContext registry={tabsBoxRegistry}>
-        <div ref={ref} className={s(moduleStyles, { tabsBox: true }, className)} tabIndex={tabIndex}>
-          {tabs && <div className={s(moduleStyles, { tabs: true })}>{tabs}</div>}
-          <div className={s(moduleStyles, { tabPanels: true })}>{children}</div>
+    <SContext registry={tabsBoxRegistry}>
+      <TabsState
+        currentTabId={currentTabId}
+        localState={localState}
+        tabList={tabList}
+        autoSelect={autoSelect}
+        enabledBaseActions={enabledBaseActions}
+        onChange={onChange}
+      >
+        <div ref={ref} className={s(style, { tabsBox: true }, className)} tabIndex={tabIndex}>
+          {tabs && <div className={s(style, { tabs: true }, tabsClassName)}>{tabs}</div>}
+          <div className={s(style, { tabPanels: true })}>{children}</div>
         </div>
-      </SContext>
-    </TabsState>
+      </TabsState>
+    </SContext>
   );
 });

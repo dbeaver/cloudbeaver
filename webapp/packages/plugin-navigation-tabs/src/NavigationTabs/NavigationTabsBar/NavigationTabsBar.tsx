@@ -23,7 +23,7 @@ interface Props {
   className?: string;
 }
 
-const navigationBarRegistry: StyleRegistry = [
+const tabsRegistry: StyleRegistry = [
   [
     baseTabStyles,
     {
@@ -86,14 +86,15 @@ export const NavigationTabsBar = observer<Props>(function NavigationTabsBar({ cl
       <Loader loading={restoring}>
         <TabsBox
           currentTabId={navigation.currentTabId}
+          className={s(style, { tabsBox: true })}
+          tabsClassName={s(style, { tabs: true })}
           tabs={
-            <SContext registry={navigationBarRegistry}>
+            <SContext registry={tabsRegistry}>
               {navigation.tabIdList.map(tabId => (
                 <TabHandlerTab key={tabId} tabId={tabId} onSelect={handleSelect} onClose={handleClose} />
               ))}
             </SContext>
           }
-          className={s(style, { tabsBox: true })}
           tabList={navigation.tabIdList}
           tabIndex={0}
           autoSelect
