@@ -11,18 +11,15 @@
   color: inherit;
 }
 
-.verticalTabs {
-  composes: theme-border-color-background from global;
-  border-top: 1px solid;
-  flex: 1;
-}
-
 .tabPanel {
   overflow: auto !important;
+  composes: theme-border-color-background from global;
+  border-top: 1px solid;
 }
 
 .tabList {
   composes: theme-background-surface theme-text-on-surface theme-border-color-background from global;
+  border-top: 1px solid;
   border-right: 1px solid;
 }
 
