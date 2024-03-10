@@ -54,7 +54,7 @@ const adminPageRegistry: StyleRegistry = [
   ],
 ];
 
-const sidebarRegistry: StyleRegistry = [
+const tabsRegistry: StyleRegistry = [
   [
     baseTabStyles,
     {
@@ -87,21 +87,21 @@ export const Administration = observer<React.PropsWithChildren<Props>>(function 
   return (
     <CaptureView view={administrationViewService} className={s(styles, { administration: true, captureView: true })}>
       <AdministrationCaptureViewContext />
-      <SContext registry={adminPageRegistry}>
-        <TabsState currentTabId={activeScreen?.item} orientation="vertical">
-          <SContext registry={sidebarRegistry}>
-            <TabList className={s(styles, { tabList: true })} aria-label="Administration items">
-              {items.map(item => (
-                <DrawerItem
-                  key={item.name}
-                  item={item}
-                  configurationWizard={configurationWizard}
-                  disabled={!!(onlyActiveItem && onlyActiveItem.filterOnlyActive?.(configurationWizard, item) !== true)}
-                  onSelect={onItemSelect}
-                />
-              ))}
-            </TabList>
-          </SContext>
+      <TabsState currentTabId={activeScreen?.item} orientation="vertical">
+        <SContext registry={tabsRegistry}>
+          <TabList className={s(styles, { tabList: true })} aria-label="Administration items">
+            {items.map(item => (
+              <DrawerItem
+                key={item.name}
+                item={item}
+                configurationWizard={configurationWizard}
+                disabled={!!(onlyActiveItem && onlyActiveItem.filterOnlyActive?.(configurationWizard, item) !== true)}
+                onSelect={onItemSelect}
+              />
+            ))}
+          </TabList>
+        </SContext>
+        <SContext registry={adminPageRegistry}>
           <div ref={contentRef} className={s(styles, { contentContainer: true })}>
             {children}
             <SlideBox className={s(styles, { slideBox: true })} open={optionsPanelService.active}>
@@ -120,8 +120,8 @@ export const Administration = observer<React.PropsWithChildren<Props>>(function 
               </SlideElement>
             </SlideBox>
           </div>
-        </TabsState>
-      </SContext>
+        </SContext>
+      </TabsState>
     </CaptureView>
   );
 });
