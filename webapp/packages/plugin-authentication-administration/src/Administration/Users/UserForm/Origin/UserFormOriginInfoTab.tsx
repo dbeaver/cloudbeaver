@@ -12,9 +12,9 @@ import { Tab, TabContainerTabComponent, TabTitle } from '@cloudbeaver/core-ui';
 
 import type { UserFormProps } from '../AdministrationUserFormService';
 
-export const UserFormOriginInfoTab: TabContainerTabComponent<UserFormProps> = observer(function UserFormOriginInfoTab({ tabId, ...rest }) {
+export const UserFormOriginInfoTab: TabContainerTabComponent<UserFormProps> = observer(function UserFormOriginInfoTab(props) {
   return (
-    <Tab {...rest} tabId={tabId}>
+    <Tab {...props}>
       <TabTitle>
         <Translate token="authentication_administration_user_auth_methods" />
       </TabTitle>

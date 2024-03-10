@@ -26,7 +26,7 @@ export const UsersAdministration: AdministrationItemContentComponent = observer(
   const translate = useTranslate();
   const usersAdministrationNavigationService = useService(UsersAdministrationNavigationService);
   const subName = sub?.name || EUsersAdministrationSub.Users;
-  const styles = useS(baseTabStyles, underlineTabStyles, tabPanelStyles, style);
+  const styles = useS(style);
 
   function openSub({ tabId }: ITabData) {
     if (subName === tabId) {

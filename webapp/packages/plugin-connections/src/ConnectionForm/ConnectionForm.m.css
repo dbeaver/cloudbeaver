@@ -62,7 +62,7 @@
   align-items: center;
   gap: 8px;
 
-  & IconOrImage {
+  & .iconOrImage {
     height: 24px;
     width: 24px;
   }
