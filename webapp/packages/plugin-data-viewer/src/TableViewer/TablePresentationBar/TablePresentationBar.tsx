@@ -10,7 +10,7 @@ import { observer } from 'mobx-react-lite';
 import { s, SContext, StyleRegistry, useS } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import type { ResultDataFormat } from '@cloudbeaver/core-sdk';
-import { baseTabStyles, TabList, TabsState, verticalRotatedTabStyles } from '@cloudbeaver/core-ui';
+import { baseTabStyles, TabList, tabListStyles, TabsState, verticalRotatedTabStyles } from '@cloudbeaver/core-ui';
 
 import type { IDatabaseDataModel } from '../../DatabaseDataModel/IDatabaseDataModel';
 import { DataPresentationService, DataPresentationType } from '../../DataPresentationService';
@@ -29,7 +29,10 @@ interface Props {
   onClose?: () => void;
 }
 
-const tablePresentationBarRegistry: StyleRegistry = [[baseTabStyles, { mode: 'append', styles: [verticalRotatedTabStyles, styles] }]];
+const tablePresentationBarRegistry: StyleRegistry = [
+  [baseTabStyles, { mode: 'append', styles: [verticalRotatedTabStyles, styles] }],
+  [tabListStyles, { mode: 'append', styles: [verticalRotatedTabStyles, styles] }],
+];
 
 export const TablePresentationBar = observer<Props>(function TablePresentationBar({
   type,
@@ -42,7 +45,7 @@ export const TablePresentationBar = observer<Props>(function TablePresentationBa
   onPresentationChange,
   onClose,
 }) {
-  const style = useS(baseTabStyles, verticalRotatedTabStyles, styles);
+  const style = useS(styles);
   const dataPresentationService = useService(DataPresentationService);
   const presentations = dataPresentationService.getSupportedList(type, supportedDataFormat, dataFormat, model, resultIndex);
   const Tab = PresentationTab; // alias for styles matching

@@ -30,7 +30,7 @@ const sideBarPanelRegistry: StyleRegistry = [
 ];
 
 export const SideBarPanel = observer<Props>(function SideBarPanel({ container }) {
-  const style = useS(baseTabStyles, underlineTabStyles, styles);
+  const style = useS(styles);
 
   return (
     <SContext registry={sideBarPanelRegistry}>

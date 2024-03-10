@@ -25,7 +25,7 @@ const ToolsPanelRegistry: StyleRegistry = [[baseTabStyles, { mode: 'append', sty
 
 export const ToolsPanel = observer(function ToolsPanel() {
   const toolsPanelService = useService(ToolsPanelService);
-  const style = useS(baseTabStyles, underlineTabStyles, styles);
+  const style = useS(styles);
 
   const state = useUserData<IToolsState>('tools', () => ({ selectedTabId: undefined }));
   const tabs = toolsPanelService.tabsContainer.getIdList();

@@ -28,7 +28,7 @@ const sqlEditorRegistry: StyleRegistry = [
 
 export const SqlEditor = observer<ISqlEditorProps>(function SqlEditor({ state, className }) {
   const split = useSplit();
-  const style = useS(verticalRotatedTabStyles, styles);
+  const style = useS(styles);
   const sqlEditorModeService = useService(SqlEditorModeService);
   const data = useSqlEditor(state);
   const [modesState] = useState(() => new MetadataMap<string, any>());

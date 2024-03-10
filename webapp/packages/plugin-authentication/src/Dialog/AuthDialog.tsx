@@ -27,7 +27,7 @@ import {
 } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogComponent } from '@cloudbeaver/core-dialogs';
-import { baseTabStyles, TabList, Tab, TabsState, TabTitle, underlineTabBigStyles, underlineTabStyles } from '@cloudbeaver/core-ui';
+import { baseTabStyles, Tab, TabList, TabsState, TabTitle, underlineTabBigStyles, underlineTabStyles } from '@cloudbeaver/core-ui';
 
 import { AuthenticationService } from '../AuthenticationService';
 import type { IAuthOptions } from '../IAuthOptions';
@@ -45,7 +45,7 @@ export const AuthDialog: DialogComponent<IAuthOptions, null> = observer(function
   options,
   rejectDialog,
 }) {
-  const styles = useS(baseTabStyles, underlineTabStyles, underlineTabBigStyles, style);
+  const styles = useS(style);
   const dialogData = useAuthDialogState(accessRequest, providerId, configurationId);
   const errorDetails = useErrorDetails(dialogData.exception);
   const authenticationService = useService(AuthenticationService);
