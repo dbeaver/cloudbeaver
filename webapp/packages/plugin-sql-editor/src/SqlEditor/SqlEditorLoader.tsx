@@ -12,7 +12,7 @@ import { ComplexLoader, createComplexLoader } from '@cloudbeaver/core-blocks';
 import type { ISqlEditorProps } from './ISqlEditorProps';
 
 const loader = createComplexLoader(async function loader() {
-  const { SqlEditor } = await import('./SqlEditor');
+  const { SqlEditor } = await import('./SqlEditor/SqlEditor');
   return { SqlEditor };
 });
 
