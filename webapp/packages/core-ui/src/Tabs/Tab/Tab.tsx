@@ -44,7 +44,7 @@ export const Tab = observer<TabProps>(function Tab({ tabId, title, menuContext, 
                 <Icon className={s(styles, { tabIcon: true })} name="cross-bold" viewBox="0 0 7 8" />
               </div>
             )}
-            <TabMenuNew tabId={tabId} state={tab.state} menuContext={menuContext} />
+            <TabMenu tabId={tabId} state={tab.state} menuContext={menuContext} />
           </div>
           <BaseTab
             ref={ref}
@@ -70,7 +70,7 @@ interface TabMenuProps {
   menuContext?: IDataContext;
 }
 
-const TabMenuNew = observer<TabMenuProps>(function TabMenuNew({ tabId, state, menuContext }) {
+const TabMenu = observer<TabMenuProps>(function TabMenu({ tabId, state, menuContext }) {
   const styles = useS(baseTabStyles, baseTabActionStyles);
 
   const [menuOpened, switchState] = useState(false);
