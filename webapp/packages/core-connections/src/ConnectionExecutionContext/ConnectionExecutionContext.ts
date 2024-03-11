@@ -8,9 +8,12 @@
 import { computed, makeObservable, observable } from 'mobx';
 
 import type { ITask, TaskScheduler } from '@cloudbeaver/core-executor';
+import type { AsyncTaskInfoService, GraphQLService } from '@cloudbeaver/core-sdk';
 
 import type { ConnectionExecutionContextResource, IConnectionExecutionContextInfo } from './ConnectionExecutionContextResource';
 import type { IConnectionExecutionContext } from './IConnectionExecutionContext';
+
+const DEFAULT_AUTO_COMMIT = true;
 
 export class ConnectionExecutionContext implements IConnectionExecutionContext {
   get context(): IConnectionExecutionContextInfo | undefined {
@@ -25,12 +28,22 @@ export class ConnectionExecutionContext implements IConnectionExecutionContext {
     return this.currentTask?.cancellable || false;
   }
 
+  get currentCommitMode() {
+    if (this.context) {
+      return this.context.autoCommit ?? DEFAULT_AUTO_COMMIT;
+    }
+
+    return DEFAULT_AUTO_COMMIT;
+  }
+
   private currentTask: ITask<any> | null;
 
   constructor(
+    private readonly contextId: string,
     private readonly scheduler: TaskScheduler<string>,
     private readonly connectionExecutionContextResource: ConnectionExecutionContextResource,
-    private readonly contextId: string,
+    private readonly asyncTaskInfoService: AsyncTaskInfoService,
+    private readonly graphQLService: GraphQLService,
   ) {
     this.currentTask = null;
     makeObservable<this, 'currentTask'>(this, {
@@ -38,6 +51,7 @@ export class ConnectionExecutionContext implements IConnectionExecutionContext {
       context: computed,
       executing: computed,
       cancellable: computed,
+      currentCommitMode: computed,
     });
   }
 
@@ -75,5 +89,77 @@ export class ConnectionExecutionContext implements IConnectionExecutionContext {
     }
 
     return await this.connectionExecutionContextResource.update(this.contextId, defaultCatalog, defaultSchema);
+  }
+
+  async setAutoCommit(auto: boolean) {
+    const result = await this.withContext(async context => {
+      const task = this.asyncTaskInfoService.create(async () => {
+        const { taskInfo } = await this.graphQLService.sdk.asyncSqlSetAutoCommit({
+          connectionId: context.connectionId,
+          contextId: context.id,
+          autoCommit: auto,
+        });
+
+        return taskInfo;
+      });
+
+      return await this.run(
+        async () => await this.asyncTaskInfoService.run(task),
+        () => this.asyncTaskInfoService.cancel(task.id),
+        () => this.asyncTaskInfoService.remove(task.id),
+      );
+    });
+
+    return result;
+  }
+
+  async commit() {
+    const result = await this.withContext(async context => {
+      const task = this.asyncTaskInfoService.create(async () => {
+        const { taskInfo } = await this.graphQLService.sdk.asyncSqlCommitTransaction({
+          connectionId: context.connectionId,
+          contextId: context.id,
+        });
+
+        return taskInfo;
+      });
+
+      return await this.run(
+        async () => await this.asyncTaskInfoService.run(task),
+        () => this.asyncTaskInfoService.cancel(task.id),
+        () => this.asyncTaskInfoService.remove(task.id),
+      );
+    });
+
+    return result;
+  }
+
+  async rollback() {
+    const result = await this.withContext(async context => {
+      const task = this.asyncTaskInfoService.create(async () => {
+        const { taskInfo } = await this.graphQLService.sdk.asyncSqlRollbackTransaction({
+          connectionId: context.connectionId,
+          contextId: context.id,
+        });
+
+        return taskInfo;
+      });
+
+      return await this.run(
+        async () => await this.asyncTaskInfoService.run(task),
+        () => this.asyncTaskInfoService.cancel(task.id),
+        () => this.asyncTaskInfoService.remove(task.id),
+      );
+    });
+
+    return result;
+  }
+
+  private withContext<R>(callback: (context: IConnectionExecutionContextInfo) => Promise<R>): Promise<R> {
+    if (!this.context) {
+      throw new Error('Execution Context not found');
+    }
+
+    return callback(this.context);
   }
 }

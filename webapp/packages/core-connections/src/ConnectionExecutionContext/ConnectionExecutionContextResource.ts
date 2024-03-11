@@ -134,13 +134,6 @@ export class ConnectionExecutionContextResource extends CachedMapResource<string
     });
   }
 
-  async refreshConnectionContexts(connection: IConnectionInfoParams) {
-    const contexts = this.values.filter(context => context.connectionId === connection.connectionId && context.projectId === connection.projectId);
-    const key = resourceKeyList(contexts.map(context => context.id));
-
-    await this.refresh(key);
-  }
-
   protected async loader(originalKey: ResourceKey<string>): Promise<Map<string, IConnectionExecutionContextInfo>> {
     const contextsList: IConnectionExecutionContextInfo[] = [];
     let projectId: string | undefined;
