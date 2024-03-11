@@ -40,7 +40,7 @@ export class TransactionManagerBootstrap extends Bootstrap {
       getActionInfo: (_, action) => {
         if (action === ACTION_COMMIT_MODE_TOGGLE) {
           const auto = this.transactionManagerService.autoCommitMode;
-          const icon = `/icons/commit_mode_${auto ? 'auto' : 'manual'}.svg`;
+          const icon = `/icons/commit_mode_${auto ? 'auto' : 'manual'}_m.svg`;
           const label = `plugin_datasource_transaction_manager_commit_mode_switch_to_${auto ? 'manual' : 'auto'}`;
 
           return { ...action.info, icon, label, tooltip: label };
@@ -81,6 +81,8 @@ export class TransactionManagerBootstrap extends Bootstrap {
             break;
           case ACTION_COMMIT_MODE_TOGGLE:
             await this.transactionManagerService.setAutoCommit(context.connectionId, context.id, !context.autoCommit);
+            break;
+          default:
             break;
         }
       },

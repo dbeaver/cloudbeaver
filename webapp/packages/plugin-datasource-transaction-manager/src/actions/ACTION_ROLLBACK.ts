@@ -10,5 +10,5 @@ import { createAction } from '@cloudbeaver/core-view';
 export const ACTION_ROLLBACK = createAction('rollback', {
   label: 'plugin_datasource_transaction_manager_rollback',
   tooltip: 'plugin_datasource_transaction_manager_rollback',
-  icon: '/icons/rollback.svg',
+  icon: '/icons/rollback_m.svg',
 });

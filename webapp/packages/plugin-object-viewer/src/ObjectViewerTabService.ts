@@ -9,11 +9,13 @@ import { action, makeObservable, runInAction } from 'mobx';
 
 import {
   Connection,
+  ConnectionExecutionContextResource,
   ConnectionInfoActiveProjectKey,
   ConnectionInfoResource,
   ConnectionNavNodeService,
   connectionProvider,
   createConnectionParam,
+  executionContextProvider,
   IConnectionInfoParams,
   objectCatalogProvider,
   objectSchemaProvider,
@@ -45,6 +47,7 @@ export class ObjectViewerTabService {
     private readonly navigationTabsService: NavigationTabsService,
     private readonly connectionInfoResource: ConnectionInfoResource,
     private readonly connectionNavNodeService: ConnectionNavNodeService,
+    private readonly connectionExecutionContextResource: ConnectionExecutionContextResource,
   ) {
     this.tabHandler = this.navigationTabsService.registerTabHandler<IObjectViewerTabState>({
       key: objectViewerTabHandlerKey,
@@ -61,6 +64,7 @@ export class ObjectViewerTabService {
         connectionProvider(this.getConnection.bind(this)),
         objectCatalogProvider(this.getDBObjectCatalog.bind(this)),
         objectSchemaProvider(this.getDBObjectSchema.bind(this)),
+        executionContextProvider(this.getExecutionContext.bind(this)),
       ],
     });
 
@@ -306,6 +310,18 @@ export class ObjectViewerTabService {
       return;
     }
     return nodeInfo.schemaId;
+  }
+
+  private getExecutionContext(context: ITab<IObjectViewerTabState>) {
+    const connectionKey = context.handlerState.connectionKey;
+
+    if (!connectionKey) {
+      return;
+    }
+
+    return this.connectionExecutionContextResource.values.find(
+      c => c.connectionId === connectionKey.connectionId && c.projectId === connectionKey.projectId,
+    );
   }
 
   private selectObjectTab(tab: ITab<IObjectViewerTabState>) {

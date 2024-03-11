@@ -10,5 +10,5 @@ import { createAction } from '@cloudbeaver/core-view';
 export const ACTION_COMMIT = createAction('commit', {
   label: 'plugin_datasource_transaction_manager_commit',
   tooltip: 'plugin_datasource_transaction_manager_commit',
-  icon: '/icons/commit.svg',
+  icon: '/icons/commit_m.svg',
 });
