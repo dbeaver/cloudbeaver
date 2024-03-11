@@ -6,6 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
+import { OptionsPanelService } from '@cloudbeaver/core-ui';
 import { ActionService, MenuService } from '@cloudbeaver/core-view';
 import { ConnectionSchemaManagerService } from '@cloudbeaver/plugin-datasource-context-switch';
 import { MENU_APP_ACTIONS } from '@cloudbeaver/plugin-top-app-bar';
@@ -22,6 +23,7 @@ export class TransactionManagerBootstrap extends Bootstrap {
     private readonly actionService: ActionService,
     private readonly connectionSchemaManagerService: ConnectionSchemaManagerService,
     private readonly transactionManagerService: TransactionManagerService,
+    private readonly optionsPanelService: OptionsPanelService,
   ) {
     super();
   }
@@ -29,7 +31,10 @@ export class TransactionManagerBootstrap extends Bootstrap {
   register() {
     this.menuService.addCreator({
       menus: [MENU_APP_ACTIONS],
-      isApplicable: () => !!this.connectionSchemaManagerService.currentConnection?.connected && !!this.transactionManagerService.currentContext,
+      isApplicable: () =>
+        !this.optionsPanelService.active &&
+        !!this.connectionSchemaManagerService.currentConnection?.connected &&
+        !!this.transactionManagerService.currentContext,
       getItems: (_, items) => [...items, ACTION_COMMIT, ACTION_ROLLBACK, ACTION_COMMIT_MODE_TOGGLE],
     });
 
