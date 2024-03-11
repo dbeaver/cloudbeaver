@@ -77,7 +77,7 @@ export class TransactionManagerService {
         () => this.asyncTaskInfoService.remove(task.id),
       );
 
-      this.connectionExecutionContextResource.markOutdated();
+      await this.connectionExecutionContextResource.refresh();
     } catch (exception: any) {
       this.notificationService.logException(exception, 'plugin_datasource_transaction_manager_commit_mode_fail');
     }
