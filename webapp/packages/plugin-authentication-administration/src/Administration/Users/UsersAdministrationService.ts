@@ -27,7 +27,7 @@ const UsersDrawerItem = React.lazy(async () => {
 });
 
 const UsersAdministration = React.lazy(async () => {
-  const { UsersAdministration } = await import('./UsersAdministration');
+  const { UsersAdministration } = await import('./UsersAdministration/UsersAdministration');
   return { default: UsersAdministration };
 });
 

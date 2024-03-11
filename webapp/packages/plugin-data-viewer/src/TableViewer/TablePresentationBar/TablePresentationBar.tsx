@@ -15,7 +15,8 @@ import { baseTabStyles, TabList, tabListStyles, TabsState, verticalRotatedTabSty
 import type { IDatabaseDataModel } from '../../DatabaseDataModel/IDatabaseDataModel';
 import { DataPresentationService, DataPresentationType } from '../../DataPresentationService';
 import { PresentationTab } from './PresentationTab';
-import styles from './TablePresentationBar.m.css';
+import styles from './styles/TablePresentationBar.m.css';
+import tabStyles from './styles/TablePresentationBarTab.m.css';
 
 interface Props {
   type: DataPresentationType;
@@ -30,8 +31,8 @@ interface Props {
 }
 
 const tablePresentationBarRegistry: StyleRegistry = [
-  [baseTabStyles, { mode: 'append', styles: [verticalRotatedTabStyles, styles] }],
-  [tabListStyles, { mode: 'append', styles: [verticalRotatedTabStyles, styles] }],
+  [baseTabStyles, { mode: 'append', styles: [verticalRotatedTabStyles, tabStyles] }],
+  [tabListStyles, { mode: 'append', styles: [verticalRotatedTabStyles] }],
 ];
 
 export const TablePresentationBar = observer<Props>(function TablePresentationBar({

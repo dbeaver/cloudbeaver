@@ -12,14 +12,16 @@ import { s, SContext, StyleRegistry, ToolsPanel, useS, useTranslate } from '@clo
 import { useService } from '@cloudbeaver/core-di';
 import { baseTabStyles, ITabData, Tab, TabList, TabPanel, tabPanelStyles, TabsState, TabTitle, underlineTabStyles } from '@cloudbeaver/core-ui';
 
-import { TeamsPage } from './Teams/TeamsPage';
-import style from './UsersAdministration.m.css';
-import { EUsersAdministrationSub, UsersAdministrationNavigationService } from './UsersAdministrationNavigationService';
-import { UsersPage } from './UsersTable/UsersPage';
+import { TeamsPage } from '../Teams/TeamsPage';
+import { EUsersAdministrationSub, UsersAdministrationNavigationService } from '../UsersAdministrationNavigationService';
+import { UsersPage } from '../UsersTable/UsersPage';
+import style from './styles/UsersAdministration.m.css';
+import tabStyle from './styles/UsersAdministrationTab.m.css';
+import tabPanelStyle from './styles/UsersAdministrationTabPanel.m.css';
 
 const registry: StyleRegistry = [
-  [baseTabStyles, { mode: 'append', styles: [underlineTabStyles, style] }],
-  [tabPanelStyles, { mode: 'append', styles: [baseTabStyles, style] }],
+  [baseTabStyles, { mode: 'append', styles: [underlineTabStyles, tabStyle] }],
+  [tabPanelStyles, { mode: 'append', styles: [baseTabStyles, tabPanelStyle] }],
 ];
 
 export const UsersAdministration: AdministrationItemContentComponent = observer(function UsersAdministration({ sub, param }) {
@@ -41,20 +43,20 @@ export const UsersAdministration: AdministrationItemContentComponent = observer(
   return (
     <SContext registry={registry}>
       <TabsState selectedId={subName} lazy onChange={openSub}>
-        <ToolsPanel className={s(styles, { toolsPanel: true })} hasBottomBorder>
+        <ToolsPanel hasBottomBorder>
           <TabList className={s(styles, { tabList: true })} aria-label="User Administration pages">
             <Tab tabId={EUsersAdministrationSub.Users}>
-              <TabTitle className={s(styles, { tabTitle: true })}>{translate('authentication_administration_item_users')}</TabTitle>
+              <TabTitle>{translate('authentication_administration_item_users')}</TabTitle>
             </Tab>
             <Tab tabId={EUsersAdministrationSub.Teams}>
-              <TabTitle className={s(styles, { tabTitle: true })}>{translate('administration_teams_tab_title')}</TabTitle>
+              <TabTitle>{translate('administration_teams_tab_title')}</TabTitle>
             </Tab>
           </TabList>
         </ToolsPanel>
-        <TabPanel className={s(styles, { tabPanel: true })} tabId={EUsersAdministrationSub.Users}>
+        <TabPanel tabId={EUsersAdministrationSub.Users}>
           <UsersPage param={param} />
         </TabPanel>
-        <TabPanel className={s(styles, { tabPanel: true })} tabId={EUsersAdministrationSub.Teams}>
+        <TabPanel tabId={EUsersAdministrationSub.Teams}>
           <TeamsPage param={param} />
         </TabPanel>
       </TabsState>

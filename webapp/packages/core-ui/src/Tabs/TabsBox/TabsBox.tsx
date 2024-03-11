@@ -13,14 +13,15 @@ import type { MetadataMap } from '@cloudbeaver/core-utils';
 import tabPanelStyles from '../TabPanel.m.css';
 import type { ITabData } from '../TabsContainer/ITabsContainer';
 import { TabsState } from '../TabsState';
-import styles from './TabsBox.m.css';
+import styles from './styles/TabsBox.m.css';
+import moduleTabPanelStyles from './styles/TabsBoxTabPanel.m.css';
 
 const tabsBoxRegistry: StyleRegistry = [
   [
     tabPanelStyles,
     {
       mode: 'append',
-      styles: [styles],
+      styles: [moduleTabPanelStyles],
     },
   ],
 ];

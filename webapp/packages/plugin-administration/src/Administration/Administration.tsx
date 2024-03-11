@@ -26,10 +26,13 @@ import { baseTabStyles, OptionsPanelService, TabList, tabListStyles, TabsState, 
 import { CaptureView } from '@cloudbeaver/core-view';
 
 import { AdministrationCaptureViewContext } from './AdministrationCaptureViewContext';
-import AdministrationToolbarStyles from './AdministrationToolbarStyles.m.css';
 import { AdministrationViewService } from './AdministrationViewService';
 import { DrawerItem } from './DrawerItem';
 import { ItemContent } from './ItemContent';
+import AdministrationToolbarStyles from './styles/AdministrationToolbarStyles.m.css';
+import adminTabStyles from './styles/AdministrationToolbarStylesTab.m.css';
+import adminTabListStyles from './styles/AdministrationToolbarStylesTabList.m.css';
+import toolsPanelStyles from './styles/AdministrationToolbarToolsPanelStyles.m.css';
 
 interface Props {
   configurationWizard: boolean;
@@ -42,14 +45,14 @@ const adminPageRegistry: StyleRegistry = [
     ToolsPanelStyles,
     {
       mode: 'append',
-      styles: [AdministrationToolbarStyles],
+      styles: [toolsPanelStyles],
     },
   ],
   [
     ToolsActionStyles,
     {
       mode: 'append',
-      styles: [AdministrationToolbarStyles],
+      styles: [toolsPanelStyles],
     },
   ],
 ];
@@ -59,14 +62,14 @@ const tabsRegistry: StyleRegistry = [
     baseTabStyles,
     {
       mode: 'append',
-      styles: [verticalTabStyles, AdministrationToolbarStyles],
+      styles: [verticalTabStyles, adminTabStyles],
     },
   ],
   [
     tabListStyles,
     {
       mode: 'append',
-      styles: [verticalTabStyles, AdministrationToolbarStyles],
+      styles: [verticalTabStyles, adminTabListStyles],
     },
   ],
 ];

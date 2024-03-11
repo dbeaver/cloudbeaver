@@ -19,10 +19,11 @@ import { DatabaseSelectAction } from '../../DatabaseDataModel/Actions/DatabaseSe
 import type { IDatabaseResultSet } from '../../DatabaseDataModel/IDatabaseResultSet';
 import type { DataPresentationComponent } from '../../DataPresentationService';
 import { DataValuePanelService } from './DataValuePanelService';
-import styles from './ValuePanel.m.css';
+import styles from './styles/ValuePanel.m.css';
+import tabStyles from './styles/ValuePanelTab.m.css';
 import { ValuePanelEditorTabs } from './ValuePanelEditorTabs';
 
-const tabListRegistry: StyleRegistry = [[baseTabStyles, { mode: 'append', styles: [underlineTabStyles, styles] }]];
+const tabListRegistry: StyleRegistry = [[baseTabStyles, { mode: 'append', styles: [underlineTabStyles, tabStyles] }]];
 
 export const ValuePanel: DataPresentationComponent<any, IDatabaseResultSet> = observer(function ValuePanel({ dataFormat, model, resultIndex }) {
   const service = useService(DataValuePanelService);

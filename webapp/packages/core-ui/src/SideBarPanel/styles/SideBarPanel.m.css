@@ -13,13 +13,6 @@
   align-items: center;
   overflow: auto;
 }
-.tabPanel {
-  display: flex;
-  flex-direction: column;
-}
-.tabOuter:only-child {
-  display: none;
-}
 
 .box {
   composes: theme-background-surface theme-text-on-surface from global;

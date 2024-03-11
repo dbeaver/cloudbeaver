@@ -6,6 +6,9 @@
  * you may not use this file except in compliance with the License.
  */
 
-.baseTab {
-  border: none;
+.tabList {
+  composes: theme-background-surface theme-text-on-surface theme-border-color-background from global;
+  width: 240px;
+  padding-top: 16px;
+  border-right: 2px solid;
 }

@@ -15,7 +15,8 @@ import { TabList } from '../Tabs/TabList';
 import { TabPanelList } from '../Tabs/TabPanelList';
 import type { TabsContainer } from '../Tabs/TabsContainer/TabsContainer';
 import { TabsState } from '../Tabs/TabsState';
-import styles from './SideBarPanel.m.css';
+import styles from './styles/SideBarPanel.m.css';
+import tabStyles from './styles/SideBarPanelTab.m.css';
 
 interface Props {
   container: TabsContainer;
@@ -26,7 +27,7 @@ const sideBarPanelRegistry: StyleRegistry = [
     baseTabStyles,
     {
       mode: 'append',
-      styles: [underlineTabStyles, styles],
+      styles: [underlineTabStyles, tabStyles],
     },
   ],
 ];
