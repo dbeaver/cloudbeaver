@@ -10,9 +10,10 @@ import { useContext } from 'react';
 
 import { SContext, type StyleRegistry } from '@cloudbeaver/core-blocks';
 
-import { baseTabStyles, tabPanelStyles } from '..';
 import { generateTabElement } from './generateTabElement';
+import baseTabStyles from './Tab/baseTab.m.css';
 import { TabPanel } from './TabPanel';
+import tabPanelStyles from './TabPanel.m.css';
 import type { ITabInfo } from './TabsContainer/ITabsContainer';
 import { TabsContext } from './TabsContext';
 

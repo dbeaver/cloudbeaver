@@ -26,10 +26,10 @@ import { MetadataMap } from '@cloudbeaver/core-utils';
 import type { ITab } from '@cloudbeaver/plugin-navigation-tabs';
 import { NavNodeViewService } from '@cloudbeaver/plugin-navigation-tree';
 
-import { navNodeTabStyle } from '..';
 import type { IObjectViewerTabState } from '../IObjectViewerTabState';
 import { FolderPanelRenderer } from './FolderPanelRenderer';
 import { FolderTabRenderer } from './FolderTabRenderer';
+import navNodeTabStyle from './NavNodeTab.m.css';
 import styles from './ObjectFolders.m.css';
 
 interface IProps {

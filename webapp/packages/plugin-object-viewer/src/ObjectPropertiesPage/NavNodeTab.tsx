@@ -11,10 +11,10 @@ import { getComputed, Loader, s, useS, useStateDelay } from '@cloudbeaver/core-b
 import { useService } from '@cloudbeaver/core-di';
 import { DBObjectResource } from '@cloudbeaver/core-navigation-tree';
 import { resourceKeyList } from '@cloudbeaver/core-resource';
-import { TabIcon, Tab, TabTitle } from '@cloudbeaver/core-ui';
+import { Tab, TabIcon, TabTitle } from '@cloudbeaver/core-ui';
 import { useChildren, useNode } from '@cloudbeaver/plugin-navigation-tree';
 
-import { navNodeTabStyle } from '..';
+import navNodeTabStyle from './NavNodeTab.m.css';
 
 interface INavNodeTabProps {
   nodeId: string;

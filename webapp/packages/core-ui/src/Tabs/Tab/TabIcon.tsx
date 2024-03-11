@@ -7,7 +7,7 @@
  */
 import { IconOrImage, s, useS } from '@cloudbeaver/core-blocks';
 
-import { baseTabStyles } from '../..';
+import baseTabStyles from './baseTab.m.css';
 
 interface IProps {
   icon?: string;

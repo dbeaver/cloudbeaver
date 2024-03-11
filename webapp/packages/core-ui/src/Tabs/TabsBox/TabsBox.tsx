@@ -10,7 +10,7 @@ import { forwardRef, PropsWithChildren, ReactNode } from 'react';
 import { s, SContext, StyleRegistry, useS } from '@cloudbeaver/core-blocks';
 import type { MetadataMap } from '@cloudbeaver/core-utils';
 
-import { tabPanelStyles } from '../..';
+import tabPanelStyles from '../TabPanel.m.css';
 import type { ITabData } from '../TabsContainer/ITabsContainer';
 import { TabsState } from '../TabsState';
 import styles from './TabsBox.m.css';

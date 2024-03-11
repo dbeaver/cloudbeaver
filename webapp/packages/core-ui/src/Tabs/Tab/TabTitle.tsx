@@ -7,7 +7,7 @@
  */
 import { s, useS } from '@cloudbeaver/core-blocks';
 
-import { baseTabStyles } from '../..';
+import baseTabStyles from './baseTab.m.css';
 
 interface IProps {
   className?: string;

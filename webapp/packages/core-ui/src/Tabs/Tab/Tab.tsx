@@ -13,10 +13,11 @@ import { getComputed, Icon, s, useS, useTranslate } from '@cloudbeaver/core-bloc
 import type { IDataContext } from '@cloudbeaver/core-data-context';
 import { useMenu } from '@cloudbeaver/core-view';
 
-import { baseTabActionStyles, baseTabStyles } from '../..';
 import { ContextMenu } from '../../ContextMenu/ContextMenu';
 import { TabContext } from '../TabContext';
 import type { ITabsContext } from '../TabsContext';
+import baseTabStyles from './baseTab.m.css';
+import baseTabActionStyles from './baseTabAction.m.css';
 import { DATA_CONTEXT_TAB_ID } from './DATA_CONTEXT_TAB_ID';
 import { DATA_CONTEXT_TABS_CONTEXT } from './DATA_CONTEXT_TABS_CONTEXT';
 import { MENU_TAB } from './MENU_TAB';

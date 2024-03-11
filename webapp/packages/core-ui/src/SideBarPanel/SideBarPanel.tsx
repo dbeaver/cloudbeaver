@@ -9,8 +9,10 @@ import { observer } from 'mobx-react-lite';
 
 import { s, SContext, type StyleRegistry, useS } from '@cloudbeaver/core-blocks';
 
-import { baseTabStyles, TabPanelList, underlineTabStyles } from '..';
+import baseTabStyles from '../Tabs/Tab/baseTab.m.css';
+import underlineTabStyles from '../Tabs/Tab/underlineTabStyles.m.css';
 import { TabList } from '../Tabs/TabList';
+import { TabPanelList } from '../Tabs/TabPanelList';
 import type { TabsContainer } from '../Tabs/TabsContainer/TabsContainer';
 import { TabsState } from '../Tabs/TabsState';
 import styles from './SideBarPanel.m.css';
