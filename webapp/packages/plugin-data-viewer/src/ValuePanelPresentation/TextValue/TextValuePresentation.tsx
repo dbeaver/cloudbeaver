@@ -25,13 +25,14 @@ import type { IDataValuePanelProps } from '../../TableViewer/ValuePanel/DataValu
 import { QuotaPlaceholder } from '../QuotaPlaceholder';
 import { getDefaultLineWrapping } from './getDefaultLineWrapping';
 import { getTypeExtension } from './getTypeExtension';
-import styles from './TextValuePresentation.m.css';
+import styles from './styles/TextValuePresentation.m.css';
+import tabStyles from './styles/TextValuePresentationTab.m.css';
 import { TextValuePresentationService } from './TextValuePresentationService';
 import { useTextValue } from './useTextValue';
 
 const DEFAULT_CONTENT_TYPE = 'text/plain';
 
-const tabRegistry: StyleRegistry = [[baseTabStyles, { mode: 'append', styles: [underlineTabStyles, styles] }]];
+const tabRegistry: StyleRegistry = [[baseTabStyles, { mode: 'append', styles: [underlineTabStyles, tabStyles] }]];
 
 export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelProps<any, IDatabaseResultSet>> = observer(
   function TextValuePresentation({ model, resultIndex, dataFormat }) {
@@ -145,19 +146,19 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
       <Container vertical gap dense overflow>
         <Container keepSize center overflow>
           <Container keepSize>
-            <SContext registry={tabRegistry}>
-              <TabsState
-                dataFormat={dataFormat}
-                resultIndex={resultIndex}
-                container={textValuePresentationService.tabs}
-                currentTabId={contentType}
-                model={model}
-                lazy
-                onChange={tab => selectTabHandler(tab.tabId)}
-              >
+            <TabsState
+              dataFormat={dataFormat}
+              resultIndex={resultIndex}
+              container={textValuePresentationService.tabs}
+              currentTabId={contentType}
+              model={model}
+              lazy
+              onChange={tab => selectTabHandler(tab.tabId)}
+            >
+              <SContext registry={tabRegistry}>
                 <TabList className={s(style, { tabList: true })} />
-              </TabsState>
-            </SContext>
+              </SContext>
+            </TabsState>
           </Container>
         </Container>
         <Group maximum box>

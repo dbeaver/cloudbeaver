@@ -5,21 +5,11 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 .baseTab {
   composes: theme-ripple theme-background-surface theme-text-text-primary-on-light from global;
-}
+  border-bottom: 0;
 
-.tabList {
-  composes: theme-border-color-background theme-background-background from global;
-  overflow: auto;
-  border-radius: var(--theme-group-element-radius);
-
-  & .baseTab {
-    border-bottom: 0;
-
-    &:global([aria-selected='false']) {
-      border-bottom: 0 !important;
-    }
+  &:global([aria-selected='false']) {
+    border-bottom: 0 !important;
   }
 }
