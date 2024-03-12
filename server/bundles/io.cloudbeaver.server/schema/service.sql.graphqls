@@ -404,7 +404,7 @@ extend type Mutation {
 
     @since(version: "24.0.1")
     asyncSqlSetAutoCommit(
-        projectId: ID,
+        projectId: ID!,
         connectionId: ID!,
         contextId: ID!,
         autoCommit: Boolean!
@@ -412,14 +412,14 @@ extend type Mutation {
 
     @since(version: "24.0.1")
     asyncSqlCommitTransaction(
-        projectId: ID,
+        projectId: ID!,
         connectionId: ID!,
         contextId: ID!
     ): AsyncTaskInfo!
 
     @since(version: "24.0.1")
     asyncSqlRollbackTransaction(
-        projectId: ID,
+        projectId: ID!,
         connectionId: ID!,
         contextId: ID!
     ): AsyncTaskInfo!
