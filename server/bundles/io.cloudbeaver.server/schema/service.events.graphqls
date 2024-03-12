@@ -37,7 +37,8 @@ enum CBServerEventId {
 enum CBClientEventId {
     cb_client_topic_subscribe,
     cb_client_topic_unsubscribe,
-    cb_client_projects_active
+    cb_client_projects_active,
+    cb_client_touch_session
 }
 
 # Client subscribes on topic to receive only related events

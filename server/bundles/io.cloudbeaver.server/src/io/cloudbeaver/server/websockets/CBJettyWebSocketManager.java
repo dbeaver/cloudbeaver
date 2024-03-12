@@ -29,6 +29,7 @@ import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.security.exception.SMAccessTokenExpiredException;
+import org.jkiss.dbeaver.runtime.DBWorkbench;
 
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
@@ -59,6 +60,9 @@ public class CBJettyWebSocketManager implements JettyWebSocketCreator {
             return createNewEventsWebSocket(webSession);
         }
         // possible desktop client session
+        if (!DBWorkbench.isDistributed()) {
+            return null;
+        }
         try {
             var headlessSession = createHeadlessSession(httpRequest);
             if (headlessSession == null) {
