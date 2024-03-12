@@ -1,4 +1,4 @@
-mutation asyncSqlSetAutoCommit($projectId: ID, $connectionId: ID!, $contextId: ID!, $autoCommit: Boolean!) {
+mutation asyncSqlSetAutoCommit($projectId: ID!, $connectionId: ID!, $contextId: ID!, $autoCommit: Boolean!) {
   taskInfo: asyncSqlSetAutoCommit(projectId: $projectId, connectionId: $connectionId, contextId: $contextId, autoCommit: $autoCommit) {
     ...AsyncTaskInfo
   }

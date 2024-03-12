@@ -11,18 +11,18 @@ import {
   ConnectionExecutionContextService,
   ConnectionInfoResource,
   createConnectionParam,
+  IConnectionExecutionContextUpdateTaskInfo,
 } from '@cloudbeaver/core-connections';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
-import type { AsyncTaskInfo } from '@cloudbeaver/core-sdk';
 import { OptionsPanelService } from '@cloudbeaver/core-ui';
 import { ActionService, MenuService } from '@cloudbeaver/core-view';
 import { ConnectionSchemaManagerService } from '@cloudbeaver/plugin-datasource-context-switch';
 import { MENU_APP_ACTIONS } from '@cloudbeaver/plugin-top-app-bar';
 
-import { ACTION_COMMIT } from './actions/ACTION_COMMIT';
-import { ACTION_COMMIT_MODE_TOGGLE } from './actions/ACTION_COMMIT_MODE_TOGGLE';
-import { ACTION_ROLLBACK } from './actions/ACTION_ROLLBACK';
+import { ACTION_DATASOURCE_TRANSACTION_COMMIT } from './actions/ACTION_DATASOURCE_TRANSACTION_COMMIT';
+import { ACTION_DATASOURCE_TRANSACTION_COMMIT_MODE_TOGGLE } from './actions/ACTION_DATASOURCE_TRANSACTION_COMMIT_MODE_TOGGLE';
+import { ACTION_DATASOURCE_TRANSACTION_ROLLBACK } from './actions/ACTION_DATASOURCE_TRANSACTION_ROLLBACK';
 
 @injectable()
 export class TransactionManagerBootstrap extends Bootstrap {
@@ -42,17 +42,31 @@ export class TransactionManagerBootstrap extends Bootstrap {
   register() {
     this.menuService.addCreator({
       menus: [MENU_APP_ACTIONS],
-      isApplicable: () =>
-        !this.optionsPanelService.active &&
-        this.connectionSchemaManagerService.currentConnection?.connected === true &&
-        this.connectionSchemaManagerService.activeExecutionContext !== undefined,
-      getItems: (_, items) => [...items, ACTION_COMMIT, ACTION_ROLLBACK, ACTION_COMMIT_MODE_TOGGLE],
+      isApplicable: () => {
+        const transaction = this.getContextTransaction();
+
+        return (
+          !this.optionsPanelService.active &&
+          this.connectionSchemaManagerService.currentConnection?.connected === true &&
+          transaction?.context !== undefined &&
+          transaction.autoCommit !== undefined
+        );
+      },
+      getItems: (_, items) => [
+        ...items,
+        ACTION_DATASOURCE_TRANSACTION_COMMIT,
+        ACTION_DATASOURCE_TRANSACTION_ROLLBACK,
+        ACTION_DATASOURCE_TRANSACTION_COMMIT_MODE_TOGGLE,
+      ],
     });
 
     this.actionService.addHandler({
       id: 'commit-mode-base',
-      isActionApplicable: (_, action) => [ACTION_COMMIT, ACTION_ROLLBACK, ACTION_COMMIT_MODE_TOGGLE].includes(action),
-      isLabelVisible: (_, action) => action === ACTION_COMMIT || action === ACTION_ROLLBACK,
+      isActionApplicable: (_, action) =>
+        [ACTION_DATASOURCE_TRANSACTION_COMMIT, ACTION_DATASOURCE_TRANSACTION_ROLLBACK, ACTION_DATASOURCE_TRANSACTION_COMMIT_MODE_TOGGLE].includes(
+          action,
+        ),
+      isLabelVisible: (_, action) => action === ACTION_DATASOURCE_TRANSACTION_COMMIT || action === ACTION_DATASOURCE_TRANSACTION_ROLLBACK,
       getActionInfo: (_, action) => {
         const transaction = this.getContextTransaction();
 
@@ -60,8 +74,8 @@ export class TransactionManagerBootstrap extends Bootstrap {
           return action.info;
         }
 
-        if (action === ACTION_COMMIT_MODE_TOGGLE) {
-          const auto = transaction.currentCommitMode;
+        if (action === ACTION_DATASOURCE_TRANSACTION_COMMIT_MODE_TOGGLE) {
+          const auto = transaction.autoCommit;
           const icon = `/icons/commit_mode_${auto ? 'auto' : 'manual'}_m.svg`;
           const label = `plugin_datasource_transaction_manager_commit_mode_switch_to_${auto ? 'manual' : 'auto'}`;
 
@@ -81,8 +95,8 @@ export class TransactionManagerBootstrap extends Bootstrap {
           return true;
         }
 
-        if (action === ACTION_COMMIT || action === ACTION_ROLLBACK) {
-          return transaction.currentCommitMode;
+        if (action === ACTION_DATASOURCE_TRANSACTION_COMMIT || action === ACTION_DATASOURCE_TRANSACTION_ROLLBACK) {
+          return transaction.autoCommit === true;
         }
 
         return false;
@@ -95,7 +109,7 @@ export class TransactionManagerBootstrap extends Bootstrap {
         }
 
         switch (action) {
-          case ACTION_COMMIT: {
+          case ACTION_DATASOURCE_TRANSACTION_COMMIT: {
             try {
               const result = await transaction.commit();
               this.showTransactionResult(transaction, result);
@@ -105,7 +119,7 @@ export class TransactionManagerBootstrap extends Bootstrap {
 
             break;
           }
-          case ACTION_ROLLBACK: {
+          case ACTION_DATASOURCE_TRANSACTION_ROLLBACK: {
             try {
               const result = await transaction.rollback();
               this.showTransactionResult(transaction, result);
@@ -115,34 +129,30 @@ export class TransactionManagerBootstrap extends Bootstrap {
 
             break;
           }
-          case ACTION_COMMIT_MODE_TOGGLE:
+          case ACTION_DATASOURCE_TRANSACTION_COMMIT_MODE_TOGGLE:
             try {
-              await transaction.setAutoCommit(!transaction.currentCommitMode);
+              await transaction.setAutoCommit(!transaction.autoCommit);
               await this.connectionExecutionContextResource.refresh();
             } catch (exception: any) {
               this.notificationService.logException(exception, 'plugin_datasource_transaction_manager_commit_mode_fail');
             }
 
             break;
-          default:
-            break;
         }
       },
     });
   }
 
-  load() {}
-
-  private showTransactionResult(transaction: ConnectionExecutionContext, taskInfo: AsyncTaskInfo) {
+  private showTransactionResult(transaction: ConnectionExecutionContext, info: IConnectionExecutionContextUpdateTaskInfo) {
     if (!transaction.context) {
       return;
     }
 
     const connectionParam = createConnectionParam(transaction.context.projectId, transaction.context.connectionId);
     const connection = this.connectionInfoResource.get(connectionParam);
-    const message = typeof taskInfo.taskResult === 'string' ? taskInfo.taskResult : '';
+    const message = typeof info.result === 'string' ? info.result : '';
 
-    this.notificationService.logInfo({ title: connection?.name ?? taskInfo.name ?? '', message });
+    this.notificationService.logInfo({ title: connection?.name ?? info.name ?? '', message });
   }
 
   private getContextTransaction() {

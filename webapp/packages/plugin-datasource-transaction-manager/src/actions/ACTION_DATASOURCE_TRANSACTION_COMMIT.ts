@@ -7,8 +7,8 @@
  */
 import { createAction } from '@cloudbeaver/core-view';
 
-export const ACTION_ROLLBACK = createAction('rollback', {
-  label: 'plugin_datasource_transaction_manager_rollback',
-  tooltip: 'plugin_datasource_transaction_manager_rollback',
-  icon: '/icons/rollback_m.svg',
+export const ACTION_DATASOURCE_TRANSACTION_COMMIT = createAction('datasource-transaction-commit', {
+  label: 'plugin_datasource_transaction_manager_commit',
+  tooltip: 'plugin_datasource_transaction_manager_commit',
+  icon: '/icons/commit_m.svg',
 });

@@ -8,12 +8,16 @@
 import { computed, makeObservable, observable } from 'mobx';
 
 import type { ITask, TaskScheduler } from '@cloudbeaver/core-executor';
-import type { AsyncTaskInfoService, GraphQLService } from '@cloudbeaver/core-sdk';
+import { ASYNC_TASK_STATUS_FINISHED, AsyncTaskInfo, type AsyncTaskInfoService, type GraphQLService } from '@cloudbeaver/core-sdk';
 
 import type { ConnectionExecutionContextResource, IConnectionExecutionContextInfo } from './ConnectionExecutionContextResource';
 import type { IConnectionExecutionContext } from './IConnectionExecutionContext';
 
-const DEFAULT_AUTO_COMMIT = true;
+export interface IConnectionExecutionContextUpdateTaskInfo {
+  success: boolean;
+  name?: string;
+  result?: string | boolean;
+}
 
 export class ConnectionExecutionContext implements IConnectionExecutionContext {
   get context(): IConnectionExecutionContextInfo | undefined {
@@ -28,12 +32,12 @@ export class ConnectionExecutionContext implements IConnectionExecutionContext {
     return this.currentTask?.cancellable || false;
   }
 
-  get currentCommitMode() {
-    if (this.context) {
-      return this.context.autoCommit ?? DEFAULT_AUTO_COMMIT;
+  get autoCommit() {
+    if (!this.context) {
+      return;
     }
 
-    return DEFAULT_AUTO_COMMIT;
+    return this.context.autoCommit;
   }
 
   private currentTask: ITask<any> | null;
@@ -51,7 +55,7 @@ export class ConnectionExecutionContext implements IConnectionExecutionContext {
       context: computed,
       executing: computed,
       cancellable: computed,
-      currentCommitMode: computed,
+      autoCommit: computed,
     });
   }
 
@@ -91,10 +95,11 @@ export class ConnectionExecutionContext implements IConnectionExecutionContext {
     return await this.connectionExecutionContextResource.update(this.contextId, defaultCatalog, defaultSchema);
   }
 
-  async setAutoCommit(auto: boolean) {
+  async setAutoCommit(auto: boolean): Promise<IConnectionExecutionContextUpdateTaskInfo> {
     const result = await this.withContext(async context => {
       const task = this.asyncTaskInfoService.create(async () => {
         const { taskInfo } = await this.graphQLService.sdk.asyncSqlSetAutoCommit({
+          projectId: context.projectId,
           connectionId: context.connectionId,
           contextId: context.id,
           autoCommit: auto,
@@ -110,13 +115,14 @@ export class ConnectionExecutionContext implements IConnectionExecutionContext {
       );
     });
 
-    return result;
+    return mapAsyncTaskInfo(result);
   }
 
-  async commit() {
+  async commit(): Promise<IConnectionExecutionContextUpdateTaskInfo> {
     const result = await this.withContext(async context => {
       const task = this.asyncTaskInfoService.create(async () => {
         const { taskInfo } = await this.graphQLService.sdk.asyncSqlCommitTransaction({
+          projectId: context.projectId,
           connectionId: context.connectionId,
           contextId: context.id,
         });
@@ -131,13 +137,14 @@ export class ConnectionExecutionContext implements IConnectionExecutionContext {
       );
     });
 
-    return result;
+    return mapAsyncTaskInfo(result);
   }
 
-  async rollback() {
+  async rollback(): Promise<IConnectionExecutionContextUpdateTaskInfo> {
     const result = await this.withContext(async context => {
       const task = this.asyncTaskInfoService.create(async () => {
         const { taskInfo } = await this.graphQLService.sdk.asyncSqlRollbackTransaction({
+          projectId: context.projectId,
           connectionId: context.connectionId,
           contextId: context.id,
         });
@@ -152,7 +159,7 @@ export class ConnectionExecutionContext implements IConnectionExecutionContext {
       );
     });
 
-    return result;
+    return mapAsyncTaskInfo(result);
   }
 
   private withContext<R>(callback: (context: IConnectionExecutionContextInfo) => Promise<R>): Promise<R> {
@@ -162,4 +169,12 @@ export class ConnectionExecutionContext implements IConnectionExecutionContext {
 
     return callback(this.context);
   }
+}
+
+function mapAsyncTaskInfo(info: AsyncTaskInfo): IConnectionExecutionContextUpdateTaskInfo {
+  return {
+    success: info.status === ASYNC_TASK_STATUS_FINISHED && !info.error,
+    name: info.name,
+    result: info.taskResult,
+  };
 }
