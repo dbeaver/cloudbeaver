@@ -8,16 +8,10 @@
 import { observer } from 'mobx-react-lite';
 import { useContext } from 'react';
 
-import { SContext, type StyleRegistry } from '@cloudbeaver/core-blocks';
-
 import { generateTabElement } from './generateTabElement';
-import baseTabStyles from './Tab/baseTab.m.css';
 import { TabPanel } from './TabPanel';
-import tabPanelStyles from './TabPanel.m.css';
 import type { ITabInfo } from './TabsContainer/ITabsContainer';
 import { TabsContext } from './TabsContext';
-
-const tabPanelRegistry: StyleRegistry = [[tabPanelStyles, { mode: 'append', styles: [baseTabStyles] }]];
 
 export const TabPanelList = observer<React.PropsWithChildren>(function TabPanelList({ children }) {
   const state = useContext(TabsContext);
@@ -38,7 +32,7 @@ export const TabPanelList = observer<React.PropsWithChildren>(function TabPanelL
   const displayed = state.container.getDisplayed(state.props);
 
   return (
-    <SContext registry={tabPanelRegistry}>
+    <>
       {displayed
         .map(
           generateTabElement(
@@ -52,6 +46,6 @@ export const TabPanelList = observer<React.PropsWithChildren>(function TabPanelL
         )
         .flat()}
       {children}
-    </SContext>
+    </>
   );
 });

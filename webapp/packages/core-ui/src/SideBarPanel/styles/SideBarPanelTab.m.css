@@ -6,11 +6,6 @@
  * you may not use this file except in compliance with the License.
  */
 
-.tabPanel {
-  display: flex;
-  flex-direction: column;
-}
-
 .tabOuter:only-child {
   display: none;
 }

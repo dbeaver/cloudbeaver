@@ -19,7 +19,7 @@ import style from './styles/UsersAdministration.m.css';
 import tabStyle from './styles/UsersAdministrationTab.m.css';
 import tabPanelStyle from './styles/UsersAdministrationTabPanel.m.css';
 
-const tabPanelRegistry: StyleRegistry = [[tabPanelStyles, { mode: 'append', styles: [baseTabStyles, tabPanelStyle] }]];
+const tabPanelRegistry: StyleRegistry = [[tabPanelStyles, { mode: 'append', styles: [tabPanelStyle] }]];
 
 const mainTabsRegistry: StyleRegistry = [[baseTabStyles, { mode: 'append', styles: [underlineTabStyles, tabStyle] }]];
 

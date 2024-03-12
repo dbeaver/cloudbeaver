@@ -6,6 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-.baseTab {
-  border: none;
+.tabPanel {
+  composes: theme-background-secondary theme-text-on-secondary from global;
+  padding-top: 8px;
 }

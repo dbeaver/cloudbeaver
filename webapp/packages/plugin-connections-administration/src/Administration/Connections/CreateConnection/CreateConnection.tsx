@@ -10,18 +10,22 @@ import { observer } from 'mobx-react-lite';
 import { Icon, IconButton, Loader, s, SContext, StaticImage, StyleRegistry, useResource, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import { DBDriverResource } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
-import { baseTabStyles, TabPanelList, TabsState, underlineTabStyles } from '@cloudbeaver/core-ui';
+import { baseTabStyles, TabPanelList, tabPanelStyles, TabsState, underlineTabStyles } from '@cloudbeaver/core-ui';
 import { ConnectionFormLoader } from '@cloudbeaver/plugin-connections';
 
 import { CreateConnectionService } from '../CreateConnectionService';
-import styles from './CreateConnection.m.css';
+import styles from './styles/CreateConnection.m.css';
+import stylesTabPanel from './styles/CreateConnectionTabPanel.m.css';
 
 interface Props {
   method: string | null | undefined;
   configurationWizard: boolean;
 }
 
-const tabsRegistry: StyleRegistry = [[baseTabStyles, { mode: 'append', styles: [styles, underlineTabStyles] }]];
+const tabsRegistry: StyleRegistry = [
+  [baseTabStyles, { mode: 'append', styles: [styles, underlineTabStyles] }],
+  [tabPanelStyles, { mode: 'append', styles: [stylesTabPanel] }],
+];
 
 export const CreateConnection = observer<Props>(function CreateConnection({ method }) {
   const style = useS(styles);

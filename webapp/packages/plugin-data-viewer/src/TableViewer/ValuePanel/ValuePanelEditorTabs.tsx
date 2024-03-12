@@ -8,11 +8,15 @@
 import { observer } from 'mobx-react-lite';
 
 import { SContext, StyleRegistry } from '@cloudbeaver/core-blocks';
-import { baseTabStyles, TabPanelList, underlineTabStyles } from '@cloudbeaver/core-ui';
+import { baseTabStyles, TabPanelList, tabPanelStyles, underlineTabStyles } from '@cloudbeaver/core-ui';
 
-import styles from './styles/ValuePanelEditorTabs.m.css';
+import tabPanelRegistryStyles from './styles/ValuePanelEditorTabPanel.m.css';
+import tabsRegistryStyles from './styles/ValuePanelEditorTabs.m.css';
 
-const tabListPanelRegistry: StyleRegistry = [[baseTabStyles, { mode: 'append', styles: [underlineTabStyles, styles] }]];
+const tabListPanelRegistry: StyleRegistry = [
+  [baseTabStyles, { mode: 'append', styles: [underlineTabStyles, tabsRegistryStyles] }],
+  [tabPanelStyles, { mode: 'append', styles: [tabPanelRegistryStyles] }],
+];
 
 export const ValuePanelEditorTabs = observer(function ValuePanelEditorTabs() {
   return (
