@@ -5,63 +5,75 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import type { IOutputLogType } from './SqlResultTabs/OutputLogs/IOutputLogTypes';
+import { schema } from '@cloudbeaver/core-utils';
 
-export interface IResultTab {
-  tabId: string;
-  // when query return several results they all have one groupId
-  // new group id generates every time you execute query in new tab
-  groupId: string;
-  indexInResultSet: number;
-}
+import { OUTPUT_LOG_TYPES } from './SqlResultTabs/OutputLogs/IOutputLogTypes';
 
-export interface IStatisticsTab {
-  tabId: string;
-  order: number;
-}
+export const RESULT_TAB_SCHEMA = schema.object({
+  tabId: schema.string(),
+  groupId: schema.string(),
+  indexInResultSet: schema.number(),
+  presentationId: schema.string(),
+  valuePresentationId: schema.nullable(schema.string()),
+});
 
-export interface IResultGroup {
-  groupId: string;
-  modelId: string;
-  order: number;
-  nameOrder: number;
-  query: string;
-}
+export type IResultTab = schema.infer<typeof RESULT_TAB_SCHEMA>;
 
-export interface ISqlEditorResultTab {
-  id: string;
-  order: number;
-  name: string;
-  icon: string;
-}
+export const STATISTIC_TAB_SCHEMA = schema.object({
+  tabId: schema.string(),
+  order: schema.number(),
+});
 
-export interface IExecutionPlanTab {
-  tabId: string;
-  order: number;
-  query: string;
-  options?: Record<string, any>;
-}
+export type IStatisticsTab = schema.infer<typeof STATISTIC_TAB_SCHEMA>;
 
-export interface IOutputLogsTab extends ISqlEditorResultTab {
-  selectedLogTypes: IOutputLogType[];
-}
+export const RESULT_GROUP_SCHEMA = schema.object({
+  groupId: schema.string(),
+  modelId: schema.string(),
+  order: schema.number(),
+  nameOrder: schema.number(),
+  query: schema.string(),
+});
 
-export interface ISqlEditorTabState {
-  editorId: string;
-  datasourceKey: string;
+export type IResultGroup = schema.infer<typeof RESULT_GROUP_SCHEMA>;
 
-  source?: string;
-  order: number;
+export const SQL_EDITOR_RESULT_TAB_SCHEMA = schema.object({
+  id: schema.string(),
+  order: schema.number(),
+  name: schema.string(),
+  icon: schema.string(),
+});
 
-  currentTabId?: string;
-  tabs: ISqlEditorResultTab[];
-  resultGroups: IResultGroup[];
-  resultTabs: IResultTab[];
-  statisticsTabs: IStatisticsTab[];
-  executionPlanTabs: IExecutionPlanTab[];
-  outputLogsTab?: IOutputLogsTab;
+export type ISqlEditorResultTab = schema.infer<typeof SQL_EDITOR_RESULT_TAB_SCHEMA>;
 
-  // mode
-  currentModeId?: string;
-  modeState: Array<[string, any]>;
-}
+export const EXECUTION_PLAN_TAB_SCHEMA = schema.object({
+  tabId: schema.string(),
+  order: schema.number(),
+  query: schema.string(),
+  options: schema.record(schema.any()).optional(),
+});
+
+export type IExecutionPlanTab = schema.infer<typeof EXECUTION_PLAN_TAB_SCHEMA>;
+
+const OUTPUT_LOGS_TAB_SCHEMA = SQL_EDITOR_RESULT_TAB_SCHEMA.extend({
+  selectedLogTypes: schema.array(schema.enum(OUTPUT_LOG_TYPES)),
+});
+
+export type IOutputLogsTab = schema.infer<typeof OUTPUT_LOGS_TAB_SCHEMA>;
+
+export const SQL_EDITOR_TAB_STATE_SCHEMA = schema.object({
+  editorId: schema.string(),
+  datasourceKey: schema.string(),
+  source: schema.string().optional(),
+  order: schema.number(),
+  currentTabId: schema.string().optional(),
+  tabs: schema.array(SQL_EDITOR_RESULT_TAB_SCHEMA),
+  resultGroups: schema.array(RESULT_GROUP_SCHEMA),
+  resultTabs: schema.array(RESULT_TAB_SCHEMA),
+  statisticsTabs: schema.array(STATISTIC_TAB_SCHEMA),
+  executionPlanTabs: schema.array(EXECUTION_PLAN_TAB_SCHEMA),
+  outputLogsTab: OUTPUT_LOGS_TAB_SCHEMA.optional(),
+  currentModeId: schema.string().optional(),
+  modeState: schema.array(schema.tuple([schema.string(), schema.any()])),
+});
+
+export type ISqlEditorTabState = schema.infer<typeof SQL_EDITOR_TAB_STATE_SCHEMA>;

@@ -8,13 +8,12 @@
 import type { IResultSetElementKey } from './IResultSetDataKey';
 
 export interface IResultSetDataContentAction {
-  activeElement: IResultSetElementKey | null;
+  isLoading: (element: IResultSetElementKey) => boolean;
   isBlobTruncated: (element: IResultSetElementKey) => boolean;
   isTextTruncated: (element: IResultSetElementKey) => boolean;
   isDownloadable: (element: IResultSetElementKey) => boolean;
-  getFileDataUrl: (element: IResultSetElementKey) => Promise<string>;
-  resolveFileDataUrl: (element: IResultSetElementKey) => Promise<string>;
-  retrieveFileDataUrlFromCache: (element: IResultSetElementKey) => string | undefined;
+  resolveFileDataUrl: (element: IResultSetElementKey) => Promise<Blob>;
+  retrieveBlobFromCache: (element: IResultSetElementKey) => Blob | undefined;
   downloadFileData: (element: IResultSetElementKey) => Promise<void>;
   clearCache: () => void;
 }

@@ -18,6 +18,7 @@ package io.cloudbeaver.service.sql;
 
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.server.CBApplication;
+import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBPDataKind;
@@ -32,7 +33,10 @@ import org.jkiss.dbeaver.model.struct.DBSEntity;
 import org.jkiss.utils.CommonUtils;
 
 import java.lang.reflect.Method;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 class WebSQLQueryDataReceiver implements DBDDataReceiver {
@@ -59,7 +63,7 @@ class WebSQLQueryDataReceiver implements DBDDataReceiver {
     }
 
     @Override
-    public void fetchStart(DBCSession session, DBCResultSet dbResult, long offset, long maxRows) throws DBCException {
+    public void fetchStart(@NotNull DBCSession session, @NotNull DBCResultSet dbResult, long offset, long maxRows) throws DBCException {
         DBCResultSetMetaData meta = dbResult.getMeta();
         List<DBCAttributeMetaData> attributes = meta.getAttributes();
         bindings = new DBDAttributeBindingMeta[attributes.size()];
@@ -70,7 +74,7 @@ class WebSQLQueryDataReceiver implements DBDDataReceiver {
     }
 
     @Override
-    public void fetchRow(DBCSession session, DBCResultSet resultSet) throws DBCException {
+    public void fetchRow(@NotNull DBCSession session, @NotNull DBCResultSet resultSet) throws DBCException {
 
         Map<String, Object> metaDataMap = null;
         Object[] row = new Object[bindings.length];
@@ -111,7 +115,7 @@ class WebSQLQueryDataReceiver implements DBDDataReceiver {
     }
 
     @Override
-    public void fetchEnd(DBCSession session, DBCResultSet resultSet) throws DBCException {
+    public void fetchEnd(@NotNull DBCSession session, @NotNull DBCResultSet resultSet) throws DBCException {
 
         WebSession webSession = contextInfo.getProcessor().getWebSession();
         DBSEntity entity = dataContainer instanceof DBSEntity ? (DBSEntity) dataContainer : null;

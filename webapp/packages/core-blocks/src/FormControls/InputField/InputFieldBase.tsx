@@ -26,14 +26,13 @@ import { FieldLabel } from '../FieldLabel';
 import { useCapsLockTracker } from '../useCapsLockTracker';
 import inputFieldStyle from './InputField.m.css';
 
-export type InputFieldBaseProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'value' | 'onChange' | 'style'> &
+export type InputFieldBaseProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'value' | 'onChange' | 'style' | 'ref'> &
   ILayoutSizeProps & {
     value?: string;
     error?: boolean;
     loading?: boolean;
     description?: string;
     labelTooltip?: string;
-    ref?: React.ForwardedRef<HTMLInputElement>;
     canShowPassword?: boolean;
     icon?: React.ReactElement;
     onCustomCopy?: () => void;
@@ -61,6 +60,7 @@ export const InputFieldBase = observer<InputFieldBaseProps, HTMLInputElement>(
     },
     ref,
   ) {
+    const [uncontrolledInputValue, setUncontrolledInputValue] = useState(value);
     const inputRef = useRef<HTMLInputElement | null>(null);
     const mergedRef = useCombinedRef(inputRef, ref);
     const capsLock = useCapsLockTracker();
@@ -81,6 +81,7 @@ export const InputFieldBase = observer<InputFieldBaseProps, HTMLInputElement>(
 
     const handleChange = useCallback(
       (event: React.ChangeEvent<HTMLInputElement>) => {
+        setUncontrolledInputValue(event.target.value);
         onChange?.(event.target.value, name);
       },
       [name, onChange],
@@ -97,15 +98,20 @@ export const InputFieldBase = observer<InputFieldBaseProps, HTMLInputElement>(
     }
 
     uncontrolled ||= value === undefined;
-    if (!value) {
-      canShowPassword = false;
-    }
 
     useLayoutEffect(() => {
       if (uncontrolled && isNotNullDefined(value) && inputRef.current) {
         inputRef.current.value = value;
+
+        if (uncontrolledInputValue !== value) {
+          setUncontrolledInputValue(value);
+        }
       }
     });
+
+    if (!uncontrolledInputValue) {
+      canShowPassword = false;
+    }
 
     return (
       <Field {...layoutProps} className={s(styles, {}, className)}>
