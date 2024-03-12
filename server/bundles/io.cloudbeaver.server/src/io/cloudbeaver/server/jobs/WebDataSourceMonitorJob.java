@@ -20,9 +20,11 @@ import io.cloudbeaver.model.session.BaseWebSession;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.server.CBApplication;
 import io.cloudbeaver.server.CBPlatform;
+import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.model.DBPDataSource;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
 import org.jkiss.dbeaver.model.app.DBPPlatform;
+import org.jkiss.dbeaver.model.app.DBPProject;
 import org.jkiss.dbeaver.model.auth.SMSession;
 import org.jkiss.dbeaver.model.websocket.event.WSEventType;
 import org.jkiss.dbeaver.model.websocket.event.datasource.WSDataSourceEvent;
@@ -46,22 +48,23 @@ public class WebDataSourceMonitorJob extends DataSourceMonitorJob {
     protected void doJob() {
         Collection<BaseWebSession> allSessions = CBPlatform.getInstance().getSessionManager().getAllActiveSessions();
         allSessions.parallelStream().forEach(s -> {
-            checkDataSourceAliveInWorkspace(s.getWorkspace(), s::getLastAccessTimeMillis);
+            checkDataSourceAliveInWorkspace(s.getWorkspace(), s.getLastAccessTimeMillis());
         });
 
     }
 
     @Override
-    public void showNotification(DBPDataSource dataSource, DBPDataSourceContainer dsDescriptor, SMSession smSession) {
-        if (smSession instanceof WebSession webSession) {
-            webSession.addSessionEvent( //TODO: Add new event for disconnect datasource
-                    WSDataSourceEvent.update(
-                        webSession.getSessionId(),
-                        webSession.getUserId(),
-                        dsDescriptor.getProject().getId(),
-                        List.of(dsDescriptor.getId()),
-                        WSDataSourceProperty.CONFIGURATION)
-            );
+    protected void showNotification(@NotNull DBPDataSource dataSource) {
+        final DBPProject project = dataSource.getContainer().getProject();
+        if (project.getWorkspaceSession() instanceof WebSession webSession) {
+            // TODO: Add new event for disconnect datasource
+            webSession.addSessionEvent(WSDataSourceEvent.update(
+                webSession.getSessionId(),
+                webSession.getUserId(),
+                project.getId(),
+                List.of(dataSource.getContainer().getId()),
+                WSDataSourceProperty.CONFIGURATION
+            ));
         }
     }
 }

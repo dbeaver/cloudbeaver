@@ -21,14 +21,15 @@
     "@cloudbeaver/core-di": "~0.1.0",
     "@cloudbeaver/core-executor": "~0.1.0",
     "@cloudbeaver/core-utils": "~0.1.0",
-    "dexie": "^3.2.4",
+    "dexie": "^3.2.6",
+    "karma": "^6.4.3",
     "mobx": "^6.12.0",
-    "workbox-core": "~7.x.x",
-    "workbox-precaching": "~7.x.x",
-    "workbox-window": "~7.x.x"
+    "workbox-core": "^7.0.0",
+    "workbox-precaching": "^7.0.0",
+    "workbox-window": "^7.0.0"
   },
   "peerDependencies": {},
   "devDependencies": {
-    "typescript": "^5.3.2"
+    "typescript": "^5.3.3"
   }
 }

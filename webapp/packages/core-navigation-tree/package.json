@@ -52,8 +52,8 @@
     "@cloudbeaver/core-ui": "~0.1.0",
     "@cloudbeaver/core-view": "~0.1.0",
     "@cloudbeaver/tests-runner": "~0.1.0",
-    "@testing-library/jest-dom": "^6.1.5",
-    "@types/jest": "^29.5.10",
-    "typescript": "^5.3.2"
+    "@testing-library/jest-dom": "^6.4.2",
+    "@types/jest": "^29.5.12",
+    "typescript": "^5.3.3"
   }
 }

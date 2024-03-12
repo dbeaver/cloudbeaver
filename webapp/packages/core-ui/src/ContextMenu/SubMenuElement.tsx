@@ -76,6 +76,7 @@ export const SubMenuElement = observer<ISubMenuElementProps, HTMLButtonElement>(
 
     return (
       <Menu
+        {...rest}
         ref={ref}
         menuRef={menu}
         label={subMenuData.menu.label}
@@ -95,7 +96,6 @@ export const SubMenuElement = observer<ISubMenuElementProps, HTMLButtonElement>(
         getHasBindings={handlers.hasBindings}
         submenu
         onVisibleSwitch={handlers.handleVisibleSwitch}
-        {...rest}
       >
         <MenuItemElement
           label={label}
