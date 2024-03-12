@@ -21,7 +21,7 @@ interface IToolsState {
   selectedTabId: string | undefined;
 }
 
-const ToolsPanelRegistry: StyleRegistry = [[baseTabStyles, { mode: 'append', styles: [underlineTabStyles, styles] }]];
+const ToolsPanelRegistry: StyleRegistry = [[baseTabStyles, { mode: 'append', styles: [underlineTabStyles] }]];
 
 export const ToolsPanel = observer(function ToolsPanel() {
   const toolsPanelService = useService(ToolsPanelService);

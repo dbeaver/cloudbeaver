@@ -11,13 +11,14 @@ import { getComputed, s, SContext, StyleRegistry, TextPlaceholder, useS, useStyl
 import { useService } from '@cloudbeaver/core-di';
 import { baseTabStyles, ITabData, TabList, TabPanel, TabsState } from '@cloudbeaver/core-ui';
 
-import type { ISqlEditorTabState } from '../ISqlEditorTabState';
-import { ESqlDataSourceFeatures } from '../SqlDataSource/ESqlDataSourceFeatures';
-import { SqlDataSourceService } from '../SqlDataSource/SqlDataSourceService';
-import { SqlResultPanel } from './SqlResultPanel';
-import { SqlResultTab } from './SqlResultTab';
-import styles from './SqlResultTabs.m.css';
-import { SqlResultTabsService } from './SqlResultTabsService';
+import type { ISqlEditorTabState } from '../../ISqlEditorTabState';
+import { ESqlDataSourceFeatures } from '../../SqlDataSource/ESqlDataSourceFeatures';
+import { SqlDataSourceService } from '../../SqlDataSource/SqlDataSourceService';
+import { SqlResultPanel } from '../SqlResultPanel';
+import { SqlResultTab } from '../SqlResultTab';
+import { SqlResultTabsService } from '../SqlResultTabsService';
+import styles from './styles/SqlResultTabs.m.css';
+import tabStyles from './styles/SqlResultTabsBaseTab.m.css';
 
 interface Props {
   state: ISqlEditorTabState;
@@ -25,7 +26,7 @@ interface Props {
   onTabClose?: (tabId: string) => void;
 }
 
-const registry: StyleRegistry = [[baseTabStyles, { mode: 'append', styles: [styles] }]];
+const registry: StyleRegistry = [[baseTabStyles, { mode: 'append', styles: [tabStyles] }]];
 
 export const SqlResultTabs = observer<Props>(function SqlDataResult({ state, onTabSelect, onTabClose }) {
   const style = useS(styles);
