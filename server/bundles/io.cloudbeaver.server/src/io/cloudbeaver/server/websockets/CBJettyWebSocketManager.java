@@ -54,6 +54,7 @@ public class CBJettyWebSocketManager implements JettyWebSocketCreator {
         var httpRequest = request.getHttpServletRequest();
         var webSession = webSessionManager.getOrRestoreSession(httpRequest);
         if (webSession != null) {
+            webSession.updateSessionParameters(httpRequest);
             // web client session
             return createNewEventsWebSocket(webSession);
         }

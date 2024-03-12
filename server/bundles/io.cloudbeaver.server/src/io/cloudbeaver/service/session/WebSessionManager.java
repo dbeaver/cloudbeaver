@@ -79,6 +79,7 @@ public class WebSessionManager {
         return application;
     }
 
+    @Deprecated
     public boolean touchSession(@NotNull HttpServletRequest request,
                                 @NotNull HttpServletResponse response) throws DBWebException {
         WebSession webSession = getWebSession(request, response, false);
@@ -106,14 +107,14 @@ public class WebSessionManager {
             var baseWebSession = sessionMap.get(sessionId);
             if (baseWebSession == null && CBApplication.getInstance().isConfigurationMode()) {
                 try {
-                    webSession = createWebSessionImpl(httpSession);
+                    webSession = createWebSessionImpl(request);
                 } catch (DBException e) {
                     throw new DBWebException("Failed to create web session", e);
                 }
                 sessionMap.put(sessionId, webSession);
             } else if (baseWebSession == null) {
                 try {
-                    webSession = createWebSessionImpl(httpSession);
+                    webSession = createWebSessionImpl(request);
                 } catch (DBException e) {
                     throw new DBWebException("Failed to create web session", e);
                 }
@@ -175,7 +176,7 @@ public class WebSessionManager {
                         return null;
                     }
 
-                    webSession = createWebSessionImpl(httpSession);
+                    webSession = createWebSessionImpl(request);
                     restorePreviousUserSession(webSession, oldAuthInfo);
 
                     sessionMap.put(sessionId, webSession);
@@ -209,8 +210,8 @@ public class WebSessionManager {
     }
 
     @NotNull
-    protected WebSession createWebSessionImpl(@NotNull HttpSession httpSession) throws DBException {
-        return new WebSession(httpSession, application, getSessionHandlers());
+    protected WebSession createWebSessionImpl(@NotNull HttpServletRequest request) throws DBException {
+        return new WebSession(request, application, getSessionHandlers());
     }
 
     @NotNull

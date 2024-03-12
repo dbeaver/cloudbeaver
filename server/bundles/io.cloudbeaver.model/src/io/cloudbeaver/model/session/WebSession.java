@@ -124,13 +124,13 @@ public class WebSession extends BaseWebSession
     private final Map<String, DBWSessionHandler> sessionHandlers;
 
     public WebSession(
-        @NotNull HttpSession httpSession,
+        @NotNull HttpServletRequest request,
         @NotNull WebAuthApplication application,
         @NotNull Map<String, DBWSessionHandler> sessionHandlers
     ) throws DBException {
-        super(httpSession.getId(), application);
+        super(request.getSession().getId(), application);
         this.lastAccessTime = this.createTime;
-        setLocale(CommonUtils.toString(httpSession.getAttribute(ATTR_LOCALE), this.locale));
+        setLocale(CommonUtils.toString(request.getSession().getAttribute(ATTR_LOCALE), this.locale));
         this.sessionHandlers = sessionHandlers;
         //force authorization of anonymous session to avoid access error,
         //because before authorization could be called by any request,
@@ -138,6 +138,7 @@ public class WebSession extends BaseWebSession
         //and the order of requests is not guaranteed.
         //look at CB-4747
         refreshSessionAuth();
+        updateSessionParameters(request);
     }
 
     @Nullable
