@@ -29,11 +29,12 @@ export type NavTreeControlProps = {
   expanded?: boolean;
   className?: string;
   style?: ComponentStyle;
-  ref?: React.Ref<HTMLDivElement> | undefined;
   onClick?: (event: React.MouseEvent<HTMLDivElement>) => void;
 };
 
-export type NavTreeControlComponent = React.ForwardRefExoticComponent<NavTreeControlProps>;
+export type NavTreeControlComponent =
+  | React.MemoExoticComponent<React.ForwardRefExoticComponent<React.PropsWithoutRef<NavTreeControlProps> & React.RefAttributes<HTMLDivElement>>>
+  | React.ForwardRefExoticComponent<React.PropsWithoutRef<NavTreeControlProps> & React.RefAttributes<HTMLDivElement>>;
 
 export type NavigationNodeComponent = React.FC<{
   node: NavNode;

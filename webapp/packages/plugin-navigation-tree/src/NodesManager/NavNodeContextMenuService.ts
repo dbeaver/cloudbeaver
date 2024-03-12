@@ -156,7 +156,7 @@ export class NavNodeContextMenuService extends Bootstrap {
               actions.rename(save);
             } else {
               const result = await this.commonDialogService.open(RenameDialog, {
-                value: name,
+                name,
                 subTitle: name,
                 objectName: node.nodeType || 'Object',
                 icon: node.icon,
