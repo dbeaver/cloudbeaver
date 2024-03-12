@@ -19,10 +19,9 @@ import style from './styles/UsersAdministration.m.css';
 import tabStyle from './styles/UsersAdministrationTab.m.css';
 import tabPanelStyle from './styles/UsersAdministrationTabPanel.m.css';
 
-const registry: StyleRegistry = [
-  [baseTabStyles, { mode: 'append', styles: [underlineTabStyles, tabStyle] }],
-  [tabPanelStyles, { mode: 'append', styles: [baseTabStyles, tabPanelStyle] }],
-];
+const tabPanelRegistry: StyleRegistry = [[tabPanelStyles, { mode: 'append', styles: [baseTabStyles, tabPanelStyle] }]];
+
+const mainTabsRegistry: StyleRegistry = [[baseTabStyles, { mode: 'append', styles: [underlineTabStyles, tabStyle] }]];
 
 export const UsersAdministration: AdministrationItemContentComponent = observer(function UsersAdministration({ sub, param }) {
   const translate = useTranslate();
@@ -41,25 +40,27 @@ export const UsersAdministration: AdministrationItemContentComponent = observer(
   }
 
   return (
-    <SContext registry={registry}>
-      <TabsState selectedId={subName} lazy onChange={openSub}>
-        <ToolsPanel hasBottomBorder>
-          <TabList className={s(styles, { tabList: true })} aria-label="User Administration pages">
+    <TabsState selectedId={subName} lazy onChange={openSub}>
+      <ToolsPanel hasBottomBorder>
+        <TabList className={s(styles, { tabList: true })} aria-label="User Administration pages">
+          <SContext registry={mainTabsRegistry}>
             <Tab tabId={EUsersAdministrationSub.Users}>
               <TabTitle>{translate('authentication_administration_item_users')}</TabTitle>
             </Tab>
             <Tab tabId={EUsersAdministrationSub.Teams}>
               <TabTitle>{translate('administration_teams_tab_title')}</TabTitle>
             </Tab>
-          </TabList>
-        </ToolsPanel>
+          </SContext>
+        </TabList>
+      </ToolsPanel>
+      <SContext registry={tabPanelRegistry}>
         <TabPanel tabId={EUsersAdministrationSub.Users}>
           <UsersPage param={param} />
         </TabPanel>
         <TabPanel tabId={EUsersAdministrationSub.Teams}>
           <TeamsPage param={param} />
         </TabPanel>
-      </TabsState>
-    </SContext>
+      </SContext>
+    </TabsState>
   );
 });
