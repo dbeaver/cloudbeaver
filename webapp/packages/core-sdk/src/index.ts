@@ -1,6 +1,5 @@
 export * from './AsyncTask/AsyncTask';
 export * from './AsyncTask/AsyncTaskInfoService';
-export * from './AsyncTask/ASYNC_TASK_STATUS_FINISHED';
 export * from './Extensions/uploadBlobResultSetExtension';
 export * from './CustomGraphQLClient';
 export * from './DetailsError';

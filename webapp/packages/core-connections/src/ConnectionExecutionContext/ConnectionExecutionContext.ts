@@ -8,13 +8,12 @@
 import { computed, makeObservable, observable } from 'mobx';
 
 import type { ITask, TaskScheduler } from '@cloudbeaver/core-executor';
-import { ASYNC_TASK_STATUS_FINISHED, AsyncTaskInfo, type AsyncTaskInfoService, type GraphQLService } from '@cloudbeaver/core-sdk';
+import type { AsyncTaskInfo, AsyncTaskInfoService, GraphQLService } from '@cloudbeaver/core-sdk';
 
 import type { ConnectionExecutionContextResource, IConnectionExecutionContextInfo } from './ConnectionExecutionContextResource';
 import type { IConnectionExecutionContext } from './IConnectionExecutionContext';
 
 export interface IConnectionExecutionContextUpdateTaskInfo {
-  success: boolean;
   name?: string;
   result?: string | boolean;
 }
@@ -173,7 +172,6 @@ export class ConnectionExecutionContext implements IConnectionExecutionContext {
 
 function mapAsyncTaskInfo(info: AsyncTaskInfo): IConnectionExecutionContextUpdateTaskInfo {
   return {
-    success: info.status === ASYNC_TASK_STATUS_FINISHED && !info.error,
     name: info.name,
     result: info.taskResult,
   };
