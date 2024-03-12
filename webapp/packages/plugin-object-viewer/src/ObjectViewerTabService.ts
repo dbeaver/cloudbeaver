@@ -7,6 +7,7 @@
  */
 import { action, makeObservable, runInAction } from 'mobx';
 
+import { importLazyComponent } from '@cloudbeaver/core-blocks';
 import {
   Connection,
   ConnectionInfoActiveProjectKey,
@@ -21,7 +22,14 @@ import {
 import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import type { IExecutionContextProvider, ISyncContextLoader } from '@cloudbeaver/core-executor';
-import { type INodeNavigationData, NavNodeManagerService, NodeManagerUtils, objectNavNodeProvider } from '@cloudbeaver/core-navigation-tree';
+import {
+  INavNodeRenameData,
+  type INodeNavigationData,
+  NavNodeManagerService,
+  NavTreeResource,
+  NodeManagerUtils,
+  objectNavNodeProvider,
+} from '@cloudbeaver/core-navigation-tree';
 import { projectProvider } from '@cloudbeaver/core-projects';
 import { ResourceKey, resourceKeyList, ResourceKeySimple, ResourceKeyUtils } from '@cloudbeaver/core-resource';
 import { ITab, NavigationTabsService, TabHandler } from '@cloudbeaver/plugin-navigation-tabs';
@@ -34,6 +42,9 @@ import { ObjectViewerPanel } from './ObjectViewerPanel/ObjectViewerPanel';
 import { ObjectViewerTab } from './ObjectViewerTab';
 import { objectViewerTabHandlerKey } from './objectViewerTabHandlerKey';
 
+const ObjectViewerPanel = importLazyComponent(() => import('./ObjectViewerPanel').then(m => m.ObjectViewerPanel));
+const ObjectViewerTab = importLazyComponent(() => import('./ObjectViewerTab').then(m => m.ObjectViewerTab));
+
 @injectable()
 export class ObjectViewerTabService {
   readonly tabHandler: TabHandler<IObjectViewerTabState>;
@@ -45,6 +56,7 @@ export class ObjectViewerTabService {
     private readonly navigationTabsService: NavigationTabsService,
     private readonly connectionInfoResource: ConnectionInfoResource,
     private readonly connectionNavNodeService: ConnectionNavNodeService,
+    private readonly navTreeResource: NavTreeResource,
   ) {
     this.tabHandler = this.navigationTabsService.registerTabHandler<IObjectViewerTabState>({
       key: objectViewerTabHandlerKey,
@@ -78,6 +90,17 @@ export class ObjectViewerTabService {
     this.connectionInfoResource.onItemUpdate.addHandler(this.updateConnectionTabs.bind(this));
     this.connectionInfoResource.onItemDelete.addHandler(this.closeConnectionTabs.bind(this));
     this.navNodeManagerService.navTree.onItemDelete.addHandler(this.removeTabs.bind(this));
+    this.navTreeResource.onNodeRename.addHandler(this.handleNodeRename.bind(this));
+  }
+
+  private handleNodeRename(data: INavNodeRenameData, contexts: IExecutionContextProvider<INavNodeRenameData>) {
+    runInAction(() => {
+      const context = contexts.getContext(this.objectViewerTabContext);
+
+      if (context.tab) {
+        context.tab.handlerState.objectId = data.newNodeId;
+      }
+    });
   }
 
   isPageActive(tab: ITab<IObjectViewerTabState>, page: ObjectPage): boolean {
