@@ -8,7 +8,7 @@
 import type { ISyncExecutor } from '@cloudbeaver/core-executor';
 import type { SqlDialectInfo } from '@cloudbeaver/core-sdk';
 
-import type { ISqlDataSource } from '../SqlDataSource/ISqlDataSource';
+import type { ISqlDataSource, ISqlEditorCursor } from '../SqlDataSource/ISqlDataSource';
 import type { SQLProposal } from '../SqlEditorService';
 import type { ISQLScriptSegment, SQLParser } from '../SQLParser';
 import type { ISQLEditorMode } from './SQLEditorModeContext';
@@ -18,13 +18,8 @@ export interface ISegmentExecutionData {
   type: 'start' | 'end' | 'error';
 }
 
-export interface ICursor {
-  readonly begin: number;
-  readonly end: number;
-}
-
 export interface ISQLEditorData {
-  readonly cursor: ICursor;
+  readonly cursor: ISqlEditorCursor;
   activeSegmentMode: ISQLEditorMode;
   readonly parser: SQLParser;
   readonly dialect: SqlDialectInfo | undefined;

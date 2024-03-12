@@ -26,6 +26,7 @@ import {
 } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import type { TLocalizationToken } from '@cloudbeaver/core-localization';
+import { ServerConfigResource } from '@cloudbeaver/core-root';
 import type { AdminUserInfoFragment } from '@cloudbeaver/core-sdk';
 
 import { getFilteredUsers } from './getFilteredUsers';
@@ -47,6 +48,7 @@ export const GrantedUserList = observer<Props>(function GrantedUserList({ grante
   const translate = useTranslate();
 
   const usersResource = useService(UsersResource);
+  const serverConfigResource = useService(ServerConfigResource);
 
   const [selectedSubjects] = useState<Map<any, boolean>>(() => observable(new Map()));
   const [filterState] = useState<IFilterState>(() => observable({ filterValue: '' }));
@@ -70,6 +72,14 @@ export const GrantedUserList = observer<Props>(function GrantedUserList({ grante
     }
   }
 
+  function isEditable(userId: string) {
+    if (serverConfigResource.distributed) {
+      return true;
+    }
+
+    return !usersResource.isActiveUser(userId);
+  }
+
   return (
     <Group className={s(styles, { box: true })} box medium overflow>
       <div className={s(styles, { innerBox: true })}>
@@ -82,12 +92,7 @@ export const GrantedUserList = observer<Props>(function GrantedUserList({ grante
           </Button>
         </GrantedUsersTableHeader>
         <div className={s(styles, { tableBox: true })}>
-          <Table
-            className={s(styles, { table: true })}
-            keys={keys}
-            selectedItems={selectedSubjects}
-            isItemSelectable={item => !usersResource.isActiveUser(item)}
-          >
+          <Table className={s(styles, { table: true })} keys={keys} selectedItems={selectedSubjects} isItemSelectable={item => isEditable(item)}>
             <GrantedUsersTableInnerHeader disabled={disabled} />
             <TableBody>
               {tableInfoText && (
@@ -95,20 +100,17 @@ export const GrantedUserList = observer<Props>(function GrantedUserList({ grante
                   <TableColumnValue colSpan={5}>{translate(tableInfoText)}</TableColumnValue>
                 </TableItem>
               )}
-              {users.map(user => {
-                const activeUser = usersResource.isActiveUser(user.userId);
-                return (
-                  <GrantedUsersTableItem
-                    key={user.userId}
-                    id={user.userId}
-                    name={`${user.userId}${activeUser ? ' (you)' : ''}`}
-                    tooltip={activeUser ? translate('administration_teams_team_granted_users_permission_denied') : user.userId}
-                    icon="/icons/user.svg"
-                    iconTooltip={translate('authentication_user_icon_tooltip')}
-                    disabled={disabled}
-                  />
-                );
-              })}
+              {users.map(user => (
+                <GrantedUsersTableItem
+                  key={user.userId}
+                  id={user.userId}
+                  name={`${user.userId}${usersResource.isActiveUser(user.userId) ? ` (${translate('ui_you')})` : ''}`}
+                  tooltip={isEditable(user.userId) ? user.userId : translate('administration_teams_team_granted_users_permission_denied')}
+                  icon="/icons/user.svg"
+                  iconTooltip={translate('authentication_user_icon_tooltip')}
+                  disabled={disabled}
+                />
+              ))}
             </TableBody>
           </Table>
         </div>

@@ -10,7 +10,7 @@ module.exports = {
   transformIgnorePatterns: [
     '\\.pnp\\.[^\\/]+$',
     'node_modules/(?!@ngrx|(?!deck.gl)|ng-dynamic)',
-    '/node_modules/(?!(uuid|go-split|@react-dnd|react-dnd-html5-backend|react-dnd|dnd-core|@cloudbeaver))(.*)',
+    '/node_modules/(?!(uuid|go-split|@react-dnd|react-dnd-html5-backend|@timohausmann|react-dnd|dnd-core|@cloudbeaver))(.*)',
   ],
   testPathIgnorePatterns: ['/node_modules/'],
   moduleNameMapper: {

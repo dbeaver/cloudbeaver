@@ -25,6 +25,9 @@
       "path": "../core-browser/tsconfig.json"
     },
     {
+      "path": "../core-client-activity/tsconfig.json"
+    },
+    {
       "path": "../core-connections/tsconfig.json"
     },
     {
