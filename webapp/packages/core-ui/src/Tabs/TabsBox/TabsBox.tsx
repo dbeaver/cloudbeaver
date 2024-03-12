@@ -39,6 +39,9 @@ type TabsBoxProps = PropsWithChildren<{
   onChange?: (tab: ITabData<any>) => void;
 }>;
 
+/**
+ * @deprecated
+ */
 export const TabsBox = forwardRef<HTMLDivElement, TabsBoxProps>(function TabsBox(
   { currentTabId, tabs, tabIndex, localState, tabsClassName, tabList, enabledBaseActions, autoSelect, children, className, onChange },
   ref,
