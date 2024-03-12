@@ -258,11 +258,12 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
     private static boolean setPreference(
         @NotNull WebSession webSession,
         @NotNull String name,
-        @Nullable String value
+        @Nullable Object value
     ) throws DBWebException {
         webSession.addInfoMessage("Set user parameter - " + name);
         try {
-            webSession.getSecurityController().setCurrentUserParameter(name, value);
+            String serializedValue = value == null ? null : value.toString();
+            webSession.getSecurityController().setCurrentUserParameter(name, serializedValue);
             return true;
         } catch (DBException e) {
             throw new DBWebException("Error setting user parameter", e);
@@ -272,12 +273,12 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
     @Override
     public WebUserInfo setUserConfigurationParameters(
         @NotNull WebSession webSession,
-        @NotNull Map<String, String> parameters
+        @NotNull Map<String, Object> parameters
     ) throws DBWebException {
         if (webSession.getUser() == null) {
             throw new DBWebException("Preferences cannot be changed for anonymous user");
         }
-        for (Map.Entry<String, String> parameter : parameters.entrySet()) {
+        for (Map.Entry<String, Object> parameter : parameters.entrySet()) {
             setPreference(webSession, parameter.getKey(), parameter.getValue());
         }
         return new WebUserInfo(webSession, webSession.getUser());

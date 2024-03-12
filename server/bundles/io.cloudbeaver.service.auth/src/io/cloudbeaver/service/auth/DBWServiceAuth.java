@@ -72,7 +72,7 @@ public interface DBWServiceAuth extends DBWService {
     @WebAction()
     WebUserInfo setUserConfigurationParameters(
         @NotNull WebSession webSession,
-        @NotNull Map<String, String> parameters
+        @NotNull Map<String, Object> parameters
     ) throws DBWebException;
 
 }
