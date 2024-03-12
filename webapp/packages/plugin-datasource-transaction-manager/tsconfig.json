@@ -25,6 +25,9 @@
       "path": "../core-sdk/tsconfig.json"
     },
     {
+      "path": "../core-ui/tsconfig.json"
+    },
+    {
       "path": "../core-utils/tsconfig.json"
     },
     {
