@@ -26,11 +26,14 @@ import { MetadataMap } from '@cloudbeaver/core-utils';
 import type { ITab } from '@cloudbeaver/plugin-navigation-tabs';
 import { NavNodeViewService } from '@cloudbeaver/plugin-navigation-tree';
 
-import type { IObjectViewerTabState } from '../IObjectViewerTabState';
-import { FolderPanelRenderer } from './FolderPanelRenderer';
-import { FolderTabRenderer } from './FolderTabRenderer';
-import navNodeTabStyle from './NavNodeTab.m.css';
-import styles from './ObjectFolders.m.css';
+import type { IObjectViewerTabState } from '../../IObjectViewerTabState';
+import { FolderPanelRenderer } from '../FolderPanelRenderer';
+import { FolderTabRenderer } from '../FolderTabRenderer';
+import navNodeTabStyle from '../NavNodeTab.m.css';
+import navNodeStyles from './styles/ObjectFoldersNavNodeTab.m.css';
+import tabStyles from './styles/ObjectFoldersTab.m.css';
+import tabListModuleStyles from './styles/ObjectFoldersTabList.m.css';
+import tabPanelModuleStyles from './styles/ObjectFoldersTabPanel.m.css';
 
 interface IProps {
   tab: ITab<IObjectViewerTabState>;
@@ -41,28 +44,28 @@ const objectFoldersRegistry: StyleRegistry = [
     navNodeTabStyle,
     {
       mode: 'append',
-      styles: [styles],
+      styles: [navNodeStyles],
     },
   ],
   [
     baseTabStyles,
     {
       mode: 'append',
-      styles: [verticalTabStyles, styles],
+      styles: [verticalTabStyles, tabStyles],
     },
   ],
   [
     tabListStyles,
     {
       mode: 'append',
-      styles: [verticalTabStyles, styles],
+      styles: [verticalTabStyles, tabListModuleStyles],
     },
   ],
   [
     tabPanelStyles,
     {
       mode: 'append',
-      styles: [styles],
+      styles: [tabPanelModuleStyles],
     },
   ],
 ];
@@ -72,7 +75,6 @@ export const ObjectFolders = observer<IProps>(function ObjectFolders({ tab }) {
   const navNodeManagerService = useService(NavNodeManagerService);
   const navNodeViewService = useService(NavNodeViewService);
   const innerTabState = useTabLocalState(() => new MetadataMap<string, any>());
-  const style = useS(styles);
 
   const nodeId = tab.handlerState.objectId;
   const parentId = tab.handlerState.parentId;
@@ -112,7 +114,7 @@ export const ObjectFolders = observer<IProps>(function ObjectFolders({ tab }) {
             ))}
           </TabList>
           {folders.map(folderId => (
-            <TabPanel key={folderId} className={s(style, { tabPanel: true })} tabId={folderId}>
+            <TabPanel key={folderId} tabId={folderId}>
               <FolderPanelRenderer key={folderId} nodeId={nodeId} folderId={folderId} parents={parents} />
             </TabPanel>
           ))}

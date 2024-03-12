@@ -9,7 +9,7 @@ import { observer } from 'mobx-react-lite';
 import styled, { css } from 'reshadow';
 
 import type { ObjectPagePanelComponent } from '../ObjectPage/ObjectPage';
-import { ObjectFolders } from './ObjectFolders';
+import { ObjectFolders } from './ObjectFolders/ObjectFolders';
 
 const viewerStyles = css`
   wrapper {

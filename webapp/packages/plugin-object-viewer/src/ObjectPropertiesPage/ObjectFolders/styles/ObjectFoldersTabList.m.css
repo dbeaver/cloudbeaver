@@ -6,31 +6,8 @@
  * you may not use this file except in compliance with the License.
  */
 
-.baseTab {
-  composes: theme-ripple theme-background-background theme-ripple-selectable from global;
-  color: inherit;
-}
-
-.tabPanel {
-  overflow: auto !important;
-  composes: theme-border-color-background from global;
-  border-top: 1px solid;
-}
-
 .tabList {
   composes: theme-background-surface theme-text-on-surface theme-border-color-background from global;
   border-top: 1px solid;
   border-right: 1px solid;
-}
-
-.tabTitle {
-  flex: 1;
-}
-
-.tabLoader {
-  width: 16px;
-  height: 16px;
-  flex-shrink: 0;
-  margin-right: 16px;
-  overflow: hidden;
 }
