@@ -15,8 +15,10 @@ import { InputFieldBase, type InputFieldBaseProps } from './InputFieldBase';
 import { InputFieldState, type InputFieldStateProps } from './InputFieldState';
 
 interface InputFieldType {
-  (props: InputFieldBaseProps): React.ReactElement<any, any> | null;
-  <TState extends Record<string, any>, TKey extends keyof TState>(props: InputFieldStateProps<TState, TKey>): React.ReactElement<any, any> | null;
+  (props: InputFieldBaseProps & React.RefAttributes<HTMLInputElement>): React.ReactElement<any, any> | null;
+  <TState extends Record<string, any>, TKey extends keyof TState>(
+    props: InputFieldStateProps<TState, TKey> & React.RefAttributes<HTMLInputElement>,
+  ): React.ReactElement<any, any> | null;
 }
 
 export const InputField: InputFieldType = observer<InputFieldBaseProps | InputFieldStateProps<any, any>, HTMLInputElement>(
@@ -27,9 +29,9 @@ export const InputField: InputFieldType = observer<InputFieldBaseProps | InputFi
     const handleKeyDown = useCombinedHandler(onKeyDown, context?.keyDown);
 
     if (isFormStateControl(rest)) {
-      return <InputFieldState ref={ref} {...rest} onChange={handleChange} onKeyDown={handleKeyDown} />;
+      return <InputFieldState {...rest} ref={ref} onChange={handleChange} onKeyDown={handleKeyDown} />;
     }
 
-    return <InputFieldBase ref={ref} {...rest} onChange={handleChange} onKeyDown={handleKeyDown} />;
+    return <InputFieldBase {...rest} ref={ref} onChange={handleChange} onKeyDown={handleKeyDown} />;
   }),
 ) as InputFieldType;

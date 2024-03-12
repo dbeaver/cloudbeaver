@@ -30,8 +30,8 @@
   "peerDependencies": {},
   "devDependencies": {
     "@cloudbeaver/core-sdk": "~0.1.0",
-    "@types/jest": "^29.5.10",
-    "msw": "~2.x.x",
-    "typescript": "^5.3.2"
+    "@types/jest": "^29.5.12",
+    "msw": "^2.2.2",
+    "typescript": "^5.3.3"
   }
 }

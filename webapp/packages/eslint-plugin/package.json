@@ -7,12 +7,12 @@
   "license": "Apache-2.0",
   "type": "commonjs",
   "dependencies": {},
-  "peerDependencies": {
-    "eslint": ">=8.0.0"
-  },
   "keywords": [
     "eslint",
     "eslintplugin",
     "eslint-plugin"
-  ]
+  ],
+  "devDependencies": {
+    "eslint": "^8.57.0"
+  }
 }

@@ -223,7 +223,7 @@ public class WebServiceDataTransfer implements DBWServiceDataTransfer {
 
         StreamTransferConsumer consumer = new StreamTransferConsumer() {
             @Override
-            public void fetchRow(DBCSession session, DBCResultSet resultSet) throws DBCException {
+            public void fetchRow(@NotNull DBCSession session, @NotNull DBCResultSet resultSet) throws DBCException {
                 super.fetchRow(session, resultSet);
                 if (fileSizeLimit != null && getBytesWritten() > fileSizeLimit.longValue()) {
                     throw new DBQuotaException(

@@ -12,6 +12,8 @@ module.exports = class CustomTestEnvironment extends Environment {
     this.global.TextDecoder = TextDecoder;
     this.global.Response = Response;
     this.global.Request = Request;
+    // FIXME https://github.com/jsdom/jsdom/issues/3363
+    this.global.structuredClone = structuredClone;
 
     // different machine has its own timezones and some tests can fail because of it
     process.env.TZ = 'UTC';
