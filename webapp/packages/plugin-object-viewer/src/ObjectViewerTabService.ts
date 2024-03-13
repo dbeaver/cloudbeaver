@@ -38,11 +38,9 @@ import type { IObjectViewerTabContext } from './IObjectViewerTabContext';
 import type { IObjectViewerTabState } from './IObjectViewerTabState';
 import { DBObjectPageService } from './ObjectPage/DBObjectPageService';
 import type { ObjectPage } from './ObjectPage/ObjectPage';
-import { ObjectViewerPanel } from './ObjectViewerPanel/ObjectViewerPanel';
-import { ObjectViewerTab } from './ObjectViewerTab';
 import { objectViewerTabHandlerKey } from './objectViewerTabHandlerKey';
 
-const ObjectViewerPanel = importLazyComponent(() => import('./ObjectViewerPanel').then(m => m.ObjectViewerPanel));
+const ObjectViewerPanel = importLazyComponent(() => import('./ObjectViewerPanel/ObjectViewerPanel').then(m => m.ObjectViewerPanel));
 const ObjectViewerTab = importLazyComponent(() => import('./ObjectViewerTab').then(m => m.ObjectViewerTab));
 
 @injectable()

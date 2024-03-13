@@ -25,7 +25,7 @@ import { ConnectionInfoResource, ConnectionsManagerService } from '@cloudbeaver/
 import { useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { NavNodeInfoResource } from '@cloudbeaver/core-navigation-tree';
-import { baseTabStyles, TabPanel, TabsBox, useTabLocalState } from '@cloudbeaver/core-ui';
+import { TabPanel, TabsBox, TabStyles, useTabLocalState } from '@cloudbeaver/core-ui';
 import { MetadataMap } from '@cloudbeaver/core-utils';
 import type { TabHandlerPanelComponent } from '@cloudbeaver/plugin-navigation-tabs';
 
@@ -34,14 +34,14 @@ import { DBObjectPagePanel } from '../ObjectPage/DBObjectPagePanel';
 import { DBObjectPageService } from '../ObjectPage/DBObjectPageService';
 import { DBObjectPageTab } from '../ObjectPage/DBObjectPageTab';
 import styles from './styles/ObjectViewerPanel.m.css';
-import tabStyles from './styles/ObjectViewerPanelTab.m.css';
+import ObjectViewerPanelTab from './styles/ObjectViewerPanelTab.m.css';
 
 const tabsRegistry: StyleRegistry = [
   [
-    baseTabStyles,
+    TabStyles,
     {
       mode: 'append',
-      styles: [tabStyles],
+      styles: [ObjectViewerPanelTab],
     },
   ],
 ];

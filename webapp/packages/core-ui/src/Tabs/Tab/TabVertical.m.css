@@ -13,11 +13,7 @@
   height: 32px !important;
 }
 
-.verticalTabs {
-  display: flex;
-  overflow: hidden;
-}
-
+// TODO TabListVertical.m.css
 .tabList {
   display: flex;
   flex-direction: column;

@@ -12,7 +12,7 @@ import { useMemo } from 'react';
 import { ActionIconButton, Button, Container, Fill, Group, s, SContext, StyleRegistry, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { baseTabStyles, TabContainerPanelComponent, TabList, TabsState, underlineTabStyles, useTabLocalState } from '@cloudbeaver/core-ui';
+import { TabContainerPanelComponent, TabList, TabsState, TabStyles, TabUnderlineStyles, useTabLocalState } from '@cloudbeaver/core-ui';
 import { bytesToSize, isNotNullDefined } from '@cloudbeaver/core-utils';
 import { EditorLoader, useCodemirrorExtensions } from '@cloudbeaver/plugin-codemirror6';
 
@@ -26,13 +26,13 @@ import { QuotaPlaceholder } from '../QuotaPlaceholder';
 import { getDefaultLineWrapping } from './getDefaultLineWrapping';
 import { getTypeExtension } from './getTypeExtension';
 import styles from './styles/TextValuePresentation.m.css';
-import tabStyles from './styles/TextValuePresentationTab.m.css';
+import TextValuePresentationTab from './styles/TextValuePresentationTab.m.css';
 import { TextValuePresentationService } from './TextValuePresentationService';
 import { useTextValue } from './useTextValue';
 
 const DEFAULT_CONTENT_TYPE = 'text/plain';
 
-const tabRegistry: StyleRegistry = [[baseTabStyles, { mode: 'append', styles: [underlineTabStyles, tabStyles] }]];
+const tabRegistry: StyleRegistry = [[TabStyles, { mode: 'append', styles: [TabUnderlineStyles, TextValuePresentationTab] }]];
 
 export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelProps<any, IDatabaseResultSet>> = observer(
   function TextValuePresentation({ model, resultIndex, dataFormat }) {

@@ -7,7 +7,7 @@
  */
 import { IconOrImage, s, useS } from '@cloudbeaver/core-blocks';
 
-import baseTabStyles from './baseTab.m.css';
+import TabIconStyles from './TabIcon.m.css';
 
 interface IProps {
   icon?: string;
@@ -16,7 +16,7 @@ interface IProps {
 }
 
 export const TabIcon: React.FC<IProps> = function TabIcon({ icon, viewBox, className }) {
-  const styles = useS(baseTabStyles);
+  const styles = useS(TabIconStyles);
 
   return (
     <div className={s(styles, { tabIcon: true }, className)}>

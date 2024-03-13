@@ -26,27 +26,6 @@
   overflow: auto;
 }
 
-.baseTab {
-  composes: theme-background-secondary theme-text-on-secondary from global;
-}
-
-.tabList {
-  composes: theme-border-color-background theme-background-secondary theme-text-on-secondary from global;
-  border-top: solid 1px;
-  position: relative;
-  flex-shrink: 0;
-  align-items: center;
-
-  &:before {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    width: 100%;
-    border-bottom: solid 2px;
-    border-color: inherit;
-  }
-}
-
 .customConnection,
 .searchDatabase {
   flex-direction: column;

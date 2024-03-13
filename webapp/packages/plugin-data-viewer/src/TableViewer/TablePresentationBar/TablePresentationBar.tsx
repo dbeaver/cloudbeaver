@@ -10,7 +10,7 @@ import { observer } from 'mobx-react-lite';
 import { s, SContext, StyleRegistry, useS } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import type { ResultDataFormat } from '@cloudbeaver/core-sdk';
-import { baseTabStyles, TabList, tabListStyles, TabsState, verticalRotatedTabStyles } from '@cloudbeaver/core-ui';
+import { TabIconStyles, TabList, TabListStyles, TabsState, TabStyles, TabTitleStyles, TabVerticalRotatedStyles } from '@cloudbeaver/core-ui';
 
 import type { IDatabaseDataModel } from '../../DatabaseDataModel/IDatabaseDataModel';
 import { DataPresentationService, DataPresentationType } from '../../DataPresentationService';
@@ -31,8 +31,22 @@ interface Props {
 }
 
 const tablePresentationBarRegistry: StyleRegistry = [
-  [baseTabStyles, { mode: 'append', styles: [verticalRotatedTabStyles, tabStyles] }],
-  [tabListStyles, { mode: 'append', styles: [verticalRotatedTabStyles] }],
+  [TabStyles, { mode: 'append', styles: [TabVerticalRotatedStyles, tabStyles] }],
+  [TabListStyles, { mode: 'append', styles: [TabVerticalRotatedStyles] }],
+  [
+    TabIconStyles,
+    {
+      mode: 'append',
+      styles: [TabVerticalRotatedStyles],
+    },
+  ],
+  [
+    TabTitleStyles,
+    {
+      mode: 'append',
+      styles: [TabVerticalRotatedStyles],
+    },
+  ],
 ];
 
 export const TablePresentationBar = observer<Props>(function TablePresentationBar({

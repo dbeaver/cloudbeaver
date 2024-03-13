@@ -24,7 +24,7 @@ import {
   useTranslate,
 } from '@cloudbeaver/core-blocks';
 import type { DataTransferOutputSettings, DataTransferProcessorInfo } from '@cloudbeaver/core-sdk';
-import { baseTabStyles, ITabData, Tab, TabList, TabsState, TabTitle, underlineTabStyles } from '@cloudbeaver/core-ui';
+import { ITabData, Tab, TabList, TabsState, TabStyles, TabTitle, TabUnderlineStyles } from '@cloudbeaver/core-ui';
 
 import { OutputOptionsForm } from './OutputOptionsForm';
 import style from './ProcessorConfigureDialog.m.css';
@@ -47,7 +47,7 @@ enum SETTINGS_TABS {
   OUTPUT = 'OUTPUT',
 }
 
-const tabsRegistry: StyleRegistry = [[baseTabStyles, { mode: 'append', styles: [underlineTabStyles] }]];
+const tabsRegistry: StyleRegistry = [[TabStyles, { mode: 'append', styles: [TabUnderlineStyles] }]];
 
 export const ProcessorConfigureDialog = observer<Props>(function ProcessorConfigureDialog({
   processor,

@@ -30,11 +30,14 @@
     & .tabIcon {
       padding-left: 6px;
     }
+
     & .tabTitle {
       padding: 0 6px;
     }
   }
 }
+
+// TODO TabListVerticalRotated.m.css
 .tabList {
   display: flex;
   gap: 4px;

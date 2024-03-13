@@ -9,16 +9,16 @@ import { observer } from 'mobx-react-lite';
 
 import { s, SContext, type StyleRegistry, useS } from '@cloudbeaver/core-blocks';
 
-import { tabPanelStyles } from '..';
-import baseTabStyles from '../Tabs/Tab/baseTab.m.css';
-import underlineTabStyles from '../Tabs/Tab/underlineTabStyles.m.css';
+import TabStyles from '../Tabs/Tab/Tab.m.css';
+import TabUnderlineStyles from '../Tabs/Tab/TabUnderline.m.css';
 import { TabList } from '../Tabs/TabList';
+import TabPanelStyles from '../Tabs/TabPanel.m.css';
 import { TabPanelList } from '../Tabs/TabPanelList';
 import type { TabsContainer } from '../Tabs/TabsContainer/TabsContainer';
 import { TabsState } from '../Tabs/TabsState';
 import styles from './styles/SideBarPanel.m.css';
-import tabStyles from './styles/SideBarPanelTab.m.css';
-import tabPanelRegistryStyle from './styles/SideBarPanelTabPanel.m.css';
+import SideBarPanelTab from './styles/SideBarPanelTab.m.css';
+import SideBarPanelTabPanel from './styles/SideBarPanelTabPanel.m.css';
 
 interface Props {
   container: TabsContainer;
@@ -26,17 +26,17 @@ interface Props {
 
 const sideBarPanelRegistry: StyleRegistry = [
   [
-    baseTabStyles,
+    TabStyles,
     {
       mode: 'append',
-      styles: [underlineTabStyles, tabStyles],
+      styles: [TabUnderlineStyles, SideBarPanelTab],
     },
   ],
   [
-    tabPanelStyles,
+    TabPanelStyles,
     {
       mode: 'append',
-      styles: [tabPanelRegistryStyle],
+      styles: [SideBarPanelTabPanel],
     },
   ],
 ];

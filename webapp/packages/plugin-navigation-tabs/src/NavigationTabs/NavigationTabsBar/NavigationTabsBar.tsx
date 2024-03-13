@@ -11,12 +11,12 @@ import { useCallback, useEffect, useState } from 'react';
 import { UserInfoResource } from '@cloudbeaver/core-authentication';
 import { Loader, s, SContext, StyleRegistry, TextPlaceholder, useExecutor, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { baseTabStyles, ITabData, TabPanel, TabsBox } from '@cloudbeaver/core-ui';
+import { ITabData, TabPanel, TabsBox, TabStyles } from '@cloudbeaver/core-ui';
 import { CaptureView } from '@cloudbeaver/core-view';
 
 import { NavigationTabsService } from '../NavigationTabsService';
 import styles from './styles/NavigationTabsBar.m.css';
-import tabStyles from './styles/NavigationTabsBarBaseTab.m.css';
+import NavigationTabsBarBaseTab from './styles/NavigationTabsBarBaseTab.m.css';
 import { TabHandlerPanel } from './Tabs/TabHandlerPanel';
 import { TabHandlerTab } from './Tabs/TabHandlerTab';
 
@@ -26,10 +26,10 @@ interface Props {
 
 const tabsRegistry: StyleRegistry = [
   [
-    baseTabStyles,
+    TabStyles,
     {
       mode: 'append',
-      styles: [tabStyles],
+      styles: [NavigationTabsBarBaseTab],
     },
   ],
 ];

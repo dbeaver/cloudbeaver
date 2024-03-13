@@ -10,7 +10,18 @@ import { observer } from 'mobx-react-lite';
 import type { AdministrationItemContentComponent } from '@cloudbeaver/core-administration';
 import { s, SContext, StyleRegistry, ToolsPanel, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { baseTabStyles, ITabData, Tab, TabList, TabPanel, tabPanelStyles, TabsState, TabTitle, underlineTabStyles } from '@cloudbeaver/core-ui';
+import {
+  ITabData,
+  Tab,
+  TabList,
+  TabPanel,
+  TabPanelStyles,
+  TabsState,
+  TabStyles,
+  TabTitle,
+  TabTitleStyles,
+  TabUnderlineStyles,
+} from '@cloudbeaver/core-ui';
 
 import { TeamsPage } from '../Teams/TeamsPage';
 import { EUsersAdministrationSub, UsersAdministrationNavigationService } from '../UsersAdministrationNavigationService';
@@ -18,10 +29,14 @@ import { UsersPage } from '../UsersTable/UsersPage';
 import style from './styles/UsersAdministration.m.css';
 import tabStyle from './styles/UsersAdministrationTab.m.css';
 import tabPanelStyle from './styles/UsersAdministrationTabPanel.m.css';
+import TabTitleModuleStyles from './styles/UsersAdministrationTabTitle.m.css';
 
-const tabPanelRegistry: StyleRegistry = [[tabPanelStyles, { mode: 'append', styles: [tabPanelStyle] }]];
+const tabPanelRegistry: StyleRegistry = [[TabPanelStyles, { mode: 'append', styles: [tabPanelStyle] }]];
 
-const mainTabsRegistry: StyleRegistry = [[baseTabStyles, { mode: 'append', styles: [underlineTabStyles, tabStyle] }]];
+const mainTabsRegistry: StyleRegistry = [
+  [TabStyles, { mode: 'append', styles: [TabUnderlineStyles, tabStyle] }],
+  [TabTitleStyles, { mode: 'append', styles: [TabTitleModuleStyles] }],
+];
 
 export const UsersAdministration: AdministrationItemContentComponent = observer(function UsersAdministration({ sub, param }) {
   const translate = useTranslate();

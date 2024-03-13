@@ -10,7 +10,3 @@
   composes: theme-ripple theme-background-background theme-ripple-selectable from global;
   color: inherit;
 }
-
-.tabTitle {
-  flex: 1;
-}

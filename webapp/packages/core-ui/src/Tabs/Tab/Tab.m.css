@@ -60,47 +60,7 @@
   flex-shrink: 0;
   text-align: left;
   align-items: center;
-
-  & .tabIcon {
-    display: flex;
-    height: 24px;
-    padding-left: 8px;
-    justify-content: center;
-    align-items: center;
-
-    & .staticImage,
-    & .iconOrImage,
-    & img {
-      width: 16px;
-      height: 16px;
-    }
-
-    & .placeholder {
-      width: 16px;
-      height: 16px;
-    }
-  }
-
-  & .tabTitle {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    padding: 0 8px;
-  }
-
-  & .tabTitle .placeholder {
-    width: 80px;
-    height: 16px;
-  }
 }
 
-.tabList {
-  box-sizing: border-box;
-}
-
-.tabPanel {
-  flex: 1;
-  display: flex;
-  overflow: hidden;
-  outline: none;
-  position: relative;
+.tabOuter {
 }

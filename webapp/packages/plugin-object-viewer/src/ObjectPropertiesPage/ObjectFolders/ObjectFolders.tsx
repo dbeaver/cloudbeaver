@@ -8,19 +8,20 @@
 import { observer } from 'mobx-react-lite';
 import { useEffect } from 'react';
 
-import { s, SContext, StyleRegistry, TextPlaceholder, useResource, useS, useTranslate } from '@cloudbeaver/core-blocks';
+import { SContext, StyleRegistry, TextPlaceholder, useResource, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { NavNodeManagerService, NavTreeResource } from '@cloudbeaver/core-navigation-tree';
 import {
-  baseTabStyles,
   ITabData,
   TabList,
-  tabListStyles,
+  TabListStyles,
   TabPanel,
-  tabPanelStyles,
+  TabPanelStyles,
   TabsState,
+  TabStyles,
+  TabTitleStyles,
+  TabVertical,
   useTabLocalState,
-  verticalTabStyles,
 } from '@cloudbeaver/core-ui';
 import { MetadataMap } from '@cloudbeaver/core-utils';
 import type { ITab } from '@cloudbeaver/plugin-navigation-tabs';
@@ -34,6 +35,7 @@ import navNodeStyles from './styles/ObjectFoldersNavNodeTab.m.css';
 import tabStyles from './styles/ObjectFoldersTab.m.css';
 import tabListModuleStyles from './styles/ObjectFoldersTabList.m.css';
 import tabPanelModuleStyles from './styles/ObjectFoldersTabPanel.m.css';
+import tabTitleModuleStyles from './styles/ObjectFoldersTabTitle.m.css';
 
 interface IProps {
   tab: ITab<IObjectViewerTabState>;
@@ -48,24 +50,31 @@ const objectFoldersRegistry: StyleRegistry = [
     },
   ],
   [
-    baseTabStyles,
+    TabStyles,
     {
       mode: 'append',
-      styles: [verticalTabStyles, tabStyles],
+      styles: [TabVertical, tabStyles],
     },
   ],
   [
-    tabListStyles,
+    TabListStyles,
     {
       mode: 'append',
-      styles: [verticalTabStyles, tabListModuleStyles],
+      styles: [TabVertical, tabListModuleStyles],
     },
   ],
   [
-    tabPanelStyles,
+    TabPanelStyles,
     {
       mode: 'append',
       styles: [tabPanelModuleStyles],
+    },
+  ],
+  [
+    TabTitleStyles,
+    {
+      mode: 'append',
+      styles: [tabTitleModuleStyles],
     },
   ],
 ];

@@ -9,7 +9,7 @@ import { observer } from 'mobx-react-lite';
 
 import { getComputed, s, SContext, StyleRegistry, TextPlaceholder, useS, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { baseTabStyles, ITabData, TabList, TabPanel, TabsState } from '@cloudbeaver/core-ui';
+import { ITabData, TabIconStyles, TabList, TabPanel, TabsState, TabStyles } from '@cloudbeaver/core-ui';
 
 import type { ISqlEditorTabState } from '../../ISqlEditorTabState';
 import { ESqlDataSourceFeatures } from '../../SqlDataSource/ESqlDataSourceFeatures';
@@ -18,7 +18,8 @@ import { SqlResultPanel } from '../SqlResultPanel';
 import { SqlResultTab } from '../SqlResultTab';
 import { SqlResultTabsService } from '../SqlResultTabsService';
 import styles from './styles/SqlResultTabs.m.css';
-import tabStyles from './styles/SqlResultTabsBaseTab.m.css';
+import SqlResultTabsTab from './styles/SqlResultTabsTab.m.css';
+import TabIconModuleStyles from './styles/SqlResultTabsTabIcon.m.css';
 
 interface Props {
   state: ISqlEditorTabState;
@@ -26,7 +27,10 @@ interface Props {
   onTabClose?: (tabId: string) => void;
 }
 
-const registry: StyleRegistry = [[baseTabStyles, { mode: 'append', styles: [tabStyles] }]];
+const registry: StyleRegistry = [
+  [TabStyles, { mode: 'append', styles: [SqlResultTabsTab] }],
+  [TabIconStyles, { mode: 'append', styles: [TabIconModuleStyles] }],
+];
 
 export const SqlResultTabs = observer<Props>(function SqlDataResult({ state, onTabSelect, onTabClose }) {
   const style = useS(styles);

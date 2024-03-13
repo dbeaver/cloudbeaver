@@ -23,14 +23,15 @@ import {
 import { useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import {
-  baseTabStyles,
   FormMode,
   IFormState,
+  TabBigUnderlineStyles,
   TabList,
   TabPanelList,
   TabsState,
-  underlineTabBigStyles,
-  underlineTabStyles,
+  TabStyles,
+  TabTitleStyles,
+  TabUnderlineStyles,
 } from '@cloudbeaver/core-ui';
 import { getFirstException } from '@cloudbeaver/core-utils';
 
@@ -44,7 +45,10 @@ interface Props {
   onClose: () => void;
 }
 
-const userFormRegistry: StyleRegistry = [[baseTabStyles, { mode: 'append', styles: [underlineTabStyles, underlineTabBigStyles] }]];
+const userFormRegistry: StyleRegistry = [
+  [TabStyles, { mode: 'append', styles: [TabUnderlineStyles, TabBigUnderlineStyles] }],
+  [TabTitleStyles, { mode: 'append', styles: [TabBigUnderlineStyles] }],
+];
 
 export const AdministrationUserForm = observer<Props>(function AdministrationUserForm({ state, onClose }) {
   const styles = useS(style);

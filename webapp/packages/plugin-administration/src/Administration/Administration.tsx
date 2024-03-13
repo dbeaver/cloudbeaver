@@ -22,7 +22,7 @@ import {
   useS,
 } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { baseTabStyles, OptionsPanelService, TabList, tabListStyles, TabsState, verticalTabStyles } from '@cloudbeaver/core-ui';
+import { OptionsPanelService, TabList, TabListStyles, TabsState, TabStyles, TabVertical } from '@cloudbeaver/core-ui';
 import { CaptureView } from '@cloudbeaver/core-view';
 
 import { AdministrationCaptureViewContext } from './AdministrationCaptureViewContext';
@@ -30,9 +30,9 @@ import { AdministrationViewService } from './AdministrationViewService';
 import { DrawerItem } from './DrawerItem';
 import { ItemContent } from './ItemContent';
 import AdministrationToolbarStyles from './styles/AdministrationToolbarStyles.m.css';
-import adminTabStyles from './styles/AdministrationToolbarStylesTab.m.css';
-import adminTabListStyles from './styles/AdministrationToolbarStylesTabList.m.css';
-import toolsPanelStyles from './styles/AdministrationToolbarToolsPanelStyles.m.css';
+import AdministrationToolbarStylesTab from './styles/AdministrationToolbarStylesTab.m.css';
+import AdministrationToolbarStylesTabList from './styles/AdministrationToolbarStylesTabList.m.css';
+import AdministrationToolbarToolsPanelStyles from './styles/AdministrationToolbarToolsPanelStyles.m.css';
 
 interface Props {
   configurationWizard: boolean;
@@ -45,31 +45,31 @@ const adminPageRegistry: StyleRegistry = [
     ToolsPanelStyles,
     {
       mode: 'append',
-      styles: [toolsPanelStyles],
+      styles: [AdministrationToolbarToolsPanelStyles],
     },
   ],
   [
     ToolsActionStyles,
     {
       mode: 'append',
-      styles: [toolsPanelStyles],
+      styles: [AdministrationToolbarToolsPanelStyles],
     },
   ],
 ];
 
 const tabsRegistry: StyleRegistry = [
   [
-    baseTabStyles,
+    TabStyles,
     {
       mode: 'append',
-      styles: [verticalTabStyles, adminTabStyles],
+      styles: [TabVertical, AdministrationToolbarStylesTab],
     },
   ],
   [
-    tabListStyles,
+    TabListStyles,
     {
       mode: 'append',
-      styles: [verticalTabStyles, adminTabListStyles],
+      styles: [TabVertical, AdministrationToolbarStylesTabList],
     },
   ],
 ];

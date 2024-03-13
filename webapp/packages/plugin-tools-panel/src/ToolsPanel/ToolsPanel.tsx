@@ -11,7 +11,7 @@ import { useRef } from 'react';
 
 import { s, SContext, StyleRegistry, useS, useUserData } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { baseTabStyles, ITabData, TabList, TabPanelList, TabsState, underlineTabStyles } from '@cloudbeaver/core-ui';
+import { ITabData, TabList, TabPanelList, TabsState, TabStyles, TabUnderlineStyles } from '@cloudbeaver/core-ui';
 import { isArraysEqual } from '@cloudbeaver/core-utils';
 
 import styles from './ToolsPanel.m.css';
@@ -21,7 +21,7 @@ interface IToolsState {
   selectedTabId: string | undefined;
 }
 
-const ToolsPanelRegistry: StyleRegistry = [[baseTabStyles, { mode: 'append', styles: [underlineTabStyles] }]];
+const ToolsPanelRegistry: StyleRegistry = [[TabStyles, { mode: 'append', styles: [TabUnderlineStyles] }]];
 
 export const ToolsPanel = observer(function ToolsPanel() {
   const toolsPanelService = useService(ToolsPanelService);

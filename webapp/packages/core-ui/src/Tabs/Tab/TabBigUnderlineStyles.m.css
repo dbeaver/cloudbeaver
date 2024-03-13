@@ -5,11 +5,12 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
+
 .baseTab {
-  composes: theme-ripple theme-background-surface theme-text-text-primary-on-light from global;
-  height: 38px !important;
+  font-size: 14px;
 }
 
-.tabIcon {
-  composes: theme-text-surface from global;
+// TODO TabTitleBigUnderline.m.css
+.tabTitle {
+  padding: 0 16px;
 }

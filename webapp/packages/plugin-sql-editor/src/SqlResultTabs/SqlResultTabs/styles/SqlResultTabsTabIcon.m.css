@@ -6,17 +6,6 @@
  * you may not use this file except in compliance with the License.
  */
 
-.baseTab {
-  height: 100%;
-  font-size: 14px;
-  font-weight: 700;
-  padding: 0 4px;
-}
-
-.tabInner {
-  height: 100%;
-}
-
-.tabOuter {
-  height: 100%;
+.tabIcon {
+  composes: theme-text-surface from global;
 }

@@ -10,7 +10,7 @@ import { observer } from 'mobx-react-lite';
 
 import { s, SContext, type StyleRegistry, useS } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { baseTabStyles, TabList, TabsState, underlineTabStyles } from '@cloudbeaver/core-ui';
+import { TabList, TabPanelList, TabPanelStyles, TabsState, TabStyles, TabUnderlineStyles } from '@cloudbeaver/core-ui';
 import { MetadataMap } from '@cloudbeaver/core-utils';
 
 import { DatabaseDataResultAction } from '../../DatabaseDataModel/Actions/DatabaseDataResultAction';
@@ -20,10 +20,16 @@ import type { IDatabaseResultSet } from '../../DatabaseDataModel/IDatabaseResult
 import type { DataPresentationComponent } from '../../DataPresentationService';
 import { DataValuePanelService } from './DataValuePanelService';
 import styles from './styles/ValuePanel.m.css';
-import tabStyles from './styles/ValuePanelTab.m.css';
-import { ValuePanelEditorTabs } from './ValuePanelEditorTabs';
+import ValuePanelEditorTabPanel from './styles/ValuePanelEditorTabPanel.m.css';
+import ValuePanelEditorTabs from './styles/ValuePanelEditorTabs.m.css';
+import ValuePanelTab from './styles/ValuePanelTab.m.css';
 
-const tabListRegistry: StyleRegistry = [[baseTabStyles, { mode: 'append', styles: [underlineTabStyles, tabStyles] }]];
+const tabListRegistry: StyleRegistry = [[TabStyles, { mode: 'append', styles: [TabUnderlineStyles, ValuePanelTab] }]];
+
+const tabPanelListRegistry: StyleRegistry = [
+  [TabStyles, { mode: 'append', styles: [TabUnderlineStyles, ValuePanelEditorTabs] }],
+  [TabPanelStyles, { mode: 'append', styles: [ValuePanelEditorTabPanel] }],
+];
 
 export const ValuePanel: DataPresentationComponent<any, IDatabaseResultSet> = observer(function ValuePanel({ dataFormat, model, resultIndex }) {
   const service = useService(DataValuePanelService);
@@ -75,7 +81,9 @@ export const ValuePanel: DataPresentationComponent<any, IDatabaseResultSet> = ob
       <SContext registry={tabListRegistry}>
         <TabList className={s(style, { tabList: true })} />
       </SContext>
-      <ValuePanelEditorTabs />
+      <SContext registry={tabPanelListRegistry}>
+        <TabPanelList />
+      </SContext>
     </TabsState>
   );
 });
