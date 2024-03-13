@@ -88,8 +88,8 @@ export const ProcessorConfigureDialog = observer<Props>(function ProcessorConfig
       <CommonDialogHeader title={title} onReject={onClose} />
       <CommonDialogBody noOverflow noBodyPadding>
         {!processor.isBinary ? (
-          <SContext registry={tabsRegistry}>
-            <TabsState currentTabId={currentTabId} onChange={handleTabChange}>
+          <TabsState currentTabId={currentTabId} onChange={handleTabChange}>
+            <SContext registry={tabsRegistry}>
               <TabList className={s(styles, { tabList: true })} aria-label="Export Settings tabs">
                 <Tab tabId={SETTINGS_TABS.EXTRACTION}>
                   <TabTitle>{translate('data_transfer_format_settings')}</TabTitle>
@@ -98,8 +98,8 @@ export const ProcessorConfigureDialog = observer<Props>(function ProcessorConfig
                   <TabTitle>{translate('data_transfer_output_settings')}</TabTitle>
                 </Tab>
               </TabList>
-            </TabsState>
-          </SContext>
+            </SContext>
+          </TabsState>
         ) : null}
         {currentTabId === SETTINGS_TABS.EXTRACTION ? (
           <PropertiesTable className={s(styles, { propertiesTable: true })} properties={properties} propertiesState={processorProperties} />

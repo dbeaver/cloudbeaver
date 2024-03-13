@@ -50,10 +50,6 @@
   gap: 16px;
 }
 
-/*Button:not(:first-child) {
-    margin-right: 24px;
-  }*/
-
 .connectionStatusMessage {
   composes: theme-typography--caption from global;
   height: 24px;

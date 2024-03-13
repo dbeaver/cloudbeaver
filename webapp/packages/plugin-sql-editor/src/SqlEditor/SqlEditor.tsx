@@ -86,16 +86,16 @@ export const SqlEditor = observer<ISqlEditorProps>(function SqlEditor({ state, c
   }, [isEditorEmpty]);
 
   return (
-    <SContext registry={sqlEditorRegistry}>
-      <TabsState
-        currentTabId={state.currentModeId}
-        container={sqlEditorModeService.tabsContainer}
-        localState={modesState}
-        state={state}
-        data={data}
-        lazy
-        onChange={handleModeSelect}
-      >
+    <TabsState
+      currentTabId={state.currentModeId}
+      container={sqlEditorModeService.tabsContainer}
+      localState={modesState}
+      state={state}
+      data={data}
+      lazy
+      onChange={handleModeSelect}
+    >
+      <SContext registry={sqlEditorRegistry}>
         <div className={s(style, { sqlEditor: true }, className)}>
           <SQLEditorActions data={data} state={state} />
           <TabPanelList />
@@ -105,7 +105,7 @@ export const SqlEditor = observer<ISqlEditorProps>(function SqlEditor({ state, c
             </div>
           ) : null}
         </div>
-      </TabsState>
-    </SContext>
+      </SContext>
+    </TabsState>
   );
 });

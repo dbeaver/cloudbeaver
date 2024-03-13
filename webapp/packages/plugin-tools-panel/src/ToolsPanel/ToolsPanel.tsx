@@ -62,15 +62,15 @@ export const ToolsPanel = observer(function ToolsPanel() {
   }
 
   return (
-    <SContext registry={ToolsPanelRegistry}>
-      <TabsState currentTabId={state.selectedTabId} container={toolsPanelService.tabsContainer} lazy onChange={handleTabChange}>
+    <TabsState currentTabId={state.selectedTabId} container={toolsPanelService.tabsContainer} lazy onChange={handleTabChange}>
+      <SContext registry={ToolsPanelRegistry}>
         <div className={s(style, { box: true })}>
           <TabList className={s(style, { tabList: true })} />
           <div className={s(style, { contentBox: true })}>
             <TabPanelList />
           </div>
         </div>
-      </TabsState>
-    </SContext>
+      </SContext>
+    </TabsState>
   );
 });

@@ -94,7 +94,7 @@ export const TablePresentationBar = observer<Props>(function TablePresentationBa
     <SContext registry={tablePresentationBarRegistry}>
       <div className={s(style, { tableLeftBar: true }, className)}>
         <TabsState currentTabId={presentationId} autoSelect={main}>
-          <TabList className={s(style, { tabListFlexible: main, tabList: true })} aria-label="Data Presentations">
+          <TabList className={s(style, { tabListFlexible: main })} aria-label="Data Presentations">
             {presentations.map(presentation => (
               <Tab key={presentation.id} presentation={presentation} model={model} resultIndex={resultIndex} onClick={handleClick} />
             ))}

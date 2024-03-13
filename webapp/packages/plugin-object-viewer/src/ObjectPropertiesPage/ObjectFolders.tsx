@@ -28,15 +28,15 @@ import { MetadataMap } from '@cloudbeaver/core-utils';
 import type { ITab } from '@cloudbeaver/plugin-navigation-tabs';
 import { NavNodeViewService } from '@cloudbeaver/plugin-navigation-tree';
 
-import type { IObjectViewerTabState } from '../../IObjectViewerTabState';
-import { FolderPanelRenderer } from '../FolderPanelRenderer';
-import { FolderTabRenderer } from '../FolderTabRenderer';
-import navNodeTabStyle from '../NavNodeTab.m.css';
+import type { IObjectViewerTabState } from '../IObjectViewerTabState';
+import { FolderPanelRenderer } from './FolderPanelRenderer';
+import { FolderTabRenderer } from './FolderTabRenderer';
+import NavNodeTabStyle from './NavNodeTab.m.css';
 import navNodeStyles from './shared/ObjectFoldersNavNodeTab.m.css';
-import tabStyles from './shared/ObjectFoldersTab.m.css';
-import tabListModuleStyles from './shared/ObjectFoldersTabList.m.css';
-import tabPanelModuleStyles from './shared/ObjectFoldersTabPanel.m.css';
-import tabTitleModuleStyles from './shared/ObjectFoldersTabTitle.m.css';
+import ObjectFoldersTab from './shared/ObjectFoldersTab.m.css';
+import ObjectFoldersTabList from './shared/ObjectFoldersTabList.m.css';
+import ObjectFoldersTabPanel from './shared/ObjectFoldersTabPanel.m.css';
+import ObjectFoldersTabTitle from './shared/ObjectFoldersTabTitle.m.css';
 
 interface IProps {
   tab: ITab<IObjectViewerTabState>;
@@ -44,7 +44,7 @@ interface IProps {
 
 const objectFoldersRegistry: StyleRegistry = [
   [
-    navNodeTabStyle,
+    NavNodeTabStyle,
     {
       mode: 'append',
       styles: [navNodeStyles],
@@ -54,28 +54,28 @@ const objectFoldersRegistry: StyleRegistry = [
     TabStyles,
     {
       mode: 'append',
-      styles: [TabVertical, tabStyles],
+      styles: [TabVertical, ObjectFoldersTab],
     },
   ],
   [
     TabListStyles,
     {
       mode: 'append',
-      styles: [TabListVertical, tabListModuleStyles],
+      styles: [TabListVertical, ObjectFoldersTabList],
     },
   ],
   [
     TabPanelStyles,
     {
       mode: 'append',
-      styles: [tabPanelModuleStyles],
+      styles: [ObjectFoldersTabPanel],
     },
   ],
   [
     TabTitleStyles,
     {
       mode: 'append',
-      styles: [tabTitleModuleStyles],
+      styles: [ObjectFoldersTabTitle],
     },
   ],
 ];

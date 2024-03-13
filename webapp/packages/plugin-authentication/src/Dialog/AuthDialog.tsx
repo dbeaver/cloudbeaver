@@ -156,22 +156,22 @@ export const AuthDialog: DialogComponent<IAuthOptions, null> = observer(function
   }
 
   return (
-    <SContext registry={authDialogRegistry}>
-      <TabsState
-        currentTabId={state.tabId}
-        onChange={tabData => {
-          state.setTabId(tabData.tabId);
-        }}
-      >
-        <CommonDialogWrapper className={s(styles, { wrapper: true })} size="large" aria-label={translate('authentication_login_dialog_title')}>
-          <CommonDialogHeader
-            title={dialogTitle}
-            tooltip={tooltip}
-            icon={icon}
-            subTitle={subTitle}
-            onReject={options?.persistent ? undefined : rejectDialog}
-          />
-          <CommonDialogBody noBodyPadding>
+    <TabsState
+      currentTabId={state.tabId}
+      onChange={tabData => {
+        state.setTabId(tabData.tabId);
+      }}
+    >
+      <CommonDialogWrapper className={s(styles, { wrapper: true })} size="large" aria-label={translate('authentication_login_dialog_title')}>
+        <CommonDialogHeader
+          title={dialogTitle}
+          tooltip={tooltip}
+          icon={icon}
+          subTitle={subTitle}
+          onReject={options?.persistent ? undefined : rejectDialog}
+        />
+        <CommonDialogBody noBodyPadding>
+          <SContext registry={authDialogRegistry}>
             {showTabs && (
               <TabList className={s(styles, { tabList: true })} aria-label="Auth providers">
                 {dialogData.providers
@@ -228,38 +228,38 @@ export const AuthDialog: DialogComponent<IAuthOptions, null> = observer(function
                 )}
               </TabList>
             )}
-            {federate ? (
-              <ConfigurationsList
-                activeProvider={state.activeProvider}
-                activeConfiguration={state.activeConfiguration}
-                providers={dialogData.federatedProviders}
-                authTask={dialogData.authTask}
-                className={s(styles, { configurationsList: true })}
-                login={login}
-                onClose={rejectDialog}
-              />
-            ) : (
-              <Form className={s(styles, { submittingForm: true })} onSubmit={() => login(linkUser)}>
-                {renderForm(state.activeProvider, state.activeConfiguration)}
-              </Form>
-            )}
-          </CommonDialogBody>
-          {!federate && (
-            <CommonDialogFooter>
-              <AuthDialogFooter authAvailable={!dialogData.configure} isAuthenticating={dialogData.authenticating} onLogin={() => login(linkUser)}>
-                {errorDetails.name && (
-                  <ErrorMessage
-                    className={s(styles, { errorMessage: true })}
-                    text={errorDetails.message || errorDetails.name}
-                    hasDetails={errorDetails.hasDetails}
-                    onShowDetails={errorDetails.open}
-                  />
-                )}
-              </AuthDialogFooter>
-            </CommonDialogFooter>
+          </SContext>
+          {federate ? (
+            <ConfigurationsList
+              activeProvider={state.activeProvider}
+              activeConfiguration={state.activeConfiguration}
+              providers={dialogData.federatedProviders}
+              authTask={dialogData.authTask}
+              className={s(styles, { configurationsList: true })}
+              login={login}
+              onClose={rejectDialog}
+            />
+          ) : (
+            <Form className={s(styles, { submittingForm: true })} onSubmit={() => login(linkUser)}>
+              {renderForm(state.activeProvider, state.activeConfiguration)}
+            </Form>
           )}
-        </CommonDialogWrapper>
-      </TabsState>
-    </SContext>
+        </CommonDialogBody>
+        {!federate && (
+          <CommonDialogFooter>
+            <AuthDialogFooter authAvailable={!dialogData.configure} isAuthenticating={dialogData.authenticating} onLogin={() => login(linkUser)}>
+              {errorDetails.name && (
+                <ErrorMessage
+                  className={s(styles, { errorMessage: true })}
+                  text={errorDetails.message || errorDetails.name}
+                  hasDetails={errorDetails.hasDetails}
+                  onShowDetails={errorDetails.open}
+                />
+              )}
+            </AuthDialogFooter>
+          </CommonDialogFooter>
+        )}
+      </CommonDialogWrapper>
+    </TabsState>
   );
 });
