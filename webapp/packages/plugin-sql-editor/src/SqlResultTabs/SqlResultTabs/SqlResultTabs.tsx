@@ -9,7 +9,7 @@ import { observer } from 'mobx-react-lite';
 
 import { getComputed, s, SContext, StyleRegistry, TextPlaceholder, useS, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { ITabData, TabIconStyles, TabList, TabPanel, TabsState, TabStyles } from '@cloudbeaver/core-ui';
+import { ITabData, TabIconStyles, TabList, TabListStyles, TabPanel, TabsState, TabStyles } from '@cloudbeaver/core-ui';
 
 import type { ISqlEditorTabState } from '../../ISqlEditorTabState';
 import { ESqlDataSourceFeatures } from '../../SqlDataSource/ESqlDataSourceFeatures';
@@ -20,6 +20,7 @@ import { SqlResultTabsService } from '../SqlResultTabsService';
 import styles from './shared/SqlResultTabs.m.css';
 import SqlResultTabsTab from './shared/SqlResultTabsTab.m.css';
 import TabIconModuleStyles from './shared/SqlResultTabsTabIcon.m.css';
+import SqlResultTabsTabList from './shared/SqlResultTabsTabList.m.css';
 
 interface Props {
   state: ISqlEditorTabState;
@@ -30,6 +31,7 @@ interface Props {
 const registry: StyleRegistry = [
   [TabStyles, { mode: 'append', styles: [SqlResultTabsTab] }],
   [TabIconStyles, { mode: 'append', styles: [TabIconModuleStyles] }],
+  [TabListStyles, { mode: 'append', styles: [SqlResultTabsTabList] }],
 ];
 
 export const SqlResultTabs = observer<Props>(function SqlDataResult({ state, onTabSelect, onTabClose }) {
@@ -97,7 +99,7 @@ export const SqlResultTabs = observer<Props>(function SqlDataResult({ state, onT
         onClose={handleClose}
       >
         <SContext registry={registry}>
-          <TabList className={s(style, { tabList: true, tabListNotExecutable: !executable })} aria-label="SQL Results">
+          <TabList className={s(style, { tabListNotExecutable: !executable })} aria-label="SQL Results">
             {orderedTabs.map(result => (
               <SqlResultTab key={result.id} result={result} />
             ))}

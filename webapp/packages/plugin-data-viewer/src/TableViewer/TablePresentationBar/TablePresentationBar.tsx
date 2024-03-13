@@ -27,7 +27,7 @@ import type { IDatabaseDataModel } from '../../DatabaseDataModel/IDatabaseDataMo
 import { DataPresentationService, DataPresentationType } from '../../DataPresentationService';
 import { PresentationTab } from './PresentationTab';
 import styles from './shared/TablePresentationBar.m.css';
-import tabStyles from './shared/TablePresentationBarTab.m.css';
+import TablePresentationBarTab from './shared/TablePresentationBarTab.m.css';
 import TablePresentationBarTabList from './shared/TablePresentationBarTabList.m.css';
 
 interface Props {
@@ -43,7 +43,7 @@ interface Props {
 }
 
 const tablePresentationBarRegistry: StyleRegistry = [
-  [TabStyles, { mode: 'append', styles: [TabVerticalRotatedStyles, tabStyles] }],
+  [TabStyles, { mode: 'append', styles: [TabVerticalRotatedStyles, TablePresentationBarTab] }],
   [TabListStyles, { mode: 'append', styles: [TabListVerticalRotatedStyles, TablePresentationBarTabList] }],
   [
     TabIconStyles,

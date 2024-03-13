@@ -6,19 +6,8 @@
  * you may not use this file except in compliance with the License.
  */
 
-.wrapper {
-  overflow: auto;
+.tabList {
+  composes: theme-background-background theme-text-text-primary-on-light from global;
   display: flex;
-  flex-direction: column;
-  flex: 1;
-  height: 100%;
-  position: relative;
-}
-
-.tabListNotExecutable .tabOuter:only-child {
-  display: none;
-}
-
-.textPlaceholder {
-  padding: 24px;
+  overflow: auto;
 }
