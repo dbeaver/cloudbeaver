@@ -15,6 +15,7 @@ import {
   ITabData,
   TabList,
   TabListStyles,
+  TabListVertical,
   TabPanel,
   TabPanelStyles,
   TabsState,
@@ -60,7 +61,7 @@ const objectFoldersRegistry: StyleRegistry = [
     TabListStyles,
     {
       mode: 'append',
-      styles: [TabVertical, tabListModuleStyles],
+      styles: [TabListVertical, tabListModuleStyles],
     },
   ],
   [

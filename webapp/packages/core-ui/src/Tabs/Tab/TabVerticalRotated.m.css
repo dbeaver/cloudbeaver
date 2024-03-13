@@ -27,21 +27,14 @@
       border-radius: var(--theme-group-element-radius);
     }
 
+    // TODO style for this
     & .tabIcon {
       padding-left: 6px;
     }
 
+    // TODO style for this
     & .tabTitle {
       padding: 0 6px;
     }
   }
-}
-
-// TODO TabListVerticalRotated.m.css
-.tabList {
-  display: flex;
-  gap: 4px;
-  outline: none;
-  max-width: 32px;
-  flex-direction: column;
 }

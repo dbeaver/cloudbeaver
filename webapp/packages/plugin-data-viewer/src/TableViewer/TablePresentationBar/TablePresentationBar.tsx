@@ -10,13 +10,23 @@ import { observer } from 'mobx-react-lite';
 import { s, SContext, StyleRegistry, useS } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import type { ResultDataFormat } from '@cloudbeaver/core-sdk';
-import { TabIconStyles, TabList, TabListStyles, TabsState, TabStyles, TabTitleStyles, TabVerticalRotatedStyles } from '@cloudbeaver/core-ui';
+import {
+  TabIconStyles,
+  TabList,
+  TabListStyles,
+  TabListVerticalRotatedStyles,
+  TabsState,
+  TabStyles,
+  TabTitleStyles,
+  TabVerticalRotatedStyles,
+} from '@cloudbeaver/core-ui';
 
 import type { IDatabaseDataModel } from '../../DatabaseDataModel/IDatabaseDataModel';
 import { DataPresentationService, DataPresentationType } from '../../DataPresentationService';
 import { PresentationTab } from './PresentationTab';
 import styles from './shared/TablePresentationBar.m.css';
 import tabStyles from './shared/TablePresentationBarTab.m.css';
+import TablePresentationBarTabList from './shared/TablePresentationBarTabList.m.css';
 
 interface Props {
   type: DataPresentationType;
@@ -32,7 +42,7 @@ interface Props {
 
 const tablePresentationBarRegistry: StyleRegistry = [
   [TabStyles, { mode: 'append', styles: [TabVerticalRotatedStyles, tabStyles] }],
-  [TabListStyles, { mode: 'append', styles: [TabVerticalRotatedStyles] }],
+  [TabListStyles, { mode: 'append', styles: [TabListVerticalRotatedStyles, TablePresentationBarTabList] }],
   [
     TabIconStyles,
     {
@@ -84,14 +94,7 @@ export const TablePresentationBar = observer<Props>(function TablePresentationBa
         <TabsState currentTabId={presentationId} autoSelect={main}>
           <TabList className={s(style, { tabListFlexible: main, tabList: true })} aria-label="Data Presentations">
             {presentations.map(presentation => (
-              <Tab
-                key={presentation.id}
-                className={s(style, { baseTab: true })}
-                presentation={presentation}
-                model={model}
-                resultIndex={resultIndex}
-                onClick={handleClick}
-              />
+              <Tab key={presentation.id} presentation={presentation} model={model} resultIndex={resultIndex} onClick={handleClick} />
             ))}
           </TabList>
         </TabsState>

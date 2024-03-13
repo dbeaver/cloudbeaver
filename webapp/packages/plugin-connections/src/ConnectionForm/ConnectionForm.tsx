@@ -25,7 +25,16 @@ import {
 import { useService } from '@cloudbeaver/core-di';
 import { ENotificationType } from '@cloudbeaver/core-events';
 import type { ConnectionConfig } from '@cloudbeaver/core-sdk';
-import { TabBigUnderlineStyles, TabList, TabPanelList, TabsState, TabStyles, TabTitleStyles, TabUnderlineStyles } from '@cloudbeaver/core-ui';
+import {
+  TabBigUnderlineStyles,
+  TabList,
+  TabPanelList,
+  TabsState,
+  TabStyles,
+  TabTitleBigUnderlineStyles,
+  TabTitleStyles,
+  TabUnderlineStyles,
+} from '@cloudbeaver/core-ui';
 
 import { ConnectionFormActionsContext, IConnectionFormActionsContext } from './ConnectFormActionsContext';
 import style from './ConnectionForm.m.css';
@@ -42,7 +51,7 @@ export interface ConnectionFormProps {
 
 const connectionFormRegistry: StyleRegistry = [
   [TabStyles, { mode: 'append', styles: [TabUnderlineStyles, TabBigUnderlineStyles] }],
-  [TabTitleStyles, { mode: 'append', styles: [TabBigUnderlineStyles] }],
+  [TabTitleStyles, { mode: 'append', styles: [TabTitleBigUnderlineStyles] }],
 ];
 
 export const ConnectionForm = observer<ConnectionFormProps>(function ConnectionForm({ state, onCancel, onSave = () => {}, className }) {

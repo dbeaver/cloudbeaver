@@ -6,10 +6,6 @@
  * you may not use this file except in compliance with the License.
  */
 
-.tableLeftBar {
-  display: flex;
-}
-
-.tabListFlexible .tabOuter:only-child {
-  display: none;
+.tabList {
+  composes: theme-background-secondary theme-text-on-secondary from global;
 }

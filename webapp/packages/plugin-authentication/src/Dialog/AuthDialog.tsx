@@ -27,7 +27,17 @@ import {
 } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogComponent } from '@cloudbeaver/core-dialogs';
-import { Tab, TabBigUnderlineStyles, TabList, TabsState, TabStyles, TabTitle, TabTitleStyles, TabUnderlineStyles } from '@cloudbeaver/core-ui';
+import {
+  Tab,
+  TabBigUnderlineStyles,
+  TabList,
+  TabsState,
+  TabStyles,
+  TabTitle,
+  TabTitleBigUnderlineStyles,
+  TabTitleStyles,
+  TabUnderlineStyles,
+} from '@cloudbeaver/core-ui';
 
 import { AuthenticationService } from '../AuthenticationService';
 import type { IAuthOptions } from '../IAuthOptions';
@@ -40,7 +50,7 @@ import { getAuthProviderTabId, useAuthDialogState } from './useAuthDialogState';
 
 const authDialogRegistry: StyleRegistry = [
   [TabStyles, { mode: 'append', styles: [TabUnderlineStyles, TabBigUnderlineStyles] }],
-  [TabTitleStyles, { mode: 'append', styles: [TabBigUnderlineStyles] }],
+  [TabTitleStyles, { mode: 'append', styles: [TabTitleBigUnderlineStyles] }],
 ];
 
 export const AuthDialog: DialogComponent<IAuthOptions, null> = observer(function AuthDialog({

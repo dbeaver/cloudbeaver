@@ -11,7 +11,15 @@ import { AUTH_PROVIDER_LOCAL_ID } from '@cloudbeaver/core-authentication';
 import { Button, s, SContext, StatusMessage, StyleRegistry, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import { ENotificationType } from '@cloudbeaver/core-events';
 import type { UserInfo } from '@cloudbeaver/core-sdk';
-import { TabBigUnderlineStyles, TabList, TabsState, TabStyles, TabTitleStyles, TabUnderlineStyles } from '@cloudbeaver/core-ui';
+import {
+  TabBigUnderlineStyles,
+  TabList,
+  TabsState,
+  TabStyles,
+  TabTitleBigUnderlineStyles,
+  TabTitleStyles,
+  TabUnderlineStyles,
+} from '@cloudbeaver/core-ui';
 
 import { AuthenticationPanel } from './Authentication/AuthenticationPanel';
 import { AuthenticationTab } from './Authentication/AuthenticationTab';
@@ -28,7 +36,7 @@ interface Props {
 
 const registry: StyleRegistry = [
   [TabStyles, { mode: 'append', styles: [TabUnderlineStyles, TabBigUnderlineStyles] }],
-  [TabTitleStyles, { mode: 'append', styles: [TabBigUnderlineStyles] }],
+  [TabTitleStyles, { mode: 'append', styles: [TabTitleBigUnderlineStyles] }],
 ];
 
 export const UserForm = observer<Props>(function UserForm({ user, state, onClose }) {

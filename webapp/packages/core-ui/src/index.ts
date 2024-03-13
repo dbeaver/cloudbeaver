@@ -50,11 +50,14 @@ export { default as TabActionsStyles } from './Tabs/Tab/TabActions.m.css';
 export { default as TabMenuStyles } from './Tabs/Tab/TabMenu.m.css';
 export { default as TabTitleStyles } from './Tabs/Tab/TabTitle.m.css';
 export { default as TabVerticalRotatedStyles } from './Tabs/Tab/TabVerticalRotated.m.css';
+export { default as TabListVerticalRotatedStyles } from './Tabs/Tab/TabListVerticalRotated.m.css';
 export { default as TabPanelStyles } from './Tabs/TabPanel.m.css';
 export { default as TabListStyles } from './Tabs/TabList.m.css';
 export { default as TabVertical } from './Tabs/Tab/TabVertical.m.css';
+export { default as TabListVertical } from './Tabs/Tab/TabListVertical.m.css';
 export { default as TabUnderlineStyles } from './Tabs/Tab/TabUnderline.m.css';
 export { default as TabBigUnderlineStyles } from './Tabs/Tab/TabBigUnderlineStyles.m.css';
+export { default as TabTitleBigUnderlineStyles } from './Tabs/Tab/TabTitleBigUnderlineStyles.m.css';
 export { default as TabIconStyles } from './Tabs/Tab/TabIcon.m.css';
 
 export * from './Tabs/Tab/DATA_CONTEXT_TAB_ID';

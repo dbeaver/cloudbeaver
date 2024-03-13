@@ -6,11 +6,6 @@
  * you may not use this file except in compliance with the License.
  */
 
-// TODO TabListUnderline
-.tabList {
-  display: flex;
-}
-
 .baseTab {
   composes: theme-typography--caption from global;
   background: none;

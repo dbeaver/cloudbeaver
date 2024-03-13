@@ -51,6 +51,7 @@
     cursor: pointer;
   }
 
+  // TODO styles for this one
   & .tabIcon {
     display: block;
   }

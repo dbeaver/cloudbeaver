@@ -6,10 +6,11 @@
  * you may not use this file except in compliance with the License.
  */
 
-.tableLeftBar {
+.tabList {
   display: flex;
-}
-
-.tabListFlexible .tabOuter:only-child {
-  display: none;
+  flex-direction: column;
+  flex: 0 0 auto;
+  min-width: 150px;
+  overflow: auto;
+  outline: none;
 }

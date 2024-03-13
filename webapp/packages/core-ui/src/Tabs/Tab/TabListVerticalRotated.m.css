@@ -6,10 +6,10 @@
  * you may not use this file except in compliance with the License.
  */
 
-.tableLeftBar {
+.tabList {
   display: flex;
-}
-
-.tabListFlexible .tabOuter:only-child {
-  display: none;
+  gap: 4px;
+  outline: none;
+  max-width: 32px;
+  flex-direction: column;
 }

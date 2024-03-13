@@ -24,7 +24,16 @@ import {
   useTranslate,
 } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { TabBigUnderlineStyles, TabList, TabPanelList, TabsState, TabStyles, TabTitleStyles, TabUnderlineStyles } from '@cloudbeaver/core-ui';
+import {
+  TabBigUnderlineStyles,
+  TabList,
+  TabPanelList,
+  TabsState,
+  TabStyles,
+  TabTitleBigUnderlineStyles,
+  TabTitleStyles,
+  TabUnderlineStyles,
+} from '@cloudbeaver/core-ui';
 
 import { teamContext } from './Contexts/teamContext';
 import type { ITeamFormState } from './ITeamFormProps';
@@ -41,7 +50,7 @@ interface Props {
 
 const teamFormRegistry: StyleRegistry = [
   [TabStyles, { mode: 'append', styles: [TabUnderlineStyles, TabBigUnderlineStyles] }],
-  [TabTitleStyles, { mode: 'append', styles: [TabBigUnderlineStyles] }],
+  [TabTitleStyles, { mode: 'append', styles: [TabTitleBigUnderlineStyles] }],
 ];
 
 export const TeamForm = observer<Props>(function TeamForm({ state, onCancel, onSave = () => {}, className }) {

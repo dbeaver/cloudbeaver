@@ -15,6 +15,7 @@ import {
   TabIconStyles,
   TabList,
   TabListStyles,
+  TabListVerticalRotatedStyles,
   TabPanelList,
   TabsState,
   TabStyles,
@@ -34,7 +35,7 @@ import SqlEditorTab from './shared/SqlEditorTab.m.css';
 import SqlEditorTabList from './shared/SqlEditorTabList.m.css';
 
 const sqlEditorRegistry: StyleRegistry = [
-  [TabListStyles, { mode: 'append', styles: [TabVerticalRotatedStyles, SqlEditorTabList] }],
+  [TabListStyles, { mode: 'append', styles: [TabListVerticalRotatedStyles, SqlEditorTabList] }],
   [TabStyles, { mode: 'append', styles: [TabVerticalRotatedStyles, SqlEditorTab] }],
   [
     TabIconStyles,

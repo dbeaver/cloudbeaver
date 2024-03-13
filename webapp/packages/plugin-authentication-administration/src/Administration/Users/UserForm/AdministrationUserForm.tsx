@@ -30,6 +30,7 @@ import {
   TabPanelList,
   TabsState,
   TabStyles,
+  TabTitleBigUnderlineStyles,
   TabTitleStyles,
   TabUnderlineStyles,
 } from '@cloudbeaver/core-ui';
@@ -47,7 +48,7 @@ interface Props {
 
 const userFormRegistry: StyleRegistry = [
   [TabStyles, { mode: 'append', styles: [TabUnderlineStyles, TabBigUnderlineStyles] }],
-  [TabTitleStyles, { mode: 'append', styles: [TabBigUnderlineStyles] }],
+  [TabTitleStyles, { mode: 'append', styles: [TabTitleBigUnderlineStyles] }],
 ];
 
 export const AdministrationUserForm = observer<Props>(function AdministrationUserForm({ state, onClose }) {
