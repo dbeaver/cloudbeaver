@@ -10,7 +10,7 @@
   composes: placeholder from global;
 }
 
-.baseTab {
+.tab {
   position: relative;
   outline: none;
   font-weight: normal;

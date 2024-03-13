@@ -13,7 +13,7 @@
   padding: 50% 0;
   height: 0;
 
-  & .baseTab {
+  & .tab {
     transform-origin: top left;
     display: block;
     box-sizing: border-box;

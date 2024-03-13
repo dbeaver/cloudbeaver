@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-.baseTab {
+.tab {
   composes: theme-ripple theme-background-background theme-text-text-primary-on-light from global;
   height: 38px !important;
 }
