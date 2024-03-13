@@ -11,16 +11,16 @@ import { getComputed, s, SContext, StyleRegistry, TextPlaceholder, useS, useStyl
 import { useService } from '@cloudbeaver/core-di';
 import { ITabData, TabIconStyles, TabList, TabListStyles, TabPanel, TabsState, TabStyles } from '@cloudbeaver/core-ui';
 
-import type { ISqlEditorTabState } from '../../ISqlEditorTabState';
-import { ESqlDataSourceFeatures } from '../../SqlDataSource/ESqlDataSourceFeatures';
-import { SqlDataSourceService } from '../../SqlDataSource/SqlDataSourceService';
-import { SqlResultPanel } from '../SqlResultPanel';
-import { SqlResultTab } from '../SqlResultTab';
-import { SqlResultTabsService } from '../SqlResultTabsService';
+import type { ISqlEditorTabState } from '../ISqlEditorTabState';
+import { ESqlDataSourceFeatures } from '../SqlDataSource/ESqlDataSourceFeatures';
+import { SqlDataSourceService } from '../SqlDataSource/SqlDataSourceService';
 import styles from './shared/SqlResultTabs.m.css';
 import SqlResultTabsTab from './shared/SqlResultTabsTab.m.css';
 import TabIconModuleStyles from './shared/SqlResultTabsTabIcon.m.css';
 import SqlResultTabsTabList from './shared/SqlResultTabsTabList.m.css';
+import { SqlResultPanel } from './SqlResultPanel';
+import { SqlResultTab } from './SqlResultTab';
+import { SqlResultTabsService } from './SqlResultTabsService';
 
 interface Props {
   state: ISqlEditorTabState;

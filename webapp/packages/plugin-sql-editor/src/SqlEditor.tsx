@@ -19,7 +19,7 @@ import { SqlEditorOpenOverlay } from './SqlEditorOpenOverlay';
 import { SqlEditorOverlay } from './SqlEditorOverlay';
 import { SqlEditorStatusBar } from './SqlEditorStatusBar';
 import { SqlEditorView } from './SqlEditorView';
-import { SqlResultTabs } from './SqlResultTabs/SqlResultTabs/SqlResultTabs';
+import { SqlResultTabs } from './SqlResultTabs/SqlResultTabs';
 import { useDataSource } from './useDataSource';
 
 interface Props {
