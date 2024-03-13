@@ -110,6 +110,7 @@ export default [
   ['ui_readonly', 'Доступно только для чтения'],
   ['ui_test', 'Проверить'],
   ['ui_export', 'Экспорт'],
+  ['ui_you', 'Вы'],
 
   ['root_permission_denied', 'Отказано в доступе'],
   ['root_permission_no_permission', 'У вас нет разрешения на это действие'],

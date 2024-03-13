@@ -150,6 +150,13 @@ public class WebSQLUtils {
         Map<String, Object> map = createMapOfType(WebSQLConstants.VALUE_TYPE_CONTENT);
         if (ContentUtils.isTextContent(value)) {
             String stringValue = ContentUtils.getContentStringValue(session.getProgressMonitor(), value);
+            int textPreviewMaxLength = CommonUtils.toInt(
+                CBApplication.getInstance().getAppConfiguration().getResourceQuota(
+                    WebSQLConstants.QUOTA_PROP_TEXT_PREVIEW_MAX_LENGTH,
+                    WebSQLConstants.TEXT_PREVIEW_MAX_LENGTH));
+            if (stringValue != null && stringValue.length() > textPreviewMaxLength) {
+                stringValue =  stringValue.substring(0, textPreviewMaxLength);
+            }
             map.put(WebSQLConstants.ATTR_TEXT, stringValue);
         } else {
             map.put(WebSQLConstants.ATTR_BINARY, true);

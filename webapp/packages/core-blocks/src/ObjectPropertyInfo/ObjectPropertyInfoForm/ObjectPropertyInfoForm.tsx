@@ -34,6 +34,7 @@ interface ObjectPropertyFormProps extends ILayoutSizeProps {
   hideEmptyPlaceholder?: boolean;
   emptyPlaceholder?: string;
   canShowPassword?: boolean;
+  disableAutoCompleteForPasswords?: boolean;
   isSaved?: (property: ObjectPropertyInfo) => boolean;
   geLayoutSize?: (property: ObjectPropertyInfo) => ILayoutSizeProps;
   onFocus?: (name: string) => void;
@@ -44,6 +45,7 @@ export const ObjectPropertyInfoForm = observer<ObjectPropertyFormProps>(function
   state,
   defaultState,
   category,
+  disableAutoCompleteForPasswords = false,
   editable = true,
   className,
   autofillToken = '',
@@ -90,7 +92,7 @@ export const ObjectPropertyInfoForm = observer<ObjectPropertyFormProps>(function
             state={state}
             defaultState={defaultState}
             editable={editable}
-            autofillToken={autofillToken}
+            autofillToken={property.features.includes('password') && disableAutoCompleteForPasswords ? 'new-password' : autofillToken}
             disabled={disabled}
             readOnly={readOnly}
             autoHide={autoHide}

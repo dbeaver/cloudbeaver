@@ -15,7 +15,6 @@ import {
   GroupTitle,
   InputField,
   ObjectPropertyInfoForm,
-  useCustomInputValidation,
   useObjectPropertyCategories,
   useTranslate,
 } from '@cloudbeaver/core-blocks';
@@ -31,6 +30,9 @@ interface Props {
 }
 
 const MAX_KEEP_ALIVE_INTERVAL_IN_SECONDS = 32767;
+const DEFAULT_CONFIG: ConnectionConfig = {
+  keepAliveInterval: 0,
+};
 
 export const ProviderPropertiesForm = observer<Props>(function ProviderPropertiesForm({ config, properties, disabled, readonly }) {
   const translate = useTranslate();
@@ -85,9 +87,9 @@ export const ProviderPropertiesForm = observer<Props>(function ProviderPropertie
         name="keepAliveInterval"
         disabled={disabled}
         readOnly={readonly}
-        defaultValue={config?.keepAliveInterval ?? 0}
         title={translate('connections_connection_keep_alive_tooltip')}
         state={config}
+        defaultState={DEFAULT_CONFIG}
       >
         {translate('connections_connection_keep_alive')}
       </InputField>

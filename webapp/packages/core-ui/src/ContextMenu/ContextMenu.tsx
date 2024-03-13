@@ -80,6 +80,7 @@ export const ContextMenu = observer<IContextMenuProps, HTMLButtonElement>(
 
     return (
       <Menu
+        {...props}
         ref={ref}
         label={translate(menuData.menu.label)}
         title={translate(menuData.menu.tooltip)}
@@ -101,7 +102,6 @@ export const ContextMenu = observer<IContextMenuProps, HTMLButtonElement>(
         disclosure={disclosure}
         getHasBindings={handlers.hasBindings}
         onVisibleSwitch={handlers.handleVisibleSwitch}
-        {...props}
       >
         {renderingChildren}
       </Menu>

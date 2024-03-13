@@ -35,11 +35,9 @@ export const SqlResultPanel = observer<Props>(function SqlResultPanel({ state, i
   const resultTab = state.resultTabs.find(tab => tab.tabId === id);
 
   if (resultTab) {
-    const group = state.resultGroups.find(group => group.groupId === resultTab.groupId)!;
-
     return styled(style)(
       <result-panel>
-        <SqlResultSetPanel resultTab={resultTab} group={group} />
+        <SqlResultSetPanel resultTab={resultTab} state={state} />
       </result-panel>,
     );
   }

@@ -8,7 +8,7 @@
 import { observer } from 'mobx-react-lite';
 
 import type { ObjectPropertyInfo } from '@cloudbeaver/core-sdk';
-import { removeMetadataFromBase64 } from '@cloudbeaver/core-utils';
+import { removeMetadataFromDataURL } from '@cloudbeaver/core-utils';
 
 import { FieldCheckbox } from '../../FormControls/Checkboxes/FieldCheckbox';
 import { Combobox } from '../../FormControls/Combobox';
@@ -88,7 +88,7 @@ export const RenderField = observer<RenderFieldProps>(function RenderField({
   }
 
   if (!editable) {
-    if (autoHide && !isControlPresented(property.id!, state)) {
+    if (autoHide && !isControlPresented(property.id, state)) {
       return null;
     }
     return (
@@ -187,7 +187,7 @@ export const RenderField = observer<RenderFieldProps>(function RenderField({
         disabled={disabled}
         fileName={passwordSavedMessage}
         className={className}
-        mapValue={removeMetadataFromBase64}
+        mapValue={removeMetadataFromDataURL}
       >
         {property.displayName}
       </InputFileTextContent>
@@ -239,9 +239,8 @@ export const RenderField = observer<RenderFieldProps>(function RenderField({
         labelTooltip={property.description || property.displayName}
         name={property.id!}
         state={state}
-        defaultState={defaultState}
+        defaultState={defaultState || { [property.id!]: defaultValue }}
         autoHide={autoHide}
-        defaultValue={defaultValue}
         description={property.hint}
         placeholder={passwordSavedMessage}
         disabled={disabled}

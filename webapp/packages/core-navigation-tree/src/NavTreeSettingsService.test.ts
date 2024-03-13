@@ -11,6 +11,7 @@ import { coreAppManifest } from '@cloudbeaver/core-app';
 import { coreAuthenticationManifest } from '@cloudbeaver/core-authentication';
 import { mockAuthentication } from '@cloudbeaver/core-authentication/dist/__custom_mocks__/mockAuthentication';
 import { coreBrowserManifest } from '@cloudbeaver/core-browser';
+import { coreClientActivityManifest } from '@cloudbeaver/core-client-activity';
 import { coreEventsManifest } from '@cloudbeaver/core-events';
 import { coreLocalizationManifest } from '@cloudbeaver/core-localization';
 import { corePluginManifest } from '@cloudbeaver/core-plugin';
@@ -50,6 +51,7 @@ const app = createApp(
   coreProjectsManifest,
   coreUIManifest,
   coreViewManifest,
+  coreClientActivityManifest,
 );
 
 const server = mockGraphQL(...mockAppInit(endpoint), ...mockAuthentication(endpoint));
