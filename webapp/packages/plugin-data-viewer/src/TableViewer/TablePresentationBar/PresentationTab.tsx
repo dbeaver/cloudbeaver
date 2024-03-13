@@ -8,7 +8,17 @@
 import { observer } from 'mobx-react-lite';
 
 import { SContext, StyleRegistry, useTranslate } from '@cloudbeaver/core-blocks';
-import { Tab, TabIcon, TabIconStyles, TabStyles, TabTitle, TabTitleStyles, TabVerticalRotatedStyles } from '@cloudbeaver/core-ui';
+import {
+  Tab,
+  TabIcon,
+  TabIconStyles,
+  TabIconVerticalRotatedStyles,
+  TabStyles,
+  TabTitle,
+  TabTitleStyles,
+  TabTitleVerticalRotatedStyles,
+  TabVerticalRotatedStyles,
+} from '@cloudbeaver/core-ui';
 
 import type { IDatabaseDataModel } from '../../DatabaseDataModel/IDatabaseDataModel';
 import type { IDataPresentationOptions } from '../../DataPresentationService';
@@ -33,14 +43,14 @@ const presentationTabRegistry: StyleRegistry = [
     TabIconStyles,
     {
       mode: 'append',
-      styles: [TabVerticalRotatedStyles],
+      styles: [TabIconVerticalRotatedStyles],
     },
   ],
   [
     TabTitleStyles,
     {
       mode: 'append',
-      styles: [TabVerticalRotatedStyles],
+      styles: [TabTitleVerticalRotatedStyles],
     },
   ],
 ];

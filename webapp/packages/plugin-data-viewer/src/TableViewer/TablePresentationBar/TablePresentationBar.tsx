@@ -12,12 +12,14 @@ import { useService } from '@cloudbeaver/core-di';
 import type { ResultDataFormat } from '@cloudbeaver/core-sdk';
 import {
   TabIconStyles,
+  TabIconVerticalRotatedStyles,
   TabList,
   TabListStyles,
   TabListVerticalRotatedStyles,
   TabsState,
   TabStyles,
   TabTitleStyles,
+  TabTitleVerticalRotatedStyles,
   TabVerticalRotatedStyles,
 } from '@cloudbeaver/core-ui';
 
@@ -47,14 +49,14 @@ const tablePresentationBarRegistry: StyleRegistry = [
     TabIconStyles,
     {
       mode: 'append',
-      styles: [TabVerticalRotatedStyles],
+      styles: [TabIconVerticalRotatedStyles],
     },
   ],
   [
     TabTitleStyles,
     {
       mode: 'append',
-      styles: [TabVerticalRotatedStyles],
+      styles: [TabTitleVerticalRotatedStyles],
     },
   ],
 ];

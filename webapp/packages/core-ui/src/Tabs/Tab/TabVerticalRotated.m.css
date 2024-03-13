@@ -26,15 +26,5 @@
     &::before {
       border-radius: var(--theme-group-element-radius);
     }
-
-    // TODO style for this
-    & .tabIcon {
-      padding-left: 6px;
-    }
-
-    // TODO style for this
-    & .tabTitle {
-      padding: 0 6px;
-    }
   }
 }

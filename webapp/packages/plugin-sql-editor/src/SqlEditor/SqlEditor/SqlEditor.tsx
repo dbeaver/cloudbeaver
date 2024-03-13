@@ -13,6 +13,7 @@ import { useService } from '@cloudbeaver/core-di';
 import {
   ITabData,
   TabIconStyles,
+  TabIconVerticalRotatedStyles,
   TabList,
   TabListStyles,
   TabListVerticalRotatedStyles,
@@ -20,6 +21,7 @@ import {
   TabsState,
   TabStyles,
   TabTitleStyles,
+  TabTitleVerticalRotatedStyles,
   TabVerticalRotatedStyles,
 } from '@cloudbeaver/core-ui';
 import { MetadataMap } from '@cloudbeaver/core-utils';
@@ -41,14 +43,14 @@ const sqlEditorRegistry: StyleRegistry = [
     TabIconStyles,
     {
       mode: 'append',
-      styles: [TabVerticalRotatedStyles],
+      styles: [TabIconVerticalRotatedStyles],
     },
   ],
   [
     TabTitleStyles,
     {
       mode: 'append',
-      styles: [TabVerticalRotatedStyles],
+      styles: [TabTitleVerticalRotatedStyles],
     },
   ],
 ];
