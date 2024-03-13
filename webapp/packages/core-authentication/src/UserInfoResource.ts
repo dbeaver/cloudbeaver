@@ -166,6 +166,20 @@ export class UserInfoResource extends CachedDataResource<UserInfo | null, void, 
     return result;
   }
 
+  async updatePreferences(preferences: Record<string, any>): Promise<UserInfo | null> {
+    await this.performUpdate(undefined, [], async () => {
+      const { user } = await this.graphQLService.sdk.updateUserPreferences({
+        preferences,
+        ...this.getDefaultIncludes(),
+        ...this.getIncludesMap(),
+      });
+
+      this.setData(user as UserInfo | null);
+    });
+
+    return this.data;
+  }
+
   async setConfigurationParameter(key: string, value: any): Promise<UserInfo | null> {
     await this.load();
 
@@ -173,7 +187,7 @@ export class UserInfoResource extends CachedDataResource<UserInfo | null, void, 
       return this.data;
     }
 
-    this.performUpdate(undefined, [], async () => {
+    await this.performUpdate(undefined, [], async () => {
       await this.graphQLService.sdk.setUserConfigurationParameter({
         name: key,
         value,
@@ -187,6 +201,15 @@ export class UserInfoResource extends CachedDataResource<UserInfo | null, void, 
     return this.data;
   }
 
+  async updateLocalPassword(oldPassword: string, newPassword: string): Promise<void> {
+    await this.performUpdate(undefined, [], async () => {
+      await this.graphQLService.sdk.authChangeLocalPassword({
+        oldPassword: this.authProviderService.hashValue(oldPassword),
+        newPassword: this.authProviderService.hashValue(newPassword),
+      });
+    });
+  }
+
   async deleteConfigurationParameter(key: ResourceKeySimple<string>): Promise<UserInfo | null> {
     await this.load();
 
@@ -195,7 +218,7 @@ export class UserInfoResource extends CachedDataResource<UserInfo | null, void, 
     }
 
     const keyList: string[] = [];
-    this.performUpdate(undefined, [], async () => {
+    await this.performUpdate(undefined, [], async () => {
       await ResourceKeyUtils.forEachAsync(key, async name => {
         await this.graphQLService.sdk.setUserConfigurationParameter({
           name,
