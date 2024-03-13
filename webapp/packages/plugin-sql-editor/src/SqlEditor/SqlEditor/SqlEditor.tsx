@@ -29,9 +29,9 @@ import { DATA_CONTEXT_SQL_EDITOR_DATA } from '../DATA_CONTEXT_SQL_EDITOR_DATA';
 import type { ISqlEditorProps } from '../ISqlEditorProps';
 import { SQLEditorActions } from '../SQLEditorActions';
 import { useSqlEditor } from '../useSqlEditor';
-import styles from './styles/SqlEditor.m.css';
-import SqlEditorTab from './styles/SqlEditorTab.m.css';
-import SqlEditorTabList from './styles/SqlEditorTabList.m.css';
+import styles from './shared/SqlEditor.m.css';
+import SqlEditorTab from './shared/SqlEditorTab.m.css';
+import SqlEditorTabList from './shared/SqlEditorTabList.m.css';
 
 const sqlEditorRegistry: StyleRegistry = [
   [TabListStyles, { mode: 'append', styles: [TabVerticalRotatedStyles, SqlEditorTabList] }],

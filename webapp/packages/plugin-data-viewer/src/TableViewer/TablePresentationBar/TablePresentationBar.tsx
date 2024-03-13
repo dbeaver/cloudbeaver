@@ -15,8 +15,8 @@ import { TabIconStyles, TabList, TabListStyles, TabsState, TabStyles, TabTitleSt
 import type { IDatabaseDataModel } from '../../DatabaseDataModel/IDatabaseDataModel';
 import { DataPresentationService, DataPresentationType } from '../../DataPresentationService';
 import { PresentationTab } from './PresentationTab';
-import styles from './styles/TablePresentationBar.m.css';
-import tabStyles from './styles/TablePresentationBarTab.m.css';
+import styles from './shared/TablePresentationBar.m.css';
+import tabStyles from './shared/TablePresentationBarTab.m.css';
 
 interface Props {
   type: DataPresentationType;

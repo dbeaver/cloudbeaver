@@ -17,9 +17,9 @@ import { SqlDataSourceService } from '../../SqlDataSource/SqlDataSourceService';
 import { SqlResultPanel } from '../SqlResultPanel';
 import { SqlResultTab } from '../SqlResultTab';
 import { SqlResultTabsService } from '../SqlResultTabsService';
-import styles from './styles/SqlResultTabs.m.css';
-import SqlResultTabsTab from './styles/SqlResultTabsTab.m.css';
-import TabIconModuleStyles from './styles/SqlResultTabsTabIcon.m.css';
+import styles from './shared/SqlResultTabs.m.css';
+import SqlResultTabsTab from './shared/SqlResultTabsTab.m.css';
+import TabIconModuleStyles from './shared/SqlResultTabsTabIcon.m.css';
 
 interface Props {
   state: ISqlEditorTabState;

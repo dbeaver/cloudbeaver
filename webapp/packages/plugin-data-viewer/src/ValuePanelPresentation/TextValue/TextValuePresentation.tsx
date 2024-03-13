@@ -25,8 +25,8 @@ import type { IDataValuePanelProps } from '../../TableViewer/ValuePanel/DataValu
 import { QuotaPlaceholder } from '../QuotaPlaceholder';
 import { getDefaultLineWrapping } from './getDefaultLineWrapping';
 import { getTypeExtension } from './getTypeExtension';
-import styles from './styles/TextValuePresentation.m.css';
-import TextValuePresentationTab from './styles/TextValuePresentationTab.m.css';
+import styles from './shared/TextValuePresentation.m.css';
+import TextValuePresentationTab from './shared/TextValuePresentationTab.m.css';
 import { TextValuePresentationService } from './TextValuePresentationService';
 import { useTextValue } from './useTextValue';
 

@@ -33,8 +33,8 @@ import type { IObjectViewerTabState } from '../IObjectViewerTabState';
 import { DBObjectPagePanel } from '../ObjectPage/DBObjectPagePanel';
 import { DBObjectPageService } from '../ObjectPage/DBObjectPageService';
 import { DBObjectPageTab } from '../ObjectPage/DBObjectPageTab';
-import styles from './styles/ObjectViewerPanel.m.css';
-import ObjectViewerPanelTab from './styles/ObjectViewerPanelTab.m.css';
+import styles from './shared/ObjectViewerPanel.m.css';
+import ObjectViewerPanelTab from './shared/ObjectViewerPanelTab.m.css';
 
 const tabsRegistry: StyleRegistry = [
   [

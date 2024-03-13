@@ -16,9 +16,9 @@ import TabPanelStyles from '../Tabs/TabPanel.m.css';
 import { TabPanelList } from '../Tabs/TabPanelList';
 import type { TabsContainer } from '../Tabs/TabsContainer/TabsContainer';
 import { TabsState } from '../Tabs/TabsState';
-import styles from './styles/SideBarPanel.m.css';
-import SideBarPanelTab from './styles/SideBarPanelTab.m.css';
-import SideBarPanelTabPanel from './styles/SideBarPanelTabPanel.m.css';
+import styles from './shared/SideBarPanel.m.css';
+import SideBarPanelTab from './shared/SideBarPanelTab.m.css';
+import SideBarPanelTabPanel from './shared/SideBarPanelTabPanel.m.css';
 
 interface Props {
   container: TabsContainer;

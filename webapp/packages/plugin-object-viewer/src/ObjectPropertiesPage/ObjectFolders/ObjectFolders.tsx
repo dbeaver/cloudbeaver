@@ -31,11 +31,11 @@ import type { IObjectViewerTabState } from '../../IObjectViewerTabState';
 import { FolderPanelRenderer } from '../FolderPanelRenderer';
 import { FolderTabRenderer } from '../FolderTabRenderer';
 import navNodeTabStyle from '../NavNodeTab.m.css';
-import navNodeStyles from './styles/ObjectFoldersNavNodeTab.m.css';
-import tabStyles from './styles/ObjectFoldersTab.m.css';
-import tabListModuleStyles from './styles/ObjectFoldersTabList.m.css';
-import tabPanelModuleStyles from './styles/ObjectFoldersTabPanel.m.css';
-import tabTitleModuleStyles from './styles/ObjectFoldersTabTitle.m.css';
+import navNodeStyles from './shared/ObjectFoldersNavNodeTab.m.css';
+import tabStyles from './shared/ObjectFoldersTab.m.css';
+import tabListModuleStyles from './shared/ObjectFoldersTabList.m.css';
+import tabPanelModuleStyles from './shared/ObjectFoldersTabPanel.m.css';
+import tabTitleModuleStyles from './shared/ObjectFoldersTabTitle.m.css';
 
 interface IProps {
   tab: ITab<IObjectViewerTabState>;

@@ -26,10 +26,10 @@ import {
 import { TeamsPage } from '../Teams/TeamsPage';
 import { EUsersAdministrationSub, UsersAdministrationNavigationService } from '../UsersAdministrationNavigationService';
 import { UsersPage } from '../UsersTable/UsersPage';
-import style from './styles/UsersAdministration.m.css';
-import tabStyle from './styles/UsersAdministrationTab.m.css';
-import tabPanelStyle from './styles/UsersAdministrationTabPanel.m.css';
-import TabTitleModuleStyles from './styles/UsersAdministrationTabTitle.m.css';
+import style from './shared/UsersAdministration.m.css';
+import tabStyle from './shared/UsersAdministrationTab.m.css';
+import tabPanelStyle from './shared/UsersAdministrationTabPanel.m.css';
+import TabTitleModuleStyles from './shared/UsersAdministrationTabTitle.m.css';
 
 const tabPanelRegistry: StyleRegistry = [[TabPanelStyles, { mode: 'append', styles: [tabPanelStyle] }]];
 

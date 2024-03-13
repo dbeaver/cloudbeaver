@@ -14,10 +14,10 @@ import { TabListStyles, TabPanelList, TabPanelStyles, TabsState, TabStyles, TabU
 import { ConnectionFormLoader } from '@cloudbeaver/plugin-connections';
 
 import { CreateConnectionService } from '../CreateConnectionService';
-import styles from './styles/CreateConnection.m.css';
-import CreateConnectionTab from './styles/CreateConnectionTab.m.css';
-import CreateConnectionTabList from './styles/CreateConnectionTabList.m.css';
-import CreateConnectionTabPanel from './styles/CreateConnectionTabPanel.m.css';
+import styles from './shared/CreateConnection.m.css';
+import CreateConnectionTab from './shared/CreateConnectionTab.m.css';
+import CreateConnectionTabList from './shared/CreateConnectionTabList.m.css';
+import CreateConnectionTabPanel from './shared/CreateConnectionTabPanel.m.css';
 
 interface Props {
   method: string | null | undefined;
