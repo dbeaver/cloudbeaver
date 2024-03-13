@@ -53,10 +53,6 @@
   margin-right: 16px;
 }
 
-.fill {
-  flex: 1;
-}
-
 .backButton {
   position: relative;
   box-sizing: border-box;
