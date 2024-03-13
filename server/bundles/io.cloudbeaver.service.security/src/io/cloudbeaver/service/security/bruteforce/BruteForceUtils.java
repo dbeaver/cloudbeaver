@@ -61,7 +61,7 @@ public class BruteForceUtils {
 
     private static void checkLoginInterval(LocalDateTime createTime, int timeout) throws DBException {
         if (createTime != null && Duration.between(createTime, LocalDateTime.now()).getSeconds() < timeout) {
-            throw new DBException("You are trying to log in too fast");
+            throw new DBException("Too frequent authentication requests");
         }
     }
 }
