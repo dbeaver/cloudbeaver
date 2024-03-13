@@ -27,14 +27,14 @@ import {
 import { MetadataMap } from '@cloudbeaver/core-utils';
 import { useCaptureViewContext } from '@cloudbeaver/core-view';
 
-import { ISqlEditorModeProps, SqlEditorModeService } from '../../SqlEditorModeService';
-import { DATA_CONTEXT_SQL_EDITOR_DATA } from '../DATA_CONTEXT_SQL_EDITOR_DATA';
-import type { ISqlEditorProps } from '../ISqlEditorProps';
-import { SQLEditorActions } from '../SQLEditorActions';
-import { useSqlEditor } from '../useSqlEditor';
+import { ISqlEditorModeProps, SqlEditorModeService } from '../SqlEditorModeService';
+import { DATA_CONTEXT_SQL_EDITOR_DATA } from './DATA_CONTEXT_SQL_EDITOR_DATA';
+import type { ISqlEditorProps } from './ISqlEditorProps';
 import styles from './shared/SqlEditor.m.css';
 import SqlEditorTab from './shared/SqlEditorTab.m.css';
 import SqlEditorTabList from './shared/SqlEditorTabList.m.css';
+import { SQLEditorActions } from './SQLEditorActions';
+import { useSqlEditor } from './useSqlEditor';
 
 const sqlEditorRegistry: StyleRegistry = [
   [TabListStyles, { mode: 'append', styles: [TabListVerticalRotatedStyles, SqlEditorTabList] }],

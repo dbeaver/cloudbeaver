@@ -45,7 +45,7 @@ export const CreateConnection = observer<Props>(function CreateConnection({ meth
           </div>
           {driver.data?.icon && <StaticImage className={s(style, { staticImage: true })} icon={driver.data.icon} />}
           {driver.data?.name ?? translate('connections_administration_connection_create')}
-          <Fill />
+          <div className={s(style, { fill: true })} />
           <IconButton name="cross" viewBox="0 0 24 24" onClick={createConnectionService.cancelCreate} />
         </div>
         <div className={s(style, { connectionCreateContent: true })}>

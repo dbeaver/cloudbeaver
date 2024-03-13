@@ -23,13 +23,13 @@ import {
   TabUnderlineStyles,
 } from '@cloudbeaver/core-ui';
 
-import { TeamsPage } from '../Teams/TeamsPage';
-import { EUsersAdministrationSub, UsersAdministrationNavigationService } from '../UsersAdministrationNavigationService';
-import { UsersPage } from '../UsersTable/UsersPage';
 import style from './shared/UsersAdministration.m.css';
 import tabStyle from './shared/UsersAdministrationTab.m.css';
 import tabPanelStyle from './shared/UsersAdministrationTabPanel.m.css';
 import TabTitleModuleStyles from './shared/UsersAdministrationTabTitle.m.css';
+import { TeamsPage } from './Teams/TeamsPage';
+import { EUsersAdministrationSub, UsersAdministrationNavigationService } from './UsersAdministrationNavigationService';
+import { UsersPage } from './UsersTable/UsersPage';
 
 const tabPanelRegistry: StyleRegistry = [[TabPanelStyles, { mode: 'append', styles: [tabPanelStyle] }]];
 
