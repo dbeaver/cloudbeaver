@@ -56,8 +56,6 @@ export class UserConfigurationBootstrap extends Bootstrap {
     });
   }
 
-  register(): void {}
-
   async load(): Promise<void> {
     await this.userInfoResource.load();
   }

@@ -26,12 +26,20 @@ export class ProductSettingsService implements ISettingsSource {
     return this.settings.has(key) || this.sessionSettingsService?.has(key) || false;
   }
 
+  isEdited(): boolean {
+    return false;
+  }
+
   isReadOnly(): boolean {
     return true;
   }
 
   getDefaultValue(key: any): any {
     return this.sessionSettingsService.getDefaultValue(key) ?? this.settings.get(key);
+  }
+
+  getEditedValue(key: any): any {
+    return this.getValue(key);
   }
 
   getValue(key: any): any {

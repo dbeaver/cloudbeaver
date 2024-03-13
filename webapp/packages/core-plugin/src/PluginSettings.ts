@@ -15,6 +15,10 @@ export class PluginSettings<TSchema extends schema.SomeZodObject = schema.AnyZod
     return this.source.has(key) || false;
   }
 
+  isEdited(key: any): boolean {
+    return false;
+  }
+
   has<TKey extends keyof schema.infer<TSchema>>(key: TKey): boolean {
     return true;
   }
@@ -33,6 +37,10 @@ export class PluginSettings<TSchema extends schema.SomeZodObject = schema.AnyZod
     }
 
     return schema.parse(undefined);
+  }
+
+  getEditedValue<TKey extends keyof schema.infer<TSchema>>(key: TKey): schema.infer<TSchema>[TKey] {
+    return this.getValue(key);
   }
 
   getValue<TKey extends keyof schema.infer<TSchema>>(key: TKey): schema.infer<TSchema>[TKey] {

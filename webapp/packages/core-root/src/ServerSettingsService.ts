@@ -9,7 +9,7 @@ import { action, makeObservable, observable } from 'mobx';
 
 import { Dependency, injectable } from '@cloudbeaver/core-di';
 import { type ISettingsSource, SettingsResolverService } from '@cloudbeaver/core-settings';
-import { parseJSONFlat, setByPath } from '@cloudbeaver/core-utils';
+import { parseJSONFlat } from '@cloudbeaver/core-utils';
 
 import { EAdminPermission } from './EAdminPermission';
 import { ServerConfigResource } from './ServerConfigResource';
@@ -47,6 +47,10 @@ export class ServerSettingsService extends Dependency implements ISettingsSource
     return this.settingsResolverService.has(key) || this.settings.has(key) || this.changes.has(key);
   }
 
+  isEdited(key: any): boolean {
+    return this.changes.has(key);
+  }
+
   isReadOnly(key: any): boolean {
     return this.settingsResolverService.has(key) || !this.sessionPermissionsResource.has(EAdminPermission.admin);
   }
@@ -55,13 +59,17 @@ export class ServerSettingsService extends Dependency implements ISettingsSource
     return this.settingsResolverService.getDefaultValue(key) ?? this.settings.get(key);
   }
 
+  getEditedValue(key: any): any {
+    if (this.changes.has(key)) {
+      return this.changes.get(key);
+    }
+
+    return this.getValue(key);
+  }
+
   getValue(key: any): any {
     if (this.settingsResolverService.has(key)) {
       return this.settingsResolverService.getValue(key);
-    }
-
-    if (this.changes.has(key)) {
-      return this.changes.get(key);
     }
 
     return this.settings.get(key);
@@ -85,13 +93,7 @@ export class ServerSettingsService extends Dependency implements ISettingsSource
   }
 
   async save() {
-    const changes: Record<string, any> = {};
-
-    for (const [key, value] of this.changes) {
-      changes[key] = value;
-    }
-
-    await this.serverConfigResource.updateProductConfiguration(changes);
+    await this.serverConfigResource.updateProductConfiguration(Object.fromEntries(this.changes));
   }
 
   resetChanges() {

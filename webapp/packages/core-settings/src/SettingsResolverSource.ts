@@ -44,6 +44,10 @@ export abstract class SettingsResolverSource implements ISettingsResolverSource 
     this.resolvers = [];
   }
 
+  isEdited(key: any): boolean {
+    return this.resolvers.some(r => r.isEdited(key));
+  }
+
   isReadOnly(key: any): boolean {
     return this.resolvers.every(r => r.isReadOnly(key));
   }
@@ -54,6 +58,16 @@ export abstract class SettingsResolverSource implements ISettingsResolverSource 
 
   getDefaultValue(key: any): any {
     return this.resolvers.find(r => r.getDefaultValue(key) !== undefined)?.getDefaultValue(key);
+  }
+
+  getEditedValue(key: any): any {
+    const edited =  this.resolvers.find(r => r.isEdited(key));
+
+  if (edited) {
+    return edited?.getEditedValue(key);
+  }
+
+  return this.getValue(key);
   }
 
   getValue(key: any): any {

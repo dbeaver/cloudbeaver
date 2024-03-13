@@ -18,12 +18,20 @@ export class SessionSettingsService implements ISettingsSource {
     return this.serverSettingsResolverService.has(key);
   }
 
+  isEdited(key: any): boolean {
+    return this.serverSettingsResolverService.isEdited(key);
+  }
+
   isReadOnly(key: any): boolean {
     return true;
   }
 
   getDefaultValue(key: any): any {
     return this.serverSettingsResolverService.getDefaultValue(key);
+  }
+
+  getEditedValue(key: any): any {
+    return this.serverSettingsResolverService.getEditedValue(key);
   }
 
   getValue(key: any): any {

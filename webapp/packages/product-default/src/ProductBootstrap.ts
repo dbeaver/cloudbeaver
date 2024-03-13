@@ -5,10 +5,11 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
+import { importLazyComponent } from '@cloudbeaver/core-blocks';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { VersionUpdateService } from '@cloudbeaver/core-version-update';
 
-import { UpdateInstruction } from './UpdateInstruction';
+const UpdateInstruction = importLazyComponent(() => import('./UpdateInstruction').then(m => m.UpdateInstruction));
 
 @injectable()
 export class ProductBootstrap extends Bootstrap {

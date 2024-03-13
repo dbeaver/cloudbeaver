@@ -44,6 +44,12 @@ export function createSettingsAliasResolver<TSource extends schema.SomeZodObject
       }
       return source.has(mapKey(key));
     },
+    isEdited(key) {
+      if (!isApplicable(key)) {
+        return false;
+      }
+      return source.isEdited(mapKey(key));
+    },
     isReadOnly(key) {
       if (!isApplicable(key)) {
         return true;
@@ -55,6 +61,12 @@ export function createSettingsAliasResolver<TSource extends schema.SomeZodObject
         return undefined;
       }
       return source.getDefaultValue(mapKey(key));
+    },
+    getEditedValue(key) {
+      if (!isApplicable(key)) {
+        return undefined;
+      }
+      return source.getEditedValue(mapKey(key));
     },
     getValue(key) {
       if (!isApplicable(key)) {
