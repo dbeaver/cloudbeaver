@@ -50,13 +50,16 @@
     position: absolute;
     cursor: pointer;
   }
+}
 
-  // TODO styles for this one
-  & .tabIcon {
-    display: block;
-  }
+.icon {
+  display: block;
 }
 
 .portal {
   visibility: hidden;
+}
+
+.portalMenuOpened {
+  visibility: visible;
 }

@@ -46,8 +46,6 @@ export * from './Tabs/TabsState';
 export * from './Tabs/useTabState';
 export * from './Tabs/useTabLocalState';
 export { default as TabStyles } from './Tabs/Tab/Tab.m.css';
-export { default as TabActionsStyles } from './Tabs/Tab/TabActions.m.css';
-export { default as TabMenuStyles } from './Tabs/Tab/TabMenu.m.css';
 export { default as TabTitleStyles } from './Tabs/Tab/TabTitle.m.css';
 export { default as TabVerticalRotatedStyles } from './Tabs/Tab/TabVerticalRotated.m.css';
 export { default as TabIconVerticalRotatedStyles } from './Tabs/Tab/TabIconVerticalRotated.m.css';

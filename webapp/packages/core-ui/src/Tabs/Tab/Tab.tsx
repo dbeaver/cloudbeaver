@@ -32,7 +32,14 @@ export const Tab = observer<TabProps>(function Tab(props) {
     <TabContext.Provider value={tabContext}>
       <div className={s(styles, { tabOuter: true })}>
         <div className={s(styles, { tabInner: true, tabInnerSelected: tab.selected })}>
-          <TabActions state={tab.state} tabId={tabId} handleClose={tab.handleClose} menuContext={props.menuContext} canClose={canClose} />
+          <TabActions
+            className={styles.tabActions}
+            state={tab.state}
+            tabId={tabId}
+            handleClose={tab.handleClose}
+            menuContext={props.menuContext}
+            canClose={canClose}
+          />
           <BaseTab
             ref={ref}
             {...tab.state.state}
