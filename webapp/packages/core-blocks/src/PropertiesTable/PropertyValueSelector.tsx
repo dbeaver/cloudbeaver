@@ -8,19 +8,12 @@
 import { observer } from 'mobx-react-lite';
 import { useCallback, useEffect, useRef } from 'react';
 import { Menu, MenuButton, MenuItem, useMenuState } from 'reakit/Menu';
-import styled, { css } from 'reshadow';
+import styled from 'reshadow';
 
 import { BASE_DROPDOWN_STYLES } from '../FormControls/BASE_DROPDOWN_STYLES';
-
-const styles = css`
-  MenuButton {
-    composes: theme-ripple from global;
-    background: transparent;
-    outline: none;
-    padding: 4px;
-    cursor: pointer;
-  }
-`;
+import { s } from '../s';
+import { useS } from '../useS';
+import classes from './PropertyValueSelector.m.css';
 
 interface Props {
   propertyName?: string;
@@ -40,6 +33,7 @@ export const PropertyValueSelector = observer<React.PropsWithChildren<Props>>(fu
   onSelect,
   onSwitch,
 }) {
+  const styles = useS(classes);
   const menuRef = useRef<HTMLDivElement>(null);
   const menu = useMenuState({
     placement: 'bottom-end',
@@ -76,12 +70,9 @@ export const PropertyValueSelector = observer<React.PropsWithChildren<Props>>(fu
 
   const visible = menu.visible;
 
-  return styled(
-    BASE_DROPDOWN_STYLES,
-    styles,
-  )(
+  return styled(BASE_DROPDOWN_STYLES)(
     <>
-      <MenuButton {...menu} className={className} visible={visible}>
+      <MenuButton {...menu} className={s(styles, { menuButton: true }, className)} visible={visible}>
         {children}
       </MenuButton>
       <Menu {...menu} ref={menuRef} visible={visible} aria-label={propertyName} modal>

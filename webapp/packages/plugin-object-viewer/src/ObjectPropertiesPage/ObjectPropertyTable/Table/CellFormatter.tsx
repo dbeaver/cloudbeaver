@@ -7,42 +7,20 @@
  */
 import { observer } from 'mobx-react-lite';
 import { useContext, useState } from 'react';
-import styled, { css, use } from 'reshadow';
 
 import { getComputed, Icon, useMouse, useStateDelay } from '@cloudbeaver/core-blocks';
 import { ConnectionInfoResource, DATA_CONTEXT_CONNECTION } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
 import { DATA_CONTEXT_NAV_NODE, type DBObject, type NavNode, NavNodeManagerService } from '@cloudbeaver/core-navigation-tree';
 import { ContextMenu } from '@cloudbeaver/core-ui';
+import { clsx } from '@cloudbeaver/core-utils';
 import { useMenu } from '@cloudbeaver/core-view';
 import { MENU_NAV_TREE, useNode } from '@cloudbeaver/plugin-navigation-tree';
 import type { RenderCellProps } from '@cloudbeaver/plugin-react-data-grid';
 
 import { getValue } from '../../helpers';
+import classes from './CellFormatter.m.css';
 import { TableContext } from './TableContext';
-
-const menuStyles = css`
-  menu-container {
-    cursor: pointer;
-    width: 100%;
-  }
-  menu-container:not([|menuEmpty]) value {
-    padding-right: 8px;
-  }
-  menu-box {
-    display: flex;
-    height: 100%;
-    align-items: center;
-
-    & Icon {
-      width: 16px;
-    }
-  }
-  value {
-    flex-grow: 1;
-    flex-shrink: 1;
-  }
-`;
 
 interface Props {
   value: string;
@@ -80,21 +58,21 @@ export const Menu = observer<Props>(function Menu({ value, node }) {
       return !menu.available;
     });
 
-  return styled(menuStyles)(
-    <menu-container ref={mouse.reference} onDoubleClick={openNode} {...use({ menuEmpty, menuOpened })}>
-      <menu-box>
-        <value className="cell-formatter__value" title={value}>
+  return (
+    <div ref={mouse.reference} className={clsx(classes.container, menuEmpty && classes.empty)} onDoubleClick={openNode}>
+      <div className={classes.box}>
+        <div className={clsx(classes.value, 'cell-formatter__value')} title={value}>
           {value}
-        </value>
+        </div>
         {!menuEmpty && (
           <ContextMenu menu={menu} modal disclosure onVisibleSwitch={switchState}>
-            <menu-icon>
-              <Icon name="snack" viewBox="0 0 16 10" />
-            </menu-icon>
+            <div>
+              <Icon className={classes.icon} name="snack" viewBox="0 0 16 10" />
+            </div>
           </ContextMenu>
         )}
-      </menu-box>
-    </menu-container>,
+      </div>
+    </div>
   );
 });
 
