@@ -18,7 +18,6 @@ import { DATA_CONTEXT_TABS_CONTEXT } from './DATA_CONTEXT_TABS_CONTEXT';
 import { MENU_TAB } from './MENU_TAB';
 import style from './Tab.m.css';
 import { TabActions } from './TabActions';
-import TabActionsStyle from './TabActions.m.css';
 import type { TabProps } from './TabProps';
 import { useTab } from './useTab';
 
@@ -29,7 +28,7 @@ export const Tab = observer<TabProps>(function Tab(props) {
   const tabContext = useMemo(() => ({ tabId }), [tabId]);
   const tab = useTab(tabId, onOpen, onClose, onClick);
   const info = tab.getInfo();
-  const styles = useS(style, TabActionsStyle);
+  const styles = useS(style);
   const canClose = getComputed(() => !!onClose || (tab.closable && tab.state.closable));
 
   const menu = useMenu({
@@ -44,7 +43,14 @@ export const Tab = observer<TabProps>(function Tab(props) {
     <TabContext.Provider value={tabContext}>
       <div className={s(styles, { tabOuter: true })}>
         <div className={s(styles, { tabInner: true, tabInnerSelected: tab.selected })}>
-          <TabActions state={tab.state} menuContext={props.menuContext} canClose={canClose} tabId={tabId} handleClose={tab.handleClose} />
+          <TabActions
+            className={s(styles, { actions: true })}
+            state={tab.state}
+            menuContext={props.menuContext}
+            canClose={canClose}
+            tabId={tabId}
+            handleClose={tab.handleClose}
+          />
           <BaseTab
             ref={ref}
             {...tab.state.state}

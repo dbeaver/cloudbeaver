@@ -37,7 +37,7 @@
   }
 }
 
-.tabActions:not(:empty) + .tab {
+.actions:not(:empty) + .tab {
   padding-right: 14px;
 }
 
