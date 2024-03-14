@@ -10,7 +10,7 @@ import { observer } from 'mobx-react-lite';
 import { Fill, Icon, IconButton, Loader, s, SContext, StaticImage, StyleRegistry, useResource, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import { DBDriverResource } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
-import { TabListStyles, TabPanelList, TabPanelStyles, TabsState, TabStyles, TabUnderlineStyles } from '@cloudbeaver/core-ui';
+import { TabListStyles, TabPanelList, TabPanelStyles, TabsState, TabStyles, TabUnderlineStyleRegistry } from '@cloudbeaver/core-ui';
 import { ConnectionFormLoader } from '@cloudbeaver/plugin-connections';
 
 import { CreateConnectionService } from '../CreateConnectionService';
@@ -25,7 +25,8 @@ interface Props {
 }
 
 const tabsRegistry: StyleRegistry = [
-  [TabStyles, { mode: 'append', styles: [TabUnderlineStyles, CreateConnectionTab] }],
+  ...TabUnderlineStyleRegistry,
+  [TabStyles, { mode: 'append', styles: [CreateConnectionTab] }],
   [TabPanelStyles, { mode: 'append', styles: [CreateConnectionTabPanel] }],
   [TabListStyles, { mode: 'append', styles: [CreateConnectionTabList] }],
 ];

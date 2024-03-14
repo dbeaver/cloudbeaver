@@ -7,33 +7,10 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import {
-  Button,
-  Container,
-  Form,
-  s,
-  SContext,
-  StatusMessage,
-  StyleRegistry,
-  useAutoLoad,
-  useForm,
-  useS,
-  useTranslate,
-} from '@cloudbeaver/core-blocks';
+import { Button, Container, Form, s, SContext, StatusMessage, useAutoLoad, useForm, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
-import {
-  FormMode,
-  IFormState,
-  TabBigUnderlineStyles,
-  TabList,
-  TabPanelList,
-  TabsState,
-  TabStyles,
-  TabTitleBigUnderlineStyles,
-  TabTitleStyles,
-  TabUnderlineStyles,
-} from '@cloudbeaver/core-ui';
+import { FormMode, IFormState, TabBigUnderlineStyleRegistry, TabList, TabPanelList, TabsState } from '@cloudbeaver/core-ui';
 import { getFirstException } from '@cloudbeaver/core-utils';
 
 import style from './AdministrationUserForm.m.css';
@@ -45,11 +22,6 @@ interface Props {
   state: IFormState<IUserFormState>;
   onClose: () => void;
 }
-
-const userFormRegistry: StyleRegistry = [
-  [TabStyles, { mode: 'append', styles: [TabUnderlineStyles, TabBigUnderlineStyles] }],
-  [TabTitleStyles, { mode: 'append', styles: [TabTitleBigUnderlineStyles] }],
-];
 
 export const AdministrationUserForm = observer<Props>(function AdministrationUserForm({ state, onClose }) {
   const styles = useS(style);
@@ -96,7 +68,7 @@ export const AdministrationUserForm = observer<Props>(function AdministrationUse
           <Container className={s(styles, { bar: true })} gap keepSize noWrap>
             <Container fill>
               <StatusMessage exception={getFirstException(state.exception)} type={state.statusType} message={state.statusMessage} />
-              <SContext registry={userFormRegistry}>
+              <SContext registry={TabBigUnderlineStyleRegistry}>
                 <TabList className={s(styles, { tabList: true })} />
               </SContext>
             </Container>

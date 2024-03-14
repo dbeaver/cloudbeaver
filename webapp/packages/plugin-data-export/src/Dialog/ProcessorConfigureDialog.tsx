@@ -18,13 +18,12 @@ import {
   PropertiesTable,
   s,
   SContext,
-  StyleRegistry,
   useErrorDetails,
   useS,
   useTranslate,
 } from '@cloudbeaver/core-blocks';
 import type { DataTransferOutputSettings, DataTransferProcessorInfo } from '@cloudbeaver/core-sdk';
-import { ITabData, Tab, TabList, TabsState, TabStyles, TabTitle, TabUnderlineStyles } from '@cloudbeaver/core-ui';
+import { ITabData, Tab, TabList, TabsState, TabTitle, TabUnderlineStyleRegistry } from '@cloudbeaver/core-ui';
 
 import { OutputOptionsForm } from './OutputOptionsForm';
 import style from './ProcessorConfigureDialog.m.css';
@@ -46,8 +45,6 @@ enum SETTINGS_TABS {
   EXTRACTION = 'EXTRACTION',
   OUTPUT = 'OUTPUT',
 }
-
-const tabsRegistry: StyleRegistry = [[TabStyles, { mode: 'append', styles: [TabUnderlineStyles] }]];
 
 export const ProcessorConfigureDialog = observer<Props>(function ProcessorConfigureDialog({
   processor,
@@ -89,7 +86,7 @@ export const ProcessorConfigureDialog = observer<Props>(function ProcessorConfig
       <CommonDialogBody noOverflow noBodyPadding>
         {!processor.isBinary ? (
           <TabsState currentTabId={currentTabId} onChange={handleTabChange}>
-            <SContext registry={tabsRegistry}>
+            <SContext registry={TabUnderlineStyleRegistry}>
               <TabList className={s(styles, { tabList: true })} aria-label="Export Settings tabs">
                 <Tab tabId={SETTINGS_TABS.EXTRACTION}>
                   <TabTitle>{translate('data_transfer_format_settings')}</TabTitle>

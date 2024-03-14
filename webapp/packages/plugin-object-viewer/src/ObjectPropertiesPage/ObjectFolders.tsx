@@ -15,13 +15,12 @@ import {
   ITabData,
   TabList,
   TabListStyles,
-  TabListVertical,
+  TabListVerticalRegistry,
   TabPanel,
   TabPanelStyles,
   TabsState,
   TabStyles,
   TabTitleStyles,
-  TabVertical,
   useTabLocalState,
 } from '@cloudbeaver/core-ui';
 import { MetadataMap } from '@cloudbeaver/core-utils';
@@ -43,6 +42,7 @@ interface IProps {
 }
 
 const objectFoldersRegistry: StyleRegistry = [
+  ...TabListVerticalRegistry,
   [
     NavNodeTabStyle,
     {
@@ -54,14 +54,14 @@ const objectFoldersRegistry: StyleRegistry = [
     TabStyles,
     {
       mode: 'append',
-      styles: [TabVertical, ObjectFoldersTab],
+      styles: [ObjectFoldersTab],
     },
   ],
   [
     TabListStyles,
     {
       mode: 'append',
-      styles: [TabListVertical, ObjectFoldersTabList],
+      styles: [ObjectFoldersTabList],
     },
   ],
   [

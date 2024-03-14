@@ -16,7 +16,6 @@ import {
   s,
   SContext,
   StatusMessage,
-  StyleRegistry,
   useExecutor,
   useForm,
   useObjectRef,
@@ -25,16 +24,7 @@ import {
 import { useService } from '@cloudbeaver/core-di';
 import { ENotificationType } from '@cloudbeaver/core-events';
 import type { ConnectionConfig } from '@cloudbeaver/core-sdk';
-import {
-  TabBigUnderlineStyles,
-  TabList,
-  TabPanelList,
-  TabsState,
-  TabStyles,
-  TabTitleBigUnderlineStyles,
-  TabTitleStyles,
-  TabUnderlineStyles,
-} from '@cloudbeaver/core-ui';
+import { TabBigUnderlineStyleRegistry, TabList, TabPanelList, TabsState } from '@cloudbeaver/core-ui';
 
 import { ConnectionFormActionsContext, IConnectionFormActionsContext } from './ConnectFormActionsContext';
 import style from './ConnectionForm.m.css';
@@ -48,11 +38,6 @@ export interface ConnectionFormProps {
   onSave?: (config: ConnectionConfig) => void;
   className?: string;
 }
-
-const connectionFormRegistry: StyleRegistry = [
-  [TabStyles, { mode: 'append', styles: [TabUnderlineStyles, TabBigUnderlineStyles] }],
-  [TabTitleStyles, { mode: 'append', styles: [TabTitleBigUnderlineStyles] }],
-];
 
 export const ConnectionForm = observer<ConnectionFormProps>(function ConnectionForm({ state, onCancel, onSave = () => {}, className }) {
   const props = useObjectRef({ onSave });
@@ -114,7 +99,7 @@ export const ConnectionForm = observer<ConnectionFormProps>(function ConnectionF
               <div className={s(styles, { connectionStatusMessage: true })}>
                 <StatusMessage type={ENotificationType.Info} message={state.statusMessage} />
               </div>
-              <SContext registry={connectionFormRegistry}>
+              <SContext registry={TabBigUnderlineStyleRegistry}>
                 <TabList className={s(styles, { tabList: true })} disabled={state.disabled} />
               </SContext>
             </div>

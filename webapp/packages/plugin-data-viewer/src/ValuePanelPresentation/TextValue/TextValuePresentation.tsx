@@ -12,7 +12,7 @@ import { useMemo } from 'react';
 import { ActionIconButton, Button, Container, Fill, Group, s, SContext, StyleRegistry, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { TabContainerPanelComponent, TabList, TabsState, TabStyles, TabUnderlineStyles, useTabLocalState } from '@cloudbeaver/core-ui';
+import { TabContainerPanelComponent, TabList, TabsState, TabStyles, TabUnderlineStyleRegistry, useTabLocalState } from '@cloudbeaver/core-ui';
 import { bytesToSize, isNotNullDefined } from '@cloudbeaver/core-utils';
 import { EditorLoader, useCodemirrorExtensions } from '@cloudbeaver/plugin-codemirror6';
 
@@ -32,7 +32,7 @@ import { useTextValue } from './useTextValue';
 
 const DEFAULT_CONTENT_TYPE = 'text/plain';
 
-const tabRegistry: StyleRegistry = [[TabStyles, { mode: 'append', styles: [TabUnderlineStyles, TextValuePresentationTab] }]];
+const tabRegistry: StyleRegistry = [...TabUnderlineStyleRegistry, [TabStyles, { mode: 'append', styles: [TextValuePresentationTab] }]];
 
 export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelProps<any, IDatabaseResultSet>> = observer(
   function TextValuePresentation({ model, resultIndex, dataFormat }) {

@@ -10,7 +10,7 @@ import { observer } from 'mobx-react-lite';
 
 import { s, SContext, type StyleRegistry, useS } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { TabList, TabPanelList, TabPanelStyles, TabsState, TabStyles, TabUnderlineStyles } from '@cloudbeaver/core-ui';
+import { TabList, TabPanelList, TabPanelStyles, TabsState, TabStyles, TabUnderlineStyleRegistry } from '@cloudbeaver/core-ui';
 import { MetadataMap } from '@cloudbeaver/core-utils';
 
 import { DatabaseDataResultAction } from '../../DatabaseDataModel/Actions/DatabaseDataResultAction';
@@ -24,10 +24,11 @@ import ValuePanelEditorTabPanel from './shared/ValuePanelEditorTabPanel.m.css';
 import ValuePanelEditorTabs from './shared/ValuePanelEditorTabs.m.css';
 import ValuePanelTab from './shared/ValuePanelTab.m.css';
 
-const tabListRegistry: StyleRegistry = [[TabStyles, { mode: 'append', styles: [TabUnderlineStyles, ValuePanelTab] }]];
+const tabListRegistry: StyleRegistry = [...TabUnderlineStyleRegistry, [TabStyles, { mode: 'append', styles: [ValuePanelTab] }]];
 
 const tabPanelListRegistry: StyleRegistry = [
-  [TabStyles, { mode: 'append', styles: [TabUnderlineStyles, ValuePanelEditorTabs] }],
+  ...TabUnderlineStyleRegistry,
+  [TabStyles, { mode: 'append', styles: [ValuePanelEditorTabs] }],
   [TabPanelStyles, { mode: 'append', styles: [ValuePanelEditorTabPanel] }],
 ];
 

@@ -22,7 +22,7 @@ import {
   useS,
 } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { OptionsPanelService, TabList, TabListStyles, TabListVertical, TabsState, TabStyles, TabVertical } from '@cloudbeaver/core-ui';
+import { OptionsPanelService, TabList, TabListStyles, TabListVerticalRegistry, TabsState, TabStyles } from '@cloudbeaver/core-ui';
 import { CaptureView } from '@cloudbeaver/core-view';
 
 import { AdministrationCaptureViewContext } from './AdministrationCaptureViewContext';
@@ -58,18 +58,19 @@ const adminPageRegistry: StyleRegistry = [
 ];
 
 const tabsRegistry: StyleRegistry = [
+  ...TabListVerticalRegistry,
   [
     TabStyles,
     {
       mode: 'append',
-      styles: [TabVertical, AdministrationStylesTab],
+      styles: [AdministrationStylesTab],
     },
   ],
   [
     TabListStyles,
     {
       mode: 'append',
-      styles: [TabListVertical, AdministrationStylesTabList],
+      styles: [AdministrationStylesTabList],
     },
   ],
 ];

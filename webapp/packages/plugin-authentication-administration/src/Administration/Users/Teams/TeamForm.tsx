@@ -16,7 +16,6 @@ import {
   Placeholder,
   s,
   SContext,
-  StyleRegistry,
   useExecutor,
   useForm,
   useObjectRef,
@@ -24,16 +23,7 @@ import {
   useTranslate,
 } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import {
-  TabBigUnderlineStyles,
-  TabList,
-  TabPanelList,
-  TabsState,
-  TabStyles,
-  TabTitleBigUnderlineStyles,
-  TabTitleStyles,
-  TabUnderlineStyles,
-} from '@cloudbeaver/core-ui';
+import { TabBigUnderlineStyleRegistry, TabList, TabPanelList, TabsState } from '@cloudbeaver/core-ui';
 
 import { teamContext } from './Contexts/teamContext';
 import type { ITeamFormState } from './ITeamFormProps';
@@ -47,11 +37,6 @@ interface Props {
   onSave?: (team: TeamInfo) => void;
   className?: string;
 }
-
-const teamFormRegistry: StyleRegistry = [
-  [TabStyles, { mode: 'append', styles: [TabUnderlineStyles, TabBigUnderlineStyles] }],
-  [TabTitleStyles, { mode: 'append', styles: [TabTitleBigUnderlineStyles] }],
-];
 
 export const TeamForm = observer<Props>(function TeamForm({ state, onCancel, onSave = () => {}, className }) {
   const translate = useTranslate();
@@ -98,7 +83,7 @@ export const TeamForm = observer<Props>(function TeamForm({ state, onCancel, onS
                   </>
                 )}
               </div>
-              <SContext registry={teamFormRegistry}>
+              <SContext registry={TabBigUnderlineStyleRegistry}>
                 <TabList className={s(styles, { tabList: true })} disabled={false} />
               </SContext>
             </div>

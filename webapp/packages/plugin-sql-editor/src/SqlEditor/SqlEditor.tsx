@@ -10,20 +10,7 @@ import { useEffect, useMemo, useState } from 'react';
 
 import { getComputed, s, SContext, StyleRegistry, useS, useSplit } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import {
-  ITabData,
-  TabIconStyles,
-  TabIconVerticalRotatedStyles,
-  TabList,
-  TabListStyles,
-  TabListVerticalRotatedStyles,
-  TabPanelList,
-  TabsState,
-  TabStyles,
-  TabTitleStyles,
-  TabTitleVerticalRotatedStyles,
-  TabVerticalRotatedStyles,
-} from '@cloudbeaver/core-ui';
+import { ITabData, TabList, TabListStyles, TabListVerticalRotatedRegistry, TabPanelList, TabsState, TabStyles } from '@cloudbeaver/core-ui';
 import { MetadataMap } from '@cloudbeaver/core-utils';
 import { useCaptureViewContext } from '@cloudbeaver/core-view';
 
@@ -37,22 +24,9 @@ import { SQLEditorActions } from './SQLEditorActions';
 import { useSqlEditor } from './useSqlEditor';
 
 const sqlEditorRegistry: StyleRegistry = [
-  [TabListStyles, { mode: 'append', styles: [TabListVerticalRotatedStyles, SqlEditorTabList] }],
-  [TabStyles, { mode: 'append', styles: [TabVerticalRotatedStyles, SqlEditorTab] }],
-  [
-    TabIconStyles,
-    {
-      mode: 'append',
-      styles: [TabIconVerticalRotatedStyles],
-    },
-  ],
-  [
-    TabTitleStyles,
-    {
-      mode: 'append',
-      styles: [TabTitleVerticalRotatedStyles],
-    },
-  ],
+  ...TabListVerticalRotatedRegistry,
+  [TabListStyles, { mode: 'append', styles: [SqlEditorTabList] }],
+  [TabStyles, { mode: 'append', styles: [SqlEditorTab] }],
 ];
 
 export const SqlEditor = observer<ISqlEditorProps>(function SqlEditor({ state, className }) {

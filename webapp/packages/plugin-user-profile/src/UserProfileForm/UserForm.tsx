@@ -8,18 +8,10 @@
 import { observer } from 'mobx-react-lite';
 
 import { AUTH_PROVIDER_LOCAL_ID } from '@cloudbeaver/core-authentication';
-import { Button, s, SContext, StatusMessage, StyleRegistry, useS, useTranslate } from '@cloudbeaver/core-blocks';
+import { Button, s, SContext, StatusMessage, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import { ENotificationType } from '@cloudbeaver/core-events';
 import type { UserInfo } from '@cloudbeaver/core-sdk';
-import {
-  TabBigUnderlineStyles,
-  TabList,
-  TabsState,
-  TabStyles,
-  TabTitleBigUnderlineStyles,
-  TabTitleStyles,
-  TabUnderlineStyles,
-} from '@cloudbeaver/core-ui';
+import { TabBigUnderlineStyleRegistry, TabList, TabsState } from '@cloudbeaver/core-ui';
 
 import { AuthenticationPanel } from './Authentication/AuthenticationPanel';
 import { AuthenticationTab } from './Authentication/AuthenticationTab';
@@ -33,11 +25,6 @@ interface Props {
   state: IUserProfileFormState;
   onClose?: () => void;
 }
-
-const registry: StyleRegistry = [
-  [TabStyles, { mode: 'append', styles: [TabUnderlineStyles, TabBigUnderlineStyles] }],
-  [TabTitleStyles, { mode: 'append', styles: [TabTitleBigUnderlineStyles] }],
-];
 
 export const UserForm = observer<Props>(function UserForm({ user, state, onClose }) {
   const translate = useTranslate();
@@ -53,7 +40,7 @@ export const UserForm = observer<Props>(function UserForm({ user, state, onClose
             <div className={s(moduleStyle, { statusMessage: true })}>
               <StatusMessage type={ENotificationType.Info} message={state.info.statusMessage} />
             </div>
-            <SContext registry={registry}>
+            <SContext registry={TabBigUnderlineStyleRegistry}>
               <TabList className={s(moduleStyle, { tabList: true })} aria-label="User Settings" disabled={state.info.disabled}>
                 <UserInfoTab />
                 {localProvider && <AuthenticationTab />}

@@ -20,7 +20,7 @@ import {
   TabStyles,
   TabTitle,
   TabTitleStyles,
-  TabUnderlineStyles,
+  TabUnderlineStyleRegistry,
 } from '@cloudbeaver/core-ui';
 
 import style from './shared/UsersAdministration.m.css';
@@ -34,7 +34,8 @@ import { UsersPage } from './UsersTable/UsersPage';
 const tabPanelRegistry: StyleRegistry = [[TabPanelStyles, { mode: 'append', styles: [tabPanelStyle] }]];
 
 const mainTabsRegistry: StyleRegistry = [
-  [TabStyles, { mode: 'append', styles: [TabUnderlineStyles, tabStyle] }],
+  ...TabUnderlineStyleRegistry,
+  [TabStyles, { mode: 'append', styles: [tabStyle] }],
   [TabTitleStyles, { mode: 'append', styles: [TabTitleModuleStyles] }],
 ];
 

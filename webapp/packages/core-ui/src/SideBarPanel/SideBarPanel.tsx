@@ -10,7 +10,7 @@ import { observer } from 'mobx-react-lite';
 import { s, SContext, type StyleRegistry, useS } from '@cloudbeaver/core-blocks';
 
 import TabStyles from '../Tabs/Tab/Tab.m.css';
-import TabUnderlineStyles from '../Tabs/Tab/TabUnderline.m.css';
+import { TabUnderlineStyleRegistry } from '../Tabs/Tab/TabStyleRegistries';
 import { TabList } from '../Tabs/TabList';
 import TabPanelStyles from '../Tabs/TabPanel.m.css';
 import { TabPanelList } from '../Tabs/TabPanelList';
@@ -25,11 +25,12 @@ interface Props {
 }
 
 const sideBarPanelRegistry: StyleRegistry = [
+  ...TabUnderlineStyleRegistry,
   [
     TabStyles,
     {
       mode: 'append',
-      styles: [TabUnderlineStyles, SideBarPanelTab],
+      styles: [SideBarPanelTab],
     },
   ],
   [

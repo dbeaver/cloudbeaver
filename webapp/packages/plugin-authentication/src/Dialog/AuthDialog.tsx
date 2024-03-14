@@ -19,7 +19,6 @@ import {
   Link,
   s,
   SContext,
-  StyleRegistry,
   TextPlaceholder,
   useErrorDetails,
   useS,
@@ -27,17 +26,7 @@ import {
 } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogComponent } from '@cloudbeaver/core-dialogs';
-import {
-  Tab,
-  TabBigUnderlineStyles,
-  TabList,
-  TabsState,
-  TabStyles,
-  TabTitle,
-  TabTitleBigUnderlineStyles,
-  TabTitleStyles,
-  TabUnderlineStyles,
-} from '@cloudbeaver/core-ui';
+import { Tab, TabBigUnderlineStyleRegistry, TabList, TabsState, TabTitle } from '@cloudbeaver/core-ui';
 
 import { AuthenticationService } from '../AuthenticationService';
 import type { IAuthOptions } from '../IAuthOptions';
@@ -47,11 +36,6 @@ import { AuthProviderForm } from './AuthProviderForm/AuthProviderForm';
 import { ConfigurationsList } from './AuthProviderForm/ConfigurationsList';
 import { FEDERATED_AUTH } from './FEDERATED_AUTH';
 import { getAuthProviderTabId, useAuthDialogState } from './useAuthDialogState';
-
-const authDialogRegistry: StyleRegistry = [
-  [TabStyles, { mode: 'append', styles: [TabUnderlineStyles, TabBigUnderlineStyles] }],
-  [TabTitleStyles, { mode: 'append', styles: [TabTitleBigUnderlineStyles] }],
-];
 
 export const AuthDialog: DialogComponent<IAuthOptions, null> = observer(function AuthDialog({
   payload: { providerId, configurationId, linkUser = false, accessRequest = false },
@@ -171,7 +155,7 @@ export const AuthDialog: DialogComponent<IAuthOptions, null> = observer(function
           onReject={options?.persistent ? undefined : rejectDialog}
         />
         <CommonDialogBody noBodyPadding>
-          <SContext registry={authDialogRegistry}>
+          <SContext registry={TabBigUnderlineStyleRegistry}>
             {showTabs && (
               <TabList className={s(styles, { tabList: true })} aria-label="Auth providers">
                 {dialogData.providers
