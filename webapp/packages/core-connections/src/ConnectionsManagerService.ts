@@ -153,10 +153,17 @@ export class ConnectionsManagerService {
       return;
     }
 
-    const param = createConnectionParam(connection);
+    await this.connectionInfo.close(createConnectionParam(connection));
+  }
 
+  async closeAllConnections(): Promise<void> {
+    if (this.disconnecting) {
+      return;
+    }
+
+    const connectionParams = this.projectConnections.map(connection => createConnectionParam(connection));
     const contexts = await this.onDisconnect.execute({
-      connections: [param],
+      connections: connectionParams,
       state: 'before',
     });
 
@@ -164,24 +171,16 @@ export class ConnectionsManagerService {
       return;
     }
 
-    await this.connectionInfo.close(param);
-
-    this.onDisconnect.execute({
-      connections: [param],
-      state: 'after',
-    });
-  }
-
-  async closeAllConnections(): Promise<void> {
-    if (this.disconnecting) {
-      return;
-    }
     this.disconnecting = true;
     const { controller, notification } = this.notificationService.processNotification(() => ProcessSnackbar, {}, { title: 'Disconnecting...' });
 
     try {
       for (const connection of this.projectConnections) {
         await this._closeConnectionAsync(connection);
+        this.onDisconnect.execute({
+          connections: [createConnectionParam(connection)],
+          state: 'after',
+        });
       }
 
       notification.close();
@@ -197,6 +196,14 @@ export class ConnectionsManagerService {
     if (!connection || !connection.connected) {
       return;
     }
+    const contexts = await this.onDisconnect.execute({
+      connections: [createConnectionParam(connection)],
+      state: 'before',
+    });
+
+    if (ExecutorInterrupter.isInterrupted(contexts)) {
+      return;
+    }
 
     const { controller, notification } = this.notificationService.processNotification(() => ProcessSnackbar, {}, { title: 'Disconnecting...' });
 
@@ -204,6 +211,10 @@ export class ConnectionsManagerService {
       await this._closeConnectionAsync(connection);
 
       notification.close();
+      this.onDisconnect.execute({
+        connections: [createConnectionParam(connection)],
+        state: 'after',
+      });
     } catch (exception: any) {
       controller.reject(exception);
     }
