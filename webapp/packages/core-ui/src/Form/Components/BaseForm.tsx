@@ -1,0 +1,71 @@
+/*
+ * CloudBeaver - Cloud Database Manager
+ * Copyright (C) 2020-2024 DBeaver Corp and others
+ *
+ * Licensed under the Apache License, Version 2.0.
+ * you may not use this file except in compliance with the License.
+ */
+import { observer } from 'mobx-react-lite';
+
+import { Button, Container, Form, s, StatusMessage, useAutoLoad, useForm, useS, useTranslate } from '@cloudbeaver/core-blocks';
+import { getFirstException } from '@cloudbeaver/core-utils';
+
+import { BASE_TAB_STYLES } from '../../Tabs/Tab/BASE_TAB_STYLES';
+import { UNDERLINE_TAB_BIG_STYLES, UNDERLINE_TAB_STYLES } from '../../Tabs/Tab/UnderlineTabStyles';
+import { TabList } from '../../Tabs/TabList';
+import { TabPanelList } from '../../Tabs/TabPanelList';
+import { TabsState } from '../../Tabs/TabsState';
+import { FormMode } from '../FormMode';
+import style from './BaseForm.m.css';
+import type { IBaseFormProps } from './IBaseFormProps';
+
+const deprecatedStyle = [BASE_TAB_STYLES, UNDERLINE_TAB_STYLES, UNDERLINE_TAB_BIG_STYLES];
+export const BaseForm = observer<IBaseFormProps<any>>(function BaseForm({ service, state, onClose, onSubmit }) {
+  const styles = useS(style);
+  const translate = useTranslate();
+
+  const editing = state.mode === FormMode.Edit;
+  const changed = state.isChanged();
+
+  const form = useForm({
+    async onSubmit() {
+      const mode = state.mode;
+      const success = await state.save();
+
+      onSubmit?.({
+        success,
+        creating: mode === FormMode.Create,
+      });
+    },
+  });
+
+  useAutoLoad(BaseForm, state);
+
+  return (
+    <Form context={form} className={s(styles, { submittingForm: true })} disabled={state.isDisabled} focusFirstChild>
+      <TabsState container={service.parts} localState={state.parts} formState={state}>
+        <Container compact parent noWrap vertical>
+          <Container className={s(styles, { bar: true })} gap keepSize noWrap>
+            <Container fill>
+              <StatusMessage exception={getFirstException(state.exception)} type={state.statusType} message={state.statusMessage} />
+              <TabList className={s(styles, { tabList: true })} style={deprecatedStyle} />
+            </Container>
+            <Container keepSize noWrap center gap compact>
+              {onClose && (
+                <Button type="button" disabled={state.isDisabled} mod={['outlined']} onClick={onClose}>
+                  {translate('ui_processing_cancel')}
+                </Button>
+              )}
+              <Button type="button" disabled={state.isDisabled || !changed} mod={['unelevated']} onClick={() => form.submit()}>
+                {translate(!editing ? 'ui_processing_create' : 'ui_processing_save')}
+              </Button>
+            </Container>
+          </Container>
+          <Container vertical>
+            <TabPanelList />
+          </Container>
+        </Container>
+      </TabsState>
+    </Form>
+  );
+});

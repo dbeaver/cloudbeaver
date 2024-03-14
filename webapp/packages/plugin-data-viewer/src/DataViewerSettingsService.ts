@@ -6,21 +6,23 @@
  * you may not use this file except in compliance with the License.
  */
 import { Dependency, injectable } from '@cloudbeaver/core-di';
+import { ServerSettingsService } from '@cloudbeaver/core-root';
 import {
   createSettingsAliasResolver,
   ESettingsValueType,
-  PluginManagerService,
-  PluginSettings,
+  ROOT_SETTINGS_LAYER,
   SettingsManagerService,
-} from '@cloudbeaver/core-plugin';
-import { ServerSettingsResolverService, ServerSettingsService } from '@cloudbeaver/core-root';
-import { schema } from '@cloudbeaver/core-utils';
+  SettingsProvider,
+  SettingsProviderService,
+  SettingsResolverService,
+} from '@cloudbeaver/core-settings';
+import { schema, schemaExtra } from '@cloudbeaver/core-utils';
 
 import { DATA_EDITOR_SETTINGS_GROUP } from './DATA_EDITOR_SETTINGS_GROUP';
 
 const defaultSettings = schema.object({
-  disableEdit: schema.coerce.boolean().default(false),
-  disableCopyData: schema.coerce.boolean().default(false),
+  disableEdit: schemaExtra.stringedBoolean().default(false),
+  disableCopyData: schemaExtra.stringedBoolean().default(false),
   fetchMin: schema.coerce.number().min(10).default(100),
   fetchMax: schema.coerce.number().min(10).default(5000),
   fetchDefault: schema.coerce.number().min(10).default(200),
@@ -30,17 +32,18 @@ export type DataViewerSettings = schema.infer<typeof defaultSettings>;
 
 @injectable()
 export class DataViewerSettingsService extends Dependency {
-  readonly settings: PluginSettings<typeof defaultSettings>;
+  readonly settings: SettingsProvider<typeof defaultSettings>;
 
   constructor(
-    private readonly pluginManagerService: PluginManagerService,
+    private readonly settingsProviderService: SettingsProviderService,
     private readonly settingsManagerService: SettingsManagerService,
     private readonly serverSettingsService: ServerSettingsService,
-    private readonly serverSettingsResolverService: ServerSettingsResolverService,
+    private readonly settingsResolverService: SettingsResolverService,
   ) {
     super();
-    this.settings = this.pluginManagerService.createSettings('data-viewer', 'plugin', defaultSettings);
-    this.serverSettingsResolverService.addResolver(
+    this.settings = this.settingsProviderService.createSettings(defaultSettings, 'plugin', 'data-viewer');
+    this.settingsResolverService.addResolver(
+      ROOT_SETTINGS_LAYER,
       /** @deprecated Use settings instead, will be removed in 23.0.0 */
       createSettingsAliasResolver(this.serverSettingsService, this.settings, 'core.app.dataViewer'),
     );
@@ -68,9 +71,12 @@ export class DataViewerSettingsService extends Dependency {
   }
 
   private registerSettings() {
-    this.settingsManagerService.registerSettings(this.settings, () => [
+    this.settingsManagerService.registerSettings(this.settings.scope, this.settings.schema, () => [
       {
         key: 'disableEdit',
+        access: {
+          accessor: ['server'],
+        },
         type: ESettingsValueType.Checkbox,
         name: 'settings_data_editor_disable_edit_name',
         description: 'settings_data_editor_disable_edit_description',
@@ -78,6 +84,9 @@ export class DataViewerSettingsService extends Dependency {
       },
       {
         key: 'disableCopyData',
+        access: {
+          accessor: ['server'],
+        },
         type: ESettingsValueType.Checkbox,
         name: 'settings_data_editor_disable_data_copy_name',
         description: 'settings_data_editor_disable_data_copy_description',
@@ -85,6 +94,9 @@ export class DataViewerSettingsService extends Dependency {
       },
       {
         key: 'fetchMin',
+        access: {
+          accessor: ['server'],
+        },
         type: ESettingsValueType.Input,
         name: 'settings_data_editor_fetch_min_name',
         description: 'settings_data_editor_fetch_min_description',
@@ -92,6 +104,9 @@ export class DataViewerSettingsService extends Dependency {
       },
       {
         key: 'fetchMax',
+        access: {
+          accessor: ['server'],
+        },
         type: ESettingsValueType.Input,
         name: 'settings_data_editor_fetch_max_name',
         description: 'settings_data_editor_fetch_max_description',
@@ -99,6 +114,9 @@ export class DataViewerSettingsService extends Dependency {
       },
       {
         key: 'fetchDefault',
+        access: {
+          accessor: ['server'],
+        },
         type: ESettingsValueType.Input,
         name: 'settings_data_editor_fetch_default_name',
         description: 'settings_data_editor_fetch_default_description',

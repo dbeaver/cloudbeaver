@@ -12,7 +12,6 @@ import { coreBrowserManifest } from '@cloudbeaver/core-browser';
 import { coreClientActivityManifest } from '@cloudbeaver/core-client-activity';
 import { coreEventsManifest } from '@cloudbeaver/core-events';
 import { coreLocalizationManifest } from '@cloudbeaver/core-localization';
-import { corePluginManifest } from '@cloudbeaver/core-plugin';
 import { coreProductManifest } from '@cloudbeaver/core-product';
 import { coreRootManifest } from '@cloudbeaver/core-root';
 import { createGQLEndpoint } from '@cloudbeaver/core-root/dist/__custom_mocks__/createGQLEndpoint';
@@ -28,7 +27,6 @@ import { ErrorMessage } from './ErrorMessage';
 const endpoint = createGQLEndpoint();
 const app = createApp(
   coreEventsManifest,
-  corePluginManifest,
   coreProductManifest,
   coreRootManifest,
   coreSDKManifest,

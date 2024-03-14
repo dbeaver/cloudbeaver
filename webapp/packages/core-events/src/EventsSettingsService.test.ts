@@ -7,11 +7,8 @@
  */
 import '@testing-library/jest-dom';
 
-import { coreBrowserManifest } from '@cloudbeaver/core-browser';
 import { coreClientActivityManifest } from '@cloudbeaver/core-client-activity';
 import { coreLocalizationManifest } from '@cloudbeaver/core-localization';
-import { corePluginManifest } from '@cloudbeaver/core-plugin';
-import { coreProductManifest } from '@cloudbeaver/core-product';
 import { coreRootManifest, ServerConfigResource } from '@cloudbeaver/core-root';
 import { createGQLEndpoint } from '@cloudbeaver/core-root/dist/__custom_mocks__/createGQLEndpoint';
 import { mockAppInit } from '@cloudbeaver/core-root/dist/__custom_mocks__/mockAppInit';
@@ -27,11 +24,8 @@ import { coreEventsManifest } from './manifest';
 const endpoint = createGQLEndpoint();
 const app = createApp(
   coreEventsManifest,
-  corePluginManifest,
   coreSettingsManifest,
   coreLocalizationManifest,
-  coreBrowserManifest,
-  coreProductManifest,
   coreRootManifest,
   coreSDKManifest,
   coreClientActivityManifest,

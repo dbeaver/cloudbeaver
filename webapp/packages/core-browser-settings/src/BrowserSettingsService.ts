@@ -6,30 +6,38 @@
  * you may not use this file except in compliance with the License.
  */
 import { Dependency, injectable } from '@cloudbeaver/core-di';
-import { createSettingsAliasResolver, PluginManagerService, PluginSettings, SettingsManagerService } from '@cloudbeaver/core-plugin';
-import { ServerSettingsResolverService, ServerSettingsService } from '@cloudbeaver/core-root';
-import { schema } from '@cloudbeaver/core-utils';
+import { ServerSettingsService } from '@cloudbeaver/core-root';
+import {
+  createSettingsAliasResolver,
+  ROOT_SETTINGS_LAYER,
+  SettingsManagerService,
+  SettingsProvider,
+  SettingsProviderService,
+  SettingsResolverService,
+} from '@cloudbeaver/core-settings';
+import { schema, schemaExtra } from '@cloudbeaver/core-utils';
 
 const settingsSchema = schema.object({
-  'cookies.disabled': schema.coerce.boolean().default(false),
+  'cookies.disabled': schemaExtra.stringedBoolean().default(false),
 });
 
 export type CookiesSettings = schema.infer<typeof settingsSchema>;
 
 @injectable()
 export class BrowserSettingsService extends Dependency {
-  readonly settings: PluginSettings<typeof settingsSchema>;
+  readonly settings: SettingsProvider<typeof settingsSchema>;
 
   constructor(
-    private readonly pluginManagerService: PluginManagerService,
+    private readonly settingsProviderService: SettingsProviderService,
     private readonly settingsManagerService: SettingsManagerService,
     private readonly serverSettingsService: ServerSettingsService,
-    private readonly serverSettingsResolverService: ServerSettingsResolverService,
+    private readonly settingsResolverService: SettingsResolverService,
   ) {
     super();
-    this.settings = this.pluginManagerService.createSettings('browser', 'core', settingsSchema);
+    this.settings = this.settingsProviderService.createSettings(settingsSchema, 'core', 'browser');
 
-    this.serverSettingsResolverService.addResolver(
+    this.settingsResolverService.addResolver(
+      ROOT_SETTINGS_LAYER,
       /** @deprecated Use settings instead, will be removed in 23.0.0 */
       createSettingsAliasResolver(this.serverSettingsService, this.settings, 'core'),
     );
@@ -37,7 +45,7 @@ export class BrowserSettingsService extends Dependency {
   }
 
   private registerSettings() {
-    this.settingsManagerService.registerSettings(this.settings, () => [
+    this.settingsManagerService.registerSettings(this.settings.scope, this.settings.schema, () => [
       // {
       //   group: BROWSER_COOKIES_SETTINGS_GROUP,
       //   key: 'cookies.disabled',

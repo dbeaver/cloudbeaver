@@ -8,11 +8,11 @@
 import { computed, makeObservable } from 'mobx';
 
 import { Dependency, injectable } from '@cloudbeaver/core-di';
-import { PluginManagerService, PluginSettings, SettingsManagerService } from '@cloudbeaver/core-plugin';
-import { schema } from '@cloudbeaver/core-utils';
+import { SettingsManagerService, SettingsProvider, SettingsProviderService } from '@cloudbeaver/core-settings';
+import { schema, schemaExtra } from '@cloudbeaver/core-utils';
 
 const defaultSettings = schema.object({
-  disabled: schema.coerce.boolean().default(false),
+  disabled: schemaExtra.stringedBoolean().default(false),
 });
 
 export type NavigationTreeSettings = schema.infer<typeof defaultSettings>;
@@ -23,11 +23,14 @@ export class NavigationTreeSettingsService extends Dependency {
     return this.settings.getValue('disabled');
   }
 
-  readonly settings: PluginSettings<typeof defaultSettings>;
+  readonly settings: SettingsProvider<typeof defaultSettings>;
 
-  constructor(private readonly pluginManagerService: PluginManagerService, private readonly settingsManagerService: SettingsManagerService) {
+  constructor(
+    private readonly settingsProviderService: SettingsProviderService,
+    private readonly settingsManagerService: SettingsManagerService,
+  ) {
     super();
-    this.settings = this.pluginManagerService.createSettings('navigation-tree', 'plugin', defaultSettings);
+    this.settings = this.settingsProviderService.createSettings(defaultSettings, 'plugin', 'navigation-tree');
 
     this.registerSettings();
 
@@ -37,7 +40,7 @@ export class NavigationTreeSettingsService extends Dependency {
   }
 
   private registerSettings() {
-    this.settingsManagerService.registerSettings(this.settings, () => [
+    this.settingsManagerService.registerSettings(this.settings.scope, this.settings.schema, () => [
       // {
       //   group: NAVIGATION_TREE_SETTINGS_GROUP,
       //   key: 'disabled',

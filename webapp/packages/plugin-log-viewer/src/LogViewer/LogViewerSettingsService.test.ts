@@ -12,10 +12,7 @@ import { coreAuthenticationManifest } from '@cloudbeaver/core-authentication';
 import { mockAuthentication } from '@cloudbeaver/core-authentication/dist/__custom_mocks__/mockAuthentication';
 import { coreBrowserManifest } from '@cloudbeaver/core-browser';
 import { coreClientActivityManifest } from '@cloudbeaver/core-client-activity';
-import { coreEventsManifest } from '@cloudbeaver/core-events';
 import { coreLocalizationManifest } from '@cloudbeaver/core-localization';
-import { corePluginManifest } from '@cloudbeaver/core-plugin';
-import { coreProductManifest } from '@cloudbeaver/core-product';
 import { coreRootManifest, ServerConfigResource } from '@cloudbeaver/core-root';
 import { createGQLEndpoint } from '@cloudbeaver/core-root/dist/__custom_mocks__/createGQLEndpoint';
 import { mockAppInit } from '@cloudbeaver/core-root/dist/__custom_mocks__/mockAppInit';
@@ -24,7 +21,7 @@ import { mockServerConfig } from '@cloudbeaver/core-root/dist/__custom_mocks__/r
 import { coreRoutingManifest } from '@cloudbeaver/core-routing';
 import { coreSDKManifest } from '@cloudbeaver/core-sdk';
 import { coreSettingsManifest } from '@cloudbeaver/core-settings';
-import { coreThemingManifest } from '@cloudbeaver/core-theming';
+import { coreStorageManifest } from '@cloudbeaver/core-storage';
 import { coreViewManifest } from '@cloudbeaver/core-view';
 import toolsPanelPlugin from '@cloudbeaver/plugin-tools-panel';
 import { createApp } from '@cloudbeaver/tests-runner';
@@ -36,19 +33,16 @@ const endpoint = createGQLEndpoint();
 const app = createApp(
   logViewerPlugin,
   toolsPanelPlugin,
-  corePluginManifest,
-  coreProductManifest,
   coreRootManifest,
+  coreStorageManifest,
   coreSDKManifest,
   coreViewManifest,
   coreAuthenticationManifest,
   coreSettingsManifest,
   coreBrowserManifest,
   coreLocalizationManifest,
-  coreEventsManifest,
   coreAppManifest,
   coreRoutingManifest,
-  coreThemingManifest,
   coreClientActivityManifest,
 );
 

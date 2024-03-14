@@ -8,8 +8,7 @@
 import { observer } from 'mobx-react-lite';
 
 import { Container, Group, GroupTitle, useTranslate } from '@cloudbeaver/core-blocks';
-import { type ISettingDescriptionWithScope, ROOT_SETTINGS_GROUP, type SettingsGroup } from '@cloudbeaver/core-plugin';
-import type { ISettingsSource } from '@cloudbeaver/core-settings';
+import { type ISettingDescriptionWithScope, ROOT_SETTINGS_GROUP, type SettingsGroup, type ISettingsSource } from '@cloudbeaver/core-settings';
 import type { ITreeData } from '@cloudbeaver/plugin-navigation-tree';
 
 import { getSettingGroupId } from './getSettingGroupId';

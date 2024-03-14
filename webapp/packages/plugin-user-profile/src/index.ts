@@ -2,6 +2,6 @@ import { userProfilePlugin } from './manifest';
 
 export default userProfilePlugin;
 
+export * from './UserProfileTabsService';
 export * from './UserMenu/MENU_USER_PROFILE';
-export * from './UserMenu/UserMenu';
-export * from './UserProfileForm/AuthProviders/AuthProvidersList';
+export * from './UserMenu/UserMenuLazy';

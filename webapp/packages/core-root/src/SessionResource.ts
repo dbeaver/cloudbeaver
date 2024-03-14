@@ -7,6 +7,7 @@
  */
 import { injectable } from '@cloudbeaver/core-di';
 import { ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
+import { LocalizationService } from '@cloudbeaver/core-localization';
 import { CachedDataResource } from '@cloudbeaver/core-resource';
 import { GraphQLService, SessionStateFragment } from '@cloudbeaver/core-sdk';
 
@@ -28,13 +29,13 @@ interface SessionStateData {
 @injectable()
 export class SessionResource extends CachedDataResource<SessionState | null> {
   private action: ISessionAction | null;
-  private defaultLocale: string | undefined;
   readonly onStatusUpdate: ISyncExecutor<SessionStateData>;
 
   constructor(
     private readonly graphQLService: GraphQLService,
     sessionInfoEventHandler: SessionInfoEventHandler,
     serverConfigResource: ServerConfigResource,
+    private readonly localizationService: LocalizationService,
   ) {
     super(() => null);
 
@@ -69,17 +70,12 @@ export class SessionResource extends CachedDataResource<SessionState | null> {
     }
   }
 
-  setDefaultLocale(defaultLocale?: string): void {
-    this.defaultLocale = defaultLocale;
-  }
-
   async changeLanguage(locale: string): Promise<void> {
     if (this.data?.locale === locale) {
       return;
     }
     await this.graphQLService.sdk.changeSessionLanguage({ locale });
 
-    this.defaultLocale = locale;
     if (this.data) {
       this.data.locale = locale;
     }
@@ -88,7 +84,7 @@ export class SessionResource extends CachedDataResource<SessionState | null> {
   }
 
   protected async loader(): Promise<SessionState> {
-    const { session } = await this.graphQLService.sdk.openSession({ defaultLocale: this.defaultLocale });
+    const { session } = await this.graphQLService.sdk.openSession({ defaultLocale: this.localizationService.currentLanguage });
 
     return session;
   }

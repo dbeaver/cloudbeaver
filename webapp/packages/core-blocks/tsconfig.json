@@ -37,9 +37,6 @@
       "path": "../core-localization/tsconfig.json"
     },
     {
-      "path": "../core-plugin/tsconfig.json"
-    },
-    {
       "path": "../core-product/tsconfig.json"
     },
     {

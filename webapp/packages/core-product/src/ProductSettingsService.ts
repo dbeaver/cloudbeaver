@@ -8,22 +8,23 @@
 import { makeObservable, observable } from 'mobx';
 
 import { injectable } from '@cloudbeaver/core-di';
-import { SessionSettingsService } from '@cloudbeaver/core-root';
-import type { ISettingsSource } from '@cloudbeaver/core-settings';
+import { createSettingsLayer, ISettingsSource, ROOT_SETTINGS_LAYER } from '@cloudbeaver/core-settings';
+
+export const PRODUCT_SETTINGS_LAYER = createSettingsLayer(ROOT_SETTINGS_LAYER, 'product');
 
 @injectable()
 export class ProductSettingsService implements ISettingsSource {
   private readonly settings: Map<string, any>;
 
-  constructor(private readonly sessionSettingsService: SessionSettingsService) {
+  constructor() {
     this.settings = new Map();
     makeObservable<this, 'settings'>(this, {
-      settings: observable,
+      settings: observable.shallow,
     });
   }
 
   has(key: any): boolean {
-    return this.settings.has(key) || this.sessionSettingsService?.has(key) || false;
+    return this.settings.has(key) || false;
   }
 
   isEdited(): boolean {
@@ -34,18 +35,11 @@ export class ProductSettingsService implements ISettingsSource {
     return true;
   }
 
-  getDefaultValue(key: any): any {
-    return this.sessionSettingsService.getDefaultValue(key) ?? this.settings.get(key);
-  }
-
   getEditedValue(key: any): any {
     return this.getValue(key);
   }
 
   getValue(key: any): any {
-    if (this.sessionSettingsService.has(key)) {
-      return this.sessionSettingsService.getValue(key);
-    }
     return this.settings.get(key);
   }
 
@@ -56,4 +50,6 @@ export class ProductSettingsService implements ISettingsSource {
   clear(): void {
     this.settings.clear();
   }
+
+  async save(): Promise<void> {}
 }

@@ -7,9 +7,6 @@
   },
   "references": [
     {
-      "path": "../core-browser/tsconfig.json"
-    },
-    {
       "path": "../core-client-activity/tsconfig.json"
     },
     {
@@ -29,15 +26,6 @@
     },
     {
       "path": "../core-localization/tsconfig.json"
-    },
-    {
-      "path": "../core-plugin/tsconfig.json"
-    },
-    {
-      "path": "../core-plugin/tsconfig.json"
-    },
-    {
-      "path": "../core-product/tsconfig.json"
     },
     {
       "path": "../core-root/tsconfig.json"

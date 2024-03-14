@@ -7,30 +7,27 @@
  */
 import { action, makeObservable, observable } from 'mobx';
 
-import { Dependency, injectable } from '@cloudbeaver/core-di';
-import { type ISettingsSource, SettingsResolverService } from '@cloudbeaver/core-settings';
-import { parseJSONFlat } from '@cloudbeaver/core-utils';
+import { injectable } from '@cloudbeaver/core-di';
+import { PRODUCT_SETTINGS_LAYER } from '@cloudbeaver/core-product';
+import { createSettingsLayer, type ISettingsSource } from '@cloudbeaver/core-settings';
+import { isNotNullDefined, parseJSONFlat } from '@cloudbeaver/core-utils';
 
 import { EAdminPermission } from './EAdminPermission';
 import { ServerConfigResource } from './ServerConfigResource';
 import { SessionPermissionsResource } from './SessionPermissionsResource';
 
+export const SERVER_SETTINGS_LAYER = createSettingsLayer(PRODUCT_SETTINGS_LAYER, 'server');
+
 @injectable()
-export class ServerSettingsService extends Dependency implements ISettingsSource {
+export class ServerSettingsService implements ISettingsSource {
   private readonly settings: Map<string, any>;
   private readonly changes: Map<string, any>;
   private lastConfig: any;
 
-  get isChanged(): boolean {
-    return this.changes.size > 0;
-  }
-
   constructor(
     readonly serverConfigResource: ServerConfigResource,
     private readonly sessionPermissionsResource: SessionPermissionsResource,
-    private readonly settingsResolverService: SettingsResolverService,
   ) {
-    super();
     this.lastConfig = null;
     this.settings = new Map();
     this.changes = new Map();
@@ -44,19 +41,19 @@ export class ServerSettingsService extends Dependency implements ISettingsSource
   }
 
   has(key: any): boolean {
-    return this.settingsResolverService.has(key) || this.settings.has(key) || this.changes.has(key);
+    return this.settings.has(key) || this.changes.has(key);
   }
 
-  isEdited(key: any): boolean {
-    return this.changes.has(key);
+  isEdited(key?: any): boolean {
+    if (isNotNullDefined(key)) {
+      return this.changes.has(key);
+    }
+
+    return this.changes.size > 0;
   }
 
   isReadOnly(key: any): boolean {
-    return this.settingsResolverService.has(key) || !this.sessionPermissionsResource.has(EAdminPermission.admin);
-  }
-
-  getDefaultValue(key: any): any {
-    return this.settingsResolverService.getDefaultValue(key) ?? this.settings.get(key);
+    return !this.sessionPermissionsResource.has(EAdminPermission.admin);
   }
 
   getEditedValue(key: any): any {
@@ -68,18 +65,10 @@ export class ServerSettingsService extends Dependency implements ISettingsSource
   }
 
   getValue(key: any): any {
-    if (this.settingsResolverService.has(key)) {
-      return this.settingsResolverService.getValue(key);
-    }
-
     return this.settings.get(key);
   }
 
   setValue(key: any, value: any): void {
-    if (this.settingsResolverService.has(key)) {
-      throw new Error(`Can't set value for key ${key}`);
-    }
-
     if (this.settings.get(key) === value) {
       this.changes.delete(key);
     } else {

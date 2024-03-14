@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 import { Dependency, injectable } from '@cloudbeaver/core-di';
-import { SettingsManagerService } from '@cloudbeaver/core-plugin';
+import { ESettingsValueType, INTERFACE_SETTINGS_GROUP, SettingsManagerService } from '@cloudbeaver/core-settings';
 
 import { ThemeService } from './ThemeService';
 import { ThemeSettingsService } from './ThemeSettingsService';
@@ -15,15 +15,18 @@ import { ThemeSettingsService } from './ThemeSettingsService';
 export class ThemeSettingsManagementService extends Dependency {
   constructor(themeSettingsService: ThemeSettingsService, themeService: ThemeService, settingsManagerService: SettingsManagerService) {
     super();
-    settingsManagerService.registerSettings(themeSettingsService.settings, () => [
-      // {
-      //   key: 'defaultTheme',
-      //   type: ESettingsValueType.Select,
-      //   name: 'core_theming_settings_default_theme_name',
-      //   description: 'core_theming_settings_default_theme_description',
-      //   options: themeService.themes.map(theme => ({ id: theme.id, name: theme.name })),
-      //   group: INTERFACE_SETTINGS_GROUP,
-      // },
+    settingsManagerService.registerSettings(themeSettingsService.settings.scope, themeSettingsService.settings.schema, () => [
+      {
+        key: 'theme',
+        access: {
+          accessor: ['server', 'client'],
+        },
+        type: ESettingsValueType.Select,
+        name: 'core_theming_settings_theme_name',
+        description: 'core_theming_settings_theme_description',
+        options: themeService.themes.map(theme => ({ id: theme.id, name: theme.name })),
+        group: INTERFACE_SETTINGS_GROUP,
+      },
     ]);
   }
 }

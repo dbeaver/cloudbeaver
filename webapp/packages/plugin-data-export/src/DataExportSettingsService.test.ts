@@ -18,8 +18,6 @@ import { coreDialogsManifest } from '@cloudbeaver/core-dialogs';
 import { coreEventsManifest } from '@cloudbeaver/core-events';
 import { coreLocalizationManifest } from '@cloudbeaver/core-localization';
 import { coreNavigationTree } from '@cloudbeaver/core-navigation-tree';
-import { corePluginManifest } from '@cloudbeaver/core-plugin';
-import { coreProductManifest } from '@cloudbeaver/core-product';
 import { coreProjectsManifest } from '@cloudbeaver/core-projects';
 import { coreRootManifest, ServerConfigResource } from '@cloudbeaver/core-root';
 import { createGQLEndpoint } from '@cloudbeaver/core-root/dist/__custom_mocks__/createGQLEndpoint';
@@ -29,10 +27,9 @@ import { mockServerConfig } from '@cloudbeaver/core-root/dist/__custom_mocks__/r
 import { coreRoutingManifest } from '@cloudbeaver/core-routing';
 import { coreSDKManifest } from '@cloudbeaver/core-sdk';
 import { coreSettingsManifest } from '@cloudbeaver/core-settings';
-import { coreThemingManifest } from '@cloudbeaver/core-theming';
+import { coreStorageManifest } from '@cloudbeaver/core-storage';
 import { coreUIManifest } from '@cloudbeaver/core-ui';
 import { coreViewManifest } from '@cloudbeaver/core-view';
-import { dataViewerManifest } from '@cloudbeaver/plugin-data-viewer';
 import { datasourceContextSwitchPluginManifest } from '@cloudbeaver/plugin-datasource-context-switch';
 import { navigationTabsPlugin } from '@cloudbeaver/plugin-navigation-tabs';
 import { navigationTreePlugin } from '@cloudbeaver/plugin-navigation-tree';
@@ -47,12 +44,11 @@ const app = createApp(
   dataExportManifest,
   coreLocalizationManifest,
   coreEventsManifest,
-  corePluginManifest,
-  coreProductManifest,
   coreRootManifest,
   coreSDKManifest,
   coreBrowserManifest,
   coreSettingsManifest,
+  coreStorageManifest,
   coreViewManifest,
   coreAuthenticationManifest,
   coreProjectsManifest,
@@ -63,12 +59,10 @@ const app = createApp(
   coreDialogsManifest,
   coreNavigationTree,
   coreAppManifest,
-  coreThemingManifest,
   datasourceContextSwitchPluginManifest,
   navigationTreePlugin,
   navigationTabsPlugin,
   objectViewerManifest,
-  dataViewerManifest,
   coreClientActivityManifest,
 );
 

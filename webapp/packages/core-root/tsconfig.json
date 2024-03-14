@@ -21,6 +21,12 @@
       "path": "../core-executor/tsconfig.json"
     },
     {
+      "path": "../core-localization/tsconfig.json"
+    },
+    {
+      "path": "../core-product/tsconfig.json"
+    },
+    {
       "path": "../core-resource/tsconfig.json"
     },
     {

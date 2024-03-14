@@ -6,33 +6,39 @@
  * you may not use this file except in compliance with the License.
  */
 import { Dependency, injectable } from '@cloudbeaver/core-di';
-import { ESettingsValueType, PluginManagerService, PluginSettings, SettingsManagerService } from '@cloudbeaver/core-plugin';
-import { schema } from '@cloudbeaver/core-utils';
+import { ESettingsValueType, SettingsManagerService, SettingsProvider, SettingsProviderService } from '@cloudbeaver/core-settings';
+import { schema, schemaExtra } from '@cloudbeaver/core-utils';
 
 import { TOOLS_PANEL_SETTINGS_GROUP } from './TOOLS_PANEL_SETTINGS_GROUP';
 
 const settings = schema.object({
-  disabled: schema.coerce.boolean().default(false),
+  disabled: schemaExtra.stringedBoolean().default(false),
 });
 
 type Settings = typeof settings;
 
 @injectable()
 export class ToolsPanelSettingsService extends Dependency {
-  readonly settings: PluginSettings<Settings>;
+  readonly settings: SettingsProvider<Settings>;
 
-  constructor(private readonly pluginManagerService: PluginManagerService, private readonly settingsManagerService: SettingsManagerService) {
+  constructor(
+    private readonly settingsProviderService: SettingsProviderService,
+    private readonly settingsManagerService: SettingsManagerService,
+  ) {
     super();
-    this.settings = this.pluginManagerService.createSettings('tools-panel', 'plugin', settings);
+    this.settings = this.settingsProviderService.createSettings(settings, 'plugin', 'tools-panel');
 
     this.registerSettings();
   }
 
   private registerSettings() {
-    this.settingsManagerService.registerSettings(this.settings, () => [
+    this.settingsManagerService.registerSettings(this.settings.scope, this.settings.schema, () => [
       {
-        group: TOOLS_PANEL_SETTINGS_GROUP,
         key: 'disabled',
+        access: {
+          accessor: ['server'],
+        },
+        group: TOOLS_PANEL_SETTINGS_GROUP,
         type: ESettingsValueType.Checkbox,
         name: 'plugin_tools_panel_settings_disable_label',
         description: 'plugin_tools_panel_settings_disable_description',

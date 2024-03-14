@@ -7,11 +7,8 @@
  */
 import '@testing-library/jest-dom';
 
-import { coreBrowserManifest } from '@cloudbeaver/core-browser';
 import { coreClientActivityManifest } from '@cloudbeaver/core-client-activity';
 import { coreLocalizationManifest } from '@cloudbeaver/core-localization';
-import { corePluginManifest } from '@cloudbeaver/core-plugin';
-import { coreProductManifest } from '@cloudbeaver/core-product';
 import { coreRootManifest, ServerConfigResource } from '@cloudbeaver/core-root';
 import { createGQLEndpoint } from '@cloudbeaver/core-root/dist/__custom_mocks__/createGQLEndpoint';
 import { mockAppInit } from '@cloudbeaver/core-root/dist/__custom_mocks__/mockAppInit';
@@ -27,14 +24,11 @@ import { type ILocalizationSettings, SettingsLocalizationService } from './Setti
 const endpoint = createGQLEndpoint();
 const app = createApp(
   coreSettingsLocalizationManifest,
-  corePluginManifest,
+  coreClientActivityManifest,
   coreSettingsManifest,
   coreLocalizationManifest,
-  coreProductManifest,
   coreRootManifest,
   coreSDKManifest,
-  coreBrowserManifest,
-  coreClientActivityManifest,
 );
 
 const server = mockGraphQL(...mockAppInit(endpoint));
@@ -47,7 +41,7 @@ const testValueB = 'te';
 const deprecatedSettings = {
   core: {
     user: {
-      defaultLanguage: testValueB,
+      language: testValueB,
     } as ILocalizationSettings,
   },
 };
@@ -56,7 +50,7 @@ const newSettings = {
   core: {
     ...deprecatedSettings,
     localization: {
-      defaultLanguage: testValue,
+      language: testValue,
     } as ILocalizationSettings,
   },
 };
@@ -69,7 +63,7 @@ test('New settings override deprecated settings', async () => {
 
   await config.refresh();
 
-  expect(settings.pluginSettings.getValue('defaultLanguage')).toBe(testValue);
+  expect(settings.settingsProvider.getValue('language')).toBe(testValue);
 });
 
 test('Deprecated settings are used if new settings are not defined', async () => {
@@ -80,5 +74,5 @@ test('Deprecated settings are used if new settings are not defined', async () =>
 
   await config.refresh();
 
-  expect(settings.pluginSettings.getValue('defaultLanguage')).toBe(testValueB);
+  expect(settings.settingsProvider.getValue('language')).toBe(testValueB);
 });

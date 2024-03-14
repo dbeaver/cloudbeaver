@@ -6,45 +6,52 @@
  * you may not use this file except in compliance with the License.
  */
 import { Dependency, injectable } from '@cloudbeaver/core-di';
+import { ServerSettingsService } from '@cloudbeaver/core-root';
 import {
   createSettingsAliasResolver,
   ESettingsValueType,
-  PluginManagerService,
-  PluginSettings,
+  ROOT_SETTINGS_LAYER,
   SettingsManagerService,
-} from '@cloudbeaver/core-plugin';
-import { ServerSettingsResolverService, ServerSettingsService } from '@cloudbeaver/core-root';
-import { schema } from '@cloudbeaver/core-utils';
+  SettingsProvider,
+  SettingsProviderService,
+  SettingsResolverService,
+} from '@cloudbeaver/core-settings';
+import { schema, schemaExtra } from '@cloudbeaver/core-utils';
 
 import { SQL_EDITOR_SETTINGS_GROUP } from './SQL_EDITOR_SETTINGS_GROUP';
 
 const defaultSettings = schema.object({
   maxFileSize: schema.coerce.number().default(10 * 1024), // kilobyte
-  disabled: schema.coerce.boolean().default(false),
-  autoSave: schema.coerce.boolean().default(true),
+  disabled: schemaExtra.stringedBoolean().default(false),
+  autoSave: schemaExtra.stringedBoolean().default(true),
 });
 
 const defaultProposalInsertTableSettings = schema.object({
-  alias: schema.coerce.boolean().default(true),
+  alias: schemaExtra.stringedBoolean().default(true),
 });
 
 export type SqlEditorSettings = schema.infer<typeof defaultSettings>;
 
 @injectable()
 export class SqlEditorSettingsService extends Dependency {
-  readonly settings: PluginSettings<typeof defaultSettings>;
-  readonly proposalInsertTableSettings: PluginSettings<typeof defaultProposalInsertTableSettings>;
+  readonly settings: SettingsProvider<typeof defaultSettings>;
+  readonly proposalInsertTableSettings: SettingsProvider<typeof defaultProposalInsertTableSettings>;
 
   constructor(
-    private readonly pluginManagerService: PluginManagerService,
+    private readonly settingsProviderService: SettingsProviderService,
     private readonly settingsManagerService: SettingsManagerService,
     private readonly serverSettingsService: ServerSettingsService,
-    private readonly serverSettingsResolverService: ServerSettingsResolverService,
+    private readonly settingsResolverService: SettingsResolverService,
   ) {
     super();
-    this.settings = this.pluginManagerService.createSettings('sql-editor', 'plugin', defaultSettings);
-    this.proposalInsertTableSettings = this.pluginManagerService.createSettings('proposals.insert.table', 'sql', defaultProposalInsertTableSettings);
-    this.serverSettingsResolverService.addResolver(
+    this.settings = this.settingsProviderService.createSettings(defaultSettings, 'plugin', 'sql-editor');
+    this.proposalInsertTableSettings = this.settingsProviderService.createSettings(
+      defaultProposalInsertTableSettings,
+      'sql',
+      'proposals.insert.table',
+    );
+    this.settingsResolverService.addResolver(
+      ROOT_SETTINGS_LAYER,
       /** @deprecated Use settings instead, will be removed in 23.0.0 */
       createSettingsAliasResolver(this.serverSettingsService, this.settings, 'core.app.sqlEditor'),
     );
@@ -52,7 +59,7 @@ export class SqlEditorSettingsService extends Dependency {
   }
 
   private registerSettings() {
-    this.settingsManagerService.registerSettings(this.settings, () => [
+    this.settingsManagerService.registerSettings(this.settings.scope, this.settings.schema, () => [
       // {
       //   group: SQL_EDITOR_SETTINGS_GROUP,
       //   key: 'disabled',
@@ -75,10 +82,13 @@ export class SqlEditorSettingsService extends Dependency {
       // },
     ]);
 
-    this.settingsManagerService.registerSettings(this.proposalInsertTableSettings, () => [
+    this.settingsManagerService.registerSettings(this.proposalInsertTableSettings.scope, this.proposalInsertTableSettings.schema, () => [
       {
-        group: SQL_EDITOR_SETTINGS_GROUP,
         key: 'alias',
+        access: {
+          accessor: ['server', 'client'],
+        },
+        group: SQL_EDITOR_SETTINGS_GROUP,
         type: ESettingsValueType.Checkbox,
         name: 'sql_editor_settings_insert_table_aliases_name',
         description: 'sql_editor_settings_insert_table_aliases_desc',

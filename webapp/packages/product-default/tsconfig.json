@@ -175,6 +175,9 @@
       "path": "../plugin-user-profile-administration/tsconfig.json"
     },
     {
+      "path": "../plugin-user-profile-settings/tsconfig.json"
+    },
+    {
       "path": "../plugin-user-profile/tsconfig.json"
     },
     {

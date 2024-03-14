@@ -8,9 +8,8 @@
 import { observer } from 'mobx-react-lite';
 import React from 'react';
 
-import { Container, Form, Group, TextPlaceholder, useForm, useTranslate } from '@cloudbeaver/core-blocks';
-import { ROOT_SETTINGS_GROUP } from '@cloudbeaver/core-plugin';
-import type { ISettingsSource } from '@cloudbeaver/core-settings';
+import { Container, Group, TextPlaceholder, useTranslate } from '@cloudbeaver/core-blocks';
+import { ROOT_SETTINGS_GROUP, type ISettingsSource } from '@cloudbeaver/core-settings';
 import { useTreeData } from '@cloudbeaver/plugin-navigation-tree';
 
 import { SettingsGroups } from './SettingsGroups/SettingsGroups';
@@ -19,11 +18,12 @@ import { useSettings } from './useSettings';
 
 export interface ISettingsProps {
   source: ISettingsSource;
+  accessor?: string[];
 }
 
-export const Settings = observer<ISettingsProps>(function Settings({ source }) {
+export const Settings = observer<ISettingsProps>(function Settings({ source, accessor }) {
   const translate = useTranslate();
-  const settings = useSettings();
+  const settings = useSettings(accessor);
 
   const treeData = useTreeData({
     rootId: ROOT_SETTINGS_GROUP.id,

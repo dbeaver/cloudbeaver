@@ -55,6 +55,7 @@ import userProfile from '@cloudbeaver/plugin-user-profile';
 import userProfileAdministration from '@cloudbeaver/plugin-user-profile-administration';
 import version from '@cloudbeaver/plugin-version';
 import versionUpdate from '@cloudbeaver/plugin-version-update-administration';
+import { userProfileSettingsPlugin } from '@cloudbeaver/plugin-user-profile-settings';
 
 import { defaultProductManifest } from './manifest';
 
@@ -112,6 +113,7 @@ const PLUGINS: PluginManifest[] = [
   coreTaskManagerManifest,
   taskManagerPluginManifest,
   settingsAdministrationPlugin,
+  userProfileSettingsPlugin,
   // must be las one to override all
   defaultProductManifest,
 ];

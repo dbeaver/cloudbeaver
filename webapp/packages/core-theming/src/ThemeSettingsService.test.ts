@@ -7,12 +7,9 @@
  */
 import '@testing-library/jest-dom';
 
-import { coreBrowserManifest } from '@cloudbeaver/core-browser';
 import { coreClientActivityManifest } from '@cloudbeaver/core-client-activity';
 import { coreEventsManifest } from '@cloudbeaver/core-events';
 import { coreLocalizationManifest } from '@cloudbeaver/core-localization';
-import { corePluginManifest } from '@cloudbeaver/core-plugin';
-import { coreProductManifest } from '@cloudbeaver/core-product';
 import { coreRootManifest, ServerConfigResource } from '@cloudbeaver/core-root';
 import { createGQLEndpoint } from '@cloudbeaver/core-root/dist/__custom_mocks__/createGQLEndpoint';
 import { mockAppInit } from '@cloudbeaver/core-root/dist/__custom_mocks__/mockAppInit';
@@ -29,12 +26,9 @@ const endpoint = createGQLEndpoint();
 const app = createApp(
   coreThemingManifest,
   coreEventsManifest,
-  corePluginManifest,
-  coreProductManifest,
   coreRootManifest,
   coreSDKManifest,
   coreSettingsManifest,
-  coreBrowserManifest,
   coreLocalizationManifest,
   coreClientActivityManifest,
 );
@@ -49,14 +43,19 @@ const testValueB = 'dark';
 const deprecatedSettings = {
   'core.user': {
     defaultTheme: testValueA,
-  } as IThemeSettings,
+  },
+  core: {
+    theming: {
+      defaultTheme: testValueA,
+    },
+  },
 };
 
 const newSettings = {
   ...deprecatedSettings,
   core: {
     theming: {
-      defaultTheme: testValueB,
+      theme: testValueB,
     } as IThemeSettings,
   },
 };
@@ -69,7 +68,7 @@ test('New Settings override deprecated settings', async () => {
 
   await config.refresh();
 
-  expect(settings.settings.getValue('defaultTheme')).toBe(testValueB);
+  expect(settings.settings.getValue('theme')).toBe(testValueB);
 });
 
 test('Deprecated settings are used if new settings are not defined', async () => {
@@ -80,5 +79,5 @@ test('Deprecated settings are used if new settings are not defined', async () =>
 
   await config.refresh();
 
-  expect(settings.settings.getValue('defaultTheme')).toBe(testValueA);
+  expect(settings.settings.getValue('theme')).toBe(testValueA);
 });

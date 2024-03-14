@@ -9,9 +9,8 @@ import { observer } from 'mobx-react-lite';
 
 import { Combobox, FieldCheckbox, InputField, Textarea, useCustomInputValidation, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { ESettingsValueType, type ISettingDescriptionWithScope, PluginManagerService } from '@cloudbeaver/core-plugin';
-import type { ISettingsSource } from '@cloudbeaver/core-settings';
-import { schemaValidationError } from '@cloudbeaver/core-utils';
+import { ESettingsValueType, type ISettingDescriptionWithScope, type ISettingsSource, SettingsProviderService } from '@cloudbeaver/core-settings';
+import { isNotNullDefined, schemaValidationError } from '@cloudbeaver/core-utils';
 
 interface Props {
   source: ISettingsSource;
@@ -20,16 +19,27 @@ interface Props {
 
 export const Setting = observer<Props>(function Setting({ source, setting }) {
   const translate = useTranslate();
-  const pluginManagerService = useService(PluginManagerService);
-
-  const defaultValue = pluginManagerService.getSettings(setting.scope)?.getDefaultValue(setting.key);
+  const settingsProviderService = useService(SettingsProviderService);
+  const settingProvider = settingsProviderService.getSettings(setting.scope);
 
   const key = `${setting.scope}.${setting.key}`;
-  const value = source.getValue(key) ?? defaultValue ?? '';
+  let value = source.getEditedValue(key);
   const name = translate(setting.name);
   const description = translate(setting.description);
   const disabled = false;
-  const readOnly = false;
+  const readOnly = settingProvider?.isReadOnly(setting.key) ?? false;
+
+  if (readOnly) {
+    value = settingProvider?.getValue(setting.key) ?? '';
+  }
+
+  if (!isNotNullDefined(value)) {
+    const result = setting.schema.safeParse(undefined);
+    value = result.success ? result.data : '';
+  }
+
+  const result = setting.schema.safeParse(value);
+  value = result.success ? result.data : value;
   const customValidation = useCustomInputValidation(value => {
     const result = setting.schema.safeParse(value);
 
