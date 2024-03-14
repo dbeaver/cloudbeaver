@@ -14,7 +14,6 @@ import { getComputed, s, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import { TabContext } from '../TabContext';
 import TabStyles from './Tab.m.css';
 import { TabActions } from './TabActions';
-import TabActionsStyle from './TabActions.m.css';
 import type { TabProps } from './TabProps';
 import { useTab } from './useTab';
 
@@ -25,7 +24,7 @@ export const Tab = observer<TabProps>(function Tab(props) {
   const tabContext = useMemo(() => ({ tabId }), [tabId]);
   const tab = useTab(tabId, onOpen, onClose, onClick);
   const info = tab.getInfo();
-  const styles = useS(TabStyles, TabActionsStyle);
+  const styles = useS(TabStyles);
   const canClose = getComputed(() => !!onClose || (tab.closable && tab.state.closable));
 
   return (
@@ -33,7 +32,7 @@ export const Tab = observer<TabProps>(function Tab(props) {
       <div className={s(styles, { tabOuter: true })}>
         <div className={s(styles, { tabInner: true, tabInnerSelected: tab.selected })}>
           <TabActions
-            className={styles.tabActions}
+            className={s(styles, { tabActions: true })}
             state={tab.state}
             tabId={tabId}
             handleClose={tab.handleClose}

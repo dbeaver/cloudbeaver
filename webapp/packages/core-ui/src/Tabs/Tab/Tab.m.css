@@ -37,6 +37,10 @@
   }
 }
 
+.tabActions:not(:empty) + .tab {
+  padding-right: 14px;
+}
+
 .tabInner {
   composes: theme-typography--body2 tab from global;
   display: grid;
