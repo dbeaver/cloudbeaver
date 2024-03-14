@@ -6,4 +6,5 @@ export default [
   ['plugin_datasource_transaction_manager_commit_fail', 'Не удалось выполнить коммит'],
   ['plugin_datasource_transaction_manager_rollback_fail', 'Не удалось выполнить откат'],
   ['plugin_datasource_transaction_manager_commit_mode_fail', 'Не удалось переключить режим коммита'],
+  ['plugin_datasource_transaction_manager_commit_confirmation_message', 'Вы хотите зафиксировать изменения?'],
 ];

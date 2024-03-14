@@ -5,16 +5,22 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
+import { ConfirmationDialog } from '@cloudbeaver/core-blocks';
 import {
   ConnectionExecutionContext,
   ConnectionExecutionContextResource,
   ConnectionExecutionContextService,
   ConnectionInfoResource,
+  ConnectionsManagerService,
   createConnectionParam,
   IConnectionExecutionContextUpdateTaskInfo,
+  IConnectionExecutorData,
 } from '@cloudbeaver/core-connections';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
+import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
+import { ExecutorInterrupter, type IExecutionContextProvider } from '@cloudbeaver/core-executor';
+import { LocalizationService } from '@cloudbeaver/core-localization';
 import { OptionsPanelService } from '@cloudbeaver/core-ui';
 import { ActionService, MenuService } from '@cloudbeaver/core-view';
 import { ConnectionSchemaManagerService } from '@cloudbeaver/plugin-datasource-context-switch';
@@ -33,13 +39,18 @@ export class TransactionManagerBootstrap extends Bootstrap {
     private readonly connectionExecutionContextService: ConnectionExecutionContextService,
     private readonly connectionExecutionContextResource: ConnectionExecutionContextResource,
     private readonly connectionInfoResource: ConnectionInfoResource,
+    private readonly connectionsManagerService: ConnectionsManagerService,
     private readonly optionsPanelService: OptionsPanelService,
     private readonly notificationService: NotificationService,
+    private readonly commonDialogService: CommonDialogService,
+    private readonly localizationService: LocalizationService,
   ) {
     super();
   }
 
   register() {
+    this.connectionsManagerService.onDisconnect.addHandler(this.disconnectHandler.bind(this));
+
     this.menuService.addCreator({
       menus: [MENU_APP_ACTIONS],
       isApplicable: () => {
@@ -110,13 +121,7 @@ export class TransactionManagerBootstrap extends Bootstrap {
 
         switch (action) {
           case ACTION_DATASOURCE_TRANSACTION_COMMIT: {
-            try {
-              const result = await transaction.commit();
-              this.showTransactionResult(transaction, result);
-            } catch (exception: any) {
-              this.notificationService.logException(exception, 'plugin_datasource_transaction_manager_commit_fail');
-            }
-
+            await this.commit(transaction);
             break;
           }
           case ACTION_DATASOURCE_TRANSACTION_ROLLBACK: {
@@ -163,5 +168,42 @@ export class TransactionManagerBootstrap extends Bootstrap {
     }
 
     return this.connectionExecutionContextService.get(context.id);
+  }
+
+  private async disconnectHandler(data: IConnectionExecutorData, contexts: IExecutionContextProvider<IConnectionExecutorData>) {
+    for (const connection of data.connections) {
+      const context = this.connectionExecutionContextResource.values.find(
+        c => c.connectionId === connection.connectionId && c.projectId === connection.projectId,
+      );
+
+      if (context) {
+        const transaction = this.connectionExecutionContextService.get(context.id);
+
+        if (transaction?.autoCommit === false) {
+          const connectionData = this.connectionInfoResource.get(connection);
+          const state = await this.commonDialogService.open(ConfirmationDialog, {
+            title: `${this.localizationService.translate('plugin_datasource_transaction_manager_commit')} (${connectionData?.name ?? context.id})`,
+            message: 'plugin_datasource_transaction_manager_commit_confirmation_message',
+            confirmActionText: 'plugin_datasource_transaction_manager_commit',
+            extraStatus: 'no',
+          });
+
+          if (state === DialogueStateResult.Resolved) {
+            await this.commit(transaction);
+          } else if (state === DialogueStateResult.Rejected) {
+            ExecutorInterrupter.interrupt(contexts);
+          }
+        }
+      }
+    }
+  }
+
+  private async commit(transaction: ConnectionExecutionContext) {
+    try {
+      const result = await transaction.commit();
+      this.showTransactionResult(transaction, result);
+    } catch (exception: any) {
+      this.notificationService.logException(exception, 'plugin_datasource_transaction_manager_commit_fail');
+    }
   }
 }
