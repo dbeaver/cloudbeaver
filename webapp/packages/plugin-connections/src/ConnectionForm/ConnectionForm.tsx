@@ -108,28 +108,28 @@ export const ConnectionForm = observer<ConnectionFormProps>(function ConnectionF
   return (
     <Form context={form} className={s(styles, { form: true })}>
       <TabsState container={service.tabsContainer} localState={state.partsState} state={state} onCancel={onCancel}>
-        <SContext registry={connectionFormRegistry}>
-          <div className={s(styles, { box: true }, className)}>
-            <div className={s(styles, { connectionTopBar: true })}>
-              <div className={s(styles, { connectionTopBarTabs: true })}>
-                <div className={s(styles, { connectionStatusMessage: true })}>
-                  <StatusMessage type={ENotificationType.Info} message={state.statusMessage} />
-                </div>
+        <div className={s(styles, { box: true }, className)}>
+          <div className={s(styles, { connectionTopBar: true })}>
+            <div className={s(styles, { connectionTopBarTabs: true })}>
+              <div className={s(styles, { connectionStatusMessage: true })}>
+                <StatusMessage type={ENotificationType.Info} message={state.statusMessage} />
+              </div>
+              <SContext registry={connectionFormRegistry}>
                 <TabList className={s(styles, { tabList: true })} disabled={state.disabled} />
-              </div>
-              <div className={s(styles, { connectionTopBarActions: true })}>
-                <Loader suspense inline hideMessage hideException>
-                  <ConnectionFormActionsContext.Provider value={actionsContext}>
-                    <Placeholder container={service.actionsContainer} state={state} onCancel={onCancel} />
-                  </ConnectionFormActionsContext.Provider>
-                </Loader>
-              </div>
+              </SContext>
             </div>
-            <div className={s(styles, { contentBox: true })}>
-              <TabPanelList />
+            <div className={s(styles, { connectionTopBarActions: true })}>
+              <Loader suspense inline hideMessage hideException>
+                <ConnectionFormActionsContext.Provider value={actionsContext}>
+                  <Placeholder container={service.actionsContainer} state={state} onCancel={onCancel} />
+                </ConnectionFormActionsContext.Provider>
+              </Loader>
             </div>
           </div>
-        </SContext>
+          <div className={s(styles, { contentBox: true })}>
+            <TabPanelList />
+          </div>
+        </div>
       </TabsState>
     </Form>
   );

@@ -86,35 +86,35 @@ export const TeamForm = observer<Props>(function TeamForm({ state, onCancel, onS
 
   return (
     <Form className={s(styles, { form: true })} context={form}>
-      <SContext registry={teamFormRegistry}>
-        <TabsState container={service.tabsContainer} localState={state.partsState} state={state} onCancel={onCancel}>
-          <div className={s(styles, { box: true }, className)}>
-            <div className={s(styles, { topBar: true })}>
-              <div className={s(styles, { topBarTabs: true })}>
-                <div className={s(styles, { statusMessage: true })}>
-                  {state.statusMessage && (
-                    <>
-                      <IconOrImage className={s(styles, { iconOrImage: true })} icon="/icons/info_icon.svg" />
-                      {translate(state.statusMessage)}
-                    </>
-                  )}
-                </div>
+      <TabsState container={service.tabsContainer} localState={state.partsState} state={state} onCancel={onCancel}>
+        <div className={s(styles, { box: true }, className)}>
+          <div className={s(styles, { topBar: true })}>
+            <div className={s(styles, { topBarTabs: true })}>
+              <div className={s(styles, { statusMessage: true })}>
+                {state.statusMessage && (
+                  <>
+                    <IconOrImage className={s(styles, { iconOrImage: true })} icon="/icons/info_icon.svg" />
+                    {translate(state.statusMessage)}
+                  </>
+                )}
+              </div>
+              <SContext registry={teamFormRegistry}>
                 <TabList className={s(styles, { tabList: true })} disabled={false} />
-              </div>
-              <div className={s(styles, { topBarActions: true })}>
-                <Loader suspense inline hideMessage hideException>
-                  <TeamFormActionsContext.Provider value={actions}>
-                    <Placeholder container={service.actionsContainer} state={state} onCancel={onCancel} />
-                  </TeamFormActionsContext.Provider>
-                </Loader>
-              </div>
+              </SContext>
             </div>
-            <div className={s(styles, { content: true })}>
-              <TabPanelList />
+            <div className={s(styles, { topBarActions: true })}>
+              <Loader suspense inline hideMessage hideException>
+                <TeamFormActionsContext.Provider value={actions}>
+                  <Placeholder container={service.actionsContainer} state={state} onCancel={onCancel} />
+                </TeamFormActionsContext.Provider>
+              </Loader>
             </div>
           </div>
-        </TabsState>
-      </SContext>
+          <div className={s(styles, { content: true })}>
+            <TabPanelList />
+          </div>
+        </div>
+      </TabsState>
     </Form>
   );
 });

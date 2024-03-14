@@ -14,7 +14,7 @@ import { resourceKeyList } from '@cloudbeaver/core-resource';
 import { Tab, TabIcon, TabTitle } from '@cloudbeaver/core-ui';
 import { useChildren, useNode } from '@cloudbeaver/plugin-navigation-tree';
 
-import navNodeTabStyle from './NavNodeTab.m.css';
+import style from './NavNodeTab.m.css';
 
 interface INavNodeTabProps {
   nodeId: string;
@@ -25,7 +25,7 @@ export const NavNodeTab = observer<INavNodeTabProps>(function NavNodeTab({ nodeI
   const children = useChildren(nodeId);
   const dbObjectResource = useService(DBObjectResource);
   const childrenList = resourceKeyList(children.children || []);
-  const styles = useS(navNodeTabStyle);
+  const styles = useS(style);
 
   const loading = useStateDelay(
     getComputed(

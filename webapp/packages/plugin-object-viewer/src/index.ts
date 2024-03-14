@@ -5,4 +5,3 @@ export * from './ObjectPage/DBObjectPageService';
 export * from './ObjectPage/ObjectPage';
 export * from './ObjectViewerTabService';
 export * from './IObjectViewerTabState';
-export { default as navNodeTabStyle } from './ObjectPropertiesPage/NavNodeTab.m.css';

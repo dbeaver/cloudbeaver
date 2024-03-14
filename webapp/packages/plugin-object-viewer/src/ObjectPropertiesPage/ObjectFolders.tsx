@@ -32,7 +32,7 @@ import type { IObjectViewerTabState } from '../IObjectViewerTabState';
 import { FolderPanelRenderer } from './FolderPanelRenderer';
 import { FolderTabRenderer } from './FolderTabRenderer';
 import NavNodeTabStyle from './NavNodeTab.m.css';
-import navNodeStyles from './shared/ObjectFoldersNavNodeTab.m.css';
+import ObjectFoldersNavNodeTab from './shared/ObjectFoldersNavNodeTab.m.css';
 import ObjectFoldersTab from './shared/ObjectFoldersTab.m.css';
 import ObjectFoldersTabList from './shared/ObjectFoldersTabList.m.css';
 import ObjectFoldersTabPanel from './shared/ObjectFoldersTabPanel.m.css';
@@ -47,7 +47,7 @@ const objectFoldersRegistry: StyleRegistry = [
     NavNodeTabStyle,
     {
       mode: 'append',
-      styles: [navNodeStyles],
+      styles: [ObjectFoldersNavNodeTab],
     },
   ],
   [
@@ -114,24 +114,22 @@ export const ObjectFolders = observer<IProps>(function ObjectFolders({ tab }) {
     }
   });
 
-  return (
-    <SContext registry={objectFoldersRegistry}>
-      {folders.length > 0 ? (
-        <TabsState currentTabId={folderId} orientation="vertical" localState={innerTabState} lazy onChange={openFolder}>
-          <TabList aria-label="Object folders">
-            {folders.map(folderId => (
-              <FolderTabRenderer key={folderId} nodeId={nodeId} folderId={folderId} parents={parents} />
-            ))}
-          </TabList>
+  return folders.length > 0 ? (
+    <TabsState currentTabId={folderId} orientation="vertical" localState={innerTabState} lazy onChange={openFolder}>
+      <SContext registry={objectFoldersRegistry}>
+        <TabList aria-label="Object folders">
           {folders.map(folderId => (
-            <TabPanel key={folderId} tabId={folderId}>
-              <FolderPanelRenderer key={folderId} nodeId={nodeId} folderId={folderId} parents={parents} />
-            </TabPanel>
+            <FolderTabRenderer key={folderId} nodeId={nodeId} folderId={folderId} parents={parents} />
           ))}
-        </TabsState>
-      ) : (
-        <TextPlaceholder>{translate('plugin_object_viewer_table_no_items')}</TextPlaceholder>
-      )}
-    </SContext>
+        </TabList>
+        {folders.map(folderId => (
+          <TabPanel key={folderId} tabId={folderId}>
+            <FolderPanelRenderer key={folderId} nodeId={nodeId} folderId={folderId} parents={parents} />
+          </TabPanel>
+        ))}
+      </SContext>
+    </TabsState>
+  ) : (
+    <TextPlaceholder>{translate('plugin_object_viewer_table_no_items')}</TextPlaceholder>
   );
 });

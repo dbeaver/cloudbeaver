@@ -111,9 +111,9 @@ export const Administration = observer<React.PropsWithChildren<Props>>(function 
             ))}
           </TabList>
         </SContext>
-        <SContext registry={adminPageRegistry}>
-          <div ref={contentRef} className={s(styles, { contentContainer: true })}>
-            {children}
+        <div ref={contentRef} className={s(styles, { contentContainer: true })}>
+          {children}
+          <SContext registry={adminPageRegistry}>
             <SlideBox className={s(styles, { slideBox: true })} open={optionsPanelService.active}>
               <SlideElement className={s(styles, { slideElement: true })}>
                 <Loader className={s(styles, { loader: true })} suspense>
@@ -129,8 +129,8 @@ export const Administration = observer<React.PropsWithChildren<Props>>(function 
                 <SlideOverlay onClick={() => optionsPanelService.close()} />
               </SlideElement>
             </SlideBox>
-          </div>
-        </SContext>
+          </SContext>
+        </div>
       </TabsState>
     </CaptureView>
   );

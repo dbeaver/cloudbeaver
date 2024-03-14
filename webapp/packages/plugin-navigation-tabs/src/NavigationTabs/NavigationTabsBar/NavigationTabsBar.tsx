@@ -16,7 +16,7 @@ import { CaptureView } from '@cloudbeaver/core-view';
 
 import { NavigationTabsService } from '../NavigationTabsService';
 import styles from './shared/NavigationTabsBar.m.css';
-import NavigationTabsBarBaseTab from './shared/NavigationTabsBarBaseTab.m.css';
+import NavigationTabsBarTab from './shared/NavigationTabsBarTab.m.css';
 import { TabHandlerPanel } from './Tabs/TabHandlerPanel';
 import { TabHandlerTab } from './Tabs/TabHandlerTab';
 
@@ -29,7 +29,7 @@ const tabsRegistry: StyleRegistry = [
     TabStyles,
     {
       mode: 'append',
-      styles: [NavigationTabsBarBaseTab],
+      styles: [NavigationTabsBarTab],
     },
   ],
 ];

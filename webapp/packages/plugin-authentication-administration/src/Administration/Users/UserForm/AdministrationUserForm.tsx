@@ -91,32 +91,32 @@ export const AdministrationUserForm = observer<Props>(function AdministrationUse
 
   return (
     <Form context={form} className={s(styles, { submittingForm: true })} disabled={state.isDisabled} focusFirstChild>
-      <SContext registry={userFormRegistry}>
-        <TabsState container={administrationUserFormService.parts} localState={state.parts} formState={state}>
-          <Container compact parent noWrap vertical>
-            <Container className={s(styles, { bar: true })} gap keepSize noWrap>
-              <Container fill>
-                <StatusMessage exception={getFirstException(state.exception)} type={state.statusType} message={state.statusMessage} />
+      <TabsState container={administrationUserFormService.parts} localState={state.parts} formState={state}>
+        <Container compact parent noWrap vertical>
+          <Container className={s(styles, { bar: true })} gap keepSize noWrap>
+            <Container fill>
+              <StatusMessage exception={getFirstException(state.exception)} type={state.statusType} message={state.statusMessage} />
+              <SContext registry={userFormRegistry}>
                 <TabList className={s(styles, { tabList: true })} />
-              </Container>
-              <Container keepSize noWrap center gap compact>
-                {editing && (
-                  <AdministrationUserFormDeleteButton userId={userFormInfoPart.initialState.userId} enabled={userFormInfoPart.initialState.enabled} />
-                )}
-                <Button type="button" disabled={state.isDisabled} mod={['outlined']} onClick={onClose}>
-                  {translate('ui_processing_cancel')}
-                </Button>
-                <Button type="button" disabled={state.isDisabled} mod={['unelevated']} onClick={() => form.submit()}>
-                  {translate(!editing ? 'ui_processing_create' : 'ui_processing_save')}
-                </Button>
-              </Container>
+              </SContext>
             </Container>
-            <Container vertical>
-              <TabPanelList />
+            <Container keepSize noWrap center gap compact>
+              {editing && (
+                <AdministrationUserFormDeleteButton userId={userFormInfoPart.initialState.userId} enabled={userFormInfoPart.initialState.enabled} />
+              )}
+              <Button type="button" disabled={state.isDisabled} mod={['outlined']} onClick={onClose}>
+                {translate('ui_processing_cancel')}
+              </Button>
+              <Button type="button" disabled={state.isDisabled} mod={['unelevated']} onClick={() => form.submit()}>
+                {translate(!editing ? 'ui_processing_create' : 'ui_processing_save')}
+              </Button>
             </Container>
           </Container>
-        </TabsState>
-      </SContext>
+          <Container vertical>
+            <TabPanelList />
+          </Container>
+        </Container>
+      </TabsState>
     </Form>
   );
 });

@@ -62,26 +62,26 @@ export const CreateConnection = observer<Props>(function CreateConnection({ meth
   }
 
   return (
-    <SContext registry={tabsRegistry}>
-      <div className={s(style, { connectionCreate: true })}>
-        <TabsState
-          currentTabId={method}
-          container={createConnectionService.tabsContainer}
-          manual
-          lazy
-          onChange={({ tabId }) => createConnectionService.setCreateMethod(tabId)}
-        >
-          <div className={s(style, { titleBar: true })}>
-            {translate('connections_administration_connection_create')}
-            <Fill />
-            <IconButton name="cross" viewBox="0 0 16 16" onClick={createConnectionService.cancelCreate} />
-          </div>
-          <div className={s(style, { connectionCreateContent: true })}>
+    <div className={s(style, { connectionCreate: true })}>
+      <TabsState
+        currentTabId={method}
+        container={createConnectionService.tabsContainer}
+        manual
+        lazy
+        onChange={({ tabId }) => createConnectionService.setCreateMethod(tabId)}
+      >
+        <div className={s(style, { titleBar: true })}>
+          {translate('connections_administration_connection_create')}
+          <Fill />
+          <IconButton name="cross" viewBox="0 0 16 16" onClick={createConnectionService.cancelCreate} />
+        </div>
+        <div className={s(style, { connectionCreateContent: true })}>
+          <SContext registry={tabsRegistry}>
             <TabPanelList />
-            {createConnectionService.disabled && <Loader overlay />}
-          </div>
-        </TabsState>
-      </div>
-    </SContext>
+          </SContext>
+          {createConnectionService.disabled && <Loader overlay />}
+        </div>
+      </TabsState>
+    </div>
   );
 });
