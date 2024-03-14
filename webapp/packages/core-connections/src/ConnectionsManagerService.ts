@@ -152,7 +152,24 @@ export class ConnectionsManagerService {
     if (!connection.connected) {
       return;
     }
-    await this.connectionInfo.close(createConnectionParam(connection));
+
+    const param = createConnectionParam(connection);
+
+    const contexts = await this.onDisconnect.execute({
+      connections: [param],
+      state: 'before',
+    });
+
+    if (ExecutorInterrupter.isInterrupted(contexts)) {
+      return;
+    }
+
+    await this.connectionInfo.close(param);
+
+    this.onDisconnect.execute({
+      connections: [param],
+      state: 'after',
+    });
   }
 
   async closeAllConnections(): Promise<void> {
@@ -166,6 +183,7 @@ export class ConnectionsManagerService {
       for (const connection of this.projectConnections) {
         await this._closeConnectionAsync(connection);
       }
+
       notification.close();
     } catch (e: any) {
       controller.reject(e);
@@ -179,14 +197,6 @@ export class ConnectionsManagerService {
     if (!connection || !connection.connected) {
       return;
     }
-    const contexts = await this.onDisconnect.execute({
-      connections: [createConnectionParam(connection)],
-      state: 'before',
-    });
-
-    if (ExecutorInterrupter.isInterrupted(contexts)) {
-      return;
-    }
 
     const { controller, notification } = this.notificationService.processNotification(() => ProcessSnackbar, {}, { title: 'Disconnecting...' });
 
@@ -194,10 +204,6 @@ export class ConnectionsManagerService {
       await this._closeConnectionAsync(connection);
 
       notification.close();
-      this.onDisconnect.execute({
-        connections: [createConnectionParam(connection)],
-        state: 'after',
-      });
     } catch (exception: any) {
       controller.reject(exception);
     }
