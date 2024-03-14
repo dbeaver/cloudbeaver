@@ -29,10 +29,10 @@ import { AdministrationCaptureViewContext } from './AdministrationCaptureViewCon
 import { AdministrationViewService } from './AdministrationViewService';
 import { DrawerItem } from './DrawerItem';
 import { ItemContent } from './ItemContent';
-import AdministrationToolbarStyles from './shared/AdministrationToolbarStyles.m.css';
-import AdministrationToolbarStylesTab from './shared/AdministrationToolbarStylesTab.m.css';
-import AdministrationToolbarStylesTabList from './shared/AdministrationToolbarStylesTabList.m.css';
-import AdministrationToolbarToolsPanelStyles from './shared/AdministrationToolbarToolsPanelStyles.m.css';
+import style from './shared/Administration.m.css';
+import AdministrationStylesTab from './shared/AdministrationTab.m.css';
+import AdministrationStylesTabList from './shared/AdministrationTabList.m.css';
+import AdministrationToolsPanelStyles from './shared/AdministrationToolsPanel.m.css';
 
 interface Props {
   configurationWizard: boolean;
@@ -45,14 +45,14 @@ const adminPageRegistry: StyleRegistry = [
     ToolsPanelStyles,
     {
       mode: 'append',
-      styles: [AdministrationToolbarToolsPanelStyles],
+      styles: [AdministrationToolsPanelStyles],
     },
   ],
   [
     ToolsActionStyles,
     {
       mode: 'append',
-      styles: [AdministrationToolbarToolsPanelStyles],
+      styles: [AdministrationToolsPanelStyles],
     },
   ],
 ];
@@ -62,14 +62,14 @@ const tabsRegistry: StyleRegistry = [
     TabStyles,
     {
       mode: 'append',
-      styles: [TabVertical, AdministrationToolbarStylesTab],
+      styles: [TabVertical, AdministrationStylesTab],
     },
   ],
   [
     TabListStyles,
     {
       mode: 'append',
-      styles: [TabListVertical, AdministrationToolbarStylesTabList],
+      styles: [TabListVertical, AdministrationStylesTabList],
     },
   ],
 ];
@@ -80,7 +80,7 @@ export const Administration = observer<React.PropsWithChildren<Props>>(function 
   onItemSelect,
   children,
 }) {
-  const styles = useS(AdministrationToolbarStyles);
+  const styles = useS(style);
   const contentRef = useRef<HTMLDivElement>(null);
   const administrationViewService = useService(AdministrationViewService);
   const administrationItemService = useService(AdministrationItemService);
