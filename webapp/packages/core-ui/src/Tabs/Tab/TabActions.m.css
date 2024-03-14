@@ -51,11 +51,3 @@
 .icon {
   display: block;
 }
-
-.portal {
-  visibility: hidden;
-}
-
-.portalMenuOpened {
-  visibility: visible;
-}

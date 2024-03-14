@@ -10,12 +10,8 @@ import { useMemo, useRef } from 'react';
 import { Tab as BaseTab } from 'reakit/Tab';
 
 import { getComputed, s, useS, useTranslate } from '@cloudbeaver/core-blocks';
-import { useMenu } from '@cloudbeaver/core-view';
 
 import { TabContext } from '../TabContext';
-import { DATA_CONTEXT_TAB_ID } from './DATA_CONTEXT_TAB_ID';
-import { DATA_CONTEXT_TABS_CONTEXT } from './DATA_CONTEXT_TABS_CONTEXT';
-import { MENU_TAB } from './MENU_TAB';
 import style from './Tab.m.css';
 import { TabActions } from './TabActions';
 import type { TabProps } from './TabProps';
@@ -30,14 +26,6 @@ export const Tab = observer<TabProps>(function Tab(props) {
   const info = tab.getInfo();
   const styles = useS(style);
   const canClose = getComputed(() => !!onClose || (tab.closable && tab.state.closable));
-
-  const menu = useMenu({
-    menu: MENU_TAB,
-    context: props.menuContext,
-  });
-
-  menu.context.set(DATA_CONTEXT_TABS_CONTEXT, tab.state);
-  menu.context.set(DATA_CONTEXT_TAB_ID, tabId);
 
   return (
     <TabContext.Provider value={tabContext}>

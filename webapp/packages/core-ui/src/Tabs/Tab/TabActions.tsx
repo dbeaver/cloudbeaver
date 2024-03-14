@@ -6,25 +6,14 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import { useState } from 'react';
 
-import { getComputed, Icon, s, useS, useTranslate } from '@cloudbeaver/core-blocks';
+import { Icon, s, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import type { IDataContext } from '@cloudbeaver/core-data-context';
-import { useMenu } from '@cloudbeaver/core-view';
 
-import { ContextMenu } from '../../ContextMenu/ContextMenu';
 import type { ITabsContext } from '../TabsContext';
-import { DATA_CONTEXT_TAB_ID } from './DATA_CONTEXT_TAB_ID';
-import { DATA_CONTEXT_TABS_CONTEXT } from './DATA_CONTEXT_TABS_CONTEXT';
-import { MENU_TAB } from './MENU_TAB';
 import TabStyle from './Tab.m.css';
 import style from './TabActions.m.css';
-
-interface TabMenuProps {
-  tabId: string;
-  state: ITabsContext<any>;
-  menuContext?: IDataContext;
-}
+import { TabMenu } from './TabMenu';
 
 interface TabActionsProps {
   tabId: string;
@@ -37,45 +26,33 @@ interface TabActionsProps {
 
 export const TabActions = observer(function TabActions({ tabId, canClose, state, className, menuContext, handleClose }: TabActionsProps) {
   const styles = useS(TabStyle, style);
-  const translate = useTranslate();
 
   return (
     <div className={s(styles, { tabActions: true }, className)}>
-      {canClose && (
-        <div className={s(styles, { tabAction: true })} title={translate('ui_close')} onClick={handleClose}>
-          <Icon className={s(styles, { icon: true })} name="cross-bold" viewBox="0 0 7 8" />
+      {canClose && <TabAction iconName="cross-bold" title="ui_close" onClick={handleClose} />}
+      <TabMenu tabId={tabId} state={state} menuContext={menuContext}>
+        {/* TODO use TabAction but resolve ContextMenu issue first */}
+        <div className={s(styles, { tabAction: true })}>
+          <Icon className={s(styles, { icon: true })} name="dots" viewBox="0 0 32 32" />
         </div>
-      )}
-      <TabMenu tabId={tabId} state={state} menuContext={menuContext} />
+      </TabMenu>
     </div>
   );
 });
 
-const TabMenu = observer<TabMenuProps>(function TabMenu({ tabId, state, menuContext }) {
+interface TabActionProps {
+  iconName: string;
+  title?: string;
+  onClick?: React.MouseEventHandler<HTMLDivElement>;
+}
+
+const TabAction = observer(function TabAction({ iconName, title, onClick }: TabActionProps) {
   const styles = useS(TabStyle, style);
-
-  const [menuOpened, switchState] = useState(false);
-  const menu = useMenu({
-    menu: MENU_TAB,
-    context: menuContext,
-  });
-
-  menu.context.set(DATA_CONTEXT_TABS_CONTEXT, state);
-  menu.context.set(DATA_CONTEXT_TAB_ID, tabId);
-
-  const hidden = getComputed(() => !menu.items.length || menu.items.every(item => item.hidden));
-
-  if (hidden) {
-    return null;
-  }
+  const translate = useTranslate();
 
   return (
-    <div className={s(styles, { portal: true, portalMenuOpened: menuOpened })}>
-      <ContextMenu menu={menu} placement="bottom-start" modal disclosure onVisibleSwitch={switchState}>
-        <div className={s(styles, { tabAction: true })}>
-          <Icon className={s(styles, { icon: true })} name="dots" viewBox="0 0 32 32" />
-        </div>
-      </ContextMenu>
+    <div className={s(styles, { tabAction: true })} title={translate(title)} onClick={onClick}>
+      <Icon className={s(styles, { icon: true })} name={iconName} viewBox="0 0 7 8" />
     </div>
   );
 });

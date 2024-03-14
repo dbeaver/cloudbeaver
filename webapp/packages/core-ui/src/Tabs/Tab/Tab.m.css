@@ -48,7 +48,6 @@
 }
 
 .tabInnerSelected .portal,
-.tabInner .portalMenuOpened,
 .tabInner:hover .portal,
 .tabInner:focus-within .portal,
 .tabInnerSelected .tabAction,
