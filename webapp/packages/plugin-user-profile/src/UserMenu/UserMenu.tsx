@@ -31,7 +31,7 @@ export const UserMenu = observer(function UserMenu() {
   return (
     <Loader suspense inline>
       <UserInfo info={authInfoService.userInfo} />
-      <ContextMenu className={s(styles, { contextMenu: true })} menu={menu} rtl modal>
+      <ContextMenu className={s(styles, { contextMenu: true })} menu={menu} modal>
         <Icon className={s(styles, { icon: true })} name="angle" viewBox="0 0 15 8" />
       </ContextMenu>
     </Loader>
