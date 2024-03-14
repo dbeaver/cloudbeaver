@@ -601,12 +601,19 @@ public class WebSQLProcessor implements WebSessionProvider {
 
                     Object[] rowValues = new Object[updateAttributes.length + keyAttributes.length];
                     // put key values first in case of updating them
+                    DBDDocument document = null;
                     for (int i = 0; i < keyAttributes.length; i++) {
                         DBDAttributeBinding keyAttribute = keyAttributes[i];
                         boolean isDocumentValue = keyAttributes.length == 1 && keyAttribute.getDataKind() == DBPDataKind.DOCUMENT && dataContainer instanceof DBSDocumentLocator;
                         if (isDocumentValue) {
-                            rowValues[updateAttributes.length + i] =
-                                makeDocumentInputValue(session, (DBSDocumentLocator) dataContainer, resultsInfo, row, metaData);
+                            document = makeDocumentInputValue(
+                                session,
+                                (DBSDocumentLocator) dataContainer,
+                                resultsInfo,
+                                row,
+                                metaData
+                            );
+                            rowValues[updateAttributes.length + i] = document;
                         } else {
                             rowValues[updateAttributes.length + i] = keyAttribute.getValueHandler().getValueFromObject(
                                 session,
@@ -626,6 +633,9 @@ public class WebSQLProcessor implements WebSessionProvider {
                         DBDAttributeBinding updateAttribute = updateAttributes[i];
                         Object value = updateValues.get(String.valueOf(updateAttribute.getOrdinalPosition()));
                         Object realCellValue = setCellRowValue(value, webSession, session, updateAttribute, withoutExecution);
+                        if (document instanceof DBDComposite compositeDoc) {
+                            compositeDoc.setAttributeValue(updateAttribute, realCellValue);
+                        }
                         rowValues[i] = realCellValue;
                         finalRow[updateAttribute.getOrdinalPosition()] = realCellValue;
                     }
