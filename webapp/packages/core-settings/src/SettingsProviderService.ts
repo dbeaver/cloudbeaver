@@ -6,33 +6,39 @@
  * you may not use this file except in compliance with the License.
  */
 import { injectable } from '@cloudbeaver/core-di';
-import { ProductSettingsService } from '@cloudbeaver/core-product';
-import type { SettingsScopeType } from '@cloudbeaver/core-settings';
 import type { schema } from '@cloudbeaver/core-utils';
 
-import { PluginSettings } from './PluginSettings';
+import { SettingsProvider } from './SettingsProvider';
+import { SettingsResolverService } from './SettingsResolverService';
+import type { SettingsScopeType } from './SettingsScopeType';
 
 @injectable()
-export class PluginManagerService {
-  readonly store: Map<string, PluginSettings>;
-  constructor(private readonly productSettingsService: ProductSettingsService) {
+export class SettingsProviderService {
+  readonly store: Map<string, SettingsProvider>;
+  constructor(private readonly settingsResolverService: SettingsResolverService) {
     this.store = new Map();
   }
 
-  createSettings<TSchema extends schema.SomeZodObject = schema.AnyZodObject>(scope: string, scopeType: SettingsScopeType, schema: TSchema) {
-    const key = scopeType + '.' + scope;
-    const settings = new PluginSettings(this.productSettingsService, key, schema);
+  createSettings<TSchema extends schema.SomeZodObject = schema.AnyZodObject>(schema: TSchema, scopeType: SettingsScopeType, scope?: string) {
+    const id = getSettingKey(scopeType, scope);
 
-    this.store.set(key, settings);
+    if (this.store.has(id)) {
+      throw new Error('Settings already exists');
+    }
+
+    const settings = new SettingsProvider(this.settingsResolverService, id, schema);
+
+    this.store.set(id, settings);
     return settings;
   }
 
-  getSettings(id: string): PluginSettings<any> | undefined;
-  getSettings(scope: string, scopeType: SettingsScopeType): PluginSettings<any> | undefined;
-  getSettings(scope: string, scopeType?: SettingsScopeType): PluginSettings<any> | undefined {
-    if (scopeType === undefined) {
-      return this.store.get(scope);
-    }
-    return this.store.get(scopeType + '.' + scope);
+  getSettings(id: string): SettingsProvider<any> | undefined;
+  getSettings(scopeType: SettingsScopeType, scope: string): SettingsProvider<any> | undefined;
+  getSettings(scopeType: SettingsScopeType | string, scope?: string): SettingsProvider<any> | undefined {
+    return this.store.get(getSettingKey(scopeType, scope));
   }
+}
+
+export function getSettingKey(scopeType: SettingsScopeType, scope?: string, key?: string) {
+  return [scopeType, scope, key].filter(Boolean).join('.');
 }
