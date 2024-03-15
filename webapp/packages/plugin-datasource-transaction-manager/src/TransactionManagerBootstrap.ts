@@ -22,6 +22,7 @@ import { NotificationService } from '@cloudbeaver/core-events';
 import { ExecutorInterrupter, type IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import { LocalizationService } from '@cloudbeaver/core-localization';
 import { OptionsPanelService } from '@cloudbeaver/core-ui';
+import { isNotNullDefined } from '@cloudbeaver/core-utils';
 import { ActionService, MenuService } from '@cloudbeaver/core-view';
 import { ConnectionSchemaManagerService } from '@cloudbeaver/plugin-datasource-context-switch';
 import { MENU_APP_ACTIONS } from '@cloudbeaver/plugin-top-app-bar';
@@ -59,8 +60,8 @@ export class TransactionManagerBootstrap extends Bootstrap {
         return (
           !this.optionsPanelService.active &&
           this.connectionSchemaManagerService.currentConnection?.connected === true &&
-          transaction?.context !== undefined &&
-          transaction.autoCommit !== undefined
+          !!transaction?.context &&
+          isNotNullDefined(transaction.autoCommit)
         );
       },
       getItems: (_, items) => [
