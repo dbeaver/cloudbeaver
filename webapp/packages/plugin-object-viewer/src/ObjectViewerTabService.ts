@@ -18,6 +18,7 @@ import {
   createConnectionParam,
   executionContextProvider,
   IConnectionInfoParams,
+  isConnectionInfoParamEqual,
   objectCatalogProvider,
   objectSchemaProvider,
 } from '@cloudbeaver/core-connections';
@@ -340,9 +341,7 @@ export class ObjectViewerTabService {
       return;
     }
 
-    return this.connectionExecutionContextResource.values.find(
-      c => c.connectionId === connectionKey.connectionId && c.projectId === connectionKey.projectId,
-    );
+    return this.connectionExecutionContextResource.values.find(connection => isConnectionInfoParamEqual(connection, connectionKey));
   }
 
   private selectObjectTab(tab: ITab<IObjectViewerTabState>) {

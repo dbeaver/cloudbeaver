@@ -15,6 +15,7 @@ import {
   createConnectionParam,
   IConnectionExecutionContextUpdateTaskInfo,
   IConnectionExecutorData,
+  isConnectionInfoParamEqual,
 } from '@cloudbeaver/core-connections';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
@@ -172,39 +173,40 @@ export class TransactionManagerBootstrap extends Bootstrap {
   }
 
   private async disconnectHandler(data: IConnectionExecutorData, contexts: IExecutionContextProvider<IConnectionExecutorData>) {
-    for (const connection of data.connections) {
-      const context = this.connectionExecutionContextResource.values.find(
-        c => c.connectionId === connection.connectionId && c.projectId === connection.projectId,
-      );
+    if (data.state === 'before') {
+      for (const connectionKey of data.connections) {
+        const context = this.connectionExecutionContextResource.values.find(connection => isConnectionInfoParamEqual(connection, connectionKey));
 
-      if (context) {
-        const transaction = this.connectionExecutionContextService.get(context.id);
+        if (context) {
+          const transaction = this.connectionExecutionContextService.get(context.id);
 
-        if (transaction?.autoCommit === false) {
-          const connectionData = this.connectionInfoResource.get(connection);
-          const state = await this.commonDialogService.open(ConfirmationDialog, {
-            title: `${this.localizationService.translate('plugin_datasource_transaction_manager_commit')} (${connectionData?.name ?? context.id})`,
-            message: 'plugin_datasource_transaction_manager_commit_confirmation_message',
-            confirmActionText: 'plugin_datasource_transaction_manager_commit',
-            extraStatus: 'no',
-          });
+          if (transaction?.autoCommit === false) {
+            const connectionData = this.connectionInfoResource.get(connectionKey);
+            const state = await this.commonDialogService.open(ConfirmationDialog, {
+              title: `${this.localizationService.translate('plugin_datasource_transaction_manager_commit')} (${connectionData?.name ?? context.id})`,
+              message: 'plugin_datasource_transaction_manager_commit_confirmation_message',
+              confirmActionText: 'plugin_datasource_transaction_manager_commit',
+              extraStatus: 'no',
+            });
 
-          if (state === DialogueStateResult.Resolved) {
-            await this.commit(transaction);
-          } else if (state === DialogueStateResult.Rejected) {
-            ExecutorInterrupter.interrupt(contexts);
+            if (state === DialogueStateResult.Resolved) {
+              await this.commit(transaction, () => ExecutorInterrupter.interrupt(contexts));
+            } else if (state === DialogueStateResult.Rejected) {
+              ExecutorInterrupter.interrupt(contexts);
+            }
           }
         }
       }
     }
   }
 
-  private async commit(transaction: ConnectionExecutionContext) {
+  private async commit(transaction: ConnectionExecutionContext, onError?: (exception: any) => void) {
     try {
       const result = await transaction.commit();
       this.showTransactionResult(transaction, result);
     } catch (exception: any) {
       this.notificationService.logException(exception, 'plugin_datasource_transaction_manager_commit_fail');
+      onError?.(exception);
     }
   }
 }
