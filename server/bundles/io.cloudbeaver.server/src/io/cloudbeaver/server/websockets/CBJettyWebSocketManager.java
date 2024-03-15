@@ -60,9 +60,6 @@ public class CBJettyWebSocketManager implements JettyWebSocketCreator {
             return createNewEventsWebSocket(webSession);
         }
         // possible desktop client session
-        if (!DBWorkbench.isDistributed()) {
-            return null;
-        }
         try {
             var headlessSession = createHeadlessSession(httpRequest);
             if (headlessSession == null) {
