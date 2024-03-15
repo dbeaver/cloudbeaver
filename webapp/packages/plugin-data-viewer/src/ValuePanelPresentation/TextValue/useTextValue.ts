@@ -123,20 +123,18 @@ export function useTextValue({ model, dataFormat, resultIndex, currentContentTyp
     const cachedFullText = contentAction.retrieveFullTextFromCache(elementKey);
 
     if (isBinary && isResultSetContentValue(contentValue)) {
-      if (!contentValue.binary) {
-        if (contentValue.text) {
-          value = contentValue.text;
-        }
-      } else {
-        value = contentValue.binary;
+      if (contentValue.binary) {
+        value = atob(contentValue.binary);
+      } else if (contentValue.text) {
+        value = contentValue.text;
       }
     } else if (isResultSetBlobValue(contentValue)) {
-      value = parsedBlobValueGetter() ?? '';
+      value = atob(parsedBlobValueGetter() ?? '');
     } else {
       value = cachedFullText || formatAction.getText(elementKey);
     }
 
-    if (!editAction.isElementEdited(elementKey)) {
+    if (!editAction.isElementEdited(elementKey) || isBinary) {
       value = formatText(contentType!, value);
     }
 

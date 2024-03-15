@@ -5,7 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { base64ToHex } from '@cloudbeaver/core-utils';
+import { textToHex } from '@cloudbeaver/core-utils';
 
 export function formatText(type: string, value: string) {
   try {
@@ -15,12 +15,11 @@ export function formatText(type: string, value: string) {
       case 'text/xml':
       case 'text/html':
         return value;
-      case 'application/octet-stream;type=base64':
-        return value;
       case 'application/octet-stream;type=hex':
-        return base64ToHex(value);
+        return textToHex(value);
+      case 'application/octet-stream;type=base64':
       case 'application/octet-stream':
-        return value;
+        return btoa(value);
       default:
         return value;
     }
