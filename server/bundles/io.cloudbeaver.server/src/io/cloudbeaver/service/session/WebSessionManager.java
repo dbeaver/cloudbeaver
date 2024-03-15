@@ -332,7 +332,13 @@ public class WebSessionManager {
                 })
                 .forEach(session -> {
                     try {
-                        session.addSessionEvent(new WSSessionStateEvent(session.getRemainingTime(), session.isValid()));
+                        session.addSessionEvent(new WSSessionStateEvent(
+                            session.getLastAccessTimeMillis(),
+                            session.getRemainingTime(),
+                            session.isValid(),
+                            ((WebSession) session).isCacheExpired(),
+                            ((WebSession) session).getLocale(),
+                            ((WebSession) session).getActionParameters()));
                     } catch (Exception e) {
                         log.error("Failed to refresh session state: " + session.getSessionId(), e);
                     }
