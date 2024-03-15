@@ -74,7 +74,7 @@ import java.util.*;
 /**
  * This class controls all aspects of the application's execution
  */
-public abstract class CBApplication extends BaseWebApplication implements WebAuthApplication {
+public abstract class CBApplication<T extends CBServerConfig> extends BaseWebApplication implements WebAuthApplication {
 
     private static final Log log = Log.getLog(CBApplication.class);
 
@@ -166,7 +166,7 @@ public abstract class CBApplication extends BaseWebApplication implements WebAut
         return getServerConfigurationController().getAppConfiguration();
     }
 
-    public CBServerConfig getServerConfiguration() {
+    public T getServerConfiguration() {
         return getServerConfigurationController().getServerConfiguration();
     }
 
@@ -740,7 +740,7 @@ public abstract class CBApplication extends BaseWebApplication implements WebAut
     }
 
     @Override
-    public abstract CBServerConfigurationController getServerConfigurationController();
+    public abstract CBServerConfigurationController<T> getServerConfigurationController();
 
     private void refreshDisabledDriversConfig() {
         CBAppConfig config = getAppConfiguration();

@@ -40,6 +40,8 @@ import org.jkiss.dbeaver.utils.SystemVariablesResolver;
 import org.jkiss.utils.CommonUtils;
 
 import java.io.*;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -47,17 +49,21 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public abstract class CBServerConfigurationController extends BaseServerConfigurationController {
+public abstract class CBServerConfigurationController<T extends CBServerConfig> extends BaseServerConfigurationController<T> {
 
     private static final Log log = Log.getLog(CBServerConfigurationController.class);
 
     // Configurations
-    private final CBServerConfig serverConfiguration = new CBServerConfig();
     protected final Map<String, Object> productConfiguration = new HashMap<>();
     protected final SMControllerConfiguration securityManagerConfiguration = new SMControllerConfiguration();
+    private final T serverConfiguration;
     private final CBAppConfig appConfiguration = new CBAppConfig();
     private Map<String, String> externalProperties = new LinkedHashMap<>();
     private Map<String, Object> originalConfigurationProperties = new LinkedHashMap<>();
+
+    protected CBServerConfigurationController(T serverConfiguration) {
+        this.serverConfiguration = serverConfiguration;
+    }
 
     public String getAuthServiceURL() {
         return Stream.of(serverConfiguration.getServerURL(),
@@ -115,9 +121,14 @@ public abstract class CBServerConfigurationController extends BaseServerConfigur
         readExternalProperties(serverConfig);
         patchConfigurationWithProperties(configProps); // patch again because properties can be changed
 
-        getServerConfiguration().parseConfiguration(serverConfig);
-
         Gson gson = getGson();
+        gson.fromJson(
+            gson.toJsonTree(serverConfig),
+            getServerConfiguration().getClass()
+        );
+
+        parseServerConfiguration();
+
         //SM config
         gson.fromJson(
             gson.toJsonTree(JSONUtils.getObject(serverConfig, CBConstants.PARAM_SM_CONFIGURATION)),
@@ -130,6 +141,38 @@ public abstract class CBServerConfigurationController extends BaseServerConfigur
 
         readProductConfiguration(serverConfig, gson);
 
+    }
+
+    @Override
+    public T parseServerConfiguration() {
+        var config = getServerConfiguration();
+        if (config.getServerURL() == null) {
+            String hostName = config.getServerHost();
+            if (CommonUtils.isEmpty(hostName)) {
+                try {
+                    hostName = InetAddress.getLocalHost().getHostName();
+                } catch (UnknownHostException e) {
+                    log.debug("Error resolving localhost address: " + e.getMessage());
+                    hostName = CBApplication.HOST_LOCALHOST;
+                }
+            }
+            config.setServerURL("http://" + hostName + ":" + config.getServerPort());
+        }
+        var homeDirectory = CBApplication.getInstance().getHomeDirectory().toString();
+        config.setContentRoot(WebAppUtils.getRelativePath(config.getContentRoot(), homeDirectory));
+        config.setRootURI(readRootUri(config.getRootURI()));
+        config.setDriversLocation(WebAppUtils.getRelativePath(config.getDriversLocation(), homeDirectory));
+        config.setWorkspaceLocation(WebAppUtils.getRelativePath(config.getWorkspaceLocation(), homeDirectory));
+
+        String staticContentsFile = config.getStaticContent();
+        if (!CommonUtils.isEmpty(staticContentsFile)) {
+            try {
+                config.setStaticContent(Files.readString(Path.of(staticContentsFile)));
+            } catch (IOException e) {
+                log.error("Error reading static contents from " + staticContentsFile, e);
+            }
+        }
+        return config;
     }
 
     protected void validateConfiguration(Map<String, Object> appConfig) throws DBException {
@@ -250,10 +293,12 @@ public abstract class CBServerConfigurationController extends BaseServerConfigur
         InstanceCreator<CBAppConfig> appConfigCreator = type -> appConfiguration;
         InstanceCreator<DataSourceNavigatorSettings> navSettingsCreator = type -> (DataSourceNavigatorSettings) appConfiguration.getDefaultNavigatorSettings();
         InstanceCreator<SMControllerConfiguration> smConfigCreator = type -> securityManagerConfiguration;
+        InstanceCreator<T> serverConfigCreator = type -> serverConfiguration;
         InstanceCreator<PasswordPolicyConfiguration> smPasswordPoliceConfigCreator =
             type -> securityManagerConfiguration.getPasswordPolicyConfiguration();
         return new GsonBuilder()
             .setLenient()
+            .registerTypeAdapter(getServerConfiguration().getClass(), serverConfigCreator)
             .registerTypeAdapter(CBAppConfig.class, appConfigCreator)
             .registerTypeAdapter(DataSourceNavigatorSettings.class, navSettingsCreator)
             .registerTypeAdapter(SMControllerConfiguration.class, smConfigCreator)
@@ -518,7 +563,7 @@ public abstract class CBServerConfigurationController extends BaseServerConfigur
         this.productConfiguration.putAll(WebAppUtils.flattenMap(mergedConfig));
     }
 
-    public CBServerConfig getServerConfiguration() {
+    public T getServerConfiguration() {
         return serverConfiguration;
     }
 
@@ -532,5 +577,16 @@ public abstract class CBServerConfigurationController extends BaseServerConfigur
 
     public SMControllerConfiguration getSecurityManagerConfiguration() {
         return securityManagerConfiguration;
+    }
+
+    private String readRootUri(String uri) {
+        //slashes are needed to correctly display static resources on ui
+        if (!uri.endsWith("/")) {
+            uri = uri + '/';
+        }
+        if (!uri.startsWith("/")) {
+            uri = '/' + uri;
+        }
+        return uri;
     }
 }

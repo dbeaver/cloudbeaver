@@ -35,20 +35,12 @@ import java.nio.charset.StandardCharsets;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-public class CBServerConfigurationControllerEmbedded extends CBServerConfigurationController {
+public class CBServerConfigurationControllerEmbedded<T extends CBServerConfig> extends CBServerConfigurationController<T> {
 
     private static final Log log = Log.getLog(CBServerConfigurationControllerEmbedded.class);
 
-    @Override
-    protected void parseConfiguration(Map<String, Object> configProps) throws DBException {
-        super.parseConfiguration(configProps);
-        Gson gson = getGson();
-        Map<String, Object> serverConfig = JSONUtils.getObject(configProps, "server");
-        //DB config
-        gson.fromJson(
-            gson.toJsonTree(JSONUtils.getObject(serverConfig, CBConstants.PARAM_DB_CONFIGURATION)),
-            WebDatabaseConfig.class
-        );
+    public CBServerConfigurationControllerEmbedded(T serverConfig) {
+        super(serverConfig);
     }
 
     @Override

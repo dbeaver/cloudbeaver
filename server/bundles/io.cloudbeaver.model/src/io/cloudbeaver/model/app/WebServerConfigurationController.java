@@ -20,8 +20,9 @@ import org.jkiss.dbeaver.DBException;
 
 import java.nio.file.Path;
 
-public interface WebServerConfigurationController {
+public interface WebServerConfigurationController<T extends WebServerConfiguration> {
 
     void loadServerConfiguration(Path configPath) throws DBException;
+    T parseServerConfiguration() throws DBException;
 
 }

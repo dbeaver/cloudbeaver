@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2023 DBeaver Corp and others
+ * Copyright (C) 2010-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,19 +16,15 @@
  */
 package io.cloudbeaver.server;
 
+import com.google.gson.annotations.SerializedName;
 import io.cloudbeaver.auth.CBAuthConstants;
 import io.cloudbeaver.model.app.WebServerConfiguration;
 import io.cloudbeaver.service.security.db.WebDatabaseConfig;
-import io.cloudbeaver.utils.WebAppUtils;
 import org.jkiss.dbeaver.Log;
-import org.jkiss.dbeaver.model.data.json.JSONUtils;
 import org.jkiss.utils.CommonUtils;
 
-import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.Map;
 
 public class CBServerConfig implements WebServerConfiguration {
@@ -42,14 +38,16 @@ public class CBServerConfig implements WebServerConfiguration {
     private String sslConfigurationPath = null;
     private String contentRoot = CBConstants.DEFAULT_CONTENT_ROOT;
     private String rootURI = CBConstants.DEFAULT_ROOT_URI;
-    private String servicesURI = CBConstants.DEFAULT_SERVICES_URI;
+    private String serviceURI = CBConstants.DEFAULT_SERVICES_URI;
 
     private String workspaceLocation = CBConstants.DEFAULT_WORKSPACE_LOCATION;
     private String driversLocation = CBConstants.DEFAULT_DRIVERS_LOCATION;
+    @SerializedName("expireSessionAfterPeriod")
     private long maxSessionIdleTime = CBAuthConstants.MAX_SESSION_IDLE_TIME;
     private boolean develMode = false;
     private boolean enableSecurityManager = false;
 
+    @SerializedName("database")
     private WebDatabaseConfig databaseConfiguration = new WebDatabaseConfig();
     private String staticContent = "";
 
@@ -94,7 +92,7 @@ public class CBServerConfig implements WebServerConfiguration {
     }
 
     public String getServicesURI() {
-        return servicesURI;
+        return serviceURI;
     }
 
     public String getWorkspaceLocation() {
@@ -113,65 +111,64 @@ public class CBServerConfig implements WebServerConfiguration {
         return staticContent;
     }
 
-    protected void parseConfiguration(Map<String, Object> serverConfig) {
-        serverPort = JSONUtils.getInteger(serverConfig, CBConstants.PARAM_SERVER_PORT, serverPort);
-        serverHost = JSONUtils.getString(serverConfig, CBConstants.PARAM_SERVER_HOST, serverHost);
-        if (serverConfig.containsKey(CBConstants.PARAM_SERVER_URL)) {
-            serverURL = JSONUtils.getString(serverConfig, CBConstants.PARAM_SERVER_URL, serverURL);
-        } else if (serverURL == null) {
-            String hostName = serverHost;
-            if (CommonUtils.isEmpty(hostName)) {
-                try {
-                    hostName = InetAddress.getLocalHost().getHostName();
-                } catch (UnknownHostException e) {
-                    log.debug("Error resolving localhost address: " + e.getMessage());
-                    hostName = CBApplication.HOST_LOCALHOST;
-                }
-            }
-            serverURL = "http://" + hostName + ":" + serverPort;
-        }
-
-        serverName = JSONUtils.getString(serverConfig, CBConstants.PARAM_SERVER_NAME, serverName);
-        sslConfigurationPath = JSONUtils.getString(serverConfig, CBConstants.PARAM_SSL_CONFIGURATION_PATH, sslConfigurationPath);
-        var homeDirectory = CBApplication.getInstance().getHomeDirectory().toString();
-        contentRoot = WebAppUtils.getRelativePath(
-            JSONUtils.getString(serverConfig, CBConstants.PARAM_CONTENT_ROOT, contentRoot), homeDirectory);
-        rootURI = readRootUri(serverConfig);
-        servicesURI = JSONUtils.getString(serverConfig, CBConstants.PARAM_SERVICES_URI, servicesURI);
-        driversLocation = WebAppUtils.getRelativePath(
-            JSONUtils.getString(serverConfig, CBConstants.PARAM_DRIVERS_LOCATION, driversLocation), homeDirectory);
-        workspaceLocation = WebAppUtils.getRelativePath(
-            JSONUtils.getString(serverConfig, CBConstants.PARAM_WORKSPACE_LOCATION, workspaceLocation), homeDirectory);
-
-        maxSessionIdleTime = JSONUtils.getLong(serverConfig,
-            CBConstants.PARAM_SESSION_EXPIRE_PERIOD,
-            maxSessionIdleTime);
-
-        develMode = JSONUtils.getBoolean(serverConfig, CBConstants.PARAM_DEVEL_MODE, develMode);
-        enableSecurityManager = JSONUtils.getBoolean(serverConfig,
-            CBConstants.PARAM_SECURITY_MANAGER,
-            enableSecurityManager);
-
-        String staticContentsFile = JSONUtils.getString(serverConfig, CBConstants.PARAM_STATIC_CONTENT);
-        if (!CommonUtils.isEmpty(staticContentsFile)) {
-            try {
-                staticContent = Files.readString(Path.of(staticContentsFile));
-            } catch (IOException e) {
-                log.error("Error reading static contents from " + staticContentsFile, e);
-            }
-        }
+    public void setServerURL(String serverURL) {
+        this.serverURL = serverURL;
     }
 
-    private String readRootUri(Map<String, Object> serverConfig) {
-        String uri = JSONUtils.getString(serverConfig, CBConstants.PARAM_ROOT_URI, rootURI);
-        //slashes are needed to correctly display static resources on ui
-        if (!uri.endsWith("/")) {
-            uri = uri + '/';
-        }
-        if (!uri.startsWith("/")) {
-            uri = '/' + uri;
-        }
-        return uri;
+    public void setServerPort(int serverPort) {
+        this.serverPort = serverPort;
+    }
+
+    public void setServerHost(String serverHost) {
+        this.serverHost = serverHost;
+    }
+
+    public void setServerName(String serverName) {
+        this.serverName = serverName;
+    }
+
+    public void setSslConfigurationPath(String sslConfigurationPath) {
+        this.sslConfigurationPath = sslConfigurationPath;
+    }
+
+    public void setContentRoot(String contentRoot) {
+        this.contentRoot = contentRoot;
+    }
+
+    public void setRootURI(String rootURI) {
+        this.rootURI = rootURI;
+    }
+
+    public void setServicesURI(String servicesURI) {
+        this.serviceURI = servicesURI;
+    }
+
+    public void setWorkspaceLocation(String workspaceLocation) {
+        this.workspaceLocation = workspaceLocation;
+    }
+
+    public void setDriversLocation(String driversLocation) {
+        this.driversLocation = driversLocation;
+    }
+
+    public void setMaxSessionIdleTime(long maxSessionIdleTime) {
+        this.maxSessionIdleTime = maxSessionIdleTime;
+    }
+
+    public void setDevelMode(boolean develMode) {
+        this.develMode = develMode;
+    }
+
+    public void setEnableSecurityManager(boolean enableSecurityManager) {
+        this.enableSecurityManager = enableSecurityManager;
+    }
+
+    public void setDatabaseConfiguration(WebDatabaseConfig databaseConfiguration) {
+        this.databaseConfiguration = databaseConfiguration;
+    }
+
+    public void setStaticContent(String staticContent) {
+        this.staticContent = staticContent;
     }
 
     @Override

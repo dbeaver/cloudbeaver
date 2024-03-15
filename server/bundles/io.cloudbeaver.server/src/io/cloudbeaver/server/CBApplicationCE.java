@@ -36,10 +36,14 @@ import org.jkiss.dbeaver.runtime.DBWorkbench;
 
 import java.util.List;
 
-public class CBApplicationCE extends CBApplication {
+public class CBApplicationCE extends CBApplication<CBServerConfig> {
     private static final Log log = Log.getLog(CBApplicationCE.class);
 
-    private final CBServerConfigurationControllerEmbedded serverConfigController = new CBServerConfigurationControllerEmbedded();
+    private final CBServerConfigurationControllerEmbedded<CBServerConfig> serverConfigController;
+
+    public CBApplicationCE() {
+        serverConfigController = new CBServerConfigurationControllerEmbedded<>(new CBServerConfig());
+    }
 
     @Override
     public SMController createSecurityController(@NotNull SMCredentialsProvider credentialsProvider) throws DBException {
@@ -84,7 +88,7 @@ public class CBApplicationCE extends CBApplication {
     }
 
     @Override
-    public CBServerConfigurationControllerEmbedded getServerConfigurationController() {
+    public CBServerConfigurationControllerEmbedded<CBServerConfig> getServerConfigurationController() {
         return serverConfigController;
     }
 
