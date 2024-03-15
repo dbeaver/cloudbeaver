@@ -45,7 +45,7 @@ export class DataExportSettingsService extends Dependency {
   }
 
   private registerSettings() {
-    this.settingsManagerService.registerSettings(this.settings.scope, this.settings.schema, () => [
+    this.settingsManagerService.registerSettings(this.settings, () => [
       // {
       //   group: DATA_EXPORT_SETTINGS_GROUP,
       //   key: 'disabled',

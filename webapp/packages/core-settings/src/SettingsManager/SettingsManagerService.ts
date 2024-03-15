@@ -5,56 +5,52 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
+import { computed, makeObservable, observable } from 'mobx';
+
 import { injectable } from '@cloudbeaver/core-di';
 import type { schema } from '@cloudbeaver/core-utils';
 
-import type { ISettingDescriptionWithScope, SettingsDescriptionGetter } from './ISettingDescription';
-import { computed, makeObservable, observable } from 'mobx';
+import type { SettingsProvider } from '../SettingsProvider';
+import type { ISettingDescriptionWithProvider, SettingsDescriptionGetter } from './ISettingDescription';
 
-interface ScopeSettingsItem<T = any> {
-  scope: string;
-  schema: schema.AnyZodObject;
-  settingsGetter: SettingsDescriptionGetter<T>;
+interface ScopeSettingsItem<T extends schema.SomeZodObject = schema.AnyZodObject> {
+  provider: SettingsProvider<T>;
+  settingsGetter: SettingsDescriptionGetter<schema.infer<T>>;
 }
 
 @injectable()
 export class SettingsManagerService {
-  get activeSettings(): Map<string, ISettingDescriptionWithScope<any>> {
-    return new Map(this.getSettings().map(setting => [`${setting.scope}.${String(setting.key)}`, setting]));
+  get activeSettings(): ReadonlyArray<ISettingDescriptionWithProvider<any>> {
+    return this.getSettings();
   }
 
-  get settings(): ReadonlyArray<ScopeSettingsItem> {
-    return this.#settings;
-  }
-
-  #settings: ScopeSettingsItem[];
+  private settings: ScopeSettingsItem[];
 
   constructor() {
-    this.#settings = observable([], { deep: false });
+    this.settings = [];
 
-    makeObservable(this, {
+    makeObservable<this, 'settings'>(this, {
       activeSettings: computed,
+      settings: observable.shallow,
     });
   }
 
   registerSettings<TSchema extends schema.SomeZodObject>(
-    scope: string,
-    schema: TSchema,
+    provider: SettingsProvider<TSchema>,
     settingsGetter: SettingsDescriptionGetter<schema.infer<TSchema>>,
   ) {
-    this.#settings.push({
-      scope,
-      schema,
+    this.settings.push({
+      provider,
       settingsGetter,
     });
   }
 
-  private getSettings(): ISettingDescriptionWithScope<any>[] {
-    const settings: ISettingDescriptionWithScope<any>[] = [];
+  private getSettings(): ReadonlyArray<ISettingDescriptionWithProvider<any>> {
+    const settings: ISettingDescriptionWithProvider<any>[] = [];
 
-    for (const { schema, scope, settingsGetter } of this.settings) {
+    for (const { provider, settingsGetter } of this.settings) {
       for (const setting of settingsGetter()) {
-        settings.push({ ...setting, scope, schema: schema.shape[setting.key] });
+        settings.push({ ...setting, provider, schema: provider.schema.shape[setting.key], scopedKey: provider.scopedKey(setting.key) });
       }
     }
 

@@ -46,7 +46,7 @@ export class EventsSettingsService extends Dependency {
   }
 
   private registerSettings() {
-    this.settingsManagerService.registerSettings(this.settings.scope, this.settings.schema, () => [
+    this.settingsManagerService.registerSettings(this.settings, () => [
       // {
       //   group: NOTIFICATIONS_SETTINGS_GROUP,
       //   key: 'maxPersistentAllow',

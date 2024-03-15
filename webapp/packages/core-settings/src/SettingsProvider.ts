@@ -65,7 +65,7 @@ export class SettingsProvider<TSchema extends schema.SomeZodObject = schema.AnyZ
     await this.source.save();
   }
 
-  private scopedKey(key: string | number | symbol | undefined | null): string | undefined | null {
+  scopedKey<T extends string | number | symbol | undefined | null>(key: T): Exclude<T | string, number | symbol> {
     if (isNotNullDefined(key)) {
       return `${this.scope}.${String(key)}`;
     }

@@ -30,7 +30,7 @@ export class PluginConnectionsSettingsService extends Dependency {
   }
 
   private registerSettings() {
-    this.settingsManagerService.registerSettings(this.settings.scope, this.settings.schema, () => [
+    this.settingsManagerService.registerSettings(this.settings, () => [
       // {
       //   key: 'hideConnectionViewForUsers',
       //   type: ESettingsValueType.Checkbox,

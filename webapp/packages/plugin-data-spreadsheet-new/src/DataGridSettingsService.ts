@@ -47,7 +47,7 @@ export class DataGridSettingsService extends Dependency {
   }
 
   private registerSettings() {
-    this.settingsManagerService.registerSettings(this.settings.scope, this.settings.schema, () => [
+    this.settingsManagerService.registerSettings(this.settings, () => [
       {
         group: DATA_EDITOR_SETTINGS_GROUP,
         key: 'hidden',

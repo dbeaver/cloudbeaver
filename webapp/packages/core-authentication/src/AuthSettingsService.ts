@@ -29,7 +29,7 @@ export class AuthSettingsService {
   }
 
   private registerSettings() {
-    this.settingsManagerService.registerSettings(this.settings.scope, this.settings.schema, () => [
+    this.settingsManagerService.registerSettings(this.settings, () => [
       // {
       //   key: 'disableAnonymousAccess',
       //   type: ESettingsValueType.Checkbox,

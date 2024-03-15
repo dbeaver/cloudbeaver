@@ -45,7 +45,7 @@ export class ResourceManagerSettingsService extends Dependency {
   }
 
   private registerSettings() {
-    this.settingsManagerService.registerSettings(this.settings.scope, this.settings.schema, () => [
+    this.settingsManagerService.registerSettings(this.settings, () => [
       // {
       //   group: RESOURCE_MANAGER_SETTINGS_GROUP,
       //   key: 'disabled',

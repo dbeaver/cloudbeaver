@@ -77,12 +77,12 @@ export abstract class SettingsResolverSource implements ISettingsResolverSource 
 
   isReadOnly(key: any): boolean {
     for (const source of this.sources) {
-      if (source.isReadOnly(key)) {
-        if (source.has(key)) {
-          return true;
-        }
-      } else {
+      if (!source.isReadOnly(key)) {
         return false;
+      }
+
+      if (source.has(key)) {
+        return true;
       }
     }
     return true;

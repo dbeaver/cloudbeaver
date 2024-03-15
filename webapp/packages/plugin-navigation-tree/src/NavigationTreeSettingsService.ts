@@ -40,7 +40,7 @@ export class NavigationTreeSettingsService extends Dependency {
   }
 
   private registerSettings() {
-    this.settingsManagerService.registerSettings(this.settings.scope, this.settings.schema, () => [
+    this.settingsManagerService.registerSettings(this.settings, () => [
       // {
       //   group: NAVIGATION_TREE_SETTINGS_GROUP,
       //   key: 'disabled',

@@ -8,6 +8,7 @@
 import type { TLocalizationToken } from '@cloudbeaver/core-localization';
 import type { schema } from '@cloudbeaver/core-utils';
 
+import type { SettingsProvider } from '../SettingsProvider';
 import type { ESettingsValueType } from './ESettingsValueType';
 import type { SettingsGroup } from './SettingsGroup';
 
@@ -32,8 +33,9 @@ export interface ISettingDescription<T = object> {
   options?: ISettingOptions[];
 }
 
-export interface ISettingDescriptionWithScope<T = Record<string, any>> extends ISettingDescription<T> {
-  scope: string;
+export interface ISettingDescriptionWithProvider<T extends schema.SomeZodObject = schema.AnyZodObject> extends ISettingDescription<schema.infer<T>> {
+  provider: SettingsProvider<T>;
+  scopedKey: string;
   schema: schema.AnyZodObject;
 }
 

@@ -26,25 +26,21 @@ export class LocalizationSettingsManagerService extends Bootstrap {
   }
 
   private registerSettings() {
-    this.settingsManagerService.registerSettings(
-      this.settingsLocalizationService.settingsProvider.scope,
-      this.settingsLocalizationService.settingsProvider.schema,
-      () => [
-        {
-          group: INTERFACE_SETTINGS_GROUP,
-          key: 'language',
-          access: {
-            accessor: ['server', 'client'],
-          },
-          name: 'core_settings_localization_settings_locale_label',
-          description: 'core_settings_localization_settings_locale_description',
-          type: ESettingsValueType.Select,
-          options: this.localizationService.supportedLanguages.map(language => ({
-            id: language.isoCode,
-            name: language.displayName,
-          })),
+    this.settingsManagerService.registerSettings(this.settingsLocalizationService.settingsProvider, () => [
+      {
+        group: INTERFACE_SETTINGS_GROUP,
+        key: 'language',
+        access: {
+          accessor: ['server', 'client'],
         },
-      ],
-    );
+        name: 'core_settings_localization_settings_locale_label',
+        description: 'core_settings_localization_settings_locale_description',
+        type: ESettingsValueType.Select,
+        options: this.localizationService.supportedLanguages.map(language => ({
+          id: language.isoCode,
+          name: language.displayName,
+        })),
+      },
+    ]);
   }
 }

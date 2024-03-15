@@ -59,7 +59,7 @@ export class SqlEditorSettingsService extends Dependency {
   }
 
   private registerSettings() {
-    this.settingsManagerService.registerSettings(this.settings.scope, this.settings.schema, () => [
+    this.settingsManagerService.registerSettings(this.settings, () => [
       // {
       //   group: SQL_EDITOR_SETTINGS_GROUP,
       //   key: 'disabled',
@@ -82,7 +82,7 @@ export class SqlEditorSettingsService extends Dependency {
       // },
     ]);
 
-    this.settingsManagerService.registerSettings(this.proposalInsertTableSettings.scope, this.proposalInsertTableSettings.schema, () => [
+    this.settingsManagerService.registerSettings(this.proposalInsertTableSettings, () => [
       {
         key: 'alias',
         access: {

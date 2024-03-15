@@ -29,7 +29,7 @@ export class ConnectionsSettingsService extends Dependency {
   }
 
   private registerSettings() {
-    this.settingsManagerService.registerSettings(this.settings.scope, this.settings.schema, () => [
+    this.settingsManagerService.registerSettings(this.settings, () => [
       // {
       //   group: CONNECTIONS_SETTINGS_GROUP,
       //   key: 'disabled',

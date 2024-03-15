@@ -9,10 +9,10 @@ import { computed, observable } from 'mobx';
 
 import { useObservableRef } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { ISettingDescriptionWithScope, ROOT_SETTINGS_GROUP, SettingsGroup, SettingsManagerService } from '@cloudbeaver/core-settings';
+import { ISettingDescriptionWithProvider, ROOT_SETTINGS_GROUP, SettingsGroup, SettingsManagerService } from '@cloudbeaver/core-settings';
 
 interface ISettings {
-  settings: Map<SettingsGroup, ISettingDescriptionWithScope<any>[]>;
+  settings: Map<SettingsGroup, ISettingDescriptionWithProvider<any>[]>;
   groups: Set<SettingsGroup>;
 }
 
@@ -23,9 +23,9 @@ export function useSettings(accessor?: string[]): ISettings {
     () => ({
       get settings() {
         const map = new Map();
-        const settings = Array.from(this.settingsManagerService.activeSettings.values())
-        .filter(setting => accessor?.some(value => setting.access.accessor.includes(value)))
-        .sort((a, b) => a.name.localeCompare(b.name));
+        const settings = this.settingsManagerService.activeSettings
+          .filter(setting => accessor?.some(value => setting.access.accessor.includes(value)))
+          .sort((a, b) => a.name.localeCompare(b.name));
 
         for (const setting of settings) {
           map.set(setting.group, [...(map.get(setting.group) || []), setting]);

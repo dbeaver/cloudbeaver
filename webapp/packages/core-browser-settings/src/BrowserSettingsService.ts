@@ -45,7 +45,7 @@ export class BrowserSettingsService extends Dependency {
   }
 
   private registerSettings() {
-    this.settingsManagerService.registerSettings(this.settings.scope, this.settings.schema, () => [
+    this.settingsManagerService.registerSettings(this.settings, () => [
       // {
       //   group: BROWSER_COOKIES_SETTINGS_GROUP,
       //   key: 'cookies.disabled',

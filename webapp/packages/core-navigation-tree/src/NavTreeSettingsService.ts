@@ -9,7 +9,6 @@ import { Dependency, injectable } from '@cloudbeaver/core-di';
 import { ServerSettingsService } from '@cloudbeaver/core-root';
 import {
   createSettingsAliasResolver,
-  ESettingsValueType,
   ROOT_SETTINGS_LAYER,
   SettingsManagerService,
   SettingsProvider,
@@ -17,8 +16,6 @@ import {
   SettingsResolverService,
 } from '@cloudbeaver/core-settings';
 import { schema, schemaExtra } from '@cloudbeaver/core-utils';
-
-import { NAVIGATION_TREE_SETTINGS_GROUP } from './NAVIGATION_TREE_SETTINGS_GROUP';
 
 const settingsSchema = schema.object({
   childrenLimit: schema.coerce.number().min(10).max(1000).default(100),
@@ -51,7 +48,7 @@ export class NavTreeSettingsService extends Dependency {
   }
 
   private registerSettings() {
-    this.settingsManagerService.registerSettings(this.settings.scope, this.settings.schema, () => [
+    this.settingsManagerService.registerSettings(this.settings, () => [
       // {
       //   key: 'childrenLimit',
       //   access: {

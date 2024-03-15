@@ -15,7 +15,7 @@ import { ThemeSettingsService } from './ThemeSettingsService';
 export class ThemeSettingsManagementService extends Dependency {
   constructor(themeSettingsService: ThemeSettingsService, themeService: ThemeService, settingsManagerService: SettingsManagerService) {
     super();
-    settingsManagerService.registerSettings(themeSettingsService.settings.scope, themeSettingsService.settings.schema, () => [
+    settingsManagerService.registerSettings(themeSettingsService.settings, () => [
       {
         key: 'theme',
         access: {
