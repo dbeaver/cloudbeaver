@@ -115,8 +115,12 @@ type WSSocketConnectedEvent implements CBServerEvent {
 type WSSessionStateEvent implements CBServerEvent {
     id: CBServerEventId!
     topicId: CBEventTopic
+    lastAccessTime: Int!
     remainingTime: Int!
     isValid: Boolean
+    isCacheExpired: Boolean
+    locale: String!
+    actionParameters: Object
 }
 
 # Session expired event
