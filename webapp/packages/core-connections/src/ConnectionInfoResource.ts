@@ -40,6 +40,7 @@ import { schemaValidationError } from '@cloudbeaver/core-utils';
 import { CONNECTION_INFO_PARAM_SCHEMA, type IConnectionInfoParams } from './CONNECTION_INFO_PARAM_SCHEMA';
 import { ConnectionInfoEventHandler, IConnectionInfoEvent } from './ConnectionInfoEventHandler';
 import type { DatabaseConnection } from './DatabaseConnection';
+import { DBDriverResource } from './DBDriverResource';
 
 export type Connection = DatabaseConnection & {
   authProperties?: UserConnectionAuthPropertiesFragment[];
@@ -89,6 +90,7 @@ export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoPar
     private readonly projectsService: ProjectsService,
     private readonly projectInfoResource: ProjectInfoResource,
     private readonly dataSynchronizationService: DataSynchronizationService,
+    dbDriverResource: DBDriverResource,
     sessionDataResource: SessionDataResource,
     appAuthService: AppAuthService,
     connectionInfoEventHandler: ConnectionInfoEventHandler,
@@ -113,6 +115,11 @@ export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoPar
     // this.onItemUpdate.addHandler(ExecutorInterrupter.interrupter(() => this.sessionUpdate));
     this.onItemDelete.addHandler(ExecutorInterrupter.interrupter(() => this.sessionUpdate));
     this.onConnectionCreate.addHandler(ExecutorInterrupter.interrupter(() => this.sessionUpdate));
+
+    dbDriverResource.onItemDelete.addHandler(data => {
+      const hiddenConnections = this.values.filter(connection => connection.driverId === data);
+      this.delete(resourceKeyList(hiddenConnections.map(connection => createConnectionParam(connection))));
+    });
 
     userInfoResource.onUserChange.addHandler(() => {
       this.clear();
