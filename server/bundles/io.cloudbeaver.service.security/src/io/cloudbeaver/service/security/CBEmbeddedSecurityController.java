@@ -2832,35 +2832,6 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
         }
     }
 
-    public void initializeMetaInformation() throws DBCException {
-        try (Connection dbCon = database.openConnection()) {
-            try (JDBCTransaction txn = new JDBCTransaction(dbCon)) {
-                Set<String> registeredProviders = new HashSet<>();
-                try (PreparedStatement dbStat = dbCon.prepareStatement(
-                    database.normalizeTableNames("SELECT PROVIDER_ID FROM {table_prefix}CB_AUTH_PROVIDER"))) {
-                    try (ResultSet dbResult = dbStat.executeQuery()) {
-                        while (dbResult.next()) {
-                            registeredProviders.add(dbResult.getString(1));
-                        }
-                    }
-                }
-                try (PreparedStatement dbStat = dbCon.prepareStatement(
-                    database.normalizeTableNames("INSERT INTO {table_prefix}CB_AUTH_PROVIDER(PROVIDER_ID,IS_ENABLED) VALUES(?,'Y')"))) {
-                    for (WebAuthProviderDescriptor authProvider : WebAuthProviderRegistry.getInstance().getAuthProviders()) {
-                        if (!registeredProviders.contains(authProvider.getId())) {
-                            dbStat.setString(1, authProvider.getId());
-                            dbStat.executeUpdate();
-                            log.debug("Auth provider '" + authProvider.getId() + "' registered");
-                        }
-                    }
-                }
-                txn.commit();
-            }
-        } catch (SQLException e) {
-            throw new DBCException("Error initializing security manager meta info", e);
-        }
-    }
-
     private void createAuthSubject(
         Connection dbCon,
         String subjectId,
