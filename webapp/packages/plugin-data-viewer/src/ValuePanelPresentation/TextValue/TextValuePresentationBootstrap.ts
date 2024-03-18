@@ -70,14 +70,14 @@ export class TextValuePresentationBootstrap extends Bootstrap {
       name: 'data_viewer_presentation_value_text_hex_title',
       order: Number.MAX_SAFE_INTEGER,
       panel: () => React.Fragment,
-      // isHidden: (_, context) => !isBlobPresentationAvailable(context),
+      isHidden: (_, context) => !isBlobPresentationAvailable(context),
     });
     this.textValuePresentationService.add({
       key: 'application/octet-stream;type=base64',
       name: 'data_viewer_presentation_value_text_base64_title',
       order: Number.MAX_SAFE_INTEGER,
       panel: () => React.Fragment,
-      // isHidden: (_, context) => !isBlobPresentationAvailable(context),
+      isHidden: (_, context) => !isBlobPresentationAvailable(context),
     });
   }
 
