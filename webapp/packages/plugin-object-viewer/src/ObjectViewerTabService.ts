@@ -43,7 +43,7 @@ import { DBObjectPageService } from './ObjectPage/DBObjectPageService';
 import type { ObjectPage } from './ObjectPage/ObjectPage';
 import { objectViewerTabHandlerKey } from './objectViewerTabHandlerKey';
 
-const ObjectViewerPanel = importLazyComponent(() => import('./ObjectViewerPanel').then(m => m.ObjectViewerPanel));
+const ObjectViewerPanel = importLazyComponent(() => import('./ObjectViewerPanel/ObjectViewerPanel').then(m => m.ObjectViewerPanel));
 const ObjectViewerTab = importLazyComponent(() => import('./ObjectViewerTab').then(m => m.ObjectViewerTab));
 
 @injectable()
