@@ -31,7 +31,7 @@ export const UserProfileSettings = observer(function UserProfileSettings() {
     }
     try {
       await userSettingsService.save();
-      notificationService.logSuccess({ title: translate('plugin_user_profile_settings_save_success') });
+      notificationService.logSuccess({ title: 'plugin_user_profile_settings_save_success' });
     } catch (error: any) {
       notificationService.logException(error, 'plugin_user_profile_settings_save_fail');
     }

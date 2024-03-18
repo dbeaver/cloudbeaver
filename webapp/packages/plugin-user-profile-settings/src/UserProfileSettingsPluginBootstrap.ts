@@ -17,7 +17,7 @@ export class UserProfileSettingsPluginBootstrap extends Bootstrap {
     super();
   }
 
-  register(): void | Promise<void> {
+  register(): void {
     this.userProfileTabsService.tabContainer.add({
       key: 'settings',
       name: 'plugin_user_profile_settings_tab_label',
@@ -25,6 +25,4 @@ export class UserProfileSettingsPluginBootstrap extends Bootstrap {
       panel: () => UserProfileSettings,
     });
   }
-
-  load(): void | Promise<void> {}
 }

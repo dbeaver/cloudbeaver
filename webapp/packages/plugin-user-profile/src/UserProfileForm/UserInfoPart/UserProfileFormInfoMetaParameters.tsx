@@ -18,8 +18,8 @@ interface Props {
   disabled: boolean;
 }
 
-export const UserProfileFormInfoMetaParameters = observer<Props>(function UserFormInfoMetaParameters({ tabState, tabSelected, disabled }) {
-  const userMetaParameters = useResource(UserFormInfoMetaParameters, UserMetaParametersResource, undefined, { active: tabSelected });
+export const UserProfileFormInfoMetaParameters = observer<Props>(function UserProfileFormInfoMetaParameters({ tabState, tabSelected, disabled }) {
+  const userMetaParameters = useResource(UserProfileFormInfoMetaParameters, UserMetaParametersResource, undefined, { active: tabSelected });
 
   if (userMetaParameters.data.length === 0) {
     return null;

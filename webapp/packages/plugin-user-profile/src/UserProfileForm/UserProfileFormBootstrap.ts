@@ -21,7 +21,7 @@ export class UserProfileFormBootstrap extends Bootstrap {
   register(): void {
     this.userProfileTabsService.tabContainer.add({
       key: 'account',
-      name: 'Account',
+      name: 'plugin_user_profile_account_title',
       order: 1,
       panel: () => UserProfileFormPanel,
     });
