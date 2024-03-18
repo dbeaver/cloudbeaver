@@ -8,6 +8,7 @@ export * from './SettingsLayer';
 export * from './SettingsResolverService';
 export * from './SettingsProvider';
 export * from './SettingsProviderService';
+export * from './SettingsSource';
 export * from './SettingsManager/ESettingsValueType';
 export * from './SettingsManager/ISettingDescription';
 export * from './SettingsManager/SettingsGroup';

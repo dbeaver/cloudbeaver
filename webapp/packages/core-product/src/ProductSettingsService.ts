@@ -5,38 +5,33 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { makeObservable, observable } from 'mobx';
+import { action, makeObservable, observable } from 'mobx';
 
 import { injectable } from '@cloudbeaver/core-di';
-import { createSettingsLayer, ISettingsSource, ROOT_SETTINGS_LAYER } from '@cloudbeaver/core-settings';
+import { createSettingsLayer, ROOT_SETTINGS_LAYER, SettingsSource } from '@cloudbeaver/core-settings';
+import { parseJSONFlat } from '@cloudbeaver/core-utils';
 
 export const PRODUCT_SETTINGS_LAYER = createSettingsLayer(ROOT_SETTINGS_LAYER, 'product');
 
 @injectable()
-export class ProductSettingsService implements ISettingsSource {
+export class ProductSettingsService extends SettingsSource {
   private readonly settings: Map<string, any>;
 
   constructor() {
+    super();
     this.settings = new Map();
     makeObservable<this, 'settings'>(this, {
+      clear: action,
       settings: observable.shallow,
     });
   }
 
   has(key: any): boolean {
-    return this.settings.has(key) || false;
-  }
-
-  isEdited(): boolean {
-    return false;
+    return this.settings.has(key) || super.has(key) || false;
   }
 
   isReadOnly(): boolean {
     return true;
-  }
-
-  getEditedValue(key: any): any {
-    return this.getValue(key);
   }
 
   getValue(key: any): any {
@@ -44,12 +39,29 @@ export class ProductSettingsService implements ISettingsSource {
   }
 
   setValue(key: any, value: any): void {
-    this.settings.set(key, value);
+    this.update(() => {
+      this.settings.set(key, value);
+    });
+  }
+
+  setSettingsObject(settings: Record<string, any>): void {
+    this.update(() => {
+      parseJSONFlat(settings, (key, value) => {
+        this.setValue(key, value);
+      });
+    });
   }
 
   clear(): void {
-    this.settings.clear();
+    this.update(() => {
+      super.clear();
+      this.settings.clear();
+    });
   }
 
   async save(): Promise<void> {}
+
+  protected getSnapshot(): Record<string, any> {
+    return Object.fromEntries(this.settings.entries());
+  }
 }

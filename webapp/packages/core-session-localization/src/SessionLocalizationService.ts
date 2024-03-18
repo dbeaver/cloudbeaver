@@ -8,17 +8,23 @@
 import { Dependency, injectable } from '@cloudbeaver/core-di';
 import { LocalizationService } from '@cloudbeaver/core-localization';
 import { SessionResource } from '@cloudbeaver/core-root';
+import { SettingsLocalizationService } from '@cloudbeaver/core-settings-localization';
 
 @injectable()
 export class SessionLocalizationService extends Dependency {
   constructor(
     private readonly sessionResource: SessionResource,
     private readonly localizationService: LocalizationService,
+    private readonly settingsLocalizationService: SettingsLocalizationService,
   ) {
     super();
 
     this.sessionResource.onDataUpdate.addHandler(this.syncLanguage.bind(this));
-    this.localizationService.onChange.addHandler(language => this.sessionResource.changeLanguage(language));
+    this.settingsLocalizationService.settingsProvider.onChange.addHandler(data => {
+      if (data.key === 'language') {
+        this.sessionResource.changeLanguage(data.value).catch(() => {});
+      }
+    });
   }
 
   private async syncLanguage() {

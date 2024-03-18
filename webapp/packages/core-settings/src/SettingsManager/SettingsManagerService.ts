@@ -13,7 +13,7 @@ import type { schema } from '@cloudbeaver/core-utils';
 import type { SettingsProvider } from '../SettingsProvider';
 import type { ISettingDescriptionWithProvider, SettingsDescriptionGetter } from './ISettingDescription';
 
-interface ScopeSettingsItem<T extends schema.SomeZodObject = schema.AnyZodObject> {
+interface ScopeSettingsItem<T extends schema.SomeZodObject = any> {
   provider: SettingsProvider<T>;
   settingsGetter: SettingsDescriptionGetter<schema.infer<T>>;
 }

@@ -17,8 +17,6 @@ export class ProductBootstrap extends Bootstrap {
     super();
   }
 
-  async load() {}
-
   register() {
     this.versionUpdateService.registerVersionInstruction(() => UpdateInstruction);
   }

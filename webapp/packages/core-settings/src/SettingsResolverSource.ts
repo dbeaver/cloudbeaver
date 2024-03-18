@@ -7,8 +7,10 @@
  */
 import { computed, makeObservable, observable } from 'mobx';
 
+import { type ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
+
 import type { ISettingsResolverSource } from './ISettingsResolverSource';
-import type { ISettingsSource } from './ISettingsSource';
+import type { ISettingChangeData, ISettingsSource } from './ISettingsSource';
 import type { ISettingsLayer } from './SettingsLayer';
 
 interface ISettingsSourcesLayer {
@@ -17,6 +19,7 @@ interface ISettingsSourcesLayer {
 }
 
 export abstract class SettingsResolverSource implements ISettingsResolverSource {
+  readonly onChange: ISyncExecutor<ISettingChangeData>;
   protected get sources(): ISettingsSource[] {
     return this.layers
       .slice()
@@ -27,6 +30,7 @@ export abstract class SettingsResolverSource implements ISettingsResolverSource 
   protected layers: ISettingsSourcesLayer[];
 
   constructor() {
+    this.onChange = new SyncExecutor();
     this.layers = [];
     makeObservable<this, 'layers' | 'sources'>(this, {
       layers: observable.shallow,
@@ -45,6 +49,7 @@ export abstract class SettingsResolverSource implements ISettingsResolverSource 
 
     if (index !== -1) {
       layerSources.sources.splice(index, 1);
+      resolver.onChange.removeNext(this.onChange);
     }
   }
 
@@ -56,6 +61,19 @@ export abstract class SettingsResolverSource implements ISettingsResolverSource 
     const layerSources = this.getOrCreateLayerSources(layer);
 
     layerSources.sources.push(...resolvers);
+
+    for (const resolver of resolvers) {
+      resolver.onChange.next(
+        this.onChange,
+        data => {
+          if (resolver.has(data.key)) {
+            return data;
+          }
+          return { ...data, value: this.getValue(data.key) };
+        },
+        data => !resolver.has(data.key) || this.sources.find(r => r.has(data.key)) === resolver,
+      );
+    }
   }
 
   clearResolvers(): void {

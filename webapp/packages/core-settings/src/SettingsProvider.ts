@@ -5,16 +5,25 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
+import { ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
 import { isNotNullDefined, type schema } from '@cloudbeaver/core-utils';
 
-import type { ISettingsSource } from './ISettingsSource';
+import type { ISettingChangeData, ISettingsSource } from './ISettingsSource';
 
-export class SettingsProvider<TSchema extends schema.SomeZodObject = schema.AnyZodObject> implements ISettingsSource {
+export class SettingsProvider<TSchema extends schema.SomeZodObject = any> implements ISettingsSource {
+  readonly onChange: ISyncExecutor<ISettingChangeData<keyof schema.infer<TSchema>>>;
   constructor(
     private readonly source: ISettingsSource,
     readonly scope: string,
     readonly schema: TSchema,
-  ) {}
+  ) {
+    this.onChange = new SyncExecutor();
+    source.onChange.next(
+      this.onChange,
+      data => ({ key: this.unscopedKey(data.key), value: data.value }),
+      data => data.key.startsWith(this.scope),
+    );
+  }
 
   isReadOnly<TKey extends keyof schema.infer<TSchema>>(key: TKey): boolean {
     return this.source.isReadOnly(this.scopedKey(key)) || false;
@@ -68,6 +77,14 @@ export class SettingsProvider<TSchema extends schema.SomeZodObject = schema.AnyZ
   scopedKey<T extends string | number | symbol | undefined | null>(key: T): Exclude<T | string, number | symbol> {
     if (isNotNullDefined(key)) {
       return `${this.scope}.${String(key)}`;
+    }
+
+    return key;
+  }
+
+  unscopedKey<T extends string | number | symbol | undefined | null>(key: T): Exclude<T | string, number | symbol> {
+    if (isNotNullDefined(key)) {
+      return String(key).replace(`${this.scope}.`, '') as Exclude<T | string, number | symbol>;
     }
 
     return key;

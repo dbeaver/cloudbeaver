@@ -5,10 +5,13 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
+import { ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
 import type { schema } from '@cloudbeaver/core-utils';
 
-import type { ISettingsSource } from './ISettingsSource';
+import type { ISettingChangeData, ISettingsSource } from './ISettingsSource';
 import type { SettingsProvider } from './SettingsProvider';
+
+const DEPRECATED_SETTINGS = new Set();
 
 type SettingsMapping<TTarget, TSource> = {
   [key in keyof TTarget]: keyof TSource;
@@ -26,23 +29,45 @@ export function createSettingsAliasResolver<TSource extends schema.SomeZodObject
   function isApplicable(key: keyof targetSchema): boolean {
     return String(key).startsWith(target.scope + '.');
   }
-  function unscopeKey(key: keyof targetSchema): keyof targetSchema {
-    return String(key).replace(target.scope + '.', '') as unknown as keyof targetSchema;
+  function unscopeKey(scope: string, key: keyof targetSchema): keyof targetSchema {
+    return String(key).replace(scope + '.', '') as unknown as keyof targetSchema;
   }
-  function scopeKey(key: keyof sourceSchema): keyof sourceSchema {
+  function scopeKey(scope: string, key: keyof sourceSchema): keyof sourceSchema {
     return `${scope}.${String(key)}` as unknown as keyof sourceSchema;
   }
   function mapKey(key: keyof targetSchema): keyof sourceSchema {
-    key = unscopeKey(key);
+    key = unscopeKey(target.scope, key);
 
-    return scopeKey(mappings?.[key] || (key as unknown as keyof sourceSchema));
+    return scopeKey(scope, mappings?.[key] || (key as unknown as keyof sourceSchema));
   }
+  const onChange: ISyncExecutor<ISettingChangeData<any>> = new SyncExecutor();
+
+  source.onChange.next(
+    onChange,
+    data => {
+      let key = unscopeKey(scope, data.key);
+
+      key = scopeKey(target.scope, mappings?.[key] || key);
+      return { ...data, key };
+    },
+    data => data.key.startsWith(scope),
+  );
   return {
+    onChange,
     has(key) {
       if (!isApplicable(key)) {
         return false;
       }
-      return source.has(mapKey(key));
+
+      const oldKey = mapKey(key);
+      const has = source.has(mapKey(key));
+
+      if (has && !DEPRECATED_SETTINGS.has(oldKey)) {
+        console.warn(`You are using deprecated settings: "${String(oldKey)}". Use "${key}" instead.`);
+        DEPRECATED_SETTINGS.add(oldKey);
+      }
+
+      return has;
     },
     isEdited(key) {
       if (!isApplicable(key)) {

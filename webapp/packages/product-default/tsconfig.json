@@ -19,9 +19,6 @@
       "path": "../core-localization/tsconfig.json"
     },
     {
-      "path": "../core-product/tsconfig.json"
-    },
-    {
       "path": "../core-task-manager/tsconfig.json"
     },
     {

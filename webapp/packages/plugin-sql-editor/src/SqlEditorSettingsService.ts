@@ -45,11 +45,7 @@ export class SqlEditorSettingsService extends Dependency {
   ) {
     super();
     this.settings = this.settingsProviderService.createSettings(defaultSettings, 'plugin', 'sql-editor');
-    this.proposalInsertTableSettings = this.settingsProviderService.createSettings(
-      defaultProposalInsertTableSettings,
-      'sql',
-      'proposals.insert.table',
-    );
+    this.proposalInsertTableSettings = this.settingsProviderService.createSettings(defaultProposalInsertTableSettings, 'sql.proposals.insert.table');
     this.settingsResolverService.addResolver(
       ROOT_SETTINGS_LAYER,
       /** @deprecated Use settings instead, will be removed in 23.0.0 */

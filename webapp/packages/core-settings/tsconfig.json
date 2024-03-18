@@ -10,6 +10,9 @@
       "path": "../core-di/tsconfig.json"
     },
     {
+      "path": "../core-executor/tsconfig.json"
+    },
+    {
       "path": "../core-localization/tsconfig.json"
     },
     {
