@@ -54,7 +54,6 @@ public class EmbeddedSecurityControllerFactory<T extends WebAuthApplication> {
             //FIXME circular dependency
             DB_INSTANCE.setAdminSecurityController(securityController);
             DB_INSTANCE.initialize();
-            securityController.initializeMetaInformation();
             if (application.isLicenseRequired()) {
                 // delete expired auth info job in enterprise products
                 new ClearAuthAttemptInfoJob(securityController).schedule();
