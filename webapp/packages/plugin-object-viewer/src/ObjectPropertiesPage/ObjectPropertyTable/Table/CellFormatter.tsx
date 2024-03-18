@@ -8,12 +8,11 @@
 import { observer } from 'mobx-react-lite';
 import { useContext, useState } from 'react';
 
-import { getComputed, Icon, useMouse, useStateDelay } from '@cloudbeaver/core-blocks';
+import { getComputed, Icon, s, useMouse, useS, useStateDelay } from '@cloudbeaver/core-blocks';
 import { ConnectionInfoResource, DATA_CONTEXT_CONNECTION } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
 import { DATA_CONTEXT_NAV_NODE, type DBObject, type NavNode, NavNodeManagerService } from '@cloudbeaver/core-navigation-tree';
 import { ContextMenu } from '@cloudbeaver/core-ui';
-import { clsx } from '@cloudbeaver/core-utils';
 import { useMenu } from '@cloudbeaver/core-view';
 import { MENU_NAV_TREE, useNode } from '@cloudbeaver/plugin-navigation-tree';
 import type { RenderCellProps } from '@cloudbeaver/plugin-react-data-grid';
@@ -28,6 +27,7 @@ interface Props {
 }
 
 export const Menu = observer<Props>(function Menu({ value, node }) {
+  const styles = useS(classes);
   const navNodeManagerService = useService(NavNodeManagerService);
   const connectionsInfoResource = useService(ConnectionInfoResource);
   const menu = useMenu({ menu: MENU_NAV_TREE });
@@ -59,9 +59,9 @@ export const Menu = observer<Props>(function Menu({ value, node }) {
     });
 
   return (
-    <div ref={mouse.reference} className={clsx(classes.container, menuEmpty && classes.empty)} onDoubleClick={openNode}>
+    <div ref={mouse.reference} className={s(styles, { container: true, empty: menuEmpty })} onDoubleClick={openNode}>
       <div className={classes.box}>
-        <div className={clsx(classes.value, 'cell-formatter__value')} title={value}>
+        <div className={s(styles, { value: true }, 'cell-formatter__value')} title={value}>
           {value}
         </div>
         {!menuEmpty && (
