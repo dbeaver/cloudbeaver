@@ -33,6 +33,7 @@ interface IContextMenuProps extends Omit<ButtonHTMLAttributes<any>, 'children'> 
   onVisibleSwitch?: (visible: boolean) => void;
 }
 
+// TODO the click doesn't work for React components as children
 export const ContextMenu = observer<IContextMenuProps, HTMLButtonElement>(
   forwardRef(function ContextMenu(
     { mouseContextMenu, menu: menuData, disclosure, children, placement, visible, onVisibleSwitch, modal, rtl, ...props },

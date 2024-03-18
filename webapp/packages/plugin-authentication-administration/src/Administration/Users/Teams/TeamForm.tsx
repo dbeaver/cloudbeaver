@@ -7,26 +7,29 @@
  */
 import { observer } from 'mobx-react-lite';
 import { useEffect } from 'react';
-import { css } from 'reshadow';
 
 import type { TeamInfo } from '@cloudbeaver/core-authentication';
-import { Form, IconOrImage, Loader, Placeholder, s, useExecutor, useForm, useObjectRef, useS, useTranslate } from '@cloudbeaver/core-blocks';
+import {
+  Form,
+  IconOrImage,
+  Loader,
+  Placeholder,
+  s,
+  SContext,
+  useExecutor,
+  useForm,
+  useObjectRef,
+  useS,
+  useTranslate,
+} from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { BASE_TAB_STYLES, TabList, TabPanelList, TabsState, UNDERLINE_TAB_BIG_STYLES, UNDERLINE_TAB_STYLES } from '@cloudbeaver/core-ui';
+import { TabBigUnderlineStyleRegistry, TabList, TabPanelList, TabsState } from '@cloudbeaver/core-ui';
 
 import { teamContext } from './Contexts/teamContext';
 import type { ITeamFormState } from './ITeamFormProps';
 import style from './TeamForm.m.css';
 import { ITeamFormActionsContext, TeamFormActionsContext } from './TeamFormActionsContext';
 import { TeamFormService } from './TeamFormService';
-
-const tabsStyles = css`
-  TabList {
-    position: relative;
-    flex-shrink: 0;
-    align-items: center;
-  }
-`;
 
 interface Props {
   state: ITeamFormState;
@@ -38,7 +41,6 @@ interface Props {
 export const TeamForm = observer<Props>(function TeamForm({ state, onCancel, onSave = () => {}, className }) {
   const translate = useTranslate();
   const props = useObjectRef({ onSave });
-  const innerTabStyles = [BASE_TAB_STYLES, tabsStyles, UNDERLINE_TAB_STYLES, UNDERLINE_TAB_BIG_STYLES];
   const styles = useS(style);
   const service = useService(TeamFormService);
   const form = useForm({
@@ -81,7 +83,9 @@ export const TeamForm = observer<Props>(function TeamForm({ state, onCancel, onS
                   </>
                 )}
               </div>
-              <TabList style={innerTabStyles} disabled={false} />
+              <SContext registry={TabBigUnderlineStyleRegistry}>
+                <TabList className={s(styles, { tabList: true })} disabled={false} />
+              </SContext>
             </div>
             <div className={s(styles, { topBarActions: true })}>
               <Loader suspense inline hideMessage hideException>
@@ -92,7 +96,7 @@ export const TeamForm = observer<Props>(function TeamForm({ state, onCancel, onS
             </div>
           </div>
           <div className={s(styles, { content: true })}>
-            <TabPanelList style={innerTabStyles} />
+            <TabPanelList />
           </div>
         </div>
       </TabsState>

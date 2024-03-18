@@ -8,42 +8,52 @@
 import { observable, runInAction } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import { useCallback } from 'react';
-import styled, { css } from 'reshadow';
 
-import { Button, Loader, TextPlaceholder, useObservableRef, useResource, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
+import {
+  Button,
+  Loader,
+  s,
+  SContext,
+  StyleRegistry,
+  TextPlaceholder,
+  useObservableRef,
+  useResource,
+  useS,
+  useTranslate,
+} from '@cloudbeaver/core-blocks';
 import { ConnectionInfoResource, ConnectionsManagerService } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { NavNodeInfoResource } from '@cloudbeaver/core-navigation-tree';
-import { BASE_TAB_STYLES, TabPanel, TabsBox, useTabLocalState } from '@cloudbeaver/core-ui';
+import { TabPanel, TabsBox, TabStyles, useTabLocalState } from '@cloudbeaver/core-ui';
 import { MetadataMap } from '@cloudbeaver/core-utils';
 import type { TabHandlerPanelComponent } from '@cloudbeaver/plugin-navigation-tabs';
 
-import type { IObjectViewerTabState } from './IObjectViewerTabState';
-import { DBObjectPagePanel } from './ObjectPage/DBObjectPagePanel';
-import { DBObjectPageService } from './ObjectPage/DBObjectPageService';
-import { DBObjectPageTab } from './ObjectPage/DBObjectPageTab';
+import type { IObjectViewerTabState } from '../IObjectViewerTabState';
+import { DBObjectPagePanel } from '../ObjectPage/DBObjectPagePanel';
+import { DBObjectPageService } from '../ObjectPage/DBObjectPageService';
+import { DBObjectPageTab } from '../ObjectPage/DBObjectPageTab';
+import styles from './shared/ObjectViewerPanel.m.css';
+import ObjectViewerPanelTab from './shared/ObjectViewerPanelTab.m.css';
 
-const styles = css`
-  Tab {
-    composes: theme-ripple theme-background-surface theme-text-text-primary-on-light from global;
-  }
-  tabs {
-    composes: theme-background-background theme-text-text-primary-on-light from global;
-  }
-  tab-outer:only-child {
-    display: none;
-  }
-`;
+const tabsRegistry: StyleRegistry = [
+  [
+    TabStyles,
+    {
+      mode: 'append',
+      styles: [ObjectViewerPanelTab],
+    },
+  ],
+];
 
 export const ObjectViewerPanel: TabHandlerPanelComponent<IObjectViewerTabState> = observer(function ObjectViewerPanel({ tab }) {
   const translate = useTranslate();
-  const style = useStyles(BASE_TAB_STYLES, styles);
   const dbObjectPagesService = useService(DBObjectPageService);
   const connectionsManagerService = useService(ConnectionsManagerService);
   const navNodeInfoResource = useService(NavNodeInfoResource);
   const notificationService = useService(NotificationService);
   const innerTabState = useTabLocalState(() => new MetadataMap<string, any>());
+  const style = useS(styles);
 
   const objectId = tab.handlerState.objectId;
   const connectionKey = tab.handlerState.connectionKey || null;
@@ -108,26 +118,26 @@ export const ObjectViewerPanel: TabHandlerPanelComponent<IObjectViewerTabState> 
     return <TextPlaceholder>{translate('plugin_object_viewer_error')}</TextPlaceholder>;
   }
 
-  return styled(style)(
-    <>
-      {node.data ? (
-        <TabsBox
-          currentTabId={tab.handlerState.pageId}
-          tabs={pages.map(page => (
-            <DBObjectPageTab key={page.key} tab={tab} page={page} style={styles} onSelect={dbObjectPagesService.selectPage} />
-          ))}
-          localState={innerTabState}
-          style={styles}
-        >
+  return node.data ? (
+    <TabsBox
+      currentTabId={tab.handlerState.pageId}
+      tabsClassName={s(style, { tabs: true })}
+      tabs={
+        <SContext registry={tabsRegistry}>
           {pages.map(page => (
-            <TabPanel key={page.key} tabId={page.key} lazy>
-              <DBObjectPagePanel tab={tab} page={page} />
-            </TabPanel>
+            <DBObjectPageTab key={page.key} tab={tab} page={page} onSelect={dbObjectPagesService.selectPage} />
           ))}
-        </TabsBox>
-      ) : (
-        <TextPlaceholder>{translate('plugin_object_viewer_table_no_items')}</TextPlaceholder>
-      )}
-    </>,
+        </SContext>
+      }
+      localState={innerTabState}
+    >
+      {pages.map(page => (
+        <TabPanel key={page.key} tabId={page.key} lazy>
+          <DBObjectPagePanel tab={tab} page={page} />
+        </TabPanel>
+      ))}
+    </TabsBox>
+  ) : (
+    <TextPlaceholder>{translate('plugin_object_viewer_table_no_items')}</TextPlaceholder>
   );
 });
