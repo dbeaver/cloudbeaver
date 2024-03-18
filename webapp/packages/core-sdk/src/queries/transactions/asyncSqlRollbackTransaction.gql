@@ -1,0 +1,5 @@
+mutation asyncSqlRollbackTransaction($projectId: ID!, $connectionId: ID!, $contextId: ID!) {
+  taskInfo: asyncSqlRollbackTransaction(projectId: $projectId, connectionId: $connectionId, contextId: $contextId) {
+    ...AsyncTaskInfo
+  }
+}

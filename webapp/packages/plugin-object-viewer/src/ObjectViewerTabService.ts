@@ -10,12 +10,15 @@ import { action, makeObservable, runInAction } from 'mobx';
 import { importLazyComponent } from '@cloudbeaver/core-blocks';
 import {
   Connection,
+  ConnectionExecutionContextResource,
   ConnectionInfoActiveProjectKey,
   ConnectionInfoResource,
   ConnectionNavNodeService,
   connectionProvider,
   createConnectionParam,
+  executionContextProvider,
   IConnectionInfoParams,
+  isConnectionInfoParamEqual,
   objectCatalogProvider,
   objectSchemaProvider,
 } from '@cloudbeaver/core-connections';
@@ -55,6 +58,7 @@ export class ObjectViewerTabService {
     private readonly connectionInfoResource: ConnectionInfoResource,
     private readonly connectionNavNodeService: ConnectionNavNodeService,
     private readonly navTreeResource: NavTreeResource,
+    private readonly connectionExecutionContextResource: ConnectionExecutionContextResource,
   ) {
     this.tabHandler = this.navigationTabsService.registerTabHandler<IObjectViewerTabState>({
       key: objectViewerTabHandlerKey,
@@ -71,6 +75,7 @@ export class ObjectViewerTabService {
         connectionProvider(this.getConnection.bind(this)),
         objectCatalogProvider(this.getDBObjectCatalog.bind(this)),
         objectSchemaProvider(this.getDBObjectSchema.bind(this)),
+        executionContextProvider(this.getExecutionContext.bind(this)),
       ],
     });
 
@@ -327,6 +332,16 @@ export class ObjectViewerTabService {
       return;
     }
     return nodeInfo.schemaId;
+  }
+
+  private getExecutionContext(context: ITab<IObjectViewerTabState>) {
+    const connectionKey = context.handlerState.connectionKey;
+
+    if (!connectionKey) {
+      return;
+    }
+
+    return this.connectionExecutionContextResource.values.find(connection => isConnectionInfoParamEqual(connection, connectionKey));
   }
 
   private selectObjectTab(tab: ITab<IObjectViewerTabState>) {
