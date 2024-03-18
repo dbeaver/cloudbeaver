@@ -46,7 +46,7 @@ export const AppStateMenu = observer(function AppStateMenu() {
   return (
     <SContext registry={registry}>
       <div className={s(styles, { menuWrapper: true, appStateMenu: true })}>
-        <MenuBar menu={menu} nestedMenuSettings={{ modal: true }} rtl />
+        <MenuBar menu={menu} nestedMenuSettings={{ modal: true }} />
       </div>
     </SContext>
   );
