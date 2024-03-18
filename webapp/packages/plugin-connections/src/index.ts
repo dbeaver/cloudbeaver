@@ -22,5 +22,6 @@ export * from './ContextMenu/MENU_CONNECTIONS';
 export * from './PublicConnectionForm/PublicConnectionFormService';
 export * from './ConnectionAuthService';
 export * from './PluginConnectionsSettingsService';
+export * from './ConnectionShield';
 
 export default connectionPlugin;
