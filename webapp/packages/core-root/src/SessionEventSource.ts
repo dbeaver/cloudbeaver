@@ -76,10 +76,12 @@ export class SessionEventSource implements IServerEventEmitter<ISessionEvent, IS
 
     this.openSubject.subscribe(() => {
       this.onInit.execute();
+      this.disconnected = false;
     });
 
     this.closeSubject.subscribe(event => {
       console.info(`Websocket closed: ${event.reason}`);
+      this.disconnect();
     });
 
     this.eventsSubject = merge(this.oldEventsSubject, this.subject);
@@ -120,8 +122,8 @@ export class SessionEventSource implements IServerEventEmitter<ISessionEvent, IS
   multiplex<T = ISessionEvent>(topicId: SessionEventTopic, mapTo: (event: ISessionEvent) => T = e => e as T): Observable<T> {
     return merge(
       this.subject.multiplex(
-        () => ({ id: ClientEventId.CbClientTopicSubscribe, topicId } as ITopicSubEvent),
-        () => ({ id: ClientEventId.CbClientTopicUnsubscribe, topicId } as ITopicSubEvent),
+        () => ({ id: ClientEventId.CbClientTopicSubscribe, topicId }) as ITopicSubEvent,
+        () => ({ id: ClientEventId.CbClientTopicUnsubscribe, topicId }) as ITopicSubEvent,
         event => event.topicId === topicId,
       ),
       this.oldEventsSubject,
@@ -135,6 +137,26 @@ export class SessionEventSource implements IServerEventEmitter<ISessionEvent, IS
 
   disconnect() {
     this.disconnected = true;
+
+    if (!this.subject.closed) {
+      this.subject.unsubscribe();
+    }
+
+    if (!this.closeSubject.closed) {
+      this.closeSubject.unsubscribe();
+    }
+
+    if (!this.openSubject.closed) {
+      this.openSubject.unsubscribe();
+    }
+
+    if (!this.oldEventsSubject.closed) {
+      this.oldEventsSubject.unsubscribe();
+    }
+
+    if (!this.errorSubject.closed) {
+      this.errorSubject.unsubscribe();
+    }
   }
 
   private handleErrors() {
