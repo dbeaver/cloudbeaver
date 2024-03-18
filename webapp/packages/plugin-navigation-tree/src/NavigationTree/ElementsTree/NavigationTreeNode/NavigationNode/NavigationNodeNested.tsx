@@ -50,6 +50,10 @@ export const NavigationNodeNested = observer(
     children = useDeferredValue(children);
     empty = useDeferredValue(empty);
 
+    if (empty && !treeContext?.tree.settings?.foldersTree) {
+      return null;
+    }
+
     if (nodeId !== undefined && rootFolder) {
       return <NavigationNode nodeId={nodeId} path={path} expanded />;
     }
