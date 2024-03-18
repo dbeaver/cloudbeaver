@@ -22,7 +22,9 @@ export class SessionLocalizationService extends Dependency {
     this.sessionResource.onDataUpdate.addHandler(this.syncLanguage.bind(this));
     this.settingsLocalizationService.settingsProvider.onChange.addHandler(data => {
       if (data.key === 'language') {
-        this.sessionResource.changeLanguage(data.value).catch(() => {});
+        this.sessionResource.changeLanguage(data.value).catch(exception => {
+          console.error(exception);
+        });
       }
     });
   }

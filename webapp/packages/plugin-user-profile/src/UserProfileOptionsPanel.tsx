@@ -34,7 +34,7 @@ export const UserProfileOptionsPanel = observer(function UserProfileOptionsPanel
   return styled(oldStyles)(
     <ColoredContainer className={styles.userProfileOptionsPanel} parent compact vertical noWrap maximum>
       <TabsState container={userProfileTabsService.tabContainer} lazy>
-        <Group box keepSize noWrap>
+        <Group box keepSize noWrap hidden>
           <TabList style={oldTabStyles} />
         </Group>
         <Container vertical>
