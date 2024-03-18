@@ -16,6 +16,10 @@
  */
 package io.cloudbeaver.model.app;
 
+/**
+ * Web server configuration.
+ * Contains only server configuration properties.
+ */
 public interface WebServerConfiguration {
     boolean isDevelMode();
 

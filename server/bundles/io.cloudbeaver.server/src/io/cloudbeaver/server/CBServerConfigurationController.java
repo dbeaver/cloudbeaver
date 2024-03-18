@@ -143,7 +143,6 @@ public abstract class CBServerConfigurationController<T extends CBServerConfig> 
 
     }
 
-    @Override
     public T parseServerConfiguration() {
         var config = getServerConfiguration();
         if (config.getServerURL() == null) {

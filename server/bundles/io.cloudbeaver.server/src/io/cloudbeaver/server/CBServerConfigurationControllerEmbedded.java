@@ -35,6 +35,9 @@ import java.nio.charset.StandardCharsets;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+/**
+ * Server configuration controller for embedded products.
+ */
 public class CBServerConfigurationControllerEmbedded<T extends CBServerConfig> extends CBServerConfigurationController<T> {
 
     private static final Log log = Log.getLog(CBServerConfigurationControllerEmbedded.class);
