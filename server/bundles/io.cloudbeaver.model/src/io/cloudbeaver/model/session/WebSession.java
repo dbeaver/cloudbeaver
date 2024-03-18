@@ -100,6 +100,7 @@ public class WebSession extends BaseWebSession
     private static final String ATTR_LOCALE = "locale";
     private static final AtomicInteger TASK_ID = new AtomicInteger();
 
+    public static String RUNTIME_PARAM_AUTH_INFOS = "auth-infos";
     private final AtomicInteger taskCount = new AtomicInteger();
 
     private String lastRemoteAddr;
@@ -926,6 +927,7 @@ public class WebSession extends BaseWebSession
             for (DBACredentialsProvider contextCredentialsProvider : getContextCredentialsProviders()) {
                 contextCredentialsProvider.provideAuthParameters(monitor, dataSourceContainer, configuration);
             }
+            configuration.setRuntimeAttribute(RUNTIME_PARAM_AUTH_INFOS, getAllAuthInfo());
 
             WebConnectionInfo webConnectionInfo = findWebConnectionInfo(dataSourceContainer.getId());
             if (webConnectionInfo != null) {
