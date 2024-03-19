@@ -6,7 +6,6 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import styled from 'reshadow';
 
 import { UserMetaParametersResource } from '@cloudbeaver/core-authentication';
 import {
@@ -18,27 +17,23 @@ import {
   Loader,
   ObjectPropertyInfoForm,
   useResource,
-  useStyles,
   useTranslate,
 } from '@cloudbeaver/core-blocks';
 import type { UserInfo } from '@cloudbeaver/core-sdk';
-import type { ComponentStyle } from '@cloudbeaver/core-theming';
-import { BASE_TAB_STYLES, TabPanel } from '@cloudbeaver/core-ui';
+import { TabPanel } from '@cloudbeaver/core-ui';
 
 import { AuthTokenList } from '../AuthTokens/AuthTokenList';
 
 interface Props {
   user: UserInfo;
   className?: string;
-  style?: ComponentStyle;
 }
 
-export const UserInfoPanel = observer<Props>(function UserInfoPanel({ user, className, style }) {
+export const UserInfoPanel = observer<Props>(function UserInfoPanel({ user, className }) {
   const userMetaParameters = useResource(UserInfoPanel, UserMetaParametersResource, undefined);
-  const styles = useStyles(BASE_TAB_STYLES, style);
   const translate = useTranslate();
 
-  return styled(styles)(
+  return (
     <TabPanel tabId="info" className={className}>
       <ColoredContainer wrap overflow parent gap>
         <Container medium gap>
@@ -57,11 +52,10 @@ export const UserInfoPanel = observer<Props>(function UserInfoPanel({ user, clas
             </Container>
             <Loader state={userMetaParameters} inline>
               {() =>
-                userMetaParameters.data.length > 0 &&
-                styled(styles)(
+                userMetaParameters.data.length > 0 && (
                   <Container wrap gap>
                     <ObjectPropertyInfoForm state={user.metaParameters} properties={userMetaParameters.data} readOnly tiny fill />
-                  </Container>,
+                  </Container>
                 )
               }
             </Loader>
@@ -72,6 +66,6 @@ export const UserInfoPanel = observer<Props>(function UserInfoPanel({ user, clas
           </Group>
         </Container>
       </ColoredContainer>
-    </TabPanel>,
+    </TabPanel>
   );
 });

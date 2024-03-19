@@ -6,21 +6,19 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import styled from 'reshadow';
 
-import { useStyles } from '@cloudbeaver/core-blocks';
-import { Tab, TabIcon, TabTitle } from '@cloudbeaver/core-ui';
+import { TabIcon, Tab, TabTitle } from '@cloudbeaver/core-ui';
 import type { NavNodeTransformViewComponent } from '@cloudbeaver/plugin-navigation-tree';
 
 import { NAV_NODE_DDL_ID } from '../NAV_NODE_DDL_ID';
 
-export const DDLViewerTab: NavNodeTransformViewComponent = observer(function DDLViewerTab({ folderId, style }) {
+export const DDLViewerTab: NavNodeTransformViewComponent = observer(function DDLViewerTab({ folderId }) {
   const title = folderId.startsWith(NAV_NODE_DDL_ID) ? 'DDL' : 'Body';
 
-  return styled(useStyles(style))(
+  return (
     <Tab tabId={folderId} title={title}>
       <TabIcon icon="/icons/DDL.svg" />
       <TabTitle>{title}</TabTitle>
-    </Tab>,
+    </Tab>
   );
 });
