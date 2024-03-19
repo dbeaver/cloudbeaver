@@ -73,8 +73,10 @@ export class SessionResource extends CachedDataResource<SessionState | null> {
       locale: event.locale,
     };
 
-    this.setData(sessionState);
-    this.onStatusUpdate.execute(sessionState);
+    this.performUpdate(undefined, [], async () => {
+      this.setData(sessionState);
+      this.onStatusUpdate.execute(sessionState);
+    });
   }
 
   async changeLanguage(locale: string): Promise<void> {

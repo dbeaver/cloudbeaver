@@ -110,13 +110,16 @@ export abstract class CachedResource<
       clear: action,
     });
 
-    setInterval(() => {
-      // mark resource outdate when it's not used
-      if (!this.useTracker.isResourceInUse && !this.isOutdated()) {
-        this.logger.log('not in use');
-        this.markOutdated();
-      }
-    }, 5 * 60 * 1000);
+    setInterval(
+      () => {
+        // mark resource outdate when it's not used
+        if (!this.useTracker.isResourceInUse && !this.isOutdated()) {
+          this.logger.log('not in use');
+          this.markOutdated();
+        }
+      },
+      5 * 60 * 1000,
+    );
   }
 
   /**
@@ -517,6 +520,11 @@ export abstract class CachedResource<
     this.setData(this.defaultValue());
   }
 
+  /**
+   * Sets data to the resource. Forbidden to use outside of the loader or performUpdate functions!
+   * @param data - new data
+   * @returns {void}
+   */
   protected setData(data: TData): void {
     this.data = data;
   }
