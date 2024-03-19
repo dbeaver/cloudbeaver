@@ -38,6 +38,8 @@ type ObjectPropertyInfo {
     supportedConfigurationTypes: [ String! ]
     # Required parameters
     required: Boolean! @since(version: "23.3.1")
+    # Parameter scopes
+    scopes:[String!]
 }
 
 enum ObjectPropertyLength {
@@ -160,6 +162,16 @@ type ServerConfig {
     disabledDrivers: [ID!]!
     resourceQuotas: Object!
     passwordPolicyConfiguration: PasswordPolicyConfig! @since(version: "23.3.3")
+}
+
+type ProductSettingsGroup {
+    id: ID!
+    displayName: String!
+}
+
+type ProductSettings {
+    groups: [ProductSettingsGroup!]!
+    settings: [ObjectPropertyInfo!]!
 }
 
 type SessionInfo {
@@ -529,6 +541,8 @@ input ConnectionConfig {
 extend type Query {
     # Returns server config
     serverConfig: ServerConfig!
+
+    productSettings: ProductSettings!
 
     # Returns session state ( initialize if not )
     sessionState: SessionInfo!
