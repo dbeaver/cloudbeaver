@@ -24,7 +24,6 @@ export interface ISessionAction {
 export class SessionResource extends CachedDataResource<SessionState | null> {
   private action: ISessionAction | null;
   private defaultLocale: string | undefined;
-  readonly onStatusUpdate: ISyncExecutor<SessionState>;
 
   constructor(
     private readonly graphQLService: GraphQLService,
@@ -35,7 +34,6 @@ export class SessionResource extends CachedDataResource<SessionState | null> {
 
     this.handleSessionStateEvent = this.handleSessionStateEvent.bind(this);
 
-    this.onStatusUpdate = new SyncExecutor();
     sessionInfoEventHandler.onEvent(ServerEventId.CbSessionState, this.handleSessionStateEvent, undefined, this);
 
     this.action = null;
@@ -59,23 +57,22 @@ export class SessionResource extends CachedDataResource<SessionState | null> {
   }
 
   private handleSessionStateEvent(event: ISessionStateEvent) {
-    if (!this.data) {
-      return;
-    }
-
-    const sessionState: SessionState = {
-      ...this.data,
-      valid: event?.isValid ?? this.data?.valid,
-      remainingTime: event.remainingTime,
-      actionParameters: event.actionParameters,
-      cacheExpired: event?.isCacheExpired ?? this.data.cacheExpired,
-      lastAccessTime: String(event.lastAccessTime),
-      locale: event.locale,
-    };
-
     this.performUpdate(undefined, [], async () => {
+      if (!this.data) {
+        return;
+      }
+
+      const sessionState: SessionState = {
+        ...this.data,
+        valid: event?.isValid ?? this.data.valid,
+        remainingTime: event.remainingTime,
+        actionParameters: event.actionParameters,
+        cacheExpired: event?.isCacheExpired ?? this.data.cacheExpired,
+        lastAccessTime: String(event.lastAccessTime),
+        locale: event.locale,
+      };
+
       this.setData(sessionState);
-      this.onStatusUpdate.execute(sessionState);
     });
   }
 
@@ -99,12 +96,12 @@ export class SessionResource extends CachedDataResource<SessionState | null> {
     return session;
   }
 
-  updateSession() {
+  pingSession() {
     if (!this.data?.valid) {
       return;
     }
 
-    this.sessionInfoEventHandler.updateSession();
+    this.sessionInfoEventHandler.pingSession();
   }
 
   protected setData(data: SessionState | null) {

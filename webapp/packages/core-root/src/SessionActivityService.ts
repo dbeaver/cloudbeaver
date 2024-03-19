@@ -30,7 +30,7 @@ export class SessionActivityService extends Dependency {
       return;
     }
 
-    this.sessionResource.updateSession();
+    this.sessionResource.pingSession();
 
     this.touchSessionTimer = setTimeout(() => {
       if (this.touchSessionTimer) {

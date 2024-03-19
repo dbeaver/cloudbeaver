@@ -19,8 +19,8 @@ export class SessionInfoEventHandler extends TopicEventHandler<ISessionStateEven
     super(SessionEventTopic.CbSession, sessionEventSource);
   }
 
-  updateSession(): void {
-    this.emit<CbClientEvent>({ id: ClientEventId.CbClientTouchSession, topicId: CbEventTopic.CbSession });
+  pingSession(): void {
+    this.emit<CbClientEvent>({ id: ClientEventId.CbClientSessionPing, topicId: CbEventTopic.CbSession });
   }
 
   map(event: any): ISessionStateEvent {

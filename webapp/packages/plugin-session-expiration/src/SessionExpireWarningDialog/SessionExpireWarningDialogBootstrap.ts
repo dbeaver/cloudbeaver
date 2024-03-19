@@ -30,14 +30,16 @@ export class SessionExpireWarningDialogBootstrap extends Bootstrap {
 
   register(): void {
     this.sessionExpireService.onSessionExpire.addHandler(this.close.bind(this));
-    this.sessionResource.onStatusUpdate.addHandler((data, contexts) => {
-      this.handleStateChange(data.valid, data.remainingTime);
+    this.sessionResource.onDataUpdate.addHandler(() => {
+      const { valid, remainingTime } = this.sessionResource.data || {};
+
+      this.handleSessionResourceDataUpdate(valid, remainingTime);
     });
   }
 
   load(): void {}
 
-  private handleStateChange(isValid?: boolean, remainingTime?: number) {
+  private handleSessionResourceDataUpdate(isValid?: boolean, remainingTime?: number) {
     if (!this.serverConfigResource.anonymousAccessEnabled && !this.userInfoResource.data && !this.serverConfigResource.configurationMode) {
       return;
     }
@@ -72,7 +74,7 @@ export class SessionExpireWarningDialogBootstrap extends Bootstrap {
         const { sessionState } = await this.graphQLService.sdk.sessionState();
 
         if (sessionState.valid) {
-          this.sessionResource.updateSession();
+          this.sessionResource.pingSession();
         } else {
           this.sessionExpireService.sessionExpired();
         }
