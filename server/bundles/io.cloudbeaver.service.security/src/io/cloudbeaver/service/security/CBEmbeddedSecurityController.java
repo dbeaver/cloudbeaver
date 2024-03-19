@@ -576,7 +576,7 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
             Map<String, Object> result = new LinkedHashMap<>();
             // Read users
             try (PreparedStatement dbStat = dbCon.prepareStatement(
-                database.normalizeTableNames("SELECT * FROM {table_prefix}CB_USER_PARAMETERS  WHERE USER_ID=?"))
+                database.normalizeTableNames("SELECT * FROM {table_prefix}CB_USER_PREFERENCES WHERE USER_ID=?"))
             ) {
                 dbStat.setString(1, userId);
                 try (ResultSet dbResult = dbStat.executeQuery()) {
@@ -594,45 +594,67 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
     }
 
     @Override
-    public void setCurrentUserParameter(String name, Object value) throws DBException {
+    public void setCurrentUserParameter(@NotNull String name, @Nullable Object value) throws DBException {
         String userId = getUserIdOrThrow();
-        try (Connection dbCon = database.openConnection()) {
-            try (JDBCTransaction txn = new JDBCTransaction(dbCon)) {
-                if (value == null) {
-                    // Delete old metas
-                    try (PreparedStatement dbStat = dbCon.prepareStatement(
-                        database.normalizeTableNames("DELETE FROM {table_prefix}CB_USER_PARAMETERS WHERE USER_ID=? AND PARAM_ID=?"))
-                    ) {
-                        dbStat.setString(1, userId);
-                        dbStat.setString(2, name);
-                        dbStat.execute();
-                    }
-                } else {
-                    // Update/Insert parameter
-                    boolean updated;
-                    try (PreparedStatement dbStat = dbCon.prepareStatement(
-                        database.normalizeTableNames("UPDATE {table_prefix}CB_USER_PARAMETERS " +
-                            "SET PARAM_VALUE=? WHERE USER_ID=? AND PARAM_ID=?"))
-                    ) {
-                        dbStat.setString(1, CommonUtils.toString(value));
-                        dbStat.setString(2, userId);
-                        dbStat.setString(3, name);
-                        updated = dbStat.executeUpdate() > 0;
-                    }
-                    if (!updated) {
-                        try (PreparedStatement dbStat = dbCon.prepareStatement(
-                            database.normalizeTableNames("INSERT INTO {table_prefix}CB_USER_PARAMETERS " +
-                                "(USER_ID,PARAM_ID,PARAM_VALUE) VALUES(?,?,?)"))
-                        ) {
-                            dbStat.setString(1, userId);
-                            dbStat.setString(2, name);
-                            dbStat.setString(3, CommonUtils.toString(value));
-                            dbStat.executeUpdate();
-                        }
-                    }
-                }
-                txn.commit();
+        try (Connection dbCon = database.openConnection();
+             JDBCTransaction txn = new JDBCTransaction(dbCon)
+        ) {
+            updateUserParameterValue(dbCon, userId, name, value);
+            txn.commit();
+        } catch (SQLException e) {
+            throw new DBCException("Error while updating user configuration", e);
+        }
+    }
+
+    private void updateUserParameterValue(
+        @NotNull Connection dbCon, @NotNull String userId, @NotNull String name, @Nullable Object value
+    ) throws SQLException {
+        if (value == null) {
+            // Delete old metas
+            try (PreparedStatement dbStat = dbCon.prepareStatement(
+                database.normalizeTableNames(
+                    "DELETE FROM {table_prefix}CB_USER_PREFERENCES WHERE USER_ID=? AND PREFERENCE_ID=?"))
+            ) {
+                dbStat.setString(1, userId);
+                dbStat.setString(2, name);
+                dbStat.execute();
             }
+        } else {
+            // Update/Insert parameter
+            boolean updated;
+            try (PreparedStatement dbStat = dbCon.prepareStatement(
+                database.normalizeTableNames("UPDATE {table_prefix}CB_USER_PREFERENCES " +
+                    "SET PREFERENCE_VALUE=? WHERE USER_ID=? AND PREFERENCE_ID=?"))
+            ) {
+                dbStat.setString(1, CommonUtils.toString(value));
+                dbStat.setString(2, userId);
+                dbStat.setString(3, name);
+                updated = dbStat.executeUpdate() > 0;
+            }
+            if (!updated) {
+                try (PreparedStatement dbStat = dbCon.prepareStatement(
+                    database.normalizeTableNames("INSERT INTO {table_prefix}CB_USER_PREFERENCES " +
+                        "(USER_ID,PREFERENCE_ID,PREFERENCE_VALUE) VALUES(?,?,?)"))
+                ) {
+                    dbStat.setString(1, userId);
+                    dbStat.setString(2, name);
+                    dbStat.setString(3, CommonUtils.toString(value));
+                    dbStat.executeUpdate();
+                }
+            }
+        }
+    }
+
+    @Override
+    public void setCurrentUserParameters(@NotNull Map<String, Object> parameters) throws DBException {
+        String userId = getUserIdOrThrow();
+        try (Connection dbCon = database.openConnection();
+             JDBCTransaction txn = new JDBCTransaction(dbCon)
+        ) {
+            for (Map.Entry<String, Object> parameter : parameters.entrySet()) {
+                updateUserParameterValue(dbCon, userId, parameter.getKey(), parameter.getValue());
+            }
+            txn.commit();
         } catch (SQLException e) {
             throw new DBCException("Error while updating user configuration", e);
         }
