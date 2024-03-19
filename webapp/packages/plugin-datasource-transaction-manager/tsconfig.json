@@ -7,10 +7,16 @@
   },
   "references": [
     {
+      "path": "../core-blocks/tsconfig.json"
+    },
+    {
       "path": "../core-connections/tsconfig.json"
     },
     {
       "path": "../core-di/tsconfig.json"
+    },
+    {
+      "path": "../core-dialogs/tsconfig.json"
     },
     {
       "path": "../core-events/tsconfig.json"
