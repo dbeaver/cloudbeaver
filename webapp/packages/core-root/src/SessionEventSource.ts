@@ -5,7 +5,21 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { catchError, debounceTime, filter, interval, map, merge, Observable, repeat, retry, share, Subject, throwError } from 'rxjs';
+import {
+  catchError,
+  debounceTime,
+  filter,
+  interval,
+  map,
+  merge,
+  Observable,
+  repeat,
+  retry,
+  share,
+  Subject,
+  SubscriptionLike,
+  throwError,
+} from 'rxjs';
 import { webSocket, WebSocketSubject } from 'rxjs/webSocket';
 
 import { injectable } from '@cloudbeaver/core-di';
@@ -53,6 +67,10 @@ export class SessionEventSource implements IServerEventEmitter<ISessionEvent, IS
   private readonly retryTimer: Observable<number>;
   private disconnected: boolean;
 
+  private readonly closeSubjectSubscription: SubscriptionLike;
+  private readonly openSubjectSubscription: SubscriptionLike;
+  private readonly errorSubjectSubscription: SubscriptionLike;
+
   constructor(
     private readonly networkStateService: NetworkStateService,
     private readonly sessionExpireService: SessionExpireService,
@@ -74,21 +92,39 @@ export class SessionEventSource implements IServerEventEmitter<ISessionEvent, IS
       openObserver: this.openSubject,
     });
 
-    this.openSubject.subscribe(() => {
+    this.openSubjectSubscription = this.openSubject.subscribe(() => {
       this.onInit.execute();
     });
 
-    this.closeSubject.subscribe(event => {
+    this.closeSubjectSubscription = this.closeSubject.subscribe(event => {
       console.info(`Websocket closed: ${event.reason}`);
     });
 
     this.eventsSubject = merge(this.oldEventsSubject, this.subject);
 
-    this.errorSubject.pipe(debounceTime(1000)).subscribe(error => {
+    this.errorSubjectSubscription = this.errorSubject.pipe(debounceTime(1000)).subscribe(error => {
       console.error(error);
     });
 
     this.errorHandler = this.errorHandler.bind(this);
+  }
+
+  unsubscribe() {
+    if (!this.subject.closed) {
+      this.subject.unsubscribe();
+    }
+
+    if (!this.closeSubjectSubscription.closed) {
+      this.closeSubjectSubscription.unsubscribe();
+    }
+
+    if (!this.openSubjectSubscription.closed) {
+      this.openSubjectSubscription.unsubscribe();
+    }
+
+    if (!this.errorSubjectSubscription.closed) {
+      this.errorSubjectSubscription.unsubscribe();
+    }
   }
 
   onEvent<T = ISessionEvent>(id: SessionEventId, callback: IServerEventCallback<T>, mapTo: (event: ISessionEvent) => T = e => e as T): Subscription {
@@ -120,8 +156,8 @@ export class SessionEventSource implements IServerEventEmitter<ISessionEvent, IS
   multiplex<T = ISessionEvent>(topicId: SessionEventTopic, mapTo: (event: ISessionEvent) => T = e => e as T): Observable<T> {
     return merge(
       this.subject.multiplex(
-        () => ({ id: ClientEventId.CbClientTopicSubscribe, topicId } as ITopicSubEvent),
-        () => ({ id: ClientEventId.CbClientTopicUnsubscribe, topicId } as ITopicSubEvent),
+        () => ({ id: ClientEventId.CbClientTopicSubscribe, topicId }) as ITopicSubEvent,
+        () => ({ id: ClientEventId.CbClientTopicUnsubscribe, topicId }) as ITopicSubEvent,
         event => event.topicId === topicId,
       ),
       this.oldEventsSubject,
