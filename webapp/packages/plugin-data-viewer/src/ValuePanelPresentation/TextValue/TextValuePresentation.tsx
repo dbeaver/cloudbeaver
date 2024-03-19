@@ -7,49 +7,32 @@
  */
 import { observable } from 'mobx';
 import { observer } from 'mobx-react-lite';
-import styled, { css } from 'reshadow';
 
-import { ActionIconButton, Container, Fill, Group, Loader, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
+import { ActionIconButton, Container, Fill, Group, Loader, s, SContext, StyleRegistry, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { BASE_TAB_STYLES, TabContainerPanelComponent, TabList, TabsState, UNDERLINE_TAB_STYLES, useTabLocalState } from '@cloudbeaver/core-ui';
+import { TabContainerPanelComponent, TabList, TabsState, TabStyles, TabUnderlineStyleRegistry, useTabLocalState } from '@cloudbeaver/core-ui';
 
 import { ResultSetSelectAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetSelectAction';
 import { useResultSetActions } from '../../DatabaseDataModel/Actions/ResultSet/useResultSetActions';
 import type { IDatabaseResultSet } from '../../DatabaseDataModel/IDatabaseResultSet';
 import type { IDataValuePanelProps } from '../../TableViewer/ValuePanel/DataValuePanelService';
-import { VALUE_PANEL_TOOLS_STYLES } from '../ValuePanelTools/VALUE_PANEL_TOOLS_STYLES';
 import { getDefaultLineWrapping } from './getDefaultLineWrapping';
+import styles from './shared/TextValuePresentation.m.css';
+import TextValuePresentationTab from './shared/TextValuePresentationTab.m.css';
 import { TextValueEditor } from './TextValueEditor';
 import { TextValuePresentationService } from './TextValuePresentationService';
 import { TextValueTruncatedMessage } from './TextValueTruncatedMessage';
 import { useTextValue } from './useTextValue';
 
-const styles = css`
-  Tab {
-    composes: theme-ripple theme-background-surface theme-text-text-primary-on-light from global;
-  }
-  TabList {
-    composes: theme-border-color-background theme-background-background from global;
-    overflow: auto;
-    border-radius: var(--theme-group-element-radius);
-
-    & Tab {
-      border-bottom: 0;
-
-      &:global([aria-selected='false']) {
-        border-bottom: 0 !important;
-      }
-    }
-  }
-`;
+const tabRegistry: StyleRegistry = [...TabUnderlineStyleRegistry, [TabStyles, { mode: 'append', styles: [TextValuePresentationTab] }]];
 
 export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelProps<any, IDatabaseResultSet>> = observer(
   function TextValuePresentation({ model, resultIndex, dataFormat }) {
     const translate = useTranslate();
     const notificationService = useService(NotificationService);
     const textValuePresentationService = useService(TextValuePresentationService);
-    const style = useStyles(styles, UNDERLINE_TAB_STYLES, VALUE_PANEL_TOOLS_STYLES);
+    const style = useS(styles);
     const selection = model.source.getAction(resultIndex, ResultSetSelectAction);
     const activeElements = selection.getActiveElements();
     const firstSelectedCell = activeElements.length ? activeElements[0] : undefined;
@@ -115,7 +98,7 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
       state.setLineWrapping(!lineWrapping);
     }
 
-    return styled(style)(
+    return (
       <Container vertical gap dense overflow>
         <Container keepSize center overflow>
           <Container keepSize>
@@ -128,7 +111,9 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
               lazy
               onChange={tab => selectTabHandler(tab.tabId)}
             >
-              <TabList style={[BASE_TAB_STYLES, styles, UNDERLINE_TAB_STYLES]} />
+              <SContext registry={tabRegistry}>
+                <TabList className={s(style, { tabList: true })} />
+              </SContext>
             </TabsState>
           </Container>
         </Container>
@@ -158,7 +143,7 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
           />
           <Fill />
         </Container>
-      </Container>,
+      </Container>
     );
   },
 );

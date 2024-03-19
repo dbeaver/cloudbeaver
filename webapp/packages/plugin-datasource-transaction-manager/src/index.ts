@@ -1,0 +1,1 @@
+export { datasourceTransactionManagerPlugin } from './manifest';

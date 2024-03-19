@@ -7,19 +7,10 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import { Button, Container, Form, s, StatusMessage, useAutoLoad, useForm, useS, useTranslate } from '@cloudbeaver/core-blocks';
+import { Button, Container, Form, s, SContext, StatusMessage, useAutoLoad, useForm, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
-import {
-  BASE_TAB_STYLES,
-  FormMode,
-  IFormState,
-  TabList,
-  TabPanelList,
-  TabsState,
-  UNDERLINE_TAB_BIG_STYLES,
-  UNDERLINE_TAB_STYLES,
-} from '@cloudbeaver/core-ui';
+import { FormMode, IFormState, TabBigUnderlineStyleRegistry, TabList, TabPanelList, TabsState } from '@cloudbeaver/core-ui';
 import { getFirstException } from '@cloudbeaver/core-utils';
 
 import style from './AdministrationUserForm.m.css';
@@ -32,7 +23,6 @@ interface Props {
   onClose: () => void;
 }
 
-const deprecatedStyle = [BASE_TAB_STYLES, UNDERLINE_TAB_STYLES, UNDERLINE_TAB_BIG_STYLES];
 export const AdministrationUserForm = observer<Props>(function AdministrationUserForm({ state, onClose }) {
   const styles = useS(style);
   const translate = useTranslate();
@@ -78,7 +68,9 @@ export const AdministrationUserForm = observer<Props>(function AdministrationUse
           <Container className={s(styles, { bar: true })} gap keepSize noWrap>
             <Container fill>
               <StatusMessage exception={getFirstException(state.exception)} type={state.statusType} message={state.statusMessage} />
-              <TabList className={s(styles, { tabList: true })} style={deprecatedStyle} />
+              <SContext registry={TabBigUnderlineStyleRegistry}>
+                <TabList className={s(styles, { tabList: true })} />
+              </SContext>
             </Container>
             <Container keepSize noWrap center gap compact>
               {editing && (

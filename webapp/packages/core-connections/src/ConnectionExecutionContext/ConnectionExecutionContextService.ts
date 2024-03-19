@@ -8,6 +8,7 @@
 import { injectable } from '@cloudbeaver/core-di';
 import { TaskScheduler } from '@cloudbeaver/core-executor';
 import { CachedMapAllKey, ResourceKeyUtils } from '@cloudbeaver/core-resource';
+import { AsyncTaskInfoService, GraphQLService } from '@cloudbeaver/core-sdk';
 import { MetadataMap } from '@cloudbeaver/core-utils';
 
 import type { IConnectionInfoParams } from '../CONNECTION_INFO_PARAM_SCHEMA';
@@ -19,8 +20,21 @@ export class ConnectionExecutionContextService {
   private readonly contexts: MetadataMap<string, ConnectionExecutionContext>;
   protected scheduler: TaskScheduler<string>;
 
-  constructor(readonly connectionExecutionContextResource: ConnectionExecutionContextResource) {
-    this.contexts = new MetadataMap(contextId => new ConnectionExecutionContext(this.scheduler, this.connectionExecutionContextResource, contextId));
+  constructor(
+    readonly connectionExecutionContextResource: ConnectionExecutionContextResource,
+    private readonly asyncTaskInfoService: AsyncTaskInfoService,
+    private readonly GraphQLService: GraphQLService,
+  ) {
+    this.contexts = new MetadataMap(
+      contextId =>
+        new ConnectionExecutionContext(
+          contextId,
+          this.scheduler,
+          this.connectionExecutionContextResource,
+          this.asyncTaskInfoService,
+          this.GraphQLService,
+        ),
+    );
     this.scheduler = new TaskScheduler((a, b) => a === b);
     this.connectionExecutionContextResource.onItemDelete.addHandler(key =>
       ResourceKeyUtils.forEach(key, contextId => this.contexts.delete(contextId)),

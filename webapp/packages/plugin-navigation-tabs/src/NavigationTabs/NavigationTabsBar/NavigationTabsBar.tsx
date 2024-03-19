@@ -7,48 +7,41 @@
  */
 import { observer } from 'mobx-react-lite';
 import { useCallback, useEffect, useState } from 'react';
-import styled, { css } from 'reshadow';
 
 import { UserInfoResource } from '@cloudbeaver/core-authentication';
-import { Loader, TextPlaceholder, useExecutor, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
+import { Loader, s, SContext, StyleRegistry, TextPlaceholder, useExecutor, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { BASE_TAB_STYLES, ITabData, TabPanel, TabsBox } from '@cloudbeaver/core-ui';
+import { ITabData, TabPanel, TabsBox, TabStyles } from '@cloudbeaver/core-ui';
 import { CaptureView } from '@cloudbeaver/core-view';
 
 import { NavigationTabsService } from '../NavigationTabsService';
+import styles from './shared/NavigationTabsBar.m.css';
+import NavigationTabsBarTab from './shared/NavigationTabsBarTab.m.css';
 import { TabHandlerPanel } from './Tabs/TabHandlerPanel';
 import { TabHandlerTab } from './Tabs/TabHandlerTab';
-
-const styles = css`
-  Tab {
-    composes: theme-ripple theme-background-background theme-text-text-primary-on-light from global;
-    height: 38px !important;
-  }
-  tabs {
-    composes: theme-background-secondary theme-text-on-secondary from global;
-  }
-  TabsBox {
-    outline: none;
-  }
-  CaptureView {
-    flex: 1;
-    display: flex;
-    overflow: auto;
-  }
-`;
 
 interface Props {
   className?: string;
 }
+
+const tabsRegistry: StyleRegistry = [
+  [
+    TabStyles,
+    {
+      mode: 'append',
+      styles: [NavigationTabsBarTab],
+    },
+  ],
+];
 
 export const NavigationTabsBar = observer<Props>(function NavigationTabsBar({ className }) {
   const userInfoResource = useService(UserInfoResource);
   const navigation = useService(NavigationTabsService);
   // TODO: we get exception when after closing the restored page trying to open another
   //       it's related to hooks order and state restoration
-  const style = useStyles(BASE_TAB_STYLES, styles);
   const [restoring, setRestoring] = useState(false);
   const translate = useTranslate();
+  const style = useS(styles);
 
   const handleSelect = useCallback((tabId: string) => navigation.selectTab(tabId), [navigation]);
   const handleClose = useCallback((tabId: string) => navigation.closeTab(tabId), [navigation]);
@@ -89,16 +82,21 @@ export const NavigationTabsBar = observer<Props>(function NavigationTabsBar({ cl
     return <TextPlaceholder>{translate('app_shared_navigationTabsBar_placeholder')}</TextPlaceholder>;
   }
 
-  return styled(style)(
-    <CaptureView view={navigation} className={className}>
+  return (
+    <CaptureView view={navigation} className={s(style, { captureView: true }, className)}>
       <Loader loading={restoring}>
         <TabsBox
           currentTabId={navigation.currentTabId}
-          tabs={navigation.tabIdList.map(tabId => (
-            <TabHandlerTab key={tabId} tabId={tabId} style={styles} onSelect={handleSelect} onClose={handleClose} />
-          ))}
+          className={s(style, { tabsBox: true })}
+          tabsClassName={s(style, { tabs: true })}
+          tabs={
+            <SContext registry={tabsRegistry}>
+              {navigation.tabIdList.map(tabId => (
+                <TabHandlerTab key={tabId} tabId={tabId} onSelect={handleSelect} onClose={handleClose} />
+              ))}
+            </SContext>
+          }
           tabList={navigation.tabIdList}
-          style={styles}
           tabIndex={0}
           autoSelect
           enabledBaseActions
@@ -111,6 +109,6 @@ export const NavigationTabsBar = observer<Props>(function NavigationTabsBar({ cl
           ))}
         </TabsBox>
       </Loader>
-    </CaptureView>,
+    </CaptureView>
   );
 });

@@ -7,24 +7,14 @@
  */
 import { observer } from 'mobx-react-lite';
 import { useContext } from 'react';
-import styled from 'reshadow';
-
-import { useStyles } from '@cloudbeaver/core-blocks';
-import type { ComponentStyle } from '@cloudbeaver/core-theming';
 
 import { generateTabElement } from './generateTabElement';
-import { BASE_TAB_STYLES } from './Tab/BASE_TAB_STYLES';
 import { TabPanel } from './TabPanel';
 import type { ITabInfo } from './TabsContainer/ITabsContainer';
 import { TabsContext } from './TabsContext';
 
-interface Props extends React.PropsWithChildren {
-  style?: ComponentStyle;
-}
-
-export const TabPanelList = observer<Props>(function TabPanelList({ style, children }) {
+export const TabPanelList = observer<React.PropsWithChildren>(function TabPanelList({ children }) {
   const state = useContext(TabsContext);
-  const styles = useStyles(BASE_TAB_STYLES, style);
 
   if (!state) {
     throw new Error('Tabs context was not provided');
@@ -41,7 +31,7 @@ export const TabPanelList = observer<Props>(function TabPanelList({ style, child
 
   const displayed = state.container.getDisplayed(state.props);
 
-  return styled(styles)(
+  return (
     <>
       {displayed
         .map(
@@ -56,6 +46,6 @@ export const TabPanelList = observer<Props>(function TabPanelList({ style, child
         )
         .flat()}
       {children}
-    </>,
+    </>
   );
 });

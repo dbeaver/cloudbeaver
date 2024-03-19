@@ -1,0 +1,5 @@
+mutation asyncSqlCommitTransaction($projectId: ID!, $connectionId: ID!, $contextId: ID!) {
+  taskInfo: asyncSqlCommitTransaction(projectId: $projectId, connectionId: $connectionId, contextId: $contextId) {
+    ...AsyncTaskInfo
+  }
+}
