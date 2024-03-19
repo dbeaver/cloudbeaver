@@ -77,7 +77,7 @@ public class CBEventsWebSocket extends CBAbstractWebSocket implements CBWebSessi
                 this.webSession.getEventsFilter().setSubscribedProjects(projectEvent.getProjectIds());
                 break;
             }
-            case TOUCH_SESSION: {
+            case SESSION_PING: {
                 if (webSession instanceof WebSession session) {
                     session.updateInfo(true);
                 }
