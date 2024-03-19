@@ -6,41 +6,32 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import styled, { css } from 'reshadow';
 
-import { ColoredContainer, Container, Group, useS, useStyles } from '@cloudbeaver/core-blocks';
+import { ColoredContainer, Container, Group, SContext, StyleRegistry, useS } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { BASE_TAB_STYLES, TabList, TabPanelList, TabsState, UNDERLINE_TAB_STYLES } from '@cloudbeaver/core-ui';
+import { TabList, TabPanelList, TabsState, TabStyles, TabUnderlineStyleRegistry } from '@cloudbeaver/core-ui';
 
 import style from './UserProfileOptionsPanel.m.css';
+import UserProfileTabStyles from './UserProfileTab.m.css';
 import { UserProfileTabsService } from './UserProfileTabsService';
 
-const tabsStyles = css`
-  tab-inner {
-    height: 100%;
-  }
-
-  tab-outer {
-    height: 100%;
-  }
-`;
-
-const oldTabStyles = [BASE_TAB_STYLES, tabsStyles, UNDERLINE_TAB_STYLES];
+export const tabsStyleRegistry: StyleRegistry = [...TabUnderlineStyleRegistry, [TabStyles, { mode: 'append', styles: [UserProfileTabStyles] }]];
 
 export const UserProfileOptionsPanel = observer(function UserProfileOptionsPanel() {
-  const oldStyles = useStyles(oldTabStyles);
   const styles = useS(style);
   const userProfileTabsService = useService(UserProfileTabsService);
-  return styled(oldStyles)(
+  return (
     <ColoredContainer className={styles.userProfileOptionsPanel} parent compact vertical noWrap maximum>
       <TabsState container={userProfileTabsService.tabContainer} lazy>
-        <Group box keepSize noWrap hidden>
-          <TabList style={oldTabStyles} />
+        <Group box keepSize noWrap>
+          <SContext registry={tabsStyleRegistry}>
+            <TabList />
+          </SContext>
         </Group>
         <Container vertical>
           <TabPanelList />
         </Container>
       </TabsState>
-    </ColoredContainer>,
+    </ColoredContainer>
   );
 });

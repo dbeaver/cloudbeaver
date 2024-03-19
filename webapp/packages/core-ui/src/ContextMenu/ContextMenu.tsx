@@ -14,6 +14,7 @@ import { MenuActionItem } from '@cloudbeaver/core-view';
 import type { IContextMenuProps } from './IContextMenuProps';
 import { MenuItemRenderer } from './MenuItemRenderer';
 
+// TODO the click doesn't work for React components as children
 export const ContextMenu = observer<IContextMenuProps, HTMLButtonElement>(
   forwardRef(function ContextMenu(
     { mouseContextMenu, menu: menuData, disclosure, children, placement, visible, onVisibleSwitch, modal, rtl, ...props },

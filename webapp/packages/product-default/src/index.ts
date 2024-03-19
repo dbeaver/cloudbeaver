@@ -17,6 +17,7 @@ import { dataSpreadsheetNewManifest } from '@cloudbeaver/plugin-data-spreadsheet
 import { dataViewerManifest } from '@cloudbeaver/plugin-data-viewer';
 import { dvResultSetGroupingPlugin } from '@cloudbeaver/plugin-data-viewer-result-set-grouping';
 import { datasourceContextSwitchPluginManifest } from '@cloudbeaver/plugin-datasource-context-switch';
+import { datasourceTransactionManagerPlugin } from '@cloudbeaver/plugin-datasource-transaction-manager';
 import ddlViewer from '@cloudbeaver/plugin-ddl-viewer';
 import devTools from '@cloudbeaver/plugin-devtools';
 import gisViewer from '@cloudbeaver/plugin-gis-viewer';
@@ -107,6 +108,7 @@ const PLUGINS: PluginManifest[] = [
   root,
   sessionExpirationPlugin,
   toolsPanel,
+  datasourceTransactionManagerPlugin,
   projects,
   browserPlugin,
   navigationTreeFilters,

@@ -6,10 +6,8 @@
  * you may not use this file except in compliance with the License.
  */
 import { useContext, useMemo } from 'react';
-import styled from 'reshadow';
 
-import { Translate, useStyles } from '@cloudbeaver/core-blocks';
-import type { ComponentStyle } from '@cloudbeaver/core-theming';
+import { Translate } from '@cloudbeaver/core-blocks';
 
 import { TabContext } from '../TabContext';
 import type { ITabData } from '../TabsContainer/ITabsContainer';
@@ -25,7 +23,6 @@ interface Props<T = Record<string, any>> {
   name?: string;
   component?: React.FC<TabProps & T>;
   className?: string;
-  style?: ComponentStyle;
   disabled?: boolean;
   onOpen?: (tab: ITabData<any>) => void;
   onClose?: (tab: ITabData<any>) => void;
@@ -37,14 +34,12 @@ export function TabDefault<T = Record<string, any>>({
   name,
   component,
   className,
-  style,
   disabled,
   onOpen,
   onClose,
   ...rest
 }: Props<T> & T): React.ReactElement | null {
   const state = useContext(TabsContext);
-  const styles = useStyles(style);
   const tabContext = useMemo(() => ({ tabId }), [tabId]);
   const selected = state?.state.selectedId === tabId;
 
@@ -56,7 +51,6 @@ export function TabDefault<T = Record<string, any>>({
           tabId={tabId}
           className={className}
           {...(rest as unknown as T)}
-          style={style}
           selected={selected}
           disabled={disabled}
           onOpen={onOpen}
@@ -66,14 +60,14 @@ export function TabDefault<T = Record<string, any>>({
     );
   }
 
-  return styled(styles)(
-    <Tab tabId={tabId} className={className} style={style} selected={selected} disabled={disabled} onOpen={onOpen} onClose={onClose}>
+  return (
+    <Tab tabId={tabId} className={className} selected={selected} disabled={disabled} onOpen={onOpen} onClose={onClose}>
       {icon && <TabIcon icon={icon} />}
       {name && (
         <TabTitle>
           <Translate token={name} />
         </TabTitle>
       )}
-    </Tab>,
+    </Tab>
   );
 }

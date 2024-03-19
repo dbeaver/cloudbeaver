@@ -7,11 +7,10 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import { Button, Container, Form, s, StatusMessage, useAutoLoad, useForm, useS, useTranslate } from '@cloudbeaver/core-blocks';
+import { Button, Container, Form, s, SContext, StatusMessage, useAutoLoad, useForm, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import { getFirstException } from '@cloudbeaver/core-utils';
 
-import { BASE_TAB_STYLES } from '../../Tabs/Tab/BASE_TAB_STYLES';
-import { UNDERLINE_TAB_BIG_STYLES, UNDERLINE_TAB_STYLES } from '../../Tabs/Tab/UnderlineTabStyles';
+import { TabBigUnderlineStyleRegistry } from '../../Tabs/Tab/TabStyleRegistries';
 import { TabList } from '../../Tabs/TabList';
 import { TabPanelList } from '../../Tabs/TabPanelList';
 import { TabsState } from '../../Tabs/TabsState';
@@ -19,7 +18,6 @@ import { FormMode } from '../FormMode';
 import style from './BaseForm.m.css';
 import type { IBaseFormProps } from './IBaseFormProps';
 
-const deprecatedStyle = [BASE_TAB_STYLES, UNDERLINE_TAB_STYLES, UNDERLINE_TAB_BIG_STYLES];
 export const BaseForm = observer<IBaseFormProps<any>>(function BaseForm({ service, state, onClose, onSubmit }) {
   const styles = useS(style);
   const translate = useTranslate();
@@ -48,7 +46,9 @@ export const BaseForm = observer<IBaseFormProps<any>>(function BaseForm({ servic
           <Container className={s(styles, { bar: true })} gap keepSize noWrap>
             <Container fill>
               <StatusMessage exception={getFirstException(state.exception)} type={state.statusType} message={state.statusMessage} />
-              <TabList className={s(styles, { tabList: true })} style={deprecatedStyle} />
+              <SContext registry={TabBigUnderlineStyleRegistry}>
+                <TabList className={s(styles, { tabList: true })} />
+              </SContext>
             </Container>
             <Container keepSize noWrap center gap compact>
               {onClose && (

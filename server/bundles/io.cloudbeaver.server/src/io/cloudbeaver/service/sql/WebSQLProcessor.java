@@ -358,9 +358,15 @@ public class WebSQLProcessor implements WebSessionProvider {
             try (DBCSession session = executionContext.openSession(monitor, DBCExecutionPurpose.USER, "Update data in container")) {
                 DBCTransactionManager txnManager = DBUtils.getTransactionManager(executionContext);
                 boolean revertToAutoCommit = false;
-                if (txnManager != null && txnManager.isSupportsTransactions() && txnManager.isAutoCommit()) {
-                    txnManager.setAutoCommit(monitor, false);
-                    revertToAutoCommit = true;
+                boolean isAutoCommitEnabled = true;
+                DBCSavepoint savepoint = null;
+                if (txnManager != null) {
+                    isAutoCommitEnabled = txnManager.isAutoCommit();
+                    if (txnManager.isSupportsTransactions() && isAutoCommitEnabled) {
+                        txnManager.setAutoCommit(monitor, false);
+                        savepoint = txnManager.setSavepoint(monitor, null);
+                        revertToAutoCommit = true;
+                    }
                 }
                 try {
                     Map<String, Object> options = Collections.emptyMap();
@@ -375,17 +381,27 @@ public class WebSQLProcessor implements WebSessionProvider {
                         newResultSetRows.add(new WebSQLQueryResultSetRow(rowValues, null));
                     }
 
-                    if (txnManager != null && txnManager.isSupportsTransactions()) {
+                    if (txnManager != null && txnManager.isSupportsTransactions() && isAutoCommitEnabled) {
                         txnManager.commit(session);
                     }
                 } catch (Exception e) {
                     if (txnManager != null && txnManager.isSupportsTransactions()) {
-                        txnManager.rollback(session, null);
+                        txnManager.rollback(session, savepoint);
                     }
                     throw new DBCException("Error persisting data changes", e);
                 } finally {
-                    if (revertToAutoCommit) {
-                        txnManager.setAutoCommit(monitor, true);
+                    if (txnManager != null) {
+                        if (revertToAutoCommit) {
+                            txnManager.setAutoCommit(monitor, true);
+                        }
+                        try {
+                            if (savepoint != null) {
+                                txnManager.releaseSavepoint(monitor, savepoint);
+                            }
+                        } catch (Throwable e) {
+                            // Maybe savepoints not supported
+                            log.debug("Can't release savepoint", e);
+                        }
                     }
                 }
             }

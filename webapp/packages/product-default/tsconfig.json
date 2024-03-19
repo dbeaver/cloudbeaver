@@ -67,6 +67,9 @@
       "path": "../plugin-datasource-context-switch/tsconfig.json"
     },
     {
+      "path": "../plugin-datasource-transaction-manager/tsconfig.json"
+    },
+    {
       "path": "../plugin-ddl-viewer/tsconfig.json"
     },
     {

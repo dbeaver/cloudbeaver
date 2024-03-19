@@ -47,26 +47,36 @@ export * from './Tabs/TabsContext';
 export * from './Tabs/TabsState';
 export * from './Tabs/useTabState';
 export * from './Tabs/useTabLocalState';
+export { default as TabStyles } from './Tabs/Tab/Tab.m.css';
+export { default as TabTitleStyles } from './Tabs/Tab/TabTitle.m.css';
+export { default as TabVerticalRotatedStyles } from './Tabs/Tab/TabVerticalRotated.m.css';
+export { default as TabIconVerticalRotatedStyles } from './Tabs/Tab/TabIconVerticalRotated.m.css';
+export { default as TabTitleVerticalRotatedStyles } from './Tabs/Tab/TabTitleVerticalRotated.m.css';
+export { default as TabListVerticalRotatedStyles } from './Tabs/TabListVerticalRotated.m.css';
+export { default as TabPanelStyles } from './Tabs/TabPanel.m.css';
+export { default as TabListStyles } from './Tabs/TabList.m.css';
+export { default as TabVertical } from './Tabs/Tab/TabVertical.m.css';
+export { default as TabListVertical } from './Tabs/TabListVertical.m.css';
+export { default as TabUnderlineStyles } from './Tabs/Tab/TabUnderline.m.css';
+export { default as TabBigUnderlineStyles } from './Tabs/Tab/TabBigUnderlineStyles.m.css';
+export { default as TabTitleBigUnderlineStyles } from './Tabs/Tab/TabTitleBigUnderlineStyles.m.css';
+export { default as TabIconStyles } from './Tabs/Tab/TabIcon.m.css';
+export * from './Tabs/Tab/TabStyleRegistries';
+export * from './Tabs/TabListStyleRegistries';
 
-export * from './Tabs/Tab/BASE_TAB_STYLES';
-export * from './Tabs/Tab/BorderTabStyles';
 export * from './Tabs/Tab/DATA_CONTEXT_TAB_ID';
 export * from './Tabs/Tab/DATA_CONTEXT_TABS_CONTEXT';
 export * from './Tabs/Tab/MENU_TAB';
-export * from './Tabs/Tab/Tab';
+
 export * from './Tabs/Tab/Tab';
 export * from './Tabs/Tab/TabDefault';
 export * from './Tabs/Tab/TabIcon';
 export * from './Tabs/Tab/TabProps';
 export * from './Tabs/Tab/TabTitle';
 export * from './Tabs/Tab/useTab';
-export * from './Tabs/Tab/VERTICAL_ROTATED_TAB_STYLES';
-export * from './Tabs/Tab/UnderlineTabStyles';
-export * from './Tabs/Tab/verticalTabStyles';
 export * from './Tabs/TabsBootstrap';
 
 export * from './Tabs/TabsBox/TabsBox';
-export * from './Tabs/TabsBox/TabsBoxFromArray';
 
 export * from './SideBarPanel/LeftBarPanelService';
 export * from './SideBarPanel/SideBarPanel';
