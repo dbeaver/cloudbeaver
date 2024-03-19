@@ -48,7 +48,6 @@ import org.jkiss.dbeaver.model.sql.parser.SQLScriptParser;
 import org.jkiss.dbeaver.model.sql.registry.SQLGeneratorConfigurationRegistry;
 import org.jkiss.dbeaver.model.sql.registry.SQLGeneratorDescriptor;
 import org.jkiss.dbeaver.model.struct.DBSDataContainer;
-import org.jkiss.dbeaver.model.struct.DBSEntity;
 import org.jkiss.dbeaver.model.struct.DBSObject;
 import org.jkiss.dbeaver.model.struct.DBSWrapper;
 import org.jkiss.dbeaver.utils.RuntimeUtils;
@@ -577,6 +576,21 @@ public class WebServiceSQL implements DBWServiceSQL {
             return (Long) taskStatus.getExtendedResult();
         }
         return null;
+    }
+
+    @Override
+    public WebAsyncTaskInfo asyncSqlSetAutoCommit(@NotNull WebSession webSession, @NotNull WebSQLContextInfo contextInfo, boolean autoCommit) throws DBWebException {
+        return contextInfo.setAutoCommit(autoCommit);
+    }
+
+    @Override
+    public WebAsyncTaskInfo asyncSqlRollbackTransaction(@NotNull WebSession webSession, @NotNull WebSQLContextInfo contextInfo) throws DBWebException {
+        return contextInfo.rollbackTransaction();
+    }
+
+    @Override
+    public WebAsyncTaskInfo asyncSqlCommitTransaction(@NotNull WebSession webSession, @NotNull WebSQLContextInfo contextInfo) {
+        return contextInfo.commitTransaction();
     }
 
 }

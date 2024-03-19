@@ -9,12 +9,12 @@ import { action, computed, observable } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import { useMemo } from 'react';
 
-import { ActionIconButton, Button, Container, Fill, s, useObservableRef, useS, useTranslate } from '@cloudbeaver/core-blocks';
+import { ActionIconButton, Button, Container, Fill, Loader, s, useObservableRef, useS, useSuspense, useTranslate } from '@cloudbeaver/core-blocks';
 import { selectFiles } from '@cloudbeaver/core-browser';
 import { useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { type TabContainerPanelComponent, useTabLocalState } from '@cloudbeaver/core-ui';
-import { bytesToSize, download, getMIME, isImageFormat, isValidUrl, throttle } from '@cloudbeaver/core-utils';
+import { blobToBase64, bytesToSize, download, getMIME, isImageFormat, isValidUrl, throttle } from '@cloudbeaver/core-utils';
 
 import { createResultSetBlobValue } from '../../DatabaseDataModel/Actions/ResultSet/createResultSetBlobValue';
 import type { IResultSetElementKey } from '../../DatabaseDataModel/Actions/ResultSet/IResultSetDataKey';
@@ -34,6 +34,7 @@ import styles from './ImageValuePresentation.m.css';
 export const ImageValuePresentation: TabContainerPanelComponent<IDataValuePanelProps<any, IDatabaseResultSet>> = observer(
   function ImageValuePresentation({ model, resultIndex }) {
     const translate = useTranslate();
+    const suspense = useSuspense();
     const notificationService = useService(NotificationService);
     const style = useS(styles);
 
@@ -82,10 +83,10 @@ export const ImageValuePresentation: TabContainerPanelComponent<IDataValuePanelP
 
           return this.formatAction.get(this.selectedCell);
         },
-        get src(): string | null {
+        get src(): string | Blob | null {
           if (isResultSetBlobValue(this.cellValue)) {
             // uploaded file preview
-            return URL.createObjectURL(this.cellValue.blob);
+            return this.cellValue.blob;
           }
 
           if (this.staticSrc) {
@@ -93,10 +94,8 @@ export const ImageValuePresentation: TabContainerPanelComponent<IDataValuePanelP
           }
 
           if (this.cacheBlob) {
-            // TODO: this object must be released with URL.revokeObjectURL()
-            // it also can be released by the browser after some time
-            // what leads to image not accessible
-            return URL.createObjectURL(this.cacheBlob);
+            // uploaded file preview
+            return this.cacheBlob;
           }
 
           return null;
@@ -204,20 +203,32 @@ export const ImageValuePresentation: TabContainerPanelComponent<IDataValuePanelP
     const isCacheDownloading = isDownloadable && data.contentAction.isLoading(data.selectedCell);
 
     const debouncedDownload = useMemo(() => throttle(() => data.download(), 1000, false), []);
+    const srcGetter = suspense.observedValue(
+      'src',
+      () => data.src,
+      async src => {
+        if (src instanceof Blob) {
+          return await blobToBase64(src);
+        }
+        return src;
+      },
+    );
 
     return (
       <Container vertical>
         <Container fill overflow center>
-          {data.src && <img src={data.src} className={s(style, { img: true, stretch: state.stretch })} />}
-          {isTruncatedMessageDisplay && (
-            <QuotaPlaceholder model={data.model} resultIndex={data.resultIndex} elementKey={data.selectedCell}>
-              {isDownloadable && (
-                <Button disabled={loading} loading={isCacheDownloading} onClick={data.loadFullImage}>
-                  {`${translate('ui_view')} (${valueSize})`}
-                </Button>
-              )}
-            </QuotaPlaceholder>
-          )}
+          <Loader suspense>
+            {data.src && <ImageRenderer srcGetter={srcGetter} className={s(style, { img: true, stretch: state.stretch })} />}
+            {isTruncatedMessageDisplay && (
+              <QuotaPlaceholder model={data.model} resultIndex={data.resultIndex} elementKey={data.selectedCell}>
+                {isDownloadable && (
+                  <Button disabled={loading} loading={isCacheDownloading} loader onClick={data.loadFullImage}>
+                    {`${translate('ui_view')} (${valueSize})`}
+                  </Button>
+                )}
+              </QuotaPlaceholder>
+            )}
+          </Loader>
         </Container>
         <Container gap dense keepSize>
           <Container keepSize flexStart center>
@@ -241,3 +252,18 @@ export const ImageValuePresentation: TabContainerPanelComponent<IDataValuePanelP
     );
   },
 );
+
+interface ImageRendererProps {
+  className?: string;
+  srcGetter: () => string | null;
+}
+
+export const ImageRenderer = observer<ImageRendererProps>(function ImageRenderer({ srcGetter, className }) {
+  const src = srcGetter();
+
+  if (!src) {
+    return null;
+  }
+
+  return <img src={src} className={className} />;
+});

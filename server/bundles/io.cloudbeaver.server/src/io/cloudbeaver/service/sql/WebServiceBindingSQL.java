@@ -207,8 +207,23 @@ public class WebServiceBindingSQL extends WebServiceBindingBase<DBWServiceSQL> i
                 getService(env).getRowDataCountResult(
                     getWebSession(env),
                     env.getArgument("taskId")
-            )
-        );
+            ))
+            .dataFetcher("asyncSqlSetAutoCommit", env ->
+                getService(env).asyncSqlSetAutoCommit(
+                    getWebSession(env),
+                    getSQLContext(env),
+                    env.getArgument("autoCommit")
+            ))
+            .dataFetcher("asyncSqlCommitTransaction", env ->
+                getService(env).asyncSqlCommitTransaction(
+                    getWebSession(env),
+                    getSQLContext(env)
+                ))
+            .dataFetcher("asyncSqlRollbackTransaction", env ->
+                getService(env).asyncSqlRollbackTransaction(
+                    getWebSession(env),
+                    getSQLContext(env)
+                ));
     }
 
     @NotNull
