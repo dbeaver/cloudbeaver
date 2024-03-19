@@ -23,7 +23,7 @@ export const UserProfileOptionsPanel = observer(function UserProfileOptionsPanel
   return (
     <ColoredContainer className={styles.userProfileOptionsPanel} parent compact vertical noWrap maximum>
       <TabsState container={userProfileTabsService.tabContainer} lazy>
-        <Group box keepSize noWrap>
+        <Group box keepSize noWrap hidden>
           <SContext registry={tabsStyleRegistry}>
             <TabList />
           </SContext>
