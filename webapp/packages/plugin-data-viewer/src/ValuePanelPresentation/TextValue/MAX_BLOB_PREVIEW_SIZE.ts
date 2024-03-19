@@ -6,7 +6,4 @@
  * you may not use this file except in compliance with the License.
  */
 
-.limitWord {
-  text-transform: lowercase;
-  display: contents;
-}
+export const MAX_BLOB_PREVIEW_SIZE = 10 * 1024;
