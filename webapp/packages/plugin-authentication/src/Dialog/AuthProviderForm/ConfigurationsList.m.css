@@ -6,13 +6,6 @@
  * you may not use this file except in compliance with the License.
  */
 
-.container {
-  display: flex;
-  flex-direction: column;
-  overflow: auto;
-  flex: 1;
-}
-
 .filter {
   margin: 0 24px 12px 24px;
 }
