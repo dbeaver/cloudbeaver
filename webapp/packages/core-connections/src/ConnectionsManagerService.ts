@@ -152,6 +152,7 @@ export class ConnectionsManagerService {
     if (!connection.connected) {
       return;
     }
+
     await this.connectionInfo.close(createConnectionParam(connection));
   }
 
@@ -159,13 +160,29 @@ export class ConnectionsManagerService {
     if (this.disconnecting) {
       return;
     }
+
+    const connectionParams = this.projectConnections.map(connection => createConnectionParam(connection));
+    const contexts = await this.onDisconnect.execute({
+      connections: connectionParams,
+      state: 'before',
+    });
+
+    if (ExecutorInterrupter.isInterrupted(contexts)) {
+      return;
+    }
+
     this.disconnecting = true;
     const { controller, notification } = this.notificationService.processNotification(() => ProcessSnackbar, {}, { title: 'Disconnecting...' });
 
     try {
       for (const connection of this.projectConnections) {
         await this._closeConnectionAsync(connection);
+        this.onDisconnect.execute({
+          connections: [createConnectionParam(connection)],
+          state: 'after',
+        });
       }
+
       notification.close();
     } catch (e: any) {
       controller.reject(e);

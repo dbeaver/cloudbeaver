@@ -6,7 +6,6 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import styled from 'reshadow';
 
 import { AuthProvider, AuthProviderConfiguration, UserInfoResource } from '@cloudbeaver/core-authentication';
 import {
@@ -19,15 +18,15 @@ import {
   getComputed,
   Link,
   s,
+  SContext,
   TextPlaceholder,
   useErrorDetails,
   useS,
-  useStyles,
   useTranslate,
 } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogComponent } from '@cloudbeaver/core-dialogs';
-import { BASE_TAB_STYLES, Tab, TabList, TabsState, TabTitle, UNDERLINE_TAB_BIG_STYLES, UNDERLINE_TAB_STYLES } from '@cloudbeaver/core-ui';
+import { Tab, TabBigUnderlineStyleRegistry, TabList, TabsState, TabTitle } from '@cloudbeaver/core-ui';
 
 import { AuthenticationService } from '../AuthenticationService';
 import type { IAuthOptions } from '../IAuthOptions';
@@ -37,7 +36,6 @@ import { AuthProviderForm } from './AuthProviderForm/AuthProviderForm';
 import { ConfigurationsList } from './AuthProviderForm/ConfigurationsList';
 import { FEDERATED_AUTH } from './FEDERATED_AUTH';
 import { getAuthProviderTabId, useAuthDialogState } from './useAuthDialogState';
-import { NotificationService } from '@cloudbeaver/core-events';
 
 export const AuthDialog: DialogComponent<IAuthOptions, null> = observer(function AuthDialog({
   payload: { providerId, configurationId, linkUser = false, accessRequest = false },
@@ -50,7 +48,6 @@ export const AuthDialog: DialogComponent<IAuthOptions, null> = observer(function
   const authenticationService = useService(AuthenticationService);
   const userInfo = useService(UserInfoResource);
   const commonDialogService = useService(CommonDialogService);
-  const notificationService = useService(NotificationService);
   const translate = useTranslate();
   const state = dialogData.state;
 
@@ -142,7 +139,7 @@ export const AuthDialog: DialogComponent<IAuthOptions, null> = observer(function
     );
   }
 
-  return styled(useStyles(BASE_TAB_STYLES, UNDERLINE_TAB_STYLES, UNDERLINE_TAB_BIG_STYLES))(
+  return (
     <TabsState
       currentTabId={state.tabId}
       onChange={tabData => {
@@ -158,62 +155,64 @@ export const AuthDialog: DialogComponent<IAuthOptions, null> = observer(function
           onReject={options?.persistent ? undefined : rejectDialog}
         />
         <CommonDialogBody noBodyPadding>
-          {showTabs && (
-            <TabList className={s(styles, { tabList: true })} aria-label="Auth providers">
-              {dialogData.providers
-                .map(provider => {
-                  if (provider.configurable) {
-                    return provider.configurations?.map(configuration => {
-                      const tabId = getAuthProviderTabId(provider, configuration);
-                      return (
-                        <Tab
-                          key={tabId}
-                          tabId={tabId}
-                          title={configuration.displayName}
-                          disabled={dialogData.authenticating}
-                          className={s(styles, { tab: true })}
-                          onClick={() => {
-                            state.setActiveProvider(provider, configuration);
-                          }}
-                        >
-                          <TabTitle>{configuration.displayName}</TabTitle>
-                        </Tab>
-                      );
-                    });
-                  }
-                  return (
-                    <Tab
-                      key={provider.id}
-                      tabId={provider.id}
-                      title={provider.description || provider.label}
-                      disabled={dialogData.authenticating}
-                      className={s(styles, { tab: true })}
-                      onClick={() => {
-                        state.setActiveProvider(provider, null);
-                      }}
-                    >
-                      <TabTitle>{provider.label}</TabTitle>
-                    </Tab>
-                  );
-                })
-                .flat()}
-              {dialogData.federatedProviders.length > 0 && (
-                <Tab
-                  key={FEDERATED_AUTH}
-                  tabId={FEDERATED_AUTH}
-                  title={translate('authentication_auth_federated')}
-                  className={s(styles, { tab: true })}
-                  disabled={dialogData.authenticating}
-                  onClick={() => {
-                    state.setActiveProvider(null, null);
-                    state.setTabId(FEDERATED_AUTH);
-                  }}
-                >
-                  <TabTitle>{translate('authentication_auth_federated')}</TabTitle>
-                </Tab>
-              )}
-            </TabList>
-          )}
+          <SContext registry={TabBigUnderlineStyleRegistry}>
+            {showTabs && (
+              <TabList className={s(styles, { tabList: true })} aria-label="Auth providers">
+                {dialogData.providers
+                  .map(provider => {
+                    if (provider.configurable) {
+                      return provider.configurations?.map(configuration => {
+                        const tabId = getAuthProviderTabId(provider, configuration);
+                        return (
+                          <Tab
+                            key={tabId}
+                            tabId={tabId}
+                            title={configuration.displayName}
+                            disabled={dialogData.authenticating}
+                            className={s(styles, { tab: true })}
+                            onClick={() => {
+                              state.setActiveProvider(provider, configuration);
+                            }}
+                          >
+                            <TabTitle>{configuration.displayName}</TabTitle>
+                          </Tab>
+                        );
+                      });
+                    }
+                    return (
+                      <Tab
+                        key={provider.id}
+                        tabId={provider.id}
+                        title={provider.description || provider.label}
+                        disabled={dialogData.authenticating}
+                        className={s(styles, { tab: true })}
+                        onClick={() => {
+                          state.setActiveProvider(provider, null);
+                        }}
+                      >
+                        <TabTitle>{provider.label}</TabTitle>
+                      </Tab>
+                    );
+                  })
+                  .flat()}
+                {dialogData.federatedProviders.length > 0 && (
+                  <Tab
+                    key={FEDERATED_AUTH}
+                    tabId={FEDERATED_AUTH}
+                    title={translate('authentication_auth_federated')}
+                    className={s(styles, { tab: true })}
+                    disabled={dialogData.authenticating}
+                    onClick={() => {
+                      state.setActiveProvider(null, null);
+                      state.setTabId(FEDERATED_AUTH);
+                    }}
+                  >
+                    <TabTitle>{translate('authentication_auth_federated')}</TabTitle>
+                  </Tab>
+                )}
+              </TabList>
+            )}
+          </SContext>
           {federate ? (
             <ConfigurationsList
               activeProvider={state.activeProvider}
@@ -245,6 +244,6 @@ export const AuthDialog: DialogComponent<IAuthOptions, null> = observer(function
           </CommonDialogFooter>
         )}
       </CommonDialogWrapper>
-    </TabsState>,
+    </TabsState>
   );
 });

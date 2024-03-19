@@ -7,9 +7,7 @@
  */
 import { observer } from 'mobx-react-lite';
 import { useContext } from 'react';
-import styled from 'reshadow';
 
-import { useStyles } from '@cloudbeaver/core-blocks';
 import { useDataContext } from '@cloudbeaver/core-data-context';
 import { ITabData, Tab, TabIcon, TabTitle } from '@cloudbeaver/core-ui';
 import { CaptureViewContext } from '@cloudbeaver/core-view';
@@ -18,8 +16,7 @@ import { useNode } from '@cloudbeaver/plugin-navigation-tree';
 
 import type { IObjectViewerTabState } from './IObjectViewerTabState';
 
-export const ObjectViewerTab: TabHandlerTabComponent<IObjectViewerTabState> = observer(function ObjectViewerTab({ tab, onSelect, onClose, style }) {
-  // const connectionsInfoResource = useService(ConnectionInfoResource);
+export const ObjectViewerTab: TabHandlerTabComponent<IObjectViewerTabState> = observer(function ObjectViewerTab({ tab, onSelect, onClose }) {
   const viewContext = useContext(CaptureViewContext);
   const tabMenuContext = useDataContext(viewContext);
   const { node } = useNode(tab.handlerState.objectId);
@@ -27,19 +24,10 @@ export const ObjectViewerTab: TabHandlerTabComponent<IObjectViewerTabState> = ob
   const handleClose = onClose ? ({ tabId }: ITabData<any>) => onClose(tabId) : undefined;
   const title = node?.name || tab.handlerState.tabTitle;
 
-  // if (node){
-  //   tabMenuContext.set(DATA_CONTEXT_NAV_NODE, node);
-  //   const connection = connectionsInfoResource.getConnectionForNode(node.id);
-
-  //   if (connection) {
-  //     tabMenuContext.set(DATA_CONTEXT_CONNECTION, connection);
-  //   }
-  // }
-
-  return styled(useStyles(style))(
-    <Tab tabId={tab.id} style={style} title={title} menuContext={tabMenuContext} onOpen={handleSelect} onClose={handleClose}>
+  return (
+    <Tab tabId={tab.id} title={title} menuContext={tabMenuContext} onOpen={handleSelect} onClose={handleClose}>
       <TabIcon icon={node?.icon || tab.handlerState.tabIcon} />
       <TabTitle>{title}</TabTitle>
-    </Tab>,
+    </Tab>
   );
 });

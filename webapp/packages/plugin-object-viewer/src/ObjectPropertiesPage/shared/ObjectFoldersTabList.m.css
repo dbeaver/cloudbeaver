@@ -1,0 +1,13 @@
+/*
+ * CloudBeaver - Cloud Database Manager
+ * Copyright (C) 2020-2024 DBeaver Corp and others
+ *
+ * Licensed under the Apache License, Version 2.0.
+ * you may not use this file except in compliance with the License.
+ */
+
+.tabList {
+  composes: theme-background-surface theme-text-on-surface theme-border-color-background from global;
+  border-top: 1px solid;
+  border-right: 1px solid;
+}

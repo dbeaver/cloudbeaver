@@ -109,7 +109,19 @@ export class ResultSetFormatAction
 
     const column = this.view.getColumn(key.column);
 
-    return column?.dataKind?.toLocaleLowerCase() === 'string';
+    if (column?.dataKind?.toLocaleLowerCase() === 'string') {
+      return true;
+    }
+
+    if (key.row && !this.isBinary(key)) {
+      const value = this.get(key as IResultSetElementKey);
+
+      if (isResultSetContentValue(value)) {
+        return value.text !== undefined;
+      }
+    }
+
+    return false;
   }
 
   getHeaders(): string[] {
