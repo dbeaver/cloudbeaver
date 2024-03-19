@@ -13,10 +13,7 @@ import { SessionExpireService } from './SessionExpireService';
 
 @injectable()
 export class SessionExpireEventService extends Dependency {
-  constructor(
-    private readonly sessionEventSource: SessionEventSource,
-    private readonly sessionExpireService: SessionExpireService,
-  ) {
+  constructor(private readonly sessionEventSource: SessionEventSource, private readonly sessionExpireService: SessionExpireService) {
     super();
     this.sessionEventSource.onEvent<WsSessionExpiredEvent>(ServerEventId.CbSessionExpired, () => {
       this.onSessionExpireEvent();
@@ -25,6 +22,5 @@ export class SessionExpireEventService extends Dependency {
 
   private onSessionExpireEvent(): void {
     this.sessionExpireService.sessionExpired();
-    this.sessionEventSource.unsubscribe();
   }
 }
