@@ -74,6 +74,7 @@ export default [
   ['ui_reconnect', 'Переподключиться'],
   ['ui_forget', 'Забыть'],
   ['ui_set', 'Установить'],
+  ['ui_restore', 'Восстановить'],
   ['ui_are_you_sure', 'Вы уверены?'],
   ['ui_options', 'Параметры'],
   ['ui_changes_might_be_lost', 'Ваши изменения могут быть потеряны'],
@@ -94,6 +95,7 @@ export default [
   ['ui_upload', 'Загрузить'],
   ['ui_import', 'Импортировать'],
   ['ui_view', 'Смотреть'],
+  ['ui_show_more', 'Показать больше'],
   ['ui_limit', 'Лимит'],
   ['ui_file_size', 'Размер файла'],
   ['ui_processing_synchronization', 'Синхронизация...'],
@@ -108,6 +110,7 @@ export default [
   ['ui_readonly', 'Доступно только для чтения'],
   ['ui_test', 'Проверить'],
   ['ui_export', 'Экспорт'],
+  ['ui_you', 'Вы'],
 
   ['root_permission_denied', 'Отказано в доступе'],
   ['root_permission_no_permission', 'У вас нет разрешения на это действие'],

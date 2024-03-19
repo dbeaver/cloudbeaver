@@ -102,6 +102,28 @@ export class ResultSetFormatAction
     return false;
   }
 
+  isText(key: IResultSetPartialKey): boolean {
+    if (!key?.column) {
+      return false;
+    }
+
+    const column = this.view.getColumn(key.column);
+
+    if (column?.dataKind?.toLocaleLowerCase() === 'string') {
+      return true;
+    }
+
+    if (key.row && !this.isBinary(key)) {
+      const value = this.get(key as IResultSetElementKey);
+
+      if (isResultSetContentValue(value)) {
+        return value.text !== undefined;
+      }
+    }
+
+    return false;
+  }
+
   getHeaders(): string[] {
     return this.view.columns.map(column => column.name!).filter(name => name !== undefined);
   }

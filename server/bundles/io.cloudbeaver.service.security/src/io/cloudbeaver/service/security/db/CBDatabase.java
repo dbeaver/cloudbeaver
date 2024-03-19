@@ -33,6 +33,7 @@ import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBConstants;
 import org.jkiss.dbeaver.model.auth.AuthInfo;
 import org.jkiss.dbeaver.model.connection.DBPDriver;
+import org.jkiss.dbeaver.model.impl.app.ApplicationRegistry;
 import org.jkiss.dbeaver.model.impl.jdbc.JDBCUtils;
 import org.jkiss.dbeaver.model.impl.jdbc.exec.JDBCTransaction;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
@@ -73,7 +74,7 @@ public class CBDatabase {
     public static final String SCHEMA_UPDATE_SQL_PATH = "db/cb_schema_update_";
 
     private static final int LEGACY_SCHEMA_VERSION = 1;
-    private static final int CURRENT_SCHEMA_VERSION = 16;
+    private static final int CURRENT_SCHEMA_VERSION = 18;
 
     private static final String DEFAULT_DB_USER_NAME = "cb-data";
     private static final String DEFAULT_DB_PWD_FILE = ".database-credentials.dat";
@@ -163,7 +164,11 @@ public class CBDatabase {
         }
 
         if (H2Migrator.isH2Database(databaseConfiguration)) {
-            var migrator = new H2Migrator(monitor, dataSourceProviderRegistry, databaseConfiguration, dbURL, dbProperties);
+            var migrator = new H2Migrator(monitor,
+                dataSourceProviderRegistry,
+                databaseConfiguration,
+                dbURL,
+                dbProperties);
             migrator.migrateDatabaseIfNeeded(V1_DB_NAME, V2_DB_NAME);
         }
 
@@ -302,7 +307,10 @@ public class CBDatabase {
 
         if (adminUser == null) {
             adminUser = new SMUser(adminName, true, "ADMINISTRATOR");
-            adminSecurityController.createUser(adminUser.getUserId(), adminUser.getMetaParameters(), true, adminUser.getAuthRole());
+            adminSecurityController.createUser(adminUser.getUserId(),
+                adminUser.getMetaParameters(),
+                true,
+                adminUser.getAuthRole());
         }
 
         if (!CommonUtils.isEmpty(adminPassword)) {
@@ -313,7 +321,8 @@ public class CBDatabase {
             credentials.put(LocalAuthProviderConstants.CRED_USER, adminUser.getUserId());
             credentials.put(LocalAuthProviderConstants.CRED_PASSWORD, clientPassword);
 
-            WebAuthProviderDescriptor authProvider = WebAuthProviderRegistry.getInstance().getAuthProvider(LocalAuthProviderConstants.PROVIDER_ID);
+            WebAuthProviderDescriptor authProvider = WebAuthProviderRegistry.getInstance()
+                .getAuthProvider(LocalAuthProviderConstants.PROVIDER_ID);
             if (authProvider != null) {
                 adminSecurityController.setUserCredentials(adminUser.getUserId(), authProvider.getId(), credentials);
             }
@@ -347,7 +356,8 @@ public class CBDatabase {
     private class CBSchemaVersionManager implements SQLSchemaVersionManager {
 
         @Override
-        public int getCurrentSchemaVersion(DBRProgressMonitor monitor, Connection connection, String schemaName) throws DBException, SQLException {
+        public int getCurrentSchemaVersion(DBRProgressMonitor monitor, Connection connection, String schemaName)
+            throws DBException, SQLException {
             // Check and update schema
             try {
                 int version = CommonUtils.toInt(JDBCUtils.executeQuery(connection,
@@ -386,7 +396,8 @@ public class CBDatabase {
             if (updateCount <= 0) {
                 JDBCUtils.executeSQL(
                     connection,
-                    normalizeTableNames("INSERT INTO {table_prefix}CB_SCHEMA_INFO (VERSION,UPDATE_TIME) VALUES(?,CURRENT_TIMESTAMP)"),
+                    normalizeTableNames(
+                        "INSERT INTO {table_prefix}CB_SCHEMA_INFO (VERSION,UPDATE_TIME) VALUES(?,CURRENT_TIMESTAMP)"),
                     version
                 );
             }
@@ -394,7 +405,8 @@ public class CBDatabase {
 
         @Override
         //TODO move out
-        public void fillInitialSchemaData(DBRProgressMonitor monitor, Connection connection) throws DBException, SQLException {
+        public void fillInitialSchemaData(DBRProgressMonitor monitor, Connection connection)
+            throws DBException, SQLException {
             // Set exclusive connection. Otherwise security controller will open a new one and won't see new schema objects.
             exclusiveConnection = new DelegatingConnection<Connection>(connection) {
                 @Override
@@ -426,7 +438,10 @@ public class CBDatabase {
                 if (!CommonUtils.isEmpty(initialTeams)) {
                     // Create teams
                     for (SMTeam team : initialTeams) {
-                        adminSecurityController.createTeam(team.getTeamId(), team.getName(), team.getDescription(), adminName);
+                        adminSecurityController.createTeam(team.getTeamId(),
+                            team.getName(),
+                            team.getDescription(),
+                            adminName);
                         if (!application.isMultiNode()) {
                             adminSecurityController.setSubjectPermissions(
                                 team.getTeamId(),
@@ -451,9 +466,18 @@ public class CBDatabase {
     // Persistence
 
 
-    private void validateInstancePersistentState(Connection connection) throws IOException, SQLException {
+    private void validateInstancePersistentState(Connection connection) throws IOException, SQLException, DBException {
         try (JDBCTransaction txn = new JDBCTransaction(connection)) {
             checkInstanceRecord(connection);
+            var defaultTeamId = application.getAppConfiguration().getDefaultUserTeam();
+            if (CommonUtils.isNotEmpty(defaultTeamId)) {
+                var team = adminSecurityController.findTeam(defaultTeamId);
+                if (team == null) {
+                    log.warn("Default users team not found, create :" + defaultTeamId);
+                    adminSecurityController.createTeam(defaultTeamId, defaultTeamId, null,
+                        ApplicationRegistry.getInstance().getApplication().getName());
+                }
+            }
             txn.commit();
         }
     }
@@ -475,7 +499,8 @@ public class CBDatabase {
         String versionName = CommonUtils.truncateString(GeneralUtils.getProductVersion().toString(), 32);
 
         boolean hasInstanceRecord = JDBCUtils.queryString(connection,
-            normalizeTableNames("SELECT HOST_NAME FROM {table_prefix}CB_INSTANCE WHERE INSTANCE_ID=?"), instanceId) != null;
+            normalizeTableNames("SELECT HOST_NAME FROM {table_prefix}CB_INSTANCE WHERE INSTANCE_ID=?"),
+            instanceId) != null;
         if (!hasInstanceRecord) {
             JDBCUtils.executeSQL(
                 connection,
@@ -511,7 +536,8 @@ public class CBDatabase {
         }
 
         try (PreparedStatement dbStat = connection.prepareStatement(
-            normalizeTableNames("INSERT INTO {table_prefix}CB_INSTANCE_DETAILS(INSTANCE_ID,FIELD_NAME,FIELD_VALUE) VALUES(?,?,?)"))
+            normalizeTableNames(
+                "INSERT INTO {table_prefix}CB_INSTANCE_DETAILS(INSTANCE_ID,FIELD_NAME,FIELD_VALUE) VALUES(?,?,?)"))
         ) {
             dbStat.setString(1, instanceId);
             for (Map.Entry<String, String> ide : instanceDetails.entrySet()) {
@@ -552,5 +578,5 @@ public class CBDatabase {
     public SQLDialect getDialect() {
         return dialect;
     }
-    
+
 }

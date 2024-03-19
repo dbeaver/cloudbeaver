@@ -5,15 +5,11 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import React from 'react';
-
+import { importLazyComponent } from '@cloudbeaver/core-blocks';
 import { injectable } from '@cloudbeaver/core-di';
 import { ESqlDataSourceFeatures, SqlEditorModeService } from '@cloudbeaver/plugin-sql-editor';
 
-const SQLCodeEditorPanel = React.lazy(async () => {
-  const { SQLCodeEditorPanel } = await import('./SQLCodeEditorPanel');
-  return { default: SQLCodeEditorPanel };
-});
+const SQLCodeEditorPanel = importLazyComponent(() => import('./SQLCodeEditorPanel').then(module => module.SQLCodeEditorPanel));
 
 @injectable()
 export class SQLCodeEditorPanelService {

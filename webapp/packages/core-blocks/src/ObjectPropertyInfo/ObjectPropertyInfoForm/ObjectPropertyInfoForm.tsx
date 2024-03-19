@@ -20,8 +20,9 @@ import { useS } from '../../useS';
 import { RenderField } from './RenderField';
 
 interface ObjectPropertyFormProps extends ILayoutSizeProps {
-  properties: ObjectPropertyInfo[];
+  properties: ReadonlyArray<ObjectPropertyInfo>;
   state?: Record<string, any>;
+  defaultState?: Record<string, any>;
   category?: string | null;
   editable?: boolean;
   autofillToken?: string;
@@ -33,6 +34,7 @@ interface ObjectPropertyFormProps extends ILayoutSizeProps {
   hideEmptyPlaceholder?: boolean;
   emptyPlaceholder?: string;
   canShowPassword?: boolean;
+  disableAutoCompleteForPasswords?: boolean;
   isSaved?: (property: ObjectPropertyInfo) => boolean;
   geLayoutSize?: (property: ObjectPropertyInfo) => ILayoutSizeProps;
   onFocus?: (name: string) => void;
@@ -41,7 +43,9 @@ interface ObjectPropertyFormProps extends ILayoutSizeProps {
 export const ObjectPropertyInfoForm = observer<ObjectPropertyFormProps>(function ObjectPropertyInfoForm({
   properties,
   state,
+  defaultState,
   category,
+  disableAutoCompleteForPasswords = false,
   editable = true,
   className,
   autofillToken = '',
@@ -86,8 +90,9 @@ export const ObjectPropertyInfoForm = observer<ObjectPropertyFormProps>(function
             className={s(sizeStyles, { ...(geLayoutSize ? geLayoutSize(property) : layoutProps) }, className)}
             property={property}
             state={state}
+            defaultState={defaultState}
             editable={editable}
-            autofillToken={autofillToken}
+            autofillToken={property.features.includes('password') && disableAutoCompleteForPasswords ? 'new-password' : autofillToken}
             disabled={disabled}
             readOnly={readOnly}
             autoHide={autoHide}

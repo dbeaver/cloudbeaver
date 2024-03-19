@@ -39,6 +39,10 @@ export class SqlEditorService {
     return this.sqlEditorSettingsService.settings.getValue('autoSave') && !this.serverConfigResource.isFeatureEnabled(FEATURE_GIT_ID, true);
   }
 
+  get canInsertAlias() {
+    return this.sqlEditorSettingsService.proposalInsertTableSettings.getValue('alias');
+  }
+
   constructor(
     private readonly graphQLService: GraphQLService,
     private readonly connectionsManagerService: ConnectionsManagerService,

@@ -78,6 +78,7 @@ export default [
   ['ui_reconnect', 'Reconnect'],
   ['ui_forget', 'Forget'],
   ['ui_set', 'Set'],
+  ['ui_restore', 'Restore'],
   ['ui_are_you_sure', 'Are you sure?'],
   ['ui_options', 'Options'],
   ['ui_changes_might_be_lost', 'Your changes might be lost'],
@@ -98,6 +99,7 @@ export default [
   ['ui_upload', 'Upload'],
   ['ui_import', 'Import'],
   ['ui_view', 'View'],
+  ['ui_show_more', 'Show more'],
   ['ui_limit', 'Limit'],
   ['ui_file_size', 'File size'],
   ['ui_processing_synchronization', 'Synchronization...'],
@@ -112,6 +114,7 @@ export default [
   ['ui_readonly', 'Read-only'],
   ['ui_test', 'Test'],
   ['ui_export', 'Export'],
+  ['ui_you', 'You'],
 
   ['root_permission_denied', "You don't have permissions"],
   ['root_permission_no_permission', "You don't have permission for this action"],

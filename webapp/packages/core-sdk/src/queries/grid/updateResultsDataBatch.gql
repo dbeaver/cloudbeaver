@@ -1,33 +1,38 @@
 mutation updateResultsDataBatch(
-    $projectId: ID!
-    $connectionId: ID!
-    $contextId: ID!
-    $resultsId: ID!
-    $updatedRows: [ SQLResultRow! ]
-    $deletedRows: [ SQLResultRow! ]
-    $addedRows: [ SQLResultRow! ]
+  $projectId: ID!
+  $connectionId: ID!
+  $contextId: ID!
+  $resultsId: ID!
+  $updatedRows: [SQLResultRow!]
+  $deletedRows: [SQLResultRow!]
+  $addedRows: [SQLResultRow!]
 ) {
-    result: updateResultsDataBatch(
-        projectId: $projectId
-        connectionId: $connectionId
-        contextId: $contextId
-        resultsId: $resultsId
+  result: updateResultsDataBatch(
+    projectId: $projectId
+    connectionId: $connectionId
+    contextId: $contextId
+    resultsId: $resultsId
 
-        updatedRows: $updatedRows
-        deletedRows: $deletedRows
-        addedRows: $addedRows
-    ) {
-        duration
-        filterText
-        results {
-            updateRowCount
-            resultSet {
-                id
-                rows
-                singleEntity
-                hasMoreData
-                hasRowIdentifier
-            }
+    updatedRows: $updatedRows
+    deletedRows: $deletedRows
+    addedRows: $addedRows
+  ) {
+    duration
+    filterText
+    results {
+      updateRowCount
+      resultSet {
+        id
+        rowsWithMetaData {
+          data
+          metaData
         }
+        singleEntity
+        hasMoreData
+        hasRowIdentifier
+        isSupportsDataFilter
+        hasChildrenCollection
+      }
     }
+  }
 }

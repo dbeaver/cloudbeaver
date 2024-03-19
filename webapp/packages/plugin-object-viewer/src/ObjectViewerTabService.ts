@@ -7,21 +7,32 @@
  */
 import { action, makeObservable, runInAction } from 'mobx';
 
+import { importLazyComponent } from '@cloudbeaver/core-blocks';
 import {
   Connection,
+  ConnectionExecutionContextResource,
   ConnectionInfoActiveProjectKey,
   ConnectionInfoResource,
   ConnectionNavNodeService,
   connectionProvider,
   createConnectionParam,
+  executionContextProvider,
   IConnectionInfoParams,
+  isConnectionInfoParamEqual,
   objectCatalogProvider,
   objectSchemaProvider,
 } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import type { IExecutionContextProvider, ISyncContextLoader } from '@cloudbeaver/core-executor';
-import { type INodeNavigationData, NavNodeManagerService, NodeManagerUtils, objectNavNodeProvider } from '@cloudbeaver/core-navigation-tree';
+import {
+  INavNodeRenameData,
+  type INodeNavigationData,
+  NavNodeManagerService,
+  NavTreeResource,
+  NodeManagerUtils,
+  objectNavNodeProvider,
+} from '@cloudbeaver/core-navigation-tree';
 import { projectProvider } from '@cloudbeaver/core-projects';
 import { ResourceKey, resourceKeyList, ResourceKeySimple, ResourceKeyUtils } from '@cloudbeaver/core-resource';
 import { ITab, NavigationTabsService, TabHandler } from '@cloudbeaver/plugin-navigation-tabs';
@@ -30,9 +41,10 @@ import type { IObjectViewerTabContext } from './IObjectViewerTabContext';
 import type { IObjectViewerTabState } from './IObjectViewerTabState';
 import { DBObjectPageService } from './ObjectPage/DBObjectPageService';
 import type { ObjectPage } from './ObjectPage/ObjectPage';
-import { ObjectViewerPanel } from './ObjectViewerPanel';
-import { ObjectViewerTab } from './ObjectViewerTab';
 import { objectViewerTabHandlerKey } from './objectViewerTabHandlerKey';
+
+const ObjectViewerPanel = importLazyComponent(() => import('./ObjectViewerPanel/ObjectViewerPanel').then(m => m.ObjectViewerPanel));
+const ObjectViewerTab = importLazyComponent(() => import('./ObjectViewerTab').then(m => m.ObjectViewerTab));
 
 @injectable()
 export class ObjectViewerTabService {
@@ -45,6 +57,8 @@ export class ObjectViewerTabService {
     private readonly navigationTabsService: NavigationTabsService,
     private readonly connectionInfoResource: ConnectionInfoResource,
     private readonly connectionNavNodeService: ConnectionNavNodeService,
+    private readonly navTreeResource: NavTreeResource,
+    private readonly connectionExecutionContextResource: ConnectionExecutionContextResource,
   ) {
     this.tabHandler = this.navigationTabsService.registerTabHandler<IObjectViewerTabState>({
       key: objectViewerTabHandlerKey,
@@ -61,6 +75,7 @@ export class ObjectViewerTabService {
         connectionProvider(this.getConnection.bind(this)),
         objectCatalogProvider(this.getDBObjectCatalog.bind(this)),
         objectSchemaProvider(this.getDBObjectSchema.bind(this)),
+        executionContextProvider(this.getExecutionContext.bind(this)),
       ],
     });
 
@@ -78,6 +93,17 @@ export class ObjectViewerTabService {
     this.connectionInfoResource.onItemUpdate.addHandler(this.updateConnectionTabs.bind(this));
     this.connectionInfoResource.onItemDelete.addHandler(this.closeConnectionTabs.bind(this));
     this.navNodeManagerService.navTree.onItemDelete.addHandler(this.removeTabs.bind(this));
+    this.navTreeResource.onNodeRename.addHandler(this.handleNodeRename.bind(this));
+  }
+
+  private handleNodeRename(data: INavNodeRenameData, contexts: IExecutionContextProvider<INavNodeRenameData>) {
+    runInAction(() => {
+      const context = contexts.getContext(this.objectViewerTabContext);
+
+      if (context.tab) {
+        context.tab.handlerState.objectId = data.newNodeId;
+      }
+    });
   }
 
   isPageActive(tab: ITab<IObjectViewerTabState>, page: ObjectPage): boolean {
@@ -306,6 +332,16 @@ export class ObjectViewerTabService {
       return;
     }
     return nodeInfo.schemaId;
+  }
+
+  private getExecutionContext(context: ITab<IObjectViewerTabState>) {
+    const connectionKey = context.handlerState.connectionKey;
+
+    if (!connectionKey) {
+      return;
+    }
+
+    return this.connectionExecutionContextResource.values.find(connection => isConnectionInfoParamEqual(connection, connectionKey));
   }
 
   private selectObjectTab(tab: ITab<IObjectViewerTabState>) {

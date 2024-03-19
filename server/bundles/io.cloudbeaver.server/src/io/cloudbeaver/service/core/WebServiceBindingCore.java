@@ -99,6 +99,8 @@ public class WebServiceBindingCore extends WebServiceBindingBase<DBWServiceCore>
             .dataFetcher("closeSession", env -> getService(env).closeSession(GraphQLEndpoint.getServletRequest(env)))
             .dataFetcher("touchSession", env -> getService(env).touchSession(
                 GraphQLEndpoint.getServletRequest(env), GraphQLEndpoint.getServletResponse(env)))
+            .dataFetcher("updateSession", env -> getService(env).updateSession(
+                GraphQLEndpoint.getServletRequest(env), GraphQLEndpoint.getServletResponse(env)))
             .dataFetcher("refreshSessionConnections", env -> getService(env).refreshSessionConnections(
                 GraphQLEndpoint.getServletRequest(env), GraphQLEndpoint.getServletResponse(env)))
             .dataFetcher("changeSessionLanguage", env -> getService(env).changeSessionLanguage(getWebSession(env), env.getArgument("locale")))
@@ -132,7 +134,8 @@ public class WebServiceBindingCore extends WebServiceBindingBase<DBWServiceCore>
                         env.getArgument("credentials"),
                         nhc,
                         env.getArgument("saveCredentials"),
-                        env.getArgument("sharedCredentials")
+                        env.getArgument("sharedCredentials"),
+                        env.getArgument("selectedSecretId")
                     );
                 }
             )

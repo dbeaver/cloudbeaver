@@ -12,8 +12,8 @@ import { CachedMapResource, isResourceAlias, type ResourceKey, resourceKeyList, 
 import { GraphQLService, NavNodeInfoFragment } from '@cloudbeaver/core-sdk';
 import { isNull } from '@cloudbeaver/core-utils';
 
-import { ConnectionInfoActiveProjectKey, ConnectionInfoResource } from './ConnectionInfoResource';
-import type { IConnectionInfoParams } from './IConnectionsResource';
+import type { IConnectionInfoParams } from './CONNECTION_INFO_PARAM_SCHEMA';
+import { ConnectionInfoActiveProjectKey, ConnectionInfoResource, createConnectionParam } from './ConnectionInfoResource';
 
 export type ObjectContainer = NavNodeInfoFragment;
 export interface ICatalogData {
@@ -47,7 +47,14 @@ export class ContainerResource extends CachedMapResource<ObjectContainerParams, 
 
     appAuthService.requireAuthentication(this);
     this.preloadResource(connectionInfoResource, () => ConnectionInfoActiveProjectKey);
-    this.before(ExecutorInterrupter.interrupter(key => !connectionInfoResource.isConnected(key)));
+    this.before(
+      ExecutorInterrupter.interrupter(key => {
+        if (isResourceAlias(key)) {
+          return false;
+        }
+        return !connectionInfoResource.isConnected(ResourceKeyUtils.mapKey(key, key => createConnectionParam(key.projectId, key.connectionId)));
+      }),
+    );
 
     this.connectionInfoResource.onItemDelete.addHandler(key =>
       ResourceKeyUtils.forEach(key, key => this.delete({ projectId: key.projectId, connectionId: key.connectionId })),

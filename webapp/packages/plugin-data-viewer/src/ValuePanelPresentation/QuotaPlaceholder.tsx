@@ -6,64 +6,59 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import styled, { css } from 'reshadow';
 
-import { Link, usePermission, useTranslate } from '@cloudbeaver/core-blocks';
+import { Container, Link, s, usePermission, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import { EAdminPermission } from '@cloudbeaver/core-root';
 
+import type { IResultSetElementKey } from '../DatabaseDataModel/Actions/ResultSet/IResultSetDataKey';
+import { useResultSetActions } from '../DatabaseDataModel/Actions/ResultSet/useResultSetActions';
+import type { IDatabaseDataModel } from '../DatabaseDataModel/IDatabaseDataModel';
+import type { IDatabaseResultSet } from '../DatabaseDataModel/IDatabaseResultSet';
+import styles from './QuotaPlaceholder.m.css';
+
 interface Props {
-  limit?: string;
-  size?: string;
   className?: string;
+  elementKey: IResultSetElementKey | undefined;
+  model: IDatabaseDataModel<any, IDatabaseResultSet>;
+  resultIndex: number;
+  keepSize?: boolean;
 }
 
-const style = css`
-  container {
-    margin: auto;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-direction: column;
-  }
-  p {
-    composes: theme-typography--body2 from global;
-    text-align: center;
-    margin: 0;
-  }
-  reason {
-    display: flex;
-    white-space: pre;
-  }
-  limit-word {
-    text-transform: lowercase;
-  }
-`;
-
-export const QuotaPlaceholder: React.FC<React.PropsWithChildren<Props>> = observer(function QuotaPlaceholder({ limit, size, className, children }) {
+export const QuotaPlaceholder: React.FC<React.PropsWithChildren<Props>> = observer(function QuotaPlaceholder({
+  className,
+  children,
+  keepSize = false,
+  elementKey,
+  model,
+  resultIndex,
+}) {
   const translate = useTranslate();
   const admin = usePermission(EAdminPermission.admin);
+  const style = useS(styles);
+  const { contentAction } = useResultSetActions({ model, resultIndex });
+  const limitInfo = elementKey ? contentAction.getLimitInfo(elementKey) : null;
 
-  return styled(style)(
-    <container className={className}>
-      <p>
-        {translate('data_viewer_presentation_value_content_was_truncated')}
-        <reason>
-          {translate('data_viewer_presentation_value_content_truncated_placeholder') + ' '}
-          <limit-word>
-            {admin ? (
-              <Link href="https://dbeaver.com/docs/cloudbeaver/Server-configuration/#resource-quotas" target="_blank" indicator>
-                {translate('ui_limit')}
-              </Link>
-            ) : (
-              translate('ui_limit')
-            )}
-          </limit-word>
-        </reason>
-        {limit && `${translate('ui_limit')}: ${limit}`}
-        <br />
-        {size && `${translate('data_viewer_presentation_value_content_value_size')}: ${size}`}
-      </p>
-      {children}
-    </container>,
+  return (
+    <Container className={className} keepSize={keepSize} vertical center>
+      <Container center vertical>
+        {translate('data_viewer_presentation_value_content_truncated_placeholder')}
+        &nbsp;
+        <span className={s(style, { limitWord: true })}>
+          {admin ? (
+            <Link
+              title={limitInfo?.limitWithSize}
+              href="https://dbeaver.com/docs/cloudbeaver/Server-configuration/#resource-quotas"
+              target="_blank"
+              indicator
+            >
+              {translate('ui_limit')}
+            </Link>
+          ) : (
+            translate('ui_limit')
+          )}
+        </span>
+      </Container>
+      <Container>{children}</Container>
+    </Container>
   );
 });

@@ -316,8 +316,8 @@ export class ConnectionOptionsTabService extends Bootstrap {
 
     if ((state.config.authModelId || driver.defaultAuthModel) && !driver.anonymousAccess) {
       tempConfig.authModelId = state.config.authModelId || driver.defaultAuthModel;
-      tempConfig.saveCredentials = state.config.saveCredentials;
       tempConfig.sharedCredentials = state.config.sharedCredentials;
+      tempConfig.saveCredentials = state.config.saveCredentials || tempConfig.sharedCredentials;
 
       const properties = await this.getConnectionAuthModelProperties(tempConfig.authModelId, state.info);
 

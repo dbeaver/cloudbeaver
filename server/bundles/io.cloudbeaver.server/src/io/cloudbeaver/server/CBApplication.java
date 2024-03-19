@@ -22,8 +22,6 @@ import com.google.gson.InstanceCreator;
 import io.cloudbeaver.WebServiceUtils;
 import io.cloudbeaver.auth.CBAuthConstants;
 import io.cloudbeaver.auth.NoAuthCredentialsProvider;
-import io.cloudbeaver.service.security.CBEmbeddedSecurityController;
-import io.cloudbeaver.service.security.PasswordPolicyConfiguration;
 import io.cloudbeaver.model.app.BaseWebApplication;
 import io.cloudbeaver.model.app.WebAuthApplication;
 import io.cloudbeaver.model.app.WebAuthConfiguration;
@@ -32,6 +30,8 @@ import io.cloudbeaver.registry.WebServiceRegistry;
 import io.cloudbeaver.server.jetty.CBJettyServer;
 import io.cloudbeaver.service.DBWServiceInitializer;
 import io.cloudbeaver.service.DBWServiceServerConfigurator;
+import io.cloudbeaver.service.security.CBEmbeddedSecurityController;
+import io.cloudbeaver.service.security.PasswordPolicyConfiguration;
 import io.cloudbeaver.service.security.SMControllerConfiguration;
 import io.cloudbeaver.service.session.WebSessionManager;
 import io.cloudbeaver.utils.WebAppUtils;
@@ -48,6 +48,7 @@ import org.jkiss.dbeaver.model.app.DBPApplication;
 import org.jkiss.dbeaver.model.app.DBPPlatform;
 import org.jkiss.dbeaver.model.auth.AuthInfo;
 import org.jkiss.dbeaver.model.auth.SMCredentialsProvider;
+import org.jkiss.dbeaver.model.connection.DBPDriver;
 import org.jkiss.dbeaver.model.data.json.JSONUtils;
 import org.jkiss.dbeaver.model.navigator.DBNBrowseSettings;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
@@ -260,6 +261,7 @@ public abstract class CBApplication extends BaseWebApplication implements WebAut
             log.error(e);
             return;
         }
+        refreshDisabledDriversConfig();
 
         configurationMode = CommonUtils.isEmpty(serverName);
 
@@ -541,7 +543,6 @@ public abstract class CBApplication extends BaseWebApplication implements WebAut
             log.debug("Runtime configuration [" + runtimeConfigFile.getAbsolutePath() + "]");
             parseConfiguration(runtimeConfigFile);
         }
-
         return path;
     }
 
@@ -555,7 +556,7 @@ public abstract class CBApplication extends BaseWebApplication implements WebAut
             parseConfiguration(configPath.toFile());
         }
         // Set default preferences
-        PrefUtils.setDefaultPreferenceValue(ModelPreferences.getPreferences(),
+        PrefUtils.setDefaultPreferenceValue(DBWorkbench.getPlatform().getPreferenceStore(),
             ModelPreferences.UI_DRIVERS_HOME,
             getDriversLocation());
     }
@@ -720,6 +721,9 @@ public abstract class CBApplication extends BaseWebApplication implements WebAut
             log.debug("Load product runtime configuration from '" + rtConfig.getAbsolutePath() + "'");
             try (Reader reader = new InputStreamReader(new FileInputStream(rtConfig), StandardCharsets.UTF_8)) {
                 productConfiguration.putAll(JSONUtils.parseMap(gson, reader));
+                Map<String, Object> flattenConfig = WebAppUtils.flattenMap(this.productConfiguration);
+                this.productConfiguration.clear();
+                this.productConfiguration.putAll(flattenConfig);
             } catch (Exception e) {
                 throw new DBException("Error reading product runtime configuration", e);
             }
@@ -1213,6 +1217,11 @@ public abstract class CBApplication extends BaseWebApplication implements WebAut
         return false;
     }
 
+    @Nullable
+    public String getLicenseStatus() {
+        return null;
+    }
+
     /**
      *
      */
@@ -1318,7 +1327,8 @@ public abstract class CBApplication extends BaseWebApplication implements WebAut
     public void saveProductConfiguration(SMCredentialsProvider credentialsProvider, Map<String, Object> productConfiguration) throws DBException {
         Map<String, Object> mergedConfig = WebAppUtils.mergeConfigurations(this.productConfiguration, productConfiguration);
         writeRuntimeConfig(getRuntimeProductConfigFilePath().toFile(), mergedConfig);
-        this.productConfiguration.putAll(mergedConfig);
+        this.productConfiguration.clear();
+        this.productConfiguration.putAll(WebAppUtils.flattenMap(mergedConfig));
         sendConfigChangedEvent(credentialsProvider);
     }
 
@@ -1328,5 +1338,17 @@ public abstract class CBApplication extends BaseWebApplication implements WebAut
             sessionId = credentialsProvider.getActiveUserCredentials().getSmSessionId();
         }
         eventController.addEvent(new WSServerConfigurationChangedEvent(sessionId, null));
+    }
+
+    private void refreshDisabledDriversConfig() {
+        CBAppConfig config = getAppConfiguration();
+        Set<String> disabledDrivers = new LinkedHashSet<>(Arrays.asList(config.getDisabledDrivers()));
+        for (DBPDriver driver : CBPlatform.getInstance().getApplicableDrivers()) {
+            if (!driver.isEmbedded() || config.isDriverForceEnabled(driver.getFullId())) {
+                continue;
+            }
+            disabledDrivers.add(driver.getFullId());
+        }
+        config.setDisabledDrivers(disabledDrivers.toArray(new String[0]));
     }
 }

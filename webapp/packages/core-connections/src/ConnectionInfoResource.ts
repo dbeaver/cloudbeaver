@@ -5,7 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { action, makeObservable, observable, runInAction } from 'mobx';
+import { action, makeObservable, observable, runInAction, toJS } from 'mobx';
 
 import { AppAuthService, UserInfoResource } from '@cloudbeaver/core-authentication';
 import { injectable } from '@cloudbeaver/core-di';
@@ -35,10 +35,12 @@ import {
   TestConnectionMutation,
   UserConnectionAuthPropertiesFragment,
 } from '@cloudbeaver/core-sdk';
+import { schemaValidationError } from '@cloudbeaver/core-utils';
 
+import { CONNECTION_INFO_PARAM_SCHEMA, type IConnectionInfoParams } from './CONNECTION_INFO_PARAM_SCHEMA';
 import { ConnectionInfoEventHandler, IConnectionInfoEvent } from './ConnectionInfoEventHandler';
 import type { DatabaseConnection } from './DatabaseConnection';
-import type { IConnectionInfoParams } from './IConnectionsResource';
+import { DBDriverResource } from './DBDriverResource';
 
 export type Connection = DatabaseConnection & {
   authProperties?: UserConnectionAuthPropertiesFragment[];
@@ -53,6 +55,7 @@ export type ConnectionInitConfig = Omit<
   | 'includeCredentialsSaved'
   | 'includeProperties'
   | 'includeProviderProperties'
+  | 'includeSharedSecrets'
   | 'customIncludeOptions'
 >;
 export type ConnectionInfoIncludes = Omit<GetUserConnectionsQueryVariables, 'id'>;
@@ -87,6 +90,7 @@ export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoPar
     private readonly projectsService: ProjectsService,
     private readonly projectInfoResource: ProjectInfoResource,
     private readonly dataSynchronizationService: DataSynchronizationService,
+    dbDriverResource: DBDriverResource,
     sessionDataResource: SessionDataResource,
     appAuthService: AppAuthService,
     connectionInfoEventHandler: ConnectionInfoEventHandler,
@@ -111,6 +115,11 @@ export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoPar
     // this.onItemUpdate.addHandler(ExecutorInterrupter.interrupter(() => this.sessionUpdate));
     this.onItemDelete.addHandler(ExecutorInterrupter.interrupter(() => this.sessionUpdate));
     this.onConnectionCreate.addHandler(ExecutorInterrupter.interrupter(() => this.sessionUpdate));
+
+    dbDriverResource.onItemDelete.addHandler(data => {
+      const hiddenConnections = this.values.filter(connection => connection.driverId === data);
+      this.delete(resourceKeyList(hiddenConnections.map(connection => createConnectionParam(connection))));
+    });
 
     userInfoResource.onUserChange.addHandler(() => {
       this.clear();
@@ -577,12 +586,17 @@ export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoPar
       includeCredentialsSaved: false,
       includeProperties: false,
       includeProviderProperties: false,
+      includeSharedSecrets: false,
       customIncludeOptions: false,
     };
   }
 
   protected validateKey(key: IConnectionInfoParams): boolean {
-    return typeof key === 'object' && typeof key.projectId === 'string' && typeof key.connectionId === 'string';
+    const parse = CONNECTION_INFO_PARAM_SCHEMA.safeParse(toJS(key));
+    if (!parse.success) {
+      this.logger.warn(`Invalid resource key ${schemaValidationError(parse.error).toString()}`);
+    }
+    return parse.success;
   }
 }
 

@@ -20,9 +20,10 @@ import { DATA_EDITOR_SETTINGS_GROUP } from './DATA_EDITOR_SETTINGS_GROUP';
 
 const defaultSettings = schema.object({
   disableEdit: schema.coerce.boolean().default(false),
-  fetchMin: schema.coerce.number().default(100),
-  fetchMax: schema.coerce.number().default(5000),
-  fetchDefault: schema.coerce.number().default(200),
+  disableCopyData: schema.coerce.boolean().default(false),
+  fetchMin: schema.coerce.number().min(10).default(100),
+  fetchMax: schema.coerce.number().min(10).default(5000),
+  fetchDefault: schema.coerce.number().min(10).default(200),
 });
 
 export type DataViewerSettings = schema.infer<typeof defaultSettings>;
@@ -73,6 +74,13 @@ export class DataViewerSettingsService extends Dependency {
         type: ESettingsValueType.Checkbox,
         name: 'settings_data_editor_disable_edit_name',
         description: 'settings_data_editor_disable_edit_description',
+        group: DATA_EDITOR_SETTINGS_GROUP,
+      },
+      {
+        key: 'disableCopyData',
+        type: ESettingsValueType.Checkbox,
+        name: 'settings_data_editor_disable_data_copy_name',
+        description: 'settings_data_editor_disable_data_copy_description',
         group: DATA_EDITOR_SETTINGS_GROUP,
       },
       {

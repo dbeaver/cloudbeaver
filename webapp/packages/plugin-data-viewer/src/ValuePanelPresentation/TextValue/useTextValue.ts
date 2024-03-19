@@ -5,89 +5,144 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { useService } from '@cloudbeaver/core-di';
-import { NotificationService } from '@cloudbeaver/core-events';
-import { isNotNullDefined } from '@cloudbeaver/core-utils';
+import { observable } from 'mobx';
 
-import { isResultSetBinaryFileValue } from '../../DatabaseDataModel/Actions/ResultSet/isResultSetBinaryFileValue';
+import { useObservableRef, useSuspense } from '@cloudbeaver/core-blocks';
+import { useService } from '@cloudbeaver/core-di';
+import type { ResultDataFormat } from '@cloudbeaver/core-sdk';
+import { blobToBase64, isNotNullDefined, removeMetadataFromDataURL } from '@cloudbeaver/core-utils';
+
+import type { IResultSetElementKey } from '../../DatabaseDataModel/Actions/ResultSet/IResultSetDataKey';
+import { isResultSetBlobValue } from '../../DatabaseDataModel/Actions/ResultSet/isResultSetBlobValue';
 import { isResultSetContentValue } from '../../DatabaseDataModel/Actions/ResultSet/isResultSetContentValue';
-import { ResultSetSelectAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetSelectAction';
-import { useResultActions } from '../../DatabaseDataModel/Actions/ResultSet/useResultActions';
+import { useResultSetActions } from '../../DatabaseDataModel/Actions/ResultSet/useResultSetActions';
 import type { IDatabaseDataModel } from '../../DatabaseDataModel/IDatabaseDataModel';
 import type { IDatabaseResultSet } from '../../DatabaseDataModel/IDatabaseResultSet';
-import { useAutoFormat } from './useAutoFormat';
+import { formatText } from './formatText';
+import { MAX_BLOB_PREVIEW_SIZE } from './MAX_BLOB_PREVIEW_SIZE';
+import { TextValuePresentationService } from './TextValuePresentationService';
 
 interface IUseTextValueArgs {
   resultIndex: number;
   model: IDatabaseDataModel<any, IDatabaseResultSet>;
-  currentContentType: string;
+  dataFormat: ResultDataFormat | null;
+  currentContentType: string | null;
+  elementKey?: IResultSetElementKey;
 }
 
-interface IUseTextValue {
-  textValue: string;
-  isTruncated: boolean;
-  isTextColumn: boolean;
-  pasteFullText(): Promise<void>;
+interface ITextValueInfo {
+  valueGetter: () => string;
+  contentType: string;
 }
 
-export function useTextValue({ model, resultIndex, currentContentType }: IUseTextValueArgs): IUseTextValue {
-  const { formatAction, editAction, contentAction, dataAction } = useResultActions({ model, resultIndex });
-  const selection = model.source.getAction(resultIndex, ResultSetSelectAction);
-  const activeElements = selection.getActiveElements();
-  const firstSelectedCell = activeElements?.[0];
-  const formatter = useAutoFormat();
-  const columnType = firstSelectedCell ? dataAction.getColumn(firstSelectedCell.column)?.dataKind : '';
-  const isTextColumn = columnType?.toLocaleLowerCase() === 'string';
-  const contentValue = firstSelectedCell ? formatAction.get(firstSelectedCell) : null;
-  const cachedFullText = firstSelectedCell ? contentAction.retrieveFileFullTextFromCache(firstSelectedCell) : '';
-  const blob = firstSelectedCell ? formatAction.get(firstSelectedCell) : null;
-  const notificationService = useService(NotificationService);
+const DEFAULT_CONTENT_TYPE = 'text/plain';
 
-  const result: IUseTextValue = {
-    textValue: '',
-    isTruncated: false,
-    isTextColumn,
-    async pasteFullText() {
-      if (!firstSelectedCell) {
-        return;
-      }
+export function useTextValue({ model, dataFormat, resultIndex, currentContentType, elementKey }: IUseTextValueArgs): ITextValueInfo {
+  const { formatAction, editAction, contentAction } = useResultSetActions({ model, resultIndex });
+  const suspense = useSuspense();
+  const contentValue = elementKey ? formatAction.get(elementKey) : null;
+  const textValuePresentationService = useService(TextValuePresentationService);
+  const activeTabs = textValuePresentationService.tabs.getDisplayed({
+    dataFormat: dataFormat,
+    model: model,
+    resultIndex: resultIndex,
+  });
+  const limitInfo = elementKey ? contentAction.getLimitInfo(elementKey) : null;
 
-      try {
-        await contentAction.getFileFullText(firstSelectedCell);
-      } catch (exception) {
-        notificationService.logException(exception as any, 'data_viewer_presentation_value_content_paste_error');
-      }
+  const observedContentValue = useObservableRef(
+    {
+      contentValue,
+      limitInfo,
     },
-  };
+    { contentValue: observable.ref, limitInfo: observable.ref },
+  );
 
-  if (!isNotNullDefined(firstSelectedCell)) {
-    return result;
-  }
+  let contentType = currentContentType;
+  let autoContentType = DEFAULT_CONTENT_TYPE;
+  let contentValueType;
 
   if (isResultSetContentValue(contentValue)) {
-    result.isTruncated = contentAction.isContentTruncated(contentValue);
+    contentValueType = contentValue.contentType;
   }
 
-  if (isTextColumn && cachedFullText) {
-    result.textValue = cachedFullText;
-    result.isTruncated = false;
+  if (isResultSetBlobValue(contentValue)) {
+    contentValueType = contentValue.blob.type;
   }
 
-  if (editAction.isElementEdited(firstSelectedCell)) {
-    result.textValue = formatAction.getText(firstSelectedCell);
-  }
-
-  if (isResultSetBinaryFileValue(blob)) {
-    const value = formatter.formatBlob(currentContentType, blob);
-
-    if (value) {
-      result.textValue = value;
+  if (contentValueType) {
+    switch (contentValueType) {
+      case 'text/json':
+        autoContentType = 'application/json';
+        break;
+      case 'application/octet-stream':
+        autoContentType = 'application/octet-stream;type=base64';
+        break;
+      default:
+        autoContentType = contentValueType;
+        break;
     }
   }
 
-  if (!result.textValue) {
-    result.textValue = formatter.format(currentContentType, formatAction.getText(firstSelectedCell));
+  if (contentType === null) {
+    contentType = autoContentType ?? DEFAULT_CONTENT_TYPE;
   }
 
-  return result;
+  if (activeTabs.length > 0 && !activeTabs.some(tab => tab.key === contentType)) {
+    contentType = activeTabs[0].key;
+  }
+
+  const parsedBlobValueGetter = suspense.observedValue(
+    'value-blob',
+    () => ({
+      blob: isResultSetBlobValue(observedContentValue.contentValue) ? observedContentValue.contentValue.blob : null,
+      limit: observedContentValue.limitInfo?.limit,
+    }),
+    async ({ blob, limit }) => {
+      if (!blob) {
+        return null;
+      }
+      const dataURL = await blobToBase64(blob, limit ?? MAX_BLOB_PREVIEW_SIZE);
+
+      if (!dataURL) {
+        return null;
+      }
+
+      return removeMetadataFromDataURL(dataURL);
+    },
+  );
+
+  function valueGetter() {
+    let value = '';
+
+    if (!isNotNullDefined(elementKey)) {
+      return value;
+    }
+
+    const contentValue = formatAction.get(elementKey);
+    const isBinary = formatAction.isBinary(elementKey);
+    const cachedFullText = contentAction.retrieveFullTextFromCache(elementKey);
+
+    if (isBinary && isResultSetContentValue(contentValue)) {
+      if (contentValue.binary) {
+        value = atob(contentValue.binary);
+      } else if (contentValue.text) {
+        value = contentValue.text;
+      }
+    } else if (isResultSetBlobValue(contentValue)) {
+      value = atob(parsedBlobValueGetter() ?? '');
+    } else {
+      value = cachedFullText || formatAction.getText(elementKey);
+    }
+
+    if (!editAction.isElementEdited(elementKey) || isBinary) {
+      value = formatText(contentType!, value);
+    }
+
+    return value;
+  }
+
+  return {
+    valueGetter,
+    contentType,
+  };
 }

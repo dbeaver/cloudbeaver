@@ -33,9 +33,7 @@ import org.jkiss.dbeaver.model.DBPDataSource;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
 import org.jkiss.dbeaver.model.DBUtils;
 import org.jkiss.dbeaver.model.data.DBDAttributeBinding;
-import org.jkiss.dbeaver.model.exec.DBCException;
-import org.jkiss.dbeaver.model.exec.DBCLogicalOperator;
-import org.jkiss.dbeaver.model.exec.DBExecUtils;
+import org.jkiss.dbeaver.model.exec.*;
 import org.jkiss.dbeaver.model.impl.sql.BasicSQLDialect;
 import org.jkiss.dbeaver.model.navigator.DBNNode;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
@@ -60,9 +58,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
-import java.util.function.Predicate;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 /**
@@ -581,6 +576,21 @@ public class WebServiceSQL implements DBWServiceSQL {
             return (Long) taskStatus.getExtendedResult();
         }
         return null;
+    }
+
+    @Override
+    public WebAsyncTaskInfo asyncSqlSetAutoCommit(@NotNull WebSession webSession, @NotNull WebSQLContextInfo contextInfo, boolean autoCommit) throws DBWebException {
+        return contextInfo.setAutoCommit(autoCommit);
+    }
+
+    @Override
+    public WebAsyncTaskInfo asyncSqlRollbackTransaction(@NotNull WebSession webSession, @NotNull WebSQLContextInfo contextInfo) throws DBWebException {
+        return contextInfo.rollbackTransaction();
+    }
+
+    @Override
+    public WebAsyncTaskInfo asyncSqlCommitTransaction(@NotNull WebSession webSession, @NotNull WebSQLContextInfo contextInfo) {
+        return contextInfo.commitTransaction();
     }
 
 }

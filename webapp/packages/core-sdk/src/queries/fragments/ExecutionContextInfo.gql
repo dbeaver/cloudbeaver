@@ -1,7 +1,8 @@
 fragment ExecutionContextInfo on SQLContextInfo {
-    id
-    projectId
-    connectionId
-    defaultCatalog
-    defaultSchema
+  id
+  projectId
+  connectionId
+  autoCommit
+  defaultCatalog
+  defaultSchema
 }

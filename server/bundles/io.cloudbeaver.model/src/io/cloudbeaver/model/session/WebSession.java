@@ -91,7 +91,7 @@ import java.util.stream.Collectors;
  * Is the main source of data in web application
  */
 public class WebSession extends BaseWebSession
-    implements SMSession, SMCredentialsProvider, DBACredentialsProvider, IAdaptable {
+    implements SMSessionWithAuth, SMCredentialsProvider, DBACredentialsProvider, IAdaptable {
 
     private static final Log log = Log.getLog(WebSession.class);
 
@@ -100,6 +100,7 @@ public class WebSession extends BaseWebSession
     private static final String ATTR_LOCALE = "locale";
     private static final AtomicInteger TASK_ID = new AtomicInteger();
 
+    public static String RUNTIME_PARAM_AUTH_INFOS = "auth-infos";
     private final AtomicInteger taskCount = new AtomicInteger();
 
     private String lastRemoteAddr;
@@ -132,8 +133,15 @@ public class WebSession extends BaseWebSession
         this.lastAccessTime = this.createTime;
         setLocale(CommonUtils.toString(httpSession.getAttribute(ATTR_LOCALE), this.locale));
         this.sessionHandlers = sessionHandlers;
+        //force authorization of anonymous session to avoid access error,
+        //because before authorization could be called by any request,
+        //but now 'updateInfo' is called only in special requests,
+        //and the order of requests is not guaranteed.
+        //look at CB-4747
+        refreshSessionAuth();
     }
 
+    @Nullable
     @Override
     public SMSessionPrincipal getSessionPrincipal() {
         synchronized (authTokens) {
@@ -521,6 +529,7 @@ public class WebSession extends BaseWebSession
         HttpServletRequest request,
         HttpServletResponse response
     ) throws DBWebException {
+        log.debug("Update session lifetime " + getSessionId() + " for user " + getUserId());
         touchSession();
         HttpSession httpSession = request.getSession();
         this.lastRemoteAddr = request.getRemoteAddr();
@@ -813,6 +822,14 @@ public class WebSession extends BaseWebSession
         }
     }
 
+    @Override
+    public List<SMAuthInfo> getAuthInfos() {
+        synchronized (authTokens) {
+            return authTokens.stream().map(WebAuthInfo::getAuthInfo).toList();
+        }
+    }
+
+
     public List<WebAuthInfo> getAllAuthInfo() {
         synchronized (authTokens) {
             return new ArrayList<>(authTokens);
@@ -910,6 +927,7 @@ public class WebSession extends BaseWebSession
             for (DBACredentialsProvider contextCredentialsProvider : getContextCredentialsProviders()) {
                 contextCredentialsProvider.provideAuthParameters(monitor, dataSourceContainer, configuration);
             }
+            configuration.setRuntimeAttribute(RUNTIME_PARAM_AUTH_INFOS, getAllAuthInfo());
 
             WebConnectionInfo webConnectionInfo = findWebConnectionInfo(dataSourceContainer.getId());
             if (webConnectionInfo != null) {
@@ -1006,6 +1024,17 @@ public class WebSession extends BaseWebSession
     @Nullable
     public WebProjectImpl getProjectById(@Nullable String projectId) {
         return getWorkspace().getProjectById(projectId);
+    }
+
+    public WebProjectImpl getAccessibleProjectById(@Nullable String projectId) throws DBWebException {
+        WebProjectImpl project = null;
+        if (projectId != null) {
+            project = getWorkspace().getProjectById(projectId);
+        }
+        if (project == null) {
+            throw new DBWebException("Project not found: " + projectId);
+        }
+        return project;
     }
 
     public List<WebProjectImpl> getAccessibleProjects() {

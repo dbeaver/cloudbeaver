@@ -9,7 +9,7 @@ import type { Compartment, Extension, SelectionRange } from '@codemirror/state';
 import type { ViewUpdate } from '@codemirror/view';
 
 /** Currently we support only main selection range */
-interface ISelection {
+export interface ISelection {
   anchor: number;
   head?: number;
 }
@@ -22,6 +22,7 @@ export interface IReactCodeMirrorProps extends React.PropsWithChildren {
   getValue?: () => string;
   extensions?: Map<Compartment, Extension>;
   readonly?: boolean;
+  disableCopy?: boolean;
   autoFocus?: boolean;
   onChange?: (value: string, update: ViewUpdate) => void;
   onCursorChange?: (selection: SelectionRange, update: ViewUpdate) => void;

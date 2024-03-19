@@ -5,6 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
+import { importLazyComponent } from '@cloudbeaver/core-blocks';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { getCachedDataResourceLoaderState } from '@cloudbeaver/core-resource';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
@@ -13,8 +14,9 @@ import { ActionService, DATA_CONTEXT_MENU, menuExtractItems, MenuService } from 
 import { MENU_TOOLS } from '@cloudbeaver/plugin-tools-panel';
 
 import { ACTION_RESOURCE_MANAGER_SCRIPTS } from './Actions/ACTION_RESOURCE_MANAGER_SCRIPTS';
-import { ResourceManagerScripts } from './ResourceManagerScripts';
 import { ResourceManagerScriptsService } from './ResourceManagerScriptsService';
+
+const ResourceManagerScripts = importLazyComponent(() => import('./ResourceManagerScripts').then(m => m.ResourceManagerScripts));
 
 @injectable()
 export class PluginBootstrap extends Bootstrap {
@@ -57,9 +59,12 @@ export class PluginBootstrap extends Bootstrap {
       isActionApplicable: (context, action) => [ACTION_RESOURCE_MANAGER_SCRIPTS].includes(action),
       isHidden: () => !this.resourceManagerScriptsService.enabled,
       isChecked: () => this.resourceManagerScriptsService.active,
-      getLoader: (context, action) => {
-        return getCachedDataResourceLoaderState(this.serverConfigResource, undefined, undefined);
-      },
+      getLoader: () =>
+        getCachedDataResourceLoaderState(
+          this.serverConfigResource,
+          () => undefined,
+          () => undefined,
+        ),
       handler: (context, action) => {
         switch (action) {
           case ACTION_RESOURCE_MANAGER_SCRIPTS: {

@@ -5,11 +5,12 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
+import { isNotNullDefined, isObject } from '@cloudbeaver/core-utils';
 
-export function isControlPresented(name: string | undefined, state: any, defaultValue?: string | number | readonly string[]): boolean {
-  if (state !== undefined && name !== undefined) {
+export function isControlPresented(name: string | number | symbol | undefined, state: any, defaultValue?: any): boolean {
+  if (isObject(state) && isNotNullDefined(state) && isNotNullDefined(name)) {
     if (name in state) {
-      return state[name] !== null && state[name] !== undefined;
+      return isNotNullDefined((state as Record<string | number | symbol, any>)[name]);
     }
     return defaultValue !== undefined;
   }

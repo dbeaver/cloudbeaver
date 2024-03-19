@@ -93,12 +93,11 @@ public class WebSessionManager {
     }
 
     @NotNull
-    public WebSession getWebSession(@NotNull HttpServletRequest request, @NotNull HttpServletResponse response, boolean errorOnNoFound) throws DBWebException {
-        return getWebSession(request, response, true, errorOnNoFound);
-    }
-
-    @NotNull
-    public WebSession getWebSession(@NotNull HttpServletRequest request, @NotNull HttpServletResponse response, boolean updateInfo, boolean errorOnNoFound) throws DBWebException {
+    public WebSession getWebSession(
+        @NotNull HttpServletRequest request,
+        @NotNull HttpServletResponse response,
+        boolean errorOnNoFound
+    ) throws DBWebException {
         HttpSession httpSession = request.getSession(true);
         String sessionId = httpSession.getId();
         WebSession webSession;
@@ -139,13 +138,6 @@ public class WebSessionManager {
                     throw new DBWebException("Unexpected session type: " + baseWebSession.getClass().getName());
                 }
                 webSession = (WebSession) baseWebSession;
-                if (updateInfo) {
-                    // Update only once per request
-                    if (!CommonUtils.toBoolean(request.getAttribute("sessionUpdated"))) {
-                        webSession.updateInfo(request, response);
-                        request.setAttribute("sessionUpdated", true);
-                    }
-                }
             }
         }
 
@@ -328,16 +320,21 @@ public class WebSessionManager {
      */
     public void sendSessionsStates() {
         synchronized (sessionMap) {
-            for (var session : sessionMap.values()) {
-                if (session instanceof WebHeadlessSession) {
-                    continue;
-                }
-                try {
-                    session.addSessionEvent(new WSSessionStateEvent(session.getRemainingTime(), session.isValid()));
-                } catch (Exception e) {
-                    log.error("Failed to refresh session state: " + session.getSessionId(), e);
-                }
-            }
+            sessionMap.values()
+                .parallelStream()
+                .filter(session -> {
+                    if (session instanceof WebSession webSession) {
+                        return webSession.isAuthorizedInSecurityManager();
+                    }
+                    return false;
+                })
+                .forEach(session -> {
+                    try {
+                        session.addSessionEvent(new WSSessionStateEvent(session.getRemainingTime(), session.isValid()));
+                    } catch (Exception e) {
+                        log.error("Failed to refresh session state: " + session.getSessionId(), e);
+                    }
+                });
         }
     }
 

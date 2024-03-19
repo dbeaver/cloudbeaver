@@ -5,13 +5,11 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import type { ComponentStyle } from '@cloudbeaver/core-theming';
 
 export type NavNodeTransformViewComponent = React.FC<{
   nodeId: string;
   folderId: string;
   parents: string[];
-  style?: ComponentStyle;
 }>;
 
 export type NavNodeTransformView = (nodeId: string, folderId: string, parents: string[]) => NavNodeTransformViewComponent | undefined;
