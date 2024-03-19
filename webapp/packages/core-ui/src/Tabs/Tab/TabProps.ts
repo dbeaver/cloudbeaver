@@ -8,7 +8,6 @@
 import type { PropsWithChildren } from 'react';
 
 import type { IDataContext } from '@cloudbeaver/core-data-context';
-import type { ComponentStyle } from '@cloudbeaver/core-theming';
 
 import type { ITabData } from '../TabsContainer/ITabsContainer';
 
@@ -19,7 +18,6 @@ export type TabProps = PropsWithChildren<{
   selected?: boolean;
   disabled?: boolean;
   className?: string;
-  style?: ComponentStyle;
   onOpen?: (tab: ITabData<any>) => void;
   onClose?: (tab: ITabData<any>) => void;
   onClick?: (tabId: string) => void;

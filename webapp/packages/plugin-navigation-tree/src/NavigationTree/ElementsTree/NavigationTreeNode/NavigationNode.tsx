@@ -72,7 +72,7 @@ export const NavigationNode: NavigationNodeComponent = observer(function Navigat
   }
 
   const hasNodes = getComputed(() => !!dndBox.state.context && dndBox.state.canDrop && dndBox.state.isOverCurrent);
-  const expanded = useDeferredValue(navNode.expanded || externalExpanded);
+  const expanded = useDeferredValue((navNode.expanded || externalExpanded) && navNode.loaded);
 
   useEffect(
     () => () => {

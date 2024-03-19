@@ -9,15 +9,17 @@ import { observer } from 'mobx-react-lite';
 import { useContext, useMemo } from 'react';
 import { TabPanel as BaseTabPanel } from 'reakit/Tab';
 
-import { getComputed, Loader } from '@cloudbeaver/core-blocks';
+import { getComputed, Loader, s, useS } from '@cloudbeaver/core-blocks';
 
 import { TabContext } from './TabContext';
+import tabPanelStyles from './TabPanel.m.css';
 import type { TabPanelProps } from './TabPanelProps';
 import { TabsContext } from './TabsContext';
 import { useTabsValidation } from './useTabsValidation';
 
 export const TabPanel: React.FC<TabPanelProps> = observer(function TabPanel({ tabId, children, className, lazy }) {
   const tabContextState = useContext(TabsContext);
+  const styles = useS(tabPanelStyles);
 
   if (!tabContextState) {
     throw new Error('Tabs context was not provided');
@@ -42,7 +44,7 @@ export const TabPanel: React.FC<TabPanelProps> = observer(function TabPanel({ ta
 
   return (
     <TabContext.Provider value={tabContext}>
-      <BaseTabPanel ref={panelRef} {...tabContextState.state} tabId={tabId} className={className}>
+      <BaseTabPanel ref={panelRef} {...tabContextState.state} tabId={tabId} className={s(styles, { tabPanel: true }, className)}>
         <Loader suspense>{renderChildren()}</Loader>
       </BaseTabPanel>
     </TabContext.Provider>
