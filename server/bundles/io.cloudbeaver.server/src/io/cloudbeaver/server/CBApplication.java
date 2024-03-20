@@ -691,6 +691,13 @@ public abstract class CBApplication extends BaseWebApplication implements WebAut
 
     protected void readProductConfiguration(Map<String, Object> serverConfig, Gson gson, String homeFolder)
         throws DBException {
+        var productConf = serverConfig.get(CBConstants.PARAM_PRODUCT_CONFIGURATION);
+        if (productConf instanceof Map) {
+            @SuppressWarnings("unchecked") Map<String, Object> productConfMap = (Map<String, Object>) productConf;
+            this.productConfiguration.putAll(productConfMap);
+            return;
+        }
+        //backward compatible for reading data from the product.conf file
         String productConfigPath = WebAppUtils.getRelativePath(
             JSONUtils.getString(
                 serverConfig,
@@ -1178,6 +1185,17 @@ public abstract class CBApplication extends BaseWebApplication implements WebAut
             }
             serverConfigProperties.put(CBConstants.PARAM_DB_CONFIGURATION, databaseConfigProperties);
         }
+
+        var productConfigProperties = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
+        Map<String, Object> oldProductRuntimeConfig = JSONUtils.getObject(originServerConfig,
+            CBConstants.PARAM_PRODUCT_CONFIGURATION);
+        if (!CommonUtils.isEmpty(productConfiguration)) {
+            for (Map.Entry<String, Object> mp : productConfiguration.entrySet()) {
+                copyConfigValue(oldProductRuntimeConfig, productConfigProperties, mp.getKey(), mp.getValue());
+            }
+            serverConfigProperties.put(CBConstants.PARAM_PRODUCT_CONFIGURATION, productConfigProperties);
+        }
+
         savePasswordPolicyConfig(originServerConfig, serverConfigProperties);
     }
 
@@ -1326,9 +1344,9 @@ public abstract class CBApplication extends BaseWebApplication implements WebAut
 
     public void saveProductConfiguration(SMCredentialsProvider credentialsProvider, Map<String, Object> productConfiguration) throws DBException {
         Map<String, Object> mergedConfig = WebAppUtils.mergeConfigurations(this.productConfiguration, productConfiguration);
-        writeRuntimeConfig(getRuntimeProductConfigFilePath().toFile(), mergedConfig);
         this.productConfiguration.clear();
         this.productConfiguration.putAll(WebAppUtils.flattenMap(mergedConfig));
+        flushConfiguration(credentialsProvider);
         sendConfigChangedEvent(credentialsProvider);
     }
 
