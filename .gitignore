@@ -40,6 +40,7 @@ server/test/io.cloudbeaver.test.platform/workspace/.data/
 .classpath
 .settings/
 
+workspace-dev-ce/
 deploy/cloudbeaver
 server/**/target
 apps/**/target
