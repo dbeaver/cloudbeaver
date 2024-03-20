@@ -1,0 +1,16 @@
+.tableColumnValue {
+  white-space: pre;
+  cursor: pointer;
+}
+
+.expandContainer {
+  width: 24px;
+  height: 24px;
+  margin-right: 4px;
+  display: flex;
+}
+
+.control {
+  display: flex;
+  align-items: center;
+}
