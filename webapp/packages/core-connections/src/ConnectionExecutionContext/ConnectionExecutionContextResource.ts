@@ -71,7 +71,8 @@ export class ConnectionExecutionContextResource extends CachedMapResource<string
   }
 
   async create(key: IConnectionInfoParams, defaultCatalog?: string, defaultSchema?: string): Promise<IConnectionExecutionContextInfo> {
-    return await this.performUpdate(getContextBaseId(key, ''), [], async () => {
+    const contextKey = getContextBaseId(key, '');
+    return await this.performUpdate(contextKey, [], async () => {
       const { context } = await this.graphQLService.sdk.executionContextCreate({
         ...key,
         defaultCatalog,
@@ -84,6 +85,8 @@ export class ConnectionExecutionContextResource extends CachedMapResource<string
         this.set(baseContext.id, baseContext);
         this.markOutdated(); // TODO: should be removed, currently multiple contexts for same connection may change catalog/schema for all contexts of connection
       });
+
+      this.onDataOutdated.execute(contextKey);
 
       return this.get(baseContext.id)!;
     });
@@ -107,6 +110,7 @@ export class ConnectionExecutionContextResource extends CachedMapResource<string
 
       context.defaultCatalog = defaultCatalog;
       context.defaultSchema = defaultSchema;
+      this.onDataOutdated.execute(contextId);
     });
 
     this.markOutdated();
@@ -126,6 +130,7 @@ export class ConnectionExecutionContextResource extends CachedMapResource<string
         connectionId: context.connectionId,
         projectId: context.projectId,
       });
+      this.onDataOutdated.execute(contextId);
     });
 
     runInAction(() => {

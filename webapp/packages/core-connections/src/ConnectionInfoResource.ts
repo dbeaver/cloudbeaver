@@ -364,6 +364,8 @@ export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoPar
         projectId: connectionKey.projectId,
         connectionId: connectionKey.connectionId,
       });
+
+      this.onDataOutdated.execute(connectionKey);
       return subjects;
     });
 
@@ -396,6 +398,7 @@ export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoPar
         ...this.getIncludesMap(key),
       });
       this.set(createConnectionParam(connection), connection);
+      this.onDataOutdated.execute(key);
     });
 
     return this.get(key)!;
@@ -413,6 +416,7 @@ export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoPar
       });
 
       this.set(createConnectionParam(connection), connection);
+      this.onDataOutdated.execute(key);
     });
 
     return this.get(key)!;
@@ -428,6 +432,7 @@ export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoPar
       });
 
       this.set(createConnectionParam(connection), connection);
+      this.onDataOutdated.execute(key);
     });
     return this.get(key)!;
   }
@@ -442,6 +447,7 @@ export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoPar
       });
 
       this.set(createConnectionParam(connection), connection);
+      this.onDataOutdated.execute(key);
     });
 
     const connection = this.get(key)!;
@@ -457,6 +463,7 @@ export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoPar
     await ResourceKeyUtils.forEachAsync(key, async key => {
       await this.performUpdate(key, [], async () => {
         await this.graphQLService.sdk.deleteConnection({ projectId: key.projectId, connectionId: key.connectionId });
+        this.onDataOutdated.execute(key);
       });
       this.delete(key);
     });

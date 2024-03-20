@@ -659,7 +659,6 @@ export abstract class CachedResource<
       {
         success: () => {
           if (loaded) {
-            this.onDataOutdated.execute(key); // TODO: probably need to remove, we need to notify any related resources that subscribed to .onOutdate, to recursively outdate them
             this.dataUpdate(key);
           }
         },
