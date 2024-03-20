@@ -7,7 +7,6 @@
  */
 import { observer } from 'mobx-react-lite';
 import { useState } from 'react';
-import styled from 'reshadow';
 
 import {
   CommonDialogBody,
@@ -18,13 +17,13 @@ import {
   IProperty,
   PropertiesTable,
   s,
+  SContext,
   useErrorDetails,
   useS,
-  useStyles,
   useTranslate,
 } from '@cloudbeaver/core-blocks';
-import type { DataTransferOutputSettings, DataTransferProcessorInfo, GQLErrorCatcher } from '@cloudbeaver/core-sdk';
-import { ITabData, Tab, TabList, TabsState, TabTitle, UNDERLINE_TAB_STYLES } from '@cloudbeaver/core-ui';
+import type { DataTransferOutputSettings, DataTransferProcessorInfo } from '@cloudbeaver/core-sdk';
+import { ITabData, Tab, TabList, TabsState, TabTitle, TabUnderlineStyleRegistry } from '@cloudbeaver/core-ui';
 
 import { OutputOptionsForm } from './OutputOptionsForm';
 import style from './ProcessorConfigureDialog.m.css';
@@ -81,20 +80,22 @@ export const ProcessorConfigureDialog = observer<Props>(function ProcessorConfig
     }
   }
 
-  return styled(useStyles(UNDERLINE_TAB_STYLES))(
+  return (
     <CommonDialogWrapper className={s(styles, { container: true })} size="large" fixedSize>
       <CommonDialogHeader title={title} onReject={onClose} />
       <CommonDialogBody noOverflow noBodyPadding>
         {!processor.isBinary ? (
           <TabsState currentTabId={currentTabId} onChange={handleTabChange}>
-            <TabList className={s(styles, { tabList: true })} aria-label="Export Settings tabs">
-              <Tab tabId={SETTINGS_TABS.EXTRACTION} style={UNDERLINE_TAB_STYLES}>
-                <TabTitle>{translate('data_transfer_format_settings')}</TabTitle>
-              </Tab>
-              <Tab tabId={SETTINGS_TABS.OUTPUT} style={UNDERLINE_TAB_STYLES}>
-                <TabTitle>{translate('data_transfer_output_settings')}</TabTitle>
-              </Tab>
-            </TabList>
+            <SContext registry={TabUnderlineStyleRegistry}>
+              <TabList className={s(styles, { tabList: true })} aria-label="Export Settings tabs">
+                <Tab tabId={SETTINGS_TABS.EXTRACTION}>
+                  <TabTitle>{translate('data_transfer_format_settings')}</TabTitle>
+                </Tab>
+                <Tab tabId={SETTINGS_TABS.OUTPUT}>
+                  <TabTitle>{translate('data_transfer_output_settings')}</TabTitle>
+                </Tab>
+              </TabList>
+            </SContext>
           </TabsState>
         ) : null}
         {currentTabId === SETTINGS_TABS.EXTRACTION ? (
@@ -122,6 +123,6 @@ export const ProcessorConfigureDialog = observer<Props>(function ProcessorConfig
           onNext={handleNextClick}
         />
       </CommonDialogFooter>
-    </CommonDialogWrapper>,
+    </CommonDialogWrapper>
   );
 });

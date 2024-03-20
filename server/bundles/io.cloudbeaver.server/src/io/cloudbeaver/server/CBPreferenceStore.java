@@ -38,7 +38,7 @@ public class CBPreferenceStore extends AbstractPreferenceStore {
 
     @Override
     public boolean contains(String name) {
-        return productConf().containsKey(name);
+        return productConf().containsKey(name) || parentStore.contains(name);
     }
 
     @Override
@@ -68,9 +68,9 @@ public class CBPreferenceStore extends AbstractPreferenceStore {
 
     @Override
     public String getString(String name) {
-        Object value = productConf().getOrDefault(name, parentStore.getString(name));
+        Object value = productConf().get(name);
         if (value == null) {
-            return null;
+            return parentStore.getString(name);
         }
         return value.toString();
     }
@@ -138,6 +138,7 @@ public class CBPreferenceStore extends AbstractPreferenceStore {
 
     @Override
     public void setDefault(String name, String defaultObject) {
+        // do not store global default properties in product.conf
         this.parentStore.setDefault(name, defaultObject);
     }
 
