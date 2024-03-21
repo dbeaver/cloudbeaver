@@ -8,6 +8,7 @@
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 
 import { ObjectPropertiesPageService } from './ObjectPropertiesPage/ObjectPropertiesPageService';
+import { ObjectPropertyTableFooterService } from './ObjectPropertiesPage/ObjectPropertyTable/ObjectPropertyTableFooterService';
 import { ObjectViewerTabService } from './ObjectViewerTabService';
 
 @injectable()
@@ -15,6 +16,7 @@ export class ObjectViewerBootstrap extends Bootstrap {
   constructor(
     private readonly objectViewerTabService: ObjectViewerTabService,
     private readonly objectPropertiesPageService: ObjectPropertiesPageService,
+    private readonly objectPropertyTableFooterService: ObjectPropertyTableFooterService,
   ) {
     super();
   }
@@ -22,6 +24,7 @@ export class ObjectViewerBootstrap extends Bootstrap {
   register(): void {
     this.objectViewerTabService.registerTabHandler();
     this.objectPropertiesPageService.registerDBObjectPage();
+    this.objectPropertyTableFooterService.registerFooterActions();
   }
 
   load(): void {}

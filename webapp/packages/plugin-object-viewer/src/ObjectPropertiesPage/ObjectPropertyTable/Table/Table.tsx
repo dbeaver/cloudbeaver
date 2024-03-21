@@ -7,10 +7,11 @@
  */
 import { observer } from 'mobx-react-lite';
 import { useCallback, useState } from 'react';
-import styled, { css } from 'reshadow';
+import styled from 'reshadow';
 
-import { IScrollState, Link, useControlledScroll, useStyles, useTable, useTranslate } from '@cloudbeaver/core-blocks';
-import type { DBObject } from '@cloudbeaver/core-navigation-tree';
+import { IScrollState, Link, s, useControlledScroll, useExecutor, useS, useStyles, useTable, useTranslate } from '@cloudbeaver/core-blocks';
+import { useService } from '@cloudbeaver/core-di';
+import { type DBObject, NavTreeResource } from '@cloudbeaver/core-navigation-tree';
 import type { ObjectPropertyInfo } from '@cloudbeaver/core-sdk';
 import { useTabLocalState } from '@cloudbeaver/core-ui';
 import { isDefined, TextTools } from '@cloudbeaver/core-utils';
@@ -26,29 +27,9 @@ import { ColumnSelect } from './Columns/ColumnSelect/ColumnSelect';
 import { HeaderRenderer } from './HeaderRenderer';
 import baseStyles from './styles/base.scss';
 import { tableStyles } from './styles/styles';
+import classes from './Table.m.css';
 import { TableContext } from './TableContext';
 import { useTableData } from './useTableData';
-
-const style = css`
-  wrapper {
-    composes: theme-typography--body2 from global;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-  }
-  DataGrid {
-    width: 100%;
-    height: 100%;
-  }
-  data-info {
-    padding: 4px 12px;
-  }
-  ObjectPropertyTableFooter {
-    composes: theme-background-secondary theme-text-on-secondary theme-border-color-background from global;
-    border-top: 1px solid;
-  }
-`;
 
 const CELL_FONT = '400 12px Roboto';
 const COLUMN_FONT = '700 12px Roboto';
@@ -95,9 +76,11 @@ function getMeasuredCells(columns: ObjectPropertyInfo[], rows: DBObject[]) {
 const CUSTOM_COLUMNS = [ColumnSelect, ColumnIcon];
 
 export const Table = observer<TableProps>(function Table({ objects, hasNextPage, loadMore }) {
+  const navTreeResource = useService(NavTreeResource);
   const [tableContainer, setTableContainerRef] = useState<HTMLDivElement | null>(null);
   const translate = useTranslate();
-  const styles = useStyles(style, baseStyles, tableStyles);
+  const styles = useS(classes);
+  const deprecatedStyles = useStyles(baseStyles, tableStyles);
   const tableState = useTable();
   const tabLocalState = useTabLocalState<IScrollState>(() => ({ scrollTop: 0, scrollLeft: 0 }));
 
@@ -133,15 +116,24 @@ export const Table = observer<TableProps>(function Table({ objects, hasNextPage,
     [loadMore],
   );
 
+  useExecutor({
+    executor: navTreeResource.onItemDelete,
+    handlers: [
+      function handleNodeDelete(nodeId) {
+        tableState.unselect(nodeId);
+      },
+    ],
+  });
+
   if (objects.length === 0) {
     return null;
   }
 
-  return styled(styles)(
+  return styled(deprecatedStyles)(
     <TableContext.Provider value={{ tableData, tableState }}>
-      <wrapper ref={setTableContainerRef} className="metadata-grid-container">
+      <div ref={setTableContainerRef} className={s(styles, { wrapper: true }, 'metadata-grid-container')}>
         <DataGrid
-          className="cb-metadata-grid-theme"
+          className={s(styles, { dataGrid: true }, 'cb-metadata-grid-theme')}
           rows={objects}
           rowKeyGetter={row => row.id}
           columns={tableData.columns}
@@ -149,14 +141,14 @@ export const Table = observer<TableProps>(function Table({ objects, hasNextPage,
           onScroll={handleScroll}
         />
         {hasNextPage && (
-          <data-info>
+          <div className={s(styles, { dataInfo: true })}>
             <Link title={translate('app_navigationTree_limited')} onClick={loadMore}>
               {translate('ui_load_more')}
             </Link>
-          </data-info>
+          </div>
         )}
-        <ObjectPropertyTableFooter nodeIds={nodeIds} tableState={tableState} />
-      </wrapper>
+        <ObjectPropertyTableFooter className={s(styles, { objectPropertyTableFooter: true })} nodeIds={nodeIds} tableState={tableState} />
+      </div>
     </TableContext.Provider>,
   );
 });

@@ -7,11 +7,13 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import { TableState, ToolsPanel } from '@cloudbeaver/core-blocks';
-import { useService } from '@cloudbeaver/core-di';
+import type { TableState } from '@cloudbeaver/core-blocks';
+import { MenuBar } from '@cloudbeaver/core-ui';
+import { useMenu } from '@cloudbeaver/core-view';
 
-import { ObjectPropertyTableFooterItem } from './ObjectPropertyTableFooterItem';
-import { ObjectPropertyTableFooterService } from './ObjectPropertyTableFooterService';
+import { DATA_CONTEXT_OBJECT_VIEWER_NODES } from './DATA_CONTEXT_OBJECT_VIEWER_NODES';
+import { DATA_CONTEXT_OBJECT_VIEWER_TABLE_STATE } from './DATA_CONTEXT_OBJECT_VIEWER_TABLE_STATE';
+import { MENU_OBJECT_VIEWER_FOOTER_ACTIONS } from './MENU_OBJECT_VIEWER_FOOTER_ACTIONS';
 
 interface Props {
   nodeIds: string[];
@@ -20,20 +22,10 @@ interface Props {
 }
 
 export const ObjectPropertyTableFooter = observer<Props>(function ObjectPropertyTableFooter({ nodeIds, tableState, className }) {
-  const service = useService(ObjectPropertyTableFooterService);
+  const menu = useMenu({ menu: MENU_OBJECT_VIEWER_FOOTER_ACTIONS });
 
-  const items = service.constructMenuWithContext(nodeIds, tableState);
-  const hidden = items.every(item => item.isHidden);
+  menu.context.set(DATA_CONTEXT_OBJECT_VIEWER_NODES, nodeIds);
+  menu.context.set(DATA_CONTEXT_OBJECT_VIEWER_TABLE_STATE, tableState);
 
-  if (hidden) {
-    return null;
-  }
-
-  return (
-    <ToolsPanel className={className}>
-      {items.map((topItem, i) => (
-        <ObjectPropertyTableFooterItem key={i} menuItem={topItem} />
-      ))}
-    </ToolsPanel>
-  );
+  return <MenuBar className={className} menu={menu} />;
 });
