@@ -86,9 +86,10 @@ export class ConnectionExecutionContextResource extends CachedMapResource<string
         this.markOutdated(); // TODO: should be removed, currently multiple contexts for same connection may change catalog/schema for all contexts of connection
       });
 
+      const result = this.get(baseContext.id)!;
       this.onDataOutdated.execute(contextKey);
 
-      return this.get(baseContext.id)!;
+      return result;
     });
   }
 

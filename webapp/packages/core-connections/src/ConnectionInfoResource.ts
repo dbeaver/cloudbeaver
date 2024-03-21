@@ -463,10 +463,10 @@ export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoPar
     await ResourceKeyUtils.forEachAsync(key, async key => {
       await this.performUpdate(key, [], async () => {
         await this.graphQLService.sdk.deleteConnection({ projectId: key.projectId, connectionId: key.connectionId });
-        this.onDataOutdated.execute(key);
       });
       this.delete(key);
     });
+    this.onDataOutdated.execute(key);
   }
 
   // async updateSessionConnections(): Promise<boolean> {

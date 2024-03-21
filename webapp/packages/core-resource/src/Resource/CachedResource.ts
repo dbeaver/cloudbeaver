@@ -609,6 +609,7 @@ export abstract class CachedResource<
    * Implements same behavior as {@link CachedResource.load} and {@link CachedResource.refresh} for custom loaders.
    * Resource will be marked as loading and will be marked as loaded after loader is finished.
    * Exceptions will be handled and stored in metadata.
+   * Tip: use onDataOutdated executor with this function where it is needed.
    * @param key - Resource key
    * @param include - Includes
    * @param update - Update function
