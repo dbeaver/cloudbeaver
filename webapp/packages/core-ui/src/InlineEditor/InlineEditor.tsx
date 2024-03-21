@@ -6,16 +6,14 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import { ChangeEvent, forwardRef, useCallback, useEffect, useImperativeHandle, useRef } from 'react';
-import styled, { use } from 'reshadow';
+import React, { ChangeEvent, forwardRef, useCallback, useEffect, useImperativeHandle, useRef } from 'react';
 
-import { Icon, IconOrImage, Loader, useObjectRef, useStyles } from '@cloudbeaver/core-blocks';
+import { Icon, IconOrImage, Loader, s, useObjectRef, useS } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
-import type { ComponentStyle } from '@cloudbeaver/core-theming';
 
 import { EditorDialog } from './EditorDialog';
-import { InlineEditorStyles } from './styles';
+import styles from './InlineEditor.m.css';
 
 export type InlineEditorControls = 'right' | 'top' | 'bottom' | 'inside';
 
@@ -30,7 +28,6 @@ export interface InlineEditorProps extends Omit<React.InputHTMLAttributes<HTMLIn
   autofocus?: boolean;
   active?: boolean;
   loading?: boolean;
-  style?: ComponentStyle;
   onChange: (value: string) => void;
   onSave?: () => void;
   onReject?: () => void;
@@ -54,7 +51,6 @@ export const InlineEditor = observer<InlineEditorProps, HTMLInputElement>(
       active,
       loading,
       disabled,
-      style,
       onChange,
       onSave,
       onUndo,
@@ -73,6 +69,7 @@ export const InlineEditor = observer<InlineEditorProps, HTMLInputElement>(
       value,
       disableSave,
     });
+    const style = useS(styles);
 
     const commonDialogService = useService(CommonDialogService);
 
@@ -113,11 +110,12 @@ export const InlineEditor = observer<InlineEditorProps, HTMLInputElement>(
 
     useImperativeHandle(ref, () => inputRef.current!);
 
-    return styled(useStyles(InlineEditorStyles, style))(
-      <editor className={className} {...use({ active })} onClick={onClick} onDoubleClick={onDoubleClick}>
-        <editor-container>
+    return (
+      <div className={s(style, { editor: true, editorActive: active }, className)} onClick={onClick} onDoubleClick={onDoubleClick}>
+        <div className={s(style, { editorContainer: true })}>
           <input
             ref={inputRef}
+            className={s(style, { input: true })}
             lang="en"
             value={value}
             autoComplete="off"
@@ -126,30 +124,52 @@ export const InlineEditor = observer<InlineEditorProps, HTMLInputElement>(
             onKeyDown={handleKeyDown}
             {...rest}
           />
-        </editor-container>
-        <editor-actions as="div" {...use({ position: controlsPosition })} onMouseDown={e => e.preventDefault()}>
+        </div>
+        <div
+          className={s(style, {
+            editorActions: true,
+            editorActionsPositionTop: controlsPosition === 'top',
+            editorActionsPositionBottom: controlsPosition === 'bottom',
+            editorActionsPositionInside: controlsPosition === 'inside',
+          })}
+          onMouseDown={e => e.preventDefault()}
+        >
           {!hideSave && (
-            <editor-action as="button" disabled={disabled || disableSave} onClick={onSave}>
-              {loading ? <Loader small fullSize /> : <Icon name="apply" viewBox="0 0 12 10" />}
-            </editor-action>
+            <EditorAction disabled={disabled || disableSave} onClick={onSave}>
+              {loading ? (
+                <Loader className={s(style, { loader: true })} small fullSize />
+              ) : (
+                <Icon className={s(style, { icon: true })} name="apply" viewBox="0 0 12 10" />
+              )}
+            </EditorAction>
           )}
           {!hideCancel && onReject && (
-            <editor-action as="button" disabled={disabled} onClick={onReject}>
-              <Icon name="reject" viewBox="0 0 11 11" />
-            </editor-action>
+            <EditorAction disabled={disabled} onClick={onReject}>
+              <Icon className={s(style, { icon: true })} name="reject" viewBox="0 0 11 11" />
+            </EditorAction>
           )}
           {onUndo && (
-            <editor-action as="button" disabled={!edited || disabled} onClick={edited ? onUndo : undefined}>
-              <IconOrImage icon="/icons/data_revert.svg" />
-            </editor-action>
+            <EditorAction disabled={!edited || disabled} onClick={edited ? onUndo : undefined}>
+              <IconOrImage className={s(style, { iconOrImage: true })} icon="/icons/data_revert.svg" />
+            </EditorAction>
           )}
           {!simple && (
-            <editor-action as="button" disabled={disabled} onClick={handlePopup}>
-              <Icon name="edit" viewBox="0 0 13 13" />
-            </editor-action>
+            <EditorAction disabled={disabled} onClick={handlePopup}>
+              <Icon className={s(style, { icon: true })} name="edit" viewBox="0 0 13 13" />
+            </EditorAction>
           )}
-        </editor-actions>
-      </editor>,
+        </div>
+      </div>
     );
   }),
 );
+
+const EditorAction = observer<React.PropsWithChildren<React.ButtonHTMLAttributes<HTMLButtonElement>>>(function EditorAction({ children, ...props }) {
+  const style = useS(styles);
+
+  return (
+    <button className={s(style, { editorAction: true })} {...props}>
+      {children}
+    </button>
+  );
+});
