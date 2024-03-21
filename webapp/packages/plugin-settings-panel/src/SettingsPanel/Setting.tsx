@@ -35,7 +35,7 @@ export const Setting = observer<Props>(function Setting({ source, setting }) {
 
   let value = source.getEditedValue(setting.key);
   if (readOnly) {
-    value = settingsResolverService.getValue(setting.key) ?? '';
+    value = settingsResolverService.getValue(setting.key);
   }
 
   if (setting.key in settingsProviderService.schema.shape) {
@@ -48,6 +48,8 @@ export const Setting = observer<Props>(function Setting({ source, setting }) {
     const result = schema.safeParse(value);
     value = result.success ? result.data : value;
   }
+
+  value = value ?? '';
 
   const customValidation = useCustomInputValidation(value => {
     if (!(setting.key in settingsProviderService.schema.shape)) {
@@ -91,10 +93,11 @@ export const Setting = observer<Props>(function Setting({ source, setting }) {
         keySelector={value => value.value}
         valueSelector={value => value.name}
         value={value}
-        title={description}
+        title={name}
         disabled={disabled}
         readOnly={readOnly}
-        tiny
+        description={description}
+        small
         onSelect={handleChange}
       >
         {name}

@@ -6,10 +6,11 @@
  * you may not use this file except in compliance with the License.
  */
 import { Dependency, injectable } from '@cloudbeaver/core-di';
-import { ServerSettingsService } from '@cloudbeaver/core-root';
+import { ServerSettingsManagerService, ServerSettingsService } from '@cloudbeaver/core-root';
 import {
   createSettingsAliasResolver,
   ESettingsValueType,
+  ISettingDescription,
   ROOT_SETTINGS_LAYER,
   SettingsManagerService,
   SettingsProvider,
@@ -19,6 +20,23 @@ import {
 import { schema, schemaExtra } from '@cloudbeaver/core-utils';
 
 import { SQL_EDITOR_SETTINGS_GROUP } from './SQL_EDITOR_SETTINGS_GROUP';
+
+const TABLE_ALIAS_OPTIONS = ['NONE', 'PLAIN', 'EXTENDED'] as const;
+
+const TABLE_ALIAS_SETTING_OPTIONS = [
+  {
+    value: 'NONE',
+    name: 'ui_disable',
+  },
+  {
+    value: 'PLAIN',
+    name: 'my_table mt',
+  },
+  {
+    value: 'EXTENDED',
+    name: 'my_table AS mt',
+  },
+];
 
 const defaultSettings = schema.object({
   'plugin.sql-editor.maxFileSize': schema.coerce.number().default(10 * 1024), // kilobyte
@@ -36,7 +54,7 @@ const defaultSettings = schema.object({
           return value;
       }
     })
-    .pipe(schema.enum(['PLAIN', 'NONE', 'EXTENDED']).default('PLAIN')),
+    .pipe(schema.enum(TABLE_ALIAS_OPTIONS).default('PLAIN')),
 });
 
 export type SqlEditorSettings = schema.infer<typeof defaultSettings>;
@@ -66,6 +84,7 @@ export class SqlEditorSettingsService extends Dependency {
     private readonly settingsManagerService: SettingsManagerService,
     private readonly serverSettingsService: ServerSettingsService,
     private readonly settingsResolverService: SettingsResolverService,
+    private readonly serverSettingsManagerService: ServerSettingsManagerService,
   ) {
     super();
     this.settings = this.settingsProviderService.createSettings(defaultSettings);
@@ -82,37 +101,56 @@ export class SqlEditorSettingsService extends Dependency {
   }
 
   private registerSettings() {
-    this.settingsManagerService.registerSettings(this.settings, () => [
-      {
-        key: 'sql.proposals.insert.table.alias',
-        access: {
-          scope: ['server', 'client'],
-        },
-        group: SQL_EDITOR_SETTINGS_GROUP,
-        type: ESettingsValueType.Checkbox,
-        name: 'sql_editor_settings_insert_table_aliases_name',
-        description: 'sql_editor_settings_insert_table_aliases_desc',
-      },
-      // {
-      //   group: SQL_EDITOR_SETTINGS_GROUP,
-      //   key: 'disabled',
-      //   type: ESettingsValueType.Checkbox,
-      //   name: 'Disable SQL editor',
-      // },
-      // {
-      //   group: SQL_EDITOR_SETTINGS_GROUP,
-      //   key: 'maxFileSize',
-      //   type: ESettingsValueType.Input,
-      //   name: 'Max file size (KB)',
-      //   description: 'Max file size for SQL editor in kilobytes',
-      // },
-      // {
-      //   group: SQL_EDITOR_SETTINGS_GROUP,
-      //   key: 'autoSave',
-      //   type: ESettingsValueType.Checkbox,
-      //   name: 'Auto save',
-      //   description: 'Auto save SQL editor content',
-      // },
-    ]);
+    this.serverSettingsManagerService.setSettingTransformer(
+      'sql.proposals.insert.table.alias',
+      setting =>
+        ({
+          ...setting,
+          group: SQL_EDITOR_SETTINGS_GROUP,
+          name: 'sql_editor_settings_insert_table_aliases_name',
+          description: 'sql_editor_settings_insert_table_aliases_desc',
+          options: [...(setting.options?.filter(option => !TABLE_ALIAS_OPTIONS.includes(option.value as any)) || []), ...TABLE_ALIAS_SETTING_OPTIONS],
+        }) as ISettingDescription<SqlEditorSettings>,
+    );
+
+    this.settingsManagerService.registerSettings(this.settings, () => {
+      const settings: ISettingDescription<SqlEditorSettings>[] = [
+        // {
+        //   group: SQL_EDITOR_SETTINGS_GROUP,
+        //   key: 'disabled',
+        //   type: ESettingsValueType.Checkbox,
+        //   name: 'Disable SQL editor',
+        // },
+        // {
+        //   group: SQL_EDITOR_SETTINGS_GROUP,
+        //   key: 'maxFileSize',
+        //   type: ESettingsValueType.Input,
+        //   name: 'Max file size (KB)',
+        //   description: 'Max file size for SQL editor in kilobytes',
+        // },
+        // {
+        //   group: SQL_EDITOR_SETTINGS_GROUP,
+        //   key: 'autoSave',
+        //   type: ESettingsValueType.Checkbox,
+        //   name: 'Auto save',
+        //   description: 'Auto save SQL editor content',
+        // },
+      ];
+
+      if (!this.serverSettingsManagerService.providedSettings.has('sql.proposals.insert.table.alias')) {
+        settings.push({
+          key: 'sql.proposals.insert.table.alias',
+          access: {
+            scope: ['server', 'client'],
+          },
+          group: SQL_EDITOR_SETTINGS_GROUP,
+          type: ESettingsValueType.Select,
+          name: 'sql_editor_settings_insert_table_aliases_name',
+          description: 'sql_editor_settings_insert_table_aliases_desc',
+          options: TABLE_ALIAS_SETTING_OPTIONS,
+        });
+      }
+      return settings;
+    });
   }
 }

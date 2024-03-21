@@ -14,6 +14,7 @@ export * from './ServerConfigResource';
 export * from './SessionEventSource';
 export * from './QuotasService';
 export * from './SessionResource';
+export * from './Settings/ServerSettingsManagerService';
 export * from './Settings/ServerSettingsService';
 export * from './Settings/SESSION_SETTINGS_LAYER';
 export * from './SessionActionService';

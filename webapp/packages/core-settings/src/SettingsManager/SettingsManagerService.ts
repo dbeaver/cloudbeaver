@@ -13,7 +13,7 @@ import type { ILoadableState, schema } from '@cloudbeaver/core-utils';
 import type { SettingsProvider } from '../SettingsProvider';
 import type { ISettingDescription, SettingsDescriptionGetter } from './ISettingDescription';
 
-interface ScopeSettingsItem<T extends schema.SomeZodObject = any> {
+interface SettingsProviderItem<T extends schema.SomeZodObject = any> {
   settingsGetter: SettingsDescriptionGetter<schema.infer<T>>;
   loaders?: ReadonlyArray<ILoadableState>;
 }
@@ -28,7 +28,7 @@ export class SettingsManagerService {
     return this.settings.flatMap(setting => setting.loaders || []);
   }
 
-  private settings: ScopeSettingsItem[];
+  private settings: SettingsProviderItem[];
 
   constructor() {
     this.settings = [];

@@ -31,4 +31,5 @@ export interface ISettingDescription<T = object> {
   options?: ISettingOptions[];
 }
 
-export type SettingsDescriptionGetter<T> = () => ISettingDescription<T>[];
+export type SettingDescriptionTransformer = (setting: ISettingDescription<any>) => ISettingDescription<any> | null;
+export type SettingsDescriptionGetter<T> = () => ReadonlyArray<ISettingDescription<T>>;

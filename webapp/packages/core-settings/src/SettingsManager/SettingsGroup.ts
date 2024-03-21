@@ -10,6 +10,9 @@ import { makeObservable, observable } from 'mobx';
 import { uuid } from '@cloudbeaver/core-utils';
 
 export class SettingsGroup {
+  get level(): number {
+    return (this.parent?.level ?? -1) + 1;
+  }
   readonly id: string;
   get subGroups(): ReadonlyArray<SettingsGroup> {
     return this.subGroupsData;

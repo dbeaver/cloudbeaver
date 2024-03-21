@@ -9,9 +9,10 @@ import { observer } from 'mobx-react-lite';
 import React from 'react';
 
 import { Container, Group, TextPlaceholder, useTranslate } from '@cloudbeaver/core-blocks';
-import { ROOT_SETTINGS_GROUP, type ISettingsSource } from '@cloudbeaver/core-settings';
+import { type ISettingsSource, ROOT_SETTINGS_GROUP } from '@cloudbeaver/core-settings';
 import { useTreeData } from '@cloudbeaver/plugin-navigation-tree';
 
+import { getSettingGroupId } from './getSettingGroupId';
 import { SettingsGroups } from './SettingsGroups/SettingsGroups';
 import { SettingsList } from './SettingsList';
 import { useSettings } from './useSettings';
@@ -50,10 +51,14 @@ export const Settings = observer<ISettingsProps>(function Settings({ source, acc
     return <TextPlaceholder>{translate('plugin_settings_panel_empty')}</TextPlaceholder>;
   }
 
+  function handleClick(id: string) {
+    document.querySelector('#' + getSettingGroupId(id))?.scrollIntoView();
+  }
+
   return (
     <Container gap overflow noWrap>
       <Group style={{ height: '100%', minWidth: '240px' }} box keepSize overflow hidden>
-        <SettingsGroups treeData={treeData} />
+        <SettingsGroups treeData={treeData} onClick={handleClick} />
       </Group>
       <Container style={{ height: '100%' }} fill>
         <SettingsList treeData={treeData} source={source} settings={settings.settings} />
