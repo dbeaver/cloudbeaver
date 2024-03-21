@@ -76,10 +76,11 @@ function getMeasuredCells(columns: ObjectPropertyInfo[], rows: DBObject[]) {
 const CUSTOM_COLUMNS = [ColumnSelect, ColumnIcon];
 
 export const Table = observer<TableProps>(function Table({ objects, hasNextPage, loadMore }) {
+  const styles = useS(classes);
   const navTreeResource = useService(NavTreeResource);
+
   const [tableContainer, setTableContainerRef] = useState<HTMLDivElement | null>(null);
   const translate = useTranslate();
-  const styles = useS(classes);
   const deprecatedStyles = useStyles(baseStyles, tableStyles);
   const tableState = useTable();
   const tabLocalState = useTabLocalState<IScrollState>(() => ({ scrollTop: 0, scrollLeft: 0 }));
@@ -131,7 +132,7 @@ export const Table = observer<TableProps>(function Table({ objects, hasNextPage,
 
   return styled(deprecatedStyles)(
     <TableContext.Provider value={{ tableData, tableState }}>
-      <div ref={setTableContainerRef} className={s(styles, { wrapper: true }, 'metadata-grid-container')}>
+      <div ref={setTableContainerRef} className={s(styles, { container: true }, 'metadata-grid-container')}>
         <DataGrid
           className={s(styles, { dataGrid: true }, 'cb-metadata-grid-theme')}
           rows={objects}
@@ -141,7 +142,7 @@ export const Table = observer<TableProps>(function Table({ objects, hasNextPage,
           onScroll={handleScroll}
         />
         {hasNextPage && (
-          <div className={s(styles, { dataInfo: true })}>
+          <div className={s(styles, { info: true })}>
             <Link title={translate('app_navigationTree_limited')} onClick={loadMore}>
               {translate('ui_load_more')}
             </Link>
