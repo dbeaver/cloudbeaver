@@ -27,7 +27,7 @@ import toolsPanelPlugin from '@cloudbeaver/plugin-tools-panel';
 import { createApp } from '@cloudbeaver/tests-runner';
 
 import { logViewerPlugin } from '../manifest';
-import { LogViewerSettings, LogViewerSettingsService } from './LogViewerSettingsService';
+import { LogViewerSettingsService } from './LogViewerSettingsService';
 
 const endpoint = createGQLEndpoint();
 const app = createApp(
@@ -51,30 +51,20 @@ const server = mockGraphQL(...mockAppInit(endpoint), ...mockAuthentication(endpo
 beforeAll(() => app.init());
 
 const deprecatedSettings = {
-  core: {
-    app: {
-      logViewer: {
-        refreshTimeout: 1,
-        maxLogRecords: 2,
-        logBatchSize: 3,
-        maxFailedRequests: 4,
-        disabled: true,
-      } as LogViewerSettings,
-    },
-  },
+  'core.app.logViewer.refreshTimeout': 1,
+  'core.app.logViewer.maxLogRecords': 2,
+  'core.app.logViewer.logBatchSize': 3,
+  'core.app.logViewer.maxFailedRequests': 4,
+  'core.app.logViewer.disabled': true,
 };
 
 const newSettings = {
   ...deprecatedSettings,
-  plugin: {
-    'log-viewer': {
-      refreshTimeout: 5,
-      maxLogRecords: 6,
-      logBatchSize: 7,
-      maxFailedRequests: 8,
-      disabled: false,
-    } as LogViewerSettings,
-  },
+  'plugin.log-viewer.refreshTimeout': 5,
+  'plugin.log-viewer.maxLogRecords': 6,
+  'plugin.log-viewer.logBatchSize': 7,
+  'plugin.log-viewer.maxFailedRequests': 8,
+  'plugin.log-viewer.disabled': false,
 };
 
 test('New settings override deprecated settings', async () => {
@@ -85,11 +75,11 @@ test('New settings override deprecated settings', async () => {
 
   await config.refresh();
 
-  expect(settings.settings.getValue('refreshTimeout')).toBe(5);
-  expect(settings.settings.getValue('maxLogRecords')).toBe(6);
-  expect(settings.settings.getValue('logBatchSize')).toBe(7);
-  expect(settings.settings.getValue('maxFailedRequests')).toBe(8);
-  expect(settings.settings.getValue('disabled')).toBe(false);
+  expect(settings.refreshTimeout).toBe(5);
+  expect(settings.maxLogRecords).toBe(6);
+  expect(settings.logBatchSize).toBe(7);
+  expect(settings.maxFailedRequests).toBe(8);
+  expect(settings.disabled).toBe(false);
 });
 
 test('Deprecated settings are used if new settings are not defined', async () => {
@@ -100,9 +90,9 @@ test('Deprecated settings are used if new settings are not defined', async () =>
 
   await config.refresh();
 
-  expect(settings.settings.getValue('refreshTimeout')).toBe(1);
-  expect(settings.settings.getValue('maxLogRecords')).toBe(2);
-  expect(settings.settings.getValue('logBatchSize')).toBe(3);
-  expect(settings.settings.getValue('maxFailedRequests')).toBe(4);
-  expect(settings.settings.getValue('disabled')).toBe(true);
+  expect(settings.refreshTimeout).toBe(1);
+  expect(settings.maxLogRecords).toBe(2);
+  expect(settings.logBatchSize).toBe(3);
+  expect(settings.maxFailedRequests).toBe(4);
+  expect(settings.disabled).toBe(true);
 });

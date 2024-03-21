@@ -13,54 +13,37 @@ import type { SettingsProvider } from './SettingsProvider';
 
 const DEPRECATED_SETTINGS = new Set();
 
-type SettingsMapping<TTarget, TSource> = {
-  [key in keyof TTarget]: keyof TSource;
-};
+type SettingsMapping<TTarget> = Partial<{
+  [key in keyof TTarget]: string;
+}>;
 
-export function createSettingsAliasResolver<TSource extends schema.SomeZodObject, TTarget extends schema.SomeZodObject = TSource>(
+export function createSettingsAliasResolver<TTarget extends schema.SomeZodObject>(
   source: ISettingsSource,
   target: SettingsProvider<TTarget>,
-  scope: string,
-  mappings?: SettingsMapping<schema.infer<TTarget>, schema.infer<TSource>>,
+  mappings: SettingsMapping<schema.infer<TTarget>>,
 ): ISettingsSource {
   type targetSchema = schema.infer<TTarget>;
-  type sourceSchema = schema.infer<TSource>;
+  const transforms = new Set(Object.values(mappings));
 
-  function isApplicable(key: keyof targetSchema): boolean {
-    return String(key).startsWith(target.scope + '.');
-  }
-  function unscopeKey(scope: string, key: keyof targetSchema): keyof targetSchema {
-    return String(key).replace(scope + '.', '') as unknown as keyof targetSchema;
-  }
-  function scopeKey(scope: string, key: keyof sourceSchema): keyof sourceSchema {
-    return `${scope}.${String(key)}` as unknown as keyof sourceSchema;
-  }
-  function mapKey(key: keyof targetSchema): keyof sourceSchema {
-    key = unscopeKey(target.scope, key);
-
-    return scopeKey(scope, mappings?.[key] || (key as unknown as keyof sourceSchema));
+  function mapKey(key: keyof targetSchema): string {
+    return mappings[key] || (key as any);
   }
   const onChange: ISyncExecutor<ISettingChangeData<any>> = new SyncExecutor();
 
   source.onChange.next(
     onChange,
-    data => {
-      let key = unscopeKey(scope, data.key);
-
-      key = scopeKey(target.scope, mappings?.[key] || key);
-      return { ...data, key };
-    },
-    data => data.key.startsWith(scope),
+    data => ({ ...data, key: mapKey(data.key) }),
+    data => transforms.has(data.key),
   );
   return {
     onChange,
     has(key) {
-      if (!isApplicable(key)) {
+      if (!(key in mappings)) {
         return false;
       }
 
       const oldKey = mapKey(key);
-      const has = source.has(mapKey(key));
+      const has = source.has(oldKey);
 
       if (has && !DEPRECATED_SETTINGS.has(oldKey)) {
         console.warn(`You are using deprecated settings: "${String(oldKey)}". Use "${key}" instead.`);
@@ -70,31 +53,31 @@ export function createSettingsAliasResolver<TSource extends schema.SomeZodObject
       return has;
     },
     isEdited(key) {
-      if (!isApplicable(key)) {
+      if (!(key in mappings)) {
         return false;
       }
       return source.isEdited(mapKey(key));
     },
     isReadOnly(key) {
-      if (!isApplicable(key)) {
+      if (!(key in mappings)) {
         return true;
       }
       return source.isReadOnly(mapKey(key));
     },
     getEditedValue(key) {
-      if (!isApplicable(key)) {
+      if (!(key in mappings)) {
         return undefined;
       }
       return source.getEditedValue(mapKey(key));
     },
     getValue(key) {
-      if (!isApplicable(key)) {
+      if (!(key in mappings)) {
         return undefined;
       }
       return source.getValue(mapKey(key));
     },
     setValue(key, value) {
-      if (!isApplicable(key)) {
+      if (!(key in mappings)) {
         return;
       }
       source.setValue(mapKey(key), value);

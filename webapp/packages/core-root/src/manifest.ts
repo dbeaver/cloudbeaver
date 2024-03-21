@@ -16,7 +16,6 @@ import { RootBootstrap } from './RootBootstrap';
 import { ServerConfigEventHandler } from './ServerConfigEventHandler';
 import { ServerConfigResource } from './ServerConfigResource';
 import { ServerNodeService } from './ServerNodeService';
-import { ServerSettingsService } from './ServerSettingsService';
 import { SessionActionService } from './SessionActionService';
 import { SessionActivityService } from './SessionActivityService';
 import { SessionDataResource } from './SessionDataResource';
@@ -27,6 +26,9 @@ import { SessionInfoEventHandler } from './SessionInfoEventHandler';
 import { SessionPermissionEventHandler } from './SessionPermissionEventHandler';
 import { SessionPermissionsResource } from './SessionPermissionsResource';
 import { SessionResource } from './SessionResource';
+import { ServerSettingsManagerService } from './Settings/ServerSettingsManagerService';
+import { ServerSettingsResource } from './Settings/ServerSettingsResource';
+import { ServerSettingsService } from './Settings/ServerSettingsService';
 import { WindowEventsService } from './WindowEventsService';
 
 export const coreRootManifest: PluginManifest = {
@@ -55,6 +57,8 @@ export const coreRootManifest: PluginManifest = {
     SessionActivityService,
     DataSynchronizationService,
     SessionPermissionEventHandler,
+    ServerSettingsResource,
+    ServerSettingsManagerService,
     RootBootstrap,
   ],
 };

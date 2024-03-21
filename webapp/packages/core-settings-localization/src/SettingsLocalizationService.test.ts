@@ -19,7 +19,7 @@ import { coreSettingsManifest } from '@cloudbeaver/core-settings';
 import { createApp } from '@cloudbeaver/tests-runner';
 
 import { coreSettingsLocalizationManifest } from './manifest';
-import { type ILocalizationSettings, SettingsLocalizationService } from './SettingsLocalizationService';
+import { SettingsLocalizationService } from './SettingsLocalizationService';
 
 const endpoint = createGQLEndpoint();
 const app = createApp(
@@ -39,20 +39,12 @@ const testValue = 'es';
 const testValueB = 'te';
 
 const deprecatedSettings = {
-  core: {
-    user: {
-      language: testValueB,
-    } as ILocalizationSettings,
-  },
+  'core.user.defaultLanguage': testValueB,
 };
 
 const newSettings = {
-  core: {
-    ...deprecatedSettings,
-    localization: {
-      language: testValue,
-    } as ILocalizationSettings,
-  },
+  ...deprecatedSettings,
+  'core.localization.language': testValueB,
 };
 
 test('New settings override deprecated settings', async () => {
@@ -63,7 +55,7 @@ test('New settings override deprecated settings', async () => {
 
   await config.refresh();
 
-  expect(settings.settingsProvider.getValue('language')).toBe(testValue);
+  expect(settings.language).toBe(testValue);
 });
 
 test('Deprecated settings are used if new settings are not defined', async () => {
@@ -74,5 +66,5 @@ test('Deprecated settings are used if new settings are not defined', async () =>
 
   await config.refresh();
 
-  expect(settings.settingsProvider.getValue('language')).toBe(testValueB);
+  expect(settings.language).toBe(testValueB);
 });

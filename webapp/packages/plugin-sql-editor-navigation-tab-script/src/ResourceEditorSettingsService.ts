@@ -9,7 +9,9 @@ import { Dependency, injectable } from '@cloudbeaver/core-di';
 import { SettingsManagerService, SettingsProvider, SettingsProviderService } from '@cloudbeaver/core-settings';
 import { schema } from '@cloudbeaver/core-utils';
 
-const defaultSettings = schema.object({});
+const defaultSettings = schema.object({
+  'plugin.sql-editor-navigation-tab-resource': schema.object({}),
+});
 
 export type ResourceEditorSettings = typeof defaultSettings;
 
@@ -22,7 +24,7 @@ export class ResourceEditorSettingsService extends Dependency {
     private readonly settingsManagerService: SettingsManagerService,
   ) {
     super();
-    this.settings = this.settingsProviderService.createSettings(defaultSettings, 'plugin', 'sql-editor-navigation-tab-resource');
+    this.settings = this.settingsProviderService.createSettings(defaultSettings);
 
     this.registerSettings();
   }

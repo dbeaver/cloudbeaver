@@ -36,7 +36,7 @@ import { navigationTreePlugin } from '@cloudbeaver/plugin-navigation-tree';
 import { objectViewerManifest } from '@cloudbeaver/plugin-object-viewer';
 import { createApp } from '@cloudbeaver/tests-runner';
 
-import { DataViewerSettings, DataViewerSettingsService } from './DataViewerSettingsService';
+import { DataViewerSettingsService } from './DataViewerSettingsService';
 import { dataViewerManifest } from './manifest';
 
 const endpoint = createGQLEndpoint();
@@ -74,18 +74,12 @@ const testValueDeprecated = true;
 const testValueNew = false;
 
 const deprecatedSettings = {
-  'core.app.dataViewer': {
-    disableEdit: testValueDeprecated,
-  } as DataViewerSettings,
+  'core.app.dataViewer.disableEdit': testValueDeprecated,
 };
 
 const newSettings = {
   ...deprecatedSettings,
-  plugin: {
-    'data-viewer': {
-      disableEdit: testValueNew,
-    } as DataViewerSettings,
-  },
+  'plugin.data-viewer.disableEdit': testValueNew,
 };
 
 async function setupSettingsService(mockConfig: any = {}) {
@@ -102,13 +96,13 @@ async function setupSettingsService(mockConfig: any = {}) {
 test('New settings override deprecated settings', async () => {
   const settingsService = await setupSettingsService(newSettings);
 
-  expect(settingsService.settings.getValue('disableEdit')).toBe(testValueNew);
+  expect(settingsService.disableEdit).toBe(testValueNew);
 });
 
 test('Deprecated settings are used if new settings are not defined', async () => {
   const settingsService = await setupSettingsService(deprecatedSettings);
 
-  expect(settingsService.settings.getValue('disableEdit')).toBe(testValueDeprecated);
+  expect(settingsService.disableEdit).toBe(testValueDeprecated);
 });
 
 describe('DataViewerSettingsService.getDefaultRowsCount', () => {
@@ -116,13 +110,9 @@ describe('DataViewerSettingsService.getDefaultRowsCount', () => {
 
   beforeAll(async () => {
     settingsService = await setupSettingsService({
-      plugin: {
-        'data-viewer': {
-          fetchMin: 200,
-          fetchMax: 1000,
-          fetchDefault: 300,
-        },
-      },
+      'plugin.data-viewer.fetchMin': '200',
+      'plugin.data-viewer.fetchMax': '1000',
+      'plugin.data-viewer.fetchDefault': '300',
     });
   });
 

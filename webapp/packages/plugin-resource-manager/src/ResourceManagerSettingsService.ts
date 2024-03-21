@@ -18,13 +18,16 @@ import {
 import { schema, schemaExtra } from '@cloudbeaver/core-utils';
 
 const defaultSettings = schema.object({
-  disabled: schemaExtra.stringedBoolean().default(false), //! use resourceManagerEnabled in server config instead
+  'plugin.resource-manager.disabled': schemaExtra.stringedBoolean().default(false), //! use resourceManagerEnabled in server config instead
 });
 
 export type ResourceManagerSettings = schema.infer<typeof defaultSettings>;
 
 @injectable()
 export class ResourceManagerSettingsService extends Dependency {
+  get disabled(): boolean {
+    return this.settings.getValue('plugin.resource-manager.disabled');
+  }
   readonly settings: SettingsProvider<typeof defaultSettings>;
 
   constructor(
@@ -34,11 +37,13 @@ export class ResourceManagerSettingsService extends Dependency {
     private readonly settingsResolverService: SettingsResolverService,
   ) {
     super();
-    this.settings = this.settingsProviderService.createSettings(defaultSettings, 'plugin', 'resource-manager');
+    this.settings = this.settingsProviderService.createSettings(defaultSettings);
     this.settingsResolverService.addResolver(
       ROOT_SETTINGS_LAYER,
       /** @deprecated Use settings instead, will be removed in 23.0.0 */
-      createSettingsAliasResolver(this.serverSettingsService, this.settings, 'plugin_resource_manager'),
+      createSettingsAliasResolver(this.serverSettingsService, this.settings, {
+        'plugin.resource-manager.disabled': 'plugin_resource_manager.disabled',
+      }),
     );
 
     this.registerSettings();

@@ -7,24 +7,26 @@
  */
 import { computed, observable } from 'mobx';
 
-import { useObservableRef } from '@cloudbeaver/core-blocks';
+import { useAutoLoad, useObservableRef } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { ISettingDescriptionWithProvider, ROOT_SETTINGS_GROUP, SettingsGroup, SettingsManagerService } from '@cloudbeaver/core-settings';
+import { ISettingDescription, ROOT_SETTINGS_GROUP, SettingsGroup, SettingsManagerService } from '@cloudbeaver/core-settings';
 
 interface ISettings {
-  settings: Map<SettingsGroup, ISettingDescriptionWithProvider<any>[]>;
+  settings: Map<SettingsGroup, ISettingDescription<any>[]>;
   groups: Set<SettingsGroup>;
 }
 
 export function useSettings(accessor?: string[]): ISettings {
   const settingsManagerService = useService(SettingsManagerService);
 
+  useAutoLoad(useSettings, settingsManagerService.loaders);
+
   return useObservableRef(
     () => ({
       get settings() {
         const map = new Map();
         const settings = this.settingsManagerService.activeSettings
-          .filter(setting => accessor?.some(value => setting.access.accessor.includes(value)))
+          .filter(setting => accessor?.some(value => setting.access.scope.includes(value)))
           .sort((a, b) => a.name.localeCompare(b.name));
 
         for (const setting of settings) {

@@ -18,13 +18,16 @@ import {
 import { schema, schemaExtra } from '@cloudbeaver/core-utils';
 
 const defaultSettings = schema.object({
-  disabled: schemaExtra.stringedBoolean().default(false),
+  'plugin.data-export.disabled': schemaExtra.stringedBoolean().default(false),
 });
 
 export type DataExportSettings = schema.infer<typeof defaultSettings>;
 
 @injectable()
 export class DataExportSettingsService extends Dependency {
+  get disabled(): boolean {
+    return this.settings.getValue('plugin.data-export.disabled');
+  }
   readonly settings: SettingsProvider<typeof defaultSettings>;
 
   constructor(
@@ -34,11 +37,11 @@ export class DataExportSettingsService extends Dependency {
     private readonly settingsResolverService: SettingsResolverService,
   ) {
     super();
-    this.settings = this.settingsProviderService.createSettings(defaultSettings, 'plugin', 'data-export');
+    this.settings = this.settingsProviderService.createSettings(defaultSettings);
     this.settingsResolverService.addResolver(
       ROOT_SETTINGS_LAYER,
       /** @deprecated Use settings instead, will be removed in 23.0.0 */
-      createSettingsAliasResolver(this.serverSettingsService, this.settings, 'plugin_data_export'),
+      createSettingsAliasResolver(this.serverSettingsService, this.settings, { 'plugin.data-export.disabled': 'plugin_data_export.disabled' }),
     );
 
     this.registerSettings();

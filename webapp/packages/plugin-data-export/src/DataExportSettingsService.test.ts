@@ -36,7 +36,7 @@ import { navigationTreePlugin } from '@cloudbeaver/plugin-navigation-tree';
 import { objectViewerManifest } from '@cloudbeaver/plugin-object-viewer';
 import { createApp } from '@cloudbeaver/tests-runner';
 
-import { DataExportSettings, DataExportSettingsService } from './DataExportSettingsService';
+import { DataExportSettingsService } from './DataExportSettingsService';
 import { dataExportManifest } from './manifest';
 
 const endpoint = createGQLEndpoint();
@@ -74,18 +74,12 @@ const testValueA = true;
 const testValueB = true;
 
 const deprecatedSettings = {
-  plugin_data_export: {
-    disabled: testValueB,
-  } as DataExportSettings,
+  'plugin_data_export.disabled': testValueB,
 };
 
 const newSettings = {
   ...deprecatedSettings,
-  plugin: {
-    'data-export': {
-      disabled: testValueA,
-    } as DataExportSettings,
-  },
+  'plugin.data-export.disabled': testValueA,
 };
 
 test('New settings override deprecated', async () => {
@@ -96,7 +90,7 @@ test('New settings override deprecated', async () => {
 
   await config.refresh();
 
-  expect(settings.settings.getValue('disabled')).toBe(testValueA);
+  expect(settings.disabled).toBe(testValueA);
 });
 
 test('Deprecated settings are used if new settings are not defined', async () => {
@@ -107,5 +101,5 @@ test('Deprecated settings are used if new settings are not defined', async () =>
 
   await config.refresh();
 
-  expect(settings.settings.getValue('disabled')).toBe(testValueB);
+  expect(settings.disabled).toBe(testValueB);
 });

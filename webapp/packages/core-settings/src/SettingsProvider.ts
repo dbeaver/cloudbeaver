@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 import { ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
-import { isNotNullDefined, type schema } from '@cloudbeaver/core-utils';
+import type { schema } from '@cloudbeaver/core-utils';
 
 import type { ISettingChangeData, ISettingsSource } from './ISettingsSource';
 
@@ -14,23 +14,22 @@ export class SettingsProvider<TSchema extends schema.SomeZodObject = any> implem
   readonly onChange: ISyncExecutor<ISettingChangeData<keyof schema.infer<TSchema>>>;
   constructor(
     private readonly source: ISettingsSource,
-    readonly scope: string,
     readonly schema: TSchema,
   ) {
     this.onChange = new SyncExecutor();
     source.onChange.next(
       this.onChange,
-      data => ({ key: this.unscopedKey(data.key), value: data.value }),
-      data => data.key.startsWith(this.scope),
+      data => data,
+      data => data.key in this.schema.shape,
     );
   }
 
   isReadOnly<TKey extends keyof schema.infer<TSchema>>(key: TKey): boolean {
-    return this.source.isReadOnly(this.scopedKey(key)) || false;
+    return this.source.isReadOnly(key) || false;
   }
 
   isEdited(key?: any): boolean {
-    return this.source.isEdited(this.scopedKey(key));
+    return this.source.isEdited(key);
   }
 
   has<TKey extends keyof schema.infer<TSchema>>(key: TKey): boolean {
@@ -38,7 +37,7 @@ export class SettingsProvider<TSchema extends schema.SomeZodObject = any> implem
   }
 
   isValueDefault<TKey extends keyof schema.infer<TSchema>>(key: TKey): boolean {
-    return !this.source.has(this.scopedKey(key));
+    return !this.source.has(key);
   }
 
   getEditedValue<TKey extends keyof schema.infer<TSchema>>(key: TKey): schema.infer<TSchema>[TKey] {
@@ -48,22 +47,26 @@ export class SettingsProvider<TSchema extends schema.SomeZodObject = any> implem
   getValue<TKey extends keyof schema.infer<TSchema>>(key: TKey): schema.infer<TSchema>[TKey] {
     let value = undefined;
 
-    if (this.source.has(this.scopedKey(key))) {
-      value = this.source.getValue(this.scopedKey(key));
+    if (this.source.has(key)) {
+      value = this.source.getValue(key);
     }
 
-    const schema = this.schema.shape[key as any];
-    const result = schema.safeParse(value);
+    if (key in this.schema.shape) {
+      const schema = this.schema.shape[key as any];
+      const result = schema.safeParse(value);
 
-    if (result.success) {
-      return result.data;
+      if (result.success) {
+        return result.data;
+      }
+
+      return schema.parse(undefined);
     }
 
-    return schema.parse(undefined);
+    return value;
   }
 
   setValue<TKey extends keyof schema.infer<TSchema>>(key: TKey, value: schema.infer<TSchema>[TKey]): void {
-    this.source.setValue(this.scopedKey(key), value);
+    this.source.setValue(key, value);
   }
 
   clear(): void {
@@ -72,21 +75,5 @@ export class SettingsProvider<TSchema extends schema.SomeZodObject = any> implem
 
   async save(): Promise<void> {
     await this.source.save();
-  }
-
-  scopedKey<T extends string | number | symbol | undefined | null>(key: T): Exclude<T | string, number | symbol> {
-    if (isNotNullDefined(key)) {
-      return `${this.scope}.${String(key)}`;
-    }
-
-    return key;
-  }
-
-  unscopedKey<T extends string | number | symbol | undefined | null>(key: T): Exclude<T | string, number | symbol> {
-    if (isNotNullDefined(key)) {
-      return String(key).replace(`${this.scope}.`, '') as Exclude<T | string, number | symbol>;
-    }
-
-    return key;
   }
 }

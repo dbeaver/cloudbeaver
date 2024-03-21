@@ -10,13 +10,16 @@ import { SettingsManagerService, SettingsProvider, SettingsProviderService } fro
 import { schema, schemaExtra } from '@cloudbeaver/core-utils';
 
 const settingsSchema = schema.object({
-  disabled: schemaExtra.stringedBoolean().default(false),
+  'core.connections.disabled': schemaExtra.stringedBoolean().default(false),
 });
 
 export type ConnectionsSettings = schema.infer<typeof settingsSchema>;
 
 @injectable()
 export class ConnectionsSettingsService extends Dependency {
+  get disabled(): boolean {
+    return this.settings.getValue('core.connections.disabled');
+  }
   readonly settings: SettingsProvider<typeof settingsSchema>;
 
   constructor(
@@ -24,7 +27,7 @@ export class ConnectionsSettingsService extends Dependency {
     private readonly settingsManagerService: SettingsManagerService,
   ) {
     super();
-    this.settings = this.settingsProviderService.createSettings(settingsSchema, 'core', 'connections');
+    this.settings = this.settingsProviderService.createSettings(settingsSchema);
     this.registerSettings();
   }
 

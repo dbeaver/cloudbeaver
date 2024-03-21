@@ -12,9 +12,9 @@ import { PRODUCT_SETTINGS_LAYER } from '@cloudbeaver/core-product';
 import { createSettingsLayer, SettingsSource } from '@cloudbeaver/core-settings';
 import { parseJSONFlat } from '@cloudbeaver/core-utils';
 
-import { EAdminPermission } from './EAdminPermission';
-import { ServerConfigResource } from './ServerConfigResource';
-import { SessionPermissionsResource } from './SessionPermissionsResource';
+import { EAdminPermission } from '../EAdminPermission';
+import { ServerConfigResource } from '../ServerConfigResource';
+import { SessionPermissionsResource } from '../SessionPermissionsResource';
 
 export const SERVER_SETTINGS_LAYER = createSettingsLayer(PRODUCT_SETTINGS_LAYER, 'server');
 

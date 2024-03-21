@@ -6,18 +6,16 @@
  * you may not use this file except in compliance with the License.
  */
 import type { TLocalizationToken } from '@cloudbeaver/core-localization';
-import type { schema } from '@cloudbeaver/core-utils';
 
-import type { SettingsProvider } from '../SettingsProvider';
 import type { ESettingsValueType } from './ESettingsValueType';
 import type { SettingsGroup } from './SettingsGroup';
 
 export interface ISettingAccess {
-  accessor: string[];
+  scope: string[];
 }
 
 export interface ISettingOptions {
-  id: string;
+  value: string;
   name: TLocalizationToken;
 }
 
@@ -31,12 +29,6 @@ export interface ISettingDescription<T = object> {
   name: TLocalizationToken;
   description?: TLocalizationToken;
   options?: ISettingOptions[];
-}
-
-export interface ISettingDescriptionWithProvider<T extends schema.SomeZodObject = schema.AnyZodObject> extends ISettingDescription<schema.infer<T>> {
-  provider: SettingsProvider<T>;
-  scopedKey: string;
-  schema: schema.AnyZodObject;
 }
 
 export type SettingsDescriptionGetter<T> = () => ISettingDescription<T>[];

@@ -20,7 +20,7 @@ import { coreSettingsManifest } from '@cloudbeaver/core-settings';
 import { createApp } from '@cloudbeaver/tests-runner';
 
 import { mockAuthentication } from './__custom_mocks__/mockAuthentication';
-import { AuthSettings, AuthSettingsService } from './AuthSettingsService';
+import { AuthSettingsService } from './AuthSettingsService';
 import { coreAuthenticationManifest } from './manifest';
 
 const endpoint = createGQLEndpoint();
@@ -39,11 +39,7 @@ const server = mockGraphQL(...mockAppInit(endpoint), ...mockAuthentication(endpo
 beforeAll(() => app.init());
 
 const equalConfig = {
-  core: {
-    authentication: {
-      disableAnonymousAccess: true,
-    } as AuthSettings,
-  },
+  'core.authentication.disableAnonymousAccess': true,
 };
 
 test('Read settings', async () => {
@@ -54,5 +50,5 @@ test('Read settings', async () => {
 
   await config.refresh();
 
-  expect(settings.settings.getValue('disableAnonymousAccess')).toBe(true);
+  expect(settings.disableAnonymousAccess).toBe(true);
 });

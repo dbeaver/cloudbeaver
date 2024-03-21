@@ -21,21 +21,45 @@ import { schema, schemaExtra } from '@cloudbeaver/core-utils';
 import { SQL_EDITOR_SETTINGS_GROUP } from './SQL_EDITOR_SETTINGS_GROUP';
 
 const defaultSettings = schema.object({
-  maxFileSize: schema.coerce.number().default(10 * 1024), // kilobyte
-  disabled: schemaExtra.stringedBoolean().default(false),
-  autoSave: schemaExtra.stringedBoolean().default(true),
-});
-
-const defaultProposalInsertTableSettings = schema.object({
-  alias: schemaExtra.stringedBoolean().default(true),
+  'plugin.sql-editor.maxFileSize': schema.coerce.number().default(10 * 1024), // kilobyte
+  'plugin.sql-editor.disabled': schemaExtra.stringedBoolean().default(false),
+  'plugin.sql-editor.autoSave': schemaExtra.stringedBoolean().default(true),
+  'sql.proposals.insert.table.alias': schema.coerce
+    .string()
+    .transform(value => {
+      switch (value) {
+        case 'false':
+          return 'NONE';
+        case 'true':
+          return 'PLAIN';
+        default:
+          return value;
+      }
+    })
+    .pipe(schema.enum(['PLAIN', 'NONE', 'EXTENDED']).default('PLAIN')),
 });
 
 export type SqlEditorSettings = schema.infer<typeof defaultSettings>;
 
 @injectable()
 export class SqlEditorSettingsService extends Dependency {
+  get maxFileSize(): number {
+    return this.settings.getValue('plugin.sql-editor.maxFileSize');
+  }
+
+  get disabled(): boolean {
+    return this.settings.getValue('plugin.sql-editor.disabled');
+  }
+
+  get autoSave(): boolean {
+    return this.settings.getValue('plugin.sql-editor.autoSave');
+  }
+
+  get insertTableAlias(): schema.infer<typeof defaultSettings>['sql.proposals.insert.table.alias'] {
+    return this.settings.getValue('sql.proposals.insert.table.alias');
+  }
+
   readonly settings: SettingsProvider<typeof defaultSettings>;
-  readonly proposalInsertTableSettings: SettingsProvider<typeof defaultProposalInsertTableSettings>;
 
   constructor(
     private readonly settingsProviderService: SettingsProviderService,
@@ -44,18 +68,31 @@ export class SqlEditorSettingsService extends Dependency {
     private readonly settingsResolverService: SettingsResolverService,
   ) {
     super();
-    this.settings = this.settingsProviderService.createSettings(defaultSettings, 'plugin', 'sql-editor');
-    this.proposalInsertTableSettings = this.settingsProviderService.createSettings(defaultProposalInsertTableSettings, 'sql.proposals.insert.table');
+    this.settings = this.settingsProviderService.createSettings(defaultSettings);
     this.settingsResolverService.addResolver(
       ROOT_SETTINGS_LAYER,
       /** @deprecated Use settings instead, will be removed in 23.0.0 */
-      createSettingsAliasResolver(this.serverSettingsService, this.settings, 'core.app.sqlEditor'),
+      createSettingsAliasResolver(this.serverSettingsService, this.settings, {
+        'plugin.sql-editor.autoSave': 'core.app.sqlEditor.autoSave',
+        'plugin.sql-editor.maxFileSize': 'core.app.sqlEditor.maxFileSize',
+        'plugin.sql-editor.disabled': 'core.app.sqlEditor.disabled',
+      }),
     );
     this.registerSettings();
   }
 
   private registerSettings() {
     this.settingsManagerService.registerSettings(this.settings, () => [
+      {
+        key: 'sql.proposals.insert.table.alias',
+        access: {
+          scope: ['server', 'client'],
+        },
+        group: SQL_EDITOR_SETTINGS_GROUP,
+        type: ESettingsValueType.Checkbox,
+        name: 'sql_editor_settings_insert_table_aliases_name',
+        description: 'sql_editor_settings_insert_table_aliases_desc',
+      },
       // {
       //   group: SQL_EDITOR_SETTINGS_GROUP,
       //   key: 'disabled',
@@ -76,19 +113,6 @@ export class SqlEditorSettingsService extends Dependency {
       //   name: 'Auto save',
       //   description: 'Auto save SQL editor content',
       // },
-    ]);
-
-    this.settingsManagerService.registerSettings(this.proposalInsertTableSettings, () => [
-      {
-        key: 'alias',
-        access: {
-          accessor: ['server', 'client'],
-        },
-        group: SQL_EDITOR_SETTINGS_GROUP,
-        type: ESettingsValueType.Checkbox,
-        name: 'sql_editor_settings_insert_table_aliases_name',
-        description: 'sql_editor_settings_insert_table_aliases_desc',
-      },
     ]);
   }
 }

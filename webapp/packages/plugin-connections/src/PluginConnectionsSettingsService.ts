@@ -10,13 +10,16 @@ import { SettingsManagerService, SettingsProvider, SettingsProviderService } fro
 import { schema, schemaExtra } from '@cloudbeaver/core-utils';
 
 const defaultSettings = schema.object({
-  hideConnectionViewForUsers: schemaExtra.stringedBoolean().default(false),
+  'plugin.connections.hideConnectionViewForUsers': schemaExtra.stringedBoolean().default(false),
 });
 
 export type PluginConnectionsSettings = schema.infer<typeof defaultSettings>;
 
 @injectable()
 export class PluginConnectionsSettingsService extends Dependency {
+  get hideConnectionViewForUsers(): boolean {
+    return this.settings.getValue('plugin.connections.hideConnectionViewForUsers');
+  }
   readonly settings: SettingsProvider<typeof defaultSettings>;
 
   constructor(
@@ -24,7 +27,7 @@ export class PluginConnectionsSettingsService extends Dependency {
     private readonly settingsManagerService: SettingsManagerService,
   ) {
     super();
-    this.settings = this.settingsProviderService.createSettings(defaultSettings, 'plugin', 'connections');
+    this.settings = this.settingsProviderService.createSettings(defaultSettings);
 
     this.registerSettings();
   }

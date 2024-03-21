@@ -8,7 +8,7 @@
 import { observer } from 'mobx-react-lite';
 
 import { Container, Group, GroupTitle, useTranslate } from '@cloudbeaver/core-blocks';
-import { type ISettingDescriptionWithProvider, type ISettingsSource, ROOT_SETTINGS_GROUP, type SettingsGroup } from '@cloudbeaver/core-settings';
+import { type ISettingDescription, type ISettingsSource, ROOT_SETTINGS_GROUP, type SettingsGroup } from '@cloudbeaver/core-settings';
 import type { ITreeData } from '@cloudbeaver/plugin-navigation-tree';
 
 import { getSettingGroupId } from './getSettingGroupId';
@@ -18,7 +18,7 @@ import { useTreeScrollSync } from './useTreeScrollSync';
 interface Props {
   treeData: ITreeData;
   source: ISettingsSource;
-  settings: Map<SettingsGroup, ISettingDescriptionWithProvider<any>[]>;
+  settings: Map<SettingsGroup, ISettingDescription<any>[]>;
   onSettingsOpen?: (groupId: string) => void;
 }
 

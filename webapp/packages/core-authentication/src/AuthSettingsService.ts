@@ -10,20 +10,23 @@ import { SettingsManagerService, SettingsProvider, SettingsProviderService } fro
 import { schema, schemaExtra } from '@cloudbeaver/core-utils';
 
 const settingsSchema = schema.object({
-  disableAnonymousAccess: schemaExtra.stringedBoolean().default(false),
+  'core.authentication.disableAnonymousAccess': schemaExtra.stringedBoolean().default(false),
 });
 
 export type AuthSettings = schema.infer<typeof settingsSchema>;
 
 @injectable()
 export class AuthSettingsService {
+  get disableAnonymousAccess(): boolean {
+    return this.settings.getValue('core.authentication.disableAnonymousAccess');
+  }
   readonly settings: SettingsProvider<typeof settingsSchema>;
 
   constructor(
     private readonly settingsProviderService: SettingsProviderService,
     private readonly settingsManagerService: SettingsManagerService,
   ) {
-    this.settings = this.settingsProviderService.createSettings(settingsSchema, 'core', 'authentication');
+    this.settings = this.settingsProviderService.createSettings(settingsSchema);
 
     this.registerSettings();
   }

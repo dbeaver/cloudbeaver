@@ -10,11 +10,14 @@ import { SettingsManagerService, SettingsProvider, SettingsProviderService } fro
 import { schema, schemaExtra } from '@cloudbeaver/core-utils';
 
 const settings = schema.object({
-  disabled: schemaExtra.stringedBoolean().default(false),
+  'plugin.connection-search.disabled': schemaExtra.stringedBoolean().default(false),
 });
 
 @injectable()
 export class ConnectionSearchSettingsService extends Dependency {
+  get disabled(): boolean {
+    return this.settings.getValue('plugin.connection-search.disabled');
+  }
   readonly settings: SettingsProvider<typeof settings>;
 
   constructor(
@@ -22,7 +25,7 @@ export class ConnectionSearchSettingsService extends Dependency {
     private readonly settingsManagerService: SettingsManagerService,
   ) {
     super();
-    this.settings = this.settingsProviderService.createSettings(settings, 'plugin', 'connection-search');
+    this.settings = this.settingsProviderService.createSettings(settings);
 
     this.registerSettings();
   }

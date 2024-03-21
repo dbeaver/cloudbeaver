@@ -38,7 +38,7 @@ import { objectViewerManifest } from '@cloudbeaver/plugin-object-viewer';
 import { createApp } from '@cloudbeaver/tests-runner';
 
 import { sqlEditorPluginManifest } from './manifest';
-import { SqlEditorSettings, SqlEditorSettingsService } from './SqlEditorSettingsService';
+import { SqlEditorSettingsService } from './SqlEditorSettingsService';
 
 const endpoint = createGQLEndpoint();
 const app = createApp(
@@ -76,22 +76,12 @@ const testValueNew = 1;
 const testValueDeprecated = 2;
 
 const deprecatedSettings = {
-  core: {
-    app: {
-      sqlEditor: {
-        maxFileSize: testValueDeprecated,
-      } as SqlEditorSettings,
-    },
-  },
+  'core.app.sqlEditor.maxFileSize': testValueDeprecated,
 };
 
 const newSettings = {
   ...deprecatedSettings,
-  plugin: {
-    'sql-editor': {
-      maxFileSize: testValueNew,
-    } as SqlEditorSettings,
-  },
+  'plugin.sql-editor.maxFileSize': testValueNew,
 };
 
 test('New settings override deprecated settings', async () => {
@@ -102,7 +92,7 @@ test('New settings override deprecated settings', async () => {
 
   await config.refresh();
 
-  expect(settings.settings.getValue('maxFileSize')).toBe(testValueNew);
+  expect(settings.maxFileSize).toBe(testValueNew);
 });
 
 test('Deprecated settings are used if new settings are not defined', async () => {
@@ -113,5 +103,5 @@ test('Deprecated settings are used if new settings are not defined', async () =>
 
   await config.refresh();
 
-  expect(settings.settings.getValue('maxFileSize')).toBe(testValueDeprecated);
+  expect(settings.maxFileSize).toBe(testValueDeprecated);
 });

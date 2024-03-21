@@ -28,7 +28,7 @@ import { coreViewManifest } from '@cloudbeaver/core-view';
 import { createApp } from '@cloudbeaver/tests-runner';
 
 import { coreNavigationTree } from './manifest';
-import { NavTreeSettings, NavTreeSettingsService } from './NavTreeSettingsService';
+import { NavTreeSettingsService } from './NavTreeSettingsService';
 
 const endpoint = createGQLEndpoint();
 const app = createApp(
@@ -53,26 +53,16 @@ const server = mockGraphQL(...mockAppInit(endpoint), ...mockAuthentication(endpo
 beforeAll(() => app.init());
 
 const deprecatedSettings = {
-  'core.app': {
-    navigationTree: {
-      childrenLimit: 100,
-    },
-    metadata: {
-      editing: false,
-      deleting: false,
-    },
-  },
+  'core.app.navigationTree.childrenLimit': 100,
+  'core.app.metadata.editing': false,
+  'core.app.metadata.deleting': false,
 };
 
 const newSettings = {
   ...deprecatedSettings,
-  core: {
-    'navigation-tree': {
-      childrenLimit: 200,
-      editing: true,
-      deleting: true,
-    } as NavTreeSettings,
-  },
+  'core.navigation-tree.childrenLimit': 200,
+  'core.navigation-tree.editing': true,
+  'core.navigation-tree.deleting': true,
 };
 
 test('New settings override deprecated', async () => {
@@ -83,9 +73,9 @@ test('New settings override deprecated', async () => {
 
   await config.refresh();
 
-  expect(settings.settings.getValue('childrenLimit')).toBe(200);
-  expect(settings.settings.getValue('editing')).toBe(true);
-  expect(settings.settings.getValue('deleting')).toBe(true);
+  expect(settings.childrenLimit).toBe(200);
+  expect(settings.editing).toBe(true);
+  expect(settings.deleting).toBe(true);
 });
 
 test('Deprecated settings are used if new settings are not defined', async () => {
@@ -96,7 +86,7 @@ test('Deprecated settings are used if new settings are not defined', async () =>
 
   await config.refresh();
 
-  expect(settings.settings.getValue('childrenLimit')).toBe(100);
-  expect(settings.settings.getValue('editing')).toBe(false);
-  expect(settings.settings.getValue('deleting')).toBe(false);
+  expect(settings.childrenLimit).toBe(100);
+  expect(settings.editing).toBe(false);
+  expect(settings.deleting).toBe(false);
 });

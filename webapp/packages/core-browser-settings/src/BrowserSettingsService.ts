@@ -18,13 +18,16 @@ import {
 import { schema, schemaExtra } from '@cloudbeaver/core-utils';
 
 const settingsSchema = schema.object({
-  'cookies.disabled': schemaExtra.stringedBoolean().default(false),
+  'core.browser.cookies.disabled': schemaExtra.stringedBoolean().default(false),
 });
 
 export type CookiesSettings = schema.infer<typeof settingsSchema>;
 
 @injectable()
 export class BrowserSettingsService extends Dependency {
+  get disabled(): boolean {
+    return this.settings.getValue('core.browser.cookies.disabled');
+  }
   readonly settings: SettingsProvider<typeof settingsSchema>;
 
   constructor(
@@ -34,12 +37,14 @@ export class BrowserSettingsService extends Dependency {
     private readonly settingsResolverService: SettingsResolverService,
   ) {
     super();
-    this.settings = this.settingsProviderService.createSettings(settingsSchema, 'core', 'browser');
+    this.settings = this.settingsProviderService.createSettings(settingsSchema);
 
     this.settingsResolverService.addResolver(
       ROOT_SETTINGS_LAYER,
       /** @deprecated Use settings instead, will be removed in 23.0.0 */
-      createSettingsAliasResolver(this.serverSettingsService, this.settings, 'core'),
+      createSettingsAliasResolver(this.serverSettingsService, this.settings, {
+        'core.browser.cookies.disabled': 'core.cookies.disabled',
+      }),
     );
     this.registerSettings();
   }

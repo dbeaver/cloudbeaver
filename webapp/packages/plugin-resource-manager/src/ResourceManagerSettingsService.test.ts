@@ -19,7 +19,7 @@ import { coreSettingsManifest } from '@cloudbeaver/core-settings';
 import { createApp } from '@cloudbeaver/tests-runner';
 
 import { resourceManagerPlugin } from './manifest';
-import { ResourceManagerSettings, ResourceManagerSettingsService } from './ResourceManagerSettingsService';
+import { ResourceManagerSettingsService } from './ResourceManagerSettingsService';
 
 const endpoint = createGQLEndpoint();
 const app = createApp(
@@ -39,18 +39,12 @@ const testValueDeprecated = true;
 const testValueNew = false;
 
 const deprecatedSettings = {
-  plugin_resource_manager: {
-    disabled: testValueDeprecated,
-  } as ResourceManagerSettings,
+  'plugin_resource_manager.disabled': testValueDeprecated,
 };
 
 const newSettings = {
   ...deprecatedSettings,
-  plugin: {
-    'resource-manager': {
-      disabled: testValueNew,
-    } as ResourceManagerSettings,
-  },
+  'plugin.resource-manager.disabled': testValueNew,
 };
 
 test('New settings equal deprecated settings A', async () => {
@@ -61,7 +55,7 @@ test('New settings equal deprecated settings A', async () => {
 
   await config.refresh();
 
-  expect(settings.settings.getValue('disabled')).toBe(testValueNew);
+  expect(settings.disabled).toBe(testValueNew);
 });
 
 test('New settings equal deprecated settings B', async () => {
@@ -72,5 +66,5 @@ test('New settings equal deprecated settings B', async () => {
 
   await config.refresh();
 
-  expect(settings.settings.getValue('disabled')).toBe(testValueDeprecated);
+  expect(settings.disabled).toBe(testValueDeprecated);
 });

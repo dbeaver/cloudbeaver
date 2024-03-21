@@ -21,17 +21,37 @@ import { schema, schemaExtra } from '@cloudbeaver/core-utils';
 import { LOG_VIEWER_SETTINGS_GROUP } from './LOG_VIEWER_SETTINGS_GROUP';
 
 const defaultSettings = schema.object({
-  refreshTimeout: schema.coerce.number().default(3000),
-  maxLogRecords: schema.coerce.number().default(1000),
-  logBatchSize: schema.coerce.number().default(2000),
-  maxFailedRequests: schema.coerce.number().default(3),
-  disabled: schemaExtra.stringedBoolean().default(false),
+  'plugin.log-viewer.refreshTimeout': schema.coerce.number().default(3000),
+  'plugin.log-viewer.maxLogRecords': schema.coerce.number().default(1000),
+  'plugin.log-viewer.logBatchSize': schema.coerce.number().default(2000),
+  'plugin.log-viewer.maxFailedRequests': schema.coerce.number().default(3),
+  'plugin.log-viewer.disabled': schemaExtra.stringedBoolean().default(false),
 });
 
 export type LogViewerSettings = schema.infer<typeof defaultSettings>;
 
 @injectable()
 export class LogViewerSettingsService extends Dependency {
+  get disabled(): boolean {
+    return this.settings.getValue('plugin.log-viewer.disabled');
+  }
+
+  get refreshTimeout(): number {
+    return this.settings.getValue('plugin.log-viewer.refreshTimeout');
+  }
+
+  get maxLogRecords(): number {
+    return this.settings.getValue('plugin.log-viewer.maxLogRecords');
+  }
+
+  get logBatchSize(): number {
+    return this.settings.getValue('plugin.log-viewer.logBatchSize');
+  }
+
+  get maxFailedRequests(): number {
+    return this.settings.getValue('plugin.log-viewer.maxFailedRequests');
+  }
+
   readonly settings: SettingsProvider<typeof defaultSettings>;
 
   constructor(
@@ -41,11 +61,17 @@ export class LogViewerSettingsService extends Dependency {
     private readonly settingsResolverService: SettingsResolverService,
   ) {
     super();
-    this.settings = this.settingsProviderService.createSettings(defaultSettings, 'plugin', 'log-viewer');
+    this.settings = this.settingsProviderService.createSettings(defaultSettings);
     this.settingsResolverService.addResolver(
       ROOT_SETTINGS_LAYER,
       /** @deprecated Use settings instead, will be removed in 23.0.0 */
-      createSettingsAliasResolver(this.serverSettingsService, this.settings, 'core.app.logViewer'),
+      createSettingsAliasResolver(this.serverSettingsService, this.settings, {
+        'plugin.log-viewer.disabled': 'core.app.logViewer.disabled',
+        'plugin.log-viewer.logBatchSize': 'core.app.logViewer.logBatchSize',
+        'plugin.log-viewer.maxFailedRequests': 'core.app.logViewer.maxFailedRequests',
+        'plugin.log-viewer.maxLogRecords': 'core.app.logViewer.maxLogRecords',
+        'plugin.log-viewer.refreshTimeout': 'core.app.logViewer.refreshTimeout',
+      }),
     );
 
     this.registerSettings();
@@ -82,9 +108,9 @@ export class LogViewerSettingsService extends Dependency {
       //   description: 'Max failed requests',
       // },
       {
-        key: 'disabled',
+        key: 'plugin.log-viewer.disabled',
         access: {
-          accessor: ['server', 'client'],
+          scope: ['server', 'client'],
         },
         group: LOG_VIEWER_SETTINGS_GROUP,
         type: ESettingsValueType.Checkbox,

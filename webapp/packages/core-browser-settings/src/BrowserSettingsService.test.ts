@@ -19,7 +19,7 @@ import { coreSDKManifest } from '@cloudbeaver/core-sdk';
 import { coreSettingsManifest } from '@cloudbeaver/core-settings';
 import { createApp } from '@cloudbeaver/tests-runner';
 
-import { BrowserSettingsService, CookiesSettings } from './BrowserSettingsService';
+import { BrowserSettingsService } from './BrowserSettingsService';
 import { coreBrowserSettingsManifest } from './manifest';
 
 const endpoint = createGQLEndpoint();
@@ -41,22 +41,12 @@ const testValueA = false;
 const testValueB = true;
 
 const equalConfigA = {
-  core: {
-    cookies: {
-      disabled: testValueA,
-    },
-    browser: {
-      'cookies.disabled': testValueA,
-    } as CookiesSettings,
-  },
+  'core.cookies.disabled': testValueA,
+  'core.browser.cookies.disabled': testValueA,
 };
 
 const equalConfigB = {
-  core: {
-    cookies: {
-      disabled: testValueB,
-    },
-  },
+  'core.cookies.disabled': testValueB,
 };
 
 test('New settings override deprecated settings', async () => {
@@ -67,7 +57,7 @@ test('New settings override deprecated settings', async () => {
 
   await config.refresh();
 
-  expect(settings.settings.getValue('cookies.disabled')).toBe(testValueA);
+  expect(settings.disabled).toBe(testValueA);
 });
 
 test('New settings fall back to deprecated settings', async () => {
@@ -78,5 +68,5 @@ test('New settings fall back to deprecated settings', async () => {
 
   await config.refresh();
 
-  expect(settings.settings.getValue('cookies.disabled')).toBe(testValueB);
+  expect(settings.disabled).toBe(testValueB);
 });

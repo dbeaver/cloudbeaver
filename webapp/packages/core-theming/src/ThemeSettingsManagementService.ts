@@ -17,14 +17,14 @@ export class ThemeSettingsManagementService extends Dependency {
     super();
     settingsManagerService.registerSettings(themeSettingsService.settings, () => [
       {
-        key: 'theme',
+        key: 'core.theming.theme',
         access: {
-          accessor: ['server', 'client'],
+          scope: ['server', 'client'],
         },
         type: ESettingsValueType.Select,
         name: 'core_theming_settings_theme_name',
         description: 'core_theming_settings_theme_description',
-        options: themeService.themes.map(theme => ({ id: theme.id, name: theme.name })),
+        options: themeService.themes.map(theme => ({ value: theme.id, name: theme.name })),
         group: INTERFACE_SETTINGS_GROUP,
       },
     ]);

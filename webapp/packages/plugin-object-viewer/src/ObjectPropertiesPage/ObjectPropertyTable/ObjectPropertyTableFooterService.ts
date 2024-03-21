@@ -40,7 +40,7 @@ export class ObjectPropertyTableFooterService {
       isPresent(context) {
         return context.contextType === ObjectPropertyTableFooterService.objectPropertyContextType;
       },
-      isHidden: () => !this.navTreeSettingsService.settings.getValue('deleting'),
+      isHidden: () => !this.navTreeSettingsService.deleting,
       isDisabled: context => {
         if (context.data.tableState.selectedList.length === 0) {
           return true;

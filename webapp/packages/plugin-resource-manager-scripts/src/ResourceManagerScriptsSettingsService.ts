@@ -10,7 +10,7 @@ import { SettingsManagerService, SettingsProvider, SettingsProviderService } fro
 import { schema, schemaExtra } from '@cloudbeaver/core-utils';
 
 const settingsSchema = schema.object({
-  disabled: schemaExtra.stringedBoolean().default(false),
+  'plugin.resource-manager-scripts.disabled': schemaExtra.stringedBoolean().default(false),
 });
 
 type Settings = typeof settingsSchema;
@@ -19,12 +19,16 @@ type Settings = typeof settingsSchema;
 export class ResourceManagerScriptsSettingsService extends Dependency {
   readonly settings: SettingsProvider<Settings>;
 
+  get disabled(): boolean {
+    return this.settings.getValue('plugin.resource-manager-scripts.disabled');
+  }
+
   constructor(
     private readonly settingsProviderService: SettingsProviderService,
     private readonly settingsManagerService: SettingsManagerService,
   ) {
     super();
-    this.settings = this.settingsProviderService.createSettings(settingsSchema, 'plugin', 'resource-manager-scripts');
+    this.settings = this.settingsProviderService.createSettings(settingsSchema);
 
     this.registerSettings();
   }

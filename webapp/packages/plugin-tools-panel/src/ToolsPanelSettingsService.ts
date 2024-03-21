@@ -12,13 +12,17 @@ import { schema, schemaExtra } from '@cloudbeaver/core-utils';
 import { TOOLS_PANEL_SETTINGS_GROUP } from './TOOLS_PANEL_SETTINGS_GROUP';
 
 const settings = schema.object({
-  disabled: schemaExtra.stringedBoolean().default(false),
+  'plugin.tools-panel.disabled': schemaExtra.stringedBoolean().default(false),
 });
 
 type Settings = typeof settings;
 
 @injectable()
 export class ToolsPanelSettingsService extends Dependency {
+  get disabled(): boolean {
+    return this.settings.getValue('plugin.tools-panel.disabled');
+  }
+
   readonly settings: SettingsProvider<Settings>;
 
   constructor(
@@ -26,7 +30,7 @@ export class ToolsPanelSettingsService extends Dependency {
     private readonly settingsManagerService: SettingsManagerService,
   ) {
     super();
-    this.settings = this.settingsProviderService.createSettings(settings, 'plugin', 'tools-panel');
+    this.settings = this.settingsProviderService.createSettings(settings);
 
     this.registerSettings();
   }
@@ -34,9 +38,9 @@ export class ToolsPanelSettingsService extends Dependency {
   private registerSettings() {
     this.settingsManagerService.registerSettings(this.settings, () => [
       {
-        key: 'disabled',
+        key: 'plugin.tools-panel.disabled',
         access: {
-          accessor: ['server'],
+          scope: ['server'],
         },
         group: TOOLS_PANEL_SETTINGS_GROUP,
         type: ESettingsValueType.Checkbox,

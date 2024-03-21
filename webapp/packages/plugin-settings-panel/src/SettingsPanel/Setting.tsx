@@ -8,37 +8,52 @@
 import { observer } from 'mobx-react-lite';
 
 import { Combobox, FieldCheckbox, InputField, Textarea, useCustomInputValidation, useTranslate } from '@cloudbeaver/core-blocks';
-import { ESettingsValueType, type ISettingDescriptionWithProvider, type ISettingsSource } from '@cloudbeaver/core-settings';
+import { useService } from '@cloudbeaver/core-di';
+import {
+  ESettingsValueType,
+  type ISettingDescription,
+  type ISettingsSource,
+  SettingsProviderService,
+  SettingsResolverService,
+} from '@cloudbeaver/core-settings';
 import { isNotNullDefined, schemaValidationError } from '@cloudbeaver/core-utils';
 
 interface Props {
   source: ISettingsSource;
-  setting: ISettingDescriptionWithProvider;
+  setting: ISettingDescription;
 }
 
 export const Setting = observer<Props>(function Setting({ source, setting }) {
+  const settingsResolverService = useService(SettingsResolverService);
+  const settingsProviderService = useService(SettingsProviderService);
   const translate = useTranslate();
 
   const name = translate(setting.name);
   const description = translate(setting.description);
   const disabled = false;
-  const readOnly = setting.provider.isReadOnly(setting.key) ?? false;
+  const readOnly = settingsResolverService.isReadOnly(setting.key) ?? false;
 
-  let value = source.getEditedValue(setting.scopedKey);
+  let value = source.getEditedValue(setting.key);
   if (readOnly) {
-    value = setting.provider.getValue(setting.key) ?? '';
+    value = settingsResolverService.getValue(setting.key) ?? '';
   }
 
-  if (!isNotNullDefined(value)) {
-    const result = setting.schema.safeParse(undefined);
-    value = result.success ? result.data : '';
-  }
+  if (setting.key in settingsProviderService.schema.shape) {
+    const schema = settingsProviderService.schema.shape[setting.key];
+    if (!isNotNullDefined(value)) {
+      const result = schema.safeParse(undefined);
+      value = result.success ? result.data : '';
+    }
 
-  const result = setting.schema.safeParse(value);
-  value = result.success ? result.data : value;
+    const result = schema.safeParse(value);
+    value = result.success ? result.data : value;
+  }
 
   const customValidation = useCustomInputValidation(value => {
-    const result = setting.schema.safeParse(value);
+    if (!(setting.key in settingsProviderService.schema.shape)) {
+      return null;
+    }
+    const result = settingsProviderService.schema.shape[setting.key].safeParse(value);
 
     if (result.success) {
       return null;
@@ -48,13 +63,13 @@ export const Setting = observer<Props>(function Setting({ source, setting }) {
   });
 
   function handleChange(value: any) {
-    source.setValue(setting.scopedKey, value);
+    source.setValue(setting.key, value);
   }
 
   if (setting.type === ESettingsValueType.Checkbox) {
     return (
       <FieldCheckbox
-        id={setting.scopedKey}
+        id={String(setting.key)}
         checked={value}
         label={name}
         title={name}
@@ -71,9 +86,9 @@ export const Setting = observer<Props>(function Setting({ source, setting }) {
     const options = setting.options?.map(option => ({ ...option, name: translate(option.name) })) || [];
     return (
       <Combobox
-        id={setting.scopedKey}
+        id={String(setting.key)}
         items={options}
-        keySelector={value => value.id}
+        keySelector={value => value.value}
         valueSelector={value => value.name}
         value={value}
         title={description}
@@ -90,7 +105,7 @@ export const Setting = observer<Props>(function Setting({ source, setting }) {
   if (setting.type === ESettingsValueType.Textarea) {
     return (
       <Textarea
-        id={setting.scopedKey}
+        id={String(setting.key)}
         title={value}
         labelTooltip={description}
         value={value}
@@ -106,7 +121,7 @@ export const Setting = observer<Props>(function Setting({ source, setting }) {
   return (
     <InputField
       ref={customValidation}
-      id={setting.scopedKey}
+      id={String(setting.key)}
       type="text"
       title={value}
       labelTooltip={description}

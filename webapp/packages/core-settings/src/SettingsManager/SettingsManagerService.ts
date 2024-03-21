@@ -8,20 +8,24 @@
 import { computed, makeObservable, observable } from 'mobx';
 
 import { injectable } from '@cloudbeaver/core-di';
-import type { schema } from '@cloudbeaver/core-utils';
+import type { ILoadableState, schema } from '@cloudbeaver/core-utils';
 
 import type { SettingsProvider } from '../SettingsProvider';
-import type { ISettingDescriptionWithProvider, SettingsDescriptionGetter } from './ISettingDescription';
+import type { ISettingDescription, SettingsDescriptionGetter } from './ISettingDescription';
 
 interface ScopeSettingsItem<T extends schema.SomeZodObject = any> {
-  provider: SettingsProvider<T>;
   settingsGetter: SettingsDescriptionGetter<schema.infer<T>>;
+  loaders?: ReadonlyArray<ILoadableState>;
 }
 
 @injectable()
 export class SettingsManagerService {
-  get activeSettings(): ReadonlyArray<ISettingDescriptionWithProvider<any>> {
-    return this.getSettings();
+  get activeSettings(): ReadonlyArray<ISettingDescription<any>> {
+    return this.settings.reduce<ISettingDescription<any>[]>((acc, setting) => [...acc, ...setting.settingsGetter()], []);
+  }
+
+  get loaders(): ReadonlyArray<ILoadableState> {
+    return this.settings.flatMap(setting => setting.loaders || []);
   }
 
   private settings: ScopeSettingsItem[];
@@ -31,6 +35,7 @@ export class SettingsManagerService {
 
     makeObservable<this, 'settings'>(this, {
       activeSettings: computed,
+      loaders: computed,
       settings: observable.shallow,
     });
   }
@@ -38,22 +43,11 @@ export class SettingsManagerService {
   registerSettings<TSchema extends schema.SomeZodObject>(
     provider: SettingsProvider<TSchema>,
     settingsGetter: SettingsDescriptionGetter<schema.infer<TSchema>>,
+    loaders?: ReadonlyArray<ILoadableState>,
   ) {
     this.settings.push({
-      provider,
       settingsGetter,
+      loaders,
     });
-  }
-
-  private getSettings(): ReadonlyArray<ISettingDescriptionWithProvider<any>> {
-    const settings: ISettingDescriptionWithProvider<any>[] = [];
-
-    for (const { provider, settingsGetter } of this.settings) {
-      for (const setting of settingsGetter()) {
-        settings.push({ ...setting, provider, schema: provider.schema.shape[setting.key], scopedKey: provider.scopedKey(setting.key) });
-      }
-    }
-
-    return settings;
   }
 }

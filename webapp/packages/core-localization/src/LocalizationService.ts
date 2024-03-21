@@ -105,19 +105,23 @@ export class LocalizationService extends Bootstrap {
     this.setSupportedLanguages([
       {
         isoCode: 'en',
-        displayName: 'English',
+        name: 'English',
+        nativeName: 'English',
       },
       {
         isoCode: 'ru',
-        displayName: 'Русский',
+        name: 'Russian',
+        nativeName: 'Русский',
       },
       {
         isoCode: 'it',
-        displayName: 'Italiano',
+        name: 'Italian',
+        nativeName: 'Italiano',
       },
       {
         isoCode: 'zh',
-        displayName: '中文',
+        name: 'Chinese',
+        nativeName: '中文',
       },
     ]);
     this.addProvider(this.coreProvider.bind(this));

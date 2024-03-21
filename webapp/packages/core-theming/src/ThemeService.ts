@@ -44,7 +44,7 @@ export class ThemeService extends Bootstrap {
   }
 
   get themeId(): string {
-    return this.themeSettingsService.settings.getEditedValue('theme');
+    return this.themeSettingsService.theme;
   }
 
   get currentTheme(): ITheme {
@@ -155,7 +155,7 @@ export class ThemeService extends Bootstrap {
   private async setTheme(themeId: string): Promise<void> {
     themeId = await this.loadTheme(themeId);
 
-    this.themeSettingsService.settings.setValue('theme', themeId);
+    this.themeSettingsService.settings.setValue('core.theming.theme', themeId);
     await this.themeSettingsService.settings.save();
   }
 

@@ -20,7 +20,7 @@ import { coreSettingsManifest } from '@cloudbeaver/core-settings';
 import { createApp } from '@cloudbeaver/tests-runner';
 
 import { coreThemingManifest } from './manifest';
-import { IThemeSettings, ThemeSettingsService } from './ThemeSettingsService';
+import { ThemeSettingsService } from './ThemeSettingsService';
 
 const endpoint = createGQLEndpoint();
 const app = createApp(
@@ -41,23 +41,13 @@ const testValueA = 'light';
 const testValueB = 'dark';
 
 const deprecatedSettings = {
-  'core.user': {
-    defaultTheme: testValueA,
-  },
-  core: {
-    theming: {
-      defaultTheme: testValueA,
-    },
-  },
+  'core.user.defaultTheme': testValueA,
+  'core.theming.defaultTheme': testValueA,
 };
 
 const newSettings = {
   ...deprecatedSettings,
-  core: {
-    theming: {
-      theme: testValueB,
-    } as IThemeSettings,
-  },
+  'core.theming.theme': testValueB,
 };
 
 test('New Settings override deprecated settings', async () => {
@@ -68,7 +58,7 @@ test('New Settings override deprecated settings', async () => {
 
   await config.refresh();
 
-  expect(settings.settings.getValue('theme')).toBe(testValueB);
+  expect(settings.theme).toBe(testValueB);
 });
 
 test('Deprecated settings are used if new settings are not defined', async () => {
@@ -79,5 +69,5 @@ test('Deprecated settings are used if new settings are not defined', async () =>
 
   await config.refresh();
 
-  expect(settings.settings.getValue('theme')).toBe(testValueA);
+  expect(settings.theme).toBe(testValueA);
 });

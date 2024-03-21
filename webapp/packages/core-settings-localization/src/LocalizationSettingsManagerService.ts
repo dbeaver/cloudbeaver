@@ -29,16 +29,16 @@ export class LocalizationSettingsManagerService extends Bootstrap {
     this.settingsManagerService.registerSettings(this.settingsLocalizationService.settingsProvider, () => [
       {
         group: INTERFACE_SETTINGS_GROUP,
-        key: 'language',
+        key: 'core.localization.language',
         access: {
-          accessor: ['server', 'client'],
+          scope: ['server', 'client'],
         },
         name: 'core_settings_localization_settings_locale_label',
         description: 'core_settings_localization_settings_locale_description',
         type: ESettingsValueType.Select,
         options: this.localizationService.supportedLanguages.map(language => ({
-          id: language.isoCode,
-          name: language.displayName,
+          value: language.isoCode,
+          name: language.nativeName ?? language.name,
         })),
       },
     ]);

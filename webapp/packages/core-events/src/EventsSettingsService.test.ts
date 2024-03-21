@@ -18,7 +18,7 @@ import { coreSDKManifest } from '@cloudbeaver/core-sdk';
 import { coreSettingsManifest } from '@cloudbeaver/core-settings';
 import { createApp } from '@cloudbeaver/tests-runner';
 
-import { EventsSettings, EventsSettingsService } from './EventsSettingsService';
+import { EventsSettingsService } from './EventsSettingsService';
 import { coreEventsManifest } from './manifest';
 
 const endpoint = createGQLEndpoint();
@@ -36,20 +36,14 @@ const server = mockGraphQL(...mockAppInit(endpoint));
 beforeAll(() => app.init());
 
 const oldConfig = {
-  core_events: {
-    notificationsPool: 1,
-    maxPersistentAllow: 2,
-  } as EventsSettings,
+  'core_events.notificationsPool': '1',
+  'core_events.maxPersistentAllow': '2',
 };
 
 const overrideConfig = {
   ...oldConfig,
-  plugin: {
-    notifications: {
-      notificationsPool: 3,
-      maxPersistentAllow: 4,
-    } as EventsSettings,
-  },
+  'plugin.notifications.notificationsPool': '3',
+  'plugin.notifications.maxPersistentAllow': '4',
 };
 
 test('New settings override deprecated settings', async () => {
@@ -60,8 +54,8 @@ test('New settings override deprecated settings', async () => {
 
   await config.refresh();
 
-  expect(settings.settings.getValue('notificationsPool')).toBe(3);
-  expect(settings.settings.getValue('maxPersistentAllow')).toBe(4);
+  expect(settings.notificationsPool).toBe(3);
+  expect(settings.maxPersistentAllow).toBe(4);
 });
 
 test('Deprecated settings accessible with new settings', async () => {
@@ -72,6 +66,6 @@ test('Deprecated settings accessible with new settings', async () => {
 
   await config.refresh();
 
-  expect(settings.settings.getValue('notificationsPool')).toBe(1);
-  expect(settings.settings.getValue('maxPersistentAllow')).toBe(2);
+  expect(settings.notificationsPool).toBe(1);
+  expect(settings.maxPersistentAllow).toBe(2);
 });

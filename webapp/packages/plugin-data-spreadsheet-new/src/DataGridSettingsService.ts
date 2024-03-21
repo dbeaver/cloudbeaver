@@ -20,13 +20,16 @@ import { schema, schemaExtra } from '@cloudbeaver/core-utils';
 import { DATA_EDITOR_SETTINGS_GROUP } from '@cloudbeaver/plugin-data-viewer';
 
 const defaultSettings = schema.object({
-  hidden: schemaExtra.stringedBoolean().default(false),
+  'plugin.data-spreadsheet.hidden': schemaExtra.stringedBoolean().default(false),
 });
 
 export type DataGridSettings = schema.infer<typeof defaultSettings>;
 
 @injectable()
 export class DataGridSettingsService extends Dependency {
+  get hidden(): boolean {
+    return this.settings.getValue('plugin.data-spreadsheet.hidden');
+  }
   readonly settings: SettingsProvider<typeof defaultSettings>;
 
   constructor(
@@ -36,11 +39,13 @@ export class DataGridSettingsService extends Dependency {
     private readonly settingsResolverService: SettingsResolverService,
   ) {
     super();
-    this.settings = this.settingsProviderService.createSettings(defaultSettings, 'plugin', 'data-spreadsheet');
+    this.settings = this.settingsProviderService.createSettings(defaultSettings);
     this.settingsResolverService.addResolver(
       ROOT_SETTINGS_LAYER,
       /** @deprecated Use settings instead, will be removed in 23.0.0 */
-      createSettingsAliasResolver(this.serverSettingsService, this.settings, 'plugin_data_spreadsheet_new'),
+      createSettingsAliasResolver(this.serverSettingsService, this.settings, {
+        'plugin.data-spreadsheet.hidden': 'plugin_data_spreadsheet_new.hidden',
+      }),
     );
 
     this.registerSettings();
@@ -50,9 +55,9 @@ export class DataGridSettingsService extends Dependency {
     this.settingsManagerService.registerSettings(this.settings, () => [
       {
         group: DATA_EDITOR_SETTINGS_GROUP,
-        key: 'hidden',
+        key: 'plugin.data-spreadsheet.hidden',
         access: {
-          accessor: ['server'],
+          scope: ['server'],
         },
         type: ESettingsValueType.Checkbox,
         name: 'plugin_data_spreadsheet_new_settings_disable',

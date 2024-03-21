@@ -12,7 +12,7 @@ import { SettingsManagerService, SettingsProvider, SettingsProviderService } fro
 import { schema, schemaExtra } from '@cloudbeaver/core-utils';
 
 const defaultSettings = schema.object({
-  disabled: schemaExtra.stringedBoolean().default(false),
+  'plugin.navigation-tree.disabled': schemaExtra.stringedBoolean().default(false),
 });
 
 export type NavigationTreeSettings = schema.infer<typeof defaultSettings>;
@@ -20,7 +20,7 @@ export type NavigationTreeSettings = schema.infer<typeof defaultSettings>;
 @injectable()
 export class NavigationTreeSettingsService extends Dependency {
   get disabled(): boolean {
-    return this.settings.getValue('disabled');
+    return this.settings.getValue('plugin.navigation-tree.disabled');
   }
 
   readonly settings: SettingsProvider<typeof defaultSettings>;
@@ -30,7 +30,7 @@ export class NavigationTreeSettingsService extends Dependency {
     private readonly settingsManagerService: SettingsManagerService,
   ) {
     super();
-    this.settings = this.settingsProviderService.createSettings(defaultSettings, 'plugin', 'navigation-tree');
+    this.settings = this.settingsProviderService.createSettings(defaultSettings);
 
     this.registerSettings();
 

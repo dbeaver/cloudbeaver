@@ -6,20 +6,28 @@
  * you may not use this file except in compliance with the License.
  */
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
-import { SettingsResolverService } from '@cloudbeaver/core-settings';
+import { SettingsManagerService, SettingsResolverService } from '@cloudbeaver/core-settings';
 
-import { SERVER_SETTINGS_LAYER, ServerSettingsService } from './ServerSettingsService';
+import { ServerSettingsManagerService } from './Settings/ServerSettingsManagerService';
+import { SERVER_SETTINGS_LAYER, ServerSettingsService } from './Settings/ServerSettingsService';
 
 @injectable()
 export class RootBootstrap extends Bootstrap {
   constructor(
     private readonly settingsResolverService: SettingsResolverService,
     private readonly serverSettingsService: ServerSettingsService,
+    private readonly settingsManagerService: SettingsManagerService,
+    private readonly serverSettingsManagerService: ServerSettingsManagerService,
   ) {
     super();
   }
 
   register(): void {
+    this.settingsManagerService.registerSettings(
+      this.serverSettingsManagerService.settingsProvider,
+      this.serverSettingsManagerService.getSettingsGetter(),
+      this.serverSettingsManagerService.loaders,
+    );
     this.settingsResolverService.addResolver(SERVER_SETTINGS_LAYER, this.serverSettingsService);
   }
 }

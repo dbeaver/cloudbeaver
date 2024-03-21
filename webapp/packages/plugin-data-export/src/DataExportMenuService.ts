@@ -146,6 +146,6 @@ export class DataExportMenuService {
       return false;
     }
 
-    return this.dataExportSettingsService.settings.getValue('disabled');
+    return this.dataExportSettingsService.disabled;
   }
 }

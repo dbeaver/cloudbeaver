@@ -37,7 +37,7 @@ import { navigationTreePlugin } from '@cloudbeaver/plugin-navigation-tree';
 import { objectViewerManifest } from '@cloudbeaver/plugin-object-viewer';
 import { createApp } from '@cloudbeaver/tests-runner';
 
-import { DataGridSettings, DataGridSettingsService } from './DataGridSettingsService';
+import { DataGridSettingsService } from './DataGridSettingsService';
 import { dataSpreadsheetNewManifest } from './manifest';
 
 const endpoint = createGQLEndpoint();
@@ -76,18 +76,12 @@ const testValueDeprecated = true;
 const testValueNew = false;
 
 const deprecatedSettings = {
-  plugin_data_spreadsheet_new: {
-    hidden: testValueDeprecated,
-  } as DataGridSettings,
+  'plugin_data_spreadsheet_new.hidden': testValueDeprecated,
 };
 
 const newSettings = {
   ...deprecatedSettings,
-  plugin: {
-    'data-spreadsheet': {
-      hidden: testValueNew,
-    } as DataGridSettings,
-  },
+  'plugin.data-spreadsheet.hidden': testValueNew,
 };
 
 test('New settings override deprecated', async () => {
@@ -98,7 +92,7 @@ test('New settings override deprecated', async () => {
 
   await config.refresh();
 
-  expect(settings.settings.getValue('hidden')).toBe(testValueNew);
+  expect(settings.hidden).toBe(testValueNew);
 });
 
 test('Deprecated settings are used if new settings are not defined', async () => {
@@ -109,5 +103,5 @@ test('Deprecated settings are used if new settings are not defined', async () =>
 
   await config.refresh();
 
-  expect(settings.settings.getValue('hidden')).toBe(testValueDeprecated);
+  expect(settings.hidden).toBe(testValueDeprecated);
 });
