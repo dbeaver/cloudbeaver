@@ -1,0 +1,7 @@
+.menuButton {
+  composes: theme-ripple from global;
+  background: transparent;
+  outline: none;
+  padding: 4px;
+  cursor: pointer;
+}
