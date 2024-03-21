@@ -1186,15 +1186,22 @@ public abstract class CBApplication extends BaseWebApplication implements WebAut
             serverConfigProperties.put(CBConstants.PARAM_DB_CONFIGURATION, databaseConfigProperties);
         }
 
-        var productConfigProperties = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
-        Map<String, Object> oldProductRuntimeConfig = JSONUtils.getObject(originServerConfig,
-            CBConstants.PARAM_PRODUCT_CONFIGURATION);
-        if (!CommonUtils.isEmpty(productConfiguration)) {
-            for (Map.Entry<String, Object> mp : productConfiguration.entrySet()) {
-                copyConfigValue(oldProductRuntimeConfig, productConfigProperties, mp.getKey(), mp.getValue());
+        if (
+            originServerConfig.containsKey(CBConstants.PARAM_PRODUCT_CONFIGURATION) &&
+                // legacy path to a config file
+                !(originServerConfig.get(CBConstants.PARAM_PRODUCT_CONFIGURATION) instanceof String)
+        ) {
+            var productConfigProperties = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
+            Map<String, Object> oldProductRuntimeConfig = JSONUtils.getObject(originServerConfig,
+                CBConstants.PARAM_PRODUCT_CONFIGURATION);
+            if (!CommonUtils.isEmpty(productConfiguration)) {
+                for (Map.Entry<String, Object> mp : productConfiguration.entrySet()) {
+                    copyConfigValue(oldProductRuntimeConfig, productConfigProperties, mp.getKey(), mp.getValue());
+                }
+                serverConfigProperties.put(CBConstants.PARAM_PRODUCT_CONFIGURATION, productConfigProperties);
             }
-            serverConfigProperties.put(CBConstants.PARAM_PRODUCT_CONFIGURATION, productConfigProperties);
         }
+
 
         savePasswordPolicyConfig(originServerConfig, serverConfigProperties);
     }
