@@ -128,10 +128,8 @@ export const InlineEditor = observer<InlineEditorProps, HTMLInputElement>(
         <div
           className={s(style, {
             editorActions: true,
-            editorActionsPositionTop: controlsPosition === 'top',
-            editorActionsPositionBottom: controlsPosition === 'bottom',
-            editorActionsPositionInside: controlsPosition === 'inside',
           })}
+          data-s-position={controlsPosition}
           onMouseDown={e => e.preventDefault()}
         >
           {!hideSave && (
@@ -164,7 +162,7 @@ export const InlineEditor = observer<InlineEditorProps, HTMLInputElement>(
   }),
 );
 
-const EditorAction = observer<React.PropsWithChildren<React.ButtonHTMLAttributes<HTMLButtonElement>>>(function EditorAction({ children, ...props }) {
+const EditorAction = observer<React.ButtonHTMLAttributes<HTMLButtonElement>>(function EditorAction({ children, ...props }) {
   const style = useS(styles);
 
   return (
