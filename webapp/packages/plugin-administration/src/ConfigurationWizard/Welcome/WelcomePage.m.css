@@ -5,14 +5,12 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import styled, { css } from 'reshadow';
 
-const styles = css`
-  fill {
-    flex: 1;
-  }
-`;
+.p {
+  line-height: 2;
+  white-space: pre-wrap;
+}
 
-export function Fill() {
-  return styled(styles)(<fill />);
+.note {
+  composes: theme-typography--body2 from global;
 }
