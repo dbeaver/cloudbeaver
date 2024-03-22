@@ -21,12 +21,17 @@ import { coreNavigationTree } from '@cloudbeaver/core-navigation-tree';
 import { coreProjectsManifest } from '@cloudbeaver/core-projects';
 import { coreRootManifest, ServerConfigResource } from '@cloudbeaver/core-root';
 import { createGQLEndpoint } from '@cloudbeaver/core-root/dist/__custom_mocks__/createGQLEndpoint';
+import '@cloudbeaver/core-root/dist/__custom_mocks__/expectWebsocketClosedMessage';
 import { mockAppInit } from '@cloudbeaver/core-root/dist/__custom_mocks__/mockAppInit';
 import { mockGraphQL } from '@cloudbeaver/core-root/dist/__custom_mocks__/mockGraphQL';
 import { mockServerConfig } from '@cloudbeaver/core-root/dist/__custom_mocks__/resolvers/mockServerConfig';
 import { coreRoutingManifest } from '@cloudbeaver/core-routing';
 import { coreSDKManifest } from '@cloudbeaver/core-sdk';
 import { coreSettingsManifest } from '@cloudbeaver/core-settings';
+import {
+  expectDeprecatedSettingMessage,
+  expectNoDeprecatedSettingMessage,
+} from '@cloudbeaver/core-settings/dist/__custom_mocks__/expectDeprecatedSettingMessage';
 import { coreStorageManifest } from '@cloudbeaver/core-storage';
 import { coreUIManifest } from '@cloudbeaver/core-ui';
 import { coreViewManifest } from '@cloudbeaver/core-view';
@@ -40,6 +45,7 @@ import { DataExportSettingsService } from './DataExportSettingsService';
 import { dataExportManifest } from './manifest';
 
 const endpoint = createGQLEndpoint();
+const server = mockGraphQL(...mockAppInit(endpoint), ...mockAuthentication(endpoint));
 const app = createApp(
   dataExportManifest,
   coreLocalizationManifest,
@@ -66,10 +72,6 @@ const app = createApp(
   coreClientActivityManifest,
 );
 
-const server = mockGraphQL(...mockAppInit(endpoint), ...mockAuthentication(endpoint));
-
-beforeAll(() => app.init());
-
 const testValueA = true;
 const testValueB = true;
 
@@ -91,6 +93,7 @@ test('New settings override deprecated', async () => {
   await config.refresh();
 
   expect(settings.disabled).toBe(testValueA);
+  expectNoDeprecatedSettingMessage();
 });
 
 test('Deprecated settings are used if new settings are not defined', async () => {
@@ -102,4 +105,5 @@ test('Deprecated settings are used if new settings are not defined', async () =>
   await config.refresh();
 
   expect(settings.disabled).toBe(testValueB);
+  expectDeprecatedSettingMessage();
 });

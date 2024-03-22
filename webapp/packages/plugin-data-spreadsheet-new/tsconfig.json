@@ -67,9 +67,6 @@
       "path": "../core-root/tsconfig.json"
     },
     {
-      "path": "../core-root/tsconfig.json"
-    },
-    {
       "path": "../core-routing/tsconfig.json"
     },
     {

@@ -40,6 +40,9 @@
     },
     {
       "path": "../core-utils/tsconfig.json"
+    },
+    {
+      "path": "../tests-runner/tsconfig.json"
     }
   ],
   "include": [

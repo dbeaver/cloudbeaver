@@ -13,10 +13,16 @@
       "path": "../core-executor/tsconfig.json"
     },
     {
+      "path": "../core-executor/tsconfig.json"
+    },
+    {
       "path": "../core-localization/tsconfig.json"
     },
     {
       "path": "../core-utils/tsconfig.json"
+    },
+    {
+      "path": "../tests-runner/tsconfig.json"
     }
   ],
   "include": [

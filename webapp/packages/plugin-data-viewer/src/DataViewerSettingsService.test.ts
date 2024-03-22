@@ -21,12 +21,17 @@ import { coreNavigationTree } from '@cloudbeaver/core-navigation-tree';
 import { coreProjectsManifest } from '@cloudbeaver/core-projects';
 import { coreRootManifest, ServerConfigResource } from '@cloudbeaver/core-root';
 import { createGQLEndpoint } from '@cloudbeaver/core-root/dist/__custom_mocks__/createGQLEndpoint';
+import '@cloudbeaver/core-root/dist/__custom_mocks__/expectWebsocketClosedMessage';
 import { mockAppInit } from '@cloudbeaver/core-root/dist/__custom_mocks__/mockAppInit';
 import { mockGraphQL } from '@cloudbeaver/core-root/dist/__custom_mocks__/mockGraphQL';
 import { mockServerConfig } from '@cloudbeaver/core-root/dist/__custom_mocks__/resolvers/mockServerConfig';
 import { coreRoutingManifest } from '@cloudbeaver/core-routing';
 import { coreSDKManifest } from '@cloudbeaver/core-sdk';
 import { coreSettingsManifest } from '@cloudbeaver/core-settings';
+import {
+  expectDeprecatedSettingMessage,
+  expectNoDeprecatedSettingMessage,
+} from '@cloudbeaver/core-settings/dist/__custom_mocks__/expectDeprecatedSettingMessage';
 import { coreStorageManifest } from '@cloudbeaver/core-storage';
 import { coreUIManifest } from '@cloudbeaver/core-ui';
 import { coreViewManifest } from '@cloudbeaver/core-view';
@@ -40,6 +45,7 @@ import { DataViewerSettingsService } from './DataViewerSettingsService';
 import { dataViewerManifest } from './manifest';
 
 const endpoint = createGQLEndpoint();
+const server = mockGraphQL(...mockAppInit(endpoint), ...mockAuthentication(endpoint));
 const app = createApp(
   dataViewerManifest,
   coreLocalizationManifest,
@@ -65,10 +71,6 @@ const app = createApp(
   navigationTabsPlugin,
   objectViewerManifest,
 );
-
-const server = mockGraphQL(...mockAppInit(endpoint), ...mockAuthentication(endpoint));
-
-beforeAll(() => app.init());
 
 const testValueDeprecated = true;
 const testValueNew = false;
@@ -97,12 +99,14 @@ test('New settings override deprecated settings', async () => {
   const settingsService = await setupSettingsService(newSettings);
 
   expect(settingsService.disableEdit).toBe(testValueNew);
+  expectNoDeprecatedSettingMessage();
 });
 
 test('Deprecated settings are used if new settings are not defined', async () => {
   const settingsService = await setupSettingsService(deprecatedSettings);
 
   expect(settingsService.disableEdit).toBe(testValueDeprecated);
+  expectDeprecatedSettingMessage();
 });
 
 describe('DataViewerSettingsService.getDefaultRowsCount', () => {

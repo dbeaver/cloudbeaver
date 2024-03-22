@@ -6,7 +6,6 @@
  * you may not use this file except in compliance with the License.
  */
 import { Dependency, injectable } from '@cloudbeaver/core-di';
-import { ServerSettingsService } from '@cloudbeaver/core-root';
 import {
   createSettingsAliasResolver,
   ESettingsValueType,
@@ -57,7 +56,6 @@ export class LogViewerSettingsService extends Dependency {
   constructor(
     private readonly settingsProviderService: SettingsProviderService,
     private readonly settingsManagerService: SettingsManagerService,
-    private readonly serverSettingsService: ServerSettingsService,
     private readonly settingsResolverService: SettingsResolverService,
   ) {
     super();
@@ -65,7 +63,7 @@ export class LogViewerSettingsService extends Dependency {
     this.settingsResolverService.addResolver(
       ROOT_SETTINGS_LAYER,
       /** @deprecated Use settings instead, will be removed in 23.0.0 */
-      createSettingsAliasResolver(this.serverSettingsService, this.settings, {
+      createSettingsAliasResolver(this.settingsResolverService, this.settings, {
         'plugin.log-viewer.disabled': 'core.app.logViewer.disabled',
         'plugin.log-viewer.logBatchSize': 'core.app.logViewer.logBatchSize',
         'plugin.log-viewer.maxFailedRequests': 'core.app.logViewer.maxFailedRequests',

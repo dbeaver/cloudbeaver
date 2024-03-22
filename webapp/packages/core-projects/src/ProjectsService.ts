@@ -118,6 +118,13 @@ export class ProjectsService extends Dependency {
       });
     });
 
+    this.projectInfoResource.onDataUpdate.addHandler(() => {
+      this.onActiveProjectChange.execute({
+        type: 'after',
+        projects: this.activeProjectIds,
+      });
+    });
+
     this.onActiveProjectChange.addHandler(data => {
       if (data.type === 'after') {
         this.projectInfoEventHandler.setActiveProjects(this.activeProjects.map(project => project.id));

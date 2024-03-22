@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 import { Dependency, injectable } from '@cloudbeaver/core-di';
-import { ServerSettingsManagerService, ServerSettingsService } from '@cloudbeaver/core-root';
+import { ServerSettingsManagerService } from '@cloudbeaver/core-root';
 import {
   createSettingsAliasResolver,
   ESettingsValueType,
@@ -58,7 +58,6 @@ export class DataViewerSettingsService extends Dependency {
   constructor(
     private readonly settingsProviderService: SettingsProviderService,
     private readonly settingsManagerService: SettingsManagerService,
-    private readonly serverSettingsService: ServerSettingsService,
     private readonly settingsResolverService: SettingsResolverService,
     private readonly serverSettingsManagerService: ServerSettingsManagerService,
   ) {
@@ -67,7 +66,7 @@ export class DataViewerSettingsService extends Dependency {
     this.settingsResolverService.addResolver(
       ROOT_SETTINGS_LAYER,
       /** @deprecated Use settings instead, will be removed in 23.0.0 */
-      createSettingsAliasResolver(this.serverSettingsService, this.settings, {
+      createSettingsAliasResolver(this.settingsResolverService, this.settings, {
         'plugin.data-viewer.disableEdit': 'core.app.dataViewer.disableEdit',
         'plugin.data-viewer.disableCopyData': 'core.app.dataViewer.disableCopyData',
         'plugin.data-viewer.fetchMin': 'core.app.dataViewer.fetchMin',
@@ -75,7 +74,7 @@ export class DataViewerSettingsService extends Dependency {
         'resultset.maxrows': 'core.app.dataViewer.fetchDefault',
       }),
       /** @deprecated Use settings instead, will be removed in 25.0.0 */
-      createSettingsAliasResolver(this.serverSettingsService, this.settings, {
+      createSettingsAliasResolver(this.settingsResolverService, this.settings, {
         'resultset.maxrows': 'plugin.data-viewer.fetchDefault',
       }),
     );

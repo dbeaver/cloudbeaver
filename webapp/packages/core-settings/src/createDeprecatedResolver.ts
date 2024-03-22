@@ -23,7 +23,11 @@ export function createSettingsAliasResolver<TTarget extends schema.SomeZodObject
   mappings: SettingsMapping<schema.infer<TTarget>>,
 ): ISettingsSource {
   type targetSchema = schema.infer<TTarget>;
-  const transforms = new Set(Object.values(mappings));
+  const reversed = Object.fromEntries(Object.entries(mappings).map(a => a.reverse()));
+
+  function reverseMapKey(key: string): keyof targetSchema {
+    return (reversed[key] as any) || (key as any);
+  }
 
   function mapKey(key: keyof targetSchema): string {
     return mappings[key] || (key as any);
@@ -32,8 +36,8 @@ export function createSettingsAliasResolver<TTarget extends schema.SomeZodObject
 
   source.onChange.next(
     onChange,
-    data => ({ ...data, key: mapKey(data.key) }),
-    data => transforms.has(data.key),
+    data => ({ ...data, key: reverseMapKey(data.key) }),
+    data => data.key in reversed,
   );
   return {
     onChange,
@@ -42,15 +46,7 @@ export function createSettingsAliasResolver<TTarget extends schema.SomeZodObject
         return false;
       }
 
-      const oldKey = mapKey(key);
-      const has = source.has(oldKey);
-
-      if (has && !DEPRECATED_SETTINGS.has(oldKey)) {
-        console.warn(`You are using deprecated settings: "${String(oldKey)}". Use "${key}" instead.`);
-        DEPRECATED_SETTINGS.add(oldKey);
-      }
-
-      return has;
+      return source.has(mapKey(key));
     },
     isEdited(key) {
       if (!(key in mappings)) {
@@ -74,6 +70,14 @@ export function createSettingsAliasResolver<TTarget extends schema.SomeZodObject
       if (!(key in mappings)) {
         return undefined;
       }
+
+      const oldKey = mapKey(key);
+
+      if (!DEPRECATED_SETTINGS.has(oldKey)) {
+        console.warn(`You are using deprecated settings: "${String(oldKey)}". Use "${key}" instead.`);
+        DEPRECATED_SETTINGS.add(oldKey);
+      }
+
       return source.getValue(mapKey(key));
     },
     setValue(key, value) {

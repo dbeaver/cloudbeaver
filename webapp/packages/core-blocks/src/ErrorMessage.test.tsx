@@ -8,38 +8,15 @@
 import '@testing-library/jest-dom';
 import { screen } from '@testing-library/react';
 
-import { coreBrowserManifest } from '@cloudbeaver/core-browser';
-import { coreClientActivityManifest } from '@cloudbeaver/core-client-activity';
 import { coreEventsManifest } from '@cloudbeaver/core-events';
 import { coreLocalizationManifest } from '@cloudbeaver/core-localization';
-import { coreProductManifest } from '@cloudbeaver/core-product';
-import { coreRootManifest } from '@cloudbeaver/core-root';
-import { createGQLEndpoint } from '@cloudbeaver/core-root/dist/__custom_mocks__/createGQLEndpoint';
-import { mockAppInit } from '@cloudbeaver/core-root/dist/__custom_mocks__/mockAppInit';
-import { mockGraphQL } from '@cloudbeaver/core-root/dist/__custom_mocks__/mockGraphQL';
-import { coreSDKManifest } from '@cloudbeaver/core-sdk';
 import { coreSettingsManifest } from '@cloudbeaver/core-settings';
 import { coreThemingManifest } from '@cloudbeaver/core-theming';
 import { createApp, renderInApp } from '@cloudbeaver/tests-runner';
 
 import { ErrorMessage } from './ErrorMessage';
 
-const endpoint = createGQLEndpoint();
-const app = createApp(
-  coreEventsManifest,
-  coreProductManifest,
-  coreRootManifest,
-  coreSDKManifest,
-  coreSettingsManifest,
-  coreBrowserManifest,
-  coreThemingManifest,
-  coreLocalizationManifest,
-  coreClientActivityManifest,
-);
-
-mockGraphQL(...mockAppInit(endpoint));
-
-beforeAll(() => app.init());
+const app = createApp(coreEventsManifest, coreSettingsManifest, coreThemingManifest, coreLocalizationManifest);
 
 test('icons.svg#name', () => {
   renderInApp(<ErrorMessage text="error" />, app);

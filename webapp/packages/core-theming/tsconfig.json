@@ -31,9 +31,6 @@
       "path": "../core-root/tsconfig.json"
     },
     {
-      "path": "../core-root/tsconfig.json"
-    },
-    {
       "path": "../core-sdk/tsconfig.json"
     },
     {

@@ -9,7 +9,6 @@ import { computed, makeObservable } from 'mobx';
 
 import { Dependency, injectable } from '@cloudbeaver/core-di';
 import { DEFAULT_LOCALE } from '@cloudbeaver/core-localization';
-import { ServerSettingsService } from '@cloudbeaver/core-root';
 import {
   createSettingsAliasResolver,
   ROOT_SETTINGS_LAYER,
@@ -34,7 +33,6 @@ export class SettingsLocalizationService extends Dependency {
 
   constructor(
     private readonly settingsProviderService: SettingsProviderService,
-    private readonly serverSettingsService: ServerSettingsService,
     private readonly settingsResolverService: SettingsResolverService,
   ) {
     super();
@@ -44,11 +42,11 @@ export class SettingsLocalizationService extends Dependency {
     this.settingsResolverService.addResolver(
       ROOT_SETTINGS_LAYER,
       /** @deprecated Use settings instead, will be removed in 23.0.0 */
-      createSettingsAliasResolver(this.serverSettingsService, this.settingsProvider, { 'core.localization.language': 'core.user.defaultLanguage' }),
-      createSettingsAliasResolver(this.serverSettingsService, this.settingsProvider, {
+      createSettingsAliasResolver(this.settingsResolverService, this.settingsProvider, { 'core.localization.language': 'core.user.defaultLanguage' }),
+      createSettingsAliasResolver(this.settingsResolverService, this.settingsProvider, {
         'core.localization.language': 'core.localization.defaultLanguage',
       }),
-      createSettingsAliasResolver(this.serverSettingsService, this.settingsProvider, { 'core.localization.language': 'app.defaultLanguage' }),
+      createSettingsAliasResolver(this.settingsResolverService, this.settingsProvider, { 'core.localization.language': 'app.defaultLanguage' }),
     );
 
     makeObservable(this, {

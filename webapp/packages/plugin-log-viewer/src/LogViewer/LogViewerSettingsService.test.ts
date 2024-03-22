@@ -15,12 +15,17 @@ import { coreClientActivityManifest } from '@cloudbeaver/core-client-activity';
 import { coreLocalizationManifest } from '@cloudbeaver/core-localization';
 import { coreRootManifest, ServerConfigResource } from '@cloudbeaver/core-root';
 import { createGQLEndpoint } from '@cloudbeaver/core-root/dist/__custom_mocks__/createGQLEndpoint';
+import '@cloudbeaver/core-root/dist/__custom_mocks__/expectWebsocketClosedMessage';
 import { mockAppInit } from '@cloudbeaver/core-root/dist/__custom_mocks__/mockAppInit';
 import { mockGraphQL } from '@cloudbeaver/core-root/dist/__custom_mocks__/mockGraphQL';
 import { mockServerConfig } from '@cloudbeaver/core-root/dist/__custom_mocks__/resolvers/mockServerConfig';
 import { coreRoutingManifest } from '@cloudbeaver/core-routing';
 import { coreSDKManifest } from '@cloudbeaver/core-sdk';
 import { coreSettingsManifest } from '@cloudbeaver/core-settings';
+import {
+  expectDeprecatedSettingMessage,
+  expectNoDeprecatedSettingMessage,
+} from '@cloudbeaver/core-settings/dist/__custom_mocks__/expectDeprecatedSettingMessage';
 import { coreStorageManifest } from '@cloudbeaver/core-storage';
 import { coreViewManifest } from '@cloudbeaver/core-view';
 import toolsPanelPlugin from '@cloudbeaver/plugin-tools-panel';
@@ -30,6 +35,7 @@ import { logViewerPlugin } from '../manifest';
 import { LogViewerSettingsService } from './LogViewerSettingsService';
 
 const endpoint = createGQLEndpoint();
+const server = mockGraphQL(...mockAppInit(endpoint), ...mockAuthentication(endpoint));
 const app = createApp(
   logViewerPlugin,
   toolsPanelPlugin,
@@ -45,10 +51,6 @@ const app = createApp(
   coreRoutingManifest,
   coreClientActivityManifest,
 );
-
-const server = mockGraphQL(...mockAppInit(endpoint), ...mockAuthentication(endpoint));
-
-beforeAll(() => app.init());
 
 const deprecatedSettings = {
   'core.app.logViewer.refreshTimeout': 1,
@@ -80,6 +82,7 @@ test('New settings override deprecated settings', async () => {
   expect(settings.logBatchSize).toBe(7);
   expect(settings.maxFailedRequests).toBe(8);
   expect(settings.disabled).toBe(false);
+  expectNoDeprecatedSettingMessage();
 });
 
 test('Deprecated settings are used if new settings are not defined', async () => {
@@ -95,4 +98,5 @@ test('Deprecated settings are used if new settings are not defined', async () =>
   expect(settings.logBatchSize).toBe(3);
   expect(settings.maxFailedRequests).toBe(4);
   expect(settings.disabled).toBe(true);
+  expectDeprecatedSettingMessage();
 });

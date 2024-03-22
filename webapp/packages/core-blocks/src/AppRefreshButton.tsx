@@ -20,7 +20,7 @@ export const AppRefreshButton: React.FC<IProps> = function AppRefreshButton({ cl
   const app = useService(App);
 
   function refresh() {
-    app.start();
+    app.restart();
   }
 
   return (

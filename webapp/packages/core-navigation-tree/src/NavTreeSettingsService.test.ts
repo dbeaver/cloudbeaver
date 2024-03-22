@@ -16,12 +16,17 @@ import { coreLocalizationManifest } from '@cloudbeaver/core-localization';
 import { coreProjectsManifest } from '@cloudbeaver/core-projects';
 import { coreRootManifest, ServerConfigResource } from '@cloudbeaver/core-root';
 import { createGQLEndpoint } from '@cloudbeaver/core-root/dist/__custom_mocks__/createGQLEndpoint';
+import '@cloudbeaver/core-root/dist/__custom_mocks__/expectWebsocketClosedMessage';
 import { mockAppInit } from '@cloudbeaver/core-root/dist/__custom_mocks__/mockAppInit';
 import { mockGraphQL } from '@cloudbeaver/core-root/dist/__custom_mocks__/mockGraphQL';
 import { mockServerConfig } from '@cloudbeaver/core-root/dist/__custom_mocks__/resolvers/mockServerConfig';
 import { coreRoutingManifest } from '@cloudbeaver/core-routing';
 import { coreSDKManifest } from '@cloudbeaver/core-sdk';
 import { coreSettingsManifest } from '@cloudbeaver/core-settings';
+import {
+  expectDeprecatedSettingMessage,
+  expectNoDeprecatedSettingMessage,
+} from '@cloudbeaver/core-settings/dist/__custom_mocks__/expectDeprecatedSettingMessage';
 import { coreStorageManifest } from '@cloudbeaver/core-storage';
 import { coreUIManifest } from '@cloudbeaver/core-ui';
 import { coreViewManifest } from '@cloudbeaver/core-view';
@@ -31,6 +36,7 @@ import { coreNavigationTree } from './manifest';
 import { NavTreeSettingsService } from './NavTreeSettingsService';
 
 const endpoint = createGQLEndpoint();
+const server = mockGraphQL(...mockAppInit(endpoint), ...mockAuthentication(endpoint));
 const app = createApp(
   coreNavigationTree,
   coreEventsManifest,
@@ -47,10 +53,6 @@ const app = createApp(
   coreViewManifest,
   coreClientActivityManifest,
 );
-
-const server = mockGraphQL(...mockAppInit(endpoint), ...mockAuthentication(endpoint));
-
-beforeAll(() => app.init());
 
 const deprecatedSettings = {
   'core.app.navigationTree.childrenLimit': 100,
@@ -76,6 +78,7 @@ test('New settings override deprecated', async () => {
   expect(settings.childrenLimit).toBe(200);
   expect(settings.editing).toBe(true);
   expect(settings.deleting).toBe(true);
+  expectNoDeprecatedSettingMessage();
 });
 
 test('Deprecated settings are used if new settings are not defined', async () => {
@@ -89,4 +92,5 @@ test('Deprecated settings are used if new settings are not defined', async () =>
   expect(settings.childrenLimit).toBe(100);
   expect(settings.editing).toBe(false);
   expect(settings.deleting).toBe(false);
+  expectDeprecatedSettingMessage();
 });

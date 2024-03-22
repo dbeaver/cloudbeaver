@@ -11,17 +11,23 @@ import { coreClientActivityManifest } from '@cloudbeaver/core-client-activity';
 import { coreLocalizationManifest } from '@cloudbeaver/core-localization';
 import { coreRootManifest, ServerConfigResource } from '@cloudbeaver/core-root';
 import { createGQLEndpoint } from '@cloudbeaver/core-root/dist/__custom_mocks__/createGQLEndpoint';
+import '@cloudbeaver/core-root/dist/__custom_mocks__/expectWebsocketClosedMessage';
 import { mockAppInit } from '@cloudbeaver/core-root/dist/__custom_mocks__/mockAppInit';
 import { mockGraphQL } from '@cloudbeaver/core-root/dist/__custom_mocks__/mockGraphQL';
 import { mockServerConfig } from '@cloudbeaver/core-root/dist/__custom_mocks__/resolvers/mockServerConfig';
 import { coreSDKManifest } from '@cloudbeaver/core-sdk';
 import { coreSettingsManifest } from '@cloudbeaver/core-settings';
+import {
+  expectDeprecatedSettingMessage,
+  expectNoDeprecatedSettingMessage,
+} from '@cloudbeaver/core-settings/dist/__custom_mocks__/expectDeprecatedSettingMessage';
 import { createApp } from '@cloudbeaver/tests-runner';
 
 import { EventsSettingsService } from './EventsSettingsService';
 import { coreEventsManifest } from './manifest';
 
 const endpoint = createGQLEndpoint();
+const server = mockGraphQL(...mockAppInit(endpoint));
 const app = createApp(
   coreEventsManifest,
   coreSettingsManifest,
@@ -30,10 +36,6 @@ const app = createApp(
   coreSDKManifest,
   coreClientActivityManifest,
 );
-
-const server = mockGraphQL(...mockAppInit(endpoint));
-
-beforeAll(() => app.init());
 
 const oldConfig = {
   'core_events.notificationsPool': '1',
@@ -56,6 +58,7 @@ test('New settings override deprecated settings', async () => {
 
   expect(settings.notificationsPool).toBe(3);
   expect(settings.maxPersistentAllow).toBe(4);
+  expectNoDeprecatedSettingMessage();
 });
 
 test('Deprecated settings accessible with new settings', async () => {
@@ -68,4 +71,5 @@ test('Deprecated settings accessible with new settings', async () => {
 
   expect(settings.notificationsPool).toBe(1);
   expect(settings.maxPersistentAllow).toBe(2);
+  expectDeprecatedSettingMessage();
 });

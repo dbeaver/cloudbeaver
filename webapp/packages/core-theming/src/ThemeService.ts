@@ -10,7 +10,6 @@ import { computed, IReactionDisposer, makeObservable, observable, reaction } fro
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { NotificationService, UIError } from '@cloudbeaver/core-events';
 import { ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
-import { ServerConfigResource } from '@cloudbeaver/core-root';
 
 import type { Style } from './ComponentStyle';
 import './styles/main/base.pure.css';
@@ -64,7 +63,6 @@ export class ThemeService extends Bootstrap {
   private reactionDisposer: IReactionDisposer | null;
 
   constructor(
-    private readonly serverConfigResource: ServerConfigResource,
     private readonly notificationService: NotificationService,
     private readonly themeSettingsService: ThemeSettingsService,
   ) {
@@ -130,7 +128,6 @@ export class ThemeService extends Bootstrap {
   }
 
   async load(): Promise<void> {
-    await this.serverConfigResource.load();
     await this.loadTheme(this.themeId);
   }
 

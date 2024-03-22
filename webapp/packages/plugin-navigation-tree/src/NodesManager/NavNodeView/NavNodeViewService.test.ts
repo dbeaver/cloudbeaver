@@ -22,6 +22,7 @@ import { coreProductManifest } from '@cloudbeaver/core-product';
 import { coreProjectsManifest } from '@cloudbeaver/core-projects';
 import { coreRootManifest } from '@cloudbeaver/core-root';
 import { createGQLEndpoint } from '@cloudbeaver/core-root/dist/__custom_mocks__/createGQLEndpoint';
+import '@cloudbeaver/core-root/dist/__custom_mocks__/expectWebsocketClosedMessage';
 import { mockAppInit } from '@cloudbeaver/core-root/dist/__custom_mocks__/mockAppInit';
 import { mockGraphQL } from '@cloudbeaver/core-root/dist/__custom_mocks__/mockGraphQL';
 import { coreRoutingManifest } from '@cloudbeaver/core-routing';
@@ -39,6 +40,7 @@ import { navigationTreePlugin } from '../../manifest';
 import { NavNodeViewService } from './NavNodeViewService';
 
 const endpoint = createGQLEndpoint();
+mockGraphQL(...mockAppInit(endpoint), ...mockAuthentication(endpoint));
 const app = createApp(
   navigationTreePlugin,
   coreLocalizationManifest,
@@ -64,10 +66,6 @@ const app = createApp(
   coreThemingManifest,
   coreClientActivityManifest,
 );
-
-mockGraphQL(...mockAppInit(endpoint), ...mockAuthentication(endpoint));
-
-beforeAll(() => app.init());
 
 describe('filterDuplicates', () => {
   test('Filter duplicates', async () => {

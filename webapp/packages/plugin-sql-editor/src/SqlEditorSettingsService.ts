@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 import { Dependency, injectable } from '@cloudbeaver/core-di';
-import { ServerSettingsManagerService, ServerSettingsService } from '@cloudbeaver/core-root';
+import { ServerSettingsManagerService } from '@cloudbeaver/core-root';
 import {
   createSettingsAliasResolver,
   ESettingsValueType,
@@ -82,7 +82,6 @@ export class SqlEditorSettingsService extends Dependency {
   constructor(
     private readonly settingsProviderService: SettingsProviderService,
     private readonly settingsManagerService: SettingsManagerService,
-    private readonly serverSettingsService: ServerSettingsService,
     private readonly settingsResolverService: SettingsResolverService,
     private readonly serverSettingsManagerService: ServerSettingsManagerService,
   ) {
@@ -91,7 +90,7 @@ export class SqlEditorSettingsService extends Dependency {
     this.settingsResolverService.addResolver(
       ROOT_SETTINGS_LAYER,
       /** @deprecated Use settings instead, will be removed in 23.0.0 */
-      createSettingsAliasResolver(this.serverSettingsService, this.settings, {
+      createSettingsAliasResolver(this.settingsResolverService, this.settings, {
         'plugin.sql-editor.autoSave': 'core.app.sqlEditor.autoSave',
         'plugin.sql-editor.maxFileSize': 'core.app.sqlEditor.maxFileSize',
         'plugin.sql-editor.disabled': 'core.app.sqlEditor.disabled',

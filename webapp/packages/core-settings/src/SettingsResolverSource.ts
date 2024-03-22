@@ -18,7 +18,7 @@ interface ISettingsSourcesLayer {
   sources: ISettingsSource[];
 }
 
-export abstract class SettingsResolverSource implements ISettingsResolverSource {
+export class SettingsResolverSource implements ISettingsResolverSource {
   readonly onChange: ISyncExecutor<ISettingChangeData>;
   protected get sources(): ISettingsSource[] {
     return this.layers
