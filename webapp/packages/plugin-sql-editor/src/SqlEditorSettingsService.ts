@@ -101,6 +101,7 @@ export class SqlEditorSettingsService extends Dependency {
   }
 
   private registerSettings() {
+    this.serverSettingsManagerService.setGroupOverride('editors/sqlEditor', SQL_EDITOR_SETTINGS_GROUP);
     this.serverSettingsManagerService.setSettingTransformer(
       'sql.proposals.insert.table.alias',
       setting =>
