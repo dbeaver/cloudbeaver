@@ -10,7 +10,7 @@ import '@testing-library/jest-dom';
 import { SyncExecutor } from '@cloudbeaver/core-executor';
 
 import { expectDeprecatedSettingMessage } from './__custom_mocks__/expectDeprecatedSettingMessage';
-import { createSettingsAliasResolver } from './createDeprecatedResolver';
+import { createSettingsAliasResolver } from './createSettingsAliasResolver';
 import type { ISettingsSource } from './ISettingsSource';
 
 const deprecatedSettings = {

@@ -1,5 +1,5 @@
 export * from './manifest';
-export * from './createDeprecatedResolver';
+export * from './createSettingsAliasResolver';
 export * from './SettingsScopeType';
 export * from './SettingsResolverSource';
 export * from './ISettingsResolverSource';
