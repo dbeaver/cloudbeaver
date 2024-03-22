@@ -6,9 +6,10 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import styled, { css } from 'reshadow';
 
-import { Filter, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
+import { Filter, s, useS, useTranslate } from '@cloudbeaver/core-blocks';
+
+import styles from './ConnectionAccessTableHeader.m.css';
 
 export interface IFilterState {
   filterValue: string;
@@ -20,26 +21,6 @@ interface Props {
   className?: string;
 }
 
-const styles = css`
-  buttons {
-    display: flex;
-    gap: 16px;
-  }
-  header {
-    composes: theme-border-color-background theme-background-surface theme-text-on-surface from global;
-    overflow: hidden;
-    position: sticky;
-    top: 0;
-    z-index: 1;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 16px;
-    gap: 16px;
-    border-bottom: 1px solid;
-  }
-`;
-
 export const ConnectionAccessTableHeader = observer<React.PropsWithChildren<Props>>(function ConnectionAccessTableHeader({
   filterState,
   disabled,
@@ -47,15 +28,16 @@ export const ConnectionAccessTableHeader = observer<React.PropsWithChildren<Prop
   children,
 }) {
   const translate = useTranslate();
-  return styled(useStyles(styles))(
-    <header className={className}>
+  const style = useS(styles);
+  return (
+    <div className={s(style, { header: true }, className)}>
       <Filter
         disabled={disabled}
         placeholder={translate('connections_connection_access_filter_placeholder')}
         name="filterValue"
         state={filterState}
       />
-      <buttons>{children}</buttons>
-    </header>,
+      <div className={s(style, { buttons: true })}>{children}</div>
+    </div>
   );
 });
