@@ -28,7 +28,7 @@ import org.jkiss.dbeaver.model.meta.Property;
 import org.jkiss.dbeaver.model.meta.PropertyLength;
 import org.jkiss.dbeaver.model.preferences.DBPPropertyDescriptor;
 import org.jkiss.dbeaver.model.preferences.DBPPropertySource;
-import org.jkiss.dbeaver.registry.settings.DBeaverSettingDescriptor;
+import org.jkiss.dbeaver.registry.settings.ProductSettingDescriptor;
 import org.jkiss.dbeaver.runtime.properties.ObjectPropertyDescriptor;
 import org.jkiss.utils.CommonUtils;
 
@@ -247,8 +247,8 @@ public class WebPropertyInfo {
     @Nullable
     @Property
     public List<String> getScopes() {
-        if (property instanceof DBeaverSettingDescriptor settingDescriptor) {
-            return settingDescriptor.getScopes();
+        if (property instanceof ProductSettingDescriptor productSettingDescriptor) {
+            return productSettingDescriptor.getScopes();
         }
         return null;
     }

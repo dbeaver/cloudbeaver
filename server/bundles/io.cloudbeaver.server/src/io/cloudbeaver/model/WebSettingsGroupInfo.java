@@ -17,14 +17,15 @@
 package io.cloudbeaver.model;
 
 import org.jkiss.code.NotNull;
+import org.jkiss.dbeaver.model.impl.PropertyGroupDescriptor;
 import org.jkiss.dbeaver.model.meta.Property;
-import org.jkiss.dbeaver.registry.settings.DBeaverSettingsGroupDescriptor;
+import org.jkiss.dbeaver.registry.settings.ProductSettingDescriptor;
 
 public class WebSettingsGroupInfo {
     @NotNull
-    private final DBeaverSettingsGroupDescriptor groupDescriptor;
+    private final PropertyGroupDescriptor<ProductSettingDescriptor> groupDescriptor;
 
-    public WebSettingsGroupInfo(@NotNull DBeaverSettingsGroupDescriptor groupDescriptor) {
+    public WebSettingsGroupInfo(@NotNull PropertyGroupDescriptor<ProductSettingDescriptor> groupDescriptor) {
         this.groupDescriptor = groupDescriptor;
     }
 

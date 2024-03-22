@@ -18,8 +18,9 @@ package io.cloudbeaver.model;
 
 import io.cloudbeaver.model.session.WebSession;
 import org.jkiss.code.NotNull;
+import org.jkiss.dbeaver.model.impl.PropertyGroupDescriptor;
 import org.jkiss.dbeaver.model.meta.Property;
-import org.jkiss.dbeaver.registry.settings.DBeaverSettingsGroupDescriptor;
+import org.jkiss.dbeaver.registry.settings.ProductSettingDescriptor;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -28,9 +29,12 @@ public class WebProductSettings {
     @NotNull
     private final WebSession webSession;
     @NotNull
-    private final List<DBeaverSettingsGroupDescriptor> groups;
+    private final List<PropertyGroupDescriptor<ProductSettingDescriptor>> groups;
 
-    public WebProductSettings(@NotNull WebSession webSession, @NotNull List<DBeaverSettingsGroupDescriptor> groups) {
+    public WebProductSettings(
+        @NotNull WebSession webSession,
+        @NotNull List<PropertyGroupDescriptor<ProductSettingDescriptor>> groups
+    ) {
         this.webSession = webSession;
         this.groups = groups;
     }
