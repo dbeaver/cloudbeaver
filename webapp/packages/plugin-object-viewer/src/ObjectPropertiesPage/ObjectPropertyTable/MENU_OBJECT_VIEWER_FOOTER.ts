@@ -7,4 +7,4 @@
  */
 import { createMenu } from '@cloudbeaver/core-view';
 
-export const MENU_OBJECT_VIEWER_FOOTER_ACTIONS = createMenu('object-viewer-footer-actions', 'Object viewer footer actions menu');
+export const MENU_OBJECT_VIEWER_FOOTER = createMenu('object-viewer-footer', 'Object viewer footer menu');

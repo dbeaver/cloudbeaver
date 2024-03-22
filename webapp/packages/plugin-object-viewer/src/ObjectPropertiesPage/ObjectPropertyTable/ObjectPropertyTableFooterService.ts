@@ -7,18 +7,16 @@
  */
 import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { ENodeFeature, type NavNode, NavNodeInfoResource, NavTreeResource, NavTreeSettingsService } from '@cloudbeaver/core-navigation-tree';
+import { DATA_CONTEXT_NAV_NODES, ENodeFeature, NavTreeResource, NavTreeSettingsService } from '@cloudbeaver/core-navigation-tree';
 import { resourceKeyList } from '@cloudbeaver/core-resource';
 import { ACTION_DELETE, ActionService, DATA_CONTEXT_MENU, MenuService } from '@cloudbeaver/core-view';
 
-import { DATA_CONTEXT_OBJECT_VIEWER_TABLE_STATE } from './DATA_CONTEXT_OBJECT_VIEWER_TABLE_STATE';
-import { MENU_OBJECT_VIEWER_FOOTER_ACTIONS } from './MENU_OBJECT_VIEWER_FOOTER_ACTIONS';
+import { MENU_OBJECT_VIEWER_FOOTER } from './MENU_OBJECT_VIEWER_FOOTER';
 
 @injectable()
 export class ObjectPropertyTableFooterService {
   constructor(
     private readonly navTreeResource: NavTreeResource,
-    private readonly navNodeInfoResource: NavNodeInfoResource,
     private readonly notificationService: NotificationService,
     private readonly navTreeSettingsService: NavTreeSettingsService,
     private readonly menuService: MenuService,
@@ -27,10 +25,10 @@ export class ObjectPropertyTableFooterService {
 
   registerFooterActions() {
     this.menuService.addCreator({
-      menus: [MENU_OBJECT_VIEWER_FOOTER_ACTIONS],
+      menus: [MENU_OBJECT_VIEWER_FOOTER],
       isApplicable: context => {
-        const state = context.tryGet(DATA_CONTEXT_OBJECT_VIEWER_TABLE_STATE);
-        return state !== undefined && this.navTreeSettingsService.settings.getValue('deleting');
+        const selected = context.tryGet(DATA_CONTEXT_NAV_NODES);
+        return selected !== undefined && this.navTreeSettingsService.settings.getValue('deleting');
       },
       getItems: (_, items) => [...items, ACTION_DELETE],
     });
@@ -38,9 +36,9 @@ export class ObjectPropertyTableFooterService {
     this.actionService.addHandler({
       id: 'object-viewer-footer-base',
       isActionApplicable: (context, action) => {
-        const menu = context.hasValue(DATA_CONTEXT_MENU, MENU_OBJECT_VIEWER_FOOTER_ACTIONS);
+        const menu = context.hasValue(DATA_CONTEXT_MENU, MENU_OBJECT_VIEWER_FOOTER);
 
-        if (!menu || !context.has(DATA_CONTEXT_OBJECT_VIEWER_TABLE_STATE)) {
+        if (!menu || !context.has(DATA_CONTEXT_NAV_NODES)) {
           return false;
         }
 
@@ -58,18 +56,16 @@ export class ObjectPropertyTableFooterService {
       },
       isDisabled: (context, action) => {
         if (action === ACTION_DELETE) {
-          const state = context.get(DATA_CONTEXT_OBJECT_VIEWER_TABLE_STATE);
-          const selectedNodes = this.getSelectedNodes(state.selectedList);
-
-          return !selectedNodes.some(node => node.features?.includes(ENodeFeature.canDelete)) || this.navTreeResource.isLoading();
+          const selected = context.get(DATA_CONTEXT_NAV_NODES)();
+          return !selected.some(node => node.features?.includes(ENodeFeature.canDelete)) || this.navTreeResource.isLoading();
         }
 
         return true;
       },
       handler: async (context, action) => {
         if (action === ACTION_DELETE) {
-          const state = context.get(DATA_CONTEXT_OBJECT_VIEWER_TABLE_STATE);
-          const nodes = this.getSelectedNodes(state.selectedList).filter(node => node.features?.includes(ENodeFeature.canDelete));
+          const selected = context.get(DATA_CONTEXT_NAV_NODES)();
+          const nodes = selected.filter(node => node.features?.includes(ENodeFeature.canDelete));
 
           try {
             await this.navTreeResource.deleteNode(resourceKeyList(nodes.map(node => node.id)));
@@ -79,9 +75,5 @@ export class ObjectPropertyTableFooterService {
         }
       },
     });
-  }
-
-  private getSelectedNodes(list: string[]) {
-    return this.navNodeInfoResource.get(resourceKeyList(list)).filter(Boolean) as NavNode[];
   }
 }

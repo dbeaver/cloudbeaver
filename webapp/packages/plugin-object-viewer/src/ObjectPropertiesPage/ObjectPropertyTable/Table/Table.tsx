@@ -90,7 +90,6 @@ export const Table = observer<TableProps>(function Table({ objects, hasNextPage,
 
   const baseObject = objects.slice().sort((a, b) => (b.object?.properties?.length || 0) - (a.object?.properties?.length || 0));
 
-  const nodeIds = objects.map(object => object.id);
   const properties = baseObject[0]?.object?.properties ?? [];
   const measuredCells = getMeasuredCells(properties, objects);
 
@@ -148,7 +147,7 @@ export const Table = observer<TableProps>(function Table({ objects, hasNextPage,
             </Link>
           </div>
         )}
-        <ObjectPropertyTableFooter className={s(styles, { objectPropertyTableFooter: true })} nodeIds={nodeIds} tableState={tableState} />
+        <ObjectPropertyTableFooter className={s(styles, { objectPropertyTableFooter: true })} state={tableState} />
       </div>
     </TableContext.Provider>,
   );
