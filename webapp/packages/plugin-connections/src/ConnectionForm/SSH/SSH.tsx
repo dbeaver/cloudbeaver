@@ -7,7 +7,6 @@
  */
 import { observer } from 'mobx-react-lite';
 import { useCallback, useState } from 'react';
-import styled, { css } from 'reshadow';
 
 import {
   Button,
@@ -20,10 +19,11 @@ import {
   Group,
   GroupItem,
   InputField,
+  s,
   Switch,
   useAdministrationSettings,
   useResource,
-  useStyles,
+  useS,
   useTranslate,
 } from '@cloudbeaver/core-blocks';
 import { NetworkHandlerResource, SSH_TUNNEL_ID } from '@cloudbeaver/core-connections';
@@ -33,16 +33,8 @@ import { isSafari } from '@cloudbeaver/core-utils';
 
 import type { IConnectionFormProps } from '../IConnectionFormProps';
 import { authTypes } from './authTypes';
+import styles from './SSH.m.css';
 import { SSHKeyUploader } from './SSHKeyUploader';
-
-const SSH_STYLES = css`
-  Form {
-    display: flex;
-    flex-direction: column;
-    flex: 1;
-    overflow: auto;
-  }
-`;
 
 interface Props extends IConnectionFormProps {
   handlerState: NetworkHandlerConfigInput;
@@ -73,7 +65,7 @@ export const SSH: TabContainerPanelComponent<Props> = observer(function SSH({ st
     setLoading(false);
   };
 
-  const styles = useStyles(SSH_STYLES);
+  const style = useS(styles);
   const translate = useTranslate();
   const disabled = formDisabled || loading;
   const enabled = handlerState.enabled || false;
@@ -91,8 +83,8 @@ export const SSH: TabContainerPanelComponent<Props> = observer(function SSH({ st
     handlerState.password = '';
   }, []);
 
-  return styled(styles)(
-    <Form>
+  return (
+    <Form className={s(style, { form: true })}>
       <ColoredContainer parent>
         <Group form gap keepSize large>
           <Switch id="ssh-enable-switch" name="enabled" state={handlerState} mod={['primary']} disabled={disabled || readonly}>
@@ -187,6 +179,6 @@ export const SSH: TabContainerPanelComponent<Props> = observer(function SSH({ st
           </GroupItem>
         </Group>
       </ColoredContainer>
-    </Form>,
+    </Form>
   );
 });
