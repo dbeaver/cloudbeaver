@@ -14,7 +14,7 @@ import { useService } from '@cloudbeaver/core-di';
 import { NavNodeInfoResource } from '@cloudbeaver/core-navigation-tree';
 import { TabPanel, TabsBox, TabStyles, useTabLocalState } from '@cloudbeaver/core-ui';
 import { MetadataMap } from '@cloudbeaver/core-utils';
-import { ConnectionShield } from '@cloudbeaver/plugin-connections';
+import { ConnectionShieldLazy } from '@cloudbeaver/plugin-connections';
 import type { TabHandlerPanelComponent } from '@cloudbeaver/plugin-navigation-tabs';
 
 import type { IObjectViewerTabState } from '../IObjectViewerTabState';
@@ -63,7 +63,7 @@ export const ObjectViewerPanel: TabHandlerPanelComponent<IObjectViewerTabState> 
   }
 
   return (
-    <ConnectionShield connectionKey={connectionKey}>
+    <ConnectionShieldLazy connectionKey={connectionKey}>
       {node.data ? (
         <TabsBox
           currentTabId={tab.handlerState.pageId}
@@ -86,6 +86,6 @@ export const ObjectViewerPanel: TabHandlerPanelComponent<IObjectViewerTabState> 
       ) : (
         <TextPlaceholder>{translate('plugin_object_viewer_table_no_items')}</TextPlaceholder>
       )}
-    </ConnectionShield>
+    </ConnectionShieldLazy>
   );
 });

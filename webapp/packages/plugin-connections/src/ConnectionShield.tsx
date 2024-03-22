@@ -13,11 +13,11 @@ import { ConnectionInfoResource, ConnectionsManagerService, type IConnectionInfo
 import { useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 
-interface Props {
+type Props = PropsWithChildren & {
   connectionKey: IConnectionInfoParams | null;
-}
+};
 
-export const ConnectionShield = observer<PropsWithChildren<Props>>(function ConnectionShield({ connectionKey, children }) {
+export const ConnectionShield = observer<Props>(function ConnectionShield({ connectionKey, children }) {
   const translate = useTranslate();
   const connectionsManagerService = useService(ConnectionsManagerService);
   const notificationService = useService(NotificationService);
