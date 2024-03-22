@@ -6,11 +6,19 @@
  * you may not use this file except in compliance with the License.
  */
 
-.sqlActions {
-  display: flex;
-  flex-direction: column;
+.tableColumnValue {
+  white-space: pre;
+  cursor: pointer;
 }
 
-.sqlActions.menuBar {
-  height: unset;
+.expandContainer {
+  width: 24px;
+  height: 24px;
+  margin-right: 4px;
+  display: flex;
+}
+
+.control {
+  display: flex;
+  align-items: center;
 }
