@@ -16,9 +16,11 @@
  */
 package io.cloudbeaver.service.sql;
 
+import io.cloudbeaver.server.CBPlatform;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.Log;
+import org.jkiss.dbeaver.ModelPreferences;
 import org.jkiss.dbeaver.model.*;
 import org.jkiss.dbeaver.model.exec.DBCExecutionContext;
 import org.jkiss.dbeaver.model.sql.SQLSyntaxManager;
@@ -66,7 +68,9 @@ public class WebSQLCompletionContext implements SQLCompletionContext {
 
     @Override
     public boolean isUseFQNames() {
-        return false;
+        return CBPlatform.getInstance()
+            .getPreferenceStore()
+            .getBoolean(ModelPreferences.SQL_EDITOR_PROPOSAL_ALWAYS_FQ);
     }
 
     @Override
@@ -81,7 +85,9 @@ public class WebSQLCompletionContext implements SQLCompletionContext {
 
     @Override
     public boolean isUseShortNames() {
-        return false;
+        return CBPlatform.getInstance()
+            .getPreferenceStore()
+            .getBoolean(ModelPreferences.SQL_EDITOR_PROPOSAL_SHORT_NAME);
     }
 
     @Override
