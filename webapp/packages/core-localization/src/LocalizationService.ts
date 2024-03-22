@@ -160,7 +160,6 @@ export class LocalizationService extends Bootstrap {
     try {
       this.setLanguage(key);
       await this.onChange.execute(key);
-      await this.loadLocale(key);
     } catch (e) {
       this.setLanguage(prevLocale);
       throw e;
