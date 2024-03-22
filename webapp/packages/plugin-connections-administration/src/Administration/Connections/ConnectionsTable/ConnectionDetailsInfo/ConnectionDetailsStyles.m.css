@@ -6,11 +6,11 @@
  * you may not use this file except in compliance with the License.
  */
 
-.sqlActions {
-  display: flex;
-  flex-direction: column;
-}
-
-.sqlActions.menuBar {
-  height: unset;
+.staticImage {
+  width: 24px;
+  height: 24px;
+  margin-right: 10px;
+  &:last-child {
+    margin-right: 0;
+  }
 }

@@ -6,11 +6,17 @@
  * you may not use this file except in compliance with the License.
  */
 
-.sqlActions {
-  display: flex;
-  flex-direction: column;
+.coloredContainer {
+  flex: 1;
+  overflow: auto;
 }
 
-.sqlActions.menuBar {
-  height: unset;
+.group {
+  max-height: 100%;
+}
+
+.propertiesTable {
+  padding-top: 8px;
+  max-height: 100%;
+  box-sizing: border-box;
 }

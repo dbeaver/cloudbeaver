@@ -6,11 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-.sqlActions {
+.staticImage {
   display: flex;
-  flex-direction: column;
-}
-
-.sqlActions.menuBar {
-  height: unset;
+  width: 24px;
 }

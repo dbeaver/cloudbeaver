@@ -6,11 +6,20 @@
  * you may not use this file except in compliance with the License.
  */
 
-.sqlActions {
+.staticImage {
   display: flex;
-  flex-direction: column;
+  width: 24px;
+
+  &:not(:last-child) {
+    margin-right: 16px;
+  }
 }
 
-.sqlActions.menuBar {
-  height: unset;
+.tableColumnValueExpand {
+  cursor: pointer;
+}
+
+.tableItemSelect {
+  margin-left: -10px;
+  margin-right: -10px;
 }

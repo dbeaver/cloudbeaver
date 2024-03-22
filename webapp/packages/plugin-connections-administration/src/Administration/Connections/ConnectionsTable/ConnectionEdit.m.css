@@ -6,11 +6,15 @@
  * you may not use this file except in compliance with the License.
  */
 
-.sqlActions {
+.box {
+  composes: theme-background-secondary theme-text-on-secondary from global;
+  box-sizing: border-box;
+  padding-bottom: 24px;
   display: flex;
   flex-direction: column;
+  height: 740px;
 }
 
-.sqlActions.menuBar {
-  height: unset;
+.loader {
+  height: 100%;
 }
