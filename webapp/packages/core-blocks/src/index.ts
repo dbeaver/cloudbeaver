@@ -128,8 +128,8 @@ export * from './FormControls/Checkboxes/FieldCheckbox';
 export * from './FormControls/Checkboxes/CheckboxMarkup';
 export * from './FormControls/Checkboxes/Switch';
 export * from './FormControls/Checkboxes/useCheckboxState';
-export * from './FormControls/BASE_DROPDOWN_STYLES';
 export * from './FormControls/Filter';
+export { default as BaseDropdownStyles } from './FormControls/BaseDropdown.m.css';
 export { default as FilterStyles } from './FormControls/Filter.m.css';
 export * from './Fill';
 
