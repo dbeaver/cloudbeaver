@@ -7,14 +7,16 @@
  */
 import { addKnownInfo, consoleSpy } from '@cloudbeaver/tests-runner';
 
+const WEBSOCKET_CLOSED_MESSAGE_REGEX = /Websocket closed.*/;
+
 beforeAll(async () => {
-  addKnownInfo(/Websocket closed.*/);
+  addKnownInfo(WEBSOCKET_CLOSED_MESSAGE_REGEX);
 });
 
 export function expectWebsocketClosedMessage() {
-  expect(consoleSpy.info).toHaveBeenCalledWith(expect.stringMatching(/Websocket closed.*/));
+  expect(consoleSpy.info).toHaveBeenCalledWith(expect.stringMatching(WEBSOCKET_CLOSED_MESSAGE_REGEX));
 }
 
 export function expectNoWebsocketClosedMessage() {
-  expect(consoleSpy.info).not.toHaveBeenCalledWith(expect.stringMatching(/Websocket closed.*/));
+  expect(consoleSpy.info).not.toHaveBeenCalledWith(expect.stringMatching(WEBSOCKET_CLOSED_MESSAGE_REGEX));
 }

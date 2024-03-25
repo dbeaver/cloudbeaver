@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 import { ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
-import type { schema } from '@cloudbeaver/core-utils';
+import { invertObject, type schema } from '@cloudbeaver/core-utils';
 
 import type { ISettingChangeData, ISettingsSource } from './ISettingsSource';
 import type { SettingsProvider } from './SettingsProvider';
@@ -23,7 +23,7 @@ export function createSettingsAliasResolver<TTarget extends schema.SomeZodObject
   mappings: SettingsMapping<schema.infer<TTarget>>,
 ): ISettingsSource {
   type targetSchema = schema.infer<TTarget>;
-  const reversed = Object.fromEntries(Object.entries(mappings).map(a => a.reverse()));
+  const reversed = invertObject(mappings);
 
   function reverseMapKey(key: string): keyof targetSchema {
     return (reversed[key] as any) || (key as any);
