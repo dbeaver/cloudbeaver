@@ -12,7 +12,6 @@ import { AuthProvider, AuthProviderConfiguration, AuthProvidersResource, compare
 import {
   Button,
   Cell,
-  Container,
   Filter,
   getComputed,
   IconOrImage,
@@ -108,7 +107,7 @@ export const ConfigurationsList = observer<Props>(function ConfigurationsList({
 
   if (activeProvider && activeConfiguration) {
     return (
-      <Container className={className} center>
+      <div className={s(style, { container: true }, className)}>
         <Loader state={authTaskState} message="authentication_authorizing" hideException>
           <div className={s(style, { center: true })}>
             {providerDisabled ? (
@@ -123,12 +122,12 @@ export const ConfigurationsList = observer<Props>(function ConfigurationsList({
             )}
           </div>
         </Loader>
-      </Container>
+      </div>
     );
   }
 
   return (
-    <Container className={className} center>
+    <div className={s(style, { container: true }, className)}>
       {configurations.length >= 10 && (
         <Filter
           className={s(style, { filter: true })}
@@ -156,6 +155,6 @@ export const ConfigurationsList = observer<Props>(function ConfigurationsList({
         })}
       </div>
       <Loader state={authTaskState} message="authentication_authorizing" overlay hideException />
-    </Container>
+    </div>
   );
 });

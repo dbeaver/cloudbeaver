@@ -28,3 +28,10 @@
 .center {
   margin: auto;
 }
+
+.container {
+  display: flex;
+  flex-direction: column;
+  overflow: auto;
+  flex: 1;
+}
