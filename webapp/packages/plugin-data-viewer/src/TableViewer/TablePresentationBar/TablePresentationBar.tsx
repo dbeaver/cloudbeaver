@@ -6,37 +6,18 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import styled, { css, use } from 'reshadow';
 
-import { useStyles } from '@cloudbeaver/core-blocks';
+import { s, SContext, StyleRegistry, useS } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import type { ResultDataFormat } from '@cloudbeaver/core-sdk';
-import { BASE_TAB_STYLES, TabList, TabsState, VERTICAL_ROTATED_TAB_STYLES } from '@cloudbeaver/core-ui';
+import { TabList, TabListStyles, TabListVerticalRotatedRegistry, TabsState, TabStyles } from '@cloudbeaver/core-ui';
 
 import type { IDatabaseDataModel } from '../../DatabaseDataModel/IDatabaseDataModel';
 import { DataPresentationService, DataPresentationType } from '../../DataPresentationService';
 import { PresentationTab } from './PresentationTab';
-
-const styles = css`
-  table-left-bar {
-    display: flex;
-  }
-  Tab {
-    composes: theme-ripple theme-background-background theme-text-text-primary-on-light theme-typography--body2 from global;
-    text-transform: uppercase;
-    font-weight: normal;
-
-    &:global([aria-selected='true']) {
-      font-weight: normal !important;
-    }
-  }
-  TabList {
-    composes: theme-background-secondary theme-text-on-secondary from global;
-  }
-  TabList[|flexible] tab-outer:only-child {
-    display: none;
-  }
-`;
+import styles from './shared/TablePresentationBar.m.css';
+import TablePresentationBarTab from './shared/TablePresentationBarTab.m.css';
+import TablePresentationBarTabList from './shared/TablePresentationBarTabList.m.css';
 
 interface Props {
   type: DataPresentationType;
@@ -50,6 +31,12 @@ interface Props {
   onClose?: () => void;
 }
 
+const tablePresentationBarRegistry: StyleRegistry = [
+  ...TabListVerticalRotatedRegistry,
+  [TabListStyles, { mode: 'append', styles: [TablePresentationBarTabList] }],
+  [TabStyles, { mode: 'append', styles: [TablePresentationBarTab] }],
+];
+
 export const TablePresentationBar = observer<Props>(function TablePresentationBar({
   type,
   presentationId,
@@ -61,7 +48,7 @@ export const TablePresentationBar = observer<Props>(function TablePresentationBa
   onPresentationChange,
   onClose,
 }) {
-  const style = useStyles(styles, BASE_TAB_STYLES, VERTICAL_ROTATED_TAB_STYLES);
+  const style = useS(styles);
   const dataPresentationService = useService(DataPresentationService);
   const presentations = dataPresentationService.getSupportedList(type, supportedDataFormat, dataFormat, model, resultIndex);
   const Tab = PresentationTab; // alias for styles matching
@@ -79,15 +66,17 @@ export const TablePresentationBar = observer<Props>(function TablePresentationBa
     return null;
   }
 
-  return styled(style)(
-    <table-left-bar className={className}>
+  return (
+    <div className={s(style, { tableLeftBar: true }, className)}>
       <TabsState currentTabId={presentationId} autoSelect={main}>
-        <TabList aria-label="Data Presentations" {...use({ flexible: main })}>
-          {presentations.map(presentation => (
-            <Tab key={presentation.id} presentation={presentation} model={model} resultIndex={resultIndex} style={styles} onClick={handleClick} />
-          ))}
-        </TabList>
+        <SContext registry={tablePresentationBarRegistry}>
+          <TabList className={s(style, { tabListFlexible: main })} aria-label="Data Presentations">
+            {presentations.map(presentation => (
+              <Tab key={presentation.id} presentation={presentation} model={model} resultIndex={resultIndex} onClick={handleClick} />
+            ))}
+          </TabList>
+        </SContext>
       </TabsState>
-    </table-left-bar>,
+    </div>
   );
 });

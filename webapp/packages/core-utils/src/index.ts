@@ -68,6 +68,7 @@ export * from './schemaValidationError';
 export * from './setByPath';
 export * from './svgToDataUri';
 export * from './TempMap';
+export * from './textToHex';
 export * from './uriToBlob';
 export * from './utf8ToBase64';
 export * from './createLastPromiseGetter';

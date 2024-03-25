@@ -6,29 +6,24 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import styled from 'reshadow';
 
-import { ColoredContainer, Container, useStyles } from '@cloudbeaver/core-blocks';
-import type { ComponentStyle } from '@cloudbeaver/core-theming';
-import { BASE_TAB_STYLES, TabPanel } from '@cloudbeaver/core-ui';
+import { ColoredContainer, Container } from '@cloudbeaver/core-blocks';
+import { TabPanel } from '@cloudbeaver/core-ui';
 
 import { ChangePassword } from './ChangePassword/ChangePassword';
 
 interface Props {
   className?: string;
-  style?: ComponentStyle;
 }
 
-export const AuthenticationPanel = observer<Props>(function AuthenticationPanel({ className, style }) {
-  const styles = useStyles(BASE_TAB_STYLES, style);
-
-  return styled(styles)(
+export const AuthenticationPanel = observer<Props>(function AuthenticationPanel({ className }) {
+  return (
     <TabPanel tabId="authentication" className={className}>
       <ColoredContainer wrap overflow parent gap>
         <Container medium gap>
           <ChangePassword />
         </Container>
       </ColoredContainer>
-    </TabPanel>,
+    </TabPanel>
   );
 });

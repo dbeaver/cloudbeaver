@@ -6,16 +6,16 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import styled from 'reshadow';
 
 import { AUTH_PROVIDER_LOCAL_ID } from '@cloudbeaver/core-authentication';
-import { PlaceholderComponent, StaticImage } from '@cloudbeaver/core-blocks';
+import { PlaceholderComponent, s, StaticImage, useS } from '@cloudbeaver/core-blocks';
 
 import type { IConnectionDetailsPlaceholderProps } from '../../ConnectionsAdministrationService';
-import { CONNECTION_DETAILS_STYLES } from './ConnectionDetailsStyles';
+import ConnectionDetailsStyles from './ConnectionDetailsStyles.m.css';
 
 export const Origin: PlaceholderComponent<IConnectionDetailsPlaceholderProps> = observer(function Origin({ connection }) {
   const isLocal = connection.origin?.type === AUTH_PROVIDER_LOCAL_ID;
+  const style = useS(ConnectionDetailsStyles);
 
   if (!connection.origin || isLocal) {
     return null;
@@ -24,5 +24,5 @@ export const Origin: PlaceholderComponent<IConnectionDetailsPlaceholderProps> = 
   const icon = connection.origin.icon;
   const title = connection.origin.displayName;
 
-  return styled(CONNECTION_DETAILS_STYLES)(<StaticImage icon={icon} title={title} />);
+  return <StaticImage className={s(style, { staticImage: true })} icon={icon} title={title} />;
 });

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: #fff;
+        stroke-width: 0px;
+      }
+    </style>
+  </defs>
+  <path class="cls-1" d="M9.6,14.5H3v-4.91l3.15-1.05c.29-.1.62-.02.84.2l.57.57c.18.18.26.42.24.67-.03.25-.17.47-.38.61l-.68.43,3.98.37h0c.28,0,.57.19.7.49.12.28.08.6-.1.84l-.7,1.19c-.22.36-.61.59-1.04.59ZM4,13.5h5.6c.07,0,.14-.04.17-.1l.61-1.03-3.93-.37c-.18,0-.84,0-1.05-.5-.13-.32-.02-.65.33-1l.09-.07.88-.56-.34-.34-2.36.79v3.19ZM10.66,12.39s.02,0,.03,0h-.03ZM6.47,9.49h0,0Z"/>
+  <polygon class="cls-1" points="12 1 5 1 5 2 8 2 8 8 9 8 9 2 12 2 12 1"/>
+  <rect class="cls-1" x="12" y="3" width="1" height="1"/>
+  <rect class="cls-1" x="14" y="3" width="1" height="1"/>
+  <rect class="cls-1" x="10" y="3" width="1" height="1"/>
+  <rect class="cls-1" x="10" y="5" width="1" height="1"/>
+  <rect class="cls-1" x="10" y="7" width="1" height="1"/>
+  <rect class="cls-1" x="10" y="9" width="1" height="1"/>
+  <path class="cls-1" d="M2.99,15h-.97c-.56,0-1.01-.45-1.01-1.01v-4.02c0-.56.45-1.01,1.01-1.01h.97c.56,0,1.01.45,1.01,1.01v4.02c0,.56-.45,1.01-1.01,1.01ZM2.01,9.95v4.03s.97.01.97.01c0,0,.01,0,.01-.01v-4.02h-.99Z"/>
+</svg>

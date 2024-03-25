@@ -7,24 +7,16 @@
  */
 import { observer } from 'mobx-react-lite';
 import React from 'react';
-import styled, { css } from 'reshadow';
 
 import { importLazyComponent } from '@cloudbeaver/core-blocks';
 
 import type { ISqlEditorTabState } from '../ISqlEditorTabState';
+import classes from './SqlResultPanel.m.css';
 
 const SqlExecutionPlanPanel = importLazyComponent(() => import('./ExecutionPlan/SqlExecutionPlanPanel').then(module => module.SqlExecutionPlanPanel));
 const OutputLogsPanel = importLazyComponent(() => import('./OutputLogs/OutputLogsPanel').then(module => module.OutputLogsPanel));
 const SqlResultSetPanel = importLazyComponent(() => import('./SqlResultSetPanel').then(module => module.SqlResultSetPanel));
 const SqlScriptStatisticsPanel = importLazyComponent(() => import('./SqlScriptStatisticsPanel').then(module => module.SqlScriptStatisticsPanel));
-
-const style = css`
-  result-panel {
-    display: flex;
-    flex: 1;
-    overflow: auto;
-  }
-`;
 
 interface Props {
   state: ISqlEditorTabState;
@@ -35,38 +27,38 @@ export const SqlResultPanel = observer<Props>(function SqlResultPanel({ state, i
   const resultTab = state.resultTabs.find(tab => tab.tabId === id);
 
   if (resultTab) {
-    return styled(style)(
-      <result-panel>
+    return (
+      <div className={classes.resultPanel}>
         <SqlResultSetPanel resultTab={resultTab} state={state} />
-      </result-panel>,
+      </div>
     );
   }
 
   const executionPlanTab = state.executionPlanTabs.find(tab => tab.tabId === id);
 
   if (executionPlanTab) {
-    return styled(style)(
-      <result-panel>
+    return (
+      <div className={classes.resultPanel}>
         <SqlExecutionPlanPanel executionPlanTab={executionPlanTab} />
-      </result-panel>,
+      </div>
     );
   }
 
   const statisticsTab = state.statisticsTabs.find(tab => tab.tabId === id);
 
   if (statisticsTab) {
-    return styled(style)(
-      <result-panel>
+    return (
+      <div className={classes.resultPanel}>
         <SqlScriptStatisticsPanel tab={statisticsTab} />
-      </result-panel>,
+      </div>
     );
   }
 
   if (state.outputLogsTab) {
-    return styled(style)(
-      <result-panel>
+    return (
+      <div className={classes.resultPanel}>
         <OutputLogsPanel sqlEditorTabState={state} />
-      </result-panel>,
+      </div>
     );
   }
 
