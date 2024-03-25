@@ -81,7 +81,7 @@ export const DEFAULT_NAVIGATOR_VIEW_SETTINGS: NavigatorSettingsInput = {
 @injectable()
 export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoParams, Connection, ConnectionInfoIncludes> {
   readonly onConnectionCreate: ISyncExecutor<Connection>;
-  readonly onConnectionClose: ISyncExecutor<Connection>;
+  readonly onConnectionClose: ISyncExecutor<IConnectionInfoParams>;
 
   private sessionUpdate: boolean;
   private readonly nodeIdMap: Map<string, IConnectionInfoParams>;
@@ -451,7 +451,7 @@ export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoPar
     });
 
     const connection = this.get(key)!;
-    this.onConnectionClose.execute(connection);
+    this.onConnectionClose.execute(key);
     return connection;
   }
 
