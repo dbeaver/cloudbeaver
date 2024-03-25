@@ -21,7 +21,7 @@
   "scripts": {
     "prebuild": "lerna run gql:gen --stream --parallel",
     "pretest": "lerna run gql:gen --stream --parallel && yarn lerna run test --scope @cloudbeaver/tests-runner",
-    "prepare": "cd .. && husky install webapp/.husky"
+    "prepare": "cd .. && husky ./webapp/.husky"
   },
   "devDependencies": {
     "@testing-library/dom": "^9.3.4",
