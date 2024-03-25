@@ -642,6 +642,8 @@ public abstract class CBApplication extends BaseWebApplication implements WebAut
         mergeOldConfiguration(prevConfig);
 
         patchConfigurationWithProperties(productConfiguration);
+
+        configurationMode = CommonUtils.isEmpty(serverName);
     }
 
     private String readRootUri(Map<String, Object> serverConfig) {
@@ -898,8 +900,6 @@ public abstract class CBApplication extends BaseWebApplication implements WebAut
         } catch (Exception e) {
             throw new DBException("Error parsing configuration", e);
         }
-
-        configurationMode = CommonUtils.isEmpty(serverName);
 
         // Reloading configuration by services
         for (DBWServiceServerConfigurator wsc : WebServiceRegistry.getInstance()
