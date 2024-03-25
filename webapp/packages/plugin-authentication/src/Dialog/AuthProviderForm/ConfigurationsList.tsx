@@ -128,17 +128,19 @@ export const ConfigurationsList = observer<Props>(function ConfigurationsList({
   }
 
   return (
-    <Container className={className} center>
+    <Container className={className} noWrap vertical>
       {configurations.length >= 10 && (
-        <Filter
-          className={s(style, { filter: true })}
-          placeholder={translate('authentication_identity_provider_search_placeholder')}
-          value={search}
-          max
-          onChange={setSearch}
-        />
+        <Container keepSize>
+          <Filter
+            className={s(style, { filter: true })}
+            placeholder={translate('authentication_identity_provider_search_placeholder')}
+            value={search}
+            max
+            onChange={setSearch}
+          />
+        </Container>
       )}
-      <div className={s(style, { list: true })}>
+      <Container overflow>
         {filteredConfigurations.map(({ provider, configuration }) => {
           const icon = configuration.iconURL || provider.icon;
           const title = `${configuration.displayName}\n${configuration.description || ''}`;
@@ -154,7 +156,7 @@ export const ConfigurationsList = observer<Props>(function ConfigurationsList({
             </Link>
           );
         })}
-      </div>
+      </Container>
       <Loader state={authTaskState} message="authentication_authorizing" overlay hideException />
     </Container>
   );
