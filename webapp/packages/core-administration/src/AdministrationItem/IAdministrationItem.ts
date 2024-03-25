@@ -5,8 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import type { ComponentStyle } from '@cloudbeaver/core-theming';
-
 import type { IRouteParams } from './IRouteParams';
 
 export enum AdministrationItemType {
@@ -24,7 +22,6 @@ export interface AdministrationItemDrawerProps {
   item: IAdministrationItem;
   configurationWizard: boolean;
   onSelect: (id: string) => void;
-  style: ComponentStyle;
   disabled?: boolean;
 }
 export type AdministrationItemDrawerComponent = React.FunctionComponent<AdministrationItemDrawerProps>;

@@ -7,7 +7,6 @@
  */
 import { makeObservable, observable } from 'mobx';
 
-import type { ComponentStyle } from '@cloudbeaver/core-theming';
 import type { ITab } from '@cloudbeaver/plugin-navigation-tabs';
 
 import type { IObjectViewerTabState } from '../IObjectViewerTabState';
@@ -16,7 +15,6 @@ export interface ObjectPageTabProps<T = unknown> {
   tab: ITab<IObjectViewerTabState>;
   page: ObjectPage<T>;
   onSelect: () => void;
-  style: ComponentStyle;
 }
 export type ObjectPageTabComponent<T = unknown> = React.FunctionComponent<ObjectPageTabProps<T>>;
 

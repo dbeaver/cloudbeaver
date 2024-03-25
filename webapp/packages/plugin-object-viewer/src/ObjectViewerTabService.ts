@@ -10,12 +10,15 @@ import { action, makeObservable, runInAction } from 'mobx';
 import { importLazyComponent } from '@cloudbeaver/core-blocks';
 import {
   Connection,
+  ConnectionExecutionContextResource,
   ConnectionInfoActiveProjectKey,
   ConnectionInfoResource,
   ConnectionNavNodeService,
   connectionProvider,
   createConnectionParam,
+  executionContextProvider,
   IConnectionInfoParams,
+  isConnectionInfoParamEqual,
   objectCatalogProvider,
   objectSchemaProvider,
 } from '@cloudbeaver/core-connections';
@@ -40,7 +43,7 @@ import { DBObjectPageService } from './ObjectPage/DBObjectPageService';
 import type { ObjectPage } from './ObjectPage/ObjectPage';
 import { objectViewerTabHandlerKey } from './objectViewerTabHandlerKey';
 
-const ObjectViewerPanel = importLazyComponent(() => import('./ObjectViewerPanel').then(m => m.ObjectViewerPanel));
+const ObjectViewerPanel = importLazyComponent(() => import('./ObjectViewerPanel/ObjectViewerPanel').then(m => m.ObjectViewerPanel));
 const ObjectViewerTab = importLazyComponent(() => import('./ObjectViewerTab').then(m => m.ObjectViewerTab));
 
 @injectable()
@@ -55,6 +58,7 @@ export class ObjectViewerTabService {
     private readonly connectionInfoResource: ConnectionInfoResource,
     private readonly connectionNavNodeService: ConnectionNavNodeService,
     private readonly navTreeResource: NavTreeResource,
+    private readonly connectionExecutionContextResource: ConnectionExecutionContextResource,
   ) {
     this.tabHandler = this.navigationTabsService.registerTabHandler<IObjectViewerTabState>({
       key: objectViewerTabHandlerKey,
@@ -71,6 +75,7 @@ export class ObjectViewerTabService {
         connectionProvider(this.getConnection.bind(this)),
         objectCatalogProvider(this.getDBObjectCatalog.bind(this)),
         objectSchemaProvider(this.getDBObjectSchema.bind(this)),
+        executionContextProvider(this.getExecutionContext.bind(this)),
       ],
     });
 
@@ -84,8 +89,8 @@ export class ObjectViewerTabService {
     this.navNodeManagerService.onCanOpen.addHandler(this.canOpenHandler.bind(this));
     this.navNodeManagerService.navigator.addHandler(this.navigationHandler.bind(this));
     this.navNodeManagerService.navigator.addPostHandler(this.navigationPostHandler.bind(this));
-    this.connectionInfoResource.onConnectionClose.addHandler(this.closeConnectionInfoTabs.bind(this));
     this.connectionInfoResource.onItemUpdate.addHandler(this.updateConnectionTabs.bind(this));
+    this.connectionInfoResource.onConnectionClose.addHandler(this.closeConnectionTabs.bind(this));
     this.connectionInfoResource.onItemDelete.addHandler(this.closeConnectionTabs.bind(this));
     this.navNodeManagerService.navTree.onItemDelete.addHandler(this.removeTabs.bind(this));
     this.navTreeResource.onNodeRename.addHandler(this.handleNodeRename.bind(this));
@@ -249,21 +254,6 @@ export class ObjectViewerTabService {
     });
   }
 
-  private closeConnectionInfoTabs(connection: Connection) {
-    if (!connection.connected) {
-      const tabs = Array.from(
-        this.navigationTabsService.findTabs(
-          isObjectViewerTab(
-            tab =>
-              tab.handlerState.connectionKey?.projectId === connection.projectId && tab.handlerState.connectionKey.connectionId === connection.id,
-          ),
-        ),
-      ).map(tab => tab.id);
-
-      this.navigationTabsService.closeTabSilent(resourceKeyList(tabs), true);
-    }
-  }
-
   private async removeTabs(key: ResourceKey<string>) {
     const tabs: string[] = [];
 
@@ -327,6 +317,16 @@ export class ObjectViewerTabService {
       return;
     }
     return nodeInfo.schemaId;
+  }
+
+  private getExecutionContext(context: ITab<IObjectViewerTabState>) {
+    const connectionKey = context.handlerState.connectionKey;
+
+    if (!connectionKey) {
+      return;
+    }
+
+    return this.connectionExecutionContextResource.values.find(connection => isConnectionInfoParamEqual(connection, connectionKey));
   }
 
   private selectObjectTab(tab: ITab<IObjectViewerTabState>) {

@@ -6,16 +6,16 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import styled from 'reshadow';
 
-import { PlaceholderComponent, StaticImage, useResource, useTranslate } from '@cloudbeaver/core-blocks';
+import { PlaceholderComponent, s, StaticImage, useResource, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import { NetworkHandlerResource, SSH_TUNNEL_ID } from '@cloudbeaver/core-connections';
 
 import type { IConnectionDetailsPlaceholderProps } from '../../ConnectionsAdministrationService';
-import { CONNECTION_DETAILS_STYLES } from './ConnectionDetailsStyles';
+import ConnectionDetailsStyles from './ConnectionDetailsStyles.m.css';
 
 export const SSH: PlaceholderComponent<IConnectionDetailsPlaceholderProps> = observer(function SSH({ connection }) {
   const translate = useTranslate();
+  const style = useS(ConnectionDetailsStyles);
   const sshConfig = connection.networkHandlersConfig?.find(state => state.id === SSH_TUNNEL_ID);
   const applicable = sshConfig?.enabled === true;
   const handler = useResource(SSH, NetworkHandlerResource, SSH_TUNNEL_ID, { active: applicable });
@@ -24,7 +24,11 @@ export const SSH: PlaceholderComponent<IConnectionDetailsPlaceholderProps> = obs
     return null;
   }
 
-  return styled(CONNECTION_DETAILS_STYLES)(
-    <StaticImage icon="/icons/ssh_tunnel.svg" title={translate(handler.data?.label || 'connections_network_handler_ssh_tunnel_title')} />,
+  return (
+    <StaticImage
+      className={s(style, { staticImage: true })}
+      icon="/icons/ssh_tunnel.svg"
+      title={translate(handler.data?.label || 'connections_network_handler_ssh_tunnel_title')}
+    />
   );
 });

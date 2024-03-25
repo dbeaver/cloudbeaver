@@ -7,12 +7,10 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import type { TabElementProps } from '@cloudbeaver/core-ui';
-
 import { useTab } from './useTab';
 import { useTabHandler } from './useTabHandler';
 
-export const TabHandlerPanel = observer<TabElementProps>(function TabHandlerPanel({ tabId }) {
+export const TabHandlerPanel = observer<{ tabId: string }>(function TabHandlerPanel({ tabId }) {
   const tab = useTab(tabId);
   const handler = useTabHandler(tab.handlerId);
 
