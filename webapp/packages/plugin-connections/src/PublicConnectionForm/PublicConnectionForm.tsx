@@ -7,28 +7,23 @@
  */
 import { observer } from 'mobx-react-lite';
 import { useCallback } from 'react';
-import styled, { css } from 'reshadow';
 
-import { Loader } from '@cloudbeaver/core-blocks';
+import { Loader, s, useS } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 
 import { ConnectionFormLoader } from '../ConnectionForm/ConnectionFormLoader';
+import styles from './PublicConnectionForm.m.css';
 import { PublicConnectionFormService } from './PublicConnectionFormService';
-
-const styles = css`
-  Loader {
-    height: 100%;
-  }
-`;
 
 export const PublicConnectionForm: React.FC = observer(function PublicConnectionForm() {
   const service = useService(PublicConnectionFormService);
+  const style = useS(styles);
 
   const close = useCallback(() => service.close(true), []);
   const save = useCallback(() => service.save(), []);
 
-  return styled(styles)(
-    <Loader loading={service.formState === null}>
+  return (
+    <Loader className={s(style, { loader: true })} loading={service.formState === null}>
       {() =>
         service.formState && (
           <ConnectionFormLoader
@@ -39,6 +34,6 @@ export const PublicConnectionForm: React.FC = observer(function PublicConnection
           />
         )
       }
-    </Loader>,
+    </Loader>
   );
 });

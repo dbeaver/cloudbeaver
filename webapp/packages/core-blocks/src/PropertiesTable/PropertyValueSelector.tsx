@@ -8,9 +8,8 @@
 import { observer } from 'mobx-react-lite';
 import { useCallback, useEffect, useRef } from 'react';
 import { Menu, MenuButton, MenuItem, useMenuState } from 'reakit/Menu';
-import styled from 'reshadow';
 
-import { BASE_DROPDOWN_STYLES } from '../FormControls/BASE_DROPDOWN_STYLES';
+import { BaseDropdownStyles } from '..';
 import { s } from '../s';
 import { useS } from '../useS';
 import classes from './PropertyValueSelector.m.css';
@@ -33,7 +32,7 @@ export const PropertyValueSelector = observer<React.PropsWithChildren<Props>>(fu
   onSelect,
   onSwitch,
 }) {
-  const styles = useS(classes);
+  const styles = useS(classes, BaseDropdownStyles);
   const menuRef = useRef<HTMLDivElement>(null);
   const menu = useMenuState({
     placement: 'bottom-end',
@@ -70,19 +69,19 @@ export const PropertyValueSelector = observer<React.PropsWithChildren<Props>>(fu
 
   const visible = menu.visible;
 
-  return styled(BASE_DROPDOWN_STYLES)(
+  return (
     <>
       <MenuButton {...menu} className={s(styles, { menuButton: true }, className)} visible={visible}>
         {children}
       </MenuButton>
-      <Menu {...menu} ref={menuRef} visible={visible} aria-label={propertyName} modal>
+      <Menu className={s(styles, { menu: true })} {...menu} ref={menuRef} visible={visible} aria-label={propertyName} modal>
         {visible &&
           values.map(value => (
-            <MenuItem key={value} id={value} type="button" {...menu} onClick={handleMenuSelect}>
+            <MenuItem key={value} className={s(styles, { menuItem: true })} id={value} type="button" {...menu} onClick={handleMenuSelect}>
               {value}
             </MenuItem>
           ))}
       </Menu>
-    </>,
+    </>
   );
 });
