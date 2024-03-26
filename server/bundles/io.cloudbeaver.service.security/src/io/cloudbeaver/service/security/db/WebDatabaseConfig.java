@@ -22,7 +22,7 @@ import org.jkiss.dbeaver.registry.storage.InternalDatabaseConfig;
 /**
  * Database configuration
  */
-public class CBDatabaseConfig implements InternalDatabaseConfig {
+public class WebDatabaseConfig implements InternalDatabaseConfig {
     private String driver;
     private String url;
     private String user;
