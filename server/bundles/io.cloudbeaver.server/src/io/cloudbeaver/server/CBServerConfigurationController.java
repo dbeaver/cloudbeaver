@@ -33,6 +33,7 @@ import org.jkiss.dbeaver.model.data.json.JSONUtils;
 import org.jkiss.dbeaver.model.navigator.DBNBrowseSettings;
 import org.jkiss.dbeaver.model.security.SMAuthProviderCustomConfiguration;
 import org.jkiss.dbeaver.registry.DataSourceNavigatorSettings;
+import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.dbeaver.runtime.IVariableResolver;
 import org.jkiss.dbeaver.utils.ContentUtils;
 import org.jkiss.dbeaver.utils.PrefUtils;
@@ -92,7 +93,7 @@ public abstract class CBServerConfigurationController<T extends CBServerConfig> 
         }
 
         // Set default preferences
-        PrefUtils.setDefaultPreferenceValue(ModelPreferences.getPreferences(),
+        PrefUtils.setDefaultPreferenceValue(DBWorkbench.getPlatform().getPreferenceStore(),
             ModelPreferences.UI_DRIVERS_HOME,
             getServerConfiguration().getDriversLocation());
     }
