@@ -110,7 +110,7 @@ export const ConfigurationsList = observer<Props>(function ConfigurationsList({
     return (
       <Container className={className} center>
         <Loader state={authTaskState} message="authentication_authorizing" hideException>
-          <div className={s(style, { center: true })}>
+          <Container keepSize center>
             {providerDisabled ? (
               <TextPlaceholder>
                 {translate('plugin_authentication_authentication_method_disabled')}
@@ -121,7 +121,7 @@ export const ConfigurationsList = observer<Props>(function ConfigurationsList({
                 <Translate token="authentication_login" />
               </Button>
             )}
-          </div>
+          </Container>
         </Loader>
       </Container>
     );
