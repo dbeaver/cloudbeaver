@@ -212,7 +212,7 @@ public abstract class CBServerConfigurationController<T extends CBServerConfig>
         throws DBException {
         // legacy configuration with path to product.conf file
         if (!serverConfig.containsKey(CBConstants.PARAM_PRODUCT_SETTINGS)
-            && serverConfig.get(CBConstants.PARAM_PRODUCT_SETTINGS) instanceof String
+            && serverConfig.get(CBConstants.PARAM_PRODUCT_CONFIGURATION) instanceof String
         ) {
             String productConfigPath = WebAppUtils.getRelativePath(
                 JSONUtils.getString(
