@@ -123,6 +123,9 @@ public abstract class CBServerConfigurationController<T extends CBServerConfig>
         patchConfigurationWithProperties(configProps); // patch again because properties can be changed
 
         Gson gson = getGson();
+        Map<String, Object> currentConfigurationAsMap = gson.fromJson(gson.toJson(getServerConfiguration()),
+            JSONUtils.MAP_TYPE_TOKEN);
+        serverConfig = WebAppUtils.mergeConfigurations(currentConfigurationAsMap, serverConfig);
         gson.fromJson(
             gson.toJsonTree(serverConfig),
             getServerConfiguration().getClass()
@@ -230,7 +233,8 @@ public abstract class CBServerConfigurationController<T extends CBServerConfig>
                     log.debug("Load product configuration from '" + productConfigFile.getAbsolutePath() + "'");
                     try (Reader reader = new InputStreamReader(new FileInputStream(productConfigFile),
                         StandardCharsets.UTF_8)) {
-                        serverConfiguration.getProductSettings().putAll(JSONUtils.parseMap(gson, reader));
+                        serverConfiguration.getProductSettings()
+                            .putAll(WebAppUtils.flattenMap(JSONUtils.parseMap(gson, reader)));
                     } catch (Exception e) {
                         throw new DBException("Error reading product configuration", e);
                     }
