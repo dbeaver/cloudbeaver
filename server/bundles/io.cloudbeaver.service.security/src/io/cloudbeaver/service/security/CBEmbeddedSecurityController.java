@@ -254,16 +254,12 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
     public SMTeam[] getUserTeams(String userId) throws DBException {
         Map<String, SMTeam> teams = new LinkedHashMap<>();
         try (Connection dbCon = database.openConnection()) {
-            String defaultUserTeam = application.getAppConfiguration().getDefaultUserTeam();
             try (PreparedStatement dbStat = dbCon.prepareStatement(database.normalizeTableNames(
                 "SELECT R.*,S.IS_SECRET_STORAGE FROM {table_prefix}CB_USER_TEAM UR, {table_prefix}CB_TEAM R, " +
                     "{table_prefix}CB_AUTH_SUBJECT S " +
-                    "WHERE UR.USER_ID=? AND UR.TEAM_ID IN (R.TEAM_ID,?) " +
-                        "AND S.SUBJECT_ID IN (R.TEAM_ID,?)"))
+                        "WHERE UR.USER_ID=? AND UR.TEAM_ID=R.TEAM_ID AND S.SUBJECT_ID=R.TEAM_ID"))
             ) {
                 dbStat.setString(1, userId);
-                dbStat.setString(2, defaultUserTeam);
-                dbStat.setString(3, defaultUserTeam);
                 try (ResultSet dbResult = dbStat.executeQuery()) {
                     while (dbResult.next()) {
                         var team = fetchTeam(dbResult);
@@ -1214,15 +1210,13 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
     public Set<String> getUserPermissions(String userId) throws DBException {
         try (Connection dbCon = database.openConnection()) {
             Set<String> permissions = new HashSet<>();
-            String defaultUserTeam = application.getAppConfiguration().getDefaultUserTeam();
             try (PreparedStatement dbStat = dbCon.prepareStatement(
                 database.normalizeTableNames(
                     "SELECT DISTINCT AP.PERMISSION_ID FROM {table_prefix}CB_AUTH_PERMISSIONS AP, {table_prefix}CB_USER_TEAM UR\n" +
-                        "WHERE UR.TEAM_ID IN (AP.SUBJECT_ID,?) AND UR.USER_ID=?"
+                        "WHERE UR.TEAM_ID = AP.SUBJECT_ID AND UR.USER_ID=?"
                 )
             )) {
-                dbStat.setString(1, defaultUserTeam);
-                dbStat.setString(2, userId);
+                dbStat.setString(1, userId);
                 try (ResultSet dbResult = dbStat.executeQuery()) {
                     while (dbResult.next()) {
                         permissions.add(dbResult.getString(1));
