@@ -85,9 +85,7 @@ public class WebSQLCompletionContext implements SQLCompletionContext {
 
     @Override
     public boolean isUseShortNames() {
-        return CBPlatform.getInstance()
-            .getPreferenceStore()
-            .getBoolean(SQLModelPreferences.SQL_EDITOR_PROPOSAL_SHORT_NAME);
+        return false;
     }
 
     @Override
