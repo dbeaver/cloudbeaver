@@ -9,7 +9,7 @@ echo "Starting Cloudbeaver Server"
   && [ ! -f "workspace/GlobalConfiguration/.dbeaver/data-sources.json" ] \
   && cp conf/initial-data-sources.conf workspace/GlobalConfiguration/.dbeaver/data-sources.json
 
-java ${JAVA_OPTS} \
+exec java ${JAVA_OPTS} \
   -Dfile.encoding=UTF-8 \
   --add-modules=ALL-SYSTEM \
   --add-opens=java.base/java.io=ALL-UNNAMED \
