@@ -22,7 +22,12 @@ You can see live demo of CloudBeaver here: https://demo.cloudbeaver.io
 
 ## Changelog
 
-
+### 24.0.1. 2024-03-25
+- Added support for two modes for committing changes to the database:
+  - Auto-commit transfers all changes that you make immediately to the database;
+  - Manual commit requires your confirmation before committing a change to the database or rolling it back.
+- Different bug fixes and enhancements have been made.
+  
 ### 24.0.0. 2024-03-04
   - Changes since 23.3.0:
 
