@@ -254,12 +254,15 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
     public SMTeam[] getUserTeams(String userId) throws DBException {
         Map<String, SMTeam> teams = new LinkedHashMap<>();
         try (Connection dbCon = database.openConnection()) {
+            String defaultUserTeam = application.getAppConfiguration().getDefaultUserTeam();
             try (PreparedStatement dbStat = dbCon.prepareStatement(database.normalizeTableNames(
                 "SELECT R.*,S.IS_SECRET_STORAGE FROM {table_prefix}CB_USER_TEAM UR, {table_prefix}CB_TEAM R, " +
                     "{table_prefix}CB_AUTH_SUBJECT S " +
-                        "WHERE UR.USER_ID=? AND UR.TEAM_ID=R.TEAM_ID AND S.SUBJECT_ID=R.TEAM_ID"))
+                        "WHERE UR.USER_ID=? AND UR.TEAM_ID = R.TEAM_ID " +
+                        "AND S.SUBJECT_ID IN (R.TEAM_ID,?)"))
             ) {
                 dbStat.setString(1, userId);
+                dbStat.setString(2, defaultUserTeam);
                 try (ResultSet dbResult = dbStat.executeQuery()) {
                     while (dbResult.next()) {
                         var team = fetchTeam(dbResult);
