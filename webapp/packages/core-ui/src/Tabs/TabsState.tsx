@@ -36,6 +36,7 @@ type Props<T = Record<string, any>> = ExtractContainerProps<T> &
     canClose?: (tab: ITabData<T>) => boolean;
     onChange?: (tab: ITabData<T>) => void;
     onClose?: (tab: ITabData<T>) => void;
+    onCloseTabGroup?: (tab: ITabData<T>) => void;
   }>;
 
 export const TabsState = observer(function TabsState<T = Record<string, any>>({
@@ -53,6 +54,7 @@ export const TabsState = observer(function TabsState<T = Record<string, any>>({
   onChange: onOpen,
   onClose,
   canClose,
+  onCloseTabGroup,
   ...rest
 }: Props<T>): React.ReactElement | null {
   const context = useDataContext();
@@ -86,6 +88,7 @@ export const TabsState = observer(function TabsState<T = Record<string, any>>({
       canClose,
       open: onOpen,
       close: onClose,
+      onCloseTabGroup,
       props,
       tabsState,
       container,
@@ -186,6 +189,12 @@ export const TabsState = observer(function TabsState<T = Record<string, any>>({
           props: dynamic.props,
         });
       },
+      async closeTabGroup(tabId: string) {
+        dynamic.onCloseTabGroup?.({
+          tabId,
+          props: dynamic.props,
+        });
+      },
       async closeAll() {
         if (dynamic.tabList) {
           for (const tab of dynamic.tabList.slice()) {
@@ -236,6 +245,7 @@ export const TabsState = observer(function TabsState<T = Record<string, any>>({
       closeAll: action.bound,
       closeAllToTheDirection: action.bound,
       closeOthers: action.bound,
+      closeTabGroup: action.bound,
     },
     {
       state,

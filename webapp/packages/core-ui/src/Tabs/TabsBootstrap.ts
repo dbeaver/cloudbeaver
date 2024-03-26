@@ -12,6 +12,7 @@ import { ACTION_TAB_CLOSE } from './Actions/ACTION_TAB_CLOSE';
 import { ACTION_TAB_CLOSE_ALL } from './Actions/ACTION_TAB_CLOSE_ALL';
 import { ACTION_TAB_CLOSE_ALL_TO_THE_LEFT } from './Actions/ACTION_TAB_CLOSE_ALL_TO_THE_LEFT';
 import { ACTION_TAB_CLOSE_ALL_TO_THE_RIGHT } from './Actions/ACTION_TAB_CLOSE_ALL_TO_THE_RIGHT';
+import { ACTION_TAB_CLOSE_GROUP } from './Actions/ACTION_TAB_CLOSE_GROUP';
 import { ACTION_TAB_CLOSE_OTHERS } from './Actions/ACTION_TAB_CLOSE_OTHERS';
 import { DATA_CONTEXT_TAB_ID } from './Tab/DATA_CONTEXT_TAB_ID';
 import { DATA_CONTEXT_TABS_CONTEXT } from './Tab/DATA_CONTEXT_TABS_CONTEXT';
@@ -19,7 +20,10 @@ import { MENU_TAB } from './Tab/MENU_TAB';
 
 @injectable()
 export class TabsBootstrap extends Bootstrap {
-  constructor(private readonly actionService: ActionService, private readonly menuService: MenuService) {
+  constructor(
+    private readonly actionService: ActionService,
+    private readonly menuService: MenuService,
+  ) {
     super();
   }
 
@@ -53,6 +57,10 @@ export class TabsBootstrap extends Bootstrap {
           return index < state.tabList.length - 1;
         }
 
+        if (action === ACTION_TAB_CLOSE_GROUP) {
+          return state.closeTabGroup !== undefined && state.tabList.length > 1;
+        }
+
         return [ACTION_TAB_CLOSE].includes(action);
       },
       handler: async (context, action) => {
@@ -75,6 +83,9 @@ export class TabsBootstrap extends Bootstrap {
           case ACTION_TAB_CLOSE_ALL_TO_THE_RIGHT:
             state.closeAllToTheDirection(tab, 'right');
             break;
+          case ACTION_TAB_CLOSE_GROUP:
+            state.closeTabGroup?.(tab);
+            break;
           default:
             break;
         }
@@ -91,6 +102,7 @@ export class TabsBootstrap extends Bootstrap {
         ...items,
         ACTION_TAB_CLOSE,
         ACTION_TAB_CLOSE_ALL,
+        ACTION_TAB_CLOSE_GROUP,
         ACTION_TAB_CLOSE_OTHERS,
         ACTION_TAB_CLOSE_ALL_TO_THE_LEFT,
         ACTION_TAB_CLOSE_ALL_TO_THE_RIGHT,
@@ -99,6 +111,7 @@ export class TabsBootstrap extends Bootstrap {
         const actions = menuExtractItems(items, [
           ACTION_TAB_CLOSE,
           ACTION_TAB_CLOSE_ALL,
+          ACTION_TAB_CLOSE_GROUP,
           ACTION_TAB_CLOSE_OTHERS,
           ACTION_TAB_CLOSE_ALL_TO_THE_LEFT,
           ACTION_TAB_CLOSE_ALL_TO_THE_RIGHT,
