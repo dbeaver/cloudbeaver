@@ -105,16 +105,16 @@ export class LogViewerSettingsService extends Dependency {
       //   name: 'Max failed requests',
       //   description: 'Max failed requests',
       // },
-      {
-        key: 'plugin.log-viewer.disabled',
-        access: {
-          scope: ['server', 'client'],
-        },
-        group: LOG_VIEWER_SETTINGS_GROUP,
-        type: ESettingsValueType.Checkbox,
-        name: 'Disable log viewer',
-        description: 'Disable log viewer',
-      },
+      // {
+      //   key: 'plugin.log-viewer.disabled',
+      //   access: {
+      //     scope: ['server', 'client'],
+      //   },
+      //   group: LOG_VIEWER_SETTINGS_GROUP,
+      //   type: ESettingsValueType.Checkbox,
+      //   name: 'Disable log viewer',
+      //   description: 'Disable log viewer',
+      // },
     ]);
   }
 }
