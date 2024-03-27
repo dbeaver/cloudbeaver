@@ -46,7 +46,7 @@ export const DataImportFileUploader = observer<Props>(function DataImportFileUpl
     <Group className={s(style, { group: true })} box overflow>
       <Table className={s(style, { table: true })} keys={keys} selectedItems={table.selected}>
         <TableHeader fixed>
-          <TableColumnHeader heightBig>{translate('administration_libraries_name_label')}</TableColumnHeader>
+          <TableColumnHeader heightBig>{translate('ui_name')}</TableColumnHeader>
           <TableColumnHeader heightBig flex>
             <Container zeroBasis />
             <InputFiles
