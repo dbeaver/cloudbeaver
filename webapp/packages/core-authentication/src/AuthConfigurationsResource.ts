@@ -30,7 +30,10 @@ type NewConfiguration = AuthConfiguration & { [NEW_CONFIGURATION_SYMBOL]: boolea
 
 @injectable()
 export class AuthConfigurationsResource extends CachedMapResource<string, AuthConfiguration, GetAuthProviderConfigurationsQueryVariables> {
-  constructor(private readonly graphQLService: GraphQLService, permissionsResource: SessionPermissionsResource) {
+  constructor(
+    private readonly graphQLService: GraphQLService,
+    permissionsResource: SessionPermissionsResource,
+  ) {
     super(() => new Map(), []);
 
     permissionsResource.require(this, EAdminPermission.admin).outdateResource(this);
@@ -51,6 +54,7 @@ export class AuthConfigurationsResource extends CachedMapResource<string, AuthCo
       }
 
       this.set(configuration.id, configuration);
+      this.onDataOutdated.execute(configuration.id);
     });
 
     return this.get(config.id)!;

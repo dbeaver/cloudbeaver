@@ -125,13 +125,13 @@ public class WebSession extends BaseWebSession
     private final Map<String, DBWSessionHandler> sessionHandlers;
 
     public WebSession(
-        @NotNull HttpSession httpSession,
+        @NotNull HttpServletRequest request,
         @NotNull WebAuthApplication application,
         @NotNull Map<String, DBWSessionHandler> sessionHandlers
     ) throws DBException {
-        super(httpSession.getId(), application);
+        super(request.getSession().getId(), application);
         this.lastAccessTime = this.createTime;
-        setLocale(CommonUtils.toString(httpSession.getAttribute(ATTR_LOCALE), this.locale));
+        setLocale(CommonUtils.toString(request.getSession().getAttribute(ATTR_LOCALE), this.locale));
         this.sessionHandlers = sessionHandlers;
         //force authorization of anonymous session to avoid access error,
         //because before authorization could be called by any request,
@@ -139,6 +139,7 @@ public class WebSession extends BaseWebSession
         //and the order of requests is not guaranteed.
         //look at CB-4747
         refreshSessionAuth();
+        updateSessionParameters(request);
     }
 
     @Nullable
@@ -525,17 +526,10 @@ public class WebSession extends BaseWebSession
         }
     }
 
-    public synchronized void updateInfo(
-        HttpServletRequest request,
-        HttpServletResponse response
-    ) throws DBWebException {
+    public synchronized void updateInfo(boolean isOldHttpSessionUsed) {
         log.debug("Update session lifetime " + getSessionId() + " for user " + getUserId());
         touchSession();
-        HttpSession httpSession = request.getSession();
-        this.lastRemoteAddr = request.getRemoteAddr();
-        this.lastRemoteUserAgent = request.getHeader("User-Agent");
-        this.cacheExpired = false;
-        if (!httpSession.isNew()) {
+        if (isOldHttpSessionUsed) {
             try {
                 // Persist session
                 if (!isAuthorizedInSecurityManager()) {
@@ -553,6 +547,12 @@ public class WebSession extends BaseWebSession
                 log.error("Error persisting web session", e);
             }
         }
+    }
+
+    public synchronized void updateSessionParameters(HttpServletRequest request) {
+        this.lastRemoteAddr = request.getRemoteAddr();
+        this.lastRemoteUserAgent = request.getHeader("User-Agent");
+        this.cacheExpired = false;
     }
 
     @Association
