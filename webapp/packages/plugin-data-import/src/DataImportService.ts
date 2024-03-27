@@ -33,7 +33,7 @@ export class DataImportService {
     });
   }
 
-  async importData(connectionId: string, contextId: string, projectId: string, resultsId: string, files: FileList) {
+  async importData(connectionId: string, contextId: string, projectId: string, resultsId: string, processorId: string, files: FileList) {
     const fileNames = Array.from(files)
       .map(file => file.name)
       .join(',\n');
@@ -45,7 +45,7 @@ export class DataImportService {
     );
 
     try {
-      await this.graphQLService.sdk.uploadResultData(connectionId, contextId, projectId, resultsId, files, event => {
+      await this.graphQLService.sdk.uploadResultData(connectionId, contextId, projectId, resultsId, processorId, files, event => {
         if (event.total !== undefined) {
           const percentCompleted = getProgressPercent(event.loaded, event.total);
 

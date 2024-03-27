@@ -15,6 +15,7 @@ export interface IUploadResultDataExtension {
     contextId: string,
     projectId: string,
     resultsId: string,
+    processorId: string,
     files: FileList,
     onUploadProgress?: (event: UploadProgressEvent) => void,
   ) => Promise<void>;
@@ -27,6 +28,7 @@ export function uploadResultDataExtension(client: CustomGraphQLClient): IUploadR
       contextId: string,
       projectId: string,
       resultsId: string,
+      processorId: string,
       files: FileList,
       onUploadProgress?: (event: UploadProgressEvent) => void,
     ): Promise<void> {

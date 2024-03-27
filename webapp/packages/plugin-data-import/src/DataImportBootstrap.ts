@@ -130,8 +130,12 @@ export class DataImportBootstrap extends Bootstrap {
       throw new Error('Files must be provided');
     }
 
+    if (!state.selectedProcessor) {
+      throw new Error('Processor must be provided');
+    }
+
     try {
-      await this.dataImportService.importData(connectionId, contextId, projectId, resultsId, state.files);
+      await this.dataImportService.importData(connectionId, contextId, projectId, resultsId, state.selectedProcessor.id, state.files);
       onSuccess?.();
     } catch (exception: any) {
       this.notificationService.logException(exception, 'plugin_data_import_process_fail');
