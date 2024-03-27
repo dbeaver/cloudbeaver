@@ -25,6 +25,7 @@ public class CBConstants {
     public static final String RUNTIME_PRODUCT_CONFIG_FILE_NAME = ".product.runtime.conf";
     public static final String AUTO_CONFIG_FILE_NAME = ".cloudbeaver.auto.conf";
 
+    public static final String PARAM_SERVER_CONFIGURATION = "server";
     public static final String PARAM_SERVER_PORT = "serverPort";
     public static final String PARAM_SERVER_HOST = "serverHost";
     public static final String PARAM_SERVER_NAME = "serverName";

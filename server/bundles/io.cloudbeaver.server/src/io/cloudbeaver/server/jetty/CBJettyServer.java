@@ -16,8 +16,10 @@
  */
 package io.cloudbeaver.server.jetty;
 
+import io.cloudbeaver.model.app.WebServerConfigurationController;
 import io.cloudbeaver.registry.WebServiceRegistry;
 import io.cloudbeaver.server.CBApplication;
+import io.cloudbeaver.server.CBServerConfig;
 import io.cloudbeaver.server.graphql.GraphQLEndpoint;
 import io.cloudbeaver.server.servlets.CBImageServlet;
 import io.cloudbeaver.server.servlets.CBStaticServlet;
@@ -37,6 +39,7 @@ import org.eclipse.jetty.util.resource.PathResource;
 import org.eclipse.jetty.websocket.server.config.JettyWebSocketServletContainerInitializer;
 import org.eclipse.jetty.xml.XmlConfiguration;
 import org.jkiss.code.NotNull;
+import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
@@ -68,12 +71,12 @@ public class CBJettyServer {
     }
 
     public void runServer() {
-        CBApplication application = CBApplication.getInstance();
         try {
+            CBServerConfig serverConfiguration = application.getServerConfiguration();
             JettyServer server;
-            int serverPort = application.getServerPort();
-            String serverHost = application.getServerHost();
-            Path sslPath = application.getSslConfigurationPath();
+            int serverPort = serverConfiguration.getServerPort();
+            String serverHost = serverConfiguration.getServerHost();
+            Path sslPath = getSslConfigurationPath();
 
             boolean sslConfigurationExists = sslPath != null && Files.exists(sslPath);
             if (sslConfigurationExists) {
@@ -97,8 +100,8 @@ public class CBJettyServer {
             {
                 // Handler configuration
                 ServletContextHandler servletContextHandler = new ServletContextHandler(ServletContextHandler.SESSIONS);
-                servletContextHandler.setResourceBase(application.getContentRoot());
-                String rootURI = application.getRootURI();
+                servletContextHandler.setResourceBase(serverConfiguration.getContentRoot());
+                String rootURI = serverConfiguration.getRootURI();
                 servletContextHandler.setContextPath(rootURI);
 
                 ServletHolder staticServletHolder = new ServletHolder("static", new CBStaticServlet());
@@ -106,11 +109,11 @@ public class CBJettyServer {
                 servletContextHandler.addServlet(staticServletHolder, "/*");
 
                 ServletHolder imagesServletHolder = new ServletHolder("images", new CBImageServlet());
-                servletContextHandler.addServlet(imagesServletHolder, application.getServicesURI() + "images/*");
+                servletContextHandler.addServlet(imagesServletHolder, serverConfiguration.getServicesURI() + "images/*");
 
                 servletContextHandler.addServlet(new ServletHolder("status", new CBStatusServlet()), "/status");
 
-                servletContextHandler.addServlet(new ServletHolder("graphql", new GraphQLEndpoint()), application.getServicesURI() + "gql/*");
+                servletContextHandler.addServlet(new ServletHolder("graphql", new GraphQLEndpoint()), serverConfiguration.getServicesURI() + "gql/*");
                 servletContextHandler.addEventListener(new CBServerContextListener());
 
                 // Add extensions from services
@@ -118,7 +121,7 @@ public class CBJettyServer {
                 CBJettyServletContext servletContext = new CBJettyServletContext(servletContextHandler);
                 for (DBWServiceBindingServlet wsd : WebServiceRegistry.getInstance().getWebServices(DBWServiceBindingServlet.class)) {
                     try {
-                        wsd.addServlets(application, servletContext);
+                        wsd.addServlets(this.application, servletContext);
                     } catch (DBException e) {
                         log.error(e.getMessage(), e);
                     }
@@ -133,8 +136,8 @@ public class CBJettyServer {
                         wsContainer.setIdleTimeout(Duration.ofMinutes(5));
                         // Add websockets
                         wsContainer.addMapping(
-                            application.getServicesURI() + "ws/*",
-                            new CBJettyWebSocketManager(application.getSessionManager())
+                            serverConfiguration.getServicesURI() + "ws/*",
+                            new CBJettyWebSocketManager(this.application.getSessionManager())
                         );
                     }
                 );
@@ -170,6 +173,16 @@ public class CBJettyServer {
         } catch (Exception e) {
             log.error("Error running Jetty server", e);
         }
+    }
+
+    @Nullable
+    private Path getSslConfigurationPath() {
+        var sslConfigurationPath = application.getServerConfiguration().getSslConfigurationPath();
+        if (sslConfigurationPath == null) {
+            return null;
+        }
+        var sslConfiguration = Path.of(sslConfigurationPath);
+        return sslConfiguration.isAbsolute() ? sslConfiguration : application.getHomeDirectory().resolve(sslConfiguration);
     }
 
     private void initSessionManager(
