@@ -326,13 +326,11 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
                 String defaultUserTeam = application.getAppConfiguration().getDefaultUserTeam();
                 dbStat.setString(1, userId);
                 try (ResultSet dbResult = dbStat.executeQuery()) {
-                    List<String> teamIDs = new ArrayList<>();
+                    Set<String> teamIDs = new LinkedHashSet<>();
                     while (dbResult.next()) {
                         teamIDs.add(dbResult.getString(1));
                     }
-                    if (!teamIDs.contains(defaultUserTeam)) {
-                        teamIDs.add(defaultUserTeam);
-                    }
+                    teamIDs.add(defaultUserTeam);
                     user.setUserTeams(teamIDs.toArray(new String[0]));
                 }
             }
