@@ -321,9 +321,13 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
             readSubjectMetas(dbCon, user);
             // Teams
             try (PreparedStatement dbStat = dbCon.prepareStatement(
-                database.normalizeTableNames("SELECT TEAM_ID FROM {table_prefix}CB_USER_TEAM WHERE USER_ID=?"))
+                database.normalizeTableNames("SELECT DISTINCT TEAM_ID " +
+                        "FROM (SELECT ? AS TEAM_ID UNION ALL SELECT TEAM_ID FROM {table_prefix}CB_USER_TEAM" +
+                        " WHERE USER_ID = ?)"))
             ) {
-                dbStat.setString(1, userId);
+                String defaultUserTeam = application.getAppConfiguration().getDefaultUserTeam();
+                dbStat.setString(1, defaultUserTeam);
+                dbStat.setString(2, userId);
                 try (ResultSet dbResult = dbStat.executeQuery()) {
                     List<String> teamIDs = new ArrayList<>();
                     while (dbResult.next()) {
