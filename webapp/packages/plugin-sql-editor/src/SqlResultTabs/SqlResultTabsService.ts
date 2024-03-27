@@ -75,6 +75,21 @@ export class SqlResultTabsService {
     }
   }
 
+  async handleCloseTabGroup(state: ISqlEditorTabState, tabId: string) {
+    const resultTab = state.resultTabs.find(tabState => tabState.tabId === tabId);
+    const groupResultTabs = state.resultTabs.filter(tab => tab.groupId === resultTab?.groupId);
+
+    if (groupResultTabs.length) {
+      for (const groupTab of groupResultTabs) {
+        const canClose = await this.sqlQueryResultService.canCloseResultTab(state, groupTab.tabId);
+
+        if (canClose) {
+          this.removeResultTab(state, groupTab.tabId);
+        }
+      }
+    }
+  }
+
   private removeTab(state: ISqlEditorTabState, tab: ISqlEditorResultTab) {
     state.tabs.splice(state.tabs.indexOf(tab), 1);
 

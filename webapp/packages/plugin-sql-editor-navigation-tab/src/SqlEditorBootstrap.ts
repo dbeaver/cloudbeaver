@@ -36,6 +36,7 @@ import {
 import { MENU_CONNECTIONS } from '@cloudbeaver/plugin-connections';
 import { NavigationTabsService } from '@cloudbeaver/plugin-navigation-tabs';
 import {
+  DATA_CONTEXT_SQL_EDITOR_RESULT_ID,
   DATA_CONTEXT_SQL_EDITOR_STATE,
   ESqlDataSourceFeatures,
   getSqlEditorName,
@@ -43,6 +44,7 @@ import {
   SqlDataSourceService,
   SqlEditorService,
   SqlEditorSettingsService,
+  SqlResultTabsService,
 } from '@cloudbeaver/plugin-sql-editor';
 import { MENU_APP_ACTIONS } from '@cloudbeaver/plugin-top-app-bar';
 
@@ -77,6 +79,7 @@ export class SqlEditorBootstrap extends Bootstrap {
     private readonly sqlEditorService: SqlEditorService,
     private readonly localizationService: LocalizationService,
     private readonly sqlEditorSettingsService: SqlEditorSettingsService,
+    private readonly sqlResultTabsService: SqlResultTabsService,
   ) {
     super();
   }
@@ -181,37 +184,35 @@ export class SqlEditorBootstrap extends Bootstrap {
 
     this.menuService.addCreator({
       isApplicable: context => {
-        const tab = context.tryGet(DATA_CONTEXT_TAB_ID);
+        const tab = context.tryGet(DATA_CONTEXT_SQL_EDITOR_RESULT_ID);
         const state = context.tryGet(DATA_CONTEXT_TABS_CONTEXT);
-        return !!tab && !!state?.enabledBaseActions && context.get(DATA_CONTEXT_MENU) === MENU_TAB && state.canClose(tab);
+        return !!tab && !!state?.enabledBaseActions && context.get(DATA_CONTEXT_MENU) === MENU_TAB;
       },
       getItems: (context, items) => [...items, ACTION_TAB_CLOSE_GROUP],
     });
 
     this.actionService.addHandler({
-      id: 'tabs-base-handler-group',
+      id: 'result-tabs-group-base-handler',
       isActionApplicable: (context, action) => {
         const menu = context.hasValue(DATA_CONTEXT_MENU, MENU_TAB);
-        const state = context.tryGet(DATA_CONTEXT_TABS_CONTEXT);
-        const tab = context.tryGet(DATA_CONTEXT_TAB_ID);
+        const tab = context.tryGet(DATA_CONTEXT_SQL_EDITOR_RESULT_ID);
+        const sqlEditorState = context.tryGet(DATA_CONTEXT_SQL_EDITOR_STATE);
+        const groupId = sqlEditorState?.resultTabs.find(tabState => tabState.tabId === tab?.id)?.groupId;
+        const hasTabsInGroup = (sqlEditorState?.resultTabs.filter(tabState => tabState.groupId === groupId) ?? []).length > 1;
 
-        if (!menu || !state?.tabList || !tab) {
+        if (!menu || !tab || !hasTabsInGroup) {
           return false;
         }
 
-        if (action === ACTION_TAB_CLOSE_GROUP) {
-          return state.tabList.length > 1 && state?.closeTabGroup !== undefined;
-        }
-
-        return false;
+        return [ACTION_TAB_CLOSE_GROUP].includes(action);
       },
       handler: async (context, action) => {
-        const state = context.get(DATA_CONTEXT_TABS_CONTEXT);
-        const tab = context.get(DATA_CONTEXT_TAB_ID);
+        const state = context.get(DATA_CONTEXT_SQL_EDITOR_STATE);
+        const tab = context.get(DATA_CONTEXT_SQL_EDITOR_RESULT_ID);
 
         switch (action) {
           case ACTION_TAB_CLOSE_GROUP:
-            state.closeTabGroup?.(tab);
+            this.sqlResultTabsService.handleCloseTabGroup(state, tab.id);
             break;
           default:
             break;
