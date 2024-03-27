@@ -73,7 +73,7 @@ public class CBPlatform extends BasePlatformImpl {
     public static final String WORK_DATA_FOLDER_NAME = ".work-data";
 
     @Nullable
-    private static CBApplication application = null;
+    private static CBApplication<?> application = null;
 
     private Path tempFolder;
 
@@ -189,7 +189,7 @@ public class CBPlatform extends BasePlatformImpl {
 
     @NotNull
     @Override
-    public CBApplication getApplication() {
+    public CBApplication<?> getApplication() {
         return application;
     }
 
