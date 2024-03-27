@@ -18,7 +18,7 @@
         <dependency>
             <groupId>io.trino</groupId>
             <artifactId>trino-jdbc</artifactId>
-            <version>422</version>
+            <version>438</version>
         </dependency>
     </dependencies>
 
