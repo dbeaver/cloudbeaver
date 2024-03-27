@@ -16,7 +16,7 @@ import { FormChangeHandler, FormContext, type IChangeData, type IFormContext } f
 interface IOptions {
   parent?: IFormContext;
   disableEnterSubmit?: boolean;
-  onSubmit?: (event?: SubmitEvent | undefined) => Promise<void>;
+  onSubmit?: (event?: SubmitEvent | undefined) => Promise<void> | void;
   onChange?: FormChangeHandler;
 }
 
