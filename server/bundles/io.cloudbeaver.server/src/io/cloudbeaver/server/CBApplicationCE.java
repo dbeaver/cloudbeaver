@@ -36,36 +36,44 @@ import org.jkiss.dbeaver.runtime.DBWorkbench;
 
 import java.util.List;
 
-public class CBApplicationCE extends CBApplication {
+public class CBApplicationCE extends CBApplication<CBServerConfig> {
     private static final Log log = Log.getLog(CBApplicationCE.class);
+
+    private final CBServerConfigurationControllerEmbedded<CBServerConfig> serverConfigController;
+
+    public CBApplicationCE() {
+        serverConfigController = new CBServerConfigurationControllerEmbedded<>(new CBServerConfig());
+    }
 
     @Override
     public SMController createSecurityController(@NotNull SMCredentialsProvider credentialsProvider) throws DBException {
         return new EmbeddedSecurityControllerFactory().createSecurityService(
             this,
-            databaseConfiguration,
+            getServerConfiguration().getDatabaseConfiguration(),
             credentialsProvider,
-            securityManagerConfiguration
+            getServerConfigurationController().getSecurityManagerConfiguration()
         );
     }
     @Override
     public SMAdminController getAdminSecurityController(@NotNull SMCredentialsProvider credentialsProvider) throws DBException {
         return new EmbeddedSecurityControllerFactory().createSecurityService(
             this,
-            databaseConfiguration,
+            getServerConfiguration().getDatabaseConfiguration(),
             credentialsProvider,
-            securityManagerConfiguration
+            getServerConfigurationController().getSecurityManagerConfiguration()
         );
     }
 
     protected SMAdminController createGlobalSecurityController() throws DBException {
         return new EmbeddedSecurityControllerFactory().createSecurityService(
             this,
-            databaseConfiguration,
+            getServerConfiguration().getDatabaseConfiguration(),
             new NoAuthCredentialsProvider(),
-            securityManagerConfiguration
+            getServerConfigurationController().getSecurityManagerConfiguration()
         );
     }
+
+
 
     @Override
     public RMController createResourceController(@NotNull SMCredentialsProvider credentialsProvider,
@@ -77,6 +85,11 @@ public class CBApplicationCE extends CBApplication {
     @Override
     public DBFileController createFileController(@NotNull SMCredentialsProvider credentialsProvider) {
         return new LocalFileController(DBWorkbench.getPlatform().getWorkspace().getAbsolutePath().resolve(DBFileController.DATA_FOLDER));
+    }
+
+    @Override
+    public CBServerConfigurationControllerEmbedded<CBServerConfig> getServerConfigurationController() {
+        return serverConfigController;
     }
 
     protected void shutdown() {
@@ -99,4 +112,5 @@ public class CBApplicationCE extends CBApplication {
             ((CBEmbeddedSecurityController) securityController).finishConfiguration(adminName, adminPassword, authInfoList);
         }
     }
+
 }

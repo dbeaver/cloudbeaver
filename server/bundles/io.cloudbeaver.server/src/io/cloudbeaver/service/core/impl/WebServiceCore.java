@@ -282,11 +282,13 @@ public class WebServiceCore implements DBWServiceCore {
     }
 
     @Override
+    @Deprecated
     public boolean touchSession(@NotNull HttpServletRequest request, @NotNull HttpServletResponse response) throws DBWebException {
         return CBPlatform.getInstance().getSessionManager().touchSession(request, response);
     }
 
     @Override
+    @Deprecated
     public WebSession updateSession(@NotNull HttpServletRequest request, @NotNull HttpServletResponse response)
         throws DBWebException {
         WebSessionManager sessionManager = CBPlatform.getInstance().getSessionManager();
