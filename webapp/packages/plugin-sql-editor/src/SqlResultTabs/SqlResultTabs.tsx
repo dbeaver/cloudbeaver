@@ -66,17 +66,6 @@ export const SqlResultTabs = observer<Props>(function SqlDataResult({ state, onT
     }
   }
 
-  async function handleCloseTabGroup(tabData: ITabData) {
-    const resultTab = state.resultTabs.find(tabState => tabState.tabId === tabData.tabId);
-    const groupResultTabs = state.resultTabs.filter(tab => tab.groupId === resultTab?.groupId);
-
-    if (groupResultTabs.length) {
-      for (const groupTab of groupResultTabs) {
-        handleClose({ tabId: groupTab.tabId, props: tabData.props });
-      }
-    }
-  }
-
   function handleCanClose(tab: ITabData): boolean {
     const resultTab = state.resultTabs.find(tabState => tabState.tabId === tab.tabId);
 
@@ -106,7 +95,6 @@ export const SqlResultTabs = observer<Props>(function SqlDataResult({ state, onT
         tabList={tabList}
         canClose={handleCanClose}
         enabledBaseActions
-        onCloseTabGroup={handleCloseTabGroup}
         onChange={handleSelect}
         onClose={handleClose}
       >

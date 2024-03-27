@@ -88,7 +88,6 @@ export default [
   ['ui_close_all', 'Закрыть все'],
   ['ui_close_others', 'Закрыть другие'],
   ['ui_close_all_to_the_right', 'Закрыть все справа'],
-  ['ui_close_group', 'Закрыть все этого запроса'],
   ['ui_close_all_to_the_left', 'Закрыть все слева'],
   ['ui_or', 'Или'],
   ['ui_download', 'Cкачать'],

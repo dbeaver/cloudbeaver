@@ -37,7 +37,6 @@ export interface ITabsContext<T = Record<string, any>> {
   closeAll: () => Promise<void>;
   closeAllToTheDirection: (tabId: string, direction: TabDirection) => Promise<void>;
   closeOthers: (tabId: string) => Promise<void>;
-  closeTabGroup?: (tabId: string) => Promise<void>;
 }
 
 export const TabsContext = createContext<ITabsContext<any> | undefined>(undefined);
