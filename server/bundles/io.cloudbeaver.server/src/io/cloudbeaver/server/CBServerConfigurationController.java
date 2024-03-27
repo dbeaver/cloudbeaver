@@ -127,7 +127,7 @@ public abstract class CBServerConfigurationController<T extends CBServerConfig>
             JSONUtils.MAP_TYPE_TOKEN);
         serverConfig = WebAppUtils.mergeConfigurations(currentConfigurationAsMap, serverConfig);
         gson.fromJson(
-            gson.toJsonTree(serverConfig),
+            gson.toJson(serverConfig),
             getServerConfiguration().getClass()
         );
 
@@ -135,13 +135,13 @@ public abstract class CBServerConfigurationController<T extends CBServerConfig>
 
         //SM config
         gson.fromJson(
-            gson.toJsonTree(JSONUtils.getObject(serverConfig, CBConstants.PARAM_SM_CONFIGURATION)),
+            gson.toJson(JSONUtils.getObject(serverConfig, CBConstants.PARAM_SM_CONFIGURATION)),
             SMControllerConfiguration.class
         );
         // App config
         Map<String, Object> appConfig = JSONUtils.getObject(configProps, "app");
         validateConfiguration(appConfig);
-        gson.fromJson(gson.toJsonTree(appConfig), CBAppConfig.class);
+        gson.fromJson(gson.toJson(appConfig), CBAppConfig.class);
         readProductConfiguration(serverConfig, gson);
     }
 
