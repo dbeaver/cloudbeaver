@@ -23,7 +23,16 @@ import { ExtensionUtils } from '@cloudbeaver/core-extensions';
 import { LocalizationService } from '@cloudbeaver/core-localization';
 import { DATA_CONTEXT_NAV_NODE, EObjectFeature, NodeManagerUtils } from '@cloudbeaver/core-navigation-tree';
 import { ISessionAction, sessionActionContext, SessionActionService } from '@cloudbeaver/core-root';
-import { ACTION_RENAME, ActionService, DATA_CONTEXT_MENU_NESTED, menuExtractItems, MenuService, ViewService } from '@cloudbeaver/core-view';
+import { DATA_CONTEXT_TAB_ID, DATA_CONTEXT_TABS_CONTEXT, MENU_TAB } from '@cloudbeaver/core-ui';
+import {
+  ACTION_RENAME,
+  ActionService,
+  DATA_CONTEXT_MENU,
+  DATA_CONTEXT_MENU_NESTED,
+  menuExtractItems,
+  MenuService,
+  ViewService,
+} from '@cloudbeaver/core-view';
 import { MENU_CONNECTIONS } from '@cloudbeaver/plugin-connections';
 import { NavigationTabsService } from '@cloudbeaver/plugin-navigation-tabs';
 import {
@@ -39,6 +48,7 @@ import { MENU_APP_ACTIONS } from '@cloudbeaver/plugin-top-app-bar';
 
 import { ACTION_SQL_EDITOR_NEW } from './ACTION_SQL_EDITOR_NEW';
 import { ACTION_SQL_EDITOR_OPEN } from './ACTION_SQL_EDITOR_OPEN';
+import { ACTION_TAB_CLOSE_GROUP } from './ACTION_TAB_CLOSE_GROUP';
 import { DATA_CONTEXT_SQL_EDITOR_TAB } from './DATA_CONTEXT_SQL_EDITOR_TAB';
 import { isSessionActionOpenSQLEditor } from './sessionActionOpenSQLEditor';
 import { SQL_EDITOR_SOURCE_ACTION } from './SQL_EDITOR_SOURCE_ACTION';
@@ -165,6 +175,46 @@ export class SqlEditorBootstrap extends Bootstrap {
             });
             break;
           }
+        }
+      },
+    });
+
+    this.menuService.addCreator({
+      isApplicable: context => {
+        const tab = context.tryGet(DATA_CONTEXT_TAB_ID);
+        const state = context.tryGet(DATA_CONTEXT_TABS_CONTEXT);
+        return !!tab && !!state?.enabledBaseActions && context.get(DATA_CONTEXT_MENU) === MENU_TAB && state.canClose(tab);
+      },
+      getItems: (context, items) => [...items, ACTION_TAB_CLOSE_GROUP],
+    });
+
+    this.actionService.addHandler({
+      id: 'tabs-base-handler-group',
+      isActionApplicable: (context, action) => {
+        const menu = context.hasValue(DATA_CONTEXT_MENU, MENU_TAB);
+        const state = context.tryGet(DATA_CONTEXT_TABS_CONTEXT);
+        const tab = context.tryGet(DATA_CONTEXT_TAB_ID);
+
+        if (!menu || !state?.tabList || !tab) {
+          return false;
+        }
+
+        if (action === ACTION_TAB_CLOSE_GROUP) {
+          return state.tabList.length > 1 && state?.closeTabGroup !== undefined;
+        }
+
+        return false;
+      },
+      handler: async (context, action) => {
+        const state = context.get(DATA_CONTEXT_TABS_CONTEXT);
+        const tab = context.get(DATA_CONTEXT_TAB_ID);
+
+        switch (action) {
+          case ACTION_TAB_CLOSE_GROUP:
+            state.closeTabGroup?.(tab);
+            break;
+          default:
+            break;
         }
       },
     });

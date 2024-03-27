@@ -87,6 +87,7 @@ export default [
   ['ui_advanced_settings', 'Advanced settings'],
   ['ui_expand', 'Expand'],
   ['ui_close_all', 'Close all'],
+  ['ui_close_group', 'Close all of the same group'],
   ['ui_close_others', 'Close others'],
   ['ui_close_all_to_the_right', 'Close all to the Right'],
   ['ui_close_all_to_the_left', 'Close all to the Left'],

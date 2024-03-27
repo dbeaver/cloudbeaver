@@ -88,6 +88,17 @@ export const SqlResultTabs = observer<Props>(function SqlDataResult({ state, onT
   const executable = dataSource?.hasFeature(ESqlDataSourceFeatures.executable);
   const tabList = orderedTabs.map(tab => tab.id);
 
+  async function handleCloseTabGroup(tabData: ITabData) {
+    const resultTab = state.resultTabs.find(tabState => tabState.tabId === tabData.tabId);
+    const groupResultTabs = state.resultTabs.filter(tab => tab.groupId === resultTab?.groupId);
+
+    if (groupResultTabs.length) {
+      for (const groupTab of groupResultTabs) {
+        handleClose({ tabId: groupTab.tabId, props: tabData.props });
+      }
+    }
+  }
+
   return (
     <div className={s(style, { wrapper: true })}>
       <TabsState
@@ -97,6 +108,7 @@ export const SqlResultTabs = observer<Props>(function SqlDataResult({ state, onT
         enabledBaseActions
         onChange={handleSelect}
         onClose={handleClose}
+        onCloseTabGroup={handleCloseTabGroup}
       >
         <SContext registry={registry}>
           <TabList className={s(style, { tabListNotExecutable: !executable })} aria-label="SQL Results">
