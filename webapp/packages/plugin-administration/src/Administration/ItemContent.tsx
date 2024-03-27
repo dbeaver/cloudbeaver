@@ -41,7 +41,7 @@ export const ItemContent = observer<Props>(function ItemContent({ activeScreen, 
       const Component = sub.getComponent ? sub.getComponent() : item.getContentComponent();
 
       return (
-        <TabPanel tabId={`${activeScreen.item}_${activeScreen.sub}`} contents>
+        <TabPanel tabId={activeScreen.item} contents>
           <Component item={item} sub={sub} param={activeScreen.param} configurationWizard={configurationWizard} />
         </TabPanel>
       );
