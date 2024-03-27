@@ -186,7 +186,8 @@ export class SqlEditorBootstrap extends Bootstrap {
       isApplicable: context => {
         const tab = context.tryGet(DATA_CONTEXT_SQL_EDITOR_RESULT_ID);
         const state = context.tryGet(DATA_CONTEXT_TABS_CONTEXT);
-        return !!tab && !!state?.enabledBaseActions && context.get(DATA_CONTEXT_MENU) === MENU_TAB;
+        const menu = context.hasValue(DATA_CONTEXT_MENU, MENU_TAB);
+        return !!tab && !!state?.enabledBaseActions && menu;
       },
       getItems: (context, items) => [...items, ACTION_TAB_CLOSE_GROUP],
     });
