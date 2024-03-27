@@ -193,6 +193,8 @@ export class UsersResource extends CachedMapResource<string, AdminUser, UserReso
       if (user) {
         user.authRole = authRole;
       }
+
+      this.onDataOutdated.execute(userId);
     });
 
     if (!skipUpdate) {

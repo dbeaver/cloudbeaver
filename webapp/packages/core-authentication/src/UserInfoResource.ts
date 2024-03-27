@@ -196,6 +196,8 @@ export class UserInfoResource extends CachedDataResource<UserInfo | null, void, 
       if (this.data) {
         this.data.configurationParameters[key] = value;
       }
+
+      this.onDataOutdated.execute();
     });
 
     return this.data;
@@ -233,6 +235,8 @@ export class UserInfoResource extends CachedDataResource<UserInfo | null, void, 
           delete this.data?.configurationParameters[item];
         }
       });
+
+      this.onDataOutdated.execute();
     });
     return this.data;
   }

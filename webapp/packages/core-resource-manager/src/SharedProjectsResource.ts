@@ -126,6 +126,8 @@ export class SharedProjectsResource extends CachedMapResource<string, SharedProj
 
           deleted.push(projectId);
         });
+
+        this.onDataOutdated.execute(key);
       });
     } finally {
       if (deleted.length > 0) {
