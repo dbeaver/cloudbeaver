@@ -5,18 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
+import { createMenu } from '@cloudbeaver/core-view';
 
-.filter {
-  margin: 0 24px 4px 24px;
-}
-
-.cell {
-  composes: theme-border-color-secondary from global;
-  border-bottom: 1px solid;
-  padding: 0 16px;
-}
-
-.iconOrImage {
-  width: 100%;
-  height: 100%;
-}
+export const MENU_OBJECT_VIEWER_FOOTER = createMenu('object-viewer-footer', 'Object viewer footer menu');
