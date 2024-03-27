@@ -10,6 +10,7 @@ import { observer } from 'mobx-react-lite';
 import { AdministrationItemService, IAdministrationItemRoute } from '@cloudbeaver/core-administration';
 import { Loader, TextPlaceholder, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
+import { TabPanel } from '@cloudbeaver/core-ui';
 
 interface Props {
   activeScreen: IAdministrationItemRoute | null;
@@ -40,9 +41,9 @@ export const ItemContent = observer<Props>(function ItemContent({ activeScreen, 
       const Component = sub.getComponent ? sub.getComponent() : item.getContentComponent();
 
       return (
-        <Loader suspense>
+        <TabPanel tabId={`${activeScreen.item}_${activeScreen.sub}`} contents>
           <Component item={item} sub={sub} param={activeScreen.param} configurationWizard={configurationWizard} />
-        </Loader>
+        </TabPanel>
       );
     }
   }
@@ -50,8 +51,8 @@ export const ItemContent = observer<Props>(function ItemContent({ activeScreen, 
   const Component = item.getContentComponent();
 
   return (
-    <Loader suspense>
+    <TabPanel tabId={activeScreen.item} contents>
       <Component item={item} configurationWizard={configurationWizard} />
-    </Loader>
+    </TabPanel>
   );
 });
