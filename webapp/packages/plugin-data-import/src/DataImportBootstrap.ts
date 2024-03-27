@@ -13,10 +13,8 @@ import {
   DATA_CONTEXT_DV_DDM,
   DATA_CONTEXT_DV_DDM_RESULT_INDEX,
   DATA_VIEWER_DATA_MODEL_ACTIONS_MENU,
-  IDatabaseDataSource,
-  IDataContainerOptions,
+  DatabaseEditAction,
 } from '@cloudbeaver/plugin-data-viewer';
-import type { IDataQueryOptions } from '@cloudbeaver/plugin-sql-editor';
 
 import { DataImportDialogLazy } from './DataImportDialog/DataImportDialogLazy';
 import type { IDataImportDialogState } from './DataImportDialog/IDataImportDialogState';
@@ -46,6 +44,15 @@ export class DataImportBootstrap extends Bootstrap {
           return false;
         }
 
+        if (action === ACTION_IMPORT) {
+          if (model.isReadonly(resultIndex)) {
+            return false;
+          }
+
+          const editor = model.source.getActionImplementation(resultIndex, DatabaseEditAction);
+          return editor?.hasFeature('add') === true;
+        }
+
         return [ACTION_IMPORT].includes(action);
       },
       isDisabled(context) {
@@ -54,7 +61,7 @@ export class DataImportBootstrap extends Bootstrap {
 
         return model.isLoading() || model.isDisabled(resultIndex) || !model.getResult(resultIndex);
       },
-      getActionInfo(context, action) {
+      getActionInfo(_, action) {
         if (action === ACTION_IMPORT) {
           return { ...action.info, icon: '/icons/data-import.png' };
         }
@@ -68,17 +75,25 @@ export class DataImportBootstrap extends Bootstrap {
         if (action === ACTION_IMPORT) {
           const result = model.getResult(resultIndex);
 
-          if (!result) {
+          if (!result?.id) {
             throw new Error('Result must be provided');
           }
 
-          const source = model.source as IDatabaseDataSource<IDataContainerOptions & IDataQueryOptions>;
+          const executionContext = model.source.executionContext?.context;
 
-          if (!source.options) {
-            throw new Error('Source options must be provided');
+          if (!executionContext) {
+            throw new Error('Execution context must be provided');
           }
 
-          await this.importData();
+          await this.openImportDataDialog(
+            executionContext.connectionId,
+            executionContext.id,
+            executionContext.projectId,
+            result.id,
+            model.name ?? model.id,
+            undefined,
+            () => model.refresh(),
+          );
         }
       },
     });
@@ -86,27 +101,41 @@ export class DataImportBootstrap extends Bootstrap {
     this.menuService.addCreator({
       menus: [DATA_VIEWER_DATA_MODEL_ACTIONS_MENU],
       isApplicable: () => !this.dataImportService.disabled,
-      getItems(context, items) {
+      getItems(_, items) {
         return [...items, ACTION_IMPORT];
       },
-      orderItems(context, items) {
+      orderItems(_, items) {
         const extracted = menuExtractItems(items, [ACTION_IMPORT]);
         return [...items, ...extracted];
       },
     });
   }
 
-  private async importData(initialState?: IDataImportDialogState) {
-    const state = await this.commonDialogService.open(DataImportDialogLazy, { initialState });
+  private async openImportDataDialog(
+    connectionId: string,
+    contextId: string,
+    projectId: string,
+    resultsId: string,
+    tableName: string,
+    initialState?: IDataImportDialogState,
+    onSuccess?: () => void,
+  ) {
+    const state = await this.commonDialogService.open(DataImportDialogLazy, { tableName, initialState });
 
     if (state === DialogueStateResult.Rejected || state === DialogueStateResult.Resolved) {
       return;
     }
 
-    // open dialog with prev state in case of an error
-    setTimeout(async () => {
-      this.notificationService.logException(new Error('Not implemented'), 'Data import is not implemented');
-      await this.importData(state);
-    }, 1500);
+    if (!state.files) {
+      throw new Error('Files must be provided');
+    }
+
+    try {
+      await this.dataImportService.importData(connectionId, contextId, projectId, resultsId, state.files);
+      onSuccess?.();
+    } catch (exception: any) {
+      this.notificationService.logException(exception, 'plugin_data_import_process_fail');
+      await this.openImportDataDialog(connectionId, contextId, projectId, resultsId, tableName, state, onSuccess);
+    }
   }
 }

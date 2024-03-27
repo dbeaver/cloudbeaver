@@ -26,6 +26,7 @@ import { ImportProcessorList } from './ImportProcessorList';
 import { useDataImportDialog } from './useDataImportDialog';
 
 export interface IDataImportDialogPayload {
+  tableName: string;
   initialState?: IDataImportDialogState;
 }
 
@@ -42,22 +43,18 @@ export const DataImportDialog: DialogComponent<IDataImportDialogPayload, IDataIm
   }
 
   let title = translate('plugin_data_import_title');
+  let icon = '/icons/data-import.png';
 
   if (dialog.state.step === EDataImportDialogStep.FILE && dialog.state.selectedProcessor) {
-    title += ` (${dialog.state.selectedProcessor})`;
+    title += ` (${dialog.state.selectedProcessor.name ?? dialog.state.selectedProcessor.id})`;
+    icon = dialog.state.selectedProcessor.icon ?? icon;
   }
 
   return (
-    <CommonDialogWrapper size="large" fixedWidth>
-      <CommonDialogHeader title={title} icon="/icons/data-import.png" onReject={rejectDialog} />
+    <CommonDialogWrapper size="large" fixedSize>
+      <CommonDialogHeader title={title} subTitle={payload.tableName} icon={icon} onReject={rejectDialog} />
       <CommonDialogBody>
-        {dialog.state.step === EDataImportDialogStep.PROCESSOR && (
-          <ImportProcessorList
-            processors={[{ id: 'processor', order: 0, name: 'Processor example', description: 'Processor description example' }]}
-            onSelect={dialog.selectProcessor}
-          />
-        )}
-
+        {dialog.state.step === EDataImportDialogStep.PROCESSOR && <ImportProcessorList onSelect={dialog.selectProcessor} />}
         {dialog.state.step === EDataImportDialogStep.FILE && <DataImportFileUploader state={dialog.state} onDelete={dialog.deleteFile} />}
       </CommonDialogBody>
 
@@ -71,7 +68,7 @@ export const DataImportDialog: DialogComponent<IDataImportDialogPayload, IDataIm
             <Button type="button" mod={['outlined']} onClick={dialog.stepBack}>
               {translate('ui_stepper_back')}
             </Button>
-            <Button type="button" mod={['raised']} onClick={handleImport}>
+            <Button type="button" mod={['raised']} disabled={!dialog.state.files} onClick={handleImport}>
               {translate('ui_import')}
             </Button>
           </Container>

@@ -8,6 +8,7 @@
 import { action, observable } from 'mobx';
 
 import { useObservableRef } from '@cloudbeaver/core-blocks';
+import type { DataTransferProcessorInfo } from '@cloudbeaver/core-sdk';
 
 import { EDataImportDialogStep } from './EDataImportDialogStep';
 import type { IDataImportDialogState } from './IDataImportDialogState';
@@ -15,7 +16,7 @@ import type { IDataImportDialogState } from './IDataImportDialogState';
 interface IDialog {
   state: IDataImportDialogState;
   stepBack: () => void;
-  selectProcessor: (id: string) => void;
+  selectProcessor: (processor: DataTransferProcessorInfo) => void;
   deleteFile: (id: string) => void;
   reset: () => void;
 }
@@ -33,12 +34,12 @@ export function useDataImportDialog(initialState?: IDataImportDialogState) {
       stepBack() {
         this.state.step = EDataImportDialogStep.PROCESSOR;
       },
-      selectProcessor(id: string) {
-        if (this.state.selectedProcessor && this.state.selectedProcessor !== id) {
+      selectProcessor(processor: DataTransferProcessorInfo) {
+        if (this.state.selectedProcessor && this.state.selectedProcessor.id !== processor.id) {
           this.reset();
         }
 
-        this.state.selectedProcessor = id;
+        this.state.selectedProcessor = processor;
         this.state.step = EDataImportDialogStep.FILE;
       },
       deleteFile(id: string) {
