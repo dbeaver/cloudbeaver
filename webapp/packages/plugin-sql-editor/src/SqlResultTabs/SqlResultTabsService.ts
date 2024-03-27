@@ -75,7 +75,7 @@ export class SqlResultTabsService {
     }
   }
 
-  async handleCloseTabGroup(state: ISqlEditorTabState, tabId: string) {
+  async closeTabGroup(state: ISqlEditorTabState, tabId: string) {
     const resultTab = state.resultTabs.find(tabState => tabState.tabId === tabId);
     const groupResultTabs = state.resultTabs.filter(tab => tab.groupId === resultTab?.groupId);
 

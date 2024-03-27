@@ -45,7 +45,7 @@ export class SqlEditorGroupTabsBootstrap extends Bootstrap {
         const tab = context.get(DATA_CONTEXT_SQL_EDITOR_RESULT_ID);
         switch (action) {
           case ACTION_TAB_CLOSE_SQL_RESULT_GROUP:
-            this.sqlResultTabsService.handleCloseTabGroup(state, tab.id);
+            this.sqlResultTabsService.closeTabGroup(state, tab.id);
             break;
           default:
             break;
