@@ -7,7 +7,6 @@
  */
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
-import { NotificationService } from '@cloudbeaver/core-events';
 import { ACTION_IMPORT, ActionService, DATA_CONTEXT_MENU, menuExtractItems, MenuService } from '@cloudbeaver/core-view';
 import {
   DATA_CONTEXT_DV_DDM,
@@ -17,7 +16,6 @@ import {
 } from '@cloudbeaver/plugin-data-viewer';
 
 import { DataImportDialogLazy } from './DataImportDialog/DataImportDialogLazy';
-import type { IDataImportDialogState } from './DataImportDialog/IDataImportDialogState';
 import { DataImportService } from './DataImportService';
 
 @injectable()
@@ -25,7 +23,6 @@ export class DataImportBootstrap extends Bootstrap {
   constructor(
     private readonly menuService: MenuService,
     private readonly actionService: ActionService,
-    private readonly notificationService: NotificationService,
     private readonly commonDialogService: CommonDialogService,
     private readonly dataImportService: DataImportService,
   ) {
@@ -85,15 +82,24 @@ export class DataImportBootstrap extends Bootstrap {
             throw new Error('Execution context must be provided');
           }
 
-          await this.openImportDataDialog(
+          const state = await this.commonDialogService.open(DataImportDialogLazy, { tableName: model.name ?? model.id });
+
+          if (state === DialogueStateResult.Rejected || state === DialogueStateResult.Resolved) {
+            return;
+          }
+
+          const success = await this.dataImportService.importData(
             executionContext.connectionId,
             executionContext.id,
             executionContext.projectId,
             result.id,
-            model.name ?? model.id,
-            undefined,
-            () => model.refresh(),
+            state.processorId,
+            state.file,
           );
+
+          if (success) {
+            await model.refresh();
+          }
         }
       },
     });
@@ -109,37 +115,5 @@ export class DataImportBootstrap extends Bootstrap {
         return [...items, ...extracted];
       },
     });
-  }
-
-  private async openImportDataDialog(
-    connectionId: string,
-    contextId: string,
-    projectId: string,
-    resultsId: string,
-    tableName: string,
-    initialState?: IDataImportDialogState,
-    onSuccess?: () => void,
-  ) {
-    const state = await this.commonDialogService.open(DataImportDialogLazy, { tableName, initialState });
-
-    if (state === DialogueStateResult.Rejected || state === DialogueStateResult.Resolved) {
-      return;
-    }
-
-    if (!state.files) {
-      throw new Error('Files must be provided');
-    }
-
-    if (!state.selectedProcessor) {
-      throw new Error('Processor must be provided');
-    }
-
-    try {
-      await this.dataImportService.importData(connectionId, contextId, projectId, resultsId, state.selectedProcessor.id, state.files);
-      onSuccess?.();
-    } catch (exception: any) {
-      this.notificationService.logException(exception, 'plugin_data_import_process_fail');
-      await this.openImportDataDialog(connectionId, contextId, projectId, resultsId, tableName, state, onSuccess);
-    }
   }
 }

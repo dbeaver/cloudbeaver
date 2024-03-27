@@ -7,21 +7,7 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import {
-  Container,
-  Group,
-  InputFiles,
-  s,
-  Table,
-  TableBody,
-  TableColumnHeader,
-  TableHeader,
-  useS,
-  useTable,
-  useTranslate,
-} from '@cloudbeaver/core-blocks';
-import { useService } from '@cloudbeaver/core-di';
-import { NotificationService } from '@cloudbeaver/core-events';
+import { Container, Group, InputFiles, s, Table, TableBody, TableColumnHeader, TableHeader, useS, useTranslate } from '@cloudbeaver/core-blocks';
 
 import { DataImportFileItem } from './DataImportFileItem';
 import styles from './DataImportFileUploader.m.css';
@@ -29,44 +15,35 @@ import type { IDataImportDialogState } from './IDataImportDialogState';
 
 interface Props {
   state: IDataImportDialogState;
-  onDelete: (id: string) => void;
+  onDelete: () => void;
 }
 
 export const DataImportFileUploader = observer<Props>(function DataImportFileUploader({ state, onDelete }) {
   const translate = useTranslate();
-  const notificationService = useService(NotificationService);
-
   const style = useS(styles);
-  const table = useTable();
 
-  const fileList = Array.from(state.files ?? []);
-  const keys = fileList.map(file => file.name);
+  function onUpload(value: FileList | null) {
+    if (value) {
+      state.file = value[0];
+    }
+  }
+
+  const extension = state.selectedProcessor?.fileExtension ? `.${state.selectedProcessor.fileExtension}` : undefined;
 
   return (
-    <Group className={s(style, { group: true })} box overflow>
-      <Table className={s(style, { table: true })} keys={keys} selectedItems={table.selected}>
+    <Group box overflow>
+      <Table>
         <TableHeader fixed>
-          <TableColumnHeader heightBig>{translate('ui_name')}</TableColumnHeader>
-          <TableColumnHeader heightBig flex>
+          <TableColumnHeader className={s(style, { columnHeader: true })} heightBig>
+            {translate('ui_name')}
+          </TableColumnHeader>
+          <TableColumnHeader className={s(style, { columnHeader: true })} heightBig flex>
             <Container zeroBasis />
-            <InputFiles
-              name="files"
-              state={state}
-              aggregate
-              multiple
-              hideTags
-              keepSize
-              onDuplicate={files => {
-                const fileNames = files.map(file => `"${file.name}"`);
-                notificationService.logInfo({ title: 'ui_upload_files_duplicate_error', message: fileNames.join(', '), autoClose: false });
-              }}
-            />
+            <InputFiles accept={extension} hideTags keepSize onChange={onUpload} />
           </TableColumnHeader>
         </TableHeader>
         <TableBody>
-          {fileList.map(file => (
-            <DataImportFileItem key={file.name} id={file.name} name={file.name} tooltip={file.name} onDelete={onDelete} />
-          ))}
+          {state.file && <DataImportFileItem id={state.file.name} name={state.file.name} tooltip={state.file.name} onDelete={onDelete} />}
         </TableBody>
       </Table>
     </Group>

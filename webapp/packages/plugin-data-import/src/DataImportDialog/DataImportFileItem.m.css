@@ -6,11 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-.staticImage {
-  display: flex;
-  width: 24px;
-}
-
 .tableColumnValue {
   height: 36px;
+  padding: 0 24px;
 }

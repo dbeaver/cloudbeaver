@@ -11,6 +11,6 @@ import type { EDataImportDialogStep } from './EDataImportDialogStep';
 
 export interface IDataImportDialogState {
   step: EDataImportDialogStep;
-  files: FileList | null;
+  file: File | null;
   selectedProcessor: DataTransferProcessorInfo | null;
 }

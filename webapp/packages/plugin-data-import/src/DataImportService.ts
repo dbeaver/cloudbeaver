@@ -10,7 +10,6 @@ import { computed, makeObservable } from 'mobx';
 import { ProcessSnackbar } from '@cloudbeaver/core-blocks';
 import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { LocalizationService } from '@cloudbeaver/core-localization';
 import { GraphQLService } from '@cloudbeaver/core-sdk';
 import { getProgressPercent } from '@cloudbeaver/core-utils';
 
@@ -25,7 +24,6 @@ export class DataImportService {
   constructor(
     private readonly dataImportSettingsService: DataImportSettingsService,
     private readonly notificationService: NotificationService,
-    private readonly localizationService: LocalizationService,
     private readonly graphQLService: GraphQLService,
   ) {
     makeObservable(this, {
@@ -33,19 +31,15 @@ export class DataImportService {
     });
   }
 
-  async importData(connectionId: string, contextId: string, projectId: string, resultsId: string, processorId: string, files: FileList) {
-    const fileNames = Array.from(files)
-      .map(file => file.name)
-      .join(',\n');
-
+  async importData(connectionId: string, contextId: string, projectId: string, resultsId: string, processorId: string, file: File) {
     const { controller, notification } = this.notificationService.processNotification(
       () => ProcessSnackbar,
       {},
-      { title: this.localizationService.translate('plugin_data_import_process_title'), message: fileNames },
+      { title: 'plugin_data_import_process_title', message: file.name },
     );
 
     try {
-      await this.graphQLService.sdk.uploadResultData(connectionId, contextId, projectId, resultsId, processorId, files, event => {
+      await this.graphQLService.sdk.uploadResultData(connectionId, contextId, projectId, resultsId, processorId, file, event => {
         if (event.total !== undefined) {
           const percentCompleted = getProgressPercent(event.loaded, event.total);
 
@@ -55,10 +49,11 @@ export class DataImportService {
         }
       });
 
-      controller.resolve(this.localizationService.translate('plugin_data_import_process_success'));
+      controller.resolve('plugin_data_import_process_success');
+      return true;
     } catch (exception: any) {
-      notification.close();
-      throw exception;
+      controller.reject(exception, 'plugin_data_import_process_fail');
+      return false;
     }
   }
 }

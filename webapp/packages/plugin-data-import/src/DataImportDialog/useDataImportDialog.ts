@@ -17,13 +17,13 @@ interface IDialog {
   state: IDataImportDialogState;
   stepBack: () => void;
   selectProcessor: (processor: DataTransferProcessorInfo) => void;
-  deleteFile: (id: string) => void;
+  deleteFile: () => void;
   reset: () => void;
 }
 
 const DEFAULT_STATE_GETTER: () => IDataImportDialogState = () => ({
-  step: EDataImportDialogStep.PROCESSOR,
-  files: null,
+  step: EDataImportDialogStep.Processor,
+  file: null,
   selectedProcessor: null,
 });
 
@@ -32,7 +32,9 @@ export function useDataImportDialog(initialState?: IDataImportDialogState) {
     () => ({
       state: initialState ?? DEFAULT_STATE_GETTER(),
       stepBack() {
-        this.state.step = EDataImportDialogStep.PROCESSOR;
+        if (this.state.step === EDataImportDialogStep.File) {
+          this.state.step = EDataImportDialogStep.Processor;
+        }
       },
       selectProcessor(processor: DataTransferProcessorInfo) {
         if (this.state.selectedProcessor && this.state.selectedProcessor.id !== processor.id) {
@@ -40,27 +42,10 @@ export function useDataImportDialog(initialState?: IDataImportDialogState) {
         }
 
         this.state.selectedProcessor = processor;
-        this.state.step = EDataImportDialogStep.FILE;
+        this.state.step = EDataImportDialogStep.File;
       },
-      deleteFile(id: string) {
-        if (this.state.files) {
-          const libraries = Array.from(this.state.files);
-          const uploadedIndex = libraries.findIndex(l => l.name === id);
-
-          if (uploadedIndex > -1) {
-            libraries.splice(uploadedIndex, 1);
-
-            const dt = new DataTransfer();
-
-            for (let i = 0; i < libraries.length; i++) {
-              const file = libraries[i];
-              dt.items.add(file);
-            }
-
-            this.state.files = dt.files;
-            return;
-          }
-        }
+      deleteFile() {
+        this.state.file = null;
       },
       reset() {
         this.state = DEFAULT_STATE_GETTER();
