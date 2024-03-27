@@ -23,20 +23,10 @@ import { ExtensionUtils } from '@cloudbeaver/core-extensions';
 import { LocalizationService } from '@cloudbeaver/core-localization';
 import { DATA_CONTEXT_NAV_NODE, EObjectFeature, NodeManagerUtils } from '@cloudbeaver/core-navigation-tree';
 import { ISessionAction, sessionActionContext, SessionActionService } from '@cloudbeaver/core-root';
-import { DATA_CONTEXT_TAB_ID, DATA_CONTEXT_TABS_CONTEXT, MENU_TAB } from '@cloudbeaver/core-ui';
-import {
-  ACTION_RENAME,
-  ActionService,
-  DATA_CONTEXT_MENU,
-  DATA_CONTEXT_MENU_NESTED,
-  menuExtractItems,
-  MenuService,
-  ViewService,
-} from '@cloudbeaver/core-view';
+import { ACTION_RENAME, ActionService, DATA_CONTEXT_MENU_NESTED, menuExtractItems, MenuService, ViewService } from '@cloudbeaver/core-view';
 import { MENU_CONNECTIONS } from '@cloudbeaver/plugin-connections';
 import { NavigationTabsService } from '@cloudbeaver/plugin-navigation-tabs';
 import {
-  DATA_CONTEXT_SQL_EDITOR_RESULT_ID,
   DATA_CONTEXT_SQL_EDITOR_STATE,
   ESqlDataSourceFeatures,
   getSqlEditorName,
@@ -44,13 +34,11 @@ import {
   SqlDataSourceService,
   SqlEditorService,
   SqlEditorSettingsService,
-  SqlResultTabsService,
 } from '@cloudbeaver/plugin-sql-editor';
 import { MENU_APP_ACTIONS } from '@cloudbeaver/plugin-top-app-bar';
 
 import { ACTION_SQL_EDITOR_NEW } from './ACTION_SQL_EDITOR_NEW';
 import { ACTION_SQL_EDITOR_OPEN } from './ACTION_SQL_EDITOR_OPEN';
-import { ACTION_TAB_CLOSE_GROUP } from './ACTION_TAB_CLOSE_GROUP';
 import { DATA_CONTEXT_SQL_EDITOR_TAB } from './DATA_CONTEXT_SQL_EDITOR_TAB';
 import { isSessionActionOpenSQLEditor } from './sessionActionOpenSQLEditor';
 import { SQL_EDITOR_SOURCE_ACTION } from './SQL_EDITOR_SOURCE_ACTION';
@@ -79,7 +67,6 @@ export class SqlEditorBootstrap extends Bootstrap {
     private readonly sqlEditorService: SqlEditorService,
     private readonly localizationService: LocalizationService,
     private readonly sqlEditorSettingsService: SqlEditorSettingsService,
-    private readonly sqlResultTabsService: SqlResultTabsService,
   ) {
     super();
   }
@@ -178,45 +165,6 @@ export class SqlEditorBootstrap extends Bootstrap {
             });
             break;
           }
-        }
-      },
-    });
-
-    this.menuService.addCreator({
-      isApplicable: context => {
-        const tab = context.tryGet(DATA_CONTEXT_SQL_EDITOR_RESULT_ID);
-        const state = context.tryGet(DATA_CONTEXT_TABS_CONTEXT);
-        const menu = context.hasValue(DATA_CONTEXT_MENU, MENU_TAB);
-        return !!tab && !!state?.enabledBaseActions && menu;
-      },
-      getItems: (context, items) => [...items, ACTION_TAB_CLOSE_GROUP],
-    });
-
-    this.actionService.addHandler({
-      id: 'result-tabs-group-base-handler',
-      isActionApplicable: (context, action) => {
-        const menu = context.hasValue(DATA_CONTEXT_MENU, MENU_TAB);
-        const tab = context.tryGet(DATA_CONTEXT_SQL_EDITOR_RESULT_ID);
-        const sqlEditorState = context.tryGet(DATA_CONTEXT_SQL_EDITOR_STATE);
-        const groupId = sqlEditorState?.resultTabs.find(tabState => tabState.tabId === tab?.id)?.groupId;
-        const hasTabsInGroup = (sqlEditorState?.resultTabs.filter(tabState => tabState.groupId === groupId) ?? []).length > 1;
-
-        if (!menu || !tab || !hasTabsInGroup) {
-          return false;
-        }
-
-        return [ACTION_TAB_CLOSE_GROUP].includes(action);
-      },
-      handler: async (context, action) => {
-        const state = context.get(DATA_CONTEXT_SQL_EDITOR_STATE);
-        const tab = context.get(DATA_CONTEXT_SQL_EDITOR_RESULT_ID);
-
-        switch (action) {
-          case ACTION_TAB_CLOSE_GROUP:
-            this.sqlResultTabsService.handleCloseTabGroup(state, tab.id);
-            break;
-          default:
-            break;
         }
       },
     });

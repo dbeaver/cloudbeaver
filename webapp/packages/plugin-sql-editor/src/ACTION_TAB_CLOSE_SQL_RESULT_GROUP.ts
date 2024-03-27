@@ -7,7 +7,7 @@
  */
 import { createAction } from '@cloudbeaver/core-view';
 
-export const ACTION_TAB_CLOSE_GROUP = createAction('tab-close-group', {
-  label: 'ui_close_group',
-  tooltip: 'ui_close_group',
+export const ACTION_TAB_CLOSE_SQL_RESULT_GROUP = createAction('tab-close-sql-result-group', {
+  label: 'plugin_sql_editor_action_close_group',
+  tooltip: 'plugin_sql_editor_action_close_group',
 });
