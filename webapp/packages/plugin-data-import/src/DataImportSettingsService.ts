@@ -17,6 +17,9 @@ export type DataImportSettings = schema.infer<typeof defaultSettings>;
 
 @injectable()
 export class DataImportSettingsService extends Dependency {
+  get disabled(): boolean {
+    return this.settings.getValue('plugin.data-import.disabled');
+  }
   readonly settings: SettingsProvider<typeof defaultSettings>;
 
   constructor(private readonly settingsProviderService: SettingsProviderService) {
