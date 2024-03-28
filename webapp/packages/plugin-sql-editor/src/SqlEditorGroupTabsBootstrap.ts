@@ -36,6 +36,7 @@ export class SqlEditorGroupTabsBootstrap extends Bootstrap {
         return items;
       },
     });
+
     this.actionService.addHandler({
       id: 'result-tabs-group-base-handler',
       isActionApplicable: (context, action) => {
@@ -50,11 +51,13 @@ export class SqlEditorGroupTabsBootstrap extends Bootstrap {
         return [ACTION_TAB_CLOSE_SQL_RESULT_GROUP].includes(action);
       },
       handler: async (context, action) => {
-        const state = context.get(DATA_CONTEXT_SQL_EDITOR_STATE);
         const tab = context.get(DATA_CONTEXT_SQL_EDITOR_RESULT_ID);
+        const sqlEditorState = context.get(DATA_CONTEXT_SQL_EDITOR_STATE);
+        const tabs = context.get(DATA_CONTEXT_TABS_CONTEXT);
+
         switch (action) {
           case ACTION_TAB_CLOSE_SQL_RESULT_GROUP:
-            this.sqlResultTabsService.closeTabGroup(state, tab.id);
+            this.sqlResultTabsService.closeTabGroup(sqlEditorState, tabs, context, tab.id);
             break;
           default:
             break;
