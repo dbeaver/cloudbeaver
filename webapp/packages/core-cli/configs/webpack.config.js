@@ -165,7 +165,7 @@ module.exports = (env, argv) => {
           loader: 'json5-loader',
           type: 'javascript/auto',
         },
-        devMode && {
+        !devMode && {
           test: /\.jsx?$/,
           enforce: 'pre',
           exclude: /node_modules/,
@@ -212,7 +212,7 @@ module.exports = (env, argv) => {
       ],
     },
     ignoreWarnings: [/Failed to parse source map/],
-    devtool: devMode ? 'source-map' : false,
+    devtool: !devMode ? 'source-map' : false,
     plugins: [
       new webpack.WatchIgnorePlugin({
         paths: [/.tsbuildinfo$/],

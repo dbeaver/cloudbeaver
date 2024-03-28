@@ -55,7 +55,7 @@ module.exports = (env, argv) => {
       main,
       sso,
     },
-    devtool: false,
+    devtool: !devMode ? 'source-map' : false,
     output: {
       filename: 'index.[contenthash].js',
       chunkFilename: '[name].[contenthash].bundle.js',
