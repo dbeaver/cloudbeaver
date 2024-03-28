@@ -370,15 +370,17 @@ export function useElementsTree(options: IOptions): IElementsTree {
         filter: '',
       }),
     async data => {
-      if (!options.settings?.saveFilter) {
-        data.filter = '';
-      }
+      runInAction(() => {
+        if (!options.settings?.saveFilter) {
+          data.filter = '';
+        }
 
-      if (!options.settings?.saveExpanded) {
-        data.nodeState = [];
-      }
+        if (!options.settings?.saveExpanded) {
+          data.nodeState = [];
+        }
 
-      state.sync(data.nodeState);
+        state.sync(data.nodeState);
+      });
 
       try {
         await functionsRef.loadTree(options.root);
