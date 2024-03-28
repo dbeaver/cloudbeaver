@@ -12,15 +12,16 @@ import { MenuBootstrap } from './MenuBootstrap';
 import { LocalStorageSqlDataSourceBootstrap } from './SqlDataSource/LocalStorage/LocalStorageSqlDataSourceBootstrap';
 import { SqlDataSourceService } from './SqlDataSource/SqlDataSourceService';
 import { SqlDialectInfoService } from './SqlDialectInfoService';
+import { SqlEditorGroupTabsBootstrap } from './SqlEditorGroupTabsBootstrap';
 import { SqlEditorModeService } from './SqlEditorModeService';
 import { SqlEditorService } from './SqlEditorService';
 import { SqlEditorSettingsService } from './SqlEditorSettingsService';
 import { SqlEditorView } from './SqlEditorView';
 import { SqlExecutionPlanService } from './SqlResultTabs/ExecutionPlan/SqlExecutionPlanService';
-import { OutputMenuBootstrap } from './SqlResultTabs/OutputLogs/OutputMenuBootstrap';
 import { OutputLogsEventHandler } from './SqlResultTabs/OutputLogs/OutputLogsEventHandler';
 import { OutputLogsResource } from './SqlResultTabs/OutputLogs/OutputLogsResource';
 import { OutputLogsService } from './SqlResultTabs/OutputLogs/OutputLogsService';
+import { OutputMenuBootstrap } from './SqlResultTabs/OutputLogs/OutputMenuBootstrap';
 import { SqlQueryResultService } from './SqlResultTabs/SqlQueryResultService';
 import { SqlQueryService } from './SqlResultTabs/SqlQueryService';
 import { SqlResultTabsService } from './SqlResultTabs/SqlResultTabsService';
@@ -48,5 +49,6 @@ export const sqlEditorPluginManifest: PluginManifest = {
     OutputLogsResource,
     OutputLogsService,
     OutputMenuBootstrap,
+    SqlEditorGroupTabsBootstrap,
   ],
 };

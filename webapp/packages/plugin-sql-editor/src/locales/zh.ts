@@ -35,4 +35,5 @@ export default [
   ['sql_editor_close_result_tabs_dialog_title', 'Confirm closing tabs'],
   ['plugin_sql_editor_action_overlay_title', 'Action required'],
   ['plugin_sql_editor_action_overlay_description', 'Please reopen editor to continue working.'],
+  ['plugin_sql_editor_action_close_group', 'Close all of the same query'],
 ];
