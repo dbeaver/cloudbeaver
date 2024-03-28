@@ -9,10 +9,13 @@ import { configure } from 'mobx';
 
 import { App, IServiceInjector, PluginManifest } from '@cloudbeaver/core-di';
 
+import './__custom_mocks__/mockKnownConsoleMessages';
+
 export interface IApplication {
   app: App;
   injector: IServiceInjector;
   init(): Promise<void>;
+  dispose(): void;
 }
 
 export function createApp(...plugins: PluginManifest[]): IApplication {
@@ -23,17 +26,21 @@ export function createApp(...plugins: PluginManifest[]): IApplication {
   const app = new App(plugins);
   const injector = app.getServiceInjector();
 
-  //@ts-expect-error
-  app.registerServices();
+  beforeAll(async () => {
+    await app.start();
+  });
+  afterAll(() => {
+    app.dispose();
+  });
 
   return {
     app,
     injector,
     async init() {
-      //@ts-expect-error
-      await app.initializeServices();
-      //@ts-expect-error
-      await app.loadServices();
+      await app.start();
+    },
+    dispose() {
+      app.dispose();
     },
   };
 }

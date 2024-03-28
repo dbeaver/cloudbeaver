@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+  <defs>
+    <style>
+      .cls-1 {
+        fill-rule: evenodd;
+      }
+
+      .cls-1, .cls-2 {
+        fill: #338ecc;
+        stroke-width: 0px;
+      }
+    </style>
+  </defs>
+  <path class="cls-1" d="M19.67,4H4.33c-1.23,0-2.33,1.08-2.33,2.33v5h1.33v-3.33h17.33v9.33c0,.8-.54,1.33-1.33,1.33H4.67c-.79,0-1.33-.53-1.33-1.33v-2h-1.33v2.33c0,1.25,1.11,2.33,2.33,2.33h15.33c1.23,0,2.33-1.08,2.33-2.33V6.33c0-1.25-1.11-2.33-2.33-2.33Z"/>
+  <polygon class="cls-2" points="10.06 13.3 6.03 10.67 6.03 12.67 2 12.67 2 14 6.03 14 6.03 15.94 10.06 13.3"/>
+  <rect class="cls-2" x="11.33" y="8" width="1.33" height="10.67"/>
+  <rect class="cls-2" x="12" y="12.67" width="8.67" height="1.33"/>
+</svg>

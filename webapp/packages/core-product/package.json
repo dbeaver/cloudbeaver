@@ -18,7 +18,6 @@
   },
   "dependencies": {
     "@cloudbeaver/core-di": "~0.1.0",
-    "@cloudbeaver/core-root": "~0.1.0",
     "@cloudbeaver/core-settings": "~0.1.0",
     "@cloudbeaver/core-utils": "~0.1.0",
     "mobx": "^6.12.0"

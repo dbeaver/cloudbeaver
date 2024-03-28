@@ -18,7 +18,7 @@ import { DataImportSettingsService } from './DataImportSettingsService';
 @injectable()
 export class DataImportService {
   get disabled() {
-    return this.dataImportSettingsService.settings.getValue('disabled');
+    return this.dataImportSettingsService.disabled;
   }
 
   constructor(

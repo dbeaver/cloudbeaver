@@ -18,41 +18,43 @@ import { coreDialogsManifest } from '@cloudbeaver/core-dialogs';
 import { coreEventsManifest } from '@cloudbeaver/core-events';
 import { coreLocalizationManifest } from '@cloudbeaver/core-localization';
 import { coreNavigationTree } from '@cloudbeaver/core-navigation-tree';
-import { corePluginManifest } from '@cloudbeaver/core-plugin';
-import { coreProductManifest } from '@cloudbeaver/core-product';
 import { coreProjectsManifest } from '@cloudbeaver/core-projects';
 import { coreRootManifest, ServerConfigResource } from '@cloudbeaver/core-root';
 import { createGQLEndpoint } from '@cloudbeaver/core-root/dist/__custom_mocks__/createGQLEndpoint';
+import '@cloudbeaver/core-root/dist/__custom_mocks__/expectWebsocketClosedMessage';
 import { mockAppInit } from '@cloudbeaver/core-root/dist/__custom_mocks__/mockAppInit';
 import { mockGraphQL } from '@cloudbeaver/core-root/dist/__custom_mocks__/mockGraphQL';
 import { mockServerConfig } from '@cloudbeaver/core-root/dist/__custom_mocks__/resolvers/mockServerConfig';
 import { coreRoutingManifest } from '@cloudbeaver/core-routing';
 import { coreSDKManifest } from '@cloudbeaver/core-sdk';
 import { coreSettingsManifest } from '@cloudbeaver/core-settings';
-import { coreThemingManifest } from '@cloudbeaver/core-theming';
+import {
+  expectDeprecatedSettingMessage,
+  expectNoDeprecatedSettingMessage,
+} from '@cloudbeaver/core-settings/dist/__custom_mocks__/expectDeprecatedSettingMessage';
+import { coreStorageManifest } from '@cloudbeaver/core-storage';
 import { coreUIManifest } from '@cloudbeaver/core-ui';
 import { coreViewManifest } from '@cloudbeaver/core-view';
-import { dataViewerManifest } from '@cloudbeaver/plugin-data-viewer';
 import { datasourceContextSwitchPluginManifest } from '@cloudbeaver/plugin-datasource-context-switch';
 import { navigationTabsPlugin } from '@cloudbeaver/plugin-navigation-tabs';
 import { navigationTreePlugin } from '@cloudbeaver/plugin-navigation-tree';
 import { objectViewerManifest } from '@cloudbeaver/plugin-object-viewer';
 import { createApp } from '@cloudbeaver/tests-runner';
 
-import { DataExportSettings, DataExportSettingsService } from './DataExportSettingsService';
+import { DataExportSettingsService } from './DataExportSettingsService';
 import { dataExportManifest } from './manifest';
 
 const endpoint = createGQLEndpoint();
+const server = mockGraphQL(...mockAppInit(endpoint), ...mockAuthentication(endpoint));
 const app = createApp(
   dataExportManifest,
   coreLocalizationManifest,
   coreEventsManifest,
-  corePluginManifest,
-  coreProductManifest,
   coreRootManifest,
   coreSDKManifest,
   coreBrowserManifest,
   coreSettingsManifest,
+  coreStorageManifest,
   coreViewManifest,
   coreAuthenticationManifest,
   coreProjectsManifest,
@@ -63,35 +65,23 @@ const app = createApp(
   coreDialogsManifest,
   coreNavigationTree,
   coreAppManifest,
-  coreThemingManifest,
   datasourceContextSwitchPluginManifest,
   navigationTreePlugin,
   navigationTabsPlugin,
   objectViewerManifest,
-  dataViewerManifest,
   coreClientActivityManifest,
 );
-
-const server = mockGraphQL(...mockAppInit(endpoint), ...mockAuthentication(endpoint));
-
-beforeAll(() => app.init());
 
 const testValueA = true;
 const testValueB = true;
 
 const deprecatedSettings = {
-  plugin_data_export: {
-    disabled: testValueB,
-  } as DataExportSettings,
+  'plugin_data_export.disabled': testValueB,
 };
 
 const newSettings = {
   ...deprecatedSettings,
-  plugin: {
-    'data-export': {
-      disabled: testValueA,
-    } as DataExportSettings,
-  },
+  'plugin.data-export.disabled': testValueA,
 };
 
 test('New settings override deprecated', async () => {
@@ -102,7 +92,8 @@ test('New settings override deprecated', async () => {
 
   await config.refresh();
 
-  expect(settings.settings.getValue('disabled')).toBe(testValueA);
+  expect(settings.disabled).toBe(testValueA);
+  expectNoDeprecatedSettingMessage();
 });
 
 test('Deprecated settings are used if new settings are not defined', async () => {
@@ -113,5 +104,6 @@ test('Deprecated settings are used if new settings are not defined', async () =>
 
   await config.refresh();
 
-  expect(settings.settings.getValue('disabled')).toBe(testValueB);
+  expect(settings.disabled).toBe(testValueB);
+  expectDeprecatedSettingMessage();
 });

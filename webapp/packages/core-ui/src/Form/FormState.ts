@@ -118,6 +118,10 @@ export class FormState<TState> implements IFormState<TState> {
     return this.dataContext.get(DATA_CONTEXT_LOADABLE_STATE).loaders.some(loader => loader.isCancelled?.() === true);
   }
 
+  isChanged(): boolean {
+    return Array.from(this.parts.values()).some(part => part.isChanged());
+  }
+
   async load(refresh?: boolean): Promise<void> {
     if (this.promise !== null) {
       return this.promise;

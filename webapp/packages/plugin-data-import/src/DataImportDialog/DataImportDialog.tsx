@@ -19,7 +19,7 @@ import {
 } from '@cloudbeaver/core-blocks';
 import type { DialogComponent } from '@cloudbeaver/core-dialogs';
 
-import { DataImportFileUploader } from './DataImportFileUploader';
+import { DataImportFileSelector } from './DataImportFileSelector';
 import { EDataImportDialogStep } from './EDataImportDialogStep';
 import type { IDataImportDialogState } from './IDataImportDialogState';
 import { ImportProcessorList } from './ImportProcessorList';
@@ -43,21 +43,6 @@ export const DataImportDialog: DialogComponent<IDataImportDialogPayload, IDataIm
   const translate = useTranslate();
   const dialog = useDataImportDialog(payload.initialState);
 
-  function handleImport() {
-    if (!dialog.state.file) {
-      throw new Error('File must be provided');
-    }
-
-    if (!dialog.state.selectedProcessor) {
-      throw new Error('Processor must be provided');
-    }
-
-    resolveDialog({
-      file: dialog.state.file,
-      processorId: dialog.state.selectedProcessor.id,
-    });
-  }
-
   let title = translate('plugin_data_import_title');
   let icon = '/icons/data-import.png';
 
@@ -71,7 +56,7 @@ export const DataImportDialog: DialogComponent<IDataImportDialogPayload, IDataIm
       <CommonDialogHeader title={title} subTitle={payload.tableName} icon={icon} onReject={rejectDialog} />
       <CommonDialogBody noBodyPadding>
         {dialog.state.step === EDataImportDialogStep.Processor && <ImportProcessorList onSelect={dialog.selectProcessor} />}
-        {dialog.state.step === EDataImportDialogStep.File && <DataImportFileUploader state={dialog.state} onDelete={dialog.deleteFile} />}
+        {dialog.state.step === EDataImportDialogStep.File && <DataImportFileSelector state={dialog.state} onDelete={dialog.deleteFile} />}
       </CommonDialogBody>
 
       <CommonDialogFooter>
@@ -84,7 +69,12 @@ export const DataImportDialog: DialogComponent<IDataImportDialogPayload, IDataIm
             <Button type="button" mod={['outlined']} onClick={dialog.stepBack}>
               {translate('ui_stepper_back')}
             </Button>
-            <Button type="button" mod={['raised']} disabled={!dialog.state.file} onClick={handleImport}>
+            <Button
+              type="button"
+              mod={['raised']}
+              disabled={!dialog.state.file || !dialog.state.selectedProcessor}
+              onClick={() => resolveDialog({ file: dialog.state.file!, processorId: dialog.state.selectedProcessor!.id })}
+            >
               {translate('ui_import')}
             </Button>
           </Container>

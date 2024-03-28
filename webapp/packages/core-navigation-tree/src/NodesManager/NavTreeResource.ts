@@ -65,7 +65,7 @@ export class NavTreeResource extends CachedMapResource<string, string[], Record<
   readonly onNodeMove: IExecutor<INavNodeMoveData>;
 
   get childrenLimit(): number {
-    return this.navTreeSettingsService.settings.getValue('childrenLimit');
+    return this.navTreeSettingsService.childrenLimit;
   }
 
   constructor(

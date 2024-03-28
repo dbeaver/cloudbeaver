@@ -12,7 +12,7 @@ import { NotificationService } from '@cloudbeaver/core-events';
 import { Executor, IExecutor } from '@cloudbeaver/core-executor';
 import { EAdminPermission, PermissionsService, ServerConfigResource, SessionPermissionsResource } from '@cloudbeaver/core-root';
 import { RouterState, ScreenService } from '@cloudbeaver/core-routing';
-import { SettingsService } from '@cloudbeaver/core-settings';
+import { StorageService } from '@cloudbeaver/core-storage';
 import { GlobalConstants } from '@cloudbeaver/core-utils';
 
 import { AdministrationItemService } from '../AdministrationItem/AdministrationItemService';
@@ -69,7 +69,7 @@ export class AdministrationScreenService {
     private readonly permissionsService: PermissionsService,
     private readonly screenService: ScreenService,
     private readonly administrationItemService: AdministrationItemService,
-    private readonly settingsService: SettingsService,
+    private readonly storageService: StorageService,
     private readonly serverConfigResource: ServerConfigResource,
     private readonly notificationService: NotificationService,
   ) {
@@ -84,8 +84,8 @@ export class AdministrationScreenService {
       activeScreen: computed,
     });
 
-    this.settingsService.registerSettings(ADMINISTRATION_ITEMS_STATE, this.itemState, () => new Map());
-    this.settingsService.registerSettings(ADMINISTRATION_INFO, this.info, getDefaultAdministrationScreenInfo);
+    this.storageService.registerSettings(ADMINISTRATION_ITEMS_STATE, this.itemState, () => new Map());
+    this.storageService.registerSettings(ADMINISTRATION_INFO, this.info, getDefaultAdministrationScreenInfo);
     this.permissionsResource.onDataUpdate.addPostHandler(() => {
       this.checkPermissions(this.screenService.routerService.state);
     });

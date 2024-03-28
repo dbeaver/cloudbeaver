@@ -1,0 +1,34 @@
+{
+  "name": "@cloudbeaver/core-settings-user",
+  "sideEffects": [
+    "src/**/*.css",
+    "src/**/*.scss",
+    "public/**/*"
+  ],
+  "version": "0.1.0",
+  "description": "",
+  "license": "Apache-2.0",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc -b",
+    "lint": "eslint ./src/ --ext .ts,.tsx",
+    "lint-fix": "eslint ./src/ --ext .ts,.tsx --fix",
+    "test": "yarn build && core-cli-test",
+    "validate-dependencies": "core-cli-validate-dependencies",
+    "update-ts-references": "rimraf --glob dist && typescript-resolve-references"
+  },
+  "dependencies": {
+    "@cloudbeaver/core-authentication": "~0.1.0",
+    "@cloudbeaver/core-di": "~0.1.0",
+    "@cloudbeaver/core-localization": "~0.1.0",
+    "@cloudbeaver/core-root": "~0.1.0",
+    "@cloudbeaver/core-settings": "~0.1.0",
+    "@cloudbeaver/core-storage": "~0.1.0",
+    "@cloudbeaver/core-utils": "~0.1.0",
+    "mobx": "^6.12.0"
+  },
+  "peerDependencies": {},
+  "devDependencies": {
+    "typescript": "^5.3.3"
+  }
+}

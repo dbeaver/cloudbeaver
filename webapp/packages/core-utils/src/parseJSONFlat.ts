@@ -7,7 +7,7 @@
  */
 
 export function parseJSONFlat(object: any, setValue: (key: string, value: any) => void, scope?: string) {
-  if (typeof object === 'object') {
+  if (typeof object === 'object' && object !== null) {
     if (Array.isArray(object)) {
       if (scope) {
         setValue(scope, object);
