@@ -1,3 +1,3 @@
-export { dataImportPlugin } from './manifest';
+export { dataImportPluginManifest } from './manifest';
 
 export * from './DataImportSettingsService';

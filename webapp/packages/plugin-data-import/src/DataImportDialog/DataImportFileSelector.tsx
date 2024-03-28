@@ -10,7 +10,7 @@ import { observer } from 'mobx-react-lite';
 import { Container, Group, InputFiles, s, Table, TableBody, TableColumnHeader, TableHeader, useS, useTranslate } from '@cloudbeaver/core-blocks';
 
 import { DataImportFileItem } from './DataImportFileItem';
-import styles from './DataImportFileUploader.m.css';
+import classes from './DataImportFileSelector.m.css';
 import type { IDataImportDialogState } from './IDataImportDialogState';
 
 interface Props {
@@ -18,11 +18,11 @@ interface Props {
   onDelete: () => void;
 }
 
-export const DataImportFileUploader = observer<Props>(function DataImportFileUploader({ state, onDelete }) {
+export const DataImportFileSelector = observer<Props>(function DataImportFileSelector({ state, onDelete }) {
   const translate = useTranslate();
-  const style = useS(styles);
+  const style = useS(classes);
 
-  function onUpload(value: FileList | null) {
+  function handleFileSelect(value: FileList | null) {
     if (value) {
       state.file = value[0];
     }
@@ -39,7 +39,7 @@ export const DataImportFileUploader = observer<Props>(function DataImportFileUpl
           </TableColumnHeader>
           <TableColumnHeader className={s(style, { columnHeader: true })} heightBig flex>
             <Container zeroBasis />
-            <InputFiles accept={extension} hideTags keepSize onChange={onUpload} />
+            <InputFiles accept={extension} hideTags keepSize onChange={handleFileSelect} />
           </TableColumnHeader>
         </TableHeader>
         <TableBody>

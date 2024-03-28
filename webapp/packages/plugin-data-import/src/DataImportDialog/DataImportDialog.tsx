@@ -19,7 +19,7 @@ import {
 } from '@cloudbeaver/core-blocks';
 import type { DialogComponent } from '@cloudbeaver/core-dialogs';
 
-import { DataImportFileUploader } from './DataImportFileUploader';
+import { DataImportFileUploader } from './DataImportFileSelector';
 import { EDataImportDialogStep } from './EDataImportDialogStep';
 import type { IDataImportDialogState } from './IDataImportDialogState';
 import { ImportProcessorList } from './ImportProcessorList';
@@ -43,18 +43,10 @@ export const DataImportDialog: DialogComponent<IDataImportDialogPayload, IDataIm
   const translate = useTranslate();
   const dialog = useDataImportDialog(payload.initialState);
 
-  function handleImport() {
-    if (!dialog.state.file) {
-      throw new Error('File must be provided');
-    }
-
-    if (!dialog.state.selectedProcessor) {
-      throw new Error('Processor must be provided');
-    }
-
+  function handleImport(file: File, processorId: string) {
     resolveDialog({
-      file: dialog.state.file,
-      processorId: dialog.state.selectedProcessor.id,
+      file,
+      processorId,
     });
   }
 
@@ -84,7 +76,12 @@ export const DataImportDialog: DialogComponent<IDataImportDialogPayload, IDataIm
             <Button type="button" mod={['outlined']} onClick={dialog.stepBack}>
               {translate('ui_stepper_back')}
             </Button>
-            <Button type="button" mod={['raised']} disabled={!dialog.state.file} onClick={handleImport}>
+            <Button
+              type="button"
+              mod={['raised']}
+              disabled={!dialog.state.file || !dialog.state.selectedProcessor}
+              onClick={() => handleImport(dialog.state.file!, dialog.state.selectedProcessor!.id)}
+            >
               {translate('ui_import')}
             </Button>
           </Container>

@@ -13,7 +13,7 @@ import { DataImportService } from './DataImportService';
 import { DataImportSettingsService } from './DataImportSettingsService';
 import { LocaleService } from './LocaleService';
 
-export const dataImportPlugin: PluginManifest = {
+export const dataImportPluginManifest: PluginManifest = {
   info: {
     name: 'Data Import Plugin',
   },
