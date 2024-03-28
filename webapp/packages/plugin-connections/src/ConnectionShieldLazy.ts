@@ -5,8 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
+import { importLazyComponent } from '@cloudbeaver/core-blocks';
 
-.tableColumnValue {
-  height: 36px;
-  padding: 0 24px;
-}
+export const ConnectionShieldLazy = importLazyComponent(() => import('./ConnectionShield').then(m => m.ConnectionShield));

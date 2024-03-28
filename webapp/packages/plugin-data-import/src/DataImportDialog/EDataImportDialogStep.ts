@@ -6,6 +6,6 @@
  * you may not use this file except in compliance with the License.
  */
 export enum EDataImportDialogStep {
-  PROCESSOR = 'PROCESSOR',
-  FILE = 'FILE',
+  Processor,
+  File,
 }

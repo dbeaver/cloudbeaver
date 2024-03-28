@@ -8,6 +8,7 @@
 import { action, observable } from 'mobx';
 
 import { useObservableRef } from '@cloudbeaver/core-blocks';
+import type { DataTransferProcessorInfo } from '@cloudbeaver/core-sdk';
 
 import { EDataImportDialogStep } from './EDataImportDialogStep';
 import type { IDataImportDialogState } from './IDataImportDialogState';
@@ -15,14 +16,14 @@ import type { IDataImportDialogState } from './IDataImportDialogState';
 interface IDialog {
   state: IDataImportDialogState;
   stepBack: () => void;
-  selectProcessor: (id: string) => void;
-  deleteFile: (id: string) => void;
+  selectProcessor: (processor: DataTransferProcessorInfo) => void;
+  deleteFile: () => void;
   reset: () => void;
 }
 
 const DEFAULT_STATE_GETTER: () => IDataImportDialogState = () => ({
-  step: EDataImportDialogStep.PROCESSOR,
-  files: null,
+  step: EDataImportDialogStep.Processor,
+  file: null,
   selectedProcessor: null,
 });
 
@@ -31,35 +32,20 @@ export function useDataImportDialog(initialState?: IDataImportDialogState) {
     () => ({
       state: initialState ?? DEFAULT_STATE_GETTER(),
       stepBack() {
-        this.state.step = EDataImportDialogStep.PROCESSOR;
+        if (this.state.step === EDataImportDialogStep.File) {
+          this.state.step = EDataImportDialogStep.Processor;
+        }
       },
-      selectProcessor(id: string) {
-        if (this.state.selectedProcessor && this.state.selectedProcessor !== id) {
+      selectProcessor(processor: DataTransferProcessorInfo) {
+        if (this.state.selectedProcessor && this.state.selectedProcessor.id !== processor.id) {
           this.reset();
         }
 
-        this.state.selectedProcessor = id;
-        this.state.step = EDataImportDialogStep.FILE;
+        this.state.selectedProcessor = processor;
+        this.state.step = EDataImportDialogStep.File;
       },
-      deleteFile(id: string) {
-        if (this.state.files) {
-          const libraries = Array.from(this.state.files);
-          const uploadedIndex = libraries.findIndex(l => l.name === id);
-
-          if (uploadedIndex > -1) {
-            libraries.splice(uploadedIndex, 1);
-
-            const dt = new DataTransfer();
-
-            for (let i = 0; i < libraries.length; i++) {
-              const file = libraries[i];
-              dt.items.add(file);
-            }
-
-            this.state.files = dt.files;
-            return;
-          }
-        }
+      deleteFile() {
+        this.state.file = null;
       },
       reset() {
         this.state = DEFAULT_STATE_GETTER();

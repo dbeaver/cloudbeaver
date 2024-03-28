@@ -94,6 +94,7 @@ public interface DBWServiceCore extends DBWService {
     @WebAction(authRequired = false)
     boolean touchSession(@NotNull HttpServletRequest request, @NotNull HttpServletResponse servletResponse) throws DBWebException;
 
+    @Deprecated
     @WebAction(authRequired = false)
     WebSession updateSession(@NotNull HttpServletRequest request, @NotNull HttpServletResponse response)
         throws DBWebException;

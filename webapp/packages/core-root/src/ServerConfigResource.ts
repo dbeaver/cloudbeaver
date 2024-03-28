@@ -232,6 +232,7 @@ export class ServerConfigResource extends CachedDataResource<ServerConfig | null
     await this.performUpdate(undefined, undefined, async () => {
       await this.graphQLService.sdk.updateProductConfiguration({ configuration });
       this.setData(await this.loader());
+      this.onDataOutdated.execute();
     });
   }
 
@@ -256,6 +257,8 @@ export class ServerConfigResource extends CachedDataResource<ServerConfig | null
           });
           this.setData(await this.loader());
         }
+
+        this.onDataOutdated.execute();
       },
       () => !this.isNavigatorSettingsChanged() && (!this.isChanged() || skipConfigUpdate),
     );
@@ -271,6 +274,7 @@ export class ServerConfigResource extends CachedDataResource<ServerConfig | null
         });
 
         this.setData(await this.loader());
+        this.onDataOutdated.execute();
       },
       () => !this.isChanged() && !onlyRestart,
     );

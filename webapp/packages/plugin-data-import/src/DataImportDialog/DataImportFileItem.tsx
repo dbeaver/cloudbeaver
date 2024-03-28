@@ -9,7 +9,7 @@ import { observer } from 'mobx-react-lite';
 
 import { ActionIconButton, Container, s, TableColumnValue, TableItem, useS } from '@cloudbeaver/core-blocks';
 
-import style from './DataImportFileItem.m.css';
+import classes from './DataImportFileItem.m.css';
 
 interface Props {
   id: string;
@@ -21,7 +21,7 @@ interface Props {
 }
 
 export const DataImportFileItem = observer<Props>(function DataImportFileItem({ id, name, tooltip, disabled, className, onDelete }) {
-  const styles = useS(style);
+  const styles = useS(classes);
 
   return (
     <TableItem item={id} title={tooltip} disabled={disabled} selectDisabled={disabled} className={className}>

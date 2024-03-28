@@ -25,11 +25,17 @@ import type { IDataImportDialogState } from './IDataImportDialogState';
 import { ImportProcessorList } from './ImportProcessorList';
 import { useDataImportDialog } from './useDataImportDialog';
 
+export interface IDataImportDialogResult {
+  file: File;
+  processorId: string;
+}
+
 export interface IDataImportDialogPayload {
+  tableName: string;
   initialState?: IDataImportDialogState;
 }
 
-export const DataImportDialog: DialogComponent<IDataImportDialogPayload, IDataImportDialogState> = observer(function DataImportDialog({
+export const DataImportDialog: DialogComponent<IDataImportDialogPayload, IDataImportDialogResult> = observer(function DataImportDialog({
   payload,
   resolveDialog,
   rejectDialog,
@@ -38,27 +44,34 @@ export const DataImportDialog: DialogComponent<IDataImportDialogPayload, IDataIm
   const dialog = useDataImportDialog(payload.initialState);
 
   function handleImport() {
-    resolveDialog(dialog.state);
+    if (!dialog.state.file) {
+      throw new Error('File must be provided');
+    }
+
+    if (!dialog.state.selectedProcessor) {
+      throw new Error('Processor must be provided');
+    }
+
+    resolveDialog({
+      file: dialog.state.file,
+      processorId: dialog.state.selectedProcessor.id,
+    });
   }
 
   let title = translate('plugin_data_import_title');
+  let icon = '/icons/data-import.png';
 
-  if (dialog.state.step === EDataImportDialogStep.FILE && dialog.state.selectedProcessor) {
-    title += ` (${dialog.state.selectedProcessor})`;
+  if (dialog.state.step === EDataImportDialogStep.File && dialog.state.selectedProcessor) {
+    title += ` (${dialog.state.selectedProcessor.name ?? dialog.state.selectedProcessor.id})`;
+    icon = dialog.state.selectedProcessor.icon ?? icon;
   }
 
   return (
-    <CommonDialogWrapper size="large" fixedWidth>
-      <CommonDialogHeader title={title} icon="/icons/data-import.png" onReject={rejectDialog} />
-      <CommonDialogBody>
-        {dialog.state.step === EDataImportDialogStep.PROCESSOR && (
-          <ImportProcessorList
-            processors={[{ id: 'processor', order: 0, name: 'Processor example', description: 'Processor description example' }]}
-            onSelect={dialog.selectProcessor}
-          />
-        )}
-
-        {dialog.state.step === EDataImportDialogStep.FILE && <DataImportFileUploader state={dialog.state} onDelete={dialog.deleteFile} />}
+    <CommonDialogWrapper size="large" fixedSize>
+      <CommonDialogHeader title={title} subTitle={payload.tableName} icon={icon} onReject={rejectDialog} />
+      <CommonDialogBody noBodyPadding>
+        {dialog.state.step === EDataImportDialogStep.Processor && <ImportProcessorList onSelect={dialog.selectProcessor} />}
+        {dialog.state.step === EDataImportDialogStep.File && <DataImportFileUploader state={dialog.state} onDelete={dialog.deleteFile} />}
       </CommonDialogBody>
 
       <CommonDialogFooter>
@@ -66,12 +79,12 @@ export const DataImportDialog: DialogComponent<IDataImportDialogPayload, IDataIm
           {translate('ui_processing_cancel')}
         </Button>
         <Fill />
-        {dialog.state.step === EDataImportDialogStep.FILE && (
+        {dialog.state.step === EDataImportDialogStep.File && (
           <Container noWrap keepSize gap>
             <Button type="button" mod={['outlined']} onClick={dialog.stepBack}>
               {translate('ui_stepper_back')}
             </Button>
-            <Button type="button" mod={['raised']} onClick={handleImport}>
+            <Button type="button" mod={['raised']} disabled={!dialog.state.file} onClick={handleImport}>
               {translate('ui_import')}
             </Button>
           </Container>

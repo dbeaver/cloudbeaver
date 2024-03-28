@@ -5,10 +5,12 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
+import type { DataTransferProcessorInfo } from '@cloudbeaver/core-sdk';
+
 import type { EDataImportDialogStep } from './EDataImportDialogStep';
 
 export interface IDataImportDialogState {
   step: EDataImportDialogStep;
-  files: FileList | null;
-  selectedProcessor: string | null;
+  file: File | null;
+  selectedProcessor: DataTransferProcessorInfo | null;
 }

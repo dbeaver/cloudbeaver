@@ -9,8 +9,9 @@ import { observer } from 'mobx-react-lite';
 import { useCallback, useState } from 'react';
 import styled from 'reshadow';
 
-import { IScrollState, Link, s, useControlledScroll, useS, useStyles, useTable, useTranslate } from '@cloudbeaver/core-blocks';
-import type { DBObject } from '@cloudbeaver/core-navigation-tree';
+import { IScrollState, Link, s, useControlledScroll, useExecutor, useS, useStyles, useTable, useTranslate } from '@cloudbeaver/core-blocks';
+import { useService } from '@cloudbeaver/core-di';
+import { type DBObject, NavTreeResource } from '@cloudbeaver/core-navigation-tree';
 import type { ObjectPropertyInfo } from '@cloudbeaver/core-sdk';
 import { useTabLocalState } from '@cloudbeaver/core-ui';
 import { isDefined, TextTools } from '@cloudbeaver/core-utils';
@@ -76,6 +77,7 @@ const CUSTOM_COLUMNS = [ColumnSelect, ColumnIcon];
 
 export const Table = observer<TableProps>(function Table({ objects, hasNextPage, loadMore }) {
   const styles = useS(classes);
+  const navTreeResource = useService(NavTreeResource);
 
   const [tableContainer, setTableContainerRef] = useState<HTMLDivElement | null>(null);
   const translate = useTranslate();
@@ -88,7 +90,6 @@ export const Table = observer<TableProps>(function Table({ objects, hasNextPage,
 
   const baseObject = objects.slice().sort((a, b) => (b.object?.properties?.length || 0) - (a.object?.properties?.length || 0));
 
-  const nodeIds = objects.map(object => object.id);
   const properties = baseObject[0]?.object?.properties ?? [];
   const measuredCells = getMeasuredCells(properties, objects);
 
@@ -115,6 +116,15 @@ export const Table = observer<TableProps>(function Table({ objects, hasNextPage,
     [loadMore],
   );
 
+  useExecutor({
+    executor: navTreeResource.onItemDelete,
+    handlers: [
+      function handleNodeDelete(nodeId) {
+        tableState.unselect(nodeId);
+      },
+    ],
+  });
+
   if (objects.length === 0) {
     return null;
   }
@@ -137,7 +147,7 @@ export const Table = observer<TableProps>(function Table({ objects, hasNextPage,
             </Link>
           </div>
         )}
-        <ObjectPropertyTableFooter className={s(styles, { objectPropertyTableFooter: true })} nodeIds={nodeIds} tableState={tableState} />
+        <ObjectPropertyTableFooter className={s(styles, { objectPropertyTableFooter: true })} state={tableState} />
       </div>
     </TableContext.Provider>,
   );

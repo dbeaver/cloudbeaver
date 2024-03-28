@@ -7,22 +7,25 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import { ItemList, ListItem, ListItemDescription, ListItemIcon, ListItemName, StaticImage } from '@cloudbeaver/core-blocks';
+import { ItemList, ListItem, ListItemDescription, ListItemIcon, ListItemName, StaticImage, useResource } from '@cloudbeaver/core-blocks';
+import { CachedMapAllKey } from '@cloudbeaver/core-resource';
 import type { DataTransferProcessorInfo } from '@cloudbeaver/core-sdk';
 
+import { DataImportProcessorsResource } from '../DataImportProcessorsResource';
 import classes from './ImportProcessorList.m.css';
 
 interface Props {
-  processors: DataTransferProcessorInfo[];
-  onSelect: (id: string) => void;
+  onSelect: (processor: DataTransferProcessorInfo) => void;
   className?: string;
 }
 
-export const ImportProcessorList = observer<Props>(function ImportProcessorList({ processors, onSelect, className }) {
+export const ImportProcessorList = observer<Props>(function ImportProcessorList({ onSelect, className }) {
+  const dataImportProcessorsResource = useResource(ImportProcessorList, DataImportProcessorsResource, CachedMapAllKey, { forceSuspense: true });
+
   return (
     <ItemList className={className}>
-      {processors.map(processor => (
-        <ListItem key={processor.id} onClick={() => onSelect(processor.id)}>
+      {dataImportProcessorsResource.resource.values.map(processor => (
+        <ListItem key={processor.id} onClick={() => onSelect(processor)}>
           <ListItemIcon>
             <StaticImage className={classes.staticImage} icon={processor.icon} />
           </ListItemIcon>
