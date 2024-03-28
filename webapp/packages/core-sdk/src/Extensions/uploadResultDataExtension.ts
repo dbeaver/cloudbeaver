@@ -32,16 +32,13 @@ export function uploadResultDataExtension(client: CustomGraphQLClient): IUploadR
       file: File,
       onUploadProgress?: (event: UploadProgressEvent) => void,
     ): Promise<void> {
-      return new Promise((resolve, reject) => {
-        setTimeout(() => {
-          const success = Math.random() > 0.5;
-          if (success) {
-            resolve();
-          } else {
-            reject(new Error('Upload failed'));
-          }
-        }, 1200);
-      });
+      return client.uploadFile(
+        GlobalConstants.absoluteServiceUrl('data', 'import'),
+        file,
+        undefined,
+        { connectionId, contextId, projectId, resultsId, processorId },
+        onUploadProgress,
+      );
     },
   };
 }
