@@ -29,14 +29,8 @@ export const InputFieldState: InputFieldType = observer<InputFieldStateProps<any
       return null;
     }
 
-    return (
-      <InputFieldBase
-        {...rest}
-        ref={ref}
-        name={name}
-        value={(controlState.stringValue || controlState.defaultValue) ?? ''}
-        onChange={controlState.onChange}
-      />
-    );
+    const defaultValue = rest.type === 'password' ? null : controlState.defaultStringValue;
+
+    return <InputFieldBase {...rest} ref={ref} name={name} value={controlState.stringValue ?? defaultValue ?? ''} onChange={controlState.onChange} />;
   }),
 ) as InputFieldType;
