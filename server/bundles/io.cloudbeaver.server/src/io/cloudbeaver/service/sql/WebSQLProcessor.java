@@ -364,8 +364,15 @@ public class WebSQLProcessor implements WebSessionProvider {
                     isAutoCommitEnabled = txnManager.isAutoCommit();
                     if (txnManager.isSupportsTransactions() && isAutoCommitEnabled) {
                         txnManager.setAutoCommit(monitor, false);
-                        savepoint = txnManager.setSavepoint(monitor, null);
                         revertToAutoCommit = true;
+                    }
+                    if (!txnManager.isAutoCommit() && txnManager.supportsSavepoints()) {
+                        try {
+                            savepoint = txnManager.setSavepoint(monitor, null);
+                        } catch (Throwable e) {
+                            // May be savepoints not supported
+                            log.debug("Can't set savepoint", e);
+                        }
                     }
                 }
                 try {

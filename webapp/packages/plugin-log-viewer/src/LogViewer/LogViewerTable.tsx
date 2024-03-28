@@ -6,50 +6,12 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import styled, { css, use } from 'reshadow';
 
-import { MenuBarSmallItem, Table, TableBody, TableColumnHeader, TableHeader, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
+import { Container, MenuBarSmallItem, s, Table, TableBody, TableColumnHeader, TableHeader, useS, useTranslate } from '@cloudbeaver/core-blocks';
 
 import type { ILogEntry } from './ILogEntry';
 import { LogEntry } from './LogEntry';
-
-const styles = css`
-  wrapper {
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-  }
-  Table {
-    flex: 1 1 auto;
-    width: 100%;
-  }
-  table-wrapper {
-    overflow: auto;
-  }
-  message-title-box {
-    display: flex;
-    align-items: center;
-
-    & message-title {
-      flex: 1;
-    }
-  }
-  [|buttons] {
-    text-align: right;
-  }
-  TableColumnHeader {
-    white-space: nowrap;
-    text-overflow: ellipsis;
-  }
-  TableColumnHeader[min] {
-    width: 32px;
-  }
-  [|timestamp] {
-    width: 116px;
-    min-width: 116px;
-  }
-`;
+import styles from './LogViewerTable.m.css';
 
 interface Props {
   items: ILogEntry[];
@@ -60,22 +22,30 @@ interface Props {
 }
 export const LogViewerTable = observer<Props>(function LogViewerTable({ items, selectedItem, onItemSelect, onClear, className }) {
   const translate = useTranslate();
-  const style = useStyles(styles);
+  const style = useS(styles);
 
-  return styled(style)(
-    <wrapper className={className}>
-      <table-wrapper>
-        <Table {...use({ expanded: !!selectedItem })}>
+  return (
+    <Container className={s(style, { wrapper: true }, className)}>
+      <MenuBarSmallItem
+        className={s(style, { clearButton: true })}
+        icon="trash"
+        viewBox="0 0 24 24"
+        title={translate('plugin_log_viewer_clear_log')}
+        onClick={onClear}
+      >
+        {translate('ui_clear')}
+      </MenuBarSmallItem>
+      <Container className={s(style, { tableWrapper: true })} overflow>
+        <Table className={s(style, { table: true })}>
           <TableHeader fixed>
-            <TableColumnHeader min />
-            <TableColumnHeader {...use({ timestamp: true })}>{translate('plugin_log_viewer_entry_timestamp')}</TableColumnHeader>
-            <TableColumnHeader>
-              <message-title-box>
-                <message-title>{translate('plugin_log_viewer_entry_message')}</message-title>
-                <MenuBarSmallItem icon="trash" viewBox="0 0 24 24" title={translate('plugin_log_viewer_clear_log')} onClick={onClear}>
-                  {translate('ui_clear')}
-                </MenuBarSmallItem>
-              </message-title-box>
+            <TableColumnHeader className={s(style, { tableColumnHeader: true, tableColumnHeaderMin: true })} min />
+            <TableColumnHeader className={s(style, { tableColumnHeader: true, timestamp: true })}>
+              {translate('plugin_log_viewer_entry_timestamp')}
+            </TableColumnHeader>
+            <TableColumnHeader className={s(style, { tableColumnHeader: true })}>
+              <div className={s(style, { messageTitleBox: true })}>
+                <div className={s(style, { messageTitle: true })}>{translate('plugin_log_viewer_entry_message')}</div>
+              </div>
             </TableColumnHeader>
           </TableHeader>
           <TableBody>
@@ -84,7 +54,7 @@ export const LogViewerTable = observer<Props>(function LogViewerTable({ items, s
             ))}
           </TableBody>
         </Table>
-      </table-wrapper>
-    </wrapper>,
+      </Container>
+    </Container>
   );
 });
