@@ -39,6 +39,21 @@ export function createSettingsAliasResolver<TTarget extends schema.SomeZodObject
     data => ({ ...data, key: reverseMapKey(data.key) }),
     data => data.key in reversed,
   );
+
+  let resolverLock = false;
+
+  function withLock<T>(fn: (locked: boolean) => T): T {
+    if (resolverLock) {
+      return fn(true);
+    }
+    try {
+      resolverLock = true;
+      return fn(false);
+    } finally {
+      resolverLock = false;
+    }
+  }
+
   return {
     onChange,
     has(key) {
@@ -46,7 +61,20 @@ export function createSettingsAliasResolver<TTarget extends schema.SomeZodObject
         return false;
       }
 
-      return source.has(mapKey(key));
+      // check that there is no actual key in source
+      if (withLock(locked => locked || source.has(key))) {
+        return false;
+      }
+
+      const oldKey = mapKey(key);
+      const has = source.has(oldKey);
+
+      if (!DEPRECATED_SETTINGS.has(oldKey)) {
+        console.warn(`You have deprecated settings: "${String(oldKey)}". Use "${key}" instead.`);
+        DEPRECATED_SETTINGS.add(oldKey);
+      }
+
+      return has;
     },
     isEdited(key) {
       if (!(key in mappings)) {
@@ -71,20 +99,17 @@ export function createSettingsAliasResolver<TTarget extends schema.SomeZodObject
         return undefined;
       }
 
-      const oldKey = mapKey(key);
-
-      if (!DEPRECATED_SETTINGS.has(oldKey)) {
-        console.warn(`You are using deprecated settings: "${String(oldKey)}". Use "${key}" instead.`);
-        DEPRECATED_SETTINGS.add(oldKey);
-      }
-
       return source.getValue(mapKey(key));
     },
     setValue(key, value) {
       if (!(key in mappings)) {
         return;
       }
-      source.setValue(mapKey(key), value);
+      withLock(locked => {
+        if (!locked) {
+          source.setValue(key, value);
+        }
+      });
     },
     async save() {},
     clear() {},
