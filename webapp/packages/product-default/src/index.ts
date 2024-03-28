@@ -13,6 +13,7 @@ import connectionTemplate from '@cloudbeaver/plugin-connection-template';
 import connectionPlugin from '@cloudbeaver/plugin-connections';
 import connectionAdministration from '@cloudbeaver/plugin-connections-administration';
 import { dataExportManifest } from '@cloudbeaver/plugin-data-export';
+import { dataImportPlugin } from '@cloudbeaver/plugin-data-import';
 import { dataSpreadsheetNewManifest } from '@cloudbeaver/plugin-data-spreadsheet-new';
 import { dataViewerManifest } from '@cloudbeaver/plugin-data-viewer';
 import { dvResultSetGroupingPlugin } from '@cloudbeaver/plugin-data-viewer-result-set-grouping';
@@ -72,6 +73,7 @@ const PLUGINS: PluginManifest[] = [
   connectionTemplate,
   connectionSearch,
   dataExportManifest,
+  dataImportPlugin,
   dataViewerManifest,
   dvResultSetGroupingPlugin,
   gisViewer,
