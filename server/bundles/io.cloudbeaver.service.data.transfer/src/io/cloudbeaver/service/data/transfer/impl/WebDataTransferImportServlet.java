@@ -20,20 +20,26 @@ import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.model.WebConnectionInfo;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.server.CBApplication;
+import io.cloudbeaver.server.CBPlatform;
 import io.cloudbeaver.service.WebServiceServletBase;
 import io.cloudbeaver.service.data.transfer.DBWServiceDataTransfer;
 import io.cloudbeaver.service.sql.WebSQLContextInfo;
 import io.cloudbeaver.service.sql.WebSQLProcessor;
 import io.cloudbeaver.service.sql.WebSQLResultsInfo;
 import io.cloudbeaver.service.sql.WebServiceBindingSQL;
+import jakarta.servlet.MultipartConfigElement;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.eclipse.jetty.ee8.nested.Request;
 import org.jkiss.dbeaver.Log;
+import org.jkiss.dbeaver.model.data.json.JSONUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Path;
+import java.util.Map;
 
 @MultipartConfig
 public class WebDataTransferImportServlet extends WebServiceServletBase {
@@ -58,27 +64,41 @@ public class WebDataTransferImportServlet extends WebServiceServletBase {
             response.sendError(HttpServletResponse.SC_FORBIDDEN, "Import for users only");
             return;
         }
+        Path tempFolder = CBPlatform.getInstance().getTempFolder(session.getProgressMonitor(), "temp-driver-files");
+        MultipartConfigElement MULTI_PART_CONFIG = new MultipartConfigElement(tempFolder.toString());
 
-        WebConnectionInfo webConnectionInfo = session.getWebConnectionInfo(request.getParameter("projectId"),
-                request.getParameter("connectionId"));
+        request.setAttribute(Request.__MULTIPART_CONFIG_ELEMENT, MULTI_PART_CONFIG);
+
+        Map<String, Object> variables = getVariables(request);
+
+        String projectId = JSONUtils.getString(variables, "projectId");
+        String connectionId = JSONUtils.getString(variables, "connectionId");
+        String contextId = JSONUtils.getString(variables, "contextId");
+        String resultId = JSONUtils.getString(variables, "resultsId");
+        String processorId = JSONUtils.getString(variables, "processorId");
+
+        if (projectId == null || connectionId == null || contextId == null || resultId == null || processorId == null) {
+            throw new IllegalArgumentException("Missing required parameters");
+        }
+
+        WebConnectionInfo webConnectionInfo = session.getWebConnectionInfo(projectId, connectionId);
         WebSQLProcessor processor = WebServiceBindingSQL.getSQLProcessor(webConnectionInfo);
-        WebSQLContextInfo webSQLContextInfo = processor.getContext(request.getParameter("contextId"));
+        WebSQLContextInfo webSQLContextInfo = processor.getContext(contextId);
 
         if (webSQLContextInfo == null) {
             throw new DBWebException("Context is empty");
         }
 
-        WebSQLResultsInfo webSQLResultsInfo = webSQLContextInfo.getResults(request.getParameter("resultId"));
-        String processorId = request.getParameter("processorId");
+        WebSQLResultsInfo webSQLResultsInfo = webSQLContextInfo.getResults(resultId);
         InputStream file;
 
         try {
-            file = request.getPart("file").getInputStream();
+            file = request.getPart("fileData").getInputStream();
         } catch (ServletException e) {
             throw new DBWebException(e.getMessage());
         }
 
-        if (!"POST".equalsIgnoreCase(request.getMethod())) {
+        if ("POST".equalsIgnoreCase(request.getMethod())) {
             dbwServiceDataTransfer.asyncImportDataContainer(processorId, file, webSQLResultsInfo, session);
         }
     }
