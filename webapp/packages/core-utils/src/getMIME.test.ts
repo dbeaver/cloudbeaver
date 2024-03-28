@@ -1,8 +1,8 @@
 import { getMIME } from './getMIME';
 
 describe('getMIME', () => {
-  it('should return null if binary is empty', () => {
-    expect(getMIME('')).toBe(null);
+  it("should return 'application/octet-stream' if binary is empty", () => {
+    expect(getMIME('')).toBe('application/octet-stream');
   });
 
   it('should return image/jpeg if binary starts with /', () => {
@@ -26,7 +26,7 @@ describe('getMIME', () => {
     expect(getMIME(webpBase64Image)).toBe('image/webp');
   });
 
-  it('should return null if binary starts with anything else', () => {
-    expect(getMIME('aasdqwe')).toBe(null);
+  it("should return 'application/octet-stream' if binary starts with anything else", () => {
+    expect(getMIME('aasdqwe')).toBe('application/octet-stream');
   });
 });

@@ -9,7 +9,7 @@ import { injectable } from '@cloudbeaver/core-di';
 import { uuid } from '@cloudbeaver/core-utils';
 import { IDatabaseDataModel, IDatabaseResultSet, TableViewerStorageService } from '@cloudbeaver/plugin-data-viewer';
 
-import type { IResultGroup, ISqlEditorTabState, IStatisticsTab } from '../ISqlEditorTabState';
+import type { IResultGroup, IResultTab, ISqlEditorTabState, IStatisticsTab } from '../ISqlEditorTabState';
 import type { IDataQueryOptions } from '../QueryDataSource';
 
 @injectable()
@@ -199,14 +199,14 @@ export class SqlQueryResultService {
     model: IDatabaseDataModel<IDataQueryOptions, IDatabaseResultSet>,
     resultCount?: number,
   ) {
-    this.updateResultTab(state, group, model, 0, resultCount);
+    this.createResultTabForGroup(state, group, model, 0, resultCount);
 
     for (let i = 1; i < model.source.results.length; i++) {
-      this.updateResultTab(state, group, model, i, resultCount);
+      this.createResultTabForGroup(state, group, model, i, resultCount);
     }
   }
 
-  private updateResultTab(
+  private createResultTabForGroup(
     state: ISqlEditorTabState,
     group: IResultGroup,
     model: IDatabaseDataModel<IDataQueryOptions, IDatabaseResultSet>,
@@ -226,6 +226,16 @@ export class SqlQueryResultService {
     }
   }
 
+  updateResultTab(state: ISqlEditorTabState, id: string, resultTab: Partial<IResultTab>) {
+    const index = state.resultTabs.findIndex(tab => tab.tabId === id);
+
+    if (index === -1) {
+      return;
+    }
+
+    state.resultTabs[index] = { ...state.resultTabs[index], ...resultTab };
+  }
+
   private createResultTab(state: ISqlEditorTabState, group: IResultGroup, indexInResultSet: number, results: number, resultCount?: number) {
     const id = uuid();
 
@@ -233,6 +243,8 @@ export class SqlQueryResultService {
       tabId: id,
       groupId: group.groupId,
       indexInResultSet,
+      presentationId: '',
+      valuePresentationId: null,
     });
 
     state.tabs.push({

@@ -114,7 +114,9 @@ public abstract class BaseWebSession extends AbstractSessionPersistent {
     public synchronized void refreshUserData() {
         try {
             userContext.refreshPermissions();
-            userContext.refreshAccessibleProjects();
+            if (userContext.isAuthorizedInSecurityManager()) {
+                userContext.refreshAccessibleProjects();
+            }
         } catch (DBException e) {
             addSessionError(e);
             log.error("Error refreshing accessible projects", e);

@@ -19,6 +19,7 @@ package io.cloudbeaver.model.session;
 import io.cloudbeaver.model.WebServerMessage;
 import io.cloudbeaver.model.app.WebAuthApplication;
 import org.jkiss.code.NotNull;
+import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.auth.SMSessionPrincipal;
 
@@ -43,6 +44,7 @@ public class WebHeadlessSession extends BaseWebSession {
 
     }
 
+    @Nullable
     @Override
     public SMSessionPrincipal getSessionPrincipal() {
         return null;

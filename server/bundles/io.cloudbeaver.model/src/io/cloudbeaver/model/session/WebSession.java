@@ -100,6 +100,7 @@ public class WebSession extends BaseWebSession
     private static final String ATTR_LOCALE = "locale";
     private static final AtomicInteger TASK_ID = new AtomicInteger();
 
+    public static String RUNTIME_PARAM_AUTH_INFOS = "auth-infos";
     private final AtomicInteger taskCount = new AtomicInteger();
 
     private String lastRemoteAddr;
@@ -124,16 +125,24 @@ public class WebSession extends BaseWebSession
     private final Map<String, DBWSessionHandler> sessionHandlers;
 
     public WebSession(
-        @NotNull HttpSession httpSession,
+        @NotNull HttpServletRequest request,
         @NotNull WebAuthApplication application,
         @NotNull Map<String, DBWSessionHandler> sessionHandlers
     ) throws DBException {
-        super(httpSession.getId(), application);
+        super(request.getSession().getId(), application);
         this.lastAccessTime = this.createTime;
-        setLocale(CommonUtils.toString(httpSession.getAttribute(ATTR_LOCALE), this.locale));
+        setLocale(CommonUtils.toString(request.getSession().getAttribute(ATTR_LOCALE), this.locale));
         this.sessionHandlers = sessionHandlers;
+        //force authorization of anonymous session to avoid access error,
+        //because before authorization could be called by any request,
+        //but now 'updateInfo' is called only in special requests,
+        //and the order of requests is not guaranteed.
+        //look at CB-4747
+        refreshSessionAuth();
+        updateSessionParameters(request);
     }
 
+    @Nullable
     @Override
     public SMSessionPrincipal getSessionPrincipal() {
         synchronized (authTokens) {
@@ -517,16 +526,10 @@ public class WebSession extends BaseWebSession
         }
     }
 
-    public synchronized void updateInfo(
-        HttpServletRequest request,
-        HttpServletResponse response
-    ) throws DBWebException {
+    public synchronized void updateInfo(boolean isOldHttpSessionUsed) {
+        log.debug("Update session lifetime " + getSessionId() + " for user " + getUserId());
         touchSession();
-        HttpSession httpSession = request.getSession();
-        this.lastRemoteAddr = request.getRemoteAddr();
-        this.lastRemoteUserAgent = request.getHeader("User-Agent");
-        this.cacheExpired = false;
-        if (!httpSession.isNew()) {
+        if (isOldHttpSessionUsed) {
             try {
                 // Persist session
                 if (!isAuthorizedInSecurityManager()) {
@@ -544,6 +547,12 @@ public class WebSession extends BaseWebSession
                 log.error("Error persisting web session", e);
             }
         }
+    }
+
+    public synchronized void updateSessionParameters(HttpServletRequest request) {
+        this.lastRemoteAddr = request.getRemoteAddr();
+        this.lastRemoteUserAgent = request.getHeader("User-Agent");
+        this.cacheExpired = false;
     }
 
     @Association
@@ -918,6 +927,7 @@ public class WebSession extends BaseWebSession
             for (DBACredentialsProvider contextCredentialsProvider : getContextCredentialsProviders()) {
                 contextCredentialsProvider.provideAuthParameters(monitor, dataSourceContainer, configuration);
             }
+            configuration.setRuntimeAttribute(RUNTIME_PARAM_AUTH_INFOS, getAllAuthInfo());
 
             WebConnectionInfo webConnectionInfo = findWebConnectionInfo(dataSourceContainer.getId());
             if (webConnectionInfo != null) {

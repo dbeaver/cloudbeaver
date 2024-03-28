@@ -57,7 +57,7 @@ export const ExportNotification = observer<Props>(function ExportNotification({ 
           {status === ENotificationType.Info && state.downloadUrl && (
             <>
               <Button type="button" mod={['outlined']} onClick={state.delete}>
-                {translate('data_transfer_notification_delete')}
+                {translate('ui_processing_cancel')}
               </Button>
               <Button tag="a" href={state.downloadUrl} mod={['unelevated']} download onClick={state.download}>
                 {translate('data_transfer_notification_download')}

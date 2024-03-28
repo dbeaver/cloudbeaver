@@ -7,13 +7,14 @@
  */
 import { action, computed, observable } from 'mobx';
 import { observer } from 'mobx-react-lite';
+import { useMemo } from 'react';
 
-import { ActionIconButton, Button, Container, Fill, s, useObservableRef, useS, useTranslate } from '@cloudbeaver/core-blocks';
+import { ActionIconButton, Button, Container, Fill, Loader, s, useObservableRef, useS, useSuspense, useTranslate } from '@cloudbeaver/core-blocks';
 import { selectFiles } from '@cloudbeaver/core-browser';
 import { useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { type TabContainerPanelComponent, useTabLocalState } from '@cloudbeaver/core-ui';
-import { bytesToSize, download, getMIME, isImageFormat, isValidUrl } from '@cloudbeaver/core-utils';
+import { blobToBase64, bytesToSize, download, getMIME, isImageFormat, isValidUrl, throttle } from '@cloudbeaver/core-utils';
 
 import { createResultSetBlobValue } from '../../DatabaseDataModel/Actions/ResultSet/createResultSetBlobValue';
 import type { IResultSetElementKey } from '../../DatabaseDataModel/Actions/ResultSet/IResultSetDataKey';
@@ -22,7 +23,6 @@ import { isResultSetBlobValue } from '../../DatabaseDataModel/Actions/ResultSet/
 import { isResultSetContentValue } from '../../DatabaseDataModel/Actions/ResultSet/isResultSetContentValue';
 import { isResultSetFileValue } from '../../DatabaseDataModel/Actions/ResultSet/isResultSetFileValue';
 import { ResultSetDataContentAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetDataContentAction';
-import { ResultSetDataKeysUtils } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetDataKeysUtils';
 import { ResultSetEditAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetEditAction';
 import { ResultSetFormatAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetFormatAction';
 import { ResultSetSelectAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetSelectAction';
@@ -31,40 +31,10 @@ import type { IDataValuePanelProps } from '../../TableViewer/ValuePanel/DataValu
 import { QuotaPlaceholder } from '../QuotaPlaceholder';
 import styles from './ImageValuePresentation.m.css';
 
-interface IToolsProps {
-  loading?: boolean;
-  stretch?: boolean;
-  onToggleStretch?: () => void;
-  onSave?: () => void;
-  onUpload?: () => void;
-}
-
-const Tools = observer<IToolsProps>(function Tools({ loading, stretch, onToggleStretch, onSave, onUpload }) {
-  const translate = useTranslate();
-
-  return (
-    <Container gap dense keepSize>
-      <Container keepSize flexStart center>
-        {onSave && <ActionIconButton title={translate('ui_download')} name="/icons/export.svg" disabled={loading} img onClick={onSave} />}
-        {onUpload && <ActionIconButton title={translate('ui_upload')} name="/icons/import.svg" disabled={loading} img onClick={onUpload} />}
-      </Container>
-      <Fill />
-      {onToggleStretch && (
-        <Container keepSize flexEnd center>
-          <ActionIconButton
-            title={translate(stretch ? 'data_viewer_presentation_value_image_original_size' : 'data_viewer_presentation_value_image_fit')}
-            name={stretch ? 'img-original-size' : 'img-fit-size'}
-            onClick={onToggleStretch}
-          />
-        </Container>
-      )}
-    </Container>
-  );
-});
-
 export const ImageValuePresentation: TabContainerPanelComponent<IDataValuePanelProps<any, IDatabaseResultSet>> = observer(
   function ImageValuePresentation({ model, resultIndex }) {
     const translate = useTranslate();
+    const suspense = useSuspense();
     const notificationService = useService(NotificationService);
     const style = useS(styles);
 
@@ -113,35 +83,50 @@ export const ImageValuePresentation: TabContainerPanelComponent<IDataValuePanelP
 
           return this.formatAction.get(this.selectedCell);
         },
-        get src() {
-          if (this.savedSrc) {
-            return this.savedSrc;
+        get src(): string | Blob | null {
+          if (isResultSetBlobValue(this.cellValue)) {
+            // uploaded file preview
+            return this.cellValue.blob;
           }
 
-          if (isResultSetBlobValue(this.cellValue)) {
-            return URL.createObjectURL(this.cellValue.blob);
+          if (this.staticSrc) {
+            return this.staticSrc;
+          }
+
+          if (this.cacheBlob) {
+            // uploaded file preview
+            return this.cacheBlob;
+          }
+
+          return null;
+        },
+        get staticSrc(): string | null {
+          if (this.truncated) {
+            return null;
           }
 
           if (isResultSetBinaryValue(this.cellValue)) {
             return `data:${getMIME(this.cellValue.binary)};base64,${this.cellValue.binary}`;
-          } else if (typeof this.cellValue === 'string' && isValidUrl(this.cellValue) && isImageFormat(this.cellValue)) {
+          }
+
+          if (typeof this.cellValue === 'string' && isValidUrl(this.cellValue) && isImageFormat(this.cellValue)) {
             return this.cellValue;
           }
 
-          return '';
+          return null;
         },
-        get savedSrc() {
+        get cacheBlob() {
           if (!this.selectedCell) {
-            return undefined;
+            return null;
           }
-          return this.contentAction.retrieveFileDataUrlFromCache(this.selectedCell);
+          return this.contentAction.retrieveBlobFromCache(this.selectedCell);
         },
         get canSave() {
           if (this.truncated && this.selectedCell) {
             return this.contentAction.isDownloadable(this.selectedCell);
           }
 
-          return !!this.src;
+          return this.staticSrc && !this.truncated;
         },
         get canUpload() {
           if (!this.selectedCell) {
@@ -156,18 +141,14 @@ export const ImageValuePresentation: TabContainerPanelComponent<IDataValuePanelP
 
           return this.selectedCell && this.contentAction.isBlobTruncated(this.selectedCell);
         },
-        get shouldShowImage() {
-          const isFullImage = !this.truncated && this.savedSrc;
-          const isImage = this.src && !this.truncated && !this.savedSrc;
-
-          return isFullImage || isImage;
-        },
-        async save() {
+        async download() {
           try {
-            if (this.truncated && this.selectedCell) {
+            if (this.src) {
+              download(this.src, '', true);
+            } else if (this.selectedCell) {
               await this.contentAction.downloadFileData(this.selectedCell);
             } else {
-              download(this.src, '', true);
+              throw new Error("Can't save image");
             }
           } catch (exception: any) {
             this.notificationService.logException(exception, 'data_viewer_presentation_value_content_download_error');
@@ -181,6 +162,17 @@ export const ImageValuePresentation: TabContainerPanelComponent<IDataValuePanelP
             }
           });
         },
+        async loadFullImage() {
+          if (!this.selectedCell) {
+            return;
+          }
+
+          try {
+            await this.contentAction.resolveFileDataUrl(this.selectedCell);
+          } catch (exception: any) {
+            this.notificationService.logException(exception, 'data_viewer_presentation_value_content_download_error');
+          }
+        },
       }),
       {
         editAction: computed,
@@ -191,60 +183,87 @@ export const ImageValuePresentation: TabContainerPanelComponent<IDataValuePanelP
         cellValue: computed,
         canUpload: computed,
         src: computed,
-        savedSrc: computed,
+        cacheBlob: computed,
         canSave: computed,
         truncated: computed,
         model: observable.ref,
         resultIndex: observable.ref,
-        save: action.bound,
+        download: action.bound,
         upload: action.bound,
+        loadFullImage: action.bound,
       },
       { model, resultIndex, notificationService },
     );
 
-    const save = data.canSave ? data.save : undefined;
-    const upload = data.canUpload ? data.upload : undefined;
     const loading = model.isLoading();
-    const value = data.cellValue;
 
-    const load = async () => {
-      if (!data.selectedCell) {
-        return;
-      }
+    const valueSize = bytesToSize(isResultSetContentValue(data.cellValue) ? data.cellValue.contentLength ?? 0 : 0);
+    const isTruncatedMessageDisplay = !!data.truncated && !data.src;
+    const isDownloadable = isTruncatedMessageDisplay && !!data.selectedCell && data.contentAction.isDownloadable(data.selectedCell);
+    const isCacheDownloading = isDownloadable && data.contentAction.isLoading(data.selectedCell);
 
-      try {
-        await data.contentAction.resolveFileDataUrl(data.selectedCell);
-      } catch (exception: any) {
-        notificationService.logException(exception, 'data_viewer_presentation_value_content_download_error');
-      }
-    };
-
-    const valueSize = bytesToSize(isResultSetContentValue(value) ? value.contentLength ?? 0 : 0);
-    const isDownloadable = data.selectedCell && data.contentAction.isDownloadable(data.selectedCell);
+    const debouncedDownload = useMemo(() => throttle(() => data.download(), 1000, false), []);
+    const srcGetter = suspense.observedValue(
+      'src',
+      () => data.src,
+      async src => {
+        if (src instanceof Blob) {
+          return await blobToBase64(src);
+        }
+        return src;
+      },
+    );
 
     return (
       <Container vertical>
         <Container fill overflow center>
-          {data.shouldShowImage && <img src={data.src} className={s(style, { img: true, stretch: state.stretch })} />}
-          {data.truncated ? (
-            <QuotaPlaceholder model={data.model} resultIndex={data.resultIndex} elementKey={data.selectedCell}>
-              {isDownloadable && (
-                <Button
-                  disabled={loading}
-                  loading={
-                    !!data.contentAction.activeElement &&
-                    ResultSetDataKeysUtils.isElementsKeyEqual(data.contentAction.activeElement, data.selectedCell)
-                  }
-                  onClick={load}
-                >
-                  {`${translate('ui_view')} (${valueSize})`}
-                </Button>
-              )}
-            </QuotaPlaceholder>
-          ) : null}
+          <Loader suspense>
+            {data.src && <ImageRenderer srcGetter={srcGetter} className={s(style, { img: true, stretch: state.stretch })} />}
+            {isTruncatedMessageDisplay && (
+              <QuotaPlaceholder model={data.model} resultIndex={data.resultIndex} elementKey={data.selectedCell}>
+                {isDownloadable && (
+                  <Button disabled={loading} loading={isCacheDownloading} loader onClick={data.loadFullImage}>
+                    {`${translate('ui_view')} (${valueSize})`}
+                  </Button>
+                )}
+              </QuotaPlaceholder>
+            )}
+          </Loader>
         </Container>
-        <Tools loading={loading} stretch={state.stretch} onToggleStretch={state.toggleStretch} onSave={save} onUpload={upload} />
+        <Container gap dense keepSize>
+          <Container keepSize flexStart center>
+            {data.canSave && (
+              <ActionIconButton title={translate('ui_download')} name="/icons/export.svg" disabled={loading} img onClick={debouncedDownload} />
+            )}
+            {data.canUpload && (
+              <ActionIconButton title={translate('ui_upload')} name="/icons/import.svg" disabled={loading} img onClick={data.upload} />
+            )}
+          </Container>
+          <Fill />
+          <Container keepSize flexEnd center>
+            <ActionIconButton
+              title={translate(state.stretch ? 'data_viewer_presentation_value_image_original_size' : 'data_viewer_presentation_value_image_fit')}
+              name={state.stretch ? 'img-original-size' : 'img-fit-size'}
+              onClick={state.toggleStretch}
+            />
+          </Container>
+        </Container>
       </Container>
     );
   },
 );
+
+interface ImageRendererProps {
+  className?: string;
+  srcGetter: () => string | null;
+}
+
+export const ImageRenderer = observer<ImageRendererProps>(function ImageRenderer({ srcGetter, className }) {
+  const src = srcGetter();
+
+  if (!src) {
+    return null;
+  }
+
+  return <img src={src} className={className} />;
+});

@@ -9,7 +9,7 @@ import type { Compartment, Extension, SelectionRange } from '@codemirror/state';
 import type { ViewUpdate } from '@codemirror/view';
 
 /** Currently we support only main selection range */
-interface ISelection {
+export interface ISelection {
   anchor: number;
   head?: number;
 }

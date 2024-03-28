@@ -12,7 +12,6 @@ import type { ILayoutSizeProps } from '../../Containers/ILayoutSizeProps';
 import { s } from '../../s';
 import { useS } from '../../useS';
 import { Field } from '../Field';
-import { FieldDescription } from '../FieldDescription';
 import { FieldLabel } from '../FieldLabel';
 import { isControlPresented } from '../isControlPresented';
 import { Checkbox, CheckboxBaseProps, CheckboxType, ICheckboxControlledProps, ICheckboxObjectProps } from './Checkbox';

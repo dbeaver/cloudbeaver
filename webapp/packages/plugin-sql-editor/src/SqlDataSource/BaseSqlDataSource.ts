@@ -14,7 +14,7 @@ import type { IDatabaseDataModel, IDatabaseResultSet } from '@cloudbeaver/plugin
 
 import type { IDataQueryOptions } from '../QueryDataSource';
 import { ESqlDataSourceFeatures } from './ESqlDataSourceFeatures';
-import type { ISetScriptData, ISqlDataSource, ISqlDataSourceKey } from './ISqlDataSource';
+import type { ISetScriptData, ISqlDataSource, ISqlDataSourceKey, ISqlEditorCursor } from './ISqlDataSource';
 import type { ISqlDataSourceHistory } from './SqlDataSourceHistory/ISqlDataSourceHistory';
 import { SqlDataSourceHistory } from './SqlDataSourceHistory/SqlDataSourceHistory';
 
@@ -36,6 +36,10 @@ export abstract class BaseSqlDataSource implements ISqlDataSource {
   incomingScript: string | undefined;
   incomingExecutionContext: IConnectionExecutionContextInfo | undefined | null;
   exception?: Error | Error[] | null | undefined;
+
+  get cursor(): ISqlEditorCursor {
+    return this.innerCursorState;
+  }
 
   get isIncomingChanges(): boolean {
     return this.incomingScript !== undefined || this.incomingExecutionContext !== null;
@@ -81,6 +85,7 @@ export abstract class BaseSqlDataSource implements ISqlDataSource {
 
   protected outdated: boolean;
   protected editing: boolean;
+  protected innerCursorState: ISqlEditorCursor;
 
   constructor(icon = '/icons/sql_script_m.svg') {
     this.icon = icon;
@@ -91,6 +96,7 @@ export abstract class BaseSqlDataSource implements ISqlDataSource {
     this.message = undefined;
     this.outdated = true;
     this.editing = true;
+    this.innerCursorState = { begin: 0, end: 0 };
     this.history = new SqlDataSourceHistory();
     this.onUpdate = new SyncExecutor();
     this.onSetScript = new SyncExecutor();
@@ -107,7 +113,7 @@ export abstract class BaseSqlDataSource implements ISqlDataSource {
 
     this.history.onNavigate.addHandler(value => this.setScript(value, SOURCE_HISTORY));
 
-    makeObservable<this, 'outdated' | 'editing'>(this, {
+    makeObservable<this, 'outdated' | 'editing' | 'innerCursorState'>(this, {
       isSaved: computed,
       isIncomingChanges: computed,
       isAutoSaveEnabled: computed,
@@ -130,6 +136,7 @@ export abstract class BaseSqlDataSource implements ISqlDataSource {
       outdated: observable.ref,
       message: observable.ref,
       editing: observable.ref,
+      innerCursorState: observable.ref,
       incomingScript: observable.ref,
       incomingExecutionContext: observable.ref,
     });
@@ -223,6 +230,20 @@ export abstract class BaseSqlDataSource implements ISqlDataSource {
 
   hasFeature(feature: ESqlDataSourceFeatures): boolean {
     return this.features.includes(feature);
+  }
+
+  setCursor(begin: number, end = begin): void {
+    if (begin > end) {
+      throw new Error('Cursor begin can not be greater than the end of it');
+    }
+
+    const scriptLength = this.script.length;
+
+    this.innerCursorState = Object.freeze({
+      begin: Math.min(begin, scriptLength),
+      end: Math.min(end, scriptLength),
+    });
+    this.onUpdate.execute();
   }
 
   setEditing(state: boolean): void {

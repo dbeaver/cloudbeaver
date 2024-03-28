@@ -3,8 +3,8 @@ Bundle-ManifestVersion: 2
 Bundle-Vendor: DBeaver Corp
 Bundle-Name: Cloudbeaver Web Service - Administration
 Bundle-SymbolicName: io.cloudbeaver.service.admin;singleton:=true
-Bundle-Version: 1.0.91.qualifier
-Bundle-Release-Date: 20240219
+Bundle-Version: 1.0.93.qualifier
+Bundle-Release-Date: 20240325
 Bundle-RequiredExecutionEnvironment: JavaSE-17
 Bundle-ActivationPolicy: lazy
 Bundle-ClassPath: .

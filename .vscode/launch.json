@@ -21,17 +21,15 @@
     {
       "type": "java",
       "name": "CloudBeaver CE",
-      "cwd": "${workspaceFolder}/../opt/cbce",
+      "cwd": "${workspaceFolder}/workspace-dev-ce",
+      "preLaunchTask": "Generate dev proprties for CBCE",
       "request": "launch",
-      "mainClass": "org.eclipse.equinox.launcher.Main",
+      "mainClass": "org.jkiss.dbeaver.launcher.DBeaverLauncher",
       "windows": {
         "type": "java",
         "name": "CloudBeaver CE",
         "request": "launch",
-        "mainClass": "org.eclipse.equinox.launcher.Main",
-        "classPaths": [
-          "${workspaceFolder}/../eclipse/eclipse/plugins/org.eclipse.equinox.launcher_1.6.600.v20231106-1826.jar"
-        ],
+        "mainClass": "org.jkiss.dbeaver.launcher.DBeaverLauncher",
         "args": [
           "-product",
           "io.cloudbeaver.product.ce.product",
@@ -63,10 +61,7 @@
         "type": "java",
         "name": "CloudBeaver CE",
         "request": "launch",
-        "mainClass": "org.eclipse.equinox.launcher.Main",
-        "classPaths": [
-          "${workspaceFolder}/../eclipse/Eclipse.app/Contents/Eclipse/plugins/org.eclipse.equinox.launcher_1.6.600.v20231106-1826.jar"
-        ],
+        "mainClass": "org.jkiss.dbeaver.launcher.DBeaverLauncher",
         "args": [
           "-product",
           "io.cloudbeaver.product.ce.product",
@@ -81,8 +76,10 @@
           "-arch",
           "aarch64",
           "-nl",
-          "en_US",
-          "-showsplash"
+          "en",
+          "-showsplash",
+          "-web-config",
+          "conf/cloudbeaver.conf"
         ],
         "vmArgs": [
           "-XX:+IgnoreUnrecognizedVMOptions",

@@ -73,7 +73,7 @@ public class CBPlatform extends BasePlatformImpl {
     public static final String WORK_DATA_FOLDER_NAME = ".work-data";
 
     @Nullable
-    private static CBApplication application = null;
+    private static CBApplication<?> application = null;
 
     private Path tempFolder;
 
@@ -118,8 +118,6 @@ public class CBPlatform extends BasePlatformImpl {
         super.initialize();
 
         refreshApplicableDrivers();
-
-        refreshDisabledDriversConfig();
 
         new WebSessionMonitorJob(this)
             .scheduleMonitor();
@@ -191,7 +189,7 @@ public class CBPlatform extends BasePlatformImpl {
 
     @NotNull
     @Override
-    public CBApplication getApplication() {
+    public CBApplication<?> getApplication() {
         return application;
     }
 
@@ -223,7 +221,7 @@ public class CBPlatform extends BasePlatformImpl {
     }
 
     @NotNull
-    public Path getTempFolder(DBRProgressMonitor monitor, String name) {
+    public Path getTempFolder(@NotNull DBRProgressMonitor monitor, @NotNull String name) {
         if (tempFolder == null) {
             // Make temp folder
             monitor.subTask("Create temp folder");
@@ -291,18 +289,6 @@ public class CBPlatform extends BasePlatformImpl {
             }
         }
         log.info("Available drivers: " + applicableDrivers.stream().map(DBPDriver::getFullName).collect(Collectors.joining(",")));
-    }
-
-    private void refreshDisabledDriversConfig() {
-        CBAppConfig config = application.getAppConfiguration();
-        Set<String> disabledDrivers = new LinkedHashSet<>(Arrays.asList(config.getDisabledDrivers()));
-        for (DBPDriver driver : applicableDrivers) {
-            if (!driver.isEmbedded() || config.isDriverForceEnabled(driver.getFullId())) {
-                continue;
-            }
-            disabledDrivers.add(driver.getFullId());
-        }
-        config.setDisabledDrivers(disabledDrivers.toArray(new String[0]));
     }
 
     @NotNull

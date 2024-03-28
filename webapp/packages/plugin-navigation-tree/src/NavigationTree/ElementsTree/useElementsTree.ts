@@ -217,7 +217,7 @@ export function useElementsTree(options: IOptions): IElementsTree {
               if (!loaded) {
                 const node = navNodeInfoResource.get(child);
 
-                if (node) {
+                if (node && expanded && elementsTree.isNodeExpandable(child)) {
                   await elementsTree.expand(node, false);
                 }
                 return;
@@ -230,6 +230,15 @@ export function useElementsTree(options: IOptions): IElementsTree {
                 for (let offset = 0; offset < lastOffset; offset += navTreeResource.childrenLimit) {
                   await navTreeResource.load(CachedResourceOffsetPageKey(offset, navTreeResource.childrenLimit).setTarget(child));
                 }
+              }
+
+              if (elementsTree.isNodeExpandable(child) && expanded && elementsTree.getNodeChildren(child).length === 0) {
+                const node = navNodeInfoResource.get(child);
+
+                if (node) {
+                  await elementsTree.expand(node, false);
+                }
+                return;
               }
 
               if (
@@ -424,7 +433,7 @@ export function useElementsTree(options: IOptions): IElementsTree {
       },
       isNodeExpandable(nodeId: string): boolean {
         if (nodeId === this.root) {
-          return true;
+          return false;
         }
 
         if (options.expandStateGetters?.length) {

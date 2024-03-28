@@ -7,70 +7,39 @@
  */
 import { observable } from 'mobx';
 import { observer } from 'mobx-react-lite';
-import { useMemo } from 'react';
-import styled, { css } from 'reshadow';
 
-import { ActionIconButton, Button, Container, Fill, Group, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
+import { ActionIconButton, Container, Fill, Group, Loader, s, SContext, StyleRegistry, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { BASE_TAB_STYLES, TabContainerPanelComponent, TabList, TabsState, UNDERLINE_TAB_STYLES, useTabLocalState } from '@cloudbeaver/core-ui';
-import { bytesToSize, isNotNullDefined } from '@cloudbeaver/core-utils';
-import { EditorLoader, useCodemirrorExtensions } from '@cloudbeaver/plugin-codemirror6';
+import { TabContainerPanelComponent, TabList, TabsState, TabStyles, TabUnderlineStyleRegistry, useTabLocalState } from '@cloudbeaver/core-ui';
 
-import { isResultSetContentValue } from '../../DatabaseDataModel/Actions/ResultSet/isResultSetContentValue';
 import { ResultSetSelectAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetSelectAction';
 import { useResultSetActions } from '../../DatabaseDataModel/Actions/ResultSet/useResultSetActions';
 import type { IDatabaseResultSet } from '../../DatabaseDataModel/IDatabaseResultSet';
-import { DataViewerService } from '../../DataViewerService';
 import type { IDataValuePanelProps } from '../../TableViewer/ValuePanel/DataValuePanelService';
-import { QuotaPlaceholder } from '../QuotaPlaceholder';
-import { VALUE_PANEL_TOOLS_STYLES } from '../ValuePanelTools/VALUE_PANEL_TOOLS_STYLES';
 import { getDefaultLineWrapping } from './getDefaultLineWrapping';
-import { getTypeExtension } from './getTypeExtension';
+import styles from './shared/TextValuePresentation.m.css';
+import TextValuePresentationTab from './shared/TextValuePresentationTab.m.css';
+import { TextValueEditor } from './TextValueEditor';
 import { TextValuePresentationService } from './TextValuePresentationService';
+import { TextValueTruncatedMessage } from './TextValueTruncatedMessage';
 import { useTextValue } from './useTextValue';
 
-const styles = css`
-  Tab {
-    composes: theme-ripple theme-background-surface theme-text-text-primary-on-light from global;
-  }
-  TabList {
-    composes: theme-border-color-background theme-background-background from global;
-    overflow: auto;
-    border-radius: var(--theme-group-element-radius);
-
-    & Tab {
-      border-bottom: 0;
-
-      &:global([aria-selected='false']) {
-        border-bottom: 0 !important;
-      }
-    }
-  }
-`;
-
-const DEFAULT_CONTENT_TYPE = 'text/plain';
+const tabRegistry: StyleRegistry = [...TabUnderlineStyleRegistry, [TabStyles, { mode: 'append', styles: [TextValuePresentationTab] }]];
 
 export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelProps<any, IDatabaseResultSet>> = observer(
   function TextValuePresentation({ model, resultIndex, dataFormat }) {
     const translate = useTranslate();
-    const dataViewerService = useService(DataViewerService);
     const notificationService = useService(NotificationService);
     const textValuePresentationService = useService(TextValuePresentationService);
-    const style = useStyles(styles, UNDERLINE_TAB_STYLES, VALUE_PANEL_TOOLS_STYLES);
+    const style = useS(styles);
     const selection = model.source.getAction(resultIndex, ResultSetSelectAction);
     const activeElements = selection.getActiveElements();
     const firstSelectedCell = activeElements.length ? activeElements[0] : undefined;
-    const activeTabs = textValuePresentationService.tabs.getDisplayed({
-      dataFormat: dataFormat,
-      model: model,
-      resultIndex: resultIndex,
-    });
     const { contentAction, editAction, formatAction } = useResultSetActions({
       model,
       resultIndex,
     });
-    const contentValue = firstSelectedCell ? formatAction.get(firstSelectedCell) : null;
     const state = useTabLocalState(() =>
       observable({
         lineWrapping: null as boolean | null,
@@ -85,51 +54,20 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
       }),
     );
 
-    let contentType = state.currentContentType;
-    let autoContentType = DEFAULT_CONTENT_TYPE;
-
-    if (isResultSetContentValue(contentValue)) {
-      if (contentValue.contentType) {
-        switch (contentValue.contentType) {
-          case 'text/json':
-            autoContentType = 'application/json';
-            break;
-          case 'application/octet-stream':
-            autoContentType = 'application/octet-stream;type=base64';
-            break;
-          default:
-            autoContentType = contentValue.contentType;
-            break;
-        }
-      }
-    }
-
-    if (contentType === null) {
-      contentType = autoContentType ?? DEFAULT_CONTENT_TYPE;
-    }
-
-    if (activeTabs.length > 0 && !activeTabs.some(tab => tab.key === contentType)) {
-      contentType = activeTabs[0].key;
-    }
-
-    const autoLineWrapping = getDefaultLineWrapping(contentType);
-    const lineWrapping = state.lineWrapping ?? autoLineWrapping;
-
-    const textValueData = useTextValue({
+    const textValueInfo = useTextValue({
       model,
       resultIndex,
-      currentContentType: contentType,
+      dataFormat,
+      currentContentType: state.currentContentType,
       elementKey: firstSelectedCell,
     });
+    const autoLineWrapping = getDefaultLineWrapping(textValueInfo.contentType);
+    const lineWrapping = state.lineWrapping ?? autoLineWrapping;
+
     const isSelectedCellReadonly = firstSelectedCell && (formatAction.isReadOnly(firstSelectedCell) || formatAction.isBinary(firstSelectedCell));
     const isReadonlyByResultIndex = model.isReadonly(resultIndex) || model.isDisabled(resultIndex) || !firstSelectedCell;
     const isReadonly = isSelectedCellReadonly || isReadonlyByResultIndex;
-    const valueSize =
-      isResultSetContentValue(contentValue) && isNotNullDefined(contentValue.contentLength) ? bytesToSize(contentValue.contentLength) : undefined;
     const canSave = firstSelectedCell && contentAction.isDownloadable(firstSelectedCell);
-    const shouldShowPasteButton = textValueData.isTextColumn && firstSelectedCell && contentAction.isTextTruncated(firstSelectedCell);
-    const typeExtension = useMemo(() => getTypeExtension(contentType!) ?? [], [contentType]);
-    const extensions = useCodemirrorExtensions(undefined, typeExtension);
 
     function valueChangeHandler(newValue: string) {
       if (firstSelectedCell && !isReadonly) {
@@ -151,7 +89,7 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
 
     async function selectTabHandler(tabId: string) {
       // currentContentType may be selected automatically we don't want to change state in this case
-      if (tabId !== contentType) {
+      if (tabId !== textValueInfo.contentType) {
         state.setContentType(tabId);
       }
     }
@@ -160,7 +98,7 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
       state.setLineWrapping(!lineWrapping);
     }
 
-    return styled(style)(
+    return (
       <Container vertical gap dense overflow>
         <Container keepSize center overflow>
           <Container keepSize>
@@ -168,37 +106,29 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
               dataFormat={dataFormat}
               resultIndex={resultIndex}
               container={textValuePresentationService.tabs}
-              currentTabId={contentType}
+              currentTabId={textValueInfo.contentType}
               model={model}
               lazy
               onChange={tab => selectTabHandler(tab.tabId)}
             >
-              <TabList style={[BASE_TAB_STYLES, styles, UNDERLINE_TAB_STYLES]} />
+              <SContext registry={tabRegistry}>
+                <TabList className={s(style, { tabList: true })} />
+              </SContext>
             </TabsState>
           </Container>
         </Container>
-        <Group maximum box>
-          <EditorLoader
-            key={isReadonly ? '1' : '0'}
-            value={textValueData.textValue}
-            lineWrapping={lineWrapping}
-            readonly={isReadonly}
-            extensions={extensions}
-            disableCopy={!dataViewerService.canCopyData}
-            onChange={valueChangeHandler}
-          />
-        </Group>
-        {firstSelectedCell && contentAction.isTextTruncated(firstSelectedCell) ? (
-          <QuotaPlaceholder model={model} resultIndex={resultIndex} elementKey={firstSelectedCell} keepSize>
-            {shouldShowPasteButton && (
-              <Container keepSize>
-                <Button disabled={model.isLoading()} onClick={textValueData.pasteFullText}>
-                  {`${translate('ui_show_more')} (${valueSize})`}
-                </Button>
-              </Container>
-            )}
-          </QuotaPlaceholder>
-        ) : null}
+        <Loader suspense>
+          <Group maximum box>
+            <TextValueEditor
+              contentType={textValueInfo.contentType}
+              lineWrapping={lineWrapping}
+              readonly={isReadonly}
+              valueGetter={textValueInfo.valueGetter}
+              onChange={valueChangeHandler}
+            />
+          </Group>
+        </Loader>
+        {firstSelectedCell && <TextValueTruncatedMessage model={model} resultIndex={resultIndex} elementKey={firstSelectedCell} />}
         <Container keepSize center overflow>
           {canSave && (
             <ActionIconButton title={translate('ui_download')} name="/icons/export.svg" disabled={model.isLoading()} img onClick={saveHandler} />
@@ -213,7 +143,7 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
           />
           <Fill />
         </Container>
-      </Container>,
+      </Container>
     );
   },
 );

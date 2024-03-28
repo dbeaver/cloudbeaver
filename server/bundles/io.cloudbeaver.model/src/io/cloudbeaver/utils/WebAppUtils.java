@@ -37,10 +37,7 @@ import org.jkiss.dbeaver.utils.GeneralUtils;
 import org.jkiss.utils.CommonUtils;
 
 import java.nio.file.Path;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class WebAppUtils {
     private static final Log log = Log.getLog(WebAppUtils.class);
@@ -179,7 +176,7 @@ public class WebAppUtils {
             sessionCookie.setMaxAge((int) (maxSessionIdleTime / 1000));
         }
 
-        String path = getWebApplication().getRootURI();
+        String path = getWebApplication().getServerConfiguration().getRootURI();
 
         if (sameSite != null) {
             if (!request.isSecure()) {
@@ -222,6 +219,42 @@ public class WebAppUtils {
             throw new DBWebException("Project '" + projectId + "' not found");
         }
         return project;
+    }
+
+    public static Map<String, Object> flattenMap(Map<String, Object> nestedMap) {
+        Map<String, Object> result = new LinkedHashMap<>();
+        flattenMapHelper(nestedMap, result, "");
+        return result;
+    }
+
+    private static void flattenMapHelper(Map<String, Object> nestedMap, Map<String, Object> result, String prefix) {
+        for (Map.Entry<String, Object> entry : nestedMap.entrySet()) {
+            String key = entry.getKey();
+            Object value = entry.getValue();
+            flattenResult(result, prefix, key, value);
+        }
+    }
+
+    private static void flattenResult(Map<String, Object> result, String prefix, String key, Object value) {
+        if (value instanceof Map) {
+            flattenMapHelper((Map<String, Object>) value, result, prefix + key + ".");
+        } else if (value instanceof Object[]) {
+            flattenArray((Object[]) value, result, prefix + key + ".");
+        } else {
+            String fullKey = prefix + key;
+            if (!result.containsKey(fullKey)) {
+                result.put(fullKey, value);
+            }
+        }
+    }
+
+    private static void flattenArray(Object[] array, Map<String, Object> result, String prefix) {
+        for (int i = 0; i < array.length; i++) {
+            String key = String.valueOf(i);
+            Object value = array[i];
+
+            flattenResult(result, prefix, key, value);
+        }
     }
 
 }

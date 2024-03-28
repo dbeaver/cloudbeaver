@@ -10,7 +10,6 @@ import { useContext } from 'react';
 import { TabList as BaseTabList, TabListOptions, TabStateReturn } from 'reakit/Tab';
 
 import { s, useS, useTranslate } from '@cloudbeaver/core-blocks';
-import type { ComponentStyle } from '@cloudbeaver/core-theming';
 
 import { generateTabElement } from './generateTabElement';
 import { TabDefault } from './Tab/TabDefault';
@@ -19,12 +18,11 @@ import { TabsContext } from './TabsContext';
 
 interface Props extends Omit<TabListOptions, keyof TabStateReturn> {
   'aria-label'?: string;
-  style?: ComponentStyle;
   childrenFirst?: boolean;
   className?: string;
 }
 
-export const TabList = observer<React.PropsWithChildren<Props>>(function TabList({ style, className, children, childrenFirst, ...props }) {
+export const TabList = observer<React.PropsWithChildren<Props>>(function TabList({ className, children, childrenFirst, ...props }) {
   const state = useContext(TabsContext);
   const translate = useTranslate();
   const componentStyle = useS(styles);
@@ -54,7 +52,6 @@ export const TabList = observer<React.PropsWithChildren<Props>>(function TabList
                   icon={tabInfo.icon}
                   component={tabInfo.tab?.()}
                   {...state.props}
-                  style={style}
                   aria-label={tabInfo.name}
                   disabled={props.disabled || tabInfo.isDisabled?.(tabInfo.key, state.props)}
                   onOpen={tabInfo.onOpen}

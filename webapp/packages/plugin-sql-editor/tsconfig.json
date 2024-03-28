@@ -25,6 +25,9 @@
       "path": "../core-browser/tsconfig.json"
     },
     {
+      "path": "../core-client-activity/tsconfig.json"
+    },
+    {
       "path": "../core-connections/tsconfig.json"
     },
     {
@@ -98,9 +101,6 @@
     },
     {
       "path": "../core-settings/tsconfig.json"
-    },
-    {
-      "path": "../core-theming/tsconfig.json"
     },
     {
       "path": "../core-theming/tsconfig.json"

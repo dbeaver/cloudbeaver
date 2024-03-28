@@ -23,6 +23,11 @@ export interface ISetScriptData {
   source?: string;
 }
 
+export interface ISqlEditorCursor {
+  readonly begin: number;
+  readonly end: number;
+}
+
 export interface ISqlDataSource extends ILoadableState {
   readonly name: string | null;
   readonly icon?: string;
@@ -33,6 +38,7 @@ export interface ISqlDataSource extends ILoadableState {
   readonly projectId: string | null;
 
   readonly script: string;
+  readonly cursor: ISqlEditorCursor;
   readonly incomingScript?: string;
   readonly history: ISqlDataSourceHistory;
 
@@ -65,6 +71,7 @@ export interface ISqlDataSource extends ILoadableState {
   setName(name: string | null): void;
   setProject(projectId: string | null): void;
   setScript(script: string, source?: string): void;
+  setCursor(begin: number, end?: number): void;
   setEditing(state: boolean): void;
   setExecutionContext(executionContext?: IConnectionExecutionContextInfo): void;
   setIncomingExecutionContext(executionContext?: IConnectionExecutionContextInfo): void;

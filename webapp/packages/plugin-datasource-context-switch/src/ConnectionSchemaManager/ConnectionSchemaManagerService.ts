@@ -15,12 +15,14 @@ import {
   IConnectionInfoParams,
   IConnectionProvider,
   IConnectionSetter,
+  IExecutionContextProvider,
   IObjectCatalogProvider,
   IObjectCatalogSetter,
   IObjectSchemaProvider,
   IObjectSchemaSetter,
   isConnectionProvider,
   isConnectionSetter,
+  isExecutionContextProvider,
   isObjectCatalogProvider,
   isObjectCatalogSetter,
   isObjectSchemaProvider,
@@ -58,6 +60,7 @@ interface IActiveItem<T> {
   getCurrentConnectionId?: IConnectionProvider<T>;
   getCurrentSchemaId?: IObjectSchemaProvider<T>;
   getCurrentCatalogId?: IObjectCatalogProvider<T>;
+  getCurrentExecutionContext?: IExecutionContextProvider<T>;
   changeConnectionId?: IConnectionSetter<T>;
   changeProjectId?: IProjectSetter<T>;
   changeCatalogId?: IObjectCatalogSetter<T>;
@@ -119,6 +122,14 @@ export class ConnectionSchemaManagerService {
       return this.pendingCatalogId;
     }
     return this.activeObjectCatalogId;
+  }
+
+  get activeExecutionContext() {
+    if (!this.activeItem?.getCurrentExecutionContext) {
+      return;
+    }
+
+    return this.activeItem.getCurrentExecutionContext(this.activeItem.context);
   }
 
   get currentObjectSchemaId(): string | undefined {
@@ -441,6 +452,9 @@ export class ConnectionSchemaManagerService {
       })
       .on(isObjectSchemaProvider, extension => {
         item.getCurrentSchemaId = extension;
+      })
+      .on(isExecutionContextProvider, extension => {
+        item.getCurrentExecutionContext = extension;
       })
 
       .on(isProjectSetter, extension => {

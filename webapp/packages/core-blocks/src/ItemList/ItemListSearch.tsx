@@ -60,6 +60,7 @@ export const ItemListSearch: React.FC<IProps> = function ItemListSearch({ value,
         <input
           ref={inputRef}
           name="search"
+          type="search"
           className={s(styles, { input: true }, className)}
           placeholder={translate(placeholder || 'ui_search')}
           value={inputValue}
