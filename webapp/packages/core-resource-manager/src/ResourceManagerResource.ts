@@ -118,6 +118,7 @@ export class ResourceManagerResource extends CachedTreeResource<RmResourceInfo, 
       await this.loader(to, []);
 
       this.moveSync(from, to, this.get(to)!);
+      this.onDataOutdated.execute(from);
     });
   }
 
@@ -144,6 +145,7 @@ export class ResourceManagerResource extends CachedTreeResource<RmResourceInfo, 
       }
 
       Object.assign(properties, propertiesPatch);
+      this.onDataOutdated.execute(key);
     });
 
     return properties;
@@ -195,6 +197,7 @@ export class ResourceManagerResource extends CachedTreeResource<RmResourceInfo, 
       });
 
       this.delete(path);
+      this.onDataOutdated.execute(path);
     });
   }
 

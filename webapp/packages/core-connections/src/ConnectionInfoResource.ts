@@ -81,7 +81,7 @@ export const DEFAULT_NAVIGATOR_VIEW_SETTINGS: NavigatorSettingsInput = {
 @injectable()
 export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoParams, Connection, ConnectionInfoIncludes> {
   readonly onConnectionCreate: ISyncExecutor<Connection>;
-  readonly onConnectionClose: ISyncExecutor<Connection>;
+  readonly onConnectionClose: ISyncExecutor<IConnectionInfoParams>;
 
   private sessionUpdate: boolean;
   private readonly nodeIdMap: Map<string, IConnectionInfoParams>;
@@ -364,6 +364,8 @@ export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoPar
         projectId: connectionKey.projectId,
         connectionId: connectionKey.connectionId,
       });
+
+      this.onDataOutdated.execute(connectionKey);
       return subjects;
     });
 
@@ -396,6 +398,7 @@ export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoPar
         ...this.getIncludesMap(key),
       });
       this.set(createConnectionParam(connection), connection);
+      this.onDataOutdated.execute(key);
     });
 
     return this.get(key)!;
@@ -413,6 +416,7 @@ export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoPar
       });
 
       this.set(createConnectionParam(connection), connection);
+      this.onDataOutdated.execute(key);
     });
 
     return this.get(key)!;
@@ -428,6 +432,7 @@ export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoPar
       });
 
       this.set(createConnectionParam(connection), connection);
+      this.onDataOutdated.execute(key);
     });
     return this.get(key)!;
   }
@@ -442,10 +447,11 @@ export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoPar
       });
 
       this.set(createConnectionParam(connection), connection);
+      this.onDataOutdated.execute(key);
     });
 
     const connection = this.get(key)!;
-    this.onConnectionClose.execute(connection);
+    this.onConnectionClose.execute(key);
     return connection;
   }
 
@@ -460,6 +466,7 @@ export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoPar
       });
       this.delete(key);
     });
+    this.onDataOutdated.execute(key);
   }
 
   // async updateSessionConnections(): Promise<boolean> {

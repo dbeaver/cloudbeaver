@@ -46,7 +46,7 @@ public class WebServerConfig {
 
     @Property
     public String getName() {
-        return CommonUtils.notEmpty(application.getServerName());
+        return CommonUtils.notEmpty(application.getServerConfiguration().getServerName());
     }
 
     @Property
@@ -61,12 +61,12 @@ public class WebServerConfig {
 
     @Property
     public String getServerURL() {
-        return CommonUtils.notEmpty(application.getServerURL());
+        return CommonUtils.notEmpty(application.getServerConfiguration().getServerURL());
     }
 
     @Property
     public String getRootURI() {
-        return CommonUtils.notEmpty(application.getRootURI());
+        return CommonUtils.notEmpty(application.getServerConfiguration().getRootURI());
     }
 
     @Deprecated
@@ -127,7 +127,7 @@ public class WebServerConfig {
 
     @Property
     public boolean isDevelopmentMode() {
-        return application.isDevelMode();
+        return application.getServerConfiguration().isDevelMode();
     }
 
     @Property
@@ -142,7 +142,7 @@ public class WebServerConfig {
 
     @Property
     public long getSessionExpireTime() {
-        return application.getConfiguredMaxSessionIdleTime();
+        return application.getServerConfiguration().getMaxSessionIdleTime();
     }
 
     @Property

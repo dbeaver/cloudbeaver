@@ -110,13 +110,16 @@ export abstract class CachedResource<
       clear: action,
     });
 
-    setInterval(() => {
-      // mark resource outdate when it's not used
-      if (!this.useTracker.isResourceInUse && !this.isOutdated()) {
-        this.logger.log('not in use');
-        this.markOutdated();
-      }
-    }, 5 * 60 * 1000);
+    setInterval(
+      () => {
+        // mark resource outdate when it's not used
+        if (!this.useTracker.isResourceInUse && !this.isOutdated()) {
+          this.logger.log('not in use');
+          this.markOutdated();
+        }
+      },
+      5 * 60 * 1000,
+    );
   }
 
   /**
@@ -517,6 +520,11 @@ export abstract class CachedResource<
     this.setData(this.defaultValue());
   }
 
+  /**
+   * Sets data to the resource. Forbidden to use outside of the loader or performUpdate functions!
+   * @param data - new data
+   * @returns {void}
+   */
   protected setData(data: TData): void {
     this.data = data;
   }
@@ -601,6 +609,7 @@ export abstract class CachedResource<
    * Implements same behavior as {@link CachedResource.load} and {@link CachedResource.refresh} for custom loaders.
    * Resource will be marked as loading and will be marked as loaded after loader is finished.
    * Exceptions will be handled and stored in metadata.
+   * Tip: use onDataOutdated executor with this function where it is needed.
    * @param key - Resource key
    * @param include - Includes
    * @param update - Update function
@@ -651,7 +660,6 @@ export abstract class CachedResource<
       {
         success: () => {
           if (loaded) {
-            this.onDataOutdated.execute(key); // TODO: probably need to remove, we need to notify any related resources that subscribed to .onOutdate, to recursively outdate them
             this.dataUpdate(key);
           }
         },
