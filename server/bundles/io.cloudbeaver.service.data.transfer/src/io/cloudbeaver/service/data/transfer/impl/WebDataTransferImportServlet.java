@@ -32,19 +32,22 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.eclipse.jetty.ee8.nested.Request;
+import org.eclipse.jetty.server.Request;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.data.json.JSONUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Map;
+import java.util.UUID;
 
 @MultipartConfig
 public class WebDataTransferImportServlet extends WebServiceServletBase {
 
     private static final Log log = Log.getLog(WebDataTransferImportServlet.class);
+    public static final String ECLIPSE_JETTY_MULTIPART_CONFIG = "org.eclipse.jetty.multipartConfig";
 
     DBWServiceDataTransfer dbwServiceDataTransfer;
 
@@ -64,10 +67,10 @@ public class WebDataTransferImportServlet extends WebServiceServletBase {
             response.sendError(HttpServletResponse.SC_FORBIDDEN, "Import for users only");
             return;
         }
-        Path tempFolder = CBPlatform.getInstance().getTempFolder(session.getProgressMonitor(), "temp-driver-files");
+        Path tempFolder = CBPlatform.getInstance().getTempFolder(session.getProgressMonitor(), "temp-import-files");
         MultipartConfigElement MULTI_PART_CONFIG = new MultipartConfigElement(tempFolder.toString());
 
-        request.setAttribute(Request.__MULTIPART_CONFIG_ELEMENT, MULTI_PART_CONFIG);
+        request.setAttribute(ECLIPSE_JETTY_MULTIPART_CONFIG, MULTI_PART_CONFIG);
 
         Map<String, Object> variables = getVariables(request);
 
@@ -90,16 +93,18 @@ public class WebDataTransferImportServlet extends WebServiceServletBase {
         }
 
         WebSQLResultsInfo webSQLResultsInfo = webSQLContextInfo.getResults(resultId);
-        InputStream file;
+        Path filePath;
 
         try {
-            file = request.getPart("fileData").getInputStream();
+            InputStream file = request.getPart("fileData").getInputStream();
+            filePath = tempFolder.resolve(UUID.randomUUID().toString());
+            Files.write(filePath, file.readAllBytes());
         } catch (ServletException e) {
             throw new DBWebException(e.getMessage());
         }
 
         if ("POST".equalsIgnoreCase(request.getMethod())) {
-            dbwServiceDataTransfer.asyncImportDataContainer(processorId, file, webSQLResultsInfo, session);
+            dbwServiceDataTransfer.asyncImportDataContainer(processorId, filePath, webSQLResultsInfo, session);
         }
     }
 }
