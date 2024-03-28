@@ -502,9 +502,9 @@ export function useElementsTree(options: IOptions): IElementsTree {
         return (options.filters || []).reduce((children, filter) => filter(elementsTree, elementsTree.filter, node, children, this.state), children);
       },
       async setFilter(value: string) {
-        this.userData.filter = value;
-
         runInAction(() => {
+          this.userData.filter = value;
+
           for (const nodeState of this.state.values()) {
             nodeState.showInFilter = false;
           }
