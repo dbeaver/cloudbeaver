@@ -8,7 +8,7 @@
 import { observer } from 'mobx-react-lite';
 import { useLayoutEffect, useRef } from 'react';
 
-import { AdministrationItemService, filterOnlyActive, IAdministrationItemRoute } from '@cloudbeaver/core-administration';
+import { AdministrationItemService, AdministrationScreenService, filterOnlyActive, IAdministrationItemRoute } from '@cloudbeaver/core-administration';
 import {
   Loader,
   s,
@@ -83,6 +83,7 @@ export const Administration = observer<React.PropsWithChildren<Props>>(function 
 }) {
   const styles = useS(style);
   const contentRef = useRef<HTMLDivElement>(null);
+  const administrationScreenService = useService(AdministrationScreenService);
   const administrationViewService = useService(AdministrationViewService);
   const administrationItemService = useService(AdministrationItemService);
   const optionsPanelService = useService(OptionsPanelService);
@@ -96,9 +97,9 @@ export const Administration = observer<React.PropsWithChildren<Props>>(function 
   }, [activeScreen?.item]);
 
   return (
-    <CaptureView view={administrationViewService} className={s(styles, { administration: true, captureView: true })}>
+    <CaptureView view={administrationViewService} className={s(styles, { captureView: true })}>
       <AdministrationCaptureViewContext />
-      <TabsState currentTabId={activeScreen?.item} orientation="vertical">
+      <TabsState currentTabId={activeScreen?.item} localState={administrationScreenService.itemState} orientation="vertical">
         <SContext registry={tabsRegistry}>
           <TabList aria-label="Administration items">
             {items.map(item => (

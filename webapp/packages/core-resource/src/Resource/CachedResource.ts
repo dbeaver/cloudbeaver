@@ -18,6 +18,7 @@ import {
   SyncExecutor,
   TaskScheduler,
 } from '@cloudbeaver/core-executor';
+import { getFirstException, isContainsException } from '@cloudbeaver/core-utils';
 
 import {
   CachedResourceOffsetPageKey,
@@ -684,6 +685,11 @@ export abstract class CachedResource<
     }
     const contexts = new ExecutionContext(key);
     if (!refresh) {
+      const exception = this.getException(key);
+      if (isContainsException(exception)) {
+        throw getFirstException(exception);
+      }
+
       if (!this.isLoadable(key, include)) {
         return;
       }

@@ -16,6 +16,7 @@ export default [
   ['ui_processing_save', 'Сохранить'],
   ['ui_processing_saved', 'Сохранено'],
   ['ui_processing_stop', 'Остановить'],
+  ['ui_processing_skip', 'Пропустить'],
   ['ui_second_first_form', '{arg:interval} секунда'],
   ['ui_second_second_form', '{arg:interval} секунды'],
   ['ui_second_third_form', '{arg:interval} секунд'],

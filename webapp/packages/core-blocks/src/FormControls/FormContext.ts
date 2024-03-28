@@ -21,7 +21,7 @@ export interface IChangeData {
 export interface IFormContext {
   ref: HTMLFormElement | null;
   onValidate: SyncExecutor;
-  onSubmit: SyncExecutor<SubmitEvent | undefined>;
+  onSubmit: IExecutor<SubmitEvent | undefined>;
   onChange: IExecutor<IChangeData>;
   parent: IFormContext | null;
   disableEnterSubmit: boolean;
@@ -30,7 +30,7 @@ export interface IFormContext {
   keyDown: KeyHandler;
   validate: () => boolean;
   reportValidity: () => boolean;
-  submit: (event?: SubmitEvent) => void;
+  submit: (event?: SubmitEvent) => Promise<void>;
 }
 
 export const FormContext = createContext<IFormContext | null>(null);

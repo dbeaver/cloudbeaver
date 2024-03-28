@@ -13,21 +13,14 @@ import { Executor, IExecutor } from '@cloudbeaver/core-executor';
 import { EAdminPermission, PermissionsService, ServerConfigResource, SessionPermissionsResource } from '@cloudbeaver/core-root';
 import { RouterState, ScreenService } from '@cloudbeaver/core-routing';
 import { StorageService } from '@cloudbeaver/core-storage';
-import { GlobalConstants } from '@cloudbeaver/core-utils';
+import { DefaultValueGetter, GlobalConstants, MetadataMap, schema } from '@cloudbeaver/core-utils';
 
 import { AdministrationItemService } from '../AdministrationItem/AdministrationItemService';
 import type { IAdministrationItemRoute } from '../AdministrationItem/IAdministrationItemRoute';
 import type { IRouteParams } from '../AdministrationItem/IRouteParams';
+import { ADMINISTRATION_SCREEN_STATE_SCHEMA, type IAdministrationScreenInfo } from './IAdministrationScreenState';
 
-const ADMINISTRATION_ITEMS_STATE = 'administration_items_state';
 const ADMINISTRATION_INFO = 'administration_info';
-
-interface IAdministrationScreenInfo {
-  workspaceId: string;
-  version: string;
-  serverVersion: string;
-  configurationMode: boolean;
-}
 
 @injectable()
 export class AdministrationScreenService {
@@ -41,9 +34,8 @@ export class AdministrationScreenService {
   static setupItemSubRouteName = 'setup.item.sub';
   static setupItemSubParamRouteName = 'setup.item.sub.param';
 
-  info: IAdministrationScreenInfo;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  itemState: Map<string, any>;
+  readonly info: IAdministrationScreenInfo;
+  readonly itemState: MetadataMap<string, any>;
 
   get isAdministrationPageActive(): boolean {
     return this.isAdministrationRouteActive(this.screenService.routerService.state.name);
@@ -64,6 +56,8 @@ export class AdministrationScreenService {
   readonly ensurePermissions: IExecutor;
   readonly activationEvent: IExecutor<boolean>;
 
+  private itemsStateSync: Array<[string, any]>;
+
   constructor(
     private readonly permissionsResource: SessionPermissionsResource,
     private readonly permissionsService: PermissionsService,
@@ -74,18 +68,46 @@ export class AdministrationScreenService {
     private readonly notificationService: NotificationService,
   ) {
     this.info = getDefaultAdministrationScreenInfo();
-    this.itemState = new Map();
+    this.itemState = new MetadataMap();
     this.activationEvent = new Executor();
     this.ensurePermissions = new Executor();
+    this.itemsStateSync = [];
 
-    makeObservable(this, {
+    makeObservable<this, 'itemsStateSync'>(this, {
       info: observable,
-      itemState: observable,
+      itemsStateSync: observable,
       activeScreen: computed,
     });
 
-    this.storageService.registerSettings(ADMINISTRATION_ITEMS_STATE, this.itemState, () => new Map());
-    this.storageService.registerSettings(ADMINISTRATION_INFO, this.info, getDefaultAdministrationScreenInfo);
+    this.storageService.registerSettings(
+      ADMINISTRATION_INFO,
+      this.info,
+      getDefaultAdministrationScreenInfo,
+      data => {
+        const parsed = ADMINISTRATION_SCREEN_STATE_SCHEMA.safeParse(data);
+
+        if (
+          !parsed.success ||
+          parsed.data.workspaceId !== this.serverConfigResource.workspaceId ||
+          parsed.data.configurationMode !== this.isConfigurationMode ||
+          parsed.data.serverVersion !== this.serverConfigResource.serverVersion ||
+          parsed.data.version !== GlobalConstants.version
+        ) {
+          return {
+            workspaceId: this.serverConfigResource.workspaceId,
+            configurationMode: this.isConfigurationMode,
+            serverVersion: this.serverConfigResource.serverVersion,
+            version: GlobalConstants.version || '',
+            itemsState: observable([], { deep: true }),
+          };
+        }
+
+        return { ...parsed.data, itemsState: observable(parsed.data.itemsState, { deep: true }) };
+      },
+      () => {
+        this.itemState.sync(this.itemsStateSync);
+      },
+    );
     this.permissionsResource.onDataUpdate.addPostHandler(() => {
       this.checkPermissions(this.screenService.routerService.state);
     });
@@ -153,26 +175,13 @@ export class AdministrationScreenService {
   }
 
   getItemState<T>(name: string): T | undefined;
-  getItemState<T>(name: string, defaultState: () => T, update?: boolean, validate?: (state: T) => boolean): T;
-  getItemState<T>(name: string, defaultState?: () => T, update?: boolean, validate?: (state: T) => boolean): T | undefined {
+  getItemState<T>(name: string, defaultState: DefaultValueGetter<string, T>, schema?: schema.AnyZodObject): T;
+  getItemState<T>(name: string, defaultState?: DefaultValueGetter<string, T>, schema?: schema.AnyZodObject): T | undefined {
     if (!this.serverConfigResource.isLoaded()) {
       throw new Error('Administration screen getItemState can be used only after server configuration loaded');
     }
-    this.validateState();
 
-    if (defaultState) {
-      if (!this.itemState.has(name) || update) {
-        this.itemState.set(name, defaultState());
-      } else if (validate) {
-        const state = this.itemState.get(name)!;
-
-        if (!validate(state)) {
-          this.itemState.set(name, defaultState());
-        }
-      }
-    }
-
-    return this.itemState.get(name);
+    return this.itemState.get(name, defaultState, schema);
   }
 
   clearItemsState(): void {
@@ -246,21 +255,6 @@ export class AdministrationScreenService {
     }
   }
 
-  private validateState() {
-    if (
-      this.info.workspaceId !== this.serverConfigResource.workspaceId ||
-      this.info.configurationMode !== this.isConfigurationMode ||
-      this.info.serverVersion !== this.serverConfigResource.serverVersion ||
-      this.info.version !== GlobalConstants.version
-    ) {
-      this.clearItemsState();
-      this.info.workspaceId = this.serverConfigResource.workspaceId;
-      this.info.configurationMode = this.isConfigurationMode;
-      this.info.serverVersion = this.serverConfigResource.serverVersion;
-      this.info.version = GlobalConstants.version || '';
-    }
-  }
-
   private async checkPermissions(state: RouterState): Promise<boolean> {
     if (!this.isAdministrationRouteActive(state.name)) {
       return false;
@@ -307,5 +301,6 @@ function getDefaultAdministrationScreenInfo(): IAdministrationScreenInfo {
     version: GlobalConstants.version || '',
     serverVersion: '',
     configurationMode: false,
+    itemsState: [],
   };
 }

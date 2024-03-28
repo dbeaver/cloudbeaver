@@ -7,17 +7,17 @@
  */
 import { useContext } from 'react';
 
-import type { MetadataValueGetter } from '@cloudbeaver/core-utils';
+import type { MetadataValueGetter, schema } from '@cloudbeaver/core-utils';
 
 import { TabContext } from './TabContext';
 import { TabsContext } from './TabsContext';
 
-export function useTabLocalState<T>(valueGetter?: MetadataValueGetter<string, T>): T {
+export function useTabLocalState<T>(valueGetter?: MetadataValueGetter<string, T>, schema?: schema.AnyZodObject): T {
   const state = useContext(TabsContext);
   const tabContext = useContext(TabContext);
   if (!state || !tabContext) {
     throw new Error('Tabs context was not provided');
   }
 
-  return state.getLocalState(tabContext.tabId, valueGetter);
+  return state.getLocalState(tabContext.tabId, valueGetter, schema);
 }

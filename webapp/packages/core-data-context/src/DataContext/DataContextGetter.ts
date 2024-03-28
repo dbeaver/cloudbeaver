@@ -7,4 +7,7 @@
  */
 import type { IDataContextProvider } from './IDataContextProvider';
 
-export type DataContextGetter<T> = (provider: IDataContextProvider) => T;
+export type DataContextGetter<T> = {
+  (provider: IDataContextProvider): T;
+  id: string;
+};

@@ -7,7 +7,7 @@
  */
 import { action, makeObservable, observable } from 'mobx';
 
-import { dataContextAddDIProvider, type IDataContext, TempDataContext } from '@cloudbeaver/core-data-context';
+import { dataContextAddDIProvider, DataContextGetter, type IDataContext, TempDataContext } from '@cloudbeaver/core-data-context';
 import type { App } from '@cloudbeaver/core-di';
 import type { ENotificationType } from '@cloudbeaver/core-events';
 import { Executor, ExecutorInterrupter, IExecutionContextProvider, type IExecutor } from '@cloudbeaver/core-executor';
@@ -18,11 +18,12 @@ import { DATA_CONTEXT_FORM_STATE } from './DATA_CONTEXT_FORM_STATE';
 import type { FormBaseService } from './FormBaseService';
 import { FormMode } from './FormMode';
 import { formStateContext } from './formStateContext';
+import type { IFormPart } from './IFormPart';
 import type { IFormState } from './IFormState';
 
 export class FormState<TState> implements IFormState<TState> {
   mode: FormMode;
-  parts: MetadataMap<string, any>;
+  parts: MetadataMap<string, IFormPart<any>>;
   state: TState;
   isDisabled: boolean;
 
@@ -122,6 +123,10 @@ export class FormState<TState> implements IFormState<TState> {
     return Array.from(this.parts.values()).some(part => part.isChanged());
   }
 
+  getPart<T extends IFormPart<any>>(getter: DataContextGetter<T>): T {
+    return this.parts.get(getter.id, () => this.dataContext.get(getter)) as T;
+  }
+
   async load(refresh?: boolean): Promise<void> {
     if (this.promise !== null) {
       return this.promise;
@@ -175,6 +180,12 @@ export class FormState<TState> implements IFormState<TState> {
       if (loader.isCancelled?.() !== true) {
         loader.cancel?.();
       }
+    }
+  }
+
+  reset(): void {
+    for (const part of this.parts.values()) {
+      part.reset();
     }
   }
 

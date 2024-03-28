@@ -16,13 +16,13 @@ import { FormChangeHandler, FormContext, type IChangeData, type IFormContext } f
 interface IOptions {
   parent?: IFormContext;
   disableEnterSubmit?: boolean;
-  onSubmit?: (event?: SubmitEvent | undefined) => void;
+  onSubmit?: (event?: SubmitEvent | undefined) => Promise<void> | void;
   onChange?: FormChangeHandler;
 }
 
 export function useForm(options?: IOptions): IFormContext {
   let parentForm = useContext(FormContext);
-  const [submittingExecutor] = useState(() => new SyncExecutor<SubmitEvent | undefined>());
+  const [submittingExecutor] = useState(() => new Executor<SubmitEvent | undefined>());
   const [validationExecutor] = useState(() => new SyncExecutor());
   const [changeExecutor] = useState(() => new Executor<IChangeData>());
 
@@ -86,14 +86,14 @@ export function useForm(options?: IOptions): IFormContext {
           this.submit();
         }
       },
-      submit(event) {
+      async submit(event) {
         if (this.parent) {
-          this.parent.submit(event);
+          await this.parent.submit(event);
         } else {
           event?.preventDefault();
 
           if (this.validate()) {
-            this.onSubmit.execute(event);
+            await this.onSubmit.execute(event);
           }
         }
       },

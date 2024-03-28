@@ -14,7 +14,13 @@ import type { ExtractInitArgs, IDestructibleController, IInitializableController
  * @deprecated use hooks instead
  */
 export function useController<T extends IInitializableController>(ctor: IServiceConstructor<T>, ...args: ExtractInitArgs<T>): T;
+/**
+ * @deprecated use hooks instead
+ */
 export function useController<T>(ctor: IServiceConstructor<T>): T;
+/**
+ * @deprecated use hooks instead
+ */
 export function useController<T>(ctor: IServiceConstructor<T>, ...args: any[]): T {
   const app = useContext(appContext);
   const controllerRef = useRef<T>();

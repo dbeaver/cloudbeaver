@@ -7,9 +7,15 @@
  */
 
 .tabPanel {
-  flex: 1;
-  display: flex;
-  overflow: hidden;
   outline: none;
   position: relative;
+
+  &:not(.contents) {
+    flex: 1;
+    display: flex;
+    overflow: hidden;
+  }
+}
+.contents {
+  display: contents;
 }

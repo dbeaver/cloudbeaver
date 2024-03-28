@@ -29,7 +29,7 @@ export function isLoadableStateHasException(state: ILoadableState): boolean {
   return isContainsException(state.exception);
 }
 
-export function isContainsException(exception?: (Error | null)[] | Error | null): boolean {
+export function isContainsException(exception?: (Error | null)[] | Error | null): exception is Error[] | Error {
   if (Array.isArray(exception)) {
     return exception.some(Boolean);
   }

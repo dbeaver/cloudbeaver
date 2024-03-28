@@ -5,5 +5,6 @@
   display: flex;
   position: absolute;
   right: 24px;
+  z-index: 1;
   margin-right: 0 !important;
 }
