@@ -35,5 +35,5 @@ export default [
   ['sql_editor_close_result_tabs_dialog_title', 'Подтвердить закрытие вкладок'],
   ['plugin_sql_editor_action_overlay_title', 'Требуется действие'],
   ['plugin_sql_editor_action_overlay_description', 'Пожалуйста, перезапустите редактор для продолжения работы.'],
-  ['plugin_sql_editor_action_close_group', 'Закрыть все из группы'],
+  ['plugin_sql_editor_action_close_group', 'Закрыть все из этого запроса'],
 ];

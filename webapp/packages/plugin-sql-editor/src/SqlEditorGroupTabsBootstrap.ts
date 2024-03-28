@@ -1,6 +1,6 @@
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { DATA_CONTEXT_TABS_CONTEXT, MENU_TAB } from '@cloudbeaver/core-ui';
-import { ActionService, DATA_CONTEXT_MENU, MenuService } from '@cloudbeaver/core-view';
+import { ActionService, DATA_CONTEXT_MENU, menuExtractItems, MenuService } from '@cloudbeaver/core-view';
 
 import { ACTION_TAB_CLOSE_SQL_RESULT_GROUP } from './ACTION_TAB_CLOSE_SQL_RESULT_GROUP';
 import { DATA_CONTEXT_SQL_EDITOR_STATE } from './DATA_CONTEXT_SQL_EDITOR_STATE';
@@ -26,6 +26,15 @@ export class SqlEditorGroupTabsBootstrap extends Bootstrap {
         return !!tab && !!state?.enabledBaseActions && menu;
       },
       getItems: (context, items) => [...items, ACTION_TAB_CLOSE_SQL_RESULT_GROUP],
+      orderItems: (context, items) => {
+        const actions = menuExtractItems(items, [ACTION_TAB_CLOSE_SQL_RESULT_GROUP]);
+
+        if (actions.length > 0) {
+          items.push(...actions);
+        }
+
+        return items;
+      },
     });
     this.actionService.addHandler({
       id: 'result-tabs-group-base-handler',
