@@ -37,10 +37,6 @@ export class AuthInfoService {
     );
   }
 
-  async logout(): Promise<void> {
-    await this.userInfoResource.logout();
-  }
-
   private federatedAuthentication(
     providerId: string,
     options: ILoginOptions,

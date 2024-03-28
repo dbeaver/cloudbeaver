@@ -36,11 +36,11 @@ export type SQLProposal = SqlCompletionProposal;
 @injectable()
 export class SqlEditorService {
   get autoSave() {
-    return this.sqlEditorSettingsService.settings.getValue('autoSave') && !this.serverConfigResource.isFeatureEnabled(FEATURE_GIT_ID, true);
+    return this.sqlEditorSettingsService.autoSave && !this.serverConfigResource.isFeatureEnabled(FEATURE_GIT_ID, true);
   }
 
-  get canInsertAlias() {
-    return this.sqlEditorSettingsService.proposalInsertTableSettings.getValue('alias');
+  get insertTableAlias() {
+    return this.sqlEditorSettingsService.insertTableAlias;
   }
 
   constructor(

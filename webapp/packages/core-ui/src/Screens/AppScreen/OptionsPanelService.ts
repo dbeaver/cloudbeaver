@@ -8,7 +8,7 @@
 import { makeObservable, observable } from 'mobx';
 
 import { injectable } from '@cloudbeaver/core-di';
-import { Executor, ExecutorInterrupter, IExecutor, IExecutorHandler } from '@cloudbeaver/core-executor';
+import { Executor, ExecutorInterrupter, IExecutionContext, IExecutor, IExecutorHandler } from '@cloudbeaver/core-executor';
 
 import { NavigationService } from './NavigationService';
 
@@ -55,12 +55,12 @@ export class OptionsPanelService {
     return true;
   }
 
-  async close(): Promise<boolean> {
+  async close(context?: IExecutionContext<void>): Promise<boolean> {
     if (this.panelComponent === null) {
       return true;
     }
 
-    const contexts = await this.closeTask.execute();
+    const contexts = await this.closeTask.execute(undefined, context);
 
     const interrupted = contexts.getContext(ExecutorInterrupter.interruptContext);
 

@@ -29,7 +29,7 @@ export function useStyles(...componentStyles: ComponentStyle[]): Record<string, 
   const stylesRef = useRef<ComponentStyle[]>([]);
   const loadedStyles = useRef<BaseStyles[]>([]);
   const themeService = useService(ThemeService);
-  const [currentThemeId, setCurrentThemeId] = useState(() => themeService.currentThemeId);
+  const [currentThemeId, setCurrentThemeId] = useState(() => themeService.themeId);
   const lastThemeRef = useRef<string>(currentThemeId);
   //@ts-ignore
   const filteredStyles = componentStyles.flat(Infinity).filter(Boolean) as Style[];
@@ -39,7 +39,7 @@ export function useStyles(...componentStyles: ComponentStyle[]): Record<string, 
     executor: themeService.onChange,
     handlers: [
       function updateThemeId(theme) {
-        if (currentThemeId !== themeService.currentThemeId && trackTheme) {
+        if (currentThemeId !== themeService.themeId && trackTheme) {
           setCurrentThemeId(theme.id);
         }
       },

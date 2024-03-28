@@ -52,7 +52,7 @@ export class NotificationService {
     if (options.persistent) {
       const persistentNotifications = this.notificationList.values.filter(value => value.persistent);
 
-      const maxPersistentAllow = this.settings.settings.getValue('maxPersistentAllow');
+      const maxPersistentAllow = this.settings.maxPersistentAllow;
 
       if (persistentNotifications.length >= maxPersistentAllow) {
         throw new Error(`You cannot create more than ${maxPersistentAllow} persistent notification`);
@@ -105,7 +105,7 @@ export class NotificationService {
 
     const filteredNotificationList = this.notificationList.values.filter(notification => !notification.persistent);
 
-    const notificationsPool = this.settings.settings.getValue('notificationsPool');
+    const notificationsPool = this.settings.notificationsPool;
 
     if (filteredNotificationList.length > notificationsPool) {
       let i = 0;

@@ -13,6 +13,9 @@
       "path": "../core-blocks/tsconfig.json"
     },
     {
+      "path": "../core-data-context/tsconfig.json"
+    },
+    {
       "path": "../core-di/tsconfig.json"
     },
     {
@@ -35,6 +38,9 @@
     },
     {
       "path": "../core-ui/tsconfig.json"
+    },
+    {
+      "path": "../core-utils/tsconfig.json"
     },
     {
       "path": "../core-view/tsconfig.json"

@@ -8,7 +8,7 @@
 import { action, makeObservable, observable } from 'mobx';
 
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
-import { SettingsService } from '@cloudbeaver/core-settings';
+import { StorageService } from '@cloudbeaver/core-storage';
 
 import { createSqlDataSourceHistoryInitialState } from '../SqlDataSourceHistory/createSqlDataSourceHistoryInitialState';
 import { validateSqlDataSourceHistoryState } from '../SqlDataSourceHistory/validateSqlDataSourceHistoryState';
@@ -22,7 +22,10 @@ const localStorageKey = 'local-storage-sql-data-source';
 export class LocalStorageSqlDataSourceBootstrap extends Bootstrap {
   private readonly dataSourceStateState = new Map<string, ILocalStorageSqlDataSourceState>();
 
-  constructor(private readonly sqlDataSourceService: SqlDataSourceService, settingsService: SettingsService) {
+  constructor(
+    private readonly sqlDataSourceService: SqlDataSourceService,
+    storageService: StorageService,
+  ) {
     super();
     this.dataSourceStateState = new Map();
 
@@ -31,7 +34,7 @@ export class LocalStorageSqlDataSourceBootstrap extends Bootstrap {
       dataSourceStateState: observable.deep,
     });
 
-    settingsService.registerSettings(
+    storageService.registerSettings(
       localStorageKey,
       this.dataSourceStateState,
       () => new Map(),

@@ -10,26 +10,28 @@ import '@testing-library/jest-dom';
 import { coreBrowserManifest } from '@cloudbeaver/core-browser';
 import { coreClientActivityManifest } from '@cloudbeaver/core-client-activity';
 import { coreLocalizationManifest } from '@cloudbeaver/core-localization';
-import { corePluginManifest } from '@cloudbeaver/core-plugin';
-import { coreProductManifest } from '@cloudbeaver/core-product';
 import { coreRootManifest, ServerConfigResource } from '@cloudbeaver/core-root';
 import { createGQLEndpoint } from '@cloudbeaver/core-root/dist/__custom_mocks__/createGQLEndpoint';
+import '@cloudbeaver/core-root/dist/__custom_mocks__/expectWebsocketClosedMessage';
 import { mockAppInit } from '@cloudbeaver/core-root/dist/__custom_mocks__/mockAppInit';
 import { mockGraphQL } from '@cloudbeaver/core-root/dist/__custom_mocks__/mockGraphQL';
 import { mockServerConfig } from '@cloudbeaver/core-root/dist/__custom_mocks__/resolvers/mockServerConfig';
 import { coreSDKManifest } from '@cloudbeaver/core-sdk';
 import { coreSettingsManifest } from '@cloudbeaver/core-settings';
+import {
+  expectDeprecatedSettingMessage,
+  expectNoDeprecatedSettingMessage,
+} from '@cloudbeaver/core-settings/dist/__custom_mocks__/expectDeprecatedSettingMessage';
 import { createApp } from '@cloudbeaver/tests-runner';
 
-import { BrowserSettingsService, CookiesSettings } from './BrowserSettingsService';
+import { BrowserSettingsService } from './BrowserSettingsService';
 import { coreBrowserSettingsManifest } from './manifest';
 
 const endpoint = createGQLEndpoint();
+const server = mockGraphQL(...mockAppInit(endpoint));
 const app = createApp(
   coreBrowserManifest,
   coreBrowserSettingsManifest,
-  corePluginManifest,
-  coreProductManifest,
   coreRootManifest,
   coreSDKManifest,
   coreSettingsManifest,
@@ -37,30 +39,16 @@ const app = createApp(
   coreClientActivityManifest,
 );
 
-const server = mockGraphQL(...mockAppInit(endpoint));
-
-beforeAll(() => app.init());
-
 const testValueA = false;
 const testValueB = true;
 
 const equalConfigA = {
-  core: {
-    cookies: {
-      disabled: testValueA,
-    },
-    browser: {
-      'cookies.disabled': testValueA,
-    } as CookiesSettings,
-  },
+  'core.cookies.disabled': testValueA,
+  'core.browser.cookies.disabled': testValueA,
 };
 
 const equalConfigB = {
-  core: {
-    cookies: {
-      disabled: testValueB,
-    },
-  },
+  'core.cookies.disabled': testValueB,
 };
 
 test('New settings override deprecated settings', async () => {
@@ -71,7 +59,8 @@ test('New settings override deprecated settings', async () => {
 
   await config.refresh();
 
-  expect(settings.settings.getValue('cookies.disabled')).toBe(testValueA);
+  expect(settings.disabled).toBe(testValueA);
+  expectNoDeprecatedSettingMessage();
 });
 
 test('New settings fall back to deprecated settings', async () => {
@@ -82,5 +71,6 @@ test('New settings fall back to deprecated settings', async () => {
 
   await config.refresh();
 
-  expect(settings.settings.getValue('cookies.disabled')).toBe(testValueB);
+  expect(settings.disabled).toBe(testValueB);
+  expectDeprecatedSettingMessage();
 });

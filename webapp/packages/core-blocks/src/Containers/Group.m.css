@@ -18,8 +18,18 @@
   padding: 24px;
   border-radius: var(--theme-group-element-radius);
 
+  > .groupTitle {
+    padding: 24px 0;
+    margin: -24px 0;
+  }
+
   &.dense {
     padding: 8px;
+
+    > .groupTitle {
+      padding: 8px 0;
+      margin: -8px 0;
+    }
   }
 
   &.form > * {
@@ -32,6 +42,7 @@
 
     > .groupTitle {
       padding: 24px;
+      margin: 0;
     }
   }
 
