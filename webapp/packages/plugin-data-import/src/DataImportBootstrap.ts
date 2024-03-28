@@ -60,7 +60,7 @@ export class DataImportBootstrap extends Bootstrap {
       },
       getActionInfo(_, action) {
         if (action === ACTION_IMPORT) {
-          return { ...action.info, icon: '/icons/data-import.png' };
+          return { ...action.info, icon: '/icons/data-import.svg' };
         }
 
         return action.info;
