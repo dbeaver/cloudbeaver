@@ -23,7 +23,10 @@ export abstract class FormPart<TPartState, TFormState = any> implements IFormPar
   protected loaded: boolean;
   protected loading: boolean;
 
-  constructor(protected readonly formState: IFormState<TFormState>, initialState: TPartState) {
+  constructor(
+    protected readonly formState: IFormState<TFormState>,
+    initialState: TPartState,
+  ) {
     this.initialState = initialState;
     this.state = toJS(this.initialState);
 
