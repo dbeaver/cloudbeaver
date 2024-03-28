@@ -95,8 +95,8 @@ export class DataViewerSettingsService extends Dependency {
       setting =>
         ({
           ...setting,
-          name: 'settings_data_editor_fetch_max_name',
-          description: 'settings_data_editor_fetch_max_description',
+          name: 'settings_data_editor_fetch_default_name',
+          description: 'settings_data_editor_fetch_default_description',
           group: DATA_EDITOR_SETTINGS_GROUP,
         }) as ISettingDescription<DataViewerSettings>,
     );
