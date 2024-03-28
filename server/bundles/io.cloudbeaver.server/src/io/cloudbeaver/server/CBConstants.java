@@ -36,7 +36,10 @@ public class CBConstants {
     public static final String PARAM_SERVICES_URI = "serviceURI";
     public static final String PARAM_DRIVERS_LOCATION = "driversLocation";
     public static final String PARAM_WORKSPACE_LOCATION = "workspaceLocation";
+    //legacy path to a product.conf file
+    @Deprecated
     public static final String PARAM_PRODUCT_CONFIGURATION = "productConfiguration";
+    public static final String PARAM_PRODUCT_SETTINGS = "productSettings";
     public static final String PARAM_EXTERNAL_PROPERTIES = "externalProperties";
     public static final String PARAM_STATIC_CONTENT = "staticContent";
     public static final String PARAM_RESOURCE_QUOTAS = "resourceQuotas";

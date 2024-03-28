@@ -5,22 +5,13 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import type { IFormStateInfo } from '@cloudbeaver/core-ui';
+import type { App } from '@cloudbeaver/core-di';
+import { FormState } from '@cloudbeaver/core-ui';
 
-import type { IUserProfileFormState } from './IUserProfileFormState';
+import type { IUserProfileFormState, UserProfileFormService } from './UserProfileFormService';
 
-export class UserProfileFormState implements IUserProfileFormState {
-  get info(): IFormStateInfo {
-    return {
-      disabled: false,
-      edited: false,
-      readonly: false,
-      statusMessage: null,
-      statusType: null,
-    };
+export class UserProfileFormState extends FormState<IUserProfileFormState> {
+  constructor(app: App, service: UserProfileFormService, config: IUserProfileFormState) {
+    super(app, service, config);
   }
-
-  async validate(): Promise<void> {}
-
-  dispose(): void {}
 }

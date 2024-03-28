@@ -53,6 +53,7 @@ public class WebServiceBindingCore extends WebServiceBindingBase<DBWServiceCore>
         WebSessionManager sessionManager = platform.getSessionManager();
         model.getQueryType()
             .dataFetcher("serverConfig", env -> getService(env).getServerConfig())
+            .dataFetcher("productSettings", env -> getService(env).getProductSettings(getWebSession(env)))
 
             .dataFetcher("driverList", env -> getService(env).getDriverList(getWebSession(env), env.getArgument("id")))
             .dataFetcher("authModels", env -> getService(env).getAuthModels(getWebSession(env)))

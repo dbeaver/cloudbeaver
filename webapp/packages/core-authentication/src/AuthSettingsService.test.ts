@@ -7,53 +7,38 @@
  */
 import '@testing-library/jest-dom';
 
-import { coreBrowserManifest } from '@cloudbeaver/core-browser';
 import { coreClientActivityManifest } from '@cloudbeaver/core-client-activity';
-import { coreEventsManifest } from '@cloudbeaver/core-events';
 import { coreLocalizationManifest } from '@cloudbeaver/core-localization';
-import { corePluginManifest } from '@cloudbeaver/core-plugin';
-import { coreProductManifest } from '@cloudbeaver/core-product';
 import { coreRootManifest, ServerConfigResource } from '@cloudbeaver/core-root';
 import { createGQLEndpoint } from '@cloudbeaver/core-root/dist/__custom_mocks__/createGQLEndpoint';
+import '@cloudbeaver/core-root/dist/__custom_mocks__/expectWebsocketClosedMessage';
 import { mockAppInit } from '@cloudbeaver/core-root/dist/__custom_mocks__/mockAppInit';
 import { mockGraphQL } from '@cloudbeaver/core-root/dist/__custom_mocks__/mockGraphQL';
 import { mockServerConfig } from '@cloudbeaver/core-root/dist/__custom_mocks__/resolvers/mockServerConfig';
 import { coreRoutingManifest } from '@cloudbeaver/core-routing';
 import { coreSDKManifest } from '@cloudbeaver/core-sdk';
 import { coreSettingsManifest } from '@cloudbeaver/core-settings';
-import { coreThemingManifest } from '@cloudbeaver/core-theming';
+import { expectNoDeprecatedSettingMessage } from '@cloudbeaver/core-settings/dist/__custom_mocks__/expectDeprecatedSettingMessage';
 import { createApp } from '@cloudbeaver/tests-runner';
 
 import { mockAuthentication } from './__custom_mocks__/mockAuthentication';
-import { AuthSettings, AuthSettingsService } from './AuthSettingsService';
+import { AuthSettingsService } from './AuthSettingsService';
 import { coreAuthenticationManifest } from './manifest';
 
 const endpoint = createGQLEndpoint();
+const server = mockGraphQL(...mockAppInit(endpoint), ...mockAuthentication(endpoint));
 const app = createApp(
   coreAuthenticationManifest,
-  coreEventsManifest,
-  corePluginManifest,
-  coreProductManifest,
   coreRootManifest,
   coreSDKManifest,
   coreSettingsManifest,
-  coreBrowserManifest,
   coreRoutingManifest,
-  coreThemingManifest,
   coreLocalizationManifest,
   coreClientActivityManifest,
 );
 
-const server = mockGraphQL(...mockAppInit(endpoint), ...mockAuthentication(endpoint));
-
-beforeAll(() => app.init());
-
 const equalConfig = {
-  core: {
-    authentication: {
-      disableAnonymousAccess: true,
-    } as AuthSettings,
-  },
+  'core.authentication.disableAnonymousAccess': true,
 };
 
 test('Read settings', async () => {
@@ -64,5 +49,6 @@ test('Read settings', async () => {
 
   await config.refresh();
 
-  expect(settings.settings.getValue('disableAnonymousAccess')).toBe(true);
+  expect(settings.disableAnonymousAccess).toBe(true);
+  expectNoDeprecatedSettingMessage();
 });

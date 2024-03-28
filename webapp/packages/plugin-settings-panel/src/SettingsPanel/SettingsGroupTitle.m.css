@@ -1,0 +1,11 @@
+.icon {
+  transform: rotate(-90deg);
+  height: 16px;
+  width: 16px;
+}
+
+.box {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}

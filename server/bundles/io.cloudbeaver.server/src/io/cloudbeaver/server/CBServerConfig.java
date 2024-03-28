@@ -20,11 +20,13 @@ import com.google.gson.annotations.SerializedName;
 import io.cloudbeaver.auth.CBAuthConstants;
 import io.cloudbeaver.model.app.WebServerConfiguration;
 import io.cloudbeaver.service.security.db.WebDatabaseConfig;
+import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.utils.CommonUtils;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.HashMap;
 import java.util.Map;
 
 public class CBServerConfig implements WebServerConfiguration {
@@ -46,6 +48,7 @@ public class CBServerConfig implements WebServerConfiguration {
     private long maxSessionIdleTime = CBAuthConstants.MAX_SESSION_IDLE_TIME;
     private boolean develMode = false;
     private boolean enableSecurityManager = false;
+    private final Map<String, Object> productSettings = new HashMap<>();
 
     @SerializedName("database")
     private WebDatabaseConfig databaseConfiguration = new WebDatabaseConfig();
@@ -184,4 +187,8 @@ public class CBServerConfig implements WebServerConfiguration {
         return enableSecurityManager;
     }
 
+    @NotNull
+    public Map<String, Object> getProductSettings() {
+        return productSettings;
+    }
 }

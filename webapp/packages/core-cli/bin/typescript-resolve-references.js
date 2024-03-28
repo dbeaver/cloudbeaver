@@ -26,23 +26,33 @@ typescriptConfig.references = [];
 // typescriptRootConfig.references = typescriptRootConfig.references || [];
 
 for (const dependency of dependencies) {
-  if (!dependency.startsWith('@cloudbeaver')) {
+  if (dependency === pkg.name) {
+    console.error(`Self reference detected: ${dependency}`);
     continue;
   }
-  const dependencyPath = resolve(require.resolve(join(dependency, 'src', 'index.ts'), { paths: nodeModules }), '../../tsconfig.json');
-  typescriptConfig.references.push({
-    path: upath.relative(currentDir, dependencyPath),
-  });
-  typescriptConfig.references.sort((a, b) => a.path.localeCompare(b.path));
+  try {
+    if (!dependency.startsWith('@cloudbeaver')) {
+      continue;
+    }
+    const dependencyPath = resolve(require.resolve(join(dependency, 'src', 'index.ts'), { paths: nodeModules }), '../../tsconfig.json');
+    typescriptConfig.references.push({
+      path: upath.relative(currentDir, dependencyPath),
+    });
 
-  // const relativePath = relative(tsRootPath, dependencyPath);
+    // const relativePath = relative(tsRootPath, dependencyPath);
 
-  // if (!typescriptRootConfig.references.find(ref => ref.path === relativePath)) {
-  //   typescriptRootConfig.references.push({
-  //     path: relativePath,
-  //   });
-  // }
+    // if (!typescriptRootConfig.references.find(ref => ref.path === relativePath)) {
+    //   typescriptRootConfig.references.push({
+    //     path: relativePath,
+    //   });
+    // }
+  } catch (e) {
+    console.error(`Failed to resolve ${dependency}`);
+  }
 }
+
+typescriptConfig.references = [...new Set(typescriptConfig.references)];
+typescriptConfig.references.sort((a, b) => a.path.localeCompare(b.path));
 
 typescriptConfig.compilerOptions = {
   rootDir: 'src',

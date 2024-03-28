@@ -63,10 +63,7 @@ export class ConnectionMenuBootstrap extends Bootstrap {
 
     this.menuService.addCreator({
       isApplicable: context => {
-        if (
-          this.pluginConnectionsSettingsService.settings.getValue('hideConnectionViewForUsers') &&
-          !this.permissionsService.has(EAdminPermission.admin)
-        ) {
+        if (this.pluginConnectionsSettingsService.hideConnectionViewForUsers && !this.permissionsService.has(EAdminPermission.admin)) {
           return false;
         }
 
@@ -273,8 +270,7 @@ export class ConnectionMenuBootstrap extends Bootstrap {
     this.menuService.setHandler({
       id: 'connections-menu-base',
       isApplicable: context => context.tryGet(DATA_CONTEXT_MENU) === MENU_CONNECTIONS,
-      isHidden: () =>
-        this.connectionsManagerService.createConnectionProjects.length === 0 || this.connectionsSettingsService.settings.getValue('disabled'),
+      isHidden: () => this.connectionsManagerService.createConnectionProjects.length === 0 || this.connectionsSettingsService.disabled,
       isLabelVisible: () => false,
     });
   }

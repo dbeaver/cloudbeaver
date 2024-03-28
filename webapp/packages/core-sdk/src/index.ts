@@ -6,6 +6,7 @@ export * from './DetailsError';
 export * from './EnvironmentService';
 export * from './EServerErrorCode';
 export * from './getGQLResponse';
+export * from './getObjectPropertyType';
 export * from './GQLError';
 export * from './GQLErrorCatcher';
 export * from './GraphQLService';
