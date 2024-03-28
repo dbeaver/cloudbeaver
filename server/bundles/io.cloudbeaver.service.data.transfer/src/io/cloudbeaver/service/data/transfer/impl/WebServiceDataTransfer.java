@@ -45,13 +45,12 @@ import org.jkiss.dbeaver.tools.transfer.database.DatabaseProducerSettings;
 import org.jkiss.dbeaver.tools.transfer.database.DatabaseTransferProducer;
 import org.jkiss.dbeaver.tools.transfer.registry.DataTransferProcessorDescriptor;
 import org.jkiss.dbeaver.tools.transfer.registry.DataTransferRegistry;
-import org.jkiss.dbeaver.tools.transfer.stream.IStreamDataExporter;
-import org.jkiss.dbeaver.tools.transfer.stream.StreamConsumerSettings;
-import org.jkiss.dbeaver.tools.transfer.stream.StreamTransferConsumer;
+import org.jkiss.dbeaver.tools.transfer.stream.*;
 import org.jkiss.dbeaver.utils.ContentUtils;
 import org.jkiss.utils.CommonUtils;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -82,7 +81,19 @@ public class WebServiceDataTransfer implements DBWServiceDataTransfer {
 
     @Override
     public List<WebDataTransferStreamProcessor> getAvailableStreamProcessors(WebSession session) {
-        List<DataTransferProcessorDescriptor> processors = DataTransferRegistry.getInstance().getAvailableProcessors(StreamTransferConsumer.class, DBSEntity.class);
+        List<DataTransferProcessorDescriptor> processors = DataTransferRegistry.getInstance()
+                .getAvailableProcessors(StreamTransferConsumer.class, DBSEntity.class);
+        if (CommonUtils.isEmpty(processors)) {
+            return Collections.emptyList();
+        }
+
+        return processors.stream().map(x -> new WebDataTransferStreamProcessor(session, x)).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<WebDataTransferStreamProcessor> getAvailableImportStreamProcessors(WebSession session) {
+        List<DataTransferProcessorDescriptor> processors =
+                DataTransferRegistry.getInstance().getAvailableProcessors(StreamTransferProducer.class, DBSEntity.class);
         if (CommonUtils.isEmpty(processors)) {
             return Collections.emptyList();
         }
@@ -205,6 +216,38 @@ public class WebServiceDataTransfer implements DBWServiceDataTransfer {
         return sqlProcessor.getWebSession().createAndRunAsyncTask("Data export", runnable);
     }
 
+    public WebAsyncTaskInfo asyncImportDataContainer(String processorId,
+                                                     InputStream inputStream,
+                                                     WebSQLResultsInfo sqlContext,
+                                                     WebSession webSession) throws DBWebException {
+        webSession.addInfoMessage("Import data");
+        DataTransferProcessorDescriptor processor = DataTransferRegistry.getInstance().getProcessor(processorId);
+
+        DBSDataContainer dataContainer = sqlContext.getDataContainer();
+        WebAsyncTaskProcessor<String> runnable = new WebAsyncTaskProcessor<>() {
+            @Override
+            public void run(DBRProgressMonitor monitor) throws InvocationTargetException {
+                monitor.beginTask("Import data", 1);
+                try {
+                    monitor.subTask("Import data using " + processor.getName());
+                    try {
+                        importData(monitor, processor, dataContainer, inputStream);
+                    } catch (Exception e) {
+                        if (e instanceof DBException) {
+                            throw e;
+                        }
+                        throw new DBException("Error importing data", e);
+                    }
+                } catch (Throwable e) {
+                    throw new InvocationTargetException(e);
+                } finally {
+                    monitor.done();
+                }
+            }
+        };
+        return webSession.createAndRunAsyncTask("Data import", runnable);
+    }
+
     private void exportData(
         DBRProgressMonitor monitor,
         DataTransferProcessorDescriptor processor,
@@ -280,6 +323,22 @@ public class WebServiceDataTransfer implements DBWServiceDataTransfer {
         producer.transferData(monitor, consumer, null, producerSettings, null);
 
         consumer.finishTransfer(monitor, false);
+    }
+
+    private void importData(
+            DBRProgressMonitor monitor,
+            DataTransferProcessorDescriptor processor,
+            @NotNull DBSDataContainer dataContainer,
+            InputStream inputStream) throws DBException
+    {
+        IDataTransferProcessor processorInstance = processor.getInstance();
+        if (!(processorInstance instanceof IStreamDataImporter importer)) {
+            throw new DBException("Invalid processor. " + IStreamDataImporter.class.getSimpleName() + " expected");
+        }
+
+        if (dataContainer.getDataSource() != null) {
+            importer.runImport(monitor, dataContainer.getDataSource(), inputStream, new StreamTransferConsumer());
+        }
     }
 
 }

@@ -1,0 +1,14 @@
+query getDataTransferImportProcessors {
+  processors: dataTransferAvailableImportStreamProcessors {
+    id
+    name
+    description
+    fileExtension
+    appFileExtension
+    appName
+    order
+    icon
+    isBinary
+    isHTML
+  }
+}
