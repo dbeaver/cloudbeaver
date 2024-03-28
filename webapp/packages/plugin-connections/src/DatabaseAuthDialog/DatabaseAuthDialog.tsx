@@ -25,15 +25,10 @@ export const DatabaseAuthDialog: DialogComponent<Payload> = observer(function Da
     key: payload.connection,
     includes: ['includeAuthNeeded', 'includeSharedSecrets', 'includeNetworkHandlersConfig', 'includeCredentialsSaved'],
   });
-  const translate = useTranslate();
   const driverLoader = useResource(DatabaseAuthDialog, DBDriverResource, connectionInfoLoader.data?.driverId || null);
   const useSharedCredentials = (connectionInfoLoader.data?.sharedSecrets?.length || 0) > 1;
 
-  let subtitle = connectionInfoLoader.data?.name;
-
-  if (useSharedCredentials) {
-    subtitle = [subtitle, translate('plugin_connections_connection_auth_secret_description')].join(' | ');
-  }
+  const subtitle = connectionInfoLoader.data?.name;
 
   return (
     <CommonDialogWrapper size="large" fixedSize={useSharedCredentials}>
