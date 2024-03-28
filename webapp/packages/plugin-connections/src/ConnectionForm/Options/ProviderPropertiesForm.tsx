@@ -10,7 +10,6 @@ import { observer } from 'mobx-react-lite';
 import {
   Container,
   Expandable,
-  getPropertyControlType,
   Group,
   GroupTitle,
   InputField,
@@ -18,7 +17,7 @@ import {
   useObjectPropertyCategories,
   useTranslate,
 } from '@cloudbeaver/core-blocks';
-import type { ConnectionConfig, DriverProviderPropertyInfoFragment } from '@cloudbeaver/core-sdk';
+import { type ConnectionConfig, type DriverProviderPropertyInfoFragment, getObjectPropertyType } from '@cloudbeaver/core-sdk';
 
 type DriverProviderPropertyInfo = DriverProviderPropertyInfoFragment;
 
@@ -104,7 +103,7 @@ export const ProviderPropertiesForm = observer<Props>(function ProviderPropertie
                 category={category}
                 disabled={disabled}
                 readOnly={readonly}
-                geLayoutSize={property => (getPropertyControlType(property) === 'checkbox' ? { maximum: true } : { small: true, noGrow: true })}
+                geLayoutSize={property => (getObjectPropertyType(property) === 'checkbox' ? { maximum: true } : { small: true, noGrow: true })}
                 hideEmptyPlaceholder
               />
             </Container>

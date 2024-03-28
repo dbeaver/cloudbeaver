@@ -6,24 +6,31 @@
  * you may not use this file except in compliance with the License.
  */
 import { Dependency, injectable } from '@cloudbeaver/core-di';
-import { ESettingsValueType, PluginManagerService, PluginSettings, SettingsManagerService } from '@cloudbeaver/core-plugin';
-import { schema } from '@cloudbeaver/core-utils';
+import { ESettingsValueType, SettingsManagerService, SettingsProvider, SettingsProviderService } from '@cloudbeaver/core-settings';
+import { schema, schemaExtra } from '@cloudbeaver/core-utils';
 
 import { TOOLS_PANEL_SETTINGS_GROUP } from './TOOLS_PANEL_SETTINGS_GROUP';
 
 const settings = schema.object({
-  disabled: schema.coerce.boolean().default(false),
+  'plugin.tools-panel.disabled': schemaExtra.stringedBoolean().default(false),
 });
 
 type Settings = typeof settings;
 
 @injectable()
 export class ToolsPanelSettingsService extends Dependency {
-  readonly settings: PluginSettings<Settings>;
+  get disabled(): boolean {
+    return this.settings.getValue('plugin.tools-panel.disabled');
+  }
 
-  constructor(private readonly pluginManagerService: PluginManagerService, private readonly settingsManagerService: SettingsManagerService) {
+  readonly settings: SettingsProvider<Settings>;
+
+  constructor(
+    private readonly settingsProviderService: SettingsProviderService,
+    private readonly settingsManagerService: SettingsManagerService,
+  ) {
     super();
-    this.settings = this.pluginManagerService.createSettings('tools-panel', 'plugin', settings);
+    this.settings = this.settingsProviderService.createSettings(settings);
 
     this.registerSettings();
   }
@@ -31,8 +38,11 @@ export class ToolsPanelSettingsService extends Dependency {
   private registerSettings() {
     this.settingsManagerService.registerSettings(this.settings, () => [
       {
+        key: 'plugin.tools-panel.disabled',
+        access: {
+          scope: ['server'],
+        },
         group: TOOLS_PANEL_SETTINGS_GROUP,
-        key: 'disabled',
         type: ESettingsValueType.Checkbox,
         name: 'plugin_tools_panel_settings_disable_label',
         description: 'plugin_tools_panel_settings_disable_description',

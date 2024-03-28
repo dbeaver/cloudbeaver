@@ -5,47 +5,64 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { makeObservable, observable } from 'mobx';
+import { action, makeObservable, observable } from 'mobx';
 
 import { injectable } from '@cloudbeaver/core-di';
-import { SessionSettingsService } from '@cloudbeaver/core-root';
-import type { ISettingsSource } from '@cloudbeaver/core-settings';
+import { createSettingsLayer, ROOT_SETTINGS_LAYER, SettingsSource } from '@cloudbeaver/core-settings';
+
+export const PRODUCT_SETTINGS_LAYER = createSettingsLayer(ROOT_SETTINGS_LAYER, 'product');
 
 @injectable()
-export class ProductSettingsService implements ISettingsSource {
+export class ProductSettingsService extends SettingsSource {
   private readonly settings: Map<string, any>;
 
-  constructor(private readonly sessionSettingsService: SessionSettingsService) {
+  constructor() {
+    super();
     this.settings = new Map();
     makeObservable<this, 'settings'>(this, {
-      settings: observable,
+      clear: action,
+      settings: observable.shallow,
     });
   }
 
   has(key: any): boolean {
-    return this.settings.has(key) || this.sessionSettingsService?.has(key) || false;
+    return this.settings.has(key) || super.has(key) || false;
   }
 
   isReadOnly(): boolean {
     return true;
   }
 
-  getDefaultValue(key: any): any {
-    return this.sessionSettingsService.getDefaultValue(key) ?? this.settings.get(key);
-  }
-
   getValue(key: any): any {
-    if (this.sessionSettingsService.has(key)) {
-      return this.sessionSettingsService.getValue(key);
-    }
     return this.settings.get(key);
   }
 
   setValue(key: any, value: any): void {
-    this.settings.set(key, value);
+    this.update(() => {
+      this.settings.set(key, value);
+    });
+  }
+
+  setSettingsObject(settings: Record<string, any>): void {
+    this.update(() => {
+      if (settings && typeof settings === 'object') {
+        for (const [key, value] of Object.entries(settings)) {
+          this.setValue(key, value);
+        }
+      }
+    });
   }
 
   clear(): void {
-    this.settings.clear();
+    this.update(() => {
+      super.clear();
+      this.settings.clear();
+    });
+  }
+
+  async save(): Promise<void> {}
+
+  protected getSnapshot(): Record<string, any> {
+    return Object.fromEntries(this.settings.entries());
   }
 }

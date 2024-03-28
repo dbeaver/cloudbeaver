@@ -232,7 +232,7 @@ export class SqlEditorBootstrap extends Bootstrap {
       },
       isHidden: (context, action) => {
         if (action === ACTION_SQL_EDITOR_NEW) {
-          return this.sqlEditorSettingsService.settings.getValue('disabled');
+          return this.sqlEditorSettingsService.disabled;
         }
 
         return false;

@@ -34,10 +34,11 @@
   display: block;
   width: 24px;
   height: 24px;
+  padding: 4px;
 }
 
 .userName {
   display: block;
   line-height: initial;
-  margin-left: 8px;
+  padding: 0 4px;
 }

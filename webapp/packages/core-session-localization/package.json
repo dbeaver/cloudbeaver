@@ -20,7 +20,8 @@
   "dependencies": {
     "@cloudbeaver/core-di": "~0.1.0",
     "@cloudbeaver/core-localization": "~0.1.0",
-    "@cloudbeaver/core-root": "~0.1.0"
+    "@cloudbeaver/core-root": "~0.1.0",
+    "@cloudbeaver/core-settings-localization": "~0.1.0"
   },
   "peerDependencies": {},
   "devDependencies": {

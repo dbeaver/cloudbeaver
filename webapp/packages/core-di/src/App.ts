@@ -10,6 +10,7 @@ import { Executor, IExecutor } from '@cloudbeaver/core-executor';
 import { Bootstrap } from './Bootstrap';
 import { Dependency } from './Dependency';
 import type { DIContainer } from './DIContainer';
+import { Disposable } from './Disposable';
 import type { IServiceCollection, IServiceConstructor, IServiceInjector } from './IApp';
 import { IDiWrapper, inversifyWrapper } from './inversifyWrapper';
 import type { PluginManifest } from './PluginManifest';
@@ -32,6 +33,15 @@ export class App {
 
   async start(): Promise<void> {
     await this.onStart.execute();
+  }
+
+  async restart(): Promise<void> {
+    this.dispose();
+    await this.start();
+  }
+
+  dispose(): void {
+    this.diWrapper.collection.unbindAll();
   }
 
   getPlugins(): PluginManifest[] {
@@ -60,8 +70,6 @@ export class App {
 
   // first phase register all dependencies
   private registerServices(): void {
-    this.diWrapper.collection.unbindAll();
-
     this.getServiceCollection().addServiceByClass(App, this);
 
     for (const service of this.getServices()) {

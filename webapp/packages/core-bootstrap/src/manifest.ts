@@ -19,7 +19,6 @@ import { coreDialogsManifest } from '@cloudbeaver/core-dialogs';
 import { coreEventsManifest } from '@cloudbeaver/core-events';
 import { coreLocalizationManifest } from '@cloudbeaver/core-localization';
 import { coreNavigationTree } from '@cloudbeaver/core-navigation-tree';
-import { corePluginManifest } from '@cloudbeaver/core-plugin';
 import { coreProductManifest } from '@cloudbeaver/core-product';
 import { coreProjectsManifest } from '@cloudbeaver/core-projects';
 import { coreResourceManifest } from '@cloudbeaver/core-resource';
@@ -31,6 +30,8 @@ import { coreServerLocalization } from '@cloudbeaver/core-server-localization';
 import { coreSessionLocalization } from '@cloudbeaver/core-session-localization';
 import { coreSettingsManifest } from '@cloudbeaver/core-settings';
 import { coreSettingsLocalizationManifest } from '@cloudbeaver/core-settings-localization';
+import { coreSettingsUserManifest } from '@cloudbeaver/core-settings-user';
+import { coreStorageManifest } from '@cloudbeaver/core-storage';
 import { coreThemingManifest } from '@cloudbeaver/core-theming';
 import { coreUIManifest } from '@cloudbeaver/core-ui';
 import { coreVersionManifest } from '@cloudbeaver/core-version';
@@ -55,11 +56,11 @@ export const coreManifests: PluginManifest[] = [
   coreServerLocalization,
   coreBlocksManifest,
   coreSettingsManifest,
+  coreStorageManifest,
   coreEventsManifest,
   coreResourceManifest,
   coreSDKManifest,
   coreRootManifest,
-  corePluginManifest,
   coreBrowserManifest,
   coreBrowserSettingsManifest,
   coreBrowserCookiesManifest,
@@ -77,4 +78,5 @@ export const coreManifests: PluginManifest[] = [
   coreAppManifest,
   coreClientActivityManifest,
   coreNavigationTree,
+  coreSettingsUserManifest,
 ];

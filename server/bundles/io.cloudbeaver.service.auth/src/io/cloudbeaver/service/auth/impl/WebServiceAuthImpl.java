@@ -18,7 +18,6 @@ package io.cloudbeaver.service.auth.impl;
 
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.WebServiceUtils;
-import io.cloudbeaver.auth.SMAuthProviderFederated;
 import io.cloudbeaver.auth.SMSignOutLinkProvider;
 import io.cloudbeaver.auth.provider.local.LocalAuthProvider;
 import io.cloudbeaver.model.WebPropertyInfo;
@@ -250,13 +249,39 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
         @NotNull String name,
         @Nullable String value
     ) throws DBWebException {
+        if (webSession.getUser() == null) {
+            throw new DBWebException("Preferences cannot be changed for anonymous user");
+        }
+        return setPreference(webSession, name, value);
+    }
+
+    private static boolean setPreference(
+        @NotNull WebSession webSession,
+        @NotNull String name,
+        @Nullable Object value
+    ) throws DBWebException {
         webSession.addInfoMessage("Set user parameter - " + name);
         try {
-            webSession.getSecurityController().setCurrentUserParameter(name, value);
+            String serializedValue = value == null ? null : value.toString();
+            webSession.getSecurityController().setCurrentUserParameter(name, serializedValue);
             return true;
         } catch (DBException e) {
             throw new DBWebException("Error setting user parameter", e);
         }
+    }
+
+    @Override
+    public WebUserInfo setUserConfigurationParameters(
+        @NotNull WebSession webSession,
+        @NotNull Map<String, Object> parameters
+    ) throws DBWebException {
+        if (webSession.getUser() == null) {
+            throw new DBWebException("Preferences cannot be changed for anonymous user");
+        }
+        for (Map.Entry<String, Object> parameter : parameters.entrySet()) {
+            setPreference(webSession, parameter.getKey(), parameter.getValue());
+        }
+        return new WebUserInfo(webSession, webSession.getUser());
     }
 
 }
