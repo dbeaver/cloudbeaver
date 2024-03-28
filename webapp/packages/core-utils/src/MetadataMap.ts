@@ -7,6 +7,7 @@
  */
 import { action, makeAutoObservable, observable } from 'mobx';
 
+import type { schema } from './schema';
 import { TempMap } from './TempMap';
 
 export type MetadataValueGetter<TKey, TValue> = (key: TKey, metadata: MetadataMap<TKey, any>) => TValue;
@@ -74,8 +75,19 @@ export class MetadataMap<TKey, TValue> implements Map<TKey, TValue> {
     return this;
   }
 
-  get(key: TKey, defaultValue?: DefaultValueGetter<TKey, TValue>): TValue {
-    if (!this.temp.has(key)) {
+  get(key: TKey, defaultValue?: DefaultValueGetter<TKey, TValue>, schema?: schema.AnyZodObject): TValue {
+    const value = this.temp.get(key);
+    let invalidate = !this.temp.has(key);
+
+    if (!invalidate && schema) {
+      const parsed = schema.safeParse(value);
+
+      if (!parsed.success) {
+        invalidate = true;
+      }
+    }
+
+    if (invalidate) {
       const provider = defaultValue || this.defaultValueGetter;
 
       if (!provider) {
@@ -85,6 +97,7 @@ export class MetadataMap<TKey, TValue> implements Map<TKey, TValue> {
       const value = provider(key, this);
       this.temp.set(key, observable(value as any));
     }
+
     return this.temp.get(key)!;
   }
 

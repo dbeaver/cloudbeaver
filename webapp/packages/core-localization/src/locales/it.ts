@@ -17,6 +17,7 @@ export default [
   ['ui_processing_save', 'Salva'],
   ['ui_processing_saved', 'Saved'],
   ['ui_processing_stop', 'Stop'],
+  ['ui_processing_skip', 'Skip'],
   ['ui_second_first_form', '{arg:interval} second'],
   ['ui_second_second_form', '{arg:interval} seconds'],
   ['ui_second_third_form', '{arg:interval} seconds'],

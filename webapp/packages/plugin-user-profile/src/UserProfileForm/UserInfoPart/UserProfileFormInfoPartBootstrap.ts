@@ -25,7 +25,7 @@ export class UserProfileFormInfoPartBootstrap extends Bootstrap {
       name: 'plugin_user_profile_info',
       order: 1,
       panel: () => UserProfileFormInfo,
-      stateGetter: props => () => props.formState.dataContext.get(DATA_CONTEXT_USER_PROFILE_FORM_INFO_PART),
+      stateGetter: props => () => props.formState.getPart(DATA_CONTEXT_USER_PROFILE_FORM_INFO_PART),
     });
   }
 }

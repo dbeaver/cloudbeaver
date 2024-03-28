@@ -7,11 +7,17 @@
  */
 import { useEffect, useState } from 'react';
 
-import type { ILoadableState } from '@cloudbeaver/core-utils';
+import { type ILoadableState, isContainsException } from '@cloudbeaver/core-utils';
 
 import { getComputed } from '../getComputed';
 
-export function useAutoLoad(component: { name: string }, state: ILoadableState | ReadonlyArray<ILoadableState>, enabled = true, lazy = false) {
+export function useAutoLoad(
+  component: { name: string },
+  state: ILoadableState | ReadonlyArray<ILoadableState>,
+  enabled = true,
+  lazy = false,
+  throwExceptions = false,
+) {
   const [loadFunctionName] = useState(`${component.name}.useAutoLoad(...)` as const);
   if (!Array.isArray(state)) {
     state = [state] as ReadonlyArray<ILoadableState>;
@@ -48,6 +54,17 @@ export function useAutoLoad(component: { name: string }, state: ILoadableState |
 
   if (promises.length > 0) {
     throw Promise.all(promises);
+  }
+
+  if (throwExceptions) {
+    const exceptions = state
+      .map(loader => loader.exception)
+      .filter(isContainsException)
+      .flat();
+
+    if (exceptions.length > 0) {
+      throw exceptions[0];
+    }
   }
 
   useEffect(() => {
