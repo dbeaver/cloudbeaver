@@ -566,9 +566,9 @@ extend type Mutation {
     closeSession: Boolean
 
     # Refreshes session on server and returns its state
-    touchSession: Boolean  @deprecated(reason: "use updateSession instead")
+    touchSession: Boolean  @deprecated(reason: "use events to update session")
     # Refreshes session on server and returns session state
-    updateSession: SessionInfo! @since(version: "24.0.0")
+    updateSession: SessionInfo! @since(version: "24.0.0") @deprecated(reason: "use events to update session")
 
     # Refresh session connection list
     refreshSessionConnections: Boolean
