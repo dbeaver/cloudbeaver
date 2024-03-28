@@ -36,7 +36,6 @@ public abstract class BaseWebAppConfiguration implements WebAppConfiguration {
 
     public BaseWebAppConfiguration() {
         this.plugins = new LinkedHashMap<>();
-        this.defaultUserTeam = DEFAULT_APP_ANONYMOUS_TEAM_NAME;
         this.resourceManagerEnabled = true;
         this.enabledFeatures = null;
         this.showReadOnlyConnectionInfo = false;
