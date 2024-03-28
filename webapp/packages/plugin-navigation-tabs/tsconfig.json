@@ -37,7 +37,7 @@
       "path": "../core-resource/tsconfig.json"
     },
     {
-      "path": "../core-settings/tsconfig.json"
+      "path": "../core-storage/tsconfig.json"
     },
     {
       "path": "../core-ui/tsconfig.json"

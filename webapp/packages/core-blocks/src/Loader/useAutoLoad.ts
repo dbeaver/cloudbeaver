@@ -13,17 +13,17 @@ import { getComputed } from '../getComputed';
 
 export function useAutoLoad(
   component: { name: string },
-  state: ILoadableState | ILoadableState[],
+  state: ILoadableState | ReadonlyArray<ILoadableState>,
   enabled = true,
   lazy = false,
   throwExceptions = false,
 ) {
   const [loadFunctionName] = useState(`${component.name}.useAutoLoad(...)` as const);
   if (!Array.isArray(state)) {
-    state = [state];
+    state = [state] as ReadonlyArray<ILoadableState>;
   }
 
-  for (const loader of state as ILoadableState[]) {
+  for (const loader of state as ReadonlyArray<ILoadableState>) {
     getComputed(
       // activate mobx subscriptions
       () => (!loader.isLoaded() || loader.isOutdated?.() === true) && !loader.isError(),
@@ -36,7 +36,7 @@ export function useAutoLoad(
         return;
       }
 
-      for (const loader of state as ILoadableState[]) {
+      for (const loader of state as ReadonlyArray<ILoadableState>) {
         if (loader.isError() || (loader.lazy === true && !lazy)) {
           continue;
         }

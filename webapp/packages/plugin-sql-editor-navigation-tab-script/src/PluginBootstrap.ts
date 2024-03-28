@@ -239,7 +239,7 @@ export class PluginBootstrap extends Bootstrap {
 
       const resource = await this.resourceManagerResource.load(resourceKey);
 
-      const maxSize = this.sqlEditorSettingsService.settings.getValue('maxFileSize');
+      const maxSize = this.sqlEditorSettingsService.maxFileSize;
       const size = Math.round(resource.length / 1000); // kilobyte
 
       if (size > maxSize) {

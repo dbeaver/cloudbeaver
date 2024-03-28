@@ -14,6 +14,9 @@
     },
     {
       "path": "../core-root/tsconfig.json"
+    },
+    {
+      "path": "../core-settings-localization/tsconfig.json"
     }
   ],
   "include": [

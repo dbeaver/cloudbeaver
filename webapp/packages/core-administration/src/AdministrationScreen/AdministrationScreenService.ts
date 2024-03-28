@@ -12,7 +12,7 @@ import { NotificationService } from '@cloudbeaver/core-events';
 import { Executor, IExecutor } from '@cloudbeaver/core-executor';
 import { EAdminPermission, PermissionsService, ServerConfigResource, SessionPermissionsResource } from '@cloudbeaver/core-root';
 import { RouterState, ScreenService } from '@cloudbeaver/core-routing';
-import { SettingsService } from '@cloudbeaver/core-settings';
+import { StorageService } from '@cloudbeaver/core-storage';
 import { DefaultValueGetter, GlobalConstants, MetadataMap, schema } from '@cloudbeaver/core-utils';
 
 import { AdministrationItemService } from '../AdministrationItem/AdministrationItemService';
@@ -63,7 +63,7 @@ export class AdministrationScreenService {
     private readonly permissionsService: PermissionsService,
     private readonly screenService: ScreenService,
     private readonly administrationItemService: AdministrationItemService,
-    private readonly settingsService: SettingsService,
+    private readonly storageService: StorageService,
     private readonly serverConfigResource: ServerConfigResource,
     private readonly notificationService: NotificationService,
   ) {
@@ -79,7 +79,7 @@ export class AdministrationScreenService {
       activeScreen: computed,
     });
 
-    this.settingsService.registerSettings(
+    this.storageService.registerSettings(
       ADMINISTRATION_INFO,
       this.info,
       getDefaultAdministrationScreenInfo,

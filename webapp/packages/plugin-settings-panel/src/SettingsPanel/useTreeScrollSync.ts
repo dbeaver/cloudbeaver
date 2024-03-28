@@ -7,7 +7,7 @@
  */
 import { useEffect, useRef } from 'react';
 
-import { ROOT_SETTINGS_GROUP } from '@cloudbeaver/core-plugin';
+import { ROOT_SETTINGS_GROUP } from '@cloudbeaver/core-settings';
 import type { ITreeData } from '@cloudbeaver/plugin-navigation-tree';
 
 import { getSettingGroupIdFromElementId } from './getSettingGroupIdFromElementId';

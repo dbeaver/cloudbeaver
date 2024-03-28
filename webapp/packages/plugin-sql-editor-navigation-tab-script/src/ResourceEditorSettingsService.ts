@@ -6,20 +6,25 @@
  * you may not use this file except in compliance with the License.
  */
 import { Dependency, injectable } from '@cloudbeaver/core-di';
-import { PluginManagerService, PluginSettings, SettingsManagerService } from '@cloudbeaver/core-plugin';
+import { SettingsManagerService, SettingsProvider, SettingsProviderService } from '@cloudbeaver/core-settings';
 import { schema } from '@cloudbeaver/core-utils';
 
-const defaultSettings = schema.object({});
+const defaultSettings = schema.object({
+  'plugin.sql-editor-navigation-tab-resource': schema.object({}),
+});
 
 export type ResourceEditorSettings = typeof defaultSettings;
 
 @injectable()
 export class ResourceEditorSettingsService extends Dependency {
-  readonly settings: PluginSettings<ResourceEditorSettings>;
+  readonly settings: SettingsProvider<ResourceEditorSettings>;
 
-  constructor(private readonly pluginManagerService: PluginManagerService, private readonly settingsManagerService: SettingsManagerService) {
+  constructor(
+    private readonly settingsProviderService: SettingsProviderService,
+    private readonly settingsManagerService: SettingsManagerService,
+  ) {
     super();
-    this.settings = this.pluginManagerService.createSettings('sql-editor-navigation-tab-resource', 'plugin', defaultSettings);
+    this.settings = this.settingsProviderService.createSettings(defaultSettings);
 
     this.registerSettings();
   }

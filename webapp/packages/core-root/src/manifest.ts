@@ -12,11 +12,10 @@ import { FeaturesResource } from './FeaturesResource';
 import { NetworkStateService } from './NetworkStateService';
 import { PermissionsService } from './PermissionsService';
 import { QuotasService } from './QuotasService';
+import { RootBootstrap } from './RootBootstrap';
 import { ServerConfigEventHandler } from './ServerConfigEventHandler';
 import { ServerConfigResource } from './ServerConfigResource';
 import { ServerNodeService } from './ServerNodeService';
-import { ServerSettingsResolverService } from './ServerSettingsResolverService';
-import { ServerSettingsService } from './ServerSettingsService';
 import { SessionActionService } from './SessionActionService';
 import { SessionActivityService } from './SessionActivityService';
 import { SessionDataResource } from './SessionDataResource';
@@ -27,7 +26,9 @@ import { SessionInfoEventHandler } from './SessionInfoEventHandler';
 import { SessionPermissionEventHandler } from './SessionPermissionEventHandler';
 import { SessionPermissionsResource } from './SessionPermissionsResource';
 import { SessionResource } from './SessionResource';
-import { SessionSettingsService } from './SessionSettingsService';
+import { ServerSettingsManagerService } from './Settings/ServerSettingsManagerService';
+import { ServerSettingsResource } from './Settings/ServerSettingsResource';
+import { ServerSettingsService } from './Settings/ServerSettingsService';
 import { WindowEventsService } from './WindowEventsService';
 
 export const coreRootManifest: PluginManifest = {
@@ -48,7 +49,6 @@ export const coreRootManifest: PluginManifest = {
     SessionExpireEventService,
     ServerNodeService,
     SessionResource,
-    SessionSettingsService,
     WindowEventsService,
     QuotasService,
     ServerConfigEventHandler,
@@ -57,6 +57,8 @@ export const coreRootManifest: PluginManifest = {
     SessionActivityService,
     DataSynchronizationService,
     SessionPermissionEventHandler,
-    ServerSettingsResolverService,
+    ServerSettingsResource,
+    ServerSettingsManagerService,
+    RootBootstrap,
   ],
 };
