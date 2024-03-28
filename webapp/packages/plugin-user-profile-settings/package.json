@@ -24,7 +24,6 @@
     "@cloudbeaver/core-settings-user": "~0.1.0",
     "@cloudbeaver/plugin-settings-panel": "~0.1.0",
     "@cloudbeaver/plugin-user-profile": "~0.1.0",
-    "mobx": "^6.12.0",
     "mobx-react-lite": "^4.0.5",
     "react": "^18.2.0"
   },
