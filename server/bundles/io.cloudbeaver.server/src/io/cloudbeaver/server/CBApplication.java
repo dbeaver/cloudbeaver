@@ -728,6 +728,7 @@ public abstract class CBApplication<T extends CBServerConfig> extends BaseWebApp
 
     public void saveProductConfiguration(SMCredentialsProvider credentialsProvider, Map<String, Object> productConfiguration) throws DBException {
         getServerConfigurationController().saveProductConfiguration(productConfiguration);
+        flushConfiguration(credentialsProvider);
         sendConfigChangedEvent(credentialsProvider);
     }
 

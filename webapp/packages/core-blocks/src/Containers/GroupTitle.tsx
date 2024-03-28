@@ -12,9 +12,17 @@ import styles from './GroupTitle.m.css';
 import type { ILayoutSizeProps } from './ILayoutSizeProps';
 import elementsSizeStyles from './shared/ElementsSize.m.css';
 
-export const GroupTitle: React.FC<ILayoutSizeProps & React.HTMLAttributes<HTMLHeadingElement>> = function GroupTitle({ className, ...rest }) {
+interface Props {
+  sticky?: boolean;
+}
+
+export const GroupTitle: React.FC<Props & ILayoutSizeProps & React.HTMLAttributes<HTMLHeadingElement>> = function GroupTitle({
+  sticky,
+  className,
+  ...rest
+}) {
   const style = useS(styles, elementsSizeStyles);
   const divProps = filterLayoutFakeProps(rest);
   const layoutProps = getLayoutProps(rest);
-  return <h2 {...divProps} className={s(style, { groupTitle: true, ...layoutProps }, className)} />;
+  return <h2 {...divProps} className={s(style, { groupTitle: true, sticky, ...layoutProps }, className)} />;
 };

@@ -58,6 +58,9 @@
       "path": "../core-view/tsconfig.json"
     },
     {
+      "path": "../plugin-connections/tsconfig.json"
+    },
+    {
       "path": "../plugin-navigation-tabs/tsconfig.json"
     },
     {

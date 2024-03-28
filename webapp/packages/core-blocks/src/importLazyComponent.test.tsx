@@ -8,8 +8,12 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import React, { Suspense } from 'react';
 
+import { addKnownError, consoleSpy } from '@cloudbeaver/tests-runner';
+
 import ErrorBoundary from './__custom__mocks__/ErrorBoundaryMock';
 import { importLazyComponent } from './importLazyComponent';
+
+addKnownError(/The above error occurred in one of your React components.*/);
 
 describe('importLazyComponent', () => {
   const fallback = 'Loading...';
@@ -45,6 +49,7 @@ describe('importLazyComponent', () => {
 
     expect(screen.getByText(fallback)).toBeTruthy();
     await waitFor(() => expect(screen.getByText(errorText)).toBeTruthy());
+    expect(consoleSpy.error).toHaveBeenCalledWith(expect.stringMatching(/The above error occurred in one of your React components.*/));
     expect(componentImporter).toHaveBeenCalled();
   });
 });

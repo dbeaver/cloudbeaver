@@ -32,9 +32,9 @@ export interface IExecutorHandlersCollection<T = unknown, TResult = any | Promis
   addContextCreator<TContext>(context: ISyncContextLoader<TContext, T>, creator: ISyncContextLoader<TContext, T>): this;
   addContextCreator<TContext>(context: IAsyncContextLoader<TContext, T>, creator: IAsyncContextLoader<TContext, T>): this;
 
-  before: <TNext>(executor: IExecutorHandlersCollection<TNext, TResult>, map?: ExecutorDataMap<T, TNext>) => this;
+  before: <TNext>(executor: IExecutorHandlersCollection<TNext, TResult>, map?: ExecutorDataMap<T, TNext>, filter?: ExecutorDataFilter<T>) => this;
   removeBefore: (executor: IExecutorHandlersCollection<any, TResult>) => void;
-  next: <TNext>(executor: IExecutorHandlersCollection<TNext, TResult>, map?: ExecutorDataMap<T, TNext>) => this;
+  next: <TNext>(executor: IExecutorHandlersCollection<TNext, TResult>, map?: ExecutorDataMap<T, TNext>, filter?: ExecutorDataFilter<T>) => this;
   removeNext: (executor: IExecutorHandlersCollection<any, TResult>) => void;
   addCollection: (collection: IExecutorHandlersCollection<T, TResult>) => this;
   hasHandler: (handler: IExecutorHandler<T, TResult>) => boolean;

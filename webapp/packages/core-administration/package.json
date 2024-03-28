@@ -27,7 +27,7 @@
     "@cloudbeaver/core-root": "~0.1.0",
     "@cloudbeaver/core-routing": "~0.1.0",
     "@cloudbeaver/core-sdk": "~0.1.0",
-    "@cloudbeaver/core-settings": "~0.1.0",
+    "@cloudbeaver/core-storage": "~0.1.0",
     "@cloudbeaver/core-utils": "~0.1.0",
     "mobx": "^6.12.0"
   },

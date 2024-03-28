@@ -5,6 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { ROOT_SETTINGS_GROUP } from '@cloudbeaver/core-plugin';
+import { ROOT_SETTINGS_GROUP } from '@cloudbeaver/core-settings';
 
 export const TOOLS_PANEL_SETTINGS_GROUP = ROOT_SETTINGS_GROUP.createSubGroup('plugin_tools_panel_tools_settings_group');

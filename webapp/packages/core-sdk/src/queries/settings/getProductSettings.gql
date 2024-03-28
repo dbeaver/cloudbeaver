@@ -1,0 +1,12 @@
+query getProductSettings {
+  settings: productSettings {
+    groups {
+      id
+      displayName
+    }
+    settings {
+      ...ObjectPropertyInfo
+      scopes
+    }
+  }
+}

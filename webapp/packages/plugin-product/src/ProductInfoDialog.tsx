@@ -39,7 +39,7 @@ export const ProductInfoDialog = observer<DialogComponentProps<null>>(function P
   const version = useAppVersion();
 
   const productInfo = serverConfigResource.data?.productInfo;
-  const logoIcon = themeService.currentThemeId === 'light' ? '/icons/product-logo_light.svg' : '/icons/product-logo_dark.svg';
+  const logoIcon = themeService.themeId === 'light' ? '/icons/product-logo_light.svg' : '/icons/product-logo_dark.svg';
 
   const styles = useS(ProductInfoDialogStyles);
 
