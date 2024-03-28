@@ -16,7 +16,6 @@
  */
 package io.cloudbeaver.server.jetty;
 
-import io.cloudbeaver.model.app.WebServerConfigurationController;
 import io.cloudbeaver.registry.WebServiceRegistry;
 import io.cloudbeaver.server.CBApplication;
 import io.cloudbeaver.server.CBServerConfig;
@@ -201,31 +200,19 @@ public class CBJettyServer {
             }
         }
 
-        SessionHandler sessionHandler = new SessionHandler()/* {
-            public HttpCookie access(HttpSession session, boolean secure) {
-                HttpCookie cookie = getSessionCookie(session, _context == null ? "/" : (_context.getContextPath()), secure);
-                return cookie;
-            }
-
-            @Override
-            public int getRefreshCookieAge() {
-                // Refresh cookie always (we need it for FA requests)
-                return 1;
-            }
-        }*/;
-        var maxIdleSeconds = application.getMaxSessionIdleTime();
+        SessionHandler sessionHandler = new SessionHandler();
+        var maxIdleTime = application.getMaxSessionIdleTime();
         int intMaxIdleSeconds;
-        if (maxIdleSeconds > Integer.MAX_VALUE) {
+        if (maxIdleTime > Integer.MAX_VALUE) {
             log.warn("Max session idle time value is greater than Integer.MAX_VALUE. Integer.MAX_VALUE will be used instead");
-            intMaxIdleSeconds = Integer.MAX_VALUE;
-        } else {
-            intMaxIdleSeconds = (int) maxIdleSeconds;
+            maxIdleTime = Integer.MAX_VALUE;
         }
+        intMaxIdleSeconds = (int) (maxIdleTime / 1000);
+        log.debug("Max http session idle time: " + intMaxIdleSeconds + "s");
         sessionHandler.setMaxInactiveInterval(intMaxIdleSeconds);
 
         DefaultSessionCache sessionCache = new DefaultSessionCache(sessionHandler);
         FileSessionDataStore sessionStore = new FileSessionDataStore();
-
         sessionStore.setStoreDir(sessionCacheFolder.toFile());
         sessionCache.setSessionDataStore(sessionStore);
         sessionHandler.setSessionCache(sessionCache);
