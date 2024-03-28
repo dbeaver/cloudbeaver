@@ -6,21 +6,21 @@
  * you may not use this file except in compliance with the License.
  */
 import { Dependency, injectable } from '@cloudbeaver/core-di';
-import { PluginManagerService, PluginSettings } from '@cloudbeaver/core-plugin';
-import { schema } from '@cloudbeaver/core-utils';
+import { SettingsProvider, SettingsProviderService } from '@cloudbeaver/core-settings';
+import { schema, schemaExtra } from '@cloudbeaver/core-utils';
 
 const defaultSettings = schema.object({
-  disabled: schema.coerce.boolean().default(false),
+  'plugin.data-import.disabled': schemaExtra.stringedBoolean().default(false),
 });
 
 export type DataImportSettings = schema.infer<typeof defaultSettings>;
 
 @injectable()
 export class DataImportSettingsService extends Dependency {
-  readonly settings: PluginSettings<typeof defaultSettings>;
+  readonly settings: SettingsProvider<typeof defaultSettings>;
 
-  constructor(private readonly pluginManagerService: PluginManagerService) {
+  constructor(private readonly settingsProviderService: SettingsProviderService) {
     super();
-    this.settings = this.pluginManagerService.createSettings('data-import', 'plugin', defaultSettings);
+    this.settings = this.settingsProviderService.createSettings(defaultSettings);
   }
 }
