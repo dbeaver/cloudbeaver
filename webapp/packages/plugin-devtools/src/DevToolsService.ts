@@ -9,7 +9,7 @@ import { makeObservable, observable } from 'mobx';
 
 import { injectable } from '@cloudbeaver/core-di';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
-import { SettingsService } from '@cloudbeaver/core-settings';
+import { StorageService } from '@cloudbeaver/core-storage';
 
 interface IDevToolsSettings {
   enabled: boolean;
@@ -35,13 +35,16 @@ export class DevToolsService {
 
   private readonly settings: IDevToolsSettings;
 
-  constructor(private readonly serverConfigResource: ServerConfigResource, private readonly settingsService: SettingsService) {
+  constructor(
+    private readonly serverConfigResource: ServerConfigResource,
+    private readonly storageService: StorageService,
+  ) {
     this.settings = getDefaultDevToolsSettings();
 
     makeObservable<this, 'settings'>(this, {
       settings: observable,
     });
-    this.settingsService.registerSettings(DEVTOOLS, this.settings, getDefaultDevToolsSettings);
+    this.storageService.registerSettings(DEVTOOLS, this.settings, getDefaultDevToolsSettings);
     this.serverConfigResource.onDataUpdate.addHandler(this.syncSettingsOverride.bind(this));
   }
 

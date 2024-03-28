@@ -53,7 +53,7 @@ export class SessionLogsResource extends CachedDataResource<ILogEntry[]> {
   }
 
   protected async loader(): Promise<ILogEntry[]> {
-    const maxLogEntries = this.logViewerSettingsService.settings.getValue('logBatchSize');
+    const maxLogEntries = this.logViewerSettingsService.logBatchSize;
 
     const { log } = await this.graphQLService.sdk.readSessionLog({
       maxEntries: maxLogEntries,

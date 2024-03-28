@@ -25,6 +25,7 @@
     "public/**/*"
   ],
   "devDependencies": {
+    "@types/jest": "^29.5.12",
     "@types/react": "^18.2.63",
     "typescript": "^5.3.3"
   }

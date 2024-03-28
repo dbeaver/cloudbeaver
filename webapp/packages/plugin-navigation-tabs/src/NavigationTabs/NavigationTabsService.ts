@@ -14,7 +14,7 @@ import { NotificationService } from '@cloudbeaver/core-events';
 import { ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
 import { ProjectsService } from '@cloudbeaver/core-projects';
 import { resourceKeyList, ResourceKeySimple, ResourceKeyUtils } from '@cloudbeaver/core-resource';
-import { SettingsService } from '@cloudbeaver/core-settings';
+import { StorageService } from '@cloudbeaver/core-storage';
 import { isArraysEqual, MetadataMap, TempMap } from '@cloudbeaver/core-utils';
 import { ACTION_OPEN_IN_TAB, IActiveView, View } from '@cloudbeaver/core-view';
 
@@ -110,7 +110,7 @@ export class NavigationTabsService extends View<ITab> {
 
   constructor(
     private readonly notificationService: NotificationService,
-    private readonly settingsService: SettingsService,
+    private readonly storageService: StorageService,
     private readonly userInfoResource: UserInfoResource,
     private readonly projectsService: ProjectsService,
     private readonly administrationScreenService: AdministrationScreenService,
@@ -152,7 +152,7 @@ export class NavigationTabsService extends View<ITab> {
     });
     this.tempHistoryState = new TempMap(this.historyState);
 
-    this.settingsService.registerSettings(
+    this.storageService.registerSettings(
       `${NAVIGATION_TABS_BASE_KEY}_tab_map`,
       this.tabsMap,
       () => new Map(),
@@ -171,7 +171,7 @@ export class NavigationTabsService extends View<ITab> {
       },
     );
 
-    this.settingsService.registerSettings(
+    this.storageService.registerSettings(
       `${NAVIGATION_TABS_BASE_KEY}_history`,
       this.historyState,
       () => new Map(),
@@ -185,7 +185,7 @@ export class NavigationTabsService extends View<ITab> {
       },
     );
 
-    this.settingsService.registerSettings(
+    this.storageService.registerSettings(
       NAVIGATION_TABS_BASE_KEY,
       this.state,
       () => new Map(),
@@ -200,7 +200,7 @@ export class NavigationTabsService extends View<ITab> {
     );
 
     this.userInfoResource.onUserChange.addHandler(this.unloadTabs.bind(this));
-    this.settingsService.onStorageChange.next(this.onStateUpdate, () => {});
+    this.storageService.onStorageChange.next(this.onStateUpdate, () => {});
   }
 
   getTabMetadata(tabId: string): ITabMetadata {

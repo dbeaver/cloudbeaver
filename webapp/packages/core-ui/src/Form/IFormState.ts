@@ -46,6 +46,7 @@ export interface IFormState<TState> extends ILoadableState {
   isError(): boolean;
   isOutdated(): boolean;
   isCancelled(): boolean;
+  isChanged(): boolean;
 
   load(): Promise<void>;
   reload(): Promise<void>;

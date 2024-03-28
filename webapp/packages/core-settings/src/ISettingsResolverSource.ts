@@ -6,10 +6,11 @@
  * you may not use this file except in compliance with the License.
  */
 import type { ISettingsSource } from './ISettingsSource';
+import type { ISettingsLayer } from './SettingsLayer';
 
 export interface ISettingsResolverSource extends ISettingsSource {
-  hasResolver: (resolver: ISettingsSource) => boolean;
-  addResolver: (...resolvers: ISettingsSource[]) => void;
-  removeResolver: (resolver: ISettingsSource) => void;
+  hasResolver: (layer: ISettingsLayer, resolver: ISettingsSource) => boolean;
+  addResolver: (layer: ISettingsLayer, ...resolvers: ISettingsSource[]) => void;
+  removeResolver: (layer: ISettingsLayer, resolver: ISettingsSource) => void;
   clearResolvers: () => void;
 }

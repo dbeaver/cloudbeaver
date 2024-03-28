@@ -73,6 +73,9 @@ public class WebServiceBindingAuth extends WebServiceBindingBase<DBWServiceAuth>
                 env -> getService(env).setUserConfigurationParameter(getWebSession(env),
                     env.getArgument("name"),
                     env.getArgument("value")))
+            .dataFetcher("setUserPreferences",
+                env -> getService(env).setUserConfigurationParameters(getWebSession(env),
+                    env.getArgument("preferences")))
         ;
     }
 }

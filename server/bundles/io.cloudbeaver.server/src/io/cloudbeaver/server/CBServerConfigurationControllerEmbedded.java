@@ -20,18 +20,11 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.InstanceCreator;
 import io.cloudbeaver.service.security.db.WebDatabaseConfig;
-import io.cloudbeaver.utils.WebAppUtils;
 import org.jkiss.code.NotNull;
-import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.data.json.JSONUtils;
 import org.jkiss.utils.CommonUtils;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.nio.charset.StandardCharsets;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -44,45 +37,6 @@ public class CBServerConfigurationControllerEmbedded<T extends CBServerConfig> e
 
     public CBServerConfigurationControllerEmbedded(T serverConfig) {
         super(serverConfig);
-    }
-
-    @Override
-    protected void readProductConfiguration(Map<String, Object> serverConfig, Gson gson)
-        throws DBException {
-        String productConfigPath = WebAppUtils.getRelativePath(
-            JSONUtils.getString(
-                serverConfig,
-                CBConstants.PARAM_PRODUCT_CONFIGURATION,
-                CBConstants.DEFAULT_PRODUCT_CONFIGURATION
-            ),
-            WebAppUtils.getWebApplication().getHomeDirectory().toString()
-        );
-
-        if (!CommonUtils.isEmpty(productConfigPath)) {
-            File productConfigFile = new File(productConfigPath);
-            if (!productConfigFile.exists()) {
-                log.error("Product configuration file not found (" + productConfigFile.getAbsolutePath() + "'");
-            } else {
-                log.debug("Load product configuration from '" + productConfigFile.getAbsolutePath() + "'");
-                try (Reader reader = new InputStreamReader(new FileInputStream(productConfigFile),
-                    StandardCharsets.UTF_8)) {
-                    productConfiguration.putAll(JSONUtils.parseMap(gson, reader));
-                } catch (Exception e) {
-                    throw new DBException("Error reading product configuration", e);
-                }
-            }
-        }
-
-        // Add product config from runtime
-        File rtConfig = getRuntimeProductConfigFilePath().toFile();
-        if (rtConfig.exists()) {
-            log.debug("Load product runtime configuration from '" + rtConfig.getAbsolutePath() + "'");
-            try (Reader reader = new InputStreamReader(new FileInputStream(rtConfig), StandardCharsets.UTF_8)) {
-                productConfiguration.putAll(JSONUtils.parseMap(gson, reader));
-            } catch (Exception e) {
-                throw new DBException("Error reading product runtime configuration", e);
-            }
-        }
     }
 
     @NotNull
