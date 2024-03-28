@@ -9,7 +9,6 @@ import { action, makeObservable, observable } from 'mobx';
 
 import { injectable } from '@cloudbeaver/core-di';
 import { createSettingsLayer, ROOT_SETTINGS_LAYER, SettingsSource } from '@cloudbeaver/core-settings';
-import { parseJSONFlat } from '@cloudbeaver/core-utils';
 
 export const PRODUCT_SETTINGS_LAYER = createSettingsLayer(ROOT_SETTINGS_LAYER, 'product');
 
@@ -46,9 +45,11 @@ export class ProductSettingsService extends SettingsSource {
 
   setSettingsObject(settings: Record<string, any>): void {
     this.update(() => {
-      parseJSONFlat(settings, (key, value) => {
-        this.setValue(key, value);
-      });
+      if (settings && typeof settings === 'object') {
+        for (const [key, value] of Object.entries(settings)) {
+          this.setValue(key, value);
+        }
+      }
     });
   }
 

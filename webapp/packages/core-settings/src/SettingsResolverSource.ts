@@ -81,16 +81,7 @@ export class SettingsResolverSource implements ISettingsResolverSource {
   }
 
   isEdited(key?: any): boolean {
-    for (const source of this.sources) {
-      if (source.has(key) && source.isReadOnly(key)) {
-        break;
-      }
-
-      if (source.isEdited(key)) {
-        return true;
-      }
-    }
-    return false;
+    return this.sources.find(r => r.has(key))?.isEdited(key) || false;
   }
 
   isReadOnly(key: any): boolean {
@@ -111,13 +102,7 @@ export class SettingsResolverSource implements ISettingsResolverSource {
   }
 
   getEditedValue(key: any): any {
-    const source = this.sources.find(r => r.has(key));
-
-    if (source?.isEdited(key)) {
-      return source.getEditedValue(key);
-    }
-
-    return this.getValue(key);
+    return this.sources.find(r => r.has(key))?.getEditedValue(key);
   }
 
   getValue(key: any): any {
@@ -126,11 +111,13 @@ export class SettingsResolverSource implements ISettingsResolverSource {
 
   setValue(key: any, value: any): void {
     for (const source of this.sources) {
-      if (source.has(key) && source.isReadOnly(key)) {
+      const readonly = source.isReadOnly(key);
+
+      if (source.has(key) && readonly) {
         throw new Error(`Can't set value for key ${key}`);
       }
 
-      if (!source.isReadOnly(key)) {
+      if (!readonly) {
         source.setValue(key, value);
         return;
       }
@@ -141,7 +128,6 @@ export class SettingsResolverSource implements ISettingsResolverSource {
     for (const source of this.sources) {
       if (source.isEdited()) {
         await source.save();
-        return;
       }
     }
   }

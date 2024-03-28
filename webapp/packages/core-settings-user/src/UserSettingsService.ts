@@ -11,7 +11,6 @@ import { UserInfoResource } from '@cloudbeaver/core-authentication';
 import { injectable } from '@cloudbeaver/core-di';
 import { SettingsSource } from '@cloudbeaver/core-settings';
 import { StorageService } from '@cloudbeaver/core-storage';
-import { parseJSONFlat } from '@cloudbeaver/core-utils';
 
 @injectable()
 export class UserSettingsService extends SettingsSource {
@@ -32,7 +31,7 @@ export class UserSettingsService extends SettingsSource {
     this.userInfoResource.onUserChange.addHandler(this.refreshConfig.bind(this));
 
     makeObservable<this, 'settings' | 'localSettings'>(this, {
-      settings: observable,
+      settings: observable.shallow,
       localSettings: observable,
     });
 
@@ -97,10 +96,13 @@ export class UserSettingsService extends SettingsSource {
         this.clear();
         this.localSettings.clear();
         this.lastConfig = this.userInfoResource.data.configurationParameters;
-        parseJSONFlat(this.lastConfig, (key, value) => {
-          this.settings.set(key, value);
-          this.localSettings.set(key, value);
-        });
+
+        if (this.lastConfig && typeof this.lastConfig === 'object') {
+          for (const [key, value] of Object.entries(this.lastConfig)) {
+            this.settings.set(key, value);
+            this.localSettings.set(key, value);
+          }
+        }
       }
     });
   }

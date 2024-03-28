@@ -10,7 +10,6 @@ import { action, makeObservable, observable } from 'mobx';
 import { injectable } from '@cloudbeaver/core-di';
 import { PRODUCT_SETTINGS_LAYER } from '@cloudbeaver/core-product';
 import { createSettingsLayer, SettingsSource } from '@cloudbeaver/core-settings';
-import { parseJSONFlat } from '@cloudbeaver/core-utils';
 
 import { EAdminPermission } from '../EAdminPermission';
 import { ServerConfigResource } from '../ServerConfigResource';
@@ -34,7 +33,7 @@ export class ServerSettingsService extends SettingsSource {
 
     makeObservable<this, 'settings' | 'refreshConfig'>(this, {
       refreshConfig: action,
-      settings: observable,
+      settings: observable.shallow,
       clear: action,
     });
   }
@@ -81,9 +80,11 @@ export class ServerSettingsService extends SettingsSource {
 
       if (this.serverConfigResource.data.productConfiguration !== this.lastConfig) {
         this.lastConfig = this.serverConfigResource.data.productConfiguration;
-        parseJSONFlat(this.serverConfigResource.data.productConfiguration, (key, value) => {
-          this.settings.set(key, value);
-        });
+        if (this.lastConfig && typeof this.lastConfig === 'object') {
+          for (const [key, value] of Object.entries(this.lastConfig)) {
+            this.settings.set(key, value);
+          }
+        }
       }
     });
   }

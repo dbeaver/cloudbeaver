@@ -86,11 +86,7 @@ export function createSettingsAliasResolver<TTarget extends schema.SomeZodObject
       }
       source.setValue(mapKey(key), value);
     },
-    save() {
-      return source.save();
-    },
-    clear() {
-      source.clear();
-    },
+    async save() {},
+    clear() {},
   };
 }

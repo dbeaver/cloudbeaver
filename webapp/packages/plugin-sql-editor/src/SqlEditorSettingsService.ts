@@ -54,7 +54,8 @@ const defaultSettings = schema.object({
           return value;
       }
     })
-    .pipe(schema.enum(TABLE_ALIAS_OPTIONS).default('PLAIN')),
+    .pipe(schema.enum(TABLE_ALIAS_OPTIONS))
+    .default('PLAIN'),
 });
 
 export type SqlEditorSettings = schema.infer<typeof defaultSettings>;
