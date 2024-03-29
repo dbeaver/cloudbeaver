@@ -8,7 +8,7 @@
 import { observer } from 'mobx-react-lite';
 
 import {
-  ColoredContainer,
+  Container,
   Group,
   GroupTitle,
   ObjectPropertyInfoForm,
@@ -37,7 +37,7 @@ export const ObjectProperties = observer<Props>(function ObjectProperties({ obje
       {!properties || properties.length === 0 ? (
         <TextPlaceholder>{translate('plugin_object_viewer_table_no_items')}</TextPlaceholder>
       ) : (
-        <ColoredContainer overflow parent gap>
+        <Container overflow gap dense>
           {isUncategorizedExists && (
             <Group gap large>
               <ObjectPropertyInfoForm properties={properties} category={null} small readOnly />
@@ -49,7 +49,7 @@ export const ObjectProperties = observer<Props>(function ObjectProperties({ obje
               <ObjectPropertyInfoForm properties={properties} category={category} small readOnly />
             </Group>
           ))}
-        </ColoredContainer>
+        </Container>
       )}
     </>
   );

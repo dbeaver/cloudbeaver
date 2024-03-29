@@ -7,18 +7,9 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import { s, useS } from '@cloudbeaver/core-blocks';
-
 import type { ObjectPagePanelComponent } from '../ObjectPage/ObjectPage';
 import { ObjectFolders } from './ObjectFolders';
-import classes from './ObjectPropertiesPagePanel.m.css';
 
 export const ObjectPropertiesPagePanel: ObjectPagePanelComponent = observer(function ObjectPropertiesPagePanel({ tab }) {
-  const styles = useS(classes);
-
-  return (
-    <div className={s(styles, { wrapper: true })}>
-      <ObjectFolders tab={tab} />
-    </div>
-  );
+  return <ObjectFolders tab={tab} />;
 });

@@ -7,14 +7,14 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import { s, useResource, useS } from '@cloudbeaver/core-blocks';
+import { Container, Group, s, useResource, useS } from '@cloudbeaver/core-blocks';
 import {
   ConnectionDialectResource,
   ConnectionInfoActiveProjectKey,
   ConnectionInfoResource,
   createConnectionParam,
 } from '@cloudbeaver/core-connections';
-import { MenuBar } from '@cloudbeaver/core-ui';
+import { MenuBar, MenuBarItemStyles, MenuBarStyles } from '@cloudbeaver/core-ui';
 import { useMenu } from '@cloudbeaver/core-view';
 import { useCodemirrorExtensions } from '@cloudbeaver/plugin-codemirror6';
 import type { NavNodeTransformViewComponent } from '@cloudbeaver/plugin-navigation-tree';
@@ -27,7 +27,7 @@ import style from './DDLViewerTabPanel.m.css';
 import { MENU_DDL_VIEWER_FOOTER } from './MENU_DDL_VIEWER_FOOTER';
 
 export const DDLViewerTabPanel: NavNodeTransformViewComponent = observer(function DDLViewerTabPanel({ nodeId, folderId }) {
-  const styles = useS(style);
+  const styles = useS(MenuBarStyles, MenuBarItemStyles, style);
   const menu = useMenu({ menu: MENU_DDL_VIEWER_FOOTER });
 
   const ddlResource = useResource(DDLViewerTabPanel, DdlResource, nodeId);
@@ -44,9 +44,13 @@ export const DDLViewerTabPanel: NavNodeTransformViewComponent = observer(functio
   menu.context.set(DATA_CONTEXT_DDL_VIEWER_VALUE, ddlResource.data);
 
   return (
-    <div className={s(styles, { wrapper: true })}>
-      <SQLCodeEditorLoader className={s(styles, { sqlCodeEditorLoader: true })} value={ddlResource.data ?? ''} extensions={extensions} readonly />
-      <MenuBar className={s(styles, { menuBar: true })} menu={menu} />
-    </div>
+    <Container gap dense vertical noWrap overflow>
+      <Group box overflow maximum>
+        <SQLCodeEditorLoader className={s(styles, { sqlCodeEditorLoader: true })} value={ddlResource.data ?? ''} extensions={extensions} readonly />
+      </Group>
+      <Group box keepSize maximum overflow>
+        <MenuBar className={s(styles, { floating: true, withLabel: true })} menu={menu} />
+      </Group>
+    </Container>
   );
 });

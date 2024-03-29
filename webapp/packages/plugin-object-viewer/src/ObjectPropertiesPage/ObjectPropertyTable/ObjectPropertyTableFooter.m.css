@@ -6,7 +6,6 @@
  * you may not use this file except in compliance with the License.
  */
 
-.tableViewerLoader {
-  padding: 8px;
-  padding-bottom: 0;
+.toolsPanel {
+  composes: theme-background-secondary theme-text-on-secondary from global;
 }

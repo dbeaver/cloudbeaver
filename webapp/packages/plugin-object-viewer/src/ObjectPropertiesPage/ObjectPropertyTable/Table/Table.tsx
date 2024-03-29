@@ -9,7 +9,19 @@ import { observer } from 'mobx-react-lite';
 import { useCallback, useState } from 'react';
 import styled from 'reshadow';
 
-import { IScrollState, Link, s, useControlledScroll, useExecutor, useS, useStyles, useTable, useTranslate } from '@cloudbeaver/core-blocks';
+import {
+  Container,
+  Group,
+  IScrollState,
+  Link,
+  s,
+  useControlledScroll,
+  useExecutor,
+  useS,
+  useStyles,
+  useTable,
+  useTranslate,
+} from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { type DBObject, NavTreeResource } from '@cloudbeaver/core-navigation-tree';
 import type { ObjectPropertyInfo } from '@cloudbeaver/core-sdk';
@@ -131,24 +143,28 @@ export const Table = observer<TableProps>(function Table({ objects, hasNextPage,
 
   return styled(deprecatedStyles)(
     <TableContext.Provider value={{ tableData, tableState }}>
-      <div ref={setTableContainerRef} className={s(styles, { container: true }, 'metadata-grid-container')}>
-        <DataGrid
-          className={s(styles, { dataGrid: true }, 'cb-metadata-grid-theme')}
-          rows={objects}
-          rowKeyGetter={row => row.id}
-          columns={tableData.columns}
-          rowHeight={40}
-          onScroll={handleScroll}
-        />
-        {hasNextPage && (
-          <div className={s(styles, { info: true })}>
-            <Link title={translate('app_navigationTree_limited')} onClick={loadMore}>
-              {translate('ui_load_more')}
-            </Link>
-          </div>
-        )}
-        <ObjectPropertyTableFooter className={s(styles, { objectPropertyTableFooter: true })} state={tableState} />
-      </div>
+      <Container vertical gap dense maximum>
+        <Group ref={setTableContainerRef} className={s(styles, { container: true }, 'metadata-grid-container')} box overflow maximum>
+          <DataGrid
+            className={s(styles, { dataGrid: true }, 'cb-metadata-grid-theme')}
+            rows={objects}
+            rowKeyGetter={row => row.id}
+            columns={tableData.columns}
+            rowHeight={40}
+            onScroll={handleScroll}
+          />
+          {hasNextPage && (
+            <div className={s(styles, { info: true })}>
+              <Link title={translate('app_navigationTree_limited')} onClick={loadMore}>
+                {translate('ui_load_more')}
+              </Link>
+            </div>
+          )}
+        </Group>
+        <Group box keepSize overflow>
+          <ObjectPropertyTableFooter state={tableState} />
+        </Group>
+      </Container>
     </TableContext.Provider>,
   );
 });

@@ -17,7 +17,7 @@ import type { TabPanelProps } from './TabPanelProps';
 import { TabsContext } from './TabsContext';
 import { useTabsValidation } from './useTabsValidation';
 
-export const TabPanel: React.FC<TabPanelProps> = observer(function TabPanel({ tabId, children, className, lazy }) {
+export const TabPanel: React.FC<TabPanelProps> = observer(function TabPanel({ tabId, children, className, lazy, contents }) {
   const tabContextState = useContext(TabsContext);
   const styles = useS(tabPanelStyles);
 
@@ -44,7 +44,7 @@ export const TabPanel: React.FC<TabPanelProps> = observer(function TabPanel({ ta
 
   return (
     <TabContext.Provider value={tabContext}>
-      <BaseTabPanel ref={panelRef} {...tabContextState.state} tabId={tabId} className={s(styles, { tabPanel: true }, className)}>
+      <BaseTabPanel ref={panelRef} {...tabContextState.state} tabId={tabId} className={s(styles, { tabPanel: true, contents }, className)}>
         <Loader suspense>{renderChildren()}</Loader>
       </BaseTabPanel>
     </TabContext.Provider>

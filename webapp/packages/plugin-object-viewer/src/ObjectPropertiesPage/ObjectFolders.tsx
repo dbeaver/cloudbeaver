@@ -8,7 +8,7 @@
 import { observer } from 'mobx-react-lite';
 import { useEffect } from 'react';
 
-import { SContext, StyleRegistry, TextPlaceholder, useResource, useTranslate } from '@cloudbeaver/core-blocks';
+import { Container, Group, SContext, StyleRegistry, TextPlaceholder, useResource, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { NavNodeManagerService, NavTreeResource } from '@cloudbeaver/core-navigation-tree';
 import {
@@ -116,18 +116,24 @@ export const ObjectFolders = observer<IProps>(function ObjectFolders({ tab }) {
 
   return folders.length > 0 ? (
     <TabsState currentTabId={folderId} orientation="vertical" localState={innerTabState} lazy onChange={openFolder}>
-      <SContext registry={objectFoldersRegistry}>
-        <TabList aria-label="Object folders">
+      <Container gap dense noWrap maximum overflow>
+        <Group box keepSize overflow>
+          <SContext registry={objectFoldersRegistry}>
+            <TabList aria-label="Object folders">
+              {folders.map(folderId => (
+                <FolderTabRenderer key={folderId} nodeId={nodeId} folderId={folderId} parents={parents} />
+              ))}
+            </TabList>
+          </SContext>
+        </Group>
+        <Container gap dense noWrap overflow>
           {folders.map(folderId => (
-            <FolderTabRenderer key={folderId} nodeId={nodeId} folderId={folderId} parents={parents} />
+            <TabPanel key={folderId} tabId={folderId}>
+              <FolderPanelRenderer key={folderId} nodeId={nodeId} folderId={folderId} parents={parents} />
+            </TabPanel>
           ))}
-        </TabList>
-        {folders.map(folderId => (
-          <TabPanel key={folderId} tabId={folderId}>
-            <FolderPanelRenderer key={folderId} nodeId={nodeId} folderId={folderId} parents={parents} />
-          </TabPanel>
-        ))}
-      </SContext>
+        </Container>
+      </Container>
     </TabsState>
   ) : (
     <TextPlaceholder>{translate('plugin_object_viewer_table_no_items')}</TextPlaceholder>

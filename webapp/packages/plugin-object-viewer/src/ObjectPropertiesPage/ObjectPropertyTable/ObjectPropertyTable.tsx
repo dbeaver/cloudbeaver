@@ -8,13 +8,12 @@
 import { observer } from 'mobx-react-lite';
 import { useEffect } from 'react';
 
-import { s, TextPlaceholder, useOffsetPagination, useResource, useTranslate } from '@cloudbeaver/core-blocks';
+import { TextPlaceholder, useOffsetPagination, useResource, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { type DBObject, DBObjectParentKey, DBObjectResource, NavTreeResource } from '@cloudbeaver/core-navigation-tree';
 import { isDefined } from '@cloudbeaver/core-utils';
 import { NavNodeViewService } from '@cloudbeaver/plugin-navigation-tree';
 
-import styles from './ObjectPropertyTable.m.css';
 import { TableLoader } from './Table/TableLoader';
 
 interface ObjectPropertyTableProps {
@@ -48,9 +47,7 @@ export const ObjectPropertyTable = observer<ObjectPropertyTableProps>(function O
       {nodes.length === 0 ? (
         <TextPlaceholder>{translate('plugin_object_viewer_table_no_items')}</TextPlaceholder>
       ) : (
-        <div className={s(styles, { box: true }, className)}>
-          <TableLoader objects={objects} hasNextPage={pagination.hasNextPage} loadMore={pagination.loadMore} />
-        </div>
+        <TableLoader objects={objects} hasNextPage={pagination.hasNextPage} loadMore={pagination.loadMore} />
       )}
     </>
   );

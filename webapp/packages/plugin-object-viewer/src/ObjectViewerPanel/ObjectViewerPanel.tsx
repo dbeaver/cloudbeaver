@@ -8,11 +8,11 @@
 import { runInAction } from 'mobx';
 import { observer } from 'mobx-react-lite';
 
-import { s, SContext, StyleRegistry, TextPlaceholder, useResource, useS, useTranslate } from '@cloudbeaver/core-blocks';
+import { ColoredContainer, Container, Group, SContext, TextPlaceholder, useResource, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import { ConnectionInfoResource } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
 import { NavNodeInfoResource } from '@cloudbeaver/core-navigation-tree';
-import { TabPanel, TabsBox, TabStyles, useTabLocalState } from '@cloudbeaver/core-ui';
+import { TabList, TabPanel, TabsState, TabUnderlineStyleRegistry, useTabLocalState } from '@cloudbeaver/core-ui';
 import { MetadataMap } from '@cloudbeaver/core-utils';
 import { ConnectionShieldLazy } from '@cloudbeaver/plugin-connections';
 import type { TabHandlerPanelComponent } from '@cloudbeaver/plugin-navigation-tabs';
@@ -22,17 +22,6 @@ import { DBObjectPagePanel } from '../ObjectPage/DBObjectPagePanel';
 import { DBObjectPageService } from '../ObjectPage/DBObjectPageService';
 import { DBObjectPageTab } from '../ObjectPage/DBObjectPageTab';
 import styles from './shared/ObjectViewerPanel.m.css';
-import ObjectViewerPanelTab from './shared/ObjectViewerPanelTab.m.css';
-
-const tabsRegistry: StyleRegistry = [
-  [
-    TabStyles,
-    {
-      mode: 'append',
-      styles: [ObjectViewerPanelTab],
-    },
-  ],
-];
 
 export const ObjectViewerPanel: TabHandlerPanelComponent<IObjectViewerTabState> = observer(function ObjectViewerPanel({ tab }) {
   const translate = useTranslate();
@@ -65,24 +54,26 @@ export const ObjectViewerPanel: TabHandlerPanelComponent<IObjectViewerTabState> 
   return (
     <ConnectionShieldLazy connectionKey={connectionKey}>
       {node.data ? (
-        <TabsBox
-          currentTabId={tab.handlerState.pageId}
-          tabsClassName={s(style, { tabs: true })}
-          tabs={
-            <SContext registry={tabsRegistry}>
+        <ColoredContainer vertical parent gap dense noWrap maximum overflow>
+          <TabsState currentTabId={tab.handlerState.pageId} localState={innerTabState}>
+            <Group style={{ overflow: 'hidden' }} box keepSize maximum overflow>
+              <SContext registry={TabUnderlineStyleRegistry}>
+                <TabList>
+                  {pages.map(page => (
+                    <DBObjectPageTab key={page.key} tab={tab} page={page} onSelect={dbObjectPagesService.selectPage} />
+                  ))}
+                </TabList>
+              </SContext>
+            </Group>
+            <Container vertical maximum overflow>
               {pages.map(page => (
-                <DBObjectPageTab key={page.key} tab={tab} page={page} onSelect={dbObjectPagesService.selectPage} />
+                <TabPanel key={page.key} tabId={page.key} lazy contents>
+                  <DBObjectPagePanel tab={tab} page={page} />
+                </TabPanel>
               ))}
-            </SContext>
-          }
-          localState={innerTabState}
-        >
-          {pages.map(page => (
-            <TabPanel key={page.key} tabId={page.key} lazy>
-              <DBObjectPagePanel tab={tab} page={page} />
-            </TabPanel>
-          ))}
-        </TabsBox>
+            </Container>
+          </TabsState>
+        </ColoredContainer>
       ) : (
         <TextPlaceholder>{translate('plugin_object_viewer_table_no_items')}</TextPlaceholder>
       )}

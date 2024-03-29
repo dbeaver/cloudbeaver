@@ -9,7 +9,7 @@ import { observer } from 'mobx-react-lite';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import styled, { css, use } from 'reshadow';
 
-import { Form, getComputed, ToolsPanel } from '@cloudbeaver/core-blocks';
+import { Container, Fill, Form, getComputed, Group } from '@cloudbeaver/core-blocks';
 import type { IDataContext } from '@cloudbeaver/core-data-context';
 import { useService } from '@cloudbeaver/core-di';
 
@@ -96,33 +96,44 @@ export const TableFooter = observer<Props>(function TableFooter({ resultIndex, m
   const disabled = getComputed(() => model.isLoading() || model.isDisabled(resultIndex));
 
   return styled(tableFooterStyles)(
-    <ToolsPanel type="secondary">
+    <Group box overflow maximum keepSize>
       {/* <reload aria-disabled={disabled} onClick={() => model.refresh()}>
         <IconOrImage icon='reload' viewBox="0 0 16 16" />
       </reload> */}
-      <AutoRefreshButton model={model} disabled={disabled} />
-      <count>
-        <Form onSubmit={handleChange}>
-          <input
-            ref={ref}
-            type="number"
-            value={limit}
-            disabled={disabled}
-            min={dataViewerSettingsService.minFetchSize}
-            max={dataViewerSettingsService.maxFetchSize}
-            onChange={e => setLimit(e.target.value)}
-            onBlur={handleChange}
-            {...use({ mod: 'surface' })}
-          />
-        </Form>
-      </count>
-      <TableFooterRowCount model={model} resultIndex={resultIndex} />
-      <TableFooterMenu model={model} resultIndex={resultIndex} simple={simple} context={context} />
+      <Container keepSize>
+        <AutoRefreshButton model={model} disabled={disabled} />
+      </Container>
+      <Container keepSize center>
+        <count>
+          <Form onSubmit={handleChange}>
+            <input
+              ref={ref}
+              type="number"
+              value={limit}
+              disabled={disabled}
+              min={dataViewerSettingsService.minFetchSize}
+              max={dataViewerSettingsService.maxFetchSize}
+              onChange={e => setLimit(e.target.value)}
+              onBlur={handleChange}
+              {...use({ mod: 'surface' })}
+            />
+          </Form>
+        </count>
+      </Container>
+      <Container keepSize>
+        <TableFooterRowCount model={model} resultIndex={resultIndex} />
+      </Container>
+      <Container keepSize>
+        <TableFooterMenu model={model} resultIndex={resultIndex} simple={simple} context={context} />
+      </Container>
+      <Fill />
       {model.source.requestInfo.requestMessage.length > 0 && (
-        <time>
-          {model.source.requestInfo.requestMessage} - {model.source.requestInfo.requestDuration}ms
-        </time>
+        <Container keepSize center>
+          <time>
+            {model.source.requestInfo.requestMessage} - {model.source.requestInfo.requestDuration}ms
+          </time>
+        </Container>
       )}
-    </ToolsPanel>,
+    </Group>,
   );
 });

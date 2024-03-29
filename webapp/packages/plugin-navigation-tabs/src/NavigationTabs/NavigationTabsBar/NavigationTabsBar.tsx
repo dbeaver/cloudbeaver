@@ -9,9 +9,9 @@ import { observer } from 'mobx-react-lite';
 import { useCallback, useEffect, useState } from 'react';
 
 import { UserInfoResource } from '@cloudbeaver/core-authentication';
-import { Loader, s, SContext, StyleRegistry, TextPlaceholder, useExecutor, useS, useTranslate } from '@cloudbeaver/core-blocks';
+import { Container, Loader, s, SContext, StyleRegistry, TextPlaceholder, useExecutor, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { ITabData, TabPanel, TabsBox, TabStyles } from '@cloudbeaver/core-ui';
+import { ITabData, TabList, TabPanel, TabsState, TabStyles } from '@cloudbeaver/core-ui';
 import { CaptureView } from '@cloudbeaver/core-view';
 
 import { NavigationTabsService } from '../NavigationTabsService';
@@ -85,29 +85,26 @@ export const NavigationTabsBar = observer<Props>(function NavigationTabsBar({ cl
   return (
     <CaptureView view={navigation} className={s(style, { captureView: true }, className)}>
       <Loader loading={restoring}>
-        <TabsBox
-          currentTabId={navigation.currentTabId}
-          className={s(style, { tabsBox: true })}
-          tabsClassName={s(style, { tabs: true })}
-          tabs={
-            <SContext registry={tabsRegistry}>
+        <TabsState currentTabId={navigation.currentTabId} tabList={navigation.tabIdList} autoSelect enabledBaseActions onChange={handleTabChange}>
+          <Container tabIndex={0} vertical noWrap maximum>
+            <Container keepSize maximum overflow>
+              <TabList>
+                <SContext registry={tabsRegistry}>
+                  {navigation.tabIdList.map(tabId => (
+                    <TabHandlerTab key={tabId} tabId={tabId} onSelect={handleSelect} onClose={handleClose} />
+                  ))}
+                </SContext>
+              </TabList>
+            </Container>
+            <Container overflow maximum vertical>
               {navigation.tabIdList.map(tabId => (
-                <TabHandlerTab key={tabId} tabId={tabId} onSelect={handleSelect} onClose={handleClose} />
+                <TabPanel key={tabId} tabId={tabId} lazy contents>
+                  {() => <TabHandlerPanel tabId={tabId} />}
+                </TabPanel>
               ))}
-            </SContext>
-          }
-          tabList={navigation.tabIdList}
-          tabIndex={0}
-          autoSelect
-          enabledBaseActions
-          onChange={handleTabChange}
-        >
-          {navigation.tabIdList.map(tabId => (
-            <TabPanel key={tabId} tabId={tabId} lazy>
-              {() => <TabHandlerPanel tabId={tabId} />}
-            </TabPanel>
-          ))}
-        </TabsBox>
+            </Container>
+          </Container>
+        </TabsState>
       </Loader>
     </CaptureView>
   );

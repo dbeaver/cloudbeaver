@@ -8,6 +8,4 @@
 
 .tabList {
   composes: theme-background-surface theme-text-on-surface theme-border-color-background from global;
-  border-top: 1px solid;
-  border-right: 1px solid;
 }
