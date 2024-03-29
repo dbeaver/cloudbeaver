@@ -5,6 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
+import { importLazyComponent } from '@cloudbeaver/core-blocks';
 import { ConnectionsManagerService } from '@cloudbeaver/core-connections';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
@@ -15,7 +16,8 @@ import { MENU_CONNECTIONS } from '@cloudbeaver/plugin-connections';
 
 import { ACTION_CONNECTION_CUSTOM } from './Actions/ACTION_CONNECTION_CUSTOM';
 import { CustomConnectionSettingsService } from './CustomConnectionSettingsService';
-import { DriverSelectorDialog } from './DriverSelector/DriverSelectorDialog';
+
+const DriverSelectorDialog = importLazyComponent(() => import('./DriverSelector/DriverSelectorDialog').then(m => m.DriverSelectorDialog));
 
 @injectable()
 export class CustomConnectionPluginBootstrap extends Bootstrap {
@@ -45,14 +47,12 @@ export class CustomConnectionPluginBootstrap extends Bootstrap {
         }
 
         if (action === ACTION_CONNECTION_CUSTOM) {
-          return this.customConnectionSettingsService.settings.getValue('disabled');
+          return this.customConnectionSettingsService.disabled;
         }
 
         return false;
       },
-      getLoader: (context, action) => {
-        return getCachedMapResourceLoaderState(this.projectInfoResource, () => CachedMapAllKey);
-      },
+      getLoader: (context, action) => getCachedMapResourceLoaderState(this.projectInfoResource, () => CachedMapAllKey),
       handler: async (context, action) => {
         switch (action) {
           case ACTION_CONNECTION_CUSTOM: {

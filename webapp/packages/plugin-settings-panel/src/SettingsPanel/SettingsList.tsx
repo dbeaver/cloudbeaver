@@ -7,24 +7,26 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import { Container, Group, GroupTitle, useTranslate } from '@cloudbeaver/core-blocks';
-import { type ISettingDescriptionWithScope, ROOT_SETTINGS_GROUP, type SettingsGroup } from '@cloudbeaver/core-plugin';
-import type { ISettingsSource } from '@cloudbeaver/core-settings';
+import { Container } from '@cloudbeaver/core-blocks';
+import {
+  type ISettingDescription,
+  type ISettingsSource,
+  ROOT_SETTINGS_GROUP,
+  type SettingsGroup as SettingsGroupType,
+} from '@cloudbeaver/core-settings';
 import type { ITreeData } from '@cloudbeaver/plugin-navigation-tree';
 
-import { getSettingGroupId } from './getSettingGroupId';
-import { Setting } from './Setting';
+import { SettingsGroup } from './SettingsGroup';
 import { useTreeScrollSync } from './useTreeScrollSync';
 
 interface Props {
   treeData: ITreeData;
   source: ISettingsSource;
-  settings: Map<SettingsGroup, ISettingDescriptionWithScope<any>[]>;
+  settings: Map<SettingsGroupType, ISettingDescription<any>[]>;
   onSettingsOpen?: (groupId: string) => void;
 }
 
 export const SettingsList = observer<Props>(function SettingsList({ treeData, source, settings, onSettingsOpen }) {
-  const translate = useTranslate();
   const list = [];
   const groups = [...treeData.getChildren(treeData.rootId)];
   const ref = useTreeScrollSync(treeData, onSettingsOpen);
@@ -42,12 +44,7 @@ export const SettingsList = observer<Props>(function SettingsList({ treeData, so
   return (
     <Container ref={ref} style={{ height: '100%' }} gap overflow>
       {list.map(({ group, settings }) => (
-        <Group key={group.id} id={getSettingGroupId(group.id)} vertical gap>
-          <GroupTitle>{translate(group.name)}</GroupTitle>
-          {settings.map((setting, i) => (
-            <Setting key={i} source={source} setting={setting} />
-          ))}
-        </Group>
+        <SettingsGroup key={group.id} group={group} source={source} settings={settings} />
       ))}
     </Container>
   );

@@ -17,7 +17,7 @@ export class ToolsPanelService {
   readonly tabsContainer: TabsContainer;
 
   get disabled() {
-    return this.toolsPanelSettingsService.settings.getValue('disabled');
+    return this.toolsPanelSettingsService.disabled;
   }
 
   constructor(private readonly toolsPanelSettingsService: ToolsPanelSettingsService) {

@@ -7,11 +7,7 @@
  */
 
 .filter {
-  margin: 0 24px 12px 24px;
-}
-
-.list {
-  overflow: auto;
+  margin: 0 24px 4px 24px;
 }
 
 .cell {
@@ -23,8 +19,4 @@
 .iconOrImage {
   width: 100%;
   height: 100%;
-}
-
-.center {
-  margin: auto;
 }

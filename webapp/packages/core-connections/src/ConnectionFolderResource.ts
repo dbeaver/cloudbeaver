@@ -37,7 +37,11 @@ export const ConnectionFolderProjectKey = resourceKeyAliasFactory('@connection-f
 
 @injectable()
 export class ConnectionFolderResource extends CachedMapResource<IConnectionFolderParam, ConnectionFolder> {
-  constructor(private readonly graphQLService: GraphQLService, sessionDataResource: SessionDataResource, appAuthService: AppAuthService) {
+  constructor(
+    private readonly graphQLService: GraphQLService,
+    sessionDataResource: SessionDataResource,
+    appAuthService: AppAuthService,
+  ) {
     super();
 
     appAuthService.requireAuthentication(this);
@@ -70,6 +74,7 @@ export class ConnectionFolderResource extends CachedMapResource<IConnectionFolde
         folderPath: key.folderId,
       });
       this.delete(key);
+      this.onDataOutdated.execute(key);
     });
   }
 

@@ -7,7 +7,6 @@
  */
 import type { PluginManifest } from '@cloudbeaver/core-di';
 
-import { ProductManagerService } from './ProductManagerService';
 import { ProductSettingsService } from './ProductSettingsService';
 
 export const coreProductManifest: PluginManifest = {
@@ -15,5 +14,5 @@ export const coreProductManifest: PluginManifest = {
     name: 'Core Product',
   },
 
-  providers: [ProductManagerService, ProductSettingsService],
+  providers: [ProductSettingsService],
 };

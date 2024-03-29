@@ -39,7 +39,7 @@ export const ProductInfoDialog = observer<DialogComponentProps<null>>(function P
   const version = useAppVersion();
 
   const productInfo = serverConfigResource.data?.productInfo;
-  const logoIcon = themeService.currentThemeId === 'light' ? '/icons/product-logo_light.svg' : '/icons/product-logo_dark.svg';
+  const logoIcon = themeService.themeId === 'light' ? '/icons/product-logo_light.svg' : '/icons/product-logo_dark.svg';
 
   const styles = useS(ProductInfoDialogStyles);
 
@@ -77,7 +77,7 @@ export const ProductInfoDialog = observer<DialogComponentProps<null>>(function P
                 <FormFieldDescription className={s(styles, { formFieldDescription: true })} label={translate('app_product_info_contacts')}>
                   <div className={s(styles, { contactsInfo: true })}>
                     You can contact us via our
-                    <Link href="https://cloudbeaver.io/contact/" target="_blank" rel="noopener noreferrer">
+                    <Link href="https://dbeaver.com/company/contact/" target="_blank" rel="noopener noreferrer">
                       {' '}
                       Site{' '}
                     </Link>

@@ -41,6 +41,9 @@ public interface DBWServiceCore extends DBWService {
     @WebAction(authRequired = false)
     WebServerConfig getServerConfig() throws DBWebException;
 
+    @WebAction(authRequired = false)
+    WebProductSettings getProductSettings(@NotNull WebSession webSession);
+
     @WebAction
     List<WebDatabaseDriverInfo> getDriverList(@NotNull WebSession webSession, String driverId) throws DBWebException;
 
@@ -94,6 +97,7 @@ public interface DBWServiceCore extends DBWService {
     @WebAction(authRequired = false)
     boolean touchSession(@NotNull HttpServletRequest request, @NotNull HttpServletResponse servletResponse) throws DBWebException;
 
+    @Deprecated
     @WebAction(authRequired = false)
     WebSession updateSession(@NotNull HttpServletRequest request, @NotNull HttpServletResponse response)
         throws DBWebException;

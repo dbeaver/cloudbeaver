@@ -6,32 +6,28 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import { useCallback } from 'react';
 
-import { UserInfoResource } from '@cloudbeaver/core-authentication';
-import { Loader, s, useResource } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
+import { NotificationService } from '@cloudbeaver/core-events';
+import { BaseForm, IBaseFormSubmitInfo, IFormState } from '@cloudbeaver/core-ui';
 
-import { UserProfileService } from '../UserProfileService';
-import { UserForm } from './UserForm';
-import style from './UserProfileForm.m.css';
+import { IUserProfileFormState, UserProfileFormService } from './UserProfileFormService';
 
-export const UserProfileForm = observer(function UserProfileForm() {
-  const userProfileService = useService(UserProfileService);
-  const userInfo = useResource(UserProfileForm, UserInfoResource, {
-    key: undefined,
-    includes: ['includeMetaParameters'] as const,
-  });
+interface Props {
+  state: IFormState<IUserProfileFormState>;
+}
 
-  const close = useCallback(() => userProfileService.close(true), []);
+export const UserProfileForm = observer<Props>(function UserProfileForm({ state }) {
+  const notificationService = useService(NotificationService);
+  const userProfileFormService = useService(UserProfileFormService);
 
-  if (!userProfileService.formState) {
-    return null;
+  function onSubmit({ success }: IBaseFormSubmitInfo) {
+    if (success) {
+      notificationService.logSuccess({ title: 'authentication_administration_user_updated' });
+    } else {
+      notificationService.logError({ title: 'authentication_administration_user_update_failed' });
+    }
   }
 
-  return (
-    <Loader className={s(style, { loader: true })} state={userInfo}>
-      {() => userInfo.data && <UserForm user={userInfo.data} state={userProfileService.formState!} onClose={close} />}
-    </Loader>
-  );
+  return <BaseForm service={userProfileFormService} state={state} onSubmit={onSubmit} />;
 });

@@ -43,6 +43,8 @@ public interface WebApplication extends DBPApplication {
 
     WebAppConfiguration getAppConfiguration();
 
+    WebServerConfiguration getServerConfiguration();
+
     Path getDataDirectory(boolean create);
 
     Path getWorkspaceDirectory();
