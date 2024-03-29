@@ -7,9 +7,7 @@
  */
 import { action, makeObservable } from 'mobx';
 
-import type { IDataContextProvider } from '@cloudbeaver/core-data-context';
 import { injectable } from '@cloudbeaver/core-di';
-import type { ITabsContext } from '@cloudbeaver/core-ui';
 
 import type { ISqlEditorResultTab, ISqlEditorTabState } from '../ISqlEditorTabState';
 import { SqlExecutionPlanService } from './ExecutionPlan/SqlExecutionPlanService';
@@ -28,6 +26,10 @@ export class SqlResultTabsService {
     makeObservable(this, {
       removeResultTabs: action,
     });
+  }
+
+  getResultTabs(state: ISqlEditorTabState) {
+    return state.resultTabs;
   }
 
   async canCloseResultTab(state: ISqlEditorTabState, tabId: string): Promise<boolean> {
@@ -74,21 +76,6 @@ export class SqlResultTabsService {
         continue;
       }
       this.removeTab(state, tab);
-    }
-  }
-
-  async closeTabGroup(state: ISqlEditorTabState, tabsContext: ITabsContext, context: IDataContextProvider, tabId: string) {
-    const resultTab = state.resultTabs.find(tabState => tabState.tabId === tabId);
-    const groupResultTabs = state.resultTabs.filter(tab => tab.groupId === resultTab?.groupId);
-
-    if (groupResultTabs.length) {
-      for (const groupTab of groupResultTabs) {
-        const canClose = tabsContext.canClose(groupTab.tabId);
-
-        if (canClose) {
-          tabsContext.close(groupTab.tabId);
-        }
-      }
     }
   }
 

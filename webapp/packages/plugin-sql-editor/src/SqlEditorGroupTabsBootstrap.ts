@@ -1,3 +1,4 @@
+import type { IDataContextProvider } from '@cloudbeaver/core-data-context';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { DATA_CONTEXT_TABS_CONTEXT, MENU_TAB } from '@cloudbeaver/core-ui';
 import { ActionService, DATA_CONTEXT_MENU, menuExtractItems, MenuService } from '@cloudbeaver/core-view';
@@ -43,26 +44,38 @@ export class SqlEditorGroupTabsBootstrap extends Bootstrap {
         const menu = context.hasValue(DATA_CONTEXT_MENU, MENU_TAB);
         const tab = context.tryGet(DATA_CONTEXT_SQL_EDITOR_RESULT_ID);
         const sqlEditorState = context.tryGet(DATA_CONTEXT_SQL_EDITOR_STATE);
+
         const groupId = sqlEditorState?.resultTabs.find(tabState => tabState.tabId === tab?.id)?.groupId;
         const hasTabsInGroup = (sqlEditorState?.resultTabs.filter(tabState => tabState.groupId === groupId) ?? []).length > 1;
+
         if (!menu || !tab || !hasTabsInGroup) {
           return false;
         }
         return [ACTION_TAB_CLOSE_SQL_RESULT_GROUP].includes(action);
       },
       handler: async (context, action) => {
-        const tab = context.get(DATA_CONTEXT_SQL_EDITOR_RESULT_ID);
-        const sqlEditorState = context.get(DATA_CONTEXT_SQL_EDITOR_STATE);
-        const tabs = context.get(DATA_CONTEXT_TABS_CONTEXT);
-
         switch (action) {
           case ACTION_TAB_CLOSE_SQL_RESULT_GROUP:
-            this.sqlResultTabsService.closeTabGroup(sqlEditorState, tabs, context, tab.id);
+            this.closeResultTabGroup(context);
             break;
           default:
             break;
         }
       },
+    });
+  }
+
+  async closeResultTabGroup(context: IDataContextProvider) {
+    const tab = context.get(DATA_CONTEXT_SQL_EDITOR_RESULT_ID);
+    const sqlEditorState = context.get(DATA_CONTEXT_SQL_EDITOR_STATE);
+    const tabsContext = context.get(DATA_CONTEXT_TABS_CONTEXT);
+    const resultTabs = this.sqlResultTabsService.getResultTabs(sqlEditorState);
+
+    const resultTab = resultTabs.find(tabState => tabState.tabId === tab.id);
+    const groupResultTabs = resultTabs.filter(tab => tab.groupId === resultTab?.groupId);
+
+    groupResultTabs.forEach(groupTab => {
+      tabsContext.close(groupTab.tabId);
     });
   }
 }
