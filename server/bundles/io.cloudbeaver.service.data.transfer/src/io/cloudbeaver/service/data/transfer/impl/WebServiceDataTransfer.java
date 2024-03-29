@@ -343,6 +343,7 @@ public class WebServiceDataTransfer implements DBWServiceDataTransfer {
             consumer.setSettings(databaseConsumerSettings);
             DatabaseMappingContainer databaseMappingContainer = new DatabaseMappingContainer(databaseConsumerSettings, dataContainer);
             databaseMappingContainer.getAttributeMappings(monitor);
+            databaseMappingContainer.setTarget(dataContainer);
             consumer.setContainerMapping(databaseMappingContainer);
 
             StreamTransferProducer producer = new StreamTransferProducer(new StreamEntityMapping(path), processor);

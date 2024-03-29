@@ -69,6 +69,7 @@ public class CBPlatform extends BasePlatformImpl {
 
     private static final Log log = Log.getLog(CBPlatform.class);
     private static final String TEMP_FILE_FOLDER = "temp-sql-upload-files";
+    private static final String TEMP_FILE_IMPORT_FOLDER = "temp-import-files";
 
     public static final String WORK_DATA_FOLDER_NAME = ".work-data";
 
@@ -133,6 +134,7 @@ public class CBPlatform extends BasePlatformImpl {
             protected IStatus run(DBRProgressMonitor monitor) {
                 try {
                     IOUtils.deleteDirectory(getTempFolder(monitor, TEMP_FILE_FOLDER));
+                    IOUtils.deleteDirectory(getTempFolder(monitor, TEMP_FILE_IMPORT_FOLDER));
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }

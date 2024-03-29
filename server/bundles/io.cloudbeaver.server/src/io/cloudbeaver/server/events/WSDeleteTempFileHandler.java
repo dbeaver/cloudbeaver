@@ -32,10 +32,21 @@ public class WSDeleteTempFileHandler implements WSEventHandler<WSEventDeleteTemp
 
     private static final Log log = Log.getLog(WSDeleteTempFileHandler.class);
     private static final String TEMP_FILE_FOLDER = "temp-sql-upload-files";
+    private static final String TEMP_IMPORT_FILE_FOLDER = "temp-import-files";
 
     public void resetTempFolder(String sessionId) {
         Path path = CBPlatform.getInstance()
                 .getTempFolder(new VoidProgressMonitor(), TEMP_FILE_FOLDER)
+                .resolve(sessionId);
+        if (Files.exists(path)) {
+            try {
+                IOUtils.deleteDirectory(path);
+            } catch (IOException e) {
+                log.error("Error deleting temp path", e);
+            }
+        }
+        path = CBPlatform.getInstance()
+                .getTempFolder(new VoidProgressMonitor(), TEMP_IMPORT_FILE_FOLDER)
                 .resolve(sessionId);
         if (Files.exists(path)) {
             try {
