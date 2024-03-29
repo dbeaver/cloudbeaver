@@ -17,6 +17,7 @@
         <resource name="drivers/sqlite/xerial"/>
         <resource name="drivers/mssql/new"/>
         <resource name="drivers/trino"/>
+        <resource name="drivers/kyuubi"/>
     </extension>
 
     <!-- Bundles  -->
@@ -36,6 +37,7 @@
         <bundle id="drivers.sqlite.xerial" label="SQLite drivers"/>
         <bundle id="drivers.mssql.new" label="SQL Server drivers"/>
         <bundle id="drivers.trino" label="Trino drivers"/>
+        <bundle id="drivers.kyuubi" label="Apache Kyuubi drivers"/>
     </extension>
 
     <!-- Enabled drivers -->
@@ -55,6 +57,7 @@
         <driver id="sqlserver:microsoft"/>
         <driver id="generic:trino_jdbc"/>
         <driver id="generic:duckdb_jdbc"/>
+        <driver id="generic:kyuubi_hive"/>
     </extension>
 
 
