@@ -107,12 +107,12 @@ function transformKeys(keyBinding: IKeyBinding): string[] {
 
 function transformModToDisplayKey(key: string): string {
   const OS = getOS();
-  if (OS === OperatingSystem.windowsOS || OperatingSystem.linuxOS) {
+  if (OS === OperatingSystem.windowsOS || OS === OperatingSystem.linuxOS) {
     return key.replace('MOD', 'CTRL');
   }
 
   if (OS === OperatingSystem.macOS) {
-    return key.replace('MOD', 'CMD');
+    return key.replace('MOD', 'CMD').replace('ALT', 'OPTION').replace('BACKSPACE', 'DELETE');
   }
   return key;
 }
