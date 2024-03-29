@@ -754,4 +754,9 @@ public abstract class CBApplication<T extends CBServerConfig> extends BaseWebApp
         }
         config.setDisabledDrivers(disabledDrivers.toArray(new String[0]));
     }
+
+    @Override
+    public boolean isEnvironmentVariablesAccessible() {
+        return getAppConfiguration().isSystemVariablesResolvingEnabled();
+    }
 }
