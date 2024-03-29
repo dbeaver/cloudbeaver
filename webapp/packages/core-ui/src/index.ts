@@ -76,8 +76,6 @@ export * from './Tabs/Tab/TabTitle';
 export * from './Tabs/Tab/useTab';
 export * from './Tabs/TabsBootstrap';
 
-export * from './Tabs/TabsBox/TabsBox';
-
 export * from './SideBarPanel/LeftBarPanelService';
 export * from './SideBarPanel/SideBarPanel';
 export * from './SideBarPanel/SideBarPanelService';
