@@ -117,7 +117,7 @@ export const ObjectFolders = observer<IProps>(function ObjectFolders({ tab }) {
   return folders.length > 0 ? (
     <TabsState currentTabId={folderId} orientation="vertical" localState={innerTabState} lazy onChange={openFolder}>
       <Container gap dense noWrap maximum overflow>
-        <Group box keepSize overflow>
+        <Group box overflow small>
           <SContext registry={objectFoldersRegistry}>
             <TabList aria-label="Object folders">
               {folders.map(folderId => (

@@ -10,6 +10,7 @@ import { observer } from 'mobx-react-lite';
 import { forwardRef, useEffect } from 'react';
 
 import {
+  Container,
   getComputed,
   Loader,
   Pane,
@@ -204,7 +205,7 @@ export const TableViewer = observer<TableViewerProps, HTMLDivElement>(
       !simple;
 
     return (
-      <div ref={ref} className={s(styles, { tableViewer: true }, className)}>
+      <Container ref={ref} maximum overflow vertical noWrap gap dense>
         <div className={s(styles, { tableContent: true })}>
           {!isStatistics && (
             <TablePresentationBar
@@ -285,7 +286,7 @@ export const TableViewer = observer<TableViewerProps, HTMLDivElement>(
           )}
         </div>
         <TableFooter model={dataModel} resultIndex={resultIndex} simple={simple} context={context} />
-      </div>
+      </Container>
     );
   }),
 );

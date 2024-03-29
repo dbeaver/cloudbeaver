@@ -88,7 +88,7 @@ export const NavigationTabsBar = observer<Props>(function NavigationTabsBar({ cl
         <TabsState currentTabId={navigation.currentTabId} tabList={navigation.tabIdList} autoSelect enabledBaseActions onChange={handleTabChange}>
           <Container tabIndex={0} vertical noWrap maximum>
             <Container keepSize maximum overflow>
-              <TabList>
+              <TabList className={s(style, { tabs: true }, className)}>
                 <SContext registry={tabsRegistry}>
                   {navigation.tabIdList.map(tabId => (
                     <TabHandlerTab key={tabId} tabId={tabId} onSelect={handleSelect} onClose={handleClose} />

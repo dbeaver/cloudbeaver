@@ -6,16 +6,12 @@
  * you may not use this file except in compliance with the License.
  */
 
-.tabs {
-  composes: theme-background-secondary theme-text-on-secondary from global;
-}
-
-.tabsBox {
-  outline: none;
-}
-
 .captureView {
   flex: 1;
   display: flex;
   overflow: auto;
+}
+
+.tabs {
+  composes: theme-background-secondary theme-text-on-secondary from global;
 }

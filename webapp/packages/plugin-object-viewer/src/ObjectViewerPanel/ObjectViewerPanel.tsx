@@ -56,7 +56,7 @@ export const ObjectViewerPanel: TabHandlerPanelComponent<IObjectViewerTabState> 
       {node.data ? (
         <ColoredContainer vertical parent gap dense noWrap maximum overflow>
           <TabsState currentTabId={tab.handlerState.pageId} localState={innerTabState}>
-            <Group style={{ overflow: 'hidden' }} box keepSize maximum overflow>
+            <Group style={{ overflow: 'hidden' }} hidden={pages.length < 2} box keepSize maximum overflow>
               <SContext registry={TabUnderlineStyleRegistry}>
                 <TabList>
                   {pages.map(page => (
