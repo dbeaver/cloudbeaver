@@ -371,7 +371,6 @@ export function useElementsTree(options: IOptions): IElementsTree {
       }),
     async data => {
       runInAction(() => {
-        console.log('useElementsTree -> userData', data);
         if (!options.settings?.saveFilter) {
           data.filter = '';
         }
