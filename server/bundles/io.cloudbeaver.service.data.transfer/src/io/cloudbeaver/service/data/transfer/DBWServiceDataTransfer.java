@@ -27,6 +27,7 @@ import io.cloudbeaver.service.data.transfer.impl.WebDataTransferStreamProcessor;
 import io.cloudbeaver.service.sql.WebSQLContextInfo;
 import io.cloudbeaver.service.sql.WebSQLProcessor;
 import io.cloudbeaver.service.sql.WebSQLResultsInfo;
+import org.jkiss.code.NotNull;
 
 import java.nio.file.Path;
 import java.util.List;
@@ -50,10 +51,10 @@ public interface DBWServiceDataTransfer extends DBWService {
 
     @WebAction
     WebAsyncTaskInfo asyncImportDataContainer(
-        String processorId,
-        Path path,
-        WebSQLResultsInfo webSQLResultsInfo,
-        WebSession webSession) throws DBWebException;
+        @NotNull String processorId,
+        @NotNull Path path,
+        @NotNull WebSQLResultsInfo webSQLResultsInfo,
+        @NotNull WebSession webSession) throws DBWebException;
 
     @WebAction
     WebAsyncTaskInfo dataTransferExportDataFromResults(
