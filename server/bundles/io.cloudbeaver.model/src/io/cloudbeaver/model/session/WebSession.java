@@ -34,8 +34,6 @@ import io.cloudbeaver.utils.CBModelConstants;
 import io.cloudbeaver.utils.WebAppUtils;
 import io.cloudbeaver.utils.WebDataSourceUtils;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -609,9 +607,9 @@ public class WebSession extends BaseWebSession
     }
 
     @Nullable
-    public WebConnectionInfo findWebConnectionInfo(String connectionID) {
+    public WebConnectionInfo findWebConnectionInfo(String projectId, String connectionId) {
         synchronized (connections) {
-            return connections.get(connectionID);
+            return connections.get(getConnectionId(projectId, connectionId));
         }
     }
 
@@ -951,7 +949,7 @@ public class WebSession extends BaseWebSession
             }
             configuration.setRuntimeAttribute(RUNTIME_PARAM_AUTH_INFOS, getAllAuthInfo());
 
-            WebConnectionInfo webConnectionInfo = findWebConnectionInfo(dataSourceContainer.getId());
+            WebConnectionInfo webConnectionInfo = findWebConnectionInfo(dataSourceContainer.getProject().getId(), dataSourceContainer.getId());
             if (webConnectionInfo != null) {
                 WebDataSourceUtils.saveCredentialsInDataSource(webConnectionInfo, dataSourceContainer, configuration);
             }
