@@ -67,43 +67,43 @@ public class WebDataTransferImportServlet extends WebServiceServletBase {
             response.sendError(HttpServletResponse.SC_FORBIDDEN, "Import for users only");
             return;
         }
-        Path tempFolder = CBPlatform.getInstance().getTempFolder(session.getProgressMonitor(), "temp-import-files");
-        MultipartConfigElement MULTI_PART_CONFIG = new MultipartConfigElement(tempFolder.toString());
-
-        request.setAttribute(ECLIPSE_JETTY_MULTIPART_CONFIG, MULTI_PART_CONFIG);
-
-        Map<String, Object> variables = getVariables(request);
-
-        String projectId = JSONUtils.getString(variables, "projectId");
-        String connectionId = JSONUtils.getString(variables, "connectionId");
-        String contextId = JSONUtils.getString(variables, "contextId");
-        String resultId = JSONUtils.getString(variables, "resultsId");
-        String processorId = JSONUtils.getString(variables, "processorId");
-
-        if (projectId == null || connectionId == null || contextId == null || resultId == null || processorId == null) {
-            throw new IllegalArgumentException("Missing required parameters");
-        }
-
-        WebConnectionInfo webConnectionInfo = session.getWebConnectionInfo(projectId, connectionId);
-        WebSQLProcessor processor = WebServiceBindingSQL.getSQLProcessor(webConnectionInfo);
-        WebSQLContextInfo webSQLContextInfo = processor.getContext(contextId);
-
-        if (webSQLContextInfo == null) {
-            throw new DBWebException("Context is empty");
-        }
-
-        WebSQLResultsInfo webSQLResultsInfo = webSQLContextInfo.getResults(resultId);
-        Path filePath;
-
-        try {
-            InputStream file = request.getPart("fileData").getInputStream();
-            filePath = tempFolder.resolve(UUID.randomUUID().toString());
-            Files.write(filePath, file.readAllBytes());
-        } catch (ServletException e) {
-            throw new DBWebException(e.getMessage());
-        }
-
         if ("POST".equalsIgnoreCase(request.getMethod())) {
+            Path tempFolder = CBPlatform.getInstance().getTempFolder(session.getProgressMonitor(), CBPlatform.TEMP_FILE_IMPORT_FOLDER);
+            MultipartConfigElement MULTI_PART_CONFIG = new MultipartConfigElement(tempFolder.toString());
+
+            request.setAttribute(ECLIPSE_JETTY_MULTIPART_CONFIG, MULTI_PART_CONFIG);
+
+            Map<String, Object> variables = getVariables(request);
+
+            String projectId = JSONUtils.getString(variables, "projectId");
+            String connectionId = JSONUtils.getString(variables, "connectionId");
+            String contextId = JSONUtils.getString(variables, "contextId");
+            String resultId = JSONUtils.getString(variables, "resultsId");
+            String processorId = JSONUtils.getString(variables, "processorId");
+
+            if (projectId == null || connectionId == null || contextId == null || resultId == null || processorId == null) {
+                throw new IllegalArgumentException("Missing required parameters");
+            }
+
+            WebConnectionInfo webConnectionInfo = session.getWebConnectionInfo(projectId, connectionId);
+            WebSQLProcessor processor = WebServiceBindingSQL.getSQLProcessor(webConnectionInfo);
+            WebSQLContextInfo webSQLContextInfo = processor.getContext(contextId);
+
+            if (webSQLContextInfo == null) {
+                throw new DBWebException("Context is empty");
+            }
+
+            WebSQLResultsInfo webSQLResultsInfo = webSQLContextInfo.getResults(resultId);
+            Path filePath;
+
+            try {
+                InputStream file = request.getPart("fileData").getInputStream();
+                filePath = tempFolder.resolve(UUID.randomUUID().toString());
+                Files.write(filePath, file.readAllBytes());
+            } catch (ServletException e) {
+                throw new DBWebException(e.getMessage());
+            }
+
             dbwServiceDataTransfer.asyncImportDataContainer(processorId, filePath, webSQLResultsInfo, session);
         }
     }

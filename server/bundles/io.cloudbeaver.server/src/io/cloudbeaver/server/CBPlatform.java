@@ -68,8 +68,8 @@ public class CBPlatform extends BasePlatformImpl {
     public static final String PLUGIN_ID = "io.cloudbeaver.server"; //$NON-NLS-1$
 
     private static final Log log = Log.getLog(CBPlatform.class);
-    private static final String TEMP_FILE_FOLDER = "temp-sql-upload-files";
-    private static final String TEMP_FILE_IMPORT_FOLDER = "temp-import-files";
+    public static final String TEMP_FILE_FOLDER = "temp-sql-upload-files";
+    public static final String TEMP_FILE_IMPORT_FOLDER = "temp-import-files";
 
     public static final String WORK_DATA_FOLDER_NAME = ".work-data";
 
