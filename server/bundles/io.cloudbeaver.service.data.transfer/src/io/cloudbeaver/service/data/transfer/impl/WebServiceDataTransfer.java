@@ -243,6 +243,11 @@ public class WebServiceDataTransfer implements DBWServiceDataTransfer {
                 } catch (Throwable e) {
                     throw new InvocationTargetException(e);
                 } finally {
+                    try {
+                        Files.deleteIfExists(path);
+                    } catch (IOException e) {
+                        log.error("Failed to delete file: " + e.getMessage());
+                    }
                     monitor.done();
                 }
             }
