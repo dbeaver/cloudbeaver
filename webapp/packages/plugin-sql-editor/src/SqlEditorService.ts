@@ -72,8 +72,9 @@ export class SqlEditorService {
     });
   }
 
-  async parseSQLScript(connectionId: string, script: string): Promise<SqlScriptInfoFragment> {
+  async parseSQLScript(projectId: string, connectionId: string, script: string): Promise<SqlScriptInfoFragment> {
     const result = await this.graphQLService.sdk.parseSQLScript({
+      projectId,
       connectionId,
       script,
     });
@@ -81,8 +82,9 @@ export class SqlEditorService {
     return result.scriptInfo;
   }
 
-  async parseSQLQuery(connectionId: string, script: string, position: number) {
+  async parseSQLQuery(projectId: string, connectionId: string, script: string, position: number) {
     const result = await this.graphQLService.sdk.parseSQLQuery({
+      projectId,
       connectionId,
       script,
       position,
@@ -92,6 +94,7 @@ export class SqlEditorService {
   }
 
   async getAutocomplete(
+    projectId: string,
     connectionId: string,
     contextId: string,
     query: string,
@@ -100,6 +103,7 @@ export class SqlEditorService {
     simple?: boolean,
   ): Promise<SQLProposal[]> {
     const { proposals } = await this.graphQLService.sdk.querySqlCompletionProposals({
+      projectId,
       connectionId,
       contextId,
       query,

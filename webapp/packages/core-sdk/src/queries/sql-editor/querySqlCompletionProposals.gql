@@ -1,4 +1,5 @@
 query querySqlCompletionProposals(
+    $projectId : ID!
     $connectionId: ID!
     $contextId: ID!
     $position: Int!
@@ -7,6 +8,7 @@ query querySqlCompletionProposals(
     $maxResults: Int
 ) {
     proposals: sqlCompletionProposals(
+        projectId: $projectId
         connectionId: $connectionId
         contextId: $contextId
         query: $query
