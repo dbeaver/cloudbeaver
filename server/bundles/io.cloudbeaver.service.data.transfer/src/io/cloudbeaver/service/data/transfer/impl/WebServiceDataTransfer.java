@@ -218,10 +218,10 @@ public class WebServiceDataTransfer implements DBWServiceDataTransfer {
         return sqlProcessor.getWebSession().createAndRunAsyncTask("Data export", runnable);
     }
 
-    public WebAsyncTaskInfo asyncImportDataContainer(String processorId,
-                                                     Path path,
-                                                     WebSQLResultsInfo sqlContext,
-                                                     WebSession webSession) throws DBWebException {
+    public WebAsyncTaskInfo asyncImportDataContainer(@NotNull String processorId,
+                                                     @NotNull Path path,
+                                                     @NotNull WebSQLResultsInfo sqlContext,
+                                                     @NotNull WebSession webSession) throws DBWebException {
         webSession.addInfoMessage("Import data");
         DataTransferProcessorDescriptor processor = DataTransferRegistry.getInstance().getProcessor(processorId);
 
@@ -246,7 +246,7 @@ public class WebServiceDataTransfer implements DBWServiceDataTransfer {
                     try {
                         Files.deleteIfExists(path);
                     } catch (IOException e) {
-                        log.error("Failed to delete file: " + e.getMessage());
+                        log.error("Failed to delete file: " + e.getMessage(), e);
                     }
                     monitor.done();
                 }
