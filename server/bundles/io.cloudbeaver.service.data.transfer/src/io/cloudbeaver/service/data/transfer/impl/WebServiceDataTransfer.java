@@ -37,6 +37,7 @@ import org.jkiss.dbeaver.model.preferences.DBPPropertyDescriptor;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.runtime.VoidProgressMonitor;
 import org.jkiss.dbeaver.model.sql.DBQuotaException;
+import org.jkiss.dbeaver.model.sql.DBSQLException;
 import org.jkiss.dbeaver.model.struct.DBSDataContainer;
 import org.jkiss.dbeaver.model.struct.DBSDataManipulator;
 import org.jkiss.dbeaver.model.struct.DBSEntity;
@@ -56,6 +57,7 @@ import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.sql.BatchUpdateException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -365,7 +367,11 @@ public class WebServiceDataTransfer implements DBWServiceDataTransfer {
                     processorInstance,
                     properties);
 
-            producer.transferData(monitor, consumer, processorInstance, producerSettings, null);
+            try {
+                producer.transferData(monitor, consumer, processorInstance, producerSettings, null);
+            } catch (DBException e) {
+                throw new DBWebException("Import failed cause: " + e.getMessage());
+            }
         }
     }
 
