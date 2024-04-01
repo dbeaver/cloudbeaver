@@ -81,7 +81,7 @@ public class CBConstants {
     public static final String VAR_AUTO_CB_ADMIN_NAME = "CB_ADMIN_NAME";
     public static final String VAR_AUTO_CB_ADMIN_PASSWORD = "CB_ADMIN_PASSWORD";
 
-    public static final String CB_SESSION_COOKIE_NAME = "cb-session-id";
+    public static final String CB_SESSION_COOKIE_NAME = "cbsessionid";
 
     public static final String APPLICATION_JSON = "application/json";
 
