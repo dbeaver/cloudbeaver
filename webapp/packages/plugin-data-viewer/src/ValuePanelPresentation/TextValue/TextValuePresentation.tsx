@@ -118,7 +118,7 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
           </Container>
         </Container>
         <Loader suspense>
-          <Group maximum box>
+          <Group overflow maximum box>
             <TextValueEditor
               contentType={textValueInfo.contentType}
               lineWrapping={lineWrapping}
