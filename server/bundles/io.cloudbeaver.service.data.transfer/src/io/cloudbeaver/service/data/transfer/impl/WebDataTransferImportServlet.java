@@ -35,10 +35,8 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.eclipse.jetty.server.Request;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.data.json.JSONUtils;
-import org.jkiss.utils.GsonUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
