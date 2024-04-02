@@ -41,6 +41,7 @@
     "@cloudbeaver/plugin-connections": "~0.1.0",
     "@cloudbeaver/plugin-connections-administration": "~0.1.0",
     "@cloudbeaver/plugin-data-export": "~0.1.0",
+    "@cloudbeaver/plugin-data-import": "~0.1.0",
     "@cloudbeaver/plugin-data-spreadsheet-new": "~0.1.0",
     "@cloudbeaver/plugin-data-viewer": "~0.1.0",
     "@cloudbeaver/plugin-data-viewer-result-set-grouping": "~0.1.0",
