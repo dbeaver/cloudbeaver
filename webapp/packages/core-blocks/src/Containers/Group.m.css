@@ -18,7 +18,7 @@
   padding: 24px;
   border-radius: var(--theme-group-element-radius);
 
-  > .groupTitle {
+  &.gap > .groupTitle {
     padding: 24px 0;
     margin: -24px 0;
   }
@@ -26,7 +26,7 @@
   &.dense {
     padding: 8px;
 
-    > .groupTitle {
+    &.gap > .groupTitle {
       padding: 8px 0;
       margin: -8px 0;
     }
@@ -36,16 +36,13 @@
     margin-right: 25%;
   }
 
-  &.box {
-    padding: 0;
-    overflow: hidden;
-
-    > .groupTitle {
-      padding: 24px;
-      margin: 0;
-    }
+  &.box > .groupTitle {
+    padding: 24px;
+    margin: 0;
   }
 
+  &.box,
+  &.box.dense,
   &.boxNoOverflow {
     padding: 0;
     overflow: initial;
