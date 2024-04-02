@@ -16,7 +16,6 @@
  */
 package io.cloudbeaver.service.data.transfer.impl;
 
-import com.google.gson.Gson;
 import com.google.gson.stream.JsonWriter;
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.model.WebAsyncTaskInfo;
@@ -25,7 +24,6 @@ import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.server.CBApplication;
 import io.cloudbeaver.server.CBConstants;
 import io.cloudbeaver.server.CBPlatform;
-import io.cloudbeaver.server.graphql.GraphQLConstants;
 import io.cloudbeaver.service.WebServiceServletBase;
 import io.cloudbeaver.service.data.transfer.DBWServiceDataTransfer;
 import io.cloudbeaver.service.sql.WebSQLContextInfo;
