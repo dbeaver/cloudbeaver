@@ -219,7 +219,11 @@ export function useElementsTree(options: IOptions): IElementsTree {
 
                 if (node && expanded && elementsTree.isNodeExpandable(child) && !elementsTree.filtering) {
                   await elementsTree.expand(node, false);
+                } else {
+                  const nodeState = state.get(child);
+                  nodeState.expanded = false;
                 }
+
                 return;
               }
 
@@ -596,7 +600,7 @@ export function useElementsTree(options: IOptions): IElementsTree {
             }
           } else {
             await options.onExpand?.(node, state);
-            treeNodeState.expanded = elementsTree.isNodeExpanded(node.id, state);
+            treeNodeState.expanded = state && this.getNodeChildren(node.id).length > 0;
           }
 
           if (state) {
