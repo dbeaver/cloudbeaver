@@ -8,6 +8,7 @@
 import { GlobalConstants } from '@cloudbeaver/core-utils';
 
 import type { CustomGraphQLClient, UploadProgressEvent } from '../CustomGraphQLClient';
+import type { AsyncTaskInfo } from '../sdk';
 
 export interface IUploadResultDataExtension {
   uploadResultData: (
@@ -18,7 +19,7 @@ export interface IUploadResultDataExtension {
     processorId: string,
     file: File,
     onUploadProgress?: (event: UploadProgressEvent) => void,
-  ) => Promise<void>;
+  ) => Promise<AsyncTaskInfo>;
 }
 
 export function uploadResultDataExtension(client: CustomGraphQLClient): IUploadResultDataExtension {
@@ -31,7 +32,7 @@ export function uploadResultDataExtension(client: CustomGraphQLClient): IUploadR
       processorId: string,
       file: File,
       onUploadProgress?: (event: UploadProgressEvent) => void,
-    ): Promise<void> {
+    ): Promise<AsyncTaskInfo> {
       return client.uploadFile(
         GlobalConstants.absoluteServiceUrl('data', 'import'),
         file,

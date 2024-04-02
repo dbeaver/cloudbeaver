@@ -10,7 +10,7 @@ import { computed, makeObservable } from 'mobx';
 import { ProcessSnackbar } from '@cloudbeaver/core-blocks';
 import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { GraphQLService } from '@cloudbeaver/core-sdk';
+import { AsyncTaskInfoService, GraphQLService } from '@cloudbeaver/core-sdk';
 import { getProgressPercent } from '@cloudbeaver/core-utils';
 
 import { DataImportSettingsService } from './DataImportSettingsService';
@@ -25,6 +25,7 @@ export class DataImportService {
     private readonly dataImportSettingsService: DataImportSettingsService,
     private readonly notificationService: NotificationService,
     private readonly graphQLService: GraphQLService,
+    private readonly asyncTaskInfoService: AsyncTaskInfoService,
   ) {
     makeObservable(this, {
       disabled: computed,
@@ -39,7 +40,7 @@ export class DataImportService {
     );
 
     try {
-      await this.graphQLService.sdk.uploadResultData(connectionId, contextId, projectId, resultsId, processorId, file, event => {
+      const result = await this.graphQLService.sdk.uploadResultData(connectionId, contextId, projectId, resultsId, processorId, file, event => {
         if (event.total !== undefined) {
           const percentCompleted = getProgressPercent(event.loaded, event.total);
 
@@ -48,6 +49,14 @@ export class DataImportService {
           }
         }
       });
+
+      const task = this.asyncTaskInfoService.create(async () => {
+        const { taskInfo } = await this.graphQLService.sdk.getAsyncTaskInfo({ taskId: result.id, removeOnFinish: false });
+        return taskInfo;
+      });
+
+      controller.setMessage('plugin_data_import_process_file_processing_step_message');
+      await this.asyncTaskInfoService.run(task);
 
       controller.resolve('plugin_data_import_process_success');
       return true;
