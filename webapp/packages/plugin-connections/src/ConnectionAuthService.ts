@@ -56,12 +56,10 @@ export class ConnectionAuthService extends Dependency {
       return null;
     }
 
-    let connection = this.connectionInfoResource.get(key);
+    const connection = await this.connectionInfoResource.load(key, ['includeAuthNeeded', 'includeNetworkHandlersConfig', 'includeCredentialsSaved']);
     const isConnectedInitially = connection?.connected;
 
-    if (!connection?.connected) {
-      connection = await this.connectionInfoResource.refresh(key);
-    } else {
+    if (connection?.connected) {
       if (resetCredentials) {
         this.connectionInfoResource.close(key);
       } else {
@@ -76,8 +74,6 @@ export class ConnectionAuthService extends Dependency {
         return connection;
       }
     }
-
-    connection = await this.connectionInfoResource.load(key, ['includeAuthNeeded', 'includeNetworkHandlersConfig', 'includeCredentialsSaved']);
 
     const networkHandlers = connection
       .networkHandlersConfig!.filter(handler => handler.enabled && (!handler.savePassword || resetCredentials))

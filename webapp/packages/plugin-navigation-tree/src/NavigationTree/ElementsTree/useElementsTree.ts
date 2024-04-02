@@ -201,6 +201,7 @@ export function useElementsTree(options: IOptions): IElementsTree {
               await navNodeInfoResource.waitLoad();
 
               const expanded = elementsTree.isNodeExpanded(child, true);
+
               if (!expanded && child !== options.root) {
                 if (navNodeInfoResource.isOutdated(child)) {
                   const node = navNodeInfoResource.get(child);
@@ -216,12 +217,16 @@ export function useElementsTree(options: IOptions): IElementsTree {
 
               if (!loaded) {
                 const node = navNodeInfoResource.get(child);
+                const nodeState = elementsTree.getNodeState(child);
+                const parentExpanded = elementsTree.getNodeState(nodeId).expanded;
 
-                if (node && expanded && elementsTree.isNodeExpandable(child) && !elementsTree.filtering) {
-                  await elementsTree.expand(node, false);
-                } else {
-                  const nodeState = state.get(child);
+                if (expanded && !parentExpanded) {
                   nodeState.expanded = false;
+                  return;
+                }
+
+                if (node && expanded && elementsTree.isNodeExpandable(child)) {
+                  await elementsTree.expand(node, false);
                 }
 
                 return;
