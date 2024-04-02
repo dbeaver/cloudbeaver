@@ -16,10 +16,13 @@
  */
 package io.cloudbeaver.service.data.transfer.impl;
 
+import com.google.gson.stream.JsonWriter;
 import io.cloudbeaver.DBWebException;
+import io.cloudbeaver.model.WebAsyncTaskInfo;
 import io.cloudbeaver.model.WebConnectionInfo;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.server.CBApplication;
+import io.cloudbeaver.server.CBConstants;
 import io.cloudbeaver.server.CBPlatform;
 import io.cloudbeaver.service.WebServiceServletBase;
 import io.cloudbeaver.service.data.transfer.DBWServiceDataTransfer;
@@ -40,6 +43,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.UUID;
 
@@ -104,7 +108,21 @@ public class WebDataTransferImportServlet extends WebServiceServletBase {
                 throw new DBWebException(e.getMessage());
             }
 
-            dbwServiceDataTransfer.asyncImportDataContainer(processorId, filePath, webSQLResultsInfo, session);
+            WebAsyncTaskInfo asyncImportDataContainer =
+                    dbwServiceDataTransfer.asyncImportDataContainer(processorId, filePath, webSQLResultsInfo, session);
+            response.setContentType(CBConstants.APPLICATION_JSON);
+            Map<String, Object> body = new LinkedHashMap<>();
+            Map<String, Object> parameters = new LinkedHashMap<>();
+            parameters.put("id", asyncImportDataContainer.getId());
+            parameters.put("name", asyncImportDataContainer.getName());
+            parameters.put("running", asyncImportDataContainer.isRunning());
+            parameters.put("status", asyncImportDataContainer.getStatus());
+            parameters.put("error", asyncImportDataContainer.getError());
+            parameters.put("taskResult", asyncImportDataContainer.getTaskResult());
+            body.put("taskInfo", parameters);
+            try (JsonWriter writer = new JsonWriter(response.getWriter())) {
+                JSONUtils.serializeMap(writer, body);
+            }
         }
     }
 }
