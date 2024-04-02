@@ -57,7 +57,7 @@ export const SqlResultTabs = observer<Props>(function SqlDataResult({ state, onT
     onTabSelect?.(tab.tabId);
   }
 
-  async function handleClose(tab: ITabData) {
+  function handleClose(tab: ITabData) {
     const canClose = handleCanClose(tab);
 
     if (canClose) {
