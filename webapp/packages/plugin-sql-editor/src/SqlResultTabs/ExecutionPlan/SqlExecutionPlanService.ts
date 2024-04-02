@@ -56,6 +56,7 @@ export class SqlExecutionPlanService {
 
     const asyncTask = this.asyncTaskInfoService.create(async () => {
       const { taskInfo } = await this.graphQLService.sdk.asyncSqlExplainExecutionPlan({
+        projectId: contextInfo.projectId,
         connectionId: contextInfo.connectionId,
         contextId: contextInfo.id,
         query,

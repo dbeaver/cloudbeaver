@@ -1,9 +1,11 @@
 query formatSqlQuery(
+    $projectId: ID!
     $connectionId: ID!
     $contextId: ID!
     $query: String!
 ) {
     query: sqlFormatQuery(
+        projectId: $projectId
         connectionId: $connectionId
         contextId: $contextId
         query: $query
