@@ -178,6 +178,7 @@ export function useElementsTree(options: IOptions): IElementsTree {
         await projectInfoResource.load();
         await connectionInfoResource.load(ConnectionInfoActiveProjectKey);
         const preloadedRoot = await elementsTree.loadPath(options.folderExplorer.state.fullPath);
+        const parentState = elementsTree.getNodeState(nodeId);
 
         if (preloadedRoot !== options.folderExplorer.state.folder) {
           if (preloadedRoot === undefined) {
@@ -218,9 +219,8 @@ export function useElementsTree(options: IOptions): IElementsTree {
               if (!loaded) {
                 const node = navNodeInfoResource.get(child);
                 const nodeState = elementsTree.getNodeState(child);
-                const parentExpanded = elementsTree.getNodeState(nodeId).expanded;
 
-                if (expanded && !parentExpanded) {
+                if (expanded && !parentState.expanded) {
                   nodeState.expanded = false;
                   return;
                 }
