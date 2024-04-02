@@ -10,6 +10,7 @@ import { computed, makeObservable } from 'mobx';
 import { ProcessSnackbar } from '@cloudbeaver/core-blocks';
 import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
+import { EAdminPermission, type SessionPermissionsResource } from '@cloudbeaver/core-root';
 import { AsyncTaskInfoService, GraphQLService } from '@cloudbeaver/core-sdk';
 import { getProgressPercent } from '@cloudbeaver/core-utils';
 
@@ -18,6 +19,10 @@ import { DataImportSettingsService } from './DataImportSettingsService';
 @injectable()
 export class DataImportService {
   get disabled() {
+    if (this.sessionPermissionsResource.has(EAdminPermission.admin)) {
+      return false;
+    }
+
     return this.dataImportSettingsService.disabled;
   }
 
@@ -26,6 +31,7 @@ export class DataImportService {
     private readonly notificationService: NotificationService,
     private readonly graphQLService: GraphQLService,
     private readonly asyncTaskInfoService: AsyncTaskInfoService,
+    private readonly sessionPermissionsResource: SessionPermissionsResource,
   ) {
     makeObservable(this, {
       disabled: computed,
