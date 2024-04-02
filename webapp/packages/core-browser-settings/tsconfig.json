@@ -27,22 +27,13 @@
       "path": "../core-localization/tsconfig.json"
     },
     {
-      "path": "../core-plugin/tsconfig.json"
-    },
-    {
-      "path": "../core-plugin/tsconfig.json"
-    },
-    {
-      "path": "../core-product/tsconfig.json"
-    },
-    {
-      "path": "../core-root/tsconfig.json"
-    },
-    {
       "path": "../core-root/tsconfig.json"
     },
     {
       "path": "../core-sdk/tsconfig.json"
+    },
+    {
+      "path": "../core-settings/tsconfig.json"
     },
     {
       "path": "../core-settings/tsconfig.json"

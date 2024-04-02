@@ -7,7 +7,6 @@
  */
 import { observer } from 'mobx-react-lite';
 import { forwardRef, useCallback } from 'react';
-import type { MenuInitialState } from 'reakit';
 
 import { getComputed, MenuSeparator, MenuSeparatorStyles, s, SContext, StyleRegistry, useAutoLoad, useS } from '@cloudbeaver/core-blocks';
 import {
@@ -24,18 +23,9 @@ import {
 } from '@cloudbeaver/core-view';
 
 import { ContextMenu } from '../ContextMenu';
+import type { IMenuBarNestedMenuSettings, IMenuBarProps } from './IMenuBarProps';
 import style from './MenuBar.m.css';
 import { MenuBarItem } from './MenuBarItem';
-
-interface INestedMenuSettings extends MenuInitialState {
-  onVisibleSwitch?: (visible: boolean) => void;
-}
-
-interface IMenuBarProps extends React.HTMLAttributes<HTMLDivElement> {
-  menu: IMenuData;
-  nestedMenuSettings?: INestedMenuSettings;
-  rtl?: boolean;
-}
 
 const registry: StyleRegistry = [
   [
@@ -72,7 +62,7 @@ export const MenuBar = observer<IMenuBarProps, HTMLDivElement>(
 interface IMenuBarElementProps {
   item: IMenuItem;
   menuData: IMenuData;
-  nestedMenuSettings?: INestedMenuSettings;
+  nestedMenuSettings?: IMenuBarNestedMenuSettings;
   className?: string;
   rtl?: boolean;
 }
@@ -155,7 +145,7 @@ const MenuBarAction = observer<IMenuBarActionProps>(function MenuBarAction({ ite
 interface ISubMenuItemProps {
   item: MenuSubMenuItem;
   menuData: IMenuData;
-  nestedMenuSettings?: INestedMenuSettings;
+  nestedMenuSettings?: IMenuBarNestedMenuSettings;
   className?: string;
   rtl?: boolean;
 }

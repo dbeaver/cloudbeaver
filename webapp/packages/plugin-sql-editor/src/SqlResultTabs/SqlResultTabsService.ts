@@ -28,6 +28,10 @@ export class SqlResultTabsService {
     });
   }
 
+  getResultTabs(state: ISqlEditorTabState) {
+    return state.resultTabs;
+  }
+
   async canCloseResultTab(state: ISqlEditorTabState, tabId: string): Promise<boolean> {
     const tab = state.tabs.find(tab => tab.id === tabId);
 

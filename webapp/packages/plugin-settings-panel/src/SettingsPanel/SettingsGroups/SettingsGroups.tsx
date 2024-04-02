@@ -9,21 +9,17 @@ import { observer } from 'mobx-react-lite';
 
 import { ITreeData, Tree } from '@cloudbeaver/plugin-navigation-tree';
 
-import { getSettingGroupId } from '../getSettingGroupId';
 import { groupNodeRenderer } from './groupNodeRenderer';
 
 interface Props {
   treeData: ITreeData;
+  onClick?: (groupId: string) => void;
 }
 
-export const SettingsGroups = observer<Props>(function SettingsGroups({ treeData }) {
+export const SettingsGroups = observer<Props>(function SettingsGroups({ treeData, onClick }) {
   function getNodeHeight(id: string) {
     return 24;
   }
 
-  function handleClick(id: string) {
-    document.querySelector('#' + getSettingGroupId(id))?.scrollIntoView();
-  }
-
-  return <Tree data={treeData} getNodeHeight={getNodeHeight} nodeRenderers={[groupNodeRenderer]} onNodeClick={handleClick} />;
+  return <Tree data={treeData} getNodeHeight={getNodeHeight} nodeRenderers={[groupNodeRenderer]} onNodeClick={onClick} />;
 });

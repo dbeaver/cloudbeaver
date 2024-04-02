@@ -14,7 +14,10 @@ import { THEME_MENU } from './THEME_MENU';
 
 @injectable()
 export class PluginBootstrap extends Bootstrap {
-  constructor(private readonly menuService: MenuService, private readonly themeService: ThemeService) {
+  constructor(
+    private readonly menuService: MenuService,
+    private readonly themeService: ThemeService,
+  ) {
     super();
   }
 
@@ -43,7 +46,7 @@ export class PluginBootstrap extends Bootstrap {
                 onSelect: () => this.themeService.changeTheme(theme.id),
               },
               {
-                isDisabled: () => this.themeService.currentThemeId === theme.id,
+                isDisabled: () => this.themeService.themeId === theme.id,
               },
             ),
         );

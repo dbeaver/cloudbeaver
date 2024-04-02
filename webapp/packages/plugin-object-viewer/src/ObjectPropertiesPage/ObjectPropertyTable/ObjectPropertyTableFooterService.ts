@@ -28,7 +28,7 @@ export class ObjectPropertyTableFooterService {
       menus: [MENU_OBJECT_VIEWER_FOOTER],
       isApplicable: context => {
         const selected = context.tryGet(DATA_CONTEXT_NAV_NODES);
-        return selected !== undefined && this.navTreeSettingsService.settings.getValue('deleting');
+        return selected !== undefined && this.navTreeSettingsService.deleting;
       },
       getItems: (_, items) => [...items, ACTION_DELETE],
     });

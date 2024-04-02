@@ -7,16 +7,13 @@
       "name": "Chrome",
       "url": "http://localhost:8080",
       "webRoot": "${workspaceFolder}/..",
+      "outFiles": [
+        "${workspaceFolder}/../cloudbeaver/packages/**/dist/**/*.{js,jsx}"
+      ],
+      "smartStep": true,
       "sourceMaps": true,
-      "sourceMapPathOverrides": {
-        "webpack:///*": "${workspaceFolder}/../*"
-      },
-      "skipFiles": [
-        "<node_internals>/**",
-        "**/node_modules/**",
-        "${workspaceFolder}/webapp/**/node_modules/**/*.js",
-        "${workspaceFolder}/webapp/**/dist/**/*.js"
-      ]
+      "disableNetworkCache": true,
+      "skipFiles": ["<node_internals>/**", "**/node_modules/**"]
     },
     {
       "type": "java",

@@ -1,4 +1,5 @@
 export default [
+  ['plugin_user_profile_account_title', 'Account'],
   ['plugin_user_profile_menu', '简介'],
   ['plugin_user_profile_info', '信息'],
   ['plugin_user_profile_info_id', '用户ID'],

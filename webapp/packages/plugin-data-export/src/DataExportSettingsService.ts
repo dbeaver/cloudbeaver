@@ -6,31 +6,40 @@
  * you may not use this file except in compliance with the License.
  */
 import { Dependency, injectable } from '@cloudbeaver/core-di';
-import { createSettingsAliasResolver, PluginManagerService, PluginSettings, SettingsManagerService } from '@cloudbeaver/core-plugin';
-import { ServerSettingsResolverService, ServerSettingsService } from '@cloudbeaver/core-root';
-import { schema } from '@cloudbeaver/core-utils';
+import {
+  createSettingsAliasResolver,
+  ROOT_SETTINGS_LAYER,
+  SettingsManagerService,
+  SettingsProvider,
+  SettingsProviderService,
+  SettingsResolverService,
+} from '@cloudbeaver/core-settings';
+import { schema, schemaExtra } from '@cloudbeaver/core-utils';
 
 const defaultSettings = schema.object({
-  disabled: schema.coerce.boolean().default(false),
+  'plugin.data-export.disabled': schemaExtra.stringedBoolean().default(false),
 });
 
 export type DataExportSettings = schema.infer<typeof defaultSettings>;
 
 @injectable()
 export class DataExportSettingsService extends Dependency {
-  readonly settings: PluginSettings<typeof defaultSettings>;
+  get disabled(): boolean {
+    return this.settings.getValue('plugin.data-export.disabled');
+  }
+  readonly settings: SettingsProvider<typeof defaultSettings>;
 
   constructor(
-    private readonly pluginManagerService: PluginManagerService,
+    private readonly settingsProviderService: SettingsProviderService,
     private readonly settingsManagerService: SettingsManagerService,
-    private readonly serverSettingsService: ServerSettingsService,
-    private readonly serverSettingsResolverService: ServerSettingsResolverService,
+    private readonly settingsResolverService: SettingsResolverService,
   ) {
     super();
-    this.settings = this.pluginManagerService.createSettings('data-export', 'plugin', defaultSettings);
-    this.serverSettingsResolverService.addResolver(
+    this.settings = this.settingsProviderService.createSettings(defaultSettings);
+    this.settingsResolverService.addResolver(
+      ROOT_SETTINGS_LAYER,
       /** @deprecated Use settings instead, will be removed in 23.0.0 */
-      createSettingsAliasResolver(this.serverSettingsService, this.settings, 'plugin_data_export'),
+      createSettingsAliasResolver(this.settingsResolverService, this.settings, { 'plugin.data-export.disabled': 'plugin_data_export.disabled' }),
     );
 
     this.registerSettings();

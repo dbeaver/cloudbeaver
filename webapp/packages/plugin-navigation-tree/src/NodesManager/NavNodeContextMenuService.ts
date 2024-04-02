@@ -187,17 +187,13 @@ export class NavNodeContextMenuService extends Bootstrap {
     this.menuService.addCreator({
       isApplicable: context => context.has(DATA_CONTEXT_NAV_NODE) && !context.has(DATA_CONTEXT_MENU_NESTED),
       getItems: (context, items) => {
-        const editingGlobalPermission = this.navTreeSettingsService.settings.getValue('editing');
-
-        const deleteGlobalPermission = this.navTreeSettingsService.settings.getValue('deleting');
-
         items = [ACTION_OPEN, ACTION_REFRESH, ...items];
 
-        if (editingGlobalPermission) {
+        if (this.navTreeSettingsService.editing) {
           items.push(ACTION_RENAME);
         }
 
-        if (deleteGlobalPermission) {
+        if (this.navTreeSettingsService.deleting) {
           items.push(ACTION_DELETE);
         }
 

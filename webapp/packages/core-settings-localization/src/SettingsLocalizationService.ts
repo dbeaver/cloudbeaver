@@ -5,53 +5,57 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { computed, makeObservable, reaction } from 'mobx';
+import { computed, makeObservable } from 'mobx';
 
 import { Dependency, injectable } from '@cloudbeaver/core-di';
-import { DEFAULT_LOCALE, LocalizationService } from '@cloudbeaver/core-localization';
-import { createSettingsAliasResolver, PluginManagerService, PluginSettings } from '@cloudbeaver/core-plugin';
-import { ServerSettingsResolverService, ServerSettingsService } from '@cloudbeaver/core-root';
+import { DEFAULT_LOCALE } from '@cloudbeaver/core-localization';
+import {
+  createSettingsAliasResolver,
+  ROOT_SETTINGS_LAYER,
+  SettingsProvider,
+  SettingsProviderService,
+  SettingsResolverService,
+} from '@cloudbeaver/core-settings';
 import { schema } from '@cloudbeaver/core-utils';
 
 const settingsSchema = schema.object({
-  defaultLanguage: schema.string().default(DEFAULT_LOCALE.isoCode),
+  'core.localization.language': schema.string().default(DEFAULT_LOCALE.isoCode),
 });
 
 export type ILocalizationSettings = schema.infer<typeof settingsSchema>;
 
 @injectable()
 export class SettingsLocalizationService extends Dependency {
-  get defaultLanguage(): string {
-    return this.pluginSettings.getValue('defaultLanguage');
+  get language(): string {
+    return this.settingsProvider.getValue('core.localization.language');
   }
-  readonly pluginSettings: PluginSettings<typeof settingsSchema>;
+  readonly settingsProvider: SettingsProvider<typeof settingsSchema>;
 
   constructor(
-    private readonly pluginManagerService: PluginManagerService,
-    private readonly localizationService: LocalizationService,
-    private readonly serverSettingsService: ServerSettingsService,
-    private readonly serverSettingsResolverService: ServerSettingsResolverService,
+    private readonly settingsProviderService: SettingsProviderService,
+    private readonly settingsResolverService: SettingsResolverService,
   ) {
     super();
 
-    this.pluginSettings = this.pluginManagerService.createSettings('localization', 'core', settingsSchema);
+    this.settingsProvider = this.settingsProviderService.createSettings(settingsSchema);
 
-    this.serverSettingsResolverService.addResolver(
+    this.settingsResolverService.addResolver(
+      ROOT_SETTINGS_LAYER,
       /** @deprecated Use settings instead, will be removed in 23.0.0 */
-      createSettingsAliasResolver(this.serverSettingsService, this.pluginSettings, 'core.user'),
-    );
-    reaction(
-      () => this.defaultLanguage,
-      defaultLanguage => {
-        this.localizationService.setDefaultLanguage(defaultLanguage);
-      },
-      {
-        fireImmediately: true,
-      },
+      createSettingsAliasResolver(this.settingsResolverService, this.settingsProvider, { 'core.localization.language': 'core.user.defaultLanguage' }),
+      createSettingsAliasResolver(this.settingsResolverService, this.settingsProvider, {
+        'core.localization.language': 'core.localization.defaultLanguage',
+      }),
+      createSettingsAliasResolver(this.settingsResolverService, this.settingsProvider, { 'core.localization.language': 'app.defaultLanguage' }),
     );
 
     makeObservable(this, {
-      defaultLanguage: computed,
+      language: computed,
     });
+  }
+
+  async changeLanguage(language: string) {
+    this.settingsProvider.setValue('core.localization.language', language);
+    await this.settingsProvider.save();
   }
 }

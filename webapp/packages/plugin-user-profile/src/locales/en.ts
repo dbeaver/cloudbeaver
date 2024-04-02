@@ -1,4 +1,5 @@
 export default [
+  ['plugin_user_profile_account_title', 'Account'],
   ['plugin_user_profile_menu', 'Profile'],
   ['plugin_user_profile_info', 'Info'],
   ['plugin_user_profile_info_id', 'UserId'],
