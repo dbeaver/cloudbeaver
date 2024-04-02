@@ -44,7 +44,7 @@ export const DataImportDialog: DialogComponent<IDataImportDialogPayload, IDataIm
   const dialog = useDataImportDialog(payload.initialState);
 
   let title = translate('plugin_data_import_title');
-  let icon = '/icons/data-import.png';
+  let icon = '/icons/data-import.svg';
 
   if (dialog.state.step === EDataImportDialogStep.File && dialog.state.selectedProcessor) {
     title += ` (${dialog.state.selectedProcessor.name ?? dialog.state.selectedProcessor.id})`;
@@ -71,7 +71,7 @@ export const DataImportDialog: DialogComponent<IDataImportDialogPayload, IDataIm
             </Button>
             <Button
               type="button"
-              mod={['raised']}
+              mod={['unelevated']}
               disabled={!dialog.state.file || !dialog.state.selectedProcessor}
               onClick={() => resolveDialog({ file: dialog.state.file!, processorId: dialog.state.selectedProcessor!.id })}
             >
