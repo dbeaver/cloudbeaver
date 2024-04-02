@@ -217,7 +217,7 @@ export function useElementsTree(options: IOptions): IElementsTree {
               if (!loaded) {
                 const node = navNodeInfoResource.get(child);
 
-                if (node && expanded && elementsTree.isNodeExpandable(child)) {
+                if (node && expanded && elementsTree.isNodeExpandable(child) && !elementsTree.filtering) {
                   await elementsTree.expand(node, false);
                 }
                 return;
@@ -596,7 +596,7 @@ export function useElementsTree(options: IOptions): IElementsTree {
             }
           } else {
             await options.onExpand?.(node, state);
-            treeNodeState.expanded = state && this.getNodeChildren(node.id).length > 0;
+            treeNodeState.expanded = elementsTree.isNodeExpanded(node.id, state);
           }
 
           if (state) {
