@@ -16,6 +16,7 @@
  */
 package io.cloudbeaver.service.data.transfer.impl;
 
+import com.google.gson.Gson;
 import com.google.gson.stream.JsonWriter;
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.model.WebAsyncTaskInfo;
@@ -24,6 +25,7 @@ import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.server.CBApplication;
 import io.cloudbeaver.server.CBConstants;
 import io.cloudbeaver.server.CBPlatform;
+import io.cloudbeaver.server.graphql.GraphQLConstants;
 import io.cloudbeaver.service.WebServiceServletBase;
 import io.cloudbeaver.service.data.transfer.DBWServiceDataTransfer;
 import io.cloudbeaver.service.sql.WebSQLContextInfo;
@@ -38,14 +40,13 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.eclipse.jetty.server.Request;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.data.json.JSONUtils;
+import org.jkiss.utils.GsonUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 @MultipartConfig
 public class WebDataTransferImportServlet extends WebServiceServletBase {
@@ -111,7 +112,6 @@ public class WebDataTransferImportServlet extends WebServiceServletBase {
             WebAsyncTaskInfo asyncImportDataContainer =
                     dbwServiceDataTransfer.asyncImportDataContainer(processorId, filePath, webSQLResultsInfo, session);
             response.setContentType(CBConstants.APPLICATION_JSON);
-            Map<String, Object> body = new LinkedHashMap<>();
             Map<String, Object> parameters = new LinkedHashMap<>();
             parameters.put("id", asyncImportDataContainer.getId());
             parameters.put("name", asyncImportDataContainer.getName());
@@ -119,9 +119,8 @@ public class WebDataTransferImportServlet extends WebServiceServletBase {
             parameters.put("status", asyncImportDataContainer.getStatus());
             parameters.put("error", asyncImportDataContainer.getError());
             parameters.put("taskResult", asyncImportDataContainer.getTaskResult());
-            body.put("taskInfo", parameters);
             try (JsonWriter writer = new JsonWriter(response.getWriter())) {
-                JSONUtils.serializeMap(writer, body);
+                JSONUtils.serializeMap(writer, parameters);
             }
         }
     }
