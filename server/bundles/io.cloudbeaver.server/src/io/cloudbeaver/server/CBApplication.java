@@ -26,7 +26,6 @@ import io.cloudbeaver.registry.WebServiceRegistry;
 import io.cloudbeaver.server.jetty.CBJettyServer;
 import io.cloudbeaver.service.DBWServiceInitializer;
 import io.cloudbeaver.service.DBWServiceServerConfigurator;
-import io.cloudbeaver.service.security.CBEmbeddedSecurityController;
 import io.cloudbeaver.service.security.SMControllerConfiguration;
 import io.cloudbeaver.service.session.WebSessionManager;
 import io.cloudbeaver.utils.WebDataSourceUtils;
@@ -199,9 +198,6 @@ public abstract class CBApplication<T extends CBServerConfig> extends BaseWebApp
         try {
             if (!loadServerConfiguration()) {
                 return;
-            }
-            if (CommonUtils.isEmpty(this.getAppConfiguration().getDefaultUserTeam())) {
-                throw new DBException("Default user team must be specified");
             }
         } catch (DBException e) {
             log.error(e);
