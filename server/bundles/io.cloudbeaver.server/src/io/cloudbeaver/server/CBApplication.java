@@ -199,6 +199,9 @@ public abstract class CBApplication<T extends CBServerConfig> extends BaseWebApp
             if (!loadServerConfiguration()) {
                 return;
             }
+            if (CommonUtils.isEmpty(this.getAppConfiguration().getDefaultUserTeam())) {
+                throw new DBException("Default user team must be specified");
+            }
         } catch (DBException e) {
             log.error(e);
             return;
