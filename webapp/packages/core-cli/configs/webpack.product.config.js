@@ -18,6 +18,9 @@ const package = require(resolve('package.json'));
 const { getServiceWorkerSource } = require('./webpack.product.utils.js');
 
 const timestampVersion = withTimestamp(package.version);
+const { getProductScriptRegExps } = require('../utils/productScripts');
+
+const CE_PACKAGES_REG_EXPS = getProductScriptRegExps('..');
 
 module.exports = (env, argv) => {
   const devMode = argv.mode !== 'production';
@@ -57,22 +60,34 @@ module.exports = (env, argv) => {
     },
     devtool: false,
     output: {
-      filename: 'index.[contenthash].js',
-      chunkFilename: '[name].[contenthash].bundle.js',
+      filename: 'index.[contenthash].public.js',
+      chunkFilename: '[name].[contenthash].bundle.public.js',
       library: package.name,
       libraryTarget: 'umd',
       path: outputDir,
       pathinfo: false,
     },
     optimization: {
+      splitChunks: {
+        cacheGroups: {
+          locale: {
+            filename: '[name].[contenthash].locale.public.js',
+          },
+        },
+      },
       minimize: true,
-
       minimizer: [new TerserPlugin({
         extractComments: /Copyright \(C\)/i,
         terserOptions: {
           keep_classnames: true,
           keep_fnames: true,
         },
+        include: [
+          ...CE_PACKAGES_REG_EXPS,
+          /.*.public.js$/,
+          /.*.css$/,
+          /^service-worker.js$/,
+        ],
       })],
     },
     plugins: [
