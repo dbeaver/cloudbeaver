@@ -79,6 +79,8 @@ module.exports = (env, argv) => {
       minimizer: [new TerserPlugin({
         extractComments: /Copyright \(C\)/i,
         terserOptions: {
+          keep_classnames: true,
+          keep_fnames: true,
           mangle: {
             toplevel: true,
             properties: {
