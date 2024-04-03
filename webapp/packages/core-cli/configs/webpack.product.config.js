@@ -57,8 +57,8 @@ module.exports = (env, argv) => {
     },
     devtool: false,
     output: {
-      filename: 'index.[contenthash].public.js',
-      chunkFilename: '[name].[contenthash].bundle.public.js',
+      filename: 'index.[contenthash].public-ce.js',
+      chunkFilename: '[name].[contenthash].bundle.public-ce.js',
       library: package.name,
       libraryTarget: 'umd',
       path: outputDir,
@@ -68,10 +68,10 @@ module.exports = (env, argv) => {
       splitChunks: {
         cacheGroups: {
           packages: {
-            filename: '[name].[contenthash].public.js',
+            filename: '[name].[contenthash].public-ce.js',
           },
           locale: {
-            filename: '[name].[contenthash].locale.public.js',
+            filename: '[name].[contenthash].locale.public-ce.js',
           },
         },
       },
@@ -79,13 +79,16 @@ module.exports = (env, argv) => {
       minimizer: [new TerserPlugin({
         extractComments: /Copyright \(C\)/i,
         terserOptions: {
-          keep_classnames: true,
-          keep_fnames: true,
+          mangle: {
+            toplevel: true,
+            properties: {
+              regex: /.*.public-ce..*$/,
+            },
+          },
         },
         include: [
-          /.*.public.js$/,
+          /.*.public-ce..*$/,
           /.*.css$/,
-          /^service-worker.js$/,
         ],
       })],
     },

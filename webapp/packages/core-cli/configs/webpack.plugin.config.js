@@ -16,8 +16,8 @@ module.exports = (env, argv) => merge(commonConfig(env, argv), {
     index,
   },
   output: {
-    filename: '[name].public.js',
-    chunkFilename: '[name].[contenthash].bundle.public.js',
+    filename: '[name].public-ce.js',
+    chunkFilename: '[name].[contenthash].bundle.public-ce.js',
     library: package.name,
     libraryTarget: 'commonjs',
     path: outputDir,
