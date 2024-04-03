@@ -88,7 +88,7 @@ module.exports = (env, argv) => {
             },
           },
         },
-        include: [/.*.public-ce..*$/],
+        include: [/.*.public-ce..*$/, /^service-worker.js$/],
       })],
     },
     plugins: [
