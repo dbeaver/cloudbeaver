@@ -18,9 +18,6 @@ const package = require(resolve('package.json'));
 const { getServiceWorkerSource } = require('./webpack.product.utils.js');
 
 const timestampVersion = withTimestamp(package.version);
-const { getProductScriptRegExps } = require('../utils/productScripts');
-
-const CE_PACKAGES_REG_EXPS = getProductScriptRegExps('..');
 
 module.exports = (env, argv) => {
   const devMode = argv.mode !== 'production';
@@ -70,6 +67,9 @@ module.exports = (env, argv) => {
     optimization: {
       splitChunks: {
         cacheGroups: {
+          packages: {
+            filename: '[name].[contenthash].public.js',
+          },
           locale: {
             filename: '[name].[contenthash].locale.public.js',
           },
@@ -83,7 +83,6 @@ module.exports = (env, argv) => {
           keep_fnames: true,
         },
         include: [
-          ...CE_PACKAGES_REG_EXPS,
           /.*.public.js$/,
           /.*.css$/,
           /^service-worker.js$/,
