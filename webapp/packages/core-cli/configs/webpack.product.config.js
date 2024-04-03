@@ -88,10 +88,7 @@ module.exports = (env, argv) => {
             },
           },
         },
-        include: [
-          /.*.public-ce..*$/,
-          /.*.css$/,
-        ],
+        include: [/.*.public-ce..*$/],
       })],
     },
     plugins: [
