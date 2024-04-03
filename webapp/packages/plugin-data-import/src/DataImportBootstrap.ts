@@ -14,6 +14,7 @@ import {
   DATA_VIEWER_DATA_MODEL_ACTIONS_MENU,
   DatabaseEditAction,
 } from '@cloudbeaver/plugin-data-viewer';
+import { QueryDataSource } from '@cloudbeaver/plugin-sql-editor';
 
 import { DataImportDialogLazy } from './DataImportDialog/DataImportDialogLazy';
 import { DataImportService } from './DataImportService';
@@ -42,7 +43,8 @@ export class DataImportBootstrap extends Bootstrap {
         }
 
         if (action === ACTION_IMPORT) {
-          if (model.isReadonly(resultIndex)) {
+          const isQuery = model.source instanceof QueryDataSource;
+          if (model.isReadonly(resultIndex) || isQuery) {
             return false;
           }
 
