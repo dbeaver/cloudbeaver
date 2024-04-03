@@ -422,7 +422,12 @@ public abstract class CBServerConfigurationController<T extends CBServerConfig>
                 appConfigProperties,
                 CBConstants.PARAM_CONN_GRANT_ANON_ACCESS,
                 appConfig.isGrantConnectionsAccessToAnonymousTeam());
-
+            copyConfigValue(
+                oldAppConfig,
+                appConfigProperties,
+                "systemVariablesResolvingEnabled",
+                appConfig.isSystemVariablesResolvingEnabled()
+            );
             Map<String, Object> resourceQuotas = new LinkedHashMap<>();
             Map<String, Object> originResourceQuotas = JSONUtils.getObject(oldAppConfig,
                 CBConstants.PARAM_RESOURCE_QUOTAS);

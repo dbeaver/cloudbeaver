@@ -204,6 +204,7 @@ export class QueryDataSource<TOptions extends IDataQueryOptions = IDataQueryOpti
 
     const task = this.asyncTaskInfoService.create(async () => {
       const { taskInfo } = await this.graphQLService.sdk.asyncSqlExecuteQuery({
+        projectId: executionContextInfo.projectId,
         connectionId: executionContextInfo.connectionId,
         contextId: executionContextInfo.id,
         query: options.query,
@@ -262,6 +263,7 @@ export class QueryDataSource<TOptions extends IDataQueryOptions = IDataQueryOpti
       }
       try {
         await this.graphQLService.sdk.closeResult({
+          projectId: result.projectId,
           connectionId: result.connectionId,
           contextId: result.contextId,
           resultId: result.id,
@@ -276,6 +278,7 @@ export class QueryDataSource<TOptions extends IDataQueryOptions = IDataQueryOpti
     return results.map<IDatabaseResultSet>((result, index) => ({
       id: result.resultSet?.id || null,
       uniqueResultId: `${executionContextInfo.connectionId}_${executionContextInfo.id}_${index}`,
+      projectId: executionContextInfo.projectId,
       connectionId: executionContextInfo.connectionId,
       contextId: executionContextInfo.id,
       dataFormat: result.dataFormat!,

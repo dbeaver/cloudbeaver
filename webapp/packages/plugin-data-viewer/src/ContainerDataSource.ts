@@ -98,6 +98,7 @@ export class ContainerDataSource extends ResultSetDataSource<IDataContainerOptio
 
     const task = this.asyncTaskInfoService.create(async () => {
       const { taskInfo } = await this.graphQLService.sdk.asyncReadDataFromContainer({
+        projectId: context.projectId,
         connectionId: context.connectionId,
         contextId: context.id,
         containerNodePath: options.containerNodePath,
@@ -237,6 +238,7 @@ export class ContainerDataSource extends ResultSetDataSource<IDataContainerOptio
       }
       try {
         await this.graphQLService.sdk.closeResult({
+          projectId: result.projectId,
           connectionId: result.connectionId,
           contextId: result.contextId,
           resultId: result.id,
@@ -251,6 +253,7 @@ export class ContainerDataSource extends ResultSetDataSource<IDataContainerOptio
     return results.map<IDatabaseResultSet>((result, index) => ({
       id: result.resultSet?.id || '0',
       uniqueResultId: `${executionContextInfo.connectionId}_${executionContextInfo.id}_${index}`,
+      projectId: executionContextInfo.projectId,
       connectionId: executionContextInfo.connectionId,
       contextId: executionContextInfo.id,
       dataFormat: result.dataFormat!,

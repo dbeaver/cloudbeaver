@@ -200,6 +200,9 @@ public abstract class CBApplication<T extends CBServerConfig> extends BaseWebApp
             if (!loadServerConfiguration()) {
                 return;
             }
+            if (CommonUtils.isEmpty(this.getAppConfiguration().getDefaultUserTeam())) {
+                throw new DBException("Default user team must be specified");
+            }
         } catch (DBException e) {
             log.error(e);
             return;
@@ -317,11 +320,6 @@ public abstract class CBApplication<T extends CBServerConfig> extends BaseWebApp
             });
             System.setSecurityManager(new SecurityManager());
         }
-        try {
-            addAllUsersToDefaultTeam();
-        } catch (DBException e) {
-            log.error("Failed insert default teams");
-        }
 
         eventController.scheduleCheckJob();
 
@@ -330,12 +328,6 @@ public abstract class CBApplication<T extends CBServerConfig> extends BaseWebApp
         log.debug("Shutdown");
 
         return;
-    }
-
-    private void addAllUsersToDefaultTeam() throws DBException {
-        if (securityController instanceof CBEmbeddedSecurityController<?> controller) {
-            controller.addAllUsersToDefaultTeam();
-        }
     }
 
     protected void initializeAdditionalConfiguration() {
@@ -753,5 +745,10 @@ public abstract class CBApplication<T extends CBServerConfig> extends BaseWebApp
             disabledDrivers.add(driver.getFullId());
         }
         config.setDisabledDrivers(disabledDrivers.toArray(new String[0]));
+    }
+
+    @Override
+    public boolean isEnvironmentVariablesAccessible() {
+        return getAppConfiguration().isSystemVariablesResolvingEnabled();
     }
 }
