@@ -29,7 +29,7 @@ public abstract class BaseWebAppConfiguration implements WebAppConfiguration {
     public static final String DEFAULT_APP_ANONYMOUS_TEAM_NAME = "user";
 
     protected final Map<String, Object> plugins;
-    protected String defaultUserTeam = DEFAULT_APP_ANONYMOUS_TEAM_NAME;
+    protected String defaultUserTeam;
     protected boolean resourceManagerEnabled;
     protected boolean showReadOnlyConnectionInfo;
     protected String[] enabledFeatures;
