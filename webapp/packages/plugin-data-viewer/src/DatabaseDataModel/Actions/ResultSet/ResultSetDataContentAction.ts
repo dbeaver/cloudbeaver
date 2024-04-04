@@ -194,6 +194,7 @@ export class ResultSetDataContentAction extends DatabaseDataAction<any, IDatabas
 
     const response = await this.graphQLService.sdk.sqlReadStringValue({
       resultsId: result.id,
+      projectId: result.projectId,
       connectionId: result.connectionId,
       contextId: result.contextId,
       columnIndex,
@@ -225,6 +226,7 @@ export class ResultSetDataContentAction extends DatabaseDataAction<any, IDatabas
 
     const { url } = await this.graphQLService.sdk.getResultsetDataURL({
       resultsId: result.id,
+      projectId: result.projectId,
       connectionId: result.connectionId,
       contextId: result.contextId,
       lobColumnIndex: columnIndex,

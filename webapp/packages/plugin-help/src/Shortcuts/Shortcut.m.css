@@ -19,6 +19,7 @@
   flex-shrink: 0;
   font-family: monospace;
   font-weight: bold;
+  text-transform: uppercase;
   width: max-content;
   padding: 4px 8px;
 }

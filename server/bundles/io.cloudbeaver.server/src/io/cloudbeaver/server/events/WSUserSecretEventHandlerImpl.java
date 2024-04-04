@@ -40,7 +40,7 @@ public class WSUserSecretEventHandlerImpl extends WSDefaultEventHandler<WSUserSe
             activeUserSession.addSessionEvent(event);
             return;
         }
-        var connectionInfo = ((WebSession) activeUserSession).findWebConnectionInfo(event.getDataSourceId());
+        var connectionInfo = ((WebSession) activeUserSession).findWebConnectionInfo(event.getProjectId(), event.getDataSourceId());
         if (connectionInfo == null) {
             log.debug("Connection " + event.getDataSourceId() + " is not found in session " + activeUserSession.getSessionId());
             return;
