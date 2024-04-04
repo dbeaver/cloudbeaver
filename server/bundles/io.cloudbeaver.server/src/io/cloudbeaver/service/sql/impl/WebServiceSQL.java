@@ -33,7 +33,9 @@ import org.jkiss.dbeaver.model.DBPDataSource;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
 import org.jkiss.dbeaver.model.DBUtils;
 import org.jkiss.dbeaver.model.data.DBDAttributeBinding;
-import org.jkiss.dbeaver.model.exec.*;
+import org.jkiss.dbeaver.model.exec.DBCException;
+import org.jkiss.dbeaver.model.exec.DBCLogicalOperator;
+import org.jkiss.dbeaver.model.exec.DBExecUtils;
 import org.jkiss.dbeaver.model.impl.sql.BasicSQLDialect;
 import org.jkiss.dbeaver.model.navigator.DBNNode;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
@@ -444,6 +446,7 @@ public class WebServiceSQL implements DBWServiceSQL {
                     this.result = executeResults.getStatusMessage();
                     this.extendedResults = executeResults;
                 } catch (Throwable e) {
+                    log.error("AAAAAAAA: " + e.getMessage(), e);
                     throw new InvocationTargetException(e);
                 } finally {
                     monitor.done();
