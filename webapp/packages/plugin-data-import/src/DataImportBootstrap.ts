@@ -9,12 +9,12 @@ import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { ACTION_IMPORT, ActionService, DATA_CONTEXT_MENU, menuExtractItems, MenuService } from '@cloudbeaver/core-view';
 import {
+  ContainerDataSource,
   DATA_CONTEXT_DV_DDM,
   DATA_CONTEXT_DV_DDM_RESULT_INDEX,
   DATA_VIEWER_DATA_MODEL_ACTIONS_MENU,
   DatabaseEditAction,
 } from '@cloudbeaver/plugin-data-viewer';
-import { QueryDataSource } from '@cloudbeaver/plugin-sql-editor';
 
 import { DataImportDialogLazy } from './DataImportDialog/DataImportDialogLazy';
 import { DataImportService } from './DataImportService';
@@ -43,8 +43,8 @@ export class DataImportBootstrap extends Bootstrap {
         }
 
         if (action === ACTION_IMPORT) {
-          const isQuery = model.source instanceof QueryDataSource;
-          if (model.isReadonly(resultIndex) || isQuery) {
+          const isContainer = model.source instanceof ContainerDataSource;
+          if (model.isReadonly(resultIndex) || !isContainer) {
             return false;
           }
 
