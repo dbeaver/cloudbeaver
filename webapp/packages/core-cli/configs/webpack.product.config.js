@@ -81,12 +81,7 @@ module.exports = (env, argv) => {
         terserOptions: {
           keep_classnames: true,
           keep_fnames: true,
-          mangle: {
-            toplevel: true,
-            properties: {
-              regex: /.*.public-ce..*$/,
-            },
-          },
+
         },
         include: [/.*.public-ce..*$/, /^service-worker.js$/],
       })],
