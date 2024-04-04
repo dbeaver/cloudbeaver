@@ -81,7 +81,6 @@ module.exports = (env, argv) => {
         terserOptions: {
           keep_classnames: true,
           keep_fnames: true,
-
         },
         include: [/.*.public-ce..*$/, /^service-worker.js$/],
       })],
