@@ -16,9 +16,16 @@ import {
 } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
 import { ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
-import { EObjectFeature, NavNodeInfoResource, NavNodeManagerService, NavTreeResource, ROOT_NODE_PATH } from '@cloudbeaver/core-navigation-tree';
+import {
+  EObjectFeature,
+  NavNode,
+  NavNodeInfoResource,
+  NavNodeManagerService,
+  NavTreeResource,
+  ROOT_NODE_PATH,
+} from '@cloudbeaver/core-navigation-tree';
 import { CACHED_RESOURCE_DEFAULT_PAGE_OFFSET, CachedResourceOffsetPageKey, ResourceKey, resourceKeyList } from '@cloudbeaver/core-resource';
-import { MetadataMap } from '@cloudbeaver/core-utils';
+import { isNotNullDefined, MetadataMap } from '@cloudbeaver/core-utils';
 import { ACTION_COLLAPSE_ALL, ACTION_FILTER, IActiveView, View } from '@cloudbeaver/core-view';
 
 import { ACTION_LINK_OBJECT } from './ElementsTree/ACTION_LINK_OBJECT';
@@ -64,6 +71,14 @@ export class NavigationTreeService extends View<string> {
 
   getChildren(id: string): string[] | undefined {
     return this.navNodeManagerService.getTree(id);
+  }
+
+  getChildrenNodes(id: string): NavNode[] {
+    return (this.getChildren(id) ?? []).map(id => this.getNode(id)).filter(isNotNullDefined);
+  }
+
+  getNode(id: string) {
+    return this.navNodeManagerService.getNode(id);
   }
 
   async navToNode(id: string, parentId?: string): Promise<void> {
@@ -166,7 +181,7 @@ export class NavigationTreeService extends View<string> {
   }
 
   private isConnectionNode(navNodeId: string) {
-    const node = this.navNodeManagerService.getNode(navNodeId);
+    const node = this.getNode(navNodeId);
     return node?.objectFeatures.includes(EObjectFeature.dataSource);
   }
 
