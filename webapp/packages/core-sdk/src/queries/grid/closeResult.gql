@@ -1,9 +1,11 @@
 mutation closeResult(
+    $projectId: ID!
     $connectionId: ID!
     $contextId: ID!
     $resultId: ID!
 ) {
     result: sqlResultClose(
+        projectId: $projectId
         connectionId: $connectionId
         contextId: $contextId
         resultId: $resultId

@@ -1,8 +1,10 @@
 query parseSQLScript(
+    $projectId: ID!
     $connectionId: ID!
     $script: String!
 ) {
     scriptInfo: sqlParseScript(
+        projectId: $projectId
         connectionId: $connectionId
         script: $script
     ) {

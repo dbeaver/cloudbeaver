@@ -34,8 +34,6 @@ import io.cloudbeaver.utils.CBModelConstants;
 import io.cloudbeaver.utils.WebAppUtils;
 import io.cloudbeaver.utils.WebDataSourceUtils;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -284,7 +282,7 @@ public class WebSession extends BaseWebSession
             switch (type) {
                 case DATASOURCE_CREATED -> {
                     WebConnectionInfo connectionInfo = new WebConnectionInfo(this, ds);
-                    this.connections.put(connectionInfo.getId(), connectionInfo);
+                    this.connections.put(getConnectionId(ds), connectionInfo);
                     sendDataSourceUpdatedEvent = true;
                 }
                 case DATASOURCE_UPDATED -> // if settings were changed we need to send event
@@ -294,7 +292,7 @@ public class WebSession extends BaseWebSession
                     if (registry instanceof DBPDataSourceRegistryCache dsrc) {
                         dsrc.removeDataSourceFromList(ds);
                     }
-                    this.connections.remove(ds.getId());
+                    this.connections.remove(getConnectionId(ds));
                     sendDataSourceUpdatedEvent = true;
                 }
                 default -> {
@@ -302,6 +300,16 @@ public class WebSession extends BaseWebSession
             }
         }
         return sendDataSourceUpdatedEvent;
+    }
+
+    @NotNull
+    private String getConnectionId(@NotNull DBPDataSourceContainer container) {
+        return getConnectionId(container.getProject().getId(), container.getId());
+    }
+
+    @NotNull
+    private String getConnectionId(@NotNull String projectId, @NotNull String dsId) {
+        return projectId + ":" + dsId;
     }
 
     // Note: for admin use only
@@ -474,7 +482,7 @@ public class WebSession extends BaseWebSession
         var registry = getProjectById(WebAppUtils.getGlobalProjectId()).getDataSourceRegistry();
         var dataSource = registry.getDataSource(dsId);
         if (dataSource != null) {
-            connections.put(dsId, new WebConnectionInfo(this, dataSource));
+            connections.put(getConnectionId(dataSource), new WebConnectionInfo(this, dataSource));
             // reflect changes is navigator model
             registry.notifyDataSourceListeners(new DBPEvent(DBPEvent.Action.OBJECT_ADD, dataSource, true));
         }
@@ -485,7 +493,7 @@ public class WebSession extends BaseWebSession
         var dataSource = registry.getDataSource(dsId);
         if (dataSource != null) {
             this.accessibleConnectionIds.remove(dsId);
-            connections.remove(dsId);
+            connections.remove(getConnectionId(dataSource));
             // reflect changes is navigator model
             registry.notifyDataSourceListeners(new DBPEvent(DBPEvent.Action.OBJECT_REMOVE, dataSource));
             dataSource.dispose();
@@ -564,9 +572,21 @@ public class WebSession extends BaseWebSession
 
     @NotNull
     public WebConnectionInfo getWebConnectionInfo(@Nullable String projectId, String connectionID) throws DBWebException {
-        WebConnectionInfo connectionInfo;
+        WebConnectionInfo connectionInfo = null;
         synchronized (connections) {
-            connectionInfo = connections.get(connectionID);
+            if (projectId != null) {
+                connectionInfo = connections.get(getConnectionId(projectId, connectionID));
+            } else {
+                addWarningMessage("Project id is not defined in request. Try to find it from connection cache");
+                for (Map.Entry<String, WebConnectionInfo> entry : connections.entrySet()) {
+                    String k = entry.getKey();
+                    WebConnectionInfo v = entry.getValue();
+                    if (k.contains(connectionID)) {
+                        connectionInfo = v;
+                        break;
+                    }
+                }
+            }
         }
         if (connectionInfo == null) {
             WebProjectImpl project = getProjectById(projectId);
@@ -577,7 +597,7 @@ public class WebSession extends BaseWebSession
             if (dataSource != null) {
                 connectionInfo = new WebConnectionInfo(this, dataSource);
                 synchronized (connections) {
-                    connections.put(connectionID, connectionInfo);
+                    connections.put(getConnectionId(dataSource), connectionInfo);
                 }
             } else {
                 throw new DBWebException("Connection '" + connectionID + "' not found");
@@ -587,22 +607,22 @@ public class WebSession extends BaseWebSession
     }
 
     @Nullable
-    public WebConnectionInfo findWebConnectionInfo(String connectionID) {
+    public WebConnectionInfo findWebConnectionInfo(String projectId, String connectionId) {
         synchronized (connections) {
-            return connections.get(connectionID);
+            return connections.get(getConnectionId(projectId, connectionId));
         }
     }
 
     public void addConnection(WebConnectionInfo connectionInfo) {
         synchronized (connections) {
-            connections.put(connectionInfo.getId(), connectionInfo);
+            connections.put(getConnectionId(connectionInfo.getDataSourceContainer()), connectionInfo);
         }
     }
 
     public void removeConnection(WebConnectionInfo connectionInfo) {
         connectionInfo.clearCache();
         synchronized (connections) {
-            connections.remove(connectionInfo.getId());
+            connections.remove(getConnectionId(connectionInfo.getDataSourceContainer()));
         }
     }
 
@@ -929,7 +949,7 @@ public class WebSession extends BaseWebSession
             }
             configuration.setRuntimeAttribute(RUNTIME_PARAM_AUTH_INFOS, getAllAuthInfo());
 
-            WebConnectionInfo webConnectionInfo = findWebConnectionInfo(dataSourceContainer.getId());
+            WebConnectionInfo webConnectionInfo = findWebConnectionInfo(dataSourceContainer.getProject().getId(), dataSourceContainer.getId());
             if (webConnectionInfo != null) {
                 WebDataSourceUtils.saveCredentialsInDataSource(webConnectionInfo, dataSourceContainer, configuration);
             }

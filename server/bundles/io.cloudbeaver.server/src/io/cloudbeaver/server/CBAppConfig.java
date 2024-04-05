@@ -56,6 +56,7 @@ public class CBAppConfig extends BaseAuthWebAppConfiguration implements WebAuthC
     private boolean redirectOnFederatedAuth;
     private boolean anonymousAccessEnabled;
     private boolean grantConnectionsAccessToAnonymousTeam;
+    private boolean systemVariablesResolvingEnabled;
     @Deprecated
     private String anonymousUserRole;
     private String anonymousUserTeam;
@@ -85,6 +86,7 @@ public class CBAppConfig extends BaseAuthWebAppConfiguration implements WebAuthC
         this.forwardProxy = false;
         this.linkExternalCredentialsWithUser = true;
         this.grantConnectionsAccessToAnonymousTeam = false;
+        this.systemVariablesResolvingEnabled = false;
     }
 
     public CBAppConfig(CBAppConfig src) {
@@ -106,6 +108,7 @@ public class CBAppConfig extends BaseAuthWebAppConfiguration implements WebAuthC
         this.forwardProxy = src.forwardProxy;
         this.linkExternalCredentialsWithUser = src.linkExternalCredentialsWithUser;
         this.grantConnectionsAccessToAnonymousTeam = src.grantConnectionsAccessToAnonymousTeam;
+        this.systemVariablesResolvingEnabled = src.systemVariablesResolvingEnabled;
     }
 
     @Override
@@ -295,5 +298,9 @@ public class CBAppConfig extends BaseAuthWebAppConfiguration implements WebAuthC
 
     public boolean isDriverForceEnabled(@NotNull String driverId) {
         return ArrayUtils.containsIgnoreCase(getEnabledDrivers(), driverId);
+    }
+
+    public boolean isSystemVariablesResolvingEnabled() {
+        return systemVariablesResolvingEnabled;
     }
 }
