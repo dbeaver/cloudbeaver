@@ -13,7 +13,6 @@ import {
   DATA_CONTEXT_DV_DDM,
   DATA_CONTEXT_DV_DDM_RESULT_INDEX,
   DATA_VIEWER_DATA_MODEL_ACTIONS_MENU,
-  DatabaseEditAction,
 } from '@cloudbeaver/plugin-data-viewer';
 
 import { DataImportDialogLazy } from './DataImportDialog/DataImportDialogLazy';
@@ -44,12 +43,7 @@ export class DataImportBootstrap extends Bootstrap {
 
         if (action === ACTION_IMPORT) {
           const isContainer = model.source instanceof ContainerDataSource;
-          if (model.isReadonly(resultIndex) || !isContainer) {
-            return false;
-          }
-
-          const editor = model.source.getActionImplementation(resultIndex, DatabaseEditAction);
-          return editor?.hasFeature('add') === true;
+          return !model.isReadonly(resultIndex) && isContainer;
         }
 
         return [ACTION_IMPORT].includes(action);
