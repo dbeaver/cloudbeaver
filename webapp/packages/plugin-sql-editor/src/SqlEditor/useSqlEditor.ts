@@ -193,6 +193,7 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
         }
 
         const hints = await this.sqlEditorService.getAutocomplete(
+          executionContext.projectId,
           executionContext.connectionId,
           executionContext.id,
           this.value,
@@ -369,10 +370,11 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
         if (!this.dataSource?.hasFeature(ESqlDataSourceFeatures.script)) {
           return;
         }
+        const projectId = this.dataSource.executionContext?.projectId;
         const connectionId = this.dataSource.executionContext?.connectionId;
         const script = this.parser.actualScript;
 
-        if (!connectionId || !script) {
+        if (!projectId || !connectionId || !script) {
           this.parser.setQueries([]);
           this.onUpdate.execute();
           return;
@@ -380,7 +382,7 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
 
         const { queries } = await this.parseScript([connectionId, script], async () => {
           try {
-            return await this.sqlEditorService.parseSQLScript(connectionId, script);
+            return await this.sqlEditorService.parseSQLScript(projectId, connectionId, script);
           } catch (exception: any) {
             this.notificationService.logException(exception, 'Failed to parse SQL script');
             throw exception;
@@ -428,9 +430,10 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
       },
 
       async getResolvedSegment(): Promise<ISQLScriptSegment | undefined> {
+        const projectId = this.dataSource?.executionContext?.projectId;
         const connectionId = this.dataSource?.executionContext?.connectionId;
 
-        if (!connectionId || this.cursor.begin !== this.cursor.end) {
+        if (!projectId || !connectionId || this.cursor.begin !== this.cursor.end) {
           return this.getSubQuery();
         }
 
@@ -438,7 +441,7 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
           return this.activeSegment;
         }
 
-        const result = await this.sqlEditorService.parseSQLQuery(connectionId, this.value, this.cursor.begin);
+        const result = await this.sqlEditorService.parseSQLQuery(projectId, connectionId, this.value, this.cursor.begin);
 
         const segment = this.parser.getSegment(result.start, result.end);
 

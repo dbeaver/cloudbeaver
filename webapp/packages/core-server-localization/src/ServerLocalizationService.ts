@@ -11,7 +11,10 @@ import { ServerConfigResource } from '@cloudbeaver/core-root';
 
 @injectable()
 export class ServerLocalizationService extends Dependency {
-  constructor(private readonly serverConfigResource: ServerConfigResource, private readonly localizationService: LocalizationService) {
+  constructor(
+    private readonly serverConfigResource: ServerConfigResource,
+    private readonly localizationService: LocalizationService,
+  ) {
     super();
 
     this.serverConfigResource.onDataUpdate.addHandler(this.updateSupportedLocalization.bind(this));
@@ -24,7 +27,8 @@ export class ServerLocalizationService extends Dependency {
       this.localizationService.setSupportedLanguages(
         supportedLanguages.map(lang => ({
           isoCode: lang.isoCode,
-          displayName: lang.displayName ?? lang.nativeName ?? lang.isoCode,
+          name: lang.displayName ?? lang.isoCode,
+          nativeName: lang.nativeName,
         })),
       );
     }

@@ -1,9 +1,16 @@
+/*
+ * CloudBeaver - Cloud Database Manager
+ * Copyright (C) 2020-2024 DBeaver Corp and others
+ *
+ * Licensed under the Apache License, Version 2.0.
+ * you may not use this file except in compliance with the License.
+ */
 export * from './Clipboard/ClipboardBootstrap';
 export * from './Clipboard/ClipboardService';
 
-export * from './ContextMenu/ContextMenu';
+export * from './ContextMenu/ContextMenuLazy';
 export * from './ContextMenu/IContextMenuItemProps';
-export * from './ContextMenu/MenuBar/MenuBar';
+export * from './ContextMenu/MenuBar/MenuBarLazy';
 export { default as MenuBarStyles } from './ContextMenu/MenuBar/MenuBar.m.css';
 export { default as MenuBarItemStyles } from './ContextMenu/MenuBar/MenuBarItem.m.css';
 
@@ -15,6 +22,8 @@ export * from './DragAndDrop/DNDProvider';
 export * from './DragAndDrop/useDNDBox';
 export * from './DragAndDrop/useDNDData';
 
+export * from './Form/Components/IBaseFormProps';
+export * from './Form/Components/BaseFormLazy';
 export * from './Form/DATA_CONTEXT_FORM_STATE';
 export * from './Form/FormBaseService';
 export * from './Form/FormMode';

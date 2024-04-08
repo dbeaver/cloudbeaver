@@ -44,6 +44,7 @@ export class ConnectionDialectResource extends CachedMapResource<IConnectionInfo
 
   async formatScript(context: IConnectionExecutionContextInfo, query: string): Promise<string> {
     const result = await this.graphQLService.sdk.formatSqlQuery({
+      projectId: context.projectId,
       connectionId: context.connectionId,
       contextId: context.id,
       query,

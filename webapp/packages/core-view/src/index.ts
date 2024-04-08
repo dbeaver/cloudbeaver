@@ -1,3 +1,10 @@
+/*
+ * CloudBeaver - Cloud Database Manager
+ * Copyright (C) 2020-2024 DBeaver Corp and others
+ *
+ * Licensed under the Apache License, Version 2.0.
+ * you may not use this file except in compliance with the License.
+ */
 export * from './Action/Actions/ACTION_COLLAPSE_ALL';
 export * from './Action/Actions/ACTION_CREATE';
 export * from './Action/Actions/ACTION_DELETE';
@@ -18,6 +25,7 @@ export * from './Action/Actions/ACTION_ZOOM_IN';
 export * from './Action/Actions/ACTION_ZOOM_OUT';
 export * from './Action/Actions/ACTION_DOWNLOAD';
 export * from './Action/Actions/ACTION_UPLOAD';
+export * from './Action/Actions/ACTION_IMPORT';
 export * from './Action/KeyBinding/Bindings/KEY_BINDING_OPEN_IN_TAB';
 export * from './Action/KeyBinding/Bindings/KEY_BINDING_REDO';
 export * from './Action/KeyBinding/Bindings/KEY_BINDING_UNDO';

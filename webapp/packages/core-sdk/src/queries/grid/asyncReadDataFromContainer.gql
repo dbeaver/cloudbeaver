@@ -1,5 +1,6 @@
 
 mutation asyncReadDataFromContainer(
+    $projectId: ID!
     $connectionId: ID!
     $contextId: ID!
     $containerNodePath: ID!
@@ -8,6 +9,7 @@ mutation asyncReadDataFromContainer(
     $dataFormat: ResultDataFormat
 ) {
     taskInfo: asyncReadDataFromContainer(
+        projectId: $projectId
         connectionId: $connectionId
         contextId: $contextId
         containerNodePath: $containerNodePath

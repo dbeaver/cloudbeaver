@@ -1,4 +1,5 @@
 mutation asyncSqlExecuteQuery(
+    $projectId: ID!
     $connectionId: ID!
     $contextId: ID!
     $query: String!
@@ -8,6 +9,7 @@ mutation asyncSqlExecuteQuery(
     $readLogs: Boolean
 ) {
     taskInfo: asyncSqlExecuteQuery(
+        projectId: $projectId
         connectionId: $connectionId
         contextId: $contextId
         sql: $query

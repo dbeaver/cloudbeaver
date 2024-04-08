@@ -1,3 +1,10 @@
+/*
+ * CloudBeaver - Cloud Database Manager
+ * Copyright (C) 2020-2024 DBeaver Corp and others
+ *
+ * Licensed under the Apache License, Version 2.0.
+ * you may not use this file except in compliance with the License.
+ */
 import 'reflect-metadata';
 
 import { bootstrap } from '@cloudbeaver/core-bootstrap';
@@ -13,6 +20,7 @@ import connectionTemplate from '@cloudbeaver/plugin-connection-template';
 import connectionPlugin from '@cloudbeaver/plugin-connections';
 import connectionAdministration from '@cloudbeaver/plugin-connections-administration';
 import { dataExportManifest } from '@cloudbeaver/plugin-data-export';
+import { dataImportPluginManifest } from '@cloudbeaver/plugin-data-import';
 import { dataSpreadsheetNewManifest } from '@cloudbeaver/plugin-data-spreadsheet-new';
 import { dataViewerManifest } from '@cloudbeaver/plugin-data-viewer';
 import { dvResultSetGroupingPlugin } from '@cloudbeaver/plugin-data-viewer-result-set-grouping';
@@ -54,6 +62,7 @@ import topAppBar from '@cloudbeaver/plugin-top-app-bar';
 import { administrationTopAppBarPlugin } from '@cloudbeaver/plugin-top-app-bar-administration';
 import userProfile from '@cloudbeaver/plugin-user-profile';
 import userProfileAdministration from '@cloudbeaver/plugin-user-profile-administration';
+import { userProfileSettingsPlugin } from '@cloudbeaver/plugin-user-profile-settings';
 import version from '@cloudbeaver/plugin-version';
 import versionUpdate from '@cloudbeaver/plugin-version-update-administration';
 
@@ -72,6 +81,7 @@ const PLUGINS: PluginManifest[] = [
   connectionTemplate,
   connectionSearch,
   dataExportManifest,
+  dataImportPluginManifest,
   dataViewerManifest,
   dvResultSetGroupingPlugin,
   gisViewer,
@@ -114,6 +124,7 @@ const PLUGINS: PluginManifest[] = [
   coreTaskManagerManifest,
   taskManagerPluginManifest,
   settingsAdministrationPlugin,
+  userProfileSettingsPlugin,
   // must be las one to override all
   defaultProductManifest,
 ];

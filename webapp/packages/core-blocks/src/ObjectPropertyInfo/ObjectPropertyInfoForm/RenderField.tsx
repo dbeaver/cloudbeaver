@@ -7,7 +7,7 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import type { ObjectPropertyInfo } from '@cloudbeaver/core-sdk';
+import { getObjectPropertyType, type ObjectPropertyInfo, type ObjectPropertyType } from '@cloudbeaver/core-sdk';
 import { removeMetadataFromDataURL } from '@cloudbeaver/core-utils';
 
 import { FieldCheckbox } from '../../FormControls/Checkboxes/FieldCheckbox';
@@ -19,7 +19,6 @@ import { isControlPresented } from '../../FormControls/isControlPresented';
 import { Textarea } from '../../FormControls/Textarea';
 import { Link } from '../../Link';
 import { useTranslate } from '../../localization/useTranslate';
-import { type ControlType, getPropertyControlType } from './getPropertyControlType';
 
 const RESERVED_KEYWORDS = ['no', 'off', 'new-password'];
 
@@ -39,7 +38,7 @@ interface RenderFieldProps {
   onFocus?: (event: React.FocusEvent<HTMLInputElement>) => void;
 }
 
-function getValue(value: any, controlType: ControlType) {
+function getValue(value: any, controlType: ObjectPropertyType) {
   const checkbox = controlType === 'checkbox';
 
   if (value === null || value === undefined) {
@@ -70,7 +69,7 @@ export const RenderField = observer<RenderFieldProps>(function RenderField({
 }) {
   const translate = useTranslate();
 
-  const controlType = getPropertyControlType(property);
+  const controlType = getObjectPropertyType(property);
   const password = property.features.includes('password');
   const required = property.required && !readOnly;
 
@@ -132,7 +131,7 @@ export const RenderField = observer<RenderFieldProps>(function RenderField({
     );
   }
 
-  if (controlType === 'combobox') {
+  if (controlType === 'selector') {
     if (state !== undefined) {
       return (
         <Combobox

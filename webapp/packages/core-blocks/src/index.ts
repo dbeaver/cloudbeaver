@@ -1,3 +1,10 @@
+/*
+ * CloudBeaver - Cloud Database Manager
+ * Copyright (C) 2020-2024 DBeaver Corp and others
+ *
+ * Licensed under the Apache License, Version 2.0.
+ * you may not use this file except in compliance with the License.
+ */
 export * from './CommonDialog/CommonDialog/CommonDialogBody';
 export * from './CommonDialog/CommonDialog/CommonDialogFooter';
 export * from './CommonDialog/CommonDialog/CommonDialogHeader';
@@ -54,7 +61,6 @@ export { MenuTrigger, type MenuState } from './MenuPanel/MenuTrigger';
 
 export * from './ObjectPropertyInfo/ObjectPropertyInfoForm/ObjectPropertyInfoForm';
 export * from './ObjectPropertyInfo/useObjectPropertyCategories';
-export * from './ObjectPropertyInfo/ObjectPropertyInfoForm/getPropertyControlType';
 
 export * from './Overlay/Overlay';
 export * from './Overlay/OverlayActions';

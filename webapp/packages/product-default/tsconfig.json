@@ -19,9 +19,6 @@
       "path": "../core-localization/tsconfig.json"
     },
     {
-      "path": "../core-product/tsconfig.json"
-    },
-    {
       "path": "../core-task-manager/tsconfig.json"
     },
     {
@@ -56,6 +53,9 @@
     },
     {
       "path": "../plugin-data-export/tsconfig.json"
+    },
+    {
+      "path": "../plugin-data-import/tsconfig.json"
     },
     {
       "path": "../plugin-data-spreadsheet-new/tsconfig.json"
@@ -176,6 +176,9 @@
     },
     {
       "path": "../plugin-user-profile-administration/tsconfig.json"
+    },
+    {
+      "path": "../plugin-user-profile-settings/tsconfig.json"
     },
     {
       "path": "../plugin-user-profile/tsconfig.json"

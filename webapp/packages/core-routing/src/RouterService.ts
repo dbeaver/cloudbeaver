@@ -67,13 +67,12 @@ export class RouterService extends Bootstrap {
     return this.router.subscribe(subscriber);
   }
 
-  register(): void | Promise<void> {}
-  load(): void | Promise<void> {
+  load(): void {
     this.start();
   }
 
   reload(): void {
-    this.app.start();
+    this.app.restart();
     // this.router.navigate(
     //   this.route,
     //   this.params,

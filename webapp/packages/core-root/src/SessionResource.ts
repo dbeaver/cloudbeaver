@@ -6,13 +6,13 @@
  * you may not use this file except in compliance with the License.
  */
 import { injectable } from '@cloudbeaver/core-di';
-import { ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
+import { LocalizationService } from '@cloudbeaver/core-localization';
 import { CachedDataResource } from '@cloudbeaver/core-resource';
 import { GraphQLService, SessionStateFragment } from '@cloudbeaver/core-sdk';
 
 import { ServerConfigResource } from './ServerConfigResource';
 import { ServerEventId } from './SessionEventSource';
-import { SessionInfoEventHandler } from './SessionInfoEventHandler';
+import { type ISessionStateEvent, SessionInfoEventHandler } from './SessionInfoEventHandler';
 
 export type SessionState = SessionStateFragment;
 export interface ISessionAction {
@@ -20,38 +20,21 @@ export interface ISessionAction {
   [key: string]: any;
 }
 
-interface SessionStateData {
-  isValid?: boolean;
-  remainingTime: number;
-}
-
 @injectable()
 export class SessionResource extends CachedDataResource<SessionState | null> {
   private action: ISessionAction | null;
-  private defaultLocale: string | undefined;
-  readonly onStatusUpdate: ISyncExecutor<SessionStateData>;
 
   constructor(
     private readonly graphQLService: GraphQLService,
-    sessionInfoEventHandler: SessionInfoEventHandler,
+    private readonly sessionInfoEventHandler: SessionInfoEventHandler,
     serverConfigResource: ServerConfigResource,
+    private readonly localizationService: LocalizationService,
   ) {
     super(() => null);
 
-    this.onStatusUpdate = new SyncExecutor();
-    sessionInfoEventHandler.onEvent(
-      ServerEventId.CbSessionState,
-      event => {
-        if (this.data) {
-          this.data.valid = event.isValid ?? this.data.valid;
-          this.data.remainingTime = event.remainingTime;
-          // TODO: probably we want to call here this.dataUpdate
-        }
-        this.onStatusUpdate.execute(event);
-      },
-      undefined,
-      this,
-    );
+    this.handleSessionStateEvent = this.handleSessionStateEvent.bind(this);
+
+    sessionInfoEventHandler.onEvent(ServerEventId.CbSessionState, this.handleSessionStateEvent, undefined, this);
 
     this.action = null;
     this.sync(
@@ -69,8 +52,24 @@ export class SessionResource extends CachedDataResource<SessionState | null> {
     }
   }
 
-  setDefaultLocale(defaultLocale?: string): void {
-    this.defaultLocale = defaultLocale;
+  private handleSessionStateEvent(event: ISessionStateEvent) {
+    this.performUpdate(undefined, [], async () => {
+      if (!this.data) {
+        return;
+      }
+
+      const sessionState: SessionState = {
+        ...this.data,
+        valid: event?.isValid ?? this.data.valid,
+        remainingTime: event.remainingTime,
+        actionParameters: event.actionParameters,
+        cacheExpired: event?.isCacheExpired ?? this.data.cacheExpired,
+        lastAccessTime: String(event.lastAccessTime),
+        locale: event.locale,
+      };
+
+      this.setData(sessionState);
+    });
   }
 
   async changeLanguage(locale: string): Promise<void> {
@@ -79,7 +78,6 @@ export class SessionResource extends CachedDataResource<SessionState | null> {
     }
     await this.graphQLService.sdk.changeSessionLanguage({ locale });
 
-    this.defaultLocale = locale;
     if (this.data) {
       this.data.locale = locale;
     }
@@ -88,21 +86,17 @@ export class SessionResource extends CachedDataResource<SessionState | null> {
   }
 
   protected async loader(): Promise<SessionState> {
-    const { session } = await this.graphQLService.sdk.openSession({ defaultLocale: this.defaultLocale });
+    const { session } = await this.graphQLService.sdk.openSession({ defaultLocale: this.localizationService.currentLanguage });
 
     return session;
   }
 
-  async updateSession() {
+  pingSession() {
     if (!this.data?.valid) {
       return;
     }
 
-    const { updateSession } = await this.graphQLService.sdk.updateSession();
-
-    this.setData(updateSession);
-
-    return updateSession;
+    this.sessionInfoEventHandler.pingSession();
   }
 
   protected setData(data: SessionState | null) {

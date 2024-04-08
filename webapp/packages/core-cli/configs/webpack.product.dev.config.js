@@ -45,6 +45,9 @@ module.exports = (env, argv) => {
       index,
       sso,
     },
+    output: {
+      devtoolModuleFilenameTemplate: 'file:///[absolute-resource-path]',
+    },
     watchOptions: {
       aggregateTimeout: 3000,
       ignored: ['**/node_modules', '**/packages/*/src/**/*.{ts,tsx}'],

@@ -9,7 +9,6 @@ import { UserInfoResource } from '@cloudbeaver/core-authentication';
 import { importLazyComponent } from '@cloudbeaver/core-blocks';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
-import { NotificationService } from '@cloudbeaver/core-events';
 import { ServerConfigResource, SESSION_EXPIRE_MIN_TIME, SessionExpireService, SessionResource } from '@cloudbeaver/core-root';
 import { GraphQLService } from '@cloudbeaver/core-sdk';
 
@@ -24,7 +23,6 @@ export class SessionExpireWarningDialogBootstrap extends Bootstrap {
     private readonly sessionResource: SessionResource,
     private readonly userInfoResource: UserInfoResource,
     private readonly graphQLService: GraphQLService,
-    private readonly notificationService: NotificationService,
   ) {
     super();
     this.dialogInternalPromise = null;
@@ -32,14 +30,16 @@ export class SessionExpireWarningDialogBootstrap extends Bootstrap {
 
   register(): void {
     this.sessionExpireService.onSessionExpire.addHandler(this.close.bind(this));
-    this.sessionResource.onStatusUpdate.addHandler((data, contexts) => {
-      this.handleStateChange(data.isValid, data.remainingTime);
+    this.sessionResource.onDataUpdate.addHandler(() => {
+      const { valid, remainingTime } = this.sessionResource.data || {};
+
+      this.handleSessionResourceDataUpdate(valid, remainingTime);
     });
   }
 
   load(): void {}
 
-  private handleStateChange(isValid?: boolean, remainingTime?: number) {
+  private handleSessionResourceDataUpdate(isValid?: boolean, remainingTime?: number) {
     if (!this.serverConfigResource.anonymousAccessEnabled && !this.userInfoResource.data && !this.serverConfigResource.configurationMode) {
       return;
     }
@@ -74,11 +74,7 @@ export class SessionExpireWarningDialogBootstrap extends Bootstrap {
         const { sessionState } = await this.graphQLService.sdk.sessionState();
 
         if (sessionState.valid) {
-          try {
-            await this.sessionResource.updateSession();
-          } catch (e: any) {
-            this.notificationService.logException(e, 'plugin_session_expiration_session_update_error');
-          }
+          this.sessionResource.pingSession();
         } else {
           this.sessionExpireService.sessionExpired();
         }

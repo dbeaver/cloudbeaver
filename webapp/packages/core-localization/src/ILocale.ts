@@ -8,5 +8,6 @@
 
 export interface ILocale {
   isoCode: string;
-  displayName: string;
+  name: string;
+  nativeName?: string;
 }

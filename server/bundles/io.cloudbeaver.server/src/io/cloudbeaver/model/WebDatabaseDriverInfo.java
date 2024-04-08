@@ -182,6 +182,7 @@ public class WebDatabaseDriverInfo {
             cfg.setUrl(driver.getSampleURL());
             cfg.setHostName(DBConstants.HOST_LOCALHOST);
             cfg.setHostPort(driver.getDefaultPort());
+            cfg.setDatabaseName(driver.getDefaultDatabase());
             cfg.setUrl(driver.getConnectionURL(cfg));
             DBPPropertyDescriptor[] properties = driver.getDataSourceProvider().getConnectionProperties(webSession.getProgressMonitor(), driver, cfg);
             if (properties == null) {

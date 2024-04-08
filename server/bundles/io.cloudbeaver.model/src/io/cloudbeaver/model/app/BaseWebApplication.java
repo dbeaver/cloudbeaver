@@ -16,8 +16,6 @@
  */
 package io.cloudbeaver.model.app;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import io.cloudbeaver.DataSourceFilter;
 import io.cloudbeaver.WebProjectImpl;
 import io.cloudbeaver.WebSessionProjectImpl;
@@ -102,8 +100,7 @@ public abstract class BaseWebApplication extends BaseApplicationImpl implements 
         return true;
     }
 
-    @Nullable
-    protected Path loadServerConfiguration() throws DBException {
+    protected boolean loadServerConfiguration() throws DBException {
         Path configFilePath = getMainConfigurationFilePath().toAbsolutePath();
         Path configFolder = configFilePath.getParent();
 
@@ -120,13 +117,13 @@ public abstract class BaseWebApplication extends BaseApplicationImpl implements 
         // Load config file
         log.debug("Loading configuration from " + configFilePath);
         try {
-            loadConfiguration(configFilePath);
+            getServerConfigurationController().loadServerConfiguration(configFilePath);
         } catch (Exception e) {
             log.error("Error parsing configuration", e);
-            return null;
+            return false;
         }
 
-        return configFilePath;
+        return true;
     }
 
     @Nullable
@@ -153,7 +150,7 @@ public abstract class BaseWebApplication extends BaseApplicationImpl implements 
         return getLogbackConfigPath(configFolder);
     }
 
-    private Path getMainConfigurationFilePath() {
+    protected Path getMainConfigurationFilePath() {
         String configPath = DEFAULT_CONFIG_FILE_PATH;
 
         String[] args = Platform.getCommandLineArgs();
@@ -178,8 +175,6 @@ public abstract class BaseWebApplication extends BaseApplicationImpl implements 
         var customConfigPath = configPath.resolve(CUSTOM_CONFIG_FOLDER).resolve(fileName);
         return Files.exists(customConfigPath) ? customConfigPath : configPath.resolve(fileName);
     }
-
-    protected abstract void loadConfiguration(Path configPath) throws DBException;
 
     @Override
     public WebProjectImpl createProjectImpl(
@@ -207,7 +202,7 @@ public abstract class BaseWebApplication extends BaseApplicationImpl implements 
         return VoidSecretController.INSTANCE;
     }
 
-    protected static Map<String, Object> getServerConfigProps(Map<String, Object> configProps) {
+    public static Map<String, Object> getServerConfigProps(Map<String, Object> configProps) {
         return JSONUtils.getObject(configProps, "server");
     }
 
@@ -270,11 +265,7 @@ public abstract class BaseWebApplication extends BaseApplicationImpl implements 
         return null;
     }
 
-    protected Gson getGson() {
-        return getGsonBuilder().create();
-    }
-
-    protected abstract GsonBuilder getGsonBuilder();
+    public abstract WebServerConfigurationController getServerConfigurationController();
 
     @Override
     public boolean isEnvironmentVariablesAccessible() {
