@@ -8,10 +8,13 @@ validate_missed_license() {
     HAS_FILES_WITHOUT_LICENSE=false
 
     for FILE in $STAGED_FILES; do
-        if ! grep -Fxq "$TEXT" "$FILE"; then
-            HAS_FILES_WITHOUT_LICENSE=true
-            git restore --staged "$FILE"
-        fi
+        while IFS= read -r LINE; do
+            if ! grep -Fxq "$LINE" "$FILE"; then
+                HAS_FILES_WITHOUT_LICENSE=true
+                git restore --staged "$FILE"
+                break
+            fi
+        done <<< "$TEXT"
     done
 
     if [ "$HAS_FILES_WITHOUT_LICENSE" = true ]; then
