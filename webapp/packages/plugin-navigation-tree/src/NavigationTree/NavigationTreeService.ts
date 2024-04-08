@@ -16,16 +16,9 @@ import {
 } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
 import { ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
-import {
-  EObjectFeature,
-  NavNode,
-  NavNodeInfoResource,
-  NavNodeManagerService,
-  NavTreeResource,
-  ROOT_NODE_PATH,
-} from '@cloudbeaver/core-navigation-tree';
+import { EObjectFeature, NavNodeInfoResource, NavNodeManagerService, NavTreeResource, ROOT_NODE_PATH } from '@cloudbeaver/core-navigation-tree';
 import { CACHED_RESOURCE_DEFAULT_PAGE_OFFSET, CachedResourceOffsetPageKey, ResourceKey, resourceKeyList } from '@cloudbeaver/core-resource';
-import { isNotNullDefined, MetadataMap } from '@cloudbeaver/core-utils';
+import { MetadataMap } from '@cloudbeaver/core-utils';
 import { ACTION_COLLAPSE_ALL, ACTION_FILTER, IActiveView, View } from '@cloudbeaver/core-view';
 
 import { ACTION_LINK_OBJECT } from './ElementsTree/ACTION_LINK_OBJECT';
