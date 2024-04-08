@@ -106,7 +106,14 @@ module.exports = (env, argv) => {
             test: /[\\/]locales[\\/].*?\.js/,
             filename: '[name].[contenthash].js',
             name(module) {
-              return module.rawRequest.substr(2);
+              const path = module.context ?? module.resource;
+              const match = /.*[\\/](.*?)[\\/]webapp[\\/]packages[\\/]((plugin|core)-.*?)([\\/]|$)/.exec(path);
+
+              if (!path || !match) {
+                return module.rawRequest.substr(2);
+              }
+
+              return `${match[1]}/${module.rawRequest.substr(2)}`;
             },
             priority: -5,
             reuseExistingChunk: true,
@@ -116,11 +123,11 @@ module.exports = (env, argv) => {
             filename: '[name].[contenthash].js',
             name(module) {
               const path = module.context ?? module.resource;
-              const match = /[\\/]packages[\\/]((plugin|core)-.*?)([\\/]|$)/.exec(path);
+              const match = /.*[\\/](.*?)[\\/]webapp[\\/]packages[\\/]((plugin|core)-.*?)([\\/]|$)/.exec(path);
               if (!path || !match) {
                 return 'package';
               }
-              return match[1];
+              return `${match[1]}/${match[2]}`;
             },
             priority: -10,
             enforce: true,

@@ -82,7 +82,8 @@ module.exports = (env, argv) => {
           keep_classnames: true,
           keep_fnames: true,
         },
-        include: [/.*.public-ce..*$/, /^service-worker.js$/],
+        include: [/.*.public-ce..*$/, /^cloudbeaver\/.*/, /^service-worker.js$/],
+        exclude: [/^cloudbeaver-ee\/.*/],
       })],
     },
     plugins: [
