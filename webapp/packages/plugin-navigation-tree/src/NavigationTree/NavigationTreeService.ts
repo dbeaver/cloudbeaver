@@ -73,14 +73,6 @@ export class NavigationTreeService extends View<string> {
     return this.navNodeManagerService.getTree(id);
   }
 
-  getChildrenNodes(id: string): NavNode[] {
-    return (this.getChildren(id) ?? []).map(id => this.getNode(id)).filter(isNotNullDefined);
-  }
-
-  getNode(id: string) {
-    return this.navNodeManagerService.getNode(id);
-  }
-
   async navToNode(id: string, parentId?: string): Promise<void> {
     await this.navNodeManagerService.navToNode(id, parentId);
   }
@@ -181,7 +173,7 @@ export class NavigationTreeService extends View<string> {
   }
 
   private isConnectionNode(navNodeId: string) {
-    const node = this.getNode(navNodeId);
+    const node = this.navNodeManagerService.getNode(navNodeId);
     return node?.objectFeatures.includes(EObjectFeature.dataSource);
   }
 
