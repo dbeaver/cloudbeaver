@@ -81,7 +81,7 @@ public class WSObjectPermissionUpdatedEventHandler extends WSDefaultEventHandler
                         return;
                     }
                     if (WSEventType.OBJECT_PERMISSIONS_UPDATED.getEventId().equals(event.getId())) {
-                        isAccessibleNow = webSession.findWebConnectionInfo(objectId) != null;
+                        isAccessibleNow = webSession.findWebConnectionInfo(project.getId(), objectId) != null;
                         if (isAccessibleNow) {
                             return;
                         }
