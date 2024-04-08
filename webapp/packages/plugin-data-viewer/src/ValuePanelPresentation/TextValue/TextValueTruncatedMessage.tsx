@@ -21,6 +21,8 @@ import type { IDatabaseResultSet } from '../../DatabaseDataModel/IDatabaseResult
 import { QuotaPlaceholder } from '../QuotaPlaceholder';
 import { MAX_BLOB_PREVIEW_SIZE } from './MAX_BLOB_PREVIEW_SIZE';
 
+const MAX_TEXT_CONTENT_SIZE = 1 * 1048576;
+
 interface Props {
   resultIndex: number;
   model: IDatabaseDataModel<any, IDatabaseResultSet>;
@@ -44,9 +46,8 @@ export const TextValueTruncatedMessage = observer<Props>(function TextValueTrunc
     return null;
   }
   const isTextColumn = formatAction.isText(elementKey);
-
-  const valueSize =
-    isResultSetContentValue(contentValue) && isNotNullDefined(contentValue.contentLength) ? bytesToSize(contentValue.contentLength) : undefined;
+  const valueSize = isResultSetContentValue(contentValue) && isNotNullDefined(contentValue.contentLength) ? contentValue.contentLength : undefined;
+  const canShowMore = valueSize ? valueSize <= MAX_TEXT_CONTENT_SIZE : true;
 
   async function pasteFullText() {
     try {
@@ -58,10 +59,11 @@ export const TextValueTruncatedMessage = observer<Props>(function TextValueTrunc
 
   return (
     <QuotaPlaceholder model={model} resultIndex={resultIndex} elementKey={elementKey} keepSize>
-      {isTextColumn && (
+      {isTextColumn && canShowMore && (
         <Container keepSize>
           <Button disabled={model.isLoading()} onClick={pasteFullText}>
-            {`${translate('ui_show_more')} (${valueSize})`}
+            {translate('ui_show_more')}
+            {valueSize ? ` (${bytesToSize(valueSize)})` : ''}
           </Button>
         </Container>
       )}
