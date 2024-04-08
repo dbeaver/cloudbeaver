@@ -17,7 +17,7 @@
 package io.cloudbeaver.service.security.db;
 
 import org.jkiss.code.NotNull;
-import org.jkiss.dbeaver.registry.storage.InternalDatabaseConfig;
+import org.jkiss.dbeaver.model.connection.InternalDatabaseConfig;
 
 /**
  * Database configuration

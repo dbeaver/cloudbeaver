@@ -217,7 +217,8 @@ public class CBDatabase {
                 null,
                 schemaName,
                 CURRENT_SCHEMA_VERSION,
-                0
+                0,
+                    databaseConfiguration
             );
             schemaManager.updateSchema(monitor);
 
