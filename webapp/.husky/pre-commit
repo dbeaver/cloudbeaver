@@ -1,7 +1,7 @@
 #!/usr/bin/env sh
 source ./webapp/scripts/license.sh
 
-add_missed_license "/*
+validate_missed_license "/*
  * CloudBeaver - Cloud Database Manager
  * Copyright (C) 2020-2024 DBeaver Corp and others
  *
