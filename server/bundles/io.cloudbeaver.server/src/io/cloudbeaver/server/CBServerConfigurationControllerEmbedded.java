@@ -25,6 +25,7 @@ import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.data.json.JSONUtils;
 import org.jkiss.utils.CommonUtils;
 
+import java.nio.file.Path;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -35,8 +36,8 @@ public class CBServerConfigurationControllerEmbedded<T extends CBServerConfig> e
 
     private static final Log log = Log.getLog(CBServerConfigurationControllerEmbedded.class);
 
-    public CBServerConfigurationControllerEmbedded(T serverConfig) {
-        super(serverConfig);
+    public CBServerConfigurationControllerEmbedded(@NotNull T serverConfig, @NotNull Path homeDirectory) {
+        super(serverConfig, homeDirectory);
     }
 
     @NotNull
@@ -79,7 +80,7 @@ public class CBServerConfigurationControllerEmbedded<T extends CBServerConfig> e
         );
         Gson gson = getGson();
         Map<String, Object> passwordPolicyConfig = gson.fromJson(
-            gson.toJsonTree(securityManagerConfiguration.getPasswordPolicyConfiguration()),
+            gson.toJsonTree(getServerConfiguration().getSecurityManagerConfiguration().getPasswordPolicyConfiguration()),
             JSONUtils.MAP_TYPE_TOKEN
         );
         if (!CommonUtils.isEmpty(passwordPolicyConfig)) {
@@ -98,10 +99,8 @@ public class CBServerConfigurationControllerEmbedded<T extends CBServerConfig> e
         GsonBuilder gsonBuilder = super.getGsonBuilder();
         var databaseConfiguration = getServerConfiguration().getDatabaseConfiguration();
         InstanceCreator<WebDatabaseConfig> dbConfigCreator = type -> databaseConfiguration;
-        InstanceCreator<WebDatabaseConfig.Pool> dbPoolConfigCreator = type -> databaseConfiguration.getPool();
         return gsonBuilder
-            .registerTypeAdapter(WebDatabaseConfig.class, dbConfigCreator)
-            .registerTypeAdapter(WebDatabaseConfig.Pool.class, dbPoolConfigCreator);
+            .registerTypeAdapter(WebDatabaseConfig.class, dbConfigCreator);
     }
 
 
