@@ -22,7 +22,7 @@ export default [
   ['sql_editor_output_logs_input_placeholder', 'Введите часть сообщения для поиска'],
   ['sql_editor_output_logs_wrap_mode', 'Перенос строк'],
   ['sql_editor_sql_execution_button_tooltip', 'Выполнить SQL Выражение (Ctrl + Enter)'],
-  ['sql_editor_sql_execution_new_tab_button_tooltip', 'Выполнить SQL Выражение в новой вкладке (Ctrl + \)(Shift + Ctrl + Enter)'],
+  ['sql_editor_sql_execution_new_tab_button_tooltip', 'Выполнить SQL Выражение в новой вкладке (Ctrl + \\)(Shift + Ctrl + Enter)'],
   ['sql_editor_sql_execution_script_button_tooltip', 'Исполнить SQL Скрипт (Alt + X)'],
   ['sql_editor_sql_format_button_tooltip', 'Форматировать SQL скрипт (Shift + Ctrl + F)'],
   ['sql_editor_sql_execution_script_lock_tooltip', 'Заблокировать скрипт во избежание изменений'],
