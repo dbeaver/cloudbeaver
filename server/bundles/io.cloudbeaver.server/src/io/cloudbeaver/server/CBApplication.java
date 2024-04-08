@@ -26,7 +26,6 @@ import io.cloudbeaver.registry.WebServiceRegistry;
 import io.cloudbeaver.server.jetty.CBJettyServer;
 import io.cloudbeaver.service.DBWServiceInitializer;
 import io.cloudbeaver.service.DBWServiceServerConfigurator;
-import io.cloudbeaver.service.security.CBEmbeddedSecurityController;
 import io.cloudbeaver.service.security.SMControllerConfiguration;
 import io.cloudbeaver.service.session.WebSessionManager;
 import io.cloudbeaver.utils.WebDataSourceUtils;
@@ -95,7 +94,8 @@ public abstract class CBApplication<T extends CBServerConfig> extends BaseWebApp
     public static CBApplication getInstance() {
         return (CBApplication) BaseApplicationImpl.getInstance();
     }
-    private File homeDirectory;
+
+    private final File homeDirectory;
 
     // Persistence
     protected SMAdminController securityController;
@@ -109,6 +109,7 @@ public abstract class CBApplication<T extends CBServerConfig> extends BaseWebApp
     private WebSessionManager sessionManager;
 
     public CBApplication() {
+        this.homeDirectory = new File(initHomeFolder());
     }
 
     public String getServerURL() {
@@ -185,7 +186,7 @@ public abstract class CBApplication<T extends CBServerConfig> extends BaseWebApp
     }
 
     public SMControllerConfiguration getSecurityManagerConfiguration() {
-        return getServerConfigurationController().getSecurityManagerConfiguration();
+        return getServerConfiguration().getSecurityManagerConfiguration();
     }
 
     public SMAdminController getSecurityController() {
@@ -195,7 +196,6 @@ public abstract class CBApplication<T extends CBServerConfig> extends BaseWebApp
     @Override
     protected void startServer() {
         CBPlatform.setApplication(this);
-        initHomeFolder();
         try {
             if (!loadServerConfiguration()) {
                 return;
@@ -466,12 +466,7 @@ public abstract class CBApplication<T extends CBServerConfig> extends BaseWebApp
         if (CommonUtils.isEmpty(homeFolder)) {
             homeFolder = ".";
         }
-        homeDirectory = new File(homeFolder);
         return homeFolder;
-    }
-
-    protected void validateConfiguration(Map<String, Object> appConfig) throws DBException {
-
     }
 
     private void runWebServer() {
