@@ -84,3 +84,5 @@ export const ConnectionNavNodeControl: NavTreeControlComponent = observer<NavTre
     );
   }),
 );
+
+ConnectionNavNodeControl.displayName = 'ConnectionNavNodeControl';

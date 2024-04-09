@@ -121,3 +121,5 @@ export const TreeNode = observer<Props, HTMLDivElement | null>(
     );
   }),
 );
+
+TreeNode.displayName = 'TreeNode';
