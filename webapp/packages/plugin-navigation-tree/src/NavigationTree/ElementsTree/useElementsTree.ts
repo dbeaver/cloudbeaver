@@ -17,7 +17,7 @@ import { type NavNode, NavNodeInfoResource, NavTreeResource, ROOT_NODE_PATH } fr
 import { ProjectInfoResource, ProjectsService } from '@cloudbeaver/core-projects';
 import { CachedMapAllKey, CachedResourceOffsetPageKey, getNextPageOffset, ResourceKeyUtils } from '@cloudbeaver/core-resource';
 import type { IDNDData } from '@cloudbeaver/core-ui';
-import { ILoadableState, MetadataMap, throttle } from '@cloudbeaver/core-utils';
+import { debounce, ILoadableState, MetadataMap } from '@cloudbeaver/core-utils';
 
 import { ElementsTreeService } from './ElementsTreeService';
 import type { IElementsTreeAction } from './IElementsTreeAction';
@@ -93,7 +93,16 @@ interface IOptions extends IElementsTreeOptions {
   folderExplorer: IFolderExplorerContext;
 }
 
+interface ILoadingNodesState {
+  state: Map<string, Set<number>>;
+  add: (nodeId: string, timestamp: number) => void;
+  reset: (nodeId: string) => void;
+  remove: (nodeId: string, timestamp: number) => void;
+  isFirstLoadingNode: (nodeId: string, timestamp: number) => boolean;
+}
+
 export interface IElementsTree extends ILoadableState {
+  loadingNodesState: ILoadingNodesState;
   actions: ISyncExecutor<IElementsTreeAction>;
   settings?: IElementsTreeSettings;
   baseRoot: string;
@@ -140,6 +149,42 @@ export function useElementsTree(options: IOptions): IElementsTree {
   const connectionInfoResource = useService(ConnectionInfoResource);
   const elementsTreeService = useService(ElementsTreeService);
 
+  const loadingNodesState = useObjectRef<ILoadingNodesState>({
+    state: new Map<string, Set<number>>(), // nodeId -> Set<timestamp>
+    add: (nodeId: string, timestamp: number) => {
+      let nodes = loadingNodesState.state.get(nodeId);
+
+      if (!nodes) {
+        nodes = new Set();
+      }
+
+      nodes.add(timestamp);
+      loadingNodesState.state.set(nodeId, nodes);
+    },
+    reset(nodeId: string) {
+      loadingNodesState.state.delete(nodeId);
+    },
+    remove(nodeId: string, timestamp: number) {
+      const nodes = loadingNodesState.state.get(nodeId);
+
+      if (!nodes) {
+        return;
+      }
+
+      nodes.delete(timestamp);
+      this.state.set(nodeId, nodes);
+    },
+    isFirstLoadingNode(nodeId: string, timestamp: number) {
+      const nodes = this.state.get(nodeId);
+
+      if (!nodes) {
+        return true;
+      }
+
+      return nodes.size === 0 || (nodes.size === 1 && nodes.has(timestamp));
+    },
+  });
+
   const [localTreeNodesState] = useState(
     () =>
       new MetadataMap<string, ITreeNodeState>(() => ({
@@ -184,85 +229,108 @@ export function useElementsTree(options: IOptions): IElementsTree {
             options.folderExplorer.open([], options.baseRoot);
           } else {
             this.exitNodeFolder(preloadedRoot);
+            loadingNodesState.reset(preloadedRoot);
           }
           return;
         }
 
-        let children = [nodeId];
+        let children: Set<string> = new Set([nodeId]);
 
-        while (children.length > 0) {
-          const nextChildren: string[] = [];
+        while (children.size > 0) {
+          const nextChildren: Set<string> = new Set();
 
           await Promise.all(
-            children.map(async child => {
-              await projectInfoResource.waitLoad();
-              await connectionInfoResource.waitLoad();
-              await navTreeResource.waitLoad();
-              await navNodeInfoResource.waitLoad();
+            Array.from(children).map(async child => {
+              const loadingNodeChildrenTimestamp = Date.now();
+              loadingNodesState.add(child, loadingNodeChildrenTimestamp);
 
-              const expanded = elementsTree.isNodeExpanded(child, true);
+              if (!loadingNodesState.isFirstLoadingNode(child, loadingNodeChildrenTimestamp)) {
+                return;
+              }
 
-              if (!expanded && child !== options.root) {
-                if (navNodeInfoResource.isOutdated(child)) {
+              try {
+                await projectInfoResource.waitLoad();
+                await connectionInfoResource.waitLoad();
+                await navTreeResource.waitLoad();
+                await navNodeInfoResource.waitLoad();
+
+                const expanded = elementsTree.isNodeExpanded(child, true);
+
+                if (!expanded && child !== options.root) {
+                  if (navNodeInfoResource.isOutdated(child)) {
+                    const node = navNodeInfoResource.get(child);
+
+                    if (node?.parentId !== undefined && !navTreeResource.isOutdated(node.parentId)) {
+                      await navNodeInfoResource.load(child);
+                    }
+                  }
+
+                  loadingNodesState.remove(child, loadingNodeChildrenTimestamp);
+                  return;
+                }
+
+                const loaded = await handleLoadChildren(child, false);
+
+                if (!loaded) {
                   const node = navNodeInfoResource.get(child);
 
-                  if (node?.parentId !== undefined && !navTreeResource.isOutdated(node.parentId)) {
-                    await navNodeInfoResource.load(child);
+                  if (node && expanded && elementsTree.isNodeExpandable(child)) {
+                    await elementsTree.expand(node, false);
+                  }
+
+                  loadingNodesState.remove(child, loadingNodeChildrenTimestamp);
+                  return;
+                }
+
+                const pageInfo = navTreeResource.offsetPagination.getPageInfo(CachedResourceOffsetPageKey(0, 0).setTarget(child));
+
+                if (pageInfo) {
+                  const lastOffset = getNextPageOffset(pageInfo);
+                  for (let offset = 0; offset < lastOffset; offset += navTreeResource.childrenLimit) {
+                    await navTreeResource.load(CachedResourceOffsetPageKey(offset, navTreeResource.childrenLimit).setTarget(child));
                   }
                 }
-                return;
-              }
 
-              const loaded = await handleLoadChildren(child, false);
+                if (elementsTree.isNodeExpandable(child) && expanded && elementsTree.getNodeChildren(child).length === 0) {
+                  const node = navNodeInfoResource.get(child);
 
-              if (!loaded) {
-                const node = navNodeInfoResource.get(child);
+                  if (node) {
+                    await elementsTree.expand(node, false);
+                  }
 
-                if (node && expanded && elementsTree.isNodeExpandable(child)) {
-                  await elementsTree.expand(node, false);
+                  loadingNodesState.remove(child, loadingNodeChildrenTimestamp);
+                  return;
                 }
 
-                return;
-              }
+                if (
+                  elementsTree.settings?.foldersTree &&
+                  options.folderExplorer.options.expandFoldersWithSingleElement &&
+                  child === options.root &&
+                  elementsTree.getNodeChildren(child).length === 1
+                ) {
+                  const nextNode = elementsTree.getNodeChildren(child)[0];
 
-              const pageInfo = navTreeResource.offsetPagination.getPageInfo(CachedResourceOffsetPageKey(0, 0).setTarget(child));
-
-              if (pageInfo) {
-                const lastOffset = getNextPageOffset(pageInfo);
-                for (let offset = 0; offset < lastOffset; offset += navTreeResource.childrenLimit) {
-                  await navTreeResource.load(CachedResourceOffsetPageKey(offset, navTreeResource.childrenLimit).setTarget(child));
+                  if (elementsTree.isNodeExpandable(nextNode) || elementsTree.isNodeExpanded(nextNode)) {
+                    options.folderExplorer.open(navNodeInfoResource.getParents(nextNode), nextNode);
+                  }
                 }
+
+                new Set(navTreeResource.get(child) || []).forEach(candidate => {
+                  nextChildren.add(candidate);
+                });
+
+                loadingNodesState.remove(child, loadingNodeChildrenTimestamp);
+              } finally {
+                loadingNodesState.remove(child, loadingNodeChildrenTimestamp);
               }
-
-              if (elementsTree.isNodeExpandable(child) && expanded && elementsTree.getNodeChildren(child).length === 0) {
-                const node = navNodeInfoResource.get(child);
-
-                if (node) {
-                  await elementsTree.expand(node, false);
-                }
-                return;
-              }
-
-              if (
-                elementsTree.settings?.foldersTree &&
-                options.folderExplorer.options.expandFoldersWithSingleElement &&
-                child === options.root &&
-                elementsTree.getNodeChildren(child).length === 1
-              ) {
-                const nextNode = elementsTree.getNodeChildren(child)[0];
-
-                if (elementsTree.isNodeExpandable(nextNode) || elementsTree.isNodeExpanded(nextNode)) {
-                  options.folderExplorer.open(navNodeInfoResource.getParents(nextNode), nextNode);
-                }
-              }
-              nextChildren.push(...(navTreeResource.get(child) || []));
             }),
           );
 
-          children = nextChildren;
+          children = new Set(nextChildren);
         }
       } finally {
         elementsTree.loading = false;
+        loadingNodesState.reset(nodeId);
       }
     },
 
@@ -385,7 +453,7 @@ export function useElementsTree(options: IOptions): IElementsTree {
       });
 
       try {
-        await functionsRef.loadTree(options.root);
+        loadTreeThreshold();
       } catch {}
     },
     data => typeof data === 'object' && typeof data.filter === 'string' && Array.isArray(data.nodeState),
@@ -395,7 +463,7 @@ export function useElementsTree(options: IOptions): IElementsTree {
     () => ({
       actions: new SyncExecutor(),
       activeDnDData: [],
-      loading: options.settings?.saveExpanded || false,
+      loading: options.settings?.saveExpanded || Array.from(loadingNodesState.state.values()).some(timestamps => timestamps.size > 0) || false,
       get filter(): string {
         return this.userData.filter;
       },
@@ -559,19 +627,24 @@ export function useElementsTree(options: IOptions): IElementsTree {
         await options.onClick?.(node);
       },
       async open(node: NavNode, path: string[], leaf: boolean) {
-        const expandableOrExpanded = this.isNodeExpandable(node.id) || this.isNodeExpanded(node.id);
-        if (!leaf && this.settings?.foldersTree && expandableOrExpanded) {
-          const nodeId = node.id;
+        try {
+          const expandableOrExpanded = this.isNodeExpandable(node.id) || this.isNodeExpanded(node.id);
 
-          const loaded = await handleLoadChildren(node.id, false);
-          if (loaded) {
-            this.setFilter('');
-            options.folderExplorer.open(path, nodeId);
+          loadingNodesState.add(node.id, Date.now());
+
+          if (!leaf && this.settings?.foldersTree && expandableOrExpanded) {
+            const loaded = await handleLoadChildren(node.id, false);
+            if (loaded) {
+              this.setFilter('');
+              options.folderExplorer.open(path, node.id);
+            }
           }
-        }
 
-        const folder = (!leaf && this.settings?.foldersTree) || false;
-        await options.onOpen?.(node, folder);
+          const folder = (!leaf && this.settings?.foldersTree) || false;
+          await options.onOpen?.(node, folder);
+        } finally {
+          loadingNodesState.reset(node.id);
+        }
       },
       async expand(node: NavNode, state: boolean) {
         if (!this.isNodeExpandable(node.id)) {
@@ -598,8 +671,9 @@ export function useElementsTree(options: IOptions): IElementsTree {
             }
           } else {
             await options.onExpand?.(node, state);
-            treeNodeState.expanded = state && this.getNodeChildren(node.id).length > 0;
           }
+
+          treeNodeState.expanded = state && this.getNodeChildren(node.id).length > 0;
 
           if (state) {
             await functionsRef.loadTree(node.id);
@@ -644,12 +718,17 @@ export function useElementsTree(options: IOptions): IElementsTree {
       async loadPath(path: string[], lastNode?: string): Promise<string | undefined> {
         let lastLoadedNode: string | undefined;
         for (const nodeId of path) {
-          const loaded = await handleLoadChildren(nodeId, false);
+          try {
+            loadingNodesState.add(nodeId, Date.now());
+            const loaded = await handleLoadChildren(nodeId, false);
 
-          if (!loaded) {
-            return lastLoadedNode;
+            if (!loaded) {
+              return lastLoadedNode;
+            }
+            lastLoadedNode = nodeId;
+          } finally {
+            loadingNodesState.reset(nodeId);
           }
-          lastLoadedNode = nodeId;
         }
 
         if (lastNode !== undefined && lastLoadedNode !== undefined && options.getChildren(lastLoadedNode)?.includes(lastNode)) {
@@ -686,6 +765,7 @@ export function useElementsTree(options: IOptions): IElementsTree {
     },
     {
       state,
+      loadingNodesState,
       isGroup: options.isGroup,
       disabled: options.disabled,
       root: options.root,
@@ -699,14 +779,14 @@ export function useElementsTree(options: IOptions): IElementsTree {
   );
 
   useEffect(() => {
-    functionsRef.loadTree(options.root).catch(() => ({}));
+    loadTreeThreshold();
   }, [options.root]);
 
   const loadTreeThreshold = useCallback(
-    throttle(function refreshRoot() {
+    debounce(function refreshRoot() {
       functionsRef.loadTree(options.root).catch(() => ({}));
     }, 100),
-    [],
+    [options.root],
   );
 
   useResource(useElementsTree, navTreeResource, options.baseRoot, {
