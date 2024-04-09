@@ -56,12 +56,10 @@ export class ConnectionAuthService extends Dependency {
       return null;
     }
 
-    let connection = this.connectionInfoResource.get(key);
+    let connection = await this.connectionInfoResource.load(key);
     const isConnectedInitially = connection?.connected;
 
-    if (!connection?.connected) {
-      connection = await this.connectionInfoResource.refresh(key);
-    } else {
+    if (connection?.connected) {
       if (resetCredentials) {
         this.connectionInfoResource.close(key);
       } else {
