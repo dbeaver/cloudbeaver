@@ -7,13 +7,15 @@
  */
 import type { PluginManifest } from '@cloudbeaver/core-di';
 
+import { LocaleService } from './LocaleService';
+import { SettingsManagerService } from './SettingsManager/SettingsManagerService';
+import { SettingsProviderService } from './SettingsProviderService';
 import { SettingsResolverService } from './SettingsResolverService';
-import { SettingsService } from './SettingsService';
 
 export const coreSettingsManifest: PluginManifest = {
   info: {
     name: 'Core Settings',
   },
 
-  providers: [SettingsService, SettingsResolverService],
+  providers: [SettingsManagerService, SettingsResolverService, LocaleService, SettingsProviderService],
 };

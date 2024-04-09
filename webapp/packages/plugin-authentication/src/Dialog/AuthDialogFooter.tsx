@@ -6,25 +6,10 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import styled, { css } from 'reshadow';
 
-import { Button, useTranslate } from '@cloudbeaver/core-blocks';
+import { Button, s, useS, useTranslate } from '@cloudbeaver/core-blocks';
 
-const styles = css`
-  footer-container {
-    display: flex;
-    width: min-content;
-    flex: 1;
-    align-items: center;
-    justify-content: flex-end;
-  }
-  footer-container > :not(:first-child) {
-    margin-left: 16px;
-  }
-  Button {
-    flex: 0 0 auto;
-  }
-`;
+import styles from './AuthDialogFooter.m.css';
 
 export interface Props extends React.PropsWithChildren {
   authAvailable: boolean;
@@ -34,13 +19,21 @@ export interface Props extends React.PropsWithChildren {
 
 export const AuthDialogFooter = observer<Props>(function AuthDialogFooter({ authAvailable, isAuthenticating, onLogin, children }) {
   const translate = useTranslate();
+  const style = useS(styles);
 
-  return styled(styles)(
-    <footer-container>
+  return (
+    <div className={s(style, { footerContainer: true })}>
       {children}
-      <Button type="button" mod={['unelevated']} loading={isAuthenticating} hidden={!authAvailable} onClick={onLogin}>
+      <Button
+        className={s(style, { button: true })}
+        type="button"
+        mod={['unelevated']}
+        loading={isAuthenticating}
+        hidden={!authAvailable}
+        onClick={onLogin}
+      >
         {translate('authentication_login')}
       </Button>
-    </footer-container>,
+    </div>
   );
 });

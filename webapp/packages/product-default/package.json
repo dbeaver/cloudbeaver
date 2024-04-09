@@ -5,7 +5,7 @@
     "src/**/*.scss",
     "public/**/*"
   ],
-  "version": "24.0.0",
+  "version": "24.0.2",
   "description": "CloudBeaver Community",
   "license": "Apache-2.0",
   "main": "dist/index.js",
@@ -29,7 +29,6 @@
     "@cloudbeaver/core-bootstrap": "~0.1.0",
     "@cloudbeaver/core-di": "~0.1.0",
     "@cloudbeaver/core-localization": "~0.1.0",
-    "@cloudbeaver/core-product": "~0.1.0",
     "@cloudbeaver/core-task-manager": "~0.1.0",
     "@cloudbeaver/core-version-update": "~0.1.0",
     "@cloudbeaver/plugin-administration": "~0.1.0",
@@ -42,10 +41,12 @@
     "@cloudbeaver/plugin-connections": "~0.1.0",
     "@cloudbeaver/plugin-connections-administration": "~0.1.0",
     "@cloudbeaver/plugin-data-export": "~0.1.0",
+    "@cloudbeaver/plugin-data-import": "~0.1.0",
     "@cloudbeaver/plugin-data-spreadsheet-new": "~0.1.0",
     "@cloudbeaver/plugin-data-viewer": "~0.1.0",
     "@cloudbeaver/plugin-data-viewer-result-set-grouping": "~0.1.0",
     "@cloudbeaver/plugin-datasource-context-switch": "~0.1.0",
+    "@cloudbeaver/plugin-datasource-transaction-manager": "~0.1.0",
     "@cloudbeaver/plugin-ddl-viewer": "~0.1.0",
     "@cloudbeaver/plugin-devtools": "~0.1.0",
     "@cloudbeaver/plugin-gis-viewer": "~0.1.0",
@@ -82,17 +83,18 @@
     "@cloudbeaver/plugin-top-app-bar-administration": "~0.1.0",
     "@cloudbeaver/plugin-user-profile": "~0.1.0",
     "@cloudbeaver/plugin-user-profile-administration": "~0.1.0",
+    "@cloudbeaver/plugin-user-profile-settings": "~0.1.0",
     "@cloudbeaver/plugin-version": "~0.1.0",
     "@cloudbeaver/plugin-version-update-administration": "~0.1.0",
     "react": "^18.2.0",
-    "reflect-metadata": "^0.1.13"
+    "reflect-metadata": "^0.2.1"
   },
   "peerDependencies": {},
   "product": {
     "name": "CloudBeaver Community"
   },
   "devDependencies": {
-    "@types/react": "^18.2.42",
-    "typescript": "^5.3.2"
+    "@types/react": "^18.2.63",
+    "typescript": "^5.3.3"
   }
 }

@@ -18,7 +18,7 @@ export class DataViewerService {
       return true;
     }
 
-    return !this.dataViewerSettingsService.settings.getValue('disableCopyData');
+    return !this.dataViewerSettingsService.disableCopyData;
   }
 
   constructor(
@@ -32,7 +32,7 @@ export class DataViewerService {
     }
 
     const isAdmin = this.sessionPermissionsResource.has(EAdminPermission.admin);
-    const disabled = this.dataViewerSettingsService.settings.getValue('disableEdit');
+    const disabled = this.dataViewerSettingsService.disableEdit;
 
     return isAdmin || !disabled;
   }

@@ -172,4 +172,22 @@ public interface DBWServiceSQL extends DBWService {
     @Nullable
     @WebAction
     Long getRowDataCountResult(@NotNull WebSession webSession, @NotNull String taskId) throws DBWebException;
+
+    @WebAction
+    WebAsyncTaskInfo asyncSqlSetAutoCommit(
+        @NotNull WebSession webSession,
+        @NotNull WebSQLContextInfo contextInfo,
+        boolean autoCommit
+    ) throws DBWebException;
+
+    @WebAction
+    WebAsyncTaskInfo asyncSqlRollbackTransaction(
+        @NotNull WebSession webSession,
+        @NotNull WebSQLContextInfo contextInfo
+    ) throws DBWebException;
+
+    @WebAction
+    WebAsyncTaskInfo asyncSqlCommitTransaction(
+        @NotNull WebSession webSession,
+        @NotNull WebSQLContextInfo sqlContext);
 }

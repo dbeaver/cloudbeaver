@@ -16,22 +16,21 @@ export const SESSION_TOUCH_TIME_PERIOD = 1000 * 60;
 export class SessionActivityService extends Dependency {
   private touchSessionTimer: ReturnType<typeof setTimeout> | null = null;
 
-  constructor(private readonly clientActivityService: ClientActivityService, private readonly sessionResource: SessionResource) {
+  constructor(
+    private readonly clientActivityService: ClientActivityService,
+    private readonly sessionResource: SessionResource,
+  ) {
     super();
     this.notifyClientActivity = this.notifyClientActivity.bind(this);
     this.clientActivityService.onActiveStateChange.addHandler(this.notifyClientActivity);
   }
 
-  private async notifyClientActivity() {
+  private notifyClientActivity() {
     if (this.touchSessionTimer || !this.clientActivityService.isActive) {
       return;
     }
 
-    try {
-      await this.sessionResource.updateSession();
-    } catch (e) {
-      console.error('Session update error', e);
-    }
+    this.sessionResource.pingSession();
 
     this.touchSessionTimer = setTimeout(() => {
       if (this.touchSessionTimer) {

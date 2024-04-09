@@ -16,7 +16,9 @@ export type InputFieldStateProps<TState extends Record<string, any>, TKey extend
   IFormStateControl<TState, TKey>;
 
 interface InputFieldType {
-  <TState extends Record<string, any>, TKey extends keyof TState>(props: InputFieldStateProps<TState, TKey>): React.ReactElement<any, any> | null;
+  <TState extends Record<string, any>, TKey extends keyof TState>(
+    props: InputFieldStateProps<TState, TKey> & React.RefAttributes<HTMLInputElement>,
+  ): React.ReactElement<any, any> | null;
 }
 
 export const InputFieldState: InputFieldType = observer<InputFieldStateProps<any, any>, HTMLInputElement>(
@@ -27,14 +29,8 @@ export const InputFieldState: InputFieldType = observer<InputFieldStateProps<any
       return null;
     }
 
-    return (
-      <InputFieldBase
-        ref={ref}
-        name={name}
-        value={(controlState.stringValue || controlState.defaultValue) ?? ''}
-        onChange={controlState.onChange}
-        {...rest}
-      />
-    );
+    const defaultValue = rest.type === 'password' ? null : controlState.defaultStringValue;
+
+    return <InputFieldBase {...rest} ref={ref} name={name} value={controlState.stringValue ?? defaultValue ?? ''} onChange={controlState.onChange} />;
   }),
 ) as InputFieldType;

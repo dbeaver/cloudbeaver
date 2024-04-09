@@ -9,6 +9,7 @@ export * from './extensions/IObjectCatalogProvider';
 export * from './extensions/IObjectCatalogSetter';
 export * from './extensions/IObjectSchemaProvider';
 export * from './extensions/IObjectSchemaSetter';
+export * from './extensions/IExecutionContextProvider';
 export * from './NavTree/ConnectionNavNodeService';
 export * from './NavTree/NavNodeExtensionsService';
 export * from './NavTree/getConnectionFolderIdFromNodeId';

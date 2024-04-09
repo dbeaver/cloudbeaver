@@ -45,6 +45,8 @@ function isCtrlKeyHeldDown(e) {
   return (e.ctrlKey || e.metaKey) && e.key !== 'Control';
 }
 function isDefaultCellInput(event) {
+  const vKey = 86;
+  if (isCtrlKeyHeldDown(event) && event.keyCode !== vKey) return false;
   return !nonInputKeys.has(event.key);
 }
 function onEditorNavigation({
@@ -57,7 +59,7 @@ function onEditorNavigation({
   return false;
 }
 
-const measuringCellClassname = "mlln6zg7-0-0-beta-41";
+const measuringCellClassname = "mlln6zg7-0-0-beta-42";
 function renderMeasuringCells(viewportColumns) {
   return viewportColumns.map(({
     key,
@@ -262,12 +264,10 @@ function canExitGrid({
   return shiftKey ? atFirstCellInRow && atFirstRow : atLastCellInRow && atLastRow;
 }
 
-const cell = "cj343x07-0-0-beta-41";
+const cell = "cj343x07-0-0-beta-42";
 const cellClassname = `rdg-cell ${cell}`;
-const cellFrozen = "csofj7r7-0-0-beta-41";
+const cellFrozen = "csofj7r7-0-0-beta-42";
 const cellFrozenClassname = `rdg-cell-frozen ${cellFrozen}`;
-const cellFrozenLast = "ch2wcw87-0-0-beta-41";
-const cellFrozenLastClassname = `rdg-cell-frozen-last ${cellFrozenLast}`;
 
 function getRowStyle(rowIdx, height) {
   if (height !== undefined) {
@@ -307,7 +307,7 @@ function getCellStyle(column, colSpan = 1) {
   };
 }
 function getCellClassname(column, ...extraClasses) {
-  return clsx(cellClassname, ...extraClasses, column.frozen && cellFrozenClassname, column.isLastFrozenColumn && cellFrozenLastClassname);
+  return clsx(cellClassname, ...extraClasses, column.frozen && cellFrozenClassname);
 }
 
 const {
@@ -336,13 +336,13 @@ function getHeaderCellRowSpan(column, rowIdx) {
   return column.parent === undefined ? rowIdx : column.level - column.parent.level;
 }
 
-const checkboxLabel = "c1bn88vv7-0-0-beta-41";
+const checkboxLabel = "c1bn88vv7-0-0-beta-42";
 const checkboxLabelClassname = `rdg-checkbox-label ${checkboxLabel}`;
-const checkboxInput = "c1qt073l7-0-0-beta-41";
+const checkboxInput = "c1qt073l7-0-0-beta-42";
 const checkboxInputClassname = `rdg-checkbox-input ${checkboxInput}`;
-const checkbox = "cf71kmq7-0-0-beta-41";
+const checkbox = "cf71kmq7-0-0-beta-42";
 const checkboxClassname = `rdg-checkbox ${checkbox}`;
-const checkboxLabelDisabled = "c1lwve4p7-0-0-beta-41";
+const checkboxLabelDisabled = "c1lwve4p7-0-0-beta-42";
 const checkboxLabelDisabledClassname = `rdg-checkbox-label-disabled ${checkboxLabelDisabled}`;
 function renderCheckbox({
   onChange,
@@ -364,9 +364,9 @@ function renderCheckbox({
   });
 }
 
-const groupCellContent = "g1s9ylgp7-0-0-beta-41";
+const groupCellContent = "g1s9ylgp7-0-0-beta-42";
 const groupCellContentClassname = `rdg-group-cell-content ${groupCellContent}`;
-const caret = "cz54e4y7-0-0-beta-41";
+const caret = "cz54e4y7-0-0-beta-42";
 const caretClassname = `rdg-caret ${caret}`;
 function renderToggleGroup(props) {
   return /*#__PURE__*/jsxRuntime.jsx(ToggleGroup, {
@@ -571,7 +571,6 @@ function useCalculatedColumns({
           idx: 0,
           level: 0,
           frozen,
-          isLastFrozenColumn: false,
           width: rawColumn.width ?? defaultWidth,
           minWidth: rawColumn.minWidth ?? defaultMinWidth,
           maxWidth: rawColumn.maxWidth ?? defaultMaxWidth,
@@ -613,9 +612,6 @@ function useCalculatedColumns({
         colSpanColumns.push(column);
       }
     });
-    if (lastFrozenColumnIndex !== -1) {
-      columns[lastFrozenColumnIndex].isLastFrozenColumn = true;
-    }
     return {
       columns,
       colSpanColumns,
@@ -1031,9 +1027,9 @@ function useViewportRows({
   };
 }
 
-const cellCopied = "c6ra8a37-0-0-beta-41";
+const cellCopied = "c6ra8a37-0-0-beta-42";
 const cellCopiedClassname = `rdg-cell-copied ${cellCopied}`;
-const cellDraggedOver = "cq910m07-0-0-beta-41";
+const cellDraggedOver = "cq910m07-0-0-beta-42";
 const cellDraggedOverClassname = `rdg-cell-dragged-over ${cellDraggedOver}`;
 function Cell({
   column,
@@ -1139,8 +1135,8 @@ function defaultRenderCell(key, props) {
   }, key);
 }
 
-const cellDragHandle = "c1w9bbhr7-0-0-beta-41";
-const cellDragHandleFrozenClassname = "c1creorc7-0-0-beta-41";
+const cellDragHandle = "c1w9bbhr7-0-0-beta-42";
+const cellDragHandleFrozenClassname = "c1creorc7-0-0-beta-42";
 const cellDragHandleClassname = `rdg-cell-drag-handle ${cellDragHandle}`;
 function DragHandle({
   gridRowStart,
@@ -1245,7 +1241,7 @@ function DragHandle({
   });
 }
 
-const cellEditing = "cis5rrm7-0-0-beta-41";
+const cellEditing = "cis5rrm7-0-0-beta-42";
 function EditCell({
   column,
   colSpan,
@@ -1383,8 +1379,8 @@ function GroupedColumnHeaderCell({
   });
 }
 
-const headerSortCellClassname = "h44jtk67-0-0-beta-41";
-const headerSortName = "hcgkhxz7-0-0-beta-41";
+const headerSortCellClassname = "h44jtk67-0-0-beta-42";
+const headerSortName = "hcgkhxz7-0-0-beta-42";
 const headerSortNameClassname = `rdg-header-sort-name ${headerSortName}`;
 function renderHeaderCell({
   column,
@@ -1418,14 +1414,14 @@ function SortableHeaderCell({
   });
 }
 
-const cellSortableClassname = "c6l2wv17-0-0-beta-41";
-const cellResizable = "c1kqdw7y7-0-0-beta-41";
+const cellSortableClassname = "c6l2wv17-0-0-beta-42";
+const cellResizable = "c1kqdw7y7-0-0-beta-42";
 const cellResizableClassname = `rdg-cell-resizable ${cellResizable}`;
-const resizeHandleClassname = "r1y6ywlx7-0-0-beta-41";
+const resizeHandleClassname = "r1y6ywlx7-0-0-beta-42";
 const cellDraggableClassname = 'rdg-cell-draggable';
-const cellDragging = "c1bezg5o7-0-0-beta-41";
+const cellDragging = "c1bezg5o7-0-0-beta-42";
 const cellDraggingClassname = `rdg-cell-dragging ${cellDragging}`;
-const cellOver = "c1vc96037-0-0-beta-41";
+const cellOver = "c1vc96037-0-0-beta-42";
 const cellOverClassname = `rdg-cell-drag-over ${cellOver}`;
 function HeaderCell({
   column,
@@ -1633,13 +1629,15 @@ function isEventPertinent(event) {
   return !event.currentTarget.contains(relatedTarget);
 }
 
-const row = "r1upfr807-0-0-beta-41";
+const row = "r1upfr807-0-0-beta-42";
 const rowClassname = `rdg-row ${row}`;
-const rowSelected = "r190mhd37-0-0-beta-41";
+const rowSelected = "r190mhd37-0-0-beta-42";
 const rowSelectedClassname = 'rdg-row-selected';
-const rowSelectedWithFrozenCell = "r139qu9m7-0-0-beta-41";
+const rowSelectedWithFrozenCell = "r139qu9m7-0-0-beta-42";
+const topSummaryRowClassname = 'rdg-top-summary-row';
+const bottomSummaryRowClassname = 'rdg-bottom-summary-row';
 
-const headerRow = "h10tskcx7-0-0-beta-41";
+const headerRow = "h10tskcx7-0-0-beta-42";
 const headerRowClassname = `rdg-header-row ${headerRow}`;
 function HeaderRow({
   rowIdx,
@@ -1848,7 +1846,7 @@ function ScrollToCell({
   });
 }
 
-const arrow = "a3ejtar7-0-0-beta-41";
+const arrow = "a3ejtar7-0-0-beta-42";
 const arrowClassname = `rdg-sort-arrow ${arrow}`;
 function renderSortStatus({
   sortDirection,
@@ -1883,14 +1881,14 @@ function renderSortPriority({
   return priority;
 }
 
-const root = "rnvodz57-0-0-beta-41";
+const root = "rnvodz57-0-0-beta-42";
 const rootClassname = `rdg ${root}`;
-const viewportDragging = "vlqv91k7-0-0-beta-41";
+const viewportDragging = "vlqv91k7-0-0-beta-42";
 const viewportDraggingClassname = `rdg-viewport-dragging ${viewportDragging}`;
-const focusSinkClassname = "f1lsfrzw7-0-0-beta-41";
-const focusSinkHeaderAndSummaryClassname = "f1cte0lg7-0-0-beta-41";
+const focusSinkClassname = "f1lsfrzw7-0-0-beta-42";
+const focusSinkHeaderAndSummaryClassname = "f1cte0lg7-0-0-beta-42";
 
-const summaryCellClassname = "s8wc6fl7-0-0-beta-41";
+const summaryCellClassname = "s8wc6fl7-0-0-beta-42";
 function SummaryCell({
   column,
   colSpan,
@@ -1933,12 +1931,9 @@ function SummaryCell({
 }
 const SummaryCell$1 = /*#__PURE__*/react.memo(SummaryCell);
 
-const summaryRow = "skuhp557-0-0-beta-41";
-const topSummaryRow = "tf8l5ub7-0-0-beta-41";
-const topSummaryRowBorderClassname = "tb9ughf7-0-0-beta-41";
-const bottomSummaryRowBorderClassname = "b1yssfnt7-0-0-beta-41";
+const summaryRow = "skuhp557-0-0-beta-42";
+const topSummaryRow = "tf8l5ub7-0-0-beta-42";
 const summaryRowClassname = `rdg-summary-row ${summaryRow}`;
-const topSummaryRowClassname = `rdg-top-summary-row ${topSummaryRow}`;
 function SummaryRow({
   rowIdx,
   gridRowStart,
@@ -1949,7 +1944,6 @@ function SummaryRow({
   lastFrozenColumnIndex,
   selectedCellIdx,
   isTop,
-  showBorder,
   selectCell,
   'aria-rowindex': ariaRowIndex
 }) {
@@ -1976,7 +1970,7 @@ function SummaryRow({
   return /*#__PURE__*/jsxRuntime.jsx("div", {
     role: "row",
     "aria-rowindex": ariaRowIndex,
-    className: clsx(rowClassname, `rdg-row-${rowIdx % 2 === 0 ? 'even' : 'odd'}`, summaryRowClassname, isTop ? [topSummaryRowClassname, showBorder && topSummaryRowBorderClassname] : ['rdg-bottom-summary-row', showBorder && bottomSummaryRowBorderClassname], selectedCellIdx === -1 && rowSelectedClassname),
+    className: clsx(rowClassname, `rdg-row-${rowIdx % 2 === 0 ? 'even' : 'odd'}`, summaryRowClassname, isTop ? `${topSummaryRowClassname} ${topSummaryRow}` : bottomSummaryRowClassname, selectedCellIdx === -1 && rowSelectedClassname),
     style: {
       ...getRowStyle(gridRowStart),
       '--rdg-summary-row-top': top !== undefined ? `${top}px` : undefined,
@@ -2270,6 +2264,7 @@ function DataGrid(props, ref) {
       const cKey = 67;
       const vKey = 86;
       if (keyCode === cKey) {
+        if (window.getSelection()?.isCollapsed === false) return;
         handleCopy();
         return;
       }
@@ -2807,7 +2802,6 @@ function DataGrid(props, ref) {
               lastFrozenColumnIndex: lastFrozenColumnIndex,
               selectedCellIdx: isSummaryRowSelected ? selectedPosition.idx : undefined,
               isTop: true,
-              showBorder: rowIdx === topSummaryRowsCount - 1,
               selectCell: selectCellLatest
             }, rowIdx);
           }), getViewportRows(), bottomSummaryRows?.map((row, rowIdx) => {
@@ -2827,7 +2821,6 @@ function DataGrid(props, ref) {
               lastFrozenColumnIndex: lastFrozenColumnIndex,
               selectedCellIdx: isSummaryRowSelected ? selectedPosition.idx : undefined,
               isTop: false,
-              showBorder: rowIdx === 0,
               selectCell: selectCellLatest
             }, rowIdx);
           })]
@@ -2901,7 +2894,7 @@ function GroupCell({
 }
 const GroupCell$1 = /*#__PURE__*/react.memo(GroupCell);
 
-const groupRow = "g1yxluv37-0-0-beta-41";
+const groupRow = "g1yxluv37-0-0-beta-42";
 const groupRowClassname = `rdg-group-row ${groupRow}`;
 function GroupedRow({
   className,
@@ -3196,11 +3189,11 @@ function TreeDataGrid({
     if (!onRowsChange) return;
     const updatedRawRows = [...rawRows];
     const rawIndexes = [];
-    indexes.forEach(index => {
+    for (const index of indexes) {
       const rawIndex = rawRows.indexOf(rows[index]);
       updatedRawRows[rawIndex] = updatedRows[index];
       rawIndexes.push(rawIndex);
-    });
+    }
     onRowsChange(updatedRawRows, {
       indexes: rawIndexes,
       column
@@ -3291,7 +3284,7 @@ function isReadonlyArray(arr) {
 }
 const TreeDataGrid$1 = /*#__PURE__*/react.forwardRef(TreeDataGrid);
 
-const textEditorInternalClassname = "t7vyx3i7-0-0-beta-41";
+const textEditorInternalClassname = "t7vyx3i7-0-0-beta-42";
 const textEditorClassname = `rdg-text-editor ${textEditorInternalClassname}`;
 function autoFocusAndSelect(input) {
   input?.focus();

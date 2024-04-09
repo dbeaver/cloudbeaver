@@ -25,12 +25,12 @@
     "@cloudbeaver/core-executor": "~0.1.0",
     "@cloudbeaver/core-localization": "~0.1.0",
     "@cloudbeaver/core-navigation-tree": "~0.1.0",
-    "@cloudbeaver/core-plugin": "~0.1.0",
     "@cloudbeaver/core-projects": "~0.1.0",
     "@cloudbeaver/core-resource": "~0.1.0",
     "@cloudbeaver/core-resource-manager": "~0.1.0",
     "@cloudbeaver/core-root": "~0.1.0",
     "@cloudbeaver/core-settings": "~0.1.0",
+    "@cloudbeaver/core-storage": "~0.1.0",
     "@cloudbeaver/core-utils": "~0.1.0",
     "@cloudbeaver/core-view": "~0.1.0",
     "@cloudbeaver/plugin-navigation-tabs": "~0.1.0",
@@ -43,6 +43,6 @@
   },
   "peerDependencies": {},
   "devDependencies": {
-    "typescript": "^5.3.2"
+    "typescript": "^5.3.3"
   }
 }

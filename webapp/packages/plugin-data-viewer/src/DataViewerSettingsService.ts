@@ -6,104 +6,159 @@
  * you may not use this file except in compliance with the License.
  */
 import { Dependency, injectable } from '@cloudbeaver/core-di';
+import { ServerSettingsManagerService } from '@cloudbeaver/core-root';
 import {
   createSettingsAliasResolver,
   ESettingsValueType,
-  PluginManagerService,
-  PluginSettings,
+  ISettingDescription,
+  ROOT_SETTINGS_LAYER,
   SettingsManagerService,
-} from '@cloudbeaver/core-plugin';
-import { ServerSettingsResolverService, ServerSettingsService } from '@cloudbeaver/core-root';
-import { schema } from '@cloudbeaver/core-utils';
+  SettingsProvider,
+  SettingsProviderService,
+  SettingsResolverService,
+} from '@cloudbeaver/core-settings';
+import { schema, schemaExtra } from '@cloudbeaver/core-utils';
 
 import { DATA_EDITOR_SETTINGS_GROUP } from './DATA_EDITOR_SETTINGS_GROUP';
 
 const defaultSettings = schema.object({
-  disableEdit: schema.coerce.boolean().default(false),
-  disableCopyData: schema.coerce.boolean().default(false),
-  fetchMin: schema.coerce.number().min(10).default(100),
-  fetchMax: schema.coerce.number().min(10).default(5000),
-  fetchDefault: schema.coerce.number().min(10).default(200),
+  'plugin.data-viewer.disableEdit': schemaExtra.stringedBoolean().default(false),
+  'plugin.data-viewer.disableCopyData': schemaExtra.stringedBoolean().default(false),
+  'plugin.data-viewer.fetchMin': schema.coerce.number().min(10).default(100),
+  'plugin.data-viewer.fetchMax': schema.coerce.number().min(10).default(5000),
+  'resultset.maxrows': schema.coerce.number().min(10).default(200),
 });
 
 export type DataViewerSettings = schema.infer<typeof defaultSettings>;
 
 @injectable()
 export class DataViewerSettingsService extends Dependency {
-  readonly settings: PluginSettings<typeof defaultSettings>;
+  get disableEdit(): boolean {
+    return this.settings.getValue('plugin.data-viewer.disableEdit');
+  }
+
+  get disableCopyData(): boolean {
+    return this.settings.getValue('plugin.data-viewer.disableCopyData');
+  }
+
+  get maxFetchSize(): number {
+    return this.settings.getValue('plugin.data-viewer.fetchMax');
+  }
+
+  get minFetchSize(): number {
+    return this.settings.getValue('plugin.data-viewer.fetchMin');
+  }
+
+  get defaultFetchSize(): number {
+    return this.settings.getValue('resultset.maxrows');
+  }
+
+  readonly settings: SettingsProvider<typeof defaultSettings>;
 
   constructor(
-    private readonly pluginManagerService: PluginManagerService,
+    private readonly settingsProviderService: SettingsProviderService,
     private readonly settingsManagerService: SettingsManagerService,
-    private readonly serverSettingsService: ServerSettingsService,
-    private readonly serverSettingsResolverService: ServerSettingsResolverService,
+    private readonly settingsResolverService: SettingsResolverService,
+    private readonly serverSettingsManagerService: ServerSettingsManagerService,
   ) {
     super();
-    this.settings = this.pluginManagerService.createSettings('data-viewer', 'plugin', defaultSettings);
-    this.serverSettingsResolverService.addResolver(
+    this.settings = this.settingsProviderService.createSettings(defaultSettings);
+    this.settingsResolverService.addResolver(
+      ROOT_SETTINGS_LAYER,
       /** @deprecated Use settings instead, will be removed in 23.0.0 */
-      createSettingsAliasResolver(this.serverSettingsService, this.settings, 'core.app.dataViewer'),
+      createSettingsAliasResolver(this.settingsResolverService, this.settings, {
+        'plugin.data-viewer.disableEdit': 'core.app.dataViewer.disableEdit',
+        'plugin.data-viewer.disableCopyData': 'core.app.dataViewer.disableCopyData',
+        'plugin.data-viewer.fetchMin': 'core.app.dataViewer.fetchMin',
+        'plugin.data-viewer.fetchMax': 'core.app.dataViewer.fetchMax',
+        'resultset.maxrows': 'core.app.dataViewer.fetchDefault',
+      }),
+      /** @deprecated Use settings instead, will be removed in 25.0.0 */
+      createSettingsAliasResolver(this.settingsResolverService, this.settings, {
+        'resultset.maxrows': 'plugin.data-viewer.fetchDefault',
+      }),
     );
 
     this.registerSettings();
-  }
-
-  getMaxFetchSize(): number {
-    return this.settings.getValue('fetchMax');
-  }
-
-  getMinFetchSize(): number {
-    return this.settings.getValue('fetchMin');
-  }
-
-  getDefaultFetchSize(): number {
-    return this.settings.getValue('fetchDefault');
   }
 
   getDefaultRowsCount(count?: number): number {
     if (typeof count === 'number' && Number.isNaN(count)) {
       count = 0;
     }
-    return count !== undefined ? Math.max(this.getMinFetchSize(), Math.min(count, this.getMaxFetchSize())) : this.getDefaultFetchSize();
+    return count !== undefined ? Math.max(this.minFetchSize, Math.min(count, this.maxFetchSize)) : this.defaultFetchSize;
   }
 
   private registerSettings() {
-    this.settingsManagerService.registerSettings(this.settings, () => [
-      {
-        key: 'disableEdit',
-        type: ESettingsValueType.Checkbox,
-        name: 'settings_data_editor_disable_edit_name',
-        description: 'settings_data_editor_disable_edit_description',
-        group: DATA_EDITOR_SETTINGS_GROUP,
-      },
-      {
-        key: 'disableCopyData',
-        type: ESettingsValueType.Checkbox,
-        name: 'settings_data_editor_disable_data_copy_name',
-        description: 'settings_data_editor_disable_data_copy_description',
-        group: DATA_EDITOR_SETTINGS_GROUP,
-      },
-      {
-        key: 'fetchMin',
-        type: ESettingsValueType.Input,
-        name: 'settings_data_editor_fetch_min_name',
-        description: 'settings_data_editor_fetch_min_description',
-        group: DATA_EDITOR_SETTINGS_GROUP,
-      },
-      {
-        key: 'fetchMax',
-        type: ESettingsValueType.Input,
-        name: 'settings_data_editor_fetch_max_name',
-        description: 'settings_data_editor_fetch_max_description',
-        group: DATA_EDITOR_SETTINGS_GROUP,
-      },
-      {
-        key: 'fetchDefault',
-        type: ESettingsValueType.Input,
-        name: 'settings_data_editor_fetch_default_name',
-        description: 'settings_data_editor_fetch_default_description',
-        group: DATA_EDITOR_SETTINGS_GROUP,
-      },
-    ]);
+    this.serverSettingsManagerService.setSettingTransformer(
+      'resultset.maxrows',
+      setting =>
+        ({
+          ...setting,
+          name: 'settings_data_editor_fetch_default_name',
+          description: 'settings_data_editor_fetch_default_description',
+          group: DATA_EDITOR_SETTINGS_GROUP,
+        }) as ISettingDescription<DataViewerSettings>,
+    );
+
+    this.settingsManagerService.registerSettings(this.settings, () => {
+      const settings: ISettingDescription<DataViewerSettings>[] = [
+        {
+          key: 'plugin.data-viewer.disableEdit',
+          access: {
+            scope: ['server'],
+          },
+          type: ESettingsValueType.Checkbox,
+          name: 'settings_data_editor_disable_edit_name',
+          description: 'settings_data_editor_disable_edit_description',
+          group: DATA_EDITOR_SETTINGS_GROUP,
+        },
+        {
+          key: 'plugin.data-viewer.disableCopyData',
+          access: {
+            scope: ['server'],
+          },
+          type: ESettingsValueType.Checkbox,
+          name: 'settings_data_editor_disable_data_copy_name',
+          description: 'settings_data_editor_disable_data_copy_description',
+          group: DATA_EDITOR_SETTINGS_GROUP,
+        },
+        {
+          key: 'plugin.data-viewer.fetchMin',
+          access: {
+            scope: ['server'],
+          },
+          type: ESettingsValueType.Input,
+          name: 'settings_data_editor_fetch_min_name',
+          description: 'settings_data_editor_fetch_min_description',
+          group: DATA_EDITOR_SETTINGS_GROUP,
+        },
+        {
+          key: 'plugin.data-viewer.fetchMax',
+          access: {
+            scope: ['server'],
+          },
+          type: ESettingsValueType.Input,
+          name: 'settings_data_editor_fetch_max_name',
+          description: 'settings_data_editor_fetch_max_description',
+          group: DATA_EDITOR_SETTINGS_GROUP,
+        },
+      ];
+
+      if (!this.serverSettingsManagerService.providedSettings.has('resultset.maxrows')) {
+        settings.push({
+          key: 'resultset.maxrows',
+          access: {
+            scope: ['server'],
+          },
+          type: ESettingsValueType.Input,
+          name: 'settings_data_editor_fetch_default_name',
+          description: 'settings_data_editor_fetch_default_description',
+          group: DATA_EDITOR_SETTINGS_GROUP,
+        });
+      }
+
+      return settings;
+    });
   }
 }

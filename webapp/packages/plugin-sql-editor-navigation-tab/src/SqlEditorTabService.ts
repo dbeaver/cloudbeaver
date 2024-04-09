@@ -18,6 +18,7 @@ import {
   ConnectionsManagerService,
   ContainerResource,
   createConnectionParam,
+  executionContextProvider,
   ICatalogData,
   IConnectionExecutorData,
   IConnectionInfoParams,
@@ -95,6 +96,7 @@ export class SqlEditorTabService extends Bootstrap {
         connectionProvider(this.getConnectionId.bind(this)),
         objectCatalogProvider(this.getObjectCatalogId.bind(this)),
         objectSchemaProvider(this.getObjectSchemaId.bind(this)),
+        executionContextProvider(this.getExecutionContext.bind(this)),
         projectSetter(this.setProjectId.bind(this)),
         connectionSetter((connectionId, tab) => this.setConnectionId(tab, connectionId)),
         objectCatalogSetter(this.setObjectCatalogId.bind(this)),
@@ -337,6 +339,11 @@ export class SqlEditorTabService extends Bootstrap {
     const dataSource = this.sqlDataSourceService.get(tab.handlerState.editorId);
     const context = this.connectionExecutionContextResource.get(dataSource?.executionContext?.id ?? '');
     return context?.defaultSchema;
+  }
+
+  private getExecutionContext(tab: ITab<ISqlEditorTabState>) {
+    const dataSource = this.sqlDataSourceService.get(tab.handlerState.editorId);
+    return dataSource?.executionContext;
   }
 
   private setProjectId(projectId: string | null, tab: ITab<ISqlEditorTabState>): boolean {

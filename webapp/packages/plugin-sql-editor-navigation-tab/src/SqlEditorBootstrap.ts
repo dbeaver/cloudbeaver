@@ -142,7 +142,7 @@ export class SqlEditorBootstrap extends Bootstrap {
             const regexp = /^(.*?)(\.\w+)$/gi.exec(name);
 
             const result = await this.commonDialogService.open(RenameDialog, {
-              value: regexp?.[1] ?? name,
+              name: regexp?.[1] ?? name,
               objectName: name,
               icon: dataSource.icon,
               validation: name =>
@@ -232,7 +232,7 @@ export class SqlEditorBootstrap extends Bootstrap {
       },
       isHidden: (context, action) => {
         if (action === ACTION_SQL_EDITOR_NEW) {
-          return this.sqlEditorSettingsService.settings.getValue('disabled');
+          return this.sqlEditorSettingsService.disabled;
         }
 
         return false;

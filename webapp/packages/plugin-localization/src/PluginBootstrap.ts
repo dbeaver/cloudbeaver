@@ -23,7 +23,7 @@ export class PluginBootstrap extends Bootstrap {
     super();
   }
 
-  register(): void | Promise<void> {
+  register(): void {
     this.menuService.setHandler({
       id: 'localization-menu',
       isApplicable: context => context.get(DATA_CONTEXT_MENU) === LOCALIZATION_MENU,
@@ -57,7 +57,7 @@ export class PluginBootstrap extends Bootstrap {
               label,
               tooltip: label,
             },
-            { onSelect: () => this.localizationService.changeLocaleAsync(lang.isoCode) },
+            { onSelect: () => this.localizationService.changeLocale(lang.isoCode) },
             { isDisabled: () => this.localizationService.currentLanguage === lang.isoCode },
           );
         });
@@ -66,6 +66,4 @@ export class PluginBootstrap extends Bootstrap {
       },
     });
   }
-
-  load(): void | Promise<void> {}
 }

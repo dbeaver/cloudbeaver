@@ -1,3 +1,3 @@
-mutation getResultsetDataURL($connectionId: ID!, $contextId: ID!, $resultsId: ID!, $lobColumnIndex: Int!, $row: SQLResultRow!) {
-  url: sqlReadLobValue(connectionId: $connectionId, contextId: $contextId, resultsId: $resultsId, lobColumnIndex: $lobColumnIndex, row: $row)
+mutation getResultsetDataURL($projectId: ID!, $connectionId: ID!, $contextId: ID!, $resultsId: ID!, $lobColumnIndex: Int!, $row: SQLResultRow!) {
+  url: sqlReadLobValue(projectId: $projectId, connectionId: $connectionId, contextId: $contextId, resultsId: $resultsId, lobColumnIndex: $lobColumnIndex, row: $row)
 }

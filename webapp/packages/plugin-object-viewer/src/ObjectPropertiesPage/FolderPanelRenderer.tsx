@@ -8,7 +8,6 @@
 import { observer } from 'mobx-react-lite';
 
 import { useService } from '@cloudbeaver/core-di';
-import type { ComponentStyle } from '@cloudbeaver/core-theming';
 import { NavNodeViewService, useNode } from '@cloudbeaver/plugin-navigation-tree';
 
 import { ObjectPropertyTable } from './ObjectPropertyTable/ObjectPropertyTable';
@@ -17,27 +16,25 @@ interface IFolderPanelRendererProps {
   nodeId: string;
   folderId: string;
   parents: string[];
-  style?: ComponentStyle;
 }
 
-export const FolderPanelRenderer = observer<IFolderPanelRendererProps>(function FolderPanelRenderer({ nodeId, folderId, parents, style }) {
+export const FolderPanelRenderer = observer<IFolderPanelRendererProps>(function FolderPanelRenderer({ nodeId, folderId, parents }) {
   const navNodeViewService = useService(NavNodeViewService);
 
   for (const panel of navNodeViewService.panels) {
     const Panel = panel(nodeId, folderId, parents);
 
     if (Panel) {
-      return <Panel nodeId={nodeId} folderId={folderId} parents={parents} style={style} />;
+      return <Panel nodeId={nodeId} folderId={folderId} parents={parents} />;
     }
   }
 
-  return <NavNodePanel nodeId={folderId} style={style} parents={parents} />;
+  return <NavNodePanel nodeId={folderId} parents={parents} />;
 });
 
 interface INavNodePanelProps {
   nodeId: string;
   parents: string[];
-  style?: ComponentStyle;
 }
 
 const NavNodePanel = observer<INavNodePanelProps>(function NavNodeTab({ nodeId }) {

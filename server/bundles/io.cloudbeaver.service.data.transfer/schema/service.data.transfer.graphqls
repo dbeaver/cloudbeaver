@@ -53,6 +53,9 @@ extend type Query {
     # Available transfer processors
     dataTransferAvailableStreamProcessors: [ DataTransferProcessorInfo! ]!
 
+    # Available transfer processors for import file
+    dataTransferAvailableImportStreamProcessors: [ DataTransferProcessorInfo! ]!
+
     dataTransferDefaultExportSettings: DataTransferDefaultExportSettings!
 
     dataTransferExportDataFromContainer(

@@ -74,7 +74,7 @@ public class CBDatabase {
     public static final String SCHEMA_UPDATE_SQL_PATH = "db/cb_schema_update_";
 
     private static final int LEGACY_SCHEMA_VERSION = 1;
-    private static final int CURRENT_SCHEMA_VERSION = 16;
+    private static final int CURRENT_SCHEMA_VERSION = 18;
 
     private static final String DEFAULT_DB_USER_NAME = "cb-data";
     private static final String DEFAULT_DB_PWD_FILE = ".database-credentials.dat";
@@ -82,7 +82,7 @@ public class CBDatabase {
     private static final String V2_DB_NAME = "cb.h2v2.dat";
 
     private final WebApplication application;
-    private final CBDatabaseConfig databaseConfiguration;
+    private final WebDatabaseConfig databaseConfiguration;
     private PoolingDataSource<PoolableConnection> cbDataSource;
     private transient volatile Connection exclusiveConnection;
 
@@ -90,7 +90,7 @@ public class CBDatabase {
     private SMAdminController adminSecurityController;
     private SQLDialect dialect;
 
-    public CBDatabase(WebApplication application, CBDatabaseConfig databaseConfiguration) {
+    public CBDatabase(WebApplication application, WebDatabaseConfig databaseConfiguration) {
         this.application = application;
         this.databaseConfiguration = databaseConfiguration;
     }

@@ -182,6 +182,7 @@ public class WebDatabaseDriverInfo {
             cfg.setUrl(driver.getSampleURL());
             cfg.setHostName(DBConstants.HOST_LOCALHOST);
             cfg.setHostPort(driver.getDefaultPort());
+            cfg.setDatabaseName(driver.getDefaultDatabase());
             cfg.setUrl(driver.getConnectionURL(cfg));
             DBPPropertyDescriptor[] properties = driver.getDataSourceProvider().getConnectionProperties(webSession.getProgressMonitor(), driver, cfg);
             if (properties == null) {
@@ -214,12 +215,12 @@ public class WebDatabaseDriverInfo {
 
     @Property
     public String[] getApplicableNetworkHandlers() {
-        if (driver.isEmbedded()) {
-            return new String[0];
+        if (!driver.isEmbedded() || CommonUtils.toBoolean(driver.getDriverParameter(DBConstants.DRIVER_PARAM_ENABLE_NETWORK_PARAMETERS))) {
+            return NetworkHandlerRegistry.getInstance().getDescriptors(driver).stream()
+                .filter(h -> !h.isDesktopHandler())
+                .map(NetworkHandlerDescriptor::getId).toArray(String[]::new);
         }
-        return NetworkHandlerRegistry.getInstance().getDescriptors(driver).stream()
-            .filter(h -> !h.isDesktopHandler())
-            .map(NetworkHandlerDescriptor::getId).toArray(String[]::new);
+        return new String[0];
     }
 
     @Property

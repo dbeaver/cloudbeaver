@@ -358,9 +358,22 @@ public class WebSQLProcessor implements WebSessionProvider {
             try (DBCSession session = executionContext.openSession(monitor, DBCExecutionPurpose.USER, "Update data in container")) {
                 DBCTransactionManager txnManager = DBUtils.getTransactionManager(executionContext);
                 boolean revertToAutoCommit = false;
-                if (txnManager != null && txnManager.isSupportsTransactions() && txnManager.isAutoCommit()) {
-                    txnManager.setAutoCommit(monitor, false);
-                    revertToAutoCommit = true;
+                boolean isAutoCommitEnabled = true;
+                DBCSavepoint savepoint = null;
+                if (txnManager != null) {
+                    isAutoCommitEnabled = txnManager.isAutoCommit();
+                    if (txnManager.isSupportsTransactions() && isAutoCommitEnabled) {
+                        txnManager.setAutoCommit(monitor, false);
+                        revertToAutoCommit = true;
+                    }
+                    if (!txnManager.isAutoCommit() && txnManager.supportsSavepoints()) {
+                        try {
+                            savepoint = txnManager.setSavepoint(monitor, null);
+                        } catch (Throwable e) {
+                            // May be savepoints not supported
+                            log.debug("Can't set savepoint", e);
+                        }
+                    }
                 }
                 try {
                     Map<String, Object> options = Collections.emptyMap();
@@ -375,17 +388,27 @@ public class WebSQLProcessor implements WebSessionProvider {
                         newResultSetRows.add(new WebSQLQueryResultSetRow(rowValues, null));
                     }
 
-                    if (txnManager != null && txnManager.isSupportsTransactions()) {
+                    if (txnManager != null && txnManager.isSupportsTransactions() && isAutoCommitEnabled) {
                         txnManager.commit(session);
                     }
                 } catch (Exception e) {
                     if (txnManager != null && txnManager.isSupportsTransactions()) {
-                        txnManager.rollback(session, null);
+                        txnManager.rollback(session, savepoint);
                     }
                     throw new DBCException("Error persisting data changes", e);
                 } finally {
-                    if (revertToAutoCommit) {
-                        txnManager.setAutoCommit(monitor, true);
+                    if (txnManager != null) {
+                        if (revertToAutoCommit) {
+                            txnManager.setAutoCommit(monitor, true);
+                        }
+                        try {
+                            if (savepoint != null) {
+                                txnManager.releaseSavepoint(monitor, savepoint);
+                            }
+                        } catch (Throwable e) {
+                            // Maybe savepoints not supported
+                            log.debug("Can't release savepoint", e);
+                        }
                     }
                 }
             }
@@ -585,12 +608,19 @@ public class WebSQLProcessor implements WebSessionProvider {
 
                     Object[] rowValues = new Object[updateAttributes.length + keyAttributes.length];
                     // put key values first in case of updating them
+                    DBDDocument document = null;
                     for (int i = 0; i < keyAttributes.length; i++) {
                         DBDAttributeBinding keyAttribute = keyAttributes[i];
                         boolean isDocumentValue = keyAttributes.length == 1 && keyAttribute.getDataKind() == DBPDataKind.DOCUMENT && dataContainer instanceof DBSDocumentLocator;
                         if (isDocumentValue) {
-                            rowValues[updateAttributes.length + i] =
-                                makeDocumentInputValue(session, (DBSDocumentLocator) dataContainer, resultsInfo, row, metaData);
+                            document = makeDocumentInputValue(
+                                session,
+                                (DBSDocumentLocator) dataContainer,
+                                resultsInfo,
+                                row,
+                                metaData
+                            );
+                            rowValues[updateAttributes.length + i] = document;
                         } else {
                             rowValues[updateAttributes.length + i] = keyAttribute.getValueHandler().getValueFromObject(
                                 session,
@@ -610,6 +640,9 @@ public class WebSQLProcessor implements WebSessionProvider {
                         DBDAttributeBinding updateAttribute = updateAttributes[i];
                         Object value = updateValues.get(String.valueOf(updateAttribute.getOrdinalPosition()));
                         Object realCellValue = setCellRowValue(value, webSession, session, updateAttribute, withoutExecution);
+                        if (document instanceof DBDComposite compositeDoc) {
+                            compositeDoc.setAttributeValue(updateAttribute, realCellValue);
+                        }
                         rowValues[i] = realCellValue;
                         finalRow[updateAttribute.getOrdinalPosition()] = realCellValue;
                     }
@@ -1019,12 +1052,12 @@ public class WebSQLProcessor implements WebSessionProvider {
         }
 
         @Override
-        public void fetchStart(DBCSession session, DBCResultSet resultSet, long offset, long maxRows) {
+        public void fetchStart(@NotNull DBCSession session, @NotNull DBCResultSet resultSet, long offset, long maxRows) {
 
         }
 
         @Override
-        public void fetchRow(DBCSession session, DBCResultSet resultSet)
+        public void fetchRow(@NotNull DBCSession session, @NotNull DBCResultSet resultSet)
             throws DBCException {
             DBDAttributeBinding[] resultsAttributes = results.getAttributes();
 
@@ -1060,7 +1093,7 @@ public class WebSQLProcessor implements WebSessionProvider {
         }
 
         @Override
-        public void fetchEnd(DBCSession session, DBCResultSet resultSet) {
+        public void fetchEnd(@NotNull DBCSession session, @NotNull DBCResultSet resultSet) {
 
         }
 

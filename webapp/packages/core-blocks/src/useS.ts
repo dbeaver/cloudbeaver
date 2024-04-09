@@ -27,10 +27,10 @@ type ExtractStyles<T extends ComponentStyle[]> = Intersect<
     ? U extends BaseStyles
       ? U
       : U extends (theme: string) => Promise<infer A>
-      ? A extends BaseStyles
-        ? A
+        ? A extends BaseStyles
+          ? A
+          : never
         : never
-      : never
     : never
 >;
 
@@ -47,7 +47,7 @@ export function useS<T extends ComponentStyle[]>(...componentStyles: [...T]): Ex
   const [patch, forceUpdate] = useState(0);
   const loadedStyles = useRef<BaseStyles[]>([]);
   const themeService = useService(ThemeService);
-  const [currentThemeId, setCurrentThemeId] = useState(() => themeService.currentThemeId);
+  const [currentThemeId, setCurrentThemeId] = useState(() => themeService.themeId);
   const lastThemeRef = useRef<string>(currentThemeId);
   // @ts-ignore
   const filteredStyles = themeService.mapStyles(componentStyles.flat(Infinity).filter(Boolean) as Style[], context);
@@ -57,7 +57,7 @@ export function useS<T extends ComponentStyle[]>(...componentStyles: [...T]): Ex
     executor: themeService.onChange,
     handlers: [
       function updateThemeId(theme) {
-        if (currentThemeId !== themeService.currentThemeId && trackTheme) {
+        if (currentThemeId !== themeService.themeId && trackTheme) {
           setCurrentThemeId(theme.id);
         }
       },

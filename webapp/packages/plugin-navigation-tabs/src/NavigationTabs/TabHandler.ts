@@ -6,7 +6,6 @@
  * you may not use this file except in compliance with the License.
  */
 import type { IExtension } from '@cloudbeaver/core-extensions';
-import type { ComponentStyle } from '@cloudbeaver/core-theming';
 
 import type { ITab } from './ITab';
 
@@ -15,7 +14,6 @@ export interface TabHandlerTabProps<T = any> {
   handler: TabHandler<T>;
   onSelect: (tabId: string) => void;
   onClose?: (tabId: string) => void;
-  style: ComponentStyle;
 }
 export type TabHandlerTabComponent<T = any> = React.FunctionComponent<TabHandlerTabProps<T>>;
 

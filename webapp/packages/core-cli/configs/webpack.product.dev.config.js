@@ -45,6 +45,9 @@ module.exports = (env, argv) => {
       index,
       sso,
     },
+    output: {
+      devtoolModuleFilenameTemplate: 'file:///[absolute-resource-path]',
+    },
     watchOptions: {
       aggregateTimeout: 3000,
       ignored: ['**/node_modules', '**/packages/*/src/**/*.{ts,tsx}'],
@@ -67,17 +70,19 @@ module.exports = (env, argv) => {
         overlay: false,
       },
       server,
-      proxy: {
-        '/api': {
+      proxy: [
+        {
+          context: ['/api'],
           target: envServer,
           secure: false,
         },
-        '/api/ws': {
+        {
+          context: ['/api/ws'],
           target: `${urlObject.protocol === 'https:' ? 'wss:' : 'ws:'}//${urlObject.hostname}:${urlObject.port}/api/ws`,
           ws: true,
           secure: false,
         },
-      },
+      ],
       // onListening: function (devServer, ...args) {
       //   if (!devServer) {
       //     throw new Error('webpack-dev-server is not defined');

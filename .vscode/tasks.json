@@ -34,6 +34,35 @@
       }
     },
     {
+      "label": "Generate dev proprties for CBCE",
+      "type": "shell",
+      "command": "mvn",
+      "osx": {
+        "args": [
+          "package",
+          "-q",
+          "exec:java",
+          "-Dexec.args=-config ${workspaceFolder}/../idea-workspace-dbeaver/rcp-gen.properties -productFile ${workspaceFolder}/server/product/web-server/CloudbeaverServer.product -projectsFolder ${workspaceFolder}/../ -eclipse ${workspaceFolder}/../eclipse/Eclipse.app/Contents/Eclipse -output ${workspaceFolder}/../eclipse/workspace/.metadata/.plugins/org.eclipse.pde.core/CloudbeaverServer.product"
+        ]
+      },
+      "windows": {
+        "args": [
+          "package",
+          "-q",
+          "exec:java",
+          "-Dexec.args=-config ${workspaceFolder}/../idea-workspace-dbeaver/rcp-gen.properties -productFile ${workspaceFolder}/server/product/web-server/CloudbeaverServer.product -projectsFolder ${workspaceFolder}/../ -eclipse ${workspaceFolder}/../eclipse/eclipse -output ${workspaceFolder}/../eclipse/workspace/.metadata/.plugins/org.eclipse.pde.core/CloudbeaverServer.product"
+        ]
+      },
+      "options": {
+        "cwd": "${workspaceFolder}/../idea-rcp-launch-config-generator"
+      },
+      "presentation": {
+        "reveal": "silent",
+        "close": true,
+        "clear": false
+      }
+    },
+    {
       "label": "Build CE",
       "type": "shell",
       "windows": {

@@ -11,7 +11,7 @@ import { injectable } from '@cloudbeaver/core-di';
 @injectable()
 export class CookiesService {
   get cookiesEnabled() {
-    return !this.browserSettingsService.settings.getValue('cookies.disabled');
+    return !this.browserSettingsService.disabled;
   }
 
   constructor(private readonly browserSettingsService: BrowserSettingsService) {}

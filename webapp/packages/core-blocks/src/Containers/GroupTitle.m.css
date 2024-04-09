@@ -5,4 +5,12 @@
   margin: 0;
   text-transform: uppercase;
   opacity: 0.9;
+
+  &.sticky {
+    position: sticky;
+    background-color: inherit;
+    top: 0;
+    z-index: 1;
+    opacity: 1;
+  }
 }

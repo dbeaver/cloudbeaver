@@ -18,6 +18,7 @@ export * from './Action/Actions/ACTION_ZOOM_IN';
 export * from './Action/Actions/ACTION_ZOOM_OUT';
 export * from './Action/Actions/ACTION_DOWNLOAD';
 export * from './Action/Actions/ACTION_UPLOAD';
+export * from './Action/Actions/ACTION_IMPORT';
 export * from './Action/KeyBinding/Bindings/KEY_BINDING_OPEN_IN_TAB';
 export * from './Action/KeyBinding/Bindings/KEY_BINDING_REDO';
 export * from './Action/KeyBinding/Bindings/KEY_BINDING_UNDO';

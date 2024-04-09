@@ -381,7 +381,7 @@ export class ConnectionSchemaManagerBootstrap extends Bootstrap {
 
   private isHidden(): boolean {
     return (
-      this.connectionsSettingsService.settings.getValue('disabled') ||
+      this.connectionsSettingsService.disabled ||
       this.optionsPanelService.active ||
       (!this.connectionSchemaManagerService.isConnectionChangeable && !this.connectionSchemaManagerService.currentConnectionKey)
     );

@@ -6,10 +6,10 @@
  * you may not use this file except in compliance with the License.
  */
 import { injectable } from '@cloudbeaver/core-di';
-import type { WsSessionStateEvent as ISessionStateEvent } from '@cloudbeaver/core-sdk';
+import { type CbClientEvent, CbEventTopic, type WsSessionStateEvent as ISessionStateEvent } from '@cloudbeaver/core-sdk';
 
 import { TopicEventHandler } from './ServerEventEmitter/TopicEventHandler';
-import { ISessionEvent, SessionEventId, SessionEventSource, SessionEventTopic } from './SessionEventSource';
+import { ClientEventId, ISessionEvent, SessionEventId, SessionEventSource, SessionEventTopic } from './SessionEventSource';
 
 export { type ISessionStateEvent };
 
@@ -17,6 +17,10 @@ export { type ISessionStateEvent };
 export class SessionInfoEventHandler extends TopicEventHandler<ISessionStateEvent, ISessionEvent, SessionEventId, SessionEventTopic> {
   constructor(sessionEventSource: SessionEventSource) {
     super(SessionEventTopic.CbSession, sessionEventSource);
+  }
+
+  pingSession(): void {
+    this.emit<CbClientEvent>({ id: ClientEventId.CbClientSessionPing, topicId: CbEventTopic.CbSession });
   }
 
   map(event: any): ISessionStateEvent {

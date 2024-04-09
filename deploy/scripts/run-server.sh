@@ -1,6 +1,6 @@
 #!/bin/bash
 
-launcherJar=( server/plugins/org.eclipse.equinox.launcher*.jar )
+launcherJar=( server/plugins/org.jkiss.dbeaver.launcher*.jar )
 
 echo "Starting Cloudbeaver Server"
 

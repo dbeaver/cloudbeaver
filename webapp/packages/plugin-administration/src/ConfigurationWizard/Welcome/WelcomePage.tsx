@@ -5,37 +5,28 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import styled, { css } from 'reshadow';
+import { ColoredContainer, Group, GroupItem, s, Translate, useS } from '@cloudbeaver/core-blocks';
 
-import { ColoredContainer, Group, GroupItem, Translate } from '@cloudbeaver/core-blocks';
-
-const styles = css`
-  p {
-    line-height: 2;
-    white-space: pre-wrap;
-  }
-
-  note {
-    composes: theme-typography--body2 from global;
-  }
-`;
+import styles from './WelcomePage.m.css';
 
 export const WelcomePage: React.FC = function WelcomePage() {
-  return styled(styles)(
+  const style = useS(styles);
+
+  return (
     <ColoredContainer wrap gap overflow parent>
       <Group form>
         <h3>
           <Translate token="administration_configuration_wizard_welcome_title" />
         </h3>
         <GroupItem>
-          <p>
+          <p className={s(style, { p: true })}>
             <Translate token="administration_configuration_wizard_welcome_message" />
           </p>
-          <note as="div">
+          <div className={s(style, { note: true })}>
             <Translate token="administration_configuration_wizard_welcome_note" />
-          </note>
+          </div>
         </GroupItem>
       </Group>
-    </ColoredContainer>,
+    </ColoredContainer>
   );
 };

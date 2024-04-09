@@ -18,6 +18,7 @@
         <module>h2</module>
         <module>h2_v2</module>
         <module>jaybird</module>
+        <module>kyuubi</module>
         <module>mysql</module>
         <module>mariadb</module>
         <module>oracle</module>

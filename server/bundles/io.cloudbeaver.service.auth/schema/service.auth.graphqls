@@ -163,9 +163,12 @@ extend type Query {
 
 }
 
+
 extend type Mutation {
 
     # Set user config parameter. If parameter value is null then removes the parameter
     setUserConfigurationParameter(name: String!, value: Object): Boolean!
+    # Updates user preferences
+    setUserPreferences(preferences: Object!): UserInfo! @since(version: "24.0.1")
 
 }

@@ -46,7 +46,7 @@ export class SearchConnectionPluginBootstrap extends Bootstrap {
         }
 
         if (action === ACTION_CONNECTION_SEARCH) {
-          return this.connectionSearchSettingsService.settings.getValue('disabled');
+          return this.connectionSearchSettingsService.disabled;
         }
 
         return false;
