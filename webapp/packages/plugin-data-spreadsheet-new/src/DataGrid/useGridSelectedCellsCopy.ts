@@ -10,7 +10,7 @@ import { useCallback } from 'react';
 import { useObjectRef } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { EventContext, EventStopPropagationFlag } from '@cloudbeaver/core-events';
-import { copyToClipboard } from '@cloudbeaver/core-utils';
+import { copyToClipboard, getSelectedText } from '@cloudbeaver/core-utils';
 import {
   DataViewerService,
   IResultSetColumnKey,
@@ -73,7 +73,7 @@ export function useGridSelectedCellsCopy(
   const props = useObjectRef({ tableData, selectionContext, resultSetSelectAction });
 
   const onKeydownHandler = useCallback((event: React.KeyboardEvent) => {
-    if ((event.ctrlKey || event.metaKey) && event.nativeEvent.code === EVENT_KEY_CODE.C) {
+    if ((event.ctrlKey || event.metaKey) && event.nativeEvent.code === EVENT_KEY_CODE.C && !getSelectedText()) {
       EventContext.set(event, EventStopPropagationFlag);
 
       if (dataViewerService.canCopyData) {

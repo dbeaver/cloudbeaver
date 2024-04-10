@@ -80,3 +80,4 @@ export * from './formatNumber';
 export * from './withTimestamp';
 export * from './toSafeHtmlString';
 export * from './getProgressPercent';
+export * from './getSelectedText';
