@@ -108,3 +108,5 @@ export const NavigationNodeControlRenderer = observer<Props, HTMLDivElement>(
     );
   }),
 );
+
+NavigationNodeControlRenderer.displayName = 'NavigationNodeControlRenderer';
