@@ -374,6 +374,7 @@ export abstract class DatabaseDataSource<TOptions, TResult extends IDatabaseData
 
   abstract dispose(): Promise<void>;
   abstract loadTotalCount(resultIndex: number): Promise<void>;
+  abstract cancelLoadTotalCount(resultIndex: number): Promise<void>;
 
   async requestDataAction(): Promise<TResult[] | null> {
     this.prevOptions = toJS(this.options);

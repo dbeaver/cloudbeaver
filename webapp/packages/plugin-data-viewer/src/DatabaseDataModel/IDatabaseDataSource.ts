@@ -83,6 +83,7 @@ export interface IDatabaseDataSource<TOptions, TResult extends IDatabaseDataResu
   setExecutionContext: (context: IConnectionExecutionContext | null) => this;
   setTotalCount: (resultIndex: number, count: number) => this;
   loadTotalCount: (resultIndex: number) => Promise<void>;
+  cancelLoadTotalCount: (resultIndex: number) => Promise<void>;
 
   retry: () => Promise<void>;
   /** Allows to perform an asynchronous action on the data source, this action will wait previous action to finish and save or load requests.
