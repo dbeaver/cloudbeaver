@@ -9,6 +9,7 @@ import { useEffect, useState } from 'react';
 
 import { IconButton } from '../../IconButton';
 import { s } from '../../s';
+import { useFocus } from '../../useFocus';
 import { useS } from '../../useS';
 import style from './SnackbarWrapper.m.css';
 
@@ -26,6 +27,7 @@ export const SnackbarWrapper: React.FC<React.PropsWithChildren<Props>> = functio
   children,
   className,
 }) {
+  const [focusedRef] = useFocus<HTMLDivElement>({ focusFirstChild: true });
   const styles = useS(style);
   const [mounted, setMounted] = useState(false);
 
@@ -34,7 +36,7 @@ export const SnackbarWrapper: React.FC<React.PropsWithChildren<Props>> = functio
   }, []);
 
   return (
-    <div className={s(styles, { notification: true, mounted, closing }, className)}>
+    <div ref={focusedRef} className={s(styles, { notification: true, mounted, closing }, className)}>
       {children}
       {!persistent && onClose && (
         <IconButton name="cross" viewBox="0 0 16 16" className={s(styles, { iconButton: true, large: true })} onClick={onClose} />
