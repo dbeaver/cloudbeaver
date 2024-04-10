@@ -446,7 +446,6 @@ public class WebServiceSQL implements DBWServiceSQL {
                     this.result = executeResults.getStatusMessage();
                     this.extendedResults = executeResults;
                 } catch (Throwable e) {
-                    log.error("AAAAAAAA: " + e.getMessage(), e);
                     throw new InvocationTargetException(e);
                 } finally {
                     monitor.done();
