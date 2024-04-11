@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 export default [
-  ['plugin_user_profile_settings_tab_label', 'Settings'],
-  ['plugin_user_profile_settings_save_success', 'Settings saved successfully'],
-  ['plugin_user_profile_settings_save_fail', 'Failed to save settings'],
+  ['plugin_user_profile_settings_tab_label', 'Preferences'],
+  ['plugin_user_profile_settings_save_success', 'Preferences saved successfully'],
+  ['plugin_user_profile_settings_save_fail', 'Failed to save preferences'],
 ];
