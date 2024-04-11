@@ -82,11 +82,10 @@ export class UserSettingsService extends SettingsSource {
   }
 
   restoreDefaults() {
-    this.update(() => {
-      for (const key of this.getSource().keys()) {
-        this.setValue(key, null);
-      }
-    });
+    this.resetChanges();
+    for (const key of this.getSource().keys()) {
+      this.setValue(key, null);
+    }
   }
 
   protected getSnapshot() {
