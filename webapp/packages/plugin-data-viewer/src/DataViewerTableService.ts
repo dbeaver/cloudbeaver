@@ -45,9 +45,7 @@ export class DataViewerTableService {
 
     if (model) {
       this.tableViewerStorageService.remove(tableId);
-      model.getResults().forEach((_, index) => {
-        model.source.cancelLoadTotalCount(index);
-      });
+      model.source.cancelLoadTotalCount(0);
       await model.dispose();
     }
   }
