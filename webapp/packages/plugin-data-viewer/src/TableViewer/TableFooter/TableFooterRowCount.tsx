@@ -45,9 +45,28 @@ export const TableFooterRowCount: React.FC<Props> = observer(function TableFoote
     }
   }
 
+  async function cancelTotalCount() {
+    try {
+      setLoading(false);
+      await model.source.cancelLoadTotalCount(resultIndex);
+    } catch (e: any) {
+      notificationService.logError({ title: 'data_viewer_total_count_cancel_failed', message: String(e) });
+    }
+  }
+
   const currentCount = result.loadedFully ? result.count : `${result.count}+`;
   const count = result.totalCount ?? currentCount;
   const disabled = getComputed(() => model.isLoading() || model.isDisabled(resultIndex));
+
+  if (loading) {
+    return styled(tableFooterMenuStyles)(
+      <div className={classes.wrapper} title={translate('ui_processing_cancel')}>
+        <ToolsAction icon="/icons/data_cancel.svg" viewBox="0 0 32 32" disableLoading disableDisabled onClick={cancelTotalCount}>
+          {translate('ui_processing_cancel')}
+        </ToolsAction>
+      </div>,
+    );
+  }
 
   return styled(tableFooterMenuStyles)(
     <div className={classes.wrapper} title={translate('data_viewer_total_count_tooltip')}>

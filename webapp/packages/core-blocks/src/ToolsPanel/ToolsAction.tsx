@@ -19,10 +19,23 @@ interface Props extends Omit<ButtonHTMLAttributes<any>, 'onClick'> {
   viewBox?: string;
   loading?: boolean;
   className?: string;
+  disableLoading?: boolean;
+  disableDisabled?: boolean;
   onClick?: (event: React.MouseEvent<HTMLButtonElement>) => Promise<any> | any;
 }
 
-export const ToolsAction: React.FC<Props> = function ToolsAction({ icon, viewBox, disabled, loading, children, className, onClick, ...rest }) {
+export const ToolsAction: React.FC<Props> = function ToolsAction({
+  icon,
+  viewBox,
+  disabled,
+  loading,
+  children,
+  className,
+  onClick,
+  disableLoading = false,
+  disableDisabled = false,
+  ...rest
+}) {
   const styles = useS(style);
   const [loadingState, setLoadingState] = useState(false);
 
@@ -35,8 +48,8 @@ export const ToolsAction: React.FC<Props> = function ToolsAction({ icon, viewBox
     }
   }
 
-  loading = useStateDelay(loading || loadingState, 300);
-  disabled = disabled || loadingState;
+  loading = useStateDelay(!disableLoading && (loading || loadingState), 300);
+  disabled = !disableDisabled && (disabled || loadingState);
 
   return (
     <button type="button" disabled={disabled} onClick={handleClick} {...rest} className={s(styles, { button: true }, className)}>

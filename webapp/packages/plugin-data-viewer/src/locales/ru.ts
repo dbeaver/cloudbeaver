@@ -1,3 +1,10 @@
+/*
+ * CloudBeaver - Cloud Database Manager
+ * Copyright (C) 2020-2024 DBeaver Corp and others
+ *
+ * Licensed under the Apache License, Version 2.0.
+ * you may not use this file except in compliance with the License.
+ */
 export default [
   ['plugin_data_viewer_data_viewer_settings_group', 'Просмотр данных'],
   ['table_header_sql_expression', 'Введите SQL выражение чтобы отфильтровать результаты, например, column_name=10'],
@@ -40,6 +47,7 @@ export default [
   ['data_viewer_refresh_result_set', 'Обновить резалт сет'],
   ['data_viewer_total_count_tooltip', 'Получить количество записей'],
   ['data_viewer_total_count_failed', 'Не удалось получить количество записей'],
+  ['data_viewer_total_count_cancel_failed', 'Не удалось отменить получение количества записей'],
   ['data_viewer_model_not_loaded', 'Не удалось загрузить модель таблицы'],
   ['settings_data_editor', 'Редактор данных'],
   ['settings_data_editor_disable_edit_name', 'Отключить редактирование'],
