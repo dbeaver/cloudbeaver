@@ -9,7 +9,7 @@ import '@testing-library/jest-dom';
 
 import { SyncExecutor } from '@cloudbeaver/core-executor';
 
-import { expectDeprecatedSettingMessage } from './__custom_mocks__/expectDeprecatedSettingMessage';
+import { expectDeprecatedSettingMessage, expectNoDeprecatedSettingMessage } from './__custom_mocks__/expectDeprecatedSettingMessage';
 import { createSettingsAliasResolver } from './createSettingsAliasResolver';
 import type { ISettingsSource } from './ISettingsSource';
 
@@ -52,8 +52,15 @@ function createResolver(settings: Record<any, any>) {
   });
 }
 
-test('Deprecated setting extracted', async () => {
+test('Deprecated setting ignored', async () => {
   const resolver = createResolver(newSettings);
+
+  expect(resolver.has('value')).toBe(false);
+  expectNoDeprecatedSettingMessage();
+});
+
+test('Deprecated setting extracted', async () => {
+  const resolver = createResolver(deprecatedSettings);
 
   expect(resolver.has('value')).toBe(true);
   expect(resolver.getValue('value')).toBe('deprecatedValue');
