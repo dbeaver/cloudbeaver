@@ -49,6 +49,7 @@ import org.jkiss.dbeaver.model.security.user.SMUser;
 import org.jkiss.utils.CommonUtils;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -264,6 +265,9 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
         try {
             String serializedValue = value == null ? null : value.toString();
             webSession.getSecurityController().setCurrentUserParameter(name, serializedValue);
+            var params = new HashMap<String, Object>();
+            params.put(name, value);
+            webSession.getUserContext().getPreferenceStore().updatePreferenceValues(params);
             return true;
         } catch (DBException e) {
             throw new DBWebException("Error setting user parameter", e);
@@ -278,10 +282,13 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
         if (webSession.getUser() == null) {
             throw new DBWebException("Preferences cannot be changed for anonymous user");
         }
-        for (Map.Entry<String, Object> parameter : parameters.entrySet()) {
-            setPreference(webSession, parameter.getKey(), parameter.getValue());
+        try {
+            webSession.getSecurityController().setCurrentUserParameters(parameters);
+            webSession.getUserContext().getPreferenceStore().updatePreferenceValues(parameters);
+            return new WebUserInfo(webSession, webSession.getUser());
+        } catch (DBException e) {
+            throw new DBWebException("Error setting user parameters", e);
         }
-        return new WebUserInfo(webSession, webSession.getUser());
     }
 
 }

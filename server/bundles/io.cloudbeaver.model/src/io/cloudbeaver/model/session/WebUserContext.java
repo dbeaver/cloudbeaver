@@ -36,6 +36,7 @@ import org.jkiss.dbeaver.model.secret.DBSSecretController;
 import org.jkiss.dbeaver.model.security.SMAdminController;
 import org.jkiss.dbeaver.model.security.SMController;
 import org.jkiss.dbeaver.model.security.user.SMAuthPermissions;
+import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.utils.CommonUtils;
 
 import java.util.Arrays;
@@ -66,6 +67,7 @@ public class WebUserContext implements SMCredentialsProvider {
     private RMController rmController;
     private DBFileController fileController;
     private Set<String> accessibleProjectIds = new HashSet<>();
+    private final WebSessionPreferenceStore preferenceStore;
 
     public WebUserContext(WebApplication application, DBPWorkspace workspace) throws DBException {
         this.application = application;
@@ -73,6 +75,7 @@ public class WebUserContext implements SMCredentialsProvider {
         this.securityController = application.createSecurityController(this);
         this.rmController = application.createResourceController(this, workspace);
         this.fileController = application.createFileController(this);
+        this.preferenceStore = new WebSessionPreferenceStore(DBWorkbench.getPlatform().getPreferenceStore());
         setUserPermissions(getDefaultPermissions());
     }
 
@@ -117,6 +120,7 @@ public class WebUserContext implements SMCredentialsProvider {
         setUserPermissions(smAuthPermissions.getPermissions());
         this.adminSecurityController = application.getAdminSecurityController(this);
         if (isSessionChanged) {
+            this.preferenceStore.updateAllUserPreferences(securityController.getCurrentUserParameters());
             this.smSessionId = smAuthPermissions.getSessionId();
             setUser(smAuthPermissions.getUserId() == null ? null : new WebUser(securityController.getCurrentUser()));
             refreshAccessibleProjects();
@@ -250,5 +254,9 @@ public class WebUserContext implements SMCredentialsProvider {
 
     private void setRefreshToken(@Nullable String refreshToken) {
         this.refreshToken = refreshToken;
+    }
+
+    public WebSessionPreferenceStore getPreferenceStore() {
+        return preferenceStore;
     }
 }

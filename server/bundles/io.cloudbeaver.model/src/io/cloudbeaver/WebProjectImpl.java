@@ -23,6 +23,7 @@ import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.app.DBPDataSourceRegistry;
 import org.jkiss.dbeaver.model.app.DBPWorkspace;
 import org.jkiss.dbeaver.model.auth.SMSessionContext;
+import org.jkiss.dbeaver.model.preferences.DBPPreferenceStore;
 import org.jkiss.dbeaver.model.rm.RMController;
 import org.jkiss.dbeaver.model.rm.RMProject;
 import org.jkiss.dbeaver.registry.rm.DataSourceRegistryRM;
@@ -30,15 +31,17 @@ import org.jkiss.dbeaver.runtime.DBWorkbench;
 
 public abstract class WebProjectImpl extends BaseWebProjectImpl {
     private static final Log log = Log.getLog(WebProjectImpl.class);
-
+    private final DBPPreferenceStore preferenceStore;
     public WebProjectImpl(
         @NotNull DBPWorkspace workspace,
         @NotNull RMController resourceController,
         @NotNull SMSessionContext sessionContext,
         @NotNull RMProject project,
-        @NotNull DataSourceFilter dataSourceFilter
+        @NotNull DataSourceFilter dataSourceFilter,
+        DBPPreferenceStore preferenceStore
     ) {
         super(workspace, resourceController, sessionContext, project, dataSourceFilter);
+        this.preferenceStore = preferenceStore;
     }
 
     @Nullable
@@ -70,7 +73,7 @@ public abstract class WebProjectImpl extends BaseWebProjectImpl {
     @Override
     protected DBPDataSourceRegistry createDataSourceRegistry() {
         return new WebDataSourceRegistryProxy(
-            new DataSourceRegistryRM(this, getResourceController()),
+            new DataSourceRegistryRM(this, getResourceController(), preferenceStore),
             dataSourceFilter
         );
     }
