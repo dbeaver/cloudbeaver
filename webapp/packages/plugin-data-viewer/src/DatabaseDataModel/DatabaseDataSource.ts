@@ -194,9 +194,6 @@ export abstract class DatabaseDataSource<TOptions, TResult extends IDatabaseData
   }
 
   setResults(results: TResult[]): this {
-    results.forEach((_, index) => {
-      this.cancelLoadTotalCount(index);
-    });
     results = observable(results);
     this.actions.updateResults(results);
     this.results = results;
