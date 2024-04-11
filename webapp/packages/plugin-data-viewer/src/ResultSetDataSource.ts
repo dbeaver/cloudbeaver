@@ -8,17 +8,18 @@
 import { makeObservable, observable } from 'mobx';
 
 import type { IServiceInjector } from '@cloudbeaver/core-di';
-import type { AsyncTask, AsyncTaskInfoService, GraphQLService } from '@cloudbeaver/core-sdk';
+import type { ITask } from '@cloudbeaver/core-executor';
+import type { AsyncTaskInfoService, GraphQLService } from '@cloudbeaver/core-sdk';
 
 import { DatabaseDataSource } from './DatabaseDataModel/DatabaseDataSource';
 import type { IDatabaseResultSet } from './DatabaseDataModel/IDatabaseResultSet';
 
 interface ResultSetDataSourceState {
-  totalCountTasks: Map<number, AsyncTask>; // Map<resultIndex, AsyncTask>
+  tasks: Map<string, ITask<number>>;
 }
 
 export abstract class ResultSetDataSource<TOptions> extends DatabaseDataSource<TOptions, IDatabaseResultSet> {
-  readonly totalCountTasks: Map<number, AsyncTask>;
+  readonly tasks: Map<string, ITask<number>>;
 
   constructor(
     readonly serviceInjector: IServiceInjector,
@@ -27,20 +28,23 @@ export abstract class ResultSetDataSource<TOptions> extends DatabaseDataSource<T
   ) {
     super(serviceInjector);
 
-    this.totalCountTasks = new Map();
+    this.tasks = new Map();
 
     makeObservable<ResultSetDataSourceState>(this, {
-      totalCountTasks: observable.shallow,
+      tasks: observable.shallow,
     });
   }
 
   async cancelLoadTotalCount(resultIndex: number) {
-    const task = this.totalCountTasks.get(resultIndex);
+    const result = this.getResult(resultIndex);
 
-    if (task && !task.cancelled) {
-      await this.asyncTaskInfoService.cancel(task.id);
-      this.totalCountTasks.delete(resultIndex);
+    if (!result?.id) {
+      throw new Error('Result id must be provided');
     }
+
+    const task = this.tasks.get(result.id);
+    task?.cancel();
+    this.tasks.delete(result.id);
   }
 
   async loadTotalCount(resultIndex: number) {
@@ -57,7 +61,7 @@ export abstract class ResultSetDataSource<TOptions> extends DatabaseDataSource<T
       throw new Error('Result id must be provided');
     }
 
-    const task = this.asyncTaskInfoService.create(async () => {
+    const asyncTask = this.asyncTaskInfoService.create(async () => {
       const { taskInfo } = await this.graphQLService.sdk.asyncSqlRowDataCount({
         resultsId: result.id!,
         connectionId: executionContextInfo.connectionId,
@@ -68,29 +72,25 @@ export abstract class ResultSetDataSource<TOptions> extends DatabaseDataSource<T
       return taskInfo;
     });
 
-    this.totalCountTasks.set(resultIndex, task);
+    const task = executionContext.run(
+      async () => {
+        const info = await this.asyncTaskInfoService.run(asyncTask);
+        const { count } = await this.graphQLService.sdk.getSqlRowDataCountResult({ taskId: info.id });
+
+        return count;
+      },
+      () => this.asyncTaskInfoService.cancel(asyncTask.id),
+      () => this.asyncTaskInfoService.remove(asyncTask.id),
+    );
+
+    this.tasks.set(result.id, task);
 
     try {
-      const count = await executionContext.run(
-        async () => {
-          const info = await this.asyncTaskInfoService.run(task);
+      const count = await task;
 
-          if (!task.cancelled && !info.running) {
-            const { count } = await this.graphQLService.sdk.getSqlRowDataCountResult({ taskId: info.id });
-            return count;
-          }
-
-          return;
-        },
-        () => this.asyncTaskInfoService.cancel(task.id),
-        () => this.asyncTaskInfoService.remove(task.id),
-      );
-
-      if (count !== undefined) {
-        this.setTotalCount(resultIndex, count);
-      }
+      this.setTotalCount(resultIndex, count);
     } finally {
-      this.totalCountTasks.delete(resultIndex);
+      this.tasks.delete(result.id);
     }
   }
 }

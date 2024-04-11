@@ -7,6 +7,7 @@
  */
 import type { IConnectionExecutionContext } from '@cloudbeaver/core-connections';
 import type { IServiceInjector } from '@cloudbeaver/core-di';
+import type { ITask } from '@cloudbeaver/core-executor';
 import type { ResultDataFormat } from '@cloudbeaver/core-sdk';
 
 import type { IDatabaseDataAction, IDatabaseDataActionClass, IDatabaseDataActionInterface } from './IDatabaseDataAction';
@@ -47,6 +48,7 @@ export interface IDatabaseDataSource<TOptions, TResult extends IDatabaseDataResu
   readonly cancelled: boolean;
   readonly serviceInjector: IServiceInjector;
   readonly outdated: boolean;
+  readonly tasks?: Map<string, ITask<number>>;
 
   isLoadable: () => boolean;
   isReadonly: (resultIndex: number) => boolean;

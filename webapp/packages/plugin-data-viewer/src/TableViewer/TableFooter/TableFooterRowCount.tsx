@@ -50,7 +50,18 @@ export const TableFooterRowCount: React.FC<Props> = observer(function TableFoote
       setLoading(false);
       await model.source.cancelLoadTotalCount(resultIndex);
     } catch (e: any) {
-      notificationService.logError({ title: 'data_viewer_total_count_cancel_failed', message: String(e) });
+      const result = model.getResult(resultIndex);
+      const cancelled = Boolean(result?.id && model.source.tasks?.get(result?.id)?.cancelled);
+
+      if (cancelled) {
+        notificationService.logError({
+          title: 'data_viewer_total_count_cancel_failed_title',
+          message: 'data_viewer_total_count_cancel_failed_desc',
+        });
+        return;
+      }
+
+      notificationService.logException(e, 'data_viewer_total_count_cancel_failed_title', typeof e === 'string' ? e : undefined);
     }
   }
 
