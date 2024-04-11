@@ -9,7 +9,7 @@ import { action, makeObservable, observable, toJS } from 'mobx';
 
 import type { IConnectionExecutionContext } from '@cloudbeaver/core-connections';
 import type { IServiceInjector } from '@cloudbeaver/core-di';
-import { Task } from '@cloudbeaver/core-executor';
+import { ITask, Task } from '@cloudbeaver/core-executor';
 import { ResultDataFormat } from '@cloudbeaver/core-sdk';
 
 import { DatabaseDataActions } from './DatabaseDataActions';
@@ -33,6 +33,7 @@ export abstract class DatabaseDataSource<TOptions, TResult extends IDatabaseData
   error: Error | null;
   executionContext: IConnectionExecutionContext | null;
   outdated: boolean;
+  abstract tasks?: Map<string, ITask<number>>;
 
   get canCancel(): boolean {
     if (this.activeTask instanceof Task) {
