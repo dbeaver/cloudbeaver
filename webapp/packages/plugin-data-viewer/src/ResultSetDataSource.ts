@@ -43,7 +43,11 @@ export abstract class ResultSetDataSource<TOptions> extends DatabaseDataSource<T
     }
 
     const task = this.tasks.get(result.id);
-    task?.cancel();
+
+    if (!task?.cancelled) {
+      task?.cancel();
+    }
+
     this.tasks.delete(result.id);
   }
 
