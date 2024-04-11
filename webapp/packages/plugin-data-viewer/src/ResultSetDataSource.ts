@@ -15,11 +15,11 @@ import { DatabaseDataSource } from './DatabaseDataModel/DatabaseDataSource';
 import type { IDatabaseResultSet } from './DatabaseDataModel/IDatabaseResultSet';
 
 interface ResultSetDataSourceState {
-  tasks: Map<string, ITask<number>>;
+  cancelLoadTotalCountTasks: Map<string, ITask<number>>;
 }
 
 export abstract class ResultSetDataSource<TOptions> extends DatabaseDataSource<TOptions, IDatabaseResultSet> {
-  readonly tasks: Map<string, ITask<number>>;
+  readonly cancelLoadTotalCountTasks: Map<string, ITask<number>>;
 
   constructor(
     readonly serviceInjector: IServiceInjector,
@@ -28,10 +28,10 @@ export abstract class ResultSetDataSource<TOptions> extends DatabaseDataSource<T
   ) {
     super(serviceInjector);
 
-    this.tasks = new Map();
+    this.cancelLoadTotalCountTasks = new Map();
 
     makeObservable<ResultSetDataSourceState>(this, {
-      tasks: observable.shallow,
+      cancelLoadTotalCountTasks: observable.shallow,
     });
   }
 
@@ -42,13 +42,13 @@ export abstract class ResultSetDataSource<TOptions> extends DatabaseDataSource<T
       throw new Error('Result id must be provided');
     }
 
-    const task = this.tasks.get(result.id);
+    const task = this.cancelLoadTotalCountTasks.get(result.id);
 
     if (!task?.cancelled) {
       task?.cancel();
     }
 
-    this.tasks.delete(result.id);
+    this.cancelLoadTotalCountTasks.delete(result.id);
   }
 
   async loadTotalCount(resultIndex: number) {
@@ -87,14 +87,14 @@ export abstract class ResultSetDataSource<TOptions> extends DatabaseDataSource<T
       () => this.asyncTaskInfoService.remove(asyncTask.id),
     );
 
-    this.tasks.set(result.id, task);
+    this.cancelLoadTotalCountTasks.set(result.id, task);
 
     try {
       const count = await task;
 
       this.setTotalCount(resultIndex, count);
     } finally {
-      this.tasks.delete(result.id);
+      this.cancelLoadTotalCountTasks.delete(result.id);
     }
   }
 }

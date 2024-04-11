@@ -51,7 +51,7 @@ export const TableFooterRowCount: React.FC<Props> = observer(function TableFoote
       await model.source.cancelLoadTotalCount(resultIndex);
     } catch (e: any) {
       const result = model.getResult(resultIndex);
-      const cancelled = Boolean(result?.id && model.source.tasks?.get(result?.id)?.cancelled);
+      const cancelled = Boolean(result?.id && model.source.cancelLoadTotalCountTasks?.get(result?.id)?.cancelled);
 
       if (cancelled) {
         notificationService.logError({

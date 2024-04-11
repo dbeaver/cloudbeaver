@@ -33,7 +33,7 @@ export abstract class DatabaseDataSource<TOptions, TResult extends IDatabaseData
   error: Error | null;
   executionContext: IConnectionExecutionContext | null;
   outdated: boolean;
-  abstract tasks?: Map<string, ITask<number>>;
+  abstract cancelLoadTotalCountTasks?: Map<string, ITask<number>>;
 
   get canCancel(): boolean {
     if (this.activeTask instanceof Task) {
@@ -194,6 +194,9 @@ export abstract class DatabaseDataSource<TOptions, TResult extends IDatabaseData
   }
 
   setResults(results: TResult[]): this {
+    results.forEach((_, index) => {
+      this.cancelLoadTotalCount(index);
+    });
     results = observable(results);
     this.actions.updateResults(results);
     this.results = results;
