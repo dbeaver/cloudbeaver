@@ -45,6 +45,7 @@ import org.jkiss.dbeaver.model.auth.SMSessionExternal;
 import org.jkiss.dbeaver.model.preferences.DBPPropertyDescriptor;
 import org.jkiss.dbeaver.model.security.SMController;
 import org.jkiss.dbeaver.model.security.SMSubjectType;
+import org.jkiss.dbeaver.model.security.user.SMAuthPermissions;
 import org.jkiss.dbeaver.model.security.user.SMUser;
 import org.jkiss.utils.CommonUtils;
 
@@ -66,7 +67,8 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
         @NotNull String providerId,
         @Nullable String providerConfigurationId,
         @Nullable Map<String, Object> authParameters,
-        boolean linkWithActiveUser
+        boolean linkWithActiveUser,
+        boolean forceSessionsLogout
     ) throws DBWebException {
         if (CommonUtils.isEmpty(providerId)) {
             throw new DBWebException("Missing auth provider parameter");
@@ -92,7 +94,8 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
                 WebSession.CB_SESSION_TYPE,
                 providerId,
                 providerConfigurationId,
-                authParameters
+                authParameters,
+                    forceSessionsLogout
             );
 
             linkWithActiveUser = linkWithActiveUser && CBApplication.getInstance().getAppConfiguration().isLinkExternalCredentialsWithUser();
@@ -104,6 +107,8 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
                 var authProcessor = new WebSessionAuthProcessor(webSession, smAuthInfo, linkWithActiveUser);
                 return new WebAuthStatus(smAuthInfo.getAuthStatus(), authProcessor.authenticateSession());
             }
+        } catch (DBWebException e) {
+            throw new DBWebException("User authentication failed", e.getWebErrorCode(), e);
         } catch (Exception e) {
             throw new DBWebException("User authentication failed", e);
         }

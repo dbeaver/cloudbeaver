@@ -140,7 +140,7 @@ type UserInfo {
 extend type Query {
 
     # Authorize user using specified auth provider. If linkUser=true then associates new
-    authLogin(provider: ID!, configuration: ID, credentials: Object, linkUser: Boolean): AuthInfo!
+    authLogin(provider: ID!, configuration: ID, credentials: Object, linkUser: Boolean, forceSessionsLogout: Boolean): AuthInfo!
 
     authUpdateStatus(authId: ID!, linkUser: Boolean): AuthInfo!
 
