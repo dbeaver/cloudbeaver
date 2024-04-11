@@ -102,7 +102,7 @@ export class SettingsResolverSource implements ISettingsResolverSource {
   }
 
   getEditedValue(key: any): any {
-    return this.sources.find(r => r.has(key))?.getEditedValue(key);
+    return this.sources.find(r => r.has(key) && r.getEditedValue(key) !== null)?.getEditedValue(key);
   }
 
   getValue(key: any): any {

@@ -16,7 +16,7 @@ import {
   SettingsProviderService,
   SettingsResolverService,
 } from '@cloudbeaver/core-settings';
-import { isNotNullDefined, schemaValidationError } from '@cloudbeaver/core-utils';
+import { isNotNullDefined, isNull, schemaValidationError } from '@cloudbeaver/core-utils';
 
 interface Props {
   source: ISettingsSource;
@@ -34,8 +34,8 @@ export const Setting = observer<Props>(function Setting({ source, setting }) {
   const readOnly = settingsResolverService.isReadOnly(setting.key) ?? false;
 
   let value = source.getEditedValue(setting.key);
-  if (readOnly) {
-    value = settingsResolverService.getValue(setting.key);
+  if (readOnly || isNull(value)) {
+    value = settingsResolverService.getEditedValue(setting.key);
   }
 
   if (setting.key in settingsProviderService.schema.shape) {

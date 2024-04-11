@@ -11,6 +11,7 @@ import { UserInfoResource } from '@cloudbeaver/core-authentication';
 import { injectable } from '@cloudbeaver/core-di';
 import { SettingsSource } from '@cloudbeaver/core-settings';
 import { StorageService } from '@cloudbeaver/core-storage';
+import { isNull } from '@cloudbeaver/core-utils';
 
 @injectable()
 export class UserSettingsService extends SettingsSource {
@@ -80,6 +81,14 @@ export class UserSettingsService extends SettingsSource {
     super.clear();
   }
 
+  restoreDefaults() {
+    this.update(() => {
+      for (const key of this.getSource().keys()) {
+        this.setValue(key, null);
+      }
+    });
+  }
+
   protected getSnapshot() {
     return Object.fromEntries(this.getSource());
   }
@@ -99,6 +108,11 @@ export class UserSettingsService extends SettingsSource {
 
         if (this.lastConfig && typeof this.lastConfig === 'object') {
           for (const [key, value] of Object.entries(this.lastConfig)) {
+            if (isNull(value)) {
+              console.warn(`User settings value is null for key: ${key}. Setting will be ignored.`);
+              continue;
+            }
+
             this.settings.set(key, value);
             this.localSettings.set(key, value);
           }

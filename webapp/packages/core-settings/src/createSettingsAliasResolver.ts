@@ -69,7 +69,7 @@ export function createSettingsAliasResolver<TTarget extends schema.SomeZodObject
       const oldKey = mapKey(key);
       const has = source.has(oldKey);
 
-      if (has && !DEPRECATED_SETTINGS.has(oldKey)) {
+      if (!DEPRECATED_SETTINGS.has(oldKey)) {
         console.warn(`You have deprecated settings: "${String(oldKey)}". Use "${key}" instead.`);
         DEPRECATED_SETTINGS.add(oldKey);
       }

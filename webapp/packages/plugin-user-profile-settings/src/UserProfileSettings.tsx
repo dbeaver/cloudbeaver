@@ -47,6 +47,10 @@ export const UserProfileSettings = observer(function UserProfileSettings() {
     userSettingsService.resetChanges();
   }
 
+  function handleRestoreDefaults() {
+    userSettingsService.restoreDefaults();
+  }
+
   return (
     <Form context={form} className={s(styles, { form: true })}>
       <ColoredContainer parent compact vertical wrap gap>
@@ -57,6 +61,9 @@ export const UserProfileSettings = observer(function UserProfileSettings() {
             </ToolsAction>
             <ToolsAction icon="admin-cancel" viewBox="0 0 24 24" disabled={!changed} onClick={handleReset}>
               {translate('ui_processing_cancel')}
+            </ToolsAction>
+            <ToolsAction icon="admin-cancel" viewBox="0 0 24 24" onClick={handleRestoreDefaults}>
+              {translate('plugin_user_profile_settings_restore_defaults')}
             </ToolsAction>
           </ToolsPanel>
         </Group>
