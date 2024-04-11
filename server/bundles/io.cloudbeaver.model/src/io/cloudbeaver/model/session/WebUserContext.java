@@ -39,10 +39,7 @@ import org.jkiss.dbeaver.model.security.user.SMAuthPermissions;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.utils.CommonUtils;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -120,7 +117,11 @@ public class WebUserContext implements SMCredentialsProvider {
         setUserPermissions(smAuthPermissions.getPermissions());
         this.adminSecurityController = application.getAdminSecurityController(this);
         if (isSessionChanged) {
-            this.preferenceStore.updateAllUserPreferences(securityController.getCurrentUserParameters());
+            if (smAuthPermissions.getUserId() != null) {
+                this.preferenceStore.updateAllUserPreferences(securityController.getCurrentUserParameters());
+            } else {
+                this.preferenceStore.updateAllUserPreferences(Map.of());
+            }
             this.smSessionId = smAuthPermissions.getSessionId();
             setUser(smAuthPermissions.getUserId() == null ? null : new WebUser(securityController.getCurrentUser()));
             refreshAccessibleProjects();
