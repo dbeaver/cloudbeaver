@@ -21,7 +21,7 @@ export abstract class ResultSetDataSource<TOptions> extends DatabaseDataSource<T
     super(serviceInjector);
   }
 
-  dispose(): void | Promise<void> {
+  dispose(): void {
     this.cancelLoadTotalCount();
   }
 

@@ -13,6 +13,7 @@ import { Form, getComputed, ToolsPanel } from '@cloudbeaver/core-blocks';
 import type { IDataContext } from '@cloudbeaver/core-data-context';
 import { useService } from '@cloudbeaver/core-di';
 
+import { ResultSetConstraintAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetConstraintAction';
 import type { IDatabaseDataModel } from '../../DatabaseDataModel/IDatabaseDataModel';
 import { DataViewerSettingsService } from '../../DataViewerSettingsService';
 import { AutoRefreshButton } from './AutoRefresh/AutoRefreshButton';
@@ -94,6 +95,7 @@ export const TableFooter = observer<Props>(function TableFooter({ resultIndex, m
   }, [model.countGain]);
 
   const disabled = getComputed(() => model.isLoading() || model.isDisabled(resultIndex));
+  const constraint = model.getResult(resultIndex) ? model.source.getAction(resultIndex, ResultSetConstraintAction) : null;
 
   return styled(tableFooterStyles)(
     <ToolsPanel type="secondary">
@@ -116,7 +118,7 @@ export const TableFooter = observer<Props>(function TableFooter({ resultIndex, m
           />
         </Form>
       </count>
-      <TableFooterRowCount model={model} resultIndex={resultIndex} />
+      {constraint?.supported && <TableFooterRowCount model={model} resultIndex={resultIndex} />}
       <TableFooterMenu model={model} resultIndex={resultIndex} simple={simple} context={context} />
       {model.source.requestInfo.requestMessage.length > 0 && (
         <time>
