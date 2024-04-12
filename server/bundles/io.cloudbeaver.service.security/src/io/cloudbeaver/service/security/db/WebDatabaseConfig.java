@@ -31,7 +31,7 @@ public class WebDatabaseConfig implements InternalDatabaseConfig {
 
     private String initialDataConfiguration;
 
-    private boolean doBackup;
+    private boolean backupEnabled;
 
     private final Pool pool = new Pool();
 
@@ -54,8 +54,8 @@ public class WebDatabaseConfig implements InternalDatabaseConfig {
         this.url = url;
     }
 
-    public void setDoBackup(boolean doBackup) {
-        this.doBackup = doBackup;
+    public void setBackupEnabled(boolean backupEnabled) {
+        this.backupEnabled = backupEnabled;
     }
 
     @Override
@@ -77,8 +77,8 @@ public class WebDatabaseConfig implements InternalDatabaseConfig {
     }
 
     @Override
-    public boolean doBackup() {
-        return doBackup;
+    public boolean isBackupEnabled() {
+        return backupEnabled;
     }
 
     public String getSchema() {
