@@ -25,6 +25,12 @@ export abstract class ResultSetDataSource<TOptions> extends DatabaseDataSource<T
     this.cancelLoadTotalCount();
   }
 
+  async refreshData(): Promise<void> {
+    this.cancelLoadTotalCount();
+
+    await super.refreshData();
+  }
+
   cancelLoadTotalCount(): ITask<number> | null {
     if (!this.cancelLoadTotalCountTask?.cancelled) {
       this.cancelLoadTotalCountTask?.cancel();

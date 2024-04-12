@@ -328,8 +328,6 @@ export abstract class DatabaseDataSource<TOptions, TResult extends IDatabaseData
   }
 
   async refreshData(): Promise<void> {
-    this.cancelLoadTotalCount();
-
     if (this.prevOptions) {
       this.options = toJS(this.prevOptions);
     }
