@@ -31,6 +31,7 @@ import org.jkiss.dbeaver.runtime.DBWorkbench;
 
 public abstract class WebProjectImpl extends BaseWebProjectImpl {
     private static final Log log = Log.getLog(WebProjectImpl.class);
+    @NotNull
     private final DBPPreferenceStore preferenceStore;
     public WebProjectImpl(
         @NotNull DBPWorkspace workspace,
@@ -38,7 +39,7 @@ public abstract class WebProjectImpl extends BaseWebProjectImpl {
         @NotNull SMSessionContext sessionContext,
         @NotNull RMProject project,
         @NotNull DataSourceFilter dataSourceFilter,
-        DBPPreferenceStore preferenceStore
+        @NotNull DBPPreferenceStore preferenceStore
     ) {
         super(workspace, resourceController, sessionContext, project, dataSourceFilter);
         this.preferenceStore = preferenceStore;
