@@ -15,11 +15,11 @@ import { DatabaseDataSource } from './DatabaseDataModel/DatabaseDataSource';
 import type { IDatabaseResultSet } from './DatabaseDataModel/IDatabaseResultSet';
 
 interface ResultSetDataSourceState {
-  cancelLoadTotalCountTasks: Map<string, ITask<number>>;
+  cancelLoadTotalCountTask: ITask<number> | null;
 }
 
 export abstract class ResultSetDataSource<TOptions> extends DatabaseDataSource<TOptions, IDatabaseResultSet> {
-  readonly cancelLoadTotalCountTasks: Map<string, ITask<number>>;
+  cancelLoadTotalCountTask: ITask<number> | null;
 
   constructor(
     readonly serviceInjector: IServiceInjector,
@@ -28,27 +28,19 @@ export abstract class ResultSetDataSource<TOptions> extends DatabaseDataSource<T
   ) {
     super(serviceInjector);
 
-    this.cancelLoadTotalCountTasks = new Map();
+    this.cancelLoadTotalCountTask = null;
 
     makeObservable<ResultSetDataSourceState>(this, {
-      cancelLoadTotalCountTasks: observable.shallow,
+      cancelLoadTotalCountTask: observable.ref,
     });
   }
 
-  async cancelLoadTotalCount(resultIndex: number) {
-    const result = this.getResult(resultIndex);
-
-    if (!result?.id) {
-      throw new Error('Result id must be provided');
+  cancelLoadTotalCount() {
+    if (!this.cancelLoadTotalCountTask?.cancelled && this.results.length === 0) {
+      this.cancelLoadTotalCountTask?.cancel();
     }
 
-    const task = this.cancelLoadTotalCountTasks.get(result.id);
-
-    if (!task?.cancelled) {
-      task?.cancel();
-    }
-
-    this.cancelLoadTotalCountTasks.delete(result.id);
+    return this.cancelLoadTotalCountTask;
   }
 
   async loadTotalCount(resultIndex: number) {
@@ -87,14 +79,18 @@ export abstract class ResultSetDataSource<TOptions> extends DatabaseDataSource<T
       () => this.asyncTaskInfoService.remove(asyncTask.id),
     );
 
-    this.cancelLoadTotalCountTasks.set(result.id, task);
+    this.cancelLoadTotalCountTask = task;
 
     try {
       const count = await task;
 
       this.setTotalCount(resultIndex, count);
     } finally {
-      this.cancelLoadTotalCountTasks.delete(result.id);
+      this.cancelLoadTotalCountTask = null;
     }
+  }
+
+  dispose(): void {
+    this.cancelLoadTotalCount();
   }
 }

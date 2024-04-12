@@ -153,12 +153,6 @@ export class SqlQueryResultService {
     const resultTab = state.resultTabs.find(resultTab => resultTab.tabId === tabId);
     const group = state.resultGroups.find(group => group.groupId === resultTab?.groupId);
 
-    const model = group && this.tableViewerStorageService.get(group.modelId);
-
-    if (model && resultTab) {
-      model.source.cancelLoadTotalCount(resultTab.indexInResultSet);
-    }
-
     if (resultTab && group) {
       state.resultTabs.splice(state.resultTabs.indexOf(resultTab), 1);
 

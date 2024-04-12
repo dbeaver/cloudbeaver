@@ -38,13 +38,12 @@ export const TableFooterRowCount: React.FC<Props> = observer(function TableFoote
     }
   }
 
-  async function cancelTotalCount() {
+  function cancelTotalCount() {
     try {
       setLoading(false);
-      await model.source.cancelLoadTotalCount(resultIndex);
+      model.source.cancelLoadTotalCount();
     } catch (e: any) {
-      const result = model.getResult(resultIndex);
-      const cancelled = Boolean(result?.id && model.source.cancelLoadTotalCountTasks?.get(result?.id)?.cancelled);
+      const cancelled = model.source.cancelLoadTotalCountTask?.cancelled;
 
       if (!cancelled) {
         notificationService.logException(e, 'data_viewer_total_count_cancel_failed_title', typeof e === 'string' ? e : undefined);
