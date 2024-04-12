@@ -365,8 +365,8 @@ public abstract class CBServerConfigurationController<T extends CBServerConfig>
     }
 
 
-    public void saveCommonConfig(@NotNull SMCredentialsProvider credentialsProvider, @Nullable String newPublicUrl) throws DBException {
-        // do nothing
+    public void updateServerUrl(@NotNull SMCredentialsProvider credentialsProvider, @Nullable String newPublicUrl) throws DBException {
+        getServerConfiguration().setServerURL(newPublicUrl);
     }
 
     protected Map<String, Object> collectConfigurationProperties(

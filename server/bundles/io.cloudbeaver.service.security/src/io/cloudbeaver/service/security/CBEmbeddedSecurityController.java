@@ -1816,10 +1816,19 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
     }
 
     @Override
-    public void invalidateAllUserTokens(@NotNull String userId) throws DBCException {
+    public void invalidateAllTokens() throws DBCException {
         try (Connection dbCon = database.openConnection()) {
             JDBCUtils.executeStatement(
-                dbCon, database.normalizeTableNames("DELETE FROM {table_prefix}CB_AUTH_TOKEN WHERE USER_ID=?"), userId);
+                dbCon, database.normalizeTableNames("DELETE FROM {table_prefix}CB_AUTH_TOKEN"));
+        } catch (SQLException e) {
+            throw new DBCException("Session invalidation failed", e);
+        }
+    }
+
+    private void invalidateAllUserTokens(@NotNull String userId) throws DBCException {
+        try (Connection dbCon = database.openConnection()) {
+            JDBCUtils.executeStatement(
+                dbCon, database.normalizeTableNames("DELETE FROM {table_prefix}CB_AUTH_TOKEN WHERE WHERE USER_ID=?"), userId);
         } catch (SQLException e) {
             throw new DBCException("Session invalidation failed", e);
         }
