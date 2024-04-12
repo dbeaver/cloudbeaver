@@ -19,6 +19,7 @@ package io.cloudbeaver.server;
 import com.google.gson.annotations.SerializedName;
 import io.cloudbeaver.auth.CBAuthConstants;
 import io.cloudbeaver.model.app.WebServerConfiguration;
+import io.cloudbeaver.service.security.SMControllerConfiguration;
 import io.cloudbeaver.service.security.db.WebDatabaseConfig;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.Log;
@@ -50,6 +51,8 @@ public class CBServerConfig implements WebServerConfiguration {
     private boolean enableSecurityManager = false;
     private final Map<String, Object> productSettings = new HashMap<>();
 
+    @SerializedName("sm")
+    protected final SMControllerConfiguration securityManagerConfiguration = new SMControllerConfiguration();
     @SerializedName("database")
     private WebDatabaseConfig databaseConfiguration = new WebDatabaseConfig();
     private String staticContent = "";
@@ -190,5 +193,9 @@ public class CBServerConfig implements WebServerConfiguration {
     @NotNull
     public Map<String, Object> getProductSettings() {
         return productSettings;
+    }
+
+    public SMControllerConfiguration getSecurityManagerConfiguration() {
+        return securityManagerConfiguration;
     }
 }
