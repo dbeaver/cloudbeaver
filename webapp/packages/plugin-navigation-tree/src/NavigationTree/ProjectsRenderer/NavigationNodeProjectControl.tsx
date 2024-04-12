@@ -79,3 +79,5 @@ export const NavigationNodeProjectControl: NavTreeControlComponent = observer<Na
     );
   }),
 );
+
+NavigationNodeProjectControl.displayName = 'NavigationNodeProjectControl';

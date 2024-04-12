@@ -72,3 +72,5 @@ export const NavigationNodeNested = observer(
     );
   }),
 );
+
+NavigationNodeNested.displayName = 'NavigationNodeNested';
