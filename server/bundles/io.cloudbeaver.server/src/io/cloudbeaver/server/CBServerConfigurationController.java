@@ -25,6 +25,7 @@ import io.cloudbeaver.service.security.PasswordPolicyConfiguration;
 import io.cloudbeaver.service.security.SMControllerConfiguration;
 import io.cloudbeaver.utils.WebAppUtils;
 import org.jkiss.code.NotNull;
+import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.ModelPreferences;
@@ -361,6 +362,11 @@ public abstract class CBServerConfigurationController<T extends CBServerConfig>
         } catch (IOException e) {
             throw new DBException("Error writing runtime configuration", e);
         }
+    }
+
+
+    public void saveCommonConfig(@NotNull SMCredentialsProvider credentialsProvider, @Nullable String newPublicUrl) throws DBException {
+        // do nothing
     }
 
     protected Map<String, Object> collectConfigurationProperties(
