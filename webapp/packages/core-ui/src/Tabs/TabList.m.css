@@ -9,4 +9,5 @@
 .tabList {
   display: flex;
   box-sizing: border-box;
+  outline: none;
 }
