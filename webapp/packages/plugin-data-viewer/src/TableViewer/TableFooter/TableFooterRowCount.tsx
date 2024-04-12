@@ -7,16 +7,14 @@
  */
 import { observer } from 'mobx-react-lite';
 import { useState } from 'react';
-import styled from 'reshadow';
 
-import { getComputed, ToolsAction, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 
 import type { IDatabaseDataModel } from '../../DatabaseDataModel/IDatabaseDataModel';
 import type { IDatabaseResultSet } from '../../DatabaseDataModel/IDatabaseResultSet';
-import { tableFooterMenuStyles } from './TableFooterMenu/TableFooterMenuItem';
-import classes from './TableFooterRowCount.m.css';
+import { CancelTotalCountAction } from './CancelTotalCountAction';
+import { TotalCountAction } from './TotalCountAction';
 
 interface Props {
   resultIndex: number;
@@ -43,11 +41,7 @@ export const TableFooterRowCount: React.FC<Props> = observer(function TableFoote
       setLoading(false);
       model.source.cancelLoadTotalCount();
     } catch (e: any) {
-      const cancelled = model.source.cancelLoadTotalCountTask?.cancelled;
-
-      if (!cancelled) {
-        notificationService.logException(e, 'data_viewer_total_count_cancel_failed_title', typeof e === 'string' ? e : undefined);
-      }
+      notificationService.logException(e);
     }
   }
 
@@ -56,47 +50,4 @@ export const TableFooterRowCount: React.FC<Props> = observer(function TableFoote
   }
 
   return <TotalCountAction loading={loading} resultIndex={resultIndex} model={model} onClick={loadTotalCount} />;
-});
-
-const CancelTotalCountAction = observer(function CancelTotalCountAction({ onClick }: { onClick: VoidFunction }) {
-  const translate = useTranslate();
-
-  return styled(tableFooterMenuStyles)(
-    <div className={classes.wrapper} title={translate('ui_processing_cancel')}>
-      <ToolsAction icon="/icons/data_cancel.svg" viewBox="0 0 32 32" onClick={onClick}>
-        {translate('ui_processing_cancel')}
-      </ToolsAction>
-    </div>,
-  );
-});
-
-const TotalCountAction = observer(function TotalCountAction({
-  onClick,
-  loading,
-  resultIndex,
-  model,
-}: {
-  onClick: VoidFunction;
-  loading: boolean;
-  resultIndex: number;
-  model: IDatabaseDataModel<any, IDatabaseResultSet>;
-}) {
-  const result = model.getResult(resultIndex);
-  const translate = useTranslate();
-  const disabled = getComputed(() => model.isLoading() || model.isDisabled(resultIndex));
-
-  if (!result) {
-    return null;
-  }
-
-  const currentCount = result.loadedFully ? result.count : `${result.count}+`;
-  const count = result.totalCount ?? currentCount;
-
-  return styled(tableFooterMenuStyles)(
-    <div className={classes.wrapper} title={translate('data_viewer_total_count_tooltip')}>
-      <ToolsAction disabled={disabled} loading={loading} icon="/icons/data_row_count.svg" viewBox="0 0 32 32" onClick={onClick}>
-        <span>{count}</span>
-      </ToolsAction>
-    </div>,
-  );
 });
