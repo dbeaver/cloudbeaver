@@ -24,15 +24,8 @@ interface Props {
 }
 
 export const TableFooterRowCount: React.FC<Props> = observer(function TableFooterRowCount({ resultIndex, model }) {
-  const translate = useTranslate();
   const notificationService = useService(NotificationService);
   const [loading, setLoading] = useState(false);
-
-  const result = model.getResult(resultIndex);
-
-  if (!result) {
-    return null;
-  }
 
   async function loadTotalCount() {
     try {
@@ -53,35 +46,56 @@ export const TableFooterRowCount: React.FC<Props> = observer(function TableFoote
       const result = model.getResult(resultIndex);
       const cancelled = Boolean(result?.id && model.source.cancelLoadTotalCountTasks?.get(result?.id)?.cancelled);
 
-      if (cancelled) {
-        notificationService.logError({
-          title: 'data_viewer_total_count_cancel_failed_title',
-          message: 'data_viewer_total_count_cancel_failed_desc',
-        });
-        return;
+      if (!cancelled) {
+        notificationService.logException(e, 'data_viewer_total_count_cancel_failed_title', typeof e === 'string' ? e : undefined);
       }
-
-      notificationService.logException(e, 'data_viewer_total_count_cancel_failed_title', typeof e === 'string' ? e : undefined);
     }
+  }
+
+  if (loading) {
+    return <CancelTotalCountAction onClick={cancelTotalCount} />;
+  }
+
+  return <TotalCountAction loading={loading} resultIndex={resultIndex} model={model} onClick={loadTotalCount} />;
+});
+
+const CancelTotalCountAction = observer(function CancelTotalCountAction({ onClick }: { onClick: VoidFunction }) {
+  const translate = useTranslate();
+
+  return styled(tableFooterMenuStyles)(
+    <div className={classes.wrapper} title={translate('ui_processing_cancel')}>
+      <ToolsAction icon="/icons/data_cancel.svg" viewBox="0 0 32 32" onClick={onClick}>
+        {translate('ui_processing_cancel')}
+      </ToolsAction>
+    </div>,
+  );
+});
+
+const TotalCountAction = observer(function TotalCountAction({
+  onClick,
+  loading,
+  resultIndex,
+  model,
+}: {
+  onClick: VoidFunction;
+  loading: boolean;
+  resultIndex: number;
+  model: IDatabaseDataModel<any, IDatabaseResultSet>;
+}) {
+  const result = model.getResult(resultIndex);
+  const translate = useTranslate();
+  const disabled = getComputed(() => model.isLoading() || model.isDisabled(resultIndex));
+
+  if (!result) {
+    return null;
   }
 
   const currentCount = result.loadedFully ? result.count : `${result.count}+`;
   const count = result.totalCount ?? currentCount;
-  const disabled = getComputed(() => model.isLoading() || model.isDisabled(resultIndex));
-
-  if (loading) {
-    return styled(tableFooterMenuStyles)(
-      <div className={classes.wrapper} title={translate('ui_processing_cancel')}>
-        <ToolsAction icon="/icons/data_cancel.svg" viewBox="0 0 32 32" disableLoading disableDisabled onClick={cancelTotalCount}>
-          {translate('ui_processing_cancel')}
-        </ToolsAction>
-      </div>,
-    );
-  }
 
   return styled(tableFooterMenuStyles)(
     <div className={classes.wrapper} title={translate('data_viewer_total_count_tooltip')}>
-      <ToolsAction disabled={disabled} loading={loading} icon="/icons/data_row_count.svg" viewBox="0 0 32 32" onClick={loadTotalCount}>
+      <ToolsAction disabled={disabled} loading={loading} icon="/icons/data_row_count.svg" viewBox="0 0 32 32" onClick={onClick}>
         <span>{count}</span>
       </ToolsAction>
     </div>,

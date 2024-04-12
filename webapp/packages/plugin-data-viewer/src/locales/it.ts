@@ -47,7 +47,6 @@ export default [
   ['data_viewer_total_count_tooltip', 'Get total count'],
   ['data_viewer_total_count_failed', 'Failed to get total count'],
   ['data_viewer_total_count_cancel_failed_title', 'Failed to cancel getting of total count'],
-  ['data_viewer_total_count_cancel_failed_desc', 'Counting already finished'],
   ['data_viewer_model_not_loaded', 'Table model is not loaded'],
   ['settings_data_editor', 'Data Editor'],
   ['settings_data_editor_disable_edit_name', 'Disable Edit'],
