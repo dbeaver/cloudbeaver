@@ -261,7 +261,7 @@ export abstract class DatabaseDataSource<TOptions, TResult extends IDatabaseData
   setTotalCount(resultIndex: number, count: number): this {
     const result = this.getResult(resultIndex);
 
-    if (result && result.totalCount !== count) {
+    if (result) {
       result.totalCount = count;
     }
     return this;

@@ -85,7 +85,9 @@ export abstract class ResultSetDataSource<TOptions> extends DatabaseDataSource<T
     try {
       const count = await task;
 
-      this.setTotalCount(resultIndex, count);
+      if (count !== this.count) {
+        this.setTotalCount(resultIndex, count);
+      }
     } finally {
       this.cancelLoadTotalCountTask = null;
     }
