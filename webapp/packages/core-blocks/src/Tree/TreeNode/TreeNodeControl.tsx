@@ -127,3 +127,5 @@ export const TreeNodeControl = observer<Props & React.HTMLAttributes<HTMLDivElem
     );
   }),
 );
+
+TreeNodeControl.displayName = 'TreeNodeControl';

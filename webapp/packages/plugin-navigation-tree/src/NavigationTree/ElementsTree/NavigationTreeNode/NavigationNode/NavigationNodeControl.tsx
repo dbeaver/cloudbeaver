@@ -158,3 +158,5 @@ export const NavigationNodeControl: NavTreeControlComponent = observer(
     );
   }),
 );
+
+NavigationNodeControl.displayName = 'NavigationNodeControl';
