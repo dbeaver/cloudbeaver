@@ -6,6 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 import { computed, makeObservable } from 'mobx';
+import { compare, gte, parse } from 'semver';
 
 import { injectable } from '@cloudbeaver/core-di';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
@@ -43,5 +44,17 @@ export class VersionService {
       frontendVersion,
       backendVersion,
     };
+  }
+
+  greaterOrEqual(v1: string, v2: string) {
+    return gte(v1, v2);
+  }
+
+  parseVersion(version: string) {
+    return parse(version);
+  }
+
+  compareVersions(v1: string, v2: string): number {
+    return compare(v1, v2);
   }
 }
