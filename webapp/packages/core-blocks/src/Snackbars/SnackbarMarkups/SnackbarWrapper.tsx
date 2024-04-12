@@ -8,8 +8,8 @@
 import { useEffect, useState } from 'react';
 
 import { IconButton } from '../../IconButton';
+import { useTranslate } from '../../localization/useTranslate';
 import { s } from '../../s';
-import { useFocus } from '../../useFocus';
 import { useS } from '../../useS';
 import style from './SnackbarWrapper.m.css';
 
@@ -27,7 +27,7 @@ export const SnackbarWrapper: React.FC<React.PropsWithChildren<Props>> = functio
   children,
   className,
 }) {
-  const [focusedRef] = useFocus<HTMLDivElement>({ focusFirstChild: true });
+  const translate = useTranslate();
   const styles = useS(style);
   const [mounted, setMounted] = useState(false);
 
@@ -36,10 +36,16 @@ export const SnackbarWrapper: React.FC<React.PropsWithChildren<Props>> = functio
   }, []);
 
   return (
-    <div ref={focusedRef} className={s(styles, { notification: true, mounted, closing }, className)}>
+    <div tabIndex={0} role="status" aria-live="polite" aria-atomic="true" className={s(styles, { notification: true, mounted, closing }, className)}>
       {children}
       {!persistent && onClose && (
-        <IconButton name="cross" viewBox="0 0 16 16" className={s(styles, { iconButton: true, large: true })} onClick={onClose} />
+        <IconButton
+          aria-label={translate('ui_close')}
+          name="cross"
+          viewBox="0 0 16 16"
+          className={s(styles, { iconButton: true, large: true })}
+          onClick={onClose}
+        />
       )}
     </div>
   );
