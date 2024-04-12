@@ -48,10 +48,10 @@ export const SettingsAdministration = observer<AdministrationItemContentProps>(f
   }
 
   return (
-    <Form context={form} className={s(styles, { form: true })}>
+    <Form context={form} contents>
       <ColoredContainer parent vertical wrap gap>
         <Group box keepSize>
-          <ToolsPanel>
+          <ToolsPanel rounded>
             <ToolsAction icon="admin-save" viewBox="0 0 24 24" disabled={!changed} onClick={() => form.submit()}>
               {translate('ui_processing_save')}
             </ToolsAction>
