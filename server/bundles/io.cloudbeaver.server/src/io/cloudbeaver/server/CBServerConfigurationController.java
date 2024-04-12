@@ -56,14 +56,17 @@ public abstract class CBServerConfigurationController<T extends CBServerConfig>
     private static final Log log = Log.getLog(CBServerConfigurationController.class);
 
     // Configurations
-    protected final SMControllerConfiguration securityManagerConfiguration = new SMControllerConfiguration();
+    @NotNull
     private final T serverConfiguration;
     private final CBAppConfig appConfiguration = new CBAppConfig();
-    private Map<String, String> externalProperties = new LinkedHashMap<>();
-    private Map<String, Object> originalConfigurationProperties = new LinkedHashMap<>();
+    @NotNull
+    protected final Path homeDirectory;
+    private final Map<String, String> externalProperties = new LinkedHashMap<>();
+    private final Map<String, Object> originalConfigurationProperties = new LinkedHashMap<>();
 
-    protected CBServerConfigurationController(T serverConfiguration) {
+    protected CBServerConfigurationController(@NotNull T serverConfiguration, @NotNull Path homeDirectory) {
         this.serverConfiguration = serverConfiguration;
+        this.homeDirectory = homeDirectory;
     }
 
     public String getAuthServiceURL() {
@@ -159,7 +162,7 @@ public abstract class CBServerConfigurationController<T extends CBServerConfig>
             }
             config.setServerURL("http://" + hostName + ":" + config.getServerPort());
         }
-        var homeDirectory = CBApplication.getInstance().getHomeDirectory().toString();
+
         config.setContentRoot(WebAppUtils.getRelativePath(config.getContentRoot(), homeDirectory));
         config.setRootURI(readRootUri(config.getRootURI()));
         config.setDriversLocation(WebAppUtils.getRelativePath(config.getDriversLocation(), homeDirectory));
@@ -223,7 +226,7 @@ public abstract class CBServerConfigurationController<T extends CBServerConfig>
                     CBConstants.PARAM_PRODUCT_CONFIGURATION,
                     CBConstants.DEFAULT_PRODUCT_CONFIGURATION
                 ),
-                CBApplication.getInstance().getHomeDirectory().toString()
+                homeDirectory
             );
             if (!CommonUtils.isEmpty(productConfigPath)) {
                 File productConfigFile = new File(productConfigPath);
@@ -300,6 +303,7 @@ public abstract class CBServerConfigurationController<T extends CBServerConfig>
         // Stupid way to populate existing objects but ok google (https://github.com/google/gson/issues/431)
         InstanceCreator<CBAppConfig> appConfigCreator = type -> appConfiguration;
         InstanceCreator<DataSourceNavigatorSettings> navSettingsCreator = type -> (DataSourceNavigatorSettings) appConfiguration.getDefaultNavigatorSettings();
+        var securityManagerConfiguration = getServerConfiguration().getSecurityManagerConfiguration();
         InstanceCreator<SMControllerConfiguration> smConfigCreator = type -> securityManagerConfiguration;
         InstanceCreator<T> serverConfigCreator = type -> serverConfiguration;
         InstanceCreator<PasswordPolicyConfiguration> smPasswordPoliceConfigCreator =
@@ -422,7 +426,12 @@ public abstract class CBServerConfigurationController<T extends CBServerConfig>
                 appConfigProperties,
                 CBConstants.PARAM_CONN_GRANT_ANON_ACCESS,
                 appConfig.isGrantConnectionsAccessToAnonymousTeam());
-
+            copyConfigValue(
+                oldAppConfig,
+                appConfigProperties,
+                "systemVariablesResolvingEnabled",
+                appConfig.isSystemVariablesResolvingEnabled()
+            );
             Map<String, Object> resourceQuotas = new LinkedHashMap<>();
             Map<String, Object> originResourceQuotas = JSONUtils.getObject(oldAppConfig,
                 CBConstants.PARAM_RESOURCE_QUOTAS);
@@ -595,10 +604,6 @@ public abstract class CBServerConfigurationController<T extends CBServerConfig>
 
     public Map<String, Object> getProductConfiguration() {
         return getServerConfiguration().getProductSettings();
-    }
-
-    public SMControllerConfiguration getSecurityManagerConfiguration() {
-        return securityManagerConfiguration;
     }
 
     private String readRootUri(String uri) {

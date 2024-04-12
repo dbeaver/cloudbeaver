@@ -42,34 +42,35 @@ public class CBApplicationCE extends CBApplication<CBServerConfig> {
     private final CBServerConfigurationControllerEmbedded<CBServerConfig> serverConfigController;
 
     public CBApplicationCE() {
-        serverConfigController = new CBServerConfigurationControllerEmbedded<>(new CBServerConfig());
+        super();
+        this.serverConfigController = new CBServerConfigurationControllerEmbedded<>(new CBServerConfig(), getHomeDirectory());
     }
 
     @Override
     public SMController createSecurityController(@NotNull SMCredentialsProvider credentialsProvider) throws DBException {
-        return new EmbeddedSecurityControllerFactory().createSecurityService(
+        return new EmbeddedSecurityControllerFactory<>().createSecurityService(
             this,
             getServerConfiguration().getDatabaseConfiguration(),
             credentialsProvider,
-            getServerConfigurationController().getSecurityManagerConfiguration()
+            getServerConfiguration().getSecurityManagerConfiguration()
         );
     }
     @Override
     public SMAdminController getAdminSecurityController(@NotNull SMCredentialsProvider credentialsProvider) throws DBException {
-        return new EmbeddedSecurityControllerFactory().createSecurityService(
+        return new EmbeddedSecurityControllerFactory<>().createSecurityService(
             this,
             getServerConfiguration().getDatabaseConfiguration(),
             credentialsProvider,
-            getServerConfigurationController().getSecurityManagerConfiguration()
+            getServerConfiguration().getSecurityManagerConfiguration()
         );
     }
 
     protected SMAdminController createGlobalSecurityController() throws DBException {
-        return new EmbeddedSecurityControllerFactory().createSecurityService(
+        return new EmbeddedSecurityControllerFactory<>().createSecurityService(
             this,
             getServerConfiguration().getDatabaseConfiguration(),
             new NoAuthCredentialsProvider(),
-            getServerConfigurationController().getSecurityManagerConfiguration()
+            getServerConfiguration().getSecurityManagerConfiguration()
         );
     }
 
@@ -94,8 +95,8 @@ public class CBApplicationCE extends CBApplication<CBServerConfig> {
 
     protected void shutdown() {
         try {
-            if (securityController instanceof CBEmbeddedSecurityController) {
-                ((CBEmbeddedSecurityController) securityController).shutdown();
+            if (securityController instanceof CBEmbeddedSecurityController<?> embeddedSecurityController) {
+                embeddedSecurityController.shutdown();
             }
         } catch (Exception e) {
             log.error(e);
@@ -108,8 +109,8 @@ public class CBApplicationCE extends CBApplication<CBServerConfig> {
         @Nullable String adminPassword,
         @NotNull List<AuthInfo> authInfoList
     ) throws DBException {
-        if (securityController instanceof CBEmbeddedSecurityController) {
-            ((CBEmbeddedSecurityController) securityController).finishConfiguration(adminName, adminPassword, authInfoList);
+        if (securityController instanceof CBEmbeddedSecurityController<?> embeddedSecurityController) {
+            embeddedSecurityController.finishConfiguration(adminName, adminPassword, authInfoList);
         }
     }
 

@@ -24,6 +24,7 @@ import io.cloudbeaver.service.WebServiceBindingBase;
 import io.cloudbeaver.service.data.transfer.impl.WebDataTransferParameters;
 import io.cloudbeaver.service.data.transfer.impl.WebDataTransferServlet;
 import io.cloudbeaver.service.data.transfer.impl.WebServiceDataTransfer;
+import io.cloudbeaver.service.data.transfer.impl.WebDataTransferImportServlet;
 import io.cloudbeaver.service.sql.WebServiceBindingSQL;
 import org.jkiss.dbeaver.DBException;
 
@@ -42,6 +43,8 @@ public class WebServiceBindingDataTransfer extends WebServiceBindingBase<DBWServ
         model.getQueryType()
             .dataFetcher("dataTransferAvailableStreamProcessors",
                 env -> getService(env).getAvailableStreamProcessors(getWebSession(env)))
+            .dataFetcher("dataTransferAvailableImportStreamProcessors",
+                env -> getService(env).getAvailableImportStreamProcessors(getWebSession(env)))
             .dataFetcher("dataTransferExportDataFromContainer", env -> getService(env).dataTransferExportDataFromContainer(
                 WebServiceBindingSQL.getSQLProcessor(env),
                 env.getArgument("containerNodePath"),
@@ -67,6 +70,11 @@ public class WebServiceBindingDataTransfer extends WebServiceBindingBase<DBWServ
             "dataTransfer",
             new WebDataTransferServlet(application, getServiceImpl()),
             application.getServicesURI() + "data/*"
+        );
+        servletContext.addServlet(
+                "dataTransferImport",
+                new WebDataTransferImportServlet(application, getServiceImpl()),
+                application.getServicesURI() + "data/import/*"
         );
     }
 }

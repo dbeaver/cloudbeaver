@@ -26,7 +26,6 @@ import io.cloudbeaver.registry.WebServiceRegistry;
 import io.cloudbeaver.server.jetty.CBJettyServer;
 import io.cloudbeaver.service.DBWServiceInitializer;
 import io.cloudbeaver.service.DBWServiceServerConfigurator;
-import io.cloudbeaver.service.security.CBEmbeddedSecurityController;
 import io.cloudbeaver.service.security.SMControllerConfiguration;
 import io.cloudbeaver.service.session.WebSessionManager;
 import io.cloudbeaver.utils.WebDataSourceUtils;
@@ -95,7 +94,8 @@ public abstract class CBApplication<T extends CBServerConfig> extends BaseWebApp
     public static CBApplication getInstance() {
         return (CBApplication) BaseApplicationImpl.getInstance();
     }
-    private File homeDirectory;
+
+    private final File homeDirectory;
 
     // Persistence
     protected SMAdminController securityController;
@@ -109,6 +109,7 @@ public abstract class CBApplication<T extends CBServerConfig> extends BaseWebApp
     private WebSessionManager sessionManager;
 
     public CBApplication() {
+        this.homeDirectory = new File(initHomeFolder());
     }
 
     public String getServerURL() {
@@ -185,7 +186,7 @@ public abstract class CBApplication<T extends CBServerConfig> extends BaseWebApp
     }
 
     public SMControllerConfiguration getSecurityManagerConfiguration() {
-        return getServerConfigurationController().getSecurityManagerConfiguration();
+        return getServerConfiguration().getSecurityManagerConfiguration();
     }
 
     public SMAdminController getSecurityController() {
@@ -195,10 +196,12 @@ public abstract class CBApplication<T extends CBServerConfig> extends BaseWebApp
     @Override
     protected void startServer() {
         CBPlatform.setApplication(this);
-        initHomeFolder();
         try {
             if (!loadServerConfiguration()) {
                 return;
+            }
+            if (CommonUtils.isEmpty(this.getAppConfiguration().getDefaultUserTeam())) {
+                throw new DBException("Default user team must be specified");
             }
         } catch (DBException e) {
             log.error(e);
@@ -317,11 +320,6 @@ public abstract class CBApplication<T extends CBServerConfig> extends BaseWebApp
             });
             System.setSecurityManager(new SecurityManager());
         }
-        try {
-            addAllUsersToDefaultTeam();
-        } catch (DBException e) {
-            log.error("Failed insert default teams");
-        }
 
         eventController.scheduleCheckJob();
 
@@ -330,12 +328,6 @@ public abstract class CBApplication<T extends CBServerConfig> extends BaseWebApp
         log.debug("Shutdown");
 
         return;
-    }
-
-    private void addAllUsersToDefaultTeam() throws DBException {
-        if (securityController instanceof CBEmbeddedSecurityController<?> controller) {
-            controller.addAllUsersToDefaultTeam();
-        }
     }
 
     protected void initializeAdditionalConfiguration() {
@@ -474,12 +466,7 @@ public abstract class CBApplication<T extends CBServerConfig> extends BaseWebApp
         if (CommonUtils.isEmpty(homeFolder)) {
             homeFolder = ".";
         }
-        homeDirectory = new File(homeFolder);
         return homeFolder;
-    }
-
-    protected void validateConfiguration(Map<String, Object> appConfig) throws DBException {
-
     }
 
     private void runWebServer() {
@@ -753,5 +740,10 @@ public abstract class CBApplication<T extends CBServerConfig> extends BaseWebApp
             disabledDrivers.add(driver.getFullId());
         }
         config.setDisabledDrivers(disabledDrivers.toArray(new String[0]));
+    }
+
+    @Override
+    public boolean isEnvironmentVariablesAccessible() {
+        return getAppConfiguration().isSystemVariablesResolvingEnabled();
     }
 }

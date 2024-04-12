@@ -45,7 +45,7 @@ export class CustomGraphQLClient extends GraphQLClient {
 
   async uploadFiles<T = any, V extends Variables = Variables>(
     url: string,
-    files: FileList,
+    files: File[],
     query?: string,
     variables?: V,
     onUploadProgress?: (event: UploadProgressEvent) => void,
@@ -122,7 +122,7 @@ export class CustomGraphQLClient extends GraphQLClient {
 
   private async overrideFilesUpload<T, V extends Variables = Variables>(
     url: string,
-    files: FileList | Blob,
+    files: File[] | Blob,
     query?: string,
     variables?: V,
     onUploadProgress?: (event: UploadProgressEvent) => void,
@@ -139,7 +139,7 @@ export class CustomGraphQLClient extends GraphQLClient {
         fileData: undefined as any,
       };
 
-      if (files instanceof FileList) {
+      if (files instanceof Array) {
         data['files[]'] = files;
       } else {
         data.fileData = files;

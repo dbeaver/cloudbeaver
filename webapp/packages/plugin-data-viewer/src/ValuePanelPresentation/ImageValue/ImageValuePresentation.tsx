@@ -156,7 +156,7 @@ export const ImageValuePresentation: TabContainerPanelComponent<IDataValuePanelP
         },
         async upload() {
           selectFiles(files => {
-            const file = files?.item(0) ?? undefined;
+            const file = files?.[0] ?? undefined;
             if (file && this.selectedCell) {
               this.editAction.set(this.selectedCell, createResultSetBlobValue(file));
             }
