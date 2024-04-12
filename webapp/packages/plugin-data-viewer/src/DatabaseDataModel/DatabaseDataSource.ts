@@ -374,21 +374,11 @@ export abstract class DatabaseDataSource<TOptions, TResult extends IDatabaseData
     return this;
   }
 
-  cancelLoadTotalCount(): ITask<number> | null {
-    if (!this.cancelLoadTotalCountTask?.cancelled) {
-      this.cancelLoadTotalCountTask?.cancel();
-    }
-
-    return this.cancelLoadTotalCountTask;
-  }
-
-  dispose(): Promise<void> | void {
-    this.cancelLoadTotalCount();
-  }
-
   abstract request(prevResults: TResult[]): TResult[] | Promise<TResult[]>;
   abstract save(prevResults: TResult[]): Promise<TResult[]> | TResult[];
 
+  abstract cancelLoadTotalCount(): ITask<number> | null;
+  abstract dispose(): Promise<void> | void;
   abstract loadTotalCount(resultIndex: number): Promise<void>;
 
   async requestDataAction(): Promise<TResult[] | null> {

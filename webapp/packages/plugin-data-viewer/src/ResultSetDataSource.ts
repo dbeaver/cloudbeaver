@@ -6,6 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 import type { IServiceInjector } from '@cloudbeaver/core-di';
+import type { ITask } from '@cloudbeaver/core-executor';
 import type { AsyncTaskInfoService, GraphQLService } from '@cloudbeaver/core-sdk';
 
 import { DatabaseDataSource } from './DatabaseDataModel/DatabaseDataSource';
@@ -18,6 +19,18 @@ export abstract class ResultSetDataSource<TOptions> extends DatabaseDataSource<T
     protected asyncTaskInfoService: AsyncTaskInfoService,
   ) {
     super(serviceInjector);
+  }
+
+  dispose(): void | Promise<void> {
+    this.cancelLoadTotalCount();
+  }
+
+  cancelLoadTotalCount(): ITask<number> | null {
+    if (!this.cancelLoadTotalCountTask?.cancelled) {
+      this.cancelLoadTotalCountTask?.cancel();
+    }
+
+    return this.cancelLoadTotalCountTask;
   }
 
   async loadTotalCount(resultIndex: number) {
