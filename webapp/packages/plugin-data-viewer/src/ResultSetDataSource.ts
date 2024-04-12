@@ -67,6 +67,11 @@ export abstract class ResultSetDataSource<TOptions> extends DatabaseDataSource<T
     const task = executionContext.run(
       async () => {
         const info = await this.asyncTaskInfoService.run(asyncTask);
+
+        if (this.cancelLoadTotalCountTask?.cancelled) {
+          return this.count;
+        }
+
         const { count } = await this.graphQLService.sdk.getSqlRowDataCountResult({ taskId: info.id });
 
         return count;
@@ -80,7 +85,9 @@ export abstract class ResultSetDataSource<TOptions> extends DatabaseDataSource<T
     try {
       const count = await task;
 
-      this.setTotalCount(resultIndex, count);
+      if (count !== this.count) {
+        this.setTotalCount(resultIndex, count);
+      }
     } finally {
       this.cancelLoadTotalCountTask = null;
     }
