@@ -129,7 +129,6 @@ export class DatabaseDataModel<TOptions, TResult extends IDatabaseDataResult = I
   }
 
   async refresh(concurrent?: boolean): Promise<void> {
-    this.source.cancelLoadTotalCount();
     if (concurrent) {
       await this.source.refreshData();
       return;
