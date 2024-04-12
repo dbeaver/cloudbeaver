@@ -40,7 +40,7 @@ export class CustomConnectionPluginBootstrap extends Bootstrap {
 
     this.actionService.addHandler({
       id: 'connection-custom',
-      isActionApplicable: (context, action) => [ACTION_CONNECTION_CUSTOM].includes(action),
+      actions: [ACTION_CONNECTION_CUSTOM],
       isHidden: (context, action) => {
         if (this.connectionsManagerService.createConnectionProjects.length === 0) {
           return true;
@@ -63,8 +63,6 @@ export class CustomConnectionPluginBootstrap extends Bootstrap {
       },
     });
   }
-
-  load(): void | Promise<void> {}
 
   private async openConnectionsDialog() {
     await this.commonDialogService.open(DriverSelectorDialog, null);

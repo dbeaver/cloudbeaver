@@ -75,10 +75,7 @@ export class TransactionManagerBootstrap extends Bootstrap {
 
     this.actionService.addHandler({
       id: 'commit-mode-base',
-      isActionApplicable: (_, action) =>
-        [ACTION_DATASOURCE_TRANSACTION_COMMIT, ACTION_DATASOURCE_TRANSACTION_ROLLBACK, ACTION_DATASOURCE_TRANSACTION_COMMIT_MODE_TOGGLE].includes(
-          action,
-        ),
+      actions: [ACTION_DATASOURCE_TRANSACTION_COMMIT, ACTION_DATASOURCE_TRANSACTION_ROLLBACK, ACTION_DATASOURCE_TRANSACTION_COMMIT_MODE_TOGGLE],
       isLabelVisible: (_, action) => action === ACTION_DATASOURCE_TRANSACTION_COMMIT || action === ACTION_DATASOURCE_TRANSACTION_ROLLBACK,
       getActionInfo: (_, action) => {
         const transaction = this.getContextTransaction();

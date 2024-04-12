@@ -37,7 +37,10 @@ export interface ITableHeaderPlaceholderProps {
 export class TableHeaderService extends Bootstrap {
   readonly tableHeaderPlaceholder = new PlaceholderContainer<ITableHeaderPlaceholderProps>();
 
-  constructor(private readonly menuService: MenuService, private readonly actionService: ActionService) {
+  constructor(
+    private readonly menuService: MenuService,
+    private readonly actionService: ActionService,
+  ) {
     super();
   }
 
@@ -47,7 +50,7 @@ export class TableHeaderService extends Bootstrap {
 
     this.actionService.addHandler({
       id: 'table-header-menu-base-handler',
-      isActionApplicable(context, action) {
+      isActionApplicable(context) {
         const menu = context.hasValue(DATA_CONTEXT_MENU, DATA_VIEWER_DATA_MODEL_TOOLS_MENU);
         const model = context.tryGet(DATA_CONTEXT_DV_DDM);
         const resultIndex = context.tryGet(DATA_CONTEXT_DV_DDM_RESULT_INDEX);
@@ -105,10 +108,8 @@ export class TableHeaderService extends Bootstrap {
     });
 
     this.menuService.addCreator({
-      isApplicable: context => context.get(DATA_CONTEXT_MENU) === DATA_VIEWER_DATA_MODEL_TOOLS_MENU,
+      menus: [DATA_VIEWER_DATA_MODEL_TOOLS_MENU],
       getItems: (context, items) => [...items, DATA_VIEWER_CONSTRAINTS_DELETE_ACTION],
     });
   }
-
-  load(): void | Promise<void> {}
 }

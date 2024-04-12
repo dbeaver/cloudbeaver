@@ -125,8 +125,9 @@ export class DataExportMenuService {
 
     this.actionService.addHandler({
       id: 'data-export',
-      isActionApplicable: (context, action) => action === ACTION_EXPORT && context.has(DATA_CONTEXT_CONNECTION) && context.has(DATA_CONTEXT_NAV_NODE),
-      handler: async (context, action) => {
+      actions: [ACTION_EXPORT],
+      contexts: [DATA_CONTEXT_CONNECTION, DATA_CONTEXT_NAV_NODE],
+      handler: async context => {
         const node = context.get(DATA_CONTEXT_NAV_NODE);
         const connection = context.get(DATA_CONTEXT_CONNECTION);
         const fileName = withTimestamp(`${connection.name}${node?.name ? ` - ${node.name}` : ''}`);

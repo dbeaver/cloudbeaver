@@ -66,7 +66,7 @@ export class UserProfileSettingsPluginBootstrap extends Bootstrap {
 
     this.actionService.addHandler({
       id: 'settings',
-      isActionApplicable: (context, action) => [ACTION_SETTINGS].includes(action),
+      actions: [ACTION_SETTINGS],
       getActionInfo(context, action) {
         return {
           ...action,

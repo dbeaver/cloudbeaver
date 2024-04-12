@@ -75,7 +75,7 @@ export class SqlEditorBootstrap extends Bootstrap {
     this.registerTopAppBarItem();
 
     this.menuService.addCreator({
-      isApplicable: context => context.has(DATA_CONTEXT_SQL_EDITOR_STATE) && context.has(DATA_CONTEXT_SQL_EDITOR_TAB),
+      contexts: [DATA_CONTEXT_SQL_EDITOR_STATE, DATA_CONTEXT_SQL_EDITOR_TAB],
       getItems: (context, items) => [...items, ACTION_RENAME],
       orderItems: (context, items) => {
         const actions = menuExtractItems(items, [ACTION_RENAME]);
@@ -89,11 +89,8 @@ export class SqlEditorBootstrap extends Bootstrap {
     });
 
     this.menuService.addCreator({
+      contexts: [DATA_CONTEXT_CONNECTION],
       isApplicable: context => {
-        if (!context.has(DATA_CONTEXT_CONNECTION)) {
-          return false;
-        }
-
         const node = context.tryGet(DATA_CONTEXT_NAV_NODE);
 
         if (node && !node.objectFeatures.includes(EObjectFeature.dataSource)) {
@@ -203,7 +200,7 @@ export class SqlEditorBootstrap extends Bootstrap {
 
     this.actionService.addHandler({
       id: 'sql-editor-new',
-      isActionApplicable: (context, action) => [ACTION_SQL_EDITOR_NEW].includes(action),
+      actions: [ACTION_SQL_EDITOR_NEW],
       isLabelVisible: () => false,
       getActionInfo: (context, action) => {
         const connectionContext = this.getActiveConnectionContext();

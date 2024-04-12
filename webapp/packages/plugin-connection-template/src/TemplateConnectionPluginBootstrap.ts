@@ -11,7 +11,7 @@ import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
 import { ProjectInfoResource, ProjectsService } from '@cloudbeaver/core-projects';
 import { CachedMapAllKey, getCachedDataResourceLoaderState, getCachedMapResourceLoaderState } from '@cloudbeaver/core-resource';
-import { ActionService, DATA_CONTEXT_MENU, MenuService } from '@cloudbeaver/core-view';
+import { ActionService, MenuService } from '@cloudbeaver/core-view';
 import { MENU_CONNECTIONS } from '@cloudbeaver/plugin-connections';
 
 import { ACTION_CONNECTION_TEMPLATE } from './Actions/ACTION_CONNECTION_TEMPLATE';
@@ -37,13 +37,13 @@ export class TemplateConnectionPluginBootstrap extends Bootstrap {
 
   register(): void | Promise<void> {
     this.menuService.addCreator({
-      isApplicable: context => context.tryGet(DATA_CONTEXT_MENU) === MENU_CONNECTIONS,
+      menus: [MENU_CONNECTIONS],
       getItems: (context, items) => [...items, ACTION_CONNECTION_TEMPLATE],
     });
 
     this.actionService.addHandler({
       id: 'connection-template',
-      isActionApplicable: (context, action) => [ACTION_CONNECTION_TEMPLATE].includes(action),
+      actions: [ACTION_CONNECTION_TEMPLATE],
       isHidden: () =>
         !this.appAuthService.authenticated ||
         !this.projectsService.userProject?.canEditDataSources ||
@@ -67,8 +67,6 @@ export class TemplateConnectionPluginBootstrap extends Bootstrap {
       },
     });
   }
-
-  load(): void | Promise<void> {}
 
   private async openConnectionsDialog() {
     await this.commonDialogService.open(ConnectionDialog, null);

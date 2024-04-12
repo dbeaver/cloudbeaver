@@ -5,6 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
+import { importLazyComponent } from '@cloudbeaver/core-blocks';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
@@ -13,7 +14,10 @@ import { DATA_CONTEXT_NAV_NODE, NavTreeResource, NodeManagerUtils } from '@cloud
 import { DATA_CONTEXT_MENU, DATA_CONTEXT_MENU_NESTED, MenuBaseItem, MenuService } from '@cloudbeaver/core-view';
 
 import { MENU_NAVIGATION_TREE_FILTERS } from './MENU_NAVIGATION_TREE_FILTERS';
-import { NavigationTreeFiltersDialog } from './NavigationTreeFiltersDialog/NavigationTreeFiltersDialog';
+
+const NavigationTreeFiltersDialog = importLazyComponent(() =>
+  import('./NavigationTreeFiltersDialog/NavigationTreeFiltersDialog').then(m => m.NavigationTreeFiltersDialog),
+);
 
 @injectable()
 export class NavigationTreeFiltersBootstrap extends Bootstrap {
@@ -27,7 +31,7 @@ export class NavigationTreeFiltersBootstrap extends Bootstrap {
     super();
   }
 
-  register(): void | Promise<void> {
+  register(): void {
     this.menuService.addCreator({
       isApplicable: context => {
         const node = context.tryGet(DATA_CONTEXT_NAV_NODE);
@@ -83,6 +87,4 @@ export class NavigationTreeFiltersBootstrap extends Bootstrap {
       },
     });
   }
-
-  load(): void | Promise<void> {}
 }
