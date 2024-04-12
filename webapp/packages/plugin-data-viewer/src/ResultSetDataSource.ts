@@ -20,14 +20,6 @@ export abstract class ResultSetDataSource<TOptions> extends DatabaseDataSource<T
     super(serviceInjector);
   }
 
-  cancelLoadTotalCount() {
-    if (!this.cancelLoadTotalCountTask?.cancelled && this.results.length === 0) {
-      this.cancelLoadTotalCountTask?.cancel();
-    }
-
-    return this.cancelLoadTotalCountTask;
-  }
-
   async loadTotalCount(resultIndex: number) {
     const executionContext = this.executionContext;
     const executionContextInfo = this.executionContext?.context;
@@ -73,9 +65,5 @@ export abstract class ResultSetDataSource<TOptions> extends DatabaseDataSource<T
     } finally {
       this.cancelLoadTotalCountTask = null;
     }
-  }
-
-  dispose(): void {
-    this.cancelLoadTotalCount();
   }
 }

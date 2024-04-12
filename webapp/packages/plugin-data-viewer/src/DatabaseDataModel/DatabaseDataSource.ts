@@ -372,12 +372,22 @@ export abstract class DatabaseDataSource<TOptions, TResult extends IDatabaseData
     return this;
   }
 
+  cancelLoadTotalCount(): ITask<number> | null {
+    if (!this.cancelLoadTotalCountTask?.cancelled) {
+      this.cancelLoadTotalCountTask?.cancel();
+    }
+
+    return this.cancelLoadTotalCountTask;
+  }
+
+  dispose(): Promise<void> | void {
+    this.cancelLoadTotalCount();
+  }
+
   abstract request(prevResults: TResult[]): TResult[] | Promise<TResult[]>;
   abstract save(prevResults: TResult[]): Promise<TResult[]> | TResult[];
 
-  abstract dispose(): void;
   abstract loadTotalCount(resultIndex: number): Promise<void>;
-  abstract cancelLoadTotalCount(): ITask<number> | null;
 
   async requestDataAction(): Promise<TResult[] | null> {
     this.prevOptions = toJS(this.options);
