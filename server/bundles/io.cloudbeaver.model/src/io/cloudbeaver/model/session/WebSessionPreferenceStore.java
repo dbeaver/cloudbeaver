@@ -30,6 +30,11 @@ public class WebSessionPreferenceStore extends AbstractUserPreferenceStore {
         super(parentStore);
     }
 
+    @NotNull
+    public Map<String, Object> getCustomUserParameters() {
+        return userPreferences;
+    }
+
     // to avoid redundant sm api call
     public void updatePreferenceValues(@NotNull Map<String, Object> newValues) {
         userPreferences.putAll(newValues);
