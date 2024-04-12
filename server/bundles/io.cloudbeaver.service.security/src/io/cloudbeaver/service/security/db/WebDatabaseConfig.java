@@ -31,6 +31,8 @@ public class WebDatabaseConfig implements InternalDatabaseConfig {
 
     private String initialDataConfiguration;
 
+    private boolean doBackup;
+
     private final Pool pool = new Pool();
 
     @Override
@@ -52,6 +54,10 @@ public class WebDatabaseConfig implements InternalDatabaseConfig {
         this.url = url;
     }
 
+    public void setDoBackup(boolean doBackup) {
+        this.doBackup = doBackup;
+    }
+
     @Override
     public String getUser() {
         return user;
@@ -68,6 +74,11 @@ public class WebDatabaseConfig implements InternalDatabaseConfig {
 
     public Pool getPool() {
         return pool;
+    }
+
+    @Override
+    public boolean doBackup() {
+        return doBackup;
     }
 
     public String getSchema() {
