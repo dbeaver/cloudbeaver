@@ -5,34 +5,19 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { makeObservable, observable } from 'mobx';
-
 import type { IServiceInjector } from '@cloudbeaver/core-di';
-import type { ITask } from '@cloudbeaver/core-executor';
 import type { AsyncTaskInfoService, GraphQLService } from '@cloudbeaver/core-sdk';
 
 import { DatabaseDataSource } from './DatabaseDataModel/DatabaseDataSource';
 import type { IDatabaseResultSet } from './DatabaseDataModel/IDatabaseResultSet';
 
-interface ResultSetDataSourceState {
-  cancelLoadTotalCountTask: ITask<number> | null;
-}
-
 export abstract class ResultSetDataSource<TOptions> extends DatabaseDataSource<TOptions, IDatabaseResultSet> {
-  cancelLoadTotalCountTask: ITask<number> | null;
-
   constructor(
     readonly serviceInjector: IServiceInjector,
     protected graphQLService: GraphQLService,
     protected asyncTaskInfoService: AsyncTaskInfoService,
   ) {
     super(serviceInjector);
-
-    this.cancelLoadTotalCountTask = null;
-
-    makeObservable<ResultSetDataSourceState>(this, {
-      cancelLoadTotalCountTask: observable.ref,
-    });
   }
 
   cancelLoadTotalCount() {

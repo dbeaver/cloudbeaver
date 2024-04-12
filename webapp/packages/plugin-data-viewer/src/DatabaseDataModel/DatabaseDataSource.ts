@@ -97,6 +97,7 @@ export abstract class DatabaseDataSource<TOptions, TResult extends IDatabaseData
       prevOptions: observable,
       options: observable,
       requestInfo: observable,
+      cancelLoadTotalCountTask: observable.ref,
       error: observable.ref,
       executionContext: observable,
       disabled: observable,
