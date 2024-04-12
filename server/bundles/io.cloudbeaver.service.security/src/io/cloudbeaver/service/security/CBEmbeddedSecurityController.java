@@ -1342,8 +1342,7 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
         @NotNull SMSessionType sessionType,
         @NotNull String authProviderId,
         @Nullable String authProviderConfigurationId,
-        @NotNull Map<String, Object> userCredentials,
-        boolean forceSessionsLogout
+        @NotNull Map<String, Object> userCredentials
     ) throws DBException {
         if (isProviderDisabled(authProviderId, authProviderConfigurationId)) {
             throw new SMException("Unsupported authentication provider: " + authProviderId);
