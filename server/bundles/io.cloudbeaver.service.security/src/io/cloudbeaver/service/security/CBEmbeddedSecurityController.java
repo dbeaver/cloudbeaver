@@ -1342,7 +1342,8 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
         @NotNull SMSessionType sessionType,
         @NotNull String authProviderId,
         @Nullable String authProviderConfigurationId,
-        @NotNull Map<String, Object> userCredentials
+        @NotNull Map<String, Object> userCredentials,
+        boolean forceSessionsLogout
     ) throws DBException {
         if (isProviderDisabled(authProviderId, authProviderConfigurationId)) {
             throw new SMException("Unsupported authentication provider: " + authProviderId);
@@ -1421,7 +1422,8 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
                             securedUserIdentifyingCredentials),
                         isMainSession
                     ),
-                    true
+                    true,
+                    forceSessionsLogout
                 );
             }
         } catch (SQLException e) {
@@ -1910,12 +1912,13 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
     @Override
     public SMAuthInfo finishAuthentication(@NotNull String authId) throws DBException {
         SMAuthInfo authInfo = getAuthStatus(authId);
-        return finishAuthentication(authInfo, false);
+        return finishAuthentication(authInfo, false, false);
     }
 
     private SMAuthInfo finishAuthentication(
         @NotNull SMAuthInfo authInfo,
-        boolean isSyncAuth
+        boolean isSyncAuth,
+        boolean forcelogout
     ) throws DBException {
         boolean isAsyncAuth = !isSyncAuth;
         String authId = authInfo.getAuthAttemptId();
@@ -2038,7 +2041,11 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
                         smSessionId = authAttemptSessionInfo.getSmSessionId();
                     }
 
-                    smTokens = generateNewSessionToken(smSessionId, activeUserId, tokenAuthRole, dbCon);
+                    if (forcelogout && CommonUtils.isNotEmpty(activeUserId)) {
+                        smTokens = forceLogoutGenerateNewSessionToken(smSessionId, activeUserId, tokenAuthRole, dbCon);
+                    } else {
+                        smTokens = generateNewSessionToken(smSessionId, activeUserId, tokenAuthRole, dbCon);
+                    }
                     permissions = new SMAuthPermissions(
                         activeUserId, smSessionId, getUserPermissions(activeUserId, tokenAuthRole)
                     );
@@ -2293,6 +2300,64 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
             dbCon, database.normalizeTableNames("DELETE FROM {table_prefix}CB_AUTH_TOKEN WHERE SESSION_ID=?"), smSessionId);
         return generateNewSessionTokens(smSessionId, userId, authRole, dbCon);
     }
+
+    protected SMTokens forceLogoutGenerateNewSessionToken (
+            @NotNull String smSessionId,
+            @NotNull String userId,
+            @Nullable String authRole,
+            @NotNull Connection dbCon
+    ) throws SQLException, DBException {
+        LocalDateTime currentTime = LocalDateTime.now();
+        deleteSessions(findActiveUserSessionIds(userId, currentTime));
+        return generateNewSessionTokens(smSessionId, userId, authRole, dbCon);
+    }
+
+    @NotNull
+    public List<String> findActiveUserSessionIds(
+            @NotNull String userId,
+            @NotNull LocalDateTime currentTime
+    ) throws DBException {
+        var activeSessionIds = new ArrayList<String>();
+        try (var dbCon = database.openConnection()) {
+            try (PreparedStatement dbStat = dbCon.prepareStatement(
+                    database.normalizeTableNames("SELECT DISTINCT CAT.SESSION_ID, CAT.EXPIRATION_TIME " +
+                            "FROM {table_prefix}CB_AUTH_TOKEN CAT " +
+                            "JOIN {table_prefix}CB_AUTH_ATTEMPT CAA ON CAA.SESSION_ID = CAT.SESSION_ID WHERE " +
+                            "CAT.USER_ID=? AND CAA.AUTH_STATUS=? AND CAT.EXPIRATION_TIME>? " +
+                            "ORDER BY CAT.EXPIRATION_TIME"
+                    ))
+            ) {
+                dbStat.setString(1, userId);
+                dbStat.setString(2, SMAuthStatus.EXPIRED.name());
+                dbStat.setTimestamp(3, Timestamp.valueOf(currentTime));
+                try (ResultSet dbResult = dbStat.executeQuery()) {
+                    while (dbResult.next()) {
+                        var sessionId = dbResult.getString(1);
+                        activeSessionIds.add(sessionId);
+                    }
+                }
+                return activeSessionIds;
+            }
+        } catch (SQLException e) {
+            throw new DBException("Error counting active user's session", e);
+        }
+    }
+
+    private void deleteSessions(@NotNull List<String> sessionsId) throws DBException {
+        try (var dbCon = database.openConnection()) {
+            try (PreparedStatement dbStat = dbCon.prepareStatement(
+                    database.normalizeTableNames("DELETE FROM {table_prefix}CB_AUTH_TOKEN WHERE SESSION_ID = ?"))
+            ) {
+                for (String sessionId : sessionsId) {
+                    dbStat.setString(1, sessionId);
+                    dbStat.executeUpdate();
+                }
+            }
+        } catch (SQLException e) {
+            throw new DBException("Error delete active user's session", e);
+        }
+    }
+
 
     private SMTokens generateNewSessionTokens(
         @NotNull String smSessionId,

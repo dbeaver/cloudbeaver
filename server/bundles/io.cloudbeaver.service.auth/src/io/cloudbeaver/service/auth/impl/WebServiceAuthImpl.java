@@ -94,7 +94,8 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
                 WebSession.CB_SESSION_TYPE,
                 providerId,
                 providerConfigurationId,
-                authParameters
+                authParameters,
+                forceSessionsLogout
             );
 
             linkWithActiveUser = linkWithActiveUser && CBApplication.getInstance().getAppConfiguration().isLinkExternalCredentialsWithUser();
