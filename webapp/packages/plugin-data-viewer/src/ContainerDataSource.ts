@@ -218,11 +218,7 @@ export class ContainerDataSource extends ResultSetDataSource<IDataContainerOptio
     return prevResults;
   }
 
-  async dispose(): Promise<void> {
-    await Promise.all([this.closeResults(this.results), this.cancel(), super.dispose()]);
-  }
-
-  private async closeResults(results: IDatabaseResultSet[]) {
+  async closeResults(results: IDatabaseResultSet[]) {
     await this.connectionExecutionContextService.load();
 
     if (!this.executionContext?.context) {

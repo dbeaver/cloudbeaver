@@ -254,7 +254,7 @@ export class QueryDataSource<TOptions extends IDataQueryOptions = IDataQueryOpti
     }
   }
 
-  private async closeResults(results: IDatabaseResultSet[]) {
+  async closeResults(results: IDatabaseResultSet[]) {
     if (!this.executionContext?.context) {
       return;
     }
@@ -292,9 +292,5 @@ export class QueryDataSource<TOptions extends IDataQueryOptions = IDataQueryOpti
       // || !result.resultSet?.hasMoreData,
       data: result.resultSet,
     }));
-  }
-
-  async dispose(): Promise<void> {
-    await Promise.all([this.closeResults(this.results), this.cancel(), super.dispose()]);
   }
 }

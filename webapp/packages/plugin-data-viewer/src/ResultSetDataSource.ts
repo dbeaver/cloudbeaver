@@ -25,10 +25,6 @@ export abstract class ResultSetDataSource<TOptions> extends DatabaseDataSource<T
     await Promise.all([this.cancelLoadTotalCount(), super.cancel()]);
   }
 
-  async dispose(): Promise<void> {
-    await Promise.all([this.cancel(), super.dispose()]);
-  }
-
   async cancelLoadTotalCount(): Promise<ITask<number> | null> {
     await this.totalCountRequestTask?.cancel();
 
