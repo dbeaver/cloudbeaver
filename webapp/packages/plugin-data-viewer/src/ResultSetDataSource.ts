@@ -21,22 +21,14 @@ export abstract class ResultSetDataSource<TOptions> extends DatabaseDataSource<T
     super(serviceInjector);
   }
 
-  dispose(): void {
-    this.cancelLoadTotalCount();
+  async dispose(): Promise<void> {
+    await this.cancelLoadTotalCount();
   }
 
-  async refreshData(): Promise<void> {
-    this.cancelLoadTotalCount();
+  async cancelLoadTotalCount(): Promise<ITask<number> | null> {
+    await this.totalCountRequestTask?.cancel();
 
-    await super.refreshData();
-  }
-
-  cancelLoadTotalCount(): ITask<number> | null {
-    if (!this.cancelLoadTotalCountTask?.cancelled) {
-      this.cancelLoadTotalCountTask?.cancel();
-    }
-
-    return this.cancelLoadTotalCountTask;
+    return this.totalCountRequestTask;
   }
 
   async loadTotalCount(resultIndex: number) {
@@ -68,10 +60,6 @@ export abstract class ResultSetDataSource<TOptions> extends DatabaseDataSource<T
       async () => {
         const info = await this.asyncTaskInfoService.run(asyncTask);
 
-        if (this.cancelLoadTotalCountTask?.cancelled) {
-          return this.count;
-        }
-
         const { count } = await this.graphQLService.sdk.getSqlRowDataCountResult({ taskId: info.id });
 
         return count;
@@ -80,16 +68,16 @@ export abstract class ResultSetDataSource<TOptions> extends DatabaseDataSource<T
       () => this.asyncTaskInfoService.remove(asyncTask.id),
     );
 
-    this.cancelLoadTotalCountTask = task;
+    this.totalCountRequestTask = task;
 
     try {
       const count = await task;
 
-      if (count !== this.count) {
-        this.setTotalCount(resultIndex, count);
-      }
+      this.setTotalCount(resultIndex, count);
     } finally {
-      this.cancelLoadTotalCountTask = null;
+      this.totalCountRequestTask = null;
     }
+
+    return this.totalCountRequestTask;
   }
 }

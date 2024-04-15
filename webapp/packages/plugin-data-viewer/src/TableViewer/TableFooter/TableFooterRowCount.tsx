@@ -36,10 +36,10 @@ export const TableFooterRowCount: React.FC<Props> = observer(function TableFoote
     }
   }
 
-  function cancelTotalCount() {
+  async function cancelTotalCount() {
     try {
       setLoading(false);
-      model.source.cancelLoadTotalCount();
+      await model.source.cancelLoadTotalCount();
     } catch (e: any) {
       notificationService.logException(e);
     }

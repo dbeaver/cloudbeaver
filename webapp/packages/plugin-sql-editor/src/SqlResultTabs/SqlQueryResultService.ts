@@ -163,7 +163,6 @@ export class SqlQueryResultService {
 
         // TODO: we need to dispose table model, but don't close execution context, so now we only
         const model = this.tableViewerStorageService.get(group.modelId);
-        model?.source.cancelLoadTotalCount();
         // model?.dispose();
 
         if (model?.isLoading()) {

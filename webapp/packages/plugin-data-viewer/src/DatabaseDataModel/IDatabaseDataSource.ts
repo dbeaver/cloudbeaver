@@ -48,7 +48,7 @@ export interface IDatabaseDataSource<TOptions, TResult extends IDatabaseDataResu
   readonly cancelled: boolean;
   readonly serviceInjector: IServiceInjector;
   readonly outdated: boolean;
-  readonly cancelLoadTotalCountTask: ITask<number> | null;
+  readonly totalCountRequestTask: ITask<number> | null;
 
   isLoadable: () => boolean;
   isReadonly: (resultIndex: number) => boolean;
@@ -84,8 +84,8 @@ export interface IDatabaseDataSource<TOptions, TResult extends IDatabaseDataResu
   setSupportedDataFormats: (dataFormats: ResultDataFormat[]) => this;
   setExecutionContext: (context: IConnectionExecutionContext | null) => this;
   setTotalCount: (resultIndex: number, count: number) => this;
-  loadTotalCount: (resultIndex: number) => Promise<void>;
-  cancelLoadTotalCount: () => ITask<number> | null;
+  loadTotalCount: (resultIndex: number) => Promise<ITask<number> | null>;
+  cancelLoadTotalCount: () => Promise<ITask<number> | null>;
 
   retry: () => Promise<void>;
   /** Allows to perform an asynchronous action on the data source, this action will wait previous action to finish and save or load requests.
@@ -97,5 +97,5 @@ export interface IDatabaseDataSource<TOptions, TResult extends IDatabaseDataResu
   cancel: () => Promise<void> | void;
   clearError: () => this;
   resetData: () => this;
-  dispose: () => Promise<void> | void;
+  dispose: () => Promise<void>;
 }

@@ -33,7 +33,7 @@ export abstract class DatabaseDataSource<TOptions, TResult extends IDatabaseData
   error: Error | null;
   executionContext: IConnectionExecutionContext | null;
   outdated: boolean;
-  cancelLoadTotalCountTask: ITask<number> | null;
+  totalCountRequestTask: ITask<number> | null;
 
   get canCancel(): boolean {
     if (this.activeTask instanceof Task) {
@@ -60,7 +60,7 @@ export abstract class DatabaseDataSource<TOptions, TResult extends IDatabaseData
 
   constructor(serviceInjector: IServiceInjector) {
     this.serviceInjector = serviceInjector;
-    this.cancelLoadTotalCountTask = null;
+    this.totalCountRequestTask = null;
     this.actions = new DatabaseDataActions(this);
     this.access = DatabaseDataAccessMode.Default;
     this.results = [];
@@ -97,7 +97,7 @@ export abstract class DatabaseDataSource<TOptions, TResult extends IDatabaseData
       prevOptions: observable,
       options: observable,
       requestInfo: observable,
-      cancelLoadTotalCountTask: observable.ref,
+      totalCountRequestTask: observable.ref,
       error: observable.ref,
       executionContext: observable,
       disabled: observable,
@@ -375,9 +375,9 @@ export abstract class DatabaseDataSource<TOptions, TResult extends IDatabaseData
   abstract request(prevResults: TResult[]): TResult[] | Promise<TResult[]>;
   abstract save(prevResults: TResult[]): Promise<TResult[]> | TResult[];
 
-  abstract cancelLoadTotalCount(): ITask<number> | null;
-  abstract dispose(): Promise<void> | void;
-  abstract loadTotalCount(resultIndex: number): Promise<void>;
+  abstract dispose(): Promise<void>;
+  abstract loadTotalCount(resultIndex: number): Promise<ITask<number> | null>;
+  abstract cancelLoadTotalCount(): Promise<ITask<number> | null>;
 
   async requestDataAction(): Promise<TResult[] | null> {
     this.prevOptions = toJS(this.options);

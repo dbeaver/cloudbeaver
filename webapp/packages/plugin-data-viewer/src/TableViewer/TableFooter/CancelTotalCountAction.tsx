@@ -13,7 +13,11 @@ import { ToolsAction, useTranslate } from '@cloudbeaver/core-blocks';
 import { tableFooterMenuStyles } from './TableFooterMenu/TableFooterMenuItem';
 import classes from './TableFooterRowCount.m.css';
 
-export const CancelTotalCountAction = observer(function CancelTotalCountAction({ onClick }: { onClick: VoidFunction }) {
+interface Props {
+  onClick: VoidFunction;
+}
+
+export const CancelTotalCountAction = observer(function CancelTotalCountAction({ onClick }: Props) {
   const translate = useTranslate();
 
   return styled(tableFooterMenuStyles)(

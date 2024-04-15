@@ -15,17 +15,14 @@ import type { IDatabaseResultSet } from '../../DatabaseDataModel/IDatabaseResult
 import { tableFooterMenuStyles } from './TableFooterMenu/TableFooterMenuItem';
 import classes from './TableFooterRowCount.m.css';
 
-export const TotalCountAction = observer(function TotalCountAction({
-  onClick,
-  loading,
-  resultIndex,
-  model,
-}: {
+interface Props {
   onClick: VoidFunction;
   loading: boolean;
   resultIndex: number;
   model: IDatabaseDataModel<any, IDatabaseResultSet>;
-}) {
+}
+
+export const TotalCountAction = observer(function TotalCountAction({ onClick, loading, resultIndex, model }: Props) {
   const result = model.getResult(resultIndex);
   const translate = useTranslate();
   const disabled = getComputed(() => model.isLoading() || model.isDisabled(resultIndex));
