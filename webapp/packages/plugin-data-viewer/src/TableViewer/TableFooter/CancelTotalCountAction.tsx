@@ -8,10 +8,10 @@
 import { observer } from 'mobx-react-lite';
 import styled from 'reshadow';
 
-import { ToolsAction, useTranslate } from '@cloudbeaver/core-blocks';
+import { Container, IconButton, useTranslate } from '@cloudbeaver/core-blocks';
 
+import styles from './CancelTotalCountAction.m.css';
 import { tableFooterMenuStyles } from './TableFooterMenu/TableFooterMenuItem';
-import classes from './TableFooterRowCount.m.css';
 
 interface Props {
   onClick: VoidFunction;
@@ -21,10 +21,9 @@ export const CancelTotalCountAction = observer(function CancelTotalCountAction({
   const translate = useTranslate();
 
   return styled(tableFooterMenuStyles)(
-    <div className={classes.wrapper} title={translate('ui_processing_cancel')}>
-      <ToolsAction icon="/icons/data_cancel.svg" viewBox="0 0 32 32" onClick={onClick}>
-        {translate('ui_processing_cancel')}
-      </ToolsAction>
-    </div>,
+    <Container className={styles.action} title={translate('ui_processing_cancel')} noWrap center zeroBasis keepSize onClick={onClick}>
+      <IconButton className={styles.icon} name="cross" title={translate('ui_processing_cancel')} viewBox="0 0 32 32" />
+      <span className={styles.cancelText}>{translate('ui_processing_cancel')}</span>
+    </Container>,
   );
 });
