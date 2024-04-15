@@ -49,7 +49,11 @@ export class QueryDataSource<TOptions extends IDataQueryOptions = IDataQueryOpti
     return this.currentTask?.cancelled || false;
   }
 
-  constructor(readonly serviceInjector: IServiceInjector, graphQLService: GraphQLService, asyncTaskInfoService: AsyncTaskInfoService) {
+  constructor(
+    readonly serviceInjector: IServiceInjector,
+    graphQLService: GraphQLService,
+    asyncTaskInfoService: AsyncTaskInfoService,
+  ) {
     super(serviceInjector, graphQLService, asyncTaskInfoService);
 
     this.currentTask = null;
@@ -80,9 +84,7 @@ export class QueryDataSource<TOptions extends IDataQueryOptions = IDataQueryOpti
   }
 
   async cancel(): Promise<void> {
-    if (this.currentTask) {
-      await this.currentTask.cancel();
-    }
+    await Promise.all([this.currentTask?.cancel(), super.cancel()]);
   }
 
   async save(prevResults: IDatabaseResultSet[]): Promise<IDatabaseResultSet[]> {
@@ -293,7 +295,6 @@ export class QueryDataSource<TOptions extends IDataQueryOptions = IDataQueryOpti
   }
 
   async dispose(): Promise<void> {
-    await this.closeResults(this.results);
-    await this.cancel();
+    await Promise.all([this.closeResults(this.results), this.cancel(), super.dispose()]);
   }
 }

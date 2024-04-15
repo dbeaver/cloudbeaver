@@ -165,9 +165,7 @@ export class SqlQueryResultService {
         const model = this.tableViewerStorageService.get(group.modelId);
         // model?.dispose();
 
-        if (model?.isLoading()) {
-          model.cancel();
-        }
+        model?.cancel();
 
         this.tableViewerStorageService.remove(group.modelId);
       }

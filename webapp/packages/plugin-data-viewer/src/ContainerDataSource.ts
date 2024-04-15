@@ -68,9 +68,7 @@ export class ContainerDataSource extends ResultSetDataSource<IDataContainerOptio
   }
 
   async cancel(): Promise<void> {
-    if (this.currentTask) {
-      await this.currentTask.cancel();
-    }
+    await Promise.all([this.currentTask?.cancel(), super.cancel()]);
   }
 
   async request(prevResults: IDatabaseResultSet[]): Promise<IDatabaseResultSet[]> {
@@ -221,8 +219,7 @@ export class ContainerDataSource extends ResultSetDataSource<IDataContainerOptio
   }
 
   async dispose(): Promise<void> {
-    await this.closeResults(this.results);
-    await this.executionContext?.destroy();
+    await Promise.all([this.closeResults(this.results), this.cancel(), super.dispose()]);
   }
 
   private async closeResults(results: IDatabaseResultSet[]) {

@@ -372,10 +372,13 @@ export abstract class DatabaseDataSource<TOptions, TResult extends IDatabaseData
     return this;
   }
 
+  async dispose(): Promise<void> {
+    await Promise.all([this.cancel(), this.executionContext?.destroy()]);
+  }
+
   abstract request(prevResults: TResult[]): TResult[] | Promise<TResult[]>;
   abstract save(prevResults: TResult[]): Promise<TResult[]> | TResult[];
 
-  abstract dispose(): Promise<void>;
   abstract loadTotalCount(resultIndex: number): Promise<ITask<number> | null>;
   abstract cancelLoadTotalCount(): Promise<ITask<number> | null>;
 

@@ -155,8 +155,7 @@ export class DatabaseDataModel<TOptions, TResult extends IDatabaseDataResult = I
   }
 
   async cancel(): Promise<void> {
-    await this.source.cancelLoadTotalCount();
-    return await this.source.cancel();
+    await this.source.cancel();
   }
 
   resetData(): void {
