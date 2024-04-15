@@ -61,7 +61,7 @@ export const Setting = observer<Props>(function Setting({ source, setting }) {
       return null;
     }
 
-    return schemaValidationError(result.error).toString();
+    return schemaValidationError(result.error, { prefix: null }).toString();
   });
 
   function handleChange(value: any) {
