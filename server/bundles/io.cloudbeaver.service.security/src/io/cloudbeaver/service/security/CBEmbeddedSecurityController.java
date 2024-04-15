@@ -1828,7 +1828,7 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
     private void invalidateAllUserTokens(@NotNull String userId) throws DBCException {
         try (Connection dbCon = database.openConnection()) {
             JDBCUtils.executeStatement(
-                dbCon, database.normalizeTableNames("DELETE FROM {table_prefix}CB_AUTH_TOKEN WHERE WHERE USER_ID=?"), userId);
+                dbCon, database.normalizeTableNames("DELETE FROM {table_prefix}CB_AUTH_TOKEN WHERE USER_ID=?"), userId);
         } catch (SQLException e) {
             throw new DBCException("Session invalidation failed", e);
         }
