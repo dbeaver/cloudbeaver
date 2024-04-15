@@ -1918,7 +1918,7 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
     private SMAuthInfo finishAuthentication(
         @NotNull SMAuthInfo authInfo,
         boolean isSyncAuth,
-        boolean forcelogout
+        boolean forceSessionsLogout
     ) throws DBException {
         boolean isAsyncAuth = !isSyncAuth;
         String authId = authInfo.getAuthAttemptId();
@@ -2041,8 +2041,8 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
                         smSessionId = authAttemptSessionInfo.getSmSessionId();
                     }
 
-                    if (forcelogout && CommonUtils.isNotEmpty(activeUserId)) {
-                        smTokens = forceLogoutGenerateNewSessionToken(smSessionId, activeUserId, tokenAuthRole, dbCon);
+                    if (forceSessionsLogout && CommonUtils.isNotEmpty(activeUserId) && isMainAuthSession) {
+                        smTokens = kilAllExistsUserSessions(smSessionId, activeUserId, tokenAuthRole, dbCon);
                     } else {
                         smTokens = generateNewSessionToken(smSessionId, activeUserId, tokenAuthRole, dbCon);
                     }
@@ -2301,14 +2301,15 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
         return generateNewSessionTokens(smSessionId, userId, authRole, dbCon);
     }
 
-    protected SMTokens forceLogoutGenerateNewSessionToken (
+    protected SMTokens kilAllExistsUserSessions(
             @NotNull String smSessionId,
             @NotNull String userId,
             @Nullable String authRole,
             @NotNull Connection dbCon
     ) throws SQLException, DBException {
+
         LocalDateTime currentTime = LocalDateTime.now();
-        deleteSessions(findActiveUserSessionIds(userId, currentTime));
+        deleteSessionsTokens(findActiveUserSessionIds(userId, currentTime));
         return generateNewSessionTokens(smSessionId, userId, authRole, dbCon);
     }
 
@@ -2343,7 +2344,7 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
         }
     }
 
-    private void deleteSessions(@NotNull List<String> sessionsId) throws DBException {
+    private void deleteSessionsTokens(@NotNull List<String> sessionsId) throws DBException {
         try (var dbCon = database.openConnection()) {
             try (PreparedStatement dbStat = dbCon.prepareStatement(
                     database.normalizeTableNames("DELETE FROM {table_prefix}CB_AUTH_TOKEN WHERE SESSION_ID = ?"))
