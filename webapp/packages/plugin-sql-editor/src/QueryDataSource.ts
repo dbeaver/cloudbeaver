@@ -7,7 +7,7 @@
  */
 import { makeObservable, observable } from 'mobx';
 
-import type { IConnectionExecutionContextInfo } from '@cloudbeaver/core-connections';
+import type { ConnectionExecutionContextService, IConnectionExecutionContextInfo } from '@cloudbeaver/core-connections';
 import type { IServiceInjector } from '@cloudbeaver/core-di';
 import type { ITask } from '@cloudbeaver/core-executor';
 import {
@@ -53,8 +53,9 @@ export class QueryDataSource<TOptions extends IDataQueryOptions = IDataQueryOpti
     readonly serviceInjector: IServiceInjector,
     graphQLService: GraphQLService,
     asyncTaskInfoService: AsyncTaskInfoService,
+    connectionExecutionContextService: ConnectionExecutionContextService,
   ) {
-    super(serviceInjector, graphQLService, asyncTaskInfoService);
+    super(serviceInjector, graphQLService, asyncTaskInfoService, connectionExecutionContextService);
 
     this.currentTask = null;
     this.requestInfo = {
@@ -251,28 +252,6 @@ export class QueryDataSource<TOptions extends IDataQueryOptions = IDataQueryOpti
     } catch (exception: any) {
       this.error = exception;
       throw exception;
-    }
-  }
-
-  async closeResults(results: IDatabaseResultSet[]) {
-    if (!this.executionContext?.context) {
-      return;
-    }
-
-    for (const result of results) {
-      if (result.id === null) {
-        continue;
-      }
-      try {
-        await this.graphQLService.sdk.closeResult({
-          projectId: result.projectId,
-          connectionId: result.connectionId,
-          contextId: result.contextId,
-          resultId: result.id,
-        });
-      } catch (exception: any) {
-        console.log(`Error closing result (${result.id}):`, exception);
-      }
     }
   }
 

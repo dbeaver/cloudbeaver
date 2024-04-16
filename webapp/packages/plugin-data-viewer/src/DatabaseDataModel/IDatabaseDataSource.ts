@@ -13,7 +13,6 @@ import type { ResultDataFormat } from '@cloudbeaver/core-sdk';
 import type { IDatabaseDataAction, IDatabaseDataActionClass, IDatabaseDataActionInterface } from './IDatabaseDataAction';
 import type { IDatabaseDataActions } from './IDatabaseDataActions';
 import type { IDatabaseDataResult } from './IDatabaseDataResult';
-import type { IDatabaseResultSet } from './IDatabaseResultSet';
 
 export interface IRequestInfo {
   readonly originalQuery: string;
@@ -99,5 +98,4 @@ export interface IDatabaseDataSource<TOptions, TResult extends IDatabaseDataResu
   clearError: () => this;
   resetData: () => this;
   dispose: () => Promise<void>;
-  closeResults?: (results: IDatabaseResultSet[]) => Promise<void>;
 }

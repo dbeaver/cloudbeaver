@@ -46,9 +46,9 @@ export class ContainerDataSource extends ResultSetDataSource<IDataContainerOptio
     serviceInjector: IServiceInjector,
     graphQLService: GraphQLService,
     asyncTaskInfoService: AsyncTaskInfoService,
-    private readonly connectionExecutionContextService: ConnectionExecutionContextService,
+    connectionExecutionContextService: ConnectionExecutionContextService,
   ) {
-    super(serviceInjector, graphQLService, asyncTaskInfoService);
+    super(serviceInjector, graphQLService, asyncTaskInfoService, connectionExecutionContextService);
 
     this.currentTask = null;
     this.executionContext = null;
@@ -216,30 +216,6 @@ export class ContainerDataSource extends ResultSetDataSource<IDataContainerOptio
     }
 
     return prevResults;
-  }
-
-  async closeResults(results: IDatabaseResultSet[]) {
-    await this.connectionExecutionContextService.load();
-
-    if (!this.executionContext?.context) {
-      return;
-    }
-
-    for (const result of results) {
-      if (result.id === null) {
-        continue;
-      }
-      try {
-        await this.graphQLService.sdk.closeResult({
-          projectId: result.projectId,
-          connectionId: result.connectionId,
-          contextId: result.contextId,
-          resultId: result.id,
-        });
-      } catch (exception: any) {
-        console.log(`Error closing result (${result.id}):`, exception);
-      }
-    }
   }
 
   private transformResults(executionContextInfo: IConnectionExecutionContextInfo, results: SqlQueryResults[], limit: number): IDatabaseResultSet[] {

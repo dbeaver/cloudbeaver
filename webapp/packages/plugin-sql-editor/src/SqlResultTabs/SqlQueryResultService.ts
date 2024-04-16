@@ -7,7 +7,7 @@
  */
 import { injectable } from '@cloudbeaver/core-di';
 import { uuid } from '@cloudbeaver/core-utils';
-import { IDatabaseDataModel, IDatabaseResultSet, TableViewerStorageService } from '@cloudbeaver/plugin-data-viewer';
+import { IDatabaseDataModel, IDatabaseResultSet, ResultSetDataSource, TableViewerStorageService } from '@cloudbeaver/plugin-data-viewer';
 
 import type { IResultGroup, IResultTab, ISqlEditorTabState, IStatisticsTab } from '../ISqlEditorTabState';
 import type { IDataQueryOptions } from '../QueryDataSource';
@@ -165,8 +165,10 @@ export class SqlQueryResultService {
         const model = this.tableViewerStorageService.get(group.modelId);
         // model?.dispose();
 
-        model?.cancel();
-        model?.source.closeResults?.(model.getResults());
+        if (model?.source instanceof ResultSetDataSource) {
+          model?.source.closeResults?.(model.getResults());
+          model?.cancel();
+        }
 
         this.tableViewerStorageService.remove(group.modelId);
       }
