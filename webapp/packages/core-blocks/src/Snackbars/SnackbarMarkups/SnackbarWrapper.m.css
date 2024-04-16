@@ -35,7 +35,8 @@
     width: 22px;
   }
 
-  &:hover {
+  &:hover,
+  &:focus {
     opacity: 0.7;
   }
 }
