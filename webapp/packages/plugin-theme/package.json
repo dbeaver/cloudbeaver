@@ -17,10 +17,7 @@
     "update-ts-references": "rimraf --glob dist && typescript-resolve-references"
   },
   "dependencies": {
-    "@cloudbeaver/core-di": "~0.1.0",
-    "@cloudbeaver/core-theming": "~0.1.0",
-    "@cloudbeaver/core-view": "~0.1.0",
-    "@cloudbeaver/plugin-settings-menu": "~0.1.0"
+    "@cloudbeaver/core-di": "~0.1.0"
   },
   "peerDependencies": {},
   "devDependencies": {

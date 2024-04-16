@@ -9,7 +9,7 @@ import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { DATA_CONTEXT_NAV_NODES, ENodeFeature, NavTreeResource, NavTreeSettingsService } from '@cloudbeaver/core-navigation-tree';
 import { resourceKeyList } from '@cloudbeaver/core-resource';
-import { ACTION_DELETE, ActionService, DATA_CONTEXT_MENU, MenuService } from '@cloudbeaver/core-view';
+import { ACTION_DELETE, ActionService, MenuService } from '@cloudbeaver/core-view';
 
 import { MENU_OBJECT_VIEWER_FOOTER } from './MENU_OBJECT_VIEWER_FOOTER';
 
@@ -26,24 +26,16 @@ export class ObjectPropertyTableFooterService {
   registerFooterActions() {
     this.menuService.addCreator({
       menus: [MENU_OBJECT_VIEWER_FOOTER],
-      isApplicable: context => {
-        const selected = context.tryGet(DATA_CONTEXT_NAV_NODES);
-        return selected !== undefined && this.navTreeSettingsService.deleting;
-      },
+      contexts: [DATA_CONTEXT_NAV_NODES],
+      isApplicable: () => this.navTreeSettingsService.deleting,
       getItems: (_, items) => [...items, ACTION_DELETE],
     });
 
     this.actionService.addHandler({
       id: 'object-viewer-footer-base',
-      isActionApplicable: (context, action) => {
-        const menu = context.hasValue(DATA_CONTEXT_MENU, MENU_OBJECT_VIEWER_FOOTER);
-
-        if (!menu || !context.has(DATA_CONTEXT_NAV_NODES)) {
-          return false;
-        }
-
-        return [ACTION_DELETE].includes(action);
-      },
+      menus: [MENU_OBJECT_VIEWER_FOOTER],
+      contexts: [DATA_CONTEXT_NAV_NODES],
+      actions: [ACTION_DELETE],
       getActionInfo: (_, action) => {
         if (action === ACTION_DELETE) {
           return {

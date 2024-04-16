@@ -6,14 +6,6 @@
  * you may not use this file except in compliance with the License.
  */
 
-.form {
-  overflow: auto;
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-  height: 100%;
-}
-
 .tabList {
   position: relative;
   flex-shrink: 0;

@@ -36,12 +36,10 @@ import org.jkiss.dbeaver.model.secret.DBSSecretController;
 import org.jkiss.dbeaver.model.security.SMAdminController;
 import org.jkiss.dbeaver.model.security.SMController;
 import org.jkiss.dbeaver.model.security.user.SMAuthPermissions;
+import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.utils.CommonUtils;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -66,6 +64,7 @@ public class WebUserContext implements SMCredentialsProvider {
     private RMController rmController;
     private DBFileController fileController;
     private Set<String> accessibleProjectIds = new HashSet<>();
+    private final WebSessionPreferenceStore preferenceStore;
 
     public WebUserContext(WebApplication application, DBPWorkspace workspace) throws DBException {
         this.application = application;
@@ -73,6 +72,7 @@ public class WebUserContext implements SMCredentialsProvider {
         this.securityController = application.createSecurityController(this);
         this.rmController = application.createResourceController(this, workspace);
         this.fileController = application.createFileController(this);
+        this.preferenceStore = new WebSessionPreferenceStore(DBWorkbench.getPlatform().getPreferenceStore());
         setUserPermissions(getDefaultPermissions());
     }
 
@@ -118,6 +118,11 @@ public class WebUserContext implements SMCredentialsProvider {
         this.adminSecurityController = application.getAdminSecurityController(this);
         this.rmController = application.createResourceController(this, workspace);
         if (isSessionChanged) {
+            if (smAuthPermissions.getUserId() != null) {
+                this.preferenceStore.updateAllUserPreferences(securityController.getCurrentUserParameters());
+            } else {
+                this.preferenceStore.updateAllUserPreferences(Map.of());
+            }
             this.smSessionId = smAuthPermissions.getSessionId();
             setUser(smAuthPermissions.getUserId() == null ? null : new WebUser(securityController.getCurrentUser()));
             refreshAccessibleProjects();
@@ -251,5 +256,9 @@ public class WebUserContext implements SMCredentialsProvider {
 
     private void setRefreshToken(@Nullable String refreshToken) {
         this.refreshToken = refreshToken;
+    }
+
+    public WebSessionPreferenceStore getPreferenceStore() {
+        return preferenceStore;
     }
 }

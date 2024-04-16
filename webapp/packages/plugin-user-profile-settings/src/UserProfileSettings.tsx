@@ -7,13 +7,11 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import { ColoredContainer, Form, Group, s, ToolsAction, ToolsPanel, useForm, useS, useTranslate } from '@cloudbeaver/core-blocks';
+import { ColoredContainer, Form, Group, s, ToolsAction, ToolsPanel, useForm, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { UserSettingsService } from '@cloudbeaver/core-settings-user';
 import { Settings } from '@cloudbeaver/plugin-settings-panel';
-
-import style from './UserProfileSettings.m.css';
 
 const clientScope = ['client'];
 
@@ -21,7 +19,6 @@ export const UserProfileSettings = observer(function UserProfileSettings() {
   const translate = useTranslate();
   const userSettingsService = useService(UserSettingsService);
   const notificationService = useService(NotificationService);
-  const styles = useS(style);
 
   const changed = userSettingsService.isEdited();
 
@@ -47,16 +44,23 @@ export const UserProfileSettings = observer(function UserProfileSettings() {
     userSettingsService.resetChanges();
   }
 
+  function handleRestoreDefaults() {
+    userSettingsService.restoreDefaults();
+  }
+
   return (
-    <Form context={form} className={s(styles, { form: true })}>
+    <Form context={form} contents>
       <ColoredContainer parent compact vertical wrap gap>
         <Group box keepSize>
-          <ToolsPanel>
+          <ToolsPanel rounded fixedHeight>
             <ToolsAction icon="admin-save" viewBox="0 0 24 24" disabled={!changed} onClick={() => form.submit()}>
               {translate('ui_processing_save')}
             </ToolsAction>
             <ToolsAction icon="admin-cancel" viewBox="0 0 24 24" disabled={!changed} onClick={handleReset}>
               {translate('ui_processing_cancel')}
+            </ToolsAction>
+            <ToolsAction icon="admin-cancel" viewBox="0 0 24 24" onClick={handleRestoreDefaults}>
+              {translate('plugin_user_profile_settings_restore_defaults')}
             </ToolsAction>
           </ToolsPanel>
         </Group>

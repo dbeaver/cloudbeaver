@@ -11,9 +11,6 @@
     },
     {
       "path": "../core-settings/tsconfig.json"
-    },
-    {
-      "path": "../core-utils/tsconfig.json"
     }
   ],
   "include": [

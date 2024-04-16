@@ -5,6 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { createMenu } from '@cloudbeaver/core-view';
+import { importLazyComponent } from '@cloudbeaver/core-blocks';
 
-export const LOCALIZATION_MENU = createMenu('localization-menu', 'app_shared_settingsMenu_lang');
+export const CaptureView = importLazyComponent(() => import('./CaptureView').then(m => m.CaptureView));

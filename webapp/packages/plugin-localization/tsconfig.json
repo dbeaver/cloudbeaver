@@ -13,13 +13,7 @@
       "path": "../core-localization/tsconfig.json"
     },
     {
-      "path": "../core-root/tsconfig.json"
-    },
-    {
-      "path": "../core-view/tsconfig.json"
-    },
-    {
-      "path": "../plugin-settings-menu/tsconfig.json"
+      "path": "../core-utils/tsconfig.json"
     }
   ],
   "include": [

@@ -16,7 +16,6 @@
  */
 package io.cloudbeaver.service.sql;
 
-import io.cloudbeaver.server.CBPlatform;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.Log;
@@ -68,8 +67,7 @@ public class WebSQLCompletionContext implements SQLCompletionContext {
 
     @Override
     public boolean isUseFQNames() {
-        return CBPlatform.getInstance()
-            .getPreferenceStore()
+        return sqlContext.getWebSession().getUserPreferenceStore()
             .getBoolean(SQLModelPreferences.SQL_EDITOR_PROPOSAL_ALWAYS_FQ);
     }
 

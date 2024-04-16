@@ -10,6 +10,7 @@ import type { TabStateReturn } from 'reakit/Tab';
 export interface TabPanelProps {
   tabId: string;
   className?: string;
+  contents?: boolean;
   children?: React.ReactNode | ((state: TabStateReturn) => React.ReactNode);
   lazy?: boolean;
 }

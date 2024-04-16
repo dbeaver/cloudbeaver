@@ -185,7 +185,8 @@ export class NavNodeContextMenuService extends Bootstrap {
     });
 
     this.menuService.addCreator({
-      isApplicable: context => context.has(DATA_CONTEXT_NAV_NODE) && !context.has(DATA_CONTEXT_MENU_NESTED),
+      contexts: [DATA_CONTEXT_NAV_NODE],
+      isApplicable: context => !context.has(DATA_CONTEXT_MENU_NESTED),
       getItems: (context, items) => {
         items = [ACTION_OPEN, ACTION_REFRESH, ...items];
 
@@ -218,6 +219,4 @@ export class NavNodeContextMenuService extends Bootstrap {
       },
     });
   }
-
-  load(): void {}
 }

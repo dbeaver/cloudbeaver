@@ -8,7 +8,7 @@
 import { AuthInfoService } from '@cloudbeaver/core-authentication';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
-import { DATA_CONTEXT_MENU, MenuBaseItem, MenuService } from '@cloudbeaver/core-view';
+import { MenuBaseItem, MenuService } from '@cloudbeaver/core-view';
 import { TOP_NAV_BAR_SETTINGS_MENU } from '@cloudbeaver/plugin-settings-menu';
 
 import { AuthenticationService } from './AuthenticationService';
@@ -26,7 +26,7 @@ export class PluginBootstrap extends Bootstrap {
 
   register(): void {
     this.menuService.addCreator({
-      isApplicable: context => context.get(DATA_CONTEXT_MENU) === TOP_NAV_BAR_SETTINGS_MENU,
+      menus: [TOP_NAV_BAR_SETTINGS_MENU],
       getItems: (context, items) => {
         if (this.serverConfigResource.enabledAuthProviders.length > 0 && !this.authInfoService.userInfo) {
           return [
@@ -70,6 +70,4 @@ export class PluginBootstrap extends Bootstrap {
       },
     });
   }
-
-  load(): void | Promise<void> {}
 }

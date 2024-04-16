@@ -36,10 +36,3 @@
   flex-direction: column;
   overflow: auto;
 }
-
-.submittingForm {
-  flex: 1;
-  overflow: auto;
-  display: flex;
-  flex-direction: column;
-}

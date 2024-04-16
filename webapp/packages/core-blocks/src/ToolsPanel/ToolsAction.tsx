@@ -40,7 +40,7 @@ export const ToolsAction: React.FC<Props> = function ToolsAction({ icon, viewBox
 
   return (
     <button type="button" disabled={disabled} onClick={handleClick} {...rest} className={s(styles, { button: true }, className)}>
-      {loading && <Loader className={s(styles, { loader: true })} small />}
+      {loading && <Loader small />}
       {!loading && icon && <IconOrImage className={s(styles, { iconOrImage: true })} icon={icon} viewBox={viewBox} />}
       {children && <div className={s(styles, { buttonLabel: true })}>{children}</div>}
     </button>

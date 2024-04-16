@@ -56,6 +56,7 @@ import org.jkiss.dbeaver.model.fs.DBFFileSystemManager;
 import org.jkiss.dbeaver.model.meta.Association;
 import org.jkiss.dbeaver.model.meta.Property;
 import org.jkiss.dbeaver.model.navigator.DBNModel;
+import org.jkiss.dbeaver.model.preferences.DBPPreferenceStore;
 import org.jkiss.dbeaver.model.rm.RMController;
 import org.jkiss.dbeaver.model.rm.RMProject;
 import org.jkiss.dbeaver.model.rm.RMProjectType;
@@ -1106,6 +1107,11 @@ public class WebSession extends BaseWebSession
             throw new DBException("Project not found: " + projectId);
         }
         return project.getFileSystemManager();
+    }
+
+    @NotNull
+    public DBPPreferenceStore getUserPreferenceStore() {
+        return getUserContext().getPreferenceStore();
     }
 
     private class SessionProgressMonitor extends BaseProgressMonitor {

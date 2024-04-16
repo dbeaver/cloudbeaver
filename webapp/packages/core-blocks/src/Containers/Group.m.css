@@ -48,6 +48,10 @@
     overflow: initial;
   }
 
+  &.hideOverflow {
+    overflow: hidden;
+  }
+
   &.center {
     margin: 0 auto;
   }

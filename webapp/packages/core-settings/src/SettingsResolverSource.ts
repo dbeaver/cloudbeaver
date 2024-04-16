@@ -8,6 +8,7 @@
 import { computed, makeObservable, observable } from 'mobx';
 
 import { type ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
+import { isNotNullDefined } from '@cloudbeaver/core-utils';
 
 import type { ISettingsResolverSource } from './ISettingsResolverSource';
 import type { ISettingChangeData, ISettingsSource } from './ISettingsSource';
@@ -102,11 +103,11 @@ export class SettingsResolverSource implements ISettingsResolverSource {
   }
 
   getEditedValue(key: any): any {
-    return this.sources.find(r => r.has(key))?.getEditedValue(key);
+    return this.sources.find(r => r.has(key) && isNotNullDefined(r.getEditedValue(key)))?.getEditedValue(key);
   }
 
   getValue(key: any): any {
-    return this.sources.find(r => r.has(key))?.getValue(key);
+    return this.sources.find(r => r.has(key) && isNotNullDefined(r.getValue(key)))?.getValue(key);
   }
 
   setValue(key: any, value: any): void {

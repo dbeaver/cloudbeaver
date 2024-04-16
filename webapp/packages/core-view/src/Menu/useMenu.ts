@@ -12,7 +12,6 @@ import type { IDataContext } from '@cloudbeaver/core-data-context';
 import { useService } from '@cloudbeaver/core-di';
 import { flat, ILoadableState } from '@cloudbeaver/core-utils';
 
-import { DATA_CONTEXT_MENU_LOCAL } from './DATA_CONTEXT_MENU_LOCAL';
 import type { IMenu } from './IMenu';
 import type { IMenuHandler } from './IMenuHandler';
 import type { MenuCreatorItem } from './IMenuItemsCreator';
@@ -33,14 +32,11 @@ export interface IMenuData {
 interface IMenuOptions {
   menu: IMenu;
   context?: IDataContext;
-  local?: boolean;
 }
 
 export function useMenu(options: IMenuOptions): IMenuData {
   const menuService = useService(MenuService);
   const context = useMenuContext(options.menu, options.context);
-
-  context.set(DATA_CONTEXT_MENU_LOCAL, options.local);
 
   const state = useObservableRef<IMenuData>(
     () => ({

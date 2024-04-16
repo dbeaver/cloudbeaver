@@ -65,7 +65,7 @@ export class UserProfileFormAuthenticationPart extends FormPart<IUserProfileForm
     const validation = contexts.getContext(formValidationContext);
 
     if (!state.success) {
-      validation.error(schemaValidationError(state.error).toString());
+      validation.error(schemaValidationError(state.error, { prefix: null }).toString());
       return;
     }
 

@@ -73,7 +73,7 @@ export const TabsState = observer(function TabsState<T = Record<string, any>>({
   const [openExecutor] = useState(() => new Executor<ITabData<T>>());
 
   const state = useTabState({
-    selectedId: selectedId || currentTabId,
+    selectedId: selectedId || currentTabId || container?.selectedId,
     orientation,
     manual,
   });
