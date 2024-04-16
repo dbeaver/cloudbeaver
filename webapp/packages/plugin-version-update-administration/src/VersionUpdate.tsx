@@ -6,10 +6,9 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import { gte } from 'semver';
 
 import type { AdministrationItemContentComponent } from '@cloudbeaver/core-administration';
-import { ColoredContainer, s, useResource, useS, useStyles } from '@cloudbeaver/core-blocks';
+import { ColoredContainer, s, useResource, useS } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { CachedMapAllKey } from '@cloudbeaver/core-resource';
 import { VersionResource, VersionService } from '@cloudbeaver/core-version';
@@ -28,7 +27,7 @@ export const VersionUpdate: AdministrationItemContentComponent = observer(functi
   });
 
   const GeneralInstructions = versionUpdateService.generalInstructionsGetter?.();
-  const versions = versionResource.resource.values.filter(v => gte(v.number, versionService.current));
+  const versions = versionResource.resource.values.filter(v => versionService.greaterOrEqual(v.number, versionService.current));
 
   return (
     <ColoredContainer className={s(style, { coloredContainer: true })} wrap gap overflow parent>
