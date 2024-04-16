@@ -6,7 +6,6 @@
  * you may not use this file except in compliance with the License.
  */
 import { computed, makeObservable } from 'mobx';
-import { compare } from 'semver';
 
 import { injectable } from '@cloudbeaver/core-di';
 import { IVersion, VersionResource, VersionService } from '@cloudbeaver/core-version';
@@ -29,10 +28,13 @@ export class VersionUpdateService {
       return false;
     }
 
-    return compare(this.versionResource.latest.number, this.versionService.current) === 1;
+    return this.versionService.compareVersions(this.versionResource.latest.number, this.versionService.current) === 1;
   }
 
-  constructor(private readonly versionService: VersionService, private readonly versionResource: VersionResource) {
+  constructor(
+    private readonly versionService: VersionService,
+    private readonly versionResource: VersionResource,
+  ) {
     this.versionInstructionGetter = null;
 
     makeObservable(this, {

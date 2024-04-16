@@ -51,7 +51,7 @@ public class WebSQLContextInfo implements WebSessionProvider {
 
     private static final Log log = Log.getLog(WebSQLContextInfo.class);
 
-    private final WebSQLProcessor processor;
+    private final transient WebSQLProcessor processor;
     private final String id;
     private final String projectId;
     private final Map<String, WebSQLResultsInfo> resultInfoMap = new HashMap<>();

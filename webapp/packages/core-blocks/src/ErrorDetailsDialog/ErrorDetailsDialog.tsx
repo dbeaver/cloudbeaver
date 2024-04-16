@@ -23,6 +23,7 @@ import { useClipboard } from '../useClipboard';
 import { useS } from '../useS';
 import style from './ErrorDetailsDialog.m.css';
 import { ErrorModel, IErrorInfo } from './ErrorModel';
+import { useFocus } from '../useFocus';
 
 function DisplayErrorInfo({ error }: { error: IErrorInfo }) {
   const styles = useS(style);
@@ -42,6 +43,7 @@ function DisplayErrorInfo({ error }: { error: IErrorInfo }) {
 }
 
 export const ErrorDetailsDialog: DialogComponent<Error | string, null> = observer(function ErrorDetailsDialog(props) {
+  const [focusedRef] = useFocus<HTMLDivElement>({ focusFirstChild: true });
   const translate = useTranslate();
   const styles = useS(style);
 
@@ -51,7 +53,7 @@ export const ErrorDetailsDialog: DialogComponent<Error | string, null> = observe
   const copyHandler = useCallback(() => copy(error.textToCopy, true), [error, copy]);
 
   return (
-    <CommonDialogWrapper size="large">
+    <CommonDialogWrapper ref={focusedRef} size="large">
       <CommonDialogHeader title="core_eventsLog_dbeaverErrorDetails" icon="/icons/error_icon.svg" bigIcon onReject={props.rejectDialog} />
       <CommonDialogBody>
         {error.errors.map((error, id) => (
