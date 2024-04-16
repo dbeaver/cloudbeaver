@@ -11,7 +11,6 @@ export interface TabPanelProps {
   tabId: string;
   contents?: boolean;
   className?: string;
-  contents?: boolean;
   children?: React.ReactNode | ((state: TabStateReturn) => React.ReactNode);
   lazy?: boolean;
 }
