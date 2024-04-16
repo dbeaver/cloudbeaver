@@ -246,7 +246,9 @@ export const AuthDialog: DialogComponent<IAuthOptions, null> = observer(function
                   checked={state.forceSessionsLogout}
                   name="forceSessionLogout"
                   label={translate('authentication_auth_force_session_logout')}
-                  onClick={e => state.setForceSessionsLogout(e.currentTarget.checked)}
+                  onClick={e => {
+                    state.forceSessionsLogout = e.currentTarget.checked;
+                  }}
                 />
               )}
               <AuthDialogFooter authAvailable={!dialogData.configure} isAuthenticating={dialogData.authenticating} onLogin={() => login(linkUser)}>
