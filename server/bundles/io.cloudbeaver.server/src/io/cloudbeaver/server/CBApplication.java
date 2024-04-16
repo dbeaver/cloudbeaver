@@ -48,6 +48,7 @@ import org.jkiss.dbeaver.model.security.SMObjectType;
 import org.jkiss.dbeaver.model.websocket.event.WSEventController;
 import org.jkiss.dbeaver.model.websocket.event.WSServerConfigurationChangedEvent;
 import org.jkiss.dbeaver.registry.BaseApplicationImpl;
+import org.jkiss.dbeaver.registry.BaseWorkspaceImpl;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.dbeaver.runtime.ui.DBPPlatformUI;
 import org.jkiss.dbeaver.utils.GeneralUtils;
@@ -321,6 +322,8 @@ public abstract class CBApplication<T extends CBServerConfig> extends BaseWebApp
             System.setSecurityManager(new SecurityManager());
         }
 
+        saveWorkspaceId();
+
         eventController.scheduleCheckJob();
 
         runWebServer();
@@ -328,6 +331,16 @@ public abstract class CBApplication<T extends CBServerConfig> extends BaseWebApp
         log.debug("Shutdown");
 
         return;
+    }
+
+    private void saveWorkspaceId() {
+        final Path metadataFolder = GeneralUtils.getMetadataFolder();
+        Properties props = BaseWorkspaceImpl.readWorkspaceInfo(metadataFolder);
+        String workspaceIdProperty = "workspace-id";
+        if (!props.contains(workspaceIdProperty)) {
+            props.setProperty(workspaceIdProperty, CBPlatform.getInstance().getWorkspace().getWorkspaceId());
+            BaseWorkspaceImpl.writeWorkspaceInfo(metadataFolder, props);
+        }
     }
 
     protected void initializeAdditionalConfiguration() {

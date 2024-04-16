@@ -38,14 +38,12 @@ export const Form = forwardRef<HTMLFormElement, FormDetailedProps>(function Form
   const formContext = useForm({
     disableEnterSubmit,
     parent: context,
-    onSubmit(event) {
-      const result = onSubmit?.(event);
-
-      if (result instanceof Promise) {
+    async onSubmit(event) {
+      try {
         setDisabledLocal(true);
-        result.finally(() => {
-          setDisabledLocal(false);
-        });
+        await onSubmit?.(event);
+      } finally {
+        setDisabledLocal(false);
       }
     },
     onChange,
