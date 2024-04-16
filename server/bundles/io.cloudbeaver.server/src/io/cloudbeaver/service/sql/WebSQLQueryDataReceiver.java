@@ -65,7 +65,7 @@ class WebSQLQueryDataReceiver implements DBDDataReceiver {
     @Override
     public void fetchStart(@NotNull DBCSession session, @NotNull DBCResultSet dbResult, long offset, long maxRows) throws DBCException {
         DBCResultSetMetaData meta = dbResult.getMeta();
-        List<DBCAttributeMetaData> attributes = meta.getAttributes();
+        List<? extends DBCAttributeMetaData> attributes = meta.getAttributes();
         bindings = new DBDAttributeBindingMeta[attributes.size()];
         for (int i = 0; i < attributes.size(); i++) {
             DBCAttributeMetaData attrMeta = attributes.get(i);
