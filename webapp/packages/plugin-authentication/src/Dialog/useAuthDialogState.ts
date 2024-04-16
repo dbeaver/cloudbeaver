@@ -10,8 +10,9 @@ import { useEffect } from 'react';
 
 import { AdministrationScreenService } from '@cloudbeaver/core-administration';
 import { AuthInfoService, AuthProvider, AuthProviderConfiguration, AuthProvidersResource, IAuthCredentials } from '@cloudbeaver/core-authentication';
-import { useObservableRef, useResource } from '@cloudbeaver/core-blocks';
+import { ConfirmationDialog, useObservableRef, useResource } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
+import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
 import type { ITask } from '@cloudbeaver/core-executor';
 import { CachedMapAllKey } from '@cloudbeaver/core-resource';
@@ -43,6 +44,8 @@ interface IState {
   credentials: IAuthCredentials;
   tabIds: string[];
   isTooManySessions: boolean;
+  isTooManySessionsDialogRejected: boolean;
+  setIsTooManySessionsDialogRejected: (value: boolean) => void;
   forceSessionsLogout: boolean;
   setIsTooManySessions: (value: boolean) => void;
   setForceSessionsLogout: (value: boolean) => void;
@@ -55,6 +58,7 @@ export function useAuthDialogState(accessRequest: boolean, providerId: string | 
   const administrationScreenService = useService(AdministrationScreenService);
   const authInfoService = useService(AuthInfoService);
   const notificationService = useService(NotificationService);
+  const commonDialogService = useService(CommonDialogService);
 
   const adminPageActive = administrationScreenService.isAdministrationPageActive;
   const providers = authProvidersResource.data.filter(notEmptyProvider).sort(compareProviders);
@@ -115,6 +119,10 @@ export function useAuthDialogState(accessRequest: boolean, providerId: string | 
       },
       isTooManySessions: false,
       forceSessionsLogout: false,
+      isTooManySessionsDialogRejected: false,
+      setIsTooManySessionsDialogRejected(value: boolean): void {
+        this.isTooManySessionsDialogRejected = value;
+      },
       setIsTooManySessions(value: boolean): void {
         this.isTooManySessions = value;
       },
@@ -158,6 +166,8 @@ export function useAuthDialogState(accessRequest: boolean, providerId: string | 
       credentials: observable,
       isTooManySessions: observable.ref,
       forceSessionsLogout: observable.ref,
+      isTooManySessionsDialogRejected: observable.ref,
+      setTabId: action.bound,
       setForceSessionsLogout: action.bound,
       setIsTooManySessions: action.bound,
       setActiveProvider: action.bound,
@@ -192,6 +202,19 @@ export function useAuthDialogState(accessRequest: boolean, providerId: string | 
           return;
         }
 
+        if (state.isTooManySessions && state.forceSessionsLogout) {
+          const result = await commonDialogService.open(ConfirmationDialog, {
+            title: 'authentication_auth_force_session_logout_popup_title',
+            message: 'authentication_auth_force_session_logout_popup_message',
+          });
+
+          state.setIsTooManySessionsDialogRejected(result === DialogueStateResult.Rejected);
+
+          if (state.isTooManySessionsDialogRejected) {
+            return;
+          }
+        }
+
         this.authenticating = true;
         state.setIsTooManySessions(false);
 
@@ -214,6 +237,7 @@ export function useAuthDialogState(accessRequest: boolean, providerId: string | 
           this.authTask = loginTask;
 
           await loginTask;
+          state.setForceSessionsLogout(false);
         } catch (exception: any) {
           const gqlError = errorOf(exception, GQLError);
 
