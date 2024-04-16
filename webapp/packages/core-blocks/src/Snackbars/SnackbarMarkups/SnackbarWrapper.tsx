@@ -39,13 +39,9 @@ export const SnackbarWrapper: React.FC<React.PropsWithChildren<Props>> = functio
     <div tabIndex={0} role="status" aria-live="polite" aria-atomic="true" className={s(styles, { notification: true, mounted, closing }, className)}>
       {children}
       {!persistent && onClose && (
-        <ActionIconButton
-          name="cross"
-          viewBox="0 0 16 16"
-          aria-label={translate('ui_close')}
-          className={s(styles, { iconButton: true, large: true })}
-          onClick={onClose}
-        />
+        <div className={s(styles, { iconButton: true })}>
+          <ActionIconButton name="cross" viewBox="0 0 16 16" aria-label={translate('ui_close')} onClick={onClose} />
+        </div>
       )}
     </div>
   );
