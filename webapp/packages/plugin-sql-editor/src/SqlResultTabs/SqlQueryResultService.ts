@@ -166,8 +166,8 @@ export class SqlQueryResultService {
         // model?.dispose();
 
         if (model?.source instanceof ResultSetDataSource) {
-          model?.source.closeResults?.(model.getResults());
-          model?.cancel();
+          model.source.closeResults(model.getResults());
+          model.cancel();
         }
 
         this.tableViewerStorageService.remove(group.modelId);

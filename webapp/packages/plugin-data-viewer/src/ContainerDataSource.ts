@@ -46,9 +46,9 @@ export class ContainerDataSource extends ResultSetDataSource<IDataContainerOptio
     serviceInjector: IServiceInjector,
     graphQLService: GraphQLService,
     asyncTaskInfoService: AsyncTaskInfoService,
-    connectionExecutionContextService: ConnectionExecutionContextService,
+    protected connectionExecutionContextService: ConnectionExecutionContextService,
   ) {
-    super(serviceInjector, graphQLService, asyncTaskInfoService, connectionExecutionContextService);
+    super(serviceInjector, graphQLService, asyncTaskInfoService);
 
     this.currentTask = null;
     this.executionContext = null;

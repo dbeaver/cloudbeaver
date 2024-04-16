@@ -130,12 +130,7 @@ export class SqlQueryService {
     let tabGroup = this.sqlQueryResultService.getSelectedGroup(editorState);
 
     if (inNewTab || !tabGroup) {
-      source = new QueryDataSource(
-        this.app.getServiceInjector(),
-        this.graphQLService,
-        this.asyncTaskInfoService,
-        this.connectionExecutionContextService,
-      );
+      source = new QueryDataSource(this.app.getServiceInjector(), this.graphQLService, this.asyncTaskInfoService);
       model = this.tableViewerStorageService.add(new DatabaseDataModel(source));
       this.dataViewerDataChangeConfirmationService.trackTableDataUpdate(model.id);
       tabGroup = this.sqlQueryResultService.createGroup(editorState, model.id, query);
@@ -221,12 +216,7 @@ export class SqlQueryService {
       options?.onQueryExecutionStart?.(query, i);
 
       if (!model || !source) {
-        source = new QueryDataSource(
-          this.app.getServiceInjector(),
-          this.graphQLService,
-          this.asyncTaskInfoService,
-          this.connectionExecutionContextService,
-        );
+        source = new QueryDataSource(this.app.getServiceInjector(), this.graphQLService, this.asyncTaskInfoService);
         model = this.tableViewerStorageService.add(new DatabaseDataModel(source));
         this.dataViewerDataChangeConfirmationService.trackTableDataUpdate(model.id);
       }

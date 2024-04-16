@@ -7,7 +7,7 @@
  */
 import { makeObservable, observable } from 'mobx';
 
-import type { ConnectionExecutionContextService, IConnectionExecutionContextInfo } from '@cloudbeaver/core-connections';
+import type { IConnectionExecutionContextInfo } from '@cloudbeaver/core-connections';
 import type { IServiceInjector } from '@cloudbeaver/core-di';
 import type { ITask } from '@cloudbeaver/core-executor';
 import {
@@ -53,9 +53,8 @@ export class QueryDataSource<TOptions extends IDataQueryOptions = IDataQueryOpti
     readonly serviceInjector: IServiceInjector,
     graphQLService: GraphQLService,
     asyncTaskInfoService: AsyncTaskInfoService,
-    connectionExecutionContextService: ConnectionExecutionContextService,
   ) {
-    super(serviceInjector, graphQLService, asyncTaskInfoService, connectionExecutionContextService);
+    super(serviceInjector, graphQLService, asyncTaskInfoService);
 
     this.currentTask = null;
     this.requestInfo = {

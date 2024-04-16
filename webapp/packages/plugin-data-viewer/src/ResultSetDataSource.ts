@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import type { ConnectionExecutionContextService } from '@cloudbeaver/core-connections';
 import type { IServiceInjector } from '@cloudbeaver/core-di';
 import type { ITask } from '@cloudbeaver/core-executor';
 import type { AsyncTaskInfoService, GraphQLService } from '@cloudbeaver/core-sdk';
@@ -18,7 +17,6 @@ export abstract class ResultSetDataSource<TOptions> extends DatabaseDataSource<T
     readonly serviceInjector: IServiceInjector,
     protected graphQLService: GraphQLService,
     protected asyncTaskInfoService: AsyncTaskInfoService,
-    protected connectionExecutionContextService: ConnectionExecutionContextService,
   ) {
     super(serviceInjector);
   }
@@ -84,8 +82,6 @@ export abstract class ResultSetDataSource<TOptions> extends DatabaseDataSource<T
   }
 
   async closeResults(results: IDatabaseResultSet[]): Promise<void> {
-    await this.connectionExecutionContextService.load();
-
     if (!this.executionContext?.context) {
       return;
     }
