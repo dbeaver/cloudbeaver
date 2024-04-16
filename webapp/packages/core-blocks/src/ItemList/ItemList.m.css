@@ -1,3 +1,10 @@
+/*
+ * CloudBeaver - Cloud Database Manager
+ * Copyright (C) 2020-2024 DBeaver Corp and others
+ *
+ * Licensed under the Apache License, Version 2.0.
+ * you may not use this file except in compliance with the License.
+ */
 .itemList {
   composes: theme-background-surface from global;
   box-sizing: border-box;
@@ -43,26 +50,9 @@
     align-items: center;
     height: 100%;
     top: 50%;
-    right: 4px;
+    right: 2px;
     transform: translateY(-50%);
-
-    & .iconButton {
-      position: relative;
-      box-sizing: border-box;
-      overflow: hidden;
-      border-radius: 2px;
-      height: 24px;
-      width: 24px;
-      margin: 0;
-    }
-
-    & .crossIcon {
-      padding: 4px;
-    }
   }
-}
-.iconButton {
-  composes: theme-ripple theme-background-primary theme-text-on-primary from global;
 }
 .listItem:not(:nth-last-child(2)) {
   border-bottom: 1px solid;

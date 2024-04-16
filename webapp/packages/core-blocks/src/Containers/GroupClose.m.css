@@ -1,10 +1,15 @@
+/*
+ * CloudBeaver - Cloud Database Manager
+ * Copyright (C) 2020-2024 DBeaver Corp and others
+ *
+ * Licensed under the Apache License, Version 2.0.
+ * you may not use this file except in compliance with the License.
+ */
 .groupClose {
-  width: 18px;
-  height: 18px;
-  cursor: pointer;
+  composes: groupClose from './Group.m.css';
   display: flex;
   position: absolute;
-  right: 24px;
-  z-index: 1;
+  right: 0;
+  top: 24px;
   margin-right: 0 !important;
 }

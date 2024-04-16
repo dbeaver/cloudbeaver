@@ -7,7 +7,7 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import { Loader, s, Translate, useS, useTranslate } from '@cloudbeaver/core-blocks';
+import { ColoredContainer, Group, GroupClose, GroupTitle, Loader, s, Translate, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import type { IFormState } from '@cloudbeaver/core-ui';
 
 import { AdministrationUserForm } from '../UserForm/AdministrationUserForm';
@@ -24,15 +24,23 @@ export const CreateUser = observer<Props>(function CreateUser({ state, onCancel 
   const styles = useS(style);
 
   return (
-    <div aria-label={translate('authentication_administration_user_connections_user_add')} className={s(styles, { box: true })}>
-      <div className={s(styles, { titleBar: true })}>
+    <Group
+      aria-label={translate('authentication_administration_user_connections_user_add')}
+      className={s(styles, { box: true })}
+      box
+      boxNoOverflow
+      vertical
+      noWrap
+    >
+      <GroupTitle keepSize>
         <Translate token="authentication_administration_user_connections_user_add" />
-      </div>
-      <div className={s(styles, { content: true })}>
+        <GroupClose onClick={onCancel} />
+      </GroupTitle>
+      <ColoredContainer overflow vertical>
         <Loader suspense>
           <AdministrationUserForm state={state} onClose={onCancel} />
         </Loader>
-      </div>
-    </div>
+      </ColoredContainer>
+    </Group>
   );
 });

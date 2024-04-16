@@ -7,6 +7,7 @@
  */
 import { useCallback, useRef, useState } from 'react';
 
+import { ActionIconButton } from '../ActionIconButton';
 import { IconButton } from '../IconButton';
 import { useTranslate } from '../localization/useTranslate';
 import { s } from '../s';
@@ -70,9 +71,9 @@ export const ItemListSearch: React.FC<IProps> = function ItemListSearch({ value,
         />
         <div className={s(styles, { actionButton: true })}>
           {!onSearch && inputValue ? (
-            <IconButton className={s(styles, { iconButton: true, crossIcon: true })} name="cross" onClick={() => changeHandler('')} />
+            <ActionIconButton name="cross" primary onClick={() => changeHandler('')} />
           ) : (
-            <IconButton className={s(styles, { iconButton: true })} name="search" onClick={searchHandler} />
+            <ActionIconButton name="search" viewBox="4 4 16 16" primary onClick={searchHandler} />
           )}
         </div>
       </div>
