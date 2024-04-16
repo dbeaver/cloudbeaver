@@ -1,3 +1,10 @@
+/*
+ * CloudBeaver - Cloud Database Manager
+ * Copyright (C) 2020-2024 DBeaver Corp and others
+ *
+ * Licensed under the Apache License, Version 2.0.
+ * you may not use this file except in compliance with the License.
+ */
 export default [
   ['authentication_login_dialog_title', '认证'],
   ['authentication_login', '登录'],
@@ -6,6 +13,7 @@ export default [
   ['authentication_authenticate', '认证'],
   ['authentication_authorizing', 'Authorizing...'],
   ['authentication_auth_federated', '联合认证'],
+  ['authentication_auth_force_session_logout', 'Force all other sessions logout'],
   ['authentication_auth_additional', 'Additional'],
   ['authentication_select_provider', '选择可用提供者'],
   ['authentication_configure', '请配置认证方法'],

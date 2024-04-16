@@ -15,8 +15,8 @@ import { useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import type { ITask } from '@cloudbeaver/core-executor';
 import { CachedMapAllKey } from '@cloudbeaver/core-resource';
-import type { UserInfo } from '@cloudbeaver/core-sdk';
-import { isArraysEqual } from '@cloudbeaver/core-utils';
+import { EServerErrorCode, GQLError, type UserInfo } from '@cloudbeaver/core-sdk';
+import { errorOf, isArraysEqual } from '@cloudbeaver/core-utils';
 
 import { FEDERATED_AUTH } from './FEDERATED_AUTH';
 
@@ -42,7 +42,10 @@ interface IState {
   activeConfiguration: AuthProviderConfiguration | null;
   credentials: IAuthCredentials;
   tabIds: string[];
-
+  isTooManySessions: boolean;
+  forceSessionsLogout: boolean;
+  setIsTooManySessions: (value: boolean) => void;
+  setForceSessionsLogout: (value: boolean) => void;
   setTabId: (tabId: string | null) => void;
   setActiveProvider: (provider: AuthProvider | null, configuration: AuthProviderConfiguration | null) => void;
 }
@@ -110,6 +113,14 @@ export function useAuthDialogState(accessRequest: boolean, providerId: string | 
         profile: '0',
         credentials: {},
       },
+      isTooManySessions: false,
+      forceSessionsLogout: false,
+      setIsTooManySessions(value: boolean): void {
+        this.isTooManySessions = value;
+      },
+      setForceSessionsLogout(value: boolean): void {
+        this.forceSessionsLogout = value;
+      },
       setTabId(tabId: string | null): void {
         if (tabIds.includes(tabId as any)) {
           this.tabId = tabId;
@@ -145,7 +156,11 @@ export function useAuthDialogState(accessRequest: boolean, providerId: string | 
       activeProvider: observable.ref,
       activeConfiguration: observable.ref,
       credentials: observable,
-      setActiveProvider: action,
+      isTooManySessions: observable.ref,
+      forceSessionsLogout: observable.ref,
+      setForceSessionsLogout: action.bound,
+      setIsTooManySessions: action.bound,
+      setActiveProvider: action.bound,
     },
     false,
   );
@@ -178,6 +193,8 @@ export function useAuthDialogState(accessRequest: boolean, providerId: string | 
         }
 
         this.authenticating = true;
+        state.setIsTooManySessions(false);
+
         try {
           this.state.setActiveProvider(provider, configuration ?? null);
 
@@ -191,17 +208,25 @@ export function useAuthDialogState(accessRequest: boolean, providerId: string | 
                 password: state.credentials.credentials.password?.trim(),
               },
             },
+            forceSessionsLogout: state.forceSessionsLogout,
             linkUser,
           });
           this.authTask = loginTask;
 
           await loginTask;
         } catch (exception: any) {
+          const gqlError = errorOf(exception, GQLError);
+
+          if (gqlError?.errorCode === EServerErrorCode.tooManySessions) {
+            state.setIsTooManySessions(true);
+          }
+
           if (this.destroyed) {
             notificationService.logException(exception, 'Login failed');
           } else {
             this.exception = exception;
           }
+
           throw exception;
         } finally {
           this.authTask = null;
