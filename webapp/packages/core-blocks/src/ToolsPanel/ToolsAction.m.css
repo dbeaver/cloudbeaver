@@ -7,7 +7,7 @@
  */
 .button {
   composes: theme-ripple from global;
-  padding: 0 8px;
+  padding: 0 4px;
   display: flex;
   align-items: center;
   cursor: pointer;
