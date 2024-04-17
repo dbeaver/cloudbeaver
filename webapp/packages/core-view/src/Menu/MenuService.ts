@@ -14,6 +14,7 @@ import { isAction } from '../Action/createAction';
 import type { IAction } from '../Action/IAction';
 import { isMenu } from './createMenu';
 import { DATA_CONTEXT_MENU } from './DATA_CONTEXT_MENU';
+import { DATA_CONTEXT_MENU_NESTED } from './DATA_CONTEXT_MENU_NESTED';
 import type { IMenuHandler, IMenuHandlerOptions } from './IMenuHandler';
 import type { IMenuItemsCreator, IMenuItemsCreatorOptions, MenuCreatorItem } from './IMenuItemsCreator';
 import type { IMenuActionItem } from './MenuItem/IMenuActionItem';
@@ -144,6 +145,9 @@ function filterApplicable(contexts: IDataContextProvider): (creator: IMenuItemsC
   const menu = contexts.getOwn(DATA_CONTEXT_MENU);
 
   return (creator: IMenuItemsCreator) => {
+    if (creator.root && contexts.has(DATA_CONTEXT_MENU_NESTED)) {
+      return false;
+    }
     if (creator.menus.size > 0) {
       if (!isNotNullDefined(menu) || !creator.menus.has(menu)) {
         return false;

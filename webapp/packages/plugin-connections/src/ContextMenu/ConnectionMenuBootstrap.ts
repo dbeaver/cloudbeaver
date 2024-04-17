@@ -25,7 +25,7 @@ import {
   PermissionsService,
   ServerConfigResource,
 } from '@cloudbeaver/core-root';
-import { ACTION_DELETE, ActionService, DATA_CONTEXT_MENU_NESTED, MenuSeparatorItem, MenuService } from '@cloudbeaver/core-view';
+import { ACTION_DELETE, ActionService, MenuSeparatorItem, MenuService } from '@cloudbeaver/core-view';
 import { MENU_APP_ACTIONS } from '@cloudbeaver/plugin-top-app-bar';
 
 import { PluginConnectionsSettingsService } from '../PluginConnectionsSettingsService';
@@ -62,6 +62,7 @@ export class ConnectionMenuBootstrap extends Bootstrap {
     this.addConnectionsMenuToTopAppBar();
 
     this.menuService.addCreator({
+      root: true,
       isApplicable: context => {
         if (this.pluginConnectionsSettingsService.hideConnectionViewForUsers && !this.permissionsService.has(EAdminPermission.admin)) {
           return false;
@@ -79,7 +80,7 @@ export class ConnectionMenuBootstrap extends Bootstrap {
           return false;
         }
 
-        return context.has(DATA_CONTEXT_CONNECTION) && !context.has(DATA_CONTEXT_MENU_NESTED);
+        return context.has(DATA_CONTEXT_CONNECTION);
       },
       getItems: (context, items) => [...items, MENU_CONNECTION_VIEW],
     });
@@ -141,8 +142,8 @@ export class ConnectionMenuBootstrap extends Bootstrap {
     });
 
     this.menuService.addCreator({
+      root: true,
       contexts: [DATA_CONTEXT_CONNECTION],
-      isApplicable: context => !context.has(DATA_CONTEXT_MENU_NESTED),
       getItems: (context, items) => [
         ...items,
         ACTION_CONNECTION_CHANGE_CREDENTIALS,

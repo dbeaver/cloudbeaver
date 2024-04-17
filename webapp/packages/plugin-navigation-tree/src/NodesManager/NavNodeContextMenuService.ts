@@ -32,7 +32,6 @@ import {
   ACTION_REFRESH,
   ACTION_RENAME,
   ActionService,
-  DATA_CONTEXT_MENU_NESTED,
   menuExtractItems,
   MenuSeparatorItem,
   MenuService,
@@ -185,8 +184,8 @@ export class NavNodeContextMenuService extends Bootstrap {
     });
 
     this.menuService.addCreator({
+      root: true,
       contexts: [DATA_CONTEXT_NAV_NODE],
-      isApplicable: context => !context.has(DATA_CONTEXT_MENU_NESTED),
       getItems: (context, items) => {
         items = [ACTION_OPEN, ACTION_REFRESH, ...items];
 
