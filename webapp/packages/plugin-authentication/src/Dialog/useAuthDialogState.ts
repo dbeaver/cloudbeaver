@@ -33,7 +33,7 @@ interface IData {
   federatedProviders: AuthProvider[];
   tabIds: string[];
 
-  login: (linkUser: boolean, provider?: AuthProvider, configuration?: AuthProviderConfiguration) => Promise<void>;
+  login: (linkUser: boolean, provider?: AuthProvider, configuration?: AuthProviderConfiguration) => Promise<boolean>;
   loginFederated: (provider: AuthProvider, configuration: AuthProviderConfiguration, onClose?: () => void) => Promise<void>;
 }
 
@@ -44,7 +44,6 @@ interface IState {
   credentials: IAuthCredentials;
   tabIds: string[];
   isTooManySessions: boolean;
-  isTooManySessionsDialogRejected: boolean;
   forceSessionsLogout: boolean;
   setTabId: (tabId: string | null) => void;
   setActiveProvider: (provider: AuthProvider | null, configuration: AuthProviderConfiguration | null) => void;
@@ -116,7 +115,6 @@ export function useAuthDialogState(accessRequest: boolean, providerId: string | 
       },
       isTooManySessions: false,
       forceSessionsLogout: false,
-      isTooManySessionsDialogRejected: false,
       setTabId(tabId: string | null): void {
         if (tabIds.includes(tabId as any)) {
           this.tabId = tabId;
@@ -154,7 +152,6 @@ export function useAuthDialogState(accessRequest: boolean, providerId: string | 
       credentials: observable,
       isTooManySessions: observable.ref,
       forceSessionsLogout: observable.ref,
-      isTooManySessionsDialogRejected: observable.ref,
       setTabId: action.bound,
       setActiveProvider: action.bound,
     },
@@ -180,12 +177,12 @@ export function useAuthDialogState(accessRequest: boolean, providerId: string | 
         }
         return false;
       },
-      async login(linkUser: boolean, provider?: AuthProvider, configuration?: AuthProviderConfiguration): Promise<void> {
+      async login(linkUser: boolean, provider?: AuthProvider, configuration?: AuthProviderConfiguration): Promise<boolean> {
         provider = (provider || state.activeProvider) ?? undefined;
         configuration = (configuration || state.activeConfiguration) ?? undefined;
 
         if (!provider || this.authenticating) {
-          return;
+          return false;
         }
 
         if (state.isTooManySessions && state.forceSessionsLogout) {
@@ -194,10 +191,8 @@ export function useAuthDialogState(accessRequest: boolean, providerId: string | 
             message: 'authentication_auth_force_session_logout_popup_message',
           });
 
-          state.isTooManySessionsDialogRejected = result === DialogueStateResult.Rejected;
-
-          if (state.isTooManySessionsDialogRejected) {
-            return;
+          if (result === DialogueStateResult.Rejected) {
+            return false;
           }
         }
 
@@ -246,6 +241,8 @@ export function useAuthDialogState(accessRequest: boolean, providerId: string | 
             this.state.setTabId(FEDERATED_AUTH);
           }
         }
+
+        return true;
       },
     }),
     {

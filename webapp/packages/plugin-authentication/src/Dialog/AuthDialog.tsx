@@ -88,9 +88,9 @@ export const AuthDialog: DialogComponent<IAuthOptions, null> = observer(function
 
   async function login(linkUser: boolean, provider?: AuthProvider, configuration?: AuthProviderConfiguration) {
     try {
-      await dialogData.login(linkUser, provider, configuration);
+      const success = await dialogData.login(linkUser, provider, configuration);
 
-      if (dialogData.state.isTooManySessionsDialogRejected) {
+      if (!success) {
         return;
       }
 
