@@ -23,7 +23,7 @@ import { ExtensionUtils } from '@cloudbeaver/core-extensions';
 import { LocalizationService } from '@cloudbeaver/core-localization';
 import { DATA_CONTEXT_NAV_NODE, EObjectFeature, NodeManagerUtils } from '@cloudbeaver/core-navigation-tree';
 import { ISessionAction, sessionActionContext, SessionActionService } from '@cloudbeaver/core-root';
-import { ACTION_RENAME, ActionService, DATA_CONTEXT_MENU_NESTED, menuExtractItems, MenuService, ViewService } from '@cloudbeaver/core-view';
+import { ACTION_RENAME, ActionService, menuExtractItems, MenuService, ViewService } from '@cloudbeaver/core-view';
 import { MENU_CONNECTIONS } from '@cloudbeaver/plugin-connections';
 import { NavigationTabsService } from '@cloudbeaver/plugin-navigation-tabs';
 import {
@@ -89,6 +89,7 @@ export class SqlEditorBootstrap extends Bootstrap {
     });
 
     this.menuService.addCreator({
+      root: true,
       contexts: [DATA_CONTEXT_CONNECTION],
       isApplicable: context => {
         const node = context.tryGet(DATA_CONTEXT_NAV_NODE);
@@ -97,7 +98,7 @@ export class SqlEditorBootstrap extends Bootstrap {
           return false;
         }
 
-        return !context.has(DATA_CONTEXT_MENU_NESTED);
+        return true;
       },
       getItems: (context, items) => [...items, ACTION_SQL_EDITOR_OPEN],
     });

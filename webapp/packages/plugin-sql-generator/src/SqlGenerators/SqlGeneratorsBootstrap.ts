@@ -44,7 +44,7 @@ export class SqlGeneratorsBootstrap extends Bootstrap {
       },
     });
     this.menuService.addCreator({
-      menus: [MENU_SQL_GENERATORS],
+      root: true,
       contexts: [DATA_CONTEXT_NAV_NODE],
       isApplicable: context => {
         const node = context.get(DATA_CONTEXT_NAV_NODE);

@@ -14,6 +14,7 @@ import type { IMenuItem } from './MenuItem/IMenuItem';
 export type MenuCreatorItem = IMenuItem | IAction | IMenu;
 
 export interface IMenuItemsCreator {
+  root?: boolean;
   menus: Set<IMenu>;
   contexts: Set<DataContextGetter<any>>;
   isApplicable?: (context: IDataContextProvider) => boolean;
