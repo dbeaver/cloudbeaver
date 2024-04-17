@@ -1,5 +1,5 @@
 {
-  "name": "@cloudbeaver/core-product",
+  "name": "@cloudbeaver/plugin-too-many-sessions",
   "sideEffects": [
     "src/**/*.css",
     "src/**/*.scss",
@@ -16,12 +16,10 @@
     "validate-dependencies": "core-cli-validate-dependencies",
     "update-ts-references": "rimraf --glob dist && typescript-resolve-references"
   },
-  "dependencies": {
-    "@cloudbeaver/core-di": "~0.1.0",
-    "@cloudbeaver/core-settings": "~0.1.0",
-    "mobx": "^6.12.0"
-  },
   "peerDependencies": {},
+  "dependencies": {
+    "@cloudbeaver/core-di": "~0.1.0"
+  },
   "devDependencies": {
     "typescript": "^5.3.3"
   }

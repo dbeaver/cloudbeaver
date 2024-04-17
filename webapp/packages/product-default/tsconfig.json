@@ -166,6 +166,9 @@
       "path": "../plugin-theme/tsconfig.json"
     },
     {
+      "path": "../plugin-too-many-sessions/tsconfig.json"
+    },
+    {
       "path": "../plugin-tools-panel/tsconfig.json"
     },
     {

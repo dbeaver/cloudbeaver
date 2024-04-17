@@ -1,3 +1,10 @@
+/*
+ * CloudBeaver - Cloud Database Manager
+ * Copyright (C) 2020-2024 DBeaver Corp and others
+ *
+ * Licensed under the Apache License, Version 2.0.
+ * you may not use this file except in compliance with the License.
+ */
 const { merge } = require('webpack-merge');
 const { resolve } = require('path');
 const webpack = require('webpack');
@@ -9,6 +16,8 @@ const commonConfig = require('./webpack.config.js');
 const index = resolve('dist/index.js');
 const sso = require.resolve('@cloudbeaver/plugin-sso/dist/index.js');
 const ssoHtmlTemplate = require.resolve('@cloudbeaver/plugin-sso/src/index.html.ejs');
+const tooManySessionsHtmlTemplate = require.resolve('@cloudbeaver/plugin-too-many-sessions/src/index.html.ejs');
+const tooManySessions = require.resolve('@cloudbeaver/plugin-too-many-sessions/dist/index.js');
 const { getAssets } = require('./webpack.product.utils');
 
 const HtmlWebpackPlugin = require('html-webpack-plugin');
@@ -44,6 +53,7 @@ module.exports = (env, argv) => {
     entry: {
       index,
       sso,
+      tooManySessions,
     },
     output: {
       devtoolModuleFilenameTemplate: 'file:///[absolute-resource-path]',
@@ -113,6 +123,14 @@ module.exports = (env, argv) => {
         template: ssoHtmlTemplate,
         inject: 'body',
         chunks: ['sso'],
+        version: package.version,
+        title: package.product?.name,
+      }),
+      new HtmlWebpackPlugin({
+        filename: 'tooManySessions.html',
+        template: tooManySessionsHtmlTemplate,
+        inject: 'body',
+        chunks: ['tooManySessions'],
         version: package.version,
         title: package.product?.name,
       }),

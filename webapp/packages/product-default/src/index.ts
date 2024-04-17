@@ -57,6 +57,7 @@ import { sqlGeneratorPlugin } from '@cloudbeaver/plugin-sql-generator';
 import { ssoPlugin } from '@cloudbeaver/plugin-sso';
 import { taskManagerPluginManifest } from '@cloudbeaver/plugin-task-manager';
 import theme from '@cloudbeaver/plugin-theme';
+import { tooManySessionsPlugin } from '@cloudbeaver/plugin-too-many-sessions';
 import toolsPanel from '@cloudbeaver/plugin-tools-panel';
 import topAppBar from '@cloudbeaver/plugin-top-app-bar';
 import { administrationTopAppBarPlugin } from '@cloudbeaver/plugin-top-app-bar-administration';
@@ -70,6 +71,7 @@ import { defaultProductManifest } from './manifest';
 
 const PLUGINS: PluginManifest[] = [
   ssoPlugin,
+  tooManySessionsPlugin,
   devTools,
   administration,
   dataSpreadsheetNewManifest,
