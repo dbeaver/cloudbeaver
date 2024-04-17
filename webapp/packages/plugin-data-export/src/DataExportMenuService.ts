@@ -13,7 +13,7 @@ import { LocalizationService } from '@cloudbeaver/core-localization';
 import { DATA_CONTEXT_NAV_NODE, EObjectFeature } from '@cloudbeaver/core-navigation-tree';
 import { EAdminPermission, SessionPermissionsResource } from '@cloudbeaver/core-root';
 import { withTimestamp } from '@cloudbeaver/core-utils';
-import { ACTION_EXPORT, ActionService, DATA_CONTEXT_MENU, DATA_CONTEXT_MENU_NESTED, menuExtractItems, MenuService } from '@cloudbeaver/core-view';
+import { ACTION_EXPORT, ActionService, DATA_CONTEXT_MENU, menuExtractItems, MenuService } from '@cloudbeaver/core-view';
 import {
   DATA_CONTEXT_DV_DDM,
   DATA_CONTEXT_DV_DDM_RESULT_INDEX,
@@ -111,6 +111,7 @@ export class DataExportMenuService {
     });
 
     this.menuService.addCreator({
+      root: true,
       isApplicable: context => {
         const node = context.tryGet(DATA_CONTEXT_NAV_NODE);
 
@@ -118,7 +119,7 @@ export class DataExportMenuService {
           return false;
         }
 
-        return !this.isExportDisabled() && context.has(DATA_CONTEXT_CONNECTION) && !context.has(DATA_CONTEXT_MENU_NESTED);
+        return !this.isExportDisabled() && context.has(DATA_CONTEXT_CONNECTION);
       },
       getItems: (context, items) => [...items, ACTION_EXPORT],
     });
