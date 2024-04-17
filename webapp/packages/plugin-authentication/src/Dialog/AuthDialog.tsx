@@ -9,10 +9,12 @@ import { observer } from 'mobx-react-lite';
 
 import { AuthProvider, AuthProviderConfiguration, UserInfoResource } from '@cloudbeaver/core-authentication';
 import {
+  Checkbox,
   CommonDialogBody,
   CommonDialogFooter,
   CommonDialogHeader,
   CommonDialogWrapper,
+  Container,
   ErrorMessage,
   Form,
   getComputed,
@@ -86,7 +88,12 @@ export const AuthDialog: DialogComponent<IAuthOptions, null> = observer(function
 
   async function login(linkUser: boolean, provider?: AuthProvider, configuration?: AuthProviderConfiguration) {
     try {
-      await dialogData.login(linkUser, provider, configuration);
+      const success = await dialogData.login(linkUser, provider, configuration);
+
+      if (!success) {
+        return;
+      }
+
       rejectDialog();
     } catch {}
   }
@@ -229,18 +236,32 @@ export const AuthDialog: DialogComponent<IAuthOptions, null> = observer(function
             </Form>
           )}
         </CommonDialogBody>
-        {!federate && (
+        {/* TODO should we always display footer for both: local and federated? */}
+        {(!federate || (federate && state.isTooManySessions)) && (
           <CommonDialogFooter>
-            <AuthDialogFooter authAvailable={!dialogData.configure} isAuthenticating={dialogData.authenticating} onLogin={() => login(linkUser)}>
-              {errorDetails.name && (
-                <ErrorMessage
-                  className={s(styles, { errorMessage: true })}
-                  text={errorDetails.message || errorDetails.name}
-                  hasDetails={errorDetails.hasDetails}
-                  onShowDetails={errorDetails.open}
+            <Container>
+              {state.isTooManySessions && (
+                <Checkbox
+                  className={s(styles, { tooManySessionsCheckbox: true })}
+                  checked={state.forceSessionsLogout}
+                  name="forceSessionLogout"
+                  label={translate('authentication_auth_force_session_logout')}
+                  onClick={e => {
+                    state.forceSessionsLogout = e.currentTarget.checked;
+                  }}
                 />
               )}
-            </AuthDialogFooter>
+              <AuthDialogFooter authAvailable={!dialogData.configure} isAuthenticating={dialogData.authenticating} onLogin={() => login(linkUser)}>
+                {errorDetails.name && (
+                  <ErrorMessage
+                    className={s(styles, { errorMessage: true })}
+                    text={errorDetails.message || errorDetails.name}
+                    hasDetails={errorDetails.hasDetails}
+                    onShowDetails={errorDetails.open}
+                  />
+                )}
+              </AuthDialogFooter>
+            </Container>
           </CommonDialogFooter>
         )}
       </CommonDialogWrapper>

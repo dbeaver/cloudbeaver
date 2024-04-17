@@ -10,13 +10,14 @@ import { useEffect } from 'react';
 
 import { AdministrationScreenService } from '@cloudbeaver/core-administration';
 import { AuthInfoService, AuthProvider, AuthProviderConfiguration, AuthProvidersResource, IAuthCredentials } from '@cloudbeaver/core-authentication';
-import { useObservableRef, useResource } from '@cloudbeaver/core-blocks';
+import { ConfirmationDialog, useObservableRef, useResource } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
+import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
 import type { ITask } from '@cloudbeaver/core-executor';
 import { CachedMapAllKey } from '@cloudbeaver/core-resource';
-import type { UserInfo } from '@cloudbeaver/core-sdk';
-import { isArraysEqual } from '@cloudbeaver/core-utils';
+import { EServerErrorCode, GQLError, type UserInfo } from '@cloudbeaver/core-sdk';
+import { errorOf, isArraysEqual } from '@cloudbeaver/core-utils';
 
 import { FEDERATED_AUTH } from './FEDERATED_AUTH';
 
@@ -32,7 +33,7 @@ interface IData {
   federatedProviders: AuthProvider[];
   tabIds: string[];
 
-  login: (linkUser: boolean, provider?: AuthProvider, configuration?: AuthProviderConfiguration) => Promise<void>;
+  login: (linkUser: boolean, provider?: AuthProvider, configuration?: AuthProviderConfiguration) => Promise<boolean>;
   loginFederated: (provider: AuthProvider, configuration: AuthProviderConfiguration, onClose?: () => void) => Promise<void>;
 }
 
@@ -42,7 +43,8 @@ interface IState {
   activeConfiguration: AuthProviderConfiguration | null;
   credentials: IAuthCredentials;
   tabIds: string[];
-
+  isTooManySessions: boolean;
+  forceSessionsLogout: boolean;
   setTabId: (tabId: string | null) => void;
   setActiveProvider: (provider: AuthProvider | null, configuration: AuthProviderConfiguration | null) => void;
 }
@@ -52,6 +54,7 @@ export function useAuthDialogState(accessRequest: boolean, providerId: string | 
   const administrationScreenService = useService(AdministrationScreenService);
   const authInfoService = useService(AuthInfoService);
   const notificationService = useService(NotificationService);
+  const commonDialogService = useService(CommonDialogService);
 
   const adminPageActive = administrationScreenService.isAdministrationPageActive;
   const providers = authProvidersResource.data.filter(notEmptyProvider).sort(compareProviders);
@@ -110,6 +113,8 @@ export function useAuthDialogState(accessRequest: boolean, providerId: string | 
         profile: '0',
         credentials: {},
       },
+      isTooManySessions: false,
+      forceSessionsLogout: false,
       setTabId(tabId: string | null): void {
         if (tabIds.includes(tabId as any)) {
           this.tabId = tabId;
@@ -145,7 +150,10 @@ export function useAuthDialogState(accessRequest: boolean, providerId: string | 
       activeProvider: observable.ref,
       activeConfiguration: observable.ref,
       credentials: observable,
-      setActiveProvider: action,
+      isTooManySessions: observable.ref,
+      forceSessionsLogout: observable.ref,
+      setTabId: action.bound,
+      setActiveProvider: action.bound,
     },
     false,
   );
@@ -169,15 +177,28 @@ export function useAuthDialogState(accessRequest: boolean, providerId: string | 
         }
         return false;
       },
-      async login(linkUser: boolean, provider?: AuthProvider, configuration?: AuthProviderConfiguration): Promise<void> {
+      async login(linkUser: boolean, provider?: AuthProvider, configuration?: AuthProviderConfiguration): Promise<boolean> {
         provider = (provider || state.activeProvider) ?? undefined;
         configuration = (configuration || state.activeConfiguration) ?? undefined;
 
         if (!provider || this.authenticating) {
-          return;
+          return false;
+        }
+
+        if (state.isTooManySessions && state.forceSessionsLogout) {
+          const result = await commonDialogService.open(ConfirmationDialog, {
+            title: 'authentication_auth_force_session_logout_popup_title',
+            message: 'authentication_auth_force_session_logout_popup_message',
+          });
+
+          if (result === DialogueStateResult.Rejected) {
+            return false;
+          }
         }
 
         this.authenticating = true;
+        state.isTooManySessions = false;
+
         try {
           this.state.setActiveProvider(provider, configuration ?? null);
 
@@ -191,17 +212,25 @@ export function useAuthDialogState(accessRequest: boolean, providerId: string | 
                 password: state.credentials.credentials.password?.trim(),
               },
             },
+            forceSessionsLogout: state.forceSessionsLogout,
             linkUser,
           });
           this.authTask = loginTask;
 
           await loginTask;
         } catch (exception: any) {
+          const gqlError = errorOf(exception, GQLError);
+
+          if (gqlError?.errorCode === EServerErrorCode.tooManySessions) {
+            state.isTooManySessions = true;
+          }
+
           if (this.destroyed) {
             notificationService.logException(exception, 'Login failed');
           } else {
             this.exception = exception;
           }
+
           throw exception;
         } finally {
           this.authTask = null;
@@ -212,6 +241,8 @@ export function useAuthDialogState(accessRequest: boolean, providerId: string | 
             this.state.setTabId(FEDERATED_AUTH);
           }
         }
+
+        return true;
       },
     }),
     {

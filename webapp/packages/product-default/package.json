@@ -78,6 +78,7 @@
     "@cloudbeaver/plugin-sso": "~0.1.0",
     "@cloudbeaver/plugin-task-manager": "~0.1.0",
     "@cloudbeaver/plugin-theme": "~0.1.0",
+    "@cloudbeaver/plugin-too-many-sessions": "~0.1.0",
     "@cloudbeaver/plugin-tools-panel": "~0.1.0",
     "@cloudbeaver/plugin-top-app-bar": "~0.1.0",
     "@cloudbeaver/plugin-top-app-bar-administration": "~0.1.0",
