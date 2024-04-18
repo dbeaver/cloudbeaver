@@ -380,7 +380,7 @@ export abstract class DatabaseDataSource<TOptions, TResult extends IDatabaseData
   abstract request(prevResults: TResult[]): TResult[] | Promise<TResult[]>;
   abstract save(prevResults: TResult[]): Promise<TResult[]> | TResult[];
 
-  abstract loadTotalCount(resultIndex: number): Promise<ITask<number> | null>;
+  abstract loadTotalCount(resultIndex: number): Promise<ITask<number>>;
   abstract cancelLoadTotalCount(): Promise<ITask<number> | null>;
 
   async requestDataAction(): Promise<TResult[] | null> {

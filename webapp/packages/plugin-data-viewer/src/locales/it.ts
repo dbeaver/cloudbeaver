@@ -45,6 +45,8 @@ export default [
   ['data_viewer_presentation_value_content_paste_error', 'Cannot load full text'],
   ['data_viewer_refresh_result_set', 'Refresh result set'],
   ['data_viewer_total_count_tooltip', 'Get total count'],
+  ['data_viewer_total_count_canceled_title', 'Total count canceled'],
+  ['data_viewer_total_count_canceled_message', 'Statement was cancelled due to user request'],
   ['data_viewer_total_count_failed', 'Failed to get total count'],
   ['data_viewer_model_not_loaded', 'Table model is not loaded'],
   ['settings_data_editor', 'Data Editor'],

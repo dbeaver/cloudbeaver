@@ -31,7 +31,7 @@ export abstract class ResultSetDataSource<TOptions> extends DatabaseDataSource<T
     return this.totalCountRequestTask;
   }
 
-  async loadTotalCount(resultIndex: number) {
+  async loadTotalCount(resultIndex: number): Promise<ITask<number>> {
     const executionContext = this.executionContext;
     const executionContextInfo = this.executionContext?.context;
 
@@ -70,13 +70,8 @@ export abstract class ResultSetDataSource<TOptions> extends DatabaseDataSource<T
 
     this.totalCountRequestTask = task;
 
-    try {
-      const count = await task;
-
-      this.setTotalCount(resultIndex, count);
-    } finally {
-      this.totalCountRequestTask = null;
-    }
+    const count = await task;
+    this.setTotalCount(resultIndex, count);
 
     return this.totalCountRequestTask;
   }

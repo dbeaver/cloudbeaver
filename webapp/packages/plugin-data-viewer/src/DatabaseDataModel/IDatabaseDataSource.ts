@@ -84,7 +84,7 @@ export interface IDatabaseDataSource<TOptions, TResult extends IDatabaseDataResu
   setSupportedDataFormats: (dataFormats: ResultDataFormat[]) => this;
   setExecutionContext: (context: IConnectionExecutionContext | null) => this;
   setTotalCount: (resultIndex: number, count: number) => this;
-  loadTotalCount: (resultIndex: number) => Promise<ITask<number> | null>;
+  loadTotalCount: (resultIndex: number) => Promise<ITask<number>>;
   cancelLoadTotalCount: () => Promise<ITask<number> | null>;
 
   retry: () => Promise<void>;

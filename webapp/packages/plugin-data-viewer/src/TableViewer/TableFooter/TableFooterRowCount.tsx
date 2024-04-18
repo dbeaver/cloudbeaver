@@ -31,7 +31,14 @@ export const TableFooterRowCount: React.FC<Props> = observer(function TableFoote
       setLoading(true);
       await model.source.loadTotalCount(resultIndex);
     } catch (exception: any) {
-      notificationService.logException(exception, 'data_viewer_total_count_failed');
+      if (model.source.totalCountRequestTask?.cancelled) {
+        notificationService.logInfo({
+          title: 'data_viewer_total_count_canceled_title',
+          message: 'data_viewer_total_count_canceled_message',
+        });
+      } else {
+        notificationService.logException(exception, 'data_viewer_total_count_failed');
+      }
     } finally {
       setLoading(false);
     }
@@ -39,15 +46,16 @@ export const TableFooterRowCount: React.FC<Props> = observer(function TableFoote
 
   async function cancelTotalCount() {
     try {
-      setLoading(false);
       await model.source.cancelLoadTotalCount();
     } catch (e: any) {
-      notificationService.logException(e);
+      if (!model.source.totalCountRequestTask?.cancelled) {
+        notificationService.logException(e);
+      }
     }
   }
 
-  if (isNotNullDefined(model.source.totalCountRequestTask)) {
-    return <CancelTotalCountAction loading={model.source.totalCountRequestTask.cancelled} onClick={cancelTotalCount} />;
+  if (loading) {
+    return <CancelTotalCountAction loading={Boolean(model.source.totalCountRequestTask?.cancelled)} onClick={cancelTotalCount} />;
   }
 
   return <TotalCountAction loading={loading} resultIndex={resultIndex} model={model} onClick={loadTotalCount} />;

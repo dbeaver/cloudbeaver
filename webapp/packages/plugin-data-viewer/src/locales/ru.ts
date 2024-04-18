@@ -46,6 +46,8 @@ export default [
   ['data_viewer_script_preview_error_title', 'Не удалось получить скрипт'],
   ['data_viewer_refresh_result_set', 'Обновить резалт сет'],
   ['data_viewer_total_count_tooltip', 'Получить количество записей'],
+  ['data_viewer_total_count_canceled_title', 'Получение количества записей отменено'],
+  ['data_viewer_total_count_canceled_message', 'Запрос был отменен пользователем'],
   ['data_viewer_total_count_failed', 'Не удалось получить количество записей'],
   ['data_viewer_model_not_loaded', 'Не удалось загрузить модель таблицы'],
   ['settings_data_editor', 'Редактор данных'],
