@@ -40,7 +40,7 @@ export const BaseForm = observer<IBaseFormProps<any>>(function BaseForm({ servic
   useAutoLoad(BaseForm, state);
 
   return (
-    <Form context={form} className={s(styles, { submittingForm: true })} disabled={state.isDisabled} focusFirstChild>
+    <Form context={form} disabled={state.isDisabled} contents focusFirstChild>
       <TabsState container={service.parts} localState={state.parts} formState={state}>
         <Container compact parent noWrap vertical>
           <Container className={s(styles, { bar: true })} gap keepSize noWrap>
@@ -61,8 +61,8 @@ export const BaseForm = observer<IBaseFormProps<any>>(function BaseForm({ servic
               </Button>
             </Container>
           </Container>
-          <Container vertical>
-            <TabPanelList />
+          <Container vertical overflow>
+            <TabPanelList contents />
           </Container>
         </Container>
       </TabsState>

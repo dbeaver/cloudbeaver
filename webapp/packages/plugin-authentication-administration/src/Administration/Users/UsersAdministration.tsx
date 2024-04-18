@@ -57,7 +57,7 @@ export const UsersAdministration: AdministrationItemContentComponent = observer(
 
   return (
     <TabsState selectedId={subName} lazy onChange={openSub}>
-      <ToolsPanel hasBottomBorder>
+      <ToolsPanel bottomBorder>
         <TabList className={s(styles, { tabList: true })} aria-label="User Administration pages">
           <SContext registry={mainTabsRegistry}>
             <Tab tabId={EUsersAdministrationSub.Users}>

@@ -85,11 +85,7 @@ public class WebUserInfo {
 
     @Property
     public Map<String, Object> getConfigurationParameters() throws DBWebException {
-        try {
-            return session.getSecurityController().getCurrentUserParameters();
-        } catch (DBException e) {
-            throw new DBWebException("Error reading user parameters", e);
-        }
+        return session.getUserContext().getPreferenceStore().getCustomUserParameters();
     }
 
 }

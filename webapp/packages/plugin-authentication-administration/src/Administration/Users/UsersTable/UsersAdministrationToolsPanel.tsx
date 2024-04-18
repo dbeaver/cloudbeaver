@@ -34,7 +34,7 @@ export const UsersAdministrationToolsPanel = observer<Props>(function UsersAdmin
   const menu = useMenu({ menu: MENU_USERS_ADMINISTRATION });
 
   return (
-    <ToolsPanel className={s(styles, { toolsPanel: true })}>
+    <ToolsPanel className={s(styles, { toolsPanel: true })} rounded>
       <SContext registry={registry}>
         <MenuBar menu={menu} className={s(styles, { menuBar: true })} />
       </SContext>

@@ -38,6 +38,7 @@ export class CreateUserBootstrap extends Bootstrap {
 
     this.actionService.addHandler({
       id: 'users-table-base',
+      actions: [ACTION_CREATE],
       isActionApplicable: (context, action) => {
         if (action === ACTION_CREATE && !this.administrationUsersManagementService.externalUserProviderEnabled) {
           return this.authProvidersResource.has(AUTH_PROVIDER_LOCAL_ID);

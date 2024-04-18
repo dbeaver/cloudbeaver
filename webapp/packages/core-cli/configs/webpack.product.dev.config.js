@@ -71,6 +71,9 @@ module.exports = (env, argv) => {
       removeEmptyChunks: false,
       splitChunks: false,
     },
+    infrastructureLogging: {
+      level: 'warn',
+    },
     devServer: {
       allowedHosts: 'all',
       host: 'localhost',

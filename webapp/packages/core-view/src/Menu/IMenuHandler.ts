@@ -5,7 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import type { IDataContextProvider } from '@cloudbeaver/core-data-context';
+import type { DataContextGetter, IDataContextProvider } from '@cloudbeaver/core-data-context';
 import type { ILoadableState } from '@cloudbeaver/core-utils';
 
 import type { IMenu } from './IMenu';
@@ -13,12 +13,14 @@ import type { MenuSubMenuItemIconComponent } from './MenuItem/IMenuSubMenuItem';
 
 export interface IMenuHandler<TExtraProps = unknown> {
   id: string;
+  menus: Set<IMenu>;
+  contexts: Set<DataContextGetter<any>>;
 
   getInfo?: (context: IDataContextProvider, menu: IMenu) => IMenu;
   getLoader?: (context: IDataContextProvider, menu: IMenu) => ILoadableState[] | ILoadableState;
   getExtraProps?: () => TExtraProps;
   iconComponent?: () => MenuSubMenuItemIconComponent<TExtraProps>;
-  isApplicable: (context: IDataContextProvider) => boolean;
+  isApplicable?: (context: IDataContextProvider) => boolean;
   isLoading?: (context: IDataContextProvider) => boolean;
   isDisabled?: (context: IDataContextProvider) => boolean;
   isHidden?: (context: IDataContextProvider) => boolean;
@@ -27,4 +29,9 @@ export interface IMenuHandler<TExtraProps = unknown> {
 
   /** @deprecated must be refactored (#1)*/
   isLabelVisible?: (context: IDataContextProvider, menu: IMenu) => boolean;
+}
+
+export interface IMenuHandlerOptions<TExtraProps = unknown> extends Omit<IMenuHandler<TExtraProps>, 'menus' | 'contexts'> {
+  menus?: IMenu[];
+  contexts?: DataContextGetter<any>[];
 }

@@ -1,3 +1,10 @@
+/*
+ * CloudBeaver - Cloud Database Manager
+ * Copyright (C) 2020-2024 DBeaver Corp and others
+ *
+ * Licensed under the Apache License, Version 2.0.
+ * you may not use this file except in compliance with the License.
+ */
 const { resolve } = require('path');
 const PnpWebpackPlugin = require('pnp-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
@@ -150,9 +157,9 @@ module.exports = (env, argv) => {
       pathinfo: false,
     },
     resolve: {
-      extensions: ['.ts', '.tsx', '.wasm', '.mjs', '.js', '.jsx', '.json'],
+      extensions: ['.ts', '.tsx', '.wasm', '.mjs', '.js', '.jsx', '.json', '.json5'],
       modules: nodeModules,
-      plugins: [PnpWebpackPlugin, new SourceAssetsResolver(['.json5', '.css', '.scss'])],
+      plugins: [PnpWebpackPlugin, new SourceAssetsResolver(['.json5', '.css', '.scss', '.json'])],
     },
     resolveLoader: {
       modules: nodeModules,

@@ -12,8 +12,10 @@ import { importLazyComponent } from '@cloudbeaver/core-blocks';
 import { injectable } from '@cloudbeaver/core-di';
 import { ExecutionContext, Executor, IExecutor, ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
 import { OptionsPanelService } from '@cloudbeaver/core-ui';
+import { isNotNullDefined } from '@cloudbeaver/core-utils';
 
 import { userProfileContext } from './userProfileContext';
+import { UserProfileTabsService } from './UserProfileTabsService';
 
 const UserProfileOptionsPanel = importLazyComponent(() => import('./UserProfileOptionsPanel').then(m => m.UserProfileOptionsPanel));
 const panelGetter = () => UserProfileOptionsPanel;
@@ -26,6 +28,7 @@ export class UserProfileOptionsPanelService {
   constructor(
     private readonly optionsPanelService: OptionsPanelService,
     private readonly userInfoResource: UserInfoResource,
+    private readonly userProfileTabsService: UserProfileTabsService,
   ) {
     this.onOpen = new SyncExecutor();
     this.onClose = new Executor();
@@ -39,7 +42,13 @@ export class UserProfileOptionsPanelService {
     });
   }
 
-  async open(): Promise<boolean> {
+  async open(tabId?: string): Promise<boolean> {
+    if (isNotNullDefined(tabId)) {
+      this.userProfileTabsService.tabContainer.select(tabId);
+    } else {
+      this.userProfileTabsService.tabContainer.select(null);
+    }
+
     if (this.optionsPanelService.isOpen(panelGetter)) {
       return true;
     }

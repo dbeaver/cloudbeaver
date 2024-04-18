@@ -57,7 +57,8 @@ export abstract class SettingsSource implements ISettingsSource {
   }
 
   setValue(key: any, value: any): void {
-    if (this.getValue(key) === value) {
+    const currentValue = this.getValue(key);
+    if (currentValue === value || (!isNotNullDefined(currentValue) && value === null)) {
       this.changes.delete(key);
     } else {
       this.changes.set(key, value);

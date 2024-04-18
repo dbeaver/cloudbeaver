@@ -40,7 +40,7 @@ import {
   RESOURCES_NODE_PATH,
 } from '@cloudbeaver/core-resource-manager';
 import { createPath, getPathParent } from '@cloudbeaver/core-utils';
-import { ACTION_NEW_FOLDER, ActionService, DATA_CONTEXT_MENU, IAction, MenuService } from '@cloudbeaver/core-view';
+import { ACTION_NEW_FOLDER, ActionService, IAction, MenuService } from '@cloudbeaver/core-view';
 import { DATA_CONTEXT_ELEMENTS_TREE, MENU_ELEMENTS_TREE_TOOLS } from '@cloudbeaver/plugin-navigation-tree';
 import { FolderDialog } from '@cloudbeaver/plugin-projects';
 import { ResourceManagerService } from '@cloudbeaver/plugin-resource-manager';
@@ -80,29 +80,28 @@ export class ResourceFoldersBootstrap extends Bootstrap {
     super();
   }
 
-  register(): void | Promise<void> {
+  register(): void {
     this.syncNavTree();
 
     this.actionService.addHandler({
       id: 'tree-tools-menu-resource-folders-handler',
-      isActionApplicable: (context, action) => {
+      actions: [ACTION_NEW_FOLDER],
+      isActionApplicable: context => {
         const tree = context.tryGet(DATA_CONTEXT_ELEMENTS_TREE);
 
-        if (![ACTION_NEW_FOLDER].includes(action) || !tree?.baseRoot.startsWith(RESOURCES_NODE_PATH) || !this.userInfoResource.data) {
+        if (!tree?.baseRoot.startsWith(RESOURCES_NODE_PATH) || !this.userInfoResource.data) {
           return false;
         }
 
         return true;
       },
-      getLoader: (context, action) => {
-        return getCachedMapResourceLoaderState(this.projectInfoResource, () => CachedMapAllKey);
-      },
+      getLoader: () => getCachedMapResourceLoaderState(this.projectInfoResource, () => CachedMapAllKey),
       isDisabled: context => this.getTargetNode(context) === undefined,
       handler: this.elementsTreeActionHandler.bind(this),
     });
 
     this.menuService.addCreator({
-      isApplicable: context => context.get(DATA_CONTEXT_MENU) === MENU_ELEMENTS_TREE_TOOLS,
+      menus: [MENU_ELEMENTS_TREE_TOOLS],
       getItems: (context, items) => {
         if (!items.includes(ACTION_NEW_FOLDER)) {
           return [...items, ACTION_NEW_FOLDER];
@@ -112,8 +111,6 @@ export class ResourceFoldersBootstrap extends Bootstrap {
       },
     });
   }
-
-  load(): void | Promise<void> {}
 
   private async moveResourceToFolder({ type, targetNode, moveContexts }: INodeMoveData, contexts: IExecutionContextProvider<INodeMoveData>) {
     const move = contexts.getContext(navNodeMoveContext);

@@ -5,14 +5,18 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import type { IDataContextProvider } from '@cloudbeaver/core-data-context';
+import type { DataContextGetter, IDataContextProvider } from '@cloudbeaver/core-data-context';
 import type { ILoadableState } from '@cloudbeaver/core-utils';
 
+import type { IMenu } from '../Menu/IMenu';
 import type { IAction } from './IAction';
 import type { IActionInfo } from './IActionInfo';
 
 export interface IActionHandler {
   id: string;
+  menus: Set<IMenu>;
+  actions: Set<IAction>;
+  contexts: Set<DataContextGetter<any>>;
 
   getActionInfo?: (context: IDataContextProvider, action: IAction) => IActionInfo;
   getLoader?: (context: IDataContextProvider, action: IAction) => ILoadableState[] | ILoadableState;
@@ -22,9 +26,15 @@ export interface IActionHandler {
   isDisabled?: (context: IDataContextProvider, action: IAction) => boolean;
   isHidden?: (context: IDataContextProvider, action: IAction) => boolean;
 
-  isActionApplicable: (context: IDataContextProvider, action: IAction) => boolean;
+  isActionApplicable?: (context: IDataContextProvider, action: IAction) => boolean;
   handler: (context: IDataContextProvider, action: IAction) => void;
 
   /** @deprecated must be refactored (#1)*/
   isLabelVisible?: (context: IDataContextProvider, action: IAction) => boolean;
+}
+
+export interface IActionHandlerOptions extends Omit<IActionHandler, 'actions' | 'contexts' | 'menus'> {
+  menus?: IMenu[];
+  actions?: IAction[];
+  contexts?: DataContextGetter<any>[];
 }

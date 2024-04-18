@@ -28,6 +28,7 @@
     "strictNullChecks": true,
     "isolatedModules": true,
     "allowArbitraryExtensions": true,
+    "resolveJsonModule": true,
 
     "useDefineForClassFields": false,
     "esModuleInterop": true,

@@ -7,7 +7,7 @@
  */
 import { importLazyComponent } from '@cloudbeaver/core-blocks';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
-import { ActionService, DATA_CONTEXT_MENU, menuExtractItems, MenuService } from '@cloudbeaver/core-view';
+import { ActionService, menuExtractItems, MenuService } from '@cloudbeaver/core-view';
 import { MENU_TOOLS, ToolsPanelService } from '@cloudbeaver/plugin-tools-panel';
 
 import { ACTION_LOG_VIEWER_ENABLE } from '../Actions/ACTION_LOG_VIEWER_ENABLE';
@@ -28,7 +28,7 @@ export class LogViewerBootstrap extends Bootstrap {
 
   register(): void {
     this.menuService.addCreator({
-      isApplicable: context => context.tryGet(DATA_CONTEXT_MENU) === MENU_TOOLS,
+      menus: [MENU_TOOLS],
       getItems: (context, items) => [...items, ACTION_LOG_VIEWER_ENABLE],
       orderItems: (context, items) => {
         const extracted = menuExtractItems(items, [ACTION_LOG_VIEWER_ENABLE]);
@@ -38,7 +38,7 @@ export class LogViewerBootstrap extends Bootstrap {
 
     this.actionService.addHandler({
       id: 'log-viewer-base',
-      isActionApplicable: (context, action) => [ACTION_LOG_VIEWER_ENABLE].includes(action),
+      actions: [ACTION_LOG_VIEWER_ENABLE],
       isChecked: () => this.logViewerService.isActive,
       isHidden: () => this.logViewerService.disabled,
       handler: (context, action) => {
@@ -60,6 +60,4 @@ export class LogViewerBootstrap extends Bootstrap {
       panel: () => LogViewer,
     });
   }
-
-  load(): void {}
 }

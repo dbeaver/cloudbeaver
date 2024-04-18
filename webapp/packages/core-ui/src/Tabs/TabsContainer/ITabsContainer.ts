@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 import type { IDataContextProvider } from '@cloudbeaver/core-data-context';
-import type { ILoadableState, MetadataMap, MetadataValueGetter } from '@cloudbeaver/core-utils';
+import type { ILoadableState, MetadataMap, MetadataValueGetter, schema } from '@cloudbeaver/core-utils';
 
 import type { TabProps } from '../Tab/TabProps';
 
@@ -52,7 +52,13 @@ export interface ITabsContainer<TProps = void, TOptions extends Record<string, a
   has: (tabId: string) => boolean;
   getTabInfo: (tabId: string) => ITabInfo<TProps, TOptions> | undefined;
   getDisplayedTabInfo: (tabId: string, props?: TProps) => ITabInfo<TProps, TOptions> | undefined;
-  getTabState: <T>(state: MetadataMap<string, any>, tabId: string, props: TProps, valueGetter?: MetadataValueGetter<string, T>) => T;
+  getTabState: <T>(
+    state: MetadataMap<string, any>,
+    tabId: string,
+    props: TProps,
+    valueGetter?: MetadataValueGetter<string, T>,
+    schema?: schema.AnyZodObject,
+  ) => T;
   getDisplayed: (props?: TProps) => Array<ITabInfo<TProps, TOptions>>;
   getIdList: (props?: TProps) => string[];
 }

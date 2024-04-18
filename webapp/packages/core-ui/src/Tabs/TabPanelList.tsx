@@ -13,7 +13,11 @@ import { TabPanel } from './TabPanel';
 import type { ITabInfo } from './TabsContainer/ITabsContainer';
 import { TabsContext } from './TabsContext';
 
-export const TabPanelList = observer<React.PropsWithChildren>(function TabPanelList({ children }) {
+interface Props {
+  contents?: boolean;
+}
+
+export const TabPanelList = observer<React.PropsWithChildren<Props>>(function TabPanelList({ contents, children }) {
   const state = useContext(TabsContext);
 
   if (!state) {
@@ -37,7 +41,7 @@ export const TabPanelList = observer<React.PropsWithChildren>(function TabPanelL
         .map(
           generateTabElement(
             (tabInfo, key) => (
-              <TabPanel key={key} tabId={key}>
+              <TabPanel key={key} tabId={key} contents={contents}>
                 {renderPanel(tabInfo, key)}
               </TabPanel>
             ),
