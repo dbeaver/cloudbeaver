@@ -50,7 +50,8 @@ import org.jkiss.dbeaver.model.security.exception.SMRefreshTokenExpiredException
 import org.jkiss.dbeaver.model.security.user.*;
 import org.jkiss.dbeaver.model.sql.SQLUtils;
 import org.jkiss.dbeaver.model.websocket.event.WSCloseUserSessionsEvent;
-import org.jkiss.dbeaver.model.websocket.event.WSUserDeletedEvent;
+import org.jkiss.dbeaver.model.websocket.event.WSEventType;
+import org.jkiss.dbeaver.model.websocket.event.WSUserEvent;
 import org.jkiss.dbeaver.model.websocket.event.permissions.WSObjectPermissionEvent;
 import org.jkiss.dbeaver.model.websocket.event.permissions.WSSubjectPermissionEvent;
 import org.jkiss.utils.ArrayUtils;
@@ -207,7 +208,7 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
         } catch (SQLException e) {
             throw new DBCException("Error deleting user from database", e);
         }
-        var event = new WSUserDeletedEvent(userId);
+        var event = new WSUserEvent(Collections.singletonList(userId), WSEventType.USER_DELETED);
         application.getEventController().addEvent(event);
     }
 
@@ -1385,7 +1386,8 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
                             sessionType,
                             sessionParameters,
                             isMainSession,
-                            null
+                            null,
+                            forceSessionsLogout
                         );
                         throw e;
                     }
@@ -1401,7 +1403,8 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
                     sessionType,
                     sessionParameters,
                     isMainSession,
-                    null
+                    null,
+                    forceSessionsLogout
                 );
 
                 if (SMAuthProviderFederated.class.isAssignableFrom(authProviderInstance.getClass())) {
@@ -1413,7 +1416,7 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
                         providerConfig.getParameters());
                     Map<SMAuthConfigurationReference, Object> authData = Map.of(new SMAuthConfigurationReference(authProviderId,
                         authProviderConfigurationId), filteredUserCreds);
-                    return SMAuthInfo.inProgress(authAttemptId, signInLink, signOutLink, authData, isMainSession);
+                    return SMAuthInfo.inProgress(authAttemptId, signInLink, signOutLink, authData, isMainSession, forceSessionsLogout);
                 }
                 txn.commit();
                 return finishAuthentication(
@@ -1423,7 +1426,8 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
                         null,
                         Map.of(new SMAuthConfigurationReference(authProviderId, authProviderConfigurationId),
                             securedUserIdentifyingCredentials),
-                        isMainSession
+                        isMainSession,
+                        forceSessionsLogout
                     ),
                     true,
                     forceSessionsLogout
@@ -1459,7 +1463,8 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
         SMSessionType sessionType,
         Map<String, Object> sessionParameters,
         boolean isMainSession,
-        @Nullable String errorCode
+        @Nullable String errorCode,
+        boolean forceLogoutSession
     ) throws DBException {
         String authAttemptId = UUID.randomUUID().toString();
         try (Connection dbCon = database.openConnection()) {
@@ -1475,8 +1480,8 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
                     database.normalizeTableNames(
                         "INSERT INTO {table_prefix}CB_AUTH_ATTEMPT" +
                             "(AUTH_ID,AUTH_STATUS,APP_SESSION_ID,SESSION_TYPE,APP_SESSION_STATE," +
-                            "SESSION_ID,IS_MAIN_AUTH,AUTH_USERNAME,ERROR_CODE) " +
-                            "VALUES(?,?,?,?,?,?,?,?,?)"
+                            "SESSION_ID,IS_MAIN_AUTH,AUTH_USERNAME,ERROR_CODE,FORCE_SESSION_LOGOUT) " +
+                            "VALUES(?,?,?,?,?,?,?,?,?,?)"
                     )
                 )) {
                     dbStat.setString(1, authAttemptId);
@@ -1501,6 +1506,7 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
                         dbStat.setString(8, null);
                     }
                     dbStat.setString(9, errorCode);
+                    dbStat.setString(10, forceLogoutSession ? CHAR_BOOL_TRUE : CHAR_BOOL_FALSE);
                     dbStat.execute();
                 }
 
@@ -1656,11 +1662,12 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
             String authError;
             String smSessionId;
             String errorCode;
+            boolean forceSessionsLogout;
             boolean isMainAuth;
             try (PreparedStatement dbStat = dbCon.prepareStatement(
                 database.normalizeTableNames(
-                    "SELECT AUTH_STATUS,AUTH_ERROR,SESSION_ID,IS_MAIN_AUTH,ERROR_CODE FROM {table_prefix}CB_AUTH_ATTEMPT WHERE " +
-                        "AUTH_ID=?"
+                    "SELECT AUTH_STATUS,AUTH_ERROR,SESSION_ID,IS_MAIN_AUTH,ERROR_CODE,FORCE_SESSION_LOGOUT" +
+                            " FROM {table_prefix}CB_AUTH_ATTEMPT WHERE AUTH_ID=?"
                 )
             )) {
                 dbStat.setString(1, authId);
@@ -1673,6 +1680,7 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
                     smSessionId = dbResult.getString(3);
                     isMainAuth = CHAR_BOOL_TRUE.equals(dbResult.getString(4));
                     errorCode = dbResult.getString(5);
+                    forceSessionsLogout = CHAR_BOOL_TRUE.equals(dbResult.getString(6));
                 }
             }
             Map<SMAuthConfigurationReference, Object> authData = new LinkedHashMap<>();
@@ -1716,7 +1724,7 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
             if (smAuthStatus != SMAuthStatus.SUCCESS) {
                 switch (smAuthStatus) {
                     case IN_PROGRESS:
-                        return SMAuthInfo.inProgress(authId, signInLink, signOutLink, authData, isMainAuth);
+                        return SMAuthInfo.inProgress(authId, signInLink, signOutLink, authData, isMainAuth, forceSessionsLogout);
                     case ERROR:
                         return SMAuthInfo.error(authId, authError, isMainAuth, errorCode);
                     case EXPIRED:
@@ -2331,7 +2339,7 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
         LocalDateTime currentTime = LocalDateTime.now();
         List<String> smSessionsId = findActiveUserSessionIds(userId, currentTime);
         deleteSessionsTokens(smSessionsId);
-        application.getEventController().addEvent(new WSCloseUserSessionsEvent(smSessionsId));
+        application.getEventController().addEvent(new WSUserEvent(smSessionsId, WSEventType.CLOSE_USER_SESSIONS));
         return generateNewSessionTokens(smSessionId, userId, authRole, dbCon);
     }
 

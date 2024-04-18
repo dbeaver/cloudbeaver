@@ -19,11 +19,20 @@ package io.cloudbeaver.server.events;
 import io.cloudbeaver.server.CBPlatform;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.model.websocket.WSEventHandler;
-import org.jkiss.dbeaver.model.websocket.event.WSUserDeletedEvent;
+import org.jkiss.dbeaver.model.websocket.event.WSEventType;
+import org.jkiss.dbeaver.model.websocket.event.WSUserEvent;
 
-public class WSUserDeletedEventHandler<EVENT extends WSUserDeletedEvent> implements WSEventHandler<EVENT> {
+public class WSUserEventHandler<EVENT extends WSUserEvent> implements WSEventHandler<EVENT> {
     @Override
     public void handleEvent(@NotNull EVENT event) {
-        CBPlatform.getInstance().getSessionManager().closeUserSessions(event.getDeletedUserId());
+        var eventType = WSEventType.valueById(event.getId());
+        if (eventType == null) {
+            return;
+        }
+        switch (eventType) {
+            case CLOSE_USER_SESSIONS -> CBPlatform.getInstance().getSessionManager().closeSessions(event.getIds());
+            case USER_DELETED -> CBPlatform.getInstance().getSessionManager().closeUserSessions(event.getIds());
+        }
+
     }
 }

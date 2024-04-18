@@ -70,11 +70,11 @@
         <eventHandler class="io.cloudbeaver.server.events.WSDeleteTempFileHandler">
             <topic id="cb_delete_temp_folder"/>
         </eventHandler>
-        <eventHandler class="io.cloudbeaver.server.events.WSUserDeletedEventHandler">
+        <eventHandler class="io.cloudbeaver.server.events.WSUserEventHandler">
             <topic id="cb_user"/>
         </eventHandler>
         <eventHandler class="io.cloudbeaver.server.events.WSCloseUserSessionsEventHandler">
-            <topic id="cb_user"/>
+            <topic id="cb_user_sessions"/>
         </eventHandler>
     </extension>
 

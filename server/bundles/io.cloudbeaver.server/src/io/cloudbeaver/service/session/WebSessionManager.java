@@ -346,13 +346,15 @@ public class WebSessionManager {
         }
     }
 
-    public void closeUserSessions(@NotNull String userId) {
+    public void closeUserSessions(@NotNull List<String> userIds) {
         synchronized (sessionMap) {
             for (Iterator<BaseWebSession> iterator = sessionMap.values().iterator(); iterator.hasNext(); ) {
                 var session = iterator.next();
-                if (CommonUtils.equalObjects(session.getUserContext().getUserId(), userId)) { // add by sessionsId
-                    iterator.remove();
-                    session.close();
+                for (String userId : userIds) {
+                    if (CommonUtils.equalObjects(session.getUserContext().getUserId(), userId)) {
+                        iterator.remove();
+                        session.close();
+                    }
                 }
             }
         }
