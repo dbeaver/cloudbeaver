@@ -24,6 +24,8 @@ import { FEDERATED_AUTH } from './FEDERATED_AUTH';
 interface IData {
   state: IState;
   exception: Error | null;
+  exceptionMap: Map<string, Error>;
+  setException: (value: Error) => void;
   authenticating: boolean;
   authTask: ITask<UserInfo | null> | null;
   destroyed: boolean;
@@ -194,7 +196,21 @@ export function useAuthDialogState(accessRequest: boolean, providerId: string | 
 
   const data = useObservableRef<IData>(
     () => ({
-      exception: null,
+      get exception() {
+        if (state.tabId) {
+          return this.exceptionMap.get(state.tabId) ?? null;
+        }
+
+        return null;
+      },
+      exceptionMap: new Map(),
+      setException(value: Error): void {
+        if (!state.tabId) {
+          throw new Error('Can not set exception for not active tab');
+        }
+
+        this.exceptionMap.set(state.tabId, value);
+      },
       authenticating: false,
       authTask: null,
       destroyed: false,
@@ -256,7 +272,7 @@ export function useAuthDialogState(accessRequest: boolean, providerId: string | 
           if (this.destroyed) {
             notificationService.logException(exception, 'Login failed');
           } else {
-            this.exception = exception;
+            this.setException(exception);
           }
 
           throw exception;
@@ -275,7 +291,9 @@ export function useAuthDialogState(accessRequest: boolean, providerId: string | 
     }),
     {
       state: observable.ref,
-      exception: observable.ref,
+      exception: computed,
+      exceptionMap: observable.shallow,
+      setException: action.bound,
       authenticating: observable.ref,
       authTask: observable.ref,
       tabIds: observable.ref,
