@@ -9,9 +9,9 @@ import { lazy } from 'react';
 
 import { AdministrationScreenService } from '@cloudbeaver/core-administration';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
-import { PermissionsService, EAdminPermission } from '@cloudbeaver/core-root';
+import { EAdminPermission, PermissionsService } from '@cloudbeaver/core-root';
 import { ScreenService } from '@cloudbeaver/core-routing';
-import { DATA_CONTEXT_MENU, MenuBaseItem, MenuService } from '@cloudbeaver/core-view';
+import { MenuBaseItem, MenuService } from '@cloudbeaver/core-view';
 import { TOP_NAV_BAR_SETTINGS_MENU } from '@cloudbeaver/plugin-settings-menu';
 
 import { AdministrationTopAppBarService } from './AdministrationScreen/AdministrationTopAppBar/AdministrationTopAppBarService';
@@ -36,7 +36,7 @@ export class PluginBootstrap extends Bootstrap {
     this.administrationTopAppBarService.placeholder.add(AppStateMenu);
 
     this.menuService.addCreator({
-      isApplicable: context => context.get(DATA_CONTEXT_MENU) === TOP_NAV_BAR_SETTINGS_MENU,
+      menus: [TOP_NAV_BAR_SETTINGS_MENU],
       getItems: (context, items) => {
         const administrationScreen = this.screenService.isActive(AdministrationScreenService.screenName);
 
@@ -82,6 +82,4 @@ export class PluginBootstrap extends Bootstrap {
       },
     });
   }
-
-  load(): void {}
 }

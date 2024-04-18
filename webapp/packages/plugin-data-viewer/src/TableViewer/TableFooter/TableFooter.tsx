@@ -98,7 +98,7 @@ export const TableFooter = observer<Props>(function TableFooter({ resultIndex, m
   const constraint = model.getResult(resultIndex) ? model.source.getAction(resultIndex, ResultSetConstraintAction) : null;
 
   return styled(tableFooterStyles)(
-    <ToolsPanel type="secondary">
+    <ToolsPanel type="secondary" center>
       {/* <reload aria-disabled={disabled} onClick={() => model.refresh()}>
         <IconOrImage icon='reload' viewBox="0 0 16 16" />
       </reload> */}

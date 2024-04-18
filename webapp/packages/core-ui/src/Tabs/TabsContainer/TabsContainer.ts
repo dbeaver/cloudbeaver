@@ -7,7 +7,7 @@
  */
 import { makeObservable, observable } from 'mobx';
 
-import type { MetadataMap, MetadataValueGetter } from '@cloudbeaver/core-utils';
+import type { MetadataMap, MetadataValueGetter, schema } from '@cloudbeaver/core-utils';
 
 import type { ITabInfo, ITabInfoOptions, ITabsContainer } from './ITabsContainer';
 
@@ -64,10 +64,16 @@ export class TabsContainer<TProps = void, TOptions extends Record<string, any> =
     return this.tabInfoMap.get(tabId);
   }
 
-  getTabState<T>(state: MetadataMap<string, any>, tabId: string, props: TProps, valueGetter?: MetadataValueGetter<string, T>): T {
+  getTabState<T>(
+    state: MetadataMap<string, any>,
+    tabId: string,
+    props: TProps,
+    valueGetter?: MetadataValueGetter<string, T>,
+    schema?: schema.AnyZodObject,
+  ): T {
     const tabInfo = this.getDisplayedTabInfo(tabId, props);
 
-    return state.get(tabId, valueGetter || tabInfo?.stateGetter?.(props));
+    return state.get(tabId, valueGetter || tabInfo?.stateGetter?.(props), schema);
   }
 
   getDisplayed(props?: TProps): Array<ITabInfo<TProps, TOptions>> {

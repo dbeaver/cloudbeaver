@@ -7,6 +7,7 @@
  */
 import { computed, makeObservable, observable } from 'mobx';
 
+import { type ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
 import { uuid } from '@cloudbeaver/core-utils';
 
 import type { AsyncTaskInfo } from '../sdk';
@@ -31,6 +32,8 @@ export class AsyncTask {
     return this.innerPromise;
   }
 
+  readonly onStatusChange: ISyncExecutor<AsyncTaskInfo>;
+
   private _cancelled: boolean;
   private taskInfo: AsyncTaskInfo | null;
   private resolve!: (value: AsyncTaskInfo) => void;
@@ -49,6 +52,7 @@ export class AsyncTask {
     this.updatingAsync = false;
     this.taskInfo = null;
     this.initPromise = null;
+    this.onStatusChange = new SyncExecutor();
 
     this.innerPromise = new Promise((resolve, reject) => {
       this.reject = reject;
@@ -125,6 +129,7 @@ export class AsyncTask {
         this.resolve(info);
       }
     }
+    this.onStatusChange.execute(this.taskInfo);
   }
 
   private async cancelTask(): Promise<void> {

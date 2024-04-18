@@ -91,7 +91,7 @@ export const ConnectionForm = observer<ConnectionFormProps>(function ConnectionF
   }
 
   return (
-    <Form context={form} className={s(styles, { form: true })}>
+    <Form context={form} contents>
       <TabsState container={service.tabsContainer} localState={state.partsState} state={state} onCancel={onCancel}>
         <div className={s(styles, { box: true }, className)}>
           <div className={s(styles, { connectionTopBar: true })}>

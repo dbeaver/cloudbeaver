@@ -115,15 +115,8 @@ export class ServerConfigurationService {
   async loadConfig(reset = false): Promise<void> {
     try {
       if (!this.stateLinked) {
-        this.state = this.administrationScreenService.getItemState(
-          'server-configuration',
-          () => {
-            reset = true;
-            return serverConfigStateContext();
-          },
-          true,
-        );
-
+        this.state = this.administrationScreenService.getItemState('server-configuration', serverConfigStateContext);
+        reset = true;
         this.stateLinked = true;
         await this.serverConfigResource.load();
 

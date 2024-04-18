@@ -20,11 +20,12 @@ interface Props extends IContainerProps {
   secondary?: boolean;
   center?: boolean;
   box?: boolean;
+  hideOverflow?: boolean;
   boxNoOverflow?: boolean;
 }
 
 export const Group = forwardRef<HTMLDivElement, Props & React.HTMLAttributes<HTMLDivElement>>(function Group(
-  { form, center, box, secondary, boxNoOverflow, className, ...rest },
+  { form, center, box, secondary, boxNoOverflow, hideOverflow, className, ...rest },
   ref,
 ) {
   const styles = useS(style, containerStyles, elementsSizeStyles);
@@ -46,6 +47,7 @@ export const Group = forwardRef<HTMLDivElement, Props & React.HTMLAttributes<HTM
           form,
           center,
           boxNoOverflow,
+          hideOverflow,
           box,
         },
         className,

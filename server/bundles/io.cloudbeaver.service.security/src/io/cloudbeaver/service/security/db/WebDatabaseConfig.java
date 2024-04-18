@@ -17,7 +17,7 @@
 package io.cloudbeaver.service.security.db;
 
 import org.jkiss.code.NotNull;
-import org.jkiss.dbeaver.registry.storage.InternalDatabaseConfig;
+import org.jkiss.dbeaver.model.connection.InternalDatabaseConfig;
 
 /**
  * Database configuration
@@ -30,6 +30,8 @@ public class WebDatabaseConfig implements InternalDatabaseConfig {
     private String schema;
 
     private String initialDataConfiguration;
+
+    private boolean backupEnabled;
 
     private final Pool pool = new Pool();
 
@@ -52,6 +54,10 @@ public class WebDatabaseConfig implements InternalDatabaseConfig {
         this.url = url;
     }
 
+    public void setBackupEnabled(boolean backupEnabled) {
+        this.backupEnabled = backupEnabled;
+    }
+
     @Override
     public String getUser() {
         return user;
@@ -68,6 +74,11 @@ public class WebDatabaseConfig implements InternalDatabaseConfig {
 
     public Pool getPool() {
         return pool;
+    }
+
+    @Override
+    public boolean isBackupEnabled() {
+        return backupEnabled;
     }
 
     public String getSchema() {

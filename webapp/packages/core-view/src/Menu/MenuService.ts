@@ -7,16 +7,16 @@
  */
 import type { IDataContextProvider } from '@cloudbeaver/core-data-context';
 import { injectable } from '@cloudbeaver/core-di';
-import { flat, ILoadableState } from '@cloudbeaver/core-utils';
+import { flat, ILoadableState, isNotNullDefined } from '@cloudbeaver/core-utils';
 
 import { ActionService } from '../Action/ActionService';
 import { isAction } from '../Action/createAction';
 import type { IAction } from '../Action/IAction';
 import { isMenu } from './createMenu';
 import { DATA_CONTEXT_MENU } from './DATA_CONTEXT_MENU';
-import { DATA_CONTEXT_MENU_LOCAL } from './DATA_CONTEXT_MENU_LOCAL';
-import type { IMenuHandler } from './IMenuHandler';
-import type { IMenuItemsCreator, MenuCreatorItem } from './IMenuItemsCreator';
+import { DATA_CONTEXT_MENU_NESTED } from './DATA_CONTEXT_MENU_NESTED';
+import type { IMenuHandler, IMenuHandlerOptions } from './IMenuHandler';
+import type { IMenuItemsCreator, IMenuItemsCreatorOptions, MenuCreatorItem } from './IMenuItemsCreator';
 import type { IMenuActionItem } from './MenuItem/IMenuActionItem';
 import type { IMenuItem } from './MenuItem/IMenuItem';
 import { MenuActionItem } from './MenuItem/MenuActionItem';
@@ -42,20 +42,42 @@ export class MenuService {
     return null;
   }
 
-  addCreator(creator: IMenuItemsCreator): void {
-    this.creators.push(creator);
+  addCreator(creator: IMenuItemsCreatorOptions): void {
+    this.creators.push({
+      ...creator,
+      menus: new Set(creator.menus),
+      contexts: new Set(creator.contexts),
+    });
   }
 
-  setHandler<T = unknown>(handler: IMenuHandler<T>): void {
+  setHandler<T = unknown>(handler: IMenuHandlerOptions<T>): void {
     if (this.handlers.has(handler.id)) {
       throw new Error(`Menu handler with same id (${handler.id}) already exists`);
     }
-    this.handlers.set(handler.id, handler);
+    this.handlers.set(handler.id, {
+      ...handler,
+      menus: new Set(handler.menus),
+      contexts: new Set(handler.contexts),
+    });
   }
 
-  getHandler(context: IDataContextProvider): IMenuHandler | null {
-    for (const handler of this.handlers.values()) {
-      if (handler.isApplicable(context)) {
+  getHandler(contexts: IDataContextProvider): IMenuHandler | null {
+    const menu = contexts.getOwn(DATA_CONTEXT_MENU);
+
+    handlers: for (const handler of this.handlers.values()) {
+      if (handler.menus.size > 0) {
+        if (!isNotNullDefined(menu) || !handler.menus.has(menu)) {
+          continue;
+        }
+      }
+      if (handler.contexts.size > 0) {
+        for (const context of handler.contexts) {
+          if (!contexts.has(context, true)) {
+            continue handlers;
+          }
+        }
+      }
+      if (handler.isApplicable?.(contexts) !== false) {
         return handler;
       }
     }
@@ -120,31 +142,24 @@ export class MenuService {
 }
 
 function filterApplicable(contexts: IDataContextProvider): (creator: IMenuItemsCreator) => boolean {
-  const local = contexts.get(DATA_CONTEXT_MENU_LOCAL);
+  const menu = contexts.getOwn(DATA_CONTEXT_MENU);
 
   return (creator: IMenuItemsCreator) => {
-    if (creator.menus) {
-      const applicable = creator.menus.some(menu => contexts.hasValue(DATA_CONTEXT_MENU, menu, false));
-
-      if (!applicable) {
+    if (creator.root && contexts.has(DATA_CONTEXT_MENU_NESTED)) {
+      return false;
+    }
+    if (creator.menus.size > 0) {
+      if (!isNotNullDefined(menu) || !creator.menus.has(menu)) {
         return false;
       }
     }
 
-    if (local) {
-      if (!creator.menus && !creator.contexts) {
-        return false;
-      }
-
-      if (creator.contexts) {
-        const applicable = creator.contexts.some(context => contexts.has(context));
-
-        if (!applicable) {
+    if (creator.contexts.size > 0) {
+      for (const context of creator.contexts) {
+        if (!contexts.has(context, true)) {
           return false;
         }
       }
-    } else if (creator.contexts) {
-      return false;
     }
 
     if (creator.isApplicable?.(contexts) === false) {

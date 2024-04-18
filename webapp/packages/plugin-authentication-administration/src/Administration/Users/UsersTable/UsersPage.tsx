@@ -40,7 +40,7 @@ export const UsersPage = observer<Props>(function UsersPage({ param }) {
 
   return (
     <ColoredContainer vertical wrap gap parent maximum>
-      <Group keepSize box maximum>
+      <Group keepSize box>
         <UsersAdministrationToolsPanel onUpdate={table.update} />
       </Group>
 

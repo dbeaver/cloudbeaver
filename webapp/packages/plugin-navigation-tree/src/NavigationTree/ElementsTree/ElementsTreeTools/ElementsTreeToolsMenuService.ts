@@ -96,7 +96,7 @@ export class ElementsTreeToolsMenuService {
     });
 
     this.menuService.addCreator({
-      isApplicable: context => context.get(DATA_CONTEXT_MENU) === MENU_ELEMENTS_TREE_TOOLS,
+      menus: [MENU_ELEMENTS_TREE_TOOLS],
       getItems: (context, items) => [...items, ACTION_LINK_OBJECT, ACTION_COLLAPSE_ALL],
     });
 
@@ -106,7 +106,8 @@ export class ElementsTreeToolsMenuService {
   private registerBindings() {
     this.actionService.addHandler({
       id: 'nav-tree-filter',
-      isActionApplicable: (contexts, action) => action === ACTION_FILTER && contexts.has(DATA_CONTEXT_NAV_TREE_ROOT),
+      actions: [ACTION_FILTER],
+      contexts: [DATA_CONTEXT_NAV_TREE_ROOT],
       handler: this.switchFilter.bind(this),
     });
 
@@ -131,21 +132,21 @@ export class ElementsTreeToolsMenuService {
     this.keyBindingService.addKeyBindingHandler({
       id: 'nav-tree-filter',
       binding: KEY_BINDING_ENABLE_FILTER,
-      isBindingApplicable: (contexts, action) => action === ACTION_FILTER,
+      actions: [ACTION_FILTER],
       handler: this.switchFilter.bind(this),
     });
 
     this.keyBindingService.addKeyBindingHandler({
       id: 'elements-tree-collapse',
       binding: KEY_BINDING_COLLAPSE_ALL,
-      isBindingApplicable: (contexts, action) => action === ACTION_COLLAPSE_ALL,
+      actions: [ACTION_COLLAPSE_ALL],
       handler: this.elementsTreeActionHandler.bind(this),
     });
 
     this.keyBindingService.addKeyBindingHandler({
       id: 'elements-tree-link',
       binding: KEY_BINDING_LINK_OBJECT,
-      isBindingApplicable: (contexts, action) => action === ACTION_LINK_OBJECT,
+      actions: [ACTION_LINK_OBJECT],
       handler: this.elementsTreeActionHandler.bind(this),
     });
   }
