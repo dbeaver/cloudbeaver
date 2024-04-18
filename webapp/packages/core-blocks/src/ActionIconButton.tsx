@@ -19,5 +19,5 @@ export interface ActionIconButtonProps extends IconButtonProps {
 export const ActionIconButton: React.FC<ActionIconButtonProps> = observer(function ActionIconButton({ primary, ...rest }) {
   const styles = useS(style);
 
-  return <IconButton {...rest} className={s(styles, { actionIconButton: true, primary }, rest.className)} />;
+  return <IconButton {...rest} className={s(styles, { actionIconButton: true, size: true, primary }, rest.className)} />;
 });

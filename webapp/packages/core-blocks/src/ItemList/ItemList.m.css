@@ -35,24 +35,6 @@
   top: 0;
   padding: 16px 24px;
   z-index: 1;
-
-  & .inputBox {
-    position: relative;
-  }
-
-  & .input {
-    padding: 4px 32px 4px 8px;
-  }
-
-  & .actionButton {
-    position: absolute;
-    display: flex;
-    align-items: center;
-    height: 100%;
-    top: 50%;
-    right: 2px;
-    transform: translateY(-50%);
-  }
 }
 .listItem:not(:nth-last-child(2)) {
   border-bottom: 1px solid;
