@@ -127,12 +127,14 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
                 case IN_PROGRESS:
                     return new WebAuthStatus(smAuthInfo.getAuthAttemptId(), smAuthInfo.getRedirectUrl(), smAuthInfo.getAuthStatus());
                 case ERROR:
-                    throw new DBWebException(smAuthInfo.getError());
+                    throw new DBWebException(smAuthInfo.getError(), smAuthInfo.getErrorCode());
                 case EXPIRED:
                     throw new DBException("Authorization has already been processed");
                 default:
                     throw new DBWebException("Unknown auth status:" + smAuthInfo.getAuthStatus());
             }
+        } catch (DBWebException e) {
+            throw e;
         } catch (DBException e) {
             throw new DBWebException(e.getMessage(), e);
         }
