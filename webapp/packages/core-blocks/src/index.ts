@@ -79,7 +79,6 @@ export * from './PropertiesTable/IProperty';
 export * from './Slide/SlideBox';
 export * from './Slide/SlideElement';
 export * from './Slide/SlideOverlay';
-export { default as SlideBoxStyles } from './Slide/SlideBox.m.css';
 
 export * from './Split/SplitControls';
 export * from './Split/Pane';
