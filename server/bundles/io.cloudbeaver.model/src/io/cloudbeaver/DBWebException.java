@@ -42,7 +42,6 @@ public class DBWebException extends DBException implements GraphQLError {
     public static final String ERROR_CODE_IDENT_REQUIRED = "identRequired";
     public static final String ERROR_CODE_AUTH_REQUIRED = "authRequired";
     public static final String ERROR_CODE_QUOTA_EXCEEDED = "quotaExceeded";
-    public static final String ERROR_TOO_MANY_SESSIONS = "tooManySessions";
 
     private List<Object> path;
     private List<SourceLocation> locations;

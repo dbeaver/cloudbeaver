@@ -350,9 +350,23 @@ public class WebSessionManager {
         synchronized (sessionMap) {
             for (Iterator<BaseWebSession> iterator = sessionMap.values().iterator(); iterator.hasNext(); ) {
                 var session = iterator.next();
-                if (CommonUtils.equalObjects(session.getUserContext().getUserId(), userId)) {
+                if (CommonUtils.equalObjects(session.getUserContext().getUserId(), userId)) { // add by sessionsId
                     iterator.remove();
                     session.close();
+                }
+            }
+        }
+    }
+
+    public void closeSessions(@NotNull List<String> smSessionsId) {
+        synchronized (sessionMap) {
+            for (Iterator<BaseWebSession> iterator = sessionMap.values().iterator(); iterator.hasNext(); ) {
+                var session = iterator.next();
+                for (String smSessionId : smSessionsId) {
+                    if (CommonUtils.equalObjects(session.getUserContext().getSmSessionId(), smSessionId)) {
+                        iterator.remove();
+                        session.close();
+                    }
                 }
             }
         }

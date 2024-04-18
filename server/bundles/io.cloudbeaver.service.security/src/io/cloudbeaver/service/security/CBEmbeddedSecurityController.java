@@ -49,6 +49,7 @@ import org.jkiss.dbeaver.model.security.exception.SMException;
 import org.jkiss.dbeaver.model.security.exception.SMRefreshTokenExpiredException;
 import org.jkiss.dbeaver.model.security.user.*;
 import org.jkiss.dbeaver.model.sql.SQLUtils;
+import org.jkiss.dbeaver.model.websocket.event.WSCloseUserSessionsEvent;
 import org.jkiss.dbeaver.model.websocket.event.WSUserDeletedEvent;
 import org.jkiss.dbeaver.model.websocket.event.permissions.WSObjectPermissionEvent;
 import org.jkiss.dbeaver.model.websocket.event.permissions.WSSubjectPermissionEvent;
@@ -1930,9 +1931,9 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
     }
 
     @Override
-    public SMAuthInfo finishAuthentication(@NotNull String authId) throws DBException {
+    public SMAuthInfo finishAuthentication(@NotNull String authId, boolean forceSessionsLogout) throws DBException {
         SMAuthInfo authInfo = getAuthStatus(authId);
-        return finishAuthentication(authInfo, false, false);
+        return finishAuthentication(authInfo, false, forceSessionsLogout);
     }
 
     private SMAuthInfo finishAuthentication(
@@ -2327,9 +2328,10 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
             @Nullable String authRole,
             @NotNull Connection dbCon
     ) throws SQLException, DBException {
-
         LocalDateTime currentTime = LocalDateTime.now();
-        deleteSessionsTokens(findActiveUserSessionIds(userId, currentTime));
+        List<String> smSessionsId = findActiveUserSessionIds(userId, currentTime);
+        deleteSessionsTokens(smSessionsId);
+        application.getEventController().addEvent(new WSCloseUserSessionsEvent(smSessionsId));
         return generateNewSessionTokens(smSessionId, userId, authRole, dbCon);
     }
 

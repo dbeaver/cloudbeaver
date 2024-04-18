@@ -14,10 +14,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.cloudbeaver;
+package io.cloudbeaver.server.events;
 
-public class DBWebExceptionTooManySessions extends DBWebException {
-    public DBWebExceptionTooManySessions(String message) {
-        super(message, ERROR_TOO_MANY_SESSIONS);
+import io.cloudbeaver.server.CBPlatform;
+import org.jkiss.code.NotNull;
+import org.jkiss.dbeaver.model.websocket.WSEventHandler;
+import org.jkiss.dbeaver.model.websocket.event.WSCloseUserSessionsEvent;
+
+public class WSCloseUserSessionsEventHandler<EVENT extends WSCloseUserSessionsEvent> implements WSEventHandler<EVENT> {
+    @Override
+    public void handleEvent(@NotNull EVENT event) {
+        CBPlatform.getInstance().getSessionManager().closeSessions(event.getSmSessionsId());
     }
 }
