@@ -7,21 +7,40 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import { Container, IconButton, useTranslate } from '@cloudbeaver/core-blocks';
+import { Container, IconButton, Loader, s, useS, useTranslate } from '@cloudbeaver/core-blocks';
 
 import styles from './CancelTotalCountAction.m.css';
 
 interface Props {
   onClick: VoidFunction;
+  loading: boolean;
 }
 
-export const CancelTotalCountAction = observer(function CancelTotalCountAction({ onClick }: Props) {
+export const CancelTotalCountAction = observer(function CancelTotalCountAction({ onClick, loading }: Props) {
   const translate = useTranslate();
+  const style = useS(styles);
+
+  function handleClick() {
+    if (loading) {
+      return;
+    }
+
+    onClick();
+  }
 
   return (
-    <Container className={styles.action} title={translate('ui_processing_cancel')} noWrap center zeroBasis keepSize onClick={onClick}>
-      <IconButton className={styles.icon} name="cross" title={translate('ui_processing_cancel')} viewBox="0 0 32 32" />
-      <span className={styles.cancelText}>{translate('ui_processing_cancel')}</span>
+    <Container
+      className={s(style, { action: true })}
+      title={loading ? translate('ui_processing_canceling') : translate('ui_processing_cancel')}
+      noWrap
+      center
+      zeroBasis
+      keepSize
+      onClick={handleClick}
+    >
+      {loading && <Loader className={s(style, { loader: true })} small />}
+      {!loading && <IconButton disabled={loading} className={s(style, { icon: true })} name="cross" viewBox="0 0 32 32" />}
+      <span className={s(style, { cancelText: true })}>{translate('ui_processing_cancel')}</span>
     </Container>
   );
 });

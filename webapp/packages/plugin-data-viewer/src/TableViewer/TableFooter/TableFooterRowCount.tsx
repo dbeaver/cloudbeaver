@@ -10,6 +10,7 @@ import { useState } from 'react';
 
 import { useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
+import { isNotNullDefined } from '@cloudbeaver/core-utils';
 
 import type { IDatabaseDataModel } from '../../DatabaseDataModel/IDatabaseDataModel';
 import type { IDatabaseResultSet } from '../../DatabaseDataModel/IDatabaseResultSet';
@@ -45,8 +46,8 @@ export const TableFooterRowCount: React.FC<Props> = observer(function TableFoote
     }
   }
 
-  if (loading) {
-    return <CancelTotalCountAction onClick={cancelTotalCount} />;
+  if (isNotNullDefined(model.source.totalCountRequestTask)) {
+    return <CancelTotalCountAction loading={model.source.totalCountRequestTask.cancelled} onClick={cancelTotalCount} />;
   }
 
   return <TotalCountAction loading={loading} resultIndex={resultIndex} model={model} onClick={loadTotalCount} />;
