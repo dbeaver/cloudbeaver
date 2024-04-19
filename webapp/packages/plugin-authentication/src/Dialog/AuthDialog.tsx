@@ -236,31 +236,34 @@ export const AuthDialog: DialogComponent<IAuthOptions, null> = observer(function
             </Form>
           )}
         </CommonDialogBody>
-        <CommonDialogFooter>
-          <Container>
-            {state.isTooManySessions && (
-              <Checkbox
-                className={s(styles, { tooManySessionsCheckbox: true })}
-                checked={state.isForceSessionsLogout}
-                name="forceSessionLogout"
-                label={translate('authentication_auth_force_session_logout')}
-                onClick={e => {
-                  state.setForceSessionsLogout(e.currentTarget.checked);
-                }}
-              />
-            )}
-            <AuthDialogFooter authAvailable={!dialogData.configure} isAuthenticating={dialogData.authenticating} onLogin={() => login(linkUser)}>
-              {errorDetails.name && (
-                <ErrorMessage
-                  className={s(styles, { errorMessage: true })}
-                  text={errorDetails.message || errorDetails.name}
-                  hasDetails={errorDetails.hasDetails}
-                  onShowDetails={errorDetails.open}
+        {/* TODO should we always display footer for both: local and federated? */}
+        {(!federate || (federate && state.isTooManySessions)) && (
+          <CommonDialogFooter>
+            <Container>
+              {state.isTooManySessions && (
+                <Checkbox
+                  className={s(styles, { tooManySessionsCheckbox: true })}
+                  checked={state.isForceSessionsLogout}
+                  name="forceSessionLogout"
+                  label={translate('authentication_auth_force_session_logout')}
+                  onClick={e => {
+                    state.setForceSessionsLogout(e.currentTarget.checked);
+                  }}
                 />
               )}
-            </AuthDialogFooter>
-          </Container>
-        </CommonDialogFooter>
+              <AuthDialogFooter authAvailable={!dialogData.configure} isAuthenticating={dialogData.authenticating} onLogin={() => login(linkUser)}>
+                {errorDetails.name && (
+                  <ErrorMessage
+                    className={s(styles, { errorMessage: true })}
+                    text={errorDetails.message || errorDetails.name}
+                    hasDetails={errorDetails.hasDetails}
+                    onShowDetails={errorDetails.open}
+                  />
+                )}
+              </AuthDialogFooter>
+            </Container>
+          </CommonDialogFooter>
+        )}
       </CommonDialogWrapper>
     </TabsState>
   );
