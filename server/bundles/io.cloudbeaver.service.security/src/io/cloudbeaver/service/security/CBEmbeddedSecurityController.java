@@ -2070,10 +2070,10 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
                     }
 
                     if (forceSessionsLogout && CommonUtils.isNotEmpty(activeUserId) && isMainAuthSession) {
-                        smTokens = kilAllExistsUserSessions(smSessionId, activeUserId, tokenAuthRole, dbCon);
-                    } else {
-                        smTokens = generateNewSessionToken(smSessionId, activeUserId, tokenAuthRole, dbCon);
+                        kilAllExistsUserSessions(activeUserId);
                     }
+                    smTokens = generateNewSessionToken(smSessionId, activeUserId, tokenAuthRole, dbCon);
+
                     permissions = new SMAuthPermissions(
                         activeUserId, smSessionId, getUserPermissions(activeUserId, tokenAuthRole)
                     );
@@ -2329,17 +2329,13 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
         return generateNewSessionTokens(smSessionId, userId, authRole, dbCon);
     }
 
-    protected SMTokens kilAllExistsUserSessions(
-            @NotNull String smSessionId,
-            @NotNull String userId,
-            @Nullable String authRole,
-            @NotNull Connection dbCon
+    protected void kilAllExistsUserSessions(
+            @NotNull String userId
     ) throws SQLException, DBException {
         LocalDateTime currentTime = LocalDateTime.now();
         List<String> smSessionsId = findActiveUserSessionIds(userId, currentTime);
         deleteSessionsTokens(smSessionsId);
         application.getEventController().addEvent(new WSUserEvent(smSessionsId, WSEventType.CLOSE_USER_SESSIONS));
-        return generateNewSessionTokens(smSessionId, userId, authRole, dbCon);
     }
 
     @NotNull
