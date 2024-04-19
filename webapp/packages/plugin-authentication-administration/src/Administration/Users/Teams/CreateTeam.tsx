@@ -25,7 +25,7 @@ export const CreateTeam: React.FC = observer(function CreateTeam() {
 
   return (
     <Group aria-label={translate('administration_teams_team_creation')} className={s(styles, { box: true })} box boxNoOverflow vertical noWrap>
-      <GroupTitle keepSize>
+      <GroupTitle header keepSize>
         <Translate token="administration_teams_team_creation" />
         <GroupClose onClick={service.cancelCreate} />
       </GroupTitle>

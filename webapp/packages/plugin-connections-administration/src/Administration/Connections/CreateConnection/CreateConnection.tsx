@@ -54,7 +54,7 @@ export const CreateConnection = observer<Props>(function CreateConnection({ meth
   if (createConnectionService.data) {
     return (
       <Group className={s(style, { connectionCreate: true })} vertical box boxNoOverflow noWrap>
-        <GroupTitle keepSize>
+        <GroupTitle header keepSize>
           <Container gap dense noWrap>
             <Container keepSize>
               <ActionIconButton

@@ -31,7 +31,7 @@
       margin: -8px 0;
 
       & > .groupClose {
-        top: 8px;
+        top: 2px;
       }
     }
   }

@@ -32,7 +32,7 @@ export const CreateUser = observer<Props>(function CreateUser({ state, onCancel 
       vertical
       noWrap
     >
-      <GroupTitle keepSize>
+      <GroupTitle header keepSize>
         <Translate token="authentication_administration_user_connections_user_add" />
         <GroupClose onClick={onCancel} />
       </GroupTitle>
