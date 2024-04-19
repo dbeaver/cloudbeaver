@@ -49,7 +49,6 @@ import org.jkiss.dbeaver.model.security.exception.SMException;
 import org.jkiss.dbeaver.model.security.exception.SMRefreshTokenExpiredException;
 import org.jkiss.dbeaver.model.security.user.*;
 import org.jkiss.dbeaver.model.sql.SQLUtils;
-import org.jkiss.dbeaver.model.websocket.event.WSCloseUserSessionsEvent;
 import org.jkiss.dbeaver.model.websocket.event.WSEventType;
 import org.jkiss.dbeaver.model.websocket.event.WSUserEvent;
 import org.jkiss.dbeaver.model.websocket.event.permissions.WSObjectPermissionEvent;

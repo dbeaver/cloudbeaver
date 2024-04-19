@@ -73,9 +73,6 @@
         <eventHandler class="io.cloudbeaver.server.events.WSUserEventHandler">
             <topic id="cb_user"/>
         </eventHandler>
-        <eventHandler class="io.cloudbeaver.server.events.WSCloseUserSessionsEventHandler">
-            <topic id="cb_user_sessions"/>
-        </eventHandler>
     </extension>
 
 </plugin>

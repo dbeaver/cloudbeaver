@@ -109,7 +109,7 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
                 return new WebAuthStatus(smAuthInfo.getAuthStatus(), authProcessor.authenticateSession());
             }
         } catch (SMExceptionTooManySessions e) {
-            throw new DBWebException("User authentication failed", e.getErrorName(), e);
+            throw new DBWebException("User authentication failed", e.getErrorType(), e);
         } catch (Exception e) {
             throw new DBWebException("User authentication failed", e);
         }
@@ -136,6 +136,8 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
             }
         } catch (DBWebException e) {
             throw e;
+        } catch (SMExceptionTooManySessions e) {
+            throw new DBWebException(e.getMessage(), e.getErrorType());
         } catch (DBException e) {
             throw new DBWebException(e.getMessage(), e);
         }
