@@ -243,11 +243,11 @@ export const AuthDialog: DialogComponent<IAuthOptions, null> = observer(function
               {state.isTooManySessions && (
                 <Checkbox
                   className={s(styles, { tooManySessionsCheckbox: true })}
-                  checked={state.isForceSessionsLogout}
+                  checked={state.forceSessionsLogout}
                   name="forceSessionLogout"
                   label={translate('authentication_auth_force_session_logout')}
                   onClick={e => {
-                    state.setForceSessionsLogout(e.currentTarget.checked);
+                    state.forceSessionsLogout = e.currentTarget.checked;
                   }}
                 />
               )}

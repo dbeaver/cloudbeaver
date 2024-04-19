@@ -43,12 +43,8 @@ interface IState {
   activeConfiguration: AuthProviderConfiguration | null;
   credentials: IAuthCredentials;
   tabIds: string[];
-  tooManySessions: Map<string, boolean>;
-  forceSessionsLogout: Map<string, boolean>;
   isTooManySessions: boolean;
-  isForceSessionsLogout: boolean;
-  setTooManySessions: (value: boolean) => void;
-  setForceSessionsLogout: (value: boolean) => void;
+  forceSessionsLogout: boolean;
   setTabId: (tabId: string | null) => void;
   setActiveProvider: (provider: AuthProvider | null, configuration: AuthProviderConfiguration | null) => void;
 }
@@ -117,28 +113,8 @@ export function useAuthDialogState(accessRequest: boolean, providerId: string | 
         profile: '0',
         credentials: {},
       },
-      tooManySessions: new Map(),
-      forceSessionsLogout: new Map(),
-      get isTooManySessions(): boolean {
-        return this.tabId ? this.tooManySessions.get(this.tabId) ?? false : false;
-      },
-      get isForceSessionsLogout(): boolean {
-        return this.tabId ? this.forceSessionsLogout.get(this.tabId) ?? false : false;
-      },
-      setTooManySessions(value: boolean): void {
-        if (!this.tabId) {
-          throw new Error('Can not set too many sessions for not active tab');
-        }
-
-        this.tooManySessions.set(this.tabId, value);
-      },
-      setForceSessionsLogout(value: boolean): void {
-        if (!this.tabId) {
-          throw new Error('Can not set force sessions logout for not active tab');
-        }
-
-        this.forceSessionsLogout.set(this.tabId, value);
-      },
+      isTooManySessions: false,
+      forceSessionsLogout: false,
       setTabId(tabId: string | null): void {
         if (tabIds.includes(tabId as any)) {
           this.tabId = tabId;
@@ -174,12 +150,8 @@ export function useAuthDialogState(accessRequest: boolean, providerId: string | 
       activeProvider: observable.ref,
       activeConfiguration: observable.ref,
       credentials: observable,
-      tooManySessions: observable.shallow,
-      forceSessionsLogout: observable.shallow,
-      isTooManySessions: computed,
-      isForceSessionsLogout: computed,
-      setTooManySessions: action.bound,
-      setForceSessionsLogout: action.bound,
+      isTooManySessions: observable.ref,
+      forceSessionsLogout: observable.ref,
       setTabId: action.bound,
       setActiveProvider: action.bound,
     },
@@ -213,7 +185,7 @@ export function useAuthDialogState(accessRequest: boolean, providerId: string | 
           return false;
         }
 
-        if (state.isTooManySessions && state.isForceSessionsLogout) {
+        if (state.isTooManySessions && state.forceSessionsLogout) {
           const result = await commonDialogService.open(ConfirmationDialog, {
             title: 'authentication_auth_force_session_logout_popup_title',
             message: 'authentication_auth_force_session_logout_popup_message',
@@ -225,7 +197,7 @@ export function useAuthDialogState(accessRequest: boolean, providerId: string | 
         }
 
         this.authenticating = true;
-        state.setTooManySessions(false);
+        state.isTooManySessions = false;
 
         try {
           this.state.setActiveProvider(provider, configuration ?? null);
@@ -240,7 +212,7 @@ export function useAuthDialogState(accessRequest: boolean, providerId: string | 
                 password: state.credentials.credentials.password?.trim(),
               },
             },
-            forceSessionsLogout: state.isForceSessionsLogout,
+            forceSessionsLogout: state.forceSessionsLogout,
             linkUser,
           });
           this.authTask = loginTask;
@@ -250,7 +222,7 @@ export function useAuthDialogState(accessRequest: boolean, providerId: string | 
           const gqlError = errorOf(exception, GQLError);
 
           if (gqlError?.errorCode === EServerErrorCode.tooManySessions) {
-            state.setTooManySessions(true);
+            state.isTooManySessions = true;
           }
 
           if (this.destroyed) {
