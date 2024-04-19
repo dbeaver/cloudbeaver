@@ -47,6 +47,7 @@ interface IState {
   forceSessionsLogout: boolean;
   setTabId: (tabId: string | null) => void;
   setActiveProvider: (provider: AuthProvider | null, configuration: AuthProviderConfiguration | null) => void;
+  resetErrorState: VoidFunction;
 }
 
 export function useAuthDialogState(accessRequest: boolean, providerId: string | null, configurationId?: string): IData {
@@ -121,6 +122,13 @@ export function useAuthDialogState(accessRequest: boolean, providerId: string | 
         } else {
           this.tabId = tabIds[0] ?? null;
         }
+
+        this.resetErrorState();
+      },
+      resetErrorState(): void {
+        this.isTooManySessions = false;
+        this.forceSessionsLogout = false;
+        data.exception = null;
       },
       setActiveProvider(provider: AuthProvider | null, configuration: AuthProviderConfiguration | null): void {
         const providerChanged = this.activeProvider?.id !== provider?.id;
@@ -154,6 +162,7 @@ export function useAuthDialogState(accessRequest: boolean, providerId: string | 
       forceSessionsLogout: observable.ref,
       setTabId: action.bound,
       setActiveProvider: action.bound,
+      resetErrorState: action.bound,
     },
     false,
   );
