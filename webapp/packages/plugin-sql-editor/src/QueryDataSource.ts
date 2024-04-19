@@ -84,7 +84,8 @@ export class QueryDataSource<TOptions extends IDataQueryOptions = IDataQueryOpti
   }
 
   async cancel(): Promise<void> {
-    await Promise.all([this.currentTask?.cancel(), super.cancel()]);
+    await super.cancel();
+    await this.currentTask?.cancel();
   }
 
   async save(prevResults: IDatabaseResultSet[]): Promise<IDatabaseResultSet[]> {

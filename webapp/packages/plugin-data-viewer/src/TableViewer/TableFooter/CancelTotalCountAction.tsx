@@ -16,7 +16,7 @@ interface Props {
   loading: boolean;
 }
 
-export const CancelTotalCountAction = observer(function CancelTotalCountAction({ onClick, loading }: Props) {
+export const CancelTotalCountAction = observer<Props>(function CancelTotalCountAction({ onClick, loading }) {
   const translate = useTranslate();
   const style = useS(styles);
 

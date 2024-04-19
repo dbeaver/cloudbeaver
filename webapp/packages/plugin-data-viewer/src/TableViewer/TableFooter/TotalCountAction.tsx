@@ -22,7 +22,7 @@ interface Props {
   model: IDatabaseDataModel<any, IDatabaseResultSet>;
 }
 
-export const TotalCountAction = observer(function TotalCountAction({ onClick, loading, resultIndex, model }: Props) {
+export const TotalCountAction = observer<Props>(function TotalCountAction({ onClick, loading, resultIndex, model }) {
   const result = model.getResult(resultIndex);
   const translate = useTranslate();
   const disabled = getComputed(() => model.isLoading() || model.isDisabled(resultIndex));

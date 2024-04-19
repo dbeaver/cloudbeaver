@@ -68,7 +68,8 @@ export class ContainerDataSource extends ResultSetDataSource<IDataContainerOptio
   }
 
   async cancel(): Promise<void> {
-    await Promise.all([this.currentTask?.cancel(), super.cancel()]);
+    await super.cancel();
+    await this.currentTask?.cancel();
   }
 
   async request(prevResults: IDatabaseResultSet[]): Promise<IDatabaseResultSet[]> {
