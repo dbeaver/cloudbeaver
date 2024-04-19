@@ -45,7 +45,7 @@ import org.jkiss.dbeaver.model.auth.SMSessionExternal;
 import org.jkiss.dbeaver.model.preferences.DBPPropertyDescriptor;
 import org.jkiss.dbeaver.model.security.SMController;
 import org.jkiss.dbeaver.model.security.SMSubjectType;
-import org.jkiss.dbeaver.model.security.exception.SMExceptionTooManySessions;
+import org.jkiss.dbeaver.model.security.exception.SMTooManySessionsException;
 import org.jkiss.dbeaver.model.security.user.SMUser;
 import org.jkiss.utils.CommonUtils;
 
@@ -108,7 +108,7 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
                 var authProcessor = new WebSessionAuthProcessor(webSession, smAuthInfo, linkWithActiveUser);
                 return new WebAuthStatus(smAuthInfo.getAuthStatus(), authProcessor.authenticateSession());
             }
-        } catch (SMExceptionTooManySessions e) {
+        } catch (SMTooManySessionsException e) {
             throw new DBWebException("User authentication failed", e.getErrorType(), e);
         } catch (Exception e) {
             throw new DBWebException("User authentication failed", e);
@@ -136,7 +136,7 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
             }
         } catch (DBWebException e) {
             throw e;
-        } catch (SMExceptionTooManySessions e) {
+        } catch (SMTooManySessionsException e) {
             throw new DBWebException(e.getMessage(), e.getErrorType());
         } catch (DBException e) {
             throw new DBWebException(e.getMessage(), e);

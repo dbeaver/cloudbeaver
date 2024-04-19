@@ -50,7 +50,8 @@ import org.jkiss.dbeaver.model.security.exception.SMRefreshTokenExpiredException
 import org.jkiss.dbeaver.model.security.user.*;
 import org.jkiss.dbeaver.model.sql.SQLUtils;
 import org.jkiss.dbeaver.model.websocket.event.WSEventType;
-import org.jkiss.dbeaver.model.websocket.event.WSUserEvent;
+import org.jkiss.dbeaver.model.websocket.event.WSUserCloseSessionsEvent;
+import org.jkiss.dbeaver.model.websocket.event.WSUserDeletedEvent;
 import org.jkiss.dbeaver.model.websocket.event.permissions.WSObjectPermissionEvent;
 import org.jkiss.dbeaver.model.websocket.event.permissions.WSSubjectPermissionEvent;
 import org.jkiss.utils.ArrayUtils;
@@ -207,7 +208,7 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
         } catch (SQLException e) {
             throw new DBCException("Error deleting user from database", e);
         }
-        var event = new WSUserEvent(Collections.singletonList(userId), WSEventType.USER_DELETED);
+        var event = new WSUserDeletedEvent(Collections.singletonList(userId), WSEventType.USER_DELETED);
         application.getEventController().addEvent(event);
     }
 
@@ -1463,7 +1464,7 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
         Map<String, Object> sessionParameters,
         boolean isMainSession,
         @Nullable String errorCode,
-        boolean forceLogoutSession
+        boolean forceSessionsLogout
     ) throws DBException {
         String authAttemptId = UUID.randomUUID().toString();
         try (Connection dbCon = database.openConnection()) {
@@ -1505,7 +1506,7 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
                         dbStat.setString(8, null);
                     }
                     dbStat.setString(9, errorCode);
-                    dbStat.setString(10, forceLogoutSession ? CHAR_BOOL_TRUE : CHAR_BOOL_FALSE);
+                    dbStat.setString(10, forceSessionsLogout ? CHAR_BOOL_TRUE : CHAR_BOOL_FALSE);
                     dbStat.execute();
                 }
 
@@ -2070,7 +2071,7 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
                     }
 
                     if (forceSessionsLogout && CommonUtils.isNotEmpty(activeUserId) && isMainAuthSession) {
-                        kilAllExistsUserSessions(activeUserId);
+                        killAllExistsUserSessions(activeUserId);
                     }
                     smTokens = generateNewSessionToken(smSessionId, activeUserId, tokenAuthRole, dbCon);
 
@@ -2329,13 +2330,13 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
         return generateNewSessionTokens(smSessionId, userId, authRole, dbCon);
     }
 
-    protected void kilAllExistsUserSessions(
+    protected void killAllExistsUserSessions(
             @NotNull String userId
     ) throws SQLException, DBException {
         LocalDateTime currentTime = LocalDateTime.now();
         List<String> smSessionsId = findActiveUserSessionIds(userId, currentTime);
         deleteSessionsTokens(smSessionsId);
-        application.getEventController().addEvent(new WSUserEvent(smSessionsId, WSEventType.CLOSE_USER_SESSIONS));
+        application.getEventController().addEvent(new WSUserCloseSessionsEvent(smSessionsId, WSEventType.CLOSE_USER_SESSIONS));
     }
 
     @NotNull
