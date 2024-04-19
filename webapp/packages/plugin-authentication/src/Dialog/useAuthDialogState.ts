@@ -122,8 +122,6 @@ export function useAuthDialogState(accessRequest: boolean, providerId: string | 
         } else {
           this.tabId = tabIds[0] ?? null;
         }
-
-        this.resetErrorState();
       },
       resetErrorState(): void {
         this.isTooManySessions = false;
