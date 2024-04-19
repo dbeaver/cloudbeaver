@@ -12,6 +12,10 @@
   user-select: none;
 }
 
+.action .loader {
+  margin-right: 8px;
+}
+
 .icon {
   composes: theme-text-error from global;
 }
@@ -20,8 +24,4 @@
   text-transform: uppercase;
   font-weight: 700;
   font-size: 12px;
-}
-
-.loader {
-  margin-right: 8px !important;
 }

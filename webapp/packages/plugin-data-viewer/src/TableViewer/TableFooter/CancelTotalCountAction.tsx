@@ -31,7 +31,7 @@ export const CancelTotalCountAction = observer(function CancelTotalCountAction({
   return (
     <Container
       className={s(style, { action: true })}
-      title={loading ? translate('ui_processing_canceling') : translate('ui_processing_cancel')}
+      title={translate(loading ? 'ui_processing_canceling' : 'ui_processing_cancel')}
       noWrap
       center
       zeroBasis
