@@ -13,7 +13,7 @@ import { AuthInfoService, AuthProvider, AuthProviderConfiguration, AuthProviders
 import { ConfirmationDialog, useObservableRef, useResource } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
-import { NotificationService } from '@cloudbeaver/core-events';
+import { NotificationService, UIError } from '@cloudbeaver/core-events';
 import type { ITask } from '@cloudbeaver/core-executor';
 import { CachedMapAllKey } from '@cloudbeaver/core-resource';
 import { EServerErrorCode, GQLError, type UserInfo } from '@cloudbeaver/core-sdk';
@@ -33,7 +33,7 @@ interface IData {
   federatedProviders: AuthProvider[];
   tabIds: string[];
 
-  login: (linkUser: boolean, provider?: AuthProvider, configuration?: AuthProviderConfiguration) => Promise<boolean>;
+  login: (linkUser: boolean, provider?: AuthProvider, configuration?: AuthProviderConfiguration) => Promise<void>;
   loginFederated: (provider: AuthProvider, configuration: AuthProviderConfiguration, onClose?: () => void) => Promise<void>;
 }
 
@@ -184,12 +184,12 @@ export function useAuthDialogState(accessRequest: boolean, providerId: string | 
         }
         return false;
       },
-      async login(linkUser: boolean, provider?: AuthProvider, configuration?: AuthProviderConfiguration): Promise<boolean> {
+      async login(linkUser: boolean, provider?: AuthProvider, configuration?: AuthProviderConfiguration): Promise<void> {
         provider = (provider || state.activeProvider) ?? undefined;
         configuration = (configuration || state.activeConfiguration) ?? undefined;
 
         if (!provider || this.authenticating) {
-          return false;
+          return;
         }
 
         if (state.isTooManySessions && state.forceSessionsLogout) {
@@ -199,7 +199,7 @@ export function useAuthDialogState(accessRequest: boolean, providerId: string | 
           });
 
           if (result === DialogueStateResult.Rejected) {
-            return false;
+            throw new UIError('Force session logout confirmation dialog rejected');
           }
         }
 
@@ -249,7 +249,7 @@ export function useAuthDialogState(accessRequest: boolean, providerId: string | 
           }
         }
 
-        return true;
+        return;
       },
     }),
     {

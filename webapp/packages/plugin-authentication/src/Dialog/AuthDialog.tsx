@@ -88,11 +88,7 @@ export const AuthDialog: DialogComponent<IAuthOptions, null> = observer(function
 
   async function login(linkUser: boolean, provider?: AuthProvider, configuration?: AuthProviderConfiguration) {
     try {
-      const success = await dialogData.login(linkUser, provider, configuration);
-
-      if (!success) {
-        return;
-      }
+      await dialogData.login(linkUser, provider, configuration);
 
       rejectDialog();
     } catch {}
