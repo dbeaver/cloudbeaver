@@ -45,7 +45,7 @@ interface IState {
   tabIds: string[];
   isTooManySessions: boolean;
   forceSessionsLogout: boolean;
-  setTabId: (tabId: string | null) => void;
+  switchAuthMode: (tabId: string | null) => void;
   setActiveProvider: (provider: AuthProvider | null, configuration: AuthProviderConfiguration | null) => void;
   resetErrorState: VoidFunction;
 }
@@ -116,12 +116,18 @@ export function useAuthDialogState(accessRequest: boolean, providerId: string | 
       },
       isTooManySessions: false,
       forceSessionsLogout: false,
-      setTabId(tabId: string | null): void {
+      switchAuthMode(tabId: string | null): void {
+        if (tabId === this.tabId) {
+          return;
+        }
+
         if (tabIds.includes(tabId as any)) {
           this.tabId = tabId;
         } else {
           this.tabId = tabIds[0] ?? null;
         }
+
+        this.resetErrorState();
       },
       resetErrorState(): void {
         this.isTooManySessions = false;
@@ -142,12 +148,10 @@ export function useAuthDialogState(accessRequest: boolean, providerId: string | 
 
         if (provider) {
           if (provider.federated) {
-            this.setTabId(FEDERATED_AUTH);
+            this.switchAuthMode(FEDERATED_AUTH);
           } else {
-            this.setTabId(getAuthProviderTabId(provider, configuration));
+            this.switchAuthMode(getAuthProviderTabId(provider, configuration));
           }
-        } else {
-          this.setTabId(null);
         }
       },
     }),
@@ -158,7 +162,7 @@ export function useAuthDialogState(accessRequest: boolean, providerId: string | 
       credentials: observable,
       isTooManySessions: observable.ref,
       forceSessionsLogout: observable.ref,
-      setTabId: action.bound,
+      switchAuthMode: action.bound,
       setActiveProvider: action.bound,
       resetErrorState: action.bound,
     },
@@ -245,7 +249,7 @@ export function useAuthDialogState(accessRequest: boolean, providerId: string | 
 
           if (provider.federated) {
             this.state.setActiveProvider(null, null);
-            this.state.setTabId(FEDERATED_AUTH);
+            this.state.switchAuthMode(FEDERATED_AUTH);
           }
         }
 

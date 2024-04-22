@@ -146,8 +146,7 @@ export const AuthDialog: DialogComponent<IAuthOptions, null> = observer(function
     <TabsState
       currentTabId={state.tabId}
       onChange={tabData => {
-        state.setTabId(tabData.tabId);
-        state.resetErrorState();
+        state.switchAuthMode(tabData.tabId);
       }}
     >
       <CommonDialogWrapper className={s(styles, { wrapper: true })} size="large" aria-label={translate('authentication_login_dialog_title')}>
@@ -208,7 +207,7 @@ export const AuthDialog: DialogComponent<IAuthOptions, null> = observer(function
                     disabled={dialogData.authenticating}
                     onClick={() => {
                       state.setActiveProvider(null, null);
-                      state.setTabId(FEDERATED_AUTH);
+                      state.switchAuthMode(FEDERATED_AUTH);
                     }}
                   >
                     <TabTitle>{translate('authentication_auth_federated')}</TabTitle>
