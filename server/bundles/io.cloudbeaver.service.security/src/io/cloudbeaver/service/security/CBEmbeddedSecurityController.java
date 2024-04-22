@@ -208,7 +208,7 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
         } catch (SQLException e) {
             throw new DBCException("Error deleting user from database", e);
         }
-        var event = new WSUserDeletedEvent(Collections.singletonList(userId), WSEventType.USER_DELETED);
+        var event = new WSUserDeletedEvent(WSEventType.USER_DELETED, userId);
         application.getEventController().addEvent(event);
     }
 
@@ -1598,7 +1598,7 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
                 dbStat.setString(1, authStatus.toString());
                 JDBCUtils.setStringOrNull(dbStat, 2, error);
                 JDBCUtils.setStringOrNull(dbStat, 3, smSessionId);
-                dbStat.setString(4, errorCode);
+                JDBCUtils.setStringOrNull(dbStat, 4, errorCode);
                 dbStat.setString(5, authId);
                 if (dbStat.executeUpdate() <= 0) {
                     throw new DBCException("Auth attempt '" + authId + "' doesn't exist");
@@ -1939,9 +1939,9 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
     }
 
     @Override
-    public SMAuthInfo finishAuthentication(@NotNull String authId, boolean forceSessionsLogout) throws DBException {
+    public SMAuthInfo finishAuthentication(@NotNull String authId) throws DBException {
         SMAuthInfo authInfo = getAuthStatus(authId);
-        return finishAuthentication(authInfo, false, forceSessionsLogout);
+        return finishAuthentication(authInfo, false, authInfo.isForceSessionsLogout());
     }
 
     private SMAuthInfo finishAuthentication(
@@ -2334,17 +2334,21 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
             @NotNull String userId
     ) throws SQLException, DBException {
         LocalDateTime currentTime = LocalDateTime.now();
-        List<String> smSessionsId = findActiveUserSessionIds(userId, currentTime);
+        List<String> smSessionsId = findActiveUserSessions(userId, currentTime)
+                .stream().map(SMActiveSession::sessionId).collect(Collectors.toList());
         deleteSessionsTokens(smSessionsId);
         application.getEventController().addEvent(new WSUserCloseSessionsEvent(smSessionsId, WSEventType.CLOSE_USER_SESSIONS));
     }
 
+    /**
+     *  Count active user's sm sessions
+     */
     @NotNull
-    public List<String> findActiveUserSessionIds(
+    public List<SMActiveSession> findActiveUserSessions(
             @NotNull String userId,
             @NotNull LocalDateTime currentTime
     ) throws DBException {
-        var activeSessionIds = new ArrayList<String>();
+        var activeSessions = new ArrayList<SMActiveSession>();
         try (var dbCon = database.openConnection()) {
             try (PreparedStatement dbStat = dbCon.prepareStatement(
                     database.normalizeTableNames("SELECT DISTINCT CAT.SESSION_ID, CAT.EXPIRATION_TIME " +
@@ -2355,15 +2359,17 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
                     ))
             ) {
                 dbStat.setString(1, userId);
+                //count only tokens actually used by users
                 dbStat.setString(2, SMAuthStatus.EXPIRED.name());
                 dbStat.setTimestamp(3, Timestamp.valueOf(currentTime));
                 try (ResultSet dbResult = dbStat.executeQuery()) {
                     while (dbResult.next()) {
                         var sessionId = dbResult.getString(1);
-                        activeSessionIds.add(sessionId);
+                        var expirationTime = dbResult.getTimestamp(2);
+                        activeSessions.add(new SMActiveSession(sessionId, expirationTime));
                     }
                 }
-                return activeSessionIds;
+                return activeSessions;
             }
         } catch (SQLException e) {
             throw new DBException("Error counting active user's session", e);

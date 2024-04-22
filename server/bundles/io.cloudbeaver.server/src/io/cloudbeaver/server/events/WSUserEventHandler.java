@@ -20,6 +20,8 @@ import io.cloudbeaver.server.CBPlatform;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.model.websocket.WSEventHandler;
 import org.jkiss.dbeaver.model.websocket.event.WSEventType;
+import org.jkiss.dbeaver.model.websocket.event.WSUserCloseSessionsEvent;
+import org.jkiss.dbeaver.model.websocket.event.WSUserDeletedEvent;
 import org.jkiss.dbeaver.model.websocket.event.WSUserEvent;
 
 public class WSUserEventHandler<EVENT extends WSUserEvent> implements WSEventHandler<EVENT> {
@@ -30,8 +32,14 @@ public class WSUserEventHandler<EVENT extends WSUserEvent> implements WSEventHan
             return;
         }
         switch (eventType) {
-            case CLOSE_USER_SESSIONS -> CBPlatform.getInstance().getSessionManager().closeSessions(event.getIds());
-            case USER_DELETED -> CBPlatform.getInstance().getSessionManager().closeUserSessions(event.getIds());
+            case CLOSE_USER_SESSIONS:
+                if (event instanceof WSUserCloseSessionsEvent closeSessionsEvent) {
+                    CBPlatform.getInstance().getSessionManager().closeSessions(closeSessionsEvent.getSessionIds());
+                }
+            case USER_DELETED:
+                if (event instanceof WSUserDeletedEvent userDeletedEvent) {
+                    CBPlatform.getInstance().getSessionManager().closeUserSession(userDeletedEvent.getUserId());
+                }
         }
 
     }
