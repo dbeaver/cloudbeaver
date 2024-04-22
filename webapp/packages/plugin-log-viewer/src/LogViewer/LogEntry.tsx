@@ -52,7 +52,7 @@ export const LogEntry = observer<Props>(function LogEntry({ item, onSelect, sele
         <div className={s(styles, { messageCell: true })}>
           <div className={s(styles, { message: true })} title={message}>
             {isError ? (
-              <Link className={s(styles, { icon: true })} onClick={() => onSelect(item)}>
+              <Link className={s(styles, { link: true })} onClick={() => onSelect(item)}>
                 {message}
               </Link>
             ) : (

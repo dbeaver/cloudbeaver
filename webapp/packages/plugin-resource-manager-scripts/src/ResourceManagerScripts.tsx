@@ -17,7 +17,7 @@ export const ResourceManagerScripts: TabContainerPanelComponent = observer(funct
   const translate = useTranslate();
 
   return (
-    <Container vertical>
+    <Container vertical overflow>
       <ResourceManagerTree resourceTypeId={SCRIPTS_TYPE_ID}>
         {translate('plugin_resource_manager_scripts_no_resources_placeholder')}
       </ResourceManagerTree>
