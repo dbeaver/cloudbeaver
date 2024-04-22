@@ -22,6 +22,22 @@ You can see live demo of CloudBeaver here: https://demo.cloudbeaver.io
 
 ## Changelog
 
+### 24.0.3. 2024-04-22
+- Unauthorized access vulnerability was fixed;
+- Added the ability for users to configure personal settings for the interface, SQL editor, and data viewer through the settings panel;
+- Added the ability to backup of the internal database before schema migration (for H2);
+- Different bug fixes and enhancements have been made.
+
+### 24.0.2. 2024-04-08
+- Added the ability to import data to the database from CSV file;
+- Implemented support for utilizing environment variables within connection configurations;
+- The ability to select a case for column names has been added to CSV export;
+- A new Apache Kyuubi driver has been added;
+- Trino driver has been updated to version 438;
+- Clickhouse driver has been updated to version 0.6.0-patch2;
+- Have enhanced security of H2 connection;
+- Different bug fixes and enhancements have been made.
+
 ### 24.0.1. 2024-03-25
 - Added support for two modes for committing changes to the database:
   - Auto-commit transfers all changes that you make immediately to the database;

@@ -46,7 +46,7 @@ export const SettingsList = observer<Props>(function SettingsList({ treeData, so
       {list.map(({ group, settings }) => (
         <SettingsGroup key={group.id} group={group} source={source} settings={settings} />
       ))}
-      <div style={{ height: 'calc(100% - 100px)' }} />
+      <div style={{ height: 'calc(100% - 100px)' }} hidden />
     </Container>
   );
 });
