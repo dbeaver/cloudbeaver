@@ -246,7 +246,11 @@ export const AuthDialog: DialogComponent<IAuthOptions, null> = observer(function
                 }}
               />
             )}
-            <AuthDialogFooter authAvailable={!dialogData.configure} isAuthenticating={dialogData.authenticating} onLogin={() => login(linkUser)}>
+            <AuthDialogFooter
+              authAvailable={!dialogData.configure && !federate}
+              isAuthenticating={dialogData.authenticating}
+              onLogin={() => login(linkUser)}
+            >
               {errorDetails.name && (
                 <ErrorMessage
                   className={s(styles, { errorMessage: true })}
