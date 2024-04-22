@@ -28,6 +28,9 @@
     },
     {
       "path": "../core-storage/tsconfig.json"
+    },
+    {
+      "path": "../core-utils/tsconfig.json"
     }
   ],
   "include": [
