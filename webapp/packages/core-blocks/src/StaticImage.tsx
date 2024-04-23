@@ -28,5 +28,5 @@ export const StaticImage: React.FC<Props> = function StaticImage({ icon, classNa
 
   const url = isValidUrl(icon) ? icon : GlobalConstants.absoluteUrl(icon);
 
-  return <img className={s(styles, { block }, className)} src={url} title={title} width={width} onClick={onClick} />;
+  return <img alt={title} className={s(styles, { block }, className)} src={url} title={title} width={width} onClick={onClick} />;
 };
