@@ -5,13 +5,11 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-.groupClose {
-  width: 18px;
-  height: 18px;
-  cursor: pointer;
-  display: flex;
-  position: absolute;
-  right: 24px;
-  z-index: 1;
-  margin-right: 0 !important;
+
+export class CancelError extends Error {
+  constructor(message?: string, options?: ErrorOptions) {
+    super(message, options);
+
+    this.name = 'Cancel Error';
+  }
 }
