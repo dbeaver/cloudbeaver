@@ -65,7 +65,9 @@ export class DataGridContextMenuSaveContentService {
       },
       isHidden: context => {
         const format = context.data.model.source.getAction(context.data.resultIndex, ResultSetFormatAction);
-        return !format.isBinary(context.data.key);
+        const isReadonlyTable = context.data.model.isReadonly(context.data.resultIndex);
+
+        return !format.isBinary(context.data.key) || isReadonlyTable;
       },
       isDisabled: context => {
         const content = context.data.model.source.getAction(context.data.resultIndex, ResultSetDataContentAction);
