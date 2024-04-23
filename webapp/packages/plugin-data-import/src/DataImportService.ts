@@ -39,28 +39,51 @@ export class DataImportService {
   }
 
   async importData(connectionId: string, contextId: string, projectId: string, resultsId: string, processorId: string, file: File) {
+    let taskId: string | undefined;
+    const abortController = new AbortController();
+
+    const cancel = async () => {
+      if (taskId) {
+        await this.asyncTaskInfoService.cancel(taskId);
+      } else {
+        abortController.abort();
+      }
+    };
+
     const { controller, notification } = this.notificationService.processNotification(
       () => ProcessSnackbar,
-      {},
+      {
+        onCancel: cancel,
+      },
       { title: 'plugin_data_import_process_title', message: file.name },
     );
 
     try {
-      const result = await this.graphQLService.sdk.uploadResultData(connectionId, contextId, projectId, resultsId, processorId, file, event => {
-        if (event.total !== undefined) {
-          const percentCompleted = getProgressPercent(event.loaded, event.total);
+      const result = await this.graphQLService.sdk.uploadResultData(
+        connectionId,
+        contextId,
+        projectId,
+        resultsId,
+        processorId,
+        file,
+        event => {
+          if (event.total !== undefined) {
+            const percentCompleted = getProgressPercent(event.loaded, event.total);
 
-          if (notification.message) {
-            controller.setMessage(`${percentCompleted}%\n${notification.message}`);
+            if (notification.message) {
+              controller.setMessage(`${percentCompleted}%\n${notification.message}`);
+            }
           }
-        }
-      });
+        },
+        abortController.signal,
+      );
 
       const task = this.asyncTaskInfoService.create(async () => {
         const { taskInfo } = await this.graphQLService.sdk.getAsyncTaskInfo({ taskId: result.id, removeOnFinish: false });
         return taskInfo;
       });
 
+      taskId = task.id;
       controller.setMessage('plugin_data_import_process_file_processing_step_message');
       await this.asyncTaskInfoService.run(task);
 
