@@ -20,7 +20,7 @@ const HtmlInjectWebpackPlugin = require('../utils/HtmlInjectWebpackPlugin.js');
 const main = resolve('dist/index.js');
 const sso = require.resolve('@cloudbeaver/plugin-sso/dist/index.js');
 const ssoHtmlTemplate = require.resolve('@cloudbeaver/plugin-sso/src/index.html.ejs');
-const errorCloseHtmlTemplate = require.resolve('@cloudbeaver/plugin-sso/src/errorClose.html.ejs');
+const ssoErrorHtmlTemplate = require.resolve('@cloudbeaver/plugin-sso/src/ssoError.html.ejs');
 const outputDir = resolve('lib');
 const package = require(resolve('package.json'));
 const { getServiceWorkerSource } = require('./webpack.product.utils.js');
@@ -107,8 +107,8 @@ module.exports = (env, argv) => {
         title: package.product?.name,
       }),
       new HtmlWebpackPlugin({
-        filename: 'errorClose.html',
-        template: errorCloseHtmlTemplate,
+        filename: 'ssoError.html',
+        template: ssoErrorHtmlTemplate,
         inject: 'body',
         chunks: ['sso'],
         version: timestampVersion,
