@@ -45,7 +45,7 @@ interface IState {
   tabIds: string[];
   isTooManySessions: boolean;
   forceSessionsLogout: boolean;
-  switchAuthMode: (tabId: string | null) => void;
+  switchAuthMode: (tabId: string | null, disableErrorRest?: boolean) => void;
   setActiveProvider: (provider: AuthProvider | null, configuration: AuthProviderConfiguration | null) => void;
   resetErrorState: VoidFunction;
 }
@@ -116,7 +116,7 @@ export function useAuthDialogState(accessRequest: boolean, providerId: string | 
       },
       isTooManySessions: false,
       forceSessionsLogout: false,
-      switchAuthMode(tabId: string | null): void {
+      switchAuthMode(tabId: string | null, disableErrorRest = false): void {
         if (tabId === this.tabId) {
           return;
         }
@@ -127,7 +127,9 @@ export function useAuthDialogState(accessRequest: boolean, providerId: string | 
           this.tabId = tabIds[0] ?? null;
         }
 
-        this.resetErrorState();
+        if (!disableErrorRest) {
+          this.resetErrorState();
+        }
       },
       resetErrorState(): void {
         this.isTooManySessions = false;
@@ -152,6 +154,8 @@ export function useAuthDialogState(accessRequest: boolean, providerId: string | 
           } else {
             this.switchAuthMode(getAuthProviderTabId(provider, configuration));
           }
+        } else {
+          this.switchAuthMode(null, true);
         }
       },
     }),
@@ -249,7 +253,7 @@ export function useAuthDialogState(accessRequest: boolean, providerId: string | 
 
           if (provider.federated) {
             this.state.setActiveProvider(null, null);
-            this.state.switchAuthMode(FEDERATED_AUTH);
+            this.state.switchAuthMode(FEDERATED_AUTH, true);
           }
         }
 
