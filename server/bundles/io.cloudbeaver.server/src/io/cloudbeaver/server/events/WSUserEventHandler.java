@@ -36,10 +36,14 @@ public class WSUserEventHandler<EVENT extends WSAbstractEvent> implements WSEven
                 if (event instanceof WSUserCloseSessionsEvent closeSessionsEvent) {
                     CBPlatform.getInstance().getSessionManager().closeSessions(closeSessionsEvent.getSessionIds());
                 }
+                break;
             case USER_DELETED:
                 if (event instanceof WSUserDeletedEvent userDeletedEvent) {
                     CBPlatform.getInstance().getSessionManager().closeUserSession(userDeletedEvent.getUserId());
                 }
+                break;
+            default:
+                break;
         }
 
     }

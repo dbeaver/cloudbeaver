@@ -365,7 +365,7 @@ public class WebSessionManager {
                 for (String smSessionId : smSessionsId) {
                     if (CommonUtils.equalObjects(session.getUserContext().getSmSessionId(), smSessionId)) {
                         iterator.remove();
-                        session.close();
+                        session.close(false);
                     }
                 }
             }
