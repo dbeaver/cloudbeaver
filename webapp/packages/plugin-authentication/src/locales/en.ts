@@ -15,6 +15,7 @@ export default [
   ['authentication_auth_federated', 'Federated'],
   ['authentication_auth_force_session_logout', 'Force all other sessions logout'],
   ['authentication_auth_force_session_logout_popup_message', 'All users will be logged out from all of the devices. Do you want to continue?'],
+  ['authentication_auth_force_session_logout_checkbox_tooltip', 'To apply this option you need to login again'],
   ['authentication_auth_additional', 'Additional'],
   ['authentication_select_provider', 'Select available provider'],
   ['authentication_configure', 'Please configure authentication methods'],
