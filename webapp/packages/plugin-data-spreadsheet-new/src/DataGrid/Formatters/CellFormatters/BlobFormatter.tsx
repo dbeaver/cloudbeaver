@@ -9,7 +9,7 @@ import { observer } from 'mobx-react-lite';
 import { useContext } from 'react';
 
 import { getComputed, s, useS } from '@cloudbeaver/core-blocks';
-import type { IResultSetRowKey } from '@cloudbeaver/plugin-data-viewer';
+import { type IResultSetRowKey, isResultSetContentValue } from '@cloudbeaver/plugin-data-viewer';
 import type { RenderCellProps } from '@cloudbeaver/plugin-react-data-grid';
 
 import { EditingContext } from '../../../Editing/EditingContext';
@@ -35,7 +35,7 @@ export const BlobFormatter = observer<RenderCellProps<IResultSetRowKey>>(functio
   const rawValue = getComputed(() => formatter.get(cell));
   const displayString = getComputed(() => formatter.getDisplayString(cell));
 
-  const nullValue = rawValue === null;
+  const nullValue = isResultSetContentValue(rawValue) ? rawValue.text === 'null' : rawValue === null;
   const disabled = !column.editable || editingContext.readonly || formatter.isReadOnly(cell);
   const readonly = tableDataContext.isCellReadonly(cell);
 

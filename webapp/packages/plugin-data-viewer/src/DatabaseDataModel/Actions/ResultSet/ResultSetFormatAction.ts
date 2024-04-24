@@ -64,9 +64,7 @@ export class ResultSetFormatAction
         const value = this.view.getCellValue(key as IResultSetElementKey);
 
         if (isResultSetContentValue(value)) {
-          readonly = value.binary !== undefined || value.contentLength !== value.text?.length;
-        } else if (value !== null && typeof value === 'object') {
-          readonly = true;
+          readonly = value.contentLength !== value.text?.length;
         }
       }
     }
@@ -97,6 +95,22 @@ export class ResultSetFormatAction
       if (isResultSetContentValue(value)) {
         return value.binary !== undefined;
       }
+    }
+
+    return false;
+  }
+
+  isGeometry(key: IResultSetPartialKey) {
+    if (key.column) {
+      const column = this.view.getColumn(key.column);
+      if (column?.dataKind?.toLocaleLowerCase() === 'geometry') {
+        return true;
+      }
+    }
+
+    if (key.row) {
+      const value = this.get(key as IResultSetElementKey);
+      return isResultSetComplexValue(value) && value.$type === 'geometry';
     }
 
     return false;
@@ -216,6 +230,10 @@ export class ResultSetFormatAction
     }
 
     if (this.isBinary(key)) {
+      if (isResultSetContentValue(value) && value.text === 'null') {
+        return '[null]';
+      }
+
       return '[blob]';
     }
 
@@ -232,8 +250,10 @@ export class ResultSetFormatAction
         if (typeof value.value === 'object' && value.value !== null) {
           return JSON.stringify(value.value);
         }
+
         return String(value.value);
       }
+
       return '[null]';
     }
 

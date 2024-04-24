@@ -54,8 +54,9 @@ export class DataGridContextMenuCellEditingService {
         const view = context.data.model.source.getAction(context.data.resultIndex, ResultSetViewAction);
         const cellValue = view.getCellValue(context.data.key);
         const column = view.getColumn(context.data.key.column);
+        const isComplex = format.isBinary(context.data.key) || format.isGeometry(context.data.key);
 
-        if (!column || cellValue === undefined || format.isReadOnly(context.data.key) || format.isBinary(context.data.key)) {
+        if (!column || cellValue === undefined || format.isReadOnly(context.data.key) || isComplex) {
           return true;
         }
 

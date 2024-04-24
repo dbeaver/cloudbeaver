@@ -88,7 +88,7 @@ export const CellRenderer = observer<CellRendererProps<IResultSetRowKey, unknown
       return false;
     }
 
-    if (tableDataContext.format.isBinary(cellContext.cell)) {
+    if (tableDataContext.format.isBinary(cellContext.cell) || tableDataContext.format.isGeometry(cellContext.cell)) {
       return false;
     }
 

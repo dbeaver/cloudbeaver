@@ -64,7 +64,9 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
     const autoLineWrapping = getDefaultLineWrapping(textValueInfo.contentType);
     const lineWrapping = state.lineWrapping ?? autoLineWrapping;
 
-    const isSelectedCellReadonly = firstSelectedCell && (formatAction.isReadOnly(firstSelectedCell) || formatAction.isBinary(firstSelectedCell));
+    const isSelectedCellReadonly =
+      firstSelectedCell &&
+      (formatAction.isReadOnly(firstSelectedCell) || formatAction.isBinary(firstSelectedCell) || formatAction.isGeometry(firstSelectedCell));
     const isReadonlyByResultIndex = model.isReadonly(resultIndex) || model.isDisabled(resultIndex) || !firstSelectedCell;
     const isReadonly = isSelectedCellReadonly || isReadonlyByResultIndex;
     const canSave = firstSelectedCell && contentAction.isDownloadable(firstSelectedCell);
