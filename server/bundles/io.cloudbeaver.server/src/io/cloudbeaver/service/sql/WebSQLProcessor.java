@@ -268,7 +268,7 @@ public class WebSQLProcessor implements WebSessionProvider {
         if (executeInfo.getResults().length == 0) {
             executeInfo.setStatusMessage("No Data");
         } else {
-            executeInfo.setStatusMessage("Success");
+            executeInfo.setStatusMessage("Executed");
         }
 
         return executeInfo;
