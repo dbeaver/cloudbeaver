@@ -159,7 +159,8 @@ public class CBStaticServlet extends DefaultServlet {
                                 WebSession.CB_SESSION_TYPE,
                                 authProvider.getId(),
                                 activeAuthConfig.getId(),
-                                Map.of()
+                                Map.of(),
+                                false
                             );
                             String signInLink = authInfo.getRedirectUrl();
                             //ignore current routing if non-root page is open
