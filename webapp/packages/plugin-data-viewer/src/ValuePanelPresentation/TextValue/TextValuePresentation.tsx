@@ -66,7 +66,10 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
 
     const isSelectedCellReadonly =
       firstSelectedCell &&
-      (formatAction.isReadOnly(firstSelectedCell) || formatAction.isBinary(firstSelectedCell) || formatAction.isGeometry(firstSelectedCell));
+      (formatAction.isReadOnly(firstSelectedCell) ||
+        formatAction.isBinary(firstSelectedCell) ||
+        formatAction.isGeometry(firstSelectedCell) ||
+        contentAction.isTextTruncated(firstSelectedCell));
     const isReadonlyByResultIndex = model.isReadonly(resultIndex) || model.isDisabled(resultIndex) || !firstSelectedCell;
     const isReadonly = isSelectedCellReadonly || isReadonlyByResultIndex;
     const canSave = firstSelectedCell && contentAction.isDownloadable(firstSelectedCell);

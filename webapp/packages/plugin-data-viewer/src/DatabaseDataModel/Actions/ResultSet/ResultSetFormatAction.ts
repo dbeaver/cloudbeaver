@@ -59,14 +59,6 @@ export class ResultSetFormatAction
       if (!readonly) {
         readonly = this.edit.getElementState(key as IResultSetElementKey) === DatabaseEditChangeType.delete;
       }
-
-      if (!readonly) {
-        const value = this.view.getCellValue(key as IResultSetElementKey);
-
-        if (isResultSetContentValue(value)) {
-          readonly = value.contentLength !== value.text?.length;
-        }
-      }
     }
 
     return readonly;
