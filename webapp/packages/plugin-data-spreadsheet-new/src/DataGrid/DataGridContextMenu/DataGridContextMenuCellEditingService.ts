@@ -9,6 +9,7 @@ import { injectable } from '@cloudbeaver/core-di';
 import {
   DatabaseEditChangeType,
   isBooleanValuePresentationAvailable,
+  ResultSetDataContentAction,
   ResultSetEditAction,
   ResultSetFormatAction,
   ResultSetSelectAction,
@@ -52,10 +53,13 @@ export class DataGridContextMenuCellEditingService {
       isHidden(context) {
         const format = context.data.model.source.getAction(context.data.resultIndex, ResultSetFormatAction);
         const view = context.data.model.source.getAction(context.data.resultIndex, ResultSetViewAction);
+        const content = context.data.model.source.getAction(context.data.resultIndex, ResultSetDataContentAction);
         const cellValue = view.getCellValue(context.data.key);
         const column = view.getColumn(context.data.key.column);
+        const isComplex = format.isBinary(context.data.key) || format.isGeometry(context.data.key);
+        const isTruncated = content.isTextTruncated(context.data.key);
 
-        if (!column || cellValue === undefined || format.isReadOnly(context.data.key) || format.isBinary(context.data.key)) {
+        if (!column || cellValue === undefined || format.isReadOnly(context.data.key) || isComplex || isTruncated) {
           return true;
         }
 
