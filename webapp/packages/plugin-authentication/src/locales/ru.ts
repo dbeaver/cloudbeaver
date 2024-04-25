@@ -1,3 +1,10 @@
+/*
+ * CloudBeaver - Cloud Database Manager
+ * Copyright (C) 2020-2024 DBeaver Corp and others
+ *
+ * Licensed under the Apache License, Version 2.0.
+ * you may not use this file except in compliance with the License.
+ */
 export default [
   ['authentication_login_dialog_title', 'Аутентификация'],
   ['authentication_login', 'Войти'],
@@ -6,6 +13,10 @@ export default [
   ['authentication_authenticate', 'Аутентифицироваться'],
   ['authentication_authorizing', 'Авторизация...'],
   ['authentication_auth_federated', 'Федеративная'],
+  ['authentication_auth_force_session_logout', 'Принудительный выход из всех сессий'],
+  ['authentication_auth_force_session_logout_popup_message', 'Текущие сессии для всех пользователей будут прерваны на всех устройствах. Продолжить?'],
+  ['authentication_auth_force_session_logout_popup_title', 'Выход из всех сессий'],
+  ['authentication_auth_force_session_logout_checkbox_tooltip', 'Для применения этой опции вам нужно войти снова'],
   ['authentication_auth_additional', 'Дополнительная'],
   ['authentication_select_provider', 'Выберите способ аутентификации'],
   ['authentication_configure', 'Пожалуйста настройте способы аутентификации'],

@@ -644,6 +644,25 @@ public class WebSession extends BaseWebSession
         super.close();
     }
 
+    @Override
+    public void close(boolean clearTokens) {
+        try {
+            resetNavigationModel();
+            resetSessionCache();
+        } catch (Throwable e) {
+            log.error(e);
+        }
+        if (clearTokens) {
+            try {
+                clearAuthTokens();
+            } catch (Exception e) {
+                log.error("Error closing web session tokens");
+            }
+        }
+        this.userContext.setUser(null);
+        super.close(clearTokens);
+    }
+
     private List<WebAuthInfo> clearAuthTokens() throws DBException {
         ArrayList<WebAuthInfo> tokensCopy;
         synchronized (authTokens) {
