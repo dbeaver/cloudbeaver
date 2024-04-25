@@ -5,7 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import axios, { AxiosProgressEvent, AxiosResponse, isAxiosError, isCancel } from 'axios';
+import axios, { AxiosProgressEvent, AxiosResponse, CanceledError, isAxiosError, isCancel } from 'axios';
 import { ClientError, GraphQLClient, RequestDocument, RequestOptions, resolveRequestDocument, Variables } from 'graphql-request';
 
 import { GQLError } from './GQLError';
@@ -160,7 +160,7 @@ export class CustomGraphQLClient extends GraphQLClient {
       return response.data;
     } catch (error: any) {
       if (isCancel(error)) {
-        error.message = 'ui_processing_canceled';
+        throw new CanceledError('ui_processing_canceled');
       }
 
       if (isAxiosError(error) && error.response?.data.message) {

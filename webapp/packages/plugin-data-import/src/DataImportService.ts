@@ -39,16 +39,12 @@ export class DataImportService {
   }
 
   async importData(connectionId: string, contextId: string, projectId: string, resultsId: string, processorId: string, file: File) {
-    let taskId: string | undefined;
     const abortController = new AbortController();
+    let cancelImplementation: (() => void | Promise<void>) | null;
 
-    const cancel = async () => {
-      if (taskId) {
-        await this.asyncTaskInfoService.cancel(taskId);
-      } else {
-        abortController.abort();
-      }
-    };
+    function cancel() {
+      cancelImplementation?.();
+    }
 
     const { controller, notification } = this.notificationService.processNotification(
       () => ProcessSnackbar,
@@ -59,6 +55,8 @@ export class DataImportService {
     );
 
     try {
+      cancelImplementation = () => abortController.abort();
+
       const result = await this.graphQLService.sdk.uploadResultData(
         connectionId,
         contextId,
@@ -83,7 +81,7 @@ export class DataImportService {
         return taskInfo;
       });
 
-      taskId = task.id;
+      cancelImplementation = () => this.asyncTaskInfoService.cancel(task.id);
       controller.setMessage('plugin_data_import_process_file_processing_step_message');
       await this.asyncTaskInfoService.run(task);
 
@@ -92,6 +90,8 @@ export class DataImportService {
     } catch (exception: any) {
       controller.reject(exception, 'plugin_data_import_process_fail');
       return false;
+    } finally {
+      cancelImplementation = null;
     }
   }
 }

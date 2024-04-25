@@ -54,12 +54,13 @@ export const ProcessSnackbar: NotificationComponent<ProcessSnackbarProps> = obse
     return null;
   }
 
+  function close() {
+    onCancel?.();
+    notification.close(false);
+  }
+
   return (
-    <SnackbarWrapper
-      closing={!!notification.state.deleteDelay}
-      persistent={status === ENotificationType.Loading}
-      onClose={() => notification.close(false)}
-    >
+    <SnackbarWrapper closing={!!notification.state.deleteDelay} persistent={status === ENotificationType.Loading} onClose={close}>
       <SnackbarStatus status={status} />
       <SnackbarContent>
         <SnackbarBody title={translate(title)}>{message && translate(message)}</SnackbarBody>
