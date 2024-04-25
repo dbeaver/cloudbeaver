@@ -15,6 +15,7 @@ export default [
   ['authentication_auth_federated', 'Федеративная'],
   ['authentication_auth_force_session_logout', 'Принудительный выход из всех сессий'],
   ['authentication_auth_force_session_logout_popup_message', 'Текущие сессии для всех пользователей будут прерваны на всех устройствах. Продолжить?'],
+  ['authentication_auth_force_session_logout_popup_title', 'Выход из всех сессий'],
   ['authentication_auth_force_session_logout_checkbox_tooltip', 'Для применения этой опции вам нужно войти снова'],
   ['authentication_auth_additional', 'Дополнительная'],
   ['authentication_select_provider', 'Выберите способ аутентификации'],
