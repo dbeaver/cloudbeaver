@@ -350,9 +350,9 @@ public class WebSessionManager {
         synchronized (sessionMap) {
             for (Iterator<BaseWebSession> iterator = sessionMap.values().iterator(); iterator.hasNext(); ) {
                 var session = iterator.next();
-                    if (CommonUtils.equalObjects(session.getUserContext().getUserId(), userId)) {
-                        iterator.remove();
-                        session.close();
+                if (CommonUtils.equalObjects(session.getUserContext().getUserId(), userId)) {
+                    iterator.remove();
+                    session.close();
                 }
             }
         }
@@ -362,11 +362,9 @@ public class WebSessionManager {
         synchronized (sessionMap) {
             for (Iterator<BaseWebSession> iterator = sessionMap.values().iterator(); iterator.hasNext(); ) {
                 var session = iterator.next();
-                for (String smSessionId : smSessionsId) {
-                    if (CommonUtils.equalObjects(session.getUserContext().getSmSessionId(), smSessionId)) {
-                        iterator.remove();
-                        session.close(false);
-                    }
+                if (smSessionsId.isEmpty() || smSessionsId.contains(session.getUserContext().getSmSessionId())) {
+                    iterator.remove();
+                    session.close(false);
                 }
             }
         }

@@ -1844,6 +1844,7 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
         } catch (SQLException e) {
             throw new DBCException("Session invalidation failed", e);
         }
+        application.getEventController().addEvent(new WSUserCloseSessionsEvent(List.of(), WSEventType.CLOSE_USER_SESSIONS));
     }
 
     private void invalidateAllUserTokens(@NotNull String userId) throws DBCException {
