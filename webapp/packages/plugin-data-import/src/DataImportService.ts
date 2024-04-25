@@ -51,7 +51,7 @@ export class DataImportService {
       {
         onCancel: cancel,
       },
-      { title: 'plugin_data_import_process_title', message: file.name },
+      { title: 'plugin_data_import_process_title', message: file.name, onClose: cancel },
     );
 
     try {
