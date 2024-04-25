@@ -16,6 +16,7 @@ const commonConfig = require('./webpack.config.js');
 const index = resolve('dist/index.js');
 const sso = require.resolve('@cloudbeaver/plugin-sso/dist/index.js');
 const ssoHtmlTemplate = require.resolve('@cloudbeaver/plugin-sso/src/index.html.ejs');
+const ssoErrorHtmlTemplate = require.resolve('@cloudbeaver/plugin-sso/src/ssoError.html.ejs');
 const { getAssets } = require('./webpack.product.utils');
 
 const HtmlWebpackPlugin = require('html-webpack-plugin');
@@ -121,6 +122,14 @@ module.exports = (env, argv) => {
       new HtmlWebpackPlugin({
         filename: 'sso.html',
         template: ssoHtmlTemplate,
+        inject: 'body',
+        chunks: ['sso'],
+        version: package.version,
+        title: package.product?.name,
+      }),
+      new HtmlWebpackPlugin({
+        filename: 'ssoError.html',
+        template: ssoErrorHtmlTemplate,
         inject: 'body',
         chunks: ['sso'],
         version: package.version,
