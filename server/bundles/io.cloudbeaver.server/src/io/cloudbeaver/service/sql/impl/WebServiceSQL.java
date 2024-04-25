@@ -557,7 +557,7 @@ public class WebServiceSQL implements DBWServiceSQL {
                 try {
                     monitor.beginTask("Get row data count", 1);
                     WebSQLResultsInfo results = contextInfo.getResults(resultsId);
-                    long rowCount = DBUtils.readRowCount(webSession.getProgressMonitor(), contextInfo.getProcessor().getExecutionContext(), results.getDataContainer(), null, this);
+                    long rowCount = DBUtils.readRowCount(monitor, contextInfo.getProcessor().getExecutionContext(), results.getDataContainer(), null, this);
                     this.result = "Row data count completed";
                     this.extendedResults = rowCount;
                 } catch (Throwable e) {
