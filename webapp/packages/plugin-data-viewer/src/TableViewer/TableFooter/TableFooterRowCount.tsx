@@ -7,16 +7,15 @@
  */
 import { observer } from 'mobx-react-lite';
 import { useState } from 'react';
-import styled from 'reshadow';
 
-import { getComputed, ToolsAction, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
+import { isNotNullDefined } from '@cloudbeaver/core-utils';
 
 import type { IDatabaseDataModel } from '../../DatabaseDataModel/IDatabaseDataModel';
 import type { IDatabaseResultSet } from '../../DatabaseDataModel/IDatabaseResultSet';
-import { tableFooterMenuStyles } from './TableFooterMenu/TableFooterMenuItem';
-import classes from './TableFooterRowCount.m.css';
+import { CancelTotalCountAction } from './CancelTotalCountAction';
+import { TotalCountAction } from './TotalCountAction';
 
 interface Props {
   resultIndex: number;
@@ -24,36 +23,40 @@ interface Props {
 }
 
 export const TableFooterRowCount: React.FC<Props> = observer(function TableFooterRowCount({ resultIndex, model }) {
-  const translate = useTranslate();
   const notificationService = useService(NotificationService);
   const [loading, setLoading] = useState(false);
-
-  const result = model.getResult(resultIndex);
-
-  if (!result) {
-    return null;
-  }
 
   async function loadTotalCount() {
     try {
       setLoading(true);
       await model.source.loadTotalCount(resultIndex);
     } catch (exception: any) {
-      notificationService.logException(exception, 'data_viewer_total_count_failed');
+      if (model.source.totalCountRequestTask?.cancelled) {
+        notificationService.logInfo({
+          title: 'data_viewer_total_count_canceled_title',
+          message: 'data_viewer_total_count_canceled_message',
+        });
+      } else {
+        notificationService.logException(exception, 'data_viewer_total_count_failed');
+      }
     } finally {
       setLoading(false);
     }
   }
 
-  const currentCount = result.loadedFully ? result.count : `${result.count}+`;
-  const count = result.totalCount ?? currentCount;
-  const disabled = getComputed(() => model.isLoading() || model.isDisabled(resultIndex));
+  async function cancelTotalCount() {
+    try {
+      await model.source.cancelLoadTotalCount();
+    } catch (e: any) {
+      if (!model.source.totalCountRequestTask?.cancelled) {
+        notificationService.logException(e);
+      }
+    }
+  }
 
-  return styled(tableFooterMenuStyles)(
-    <div className={classes.wrapper} title={translate('data_viewer_total_count_tooltip')}>
-      <ToolsAction disabled={disabled} loading={loading} icon="/icons/data_row_count.svg" viewBox="0 0 32 32" onClick={loadTotalCount}>
-        <span>{count}</span>
-      </ToolsAction>
-    </div>,
-  );
+  if (loading) {
+    return <CancelTotalCountAction loading={Boolean(model.source.totalCountRequestTask?.cancelled)} onClick={cancelTotalCount} />;
+  }
+
+  return <TotalCountAction loading={loading} resultIndex={resultIndex} model={model} onClick={loadTotalCount} />;
 });
