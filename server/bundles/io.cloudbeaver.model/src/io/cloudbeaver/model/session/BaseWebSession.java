@@ -173,6 +173,14 @@ public abstract class BaseWebSession extends AbstractSessionPersistent {
     @Override
     public void close() {
         super.close();
+        cleanUpSession();
+    }
+
+    public void close(boolean clearTokens) {
+        cleanUpSession();
+    }
+
+    private void cleanUpSession() {
         var sessionExpiredEvent = new WSSessionExpiredEvent();
         application.getEventController().addEvent(new WSEventDeleteTempFile(getSessionId()));
         synchronized (sessionEventHandlers) {
