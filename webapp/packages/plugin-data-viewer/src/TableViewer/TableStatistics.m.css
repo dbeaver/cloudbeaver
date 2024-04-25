@@ -6,8 +6,11 @@
  * you may not use this file except in compliance with the License.
  */
 
-export enum EServerErrorCode {
-  'sessionExpired' = 'sessionExpired',
-  'licenseRequired' = 'licenseRequired',
-  'tooManySessions' = 'tooManySessions',
+.statistics {
+  composes: theme-typography--caption from global;
+  flex: 1;
+  overflow: auto;
+  box-sizing: border-box;
+  white-space: pre-wrap;
+  padding: 16px;
 }

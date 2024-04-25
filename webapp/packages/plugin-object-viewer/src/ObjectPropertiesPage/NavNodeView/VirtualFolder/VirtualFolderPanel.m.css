@@ -6,8 +6,10 @@
  * you may not use this file except in compliance with the License.
  */
 
-export enum EServerErrorCode {
-  'sessionExpired' = 'sessionExpired',
-  'licenseRequired' = 'licenseRequired',
-  'tooManySessions' = 'tooManySessions',
+.tabWrapper {
+  position: relative;
+  width: 100%;
+  flex: 1 0 auto;
+  display: flex;
+  flex-direction: column;
 }

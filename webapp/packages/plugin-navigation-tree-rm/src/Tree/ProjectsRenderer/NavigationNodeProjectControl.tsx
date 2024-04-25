@@ -7,7 +7,6 @@
  */
 import { observer } from 'mobx-react-lite';
 import React, { forwardRef, useContext } from 'react';
-import styled, { css, use } from 'reshadow';
 
 import { getComputed, s, TreeNodeContext, TreeNodeControl, TreeNodeName, useMouseContextMenu, useS } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
@@ -96,7 +95,7 @@ export const NavigationNodeProjectControl: NavTreeControlComponent = observer<Na
     return (
       <TreeNodeControl
         ref={ref}
-        className={s(styles, { treeNodeControl: true, outdated  }, className)}
+        className={s(styles, { treeNodeControl: true, outdated }, className)}
         onClick={handleClick}
         onContextMenu={handleContextMenuOpen}
       >

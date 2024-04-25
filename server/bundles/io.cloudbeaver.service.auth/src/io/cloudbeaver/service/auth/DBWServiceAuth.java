@@ -38,7 +38,8 @@ public interface DBWServiceAuth extends DBWService {
         @NotNull String providerId,
         @Nullable String providerConfigurationId,
         @Nullable Map<String, Object> credentials,
-        boolean linkWithActiveUser) throws DBWebException;
+        boolean linkWithActiveUser,
+        boolean forceSessionsLogout) throws DBWebException;
 
 
     @WebAction(authRequired = false)
