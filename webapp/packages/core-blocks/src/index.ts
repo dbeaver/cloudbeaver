@@ -47,6 +47,7 @@ export * from './Menu/MenuBarSmallItem';
 export * from './Menu/MenuEmptyItem';
 export * from './Menu/MenuItem';
 export { default as MenuItemStyles } from './Menu/MenuItem.m.css';
+export { default as MenuPanelItemAndTriggerStyles } from './MenuPanel/shared/MenuPanelItemAndTrigger.m.css';
 export * from './Menu/MenuItemCheckbox';
 export * from './Menu/MenuItemElement';
 export { default as MenuItemElementStyles } from './Menu/MenuItemElement.m.css';
