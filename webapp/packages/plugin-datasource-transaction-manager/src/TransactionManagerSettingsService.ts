@@ -10,16 +10,13 @@ import { SettingsProvider, SettingsProviderService } from '@cloudbeaver/core-set
 import { schema, schemaExtra } from '@cloudbeaver/core-utils';
 
 const defaultSettings = schema.object({
-  'plugin.transaction-manager.disabled': schemaExtra.stringedBoolean().default(false),
+  'plugin.datasource-transaction-manager.disabled': schemaExtra.stringedBoolean().default(false),
 });
-
-export type TransactionManagerSettingsSchema = typeof defaultSettings;
-export type TransactionManagerSettings = schema.infer<typeof defaultSettings>;
 
 @injectable()
 export class TransactionManagerSettingsService extends Dependency {
   get disabled(): boolean {
-    return this.settings.getValue('plugin.transaction-manager.disabled');
+    return this.settings.getValue('plugin.datasource-transaction-manager.disabled');
   }
   readonly settings: SettingsProvider<typeof defaultSettings>;
 
