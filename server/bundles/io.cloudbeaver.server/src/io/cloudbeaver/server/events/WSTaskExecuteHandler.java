@@ -32,6 +32,9 @@ public class WSTaskExecuteHandler extends WSDefaultEventHandler<WSTaskExecuteEve
 
     protected boolean isAcceptableInSession(@NotNull BaseWebSession activeUserSession, @NotNull WSTaskExecuteEvent event) {
         return activeUserSession.isProjectAccessible(event.getProjectName())
-                && SMUtils.hasProjectPermission((WebSession) activeUserSession, ((WebProjectImpl) event.getProject()).getRmProject(), RMProjectPermission.RESOURCE_EDIT);
+                && SMUtils.hasProjectPermission(
+                        (WebSession) activeUserSession,
+                        ((WebProjectImpl) event.getProject()).getRmProject(),
+                        RMProjectPermission.RESOURCE_EDIT);
     }
 }
