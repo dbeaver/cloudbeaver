@@ -7,7 +7,7 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import { ColoredContainer, Group, GroupClose, GroupTitle, Loader, s, Translate, useS, useTranslate } from '@cloudbeaver/core-blocks';
+import { ColoredContainer, Group, GroupTitle, Loader, s, Translate, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import type { IFormState } from '@cloudbeaver/core-ui';
 
 import { AdministrationUserForm } from '../UserForm/AdministrationUserForm';
@@ -34,7 +34,6 @@ export const CreateUser = observer<Props>(function CreateUser({ state, onCancel 
     >
       <GroupTitle header keepSize>
         <Translate token="authentication_administration_user_connections_user_add" />
-        <GroupClose onClick={onCancel} />
       </GroupTitle>
       <ColoredContainer overflow vertical>
         <Loader suspense>
