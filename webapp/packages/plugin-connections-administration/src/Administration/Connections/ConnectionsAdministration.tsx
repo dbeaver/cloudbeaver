@@ -105,11 +105,7 @@ export const ConnectionsAdministration = observer<AdministrationItemContentProps
             <GroupItem className={s(style, { groupItem: true })}>{translate('connections_administration_configuration_wizard_message')}</GroupItem>
           </Group>
         )}
-        {sub && (
-          <Group box>
-            <CreateConnection method={param} configurationWizard={configurationWizard} />
-          </Group>
-        )}
+        {sub && <CreateConnection method={param} configurationWizard={configurationWizard} />}
         <Group boxNoOverflow>
           <SContext registry={registry}>
             <Loader loading={controller.isProcessing} overlay>

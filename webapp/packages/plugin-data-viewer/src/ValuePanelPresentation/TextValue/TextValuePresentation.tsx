@@ -134,19 +134,20 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
           </Group>
         </Loader>
         {firstSelectedCell && <TextValueTruncatedMessage model={model} resultIndex={resultIndex} elementKey={firstSelectedCell} />}
-        <Container keepSize center overflow>
-          {canSave && (
-            <ActionIconButton title={translate('ui_download')} name="/icons/export.svg" disabled={model.isLoading()} img onClick={saveHandler} />
-          )}
-          <ActionIconButton
-            title={translate(
-              lineWrapping ? 'data_viewer_presentation_value_text_line_wrapping_no_wrap' : 'data_viewer_presentation_value_text_line_wrapping_wrap',
+        <Container keepSize overflow>
+          <Container keepSize noWrap>
+            {canSave && (
+              <ActionIconButton title={translate('ui_download')} name="/icons/export.svg" disabled={model.isLoading()} img onClick={saveHandler} />
             )}
-            name={`/icons/plugin_data_viewer_${lineWrapping ? 'no_wrap' : 'wrap'}_lines.svg`}
-            img
-            onClick={toggleLineWrappingHandler}
-          />
-          <Fill />
+            <ActionIconButton
+              title={translate(
+                lineWrapping ? 'data_viewer_presentation_value_text_line_wrapping_no_wrap' : 'data_viewer_presentation_value_text_line_wrapping_wrap',
+              )}
+              name={`/icons/plugin_data_viewer_${lineWrapping ? 'no_wrap' : 'wrap'}_lines.svg`}
+              img
+              onClick={toggleLineWrappingHandler}
+            />
+          </Container>
         </Container>
       </Container>
     );

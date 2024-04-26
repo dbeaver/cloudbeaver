@@ -135,7 +135,6 @@ export const ConfigurationsList = observer<Props>(function ConfigurationsList({
             className={s(style, { filter: true })}
             placeholder={translate('authentication_identity_provider_search_placeholder')}
             value={search}
-            max
             onChange={setSearch}
           />
         </Container>

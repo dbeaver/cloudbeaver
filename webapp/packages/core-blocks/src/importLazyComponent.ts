@@ -5,11 +5,11 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import React from 'react';
+import React, { ComponentType } from 'react';
 
-export function importLazyComponent<TComponent extends React.FC<any>>(componentImporter: () => Promise<TComponent>) {
+export function importLazyComponent<TComponent extends ComponentType<any>>(componentImporter: () => Promise<TComponent>): TComponent {
   return React.lazy<TComponent>(async () => {
     const component = await componentImporter();
     return { default: component };
-  });
+  }) as any;
 }

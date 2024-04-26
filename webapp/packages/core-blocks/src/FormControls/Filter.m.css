@@ -1,39 +1,47 @@
+/*
+ * CloudBeaver - Cloud Database Manager
+ * Copyright (C) 2020-2024 DBeaver Corp and others
+ *
+ * Licensed under the Apache License, Version 2.0.
+ * you may not use this file except in compliance with the License.
+ */
 .filterContainer {
   position: relative;
-  min-width: 24px;
   min-height: 24px;
 }
 .inputField {
   display: block;
-  width: 300px;
-  &.max {
-    width: 100%;
-  }
 
   & input {
-    padding-right: 40px !important;
+    padding-right: 32px !important;
   }
 }
-.iconButton {
+.actionButtons {
   position: absolute;
-  right: 4px;
-  top: 4px;
-  margin: 0;
-  width: 24px;
-  height: 24px;
-  border-radius: 2px;
-  cursor: auto;
-
-  &.cross svg {
-    width: 16px;
-  }
-
-  &.cross.manualMode {
-    right: 32px;
-  }
+  display: flex;
+  align-items: center;
+  height: 100%;
+  top: 50%;
+  right: 2px;
+  transform: translateY(-50%);
 }
 
-.manualMode {
-  composes: theme-background-primary theme-text-on-primary from global;
-  cursor: pointer;
+.actionButton {
+}
+
+.smallSize {
+  &.filterContainer {
+    min-height: 24px;
+  }
+
+  & .inputField input {
+    padding: 2px 6px;
+    padding-right: 22px !important;
+  }
+
+  & .actionButton {
+    height: 18px;
+    width: 18px;
+    padding: 2px;
+  }
 }
