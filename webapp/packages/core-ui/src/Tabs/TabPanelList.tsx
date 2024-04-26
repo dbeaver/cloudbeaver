@@ -13,11 +13,11 @@ import { TabPanel } from './TabPanel';
 import type { ITabInfo } from './TabsContainer/ITabsContainer';
 import { TabsContext } from './TabsContext';
 
-interface Props {
+export interface TabPanelListProps {
   contents?: boolean;
 }
 
-export const TabPanelList = observer<React.PropsWithChildren<Props>>(function TabPanelList({ contents, children }) {
+export const TabPanelList = observer<React.PropsWithChildren<TabPanelListProps>>(function TabPanelList({ contents, children }) {
   const state = useContext(TabsContext);
 
   if (!state) {

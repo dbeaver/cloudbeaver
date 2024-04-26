@@ -127,7 +127,7 @@ public class RPSessionHandler implements DBWSessionHandler {
                         webSession.getSessionId(),
                         currentSmSessionId,
                         sessionParameters,
-                        WebSession.CB_SESSION_TYPE, authProvider.getId(), configuration.getId(), userCredentials);
+                        WebSession.CB_SESSION_TYPE, authProvider.getId(), configuration.getId(), userCredentials, false);
                     new WebSessionAuthProcessor(webSession, smAuthInfo, false).authenticateSession();
                     log.debug(MessageFormat.format(
                         "Successful reverse proxy authentication: user ''{0}'' with teams {1}", userName, userTeams));

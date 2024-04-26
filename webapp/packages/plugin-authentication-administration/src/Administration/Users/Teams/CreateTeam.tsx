@@ -7,7 +7,7 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import { Fill, IconButton, s, Translate, useS, useTranslate } from '@cloudbeaver/core-blocks';
+import { Container, Group, GroupTitle, s, Translate, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 
 import style from './CreateTeam.m.css';
@@ -24,15 +24,13 @@ export const CreateTeam: React.FC = observer(function CreateTeam() {
   }
 
   return (
-    <div aria-label={translate('administration_teams_team_creation')} className={s(styles, { box: true })}>
-      <div className={s(styles, { titleBar: true })}>
+    <Group aria-label={translate('administration_teams_team_creation')} className={s(styles, { box: true })} box boxNoOverflow vertical noWrap>
+      <GroupTitle header keepSize>
         <Translate token="administration_teams_team_creation" />
-        <Fill />
-        <IconButton name="cross" viewBox="0 0 16 16" onClick={service.cancelCreate} />
-      </div>
-      <div className={s(styles, { content: true })}>
+      </GroupTitle>
+      <Container overflow>
         <TeamForm state={service.data} onCancel={service.cancelCreate} onSave={service.cancelCreate} />
-      </div>
-    </div>
+      </Container>
+    </Group>
   );
 });

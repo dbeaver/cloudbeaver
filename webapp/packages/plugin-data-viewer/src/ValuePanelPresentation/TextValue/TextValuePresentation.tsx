@@ -64,7 +64,12 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
     const autoLineWrapping = getDefaultLineWrapping(textValueInfo.contentType);
     const lineWrapping = state.lineWrapping ?? autoLineWrapping;
 
-    const isSelectedCellReadonly = firstSelectedCell && (formatAction.isReadOnly(firstSelectedCell) || formatAction.isBinary(firstSelectedCell));
+    const isSelectedCellReadonly =
+      firstSelectedCell &&
+      (formatAction.isReadOnly(firstSelectedCell) ||
+        formatAction.isBinary(firstSelectedCell) ||
+        formatAction.isGeometry(firstSelectedCell) ||
+        contentAction.isTextTruncated(firstSelectedCell));
     const isReadonlyByResultIndex = model.isReadonly(resultIndex) || model.isDisabled(resultIndex) || !firstSelectedCell;
     const isReadonly = isSelectedCellReadonly || isReadonlyByResultIndex;
     const canSave = firstSelectedCell && contentAction.isDownloadable(firstSelectedCell);
@@ -129,19 +134,20 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
           </Group>
         </Loader>
         {firstSelectedCell && <TextValueTruncatedMessage model={model} resultIndex={resultIndex} elementKey={firstSelectedCell} />}
-        <Container keepSize center overflow>
-          {canSave && (
-            <ActionIconButton title={translate('ui_download')} name="/icons/export.svg" disabled={model.isLoading()} img onClick={saveHandler} />
-          )}
-          <ActionIconButton
-            title={translate(
-              lineWrapping ? 'data_viewer_presentation_value_text_line_wrapping_no_wrap' : 'data_viewer_presentation_value_text_line_wrapping_wrap',
+        <Container keepSize overflow>
+          <Container keepSize noWrap>
+            {canSave && (
+              <ActionIconButton title={translate('ui_download')} name="/icons/export.svg" disabled={model.isLoading()} img onClick={saveHandler} />
             )}
-            name={`/icons/plugin_data_viewer_${lineWrapping ? 'no_wrap' : 'wrap'}_lines.svg`}
-            img
-            onClick={toggleLineWrappingHandler}
-          />
-          <Fill />
+            <ActionIconButton
+              title={translate(
+                lineWrapping ? 'data_viewer_presentation_value_text_line_wrapping_no_wrap' : 'data_viewer_presentation_value_text_line_wrapping_wrap',
+              )}
+              name={`/icons/plugin_data_viewer_${lineWrapping ? 'no_wrap' : 'wrap'}_lines.svg`}
+              img
+              onClick={toggleLineWrappingHandler}
+            />
+          </Container>
         </Container>
       </Container>
     );

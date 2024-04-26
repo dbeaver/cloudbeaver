@@ -45,6 +45,7 @@ import org.jkiss.dbeaver.model.auth.SMSessionExternal;
 import org.jkiss.dbeaver.model.preferences.DBPPropertyDescriptor;
 import org.jkiss.dbeaver.model.security.SMController;
 import org.jkiss.dbeaver.model.security.SMSubjectType;
+import org.jkiss.dbeaver.model.security.exception.SMTooManySessionsException;
 import org.jkiss.dbeaver.model.security.user.SMUser;
 import org.jkiss.utils.CommonUtils;
 
@@ -67,7 +68,8 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
         @NotNull String providerId,
         @Nullable String providerConfigurationId,
         @Nullable Map<String, Object> authParameters,
-        boolean linkWithActiveUser
+        boolean linkWithActiveUser,
+        boolean forceSessionsLogout
     ) throws DBWebException {
         if (CommonUtils.isEmpty(providerId)) {
             throw new DBWebException("Missing auth provider parameter");
@@ -93,7 +95,8 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
                 WebSession.CB_SESSION_TYPE,
                 providerId,
                 providerConfigurationId,
-                authParameters
+                authParameters,
+                forceSessionsLogout
             );
 
             linkWithActiveUser = linkWithActiveUser && CBApplication.getInstance().getAppConfiguration().isLinkExternalCredentialsWithUser();
@@ -105,6 +108,8 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
                 var authProcessor = new WebSessionAuthProcessor(webSession, smAuthInfo, linkWithActiveUser);
                 return new WebAuthStatus(smAuthInfo.getAuthStatus(), authProcessor.authenticateSession());
             }
+        } catch (SMTooManySessionsException e) {
+            throw new DBWebException("User authentication failed", e.getErrorType(), e);
         } catch (Exception e) {
             throw new DBWebException("User authentication failed", e);
         }
@@ -123,12 +128,16 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
                 case IN_PROGRESS:
                     return new WebAuthStatus(smAuthInfo.getAuthAttemptId(), smAuthInfo.getRedirectUrl(), smAuthInfo.getAuthStatus());
                 case ERROR:
-                    throw new DBWebException(smAuthInfo.getError());
+                    throw new DBWebException(smAuthInfo.getError(), smAuthInfo.getErrorCode());
                 case EXPIRED:
                     throw new DBException("Authorization has already been processed");
                 default:
                     throw new DBWebException("Unknown auth status:" + smAuthInfo.getAuthStatus());
             }
+        } catch (DBWebException e) {
+            throw e;
+        } catch (SMTooManySessionsException e) {
+            throw new DBWebException(e.getMessage(), e.getErrorType());
         } catch (DBException e) {
             throw new DBWebException(e.getMessage(), e);
         }

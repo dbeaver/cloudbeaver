@@ -25,6 +25,7 @@ public interface CBAuthConstants {
     String CB_AUTH_ID_REQUEST_PARAM = "authId";
     String CB_AUTO_LOGIN_REQUEST_PARAM = "autoLogin";
     String CB_REDIRECT_URL_REQUEST_PARAM = "redirectUrl";
+    String CB_FORCE_SESSIONS_LOGOUT = "forceSessionsLogout";
 
     // Default max idle time (10 minutes)
     long MAX_SESSION_IDLE_TIME = 10 * 60 * 1000;

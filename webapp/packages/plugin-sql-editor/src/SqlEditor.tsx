@@ -22,11 +22,11 @@ import { SqlEditorView } from './SqlEditorView';
 import { SqlResultTabs } from './SqlResultTabs/SqlResultTabs';
 import { useDataSource } from './useDataSource';
 
-interface Props {
+export interface SqlEditorProps {
   state: ISqlEditorTabState;
 }
 
-export const SqlEditor = observer<Props>(function SqlEditor({ state }) {
+export const SqlEditor = observer<SqlEditorProps>(function SqlEditor({ state }) {
   const styles = useS(style);
   const sqlEditorView = useService(SqlEditorView);
   const sqlDataSourceService = useService(SqlDataSourceService);
