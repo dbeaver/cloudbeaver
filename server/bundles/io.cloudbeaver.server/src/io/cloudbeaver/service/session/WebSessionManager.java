@@ -362,10 +362,23 @@ public class WebSessionManager {
         synchronized (sessionMap) {
             for (Iterator<BaseWebSession> iterator = sessionMap.values().iterator(); iterator.hasNext(); ) {
                 var session = iterator.next();
-                if (smSessionsId.isEmpty() || smSessionsId.contains(session.getUserContext().getSmSessionId())) {
+                if (smSessionsId.contains(session.getUserContext().getSmSessionId())) {
                     iterator.remove();
                     session.close(false);
                 }
+            }
+        }
+    }
+
+    /**
+     * Closes all sessions in session manager.
+     */
+    public void closeAllSessions() {
+        synchronized (sessionMap) {
+            for (Iterator<BaseWebSession> iterator = sessionMap.values().iterator(); iterator.hasNext(); ) {
+                var session = iterator.next();
+                iterator.remove();
+                session.close(false);
             }
         }
     }

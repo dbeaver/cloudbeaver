@@ -49,7 +49,6 @@ import org.jkiss.dbeaver.model.security.exception.SMException;
 import org.jkiss.dbeaver.model.security.exception.SMRefreshTokenExpiredException;
 import org.jkiss.dbeaver.model.security.user.*;
 import org.jkiss.dbeaver.model.sql.SQLUtils;
-import org.jkiss.dbeaver.model.websocket.event.WSEventType;
 import org.jkiss.dbeaver.model.websocket.event.WSUserCloseSessionsEvent;
 import org.jkiss.dbeaver.model.websocket.event.WSUserDeletedEvent;
 import org.jkiss.dbeaver.model.websocket.event.permissions.WSObjectPermissionEvent;
@@ -208,7 +207,7 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
         } catch (SQLException e) {
             throw new DBCException("Error deleting user from database", e);
         }
-        var event = new WSUserDeletedEvent(WSEventType.USER_DELETED, userId);
+        var event = new WSUserDeletedEvent(userId);
         application.getEventController().addEvent(event);
     }
 
@@ -1844,7 +1843,7 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
         } catch (SQLException e) {
             throw new DBCException("Session invalidation failed", e);
         }
-        application.getEventController().addEvent(new WSUserCloseSessionsEvent(List.of(), WSEventType.CLOSE_USER_SESSIONS));
+        application.getEventController().addEvent(new WSUserCloseSessionsEvent(List.of()));
     }
 
     private void invalidateAllUserTokens(@NotNull String userId) throws DBCException {
@@ -2338,7 +2337,7 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
         List<String> smSessionsId = findActiveUserSessions(userId, currentTime)
                 .stream().map(SMActiveSession::sessionId).collect(Collectors.toList());
         deleteSessionsTokens(smSessionsId);
-        application.getEventController().addEvent(new WSUserCloseSessionsEvent(smSessionsId, WSEventType.CLOSE_USER_SESSIONS));
+        application.getEventController().addEvent(new WSUserCloseSessionsEvent(smSessionsId));
     }
 
     /**
