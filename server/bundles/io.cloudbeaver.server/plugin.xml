@@ -73,9 +73,6 @@
         <eventHandler class="io.cloudbeaver.server.events.WSUserEventHandler">
             <topic id="cb_user"/>
         </eventHandler>
-        <eventHandler class="io.cloudbeaver.server.events.WSTaskExecuteHandler">
-            <topic id="cb_task"/>
-        </eventHandler>
     </extension>
 
 </plugin>
