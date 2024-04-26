@@ -21,7 +21,7 @@ import { TabsValidationProvider } from './TabsValidationProvider';
 
 type ExtractContainerProps<T> = T extends void ? Record<string, any> : T;
 
-type Props<T = Record<string, any>> = ExtractContainerProps<T> &
+export type TabsStateProps<T = Record<string, any>> = ExtractContainerProps<T> &
   React.PropsWithChildren<{
     selectedId?: string;
     orientation?: 'horizontal' | 'vertical';
@@ -54,7 +54,7 @@ export const TabsState = observer(function TabsState<T = Record<string, any>>({
   onClose,
   canClose,
   ...rest
-}: Props<T>): React.ReactElement | null {
+}: TabsStateProps<T>): React.ReactElement | null {
   const context = useDataContext();
   const props = useMemo(() => rest as any as T, [...Object.values(rest)]);
   let displayed: string[] = [];
@@ -73,7 +73,7 @@ export const TabsState = observer(function TabsState<T = Record<string, any>>({
   const [openExecutor] = useState(() => new Executor<ITabData<T>>());
 
   const state = useTabState({
-    selectedId: selectedId || currentTabId || container?.selectedId,
+    selectedId: selectedId || currentTabId || container?.selectedId || null,
     orientation,
     manual,
   });

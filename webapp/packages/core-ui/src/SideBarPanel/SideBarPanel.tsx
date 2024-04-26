@@ -20,7 +20,7 @@ import styles from './shared/SideBarPanel.m.css';
 import SideBarPanelTab from './shared/SideBarPanelTab.m.css';
 import SideBarPanelTabPanel from './shared/SideBarPanelTabPanel.m.css';
 
-interface Props {
+export interface SideBarPanelProps {
   container: TabsContainer;
 }
 
@@ -42,7 +42,7 @@ const sideBarPanelRegistry: StyleRegistry = [
   ],
 ];
 
-export const SideBarPanel = observer<Props>(function SideBarPanel({ container }) {
+export const SideBarPanel = observer<SideBarPanelProps>(function SideBarPanel({ container }) {
   const style = useS(styles);
 
   return (

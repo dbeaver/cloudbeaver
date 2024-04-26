@@ -50,9 +50,7 @@ export const UsersPage = observer<Props>(function UsersPage({ param }) {
 
       <Container overflow gap maximum>
         {create && createUserService.state && !userManagementDisabled && (
-          <Group box>
-            <CreateUser state={createUserService.state} onCancel={createUserService.cancelCreate} />
-          </Group>
+          <CreateUser state={createUserService.state} onCancel={createUserService.cancelCreate} />
         )}
 
         <Placeholder container={createUserService.toolsContainer} param={param} />

@@ -59,7 +59,7 @@ export * from './Menu/MenuStateContext';
 export * from './Menu/useMouseContextMenu';
 export { MenuTrigger, type MenuState } from './MenuPanel/MenuTrigger';
 
-export * from './ObjectPropertyInfo/ObjectPropertyInfoForm/ObjectPropertyInfoForm';
+export * from './ObjectPropertyInfo/ObjectPropertyInfoForm/ObjectPropertyInfoFormLoader';
 export * from './ObjectPropertyInfo/useObjectPropertyCategories';
 
 export * from './Overlay/Overlay';
@@ -158,7 +158,7 @@ export * from './FolderExplorer/useFolderExplorer';
 export * from './Tags/Tag';
 export * from './Tags/Tags';
 
-export * from './FormControls/Combobox';
+export * from './FormControls/ComboboxLoader';
 export * from './FormControls/FormContext';
 export * from './FormControls/FormFieldDescription';
 export * from './FormControls/InputField/InputField';

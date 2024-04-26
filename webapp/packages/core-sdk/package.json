@@ -22,6 +22,7 @@
   },
   "dependencies": {
     "@cloudbeaver/core-di": "~0.1.0",
+    "@cloudbeaver/core-executor": "~0.1.0",
     "@cloudbeaver/core-utils": "~0.1.0",
     "axios": "^1.6.7",
     "graphql-request": "^6.1.0",

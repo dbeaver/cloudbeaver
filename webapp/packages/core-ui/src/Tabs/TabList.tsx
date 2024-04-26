@@ -16,13 +16,13 @@ import { TabDefault } from './Tab/TabDefault';
 import styles from './TabList.m.css';
 import { TabsContext } from './TabsContext';
 
-interface Props extends Omit<TabListOptions, keyof TabStateReturn> {
+export interface TabListProps extends Omit<TabListOptions, keyof TabStateReturn> {
   'aria-label'?: string;
   childrenFirst?: boolean;
   className?: string;
 }
 
-export const TabList = observer<React.PropsWithChildren<Props>>(function TabList({ className, children, childrenFirst, ...props }) {
+export const TabList = observer<React.PropsWithChildren<TabListProps>>(function TabList({ className, children, childrenFirst, ...props }) {
   const state = useContext(TabsContext);
   const translate = useTranslate();
   const componentStyle = useS(styles);

@@ -9,11 +9,11 @@ import { s, useS } from '@cloudbeaver/core-blocks';
 
 import TabTitleStyles from './TabTitle.m.css';
 
-interface IProps {
+export interface TabTitleProps {
   className?: string;
 }
 
-export const TabTitle: React.FC<React.PropsWithChildren<IProps>> = function TabTitle({ children, className }) {
+export const TabTitle: React.FC<React.PropsWithChildren<TabTitleProps>> = function TabTitle({ children, className }) {
   const styles = useS(TabTitleStyles);
   return <div className={s(styles, { tabTitle: true }, className)}>{children || <div className={s(styles, { placeholder: true })} />}</div>;
 };

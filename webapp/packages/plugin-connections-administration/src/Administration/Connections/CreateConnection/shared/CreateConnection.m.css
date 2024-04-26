@@ -6,31 +6,8 @@
  * you may not use this file except in compliance with the License.
  */
 
-.titleBar {
-  composes: theme-border-color-background from global;
-}
-
 .connectionCreate {
-  display: flex;
-  flex-direction: column;
   height: 800px;
-  overflow: hidden;
-}
-
-.connectionCreateContent {
-  composes: theme-background-secondary theme-text-on-secondary from global;
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-  overflow: auto;
-}
-
-.customConnection,
-.searchDatabase {
-  flex-direction: column;
-  height: 100%;
-  overflow: auto;
 }
 
 .loader {
@@ -38,32 +15,11 @@
   height: 100%;
 }
 
-.titleBar {
-  composes: theme-typography--headline6 from global;
-  padding: 16px 24px;
-  align-items: center;
-  display: flex;
-  font-weight: 400;
-  flex: auto 0 0;
-}
-
 .staticImage {
-  width: 32px;
-  max-height: 32px;
-  margin-right: 16px;
+  width: 24px;
+  max-height: 24px;
 }
 
 .backButton {
-  position: relative;
-  box-sizing: border-box;
-  margin-right: 16px;
-  display: flex;
-
-  & .icon {
-    box-sizing: border-box;
-    transform: rotate(90deg);
-    cursor: pointer;
-    height: 16px;
-    width: 16px;
-  }
+  transform: rotate(90deg);
 }

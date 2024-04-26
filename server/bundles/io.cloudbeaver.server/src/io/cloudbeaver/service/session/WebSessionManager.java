@@ -346,13 +346,27 @@ public class WebSessionManager {
         }
     }
 
-    public void closeUserSessions(@NotNull String userId) {
+    public void closeUserSession(@NotNull String userId) {
         synchronized (sessionMap) {
             for (Iterator<BaseWebSession> iterator = sessionMap.values().iterator(); iterator.hasNext(); ) {
                 var session = iterator.next();
-                if (CommonUtils.equalObjects(session.getUserContext().getUserId(), userId)) {
-                    iterator.remove();
-                    session.close();
+                    if (CommonUtils.equalObjects(session.getUserContext().getUserId(), userId)) {
+                        iterator.remove();
+                        session.close();
+                }
+            }
+        }
+    }
+
+    public void closeSessions(@NotNull List<String> smSessionsId) {
+        synchronized (sessionMap) {
+            for (Iterator<BaseWebSession> iterator = sessionMap.values().iterator(); iterator.hasNext(); ) {
+                var session = iterator.next();
+                for (String smSessionId : smSessionsId) {
+                    if (CommonUtils.equalObjects(session.getUserContext().getSmSessionId(), smSessionId)) {
+                        iterator.remove();
+                        session.close(false);
+                    }
                 }
             }
         }
