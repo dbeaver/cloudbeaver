@@ -57,7 +57,7 @@ type ObjectProps<TValue, TKey extends keyof TState, TState> = BaseProps<TState[T
   value?: never;
 };
 
-interface ComboboxType {
+export interface ComboboxType {
   <TKey, TValue>(props: ControlledProps<TKey, TValue>): JSX.Element;
   <TValue, TKey extends keyof TState, TState>(props: ObjectProps<TValue, TKey, TState>): JSX.Element;
 }

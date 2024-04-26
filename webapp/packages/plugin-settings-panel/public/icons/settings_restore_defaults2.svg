@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg  data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <g id="root">
+    <defs>
+      <style>
+        .cls-1 {
+          fill: none;
+          stroke: currentColor;
+          stroke-miterlimit: 10;
+          stroke-width: 2px;
+        }
+      </style>
+    </defs>
+    <polyline class="cls-1" stroke="currentColor" points="9 2 3 8 9 14"/>
+    <path class="cls-1" stroke="currentColor" d="m5.45,18.5c0,5.8,4.7,10.5,10.5,10.5s10.5-4.7,10.5-10.5-4.7-10.5-10.5-10.5H3.55"/>
+  </g>
+</svg>

@@ -59,7 +59,7 @@ export const UserProfileSettings = observer(function UserProfileSettings() {
             <ToolsAction icon="admin-cancel" viewBox="0 0 24 24" disabled={!changed} onClick={handleReset}>
               {translate('ui_processing_cancel')}
             </ToolsAction>
-            <ToolsAction icon="admin-cancel" viewBox="0 0 24 24" onClick={handleRestoreDefaults}>
+            <ToolsAction icon="/icons/settings_restore_defaults2_m.svg#root" viewBox="0 0 24 24" svg onClick={handleRestoreDefaults}>
               {translate('plugin_user_profile_settings_restore_defaults')}
             </ToolsAction>
           </ToolsPanel>

@@ -27,7 +27,6 @@ export const OutputLogsToolbar = observer<Props>(function OutputLogsToolbar({ st
       <Filter
         value={state.searchValue}
         placeholder={translate('sql_editor_output_logs_input_placeholder')}
-        max
         onChange={value => state.setSearchValue(value.toString())}
       />
       <Container keepSize>
