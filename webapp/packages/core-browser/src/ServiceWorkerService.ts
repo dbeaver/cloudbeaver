@@ -8,51 +8,102 @@
 /// <reference lib="WebWorker" />
 import { Workbox } from 'workbox-window';
 
-import { injectable } from '@cloudbeaver/core-di';
+import { displayUpdateStatus, Disposable, injectable } from '@cloudbeaver/core-di';
 import { Executor, IExecutor } from '@cloudbeaver/core-executor';
 import { GlobalConstants } from '@cloudbeaver/core-utils';
 
 @injectable()
-export class ServiceWorkerService {
+export class ServiceWorkerService extends Disposable {
   readonly onUpdate: IExecutor;
 
   private readonly workerURL: string;
   private workbox: Workbox | null;
+  private updateIntervalId: ReturnType<typeof setInterval> | null;
+  private waitUpdating: boolean;
 
   constructor() {
+    super();
     this.onUpdate = new Executor();
     this.workerURL = GlobalConstants.absoluteRootUrl('service-worker.js');
     this.workbox = null;
+    this.updateIntervalId = null;
+    this.waitUpdating = false;
   }
 
-  register(): void | Promise<void> {
-    if ('serviceWorker' in navigator) {
+  async register(): Promise<void> {
+    try {
+      if (!('serviceWorker' in navigator)) {
+        return;
+      }
       if (process.env.NODE_ENV === 'development') {
-        navigator.serviceWorker
-          .getRegistration(this.workerURL)
-          .then(registration => registration?.unregister())
-          .catch();
+        const registration = await navigator.serviceWorker.getRegistration(this.workerURL);
+        registration?.unregister();
       } else {
         this.workbox = new Workbox(this.workerURL);
-        this.registerSkipWaitingPrompt(this.workbox);
-        this.workbox.register();
-        setInterval(() => this.workbox?.update(), 1000 * 60 * 60);
+        this.registerRefreshAfterUpdate();
+
+        const reg = await this.workbox.register();
+
+        if (reg) {
+          if (reg.active && (reg.waiting || reg.installing)) {
+            this.updating();
+          }
+
+          reg.addEventListener('updatefound', () => {
+            if (reg.active) {
+              this.updating();
+            }
+          });
+          await this.workbox.update();
+        }
       }
+    } catch (e) {
+      console.log(e);
     }
   }
 
-  private registerSkipWaitingPrompt(workbox: Workbox): void {
-    workbox.addEventListener('controlling', async event => {
+  async load(): Promise<void> {
+    try {
+      if (this.workbox) {
+        await this.workbox.update();
+      }
+    } catch (e) {
+      console.log(e);
+    }
+
+    if (this.waitUpdating) {
+      await new Promise(() => {});
+    }
+
+    this.updateIntervalId = setInterval(() => this.workbox?.update(), 1000 * 60 * 60 * 24);
+  }
+
+  dispose(): void {
+    if (this.updateIntervalId) {
+      clearInterval(this.updateIntervalId);
+    }
+  }
+
+  private registerRefreshAfterUpdate(): void {
+    if (!this.workbox) {
+      return;
+    }
+
+    this.workbox.addEventListener('controlling', async event => {
       if (!event.isUpdate) {
         return;
       }
 
-      await this.onUpdate.execute();
       window.location.reload();
     });
+  }
 
-    workbox.addEventListener('waiting', event => {
-      workbox.messageSkipWaiting();
-    });
+  private updating() {
+    if (this.waitUpdating) {
+      return;
+    }
+    this.waitUpdating = true;
+    displayUpdateStatus();
+    this.onUpdate.execute();
   }
 }

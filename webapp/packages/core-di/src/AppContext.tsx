@@ -7,8 +7,8 @@
  */
 import { createContext } from 'react';
 
+import { useAppLoadingScreen } from './AppLoadingScreen/useAppLoadingScreen';
 import type { IServiceInjector } from './IApp';
-import { useAppLoadingScreen } from './useAppLoadingScreen';
 
 export const appContext = createContext<IServiceInjector>(undefined as any);
 

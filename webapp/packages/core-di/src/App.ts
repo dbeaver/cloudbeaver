@@ -10,7 +10,6 @@ import { Executor, IExecutor } from '@cloudbeaver/core-executor';
 import { Bootstrap } from './Bootstrap';
 import { Dependency } from './Dependency';
 import type { DIContainer } from './DIContainer';
-import { Disposable } from './Disposable';
 import type { IServiceCollection, IServiceConstructor, IServiceInjector } from './IApp';
 import { IDiWrapper, inversifyWrapper } from './inversifyWrapper';
 import type { PluginManifest } from './PluginManifest';
