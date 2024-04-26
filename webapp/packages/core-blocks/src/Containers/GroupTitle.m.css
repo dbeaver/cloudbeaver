@@ -11,13 +11,17 @@
   font-weight: 400;
   margin: 0;
   text-transform: uppercase;
-  opacity: 0.9;
+  position: relative;
+
+  &.header {
+    font-weight: 500;
+    font-size: 16px;
+  }
 
   &.sticky {
     position: sticky;
     background-color: inherit;
     top: 0;
     z-index: 1;
-    opacity: 1;
   }
 }

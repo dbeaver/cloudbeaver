@@ -5,9 +5,8 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { useCallback, useRef, useState } from 'react';
-
-import { IconButton } from '../IconButton';
+import { Container } from '../Containers/Container';
+import { Filter } from '../FormControls/Filter';
 import { useTranslate } from '../localization/useTranslate';
 import { s } from '../s';
 import { useS } from '../useS';
@@ -23,59 +22,12 @@ interface IProps {
 }
 
 export const ItemListSearch: React.FC<IProps> = function ItemListSearch({ value, placeholder, disabled, onChange, onSearch, className }) {
-  const inputRef = useRef<HTMLInputElement>(null);
   const styles = useS(style);
-  const [search, setSearch] = useState(value ?? '');
   const translate = useTranslate();
-  const changeHandler = useCallback(
-    (changeValue: string) => {
-      if (value === undefined) {
-        setSearch(changeValue);
-      }
-      if (onChange) {
-        onChange(changeValue);
-      }
-    },
-    [value, onChange],
-  );
-
-  const searchHandler = useCallback(() => {
-    if (!inputRef.current) {
-      return;
-    }
-
-    if (value === undefined) {
-      setSearch(inputRef.current.value);
-    }
-    if (onSearch) {
-      onSearch(inputRef.current.value);
-    }
-  }, [value, onSearch]);
-
-  const inputValue = value ?? search;
 
   return (
-    <div className={s(styles, { listSearch: true })}>
-      <div className={s(styles, { inputBox: true })}>
-        <input
-          ref={inputRef}
-          name="search"
-          type="search"
-          className={s(styles, { input: true }, className)}
-          placeholder={translate(placeholder || 'ui_search')}
-          value={inputValue}
-          autoComplete="off"
-          disabled={disabled}
-          onChange={event => changeHandler(event.target.value)}
-        />
-        <div className={s(styles, { actionButton: true })}>
-          {!onSearch && inputValue ? (
-            <IconButton className={s(styles, { iconButton: true, crossIcon: true })} name="cross" onClick={() => changeHandler('')} />
-          ) : (
-            <IconButton className={s(styles, { iconButton: true })} name="search" onClick={searchHandler} />
-          )}
-        </div>
-      </div>
-    </div>
+    <Container className={s(styles, { listSearch: true }, className)} keepSize>
+      <Filter value={value} disabled={disabled} placeholder={translate(placeholder || 'ui_search')} onSearch={onSearch} onChange={onChange} />
+    </Container>
   );
 };

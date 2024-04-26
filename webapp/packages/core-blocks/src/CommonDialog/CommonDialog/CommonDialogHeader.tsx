@@ -9,7 +9,7 @@ import { observer } from 'mobx-react-lite';
 
 import type { ComponentStyle } from '@cloudbeaver/core-theming';
 
-import { Icon } from '../../Icon';
+import { ActionIconButton } from '../../ActionIconButton';
 import { IconOrImage } from '../../IconOrImage';
 import { useTranslate } from '../../localization/useTranslate';
 import { s } from '../../s';
@@ -51,7 +51,7 @@ export const CommonDialogHeader = observer<Props>(function CommonDialogHeader({
         <h3 className={s(computedStyles, { headerTitle: true })}>{translate(title)}</h3>
         {onReject && (
           <div className={s(computedStyles, { reject: true })}>
-            <Icon name="cross" viewBox="0 0 16 16" onClick={onReject} />
+            <ActionIconButton name="cross" viewBox="0 0 16 16" onClick={onReject} />
           </div>
         )}
       </div>

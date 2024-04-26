@@ -15,6 +15,9 @@
       "path": "../core-di/tsconfig.json"
     },
     {
+      "path": "../core-executor/tsconfig.json"
+    },
+    {
       "path": "../core-utils/tsconfig.json"
     }
   ],

@@ -30,7 +30,7 @@ export const ElementsTreeFilter = observer<Props>(function ElementsTreeFilter({ 
 
   return (
     <div ref={focusedRef} className={s(computedStyles, { filterBox: true }, className)}>
-      <Filter placeholder={translate('app_navigationTree_search')} value={tree.filter} max onChange={value => tree.setFilter(value as string)} />
+      <Filter placeholder={translate('app_navigationTree_search')} value={tree.filter} onChange={value => tree.setFilter(value as string)} />
     </div>
   );
 });
