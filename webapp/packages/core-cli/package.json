@@ -82,5 +82,8 @@
     "tsconfig-paths-webpack-plugin": "^4.1.0",
     "upath": "^2.0.1",
     "workbox-webpack-plugin": "^7.0.0"
+  },
+  "resolutions": {
+    "webpack-dev-middleware": "^7.2.1"
   }
 }
