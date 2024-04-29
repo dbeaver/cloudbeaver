@@ -8,7 +8,6 @@
 import { Dependency, injectable } from '@cloudbeaver/core-di';
 import {
   createSettingsAliasResolver,
-  ESettingsValueType,
   ROOT_SETTINGS_LAYER,
   SettingsManagerService,
   SettingsProvider,
@@ -16,8 +15,6 @@ import {
   SettingsResolverService,
 } from '@cloudbeaver/core-settings';
 import { schema, schemaExtra } from '@cloudbeaver/core-utils';
-
-import { LOG_VIEWER_SETTINGS_GROUP } from './LOG_VIEWER_SETTINGS_GROUP';
 
 const defaultSettings = schema.object({
   'plugin.log-viewer.refreshTimeout': schema.coerce.number().default(3000),

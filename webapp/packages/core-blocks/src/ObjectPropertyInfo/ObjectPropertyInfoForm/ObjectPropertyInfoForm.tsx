@@ -19,7 +19,7 @@ import { TextPlaceholder } from '../../TextPlaceholder';
 import { useS } from '../../useS';
 import { RenderField } from './RenderField';
 
-interface ObjectPropertyFormProps extends ILayoutSizeProps {
+export interface ObjectPropertyFormProps extends ILayoutSizeProps {
   properties: ReadonlyArray<ObjectPropertyInfo>;
   state?: Record<string, any>;
   defaultState?: Record<string, any>;

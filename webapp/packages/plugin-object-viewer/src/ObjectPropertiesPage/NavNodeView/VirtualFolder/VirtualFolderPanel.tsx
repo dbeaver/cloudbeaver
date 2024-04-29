@@ -7,7 +7,6 @@
  */
 import { observer } from 'mobx-react-lite';
 import { useEffect } from 'react';
-import styled, { css } from 'reshadow';
 
 import { TextPlaceholder, useOffsetPagination, useResource, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
@@ -16,17 +15,8 @@ import { isDefined } from '@cloudbeaver/core-utils';
 import { type NavNodeTransformViewComponent, NavNodeViewService } from '@cloudbeaver/plugin-navigation-tree';
 
 import { TableLoader } from '../../ObjectPropertyTable/Table/TableLoader';
+import classes from './VirtualFolderPanel.m.css';
 import { VirtualFolderUtils } from './VirtualFolderUtils';
-
-const style = css`
-  tab-wrapper {
-    position: relative;
-    width: 100%;
-    flex: 1 0 auto;
-    display: flex;
-    flex-direction: column;
-  }
-`;
 
 export const VirtualFolderPanel: NavNodeTransformViewComponent = observer(function VirtualFolderPanel({ folderId, nodeId }) {
   const translate = useTranslate();
@@ -52,15 +42,15 @@ export const VirtualFolderPanel: NavNodeTransformViewComponent = observer(functi
     navNodeViewService.logDuplicates(nodeId, duplicates);
   });
 
-  return styled(style)(
+  return (
     <>
       {objects.length === 0 ? (
         <TextPlaceholder>{translate('plugin_object_viewer_table_no_items')}</TextPlaceholder>
       ) : (
-        <tab-wrapper>
+        <div className={classes.tabWrapper}>
           <TableLoader objects={objects} hasNextPage={pagination?.hasNextPage ?? false} loadMore={pagination.loadMore} />
-        </tab-wrapper>
+        </div>
       )}
-    </>,
+    </>
   );
 });

@@ -35,6 +35,8 @@ export const Group = forwardRef<HTMLDivElement, Props & React.HTMLAttributes<HTM
   return (
     <div
       ref={ref}
+      role="group"
+      tabIndex={-1}
       {...divProps}
       className={s(
         styles,

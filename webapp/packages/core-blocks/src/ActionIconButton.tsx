@@ -12,8 +12,12 @@ import { IconButton, type IconButtonProps } from './IconButton';
 import { s } from './s';
 import { useS } from './useS';
 
-export const ActionIconButton: React.FC<IconButtonProps> = observer(function ActionIconButton(props) {
+export interface ActionIconButtonProps extends IconButtonProps {
+  primary?: boolean;
+}
+
+export const ActionIconButton: React.FC<ActionIconButtonProps> = observer(function ActionIconButton({ primary, ...rest }) {
   const styles = useS(style);
 
-  return <IconButton {...props} className={s(styles, { actionIconButton: true }, props.className)} />;
+  return <IconButton {...rest} className={s(styles, { actionIconButton: true, size: true, primary }, rest.className)} />;
 });

@@ -14,15 +14,17 @@ import elementsSizeStyles from './shared/ElementsSize.m.css';
 
 interface Props {
   sticky?: boolean;
+  header?: boolean;
 }
 
 export const GroupTitle: React.FC<Props & ILayoutSizeProps & React.HTMLAttributes<HTMLHeadingElement>> = function GroupTitle({
   sticky,
+  header,
   className,
   ...rest
 }) {
   const style = useS(styles, elementsSizeStyles);
   const divProps = filterLayoutFakeProps(rest);
   const layoutProps = getLayoutProps(rest);
-  return <h2 {...divProps} className={s(style, { groupTitle: true, sticky, ...layoutProps }, className)} />;
+  return <h2 tabIndex={-1} {...divProps} className={s(style, { groupTitle: true, sticky, header, ...layoutProps }, className)} />;
 };
