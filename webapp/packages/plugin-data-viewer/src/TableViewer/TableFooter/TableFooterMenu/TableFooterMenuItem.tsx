@@ -7,80 +7,75 @@
  */
 import { observer } from 'mobx-react-lite';
 import type { ButtonHTMLAttributes } from 'react';
-import styled, { css, use } from 'reshadow';
 
-import { IconOrImage, MenuTrigger, ToolsAction, useTranslate } from '@cloudbeaver/core-blocks';
+import {
+  IconOrImage,
+  MenuPanelItemAndTriggerStyles,
+  MenuTrigger,
+  s,
+  SContext,
+  StyleRegistry,
+  ToolsAction,
+  useS,
+  useTranslate,
+} from '@cloudbeaver/core-blocks';
 import type { IMenuItem } from '@cloudbeaver/core-dialogs';
+
+import styles from './TableFooterMenuItem.m.css';
 
 type Props = ButtonHTMLAttributes<any> & {
   menuItem: IMenuItem;
 };
 
-export const tableFooterMenuStyles = css`
-  Menu {
-    composes: theme-text-on-surface from global;
-  }
-  MenuTrigger {
-    composes: theme-ripple from global;
-    height: 100%;
-    padding: 0 12px;
-    display: flex;
-    align-items: center;
-    cursor: pointer;
-    &[|hidden] {
-      display: none;
-    }
-  }
-  ToolsAction[|hidden] {
-    display: none;
-  }
-  menu-trigger-icon IconOrImage {
-    display: block;
-    width: 16px;
-  }
-  menu-trigger-title {
-    display: block;
-  }
-  menu-trigger-icon + menu-trigger-title {
-    padding-left: 8px;
-  }
-`;
+const registry: StyleRegistry = [
+  [
+    MenuPanelItemAndTriggerStyles,
+    {
+      mode: 'append',
+      styles: [styles],
+    },
+  ],
+];
 
 export const TableFooterMenuItem = observer<Props>(function TableFooterMenuItem({ menuItem, ...props }) {
   const translate = useTranslate();
+  const style = useS(styles);
 
   if (!menuItem.panel) {
-    return styled(tableFooterMenuStyles)(
-      <ToolsAction
-        {...props}
-        {...use({ hidden: menuItem.isHidden })}
-        title={translate(menuItem.tooltip)}
-        icon={menuItem.icon}
-        viewBox="0 0 32 32"
-        disabled={menuItem.isDisabled}
-        onClick={() => menuItem.onClick?.()}
-      >
-        {translate(menuItem.title)}
-      </ToolsAction>,
+    return (
+      <SContext registry={registry}>
+        <ToolsAction
+          {...props}
+          className={s(style, { toolsAction: true, hidden: menuItem.isHidden })}
+          title={translate(menuItem.tooltip)}
+          icon={menuItem.icon}
+          viewBox="0 0 32 32"
+          disabled={menuItem.isDisabled}
+          onClick={() => menuItem.onClick?.()}
+        >
+          {translate(menuItem.title)}
+        </ToolsAction>
+      </SContext>
     );
   }
 
-  return styled(tableFooterMenuStyles)(
-    <MenuTrigger
-      {...props}
-      {...use({ hidden: menuItem.isHidden })}
-      title={translate(menuItem.tooltip)}
-      panel={menuItem.panel}
-      disabled={menuItem.isDisabled}
-      style={[tableFooterMenuStyles]}
-      modal
-    >
-      {menuItem.icon && (
-        <menu-trigger-icon>
-          <IconOrImage icon={menuItem.icon} viewBox="0 0 32 32" />
-        </menu-trigger-icon>
-      )}
-      {menuItem.title && <menu-trigger-title>{translate(menuItem.title)}</menu-trigger-title>}
-    </MenuTrigger>,
+  return (
+    <SContext registry={registry}>
+      <MenuTrigger
+        {...props}
+        className={s(style, { menuTrigger: true, hidden: menuItem.isHidden })}
+        title={translate(menuItem.tooltip)}
+        panel={menuItem.panel}
+        disabled={menuItem.isDisabled}
+        modal
+      >
+        {menuItem.icon && (
+          <div className={s(style, { menuTriggerIcon: true })}>
+            <IconOrImage className={s(style, { iconOrImage: true })} icon={menuItem.icon} viewBox="0 0 32 32" />
+          </div>
+        )}
+        {menuItem.title && <div className={s(style, { menuTriggerTitle: true })}>{translate(menuItem.title)}</div>}
+      </MenuTrigger>
+    </SContext>
   );
 });
