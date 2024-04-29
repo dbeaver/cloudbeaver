@@ -7,7 +7,6 @@
  */
 import { observer } from 'mobx-react-lite';
 import { useCallback, useState } from 'react';
-import styled from 'reshadow';
 
 import { IScrollState, Link, s, useControlledScroll, useExecutor, useS, useStyles, useTable, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
@@ -81,7 +80,7 @@ export const Table = observer<TableProps>(function Table({ objects, hasNextPage,
 
   const [tableContainer, setTableContainerRef] = useState<HTMLDivElement | null>(null);
   const translate = useTranslate();
-  const deprecatedStyles = useStyles(baseStyles, tableStyles);
+
   const tableState = useTable();
   const tabLocalState = useTabLocalState<IScrollState>(() => ({ scrollTop: 0, scrollLeft: 0 }));
 
@@ -116,6 +115,8 @@ export const Table = observer<TableProps>(function Table({ objects, hasNextPage,
     [loadMore],
   );
 
+  useS(baseStyles, tableStyles);
+
   useExecutor({
     executor: navTreeResource.onItemDelete,
     handlers: [
@@ -129,7 +130,7 @@ export const Table = observer<TableProps>(function Table({ objects, hasNextPage,
     return null;
   }
 
-  return styled(deprecatedStyles)(
+  return (
     <TableContext.Provider value={{ tableData, tableState }}>
       <div ref={setTableContainerRef} className={s(styles, { container: true }, 'metadata-grid-container')}>
         <DataGrid
@@ -149,7 +150,7 @@ export const Table = observer<TableProps>(function Table({ objects, hasNextPage,
         )}
         <ObjectPropertyTableFooter className={s(styles, { objectPropertyTableFooter: true })} state={tableState} />
       </div>
-    </TableContext.Provider>,
+    </TableContext.Provider>
   );
 });
 

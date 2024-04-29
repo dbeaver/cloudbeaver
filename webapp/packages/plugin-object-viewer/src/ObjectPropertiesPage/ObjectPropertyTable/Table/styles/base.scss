@@ -6,54 +6,56 @@
  * you may not use this file except in compliance with the License.
  */
 
-.metadata-grid-container {
-  .cb-metadata-grid-theme {
-    outline: 0 !important;
-    height: 100% !important;
-    background-color: inherit !important;
-    border: none !important;
-    font-family: inherit !important;
-    font-size: inherit !important;
-
-    * {
-      font-size: inherit !important;
+:global {
+  .metadata-grid-container {
+    .cb-metadata-grid-theme {
+      outline: 0 !important;
+      height: 100% !important;
+      background-color: inherit !important;
+      border: none !important;
       font-family: inherit !important;
-    }
+      font-size: inherit !important;
 
-    .rdg-header-row,
-    .rdg-row {
-      background-color: transparent !important;
-    }
+      * {
+        font-size: inherit !important;
+        font-family: inherit !important;
+      }
 
-    .rdg-header-row {
-      text-transform: uppercase !important;
-    }
+      .rdg-header-row,
+      .rdg-row {
+        background-color: transparent !important;
+      }
 
-    .rdg-cell {
-      border-color: transparent !important;
-      display: flex !important;
-      flex-direction: row !important;
-      user-select: text !important;
+      .rdg-header-row {
+        text-transform: uppercase !important;
+      }
 
-      &.rdg-cell-frozen {
+      .rdg-cell {
+        border-color: transparent !important;
+        display: flex !important;
+        flex-direction: row !important;
+        user-select: text !important;
+
+        &.rdg-cell-frozen {
+          box-shadow: none !important;
+        }
+      }
+
+      .rdg-cell:global([aria-selected='true']) {
         box-shadow: none !important;
       }
-    }
 
-    .rdg-cell:global([aria-selected='true']) {
-      box-shadow: none !important;
-    }
+      .cell-formatter {
+        display: flex !important;
+        align-items: center !important;
+        width: 100% !important;
+      }
 
-    .cell-formatter {
-      display: flex !important;
-      align-items: center !important;
-      width: 100% !important;
-    }
-
-    .cell-formatter__value {
-      overflow: hidden !important;
-      white-space: nowrap !important;
-      text-overflow: ellipsis !important;
+      .cell-formatter__value {
+        overflow: hidden !important;
+        white-space: nowrap !important;
+        text-overflow: ellipsis !important;
+      }
     }
   }
 }
