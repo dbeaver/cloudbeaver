@@ -16,6 +16,7 @@ export default [
   ['ui_processing_loading', 'Загрузка...'],
   ['ui_processing_cancel', 'Отменить'],
   ['ui_processing_canceling', 'Отмена...'],
+  ['ui_processing_canceled', 'Отменено'],
   ['ui_processing_reload', 'Перезагрузить'],
   ['ui_processing_retry', 'Повторить'],
   ['ui_processing_ok', 'Принять'],

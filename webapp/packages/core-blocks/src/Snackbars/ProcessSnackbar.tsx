@@ -24,6 +24,7 @@ import { SnackbarWrapper } from './SnackbarMarkups/SnackbarWrapper';
 export interface ProcessSnackbarProps extends INotificationProcessExtraProps {
   closeDelay?: number;
   displayDelay?: number;
+  onCancel?: () => void | Promise<void>;
 }
 
 export const ProcessSnackbar: NotificationComponent<ProcessSnackbarProps> = observer(function ProcessSnackbar({
@@ -31,6 +32,7 @@ export const ProcessSnackbar: NotificationComponent<ProcessSnackbarProps> = obse
   displayDelay = 750,
   notification,
   state,
+  onCancel,
 }) {
   const { error, title, message, status } = state!;
 
@@ -65,6 +67,12 @@ export const ProcessSnackbar: NotificationComponent<ProcessSnackbarProps> = obse
           {details.hasDetails && (
             <Button type="button" mod={['outlined']} disabled={details.isOpen} onClick={details.open}>
               {translate('ui_errors_details')}
+            </Button>
+          )}
+
+          {onCancel && status === ENotificationType.Loading && (
+            <Button mod={['unelevated']} onClick={onCancel}>
+              {translate('ui_processing_cancel')}
             </Button>
           )}
         </SnackbarFooter>
