@@ -31,4 +31,8 @@ public class WebGlobalWorkspace extends EclipseWorkspaceImpl {
         super(platform, eclipseWorkspace);
     }
 
+    @Override
+    protected String initWorkspaceId() {
+        return readWorkspaceIdProperty();
+    }
 }
