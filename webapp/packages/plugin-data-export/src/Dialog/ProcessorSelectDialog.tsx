@@ -7,7 +7,7 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import { CommonDialogBody, CommonDialogHeader, CommonDialogWrapper, s, useResource, useS } from '@cloudbeaver/core-blocks';
+import { CommonDialogBody, CommonDialogHeader, CommonDialogWrapper, s, useFocus, useResource, useS } from '@cloudbeaver/core-blocks';
 import { CachedMapAllKey } from '@cloudbeaver/core-resource';
 import type { DataTransferProcessorInfo } from '@cloudbeaver/core-sdk';
 
@@ -23,6 +23,7 @@ interface Props {
 }
 
 export const ProcessorSelectDialog = observer<Props>(function ProcessorSelectDialog({ context, onSelect, onClose }) {
+  const [focusedRef] = useFocus<HTMLDivElement>({ focusFirstChild: true });
   const styles = useS(style);
   const dataTransferProcessorsResource = useResource(ProcessorSelectDialog, DataTransferProcessorsResource, CachedMapAllKey, {
     forceSuspense: true,
@@ -31,7 +32,7 @@ export const ProcessorSelectDialog = observer<Props>(function ProcessorSelectDia
   const processors = dataTransferProcessorsResource.resource.values.slice().sort(sortProcessors);
 
   return (
-    <CommonDialogWrapper size="large" fixedSize>
+    <CommonDialogWrapper ref={focusedRef} size="large" fixedSize>
       <CommonDialogHeader title="data_transfer_dialog_title" subTitle={context.name} onReject={onClose} />
       <CommonDialogBody noBodyPadding noOverflow>
         {context.query && (

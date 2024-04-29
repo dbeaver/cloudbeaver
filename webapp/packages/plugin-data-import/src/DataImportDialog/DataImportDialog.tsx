@@ -15,6 +15,7 @@ import {
   CommonDialogWrapper,
   Container,
   Fill,
+  useFocus,
   useTranslate,
 } from '@cloudbeaver/core-blocks';
 import type { DialogComponent } from '@cloudbeaver/core-dialogs';
@@ -40,6 +41,7 @@ export const DataImportDialog: DialogComponent<IDataImportDialogPayload, IDataIm
   resolveDialog,
   rejectDialog,
 }) {
+  const [focusedRef] = useFocus<HTMLDivElement>({ focusFirstChild: true });
   const translate = useTranslate();
   const dialog = useDataImportDialog(payload.initialState);
 
@@ -52,7 +54,7 @@ export const DataImportDialog: DialogComponent<IDataImportDialogPayload, IDataIm
   }
 
   return (
-    <CommonDialogWrapper size="large" fixedSize>
+    <CommonDialogWrapper ref={focusedRef} size="large" fixedSize>
       <CommonDialogHeader title={title} subTitle={payload.tableName} icon={icon} onReject={rejectDialog} />
       <CommonDialogBody noBodyPadding>
         {dialog.state.step === EDataImportDialogStep.Processor && <ImportProcessorList onSelect={dialog.selectProcessor} />}

@@ -19,6 +19,7 @@ import {
   s,
   SContext,
   useErrorDetails,
+  useFocus,
   useS,
   useTranslate,
 } from '@cloudbeaver/core-blocks';
@@ -57,6 +58,7 @@ export const ProcessorConfigureDialog = observer<Props>(function ProcessorConfig
   onBack,
   onExport,
 }) {
+  const [focusedRef] = useFocus<HTMLDivElement>({ focusFirstChild: true });
   const translate = useTranslate();
   const styles = useS(style);
 
@@ -81,7 +83,7 @@ export const ProcessorConfigureDialog = observer<Props>(function ProcessorConfig
   }
 
   return (
-    <CommonDialogWrapper className={s(styles, { container: true })} size="large" fixedSize>
+    <CommonDialogWrapper ref={focusedRef} className={s(styles, { container: true })} size="large" fixedSize>
       <CommonDialogHeader title={title} onReject={onClose} />
       <CommonDialogBody noOverflow noBodyPadding>
         {!processor.isBinary ? (

@@ -54,6 +54,7 @@ export const CommonDialogWrapper = observer<CommonDialogWrapperProps, HTMLDivEle
         modal={false}
       >
         <dialog
+          tabIndex={0}
           className={s(
             computedStyles,
             { dialog: true, small: size === 'small', medium: size === 'medium', large: size === 'large', fixedSize, fixedWidth, freeHeight },
