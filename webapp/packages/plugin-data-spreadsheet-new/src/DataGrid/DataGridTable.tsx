@@ -7,9 +7,8 @@
  */
 import { observer } from 'mobx-react-lite';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import styled from 'reshadow';
 
-import { TextPlaceholder, useObjectRef, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
+import { TextPlaceholder, useObjectRef, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { EventContext, EventStopPropagationFlag } from '@cloudbeaver/core-events';
 import { Executor } from '@cloudbeaver/core-executor';
@@ -77,7 +76,6 @@ export const DataGridTable = observer<IDataPresentationProps<any, IDatabaseResul
     }),
     false,
   );
-  const styles = useStyles(reactGridStyles, baseStyles);
   const [columnResize] = useState(() => new Executor<IColumnResizeInfo>());
 
   const selectionAction = model.source.getAction(resultIndex, ResultSetSelectAction);
@@ -272,6 +270,8 @@ export const DataGridTable = observer<IDataPresentationProps<any, IDatabaseResul
     editingContext.edit({ idx, rowIdx }, event.nativeEvent.code, event.key);
   }
 
+  useS(reactGridStyles, baseStyles);
+
   useEffect(() => {
     function syncEditor(data: IResultSetEditActionData) {
       const editor = tableData.editor;
@@ -419,12 +419,12 @@ export const DataGridTable = observer<IDataPresentationProps<any, IDatabaseResul
     return <TextPlaceholder>{translate('data_grid_table_empty_placeholder')}</TextPlaceholder>;
   }
 
-  return styled(styles)(
+  return (
     <DataGridContext.Provider value={gridContext}>
       <DataGridSelectionContext.Provider value={gridSelectionContext}>
         <EditingContext.Provider value={editingContext}>
           <TableDataContext.Provider value={tableData}>
-            <grid-container
+            <div
               ref={setContainersRef}
               className="cb-react-grid-container"
               tabIndex={-1}
@@ -453,10 +453,10 @@ export const DataGridTable = observer<IDataPresentationProps<any, IDatabaseResul
                 onScroll={handleScroll}
               />
               <div ref={editorRef} />
-            </grid-container>
+            </div>
           </TableDataContext.Provider>
         </EditingContext.Provider>
       </DataGridSelectionContext.Provider>
-    </DataGridContext.Provider>,
+    </DataGridContext.Provider>
   );
 });
