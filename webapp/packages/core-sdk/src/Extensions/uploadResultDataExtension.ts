@@ -19,6 +19,7 @@ export interface IUploadResultDataExtension {
     processorId: string,
     file: File,
     onUploadProgress?: (event: UploadProgressEvent) => void,
+    signal?: AbortSignal,
   ) => Promise<AsyncTaskInfo>;
 }
 
@@ -32,6 +33,7 @@ export function uploadResultDataExtension(client: CustomGraphQLClient): IUploadR
       processorId: string,
       file: File,
       onUploadProgress?: (event: UploadProgressEvent) => void,
+      signal?: AbortSignal,
     ): Promise<AsyncTaskInfo> {
       return client.uploadFile(
         GlobalConstants.absoluteServiceUrl('data', 'import'),
@@ -39,6 +41,7 @@ export function uploadResultDataExtension(client: CustomGraphQLClient): IUploadR
         undefined,
         { connectionId, contextId, projectId, resultsId, processorId },
         onUploadProgress,
+        signal,
       );
     },
   };

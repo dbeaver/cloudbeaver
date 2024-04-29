@@ -14,53 +14,44 @@
   align-items: center;
   opacity: 0;
   transition: opacity cubic-bezier(0.4, 0, 0.2, 1) 0.3s;
-
   &:global(.animate) {
     opacity: 1;
   }
-
   & .staticImage {
     height: 100%;
     width: 100%;
     display: none;
   }
-
-  & .secondary,
-  & .overlay,
+  &.secondary,
+  &.overlay,
   &:global(.secondary),
   &:global(.overlay) {
-    &:not(.small),
-    &:not(:global(.small)) {
-      & .secondaryIcon {
+    &:not(.small):not(:global(.small)) {
+      & .staticImage.secondaryIcon {
         display: block;
       }
     }
-
-    & .small,
+    &.small,
     &:global(.small) {
-      & .secondarySmallIcon {
+      & .staticImage.secondarySmallIcon {
         display: block;
       }
     }
   }
-
   &:not(.secondary):not(.overlay):not(:global(.secondary)):not(:global(.overlay)) {
-    &:not(.small),
-    &:not(:global(.small)) {
-      & .primaryIcon {
+    &:not(.small):not(:global(.small)) {
+      & .staticImage.primaryIcon {
         display: block;
       }
     }
-
-    & .small,
+    &.small,
     &:global(.small) {
-      & .primarySmallIcon {
+      & .staticImage.primarySmallIcon {
         display: block;
       }
     }
   }
 }
-
 .icon {
   display: flex;
   align-items: center;
@@ -69,21 +60,17 @@
   height: 40px;
   animation: rotation 2s infinite linear;
 }
-
 .message {
   padding: 16px;
 }
-
 .actions {
   padding-top: 42px;
 }
-
-.inline {
+.loader.inline {
   height: 38px;
   flex-direction: row;
   margin: 0;
   justify-content: left;
-
   & .icon {
     width: 24px;
     height: 24px;
@@ -96,8 +83,7 @@
     padding: 0;
   }
 }
-
-.small {
+.loader.small {
   & .icon {
     width: 16px;
     height: 16px;
@@ -106,16 +92,13 @@
     display: none;
   }
 }
-
-.fullSize {
+.loader.fullSize {
   height: 100%;
-
   & .icon {
     width: 100%;
     height: 100%;
   }
 }
-
 @keyframes rotation {
   from {
     transform: rotate(0deg);

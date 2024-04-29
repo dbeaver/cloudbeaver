@@ -39,28 +39,49 @@ export class DataImportService {
   }
 
   async importData(connectionId: string, contextId: string, projectId: string, resultsId: string, processorId: string, file: File) {
+    const abortController = new AbortController();
+    let cancelImplementation: (() => void | Promise<void>) | null;
+
+    function cancel() {
+      cancelImplementation?.();
+    }
+
     const { controller, notification } = this.notificationService.processNotification(
       () => ProcessSnackbar,
-      {},
-      { title: 'plugin_data_import_process_title', message: file.name },
+      {
+        onCancel: cancel,
+      },
+      { title: 'plugin_data_import_process_title', message: file.name, onClose: cancel },
     );
 
     try {
-      const result = await this.graphQLService.sdk.uploadResultData(connectionId, contextId, projectId, resultsId, processorId, file, event => {
-        if (event.total !== undefined) {
-          const percentCompleted = getProgressPercent(event.loaded, event.total);
+      cancelImplementation = () => abortController.abort();
 
-          if (notification.message) {
-            controller.setMessage(`${percentCompleted}%\n${notification.message}`);
+      const result = await this.graphQLService.sdk.uploadResultData(
+        connectionId,
+        contextId,
+        projectId,
+        resultsId,
+        processorId,
+        file,
+        event => {
+          if (event.total !== undefined) {
+            const percentCompleted = getProgressPercent(event.loaded, event.total);
+
+            if (notification.message) {
+              controller.setMessage(`${percentCompleted}%\n${notification.message}`);
+            }
           }
-        }
-      });
+        },
+        abortController.signal,
+      );
 
       const task = this.asyncTaskInfoService.create(async () => {
         const { taskInfo } = await this.graphQLService.sdk.getAsyncTaskInfo({ taskId: result.id, removeOnFinish: false });
         return taskInfo;
       });
 
+      cancelImplementation = () => this.asyncTaskInfoService.cancel(task.id);
       controller.setMessage('plugin_data_import_process_file_processing_step_message');
       await this.asyncTaskInfoService.run(task);
 
@@ -69,6 +90,8 @@ export class DataImportService {
     } catch (exception: any) {
       controller.reject(exception, 'plugin_data_import_process_fail');
       return false;
+    } finally {
+      cancelImplementation = null;
     }
   }
 }

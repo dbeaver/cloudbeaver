@@ -18,6 +18,7 @@ export default [
   ['ui_processing_loading', 'Caricamento...'],
   ['ui_processing_cancel', 'Annulla'],
   ['ui_processing_canceling', 'Annullamento...'],
+  ['ui_processing_canceled', 'Canceled'],
   ['ui_processing_retry', 'Riprova'],
   ['ui_processing_ok', 'Ok'],
   ['ui_processing_create', 'Crea'],

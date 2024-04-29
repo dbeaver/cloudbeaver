@@ -9,7 +9,6 @@
 .menu {
   composes: theme-text-on-surface from global;
 }
-
 .menuTrigger {
   composes: theme-ripple from global;
   height: 100%;
@@ -21,20 +20,16 @@
     display: none;
   }
 }
-
-.toolsAction .hidden {
+.toolsAction.hidden {
   display: none;
 }
-
 .menuTriggerIcon .iconOrImage {
   display: block;
   width: 16px;
 }
-
 .menuTriggerTitle {
   display: block;
 }
-
 .menuTriggerIcon + .menuTriggerTitle {
   padding-left: 8px;
 }

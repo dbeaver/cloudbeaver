@@ -21,7 +21,6 @@
 .menuPanelItem {
   composes: theme-border-color-background from global;
 }
-
 .box {
   display: flex;
   align-items: center;
@@ -45,7 +44,6 @@
   composes: theme-typography--body2 theme-elevation-z5 from global;
   min-width: 140px;
   padding: 12px 0;
-
   & .menuBox {
     margin-top: -12px;
   }
@@ -68,12 +66,10 @@
   color: inherit;
   cursor: pointer;
   white-space: nowrap;
-
-  & .use,
-  & .hidden {
+  &.use,
+  &.hidden {
     display: none;
   }
-
   &:hover,
   &:global([aria-expanded='true']) {
     & .icon {
@@ -81,14 +77,13 @@
     }
   }
 }
-
 .menuPanelItem {
   flex: 1;
   display: flex;
   align-items: center;
   height: 30px;
   padding: 0 4px;
-  & .separator {
+  &.separator {
     border-bottom: 1px solid;
   }
   & .menuItemText {
