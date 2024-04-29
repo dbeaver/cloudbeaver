@@ -58,7 +58,7 @@ export const TableFooter = observer<Props>(function TableFooter({ resultIndex, m
   return (
     <ToolsPanel type="secondary" center>
       <AutoRefreshButton model={model} disabled={disabled} />
-      <count className={s(style, { count: true })}>
+      <div className={s(style, { count: true })}>
         <Form onSubmit={handleChange}>
           <input
             ref={ref}
@@ -72,7 +72,7 @@ export const TableFooter = observer<Props>(function TableFooter({ resultIndex, m
             onBlur={handleChange}
           />
         </Form>
-      </count>
+      </div>
       {constraint?.supported && <TableFooterRowCount model={model} resultIndex={resultIndex} />}
       <TableFooterMenu model={model} resultIndex={resultIndex} simple={simple} context={context} />
       {model.source.requestInfo.requestMessage.length > 0 && (

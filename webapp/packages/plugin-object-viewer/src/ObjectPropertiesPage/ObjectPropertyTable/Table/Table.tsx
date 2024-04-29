@@ -8,7 +8,7 @@
 import { observer } from 'mobx-react-lite';
 import { useCallback, useState } from 'react';
 
-import { IScrollState, Link, s, useControlledScroll, useExecutor, useS, useStyles, useTable, useTranslate } from '@cloudbeaver/core-blocks';
+import { IScrollState, Link, s, useControlledScroll, useExecutor, useS, useTable, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { type DBObject, NavTreeResource } from '@cloudbeaver/core-navigation-tree';
 import type { ObjectPropertyInfo } from '@cloudbeaver/core-sdk';
