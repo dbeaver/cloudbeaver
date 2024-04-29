@@ -8,18 +8,17 @@
 /// <reference lib="WebWorker" />
 import { Workbox } from 'workbox-window';
 
-import { displayUpdateStatus, Disposable, injectable } from '@cloudbeaver/core-di';
+import { Disposable, injectable } from '@cloudbeaver/core-di';
 import { Executor, IExecutor } from '@cloudbeaver/core-executor';
 import { GlobalConstants } from '@cloudbeaver/core-utils';
 
 @injectable()
 export class ServiceWorkerService extends Disposable {
-  readonly onUpdate: IExecutor;
+  readonly onUpdate: IExecutor<number>;
 
   private readonly workerURL: string;
   private workbox: Workbox | null;
   private updateIntervalId: ReturnType<typeof setInterval> | null;
-  private waitUpdating: boolean;
 
   constructor() {
     super();
@@ -27,7 +26,6 @@ export class ServiceWorkerService extends Disposable {
     this.workerURL = GlobalConstants.absoluteRootUrl('service-worker.js');
     this.workbox = null;
     this.updateIntervalId = null;
-    this.waitUpdating = false;
   }
 
   async register(): Promise<void> {
@@ -42,20 +40,7 @@ export class ServiceWorkerService extends Disposable {
         this.workbox = new Workbox(this.workerURL);
         this.registerRefreshAfterUpdate();
 
-        const reg = await this.workbox.register();
-
-        if (reg) {
-          if (reg.active && (reg.waiting || reg.installing)) {
-            this.updating();
-          }
-
-          reg.addEventListener('updatefound', () => {
-            if (reg.active) {
-              this.updating();
-            }
-          });
-          await this.workbox.update();
-        }
+        this.workbox.register().then(sw => sw?.update());
       }
     } catch (e) {
       console.log(e);
@@ -63,18 +48,6 @@ export class ServiceWorkerService extends Disposable {
   }
 
   async load(): Promise<void> {
-    try {
-      if (this.workbox) {
-        await this.workbox.update();
-      }
-    } catch (e) {
-      console.log(e);
-    }
-
-    if (this.waitUpdating) {
-      await new Promise(() => {});
-    }
-
     this.updateIntervalId = setInterval(() => this.workbox?.update(), 1000 * 60 * 60 * 24);
   }
 
@@ -89,6 +62,18 @@ export class ServiceWorkerService extends Disposable {
       return;
     }
 
+    this.workbox.addEventListener('message', ({ data }) => {
+      switch (data.type) {
+        case 'update-progress':
+          {
+            const progress = Math.floor(Math.min(1, Math.max(0, data.progress)) * 100) / 100;
+            this.onUpdate.execute(progress);
+            // displayUpdateStatus(progress); // this can be enabled to display splash screen with updating state
+          }
+          break;
+      }
+    });
+
     this.workbox.addEventListener('controlling', async event => {
       if (!event.isUpdate) {
         return;
@@ -96,14 +81,5 @@ export class ServiceWorkerService extends Disposable {
 
       window.location.reload();
     });
-  }
-
-  private updating() {
-    if (this.waitUpdating) {
-      return;
-    }
-    this.waitUpdating = true;
-    displayUpdateStatus();
-    this.onUpdate.execute();
   }
 }

@@ -6,9 +6,10 @@
  * you may not use this file except in compliance with the License.
  */
 import { CacheableResponsePlugin } from 'workbox-cacheable-response';
-import { clientsClaim } from 'workbox-core';
+import { cacheNames, clientsClaim, WorkboxPlugin } from 'workbox-core';
 import { ExpirationPlugin } from 'workbox-expiration';
-import { cleanupOutdatedCaches, matchPrecache, precacheAndRoute } from 'workbox-precaching';
+import { addPlugins, matchPrecache, precacheAndRoute } from 'workbox-precaching';
+import { getOrCreatePrecacheController } from 'workbox-precaching/utils/getOrCreatePrecacheController';
 import { registerRoute } from 'workbox-routing';
 import { CacheFirst } from 'workbox-strategies';
 
@@ -53,12 +54,45 @@ self.addEventListener('install', () => {
 });
 
 clientsClaim();
-cleanupOutdatedCaches();
 precacheAndRoute(manifest);
+
+function createUpdateProgressPlugin(): WorkboxPlugin {
+  const precacheController = getOrCreatePrecacheController();
+  let updated = 0;
+  let firstInstall = null as boolean | null;
+
+  return {
+    handlerWillStart: async ({ request, state }) => {
+      if (state) {
+        state.originalRequest = request;
+      }
+      if (firstInstall === null) {
+        firstInstall = (await caches.has(cacheNames.precache)) === false;
+      }
+    },
+    cachedResponseWillBeUsed: async ({ event, cachedResponse, cacheName }) => {
+      if (!firstInstall && event.type === 'install' && cacheName === cacheNames.precache) {
+        updated++;
+
+        const clients = await self.clients.matchAll({ includeUncontrolled: true });
+        clients.forEach(client => {
+          client.postMessage({
+            type: 'update-progress',
+            progress: updated / (precacheController.getURLsToCacheKeys().size ?? 1),
+          });
+        });
+      }
+
+      return cachedResponse;
+    },
+  };
+}
+
+addPlugins([createUpdateProgressPlugin()]);
 
 const cacheName = 'images';
 const maxAgeSeconds = 30 * 24 * 60 * 60;
-const maxEntries = 60;
+const maxEntries = 1000;
 
 registerRoute(
   ({ request }) => request.destination === 'image',
