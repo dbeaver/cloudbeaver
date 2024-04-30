@@ -16,7 +16,7 @@ import { s, useS, useSplit, useTranslate } from '@cloudbeaver/core-blocks';
 import type { IResultSetElementKey, IResultSetValue } from '@cloudbeaver/plugin-data-viewer';
 
 import styles from './LeafletMap.m.css';
-import baseStyles from './styles/base.scss';
+import './styles/base.scss';
 
 export interface IAssociatedValue {
   key: string;
@@ -170,7 +170,7 @@ export const LeafletMap: React.FC<Props> = function LeafletMap({ geoJSON, crsKey
     }
   }, [split.state.isResizing, split.state.mode, mapRef]);
 
-  const style = useS(styles, baseStyles);
+  const style = useS(styles);
 
   return (
     <MapContainer ref={setMapRef} className={s(style, { mapContainer: true })} crs={leaflet.CRS.EPSG3857} zoom={12}>

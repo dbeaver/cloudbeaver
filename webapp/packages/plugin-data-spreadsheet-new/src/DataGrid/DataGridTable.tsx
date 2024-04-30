@@ -30,7 +30,7 @@ import '@cloudbeaver/plugin-react-data-grid/react-data-grid-dist/lib/styles.css'
 
 import { CellPosition, EditingContext } from '../Editing/EditingContext';
 import { useEditing } from '../Editing/useEditing';
-import baseStyles from '../styles/base.scss';
+import '../styles/base.scss';
 import { reactGridStyles } from '../styles/styles';
 import { CellRenderer } from './CellRenderer/CellRenderer';
 import { DataGridContext, IColumnResizeInfo, IDataGridContext } from './DataGridContext';
@@ -270,7 +270,7 @@ export const DataGridTable = observer<IDataPresentationProps<any, IDatabaseResul
     editingContext.edit({ idx, rowIdx }, event.nativeEvent.code, event.key);
   }
 
-  useS(reactGridStyles, baseStyles);
+  useS(reactGridStyles);
 
   useEffect(() => {
     function syncEditor(data: IResultSetEditActionData) {

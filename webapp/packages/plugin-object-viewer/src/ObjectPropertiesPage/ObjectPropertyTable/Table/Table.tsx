@@ -24,7 +24,7 @@ import type { IDataColumn } from './Column';
 import { ColumnIcon } from './Columns/ColumnIcon/ColumnIcon';
 import { ColumnSelect } from './Columns/ColumnSelect/ColumnSelect';
 import { HeaderRenderer } from './HeaderRenderer';
-import baseStyles from './styles/base.scss';
+import './styles/base.scss';
 import { tableStyles } from './styles/styles';
 import classes from './Table.m.css';
 import { TableContext } from './TableContext';
@@ -75,7 +75,7 @@ function getMeasuredCells(columns: ObjectPropertyInfo[], rows: DBObject[]) {
 const CUSTOM_COLUMNS = [ColumnSelect, ColumnIcon];
 
 export const Table = observer<TableProps>(function Table({ objects, hasNextPage, loadMore }) {
-  const styles = useS(classes);
+  const styles = useS(classes, tableStyles);
   const navTreeResource = useService(NavTreeResource);
 
   const [tableContainer, setTableContainerRef] = useState<HTMLDivElement | null>(null);
@@ -114,8 +114,6 @@ export const Table = observer<TableProps>(function Table({ objects, hasNextPage,
     },
     [loadMore],
   );
-
-  useS(baseStyles, tableStyles);
 
   useExecutor({
     executor: navTreeResource.onItemDelete,
