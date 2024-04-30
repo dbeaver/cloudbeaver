@@ -8,18 +8,16 @@
 
 @import 'leaflet/dist/leaflet.css';
 
-:global {
-  /* TODO remove when the global 'input' and 'a' styles are not applied anymore */
-  .leaflet-control-layers-selector {
-    width: unset !important;
-    min-height: unset !important;
-  }
+/* TODO remove when the global 'input' and 'a' styles are not applied anymore */
+.leaflet-control-layers-selector {
+  width: unset !important;
+  min-height: unset !important;
+}
 
-  .leaflet-control-zoom-out,
-  .leaflet-control-zoom-in,
-  .leaflet-control-zoom-out:hover,
-  .leaflet-control-zoom-out:hover {
-    color: black !important;
-    text-decoration: none !important;
-  }
+.leaflet-control-zoom-out,
+.leaflet-control-zoom-in,
+.leaflet-control-zoom-out:hover,
+.leaflet-control-zoom-out:hover {
+  color: black !important;
+  text-decoration: none !important;
 }
