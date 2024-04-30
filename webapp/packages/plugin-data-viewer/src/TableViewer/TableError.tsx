@@ -7,6 +7,7 @@
  */
 import { observable } from 'mobx';
 import { observer } from 'mobx-react-lite';
+import { useEffect } from 'react';
 import styled, { css, use } from 'reshadow';
 
 import { Button, IconOrImage, useErrorDetails, useObservableRef, useStateDelay, useTranslate } from '@cloudbeaver/core-blocks';
@@ -14,7 +15,6 @@ import { ServerErrorType, ServerInternalError } from '@cloudbeaver/core-sdk';
 import { errorOf } from '@cloudbeaver/core-utils';
 
 import type { IDatabaseDataModel } from '../DatabaseDataModel/IDatabaseDataModel';
-import { useEffect } from 'react';
 
 const style = css`
   error {
@@ -30,7 +30,11 @@ const style = css`
     right: 0;
     z-index: 1;
     opacity: 0;
-    transition: opacity 0.3s ease-in-out, width 0.3s ease-in-out, height 0.3s ease-in-out, background 0.3s ease-in-out;
+    transition:
+      opacity 0.3s ease-in-out,
+      width 0.3s ease-in-out,
+      height 0.3s ease-in-out,
+      background 0.3s ease-in-out;
 
     &[|animated] {
       overflow: hidden;
@@ -145,7 +149,13 @@ export const TableError = observer<Props>(function TableError({ model, loading, 
   }, [errorInfo, model.source.error]);
 
   return styled(style)(
-    <error {...use({ animated, collapsed: !errorInfo.display, errorHidden })} className={className}>
+    <error
+      role="status"
+      aria-label={error.message}
+      tabIndex={0}
+      {...use({ animated, collapsed: !errorInfo.display, errorHidden })}
+      className={className}
+    >
       <error-body>
         <IconOrImage icon={icon} title={error.message} onClick={() => errorInfo.show()} />
         <error-message>{error.message}</error-message>
