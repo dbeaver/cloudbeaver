@@ -135,7 +135,8 @@ export const CellRenderer = observer<CellRendererProps<IResultSetRowKey, unknown
       },
       doubleClick(args: any, event: React.MouseEvent<HTMLDivElement>) {
         if (cellContext.cell) {
-          const isTruncated = tableDataContext.dataContent.isTextTruncated(cellContext.cell);
+          const isTruncated =
+            tableDataContext.dataContent.isTextTruncated(cellContext.cell) || tableDataContext.dataContent.isBlobTruncated(cellContext.cell);
           const isHugeText = tableDataContext.format.getText(cellContext.cell).length >= MAX_CELL_TEXT_SIZE;
 
           if (isHugeText || isTruncated) {
