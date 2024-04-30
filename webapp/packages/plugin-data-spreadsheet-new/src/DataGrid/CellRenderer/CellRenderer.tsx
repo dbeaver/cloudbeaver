@@ -21,6 +21,8 @@ import { DataGridSelectionContext } from '../DataGridSelection/DataGridSelection
 import { TableDataContext } from '../TableDataContext';
 import { CellContext } from './CellContext';
 
+const MAX_CELL_TEXT_SIZE = 100 * 1024;
+
 export const CellRenderer = observer<CellRendererProps<IResultSetRowKey, unknown>>(function CellRenderer(props) {
   const { rowIdx, row, column, isCellSelected, onDoubleClick, selectCell } = props;
   const dataGridContext = useContext(DataGridContext);
@@ -132,6 +134,16 @@ export const CellRenderer = observer<CellRendererProps<IResultSetRowKey, unknown
         );
       },
       doubleClick(args: any, event: React.MouseEvent<HTMLDivElement>) {
+        if (cellContext.cell) {
+          const isTruncated = tableDataContext.dataContent.isTextTruncated(cellContext.cell);
+          const isHugeText = tableDataContext.format.getText(cellContext.cell).length >= MAX_CELL_TEXT_SIZE;
+
+          if (isHugeText || isTruncated) {
+            this.dataGridContext.actions.setValuePresentation('');
+            return;
+          }
+        }
+
         if (
           !this.isEditable(this.column) ||
           // !this.dataGridContext.isGridInFocus()
