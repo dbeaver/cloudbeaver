@@ -174,6 +174,11 @@ public class WebServiceAdmin implements DBWServiceAdmin {
     }
 
     @Override
+    public List<String> listTeamRoles() {
+        return CBApplication.getInstance().getAvailableAuthRoles();
+    }
+
+    @Override
     public boolean deleteUser(@NotNull WebSession webSession, String userName) throws DBWebException {
         if (CommonUtils.equalObjects(userName, webSession.getUser().getUserId())) {
             throw new DBWebException("You cannot delete yourself");
@@ -386,6 +391,21 @@ public class WebServiceAdmin implements DBWServiceAdmin {
     public Boolean setUserAuthRole(WebSession webSession, String userId, String authRole) throws DBWebException {
         try {
             webSession.getAdminSecurityController().setUserAuthRole(userId, authRole);
+            return true;
+        } catch (Exception e) {
+            throw new DBWebException("Error updating user auth role", e);
+        }
+    }
+
+    @Override
+    public Boolean setUserTeamRole(
+        @NotNull WebSession webSession,
+        @NotNull String userId,
+        @NotNull String teamId,
+        @Nullable String teamRole
+    ) throws DBWebException {
+        try {
+            webSession.getAdminSecurityController().setUserTeamRole(userId, teamId, teamRole);
             return true;
         } catch (Exception e) {
             throw new DBWebException("Error updating user auth role", e);

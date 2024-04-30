@@ -19,6 +19,7 @@ package io.cloudbeaver.service.security;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
+import io.cloudbeaver.DBWConstants;
 import io.cloudbeaver.auth.*;
 import io.cloudbeaver.model.app.WebAppConfiguration;
 import io.cloudbeaver.model.app.WebAuthApplication;
@@ -223,6 +224,33 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
         addSubjectPermissionsUpdateEvent(userId, SMSubjectType.user);
     }
 
+    @Override
+    public void setUserTeamRole(
+        @NotNull String userId,
+        @NotNull String teamId,
+        @Nullable String teamRole
+    ) throws DBException {
+        if (!isSubjectExists(userId)) {
+            throw new DBCException("User '" + userId + "' doesn't exists");
+        }
+        if (!isSubjectExists(teamId)) {
+            throw new DBCException("Team '" + teamId + "' doesn't exists");
+        }
+
+        try (
+            var dbCon = database.openConnection();
+            PreparedStatement dbStat = dbCon.prepareStatement(
+                database.normalizeTableNames("UPDATE {table_prefix}CB_USER_TEAM " +
+                    "SET TEAM_ROLE=? WHERE USER_ID=? AND TEAM_ID=?"))
+        ) {
+            dbStat.setString(1, userId);
+            dbStat.setString(2, teamId);
+            JDBCUtils.setStringOrNull(dbStat, 3, teamId);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     public void setUserTeams(@NotNull Connection dbCon, String userId, String[] teamIds, String grantorId)
         throws SQLException {
         JDBCUtils.executeStatement(
@@ -252,12 +280,12 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
 
     @NotNull
     @Override
-    public SMTeam[] getUserTeams(String userId) throws DBException {
-        Map<String, SMTeam> teams = new LinkedHashMap<>();
+    public SMUserTeam[] getUserTeams(String userId) throws DBException {
+        Map<String, SMUserTeam> teams = new LinkedHashMap<>();
         try (Connection dbCon = database.openConnection()) {
             String defaultUserTeam = application.getAppConfiguration().getDefaultUserTeam();
             try (PreparedStatement dbStat = dbCon.prepareStatement(database.normalizeTableNames(
-                "SELECT R.*,S.IS_SECRET_STORAGE FROM {table_prefix}CB_USER_TEAM UR, {table_prefix}CB_TEAM R, " +
+                "SELECT R.*,S.IS_SECRET_STORAGE,UR.TEAM_ROLE FROM {table_prefix}CB_USER_TEAM UR, {table_prefix}CB_TEAM R, " +
                     "{table_prefix}CB_AUTH_SUBJECT S " +
                         "WHERE UR.USER_ID=? AND UR.TEAM_ID = R.TEAM_ID " +
                         "AND S.SUBJECT_ID IN (R.TEAM_ID,?)"))
@@ -267,12 +295,13 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
                 try (ResultSet dbResult = dbStat.executeQuery()) {
                     while (dbResult.next()) {
                         var team = fetchTeam(dbResult);
-                        teams.put(team.getTeamId(), team);
+                        String teamRole = dbResult.getString("TEAM_ROLE");
+                        teams.put(team.getTeamId(), new SMUserTeam(team, teamRole));
                     }
                 }
             }
             readSubjectsMetas(dbCon, SMSubjectType.team, null, teams);
-            return teams.values().toArray(new SMTeam[0]);
+            return teams.values().toArray(new SMUserTeam[0]);
         } catch (SQLException e) {
             throw new DBCException("Error while reading user teams", e);
         }
@@ -296,7 +325,7 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
 
     @NotNull
     @Override
-    public SMTeam[] getCurrentUserTeams() throws DBException {
+    public SMUserTeam[] getCurrentUserTeams() throws DBException {
         return getUserTeams(getUserIdOrThrow());
     }
 
@@ -2728,6 +2757,42 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
     }
 
     @Override
+    public boolean hasAccessToUsers(@NotNull String teamRole, @NotNull Set<String> userIds) throws DBException {
+        if (CommonUtils.isEmpty(userIds)) {
+            return true;
+        }
+        String currentUserId = getUserIdOrThrow();
+        var currentPermissions = getUserPermissions(currentUserId);
+        if (currentPermissions.contains(DBWConstants.PERMISSION_ADMIN)) {
+            return true;
+        }
+
+        String sql = "SELECT COUNT(DISTINCT UT.USER_ID) FROM {table_prefix}CB_USER_TEAM UT " +
+            "WHERE TEAM_ID IN (SELECT TEAM_ID FROM {table_prefix}CB_USER_TEAM WHERE USER_ID = ? and TEAM_ROLE = ?) " +
+            "AND UT.USER_ID IN(" + SQLUtils.generateParamList(userIds.size()) + ")";
+        try (var dbCon = database.openConnection();
+             var dbStat = dbCon.prepareStatement(database.normalizeTableNames(sql))
+        ) {
+            dbStat.setString(1, currentUserId);
+            dbStat.setString(2, teamRole);
+            int index = 3;
+            for (String userId : userIds) {
+                dbStat.setString(index++, userId);
+            }
+            try (ResultSet dbResult = dbStat.executeQuery()) {
+                if (dbResult.next()) {
+                    int matchesUsersCount = dbResult.getInt(1);
+                    return matchesUsersCount == userIds.size();
+                } else {
+                    return false;
+                }
+            }
+        } catch (SQLException e) {
+            throw new DBCException("Error validating user access", e);
+        }
+    }
+
+    @Override
     public void deleteAllSubjectObjectPermissions(@NotNull String subjectId, @NotNull SMObjectType objectType) throws DBException {
         try (Connection dbCon = database.openConnection()) {
             JDBCUtils.executeStatement(dbCon,
@@ -2977,7 +3042,7 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
 
 
     @NotNull
-    private String getUserIdOrThrow() throws SMException {
+    protected String getUserIdOrThrow() throws SMException {
         String userId = getUserIdOrNull();
         if (userId == null) {
             throw new SMException("User not authenticated");
@@ -2986,7 +3051,7 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
     }
 
     @Nullable
-    private String getUserIdOrNull() {
+    protected String getUserIdOrNull() {
         SMCredentials activeUserCredentials = credentialsProvider.getActiveUserCredentials();
         if (activeUserCredentials == null || activeUserCredentials.getUserId() == null) {
             return null;

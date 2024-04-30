@@ -150,6 +150,8 @@ extend type Query {
 
     setUserAuthRole(userId: ID!, authRole: String): Boolean
 
+    setUserTeamRole(userId: ID!, teamId: ID!,teamRole: String): Boolean
+
     #### Connection management
 
     # All connection configurations
