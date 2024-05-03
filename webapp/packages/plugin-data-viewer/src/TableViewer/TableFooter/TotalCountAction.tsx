@@ -6,13 +6,12 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import styled from 'reshadow';
 
-import { getComputed, ToolsAction, useTranslate } from '@cloudbeaver/core-blocks';
+import { getComputed, s, ToolsAction, useS, useTranslate } from '@cloudbeaver/core-blocks';
 
 import type { IDatabaseDataModel } from '../../DatabaseDataModel/IDatabaseDataModel';
 import type { IDatabaseResultSet } from '../../DatabaseDataModel/IDatabaseResultSet';
-import { tableFooterMenuStyles } from './TableFooterMenu/TableFooterMenuItem';
+import TableFooterMenuStyles from './TableFooterMenu/TableFooterMenuItem.m.css';
 import classes from './TableFooterRowCount.m.css';
 
 interface Props {
@@ -26,6 +25,7 @@ export const TotalCountAction = observer<Props>(function TotalCountAction({ onCl
   const result = model.getResult(resultIndex);
   const translate = useTranslate();
   const disabled = getComputed(() => model.isLoading() || model.isDisabled(resultIndex));
+  const style = useS(TableFooterMenuStyles, classes);
 
   if (!result) {
     return null;
@@ -34,11 +34,18 @@ export const TotalCountAction = observer<Props>(function TotalCountAction({ onCl
   const currentCount = result.loadedFully ? result.count : `${result.count}+`;
   const count = result.totalCount ?? currentCount;
 
-  return styled(tableFooterMenuStyles)(
-    <div className={classes.wrapper} title={translate('data_viewer_total_count_tooltip')}>
-      <ToolsAction disabled={disabled} loading={loading} icon="/icons/data_row_count.svg" viewBox="0 0 32 32" onClick={onClick}>
+  return (
+    <div className={s(style, { wrapper: true })} title={translate('data_viewer_total_count_tooltip')}>
+      <ToolsAction
+        className={s(style, { toolsAction: true })}
+        disabled={disabled}
+        loading={loading}
+        icon="/icons/data_row_count.svg"
+        viewBox="0 0 32 32"
+        onClick={onClick}
+      >
         <span>{count}</span>
       </ToolsAction>
-    </div>,
+    </div>
   );
 });

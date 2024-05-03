@@ -18,6 +18,7 @@ export default [
   ['ui_processing_loading', '加载中...'],
   ['ui_processing_cancel', '取消'],
   ['ui_processing_canceling', '取消中...'],
+  ['ui_processing_canceled', 'Canceled'],
   ['ui_processing_retry', '重试'],
   ['ui_processing_ok', '好'],
   ['ui_processing_create', '创建'],
