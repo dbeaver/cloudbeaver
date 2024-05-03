@@ -35,6 +35,7 @@ import java.nio.file.Path;
 @Suite.SuiteClasses(
     {
         ConnectionsTest.class,
+        SQLQueryTranslatorTest.class,
         AuthenticationTest.class,
         ResourceManagerTest.class,
         RMLockTest.class,
