@@ -13,6 +13,7 @@ import type { ComponentStyle } from '@cloudbeaver/core-theming';
 
 import { Loader } from '../../Loader/Loader';
 import { s } from '../../s';
+import { useFocus } from '../../useFocus';
 import { useS } from '../../useS';
 import { DialogContext } from '../DialogContext';
 import styles from './CommonDialogWrapper.m.css';
@@ -33,6 +34,7 @@ export const CommonDialogWrapper = observer<CommonDialogWrapperProps, HTMLDivEle
     { size = 'medium', fixedSize, fixedWidth, freeHeight, 'aria-label': ariaLabel, className, children, style },
     ref,
   ) {
+    const [focusedRef] = useFocus({ autofocus: true });
     const computedStyles = useS(styles, style);
     const context = useContext(DialogContext);
     const dialogState = useDialogState({ visible: true });
@@ -54,6 +56,7 @@ export const CommonDialogWrapper = observer<CommonDialogWrapperProps, HTMLDivEle
         modal={false}
       >
         <dialog
+          ref={focusedRef}
           tabIndex={0}
           className={s(
             computedStyles,
