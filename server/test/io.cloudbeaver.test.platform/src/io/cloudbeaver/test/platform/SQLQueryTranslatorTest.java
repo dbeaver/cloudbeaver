@@ -45,12 +45,16 @@ public class SQLQueryTranslatorTest {
         expectedSqlByDialect.put(new H2SQLDialect(), basicSql);
         expectedSqlByDialect.put(
             new PostgreDialect(),
-            "create table CB_AUTH_SUBJECT (SUBJECT_ID VARCHAR (128) not null,\n" +
-                "SUBJECT_TYPE VARCHAR (8) not null,\n" +
-                "IS_SECRET_STORAGE CHAR (1) default 'Y' not null,\n" +
-                "primary key (SUBJECT_ID));\n"
+            "CREATE TABLE CB_AUTH_SUBJECT (SUBJECT_ID VARCHAR (128) NOT NULL,\n" +
+                "SUBJECT_TYPE VARCHAR (8) NOT NULL,\n" +
+                "IS_SECRET_STORAGE CHAR (1) DEFAULT 'Y' NOT NULL,\n" +
+                "PRIMARY KEY (SUBJECT_ID));\n"
         );
-        expectedSqlByDialect.put(new MySQLDialect(), basicSql);
+        expectedSqlByDialect.put(new MySQLDialect(),
+            "CREATE TABLE CB_AUTH_SUBJECT (SUBJECT_ID VARCHAR (128) NOT NULL,\n" +
+                "SUBJECT_TYPE VARCHAR (8) NOT NULL,\n" +
+                "IS_SECRET_STORAGE CHAR (1) DEFAULT 'Y' NOT NULL,\n" +
+                "PRIMARY KEY (SUBJECT_ID));\n");
         expectedSqlByDialect.put(new OracleSQLDialect(), basicSql);
         expectedSqlByDialect.put(new SQLServerDialect(), basicSql);
 
@@ -109,7 +113,7 @@ public class SQLQueryTranslatorTest {
         Map<SQLDialect, String> expectedSqlByDialect = new HashMap<>();
         expectedSqlByDialect.put(new H2SQLDialect(), basicSql);
         expectedSqlByDialect.put(new PostgreDialect(), basicSql);
-        expectedSqlByDialect.put(new MySQLDialect(), basicSql);
+        expectedSqlByDialect.put(new MySQLDialect(), "CREATE TABLE CB_TEST_TYPES (BOOLEAN_COLUMN TINYINT(1));\n");
 
         expectedSqlByDialect.put(
             new OracleSQLDialect(),
