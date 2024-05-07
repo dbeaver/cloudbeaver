@@ -85,17 +85,15 @@ public class SQLQueryTranslatorTest {
 
     @Test
     public void createTableWithUuid() throws DBException {
-        var basicSql = "CREATE TABLE CB_TEST_TYPES (UUID_COLUMN UUID)";
-        String genericExpectedSql = basicSql + ";\n";
+        var basicSql = "CREATE TABLE CB_TEST_TYPES (UUID_COLUMN UUID);\n";
 
         Map<SQLDialect, String> expectedSqlByDialect = new HashMap<>();
-        expectedSqlByDialect.put(new H2SQLDialect(), genericExpectedSql);
-        expectedSqlByDialect.put(new PostgreDialect(), genericExpectedSql);
-        //TODO CB-5095
-//        expectedSqlByDialect.put(
-//            new MySQLDialect(),
-//            "CREATE TABLE CB_TEST_TYPES (UUID_COLUMN VARCHAR2(36));\n"
-//        );
+        expectedSqlByDialect.put(new H2SQLDialect(), basicSql);
+        expectedSqlByDialect.put(new PostgreDialect(), basicSql);
+        expectedSqlByDialect.put(
+            new MySQLDialect(),
+            "CREATE TABLE CB_TEST_TYPES (UUID_COLUMN CHAR(36));\n"
+        );
         expectedSqlByDialect.put(new OracleSQLDialect(), "CREATE TABLE CB_TEST_TYPES (UUID_COLUMN VARCHAR2(36));\n");
         expectedSqlByDialect.put(
             new SQLServerDialect(),
