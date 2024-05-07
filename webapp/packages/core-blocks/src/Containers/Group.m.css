@@ -31,7 +31,8 @@
       margin: -8px 0;
 
       & > .groupClose {
-        top: 2px;
+        right: 0px;
+        top: 8px;
       }
     }
   }
@@ -46,6 +47,14 @@
 
     & > .groupClose {
       right: 24px;
+    }
+  }
+  &.box.dense > .groupTitle {
+    padding: 8px;
+    margin: 0;
+
+    & > .groupClose {
+      right: 8px;
     }
   }
 

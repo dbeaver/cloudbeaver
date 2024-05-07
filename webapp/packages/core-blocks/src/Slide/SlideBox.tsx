@@ -49,7 +49,7 @@ export const SlideBox = observer<Props>(function SlideBox({ children, open, clas
   return (
     <div
       ref={divRef}
-      className={s(slideBoxStyles, { slideBox: true}, s(slideBoxElementStyles, { open }), s(slideBoxOverlayStyles, { open }), className)}
+      className={s(slideBoxStyles, { slideBox: true }, s(slideBoxElementStyles, { open }), s(slideBoxOverlayStyles, { open }), className)}
     >
       {children}
     </div>

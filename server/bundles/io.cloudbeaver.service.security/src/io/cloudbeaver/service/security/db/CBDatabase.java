@@ -550,8 +550,6 @@ public class CBDatabase {
     }
 
     private String getCurrentInstanceId() throws IOException {
-        // 12 chars - mac address
-        String macAddress = CommonUtils.toHexString(RuntimeUtils.getLocalMacAddress());
         // 16 chars - workspace ID
         String workspaceId = DBWorkbench.getPlatform().getWorkspace().getWorkspaceId();
         if (workspaceId.length() > 16) {
@@ -559,7 +557,7 @@ public class CBDatabase {
         }
 
         StringBuilder id = new StringBuilder(36);
-        id.append(macAddress);
+        id.append("000000000000"); // there was mac address, but it generates dynamically when docker is used
         id.append(":").append(workspaceId).append(":");
         while (id.length() < 36) {
             id.append("X");
