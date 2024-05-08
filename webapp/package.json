@@ -49,5 +49,6 @@
     "typescript-plugin-css-modules": "^5.1.0"
   },
   "dependencies": {},
-  "prettier": "@cloudbeaver/prettier-config"
+  "prettier": "@cloudbeaver/prettier-config",
+  "packageManager": "yarn@1.22.21"
 }
