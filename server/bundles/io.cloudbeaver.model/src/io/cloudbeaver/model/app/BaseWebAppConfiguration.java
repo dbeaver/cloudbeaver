@@ -33,11 +33,14 @@ public abstract class BaseWebAppConfiguration implements WebAppConfiguration {
     protected boolean resourceManagerEnabled;
     protected boolean showReadOnlyConnectionInfo;
     protected String[] enabledFeatures;
+    protected String[] betaFeatures;
+
 
     public BaseWebAppConfiguration() {
         this.plugins = new LinkedHashMap<>();
         this.resourceManagerEnabled = true;
         this.enabledFeatures = null;
+        this.betaFeatures = new String[0];
         this.showReadOnlyConnectionInfo = false;
     }
 
@@ -46,6 +49,7 @@ public abstract class BaseWebAppConfiguration implements WebAppConfiguration {
         this.defaultUserTeam = src.defaultUserTeam;
         this.resourceManagerEnabled = src.resourceManagerEnabled;
         this.enabledFeatures = src.enabledFeatures;
+        this.betaFeatures = src.betaFeatures;
         this.showReadOnlyConnectionInfo = src.showReadOnlyConnectionInfo;
     }
 
@@ -103,5 +107,9 @@ public abstract class BaseWebAppConfiguration implements WebAppConfiguration {
 
     public boolean isShowReadOnlyConnectionInfo() {
         return showReadOnlyConnectionInfo;
+    }
+
+    public String[] getBetaFeatures() {
+        return betaFeatures;
     }
 }

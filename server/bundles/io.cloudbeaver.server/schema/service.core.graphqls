@@ -153,6 +153,7 @@ type ServerConfig {
     distributed: Boolean!
 
     enabledFeatures: [ID!]!
+    betaFeatures: [ID!] @since(version: "24.0.5")
     enabledAuthProviders: [ID!]!
     supportedLanguages: [ ServerLanguage! ]!
     services: [ WebServiceConfig ]
