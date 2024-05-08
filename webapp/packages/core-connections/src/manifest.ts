@@ -7,44 +7,27 @@
  */
 import type { PluginManifest } from '@cloudbeaver/core-di';
 
-import { ConnectionDialectResource } from './ConnectionDialectResource';
-import { ConnectionExecutionContextResource } from './ConnectionExecutionContext/ConnectionExecutionContextResource';
-import { ConnectionExecutionContextService } from './ConnectionExecutionContext/ConnectionExecutionContextService';
-import { ConnectionFolderEventHandler } from './ConnectionFolderEventHandler';
-import { ConnectionFolderResource } from './ConnectionFolderResource';
-import { ConnectionInfoEventHandler } from './ConnectionInfoEventHandler';
-import { ConnectionInfoResource } from './ConnectionInfoResource';
-import { ConnectionsLocaleService } from './ConnectionsLocaleService';
-import { ConnectionsManagerService } from './ConnectionsManagerService';
-import { ConnectionsSettingsService } from './ConnectionsSettingsService';
-import { ContainerResource } from './ContainerResource';
-import { DatabaseAuthModelsResource } from './DatabaseAuthModelsResource';
-import { DBDriverResource } from './DBDriverResource';
-import { ConnectionNavNodeService } from './NavTree/ConnectionNavNodeService';
-import { NavNodeExtensionsService } from './NavTree/NavNodeExtensionsService';
-import { NetworkHandlerResource } from './NetworkHandlerResource';
-
 export const manifest: PluginManifest = {
   info: {
     name: 'Core Connections',
   },
 
   providers: [
-    ConnectionFolderResource,
-    ConnectionExecutionContextResource,
-    ConnectionExecutionContextService,
-    ConnectionsManagerService,
-    ConnectionInfoResource,
-    ContainerResource,
-    ConnectionsLocaleService,
-    DatabaseAuthModelsResource,
-    DBDriverResource,
-    NetworkHandlerResource,
-    ConnectionDialectResource,
-    ConnectionNavNodeService,
-    NavNodeExtensionsService,
-    ConnectionInfoEventHandler,
-    ConnectionFolderEventHandler,
-    ConnectionsSettingsService,
+    () => import('./ConnectionFolderResource').then(m => m.ConnectionFolderResource),
+    () => import('./ConnectionExecutionContext/ConnectionExecutionContextResource').then(m => m.ConnectionExecutionContextResource),
+    () => import('./ConnectionExecutionContext/ConnectionExecutionContextService').then(m => m.ConnectionExecutionContextService),
+    () => import('./ConnectionsManagerService').then(m => m.ConnectionsManagerService),
+    () => import('./ConnectionInfoResource').then(m => m.ConnectionInfoResource),
+    () => import('./ContainerResource').then(m => m.ContainerResource),
+    () => import('./ConnectionsLocaleService').then(m => m.ConnectionsLocaleService),
+    () => import('./DatabaseAuthModelsResource').then(m => m.DatabaseAuthModelsResource),
+    () => import('./DBDriverResource').then(m => m.DBDriverResource),
+    () => import('./NetworkHandlerResource').then(m => m.NetworkHandlerResource),
+    () => import('./ConnectionDialectResource').then(m => m.ConnectionDialectResource),
+    () => import('./NavTree/ConnectionNavNodeService').then(m => m.ConnectionNavNodeService),
+    () => import('./NavTree/NavNodeExtensionsService').then(m => m.NavNodeExtensionsService),
+    () => import('./ConnectionInfoEventHandler').then(m => m.ConnectionInfoEventHandler),
+    () => import('./ConnectionFolderEventHandler').then(m => m.ConnectionFolderEventHandler),
+    () => import('./ConnectionsSettingsService').then(m => m.ConnectionsSettingsService),
   ],
 };

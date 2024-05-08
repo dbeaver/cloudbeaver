@@ -7,14 +7,14 @@
  */
 import type { PluginManifest } from '@cloudbeaver/core-di';
 
-import { EventsSettingsService } from './EventsSettingsService';
-import { ExceptionsCatcherService } from './ExceptionsCatcherService';
-import { NotificationService } from './NotificationService';
-
 export const coreEventsManifest: PluginManifest = {
   info: {
     name: 'Core Events',
   },
 
-  providers: [NotificationService, ExceptionsCatcherService, EventsSettingsService],
+  providers: [
+    () => import('./NotificationService').then(m => m.NotificationService),
+    () => import('./ExceptionsCatcherService').then(m => m.ExceptionsCatcherService),
+    () => import('./EventsSettingsService').then(m => m.EventsSettingsService),
+  ],
 };

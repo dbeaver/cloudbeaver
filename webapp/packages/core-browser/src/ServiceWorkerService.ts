@@ -12,13 +12,20 @@ import { Disposable, injectable } from '@cloudbeaver/core-di';
 import { Executor, IExecutor } from '@cloudbeaver/core-executor';
 import { GlobalConstants } from '@cloudbeaver/core-utils';
 
+export interface IUpdateData {
+  type: 'updating' | 'finished' | 'installing';
+  progress?: number;
+}
+
 @injectable()
 export class ServiceWorkerService extends Disposable {
-  readonly onUpdate: IExecutor<number>;
+  readonly onUpdate: IExecutor<IUpdateData>;
 
   private readonly workerURL: string;
   private workbox: Workbox | null;
   private updateIntervalId: ReturnType<typeof setInterval> | null;
+  private isUpdating: boolean;
+  private registration: ServiceWorkerRegistration | null;
 
   constructor() {
     super();
@@ -26,28 +33,43 @@ export class ServiceWorkerService extends Disposable {
     this.workerURL = GlobalConstants.absoluteRootUrl('service-worker.js');
     this.workbox = null;
     this.updateIntervalId = null;
+    this.registration = null;
+    this.isUpdating = false;
   }
 
   async register(): Promise<void> {
-    try {
-      if (!('serviceWorker' in navigator)) {
-        return;
-      }
-      if (process.env.NODE_ENV === 'development') {
-        const registration = await navigator.serviceWorker.getRegistration(this.workerURL);
-        registration?.unregister();
-      } else {
-        this.workbox = new Workbox(this.workerURL);
-        this.registerRefreshAfterUpdate();
+    if (!('serviceWorker' in navigator)) {
+      return;
+    }
 
-        this.workbox.register().then(sw => sw?.update());
-      }
-    } catch (e) {
-      console.log(e);
+    this.workbox = new Workbox(this.workerURL);
+    this.registration = (await this.workbox.register()) || null;
+    this.registration?.addEventListener('updatefound', () => {});
+    // should be after registration
+    this.registerRefreshAfterUpdate();
+
+    if (this.registration?.active) {
+      this.isUpdating = true;
     }
   }
 
   async load(): Promise<void> {
+    if (this.registration?.installing || this.registration?.waiting) {
+      this.onUpdate.execute({
+        type: this.isUpdating ? 'updating' : 'installing',
+      });
+    }
+
+    if (this.registration?.active) {
+      // wait for update only for active service worker
+      await this.workbox?.update();
+
+      if (this.registration.installing || this.registration.waiting) {
+        // handled by refresh at 'controlling' event
+        await new Promise(() => {});
+      }
+    }
+
     this.updateIntervalId = setInterval(() => this.workbox?.update(), 1000 * 60 * 60 * 24);
   }
 
@@ -64,17 +86,32 @@ export class ServiceWorkerService extends Disposable {
 
     this.workbox.addEventListener('message', ({ data }) => {
       switch (data.type) {
-        case 'update-progress':
+        case 'mode':
           {
-            const progress = Math.floor(Math.min(1, Math.max(0, data.progress)) * 100) / 100;
-            this.onUpdate.execute(progress);
-            // displayUpdateStatus(progress); // this can be enabled to display splash screen with updating state
+            this.onUpdate.execute({
+              type: this.isUpdating || data.isUpdate ? 'updating' : 'installing',
+            });
+          }
+          break;
+        case 'progress':
+          {
+            const progress = Math.min(1, Math.max(0, data.progress));
+
+            this.onUpdate.execute({
+              type: this.isUpdating || data.isUpdate ? 'updating' : 'installing',
+              progress,
+            });
           }
           break;
       }
     });
 
     this.workbox.addEventListener('controlling', async event => {
+      this.isUpdating = false;
+      await this.onUpdate.execute({
+        type: 'finished',
+      });
+
       if (!event.isUpdate) {
         return;
       }

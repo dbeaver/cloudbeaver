@@ -16,15 +16,10 @@
       background: white;
     }
 
-    #app-loading-screen .app-loading-screen__updating {
+    #app-loading-screen .app-loading-screen__status {
       font-weight: 500;
       color: #244357;
       transition: opacity 5s;
-      opacity: 0;
-    }
-
-    #app-loading-screen .app-loading-screen__updating.visible {
-      opacity: 1;
     }
 
     #app-loading-screen .app-loading-screen__logo-spinner {
@@ -89,6 +84,6 @@
       </radialGradient>
     </defs>
   </svg>
-  <div class="app-loading-screen__updating">Updating...</div>
-  <div class="app-loading-screen__updating app-loading-screen__updating_percent"></div>
+  <div class="app-loading-screen__status app-loading-screen__status_message">Loading...</div>
+  <div class="app-loading-screen__status app-loading-screen__status_percent"></div>
 </div>

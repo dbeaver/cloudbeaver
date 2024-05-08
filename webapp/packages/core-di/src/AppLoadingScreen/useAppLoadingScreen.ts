@@ -19,9 +19,9 @@ export function useAppLoadingScreen() {
       return;
     }
 
-    if (document.querySelector('#app-loading-screen .app-loading-screen__updating')?.classList.contains('visible')) {
-      return;
-    }
+    // if (document.querySelector('#app-loading-screen .app-loading-screen__status')?.classList.contains('visible')) {
+    //   return;
+    // }
 
     if (appLoadingScreen.classList.contains('app-loading-screen--fade-out')) {
       appLoadingScreen.classList.remove('app-loading-screen--fade-out');

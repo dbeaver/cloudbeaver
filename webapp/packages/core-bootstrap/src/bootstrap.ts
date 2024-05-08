@@ -11,12 +11,21 @@ import { App, PluginManifest } from '@cloudbeaver/core-di';
 import { executionExceptionContext, SyncExecutor } from '@cloudbeaver/core-executor';
 
 import { coreManifests } from './manifest';
-import { renderLayout } from './renderLayout';
 
-export function bootstrap(plugins: PluginManifest[]): App {
+export async function bootstrap(plugins: PluginManifest[]): Promise<App> {
   configure({ enforceActions: 'never' });
 
   const app = new App([...coreManifests, ...plugins]);
+  let exception: Error | null = null;
+
+  try {
+    await app.preload();
+    await app.start();
+  } catch (e: any) {
+    exception = e;
+  }
+
+  const { renderLayout } = await import('./renderLayout');
   const render = renderLayout(app.getServiceInjector());
   const unmountExecutor = new SyncExecutor();
 
@@ -31,6 +40,11 @@ export function bootstrap(plugins: PluginManifest[]): App {
     }
   });
 
-  app.start().catch();
+  if (exception) {
+    render.renderError(exception);
+  } else {
+    render.renderApp();
+  }
+
   return app;
 }

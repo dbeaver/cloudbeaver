@@ -7,12 +7,10 @@
  */
 import type { PluginManifest } from '@cloudbeaver/core-di';
 
-import { TaskManagerService } from './TaskManagerService';
-
 export const coreTaskManagerManifest: PluginManifest = {
   info: {
     name: 'Core Task Manager',
   },
 
-  providers: [TaskManagerService],
+  providers: [() => import('./TaskManagerService').then(m => m.TaskManagerService)],
 };

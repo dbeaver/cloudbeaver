@@ -14,8 +14,12 @@ import type { IServiceCollection, IServiceConstructor, IServiceInjector } from '
 import { IDiWrapper, inversifyWrapper } from './inversifyWrapper';
 import type { PluginManifest } from './PluginManifest';
 
+export interface IStartData {
+  preload: boolean;
+}
+
 export class App {
-  readonly onStart: IExecutor;
+  readonly onStart: IExecutor<IStartData>;
   private readonly plugins: PluginManifest[];
   private readonly diWrapper: IDiWrapper = inversifyWrapper;
 
@@ -23,15 +27,20 @@ export class App {
     this.plugins = plugins;
     this.onStart = new Executor();
 
-    this.onStart.addHandler(async () => {
-      this.registerServices();
-      await this.initializeServices();
-      await this.loadServices();
+    this.getServiceCollection().addServiceByClass(App, this);
+    this.onStart.addHandler(async ({ preload }) => {
+      await this.registerServices(preload);
+      await this.initializeServices(preload);
+      await this.loadServices(preload);
     });
   }
 
+  async preload(): Promise<void> {
+    await this.onStart.execute({ preload: true });
+  }
+
   async start(): Promise<void> {
-    await this.onStart.execute();
+    await this.onStart.execute({ preload: false });
   }
 
   async restart(): Promise<void> {
@@ -47,8 +56,8 @@ export class App {
     return [...this.plugins];
   }
 
-  getServices(): IServiceConstructor<any>[] {
-    return this.plugins.map(plugin => plugin.providers).flat();
+  getServices(preload?: boolean): Array<() => Promise<IServiceConstructor<any>>> {
+    return this.plugins.map(plugin => (preload ? plugin.preload || [] : plugin.providers)).flat();
   }
 
   registerChildContainer(container: DIContainer): void {
@@ -68,17 +77,16 @@ export class App {
   }
 
   // first phase register all dependencies
-  private registerServices(): void {
-    this.getServiceCollection().addServiceByClass(App, this);
-
-    for (const service of this.getServices()) {
-      // console.log('provider', provider.name);
+  private async registerServices(preload?: boolean): Promise<void> {
+    for (const serviceLoader of this.getServices(preload)) {
+      const service = await serviceLoader();
       this.diWrapper.collection.addServiceByClass(service);
     }
   }
 
-  private async initializeServices(): Promise<void> {
-    for (const service of this.getServices()) {
+  private async initializeServices(preload?: boolean): Promise<void> {
+    for (const serviceLoader of this.getServices(preload)) {
+      const service = await serviceLoader();
       if (service.prototype instanceof Bootstrap) {
         const serviceInstance = this.diWrapper.injector.getServiceByClass<Bootstrap>(service);
 
@@ -91,8 +99,9 @@ export class App {
     }
   }
 
-  private async loadServices(): Promise<void> {
-    for (const service of this.getServices()) {
+  private async loadServices(preload?: boolean): Promise<void> {
+    for (const serviceLoader of this.getServices(preload)) {
+      const service = await serviceLoader();
       if (service.prototype instanceof Bootstrap) {
         const serviceInstance = this.diWrapper.injector.getServiceByClass<Bootstrap>(service);
 

@@ -18,6 +18,13 @@ import { CacheFirst } from 'workbox-strategies';
 declare const self: ServiceWorkerGlobalScope;
 const manifest = self.__WB_MANIFEST;
 
+async function broadcastMessage(message: Record<string, any>) {
+  const clients = await self.clients.matchAll({ includeUncontrolled: true });
+  clients.forEach(client => {
+    client.postMessage(message);
+  });
+}
+
 addEventListener('fetch', async event => {
   if (!(event instanceof FetchEvent)) {
     return;
@@ -53,33 +60,33 @@ self.addEventListener('install', () => {
   self.skipWaiting();
 });
 
-clientsClaim();
-precacheAndRoute(manifest);
-
 function createUpdateProgressPlugin(): WorkboxPlugin {
   const precacheController = getOrCreatePrecacheController();
   let updated = 0;
-  let firstInstall = null as boolean | null;
+  let hasPreviousCache = null as boolean | null;
 
   return {
     handlerWillStart: async ({ request, state }) => {
       if (state) {
         state.originalRequest = request;
       }
-      if (firstInstall === null) {
-        firstInstall = (await caches.has(cacheNames.precache)) === false;
+      if (hasPreviousCache === null) {
+        hasPreviousCache = await caches.has(cacheNames.precache);
+
+        await broadcastMessage({
+          type: 'mode',
+          isUpdate: hasPreviousCache,
+        });
       }
     },
     cachedResponseWillBeUsed: async ({ event, cachedResponse, cacheName }) => {
-      if (!firstInstall && event.type === 'install' && cacheName === cacheNames.precache) {
+      if (event.type === 'install' && cacheName === cacheNames.precache) {
+        const size = precacheController.getURLsToCacheKeys().size;
         updated++;
 
-        const clients = await self.clients.matchAll({ includeUncontrolled: true });
-        clients.forEach(client => {
-          client.postMessage({
-            type: 'update-progress',
-            progress: updated / (precacheController.getURLsToCacheKeys().size ?? 1),
-          });
+        await broadcastMessage({
+          type: 'progress',
+          progress: updated / (size ?? 1),
         });
       }
 
@@ -90,8 +97,11 @@ function createUpdateProgressPlugin(): WorkboxPlugin {
 
 addPlugins([createUpdateProgressPlugin()]);
 
+clientsClaim();
+precacheAndRoute(manifest);
+
 const cacheName = 'images';
-const maxAgeSeconds = 30 * 24 * 60 * 60;
+const maxAgeSeconds = 7 * 24 * 60 * 60;
 const maxEntries = 1000;
 
 registerRoute(

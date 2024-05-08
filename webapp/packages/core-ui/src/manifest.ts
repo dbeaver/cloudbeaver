@@ -7,28 +7,19 @@
  */
 import type { PluginManifest } from '@cloudbeaver/core-di';
 
-import { ClipboardBootstrap } from './Clipboard/ClipboardBootstrap';
-import { ClipboardService } from './Clipboard/ClipboardService';
-import { LocaleService } from './LocaleService';
-import { NavigationService } from './Screens/AppScreen/NavigationService';
-import { OptionsPanelService } from './Screens/AppScreen/OptionsPanelService';
-import { LeftBarPanelService } from './SideBarPanel/LeftBarPanelService';
-import { SideBarPanelService } from './SideBarPanel/SideBarPanelService';
-import { TabsBootstrap } from './Tabs/TabsBootstrap';
-
 export const manifest: PluginManifest = {
   info: {
     name: 'Core UI',
   },
 
   providers: [
-    NavigationService,
-    OptionsPanelService,
-    ClipboardBootstrap,
-    ClipboardService,
-    TabsBootstrap,
-    SideBarPanelService,
-    LocaleService,
-    LeftBarPanelService,
+    () => import('./Screens/AppScreen/NavigationService').then(m => m.NavigationService),
+    () => import('./Screens/AppScreen/OptionsPanelService').then(m => m.OptionsPanelService),
+    () => import('./Clipboard/ClipboardBootstrap').then(m => m.ClipboardBootstrap),
+    () => import('./Clipboard/ClipboardService').then(m => m.ClipboardService),
+    () => import('./Tabs/TabsBootstrap').then(m => m.TabsBootstrap),
+    () => import('./SideBarPanel/SideBarPanelService').then(m => m.SideBarPanelService),
+    () => import('./LocaleService').then(m => m.LocaleService),
+    () => import('./SideBarPanel/LeftBarPanelService').then(m => m.LeftBarPanelService),
   ],
 };

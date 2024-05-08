@@ -7,10 +7,10 @@
  */
 import type { PluginManifest } from '@cloudbeaver/core-di';
 
-import { LocaleService } from './LocaleService';
-import { SettingsAdministrationPluginBootstrap } from './SettingsAdministrationPluginBootstrap';
-
 export const settingsAdministrationPlugin: PluginManifest = {
   info: { name: 'Settings Administration plugin' },
-  providers: [SettingsAdministrationPluginBootstrap, LocaleService],
+  providers: [
+    () => import('./SettingsAdministrationPluginBootstrap').then(m => m.SettingsAdministrationPluginBootstrap),
+    () => import('./LocaleService').then(m => m.LocaleService),
+  ],
 };
