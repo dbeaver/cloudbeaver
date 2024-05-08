@@ -42,14 +42,19 @@ export class ServiceWorkerService extends Disposable {
       return;
     }
 
-    this.workbox = new Workbox(this.workerURL);
-    this.registration = (await this.workbox.register()) || null;
-    this.registration?.addEventListener('updatefound', () => {});
-    // should be after registration
-    this.registerRefreshAfterUpdate();
+    if (process.env.NODE_ENV === 'development') {
+      const registration = await navigator.serviceWorker.getRegistration(this.workerURL);
+      registration?.unregister();
+    } else {
+      this.workbox = new Workbox(this.workerURL);
+      this.registration = (await this.workbox.register()) || null;
+      this.registration?.addEventListener('updatefound', () => {});
+      // should be after registration
+      this.registerRefreshAfterUpdate();
 
-    if (this.registration?.active) {
-      this.isUpdating = true;
+      if (this.registration?.active) {
+        this.isUpdating = true;
+      }
     }
   }
 

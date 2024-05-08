@@ -28,27 +28,33 @@ module.exports = (env, argv) => {
   process.env.NODE_ENV = argv.mode;
   const devMode = argv.mode !== 'production';
 
-  const workboxPlugin = new WorkboxPlugin.InjectManifest({
-    swSrc: getServiceWorkerSource(),
-    swDest: 'service-worker.js',
-    maximumFileSizeToCacheInBytes: 20 * 1024 * 1024,
-    exclude: [/license\.txt$/, /\.map$/, /manifest.*\.js$/, /\.tsx?$/, /\.tsbuildinfo$/, /\.DS_Store$/],
-  });
+  const workboxPlugin = [];
 
   if (devMode) {
-    // Suppress the "InjectManifest has been called multiple times" warning by reaching into
-    // the private properties of the plugin and making sure it never ends up in the state
-    // where it makes that warning.
-    // https://github.com/GoogleChrome/workbox/blob/v6/packages/workbox-webpack-plugin/src/inject-manifest.ts#L260-L282
-    Object.defineProperty(workboxPlugin, 'alreadyCalled', {
-      get() {
-        return false;
-      },
-      set() {
-        // do nothing; the internals try to set it to true, which then results in a warning
-        // on the next run of webpack.
-      },
-    });
+    workboxPlugin.push(
+      new WorkboxPlugin.InjectManifest({
+        swSrc: getServiceWorkerSource(),
+        swDest: 'service-worker.js',
+        maximumFileSizeToCacheInBytes: 20 * 1024 * 1024,
+        exclude: [/license\.txt$/, /\.map$/, /manifest.*\.js$/, /\.tsx?$/, /\.tsbuildinfo$/, /\.DS_Store$/],
+      }),
+    );
+
+    if (devMode) {
+      // Suppress the "InjectManifest has been called multiple times" warning by reaching into
+      // the private properties of the plugin and making sure it never ends up in the state
+      // where it makes that warning.
+      // https://github.com/GoogleChrome/workbox/blob/v6/packages/workbox-webpack-plugin/src/inject-manifest.ts#L260-L282
+      Object.defineProperty(workboxPlugin, 'alreadyCalled', {
+        get() {
+          return false;
+        },
+        set() {
+          // do nothing; the internals try to set it to true, which then results in a warning
+          // on the next run of webpack.
+        },
+      });
+    }
   }
   function getBaseStyleLoaders() {
     const loaders = [];
@@ -352,7 +358,7 @@ module.exports = (env, argv) => {
           }
         },
       }),
-      workboxPlugin,
+      ...workboxPlugin,
     ],
   };
 };
