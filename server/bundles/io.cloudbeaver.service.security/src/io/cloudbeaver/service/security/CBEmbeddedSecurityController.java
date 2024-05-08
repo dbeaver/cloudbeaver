@@ -163,7 +163,7 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
             dbStat.execute();
         }
         saveSubjectMetas(dbCon, userId, metaParameters);
-        String defaultTeamName = application.getAppConfiguration().getDefaultUserTeam();
+        String defaultTeamName = getDefaultUserTeam();
         if (!CommonUtils.isEmpty(defaultTeamName)) {
             setUserTeams(dbCon, userId, new String[]{defaultTeamName}, userId);
         }
@@ -258,7 +258,7 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
             database.normalizeTableNames("DELETE FROM {table_prefix}CB_USER_TEAM WHERE USER_ID=?"),
             userId
         );
-        String defaultUserTeam = application.getAppConfiguration().getDefaultUserTeam();
+        String defaultUserTeam = getDefaultUserTeam();
         if (CommonUtils.isNotEmpty(defaultUserTeam) && !ArrayUtils.contains(teamIds, defaultUserTeam)) {
             teamIds = ArrayUtils.add(String.class, teamIds, defaultUserTeam);
         }
@@ -283,7 +283,7 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
     public SMUserTeam[] getUserTeams(String userId) throws DBException {
         Map<String, SMUserTeam> teams = new LinkedHashMap<>();
         try (Connection dbCon = database.openConnection()) {
-            String defaultUserTeam = application.getAppConfiguration().getDefaultUserTeam();
+            String defaultUserTeam = getDefaultUserTeam();
             try (PreparedStatement dbStat = dbCon.prepareStatement(database.normalizeTableNames(
                 "SELECT R.*,S.IS_SECRET_STORAGE,UR.TEAM_ROLE FROM {table_prefix}CB_USER_TEAM UR, {table_prefix}CB_TEAM R, " +
                     "{table_prefix}CB_AUTH_SUBJECT S " +
@@ -353,7 +353,7 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
             try (PreparedStatement dbStat = dbCon.prepareStatement(
                     database.normalizeTableNames("SELECT TEAM_ID FROM {table_prefix}CB_USER_TEAM WHERE USER_ID=?"))
             ) {
-                String defaultUserTeam = application.getAppConfiguration().getDefaultUserTeam();
+                String defaultUserTeam = getDefaultUserTeam();
                 dbStat.setString(1, userId);
                 try (ResultSet dbResult = dbStat.executeQuery()) {
                     Set<String> teamIDs = new LinkedHashSet<>();
@@ -964,7 +964,7 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
     @Override
     public SMTeam[] readAllTeams() throws DBCException {
         try (Connection dbCon = database.openConnection()) {
-            String defaultUserTeam = application.getAppConfiguration().getDefaultUserTeam();
+            String defaultUserTeam = getDefaultUserTeam();
             Map<String, SMTeam> teams = new LinkedHashMap<>();
             String query = database.normalizeTableNames(
                     "SELECT T.*, S.IS_SECRET_STORAGE FROM {table_prefix}CB_TEAM T, " +
@@ -1009,32 +1009,43 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
 
     @NotNull
     @Override
-    public String[] getTeamMembers(String teamId) throws DBCException {
+    public String[] getTeamMembers(String teamId) throws DBException {
+        return getTeamMembersInfo(teamId).stream().map(SMTeamMemberInfo::userId).toArray(String[]::new);
+    }
+
+    @NotNull
+    @Override
+    public List<SMTeamMemberInfo> getTeamMembersInfo(@NotNull String teamId) throws DBException {
         try (Connection dbCon = database.openConnection()) {
-            if (application.getAppConfiguration().getDefaultUserTeam().equals(teamId)) {
+            Map<String, String> usersRoles = new LinkedHashMap<>();
+            if (getDefaultUserTeam().equals(teamId)) {
                 try (PreparedStatement dbStat = dbCon.prepareStatement(
-                        database.normalizeTableNames("SELECT USER_ID FROM {table_prefix}CB_USER"))) {
-                    List<String> subjects = new ArrayList<>();
+                    database.normalizeTableNames("SELECT USER_ID FROM {table_prefix}CB_USER"))
+                ) {
                     try (ResultSet dbResult = dbStat.executeQuery()) {
                         while (dbResult.next()) {
-                            subjects.add(dbResult.getString(1));
+                            usersRoles.put(dbResult.getString(1), null);
                         }
                     }
-                    return subjects.toArray(new String[0]);
-                }
-            } else {
-                try (PreparedStatement dbStat = dbCon.prepareStatement(
-                        database.normalizeTableNames("SELECT USER_ID FROM {table_prefix}CB_USER_TEAM WHERE TEAM_ID=?"))) {
-                    dbStat.setString(1, teamId);
-                    List<String> subjects = new ArrayList<>();
-                    try (ResultSet dbResult = dbStat.executeQuery()) {
-                        while (dbResult.next()) {
-                            subjects.add(dbResult.getString(1));
-                        }
-                    }
-                    return subjects.toArray(new String[0]);
                 }
             }
+            try (PreparedStatement dbStat = dbCon.prepareStatement(
+                database.normalizeTableNames(
+                    "SELECT USER_ID,TEAM_ROLE FROM {table_prefix}CB_USER_TEAM WHERE TEAM_ID=?"))
+            ) {
+                dbStat.setString(1, teamId);
+                try (ResultSet dbResult = dbStat.executeQuery()) {
+                    while (dbResult.next()) {
+                        String userId = dbResult.getString(1);
+                        String teamRole = dbResult.getString(2);
+                        usersRoles.put(userId, teamRole);
+                    }
+                }
+            }
+            return usersRoles.entrySet()
+                .stream()
+                .map(entry -> new SMTeamMemberInfo(entry.getKey(), entry.getValue()))
+                .toList();
         } catch (SQLException e) {
             throw new DBCException("Error while reading team members", e);
         }
@@ -1123,7 +1134,7 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
 
     @Override
     public void deleteTeam(String teamId, boolean force) throws DBCException {
-        String defaultUsersTeam = application.getAppConfiguration().getDefaultUserTeam();
+        String defaultUsersTeam = getDefaultUserTeam();
         if (CommonUtils.isNotEmpty(defaultUsersTeam) && defaultUsersTeam.equals(teamId)) {
             throw new DBCException("Default users team cannot be deleted");
         }
@@ -3145,5 +3156,10 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
     private String getUserId() {
         var credentials = credentialsProvider.getActiveUserCredentials();
         return credentials == null ? null : credentials.getUserId();
+    }
+
+    @NotNull
+    private String getDefaultUserTeam() {
+        return application.getAppConfiguration().getDefaultUserTeam();
     }
 }
