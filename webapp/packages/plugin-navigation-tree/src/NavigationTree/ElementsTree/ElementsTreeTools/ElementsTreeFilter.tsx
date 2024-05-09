@@ -8,21 +8,19 @@
 import { observer } from 'mobx-react-lite';
 
 import { Filter, s, useFocus, useS, useTranslate } from '@cloudbeaver/core-blocks';
-import type { ComponentStyle } from '@cloudbeaver/core-theming';
 
 import type { IElementsTree } from '../useElementsTree';
 import styles from './ElementsTreeFilter.m.css';
 
 interface Props {
   tree: IElementsTree;
-  style?: ComponentStyle;
   className?: string;
 }
 
-export const ElementsTreeFilter = observer<Props>(function ElementsTreeFilter({ tree, style, className }) {
+export const ElementsTreeFilter = observer<Props>(function ElementsTreeFilter({ tree, className }) {
   const [focusedRef] = useFocus<HTMLDivElement>({ focusFirstChild: true });
   const translate = useTranslate();
-  const computedStyles = useS(styles, style);
+  const computedStyles = useS(styles);
 
   if (!tree.settings?.filter) {
     return null;

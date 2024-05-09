@@ -7,14 +7,12 @@
  */
 import { PlaceholderContainer } from '@cloudbeaver/core-blocks';
 import { injectable } from '@cloudbeaver/core-di';
-import type { ComponentStyle } from '@cloudbeaver/core-theming';
 
 import type { IElementsTree } from '../../useElementsTree';
 import { ElementsTreeBaseSettingsForm } from './ElementsTreeBaseSettingsForm';
 
 export interface IElementsTreeSettingsProps {
   tree: IElementsTree;
-  style?: ComponentStyle;
 }
 
 @injectable()

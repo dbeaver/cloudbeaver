@@ -6,26 +6,23 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import styled from 'reshadow';
 
-import { type PlaceholderComponent, PlaceholderElement, Switch, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
+import { type PlaceholderComponent, PlaceholderElement, Switch, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { ProjectsService } from '@cloudbeaver/core-projects';
 import type { IElementsTreeSettingsProps } from '@cloudbeaver/plugin-navigation-tree';
 
 export const ProjectsSettingsForm: PlaceholderComponent<IElementsTreeSettingsProps> = observer(function ProjectsSettingsForm({
   tree: { root, settings },
-  style,
 }) {
   const projectsService = useService(ProjectsService);
-  const styles = useStyles(style);
   const translate = useTranslate();
 
   if (!settings || projectsService.activeProjects.length <= 1) {
     return null;
   }
 
-  return styled(styles)(
+  return (
     <>
       <Switch
         id={`${root}.projects`}
@@ -38,7 +35,7 @@ export const ProjectsSettingsForm: PlaceholderComponent<IElementsTreeSettingsPro
       >
         {translate('plugin_navigation_tree_settings_projects_title')}
       </Switch>
-    </>,
+    </>
   );
 });
 

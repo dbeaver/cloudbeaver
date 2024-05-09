@@ -49,14 +49,6 @@
       right: 24px;
     }
   }
-  &.box.dense > .groupTitle {
-    padding: 8px;
-    margin: 0;
-
-    & > .groupClose {
-      right: 8px;
-    }
-  }
 
   &.box,
   &.box.dense,

@@ -82,10 +82,6 @@ module.exports = (env, argv) => {
 
     const postCssPlugins = [require('postcss-preset-env')({ stage: 0 })];
 
-    if (!options.pure) {
-      postCssPlugins.push(require('@reshadow/postcss')({ scopeBehaviour: moduleScope }));
-    }
-
     return [
       ...getBaseStyleLoaders(),
       {
@@ -349,13 +345,7 @@ module.exports = (env, argv) => {
         chunkFilename: devMode ? 'styles/[name].bundle.css' : 'styles/[name]-[contenthash].css',
         ignoreOrder: true, // Enable to remove warnings about conflicting order
         insert: linkTag => {
-          let reshadowObj = document.getElementById('__reshadow__');
-
-          if (reshadowObj) {
-            document.head.insertBefore(linkTag, reshadowObj);
-          } else {
-            document.head.appendChild(linkTag);
-          }
+          document.head.appendChild(linkTag);
         },
       }),
       ...workboxPlugin,
