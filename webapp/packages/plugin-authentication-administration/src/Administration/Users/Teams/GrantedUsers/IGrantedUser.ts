@@ -5,11 +5,8 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-.staticImage {
-  display: flex;
-  width: 24px;
-}
+import type { AdminUserInfoFragment } from '@cloudbeaver/core-sdk';
 
-.roleSelector {
-  padding: 8px 0;
+export interface IGrantedUser extends AdminUserInfoFragment {
+  teamRole: string | null;
 }

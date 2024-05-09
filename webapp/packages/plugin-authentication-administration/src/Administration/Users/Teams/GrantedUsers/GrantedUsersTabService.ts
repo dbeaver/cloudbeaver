@@ -7,7 +7,7 @@
  */
 import React from 'react';
 
-import { TeamsResource, UsersResource } from '@cloudbeaver/core-authentication';
+import { TeamRolesResource, TeamsResource, UsersResource } from '@cloudbeaver/core-authentication';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
@@ -32,6 +32,7 @@ export class GrantedUsersTabService extends Bootstrap {
     private readonly usersResource: UsersResource,
     private readonly teamsResource: TeamsResource,
     private readonly notificationService: NotificationService,
+    private readonly teamRolesResource: TeamRolesResource,
   ) {
     super();
     this.key = 'granted-users';
@@ -91,14 +92,20 @@ export class GrantedUsersTabService extends Bootstrap {
 
     try {
       for (const user of revokedUsers) {
-        await this.usersResource.revokeTeam(user, config.teamId);
-        revoked.push(user);
+        await this.usersResource.revokeTeam(user.userId, config.teamId);
+        revoked.push(user.userId);
       }
 
       for (const user of state.grantedUsers) {
         if (!initial.includes(user)) {
-          await this.usersResource.grantTeam(user, config.teamId);
-          granted.push(user);
+          await this.usersResource.grantTeam(user.userId, config.teamId);
+
+          // ask the backend whether we need to reset the team role on revoke or it will be done automatically
+          if (user.teamRole) {
+            await this.teamRolesResource.assignTeamRoleToUser(user.userId, config.teamId, user.teamRole);
+          }
+
+          granted.push(user.userId);
         }
       }
 

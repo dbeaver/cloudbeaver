@@ -7,11 +7,10 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import { AdminUser, UsersResource, UsersResourceFilterKey } from '@cloudbeaver/core-authentication';
+import { UsersResource, UsersResourceFilterKey } from '@cloudbeaver/core-authentication';
 import {
   ColoredContainer,
   Container,
-  getComputed,
   Group,
   InfoItem,
   Loader,
@@ -29,6 +28,7 @@ import { TabContainerPanelComponent, useTab } from '@cloudbeaver/core-ui';
 import type { ITeamFormProps } from '../ITeamFormProps';
 import { GrantedUserList } from './GrantedUserList';
 import style from './GrantedUsers.m.css';
+import type { IGrantedUser } from './IGrantedUser';
 import { useGrantedUsers } from './useGrantedUsers';
 import { UserList } from './UserList';
 
@@ -46,9 +46,19 @@ export const GrantedUsers: TabContainerPanelComponent<ITeamFormProps> = observer
     active: selected && !isDefaultTeam,
   });
 
-  const grantedUsers = getComputed(() =>
-    users.data.filter<AdminUser>((user): user is AdminUser => !!user && state.state.grantedUsers.includes(user.userId)),
-  );
+  const grantedUserIds = state.state.grantedUsers.map(user => user.userId);
+  const grantedUsers: IGrantedUser[] = [];
+
+  for (const user of users.data) {
+    const granted = state.state.grantedUsers.find(grantedUser => grantedUser.userId === user?.userId);
+
+    if (granted && user) {
+      grantedUsers.push({
+        ...user,
+        teamRole: granted.teamRole,
+      });
+    }
+  }
 
   useAutoLoad(GrantedUsers, state, selected && !state.state.loaded && !isDefaultTeam);
 
@@ -78,14 +88,15 @@ export const GrantedUsers: TabContainerPanelComponent<ITeamFormProps> = observer
             <>
               {formState.mode === 'edit' && state.changed && <InfoItem info="ui_save_reminder" />}
               <Container gap overflow>
-                <GrantedUserList grantedUsers={grantedUsers} disabled={formState.disabled} onEdit={state.edit} onRevoke={state.revoke} />
+                <GrantedUserList
+                  grantedUsers={grantedUsers}
+                  disabled={formState.disabled}
+                  onEdit={state.edit}
+                  onRevoke={state.revoke}
+                  onTeamRoleAssign={state.assignTeamRole}
+                />
                 {state.state.editing && (
-                  <UserList
-                    userList={users.resource.values}
-                    grantedUsers={state.state.grantedUsers}
-                    disabled={formState.disabled}
-                    onGrant={state.grant}
-                  />
+                  <UserList userList={users.resource.values} grantedUsers={grantedUserIds} disabled={formState.disabled} onGrant={state.grant} />
                 )}
               </Container>
             </>
