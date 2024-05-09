@@ -26,6 +26,6 @@ module.exports = api => {
         },
       ],
     ],
-    plugins: [[require('@reshadow/babel'), {}], devMode && require.resolve('react-refresh/babel')].filter(Boolean),
+    plugins: [devMode && require.resolve('react-refresh/babel')].filter(Boolean),
   };
 };

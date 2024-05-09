@@ -157,7 +157,7 @@ export const AuthDialog: DialogComponent<IAuthOptions, null> = observer(function
           subTitle={subTitle}
           onReject={options?.persistent ? undefined : rejectDialog}
         />
-        <CommonDialogBody noBodyPadding>
+        <CommonDialogBody noOverflow={federate} noBodyPadding>
           <SContext registry={TabBigUnderlineStyleRegistry}>
             {showTabs && (
               <TabList className={s(styles, { tabList: true })} aria-label="Auth providers">

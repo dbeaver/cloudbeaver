@@ -1,3 +1,10 @@
+/*
+ * CloudBeaver - Cloud Database Manager
+ * Copyright (C) 2020-2024 DBeaver Corp and others
+ *
+ * Licensed under the Apache License, Version 2.0.
+ * you may not use this file except in compliance with the License.
+ */
 // https://jestjs.io/docs/configuration
 const path = require('path');
 
@@ -17,10 +24,6 @@ module.exports = {
     '\\.(jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$': require.resolve('./__mocks__/fileMock.js'),
     '\\.(css|scss|less)$': require.resolve('./__mocks__/styleMock.js'),
     '^dexie$': require.resolve('dexie'),
-
-    '^reshadow$': 'reshadow/lib',
-    '^@reshadow/react$': '@reshadow/react/lib',
-    '^@reshadow/runtime$': '@reshadow/runtime/lib',
   },
   passWithNoTests: true,
   setupFiles: [require.resolve('fake-indexeddb/auto'), require.resolve('../tests/setup.js')],
