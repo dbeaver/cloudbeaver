@@ -46,7 +46,6 @@ export const GrantedUsers: TabContainerPanelComponent<ITeamFormProps> = observer
     active: selected && !isDefaultTeam,
   });
 
-  const grantedUserIds = state.state.grantedUsers.map(user => user.userId);
   const grantedUsers: IGrantedUser[] = [];
 
   for (const user of users.data) {
@@ -96,7 +95,12 @@ export const GrantedUsers: TabContainerPanelComponent<ITeamFormProps> = observer
                   onTeamRoleAssign={state.assignTeamRole}
                 />
                 {state.state.editing && (
-                  <UserList userList={users.resource.values} grantedUsers={grantedUserIds} disabled={formState.disabled} onGrant={state.grant} />
+                  <UserList
+                    userList={users.resource.values}
+                    grantedUsers={grantedUsers.map(user => user.userId)}
+                    disabled={formState.disabled}
+                    onGrant={state.grant}
+                  />
                 )}
               </Container>
             </>
