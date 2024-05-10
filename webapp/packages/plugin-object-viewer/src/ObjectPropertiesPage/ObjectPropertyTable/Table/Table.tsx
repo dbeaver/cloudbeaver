@@ -7,9 +7,8 @@
  */
 import { observer } from 'mobx-react-lite';
 import { useCallback, useState } from 'react';
-import styled from 'reshadow';
 
-import { IScrollState, Link, s, useControlledScroll, useExecutor, useS, useStyles, useTable, useTranslate } from '@cloudbeaver/core-blocks';
+import { IScrollState, Link, s, useControlledScroll, useExecutor, useS, useTable, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { type DBObject, NavTreeResource } from '@cloudbeaver/core-navigation-tree';
 import type { ObjectPropertyInfo } from '@cloudbeaver/core-sdk';
@@ -25,7 +24,7 @@ import type { IDataColumn } from './Column';
 import { ColumnIcon } from './Columns/ColumnIcon/ColumnIcon';
 import { ColumnSelect } from './Columns/ColumnSelect/ColumnSelect';
 import { HeaderRenderer } from './HeaderRenderer';
-import baseStyles from './styles/base.scss';
+import './styles/base.scss';
 import { tableStyles } from './styles/styles';
 import classes from './Table.m.css';
 import { TableContext } from './TableContext';
@@ -76,12 +75,12 @@ function getMeasuredCells(columns: ObjectPropertyInfo[], rows: DBObject[]) {
 const CUSTOM_COLUMNS = [ColumnSelect, ColumnIcon];
 
 export const Table = observer<TableProps>(function Table({ objects, hasNextPage, loadMore }) {
-  const styles = useS(classes);
+  const styles = useS(classes, tableStyles);
   const navTreeResource = useService(NavTreeResource);
 
   const [tableContainer, setTableContainerRef] = useState<HTMLDivElement | null>(null);
   const translate = useTranslate();
-  const deprecatedStyles = useStyles(baseStyles, tableStyles);
+
   const tableState = useTable();
   const tabLocalState = useTabLocalState<IScrollState>(() => ({ scrollTop: 0, scrollLeft: 0 }));
 
@@ -129,7 +128,7 @@ export const Table = observer<TableProps>(function Table({ objects, hasNextPage,
     return null;
   }
 
-  return styled(deprecatedStyles)(
+  return (
     <TableContext.Provider value={{ tableData, tableState }}>
       <div ref={setTableContainerRef} className={s(styles, { container: true }, 'metadata-grid-container')}>
         <DataGrid
@@ -149,7 +148,7 @@ export const Table = observer<TableProps>(function Table({ objects, hasNextPage,
         )}
         <ObjectPropertyTableFooter className={s(styles, { objectPropertyTableFooter: true })} state={tableState} />
       </div>
-    </TableContext.Provider>,
+    </TableContext.Provider>
   );
 });
 

@@ -7,8 +7,6 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import type { ComponentStyle } from '@cloudbeaver/core-theming';
-
 import { ActionIconButton } from '../../ActionIconButton';
 import { IconOrImage } from '../../IconOrImage';
 import { useTranslate } from '../../localization/useTranslate';
@@ -25,7 +23,6 @@ interface Props {
   bigIcon?: boolean;
   onReject?: () => void;
   className?: string;
-  style?: ComponentStyle;
 }
 
 export const CommonDialogHeader = observer<Props>(function CommonDialogHeader({
@@ -37,10 +34,9 @@ export const CommonDialogHeader = observer<Props>(function CommonDialogHeader({
   bigIcon,
   className,
   onReject,
-  style,
 }) {
   const translate = useTranslate();
-  const computedStyles = useS(styles, style);
+  const computedStyles = useS(styles);
 
   return (
     <header title={tooltip} className={s(computedStyles, { header: true }, className)}>
