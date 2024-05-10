@@ -227,7 +227,7 @@ export const AuthDialog: DialogComponent<IAuthOptions, null> = observer(function
               onClose={rejectDialog}
             />
           ) : (
-            <Form className={s(styles, { submittingForm: true })} onSubmit={() => login(linkUser)}>
+            <Form className={s(styles, { submittingForm: true })} focusFirstChild onSubmit={() => login(linkUser)}>
               {renderForm(state.activeProvider, state.activeConfiguration)}
             </Form>
           )}
