@@ -10,6 +10,7 @@ import { useContext } from 'react';
 
 import { EventContext } from '@cloudbeaver/core-events';
 
+import { Clickable } from '../../Clickable';
 import { getComputed } from '../../getComputed';
 import { Icon } from '../../Icon';
 import { Loader } from '../../Loader/Loader';
@@ -86,13 +87,16 @@ export const TreeNodeExpand = observer<Props>(function TreeNodeExpand({ leaf, bi
   }
 
   return (
-    <div
+    <Clickable
+      as="div"
       className={s(styles, { treeNodeExpand: true, expanded: context.expanded, big }, className)}
+      focusable={!disabled && expandable}
+      disabled={disabled || !expandable}
       onClick={handleExpand}
       onDoubleClick={handleDbClick}
     >
       {loading && <Loader small fullSize />}
       {expandable && <Icon name={iconName} className={s(styles, { icon: true })} viewBox={viewBox} />}
-    </div>
+    </Clickable>
   );
 });
