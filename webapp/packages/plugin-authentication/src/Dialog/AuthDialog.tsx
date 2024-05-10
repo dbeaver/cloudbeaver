@@ -149,7 +149,12 @@ export const AuthDialog: DialogComponent<IAuthOptions, null> = observer(function
         state.switchAuthMode(tabData.tabId);
       }}
     >
-      <CommonDialogWrapper className={s(styles, { wrapper: true })} size="large" aria-label={translate('authentication_login_dialog_title')}>
+      <CommonDialogWrapper
+        className={s(styles, { wrapper: true })}
+        size="large"
+        aria-label={translate('authentication_login_dialog_title')}
+        autofocus={false}
+      >
         <CommonDialogHeader
           title={dialogTitle}
           tooltip={tooltip}
@@ -227,7 +232,7 @@ export const AuthDialog: DialogComponent<IAuthOptions, null> = observer(function
               onClose={rejectDialog}
             />
           ) : (
-            <Form className={s(styles, { submittingForm: true })} focusFirstChild onSubmit={() => login(linkUser)}>
+            <Form className={s(styles, { submittingForm: true })} onSubmit={() => login(linkUser)}>
               {renderForm(state.activeProvider, state.activeConfiguration)}
             </Form>
           )}
