@@ -268,6 +268,7 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
             for (String teamId : teamIds) {
                 dbStat.setString(index++, teamId);
             }
+            dbStat.execute();
         }
 
         String defaultUserTeam = getDefaultUserTeam();
