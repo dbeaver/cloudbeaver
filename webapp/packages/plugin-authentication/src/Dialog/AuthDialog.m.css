@@ -7,7 +7,7 @@
  */
 .wrapper {
   min-height: 520px !important;
-  max-height: max(var(--app-height) - 48px, 520px) !important;
+  max-height: max(var(--app-height, 100vh) - 48px, 520px) !important;
 }
 .submittingForm {
   overflow: auto;

@@ -7,17 +7,15 @@
  */
 import { createContext } from 'react';
 
-import { useAppLoadingScreen } from './AppLoadingScreen/useAppLoadingScreen';
 import type { IServiceInjector } from './IApp';
 
 export const appContext = createContext<IServiceInjector>(undefined as any);
 
-interface Props {
+export interface AppContextProps extends React.PropsWithChildren {
   app: IServiceInjector;
 }
 
-export const AppContext: React.FC<React.PropsWithChildren<Props>> = function AppContext({ app, children }) {
-  useAppLoadingScreen();
+export const AppContext: React.FC<AppContextProps> = function AppContext({ app, children }) {
   return (
     //<StrictMode> // problems with TabState when empty -> displayed state switch
     <appContext.Provider value={app}>{children}</appContext.Provider>

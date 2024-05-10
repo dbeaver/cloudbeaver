@@ -7,7 +7,7 @@
  */
 export * from './IApp';
 export * from './App';
-export * from './AppContext';
+export * from './AppContextLazy';
 export * from './Bootstrap';
 export * from './Disposable';
 export * from './Dependency';
@@ -21,5 +21,6 @@ export * from './InjectionToken';
 export * from './entities/ServiceInjectorToken';
 export * from './ITypedConstructor';
 export * from './isConstructor';
+export * from './AppLoadingScreen/HideAppLoadingScreenLazy';
 export * from './AppLoadingScreen/displayUpdateStatus';
 export { manifest as coreDIManifest } from './manifest';

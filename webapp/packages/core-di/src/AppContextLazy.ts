@@ -5,6 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-.loader {
-  height: var(--app-height, 100vh);
-}
+import { lazy } from 'react';
+
+export const AppContext = lazy(() => import('./AppContext').then(m => ({ default: m.AppContext })));
