@@ -267,8 +267,7 @@ public class WebServiceCore implements DBWServiceCore {
     public boolean closeSession(HttpServletRequest request) throws DBWebException {
         try {
             var baseWebSession = CBPlatform.getInstance().getSessionManager().closeSession(request);
-            if (baseWebSession instanceof WebSession) {
-                var webSession = (WebSession) baseWebSession;
+            if (baseWebSession instanceof WebSession webSession) {
                 for (WebSessionHandlerDescriptor hd : WebHandlerRegistry.getInstance().getSessionHandlers()) {
                     try {
                         hd.getInstance().handleSessionClose(webSession);
@@ -711,15 +710,12 @@ public class WebServiceCore implements DBWServiceCore {
             );
             if (connectionConfig.getSelectedSecretId() != null) {
                 try {
-                    DBSSecretValue secretValue = dataSource.listSharedCredentials()
+                    dataSource.listSharedCredentials()
                         .stream()
                         .filter(secret -> connectionConfig.getSelectedSecretId().equals(secret.getSubjectId()))
                         .findFirst()
-                        .orElse(null);
+                        .ifPresent(testDataSource::setSelectedSharedCredentials);
 
-                    if (secretValue != null) {
-                        testDataSource.setSelectedSharedCredentials(secretValue);
-                    }
                 } catch (DBException e) {
                     throw new DBWebException("Failed to load secret value: " + connectionConfig.getSelectedSecretId());
                 }
@@ -741,7 +737,7 @@ public class WebServiceCore implements DBWServiceCore {
             testDataSource.getConnectionConfiguration());
         testDataSource.setSavePassword(true); // We need for test to avoid password callback
         if (DataSourceDescriptor.class.isAssignableFrom(testDataSource.getClass())) {
-            ((DataSourceDescriptor) testDataSource).setAccessCheckRequired(!webSession.hasPermission(DBWConstants.PERMISSION_ADMIN));
+            testDataSource.setAccessCheckRequired(!webSession.hasPermission(DBWConstants.PERMISSION_ADMIN));
         }
         try {
             ConnectionTestJob ct = new ConnectionTestJob(testDataSource, param -> {
@@ -776,8 +772,7 @@ public class WebServiceCore implements DBWServiceCore {
         }
         try {
             DBWNetworkHandler handler = handlerDescriptor.createHandler(DBWNetworkHandler.class);
-            if (handler instanceof DBWTunnel) {
-                DBWTunnel tunnel = (DBWTunnel) handler;
+            if (handler instanceof DBWTunnel tunnel) {
                 DBPConnectionConfiguration connectionConfig = new DBPConnectionConfiguration();
                 connectionConfig.setHostName(DBConstants.HOST_LOCALHOST);
                 connectionConfig.setHostPort(CommonUtils.toString(nhConfig.getProperties()
@@ -875,7 +870,6 @@ public class WebServiceCore implements DBWServiceCore {
         @Nullable String parentPath,
         @NotNull String folderName
     ) throws DBWebException {
-        DBRProgressMonitor monitor = session.getProgressMonitor();
         WebConnectionFolderUtils.validateConnectionFolder(folderName);
         session.addInfoMessage("Create new folder");
         WebConnectionFolderInfo parentNode = null;

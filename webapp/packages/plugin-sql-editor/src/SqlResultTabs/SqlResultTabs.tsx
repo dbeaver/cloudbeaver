@@ -7,7 +7,7 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import { getComputed, s, SContext, StyleRegistry, TextPlaceholder, useS, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
+import { getComputed, s, SContext, StyleRegistry, TextPlaceholder, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { ITabData, TabIconStyles, TabList, TabListStyles, TabPanel, TabsState, TabStyles } from '@cloudbeaver/core-ui';
 

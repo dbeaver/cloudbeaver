@@ -7,7 +7,7 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import { IconOrImage, s, useS, useTranslate } from '@cloudbeaver/core-blocks';
+import { Clickable, IconOrImage, s, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import type { UserInfo as IUserInfo } from '@cloudbeaver/core-sdk';
 
