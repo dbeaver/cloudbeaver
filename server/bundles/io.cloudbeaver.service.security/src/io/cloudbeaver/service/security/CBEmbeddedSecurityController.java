@@ -243,8 +243,8 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
                 database.normalizeTableNames("UPDATE {table_prefix}CB_USER_TEAM " +
                     "SET TEAM_ROLE=? WHERE USER_ID=? AND TEAM_ID=?"))
         ) {
-            dbStat.setString(1, userId);
-            dbStat.setString(2, teamId);
+            dbStat.setString(1, teamRole);
+            dbStat.setString(2, userId);
             JDBCUtils.setStringOrNull(dbStat, 3, teamId);
         } catch (SQLException e) {
             throw new RuntimeException(e);
