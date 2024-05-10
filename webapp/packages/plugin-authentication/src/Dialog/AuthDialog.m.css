@@ -38,7 +38,6 @@
 .configurationsList {
   overflow: auto;
   margin-top: 12px;
-  margin-bottom: 12px;
   max-height: 400px;
 }
 .errorMessage {

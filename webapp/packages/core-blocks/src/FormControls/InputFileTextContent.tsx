@@ -8,7 +8,6 @@
 import { observer } from 'mobx-react-lite';
 import { ReactNode, useContext, useState } from 'react';
 
-import type { ComponentStyle } from '@cloudbeaver/core-theming';
 import { blobToBase64, bytesToSize } from '@cloudbeaver/core-utils';
 
 import { Button } from '../Button';
@@ -34,7 +33,6 @@ interface Props<TState> extends ILayoutSizeProps {
   tooltip?: string;
   required?: boolean;
   fileName?: string;
-  style?: ComponentStyle;
   /** Max file size in KB */
   maxFileSize?: number;
   disabled?: boolean;
