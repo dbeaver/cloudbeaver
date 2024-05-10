@@ -81,33 +81,24 @@ module.exports = (env, argv) => {
     return loaders;
   }
 
-  function generateStyleLoaders(options = { hasModule: false, disable: false, pure: false }) {
-    const moduleScope = options.hasModule ? 'local' : 'global';
-    let modules = {
-      mode: moduleScope,
-      localIdentName: '[local]___[hash:base64:5]',
-    };
-
-    if (options.disable) {
-      modules = false;
-    }
-
-    const postCssPlugins = [require('postcss-preset-env')({ stage: 0 })];
-
+  function generateModuleStyleLoaders() {
     return [
       ...getBaseStyleLoaders(),
       {
         loader: 'css-loader',
         options: {
           esModule: true,
-          modules: modules,
+          modules: {
+            auto: /(module|m)\.(css|s[ac]ss)$/,
+            localIdentName: '[local]___[hash:base64:5]',
+          },
         },
       },
       {
         loader: 'postcss-loader',
         options: {
           postcssOptions: {
-            plugins: postCssPlugins,
+            plugins: [require('postcss-preset-env')({ stage: 0 })],
           },
         },
       },
@@ -165,19 +156,19 @@ module.exports = (env, argv) => {
       removeEmptyChunks: false,
       splitChunks: {
         cacheGroups: {
-          stylesAsync: {
-            name: 'styles-async',
-            type: 'css/mini-extract',
-            chunks: 'async',
-            reuseExistingChunk: true,
-            priority: 20,
-          },
           styles: {
             name: 'styles',
             type: 'css/mini-extract',
             chunks: 'initial',
             reuseExistingChunk: true,
             priority: 10,
+          },
+          stylesAsync: {
+            name: 'styles-async',
+            type: 'css/mini-extract',
+            chunks: 'async',
+            reuseExistingChunk: true,
+            priority: 20,
           },
           locale: {
             chunks: 'all',
@@ -324,27 +315,7 @@ module.exports = (env, argv) => {
         {
           test: /\.(css|s[ac]ss)$/,
           exclude: /node_modules/,
-          oneOf: [
-            {
-              test: /\.module\.(css|s[ac]ss)$/,
-              use: generateStyleLoaders({ hasModule: true }),
-            },
-            {
-              test: /\.m\.(css|s[ac]ss)$/,
-              use: generateStyleLoaders({ hasModule: true, pure: true }),
-            },
-            {
-              include: /node_modules/,
-              use: [...getBaseStyleLoaders(), 'css-loader', 'sass-loader'],
-            },
-            {
-              test: /\.(theme|pure)\.(css|s[ac]ss)$/,
-              use: generateStyleLoaders({ disable: true }),
-            },
-            {
-              use: generateStyleLoaders(),
-            },
-          ],
+          use: generateModuleStyleLoaders(),
         },
         {
           test: /\.(png|jpg|gif)$/i,

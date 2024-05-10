@@ -10,18 +10,7 @@ import { observer } from 'mobx-react-lite';
 import type { AdministrationItemContentComponent } from '@cloudbeaver/core-administration';
 import { s, SContext, StyleRegistry, ToolsPanel, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import {
-  ITabData,
-  Tab,
-  TabList,
-  TabPanel,
-  TabPanelStyles,
-  TabsState,
-  TabStyles,
-  TabTitle,
-  TabTitleStyles,
-  TabUnderlineStyleRegistry,
-} from '@cloudbeaver/core-ui';
+import { ITabData, Tab, TabList, TabPanel, TabPanelStyles, TabsState, TabStyles, TabTitle, TabTitleStyles } from '@cloudbeaver/core-ui';
 
 import style from './shared/UsersAdministration.m.css';
 import tabStyle from './shared/UsersAdministrationTab.m.css';
@@ -34,7 +23,6 @@ import { UsersPage } from './UsersTable/UsersPage';
 const tabPanelRegistry: StyleRegistry = [[TabPanelStyles, { mode: 'append', styles: [tabPanelStyle] }]];
 
 const mainTabsRegistry: StyleRegistry = [
-  ...TabUnderlineStyleRegistry,
   [TabStyles, { mode: 'append', styles: [tabStyle] }],
   [TabTitleStyles, { mode: 'append', styles: [TabTitleModuleStyles] }],
 ];
@@ -58,7 +46,7 @@ export const UsersAdministration: AdministrationItemContentComponent = observer(
   return (
     <TabsState selectedId={subName} lazy onChange={openSub}>
       <ToolsPanel bottomBorder>
-        <TabList className={s(styles, { tabList: true, administrationTabs: true })} aria-label="User Administration pages">
+        <TabList className={s(styles, { tabList: true, administrationTabs: true })} aria-label="User Administration pages" underline>
           <SContext registry={mainTabsRegistry}>
             <Tab tabId={EUsersAdministrationSub.Users}>
               <TabTitle>{translate('authentication_administration_item_users')}</TabTitle>

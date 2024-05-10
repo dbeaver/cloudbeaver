@@ -11,7 +11,7 @@ import { observer } from 'mobx-react-lite';
 import { ActionIconButton, Container, Group, Loader, s, SContext, StyleRegistry, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { TabContainerPanelComponent, TabList, TabsState, TabStyles, TabUnderlineStyleRegistry, useTabLocalState } from '@cloudbeaver/core-ui';
+import { TabContainerPanelComponent, TabList, TabsState, TabStyles, useTabLocalState } from '@cloudbeaver/core-ui';
 
 import { ResultSetSelectAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetSelectAction';
 import { useResultSetActions } from '../../DatabaseDataModel/Actions/ResultSet/useResultSetActions';
@@ -25,7 +25,7 @@ import { TextValuePresentationService } from './TextValuePresentationService';
 import { TextValueTruncatedMessage } from './TextValueTruncatedMessage';
 import { useTextValue } from './useTextValue';
 
-const tabRegistry: StyleRegistry = [...TabUnderlineStyleRegistry, [TabStyles, { mode: 'append', styles: [TextValuePresentationTab] }]];
+const tabRegistry: StyleRegistry = [[TabStyles, { mode: 'append', styles: [TextValuePresentationTab] }]];
 
 export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelProps<any, IDatabaseResultSet>> = observer(
   function TextValuePresentation({ model, resultIndex, dataFormat }) {
@@ -117,7 +117,7 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
               onChange={tab => selectTabHandler(tab.tabId)}
             >
               <SContext registry={tabRegistry}>
-                <TabList className={s(style, { tabList: true, textValuePresentationTab: true })} />
+                <TabList className={s(style, { tabList: true, textValuePresentationTab: true, underline: true })} underline />
               </SContext>
             </TabsState>
           </Container>

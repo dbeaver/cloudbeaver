@@ -7,10 +7,10 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import { Button, Container, Form, s, SContext, StatusMessage, useAutoLoad, useForm, useS, useTranslate } from '@cloudbeaver/core-blocks';
+import { Button, Container, Form, s, StatusMessage, useAutoLoad, useForm, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { FormMode, IFormState, TabBigUnderlineStyleRegistry, TabList, TabPanelList, TabsState } from '@cloudbeaver/core-ui';
+import { FormMode, IFormState, TabList, TabPanelList, TabsState } from '@cloudbeaver/core-ui';
 import { getFirstException } from '@cloudbeaver/core-utils';
 
 import style from './AdministrationUserForm.m.css';
@@ -68,9 +68,7 @@ export const AdministrationUserForm = observer<Props>(function AdministrationUse
           <Container className={s(styles, { bar: true })} gap keepSize noWrap>
             <Container fill>
               <StatusMessage exception={getFirstException(state.exception)} type={state.statusType} message={state.statusMessage} />
-              <SContext registry={TabBigUnderlineStyleRegistry}>
-                <TabList className={s(styles, { tabList: true })} />
-              </SContext>
+              <TabList className={s(styles, { tabList: true })} underline big />
             </Container>
             <Container keepSize noWrap center gap compact>
               {editing && (
