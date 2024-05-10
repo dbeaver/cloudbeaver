@@ -7,9 +7,8 @@
  */
 import { observer } from 'mobx-react-lite';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import styled, { css, use } from 'reshadow';
 
-import { Form, getComputed, ToolsPanel } from '@cloudbeaver/core-blocks';
+import { Form, getComputed, s, ToolsPanel, useS } from '@cloudbeaver/core-blocks';
 import type { IDataContext } from '@cloudbeaver/core-data-context';
 import { useService } from '@cloudbeaver/core-di';
 
@@ -17,51 +16,9 @@ import { ResultSetConstraintAction } from '../../DatabaseDataModel/Actions/Resul
 import type { IDatabaseDataModel } from '../../DatabaseDataModel/IDatabaseDataModel';
 import { DataViewerSettingsService } from '../../DataViewerSettingsService';
 import { AutoRefreshButton } from './AutoRefresh/AutoRefreshButton';
+import styles from './TableFooter.m.css';
 import { TableFooterMenu } from './TableFooterMenu/TableFooterMenu';
 import { TableFooterRowCount } from './TableFooterRowCount';
-
-const tableFooterStyles = css`
-  count input,
-  count placeholder {
-    height: 26px;
-    width: 80px;
-    box-sizing: border-box;
-    padding: 4px 7px;
-    font-size: 13px;
-    line-height: 24px;
-  }
-  reload {
-    composes: theme-text-primary theme-ripple from global;
-    height: 100%;
-    display: flex;
-    cursor: pointer;
-    align-items: center;
-    padding: 0 16px;
-
-    & IconOrImage {
-      & :global(use) {
-        fill: var(--theme-primary) !important;
-      }
-      width: 24px;
-      height: 24px;
-    }
-  }
-  IconButton {
-    position: relative;
-    height: 24px;
-    width: 24px;
-    display: block;
-  }
-  time {
-    composes: theme-typography--caption from global;
-    white-space: nowrap;
-    margin-left: auto;
-    margin-right: 16px;
-  }
-  count {
-    padding: 0 4px;
-  }
-`;
 
 interface Props {
   resultIndex: number;
@@ -74,6 +31,7 @@ export const TableFooter = observer<Props>(function TableFooter({ resultIndex, m
   const ref = useRef<HTMLInputElement>(null);
   const [limit, setLimit] = useState(model.countGain + '');
   const dataViewerSettingsService = useService(DataViewerSettingsService);
+  const style = useS(styles);
 
   const handleChange = useCallback(async () => {
     if (!ref.current) {
@@ -97,16 +55,14 @@ export const TableFooter = observer<Props>(function TableFooter({ resultIndex, m
   const disabled = getComputed(() => model.isLoading() || model.isDisabled(resultIndex));
   const constraint = model.getResult(resultIndex) ? model.source.getAction(resultIndex, ResultSetConstraintAction) : null;
 
-  return styled(tableFooterStyles)(
+  return (
     <ToolsPanel type="secondary" center>
-      {/* <reload aria-disabled={disabled} onClick={() => model.refresh()}>
-        <IconOrImage icon='reload' viewBox="0 0 16 16" />
-      </reload> */}
       <AutoRefreshButton model={model} disabled={disabled} />
-      <count>
+      <div className={s(style, { count: true })}>
         <Form onSubmit={handleChange}>
           <input
             ref={ref}
+            className={s(style, { input: true })}
             type="number"
             value={limit}
             disabled={disabled}
@@ -114,17 +70,16 @@ export const TableFooter = observer<Props>(function TableFooter({ resultIndex, m
             max={dataViewerSettingsService.maxFetchSize}
             onChange={e => setLimit(e.target.value)}
             onBlur={handleChange}
-            {...use({ mod: 'surface' })}
           />
         </Form>
-      </count>
+      </div>
       {constraint?.supported && <TableFooterRowCount model={model} resultIndex={resultIndex} />}
       <TableFooterMenu model={model} resultIndex={resultIndex} simple={simple} context={context} />
       {model.source.requestInfo.requestMessage.length > 0 && (
-        <time>
+        <div className={s(style, { time: true })}>
           {model.source.requestInfo.requestMessage} - {model.source.requestInfo.requestDuration}ms
-        </time>
+        </div>
       )}
-    </ToolsPanel>,
+    </ToolsPanel>
   );
 });

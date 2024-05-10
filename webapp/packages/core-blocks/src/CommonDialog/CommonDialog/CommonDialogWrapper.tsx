@@ -9,10 +9,9 @@ import { observer } from 'mobx-react-lite';
 import { forwardRef, useContext, useEffect } from 'react';
 import { Dialog, useDialogState } from 'reakit/Dialog';
 
-import type { ComponentStyle } from '@cloudbeaver/core-theming';
-
 import { Loader } from '../../Loader/Loader';
 import { s } from '../../s';
+import { useFocus } from '../../useFocus';
 import { useS } from '../../useS';
 import { DialogContext } from '../DialogContext';
 import styles from './CommonDialogWrapper.m.css';
@@ -25,15 +24,12 @@ export interface CommonDialogWrapperProps {
   freeHeight?: boolean;
   className?: string;
   children?: React.ReactNode;
-  style?: ComponentStyle;
 }
 
 export const CommonDialogWrapper = observer<CommonDialogWrapperProps, HTMLDivElement>(
-  forwardRef(function CommonDialogWrapper(
-    { size = 'medium', fixedSize, fixedWidth, freeHeight, 'aria-label': ariaLabel, className, children, style },
-    ref,
-  ) {
-    const computedStyles = useS(styles, style);
+  forwardRef(function CommonDialogWrapper({ size = 'medium', fixedSize, fixedWidth, freeHeight, 'aria-label': ariaLabel, className, children }, ref) {
+    const [focusedRef] = useFocus({ autofocus: true });
+    const computedStyles = useS(styles);
     const context = useContext(DialogContext);
     const dialogState = useDialogState({ visible: true });
 
@@ -54,6 +50,8 @@ export const CommonDialogWrapper = observer<CommonDialogWrapperProps, HTMLDivEle
         modal={false}
       >
         <dialog
+          ref={focusedRef}
+          tabIndex={0}
           className={s(
             computedStyles,
             { dialog: true, small: size === 'small', medium: size === 'medium', large: size === 'large', fixedSize, fixedWidth, freeHeight },

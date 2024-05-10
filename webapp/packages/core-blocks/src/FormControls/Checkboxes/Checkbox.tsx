@@ -7,8 +7,6 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import type { ComponentStyle } from '@cloudbeaver/core-theming';
-
 import { isControlPresented } from '../isControlPresented';
 import { CheckboxMarkup, CheckboxMod } from './CheckboxMarkup';
 import { CheckboxOnChangeEvent, useCheckboxState } from './useCheckboxState';
@@ -19,7 +17,6 @@ export interface CheckboxBaseProps {
   ripple?: boolean;
   indeterminate?: boolean;
   inverse?: boolean;
-  style?: ComponentStyle;
 }
 
 export type CheckboxInputProps = Omit<
