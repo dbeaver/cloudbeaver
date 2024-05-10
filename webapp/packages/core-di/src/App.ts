@@ -78,15 +78,17 @@ export class App {
 
   // first phase register all dependencies
   private async registerServices(preload?: boolean): Promise<void> {
-    for (const serviceLoader of this.getServices(preload)) {
-      const service = await serviceLoader();
+    const services = await Promise.all(this.getServices(preload).map(serviceLoader => serviceLoader()));
+
+    for (const service of services) {
       this.diWrapper.collection.addServiceByClass(service);
     }
   }
 
   private async initializeServices(preload?: boolean): Promise<void> {
-    for (const serviceLoader of this.getServices(preload)) {
-      const service = await serviceLoader();
+    const services = await Promise.all(this.getServices(preload).map(serviceLoader => serviceLoader()));
+
+    for (const service of services) {
       if (service.prototype instanceof Bootstrap) {
         const serviceInstance = this.diWrapper.injector.getServiceByClass<Bootstrap>(service);
 
@@ -100,8 +102,9 @@ export class App {
   }
 
   private async loadServices(preload?: boolean): Promise<void> {
-    for (const serviceLoader of this.getServices(preload)) {
-      const service = await serviceLoader();
+    const services = await Promise.all(this.getServices(preload).map(serviceLoader => serviceLoader()));
+
+    for (const service of services) {
       if (service.prototype instanceof Bootstrap) {
         const serviceInstance = this.diWrapper.injector.getServiceByClass<Bootstrap>(service);
 

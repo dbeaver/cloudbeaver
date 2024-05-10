@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 /// <reference lib="WebWorker" />
-import { Workbox } from 'workbox-window';
+import { Workbox, WorkboxLifecycleEvent, WorkboxMessageEvent } from 'workbox-window';
 
 import { Disposable, injectable } from '@cloudbeaver/core-di';
 import { Executor, IExecutor } from '@cloudbeaver/core-executor';
@@ -35,6 +35,8 @@ export class ServiceWorkerService extends Disposable {
     this.updateIntervalId = null;
     this.registration = null;
     this.isUpdating = false;
+    this.handleMessage = this.handleMessage.bind(this);
+    this.handleControlling = this.handleControlling.bind(this);
   }
 
   async register(): Promise<void> {
@@ -48,9 +50,8 @@ export class ServiceWorkerService extends Disposable {
     } else {
       this.workbox = new Workbox(this.workerURL);
       this.registration = (await this.workbox.register()) || null;
-      this.registration?.addEventListener('updatefound', () => {});
       // should be after registration
-      this.registerRefreshAfterUpdate();
+      this.registerEventListeners();
 
       if (this.registration?.active) {
         this.isUpdating = true;
@@ -65,10 +66,10 @@ export class ServiceWorkerService extends Disposable {
       });
     }
 
+    await this.workbox?.update();
+
     if (this.registration?.active) {
       // wait for update only for active service worker
-      await this.workbox?.update();
-
       if (this.registration.installing || this.registration.waiting) {
         // handled by refresh at 'controlling' event
         await new Promise(() => {});
@@ -82,46 +83,48 @@ export class ServiceWorkerService extends Disposable {
     if (this.updateIntervalId) {
       clearInterval(this.updateIntervalId);
     }
+
+    this.workbox?.removeEventListener('message', this.handleMessage);
+    this.workbox?.removeEventListener('controlling', this.handleControlling);
   }
 
-  private registerRefreshAfterUpdate(): void {
-    if (!this.workbox) {
+  private registerEventListeners(): void {
+    this.workbox?.addEventListener('message', this.handleMessage);
+    this.workbox?.addEventListener('controlling', this.handleControlling);
+  }
+
+  private handleMessage({ data }: WorkboxMessageEvent) {
+    switch (data.type) {
+      case 'mode':
+        {
+          this.onUpdate.execute({
+            type: this.isUpdating || data.isUpdate ? 'updating' : 'installing',
+          });
+        }
+        break;
+      case 'progress':
+        {
+          const progress = Math.min(1, Math.max(0, data.progress));
+
+          this.onUpdate.execute({
+            type: this.isUpdating || data.isUpdate ? 'updating' : 'installing',
+            progress,
+          });
+        }
+        break;
+    }
+  }
+
+  private async handleControlling(event: WorkboxLifecycleEvent) {
+    this.isUpdating = false;
+    await this.onUpdate.execute({
+      type: 'finished',
+    });
+
+    if (!event.isUpdate) {
       return;
     }
 
-    this.workbox.addEventListener('message', ({ data }) => {
-      switch (data.type) {
-        case 'mode':
-          {
-            this.onUpdate.execute({
-              type: this.isUpdating || data.isUpdate ? 'updating' : 'installing',
-            });
-          }
-          break;
-        case 'progress':
-          {
-            const progress = Math.min(1, Math.max(0, data.progress));
-
-            this.onUpdate.execute({
-              type: this.isUpdating || data.isUpdate ? 'updating' : 'installing',
-              progress,
-            });
-          }
-          break;
-      }
-    });
-
-    this.workbox.addEventListener('controlling', async event => {
-      this.isUpdating = false;
-      await this.onUpdate.execute({
-        type: 'finished',
-      });
-
-      if (!event.isUpdate) {
-        return;
-      }
-
-      window.location.reload();
-    });
+    window.location.reload();
   }
 }

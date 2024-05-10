@@ -81,12 +81,12 @@ function createUpdateProgressPlugin(): WorkboxPlugin {
     },
     cachedResponseWillBeUsed: async ({ event, cachedResponse, cacheName }) => {
       if (event.type === 'install' && cacheName === cacheNames.precache) {
-        const size = precacheController.getURLsToCacheKeys().size;
+        const size = Math.max(precacheController.getURLsToCacheKeys().size, 1);
         updated++;
 
         await broadcastMessage({
           type: 'progress',
-          progress: updated / (size ?? 1),
+          progress: updated / size,
         });
       }
 
@@ -100,21 +100,33 @@ addPlugins([createUpdateProgressPlugin()]);
 clientsClaim();
 precacheAndRoute(manifest);
 
-const cacheName = 'images';
-const maxAgeSeconds = 7 * 24 * 60 * 60;
-const maxEntries = 1000;
-
 registerRoute(
-  ({ request }) => request.destination === 'image',
+  ({ request }) => request.destination === 'font',
   new CacheFirst({
-    cacheName,
+    cacheName: 'fonts',
     plugins: [
       new CacheableResponsePlugin({
         statuses: [0, 200],
       }),
       new ExpirationPlugin({
-        maxEntries,
-        maxAgeSeconds,
+        maxEntries: 1000,
+        maxAgeSeconds: 7 * 24 * 60 * 60,
+      }),
+    ],
+  }),
+);
+
+registerRoute(
+  ({ request }) => request.destination === 'image',
+  new CacheFirst({
+    cacheName: 'images',
+    plugins: [
+      new CacheableResponsePlugin({
+        statuses: [0, 200],
+      }),
+      new ExpirationPlugin({
+        maxEntries: 1000,
+        maxAgeSeconds: 7 * 24 * 60 * 60,
       }),
     ],
   }),

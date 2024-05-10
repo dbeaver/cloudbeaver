@@ -5,7 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-const { resolve, join } = require('path');
+const { resolve } = require('path');
 const PnpWebpackPlugin = require('pnp-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const { SourceAssetsResolver } = require('../utils/SourceAssetsResolver.js');
@@ -30,13 +30,25 @@ module.exports = (env, argv) => {
 
   const workboxPlugin = [];
 
-  if (devMode) {
+  if (!devMode) {
     workboxPlugin.push(
       new WorkboxPlugin.InjectManifest({
         swSrc: getServiceWorkerSource(),
         swDest: 'service-worker.js',
         maximumFileSizeToCacheInBytes: 20 * 1024 * 1024,
-        exclude: [/license\.txt$/, /\.map$/, /manifest.*\.js$/, /\.tsx?$/, /\.tsbuildinfo$/, /\.DS_Store$/],
+        exclude: [
+          /license\.txt$/,
+          /\.map$/,
+          /manifest.*\.js$/,
+          /\.tsx?$/,
+          /\.tsbuildinfo$/,
+          /\.DS_Store$/,
+          /\.svg$/,
+          /.woff2?$/,
+          /.eot$/,
+          /.ttf$/,
+          /.otf$/,
+        ],
       }),
     );
 
