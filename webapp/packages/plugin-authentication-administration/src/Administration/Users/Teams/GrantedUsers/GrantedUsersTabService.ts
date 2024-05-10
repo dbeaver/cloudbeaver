@@ -11,7 +11,7 @@ import { TeamRolesResource, TeamsResource, UsersResource } from '@cloudbeaver/co
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
-import { isArraysEqual, MetadataValueGetter } from '@cloudbeaver/core-utils';
+import { isArraysEqual, isObjectsEqual, MetadataValueGetter } from '@cloudbeaver/core-utils';
 
 import { teamContext } from '../Contexts/teamContext';
 import type { ITeamFormProps, ITeamFormSubmitData } from '../ITeamFormProps';
@@ -79,7 +79,7 @@ export class GrantedUsersTabService extends Bootstrap {
 
     const initial = await this.teamsResource.loadGrantedUsers(config.teamId);
 
-    const changed = !isArraysEqual(initial, state.grantedUsers);
+    const changed = !isArraysEqual(initial, state.grantedUsers, isObjectsEqual);
 
     if (!changed) {
       return;
@@ -88,7 +88,7 @@ export class GrantedUsersTabService extends Bootstrap {
     const granted: string[] = [];
     const revoked: string[] = [];
 
-    const revokedUsers = initial.filter(user => !state.grantedUsers.includes(user));
+    const revokedUsers = initial.filter(user => !state.grantedUsers.some(grantedUser => grantedUser.userId === user.userId));
 
     try {
       for (const user of revokedUsers) {
@@ -97,15 +97,17 @@ export class GrantedUsersTabService extends Bootstrap {
       }
 
       for (const user of state.grantedUsers) {
-        if (!initial.includes(user)) {
+        const initialUser = initial.find(grantedUser => grantedUser.userId === user.userId);
+
+        if (!initialUser) {
           await this.usersResource.grantTeam(user.userId, config.teamId);
-
-          // ask the backend whether we need to reset the team role on revoke or it will be done automatically
-          if (user.teamRole) {
-            await this.teamRolesResource.assignTeamRoleToUser(user.userId, config.teamId, user.teamRole);
-          }
-
           granted.push(user.userId);
+        }
+
+        const initialRole = initialUser?.teamRole ?? null;
+
+        if (user.teamRole !== initialRole) {
+          await this.teamRolesResource.assignTeamRoleToUser(user.userId, config.teamId, user.teamRole);
         }
       }
 

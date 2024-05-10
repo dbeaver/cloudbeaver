@@ -23,11 +23,11 @@ export class TeamRolesResource extends CachedDataResource<string[]> {
     sessionPermissionsResource.require(this, EAdminPermission.admin).outdateResource(this);
   }
 
-  async assignTeamRoleToUser(userId: string, teamId: string, teamRole: string) {
+  async assignTeamRoleToUser(userId: string, teamId: string, teamRole: string | null) {
     const { result } = await this.graphQLService.sdk.updateUserTeamRole({
       userId,
       teamId,
-      teamRole,
+      teamRole: teamRole ?? undefined,
     });
 
     return result;
