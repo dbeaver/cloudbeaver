@@ -61,7 +61,7 @@ public class WebServiceBindingAdmin extends WebServiceBindingBase<DBWServiceAdmi
             .dataFetcher("listAuthRoles",
                 env -> getService(env).listAuthRoles())
             .dataFetcher("listTeamRoles",
-                env -> getService(env).listAuthRoles())
+                env -> getService(env).listTeamRoles())
             .dataFetcher("listTeamMetaParameters",
                 env -> getService(env).listTeamMetaParameters(getWebSession(env)))
             .dataFetcher("createUser",
