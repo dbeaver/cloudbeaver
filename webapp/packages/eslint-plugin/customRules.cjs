@@ -6,7 +6,6 @@
  * you may not use this file except in compliance with the License.
  */
 
-const reshadowDeprecated = require('./reshadowDeprecated.cjs');
 const noSyncComponentImport = require('./noSyncComponentImport.cjs');
 
 module.exports = {
@@ -18,10 +17,9 @@ module.exports = {
     recommended: {
       plugins: ['@cloudbeaver'],
       rules: {
-        '@cloudbeaver/reshadow-deprecated': 'warn',
         '@cloudbeaver/no-sync-component-import': 'error',
       },
     },
   },
-  rules: { 'reshadow-deprecated': reshadowDeprecated, 'no-sync-component-import': noSyncComponentImport },
+  rules: { 'no-sync-component-import': noSyncComponentImport },
 };

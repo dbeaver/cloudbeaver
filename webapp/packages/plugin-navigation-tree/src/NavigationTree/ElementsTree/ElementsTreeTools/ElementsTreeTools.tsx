@@ -7,7 +7,6 @@
  */
 import { observer } from 'mobx-react-lite';
 import React, { useState } from 'react';
-import styled from 'reshadow';
 
 import {
   ActionIconButton,
@@ -18,10 +17,8 @@ import {
   SContext,
   StyleRegistry,
   useS,
-  useStyles,
   useTranslate,
 } from '@cloudbeaver/core-blocks';
-import type { ComponentStyle } from '@cloudbeaver/core-theming';
 import { useCaptureViewContext } from '@cloudbeaver/core-view';
 
 import { DATA_CONTEXT_ELEMENTS_TREE } from '../DATA_CONTEXT_ELEMENTS_TREE';
@@ -47,14 +44,12 @@ const registry: StyleRegistry = [
 interface Props {
   tree: IElementsTree;
   settingsElements?: PlaceholderElement<IElementsTreeSettingsProps>[];
-  style?: ComponentStyle;
 }
 
-export const ElementsTreeTools = observer<React.PropsWithChildren<Props>>(function ElementsTreeTools({ tree, settingsElements, style, children }) {
+export const ElementsTreeTools = observer<React.PropsWithChildren<Props>>(function ElementsTreeTools({ tree, settingsElements, children }) {
   const root = tree.root;
   const translate = useTranslate();
   const [opened, setOpen] = useState(false);
-  const deprecatedStyles = useStyles(style);
   const styles = useS(ElementsTreeToolsStyles, ElementsTreeToolsIconButtonStyles);
 
   useCaptureViewContext(context => {
@@ -64,7 +59,7 @@ export const ElementsTreeTools = observer<React.PropsWithChildren<Props>>(functi
 
   const loading = tree.isLoading();
 
-  return styled(deprecatedStyles)(
+  return (
     <SContext registry={registry}>
       <div className={s(styles, { tools: true })}>
         <div className={s(styles, { actions: true })}>
@@ -88,10 +83,10 @@ export const ElementsTreeTools = observer<React.PropsWithChildren<Props>>(functi
             onClick={() => tree.refresh(root)}
           />
         </div>
-        {tree.settings && opened && <NavigationTreeSettings tree={tree} elements={settingsElements} style={style} />}
-        <ElementsTreeFilter tree={tree} style={style} />
+        {tree.settings && opened && <NavigationTreeSettings tree={tree} elements={settingsElements} />}
+        <ElementsTreeFilter tree={tree} />
         {children}
       </div>
-    </SContext>,
+    </SContext>
   );
 });

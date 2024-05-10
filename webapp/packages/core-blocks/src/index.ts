@@ -220,7 +220,6 @@ export * from './useErrorDetails';
 export * from './useActivationDelay';
 export * from './useAdministrationSettings';
 export * from './useInterval';
-export * from './useStyles';
 export * from './useSuspense';
 export * from './BlocksLocaleService';
 export * from './Snackbars/NotificationMark';
