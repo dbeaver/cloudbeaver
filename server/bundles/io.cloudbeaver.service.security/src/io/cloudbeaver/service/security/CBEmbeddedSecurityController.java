@@ -276,7 +276,7 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
         if (!ArrayUtils.isEmpty(teamIds)) {
             Set<String> currentUserTeams = new HashSet<>(JDBCUtils.queryStrings(
                 dbCon,
-                "SELECT TEAM_ID FROM {table_prefix}CB_USER_TEAM WHERE USER_ID=?",
+                database.normalizeTableNames("SELECT TEAM_ID FROM {table_prefix}CB_USER_TEAM WHERE USER_ID=?"),
                 userId
             ));
 
