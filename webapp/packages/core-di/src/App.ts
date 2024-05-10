@@ -22,12 +22,13 @@ export class App {
   readonly onStart: IExecutor<IStartData>;
   private readonly plugins: PluginManifest[];
   private readonly diWrapper: IDiWrapper = inversifyWrapper;
+  private isAppServiceBound: boolean;
 
   constructor(plugins: PluginManifest[] = []) {
     this.plugins = plugins;
     this.onStart = new Executor();
+    this.isAppServiceBound = false;
 
-    this.getServiceCollection().addServiceByClass(App, this);
     this.onStart.addHandler(async ({ preload }) => {
       await this.registerServices(preload);
       await this.initializeServices(preload);
@@ -50,6 +51,7 @@ export class App {
 
   dispose(): void {
     this.diWrapper.collection.unbindAll();
+    this.isAppServiceBound = false;
   }
 
   getPlugins(): PluginManifest[] {
@@ -78,6 +80,10 @@ export class App {
 
   // first phase register all dependencies
   private async registerServices(preload?: boolean): Promise<void> {
+    if (!this.isAppServiceBound) {
+      this.getServiceCollection().addServiceByClass(App, this);
+      this.isAppServiceBound = true;
+    }
     const services = await Promise.all(this.getServices(preload).map(serviceLoader => serviceLoader()));
 
     for (const service of services) {
