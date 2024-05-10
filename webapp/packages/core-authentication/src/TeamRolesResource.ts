@@ -10,7 +10,7 @@ import { CachedDataResource } from '@cloudbeaver/core-resource';
 import { EAdminPermission, SessionPermissionsResource } from '@cloudbeaver/core-root';
 import { GraphQLService } from '@cloudbeaver/core-sdk';
 
-export const USER_TEAM_ROLE_SUPERVISOR = 'SUPERVISOR';
+export const USER_TEAM_ROLE_SUPERVISOR = 'Supervisor';
 
 @injectable()
 export class TeamRolesResource extends CachedDataResource<string[]> {
