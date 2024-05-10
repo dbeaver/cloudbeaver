@@ -19,7 +19,6 @@ export async function bootstrap(plugins: PluginManifest[]): Promise<App> {
   let exception: Error | null = null;
 
   try {
-    await app.preload();
     await app.start();
   } catch (e: any) {
     exception = e;
@@ -30,8 +29,12 @@ export async function bootstrap(plugins: PluginManifest[]): Promise<App> {
   const unmountExecutor = new SyncExecutor();
 
   unmountExecutor.addHandler(() => render.unmount());
-  app.onStart.before(unmountExecutor);
-  app.onStart.addHandler(() => render.renderApp());
+  app.onStart.before(unmountExecutor, undefined, data => data.preload);
+  app.onStart.addHandler(({ preload }) => {
+    if (!preload) {
+      render.renderApp();
+    }
+  });
   app.onStart.addPostHandler((_, context) => {
     const exception = context.getContext(executionExceptionContext);
 

@@ -36,11 +36,8 @@ export class App {
     });
   }
 
-  async preload(): Promise<void> {
-    await this.onStart.execute({ preload: true });
-  }
-
   async start(): Promise<void> {
+    await this.onStart.execute({ preload: true });
     await this.onStart.execute({ preload: false });
   }
 
