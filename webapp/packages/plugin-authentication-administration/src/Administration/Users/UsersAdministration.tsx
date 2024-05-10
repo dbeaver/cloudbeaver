@@ -43,7 +43,7 @@ export const UsersAdministration: AdministrationItemContentComponent = observer(
   const translate = useTranslate();
   const usersAdministrationNavigationService = useService(UsersAdministrationNavigationService);
   const subName = sub?.name || EUsersAdministrationSub.Users;
-  const styles = useS(style);
+  const styles = useS(style, tabStyle);
 
   function openSub({ tabId }: ITabData) {
     if (subName === tabId) {
@@ -58,7 +58,7 @@ export const UsersAdministration: AdministrationItemContentComponent = observer(
   return (
     <TabsState selectedId={subName} lazy onChange={openSub}>
       <ToolsPanel bottomBorder>
-        <TabList className={s(styles, { tabList: true })} aria-label="User Administration pages">
+        <TabList className={s(styles, { tabList: true, administrationTabs: true })} aria-label="User Administration pages">
           <SContext registry={mainTabsRegistry}>
             <Tab tabId={EUsersAdministrationSub.Users}>
               <TabTitle>{translate('authentication_administration_item_users')}</TabTitle>

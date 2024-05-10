@@ -8,7 +8,7 @@
 import { observable } from 'mobx';
 import { observer } from 'mobx-react-lite';
 
-import { ActionIconButton, Container, Fill, Group, Loader, s, SContext, StyleRegistry, useS, useTranslate } from '@cloudbeaver/core-blocks';
+import { ActionIconButton, Container, Group, Loader, s, SContext, StyleRegistry, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { TabContainerPanelComponent, TabList, TabsState, TabStyles, TabUnderlineStyleRegistry, useTabLocalState } from '@cloudbeaver/core-ui';
@@ -32,7 +32,7 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
     const translate = useTranslate();
     const notificationService = useService(NotificationService);
     const textValuePresentationService = useService(TextValuePresentationService);
-    const style = useS(styles);
+    const style = useS(styles, TextValuePresentationTab);
     const selection = model.source.getAction(resultIndex, ResultSetSelectAction);
     const activeElements = selection.getActiveElements();
     const firstSelectedCell = activeElements.length ? activeElements[0] : undefined;
@@ -117,7 +117,7 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
               onChange={tab => selectTabHandler(tab.tabId)}
             >
               <SContext registry={tabRegistry}>
-                <TabList className={s(style, { tabList: true })} />
+                <TabList className={s(style, { tabList: true, textValuePresentationTab: true })} />
               </SContext>
             </TabsState>
           </Container>
