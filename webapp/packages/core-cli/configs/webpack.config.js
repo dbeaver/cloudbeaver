@@ -165,6 +165,20 @@ module.exports = (env, argv) => {
       removeEmptyChunks: false,
       splitChunks: {
         cacheGroups: {
+          stylesAsync: {
+            name: 'styles-async',
+            type: 'css/mini-extract',
+            chunks: 'async',
+            reuseExistingChunk: true,
+            priority: 20,
+          },
+          styles: {
+            name: 'styles',
+            type: 'css/mini-extract',
+            chunks: 'initial',
+            reuseExistingChunk: true,
+            priority: 10,
+          },
           locale: {
             chunks: 'all',
             test: /[\\/]locales[\\/].*?\.js/,
