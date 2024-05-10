@@ -246,6 +246,7 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
             JDBCUtils.setStringOrNull(dbStat, 1, teamRole);
             dbStat.setString(2, userId);
             dbStat.setString(3, teamId);
+            dbStat.execute();
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
