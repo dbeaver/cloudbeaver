@@ -17,13 +17,13 @@
     border-bottom: 2px solid var(--theme-primary);
     outline: none;
     opacity: 1;
-    border-top: none !important;
-    font-weight: normal !important;
+    border-top: none;
+    font-weight: normal;
     text-transform: uppercase;
 
     &:global([aria-selected='false']) {
       opacity: 0.8;
-      border-bottom: 2px solid transparent !important;
+      border-bottom: 2px solid transparent;
     }
 
     &:global([aria-disabled='true']) {

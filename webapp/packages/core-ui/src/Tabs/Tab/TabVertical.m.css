@@ -8,7 +8,7 @@
 
 .vertical .tab {
   overflow: auto;
-  border: none !important;
+  border: none;
   flex-shrink: 0;
-  height: 32px !important;
+  height: 32px;
 }

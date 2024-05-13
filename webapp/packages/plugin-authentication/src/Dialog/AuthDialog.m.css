@@ -8,6 +8,18 @@
 .wrapper {
   min-height: 520px !important;
   max-height: max(var(--app-height, 100vh) - 48px, 520px) !important;
+
+  & .tabList {
+    justify-content: center;
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    & .tab {
+      &:global([aria-selected='true']) {
+        font-weight: 500;
+      }
+    }
+  }
 }
 .submittingForm {
   overflow: auto;
@@ -18,18 +30,6 @@
   flex: 1;
   display: flex;
   flex-direction: column;
-}
-.tabList {
-  composes: theme-background-surface theme-text-on-surface from global;
-  justify-content: center;
-  position: sticky;
-  top: 0;
-  z-index: 1;
-}
-.tab {
-  &:global([aria-selected='true']) {
-    font-weight: 500 !important;
-  }
 }
 .authProviderForm {
   flex-direction: column;
