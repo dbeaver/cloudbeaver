@@ -158,8 +158,8 @@ public class WebServerConfig {
 
     @Property
     @Nullable
-    public String[] getBetaFeatures() {
-        return application.getAppConfiguration().getBetaFeatures();
+    public String[] getDisabledBetaFeatures() {
+        return application.getAppConfiguration().getDisabledBetaFeatures();
     }
 
     @Property
