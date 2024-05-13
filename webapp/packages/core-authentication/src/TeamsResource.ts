@@ -94,7 +94,7 @@ export class TeamsResource extends CachedMapResource<string, TeamInfo, TeamResou
 
   async loadGrantedUsers(teamId: string): Promise<UserTeamGrantInfo[]> {
     const { team } = await this.graphQLService.sdk.getTeamGrantedUsers({ teamId });
-    return team[0].grantedUsersInfo as UserTeamGrantInfo[];
+    return team[0].grantedUsersInfo.map(user => ({ userId: user.userId, teamRole: user.teamRole ?? null }));
   }
 
   async getSubjectConnectionAccess(subjectId: string): Promise<AdminConnectionGrantInfo[]> {
