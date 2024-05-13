@@ -62,14 +62,19 @@ export const AdministrationUserForm = observer<Props>(function AdministrationUse
   useAutoLoad(AdministrationUserForm, state);
 
   return (
-    <Form context={form} className={s(styles, { submittingForm: true })} disabled={state.isDisabled} focusFirstChild>
+    <Form context={form} disabled={state.isDisabled} contents focusFirstChild>
       <TabsState container={administrationUserFormService.parts} localState={state.parts} formState={state}>
-        <Container compact parent noWrap vertical>
-          <Container className={s(styles, { bar: true })} gap keepSize noWrap>
+        <Container noWrap vertical>
+          <Container className={s(styles, { header: true })} gap keepSize noWrap>
             <Container fill>
-              <StatusMessage exception={getFirstException(state.exception)} type={state.statusType} message={state.statusMessage} />
+              <StatusMessage
+                className={s(styles, { statusMessage: true })}
+                exception={getFirstException(state.exception)}
+                type={state.statusType}
+                message={state.statusMessage}
+              />
               <SContext registry={TabBigUnderlineStyleRegistry}>
-                <TabList className={s(styles, { tabList: true })} />
+                <TabList />
               </SContext>
             </Container>
             <Container keepSize noWrap center gap compact>

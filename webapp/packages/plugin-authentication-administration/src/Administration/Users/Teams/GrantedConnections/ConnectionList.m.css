@@ -1,28 +1,14 @@
-.group {
-  position: relative;
-}
+/*
+ * CloudBeaver - Cloud Database Manager
+ * Copyright (C) 2020-2024 DBeaver Corp and others
+ *
+ * Licensed under the Apache License, Version 2.0.
+ * you may not use this file except in compliance with the License.
+ */
 
-.group,
-.container,
-.tableContainer {
+.group {
   height: 100%;
 }
-
-.container {
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-}
-
-.tableContainer {
-  overflow: auto;
-}
-
-.grantedConnectionsTableHeader {
+.header {
   flex: 0 0 auto;
-}
-
-.table {
-  composes: theme-background-surface theme-text-on-surface from global;
-  width: 100%;
 }

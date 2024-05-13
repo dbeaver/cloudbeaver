@@ -11,7 +11,6 @@ import { Fragment } from 'react';
 import { AdminUserOrigin, UsersResource } from '@cloudbeaver/core-authentication';
 import {
   Button,
-  ColoredContainer,
   Combobox,
   ConfirmationDialog,
   Container,
@@ -87,7 +86,7 @@ export const UserFormOriginInfoPanel: TabContainerPanelComponent<UserFormProps> 
   }
 
   return (
-    <ColoredContainer gap>
+    <Container gap>
       <Group gap medium overflow>
         <Combobox
           state={localState}
@@ -120,6 +119,6 @@ export const UserFormOriginInfoPanel: TabContainerPanelComponent<UserFormProps> 
           </Fragment>
         )}
       </Group>
-    </ColoredContainer>
+    </Container>
   );
 });

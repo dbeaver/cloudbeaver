@@ -7,7 +7,7 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import { Filter, s, useS, useTranslate } from '@cloudbeaver/core-blocks';
+import { Container, Filter, s, useS, useTranslate } from '@cloudbeaver/core-blocks';
 
 import style from './GrantedUsersTableHeader.m.css';
 
@@ -26,14 +26,14 @@ export const GrantedUsersTableHeader = observer<Props>(function GrantedUsersTabl
   const translate = useTranslate();
 
   return (
-    <header className={s(styles, { header: true }, className)}>
+    <Container className={s(styles, { header: true }, className)} gap parent compact noWrap>
       <Filter
         disabled={disabled}
         placeholder={translate('administration_teams_team_granted_users_search_placeholder')}
         name="filterValue"
         state={filterState}
       />
-      <div className={s(styles, { buttons: true })}>{children}</div>
-    </header>
+      {children}
+    </Container>
   );
 });

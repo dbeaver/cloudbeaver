@@ -7,7 +7,7 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import { Filter, s, useS, useTranslate } from '@cloudbeaver/core-blocks';
+import { Container, Filter, s, useS, useTranslate } from '@cloudbeaver/core-blocks';
 
 import style from './GrantedConnectionsTableHeader.m.css';
 
@@ -26,14 +26,14 @@ export const GrantedConnectionsTableHeader = observer<Props>(function GrantedCon
   const translate = useTranslate();
 
   return (
-    <header className={s(styles, { header: true }, className)}>
+    <Container className={s(styles, { header: true }, className)} noWrap parent compact gap keepSize>
       <Filter
         disabled={disabled}
         placeholder={translate('administration_teams_team_granted_connections_search_placeholder')}
         name="filterValue"
         state={filterState}
       />
-      <div className={s(styles, { buttons: true })}>{children}</div>
-    </header>
+      {children}
+    </Container>
   );
 });

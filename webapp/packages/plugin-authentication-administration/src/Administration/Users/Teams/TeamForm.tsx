@@ -10,12 +10,13 @@ import { useEffect } from 'react';
 
 import type { TeamInfo } from '@cloudbeaver/core-authentication';
 import {
+  Container,
   Form,
-  IconOrImage,
   Loader,
   Placeholder,
   s,
   SContext,
+  StatusMessage,
   useExecutor,
   useForm,
   useObjectRef,
@@ -23,6 +24,7 @@ import {
   useTranslate,
 } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
+import { ENotificationType } from '@cloudbeaver/core-events';
 import { TabBigUnderlineStyleRegistry, TabList, TabPanelList, TabsState } from '@cloudbeaver/core-ui';
 
 import { teamContext } from './Contexts/teamContext';
@@ -70,35 +72,28 @@ export const TeamForm = observer<Props>(function TeamForm({ state, onCancel, onS
   }, []);
 
   return (
-    <Form className={s(styles, { form: true })} context={form}>
+    <Form context={form} contents>
       <TabsState container={service.tabsContainer} localState={state.partsState} state={state} onCancel={onCancel}>
-        <div className={s(styles, { box: true }, className)}>
-          <div className={s(styles, { topBar: true })}>
-            <div className={s(styles, { topBarTabs: true })}>
-              <div className={s(styles, { statusMessage: true })}>
-                {state.statusMessage && (
-                  <>
-                    <IconOrImage className={s(styles, { iconOrImage: true })} icon="/icons/info_icon.svg" />
-                    {translate(state.statusMessage)}
-                  </>
-                )}
-              </div>
+        <Container noWrap vertical>
+          <Container className={s(styles, { topBar: true })} gap keepSize noWrap>
+            <Container fill>
+              <StatusMessage message={translate(state.statusMessage || undefined)} type={ENotificationType.Info} />
               <SContext registry={TabBigUnderlineStyleRegistry}>
-                <TabList className={s(styles, { tabList: true })} disabled={false} />
+                <TabList disabled={false} />
               </SContext>
-            </div>
-            <div className={s(styles, { topBarActions: true })}>
+            </Container>
+            <Container keepSize noWrap center gap compact>
               <Loader suspense inline hideMessage hideException>
                 <TeamFormActionsContext.Provider value={actions}>
                   <Placeholder container={service.actionsContainer} state={state} onCancel={onCancel} />
                 </TeamFormActionsContext.Provider>
               </Loader>
-            </div>
-          </div>
-          <div className={s(styles, { content: true })}>
+            </Container>
+          </Container>
+          <Container vertical>
             <TabPanelList />
-          </div>
-        </div>
+          </Container>
+        </Container>
       </TabsState>
     </Form>
   );
