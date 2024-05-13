@@ -11,6 +11,7 @@ import { Dialog, useDialogState } from 'reakit/Dialog';
 
 import { Loader } from '../../Loader/Loader';
 import { s } from '../../s';
+import { useFocus } from '../../useFocus';
 import { useS } from '../../useS';
 import { DialogContext } from '../DialogContext';
 import styles from './CommonDialogWrapper.m.css';
@@ -27,6 +28,7 @@ export interface CommonDialogWrapperProps {
 
 export const CommonDialogWrapper = observer<CommonDialogWrapperProps, HTMLDivElement>(
   forwardRef(function CommonDialogWrapper({ size = 'medium', fixedSize, fixedWidth, freeHeight, 'aria-label': ariaLabel, className, children }, ref) {
+    const [focusedRef] = useFocus({ autofocus: true });
     const computedStyles = useS(styles);
     const context = useContext(DialogContext);
     const dialogState = useDialogState({ visible: true });
@@ -48,6 +50,8 @@ export const CommonDialogWrapper = observer<CommonDialogWrapperProps, HTMLDivEle
         modal={false}
       >
         <dialog
+          ref={focusedRef}
+          tabIndex={0}
           className={s(
             computedStyles,
             { dialog: true, small: size === 'small', medium: size === 'medium', large: size === 'large', fixedSize, fixedWidth, freeHeight },
