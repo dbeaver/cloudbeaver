@@ -45,6 +45,7 @@ export async function bootstrap(plugins: PluginManifest[]): Promise<App> {
   });
 
   if (exception) {
+    console.error(exception);
     render.renderError(exception);
   } else {
     render.renderApp();
