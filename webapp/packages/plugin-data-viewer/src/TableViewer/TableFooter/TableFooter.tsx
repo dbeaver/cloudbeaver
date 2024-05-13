@@ -56,7 +56,7 @@ export const TableFooter = observer<Props>(function TableFooter({ resultIndex, m
   const constraint = model.getResult(resultIndex) ? model.source.getAction(resultIndex, ResultSetConstraintAction) : null;
 
   return (
-    <ToolsPanel type="secondary" center fixedHeight>
+    <ToolsPanel type="secondary" center minHeight>
       <AutoRefreshButton model={model} disabled={disabled} />
       <div className={s(style, { count: true })}>
         <Form onSubmit={handleChange}>
