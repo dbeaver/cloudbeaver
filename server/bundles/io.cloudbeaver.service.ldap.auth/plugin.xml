@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.2"?>
+
+<plugin>
+    <extension point="org.jkiss.dbeaver.auth.provider">
+        <authProvider id="ldap" label="LDAP" description="LDAP authentication provider"
+                      configurable="true"
+                      class="io.cloudbeaver.service.ldap.auth.LdapAuthProvider"
+                      icon="platform:/plugin/org.jkiss.dbeaver.model/icons/idp/ldap.png"
+        >
+            <configuration>
+                <propertyGroup label="LDAP" description="LDAP authentication">
+                    <property id="ldap-host" label="Host" type="string" description="LDAP server host" required="true"/>
+                    <property id="ldap-port" label="Port" type="integer" description="LDAP server port, default is 389"/>
+                    <property id="ldap-dn" label="Base Distinguished Name" type="string"
+                              description="Base Distinguished Name applicable for all users, example: dc=myOrg,dc=com"
+                              required="true"
+                    />
+                </propertyGroup>
+            </configuration>
+            <credentials>
+                <propertyGroup label="Auth credentials">
+                    <property id="units" label="Unit paths" type="string" description="LDAP unit paths separated by commas. Example ou=unit1,ou=unit2" user="true"/>
+                    <property id="user" label="User name" type="string" description="LDAP user name" user="true"/>
+                    <property id="password" label="User password" type="string" description="LDAP user password"
+                              user="true" encryption="plain"/>
+                </propertyGroup>
+            </credentials>
+        </authProvider>
+    </extension>
+</plugin>
