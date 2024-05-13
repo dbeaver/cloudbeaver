@@ -11,5 +11,6 @@
   gap: 4px;
   outline: none;
   max-width: 32px;
+  overflow: hidden;
   flex-direction: column;
 }
