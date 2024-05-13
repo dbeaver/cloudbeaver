@@ -6,60 +6,13 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import styled, { css } from 'reshadow';
 
-import { Icon, Menu, MenuItem, MenuItemElement, TimerIcon, useTranslate } from '@cloudbeaver/core-blocks';
+import { Icon, Menu, MenuItem, MenuItemElement, s, TimerIcon, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import { declensionOfNumber } from '@cloudbeaver/core-utils';
 
 import type { IDatabaseDataModel } from '../../../DatabaseDataModel/IDatabaseDataModel';
+import styles from './AutoRefreshButton.m.css';
 import { useAutoRefresh } from './useAutoRefresh';
-
-const styles = css`
-  auto-reload {
-    composes: theme-text-primary theme-ripple from global;
-    height: 100%;
-    display: flex;
-    cursor: pointer;
-    align-items: center;
-
-    & icon-box {
-      position: relative;
-      padding-left: 8px;
-      display: flex;
-      align-items: center;
-
-      & Icon {
-        width: 16px;
-        height: 16px;
-        flex-grow: 0;
-        flex-shrink: 0;
-      }
-
-      &:hover > Icon :global(use) {
-        fill: var(--theme-primary) !important;
-      }
-    }
-
-    & arrow-box {
-      position: relative;
-      height: 100%;
-      display: flex;
-      align-items: center;
-      padding-right: 8px;
-
-      & > Icon {
-        width: 14px;
-        height: 14px;
-        flex-grow: 0;
-        flex-shrink: 0;
-      }
-
-      &:hover > Icon :global(use) {
-        fill: var(--theme-primary) !important;
-      }
-    }
-  }
-`;
 
 interface Props {
   model: IDatabaseDataModel<any, any>;
@@ -73,6 +26,7 @@ export const AutoRefreshButton = observer<Props>(function AutoRefreshButton({ mo
   const autoRefresh = useAutoRefresh(model);
   const interval = autoRefresh.settings.interval;
   const intervals_messages: string[] = [];
+  const style = useS(styles);
 
   const buttonTitle = translate(interval === null ? 'data_viewer_action_refresh' : 'data_viewer_action_auto_refresh_stop');
 
@@ -99,11 +53,15 @@ export const AutoRefreshButton = observer<Props>(function AutoRefreshButton({ mo
     intervals_messages.push(translate(declensionOfNumber(interval, message), undefined, { interval }));
   }
 
-  return styled(styles)(
-    <auto-reload aria-disabled={disabled}>
-      <icon-box title={buttonTitle} onClick={handleClick}>
-        {interval === null ? <Icon name="/icons/refresh_m.svg#root" viewBox="0 0 24 24" /> : <TimerIcon state="stop" interval={interval} />}
-      </icon-box>
+  return (
+    <div className={s(style, { autoReload: true })} aria-disabled={disabled}>
+      <div className={s(style, { iconBox: true })} title={buttonTitle} onClick={handleClick}>
+        {interval === null ? (
+          <Icon className={s(style, { icon: true })} name="/icons/refresh_m.svg#root" viewBox="0 0 24 24" />
+        ) : (
+          <TimerIcon state="stop" interval={interval} />
+        )}
+      </div>
       <Menu
         label="Auto refresh"
         items={
@@ -131,10 +89,10 @@ export const AutoRefreshButton = observer<Props>(function AutoRefreshButton({ mo
         modal
         disclosure
       >
-        <arrow-box title={translate('data_viewer_action_auto_refresh')}>
-          <Icon name="arrow" viewBox="0 0 16 16" />
-        </arrow-box>
+        <div className={s(style, { arrowBox: true })} title={translate('data_viewer_action_auto_refresh')}>
+          <Icon className={s(style, { icon: true })} name="arrow" viewBox="0 0 16 16" />
+        </div>
       </Menu>
-    </auto-reload>,
+    </div>
   );
 });

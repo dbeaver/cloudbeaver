@@ -34,7 +34,7 @@ export const MenuPanelItem = observer<MenuPanelItemProps>(function MenuPanelItem
   if (menuItem.type === 'radio') {
     control = <Radio checked={menuItem.isChecked} mod={['primary', 'menu']} ripple={false} />;
   } else if (menuItem.type === 'checkbox') {
-    control = <Checkbox checked={menuItem.isChecked} mod={['primary', 'small']} style={style} ripple={false} />;
+    control = <Checkbox checked={menuItem.isChecked} mod={['primary', 'small']} ripple={false} />;
   }
 
   return (

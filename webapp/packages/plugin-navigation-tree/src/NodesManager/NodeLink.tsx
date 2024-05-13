@@ -6,19 +6,13 @@
  * you may not use this file except in compliance with the License.
  */
 import { useCallback } from 'react';
-import styled, { css } from 'reshadow';
 
 import { Link } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { parseNodeParentId } from '@cloudbeaver/core-navigation-tree';
 
 import { NavigationTreeService } from '../NavigationTree/NavigationTreeService';
-
-const style = css`
-  Link {
-    cursor: pointer;
-  }
-`;
+import styles from './NodeLink.m.css';
 
 export interface NodeLinkProps {
   name: string;
@@ -36,7 +30,11 @@ export const NodeLink: React.FC<React.PropsWithChildren<NodeLinkProps>> = functi
   }, [nodeId, navigationTreeService]);
 
   if (nodeId) {
-    return styled(style)(<Link onClick={handleClick}>{children}</Link>);
+    return (
+      <Link className={styles.link} onClick={handleClick}>
+        {children}
+      </Link>
+    );
   }
 
   return <>{children}</>;
