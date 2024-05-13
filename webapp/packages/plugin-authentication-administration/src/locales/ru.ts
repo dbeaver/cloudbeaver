@@ -145,4 +145,8 @@ export default [
   ['plugin_authentication_administration_user_team_default_readonly_tooltip', 'Команда по умолчанию. Не может быть отозвана'],
   ['plugin_authentication_administration_team_default_users_tooltip', 'Команда по умолчанию. Содержит всех пользователей'],
   ['plugin_authentication_administration_team_user_team_role_supervisor', 'Супервайзер'],
+  [
+    'plugin_authentication_administration_team_user_team_role_supervisor_description',
+    'Супервайзеры могут просматривать выполненные запросы своей команды',
+  ],
 ];

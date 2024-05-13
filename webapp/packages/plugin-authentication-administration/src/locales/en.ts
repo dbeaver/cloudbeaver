@@ -140,4 +140,5 @@ export default [
   ['plugin_authentication_administration_user_team_default_readonly_tooltip', "Default team. Can't be revoked"],
   ['plugin_authentication_administration_team_default_users_tooltip', 'Default team. Contains all users'],
   ['plugin_authentication_administration_team_user_team_role_supervisor', 'Supervisor'],
+  ['plugin_authentication_administration_team_user_team_role_supervisor_description', 'Supervisors can view their team’s executed queries'],
 ];
