@@ -707,7 +707,7 @@ public class WebSQLProcessor implements WebSessionProvider {
                             Object plainValue = WebSQLUtils.makePlainCellValue(session, attr, row.getData()[j]);
                             keyMap.put(attr.getName(), plainValue);
                         }
-                        DBDDocument document = dataLocator.findDocument(session, keyMap, keyMetaData, dataLocator);
+                        DBDDocument document = dataLocator.findDocument(session, keyMap, keyMetaData);
 
                         DBSDataManipulator.ExecuteBatch deleteBatch = dataManipulator.deleteData(
                                 session,
@@ -772,7 +772,7 @@ public class WebSQLProcessor implements WebSessionProvider {
             keyMap.put(attr.getName(), plainValue);
         }
         if (document == null) {
-            document = dataContainer.findDocument(session, keyMap, metaData, dataContainer);
+            document = dataContainer.findDocument(session, keyMap, metaData);
             if (document == null) {
                 throw new DBCException("Error finding document by key " + keyMap);
             }
