@@ -27,6 +27,7 @@ export interface ITagsComboboxProps extends ComboboxBaseProps<string, IItemValue
 
 export const TagsCombobox: React.FC<ITagsComboboxProps> = observer(function TagsCombobox({ addedItems, onAdd, onRemove, ...rest }) {
   const tags: ITag[] = [];
+  const hasIcons = rest.items.some(item => !!item.icon);
 
   for (const addedItem of addedItems) {
     const item = rest.items.find(item => item.id === addedItem);
@@ -59,7 +60,7 @@ export const TagsCombobox: React.FC<ITagsComboboxProps> = observer(function Tags
       <Combobox
         keySelector={item => item.id}
         valueSelector={value => value.label}
-        iconSelector={value => value.icon}
+        iconSelector={hasIcons ? value => value.icon : undefined}
         isDisabled={item => addedItems.includes(item.id)}
         searchable
         onSelect={add}
