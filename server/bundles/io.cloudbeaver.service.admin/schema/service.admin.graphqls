@@ -11,7 +11,7 @@ type AdminConnectionGrantInfo {
     subjectType: AdminSubjectType!
 }
 
-type AdminUserTeamGrantInfo {
+type AdminUserTeamGrantInfo @since(version: "24.0.5"){
     userId: ID!
     teamRole: String
 }
@@ -58,7 +58,7 @@ type AdminTeamInfo {
     metaParameters: Object!
 
     grantedUsers: [ID!]!
-    grantedUsersInfo: [AdminUserTeamGrantInfo]!
+    grantedUsersInfo: [AdminUserTeamGrantInfo!]! @since(version: "24.0.5")
     grantedConnections: [AdminConnectionGrantInfo!]!
 
     teamPermissions: [ID!]!
@@ -157,7 +157,7 @@ extend type Query {
 
     setUserAuthRole(userId: ID!, authRole: String): Boolean
 
-    setUserTeamRole(userId: ID!, teamId: ID!,teamRole: String): Boolean
+    setUserTeamRole(userId: ID!, teamId: ID!, teamRole: String): Boolean @since(version: "24.0.5")
 
     #### Connection management
 
