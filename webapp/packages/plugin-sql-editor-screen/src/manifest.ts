@@ -7,15 +7,15 @@
  */
 import type { PluginManifest } from '@cloudbeaver/core-di';
 
-import { LocaleService } from './LocaleService';
-import { PluginBootstrap } from './PluginBootstrap';
-import { SqlEditorScreenBootstrap } from './Screen/SqlEditorScreenBootstrap';
-import { SqlEditorScreenService } from './Screen/SqlEditorScreenService';
-
 export const sqlEditorPagePluginManifest: PluginManifest = {
   info: {
     name: 'Sql Editor Page plugin',
   },
 
-  providers: [PluginBootstrap, LocaleService, SqlEditorScreenBootstrap, SqlEditorScreenService],
+  providers: [
+    () => import('./PluginBootstrap').then(m => m.PluginBootstrap),
+    () => import('./LocaleService').then(m => m.LocaleService),
+    () => import('./Screen/SqlEditorScreenBootstrap').then(m => m.SqlEditorScreenBootstrap),
+    () => import('./Screen/SqlEditorScreenService').then(m => m.SqlEditorScreenService),
+  ],
 };

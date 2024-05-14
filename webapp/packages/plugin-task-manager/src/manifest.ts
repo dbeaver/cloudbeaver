@@ -7,10 +7,10 @@
  */
 import type { PluginManifest } from '@cloudbeaver/core-di';
 
-import { LocaleService } from './LocaleService';
-import { TaskManagerPluginBootstrap } from './TaskManagerPluginBootstrap';
-
 export const taskManagerPluginManifest: PluginManifest = {
   info: { name: 'Task Manager plugin' },
-  providers: [TaskManagerPluginBootstrap, LocaleService],
+  providers: [
+    () => import('./TaskManagerPluginBootstrap').then(m => m.TaskManagerPluginBootstrap),
+    () => import('./LocaleService').then(m => m.LocaleService),
+  ],
 };

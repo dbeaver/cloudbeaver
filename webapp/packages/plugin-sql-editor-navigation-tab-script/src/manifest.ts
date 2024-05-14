@@ -7,12 +7,12 @@
  */
 import type { PluginManifest } from '@cloudbeaver/core-di';
 
-import { LocaleService } from './LocaleService';
-import { PluginBootstrap } from './PluginBootstrap';
-import { ResourceSqlDataSourceBootstrap } from './ResourceSqlDataSourceBootstrap';
-import { SqlEditorTabResourceService } from './SqlEditorTabResourceService';
-
 export const manifest: PluginManifest = {
   info: { name: 'Sql Editor Script plugin' },
-  providers: [PluginBootstrap, LocaleService, SqlEditorTabResourceService, ResourceSqlDataSourceBootstrap],
+  providers: [
+    () => import('./PluginBootstrap').then(m => m.PluginBootstrap),
+    () => import('./LocaleService').then(m => m.LocaleService),
+    () => import('./SqlEditorTabResourceService').then(m => m.SqlEditorTabResourceService),
+    () => import('./ResourceSqlDataSourceBootstrap').then(m => m.ResourceSqlDataSourceBootstrap),
+  ],
 };
