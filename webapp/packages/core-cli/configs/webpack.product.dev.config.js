@@ -13,8 +13,6 @@ const fs = require('fs');
 const { URL } = require('url');
 
 const commonConfig = require('./webpack.config.js');
-const index = resolve('dist/index.js');
-const sso = require.resolve('@cloudbeaver/plugin-sso/dist/index.js');
 const ssoHtmlTemplate = require.resolve('@cloudbeaver/plugin-sso/src/index.html.ejs');
 const ssoErrorHtmlTemplate = require.resolve('@cloudbeaver/plugin-sso/src/ssoError.html.ejs');
 const { getAssets } = require('./webpack.product.utils');
@@ -48,11 +46,6 @@ module.exports = (env, argv) => {
 
   return merge(commonConfig(env, argv), {
     mode: 'development',
-    context: resolve(__dirname, '../../../../../'),
-    entry: {
-      index,
-      sso,
-    },
     output: {
       devtoolModuleFilenameTemplate: 'file:///[absolute-resource-path]',
     },
@@ -62,12 +55,12 @@ module.exports = (env, argv) => {
     },
     optimization: {
       minimize: false,
-      moduleIds: 'named',
+      // moduleIds: 'named',
 
       // improve performance
       removeAvailableModules: false,
       removeEmptyChunks: false,
-      splitChunks: false,
+      // splitChunks: false,
     },
     infrastructureLogging: {
       level: 'warn',
@@ -115,7 +108,7 @@ module.exports = (env, argv) => {
       new HtmlWebpackPlugin({
         template: resolve('src/index.html.ejs'),
         inject: 'body',
-        chunks: ['index'],
+        chunks: ['main'],
         version: package.version,
         title: package.product?.name,
       }),

@@ -7,12 +7,10 @@
  */
 import type { PluginManifest } from '@cloudbeaver/core-di';
 
-import { StorageService } from './StorageService';
-
 export const coreStorageManifest: PluginManifest = {
   info: {
     name: 'Core Storage',
   },
 
-  providers: [StorageService],
+  providers: [() => import('./StorageService').then(m => m.StorageService)],
 };

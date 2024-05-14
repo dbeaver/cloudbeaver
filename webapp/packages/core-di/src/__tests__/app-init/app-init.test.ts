@@ -14,7 +14,7 @@ test('App Initialization', async () => {
   const app = new App([manifest]);
   const injector = app.getServiceInjector();
 
-  (app as any).registerServices();
+  await (app as any).registerServices();
 
   const service = injector.getServiceByClass(TestService);
   const bootstrap = injector.getServiceByClass(TestBootstrap);

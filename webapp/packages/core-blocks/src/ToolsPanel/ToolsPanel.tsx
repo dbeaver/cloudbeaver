@@ -17,7 +17,7 @@ interface Props {
   type?: TType;
   center?: boolean;
   rounded?: boolean;
-  fixedHeight?: boolean;
+  minHeight?: boolean;
   bottomBorder?: boolean;
 }
 
@@ -26,11 +26,11 @@ export const ToolsPanel: React.FC<React.PropsWithChildren<Props>> = observer(fun
   children,
   center,
   rounded,
-  fixedHeight,
+  minHeight,
   type = 'primary',
   bottomBorder = false,
 }) {
   const styles = useS(style);
 
-  return <div className={s(styles, { toolsPanel: true, [type]: true, bottomBorder, fixedHeight, center, rounded }, className)}>{children}</div>;
+  return <div className={s(styles, { toolsPanel: true, [type]: true, bottomBorder, minHeight, center, rounded }, className)}>{children}</div>;
 });

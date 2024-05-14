@@ -7,13 +7,13 @@
  */
 import type { PluginManifest } from '@cloudbeaver/core-di';
 
-import { BrowserSettingsService } from './BrowserSettingsService';
-import { LocaleService } from './LocaleService';
-
 export const coreBrowserSettingsManifest: PluginManifest = {
   info: {
     name: 'Core Browser Settings',
   },
 
-  providers: [BrowserSettingsService, LocaleService],
+  providers: [
+    () => import('./BrowserSettingsService').then(m => m.BrowserSettingsService),
+    () => import('./LocaleService').then(m => m.LocaleService),
+  ],
 };

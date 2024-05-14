@@ -15,6 +15,6 @@ import TabUnderlineStyles from './TabUnderline.m.css';
 
 export const TabUnderlineStyleRegistry: StyleRegistry = [[TabStyles, { mode: 'append', styles: [TabUnderlineStyles] }]];
 export const TabBigUnderlineStyleRegistry: StyleRegistry = [
-  [TabStyles, { mode: 'append', styles: [TabUnderlineStyles, TabBigUnderlineStyles] }],
+  [TabStyles, { mode: 'append', styles: [TabBigUnderlineStyles] }],
   [TabTitleStyles, { mode: 'append', styles: [TabTitleBigUnderlineStyles] }],
 ];

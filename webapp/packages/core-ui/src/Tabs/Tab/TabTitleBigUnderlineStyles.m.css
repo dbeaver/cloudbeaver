@@ -6,6 +6,8 @@
  * you may not use this file except in compliance with the License.
  */
 
-.tabTitle {
-  padding: 0 16px;
+.underline.big {
+  & .tabTitle {
+    padding: 0 16px;
+  }
 }

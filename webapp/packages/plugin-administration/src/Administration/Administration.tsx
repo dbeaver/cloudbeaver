@@ -22,7 +22,7 @@ import {
   useS,
 } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { OptionsPanelService, TabList, TabListStyles, TabListVerticalRegistry, TabsState, TabStyles } from '@cloudbeaver/core-ui';
+import { OptionsPanelService, TabList, TabListStyles, TabsState, TabStyles } from '@cloudbeaver/core-ui';
 import { CaptureView } from '@cloudbeaver/core-view';
 
 import { AdministrationCaptureViewContext } from './AdministrationCaptureViewContext';
@@ -58,7 +58,6 @@ const adminPageRegistry: StyleRegistry = [
 ];
 
 const tabsRegistry: StyleRegistry = [
-  ...TabListVerticalRegistry,
   [
     TabStyles,
     {
@@ -101,7 +100,7 @@ export const Administration = observer<React.PropsWithChildren<Props>>(function 
       <AdministrationCaptureViewContext />
       <TabsState currentTabId={activeScreen?.item} localState={administrationScreenService.itemState} orientation="vertical">
         <SContext registry={tabsRegistry}>
-          <TabList aria-label="Administration items">
+          <TabList aria-label="Administration items" vertical>
             {items.map(item => (
               <DrawerItem
                 key={item.name}
