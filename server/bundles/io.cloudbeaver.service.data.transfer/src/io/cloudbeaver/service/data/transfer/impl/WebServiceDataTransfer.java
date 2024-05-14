@@ -344,16 +344,11 @@ public class WebServiceDataTransfer implements DBWServiceDataTransfer {
 
         if (dataContainer.getDataSource() != null) {
             DatabaseTransferConsumer consumer = new DatabaseTransferConsumer(dataContainer);
+            StreamTransferProducer producer = new StreamTransferProducer(new StreamEntityMapping(path), processor);
 
             DatabaseConsumerSettings databaseConsumerSettings = new DatabaseConsumerSettings();
             databaseConsumerSettings.setContainer((DBSObjectContainer) dataContainer.getDataSource());
             consumer.setSettings(databaseConsumerSettings);
-            DatabaseMappingContainer databaseMappingContainer = new DatabaseMappingContainer(databaseConsumerSettings, dataContainer);
-            databaseMappingContainer.getAttributeMappings(monitor);
-            databaseMappingContainer.setTarget(dataContainer);
-            consumer.setContainerMapping(databaseMappingContainer);
-
-            StreamTransferProducer producer = new StreamTransferProducer(new StreamEntityMapping(path), processor);
 
             StreamProducerSettings producerSettings = new StreamProducerSettings();
             Map<String, Object> properties = new HashMap<>();
@@ -366,7 +361,11 @@ public class WebServiceDataTransfer implements DBWServiceDataTransfer {
                     producer,
                     processorInstance,
                     properties);
-
+            DatabaseMappingContainer databaseMappingContainer =
+                new DatabaseMappingContainer(databaseConsumerSettings, producer.getDatabaseObject());
+            databaseMappingContainer.getAttributeMappings(monitor);
+            databaseMappingContainer.setTarget(dataContainer);
+            consumer.setContainerMapping(databaseMappingContainer);
             try {
                 producer.transferData(monitor, consumer, processorInstance, producerSettings, null);
             } catch (DBException e) {
