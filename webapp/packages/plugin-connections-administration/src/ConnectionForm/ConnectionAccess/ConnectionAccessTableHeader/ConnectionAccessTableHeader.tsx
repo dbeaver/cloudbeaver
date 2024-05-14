@@ -30,7 +30,7 @@ export const ConnectionAccessTableHeader = observer<React.PropsWithChildren<Prop
   const translate = useTranslate();
   const style = useS(styles);
   return (
-    <div className={s(style, { header: true }, className)}>
+    <header className={s(style, { header: true }, className)}>
       <Filter
         disabled={disabled}
         placeholder={translate('connections_connection_access_filter_placeholder')}
@@ -38,6 +38,6 @@ export const ConnectionAccessTableHeader = observer<React.PropsWithChildren<Prop
         state={filterState}
       />
       <div className={s(style, { buttons: true })}>{children}</div>
-    </div>
+    </header>
   );
 });

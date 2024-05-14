@@ -9,7 +9,6 @@ import { observer } from 'mobx-react-lite';
 
 import { AdminUser, UsersResource, UsersResourceFilterKey } from '@cloudbeaver/core-authentication';
 import {
-  ColoredContainer,
   Container,
   getComputed,
   Group,
@@ -58,18 +57,18 @@ export const GrantedUsers: TabContainerPanelComponent<ITeamFormProps> = observer
 
   if (isDefaultTeam) {
     return (
-      <ColoredContainer className={s(styles, { box: true })} parent gap vertical>
+      <Container className={s(styles, { box: true })} parent gap vertical>
         <Group className={s(styles, { placeholderBox: true })} keepSize large>
           <TextPlaceholder>{translate('plugin_authentication_administration_team_default_users_tooltip')}</TextPlaceholder>
         </Group>
-      </ColoredContainer>
+      </Container>
     );
   }
 
   return (
     <Loader className={s(styles, { loader: true })} state={[state.state]}>
       {() => (
-        <ColoredContainer className={s(styles, { box: true })} parent gap vertical>
+        <Container className={s(styles, { box: true })} parent gap vertical>
           {!users.resource.values.length ? (
             <Group className={s(styles, { placeholderBox: true })} keepSize large>
               <TextPlaceholder>{translate('administration_teams_team_granted_users_empty')}</TextPlaceholder>
@@ -90,7 +89,7 @@ export const GrantedUsers: TabContainerPanelComponent<ITeamFormProps> = observer
               </Container>
             </>
           )}
-        </ColoredContainer>
+        </Container>
       )}
     </Loader>
   );

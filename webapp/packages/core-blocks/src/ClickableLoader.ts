@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-.header {
-  composes: theme-border-color-background from global;
-  border-bottom: 1px solid;
-}
+import { importLazyComponent } from './importLazyComponent';
+
+export const Clickable = importLazyComponent(() => import('./Clickable').then(m => m.Clickable));
