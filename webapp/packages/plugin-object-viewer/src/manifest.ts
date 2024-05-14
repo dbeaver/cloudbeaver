@@ -7,26 +7,17 @@
  */
 import type { PluginManifest } from '@cloudbeaver/core-di';
 
-import { LocaleService } from './LocaleService';
-import { DBObjectPageService } from './ObjectPage/DBObjectPageService';
-import { NavNodeMetadataViewBootstrap } from './ObjectPropertiesPage/NavNodeView/NavNodeMetadata/NavNodeMetadataViewBootstrap';
-import { VirtualFolderViewBootstrap } from './ObjectPropertiesPage/NavNodeView/VirtualFolder/VirtualFolderViewBootstrap';
-import { ObjectPropertiesPageService } from './ObjectPropertiesPage/ObjectPropertiesPageService';
-import { ObjectPropertyTableFooterService } from './ObjectPropertiesPage/ObjectPropertyTable/ObjectPropertyTableFooterService';
-import { ObjectViewerBootstrap } from './ObjectViewerBootstrap';
-import { ObjectViewerTabService } from './ObjectViewerTabService';
-
 export const objectViewerManifest: PluginManifest = {
   info: { name: 'Object Viewer Plugin' },
 
   providers: [
-    ObjectViewerBootstrap,
-    NavNodeMetadataViewBootstrap,
-    VirtualFolderViewBootstrap,
-    ObjectPropertiesPageService,
-    ObjectViewerTabService,
-    DBObjectPageService,
-    LocaleService,
-    ObjectPropertyTableFooterService,
+    () => import('./ObjectViewerBootstrap').then(m => m.ObjectViewerBootstrap),
+    () => import('./ObjectPropertiesPage/NavNodeView/NavNodeMetadata/NavNodeMetadataViewBootstrap').then(m => m.NavNodeMetadataViewBootstrap),
+    () => import('./ObjectPropertiesPage/NavNodeView/VirtualFolder/VirtualFolderViewBootstrap').then(m => m.VirtualFolderViewBootstrap),
+    () => import('./ObjectPropertiesPage/ObjectPropertiesPageService').then(m => m.ObjectPropertiesPageService),
+    () => import('./ObjectViewerTabService').then(m => m.ObjectViewerTabService),
+    () => import('./ObjectPage/DBObjectPageService').then(m => m.DBObjectPageService),
+    () => import('./LocaleService').then(m => m.LocaleService),
+    () => import('./ObjectPropertiesPage/ObjectPropertyTable/ObjectPropertyTableFooterService').then(m => m.ObjectPropertyTableFooterService),
   ],
 };

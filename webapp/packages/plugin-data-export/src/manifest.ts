@@ -7,28 +7,19 @@
  */
 import type { PluginManifest } from '@cloudbeaver/core-di';
 
-import { Bootstrap } from './Bootstrap';
-import { DataExportMenuService } from './DataExportMenuService';
-import { DataExportProcessService } from './DataExportProcessService';
-import { DataExportService } from './DataExportService';
-import { DataExportSettingsService } from './DataExportSettingsService';
-import { DataTransferProcessorsResource } from './DataTransferProcessorsResource';
-import { DefaultExportOutputSettingsResource } from './Dialog/DefaultExportOutputSettingsResource';
-import { LocaleService } from './LocaleService';
-
 export const dataExportManifest: PluginManifest = {
   info: {
     name: 'Data Export Plugin',
   },
 
   providers: [
-    Bootstrap,
-    DataExportMenuService,
-    DataExportSettingsService,
-    DataExportService,
-    DataExportProcessService,
-    DataTransferProcessorsResource,
-    LocaleService,
-    DefaultExportOutputSettingsResource,
+    () => import('./Bootstrap').then(m => m.Bootstrap),
+    () => import('./DataExportMenuService').then(m => m.DataExportMenuService),
+    () => import('./DataExportSettingsService').then(m => m.DataExportSettingsService),
+    () => import('./DataExportService').then(m => m.DataExportService),
+    () => import('./DataExportProcessService').then(m => m.DataExportProcessService),
+    () => import('./DataTransferProcessorsResource').then(m => m.DataTransferProcessorsResource),
+    () => import('./LocaleService').then(m => m.LocaleService),
+    () => import('./Dialog/DefaultExportOutputSettingsResource').then(m => m.DefaultExportOutputSettingsResource),
   ],
 };

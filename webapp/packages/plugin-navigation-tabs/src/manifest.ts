@@ -7,10 +7,10 @@
  */
 import type { PluginManifest } from '@cloudbeaver/core-di';
 
-import { NavigationTabsService } from './NavigationTabs/NavigationTabsService';
-import { PluginBootstrap } from './PluginBootstrap';
-
 export const navigationTabsPlugin: PluginManifest = {
   info: { name: 'Navigation tabs plugin' },
-  providers: [PluginBootstrap, NavigationTabsService],
+  providers: [
+    () => import('./PluginBootstrap').then(m => m.PluginBootstrap),
+    () => import('./NavigationTabs/NavigationTabsService').then(m => m.NavigationTabsService),
+  ],
 };

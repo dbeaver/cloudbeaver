@@ -6,6 +6,8 @@
  * you may not use this file except in compliance with the License.
  */
 
-.tab {
-  font-size: 14px;
+.underline.big {
+  & .tab {
+    font-size: 14px;
+  }
 }

@@ -7,15 +7,15 @@
  */
 import type { PluginManifest } from '@cloudbeaver/core-di';
 
-import { LocaleService } from './LocaleService';
-import { SqlEditorBootstrap } from './SqlEditorBootstrap';
-import { SqlEditorNavigatorService } from './SqlEditorNavigatorService';
-import { SqlEditorTabService } from './SqlEditorTabService';
-
 export const sqlEditorTabPluginManifest: PluginManifest = {
   info: {
     name: 'Sql Editor Navigation Tab Plugin',
   },
 
-  providers: [SqlEditorBootstrap, SqlEditorTabService, SqlEditorNavigatorService, LocaleService],
+  providers: [
+    () => import('./SqlEditorBootstrap').then(m => m.SqlEditorBootstrap),
+    () => import('./SqlEditorTabService').then(m => m.SqlEditorTabService),
+    () => import('./SqlEditorNavigatorService').then(m => m.SqlEditorNavigatorService),
+    () => import('./LocaleService').then(m => m.LocaleService),
+  ],
 };

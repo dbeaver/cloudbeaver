@@ -15,8 +15,8 @@
   align-items: center;
 }
 
-.fixedHeight {
-  height: 32px;
+.minHeight {
+  min-height: 32px;
 }
 
 .rounded {

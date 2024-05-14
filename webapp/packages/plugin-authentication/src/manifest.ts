@@ -7,16 +7,16 @@
  */
 import type { PluginManifest } from '@cloudbeaver/core-di';
 
-import { AuthenticationLocaleService } from './AuthenticationLocaleService';
-import { AuthenticationService } from './AuthenticationService';
-import { AuthDialogService } from './Dialog/AuthDialogService';
-import { PluginBootstrap } from './PluginBootstrap';
-import { UserLoadingErrorDialogBootstrap } from './UserLoadingErrorDialogBootstrap';
-
 export const manifest: PluginManifest = {
   info: {
     name: 'Plugin Authentication',
   },
 
-  providers: [AuthenticationService, AuthDialogService, PluginBootstrap, AuthenticationLocaleService, UserLoadingErrorDialogBootstrap],
+  providers: [
+    () => import('./AuthenticationService').then(m => m.AuthenticationService),
+    () => import('./Dialog/AuthDialogService').then(m => m.AuthDialogService),
+    () => import('./PluginBootstrap').then(m => m.PluginBootstrap),
+    () => import('./AuthenticationLocaleService').then(m => m.AuthenticationLocaleService),
+    () => import('./UserLoadingErrorDialogBootstrap').then(m => m.UserLoadingErrorDialogBootstrap),
+  ],
 };

@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-.tabList {
+.vertical.tabList {
   display: flex;
   flex-direction: column;
   flex: 0 0 auto;
