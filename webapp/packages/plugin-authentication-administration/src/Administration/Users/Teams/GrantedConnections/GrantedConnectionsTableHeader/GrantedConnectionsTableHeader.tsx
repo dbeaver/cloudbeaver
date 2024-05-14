@@ -26,7 +26,7 @@ export const GrantedConnectionsTableHeader = observer<Props>(function GrantedCon
   const translate = useTranslate();
 
   return (
-    <Container className={s(styles, { header: true }, className)} noWrap parent compact gap keepSize>
+    <Container as="header" className={s(styles, { header: true }, className)} noWrap parent compact gap keepSize>
       <Filter
         disabled={disabled}
         placeholder={translate('administration_teams_team_granted_connections_search_placeholder')}

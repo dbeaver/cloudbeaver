@@ -26,7 +26,7 @@ export const GrantedUsersTableHeader = observer<Props>(function GrantedUsersTabl
   const translate = useTranslate();
 
   return (
-    <Container className={s(styles, { header: true }, className)} gap parent compact noWrap>
+    <Container as="header" className={s(styles, { header: true }, className)} gap parent compact noWrap>
       <Filter
         disabled={disabled}
         placeholder={translate('administration_teams_team_granted_users_search_placeholder')}
