@@ -7,7 +7,7 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import { ColoredContainer, Group, TextPlaceholder, useAutoLoad, useTranslate } from '@cloudbeaver/core-blocks';
+import { ColoredContainer, Container, Group, TextPlaceholder, useAutoLoad, useTranslate } from '@cloudbeaver/core-blocks';
 import { type TabContainerPanelComponent, useTab } from '@cloudbeaver/core-ui';
 
 import type { UserFormProps } from '../AdministrationUserFormService';
@@ -29,11 +29,9 @@ export const UserFormConnectionAccessPanel: TabContainerPanelComponent<UserFormP
 
   if (isAdmin) {
     return (
-      <ColoredContainer>
-        <Group large>
-          <TextPlaceholder>{translate('connections_connection_access_admin_info')}</TextPlaceholder>
-        </Group>
-      </ColoredContainer>
+      <Container>
+        <Group large>{translate('connections_connection_access_admin_info')}</Group>
+      </Container>
     );
   }
 

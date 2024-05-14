@@ -9,7 +9,7 @@ import { observer } from 'mobx-react-lite';
 import { useCallback, useContext } from 'react';
 
 import { TeamsResource } from '@cloudbeaver/core-authentication';
-import { s, TableContext, useS } from '@cloudbeaver/core-blocks';
+import { Container, s, TableContext, useS } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 
 import { TeamForm } from '../TeamForm';
@@ -34,8 +34,8 @@ export const TeamEdit = observer<Props>(function TeamEdit({ item }) {
   data.config.teamId = item;
 
   return (
-    <div className={s(styles, { box: true })}>
+    <Container className={s(styles, { box: true })} parent vertical>
       <TeamForm state={data} onCancel={collapse} />
-    </div>
+    </Container>
   );
 });
