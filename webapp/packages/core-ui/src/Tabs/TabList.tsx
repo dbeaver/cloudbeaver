@@ -6,70 +6,98 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import { useContext } from 'react';
+import { useContext, useMemo } from 'react';
 import { TabList as BaseTabList, TabListOptions, TabStateReturn } from 'reakit/Tab';
 
-import { s, useS, useTranslate } from '@cloudbeaver/core-blocks';
+import { s, SContext, StyleRegistry, useS, useTranslate } from '@cloudbeaver/core-blocks';
 
 import { generateTabElement } from './generateTabElement';
 import { TabDefault } from './Tab/TabDefault';
+import { TabBigUnderlineStyleRegistry, TabUnderlineStyleRegistry } from './Tab/TabStyleRegistries';
 import styles from './TabList.m.css';
+import { TabListVerticalRegistry, TabListVerticalRotatedRegistry } from './TabListStyleRegistries';
+import verticalStyles from './TabListVertical.m.css';
+import verticalRotatedStyles from './TabListVerticalRotated.m.css';
 import { TabsContext } from './TabsContext';
 
 export interface TabListProps extends Omit<TabListOptions, keyof TabStateReturn> {
   'aria-label'?: string;
   childrenFirst?: boolean;
+  vertical?: boolean;
+  rotated?: boolean;
+  underline?: boolean;
+  big?: boolean;
   className?: string;
 }
 
-export const TabList = observer<React.PropsWithChildren<TabListProps>>(function TabList({ className, children, childrenFirst, ...props }) {
+export const TabList = observer<React.PropsWithChildren<TabListProps>>(function TabList({
+  className,
+  children,
+  vertical,
+  rotated,
+  underline,
+  big,
+  childrenFirst,
+  ...props
+}) {
   const state = useContext(TabsContext);
   const translate = useTranslate();
-  const componentStyle = useS(styles);
+  const componentStyle = useS(styles, !rotated && verticalStyles, verticalRotatedStyles);
 
   if (!state) {
     throw new Error('Tabs context was not provided');
   }
 
+  const registry = useMemo<StyleRegistry>(
+    () => [
+      ...(vertical && !rotated ? TabListVerticalRegistry : []),
+      ...(vertical && rotated ? TabListVerticalRotatedRegistry : []),
+      ...(underline ? TabUnderlineStyleRegistry : []),
+      ...(underline && big ? TabBigUnderlineStyleRegistry : []),
+    ],
+    [vertical, rotated, underline, big],
+  );
+
+  className = s(componentStyle, { tabList: true, vertical, rotated, underline, big }, className);
+
   if (state.container) {
     const displayed = state.container.getDisplayed(state.props);
     return (
-      <BaseTabList
-        {...props}
-        className={s(componentStyle, { tabList: true }, className)}
-        {...state.state}
-        aria-label={translate(props['aria-label'] ?? state.container.areaLabel)}
-      >
-        {childrenFirst && children}
-        {displayed
-          .map(
-            generateTabElement(
-              (tabInfo, key) => (
-                <TabDefault
-                  key={key}
-                  tabId={key}
-                  name={tabInfo.name}
-                  icon={tabInfo.icon}
-                  component={tabInfo.tab?.()}
-                  {...state.props}
-                  aria-label={tabInfo.name}
-                  disabled={props.disabled || tabInfo.isDisabled?.(tabInfo.key, state.props)}
-                  onOpen={tabInfo.onOpen}
-                  onClose={tabInfo.onClose}
-                />
+      <SContext registry={registry}>
+        <BaseTabList {...props} className={className} {...state.state} aria-label={translate(props['aria-label'] ?? state.container.areaLabel)}>
+          {childrenFirst && children}
+          {displayed
+            .map(
+              generateTabElement(
+                (tabInfo, key) => (
+                  <TabDefault
+                    key={key}
+                    tabId={key}
+                    name={tabInfo.name}
+                    icon={tabInfo.icon}
+                    component={tabInfo.tab?.()}
+                    {...state.props}
+                    aria-label={tabInfo.name}
+                    disabled={props.disabled || tabInfo.isDisabled?.(tabInfo.key, state.props)}
+                    onOpen={tabInfo.onOpen}
+                    onClose={tabInfo.onClose}
+                  />
+                ),
+                state.props,
               ),
-              state.props,
-            ),
-          )
-          .flat()}
-        {!childrenFirst && children}
-      </BaseTabList>
+            )
+            .flat()}
+          {!childrenFirst && children}
+        </BaseTabList>
+      </SContext>
     );
   }
 
   return (
-    <BaseTabList {...props} className={s(componentStyle, { tabList: true }, className)} {...state.state} aria-label={translate(props['aria-label'])}>
-      {children}
-    </BaseTabList>
+    <SContext registry={registry}>
+      <BaseTabList {...props} className={className} {...state.state} aria-label={translate(props['aria-label'])}>
+        {children}
+      </BaseTabList>
+    </SContext>
   );
 });

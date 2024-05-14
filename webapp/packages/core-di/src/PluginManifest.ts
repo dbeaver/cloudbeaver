@@ -13,7 +13,8 @@ export interface PluginManifest {
     defaultSettings?: Record<string, any>;
   };
 
-  providers: Array<IServiceConstructor<any>>;
+  preload?: Array<() => Promise<IServiceConstructor<any>>>;
+  providers: Array<() => Promise<IServiceConstructor<any>>>;
 
   /**
    * The list of plugins which your plugin depends on

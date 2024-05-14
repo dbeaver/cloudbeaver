@@ -7,12 +7,10 @@
  */
 import type { PluginManifest } from '@cloudbeaver/core-di';
 
-import { ProductSettingsService } from './ProductSettingsService';
-
 export const coreProductManifest: PluginManifest = {
   info: {
     name: 'Core Product',
   },
 
-  providers: [ProductSettingsService],
+  providers: [() => import('./ProductSettingsService').then(m => m.ProductSettingsService)],
 };

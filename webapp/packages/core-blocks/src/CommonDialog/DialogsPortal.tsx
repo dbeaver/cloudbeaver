@@ -84,8 +84,8 @@ export const DialogsPortal = observer(function DialogsPortal() {
   }, [activeDialog]);
 
   return (
-    <Loader className={s(styles, { loader: true })} suspense overlay>
-      <DialogBackdrop className={s(styles, { backdrop: true })} visible={!!activeDialog} onMouseDown={state.backdropClick}>
+    <DialogBackdrop className={s(styles, { backdrop: true })} visible={!!activeDialog} onMouseDown={state.backdropClick}>
+      <Loader className={s(styles, { loader: true })} suspense>
         <div className={s(styles, { innerBox: true })}>
           {commonDialogService.dialogs.map((dialog, i, arr) => (
             <ErrorBoundary key={dialog.id} className={s(styles, { error: true })} remount onClose={state.reject}>
@@ -99,8 +99,8 @@ export const DialogsPortal = observer(function DialogsPortal() {
             </ErrorBoundary>
           ))}
         </div>
-      </DialogBackdrop>
-    </Loader>
+      </Loader>
+    </DialogBackdrop>
   );
 });
 

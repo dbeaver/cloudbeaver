@@ -7,13 +7,13 @@
  */
 import type { PluginManifest } from '@cloudbeaver/core-di';
 
-import { LocaleService } from './LocaleService';
-import { NavigationTreeFiltersBootstrap } from './NavigationTreeFiltersBootstrap';
-
 export const navigationTreeFiltersPlugin: PluginManifest = {
   info: {
     name: 'Navigation tree filters plugin',
   },
 
-  providers: [LocaleService, NavigationTreeFiltersBootstrap],
+  providers: [
+    () => import('./LocaleService').then(m => m.LocaleService),
+    () => import('./NavigationTreeFiltersBootstrap').then(m => m.NavigationTreeFiltersBootstrap),
+  ],
 };
