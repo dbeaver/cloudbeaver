@@ -9,7 +9,7 @@ import { observable } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import { useCallback, useState } from 'react';
 
-import { UsersResource } from '@cloudbeaver/core-authentication';
+import { TeamRolesResource, UsersResource } from '@cloudbeaver/core-authentication';
 import {
   Button,
   Container,
@@ -22,28 +22,30 @@ import {
   TableColumnValue,
   TableItem,
   useObjectRef,
+  useResource,
   useS,
   useTranslate,
 } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import type { TLocalizationToken } from '@cloudbeaver/core-localization';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
-import type { AdminUserInfoFragment } from '@cloudbeaver/core-sdk';
 
 import { getFilteredUsers } from './getFilteredUsers';
 import style from './GrantedUserList.m.css';
 import { GrantedUsersTableHeader, IFilterState } from './GrantedUsersTableHeader/GrantedUsersTableHeader';
 import { GrantedUsersTableInnerHeader } from './GrantedUsersTableHeader/GrantedUsersTableInnerHeader';
 import { GrantedUsersTableItem } from './GrantedUsersTableItem';
+import type { IGrantedUser } from './IGrantedUser';
 
 interface Props {
-  grantedUsers: AdminUserInfoFragment[];
+  grantedUsers: IGrantedUser[];
   disabled: boolean;
   onRevoke: (subjectIds: string[]) => void;
+  onTeamRoleAssign: (subjectId: string, teamRole: string | null) => void;
   onEdit: () => void;
 }
 
-export const GrantedUserList = observer<Props>(function GrantedUserList({ grantedUsers, disabled, onRevoke, onEdit }) {
+export const GrantedUserList = observer<Props>(function GrantedUserList({ grantedUsers, disabled, onRevoke, onTeamRoleAssign, onEdit }) {
   const styles = useS(style);
   const props = useObjectRef({ onRevoke, onEdit });
   const translate = useTranslate();
@@ -51,12 +53,14 @@ export const GrantedUserList = observer<Props>(function GrantedUserList({ grante
   const usersResource = useService(UsersResource);
   const serverConfigResource = useService(ServerConfigResource);
 
+  const teamRolesResource = useResource(GrantedUserList, TeamRolesResource, undefined);
+
   const [selectedSubjects] = useState<Map<any, boolean>>(() => observable(new Map()));
   const [filterState] = useState<IFilterState>(() => observable({ filterValue: '' }));
 
   const selected = getComputed(() => Array.from(selectedSubjects.values()).some(v => v));
 
-  const users = getFilteredUsers(grantedUsers, filterState.filterValue);
+  const users = getFilteredUsers(grantedUsers, filterState.filterValue) as IGrantedUser[];
   const keys = users.map(user => user.userId);
 
   const revoke = useCallback(() => {
@@ -97,7 +101,7 @@ export const GrantedUserList = observer<Props>(function GrantedUserList({ grante
       </GrantedUsersTableHeader>
       <Container overflow>
         <Table keys={keys} selectedItems={selectedSubjects} isItemSelectable={item => isEditable(item)}>
-          <GrantedUsersTableInnerHeader disabled={disabled} />
+          <GrantedUsersTableInnerHeader disabled={disabled} showUserTeamRole={teamRolesResource.data.length > 0} />
           <TableBody>
             {tableInfoText && (
               <TableItem item="tableInfo" selectDisabled>
@@ -112,7 +116,10 @@ export const GrantedUserList = observer<Props>(function GrantedUserList({ grante
                 tooltip={isEditable(user.userId) ? user.userId : translate('administration_teams_team_granted_users_permission_denied')}
                 icon="/icons/user.svg"
                 iconTooltip={translate('authentication_user_icon_tooltip')}
+                teamRole={user.teamRole}
+                teamRoles={teamRolesResource.data}
                 disabled={disabled}
+                onTeamRoleAssign={onTeamRoleAssign}
               />
             ))}
           </TableBody>

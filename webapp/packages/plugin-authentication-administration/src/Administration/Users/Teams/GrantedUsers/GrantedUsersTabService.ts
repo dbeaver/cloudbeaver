@@ -7,11 +7,11 @@
  */
 import React from 'react';
 
-import { TeamsResource, UsersResource } from '@cloudbeaver/core-authentication';
+import { TeamRolesResource, TeamsResource, UsersResource } from '@cloudbeaver/core-authentication';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
-import { isArraysEqual, MetadataValueGetter } from '@cloudbeaver/core-utils';
+import { isArraysEqual, isObjectsEqual, MetadataValueGetter } from '@cloudbeaver/core-utils';
 
 import { teamContext } from '../Contexts/teamContext';
 import type { ITeamFormProps, ITeamFormSubmitData } from '../ITeamFormProps';
@@ -32,6 +32,7 @@ export class GrantedUsersTabService extends Bootstrap {
     private readonly usersResource: UsersResource,
     private readonly teamsResource: TeamsResource,
     private readonly notificationService: NotificationService,
+    private readonly teamRolesResource: TeamRolesResource,
   ) {
     super();
     this.key = 'granted-users';
@@ -78,7 +79,7 @@ export class GrantedUsersTabService extends Bootstrap {
 
     const initial = await this.teamsResource.loadGrantedUsers(config.teamId);
 
-    const changed = !isArraysEqual(initial, state.grantedUsers);
+    const changed = !isArraysEqual(initial, state.grantedUsers, isObjectsEqual);
 
     if (!changed) {
       return;
@@ -87,18 +88,26 @@ export class GrantedUsersTabService extends Bootstrap {
     const granted: string[] = [];
     const revoked: string[] = [];
 
-    const revokedUsers = initial.filter(user => !state.grantedUsers.includes(user));
+    const revokedUsers = initial.filter(user => !state.grantedUsers.some(grantedUser => grantedUser.userId === user.userId));
 
     try {
       for (const user of revokedUsers) {
-        await this.usersResource.revokeTeam(user, config.teamId);
-        revoked.push(user);
+        await this.usersResource.revokeTeam(user.userId, config.teamId);
+        revoked.push(user.userId);
       }
 
       for (const user of state.grantedUsers) {
-        if (!initial.includes(user)) {
-          await this.usersResource.grantTeam(user, config.teamId);
-          granted.push(user);
+        const initialUser = initial.find(grantedUser => grantedUser.userId === user.userId);
+
+        if (!initialUser) {
+          await this.usersResource.grantTeam(user.userId, config.teamId);
+          granted.push(user.userId);
+        }
+
+        const initialRole = initialUser?.teamRole ?? null;
+
+        if (user.teamRole !== initialRole) {
+          await this.teamRolesResource.assignTeamRoleToUser(user.userId, config.teamId, user.teamRole);
         }
       }
 
