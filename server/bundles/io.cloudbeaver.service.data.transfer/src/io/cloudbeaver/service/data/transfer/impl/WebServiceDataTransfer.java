@@ -338,14 +338,14 @@ public class WebServiceDataTransfer implements DBWServiceDataTransfer {
             DBRProgressMonitor monitor,
             DataTransferProcessorDescriptor processor,
             @NotNull DBSDataManipulator dataContainer,
-            Path path) throws DBException
-    {
+            Path path) throws DBException {
         IDataTransferProcessor processorInstance = processor.getInstance();
 
+        StreamTransferProducer producer;
         if (dataContainer.getDataSource() != null) {
-            DatabaseTransferConsumer consumer = new DatabaseTransferConsumer(dataContainer);
-            StreamTransferProducer producer = new StreamTransferProducer(new StreamEntityMapping(path), processor);
+            producer = new StreamTransferProducer(new StreamEntityMapping(path), processor);
 
+            DatabaseTransferConsumer consumer = new DatabaseTransferConsumer(dataContainer);
             DatabaseConsumerSettings databaseConsumerSettings = new DatabaseConsumerSettings();
             databaseConsumerSettings.setContainer((DBSObjectContainer) dataContainer.getDataSource());
             consumer.setSettings(databaseConsumerSettings);
