@@ -35,8 +35,8 @@ export class LocalizationService extends Bootstrap {
 
   readonly onChange: IExecutor<string>;
   private language: string | null;
-  private readonly localeMap: Map<string, Map<string, string>> = new Map();
-  private readonly localeProviders: ILocaleProvider[] = [];
+  private readonly localeMap: Map<string, Map<string, string>>;
+  private readonly localeProviders: ILocaleProvider[];
   private reactionDisposer: IReactionDisposer | null;
 
   constructor() {
@@ -46,6 +46,8 @@ export class LocalizationService extends Bootstrap {
     this.language = null;
     this.reactionDisposer = null;
     this.onChange = new Executor();
+    this.localeMap = new Map();
+    this.localeProviders = [];
 
     makeObservable<LocalizationService, 'localeMap' | 'supportedLanguages' | 'language'>(this, {
       language: observable,
@@ -125,18 +127,15 @@ export class LocalizationService extends Bootstrap {
       },
     ]);
     this.addProvider(this.coreProvider.bind(this));
+  }
+
+  async load(): Promise<void> {
     this.reactionDisposer = reaction(
       () => this.currentLanguage,
       lang => {
         this.loadLocale(lang);
       },
-      {
-        fireImmediately: true,
-      },
     );
-  }
-
-  async load(): Promise<void> {
     await this.loadLocale(DEFAULT_LOCALE.isoCode);
     await this.loadLocale(this.currentLanguage);
   }

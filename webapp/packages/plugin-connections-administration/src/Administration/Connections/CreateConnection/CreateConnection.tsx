@@ -24,7 +24,7 @@ import {
 } from '@cloudbeaver/core-blocks';
 import { DBDriverResource } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
-import { TabListStyles, TabPanelList, TabPanelStyles, TabsState, TabStyles, TabUnderlineStyleRegistry } from '@cloudbeaver/core-ui';
+import { TabListStyles, TabPanelList, TabPanelStyles, TabsState, TabStyles } from '@cloudbeaver/core-ui';
 import { ConnectionFormLoader } from '@cloudbeaver/plugin-connections';
 
 import { CreateConnectionService } from '../CreateConnectionService';
@@ -39,7 +39,6 @@ interface Props {
 }
 
 const tabsRegistry: StyleRegistry = [
-  ...TabUnderlineStyleRegistry,
   [TabStyles, { mode: 'append', styles: [CreateConnectionTab] }],
   [TabPanelStyles, { mode: 'append', styles: [CreateConnectionTabPanel] }],
   [TabListStyles, { mode: 'append', styles: [CreateConnectionTabList] }],

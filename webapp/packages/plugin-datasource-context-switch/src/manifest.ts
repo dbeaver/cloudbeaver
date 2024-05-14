@@ -7,15 +7,15 @@
  */
 import type { PluginManifest } from '@cloudbeaver/core-di';
 
-import { ConnectionSchemaManagerBootstrap } from './ConnectionSchemaManager/ConnectionSchemaManagerBootstrap';
-import { ConnectionSchemaManagerService } from './ConnectionSchemaManager/ConnectionSchemaManagerService';
-import { LocaleService } from './LocaleService';
-import { PluginBootstrap } from './PluginBootstrap';
-
 export const datasourceContextSwitchPluginManifest: PluginManifest = {
   info: {
     name: 'Datasource context switch plugin',
   },
 
-  providers: [PluginBootstrap, ConnectionSchemaManagerService, ConnectionSchemaManagerBootstrap, LocaleService],
+  providers: [
+    () => import('./PluginBootstrap').then(m => m.PluginBootstrap),
+    () => import('./ConnectionSchemaManager/ConnectionSchemaManagerService').then(m => m.ConnectionSchemaManagerService),
+    () => import('./ConnectionSchemaManager/ConnectionSchemaManagerBootstrap').then(m => m.ConnectionSchemaManagerBootstrap),
+    () => import('./LocaleService').then(m => m.LocaleService),
+  ],
 };

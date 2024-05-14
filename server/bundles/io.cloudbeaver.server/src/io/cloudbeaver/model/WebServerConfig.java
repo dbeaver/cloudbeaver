@@ -21,6 +21,7 @@ import io.cloudbeaver.registry.WebServiceRegistry;
 import io.cloudbeaver.server.CBApplication;
 import io.cloudbeaver.server.CBPlatform;
 import io.cloudbeaver.service.security.PasswordPolicyConfiguration;
+import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.model.meta.Property;
 import org.jkiss.dbeaver.model.navigator.DBNBrowseSettings;
 import org.jkiss.dbeaver.registry.language.PlatformLanguageDescriptor;
@@ -153,6 +154,12 @@ public class WebServerConfig {
     @Property
     public String[] getEnabledFeatures() {
         return application.getAppConfiguration().getEnabledFeatures();
+    }
+
+    @Property
+    @Nullable
+    public String[] getDisabledBetaFeatures() {
+        return application.getAppConfiguration().getDisabledBetaFeatures();
     }
 
     @Property

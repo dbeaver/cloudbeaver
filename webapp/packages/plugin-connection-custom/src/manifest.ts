@@ -7,14 +7,14 @@
  */
 import type { PluginManifest } from '@cloudbeaver/core-di';
 
-import { CustomConnectionPluginBootstrap } from './CustomConnectionPluginBootstrap';
-import { CustomConnectionSettingsService } from './CustomConnectionSettingsService';
-import { LocaleService } from './LocaleService';
-
 export const customConnectionPluginManifest: PluginManifest = {
   info: {
     name: 'Custom connection plugin',
   },
 
-  providers: [LocaleService, CustomConnectionPluginBootstrap, CustomConnectionSettingsService],
+  providers: [
+    () => import('./LocaleService').then(m => m.LocaleService),
+    () => import('./CustomConnectionPluginBootstrap').then(m => m.CustomConnectionPluginBootstrap),
+    () => import('./CustomConnectionSettingsService').then(m => m.CustomConnectionSettingsService),
+  ],
 };

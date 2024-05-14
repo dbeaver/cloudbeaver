@@ -49,6 +49,7 @@ export const coreManifests: PluginManifest[] = [
   },
   coreDIManifest,
   coreRoutingManifest, // important, should be first because the router starts in load phase first after all plugins register phase
+  coreBrowserManifest,
   coreThemingManifest,
   coreLocalizationManifest,
   coreSettingsLocalizationManifest,
@@ -61,7 +62,6 @@ export const coreManifests: PluginManifest[] = [
   coreResourceManifest,
   coreSDKManifest,
   coreRootManifest,
-  coreBrowserManifest,
   coreBrowserSettingsManifest,
   coreBrowserCookiesManifest,
   coreProductManifest,
