@@ -168,7 +168,7 @@ export const InputFiles: InputFilesType = observer(
     const files = Array.from(value ?? []);
 
     return (
-      <Field {...layoutProps} className={className}>
+      <Field {...layoutProps} className={s(styles, { field: true }, className)}>
         <FieldLabel title={labelTooltip || rest.title} required={required} className={s(styles, { fieldLabel: true })}>
           {children}
         </FieldLabel>

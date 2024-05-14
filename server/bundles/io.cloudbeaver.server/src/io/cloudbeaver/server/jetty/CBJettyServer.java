@@ -28,7 +28,7 @@ import io.cloudbeaver.service.DBWServiceBindingServlet;
 import org.eclipse.jetty.server.*;
 import org.eclipse.jetty.server.session.DefaultSessionCache;
 import org.eclipse.jetty.server.session.DefaultSessionIdManager;
-import org.eclipse.jetty.server.session.FileSessionDataStore;
+import org.eclipse.jetty.server.session.NullSessionDataStore;
 import org.eclipse.jetty.server.session.SessionHandler;
 import org.eclipse.jetty.servlet.ErrorPageErrorHandler;
 import org.eclipse.jetty.servlet.ServletContextHandler;
@@ -41,11 +41,8 @@ import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
-import org.jkiss.dbeaver.runtime.DBWorkbench;
-import org.jkiss.dbeaver.utils.GeneralUtils;
 import org.jkiss.utils.CommonUtils;
 
-import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -189,17 +186,6 @@ public class CBJettyServer {
         @NotNull ServletContextHandler servletContextHandler
     ) {
         // Init sessions persistence
-        Path metadataFolder = GeneralUtils.getMetadataFolder(DBWorkbench.getPlatform().getWorkspace().getAbsolutePath());
-        Path sessionCacheFolder = metadataFolder.resolve(SESSION_CACHE_DIR);
-        if (!Files.exists(sessionCacheFolder)) {
-            try {
-                Files.createDirectories(sessionCacheFolder);
-            } catch (IOException e) {
-                log.error("Can't create http session cache directory '" + sessionCacheFolder.toAbsolutePath() + "'", e);
-                return;
-            }
-        }
-
         SessionHandler sessionHandler = new SessionHandler();
         var maxIdleTime = application.getMaxSessionIdleTime();
         int intMaxIdleSeconds;
@@ -212,10 +198,9 @@ public class CBJettyServer {
         sessionHandler.setMaxInactiveInterval(intMaxIdleSeconds);
 
         DefaultSessionCache sessionCache = new DefaultSessionCache(sessionHandler);
-        FileSessionDataStore sessionStore = new FileSessionDataStore();
-        sessionStore.setStoreDir(sessionCacheFolder.toFile());
-        sessionCache.setSessionDataStore(sessionStore);
+        sessionCache.setSessionDataStore(new NullSessionDataStore());
         sessionHandler.setSessionCache(sessionCache);
+
         servletContextHandler.setSessionHandler(sessionHandler);
     }
 

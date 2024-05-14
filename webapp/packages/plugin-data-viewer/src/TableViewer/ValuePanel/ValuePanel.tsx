@@ -10,7 +10,7 @@ import { observer } from 'mobx-react-lite';
 
 import { s, SContext, type StyleRegistry, useS } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { TabList, TabPanelList, TabPanelStyles, TabsState, TabStyles, TabUnderlineStyleRegistry } from '@cloudbeaver/core-ui';
+import { TabList, TabPanelList, TabPanelStyles, TabsState, TabStyles } from '@cloudbeaver/core-ui';
 import { MetadataMap } from '@cloudbeaver/core-utils';
 
 import { DatabaseDataResultAction } from '../../DatabaseDataModel/Actions/DatabaseDataResultAction';
@@ -24,10 +24,9 @@ import ValuePanelEditorTabPanel from './shared/ValuePanelEditorTabPanel.m.css';
 import ValuePanelEditorTabs from './shared/ValuePanelEditorTabs.m.css';
 import ValuePanelTab from './shared/ValuePanelTab.m.css';
 
-const tabListRegistry: StyleRegistry = [...TabUnderlineStyleRegistry, [TabStyles, { mode: 'append', styles: [ValuePanelTab] }]];
+const tabListRegistry: StyleRegistry = [[TabStyles, { mode: 'append', styles: [ValuePanelTab] }]];
 
 const tabPanelListRegistry: StyleRegistry = [
-  ...TabUnderlineStyleRegistry,
   [TabStyles, { mode: 'append', styles: [ValuePanelEditorTabs] }],
   [TabPanelStyles, { mode: 'append', styles: [ValuePanelEditorTabPanel] }],
 ];
@@ -80,7 +79,7 @@ export const ValuePanel: DataPresentationComponent<any, IDatabaseResultSet> = ob
       onChange={tab => state.setCurrentTabId(tab.tabId)}
     >
       <SContext registry={tabListRegistry}>
-        <TabList className={s(style, { tabList: true })} />
+        <TabList className={s(style, { tabList: true })} underline />
       </SContext>
       <SContext registry={tabPanelListRegistry}>
         <TabPanelList />

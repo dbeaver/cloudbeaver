@@ -7,25 +7,19 @@
  */
 import type { PluginManifest } from '@cloudbeaver/core-di';
 
-import { DataGridContextMenuCellEditingService } from './DataGrid/DataGridContextMenu/DataGridContextMenuCellEditingService';
-import { DataGridContextMenuFilterService } from './DataGrid/DataGridContextMenu/DataGridContextMenuFilter/DataGridContextMenuFilterService';
-import { DataGridContextMenuOrderService } from './DataGrid/DataGridContextMenu/DataGridContextMenuOrderService';
-import { DataGridContextMenuSaveContentService } from './DataGrid/DataGridContextMenu/DataGridContextMenuSaveContentService';
-import { DataGridContextMenuService } from './DataGrid/DataGridContextMenu/DataGridContextMenuService';
-import { DataGridSettingsService } from './DataGridSettingsService';
-import { LocaleService } from './LocaleService';
-import { SpreadsheetBootstrap } from './SpreadsheetBootstrap';
-
 export const dataSpreadsheetNewManifest: PluginManifest = {
   info: { name: 'New spreadsheet implementation' },
   providers: [
-    SpreadsheetBootstrap,
-    DataGridSettingsService,
-    LocaleService,
-    DataGridContextMenuService,
-    DataGridContextMenuOrderService,
-    DataGridContextMenuFilterService,
-    DataGridContextMenuCellEditingService,
-    DataGridContextMenuSaveContentService,
+    () => import('./SpreadsheetBootstrap').then(m => m.SpreadsheetBootstrap),
+    () => import('./DataGridSettingsService').then(m => m.DataGridSettingsService),
+    () => import('./LocaleService').then(m => m.LocaleService),
+    () => import('./DataGrid/DataGridContextMenu/DataGridContextMenuService').then(m => m.DataGridContextMenuService),
+    () => import('./DataGrid/DataGridContextMenu/DataGridContextMenuOrderService').then(m => m.DataGridContextMenuOrderService),
+    () =>
+      import('./DataGrid/DataGridContextMenu/DataGridContextMenuFilter/DataGridContextMenuFilterService').then(
+        m => m.DataGridContextMenuFilterService,
+      ),
+    () => import('./DataGrid/DataGridContextMenu/DataGridContextMenuCellEditingService').then(m => m.DataGridContextMenuCellEditingService),
+    () => import('./DataGrid/DataGridContextMenu/DataGridContextMenuSaveContentService').then(m => m.DataGridContextMenuSaveContentService),
   ],
 };
