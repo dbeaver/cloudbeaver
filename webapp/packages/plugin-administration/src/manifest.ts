@@ -7,30 +7,20 @@
  */
 import type { PluginManifest } from '@cloudbeaver/core-di';
 
-import { AdministrationViewService } from './Administration/AdministrationViewService';
-import { AdministrationScreenServiceBootstrap } from './AdministrationScreen/AdministrationScreenServiceBootstrap';
-import { AdministrationTopAppBarService } from './AdministrationScreen/AdministrationTopAppBar/AdministrationTopAppBarService';
-import { WizardTopAppBarService } from './AdministrationScreen/ConfigurationWizard/WizardTopAppBar/WizardTopAppBarService';
-import { ConfigurationWizardPagesBootstrapService } from './ConfigurationWizard/ConfigurationWizardPagesBootstrapService';
-import { ServerConfigurationService } from './ConfigurationWizard/ServerConfiguration/ServerConfigurationService';
-import { ServerConfigurationAdministrationNavService } from './ConfigurationWizard/ServerConfigurationAdministrationNavService';
-import { LocaleService } from './LocaleService';
-import { PluginBootstrap } from './PluginBootstrap';
-
 export const manifest: PluginManifest = {
   info: {
     name: 'Authentication',
   },
 
   providers: [
-    LocaleService,
-    PluginBootstrap,
-    ServerConfigurationService,
-    ServerConfigurationAdministrationNavService,
-    ConfigurationWizardPagesBootstrapService,
-    AdministrationScreenServiceBootstrap,
-    AdministrationTopAppBarService,
-    WizardTopAppBarService,
-    AdministrationViewService,
+    () => import('./LocaleService').then(m => m.LocaleService),
+    () => import('./PluginBootstrap').then(m => m.PluginBootstrap),
+    () => import('./ConfigurationWizard/ServerConfiguration/ServerConfigurationService').then(m => m.ServerConfigurationService),
+    () => import('./ConfigurationWizard/ServerConfigurationAdministrationNavService').then(m => m.ServerConfigurationAdministrationNavService),
+    () => import('./ConfigurationWizard/ConfigurationWizardPagesBootstrapService').then(m => m.ConfigurationWizardPagesBootstrapService),
+    () => import('./AdministrationScreen/AdministrationScreenServiceBootstrap').then(m => m.AdministrationScreenServiceBootstrap),
+    () => import('./AdministrationScreen/AdministrationTopAppBar/AdministrationTopAppBarService').then(m => m.AdministrationTopAppBarService),
+    () => import('./AdministrationScreen/ConfigurationWizard/WizardTopAppBar/WizardTopAppBarService').then(m => m.WizardTopAppBarService),
+    () => import('./Administration/AdministrationViewService').then(m => m.AdministrationViewService),
   ],
 };

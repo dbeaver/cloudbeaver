@@ -7,12 +7,10 @@
  */
 import type { PluginManifest } from '@cloudbeaver/core-di';
 
-import { BlocksLocaleService } from './BlocksLocaleService';
-
 export const coreBlocksManifest: PluginManifest = {
   info: {
     name: 'Core Blocks',
   },
 
-  providers: [BlocksLocaleService],
+  providers: [() => import('./BlocksLocaleService').then(m => m.BlocksLocaleService)],
 };

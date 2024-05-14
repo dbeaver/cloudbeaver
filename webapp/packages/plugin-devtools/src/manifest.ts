@@ -7,12 +7,9 @@
  */
 import type { PluginManifest } from '@cloudbeaver/core-di';
 
-import { DevToolsService } from './DevToolsService';
-import { PluginBootstrap } from './PluginBootstrap';
-
 export const devToolsPlugin: PluginManifest = {
   info: {
     name: 'DevTools plugin',
   },
-  providers: [PluginBootstrap, DevToolsService],
+  providers: [() => import('./PluginBootstrap').then(m => m.PluginBootstrap), () => import('./DevToolsService').then(m => m.DevToolsService)],
 };

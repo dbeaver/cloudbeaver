@@ -7,14 +7,14 @@
  */
 import type { PluginManifest } from '@cloudbeaver/core-di';
 
-import { LocaleService } from './LocaleService';
-import { SettingsUserBootstrap } from './SettingsUserBootstrap';
-import { UserSettingsService } from './UserSettingsService';
-
 export const coreSettingsUserManifest: PluginManifest = {
   info: {
     name: 'Core User Settings',
   },
 
-  providers: [LocaleService, UserSettingsService, SettingsUserBootstrap],
+  providers: [
+    () => import('./UserSettingsService').then(m => m.UserSettingsService),
+    () => import('./SettingsUserBootstrap').then(m => m.SettingsUserBootstrap),
+    () => import('./LocaleService').then(m => m.LocaleService),
+  ],
 };

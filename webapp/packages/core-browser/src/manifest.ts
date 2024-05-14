@@ -7,15 +7,17 @@
  */
 import type { PluginManifest } from '@cloudbeaver/core-di';
 
-import { IndexedDBService } from './IndexedDB/IndexedDBService';
-import { LocalStorageSaveService } from './LocalStorageSaveService';
-import { ServiceWorkerBootstrap } from './ServiceWorkerBootstrap';
-import { ServiceWorkerService } from './ServiceWorkerService';
-
 export const coreBrowserManifest: PluginManifest = {
   info: {
     name: 'Core Browser',
   },
 
-  providers: [ServiceWorkerBootstrap, ServiceWorkerService, IndexedDBService, LocalStorageSaveService],
+  preload: [
+    () => import('./ServiceWorkerBootstrap').then(module => module.ServiceWorkerBootstrap),
+    () => import('./ServiceWorkerService').then(module => module.ServiceWorkerService),
+  ],
+  providers: [
+    () => import('./IndexedDB/IndexedDBService').then(module => module.IndexedDBService),
+    () => import('./LocalStorageSaveService').then(module => module.LocalStorageSaveService),
+  ],
 };

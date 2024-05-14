@@ -39,7 +39,12 @@ export const VersionChecker = observer(function VersionChecker() {
 
   return (
     <SContext registry={registry}>
-      <Cell before={<IconOrImage icon={icon} />} description={versionUpdateService.newVersionAvailable ? description : undefined} ripple={false}>
+      <Cell
+        before={<IconOrImage icon={icon} width={32} />}
+        description={versionUpdateService.newVersionAvailable ? description : undefined}
+        ripple={false}
+        big
+      >
         {translate(text)}
       </Cell>
     </SContext>

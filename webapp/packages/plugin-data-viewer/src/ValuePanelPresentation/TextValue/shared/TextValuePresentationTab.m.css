@@ -7,6 +7,9 @@
  */
 .tab {
   composes: theme-ripple theme-background-surface theme-text-text-primary-on-light from global;
+}
+
+.textValuePresentationTab.underline .tab {
   border-bottom: 0;
 
   &:global([aria-selected='false']) {

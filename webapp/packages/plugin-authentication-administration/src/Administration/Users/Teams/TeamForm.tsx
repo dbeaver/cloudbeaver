@@ -15,7 +15,6 @@ import {
   Loader,
   Placeholder,
   s,
-  SContext,
   StatusMessage,
   useExecutor,
   useForm,
@@ -25,7 +24,7 @@ import {
 } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { ENotificationType } from '@cloudbeaver/core-events';
-import { TabBigUnderlineStyleRegistry, TabList, TabPanelList, TabsState } from '@cloudbeaver/core-ui';
+import { TabList, TabPanelList, TabsState } from '@cloudbeaver/core-ui';
 
 import { teamContext } from './Contexts/teamContext';
 import type { ITeamFormState } from './ITeamFormProps';
@@ -78,9 +77,7 @@ export const TeamForm = observer<Props>(function TeamForm({ state, onCancel, onS
           <Container className={s(styles, { topBar: true })} gap keepSize noWrap>
             <Container fill>
               <StatusMessage message={translate(state.statusMessage || undefined)} type={ENotificationType.Info} />
-              <SContext registry={TabBigUnderlineStyleRegistry}>
-                <TabList disabled={false} />
-              </SContext>
+              <TabList disabled={false} underline big />
             </Container>
             <Container keepSize noWrap center gap compact>
               <Loader suspense inline hideMessage hideException>

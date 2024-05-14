@@ -7,14 +7,14 @@
  */
 import type { PluginManifest } from '@cloudbeaver/core-di';
 
-import { LocaleService } from './LocaleService';
-import { PluginBootstrap } from './PluginBootstrap';
-import { SQLCodeEditorPanelService } from './SQLEditor/SQLCodeEditorPanel/SQLCodeEditorPanelService';
-
 export const sqlEditorNewPlugin: PluginManifest = {
   info: {
     name: 'Sql Editor New Plugin',
   },
 
-  providers: [PluginBootstrap, SQLCodeEditorPanelService, LocaleService],
+  providers: [
+    () => import('./PluginBootstrap').then(m => m.PluginBootstrap),
+    () => import('./SQLEditor/SQLCodeEditorPanel/SQLCodeEditorPanelService').then(m => m.SQLCodeEditorPanelService),
+    () => import('./LocaleService').then(m => m.LocaleService),
+  ],
 };

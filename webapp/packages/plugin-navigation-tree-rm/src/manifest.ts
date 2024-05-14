@@ -7,12 +7,12 @@
  */
 import type { PluginManifest } from '@cloudbeaver/core-di';
 
-import { LocaleService } from './LocaleService';
-import { ResourceFoldersBootstrap } from './NavNodes/ResourceFoldersBootstrap';
-import { NavResourceNodeService } from './NavResourceNodeService';
-import { NavTreeRMContextMenuService } from './NavTreeRMContextMenuService';
-
 export const navigationTreeRMPlugin: PluginManifest = {
   info: { name: 'Navigation Tree RM plugin' },
-  providers: [LocaleService, NavResourceNodeService, ResourceFoldersBootstrap, NavTreeRMContextMenuService],
+  providers: [
+    () => import('./LocaleService').then(m => m.LocaleService),
+    () => import('./NavResourceNodeService').then(m => m.NavResourceNodeService),
+    () => import('./NavNodes/ResourceFoldersBootstrap').then(m => m.ResourceFoldersBootstrap),
+    () => import('./NavTreeRMContextMenuService').then(m => m.NavTreeRMContextMenuService),
+  ],
 };

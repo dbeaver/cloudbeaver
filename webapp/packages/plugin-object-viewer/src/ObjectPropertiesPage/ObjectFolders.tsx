@@ -15,7 +15,6 @@ import {
   ITabData,
   TabList,
   TabListStyles,
-  TabListVerticalRegistry,
   TabPanel,
   TabPanelStyles,
   TabsState,
@@ -42,7 +41,6 @@ interface IProps {
 }
 
 const objectFoldersRegistry: StyleRegistry = [
-  ...TabListVerticalRegistry,
   [
     NavNodeTabStyle,
     {
@@ -117,7 +115,7 @@ export const ObjectFolders = observer<IProps>(function ObjectFolders({ tab }) {
   return folders.length > 0 ? (
     <TabsState currentTabId={folderId} orientation="vertical" localState={innerTabState} lazy onChange={openFolder}>
       <SContext registry={objectFoldersRegistry}>
-        <TabList aria-label="Object folders">
+        <TabList aria-label="Object folders" vertical>
           {folders.map(folderId => (
             <FolderTabRenderer key={folderId} nodeId={nodeId} folderId={folderId} parents={parents} />
           ))}
