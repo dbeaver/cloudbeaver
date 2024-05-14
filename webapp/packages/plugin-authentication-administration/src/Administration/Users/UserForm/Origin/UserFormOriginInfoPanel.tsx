@@ -86,7 +86,7 @@ export const UserFormOriginInfoPanel: TabContainerPanelComponent<UserFormProps> 
   }
 
   return (
-    <Container gap>
+    <Container>
       <Group gap medium overflow>
         <Combobox
           state={localState}
@@ -103,13 +103,15 @@ export const UserFormOriginInfoPanel: TabContainerPanelComponent<UserFormProps> 
         {origin && (
           <Fragment>
             <Container gap>
-              <ObjectPropertyInfoForm
-                properties={origin.details || empty}
-                emptyPlaceholder="authentication_administration_user_auth_method_no_details"
-                readOnly
-                small
-                autoHide
-              />
+              <Container gap keepSize>
+                <ObjectPropertyInfoForm
+                  properties={origin.details || empty}
+                  emptyPlaceholder="authentication_administration_user_auth_method_no_details"
+                  readOnly
+                  small
+                  autoHide
+                />
+              </Container>
             </Container>
             <GroupItem>
               <Button type="button" mod={['outlined']} onClick={deleteHandler}>
