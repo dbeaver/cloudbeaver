@@ -7,14 +7,14 @@
  */
 import type { PluginManifest } from '@cloudbeaver/core-di';
 
-import { AsyncTaskInfoService } from './AsyncTask/AsyncTaskInfoService';
-import { EnvironmentService } from './EnvironmentService';
-import { GraphQLService } from './GraphQLService';
-
 export const coreSDKManifest: PluginManifest = {
   info: {
     name: 'Core SDK',
   },
 
-  providers: [AsyncTaskInfoService, EnvironmentService, GraphQLService],
+  providers: [
+    () => import('./AsyncTask/AsyncTaskInfoService').then(m => m.AsyncTaskInfoService),
+    () => import('./EnvironmentService').then(m => m.EnvironmentService),
+    () => import('./GraphQLService').then(m => m.GraphQLService),
+  ],
 };

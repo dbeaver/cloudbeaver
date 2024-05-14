@@ -7,12 +7,10 @@
  */
 import type { PluginManifest } from '@cloudbeaver/core-di';
 
-import { SessionLocalizationService } from './SessionLocalizationService';
-
 export const coreSessionLocalization: PluginManifest = {
   info: {
     name: 'Core Session Localization',
   },
 
-  providers: [SessionLocalizationService],
+  providers: [() => import('./SessionLocalizationService').then(m => m.SessionLocalizationService)],
 };

@@ -157,6 +157,10 @@ export class ServerConfigResource extends CachedDataResource<ServerConfig | null
     return this.update.resourceManagerEnabled ?? this.data?.resourceManagerEnabled ?? false;
   }
 
+  isBetaFeatureDisabled(feature: string): boolean {
+    return this.data?.disabledBetaFeatures?.includes(feature) || false;
+  }
+
   isFeatureEnabled(feature: string, serverSide = false): boolean {
     if (serverSide) {
       return this.data?.enabledFeatures.includes(feature) || false;

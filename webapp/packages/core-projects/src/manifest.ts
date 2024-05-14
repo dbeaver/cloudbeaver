@@ -7,15 +7,15 @@
  */
 import type { PluginManifest } from '@cloudbeaver/core-di';
 
-import { LocaleService } from './LocaleService';
-import { ProjectInfoEventHandler } from './ProjectInfoEventHandler';
-import { ProjectInfoResource } from './ProjectInfoResource';
-import { ProjectsService } from './ProjectsService';
-
 export const manifest: PluginManifest = {
   info: {
     name: 'Core Projects',
   },
 
-  providers: [ProjectInfoResource, ProjectsService, LocaleService, ProjectInfoEventHandler],
+  providers: [
+    () => import('./ProjectsService').then(m => m.ProjectsService),
+    () => import('./ProjectInfoResource').then(m => m.ProjectInfoResource),
+    () => import('./ProjectInfoEventHandler').then(m => m.ProjectInfoEventHandler),
+    () => import('./LocaleService').then(m => m.LocaleService),
+  ],
 };

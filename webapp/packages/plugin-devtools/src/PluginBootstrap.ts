@@ -85,7 +85,7 @@ export class PluginBootstrap extends Bootstrap {
         if (search) {
           return [
             new SearchResourceMenuItem(),
-            ...this.getResources(this.app.getServices().filter(service => service.name.toLocaleLowerCase().includes(search.toLocaleLowerCase()))),
+            // ...this.getResources(this.app.services.filter(service => service.name.toLocaleLowerCase().includes(search.toLocaleLowerCase()))),
           ];
         }
 
@@ -152,7 +152,7 @@ export class PluginBootstrap extends Bootstrap {
           return items;
         }
 
-        return [...this.getResources(plugin.providers), ...items];
+        return [/*...this.getResources(plugin.providers),*/ ...items];
       },
     });
 

@@ -7,12 +7,10 @@
  */
 import type { PluginManifest } from '@cloudbeaver/core-di';
 
-import { PluginBootstrap } from './PluginBootstrap';
-
 export const userProfileAdministrationPlugin: PluginManifest = {
   info: {
     name: 'User profile administration plugin',
   },
 
-  providers: [PluginBootstrap],
+  providers: [() => import('./PluginBootstrap').then(m => m.PluginBootstrap)],
 };

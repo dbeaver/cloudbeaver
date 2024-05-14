@@ -68,8 +68,6 @@ export { default as TabUnderlineStyles } from './Tabs/Tab/TabUnderline.m.css';
 export { default as TabBigUnderlineStyles } from './Tabs/Tab/TabBigUnderlineStyles.m.css';
 export { default as TabTitleBigUnderlineStyles } from './Tabs/Tab/TabTitleBigUnderlineStyles.m.css';
 export { default as TabIconStyles } from './Tabs/Tab/TabIcon.m.css';
-export * from './Tabs/Tab/TabStyleRegistries';
-export * from './Tabs/TabListStyleRegistries';
 
 export * from './Tabs/Tab/DATA_CONTEXT_TAB_ID';
 export * from './Tabs/Tab/DATA_CONTEXT_TABS_CONTEXT';

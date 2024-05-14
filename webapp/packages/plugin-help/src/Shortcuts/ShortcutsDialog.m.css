@@ -11,6 +11,3 @@
 .container {
   composes: theme-typography--body2 from global;
 }
-.groupTitle {
-  font-weight: bold;
-}
