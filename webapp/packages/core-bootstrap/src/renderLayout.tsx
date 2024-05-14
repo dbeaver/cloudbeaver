@@ -10,7 +10,7 @@ import { createRoot, Root } from 'react-dom/client';
 
 import { BodyLazy } from '@cloudbeaver/core-app';
 import { DisplayError, ErrorBoundary, Loader, s } from '@cloudbeaver/core-blocks';
-import { AppContext, IServiceInjector } from '@cloudbeaver/core-di';
+import { AppContext, HideAppLoadingScreen, IServiceInjector } from '@cloudbeaver/core-di';
 
 import styles from './renderLayout.m.css';
 
@@ -51,6 +51,7 @@ export function renderLayout(serviceInjector: IServiceInjector): IRender {
           <ErrorBoundary root>
             <Suspense fallback={<Loader className={s(styles, { loader: true })} />}>
               <BodyLazy />
+              <HideAppLoadingScreen />
             </Suspense>
           </ErrorBoundary>
         </AppContext>,
@@ -60,6 +61,7 @@ export function renderLayout(serviceInjector: IServiceInjector): IRender {
       this.initRoot().render(
         <AppContext app={serviceInjector}>
           <DisplayError error={exception} root />
+          <HideAppLoadingScreen />
         </AppContext>,
       );
     },

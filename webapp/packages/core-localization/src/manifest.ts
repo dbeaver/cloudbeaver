@@ -7,12 +7,10 @@
  */
 import type { PluginManifest } from '@cloudbeaver/core-di';
 
-import { LocalizationService } from './LocalizationService';
-
 export const coreLocalizationManifest: PluginManifest = {
   info: {
     name: 'Core Localization',
   },
 
-  providers: [LocalizationService],
+  providers: [() => import('./LocalizationService').then(m => m.LocalizationService)],
 };

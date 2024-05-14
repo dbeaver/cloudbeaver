@@ -7,16 +7,16 @@
  */
 import type { PluginManifest } from '@cloudbeaver/core-di';
 
-import { DataImportBootstrap } from './DataImportBootstrap';
-import { DataImportProcessorsResource } from './DataImportProcessorsResource';
-import { DataImportService } from './DataImportService';
-import { DataImportSettingsService } from './DataImportSettingsService';
-import { LocaleService } from './LocaleService';
-
 export const dataImportPluginManifest: PluginManifest = {
   info: {
     name: 'Data Import Plugin',
   },
 
-  providers: [LocaleService, DataImportSettingsService, DataImportBootstrap, DataImportService, DataImportProcessorsResource],
+  providers: [
+    () => import('./LocaleService').then(m => m.LocaleService),
+    () => import('./DataImportSettingsService').then(m => m.DataImportSettingsService),
+    () => import('./DataImportBootstrap').then(m => m.DataImportBootstrap),
+    () => import('./DataImportService').then(m => m.DataImportService),
+    () => import('./DataImportProcessorsResource').then(m => m.DataImportProcessorsResource),
+  ],
 };

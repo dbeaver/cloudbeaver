@@ -7,13 +7,13 @@
  */
 import type { PluginManifest } from '@cloudbeaver/core-di';
 
-import { CommonDialogService } from './CommonDialog/CommonDialogService';
-import { ContextMenuService } from './Menu/ContextMenu/ContextMenuService';
-
 export const coreDialogsManifest: PluginManifest = {
   info: {
     name: 'Core Dialogs',
   },
 
-  providers: [CommonDialogService, ContextMenuService],
+  providers: [
+    () => import('./CommonDialog/CommonDialogService').then(m => m.CommonDialogService),
+    () => import('./Menu/ContextMenu/ContextMenuService').then(m => m.ContextMenuService),
+  ],
 };

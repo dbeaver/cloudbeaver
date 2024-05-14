@@ -83,7 +83,12 @@ export const TableError = observer<Props>(function TableError({ model, loading, 
   }, [errorInfo, model.source.error]);
 
   return (
-    <div className={s(style, { error: true, animated, collapsed: !errorInfo.display, errorHidden }, className)}>
+    <div
+      role="status"
+      aria-label={error.message}
+      tabIndex={0}
+      className={s(style, { error: true, animated, collapsed: !errorInfo.display, errorHidden }, className)}
+    >
       <div className={s(style, { errorBody: true })}>
         <IconOrImage className={s(style, { iconOrImage: true })} icon={icon} title={error.message} onClick={() => errorInfo.show()} />
         <div className={s(style, { errorMessage: true })}>{error.message}</div>

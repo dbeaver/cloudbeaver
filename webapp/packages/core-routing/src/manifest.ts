@@ -7,14 +7,14 @@
  */
 import type { PluginManifest } from '@cloudbeaver/core-di';
 
-import { RouterService } from './RouterService';
-import { ScreenService } from './Screen/ScreenService';
-import { WindowsService } from './WindowsService';
-
 export const coreRoutingManifest: PluginManifest = {
   info: {
     name: 'Core Routing',
   },
 
-  providers: [ScreenService, RouterService, WindowsService],
+  providers: [
+    () => import('./Screen/ScreenService').then(m => m.ScreenService),
+    () => import('./RouterService').then(m => m.RouterService),
+    () => import('./WindowsService').then(m => m.WindowsService),
+  ],
 };
