@@ -8,7 +8,7 @@
 import { observer } from 'mobx-react-lite';
 import { useState } from 'react';
 
-import { Loader, s, TableItemExpandProps, useS } from '@cloudbeaver/core-blocks';
+import { Container, Loader, s, TableItemExpandProps, useS } from '@cloudbeaver/core-blocks';
 import { App, useService } from '@cloudbeaver/core-di';
 import { FormMode } from '@cloudbeaver/core-ui';
 
@@ -30,10 +30,10 @@ export const UserEdit = observer<TableItemExpandProps<string>>(function UserEdit
   });
 
   return (
-    <div className={s(styles, { box: true })}>
+    <Container className={s(styles, { box: true })} parent vertical>
       <Loader suspense>
         <AdministrationUserForm state={state} onClose={onClose} />
       </Loader>
-    </div>
+    </Container>
   );
 });

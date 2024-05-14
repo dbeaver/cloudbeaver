@@ -11,6 +11,7 @@ import { useCallback, useState } from 'react';
 
 import {
   Button,
+  Container,
   getComputed,
   getSelectedItems,
   Group,
@@ -70,43 +71,45 @@ export const GrantedConnectionList = observer<Props>(function GrantedConnectionL
   }
 
   return (
-    <Group className={s(styles, { box: true })} box medium overflow>
-      <div className={s(styles, { innerBox: true })}>
-        <GrantedConnectionsTableHeader className={s(styles, { header: true })} filterState={filterState} disabled={disabled}>
+    <Group className={s(styles, { group: true })} box border medium overflow vertical>
+      <GrantedConnectionsTableHeader className={s(styles, { header: true })} filterState={filterState} disabled={disabled}>
+        <Container keepSize>
           <Button disabled={disabled || !selected} mod={['outlined']} onClick={revoke}>
             {translate('ui_delete')}
           </Button>
+        </Container>
+        <Container keepSize>
           <Button disabled={disabled} mod={['unelevated']} onClick={props.onEdit}>
             {translate('ui_edit')}
           </Button>
-        </GrantedConnectionsTableHeader>
-        <div className={s(styles, { tableBox: true })}>
-          <Table className={s(styles, { table: true })} keys={keys} selectedItems={selectedSubjects} size="big">
-            <GrantedConnectionsTableInnerHeader disabled={disabled} />
-            <TableBody>
-              {tableInfoText && (
-                <TableItem item="tableInfo" selectDisabled>
-                  <TableColumnValue colSpan={5}>{translate(tableInfoText)}</TableColumnValue>
-                </TableItem>
-              )}
-              {connections.map(connection => {
-                const driver = driversResource.get(connection.driverId);
-                return (
-                  <GrantedConnectionsTableItem
-                    key={connection.id}
-                    id={connection.id}
-                    name={connection.name}
-                    tooltip={connection.name}
-                    host={`${connection.host || ''}${connection.port ? ':' + connection.port : ''}`}
-                    icon={driver?.icon}
-                    disabled={disabled}
-                  />
-                );
-              })}
-            </TableBody>
-          </Table>
-        </div>
-      </div>
+        </Container>
+      </GrantedConnectionsTableHeader>
+      <Container overflow>
+        <Table keys={keys} selectedItems={selectedSubjects}>
+          <GrantedConnectionsTableInnerHeader disabled={disabled} />
+          <TableBody>
+            {tableInfoText && (
+              <TableItem item="tableInfo" selectDisabled>
+                <TableColumnValue colSpan={5}>{translate(tableInfoText)}</TableColumnValue>
+              </TableItem>
+            )}
+            {connections.map(connection => {
+              const driver = driversResource.get(connection.driverId);
+              return (
+                <GrantedConnectionsTableItem
+                  key={connection.id}
+                  id={connection.id}
+                  name={connection.name}
+                  tooltip={connection.name}
+                  host={`${connection.host || ''}${connection.port ? ':' + connection.port : ''}`}
+                  icon={driver?.icon}
+                  disabled={disabled}
+                />
+              );
+            })}
+          </TableBody>
+        </Table>
+      </Container>
     </Group>
   );
 });

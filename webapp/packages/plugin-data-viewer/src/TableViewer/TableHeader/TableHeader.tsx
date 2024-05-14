@@ -26,8 +26,8 @@ export const TableHeader = observer<Props>(function TableHeader({ model, resultI
   const service = useService(TableHeaderService);
 
   return (
-    <div className={s(styles, { tableHeader: true }, className)}>
+    <header className={s(styles, { tableHeader: true }, className)}>
       <Placeholder container={service.tableHeaderPlaceholder} model={model} resultIndex={resultIndex} simple={simple} />
-    </div>
+    </header>
   );
 });
