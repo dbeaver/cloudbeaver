@@ -33,7 +33,11 @@ public abstract class AbstractSessionExternal implements SMSessionExternal {
     @NotNull
     protected final SMAuthSpace space;
 
-    protected AbstractSessionExternal(@NotNull SMSession parentSession, @NotNull SMAuthSpace space, @NotNull Map<String, Object> authParameters) {
+    protected AbstractSessionExternal(
+        @NotNull SMSession parentSession,
+        @NotNull SMAuthSpace space,
+        @NotNull Map<String, Object> authParameters
+    ) {
         this.parentSession = parentSession;
         this.space = space;
         this.authParameters = authParameters;

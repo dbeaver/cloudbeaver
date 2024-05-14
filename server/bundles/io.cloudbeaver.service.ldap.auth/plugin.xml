@@ -11,7 +11,7 @@
             <configuration>
                 <propertyGroup label="LDAP" description="LDAP authentication">
                     <property id="ldap-host" label="Host" type="string" description="LDAP server host" required="true"/>
-                    <property id="ldap-port" label="Port" type="integer" description="LDAP server port, default is 389"/>
+                    <property id="ldap-port" label="Port" type="integer" defaultValue="389" required="true" description="LDAP server port, default is 389"/>
                     <property id="ldap-dn" label="Base Distinguished Name" type="string"
                               description="Base Distinguished Name applicable for all users, example: dc=myOrg,dc=com"
                               required="true"

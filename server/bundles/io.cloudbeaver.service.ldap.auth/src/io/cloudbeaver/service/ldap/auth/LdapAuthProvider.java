@@ -150,8 +150,11 @@ public class LdapAuthProvider implements SMAuthProviderExternal<SMSession> {
     }
 
     @Override
-    public void refreshSession(@NotNull DBRProgressMonitor monitor, @NotNull SMSession mainSession, SMSession session)
-        throws DBException {
+    public void refreshSession(
+        @NotNull DBRProgressMonitor monitor,
+        @NotNull SMSession mainSession,
+        SMSession session
+    ) throws DBException {
 
     }
 }
