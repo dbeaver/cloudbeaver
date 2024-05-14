@@ -6,10 +6,11 @@
  * you may not use this file except in compliance with the License.
  */
 
-.tabList {
+.vertical.rotated.tabList {
   display: flex;
   gap: 4px;
   outline: none;
   max-width: 32px;
+  overflow: hidden;
   flex-direction: column;
 }

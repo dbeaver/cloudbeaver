@@ -7,15 +7,15 @@
  */
 import type { PluginManifest } from '@cloudbeaver/core-di';
 
-import { LocaleService } from './LocaleService';
-import { ThemeService } from './ThemeService';
-import { ThemeSettingsManagementService } from './ThemeSettingsManagementService';
-import { ThemeSettingsService } from './ThemeSettingsService';
-
 export const coreThemingManifest: PluginManifest = {
   info: {
     name: 'Core Theming',
   },
 
-  providers: [ThemeService, ThemeSettingsService, LocaleService, ThemeSettingsManagementService],
+  providers: [
+    () => import('./ThemeService').then(m => m.ThemeService),
+    () => import('./ThemeSettingsService').then(m => m.ThemeSettingsService),
+    () => import('./LocaleService').then(m => m.LocaleService),
+    () => import('./ThemeSettingsManagementService').then(m => m.ThemeSettingsManagementService),
+  ],
 };

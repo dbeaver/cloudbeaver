@@ -32,13 +32,15 @@ export const LogViewerInfoPanel = observer<Props>(function LogViewerInfoPanel({ 
 
   return (
     <Container className={s(styles, { panelWrapper: true }, className)} vertical>
-      <Container className={s(styles, { buttons: true })} noGrow>
-        <MenuBarSmallItem className={s(styles, { button: true })} title={translate('ui_copy_to_clipboard')} onClick={copyMessage}>
-          {translate('ui_copy_to_clipboard')}
-        </MenuBarSmallItem>
-        <MenuBarSmallItem className={s(styles, { button: true })} title={translate('ui_close')} onClick={onClose}>
-          {translate('ui_close')}
-        </MenuBarSmallItem>
+      <Container className={s(styles, { buttons: true })} noGrow noWrap>
+        <Container keepSize noWrap>
+          <MenuBarSmallItem className={s(styles, { button: true })} title={translate('ui_copy_to_clipboard')} onClick={copyMessage}>
+            {translate('ui_copy_to_clipboard')}
+          </MenuBarSmallItem>
+          <MenuBarSmallItem className={s(styles, { button: true })} title={translate('ui_close')} onClick={onClose}>
+            {translate('ui_close')}
+          </MenuBarSmallItem>
+        </Container>
       </Container>
       <div className={s(styles, { contentWrapper: true })}>
         <h2 className={s(styles, { type: true })}>{typeInfo}</h2>

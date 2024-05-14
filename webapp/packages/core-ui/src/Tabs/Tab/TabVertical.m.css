@@ -6,9 +6,9 @@
  * you may not use this file except in compliance with the License.
  */
 
-.tab {
+.vertical .tab {
   overflow: auto;
-  border: none !important;
+  border: none;
   flex-shrink: 0;
-  height: 32px !important;
+  height: 32px;
 }

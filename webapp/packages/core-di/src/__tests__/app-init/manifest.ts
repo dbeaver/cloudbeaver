@@ -6,12 +6,10 @@
  * you may not use this file except in compliance with the License.
  */
 import type { PluginManifest } from '../../PluginManifest';
-import { TestBootstrap } from './TestBootstrap';
-import { TestService } from './TestService';
 
 export const manifest: PluginManifest = {
   info: {
     name: 'Sample Manifest',
   },
-  providers: [TestService, TestBootstrap],
+  providers: [() => import('./TestService').then(m => m.TestService), () => import('./TestBootstrap').then(m => m.TestBootstrap)],
 };
