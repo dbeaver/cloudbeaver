@@ -8,7 +8,8 @@
 
 .group {
   height: 100%;
-}
-.header {
-  flex: 0 0 auto;
+
+  & .header {
+    flex: 0 0 auto;
+  }
 }
