@@ -9,21 +9,9 @@ import { observer } from 'mobx-react-lite';
 import { useEffect } from 'react';
 
 import type { TeamInfo } from '@cloudbeaver/core-authentication';
-import {
-  Form,
-  IconOrImage,
-  Loader,
-  Placeholder,
-  s,
-  SContext,
-  useExecutor,
-  useForm,
-  useObjectRef,
-  useS,
-  useTranslate,
-} from '@cloudbeaver/core-blocks';
+import { Form, IconOrImage, Loader, Placeholder, s, useExecutor, useForm, useObjectRef, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { TabBigUnderlineStyleRegistry, TabList, TabPanelList, TabsState } from '@cloudbeaver/core-ui';
+import { TabList, TabPanelList, TabsState } from '@cloudbeaver/core-ui';
 
 import { teamContext } from './Contexts/teamContext';
 import type { ITeamFormState } from './ITeamFormProps';
@@ -83,9 +71,7 @@ export const TeamForm = observer<Props>(function TeamForm({ state, onCancel, onS
                   </>
                 )}
               </div>
-              <SContext registry={TabBigUnderlineStyleRegistry}>
-                <TabList className={s(styles, { tabList: true })} disabled={false} />
-              </SContext>
+              <TabList className={s(styles, { tabList: true })} disabled={false} underline big />
             </div>
             <div className={s(styles, { topBarActions: true })}>
               <Loader suspense inline hideMessage hideException>

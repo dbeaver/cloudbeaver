@@ -7,26 +7,18 @@
  */
 import type { PluginManifest } from '@cloudbeaver/core-di';
 
-import { ConnectionsAdministrationNavService } from './Administration/Connections/ConnectionsAdministrationNavService';
-import { ConnectionsAdministrationService } from './Administration/Connections/ConnectionsAdministrationService';
-import { CreateConnectionBaseBootstrap } from './Administration/Connections/CreateConnection/CreateConnectionBaseBootstrap';
-import { ConnectionManualService } from './Administration/Connections/CreateConnection/Manual/ConnectionManualService';
-import { CreateConnectionService } from './Administration/Connections/CreateConnectionService';
-import { ConnectionAccessTabService } from './ConnectionForm/ConnectionAccess/ConnectionAccessTabService';
-import { LocaleService } from './LocaleService';
-
 export const connectionPlugin: PluginManifest = {
   info: {
     name: 'Connections Administration plugin',
   },
 
   providers: [
-    LocaleService,
-    ConnectionsAdministrationService,
-    ConnectionsAdministrationNavService,
-    CreateConnectionService,
-    ConnectionManualService,
-    CreateConnectionBaseBootstrap,
-    ConnectionAccessTabService,
+    () => import('./LocaleService').then(m => m.LocaleService),
+    () => import('./Administration/Connections/ConnectionsAdministrationService').then(m => m.ConnectionsAdministrationService),
+    () => import('./Administration/Connections/ConnectionsAdministrationNavService').then(m => m.ConnectionsAdministrationNavService),
+    () => import('./Administration/Connections/CreateConnectionService').then(m => m.CreateConnectionService),
+    () => import('./Administration/Connections/CreateConnection/Manual/ConnectionManualService').then(m => m.ConnectionManualService),
+    () => import('./Administration/Connections/CreateConnection/CreateConnectionBaseBootstrap').then(m => m.CreateConnectionBaseBootstrap),
+    () => import('./ConnectionForm/ConnectionAccess/ConnectionAccessTabService').then(m => m.ConnectionAccessTabService),
   ],
 };

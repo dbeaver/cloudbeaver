@@ -40,6 +40,10 @@
   overflow: auto;
   min-height: 40px;
   max-height: 96px;
+
+  &:empty {
+    display: none;
+  }
 }
 
 .type,

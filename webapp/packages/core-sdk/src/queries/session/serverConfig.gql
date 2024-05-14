@@ -30,6 +30,7 @@ query serverConfig {
     distributed
 
     enabledFeatures
+    disabledBetaFeatures
     enabledAuthProviders
     supportedLanguages {
       isoCode

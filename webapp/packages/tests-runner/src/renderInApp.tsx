@@ -6,6 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 import { queries, Queries, render, RenderOptions, RenderResult } from '@testing-library/react';
+import { Suspense } from 'react';
 
 import { AppContext, IServiceInjector } from '@cloudbeaver/core-di';
 
@@ -13,7 +14,11 @@ import type { IApplication } from './createApp';
 
 function ApplicationWrapper(serviceInjector: IServiceInjector): React.FC<React.PropsWithChildren> {
   return function render({ children }) {
-    return <AppContext app={serviceInjector}>{children}</AppContext>;
+    return (
+      <Suspense fallback={null}>
+        <AppContext app={serviceInjector}>{children}</AppContext>
+      </Suspense>
+    );
   };
 }
 

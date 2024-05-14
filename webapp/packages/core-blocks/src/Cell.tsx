@@ -8,6 +8,7 @@
 import { observer } from 'mobx-react-lite';
 
 import style from './Cell.m.css';
+import { Container } from './Containers/Container';
 import { s } from './s';
 import { useS } from './useS';
 
@@ -16,23 +17,32 @@ interface Props {
   before?: React.ReactElement;
   after?: React.ReactElement;
   ripple?: boolean;
+  big?: boolean;
   className?: string;
   children?: React.ReactNode;
 }
 
-export const Cell = observer<Props>(function Cell({ before, after, description, className, ripple = true, children }) {
+export const Cell = observer<Props>(function Cell({ before, after, description, className, ripple = true, big, children }) {
   const styles = useS(style);
 
   return (
-    <div className={s(styles, { ripple }, className)}>
-      <main className={s(styles, { main: true })}>
-        <div className={s(styles, { before: true })}>{before}</div>
-        <div className={s(styles, { info: true })}>
+    <div className={s(styles, { ripple, big }, className)}>
+      <Container className={s(styles, { main: true })} gap parent center dense>
+        {before && (
+          <Container className={s(styles, { before: true })} keepSize>
+            {before}
+          </Container>
+        )}
+        <Container className={s(styles, { info: true })} zeroBasis>
           {children}
-          {description && <div className={s(styles, { description: true })}>{description}</div>}
-        </div>
-        <div className={s(styles, { after: true })}>{after}</div>
-      </main>
+          {description && <Container className={s(styles, { description: true })}>{description}</Container>}
+        </Container>
+        {after && (
+          <Container className={s(styles, { after: true })} keepSize>
+            {after}
+          </Container>
+        )}
+      </Container>
     </div>
   );
 });

@@ -7,25 +7,25 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import { ColoredContainer, Container, Group, SContext, StyleRegistry, useS } from '@cloudbeaver/core-blocks';
+import { ColoredContainer, Container, Group, s, SContext, StyleRegistry, useS } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { TabList, TabPanelList, TabsState, TabStyles, TabUnderlineStyleRegistry } from '@cloudbeaver/core-ui';
+import { TabList, TabPanelList, TabsState, TabStyles } from '@cloudbeaver/core-ui';
 
 import style from './UserProfileOptionsPanel.m.css';
 import UserProfileTabStyles from './UserProfileTab.m.css';
 import { UserProfileTabsService } from './UserProfileTabsService';
 
-export const tabsStyleRegistry: StyleRegistry = [...TabUnderlineStyleRegistry, [TabStyles, { mode: 'append', styles: [UserProfileTabStyles] }]];
+export const tabsStyleRegistry: StyleRegistry = [[TabStyles, { mode: 'append', styles: [UserProfileTabStyles] }]];
 
 export const UserProfileOptionsPanel = observer(function UserProfileOptionsPanel() {
   const styles = useS(style);
   const userProfileTabsService = useService(UserProfileTabsService);
   return (
-    <ColoredContainer className={styles.userProfileOptionsPanel} parent compact vertical noWrap maximum>
+    <ColoredContainer className={s(styles, { userProfileOptionsPanel: true })} parent compact vertical noWrap maximum>
       <TabsState container={userProfileTabsService.tabContainer} lazy>
         <Group box keepSize noWrap>
           <SContext registry={tabsStyleRegistry}>
-            <TabList />
+            <TabList underline />
           </SContext>
         </Group>
         <Container vertical>
