@@ -7,16 +7,16 @@
  */
 import type { PluginManifest } from '@cloudbeaver/core-di';
 
-import { ActionService } from './Action/ActionService';
-import { KeyBindingService } from './Action/KeyBinding/KeyBindingService';
-import { LocaleService } from './LocaleService';
-import { MenuService } from './Menu/MenuService';
-import { ViewService } from './View/ViewService';
-
 export const manifest: PluginManifest = {
   info: {
     name: 'Core View',
   },
 
-  providers: [ActionService, KeyBindingService, MenuService, ViewService, LocaleService],
+  providers: [
+    () => import('./Action/ActionService').then(m => m.ActionService),
+    () => import('./Action/KeyBinding/KeyBindingService').then(m => m.KeyBindingService),
+    () => import('./LocaleService').then(m => m.LocaleService),
+    () => import('./Menu/MenuService').then(m => m.MenuService),
+    () => import('./View/ViewService').then(m => m.ViewService),
+  ],
 };

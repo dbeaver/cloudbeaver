@@ -7,48 +7,29 @@
  */
 import type { PluginManifest } from '@cloudbeaver/core-di';
 
-import { AppAuthService } from './AppAuthService';
-import { AuthConfigurationParametersResource } from './AuthConfigurationParametersResource';
-import { AuthConfigurationsResource } from './AuthConfigurationsResource';
-import { AuthInfoService } from './AuthInfoService';
-import { AuthProviderService } from './AuthProviderService';
-import { AuthProvidersResource } from './AuthProvidersResource';
-import { AuthRolesResource } from './AuthRolesResource';
-import { AuthSettingsService } from './AuthSettingsService';
-import { LocaleService } from './LocaleService';
-import { PasswordPolicyService } from './PasswordPolicyService';
-import { TeamMetaParametersResource } from './TeamMetaParametersResource';
-import { TeamsManagerService } from './TeamsManagerService';
-import { TeamsResource } from './TeamsResource';
-import { UserConfigurationBootstrap } from './UserConfigurationBootstrap';
-import { UserDataService } from './UserDataService';
-import { UserInfoResource } from './UserInfoResource';
-import { UserMetaParametersResource } from './UserMetaParametersResource';
-import { UsersResource } from './UsersResource';
-
 export const coreAuthenticationManifest: PluginManifest = {
   info: {
     name: 'Core Authentication',
   },
 
   providers: [
-    AppAuthService,
-    AuthInfoService,
-    AuthProviderService,
-    AuthProvidersResource,
-    AuthSettingsService,
-    AuthConfigurationsResource,
-    AuthConfigurationParametersResource,
-    TeamsManagerService,
-    TeamsResource,
-    UserDataService,
-    UserInfoResource,
-    UsersResource,
-    UserMetaParametersResource,
-    UserConfigurationBootstrap,
-    AuthRolesResource,
-    TeamMetaParametersResource,
-    PasswordPolicyService,
-    LocaleService,
+    () => import('./AppAuthService').then(m => m.AppAuthService),
+    () => import('./AuthConfigurationParametersResource').then(m => m.AuthConfigurationParametersResource),
+    () => import('./AuthConfigurationsResource').then(m => m.AuthConfigurationsResource),
+    () => import('./AuthInfoService').then(m => m.AuthInfoService),
+    () => import('./AuthProviderService').then(m => m.AuthProviderService),
+    () => import('./AuthProvidersResource').then(m => m.AuthProvidersResource),
+    () => import('./AuthRolesResource').then(m => m.AuthRolesResource),
+    () => import('./AuthSettingsService').then(m => m.AuthSettingsService),
+    () => import('./LocaleService').then(m => m.LocaleService),
+    () => import('./PasswordPolicyService').then(m => m.PasswordPolicyService),
+    () => import('./TeamMetaParametersResource').then(m => m.TeamMetaParametersResource),
+    () => import('./TeamsManagerService').then(m => m.TeamsManagerService),
+    () => import('./TeamsResource').then(m => m.TeamsResource),
+    () => import('./UserConfigurationBootstrap').then(m => m.UserConfigurationBootstrap),
+    () => import('./UserDataService').then(m => m.UserDataService),
+    () => import('./UserInfoResource').then(m => m.UserInfoResource),
+    () => import('./UserMetaParametersResource').then(m => m.UserMetaParametersResource),
+    () => import('./UsersResource').then(m => m.UsersResource),
   ],
 };

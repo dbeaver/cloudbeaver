@@ -7,13 +7,13 @@
  */
 import type { PluginManifest } from '@cloudbeaver/core-di';
 
-import { DataSynchronizationResolverBootstrap } from './DataSynchronization/DataSynchronizationResolverBootstrap';
-import { LocaleService } from './LocaleService';
-import { NetworkStateNotificationService } from './NetworkStateNotification/NetworkStateNotificationService';
-import { PluginBootstrap } from './PluginBootstrap';
-import { ServerNodeChangedDialogService } from './ServerNodeChangedDialog/ServerNodeChangedDialogService';
-
 export const rootPlugin: PluginManifest = {
   info: { name: 'Root plugin' },
-  providers: [LocaleService, PluginBootstrap, ServerNodeChangedDialogService, NetworkStateNotificationService, DataSynchronizationResolverBootstrap],
+  providers: [
+    () => import('./LocaleService').then(m => m.LocaleService),
+    () => import('./PluginBootstrap').then(m => m.PluginBootstrap),
+    () => import('./ServerNodeChangedDialog/ServerNodeChangedDialogService').then(m => m.ServerNodeChangedDialogService),
+    () => import('./NetworkStateNotification/NetworkStateNotificationService').then(m => m.NetworkStateNotificationService),
+    () => import('./DataSynchronization/DataSynchronizationResolverBootstrap').then(m => m.DataSynchronizationResolverBootstrap),
+  ],
 };

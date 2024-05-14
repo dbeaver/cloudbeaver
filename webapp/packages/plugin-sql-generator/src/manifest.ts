@@ -7,16 +7,16 @@
  */
 import type { PluginManifest } from '@cloudbeaver/core-di';
 
-import { GeneratorMenuBootstrap } from './GeneratorMenuBootstrap';
-import { LocaleService } from './LocaleService';
-import { ScriptPreviewService } from './ScriptPreview/ScriptPreviewService';
-import { SqlGeneratorsBootstrap } from './SqlGenerators/SqlGeneratorsBootstrap';
-import { SqlGeneratorsResource } from './SqlGenerators/SqlGeneratorsResource';
-
 export const sqlGeneratorPlugin: PluginManifest = {
   info: {
     name: 'Sql Editor Generator plugin',
   },
 
-  providers: [LocaleService, SqlGeneratorsBootstrap, SqlGeneratorsResource, ScriptPreviewService, GeneratorMenuBootstrap],
+  providers: [
+    () => import('./LocaleService').then(m => m.LocaleService),
+    () => import('./SqlGenerators/SqlGeneratorsBootstrap').then(m => m.SqlGeneratorsBootstrap),
+    () => import('./SqlGenerators/SqlGeneratorsResource').then(m => m.SqlGeneratorsResource),
+    () => import('./ScriptPreview/ScriptPreviewService').then(m => m.ScriptPreviewService),
+    () => import('./GeneratorMenuBootstrap').then(m => m.GeneratorMenuBootstrap),
+  ],
 };

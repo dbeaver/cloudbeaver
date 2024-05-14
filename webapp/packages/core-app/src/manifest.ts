@@ -7,14 +7,14 @@
  */
 import type { PluginManifest } from '@cloudbeaver/core-di';
 
-import { AppLocaleService } from './AppLocaleService';
-import { AppScreenBootstrap } from './AppScreen/AppScreenBootstrap';
-import { AppScreenService } from './AppScreen/AppScreenService';
-
 export const coreAppManifest: PluginManifest = {
   info: {
     name: 'Core App',
   },
 
-  providers: [AppScreenService, AppScreenBootstrap, AppLocaleService],
+  providers: [
+    () => import('./AppScreen/AppScreenService').then(m => m.AppScreenService),
+    () => import('./AppScreen/AppScreenBootstrap').then(m => m.AppScreenBootstrap),
+    () => import('./AppLocaleService').then(m => m.AppLocaleService),
+  ],
 };

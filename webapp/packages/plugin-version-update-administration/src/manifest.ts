@@ -7,13 +7,10 @@
  */
 import type { PluginManifest } from '@cloudbeaver/core-di';
 
-import { LocaleService } from './LocaleService';
-import { PluginBootstrap } from './PluginBootstrap';
-
 export const versionUpdatePlugin: PluginManifest = {
   info: {
     name: 'Version update plugin',
   },
 
-  providers: [PluginBootstrap, LocaleService],
+  providers: [() => import('./PluginBootstrap').then(m => m.PluginBootstrap), () => import('./LocaleService').then(m => m.LocaleService)],
 };
