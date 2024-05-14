@@ -236,4 +236,4 @@ export * from './useMergeRefs';
 export * from './usePasswordValidation';
 export * from './manifest';
 export * from './importLazyComponent';
-export * from './Clickable';
+export * from './ClickableLoader';
