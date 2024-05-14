@@ -7,24 +7,17 @@
  */
 import type { PluginManifest } from '@cloudbeaver/core-di';
 
-import { LocaleService } from './LocaleService';
-import { PluginBootstrap } from './PluginBootstrap';
-import { ProjectPermissionsResource } from './ProjectPermissionsResource';
-import { ResourceManagerEventHandler } from './ResourceManagerEventHandler';
-import { ResourceManagerResource } from './ResourceManagerResource';
-import { SharedProjectsResource } from './SharedProjectsResource';
-
 export const resourceManagerManifest: PluginManifest = {
   info: {
     name: 'Resource Manager Core',
   },
 
   providers: [
-    PluginBootstrap,
-    SharedProjectsResource,
-    ProjectPermissionsResource,
-    ResourceManagerEventHandler,
-    ResourceManagerResource,
-    LocaleService,
+    () => import('./PluginBootstrap').then(m => m.PluginBootstrap),
+    () => import('./SharedProjectsResource').then(m => m.SharedProjectsResource),
+    () => import('./ProjectPermissionsResource').then(m => m.ProjectPermissionsResource),
+    () => import('./ResourceManagerEventHandler').then(m => m.ResourceManagerEventHandler),
+    () => import('./ResourceManagerResource').then(m => m.ResourceManagerResource),
+    () => import('./LocaleService').then(m => m.LocaleService),
   ],
 };

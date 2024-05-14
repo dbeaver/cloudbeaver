@@ -7,12 +7,12 @@
  */
 import type { PluginManifest } from '@cloudbeaver/core-di';
 
-import { PluginBootstrap } from './PluginBootstrap';
-import { AdministrationTopAppBarBootstrap } from './TopNavBar/AdministrationTopAppBarBootstrap';
-
 export const administrationTopAppBarPlugin: PluginManifest = {
   info: {
     name: 'Administration Top App Bar plugin',
   },
-  providers: [PluginBootstrap, AdministrationTopAppBarBootstrap],
+  providers: [
+    () => import('./PluginBootstrap').then(m => m.PluginBootstrap),
+    () => import('./TopNavBar/AdministrationTopAppBarBootstrap').then(m => m.AdministrationTopAppBarBootstrap),
+  ],
 };
