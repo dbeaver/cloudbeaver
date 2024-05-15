@@ -140,7 +140,8 @@ export const Combobox: ComboboxType = observer(function Combobox({
 
   const hideMenu = items.length === 1 && (!!selectedItem || isDisabled?.(items[0]) === true);
 
-  function handleClick() {
+  function handleClick(e: React.MouseEvent<HTMLInputElement>) {
+    e.preventDefault();
     if (!searchable) {
       if (menu.visible) {
         menu.hide();
@@ -299,7 +300,7 @@ export const Combobox: ComboboxType = observer(function Combobox({
           {...rest}
         />
         <MenuButton {...menu} disabled={readOnly || disabled || hideMenu} className={styles.menuButton}>
-          <Icon name="arrow" viewBox="0 0 16 16" className={s(styles, { icon: true, focus })} />
+          <Icon name="arrow" viewBox="0 0 16 16" className={s(styles, { icon: true, focus })} onClick={handleClick} />
         </MenuButton>
         <Menu {...menu} ref={menuRef} aria-label={propertyName} className={s(styles, { menu: true })} modal>
           {!filteredItems.length ? (
