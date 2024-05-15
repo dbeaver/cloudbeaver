@@ -15,7 +15,7 @@ import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dial
 import { NotificationService } from '@cloudbeaver/core-events';
 import { SyncExecutor } from '@cloudbeaver/core-executor';
 import type { SqlCompletionProposal, SqlDialectInfo, SqlScriptInfoFragment } from '@cloudbeaver/core-sdk';
-import { createLastPromiseGetter, LastPromiseGetter, throttleAsync } from '@cloudbeaver/core-utils';
+import { createLastPromiseGetter, debounceAsync, LastPromiseGetter } from '@cloudbeaver/core-utils';
 
 import type { ISqlEditorTabState } from '../ISqlEditorTabState';
 import { ESqlDataSourceFeatures } from '../SqlDataSource/ESqlDataSourceFeatures';
@@ -166,7 +166,7 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
               untracked(() => {
                 this.sqlDialectInfoService.loadSqlDialectInfo(key).then(async () => {
                   try {
-                    await this.updateParserScriptsThrottle();
+                    await this.updateParserScriptsDebounced();
                   } catch {}
                 });
               });
@@ -186,7 +186,7 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
       getLastAutocomplete: createLastPromiseGetter(),
       parseScript: createLastPromiseGetter(),
 
-      getHintProposals: throttleAsync(async function getHintProposals(this: ISQLEditorDataPrivate, position, simple) {
+      getHintProposals: async function getHintProposals(this: ISQLEditorDataPrivate, position, simple) {
         const executionContext = this.dataSource?.executionContext;
         if (!executionContext) {
           return [];
@@ -205,7 +205,7 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
         this.hintsLimitIsMet = hints.length >= MAX_HINTS_LIMIT;
 
         return hints;
-      }, 1000 / 3),
+      },
 
       async formatScript(): Promise<void> {
         if (this.isDisabled || this.isScriptEmpty || !this.dataSource?.executionContext) {
@@ -362,9 +362,9 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
         this.dataSource?.setScript(query);
       },
 
-      updateParserScriptsThrottle: throttleAsync(async function updateParserScriptsThrottle() {
+      updateParserScriptsDebounced: debounceAsync(async function updateParserScriptsThrottle() {
         await data.updateParserScripts();
-      }, 1000 / 2),
+      }, 500),
 
       async updateParserScripts() {
         if (!this.dataSource?.hasFeature(ESqlDataSourceFeatures.script)) {
@@ -469,6 +469,7 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
       },
     }),
     {
+      getHintProposals: action.bound,
       formatScript: action.bound,
       executeQuery: action.bound,
       executeQueryNewTab: action.bound,
@@ -507,7 +508,7 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
         // ensure that cursor is in script boundaries
         data.setCursor(data.cursor.begin, data.cursor.end);
         data.parser.setScript(script);
-        data.updateParserScriptsThrottle().catch(() => {});
+        data.updateParserScriptsDebounced().catch(() => {});
         data.onUpdate.execute();
       },
     ],

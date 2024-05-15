@@ -13,6 +13,7 @@ import { useMemo } from 'react';
 export type CompletionConfig = Parameters<typeof autocompletion>[0];
 
 const EDITOR_AUTOCOMPLETION_COMPARTMENT = new Compartment();
+const AUTO_COMPLETE_DELAY = 300;
 
 const EDITOR_AUTOCOMPLETION_KEYMAP = keymap.of([
   { key: 'Alt-Space', run: startCompletion, preventDefault: true },
@@ -25,6 +26,7 @@ export function useEditorAutocompletion(config?: CompletionConfig): [Compartment
       EDITOR_AUTOCOMPLETION_KEYMAP,
       autocompletion({
         ...config,
+        activateOnTypingDelay: AUTO_COMPLETE_DELAY,
         closeOnBlur: false,
       }),
     ],

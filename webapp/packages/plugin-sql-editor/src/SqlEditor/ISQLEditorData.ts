@@ -42,7 +42,7 @@ export interface ISQLEditorData {
   /** displays if last getHintProposals call ended with limit */
   readonly hintsLimitIsMet: boolean;
 
-  updateParserScriptsThrottle(): Promise<void>;
+  updateParserScriptsDebounced(): Promise<void>;
   setScript(query: string): void;
   init(): void;
   destruct(): void;
