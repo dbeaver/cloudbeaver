@@ -31,9 +31,9 @@ import type { AdminUserInfoFragment } from '@cloudbeaver/core-sdk';
 
 import { getFilteredUsers } from './getFilteredUsers';
 import { GrantedUsersTableHeader, IFilterState } from './GrantedUsersTableHeader/GrantedUsersTableHeader';
-import { GrantedUsersTableInnerHeader } from './GrantedUsersTableHeader/GrantedUsersTableInnerHeader';
-import { GrantedUsersTableItem } from './GrantedUsersTableItem';
 import style from './UserList.m.css';
+import { UsersTableInnerHeader } from './UsersTableInnerHeader';
+import { UsersTableItem } from './UsersTableItem';
 
 interface Props {
   userList: AdminUserInfoFragment[];
@@ -82,7 +82,7 @@ export const UserList = observer<Props>(function UserList({ userList, grantedUse
       </GrantedUsersTableHeader>
       <Container overflow>
         <Table keys={keys} selectedItems={selectedSubjects} isItemSelectable={item => isEditable(item) && !grantedUsers.includes(item)}>
-          <GrantedUsersTableInnerHeader disabled={disabled} />
+          <UsersTableInnerHeader disabled={disabled} />
           <TableBody>
             {!users.length && filterState.filterValue && (
               <TableItem item="tableInfo" selectDisabled>
@@ -90,7 +90,7 @@ export const UserList = observer<Props>(function UserList({ userList, grantedUse
               </TableItem>
             )}
             {users.map(user => (
-              <GrantedUsersTableItem
+              <UsersTableItem
                 key={user.userId}
                 id={user.userId}
                 name={`${user.userId}${usersResource.isActiveUser(user.userId) ? ` (${translate('ui_you')})` : ''}`}

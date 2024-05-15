@@ -134,7 +134,14 @@ type UserInfo {
     metaParameters: Object!
     # User configuration parameters
     configurationParameters: Object!
+    # User teams
+    teams: [UserTeamInfo!]!
+}
 
+type UserTeamInfo {
+    teamId: String!
+    teamName: String!
+    teamRole: String
 }
 
 extend type Query {
