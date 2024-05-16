@@ -18,6 +18,7 @@ interface Props extends ILayoutSizeProps {
   label?: string;
   title?: string;
   content?: React.ReactNode;
+  hidden?: boolean;
   className?: string;
 }
 
