@@ -364,7 +364,7 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
 
       updateParserScriptsDebounced: debounceAsync(async function updateParserScriptsThrottle() {
         await data.updateParserScripts();
-      }, 500),
+      }, 1700),
 
       async updateParserScripts() {
         if (!this.dataSource?.hasFeature(ESqlDataSourceFeatures.script)) {
@@ -441,6 +441,7 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
           return this.activeSegment;
         }
 
+        await data.updateParserScripts();
         const result = await this.sqlEditorService.parseSQLQuery(projectId, connectionId, this.value, this.cursor.begin);
 
         const segment = this.parser.getSegment(result.start, result.end);
