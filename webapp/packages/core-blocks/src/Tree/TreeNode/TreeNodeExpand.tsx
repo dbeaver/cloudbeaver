@@ -14,6 +14,7 @@ import { Clickable } from '../../Clickable';
 import { getComputed } from '../../getComputed';
 import { Icon } from '../../Icon';
 import { Loader } from '../../Loader/Loader';
+import { useTranslate } from '../../localization/useTranslate';
 import { s } from '../../s';
 import { useS } from '../../useS';
 import { useStateDelay } from '../../useStateDelay';
@@ -30,6 +31,7 @@ interface Props {
 }
 
 export const TreeNodeExpand = observer<Props>(function TreeNodeExpand({ leaf, big, filterActive, disabled, className }) {
+  const translate = useTranslate();
   const styles = useS(style);
   const context = useContext(TreeNodeContext);
 
@@ -86,11 +88,16 @@ export const TreeNodeExpand = observer<Props>(function TreeNodeExpand({ leaf, bi
     }
   }
 
+  const title = translate('ui_expand');
+
   return (
     <Clickable
       as="div"
+      role="button"
+      title={title}
+      aria-label={title}
       className={s(styles, { treeNodeExpand: true, expanded: context.expanded, big }, className)}
-      focusable={!disabled && expandable}
+      focusable={expandable}
       disabled={disabled || !expandable}
       onClick={handleExpand}
       onDoubleClick={handleDbClick}
