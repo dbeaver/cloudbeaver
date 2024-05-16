@@ -6,10 +6,9 @@
  * you may not use this file except in compliance with the License.
  */
 
-@import "@material/typography/mixins";
+@import '@material/typography/mixins';
 
 @mixin typography-core-styles($query: mdc-feature-all()) {
-
   .theme-typography {
     @include mdc-typography-base($query: $query);
   }

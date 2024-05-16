@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 import '@testing-library/jest-dom';
-import { screen } from '@testing-library/react';
+import { screen, waitFor } from '@testing-library/react';
 
 import { coreEventsManifest } from '@cloudbeaver/core-events';
 import { coreLocalizationManifest } from '@cloudbeaver/core-localization';
@@ -18,7 +18,7 @@ import { ErrorMessage } from './ErrorMessage';
 
 const app = createApp(coreEventsManifest, coreSettingsManifest, coreThemingManifest, coreLocalizationManifest);
 
-test('icons.svg#name', () => {
+test('icons.svg#name', async () => {
   renderInApp(<ErrorMessage text="error" />, app);
-  expect(screen.getByText('error')).not.toBeNull();
+  await waitFor(() => expect(screen.getByText('error')).not.toBeNull());
 });

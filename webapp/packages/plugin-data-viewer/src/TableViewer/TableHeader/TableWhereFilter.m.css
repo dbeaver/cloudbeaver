@@ -8,6 +8,9 @@
 
 .inlineEditor {
   composes: theme-background-surface theme-text-on-surface from global;
+}
+
+.imbeddedEditor .inlineEditor {
   flex: 1;
   height: 24px;
 }

@@ -5,9 +5,10 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
 .tab {
   composes: theme-ripple theme-background-background theme-text-text-primary-on-light theme-typography--body2 from global;
+}
+.sqlEditor .tab {
   text-transform: uppercase;
   font-weight: normal;
 

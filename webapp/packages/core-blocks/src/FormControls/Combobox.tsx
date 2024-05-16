@@ -24,7 +24,10 @@ import { FieldDescription } from './FieldDescription';
 import { FieldLabel } from './FieldLabel';
 import { FormContext } from './FormContext';
 
-type BaseProps<TKey, TValue> = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'onSelect' | 'name' | 'value' | 'defaultValue'> &
+export type ComboboxBaseProps<TKey, TValue> = Omit<
+  React.InputHTMLAttributes<HTMLInputElement>,
+  'onChange' | 'onSelect' | 'name' | 'value' | 'defaultValue'
+> &
   ILayoutSizeProps & {
     propertyName?: string;
     items: TValue[];
@@ -41,7 +44,7 @@ type BaseProps<TKey, TValue> = Omit<React.InputHTMLAttributes<HTMLInputElement>,
     inline?: boolean;
   };
 
-type ControlledProps<TKey, TValue> = BaseProps<TKey, TValue> & {
+type ControlledProps<TKey, TValue> = ComboboxBaseProps<TKey, TValue> & {
   name?: string;
   value?: TKey;
   onSelect?: (value: TKey, name: string | undefined, prev: TKey) => void;
@@ -49,7 +52,7 @@ type ControlledProps<TKey, TValue> = BaseProps<TKey, TValue> & {
   state?: never;
 };
 
-type ObjectProps<TValue, TKey extends keyof TState, TState> = BaseProps<TState[TKey], TValue> & {
+type ObjectProps<TValue, TKey extends keyof TState, TState> = ComboboxBaseProps<TState[TKey], TValue> & {
   name: TKey;
   state: TState;
   onSelect?: (value: TState[TKey], name: TKey | undefined, prev: TState[TKey]) => void;

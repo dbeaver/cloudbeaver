@@ -12,6 +12,10 @@
 .surface {
   composes: theme-background-surface theme-text-on-surface from global;
 }
+.border {
+  composes: theme-border-color-background from global;
+  border: 1px solid;
+}
 .group {
   align-content: baseline;
   box-sizing: border-box;

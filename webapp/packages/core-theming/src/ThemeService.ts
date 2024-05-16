@@ -12,11 +12,12 @@ import { NotificationService, UIError } from '@cloudbeaver/core-events';
 import { ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
 
 import type { Style } from './ComponentStyle';
+// TODO: important to keep normalize first
+import './styles/main/normalize.pure.css';
 import './styles/main/base.pure.css';
 import './styles/main/color.pure.scss';
 import './styles/main/elevation.pure.scss';
 import './styles/main/fonts.pure.css';
-import './styles/main/normalize.pure.css';
 import './styles/main/typography.pure.scss';
 import { DEFAULT_THEME_ID, themes } from './themes';
 import { ThemeSettingsService } from './ThemeSettingsService';

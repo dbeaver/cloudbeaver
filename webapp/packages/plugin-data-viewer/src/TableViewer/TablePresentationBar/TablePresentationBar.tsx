@@ -10,7 +10,7 @@ import { observer } from 'mobx-react-lite';
 import { s, SContext, StyleRegistry, useS } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import type { ResultDataFormat } from '@cloudbeaver/core-sdk';
-import { TabList, TabListStyles, TabListVerticalRotatedRegistry, TabsState, TabStyles } from '@cloudbeaver/core-ui';
+import { TabList, TabListStyles, TabsState, TabStyles } from '@cloudbeaver/core-ui';
 
 import type { IDatabaseDataModel } from '../../DatabaseDataModel/IDatabaseDataModel';
 import { DataPresentationService, DataPresentationType } from '../../DataPresentationService';
@@ -32,7 +32,6 @@ interface Props {
 }
 
 const tablePresentationBarRegistry: StyleRegistry = [
-  ...TabListVerticalRotatedRegistry,
   [TabListStyles, { mode: 'append', styles: [TablePresentationBarTabList] }],
   [TabStyles, { mode: 'append', styles: [TablePresentationBarTab] }],
 ];
@@ -70,7 +69,7 @@ export const TablePresentationBar = observer<Props>(function TablePresentationBa
     <div className={s(style, { tableLeftBar: true }, className)}>
       <TabsState currentTabId={presentationId} autoSelect={main}>
         <SContext registry={tablePresentationBarRegistry}>
-          <TabList className={s(style, { tabListFlexible: main })} aria-label="Data Presentations">
+          <TabList className={s(style, { tabListFlexible: main })} aria-label="Data Presentations" vertical rotated>
             {presentations.map(presentation => (
               <Tab key={presentation.id} presentation={presentation} model={model} resultIndex={resultIndex} onClick={handleClick} />
             ))}

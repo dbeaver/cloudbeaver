@@ -7,7 +7,7 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import { ColoredContainer, Group, InputField, Textarea, useResource, useTranslate } from '@cloudbeaver/core-blocks';
+import { Container, Group, InputField, Textarea, useResource, useTranslate } from '@cloudbeaver/core-blocks';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
 import type { TabContainerPanelComponent } from '@cloudbeaver/core-ui';
 
@@ -21,7 +21,7 @@ export const TeamOptions: TabContainerPanelComponent<ITeamFormProps> = observer(
   const edit = state.mode === 'edit';
 
   return (
-    <ColoredContainer parent gap overflow>
+    <Container>
       <Group small gap>
         <InputField name="teamId" state={state.config} readOnly={state.readonly || edit} disabled={state.disabled} required tiny fill>
           {translate('administration_teams_team_id')}
@@ -35,6 +35,6 @@ export const TeamOptions: TabContainerPanelComponent<ITeamFormProps> = observer(
       </Group>
       {!serverConfigResource.resource.distributed && <Permissions state={state} />}
       <TeamMetaParameters state={state} />
-    </ColoredContainer>
+    </Container>
   );
 });

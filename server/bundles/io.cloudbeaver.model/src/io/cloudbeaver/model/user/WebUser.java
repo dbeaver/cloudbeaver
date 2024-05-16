@@ -70,6 +70,7 @@ public class WebUser {
         return Collections.emptyMap();
     }
 
+    @NotNull
     public String[] getTeams() {
         return user.getUserTeams();
     }

@@ -14,8 +14,10 @@ export class ServiceWorkerBootstrap extends Bootstrap {
   constructor(private readonly serviceWorkerService: ServiceWorkerService) {
     super();
   }
-  register(): void | Promise<void> {}
-  load(): void | Promise<void> {
-    this.serviceWorkerService.register();
+  async register(): Promise<void> {
+    await this.serviceWorkerService.register();
+  }
+  async load(): Promise<void> {
+    await this.serviceWorkerService.load();
   }
 }

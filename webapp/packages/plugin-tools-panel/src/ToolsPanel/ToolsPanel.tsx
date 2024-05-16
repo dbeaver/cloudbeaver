@@ -9,9 +9,9 @@ import { action, untracked } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import { useRef } from 'react';
 
-import { s, SContext, useS, useUserData } from '@cloudbeaver/core-blocks';
+import { s, useS, useUserData } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { ITabData, TabList, TabPanelList, TabsState, TabUnderlineStyleRegistry } from '@cloudbeaver/core-ui';
+import { ITabData, TabList, TabPanelList, TabsState } from '@cloudbeaver/core-ui';
 import { isArraysEqual } from '@cloudbeaver/core-utils';
 
 import styles from './ToolsPanel.m.css';
@@ -61,14 +61,12 @@ export const ToolsPanel = observer(function ToolsPanel() {
 
   return (
     <TabsState currentTabId={state.selectedTabId} container={toolsPanelService.tabsContainer} lazy onChange={handleTabChange}>
-      <SContext registry={TabUnderlineStyleRegistry}>
-        <div className={s(style, { box: true })}>
-          <TabList className={s(style, { tabList: true })} />
-          <div className={s(style, { contentBox: true })}>
-            <TabPanelList />
-          </div>
+      <div className={s(style, { box: true })}>
+        <TabList className={s(style, { tabList: true })} underline />
+        <div className={s(style, { contentBox: true })}>
+          <TabPanelList />
         </div>
-      </SContext>
+      </div>
     </TabsState>
   );
 });
