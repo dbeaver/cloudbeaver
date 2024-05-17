@@ -227,6 +227,7 @@ export const Loader = observer<Props>(function Loader({
                 small={small}
                 inline={inline}
                 fullSize={fullSize}
+                overlay={overlay}
                 className={className}
                 inlineException={inlineException}
               />
