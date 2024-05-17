@@ -338,22 +338,17 @@ public class WebServiceDataTransfer implements DBWServiceDataTransfer {
             DBRProgressMonitor monitor,
             DataTransferProcessorDescriptor processor,
             @NotNull DBSDataManipulator dataContainer,
-            Path path) throws DBException
-    {
+            Path path) throws DBException {
         IDataTransferProcessor processorInstance = processor.getInstance();
 
+        StreamTransferProducer producer;
         if (dataContainer.getDataSource() != null) {
-            DatabaseTransferConsumer consumer = new DatabaseTransferConsumer(dataContainer);
+            producer = new StreamTransferProducer(new StreamEntityMapping(path), processor);
 
+            DatabaseTransferConsumer consumer = new DatabaseTransferConsumer(dataContainer);
             DatabaseConsumerSettings databaseConsumerSettings = new DatabaseConsumerSettings();
             databaseConsumerSettings.setContainer((DBSObjectContainer) dataContainer.getDataSource());
             consumer.setSettings(databaseConsumerSettings);
-            DatabaseMappingContainer databaseMappingContainer = new DatabaseMappingContainer(databaseConsumerSettings, dataContainer);
-            databaseMappingContainer.getAttributeMappings(monitor);
-            databaseMappingContainer.setTarget(dataContainer);
-            consumer.setContainerMapping(databaseMappingContainer);
-
-            StreamTransferProducer producer = new StreamTransferProducer(new StreamEntityMapping(path), processor);
 
             StreamProducerSettings producerSettings = new StreamProducerSettings();
             Map<String, Object> properties = new HashMap<>();
@@ -366,7 +361,11 @@ public class WebServiceDataTransfer implements DBWServiceDataTransfer {
                     producer,
                     processorInstance,
                     properties);
-
+            DatabaseMappingContainer databaseMappingContainer =
+                new DatabaseMappingContainer(databaseConsumerSettings, producer.getDatabaseObject());
+            databaseMappingContainer.getAttributeMappings(monitor);
+            databaseMappingContainer.setTarget(dataContainer);
+            consumer.setContainerMapping(databaseMappingContainer);
             try {
                 producer.transferData(monitor, consumer, processorInstance, producerSettings, null);
             } catch (DBException e) {

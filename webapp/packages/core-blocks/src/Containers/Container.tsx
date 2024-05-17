@@ -14,16 +14,21 @@ import { filterContainerFakeProps, getContainerProps } from './filterContainerFa
 import type { IContainerProps } from './IContainerProps';
 import elementsSizeStyle from './shared/ElementsSize.m.css';
 
-export const Container = forwardRef<HTMLDivElement, IContainerProps & React.HTMLAttributes<HTMLDivElement>>(function Container(
-  { className, ...rest },
+interface Props {
+  as?: 'div' | 'header' | 'footer' | 'section' | 'aside' | 'main' | 'nav';
+}
+
+export const Container = forwardRef<HTMLDivElement, Props & IContainerProps & React.HTMLAttributes<HTMLDivElement>>(function Container(
+  { as = 'div', className, ...rest },
   ref,
 ) {
   const styles = useS(style, elementsSizeStyle);
   const divProps = filterContainerFakeProps(rest);
   const containerProps = getContainerProps(rest);
+  const Element = as;
 
   return (
-    <div
+    <Element
       ref={ref}
       {...divProps}
       className={s(

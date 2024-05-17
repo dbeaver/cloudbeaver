@@ -5,11 +5,12 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
+import type { UserTeamGrantInfo } from '@cloudbeaver/core-authentication';
 
 export interface IGrantedUsersTabState {
   loading: boolean;
   loaded: boolean;
-  grantedUsers: string[];
-  initialGrantedUsers: string[];
+  grantedUsers: UserTeamGrantInfo[];
+  initialGrantedUsers: UserTeamGrantInfo[];
   editing: boolean;
 }

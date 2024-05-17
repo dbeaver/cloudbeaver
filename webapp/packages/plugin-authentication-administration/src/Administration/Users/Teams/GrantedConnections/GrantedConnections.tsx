@@ -8,7 +8,6 @@
 import { observer } from 'mobx-react-lite';
 
 import {
-  ColoredContainer,
   Container,
   getComputed,
   Group,
@@ -76,7 +75,7 @@ export const GrantedConnections: TabContainerPanelComponent<ITeamFormProps> = ob
   return (
     <Loader className={s(styles, { loader: true })} state={[state.state]}>
       {() => (
-        <ColoredContainer className={s(styles, { box: true })} parent gap vertical>
+        <Container className={s(styles, { box: true })} parent gap vertical>
           {!connections.length ? (
             <Group className={s(styles, { placeholderBox: true })} large>
               <TextPlaceholder>{translate('administration_teams_team_granted_connections_empty')}</TextPlaceholder>
@@ -102,7 +101,7 @@ export const GrantedConnections: TabContainerPanelComponent<ITeamFormProps> = ob
               </Container>
             </>
           )}
-        </ColoredContainer>
+        </Container>
       )}
     </Loader>
   );

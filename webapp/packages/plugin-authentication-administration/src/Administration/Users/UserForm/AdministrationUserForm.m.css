@@ -6,10 +6,8 @@
  * you may not use this file except in compliance with the License.
  */
 
-.bar {
-  composes: theme-border-color-background theme-background-secondary theme-text-on-secondary from global;
-  position: relative;
-  display: flex;
+.header {
+  composes: theme-border-color-background from global;
   margin-bottom: 16px;
 
   &:before {
@@ -22,24 +20,6 @@
   }
 }
 
-.tabList {
-  display: flex;
-  position: relative;
-  flex-shrink: 0;
-  align-items: center;
-}
-
-.contentBox {
-  composes: theme-background-secondary theme-text-on-secondary theme-border-color-background from global;
-  display: flex;
-  flex: 1;
-  flex-direction: column;
-  overflow: auto;
-}
-
-.submittingForm {
-  flex: 1;
-  overflow: auto;
-  display: flex;
-  flex-direction: column;
+.statusMessage {
+  margin-bottom: 8px;
 }
