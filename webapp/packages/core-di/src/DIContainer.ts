@@ -92,6 +92,10 @@ export class DIContainer implements IServiceInjector, IServiceCollection {
     return this.parent;
   }
 
+  hasServiceByClass<T>(ctor: IServiceConstructor<T>): boolean {
+    return this.container.isBound(ctor);
+  }
+
   getServiceByClass<T>(ctor: IServiceConstructor<T>): T {
     return this.container.get<T>(ctor);
   }
