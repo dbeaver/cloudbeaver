@@ -54,6 +54,7 @@ function isAtBottom(event: React.UIEvent<HTMLDivElement>): boolean {
 
 const rowHeight = 25;
 const headerHeight = 28;
+const MAX_CELL_TEXT_SIZE = 100 * 1024;
 
 export const DataGridTable = observer<IDataPresentationProps<any, IDatabaseResultSet>>(function DataGridTable({
   model,
@@ -82,6 +83,7 @@ export const DataGridTable = observer<IDataPresentationProps<any, IDatabaseResul
 
   const focusSyncRef = useRef<CellPosition | null>(null);
 
+  const tableData = useTableData(model, resultIndex, dataGridDivRef);
   const editingContext = useEditing({
     readonly: model.isReadonly(resultIndex) || model.isDisabled(resultIndex),
     onEdit: (position, code, key) => {
@@ -114,6 +116,14 @@ export const DataGridTable = observer<IDataPresentationProps<any, IDatabaseResul
           }
       }
 
+      const isTruncated = tableData.dataContent.isTextTruncated(cellKey) || tableData.dataContent.isBlobTruncated(cellKey);
+      const isHugeText = tableData.format.getText(cellKey).length > MAX_CELL_TEXT_SIZE;
+
+      if (isHugeText || isTruncated) {
+        actions.setValuePresentation('value-text-presentation');
+        return false;
+      }
+
       return true;
     },
     onCloseEditor: () => {
@@ -121,7 +131,6 @@ export const DataGridTable = observer<IDataPresentationProps<any, IDatabaseResul
     },
   });
 
-  const tableData = useTableData(model, resultIndex, dataGridDivRef);
   const gridSelectionContext = useGridSelectionContext(tableData, selectionAction);
 
   function restoreFocus() {

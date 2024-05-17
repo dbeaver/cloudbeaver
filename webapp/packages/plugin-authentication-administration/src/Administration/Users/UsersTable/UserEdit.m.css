@@ -7,10 +7,5 @@
  */
 
 .box {
-  composes: theme-background-secondary theme-text-on-secondary from global;
-  box-sizing: border-box;
-  padding-bottom: 24px;
   height: 600px;
-  display: flex;
-  flex-direction: column;
 }

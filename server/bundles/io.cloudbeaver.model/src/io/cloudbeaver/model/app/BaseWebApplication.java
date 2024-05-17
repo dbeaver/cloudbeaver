@@ -41,6 +41,7 @@ import org.jkiss.dbeaver.model.rm.RMProject;
 import org.jkiss.dbeaver.model.secret.DBSSecretController;
 import org.jkiss.dbeaver.model.websocket.event.WSEventController;
 import org.jkiss.dbeaver.registry.BaseApplicationImpl;
+import org.jkiss.dbeaver.registry.BaseWorkspaceImpl;
 import org.jkiss.dbeaver.runtime.IVariableResolver;
 import org.jkiss.dbeaver.utils.GeneralUtils;
 import org.jkiss.dbeaver.utils.RuntimeUtils;
@@ -63,6 +64,8 @@ public abstract class BaseWebApplication extends BaseApplicationImpl implements 
 
 
     private static final Log log = Log.getLog(BaseWebApplication.class);
+
+    private String instanceId;
 
     @NotNull
     @Override
@@ -242,14 +245,22 @@ public abstract class BaseWebApplication extends BaseApplicationImpl implements 
     protected abstract void startServer() throws DBException;
 
     @Override
-    public String getApplicationInstanceId() throws DBException {
-        try {
-            byte[] macAddress = RuntimeUtils.getLocalMacAddress();
-            String appId = ApplicationRegistry.getInstance().getApplication().getId();
-            return appId + "_" + CommonUtils.toHexString(macAddress) + getServerPort();
-        } catch (Exception e) {
-            throw new DBException("Error during generation instance id generation", e);
+    public synchronized String getApplicationInstanceId() throws DBException {
+        if (instanceId == null) {
+            try {
+                byte[] macAddress = RuntimeUtils.getLocalMacAddress();
+                instanceId = String.join(
+                    "_",
+                    ApplicationRegistry.getInstance().getApplication().getId(),
+                    BaseWorkspaceImpl.readWorkspaceIdProperty(), // workspace id is read from property file
+                    CommonUtils.toHexString(macAddress),
+                    CommonUtils.toString(getServerPort())
+                );
+            } catch (Exception e) {
+                throw new DBException("Error during generation instance id generation", e);
+            }
         }
+        return instanceId;
     }
 
     public String getApplicationId() {

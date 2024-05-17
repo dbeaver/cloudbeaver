@@ -40,6 +40,10 @@ export class UserInfoResource extends CachedDataResource<UserInfo | null, void, 
     return this.data?.authRole as ELMRole | undefined;
   }
 
+  get teams() {
+    return this.data?.teams || [];
+  }
+
   get parametersAvailable() {
     return this.data !== null;
   }
