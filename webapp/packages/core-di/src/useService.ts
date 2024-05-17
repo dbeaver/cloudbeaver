@@ -11,8 +11,15 @@ import { appContext } from './AppContext';
 import type { IServiceConstructor } from './IApp';
 import type { ValueToken } from './InjectionToken';
 
-export function useService<T>(ctor: IServiceConstructor<T>): T {
+export function useService<T>(ctor: IServiceConstructor<T>): T;
+export function useService<T>(ctor: IServiceConstructor<T>, optional: true): T | undefined;
+export function useService<T>(ctor: IServiceConstructor<T>, optional?: boolean): T | undefined {
   const app = useContext(appContext);
+
+  if (optional && !app.hasServiceByClass(ctor)) {
+    return undefined;
+  }
+
   return app.getServiceByClass(ctor);
 }
 
