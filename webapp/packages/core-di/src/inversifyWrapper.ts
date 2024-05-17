@@ -19,6 +19,9 @@ const mainContainer = new DIContainer();
 
 export const inversifyWrapper: IDiWrapper = {
   injector: {
+    hasServiceByClass<T>(ctor: IServiceConstructor<T>): boolean {
+      return mainContainer.hasServiceByClass(ctor);
+    },
     getServiceByClass<T>(ctor: IServiceConstructor<T>): T {
       return mainContainer.getServiceByClass(ctor);
     },
