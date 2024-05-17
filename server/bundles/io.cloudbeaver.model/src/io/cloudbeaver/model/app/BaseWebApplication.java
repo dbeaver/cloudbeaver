@@ -35,6 +35,7 @@ import org.jkiss.dbeaver.model.app.DBPWorkspace;
 import org.jkiss.dbeaver.model.auth.SMCredentialsProvider;
 import org.jkiss.dbeaver.model.auth.SMSessionContext;
 import org.jkiss.dbeaver.model.data.json.JSONUtils;
+import org.jkiss.dbeaver.model.impl.app.ApplicationRegistry;
 import org.jkiss.dbeaver.model.rm.RMController;
 import org.jkiss.dbeaver.model.rm.RMProject;
 import org.jkiss.dbeaver.model.secret.DBSSecretController;
@@ -248,8 +249,13 @@ public abstract class BaseWebApplication extends BaseApplicationImpl implements 
         if (instanceId == null) {
             try {
                 byte[] macAddress = RuntimeUtils.getLocalMacAddress();
-                // workspace id from is read from property file
-                instanceId = BaseWorkspaceImpl.readWorkspaceIdProperty() + "_" + CommonUtils.toHexString(macAddress);
+                instanceId = String.join(
+                    "_",
+                    ApplicationRegistry.getInstance().getApplication().getId(),
+                    BaseWorkspaceImpl.readWorkspaceIdProperty(), // workspace id is read from property file
+                    CommonUtils.toHexString(macAddress),
+                    CommonUtils.toString(getServerPort())
+                );
             } catch (Exception e) {
                 throw new DBException("Error during generation instance id generation", e);
             }
