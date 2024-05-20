@@ -39,13 +39,11 @@ export async function bootstrap(plugins: PluginManifest[]): Promise<App> {
     const exception = context.getContext(executionExceptionContext);
 
     if (exception.exception) {
-      console.error(exception.exception);
       render.renderError(exception.exception);
     }
   });
 
   if (exception) {
-    console.error(exception);
     render.renderError(exception);
   } else {
     render.renderApp();

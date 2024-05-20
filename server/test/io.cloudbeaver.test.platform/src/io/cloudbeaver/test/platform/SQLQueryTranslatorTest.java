@@ -27,6 +27,7 @@ import org.jkiss.dbeaver.model.impl.sql.BasicSQLDialect;
 import org.jkiss.dbeaver.model.sql.SQLDialect;
 import org.jkiss.dbeaver.model.sql.translate.SQLQueryTranslator;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
+import org.jkiss.dbeaver.utils.GeneralUtils;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -191,10 +192,15 @@ public class SQLQueryTranslatorTest {
             );
             Assert.assertEquals(
                 entry.getKey().getDialectId() + " has invalid syntax " + translated,
-                entry.getValue().toLowerCase(),
-                translated.toLowerCase()
+                normalizeScript(entry.getValue()),
+                normalizeScript(translated)
             );
         }
+    }
+
+    private static String normalizeScript(String script) {
+        // Unify for tests
+        return script.toLowerCase().replace(GeneralUtils.getDefaultLineSeparator(), "\n");
     }
 
 }
