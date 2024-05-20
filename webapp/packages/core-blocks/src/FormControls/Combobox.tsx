@@ -106,6 +106,7 @@ export const Combobox: ComboboxType = observer(function Combobox({
     placement: 'bottom-end',
     currentId: null,
     gutter: 4,
+    unstable_fixed: true,
   });
 
   if (readOnly) {
@@ -148,11 +149,6 @@ export const Combobox: ComboboxType = observer(function Combobox({
         menu.show();
       }
     }
-  }
-
-  function handleArrowClick(e: React.MouseEvent) {
-    e.preventDefault();
-    handleClick();
   }
 
   const handleChange = useCallback(
@@ -303,7 +299,7 @@ export const Combobox: ComboboxType = observer(function Combobox({
           onClick={handleClick}
           {...rest}
         />
-        <MenuButton {...menu} disabled={readOnly || disabled || hideMenu} className={styles.menuButton} onClick={handleArrowClick}>
+        <MenuButton {...menu} disabled={readOnly || disabled || hideMenu} className={styles.menuButton}>
           <Icon name="arrow" viewBox="0 0 16 16" className={s(styles, { icon: true, focus })} />
         </MenuButton>
         <Menu {...menu} ref={menuRef} aria-label={propertyName} className={s(styles, { menu: true })} modal>
