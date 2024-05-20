@@ -43,10 +43,3 @@ RUN set -eux; \
 
 ### Patch java security
 COPY java.security* ${JAVA_HOME}/conf/security/java.security
-
-COPY cloudbeaver /opt/cloudbeaver
-
-EXPOSE 8978
-RUN find /opt/cloudbeaver -type d -exec chmod 775 {} \;
-WORKDIR /opt/cloudbeaver/
-ENTRYPOINT ["./run-server.sh"]
