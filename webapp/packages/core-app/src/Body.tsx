@@ -54,10 +54,10 @@ export const Body = observer(function Body() {
           <Loader className={s(styles, { loader: true })} suspense>
             {Screen && <Screen {...screenService.routerService.params} />}
           </Loader>
-          <Loader className={s(styles, { loader: true })} suspense>
+          <Loader suspense overlay>
             <DialogsPortal />
           </Loader>
-          <Loader className={s(styles, { loader: true })} suspense>
+          <Loader suspense overlay>
             <Notifications />
           </Loader>
         </div>

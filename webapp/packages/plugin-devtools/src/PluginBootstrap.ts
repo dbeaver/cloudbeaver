@@ -85,7 +85,7 @@ export class PluginBootstrap extends Bootstrap {
         if (search) {
           return [
             new SearchResourceMenuItem(),
-            // ...this.getResources(this.app.services.filter(service => service.name.toLocaleLowerCase().includes(search.toLocaleLowerCase()))),
+            ...this.getResources(this.app.getServices().filter(service => service.name.toLocaleLowerCase().includes(search.toLocaleLowerCase()))),
           ];
         }
 
@@ -128,7 +128,7 @@ export class PluginBootstrap extends Bootstrap {
         const item = context.tryGet(DATA_CONTEXT_SUBMENU_ITEM);
 
         if (item instanceof PluginSubMenuItem) {
-          return item.plugin.providers.some(provider => provider.prototype instanceof CachedResource);
+          return this.app.getServices(item.plugin).some(service => service.prototype instanceof CachedResource);
         }
 
         return false;
@@ -152,7 +152,7 @@ export class PluginBootstrap extends Bootstrap {
           return items;
         }
 
-        return [/*...this.getResources(plugin.providers),*/ ...items];
+        return [...this.getResources(this.app.getServices(plugin)), ...items];
       },
     });
 

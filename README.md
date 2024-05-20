@@ -22,6 +22,16 @@ You can see live demo of CloudBeaver here: https://demo.cloudbeaver.io
 
 ## Changelog
 
+### 24.0.5. 2024-05-20
+- The process of application update was improved - you can track the application update process now;
+- All popup dialogs became available for screen readers, including JAWS, to improve the experience for users with disabilities;
+- Data Editor:
+   - Large text values (more than 100 Kb) are now automatically opened in the Value panel;
+- DuckDB:
+   - Spatial data visualization support was added;
+   - The driver has been updated to version 0.10.2;
+- Different bug fixes and enhancements have been made.
+
 ### 24.0.4. 2024-05-06
 - Added the ability to stop the process of file upload in the table;
 - Row count calculation in the grid can be cancelled for Data Editor and SQL Editor;

@@ -44,39 +44,47 @@ export class ServiceWorkerService extends Disposable {
       return;
     }
 
-    if (process.env.NODE_ENV === 'development') {
-      const registration = await navigator.serviceWorker.getRegistration(this.workerURL);
-      registration?.unregister();
-    } else {
-      this.workbox = new Workbox(this.workerURL);
-      this.registration = (await this.workbox.register()) || null;
-      // should be after registration
-      this.registerEventListeners();
+    try {
+      if (process.env.NODE_ENV === 'development') {
+        const registration = await navigator.serviceWorker.getRegistration(this.workerURL);
+        registration?.unregister();
+      } else {
+        this.workbox = new Workbox(this.workerURL);
+        this.registration = (await this.workbox.register()) || null;
+        // should be after registration
+        this.registerEventListeners();
 
-      if (this.registration?.active) {
-        this.isUpdating = true;
+        if (this.registration?.active) {
+          this.isUpdating = true;
+        }
       }
+    } catch (exception: any) {
+      console.error(exception);
     }
   }
 
   async load(): Promise<void> {
-    if (this.registration?.installing || this.registration?.waiting) {
-      this.onUpdate.execute({
-        type: this.isUpdating ? 'updating' : 'installing',
-      });
-    }
-
-    await this.workbox?.update();
-
-    if (this.registration?.active) {
-      // wait for update only for active service worker
-      if (this.registration.installing || this.registration.waiting) {
-        // handled by refresh at 'controlling' event
-        await new Promise(() => {});
+    try {
+      if (this.registration?.installing || this.registration?.waiting) {
+        this.onUpdate.execute({
+          type: this.isUpdating ? 'updating' : 'installing',
+        });
       }
-    }
 
-    this.updateIntervalId = setInterval(() => this.workbox?.update(), 1000 * 60 * 60 * 24);
+      await this.workbox?.update();
+
+      if (this.registration?.active) {
+        // wait for update only for active service worker
+        if (this.registration.installing || this.registration.waiting) {
+          // handled by refresh at 'controlling' event
+          await new Promise(() => {});
+        }
+      }
+
+      this.updateIntervalId = setInterval(() => this.workbox?.update(), 1000 * 60 * 60 * 24);
+    } catch (exception: any) {
+      console.error(exception);
+    }
   }
 
   dispose(): void {
