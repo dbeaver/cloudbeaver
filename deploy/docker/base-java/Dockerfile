@@ -2,9 +2,11 @@ FROM ubuntu:23.10
 
 MAINTAINER DBeaver Corp, devops@dbeaver.com
 
+ENV DEBIAN_FRONTEND=noninteractive
+
 RUN set -eux; \
     apt-get update; \
-    DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+    apt-get install -y --no-install-recommends \
         # curl required for historical reasons, see https://github.com/adoptium/containers/issues/255
         curl \
         wget \
