@@ -50,17 +50,13 @@ module.exports = (env, argv) => {
       devtoolModuleFilenameTemplate: 'file:///[absolute-resource-path]',
     },
     watchOptions: {
-      aggregateTimeout: 3000,
+      aggregateTimeout: 1000,
       ignored: ['**/node_modules', '**/packages/*/src/**/*.{ts,tsx}'],
     },
     optimization: {
       minimize: false,
-      // moduleIds: 'named',
-
-      // improve performance
-      removeAvailableModules: false,
-      removeEmptyChunks: false,
-      // splitChunks: false,
+      runtimeChunk: 'single',
+      moduleIds: 'named',
     },
     infrastructureLogging: {
       level: 'warn',
