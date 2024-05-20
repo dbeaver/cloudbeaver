@@ -39,7 +39,9 @@
     <plugin id="io.cloudbeaver.service.fs" download-size="0" install-size="0" version="0.0.0" unpack="false"/>
     <plugin id="io.cloudbeaver.service.rm" download-size="0" install-size="0" version="0.0.0" unpack="false"/>
     <plugin id="io.cloudbeaver.service.rm.nio" download-size="0" install-size="0" version="0.0.0" unpack="false"/>
+
     <plugin id="io.cloudbeaver.service.security" download-size="0" install-size="0" version="0.0.0" unpack="false"/>
+    <plugin id="io.cloudbeaver.service.ldap.auth" download-size="0" install-size="0" version="0.0.0" unpack="false"/>
 
     <!-- Extra plugins -->
     <plugin id="org.jkiss.dbeaver.data.office" download-size="0" install-size="0" version="0.0.0" unpack="false"/>
