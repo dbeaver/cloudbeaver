@@ -128,23 +128,32 @@ module.exports = (env, argv) => {
     },
   };
 
-  return {
-    context: resolve(__dirname, '../../../../../'),
-    experiments: {
-      layers: true,
-    },
-    entry: {
+  let entry = {};
+
+  if (devMode) {
+    entry = {
       main: {
         import: main,
-        runtime: 'main-runtime',
-        layer: 'main',
+      },
+      sso: {
+        import: sso,
+      },
+    };
+  } else {
+    entry = {
+      main: {
+        import: main,
       },
       sso: {
         import: sso,
         runtime: 'sso-runtime',
-        layer: 'sso',
       },
-    },
+    };
+  }
+
+  return {
+    context: resolve(__dirname, '../../../../../'),
+    entry,
     output: {
       filename: 'js/[name]-[contenthash].js',
       chunkFilename: 'js/[name]-[contenthash].js',
@@ -183,7 +192,6 @@ module.exports = (env, argv) => {
             priority: 20,
             reuseExistingChunk: true,
             enforce: true,
-            layer: 'main',
           },
           packages: {
             chunks: 'initial',
@@ -191,7 +199,6 @@ module.exports = (env, argv) => {
             name: 'packages',
             priority: 10,
             reuseExistingChunk: true,
-            layer: 'main',
           },
           packagesAsync: {
             chunks: 'async',
@@ -206,7 +213,6 @@ module.exports = (env, argv) => {
             },
             priority: 10,
             reuseExistingChunk: true,
-            layer: 'main',
           },
           extendedVendorAsync: {
             chunks: 'async',
@@ -214,7 +220,6 @@ module.exports = (env, argv) => {
             name: 'extended-vendor-async',
             priority: -5,
             reuseExistingChunk: true,
-            layer: 'main',
           },
           extendedVendor: {
             chunks: 'initial',
@@ -222,7 +227,6 @@ module.exports = (env, argv) => {
             test: new RegExp(`[\\/]node_modules/(${excludedFromVendor.join('|')}).*?`, ''),
             priority: -5,
             reuseExistingChunk: true,
-            layer: 'main',
           },
           vendorAsync: {
             chunks: 'async',
@@ -230,7 +234,6 @@ module.exports = (env, argv) => {
             name: 'vendor-async',
             priority: -10,
             reuseExistingChunk: true,
-            layer: 'main',
           },
           vendor: {
             chunks: 'initial',
@@ -238,21 +241,20 @@ module.exports = (env, argv) => {
             test: new RegExp(`[\\/]node_modules/(?!:${excludedFromVendor.join('|')}).*?`, ''),
             priority: -10,
             reuseExistingChunk: true,
-            layer: 'main',
           },
           asyncCommons: {
             chunks: 'async',
             name: 'commons-async',
             filename: 'js/[name]-[contenthash].js',
             priority: -15,
-            layer: 'main',
+            reuseExistingChunk: true,
           },
           commons: {
             chunks: 'initial',
             name: 'commons',
             filename: 'js/[name]-[contenthash].js',
             priority: -15,
-            layer: 'main',
+            reuseExistingChunk: true,
           },
           defaultAsync: {
             chunks: 'async',
@@ -260,7 +262,6 @@ module.exports = (env, argv) => {
             filename: '[name]-[contenthash].js',
             priority: -20,
             reuseExistingChunk: true,
-            layer: 'main',
           },
           default: {
             chunks: 'initial',
@@ -268,23 +269,6 @@ module.exports = (env, argv) => {
             filename: '[name]-[contenthash].js',
             priority: -20,
             reuseExistingChunk: true,
-            layer: 'main',
-          },
-          defaultAsyncSso: {
-            chunks: 'async',
-            name: 'bundle-async',
-            filename: '[name]-[contenthash].js',
-            priority: -20,
-            reuseExistingChunk: true,
-            layer: 'sso',
-          },
-          defaultSso: {
-            chunks: 'initial',
-            name: 'bundle',
-            filename: '[name]-[contenthash].js',
-            priority: -20,
-            reuseExistingChunk: true,
-            layer: 'sso',
           },
         },
       },
@@ -342,8 +326,8 @@ module.exports = (env, argv) => {
       }),
       new IgnoreNotFoundExportPlugin(),
       new MiniCssExtractPlugin({
-        filename: devMode ? 'styles/[name].css' : 'styles/[name]-[contenthash].css',
-        chunkFilename: devMode ? 'styles/[name].bundle.css' : 'styles/[name]-[contenthash].css',
+        filename: 'styles/[name]-[contenthash].css',
+        chunkFilename: 'styles/[name]-[contenthash].css',
         ignoreOrder: true, // Enable to remove warnings about conflicting order
         insert: linkTag => {
           document.head.appendChild(linkTag);
