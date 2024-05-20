@@ -18,6 +18,7 @@ package io.cloudbeaver.service.ldap.auth;
 
 import io.cloudbeaver.DBWUserIdentity;
 import io.cloudbeaver.auth.SMAuthProviderExternal;
+import io.cloudbeaver.auth.SMBruteForceProtected;
 import io.cloudbeaver.auth.provider.local.LocalAuthProviderConstants;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.model.user.WebUser;
@@ -42,7 +43,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class LdapAuthProvider implements SMAuthProviderExternal<SMSession> {
+public class LdapAuthProvider implements SMAuthProviderExternal<SMSession>, SMBruteForceProtected {
     public LdapAuthProvider() {
     }
 
@@ -156,5 +157,10 @@ public class LdapAuthProvider implements SMAuthProviderExternal<SMSession> {
         SMSession session
     ) throws DBException {
 
+    }
+
+    @Override
+    public Object getInputUsername(@NotNull Map<String, Object> cred) {
+        return cred.get(LdapConstants.CRED_USERNAME);
     }
 }
