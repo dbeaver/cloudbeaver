@@ -45,7 +45,7 @@ public class WSUserEventHandler<EVENT extends WSAbstractEvent> implements WSEven
                 break;
             case USER_DELETED:
                 if (event instanceof WSUserDeletedEvent userDeletedEvent) {
-                    sessionManager.closeUserSession(userDeletedEvent.getUserId());
+                    sessionManager.closeUserSession(userDeletedEvent.getDeletedUserId());
                 }
                 break;
             default:
