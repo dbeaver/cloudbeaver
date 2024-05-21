@@ -218,4 +218,16 @@
   .editor .tok-type {
     color: $variable-3;
   }
+
+  .editor .tok-typeName {
+    color: $type-name;
+  }
+
+  .editor .tok-punctuation {
+    color: $punctuation;
+  }
+
+  .editor .tok-propertyName {
+    color: $property-name;
+  }
 }

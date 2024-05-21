@@ -34,6 +34,9 @@ $error: #f00;
 $delimiter: rgb(238, 204, 100);
 $cursor: #000;
 $active-query: $color-positive;
+$type-name: #007acc;
+$punctuation: #000;
+$property-name: #c42626;
 
 :global .#{$theme-class} {
   @include base-code-editor;
