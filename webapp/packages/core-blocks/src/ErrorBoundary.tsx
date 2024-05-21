@@ -16,11 +16,13 @@ import { ErrorContext, IExceptionContext } from './ErrorContext';
 import { ExceptionMessage } from './ExceptionMessage';
 
 interface Props {
+  simple?: boolean;
   icon?: boolean;
   root?: boolean;
   inline?: boolean;
   remount?: boolean;
   className?: string;
+  fallback?: React.ReactElement;
   onClose?: () => any;
   onRefresh?: () => any;
 }
@@ -71,6 +73,35 @@ export class ErrorBoundary extends React.Component<React.PropsWithChildren<Props
     const { root, inline, icon, children, className, onClose } = this.props;
 
     for (const errorData of this.state.exceptions) {
+      if (this.props.simple) {
+        const stack = errorData.errorInfo?.componentStack || errorData.error.stack;
+        return (
+          <div>
+            <p>Something went wrong.</p>
+            {onClose && (
+              <div className={style.action}>
+                <button type="button" onClick={onClose}>
+                  Close
+                </button>
+              </div>
+            )}
+            {this.canRefresh && (
+              <div className={style.action}>
+                <button type="button" onClick={this.refresh}>
+                  Refresh
+                </button>
+              </div>
+            )}
+            <div>
+              {errorData.error.toString()}
+              {stack && <br />}
+              {stack}
+            </div>
+            {this.props.fallback}
+          </div>
+        );
+      }
+
       if (root) {
         return (
           <DisplayError className={className} root={root} error={errorData.error} errorInfo={errorData.errorInfo}>
