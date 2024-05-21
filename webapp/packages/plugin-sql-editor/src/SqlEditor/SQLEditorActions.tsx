@@ -26,7 +26,7 @@ export const SQLEditorActions = observer<Props>(function SQLEditorActions({ data
   const styles = useS(style);
   const translate = useTranslate();
   const isActiveSegmentMode = getComputed(() => data.activeSegmentMode.activeSegmentMode);
-  const disabled = getComputed(() => data.isLineScriptEmpty || data.isDisabled);
+  const disabled = getComputed(() => data.value.length === 0 || data.isDisabled);
   const isQuery = data.dataSource?.hasFeature(ESqlDataSourceFeatures.query);
   const isExecutable = data.dataSource?.hasFeature(ESqlDataSourceFeatures.executable);
 
