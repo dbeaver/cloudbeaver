@@ -8,7 +8,7 @@
 import { observer } from 'mobx-react-lite';
 import { useEffect } from 'react';
 
-import { s, TextPlaceholder, useOffsetPagination, useResource, useTranslate } from '@cloudbeaver/core-blocks';
+import { Loader, s, TextPlaceholder, useOffsetPagination, useResource, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { type DBObject, DBObjectParentKey, DBObjectResource, NavTreeResource } from '@cloudbeaver/core-navigation-tree';
 import { isDefined } from '@cloudbeaver/core-utils';
@@ -26,11 +26,11 @@ interface ObjectPropertyTableProps {
 export const ObjectPropertyTable = observer<ObjectPropertyTableProps>(function ObjectPropertyTable({ objectId, parentId, className }) {
   const translate = useTranslate();
   const navNodeViewService = useService(NavNodeViewService);
-  const navTreeResource = useService(NavTreeResource);
+  const navTreeResource = useResource(ObjectPropertyTable, NavTreeResource, objectId);
 
   const pagination = useOffsetPagination(DBObjectResource, {
     key: DBObjectParentKey(objectId),
-    pageSize: navTreeResource.childrenLimit,
+    pageSize: navTreeResource.resource.childrenLimit,
   });
 
   const dbObjectLoader = useResource(ObjectPropertyTable, DBObjectResource, pagination.key);
@@ -42,6 +42,10 @@ export const ObjectPropertyTable = observer<ObjectPropertyTableProps>(function O
   useEffect(() => {
     navNodeViewService.logDuplicates(objectId, duplicates);
   });
+
+  if (navTreeResource.loading || dbObjectLoader.loading) {
+    return <Loader />;
+  }
 
   return (
     <>
