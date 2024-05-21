@@ -23,6 +23,7 @@ export default [
   ['ui_processing_ok', '好'],
   ['ui_processing_create', '创建'],
   ['ui_processing_save', '保存'],
+  ['ui_processing_saving', 'Saving...'],
   ['ui_processing_saved', 'Saved'],
   ['ui_processing_stop', 'Stop'],
   ['ui_processing_skip', 'Skip'],

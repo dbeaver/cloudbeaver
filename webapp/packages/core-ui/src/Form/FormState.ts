@@ -26,6 +26,7 @@ export class FormState<TState> implements IFormState<TState> {
   parts: MetadataMap<string, IFormPart<any>>;
   state: TState;
   isDisabled: boolean;
+  isSaving: boolean;
 
   statusMessage: string | string[] | null;
   statusType: ENotificationType | null;
@@ -53,6 +54,7 @@ export class FormState<TState> implements IFormState<TState> {
     this.parts = new MetadataMap<string, any>();
     this.state = state;
     this.isDisabled = false;
+    this.isSaving = false;
 
     this.statusMessage = null;
     this.statusType = null;
@@ -88,6 +90,7 @@ export class FormState<TState> implements IFormState<TState> {
       promise: observable.ref,
       exception: observable.ref,
       isDisabled: observable.ref,
+      isSaving: observable.ref,
       state: observable,
       setMode: action,
       setPartsState: action,
@@ -211,6 +214,7 @@ export class FormState<TState> implements IFormState<TState> {
 
   async save(): Promise<boolean> {
     try {
+      this.isSaving = true;
       this.isDisabled = true;
       const context = await this.submitTask.execute(this);
 
@@ -223,6 +227,7 @@ export class FormState<TState> implements IFormState<TState> {
     } catch (exception: any) {
       this.exception = exception;
     } finally {
+      this.isSaving = false;
       this.isDisabled = false;
     }
     return false;
