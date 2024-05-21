@@ -35,8 +35,12 @@ $delimiter: rgb(238, 204, 100);
 $cursor: #000;
 $active-query: $color-positive;
 $type-name: #007acc;
-$punctuation: #000;
+$class-name: #007acc;
+$punctuation: #6d6d6d;
 $property-name: #c42626;
+$bool: #905;
+$variable-name: #905;
+$label-name: #81a1c1;
 
 :global .#{$theme-class} {
   @include base-code-editor;

@@ -230,4 +230,20 @@
   .editor .tok-propertyName {
     color: $property-name;
   }
+
+  .editor .tok-className {
+    color: $class-name;
+  }
+
+  .editor .tok-bool {
+    color: $bool;
+  }
+
+  .editor .tok-variableName {
+    color: $variable-name;
+  }
+
+  .editor .tok-labelName {
+    color: $variable-name;
+  }
 }
