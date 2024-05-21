@@ -24,6 +24,7 @@ export default [
   ['ui_processing_create', '创建'],
   ['ui_processing_save', '保存'],
   ['ui_processing_saving', 'Saving...'],
+  ['ui_processing_do_you_want_to_proceed', 'Do you want to proceed?'],
   ['ui_processing_saved', 'Saved'],
   ['ui_processing_stop', 'Stop'],
   ['ui_processing_skip', 'Skip'],

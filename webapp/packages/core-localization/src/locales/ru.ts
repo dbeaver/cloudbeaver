@@ -23,6 +23,7 @@ export default [
   ['ui_processing_create', 'Создать'],
   ['ui_processing_save', 'Сохранить'],
   ['ui_processing_saving', 'Сохранение...'],
+  ['ui_processing_do_you_want_to_proceed', 'Хотите продолжить?'],
   ['ui_processing_saved', 'Сохранено'],
   ['ui_processing_stop', 'Остановить'],
   ['ui_processing_skip', 'Пропустить'],
