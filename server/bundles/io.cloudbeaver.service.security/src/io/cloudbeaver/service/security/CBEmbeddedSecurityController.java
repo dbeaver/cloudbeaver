@@ -48,6 +48,8 @@ import org.jkiss.dbeaver.model.security.*;
 import org.jkiss.dbeaver.model.security.exception.SMAccessTokenExpiredException;
 import org.jkiss.dbeaver.model.security.exception.SMException;
 import org.jkiss.dbeaver.model.security.exception.SMRefreshTokenExpiredException;
+import org.jkiss.dbeaver.model.security.task.SMTask;
+import org.jkiss.dbeaver.model.security.task.SMTaskType;
 import org.jkiss.dbeaver.model.security.user.*;
 import org.jkiss.dbeaver.model.sql.SQLUtils;
 import org.jkiss.dbeaver.model.websocket.event.WSUserCloseSessionsEvent;
@@ -3183,5 +3185,60 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
     @NotNull
     private String getDefaultUserTeam() {
         return application.getAppConfiguration().getDefaultUserTeam();
+    }
+
+    @Override
+    public boolean createSingletonTask(@NotNull SMTaskType type, int timeout) throws DBException {
+        try (Connection dbCon = database.openConnection();
+             JDBCTransaction txn = new JDBCTransaction(dbCon)) {
+            try (PreparedStatement dbStat = dbCon.prepareStatement(
+                database.normalizeTableNames("SELECT * FROM {table_prefix}CB_TASKS WHERE TASK_ID=?"))) {
+                dbStat.setString(1, type.name());
+                try (var dbResult = dbStat.executeQuery()) {
+                    if (dbResult.next()) {
+                        SMTask taskInfo = new SMTask(
+                            SMTaskType.valueOf(dbResult.getString("TASK_ID")),
+                            dbResult.getObject("CREATE_TIME", LocalDateTime.class),
+                            dbResult.getInt("TIMEOUT")
+                        );
+                        if (LocalDateTime.now().isBefore(taskInfo.getExpirationTime())) {
+                            return false;
+                        }
+                        endTask(SMTaskType.DOMAIN_REFRESH);
+                    }
+                    updateTaskStatus(dbCon, type, timeout);
+                    txn.commit();
+                    return true;
+                }
+            }
+        } catch (SQLException e) {
+            throw new DBCException("Error creating singleton task %s".formatted(type), e);
+        }
+    }
+
+    private void updateTaskStatus(
+        @NotNull Connection dbCon,
+        @NotNull SMTaskType type,
+        int timeout
+    ) throws SQLException {
+        try (PreparedStatement dbStat = dbCon.prepareStatement(database.normalizeTableNames(
+            "INSERT INTO {table_prefix}CB_TASKS(TASK_ID,CREATE_TIME,TIMEOUT) VALUES (?,CURRENT_TIMESTAMP,?)"))) {
+            dbStat.setString(1, type.name());
+            dbStat.setInt(2, timeout);
+            dbStat.execute();
+        }
+    }
+
+    @Override
+    public boolean endTask(@NotNull SMTaskType type) throws DBException {
+        try (Connection dbCon = database.openConnection();
+             PreparedStatement dbStat = dbCon.prepareStatement(
+                 database.normalizeTableNames("DELETE FROM {table_prefix}CB_TASKS WHERE TASK_ID=?"))) {
+            dbStat.setString(1, type.name());
+            dbStat.execute();
+        } catch (SQLException e) {
+            throw new DBCException("Error deleting singleton task %s".formatted(type), e);
+        }
+        return true;
     }
 }
