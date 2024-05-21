@@ -15,7 +15,7 @@ import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dial
 import { NotificationService } from '@cloudbeaver/core-events';
 import { SyncExecutor } from '@cloudbeaver/core-executor';
 import type { SqlCompletionProposal, SqlDialectInfo, SqlScriptInfoFragment } from '@cloudbeaver/core-sdk';
-import { createLastPromiseGetter, debounceAsync, LastPromiseGetter } from '@cloudbeaver/core-utils';
+import { createLastPromiseGetter, debounceAsync, LastPromiseGetter, throttleAsync } from '@cloudbeaver/core-utils';
 
 import type { ISqlEditorTabState } from '../ISqlEditorTabState';
 import { ESqlDataSourceFeatures } from '../SqlDataSource/ESqlDataSourceFeatures';
@@ -433,6 +433,8 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
         const projectId = this.dataSource?.executionContext?.projectId;
         const connectionId = this.dataSource?.executionContext?.connectionId;
 
+        await data.updateParserScripts();
+
         if (!projectId || !connectionId || this.cursor.begin !== this.cursor.end) {
           return this.getSubQuery();
         }
@@ -441,7 +443,6 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
           return this.activeSegment;
         }
 
-        await data.updateParserScripts();
         const result = await this.sqlEditorService.parseSQLQuery(projectId, connectionId, this.value, this.cursor.begin);
 
         const segment = this.parser.getSegment(result.start, result.end);
