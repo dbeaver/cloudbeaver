@@ -47,22 +47,29 @@ export function renderLayout(serviceInjector: IServiceInjector): IRender {
     },
     renderApp() {
       this.initRoot().render(
-        <AppContext app={serviceInjector}>
-          <ErrorBoundary root>
-            <Suspense fallback={<Loader className={s(styles, { loader: true })} />}>
-              <BodyLazy />
-              <HideAppLoadingScreen />
-            </Suspense>
-          </ErrorBoundary>
-        </AppContext>,
+        <ErrorBoundary fallback={<HideAppLoadingScreen />} simple>
+          <AppContext app={serviceInjector}>
+            <ErrorBoundary fallback={<HideAppLoadingScreen />} root>
+              <Suspense fallback={<Loader className={s(styles, { loader: true })} />}>
+                <BodyLazy />
+                <HideAppLoadingScreen />
+              </Suspense>
+            </ErrorBoundary>
+          </AppContext>
+        </ErrorBoundary>,
       );
     },
     renderError(exception?: any) {
+      if (exception) {
+        console.error(exception);
+      }
       this.initRoot().render(
-        <AppContext app={serviceInjector}>
-          <DisplayError error={exception} root />
-          <HideAppLoadingScreen />
-        </AppContext>,
+        <ErrorBoundary fallback={<HideAppLoadingScreen />} simple>
+          <AppContext app={serviceInjector}>
+            <DisplayError error={exception} root />
+            <HideAppLoadingScreen />
+          </AppContext>
+        </ErrorBoundary>,
       );
     },
   };
