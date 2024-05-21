@@ -9,7 +9,8 @@ import { Code } from '@cloudbeaver/core-blocks';
 import type { InstructionComponent } from '@cloudbeaver/core-version-update';
 
 export const UpdateInstruction: InstructionComponent = function UpdateInstruction({ version, containerId, className }) {
-  const id = containerId || 'cloudbeaver';
+  const id = `containerId("${containerId || 'cloudbeaver'}")`;
+
   return (
     <div className={className}>
       <Code>
