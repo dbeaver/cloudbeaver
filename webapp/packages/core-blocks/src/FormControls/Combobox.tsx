@@ -106,6 +106,7 @@ export const Combobox: ComboboxType = observer(function Combobox({
     placement: 'bottom-end',
     currentId: null,
     gutter: 4,
+    unstable_fixed: true,
   });
 
   if (readOnly) {
