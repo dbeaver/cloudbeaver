@@ -33,7 +33,7 @@ interface IRenameDialogState {
   message: string | undefined;
   valid: boolean;
   payload: RenameDialogPayload;
-  validate: () => void;
+  validate: () => Promise<void>;
   setMessage: (message: string) => void;
 }
 
@@ -97,7 +97,7 @@ export const RenameDialog: DialogComponent<RenameDialogPayload, string> = observ
   );
 
   useEffect(() => {
-    state.validate();
+    state.validate().catch(() => {});
   }, [name]);
 
   const errorMessage = state.valid ? ' ' : translate(state.message ?? 'ui_rename_taken_or_invalid');
@@ -108,7 +108,7 @@ export const RenameDialog: DialogComponent<RenameDialogPayload, string> = observ
       <CommonDialogBody>
         <Form ref={focusedRef} onSubmit={() => resolveDialog(state.name)}>
           <Container center>
-            <InputField name="name" state={state} error={!state.valid} description={errorMessage} onChange={() => state.validate()}>
+            <InputField name="name" state={state} error={!state.valid} description={errorMessage} onChange={() => state.validate().catch(() => {})}>
               {translate('ui_name') + ':'}
             </InputField>
           </Container>
