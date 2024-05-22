@@ -26,7 +26,7 @@ export const ParametersForm = observer<Props>(function ParametersForm({ config, 
     <Container gap>
       {!embedded && (
         <Container wrap gap>
-          <InputField type="text" name="host" state={config} disabled={disabled} readOnly={readOnly || !originLocal} small required>
+          <InputField type="text" name="host" state={config} disabled={disabled} readOnly={readOnly || !originLocal} small>
             {translate('customConnection_custom_host')}
           </InputField>
           <InputField type="number" name="port" state={config} disabled={disabled} readOnly={readOnly || !originLocal} tiny>
@@ -38,7 +38,7 @@ export const ParametersForm = observer<Props>(function ParametersForm({ config, 
         {translate('customConnection_custom_database')}
       </InputField>
       {requiresServerName && (
-        <InputField type="text" name="serverName" state={config} disabled={disabled} readOnly={readOnly} required>
+        <InputField type="text" name="serverName" state={config} disabled={disabled} readOnly={readOnly}>
           {translate('customConnection_custom_server_name')}
         </InputField>
       )}
