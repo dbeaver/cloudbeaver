@@ -186,7 +186,7 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
       getLastAutocomplete: createLastPromiseGetter(),
       parseScript: createLastPromiseGetter(),
 
-      getHintProposals: async function getHintProposals(this: ISQLEditorDataPrivate, position, simple) {
+      getHintProposals: throttleAsync(async function getHintProposals(this: ISQLEditorDataPrivate, position, simple) {
         const executionContext = this.dataSource?.executionContext;
         if (!executionContext) {
           return [];
@@ -205,7 +205,7 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
         this.hintsLimitIsMet = hints.length >= MAX_HINTS_LIMIT;
 
         return hints;
-      },
+      }, 300),
 
       async formatScript(): Promise<void> {
         if (this.isDisabled || this.isScriptEmpty || !this.dataSource?.executionContext) {
@@ -364,7 +364,7 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
 
       updateParserScriptsDebounced: debounceAsync(async function updateParserScriptsThrottle() {
         await data.updateParserScripts();
-      }, 1700),
+      }, 2000),
 
       async updateParserScripts() {
         if (!this.dataSource?.hasFeature(ESqlDataSourceFeatures.script)) {
