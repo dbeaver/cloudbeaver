@@ -5,7 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { action, makeObservable, observable } from 'mobx';
+import { action, computed, makeObservable, observable } from 'mobx';
 
 import { dataContextAddDIProvider, DataContextGetter, type IDataContext, TempDataContext } from '@cloudbeaver/core-data-context';
 import type { App } from '@cloudbeaver/core-di';
@@ -25,7 +25,6 @@ export class FormState<TState> implements IFormState<TState> {
   mode: FormMode;
   parts: MetadataMap<string, IFormPart<any>>;
   state: TState;
-  isDisabled: boolean;
   isSaving: boolean;
 
   statusMessage: string | string[] | null;
@@ -33,6 +32,10 @@ export class FormState<TState> implements IFormState<TState> {
   exception: Error | (Error | null)[] | null;
 
   promise: Promise<any> | null;
+
+  get isDisabled(): boolean {
+    return this.isSaving || this.isLoading();
+  }
 
   readonly id: string;
   readonly service: FormBaseService<TState, any>;
@@ -53,7 +56,6 @@ export class FormState<TState> implements IFormState<TState> {
     this.mode = FormMode.Create;
     this.parts = new MetadataMap<string, any>();
     this.state = state;
-    this.isDisabled = false;
     this.isSaving = false;
 
     this.statusMessage = null;
@@ -89,9 +91,9 @@ export class FormState<TState> implements IFormState<TState> {
       parts: observable.ref,
       promise: observable.ref,
       exception: observable.ref,
-      isDisabled: observable.ref,
       isSaving: observable.ref,
       state: observable,
+      isDisabled: computed,
       setMode: action,
       setPartsState: action,
       setException: action,
@@ -100,7 +102,7 @@ export class FormState<TState> implements IFormState<TState> {
   }
 
   isLoading(): boolean {
-    return this.dataContext.get(DATA_CONTEXT_LOADABLE_STATE).loaders.some(loader => loader.isLoading());
+    return this.promise !== null || this.dataContext.get(DATA_CONTEXT_LOADABLE_STATE).loaders.some(loader => loader.isLoading());
   }
 
   isLoaded(): boolean {
@@ -141,7 +143,6 @@ export class FormState<TState> implements IFormState<TState> {
 
     this.promise = (async () => {
       try {
-        this.isDisabled = true;
         await this.configureTask.execute(this);
 
         const loaders = this.dataContext.get(DATA_CONTEXT_LOADABLE_STATE).loaders;
@@ -166,7 +167,6 @@ export class FormState<TState> implements IFormState<TState> {
         this.exception = exception;
         throw exception;
       } finally {
-        this.isDisabled = false;
         this.promise = null;
       }
     })();
@@ -215,7 +215,6 @@ export class FormState<TState> implements IFormState<TState> {
   async save(): Promise<boolean> {
     try {
       this.isSaving = true;
-      this.isDisabled = true;
       const context = await this.submitTask.execute(this);
 
       if (ExecutorInterrupter.isInterrupted(context)) {
@@ -228,7 +227,6 @@ export class FormState<TState> implements IFormState<TState> {
       this.exception = exception;
     } finally {
       this.isSaving = false;
-      this.isDisabled = false;
     }
     return false;
   }
