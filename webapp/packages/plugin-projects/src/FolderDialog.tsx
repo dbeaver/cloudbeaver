@@ -112,7 +112,10 @@ export const FolderDialog: DialogComponent<FolderDialogPayload, IFolderDialogRes
               state.setMessage(message);
             }
           });
-        } catch {}
+        } catch (exception: any) {
+          valid = false;
+          state.setMessage(exception.message);
+        }
 
         if (state.folder === folder && state.value === value && state.projectId === projectId) {
           state.valid = valid ?? true;
@@ -143,14 +146,16 @@ export const FolderDialog: DialogComponent<FolderDialogPayload, IFolderDialogRes
   const projectInfoLoader = useResource(FolderDialog, ProjectInfoResource, state.projectId);
 
   async function resolveHandler() {
-    await state.validate();
-    if (state.valid) {
-      resolveDialog({ folder: state.folder, name: state.value, projectId: state.projectId });
-    }
+    try {
+      await state.validate();
+      if (state.valid) {
+        resolveDialog({ folder: state.folder, name: state.value, projectId: state.projectId });
+      }
+    } catch {}
   }
 
   useEffect(() => {
-    state.validate();
+    state.validate().catch(() => {});
   }, [state.value, state.projectId]);
 
   const errorMessage = state.valid ? ' ' : translate(state.message ?? 'ui_rename_taken_or_invalid');
@@ -169,7 +174,7 @@ export const FolderDialog: DialogComponent<FolderDialogPayload, IFolderDialogRes
               error={!state.valid}
               description={errorMessage}
               loading={state.validationInProgress}
-              onChange={() => state.validate()}
+              onChange={() => state.validate().catch(() => {})}
             >
               {translate('ui_name') + ':'}
             </InputField>
