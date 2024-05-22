@@ -119,24 +119,23 @@ export class ConnectionExecutionContextResource extends CachedMapResource<string
   }
 
   async destroy(contextId: string): Promise<void> {
-    const context = this.get(contextId);
-
-    if (!context) {
-      return;
-    }
-
     await this.performUpdate(contextId, [], async () => {
+      const context = this.get(contextId);
+
+      if (!context) {
+        return;
+      }
+
       await this.graphQLService.sdk.executionContextDestroy({
         contextId: context.id,
         connectionId: context.connectionId,
         projectId: context.projectId,
       });
-      this.onDataOutdated.execute(contextId);
+      this.delete(contextId);
     });
 
     runInAction(() => {
       this.markOutdated(); // TODO: should be removed, currently multiple contexts for same connection may change catalog/schema for all contexts of connection
-      this.delete(contextId);
     });
   }
 
