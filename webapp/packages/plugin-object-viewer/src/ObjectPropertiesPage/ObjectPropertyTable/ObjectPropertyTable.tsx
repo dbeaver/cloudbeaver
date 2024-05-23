@@ -34,14 +34,6 @@ export const ObjectPropertyTable = observer<ObjectPropertyTableProps>(function O
   });
 
   const dbObjectLoader = useResource(ObjectPropertyTable, DBObjectResource, pagination.key);
-  console.log('paginationInfo', {
-    nodeId: objectId,
-    loaded: dbObjectLoader.isLoaded(),
-    loading: dbObjectLoader.isLoading(),
-    isOutdated: dbObjectLoader.isOutdated(),
-    hasError: dbObjectLoader.isError(),
-    cancelled: dbObjectLoader.isCancelled?.(),
-  });
 
   const { nodes, duplicates } = navNodeViewService.filterDuplicates(dbObjectLoader.data.filter(isDefined).map(node => node?.id) || []);
 
