@@ -13,7 +13,7 @@
 
 $meta: #ff1717;
 $keyword: rgb(115, 158, 202);
-$atom: #604aff;
+$atom: #56c8d8;
 $number: rgb(192, 192, 192);
 $def: #00f;
 $variable: rgb(126, 186, 211);
@@ -34,6 +34,13 @@ $error: #f00;
 $delimiter: rgb(238, 204, 100);
 $cursor: #fff;
 $active-query: $color-positive;
+$type-name: #c586c0;
+$class-name: #c586c0;
+$punctuation: #ffffff8c;
+$property-name: #569cd6;
+$bool: #56c8d8;
+$variable-name: #56c8d8;
+$label-name: #cf6edf;
 
 :global .#{$theme-class} {
   @include base-code-editor;
