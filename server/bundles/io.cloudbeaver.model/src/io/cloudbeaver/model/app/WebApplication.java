@@ -34,6 +34,7 @@ import org.jkiss.dbeaver.model.security.SMController;
 import org.jkiss.dbeaver.model.websocket.event.WSEventController;
 
 import java.nio.file.Path;
+import java.time.LocalDateTime;
 
 /**
  * Base interface for web application
@@ -95,4 +96,10 @@ public interface WebApplication extends DBPApplication {
     int getServerPort();
 
     boolean isLicenseRequired();
+
+    /**
+     * @return - server start time
+     */
+    @NotNull
+    LocalDateTime getStartTime();
 }
