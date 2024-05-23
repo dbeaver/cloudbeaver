@@ -173,22 +173,24 @@ public abstract class BaseWebSession extends AbstractSessionPersistent {
     @Override
     public void close() {
         super.close();
-        cleanUpSession();
+        cleanUpSession(true);
     }
 
-    public void close(boolean clearTokens) {
-        cleanUpSession();
+    public void close(boolean clearTokens, boolean sendSessionExpiredEvent) {
+        cleanUpSession(sendSessionExpiredEvent);
     }
 
-    private void cleanUpSession() {
-        var sessionExpiredEvent = new WSSessionExpiredEvent();
+    private void cleanUpSession(boolean sendSessionExpiredEvent) {
         application.getEventController().addEvent(new WSEventDeleteTempFile(getSessionId()));
         synchronized (sessionEventHandlers) {
+            var sessionExpiredEvent = new WSSessionExpiredEvent();
             for (CBWebSessionEventHandler sessionEventHandler : sessionEventHandlers) {
-                try {
-                    sessionEventHandler.handleWebSessionEvent(sessionExpiredEvent);
-                } catch (DBException e) {
-                    log.warn("Failed to send session expiration event", e);
+                if (sendSessionExpiredEvent) {
+                    try {
+                        sessionEventHandler.handleWebSessionEvent(sessionExpiredEvent);
+                    } catch (DBException e) {
+                        log.warn("Failed to send session expiration event", e);
+                    }
                 }
                 sessionEventHandler.close();
             }

@@ -645,7 +645,7 @@ public class WebSession extends BaseWebSession
     }
 
     @Override
-    public void close(boolean clearTokens) {
+    public void close(boolean clearTokens, boolean sendSessionExpiredEvent) {
         try {
             resetNavigationModel();
             resetSessionCache();
@@ -660,7 +660,7 @@ public class WebSession extends BaseWebSession
             }
         }
         this.userContext.setUser(null);
-        super.close(clearTokens);
+        super.close(clearTokens, sendSessionExpiredEvent);
     }
 
     private List<WebAuthInfo> clearAuthTokens() throws DBException {

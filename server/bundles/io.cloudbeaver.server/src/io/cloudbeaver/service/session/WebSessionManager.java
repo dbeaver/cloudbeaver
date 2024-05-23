@@ -25,6 +25,7 @@ import io.cloudbeaver.model.session.WebSessionAuthProcessor;
 import io.cloudbeaver.registry.WebHandlerRegistry;
 import io.cloudbeaver.registry.WebSessionHandlerDescriptor;
 import io.cloudbeaver.server.CBApplication;
+import io.cloudbeaver.server.events.WSWebUtils;
 import io.cloudbeaver.service.DBWSessionHandler;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -364,7 +365,7 @@ public class WebSessionManager {
                 var session = iterator.next();
                 if (smSessionsId.contains(session.getUserContext().getSmSessionId())) {
                     iterator.remove();
-                    session.close(false);
+                    session.close(false, true);
                 }
             }
         }
@@ -373,12 +374,12 @@ public class WebSessionManager {
     /**
      * Closes all sessions in session manager.
      */
-    public void closeAllSessions() {
+    public void closeAllSessions(@Nullable String initiatorSessionId) {
         synchronized (sessionMap) {
             for (Iterator<BaseWebSession> iterator = sessionMap.values().iterator(); iterator.hasNext(); ) {
                 var session = iterator.next();
                 iterator.remove();
-                session.close(false);
+                session.close(false, !WSWebUtils.isSessionIdEquals(session, initiatorSessionId));
             }
         }
     }
