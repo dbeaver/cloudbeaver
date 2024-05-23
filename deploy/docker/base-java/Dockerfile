@@ -2,9 +2,11 @@ FROM ubuntu:23.10
 
 MAINTAINER DBeaver Corp, devops@dbeaver.com
 
+ENV DEBIAN_FRONTEND=noninteractive
+
 RUN set -eux; \
     apt-get update; \
-    DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+    apt-get install -y --no-install-recommends \
         # curl required for historical reasons, see https://github.com/adoptium/containers/issues/255
         curl \
         wget \
@@ -43,10 +45,3 @@ RUN set -eux; \
 
 ### Patch java security
 COPY java.security* ${JAVA_HOME}/conf/security/java.security
-
-COPY cloudbeaver /opt/cloudbeaver
-
-EXPOSE 8978
-RUN find /opt/cloudbeaver -type d -exec chmod 775 {} \;
-WORKDIR /opt/cloudbeaver/
-ENTRYPOINT ["./run-server.sh"]
