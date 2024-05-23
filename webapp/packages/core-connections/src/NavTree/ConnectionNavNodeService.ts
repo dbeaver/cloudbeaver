@@ -23,7 +23,7 @@ import { ServerEventId } from '@cloudbeaver/core-root';
 import type { IConnectionInfoParams } from '../CONNECTION_INFO_PARAM_SCHEMA';
 import { ConnectionFolderEventHandler, IConnectionFolderEvent } from '../ConnectionFolderEventHandler';
 import { Connection, ConnectionInfoActiveProjectKey, ConnectionInfoResource, createConnectionParam } from '../ConnectionInfoResource';
-import { ConnectionsManagerService } from '../ConnectionsManagerService';
+import { ConnectionsManagerService, IConnectionExecutorData } from '../ConnectionsManagerService';
 import { ContainerResource } from '../ContainerResource';
 import { getConnectionParentId } from './getConnectionParentId';
 import { getFolderNodeParents } from './getFolderNodeParents';
@@ -54,6 +54,8 @@ export class ConnectionNavNodeService extends Dependency {
     this.navNodeInfoResource.onDataOutdated.addHandler(this.navNodeOutdateHandler.bind(this));
 
     this.navTreeResource.before(this.preloadConnectionInfo.bind(this));
+
+    this.connectionsManagerService.onDisconnect.addHandler(this.onDisconnectHandle.bind(this));
 
     this.navNodeManagerService.navigator.addHandler(this.navigateHandler.bind(this));
 
@@ -97,6 +99,13 @@ export class ConnectionNavNodeService extends Dependency {
       undefined,
       this.navTreeResource,
     );
+  }
+
+  onDisconnectHandle(context: IConnectionExecutorData) {
+    const connectionsKey = resourceKeyList(context.connections);
+    connectionsKey.map(connection => {
+      this.navTreeResource.markOutdated(connection.connectionId);
+    });
   }
 
   navigationNavNodeConnectionContext: IAsyncContextLoader<Connection | undefined, INodeNavigationData> = async (context, { nodeId }) => {

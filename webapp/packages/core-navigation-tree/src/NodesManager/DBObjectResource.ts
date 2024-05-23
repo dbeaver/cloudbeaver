@@ -7,6 +7,7 @@
  */
 import { runInAction } from 'mobx';
 
+import { createPaginationPageKey } from '@cloudbeaver/core-blocks';
 import { injectable } from '@cloudbeaver/core-di';
 import { ExecutorInterrupter } from '@cloudbeaver/core-executor';
 import {
@@ -52,6 +53,10 @@ export class DBObjectResource extends CachedMapResource<string, DBObject> {
 
         if (!isResourceAlias(nodeId)) {
           this.markOutdated(DBObjectParentKey(nodeId));
+
+          const paginationKey = createPaginationPageKey(0, 0, key);
+          console.log('paginationKey', paginationKey);
+          this.markOutdated(paginationKey);
         }
       });
     });

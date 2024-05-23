@@ -51,7 +51,7 @@ export function useOffsetPagination<TResource extends CachedMapResource<any, any
   const targetKey = options?.key;
   const pageSize = options?.pageSize || CACHED_RESOURCE_DEFAULT_PAGE_LIMIT;
   const resource = useService(ctor);
-  const pageInfo = resource.offsetPagination.getPageInfo(createPageKey(0, 0, targetKey));
+  const pageInfo = resource.offsetPagination.getPageInfo(createPaginationPageKey(0, 0, targetKey));
   const offset = Math.max(
     (pageInfo ? getNextPageOffset(pageInfo) : CACHED_RESOURCE_DEFAULT_PAGE_OFFSET) - pageSize,
     CACHED_RESOURCE_DEFAULT_PAGE_OFFSET,
@@ -60,13 +60,13 @@ export function useOffsetPagination<TResource extends CachedMapResource<any, any
   const pagination = useObservableRef<IOffsetPaginationPrivate<TKey>>(
     () => ({
       offset,
-      _key: createPageKey(offset, pageSize, targetKey),
+      _key: createPaginationPageKey(offset, pageSize, targetKey),
       get key() {
-        const pageInfo = resource.offsetPagination.getPageInfo(createPageKey(0, 0, this._key.target));
+        const pageInfo = resource.offsetPagination.getPageInfo(createPaginationPageKey(0, 0, this._key.target));
 
         for (const page of pageInfo?.pages || []) {
           if (page.outdated && page.from < this._key.options.offset) {
-            return createPageKey(page.from, this._key.options.limit, this._key.target);
+            return createPaginationPageKey(page.from, this._key.options.limit, this._key.target);
           }
         }
         return this._key as any;
@@ -76,7 +76,7 @@ export function useOffsetPagination<TResource extends CachedMapResource<any, any
       },
       loadMore() {
         if (this.hasNextPage) {
-          this._key = createPageKey(this._key.options.offset + this._key.options.limit, this._key.options.limit, this._key.target);
+          this._key = createPaginationPageKey(this._key.options.offset + this._key.options.limit, this._key.options.limit, this._key.target);
         }
       },
       refresh() {
@@ -94,13 +94,13 @@ export function useOffsetPagination<TResource extends CachedMapResource<any, any
   );
 
   if (!resource.isIntersect(targetKey, pagination._key.target)) {
-    pagination._key = createPageKey(offset, pageSize, targetKey);
+    pagination._key = createPaginationPageKey(offset, pageSize, targetKey);
   }
 
   return pagination;
 }
 
-function createPageKey(
+export function createPaginationPageKey(
   offset: number,
   limit: number,
   target: ResourceKey<any>,
