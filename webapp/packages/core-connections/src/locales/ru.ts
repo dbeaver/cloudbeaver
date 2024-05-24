@@ -1,3 +1,10 @@
+/*
+ * CloudBeaver - Cloud Database Manager
+ * Copyright (C) 2020-2024 DBeaver Corp and others
+ *
+ * Licensed under the Apache License, Version 2.0.
+ * you may not use this file except in compliance with the License.
+ */
 export default [
   ['core_connections_connections_settings_group', 'Подключения'],
   ['connections_administration_item', 'Шаблоны подключений'],
@@ -25,7 +32,7 @@ export default [
   ['connections_connection_create_search_database', 'Найти'],
   ['connections_connection_edit_save_credentials', ' Запомнить данные'],
   ['connections_connection_share_credentials', 'Запомнить данные для всех пользователей'],
-  ['connections_connection_share_credentials_tooltip', 'Запомнить данные для всех пользователей'],
+  ['connections_connection_share_credentials_tooltip', 'Запомнить данные для команды'],
   ['connections_connection_credentials_provisioning', 'Аутентификационные данные'],
   ['connections_connection_credentials_provisioning_description', 'Чтобы проверить подключение, необходимо заполнить или подтвердить данные доступа'],
   ['connections_connection_edit_authentication', 'Авторизация'],
