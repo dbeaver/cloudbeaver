@@ -7,7 +7,6 @@
  */
 import { useEffect } from 'react';
 
-import { useObjectRef, useObservableRef } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 
 import type { ISqlDataSource } from './SqlDataSource/ISqlDataSource';

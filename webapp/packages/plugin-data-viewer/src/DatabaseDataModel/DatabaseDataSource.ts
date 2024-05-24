@@ -372,9 +372,11 @@ export abstract class DatabaseDataSource<TOptions, TResult extends IDatabaseData
     return this;
   }
 
-  async dispose(): Promise<void> {
+  async dispose(keepExecutionContext = false): Promise<void> {
     await this.cancel();
-    await this.executionContext?.destroy();
+    if (!keepExecutionContext) {
+      await this.executionContext?.destroy();
+    }
   }
 
   abstract request(prevResults: TResult[]): TResult[] | Promise<TResult[]>;

@@ -5,7 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import React, { ErrorInfo } from 'react';
+import React, { ErrorInfo, Suspense } from 'react';
 
 import { errorOf, LoadingError } from '@cloudbeaver/core-utils';
 
@@ -76,62 +76,72 @@ export class ErrorBoundary extends React.Component<React.PropsWithChildren<Props
       if (this.props.simple) {
         const stack = errorData.errorInfo?.componentStack || errorData.error.stack;
         return (
-          <div>
-            <p>Something went wrong.</p>
-            {onClose && (
-              <div className={style.action}>
-                <button type="button" onClick={onClose}>
-                  Close
-                </button>
-              </div>
-            )}
-            {this.canRefresh && (
-              <div className={style.action}>
-                <button type="button" onClick={this.refresh}>
-                  Refresh
-                </button>
-              </div>
-            )}
+          <Suspense fallback={<>Loading...</>}>
             <div>
-              {errorData.error.toString()}
-              {stack && <br />}
-              {stack}
+              <p>Something went wrong.</p>
+              {onClose && (
+                <div className={style.action}>
+                  <button type="button" onClick={onClose}>
+                    Close
+                  </button>
+                </div>
+              )}
+              {this.canRefresh && (
+                <div className={style.action}>
+                  <button type="button" onClick={this.refresh}>
+                    Refresh
+                  </button>
+                </div>
+              )}
+              <div>
+                {errorData.error.toString()}
+                {stack && <br />}
+                {stack}
+              </div>
+              {this.props.fallback}
             </div>
-            {this.props.fallback}
-          </div>
+          </Suspense>
         );
       }
 
       if (root) {
         return (
-          <DisplayError className={className} root={root} error={errorData.error} errorInfo={errorData.errorInfo}>
-            {onClose && (
-              <div className={style.action}>
-                <Button onClick={onClose}>Close</Button>
-              </div>
-            )}
-            {this.canRefresh && (
-              <div className={style.action}>
-                <Button onClick={this.refresh}>Refresh</Button>
-              </div>
-            )}
-          </DisplayError>
+          <Suspense fallback={<>Loading...</>}>
+            <DisplayError className={className} root={root} error={errorData.error} errorInfo={errorData.errorInfo}>
+              {onClose && (
+                <div className={style.action}>
+                  <Button onClick={onClose}>Close</Button>
+                </div>
+              )}
+              {this.canRefresh && (
+                <div className={style.action}>
+                  <Button onClick={this.refresh}>Refresh</Button>
+                </div>
+              )}
+            </DisplayError>
+          </Suspense>
         );
       } else {
         return (
-          <ExceptionMessage
-            inline={inline}
-            icon={icon}
-            className={className}
-            exception={errorData.error}
-            onRetry={this.canRefresh ? this.refresh : undefined}
-            onClose={onClose}
-          />
+          <Suspense fallback={<>Loading...</>}>
+            <ExceptionMessage
+              inline={inline}
+              icon={icon}
+              className={className}
+              exception={errorData.error}
+              onRetry={this.canRefresh ? this.refresh : undefined}
+              onClose={onClose}
+            />
+          </Suspense>
         );
       }
     }
 
-    return <ErrorContext.Provider value={this}>{children}</ErrorContext.Provider>;
+    return (
+      <ErrorContext.Provider value={this}>
+        <Suspense fallback={<>Loading...</>}>{children}</Suspense>
+      </ErrorContext.Provider>
+    );
   }
 
   private refresh() {
