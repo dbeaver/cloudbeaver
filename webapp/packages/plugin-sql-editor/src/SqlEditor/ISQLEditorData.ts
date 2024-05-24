@@ -27,7 +27,6 @@ export interface ISQLEditorData {
   readonly cursorSegment: ISQLScriptSegment | undefined;
   readonly readonly: boolean;
   readonly editing: boolean;
-  readonly isLineScriptEmpty: boolean;
   readonly isScriptEmpty: boolean;
   readonly isDisabled: boolean;
   readonly isIncomingChanges: boolean;

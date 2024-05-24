@@ -104,12 +104,8 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
         return this.dataSource?.isEditing() ?? false;
       },
 
-      get isLineScriptEmpty(): boolean {
-        return !this.activeSegment?.query;
-      },
-
       get isScriptEmpty(): boolean {
-        return this.value === '' || this.parser.scripts.length === 0;
+        return this.value === '';
       },
 
       get isDisabled(): boolean {
@@ -212,6 +208,7 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
           return;
         }
 
+        await this.updateParserScripts();
         const query = this.value;
         const script = this.getExecutingQuery(false);
 
@@ -238,6 +235,8 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
         if (!isQuery || !isExecutable) {
           return;
         }
+
+        await this.updateParserScripts();
         const query = this.getSubQuery();
 
         try {
@@ -269,6 +268,8 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
         if (!isQuery || !isExecutable) {
           return;
         }
+
+        await this.updateParserScripts();
         const query = this.getSubQuery();
 
         try {
@@ -286,6 +287,7 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
           return;
         }
 
+        await this.updateParserScripts();
         const query = this.getSubQuery();
 
         try {
@@ -402,7 +404,7 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
         passEmpty?: boolean,
         passDisabled?: boolean,
       ): Promise<T | undefined> {
-        if (!segment || (this.isDisabled && !passDisabled) || (!passEmpty && this.isLineScriptEmpty)) {
+        if (!segment || (this.isDisabled && !passDisabled) || (!passEmpty && this.isScriptEmpty)) {
           return;
         }
 
