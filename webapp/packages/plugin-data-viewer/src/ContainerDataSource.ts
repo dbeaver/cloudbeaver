@@ -138,8 +138,6 @@ export class ContainerDataSource extends ResultSetDataSource<IDataContainerOptio
 
       this.clearError();
 
-      await this.closeResults(prevResults);
-
       return this.transformResults(executionContext.context!, response.results, limit);
     } catch (exception: any) {
       this.error = exception;
