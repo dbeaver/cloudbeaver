@@ -443,12 +443,11 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
 
         const result = await this.sqlEditorService.parseSQLQuery(projectId, connectionId, this.value, this.cursor.begin);
 
-        const segment = this.parser.getSegment(result.start, result.end);
-
-        if (!segment) {
-          throw new Error('Failed to get position');
+        if (result.end === 0 && result.start === 0) {
+          return;
         }
 
+        const segment = this.parser.getSegment(result.start, result.end);
         return segment;
       },
 
