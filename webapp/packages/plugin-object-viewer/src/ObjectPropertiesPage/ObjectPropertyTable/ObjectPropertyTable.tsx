@@ -45,7 +45,7 @@ export const ObjectPropertyTable = observer<ObjectPropertyTableProps>(function O
 
   return (
     <>
-      {objects.length === 0 ? (
+      {nodes.length === 0 ? (
         <TextPlaceholder>{translate('plugin_object_viewer_table_no_items')}</TextPlaceholder>
       ) : (
         <div className={s(styles, { box: true }, className)}>

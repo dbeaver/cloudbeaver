@@ -8,7 +8,7 @@
 import { action, makeObservable } from 'mobx';
 
 import { Dependency, injectable } from '@cloudbeaver/core-di';
-import { ExecutorInterrupter, IAsyncContextLoader, IExecutionContextProvider, IExecutorHandler } from '@cloudbeaver/core-executor';
+import { ExecutorInterrupter, IAsyncContextLoader, IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import {
   INodeNavigationData,
   NavNodeInfoResource,
@@ -23,7 +23,7 @@ import { ServerEventId } from '@cloudbeaver/core-root';
 import type { IConnectionInfoParams } from '../CONNECTION_INFO_PARAM_SCHEMA';
 import { ConnectionFolderEventHandler, IConnectionFolderEvent } from '../ConnectionFolderEventHandler';
 import { Connection, ConnectionInfoActiveProjectKey, ConnectionInfoResource, createConnectionParam } from '../ConnectionInfoResource';
-import { ConnectionsManagerService, IConnectionExecutorData } from '../ConnectionsManagerService';
+import { ConnectionsManagerService } from '../ConnectionsManagerService';
 import { ContainerResource } from '../ContainerResource';
 import { getConnectionParentId } from './getConnectionParentId';
 import { getFolderNodeParents } from './getFolderNodeParents';
@@ -56,8 +56,6 @@ export class ConnectionNavNodeService extends Dependency {
     this.navTreeResource.before(this.preloadConnectionInfo.bind(this));
 
     this.navNodeManagerService.navigator.addHandler(this.navigateHandler.bind(this));
-
-    this.connectionsManagerService.onDisconnect.addHandler(this.onDisconnectHandle.bind(this));
 
     this.connectionInfoResource.connect(this.navTreeResource);
 
@@ -100,10 +98,6 @@ export class ConnectionNavNodeService extends Dependency {
       this.navTreeResource,
     );
   }
-
-  onDisconnectHandle: IExecutorHandler<IConnectionExecutorData, any> = async (data, contexts) => {
-    this.navTreeResource.markOutdated(resourceKeyList(data.connections.map(connection => connection.connectionId)));
-  };
 
   navigationNavNodeConnectionContext: IAsyncContextLoader<Connection | undefined, INodeNavigationData> = async (context, { nodeId }) => {
     await this.connectionInfoResource.load(ConnectionInfoActiveProjectKey);
