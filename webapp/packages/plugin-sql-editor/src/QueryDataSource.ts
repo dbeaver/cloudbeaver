@@ -246,8 +246,6 @@ export class QueryDataSource<TOptions extends IDataQueryOptions = IDataQueryOpti
         return prevResults;
       }
 
-      this.closeResults(prevResults);
-
       return results;
     } catch (exception: any) {
       this.error = exception;
