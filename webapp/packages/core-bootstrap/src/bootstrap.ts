@@ -16,6 +16,7 @@ export async function bootstrap(plugins: PluginManifest[]): Promise<App> {
   configure({ enforceActions: 'never' });
 
   const app = new App([...coreManifests, ...plugins]);
+  (window as any).internalRestartApp = () => app.restart();
   let exception: Error | null = null;
 
   try {

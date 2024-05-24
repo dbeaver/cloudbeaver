@@ -88,15 +88,7 @@ export const DialogsPortal = observer(function DialogsPortal() {
       <Loader className={s(styles, { loader: true })} suspense>
         <div className={s(styles, { innerBox: true })}>
           {commonDialogService.dialogs.map((dialog, i, arr) => (
-            <ErrorBoundary key={dialog.id} className={s(styles, { error: true })} remount onClose={state.reject}>
-              <NestedDialog
-                key={dialog.id}
-                visible={i === arr.length - 1}
-                dialog={dialog}
-                resolveDialog={state.resolve}
-                rejectDialog={state.reject}
-              />
-            </ErrorBoundary>
+            <NestedDialog key={dialog.id} visible={i === arr.length - 1} dialog={dialog} resolveDialog={state.resolve} rejectDialog={state.reject} />
           ))}
         </div>
       </Loader>
@@ -112,6 +104,7 @@ interface NestedDialogType {
 }
 
 const NestedDialog: React.FC<NestedDialogType> = function NestedDialog({ dialog, resolveDialog, rejectDialog, visible }) {
+  const styles = useS(style);
   const DialogComponent = dialog.component;
 
   const context = useMemo<IDialogContext>(
@@ -125,13 +118,15 @@ const NestedDialog: React.FC<NestedDialogType> = function NestedDialog({ dialog,
 
   return (
     <DialogContext.Provider value={context}>
-      <DialogComponent
-        visible={visible}
-        payload={dialog.payload}
-        options={dialog.options}
-        resolveDialog={resolveDialog}
-        rejectDialog={rejectDialog}
-      />
+      <ErrorBoundary className={s(styles, { error: true })} remount onClose={rejectDialog}>
+        <DialogComponent
+          visible={visible}
+          payload={dialog.payload}
+          options={dialog.options}
+          resolveDialog={resolveDialog}
+          rejectDialog={rejectDialog}
+        />
+      </ErrorBoundary>
     </DialogContext.Provider>
   );
 };

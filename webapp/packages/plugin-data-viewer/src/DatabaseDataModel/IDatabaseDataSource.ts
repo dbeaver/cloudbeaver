@@ -97,5 +97,5 @@ export interface IDatabaseDataSource<TOptions, TResult extends IDatabaseDataResu
   cancel: () => Promise<void> | void;
   clearError: () => this;
   resetData: () => this;
-  dispose: () => Promise<void>;
+  dispose: (keepExecutionContext?: boolean) => Promise<void>;
 }
