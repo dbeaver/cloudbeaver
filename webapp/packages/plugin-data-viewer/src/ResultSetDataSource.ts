@@ -78,7 +78,7 @@ export abstract class ResultSetDataSource<TOptions> extends DatabaseDataSource<T
   }
 
   setResults(results: IDatabaseResultSet[]): this {
-    this.closeResults(this.results);
+    this.closeResults(this.results.filter(result => !results.some(r => r.id === result.id)));
     return super.setResults(results);
   }
 
