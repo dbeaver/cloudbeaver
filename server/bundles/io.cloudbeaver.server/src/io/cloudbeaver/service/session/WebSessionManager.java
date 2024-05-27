@@ -275,7 +275,7 @@ public class WebSessionManager {
 
     public Collection<BaseWebSession> getAllActiveSessions() {
         synchronized (sessionMap) {
-            return sessionMap.values();
+            return new ArrayList<>(sessionMap.values());
         }
     }
 
