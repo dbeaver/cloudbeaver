@@ -283,8 +283,13 @@ public abstract class CBServerConfigurationController<T extends CBServerConfig>
         Map<String, Object> configProps = new LinkedHashMap<>();
         if (Files.exists(configPath)) {
             log.debug("Read configuration [" + configPath.toAbsolutePath() + "]");
+
+            configProps.putAll(readConfigurationFile(configPath));
+
+            var mergedOriginalConfigs = WebAppUtils.mergeConfigurations(configProps, originalConfigurationProperties);
+            this.originalConfigurationProperties.clear();
             // saves original configuration file
-            this.originalConfigurationProperties.putAll(readConfigurationFile(configPath));
+            this.originalConfigurationProperties.putAll(mergedOriginalConfigs);
 
             configProps.putAll(readConfigurationFile(configPath));
             patchConfigurationWithProperties(configProps); // patch original properties
