@@ -7,38 +7,24 @@
  */
 import type { PluginManifest } from '@cloudbeaver/core-di';
 
-import { ConnectionAuthService } from './ConnectionAuthService';
-import { ConnectionFormService } from './ConnectionForm/ConnectionFormService';
-import { ConnectionDriverPropertiesTabService } from './ConnectionForm/DriverProperties/ConnectionDriverPropertiesTabService';
-import { ConnectionOptionsTabService } from './ConnectionForm/Options/ConnectionOptionsTabService';
-import { ConnectionOriginInfoTabService } from './ConnectionForm/OriginInfo/ConnectionOriginInfoTabService';
-import { ConnectionSSHTabService } from './ConnectionForm/SSH/ConnectionSSHTabService';
-import { ConnectionSSLTabService } from './ConnectionForm/SSL/ConnectionSSLTabService';
-import { ConnectionMenuBootstrap } from './ContextMenu/ConnectionMenuBootstrap';
-import { LocaleService } from './LocaleService';
-import { ConnectionFoldersBootstrap } from './NavNodes/ConnectionFoldersBootstrap';
-import { PluginBootstrap } from './PluginBootstrap';
-import { PluginConnectionsSettingsService } from './PluginConnectionsSettingsService';
-import { PublicConnectionFormService } from './PublicConnectionForm/PublicConnectionFormService';
-
 export const connectionPlugin: PluginManifest = {
   info: {
     name: 'Connections plugin',
   },
 
   providers: [
-    PluginBootstrap,
-    ConnectionMenuBootstrap,
-    PublicConnectionFormService,
-    LocaleService,
-    ConnectionAuthService,
-    ConnectionFormService,
-    ConnectionOptionsTabService,
-    ConnectionDriverPropertiesTabService,
-    ConnectionSSHTabService,
-    ConnectionOriginInfoTabService,
-    ConnectionFoldersBootstrap,
-    ConnectionSSLTabService,
-    PluginConnectionsSettingsService,
+    () => import('./PluginBootstrap').then(m => m.PluginBootstrap),
+    () => import('./ContextMenu/ConnectionMenuBootstrap').then(m => m.ConnectionMenuBootstrap),
+    () => import('./PublicConnectionForm/PublicConnectionFormService').then(m => m.PublicConnectionFormService),
+    () => import('./LocaleService').then(m => m.LocaleService),
+    () => import('./ConnectionAuthService').then(m => m.ConnectionAuthService),
+    () => import('./ConnectionForm/ConnectionFormService').then(m => m.ConnectionFormService),
+    () => import('./ConnectionForm/Options/ConnectionOptionsTabService').then(m => m.ConnectionOptionsTabService),
+    () => import('./ConnectionForm/DriverProperties/ConnectionDriverPropertiesTabService').then(m => m.ConnectionDriverPropertiesTabService),
+    () => import('./ConnectionForm/SSH/ConnectionSSHTabService').then(m => m.ConnectionSSHTabService),
+    () => import('./ConnectionForm/OriginInfo/ConnectionOriginInfoTabService').then(m => m.ConnectionOriginInfoTabService),
+    () => import('./NavNodes/ConnectionFoldersBootstrap').then(m => m.ConnectionFoldersBootstrap),
+    () => import('./ConnectionForm/SSL/ConnectionSSLTabService').then(m => m.ConnectionSSLTabService),
+    () => import('./PluginConnectionsSettingsService').then(m => m.PluginConnectionsSettingsService),
   ],
 };

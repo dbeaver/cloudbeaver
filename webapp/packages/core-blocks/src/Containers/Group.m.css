@@ -12,6 +12,10 @@
 .surface {
   composes: theme-background-surface theme-text-on-surface from global;
 }
+.border {
+  composes: theme-border-color-background from global;
+  border: 1px solid;
+}
 .group {
   align-content: baseline;
   box-sizing: border-box;
@@ -29,6 +33,11 @@
     &.gap > .groupTitle {
       padding: 8px 0;
       margin: -8px 0;
+
+      & > .groupClose {
+        right: 0px;
+        top: 8px;
+      }
     }
   }
 
@@ -39,6 +48,10 @@
   &.box > .groupTitle {
     padding: 24px;
     margin: 0;
+
+    & > .groupClose {
+      right: 24px;
+    }
   }
 
   &.box,
@@ -46,6 +59,10 @@
   &.boxNoOverflow {
     padding: 0;
     overflow: initial;
+  }
+
+  &.hideOverflow {
+    overflow: hidden;
   }
 
   &.center {

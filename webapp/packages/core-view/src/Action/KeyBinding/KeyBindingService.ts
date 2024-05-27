@@ -9,7 +9,7 @@ import type { IDataContextProvider } from '@cloudbeaver/core-data-context';
 import { injectable } from '@cloudbeaver/core-di';
 
 import type { IAction } from '../../Action/IAction';
-import type { IKeyBindingHandler } from './IKeyBindingHandler';
+import type { IKeyBindingHandler, IKeyBindingHandlerOptions } from './IKeyBindingHandler';
 
 @injectable()
 export class KeyBindingService {
@@ -19,16 +19,30 @@ export class KeyBindingService {
     this.handlers = new Map();
   }
 
-  addKeyBindingHandler(handler: IKeyBindingHandler): void {
+  addKeyBindingHandler(handler: IKeyBindingHandlerOptions): void {
     if (this.handlers.has(handler.id)) {
       throw new Error(`Key binding handler with same id (${handler.id}) already exists`);
     }
-    this.handlers.set(handler.id, handler);
+    this.handlers.set(handler.id, {
+      ...handler,
+      actions: new Set(handler.actions),
+      contexts: new Set(handler.contexts),
+    });
   }
 
-  getKeyBindingHandler(context: IDataContextProvider, action: IAction): IKeyBindingHandler | null {
-    for (const handler of this.handlers.values()) {
-      if (handler.isBindingApplicable(context, action)) {
+  getKeyBindingHandler(contexts: IDataContextProvider, action: IAction): IKeyBindingHandler | null {
+    handlers: for (const handler of this.handlers.values()) {
+      if (handler.actions.size > 0 && !handler.actions.has(action)) {
+        continue;
+      }
+      if (handler.contexts.size > 0) {
+        for (const context of handler.contexts) {
+          if (!contexts.has(context, true)) {
+            continue handlers;
+          }
+        }
+      }
+      if (handler.isBindingApplicable?.(contexts, action) !== false) {
         return handler;
       }
     }

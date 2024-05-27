@@ -5,13 +5,14 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import type { IDataContext } from '@cloudbeaver/core-data-context';
+import type { DataContextGetter, IDataContext } from '@cloudbeaver/core-data-context';
 import type { ENotificationType } from '@cloudbeaver/core-events';
 import type { IExecutor } from '@cloudbeaver/core-executor';
 import type { ILoadableState, MetadataMap } from '@cloudbeaver/core-utils';
 
 import type { FormBaseService } from './FormBaseService';
 import type { FormMode } from './FormMode';
+import type { IFormPart } from './IFormPart';
 
 export interface IFormState<TState> extends ILoadableState {
   readonly id: string;
@@ -41,6 +42,8 @@ export interface IFormState<TState> extends ILoadableState {
   setException(exception: Error | (Error | null)[] | null): this;
   setState(state: TState): this;
 
+  getPart<T extends IFormPart<any>>(getter: DataContextGetter<T>): T;
+
   isLoading(): boolean;
   isLoaded(): boolean;
   isError(): boolean;
@@ -51,5 +54,6 @@ export interface IFormState<TState> extends ILoadableState {
   load(): Promise<void>;
   reload(): Promise<void>;
   save(): Promise<boolean>;
+  reset(): void;
   cancel(): void;
 }

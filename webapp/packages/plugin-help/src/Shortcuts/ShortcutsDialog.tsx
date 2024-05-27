@@ -34,8 +34,8 @@ export const ShortcutsDialog: DialogComponent<null> = function ShortcutsDialog({
       <CommonDialogHeader title={translate('shortcuts_title')} onReject={rejectDialog} />
       <CommonDialogBody>
         <Container className={s(styles, { container: true })} gap wrap overflow>
-          <Group gap box dense overflow>
-            <GroupTitle className={s(styles, { groupTitle: true })}>
+          <Group box gap dense overflow>
+            <GroupTitle header>
               <Link href="https://dbeaver.com/docs/cloudbeaver/Data-editor/" target="_blank" wrapper indicator>
                 Data Viewer
               </Link>
@@ -44,8 +44,8 @@ export const ShortcutsDialog: DialogComponent<null> = function ShortcutsDialog({
               <Shortcut key={shortcut.label} shortcut={shortcut} />
             ))}
           </Group>
-          <Group gap box dense overflow>
-            <GroupTitle className={s(styles, { groupTitle: true })}>
+          <Group box gap dense overflow>
+            <GroupTitle header>
               <Link href="https://dbeaver.com/docs/cloudbeaver/SQL-Editor/" target="_blank" wrapper indicator>
                 SQL Editor
               </Link>
@@ -54,8 +54,8 @@ export const ShortcutsDialog: DialogComponent<null> = function ShortcutsDialog({
               <Shortcut key={shortcut.label} shortcut={shortcut} />
             ))}
           </Group>
-          <Group gap box dense overflow>
-            <GroupTitle className={s(styles, { groupTitle: true })}>
+          <Group box gap dense overflow>
+            <GroupTitle header>
               <Link href="https://dbeaver.com/docs/cloudbeaver/Database-Navigator/" target="_blank" wrapper indicator>
                 Navigation Tree
               </Link>

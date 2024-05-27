@@ -5,34 +5,48 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
+import { makeObservable, observable } from 'mobx';
+
 import { Executor, IExecutor } from '@cloudbeaver/core-executor';
 
 import { Bootstrap } from './Bootstrap';
 import { Dependency } from './Dependency';
 import type { DIContainer } from './DIContainer';
-import { Disposable } from './Disposable';
 import type { IServiceCollection, IServiceConstructor, IServiceInjector } from './IApp';
 import { IDiWrapper, inversifyWrapper } from './inversifyWrapper';
 import type { PluginManifest } from './PluginManifest';
 
+export interface IStartData {
+  preload: boolean;
+}
+
 export class App {
-  readonly onStart: IExecutor;
+  readonly onStart: IExecutor<IStartData>;
   private readonly plugins: PluginManifest[];
+  private readonly loadedServices: Map<PluginManifest, Set<IServiceConstructor<any>>>;
   private readonly diWrapper: IDiWrapper = inversifyWrapper;
+  private isAppServiceBound: boolean;
 
   constructor(plugins: PluginManifest[] = []) {
     this.plugins = plugins;
     this.onStart = new Executor();
+    this.loadedServices = new Map();
+    this.isAppServiceBound = false;
 
-    this.onStart.addHandler(async () => {
-      this.registerServices();
-      await this.initializeServices();
-      await this.loadServices();
+    this.onStart.addHandler(async ({ preload }) => {
+      await this.registerServices(preload);
+      await this.initializeServices(preload);
+      await this.loadServices(preload);
+    });
+
+    makeObservable<this, 'loadedServices'>(this, {
+      loadedServices: observable.shallow,
     });
   }
 
   async start(): Promise<void> {
-    await this.onStart.execute();
+    await this.onStart.execute({ preload: true });
+    await this.onStart.execute({ preload: false });
   }
 
   async restart(): Promise<void> {
@@ -42,14 +56,20 @@ export class App {
 
   dispose(): void {
     this.diWrapper.collection.unbindAll();
+    this.isAppServiceBound = false;
   }
 
   getPlugins(): PluginManifest[] {
     return [...this.plugins];
   }
 
-  getServices(): IServiceConstructor<any>[] {
-    return this.plugins.map(plugin => plugin.providers).flat();
+  getServices(plugin?: PluginManifest): Array<IServiceConstructor<any>> {
+    if (plugin) {
+      return [...(this.loadedServices.get(plugin) || [])];
+    }
+    return Array.from(this.loadedServices.values())
+      .map(set => [...set])
+      .flat();
   }
 
   registerChildContainer(container: DIContainer): void {
@@ -69,17 +89,19 @@ export class App {
   }
 
   // first phase register all dependencies
-  private registerServices(): void {
-    this.getServiceCollection().addServiceByClass(App, this);
+  private async registerServices(preload?: boolean): Promise<void> {
+    if (!this.isAppServiceBound) {
+      this.getServiceCollection().addServiceByClass(App, this);
+      this.isAppServiceBound = true;
+    }
 
-    for (const service of this.getServices()) {
-      // console.log('provider', provider.name);
+    for await (const service of this.getServicesAsync(preload)) {
       this.diWrapper.collection.addServiceByClass(service);
     }
   }
 
-  private async initializeServices(): Promise<void> {
-    for (const service of this.getServices()) {
+  private async initializeServices(preload?: boolean): Promise<void> {
+    for await (const service of this.getServicesAsync(preload)) {
       if (service.prototype instanceof Bootstrap) {
         const serviceInstance = this.diWrapper.injector.getServiceByClass<Bootstrap>(service);
 
@@ -92,14 +114,64 @@ export class App {
     }
   }
 
-  private async loadServices(): Promise<void> {
-    for (const service of this.getServices()) {
+  private async loadServices(preload?: boolean): Promise<void> {
+    for await (const service of this.getServicesAsync(preload)) {
       if (service.prototype instanceof Bootstrap) {
         const serviceInstance = this.diWrapper.injector.getServiceByClass<Bootstrap>(service);
 
         if ('load' in serviceInstance) {
           await serviceInstance.load();
         }
+      }
+    }
+  }
+
+  private async *getServicesAsync(preload?: boolean, concurrency = 20): AsyncGenerator<IServiceConstructor<any>> {
+    let i = 0;
+    let queue: Array<Promise<Array<IServiceConstructor<any>>>> = [];
+
+    for (const plugin of this.plugins) {
+      let servicesLoaders: Array<() => Promise<IServiceConstructor<any>>> = [];
+
+      if (preload) {
+        servicesLoaders = plugin.preload || [];
+      } else {
+        servicesLoaders = plugin.providers;
+      }
+
+      const loadedServices = this.loadedServices.get(plugin) || (observable(new Set(), { deep: false }) as Set<IServiceConstructor<any>>);
+      this.loadedServices.set(plugin, loadedServices);
+
+      queue.push(
+        (async function loader() {
+          const services = (await Promise.all(servicesLoaders.map(serviceLoader => serviceLoader()))).flat();
+
+          for (const service of services) {
+            loadedServices.add(service);
+          }
+
+          return services;
+        })(),
+      );
+      i++;
+
+      if (i >= concurrency) {
+        const services = (await Promise.all(queue)).flat();
+
+        for (const service of services) {
+          yield service;
+        }
+
+        queue = [];
+        i = 0;
+      }
+    }
+
+    if (queue.length > 0) {
+      const services = (await Promise.all(queue)).flat();
+
+      for (const service of services) {
+        yield service;
       }
     }
   }

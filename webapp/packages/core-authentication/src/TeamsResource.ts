@@ -15,12 +15,19 @@ import {
   type ResourceKeySimple,
   ResourceKeyUtils,
 } from '@cloudbeaver/core-resource';
-import { AdminConnectionGrantInfo, AdminTeamInfoFragment, GetTeamsListQueryVariables, GraphQLService } from '@cloudbeaver/core-sdk';
-import { isArraysEqual } from '@cloudbeaver/core-utils';
+import {
+  AdminConnectionGrantInfo,
+  AdminTeamInfoFragment,
+  AdminUserTeamGrantInfo,
+  GetTeamsListQueryVariables,
+  GraphQLService,
+} from '@cloudbeaver/core-sdk';
+import { isArraysEqual, UndefinedToNull } from '@cloudbeaver/core-utils';
 
 const NEW_TEAM_SYMBOL = Symbol('new-team');
 
 export type TeamInfo = AdminTeamInfoFragment;
+export type UserTeamGrantInfo = UndefinedToNull<AdminUserTeamGrantInfo>;
 
 type TeamResourceIncludes = Omit<GetTeamsListQueryVariables, 'teamId'>;
 type NewTeam = TeamInfo & { [NEW_TEAM_SYMBOL]: boolean; timestamp: number };
@@ -85,9 +92,9 @@ export class TeamsResource extends CachedMapResource<string, TeamInfo, TeamResou
     return this.data;
   }
 
-  async loadGrantedUsers(teamId: string): Promise<string[]> {
+  async loadGrantedUsers(teamId: string): Promise<UserTeamGrantInfo[]> {
     const { team } = await this.graphQLService.sdk.getTeamGrantedUsers({ teamId });
-    return team[0].grantedUsers;
+    return team[0].grantedUsersInfo.map(user => ({ userId: user.userId, teamRole: user.teamRole ?? null }));
   }
 
   async getSubjectConnectionAccess(subjectId: string): Promise<AdminConnectionGrantInfo[]> {

@@ -1,3 +1,10 @@
+/*
+ * CloudBeaver - Cloud Database Manager
+ * Copyright (C) 2020-2024 DBeaver Corp and others
+ *
+ * Licensed under the Apache License, Version 2.0.
+ * you may not use this file except in compliance with the License.
+ */
 const { merge } = require('webpack-merge');
 const { resolve } = require('path');
 const webpack = require('webpack');
@@ -6,9 +13,8 @@ const fs = require('fs');
 const { URL } = require('url');
 
 const commonConfig = require('./webpack.config.js');
-const index = resolve('dist/index.js');
-const sso = require.resolve('@cloudbeaver/plugin-sso/dist/index.js');
 const ssoHtmlTemplate = require.resolve('@cloudbeaver/plugin-sso/src/index.html.ejs');
+const ssoErrorHtmlTemplate = require.resolve('@cloudbeaver/plugin-sso/src/ssoError.html.ejs');
 const { getAssets } = require('./webpack.product.utils');
 
 const HtmlWebpackPlugin = require('html-webpack-plugin');
@@ -40,26 +46,20 @@ module.exports = (env, argv) => {
 
   return merge(commonConfig(env, argv), {
     mode: 'development',
-    context: resolve(__dirname, '../../../../../'),
-    entry: {
-      index,
-      sso,
-    },
     output: {
       devtoolModuleFilenameTemplate: 'file:///[absolute-resource-path]',
     },
     watchOptions: {
-      aggregateTimeout: 3000,
+      aggregateTimeout: 1000,
       ignored: ['**/node_modules', '**/packages/*/src/**/*.{ts,tsx}'],
     },
     optimization: {
       minimize: false,
+      runtimeChunk: 'single',
       moduleIds: 'named',
-
-      // improve performance
-      removeAvailableModules: false,
-      removeEmptyChunks: false,
-      splitChunks: false,
+    },
+    infrastructureLogging: {
+      level: 'warn',
     },
     devServer: {
       allowedHosts: 'all',
@@ -104,13 +104,21 @@ module.exports = (env, argv) => {
       new HtmlWebpackPlugin({
         template: resolve('src/index.html.ejs'),
         inject: 'body',
-        chunks: ['index'],
+        chunks: ['main'],
         version: package.version,
         title: package.product?.name,
       }),
       new HtmlWebpackPlugin({
         filename: 'sso.html',
         template: ssoHtmlTemplate,
+        inject: 'body',
+        chunks: ['sso'],
+        version: package.version,
+        title: package.product?.name,
+      }),
+      new HtmlWebpackPlugin({
+        filename: 'ssoError.html',
+        template: ssoErrorHtmlTemplate,
         inject: 'body',
         chunks: ['sso'],
         version: package.version,

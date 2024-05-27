@@ -7,7 +7,7 @@
  */
 import { injectable } from '@cloudbeaver/core-di';
 import { uuid } from '@cloudbeaver/core-utils';
-import { IDatabaseDataModel, IDatabaseResultSet, TableViewerStorageService } from '@cloudbeaver/plugin-data-viewer';
+import { IDatabaseDataModel, IDatabaseResultSet, ResultSetDataSource, TableViewerStorageService } from '@cloudbeaver/plugin-data-viewer';
 
 import type { IResultGroup, IResultTab, ISqlEditorTabState, IStatisticsTab } from '../ISqlEditorTabState';
 import type { IDataQueryOptions } from '../QueryDataSource';
@@ -160,14 +160,9 @@ export class SqlQueryResultService {
 
       if (isGroupEmpty) {
         state.resultGroups.splice(state.resultGroups.indexOf(group), 1);
-
-        // TODO: we need to dispose table model, but don't close execution context, so now we only
         const model = this.tableViewerStorageService.get(group.modelId);
-        // model?.dispose();
 
-        if (model?.isLoading()) {
-          model.cancel();
-        }
+        model?.dispose(true);
 
         this.tableViewerStorageService.remove(group.modelId);
       }

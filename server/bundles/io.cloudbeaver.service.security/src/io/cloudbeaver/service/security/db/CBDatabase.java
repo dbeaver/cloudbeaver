@@ -74,7 +74,7 @@ public class CBDatabase {
     public static final String SCHEMA_UPDATE_SQL_PATH = "db/cb_schema_update_";
 
     private static final int LEGACY_SCHEMA_VERSION = 1;
-    private static final int CURRENT_SCHEMA_VERSION = 18;
+    private static final int CURRENT_SCHEMA_VERSION = 21;
 
     private static final String DEFAULT_DB_USER_NAME = "cb-data";
     private static final String DEFAULT_DB_PWD_FILE = ".database-credentials.dat";
@@ -217,7 +217,8 @@ public class CBDatabase {
                 null,
                 schemaName,
                 CURRENT_SCHEMA_VERSION,
-                0
+                0,
+                databaseConfiguration
             );
             schemaManager.updateSchema(monitor);
 
@@ -549,8 +550,6 @@ public class CBDatabase {
     }
 
     private String getCurrentInstanceId() throws IOException {
-        // 12 chars - mac address
-        String macAddress = CommonUtils.toHexString(RuntimeUtils.getLocalMacAddress());
         // 16 chars - workspace ID
         String workspaceId = DBWorkbench.getPlatform().getWorkspace().getWorkspaceId();
         if (workspaceId.length() > 16) {
@@ -558,7 +557,7 @@ public class CBDatabase {
         }
 
         StringBuilder id = new StringBuilder(36);
-        id.append(macAddress);
+        id.append("000000000000"); // there was mac address, but it generates dynamically when docker is used
         id.append(":").append(workspaceId).append(":");
         while (id.length() < 36) {
             id.append("X");

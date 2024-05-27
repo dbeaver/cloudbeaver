@@ -7,26 +7,18 @@
  */
 import type { PluginManifest } from '@cloudbeaver/core-di';
 
-import { LocaleService } from './LocaleService';
-import { NavTreeSettingsService } from './NavTreeSettingsService';
-import { DBObjectResource } from './NodesManager/DBObjectResource';
-import { NavNodeInfoResource } from './NodesManager/NavNodeInfoResource';
-import { NavNodeManagerService } from './NodesManager/NavNodeManagerService';
-import { NavTreeResource } from './NodesManager/NavTreeResource';
-import { ProjectsNavNodeService } from './NodesManager/ProjectsNavNodeService';
-
 export const coreNavigationTree: PluginManifest = {
   info: {
     name: 'Core Navigation Tree',
   },
 
   providers: [
-    NavTreeSettingsService,
-    NavNodeManagerService,
-    DBObjectResource,
-    NavNodeInfoResource,
-    NavTreeResource,
-    ProjectsNavNodeService,
-    LocaleService,
+    () => import('./NavTreeSettingsService').then(m => m.NavTreeSettingsService),
+    () => import('./NodesManager/NavNodeManagerService').then(m => m.NavNodeManagerService),
+    () => import('./NodesManager/DBObjectResource').then(m => m.DBObjectResource),
+    () => import('./NodesManager/NavNodeInfoResource').then(m => m.NavNodeInfoResource),
+    () => import('./NodesManager/NavTreeResource').then(m => m.NavTreeResource),
+    () => import('./NodesManager/ProjectsNavNodeService').then(m => m.ProjectsNavNodeService),
+    () => import('./LocaleService').then(m => m.LocaleService),
   ],
 };

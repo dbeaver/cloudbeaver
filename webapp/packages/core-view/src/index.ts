@@ -1,3 +1,10 @@
+/*
+ * CloudBeaver - Cloud Database Manager
+ * Copyright (C) 2020-2024 DBeaver Corp and others
+ *
+ * Licensed under the Apache License, Version 2.0.
+ * you may not use this file except in compliance with the License.
+ */
 export * from './Action/Actions/ACTION_COLLAPSE_ALL';
 export * from './Action/Actions/ACTION_CREATE';
 export * from './Action/Actions/ACTION_DELETE';
@@ -50,7 +57,6 @@ export * from './Menu/MenuItem/MenuLazyItem';
 export * from './Menu/MenuItem/MenuSeparatorItem';
 export * from './Menu/MenuItem/MenuSubMenuItem';
 export * from './Menu/createMenu';
-export * from './Menu/DATA_CONTEXT_MENU_LOCAL';
 export * from './Menu/DATA_CONTEXT_MENU_NESTED';
 export * from './Menu/DATA_CONTEXT_MENU';
 export * from './Menu/DATA_CONTEXT_SUBMENU_ITEM';
@@ -60,7 +66,7 @@ export * from './Menu/MenuService';
 export * from './Menu/useMenu';
 export * from './Menu/useMenuContext';
 export * from './View/AppView';
-export * from './View/CaptureView';
+export * from './View/CaptureViewLazy';
 export * from './View/CaptureViewContext';
 export * from './View/IActiveView';
 export * from './View/IView';

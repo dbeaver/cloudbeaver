@@ -10,7 +10,6 @@ import { observer } from 'mobx-react-lite';
 import { s, SContext, type StyleRegistry, useS } from '@cloudbeaver/core-blocks';
 
 import TabStyles from '../Tabs/Tab/Tab.m.css';
-import { TabUnderlineStyleRegistry } from '../Tabs/Tab/TabStyleRegistries';
 import { TabList } from '../Tabs/TabList';
 import TabPanelStyles from '../Tabs/TabPanel.m.css';
 import { TabPanelList } from '../Tabs/TabPanelList';
@@ -20,12 +19,11 @@ import styles from './shared/SideBarPanel.m.css';
 import SideBarPanelTab from './shared/SideBarPanelTab.m.css';
 import SideBarPanelTabPanel from './shared/SideBarPanelTabPanel.m.css';
 
-interface Props {
+export interface SideBarPanelProps {
   container: TabsContainer;
 }
 
 const sideBarPanelRegistry: StyleRegistry = [
-  ...TabUnderlineStyleRegistry,
   [
     TabStyles,
     {
@@ -42,14 +40,14 @@ const sideBarPanelRegistry: StyleRegistry = [
   ],
 ];
 
-export const SideBarPanel = observer<Props>(function SideBarPanel({ container }) {
+export const SideBarPanel = observer<SideBarPanelProps>(function SideBarPanel({ container }) {
   const style = useS(styles);
 
   return (
     <SContext registry={sideBarPanelRegistry}>
       <TabsState container={container} lazy>
         <div className={s(style, { box: true })}>
-          <TabList className={s(style, { tabList: true })} />
+          <TabList className={s(style, { tabList: true })} underline />
           <div className={s(style, { contentBox: true })}>
             <TabPanelList />
           </div>

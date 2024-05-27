@@ -7,10 +7,9 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import { Button, Container, Form, s, SContext, StatusMessage, useAutoLoad, useForm, useS, useTranslate } from '@cloudbeaver/core-blocks';
+import { Button, Container, Form, s, StatusMessage, useAutoLoad, useForm, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import { getFirstException } from '@cloudbeaver/core-utils';
 
-import { TabBigUnderlineStyleRegistry } from '../../Tabs/Tab/TabStyleRegistries';
 import { TabList } from '../../Tabs/TabList';
 import { TabPanelList } from '../../Tabs/TabPanelList';
 import { TabsState } from '../../Tabs/TabsState';
@@ -40,15 +39,13 @@ export const BaseForm = observer<IBaseFormProps<any>>(function BaseForm({ servic
   useAutoLoad(BaseForm, state);
 
   return (
-    <Form context={form} className={s(styles, { submittingForm: true })} disabled={state.isDisabled} focusFirstChild>
+    <Form context={form} disabled={state.isDisabled} contents focusFirstChild>
       <TabsState container={service.parts} localState={state.parts} formState={state}>
         <Container compact parent noWrap vertical>
           <Container className={s(styles, { bar: true })} gap keepSize noWrap>
             <Container fill>
               <StatusMessage exception={getFirstException(state.exception)} type={state.statusType} message={state.statusMessage} />
-              <SContext registry={TabBigUnderlineStyleRegistry}>
-                <TabList className={s(styles, { tabList: true })} />
-              </SContext>
+              <TabList className={s(styles, { tabList: true })} underline big />
             </Container>
             <Container keepSize noWrap center gap compact>
               {onClose && (
@@ -61,8 +58,8 @@ export const BaseForm = observer<IBaseFormProps<any>>(function BaseForm({ servic
               </Button>
             </Container>
           </Container>
-          <Container vertical>
-            <TabPanelList />
+          <Container vertical overflow>
+            <TabPanelList contents />
           </Container>
         </Container>
       </TabsState>

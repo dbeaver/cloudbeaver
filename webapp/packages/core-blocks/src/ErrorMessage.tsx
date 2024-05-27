@@ -6,13 +6,13 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
+
 import { Button } from './Button';
+import styles from './ErrorMessage.m.css';
 import { IconOrImage } from './IconOrImage';
 import { useTranslate } from './localization/useTranslate';
-import { useS } from './useS';
-
-import styles from './ErrorMessage.m.css';
 import { s } from './s';
+import { useS } from './useS';
 
 interface Props {
   hasDetails?: boolean;
@@ -26,9 +26,11 @@ export const ErrorMessage = observer<Props>(function ErrorMessage({ text, classN
   const style = useS(styles);
 
   return (
-    <div className={s(style, { message: true }, className)}>
+    <div role="status" tabIndex={0} aria-label={text} className={s(style, { message: true }, className)}>
       <IconOrImage className={s(style, { errorIcon: true })} icon="/icons/error_icon_sm.svg" />
-      <div className={s(style, { messageBody: true })} title={text}>{text}</div>
+      <div className={s(style, { messageBody: true })} title={text}>
+        {text}
+      </div>
       <div className={s(style, { messageActions: true })}>
         {hasDetails && (
           <Button type="button" mod={['outlined']} onClick={onShowDetails}>

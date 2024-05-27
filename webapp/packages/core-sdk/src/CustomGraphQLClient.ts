@@ -5,7 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import axios, { AxiosProgressEvent, AxiosResponse, isAxiosError } from 'axios';
+import axios, { AxiosProgressEvent, AxiosResponse, CanceledError, isAxiosError, isCancel } from 'axios';
 import { ClientError, GraphQLClient, RequestDocument, RequestOptions, resolveRequestDocument, Variables } from 'graphql-request';
 
 import { GQLError } from './GQLError';
@@ -36,16 +36,17 @@ export class CustomGraphQLClient extends GraphQLClient {
     query?: string,
     variables?: V,
     onUploadProgress?: (event: UploadProgressEvent) => void,
+    signal?: AbortSignal,
   ): Promise<T> {
     return this.interceptors.reduce(
       (accumulator, interceptor) => interceptor(accumulator),
-      this.overrideFilesUpload<T, V>(url, file, query, variables, onUploadProgress),
+      this.overrideFilesUpload<T, V>(url, file, query, variables, onUploadProgress, signal),
     );
   }
 
   async uploadFiles<T = any, V extends Variables = Variables>(
     url: string,
-    files: FileList,
+    files: File[],
     query?: string,
     variables?: V,
     onUploadProgress?: (event: UploadProgressEvent) => void,
@@ -122,10 +123,11 @@ export class CustomGraphQLClient extends GraphQLClient {
 
   private async overrideFilesUpload<T, V extends Variables = Variables>(
     url: string,
-    files: FileList | Blob,
+    files: File[] | Blob,
     query?: string,
     variables?: V,
     onUploadProgress?: (event: UploadProgressEvent) => void,
+    signal?: AbortSignal,
   ): Promise<T> {
     this.blockRequestsReasonHandler();
     try {
@@ -139,13 +141,14 @@ export class CustomGraphQLClient extends GraphQLClient {
         fileData: undefined as any,
       };
 
-      if (files instanceof FileList) {
+      if (files instanceof Array) {
         data['files[]'] = files;
       } else {
         data.fileData = files;
       }
 
       const response = await axios.postForm/*<GqlResponse>*/ <T>(url, data, {
+        signal,
         onUploadProgress,
         responseType: 'json',
       });
@@ -156,6 +159,10 @@ export class CustomGraphQLClient extends GraphQLClient {
 
       return response.data;
     } catch (error: any) {
+      if (isCancel(error)) {
+        throw new CanceledError('ui_processing_canceled');
+      }
+
       if (isAxiosError(error) && error.response?.data.message) {
         throw new ServerInternalError({ ...error, message: error.response.data.message });
       }

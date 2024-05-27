@@ -23,7 +23,7 @@ import { ExtensionUtils } from '@cloudbeaver/core-extensions';
 import { LocalizationService } from '@cloudbeaver/core-localization';
 import { DATA_CONTEXT_NAV_NODE, EObjectFeature, NodeManagerUtils } from '@cloudbeaver/core-navigation-tree';
 import { ISessionAction, sessionActionContext, SessionActionService } from '@cloudbeaver/core-root';
-import { ACTION_RENAME, ActionService, DATA_CONTEXT_MENU_NESTED, menuExtractItems, MenuService, ViewService } from '@cloudbeaver/core-view';
+import { ACTION_RENAME, ActionService, menuExtractItems, MenuService, ViewService } from '@cloudbeaver/core-view';
 import { MENU_CONNECTIONS } from '@cloudbeaver/plugin-connections';
 import { NavigationTabsService } from '@cloudbeaver/plugin-navigation-tabs';
 import {
@@ -75,7 +75,7 @@ export class SqlEditorBootstrap extends Bootstrap {
     this.registerTopAppBarItem();
 
     this.menuService.addCreator({
-      isApplicable: context => context.has(DATA_CONTEXT_SQL_EDITOR_STATE) && context.has(DATA_CONTEXT_SQL_EDITOR_TAB),
+      contexts: [DATA_CONTEXT_SQL_EDITOR_STATE, DATA_CONTEXT_SQL_EDITOR_TAB],
       getItems: (context, items) => [...items, ACTION_RENAME],
       orderItems: (context, items) => {
         const actions = menuExtractItems(items, [ACTION_RENAME]);
@@ -89,18 +89,16 @@ export class SqlEditorBootstrap extends Bootstrap {
     });
 
     this.menuService.addCreator({
+      root: true,
+      contexts: [DATA_CONTEXT_CONNECTION],
       isApplicable: context => {
-        if (!context.has(DATA_CONTEXT_CONNECTION)) {
-          return false;
-        }
-
         const node = context.tryGet(DATA_CONTEXT_NAV_NODE);
 
         if (node && !node.objectFeatures.includes(EObjectFeature.dataSource)) {
           return false;
         }
 
-        return !context.has(DATA_CONTEXT_MENU_NESTED);
+        return true;
       },
       getItems: (context, items) => [...items, ACTION_SQL_EDITOR_OPEN],
     });
@@ -203,7 +201,7 @@ export class SqlEditorBootstrap extends Bootstrap {
 
     this.actionService.addHandler({
       id: 'sql-editor-new',
-      isActionApplicable: (context, action) => [ACTION_SQL_EDITOR_NEW].includes(action),
+      actions: [ACTION_SQL_EDITOR_NEW],
       isLabelVisible: () => false,
       getActionInfo: (context, action) => {
         const connectionContext = this.getActiveConnectionContext();

@@ -25,6 +25,7 @@ import io.cloudbeaver.service.security.PasswordPolicyConfiguration;
 import io.cloudbeaver.service.security.SMControllerConfiguration;
 import io.cloudbeaver.utils.WebAppUtils;
 import org.jkiss.code.NotNull;
+import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.ModelPreferences;
@@ -282,8 +283,13 @@ public abstract class CBServerConfigurationController<T extends CBServerConfig>
         Map<String, Object> configProps = new LinkedHashMap<>();
         if (Files.exists(configPath)) {
             log.debug("Read configuration [" + configPath.toAbsolutePath() + "]");
+
+            configProps.putAll(readConfigurationFile(configPath));
+
+            var mergedOriginalConfigs = WebAppUtils.mergeConfigurations(configProps, originalConfigurationProperties);
+            this.originalConfigurationProperties.clear();
             // saves original configuration file
-            this.originalConfigurationProperties.putAll(readConfigurationFile(configPath));
+            this.originalConfigurationProperties.putAll(mergedOriginalConfigs);
 
             configProps.putAll(readConfigurationFile(configPath));
             patchConfigurationWithProperties(configProps); // patch original properties
@@ -361,6 +367,11 @@ public abstract class CBServerConfigurationController<T extends CBServerConfig>
         } catch (IOException e) {
             throw new DBException("Error writing runtime configuration", e);
         }
+    }
+
+
+    public void updateServerUrl(@NotNull SMCredentialsProvider credentialsProvider, @Nullable String newPublicUrl) throws DBException {
+        getServerConfiguration().setServerURL(newPublicUrl);
     }
 
     protected Map<String, Object> collectConfigurationProperties(

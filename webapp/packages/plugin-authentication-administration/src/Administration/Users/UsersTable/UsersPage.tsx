@@ -40,7 +40,7 @@ export const UsersPage = observer<Props>(function UsersPage({ param }) {
 
   return (
     <ColoredContainer vertical wrap gap parent maximum>
-      <Group keepSize box maximum>
+      <Group keepSize box>
         <UsersAdministrationToolsPanel onUpdate={table.update} />
       </Group>
 
@@ -50,9 +50,7 @@ export const UsersPage = observer<Props>(function UsersPage({ param }) {
 
       <Container overflow gap maximum>
         {create && createUserService.state && !userManagementDisabled && (
-          <Group box>
-            <CreateUser state={createUserService.state} onCancel={createUserService.cancelCreate} />
-          </Group>
+          <CreateUser state={createUserService.state} onCancel={createUserService.cancelCreate} />
         )}
 
         <Placeholder container={createUserService.toolsContainer} param={param} />

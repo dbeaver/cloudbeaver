@@ -9,13 +9,13 @@ import { IconOrImage, s, useS } from '@cloudbeaver/core-blocks';
 
 import TabIconStyles from './TabIcon.m.css';
 
-interface IProps {
+export interface TabIconProps {
   icon?: string;
   viewBox?: string;
   className?: string;
 }
 
-export const TabIcon: React.FC<IProps> = function TabIcon({ icon, viewBox, className }) {
+export const TabIcon: React.FC<TabIconProps> = function TabIcon({ icon, viewBox, className }) {
   const styles = useS(TabIconStyles);
 
   return (

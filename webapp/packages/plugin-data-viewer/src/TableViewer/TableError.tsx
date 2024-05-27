@@ -7,77 +7,14 @@
  */
 import { observable } from 'mobx';
 import { observer } from 'mobx-react-lite';
-import styled, { css, use } from 'reshadow';
+import { useEffect } from 'react';
 
-import { Button, IconOrImage, useErrorDetails, useObservableRef, useStateDelay, useTranslate } from '@cloudbeaver/core-blocks';
+import { Button, IconOrImage, s, useErrorDetails, useObservableRef, useS, useStateDelay, useTranslate } from '@cloudbeaver/core-blocks';
 import { ServerErrorType, ServerInternalError } from '@cloudbeaver/core-sdk';
 import { errorOf } from '@cloudbeaver/core-utils';
 
 import type { IDatabaseDataModel } from '../DatabaseDataModel/IDatabaseDataModel';
-import { useEffect } from 'react';
-
-const style = css`
-  error {
-    composes: theme-background-surface theme-text-on-surface from global;
-    position: absolute;
-    box-sizing: border-box;
-    width: 100%;
-    height: 100%;
-    padding: 16px;
-    overflow: auto;
-    pointer-events: none;
-    bottom: 0;
-    right: 0;
-    z-index: 1;
-    opacity: 0;
-    transition: opacity 0.3s ease-in-out, width 0.3s ease-in-out, height 0.3s ease-in-out, background 0.3s ease-in-out;
-
-    &[|animated] {
-      overflow: hidden;
-      pointer-events: auto;
-      opacity: 1;
-    }
-    &[|collapsed] {
-      pointer-events: auto;
-      width: 92px;
-      height: 72px;
-      background: transparent !important;
-
-      & IconOrImage {
-        cursor: pointer;
-      }
-
-      & error-message,
-      & controls {
-        display: none;
-      }
-    }
-    &[|errorHidden] {
-      pointer-events: none;
-      overflow: hidden;
-    }
-  }
-  error-body {
-    display: flex;
-    gap: 24px;
-    align-items: center;
-    margin-bottom: 24px;
-  }
-  error-message {
-    white-space: pre-wrap;
-  }
-  IconOrImage {
-    width: 40px;
-    height: 40px;
-  }
-  controls {
-    display: flex;
-    gap: 16px;
-    & > Button {
-      flex-shrink: 0;
-    }
-  }
-`;
+import styles from './TableError.m.css';
 
 interface Props {
   model: IDatabaseDataModel;
@@ -94,6 +31,7 @@ interface ErrorInfo {
 
 export const TableError = observer<Props>(function TableError({ model, loading, className }) {
   const translate = useTranslate();
+  const style = useS(styles);
   const errorInfo = useObservableRef<ErrorInfo>(
     () => ({
       error: null,
@@ -144,25 +82,30 @@ export const TableError = observer<Props>(function TableError({ model, loading, 
     }
   }, [errorInfo, model.source.error]);
 
-  return styled(style)(
-    <error {...use({ animated, collapsed: !errorInfo.display, errorHidden })} className={className}>
-      <error-body>
-        <IconOrImage icon={icon} title={error.message} onClick={() => errorInfo.show()} />
-        <error-message>{error.message}</error-message>
-      </error-body>
-      <controls>
-        <Button type="button" mod={['outlined']} onClick={() => errorInfo.hide()}>
+  return (
+    <div
+      role="status"
+      aria-label={error.message}
+      tabIndex={0}
+      className={s(style, { error: true, animated, collapsed: !errorInfo.display, errorHidden }, className)}
+    >
+      <div className={s(style, { errorBody: true })}>
+        <IconOrImage className={s(style, { iconOrImage: true })} icon={icon} title={error.message} onClick={() => errorInfo.show()} />
+        <div className={s(style, { errorMessage: true })}>{error.message}</div>
+      </div>
+      <div className={s(style, { controls: true })}>
+        <Button className={s(style, { button: true })} type="button" mod={['outlined']} onClick={() => errorInfo.hide()}>
           {translate('ui_error_close')}
         </Button>
         {error.hasDetails && (
-          <Button type="button" mod={['outlined']} onClick={error.open}>
+          <Button className={s(style, { button: true })} type="button" mod={['outlined']} onClick={error.open}>
             {translate('ui_errors_details')}
           </Button>
         )}
-        <Button type="button" mod={['unelevated']} onClick={onRetry}>
+        <Button className={s(style, { button: true })} type="button" mod={['unelevated']} onClick={onRetry}>
           {translate('ui_processing_retry')}
         </Button>
-      </controls>
-    </error>,
+      </div>
+    </div>
   );
 });

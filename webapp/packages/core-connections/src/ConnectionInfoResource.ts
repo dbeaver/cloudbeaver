@@ -601,7 +601,7 @@ export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoPar
   protected validateKey(key: IConnectionInfoParams): boolean {
     const parse = CONNECTION_INFO_PARAM_SCHEMA.safeParse(toJS(key));
     if (!parse.success) {
-      this.logger.warn(`Invalid resource key ${schemaValidationError(parse.error).toString()}`);
+      this.logger.warn(`Invalid resource key ${(schemaValidationError(parse.error).toString(), { prefix: null })}`);
     }
     return parse.success;
   }

@@ -6,7 +6,6 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import styled, { css } from 'reshadow';
 
 import { Radio, TextPlaceholder, useTranslate } from '@cloudbeaver/core-blocks';
 import type { TabContainerPanelComponent } from '@cloudbeaver/core-ui';
@@ -17,17 +16,8 @@ import { ResultSetSelectAction } from '../../DatabaseDataModel/Actions/ResultSet
 import { ResultSetViewAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetViewAction';
 import type { IDatabaseResultSet } from '../../DatabaseDataModel/IDatabaseResultSet';
 import type { IDataValuePanelProps } from '../../TableViewer/ValuePanel/DataValuePanelService';
+import classes from './BooleanValuePresentation.m.css';
 import { isStringifiedBoolean } from './isBooleanValuePresentationAvailable';
-
-const styles = css`
-  container {
-    display: flex;
-    flex-direction: column;
-  }
-  Radio {
-    padding: 0;
-  }
-`;
 
 export const BooleanValuePresentation: TabContainerPanelComponent<IDataValuePanelProps<any, IDatabaseResultSet>> = observer(
   function BooleanValuePresentation({ model, resultIndex }) {
@@ -63,20 +53,41 @@ export const BooleanValuePresentation: TabContainerPanelComponent<IDataValuePane
     const nullable = column?.required === false;
     const readonly = model.isReadonly(resultIndex) || model.isDisabled(resultIndex) || format.isReadOnly(firstSelectedCell);
 
-    return styled(styles)(
-      <container>
-        <Radio id="true_value" mod={['primary']} checked={value === true} disabled={readonly} onClick={() => editor.set(firstSelectedCell, true)}>
+    return (
+      <div className={classes.container}>
+        <Radio
+          className={classes.radio}
+          id="true_value"
+          mod={['primary']}
+          checked={value === true}
+          disabled={readonly}
+          onClick={() => editor.set(firstSelectedCell, true)}
+        >
           TRUE
         </Radio>
-        <Radio id="false_value" mod={['primary']} checked={value === false} disabled={readonly} onClick={() => editor.set(firstSelectedCell, false)}>
+        <Radio
+          className={classes.radio}
+          id="false_value"
+          mod={['primary']}
+          checked={value === false}
+          disabled={readonly}
+          onClick={() => editor.set(firstSelectedCell, false)}
+        >
           FALSE
         </Radio>
         {nullable && (
-          <Radio id="null_value" mod={['primary']} checked={value === null} disabled={readonly} onClick={() => editor.set(firstSelectedCell, null)}>
+          <Radio
+            className={classes.radio}
+            id="null_value"
+            mod={['primary']}
+            checked={value === null}
+            disabled={readonly}
+            onClick={() => editor.set(firstSelectedCell, null)}
+          >
             NULL
           </Radio>
         )}
-      </container>,
+      </div>
     );
   },
 );

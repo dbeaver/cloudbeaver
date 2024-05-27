@@ -154,17 +154,17 @@ export class DatabaseDataModel<TOptions, TResult extends IDatabaseDataResult = I
     }
   }
 
-  cancel(): Promise<void> | void {
-    return this.source.cancel();
+  async cancel(): Promise<void> {
+    await this.source.cancel();
   }
 
   resetData(): void {
     this.source.resetData();
   }
 
-  async dispose(): Promise<void> {
+  async dispose(keepExecutionContext = false): Promise<void> {
     await this.onDispose.execute();
-    await this.source.dispose();
+    await this.source.dispose(keepExecutionContext);
   }
 
   async requestSaveAction(action: () => Promise<void> | void): Promise<void> {

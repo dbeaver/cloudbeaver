@@ -7,14 +7,14 @@
  */
 import type { PluginManifest } from '@cloudbeaver/core-di';
 
-import { LocaleService } from './LocaleService';
-import { LogViewerBootstrap } from './LogViewer/LogViewerBootstrap';
-import { LogViewerService } from './LogViewer/LogViewerService';
-import { LogViewerSettingsService } from './LogViewer/LogViewerSettingsService';
-import { SessionLogsEventHandler } from './SessionLogsEventHandler';
-import { SessionLogsResource } from './SessionLogsResource';
-
 export const logViewerPlugin: PluginManifest = {
   info: { name: 'Log viewer plugin' },
-  providers: [LogViewerBootstrap, LogViewerService, LocaleService, LogViewerSettingsService, SessionLogsResource, SessionLogsEventHandler],
+  providers: [
+    () => import('./LogViewer/LogViewerBootstrap').then(m => m.LogViewerBootstrap),
+    () => import('./LogViewer/LogViewerService').then(m => m.LogViewerService),
+    () => import('./LocaleService').then(m => m.LocaleService),
+    () => import('./LogViewer/LogViewerSettingsService').then(m => m.LogViewerSettingsService),
+    () => import('./SessionLogsResource').then(m => m.SessionLogsResource),
+    () => import('./SessionLogsEventHandler').then(m => m.SessionLogsEventHandler),
+  ],
 };

@@ -74,6 +74,14 @@ export function useGridSelectedCellsCopy(
 
   const onKeydownHandler = useCallback((event: React.KeyboardEvent) => {
     if ((event.ctrlKey || event.metaKey) && event.nativeEvent.code === EVENT_KEY_CODE.C) {
+      const activeElement = document.activeElement as HTMLElement | null;
+      if (
+        activeElement?.getAttribute('role') !== 'gridcell' &&
+        activeElement?.getAttribute('role') !== 'columnheader' &&
+        event.target !== event.currentTarget
+      ) {
+        return;
+      }
       EventContext.set(event, EventStopPropagationFlag);
 
       if (dataViewerService.canCopyData) {

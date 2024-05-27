@@ -685,6 +685,10 @@ public abstract class CBApplication<T extends CBServerConfig> extends BaseWebApp
         return List.of();
     }
 
+    public List<String> getAvailableTeamRoles() {
+        return List.of();
+    }
+
     @Override
     public WSEventController getEventController() {
         return eventController;

@@ -33,7 +33,9 @@ import org.jkiss.dbeaver.model.DBPDataSource;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
 import org.jkiss.dbeaver.model.DBUtils;
 import org.jkiss.dbeaver.model.data.DBDAttributeBinding;
-import org.jkiss.dbeaver.model.exec.*;
+import org.jkiss.dbeaver.model.exec.DBCException;
+import org.jkiss.dbeaver.model.exec.DBCLogicalOperator;
+import org.jkiss.dbeaver.model.exec.DBExecUtils;
 import org.jkiss.dbeaver.model.impl.sql.BasicSQLDialect;
 import org.jkiss.dbeaver.model.navigator.DBNNode;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
@@ -555,7 +557,7 @@ public class WebServiceSQL implements DBWServiceSQL {
                 try {
                     monitor.beginTask("Get row data count", 1);
                     WebSQLResultsInfo results = contextInfo.getResults(resultsId);
-                    long rowCount = DBUtils.readRowCount(webSession.getProgressMonitor(), contextInfo.getProcessor().getExecutionContext(), results.getDataContainer(), null, this);
+                    long rowCount = DBUtils.readRowCount(monitor, contextInfo.getProcessor().getExecutionContext(), results.getDataContainer(), null, this);
                     this.result = "Row data count completed";
                     this.extendedResults = rowCount;
                 } catch (Throwable e) {

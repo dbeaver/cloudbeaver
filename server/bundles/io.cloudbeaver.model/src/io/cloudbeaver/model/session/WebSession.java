@@ -56,6 +56,7 @@ import org.jkiss.dbeaver.model.fs.DBFFileSystemManager;
 import org.jkiss.dbeaver.model.meta.Association;
 import org.jkiss.dbeaver.model.meta.Property;
 import org.jkiss.dbeaver.model.navigator.DBNModel;
+import org.jkiss.dbeaver.model.preferences.DBPPreferenceStore;
 import org.jkiss.dbeaver.model.rm.RMController;
 import org.jkiss.dbeaver.model.rm.RMProject;
 import org.jkiss.dbeaver.model.rm.RMProjectType;
@@ -643,6 +644,25 @@ public class WebSession extends BaseWebSession
         super.close();
     }
 
+    @Override
+    public void close(boolean clearTokens, boolean sendSessionExpiredEvent) {
+        try {
+            resetNavigationModel();
+            resetSessionCache();
+        } catch (Throwable e) {
+            log.error(e);
+        }
+        if (clearTokens) {
+            try {
+                clearAuthTokens();
+            } catch (Exception e) {
+                log.error("Error closing web session tokens");
+            }
+        }
+        this.userContext.setUser(null);
+        super.close(clearTokens, sendSessionExpiredEvent);
+    }
+
     private List<WebAuthInfo> clearAuthTokens() throws DBException {
         ArrayList<WebAuthInfo> tokensCopy;
         synchronized (authTokens) {
@@ -1106,6 +1126,11 @@ public class WebSession extends BaseWebSession
             throw new DBException("Project not found: " + projectId);
         }
         return project.getFileSystemManager();
+    }
+
+    @NotNull
+    public DBPPreferenceStore getUserPreferenceStore() {
+        return getUserContext().getPreferenceStore();
     }
 
     private class SessionProgressMonitor extends BaseProgressMonitor {

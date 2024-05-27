@@ -7,13 +7,14 @@
  */
 import type { PluginManifest } from '@cloudbeaver/core-di';
 
-import { LocaleService } from './LocaleService';
-import { TransactionManagerBootstrap } from './TransactionManagerBootstrap';
-
 export const datasourceTransactionManagerPlugin: PluginManifest = {
   info: {
     name: 'Datasource transaction manager plugin',
   },
 
-  providers: [TransactionManagerBootstrap, LocaleService],
+  providers: [
+    () => import('./TransactionManagerBootstrap').then(m => m.TransactionManagerBootstrap),
+    () => import('./TransactionManagerSettingsService').then(m => m.TransactionManagerSettingsService),
+    () => import('./LocaleService').then(m => m.LocaleService),
+  ],
 };

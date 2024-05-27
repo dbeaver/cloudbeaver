@@ -74,13 +74,16 @@ public class WebAppUtils {
     }
 
     @SuppressWarnings("unchecked")
-    public static Map<String, Object> mergeConfigurations(Map<String, Object> origin, Map<String, Object> additional) {
+    public static Map<String, Object> mergeConfigurations(
+        Map<String, Object> priorityConfiguration,
+        Map<String, Object> additional
+    ) {
         var resultConfig = new HashMap<String, Object>();
-        Set<String> rootKeys = new HashSet<>(origin.keySet());
+        Set<String> rootKeys = new HashSet<>(priorityConfiguration.keySet());
         rootKeys.addAll(additional.keySet());
 
         for (var rootKey : rootKeys) {
-            var originValue = origin.get(rootKey);
+            var originValue = priorityConfiguration.get(rootKey);
             var additionalValue = additional.get(rootKey);
 
             if (originValue == null || additionalValue == null) {

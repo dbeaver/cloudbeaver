@@ -1,3 +1,10 @@
+/*
+ * CloudBeaver - Cloud Database Manager
+ * Copyright (C) 2020-2024 DBeaver Corp and others
+ *
+ * Licensed under the Apache License, Version 2.0.
+ * you may not use this file except in compliance with the License.
+ */
 .notification {
   composes: theme-background-surface theme-text-on-surface theme-elevation-z5 from global;
   position: relative;
@@ -10,7 +17,9 @@
   line-height: 1.5;
   opacity: 0;
   border-radius: var(--theme-group-element-radius);
-  transition: opacity 0.3s ease-in-out, transform 0.5s ease-in-out;
+  transition:
+    opacity 0.3s ease-in-out,
+    transform 0.5s ease-in-out;
   transform: translateX(-100%);
 
   &.mounted {
@@ -21,21 +30,14 @@
   &.closing {
     opacity: 0;
     transform: translateX(-100%);
-    transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
+    transition:
+      opacity 0.5s ease-in-out,
+      transform 0.5s ease-in-out;
   }
 }
 
 .iconButton {
   position: absolute;
-
-  &.large {
-    top: 8px;
-    right: 8px;
-    height: 22px;
-    width: 22px;
-  }
-
-  &:hover {
-    opacity: 0.7;
-  }
+  top: 8px;
+  right: 8px;
 }

@@ -7,9 +7,8 @@
  */
 import { observer } from 'mobx-react-lite';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import styled from 'reshadow';
 
-import { TextPlaceholder, useObjectRef, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
+import { TextPlaceholder, useObjectRef, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { EventContext, EventStopPropagationFlag } from '@cloudbeaver/core-events';
 import { Executor } from '@cloudbeaver/core-executor';
@@ -31,7 +30,7 @@ import '@cloudbeaver/plugin-react-data-grid/react-data-grid-dist/lib/styles.css'
 
 import { CellPosition, EditingContext } from '../Editing/EditingContext';
 import { useEditing } from '../Editing/useEditing';
-import baseStyles from '../styles/base.scss';
+import '../styles/base.scss';
 import { reactGridStyles } from '../styles/styles';
 import { CellRenderer } from './CellRenderer/CellRenderer';
 import { DataGridContext, IColumnResizeInfo, IDataGridContext } from './DataGridContext';
@@ -55,6 +54,7 @@ function isAtBottom(event: React.UIEvent<HTMLDivElement>): boolean {
 
 const rowHeight = 25;
 const headerHeight = 28;
+const MAX_CELL_TEXT_SIZE = 100 * 1024;
 
 export const DataGridTable = observer<IDataPresentationProps<any, IDatabaseResultSet>>(function DataGridTable({
   model,
@@ -77,13 +77,13 @@ export const DataGridTable = observer<IDataPresentationProps<any, IDatabaseResul
     }),
     false,
   );
-  const styles = useStyles(reactGridStyles, baseStyles);
   const [columnResize] = useState(() => new Executor<IColumnResizeInfo>());
 
   const selectionAction = model.source.getAction(resultIndex, ResultSetSelectAction);
 
   const focusSyncRef = useRef<CellPosition | null>(null);
 
+  const tableData = useTableData(model, resultIndex, dataGridDivRef);
   const editingContext = useEditing({
     readonly: model.isReadonly(resultIndex) || model.isDisabled(resultIndex),
     onEdit: (position, code, key) => {
@@ -116,6 +116,14 @@ export const DataGridTable = observer<IDataPresentationProps<any, IDatabaseResul
           }
       }
 
+      const isTruncated = tableData.dataContent.isTextTruncated(cellKey) || tableData.dataContent.isBlobTruncated(cellKey);
+      const isHugeText = tableData.format.getText(cellKey).length > MAX_CELL_TEXT_SIZE;
+
+      if (isHugeText || isTruncated) {
+        actions.setValuePresentation('value-text-presentation');
+        return false;
+      }
+
       return true;
     },
     onCloseEditor: () => {
@@ -123,18 +131,17 @@ export const DataGridTable = observer<IDataPresentationProps<any, IDatabaseResul
     },
   });
 
-  const tableData = useTableData(model, resultIndex, dataGridDivRef);
   const gridSelectionContext = useGridSelectionContext(tableData, selectionAction);
 
   function restoreFocus() {
     const gridDiv = gridContainerRef.current;
-    const focusSink = gridDiv?.querySelector<HTMLDivElement>('[tabindex="0"]');
+    const focusSink = gridDiv?.querySelector<HTMLDivElement>('[aria-selected="true"]');
     focusSink?.focus();
   }
 
   function isGridInFocus(): boolean {
     const gridDiv = gridContainerRef.current;
-    const focusSink = gridDiv?.querySelector('[tabindex="0"]');
+    const focusSink = gridDiv?.querySelector('[aria-selected="true"]');
 
     if (!gridDiv || !focusSink) {
       return false;
@@ -271,6 +278,8 @@ export const DataGridTable = observer<IDataPresentationProps<any, IDatabaseResul
 
     editingContext.edit({ idx, rowIdx }, event.nativeEvent.code, event.key);
   }
+
+  useS(reactGridStyles);
 
   useEffect(() => {
     function syncEditor(data: IResultSetEditActionData) {
@@ -419,12 +428,12 @@ export const DataGridTable = observer<IDataPresentationProps<any, IDatabaseResul
     return <TextPlaceholder>{translate('data_grid_table_empty_placeholder')}</TextPlaceholder>;
   }
 
-  return styled(styles)(
+  return (
     <DataGridContext.Provider value={gridContext}>
       <DataGridSelectionContext.Provider value={gridSelectionContext}>
         <EditingContext.Provider value={editingContext}>
           <TableDataContext.Provider value={tableData}>
-            <grid-container
+            <div
               ref={setContainersRef}
               className="cb-react-grid-container"
               tabIndex={-1}
@@ -453,10 +462,10 @@ export const DataGridTable = observer<IDataPresentationProps<any, IDatabaseResul
                 onScroll={handleScroll}
               />
               <div ref={editorRef} />
-            </grid-container>
+            </div>
           </TableDataContext.Provider>
         </EditingContext.Provider>
       </DataGridSelectionContext.Provider>
-    </DataGridContext.Provider>,
+    </DataGridContext.Provider>
   );
 });

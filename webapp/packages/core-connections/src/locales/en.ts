@@ -1,3 +1,10 @@
+/*
+ * CloudBeaver - Cloud Database Manager
+ * Copyright (C) 2020-2024 DBeaver Corp and others
+ *
+ * Licensed under the Apache License, Version 2.0.
+ * you may not use this file except in compliance with the License.
+ */
 export default [
   ['core_connections_connections_settings_group', 'Connections'],
   ['connections_administration_item', 'Connection Templates'],
@@ -28,7 +35,7 @@ export default [
   ['connections_connection_create_search_database', 'Search'],
   ['connections_connection_edit_save_credentials', 'Save credentials'],
   ['connections_connection_share_credentials', 'Share credentials'],
-  ['connections_connection_share_credentials_tooltip', 'Share credentials across all users'],
+  ['connections_connection_share_credentials_tooltip', 'Share credentials based on the team'],
   ['connections_connection_credentials_provisioning', 'Authentication credentials'],
   ['connections_connection_credentials_provisioning_description', 'You need to fill in or confirm the credentials to test this connection'],
   ['connections_connection_edit_authentication', 'Authentication'],

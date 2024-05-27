@@ -7,7 +7,7 @@
  */
 import { addKnownWarn, consoleSpy } from '@cloudbeaver/tests-runner';
 
-const DEPRECATED_SETTING_MESSAGE_REGEX = /You are using deprecated settings.*/;
+const DEPRECATED_SETTING_MESSAGE_REGEX = /You have deprecated settings:*/;
 
 beforeAll(async () => {
   addKnownWarn(DEPRECATED_SETTING_MESSAGE_REGEX);
@@ -15,7 +15,7 @@ beforeAll(async () => {
 
 export function expectDeprecatedSettingMessage(deprecated?: string, key?: string) {
   if (deprecated && key) {
-    expect(consoleSpy.warn).toHaveBeenCalledWith(expect.stringMatching(`You are using deprecated settings: "${deprecated}". Use "${key}" instead.`));
+    expect(consoleSpy.warn).toHaveBeenCalledWith(expect.stringMatching(`You have deprecated settings: "${deprecated}". Use "${key}" instead.`));
   } else {
     expect(consoleSpy.warn).toHaveBeenCalledWith(expect.stringMatching(DEPRECATED_SETTING_MESSAGE_REGEX));
   }

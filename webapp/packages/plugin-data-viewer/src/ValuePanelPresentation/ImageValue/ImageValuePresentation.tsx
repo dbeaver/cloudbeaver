@@ -156,7 +156,7 @@ export const ImageValuePresentation: TabContainerPanelComponent<IDataValuePanelP
         },
         async upload() {
           selectFiles(files => {
-            const file = files?.item(0) ?? undefined;
+            const file = files?.[0] ?? undefined;
             if (file && this.selectedCell) {
               this.editAction.set(this.selectedCell, createResultSetBlobValue(file));
             }
@@ -231,7 +231,7 @@ export const ImageValuePresentation: TabContainerPanelComponent<IDataValuePanelP
           </Loader>
         </Container>
         <Container gap dense keepSize>
-          <Container keepSize flexStart center>
+          <Container keepSize flexStart noWrap>
             {data.canSave && (
               <ActionIconButton title={translate('ui_download')} name="/icons/export.svg" disabled={loading} img onClick={debouncedDownload} />
             )}
@@ -240,7 +240,7 @@ export const ImageValuePresentation: TabContainerPanelComponent<IDataValuePanelP
             )}
           </Container>
           <Fill />
-          <Container keepSize flexEnd center>
+          <Container keepSize flexEnd>
             <ActionIconButton
               title={translate(state.stretch ? 'data_viewer_presentation_value_image_original_size' : 'data_viewer_presentation_value_image_fit')}
               name={state.stretch ? 'img-original-size' : 'img-fit-size'}

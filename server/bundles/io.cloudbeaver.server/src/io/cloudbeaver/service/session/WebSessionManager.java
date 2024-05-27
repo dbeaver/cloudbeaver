@@ -25,6 +25,7 @@ import io.cloudbeaver.model.session.WebSessionAuthProcessor;
 import io.cloudbeaver.registry.WebHandlerRegistry;
 import io.cloudbeaver.registry.WebSessionHandlerDescriptor;
 import io.cloudbeaver.server.CBApplication;
+import io.cloudbeaver.server.events.WSWebUtils;
 import io.cloudbeaver.service.DBWSessionHandler;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -274,7 +275,7 @@ public class WebSessionManager {
 
     public Collection<BaseWebSession> getAllActiveSessions() {
         synchronized (sessionMap) {
-            return sessionMap.values();
+            return new ArrayList<>(sessionMap.values());
         }
     }
 
@@ -346,7 +347,7 @@ public class WebSessionManager {
         }
     }
 
-    public void closeUserSessions(@NotNull String userId) {
+    public void closeUserSession(@NotNull String userId) {
         synchronized (sessionMap) {
             for (Iterator<BaseWebSession> iterator = sessionMap.values().iterator(); iterator.hasNext(); ) {
                 var session = iterator.next();
@@ -354,6 +355,31 @@ public class WebSessionManager {
                     iterator.remove();
                     session.close();
                 }
+            }
+        }
+    }
+
+    public void closeSessions(@NotNull List<String> smSessionsId) {
+        synchronized (sessionMap) {
+            for (Iterator<BaseWebSession> iterator = sessionMap.values().iterator(); iterator.hasNext(); ) {
+                var session = iterator.next();
+                if (smSessionsId.contains(session.getUserContext().getSmSessionId())) {
+                    iterator.remove();
+                    session.close(false, true);
+                }
+            }
+        }
+    }
+
+    /**
+     * Closes all sessions in session manager.
+     */
+    public void closeAllSessions(@Nullable String initiatorSessionId) {
+        synchronized (sessionMap) {
+            for (Iterator<BaseWebSession> iterator = sessionMap.values().iterator(); iterator.hasNext(); ) {
+                var session = iterator.next();
+                iterator.remove();
+                session.close(false, !WSWebUtils.isSessionIdEquals(session, initiatorSessionId));
             }
         }
     }

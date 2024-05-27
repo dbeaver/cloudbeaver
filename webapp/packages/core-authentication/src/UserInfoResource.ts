@@ -26,6 +26,7 @@ export interface ILoginOptions {
   credentials?: IAuthCredentials;
   configurationId?: string;
   linkUser?: boolean;
+  forceSessionsLogout?: boolean;
 }
 
 export const ANONYMOUS_USER_ID = 'anonymous';
@@ -37,6 +38,10 @@ export class UserInfoResource extends CachedDataResource<UserInfo | null, void, 
 
   get authRole(): ELMRole | undefined {
     return this.data?.authRole as ELMRole | undefined;
+  }
+
+  get teams() {
+    return this.data?.teams || [];
   }
 
   get parametersAvailable() {
@@ -86,7 +91,7 @@ export class UserInfoResource extends CachedDataResource<UserInfo | null, void, 
     return this.data.authTokens.some(token => token.authProvider === providerId);
   }
 
-  async login(provider: string, { credentials, configurationId, linkUser }: ILoginOptions): Promise<AuthInfo> {
+  async login(provider: string, { credentials, configurationId, linkUser, forceSessionsLogout }: ILoginOptions): Promise<AuthInfo> {
     let processedCredentials: Record<string, any> | undefined;
 
     if (credentials) {
@@ -100,6 +105,7 @@ export class UserInfoResource extends CachedDataResource<UserInfo | null, void, 
       credentials: processedCredentials,
       linkUser,
       customIncludeOriginDetails: true,
+      forceSessionsLogout,
     });
 
     if (authInfo.userTokens && authInfo.authStatus === AuthStatus.Success) {

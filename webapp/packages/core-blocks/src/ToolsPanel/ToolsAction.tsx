@@ -17,12 +17,13 @@ import style from './ToolsAction.m.css';
 interface Props extends Omit<ButtonHTMLAttributes<any>, 'onClick'> {
   icon?: string;
   viewBox?: string;
+  svg?: boolean;
   loading?: boolean;
   className?: string;
   onClick?: (event: React.MouseEvent<HTMLButtonElement>) => Promise<any> | any;
 }
 
-export const ToolsAction: React.FC<Props> = function ToolsAction({ icon, viewBox, disabled, loading, children, className, onClick, ...rest }) {
+export const ToolsAction: React.FC<Props> = function ToolsAction({ icon, viewBox, disabled, svg, loading, children, className, onClick, ...rest }) {
   const styles = useS(style);
   const [loadingState, setLoadingState] = useState(false);
 
@@ -40,8 +41,8 @@ export const ToolsAction: React.FC<Props> = function ToolsAction({ icon, viewBox
 
   return (
     <button type="button" disabled={disabled} onClick={handleClick} {...rest} className={s(styles, { button: true }, className)}>
-      {loading && <Loader className={s(styles, { loader: true })} small />}
-      {!loading && icon && <IconOrImage className={s(styles, { iconOrImage: true })} icon={icon} viewBox={viewBox} />}
+      {loading && <Loader small />}
+      {!loading && icon && <IconOrImage className={s(styles, { iconOrImage: true })} icon={icon} viewBox={viewBox} svg={svg} />}
       {children && <div className={s(styles, { buttonLabel: true })}>{children}</div>}
     </button>
   );

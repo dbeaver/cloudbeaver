@@ -3,8 +3,8 @@ Bundle-ManifestVersion: 2
 Bundle-Vendor: DBeaver Corp
 Bundle-Name: Cloudbeaver Web Model
 Bundle-SymbolicName: io.cloudbeaver.model;singleton:=true
-Bundle-Version: 1.0.50.qualifier
-Bundle-Release-Date: 20240408
+Bundle-Version: 1.0.54.qualifier
+Bundle-Release-Date: 20240603
 Bundle-RequiredExecutionEnvironment: JavaSE-17
 Bundle-ActivationPolicy: lazy
 Bundle-ClassPath: .
@@ -22,6 +22,7 @@ Require-Bundle: org.jkiss.dbeaver.data.gis;visibility:=reexport,
 Export-Package: io.cloudbeaver,
  io.cloudbeaver.auth,
  io.cloudbeaver.auth.provider,
+ io.cloudbeaver.auth.provider.fa,
  io.cloudbeaver.auth.provider.local,
  io.cloudbeaver.auth.provisioning,
  io.cloudbeaver.websocket,

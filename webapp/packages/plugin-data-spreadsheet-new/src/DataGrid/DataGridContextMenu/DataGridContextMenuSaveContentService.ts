@@ -8,19 +8,16 @@
 import { selectFiles } from '@cloudbeaver/core-browser';
 import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
-import {
-  createResultSetBlobValue,
-  ResultSetDataContentAction,
-  ResultSetDataKeysUtils,
-  ResultSetEditAction,
-  ResultSetFormatAction,
-} from '@cloudbeaver/plugin-data-viewer';
+import { createResultSetBlobValue, ResultSetDataContentAction, ResultSetEditAction, ResultSetFormatAction } from '@cloudbeaver/plugin-data-viewer';
 
 import { DataGridContextMenuService } from './DataGridContextMenuService';
 
 @injectable()
 export class DataGridContextMenuSaveContentService {
-  constructor(private readonly dataGridContextMenuService: DataGridContextMenuService, private readonly notificationService: NotificationService) {}
+  constructor(
+    private readonly dataGridContextMenuService: DataGridContextMenuService,
+    private readonly notificationService: NotificationService,
+  ) {}
 
   register(): void {
     this.dataGridContextMenuService.add(this.dataGridContextMenuService.getMenuToken(), {
@@ -60,7 +57,7 @@ export class DataGridContextMenuSaveContentService {
       onClick: async context => {
         selectFiles(files => {
           const edit = context.data.model.source.getAction(context.data.resultIndex, ResultSetEditAction);
-          const file = files?.item(0) ?? undefined;
+          const file = files?.[0] ?? undefined;
           if (file) {
             edit.set(context.data.key, createResultSetBlobValue(file));
           }
@@ -68,7 +65,8 @@ export class DataGridContextMenuSaveContentService {
       },
       isHidden: context => {
         const format = context.data.model.source.getAction(context.data.resultIndex, ResultSetFormatAction);
-        return !format.isBinary(context.data.key);
+
+        return !format.isBinary(context.data.key) || context.data.model.isReadonly(context.data.resultIndex);
       },
       isDisabled: context => {
         const content = context.data.model.source.getAction(context.data.resultIndex, ResultSetDataContentAction);

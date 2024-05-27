@@ -1,3 +1,10 @@
+/*
+ * CloudBeaver - Cloud Database Manager
+ * Copyright (C) 2020-2024 DBeaver Corp and others
+ *
+ * Licensed under the Apache License, Version 2.0.
+ * you may not use this file except in compliance with the License.
+ */
 export default [
   ['name', 'en'],
   ['ui_rename_taken_or_invalid', 'This name is unavailable or invalid'],
@@ -11,6 +18,7 @@ export default [
   ['ui_processing_loading', 'Loading...'],
   ['ui_processing_cancel', 'Cancel'],
   ['ui_processing_canceling', 'Cancelling...'],
+  ['ui_processing_canceled', 'Canceled'],
   ['ui_processing_reload', 'Reload'],
   ['ui_processing_retry', 'Retry'],
   ['ui_processing_ok', 'Ok'],
@@ -18,6 +26,7 @@ export default [
   ['ui_processing_save', 'Save'],
   ['ui_processing_saved', 'Saved'],
   ['ui_processing_stop', 'Stop'],
+  ['ui_processing_skip', 'Skip'],
   ['ui_second_first_form', '{arg:interval} second'],
   ['ui_second_second_form', '{arg:interval} seconds'],
   ['ui_second_third_form', '{arg:interval} seconds'],

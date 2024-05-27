@@ -46,7 +46,7 @@ export class ContainerDataSource extends ResultSetDataSource<IDataContainerOptio
     serviceInjector: IServiceInjector,
     graphQLService: GraphQLService,
     asyncTaskInfoService: AsyncTaskInfoService,
-    private readonly connectionExecutionContextService: ConnectionExecutionContextService,
+    protected connectionExecutionContextService: ConnectionExecutionContextService,
   ) {
     super(serviceInjector, graphQLService, asyncTaskInfoService);
 
@@ -68,9 +68,8 @@ export class ContainerDataSource extends ResultSetDataSource<IDataContainerOptio
   }
 
   async cancel(): Promise<void> {
-    if (this.currentTask) {
-      await this.currentTask.cancel();
-    }
+    await super.cancel();
+    await this.currentTask?.cancel();
   }
 
   async request(prevResults: IDatabaseResultSet[]): Promise<IDatabaseResultSet[]> {
@@ -138,8 +137,6 @@ export class ContainerDataSource extends ResultSetDataSource<IDataContainerOptio
       };
 
       this.clearError();
-
-      await this.closeResults(prevResults);
 
       return this.transformResults(executionContext.context!, response.results, limit);
     } catch (exception: any) {
@@ -218,35 +215,6 @@ export class ContainerDataSource extends ResultSetDataSource<IDataContainerOptio
     }
 
     return prevResults;
-  }
-
-  async dispose(): Promise<void> {
-    await this.closeResults(this.results);
-    await this.executionContext?.destroy();
-  }
-
-  private async closeResults(results: IDatabaseResultSet[]) {
-    await this.connectionExecutionContextService.load();
-
-    if (!this.executionContext?.context) {
-      return;
-    }
-
-    for (const result of results) {
-      if (result.id === null) {
-        continue;
-      }
-      try {
-        await this.graphQLService.sdk.closeResult({
-          projectId: result.projectId,
-          connectionId: result.connectionId,
-          contextId: result.contextId,
-          resultId: result.id,
-        });
-      } catch (exception: any) {
-        console.log(`Error closing result (${result.id}):`, exception);
-      }
-    }
   }
 
   private transformResults(executionContextInfo: IConnectionExecutionContextInfo, results: SqlQueryResults[], limit: number): IDatabaseResultSet[] {

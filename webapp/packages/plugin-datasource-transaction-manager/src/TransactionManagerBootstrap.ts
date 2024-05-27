@@ -31,6 +31,7 @@ import { MENU_APP_ACTIONS } from '@cloudbeaver/plugin-top-app-bar';
 import { ACTION_DATASOURCE_TRANSACTION_COMMIT } from './actions/ACTION_DATASOURCE_TRANSACTION_COMMIT';
 import { ACTION_DATASOURCE_TRANSACTION_COMMIT_MODE_TOGGLE } from './actions/ACTION_DATASOURCE_TRANSACTION_COMMIT_MODE_TOGGLE';
 import { ACTION_DATASOURCE_TRANSACTION_ROLLBACK } from './actions/ACTION_DATASOURCE_TRANSACTION_ROLLBACK';
+import { TransactionManagerSettingsService } from './TransactionManagerSettingsService';
 
 @injectable()
 export class TransactionManagerBootstrap extends Bootstrap {
@@ -46,6 +47,7 @@ export class TransactionManagerBootstrap extends Bootstrap {
     private readonly notificationService: NotificationService,
     private readonly commonDialogService: CommonDialogService,
     private readonly localizationService: LocalizationService,
+    private readonly transactionManagerSettingsService: TransactionManagerSettingsService,
   ) {
     super();
   }
@@ -59,6 +61,7 @@ export class TransactionManagerBootstrap extends Bootstrap {
         const transaction = this.getContextTransaction();
 
         return (
+          !this.transactionManagerSettingsService.disabled &&
           !this.optionsPanelService.active &&
           this.connectionSchemaManagerService.currentConnection?.connected === true &&
           !!transaction?.context &&
@@ -75,10 +78,7 @@ export class TransactionManagerBootstrap extends Bootstrap {
 
     this.actionService.addHandler({
       id: 'commit-mode-base',
-      isActionApplicable: (_, action) =>
-        [ACTION_DATASOURCE_TRANSACTION_COMMIT, ACTION_DATASOURCE_TRANSACTION_ROLLBACK, ACTION_DATASOURCE_TRANSACTION_COMMIT_MODE_TOGGLE].includes(
-          action,
-        ),
+      actions: [ACTION_DATASOURCE_TRANSACTION_COMMIT, ACTION_DATASOURCE_TRANSACTION_ROLLBACK, ACTION_DATASOURCE_TRANSACTION_COMMIT_MODE_TOGGLE],
       isLabelVisible: (_, action) => action === ACTION_DATASOURCE_TRANSACTION_COMMIT || action === ACTION_DATASOURCE_TRANSACTION_ROLLBACK,
       getActionInfo: (_, action) => {
         const transaction = this.getContextTransaction();

@@ -8,7 +8,7 @@
 import { observer } from 'mobx-react-lite';
 
 import {
-  ColoredContainer,
+  Container,
   Group,
   Table,
   TableBody,
@@ -68,11 +68,11 @@ export const UserFormConnectionAccess: TabContainerPanelComponent<UserFormProps>
 
   if (connections.length === 0) {
     return (
-      <ColoredContainer>
+      <Container>
         <Group large>
           <TextPlaceholder>{translate('authentication_administration_user_connections_empty')}</TextPlaceholder>
         </Group>
-      </ColoredContainer>
+      </Container>
     );
   }
 
@@ -92,9 +92,9 @@ export const UserFormConnectionAccess: TabContainerPanelComponent<UserFormProps>
   // }
 
   return (
-    <ColoredContainer vertical gap>
+    <Container parent vertical>
       {/* {info && <InfoItem info={info} />} */}
-      <Group box large overflow>
+      <Group box border large overflow>
         <Table onSelect={handleSelect}>
           <TableHeader fixed>
             <TableColumnHeader min />
@@ -114,6 +114,6 @@ export const UserFormConnectionAccess: TabContainerPanelComponent<UserFormProps>
           </TableBody>
         </Table>
       </Group>
-    </ColoredContainer>
+    </Container>
   );
 });

@@ -9,7 +9,7 @@ import { ConnectionInfoResource, createConnectionParam } from '@cloudbeaver/core
 import { injectable } from '@cloudbeaver/core-di';
 import { NavNodeManagerService } from '@cloudbeaver/core-navigation-tree';
 import { download, withTimestamp } from '@cloudbeaver/core-utils';
-import { ACTION_SAVE, ActionService, DATA_CONTEXT_MENU, MenuService } from '@cloudbeaver/core-view';
+import { ACTION_SAVE, ActionService, MenuService } from '@cloudbeaver/core-view';
 import { LocalStorageSqlDataSource } from '@cloudbeaver/plugin-sql-editor';
 import { ACTION_SQL_EDITOR_OPEN, SqlEditorNavigatorService } from '@cloudbeaver/plugin-sql-editor-navigation-tab';
 
@@ -30,21 +30,9 @@ export class DDLViewerFooterService {
   register(): void {
     this.actionsService.addHandler({
       id: 'ddl-viewer-footer-base-handler',
-      isActionApplicable(context, action) {
-        const menu = context.hasValue(DATA_CONTEXT_MENU, MENU_DDL_VIEWER_FOOTER);
-        const node = context.tryGet(DATA_CONTEXT_DDL_VIEWER_NODE);
-
-        if (!menu || !node) {
-          return false;
-        }
-
-        if (action === ACTION_SAVE || action === ACTION_SQL_EDITOR_OPEN) {
-          const ddl = context.tryGet(DATA_CONTEXT_DDL_VIEWER_VALUE);
-          return !!ddl;
-        }
-
-        return false;
-      },
+      menus: [MENU_DDL_VIEWER_FOOTER],
+      contexts: [DATA_CONTEXT_DDL_VIEWER_NODE, DATA_CONTEXT_DDL_VIEWER_VALUE],
+      actions: [ACTION_SAVE, ACTION_SQL_EDITOR_OPEN],
       handler: async (context, action) => {
         switch (action) {
           case ACTION_SAVE: {
@@ -101,7 +89,7 @@ export class DDLViewerFooterService {
     });
 
     this.menuService.addCreator({
-      isApplicable: context => context.get(DATA_CONTEXT_MENU) === MENU_DDL_VIEWER_FOOTER,
+      menus: [MENU_DDL_VIEWER_FOOTER],
       getItems: (context, items) => [...items, ACTION_SAVE, ACTION_SQL_EDITOR_OPEN],
     });
   }

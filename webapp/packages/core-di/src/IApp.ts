@@ -27,6 +27,7 @@ export interface IInitializableController<TArgs extends any[] = any[]> {
 export type IServiceConstructor<T> = ITypedConstructor<T>;
 
 export interface IServiceInjector {
+  hasServiceByClass: <T>(ctor: IServiceConstructor<T>) => boolean;
   getServiceByClass: <T>(ctor: IServiceConstructor<T>) => T;
   getServiceByToken: <T>(token: ValueToken<T>) => T;
   resolveServiceByClass: <T>(ctor: IServiceConstructor<T>) => T;

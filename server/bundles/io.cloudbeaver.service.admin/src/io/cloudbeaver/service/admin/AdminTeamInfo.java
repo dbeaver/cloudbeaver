@@ -21,6 +21,7 @@ import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.meta.Property;
 import org.jkiss.dbeaver.model.security.SMDataSourceGrant;
 import org.jkiss.dbeaver.model.security.SMObjectType;
+import org.jkiss.dbeaver.model.security.SMTeamMemberInfo;
 import org.jkiss.dbeaver.model.security.user.SMTeam;
 
 import java.util.ArrayList;
@@ -88,4 +89,8 @@ public class AdminTeamInfo {
         return session.getAdminSecurityController().getTeamMembers(getTeamId());
     }
 
+    @Property
+    public List<SMTeamMemberInfo> getGrantedUsersInfo() throws DBException {
+        return session.getAdminSecurityController().getTeamMembersInfo(getTeamId());
+    }
 }

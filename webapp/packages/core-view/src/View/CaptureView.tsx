@@ -8,6 +8,7 @@
 import { observer } from 'mobx-react-lite';
 import { useContext } from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
+
 import { s, useFocus, useS } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { isObjectsEqual } from '@cloudbeaver/core-utils';
@@ -15,19 +16,19 @@ import { isObjectsEqual } from '@cloudbeaver/core-utils';
 import { ActionService } from '../Action/ActionService';
 import type { IActionItem } from '../Action/IActionItem';
 import { getCommonAndOSSpecificKeys } from '../Action/KeyBinding/getCommonAndOSSpecificKeys';
+import styles from './CaptureView.m.css';
 import { CaptureViewContext } from './CaptureViewContext';
 import type { IView } from './IView';
 import { parseHotkey } from './parseHotkey';
 import { useActiveView } from './useActiveView';
 import { useViewContext } from './useViewContext';
-import styles from './CaptureView.m.css';
 
-interface Props {
+export interface ICaptureViewProps {
   view: IView<any>;
   className?: string;
 }
 
-export const CaptureView = observer<React.PropsWithChildren<Props>>(function CaptureView({ view, children, className }) {
+export const CaptureView = observer<React.PropsWithChildren<ICaptureViewProps>>(function CaptureView({ view, children, className }) {
   const parentContext = useContext(CaptureViewContext);
   const viewContext = useViewContext(view, parentContext);
   const actionService = useService(ActionService);

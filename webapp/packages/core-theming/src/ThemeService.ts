@@ -8,21 +8,20 @@
 import { computed, IReactionDisposer, makeObservable, observable, reaction } from 'mobx';
 
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
-import { NotificationService, UIError } from '@cloudbeaver/core-events';
+import { UIError } from '@cloudbeaver/core-events';
 import { ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
 
 import type { Style } from './ComponentStyle';
+// TODO: important to keep normalize first
+import './styles/main/normalize.pure.css';
 import './styles/main/base.pure.css';
 import './styles/main/color.pure.scss';
 import './styles/main/elevation.pure.scss';
 import './styles/main/fonts.pure.css';
-import './styles/main/normalize.pure.css';
 import './styles/main/typography.pure.scss';
 import { DEFAULT_THEME_ID, themes } from './themes';
 import { ThemeSettingsService } from './ThemeSettingsService';
 import type { ClassCollection } from './themeUtils';
-
-const COMMON_STYLES: any[] = [];
 
 export interface ITheme {
   name: string;
@@ -62,10 +61,7 @@ export class ThemeService extends Bootstrap {
   private readonly themeMap: Map<string, ITheme> = new Map();
   private reactionDisposer: IReactionDisposer | null;
 
-  constructor(
-    private readonly notificationService: NotificationService,
-    private readonly themeSettingsService: ThemeSettingsService,
-  ) {
+  constructor(private readonly themeSettingsService: ThemeSettingsService) {
     super();
 
     this.reactionDisposer = null;
@@ -129,16 +125,6 @@ export class ThemeService extends Bootstrap {
 
   async load(): Promise<void> {
     await this.loadTheme(this.themeId);
-  }
-
-  getThemeStyles(themeId: string): ClassCollection[] {
-    const theme = this.themeMap.get(themeId);
-
-    if (!theme) {
-      this.notificationService.logError({ title: `Theme ${themeId} not found.` });
-      return COMMON_STYLES;
-    }
-    return [...COMMON_STYLES, theme.styles!];
   }
 
   async changeTheme(themeId: string): Promise<void> {

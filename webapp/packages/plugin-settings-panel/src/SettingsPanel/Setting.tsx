@@ -34,8 +34,8 @@ export const Setting = observer<Props>(function Setting({ source, setting }) {
   const readOnly = settingsResolverService.isReadOnly(setting.key) ?? false;
 
   let value = source.getEditedValue(setting.key);
-  if (readOnly) {
-    value = settingsResolverService.getValue(setting.key);
+  if (readOnly || !isNotNullDefined(value)) {
+    value = settingsResolverService.getEditedValue(setting.key);
   }
 
   if (setting.key in settingsProviderService.schema.shape) {
@@ -61,7 +61,7 @@ export const Setting = observer<Props>(function Setting({ source, setting }) {
       return null;
     }
 
-    return schemaValidationError(result.error).toString();
+    return schemaValidationError(result.error, { prefix: null }).toString();
   });
 
   function handleChange(value: any) {

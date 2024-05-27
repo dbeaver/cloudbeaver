@@ -6,6 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 import { AppAuthService } from '@cloudbeaver/core-authentication';
+import { importLazyComponent } from '@cloudbeaver/core-blocks';
 import {
   compareConnectionsInfo,
   ConnectionInfoResource,
@@ -21,15 +22,16 @@ import { EObjectFeature, NodeManagerUtils } from '@cloudbeaver/core-navigation-t
 import { ProjectsService } from '@cloudbeaver/core-projects';
 import { getCachedMapResourceLoaderState } from '@cloudbeaver/core-resource';
 import { OptionsPanelService } from '@cloudbeaver/core-ui';
-import { DATA_CONTEXT_MENU, MenuBaseItem, menuExtractItems, MenuSeparatorItem, MenuService } from '@cloudbeaver/core-view';
+import { MenuBaseItem, menuExtractItems, MenuSeparatorItem, MenuService } from '@cloudbeaver/core-view';
 import { MENU_APP_ACTIONS } from '@cloudbeaver/plugin-top-app-bar';
 
 import { ConnectionSchemaManagerService } from './ConnectionSchemaManagerService';
-import { ConnectionIcon } from './ConnectionSelector/ConnectionIcon';
-import { ConnectionIconSmall } from './ConnectionSelector/ConnectionIconSmall';
 import type { IConnectionSelectorExtraProps } from './ConnectionSelector/IConnectionSelectorExtraProps';
 import { MENU_CONNECTION_DATA_CONTAINER_SELECTOR } from './MENU_CONNECTION_DATA_CONTAINER_SELECTOR';
 import { MENU_CONNECTION_SELECTOR } from './MENU_CONNECTION_SELECTOR';
+
+const ConnectionIcon = importLazyComponent(() => import('./ConnectionSelector/ConnectionIcon').then(module => module.ConnectionIcon));
+const ConnectionIconSmall = importLazyComponent(() => import('./ConnectionSelector/ConnectionIconSmall').then(module => module.ConnectionIconSmall));
 
 @injectable()
 export class ConnectionSchemaManagerBootstrap extends Bootstrap {
@@ -61,7 +63,7 @@ export class ConnectionSchemaManagerBootstrap extends Bootstrap {
 
     this.menuService.setHandler<IConnectionSelectorExtraProps>({
       id: 'connection-selector-base',
-      isApplicable: context => context.hasValue(DATA_CONTEXT_MENU, MENU_CONNECTION_SELECTOR),
+      menus: [MENU_CONNECTION_SELECTOR],
       isLoading: () => this.connectionSelectorLoading,
       isHidden: () => this.isHidden() || !this.appAuthService.authenticated,
       isDisabled: () =>
@@ -166,7 +168,7 @@ export class ConnectionSchemaManagerBootstrap extends Bootstrap {
 
     this.menuService.setHandler({
       id: 'connection-data-container-selector-base',
-      isApplicable: context => context.hasValue(DATA_CONTEXT_MENU, MENU_CONNECTION_DATA_CONTAINER_SELECTOR),
+      menus: [MENU_CONNECTION_DATA_CONTAINER_SELECTOR],
       isDisabled: () =>
         !this.connectionSchemaManagerService.currentConnection?.connected ||
         this.connectionSelectorLoading ||
@@ -183,7 +185,7 @@ export class ConnectionSchemaManagerBootstrap extends Bootstrap {
           !this.connectionSchemaManagerService.isObjectSchemaChangeable) ||
         (this.connectionSchemaManagerService.objectContainerList.schemaList.length === 0 &&
           this.connectionSchemaManagerService.objectContainerList.catalogList.length === 0),
-      getLoader: (context, menu) => {
+      getLoader: () => {
         if (this.isHidden()) {
           return [];
         }
@@ -376,8 +378,6 @@ export class ConnectionSchemaManagerBootstrap extends Bootstrap {
       },
     });
   }
-
-  load(): void {}
 
   private isHidden(): boolean {
     return (

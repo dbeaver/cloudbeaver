@@ -17,12 +17,15 @@ import style from './FormFieldDescription.m.css';
 interface Props extends ILayoutSizeProps {
   label?: string;
   title?: string;
+  content?: React.ReactNode;
+  hidden?: boolean;
   className?: string;
 }
 
 export const FormFieldDescription: React.FC<React.PropsWithChildren<Props>> = function FormFieldDescription({
   label,
   title,
+  content,
   children,
   className,
   ...rest
@@ -34,6 +37,7 @@ export const FormFieldDescription: React.FC<React.PropsWithChildren<Props>> = fu
   return (
     <Field title={title} className={className} {...rest} {...layoutProps}>
       {label && <FieldLabel className={s(styles, { fieldLabel: true })}>{label}</FieldLabel>}
+      {content}
       <FieldDescription className={s(styles, { fieldDescription: true })}>{children}</FieldDescription>
     </Field>
   );

@@ -8,23 +8,11 @@
 import { observer } from 'mobx-react-lite';
 import { useEffect } from 'react';
 
-import {
-  ExceptionMessage,
-  Form,
-  Loader,
-  Placeholder,
-  s,
-  SContext,
-  StatusMessage,
-  useExecutor,
-  useForm,
-  useObjectRef,
-  useS,
-} from '@cloudbeaver/core-blocks';
+import { ExceptionMessage, Form, Loader, Placeholder, s, StatusMessage, useExecutor, useForm, useObjectRef, useS } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { ENotificationType } from '@cloudbeaver/core-events';
 import type { ConnectionConfig } from '@cloudbeaver/core-sdk';
-import { TabBigUnderlineStyleRegistry, TabList, TabPanelList, TabsState } from '@cloudbeaver/core-ui';
+import { TabList, TabPanelList, TabsState } from '@cloudbeaver/core-ui';
 
 import { ConnectionFormActionsContext, IConnectionFormActionsContext } from './ConnectFormActionsContext';
 import style from './ConnectionForm.m.css';
@@ -91,7 +79,7 @@ export const ConnectionForm = observer<ConnectionFormProps>(function ConnectionF
   }
 
   return (
-    <Form context={form} className={s(styles, { form: true })}>
+    <Form context={form} contents>
       <TabsState container={service.tabsContainer} localState={state.partsState} state={state} onCancel={onCancel}>
         <div className={s(styles, { box: true }, className)}>
           <div className={s(styles, { connectionTopBar: true })}>
@@ -99,9 +87,7 @@ export const ConnectionForm = observer<ConnectionFormProps>(function ConnectionF
               <div className={s(styles, { connectionStatusMessage: true })}>
                 <StatusMessage type={ENotificationType.Info} message={state.statusMessage} />
               </div>
-              <SContext registry={TabBigUnderlineStyleRegistry}>
-                <TabList className={s(styles, { tabList: true })} disabled={state.disabled} />
-              </SContext>
+              <TabList className={s(styles, { tabList: true })} disabled={state.disabled} underline big />
             </div>
             <div className={s(styles, { connectionTopBarActions: true })}>
               <Loader suspense inline hideMessage hideException>

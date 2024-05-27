@@ -1,3 +1,10 @@
+/*
+ * CloudBeaver - Cloud Database Manager
+ * Copyright (C) 2020-2024 DBeaver Corp and others
+ *
+ * Licensed under the Apache License, Version 2.0.
+ * you may not use this file except in compliance with the License.
+ */
 import { sqlEditorPluginManifest } from './manifest';
 
 export * from './actions/bindings/KEY_BINDING_SQL_EDITOR_EXECUTE_NEW';
@@ -36,7 +43,7 @@ export * from './getSqlEditorName';
 export * from './QueryDataSource';
 export * from './SqlDialectInfoService';
 export * from './ISqlEditorTabState';
-export * from './SqlEditor';
+export * from './SQLEditorLoader';
 export * from './SqlEditorModeService';
 export * from './SqlEditorService';
 export * from './SqlEditorSettingsService';

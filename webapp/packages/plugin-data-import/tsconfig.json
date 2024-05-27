@@ -10,9 +10,6 @@
       "path": "../core-blocks/tsconfig.json"
     },
     {
-      "path": "../core-connections/tsconfig.json"
-    },
-    {
       "path": "../core-di/tsconfig.json"
     },
     {
@@ -23,9 +20,6 @@
     },
     {
       "path": "../core-localization/tsconfig.json"
-    },
-    {
-      "path": "../core-navigation-tree/tsconfig.json"
     },
     {
       "path": "../core-resource/tsconfig.json"
@@ -40,9 +34,6 @@
       "path": "../core-settings/tsconfig.json"
     },
     {
-      "path": "../core-ui/tsconfig.json"
-    },
-    {
       "path": "../core-utils/tsconfig.json"
     },
     {
@@ -50,15 +41,6 @@
     },
     {
       "path": "../plugin-data-viewer/tsconfig.json"
-    },
-    {
-      "path": "../plugin-datasource-context-switch/tsconfig.json"
-    },
-    {
-      "path": "../plugin-sql-editor/tsconfig.json"
-    },
-    {
-      "path": "../plugin-top-app-bar/tsconfig.json"
     }
   ],
   "include": [

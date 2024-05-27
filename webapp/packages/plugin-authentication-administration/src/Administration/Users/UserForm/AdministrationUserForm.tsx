@@ -7,10 +7,10 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import { Button, Container, Form, s, SContext, StatusMessage, useAutoLoad, useForm, useS, useTranslate } from '@cloudbeaver/core-blocks';
+import { Button, Container, Form, s, StatusMessage, useAutoLoad, useForm, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { FormMode, IFormState, TabBigUnderlineStyleRegistry, TabList, TabPanelList, TabsState } from '@cloudbeaver/core-ui';
+import { FormMode, IFormState, TabList, TabPanelList, TabsState } from '@cloudbeaver/core-ui';
 import { getFirstException } from '@cloudbeaver/core-utils';
 
 import style from './AdministrationUserForm.m.css';
@@ -62,15 +62,18 @@ export const AdministrationUserForm = observer<Props>(function AdministrationUse
   useAutoLoad(AdministrationUserForm, state);
 
   return (
-    <Form context={form} className={s(styles, { submittingForm: true })} disabled={state.isDisabled} focusFirstChild>
+    <Form context={form} disabled={state.isDisabled} contents focusFirstChild>
       <TabsState container={administrationUserFormService.parts} localState={state.parts} formState={state}>
-        <Container compact parent noWrap vertical>
-          <Container className={s(styles, { bar: true })} gap keepSize noWrap>
+        <Container noWrap vertical>
+          <Container className={s(styles, { header: true })} gap keepSize noWrap>
             <Container fill>
-              <StatusMessage exception={getFirstException(state.exception)} type={state.statusType} message={state.statusMessage} />
-              <SContext registry={TabBigUnderlineStyleRegistry}>
-                <TabList className={s(styles, { tabList: true })} />
-              </SContext>
+              <StatusMessage
+                className={s(styles, { statusMessage: true })}
+                exception={getFirstException(state.exception)}
+                type={state.statusType}
+                message={state.statusMessage}
+              />
+              <TabList underline big />
             </Container>
             <Container keepSize noWrap center gap compact>
               {editing && (

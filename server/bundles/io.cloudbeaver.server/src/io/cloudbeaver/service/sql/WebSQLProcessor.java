@@ -16,7 +16,6 @@
  */
 package io.cloudbeaver.service.sql;
 
-import com.google.gson.internal.LinkedTreeMap;
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.model.WebConnectionInfo;
 import io.cloudbeaver.model.session.WebSession;
@@ -268,7 +267,7 @@ public class WebSQLProcessor implements WebSessionProvider {
         if (executeInfo.getResults().length == 0) {
             executeInfo.setStatusMessage("No Data");
         } else {
-            executeInfo.setStatusMessage("Success");
+            executeInfo.setStatusMessage("Executed");
         }
 
         return executeInfo;
@@ -667,7 +666,7 @@ public class WebSQLProcessor implements WebSessionProvider {
                     for (int i = 0; i < allAttributes.length; i++) {
                         if (addedValues[i] != null) {
                             Object realCellValue;
-                            if (addedValues[i] instanceof LinkedTreeMap variables) {
+                            if (addedValues[i] instanceof Map<?, ?> variables) {
                                 realCellValue = setCellRowValue(variables, webSession, session, allAttributes[i], withoutExecution);
                             } else {
                                 realCellValue = convertInputCellValue(session, allAttributes[i],
@@ -1062,7 +1061,7 @@ public class WebSQLProcessor implements WebSessionProvider {
             DBDAttributeBinding[] resultsAttributes = results.getAttributes();
 
             DBCResultSetMetaData rsMeta = resultSet.getMeta();
-            List<DBCAttributeMetaData> keyAttributes = rsMeta.getAttributes();
+            List<? extends DBCAttributeMetaData> keyAttributes = rsMeta.getAttributes();
             for (int i = 0; i < keyAttributes.size(); i++) {
                 DBCAttributeMetaData keyAttribute = keyAttributes.get(i);
                 DBDValueHandler valueHandler = DBUtils.findValueHandler(session, keyAttribute);
@@ -1140,8 +1139,8 @@ public class WebSQLProcessor implements WebSessionProvider {
     }
 
     private Object setCellRowValue(Object cellRow, WebSession webSession, DBCSession dbcSession, DBDAttributeBinding allAttributes, boolean withoutExecution) {
-        if (cellRow instanceof LinkedTreeMap) {
-            LinkedTreeMap<String, Object> variables = (LinkedTreeMap<String, Object>) cellRow;
+        if (cellRow instanceof Map<?, ?>) {
+            Map<String, Object> variables = (Map<String, Object>) cellRow;
             if (variables.get(FILE_ID) != null) {
                 Path path = CBPlatform.getInstance()
                     .getTempFolder(webSession.getProgressMonitor(), TEMP_FILE_FOLDER)

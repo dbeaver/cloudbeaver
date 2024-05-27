@@ -7,15 +7,15 @@
  */
 import type { PluginManifest } from '@cloudbeaver/core-di';
 
-import { DdlResource } from './DdlViewer/DdlResource';
-import { DDLViewerFooterService } from './DdlViewer/DDLViewerFooterService';
-import { DdlViewerBootstrap } from './DdlViewerBootstrap';
-import { ExtendedDDLResource } from './ExtendedDDLViewer/ExtendedDDLResource';
-
 export const manifest: PluginManifest = {
   info: {
     name: 'DDL Viewer Plugin',
   },
 
-  providers: [DdlViewerBootstrap, DDLViewerFooterService, ExtendedDDLResource, DdlResource],
+  providers: [
+    () => import('./DdlViewerBootstrap').then(m => m.DdlViewerBootstrap),
+    () => import('./DdlViewer/DDLViewerFooterService').then(m => m.DDLViewerFooterService),
+    () => import('./ExtendedDDLViewer/ExtendedDDLResource').then(m => m.ExtendedDDLResource),
+    () => import('./DdlViewer/DdlResource').then(m => m.DdlResource),
+  ],
 };

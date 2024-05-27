@@ -49,7 +49,11 @@ export class QueryDataSource<TOptions extends IDataQueryOptions = IDataQueryOpti
     return this.currentTask?.cancelled || false;
   }
 
-  constructor(readonly serviceInjector: IServiceInjector, graphQLService: GraphQLService, asyncTaskInfoService: AsyncTaskInfoService) {
+  constructor(
+    readonly serviceInjector: IServiceInjector,
+    graphQLService: GraphQLService,
+    asyncTaskInfoService: AsyncTaskInfoService,
+  ) {
     super(serviceInjector, graphQLService, asyncTaskInfoService);
 
     this.currentTask = null;
@@ -80,9 +84,8 @@ export class QueryDataSource<TOptions extends IDataQueryOptions = IDataQueryOpti
   }
 
   async cancel(): Promise<void> {
-    if (this.currentTask) {
-      await this.currentTask.cancel();
-    }
+    await super.cancel();
+    await this.currentTask?.cancel();
   }
 
   async save(prevResults: IDatabaseResultSet[]): Promise<IDatabaseResultSet[]> {
@@ -243,34 +246,10 @@ export class QueryDataSource<TOptions extends IDataQueryOptions = IDataQueryOpti
         return prevResults;
       }
 
-      this.closeResults(prevResults);
-
       return results;
     } catch (exception: any) {
       this.error = exception;
       throw exception;
-    }
-  }
-
-  private async closeResults(results: IDatabaseResultSet[]) {
-    if (!this.executionContext?.context) {
-      return;
-    }
-
-    for (const result of results) {
-      if (result.id === null) {
-        continue;
-      }
-      try {
-        await this.graphQLService.sdk.closeResult({
-          projectId: result.projectId,
-          connectionId: result.connectionId,
-          contextId: result.contextId,
-          resultId: result.id,
-        });
-      } catch (exception: any) {
-        console.log(`Error closing result (${result.id}):`, exception);
-      }
     }
   }
 
@@ -290,10 +269,5 @@ export class QueryDataSource<TOptions extends IDataQueryOptions = IDataQueryOpti
       // || !result.resultSet?.hasMoreData,
       data: result.resultSet,
     }));
-  }
-
-  async dispose(): Promise<void> {
-    await this.closeResults(this.results);
-    await this.cancel();
   }
 }

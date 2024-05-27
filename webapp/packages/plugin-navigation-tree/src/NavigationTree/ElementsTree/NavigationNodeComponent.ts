@@ -8,7 +8,6 @@
 import type React from 'react';
 
 import type { NavNode } from '@cloudbeaver/core-navigation-tree';
-import type { ComponentStyle } from '@cloudbeaver/core-theming';
 
 import type { INavTreeNodeInfo } from './INavTreeNodeInfo';
 
@@ -28,7 +27,6 @@ export type NavTreeControlProps = {
   dndPlaceholder?: boolean;
   expanded?: boolean;
   className?: string;
-  style?: ComponentStyle;
   onClick?: (event: React.MouseEvent<HTMLDivElement>) => void;
 };
 
@@ -44,7 +42,6 @@ export type NavigationNodeComponent = React.FC<{
   dragging?: boolean;
   expanded?: boolean;
   className?: string;
-  style?: ComponentStyle;
 }>;
 
 export type NavigationNodeRendererComponent = React.FC<{

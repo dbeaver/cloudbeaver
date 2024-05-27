@@ -70,6 +70,7 @@ export const Menu = observer<IMenuProps, HTMLButtonElement>(
       placement,
       visible,
       rtl,
+      unstable_fixed: true,
     });
     const styles = useS(style);
 

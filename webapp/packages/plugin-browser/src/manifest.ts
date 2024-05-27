@@ -7,10 +7,11 @@
  */
 import type { PluginManifest } from '@cloudbeaver/core-di';
 
-import { LocaleService } from './LocaleService';
-import { PluginBrowserBootstrap } from './PluginBrowserBootstrap';
-
 export const browserPlugin: PluginManifest = {
   info: { name: 'Browser plugin' },
-  providers: [PluginBrowserBootstrap, LocaleService],
+  preload: [() => import('./PluginBrowserPreloadingBootstrap').then(m => m.PluginBrowserPreloadingBootstrap)],
+  providers: [
+    () => import('./PluginBrowserBootstrap').then(m => m.PluginBrowserBootstrap),
+    () => import('./LocaleService').then(m => m.LocaleService),
+  ],
 };

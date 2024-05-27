@@ -17,11 +17,9 @@ export class PluginBootstrap extends Bootstrap {
     super();
   }
 
-  register(): void | Promise<void> {
+  register(): void {
     this.addTopAppMenuItems();
   }
-
-  load(): void | Promise<void> {}
 
   private addTopAppMenuItems() {
     this.menuService.addCreator({

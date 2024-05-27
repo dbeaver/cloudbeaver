@@ -1,3 +1,10 @@
+/*
+ * CloudBeaver - Cloud Database Manager
+ * Copyright (C) 2020-2024 DBeaver Corp and others
+ *
+ * Licensed under the Apache License, Version 2.0.
+ * you may not use this file except in compliance with the License.
+ */
 export * from './CommonDialog/CommonDialog/CommonDialogBody';
 export * from './CommonDialog/CommonDialog/CommonDialogFooter';
 export * from './CommonDialog/CommonDialog/CommonDialogHeader';
@@ -40,6 +47,7 @@ export * from './Menu/MenuBarSmallItem';
 export * from './Menu/MenuEmptyItem';
 export * from './Menu/MenuItem';
 export { default as MenuItemStyles } from './Menu/MenuItem.m.css';
+export { default as MenuPanelItemAndTriggerStyles } from './MenuPanel/shared/MenuPanelItemAndTrigger.m.css';
 export * from './Menu/MenuItemCheckbox';
 export * from './Menu/MenuItemElement';
 export { default as MenuItemElementStyles } from './Menu/MenuItemElement.m.css';
@@ -52,7 +60,7 @@ export * from './Menu/MenuStateContext';
 export * from './Menu/useMouseContextMenu';
 export { MenuTrigger, type MenuState } from './MenuPanel/MenuTrigger';
 
-export * from './ObjectPropertyInfo/ObjectPropertyInfoForm/ObjectPropertyInfoForm';
+export * from './ObjectPropertyInfo/ObjectPropertyInfoForm/ObjectPropertyInfoFormLoader';
 export * from './ObjectPropertyInfo/useObjectPropertyCategories';
 
 export * from './Overlay/Overlay';
@@ -72,7 +80,6 @@ export * from './PropertiesTable/IProperty';
 export * from './Slide/SlideBox';
 export * from './Slide/SlideElement';
 export * from './Slide/SlideOverlay';
-export { default as SlideBoxStyles } from './Slide/SlideBox.m.css';
 
 export * from './Split/SplitControls';
 export * from './Split/Pane';
@@ -151,7 +158,7 @@ export * from './FolderExplorer/useFolderExplorer';
 export * from './Tags/Tag';
 export * from './Tags/Tags';
 
-export * from './FormControls/Combobox';
+export * from './FormControls/ComboboxLoader';
 export * from './FormControls/FormContext';
 export * from './FormControls/FormFieldDescription';
 export * from './FormControls/InputField/InputField';
@@ -213,7 +220,6 @@ export * from './useErrorDetails';
 export * from './useActivationDelay';
 export * from './useAdministrationSettings';
 export * from './useInterval';
-export * from './useStyles';
 export * from './useSuspense';
 export * from './BlocksLocaleService';
 export * from './Snackbars/NotificationMark';
@@ -230,3 +236,5 @@ export * from './useMergeRefs';
 export * from './usePasswordValidation';
 export * from './manifest';
 export * from './importLazyComponent';
+export * from './ClickableLoader';
+export * from './FormControls/TagsComboboxLoader';

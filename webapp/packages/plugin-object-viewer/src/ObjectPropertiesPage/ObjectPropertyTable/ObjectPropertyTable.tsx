@@ -26,11 +26,11 @@ interface ObjectPropertyTableProps {
 export const ObjectPropertyTable = observer<ObjectPropertyTableProps>(function ObjectPropertyTable({ objectId, parentId, className }) {
   const translate = useTranslate();
   const navNodeViewService = useService(NavNodeViewService);
-  const navTreeResource = useService(NavTreeResource);
+  const navTreeResource = useResource(ObjectPropertyTable, NavTreeResource, objectId, { forceSuspense: true });
 
   const pagination = useOffsetPagination(DBObjectResource, {
     key: DBObjectParentKey(objectId),
-    pageSize: navTreeResource.childrenLimit,
+    pageSize: navTreeResource.resource.childrenLimit,
   });
 
   const dbObjectLoader = useResource(ObjectPropertyTable, DBObjectResource, pagination.key);

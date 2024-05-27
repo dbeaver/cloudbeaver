@@ -1,3 +1,10 @@
+/*
+ * CloudBeaver - Cloud Database Manager
+ * Copyright (C) 2020-2024 DBeaver Corp and others
+ *
+ * Licensed under the Apache License, Version 2.0.
+ * you may not use this file except in compliance with the License.
+ */
 .container {
   box-sizing: border-box;
   display: flex;
@@ -17,11 +24,12 @@
   max-height: 100%;
   max-width: 748px;
   padding: 0px;
+  outline: none;
 
   &.small {
     min-width: 404px;
     min-height: 262px;
-    max-height: max(var(--app-height) - 48px, 262px);
+    max-height: max(var(--app-height, 100vh) - 48px, 262px);
 
     &.fixedSize {
       width: 404px;
@@ -34,7 +42,7 @@
   &.medium {
     min-width: 576px;
     min-height: 374px;
-    max-height: max(var(--app-height) - 48px, 374px);
+    max-height: max(var(--app-height, 100vh) - 48px, 374px);
 
     &.fixedSize {
       width: 576px;
@@ -47,7 +55,7 @@
   &.large {
     min-width: 720px;
     min-height: 468px;
-    max-height: max(var(--app-height) - 48px, 468px);
+    max-height: max(var(--app-height, 100vh) - 48px, 468px);
 
     &.fixedSize {
       width: 720px;

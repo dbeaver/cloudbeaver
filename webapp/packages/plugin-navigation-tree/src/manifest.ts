@@ -7,27 +7,20 @@
  */
 import type { PluginManifest } from '@cloudbeaver/core-di';
 
-import { LocaleService } from './LocaleService';
-import { ElementsTreeService } from './NavigationTree/ElementsTree/ElementsTreeService';
-import { ElementsTreeToolsMenuService } from './NavigationTree/ElementsTree/ElementsTreeTools/ElementsTreeToolsMenuService';
-import { ElementsTreeSettingsService } from './NavigationTree/ElementsTree/ElementsTreeTools/NavigationTreeSettings/ElementsTreeSettingsService';
-import { NavigationTreeBootstrap } from './NavigationTree/NavigationTreeBootstrap';
-import { NavigationTreeService } from './NavigationTree/NavigationTreeService';
-import { NavigationTreeSettingsService } from './NavigationTreeSettingsService';
-import { NavNodeContextMenuService } from './NodesManager/NavNodeContextMenuService';
-import { NavNodeViewService } from './NodesManager/NavNodeView/NavNodeViewService';
-
 export const navigationTreePlugin: PluginManifest = {
   info: { name: 'Navigation Tree plugin' },
   providers: [
-    LocaleService,
-    NavigationTreeService,
-    ElementsTreeToolsMenuService,
-    NavigationTreeBootstrap,
-    NavNodeContextMenuService,
-    NavNodeViewService,
-    ElementsTreeSettingsService,
-    NavigationTreeSettingsService,
-    ElementsTreeService,
+    () => import('./LocaleService').then(m => m.LocaleService),
+    () => import('./NavigationTree/NavigationTreeService').then(m => m.NavigationTreeService),
+    () => import('./NavigationTree/ElementsTree/ElementsTreeTools/ElementsTreeToolsMenuService').then(m => m.ElementsTreeToolsMenuService),
+    () => import('./NavigationTree/NavigationTreeBootstrap').then(m => m.NavigationTreeBootstrap),
+    () => import('./NodesManager/NavNodeContextMenuService').then(m => m.NavNodeContextMenuService),
+    () => import('./NodesManager/NavNodeView/NavNodeViewService').then(m => m.NavNodeViewService),
+    () =>
+      import('./NavigationTree/ElementsTree/ElementsTreeTools/NavigationTreeSettings/ElementsTreeSettingsService').then(
+        m => m.ElementsTreeSettingsService,
+      ),
+    () => import('./NavigationTreeSettingsService').then(m => m.NavigationTreeSettingsService),
+    () => import('./NavigationTree/ElementsTree/ElementsTreeService').then(m => m.ElementsTreeService),
   ],
 };

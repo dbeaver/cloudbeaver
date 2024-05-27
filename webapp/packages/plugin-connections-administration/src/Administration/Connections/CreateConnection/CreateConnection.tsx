@@ -7,10 +7,24 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import { Fill, Icon, IconButton, Loader, s, SContext, StaticImage, StyleRegistry, useResource, useS, useTranslate } from '@cloudbeaver/core-blocks';
+import {
+  ActionIconButton,
+  Container,
+  Group,
+  GroupClose,
+  GroupTitle,
+  Loader,
+  s,
+  SContext,
+  StaticImage,
+  StyleRegistry,
+  useResource,
+  useS,
+  useTranslate,
+} from '@cloudbeaver/core-blocks';
 import { DBDriverResource } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
-import { TabListStyles, TabPanelList, TabPanelStyles, TabsState, TabStyles, TabUnderlineStyleRegistry } from '@cloudbeaver/core-ui';
+import { TabListStyles, TabPanelList, TabPanelStyles, TabsState, TabStyles } from '@cloudbeaver/core-ui';
 import { ConnectionFormLoader } from '@cloudbeaver/plugin-connections';
 
 import { CreateConnectionService } from '../CreateConnectionService';
@@ -25,7 +39,6 @@ interface Props {
 }
 
 const tabsRegistry: StyleRegistry = [
-  ...TabUnderlineStyleRegistry,
   [TabStyles, { mode: 'append', styles: [CreateConnectionTab] }],
   [TabPanelStyles, { mode: 'append', styles: [CreateConnectionTabPanel] }],
   [TabListStyles, { mode: 'append', styles: [CreateConnectionTabList] }],
@@ -39,17 +52,27 @@ export const CreateConnection = observer<Props>(function CreateConnection({ meth
 
   if (createConnectionService.data) {
     return (
-      <div className={s(style, { connectionCreate: true })}>
-        <div className={s(style, { titleBar: true })}>
-          <div className={s(style, { backButton: true })}>
-            <Icon className={s(style, { icon: true })} name="angle" viewBox="0 0 15 8" onClick={createConnectionService.clearConnectionTemplate} />
-          </div>
-          {driver.data?.icon && <StaticImage className={s(style, { staticImage: true })} icon={driver.data.icon} />}
-          {driver.data?.name ?? translate('connections_administration_connection_create')}
-          <Fill />
-          <IconButton name="cross" viewBox="0 0 24 24" onClick={createConnectionService.cancelCreate} />
-        </div>
-        <div className={s(style, { connectionCreateContent: true })}>
+      <Group className={s(style, { connectionCreate: true })} vertical box boxNoOverflow noWrap>
+        <GroupTitle header keepSize>
+          <Container gap dense noWrap>
+            <Container keepSize>
+              <ActionIconButton
+                name="angle"
+                viewBox="0 0 15 8"
+                className={s(style, { backButton: true })}
+                onClick={createConnectionService.clearConnectionTemplate}
+              />
+            </Container>
+            <Container keepSize center>
+              {driver.data?.icon && <StaticImage className={s(style, { staticImage: true })} icon={driver.data.icon} />}
+            </Container>
+            <Container keepSize center>
+              {translate('connections_administration_connection_create')}
+            </Container>
+          </Container>
+          <GroupClose onClick={createConnectionService.cancelCreate} />
+        </GroupTitle>
+        <Container overflow>
           <Loader className={s(style, { loader: true })} suspense>
             <ConnectionFormLoader
               state={createConnectionService.data}
@@ -57,13 +80,13 @@ export const CreateConnection = observer<Props>(function CreateConnection({ meth
               onSave={createConnectionService.clearConnectionTemplate}
             />
           </Loader>
-        </div>
-      </div>
+        </Container>
+      </Group>
     );
   }
 
   return (
-    <div className={s(style, { connectionCreate: true })}>
+    <Group className={s(style, { connectionCreate: true })} vertical box boxNoOverflow noWrap>
       <TabsState
         currentTabId={method}
         container={createConnectionService.tabsContainer}
@@ -71,18 +94,17 @@ export const CreateConnection = observer<Props>(function CreateConnection({ meth
         lazy
         onChange={({ tabId }) => createConnectionService.setCreateMethod(tabId)}
       >
-        <div className={s(style, { titleBar: true })}>
+        <GroupTitle keepSize>
           {translate('connections_administration_connection_create')}
-          <Fill />
-          <IconButton name="cross" viewBox="0 0 16 16" onClick={createConnectionService.cancelCreate} />
-        </div>
-        <div className={s(style, { connectionCreateContent: true })}>
+          <GroupClose onClick={createConnectionService.cancelCreate} />
+        </GroupTitle>
+        <Container overflow>
           <SContext registry={tabsRegistry}>
             <TabPanelList />
           </SContext>
           {createConnectionService.disabled && <Loader overlay />}
-        </div>
+        </Container>
       </TabsState>
-    </div>
+    </Group>
   );
 });

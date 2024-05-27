@@ -7,7 +7,8 @@
  */
 import { useEffect, useState } from 'react';
 
-import { IconButton } from '../../IconButton';
+import { ActionIconButton } from '../../ActionIconButton';
+import { useTranslate } from '../../localization/useTranslate';
 import { s } from '../../s';
 import { useS } from '../../useS';
 import style from './SnackbarWrapper.m.css';
@@ -26,6 +27,7 @@ export const SnackbarWrapper: React.FC<React.PropsWithChildren<Props>> = functio
   children,
   className,
 }) {
+  const translate = useTranslate();
   const styles = useS(style);
   const [mounted, setMounted] = useState(false);
 
@@ -34,10 +36,12 @@ export const SnackbarWrapper: React.FC<React.PropsWithChildren<Props>> = functio
   }, []);
 
   return (
-    <div className={s(styles, { notification: true, mounted, closing }, className)}>
+    <div tabIndex={0} role="status" aria-live="polite" aria-atomic="true" className={s(styles, { notification: true, mounted, closing }, className)}>
       {children}
       {!persistent && onClose && (
-        <IconButton name="cross" viewBox="0 0 16 16" className={s(styles, { iconButton: true, large: true })} onClick={onClose} />
+        <div className={s(styles, { iconButton: true })}>
+          <ActionIconButton name="cross" viewBox="0 0 16 16" aria-label={translate('ui_close')} onClick={onClose} />
+        </div>
       )}
     </div>
   );

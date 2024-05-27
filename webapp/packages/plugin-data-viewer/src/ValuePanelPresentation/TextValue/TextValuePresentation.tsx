@@ -8,10 +8,10 @@
 import { observable } from 'mobx';
 import { observer } from 'mobx-react-lite';
 
-import { ActionIconButton, Container, Fill, Group, Loader, s, SContext, StyleRegistry, useS, useTranslate } from '@cloudbeaver/core-blocks';
+import { ActionIconButton, Container, Group, Loader, s, SContext, StyleRegistry, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { TabContainerPanelComponent, TabList, TabsState, TabStyles, TabUnderlineStyleRegistry, useTabLocalState } from '@cloudbeaver/core-ui';
+import { TabContainerPanelComponent, TabList, TabsState, TabStyles, useTabLocalState } from '@cloudbeaver/core-ui';
 
 import { ResultSetSelectAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetSelectAction';
 import { useResultSetActions } from '../../DatabaseDataModel/Actions/ResultSet/useResultSetActions';
@@ -25,14 +25,14 @@ import { TextValuePresentationService } from './TextValuePresentationService';
 import { TextValueTruncatedMessage } from './TextValueTruncatedMessage';
 import { useTextValue } from './useTextValue';
 
-const tabRegistry: StyleRegistry = [...TabUnderlineStyleRegistry, [TabStyles, { mode: 'append', styles: [TextValuePresentationTab] }]];
+const tabRegistry: StyleRegistry = [[TabStyles, { mode: 'append', styles: [TextValuePresentationTab] }]];
 
 export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelProps<any, IDatabaseResultSet>> = observer(
   function TextValuePresentation({ model, resultIndex, dataFormat }) {
     const translate = useTranslate();
     const notificationService = useService(NotificationService);
     const textValuePresentationService = useService(TextValuePresentationService);
-    const style = useS(styles);
+    const style = useS(styles, TextValuePresentationTab);
     const selection = model.source.getAction(resultIndex, ResultSetSelectAction);
     const activeElements = selection.getActiveElements();
     const firstSelectedCell = activeElements.length ? activeElements[0] : undefined;
@@ -64,7 +64,12 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
     const autoLineWrapping = getDefaultLineWrapping(textValueInfo.contentType);
     const lineWrapping = state.lineWrapping ?? autoLineWrapping;
 
-    const isSelectedCellReadonly = firstSelectedCell && (formatAction.isReadOnly(firstSelectedCell) || formatAction.isBinary(firstSelectedCell));
+    const isSelectedCellReadonly =
+      firstSelectedCell &&
+      (formatAction.isReadOnly(firstSelectedCell) ||
+        formatAction.isBinary(firstSelectedCell) ||
+        formatAction.isGeometry(firstSelectedCell) ||
+        contentAction.isTextTruncated(firstSelectedCell));
     const isReadonlyByResultIndex = model.isReadonly(resultIndex) || model.isDisabled(resultIndex) || !firstSelectedCell;
     const isReadonly = isSelectedCellReadonly || isReadonlyByResultIndex;
     const canSave = firstSelectedCell && contentAction.isDownloadable(firstSelectedCell);
@@ -112,7 +117,7 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
               onChange={tab => selectTabHandler(tab.tabId)}
             >
               <SContext registry={tabRegistry}>
-                <TabList className={s(style, { tabList: true })} />
+                <TabList className={s(style, { tabList: true, textValuePresentationTab: true, underline: true })} underline />
               </SContext>
             </TabsState>
           </Container>
@@ -129,19 +134,20 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
           </Group>
         </Loader>
         {firstSelectedCell && <TextValueTruncatedMessage model={model} resultIndex={resultIndex} elementKey={firstSelectedCell} />}
-        <Container keepSize center overflow>
-          {canSave && (
-            <ActionIconButton title={translate('ui_download')} name="/icons/export.svg" disabled={model.isLoading()} img onClick={saveHandler} />
-          )}
-          <ActionIconButton
-            title={translate(
-              lineWrapping ? 'data_viewer_presentation_value_text_line_wrapping_no_wrap' : 'data_viewer_presentation_value_text_line_wrapping_wrap',
+        <Container keepSize overflow>
+          <Container keepSize noWrap>
+            {canSave && (
+              <ActionIconButton title={translate('ui_download')} name="/icons/export.svg" disabled={model.isLoading()} img onClick={saveHandler} />
             )}
-            name={`/icons/plugin_data_viewer_${lineWrapping ? 'no_wrap' : 'wrap'}_lines.svg`}
-            img
-            onClick={toggleLineWrappingHandler}
-          />
-          <Fill />
+            <ActionIconButton
+              title={translate(
+                lineWrapping ? 'data_viewer_presentation_value_text_line_wrapping_no_wrap' : 'data_viewer_presentation_value_text_line_wrapping_wrap',
+              )}
+              name={`/icons/plugin_data_viewer_${lineWrapping ? 'no_wrap' : 'wrap'}_lines.svg`}
+              img
+              onClick={toggleLineWrappingHandler}
+            />
+          </Container>
         </Container>
       </Container>
     );
