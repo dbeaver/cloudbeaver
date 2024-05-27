@@ -19,3 +19,27 @@ export function debounce<T extends (...args: any[]) => any>(func: T, delay: numb
     }, delay);
   };
 }
+
+export function debounceAsync<T extends (...args: any[]) => Promise<any>>(func: T, delay: number): T {
+  let timeoutId: NodeJS.Timeout | null;
+
+  return function (this: any, ...args: Parameters<T>): Promise<ReturnType<T>> {
+    // eslint-disable-next-line @typescript-eslint/no-this-alias
+    const context = this;
+
+    return new Promise((resolve, reject) => {
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+      }
+
+      timeoutId = setTimeout(async () => {
+        try {
+          const result = await func.apply(context, args);
+          resolve(result);
+        } catch (error) {
+          reject(error);
+        }
+      }, delay);
+    });
+  } as T;
+}

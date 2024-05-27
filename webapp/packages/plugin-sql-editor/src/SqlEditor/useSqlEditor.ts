@@ -15,7 +15,7 @@ import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dial
 import { NotificationService } from '@cloudbeaver/core-events';
 import { SyncExecutor } from '@cloudbeaver/core-executor';
 import type { SqlCompletionProposal, SqlDialectInfo, SqlScriptInfoFragment } from '@cloudbeaver/core-sdk';
-import { createLastPromiseGetter, LastPromiseGetter, throttleAsync } from '@cloudbeaver/core-utils';
+import { createLastPromiseGetter, debounceAsync, LastPromiseGetter, throttleAsync } from '@cloudbeaver/core-utils';
 
 import type { ISqlEditorTabState } from '../ISqlEditorTabState';
 import { ESqlDataSourceFeatures } from '../SqlDataSource/ESqlDataSourceFeatures';
@@ -104,12 +104,8 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
         return this.dataSource?.isEditing() ?? false;
       },
 
-      get isLineScriptEmpty(): boolean {
-        return !this.activeSegment?.query;
-      },
-
       get isScriptEmpty(): boolean {
-        return this.value === '' || this.parser.scripts.length === 0;
+        return this.value === '';
       },
 
       get isDisabled(): boolean {
@@ -166,7 +162,7 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
               untracked(() => {
                 this.sqlDialectInfoService.loadSqlDialectInfo(key).then(async () => {
                   try {
-                    await this.updateParserScriptsThrottle();
+                    await this.updateParserScriptsDebounced();
                   } catch {}
                 });
               });
@@ -205,13 +201,14 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
         this.hintsLimitIsMet = hints.length >= MAX_HINTS_LIMIT;
 
         return hints;
-      }, 1000 / 3),
+      }, 300),
 
       async formatScript(): Promise<void> {
         if (this.isDisabled || this.isScriptEmpty || !this.dataSource?.executionContext) {
           return;
         }
 
+        await this.updateParserScripts();
         const query = this.value;
         const script = this.getExecutingQuery(false);
 
@@ -238,6 +235,8 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
         if (!isQuery || !isExecutable) {
           return;
         }
+
+        await this.updateParserScripts();
         const query = this.getSubQuery();
 
         try {
@@ -269,6 +268,8 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
         if (!isQuery || !isExecutable) {
           return;
         }
+
+        await this.updateParserScripts();
         const query = this.getSubQuery();
 
         try {
@@ -286,6 +287,7 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
           return;
         }
 
+        await this.updateParserScripts();
         const query = this.getSubQuery();
 
         try {
@@ -362,9 +364,9 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
         this.dataSource?.setScript(query);
       },
 
-      updateParserScriptsThrottle: throttleAsync(async function updateParserScriptsThrottle() {
+      updateParserScriptsDebounced: debounceAsync(async function updateParserScriptsThrottle() {
         await data.updateParserScripts();
-      }, 1000 / 2),
+      }, 2000),
 
       async updateParserScripts() {
         if (!this.dataSource?.hasFeature(ESqlDataSourceFeatures.script)) {
@@ -402,7 +404,7 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
         passEmpty?: boolean,
         passDisabled?: boolean,
       ): Promise<T | undefined> {
-        if (!segment || (this.isDisabled && !passDisabled) || (!passEmpty && this.isLineScriptEmpty)) {
+        if (!segment || (this.isDisabled && !passDisabled) || (!passEmpty && this.isScriptEmpty)) {
           return;
         }
 
@@ -432,6 +434,8 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
       async getResolvedSegment(): Promise<ISQLScriptSegment | undefined> {
         const projectId = this.dataSource?.executionContext?.projectId;
         const connectionId = this.dataSource?.executionContext?.connectionId;
+
+        await data.updateParserScripts();
 
         if (!projectId || !connectionId || this.cursor.begin !== this.cursor.end) {
           return this.getSubQuery();
@@ -469,6 +473,7 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
       },
     }),
     {
+      getHintProposals: action.bound,
       formatScript: action.bound,
       executeQuery: action.bound,
       executeQueryNewTab: action.bound,
@@ -507,7 +512,7 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
         // ensure that cursor is in script boundaries
         data.setCursor(data.cursor.begin, data.cursor.end);
         data.parser.setScript(script);
-        data.updateParserScriptsThrottle().catch(() => {});
+        data.updateParserScriptsDebounced().catch(() => {});
         data.onUpdate.execute();
       },
     ],

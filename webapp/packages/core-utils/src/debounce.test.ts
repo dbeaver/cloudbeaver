@@ -5,7 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { debounce } from './debounce';
+import { debounce, debounceAsync } from './debounce';
 
 // https://jestjs.io/docs/timer-mocks
 // Tell Jest to mock all timeout functions
@@ -23,6 +23,22 @@ describe('Debounce', () => {
     // Fast-forward time
     jest.runAllTimers();
 
-    expect(func).toBeCalledTimes(1);
+    expect(func).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe('DebounceAsync', () => {
+  test('function should be executed just once', async () => {
+    const func = jest.fn(() => Promise.resolve(true));
+    const debouncedFunction = debounceAsync(func, 1000);
+
+    debouncedFunction();
+    debouncedFunction();
+    debouncedFunction();
+
+    // Fast-forward time
+    jest.runAllTimers();
+
+    expect(func).toHaveBeenCalledTimes(1);
   });
 });
