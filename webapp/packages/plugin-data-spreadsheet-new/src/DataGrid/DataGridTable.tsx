@@ -135,13 +135,13 @@ export const DataGridTable = observer<IDataPresentationProps<any, IDatabaseResul
 
   function restoreFocus() {
     const gridDiv = gridContainerRef.current;
-    const focusSink = gridDiv?.querySelector<HTMLDivElement>('[tabindex="0"]');
+    const focusSink = gridDiv?.querySelector<HTMLDivElement>('[aria-selected="true"]');
     focusSink?.focus();
   }
 
   function isGridInFocus(): boolean {
     const gridDiv = gridContainerRef.current;
-    const focusSink = gridDiv?.querySelector('[tabindex="0"]');
+    const focusSink = gridDiv?.querySelector('[aria-selected="true"]');
 
     if (!gridDiv || !focusSink) {
       return false;
