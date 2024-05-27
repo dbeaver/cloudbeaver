@@ -5,4 +5,5 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-export { invert as invertObject, flowRight, isNull, isObject, isUndefined, groupBy, uniq, values as objectValues } from 'lodash-es';
+
+export { isNull, isUndefined, isObject, uniq, groupBy, iteratee, values as objectValues, compose, invert as invertObject } from 'underscore';

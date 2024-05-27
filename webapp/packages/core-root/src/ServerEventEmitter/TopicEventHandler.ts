@@ -9,7 +9,7 @@ import { Connectable, connectable, filter, map, merge, Observable, Subject } fro
 
 import { ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
 import type { IResource } from '@cloudbeaver/core-resource';
-import { flowRight } from '@cloudbeaver/core-utils';
+import { compose } from '@cloudbeaver/core-utils';
 
 import type { IBaseServerEvent, IServerEventCallback, IServerEventEmitter, Subscription } from './IServerEventEmitter';
 
@@ -33,10 +33,7 @@ export abstract class TopicEventHandler<
   private readonly subscribedResources: Map<IResource<any, any, any, any, any>, ISubscribedResourceInfo>;
   private readonly serverSubject?: Observable<TEvent>;
   private readonly subject: Subject<TEvent>;
-  constructor(
-    private readonly topic: string,
-    private readonly emitter: IServerEventEmitter<SourceEvent>,
-  ) {
+  constructor(private readonly topic: string, private readonly emitter: IServerEventEmitter<SourceEvent>) {
     this.onInit = new SyncExecutor();
     this.subject = new Subject();
     this.activeResources = [];
@@ -52,7 +49,7 @@ export abstract class TopicEventHandler<
   }
 
   multiplex<T = TEvent>(topicId: TTopic, mapTo: (event: TEvent) => T = event => event as unknown as T): Observable<T> {
-    return this.emitter.multiplex(topicId, flowRight(mapTo, this.map) as unknown as (event: SourceEvent) => T);
+    return this.emitter.multiplex(topicId, compose(mapTo, this.map) as unknown as (event: SourceEvent) => T);
   }
 
   onEvent<T = TEvent>(

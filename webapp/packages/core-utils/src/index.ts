@@ -13,7 +13,7 @@ export * from './Promises/PromiseExecutor';
 
 export * from './Quadtree/index';
 
-export * from './lodash';
+export * from './underscore';
 
 export * from './emptyConstants';
 export * from './base64ToBlob';
