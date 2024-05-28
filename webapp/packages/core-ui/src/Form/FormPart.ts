@@ -7,7 +7,7 @@
  */
 import { action, makeObservable, observable, toJS } from 'mobx';
 
-import { executorHandlerFilter, type IExecutionContextProvider } from '@cloudbeaver/core-executor';
+import { executorHandlerFilter, ExecutorInterrupter, type IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import { isObjectsEqual } from '@cloudbeaver/core-utils';
 
 import type { IFormPart } from './IFormPart';
@@ -76,7 +76,7 @@ export abstract class FormPart<TPartState, TFormState = any> implements IFormPar
     return !isObjectsEqual(this.initialState, this.state);
   }
 
-  async save(): Promise<any> {
+  async save(data: IFormState<TFormState>, contexts: IExecutionContextProvider<IFormState<TFormState>>): Promise<any> {
     if (this.loading) {
       return;
     }
@@ -89,7 +89,10 @@ export abstract class FormPart<TPartState, TFormState = any> implements IFormPar
         return;
       }
 
-      await this.saveChanges();
+      await this.saveChanges(data, contexts);
+      if (ExecutorInterrupter.isInterrupted(contexts)) {
+        return;
+      }
 
       this.loaded = false;
       this.exception = null;
@@ -149,5 +152,5 @@ export abstract class FormPart<TPartState, TFormState = any> implements IFormPar
   protected validate(data: IFormState<TFormState>, contexts: IExecutionContextProvider<IFormState<TFormState>>): void | Promise<void> {}
 
   protected abstract loader(): Promise<void>;
-  protected abstract saveChanges(): Promise<void>;
+  protected abstract saveChanges(data: IFormState<TFormState>, contexts: IExecutionContextProvider<IFormState<TFormState>>): Promise<void>;
 }
