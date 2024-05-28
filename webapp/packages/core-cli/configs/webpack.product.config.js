@@ -63,7 +63,7 @@ module.exports = (env, argv) => {
           keep_fnames: true,
         },
         include: [/.*.public-ce..*$/, /^cloudbeaver\/.*/, /^service-worker.js$/],
-        exclude: [/^cloudbeaver-ee\/.*/],
+        exclude: [/^cloudbeaver-ee\/.*/, /.*.private-ee..*$/],
       }),
       new CssMinimizerPlugin(),
     ],
