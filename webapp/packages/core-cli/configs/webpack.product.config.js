@@ -32,7 +32,9 @@ module.exports = (env, argv) => {
     devtool: false,
     output: {
       filename: 'index.[contenthash].public-ce.js',
-      chunkFilename: '[name].[contenthash].bundle.public-ce.js',
+      chunkFilename(module) {
+        return '[name].[contenthash].bundle.public-ce.js';
+      },
       library: package.name,
       libraryTarget: 'umd',
       path: outputDir,

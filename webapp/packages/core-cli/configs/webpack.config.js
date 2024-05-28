@@ -156,7 +156,9 @@ module.exports = (env, argv) => {
     entry,
     output: {
       filename: 'js/[name]-[contenthash].js',
-      chunkFilename: 'js/[name]-[contenthash].js',
+      chunkFilename(module) {
+        return 'js/[name]-[contenthash].js';
+      },
       pathinfo: false,
     },
     optimization: {
@@ -334,7 +336,9 @@ module.exports = (env, argv) => {
       new IgnoreNotFoundExportPlugin(),
       new MiniCssExtractPlugin({
         filename: 'styles/[name]-[contenthash].css',
-        chunkFilename: 'styles/[name]-[contenthash].css',
+        chunkFilename(module) {
+          return 'styles/[name]-[contenthash].css';
+        },
         ignoreOrder: true, // Enable to remove warnings about conflicting order
         insert: linkTag => {
           document.head.appendChild(linkTag);
