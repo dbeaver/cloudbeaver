@@ -35,11 +35,11 @@
   "devDependencies": {
     "@types/jest": "^29.5.12",
     "@types/md5": "~2.3.5",
-    "@types/react": "^18.2.63",
+    "@types/react": "^18.3.3",
     "@types/underscore": "^1.11.15",
     "@types/uuid": "~9.0.8",
     "@types/whatwg-mimetype": "^3.0.2",
-    "react": "^18.2.0",
+    "react": "^18.3.1",
     "typescript": "^5.4.5"
   }
 }

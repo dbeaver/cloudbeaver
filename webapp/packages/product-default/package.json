@@ -86,7 +86,7 @@
     "@cloudbeaver/plugin-user-profile-settings": "~0.1.0",
     "@cloudbeaver/plugin-version": "~0.1.0",
     "@cloudbeaver/plugin-version-update-administration": "~0.1.0",
-    "react": "^18.2.0",
+    "react": "^18.3.1",
     "reflect-metadata": "^0.2.1"
   },
   "peerDependencies": {},
@@ -94,7 +94,7 @@
     "name": "CloudBeaver Community"
   },
   "devDependencies": {
-    "@types/react": "^18.2.63",
+    "@types/react": "^18.3.3",
     "typescript": "^5.4.5"
   }
 }

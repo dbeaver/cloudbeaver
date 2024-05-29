@@ -23,12 +23,12 @@
     "@cloudbeaver/core-root": "~0.1.0",
     "@cloudbeaver/core-utils": "~0.1.0",
     "mobx": "^6.12.3",
-    "react": "^18.2.0",
+    "react": "^18.3.1",
     "semver": "^7.6.2"
   },
   "peerDependencies": {},
   "devDependencies": {
-    "@types/react": "^18.2.63",
+    "@types/react": "^18.3.3",
     "@types/semver": "^7.5.8",
     "typescript": "^5.4.5"
   }

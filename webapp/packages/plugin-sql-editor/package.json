@@ -41,7 +41,7 @@
     "@cloudbeaver/plugin-navigation-tabs": "~0.1.0",
     "mobx": "^6.12.3",
     "mobx-react-lite": "^4.0.7",
-    "react": "^18.2.0"
+    "react": "^18.3.1"
   },
   "peerDependencies": {},
   "devDependencies": {
@@ -71,7 +71,7 @@
     "@cloudbeaver/tests-runner": "~0.1.0",
     "@testing-library/jest-dom": "^6.4.2",
     "@types/jest": "^29.5.12",
-    "@types/react": "^18.2.63",
+    "@types/react": "^18.3.3",
     "typescript": "^5.4.5",
     "typescript-plugin-css-modules": "^5.1.0"
   }

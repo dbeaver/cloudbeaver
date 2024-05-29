@@ -25,11 +25,11 @@
     "@cloudbeaver/core-root": "~0.1.0",
     "@cloudbeaver/plugin-administration": "~0.1.0",
     "mobx-react-lite": "^4.0.7",
-    "react": "^18.2.0"
+    "react": "^18.3.1"
   },
   "peerDependencies": {},
   "devDependencies": {
-    "@types/react": "^18.2.63",
+    "@types/react": "^18.3.3",
     "typescript": "^5.4.5"
   }
 }
