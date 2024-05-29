@@ -77,6 +77,11 @@ module.exports = (env, argv) => {
           secure: false,
         },
         {
+          context: ['/status'],
+          target: envServer,
+          secure: false,
+        },
+        {
           context: ['/api/ws'],
           target: `${urlObject.protocol === 'https:' ? 'wss:' : 'ws:'}//${urlObject.hostname}:${urlObject.port}/api/ws`,
           ws: true,
