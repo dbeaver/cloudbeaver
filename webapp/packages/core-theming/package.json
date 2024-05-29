@@ -35,7 +35,7 @@
     "@cloudbeaver/core-sdk": "~0.1.0",
     "@cloudbeaver/core-settings": "~0.1.0",
     "@cloudbeaver/tests-runner": "~0.1.0",
-    "@fontsource/roboto": "^5.0.8",
+    "@fontsource/roboto": "^5.0.13",
     "@material/button": "~4.0.0",
     "@material/checkbox": "~4.0.0",
     "@material/elevation": "~4.0.0",

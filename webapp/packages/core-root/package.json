@@ -34,7 +34,7 @@
     "@cloudbeaver/core-sdk": "~0.1.0",
     "@cloudbeaver/tests-runner": "~0.1.0",
     "@types/jest": "^29.5.12",
-    "msw": "^2.2.2",
+    "msw": "^2.3.0",
     "typescript": "^5.3.3"
   }
 }
