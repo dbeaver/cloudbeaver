@@ -20,10 +20,10 @@
     "@cloudbeaver/core-di": "~0.1.0",
     "@cloudbeaver/core-localization": "~0.1.0",
     "@cloudbeaver/core-version": "~0.1.0",
-    "mobx": "^6.12.0"
+    "mobx": "^6.12.3"
   },
   "peerDependencies": {},
   "devDependencies": {
-    "typescript": "^5.3.3"
+    "typescript": "^5.4.5"
   }
 }

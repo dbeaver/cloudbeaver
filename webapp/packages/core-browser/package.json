@@ -23,7 +23,7 @@
     "@cloudbeaver/core-utils": "~0.1.0",
     "dexie": "^4.0.7",
     "karma": "^6.4.3",
-    "mobx": "^6.12.0",
+    "mobx": "^6.12.3",
     "workbox-cacheable-response": "^7.1.0",
     "workbox-core": "^7.1.0",
     "workbox-expiration": "^7.1.0",
@@ -34,6 +34,6 @@
   },
   "peerDependencies": {},
   "devDependencies": {
-    "typescript": "^5.3.3"
+    "typescript": "^5.4.5"
   }
 }

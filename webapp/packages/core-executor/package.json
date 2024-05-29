@@ -18,10 +18,10 @@
     "update-ts-references": "rimraf --glob dist && typescript-resolve-references"
   },
   "dependencies": {
-    "mobx": "^6.12.0"
+    "mobx": "^6.12.3"
   },
   "peerDependencies": {},
   "devDependencies": {
-    "typescript": "^5.3.3"
+    "typescript": "^5.4.5"
   }
 }

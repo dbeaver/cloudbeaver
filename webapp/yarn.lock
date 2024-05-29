@@ -12219,14 +12219,14 @@ mkdirp@^1.0.3, mkdirp@^1.0.4:
   resolved "https://registry.yarnpkg.com/mkdirp/-/mkdirp-1.0.4.tgz#3eb5ed62622756d79a5f0e2a221dfebad75c2f7e"
   integrity sha512-vVqVZQyf3WLx2Shd0qJ9xuvqgAyKPLAiqITEtqW0oIUjzo3PePDd6fW9iFz30ef7Ysp/oiWqbhszeGWW2T6Gzw==
 
-mobx-react-lite@^4.0.5:
+mobx-react-lite@^4.0.7:
   version "4.0.7"
   resolved "https://registry.yarnpkg.com/mobx-react-lite/-/mobx-react-lite-4.0.7.tgz#f4e21e18d05c811010dcb1d3007e797924c4d90b"
   integrity sha512-RjwdseshK9Mg8On5tyJZHtGD+J78ZnCnRaxeQDSiciKVQDUbfZcXhmld0VMxAwvcTnPEHZySGGewm467Fcpreg==
   dependencies:
     use-sync-external-store "^1.2.0"
 
-mobx@^6.12.0:
+mobx@^6.12.3:
   version "6.12.3"
   resolved "https://registry.yarnpkg.com/mobx/-/mobx-6.12.3.tgz#b6a0fde4268116be602d50bffb32f1b90a8fb077"
   integrity sha512-c8NKkO4R2lShkSXZ2Ongj1ycjugjzFFo/UswHBnS62y07DMcTc9Rvo03/3nRyszIvwPNljlkd4S828zIBv/piw==
@@ -16079,7 +16079,7 @@ typescript-plugin-css-modules@^5.1.0:
   resolved "https://registry.yarnpkg.com/typescript/-/typescript-4.9.5.tgz#095979f9bcc0d09da324d58d03ce8f8374cbe65a"
   integrity sha512-1FXk9E2Hm+QzZQ7z+McJiHL4NW1F2EzMu9Nq9i3zAaGqibafqYwCVU6WyWAuyQRRzOlxou8xZSyXLEN8oKj24g==
 
-typescript@^5.0.4, typescript@^5.3.3, typescript@^5.4.4:
+typescript@^5.0.4, typescript@^5.4.4, typescript@^5.4.5:
   version "5.4.5"
   resolved "https://registry.yarnpkg.com/typescript/-/typescript-5.4.5.tgz#42ccef2c571fdbd0f6718b1d1f5e6e5ef006f611"
   integrity sha512-vcI4UpRgg81oIRUFwR0WSIHKt11nJ7SAVlYNIu+QpqeyXP+gpQJy/Z4+F0aGxSE4MqwjyXvW/TzgkLAx2AGHwQ==

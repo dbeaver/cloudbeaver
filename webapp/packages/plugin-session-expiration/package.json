@@ -27,12 +27,12 @@
     "@cloudbeaver/core-routing": "~0.1.0",
     "@cloudbeaver/core-sdk": "~0.1.0",
     "@cloudbeaver/plugin-root": "~0.1.0",
-    "mobx-react-lite": "^4.0.5",
+    "mobx-react-lite": "^4.0.7",
     "react": "^18.2.0"
   },
   "peerDependencies": {},
   "devDependencies": {
     "@types/react": "^18.2.63",
-    "typescript": "^5.3.3"
+    "typescript": "^5.4.5"
   }
 }

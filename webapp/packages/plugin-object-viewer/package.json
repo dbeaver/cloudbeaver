@@ -36,8 +36,8 @@
     "@cloudbeaver/plugin-navigation-tabs": "~0.1.0",
     "@cloudbeaver/plugin-navigation-tree": "~0.1.0",
     "@cloudbeaver/plugin-react-data-grid": "~0.1.0",
-    "mobx": "^6.12.0",
-    "mobx-react-lite": "^4.0.5",
+    "mobx": "^6.12.3",
+    "mobx-react-lite": "^4.0.7",
     "react": "^18.2.0",
     "reakit": "~1.3.11"
   },
@@ -45,7 +45,7 @@
   "devDependencies": {
     "@cloudbeaver/core-theming": "~0.1.0",
     "@types/react": "^18.2.63",
-    "typescript": "^5.3.3",
+    "typescript": "^5.4.5",
     "typescript-plugin-css-modules": "^5.1.0"
   }
 }
