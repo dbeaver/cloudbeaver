@@ -98,7 +98,7 @@ public interface WebApplication extends DBPApplication {
     boolean isLicenseRequired();
 
     /**
-     * @return - server start time
+     * @return - server start time in UTC
      */
     @NotNull
     LocalDateTime getStartTime();

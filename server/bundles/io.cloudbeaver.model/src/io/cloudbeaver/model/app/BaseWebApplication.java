@@ -50,6 +50,7 @@ import org.jkiss.utils.CommonUtils;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Map;
 
@@ -67,7 +68,8 @@ public abstract class BaseWebApplication extends BaseApplicationImpl implements 
     private static final Log log = Log.getLog(BaseWebApplication.class);
 
     private String instanceId;
-    private LocalDateTime startTime = LocalDateTime.now();
+    private final LocalDateTime startTime = LocalDateTime.now(ZoneOffset.UTC);
+
     @NotNull
     @Override
     public DBPWorkspace createWorkspace(@NotNull DBPPlatform platform, @NotNull IWorkspace eclipseWorkspace) {
