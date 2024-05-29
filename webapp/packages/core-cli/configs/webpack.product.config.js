@@ -42,6 +42,9 @@ module.exports = (env, argv) => {
     optimization: {
       splitChunks: {
         cacheGroups: {
+          asyncCommons: {
+            filename: '[name].[contenthash].public-ce.js',
+          },
           packages: {
             filename: '[name].[contenthash].public-ce.js',
           },

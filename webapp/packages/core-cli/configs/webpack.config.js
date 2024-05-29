@@ -254,7 +254,7 @@ module.exports = (env, argv) => {
           asyncCommons: {
             chunks: 'async',
             name: 'commons-async',
-            filename: 'js/[name]-[contenthash].js',
+            filename: '[name].[contenthash].js',
             priority: -15,
             reuseExistingChunk: true,
           },
