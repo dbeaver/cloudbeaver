@@ -82,3 +82,4 @@ jobs:
         with:
           name: frontend-build-artifacts
           path: webapp/packages/product-default/lib
+          if-no-files-found: error
