@@ -30,22 +30,32 @@ jobs:
           distribution: "temurin"
           java-version: "17"
           cache: maven
-
-      - name: Cache Maven packages
-        uses: actions/cache@v4
+      
+      - uses: stCarolas/setup-maven@v5
         with:
-          path: ~/.m2
-          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
-          restore-keys: |
-            ${{ runner.os }}-maven-
+          maven-version: 3.9.0
+
+      - name: Give permissions
+        run: |
+          sudo chmod 777 ../
+        shell: bash
 
       - name: Run build script
-        run: sudo ./build-backend.sh
+        run: ./build-backend.sh
         shell: bash
         working-directory: ./deploy
+
+      # - name: Cache Maven packages
+      #   uses: actions/cache@v4
+      #   with:
+      #     path: ~/.m2
+      #     key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+      #     restore-keys: |
+      #       ${{ runner.os }}-maven-
 
       - name: Archive build artifacts
         uses: actions/upload-artifact@v4
         with:
           name: backend-build-artifacts
           path: deploy/cloudbeaver
+          if-no-files-found: error
