@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 export * from './Promises/CancellablePromise';
-export * from './Promises/deferPromise';
+export * from './Promises/cancellableTimeout';
 export * from './Promises/Deferred';
 export * from './Promises/PromiseCancelledError';
 export * from './Promises/PromiseExecutor';
