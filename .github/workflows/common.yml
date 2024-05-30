@@ -14,7 +14,7 @@ on:
       skip_cache:
         description: "Skip cache restoration"
         required: false
-        default: "false"
+        default: "true"
 
 jobs:
   call-backend-build:
