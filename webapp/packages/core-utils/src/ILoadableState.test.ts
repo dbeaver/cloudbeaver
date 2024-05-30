@@ -1,0 +1,79 @@
+/*
+ * CloudBeaver - Cloud Database Manager
+ * Copyright (C) 2020-2024 DBeaver Corp and others
+ *
+ * Licensed under the Apache License, Version 2.0.
+ * you may not use this file except in compliance with the License.
+ */
+import { getFirstException, ILoadableState, isContainsException, isLoadableStateHasException } from './ILoadableState';
+
+describe('isContainsException', () => {
+  it('should return true if exception is present', () => {
+    expect(isContainsException(new Error())).toBe(true);
+  });
+
+  it('should return false if exception is not present', () => {
+    expect(isContainsException(null)).toBe(false);
+  });
+
+  it('should check array of exceptions', () => {
+    expect(isContainsException([null, new Error()])).toBe(true);
+    expect(isContainsException([null, null])).toBe(false);
+  });
+});
+
+describe('getFirstException', () => {
+  it('should return first exception', () => {
+    const error = new Error();
+
+    expect(getFirstException(error)).toBe(error);
+    expect(getFirstException([null, error])).toBe(error);
+  });
+
+  it('should not get exception', () => {
+    expect(getFirstException([null, null])).toBe(null);
+    expect(getFirstException(null)).toBe(null);
+  });
+});
+
+describe('isLoadableStateHasException', () => {
+  it('should return true if exception is present', () => {
+    const state: ILoadableState = {
+      exception: new Error(),
+      isLoading: () => false,
+      isLoaded: () => false,
+      isError: () => false,
+      load: () => undefined,
+    };
+    const stateWithArray: ILoadableState = {
+      exception: [null, new Error()],
+      isLoading: () => false,
+      isLoaded: () => false,
+      isError: () => false,
+      load: () => undefined,
+    };
+
+    expect(isLoadableStateHasException(state)).toBe(true);
+    expect(isLoadableStateHasException(stateWithArray)).toBe(true);
+  });
+
+  it('should return false if exception is not present', () => {
+    const state: ILoadableState = {
+      exception: null,
+      isLoading: () => false,
+      isLoaded: () => false,
+      isError: () => false,
+      load: () => undefined,
+    };
+    const stateWithArray: ILoadableState = {
+      exception: [null, null],
+      isLoading: () => false,
+      isLoaded: () => false,
+      isError: () => false,
+      load: () => undefined,
+    };
+
+    expect(isLoadableStateHasException(state)).toBe(false);
+    expect(isLoadableStateHasException(stateWithArray)).toBe(false);
+  });
+});
