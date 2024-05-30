@@ -1,4 +1,4 @@
-name: Frontend Build
+name: Frontend Tests
 
 on:
   # Allows you to run this workflow manually from the Actions tab
@@ -8,15 +8,12 @@ on:
   workflow_call:
 
 jobs:
-  frontend-build:
+  run-tests:
     runs-on: ubuntu-latest
 
-    defaults:
-      run:
-        working-directory: ./webapp
-
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
       - uses: actions/setup-node@v4
         with:
@@ -46,15 +43,8 @@ jobs:
           dir: webapp
           cmd: install
 
-      - name: build
+      - name: test
         uses: borales/actions-yarn@v5
         with:
-          dir: webapp/packages/product-default
-          cmd: bundle
-
-      - name: Archive build artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: frontend-build-artifacts
-          path: webapp/packages/product-default/lib
-          if-no-files-found: error
+          dir: webapp
+          cmd: lerna run test

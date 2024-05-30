@@ -1,15 +1,6 @@
 name: Backend Build
 
 on:
-  # push:
-  #   branches:
-  #     - devel
-  # pull_request:
-  #   branches:
-  #     - devel
-  #   paths-ignore:
-  #     - "webapp/**"
-
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 

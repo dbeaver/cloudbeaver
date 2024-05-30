@@ -1,0 +1,27 @@
+name: Common
+
+on:
+  push:
+    branches:
+      - devel
+  pull_request:
+    branches:
+      - devel
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+jobs:
+  call-backend-build:
+    uses: ./.github/workflows/backend-build.yml
+
+  call-frontend-build:
+    uses: ./.github/workflows/frontend-build.yml
+
+  call-frontend-tests:
+    needs: [ call-frontend-build]
+    uses: ./.github/workflows/frontend-tests.yml
+
+  call-docker-build-and-push:
+    needs: [call-backend-build, call-frontend-build]
+    uses: ./.github/workflows/docker-build-and-push.yml
