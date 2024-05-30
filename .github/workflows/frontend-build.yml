@@ -6,6 +6,13 @@ on:
 
   # Allows you to reuse workflows by referencing their YAML files
   workflow_call:
+    outputs:
+      build:
+        description: "Build status"
+        value: ${{ jobs.frontend-build.outputs.build-status }}
+      test:
+        description: "Test status"
+        value: ${{ jobs.frontend-build.outputs.test-status }}
     inputs:
       skip_cache:
         required: false
@@ -15,6 +22,10 @@ jobs:
   frontend-build:
     name: Frontend
     runs-on: ubuntu-latest
+
+    outputs:
+      build-status: ${{ steps.build.outcome }}
+      test-status: ${{ steps.test.outcome }}
 
     defaults:
       run:
@@ -53,10 +64,18 @@ jobs:
           cmd: install
 
       - name: build
+        id: build
         uses: borales/actions-yarn@v5
         with:
           dir: webapp/packages/product-default
           cmd: bundle
+
+      - name: test
+        id: test
+        uses: borales/actions-yarn@v5
+        with:
+          dir: webapp
+          cmd: test
 
       - name: Archive build artifacts
         uses: actions/upload-artifact@v4

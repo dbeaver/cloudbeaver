@@ -28,9 +28,18 @@ jobs:
       skip_cache: ${{ github.event.inputs.skip_cache }}
 
   call-frontend-tests:
-    name: Run
-    needs: [call-frontend-build]
-    uses: ./.github/workflows/frontend-tests.yml
+    name: Run Frontend Tests
+    needs: call-frontend-build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check if tests passed
+        if: ${{ needs.call-frontend-build.outputs.test-status != 'success' }}
+        run: |
+          echo "Tests failed"
+          exit 1
+      - name: Continue if tests passed
+        if: ${{ needs.call-frontend-build.outputs.test-status == 'success' }}
+        run: echo "Tests passed"
 
   call-docker-build-and-push:
     name: Run
