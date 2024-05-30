@@ -44,9 +44,7 @@ jobs:
       - name: Run custom Docker build script
         working-directory: ./deploy
         shell: bash
-        run: |
-          chmod +x make-docker-container.sh
-          ./make-docker-container.sh
+        run: ./make-docker-container.sh
 
       - name: Tag Docker Image
         run: |
