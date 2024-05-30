@@ -49,5 +49,6 @@ jobs:
       - name: Tag Docker Image
         run: |
           IMAGE_NAME=dbeaver/cloudbeaver
-          TAG_NAME=${{ github.head_ref || github.ref_name }}
+          BRANCH_NAME=${{ github.head_ref || github.ref_name }}
+          TAG_NAME=$(echo $BRANCH_NAME | sed 's/[^a-zA-Z0-9._-]/-/g')
           docker tag $IMAGE_NAME:dev $IMAGE_NAME:$TAG_NAME
