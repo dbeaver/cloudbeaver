@@ -9,6 +9,7 @@ on:
 
 jobs:
   run-tests:
+    name: Frontend Tests
     runs-on: ubuntu-latest
 
     steps:

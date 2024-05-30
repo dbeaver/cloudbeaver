@@ -9,6 +9,7 @@ on:
 
 jobs:
   frontend-build:
+    name: Frontend
     runs-on: ubuntu-latest
 
     defaults:
