@@ -72,7 +72,6 @@ export * from './createPath';
 export * from './debounce';
 export * from './schema';
 export * from './schemaValidationError';
-export * from './setByPath';
 export * from './svgToDataUri';
 export * from './TempMap';
 export * from './textToHex';
