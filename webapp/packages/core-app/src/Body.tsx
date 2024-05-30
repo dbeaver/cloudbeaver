@@ -19,7 +19,7 @@ import { ThemeService } from '@cloudbeaver/core-theming';
 import { DNDProvider } from '@cloudbeaver/core-ui';
 import { useAppVersion } from '@cloudbeaver/core-version';
 
-import style from './Body.m.css';
+import style from './Body.module.css';
 import { useAppHeight } from './useAppHeight';
 import { useClientActivity } from './useClientActivity';
 

@@ -23,7 +23,7 @@ import type { DialogComponent } from '@cloudbeaver/core-dialogs';
 
 import { Shortcut } from './Shortcut';
 import { DATA_VIEWER_SHORTCUTS, NAVIGATION_TREE_SHORTCUTS, SQL_EDITOR_SHORTCUTS } from './SHORTCUTS_DATA';
-import style from './ShortcutsDialog.m.css';
+import style from './ShortcutsDialog.module.css';
 
 export const ShortcutsDialog: DialogComponent<null> = function ShortcutsDialog({ rejectDialog }) {
   const translate = useTranslate();

@@ -14,7 +14,7 @@ import { TableViewerStorageService } from '@cloudbeaver/plugin-data-viewer';
 import type { IStatisticsTab } from '../ISqlEditorTabState';
 import type { QueryDataSource } from '../QueryDataSource';
 import { SqlQueryService } from './SqlQueryService';
-import classes from './SqlScriptStatisticsPanel.m.css';
+import classes from './SqlScriptStatisticsPanel.module.css';
 
 interface IProps {
   tab: IStatisticsTab;

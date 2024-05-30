@@ -33,7 +33,7 @@ import { navigationTreeProjectsRendererRenderer } from './ProjectsRenderer/navig
 import { navigationTreeResourceTypeFilter } from './ProjectsRenderer/navigationTreeResourceTypeFilter';
 import { ProjectsSettingsPlaceholderElement } from './ProjectsRenderer/ProjectsSettingsForm';
 import { navigationTreeResourceExpandStateGetter } from './ResourceFolderRenderer/navigationTreeResourceExpandStateGetter';
-import style from './ResourceManagerTree.m.css';
+import style from './ResourceManagerTree.module.css';
 import { ResourceManagerTreeCaptureViewContext } from './ResourceManagerTreeCaptureViewContext';
 import { transformResourceNodeInfo } from './ResourceRenderer/transformResourceNodeInfo';
 

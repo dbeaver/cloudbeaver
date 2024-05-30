@@ -13,7 +13,7 @@ import type { ObjectPagePanelComponent } from '@cloudbeaver/plugin-object-viewer
 
 import type { IDataViewerPageState } from '../IDataViewerPageState';
 import { TableViewerLoader } from '../TableViewer/TableViewerLoader';
-import classes from './DataViewerPanel.m.css';
+import classes from './DataViewerPanel.module.css';
 import { useDataViewerDatabaseDataModel } from './useDataViewerDatabaseDataModel';
 
 export const DataViewerPanel: ObjectPagePanelComponent<IDataViewerPageState> = observer(function DataViewerPanel({ tab, page }) {

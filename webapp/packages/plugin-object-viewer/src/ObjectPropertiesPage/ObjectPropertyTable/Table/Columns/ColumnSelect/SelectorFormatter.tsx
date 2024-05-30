@@ -13,7 +13,7 @@ import type { DBObject } from '@cloudbeaver/core-navigation-tree';
 import type { RenderCellProps } from '@cloudbeaver/plugin-react-data-grid';
 
 import { TableContext } from '../../TableContext';
-import style from './SelectorFormatter.m.css';
+import style from './SelectorFormatter.module.css';
 
 export const SelectorFormatter = observer<RenderCellProps<DBObject>>(function SelectorFormatter(props) {
   const context = useContext(TableContext);

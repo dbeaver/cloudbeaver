@@ -11,7 +11,7 @@ import { getComputed, Loader, Pane, ResizerControls, s, Split, useS, useSplitUse
 import { useService } from '@cloudbeaver/core-di';
 import { LeftBarPanelService, SideBarPanel, SideBarPanelService } from '@cloudbeaver/core-ui';
 
-import style from './Main.m.css';
+import style from './Main.module.css';
 import { RightArea } from './RightArea';
 
 export const Main = observer(function Main() {

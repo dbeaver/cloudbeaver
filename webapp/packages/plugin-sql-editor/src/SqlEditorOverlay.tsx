@@ -36,7 +36,7 @@ import { NodeManagerUtils } from '@cloudbeaver/core-navigation-tree';
 
 import type { ISqlEditorTabState } from './ISqlEditorTabState';
 import { SqlDataSourceService } from './SqlDataSource/SqlDataSourceService';
-import style from './SqlEditorOverlay.m.css';
+import style from './SqlEditorOverlay.module.css';
 import { SqlEditorService } from './SqlEditorService';
 
 interface Props {

@@ -32,7 +32,7 @@ import { useCodemirrorExtensions } from '@cloudbeaver/plugin-codemirror6';
 import { SqlDialectInfoService } from '@cloudbeaver/plugin-sql-editor';
 import { SQLCodeEditorLoader, useSqlDialectExtension } from '@cloudbeaver/plugin-sql-editor-new';
 
-import style from './GeneratedSqlDialog.m.css';
+import style from './GeneratedSqlDialog.module.css';
 import { SqlGeneratorsResource } from './SqlGeneratorsResource';
 
 interface Payload {

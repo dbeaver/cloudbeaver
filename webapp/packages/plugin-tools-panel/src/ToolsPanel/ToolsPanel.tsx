@@ -14,7 +14,7 @@ import { useService } from '@cloudbeaver/core-di';
 import { ITabData, TabList, TabPanelList, TabsState } from '@cloudbeaver/core-ui';
 import { isArraysEqual } from '@cloudbeaver/core-utils';
 
-import styles from './ToolsPanel.m.css';
+import styles from './ToolsPanel.module.css';
 import { ToolsPanelService } from './ToolsPanelService';
 
 interface IToolsState {

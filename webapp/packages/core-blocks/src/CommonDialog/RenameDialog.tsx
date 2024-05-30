@@ -26,7 +26,7 @@ import { CommonDialogBody } from './CommonDialog/CommonDialogBody';
 import { CommonDialogFooter } from './CommonDialog/CommonDialogFooter';
 import { CommonDialogHeader } from './CommonDialog/CommonDialogHeader';
 import { CommonDialogWrapper } from './CommonDialog/CommonDialogWrapper';
-import style from './RenameDialog.m.css';
+import style from './RenameDialog.module.css';
 
 interface IRenameDialogState {
   name: string;

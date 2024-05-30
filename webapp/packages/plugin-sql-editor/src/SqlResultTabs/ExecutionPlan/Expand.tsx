@@ -7,7 +7,7 @@
  */
 import { Icon, s, useS } from '@cloudbeaver/core-blocks';
 
-import classes from './Expand.m.css';
+import classes from './Expand.module.css';
 
 interface Props {
   expanded: boolean;

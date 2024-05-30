@@ -11,7 +11,7 @@ import React from 'react';
 import { importLazyComponent } from '@cloudbeaver/core-blocks';
 
 import type { ISqlEditorTabState } from '../ISqlEditorTabState';
-import classes from './SqlResultPanel.m.css';
+import classes from './SqlResultPanel.module.css';
 
 const SqlExecutionPlanPanel = importLazyComponent(() => import('./ExecutionPlan/SqlExecutionPlanPanel').then(module => module.SqlExecutionPlanPanel));
 const OutputLogsPanel = importLazyComponent(() => import('./OutputLogs/OutputLogsPanel').then(module => module.OutputLogsPanel));

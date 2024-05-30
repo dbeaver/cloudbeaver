@@ -9,7 +9,7 @@ import { s, Translate, useS } from '@cloudbeaver/core-blocks';
 
 import type { NavigationNodeRendererComponent } from '../ElementsTree/NavigationNodeComponent';
 import { NAVIGATION_TREE_CONNECTION_GROUPS } from './navigationTreeConnectionGroupFilter';
-import style from './NavigationTreeConnectionGroupRenderer.m.css';
+import style from './NavigationTreeConnectionGroupRenderer.module.css';
 
 export function navigationTreeConnectionGroupRenderer(nodeId: string): NavigationNodeRendererComponent | undefined {
   if (nodeId !== NAVIGATION_TREE_CONNECTION_GROUPS.manageable && nodeId !== NAVIGATION_TREE_CONNECTION_GROUPS.unmanageable) {

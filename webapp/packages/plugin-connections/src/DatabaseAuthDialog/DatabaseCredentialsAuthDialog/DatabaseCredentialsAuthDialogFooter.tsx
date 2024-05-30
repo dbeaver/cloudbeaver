@@ -9,7 +9,7 @@ import { observer } from 'mobx-react-lite';
 
 import { Button, s, useS, useTranslate } from '@cloudbeaver/core-blocks';
 
-import styles from './DatabaseCredentialsAuthDialogFooter.m.css';
+import styles from './DatabaseCredentialsAuthDialogFooter.module.css';
 
 export interface Props {
   isAuthenticating: boolean;

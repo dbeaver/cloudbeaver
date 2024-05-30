@@ -28,7 +28,7 @@ import { isSafari } from '@cloudbeaver/core-utils';
 
 import type { IConnectionFormProps } from '../IConnectionFormProps';
 import { SAVED_VALUE_INDICATOR } from './SAVED_VALUE_INDICATOR';
-import styles from './SSL.m.css';
+import styles from './SSL.module.css';
 
 interface Props extends IConnectionFormProps {
   handler: NetworkHandlerDescriptor;

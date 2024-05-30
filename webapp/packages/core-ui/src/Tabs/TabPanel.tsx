@@ -12,7 +12,7 @@ import { TabPanel as BaseTabPanel } from 'reakit/Tab';
 import { getComputed, Loader, s, useS } from '@cloudbeaver/core-blocks';
 
 import { TabContext } from './TabContext';
-import tabPanelStyles from './TabPanel.m.css';
+import tabPanelStyles from './TabPanel.module.css';
 import type { TabPanelProps } from './TabPanelProps';
 import { TabsContext } from './TabsContext';
 import { useTabsValidation } from './useTabsValidation';

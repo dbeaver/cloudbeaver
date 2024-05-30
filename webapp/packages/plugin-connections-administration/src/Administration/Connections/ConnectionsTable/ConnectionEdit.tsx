@@ -13,7 +13,7 @@ import { ConnectionInfoResource, IConnectionInfoParams } from '@cloudbeaver/core
 import { useService } from '@cloudbeaver/core-di';
 import { ConnectionFormLoader, useConnectionFormState } from '@cloudbeaver/plugin-connections';
 
-import styles from './ConnectionEdit.m.css';
+import styles from './ConnectionEdit.module.css';
 
 interface Props {
   item: IConnectionInfoParams;

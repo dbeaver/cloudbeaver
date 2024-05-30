@@ -15,7 +15,7 @@ import type { ConnectionConfig } from '@cloudbeaver/core-sdk';
 import { TabList, TabPanelList, TabsState } from '@cloudbeaver/core-ui';
 
 import { ConnectionFormActionsContext, IConnectionFormActionsContext } from './ConnectFormActionsContext';
-import style from './ConnectionForm.m.css';
+import style from './ConnectionForm.module.css';
 import { ConnectionFormService } from './ConnectionFormService';
 import { connectionConfigContext } from './Contexts/connectionConfigContext';
 import type { IConnectionFormState } from './IConnectionFormProps';

@@ -15,7 +15,7 @@ import { useMenu } from '@cloudbeaver/core-view';
 import { DATA_CONTEXT_SQL_EDITOR_STATE } from '../../DATA_CONTEXT_SQL_EDITOR_STATE';
 import type { ISqlEditorTabState } from '../../ISqlEditorTabState';
 import { OUTPUT_LOGS_MENU } from './OUTPUT_LOGS_MENU';
-import styles from './OutputLogsMenu.m.css';
+import styles from './OutputLogsMenu.module.css';
 
 interface Props {
   sqlEditorTabState: ISqlEditorTabState;

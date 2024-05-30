@@ -14,7 +14,7 @@ import { TabList } from '../../Tabs/TabList';
 import { TabPanelList } from '../../Tabs/TabPanelList';
 import { TabsState } from '../../Tabs/TabsState';
 import { FormMode } from '../FormMode';
-import style from './BaseForm.m.css';
+import style from './BaseForm.module.css';
 import type { IBaseFormProps } from './IBaseFormProps';
 
 export const BaseForm = observer<IBaseFormProps<any>>(function BaseForm({ service, state, onClose, onSubmit }) {
