@@ -7,10 +7,10 @@ on:
   # Allows you to reuse workflows by referencing their YAML files
   workflow_call:
     outputs:
-      build:
+      build-status:
         description: "Build status"
         value: ${{ jobs.frontend-build.outputs.build-status }}
-      test:
+      test-status:
         description: "Test status"
         value: ${{ jobs.frontend-build.outputs.test-status }}
     inputs:
