@@ -17,7 +17,7 @@
       "type": "shell",
       "command": "yarn",
       "group": "test",
-      "args": ["lerna", "run", "test", "--no-bail", "--stream", "--"]
+      "args": ["test"]
     },
     {
       "label": "Run DevServer CE",
@@ -107,6 +107,14 @@
       "label": "Update TS references CE",
       "type": "shell",
       "command": "yarn lerna run update-ts-references --stream",
+      "options": {
+        "cwd": "${workspaceFolder}/webapp"
+      }
+    },
+    {
+      "label": "Clean CE",
+      "type": "shell",
+      "command": "yarn lerna run clean --parallel --stream",
       "options": {
         "cwd": "${workspaceFolder}/webapp"
       }

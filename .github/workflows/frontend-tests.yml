@@ -48,4 +48,4 @@ jobs:
         uses: borales/actions-yarn@v5
         with:
           dir: webapp
-          cmd: lerna run test
+          cmd: test
