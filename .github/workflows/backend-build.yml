@@ -22,7 +22,7 @@ jobs:
           distribution: "temurin"
           java-version: "17"
           cache: maven
-      
+
       - uses: stCarolas/setup-maven@v5
         with:
           maven-version: 3.9.0

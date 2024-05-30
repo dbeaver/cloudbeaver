@@ -6,6 +6,10 @@ on:
 
   # Allows you to reuse workflows by referencing their YAML files
   workflow_call:
+    inputs:
+      skip_cache:
+        required: false
+        type: string
 
 jobs:
   frontend-build:
@@ -34,6 +38,7 @@ jobs:
             ${{ runner.os }}-node_modules-
 
       - name: restore typescript cache
+        if: env.skip_cache != 'true'
         uses: actions/cache@v4
         with:
           path: "**/packages/*/dist"

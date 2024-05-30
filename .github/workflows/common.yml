@@ -10,6 +10,11 @@ on:
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
+    inputs:
+      skip_cache:
+        description: "Skip cache restoration"
+        required: false
+        default: "false"
 
 jobs:
   call-backend-build:
@@ -19,10 +24,12 @@ jobs:
   call-frontend-build:
     name: Build
     uses: ./.github/workflows/frontend-build.yml
+    with:
+      skip_cache: ${{ github.event.inputs.skip_cache }}
 
   call-frontend-tests:
     name: Run
-    needs: [ call-frontend-build]
+    needs: [call-frontend-build]
     uses: ./.github/workflows/frontend-tests.yml
 
   call-docker-build-and-push:
