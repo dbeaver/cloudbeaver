@@ -79,7 +79,6 @@ export * from './uriToBlob';
 export * from './utf8ToBase64';
 export * from './createLastPromiseGetter';
 export * from './removeMetadataFromDataURL';
-export * from './renamePathName';
 export * from './removeLineBreak';
 export * from './replaceSubstring';
 export * from './formatNumber';
