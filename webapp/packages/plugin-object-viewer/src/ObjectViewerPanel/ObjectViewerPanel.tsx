@@ -21,8 +21,8 @@ import type { IObjectViewerTabState } from '../IObjectViewerTabState';
 import { DBObjectPagePanel } from '../ObjectPage/DBObjectPagePanel';
 import { DBObjectPageService } from '../ObjectPage/DBObjectPageService';
 import { DBObjectPageTab } from '../ObjectPage/DBObjectPageTab';
-import styles from './shared/ObjectViewerPanel.m.css';
-import ObjectViewerPanelTab from './shared/ObjectViewerPanelTab.m.css';
+import styles from './shared/ObjectViewerPanel.module.css';
+import ObjectViewerPanelTab from './shared/ObjectViewerPanelTab.module.css';
 
 const tabsRegistry: StyleRegistry = [
   [

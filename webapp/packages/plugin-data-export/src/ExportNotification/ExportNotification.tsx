@@ -22,7 +22,7 @@ import {
 import { ENotificationType } from '@cloudbeaver/core-events';
 import { EDeferredState } from '@cloudbeaver/core-utils';
 
-import styles from './ExportNotification.m.css';
+import styles from './ExportNotification.module.css';
 import type { IExportNotification } from './IExportNotification';
 import { useExportNotification } from './useExportNotification';
 

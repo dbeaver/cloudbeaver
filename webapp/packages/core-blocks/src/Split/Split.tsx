@@ -10,7 +10,7 @@ import { observer } from 'mobx-react-lite';
 
 import { s } from '../s';
 import { useS } from '../useS';
-import style from './Split.m.css';
+import style from './Split.module.css';
 
 export type ISplitProps = SplitProps & {
   disableAutoMargin?: boolean;

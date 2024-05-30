@@ -1,3 +1,10 @@
+/*
+ * CloudBeaver - Cloud Database Manager
+ * Copyright (C) 2020-2024 DBeaver Corp and others
+ *
+ * Licensed under the Apache License, Version 2.0.
+ * you may not use this file except in compliance with the License.
+ */
 export * from './manifest';
 
 export * from './NavigationTree/ElementsTree/ElementsTreeTools/NavigationTreeSettings/createElementsTreeSettings';
@@ -29,11 +36,11 @@ export * from './NavigationTree/ElementsTree/elementsTreeNameFilter';
 export * from './NavigationTree/ElementsTree/ElementsTreeService';
 export * from './NavigationTree/NavigationTreeBootstrap';
 export * from './NavigationTree/NavigationTreeService';
-export { default as ElementsTreeToolsStyles } from './NavigationTree/ElementsTree/ElementsTreeTools/ElementsTreeTools.m.css';
-export { default as ElementsTreeFilterStyles } from './NavigationTree/ElementsTree/ElementsTreeTools/ElementsTreeFilter.m.css';
-export { default as NavigationNodeNestedStyles } from './NavigationTree/ElementsTree/NavigationTreeNode/NavigationNode/NavigationNodeNested.m.css';
-export { default as NavigationNodeControlRendererStyles } from './NavigationTree/ElementsTree/NavigationTreeNode/NavigationNodeControlRenderer.m.css';
-export { default as NavigationNodeControlStyles } from './NavigationTree/ElementsTree/NavigationTreeNode/NavigationNode/NavigationNodeControl.m.css';
+export { default as ElementsTreeToolsStyles } from './NavigationTree/ElementsTree/ElementsTreeTools/ElementsTreeTools.module.css';
+export { default as ElementsTreeFilterStyles } from './NavigationTree/ElementsTree/ElementsTreeTools/ElementsTreeFilter.module.css';
+export { default as NavigationNodeNestedStyles } from './NavigationTree/ElementsTree/NavigationTreeNode/NavigationNode/NavigationNodeNested.module.css';
+export { default as NavigationNodeControlRendererStyles } from './NavigationTree/ElementsTree/NavigationTreeNode/NavigationNodeControlRenderer.module.css';
+export { default as NavigationNodeControlStyles } from './NavigationTree/ElementsTree/NavigationTreeNode/NavigationNode/NavigationNodeControl.module.css';
 
 export * from './NavigationTree/NavigationTreeLoader';
 export * from './TreeNew/INodeRenderer';

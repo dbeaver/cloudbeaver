@@ -15,7 +15,7 @@ import { IVersion, VersionResource } from '@cloudbeaver/core-version';
 import { VersionUpdateService } from '@cloudbeaver/core-version-update';
 
 import { VersionInfo } from './VersionInfo';
-import styles from './VersionSelector.m.css';
+import styles from './VersionSelector.module.css';
 
 interface Props {
   versions: IVersion[];

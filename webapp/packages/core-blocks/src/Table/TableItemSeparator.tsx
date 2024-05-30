@@ -9,8 +9,8 @@ import { observer } from 'mobx-react-lite';
 
 import { s } from '../s';
 import { useS } from '../useS';
-import cellStyles from './TableColumnValue.m.css';
-import rowStyles from './TableItem.m.css';
+import cellStyles from './TableColumnValue.module.css';
+import rowStyles from './TableItem.module.css';
 
 interface Props {
   colSpan?: number;

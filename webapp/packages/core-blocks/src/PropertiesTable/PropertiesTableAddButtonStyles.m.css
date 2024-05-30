@@ -1,8 +1,0 @@
-.buttonIcon {
-  margin-right: 0px !important;
-}
-.buttonLabel {
-  composes: theme-typography--caption from global;
-  text-transform: initial;
-  font-weight: 600;
-}

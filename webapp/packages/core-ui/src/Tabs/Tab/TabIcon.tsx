@@ -7,7 +7,7 @@
  */
 import { IconOrImage, s, useS } from '@cloudbeaver/core-blocks';
 
-import TabIconStyles from './TabIcon.m.css';
+import TabIconStyles from './TabIcon.module.css';
 
 export interface TabIconProps {
   icon?: string;

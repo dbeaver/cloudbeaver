@@ -12,7 +12,7 @@ import { Disclosure, DisclosureContent, DisclosureStateReturn, useDisclosureStat
 import { IconOrImage } from '../IconOrImage';
 import { s } from '../s';
 import { useS } from '../useS';
-import style from './Expandable.m.css';
+import style from './Expandable.module.css';
 
 export type ExpandableState = Pick<DisclosureStateReturn, 'setVisible' | 'show' | 'hide' | 'toggle' | 'visible'>;
 

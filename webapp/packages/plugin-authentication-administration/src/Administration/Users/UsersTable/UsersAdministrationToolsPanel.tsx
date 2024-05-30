@@ -12,8 +12,8 @@ import { MenuBar, MenuBarItemStyles } from '@cloudbeaver/core-ui';
 import { useMenu } from '@cloudbeaver/core-view';
 
 import { MENU_USERS_ADMINISTRATION } from '../../../Menus/MENU_USERS_ADMINISTRATION';
-import UsersAdministrationMenuBarItemStyles from './UsersAdministrationMenuBarItemStyles.m.css';
-import styles from './UsersAdministrationToolsPanel.m.css';
+import UsersAdministrationMenuBarItemStyles from './UsersAdministrationMenuBarItemStyles.module.css';
+import styles from './UsersAdministrationToolsPanel.module.css';
 
 interface Props {
   onUpdate: () => void;

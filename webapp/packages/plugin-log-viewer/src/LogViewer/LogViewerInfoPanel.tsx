@@ -11,7 +11,7 @@ import { useCallback } from 'react';
 import { Container, MenuBarSmallItem, s, Textarea, useClipboard, useS, useTranslate } from '@cloudbeaver/core-blocks';
 
 import type { ILogEntry } from './ILogEntry';
-import classes from './LogViewerInfoPanel.m.css';
+import classes from './LogViewerInfoPanel.module.css';
 
 interface Props {
   selectedItem: ILogEntry;

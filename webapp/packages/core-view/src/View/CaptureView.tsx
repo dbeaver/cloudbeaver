@@ -16,7 +16,7 @@ import { isObjectsEqual } from '@cloudbeaver/core-utils';
 import { ActionService } from '../Action/ActionService';
 import type { IActionItem } from '../Action/IActionItem';
 import { getCommonAndOSSpecificKeys } from '../Action/KeyBinding/getCommonAndOSSpecificKeys';
-import styles from './CaptureView.m.css';
+import styles from './CaptureView.module.css';
 import { CaptureViewContext } from './CaptureViewContext';
 import type { IView } from './IView';
 import { parseHotkey } from './parseHotkey';

@@ -27,7 +27,7 @@ import { useCodemirrorExtensions } from '@cloudbeaver/plugin-codemirror6';
 import type { IDatabaseDataModel } from '@cloudbeaver/plugin-data-viewer';
 import { SQLCodeEditorLoader, useSqlDialectExtension } from '@cloudbeaver/plugin-sql-editor-new';
 
-import style from './ScriptPreviewDialog.m.css';
+import style from './ScriptPreviewDialog.module.css';
 
 interface Payload {
   script: string;

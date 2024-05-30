@@ -18,7 +18,7 @@ import {
 } from '@cloudbeaver/core-blocks';
 import type { DialogComponent } from '@cloudbeaver/core-dialogs';
 
-import style from './ScriptImportDialog.m.css';
+import style from './ScriptImportDialog.module.css';
 
 export const ScriptImportDialog: DialogComponent<null, boolean> = function ScriptImportDialog({ resolveDialog, rejectDialog, className }) {
   const styles = useS(style);

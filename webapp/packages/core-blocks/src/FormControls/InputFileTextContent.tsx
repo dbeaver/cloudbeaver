@@ -21,7 +21,7 @@ import { Field } from './Field';
 import { FieldDescription } from './FieldDescription';
 import { FieldLabel } from './FieldLabel';
 import { FormContext } from './FormContext';
-import inputFileTextContentStyles from './InputFileTextContent.m.css';
+import inputFileTextContentStyles from './InputFileTextContent.module.css';
 
 const DEFAULT_MAX_FILE_SIZE = 2048;
 

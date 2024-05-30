@@ -15,7 +15,7 @@ import { useTranslate } from '../localization/useTranslate';
 import { s } from '../s';
 import { useS } from '../useS';
 import type { IProperty } from './IProperty';
-import classes from './PropertyItem.m.css';
+import classes from './PropertyItem.module.css';
 import { PropertyValueSelector } from './PropertyValueSelector';
 
 interface Props {

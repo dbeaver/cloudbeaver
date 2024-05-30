@@ -13,7 +13,7 @@ import { isArraysEqual } from '@cloudbeaver/core-utils';
 
 import { ElementsTreeContext } from '../../ElementsTreeContext';
 import type { NavTreeNodeComponent } from '../../NavigationNodeComponent';
-import style from './NavigationNodeNested.m.css';
+import style from './NavigationNodeNested.module.css';
 
 interface Props {
   nodeId?: string;

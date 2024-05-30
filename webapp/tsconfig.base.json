@@ -52,7 +52,6 @@
         // https://github.com/mrmckeb/typescript-plugin-css-modules/issues/222
         "name": "typescript-plugin-css-modules",
         "options": {
-          "customMatcher": "\\.m\\.(c|le|sa|sc)ss$",
           "goToDefinition": true
         }
       }

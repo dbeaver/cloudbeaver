@@ -26,7 +26,7 @@ import { useService } from '@cloudbeaver/core-di';
 import type { DialogComponent } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
 
-import classes from './DisableUserDialog.m.css';
+import classes from './DisableUserDialog.module.css';
 
 interface IPayload {
   userId: string;

@@ -11,8 +11,8 @@ import { ConnectionImageWithMask, ConnectionImageWithMaskSvgStyles, s, SContext,
 import { ConnectionInfoResource, DBDriverResource } from '@cloudbeaver/core-connections';
 import { CachedMapAllKey } from '@cloudbeaver/core-resource';
 
-import styles from './ConnectionIcon.m.css';
-import ConnectionImageWithMaskSvgBackgroundStyles from './ConnectionImageWithMask.m.css';
+import styles from './ConnectionIcon.module.css';
+import ConnectionImageWithMaskSvgBackgroundStyles from './ConnectionImageWithMask.module.css';
 import type { IConnectionSelectorExtraProps } from './IConnectionSelectorExtraProps';
 
 export interface ConnectionIconProps extends IConnectionSelectorExtraProps {

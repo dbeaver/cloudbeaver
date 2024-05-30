@@ -11,7 +11,7 @@ import { Container, MenuBarSmallItem, s, Table, TableBody, TableColumnHeader, Ta
 
 import type { ILogEntry } from './ILogEntry';
 import { LogEntry } from './LogEntry';
-import styles from './LogViewerTable.m.css';
+import styles from './LogViewerTable.module.css';
 
 interface Props {
   items: ILogEntry[];
