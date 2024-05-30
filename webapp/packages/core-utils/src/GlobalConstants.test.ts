@@ -101,6 +101,6 @@ describe('GlobalConstants', () => {
 
   it('should generate absolute url', () => {
     expect(GlobalConstants.absoluteUrl('test/', 'test2')).toBe('/test/test2');
-    expect(GlobalConstants.absoluteUrl('platform:test/', 'test2')).toBe('/apiimages/test/test2');
+    expect(GlobalConstants.absoluteUrl('platform:test/', 'test2')).toBe('/apiimagesplatform:test/test2');
   });
 });
