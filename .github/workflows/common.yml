@@ -1,4 +1,4 @@
-name: Common
+name: Check
 
 on:
   push:
@@ -17,9 +17,9 @@ on:
         default: "false"
 
 jobs:
-  call-backend-build:
-    name: Build
-    uses: ./.github/workflows/backend-build.yml
+  # call-backend-build:
+  #   name: Build
+  #   uses: ./.github/workflows/backend-build.yml
 
   call-frontend-build:
     name: Build
@@ -27,8 +27,13 @@ jobs:
     with:
       skip_cache: ${{ github.event.inputs.skip_cache }}
 
+  call-frontend-lint:
+    name: Frontend lint
+    needs: call-frontend-build
+    uses: ./.github/workflows/frontend-lint.yml
+
   call-frontend-tests:
-    name: Run Frontend Tests
+    name: Frontend Unit Tests
     needs: call-frontend-build
     runs-on: ubuntu-latest
     steps:
@@ -41,7 +46,7 @@ jobs:
         if: ${{ needs.call-frontend-build.outputs.test-status == 'success' }}
         run: echo "Tests passed"
 
-  call-docker-build-and-push:
-    name: Run
-    needs: [call-backend-build, call-frontend-build]
-    uses: ./.github/workflows/docker-build-and-push.yml
+  # call-docker-build-and-push:
+  #   name: Run
+  #   needs: [call-backend-build, call-frontend-build]
+  #   uses: ./.github/workflows/docker-build-and-push.yml

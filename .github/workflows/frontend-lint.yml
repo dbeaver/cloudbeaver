@@ -1,0 +1,69 @@
+name: Frontend Lint
+
+on:
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+  # Allows you to reuse workflows by referencing their YAML files
+  workflow_call:
+    inputs:
+      skip_cache:
+        required: false
+        type: string
+
+jobs:
+  lint:
+    name: Frontend
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: ./webapp
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: yarn
+          cache-dependency-path: webapp/yarn.lock
+
+      - name: restore node_modules
+        uses: actions/cache@v4
+        with:
+          path: "**/node_modules"
+          key: ${{ runner.os }}-node_modules-${{ hashFiles('webapp/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-node_modules-
+
+      - name: yarn install --frozen-lockfile
+        uses: borales/actions-yarn@v5
+        with:
+          dir: webapp
+          cmd: install
+
+      - name: Get list of changed files
+        id: git_diff
+        run: |
+          CHANGED_FILES=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep -E 'webapp/packages/[^/]+/src/.+\.tsx?$')
+          echo "Changed files: $CHANGED_FILES"
+          echo "::set-output name=files::$CHANGED_FILES"
+
+      - name: yarn lint
+        if: steps.git_diff.outputs.files != ''
+        id: lint
+        uses: borales/actions-yarn@v5
+        with:
+          dir: webapp
+          cmd: lint ${{ steps.git_diff.outputs.files }}
+
+      - name: Annotate PR with ESLint results
+        if: steps.git_diff.outputs.files != ''
+        uses: reviewdog/action-eslint@v1
+        with:
+          reporter: github-pr-review
+          filter_mode: file
+          workdir: webapp
+          level: warning
+          eslint_flags: "--ext .ts,.tsx --format json --output-file eslint-results.json ${{ steps.git_diff.outputs.files }}"
