@@ -45,7 +45,7 @@ import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.*;
 
-import jakarta.servlet.http.HttpServletRequest; // trigger lint
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 public class RPSessionHandler implements DBWSessionHandler {
@@ -53,8 +53,8 @@ public class RPSessionHandler implements DBWSessionHandler {
     private static final Log log = Log.getLog(RPSessionHandler.class);
     public static final String DEFAULT_TEAM_DELIMITER = "\\|";
 
-    @Override // trigger lint
-    public boolean handleSessionOpen(WebSession webSession, HttpServletRequest request, HttpServletResponse response) throws DBException, IOException { // trigger lint
+    @Override
+    public boolean handleSessionOpen(WebSession webSession, HttpServletRequest request, HttpServletResponse response) throws DBException, IOException {
         boolean configMode = CBApplication.getInstance().isConfigurationMode();
         //checks if the app is not in configuration mode and reverse proxy auth is enabled in the config file
         WebAuthConfiguration appConfiguration = (WebAuthConfiguration) WebAppUtils.getWebApplication().getAppConfiguration();
