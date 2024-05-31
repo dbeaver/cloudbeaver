@@ -20,6 +20,7 @@
   },
   "scripts": {
     "test": "core-cli-test",
+    "clean": "rimraf --glob packages/*/dist",
     "lint": "eslint --ext .ts,.tsx",
     "prebuild": "lerna run gql:gen --stream --parallel",
     "prepare": "cd .. && husky ./webapp/.husky",
