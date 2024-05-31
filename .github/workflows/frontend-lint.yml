@@ -50,7 +50,7 @@ jobs:
         id: git_diff
         run: |
           BEFORE=${{ github.event.before || 'HEAD^' }}
-          CHANGED_FILES=$(git diff --name-only $BEFORE ${{ github.sha }} | grep -E 'webapp/packages/[^/]+/src/.+\.tsx?$')
+          CHANGED_FILES=$(git diff --name-only $BEFORE ${{ github.sha }} | grep -E 'webapp/packages/[^/]+/src/.+\.tsx?$' | sed 's|webapp/||')
           echo "Changed files: $CHANGED_FILES"
           echo "files=$CHANGED_FILES" >> $GITHUB_ENV
 
