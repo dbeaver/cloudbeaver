@@ -106,7 +106,7 @@
     {
       "label": "Update TS references CE",
       "type": "shell",
-      "command": "yarn lerna run update-ts-references --stream",
+      "command": "yarn run update-ts-references",
       "options": {
         "cwd": "${workspaceFolder}/webapp"
       }

@@ -22,6 +22,8 @@
     "test": "core-cli-test",
     "clean": "rimraf --glob packages/*/dist",
     "lint": "eslint --ext .ts,.tsx",
+    "validate-dependencies": "core-cli-validate-dependencies './packages/*/'",
+    "update-ts-references": "yarn run clean && typescript-resolve-references './packages/*/'",
     "prebuild": "lerna run gql:gen --stream --parallel",
     "prepare": "cd .. && husky ./webapp/.husky",
     "postinstall": "husky"
