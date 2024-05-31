@@ -17,9 +17,9 @@ on:
         default: "false"
 
 jobs:
-  # call-backend-build:
-  #   name: Build
-  #   uses: ./.github/workflows/backend-build.yml
+  call-backend-build:
+    name: Build
+    uses: ./.github/workflows/backend-build.yml
 
   call-frontend-build:
     name: Build
@@ -46,7 +46,7 @@ jobs:
         if: ${{ needs.call-frontend-build.outputs.test-status == 'success' }}
         run: echo "Tests passed"
 
-  # call-docker-build-and-push:
-  #   name: Run
-  #   needs: [call-backend-build, call-frontend-build]
-  #   uses: ./.github/workflows/docker-build-and-push.yml
+  call-docker-build-and-push:
+    name: Run
+    needs: [call-backend-build, call-frontend-build]
+    uses: ./.github/workflows/docker-build-and-push.yml

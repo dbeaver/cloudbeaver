@@ -38,10 +38,18 @@ jobs:
 
       - name: Tag Docker Image
         run: |
-          IMAGE_NAME=dbeaver/cloudbeaver
+          REPO_NAME=$(basename ${{ github.repository }})
+          IMAGE_NAME=ghcr.io/${{ github.repository_owner }}/$REPO_NAME
           BRANCH_NAME=${{ github.head_ref || github.ref_name }}
           TAG_NAME=$(echo $BRANCH_NAME | sed 's/[^a-zA-Z0-9._-]/-/g')
           docker tag $IMAGE_NAME:dev $IMAGE_NAME:$TAG_NAME
+          echo "image=$IMAGE_NAME:$TAG_NAME" >> $GITHUB_ENV
+
+      - name: Log in to GitHub Container Registry
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.repository_owner }} --password-stdin
+
+      - name: Push Docker Image
+        run: docker push ${{ env.image }}
 
       # - name: Comment on Pull Request
       #   if: github.event_name == 'pull_request'
