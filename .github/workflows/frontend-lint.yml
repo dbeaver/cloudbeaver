@@ -43,27 +43,31 @@ jobs:
           dir: webapp
           cmd: install
 
+      - name: Fetch all history for diff
+        run: git fetch --prune --unshallow
+
       - name: Get list of changed files
         id: git_diff
         run: |
-          CHANGED_FILES=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep -E 'webapp/packages/[^/]+/src/.+\.tsx?$')
+          BEFORE=${{ github.event.before || 'HEAD^' }}
+          CHANGED_FILES=$(git diff --name-only $BEFORE ${{ github.sha }} | grep -E 'webapp/packages/[^/]+/src/.+\.tsx?$')
           echo "Changed files: $CHANGED_FILES"
-          echo "::set-output name=files::$CHANGED_FILES"
+          echo "files=$CHANGED_FILES" >> $GITHUB_ENV
 
       - name: yarn lint
-        if: steps.git_diff.outputs.files != ''
+        if: env.files != ''
         id: lint
         uses: borales/actions-yarn@v5
         with:
           dir: webapp
-          cmd: lint ${{ steps.git_diff.outputs.files }}
+          cmd: lint ${{ env.files }}
 
       - name: Annotate PR with ESLint results
-        if: steps.git_diff.outputs.files != ''
+        if: env.files != ''
         uses: reviewdog/action-eslint@v1
         with:
           reporter: github-pr-review
           filter_mode: file
           workdir: webapp
           level: warning
-          eslint_flags: "--ext .ts,.tsx --format json --output-file eslint-results.json ${{ steps.git_diff.outputs.files }}"
+          eslint_flags: "--ext .ts,.tsx ${{ env.files }}"

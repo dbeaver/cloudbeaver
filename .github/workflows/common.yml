@@ -28,7 +28,7 @@ jobs:
       skip_cache: ${{ github.event.inputs.skip_cache }}
 
   call-frontend-lint:
-    name: Frontend lint
+    name: Lint
     needs: call-frontend-build
     uses: ./.github/workflows/frontend-lint.yml
 
