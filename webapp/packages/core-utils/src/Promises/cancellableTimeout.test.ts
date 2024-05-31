@@ -14,6 +14,8 @@ jest.mock('./CancellablePromise', () => ({
 }));
 
 describe('cancellableTimeout', () => {
+  jest.useFakeTimers();
+
   it('resolves after the specified timeout', async () => {
     const timeout = 0;
     const start = Date.now();
@@ -21,6 +23,8 @@ describe('cancellableTimeout', () => {
     const promise = cancellableTimeout(timeout);
 
     await promise;
+
+    jest.advanceTimersByTime(timeout);
 
     expect(Date.now() - start).toBe(timeout);
   });
