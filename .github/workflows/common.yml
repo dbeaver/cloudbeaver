@@ -36,21 +36,21 @@ jobs:
     name: Lint
     uses: ./.github/workflows/backend-lint.yml
 
-  call-frontend-tests:
-    name: Frontend Unit Tests
-    needs: call-frontend-build
-    runs-on: ubuntu-latest
-    steps:
-      - name: Check if tests passed
-        if: ${{ needs.call-frontend-build.outputs.test-status != 'success' }}
-        run: |
-          echo "Tests failed"
-          exit 1
-      - name: Continue if tests passed
-        if: ${{ needs.call-frontend-build.outputs.test-status == 'success' }}
-        run: echo "Tests passed"
+  # call-frontend-tests:
+  #   name: Frontend Unit Tests
+  #   needs: call-frontend-build
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: Check if tests passed
+  #       if: ${{ needs.call-frontend-build.outputs.test-status != 'success' }}
+  #       run: |
+  #         echo "Tests failed"
+  #         exit 1
+  #     - name: Continue if tests passed
+  #       if: ${{ needs.call-frontend-build.outputs.test-status == 'success' }}
+  #       run: echo "Tests passed"
 
-  call-docker-build-and-push:
-    name: Run
-    needs: [call-backend-build, call-frontend-build]
-    uses: ./.github/workflows/docker-build-and-push.yml
+  # call-docker-build-and-push:
+  #   name: Run
+  #   needs: [call-backend-build, call-frontend-build]
+  #   uses: ./.github/workflows/docker-build-and-push.yml

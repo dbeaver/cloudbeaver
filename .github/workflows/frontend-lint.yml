@@ -6,10 +6,6 @@ on:
 
   # Allows you to reuse workflows by referencing their YAML files
   workflow_call:
-    inputs:
-      skip_cache:
-        required: false
-        type: string
 
 jobs:
   lint:

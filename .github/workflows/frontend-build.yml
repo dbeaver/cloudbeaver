@@ -49,13 +49,19 @@ jobs:
             ${{ runner.os }}-node_modules-
 
       - name: restore typescript cache
-        if: env.skip_cache != 'true'
         uses: actions/cache@v4
         with:
           path: "**/packages/*/dist"
           key: ${{ runner.os }}-dist-${{ hashFiles('webapp/yarn.lock') }}
           restore-keys: |
             ${{ runner.os }}-dist-
+
+      - name: yarn clean
+        if: env.skip_cache == 'true'
+        uses: borales/actions-yarn@v5
+        with:
+          dir: webapp
+          cmd: clean
 
       - name: yarn install --frozen-lockfile
         uses: borales/actions-yarn@v5

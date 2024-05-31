@@ -6,10 +6,18 @@ echo "Build static content"
 cd ../../cloudbeaver/webapp
 
 yarn
-yarn lerna run bootstrap
-yarn lerna run bundle --no-bail --stream --scope=@cloudbeaver/product-default #-- -- --env source-map
+cd ./packages/product-default
+yarn run bundle
+
 if [[ "$?" -ne 0 ]] ; then
   echo 'Application build failed'; exit $rc
+fi
+
+cd ../../
+yarn test
+
+if [[ "$?" -ne 0 ]] ; then
+  echo 'Frontend tests failed'; exit $rc
 fi
 
 cd ../deploy
