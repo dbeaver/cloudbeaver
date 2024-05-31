@@ -16,10 +16,6 @@ jobs:
     name: Frontend
     runs-on: ubuntu-latest
 
-    defaults:
-      run:
-        working-directory: ./webapp
-
     steps:
       - uses: actions/checkout@v4
 
@@ -43,23 +39,11 @@ jobs:
           dir: webapp
           cmd: install
 
-      - name: Fetch all history for diff
-        run: git fetch --prune --unshallow
-
-      - name: Get list of changed files
-        id: git_diff
-        run: |
-          BEFORE=${{ github.event.before || 'HEAD^' }}
-          CHANGED_FILES=$(git diff --name-only $BEFORE ${{ github.sha }} | grep -E 'webapp/packages/[^/]+/src/.+\.tsx?$' | sed 's|webapp/||')
-          echo "Changed files: $CHANGED_FILES"
-          echo "files=$CHANGED_FILES" >> $GITHUB_ENV
-
       - name: Lint
-        if: env.files != ''
         uses: reviewdog/action-eslint@v1
         with:
           reporter: github-pr-review
           filter_mode: file
           workdir: webapp
           fail_on_error: true
-          eslint_flags: "--ext .ts,.tsx ${{ env.files }}"
+          eslint_flags: "--ext .ts,.tsx"
