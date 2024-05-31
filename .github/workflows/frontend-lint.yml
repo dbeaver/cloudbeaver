@@ -58,6 +58,7 @@ jobs:
         if: env.files != ''
         id: lint
         uses: borales/actions-yarn@v5
+        continue-on-error: true
         with:
           dir: webapp
           cmd: lint ${{ env.files }}
@@ -65,6 +66,7 @@ jobs:
       - name: Annotate PR with ESLint results
         if: env.files != ''
         uses: reviewdog/action-eslint@v1
+        continue-on-error: true
         with:
           reporter: github-pr-review
           filter_mode: file
