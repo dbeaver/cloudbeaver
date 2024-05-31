@@ -45,6 +45,28 @@ jobs:
           docker tag dbeaver/cloudbeaver:dev $IMAGE_NAME:$TAG_NAME
           echo "image=$IMAGE_NAME:$TAG_NAME" >> $GITHUB_ENV
 
+      - name: Install Docker Credential Helper
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gnupg2 pass
+          curl -fsSL https://github.com/docker/docker-credential-helpers/releases/download/v0.6.4/docker-credential-pass-v0.6.4-amd64.tar.gz | sudo tar xvz --strip-components=1 -C /usr/local/bin/ docker-credential-pass
+  
+      - name: Configure Docker to use Credential Helper
+        run: |
+          echo '{"credsStore":"pass"}' > ~/.docker/config.json
+
+      - name: Initialize Password Store
+        run: |
+          gpg --batch --gen-key <<EOF
+          %no-protection
+          Key-Type: default
+          Subkey-Type: default
+          Name-Real: Docker Credential Helper
+          Expire-Date: 0
+          %commit
+          EOF
+          pass init "$(gpg --list-keys --with-colons | grep '^pub' | cut -d: -f5)"
+
       - name: Log in to GitHub Container Registry
         run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.repository_owner }} --password-stdin
 
