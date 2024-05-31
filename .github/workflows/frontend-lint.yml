@@ -6,10 +6,6 @@ on:
 
   # Allows you to reuse workflows by referencing their YAML files
   workflow_call:
-    outputs:
-      lint-status:
-        description: "Lint status"
-        value: ${{ jobs.lint.outputs.lint-status }}
     inputs:
       skip_cache:
         required: false
@@ -23,9 +19,6 @@ jobs:
     defaults:
       run:
         working-directory: ./webapp
-
-    outputs:
-      lint-status: ${{ steps.lint.outcome }}
 
     steps:
       - uses: actions/checkout@v4
@@ -61,22 +54,12 @@ jobs:
           echo "Changed files: $CHANGED_FILES"
           echo "files=$CHANGED_FILES" >> $GITHUB_ENV
 
-      - name: yarn lint
-        if: env.files != ''
-        id: lint
-        uses: borales/actions-yarn@v5
-        continue-on-error: true
-        with:
-          dir: webapp
-          cmd: lint ${{ env.files }}
-
-      - name: Annotate PR with ESLint results
+      - name: Lint
         if: env.files != ''
         uses: reviewdog/action-eslint@v1
-        continue-on-error: true
         with:
           reporter: github-pr-review
           filter_mode: file
           workdir: webapp
-          level: warning
+          fail_on_error: true
           eslint_flags: "--ext .ts,.tsx ${{ env.files }}"
