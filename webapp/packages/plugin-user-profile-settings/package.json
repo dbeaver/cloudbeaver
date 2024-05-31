@@ -34,7 +34,6 @@
   "peerDependencies": {},
   "devDependencies": {
     "@types/react": "^18.2.63",
-    "typescript": "^5.3.3",
-    "typescript-plugin-css-modules": "^5.1.0"
+    "typescript": "^5.3.3"
   }
 }
