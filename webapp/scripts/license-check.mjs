@@ -46,6 +46,9 @@ for await (const line of rl) {
 
     let fileLineIndex = 0;
     for await (const fileLine of fileRl) {
+      if (fileLine.startsWith('#!/usr/bin/env')) {
+        continue;
+      }
       if (fileLine !== license[fileLineIndex]) {
         invalidFiles.push(line);
         break;

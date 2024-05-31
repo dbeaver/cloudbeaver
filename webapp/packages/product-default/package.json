@@ -22,7 +22,7 @@
     "lint-fix": "eslint ./src/ --ext .ts,.tsx --fix",
     "version:new": "yarn version --no-git-tag-version",
     "validate-dependencies": "core-cli-validate-dependencies",
-    "update-ts-references": "rimraf --glob dist && typescript-resolve-references"
+    "update-ts-references": "yarn run clean && typescript-resolve-references"
   },
   "dependencies": {
     "@cloudbeaver/core-blocks": "~0.1.0",
