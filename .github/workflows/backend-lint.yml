@@ -23,12 +23,13 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: dbeaver/dbeaver
+          path: dbeaver-config
 
       - name: Copy checkstyle config
-        run: cp dbeaver/dbeaver-checkstyle-config.xml ./dbeaver-checkstyle-config.xml
+        run: cp dbeaver-config/dbeaver-checkstyle-config.xml ./dbeaver-checkstyle-config.xml
 
       - name: Remove checkstyle config directory
-        run: rm -rf dbeaver
+        run: rm -rf dbeaver-config
 
       - uses: dbelyaev/action-checkstyle@master
         with:
