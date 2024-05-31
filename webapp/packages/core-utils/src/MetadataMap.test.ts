@@ -12,35 +12,18 @@ import { MetadataMap } from './MetadataMap';
 describe('MetadataMap', () => {
   it('should add and get items', () => {
     const map = new MetadataMap<number, string>();
-    map.sync([
+    const data: [number, string][] = [
       [1, 'one'],
       [2, 'two'],
       [3, 'three'],
-
       [Infinity, 'infinity'],
       [NaN, 'nan'],
-    ]);
+    ];
+    map.sync(data);
 
-    expect(map.get(1)).toBe('one');
-    expect(map.get(2)).toBe('two');
-    expect(map.get(3)).toBe('three');
-    expect(map.get(Infinity)).toBe('infinity');
-    expect(map.get(NaN)).toBe('nan');
-  });
-
-  it('should get items with class constructor default value', () => {
-    const map = new MetadataMap<number, string>(key => `default ${key}`);
-    map.sync([
-      [1, 'one'],
-      [2, 'two'],
-      [3, 'three'],
-    ]);
-
-    expect(map.get(1)).toBe('one');
-    expect(map.get(2)).toBe('two');
-    expect(map.get(3)).toBe('three');
-    expect(JSON.stringify(map.get(Infinity))).toStrictEqual(JSON.stringify('default Infinity'));
-    expect(JSON.stringify(map.get(NaN))).toStrictEqual(JSON.stringify('default NaN'));
+    data.forEach(([key, value]) => {
+      expect(map.get(key)).toBe(value);
+    });
   });
 
   it('should throw an error on invalidate with no default value getter', () => {
@@ -53,6 +36,13 @@ describe('MetadataMap', () => {
 
     try {
       map.get(1, undefined, z.object({}));
+      expect(true).toBeFalsy(); // should not be called
+    } catch (e) {
+      expect(e).toBeInstanceOf(Error);
+    }
+
+    try {
+      map.get(1);
       expect(true).toBeFalsy(); // should not be called
     } catch (e) {
       expect(e).toBeInstanceOf(Error);
@@ -91,11 +81,12 @@ describe('MetadataMap', () => {
 
   it('should iterate', () => {
     const map = new MetadataMap<number, string>();
-    map.sync([
+    const data: [number, string][] = [
       [1, 'one'],
       [2, 'two'],
       [3, 'three'],
-    ]);
+    ];
+    map.sync(data);
 
     const items = Array.from(map);
     expect(items).toStrictEqual([

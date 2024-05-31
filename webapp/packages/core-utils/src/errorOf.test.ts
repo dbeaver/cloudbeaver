@@ -21,11 +21,20 @@ describe('errorOf', () => {
 
   it('returns error of the specified type from the cause', () => {
     class TestError extends Error {}
+    class AnotherError extends Error {
+      cause: Error;
+
+      constructor(message: string, cause: Error) {
+        super(message);
+        this.cause = cause;
+      }
+    }
 
     const error = new TestError('test');
-    const result = errorOf(error, Error);
+    const testError = new AnotherError('another', error);
+    const result = errorOf(testError, TestError);
 
-    expect(result).toBeInstanceOf(Error);
+    expect(result).toBeInstanceOf(TestError);
   });
 
   it('returns undefined if error is not of the specified type', () => {

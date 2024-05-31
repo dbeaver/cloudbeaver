@@ -8,12 +8,24 @@
 import { openCenteredPopup } from './openCenteredPopup';
 
 describe('openCenteredPopup', () => {
+  let windowSpy: jest.SpyInstance;
+  const params = {
+    url: 'http://localhost:3000',
+    target: 'target',
+    width: 500,
+    height: 500,
+    features: 'features',
+  };
+
+  beforeEach(() => {
+    windowSpy = jest.spyOn(window, 'window', 'get');
+  });
+
+  afterEach(() => {
+    windowSpy.mockRestore();
+  });
+
   it('opens centered popup', () => {
-    const url = 'http://localhost:3000';
-    const target = 'target';
-    const width = 500;
-    const height = 500;
-    const features = 'features';
     const windowMock = {
       top: {
         outerWidth: 1000,
@@ -27,18 +39,26 @@ describe('openCenteredPopup', () => {
       open: jest.fn(),
     };
 
+    windowSpy.mockImplementation(() => windowMock);
+
+    const { url, target, width, height, features } = params;
+
     const result = openCenteredPopup({ url, target, width, height, features });
 
-    expect(result).toBe(windowMock.open(url, target, `toolbar=no, menubar=no, width=${width / 2}, height=${height / 2}, top=50, left=50${features}`));
+    expect(result).toBe(windowMock.open());
+    expect(windowMock.open).toHaveBeenCalledWith(
+      url,
+      target,
+      `toolbar=no, menubar=no, width=${width}, height=${height}, top=350, left=350${features}`,
+    );
   });
 
   it('returns null if window.top is null', () => {
-    const url = 'http://localhost:3000';
-    const target = 'target';
-    const width = 500;
-    const height = 500;
-    const features = 'features';
-    jest.spyOn(window, 'top', 'get').mockReturnValue(null);
+    const { url, target, width, height, features } = params;
+
+    windowSpy.mockImplementation(() => ({
+      top: null,
+    }));
 
     const result = openCenteredPopup({ url, target, width, height, features });
 

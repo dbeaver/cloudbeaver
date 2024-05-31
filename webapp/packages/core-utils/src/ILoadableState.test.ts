@@ -7,6 +7,15 @@
  */
 import { getFirstException, ILoadableState, isContainsException, isLoadableStateHasException } from './ILoadableState';
 
+const getMockedLoadableState = (state: Partial<ILoadableState>): ILoadableState => ({
+  exception: new Error(),
+  isLoading: () => false,
+  isLoaded: () => false,
+  isError: () => false,
+  load: () => undefined,
+  ...state,
+});
+
 describe('isContainsException', () => {
   it('should return true if exception is present', () => {
     expect(isContainsException(new Error())).toBe(true);
@@ -38,40 +47,16 @@ describe('getFirstException', () => {
 
 describe('isLoadableStateHasException', () => {
   it('should return true if exception is present', () => {
-    const state: ILoadableState = {
-      exception: new Error(),
-      isLoading: () => false,
-      isLoaded: () => false,
-      isError: () => false,
-      load: () => undefined,
-    };
-    const stateWithArray: ILoadableState = {
-      exception: [null, new Error()],
-      isLoading: () => false,
-      isLoaded: () => false,
-      isError: () => false,
-      load: () => undefined,
-    };
+    const state: ILoadableState = getMockedLoadableState({ exception: new Error() });
+    const stateWithArray: ILoadableState = getMockedLoadableState({ exception: [null, new Error()] });
 
     expect(isLoadableStateHasException(state)).toBe(true);
     expect(isLoadableStateHasException(stateWithArray)).toBe(true);
   });
 
   it('should return false if exception is not present', () => {
-    const state: ILoadableState = {
-      exception: null,
-      isLoading: () => false,
-      isLoaded: () => false,
-      isError: () => false,
-      load: () => undefined,
-    };
-    const stateWithArray: ILoadableState = {
-      exception: [null, null],
-      isLoading: () => false,
-      isLoaded: () => false,
-      isError: () => false,
-      load: () => undefined,
-    };
+    const state: ILoadableState = getMockedLoadableState({ exception: null });
+    const stateWithArray: ILoadableState = getMockedLoadableState({ exception: [null, null] });
 
     expect(isLoadableStateHasException(state)).toBe(false);
     expect(isLoadableStateHasException(stateWithArray)).toBe(false);
