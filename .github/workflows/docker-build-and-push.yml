@@ -42,7 +42,7 @@ jobs:
           IMAGE_NAME=ghcr.io/${{ github.repository_owner }}/$REPO_NAME
           BRANCH_NAME=${{ github.head_ref || github.ref_name }}
           TAG_NAME=$(echo $BRANCH_NAME | sed 's/[^a-zA-Z0-9._-]/-/g')
-          docker tag $IMAGE_NAME:dev $IMAGE_NAME:$TAG_NAME
+          docker tag dbeaver/cloudbeaver:dev $IMAGE_NAME:$TAG_NAME
           echo "image=$IMAGE_NAME:$TAG_NAME" >> $GITHUB_ENV
 
       - name: Log in to GitHub Container Registry

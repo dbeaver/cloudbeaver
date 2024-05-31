@@ -46,6 +46,20 @@ jobs:
         if: ${{ needs.call-frontend-build.outputs.test-status == 'success' }}
         run: echo "Tests passed"
 
+  check-lint-status:
+    name: Frontend Lint Status
+    needs: call-frontend-lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check if lint passed
+        if: ${{ needs.call-frontend-lint.outputs.lint-status != 'success' }}
+        run: |
+          echo "Linting failed"
+          exit 1
+      - name: Continue if lint passed
+        if: ${{ needs.call-frontend-lint.outputs.lint-status == 'success' }}
+        run: echo "Linting passed"
+
   call-docker-build-and-push:
     name: Run
     needs: [call-backend-build, call-frontend-build]
