@@ -11,9 +11,9 @@ const path = require('path');
 /** @type {import('ts-jest').JestConfigWithTsJest} */
 module.exports = {
   testEnvironment: require.resolve('../tests/test.environment.js'),
-  rootDir: path.resolve('./dist'),
+  rootDir: path.resolve('./'),
   moduleFileExtensions: ['js', 'jsx', 'json'],
-  testMatch: ['**/?(*.)+(spec|test).js?(x)'],
+  testMatch: ['<rootDir>/(packages/*/|)dist/?(*.)+(spec|test).js?(x)'],
   transformIgnorePatterns: [
     '\\.pnp\\.[^\\/]+$',
     'node_modules/(?!@ngrx|(?!deck.gl)|ng-dynamic)',
@@ -25,11 +25,11 @@ module.exports = {
     '\\.(css|scss|less)$': require.resolve('./__mocks__/styleMock.js'),
     '^dexie$': require.resolve('dexie'),
   },
-  passWithNoTests: true,
+  // passWithNoTests: true,
   setupFiles: [require.resolve('fake-indexeddb/auto'), require.resolve('../tests/setup.js')],
   setupFilesAfterEnv: ['@testing-library/jest-dom'],
   transform: {
-    '\\.jsx?$': ['babel-jest', { configFile: require.resolve('./jest.babel.config.js') }],
+    '\\.jsx?$': [require.resolve('@swc/jest')],
   },
   testEnvironmentOptions: {
     // This will force JSDOM to use the default export condition when importing msw/node, resulting in correct imports.

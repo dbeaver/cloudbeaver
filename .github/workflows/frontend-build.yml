@@ -1,24 +1,31 @@
 name: Frontend Build
 
 on:
-  # push:
-  #   branches:
-  #     - devel
-  # pull_request:
-  #   branches:
-  #     - devel
-  #   paths:
-  #     - "webapp/**"
-
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
   # Allows you to reuse workflows by referencing their YAML files
   workflow_call:
+    outputs:
+      build-status:
+        description: "Build status"
+        value: ${{ jobs.frontend-build.outputs.build-status }}
+      test-status:
+        description: "Test status"
+        value: ${{ jobs.frontend-build.outputs.test-status }}
+    inputs:
+      skip_cache:
+        required: false
+        type: string
 
 jobs:
   frontend-build:
+    name: Frontend
     runs-on: ubuntu-latest
+
+    outputs:
+      build-status: ${{ steps.build.outcome }}
+      test-status: ${{ steps.test.outcome }}
 
     defaults:
       run:
@@ -49,17 +56,32 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-dist-
 
-      - name: yarn install
+      - name: yarn clean
+        if: env.skip_cache == 'true'
+        uses: borales/actions-yarn@v5
+        with:
+          dir: webapp
+          cmd: clean
+
+      - name: yarn install --frozen-lockfile
         uses: borales/actions-yarn@v5
         with:
           dir: webapp
           cmd: install
 
       - name: build
+        id: build
         uses: borales/actions-yarn@v5
         with:
           dir: webapp/packages/product-default
           cmd: bundle
+
+      - name: test
+        id: test
+        uses: borales/actions-yarn@v5
+        with:
+          dir: webapp
+          cmd: test
 
       - name: Archive build artifacts
         uses: actions/upload-artifact@v4
