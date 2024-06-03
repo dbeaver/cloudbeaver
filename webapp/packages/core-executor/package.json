@@ -11,11 +11,12 @@
   "main": "dist/index.js",
   "scripts": {
     "build": "tsc -b",
+    "clean": "rimraf --glob dist",
     "lint": "eslint ./src/ --ext .ts,.tsx",
     "lint-fix": "eslint ./src/ --ext .ts,.tsx --fix",
-    "test": "yarn build && core-cli-test",
+    "test": "core-cli-test",
     "validate-dependencies": "core-cli-validate-dependencies",
-    "update-ts-references": "rimraf --glob dist && typescript-resolve-references"
+    "update-ts-references": "yarn run clean && typescript-resolve-references"
   },
   "dependencies": {
     "mobx": "^6.12.0"
