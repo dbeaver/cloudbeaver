@@ -98,8 +98,8 @@ public class WebServiceUtils extends WebCommonUtils {
         return WebServiceUtils.class.getClassLoader().getResourceAsStream(path);
     }
 
-    @NotNull
-    public static DBPDataSourceContainer createConnectionFromConfig(WebConnectionConfig config, DBPDataSourceRegistry registry) throws DBWebException {
+    @NotNull//triger check
+    public static DBPDataSourceContainer createConnectionFromConfig(WebConnectionConfig config, DBPDataSourceRegistry registry) throws DBWebException {//triger check
         DBPDataSourceContainer newDataSource;
         if (!CommonUtils.isEmpty(config.getTemplateId())) {
             DBPDataSourceContainer tpl = registry.getDataSource(config.getTemplateId());
