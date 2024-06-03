@@ -50,7 +50,7 @@ You can see live demo of CloudBeaver here: https://demo.cloudbeaver.io
   -    Enhanced security for connection through H2 driver;
   -    Updated DuckDB driver to version 0.10.2;
   -    DuckDB driver updated to version 0.10.2;
-  -    Oracle driver updated to version 23.2.0.0.0;
+  -    Oracle driver updated to version 23.2.0.0;
   -    SQLite driver updated to version 3.44.1.0;
   -    Clickhouse driver updated to version 0.6.0-patch2;
   -    Trino driver updated to version 438.
