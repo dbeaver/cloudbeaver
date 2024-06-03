@@ -59,7 +59,7 @@ describe('TempMap', () => {
     expect(map.isDeleted('test')).toBe(false);
   });
 
-  it('should remove from deleted if set again', () => {
+  it('should remove from deleted map if set again', () => {
     const map = new TempMap<string, string>(new Map());
 
     map.set('test', 'test value');

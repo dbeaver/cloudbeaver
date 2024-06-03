@@ -45,9 +45,12 @@ describe('errorOf', () => {
   });
 
   it('returns undefined if error is not an instance of Error', () => {
-    const error = { message: 'test' };
-    const result = errorOf(error, Error);
-
-    expect(result).toBeUndefined();
+    expect(errorOf({ message: 'test' }, Error)).toBeUndefined();
+    expect(errorOf(undefined, Error)).toBeUndefined();
+    expect(errorOf(null, Error)).toBeUndefined();
+    expect(errorOf(0, Error)).toBeUndefined();
+    expect(errorOf('', Error)).toBeUndefined();
+    expect(errorOf(true, Error)).toBeUndefined();
+    expect(errorOf(Symbol(), Error)).toBeUndefined();
   });
 });

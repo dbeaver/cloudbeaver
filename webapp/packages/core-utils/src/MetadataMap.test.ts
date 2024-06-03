@@ -10,8 +10,16 @@ import { z } from 'zod';
 import { MetadataMap } from './MetadataMap';
 
 describe('MetadataMap', () => {
+  it('should create an empty map', () => {
+    const map = new MetadataMap<number, string>();
+
+    expect(map.size).toBe(0);
+  });
+
   it('should sync items', () => {
     const map = new MetadataMap<number, string>();
+    const emptyMap = new MetadataMap<number, string>();
+
     const data: [number, string][] = [
       [1, 'one'],
       [2, 'two'],
@@ -19,11 +27,15 @@ describe('MetadataMap', () => {
       [Infinity, 'infinity'],
       [NaN, 'nan'],
     ];
+
     map.sync(data);
+    emptyMap.sync([]);
 
     data.forEach(([key, value]) => {
       expect(map.get(key)).toBe(value);
     });
+
+    expect(emptyMap.size).toBe(0);
   });
 
   it('should set items', () => {
@@ -163,19 +175,6 @@ describe('MetadataMap', () => {
     expect(map.has(2)).toBeTruthy();
     expect(map.has(3)).toBeTruthy();
     expect(map.has(4)).toBeFalsy();
-  });
-
-  it('should set value', () => {
-    const map = new MetadataMap<number, string>();
-    map.sync([
-      [1, 'one'],
-      [2, 'two'],
-      [3, 'three'],
-    ]);
-
-    map.set(4, 'four');
-
-    expect(map.get(4)).toBe('four');
   });
 
   it('should clear', () => {
