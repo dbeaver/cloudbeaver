@@ -16,13 +16,14 @@ jest.mock('./pathJoin', () => ({
 }));
 
 describe('GlobalConstants', () => {
-  beforeAll(() => {
-    Object.defineProperty(window, 'location', {
-      value: {
-        protocol: 'http:',
-        host: 'localhost',
-      },
-    });
+  let windowSpy: jest.SpyInstance;
+
+  beforeEach(() => {
+    windowSpy = jest.spyOn(window, 'window', 'get');
+  });
+
+  afterEach(() => {
+    windowSpy.mockRestore();
   });
 
   beforeEach(() => {
@@ -30,8 +31,15 @@ describe('GlobalConstants', () => {
     (global as any)._VERSION_ = '1.0.0';
     (global as any)._ROOT_URI_ = '{ROOT_URI}';
 
-    window.location.protocol = 'http:';
-    window.location.host = 'localhost';
+    windowSpy.mockImplementation(
+      () =>
+        ({
+          location: {
+            protocol: 'http:',
+            host: 'localhost',
+          },
+        }) as any,
+    );
   });
 
   it('should return correct dev value', () => {
@@ -53,7 +61,14 @@ describe('GlobalConstants', () => {
   it('should return correct websocket protocol', () => {
     expect(GlobalConstants.wsProtocol).toBe('ws:');
 
-    window.location.protocol = 'https:';
+    windowSpy.mockImplementationOnce(
+      () =>
+        ({
+          location: {
+            protocol: 'https:',
+          },
+        }) as any,
+    );
 
     expect(GlobalConstants.wsProtocol).toBe('wss:');
   });
@@ -94,7 +109,15 @@ describe('GlobalConstants', () => {
   it('should generate absoluteServiceWSUrl', () => {
     expect(GlobalConstants.absoluteServiceWSUrl('/test/', 'test2')).toBe('ws://localhost/api/test/test2');
 
-    window.location.protocol = 'https:';
+    windowSpy.mockImplementationOnce(
+      () =>
+        ({
+          location: {
+            protocol: 'https:',
+            host: 'localhost',
+          },
+        }) as any,
+    );
 
     expect(GlobalConstants.absoluteServiceWSUrl('/test/', 'test2')).toBe('wss://localhost/api/test/test2');
   });
