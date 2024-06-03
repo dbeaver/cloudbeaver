@@ -7,17 +7,42 @@
  */
 import { action, computed, makeObservable, observable } from 'mobx';
 
-import { injectable } from '@cloudbeaver/core-di';
+import { ConnectionsManagerService, type IConnectionExecutorData } from '@cloudbeaver/core-connections';
+import { Dependency, injectable } from '@cloudbeaver/core-di';
+import type { IExecutorHandler } from '@cloudbeaver/core-executor';
+import { DBObjectParentKey, DBObjectResource, NavTreeResource, NodeManagerUtils } from '@cloudbeaver/core-navigation-tree';
+import {
+  CACHED_RESOURCE_DEFAULT_PAGE_LIMIT,
+  CACHED_RESOURCE_DEFAULT_PAGE_OFFSET,
+  createResourceOffsetPageKey,
+  getNextPageOffset,
+  type ResourceKey,
+} from '@cloudbeaver/core-resource';
 import type { ITab } from '@cloudbeaver/plugin-navigation-tabs';
+import { NavNodeViewService } from '@cloudbeaver/plugin-navigation-tree';
 
 import type { IObjectViewerTabState } from '../IObjectViewerTabState';
 import { ObjectPage, ObjectPageCallback, ObjectPageOptions } from './ObjectPage';
 
+interface IOptions<TKey extends ResourceKey<any>> {
+  key: TKey;
+  pageSize?: number;
+}
+
 @injectable()
-export class DBObjectPageService {
+export class DBObjectPageService extends Dependency {
   pages = new Map<string, ObjectPage<any>>();
 
-  constructor() {
+  constructor(
+    private readonly navNodeViewService: NavNodeViewService,
+    private readonly navTreeResource: NavTreeResource,
+    private readonly dbObjectResource: DBObjectResource,
+    private readonly connectionsManagerService: ConnectionsManagerService,
+  ) {
+    super();
+
+    this.connectionsManagerService.onDisconnect.addHandler(this.onDisconnectHandle.bind(this));
+
     makeObservable(this, {
       pages: observable,
       orderedPages: computed,
@@ -28,6 +53,44 @@ export class DBObjectPageService {
 
   get orderedPages(): Array<ObjectPage<any>> {
     return Array.from(this.pages.values()).sort(this.comparePages.bind(this));
+  }
+
+  onDisconnectHandle: IExecutorHandler<IConnectionExecutorData, any> = (data, contexts) => {
+    if (data.state === 'before') {
+      data.connections.forEach(connection => {
+        const id = NodeManagerUtils.connectionIdToConnectionNodeId(connection.connectionId);
+        const children = this.navTreeResource.get(id);
+        const folders = this.navNodeViewService.getFolders(id, children) || [];
+        const properties = folders.map(DBObjectParentKey);
+
+        properties.forEach(key => {
+          const dbObjectKey = this.getDBObjectKey({ key, pageSize: this.navTreeResource.childrenLimit });
+          this.dbObjectResource.markOutdated(dbObjectKey);
+        });
+      });
+    }
+  };
+
+  // TODO isolate this logic somewhere (repeats useOffsetPagination logic)
+  private getDBObjectKey(options: IOptions<ResourceKey<any>>) {
+    const targetKey = options?.key;
+    const pageSize = options?.pageSize || CACHED_RESOURCE_DEFAULT_PAGE_LIMIT;
+    const pageInfo = this.dbObjectResource.offsetPagination.getPageInfo(createResourceOffsetPageKey(0, 0, targetKey));
+    const offset = Math.max(
+      (pageInfo ? getNextPageOffset(pageInfo) : CACHED_RESOURCE_DEFAULT_PAGE_OFFSET) - pageSize,
+      CACHED_RESOURCE_DEFAULT_PAGE_OFFSET,
+    );
+    const _key = createResourceOffsetPageKey(offset, pageSize, targetKey);
+
+    const pageInfoTarget = this.dbObjectResource.offsetPagination.getPageInfo(createResourceOffsetPageKey(0, 0, _key.target));
+
+    for (const page of pageInfoTarget?.pages || []) {
+      if (page.outdated && page.from < _key.options.offset) {
+        return createResourceOffsetPageKey(page.from, _key.options.limit, _key.target);
+      }
+    }
+
+    return _key;
   }
 
   register<T>(options: ObjectPageOptions<T>): ObjectPage<T> {
