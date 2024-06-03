@@ -8,7 +8,7 @@
 import { getFirstException, ILoadableState, isContainsException, isLoadableStateHasException } from './ILoadableState';
 
 const getMockedLoadableState = (state: Partial<ILoadableState>): ILoadableState => ({
-  exception: new Error(),
+  exception: null,
   isLoading: () => false,
   isLoaded: () => false,
   isError: () => false,
@@ -28,37 +28,108 @@ describe('isContainsException', () => {
   it('should check array of exceptions', () => {
     expect(isContainsException([null, new Error()])).toBe(true);
     expect(isContainsException([null, null])).toBe(false);
+    expect(isContainsException([])).toBe(false);
   });
 });
 
 describe('getFirstException', () => {
   it('should return first exception', () => {
     const error = new Error();
+    const error2 = new Error('error2');
 
-    expect(getFirstException(error)).toBe(error);
+    expect(getFirstException([null, error, error2])).toBe(error);
     expect(getFirstException([null, error])).toBe(error);
+    expect(getFirstException([error])).toBe(error);
+    expect(getFirstException(error)).toBe(error);
   });
 
   it('should not get exception', () => {
     expect(getFirstException([null, null])).toBe(null);
+    expect(getFirstException([null])).toBe(null);
+    expect(getFirstException([])).toBe(null);
     expect(getFirstException(null)).toBe(null);
   });
 });
 
 describe('isLoadableStateHasException', () => {
   it('should return true if exception is present', () => {
-    const state: ILoadableState = getMockedLoadableState({ exception: new Error() });
-    const stateWithArray: ILoadableState = getMockedLoadableState({ exception: [null, new Error()] });
+    expect(
+      isLoadableStateHasException(
+        getMockedLoadableState({
+          exception: [new Error(), new Error('error2')],
+          isError() {
+            return true;
+          },
+        }),
+      ),
+    ).toBe(true);
 
-    expect(isLoadableStateHasException(state)).toBe(true);
-    expect(isLoadableStateHasException(stateWithArray)).toBe(true);
+    expect(
+      isLoadableStateHasException(
+        getMockedLoadableState({
+          exception: [new Error()],
+          isError() {
+            return true;
+          },
+        }),
+      ),
+    ).toBe(true);
+
+    expect(
+      isLoadableStateHasException(
+        getMockedLoadableState({
+          exception: new Error(),
+          isError() {
+            return true;
+          },
+        }),
+      ),
+    ).toBe(true);
+
+    expect(
+      isLoadableStateHasException(
+        getMockedLoadableState({
+          exception: [null, new Error()],
+          isError() {
+            return true;
+          },
+        }),
+      ),
+    ).toBe(true);
   });
 
   it('should return false if exception is not present', () => {
-    const state: ILoadableState = getMockedLoadableState({ exception: null });
-    const stateWithArray: ILoadableState = getMockedLoadableState({ exception: [null, null] });
+    expect(
+      isLoadableStateHasException(
+        getMockedLoadableState({
+          exception: [],
+          isError() {
+            return false;
+          },
+        }),
+      ),
+    ).toBe(false);
 
-    expect(isLoadableStateHasException(state)).toBe(false);
-    expect(isLoadableStateHasException(stateWithArray)).toBe(false);
+    expect(
+      isLoadableStateHasException(
+        getMockedLoadableState({
+          exception: null,
+          isError() {
+            return false;
+          },
+        }),
+      ),
+    ).toBe(false);
+
+    expect(
+      isLoadableStateHasException(
+        getMockedLoadableState({
+          exception: [null, null],
+          isError() {
+            return false;
+          },
+        }),
+      ),
+    ).toBe(false);
   });
 });

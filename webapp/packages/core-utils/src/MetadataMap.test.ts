@@ -10,7 +10,7 @@ import { z } from 'zod';
 import { MetadataMap } from './MetadataMap';
 
 describe('MetadataMap', () => {
-  it('should add and get items', () => {
+  it('should sync items', () => {
     const map = new MetadataMap<number, string>();
     const data: [number, string][] = [
       [1, 'one'],
@@ -24,6 +24,21 @@ describe('MetadataMap', () => {
     data.forEach(([key, value]) => {
       expect(map.get(key)).toBe(value);
     });
+  });
+
+  it('should set items', () => {
+    const map = new MetadataMap<number, string>();
+    map.set(1, 'one');
+    map.set(2, 'two');
+    map.set(3, 'three');
+    map.set(Infinity, 'infinity');
+    map.set(NaN, 'nan');
+
+    expect(map.get(1)).toBe('one');
+    expect(map.get(2)).toBe('two');
+    expect(map.get(3)).toBe('three');
+    expect(map.get(Infinity)).toBe('infinity');
+    expect(map.get(NaN)).toBe('nan');
   });
 
   it('should throw an error on invalidate with no default value getter', () => {
