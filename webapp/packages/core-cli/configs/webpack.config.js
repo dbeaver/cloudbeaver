@@ -120,15 +120,6 @@ module.exports = (env, argv) => {
     ];
   }
 
-  var babelLoader = {
-    loader: require.resolve('babel-loader'),
-    options: {
-      root: __dirname,
-      // cacheDirectory: true,
-      envName: argv.mode,
-    },
-  };
-
   let entry = {};
 
   if (devMode) {
@@ -296,10 +287,10 @@ module.exports = (env, argv) => {
           exclude: /node_modules/,
           use: ['source-map-loader'],
         },
-        {
+        devMode && {
           test: /\.jsx?$/,
           exclude: /node_modules/,
-          use: ['thread-loader', babelLoader],
+          use: ['thread-loader', 'swc-loader'],
         },
         {
           test: /\.(css|s[ac]ss)$/,
