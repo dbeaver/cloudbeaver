@@ -290,7 +290,17 @@ module.exports = (env, argv) => {
         devMode && {
           test: /\.jsx?$/,
           exclude: /node_modules/,
-          use: ['thread-loader', 'swc-loader'],
+          use: [
+            'thread-loader',
+            {
+              loader: 'swc-loader',
+              options: {
+                jsc: {
+                  target: 'esnext',
+                },
+              },
+            },
+          ],
         },
         {
           test: /\.(css|s[ac]ss)$/,
