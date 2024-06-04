@@ -32,7 +32,7 @@ import { AuthDialogService } from './Dialog/AuthDialogService';
 import type { IAuthOptions } from './IAuthOptions';
 import { isAutoLoginSessionAction } from './isAutoLoginSessionAction';
 
-export type AuthEventType = 'before' | 'after';
+type AuthEventType = 'before' | 'after';
 
 @injectable()
 export class AuthenticationService extends Bootstrap {
