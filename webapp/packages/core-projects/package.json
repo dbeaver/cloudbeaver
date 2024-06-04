@@ -18,20 +18,20 @@
     "update-ts-references": "yarn run clean && typescript-resolve-references"
   },
   "dependencies": {
-    "@cloudbeaver/core-authentication": "~0.1.0",
-    "@cloudbeaver/core-di": "~0.1.0",
-    "@cloudbeaver/core-executor": "~0.1.0",
-    "@cloudbeaver/core-extensions": "~0.1.0",
-    "@cloudbeaver/core-localization": "~0.1.0",
-    "@cloudbeaver/core-resource": "~0.1.0",
-    "@cloudbeaver/core-root": "~0.1.0",
-    "@cloudbeaver/core-sdk": "~0.1.0",
-    "@cloudbeaver/core-ui": "~0.1.0",
-    "@cloudbeaver/core-utils": "~0.1.0",
-    "mobx": "^6.12.3"
+    "@cloudbeaver/core-authentication": "^0",
+    "@cloudbeaver/core-di": "^0",
+    "@cloudbeaver/core-executor": "^0",
+    "@cloudbeaver/core-extensions": "^0",
+    "@cloudbeaver/core-localization": "^0",
+    "@cloudbeaver/core-resource": "^0",
+    "@cloudbeaver/core-root": "^0",
+    "@cloudbeaver/core-sdk": "^0",
+    "@cloudbeaver/core-ui": "^0",
+    "@cloudbeaver/core-utils": "^0",
+    "mobx": "^6"
   },
   "peerDependencies": {},
   "devDependencies": {
-    "typescript": "^5.4.5"
+    "typescript": "^5"
   }
 }

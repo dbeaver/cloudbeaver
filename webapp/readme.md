@@ -4,7 +4,6 @@
 
 ```sh
 yarn
-yarn lerna bootstrap
 ```
 
 ## Build

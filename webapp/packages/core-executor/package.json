@@ -19,10 +19,10 @@
     "update-ts-references": "yarn run clean && typescript-resolve-references"
   },
   "dependencies": {
-    "mobx": "^6.12.3"
+    "mobx": "^6"
   },
   "peerDependencies": {},
   "devDependencies": {
-    "typescript": "^5.4.5"
+    "typescript": "^5"
   }
 }

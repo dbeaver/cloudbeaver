@@ -18,19 +18,19 @@
     "update-ts-references": "yarn run clean && typescript-resolve-references"
   },
   "dependencies": {
-    "@cloudbeaver/core-di": "~0.1.0",
-    "@cloudbeaver/core-localization": "~0.1.0",
-    "@cloudbeaver/core-resource": "~0.1.0",
-    "@cloudbeaver/core-root": "~0.1.0",
-    "@cloudbeaver/core-utils": "~0.1.0",
-    "mobx": "^6.12.3",
-    "react": "^18.3.1",
-    "semver": "^7.6.2"
+    "@cloudbeaver/core-di": "^0",
+    "@cloudbeaver/core-localization": "^0",
+    "@cloudbeaver/core-resource": "^0",
+    "@cloudbeaver/core-root": "^0",
+    "@cloudbeaver/core-utils": "^0",
+    "mobx": "^6",
+    "react": "^18",
+    "semver": "^7"
   },
   "peerDependencies": {},
   "devDependencies": {
-    "@types/react": "^18.3.3",
-    "@types/semver": "^7.5.8",
-    "typescript": "^5.4.5"
+    "@types/react": "^18",
+    "@types/semver": "^7",
+    "typescript": "^5"
   }
 }

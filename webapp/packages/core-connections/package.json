@@ -18,27 +18,27 @@
     "update-ts-references": "yarn run clean && typescript-resolve-references"
   },
   "dependencies": {
-    "@cloudbeaver/core-authentication": "~0.1.0",
-    "@cloudbeaver/core-blocks": "~0.1.0",
-    "@cloudbeaver/core-data-context": "~0.1.0",
-    "@cloudbeaver/core-di": "~0.1.0",
-    "@cloudbeaver/core-dialogs": "~0.1.0",
-    "@cloudbeaver/core-events": "~0.1.0",
-    "@cloudbeaver/core-executor": "~0.1.0",
-    "@cloudbeaver/core-extensions": "~0.1.0",
-    "@cloudbeaver/core-localization": "~0.1.0",
-    "@cloudbeaver/core-navigation-tree": "~0.1.0",
-    "@cloudbeaver/core-projects": "~0.1.0",
-    "@cloudbeaver/core-resource": "~0.1.0",
-    "@cloudbeaver/core-root": "~0.1.0",
-    "@cloudbeaver/core-sdk": "~0.1.0",
-    "@cloudbeaver/core-settings": "~0.1.0",
-    "@cloudbeaver/core-utils": "~0.1.0",
-    "mobx": "^6.12.3",
-    "react": "^18.3.1"
+    "@cloudbeaver/core-authentication": "^0",
+    "@cloudbeaver/core-blocks": "^0",
+    "@cloudbeaver/core-data-context": "^0",
+    "@cloudbeaver/core-di": "^0",
+    "@cloudbeaver/core-dialogs": "^0",
+    "@cloudbeaver/core-events": "^0",
+    "@cloudbeaver/core-executor": "^0",
+    "@cloudbeaver/core-extensions": "^0",
+    "@cloudbeaver/core-localization": "^0",
+    "@cloudbeaver/core-navigation-tree": "^0",
+    "@cloudbeaver/core-projects": "^0",
+    "@cloudbeaver/core-resource": "^0",
+    "@cloudbeaver/core-root": "^0",
+    "@cloudbeaver/core-sdk": "^0",
+    "@cloudbeaver/core-settings": "^0",
+    "@cloudbeaver/core-utils": "^0",
+    "mobx": "^6",
+    "react": "^18"
   },
   "peerDependencies": {},
   "devDependencies": {
-    "typescript": "^5.4.5"
+    "typescript": "^5"
   }
 }

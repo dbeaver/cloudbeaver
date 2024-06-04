@@ -14,10 +14,10 @@
     "update-ts-references": "yarn run clean && typescript-resolve-references"
   },
   "dependencies": {
-    "@cloudbeaver/core-di": "~0.1.0",
-    "@testing-library/react": "^14.2.1",
-    "mobx": "^6.12.3",
-    "react": "^18.3.1"
+    "@cloudbeaver/core-di": "^0",
+    "@testing-library/react": "^14",
+    "mobx": "^6",
+    "react": "^18"
   },
   "peerDependencies": {},
   "sideEffects": [
@@ -26,8 +26,8 @@
     "public/**/*"
   ],
   "devDependencies": {
-    "@types/jest": "^29.5.12",
-    "@types/react": "^18.3.3",
-    "typescript": "^5.4.5"
+    "@types/jest": "^29",
+    "@types/react": "^18",
+    "typescript": "^5"
   }
 }

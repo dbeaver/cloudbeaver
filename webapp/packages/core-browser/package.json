@@ -19,22 +19,21 @@
     "update-ts-references": "yarn run clean && typescript-resolve-references"
   },
   "dependencies": {
-    "@cloudbeaver/core-di": "~0.1.0",
-    "@cloudbeaver/core-executor": "~0.1.0",
-    "@cloudbeaver/core-utils": "~0.1.0",
-    "dexie": "^4.0.7",
-    "karma": "^6.4.3",
-    "mobx": "^6.12.3",
-    "workbox-cacheable-response": "^7.1.0",
-    "workbox-core": "^7.1.0",
-    "workbox-expiration": "^7.1.0",
-    "workbox-precaching": "^7.1.0",
-    "workbox-routing": "^7.1.0",
-    "workbox-strategies": "^7.1.0",
-    "workbox-window": "^7.1.0"
+    "@cloudbeaver/core-di": "^0",
+    "@cloudbeaver/core-executor": "^0",
+    "@cloudbeaver/core-utils": "^0",
+    "dexie": "^4",
+    "mobx": "^6",
+    "workbox-cacheable-response": "^7",
+    "workbox-core": "^7",
+    "workbox-expiration": "^7",
+    "workbox-precaching": "^7",
+    "workbox-routing": "^7",
+    "workbox-strategies": "^7",
+    "workbox-window": "^7"
   },
   "peerDependencies": {},
   "devDependencies": {
-    "typescript": "^5.4.5"
+    "typescript": "^5"
   }
 }
