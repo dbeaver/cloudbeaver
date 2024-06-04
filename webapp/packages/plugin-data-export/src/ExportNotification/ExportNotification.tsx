@@ -44,7 +44,7 @@ export const ExportNotification = observer<Props>(function ExportNotification({ 
       <SnackbarContent>
         <SnackbarBody title={translate(title)}>
           {message && <div className={s(style, { message: true })}>{message}</div>}
-          <div className={s(style, { 'source-name': true })}>
+          <div className={s(style, { sourceName: true })}>
             {state.sourceName}
             {state.task?.context.query && (
               <pre className={s(style, { pre: true })} title={state.task.context.query}>
