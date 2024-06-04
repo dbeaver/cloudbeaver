@@ -12,7 +12,7 @@ import { Menu, MenuButton, MenuItem, useMenuState } from 'reakit/Menu';
 import { BaseDropdownStyles } from '..';
 import { s } from '../s';
 import { useS } from '../useS';
-import classes from './PropertyValueSelector.m.css';
+import classes from './PropertyValueSelector.module.css';
 
 interface Props {
   propertyName?: string;

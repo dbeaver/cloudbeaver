@@ -7,7 +7,7 @@
  */
 import { s } from '../../s';
 import { useS } from '../../useS';
-import style from './SnackbarBody.m.css';
+import style from './SnackbarBody.module.css';
 
 interface Props {
   title: string;

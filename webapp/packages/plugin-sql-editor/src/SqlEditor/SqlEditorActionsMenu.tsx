@@ -14,8 +14,8 @@ import { useMenu } from '@cloudbeaver/core-view';
 
 import type { ISqlEditorTabState } from '../ISqlEditorTabState';
 import { SQL_EDITOR_ACTIONS_MENU } from './SQL_EDITOR_ACTIONS_MENU';
-import SqlEditorActionsMenuBarStyles from './SqlEditorActionsMenuBar.m.css';
-import SqlEditorActionsMenuBarItemStyles from './SqlEditorActionsMenuBarItem.m.css';
+import SqlEditorActionsMenuBarStyles from './SqlEditorActionsMenuBar.module.css';
+import SqlEditorActionsMenuBarItemStyles from './SqlEditorActionsMenuBarItem.module.css';
 
 interface Props {
   state: ISqlEditorTabState;

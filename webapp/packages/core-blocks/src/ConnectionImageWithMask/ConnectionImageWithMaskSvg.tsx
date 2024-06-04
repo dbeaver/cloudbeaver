@@ -8,7 +8,7 @@
 import { GlobalConstants, isValidUrl } from '@cloudbeaver/core-utils';
 
 import { useS } from '../useS';
-import style from './ConnectionImageWithMaskSvg.m.css';
+import style from './ConnectionImageWithMaskSvg.module.css';
 
 interface Props {
   icon?: string;

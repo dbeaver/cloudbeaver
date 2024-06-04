@@ -44,7 +44,7 @@ import { ConnectionFormService } from '../ConnectionFormService';
 import type { IConnectionFormProps } from '../IConnectionFormProps';
 import { CONNECTION_FORM_SHARED_CREDENTIALS_TAB_ID } from '../SharedCredentials/CONNECTION_FORM_SHARED_CREDENTIALS_TAB_ID';
 import { ConnectionOptionsTabService } from './ConnectionOptionsTabService';
-import styles from './Options.m.css';
+import styles from './Options.module.css';
 import { ParametersForm } from './ParametersForm';
 import { ProviderPropertiesForm } from './ProviderPropertiesForm';
 import { useOptions } from './useOptions';

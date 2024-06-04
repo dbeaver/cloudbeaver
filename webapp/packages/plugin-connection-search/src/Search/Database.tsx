@@ -13,7 +13,7 @@ import { DBDriverResource } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
 import type { AdminConnectionSearchInfo } from '@cloudbeaver/core-sdk';
 
-import style from './Database.m.css';
+import style from './Database.module.css';
 
 interface Props {
   database: AdminConnectionSearchInfo;

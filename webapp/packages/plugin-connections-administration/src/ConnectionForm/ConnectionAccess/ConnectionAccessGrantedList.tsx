@@ -27,7 +27,7 @@ import {
 import type { TLocalizationToken } from '@cloudbeaver/core-localization';
 import type { AdminUserInfoFragment } from '@cloudbeaver/core-sdk';
 
-import styles from './ConnectionAccessGrantedList.m.css';
+import styles from './ConnectionAccessGrantedList.module.css';
 import { ConnectionAccessTableHeader, IFilterState } from './ConnectionAccessTableHeader/ConnectionAccessTableHeader';
 import { ConnectionAccessTableInnerHeader } from './ConnectionAccessTableHeader/ConnectionAccessTableInnerHeader';
 import { ConnectionAccessTableItem } from './ConnectionAccessTableItem';

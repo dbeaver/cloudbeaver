@@ -18,7 +18,7 @@ import { s } from '../s';
 import { useObjectRef } from '../useObjectRef';
 import { useS } from '../useS';
 import { DialogContext, IDialogContext } from './DialogContext';
-import style from './DialogsPortal.m.css';
+import style from './DialogsPortal.module.css';
 
 export const DialogsPortal = observer(function DialogsPortal() {
   const styles = useS(style);

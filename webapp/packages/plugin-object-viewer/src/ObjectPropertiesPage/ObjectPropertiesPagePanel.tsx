@@ -11,7 +11,7 @@ import { s, useS } from '@cloudbeaver/core-blocks';
 
 import type { ObjectPagePanelComponent } from '../ObjectPage/ObjectPage';
 import { ObjectFolders } from './ObjectFolders';
-import classes from './ObjectPropertiesPagePanel.m.css';
+import classes from './ObjectPropertiesPagePanel.module.css';
 
 export const ObjectPropertiesPagePanel: ObjectPagePanelComponent = observer(function ObjectPropertiesPagePanel({ tab }) {
   const styles = useS(classes);

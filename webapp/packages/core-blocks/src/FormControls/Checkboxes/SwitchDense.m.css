@@ -1,9 +1,0 @@
-.switchBody {
-  composes: theme-switch_dense from global;
-}
-.fieldLabel {
-  composes: theme-typography--body2 from global;
-}
-.switchBody .fieldLabel {
-  font-weight: initial;
-}

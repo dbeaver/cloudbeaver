@@ -1,0 +1,97 @@
+/*
+ * CloudBeaver - Cloud Database Manager
+ * Copyright (C) 2020-2024 DBeaver Corp and others
+ *
+ * Licensed under the Apache License, Version 2.0.
+ * you may not use this file except in compliance with the License.
+ */
+.tiny,
+.field.tiny,
+.container.tiny,
+.grid.tiny > *,
+.container > .tiny,
+.container > .grid.tiny > * {
+  flex-basis: 140px;
+  max-width: 210px;
+}
+
+.small,
+.field.small,
+.container.small,
+.grid.small > *,
+.container > .small,
+.container > .grid.small > * {
+  flex-basis: 260px;
+  max-width: 390px;
+}
+
+.medium,
+.field.medium,
+.container.medium,
+.grid.medium > *,
+.container > .medium,
+.container > .grid.medium > * {
+  flex-basis: 460px;
+  max-width: 640px;
+}
+
+.large,
+.field.large,
+.container.large,
+.grid.large > *,
+.container > .large,
+.container > .grid.large > * {
+  flex-basis: 800px;
+  max-width: 800px;
+}
+
+.maximum,
+.field.maximum,
+.container.maximum,
+.grid.maximum > *,
+.container > .maximum,
+.container > .grid.maximum > * {
+  max-width: 100%;
+}
+
+.fill,
+.field.fill,
+.container.fill,
+.container > .fill {
+  flex-grow: 1;
+  max-width: none;
+}
+
+.keepSize,
+.field.keepSize,
+.container.keepSize,
+.container > .keepSize {
+  flex-grow: 0;
+  flex-basis: auto;
+}
+
+.noGrow,
+.field.noGrow,
+.container.noGrow,
+.container > .noGrow {
+  flex-grow: 0;
+}
+
+.zeroBasis,
+.field.zeroBasis,
+.container.zeroBasis,
+.container > .zeroBasis {
+  flex-basis: 0%;
+}
+
+.container.gap > .groupGap + .groupGap {
+  margin-top: -12px;
+}
+
+.container.gap.compact > .groupGap + .groupGap {
+  margin-top: -8px;
+}
+
+.container.gap.dense > .groupGap + .groupGap {
+  margin-top: -4px;
+}

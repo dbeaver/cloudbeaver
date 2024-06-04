@@ -8,7 +8,7 @@
 import { IconOrImage } from '../IconOrImage';
 import { s } from '../s';
 import { useS } from '../useS';
-import styles from './AppLogo.m.css';
+import styles from './AppLogo.module.css';
 
 interface Props {
   title: string;

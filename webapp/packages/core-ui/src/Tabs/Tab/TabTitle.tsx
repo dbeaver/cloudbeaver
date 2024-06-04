@@ -7,7 +7,7 @@
  */
 import { s, useS } from '@cloudbeaver/core-blocks';
 
-import TabTitleStyles from './TabTitle.m.css';
+import TabTitleStyles from './TabTitle.module.css';
 
 export interface TabTitleProps {
   className?: string;

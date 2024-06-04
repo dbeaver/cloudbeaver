@@ -10,7 +10,8 @@ import { observer } from 'mobx-react-lite';
 import { ConfigurationWizardService } from '@cloudbeaver/core-administration';
 import { Button, s, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import styles from './WizardStepper.m.css';
+
+import styles from './WizardStepper.module.css';
 
 export const WizardStepper = observer(function WizardStepper() {
   const service = useService(ConfigurationWizardService);

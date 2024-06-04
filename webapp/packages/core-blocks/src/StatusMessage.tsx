@@ -13,7 +13,7 @@ import { IconOrImage } from './IconOrImage';
 import { Link } from './Link';
 import { useTranslate } from './localization/useTranslate';
 import { s } from './s';
-import style from './StatusMessage.m.css';
+import style from './StatusMessage.module.css';
 import { useErrorDetails } from './useErrorDetails';
 import { useS } from './useS';
 

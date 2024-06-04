@@ -9,7 +9,7 @@ import { observer } from 'mobx-react-lite';
 
 import { Container, Filter, s, useS, useTranslate } from '@cloudbeaver/core-blocks';
 
-import style from './GrantedConnectionsTableHeader.m.css';
+import style from './GrantedConnectionsTableHeader.module.css';
 
 export interface IFilterState {
   filterValue: string;

@@ -14,7 +14,7 @@ import { type DBObject, DBObjectParentKey, DBObjectResource, NavTreeResource } f
 import { isDefined } from '@cloudbeaver/core-utils';
 import { NavNodeViewService } from '@cloudbeaver/plugin-navigation-tree';
 
-import styles from './ObjectPropertyTable.m.css';
+import styles from './ObjectPropertyTable.module.css';
 import { TableLoader } from './Table/TableLoader';
 
 interface ObjectPropertyTableProps {

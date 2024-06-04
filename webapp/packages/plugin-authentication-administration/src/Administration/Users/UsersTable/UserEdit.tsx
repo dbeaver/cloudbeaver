@@ -15,7 +15,7 @@ import { FormMode } from '@cloudbeaver/core-ui';
 import { AdministrationUserForm } from '../UserForm/AdministrationUserForm';
 import { AdministrationUserFormService } from '../UserForm/AdministrationUserFormService';
 import { AdministrationUserFormState } from '../UserForm/AdministrationUserFormState';
-import style from './UserEdit.m.css';
+import style from './UserEdit.module.css';
 
 export const UserEdit = observer<TableItemExpandProps<string>>(function UserEdit({ item, onClose }) {
   const styles = useS(style);

@@ -10,7 +10,8 @@ import ReactMarkdown from 'react-markdown';
 
 import { Container, Group, GroupItem, GroupTitle, s, useResource, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import { VersionResource } from '@cloudbeaver/core-version';
-import styles from './VersionInfo.m.css';
+
+import styles from './VersionInfo.module.css';
 
 interface Props {
   item: string;

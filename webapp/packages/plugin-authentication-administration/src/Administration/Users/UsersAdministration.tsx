@@ -12,10 +12,10 @@ import { s, SContext, StyleRegistry, ToolsPanel, useS, useTranslate } from '@clo
 import { useService } from '@cloudbeaver/core-di';
 import { ITabData, Tab, TabList, TabPanel, TabPanelStyles, TabsState, TabStyles, TabTitle, TabTitleStyles } from '@cloudbeaver/core-ui';
 
-import style from './shared/UsersAdministration.m.css';
-import tabStyle from './shared/UsersAdministrationTab.m.css';
-import tabPanelStyle from './shared/UsersAdministrationTabPanel.m.css';
-import TabTitleModuleStyles from './shared/UsersAdministrationTabTitle.m.css';
+import style from './shared/UsersAdministration.module.css';
+import tabStyle from './shared/UsersAdministrationTab.module.css';
+import tabPanelStyle from './shared/UsersAdministrationTabPanel.module.css';
+import TabTitleModuleStyles from './shared/UsersAdministrationTabTitle.module.css';
 import { TeamsPage } from './Teams/TeamsPage';
 import { EUsersAdministrationSub, UsersAdministrationNavigationService } from './UsersAdministrationNavigationService';
 import { UsersPage } from './UsersTable/UsersPage';

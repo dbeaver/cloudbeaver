@@ -12,7 +12,7 @@ import { s, useS } from '@cloudbeaver/core-blocks';
 import { EventContext, EventStopPropagationFlag } from '@cloudbeaver/core-events';
 import { InlineEditor } from '@cloudbeaver/core-ui';
 
-import style from './NavigationNodeEditor.m.css';
+import style from './NavigationNodeEditor.module.css';
 
 export interface NavigationNodeEditorProps {
   name: string;

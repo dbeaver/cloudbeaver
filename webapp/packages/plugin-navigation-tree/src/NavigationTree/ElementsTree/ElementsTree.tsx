@@ -26,7 +26,7 @@ import { EventContext, EventStopPropagationFlag } from '@cloudbeaver/core-events
 import { EObjectFeature, type NavNode, NavNodeInfoResource, NavTreeResource, ROOT_NODE_PATH } from '@cloudbeaver/core-navigation-tree';
 
 import { useNavTreeDropBox } from '../useNavTreeDropBox';
-import style from './ElementsTree.m.css';
+import style from './ElementsTree.module.css';
 import { ElementsTreeContentLoader } from './ElementsTreeContentLoader';
 import { ElementsTreeContext, IElementsTreeContext } from './ElementsTreeContext';
 import { elementsTreeNameFilter } from './elementsTreeNameFilter';

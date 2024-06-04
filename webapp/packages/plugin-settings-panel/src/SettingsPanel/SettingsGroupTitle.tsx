@@ -10,7 +10,7 @@ import { observer } from 'mobx-react-lite';
 import { Icon, s, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import { ROOT_SETTINGS_GROUP, type SettingsGroup } from '@cloudbeaver/core-settings';
 
-import style from './SettingsGroupTitle.m.css';
+import style from './SettingsGroupTitle.module.css';
 
 interface Props {
   group: SettingsGroup;

@@ -9,15 +9,15 @@ import { observer } from 'mobx-react-lite';
 
 import { s, SContext, type StyleRegistry, useS } from '@cloudbeaver/core-blocks';
 
-import TabStyles from '../Tabs/Tab/Tab.m.css';
+import TabStyles from '../Tabs/Tab/Tab.module.css';
 import { TabList } from '../Tabs/TabList';
-import TabPanelStyles from '../Tabs/TabPanel.m.css';
+import TabPanelStyles from '../Tabs/TabPanel.module.css';
 import { TabPanelList } from '../Tabs/TabPanelList';
 import type { TabsContainer } from '../Tabs/TabsContainer/TabsContainer';
 import { TabsState } from '../Tabs/TabsState';
-import styles from './shared/SideBarPanel.m.css';
-import SideBarPanelTab from './shared/SideBarPanelTab.m.css';
-import SideBarPanelTabPanel from './shared/SideBarPanelTabPanel.m.css';
+import styles from './shared/SideBarPanel.module.css';
+import SideBarPanelTab from './shared/SideBarPanelTab.module.css';
+import SideBarPanelTabPanel from './shared/SideBarPanelTabPanel.module.css';
 
 export interface SideBarPanelProps {
   container: TabsContainer;
