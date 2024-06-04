@@ -12,7 +12,8 @@ import {
   CACHED_RESOURCE_DEFAULT_PAGE_LIMIT,
   CACHED_RESOURCE_DEFAULT_PAGE_OFFSET,
   CachedMapResource,
-  createResourceOffsetPageKey,
+  CachedResourceOffsetPageKey,
+  CachedResourceOffsetPageListKey,
   getNextPageOffset,
   ICachedResourceOffsetPageOptions,
   ResourceKey,
@@ -50,7 +51,7 @@ export function useOffsetPagination<TResource extends CachedMapResource<any, any
   const targetKey = options?.key;
   const pageSize = options?.pageSize || CACHED_RESOURCE_DEFAULT_PAGE_LIMIT;
   const resource = useService(ctor);
-  const pageInfo = resource.offsetPagination.getPageInfo(createResourceOffsetPageKey(0, 0, targetKey));
+  const pageInfo = resource.offsetPagination.getPageInfo(createPageKey(0, 0, targetKey));
   const offset = Math.max(
     (pageInfo ? getNextPageOffset(pageInfo) : CACHED_RESOURCE_DEFAULT_PAGE_OFFSET) - pageSize,
     CACHED_RESOURCE_DEFAULT_PAGE_OFFSET,
@@ -59,13 +60,13 @@ export function useOffsetPagination<TResource extends CachedMapResource<any, any
   const pagination = useObservableRef<IOffsetPaginationPrivate<TKey>>(
     () => ({
       offset,
-      _key: createResourceOffsetPageKey(offset, pageSize, targetKey),
+      _key: createPageKey(offset, pageSize, targetKey),
       get key() {
-        const pageInfo = resource.offsetPagination.getPageInfo(createResourceOffsetPageKey(0, 0, this._key.target));
+        const pageInfo = resource.offsetPagination.getPageInfo(createPageKey(0, 0, this._key.target));
 
         for (const page of pageInfo?.pages || []) {
           if (page.outdated && page.from < this._key.options.offset) {
-            return createResourceOffsetPageKey(page.from, this._key.options.limit, this._key.target);
+            return createPageKey(page.from, this._key.options.limit, this._key.target);
           }
         }
         return this._key as any;
@@ -75,7 +76,7 @@ export function useOffsetPagination<TResource extends CachedMapResource<any, any
       },
       loadMore() {
         if (this.hasNextPage) {
-          this._key = createResourceOffsetPageKey(this._key.options.offset + this._key.options.limit, this._key.options.limit, this._key.target);
+          this._key = createPageKey(this._key.options.offset + this._key.options.limit, this._key.options.limit, this._key.target);
         }
       },
       refresh() {
@@ -93,8 +94,19 @@ export function useOffsetPagination<TResource extends CachedMapResource<any, any
   );
 
   if (!resource.isIntersect(targetKey, pagination._key.target)) {
-    pagination._key = createResourceOffsetPageKey(offset, pageSize, targetKey);
+    pagination._key = createPageKey(offset, pageSize, targetKey);
   }
 
   return pagination;
+}
+
+function createPageKey(
+  offset: number,
+  limit: number,
+  target: ResourceKey<any>,
+): ResourceKeyAlias<any, Readonly<ICachedResourceOffsetPageOptions>> | ResourceKeyListAlias<any, Readonly<ICachedResourceOffsetPageOptions>> {
+  if (target instanceof ResourceKeyList || target instanceof ResourceKeyListAlias) {
+    return CachedResourceOffsetPageListKey(offset, limit).setTarget(target);
+  }
+  return CachedResourceOffsetPageKey(offset, limit).setTarget(target);
 }

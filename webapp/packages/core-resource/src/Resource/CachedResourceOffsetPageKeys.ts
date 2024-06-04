@@ -5,10 +5,8 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import type { ResourceKey } from './ResourceKey';
-import { ResourceKeyAlias, resourceKeyAliasFactory } from './ResourceKeyAlias';
-import { ResourceKeyList } from './ResourceKeyList';
-import { ResourceKeyListAlias, resourceKeyListAliasFactory } from './ResourceKeyListAlias';
+import { resourceKeyAliasFactory } from './ResourceKeyAlias';
+import { resourceKeyListAliasFactory } from './ResourceKeyListAlias';
 
 interface IOffsetPageInfo {
   offset: number;
@@ -151,15 +149,4 @@ export function expandOffsetPageRange(pages: IResourceOffsetPage[], info: IOffse
     result.push(previous);
   }
   return result;
-}
-
-export function createResourceOffsetPageKey(
-  offset: number,
-  limit: number,
-  target: ResourceKey<any>,
-): ResourceKeyAlias<any, Readonly<ICachedResourceOffsetPageOptions>> | ResourceKeyListAlias<any, Readonly<ICachedResourceOffsetPageOptions>> {
-  if (target instanceof ResourceKeyList || target instanceof ResourceKeyListAlias) {
-    return CachedResourceOffsetPageListKey(offset, limit).setTarget(target);
-  }
-  return CachedResourceOffsetPageKey(offset, limit).setTarget(target);
 }
