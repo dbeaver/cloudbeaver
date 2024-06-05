@@ -13,8 +13,8 @@ import { useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { TabContainerPanelComponent, TabList, TabsState, TabStyles, useTabLocalState } from '@cloudbeaver/core-ui';
 
+import { getResultSetActions } from '../../DatabaseDataModel/Actions/ResultSet/getResulеSetActions';
 import { ResultSetSelectAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetSelectAction';
-import { useResultSetActions } from '../../DatabaseDataModel/Actions/ResultSet/useResultSetActions';
 import type { IDatabaseResultSet } from '../../DatabaseDataModel/IDatabaseResultSet';
 import type { IDataValuePanelProps } from '../../TableViewer/ValuePanel/DataValuePanelService';
 import { getDefaultLineWrapping } from './getDefaultLineWrapping';
@@ -36,7 +36,7 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
     const selection = model.source.getAction(resultIndex, ResultSetSelectAction);
     const activeElements = selection.getActiveElements();
     const firstSelectedCell = activeElements.length ? activeElements[0] : undefined;
-    const { contentAction, editAction, formatAction } = useResultSetActions({
+    const { contentAction, editAction, formatAction } = getResultSetActions({
       model,
       resultIndex,
     });

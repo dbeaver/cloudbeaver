@@ -12,10 +12,10 @@ import { useService } from '@cloudbeaver/core-di';
 import type { ResultDataFormat } from '@cloudbeaver/core-sdk';
 import { blobToBase64, isNotNullDefined, removeMetadataFromDataURL } from '@cloudbeaver/core-utils';
 
+import { getResultSetActions } from '../../DatabaseDataModel/Actions/ResultSet/getResulеSetActions';
 import type { IResultSetElementKey } from '../../DatabaseDataModel/Actions/ResultSet/IResultSetDataKey';
 import { isResultSetBlobValue } from '../../DatabaseDataModel/Actions/ResultSet/isResultSetBlobValue';
 import { isResultSetContentValue } from '../../DatabaseDataModel/Actions/ResultSet/isResultSetContentValue';
-import { useResultSetActions } from '../../DatabaseDataModel/Actions/ResultSet/useResultSetActions';
 import type { IDatabaseDataModel } from '../../DatabaseDataModel/IDatabaseDataModel';
 import type { IDatabaseResultSet } from '../../DatabaseDataModel/IDatabaseResultSet';
 import { formatText } from './formatText';
@@ -38,7 +38,7 @@ interface ITextValueInfo {
 const DEFAULT_CONTENT_TYPE = 'text/plain';
 
 export function useTextValue({ model, dataFormat, resultIndex, currentContentType, elementKey }: IUseTextValueArgs): ITextValueInfo {
-  const { formatAction, editAction, contentAction } = useResultSetActions({ model, resultIndex });
+  const { formatAction, editAction, contentAction } = getResultSetActions({ model, resultIndex });
   const suspense = useSuspense();
   const contentValue = elementKey ? formatAction.get(elementKey) : null;
   const textValuePresentationService = useService(TextValuePresentationService);
