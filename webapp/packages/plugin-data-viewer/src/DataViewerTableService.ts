@@ -17,10 +17,11 @@ import { DatabaseDataAccessMode } from './DatabaseDataModel/IDatabaseDataSource'
 import type { IDatabaseResultSet } from './DatabaseDataModel/IDatabaseResultSet';
 import { DataViewerService } from './DataViewerService';
 import { DataViewerSettingsService } from './DataViewerSettingsService';
+import { DataViewerTable } from './DataViewerTable';
 import { TableViewerStorageService } from './TableViewer/TableViewerStorageService';
 
 @injectable()
-export class DataViewerTableService {
+export class DataViewerTableService extends DataViewerTable {
   constructor(
     private readonly app: App,
     private readonly navNodeManagerService: NavNodeManagerService,
@@ -30,23 +31,8 @@ export class DataViewerTableService {
     private readonly connectionExecutionContextService: ConnectionExecutionContextService,
     private readonly dataViewerService: DataViewerService,
     private readonly dataViewerSettingsService: DataViewerSettingsService,
-  ) {}
-
-  has(tableId: string): boolean {
-    return this.tableViewerStorageService.has(tableId);
-  }
-
-  get(tableId: string): IDatabaseDataModel<any, any> | undefined {
-    return this.tableViewerStorageService.get(tableId);
-  }
-
-  async removeTableModel(tableId: string): Promise<void> {
-    const model = this.tableViewerStorageService.get(tableId);
-
-    if (model) {
-      this.tableViewerStorageService.remove(tableId);
-      await model.dispose();
-    }
+  ) {
+    super(tableViewerStorageService);
   }
 
   create(connection: Connection, node: NavNode | undefined): IDatabaseDataModel<IDataContainerOptions, IDatabaseResultSet> {
