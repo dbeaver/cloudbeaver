@@ -14,7 +14,7 @@ import { NotificationService } from '@cloudbeaver/core-events';
 import { download, getMIME, isImageFormat, isValidUrl } from '@cloudbeaver/core-utils';
 
 import { createResultSetBlobValue } from '../../../../DatabaseDataModel/Actions/ResultSet/createResultSetBlobValue';
-import { getResultSetActions } from '../../../../DatabaseDataModel/Actions/ResultSet/getResulеSetActions';
+import { getResultSetActions } from '../../../../DatabaseDataModel/Actions/ResultSet/getResultSetActions';
 import type { IResultSetElementKey } from '../../../../DatabaseDataModel/Actions/ResultSet/IResultSetDataKey';
 import { isResultSetBinaryValue } from '../../../../DatabaseDataModel/Actions/ResultSet/isResultSetBinaryValue';
 import { isResultSetBlobValue } from '../../../../DatabaseDataModel/Actions/ResultSet/isResultSetBlobValue';

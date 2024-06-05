@@ -14,7 +14,7 @@ import { NotificationService } from '@cloudbeaver/core-events';
 import { TabContainerPanelComponent, TabList, TabsState, TabStyles, useTabLocalState } from '@cloudbeaver/core-ui';
 import { getDefaultLineWrapping } from '@cloudbeaver/core-utils';
 
-import { getResultSetActions } from '../../../../DatabaseDataModel/Actions/ResultSet/getResulеSetActions';
+import { getResultSetActions } from '../../../../DatabaseDataModel/Actions/ResultSet/getResultSetActions';
 import { ResultSetSelectAction } from '../../../../DatabaseDataModel/Actions/ResultSet/ResultSetSelectAction';
 import type { IDatabaseResultSet } from '../../../../DatabaseDataModel/IDatabaseResultSet';
 import type { IDataValuePanelProps } from '../../DataValuePanelService';

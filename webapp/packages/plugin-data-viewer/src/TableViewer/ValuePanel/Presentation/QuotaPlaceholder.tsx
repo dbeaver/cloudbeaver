@@ -10,7 +10,7 @@ import { observer } from 'mobx-react-lite';
 import { Container, Link, s, usePermission, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import { EAdminPermission } from '@cloudbeaver/core-root';
 
-import { getResultSetActions } from '../../../DatabaseDataModel/Actions/ResultSet/getResulеSetActions';
+import { getResultSetActions } from '../../../DatabaseDataModel/Actions/ResultSet/getResultSetActions';
 import type { IResultSetElementKey } from '../../../DatabaseDataModel/Actions/ResultSet/IResultSetDataKey';
 import type { IDatabaseDataModel } from '../../../DatabaseDataModel/IDatabaseDataModel';
 import type { IDatabaseResultSet } from '../../../DatabaseDataModel/IDatabaseResultSet';

@@ -8,7 +8,7 @@
 import { useService } from '@cloudbeaver/core-di';
 import type { ResultDataFormat } from '@cloudbeaver/core-sdk';
 
-import { getResultSetActions } from '../../../../DatabaseDataModel/Actions/ResultSet/getResulеSetActions';
+import { getResultSetActions } from '../../../../DatabaseDataModel/Actions/ResultSet/getResultSetActions';
 import type { IResultSetElementKey } from '../../../../DatabaseDataModel/Actions/ResultSet/IResultSetDataKey';
 import { isResultSetBlobValue } from '../../../../DatabaseDataModel/Actions/ResultSet/isResultSetBlobValue';
 import { isResultSetContentValue } from '../../../../DatabaseDataModel/Actions/ResultSet/isResultSetContentValue';
