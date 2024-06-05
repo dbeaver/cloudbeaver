@@ -24,7 +24,7 @@ import { useService } from '@cloudbeaver/core-di';
 import { OptionsPanelService } from '@cloudbeaver/core-ui';
 
 import { AppScreenService } from './AppScreenService';
-import style from './RightArea.m.css';
+import style from './RightArea.module.css';
 
 interface Props {
   className?: string;

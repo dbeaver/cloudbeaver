@@ -29,7 +29,7 @@ import { getNodePlainName, type INodeActions, NavNodeInfoResource, NavTreeResour
 import type { NavTreeControlComponent } from '../../NavigationNodeComponent';
 import { TreeNodeMenuLoader } from '../TreeNodeMenu/TreeNodeMenuLoader';
 import { DATA_ATTRIBUTE_NODE_EDITING } from './DATA_ATTRIBUTE_NODE_EDITING';
-import style from './NavigationNodeControl.m.css';
+import style from './NavigationNodeControl.module.css';
 import { NavigationNodeExpand } from './NavigationNodeExpand';
 import { NavigationNodeEditorLoader } from './NavigationNodeLoaders';
 

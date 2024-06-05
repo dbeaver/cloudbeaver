@@ -11,8 +11,8 @@ import { ColoredContainer, Container, Group, s, SContext, StyleRegistry, useS } 
 import { useService } from '@cloudbeaver/core-di';
 import { TabList, TabPanelList, TabsState, TabStyles } from '@cloudbeaver/core-ui';
 
-import style from './UserProfileOptionsPanel.m.css';
-import UserProfileTabStyles from './UserProfileTab.m.css';
+import style from './UserProfileOptionsPanel.module.css';
+import UserProfileTabStyles from './UserProfileTab.module.css';
 import { UserProfileTabsService } from './UserProfileTabsService';
 
 export const tabsStyleRegistry: StyleRegistry = [[TabStyles, { mode: 'append', styles: [UserProfileTabStyles] }]];

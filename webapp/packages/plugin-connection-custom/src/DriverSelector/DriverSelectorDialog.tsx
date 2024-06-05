@@ -14,7 +14,7 @@ import { ProjectInfoResource } from '@cloudbeaver/core-projects';
 import { CachedMapAllKey } from '@cloudbeaver/core-resource';
 
 import { DriverSelector } from './DriverSelector';
-import styles from './DriverSelectorDialog.m.css';
+import styles from './DriverSelectorDialog.module.css';
 import { useDriverSelectorDialog } from './useDriverSelectorDialog';
 
 export const DriverSelectorDialog: DialogComponent<null> = observer(function DriverSelectorDialog({ rejectDialog }) {

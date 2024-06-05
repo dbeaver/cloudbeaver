@@ -28,7 +28,7 @@ import { TabContainerPanelComponent, useTab } from '@cloudbeaver/core-ui';
 
 import type { ITeamFormProps } from '../ITeamFormProps';
 import { ConnectionList } from './ConnectionList';
-import style from './GrantedConnections.m.css';
+import style from './GrantedConnections.module.css';
 import { GrantedConnectionList } from './GrantedConnectionsList';
 import { useGrantedConnections } from './useGrantedConnections';
 

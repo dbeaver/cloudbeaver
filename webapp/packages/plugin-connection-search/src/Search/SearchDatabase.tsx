@@ -17,7 +17,7 @@ import { ConnectionFormLoader } from '@cloudbeaver/plugin-connections';
 
 import { ConnectionSearchService } from './ConnectionSearchService';
 import { DatabaseList } from './DatabaseList';
-import style from './SearchDatabase.m.css';
+import style from './SearchDatabase.module.css';
 
 export const SearchDatabase: React.FC = observer(function SearchDatabase() {
   const styles = useS(style);

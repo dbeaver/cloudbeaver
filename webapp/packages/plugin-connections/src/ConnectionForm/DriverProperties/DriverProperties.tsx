@@ -15,7 +15,7 @@ import { TabContainerPanelComponent, useTab } from '@cloudbeaver/core-ui';
 import { uuid } from '@cloudbeaver/core-utils';
 
 import type { IConnectionFormProps } from '../IConnectionFormProps';
-import styles from './DriverProperties.m.css';
+import styles from './DriverProperties.module.css';
 
 export const DriverProperties: TabContainerPanelComponent<IConnectionFormProps> = observer(function DriverProperties({ tabId, state: formState }) {
   const { selected } = useTab(tabId);

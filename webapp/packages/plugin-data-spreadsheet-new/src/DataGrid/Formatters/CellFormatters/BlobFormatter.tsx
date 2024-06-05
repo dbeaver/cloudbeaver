@@ -16,7 +16,7 @@ import { EditingContext } from '../../../Editing/EditingContext';
 import { CellContext } from '../../CellRenderer/CellContext';
 import { DataGridContext } from '../../DataGridContext';
 import { TableDataContext } from '../../TableDataContext';
-import style from './BlobFormatter.m.css';
+import style from './BlobFormatter.module.css';
 
 export const BlobFormatter = observer<RenderCellProps<IResultSetRowKey>>(function BlobFormatter({ column, row }) {
   const context = useContext(DataGridContext);

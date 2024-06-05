@@ -9,7 +9,7 @@ import { observer } from 'mobx-react-lite';
 
 import { s } from '../s';
 import { useS } from '../useS';
-import style from './Overlay.m.css';
+import style from './Overlay.module.css';
 
 interface Props {
   active?: boolean;

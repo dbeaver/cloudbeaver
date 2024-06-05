@@ -1,0 +1,23 @@
+/*
+ * CloudBeaver - Cloud Database Manager
+ * Copyright (C) 2020-2024 DBeaver Corp and others
+ *
+ * Licensed under the Apache License, Version 2.0.
+ * you may not use this file except in compliance with the License.
+ */
+.unsavedMark {
+  background-color: var(--theme-primary);
+  width: 8px;
+  height: 8px;
+  border-radius: 100%;
+  margin-right: 4px;
+  display: inline-block;
+  vertical-align: middle;
+  flex-shrink: 0;
+}
+
+.readonlyIcon {
+  cursor: auto;
+  width: 10px;
+  margin-right: 4px;
+}

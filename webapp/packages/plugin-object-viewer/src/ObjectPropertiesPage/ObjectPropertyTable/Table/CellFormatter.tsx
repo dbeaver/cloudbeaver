@@ -18,7 +18,7 @@ import { MENU_NAV_TREE, useNode } from '@cloudbeaver/plugin-navigation-tree';
 import type { RenderCellProps } from '@cloudbeaver/plugin-react-data-grid';
 
 import { getValue } from '../../helpers';
-import classes from './CellFormatter.m.css';
+import classes from './CellFormatter.module.css';
 import { TableContext } from './TableContext';
 
 interface Props {

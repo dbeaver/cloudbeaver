@@ -14,7 +14,7 @@ import { s } from '../../s';
 import { useFocus } from '../../useFocus';
 import { useS } from '../../useS';
 import { DialogContext } from '../DialogContext';
-import styles from './CommonDialogWrapper.m.css';
+import styles from './CommonDialogWrapper.module.css';
 
 export interface CommonDialogWrapperProps {
   size?: 'small' | 'medium' | 'large';

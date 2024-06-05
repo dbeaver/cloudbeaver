@@ -18,7 +18,7 @@ import { Translate } from '../localization/Translate';
 import { s } from '../s';
 import { StaticImage } from '../StaticImage';
 import { useS } from '../useS';
-import styles from './Loader.m.css';
+import styles from './Loader.module.css';
 import { ILoaderContext, LoaderContext } from './LoaderContext';
 
 type LoaderState =

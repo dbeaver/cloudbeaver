@@ -9,7 +9,7 @@ import { observer } from 'mobx-react-lite';
 
 import { Button, Fill, s, useS, useTranslate } from '@cloudbeaver/core-blocks';
 
-import style from './ProcessorConfigureDialogFooter.m.css';
+import style from './ProcessorConfigureDialogFooter.module.css';
 
 interface Props {
   isExporting: boolean;

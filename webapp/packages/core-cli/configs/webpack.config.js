@@ -93,7 +93,7 @@ module.exports = (env, argv) => {
         options: {
           esModule: true,
           modules: {
-            auto: /(module|m)\.(css|s[ac]ss)$/,
+            auto: /module\.(css|s[ac]ss)$/,
             localIdentName: '[local]___[hash:base64:5]',
             namedExport: false,
           },

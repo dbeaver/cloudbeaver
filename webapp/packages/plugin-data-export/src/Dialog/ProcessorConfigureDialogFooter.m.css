@@ -1,8 +1,0 @@
-.controls {
-  display: flex;
-  flex: 1;
-  height: 100%;
-  align-items: center;
-  margin: auto;
-  gap: 24px;
-}

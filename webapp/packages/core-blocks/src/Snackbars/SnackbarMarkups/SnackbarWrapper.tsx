@@ -11,7 +11,7 @@ import { ActionIconButton } from '../../ActionIconButton';
 import { useTranslate } from '../../localization/useTranslate';
 import { s } from '../../s';
 import { useS } from '../../useS';
-import style from './SnackbarWrapper.m.css';
+import style from './SnackbarWrapper.module.css';
 
 interface Props {
   closing?: boolean;

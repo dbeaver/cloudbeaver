@@ -13,8 +13,8 @@ import { useMenu } from '@cloudbeaver/core-view';
 
 import { DATA_CONTEXT_ELEMENTS_TREE } from '../DATA_CONTEXT_ELEMENTS_TREE';
 import type { IElementsTree } from '../useElementsTree';
-import elementsTreeMenuBarItemStyles from './ElementsTreeMenuBarItem.m.css';
-import style from './ElementsTreeToolsMenu.m.css';
+import elementsTreeMenuBarItemStyles from './ElementsTreeMenuBarItem.module.css';
+import style from './ElementsTreeToolsMenu.module.css';
 import { MENU_ELEMENTS_TREE_TOOLS } from './MENU_ELEMENTS_TREE_TOOLS';
 
 interface Props {

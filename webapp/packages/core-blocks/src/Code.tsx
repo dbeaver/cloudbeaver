@@ -5,10 +5,11 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import style from './Code.m.css';
+import { observer } from 'mobx-react-lite';
+
+import style from './Code.module.css';
 import { s } from './s';
 import { useS } from './useS';
-import {observer} from "mobx-react-lite";
 
 interface Props {
   className?: string;

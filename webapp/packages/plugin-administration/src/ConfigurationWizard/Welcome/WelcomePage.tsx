@@ -7,7 +7,7 @@
  */
 import { ColoredContainer, Group, GroupItem, s, Translate, useS } from '@cloudbeaver/core-blocks';
 
-import styles from './WelcomePage.m.css';
+import styles from './WelcomePage.module.css';
 
 export const WelcomePage: React.FC = function WelcomePage() {
   const style = useS(styles);

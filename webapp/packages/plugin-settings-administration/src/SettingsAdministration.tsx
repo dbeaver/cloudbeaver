@@ -14,7 +14,7 @@ import { NotificationService } from '@cloudbeaver/core-events';
 import { ServerSettingsService } from '@cloudbeaver/core-root';
 import { Settings } from '@cloudbeaver/plugin-settings-panel';
 
-import style from './SettingsAdministration.m.css';
+import style from './SettingsAdministration.module.css';
 
 const clientScope = ['server'];
 

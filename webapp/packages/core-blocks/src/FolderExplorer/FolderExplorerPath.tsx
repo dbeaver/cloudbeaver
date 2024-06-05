@@ -11,7 +11,7 @@ import { useContext } from 'react';
 import { s } from '../s';
 import { useS } from '../useS';
 import { FolderExplorerContext } from './FolderExplorerContext';
-import style from './FolderExplorerPath.m.css';
+import style from './FolderExplorerPath.module.css';
 import { FolderName } from './FolderName';
 
 interface Props {

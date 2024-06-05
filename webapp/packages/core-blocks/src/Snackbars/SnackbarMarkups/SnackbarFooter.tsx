@@ -7,7 +7,7 @@
  */
 import { s } from '../../s';
 import { useS } from '../../useS';
-import style from './SnackbarFooter.m.css';
+import style from './SnackbarFooter.module.css';
 
 interface Props {
   timestamp: number;
