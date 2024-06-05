@@ -18,28 +18,28 @@
     "update-ts-references": "yarn run clean && typescript-resolve-references"
   },
   "dependencies": {
-    "@cloudbeaver/core-blocks": "~0.1.0",
-    "@cloudbeaver/core-di": "~0.1.0",
-    "@cloudbeaver/core-localization": "~0.1.0",
-    "@cloudbeaver/core-sdk": "~0.1.0",
-    "@cloudbeaver/core-ui": "~0.1.0",
-    "@cloudbeaver/plugin-data-viewer": "~0.1.0",
-    "geojson": "^0.5.0",
-    "leaflet": "^1.9.4",
-    "mobx-react-lite": "^4.0.5",
-    "proj4": "^2.10.0",
-    "react": "^18.2.0",
-    "react-leaflet": "^4.2.1",
-    "wellknown": "^0.5.0"
+    "@cloudbeaver/core-blocks": "^0",
+    "@cloudbeaver/core-di": "^0",
+    "@cloudbeaver/core-localization": "^0",
+    "@cloudbeaver/core-sdk": "^0",
+    "@cloudbeaver/core-ui": "^0",
+    "@cloudbeaver/plugin-data-viewer": "^0",
+    "geojson": "^0",
+    "leaflet": "^1",
+    "mobx-react-lite": "^4",
+    "proj4": "^2",
+    "react": "^18",
+    "react-leaflet": "^4",
+    "wellknown": "^0"
   },
   "peerDependencies": {},
   "devDependencies": {
-    "@types/leaflet": "^1.9.8",
-    "@types/proj4": "^2.5.5",
-    "@types/react": "^18.2.63",
-    "@types/wellknown": "~0.5.8",
-    "leaflet": "^1.9.4",
-    "typescript": "^5.3.3",
-    "typescript-plugin-css-modules": "^5.1.0"
+    "@types/leaflet": "^1",
+    "@types/proj4": "^2",
+    "@types/react": "^18",
+    "@types/wellknown": "^0",
+    "leaflet": "^1",
+    "typescript": "^5",
+    "typescript-plugin-css-modules": "^5"
   }
 }

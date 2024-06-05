@@ -95,6 +95,7 @@ module.exports = (env, argv) => {
           modules: {
             auto: /module\.(css|s[ac]ss)$/,
             localIdentName: '[local]___[hash:base64:5]',
+            namedExport: false,
           },
         },
       },
