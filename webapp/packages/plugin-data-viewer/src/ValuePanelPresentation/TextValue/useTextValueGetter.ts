@@ -27,11 +27,9 @@ interface IUseTextValueArgs {
   elementKey?: IResultSetElementKey;
 }
 
-interface ITextValueInfo {
-  valueGetter: () => string;
-}
+type ValueGetter = () => string;
 
-export function useTextValue({ model, resultIndex, contentType, elementKey }: IUseTextValueArgs): ITextValueInfo {
+export function useTextValueGetter({ model, resultIndex, contentType, elementKey }: IUseTextValueArgs): ValueGetter {
   const { formatAction, editAction, contentAction } = getResultSetActions({ model, resultIndex });
   const suspense = useSuspense();
   const contentValue = elementKey ? formatAction.get(elementKey) : null;
@@ -94,7 +92,5 @@ export function useTextValue({ model, resultIndex, contentType, elementKey }: IU
     return value;
   }
 
-  return {
-    valueGetter,
-  };
+  return valueGetter;
 }

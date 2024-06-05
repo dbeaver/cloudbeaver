@@ -24,7 +24,8 @@ import { TextValueEditor } from './TextValueEditor';
 import { TextValuePresentationService } from './TextValuePresentationService';
 import { TextValueTruncatedMessage } from './TextValueTruncatedMessage';
 import { useAutoContentType } from './useAutoContentType';
-import { useTextValue } from './useTextValue';
+import { useTextValueGetter } from './useTextValueGetter';
+import { useTextValueReadonly } from './useTextValueReadonly';
 
 const tabRegistry: StyleRegistry = [[TabStyles, { mode: 'append', styles: [TextValuePresentationTab] }]];
 
@@ -37,7 +38,7 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
     const selection = model.source.getAction(resultIndex, ResultSetSelectAction);
     const activeElements = selection.getActiveElements();
     const firstSelectedCell = activeElements.length ? activeElements[0] : undefined;
-    const { contentAction, editAction, formatAction } = getResultSetActions({
+    const { contentAction, editAction } = getResultSetActions({
       model,
       resultIndex,
     });
@@ -61,24 +62,16 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
       currentContentType: state.currentContentType,
       elementKey: firstSelectedCell,
     });
-    const textValueInfo = useTextValue({
+    const textValueGetter = useTextValueGetter({
       model,
       resultIndex,
       dataFormat,
-      contentType: contentType,
+      contentType,
       elementKey: firstSelectedCell,
     });
     const autoLineWrapping = getDefaultLineWrapping(contentType);
     const lineWrapping = state.lineWrapping ?? autoLineWrapping;
-
-    const isSelectedCellReadonly =
-      firstSelectedCell &&
-      (formatAction.isReadOnly(firstSelectedCell) ||
-        formatAction.isBinary(firstSelectedCell) ||
-        formatAction.isGeometry(firstSelectedCell) ||
-        contentAction.isTextTruncated(firstSelectedCell));
-    const isReadonlyByResultIndex = model.isReadonly(resultIndex) || model.isDisabled(resultIndex) || !firstSelectedCell;
-    const isReadonly = isSelectedCellReadonly || isReadonlyByResultIndex;
+    const isReadonly = useTextValueReadonly({ model, resultIndex });
     const canSave = firstSelectedCell && contentAction.isDownloadable(firstSelectedCell);
 
     function valueChangeHandler(newValue: string) {
@@ -135,7 +128,7 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
               contentType={contentType}
               lineWrapping={lineWrapping}
               readonly={isReadonly}
-              valueGetter={textValueInfo.valueGetter}
+              valueGetter={textValueGetter}
               onChange={valueChangeHandler}
             />
           </Group>
