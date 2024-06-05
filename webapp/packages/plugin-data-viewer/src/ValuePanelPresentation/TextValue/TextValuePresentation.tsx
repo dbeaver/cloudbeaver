@@ -12,17 +12,18 @@ import { ActionIconButton, Container, Group, Loader, s, SContext, StyleRegistry,
 import { useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { TabContainerPanelComponent, TabList, TabsState, TabStyles, useTabLocalState } from '@cloudbeaver/core-ui';
+import { getDefaultLineWrapping } from '@cloudbeaver/core-utils';
 
 import { getResultSetActions } from '../../DatabaseDataModel/Actions/ResultSet/getResulеSetActions';
 import { ResultSetSelectAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetSelectAction';
 import type { IDatabaseResultSet } from '../../DatabaseDataModel/IDatabaseResultSet';
 import type { IDataValuePanelProps } from '../../TableViewer/ValuePanel/DataValuePanelService';
-import { getDefaultLineWrapping } from './getDefaultLineWrapping';
 import styles from './shared/TextValuePresentation.m.css';
 import TextValuePresentationTab from './shared/TextValuePresentationTab.m.css';
 import { TextValueEditor } from './TextValueEditor';
 import { TextValuePresentationService } from './TextValuePresentationService';
 import { TextValueTruncatedMessage } from './TextValueTruncatedMessage';
+import { useAutoContentType } from './useAutoContentType';
 import { useTextValue } from './useTextValue';
 
 const tabRegistry: StyleRegistry = [[TabStyles, { mode: 'append', styles: [TextValuePresentationTab] }]];
@@ -53,15 +54,21 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
         },
       }),
     );
-
+    const contentType = useAutoContentType({
+      dataFormat,
+      model,
+      resultIndex,
+      currentContentType: state.currentContentType,
+      elementKey: firstSelectedCell,
+    });
     const textValueInfo = useTextValue({
       model,
       resultIndex,
       dataFormat,
-      currentContentType: state.currentContentType,
+      contentType: contentType,
       elementKey: firstSelectedCell,
     });
-    const autoLineWrapping = getDefaultLineWrapping(textValueInfo.contentType);
+    const autoLineWrapping = getDefaultLineWrapping(contentType);
     const lineWrapping = state.lineWrapping ?? autoLineWrapping;
 
     const isSelectedCellReadonly =
@@ -94,7 +101,7 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
 
     async function selectTabHandler(tabId: string) {
       // currentContentType may be selected automatically we don't want to change state in this case
-      if (tabId !== textValueInfo.contentType) {
+      if (tabId !== contentType) {
         state.setContentType(tabId);
       }
     }
@@ -111,7 +118,7 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
               dataFormat={dataFormat}
               resultIndex={resultIndex}
               container={textValuePresentationService.tabs}
-              currentTabId={textValueInfo.contentType}
+              currentTabId={contentType}
               model={model}
               lazy
               onChange={tab => selectTabHandler(tab.tabId)}
@@ -125,7 +132,7 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
         <Loader suspense>
           <Group overflow maximum box>
             <TextValueEditor
-              contentType={textValueInfo.contentType}
+              contentType={contentType}
               lineWrapping={lineWrapping}
               readonly={isReadonly}
               valueGetter={textValueInfo.valueGetter}
