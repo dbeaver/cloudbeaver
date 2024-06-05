@@ -11,10 +11,7 @@ import { Radio, TextPlaceholder, useTranslate } from '@cloudbeaver/core-blocks';
 import type { TabContainerPanelComponent } from '@cloudbeaver/core-ui';
 import { isDefined } from '@cloudbeaver/core-utils';
 
-import { ResultSetEditAction } from '../../../../DatabaseDataModel/Actions/ResultSet/ResultSetEditAction';
-import { ResultSetFormatAction } from '../../../../DatabaseDataModel/Actions/ResultSet/ResultSetFormatAction';
-import { ResultSetSelectAction } from '../../../../DatabaseDataModel/Actions/ResultSet/ResultSetSelectAction';
-import { ResultSetViewAction } from '../../../../DatabaseDataModel/Actions/ResultSet/ResultSetViewAction';
+import { getResultSetActions } from '../../../../DatabaseDataModel/Actions/ResultSet/getResultSetActions';
 import type { IDatabaseResultSet } from '../../../../DatabaseDataModel/IDatabaseResultSet';
 import type { IDataValuePanelProps } from '../../DataValuePanelService';
 import classes from './BooleanValuePresentation.module.css';
@@ -24,12 +21,9 @@ export const BooleanValuePresentation: TabContainerPanelComponent<IDataValuePane
   function BooleanValuePresentation({ model, resultIndex }) {
     const translate = useTranslate();
 
-    const selection = model.source.getAction(resultIndex, ResultSetSelectAction);
-    const view = model.source.getAction(resultIndex, ResultSetViewAction);
-    const editor = model.source.getAction(resultIndex, ResultSetEditAction);
-    const format = model.source.getAction(resultIndex, ResultSetFormatAction);
+    const { selectAction, viewAction, editAction, formatAction } = getResultSetActions({ model, resultIndex });
 
-    const activeElements = selection.getActiveElements();
+    const activeElements = selectAction.getActiveElements();
     const value = useValuePanelBooleanValue(model, resultIndex);
 
     if (activeElements.length === 0) {
@@ -41,9 +35,9 @@ export const BooleanValuePresentation: TabContainerPanelComponent<IDataValuePane
     }
 
     const firstSelectedCell = activeElements[0];
-    const column = view.getColumn(firstSelectedCell.column);
+    const column = viewAction.getColumn(firstSelectedCell.column);
     const nullable = column?.required === false;
-    const readonly = model.isReadonly(resultIndex) || model.isDisabled(resultIndex) || format.isReadOnly(firstSelectedCell);
+    const readonly = model.isReadonly(resultIndex) || model.isDisabled(resultIndex) || formatAction.isReadOnly(firstSelectedCell);
 
     return (
       <div className={classes.container}>
@@ -53,7 +47,7 @@ export const BooleanValuePresentation: TabContainerPanelComponent<IDataValuePane
           mod={['primary']}
           checked={value === true}
           disabled={readonly}
-          onClick={() => editor.set(firstSelectedCell, true)}
+          onClick={() => editAction.set(firstSelectedCell, true)}
         >
           TRUE
         </Radio>
@@ -63,7 +57,7 @@ export const BooleanValuePresentation: TabContainerPanelComponent<IDataValuePane
           mod={['primary']}
           checked={value === false}
           disabled={readonly}
-          onClick={() => editor.set(firstSelectedCell, false)}
+          onClick={() => editAction.set(firstSelectedCell, false)}
         >
           FALSE
         </Radio>
@@ -74,7 +68,7 @@ export const BooleanValuePresentation: TabContainerPanelComponent<IDataValuePane
             mod={['primary']}
             checked={value === null}
             disabled={readonly}
-            onClick={() => editor.set(firstSelectedCell, null)}
+            onClick={() => editAction.set(firstSelectedCell, null)}
           >
             NULL
           </Radio>
