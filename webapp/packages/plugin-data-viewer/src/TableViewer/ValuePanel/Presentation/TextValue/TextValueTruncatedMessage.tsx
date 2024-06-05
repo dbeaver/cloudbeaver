@@ -14,12 +14,10 @@ import { bytesToSize, isNotNullDefined } from '@cloudbeaver/core-utils';
 
 import { getResultSetActions } from '../../../../DatabaseDataModel/Actions/ResultSet/getResultSetActions';
 import type { IResultSetElementKey } from '../../../../DatabaseDataModel/Actions/ResultSet/IResultSetDataKey';
-import { isResultSetBlobValue } from '../../../../DatabaseDataModel/Actions/ResultSet/isResultSetBlobValue';
 import { isResultSetContentValue } from '../../../../DatabaseDataModel/Actions/ResultSet/isResultSetContentValue';
 import type { IDatabaseDataModel } from '../../../../DatabaseDataModel/IDatabaseDataModel';
 import type { IDatabaseResultSet } from '../../../../DatabaseDataModel/IDatabaseResultSet';
 import { QuotaPlaceholder } from '../QuotaPlaceholder';
-import { MAX_BLOB_PREVIEW_SIZE } from './MAX_BLOB_PREVIEW_SIZE';
 
 interface Props {
   resultIndex: number;
@@ -32,13 +30,8 @@ export const TextValueTruncatedMessage = observer<Props>(function TextValueTrunc
   const notificationService = useService(NotificationService);
   const { contentAction, formatAction } = getResultSetActions({ model, resultIndex });
   const contentValue = formatAction.get(elementKey);
-  let isTruncated = contentAction.isTextTruncated(elementKey);
+  const isTruncated = contentAction.isTextTruncated(elementKey) || contentAction.isBlobTruncated(elementKey);
   const isCacheLoaded = !!contentAction.retrieveFullTextFromCache(elementKey);
-  const limitInfo = elementKey ? contentAction.getLimitInfo(elementKey) : null;
-
-  if (isResultSetBlobValue(contentValue)) {
-    isTruncated ||= contentValue.blob.size > (limitInfo?.limit ?? MAX_BLOB_PREVIEW_SIZE);
-  }
 
   if (!isTruncated || isCacheLoaded) {
     return null;

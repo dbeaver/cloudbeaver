@@ -11,12 +11,14 @@ import { QuotasService } from '@cloudbeaver/core-root';
 import { GraphQLService, ResultDataFormat } from '@cloudbeaver/core-sdk';
 import { bytesToSize, download, downloadFromURL, GlobalConstants, isNotNullDefined } from '@cloudbeaver/core-utils';
 
+import { MAX_BLOB_PREVIEW_SIZE } from '../../../TableViewer/ValuePanel/Presentation/TextValue/MAX_BLOB_PREVIEW_SIZE';
 import { DatabaseDataAction } from '../../DatabaseDataAction';
 import type { IDatabaseDataSource } from '../../IDatabaseDataSource';
 import type { IDatabaseResultSet } from '../../IDatabaseResultSet';
 import { databaseDataAction } from '../DatabaseDataActionDecorator';
 import type { IResultSetDataContentAction } from './IResultSetDataContentAction';
 import type { IResultSetElementKey } from './IResultSetDataKey';
+import { isResultSetBlobValue } from './isResultSetBlobValue';
 import { isResultSetContentValue } from './isResultSetContentValue';
 import { ResultSetCacheAction } from './ResultSetCacheAction';
 import { ResultSetDataAction } from './ResultSetDataAction';
@@ -80,6 +82,10 @@ export class ResultSetDataContentAction extends DatabaseDataAction<any, IDatabas
   isBlobTruncated(elementKey: IResultSetElementKey) {
     const limit = this.getLimitInfo(elementKey).limit;
     const content = this.format.get(elementKey);
+
+    if (isResultSetBlobValue(elementKey)) {
+      return elementKey.blob.size > (limit ?? MAX_BLOB_PREVIEW_SIZE);
+    }
 
     if (!isNotNullDefined(limit) || !isResultSetContentValue(content) || !this.format.isBinary(elementKey)) {
       return false;
