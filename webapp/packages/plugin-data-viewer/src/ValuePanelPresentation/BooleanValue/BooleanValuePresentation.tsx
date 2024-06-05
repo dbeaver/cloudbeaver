@@ -9,6 +9,7 @@ import { observer } from 'mobx-react-lite';
 
 import { Radio, TextPlaceholder, useTranslate } from '@cloudbeaver/core-blocks';
 import type { TabContainerPanelComponent } from '@cloudbeaver/core-ui';
+import { isDefined } from '@cloudbeaver/core-utils';
 
 import { ResultSetEditAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetEditAction';
 import { ResultSetFormatAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetFormatAction';
@@ -17,38 +18,29 @@ import { ResultSetViewAction } from '../../DatabaseDataModel/Actions/ResultSet/R
 import type { IDatabaseResultSet } from '../../DatabaseDataModel/IDatabaseResultSet';
 import type { IDataValuePanelProps } from '../../TableViewer/ValuePanel/DataValuePanelService';
 import classes from './BooleanValuePresentation.m.css';
-import { isStringifiedBoolean } from './isBooleanValuePresentationAvailable';
+import { useValuePanelBooleanValue } from './useValuePanelBooleanValue';
 
 export const BooleanValuePresentation: TabContainerPanelComponent<IDataValuePanelProps<any, IDatabaseResultSet>> = observer(
   function BooleanValuePresentation({ model, resultIndex }) {
     const translate = useTranslate();
+
     const selection = model.source.getAction(resultIndex, ResultSetSelectAction);
-    const activeElements = selection.getActiveElements();
-
-    if (activeElements.length === 0) {
-      return null;
-    }
-
-    let value: boolean | null | undefined;
-
     const view = model.source.getAction(resultIndex, ResultSetViewAction);
     const editor = model.source.getAction(resultIndex, ResultSetEditAction);
+    const format = model.source.getAction(resultIndex, ResultSetFormatAction);
 
-    const firstSelectedCell = activeElements[0];
-    const cellValue = view.getCellValue(firstSelectedCell);
+    const activeElements = selection.getActiveElements();
+    const value = useValuePanelBooleanValue(model, resultIndex);
 
-    if (typeof cellValue === 'string' && isStringifiedBoolean(cellValue)) {
-      value = cellValue.toLowerCase() === 'true';
-    } else if (typeof cellValue === 'boolean' || cellValue === null) {
-      value = cellValue;
+    if (activeElements.length === 0) {
+      throw new Error('No active elements');
     }
 
-    if (value === undefined) {
+    if (!isDefined(value)) {
       return <TextPlaceholder>{translate('data_viewer_presentation_value_boolean_placeholder')}</TextPlaceholder>;
     }
 
-    const format = model.source.getAction(resultIndex, ResultSetFormatAction);
-
+    const firstSelectedCell = activeElements[0];
     const column = view.getColumn(firstSelectedCell.column);
     const nullable = column?.required === false;
     const readonly = model.isReadonly(resultIndex) || model.isDisabled(resultIndex) || format.isReadOnly(firstSelectedCell);
