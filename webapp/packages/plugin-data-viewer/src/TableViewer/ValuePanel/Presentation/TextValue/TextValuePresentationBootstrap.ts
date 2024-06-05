@@ -10,7 +10,7 @@ import React, { lazy } from 'react';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { ResultDataFormat } from '@cloudbeaver/core-sdk';
 
-import { DataValuePanelService } from '../../TableViewer/ValuePanel/DataValuePanelService';
+import { DataValuePanelService } from '../../DataValuePanelService';
 import { isBlobPresentationAvailable } from './isTextValuePresentationAvailable';
 import { TextValuePresentationService } from './TextValuePresentationService';
 

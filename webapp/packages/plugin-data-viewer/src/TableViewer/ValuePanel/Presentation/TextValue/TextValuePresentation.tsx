@@ -14,10 +14,10 @@ import { NotificationService } from '@cloudbeaver/core-events';
 import { TabContainerPanelComponent, TabList, TabsState, TabStyles, useTabLocalState } from '@cloudbeaver/core-ui';
 import { getDefaultLineWrapping } from '@cloudbeaver/core-utils';
 
-import { getResultSetActions } from '../../DatabaseDataModel/Actions/ResultSet/getResulеSetActions';
-import { ResultSetSelectAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetSelectAction';
-import type { IDatabaseResultSet } from '../../DatabaseDataModel/IDatabaseResultSet';
-import type { IDataValuePanelProps } from '../../TableViewer/ValuePanel/DataValuePanelService';
+import { getResultSetActions } from '../../../../DatabaseDataModel/Actions/ResultSet/getResulеSetActions';
+import { ResultSetSelectAction } from '../../../../DatabaseDataModel/Actions/ResultSet/ResultSetSelectAction';
+import type { IDatabaseResultSet } from '../../../../DatabaseDataModel/IDatabaseResultSet';
+import type { IDataValuePanelProps } from '../../DataValuePanelService';
 import styles from './shared/TextValuePresentation.m.css';
 import TextValuePresentationTab from './shared/TextValuePresentationTab.m.css';
 import { TextValueEditor } from './TextValueEditor';

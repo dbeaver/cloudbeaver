@@ -5,10 +5,10 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { ResultSetSelectAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetSelectAction';
-import { ResultSetViewAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetViewAction';
-import type { IDatabaseDataModel } from '../../DatabaseDataModel/IDatabaseDataModel';
-import type { IDatabaseResultSet } from '../../DatabaseDataModel/IDatabaseResultSet';
+import { ResultSetSelectAction } from '../../../../DatabaseDataModel/Actions/ResultSet/ResultSetSelectAction';
+import { ResultSetViewAction } from '../../../../DatabaseDataModel/Actions/ResultSet/ResultSetViewAction';
+import type { IDatabaseDataModel } from '../../../../DatabaseDataModel/IDatabaseDataModel';
+import type { IDatabaseResultSet } from '../../../../DatabaseDataModel/IDatabaseResultSet';
 import { isStringifiedBoolean } from './isBooleanValuePresentationAvailable';
 
 export function useValuePanelBooleanValue(model: IDatabaseDataModel<any, IDatabaseResultSet>, resultIndex: number): boolean | null | undefined {

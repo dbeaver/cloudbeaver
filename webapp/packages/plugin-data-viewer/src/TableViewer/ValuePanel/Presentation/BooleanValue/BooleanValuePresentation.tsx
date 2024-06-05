@@ -11,12 +11,12 @@ import { Radio, TextPlaceholder, useTranslate } from '@cloudbeaver/core-blocks';
 import type { TabContainerPanelComponent } from '@cloudbeaver/core-ui';
 import { isDefined } from '@cloudbeaver/core-utils';
 
-import { ResultSetEditAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetEditAction';
-import { ResultSetFormatAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetFormatAction';
-import { ResultSetSelectAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetSelectAction';
-import { ResultSetViewAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetViewAction';
-import type { IDatabaseResultSet } from '../../DatabaseDataModel/IDatabaseResultSet';
-import type { IDataValuePanelProps } from '../../TableViewer/ValuePanel/DataValuePanelService';
+import { ResultSetEditAction } from '../../../../DatabaseDataModel/Actions/ResultSet/ResultSetEditAction';
+import { ResultSetFormatAction } from '../../../../DatabaseDataModel/Actions/ResultSet/ResultSetFormatAction';
+import { ResultSetSelectAction } from '../../../../DatabaseDataModel/Actions/ResultSet/ResultSetSelectAction';
+import { ResultSetViewAction } from '../../../../DatabaseDataModel/Actions/ResultSet/ResultSetViewAction';
+import type { IDatabaseResultSet } from '../../../../DatabaseDataModel/IDatabaseResultSet';
+import type { IDataValuePanelProps } from '../../DataValuePanelService';
 import classes from './BooleanValuePresentation.m.css';
 import { useValuePanelBooleanValue } from './useValuePanelBooleanValue';
 

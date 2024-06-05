@@ -5,9 +5,9 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { getResultSetActions } from '../../DatabaseDataModel/Actions/ResultSet/getResulеSetActions';
-import type { IDatabaseDataModel } from '../../DatabaseDataModel/IDatabaseDataModel';
-import type { IDatabaseResultSet } from '../../DatabaseDataModel/IDatabaseResultSet';
+import { getResultSetActions } from '../../../../DatabaseDataModel/Actions/ResultSet/getResulеSetActions';
+import type { IDatabaseDataModel } from '../../../../DatabaseDataModel/IDatabaseDataModel';
+import type { IDatabaseResultSet } from '../../../../DatabaseDataModel/IDatabaseResultSet';
 
 interface Args {
   model: IDatabaseDataModel<any, IDatabaseResultSet>;
