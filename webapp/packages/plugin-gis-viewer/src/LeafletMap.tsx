@@ -15,7 +15,7 @@ import { GeoJSON, LayersControl, MapContainer, TileLayer, type TileLayerProps } 
 import { s, useS, useSplit, useTranslate } from '@cloudbeaver/core-blocks';
 import type { IResultSetElementKey, IResultSetValue } from '@cloudbeaver/plugin-data-viewer';
 
-import styles from './LeafletMap.m.css';
+import styles from './LeafletMap.module.css';
 import './styles/base.scss';
 
 export interface IAssociatedValue {

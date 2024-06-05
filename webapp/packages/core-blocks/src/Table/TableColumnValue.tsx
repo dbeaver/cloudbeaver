@@ -15,7 +15,7 @@ import { useObjectRef } from '../useObjectRef';
 import { useS } from '../useS';
 import { EventTableItemExpandFlag } from './EventTableItemExpandFlag';
 import { EventTableItemSelectionFlag } from './EventTableItemSelectionFlag';
-import style from './TableColumnValue.m.css';
+import style from './TableColumnValue.module.css';
 import { TableContext } from './TableContext';
 import { TableItemContext } from './TableItemContext';
 

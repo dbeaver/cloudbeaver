@@ -1,0 +1,31 @@
+/*
+ * CloudBeaver - Cloud Database Manager
+ * Copyright (C) 2020-2024 DBeaver Corp and others
+ *
+ * Licensed under the Apache License, Version 2.0.
+ * you may not use this file except in compliance with the License.
+ */
+.treeNodeControl {
+  composes: theme-ripple theme-ripple-selectable from global;
+  box-sizing: border-box;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  padding: 2px 0 2px 0;
+  user-select: none;
+  white-space: nowrap;
+  position: initial !important;
+  outline: none;
+
+  &::before {
+    left: 0 !important;
+    top: auto !important;
+    height: inherit !important;
+    width: 100% !important;
+  }
+
+  & > * {
+    margin-right: 0;
+    margin-left: 4px;
+  }
+}

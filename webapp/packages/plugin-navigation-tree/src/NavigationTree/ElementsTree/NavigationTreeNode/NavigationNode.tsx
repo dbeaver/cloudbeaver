@@ -16,7 +16,7 @@ import { useDNDData } from '@cloudbeaver/core-ui';
 
 import { useNavTreeDropBox } from '../../useNavTreeDropBox';
 import type { NavigationNodeComponent } from '../NavigationNodeComponent';
-import style from './NavigationNode.m.css';
+import style from './NavigationNode.module.css';
 import { DATA_ATTRIBUTE_NODE_EDITING } from './NavigationNode/DATA_ATTRIBUTE_NODE_EDITING';
 import { NavigationNodeNested } from './NavigationNode/NavigationNodeNested';
 import { NavigationNodeControlRenderer } from './NavigationNodeControlRenderer';

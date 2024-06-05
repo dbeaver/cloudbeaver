@@ -13,7 +13,7 @@ import type { CompositeItemOptions } from 'reakit/ts';
 import { s } from '../s';
 import { useCombinedHandler } from '../useCombinedHandler';
 import { useS } from '../useS';
-import style from './MenuItem.m.css';
+import style from './MenuItem.module.css';
 import { MenuStateContext } from './MenuStateContext';
 import type { ReakitProxyComponent, ReakitProxyComponentOptions } from './ReakitProxyComponent';
 

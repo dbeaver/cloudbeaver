@@ -11,7 +11,7 @@ import { Group, Loader, Placeholder, PlaceholderElement, s, useS } from '@cloudb
 import { useService } from '@cloudbeaver/core-di';
 
 import { ElementsTreeSettingsService, IElementsTreeSettingsProps } from './ElementsTreeSettingsService';
-import NavigationTreeSettingsStyles from './NavigationTreeSettings.m.css';
+import NavigationTreeSettingsStyles from './NavigationTreeSettings.module.css';
 
 interface Props extends IElementsTreeSettingsProps {
   elements?: PlaceholderElement<IElementsTreeSettingsProps>[];

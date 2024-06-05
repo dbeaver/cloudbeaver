@@ -10,7 +10,7 @@ import { observer } from 'mobx-react-lite';
 import { IconOrImage, s, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import { EOrder, getNextOrder, IDatabaseDataModel, ResultSetConstraintAction } from '@cloudbeaver/plugin-data-viewer';
 
-import style from './OrderButton.m.css';
+import style from './OrderButton.module.css';
 
 interface Props {
   model: IDatabaseDataModel;

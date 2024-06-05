@@ -7,7 +7,7 @@
  */
 import { s } from '../s';
 import { useS } from '../useS';
-import style from './TableHeader.m.css';
+import style from './TableHeader.module.css';
 
 interface Props {
   fixed?: boolean;

@@ -16,7 +16,7 @@ import { ResultSetConstraintAction } from '../../DatabaseDataModel/Actions/Resul
 import type { IDatabaseDataModel } from '../../DatabaseDataModel/IDatabaseDataModel';
 import { DataViewerSettingsService } from '../../DataViewerSettingsService';
 import { AutoRefreshButton } from './AutoRefresh/AutoRefreshButton';
-import styles from './TableFooter.m.css';
+import styles from './TableFooter.module.css';
 import { TableFooterMenu } from './TableFooterMenu/TableFooterMenu';
 import { TableFooterRowCount } from './TableFooterRowCount';
 

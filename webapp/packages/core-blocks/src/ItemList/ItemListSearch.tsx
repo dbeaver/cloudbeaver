@@ -10,7 +10,7 @@ import { Filter } from '../FormControls/Filter';
 import { useTranslate } from '../localization/useTranslate';
 import { s } from '../s';
 import { useS } from '../useS';
-import style from './ItemList.m.css';
+import style from './ItemList.module.css';
 
 interface IProps {
   value?: string;

@@ -9,7 +9,7 @@ import { observer } from 'mobx-react-lite';
 
 import { s } from '../s';
 import { useS } from '../useS';
-import style from './SlideElement.m.css';
+import style from './SlideElement.module.css';
 
 interface Props {
   className?: string;

@@ -25,7 +25,7 @@ import type { DataTransferOutputSettings, DataTransferProcessorInfo } from '@clo
 import { ITabData, Tab, TabList, TabsState, TabTitle } from '@cloudbeaver/core-ui';
 
 import { OutputOptionsForm } from './OutputOptionsForm';
-import style from './ProcessorConfigureDialog.m.css';
+import style from './ProcessorConfigureDialog.module.css';
 import { ProcessorConfigureDialogFooter } from './ProcessorConfigureDialogFooter';
 
 interface Props {

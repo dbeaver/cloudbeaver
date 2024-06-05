@@ -11,7 +11,7 @@ import { Container, IconOrImage, Link, s, TableColumnValue, TableItem, useS, use
 import { isSameDay } from '@cloudbeaver/core-utils';
 
 import type { ILogEntry } from './ILogEntry';
-import classes from './LogEntry.m.css';
+import classes from './LogEntry.module.css';
 
 interface Props {
   item: ILogEntry;

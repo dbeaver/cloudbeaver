@@ -26,7 +26,7 @@ import {
 } from '@cloudbeaver/core-blocks';
 import type { AdminUserInfoFragment } from '@cloudbeaver/core-sdk';
 
-import styles from './ConnectionAccessList.m.css';
+import styles from './ConnectionAccessList.module.css';
 import { ConnectionAccessTableHeader, IFilterState } from './ConnectionAccessTableHeader/ConnectionAccessTableHeader';
 import { ConnectionAccessTableInnerHeader } from './ConnectionAccessTableHeader/ConnectionAccessTableInnerHeader';
 import { ConnectionAccessTableItem } from './ConnectionAccessTableItem';

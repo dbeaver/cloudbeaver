@@ -1,9 +1,0 @@
-.header {
-    flex-shrink: 0;
-    padding: 24px;
-    position: relative;
-    display: grid;
-    grid-template-columns: max-content 1fr;
-    flex: 0 0 auto;
-    box-sizing: border-box;
-}

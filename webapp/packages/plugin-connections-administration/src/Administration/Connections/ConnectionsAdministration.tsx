@@ -30,7 +30,7 @@ import { ConnectionInfoActiveProjectKey, ConnectionInfoResource, DBDriverResourc
 import { useController, useService } from '@cloudbeaver/core-di';
 import { CachedMapAllKey } from '@cloudbeaver/core-resource';
 
-import ConnectionsAdministrationStyle from './ConnectionsAdministration.m.css';
+import ConnectionsAdministrationStyle from './ConnectionsAdministration.module.css';
 import { ConnectionsAdministrationController } from './ConnectionsAdministrationController';
 import { ConnectionsTable } from './ConnectionsTable/ConnectionsTable';
 import { CreateConnection } from './CreateConnection/CreateConnection';

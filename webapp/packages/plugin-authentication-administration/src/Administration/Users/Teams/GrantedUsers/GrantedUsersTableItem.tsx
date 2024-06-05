@@ -10,7 +10,7 @@ import { observer } from 'mobx-react-lite';
 import { USER_TEAM_ROLE_SUPERVISOR } from '@cloudbeaver/core-authentication';
 import { Checkbox, StaticImage, TableColumnValue, TableItem, TableItemSelect, useTranslate } from '@cloudbeaver/core-blocks';
 
-import classes from './GrantedUsersTableItem.m.css';
+import classes from './GrantedUsersTableItem.module.css';
 
 interface Props {
   id: any;

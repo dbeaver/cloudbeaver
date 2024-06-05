@@ -12,7 +12,7 @@ import { useService } from '@cloudbeaver/core-di';
 import { VersionResource, VersionService } from '@cloudbeaver/core-version';
 import { VersionUpdateService } from '@cloudbeaver/core-version-update';
 
-import VersionCheckerCellStyles from './VersionCheckerCellStyles.m.css';
+import VersionCheckerCellStyles from './VersionCheckerCellStyles.module.css';
 
 const registry: StyleRegistry = [
   [
