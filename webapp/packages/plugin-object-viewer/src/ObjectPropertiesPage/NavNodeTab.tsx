@@ -14,7 +14,7 @@ import { resourceKeyList } from '@cloudbeaver/core-resource';
 import { Tab, TabIcon, TabTitle } from '@cloudbeaver/core-ui';
 import { useChildren, useNode } from '@cloudbeaver/plugin-navigation-tree';
 
-import style from './NavNodeTab.m.css';
+import style from './NavNodeTab.module.css';
 
 interface INavNodeTabProps {
   nodeId: string;

@@ -1,5 +1,0 @@
-.filterBox {
-  composes: theme-background-surface from global;
-  padding: 8px 12px;
-  flex: 0 0 auto;
-}

@@ -25,7 +25,7 @@ import { clsx } from '@cloudbeaver/core-utils';
 
 import { AdministrationUsersManagementService } from '../../../AdministrationUsersManagementService';
 import { UsersAdministrationService } from '../UsersAdministrationService';
-import style from './User.m.css';
+import style from './User.module.css';
 import { UserEdit } from './UserEdit';
 
 interface Props {

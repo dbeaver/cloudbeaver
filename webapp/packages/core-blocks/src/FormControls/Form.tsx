@@ -11,7 +11,7 @@ import { s } from '../s';
 import { useCombinedRef } from '../useCombinedRef';
 import { useFocus } from '../useFocus';
 import { useS } from '../useS';
-import styles from './Form.m.css';
+import styles from './Form.module.css';
 import { FormChangeHandler, FormContext, IFormContext } from './FormContext';
 import { useForm } from './useForm';
 

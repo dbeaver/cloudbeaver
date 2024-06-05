@@ -16,7 +16,7 @@ import { DataPresentationComponent, IDatabaseResultSet, TableViewerLoader } from
 
 import { DATA_CONTEXT_DV_DDM_RS_GROUPING } from './DataContext/DATA_CONTEXT_DV_DDM_RS_GROUPING';
 import { DEFAULT_GROUPING_QUERY_OPERATION } from './DEFAULT_GROUPING_QUERY_OPERATION';
-import styles from './DVResultSetGroupingPresentation.m.css';
+import styles from './DVResultSetGroupingPresentation.module.css';
 import type { IGroupingQueryState } from './IGroupingQueryState';
 import { useGroupingData } from './useGroupingData';
 import { useGroupingDataModel } from './useGroupingDataModel';

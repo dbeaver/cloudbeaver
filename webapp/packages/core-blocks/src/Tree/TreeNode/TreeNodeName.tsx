@@ -9,7 +9,7 @@ import { observer } from 'mobx-react-lite';
 
 import { s } from '../../s';
 import { useS } from '../../useS';
-import style from './TreeNodeName.m.css';
+import style from './TreeNodeName.module.css';
 
 interface Props extends React.HTMLAttributes<HTMLDivElement> {
   className?: string;

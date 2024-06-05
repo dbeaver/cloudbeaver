@@ -10,7 +10,7 @@ import { observer } from 'mobx-react-lite';
 import { s, TableColumnValue, TableItem, TableItemExpand, useS } from '@cloudbeaver/core-blocks';
 import type { IVersion } from '@cloudbeaver/core-version';
 
-import styles from './Version.m.css';
+import styles from './Version.module.css';
 import { VersionInfo } from './VersionInfo';
 
 interface Props {

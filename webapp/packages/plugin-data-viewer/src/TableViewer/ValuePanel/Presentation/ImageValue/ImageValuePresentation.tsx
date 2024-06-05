@@ -17,7 +17,7 @@ import { isResultSetContentValue } from '../../../../DatabaseDataModel/Actions/R
 import type { IDatabaseResultSet } from '../../../../DatabaseDataModel/IDatabaseResultSet';
 import type { IDataValuePanelProps } from '../../DataValuePanelService';
 import { QuotaPlaceholder } from '../QuotaPlaceholder';
-import styles from './ImageValuePresentation.m.css';
+import styles from './ImageValuePresentation.module.css';
 import { useValuePanelImageValue } from './useValuePanelImageValue';
 
 export const ImageValuePresentation: TabContainerPanelComponent<IDataValuePanelProps<any, IDatabaseResultSet>> = observer(

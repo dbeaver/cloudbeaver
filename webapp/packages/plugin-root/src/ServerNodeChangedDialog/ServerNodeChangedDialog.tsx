@@ -21,7 +21,7 @@ import { useService } from '@cloudbeaver/core-di';
 import type { DialogComponent } from '@cloudbeaver/core-dialogs';
 import { RouterService } from '@cloudbeaver/core-routing';
 
-import style from './ServerNodeChangedDialog.m.css';
+import style from './ServerNodeChangedDialog.module.css';
 
 export const ServerNodeChangedDialog: DialogComponent<null, null> = observer(function ServerNodeChangedDialog({ rejectDialog }) {
   const styles = useS(style);

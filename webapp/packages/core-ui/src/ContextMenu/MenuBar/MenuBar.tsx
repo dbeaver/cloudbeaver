@@ -24,7 +24,7 @@ import {
 
 import { ContextMenu } from '../ContextMenu';
 import type { IMenuBarNestedMenuSettings, IMenuBarProps } from './IMenuBarProps';
-import style from './MenuBar.m.css';
+import style from './MenuBar.module.css';
 import { MenuBarItem } from './MenuBarItem';
 
 const registry: StyleRegistry = [

@@ -23,7 +23,7 @@ import { useDBDriver } from '@cloudbeaver/core-connections';
 import type { DialogComponent } from '@cloudbeaver/core-dialogs';
 import type { ConnectionConfig } from '@cloudbeaver/core-sdk';
 
-import style from './ConnectionAuthenticationDialog.m.css';
+import style from './ConnectionAuthenticationDialog.module.css';
 import { ConnectionAuthenticationFormLoader } from './ConnectionAuthenticationFormLoader';
 
 export interface ConnectionAuthenticationDialogPayload {

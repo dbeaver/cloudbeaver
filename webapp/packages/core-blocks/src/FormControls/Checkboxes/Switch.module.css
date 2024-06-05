@@ -1,0 +1,54 @@
+/*
+ * CloudBeaver - Cloud Database Manager
+ * Copyright (C) 2020-2024 DBeaver Corp and others
+ *
+ * Licensed under the Apache License, Version 2.0.
+ * you may not use this file except in compliance with the License.
+ */
+.switchControl {
+  composes: theme-switch from global;
+}
+
+.disabled {
+  composes: theme-switch--disabled mdc-switch--disabled from global;
+}
+
+.checked {
+  composes: theme-switch--checked mdc-switch--checked from global;
+}
+
+.switchControlTrack {
+  composes: theme-switch__track from global;
+}
+
+.switchInput {
+  composes: theme-switch_native-control from global;
+}
+
+.switchControlUnderlay {
+  composes: theme-switch__thumb-underlay from global;
+}
+
+.switchControlThumb {
+  composes: theme-switch__thumb from global;
+}
+
+.radioRipple {
+  composes: theme-radio_ripple from global;
+}
+
+.switchBody {
+  display: flex;
+  align-items: center;
+  composes: theme-typography--body1 from global;
+
+  & .fieldLabel {
+    cursor: pointer;
+    user-select: none;
+    display: block;
+    padding-left: 18px;
+    min-width: 50px;
+    white-space: pre-wrap;
+    font-weight: 500;
+  }
+}

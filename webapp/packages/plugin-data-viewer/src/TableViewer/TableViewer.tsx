@@ -36,7 +36,7 @@ import { TableGrid } from './TableGrid';
 import { TableHeader } from './TableHeader/TableHeader';
 import { TablePresentationBar } from './TablePresentationBar/TablePresentationBar';
 import { TableToolsPanel } from './TableToolsPanel';
-import style from './TableViewer.m.css';
+import style from './TableViewer.module.css';
 import { TableViewerStorageService } from './TableViewerStorageService';
 
 export interface TableViewerProps {

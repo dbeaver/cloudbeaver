@@ -8,7 +8,7 @@
 import { s } from '../s';
 import { useObjectRef } from '../useObjectRef';
 import { useS } from '../useS';
-import SplitControlsStyles from './SplitControls.m.css';
+import SplitControlsStyles from './SplitControls.module.css';
 import { useSplit } from './useSplit';
 
 export const SplitControls: React.FC = function SplitControls() {

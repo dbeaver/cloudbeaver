@@ -23,7 +23,7 @@ import {
 import type { DialogComponentProps } from '@cloudbeaver/core-dialogs';
 
 import type { IResultSetGroupingData } from '../DataContext/DATA_CONTEXT_DV_DDM_RS_GROUPING';
-import styles from './DVGroupingColumnEditorDialog.m.css';
+import styles from './DVGroupingColumnEditorDialog.module.css';
 import { GroupingColumnEditorTable } from './GroupingColumnEditorTable';
 
 interface Payload {

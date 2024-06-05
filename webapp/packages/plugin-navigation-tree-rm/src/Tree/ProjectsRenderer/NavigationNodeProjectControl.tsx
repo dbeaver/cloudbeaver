@@ -26,7 +26,7 @@ import { ResourceManagerService } from '@cloudbeaver/plugin-resource-manager';
 
 import { getRmProjectNodeId } from '../../NavNodes/getRmProjectNodeId';
 import { DATA_CONTEXT_RESOURCE_MANAGER_TREE_RESOURCE_TYPE_ID } from '../DATA_CONTEXT_RESOURCE_MANAGER_TREE_RESOURCE_TYPE_ID';
-import style from './NavigationNodeProjectControl.m.css';
+import style from './NavigationNodeProjectControl.module.css';
 
 export const NavigationNodeProjectControl: NavTreeControlComponent = observer<NavTreeControlProps, HTMLDivElement>(
   forwardRef(function NavigationNodeProjectControl({ node, dndElement, dndPlaceholder, className }, ref) {

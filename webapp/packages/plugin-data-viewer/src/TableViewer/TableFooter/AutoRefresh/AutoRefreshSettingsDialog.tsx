@@ -26,7 +26,7 @@ import {
 } from '@cloudbeaver/core-blocks';
 import type { DialogComponentProps } from '@cloudbeaver/core-dialogs';
 
-import style from './AutoRefreshSettingsDialog.m.css';
+import style from './AutoRefreshSettingsDialog.module.css';
 import type { IAutoRefreshSettings } from './IAutoRefreshSettings';
 
 interface Payload {

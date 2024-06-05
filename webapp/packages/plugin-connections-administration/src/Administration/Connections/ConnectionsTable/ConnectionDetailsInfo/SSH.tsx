@@ -11,7 +11,7 @@ import { PlaceholderComponent, s, StaticImage, useResource, useS, useTranslate }
 import { NetworkHandlerResource, SSH_TUNNEL_ID } from '@cloudbeaver/core-connections';
 
 import type { IConnectionDetailsPlaceholderProps } from '../../ConnectionsAdministrationService';
-import ConnectionDetailsStyles from './ConnectionDetailsStyles.m.css';
+import ConnectionDetailsStyles from './ConnectionDetailsStyles.module.css';
 
 export const SSH: PlaceholderComponent<IConnectionDetailsPlaceholderProps> = observer(function SSH({ connection }) {
   const translate = useTranslate();

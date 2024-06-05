@@ -21,7 +21,7 @@ import { useTranslate } from '../localization/useTranslate';
 import { s } from '../s';
 import { useClipboard } from '../useClipboard';
 import { useS } from '../useS';
-import style from './ErrorDetailsDialog.m.css';
+import style from './ErrorDetailsDialog.module.css';
 import { ErrorModel, IErrorInfo } from './ErrorModel';
 
 function DisplayErrorInfo({ error }: { error: IErrorInfo }) {

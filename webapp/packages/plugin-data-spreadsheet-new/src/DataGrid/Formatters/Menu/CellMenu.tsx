@@ -13,7 +13,7 @@ import { EventContext, EventStopPropagationFlag } from '@cloudbeaver/core-events
 import type { IDatabaseDataModel, IDataPresentationActions, IDataTableActions, IResultSetElementKey } from '@cloudbeaver/plugin-data-viewer';
 
 import { DataGridContextMenuService } from '../../DataGridContextMenu/DataGridContextMenuService';
-import styles from './CellMenu.m.css';
+import styles from './CellMenu.module.css';
 
 interface Props {
   model: IDatabaseDataModel;

@@ -19,13 +19,13 @@
     "update-ts-references": "yarn run clean && typescript-resolve-references"
   },
   "dependencies": {
-    "@cloudbeaver/core-di": "~0.1.0",
-    "@cloudbeaver/core-localization": "~0.1.0",
-    "@cloudbeaver/core-root": "~0.1.0",
-    "@cloudbeaver/core-settings-localization": "~0.1.0"
+    "@cloudbeaver/core-di": "^0",
+    "@cloudbeaver/core-localization": "^0",
+    "@cloudbeaver/core-root": "^0",
+    "@cloudbeaver/core-settings-localization": "^0"
   },
   "peerDependencies": {},
   "devDependencies": {
-    "typescript": "^5.3.3"
+    "typescript": "^5"
   }
 }

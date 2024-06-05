@@ -9,7 +9,7 @@ import { observer } from 'mobx-react-lite';
 
 import { Container, IconButton, Loader, s, useS, useTranslate } from '@cloudbeaver/core-blocks';
 
-import styles from './CancelTotalCountAction.m.css';
+import styles from './CancelTotalCountAction.module.css';
 
 interface Props {
   onClick: VoidFunction;

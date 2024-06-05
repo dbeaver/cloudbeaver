@@ -14,7 +14,7 @@ import { getComputed } from '../getComputed';
 import { s } from '../s';
 import { useS } from '../useS';
 import { MenuEmptyItem } from './MenuEmptyItem';
-import style from './MenuPanel.m.css';
+import style from './MenuPanel.module.css';
 
 export interface IMenuPanelProps {
   label: string;

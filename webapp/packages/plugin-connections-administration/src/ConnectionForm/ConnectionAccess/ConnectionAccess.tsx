@@ -29,7 +29,7 @@ import { CachedMapAllKey, CachedResourceOffsetPageListKey } from '@cloudbeaver/c
 import { TabContainerPanelComponent, useTab } from '@cloudbeaver/core-ui';
 import type { IConnectionFormProps } from '@cloudbeaver/plugin-connections';
 
-import styles from './ConnectionAccess.m.css';
+import styles from './ConnectionAccess.module.css';
 import { ConnectionAccessGrantedList } from './ConnectionAccessGrantedList';
 import { ConnectionAccessList } from './ConnectionAccessList';
 import { useConnectionAccessState } from './useConnectionAccessState';

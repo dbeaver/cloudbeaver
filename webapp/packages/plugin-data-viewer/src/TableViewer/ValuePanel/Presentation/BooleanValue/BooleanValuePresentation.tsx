@@ -17,7 +17,7 @@ import { ResultSetSelectAction } from '../../../../DatabaseDataModel/Actions/Res
 import { ResultSetViewAction } from '../../../../DatabaseDataModel/Actions/ResultSet/ResultSetViewAction';
 import type { IDatabaseResultSet } from '../../../../DatabaseDataModel/IDatabaseResultSet';
 import type { IDataValuePanelProps } from '../../DataValuePanelService';
-import classes from './BooleanValuePresentation.m.css';
+import classes from './BooleanValuePresentation.module.css';
 import { useValuePanelBooleanValue } from './useValuePanelBooleanValue';
 
 export const BooleanValuePresentation: TabContainerPanelComponent<IDataValuePanelProps<any, IDatabaseResultSet>> = observer(

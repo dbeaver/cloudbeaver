@@ -10,7 +10,7 @@ import { ButtonHTMLAttributes, forwardRef } from 'react';
 
 import { Icon, IconOrImage, Loader, s, useS, useStateDelay, useTranslate } from '@cloudbeaver/core-blocks';
 
-import style from './MenuBarItem.m.css';
+import style from './MenuBarItem.module.css';
 
 interface Props extends Omit<React.DetailedHTMLProps<ButtonHTMLAttributes<HTMLButtonElement>, HTMLButtonElement>, 'style'> {
   label?: string;

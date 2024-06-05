@@ -13,7 +13,7 @@ import { useTranslate } from '../localization/useTranslate';
 import { s } from '../s';
 import { useS } from '../useS';
 import { TableContext } from './TableContext';
-import style from './TableSelect.m.css';
+import style from './TableSelect.module.css';
 
 interface Props {
   id?: string;

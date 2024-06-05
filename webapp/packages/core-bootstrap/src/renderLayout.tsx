@@ -12,7 +12,7 @@ import { BodyLazy } from '@cloudbeaver/core-app';
 import { DisplayError, ErrorBoundary, Loader, s } from '@cloudbeaver/core-blocks';
 import { AppContext, HideAppLoadingScreen, IServiceInjector } from '@cloudbeaver/core-di';
 
-import styles from './renderLayout.m.css';
+import styles from './renderLayout.module.css';
 
 interface IRender {
   initRoot(): Root;

@@ -18,8 +18,8 @@ import { getResultSetActions } from '../../../../DatabaseDataModel/Actions/Resul
 import { ResultSetSelectAction } from '../../../../DatabaseDataModel/Actions/ResultSet/ResultSetSelectAction';
 import type { IDatabaseResultSet } from '../../../../DatabaseDataModel/IDatabaseResultSet';
 import type { IDataValuePanelProps } from '../../DataValuePanelService';
-import styles from './shared/TextValuePresentation.m.css';
-import TextValuePresentationTab from './shared/TextValuePresentationTab.m.css';
+import styles from './shared/TextValuePresentation.module.css';
+import TextValuePresentationTab from './shared/TextValuePresentationTab.module.css';
 import { TextValueEditor } from './TextValueEditor';
 import { TextValuePresentationService } from './TextValuePresentationService';
 import { TextValueTruncatedMessage } from './TextValueTruncatedMessage';

@@ -29,7 +29,7 @@ import { ServerConfigResource } from '@cloudbeaver/core-root';
 import { ThemeService } from '@cloudbeaver/core-theming';
 import { useAppVersion } from '@cloudbeaver/core-version';
 
-import ProductInfoDialogStyles from './ProductInfoDialog.m.css';
+import ProductInfoDialogStyles from './ProductInfoDialog.module.css';
 
 export const ProductInfoDialog = observer<DialogComponentProps<null>>(function ProductInfoDialog(props) {
   const translate = useTranslate();

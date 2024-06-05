@@ -15,8 +15,8 @@ import { ITabData, TabPanel, TabsBox, TabStyles } from '@cloudbeaver/core-ui';
 import { CaptureView } from '@cloudbeaver/core-view';
 
 import { NavigationTabsService } from '../NavigationTabsService';
-import styles from './shared/NavigationTabsBar.m.css';
-import NavigationTabsBarTab from './shared/NavigationTabsBarTab.m.css';
+import styles from './shared/NavigationTabsBar.module.css';
+import NavigationTabsBarTab from './shared/NavigationTabsBarTab.module.css';
 import { TabHandlerPanel } from './Tabs/TabHandlerPanel';
 import { TabHandlerTab } from './Tabs/TabHandlerTab';
 

@@ -14,7 +14,7 @@ import { getResultSetActions } from '../../../DatabaseDataModel/Actions/ResultSe
 import type { IResultSetElementKey } from '../../../DatabaseDataModel/Actions/ResultSet/IResultSetDataKey';
 import type { IDatabaseDataModel } from '../../../DatabaseDataModel/IDatabaseDataModel';
 import type { IDatabaseResultSet } from '../../../DatabaseDataModel/IDatabaseResultSet';
-import styles from './QuotaPlaceholder.m.css';
+import styles from './QuotaPlaceholder.module.css';
 
 interface Props {
   className?: string;
