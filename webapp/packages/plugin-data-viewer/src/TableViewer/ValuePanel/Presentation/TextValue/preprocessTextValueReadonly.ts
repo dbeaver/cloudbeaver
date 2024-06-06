@@ -5,22 +5,21 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { ResultSetDataContentAction } from '../../../../DatabaseDataModel/Actions/ResultSet/ResultSetDataContentAction';
-import { ResultSetFormatAction } from '../../../../DatabaseDataModel/Actions/ResultSet/ResultSetFormatAction';
-import { ResultSetSelectAction } from '../../../../DatabaseDataModel/Actions/ResultSet/ResultSetSelectAction';
+import type { ResultSetDataContentAction } from '../../../../DatabaseDataModel/Actions/ResultSet/ResultSetDataContentAction';
+import type { ResultSetFormatAction } from '../../../../DatabaseDataModel/Actions/ResultSet/ResultSetFormatAction';
+import type { ResultSetSelectAction } from '../../../../DatabaseDataModel/Actions/ResultSet/ResultSetSelectAction';
 import type { IDatabaseDataModel } from '../../../../DatabaseDataModel/IDatabaseDataModel';
 import type { IDatabaseResultSet } from '../../../../DatabaseDataModel/IDatabaseResultSet';
 
 interface Args {
+  contentAction: ResultSetDataContentAction;
+  formatAction: ResultSetFormatAction;
+  selectAction: ResultSetSelectAction;
   model: IDatabaseDataModel<any, IDatabaseResultSet>;
   resultIndex: number;
 }
 
-export function useTextValueReadonly({ model, resultIndex }: Args) {
-  const contentAction = model.source.getAction(resultIndex, ResultSetDataContentAction);
-  const formatAction = model.source.getAction(resultIndex, ResultSetFormatAction);
-  const selectAction = model.source.getAction(resultIndex, ResultSetSelectAction);
-
+export function preprocessTextValueReadonly({ contentAction, formatAction, selectAction, model, resultIndex }: Args) {
   const activeElements = selectAction.getActiveElements();
   const firstSelectedCell = activeElements.length ? activeElements[0] : undefined;
 

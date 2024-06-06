@@ -15,10 +15,12 @@ import { TabContainerPanelComponent, TabList, TabsState, TabStyles, useTabLocalS
 
 import { ResultSetDataContentAction } from '../../../../DatabaseDataModel/Actions/ResultSet/ResultSetDataContentAction';
 import { ResultSetEditAction } from '../../../../DatabaseDataModel/Actions/ResultSet/ResultSetEditAction';
+import { ResultSetFormatAction } from '../../../../DatabaseDataModel/Actions/ResultSet/ResultSetFormatAction';
 import { ResultSetSelectAction } from '../../../../DatabaseDataModel/Actions/ResultSet/ResultSetSelectAction';
 import type { IDatabaseResultSet } from '../../../../DatabaseDataModel/IDatabaseResultSet';
 import type { IDataValuePanelProps } from '../../DataValuePanelService';
 import { getDefaultLineWrapping } from './getDefaultLineWrapping';
+import { preprocessTextValueReadonly } from './preprocessTextValueReadonly';
 import styles from './shared/TextValuePresentation.module.css';
 import TextValuePresentationTab from './shared/TextValuePresentationTab.module.css';
 import { TextValueEditor } from './TextValueEditor';
@@ -26,7 +28,6 @@ import { TextValuePresentationService } from './TextValuePresentationService';
 import { TextValueTruncatedMessage } from './TextValueTruncatedMessage';
 import { useAutoContentType } from './useAutoContentType';
 import { useTextValueGetter } from './useTextValueGetter';
-import { useTextValueReadonly } from './useTextValueReadonly';
 
 const tabRegistry: StyleRegistry = [[TabStyles, { mode: 'append', styles: [TextValuePresentationTab] }]];
 
@@ -36,8 +37,9 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
     const notificationService = useService(NotificationService);
     const textValuePresentationService = useService(TextValuePresentationService);
     const style = useS(styles, TextValuePresentationTab);
-    const selection = model.source.getAction(resultIndex, ResultSetSelectAction);
-    const activeElements = selection.getActiveElements();
+    const selectAction = model.source.getAction(resultIndex, ResultSetSelectAction);
+    const formatAction = model.source.getAction(resultIndex, ResultSetFormatAction);
+    const activeElements = selectAction.getActiveElements();
     const firstSelectedCell = activeElements.length ? activeElements[0] : undefined;
     const contentAction = model.source.getAction(resultIndex, ResultSetDataContentAction);
     const editAction = model.source.getAction(resultIndex, ResultSetEditAction);
@@ -71,7 +73,7 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
     });
     const autoLineWrapping = getDefaultLineWrapping(contentType);
     const lineWrapping = state.lineWrapping ?? autoLineWrapping;
-    const isReadonly = useTextValueReadonly({ model, resultIndex });
+    const isReadonly = preprocessTextValueReadonly({ model, resultIndex, contentAction, selectAction, formatAction });
     const canSave = firstSelectedCell && contentAction.isDownloadable(firstSelectedCell);
 
     function valueChangeHandler(newValue: string) {
