@@ -18,23 +18,23 @@
     "update-ts-references": "yarn run clean && typescript-resolve-references"
   },
   "dependencies": {
-    "@cloudbeaver/core-administration": "~0.1.0",
-    "@cloudbeaver/core-blocks": "~0.1.0",
-    "@cloudbeaver/core-di": "~0.1.0",
-    "@cloudbeaver/core-localization": "~0.1.0",
-    "@cloudbeaver/core-resource": "~0.1.0",
-    "@cloudbeaver/core-root": "~0.1.0",
-    "@cloudbeaver/core-ui": "~0.1.0",
-    "@cloudbeaver/core-version": "~0.1.0",
-    "@cloudbeaver/core-version-update": "~0.1.0",
-    "mobx-react-lite": "^4.0.5",
-    "react": "^18.2.0",
-    "react-markdown": "^9.0.1"
+    "@cloudbeaver/core-administration": "^0",
+    "@cloudbeaver/core-blocks": "^0",
+    "@cloudbeaver/core-di": "^0",
+    "@cloudbeaver/core-localization": "^0",
+    "@cloudbeaver/core-resource": "^0",
+    "@cloudbeaver/core-root": "^0",
+    "@cloudbeaver/core-ui": "^0",
+    "@cloudbeaver/core-version": "^0",
+    "@cloudbeaver/core-version-update": "^0",
+    "mobx-react-lite": "^4",
+    "react": "^18",
+    "react-markdown": "^9"
   },
   "peerDependencies": {},
   "devDependencies": {
-    "@types/react": "^18.2.63",
-    "typescript": "^5.3.3",
-    "typescript-plugin-css-modules": "^5.1.0"
+    "@types/react": "^18",
+    "typescript": "^5",
+    "typescript-plugin-css-modules": "^5"
   }
 }

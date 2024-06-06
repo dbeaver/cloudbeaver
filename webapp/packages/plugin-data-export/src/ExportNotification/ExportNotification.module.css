@@ -14,7 +14,7 @@
   white-space: pre-line;
 }
 
-.source-name {
+.sourceName {
   composes: theme-typography--body2 from global;
   padding-top: 16px;
   max-height: 50px;

@@ -18,12 +18,12 @@
     "update-ts-references": "yarn run clean && typescript-resolve-references"
   },
   "dependencies": {
-    "@cloudbeaver/core-di": "~0.1.0",
-    "@cloudbeaver/core-executor": "~0.1.0",
-    "mobx": "^6.12.0"
+    "@cloudbeaver/core-di": "^0",
+    "@cloudbeaver/core-executor": "^0",
+    "mobx": "^6"
   },
   "peerDependencies": {},
   "devDependencies": {
-    "typescript": "^5.3.3"
+    "typescript": "^5"
   }
 }
