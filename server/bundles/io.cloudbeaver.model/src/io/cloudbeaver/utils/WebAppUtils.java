@@ -133,6 +133,10 @@ public class WebAppUtils {
         if (!(oldValue instanceof String)) {
             return newValue;
         }
+        //new value already contains variable pattern
+        if (newValue instanceof String newStringValue && GeneralUtils.isVariablePattern(newStringValue)) {
+            return newValue;
+        }
         String value = (String) oldValue;
         if (!GeneralUtils.isVariablePattern(value)) {
             return newValue;
