@@ -18,7 +18,7 @@ import { ResultSetViewAction } from '../../../../DatabaseDataModel/Actions/Resul
 import type { IDatabaseResultSet } from '../../../../DatabaseDataModel/IDatabaseResultSet';
 import type { IDataValuePanelProps } from '../../DataValuePanelService';
 import classes from './BooleanValuePresentation.module.css';
-import { useValuePanelBooleanValue } from './useValuePanelBooleanValue';
+import { preprocessBooleanValue } from './preprocessBooleanValue';
 
 export const BooleanValuePresentation: TabContainerPanelComponent<IDataValuePanelProps<any, IDatabaseResultSet>> = observer(
   function BooleanValuePresentation({ model, resultIndex }) {
@@ -30,7 +30,7 @@ export const BooleanValuePresentation: TabContainerPanelComponent<IDataValuePane
     const formatAction = model.source.getAction(resultIndex, ResultSetFormatAction);
 
     const activeElements = selectAction.getActiveElements();
-    const value = useValuePanelBooleanValue(model, resultIndex);
+    const value = preprocessBooleanValue({ viewAction, selectAction });
 
     if (activeElements.length === 0) {
       throw new Error('No active elements');
