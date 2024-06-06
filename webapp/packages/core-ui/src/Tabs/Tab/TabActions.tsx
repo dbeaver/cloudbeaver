@@ -11,8 +11,8 @@ import { Icon, s, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import type { IDataContext } from '@cloudbeaver/core-data-context';
 
 import type { ITabsContext } from '../TabsContext';
-import TabStyle from './Tab.m.css';
-import style from './TabActions.m.css';
+import TabStyle from './Tab.module.css';
+import style from './TabActions.module.css';
 import { TabMenu } from './TabMenu';
 
 interface TabActionsProps {

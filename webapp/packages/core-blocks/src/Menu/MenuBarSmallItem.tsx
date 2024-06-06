@@ -10,7 +10,7 @@ import type { ButtonProps } from 'reakit/ts';
 import { IconButton } from '../IconButton';
 import { s } from '../s';
 import { useS } from '../useS';
-import moduleStyles from './MenuBarSmallItem.m.css';
+import moduleStyles from './MenuBarSmallItem.module.css';
 
 interface Props extends Omit<ButtonProps, 'style' | 'icon'> {
   icon?: string;

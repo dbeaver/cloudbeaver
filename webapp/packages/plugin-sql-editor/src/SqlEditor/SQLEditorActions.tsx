@@ -12,7 +12,7 @@ import { ActionIconButton, getComputed, preventFocusHandler, s, useS, useTransla
 import type { ISqlEditorTabState } from '../ISqlEditorTabState';
 import { ESqlDataSourceFeatures } from '../SqlDataSource/ESqlDataSourceFeatures';
 import type { ISQLEditorData } from './ISQLEditorData';
-import style from './SQLEditorActions.m.css';
+import style from './SQLEditorActions.module.css';
 import { SqlEditorActionsMenu } from './SqlEditorActionsMenu';
 import { SqlEditorTools } from './SqlEditorTools';
 

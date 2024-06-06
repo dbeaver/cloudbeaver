@@ -1,8 +1,0 @@
-.messageContent {
-  word-break: break-word;
-  white-space: pre-line;
-}
-
-.messageContent:empty {
-  display: none;
-}

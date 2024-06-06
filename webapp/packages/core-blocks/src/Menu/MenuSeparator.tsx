@@ -10,7 +10,7 @@ import type { SeparatorOptions } from 'reakit/ts';
 
 import { s } from '../s';
 import { useS } from '../useS';
-import style from './MenuSeparator.m.css';
+import style from './MenuSeparator.module.css';
 import type { ReakitProxyComponentOptions } from './ReakitProxyComponent';
 
 export const MenuSeparator = function MenuSeparator({ className, ...props }: ReakitProxyComponentOptions<'hr', SeparatorOptions>) {

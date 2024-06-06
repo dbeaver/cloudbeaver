@@ -28,7 +28,7 @@ import { TabList, TabPanelList, TabsState } from '@cloudbeaver/core-ui';
 
 import { teamContext } from './Contexts/teamContext';
 import type { ITeamFormState } from './ITeamFormProps';
-import style from './TeamForm.m.css';
+import style from './TeamForm.module.css';
 import { ITeamFormActionsContext, TeamFormActionsContext } from './TeamFormActionsContext';
 import { TeamFormService } from './TeamFormService';
 

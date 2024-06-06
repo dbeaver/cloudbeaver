@@ -10,11 +10,11 @@ import { forwardRef, PropsWithChildren, ReactNode } from 'react';
 import { s, SContext, StyleRegistry, useS } from '@cloudbeaver/core-blocks';
 import type { MetadataMap } from '@cloudbeaver/core-utils';
 
-import tabPanelStyles from '../TabPanel.m.css';
+import tabPanelStyles from '../TabPanel.module.css';
 import type { ITabData } from '../TabsContainer/ITabsContainer';
 import { TabsState } from '../TabsState';
-import styles from './shared/TabsBox.m.css';
-import moduleTabPanelStyles from './shared/TabsBoxTabPanel.m.css';
+import styles from './shared/TabsBox.module.css';
+import moduleTabPanelStyles from './shared/TabsBoxTabPanel.module.css';
 
 const tabsBoxRegistry: StyleRegistry = [
   [

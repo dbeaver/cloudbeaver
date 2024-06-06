@@ -7,7 +7,7 @@
  */
 import { Combobox } from '@cloudbeaver/core-blocks';
 
-import classes from './CrsInput.m.css';
+import classes from './CrsInput.module.css';
 import type { CrsKey } from './LeafletMap';
 
 interface Props {

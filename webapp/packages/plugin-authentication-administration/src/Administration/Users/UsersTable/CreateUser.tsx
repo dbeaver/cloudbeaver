@@ -12,7 +12,7 @@ import type { IFormState } from '@cloudbeaver/core-ui';
 
 import { AdministrationUserForm } from '../UserForm/AdministrationUserForm';
 import type { IUserFormState } from '../UserForm/AdministrationUserFormService';
-import style from './CreateUser.m.css';
+import style from './CreateUser.module.css';
 
 interface Props {
   state: IFormState<IUserFormState>;

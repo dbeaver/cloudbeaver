@@ -16,7 +16,7 @@ import { EditingContext } from '../../Editing/EditingContext';
 import { CellContext } from '../CellRenderer/CellContext';
 import { DataGridContext } from '../DataGridContext';
 import { TableDataContext } from '../TableDataContext';
-import style from './CellFormatter.m.css';
+import style from './CellFormatter.module.css';
 import { CellFormatterFactory } from './CellFormatterFactory';
 import { CellMenu } from './Menu/CellMenu';
 

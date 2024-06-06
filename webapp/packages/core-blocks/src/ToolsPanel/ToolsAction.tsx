@@ -12,7 +12,7 @@ import { Loader } from '../Loader/Loader';
 import { s } from '../s';
 import { useS } from '../useS';
 import { useStateDelay } from '../useStateDelay';
-import style from './ToolsAction.m.css';
+import style from './ToolsAction.module.css';
 
 interface Props extends Omit<ButtonHTMLAttributes<any>, 'onClick'> {
   icon?: string;

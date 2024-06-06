@@ -11,7 +11,7 @@ import { useCallback } from 'react';
 import { ListItem, ListItemDescription, ListItemIcon, ListItemName, s, StaticImage, useS } from '@cloudbeaver/core-blocks';
 import type { Connection, DBDriver } from '@cloudbeaver/core-connections';
 
-import styles from './TemplateConnectionItem.m.css';
+import styles from './TemplateConnectionItem.module.css';
 
 interface Props {
   template: Connection;

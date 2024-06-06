@@ -8,7 +8,7 @@
 import { observable } from 'mobx';
 import { observer } from 'mobx-react-lite';
 
-import style from './Button.m.css';
+import style from './Button.module.css';
 import { IconOrImage } from './IconOrImage';
 import { Loader } from './Loader/Loader';
 import { s } from './s';

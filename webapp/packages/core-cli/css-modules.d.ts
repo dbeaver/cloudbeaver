@@ -21,7 +21,7 @@ declare module '*.scss' {
   export default classes;
 }
 
-declare module '*.m.css' {
+declare module '*.module.css' {
   const classes: { [key: string]: string };
   export default classes;
 }

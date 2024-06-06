@@ -9,7 +9,7 @@ import { observer } from 'mobx-react-lite';
 
 import { Button, useS, useTranslate } from '@cloudbeaver/core-blocks';
 
-import style from './ConnectionDialogFooter.m.css';
+import style from './ConnectionDialogFooter.module.css';
 
 interface Props {
   isConnecting: boolean;

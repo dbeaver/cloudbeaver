@@ -14,10 +14,10 @@ import { s, SContext, StyleRegistry, useS, useTranslate } from '@cloudbeaver/cor
 import { generateTabElement } from './generateTabElement';
 import { TabDefault } from './Tab/TabDefault';
 import { TabBigUnderlineStyleRegistry, TabUnderlineStyleRegistry } from './Tab/TabStyleRegistries';
-import styles from './TabList.m.css';
+import styles from './TabList.module.css';
 import { TabListVerticalRegistry, TabListVerticalRotatedRegistry } from './TabListStyleRegistries';
-import verticalStyles from './TabListVertical.m.css';
-import verticalRotatedStyles from './TabListVerticalRotated.m.css';
+import verticalStyles from './TabListVertical.module.css';
+import verticalRotatedStyles from './TabListVerticalRotated.module.css';
 import { TabsContext } from './TabsContext';
 
 export interface TabListProps extends Omit<TabListOptions, keyof TabStateReturn> {

@@ -21,7 +21,7 @@ import {
 } from '@cloudbeaver/core-blocks';
 import type { IMenuItem } from '@cloudbeaver/core-dialogs';
 
-import styles from './TableFooterMenuItem.m.css';
+import styles from './TableFooterMenuItem.module.css';
 
 type Props = ButtonHTMLAttributes<any> & {
   menuItem: IMenuItem;

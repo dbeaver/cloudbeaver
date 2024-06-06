@@ -31,7 +31,7 @@ import type { UserInfo } from '@cloudbeaver/core-sdk';
 import { ServerConfigurationAdministrationNavService } from '@cloudbeaver/plugin-administration';
 
 import { AuthenticationService } from '../../AuthenticationService';
-import styles from './ConfigurationsList.m.css';
+import styles from './ConfigurationsList.module.css';
 
 interface IProviderConfiguration {
   provider: AuthProvider;

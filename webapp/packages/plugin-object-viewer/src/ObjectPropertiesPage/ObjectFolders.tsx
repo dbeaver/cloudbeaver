@@ -29,12 +29,12 @@ import { NavNodeViewService } from '@cloudbeaver/plugin-navigation-tree';
 import type { IObjectViewerTabState } from '../IObjectViewerTabState';
 import { FolderPanelRenderer } from './FolderPanelRenderer';
 import { FolderTabRenderer } from './FolderTabRenderer';
-import NavNodeTabStyle from './NavNodeTab.m.css';
-import ObjectFoldersNavNodeTab from './shared/ObjectFoldersNavNodeTab.m.css';
-import ObjectFoldersTab from './shared/ObjectFoldersTab.m.css';
-import ObjectFoldersTabList from './shared/ObjectFoldersTabList.m.css';
-import ObjectFoldersTabPanel from './shared/ObjectFoldersTabPanel.m.css';
-import ObjectFoldersTabTitle from './shared/ObjectFoldersTabTitle.m.css';
+import NavNodeTabStyle from './NavNodeTab.module.css';
+import ObjectFoldersNavNodeTab from './shared/ObjectFoldersNavNodeTab.module.css';
+import ObjectFoldersTab from './shared/ObjectFoldersTab.module.css';
+import ObjectFoldersTabList from './shared/ObjectFoldersTabList.module.css';
+import ObjectFoldersTabPanel from './shared/ObjectFoldersTabPanel.module.css';
+import ObjectFoldersTabTitle from './shared/ObjectFoldersTabTitle.module.css';
 
 interface IProps {
   tab: ITab<IObjectViewerTabState>;

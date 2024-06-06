@@ -7,16 +7,16 @@
  */
 import type { StyleRegistry } from '@cloudbeaver/core-blocks';
 
-import TabStyles from './Tab/Tab.m.css';
-import TabIconStyles from './Tab/TabIcon.m.css';
-import TabIconVerticalRotatedStyles from './Tab/TabIconVerticalRotated.m.css';
-import TabTitleStyles from './Tab/TabTitle.m.css';
-import TabTitleVerticalRotatedStyles from './Tab/TabTitleVerticalRotated.m.css';
-import TabVerticalStyles from './Tab/TabVertical.m.css';
-import TabVerticalRotatedStyles from './Tab/TabVerticalRotated.m.css';
-import TabListStyles from './TabList.m.css';
-import TabListVerticalStyles from './TabListVertical.m.css';
-import TabListVerticalRotatedStyles from './TabListVerticalRotated.m.css';
+import TabStyles from './Tab/Tab.module.css';
+import TabIconStyles from './Tab/TabIcon.module.css';
+import TabIconVerticalRotatedStyles from './Tab/TabIconVerticalRotated.module.css';
+import TabTitleStyles from './Tab/TabTitle.module.css';
+import TabTitleVerticalRotatedStyles from './Tab/TabTitleVerticalRotated.module.css';
+import TabVerticalStyles from './Tab/TabVertical.module.css';
+import TabVerticalRotatedStyles from './Tab/TabVerticalRotated.module.css';
+import TabListStyles from './TabList.module.css';
+import TabListVerticalStyles from './TabListVertical.module.css';
+import TabListVerticalRotatedStyles from './TabListVerticalRotated.module.css';
 
 export const TabListVerticalRegistry: StyleRegistry = [
   [

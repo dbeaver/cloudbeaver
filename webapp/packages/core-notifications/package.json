@@ -18,17 +18,17 @@
     "update-ts-references": "yarn run clean && typescript-resolve-references"
   },
   "dependencies": {
-    "@cloudbeaver/core-blocks": "~0.1.0",
-    "@cloudbeaver/core-di": "~0.1.0",
-    "@cloudbeaver/core-events": "~0.1.0",
-    "mobx-react-lite": "^4.0.5",
-    "react": "^18.2.0",
-    "reakit": "~1.3.11"
+    "@cloudbeaver/core-blocks": "^0",
+    "@cloudbeaver/core-di": "^0",
+    "@cloudbeaver/core-events": "^0",
+    "mobx-react-lite": "^4",
+    "react": "^18",
+    "reakit": "^1"
   },
   "peerDependencies": {},
   "devDependencies": {
-    "@types/react": "^18.2.63",
-    "typescript": "^5.3.3",
-    "typescript-plugin-css-modules": "^5.1.0"
+    "@types/react": "^18",
+    "typescript": "^5",
+    "typescript-plugin-css-modules": "^5"
   }
 }

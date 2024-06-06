@@ -9,7 +9,7 @@ import { observer } from 'mobx-react-lite';
 
 import { StaticImage, TableColumnValue, TableItem, TableItemSelect } from '@cloudbeaver/core-blocks';
 
-import style from './GrantedUsersTableItem.m.css';
+import style from './GrantedUsersTableItem.module.css';
 
 interface Props {
   id: any;

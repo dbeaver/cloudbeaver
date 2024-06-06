@@ -24,7 +24,7 @@ import { Field } from '../Field';
 import { FieldDescription } from '../FieldDescription';
 import { FieldLabel } from '../FieldLabel';
 import { useCapsLockTracker } from '../useCapsLockTracker';
-import inputFieldStyle from './InputField.m.css';
+import inputFieldStyle from './InputField.module.css';
 
 export type InputFieldBaseProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'value' | 'onChange' | 'style' | 'ref'> &
   ILayoutSizeProps & {

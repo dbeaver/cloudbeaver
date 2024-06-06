@@ -1,0 +1,30 @@
+/*
+ * CloudBeaver - Cloud Database Manager
+ * Copyright (C) 2020-2024 DBeaver Corp and others
+ *
+ * Licensed under the Apache License, Version 2.0.
+ * you may not use this file except in compliance with the License.
+ */
+.menuItem {
+  composes: theme-ripple from global;
+  composes: menuItem from './MenuItemElement.module.css';
+
+  display: flex;
+  align-items: center;
+  border: none;
+  padding: 0;
+  background: none;
+  text-align: left;
+  outline: none;
+  color: inherit;
+  cursor: pointer;
+  white-space: nowrap;
+
+  &.hidden {
+    display: none;
+  }
+
+  &:global([aria-selected='true']) {
+    opacity: 0.7;
+  }
+}

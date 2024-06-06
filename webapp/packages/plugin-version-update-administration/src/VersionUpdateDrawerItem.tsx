@@ -11,11 +11,11 @@ import type { AdministrationItemDrawerProps } from '@cloudbeaver/core-administra
 import { s, Translate, useResource, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { CachedMapAllKey } from '@cloudbeaver/core-resource';
-import { TabIcon, Tab, TabTitle } from '@cloudbeaver/core-ui';
+import { Tab, TabIcon, TabTitle } from '@cloudbeaver/core-ui';
 import { VersionResource } from '@cloudbeaver/core-version';
 import { VersionUpdateService } from '@cloudbeaver/core-version-update';
 
-import moduleStyles from './VersionUpdateDrawerItem.m.css';
+import moduleStyles from './VersionUpdateDrawerItem.module.css';
 
 export const VersionUpdateDrawerItem = observer<AdministrationItemDrawerProps>(function VersionUpdateDrawerItem({ item, onSelect, disabled }) {
   const translate = useTranslate();

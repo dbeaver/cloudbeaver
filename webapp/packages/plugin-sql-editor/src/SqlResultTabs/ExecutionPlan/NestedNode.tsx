@@ -14,7 +14,7 @@ import type { ObjectPropertyInfo } from '@cloudbeaver/core-sdk';
 import type { IExecutionPlanNode } from './ExecutionPlanTreeContext';
 import { Expand } from './Expand';
 import { getPropertyValue } from './getPropertyValue';
-import classes from './NestedNode.m.css';
+import classes from './NestedNode.module.css';
 
 interface Props {
   columns: ObjectPropertyInfo[];

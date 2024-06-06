@@ -18,14 +18,14 @@
     "update-ts-references": "yarn run clean && typescript-resolve-references"
   },
   "dependencies": {
-    "@cloudbeaver/core-di": "~0.1.0",
-    "@cloudbeaver/plugin-administration": "~0.1.0",
-    "@cloudbeaver/plugin-top-app-bar": "~0.1.0",
-    "react": "^18.2.0"
+    "@cloudbeaver/core-di": "^0",
+    "@cloudbeaver/plugin-administration": "^0",
+    "@cloudbeaver/plugin-top-app-bar": "^0",
+    "react": "^18"
   },
   "peerDependencies": {},
   "devDependencies": {
-    "@types/react": "^18.2.63",
-    "typescript": "^5.3.3"
+    "@types/react": "^18",
+    "typescript": "^5"
   }
 }

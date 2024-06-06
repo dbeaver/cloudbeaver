@@ -17,7 +17,7 @@ import { EventTreeNodeExpandFlag } from './EventTreeNodeExpandFlag';
 import { EventTreeNodeSelectFlag } from './EventTreeNodeSelectFlag';
 import type { ITreeNodeState } from './ITreeNodeState';
 import { TreeNodeContext } from './TreeNodeContext';
-import style from './TreeNodeControl.m.css';
+import style from './TreeNodeControl.module.css';
 
 const KEY = {
   ENTER: 'Enter',

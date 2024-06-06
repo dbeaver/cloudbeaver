@@ -21,7 +21,7 @@ import {
 } from '@cloudbeaver/plugin-data-viewer';
 
 import { CrsInput } from './CrsInput';
-import classes from './GISValuePresentation.m.css';
+import classes from './GISValuePresentation.module.css';
 import { CrsKey, IAssociatedValue, IGeoJSONFeature, LeafletMap } from './LeafletMap';
 import { ResultSetGISAction } from './ResultSetGISAction';
 

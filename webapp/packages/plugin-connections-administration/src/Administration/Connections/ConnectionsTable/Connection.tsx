@@ -12,7 +12,7 @@ import { DatabaseConnection, DBDriverResource, IConnectionInfoParams } from '@cl
 import { useService } from '@cloudbeaver/core-di';
 
 import { ConnectionsAdministrationService } from '../ConnectionsAdministrationService';
-import styles from './Connection.m.css';
+import styles from './Connection.module.css';
 import { ConnectionEdit } from './ConnectionEdit';
 
 interface Props {

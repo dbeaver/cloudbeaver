@@ -22,7 +22,7 @@ import { SQLCodeEditorLoader, useSqlDialectExtension } from '@cloudbeaver/plugin
 
 import { DATA_CONTEXT_DDL_VIEWER_NODE } from '../DdlViewer/DATA_CONTEXT_DDL_VIEWER_NODE';
 import { DATA_CONTEXT_DDL_VIEWER_VALUE } from '../DdlViewer/DATA_CONTEXT_DDL_VIEWER_VALUE';
-import style from '../DdlViewer/DDLViewerTabPanel.m.css';
+import style from '../DdlViewer/DDLViewerTabPanel.module.css';
 import { MENU_DDL_VIEWER_FOOTER } from '../DdlViewer/MENU_DDL_VIEWER_FOOTER';
 import { ExtendedDDLResource } from './ExtendedDDLResource';
 

@@ -8,7 +8,7 @@
 import { s } from '../s';
 import { useS } from '../useS';
 import { filterLayoutFakeProps, getLayoutProps } from './filterLayoutFakeProps';
-import styles from './GroupItem.m.css';
+import styles from './GroupItem.module.css';
 import type { ILayoutSizeProps } from './ILayoutSizeProps';
 
 export const GroupItem: React.FC<ILayoutSizeProps & React.HTMLAttributes<HTMLDivElement>> = function GroupItem({ className, ...rest }) {
