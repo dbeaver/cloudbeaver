@@ -12,12 +12,12 @@ import { ActionIconButton, Container, Group, Loader, s, SContext, StyleRegistry,
 import { useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { TabContainerPanelComponent, TabList, TabsState, TabStyles, useTabLocalState } from '@cloudbeaver/core-ui';
-import { getDefaultLineWrapping } from '@cloudbeaver/core-utils';
 
 import { getResultSetActions } from '../../../../DatabaseDataModel/Actions/ResultSet/getResultSetActions';
 import { ResultSetSelectAction } from '../../../../DatabaseDataModel/Actions/ResultSet/ResultSetSelectAction';
 import type { IDatabaseResultSet } from '../../../../DatabaseDataModel/IDatabaseResultSet';
 import type { IDataValuePanelProps } from '../../DataValuePanelService';
+import { getDefaultLineWrapping } from './getDefaultLineWrapping';
 import styles from './shared/TextValuePresentation.module.css';
 import TextValuePresentationTab from './shared/TextValuePresentationTab.module.css';
 import { TextValueEditor } from './TextValueEditor';

@@ -5,7 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { textToHex } from './textToHex';
+import { textToHex } from '@cloudbeaver/core-utils';
 
 export function formatText(type: string, value: string) {
   try {
