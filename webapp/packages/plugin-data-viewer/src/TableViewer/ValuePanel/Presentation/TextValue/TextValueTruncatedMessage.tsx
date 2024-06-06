@@ -13,12 +13,14 @@ import { NotificationService } from '@cloudbeaver/core-events';
 import { bytesToSize, isNotNullDefined } from '@cloudbeaver/core-utils';
 
 import type { IResultSetElementKey } from '../../../../DatabaseDataModel/Actions/ResultSet/IResultSetDataKey';
+import { isResultSetBlobValue } from '../../../../DatabaseDataModel/Actions/ResultSet/isResultSetBlobValue';
 import { isResultSetContentValue } from '../../../../DatabaseDataModel/Actions/ResultSet/isResultSetContentValue';
 import { ResultSetDataContentAction } from '../../../../DatabaseDataModel/Actions/ResultSet/ResultSetDataContentAction';
 import { ResultSetFormatAction } from '../../../../DatabaseDataModel/Actions/ResultSet/ResultSetFormatAction';
 import type { IDatabaseDataModel } from '../../../../DatabaseDataModel/IDatabaseDataModel';
 import type { IDatabaseResultSet } from '../../../../DatabaseDataModel/IDatabaseResultSet';
 import { QuotaPlaceholder } from '../QuotaPlaceholder';
+import { MAX_BLOB_PREVIEW_SIZE } from './MAX_BLOB_PREVIEW_SIZE';
 
 interface Props {
   resultIndex: number;
@@ -32,14 +34,10 @@ export const TextValueTruncatedMessage = observer<Props>(function TextValueTrunc
   const contentAction = model.source.getAction(resultIndex, ResultSetDataContentAction);
   const formatAction = model.source.getAction(resultIndex, ResultSetFormatAction);
   const contentValue = formatAction.get(elementKey);
-  const isTruncated = contentAction.isTextTruncated(elementKey) || contentAction.isBlobTruncated(elementKey);
+  let isTruncated = contentAction.isTextTruncated(elementKey);
   const isCacheLoaded = !!contentAction.retrieveFullTextFromCache(elementKey);
-
-  if (!isTruncated || isCacheLoaded) {
-    return null;
-  }
+  const limitInfo = elementKey ? contentAction.getLimitInfo(elementKey) : null;
   const isTextColumn = formatAction.isText(elementKey);
-
   const valueSize =
     isResultSetContentValue(contentValue) && isNotNullDefined(contentValue.contentLength) ? bytesToSize(contentValue.contentLength) : undefined;
 
@@ -49,6 +47,14 @@ export const TextValueTruncatedMessage = observer<Props>(function TextValueTrunc
     } catch (exception) {
       notificationService.logException(exception as any, 'data_viewer_presentation_value_content_paste_error');
     }
+  }
+
+  if (isResultSetBlobValue(contentValue)) {
+    isTruncated ||= contentValue.blob.size > (limitInfo?.limit ?? MAX_BLOB_PREVIEW_SIZE);
+  }
+
+  if (!isTruncated || isCacheLoaded) {
+    return null;
   }
 
   return (
