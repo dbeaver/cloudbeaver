@@ -12,9 +12,10 @@ import { useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { bytesToSize, isNotNullDefined } from '@cloudbeaver/core-utils';
 
-import { getResultSetActions } from '../../../../DatabaseDataModel/Actions/ResultSet/getResultSetActions';
 import type { IResultSetElementKey } from '../../../../DatabaseDataModel/Actions/ResultSet/IResultSetDataKey';
 import { isResultSetContentValue } from '../../../../DatabaseDataModel/Actions/ResultSet/isResultSetContentValue';
+import { ResultSetDataContentAction } from '../../../../DatabaseDataModel/Actions/ResultSet/ResultSetDataContentAction';
+import { ResultSetFormatAction } from '../../../../DatabaseDataModel/Actions/ResultSet/ResultSetFormatAction';
 import type { IDatabaseDataModel } from '../../../../DatabaseDataModel/IDatabaseDataModel';
 import type { IDatabaseResultSet } from '../../../../DatabaseDataModel/IDatabaseResultSet';
 import { QuotaPlaceholder } from '../QuotaPlaceholder';
@@ -28,7 +29,8 @@ interface Props {
 export const TextValueTruncatedMessage = observer<Props>(function TextValueTruncatedMessage({ model, resultIndex, elementKey }) {
   const translate = useTranslate();
   const notificationService = useService(NotificationService);
-  const { contentAction, formatAction } = getResultSetActions({ model, resultIndex });
+  const contentAction = model.source.getAction(resultIndex, ResultSetDataContentAction);
+  const formatAction = model.source.getAction(resultIndex, ResultSetFormatAction);
   const contentValue = formatAction.get(elementKey);
   const isTruncated = contentAction.isTextTruncated(elementKey) || contentAction.isBlobTruncated(elementKey);
   const isCacheLoaded = !!contentAction.retrieveFullTextFromCache(elementKey);

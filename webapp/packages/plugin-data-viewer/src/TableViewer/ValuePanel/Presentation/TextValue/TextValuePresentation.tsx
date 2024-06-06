@@ -13,7 +13,8 @@ import { useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { TabContainerPanelComponent, TabList, TabsState, TabStyles, useTabLocalState } from '@cloudbeaver/core-ui';
 
-import { getResultSetActions } from '../../../../DatabaseDataModel/Actions/ResultSet/getResultSetActions';
+import { ResultSetDataContentAction } from '../../../../DatabaseDataModel/Actions/ResultSet/ResultSetDataContentAction';
+import { ResultSetEditAction } from '../../../../DatabaseDataModel/Actions/ResultSet/ResultSetEditAction';
 import { ResultSetSelectAction } from '../../../../DatabaseDataModel/Actions/ResultSet/ResultSetSelectAction';
 import type { IDatabaseResultSet } from '../../../../DatabaseDataModel/IDatabaseResultSet';
 import type { IDataValuePanelProps } from '../../DataValuePanelService';
@@ -38,10 +39,9 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
     const selection = model.source.getAction(resultIndex, ResultSetSelectAction);
     const activeElements = selection.getActiveElements();
     const firstSelectedCell = activeElements.length ? activeElements[0] : undefined;
-    const { contentAction, editAction } = getResultSetActions({
-      model,
-      resultIndex,
-    });
+    const contentAction = model.source.getAction(resultIndex, ResultSetDataContentAction);
+    const editAction = model.source.getAction(resultIndex, ResultSetEditAction);
+
     const state = useTabLocalState(() =>
       observable({
         lineWrapping: null as boolean | null,

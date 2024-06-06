@@ -10,8 +10,8 @@ import { observer } from 'mobx-react-lite';
 import { Container, Link, s, usePermission, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import { EAdminPermission } from '@cloudbeaver/core-root';
 
-import { getResultSetActions } from '../../../DatabaseDataModel/Actions/ResultSet/getResultSetActions';
 import type { IResultSetElementKey } from '../../../DatabaseDataModel/Actions/ResultSet/IResultSetDataKey';
+import { ResultSetDataContentAction } from '../../../DatabaseDataModel/Actions/ResultSet/ResultSetDataContentAction';
 import type { IDatabaseDataModel } from '../../../DatabaseDataModel/IDatabaseDataModel';
 import type { IDatabaseResultSet } from '../../../DatabaseDataModel/IDatabaseResultSet';
 import styles from './QuotaPlaceholder.module.css';
@@ -35,7 +35,7 @@ export const QuotaPlaceholder: React.FC<React.PropsWithChildren<Props>> = observ
   const translate = useTranslate();
   const admin = usePermission(EAdminPermission.admin);
   const style = useS(styles);
-  const { contentAction } = getResultSetActions({ model, resultIndex });
+  const contentAction = model.source.getAction(resultIndex, ResultSetDataContentAction);
   const limitInfo = elementKey ? contentAction.getLimitInfo(elementKey) : null;
 
   return (

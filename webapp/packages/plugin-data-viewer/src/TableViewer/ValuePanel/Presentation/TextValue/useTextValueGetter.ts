@@ -11,10 +11,12 @@ import { useObservableRef, useSuspense } from '@cloudbeaver/core-blocks';
 import type { ResultDataFormat } from '@cloudbeaver/core-sdk';
 import { blobToBase64, isNotNullDefined, removeMetadataFromDataURL } from '@cloudbeaver/core-utils';
 
-import { getResultSetActions } from '../../../../DatabaseDataModel/Actions/ResultSet/getResultSetActions';
 import type { IResultSetElementKey } from '../../../../DatabaseDataModel/Actions/ResultSet/IResultSetDataKey';
 import { isResultSetBlobValue } from '../../../../DatabaseDataModel/Actions/ResultSet/isResultSetBlobValue';
 import { isResultSetContentValue } from '../../../../DatabaseDataModel/Actions/ResultSet/isResultSetContentValue';
+import { ResultSetDataContentAction } from '../../../../DatabaseDataModel/Actions/ResultSet/ResultSetDataContentAction';
+import { ResultSetEditAction } from '../../../../DatabaseDataModel/Actions/ResultSet/ResultSetEditAction';
+import { ResultSetFormatAction } from '../../../../DatabaseDataModel/Actions/ResultSet/ResultSetFormatAction';
 import type { IDatabaseDataModel } from '../../../../DatabaseDataModel/IDatabaseDataModel';
 import type { IDatabaseResultSet } from '../../../../DatabaseDataModel/IDatabaseResultSet';
 import { formatText } from './formatText';
@@ -31,7 +33,10 @@ interface IUseTextValueArgs {
 type ValueGetter = () => string;
 
 export function useTextValueGetter({ model, resultIndex, contentType, elementKey }: IUseTextValueArgs): ValueGetter {
-  const { formatAction, editAction, contentAction } = getResultSetActions({ model, resultIndex });
+  const contentAction = model.source.getAction(resultIndex, ResultSetDataContentAction);
+  const formatAction = model.source.getAction(resultIndex, ResultSetFormatAction);
+  const editAction = model.source.getAction(resultIndex, ResultSetEditAction);
+
   const suspense = useSuspense();
   const contentValue = elementKey ? formatAction.get(elementKey) : null;
   const limitInfo = elementKey ? contentAction.getLimitInfo(elementKey) : null;

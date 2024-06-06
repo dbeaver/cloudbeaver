@@ -11,7 +11,10 @@ import { Radio, TextPlaceholder, useTranslate } from '@cloudbeaver/core-blocks';
 import type { TabContainerPanelComponent } from '@cloudbeaver/core-ui';
 import { isDefined } from '@cloudbeaver/core-utils';
 
-import { getResultSetActions } from '../../../../DatabaseDataModel/Actions/ResultSet/getResultSetActions';
+import { ResultSetEditAction } from '../../../../DatabaseDataModel/Actions/ResultSet/ResultSetEditAction';
+import { ResultSetFormatAction } from '../../../../DatabaseDataModel/Actions/ResultSet/ResultSetFormatAction';
+import { ResultSetSelectAction } from '../../../../DatabaseDataModel/Actions/ResultSet/ResultSetSelectAction';
+import { ResultSetViewAction } from '../../../../DatabaseDataModel/Actions/ResultSet/ResultSetViewAction';
 import type { IDatabaseResultSet } from '../../../../DatabaseDataModel/IDatabaseResultSet';
 import type { IDataValuePanelProps } from '../../DataValuePanelService';
 import classes from './BooleanValuePresentation.module.css';
@@ -21,7 +24,10 @@ export const BooleanValuePresentation: TabContainerPanelComponent<IDataValuePane
   function BooleanValuePresentation({ model, resultIndex }) {
     const translate = useTranslate();
 
-    const { selectAction, viewAction, editAction, formatAction } = getResultSetActions({ model, resultIndex });
+    const selectAction = model.source.getAction(resultIndex, ResultSetSelectAction);
+    const viewAction = model.source.getAction(resultIndex, ResultSetViewAction);
+    const editAction = model.source.getAction(resultIndex, ResultSetEditAction);
+    const formatAction = model.source.getAction(resultIndex, ResultSetFormatAction);
 
     const activeElements = selectAction.getActiveElements();
     const value = useValuePanelBooleanValue(model, resultIndex);

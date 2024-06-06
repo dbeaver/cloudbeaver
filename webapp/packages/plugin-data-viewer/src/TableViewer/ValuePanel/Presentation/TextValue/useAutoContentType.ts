@@ -8,11 +8,10 @@
 import { useService } from '@cloudbeaver/core-di';
 import type { ResultDataFormat } from '@cloudbeaver/core-sdk';
 
-import { getResultSetActions } from '../../../../DatabaseDataModel/Actions/ResultSet/getResultSetActions';
 import type { IResultSetElementKey } from '../../../../DatabaseDataModel/Actions/ResultSet/IResultSetDataKey';
 import { isResultSetBlobValue } from '../../../../DatabaseDataModel/Actions/ResultSet/isResultSetBlobValue';
 import { isResultSetContentValue } from '../../../../DatabaseDataModel/Actions/ResultSet/isResultSetContentValue';
-import type { IResultSetValue } from '../../../../DatabaseDataModel/Actions/ResultSet/ResultSetFormatAction';
+import { type IResultSetValue, ResultSetFormatAction } from '../../../../DatabaseDataModel/Actions/ResultSet/ResultSetFormatAction';
 import type { IDatabaseDataModel } from '../../../../DatabaseDataModel/IDatabaseDataModel';
 import type { IDatabaseResultSet } from '../../../../DatabaseDataModel/IDatabaseResultSet';
 import { TextValuePresentationService } from './TextValuePresentationService';
@@ -61,7 +60,7 @@ export function useAutoContentType({ dataFormat, model, resultIndex, currentCont
     model: model,
     resultIndex: resultIndex,
   });
-  const { formatAction } = getResultSetActions({ model, resultIndex });
+  const formatAction = model.source.getAction(resultIndex, ResultSetFormatAction);
   const contentValue = elementKey ? formatAction.get(elementKey) : null;
   const contentValueType = getContentTypeFromResultSetValue(contentValue);
   const defaultContentType = preprocessDefaultContentType(contentValueType);
