@@ -8,13 +8,13 @@
 import { utf8ToBase64 } from './utf8ToBase64';
 
 describe('utf8ToBase64', () => {
-  it('converts utf8 to base64', () => {
+  it('should convert utf8 to base64', () => {
     expect(utf8ToBase64('test')).toBe('dGVzdA==');
     expect(utf8ToBase64('')).toBe('');
     expect(utf8ToBase64('test test')).toBe('dGVzdCB0ZXN0');
   });
 
-  it('converts utf8 to base64 with special characters', () => {
+  it('should convert utf8 to base64 with special characters', () => {
     expect(utf8ToBase64('test % test')).toBe('dGVzdCAlIHRlc3Q=');
     expect(utf8ToBase64('%')).toBe('JQ==');
   });

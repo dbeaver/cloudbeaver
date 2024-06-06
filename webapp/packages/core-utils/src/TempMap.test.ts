@@ -14,9 +14,10 @@ describe('TempMap', () => {
 
     expect(map.size).toBe(0);
     expect(target.size).toBe(0);
+    expect(Array.from(map.entries()).length).toBe(0);
   });
 
-  it('should store values', () => {
+  it('should set and get values', () => {
     const map = new TempMap<string, string>(new Map());
 
     map.set('test', 'test value');
@@ -47,7 +48,7 @@ describe('TempMap', () => {
     expect(map.get('test2')).toBeUndefined();
   });
 
-  it('should also clear deleted values', () => {
+  it('should delete deleted values after map being cleared', () => {
     const map = new TempMap<string, string>(new Map());
 
     map.set('test', 'test value');
@@ -59,7 +60,7 @@ describe('TempMap', () => {
     expect(map.isDeleted('test')).toBe(false);
   });
 
-  it('should remove from deleted map if set again', () => {
+  it('should remove item from deleted map if it was set again', () => {
     const map = new TempMap<string, string>(new Map());
 
     map.set('test', 'test value');
@@ -73,7 +74,7 @@ describe('TempMap', () => {
     expect(map.isDeleted('test')).toBe(false);
   });
 
-  it('should for each values', () => {
+  it('should have for each items', () => {
     const map = new TempMap<string, string>(new Map());
 
     map.set('test', 'test value');
@@ -90,7 +91,7 @@ describe('TempMap', () => {
     expect(keys).toEqual(['test', 'test2']);
   });
 
-  it('should for each and miss deleted', () => {
+  it('should for each items and not include deleted', () => {
     const map = new TempMap<string, string>(new Map());
 
     map.set('test', 'test value');
@@ -109,7 +110,7 @@ describe('TempMap', () => {
     expect(map.isDeleted('test')).toBe(true);
   });
 
-  it('should check if key exists', () => {
+  it('should check if key exists in the map', () => {
     const map = new TempMap<string, string>(new Map());
 
     map.set('test', 'test value');

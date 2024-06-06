@@ -25,7 +25,7 @@ describe('openCenteredPopup', () => {
     windowSpy.mockRestore();
   });
 
-  it('opens centered popup', () => {
+  it('should open centered popup', () => {
     const windowMock = {
       top: {
         outerWidth: 1000,
@@ -53,7 +53,7 @@ describe('openCenteredPopup', () => {
     );
   });
 
-  it('returns null if window.top is null', () => {
+  it('should return null if window.top is null', () => {
     const { url, target, width, height, features } = params;
 
     windowSpy.mockImplementation(() => ({

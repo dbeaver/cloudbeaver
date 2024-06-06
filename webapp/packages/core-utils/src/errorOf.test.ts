@@ -8,7 +8,7 @@
 import { errorOf } from './errorOf';
 
 describe('errorOf', () => {
-  it('returns error of the specified type', () => {
+  it('should return error of the specified type', () => {
     class TestError extends Error {}
 
     const error = new TestError('test');
@@ -19,7 +19,7 @@ describe('errorOf', () => {
     expect(result?.message).toBe('test');
   });
 
-  it('returns error of the specified type from the cause', () => {
+  it('should return error of the specified type from the cause', () => {
     class TestError extends Error {}
     class AnotherError extends Error {
       cause: Error;
@@ -37,14 +37,14 @@ describe('errorOf', () => {
     expect(result).toBeInstanceOf(TestError);
   });
 
-  it('returns undefined if error is not of the specified type', () => {
+  it('should return undefined if error is not of the specified type', () => {
     const error = new Error('test');
     const result = errorOf(error, TypeError);
 
     expect(result).toBeUndefined();
   });
 
-  it('returns undefined if error is not an instance of Error', () => {
+  it('should return undefined if error is not an instance of Error', () => {
     expect(errorOf({ message: 'test' }, Error)).toBeUndefined();
     expect(errorOf(undefined, Error)).toBeUndefined();
     expect(errorOf(null, Error)).toBeUndefined();
