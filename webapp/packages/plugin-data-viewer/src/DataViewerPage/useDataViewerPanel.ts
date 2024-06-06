@@ -15,61 +15,66 @@ import { DataPresentationService } from '../DataPresentationService';
 import { DataViewerDataChangeConfirmationService } from '../DataViewerDataChangeConfirmationService';
 import { DataViewerTableService } from '../DataViewerTableService';
 import { DataViewerTabService } from '../DataViewerTabService';
+import { TableViewerStorageService } from '../TableViewer/TableViewerStorageService';
 import { useDataViewerModel } from '../useDataViewerModel';
 
-export function useDataViewerPanel(objectViewerTab: ITab<IObjectViewerTabState>) {
+export function useDataViewerPanel(tab: ITab<IObjectViewerTabState>) {
   const dataViewerTableService = useService(DataViewerTableService);
+  const tableViewerStorageService = useService(TableViewerStorageService);
   const navNodeManagerService = useService(NavNodeManagerService);
   const dataViewerTabService = useService(DataViewerTabService);
   const connectionInfoResource = useService(ConnectionInfoResource);
   const dataPresentationService = useService(DataPresentationService);
   const dataViewerDataChangeConfirmationService = useService(DataViewerDataChangeConfirmationService);
 
-  const model = useDataViewerModel(objectViewerTab, dataViewerTableService, async (tab, state) => {
-    const node = navNodeManagerService.getNode({
-      nodeId: tab.handlerState.objectId,
-      parentId: tab.handlerState.parentId,
-    });
+  const model = useDataViewerModel(
+    tab.handlerState.connectionKey,
+    async () => {
+      const node = navNodeManagerService.getNode({
+        nodeId: tab.handlerState.objectId,
+        parentId: tab.handlerState.parentId,
+      });
 
-    if (!navNodeManagerService.isNodeHasData(node)) {
-      state.resetException();
-      return;
-    }
-
-    let model = dataViewerTableService.get(tab.handlerState.tableId || '');
-
-    if (model && !model.source.executionContext?.context && model.source.results.length > 0) {
-      model.resetData();
-    }
-
-    if (!model) {
-      await connectionInfoResource.waitLoad();
-      const connectionInfo = connectionInfoResource.get(tab.handlerState.connectionKey!);
-
-      if (!connectionInfo) {
-        throw new Error("Connection doesn't exists");
+      if (!navNodeManagerService.isNodeHasData(node)) {
+        return;
       }
 
-      model = dataViewerTableService.create(connectionInfo, node);
-      tab.handlerState.tableId = model.id;
-      model.source.setOutdated();
-      dataViewerDataChangeConfirmationService.trackTableDataUpdate(model.id);
+      let model = tableViewerStorageService.get(tab.handlerState.tableId || '');
 
-      const pageState = dataViewerTabService.page.getState(tab);
+      if (model && !model.source.executionContext?.context && model.source.results.length > 0) {
+        model.resetData();
+      }
 
-      if (pageState) {
-        const presentation = dataPresentationService.get(pageState.presentationId);
+      if (!model) {
+        await connectionInfoResource.waitLoad();
+        const connectionInfo = connectionInfoResource.get(tab.handlerState.connectionKey!);
 
-        if (presentation?.dataFormat !== undefined) {
-          model.setDataFormat(presentation.dataFormat);
+        if (!connectionInfo) {
+          throw new Error("Connection doesn't exists");
+        }
+
+        model = dataViewerTableService.create(connectionInfo, node);
+        tab.handlerState.tableId = model.id;
+        model.source.setOutdated();
+        dataViewerDataChangeConfirmationService.trackTableDataUpdate(model.id);
+
+        const pageState = dataViewerTabService.page.getState(tab);
+
+        if (pageState) {
+          const presentation = dataPresentationService.get(pageState.presentationId);
+
+          if (presentation?.dataFormat !== undefined) {
+            model.setDataFormat(presentation.dataFormat);
+          }
         }
       }
-    }
 
-    if (node?.name) {
-      model.setName(node.name);
-    }
-  });
+      if (node?.name) {
+        model.setName(node.name);
+      }
+    },
+    tab.handlerState.tableId,
+  );
 
   return model;
 }

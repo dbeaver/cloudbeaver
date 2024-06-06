@@ -74,7 +74,7 @@ export class ContainerDataSource extends ResultSetDataSource<IDataContainerOptio
   }
 
   async request(prevResults: IDatabaseResultSet[]): Promise<IDatabaseResultSet[]> {
-    const executionContext = await this.getContext();
+    const executionContext = await this.ensureContextCreated();
     const context = executionContext.context!;
     const limit = this.count;
     const task = await this.getRequestTask(prevResults, context);
@@ -111,7 +111,7 @@ export class ContainerDataSource extends ResultSetDataSource<IDataContainerOptio
   }
 
   async save(prevResults: IDatabaseResultSet[]): Promise<IDatabaseResultSet[]> {
-    const executionContext = await this.getContext();
+    const executionContext = await this.ensureContextCreated();
 
     try {
       for (const result of prevResults) {
@@ -182,22 +182,7 @@ export class ContainerDataSource extends ResultSetDataSource<IDataContainerOptio
     return prevResults;
   }
 
-  getResultId(prevResults: IDatabaseResultSet[], context: IConnectionExecutionContextInfo) {
-    let resultId: string | undefined;
-
-    if (
-      prevResults.length === 1 &&
-      prevResults[0].contextId === context.id &&
-      prevResults[0].connectionId === context.connectionId &&
-      prevResults[0].id !== null
-    ) {
-      resultId = prevResults[0].id;
-    }
-
-    return resultId;
-  }
-
-  getConfig(prevResults: IDatabaseResultSet[], context: IConnectionExecutionContextInfo) {
+  protected getConfig(prevResults: IDatabaseResultSet[], context: IConnectionExecutionContextInfo) {
     const options = this.options;
 
     if (!options) {
@@ -224,7 +209,7 @@ export class ContainerDataSource extends ResultSetDataSource<IDataContainerOptio
     };
   }
 
-  async getRequestTask(prevResults: IDatabaseResultSet[], context: IConnectionExecutionContextInfo): Promise<AsyncTask> {
+  protected async getRequestTask(prevResults: IDatabaseResultSet[], context: IConnectionExecutionContextInfo): Promise<AsyncTask> {
     const task = this.asyncTaskInfoService.create(async () => {
       const config = this.getConfig(prevResults, context);
       const { taskInfo } = await this.graphQLService.sdk.asyncReadDataFromContainer(config);
@@ -232,6 +217,21 @@ export class ContainerDataSource extends ResultSetDataSource<IDataContainerOptio
     });
 
     return task;
+  }
+
+  private getResultId(prevResults: IDatabaseResultSet[], context: IConnectionExecutionContextInfo) {
+    let resultId: string | undefined;
+
+    if (
+      prevResults.length === 1 &&
+      prevResults[0].contextId === context.id &&
+      prevResults[0].connectionId === context.connectionId &&
+      prevResults[0].id !== null
+    ) {
+      resultId = prevResults[0].id;
+    }
+
+    return resultId;
   }
 
   private transformResults(executionContextInfo: IConnectionExecutionContextInfo, results: SqlQueryResults[], limit: number): IDatabaseResultSet[] {
@@ -250,7 +250,7 @@ export class ContainerDataSource extends ResultSetDataSource<IDataContainerOptio
     }));
   }
 
-  private async getContext(): Promise<IConnectionExecutionContext> {
+  private async ensureContextCreated(): Promise<IConnectionExecutionContext> {
     const currentContext = this.executionContext?.context;
 
     if (!currentContext) {

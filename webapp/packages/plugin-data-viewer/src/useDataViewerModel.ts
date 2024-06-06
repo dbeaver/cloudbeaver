@@ -9,34 +9,25 @@ import { action, computed, observable } from 'mobx';
 
 import { useObservableRef, useResource } from '@cloudbeaver/core-blocks';
 import { ConnectionInfoResource, IConnectionInfoParams } from '@cloudbeaver/core-connections';
+import { useService } from '@cloudbeaver/core-di';
 import { ILoadableState, isContainsException } from '@cloudbeaver/core-utils';
-import type { ITab } from '@cloudbeaver/plugin-navigation-tabs';
 
-import type { DataViewerTable } from './DataViewerTable';
+import { TableViewerStorageService } from './TableViewer/TableViewerStorageService';
 
-interface ITabState {
+export interface IDataViewerDatabaseDataModel extends ILoadableState {
   connectionKey: IConnectionInfoParams | undefined;
+  tableViewerStorageService: TableViewerStorageService;
   tableId?: string;
-}
-
-type Tab = ITab<ITabState>;
-
-interface State extends ILoadableState {
-  resetException(): void;
-}
-
-export interface IDataViewerDatabaseDataModel extends State {
-  dataViewerTable: DataViewerTable;
-  tab: Tab;
   _exception?: Error[] | Error | null;
   _loading: boolean;
   _init(): Promise<void>;
-  init(tab: Tab, state: State): Promise<void>;
+  init(): Promise<void>;
   load(): Promise<void>;
 }
 
-export function useDataViewerModel<T extends Tab>(tab: T, dataViewerTable: DataViewerTable, init: (tab: T, state: State) => Promise<void>) {
-  const connection = useResource(useDataViewerModel, ConnectionInfoResource, tab.handlerState.connectionKey ?? null);
+export function useDataViewerModel(connectionKey: IConnectionInfoParams | undefined, init: () => Promise<void>, tableId?: string) {
+  const tableViewerStorageService = useService(TableViewerStorageService);
+  const connection = useResource(useDataViewerModel, ConnectionInfoResource, connectionKey ?? null);
 
   const state = useObservableRef<IDataViewerDatabaseDataModel>(
     () => ({
@@ -53,10 +44,10 @@ export function useDataViewerModel<T extends Tab>(tab: T, dataViewerTable: DataV
         return connection.isLoading() || this._loading;
       },
       isLoaded(): boolean {
-        return connection.isLoaded() && this.dataViewerTable.get(this.tab.handlerState.tableId || '') !== undefined;
+        return connection.isLoaded() && this.tableViewerStorageService.get(this.tableId || '') !== undefined;
       },
       isError(): boolean {
-        return this.exception !== null;
+        return isContainsException(this.exception);
       },
       async reload() {
         if (isContainsException(connection.exception)) {
@@ -83,13 +74,13 @@ export function useDataViewerModel<T extends Tab>(tab: T, dataViewerTable: DataV
         this._loading = true;
 
         try {
-          if (!this.tab.handlerState.connectionKey) {
-            this.resetException();
+          if (!this.connectionKey) {
+            this._exception = null;
             return;
           }
 
-          await this.init(tab, this);
-          this.resetException();
+          await this.init();
+          this._exception = null;
         } catch (exception: any) {
           this._exception = exception;
         } finally {
@@ -101,16 +92,15 @@ export function useDataViewerModel<T extends Tab>(tab: T, dataViewerTable: DataV
       exception: computed,
       _loading: observable.ref,
       _exception: observable.ref,
-      tab: observable.ref,
-      resetException: action.bound,
       isLoaded: action.bound,
       isLoading: action.bound,
       isError: action.bound,
       reload: action.bound,
     },
     {
-      tab,
-      dataViewerTable,
+      connectionKey,
+      tableId,
+      tableViewerStorageService,
       init,
     },
   );

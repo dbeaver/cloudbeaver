@@ -17,11 +17,10 @@ import { DatabaseDataAccessMode } from './DatabaseDataModel/IDatabaseDataSource'
 import type { IDatabaseResultSet } from './DatabaseDataModel/IDatabaseResultSet';
 import { DataViewerService } from './DataViewerService';
 import { DataViewerSettingsService } from './DataViewerSettingsService';
-import { DataViewerTable } from './DataViewerTable';
 import { TableViewerStorageService } from './TableViewer/TableViewerStorageService';
 
 @injectable()
-export class DataViewerTableService extends DataViewerTable {
+export class DataViewerTableService {
   constructor(
     private readonly app: App,
     private readonly navNodeManagerService: NavNodeManagerService,
@@ -31,9 +30,7 @@ export class DataViewerTableService extends DataViewerTable {
     private readonly connectionExecutionContextService: ConnectionExecutionContextService,
     private readonly dataViewerService: DataViewerService,
     private readonly dataViewerSettingsService: DataViewerSettingsService,
-  ) {
-    super(tableViewerStorageService);
-  }
+  ) {}
 
   create(connection: Connection, node: NavNode | undefined): IDatabaseDataModel<IDataContainerOptions, IDatabaseResultSet> {
     const nodeInfo = this.navNodeManagerService.getNodeContainerInfo(node?.id ?? '');
