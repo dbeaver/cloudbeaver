@@ -10,7 +10,7 @@ import { observer } from 'mobx-react-lite';
 import { Container, Group, InputFiles, s, Table, TableBody, TableColumnHeader, TableHeader, useS, useTranslate } from '@cloudbeaver/core-blocks';
 
 import { DataImportFileItem } from './DataImportFileItem';
-import classes from './DataImportFileSelector.m.css';
+import classes from './DataImportFileSelector.module.css';
 import type { IDataImportDialogState } from './IDataImportDialogState';
 
 interface Props {

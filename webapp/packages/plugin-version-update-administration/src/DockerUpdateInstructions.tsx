@@ -9,7 +9,7 @@ import { observer } from 'mobx-react-lite';
 
 import { Group, GroupItem, GroupTitle, s, useS, useTranslate } from '@cloudbeaver/core-blocks';
 
-import styles from './DockerUpdateInstructions.m.css';
+import styles from './DockerUpdateInstructions.module.css';
 
 export const DockerUpdateInstructions = observer(function DockerUpdateInstructions() {
   const translate = useTranslate();

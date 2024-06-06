@@ -22,42 +22,35 @@ You can see live demo of CloudBeaver here: https://demo.cloudbeaver.io
 
 ## Changelog
 
-### 24.0.5. 2024-05-20
-- The process of application update was improved - you can track the application update process now;
-- All popup dialogs became available for screen readers, including JAWS, to improve the experience for users with disabilities;
-- Data Editor:
-   - Large text values (more than 100 Kb) are now automatically opened in the Value panel;
-- DuckDB:
-   - Spatial data visualization support was added;
-   - The driver has been updated to version 0.10.2;
-- Different bug fixes and enhancements have been made.
+### 24.1.0. 2024-06-03
+### Changes since 24.0.0:
+- General:
+  -    Added the ability to back up the internal database before schema migration (for H2 and PostgreSQL)
+  -    The process of application update has improved - you can track the application update process now;
+  -    Added the ability for users to configure personal settings for the interface, SQL editor, and data viewer through the settings panel
+  -    All popup dialogs became available for screen readers, including JAWS, to improve the experience for users with disabilities;
+- User authorization:
+  -    Security for unauthorized access enhanced;
+  -    Added LDAP authentication;
+- Data viewer and SQL editor:
+  -    Added support for manual and automatic modes for committing changes to the database
+  -    Large text values (more than 100 Kb) are now automatically opened in the Value panel;
+  -    Row count calculation in the grid can be canceled for Data Editor and SQL Editor;
+  -    Added the ability to set null values for BLOB and GIS data via the cell's context menu in the table;
+  -    Added spatial data visualization for DuckDB;
+  -    Aliases autocompletion fixed for DuckDB;
+  -    Procedure creation query recognition fixed for DB2i.
+- Connection settings:
+  -    Implemented support for utilizing environment variables within connection configurations;
+- Data transfer:
+  -    Added the ability to import data to the database from CSV file;
+  -    Added the ability to select a case for column names for export to CSV;
+- Databases:
+  -    Added a new Apache Kyuubi driver;
+  -    Enhanced security for connection through H2 driver;
+  -    DuckDB driver updated to version 0.10.2;
+  -    Oracle driver updated to version 23.2.0.0;
+  -    SQLite driver updated to version 3.44.1.0;
+  -    Clickhouse driver updated to version 0.6.0-patch2;
+  -    Trino driver updated to version 438.
 
-### 24.0.4. 2024-05-06
-- Added the ability to stop the process of file upload in the table;
-- Row count calculation in the grid can be cancelled for Data Editor and SQL Editor;
-- Added the ability to set null values for BLOB and GIS data via the cell's context menu in the table;
-- Oracle driver has been updated to version 23.2.0.0.0;
-- SQLite driver has been updated to version 3.44.1.0;
-- Different bug fixes and enhancements have been made.
-
-### 24.0.3. 2024-04-22
-- Unauthorized access vulnerability was fixed;
-- Added the ability for users to configure personal settings for the interface, SQL editor, and data viewer through the settings panel;
-- Added the ability to backup of the internal database before schema migration (for H2);
-- Different bug fixes and enhancements have been made.
-
-### 24.0.2. 2024-04-08
-- Added the ability to import data to the database from CSV file;
-- Implemented support for utilizing environment variables within connection configurations;
-- The ability to select a case for column names has been added to CSV export;
-- A new Apache Kyuubi driver has been added;
-- Trino driver has been updated to version 438;
-- Clickhouse driver has been updated to version 0.6.0-patch2;
-- Have enhanced security of H2 connection;
-- Different bug fixes and enhancements have been made.
-
-### 24.0.1. 2024-03-25
-- Added support for two modes for committing changes to the database:
-  - Auto-commit transfers all changes that you make immediately to the database;
-  - Manual commit requires your confirmation before committing a change to the database or rolling it back.
-- Different bug fixes and enhancements have been made.

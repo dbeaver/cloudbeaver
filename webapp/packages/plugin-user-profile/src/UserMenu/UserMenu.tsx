@@ -15,7 +15,7 @@ import { useMenu } from '@cloudbeaver/core-view';
 
 import { UserInfo } from '../UserInfo';
 import { MENU_USER_PROFILE } from './MENU_USER_PROFILE';
-import style from './UserMenu.m.css';
+import style from './UserMenu.module.css';
 
 export const UserMenu = observer(function UserMenu() {
   const styles = useS(style);

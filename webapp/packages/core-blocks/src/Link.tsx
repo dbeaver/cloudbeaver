@@ -8,7 +8,7 @@
 import { observer } from 'mobx-react-lite';
 
 import { IconOrImage } from './IconOrImage';
-import style from './Link.m.css';
+import style from './Link.module.css';
 import { s } from './s';
 import { useS } from './useS';
 

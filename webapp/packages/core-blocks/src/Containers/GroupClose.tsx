@@ -8,7 +8,7 @@
 import { ActionIconButton } from '../ActionIconButton';
 import { s } from '../s';
 import { useS } from '../useS';
-import styles from './GroupClose.m.css';
+import styles from './GroupClose.module.css';
 
 interface IProps {
   onClick?: () => void;

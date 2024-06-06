@@ -7,7 +7,7 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import style from './ActionIconButton.m.css';
+import style from './ActionIconButton.module.css';
 import { IconButton, type IconButtonProps } from './IconButton';
 import { s } from './s';
 import { useS } from './useS';

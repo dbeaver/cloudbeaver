@@ -24,7 +24,7 @@ import { Field } from './Field';
 import { FieldDescription } from './FieldDescription';
 import { FieldLabel } from './FieldLabel';
 import { FormContext } from './FormContext';
-import InputFilesStyles from './InputFiles.m.css';
+import InputFilesStyles from './InputFiles.module.css';
 import { isControlPresented } from './isControlPresented';
 
 type BaseProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'name' | 'value' | 'style'> &

@@ -25,7 +25,7 @@ import { createConnectionParam, DatabaseAuthModelsResource, DBDriverResource } f
 import { TabContainerPanelComponent, useTab, useTabState } from '@cloudbeaver/core-ui';
 
 import type { IConnectionFormProps } from '../IConnectionFormProps';
-import styles from './OriginInfo.m.css';
+import styles from './OriginInfo.module.css';
 
 export const OriginInfo: TabContainerPanelComponent<IConnectionFormProps> = observer(function OriginInfo({
   tabId,

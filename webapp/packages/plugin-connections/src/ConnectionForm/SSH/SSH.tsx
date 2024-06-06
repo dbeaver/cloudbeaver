@@ -33,7 +33,7 @@ import { isSafari } from '@cloudbeaver/core-utils';
 
 import type { IConnectionFormProps } from '../IConnectionFormProps';
 import { authTypes } from './authTypes';
-import styles from './SSH.m.css';
+import styles from './SSH.module.css';
 import { SSHKeyUploader } from './SSHKeyUploader';
 
 interface Props extends IConnectionFormProps {

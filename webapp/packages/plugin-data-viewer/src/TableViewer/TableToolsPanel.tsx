@@ -13,7 +13,7 @@ import type { ResultDataFormat } from '@cloudbeaver/core-sdk';
 import type { IDatabaseDataModel } from '../DatabaseDataModel/IDatabaseDataModel';
 import type { IDataPresentationOptions } from '../DataPresentationService';
 import type { IDataTableActions } from './IDataTableActions';
-import styles from './TableToolsPanel.m.css';
+import styles from './TableToolsPanel.module.css';
 
 interface Props {
   model: IDatabaseDataModel<any, any>;

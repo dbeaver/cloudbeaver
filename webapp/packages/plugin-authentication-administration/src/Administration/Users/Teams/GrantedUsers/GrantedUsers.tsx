@@ -8,25 +8,14 @@
 import { observer } from 'mobx-react-lite';
 
 import { UsersResource, UsersResourceFilterKey } from '@cloudbeaver/core-authentication';
-import {
-  Container,
-  Group,
-  InfoItem,
-  Loader,
-  s,
-  TextPlaceholder,
-  useAutoLoad,
-  useResource,
-  useS,
-  useTranslate,
-} from '@cloudbeaver/core-blocks';
+import { Container, Group, InfoItem, Loader, s, TextPlaceholder, useAutoLoad, useResource, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import { CachedResourceOffsetPageListKey } from '@cloudbeaver/core-resource';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
 import { TabContainerPanelComponent, useTab } from '@cloudbeaver/core-ui';
 
 import type { ITeamFormProps } from '../ITeamFormProps';
 import { GrantedUserList } from './GrantedUserList';
-import style from './GrantedUsers.m.css';
+import style from './GrantedUsers.module.css';
 import type { IGrantedUser } from './IGrantedUser';
 import { useGrantedUsers } from './useGrantedUsers';
 import { UserList } from './UserList';

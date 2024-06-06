@@ -7,13 +7,24 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import { Button, SnackbarBody, SnackbarContent, SnackbarFooter, SnackbarStatus, SnackbarWrapper, s, useS, useTranslate } from '@cloudbeaver/core-blocks';
+import {
+  Button,
+  s,
+  SnackbarBody,
+  SnackbarContent,
+  SnackbarFooter,
+  SnackbarStatus,
+  SnackbarWrapper,
+  useS,
+  useTranslate,
+} from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { ENotificationType, NotificationComponentProps } from '@cloudbeaver/core-events';
 import { DataSynchronizationService } from '@cloudbeaver/core-root';
 import { groupBy, objectValues } from '@cloudbeaver/core-utils';
+
+import styles from './DataSynchronizationNotification.module.css';
 import { DataSynchronizationNotificationMessages } from './DataSynchronizationNotificationMessages';
-import styles from './DataSynchronizationNotification.m.css';
 
 export const DataSynchronizationNotification = observer<NotificationComponentProps>(function DataSynchronizationNotification({ notification }) {
   const dataSynchronizationService = useService(DataSynchronizationService);
@@ -37,7 +48,9 @@ export const DataSynchronizationNotification = observer<NotificationComponentPro
         <SnackbarBody title={translate(notification.title)}>
           {notification.message && translate(notification.message)}
           <div className={s(style, { message: true })}>
-            {groups.map((messages, index) => <DataSynchronizationNotificationMessages key={index} messages={messages} />)}
+            {groups.map((messages, index) => (
+              <DataSynchronizationNotificationMessages key={index} messages={messages} />
+            ))}
           </div>
         </SnackbarBody>
         <SnackbarFooter timestamp={notification.timestamp}>

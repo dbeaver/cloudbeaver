@@ -9,7 +9,7 @@ import { observer } from 'mobx-react-lite';
 
 import { s } from '../s';
 import { useS } from '../useS';
-import style from './ConnectionMark.m.css';
+import style from './ConnectionMark.module.css';
 
 interface Props {
   connected: boolean;

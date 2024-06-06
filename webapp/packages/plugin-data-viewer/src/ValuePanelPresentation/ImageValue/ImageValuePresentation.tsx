@@ -29,7 +29,7 @@ import { ResultSetSelectAction } from '../../DatabaseDataModel/Actions/ResultSet
 import type { IDatabaseResultSet } from '../../DatabaseDataModel/IDatabaseResultSet';
 import type { IDataValuePanelProps } from '../../TableViewer/ValuePanel/DataValuePanelService';
 import { QuotaPlaceholder } from '../QuotaPlaceholder';
-import styles from './ImageValuePresentation.m.css';
+import styles from './ImageValuePresentation.module.css';
 
 export const ImageValuePresentation: TabContainerPanelComponent<IDataValuePanelProps<any, IDatabaseResultSet>> = observer(
   function ImageValuePresentation({ model, resultIndex }) {

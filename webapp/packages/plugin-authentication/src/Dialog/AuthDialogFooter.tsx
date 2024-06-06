@@ -9,7 +9,7 @@ import { observer } from 'mobx-react-lite';
 
 import { Button, s, useS, useTranslate } from '@cloudbeaver/core-blocks';
 
-import styles from './AuthDialogFooter.m.css';
+import styles from './AuthDialogFooter.module.css';
 
 export interface Props extends React.PropsWithChildren {
   authAvailable: boolean;

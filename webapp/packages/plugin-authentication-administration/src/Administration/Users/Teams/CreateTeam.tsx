@@ -10,7 +10,7 @@ import { observer } from 'mobx-react-lite';
 import { Container, Group, GroupTitle, Loader, s, Translate, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 
-import style from './CreateTeam.m.css';
+import style from './CreateTeam.module.css';
 import { CreateTeamService } from './CreateTeamService';
 import { TeamForm } from './TeamForm';
 

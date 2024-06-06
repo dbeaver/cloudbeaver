@@ -16,7 +16,7 @@ import { VersionUpdateService } from '@cloudbeaver/core-version-update';
 
 import { VersionChecker } from './VersionChecker';
 import { VersionSelector } from './VersionSelector';
-import styles from './VersionUpdate.m.css';
+import styles from './VersionUpdate.module.css';
 
 export const VersionUpdate: AdministrationItemContentComponent = observer(function VersionUpdate() {
   const style = useS(styles);

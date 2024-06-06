@@ -1,0 +1,19 @@
+/*
+ * CloudBeaver - Cloud Database Manager
+ * Copyright (C) 2020-2024 DBeaver Corp and others
+ *
+ * Licensed under the Apache License, Version 2.0.
+ * you may not use this file except in compliance with the License.
+ */
+.groupItem {
+  white-space: pre-line;
+}
+
+.h4 {
+  margin-top: 0;
+}
+
+.ol {
+  margin: 0;
+  padding: 0;
+}

@@ -95,7 +95,7 @@
     {
       "label": "Yarn Install",
       "type": "shell",
-      "command": "yarn install; yarn lerna bootstrap",
+      "command": "yarn install",
       "args": [],
       "presentation": {
         "reveal": "silent",

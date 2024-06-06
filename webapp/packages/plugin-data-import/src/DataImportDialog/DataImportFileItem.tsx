@@ -9,7 +9,7 @@ import { observer } from 'mobx-react-lite';
 
 import { ActionIconButton, Container, s, TableColumnValue, TableItem, useS } from '@cloudbeaver/core-blocks';
 
-import classes from './DataImportFileItem.m.css';
+import classes from './DataImportFileItem.module.css';
 
 interface Props {
   id: string;

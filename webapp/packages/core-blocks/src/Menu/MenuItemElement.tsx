@@ -14,7 +14,7 @@ import { useTranslate } from '../localization/useTranslate';
 import { s } from '../s';
 import { useS } from '../useS';
 import { useStateDelay } from '../useStateDelay';
-import style from './MenuItemElement.m.css';
+import style from './MenuItemElement.module.css';
 
 interface IMenuItemElementProps {
   label: string;
