@@ -97,7 +97,12 @@ export class MetadataMap<TKey, TValue> implements Map<TKey, TValue> {
       }
 
       const value = provider(key, this);
-      this.temp.set(key, observable(value as any));
+
+      if (typeof value === 'object' && value !== null) {
+        this.temp.set(key, observable(value));
+      }
+
+      this.temp.set(key, value);
     }
 
     return this.temp.get(key)!;

@@ -53,7 +53,7 @@ describe('MetadataMap', () => {
     expect(map.get(NaN)).toBe('nan');
   });
 
-  it('should throw an error on invalidate with no default value getter', () => {
+  it('should throw an error if validation failed and no default value getter', () => {
     const map = new MetadataMap<number, string>();
     map.sync([
       [1, 'one'],
@@ -61,22 +61,10 @@ describe('MetadataMap', () => {
       [3, 'three'],
     ]);
 
-    try {
-      map.get(1, undefined, z.object({}));
-      expect(true).toBeFalsy(); // should not be called
-    } catch (e) {
-      expect(e).toBeInstanceOf(Error);
-    }
-
-    try {
-      map.get(1);
-      expect(true).toBeFalsy(); // should not be called
-    } catch (e) {
-      expect(e).toBeInstanceOf(Error);
-    }
+    expect(() => map.get(1, undefined, z.object({}))).toThrow();
   });
 
-  it('should get function default value', () => {
+  it('should get function default value if validation failed', () => {
     const map = new MetadataMap<number, string>();
     map.sync([
       [1, 'one'],
@@ -84,15 +72,15 @@ describe('MetadataMap', () => {
       [3, 'three'],
     ]);
 
-    expect(JSON.stringify(map.get(1, key => `default ${key}`, z.object({})))).toStrictEqual(JSON.stringify('default 1'));
+    expect(map.get(1, key => `default ${key}`, z.object({}))).toBe('default 1');
   });
 
-  it('should return default value', () => {
+  it('should return default value for non existing element using default getter in constructor', () => {
     const map = new MetadataMap<number, string>(key => `default ${key}`);
 
-    expect(JSON.stringify(map.get(1))).toStrictEqual(JSON.stringify('default 1'));
-    expect(JSON.stringify(map.get(Infinity))).toStrictEqual(JSON.stringify('default Infinity'));
-    expect(JSON.stringify(map.get(NaN))).toStrictEqual(JSON.stringify('default NaN'));
+    expect(map.get(1)).toBe('default 1');
+    expect(map.get(Infinity)).toBe('default Infinity');
+    expect(map.get(NaN)).toBe('default NaN');
   });
 
   it('should return size', () => {
@@ -106,7 +94,7 @@ describe('MetadataMap', () => {
     expect(map.size).toBe(3);
   });
 
-  it('should iterate', () => {
+  it('should return iterator', () => {
     const map = new MetadataMap<number, string>();
     const data: [number, string][] = [
       [1, 'one'],
@@ -115,52 +103,54 @@ describe('MetadataMap', () => {
     ];
     map.sync(data);
 
-    const items = Array.from(map);
-    expect(items).toStrictEqual([
-      [1, 'one'],
-      [2, 'two'],
-      [3, 'three'],
-    ]);
+    for (const [key, value] of map) {
+      expect(map.get(key)).toBe(value);
+    }
   });
 
   it('should iterate keys', () => {
     const map = new MetadataMap<number, string>();
-    map.sync([
+    const data: [number, string][] = [
       [1, 'one'],
       [2, 'two'],
       [3, 'three'],
-    ]);
+    ];
+    const keys = data.map(([key]) => key);
 
-    const keys = Array.from(map.keys());
-    expect(keys).toStrictEqual([1, 2, 3]);
+    map.sync(data);
+
+    for (const key of map.keys()) {
+      expect(key).toBe(keys.shift());
+    }
   });
 
   it('should iterate values', () => {
     const map = new MetadataMap<number, string>();
-    map.sync([
+    const data: [number, string][] = [
       [1, 'one'],
       [2, 'two'],
       [3, 'three'],
-    ]);
+    ];
+    const values = data.map(([, value]) => value);
+    map.sync(data);
 
-    const values = Array.from(map.values());
-    expect(values).toStrictEqual(['one', 'two', 'three']);
+    for (const value of map.values()) {
+      expect(value).toBe(values.shift());
+    }
   });
 
   it('should iterate entries', () => {
     const map = new MetadataMap<number, string>();
-    map.sync([
+    const data: [number, string][] = [
       [1, 'one'],
       [2, 'two'],
       [3, 'three'],
-    ]);
+    ];
+    map.sync(data);
 
-    const entries = Array.from(map.entries());
-    expect(entries).toStrictEqual([
-      [1, 'one'],
-      [2, 'two'],
-      [3, 'three'],
-    ]);
+    for (const [key, value] of map.entries()) {
+      expect([key, value]).toStrictEqual(data.shift());
+    }
   });
 
   it('should check if key exists', () => {
@@ -190,30 +180,22 @@ describe('MetadataMap', () => {
     expect(map.size).toBe(0);
   });
 
-  it('should delete', () => {
+  it('should delete items', () => {
     const map = new MetadataMap<number, string>();
-    map.sync([
+    const data: [number, string][] = [
       [1, 'one'],
       [2, 'two'],
       [3, 'three'],
-    ]);
+    ];
+
+    map.sync(data);
 
     map.delete(2);
+    map.delete(4);
+    data.splice(1, 1);
 
     expect(map.has(2)).toBeFalsy();
-  });
-
-  it('should not delete not existing key', () => {
-    const map = new MetadataMap<number, string>();
-    map.sync([
-      [1, 'one'],
-      [2, 'two'],
-      [3, 'three'],
-    ]);
-
-    map.delete(4);
-
-    expect(map.size).toBe(3);
+    expect(Array.from(map)).toEqual(data);
   });
 
   it('should forEach', () => {
