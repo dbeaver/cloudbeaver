@@ -63,10 +63,12 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
       resultIndex,
       currentContentType: state.currentContentType,
       elementKey: firstSelectedCell,
+      formatAction,
     });
     const textValueGetter = useTextValueGetter({
-      model,
-      resultIndex,
+      contentAction,
+      editAction,
+      formatAction,
       dataFormat,
       contentType,
       elementKey: firstSelectedCell,

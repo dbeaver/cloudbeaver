@@ -11,7 +11,7 @@ import type { ResultDataFormat } from '@cloudbeaver/core-sdk';
 import type { IResultSetElementKey } from '../../../../DatabaseDataModel/Actions/ResultSet/IResultSetDataKey';
 import { isResultSetBlobValue } from '../../../../DatabaseDataModel/Actions/ResultSet/isResultSetBlobValue';
 import { isResultSetContentValue } from '../../../../DatabaseDataModel/Actions/ResultSet/isResultSetContentValue';
-import { type IResultSetValue, ResultSetFormatAction } from '../../../../DatabaseDataModel/Actions/ResultSet/ResultSetFormatAction';
+import type { IResultSetValue, ResultSetFormatAction } from '../../../../DatabaseDataModel/Actions/ResultSet/ResultSetFormatAction';
 import type { IDatabaseDataModel } from '../../../../DatabaseDataModel/IDatabaseDataModel';
 import type { IDatabaseResultSet } from '../../../../DatabaseDataModel/IDatabaseResultSet';
 import { TextValuePresentationService } from './TextValuePresentationService';
@@ -22,6 +22,7 @@ interface Args {
   dataFormat: ResultDataFormat | null;
   currentContentType: string | null;
   elementKey?: IResultSetElementKey;
+  formatAction: ResultSetFormatAction;
 }
 
 const DEFAULT_CONTENT_TYPE = 'text/plain';
@@ -53,14 +54,13 @@ function preprocessDefaultContentType(contentType: string | null | undefined) {
   return DEFAULT_CONTENT_TYPE;
 }
 
-export function useAutoContentType({ dataFormat, model, resultIndex, currentContentType, elementKey }: Args) {
+export function useAutoContentType({ dataFormat, model, formatAction, resultIndex, currentContentType, elementKey }: Args) {
   const textValuePresentationService = useService(TextValuePresentationService);
   const activeTabs = textValuePresentationService.tabs.getDisplayed({
     dataFormat: dataFormat,
-    model: model,
+    model,
     resultIndex: resultIndex,
   });
-  const formatAction = model.source.getAction(resultIndex, ResultSetFormatAction);
   const contentValue = elementKey ? formatAction.get(elementKey) : null;
   const contentValueType = getContentTypeFromResultSetValue(contentValue);
   const defaultContentType = preprocessDefaultContentType(contentValueType);

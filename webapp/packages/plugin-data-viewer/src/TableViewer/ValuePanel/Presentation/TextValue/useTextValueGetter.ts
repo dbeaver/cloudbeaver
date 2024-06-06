@@ -14,29 +14,24 @@ import { blobToBase64, isNotNullDefined, removeMetadataFromDataURL } from '@clou
 import type { IResultSetElementKey } from '../../../../DatabaseDataModel/Actions/ResultSet/IResultSetDataKey';
 import { isResultSetBlobValue } from '../../../../DatabaseDataModel/Actions/ResultSet/isResultSetBlobValue';
 import { isResultSetContentValue } from '../../../../DatabaseDataModel/Actions/ResultSet/isResultSetContentValue';
-import { ResultSetDataContentAction } from '../../../../DatabaseDataModel/Actions/ResultSet/ResultSetDataContentAction';
-import { ResultSetEditAction } from '../../../../DatabaseDataModel/Actions/ResultSet/ResultSetEditAction';
-import { ResultSetFormatAction } from '../../../../DatabaseDataModel/Actions/ResultSet/ResultSetFormatAction';
-import type { IDatabaseDataModel } from '../../../../DatabaseDataModel/IDatabaseDataModel';
-import type { IDatabaseResultSet } from '../../../../DatabaseDataModel/IDatabaseResultSet';
+import type { ResultSetDataContentAction } from '../../../../DatabaseDataModel/Actions/ResultSet/ResultSetDataContentAction';
+import type { ResultSetEditAction } from '../../../../DatabaseDataModel/Actions/ResultSet/ResultSetEditAction';
+import type { ResultSetFormatAction } from '../../../../DatabaseDataModel/Actions/ResultSet/ResultSetFormatAction';
 import { formatText } from './formatText';
 import { MAX_BLOB_PREVIEW_SIZE } from './MAX_BLOB_PREVIEW_SIZE';
 
 interface IUseTextValueArgs {
-  resultIndex: number;
-  model: IDatabaseDataModel<any, IDatabaseResultSet>;
   dataFormat: ResultDataFormat | null;
   contentType: string;
   elementKey?: IResultSetElementKey;
+  contentAction: ResultSetDataContentAction;
+  formatAction: ResultSetFormatAction;
+  editAction: ResultSetEditAction;
 }
 
 type ValueGetter = () => string;
 
-export function useTextValueGetter({ model, resultIndex, contentType, elementKey }: IUseTextValueArgs): ValueGetter {
-  const contentAction = model.source.getAction(resultIndex, ResultSetDataContentAction);
-  const formatAction = model.source.getAction(resultIndex, ResultSetFormatAction);
-  const editAction = model.source.getAction(resultIndex, ResultSetEditAction);
-
+export function useTextValueGetter({ contentType, elementKey, formatAction, contentAction, editAction }: IUseTextValueArgs): ValueGetter {
   const suspense = useSuspense();
   const contentValue = elementKey ? formatAction.get(elementKey) : null;
   const limitInfo = elementKey ? contentAction.getLimitInfo(elementKey) : null;
