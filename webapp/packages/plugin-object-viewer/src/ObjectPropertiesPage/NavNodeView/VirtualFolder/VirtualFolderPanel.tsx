@@ -15,7 +15,7 @@ import { isDefined } from '@cloudbeaver/core-utils';
 import { type NavNodeTransformViewComponent, NavNodeViewService } from '@cloudbeaver/plugin-navigation-tree';
 
 import { TableLoader } from '../../ObjectPropertyTable/Table/TableLoader';
-import classes from './VirtualFolderPanel.m.css';
+import classes from './VirtualFolderPanel.module.css';
 import { VirtualFolderUtils } from './VirtualFolderUtils';
 
 export const VirtualFolderPanel: NavNodeTransformViewComponent = observer(function VirtualFolderPanel({ folderId, nodeId }) {

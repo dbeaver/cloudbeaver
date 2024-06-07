@@ -11,7 +11,7 @@ import { Container, PlaceholderComponent, useTranslate } from '@cloudbeaver/core
 import { InlineEditor } from '@cloudbeaver/core-ui';
 
 import type { ITableHeaderPlaceholderProps } from './TableHeaderService';
-import styles from './TableWhereFilter.m.css';
+import styles from './TableWhereFilter.module.css';
 import { useWhereFilter } from './useWhereFilter';
 
 export const TableWhereFilter: PlaceholderComponent<ITableHeaderPlaceholderProps> = observer(function TableWhereFilter({ model, resultIndex }) {

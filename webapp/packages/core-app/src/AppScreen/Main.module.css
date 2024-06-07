@@ -1,0 +1,23 @@
+/*
+ * CloudBeaver - Cloud Database Manager
+ * Copyright (C) 2020-2024 DBeaver Corp and others
+ *
+ * Licensed under the Apache License, Version 2.0.
+ * you may not use this file except in compliance with the License.
+ */
+.space {
+  composes: theme-typography--body2 theme-background-surface theme-text-on-surface from global;
+  display: flex;
+  flex-direction: row;
+  flex: 1;
+  overflow: hidden;
+}
+.pane {
+  composes: theme-background-surface theme-text-on-surface from global;
+  display: flex;
+  position: relative;
+  overflow: hidden;
+}
+.loader {
+  height: 100%;
+}

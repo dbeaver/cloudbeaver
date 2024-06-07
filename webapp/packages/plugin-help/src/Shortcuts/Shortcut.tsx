@@ -10,7 +10,7 @@ import React from 'react';
 import { s, useS, useTranslate } from '@cloudbeaver/core-blocks';
 
 import type { IShortcut } from './IShortcut';
-import styles from './Shortcut.m.css';
+import styles from './Shortcut.module.css';
 
 interface Props {
   shortcut: IShortcut;

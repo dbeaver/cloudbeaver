@@ -16,7 +16,7 @@ import type { IContainerProps } from '../Containers/IContainerProps';
 import { s } from '../s';
 import { useFocus } from '../useFocus';
 import { useS } from '../useS';
-import filterStyle from './Filter.m.css';
+import filterStyle from './Filter.module.css';
 import { InputField } from './InputField/InputField';
 
 interface BaseProps extends Omit<HTMLAttributes<HTMLDivElement>, 'onChange'>, IContainerProps {

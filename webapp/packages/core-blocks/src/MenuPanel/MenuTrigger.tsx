@@ -16,7 +16,7 @@ import { s } from '../s';
 import { useObjectRef } from '../useObjectRef';
 import { useS } from '../useS';
 import { MenuPanelItem } from './MenuPanelItem';
-import MenuPanelItemAndTriggerStyles from './shared/MenuPanelItemAndTrigger.m.css';
+import MenuPanelItemAndTriggerStyles from './shared/MenuPanelItemAndTrigger.module.css';
 
 export type MenuState = MenuStateReturn;
 

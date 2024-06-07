@@ -12,7 +12,7 @@ import type { ObjectPropertyInfo } from '@cloudbeaver/core-sdk';
 
 import { Expand } from '../Expand';
 import { getPropertyValue } from '../getPropertyValue';
-import classes from './PropertiesPanelItemsGroup.m.css';
+import classes from './PropertiesPanelItemsGroup.module.css';
 
 interface Props {
   properties: ObjectPropertyInfo[];

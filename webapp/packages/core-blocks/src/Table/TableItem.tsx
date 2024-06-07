@@ -16,9 +16,9 @@ import { s } from '../s';
 import { useObjectRef } from '../useObjectRef';
 import { useS } from '../useS';
 import { EventTableItemSelectionFlag } from './EventTableItemSelectionFlag';
-import cellStyles from './TableColumnValue.m.css';
+import cellStyles from './TableColumnValue.module.css';
 import { TableContext } from './TableContext';
-import rowStyles from './TableItem.m.css';
+import rowStyles from './TableItem.module.css';
 import { ITableItemContext, TableItemContext } from './TableItemContext';
 
 export interface TableItemExpandProps<T> {

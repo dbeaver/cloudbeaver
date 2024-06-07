@@ -16,7 +16,7 @@ import type { ITabsContext } from '../TabsContext';
 import { DATA_CONTEXT_TAB_ID } from './DATA_CONTEXT_TAB_ID';
 import { DATA_CONTEXT_TABS_CONTEXT } from './DATA_CONTEXT_TABS_CONTEXT';
 import { MENU_TAB } from './MENU_TAB';
-import style from './TabMenu.m.css';
+import style from './TabMenu.module.css';
 
 interface TabMenuProps extends React.PropsWithChildren {
   tabId: string;

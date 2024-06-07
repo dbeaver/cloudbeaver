@@ -12,7 +12,7 @@ import { useService } from '@cloudbeaver/core-di';
 import { parseNodeParentId } from '@cloudbeaver/core-navigation-tree';
 
 import { NavigationTreeService } from '../NavigationTree/NavigationTreeService';
-import styles from './NodeLink.m.css';
+import styles from './NodeLink.module.css';
 
 export interface NodeLinkProps {
   name: string;

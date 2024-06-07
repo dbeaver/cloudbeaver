@@ -18,7 +18,7 @@ import { EventTableItemExpandFlag } from './EventTableItemExpandFlag';
 import { EventTableItemSelectionFlag } from './EventTableItemSelectionFlag';
 import { TableContext } from './TableContext';
 import { TableItemContext } from './TableItemContext';
-import style from './TableItemExpand.m.css';
+import style from './TableItemExpand.module.css';
 
 interface Props {
   onExpand?: (item: any, state: boolean) => void;

@@ -12,7 +12,7 @@ import type { IContextMenuItemProps } from '@cloudbeaver/core-ui';
 import type { ICustomMenuItemComponent } from '@cloudbeaver/core-view';
 
 import { DATA_CONTEXT_MENU_SEARCH } from './DATA_CONTEXT_MENU_SEARCH';
-import styles from './SearchResourceMenuItemComponent.m.css';
+import styles from './SearchResourceMenuItemComponent.module.css';
 
 export const SearchResourceMenuItemComponent: ICustomMenuItemComponent<IContextMenuItemProps> = observer(function SearchResourceMenuItemComponent({
   item,

@@ -10,7 +10,7 @@ import { observer } from 'mobx-react-lite';
 import { Loader, s, useS } from '@cloudbeaver/core-blocks';
 
 import type { ISqlDataSource } from './SqlDataSource/ISqlDataSource';
-import classes from './SqlEditorStatusBar.m.css';
+import classes from './SqlEditorStatusBar.module.css';
 
 interface Props {
   dataSource: ISqlDataSource | undefined;

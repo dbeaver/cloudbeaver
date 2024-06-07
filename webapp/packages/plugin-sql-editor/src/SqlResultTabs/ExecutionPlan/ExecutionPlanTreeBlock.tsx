@@ -24,7 +24,7 @@ import {
 } from '@cloudbeaver/core-blocks';
 import type { SqlExecutionPlanNode } from '@cloudbeaver/core-sdk';
 
-import style from './ExecutionPlanTreeBlock.m.css';
+import style from './ExecutionPlanTreeBlock.module.css';
 import { NestedNode } from './NestedNode';
 import { useExecutionPlanTreeState } from './useExecutionPlanTreeState';
 

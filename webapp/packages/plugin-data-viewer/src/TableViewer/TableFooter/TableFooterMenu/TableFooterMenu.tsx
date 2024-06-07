@@ -18,7 +18,7 @@ import { DATA_CONTEXT_DV_DDM_RESULT_INDEX } from '../../../DatabaseDataModel/Dat
 import type { IDatabaseDataModel } from '../../../DatabaseDataModel/IDatabaseDataModel';
 import { DATA_CONTEXT_DATA_VIEWER_SIMPLE } from '../../TableHeader/DATA_CONTEXT_DATA_VIEWER_SIMPLE';
 import { DATA_VIEWER_DATA_MODEL_ACTIONS_MENU } from './DATA_VIEWER_DATA_MODEL_ACTIONS_MENU';
-import style from './TableFooterMenu.m.css';
+import style from './TableFooterMenu.module.css';
 import { TableFooterMenuItem } from './TableFooterMenuItem';
 import { TableFooterMenuService } from './TableFooterMenuService';
 

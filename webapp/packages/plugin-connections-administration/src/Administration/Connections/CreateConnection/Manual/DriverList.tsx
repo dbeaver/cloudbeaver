@@ -12,7 +12,7 @@ import { ItemList, ItemListSearch, s, useFocus, useS, useTranslate } from '@clou
 import type { DBDriver } from '@cloudbeaver/core-connections';
 
 import { Driver } from './Driver';
-import styles from './DriverList.m.css';
+import styles from './DriverList.module.css';
 
 interface Props {
   drivers: DBDriver[];

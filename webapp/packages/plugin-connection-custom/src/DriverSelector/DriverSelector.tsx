@@ -11,7 +11,7 @@ import { useMemo, useState } from 'react';
 import { ItemList, ItemListSearch, s, useFocus, useS, useTranslate } from '@cloudbeaver/core-blocks';
 
 import { Driver, IDriver } from './Driver';
-import style from './DriverSelector.m.css';
+import style from './DriverSelector.module.css';
 
 interface Props {
   drivers: IDriver[];

@@ -8,7 +8,7 @@
 import { s } from '../s';
 import { useS } from '../useS';
 import { filterLayoutFakeProps, getLayoutProps } from './filterLayoutFakeProps';
-import styles from './GroupSubTitle.m.css';
+import styles from './GroupSubTitle.module.css';
 import type { ILayoutSizeProps } from './ILayoutSizeProps';
 
 export const GroupSubTitle: React.FC<ILayoutSizeProps & React.HTMLAttributes<HTMLHeadingElement>> = function GroupSubTitle({ className, ...rest }) {

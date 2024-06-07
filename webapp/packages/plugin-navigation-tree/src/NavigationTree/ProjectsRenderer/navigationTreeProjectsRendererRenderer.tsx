@@ -21,7 +21,7 @@ import { isDraggingInsideProject } from '../ElementsTree/NavigationTreeNode/isDr
 import { NavigationNodeRendererLoader } from '../ElementsTree/NavigationTreeNode/NavigationNodeRendererLoader';
 import type { IElementsTreeCustomRenderer } from '../ElementsTree/useElementsTree';
 import { NavigationNodeProjectControl } from './NavigationNodeProjectControl';
-import style from './NavigationTreeProjectsRendererRenderer.m.css';
+import style from './NavigationTreeProjectsRendererRenderer.module.css';
 
 const registry: StyleRegistry = [
   [

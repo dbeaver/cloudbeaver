@@ -9,7 +9,7 @@ import { useLayoutEffect, useRef } from 'react';
 
 import { s } from '../../s';
 import { useS } from '../../useS';
-import CheckboxMarkupStyles from './CheckboxMarkup.m.css';
+import CheckboxMarkupStyles from './CheckboxMarkup.module.css';
 
 export type CheckboxMod = 'primary' | 'surface' | 'small';
 

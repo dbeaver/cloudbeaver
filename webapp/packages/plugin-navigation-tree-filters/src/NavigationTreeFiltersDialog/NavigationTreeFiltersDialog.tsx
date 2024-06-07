@@ -26,7 +26,7 @@ import { NotificationService } from '@cloudbeaver/core-events';
 import { type NavNode, NavTreeResource } from '@cloudbeaver/core-navigation-tree';
 
 import { FiltersTable } from './FiltersTable';
-import styles from './NavigationTreeFiltersDialog.m.css';
+import styles from './NavigationTreeFiltersDialog.module.css';
 import { useFilters } from './useFilters';
 
 interface Payload {

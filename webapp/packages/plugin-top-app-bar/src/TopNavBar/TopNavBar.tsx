@@ -24,14 +24,14 @@ import {
 } from '@cloudbeaver/core-blocks';
 import { MenuBarItemStyles, MenuBarStyles } from '@cloudbeaver/core-ui';
 
-import TopMenuStyles from './shared/TopMenu.m.css';
-import TopMenuBarStyles from './shared/TopMenuBar.m.css';
-import TopMenuBarItemStyles from './shared/TopMenuBarItem.m.css';
-import TopMenuCheckboxStyles from './shared/TopMenuCheckbox.m.css';
-import TopMenuItemStyles from './shared/TopMenuItem.m.css';
-import TopMenuItemElementStyles from './shared/TopMenuItemElement.m.css';
-import TopMenuPanelStyles from './shared/TopMenuPanel.m.css';
-import TopMenuSeparatorStyles from './shared/TopMenuSeparator.m.css';
+import TopMenuStyles from './shared/TopMenu.module.css';
+import TopMenuBarStyles from './shared/TopMenuBar.module.css';
+import TopMenuBarItemStyles from './shared/TopMenuBarItem.module.css';
+import TopMenuCheckboxStyles from './shared/TopMenuCheckbox.module.css';
+import TopMenuItemStyles from './shared/TopMenuItem.module.css';
+import TopMenuItemElementStyles from './shared/TopMenuItemElement.module.css';
+import TopMenuPanelStyles from './shared/TopMenuPanel.module.css';
+import TopMenuSeparatorStyles from './shared/TopMenuSeparator.module.css';
 
 interface Props {
   container: PlaceholderContainer<Record<string, any>>;

@@ -14,7 +14,7 @@ import type { DataTransferProcessorInfo } from '@cloudbeaver/core-sdk';
 import { DataTransferProcessorsResource } from '../DataTransferProcessorsResource';
 import type { IExportContext } from '../IExportContext';
 import { ExportProcessorList } from './ExportProcessorList/ExportProcessorList';
-import style from './ProcessorSelectDialog.m.css';
+import style from './ProcessorSelectDialog.module.css';
 
 interface Props {
   context: IExportContext;

@@ -19,10 +19,10 @@ import { DatabaseSelectAction } from '../../DatabaseDataModel/Actions/DatabaseSe
 import type { IDatabaseResultSet } from '../../DatabaseDataModel/IDatabaseResultSet';
 import type { DataPresentationComponent } from '../../DataPresentationService';
 import { DataValuePanelService } from './DataValuePanelService';
-import styles from './shared/ValuePanel.m.css';
-import ValuePanelEditorTabPanel from './shared/ValuePanelEditorTabPanel.m.css';
-import ValuePanelEditorTabs from './shared/ValuePanelEditorTabs.m.css';
-import ValuePanelTab from './shared/ValuePanelTab.m.css';
+import styles from './shared/ValuePanel.module.css';
+import ValuePanelEditorTabPanel from './shared/ValuePanelEditorTabPanel.module.css';
+import ValuePanelEditorTabs from './shared/ValuePanelEditorTabs.module.css';
+import ValuePanelTab from './shared/ValuePanelTab.module.css';
 
 const tabListRegistry: StyleRegistry = [[TabStyles, { mode: 'append', styles: [ValuePanelTab] }]];
 
