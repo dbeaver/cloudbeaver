@@ -87,7 +87,12 @@ public class WebAppUtils {
             var additionalValue = additional.get(rootKey);
 
             if (originValue == null || additionalValue == null) {
-                var resultValue = originValue != null ? originValue : additionalValue;
+                Object resultValue = null;
+                if (additional.containsKey(rootKey)) {
+                    resultValue = additionalValue;
+                } else if (originValue != null) {
+                    resultValue = originValue;
+                }
                 resultConfig.put(rootKey, resultValue);
                 continue;
             }
@@ -131,6 +136,10 @@ public class WebAppUtils {
 
     public static Object getExtractedValue(Object oldValue, Object newValue) {
         if (!(oldValue instanceof String)) {
+            return newValue;
+        }
+        //new value already contains variable pattern
+        if (newValue instanceof String newStringValue && GeneralUtils.isVariablePattern(newStringValue)) {
             return newValue;
         }
         String value = (String) oldValue;
