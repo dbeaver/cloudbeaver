@@ -248,6 +248,10 @@ type DriverInfo {
     # Driver parameters (map name->value)
     driverParameters: Object!
 
+    # Main driver properties
+    # Contains info about main fields (host, port, database, server name)
+    mainProperties: [ObjectPropertyInfo!]!
+
     # Additional driver provider properties
     # These properties can be configured by user on main connection page
     # to provide important connection settings
@@ -281,7 +285,8 @@ enum ResultDataFormat {
 
 enum DriverConfigurationType {
     MANUAL,
-    URL
+    URL,
+    CUSTOM
 }
 
 ## Network handler config
@@ -339,6 +344,8 @@ type ConnectionInfo {
     serverName: String
     databaseName: String
     url: String
+
+    mainProperties: [ObjectPropertyInfo!]
 
     keepAliveInterval: Int!
 
@@ -494,10 +501,14 @@ input ConnectionConfig {
 
     # Custom connection parameters (all optional)
 
-    host: String
-    port: String
-    serverName: String
-    databaseName: String
+    host: String @deprecated(reason: "24.1.1, use mainProperties")
+    port: String @deprecated(reason: "24.1.1, use mainProperties")
+    serverName: String @deprecated(reason: "24.1.1, use mainProperties")
+    databaseName: String @deprecated(reason: "24.1.1, use mainProperties")
+
+    # Host, port, serverName, databaseName are stored and mainProperties
+    mainProperties: Object
+
     # Connection url jdbc:{driver}://{host}[:{port}]/[{database}]
     url: String
     # Properties

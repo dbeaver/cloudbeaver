@@ -33,6 +33,7 @@ import io.cloudbeaver.utils.WebDataSourceUtils;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.Log;
+import org.jkiss.dbeaver.model.DBConstants;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
 import org.jkiss.dbeaver.model.access.DBAAuthCredentials;
 import org.jkiss.dbeaver.model.app.DBPDataSourceRegistry;
@@ -150,22 +151,7 @@ public class WebServiceUtils extends WebCommonUtils {
     }
 
     public static void setConnectionConfiguration(DBPDriver driver, DBPConnectionConfiguration dsConfig, WebConnectionConfig config) {
-        if (!CommonUtils.isEmpty(config.getUrl())) {
-            dsConfig.setUrl(config.getUrl());
-        } else {
-            if (config.getHost() != null) {
-                dsConfig.setHostName(config.getHost());
-            }
-            if (config.getPort() != null) {
-                dsConfig.setHostPort(config.getPort());
-            }
-            if (config.getDatabaseName() != null) {
-                dsConfig.setDatabaseName(config.getDatabaseName());
-            }
-            if (config.getServerName() != null) {
-                dsConfig.setServerName(config.getServerName());
-            }
-        }
+        setMainProperties(dsConfig, config);
         if (config.getProperties() != null) {
             Map<String, String> newProps = new LinkedHashMap<>();
             for (Map.Entry<String, Object> pe : config.getProperties().entrySet()) {
@@ -216,6 +202,37 @@ public class WebServiceUtils extends WebCommonUtils {
                 }
                 dsConfig.updateHandler(handlerConfig);
             }
+        }
+    }
+
+    private static void setMainProperties(DBPConnectionConfiguration dsConfig, WebConnectionConfig config) {
+        if (config.getMainProperties() != null) {
+            for (Map.Entry<String, Object> e : config.getMainProperties().entrySet()) {
+                switch (e.getKey()) {
+                    case DBConstants.PROP_HOST -> dsConfig.setHostName(CommonUtils.toString(e.getValue()));
+                    case DBConstants.PROP_PORT -> dsConfig.setHostPort(CommonUtils.toString(e.getValue()));
+                    case DBConstants.PROP_DATABASE -> dsConfig.setDatabaseName(CommonUtils.toString(e.getValue()));
+                    case DBConstants.PROP_SERVER -> dsConfig.setServerName(CommonUtils.toString(e.getValue()));
+                    default -> throw new IllegalStateException("Unexpected value: " + e.getKey());
+                }
+            }
+            return;
+        }
+        if (!CommonUtils.isEmpty(config.getUrl())) {
+            dsConfig.setUrl(config.getUrl());
+            return;
+        }
+        if (config.getHost() != null) {
+            dsConfig.setHostName(config.getHost());
+        }
+        if (config.getPort() != null) {
+            dsConfig.setHostPort(config.getPort());
+        }
+        if (config.getDatabaseName() != null) {
+            dsConfig.setDatabaseName(config.getDatabaseName());
+        }
+        if (config.getServerName() != null) {
+            dsConfig.setServerName(config.getServerName());
         }
     }
 

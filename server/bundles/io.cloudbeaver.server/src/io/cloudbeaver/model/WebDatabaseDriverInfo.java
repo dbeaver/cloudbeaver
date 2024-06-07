@@ -234,6 +234,13 @@ public class WebDatabaseDriverInfo {
     }
 
     @Property
+    public WebPropertyInfo[] getMainProperties() {
+        return Arrays.stream(driver.getMainPropertyDescriptors())
+            .map(p -> new WebPropertyInfo(webSession, p, null))
+            .toArray(WebPropertyInfo[]::new);
+    }
+
+    @Property
     public WebPropertyInfo[] getProviderProperties() {
         return Arrays.stream(driver.getProviderPropertyDescriptors())
             .map(p -> new WebPropertyInfo(webSession, p, null))

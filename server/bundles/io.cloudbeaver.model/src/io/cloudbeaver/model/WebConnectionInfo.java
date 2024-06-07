@@ -385,6 +385,16 @@ public class WebConnectionInfo {
     }
 
     @Property
+    public Map<String, String> getMainProperties() {
+        Map<String, String> mainProperties = new LinkedHashMap<>();
+        mainProperties.put(DBConstants.PROP_HOST, dataSourceContainer.getConnectionConfiguration().getHostName());
+        mainProperties.put(DBConstants.PROP_PORT, dataSourceContainer.getConnectionConfiguration().getHostPort());
+        mainProperties.put(DBConstants.PROP_DATABASE, dataSourceContainer.getConnectionConfiguration().getDatabaseName());
+        mainProperties.put(DBConstants.PROP_SERVER, dataSourceContainer.getConnectionConfiguration().getServerName());
+        return mainProperties;
+    }
+
+    @Property
     public Map<String, String> getProviderProperties() {
         return dataSourceContainer.getConnectionConfiguration().getProviderProperties();
     }
