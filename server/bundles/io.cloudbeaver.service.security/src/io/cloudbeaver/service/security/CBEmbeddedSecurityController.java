@@ -224,6 +224,30 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
         addSubjectPermissionsUpdateEvent(userId, SMSubjectType.user);
     }
 
+    public void addUserTeams(String userId, String[] teamIds, String grantorId) throws DBCException {
+        try (Connection dbCon = database.openConnection()) {
+            try (JDBCTransaction txn = new JDBCTransaction(dbCon)) {
+                addUserTeams(dbCon, userId, teamIds, grantorId);
+                txn.commit();
+            }
+        } catch (SQLException e) {
+            throw new DBCException("Error saving user teams in database", e);
+        }
+        addSubjectPermissionsUpdateEvent(userId, SMSubjectType.user);
+    }
+
+    public void deleteUserTeams(String userId, String[] teamIds) throws DBCException {
+        try (Connection dbCon = database.openConnection()) {
+            try (JDBCTransaction txn = new JDBCTransaction(dbCon)) {
+                deleteUserTeams(dbCon, userId, teamIds);
+                txn.commit();
+            }
+        } catch (SQLException e) {
+            throw new DBCException("Error delete user teams in database", e);
+        }
+        addSubjectPermissionsUpdateEvent(userId, SMSubjectType.user);
+    }
+
     @Override
     public void setUserTeamRole(
         @NotNull String userId,
@@ -297,6 +321,56 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
                     dbStat.execute();
                 }
             }
+        }
+    }
+
+    protected void addUserTeams(@NotNull Connection dbCon, String userId, String[] teamIds, String grantorId) throws SQLException {
+        if (ArrayUtils.isEmpty(teamIds)) {
+            return;
+        }
+
+        String defaultUserTeam = getDefaultUserTeam();
+        if (CommonUtils.isNotEmpty(defaultUserTeam) && !ArrayUtils.contains(teamIds, defaultUserTeam)) {
+            teamIds = ArrayUtils.add(String.class, teamIds, defaultUserTeam);
+        }
+
+        Set<String> currentUserTeams = new HashSet<>(JDBCUtils.queryStrings(
+            dbCon,
+            database.normalizeTableNames("SELECT TEAM_ID FROM {table_prefix}CB_USER_TEAM WHERE USER_ID=?"),
+            userId
+        ));
+
+        try (PreparedStatement dbStat = dbCon.prepareStatement(
+            database.normalizeTableNames("INSERT INTO {table_prefix}CB_USER_TEAM" +
+                "(USER_ID,TEAM_ID,GRANT_TIME,GRANTED_BY) VALUES(?,?,?,?)"))
+        ) {
+            for (String teamId : teamIds) {
+                if (currentUserTeams.contains(teamId)) {
+                    continue;
+                }
+                dbStat.setString(1, userId);
+                dbStat.setString(2, teamId);
+                dbStat.setTimestamp(3, new Timestamp(System.currentTimeMillis()));
+                dbStat.setString(4, grantorId);
+                dbStat.execute();
+            }
+        }
+    }
+
+    protected void deleteUserTeams(@NotNull Connection dbCon, String userId, String[] teamIds) throws SQLException {
+        String deleteUserTeamsSql = "DELETE FROM {table_prefix}CB_USER_TEAM WHERE USER_ID=?";
+
+        if (!ArrayUtils.isEmpty(teamIds)) {
+            deleteUserTeamsSql += " AND TEAM_ID NOT IN (" + SQLUtils.generateParamList(teamIds.length) + ")";
+        }
+
+        try (PreparedStatement dbStat = dbCon.prepareStatement(database.normalizeTableNames(deleteUserTeamsSql))) {
+            int index = 1;
+            dbStat.setString(index++, userId);
+            for (String teamId : teamIds) {
+                dbStat.setString(index++, teamId);
+            }
+            dbStat.execute();
         }
     }
 

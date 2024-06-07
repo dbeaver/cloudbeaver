@@ -276,7 +276,7 @@ public class WebServiceAdmin implements DBWServiceAdmin {
                 return true;
             }
             teamIds.add(team);
-            adminSecurityController.setUserTeams(user, teamIds.toArray(new String[0]), grantor.getUserId());
+            adminSecurityController.addUserTeams(user, teamIds.toArray(new String[0]), grantor.getUserId());
             return true;
         } catch (Exception e) {
             throw new DBWebException("Error granting team", e);
@@ -300,7 +300,7 @@ public class WebServiceAdmin implements DBWServiceAdmin {
             List<String> teamIds = Arrays.stream(userTeams).map(SMTeam::getTeamId).collect(Collectors.toList());
             if (teamIds.contains(team)) {
                 teamIds.remove(team);
-                adminSecurityController.setUserTeams(user, teamIds.toArray(new String[0]), grantor.getUserId());
+                adminSecurityController.deleteUserTeams(user, teamIds.toArray(new String[0]));
             } else {
                 throw new DBWebException("User '" + user + "' doesn't have team '" + team + "'");
             }
