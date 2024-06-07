@@ -87,7 +87,12 @@ public class WebAppUtils {
             var additionalValue = additional.get(rootKey);
 
             if (originValue == null || additionalValue == null) {
-                var resultValue = originValue != null ? originValue : additionalValue;
+                Object resultValue = null;
+                if (additional.containsKey(rootKey)) {
+                    resultValue = additionalValue;
+                } else if (originValue != null) {
+                    resultValue = originValue;
+                }
                 resultConfig.put(rootKey, resultValue);
                 continue;
             }
