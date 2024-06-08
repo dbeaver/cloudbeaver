@@ -11,12 +11,12 @@ import { useContext } from 'react';
 import { EventContext } from '@cloudbeaver/core-events';
 
 import { Checkbox } from '../FormControls/Checkboxes/Checkbox';
+import { s } from '../s';
+import { useS } from '../useS';
 import { EventTableItemSelectionFlag } from './EventTableItemSelectionFlag';
 import { TableContext } from './TableContext';
 import { TableItemContext } from './TableItemContext';
-import { useS } from '../useS';
-import styles from './TableItemSelect.m.css';
-import { s } from '../s';
+import styles from './TableItemSelect.module.css';
 
 interface Props {
   checked?: boolean;
@@ -45,12 +45,12 @@ export const TableItemSelect = observer<Props>(function TableItemSelect({ checke
   }
 
   return (
-    <Checkbox 
+    <Checkbox
       className={s(style, { checkbox: true }, className)}
       title={tooltip}
       disabled={context.selectDisabled || disabled}
       checked={selected}
-      onClick={handleClick} 
+      onClick={handleClick}
     />
   );
 });

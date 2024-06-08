@@ -1,9 +1,0 @@
-.treeNode {
-  &.hovered ::before {
-    opacity: 0.16;
-  }
-
-  &.expanded > .navNodeNested {
-    display: block;
-  }
-}

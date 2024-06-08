@@ -12,7 +12,7 @@ import { Loader, Placeholder, s, TableColumnValue, TableItem, TableItemExpand, T
 import { useService } from '@cloudbeaver/core-di';
 
 import { TeamsAdministrationService } from '../TeamsAdministrationService';
-import style from './Team.m.css';
+import style from './Team.module.css';
 import { TeamEdit } from './TeamEdit';
 
 interface Props {

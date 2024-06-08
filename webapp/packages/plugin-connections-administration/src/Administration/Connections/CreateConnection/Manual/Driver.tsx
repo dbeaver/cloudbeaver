@@ -11,7 +11,7 @@ import { useCallback } from 'react';
 import { ListItem, ListItemDescription, ListItemIcon, ListItemName, s, StaticImage, useS } from '@cloudbeaver/core-blocks';
 import type { DBDriver } from '@cloudbeaver/core-connections';
 
-import style from './Driver.m.css';
+import style from './Driver.module.css';
 
 interface Props {
   driver: DBDriver;

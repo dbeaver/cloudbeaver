@@ -8,12 +8,12 @@
 import { observer } from 'mobx-react-lite';
 import { Portal } from 'reakit/Portal';
 
+import { s, useS } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 
+import styles from './Notifications.module.css';
 import { NotificationsItem } from './NotificationsItem/NotificationsItem';
-import { s, useS } from '@cloudbeaver/core-blocks';
-import styles from './Notifications.m.css';
 
 export const Notifications = observer(function Notifications() {
   const notificationService = useService(NotificationService);

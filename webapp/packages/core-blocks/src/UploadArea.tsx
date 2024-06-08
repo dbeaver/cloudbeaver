@@ -11,7 +11,7 @@ import { forwardRef, useLayoutEffect } from 'react';
 import { uuid } from '@cloudbeaver/core-utils';
 
 import { s } from './s';
-import style from './UploadArea.m.css';
+import style from './UploadArea.module.css';
 import { useRefInherit } from './useRefInherit';
 import { useS } from './useS';
 

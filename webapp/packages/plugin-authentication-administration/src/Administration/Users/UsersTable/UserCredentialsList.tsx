@@ -14,7 +14,7 @@ import { BaseDropdownStyles, PlaceholderComponent, s, StaticImage, useS, useTran
 import type { ObjectOrigin } from '@cloudbeaver/core-sdk';
 
 import type { IUserDetailsInfoProps } from '../UsersAdministrationService';
-import style from './UserCredentialsList.m.css';
+import style from './UserCredentialsList.module.css';
 
 const MAX_VISIBLE_CREDENTIALS = 3;
 

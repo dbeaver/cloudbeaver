@@ -1,4 +1,0 @@
-.commonDialogWrapper {
-  // override because of the non-english locales and the medium size is too large
-  width: 440px !important;
-}

@@ -7,11 +7,11 @@
  */
 import type { StyleRegistry } from '@cloudbeaver/core-blocks';
 
-import TabStyles from './Tab.m.css';
-import TabBigUnderlineStyles from './TabBigUnderlineStyles.m.css';
-import TabTitleStyles from './TabTitle.m.css';
-import TabTitleBigUnderlineStyles from './TabTitleBigUnderlineStyles.m.css';
-import TabUnderlineStyles from './TabUnderline.m.css';
+import TabStyles from './Tab.module.css';
+import TabBigUnderlineStyles from './TabBigUnderlineStyles.module.css';
+import TabTitleStyles from './TabTitle.module.css';
+import TabTitleBigUnderlineStyles from './TabTitleBigUnderlineStyles.module.css';
+import TabUnderlineStyles from './TabUnderline.module.css';
 
 export const TabUnderlineStyleRegistry: StyleRegistry = [[TabStyles, { mode: 'append', styles: [TabUnderlineStyles] }]];
 export const TabBigUnderlineStyleRegistry: StyleRegistry = [

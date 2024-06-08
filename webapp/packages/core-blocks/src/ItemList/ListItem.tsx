@@ -8,7 +8,7 @@
 import { Clickable } from '../Clickable';
 import { s } from '../s';
 import { useS } from '../useS';
-import style from './ItemList.m.css';
+import style from './ItemList.module.css';
 
 interface Props {
   onClick: () => void;

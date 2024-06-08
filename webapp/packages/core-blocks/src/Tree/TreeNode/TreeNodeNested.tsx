@@ -10,7 +10,7 @@ import { forwardRef } from 'react';
 
 import { s } from '../../s';
 import { useS } from '../../useS';
-import style from './TreeNodeNested.m.css';
+import style from './TreeNodeNested.module.css';
 
 interface Props extends React.PropsWithChildren {
   root?: boolean;

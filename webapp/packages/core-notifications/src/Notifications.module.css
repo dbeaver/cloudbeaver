@@ -1,0 +1,19 @@
+/*
+ * CloudBeaver - Cloud Database Manager
+ * Copyright (C) 2020-2024 DBeaver Corp and others
+ *
+ * Licensed under the Apache License, Version 2.0.
+ * you may not use this file except in compliance with the License.
+ */
+.notifications {
+  composes: theme-typography from global;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  max-height: 329px;
+  display: flex;
+  flex-direction: column-reverse;
+  flex-wrap: nowrap;
+  justify-content: flex-end;
+  z-index: 1000; /* modal dialogs is 999, but more correct way is place notifications after dialogs in the dom */
+}

@@ -10,7 +10,7 @@ import { observer } from 'mobx-react-lite';
 import { s, useS, useTranslate } from '@cloudbeaver/core-blocks';
 
 import type { IDatabaseDataModel } from '../DatabaseDataModel/IDatabaseDataModel';
-import classes from './TableStatistics.m.css';
+import classes from './TableStatistics.module.css';
 
 interface Props {
   model: IDatabaseDataModel;

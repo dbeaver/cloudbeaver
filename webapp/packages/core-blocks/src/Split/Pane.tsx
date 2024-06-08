@@ -10,7 +10,7 @@ import { observer } from 'mobx-react-lite';
 
 import { s } from '../s';
 import { useS } from '../useS';
-import style from './Pane.m.css';
+import style from './Pane.module.css';
 import { useSplit } from './useSplit';
 
 export const Pane = observer<PaneProps>(function Pane({ className, children, ...rest }) {

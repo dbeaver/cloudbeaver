@@ -7,8 +7,8 @@
  */
 import { s } from '../s';
 import { useS } from '../useS';
-import tableStyles from './Table.m.css';
-import style from './TableColumnHeader.m.css';
+import tableStyles from './Table.module.css';
+import style from './TableColumnHeader.module.css';
 
 interface Props {
   title?: string;

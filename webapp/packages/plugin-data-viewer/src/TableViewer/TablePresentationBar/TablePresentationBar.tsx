@@ -15,9 +15,9 @@ import { TabList, TabListStyles, TabsState, TabStyles } from '@cloudbeaver/core-
 import type { IDatabaseDataModel } from '../../DatabaseDataModel/IDatabaseDataModel';
 import { DataPresentationService, DataPresentationType } from '../../DataPresentationService';
 import { PresentationTab } from './PresentationTab';
-import styles from './shared/TablePresentationBar.m.css';
-import TablePresentationBarTab from './shared/TablePresentationBarTab.m.css';
-import TablePresentationBarTabList from './shared/TablePresentationBarTabList.m.css';
+import styles from './shared/TablePresentationBar.module.css';
+import TablePresentationBarTab from './shared/TablePresentationBarTab.module.css';
+import TablePresentationBarTabList from './shared/TablePresentationBarTabList.module.css';
 
 interface Props {
   type: DataPresentationType;

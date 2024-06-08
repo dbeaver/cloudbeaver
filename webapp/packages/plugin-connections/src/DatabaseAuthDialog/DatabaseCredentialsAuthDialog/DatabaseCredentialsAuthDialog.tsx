@@ -24,7 +24,7 @@ import {
 import type { IConnectionInfoParams } from '@cloudbeaver/core-connections';
 
 import { ConnectionAuthenticationFormLoader } from '../../ConnectionAuthentication/ConnectionAuthenticationFormLoader';
-import style from './DatabaseCredentialsAuthDialog.m.css';
+import style from './DatabaseCredentialsAuthDialog.module.css';
 import { DatabaseCredentialsAuthDialogFooter } from './DatabaseCredentialsAuthDialogFooter';
 import { useDatabaseCredentialsAuthDialog } from './useDatabaseCredentialsAuthDialog';
 

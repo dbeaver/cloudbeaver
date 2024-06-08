@@ -12,7 +12,7 @@ import { Form, ItemList, ItemListSearch, s, TextPlaceholder, useFocus, useS, use
 import type { AdminConnectionSearchInfo } from '@cloudbeaver/core-sdk';
 
 import { Database } from './Database';
-import style from './DatabaseList.m.css';
+import style from './DatabaseList.module.css';
 
 interface Props {
   databases: AdminConnectionSearchInfo[];

@@ -9,11 +9,11 @@ import { forwardRef } from 'react';
 
 import { s } from '../s';
 import { useS } from '../useS';
-import coloredContainerStyles from './ColoredContainer.m.css';
-import containerStyles from './Container.m.css';
+import coloredContainerStyles from './ColoredContainer.module.css';
+import containerStyles from './Container.module.css';
 import { filterContainerFakeProps, getContainerProps } from './filterContainerFakeProps';
 import type { IContainerProps } from './IContainerProps';
-import elementsSizeStyles from './shared/ElementsSize.m.css';
+import elementsSizeStyles from './shared/ElementsSize.module.css';
 
 interface Props extends IContainerProps, React.HTMLAttributes<HTMLDivElement> {
   surface?: boolean;

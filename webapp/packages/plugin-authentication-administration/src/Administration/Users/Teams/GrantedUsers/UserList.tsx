@@ -31,7 +31,7 @@ import type { AdminUserInfoFragment } from '@cloudbeaver/core-sdk';
 
 import { getFilteredUsers } from './getFilteredUsers';
 import { GrantedUsersTableHeader, IFilterState } from './GrantedUsersTableHeader/GrantedUsersTableHeader';
-import style from './UserList.m.css';
+import style from './UserList.module.css';
 import { UsersTableInnerHeader } from './UsersTableInnerHeader';
 import { UsersTableItem } from './UsersTableItem';
 

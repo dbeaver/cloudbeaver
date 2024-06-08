@@ -1,0 +1,93 @@
+name: Build and Push Docker Image
+
+on:
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+  # Allows you to reuse workflows by referencing their YAML files
+  workflow_call:
+
+jobs:
+  build-and-push-docker:
+    name: Build and Push Docker Image
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Download backend artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: backend-build-artifacts
+          path: deploy/cloudbeaver/
+
+      - name: Download frontend artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: frontend-build-artifacts
+          path: deploy/cloudbeaver/web
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Run custom Docker build script
+        run: ./make-docker-container.sh
+        shell: bash
+        working-directory: ./deploy/docker
+
+      - name: Tag Docker Image
+        run: |
+          REPO_NAME=$(basename ${{ github.repository }})
+          IMAGE_NAME=ghcr.io/${{ github.repository_owner }}/$REPO_NAME
+          BRANCH_NAME=${{ github.head_ref || github.ref_name }}
+          TAG_NAME=$(echo $BRANCH_NAME | sed 's/[^a-zA-Z0-9._-]/-/g')
+          docker tag dbeaver/cloudbeaver:dev $IMAGE_NAME:$TAG_NAME
+          echo "image=$IMAGE_NAME:$TAG_NAME" >> $GITHUB_ENV
+
+      # - name: Install Docker Credential Helper
+      #   run: |
+      #     sudo apt-get update
+      #     sudo apt-get install -y gnupg2 pass
+      #     curl -fsSL https://github.com/docker/docker-credential-helpers/releases/download/v0.6.4/docker-credential-pass-v0.6.4-amd64.tar.gz -o docker-credential-pass.tar.gz
+      #     tar xzvf docker-credential-pass.tar.gz
+      #     sudo mv docker-credential-pass /usr/local/bin/docker-credential-pass
+      #     sudo chmod +x /usr/local/bin/docker-credential-pass
+  
+      # - name: Configure Docker to use Credential Helper
+      #   run: |
+      #     mkdir -p ~/.docker
+      #     echo '{"credsStore":"pass"}' > ~/.docker/config.json
+
+      # - name: Initialize Password Store
+      #   run: |
+      #     gpg --batch --gen-key <<EOF
+      #     %no-protection
+      #     Key-Type: default
+      #     Subkey-Type: default
+      #     Name-Real: Docker Credential Helper
+      #     Expire-Date: 0
+      #     %commit
+      #     EOF
+      #     pass init "$(gpg --list-keys --with-colons | grep '^pub' | cut -d: -f5)"
+
+      - name: Log in to GitHub Container Registry
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.repository_owner }} --password-stdin
+
+      - name: Push Docker Image
+        run: docker push ${{ env.image }}
+
+      # - name: Comment on Pull Request
+      #   if: github.event_name == 'pull_request'
+      #   uses: actions/github-script@v6
+      #   with:
+      #     github-token: ${{ secrets.PAT }}
+      #     script: |
+      #       const tag = process.env.TAG_NAME;
+      #       const commentBody = `The Docker image has been built and pushed to Docker Hub.\n\nYou can pull the image using the following command:\n\`\`\`\ndocker pull dbeaver/cloudbeaver:${tag}\n\`\`\``;
+      #       github.rest.issues.createComment({
+      #         owner: context.repo.owner,
+      #         repo: context.repo.repo,
+      #         issue_number: context.issue.number,
+      #         body: commentBody
+      #       });

@@ -9,7 +9,7 @@ import { observer } from 'mobx-react-lite';
 
 import { s } from '../s';
 import { useS } from '../useS';
-import style from './ToolsPanel.m.css';
+import style from './ToolsPanel.module.css';
 
 type TType = 'primary' | 'secondary';
 interface Props {

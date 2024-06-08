@@ -8,7 +8,7 @@
 import { IconOrImage } from '../IconOrImage';
 import { s } from '../s';
 import { useS } from '../useS';
-import style from './OverlayHeaderIcon.m.css';
+import style from './OverlayHeaderIcon.module.css';
 
 interface Props {
   icon?: string;

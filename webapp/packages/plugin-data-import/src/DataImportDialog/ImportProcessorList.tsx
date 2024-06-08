@@ -12,7 +12,7 @@ import { CachedMapAllKey } from '@cloudbeaver/core-resource';
 import type { DataTransferProcessorInfo } from '@cloudbeaver/core-sdk';
 
 import { DataImportProcessorsResource } from '../DataImportProcessorsResource';
-import classes from './ImportProcessorList.m.css';
+import classes from './ImportProcessorList.module.css';
 
 interface Props {
   onSelect: (processor: DataTransferProcessorInfo) => void;

@@ -1,9 +1,0 @@
-.inlineEditor {
-  height: 22px !important;
-
-  & input,
-  & input[disabled],
-  & input[readonly] {
-    padding: 1px !important;
-  }
-}

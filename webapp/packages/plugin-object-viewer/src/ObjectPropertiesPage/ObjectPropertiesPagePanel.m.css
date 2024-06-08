@@ -1,7 +1,0 @@
-.wrapper {
-  composes: theme-background-surface from global;
-  display: flex;
-  width: 100%;
-  flex: 1 1 auto;
-  padding-top: 16px;
-}

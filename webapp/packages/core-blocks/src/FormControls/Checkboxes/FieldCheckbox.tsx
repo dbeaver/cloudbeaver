@@ -15,7 +15,7 @@ import { Field } from '../Field';
 import { FieldLabel } from '../FieldLabel';
 import { isControlPresented } from '../isControlPresented';
 import { Checkbox, CheckboxBaseProps, CheckboxType, ICheckboxControlledProps, ICheckboxObjectProps } from './Checkbox';
-import fieldCheckboxStyles from './FieldCheckbox.m.css';
+import fieldCheckboxStyles from './FieldCheckbox.module.css';
 
 export const FieldCheckbox: CheckboxType<ILayoutSizeProps> = observer(function FieldCheckbox({
   children,
