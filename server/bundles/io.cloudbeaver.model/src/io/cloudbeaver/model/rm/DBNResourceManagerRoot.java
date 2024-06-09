@@ -82,8 +82,8 @@ public class DBNResourceManagerRoot extends DBNNode implements DBPHiddenObject, 
     }
 
     @Override
-    public DBNResourceManagerProject[] getChildren(@Nullable DBRProgressMonitor monitor) throws DBException {
-        if (projects == null && monitor != null) {
+    public DBNResourceManagerProject[] getChildren(@NotNull DBRProgressMonitor monitor) throws DBException {
+        if (projects == null && !monitor.isForceCacheUsage()) {
             List<? extends DBPProject> projectList = getParentNode().getModel().getModelProjects();
             if (CommonUtils.isEmpty(projectList)) {
                 return new DBNResourceManagerProject[0];
