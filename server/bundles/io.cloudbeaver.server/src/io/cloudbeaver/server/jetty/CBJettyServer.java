@@ -52,17 +52,15 @@ import java.util.Arrays;
 public class CBJettyServer {
 
     private static final Log log = Log.getLog(CBJettyServer.class);
-    private static final String SESSION_CACHE_DIR = ".http-sessions";
-
     static {
         // Set Jetty log level to WARN
         System.setProperty("org.eclipse.jetty.util.log.class", "org.eclipse.jetty.util.log.StdErrLog");
         System.setProperty("org.eclipse.jetty.LEVEL", "WARN");
     }
 
-    private final CBApplication application;
+    private final CBApplication<?> application;
 
-    public CBJettyServer(@NotNull CBApplication application) {
+    public CBJettyServer(@NotNull CBApplication<?> application) {
         this.application = application;
     }
 
@@ -182,7 +180,7 @@ public class CBJettyServer {
     }
 
     private void initSessionManager(
-        @NotNull CBApplication application,
+        @NotNull CBApplication<?> application,
         @NotNull ServletContextHandler servletContextHandler
     ) {
         // Init sessions persistence
