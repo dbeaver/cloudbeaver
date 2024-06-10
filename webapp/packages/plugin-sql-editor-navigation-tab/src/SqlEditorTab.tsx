@@ -12,7 +12,7 @@ import { IconOrImage, s, useTranslate } from '@cloudbeaver/core-blocks';
 import { Connection, ConnectionInfoResource, createConnectionParam } from '@cloudbeaver/core-connections';
 import { useDataContext } from '@cloudbeaver/core-data-context';
 import { useService } from '@cloudbeaver/core-di';
-import { ITabData, TabIcon, Tab, TabTitle } from '@cloudbeaver/core-ui';
+import { ITabData, Tab, TabIcon, TabTitle } from '@cloudbeaver/core-ui';
 import { CaptureViewContext } from '@cloudbeaver/core-view';
 import type { TabHandlerTabComponent } from '@cloudbeaver/plugin-navigation-tabs';
 import {
@@ -24,7 +24,7 @@ import {
 } from '@cloudbeaver/plugin-sql-editor';
 
 import { DATA_CONTEXT_SQL_EDITOR_TAB } from './DATA_CONTEXT_SQL_EDITOR_TAB';
-import sqlEditorTabStyles from './SqlEditorTab.m.css';
+import sqlEditorTabStyles from './SqlEditorTab.module.css';
 
 export const SqlEditorTab: TabHandlerTabComponent<ISqlEditorTabState> = observer(function SqlEditorTab({ tab, onSelect, onClose }) {
   const viewContext = useContext(CaptureViewContext);

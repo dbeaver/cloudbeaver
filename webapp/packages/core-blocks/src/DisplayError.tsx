@@ -11,7 +11,7 @@ import type React from 'react';
 import { ENotificationType } from '@cloudbeaver/core-events';
 
 import { AppRefreshButton } from './AppRefreshButton';
-import style from './DisplayError.m.css';
+import style from './DisplayError.module.css';
 import { s } from './s';
 import { NotificationMark } from './Snackbars/NotificationMark';
 import { useS } from './useS';

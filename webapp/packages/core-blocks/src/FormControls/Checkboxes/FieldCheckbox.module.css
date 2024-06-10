@@ -1,0 +1,24 @@
+/*
+ * CloudBeaver - Cloud Database Manager
+ * Copyright (C) 2020-2024 DBeaver Corp and others
+ *
+ * Licensed under the Apache License, Version 2.0.
+ * you may not use this file except in compliance with the License.
+ */
+.field {
+  display: flex;
+  align-items: center;
+  white-space: pre-wrap;
+
+  & .fieldLabel {
+    cursor: pointer;
+    user-select: none;
+    line-height: 16px;
+  }
+}
+.fieldLabel {
+  composes: theme-typography--body2 from global;
+}
+.checkbox[disabled] + .fieldLabel {
+  cursor: auto;
+}

@@ -11,7 +11,7 @@ import { Clickable, IconOrImage, s, useS, useTranslate } from '@cloudbeaver/core
 import { useService } from '@cloudbeaver/core-di';
 import type { UserInfo as IUserInfo } from '@cloudbeaver/core-sdk';
 
-import styles from './UserInfo.m.css';
+import styles from './UserInfo.module.css';
 import { UserProfileOptionsPanelService } from './UserProfileOptionsPanelService';
 
 interface Props {

@@ -8,9 +8,9 @@
 import { s } from '../s';
 import { useS } from '../useS';
 import { filterLayoutFakeProps, getLayoutProps } from './filterLayoutFakeProps';
-import styles from './GroupTitle.m.css';
+import styles from './GroupTitle.module.css';
 import type { ILayoutSizeProps } from './ILayoutSizeProps';
-import elementsSizeStyles from './shared/ElementsSize.m.css';
+import elementsSizeStyles from './shared/ElementsSize.module.css';
 
 interface Props {
   sticky?: boolean;

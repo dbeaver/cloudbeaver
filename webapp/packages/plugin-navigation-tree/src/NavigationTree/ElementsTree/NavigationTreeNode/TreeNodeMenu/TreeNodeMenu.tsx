@@ -16,7 +16,7 @@ import { useMenu } from '@cloudbeaver/core-view';
 
 import { MENU_NAV_TREE } from '../../MENU_NAV_TREE';
 import { DATA_CONTEXT_NAV_NODE_ACTIONS } from './DATA_CONTEXT_NAV_NODE_ACTIONS';
-import style from './TreeNodeMenu.m.css';
+import style from './TreeNodeMenu.module.css';
 
 export interface TreeNodeMenuProps {
   node: NavNode;

@@ -20,7 +20,7 @@ import { useS } from '../../useS';
 import { useStateDelay } from '../../useStateDelay';
 import { EventTreeNodeExpandFlag } from './EventTreeNodeExpandFlag';
 import { TreeNodeContext } from './TreeNodeContext';
-import style from './TreeNodeExpand.m.css';
+import style from './TreeNodeExpand.module.css';
 
 interface Props {
   leaf?: boolean;

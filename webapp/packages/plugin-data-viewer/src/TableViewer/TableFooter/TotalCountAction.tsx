@@ -11,8 +11,8 @@ import { getComputed, s, ToolsAction, useS, useTranslate } from '@cloudbeaver/co
 
 import type { IDatabaseDataModel } from '../../DatabaseDataModel/IDatabaseDataModel';
 import type { IDatabaseResultSet } from '../../DatabaseDataModel/IDatabaseResultSet';
-import TableFooterMenuStyles from './TableFooterMenu/TableFooterMenuItem.m.css';
-import classes from './TableFooterRowCount.m.css';
+import TableFooterMenuStyles from './TableFooterMenu/TableFooterMenuItem.module.css';
+import classes from './TableFooterRowCount.module.css';
 
 interface Props {
   onClick: VoidFunction;

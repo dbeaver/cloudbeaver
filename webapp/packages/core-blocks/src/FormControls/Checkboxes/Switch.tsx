@@ -16,9 +16,9 @@ import { FieldDescription } from '../FieldDescription';
 import { FieldLabel } from '../FieldLabel';
 import { isControlPresented } from '../isControlPresented';
 import type { ICheckboxControlledProps, ICheckboxObjectProps } from './Checkbox';
-import switchStyles from './Switch.m.css';
-import denseModStyles from './SwitchDense.m.css';
-import primaryModStyles from './SwitchPrimary.m.css';
+import switchStyles from './Switch.module.css';
+import denseModStyles from './SwitchDense.module.css';
+import primaryModStyles from './SwitchPrimary.module.css';
 import { useCheckboxState } from './useCheckboxState';
 
 const switchMod = {

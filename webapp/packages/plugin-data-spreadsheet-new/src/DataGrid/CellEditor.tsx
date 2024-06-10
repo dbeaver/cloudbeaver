@@ -16,7 +16,7 @@ import { InlineEditor } from '@cloudbeaver/core-ui';
 import type { IResultSetElementKey, IResultSetRowKey } from '@cloudbeaver/plugin-data-viewer';
 import type { RenderEditCellProps } from '@cloudbeaver/plugin-react-data-grid';
 
-import style from './CellEditor.m.css';
+import style from './CellEditor.module.css';
 import { DataGridContext, IColumnResizeInfo } from './DataGridContext';
 import { TableDataContext } from './TableDataContext';
 

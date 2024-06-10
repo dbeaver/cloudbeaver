@@ -10,7 +10,7 @@ import { observer } from 'mobx-react-lite';
 
 import { s } from '../s';
 import { useS } from '../useS';
-import style from './ResizeControls.m.css';
+import style from './ResizeControls.module.css';
 import { SplitControls } from './SplitControls';
 import { useSplit } from './useSplit';
 

@@ -12,7 +12,7 @@ import { useS } from '../useS';
 import { Field } from './Field';
 import { FieldDescription } from './FieldDescription';
 import { FieldLabel } from './FieldLabel';
-import style from './FormFieldDescription.m.css';
+import style from './FormFieldDescription.module.css';
 
 interface Props extends ILayoutSizeProps {
   label?: string;

@@ -1,0 +1,28 @@
+/*
+ * CloudBeaver - Cloud Database Manager
+ * Copyright (C) 2020-2024 DBeaver Corp and others
+ *
+ * Licensed under the Apache License, Version 2.0.
+ * you may not use this file except in compliance with the License.
+ */
+.exportProcessorList {
+  flex: 1;
+}
+.exportObject {
+  composes: theme-typography--body2 from global;
+  flex-shrink: 0;
+  padding: 16px 24px;
+  padding-top: 0;
+  max-height: 50px;
+  overflow: hidden;
+
+  & pre {
+    margin: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: initial;
+  }
+}
+.pre {
+  composes: theme-typography--caption from global;
+}

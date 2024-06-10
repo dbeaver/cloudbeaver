@@ -12,7 +12,7 @@ import { Tab as BaseTab } from 'reakit/Tab';
 import { getComputed, s, useS, useTranslate } from '@cloudbeaver/core-blocks';
 
 import { TabContext } from '../TabContext';
-import style from './Tab.m.css';
+import style from './Tab.module.css';
 import { TabActions } from './TabActions';
 import type { TabProps } from './TabProps';
 import { useTab } from './useTab';

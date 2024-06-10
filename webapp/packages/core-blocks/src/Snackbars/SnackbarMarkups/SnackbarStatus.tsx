@@ -11,7 +11,7 @@ import { Loader } from '../../Loader/Loader';
 import { s } from '../../s';
 import { useS } from '../../useS';
 import { NotificationMark } from '../NotificationMark';
-import style from './SnackbarStatus.m.css';
+import style from './SnackbarStatus.module.css';
 
 interface SnackbarStatusProps {
   status: ENotificationType;

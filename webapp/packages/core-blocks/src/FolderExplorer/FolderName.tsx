@@ -13,7 +13,7 @@ import { Link } from '../Link';
 import { s } from '../s';
 import { useS } from '../useS';
 import { FolderExplorerContext } from './FolderExplorerContext';
-import style from './FolderName.m.css';
+import style from './FolderName.module.css';
 
 interface BaseProps {
   folder?: string;

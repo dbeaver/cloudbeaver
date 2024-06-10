@@ -1,8 +1,0 @@
-.deleteColumnCell {
-  opacity: 0;
-  justify-content: flex-end;
-}
-
-.tableItem:hover .deleteColumnCell {
-  opacity: 1;
-}

@@ -31,7 +31,7 @@ import type { TLocalizationToken } from '@cloudbeaver/core-localization';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
 
 import { getFilteredUsers } from './getFilteredUsers';
-import style from './GrantedUserList.m.css';
+import style from './GrantedUserList.module.css';
 import { GrantedUsersTableHeader, IFilterState } from './GrantedUsersTableHeader/GrantedUsersTableHeader';
 import { GrantedUsersTableInnerHeader } from './GrantedUsersTableHeader/GrantedUsersTableInnerHeader';
 import { GrantedUsersTableItem } from './GrantedUsersTableItem';

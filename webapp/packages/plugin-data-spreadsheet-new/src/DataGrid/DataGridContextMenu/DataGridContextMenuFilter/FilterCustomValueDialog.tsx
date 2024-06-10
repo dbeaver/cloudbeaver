@@ -23,7 +23,7 @@ import { useService } from '@cloudbeaver/core-di';
 import type { DialogComponent, DialogComponentProps } from '@cloudbeaver/core-dialogs';
 import { ClipboardService } from '@cloudbeaver/core-ui';
 
-import style from './FilterCustomValueDialog.m.css';
+import style from './FilterCustomValueDialog.module.css';
 
 interface IPayload {
   inputTitle: string;

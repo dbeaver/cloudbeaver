@@ -14,7 +14,7 @@ import { s } from '../s';
 import { useS } from '../useS';
 import { Field } from './Field';
 import { FormContext } from './FormContext';
-import style from './Radio.m.css';
+import style from './Radio.module.css';
 import { RadioGroupContext } from './RadioGroupContext';
 
 type BaseProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'value' | 'checked'> &

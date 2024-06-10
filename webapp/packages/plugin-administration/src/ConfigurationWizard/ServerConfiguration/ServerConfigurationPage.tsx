@@ -36,7 +36,7 @@ import { ServerConfigurationInfoForm } from './Form/ServerConfigurationInfoForm'
 import { ServerConfigurationNavigatorViewForm } from './Form/ServerConfigurationNavigatorViewForm';
 import { ServerConfigurationSecurityForm } from './Form/ServerConfigurationSecurityForm';
 import { ServerConfigurationDriversForm } from './ServerConfigurationDriversForm';
-import style from './ServerConfigurationPage.m.css';
+import style from './ServerConfigurationPage.module.css';
 import { ServerConfigurationService } from './ServerConfigurationService';
 
 export const ServerConfigurationPage: AdministrationItemContentComponent = observer(function ServerConfigurationPage({ configurationWizard }) {

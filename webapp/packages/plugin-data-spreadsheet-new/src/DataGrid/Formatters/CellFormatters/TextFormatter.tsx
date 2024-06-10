@@ -17,7 +17,7 @@ import { EditingContext } from '../../../Editing/EditingContext';
 import type { IEditorRef } from '../../CellEditor';
 import { CellContext } from '../../CellRenderer/CellContext';
 import { TableDataContext } from '../../TableDataContext';
-import styles from './TextFormatter.m.css';
+import styles from './TextFormatter.module.css';
 
 const CellEditor = importLazyComponent(() => import('../../CellEditor').then(module => module.CellEditor));
 

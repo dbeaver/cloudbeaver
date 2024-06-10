@@ -9,9 +9,9 @@ import { observer } from 'mobx-react-lite';
 import { useEffect, useRef } from 'react';
 
 import { s, useS } from '../index';
-import SlideBoxStyles from './SlideBox.m.css';
-import SlideBoxElementStyles from './SlideElement.m.css';
-import SlideBoxOverlayStyles from './SlideOverlay.m.css';
+import SlideBoxStyles from './SlideBox.module.css';
+import SlideBoxElementStyles from './SlideElement.module.css';
+import SlideBoxOverlayStyles from './SlideOverlay.module.css';
 
 interface Props {
   className?: string;

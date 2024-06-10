@@ -1,0 +1,25 @@
+/*
+ * CloudBeaver - Cloud Database Manager
+ * Copyright (C) 2020-2024 DBeaver Corp and others
+ *
+ * Licensed under the Apache License, Version 2.0.
+ * you may not use this file except in compliance with the License.
+ */
+.footerContainer {
+  width: 100%;
+  display: flex;
+  gap: 14px;
+  justify-content: flex-end;
+}
+
+.tablesContainer {
+  padding: 0 24px;
+  display: flex;
+  gap: 24px;
+  height: 100%;
+}
+
+.tableContainer {
+  overflow: auto;
+  flex: 1;
+}

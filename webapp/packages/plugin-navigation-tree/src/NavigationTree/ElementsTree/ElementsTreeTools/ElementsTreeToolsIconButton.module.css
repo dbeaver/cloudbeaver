@@ -1,0 +1,36 @@
+/*
+ * CloudBeaver - Cloud Database Manager
+ * Copyright (C) 2020-2024 DBeaver Corp and others
+ *
+ * Licensed under the Apache License, Version 2.0.
+ * you may not use this file except in compliance with the License.
+ */
+.iconButton {
+  & .icon,
+  & .staticImage {
+    transition: transform 0.3s ease-in-out;
+  }
+
+  &.loading {
+    & .icon,
+    & .staticImage {
+      animation: rotating 1.5s linear infinite;
+    }
+  }
+
+  &.opened {
+    & .icon,
+    & .staticImage {
+      transform: rotate(180deg);
+    }
+  }
+}
+
+@keyframes rotating {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}

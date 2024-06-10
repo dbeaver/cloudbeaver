@@ -13,7 +13,7 @@ import { s } from '../s';
 import { useObjectRef } from '../useObjectRef';
 import { useObservableRef } from '../useObservableRef';
 import { useS } from '../useS';
-import style from './Table.m.css';
+import style from './Table.module.css';
 import { ITableContext, ITableState, TableContext } from './TableContext';
 
 interface Props {
