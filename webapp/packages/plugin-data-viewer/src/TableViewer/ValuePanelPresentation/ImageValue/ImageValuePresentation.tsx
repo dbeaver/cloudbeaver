@@ -13,12 +13,12 @@ import { ActionIconButton, Button, Container, Fill, Loader, s, useS, useSuspense
 import { type TabContainerPanelComponent, useTabLocalState } from '@cloudbeaver/core-ui';
 import { blobToBase64, bytesToSize, throttle } from '@cloudbeaver/core-utils';
 
-import { isResultSetContentValue } from '../../../../DatabaseDataModel/Actions/ResultSet/isResultSetContentValue';
-import type { IDatabaseResultSet } from '../../../../DatabaseDataModel/IDatabaseResultSet';
-import type { IDataValuePanelProps } from '../../DataValuePanelService';
-import { QuotaPlaceholder } from '../QuotaPlaceholder';
+import { isResultSetContentValue } from '../../../DatabaseDataModel/Actions/ResultSet/isResultSetContentValue';
+import type { IDatabaseResultSet } from '../../../DatabaseDataModel/IDatabaseResultSet';
+import type { IDataValuePanelProps } from '../../ValuePanel/DataValuePanelService';
+import { useValuePanelImageValue } from '../../ValuePanel/Presentation/ImageValue/useValuePanelImageValue';
+import { QuotaPlaceholder } from '../../ValuePanel/Presentation/QuotaPlaceholder';
 import styles from './ImageValuePresentation.module.css';
-import { useValuePanelImageValue } from './useValuePanelImageValue';
 
 export const ImageValuePresentation: TabContainerPanelComponent<IDataValuePanelProps<any, IDatabaseResultSet>> = observer(
   function ImageValuePresentation({ model, resultIndex }) {
