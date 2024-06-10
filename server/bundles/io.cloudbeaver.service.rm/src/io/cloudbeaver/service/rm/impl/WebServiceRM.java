@@ -205,13 +205,17 @@ public class WebServiceRM implements DBWServiceRM {
                 webSession,
                 oldResourcePath,
                 WSConstants.EventAction.DELETE,
-                WSResourceProperty.NAME);
+                WSResourceProperty.NAME,
+                newResourcePath
+            );
             WebEventUtils.addRmResourceUpdatedEvent(
                 projectId,
                 webSession,
                 newResourcePath,
                 WSConstants.EventAction.CREATE,
-                WSResourceProperty.NAME);
+                WSResourceProperty.NAME,
+                oldResourcePath
+            );
             return true;
         } catch (Exception e) {
             throw new DBWebException("Error moving resource " + oldResourcePath, e);
