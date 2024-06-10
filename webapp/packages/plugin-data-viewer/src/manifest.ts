@@ -22,12 +22,18 @@ export const dataViewerManifest: PluginManifest = {
     () => import('./TableViewer/TableHeader/TableHeaderService').then(m => m.TableHeaderService),
     () => import('./LocaleService').then(m => m.LocaleService),
     () => import('./TableViewer/ValuePanel/DataValuePanelService').then(m => m.DataValuePanelService),
-    () => import('./TableViewer/ValuePanel/Presentation/TextValue/TextValuePresentationService').then(m => m.TextValuePresentationService),
+    () => import('./TableViewer/ValuePanel/ValuePanelPresentation/TextValue/TextValuePresentationService').then(m => m.TextValuePresentationService),
     () => import('./DataViewerDataChangeConfirmationService').then(m => m.DataViewerDataChangeConfirmationService),
-    () => import('./TableViewer/ValuePanel/Presentation/TextValue/TextValuePresentationBootstrap').then(m => m.TextValuePresentationBootstrap),
-    () => import('./TableViewer/ValuePanel/Presentation/ImageValue/ImageValuePresentationBootstrap').then(m => m.ImageValuePresentationBootstrap),
     () =>
-      import('./TableViewer/ValuePanel/Presentation/BooleanValue/BooleanValuePresentationBootstrap').then(m => m.BooleanValuePresentationBootstrap),
+      import('./TableViewer/ValuePanel/ValuePanelPresentation/TextValue/TextValuePresentationBootstrap').then(m => m.TextValuePresentationBootstrap),
+    () =>
+      import('./TableViewer/ValuePanel/ValuePanelPresentation/ImageValue/ImageValuePresentationBootstrap').then(
+        m => m.ImageValuePresentationBootstrap,
+      ),
+    () =>
+      import('./TableViewer/ValuePanel/ValuePanelPresentation/BooleanValue/BooleanValuePresentationBootstrap').then(
+        m => m.BooleanValuePresentationBootstrap,
+      ),
     () => import('./TableViewer/ValuePanel/DataValuePanelBootstrap').then(m => m.DataValuePanelBootstrap),
     () => import('./DataViewerSettingsService').then(m => m.DataViewerSettingsService),
     () => import('./DataViewerService').then(m => m.DataViewerService),

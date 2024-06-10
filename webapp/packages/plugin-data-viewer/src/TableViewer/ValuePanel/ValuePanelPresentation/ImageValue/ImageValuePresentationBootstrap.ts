@@ -10,8 +10,8 @@ import { ResultDataFormat } from '@cloudbeaver/core-sdk';
 
 import { ResultSetSelectAction } from '../../../../DatabaseDataModel/Actions/ResultSet/ResultSetSelectAction';
 import { ResultSetViewAction } from '../../../../DatabaseDataModel/Actions/ResultSet/ResultSetViewAction';
-import { ImageValuePresentation } from '../../../../ValuePanelPresentation/ImageValue/ImageValuePresentation';
 import { DataValuePanelService } from '../../DataValuePanelService';
+import { ImageValuePresentation } from './ImageValuePresentation';
 import { isImageValuePresentationAvailable } from './isImageValuePresentationAvailable';
 
 @injectable()

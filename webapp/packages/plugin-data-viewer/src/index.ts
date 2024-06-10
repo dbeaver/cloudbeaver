@@ -83,6 +83,6 @@ export * from './ResultSetDataSource';
 export * from './DataPresentationService';
 export * from './DataViewerDataChangeConfirmationService';
 export * from './useDataModel';
-export * from './TableViewer/ValuePanel/Presentation/BooleanValue/isBooleanValuePresentationAvailable';
+export * from './TableViewer/ValuePanel/ValuePanelPresentation/BooleanValue/isBooleanValuePresentationAvailable';
 export * from './DataViewerSettingsService';
 export * from './DATA_EDITOR_SETTINGS_GROUP';
