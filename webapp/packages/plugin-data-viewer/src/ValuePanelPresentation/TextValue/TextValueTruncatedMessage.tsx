@@ -37,6 +37,15 @@ export const TextValueTruncatedMessage = observer<Props>(function TextValueTrunc
   let isTruncated = contentAction.isTextTruncated(elementKey);
   const isCacheLoaded = !!contentAction.retrieveFullTextFromCache(elementKey);
   const limitInfo = elementKey ? contentAction.getLimitInfo(elementKey) : null;
+
+  if (isResultSetBlobValue(contentValue)) {
+    isTruncated ||= contentValue.blob.size > (limitInfo?.limit ?? MAX_BLOB_PREVIEW_SIZE);
+  }
+
+  if (!isTruncated || isCacheLoaded) {
+    return null;
+  }
+
   const isTextColumn = formatAction.isText(elementKey);
   const valueSize =
     isResultSetContentValue(contentValue) && isNotNullDefined(contentValue.contentLength) ? bytesToSize(contentValue.contentLength) : undefined;
@@ -47,14 +56,6 @@ export const TextValueTruncatedMessage = observer<Props>(function TextValueTrunc
     } catch (exception) {
       notificationService.logException(exception as any, 'data_viewer_presentation_value_content_paste_error');
     }
-  }
-
-  if (isResultSetBlobValue(contentValue)) {
-    isTruncated ||= contentValue.blob.size > (limitInfo?.limit ?? MAX_BLOB_PREVIEW_SIZE);
-  }
-
-  if (!isTruncated || isCacheLoaded) {
-    return null;
   }
 
   return (

@@ -20,7 +20,7 @@ import { ResultSetSelectAction } from '../../DatabaseDataModel/Actions/ResultSet
 import type { IDatabaseResultSet } from '../../DatabaseDataModel/IDatabaseResultSet';
 import type { IDataValuePanelProps } from '../../TableViewer/ValuePanel/DataValuePanelService';
 import { getDefaultLineWrapping } from './getDefaultLineWrapping';
-import { preprocessTextValueReadonly } from './preprocessTextValueReadonly';
+import { isTextValueReadonly } from './isTextValueReadonly';
 import styles from './shared/TextValuePresentation.module.css';
 import TextValuePresentationTab from './shared/TextValuePresentationTab.module.css';
 import { TextValueEditor } from './TextValueEditor';
@@ -75,7 +75,7 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
     });
     const autoLineWrapping = getDefaultLineWrapping(contentType);
     const lineWrapping = state.lineWrapping ?? autoLineWrapping;
-    const isReadonly = preprocessTextValueReadonly({ model, resultIndex, contentAction, selectAction, formatAction });
+    const isReadonly = isTextValueReadonly({ model, resultIndex, contentAction, cell: firstSelectedCell, formatAction });
     const canSave = firstSelectedCell && contentAction.isDownloadable(firstSelectedCell);
 
     function valueChangeHandler(newValue: string) {

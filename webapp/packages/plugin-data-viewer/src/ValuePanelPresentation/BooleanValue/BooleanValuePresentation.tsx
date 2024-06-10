@@ -30,7 +30,9 @@ export const BooleanValuePresentation: TabContainerPanelComponent<IDataValuePane
     const formatAction = model.source.getAction(resultIndex, ResultSetFormatAction);
 
     const activeElements = selectAction.getActiveElements();
-    const value = preprocessBooleanValue({ viewAction, selectAction });
+    const firstSelectedCell = activeElements[0];
+    const cellValue = viewAction.getCellValue(firstSelectedCell);
+    const value = preprocessBooleanValue(cellValue);
 
     if (activeElements.length === 0) {
       throw new Error('No active elements');
@@ -40,7 +42,6 @@ export const BooleanValuePresentation: TabContainerPanelComponent<IDataValuePane
       return <TextPlaceholder>{translate('data_viewer_presentation_value_boolean_placeholder')}</TextPlaceholder>;
     }
 
-    const firstSelectedCell = activeElements[0];
     const column = viewAction.getColumn(firstSelectedCell.column);
     const nullable = column?.required === false;
     const readonly = model.isReadonly(resultIndex) || model.isDisabled(resultIndex) || formatAction.isReadOnly(firstSelectedCell);
