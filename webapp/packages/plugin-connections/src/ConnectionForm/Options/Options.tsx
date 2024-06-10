@@ -21,6 +21,7 @@ import {
   GroupTitle,
   InputField,
   Link,
+  ObjectPropertyInfoForm,
   Radio,
   RadioGroup,
   s,
@@ -36,6 +37,7 @@ import { useService } from '@cloudbeaver/core-di';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
 import { DriverConfigurationType } from '@cloudbeaver/core-sdk';
 import { type TabContainerPanelComponent, TabsContext, useAuthenticationAction } from '@cloudbeaver/core-ui';
+import { EMPTY_ARRAY } from '@cloudbeaver/core-utils';
 import { ProjectSelect } from '@cloudbeaver/plugin-projects';
 
 import { ConnectionAuthModelCredentialsForm } from '../ConnectionAuthModelCredentials/ConnectionAuthModelCredentialsForm';
@@ -66,6 +68,10 @@ const driverConfiguration: IDriverConfiguration[] = [
   {
     name: 'URL',
     value: DriverConfigurationType.Url,
+  },
+  {
+    name: 'Custom',
+    value: DriverConfigurationType.Custom,
   },
 ];
 
@@ -141,7 +147,6 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
     providerId: authModel?.requiredAuth ?? info?.requiredAuth ?? AUTH_PROVIDER_LOCAL_ID,
   });
 
-  const isURLConfiguration = config.configurationType === DriverConfigurationType.Url;
   const edit = state.mode === 'edit';
   const originLocal = !info || isLocalConnection(info);
 
@@ -221,7 +226,7 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
                 </>
               )}
             </Container>
-            {isURLConfiguration ? (
+            {config.configurationType === DriverConfigurationType.Url && (
               <InputField
                 type="text"
                 name="url"
@@ -232,7 +237,9 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
               >
                 {translate('customConnection_url_JDBC')}
               </InputField>
-            ) : (
+            )}
+
+            {config.configurationType === DriverConfigurationType.Manual && (
               <ParametersForm
                 config={config}
                 embedded={driver?.embedded}
@@ -240,6 +247,15 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
                 disabled={disabled}
                 readOnly={readonly}
                 originLocal={originLocal}
+              />
+            )}
+
+            {config.configurationType === DriverConfigurationType.Custom && (
+              <ObjectPropertyInfoForm
+                state={config.mainProperties}
+                properties={driver?.mainProperties ?? EMPTY_ARRAY}
+                disabled={disabled}
+                readOnly={readonly}
               />
             )}
           </Group>

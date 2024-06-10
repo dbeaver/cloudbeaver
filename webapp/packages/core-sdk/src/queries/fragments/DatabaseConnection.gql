@@ -17,6 +17,10 @@ fragment DatabaseConnection on ConnectionInfo {
   folder
   nodePath
 
+  mainProperties {
+    ...ObjectPropertyInfo
+  }
+
   configurationType @include(if: $customIncludeOptions)
   useUrl @include(if: $customIncludeOptions)
   host @include(if: $customIncludeOptions)

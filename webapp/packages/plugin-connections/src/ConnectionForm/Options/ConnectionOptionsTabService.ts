@@ -242,6 +242,10 @@ export class ConnectionOptionsTabService extends Bootstrap {
     if (state.info.providerProperties) {
       state.config.providerProperties = { ...state.info.providerProperties };
     }
+
+    if (state.info.mainProperties) {
+      state.config.mainProperties = { ...state.info.mainProperties };
+    }
   }
 
   private configure(data: IConnectionFormState, contexts: IExecutionContextProvider<IConnectionFormState>) {
@@ -357,6 +361,10 @@ export class ConnectionOptionsTabService extends Bootstrap {
           tempConfig.providerProperties[key] = tempConfig.providerProperties[key]?.trim();
         }
       }
+    }
+
+    if (driver.mainProperties.length > 0) {
+      tempConfig.mainProperties = { ...state.config.mainProperties };
     }
 
     runInAction(() => {
