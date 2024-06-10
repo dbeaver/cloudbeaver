@@ -7,10 +7,10 @@
  */
 import { getMIME, isImageFormat, isValidUrl } from '@cloudbeaver/core-utils';
 
-import { isResultSetBinaryValue } from '../../../../DatabaseDataModel/Actions/ResultSet/isResultSetBinaryValue';
-import { isResultSetBlobValue } from '../../../../DatabaseDataModel/Actions/ResultSet/isResultSetBlobValue';
-import { isResultSetContentValue } from '../../../../DatabaseDataModel/Actions/ResultSet/isResultSetContentValue';
-import type { IResultSetValue } from '../../../../DatabaseDataModel/Actions/ResultSet/ResultSetFormatAction';
+import { isResultSetBinaryValue } from '../../DatabaseDataModel/Actions/ResultSet/isResultSetBinaryValue';
+import { isResultSetBlobValue } from '../../DatabaseDataModel/Actions/ResultSet/isResultSetBlobValue';
+import { isResultSetContentValue } from '../../DatabaseDataModel/Actions/ResultSet/isResultSetContentValue';
+import type { IResultSetValue } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetFormatAction';
 
 export function isImageValuePresentationAvailable(value: IResultSetValue) {
   let contentType = null;

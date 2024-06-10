@@ -8,27 +8,27 @@
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { ResultDataFormat } from '@cloudbeaver/core-sdk';
 
-import { ResultSetSelectAction } from '../../../../DatabaseDataModel/Actions/ResultSet/ResultSetSelectAction';
-import { ResultSetViewAction } from '../../../../DatabaseDataModel/Actions/ResultSet/ResultSetViewAction';
-import { DataValuePanelService } from '../../DataValuePanelService';
-import { BooleanValuePresentation } from './BooleanValuePresentation';
-import { isBooleanValuePresentationAvailable } from './isBooleanValuePresentationAvailable';
+import { ResultSetSelectAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetSelectAction';
+import { ResultSetViewAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetViewAction';
+import { DataValuePanelService } from '../../TableViewer/ValuePanel/DataValuePanelService';
+import { ImageValuePresentation } from './ImageValuePresentation';
+import { isImageValuePresentationAvailable } from './isImageValuePresentationAvailable';
 
 @injectable()
-export class BooleanValuePresentationBootstrap extends Bootstrap {
+export class ImageValuePresentationBootstrap extends Bootstrap {
   constructor(private readonly dataValuePanelService: DataValuePanelService) {
     super();
   }
 
-  register(): void {
+  register(): void | Promise<void> {
     this.dataValuePanelService.add({
-      key: 'boolean-presentation',
+      key: 'image-presentation',
       options: { dataFormat: [ResultDataFormat.Resultset] },
-      name: 'boolean',
+      name: 'data_viewer_presentation_value_image_title',
       order: 1,
-      panel: () => BooleanValuePresentation,
+      panel: () => ImageValuePresentation,
       isHidden: (_, context) => {
-        if (!context || !context.model.source.hasResult(context.resultIndex)) {
+        if (!context?.model.source.hasResult(context.resultIndex)) {
           return true;
         }
 
@@ -38,11 +38,12 @@ export class BooleanValuePresentationBootstrap extends Bootstrap {
 
         if (activeElements.length > 0) {
           const view = context.model.source.getAction(context.resultIndex, ResultSetViewAction);
-          const firstSelectedCell = activeElements[0];
-          const cellValue = view.getCellValue(firstSelectedCell);
-          const column = view.getColumn(firstSelectedCell.column);
 
-          return cellValue === undefined || column === undefined || !isBooleanValuePresentationAvailable(cellValue, column);
+          const firstSelectedCell = activeElements[0];
+
+          const cellValue = view.getCellValue(firstSelectedCell);
+
+          return !isImageValuePresentationAvailable(cellValue);
         }
 
         return true;

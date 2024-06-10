@@ -11,7 +11,7 @@ import { useMemo } from 'react';
 import { useService } from '@cloudbeaver/core-di';
 import { EditorLoader, useCodemirrorExtensions } from '@cloudbeaver/plugin-codemirror6';
 
-import { DataViewerService } from '../../../../DataViewerService';
+import { DataViewerService } from '../../DataViewerService';
 import { getTypeExtension } from './getTypeExtension';
 
 interface Props {

@@ -13,17 +13,17 @@ import { useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { download, getMIME, isImageFormat, isValidUrl } from '@cloudbeaver/core-utils';
 
-import { createResultSetBlobValue } from '../../../../DatabaseDataModel/Actions/ResultSet/createResultSetBlobValue';
-import type { IResultSetElementKey } from '../../../../DatabaseDataModel/Actions/ResultSet/IResultSetDataKey';
-import { isResultSetBinaryValue } from '../../../../DatabaseDataModel/Actions/ResultSet/isResultSetBinaryValue';
-import { isResultSetBlobValue } from '../../../../DatabaseDataModel/Actions/ResultSet/isResultSetBlobValue';
-import { isResultSetFileValue } from '../../../../DatabaseDataModel/Actions/ResultSet/isResultSetFileValue';
-import { ResultSetDataContentAction } from '../../../../DatabaseDataModel/Actions/ResultSet/ResultSetDataContentAction';
-import { ResultSetEditAction } from '../../../../DatabaseDataModel/Actions/ResultSet/ResultSetEditAction';
-import { ResultSetFormatAction } from '../../../../DatabaseDataModel/Actions/ResultSet/ResultSetFormatAction';
-import { ResultSetSelectAction } from '../../../../DatabaseDataModel/Actions/ResultSet/ResultSetSelectAction';
-import type { IDatabaseDataModel } from '../../../../DatabaseDataModel/IDatabaseDataModel';
-import type { IDatabaseResultSet } from '../../../../DatabaseDataModel/IDatabaseResultSet';
+import { createResultSetBlobValue } from '../../DatabaseDataModel/Actions/ResultSet/createResultSetBlobValue';
+import type { IResultSetElementKey } from '../../DatabaseDataModel/Actions/ResultSet/IResultSetDataKey';
+import { isResultSetBinaryValue } from '../../DatabaseDataModel/Actions/ResultSet/isResultSetBinaryValue';
+import { isResultSetBlobValue } from '../../DatabaseDataModel/Actions/ResultSet/isResultSetBlobValue';
+import { isResultSetFileValue } from '../../DatabaseDataModel/Actions/ResultSet/isResultSetFileValue';
+import { ResultSetDataContentAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetDataContentAction';
+import { ResultSetEditAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetEditAction';
+import { ResultSetFormatAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetFormatAction';
+import { ResultSetSelectAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetSelectAction';
+import type { IDatabaseDataModel } from '../../DatabaseDataModel/IDatabaseDataModel';
+import type { IDatabaseResultSet } from '../../DatabaseDataModel/IDatabaseResultSet';
 
 interface Props {
   model: IDatabaseDataModel<any, IDatabaseResultSet>;

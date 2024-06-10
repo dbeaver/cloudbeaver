@@ -5,12 +5,12 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { isResultSetBinaryValue } from '../../../../DatabaseDataModel/Actions/ResultSet/isResultSetBinaryValue';
-import { isResultSetBlobValue } from '../../../../DatabaseDataModel/Actions/ResultSet/isResultSetBlobValue';
-import { ResultSetSelectAction } from '../../../../DatabaseDataModel/Actions/ResultSet/ResultSetSelectAction';
-import { ResultSetViewAction } from '../../../../DatabaseDataModel/Actions/ResultSet/ResultSetViewAction';
-import type { IDatabaseDataResult } from '../../../../DatabaseDataModel/IDatabaseDataResult';
-import type { IDataValuePanelProps } from '../../DataValuePanelService';
+import { isResultSetBinaryValue } from '../../DatabaseDataModel/Actions/ResultSet/isResultSetBinaryValue';
+import { isResultSetBlobValue } from '../../DatabaseDataModel/Actions/ResultSet/isResultSetBlobValue';
+import { ResultSetSelectAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetSelectAction';
+import { ResultSetViewAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetViewAction';
+import type { IDatabaseDataResult } from '../../DatabaseDataModel/IDatabaseDataResult';
+import type { IDataValuePanelProps } from '../../TableViewer/ValuePanel/DataValuePanelService';
 
 export function isBlobPresentationAvailable(context: IDataValuePanelProps<any, IDatabaseDataResult> | undefined): boolean {
   if (!context?.model.source.hasResult(context.resultIndex)) {

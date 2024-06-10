@@ -8,7 +8,7 @@
 import { injectable } from '@cloudbeaver/core-di';
 import { ITabInfo, ITabInfoOptions, TabsContainer } from '@cloudbeaver/core-ui';
 
-import type { IDataValuePanelOptions, IDataValuePanelProps } from '../../DataValuePanelService';
+import type { IDataValuePanelOptions, IDataValuePanelProps } from '../../TableViewer/ValuePanel/DataValuePanelService';
 
 @injectable()
 export class TextValuePresentationService {

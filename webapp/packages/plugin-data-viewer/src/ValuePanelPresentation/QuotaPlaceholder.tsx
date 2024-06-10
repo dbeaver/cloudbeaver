@@ -10,10 +10,10 @@ import { observer } from 'mobx-react-lite';
 import { Container, Link, s, usePermission, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import { EAdminPermission } from '@cloudbeaver/core-root';
 
-import type { IResultSetElementKey } from '../../../DatabaseDataModel/Actions/ResultSet/IResultSetDataKey';
-import { ResultSetDataContentAction } from '../../../DatabaseDataModel/Actions/ResultSet/ResultSetDataContentAction';
-import type { IDatabaseDataModel } from '../../../DatabaseDataModel/IDatabaseDataModel';
-import type { IDatabaseResultSet } from '../../../DatabaseDataModel/IDatabaseResultSet';
+import type { IResultSetElementKey } from '../DatabaseDataModel/Actions/ResultSet/IResultSetDataKey';
+import { ResultSetDataContentAction } from '../DatabaseDataModel/Actions/ResultSet/ResultSetDataContentAction';
+import type { IDatabaseDataModel } from '../DatabaseDataModel/IDatabaseDataModel';
+import type { IDatabaseResultSet } from '../DatabaseDataModel/IDatabaseResultSet';
 import styles from './QuotaPlaceholder.module.css';
 
 interface Props {

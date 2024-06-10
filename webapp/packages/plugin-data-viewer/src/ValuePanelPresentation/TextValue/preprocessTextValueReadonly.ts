@@ -5,11 +5,11 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import type { ResultSetDataContentAction } from '../../../../DatabaseDataModel/Actions/ResultSet/ResultSetDataContentAction';
-import type { ResultSetFormatAction } from '../../../../DatabaseDataModel/Actions/ResultSet/ResultSetFormatAction';
-import type { ResultSetSelectAction } from '../../../../DatabaseDataModel/Actions/ResultSet/ResultSetSelectAction';
-import type { IDatabaseDataModel } from '../../../../DatabaseDataModel/IDatabaseDataModel';
-import type { IDatabaseResultSet } from '../../../../DatabaseDataModel/IDatabaseResultSet';
+import type { ResultSetDataContentAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetDataContentAction';
+import type { ResultSetFormatAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetFormatAction';
+import type { ResultSetSelectAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetSelectAction';
+import type { IDatabaseDataModel } from '../../DatabaseDataModel/IDatabaseDataModel';
+import type { IDatabaseResultSet } from '../../DatabaseDataModel/IDatabaseResultSet';
 
 interface Args {
   contentAction: ResultSetDataContentAction;

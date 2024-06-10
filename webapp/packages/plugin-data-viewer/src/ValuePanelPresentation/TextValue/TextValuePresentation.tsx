@@ -13,12 +13,12 @@ import { useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { TabContainerPanelComponent, TabList, TabsState, TabStyles, useTabLocalState } from '@cloudbeaver/core-ui';
 
-import { ResultSetDataContentAction } from '../../../../DatabaseDataModel/Actions/ResultSet/ResultSetDataContentAction';
-import { ResultSetEditAction } from '../../../../DatabaseDataModel/Actions/ResultSet/ResultSetEditAction';
-import { ResultSetFormatAction } from '../../../../DatabaseDataModel/Actions/ResultSet/ResultSetFormatAction';
-import { ResultSetSelectAction } from '../../../../DatabaseDataModel/Actions/ResultSet/ResultSetSelectAction';
-import type { IDatabaseResultSet } from '../../../../DatabaseDataModel/IDatabaseResultSet';
-import type { IDataValuePanelProps } from '../../DataValuePanelService';
+import { ResultSetDataContentAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetDataContentAction';
+import { ResultSetEditAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetEditAction';
+import { ResultSetFormatAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetFormatAction';
+import { ResultSetSelectAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetSelectAction';
+import type { IDatabaseResultSet } from '../../DatabaseDataModel/IDatabaseResultSet';
+import type { IDataValuePanelProps } from '../../TableViewer/ValuePanel/DataValuePanelService';
 import { getDefaultLineWrapping } from './getDefaultLineWrapping';
 import { preprocessTextValueReadonly } from './preprocessTextValueReadonly';
 import styles from './shared/TextValuePresentation.module.css';
