@@ -97,12 +97,9 @@ export class MetadataMap<TKey, TValue> implements Map<TKey, TValue> {
       }
 
       const value = provider(key, this);
+      const isNotPrimitiveValue = typeof value === 'object' && value !== null;
 
-      if (typeof value === 'object' && value !== null) {
-        this.temp.set(key, observable(value));
-      }
-
-      this.temp.set(key, value);
+      this.temp.set(key, isNotPrimitiveValue ? observable(value) : value);
     }
 
     return this.temp.get(key)!;
