@@ -224,7 +224,7 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
         addSubjectPermissionsUpdateEvent(userId, SMSubjectType.user);
     }
 
-    public void addUserTeams(String userId, String[] teamIds, String grantorId) throws DBCException {
+    public void addUserTeams(@NotNull String userId, @NotNull String[] teamIds, @NotNull String grantorId) throws DBCException {
         try (Connection dbCon = database.openConnection()) {
             try (JDBCTransaction txn = new JDBCTransaction(dbCon)) {
                 addUserTeams(dbCon, userId, teamIds, grantorId);
@@ -236,7 +236,7 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
         addSubjectPermissionsUpdateEvent(userId, SMSubjectType.user);
     }
 
-    public void deleteUserTeams(String userId, String[] teamIds) throws DBCException {
+    public void deleteUserTeams(@NotNull String userId, @NotNull String[] teamIds) throws DBCException {
         try (Connection dbCon = database.openConnection()) {
             try (JDBCTransaction txn = new JDBCTransaction(dbCon)) {
                 deleteUserTeams(dbCon, userId, teamIds);
