@@ -223,7 +223,9 @@ public abstract class WebServiceBindingBase<API_TYPE extends DBWService> impleme
                 }
 
                 String projectId = args[objectIdArgumentIndex] == null ? null : String.valueOf(args[objectIdArgumentIndex]);
-                WebProjectImpl project = projectId == null ? null : webSession.getProjectById(projectId);
+                // we should always get the project from the session, even if projectId is null - the active project
+                // will be returned
+                WebProjectImpl project = webSession.getProjectById(projectId);
                 if (project == null) {
                     throw new DBException("Project not found:" + projectId);
                 }
