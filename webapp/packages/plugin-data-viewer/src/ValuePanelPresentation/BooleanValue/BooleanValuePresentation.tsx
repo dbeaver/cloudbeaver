@@ -30,13 +30,14 @@ export const BooleanValuePresentation: TabContainerPanelComponent<IDataValuePane
     const formatAction = model.source.getAction(resultIndex, ResultSetFormatAction);
 
     const activeElements = selectAction.getActiveElements();
+
+    if (activeElements.length === 0) {
+      return <TextPlaceholder>{translate('data_viewer_presentation_value_no_active_elements')}</TextPlaceholder>;
+    }
+
     const firstSelectedCell = activeElements[0];
     const cellValue = viewAction.getCellValue(firstSelectedCell);
     const value = preprocessBooleanValue(cellValue);
-
-    if (activeElements.length === 0) {
-      throw new Error('No active elements');
-    }
 
     if (!isDefined(value)) {
       return <TextPlaceholder>{translate('data_viewer_presentation_value_boolean_placeholder')}</TextPlaceholder>;
