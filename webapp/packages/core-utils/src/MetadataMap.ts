@@ -75,6 +75,8 @@ export class MetadataMap<TKey, TValue> implements Map<TKey, TValue> {
     return this;
   }
 
+  // TODO replace zod schema with just validation callback returning true/false.
+  // In case we use something else than zod
   get(key: TKey, defaultValue?: DefaultValueGetter<TKey, TValue>, schema?: schema.AnyZodObject): TValue {
     const value = this.temp.get(key);
     let invalidate = !this.temp.has(key);
@@ -95,7 +97,9 @@ export class MetadataMap<TKey, TValue> implements Map<TKey, TValue> {
       }
 
       const value = provider(key, this);
-      this.temp.set(key, observable(value as any));
+      const isNotPrimitiveValue = typeof value === 'object' && value !== null;
+
+      this.temp.set(key, isNotPrimitiveValue ? observable(value) : value);
     }
 
     return this.temp.get(key)!;
