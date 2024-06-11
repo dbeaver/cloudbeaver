@@ -21,7 +21,6 @@ import io.cloudbeaver.service.DBWServletContext;
 import jakarta.servlet.http.HttpServlet;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
-import org.jkiss.dbeaver.DBException;
 
 public class CBJettyServletContext implements DBWServletContext {
     private final ServletContextHandler contextHandler;
@@ -31,7 +30,7 @@ public class CBJettyServletContext implements DBWServletContext {
     }
 
     @Override
-    public void addServlet(String servletId, HttpServlet servlet, String mapping) throws DBException {
+    public void addServlet(String servletId, HttpServlet servlet, String mapping) {
         contextHandler.addServlet(new ServletHolder(servletId, servlet), mapping);
     }
 }
