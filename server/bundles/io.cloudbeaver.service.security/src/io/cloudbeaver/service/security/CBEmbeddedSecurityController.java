@@ -300,11 +300,7 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
             teamIds = ArrayUtils.add(String.class, teamIds, defaultUserTeam);
         }
         if (!ArrayUtils.isEmpty(teamIds)) {
-            Set<String> currentUserTeams = new HashSet<>(JDBCUtils.queryStrings(
-                dbCon,
-                database.normalizeTableNames("SELECT TEAM_ID FROM {table_prefix}CB_USER_TEAM WHERE USER_ID=?"),
-                userId
-            ));
+            Set<String> currentUserTeams = getCurrentUserTeams(dbCon, userId);
 
             try (PreparedStatement dbStat = dbCon.prepareStatement(
                 database.normalizeTableNames("INSERT INTO {table_prefix}CB_USER_TEAM" +
@@ -324,7 +320,21 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
         }
     }
 
-    protected void addUserTeams(@NotNull Connection dbCon, String userId, String[] teamIds, String grantorId) throws SQLException {
+    @NotNull
+    private HashSet<String> getCurrentUserTeams(@NotNull Connection dbCon, String userId) throws SQLException {
+        return new HashSet<>(JDBCUtils.queryStrings(
+            dbCon,
+            database.normalizeTableNames("SELECT TEAM_ID FROM {table_prefix}CB_USER_TEAM WHERE USER_ID=?"),
+            userId
+        ));
+    }
+
+    protected void addUserTeams(
+        @NotNull Connection dbCon,
+        @NotNull String userId,
+        @NotNull String[] teamIds,
+        @NotNull String grantorId
+    ) throws SQLException {
         if (ArrayUtils.isEmpty(teamIds)) {
             return;
         }
@@ -334,11 +344,7 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
             teamIds = ArrayUtils.add(String.class, teamIds, defaultUserTeam);
         }
 
-        Set<String> currentUserTeams = new HashSet<>(JDBCUtils.queryStrings(
-            dbCon,
-            database.normalizeTableNames("SELECT TEAM_ID FROM {table_prefix}CB_USER_TEAM WHERE USER_ID=?"),
-            userId
-        ));
+        Set<String> currentUserTeams = getCurrentUserTeams(dbCon, userId);
 
         try (PreparedStatement dbStat = dbCon.prepareStatement(
             database.normalizeTableNames("INSERT INTO {table_prefix}CB_USER_TEAM" +
@@ -357,12 +363,16 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
         }
     }
 
-    protected void deleteUserTeams(@NotNull Connection dbCon, String userId, String[] teamIds) throws SQLException {
-        String deleteUserTeamsSql = "DELETE FROM {table_prefix}CB_USER_TEAM WHERE USER_ID=?";
-
-        if (!ArrayUtils.isEmpty(teamIds)) {
-            deleteUserTeamsSql += " AND TEAM_ID NOT IN (" + SQLUtils.generateParamList(teamIds.length) + ")";
+    protected void deleteUserTeams(
+        @NotNull Connection dbCon,
+        @NotNull String userId,
+        @NotNull String[] teamIds
+    ) throws SQLException {
+        if (ArrayUtils.isEmpty(teamIds)) {
+            return;
         }
+        String deleteUserTeamsSql = "DELETE FROM {table_prefix}CB_USER_TEAM WHERE USER_ID=? " +
+            "AND TEAM_ID NOT IN (" + SQLUtils.generateParamList(teamIds.length) + ")";
 
         try (PreparedStatement dbStat = dbCon.prepareStatement(database.normalizeTableNames(deleteUserTeamsSql))) {
             int index = 1;
