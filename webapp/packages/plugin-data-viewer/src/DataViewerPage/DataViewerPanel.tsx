@@ -8,7 +8,7 @@
 import { observer } from 'mobx-react-lite';
 import { useCallback } from 'react';
 
-import { Loader, TextPlaceholder, useAutoLoad, useTranslate } from '@cloudbeaver/core-blocks';
+import { TextPlaceholder, useAutoLoad, useTranslate } from '@cloudbeaver/core-blocks';
 import type { ObjectPagePanelComponent } from '@cloudbeaver/plugin-object-viewer';
 
 import type { IDataViewerPageState } from '../IDataViewerPageState';
