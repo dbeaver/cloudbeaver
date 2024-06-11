@@ -7,7 +7,7 @@
  */
 import type { ObjectPropertyInfo } from './sdk';
 
-export type ObjectPropertyType = 'checkbox' | 'selector' | 'link' | 'input' | 'textarea' | 'file';
+export type ObjectPropertyType = 'checkbox' | 'selector' | 'link' | 'textarea' | 'file' | 'input' | 'input:number';
 
 export function getObjectPropertyType(property: ObjectPropertyInfo): ObjectPropertyType {
   const dataType = property.dataType?.toLowerCase();
@@ -22,6 +22,8 @@ export function getObjectPropertyType(property: ObjectPropertyInfo): ObjectPrope
     return 'textarea';
   } else if (property.features.includes('file')) {
     return 'file';
+  } else if (dataType === 'integer') {
+    return 'input:number';
   }
 
   return 'input';

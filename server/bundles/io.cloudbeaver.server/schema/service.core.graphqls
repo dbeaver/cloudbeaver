@@ -345,7 +345,7 @@ type ConnectionInfo {
     databaseName: String
     url: String
 
-    mainProperties: [ObjectPropertyInfo!]
+    mainProperties: Object
 
     keepAliveInterval: Int!
 

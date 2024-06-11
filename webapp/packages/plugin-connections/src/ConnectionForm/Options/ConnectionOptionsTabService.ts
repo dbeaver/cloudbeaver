@@ -32,6 +32,7 @@ import { connectionConfigContext } from '../Contexts/connectionConfigContext';
 import { connectionCredentialsStateContext } from '../Contexts/connectionCredentialsStateContext';
 import type { IConnectionFormFillConfigData, IConnectionFormState, IConnectionFormSubmitData } from '../IConnectionFormProps';
 import { getConnectionName } from './getConnectionName';
+import { getDefaultConfigurationType } from './getDefaultConfigurationType';
 
 export const Options = React.lazy(async () => {
   const { Options } = await import('./Options');
@@ -174,10 +175,7 @@ export class ConnectionOptionsTabService extends Bootstrap {
     const driver = await this.dbDriverResource.load(state.config.driverId, ['includeProviderProperties']);
 
     state.config.authModelId = driver?.defaultAuthModel;
-
-    state.config.configurationType = driver?.configurationTypes.includes(DriverConfigurationType.Manual)
-      ? DriverConfigurationType.Manual
-      : DriverConfigurationType.Url;
+    state.config.configurationType = driver ? getDefaultConfigurationType(driver) : DriverConfigurationType.Manual;
 
     state.config.host = driver?.defaultServer || 'localhost';
     state.config.port = driver?.defaultPort;
@@ -203,6 +201,10 @@ export class ConnectionOptionsTabService extends Bootstrap {
 
     if (!state.config.providerProperties || updated) {
       state.config.providerProperties = {};
+    }
+
+    if (!state.config.mainProperties || updated) {
+      state.config.mainProperties = {};
     }
 
     if (!state.info) {
@@ -252,19 +254,6 @@ export class ConnectionOptionsTabService extends Bootstrap {
     const configuration = contexts.getContext(connectionFormConfigureContext);
 
     configuration.include('includeOrigin', 'includeAuthProperties', 'includeCredentialsSaved', 'customIncludeOptions');
-  }
-
-  private getTrimmedPropertiesConfig(authProperties: ObjectPropertyInfo[], credentials: Record<string, any>): Record<string, any> {
-    const trimmedProperties: Record<string, any> = toJS(credentials);
-    for (const property of authProperties) {
-      const value = credentials?.[property.id!];
-
-      if (typeof value === 'string' && value) {
-        trimmedProperties[property.id!] = value?.trim();
-      }
-    }
-
-    return trimmedProperties;
   }
 
   private async prepareConfig({ state }: IConnectionFormSubmitData, contexts: IExecutionContextProvider<IConnectionFormSubmitData>) {
@@ -326,7 +315,7 @@ export class ConnectionOptionsTabService extends Bootstrap {
       const properties = await this.getConnectionAuthModelProperties(tempConfig.authModelId, state.info);
 
       if (this.isCredentialsChanged(properties, state.config.credentials)) {
-        tempConfig.credentials = this.getTrimmedPropertiesConfig(properties, { ...state.config.credentials });
+        tempConfig.credentials = this.prepareDynamicProperties(properties, toJS(state.config.credentials));
       }
 
       if (!tempConfig.saveCredentials) {
@@ -335,41 +324,39 @@ export class ConnectionOptionsTabService extends Bootstrap {
     }
 
     if (driver.providerProperties.length > 0) {
-      const providerProperties: Record<string, any> = { ...state.config.providerProperties };
-
-      for (const providerProperty of driver.providerProperties) {
-        if (!providerProperty.id) {
-          continue;
-        }
-
-        const supported = providerProperty.supportedConfigurationTypes?.some(t => t === tempConfig.configurationType);
-
-        if (!supported) {
-          delete providerProperties[providerProperty.id];
-        } else {
-          const isDefault = isNotNullDefined(providerProperty.defaultValue);
-          if (!(providerProperty.id in providerProperties) && isDefault) {
-            providerProperties[providerProperty.id] = providerProperty.defaultValue;
-          }
-        }
-      }
-
-      tempConfig.providerProperties = providerProperties;
-
-      for (const key of Object.keys(tempConfig.providerProperties)) {
-        if (typeof tempConfig.providerProperties[key] === 'string') {
-          tempConfig.providerProperties[key] = tempConfig.providerProperties[key]?.trim();
-        }
-      }
+      tempConfig.providerProperties = this.prepareDynamicProperties(driver.providerProperties, toJS(state.config.providerProperties));
     }
 
     if (driver.mainProperties.length > 0) {
-      tempConfig.mainProperties = { ...state.config.mainProperties };
+      tempConfig.mainProperties = this.prepareDynamicProperties(driver.mainProperties, toJS(state.config.mainProperties));
     }
 
     runInAction(() => {
       Object.assign(config, tempConfig);
     });
+  }
+
+  private prepareDynamicProperties(propertiesInfo: ObjectPropertyInfo[], properties: Record<string, any>) {
+    const result: Record<string, any> = { ...properties };
+
+    for (const propertyInfo of propertiesInfo) {
+      if (!propertyInfo.id) {
+        continue;
+      }
+
+      const isDefault = isNotNullDefined(propertyInfo.defaultValue);
+      if (!(propertyInfo.id in result) && isDefault) {
+        result[propertyInfo.id] = propertyInfo.defaultValue;
+      }
+    }
+
+    for (const key of Object.keys(result)) {
+      if (typeof result[key] === 'string') {
+        result[key] = result[key]?.trim();
+      }
+    }
+
+    return result;
   }
 
   private async formAuthState(data: IConnectionFormState, contexts: IExecutionContextProvider<IConnectionFormState>) {
@@ -420,6 +407,8 @@ export class ConnectionOptionsTabService extends Bootstrap {
       (config.sharedCredentials !== undefined && config.sharedCredentials !== data.info.sharedCredentials) ||
       (config.providerProperties !== undefined &&
         !isObjectPropertyInfoStateEqual(driver.providerProperties, config.providerProperties, data.info.providerProperties)) ||
+      (config.mainProperties !== undefined &&
+        !isObjectPropertyInfoStateEqual(driver.mainProperties, config.mainProperties, data.info.mainProperties)) ||
       (config.keepAliveInterval !== undefined && !isValuesEqual(config.keepAliveInterval, data.info.keepAliveInterval))
     ) {
       stateContext.markEdited();

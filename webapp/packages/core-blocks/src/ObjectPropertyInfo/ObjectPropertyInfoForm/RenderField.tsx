@@ -6,6 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
+import type { HTMLInputTypeAttribute } from 'react';
 
 import { getObjectPropertyType, type ObjectPropertyInfo, type ObjectPropertyType } from '@cloudbeaver/core-sdk';
 import { removeMetadataFromDataURL } from '@cloudbeaver/core-utils';
@@ -229,11 +230,21 @@ export const RenderField = observer<RenderFieldProps>(function RenderField({
     );
   }
 
+  let type: HTMLInputTypeAttribute = 'text';
+
+  if (controlType === 'input:number') {
+    type = 'number';
+  }
+
+  if (password) {
+    type = 'password';
+  }
+
   if (state !== undefined) {
     return (
       <InputField
         required={required}
-        type={password ? 'password' : 'text'}
+        type={type}
         title={password ? property.description || property.displayName : undefined}
         labelTooltip={property.description || property.displayName}
         name={property.id!}
@@ -257,7 +268,7 @@ export const RenderField = observer<RenderFieldProps>(function RenderField({
   return (
     <InputField
       required={required}
-      type={password ? 'password' : 'text'}
+      type={type}
       title={password ? property.description || property.displayName : undefined}
       labelTooltip={property.description || property.displayName}
       name={property.id!}

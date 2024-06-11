@@ -32,7 +32,7 @@ import {
   useS,
   useTranslate,
 } from '@cloudbeaver/core-blocks';
-import { DatabaseAuthModelsResource, DBDriverResource, isLocalConnection } from '@cloudbeaver/core-connections';
+import { DatabaseAuthModelsResource, DBDriver, DBDriverResource, isLocalConnection } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
 import { DriverConfigurationType } from '@cloudbeaver/core-sdk';
@@ -58,20 +58,24 @@ interface IDriverConfiguration {
   value: DriverConfigurationType;
   description?: string;
   icon?: string;
+  isVisible: (driver: DBDriver) => boolean;
 }
 
 const driverConfiguration: IDriverConfiguration[] = [
   {
     name: 'Manual',
     value: DriverConfigurationType.Manual,
+    isVisible: driver => driver.configurationTypes.includes(DriverConfigurationType.Manual),
   },
   {
     name: 'URL',
     value: DriverConfigurationType.Url,
+    isVisible: driver => driver.configurationTypes.includes(DriverConfigurationType.Url),
   },
   {
     name: 'Custom',
     value: DriverConfigurationType.Custom,
+    isVisible: driver => driver.configurationTypes.includes(DriverConfigurationType.Custom) && driver.mainProperties.length > 0,
   },
 ];
 
@@ -104,7 +108,7 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
   );
 
   const driver = driverMap.data;
-  const configurationTypes = driverConfiguration.filter(conf => driver?.configurationTypes.includes(conf.value));
+  const configurationTypes = driverConfiguration.filter(configuration => driver && configuration.isVisible(driver));
 
   function handleFormChange(value?: unknown, name?: string) {
     if (name !== 'name' && optionsHook.isNameAutoFill()) {
@@ -189,41 +193,25 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
                 {translate('connections_connection_driver')}
               </Combobox>
               {configurationTypes.length > 1 && (
-                <>
-                  {/*<Combobox
-                  name='configurationType'
-                  state={config}
-                  items={configurationTypes}
-                  keySelector={conf => conf.value}
-                  valueSelector={conf => conf.name}
-                  titleSelector={conf => conf.description}
-                  readOnly={readonly || configurationTypes.length < 2}
-                  disabled={disabled}
-                  tiny
-                  fill
-                >
-                  {translate('connections_connection_configuration')}
-              </Combobox>*/}
-                  <FormFieldDescription label={translate('connections_connection_configuration')} tiny>
-                    <Container gap>
-                      <RadioGroup name="configurationType" state={config}>
-                        {driverConfiguration.map(conf => (
-                          <Radio
-                            key={conf.value}
-                            id={conf.value}
-                            value={conf.value}
-                            mod={['primary', 'small']}
-                            readOnly={readonly || configurationTypes.length < 2}
-                            disabled={readonly}
-                            keepSize
-                          >
-                            {conf.name}
-                          </Radio>
-                        ))}
-                      </RadioGroup>
-                    </Container>
-                  </FormFieldDescription>
-                </>
+                <FormFieldDescription label={translate('connections_connection_configuration')} tiny>
+                  <Container gap>
+                    <RadioGroup name="configurationType" state={config}>
+                      {configurationTypes.map(conf => (
+                        <Radio
+                          key={conf.value}
+                          id={conf.value}
+                          value={conf.value}
+                          mod={['primary', 'small']}
+                          readOnly={readonly || configurationTypes.length < 2}
+                          disabled={readonly}
+                          keepSize
+                        >
+                          {conf.name}
+                        </Radio>
+                      ))}
+                    </RadioGroup>
+                  </Container>
+                </FormFieldDescription>
               )}
             </Container>
             {config.configurationType === DriverConfigurationType.Url && (

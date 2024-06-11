@@ -14,6 +14,7 @@ import { DatabaseAuthModel, DriverConfigurationType } from '@cloudbeaver/core-sd
 
 import type { IConnectionFormState } from '../IConnectionFormProps';
 import { getConnectionName } from './getConnectionName';
+import { getDefaultConfigurationType } from './getDefaultConfigurationType';
 
 export function useOptions(state: IConnectionFormState) {
   const dbDriverResource = useService(DBDriverResource);
@@ -71,9 +72,7 @@ export function useOptions(state: IConnectionFormState) {
         refObject.prevDriverId = driver?.id || null;
 
         if (!config.configurationType || !driver?.configurationTypes.includes(config.configurationType)) {
-          config.configurationType = driver?.configurationTypes.includes(DriverConfigurationType.Manual)
-            ? DriverConfigurationType.Manual
-            : DriverConfigurationType.Url;
+          state.config.configurationType = driver ? getDefaultConfigurationType(driver) : DriverConfigurationType.Manual;
         }
 
         if ((!prevDriver && config.host === undefined) || config.host === prevDriver?.defaultServer) {
