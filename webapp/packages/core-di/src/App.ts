@@ -35,7 +35,7 @@ export class App {
     this.isAppServiceBound = false;
 
     this.onStart.addHandler(async ({ restart, preload }) => {
-      if (restart) {
+      if (preload && restart) {
         this.dispose();
       }
       await this.registerServices(preload);
