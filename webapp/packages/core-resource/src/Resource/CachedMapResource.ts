@@ -28,9 +28,8 @@ export type CachedMapResourceListGetter<TValue, TIncludes> = Array<CachedMapReso
 
 export type CachedMapResourceGetter<TValue, TIncludes> = CachedResourceValueIncludes<TValue, TIncludes> | undefined;
 
-export type CachedMapResourceLoader<TRealKey, TKey, TValue, TIncludes> = TRealKey extends ResourceKeyList<TKey>
-  ? Array<CachedResourceValueIncludes<TValue, TIncludes>>
-  : CachedResourceValueIncludes<TValue, TIncludes>;
+export type CachedMapResourceLoader<TRealKey, TKey, TValue, TIncludes> =
+  TRealKey extends ResourceKeyList<TKey> ? Array<CachedResourceValueIncludes<TValue, TIncludes>> : CachedResourceValueIncludes<TValue, TIncludes>;
 
 export const CachedMapAllKey = resourceKeyListAlias('@cached-map-resource/all');
 
@@ -158,8 +157,9 @@ export abstract class CachedMapResource<
       this.dataDelete(this.getKeyRef(key));
     });
     this.metadata.delete(originalKey);
+
     // rewrites pending outdate
-    // this.markUpdated(key);
+    this.markUpdated(key);
   }
 
   async refresh<T extends CachedResourceIncludeArgs<TValue, TContext> = []>(

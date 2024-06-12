@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 export * from './Promises/CancellablePromise';
-export * from './Promises/deferPromise';
+export * from './Promises/cancellableTimeout';
 export * from './Promises/Deferred';
 export * from './Promises/PromiseCancelledError';
 export * from './Promises/PromiseExecutor';
@@ -72,7 +72,6 @@ export * from './createPath';
 export * from './debounce';
 export * from './schema';
 export * from './schemaValidationError';
-export * from './setByPath';
 export * from './svgToDataUri';
 export * from './TempMap';
 export * from './textToHex';
@@ -80,7 +79,6 @@ export * from './uriToBlob';
 export * from './utf8ToBase64';
 export * from './createLastPromiseGetter';
 export * from './removeMetadataFromDataURL';
-export * from './renamePathName';
 export * from './removeLineBreak';
 export * from './replaceSubstring';
 export * from './formatNumber';
