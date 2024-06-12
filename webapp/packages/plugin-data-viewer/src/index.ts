@@ -66,6 +66,7 @@ export * from './DatabaseDataModel/IDatabaseDataSource';
 export * from './DatabaseDataModel/IDatabaseResultSet';
 export * from './DatabaseDataModel/Order';
 export * from './DataViewerService';
+export * from './useDataViewerModel';
 
 // All Services and Components that is provided by this plugin should be exported here
 export * from './TableViewer/TableViewerStorageService';
@@ -82,7 +83,6 @@ export * from './ContainerDataSource';
 export * from './ResultSetDataSource';
 export * from './DataPresentationService';
 export * from './DataViewerDataChangeConfirmationService';
-export * from './useDataModel';
 export * from './ValuePanelPresentation/BooleanValue/isBooleanValuePresentationAvailable';
 export * from './DataViewerSettingsService';
 export * from './DATA_EDITOR_SETTINGS_GROUP';
