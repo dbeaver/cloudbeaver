@@ -368,13 +368,8 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
         @NotNull String userId,
         @NotNull String[] teamIds
     ) throws SQLException {
-        String deleteUserTeamsSql;
-        if (ArrayUtils.isEmpty(teamIds)) {
-            deleteUserTeamsSql = "DELETE FROM {table_prefix}CB_USER_TEAM WHERE USER_ID=? ";
-        } else {
-            deleteUserTeamsSql = "DELETE FROM {table_prefix}CB_USER_TEAM WHERE USER_ID=? " +
-                "AND TEAM_ID NOT IN (" + SQLUtils.generateParamList(teamIds.length) + ")";
-        }
+        String deleteUserTeamsSql = "DELETE FROM {table_prefix}CB_USER_TEAM WHERE USER_ID=? " +
+                "AND TEAM_ID IN (" + SQLUtils.generateParamList(teamIds.length) + ")";
 
         try (PreparedStatement dbStat = dbCon.prepareStatement(database.normalizeTableNames(deleteUserTeamsSql))) {
             int index = 1;

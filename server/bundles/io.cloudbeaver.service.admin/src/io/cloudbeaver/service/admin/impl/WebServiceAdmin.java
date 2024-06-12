@@ -300,7 +300,7 @@ public class WebServiceAdmin implements DBWServiceAdmin {
             List<String> teamIds = Arrays.stream(userTeams).map(SMTeam::getTeamId).collect(Collectors.toList());
             if (teamIds.contains(team)) {
                 teamIds.remove(team);
-                adminSecurityController.deleteUserTeams(user, teamIds.toArray(new String[0]));
+                adminSecurityController.deleteUserTeams(user, new String[]{team});
             } else {
                 throw new DBWebException("User '" + user + "' doesn't have team '" + team + "'");
             }
