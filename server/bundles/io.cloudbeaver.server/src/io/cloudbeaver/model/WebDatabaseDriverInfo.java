@@ -39,6 +39,7 @@ import org.jkiss.dbeaver.runtime.properties.PropertySourceCustom;
 import org.jkiss.utils.CommonUtils;
 
 import java.util.Arrays;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -235,8 +236,17 @@ public class WebDatabaseDriverInfo {
 
     @Property
     public WebPropertyInfo[] getMainProperties() {
-        return Arrays.stream(driver.getMainPropertyDescriptors())
-            .map(p -> new WebPropertyInfo(webSession, p, null))
+        DBPPropertyDescriptor[] properties = driver.getMainPropertyDescriptors();
+        // set default values to main properties
+        Map<String, String> defaultValues = new LinkedHashMap<>();
+        defaultValues.put(DBConstants.PROP_HOST, getDefaultHost());
+        defaultValues.put(DBConstants.PROP_PORT, getDefaultPort());
+        defaultValues.put(DBConstants.PROP_DATABASE, getDefaultDatabase());
+        defaultValues.put(DBConstants.PROP_SERVER, getDefaultServer());
+        PropertySourceCustom propertySource = new PropertySourceCustom(properties, defaultValues);
+
+        return Arrays.stream(properties)
+            .map(p -> new WebPropertyInfo(webSession, p, propertySource))
             .toArray(WebPropertyInfo[]::new);
     }
 
