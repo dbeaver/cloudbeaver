@@ -321,7 +321,7 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
     }
 
     @NotNull
-    private HashSet<String> getCurrentUserTeams(@NotNull Connection dbCon, String userId) throws SQLException {
+    private Set<String> getCurrentUserTeams(@NotNull Connection dbCon, String userId) throws SQLException {
         return new HashSet<>(JDBCUtils.queryStrings(
             dbCon,
             database.normalizeTableNames("SELECT TEAM_ID FROM {table_prefix}CB_USER_TEAM WHERE USER_ID=?"),
@@ -368,17 +368,20 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
         @NotNull String userId,
         @NotNull String[] teamIds
     ) throws SQLException {
+        String deleteUserTeamsSql;
         if (ArrayUtils.isEmpty(teamIds)) {
-            return;
+            deleteUserTeamsSql = "DELETE FROM {table_prefix}CB_USER_TEAM WHERE USER_ID=? ";
+        } else {
+            deleteUserTeamsSql = "DELETE FROM {table_prefix}CB_USER_TEAM WHERE USER_ID=? " +
+                "AND TEAM_ID NOT IN (" + SQLUtils.generateParamList(teamIds.length) + ")";
         }
-        String deleteUserTeamsSql = "DELETE FROM {table_prefix}CB_USER_TEAM WHERE USER_ID=? " +
-            "AND TEAM_ID NOT IN (" + SQLUtils.generateParamList(teamIds.length) + ")";
 
         try (PreparedStatement dbStat = dbCon.prepareStatement(database.normalizeTableNames(deleteUserTeamsSql))) {
             int index = 1;
-            dbStat.setString(index++, userId);
+            dbStat.setString(index, userId);
             for (String teamId : teamIds) {
-                dbStat.setString(index++, teamId);
+                index++;
+                dbStat.setString(index, teamId);
             }
             dbStat.execute();
         }
