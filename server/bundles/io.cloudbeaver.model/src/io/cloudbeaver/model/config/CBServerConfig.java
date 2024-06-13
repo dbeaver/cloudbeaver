@@ -14,13 +14,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.cloudbeaver.server;
+package io.cloudbeaver.model.config;
 
 import com.google.gson.annotations.SerializedName;
 import io.cloudbeaver.auth.CBAuthConstants;
 import io.cloudbeaver.model.app.WebServerConfiguration;
-import io.cloudbeaver.service.security.SMControllerConfiguration;
-import io.cloudbeaver.service.security.db.WebDatabaseConfig;
+import io.cloudbeaver.server.CBConstants;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.utils.CommonUtils;
@@ -65,7 +64,7 @@ public class CBServerConfig implements WebServerConfiguration {
                     hostName = InetAddress.getLocalHost().getHostName();
                 } catch (UnknownHostException e) {
                     log.debug("Error resolving localhost address: " + e.getMessage());
-                    hostName = CBApplication.HOST_LOCALHOST;
+                    hostName = CBConstants.HOST_LOCALHOST;
                 }
             }
             serverURL = "http://" + hostName + ":" + serverPort;

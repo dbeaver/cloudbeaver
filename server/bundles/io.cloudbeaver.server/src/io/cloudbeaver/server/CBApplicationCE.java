@@ -17,6 +17,7 @@
 package io.cloudbeaver.server;
 
 import io.cloudbeaver.auth.NoAuthCredentialsProvider;
+import io.cloudbeaver.model.config.CBServerConfig;
 import io.cloudbeaver.model.rm.local.LocalResourceController;
 import io.cloudbeaver.service.security.CBEmbeddedSecurityController;
 import io.cloudbeaver.service.security.EmbeddedSecurityControllerFactory;

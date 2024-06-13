@@ -16,11 +16,11 @@
  */
 package io.cloudbeaver.model;
 
+import io.cloudbeaver.model.config.PasswordPolicyConfiguration;
 import io.cloudbeaver.registry.WebServiceDescriptor;
 import io.cloudbeaver.registry.WebServiceRegistry;
 import io.cloudbeaver.server.CBApplication;
 import io.cloudbeaver.server.CBPlatform;
-import io.cloudbeaver.service.security.PasswordPolicyConfiguration;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.model.meta.Property;
 import org.jkiss.dbeaver.model.navigator.DBNBrowseSettings;

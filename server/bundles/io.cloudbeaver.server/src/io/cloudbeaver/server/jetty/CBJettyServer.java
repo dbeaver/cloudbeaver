@@ -18,7 +18,7 @@ package io.cloudbeaver.server.jetty;
 
 import io.cloudbeaver.registry.WebServiceRegistry;
 import io.cloudbeaver.server.CBApplication;
-import io.cloudbeaver.server.CBServerConfig;
+import io.cloudbeaver.model.config.CBServerConfig;
 import io.cloudbeaver.server.graphql.GraphQLEndpoint;
 import io.cloudbeaver.server.servlets.CBImageServlet;
 import io.cloudbeaver.server.servlets.CBStaticServlet;

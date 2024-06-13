@@ -22,11 +22,11 @@ import io.cloudbeaver.WebProjectImpl;
 import io.cloudbeaver.WebServiceUtils;
 import io.cloudbeaver.auth.provider.local.LocalAuthProvider;
 import io.cloudbeaver.model.WebPropertyInfo;
+import io.cloudbeaver.model.config.CBAppConfig;
 import io.cloudbeaver.model.session.WebAuthInfo;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.model.user.WebUser;
 import io.cloudbeaver.registry.*;
-import io.cloudbeaver.server.CBAppConfig;
 import io.cloudbeaver.server.CBApplication;
 import io.cloudbeaver.server.CBConstants;
 import io.cloudbeaver.server.CBPlatform;
@@ -42,6 +42,7 @@ import org.jkiss.dbeaver.model.DBPDataSourceContainer;
 import org.jkiss.dbeaver.model.app.DBPDataSourceRegistry;
 import org.jkiss.dbeaver.model.app.DBPProject;
 import org.jkiss.dbeaver.model.auth.AuthInfo;
+import org.jkiss.dbeaver.model.connection.DBPDriver;
 import org.jkiss.dbeaver.model.navigator.DBNBrowseSettings;
 import org.jkiss.dbeaver.model.preferences.DBPPropertyDescriptor;
 import org.jkiss.dbeaver.model.rm.RMProjectType;
@@ -549,7 +550,7 @@ public class WebServiceAdmin implements DBWServiceAdmin {
                 appConfig.setAdminCredentialsSaveEnabled(config.isAdminCredentialsSaveEnabled());
                 appConfig.setEnabledFeatures(config.getEnabledFeatures().toArray(new String[0]));
                 // custom logic for enabling embedded drivers
-                appConfig.updateDisabledDriversConfig(config.getDisabledDrivers());
+                updateDisabledDriversConfig(appConfig, config.getDisabledDrivers());
                 appConfig.setResourceManagerEnabled(config.isResourceManagerEnabled());
 
                 if (CommonUtils.isEmpty(config.getEnabledAuthProviders())) {
@@ -627,6 +628,36 @@ public class WebServiceAdmin implements DBWServiceAdmin {
             throw new DBWebException("Error configuring server", e);
         }
         return true;
+    }
+
+    // we disable embedded drivers by default and enable it in enabled drivers list
+    // that's why we need so complicated logic for disabling drivers
+    private void updateDisabledDriversConfig(CBAppConfig appConfig, String[] disabledDriversConfig) {
+        Set<String> disabledIds = new LinkedHashSet<>(Arrays.asList(disabledDriversConfig));
+        Set<String> enabledIds = new LinkedHashSet<>(Arrays.asList(appConfig.getEnabledDrivers()));
+
+        // remove all disabled embedded drivers from enabled drivers list
+        enabledIds.removeAll(disabledIds);
+
+        // enable embedded driver if it is not in disabled drivers list
+        for (String driverId : appConfig.getDisabledDrivers()) {
+            if (disabledIds.contains(driverId)) {
+                // driver is also disabled
+                continue;
+            }
+            // driver is removed from disabled list
+            // we need to enable if it is embedded
+            try {
+                DBPDriver driver = WebServiceUtils.getDriverById(driverId);
+                if (driver.isEmbedded()) {
+                    enabledIds.add(driverId);
+                }
+            } catch (DBWebException e) {
+                log.error("Failed to find driver by id", e);
+            }
+        }
+        appConfig.setDisabledDrivers(disabledDriversConfig);
+        appConfig.setEnabledDrivers(enabledIds.toArray(String[]::new));
     }
 
     @Override
