@@ -12,7 +12,7 @@ import { ActionIconButton, getComputed, preventFocusHandler, s, useS, useTransla
 import type { ISqlEditorTabState } from '../ISqlEditorTabState';
 import { ESqlDataSourceFeatures } from '../SqlDataSource/ESqlDataSourceFeatures';
 import type { ISQLEditorData } from './ISQLEditorData';
-import style from './SQLEditorActions.m.css';
+import style from './SQLEditorActions.module.css';
 import { SqlEditorActionsMenu } from './SqlEditorActionsMenu';
 import { SqlEditorTools } from './SqlEditorTools';
 
@@ -26,7 +26,7 @@ export const SQLEditorActions = observer<Props>(function SQLEditorActions({ data
   const styles = useS(style);
   const translate = useTranslate();
   const isActiveSegmentMode = getComputed(() => data.activeSegmentMode.activeSegmentMode);
-  const disabled = getComputed(() => data.isLineScriptEmpty || data.isDisabled);
+  const disabled = getComputed(() => data.isScriptEmpty || data.isDisabled);
   const isQuery = data.dataSource?.hasFeature(ESqlDataSourceFeatures.query);
   const isExecutable = data.dataSource?.hasFeature(ESqlDataSourceFeatures.executable);
 

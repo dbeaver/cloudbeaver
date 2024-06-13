@@ -37,7 +37,7 @@ public class WSUserEventHandler<EVENT extends WSAbstractEvent> implements WSEven
             case CLOSE_USER_SESSIONS:
                 if (event instanceof WSUserCloseSessionsEvent closeSessionsEvent) {
                     if (closeSessionsEvent.getSessionIds().isEmpty()) {
-                        sessionManager.closeAllSessions();
+                        sessionManager.closeAllSessions(closeSessionsEvent.getSessionId());
                     } else {
                         sessionManager.closeSessions(closeSessionsEvent.getSessionIds());
                     }

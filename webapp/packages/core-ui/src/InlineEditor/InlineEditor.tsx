@@ -13,7 +13,7 @@ import { useService } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 
 import { EditorDialog } from './EditorDialog';
-import styles from './InlineEditor.m.css';
+import styles from './InlineEditor.module.css';
 
 export type InlineEditorControls = 'right' | 'top' | 'bottom' | 'inside';
 

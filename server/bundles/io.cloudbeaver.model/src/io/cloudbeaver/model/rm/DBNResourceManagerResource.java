@@ -110,8 +110,8 @@ public class DBNResourceManagerResource extends DBNAbstractResourceManagerNode {
     }
 
     @Override
-    public DBNNode[] getChildren(DBRProgressMonitor monitor) throws DBException {
-        if (children == null) {
+    public DBNNode[] getChildren(@NotNull DBRProgressMonitor monitor) throws DBException {
+        if (children == null && !monitor.isForceCacheUsage()) {
             List<DBNResourceManagerResource> rfList = new ArrayList<>();
             for (RMResource resource : getResourceController().listResources(
                 getResourceProject().getId(), getResourceFolder(), null, true, false, false)) {

@@ -18,7 +18,7 @@ import { Loader } from '../Loader/Loader';
 import { useTranslate } from '../localization/useTranslate';
 import { s } from '../s';
 import { useS } from '../useS';
-import comboboxStyles from './Combobox.m.css';
+import comboboxStyles from './Combobox.module.css';
 import { Field } from './Field';
 import { FieldDescription } from './FieldDescription';
 import { FieldLabel } from './FieldLabel';

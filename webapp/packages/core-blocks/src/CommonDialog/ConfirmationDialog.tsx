@@ -17,7 +17,7 @@ import { CommonDialogBody } from './CommonDialog/CommonDialogBody';
 import { CommonDialogFooter } from './CommonDialog/CommonDialogFooter';
 import { CommonDialogHeader } from './CommonDialog/CommonDialogHeader';
 import { CommonDialogWrapper } from './CommonDialog/CommonDialogWrapper';
-import style from './ConfirmationDialog.m.css';
+import style from './ConfirmationDialog.module.css';
 
 export interface ConfirmationDialogPayload {
   icon?: string;

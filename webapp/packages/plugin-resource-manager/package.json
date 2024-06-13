@@ -11,35 +11,36 @@
   "main": "dist/index.js",
   "scripts": {
     "build": "tsc -b",
+    "clean": "rimraf --glob dist",
     "lint": "eslint ./src/ --ext .ts,.tsx",
     "lint-fix": "eslint ./src/ --ext .ts,.tsx --fix",
-    "test": "yarn build && core-cli-test",
+    "test": "core-cli-test",
     "validate-dependencies": "core-cli-validate-dependencies",
-    "update-ts-references": "rimraf --glob dist && typescript-resolve-references"
+    "update-ts-references": "yarn run clean && typescript-resolve-references"
   },
   "dependencies": {
-    "@cloudbeaver/core-authentication": "~0.1.0",
-    "@cloudbeaver/core-di": "~0.1.0",
-    "@cloudbeaver/core-localization": "~0.1.0",
-    "@cloudbeaver/core-projects": "~0.1.0",
-    "@cloudbeaver/core-resource": "~0.1.0",
-    "@cloudbeaver/core-resource-manager": "~0.1.0",
-    "@cloudbeaver/core-root": "~0.1.0",
-    "@cloudbeaver/core-sdk": "~0.1.0",
-    "@cloudbeaver/core-settings": "~0.1.0",
-    "@cloudbeaver/core-utils": "~0.1.0",
-    "mobx": "^6.12.0"
+    "@cloudbeaver/core-authentication": "^0",
+    "@cloudbeaver/core-di": "^0",
+    "@cloudbeaver/core-localization": "^0",
+    "@cloudbeaver/core-projects": "^0",
+    "@cloudbeaver/core-resource": "^0",
+    "@cloudbeaver/core-resource-manager": "^0",
+    "@cloudbeaver/core-root": "^0",
+    "@cloudbeaver/core-sdk": "^0",
+    "@cloudbeaver/core-settings": "^0",
+    "@cloudbeaver/core-utils": "^0",
+    "mobx": "^6"
   },
   "peerDependencies": {},
   "devDependencies": {
-    "@cloudbeaver/core-client-activity": "~0.1.0",
-    "@cloudbeaver/core-localization": "~0.1.0",
-    "@cloudbeaver/core-root": "~0.1.0",
-    "@cloudbeaver/core-sdk": "~0.1.0",
-    "@cloudbeaver/core-settings": "~0.1.0",
-    "@cloudbeaver/tests-runner": "~0.1.0",
-    "@testing-library/jest-dom": "^6.4.2",
-    "@types/jest": "^29.5.12",
-    "typescript": "^5.3.3"
+    "@cloudbeaver/core-client-activity": "^0",
+    "@cloudbeaver/core-localization": "^0",
+    "@cloudbeaver/core-root": "^0",
+    "@cloudbeaver/core-sdk": "^0",
+    "@cloudbeaver/core-settings": "^0",
+    "@cloudbeaver/tests-runner": "^0",
+    "@testing-library/jest-dom": "^6",
+    "@types/jest": "^29",
+    "typescript": "^5"
   }
 }

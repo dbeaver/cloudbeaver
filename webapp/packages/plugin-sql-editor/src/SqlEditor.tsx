@@ -13,7 +13,7 @@ import { CaptureView } from '@cloudbeaver/core-view';
 
 import type { ISqlEditorTabState } from './ISqlEditorTabState';
 import { SqlDataSourceService } from './SqlDataSource/SqlDataSourceService';
-import style from './SqlEditor.m.css';
+import style from './SqlEditor.module.css';
 import { SqlEditorLoader } from './SqlEditor/SqlEditorLoader';
 import { SqlEditorOpenOverlay } from './SqlEditorOpenOverlay';
 import { SqlEditorOverlay } from './SqlEditorOverlay';

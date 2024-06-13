@@ -16,7 +16,7 @@ import { EditingContext } from '../../../Editing/EditingContext';
 import { CellContext } from '../../CellRenderer/CellContext';
 import { DataGridContext } from '../../DataGridContext';
 import { TableDataContext } from '../../TableDataContext';
-import style from './BooleanFormatter.m.css';
+import style from './BooleanFormatter.module.css';
 
 export const BooleanFormatter = observer<RenderCellProps<IResultSetRowKey>>(function BooleanFormatter({ column, row }) {
   const context = useContext(DataGridContext);

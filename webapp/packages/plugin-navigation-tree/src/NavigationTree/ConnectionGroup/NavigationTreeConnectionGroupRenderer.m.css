@@ -1,8 +1,0 @@
-.connectionGroup {
-  composes: theme-text-text-hint-on-light theme-typography--caption from global;
-  padding: 4px 12px;
-
-  &:not(:first-child) {
-    margin-top: 8px;
-  }
-}

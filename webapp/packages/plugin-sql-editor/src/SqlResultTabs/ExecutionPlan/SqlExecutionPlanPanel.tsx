@@ -14,7 +14,7 @@ import { useService } from '@cloudbeaver/core-di';
 import type { IExecutionPlanTab } from '../../ISqlEditorTabState';
 import { ExecutionPlanTreeBlock } from './ExecutionPlanTreeBlock';
 import { PropertiesPanel } from './PropertiesPanel/PropertiesPanel';
-import style from './SqlExecutionPlanPanel.m.css';
+import style from './SqlExecutionPlanPanel.module.css';
 import { SqlExecutionPlanService } from './SqlExecutionPlanService';
 
 interface Props {

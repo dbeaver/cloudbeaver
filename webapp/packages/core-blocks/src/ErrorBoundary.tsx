@@ -11,7 +11,7 @@ import { errorOf, LoadingError } from '@cloudbeaver/core-utils';
 
 import { Button } from './Button';
 import { DisplayError } from './DisplayError';
-import style from './ErrorBoundary.m.css';
+import style from './ErrorBoundary.module.css';
 import { ErrorContext, IExceptionContext } from './ErrorContext';
 import { ExceptionMessage } from './ExceptionMessage';
 

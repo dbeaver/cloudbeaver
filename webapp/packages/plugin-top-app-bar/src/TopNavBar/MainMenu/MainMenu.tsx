@@ -13,7 +13,7 @@ import { useService } from '@cloudbeaver/core-di';
 import { MenuBar } from '@cloudbeaver/core-ui';
 import { useMenu } from '@cloudbeaver/core-view';
 
-import style from '../shared/TopMenuWrapper.m.css';
+import style from '../shared/TopMenuWrapper.module.css';
 import { MENU_APP_ACTIONS } from './MENU_APP_ACTIONS';
 
 export const MainMenu = observer(function MainMenu() {

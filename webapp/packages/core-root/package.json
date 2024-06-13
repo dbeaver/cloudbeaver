@@ -11,30 +11,31 @@
   "main": "dist/index.js",
   "scripts": {
     "build": "tsc -b",
+    "clean": "rimraf --glob dist",
     "lint": "eslint ./src/ --ext .ts,.tsx",
     "lint-fix": "eslint ./src/ --ext .ts,.tsx --fix",
     "validate-dependencies": "core-cli-validate-dependencies",
-    "update-ts-references": "rimraf --glob dist && typescript-resolve-references"
+    "update-ts-references": "yarn run clean && typescript-resolve-references"
   },
   "dependencies": {
-    "@cloudbeaver/core-client-activity": "~0.1.0",
-    "@cloudbeaver/core-di": "~0.1.0",
-    "@cloudbeaver/core-executor": "~0.1.0",
-    "@cloudbeaver/core-localization": "~0.1.0",
-    "@cloudbeaver/core-product": "~0.1.0",
-    "@cloudbeaver/core-resource": "~0.1.0",
-    "@cloudbeaver/core-sdk": "~0.1.0",
-    "@cloudbeaver/core-settings": "~0.1.0",
-    "@cloudbeaver/core-utils": "~0.1.0",
-    "mobx": "^6.12.0",
-    "rxjs": "^7.8.1"
+    "@cloudbeaver/core-client-activity": "^0",
+    "@cloudbeaver/core-di": "^0",
+    "@cloudbeaver/core-executor": "^0",
+    "@cloudbeaver/core-localization": "^0",
+    "@cloudbeaver/core-product": "^0",
+    "@cloudbeaver/core-resource": "^0",
+    "@cloudbeaver/core-sdk": "^0",
+    "@cloudbeaver/core-settings": "^0",
+    "@cloudbeaver/core-utils": "^0",
+    "mobx": "^6",
+    "rxjs": "^7"
   },
   "peerDependencies": {},
   "devDependencies": {
-    "@cloudbeaver/core-sdk": "~0.1.0",
-    "@cloudbeaver/tests-runner": "~0.1.0",
-    "@types/jest": "^29.5.12",
-    "msw": "^2.2.2",
-    "typescript": "^5.3.3"
+    "@cloudbeaver/core-sdk": "^0",
+    "@cloudbeaver/tests-runner": "^0",
+    "@types/jest": "^29",
+    "msw": "^2",
+    "typescript": "^5"
   }
 }

@@ -12,7 +12,7 @@ import { TableViewerLoader } from '@cloudbeaver/plugin-data-viewer';
 
 import type { IResultTab, ISqlEditorTabState } from '../ISqlEditorTabState';
 import { SqlQueryResultService } from './SqlQueryResultService';
-import style from './SqlResultSetPanel.m.css';
+import style from './SqlResultSetPanel.module.css';
 
 interface Props {
   state: ISqlEditorTabState;

@@ -11,21 +11,23 @@
   "main": "dist/index.js",
   "scripts": {
     "build": "tsc -b",
+    "clean": "rimraf --glob dist",
     "lint": "eslint ./src/ --ext .ts,.tsx",
     "lint-fix": "eslint ./src/ --ext .ts,.tsx --fix",
-    "test": "yarn build && core-cli-test",
+    "test": "core-cli-test",
     "validate-dependencies": "core-cli-validate-dependencies",
-    "update-ts-references": "rimraf --glob dist && typescript-resolve-references"
+    "update-ts-references": "yarn run clean && typescript-resolve-references"
   },
   "dependencies": {
-    "@cloudbeaver/core-executor": "~0.1.0",
-    "inversify": "^6.0.2",
-    "react": "^18.2.0"
+    "@cloudbeaver/core-executor": "^0",
+    "inversify": "^6",
+    "mobx": "^6",
+    "react": "^18"
   },
   "peerDependencies": {},
   "devDependencies": {
-    "@types/jest": "^29.5.12",
-    "@types/react": "^18.2.63",
-    "typescript": "^5.3.3"
+    "@types/jest": "^29",
+    "@types/react": "^18",
+    "typescript": "^5"
   }
 }

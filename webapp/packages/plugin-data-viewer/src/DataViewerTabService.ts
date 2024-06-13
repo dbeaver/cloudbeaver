@@ -16,8 +16,8 @@ import { DBObjectPageService, IObjectViewerTabState, isObjectViewerTab, ObjectPa
 
 import { DataViewerPanel } from './DataViewerPage/DataViewerPanel';
 import { DataViewerTab } from './DataViewerPage/DataViewerTab';
-import { DataViewerTableService } from './DataViewerTableService';
 import type { IDataViewerPageState } from './IDataViewerPageState';
+import { TableViewerStorageService } from './TableViewer/TableViewerStorageService';
 
 @injectable()
 export class DataViewerTabService {
@@ -25,13 +25,13 @@ export class DataViewerTabService {
 
   constructor(
     private readonly navNodeManagerService: NavNodeManagerService,
-    private readonly dataViewerTableService: DataViewerTableService,
     private readonly objectViewerTabService: ObjectViewerTabService,
     private readonly dbObjectPageService: DBObjectPageService,
     private readonly notificationService: NotificationService,
     private readonly connectionsManagerService: ConnectionsManagerService,
     private readonly navigationTabsService: NavigationTabsService,
     private readonly connectionInfoResource: ConnectionInfoResource,
+    private readonly tableViewerStorageService: TableViewerStorageService,
   ) {
     this.page = this.dbObjectPageService.register({
       key: 'data_viewer_data',
@@ -103,7 +103,7 @@ export class DataViewerTabService {
   }
 
   private async handleTabCanClose(tab: ITab<IObjectViewerTabState>): Promise<boolean> {
-    const model = this.dataViewerTableService.get(tab.handlerState.tableId || '');
+    const model = this.tableViewerStorageService.get(tab.handlerState.tableId || '');
 
     if (model) {
       let canClose = false;
@@ -119,9 +119,16 @@ export class DataViewerTabService {
     return true;
   }
 
-  private handleTabClose(tab: ITab<IObjectViewerTabState>) {
-    if (tab.handlerState.tableId) {
-      this.dataViewerTableService.removeTableModel(tab.handlerState.tableId);
+  private async handleTabClose(tab: ITab<IObjectViewerTabState>) {
+    const tableId = tab.handlerState.tableId;
+
+    if (tableId) {
+      const model = this.tableViewerStorageService.get(tableId);
+
+      if (model) {
+        this.tableViewerStorageService.remove(tableId);
+        await model.dispose();
+      }
     }
   }
 }

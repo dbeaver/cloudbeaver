@@ -18,7 +18,7 @@ import { MENU_NAV_TREE, useNode } from '@cloudbeaver/plugin-navigation-tree';
 import type { RenderCellProps } from '@cloudbeaver/plugin-react-data-grid';
 
 import { getValue } from '../../helpers';
-import classes from './CellFormatter.m.css';
+import classes from './CellFormatter.module.css';
 import { TableContext } from './TableContext';
 
 interface Props {
@@ -61,7 +61,7 @@ export const Menu = observer<Props>(function Menu({ value, node }) {
   return (
     <div ref={mouse.reference} className={s(styles, { container: true, empty: menuEmpty })} onDoubleClick={openNode}>
       <div className={classes.box}>
-        <div className={s(styles, { value: true }, 'cell-formatter__value')} title={value}>
+        <div className={s(styles, { value: true, cellValue: true })} title={value}>
           {value}
         </div>
         {!menuEmpty && (
@@ -90,8 +90,8 @@ export const CellFormatter = observer<RenderCellProps<DBObject>>(function CellFo
   const value = property ? getValue(property.value) : '';
 
   return (
-    <div className="cell-formatter" title={value}>
-      {columnIdx === 0 && !!node ? <Menu node={node} value={value} /> : <span className="cell-formatter__value">{value}</span>}
+    <div className={classes.cell} title={value}>
+      {columnIdx === 0 && !!node ? <Menu node={node} value={value} /> : <span className={classes.cellValue}>{value}</span>}
     </div>
   );
 });

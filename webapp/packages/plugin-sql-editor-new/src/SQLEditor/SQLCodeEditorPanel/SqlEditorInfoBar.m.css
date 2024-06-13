@@ -1,9 +1,0 @@
-.container {
-  display: flex;
-  align-items: center;
-  padding: 0 6px;
-}
-.info {
-  composes: theme-typography--caption from global;
-  margin-left: auto;
-}

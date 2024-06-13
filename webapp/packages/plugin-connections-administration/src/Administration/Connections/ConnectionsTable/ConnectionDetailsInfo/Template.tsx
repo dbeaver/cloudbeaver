@@ -10,7 +10,7 @@ import { observer } from 'mobx-react-lite';
 import { PlaceholderComponent, s, StaticImage, useS } from '@cloudbeaver/core-blocks';
 
 import type { IConnectionDetailsPlaceholderProps } from '../../ConnectionsAdministrationService';
-import ConnectionDetailsStyles from './ConnectionDetailsStyles.m.css';
+import ConnectionDetailsStyles from './ConnectionDetailsStyles.module.css';
 
 export const Template: PlaceholderComponent<IConnectionDetailsPlaceholderProps> = observer(function Template({ connection }) {
   const style = useS(ConnectionDetailsStyles);

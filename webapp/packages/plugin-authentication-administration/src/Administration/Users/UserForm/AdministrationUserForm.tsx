@@ -13,7 +13,7 @@ import { NotificationService } from '@cloudbeaver/core-events';
 import { FormMode, IFormState, TabList, TabPanelList, TabsState } from '@cloudbeaver/core-ui';
 import { getFirstException } from '@cloudbeaver/core-utils';
 
-import style from './AdministrationUserForm.m.css';
+import style from './AdministrationUserForm.module.css';
 import { AdministrationUserFormDeleteButton } from './AdministrationUserFormDeleteButton';
 import { AdministrationUserFormService, IUserFormState } from './AdministrationUserFormService';
 import { DATA_CONTEXT_USER_FORM_INFO_PART } from './Info/DATA_CONTEXT_USER_FORM_INFO_PART';
