@@ -7,27 +7,26 @@
  */
 import { action, makeObservable, observable } from 'mobx';
 
-import { MetadataMap } from '@cloudbeaver/core-utils';
-
 import type { DataContextGetter } from './DataContextGetter';
-import type { DeleteVersionedContextCallback, IDataContext } from './IDataContext';
+import type { IDataContext } from './IDataContext';
 import type { IDataContextProvider } from './IDataContextProvider';
 
+const NOT_FOUND = Symbol('not found');
+
 export class DataContext implements IDataContext {
-  readonly map: Map<DataContextGetter<any>, any>;
-  private readonly versions: MetadataMap<DataContextGetter<any>, number>;
-  fallback?: IDataContextProvider;
+  private readonly store: Map<DataContextGetter<unknown>, Map<string, unknown>>;
+  private fallback?: IDataContextProvider;
 
   constructor(fallback?: IDataContextProvider) {
-    this.map = new Map();
-    this.versions = new MetadataMap(() => 0);
+    this.store = new Map();
     this.fallback = fallback;
 
-    makeObservable<this, 'map'>(this, {
+    makeObservable<this, 'store' | 'fallback'>(this, {
       set: action,
       delete: action,
       clear: action,
-      map: observable.shallow,
+      deleteForId: action,
+      store: observable.shallow,
       fallback: observable.ref,
     });
   }
@@ -37,119 +36,121 @@ export class DataContext implements IDataContext {
   }
 
   hasOwn(context: DataContextGetter<any>): boolean {
-    return this.map.has(context);
+    return this.store.has(context);
   }
 
-  has(context: DataContextGetter<any>, nested = true): boolean {
+  has(context: DataContextGetter<any>): boolean {
     if (this.hasOwn(context)) {
       return true;
     }
 
-    if (nested && this.fallback?.has(context)) {
+    if (this.fallback?.has(context)) {
       return true;
     }
 
     return false;
   }
 
-  hasValue<T>(context: DataContextGetter<T>, value: T, nested = true): boolean {
-    // eslint-disable-next-line @typescript-eslint/no-this-alias
-    let provider: IDataContextProvider = this;
+  hasOwnValue<T>(context: DataContextGetter<T>, value: T): boolean {
+    return this.getOwn(context) === value;
+  }
 
-    while (true) {
-      if (provider.getOwn(context) === value) {
-        return true;
-      }
-
-      if (provider.fallback && nested) {
-        provider = provider.fallback;
-      } else {
-        return false;
-      }
-    }
+  hasValue<T>(context: DataContextGetter<T>, value: T): boolean {
+    return this.hasOwnValue(context, value) || this.fallback?.hasOwnValue(context, value) || false;
   }
 
   find<T>(context: DataContextGetter<T>, predicate: (value: T) => boolean): T | undefined {
-    // eslint-disable-next-line @typescript-eslint/no-this-alias
-    let provider: IDataContextProvider = this;
+    const value = this.internalGet(context);
 
-    while (true) {
-      if (provider.hasOwn(context)) {
-        const value = provider.getOwn(context)!;
-
-        if (predicate(value)) {
-          return value;
-        }
-      }
-
-      if (provider.fallback) {
-        provider = provider.fallback;
-      } else {
-        return undefined;
-      }
+    if (value !== NOT_FOUND && predicate(value)) {
+      return value;
     }
+
+    if (this.fallback) {
+      return this.fallback.find(context, predicate);
+    }
+
+    return undefined;
   }
 
-  set<T>(context: DataContextGetter<T>, value: T): DeleteVersionedContextCallback {
-    const data = this.getOwn(context);
-    let version = this.versions.get(context);
+  set<T>(context: DataContextGetter<T>, value: T, id: string): this {
+    let data = this.store.get(context);
 
-    if (data === value) {
-      return this.delete.bind(this, context, version);
+    if (!data) {
+      data = observable(new Map(), { deep: false });
+      this.store.set(context, data);
     }
 
-    version++;
-    this.map.set(context, value);
-    this.versions.set(context, version);
-
-    return this.delete.bind(this, context, version);
+    data.set(id, value);
+    return this;
   }
 
-  delete(context: DataContextGetter<any>, version?: number): this {
-    if (version !== this.versions.get(context)) {
-      return this;
+  delete(context: DataContextGetter<any>, id?: string): this {
+    if (id) {
+      const data = this.store.get(context);
+      data?.delete(id);
+
+      if (data?.size) {
+        return this;
+      }
+    }
+    this.store.delete(context);
+
+    return this;
+  }
+
+  deleteForId(id: string): this {
+    const ids = new Set<DataContextGetter<unknown>>();
+    for (const [context, data] of this.store) {
+      data.delete(id);
+
+      if (data.size === 0) {
+        ids.add(context);
+      }
     }
 
-    this.map.delete(context);
+    for (const context of ids) {
+      this.store.delete(context);
+    }
 
     return this;
   }
 
   getOwn<T>(context: DataContextGetter<T>): T | undefined {
-    return this.map.get(context);
-  }
+    const value = this.internalGet(context);
 
-  get<T>(context: DataContextGetter<T>): T {
-    if (!this.hasOwn(context)) {
-      const defaultValue = context(this);
-
-      if (defaultValue !== undefined) {
-        this.set(context, defaultValue);
-        return defaultValue;
-      }
-
-      if (this.fallback) {
-        return this.fallback.get(context);
-      }
-
-      throw new Error("Context doesn't exists");
+    if (value === NOT_FOUND) {
+      return undefined;
     }
 
-    return this.getOwn(context)!;
+    return value;
   }
 
-  tryGet<T>(context: DataContextGetter<T>): T | undefined {
-    if (!this.map.has(context)) {
-      if (this.fallback) {
-        return this.fallback.tryGet(context);
-      }
+  get<T>(context: DataContextGetter<T>): T | undefined {
+    const value = this.internalGet(context);
+
+    if (value === NOT_FOUND && this.fallback) {
+      return this.fallback.get(context);
     }
 
-    return this.getOwn(context);
+    if (value === NOT_FOUND) {
+      return undefined;
+    }
+
+    return value;
   }
 
   clear(): void {
-    this.map.clear();
-    this.versions.clear();
+    this.store.clear();
+  }
+
+  private internalGet<T>(context: DataContextGetter<T>): T | typeof NOT_FOUND {
+    const data = this.store.get(context);
+
+    if (data?.size) {
+      return [...data.values()][data.size - 1] as T;
+    }
+
+    return NOT_FOUND;
   }
 }
