@@ -9,7 +9,7 @@ import { observer } from 'mobx-react-lite';
 import { useContext, useState } from 'react';
 
 import { s, useS, useTranslate } from '@cloudbeaver/core-blocks';
-import { useDataContext } from '@cloudbeaver/core-data-context';
+import { useDataContext, useDataContextLink } from '@cloudbeaver/core-data-context';
 import { useTabLocalState } from '@cloudbeaver/core-ui';
 import { CaptureViewContext } from '@cloudbeaver/core-view';
 import { DataPresentationComponent, IDatabaseResultSet, TableViewerLoader } from '@cloudbeaver/plugin-data-viewer';
@@ -48,7 +48,9 @@ export const DVResultSetGroupingPresentation: DataPresentationComponent<any, IDa
 
   const grouping = useGroupingData(state);
 
-  context.set(DATA_CONTEXT_DV_DDM_RS_GROUPING, grouping);
+  useDataContextLink(context, (context, id) => {
+    context.set(DATA_CONTEXT_DV_DDM_RS_GROUPING, grouping, id);
+  });
 
   return (
     <>
@@ -58,7 +60,7 @@ export const DVResultSetGroupingPresentation: DataPresentationComponent<any, IDa
           throwBox: true,
           showDropOutside: dnd.dndThrowBox.state.canDrop,
           active: dnd.dndThrowBox.state.canDrop,
-          over: dnd.dndThrowBox.state.isOver,
+          over: dnd.dndThrowBox.state.isOver, // todo: this style doesn't exist
         })}
       />
       <div

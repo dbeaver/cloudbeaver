@@ -59,14 +59,14 @@ export function useGroupingDnDColumns(
 
   const dndBox = useDNDBox({
     canDrop: context => {
-      const model = context.tryGet(DATA_CONTEXT_DV_DDM);
+      const model = context.get(DATA_CONTEXT_DV_DDM);
 
       return context.has(DATA_CONTEXT_DV_DDM_RS_COLUMN_KEY) && model === sourceModel;
     },
     onDrop: async context => {
-      const model = context.get(DATA_CONTEXT_DV_DDM);
-      const resultIndex = context.get(DATA_CONTEXT_DV_DDM_RESULT_INDEX);
-      const columnKey = context.get(DATA_CONTEXT_DV_DDM_RS_COLUMN_KEY);
+      const model = context.get(DATA_CONTEXT_DV_DDM)!;
+      const resultIndex = context.get(DATA_CONTEXT_DV_DDM_RESULT_INDEX)!;
+      const columnKey = context.get(DATA_CONTEXT_DV_DDM_RS_COLUMN_KEY)!;
 
       dropItem(model, resultIndex, columnKey, false);
     },
@@ -74,14 +74,14 @@ export function useGroupingDnDColumns(
 
   const dndThrowBox = useDNDBox({
     canDrop: context => {
-      const model = context.tryGet(DATA_CONTEXT_DV_DDM);
+      const model = context.get(DATA_CONTEXT_DV_DDM);
 
       return context.has(DATA_CONTEXT_DV_DDM_RS_COLUMN_KEY) && model?.id === groupingModel.model.id;
     },
     onDrop: async context => {
-      const model = context.get(DATA_CONTEXT_DV_DDM);
-      const resultIndex = context.get(DATA_CONTEXT_DV_DDM_RESULT_INDEX);
-      const columnKey = context.get(DATA_CONTEXT_DV_DDM_RS_COLUMN_KEY);
+      const model = context.get(DATA_CONTEXT_DV_DDM)!;
+      const resultIndex = context.get(DATA_CONTEXT_DV_DDM_RESULT_INDEX)!;
+      const columnKey = context.get(DATA_CONTEXT_DV_DDM_RS_COLUMN_KEY)!;
 
       dropItem(model, resultIndex, columnKey, true);
     },

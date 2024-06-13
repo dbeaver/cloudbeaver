@@ -9,6 +9,7 @@ import { observer } from 'mobx-react-lite';
 import { forwardRef, useCallback } from 'react';
 
 import { getComputed, MenuSeparator, MenuSeparatorStyles, s, SContext, StyleRegistry, useAutoLoad, useS } from '@cloudbeaver/core-blocks';
+import { useDataContextLink } from '@cloudbeaver/core-data-context';
 import {
   DATA_CONTEXT_MENU_NESTED,
   DATA_CONTEXT_SUBMENU_ITEM,
@@ -150,16 +151,19 @@ interface ISubMenuItemProps {
   rtl?: boolean;
 }
 
-const SubMenuItem = observer<ISubMenuItemProps>(function SubmenuItem({ item, menuData, nestedMenuSettings, className, rtl }) {
+const SubMenuItem = observer<ISubMenuItemProps>(function SubMenuItem({ item, menuData, nestedMenuSettings, className, rtl }) {
   const subMenuData = useMenu({ menu: item.menu, context: menuData.context });
 
-  subMenuData.context.set(DATA_CONTEXT_MENU_NESTED, true);
-  subMenuData.context.set(DATA_CONTEXT_SUBMENU_ITEM, item);
+  useDataContextLink(subMenuData.context, (context, id) => {
+    subMenuData.context.set(DATA_CONTEXT_MENU_NESTED, true, id);
+    subMenuData.context.set(DATA_CONTEXT_SUBMENU_ITEM, item, id);
+  });
 
   const handler = subMenuData.handler;
   const hideIfEmpty = handler?.hideIfEmpty?.(subMenuData.context) ?? true;
   const hidden = getComputed(() => subMenuData.items.every(item => item.hidden));
 
+  // TODO: need to be fixed, in case when menu depend on data from loaders this may be always true
   if (hideIfEmpty && hidden) {
     return null;
   }

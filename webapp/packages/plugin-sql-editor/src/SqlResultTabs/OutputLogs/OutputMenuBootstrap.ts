@@ -44,7 +44,7 @@ export class OutputMenuBootstrap extends Bootstrap {
     this.menuService.addCreator({
       menus: [OUTPUT_LOGS_FILTER_MENU],
       getItems: (context, items) => {
-        const state = context.tryGet(DATA_CONTEXT_SQL_EDITOR_STATE);
+        const state = context.get(DATA_CONTEXT_SQL_EDITOR_STATE);
 
         if (!state) {
           return [];
@@ -86,7 +86,7 @@ export class OutputMenuBootstrap extends Bootstrap {
     this.menuService.addCreator({
       menus: [OUTPUT_LOGS_SETTINGS_MENU],
       getItems: (context, items) => {
-        const state = context.tryGet(DATA_CONTEXT_SQL_EDITOR_STATE);
+        const state = context.get(DATA_CONTEXT_SQL_EDITOR_STATE);
 
         if (!state) {
           return [];
@@ -121,7 +121,7 @@ export class OutputMenuBootstrap extends Bootstrap {
       actions: [ACTION_SHOW_OUTPUT_LOGS],
       contexts: [DATA_CONTEXT_SQL_EDITOR_STATE],
       isActionApplicable: (context): boolean => {
-        const state = context.get(DATA_CONTEXT_SQL_EDITOR_STATE);
+        const state = context.get(DATA_CONTEXT_SQL_EDITOR_STATE)!;
 
         const sqlDataSource = this.sqlDataSourceService.get(state.editorId);
         const isQuery = sqlDataSource?.hasFeature(ESqlDataSourceFeatures.query);
@@ -131,7 +131,7 @@ export class OutputMenuBootstrap extends Bootstrap {
       },
 
       handler: async (context, action) => {
-        const state = context.get(DATA_CONTEXT_SQL_EDITOR_STATE);
+        const state = context.get(DATA_CONTEXT_SQL_EDITOR_STATE)!;
 
         if (action === ACTION_SHOW_OUTPUT_LOGS) {
           this.outputLogsService.showOutputLogs(state);
@@ -148,8 +148,9 @@ export class OutputMenuBootstrap extends Bootstrap {
       id: 'sql-editor-show-output',
       binding: KEY_BINDING_SQL_EDITOR_SHOW_OUTPUT,
       actions: [ACTION_SQL_EDITOR_SHOW_OUTPUT],
+      contexts: [DATA_CONTEXT_SQL_EDITOR_STATE],
       handler: (context, action) => {
-        const state = context.get(DATA_CONTEXT_SQL_EDITOR_STATE);
+        const state = context.get(DATA_CONTEXT_SQL_EDITOR_STATE)!;
 
         if (action === ACTION_SQL_EDITOR_SHOW_OUTPUT) {
           this.outputLogsService.showOutputLogs(state);

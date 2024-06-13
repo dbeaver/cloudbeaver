@@ -36,7 +36,7 @@ export class DDLViewerFooterService {
       handler: async (context, action) => {
         switch (action) {
           case ACTION_SAVE: {
-            const ddl = context.get(DATA_CONTEXT_DDL_VIEWER_VALUE);
+            const ddl = context.get(DATA_CONTEXT_DDL_VIEWER_VALUE)!;
             const nodeId = context.get(DATA_CONTEXT_DDL_VIEWER_NODE);
 
             const blob = new Blob([ddl], {
@@ -50,8 +50,8 @@ export class DDLViewerFooterService {
             break;
           }
           case ACTION_SQL_EDITOR_OPEN: {
-            const ddl = context.get(DATA_CONTEXT_DDL_VIEWER_VALUE);
-            const nodeId = context.get(DATA_CONTEXT_DDL_VIEWER_NODE);
+            const ddl = context.get(DATA_CONTEXT_DDL_VIEWER_VALUE)!;
+            const nodeId = context.get(DATA_CONTEXT_DDL_VIEWER_NODE)!;
 
             const connection = this.connectionInfoResource.getConnectionForNode(nodeId);
             const container = this.navNodeManagerService.getNodeContainerInfo(nodeId);

@@ -8,7 +8,7 @@
 import { observer } from 'mobx-react-lite';
 
 import { s, useS } from '@cloudbeaver/core-blocks';
-import type { IDataContext } from '@cloudbeaver/core-data-context';
+import { type IDataContext, useDataContextLink } from '@cloudbeaver/core-data-context';
 import { useService } from '@cloudbeaver/core-di';
 import { MenuBar } from '@cloudbeaver/core-ui';
 import { useMenu } from '@cloudbeaver/core-view';
@@ -35,9 +35,11 @@ export const TableFooterMenu = observer<Props>(function TableFooterMenu({ result
   const styles = useS(style);
   const menu = useMenu({ menu: DATA_VIEWER_DATA_MODEL_ACTIONS_MENU, context });
 
-  menu.context.set(DATA_CONTEXT_DV_DDM, model);
-  menu.context.set(DATA_CONTEXT_DV_DDM_RESULT_INDEX, resultIndex);
-  menu.context.set(DATA_CONTEXT_DATA_VIEWER_SIMPLE, simple);
+  useDataContextLink(menu.context, (context, id) => {
+    context.set(DATA_CONTEXT_DV_DDM, model, id);
+    context.set(DATA_CONTEXT_DV_DDM_RESULT_INDEX, resultIndex, id);
+    context.set(DATA_CONTEXT_DATA_VIEWER_SIMPLE, simple, id);
+  });
 
   return (
     <div className={s(styles, { wrapper: true }, className)}>

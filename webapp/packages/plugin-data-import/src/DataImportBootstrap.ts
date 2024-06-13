@@ -32,10 +32,11 @@ export class DataImportBootstrap extends Bootstrap {
   register() {
     this.actionService.addHandler({
       id: 'data-import-base-handler',
+      contexts: [DATA_CONTEXT_DV_DDM, DATA_CONTEXT_DV_DDM_RESULT_INDEX],
       isActionApplicable(context, action) {
         const menu = context.hasValue(DATA_CONTEXT_MENU, DATA_VIEWER_DATA_MODEL_ACTIONS_MENU);
-        const model = context.tryGet(DATA_CONTEXT_DV_DDM);
-        const resultIndex = context.tryGet(DATA_CONTEXT_DV_DDM_RESULT_INDEX);
+        const model = context.get(DATA_CONTEXT_DV_DDM);
+        const resultIndex = context.get(DATA_CONTEXT_DV_DDM_RESULT_INDEX);
 
         if (!menu || !model || resultIndex === undefined) {
           return false;
@@ -49,8 +50,8 @@ export class DataImportBootstrap extends Bootstrap {
         return [ACTION_IMPORT].includes(action);
       },
       isDisabled(context) {
-        const model = context.get(DATA_CONTEXT_DV_DDM);
-        const resultIndex = context.get(DATA_CONTEXT_DV_DDM_RESULT_INDEX);
+        const model = context.get(DATA_CONTEXT_DV_DDM)!;
+        const resultIndex = context.get(DATA_CONTEXT_DV_DDM_RESULT_INDEX)!;
 
         return model.isLoading() || model.isDisabled(resultIndex) || !model.getResult(resultIndex);
       },
@@ -62,8 +63,8 @@ export class DataImportBootstrap extends Bootstrap {
         return action.info;
       },
       handler: async (context, action) => {
-        const model = context.get(DATA_CONTEXT_DV_DDM);
-        const resultIndex = context.get(DATA_CONTEXT_DV_DDM_RESULT_INDEX);
+        const model = context.get(DATA_CONTEXT_DV_DDM)!;
+        const resultIndex = context.get(DATA_CONTEXT_DV_DDM_RESULT_INDEX)!;
 
         if (action === ACTION_IMPORT) {
           const result = model.getResult(resultIndex);

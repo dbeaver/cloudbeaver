@@ -60,8 +60,19 @@ export class DVResultSetGroupingPluginBootstrap extends Bootstrap {
       ],
       contexts: [DATA_CONTEXT_DV_DDM_RS_GROUPING],
       menus: [DATA_VIEWER_DATA_MODEL_ACTIONS_MENU],
+      isActionApplicable(context, action) {
+        switch (action) {
+          case ACTION_DATA_VIEWER_GROUPING_REMOVE_COLUMN:
+            return context.has(DATA_CONTEXT_DV_DDM) && context.has(DATA_CONTEXT_DV_DDM_RESULT_INDEX);
+          case ACTION_DATA_VIEWER_GROUPING_CLEAR:
+          case ACTION_DATA_VIEWER_GROUPING_CONFIGURE:
+          case ACTION_DATA_VIEWER_GROUPING_SHOW_DUPLICATES:
+            return true;
+        }
+        return false;
+      },
       getActionInfo(context, action) {
-        const grouping = context.get(DATA_CONTEXT_DV_DDM_RS_GROUPING);
+        const grouping = context.get(DATA_CONTEXT_DV_DDM_RS_GROUPING)!;
         const isShowDuplicatesOnly = grouping.getShowDuplicatesOnly();
 
         if (action === ACTION_DATA_VIEWER_GROUPING_SHOW_DUPLICATES && isShowDuplicatesOnly) {
@@ -76,14 +87,14 @@ export class DVResultSetGroupingPluginBootstrap extends Bootstrap {
         return action.info;
       },
       isDisabled(context, action) {
-        const grouping = context.get(DATA_CONTEXT_DV_DDM_RS_GROUPING);
-        const model = context.get(DATA_CONTEXT_DV_DDM);
-        const resultIndex = context.get(DATA_CONTEXT_DV_DDM_RESULT_INDEX);
+        const grouping = context.get(DATA_CONTEXT_DV_DDM_RS_GROUPING)!;
 
         switch (action) {
           case ACTION_DATA_VIEWER_GROUPING_CLEAR:
             return grouping.getColumns().length === 0;
           case ACTION_DATA_VIEWER_GROUPING_REMOVE_COLUMN: {
+            const model = context.get(DATA_CONTEXT_DV_DDM)!;
+            const resultIndex = context.get(DATA_CONTEXT_DV_DDM_RESULT_INDEX)!;
             if (!model.source.hasResult(resultIndex)) {
               return true;
             }
@@ -112,15 +123,15 @@ export class DVResultSetGroupingPluginBootstrap extends Bootstrap {
         return false;
       },
       handler: async (context, action) => {
-        const grouping = context.get(DATA_CONTEXT_DV_DDM_RS_GROUPING);
-        const model = context.get(DATA_CONTEXT_DV_DDM);
-        const resultIndex = context.get(DATA_CONTEXT_DV_DDM_RESULT_INDEX);
+        const grouping = context.get(DATA_CONTEXT_DV_DDM_RS_GROUPING)!;
 
         switch (action) {
           case ACTION_DATA_VIEWER_GROUPING_CLEAR:
             grouping.clear();
             break;
           case ACTION_DATA_VIEWER_GROUPING_REMOVE_COLUMN: {
+            const model = context.get(DATA_CONTEXT_DV_DDM)!;
+            const resultIndex = context.get(DATA_CONTEXT_DV_DDM_RESULT_INDEX)!;
             const selectionAction = model.source.getAction(resultIndex, ResultSetSelectAction);
             const dataAction = model.source.getAction(resultIndex, ResultSetDataAction);
 
