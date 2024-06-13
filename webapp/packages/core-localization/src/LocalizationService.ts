@@ -125,6 +125,11 @@ export class LocalizationService extends Bootstrap {
         name: 'Chinese',
         nativeName: '中文',
       },
+      {
+        isoCode: 'fr',
+        name: 'French',
+        nativeName: 'Français',
+      },
     ]);
     this.addProvider(this.coreProvider.bind(this));
   }
@@ -173,6 +178,8 @@ export class LocalizationService extends Bootstrap {
         return (await import('./locales/it')).default;
       case 'zh':
         return (await import('./locales/zh')).default;
+      case 'fr':
+        return (await import('./locales/fr')).default;
       default:
         return (await import('./locales/en')).default;
     }

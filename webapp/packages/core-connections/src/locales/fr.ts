@@ -1,8 +1,18 @@
+/*
+ * CloudBeaver - Cloud Database Manager
+ * Copyright (C) 2020-2024 DBeaver Corp and others
+ *
+ * Licensed under the Apache License, Version 2.0.
+ * you may not use this file except in compliance with the License.
+ */
 export default [
   ['core_connections_connections_settings_group', 'Connexions'],
   ['connections_administration_item', 'Modèles de connexion'],
   ['connections_administration_connection_create', 'Ajouter un modèle de base de données'],
-  ['connections_administration_search_database_tip', "Saisissez vos hôtes ici, par exemple 'localhost host1.myhost.com 192.168.0.1' et appuyez sur Entrée"],
+  [
+    'connections_administration_search_database_tip',
+    "Saisissez vos hôtes ici, par exemple 'localhost host1.myhost.com 192.168.0.1' et appuyez sur Entrée",
+  ],
   ['connections_administration_new_connection', 'Nouvelle connexion'],
   ['connections_administration_connection_create_error', 'Erreur de création de connexion'],
   ['connections_administration_connection_save_error', 'Erreur de sauvegarde de connexion'],
@@ -15,7 +25,7 @@ export default [
     'Ici, vous pouvez créer des connexions de base de données manuellement ou en utilisant une recherche de serveur de base de données.\nVous pouvez passer cette étape et configurer les connexions plus tard.',
   ],
   ['connections_administration_connection_no_information', 'Aucune information disponible'],
-  ['connections_administration_delete_confirmation', "Vous allez supprimer ces connexions : "],
+  ['connections_administration_delete_confirmation', 'Vous allez supprimer ces connexions : '],
   ['connections_administration_tools_add_tooltip', 'Ajouter un nouveau modèle'],
   ['connections_administration_tools_refresh_tooltip', 'Actualiser la liste des connexions'],
   ['connections_administration_tools_delete_tooltip', 'Supprimer les connexions sélectionnées'],
@@ -29,7 +39,7 @@ export default [
   ['connections_connection_edit_save_credentials', 'Enregistrer les identifiants'],
   ['connections_connection_share_credentials', 'Partager les identifiants'],
   ['connections_connection_share_credentials_tooltip', 'Partager les identifiants avec tous les utilisateurs'],
-  ['connections_connection_credentials_provisioning', 'Identifiants d\'authentification'],
+  ['connections_connection_credentials_provisioning', "Identifiants d'authentification"],
   ['connections_connection_credentials_provisioning_description', 'Vous devez remplir ou confirmer les identifiants pour tester cette connexion'],
   ['connections_connection_edit_authentication', 'Authentification'],
   ['connections_connection_edit_access', 'Accès'],
@@ -39,10 +49,13 @@ export default [
   ['connections_connection_edit_search_hosts', 'Noms des hôtes'],
   ['connections_connection_address', 'Adresse'],
   ['connections_connection_folder', 'Dossier'],
-  ['connections_connection_folder_validation', 'Le nom du dossier ne peut pas contenir les symboles suivants : / : " \\ et ne peut pas commencer par un point'],
+  [
+    'connections_connection_folder_validation',
+    'Le nom du dossier ne peut pas contenir les symboles suivants : / : " \\ et ne peut pas commencer par un point',
+  ],
   ['connections_connection_name', 'Nom de la connexion'],
-  ['connections_connection_access_user_or_team_name', 'Nom de l\'utilisateur ou de l\'équipe'],
-  ['connections_connection_access_filter_placeholder', 'Rechercher un nom d\'utilisateur ou d\'équipe'],
+  ['connections_connection_access_user_or_team_name', "Nom de l'utilisateur ou de l'équipe"],
+  ['connections_connection_access_filter_placeholder', "Rechercher un nom d'utilisateur ou d'équipe"],
   ['connections_connection_access_admin_info', 'Les administrateurs voient toutes les connexions.'],
   ['connections_connection_description', 'Description'],
   ['connections_connection_project', 'Projet'],
@@ -70,7 +83,7 @@ export default [
   ['connections_network_handler_ssh_tunnel_port', 'Port'],
   ['connections_network_handler_ssh_tunnel_user', 'Utilisateur'],
   ['connections_network_handler_ssh_tunnel_password', 'Mot de passe'],
-  ['connections_network_handler_ssh_tunnel_auth_type', 'Méthode d\'authentification'],
+  ['connections_network_handler_ssh_tunnel_auth_type', "Méthode d'authentification"],
   ['connections_network_handler_ssh_tunnel_private_key', 'Clé privée'],
   ['connections_network_handler_ssh_tunnel_advanced_settings', 'Paramètres avancés'],
   ['connections_network_handler_ssh_tunnel_advanced_settings_alive_interval', 'Intervalle de maintien en vie (ms)'],

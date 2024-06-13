@@ -1,3 +1,10 @@
+/*
+ * CloudBeaver - Cloud Database Manager
+ * Copyright (C) 2020-2024 DBeaver Corp and others
+ *
+ * Licensed under the Apache License, Version 2.0.
+ * you may not use this file except in compliance with the License.
+ */
 export default [
   ['core_block_properties_table_name', 'Nom'],
   ['core_block_properties_table_value', 'Valeur'],
@@ -8,7 +15,7 @@ export default [
   ['core_blocks_object_property_info_password_saved', 'La valeur du champ est sauvegardée'],
   ['core_blocks_properties_table_item_remove', 'Supprimer la propriété'],
   ['combobox_no_results_placeholder', 'Aucun résultat'],
-  ['core_blocks_exception_message_error_title', 'Impossible d\'afficher le contenu'],
+  ['core_blocks_exception_message_error_title', "Impossible d'afficher le contenu"],
   ['core_blocks_exception_message_error_message', 'Quelque chose a mal tourné.'],
-  ['core_blocks_custom_input_validation_error', 'La valeur du champ n\'est pas valide'],
+  ['core_blocks_custom_input_validation_error', "La valeur du champ n'est pas valide"],
 ];
