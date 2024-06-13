@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { DataGrid } from './DataGridLazy';
+import { importLazyComponent } from '@cloudbeaver/core-blocks';
 
-export * from 'react-data-grid';
-export default DataGrid;
+export const DataGrid = importLazyComponent(() => import('./DataGrid').then(m => m.DataGrid));
