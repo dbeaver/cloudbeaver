@@ -13,13 +13,12 @@ import { FormPart, formValidationContext, IFormState } from '@cloudbeaver/core-u
 import { isValuesEqual, schemaValidationError } from '@cloudbeaver/core-utils';
 
 import type { IUserProfileFormState } from '../UserProfileFormService';
-import type { UserProfileFormState } from '../UserProfileFormState';
 import { type IUserProfileFormAuthenticationState, USER_PROFILE_FORM_AUTHENTICATION_PART_STATE_SCHEMA } from './IUserProfileFormAuthenticationState';
 
 export class UserProfileFormAuthenticationPart extends FormPart<IUserProfileFormAuthenticationState, IUserProfileFormState> {
   private baseIncludes: CachedResourceIncludeArgs<AdminUserInfoFragment, UserResourceIncludes>;
   constructor(
-    formState: UserProfileFormState,
+    formState: IFormState<IUserProfileFormState>,
     private readonly userInfoResource: UserInfoResource,
     private readonly passwordPolicyService: PasswordPolicyService,
   ) {
