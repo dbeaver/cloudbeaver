@@ -30,6 +30,7 @@ export default [
   ['data_viewer_data_save_error_title', 'Ошибка сохранения изменений'],
   ['data_viewer_auto_refresh_settings', 'Параметры автообновления'],
   ['data_viewer_auto_refresh_settings_stop_on_error', 'Остановить при ошибке'],
+  ['data_viewer_presentation_value_no_active_elements', 'Нет выбраных ячеек таблицы'],
   ['data_viewer_presentation_value_title', 'Значение'],
   ['data_viewer_presentation_value_text_line_wrapping_wrap', 'Переносить строки'],
   ['data_viewer_presentation_value_text_line_wrapping_no_wrap', 'Не переносить строки'],

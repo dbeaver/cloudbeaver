@@ -13,17 +13,21 @@ import { useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { TabContainerPanelComponent, TabList, TabsState, TabStyles, useTabLocalState } from '@cloudbeaver/core-ui';
 
+import { ResultSetDataContentAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetDataContentAction';
+import { ResultSetEditAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetEditAction';
+import { ResultSetFormatAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetFormatAction';
 import { ResultSetSelectAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetSelectAction';
-import { useResultSetActions } from '../../DatabaseDataModel/Actions/ResultSet/useResultSetActions';
 import type { IDatabaseResultSet } from '../../DatabaseDataModel/IDatabaseResultSet';
 import type { IDataValuePanelProps } from '../../TableViewer/ValuePanel/DataValuePanelService';
 import { getDefaultLineWrapping } from './getDefaultLineWrapping';
+import { isTextValueReadonly } from './isTextValueReadonly';
 import styles from './shared/TextValuePresentation.module.css';
 import TextValuePresentationTab from './shared/TextValuePresentationTab.module.css';
 import { TextValueEditor } from './TextValueEditor';
 import { TextValuePresentationService } from './TextValuePresentationService';
 import { TextValueTruncatedMessage } from './TextValueTruncatedMessage';
-import { useTextValue } from './useTextValue';
+import { useAutoContentType } from './useAutoContentType';
+import { useTextValueGetter } from './useTextValueGetter';
 
 const tabRegistry: StyleRegistry = [[TabStyles, { mode: 'append', styles: [TextValuePresentationTab] }]];
 
@@ -33,13 +37,13 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
     const notificationService = useService(NotificationService);
     const textValuePresentationService = useService(TextValuePresentationService);
     const style = useS(styles, TextValuePresentationTab);
-    const selection = model.source.getAction(resultIndex, ResultSetSelectAction);
-    const activeElements = selection.getActiveElements();
+    const selectAction = model.source.getAction(resultIndex, ResultSetSelectAction);
+    const formatAction = model.source.getAction(resultIndex, ResultSetFormatAction);
+    const activeElements = selectAction.getActiveElements();
     const firstSelectedCell = activeElements.length ? activeElements[0] : undefined;
-    const { contentAction, editAction, formatAction } = useResultSetActions({
-      model,
-      resultIndex,
-    });
+    const contentAction = model.source.getAction(resultIndex, ResultSetDataContentAction);
+    const editAction = model.source.getAction(resultIndex, ResultSetEditAction);
+
     const state = useTabLocalState(() =>
       observable({
         lineWrapping: null as boolean | null,
@@ -53,25 +57,25 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
         },
       }),
     );
-
-    const textValueInfo = useTextValue({
+    const contentType = useAutoContentType({
+      dataFormat,
       model,
       resultIndex,
-      dataFormat,
       currentContentType: state.currentContentType,
       elementKey: firstSelectedCell,
+      formatAction,
     });
-    const autoLineWrapping = getDefaultLineWrapping(textValueInfo.contentType);
+    const textValueGetter = useTextValueGetter({
+      contentAction,
+      editAction,
+      formatAction,
+      dataFormat,
+      contentType,
+      elementKey: firstSelectedCell,
+    });
+    const autoLineWrapping = getDefaultLineWrapping(contentType);
     const lineWrapping = state.lineWrapping ?? autoLineWrapping;
-
-    const isSelectedCellReadonly =
-      firstSelectedCell &&
-      (formatAction.isReadOnly(firstSelectedCell) ||
-        formatAction.isBinary(firstSelectedCell) ||
-        formatAction.isGeometry(firstSelectedCell) ||
-        contentAction.isTextTruncated(firstSelectedCell));
-    const isReadonlyByResultIndex = model.isReadonly(resultIndex) || model.isDisabled(resultIndex) || !firstSelectedCell;
-    const isReadonly = isSelectedCellReadonly || isReadonlyByResultIndex;
+    const isReadonly = isTextValueReadonly({ model, resultIndex, contentAction, cell: firstSelectedCell, formatAction });
     const canSave = firstSelectedCell && contentAction.isDownloadable(firstSelectedCell);
 
     function valueChangeHandler(newValue: string) {
@@ -94,7 +98,7 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
 
     async function selectTabHandler(tabId: string) {
       // currentContentType may be selected automatically we don't want to change state in this case
-      if (tabId !== textValueInfo.contentType) {
+      if (tabId !== contentType) {
         state.setContentType(tabId);
       }
     }
@@ -111,7 +115,7 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
               dataFormat={dataFormat}
               resultIndex={resultIndex}
               container={textValuePresentationService.tabs}
-              currentTabId={textValueInfo.contentType}
+              currentTabId={contentType}
               model={model}
               lazy
               onChange={tab => selectTabHandler(tab.tabId)}
@@ -125,10 +129,10 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
         <Loader suspense>
           <Group overflow maximum box>
             <TextValueEditor
-              contentType={textValueInfo.contentType}
+              contentType={contentType}
               lineWrapping={lineWrapping}
               readonly={isReadonly}
-              valueGetter={textValueInfo.valueGetter}
+              valueGetter={textValueGetter}
               onChange={valueChangeHandler}
             />
           </Group>
