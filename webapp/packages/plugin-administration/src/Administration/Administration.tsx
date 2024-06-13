@@ -29,10 +29,10 @@ import { AdministrationCaptureViewContext } from './AdministrationCaptureViewCon
 import { AdministrationViewService } from './AdministrationViewService';
 import { DrawerItem } from './DrawerItem';
 import { ItemContent } from './ItemContent';
-import style from './shared/Administration.m.css';
-import AdministrationStylesTab from './shared/AdministrationTab.m.css';
-import AdministrationStylesTabList from './shared/AdministrationTabList.m.css';
-import AdministrationToolsPanelStyles from './shared/AdministrationToolsPanel.m.css';
+import style from './shared/Administration.module.css';
+import AdministrationStylesTab from './shared/AdministrationTab.module.css';
+import AdministrationStylesTabList from './shared/AdministrationTabList.module.css';
+import AdministrationToolsPanelStyles from './shared/AdministrationToolsPanel.module.css';
 
 interface Props {
   configurationWizard: boolean;

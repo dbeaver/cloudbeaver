@@ -11,35 +11,36 @@
   "main": "dist/index.js",
   "scripts": {
     "build": "tsc -b",
+    "clean": "rimraf --glob dist",
     "lint": "eslint ./src/ --ext .ts,.tsx",
     "lint-fix": "eslint ./src/ --ext .ts,.tsx --fix",
-    "test": "yarn build && core-cli-test",
+    "test": "core-cli-test",
     "validate-dependencies": "core-cli-validate-dependencies",
-    "update-ts-references": "rimraf --glob dist && typescript-resolve-references"
+    "update-ts-references": "yarn run clean && typescript-resolve-references"
   },
   "dependencies": {
-    "@timohausmann/quadtree-ts": "^2.2.2",
-    "@types/whatwg-mimetype": "^3.0.2",
-    "clsx": "^2.1.0",
-    "fast-deep-equal": "^3.1.3",
-    "i18next": "^23.11.2",
-    "md5": "^2.3.0",
-    "mobx": "^6.12.0",
-    "underscore": "^1.13.6",
-    "uuid": "^9.0.1",
-    "whatwg-mimetype": "^4.0.0",
-    "zod": "^3.22.4",
-    "zod-i18n-map": "^2.27.0",
-    "zod-validation-error": "^3.0.3"
+    "@timohausmann/quadtree-ts": "^2",
+    "clsx": "^2",
+    "fast-deep-equal": "^3",
+    "i18next": "^23",
+    "md5": "^2",
+    "mobx": "^6",
+    "underscore": "^1",
+    "uuid": "^9",
+    "whatwg-mimetype": "^4",
+    "zod": "^3",
+    "zod-i18n-map": "^2",
+    "zod-validation-error": "^3"
   },
   "peerDependencies": {},
   "devDependencies": {
-    "@types/jest": "^29.5.12",
-    "@types/md5": "~2.3.5",
-    "@types/react": "^18.2.63",
-    "@types/underscore": "^1.11.15",
-    "@types/uuid": "~9.0.8",
-    "react": "^18.2.0",
-    "typescript": "^5.3.3"
+    "@types/jest": "^29",
+    "@types/md5": "^2",
+    "@types/react": "^18",
+    "@types/underscore": "^1",
+    "@types/uuid": "^9",
+    "@types/whatwg-mimetype": "^3",
+    "react": "^18",
+    "typescript": "^5"
   }
 }

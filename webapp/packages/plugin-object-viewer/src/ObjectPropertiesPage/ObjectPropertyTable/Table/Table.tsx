@@ -24,9 +24,8 @@ import type { IDataColumn } from './Column';
 import { ColumnIcon } from './Columns/ColumnIcon/ColumnIcon';
 import { ColumnSelect } from './Columns/ColumnSelect/ColumnSelect';
 import { HeaderRenderer } from './HeaderRenderer';
-import './styles/base.scss';
 import { tableStyles } from './styles/styles';
-import classes from './Table.m.css';
+import classes from './Table.module.css';
 import { TableContext } from './TableContext';
 import { useTableData } from './useTableData';
 

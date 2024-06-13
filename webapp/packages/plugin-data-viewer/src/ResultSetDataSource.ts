@@ -77,13 +77,26 @@ export abstract class ResultSetDataSource<TOptions> extends DatabaseDataSource<T
     return this.totalCountRequestTask;
   }
 
-  async closeResults(results: IDatabaseResultSet[]): Promise<void> {
+  setResults(results: IDatabaseResultSet[]): this {
+    this.closeResults(this.results.filter(result => !results.some(r => r.id === result.id)));
+    return super.setResults(results);
+  }
+
+  async dispose(keepExecutionContext?: boolean): Promise<void> {
+    if (keepExecutionContext) {
+      await this.closeResults(this.results);
+    }
+    return super.dispose(keepExecutionContext);
+  }
+
+  private async closeResults(results: IDatabaseResultSet[]): Promise<void> {
     if (!this.executionContext?.context) {
       return;
     }
 
     for (const result of results) {
-      if (result.id === null) {
+      // TODO: it's better to track that context is closed with subscription
+      if (result.id === null || result.contextId !== this.executionContext.context.id) {
         continue;
       }
       try {

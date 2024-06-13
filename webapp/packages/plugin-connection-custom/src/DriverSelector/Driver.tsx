@@ -10,7 +10,7 @@ import { useCallback } from 'react';
 
 import { ListItem, ListItemDescription, ListItemIcon, ListItemName, s, StaticImage, useS } from '@cloudbeaver/core-blocks';
 
-import style from './Driver.m.css';
+import style from './Driver.module.css';
 
 export interface IDriver {
   id: string;

@@ -16,7 +16,7 @@ import { DataGridContext } from '../DataGridContext';
 import { DataGridSelectionContext } from '../DataGridSelection/DataGridSelectionContext';
 import { TableDataContext } from '../TableDataContext';
 import { OrderButton } from './OrderButton';
-import style from './TableColumnHeader.m.css';
+import style from './TableColumnHeader.module.css';
 import { useTableColumnDnD } from './useTableColumnDnD';
 
 export const TableColumnHeader = observer<RenderHeaderCellProps<any>>(function TableColumnHeader({ column: calculatedColumn }) {

@@ -11,7 +11,7 @@ import { ConfigurationWizardService } from '@cloudbeaver/core-administration';
 import { Button, s, useFocus, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 
-import styles from './FinishPage.m.css';
+import styles from './FinishPage.module.css';
 
 export const FinishPage = observer(function FinishPage() {
   const translate = useTranslate();

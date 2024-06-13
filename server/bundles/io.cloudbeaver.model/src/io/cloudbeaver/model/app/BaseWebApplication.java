@@ -252,7 +252,7 @@ public abstract class BaseWebApplication extends BaseApplicationImpl implements 
                 instanceId = String.join(
                     "_",
                     ApplicationRegistry.getInstance().getApplication().getId(),
-                    BaseWorkspaceImpl.readWorkspaceIdProperty(), // workspace id is read from property file
+                    getWorkspaceIdProperty(), // workspace id is read from property file
                     CommonUtils.toHexString(macAddress),
                     CommonUtils.toString(getServerPort())
                 );
@@ -261,6 +261,11 @@ public abstract class BaseWebApplication extends BaseApplicationImpl implements 
             }
         }
         return instanceId;
+    }
+
+    @NotNull
+    public String getWorkspaceIdProperty() throws DBException {
+        return BaseWorkspaceImpl.readWorkspaceIdProperty();
     }
 
     public String getApplicationId() {

@@ -8,7 +8,7 @@
 import { observer } from 'mobx-react-lite';
 
 import { Button } from './Button';
-import styles from './ErrorMessage.m.css';
+import styles from './ErrorMessage.module.css';
 import { IconOrImage } from './IconOrImage';
 import { useTranslate } from './localization/useTranslate';
 import { s } from './s';

@@ -30,12 +30,12 @@ import '@cloudbeaver/plugin-react-data-grid/react-data-grid-dist/lib/styles.css'
 
 import { CellPosition, EditingContext } from '../Editing/EditingContext';
 import { useEditing } from '../Editing/useEditing';
-import '../styles/base.scss';
 import { reactGridStyles } from '../styles/styles';
 import { CellRenderer } from './CellRenderer/CellRenderer';
 import { DataGridContext, IColumnResizeInfo, IDataGridContext } from './DataGridContext';
 import { DataGridSelectionContext } from './DataGridSelection/DataGridSelectionContext';
 import { useGridSelectionContext } from './DataGridSelection/useGridSelectionContext';
+import classes from './DataGridTable.module.css';
 import { CellFormatter } from './Formatters/CellFormatter';
 import { TableDataContext } from './TableDataContext';
 import { useGridDragging } from './useGridDragging';
@@ -135,13 +135,13 @@ export const DataGridTable = observer<IDataPresentationProps<any, IDatabaseResul
 
   function restoreFocus() {
     const gridDiv = gridContainerRef.current;
-    const focusSink = gridDiv?.querySelector<HTMLDivElement>('[tabindex="0"]');
+    const focusSink = gridDiv?.querySelector<HTMLDivElement>('[aria-selected="true"]');
     focusSink?.focus();
   }
 
   function isGridInFocus(): boolean {
     const gridDiv = gridContainerRef.current;
-    const focusSink = gridDiv?.querySelector('[tabindex="0"]');
+    const focusSink = gridDiv?.querySelector('[aria-selected="true"]');
 
     if (!gridDiv || !focusSink) {
       return false;
@@ -435,7 +435,7 @@ export const DataGridTable = observer<IDataPresentationProps<any, IDatabaseResul
           <TableDataContext.Provider value={tableData}>
             <div
               ref={setContainersRef}
-              className="cb-react-grid-container"
+              className={`cb-react-grid-container ${classes.container}`}
               tabIndex={-1}
               onKeyDown={handleKeyDown}
               onMouseDown={onMouseDownHandler}

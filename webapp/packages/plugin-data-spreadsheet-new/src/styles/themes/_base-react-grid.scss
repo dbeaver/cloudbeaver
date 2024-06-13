@@ -132,12 +132,6 @@ $deleted-color: rgba(255, 51, 0, 0.3);
       .rdg-cell-custom-deleted {
         background-color: $deleted-color !important;
       }
-
-      .cell-formatter {
-        overflow: hidden;
-        white-space: nowrap;
-        text-overflow: ellipsis;
-      }
     }
   }
 }

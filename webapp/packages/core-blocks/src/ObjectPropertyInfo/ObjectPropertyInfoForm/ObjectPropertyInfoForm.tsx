@@ -12,7 +12,7 @@ import type { ObjectPropertyInfo } from '@cloudbeaver/core-sdk';
 
 import { getLayoutProps } from '../../Containers/filterLayoutFakeProps';
 import type { ILayoutSizeProps } from '../../Containers/ILayoutSizeProps';
-import elementsSizeStyles from '../../Containers/shared/ElementsSize.m.css';
+import elementsSizeStyles from '../../Containers/shared/ElementsSize.module.css';
 import { useTranslate } from '../../localization/useTranslate';
 import { s } from '../../s';
 import { TextPlaceholder } from '../../TextPlaceholder';

@@ -23,7 +23,7 @@ import { SQLCodeEditorLoader, useSqlDialectExtension } from '@cloudbeaver/plugin
 import { DATA_CONTEXT_DDL_VIEWER_NODE } from './DATA_CONTEXT_DDL_VIEWER_NODE';
 import { DATA_CONTEXT_DDL_VIEWER_VALUE } from './DATA_CONTEXT_DDL_VIEWER_VALUE';
 import { DdlResource } from './DdlResource';
-import style from './DDLViewerTabPanel.m.css';
+import style from './DDLViewerTabPanel.module.css';
 import { MENU_DDL_VIEWER_FOOTER } from './MENU_DDL_VIEWER_FOOTER';
 
 export const DDLViewerTabPanel: NavNodeTransformViewComponent = observer(function DDLViewerTabPanel({ nodeId, folderId }) {

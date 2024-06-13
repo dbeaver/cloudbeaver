@@ -14,7 +14,7 @@ import { useService } from '@cloudbeaver/core-di';
 
 import { TeamForm } from '../TeamForm';
 import { useTeamFormState } from '../useTeamFormState';
-import style from './TeamEdit.m.css';
+import style from './TeamEdit.module.css';
 
 interface Props {
   item: string;

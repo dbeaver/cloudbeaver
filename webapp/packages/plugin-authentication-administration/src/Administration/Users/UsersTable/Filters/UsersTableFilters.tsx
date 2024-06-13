@@ -11,7 +11,7 @@ import { useState } from 'react';
 import { AuthRolesResource } from '@cloudbeaver/core-authentication';
 import { Combobox, Filter, Group, IconOrImage, s, useResource, useS, useTranslate } from '@cloudbeaver/core-blocks';
 
-import styles from './UsersTableFilters.m.css';
+import styles from './UsersTableFilters.module.css';
 import { IUserFilters, USER_ROLE_ALL, USER_STATUSES } from './useUsersTableFilters';
 
 interface Props {

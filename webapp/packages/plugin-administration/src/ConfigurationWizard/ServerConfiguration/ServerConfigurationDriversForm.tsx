@@ -14,7 +14,7 @@ import { CachedMapAllKey, resourceKeyList } from '@cloudbeaver/core-resource';
 import type { ServerConfigInput } from '@cloudbeaver/core-sdk';
 import { isDefined } from '@cloudbeaver/core-utils';
 
-import style from './ServerConfigurationDriversForm.m.css';
+import style from './ServerConfigurationDriversForm.module.css';
 
 interface Props {
   serverConfig: ServerConfigInput;

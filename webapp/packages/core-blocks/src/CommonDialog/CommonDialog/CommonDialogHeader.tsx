@@ -12,7 +12,7 @@ import { IconOrImage } from '../../IconOrImage';
 import { useTranslate } from '../../localization/useTranslate';
 import { s } from '../../s';
 import { useS } from '../../useS';
-import styles from './CommonDialogHeader.m.css';
+import styles from './CommonDialogHeader.module.css';
 
 interface Props {
   title?: string;

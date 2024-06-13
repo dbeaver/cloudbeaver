@@ -160,15 +160,9 @@ export class SqlQueryResultService {
 
       if (isGroupEmpty) {
         state.resultGroups.splice(state.resultGroups.indexOf(group), 1);
-
-        // TODO: we need to dispose table model, but don't close execution context, so now we only
         const model = this.tableViewerStorageService.get(group.modelId);
-        // model?.dispose();
 
-        if (model?.source instanceof ResultSetDataSource) {
-          model.source.closeResults(model.getResults());
-          model.cancel();
-        }
+        model?.dispose(true);
 
         this.tableViewerStorageService.remove(group.modelId);
       }

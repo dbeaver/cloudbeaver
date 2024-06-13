@@ -1,4 +1,0 @@
-.loadMoreBox {
-  composes: theme-text-text-hint-on-light theme-typography--caption from global;
-  padding: 4px 24px;
-}

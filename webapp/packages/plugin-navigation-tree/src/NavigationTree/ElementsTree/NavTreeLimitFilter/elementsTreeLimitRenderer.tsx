@@ -14,7 +14,7 @@ import { CachedResourceOffsetPageKey, getNextPageOffset } from '@cloudbeaver/cor
 
 import type { NavigationNodeRendererComponent } from '../NavigationNodeComponent';
 import { NAVIGATION_TREE_LIMIT } from './elementsTreeLimitFilter';
-import styles from './elementsTreeLimitRenderer.m.css';
+import styles from './elementsTreeLimitRenderer.module.css';
 
 export function elementsTreeLimitRenderer(nodeId: string): NavigationNodeRendererComponent | undefined {
   if (nodeId === NAVIGATION_TREE_LIMIT.limit) {

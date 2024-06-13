@@ -24,6 +24,8 @@ export default [
   ['ui_processing_ok', 'Ok'],
   ['ui_processing_create', 'Create'],
   ['ui_processing_save', 'Save'],
+  ['ui_processing_saving', 'Saving...'],
+  ['ui_processing_do_you_want_to_proceed', 'Do you want to proceed?'],
   ['ui_processing_saved', 'Saved'],
   ['ui_processing_stop', 'Stop'],
   ['ui_processing_skip', 'Skip'],

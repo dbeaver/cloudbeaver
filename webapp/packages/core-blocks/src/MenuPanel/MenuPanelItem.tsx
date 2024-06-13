@@ -17,7 +17,7 @@ import { Loader } from '../Loader/Loader';
 import { useTranslate } from '../localization/useTranslate';
 import { s } from '../s';
 import { useS } from '../useS';
-import MenuPanelItemAndTriggerStyles from './shared/MenuPanelItemAndTrigger.m.css';
+import MenuPanelItemAndTriggerStyles from './shared/MenuPanelItemAndTrigger.module.css';
 
 interface MenuPanelItemProps {
   menuItem: IMenuItem;

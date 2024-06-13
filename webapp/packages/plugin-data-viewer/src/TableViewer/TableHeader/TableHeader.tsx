@@ -11,7 +11,7 @@ import { Placeholder, s, useS } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 
 import type { IDatabaseDataModel } from '../../DatabaseDataModel/IDatabaseDataModel';
-import classes from './TableHeader.m.css';
+import classes from './TableHeader.module.css';
 import { TableHeaderService } from './TableHeaderService';
 
 interface Props {

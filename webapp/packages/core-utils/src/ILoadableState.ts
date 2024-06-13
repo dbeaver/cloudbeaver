@@ -21,10 +21,6 @@ export interface ILoadableState {
   cancel?: () => void;
 }
 
-// export function composeLoadableState(...states: ILoadableState[]): ILoadableState {
-
-// }
-
 export function isLoadableStateHasException(state: ILoadableState): boolean {
   return isContainsException(state.exception);
 }

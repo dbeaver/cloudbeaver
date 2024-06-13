@@ -22,7 +22,7 @@ import { SQLCodeEditorLoader } from '../SQLCodeEditor/SQLCodeEditorLoader';
 import { useSQLCodeEditor } from '../SQLCodeEditor/useSQLCodeEditor';
 import { useSqlDialectAutocompletion } from '../useSqlDialectAutocompletion';
 import { useSqlDialectExtension } from '../useSqlDialectExtension';
-import style from './SQLCodeEditorPanel.m.css';
+import style from './SQLCodeEditorPanel.module.css';
 import { SqlEditorInfoBar } from './SqlEditorInfoBar';
 import { useSQLCodeEditorPanel } from './useSQLCodeEditorPanel';
 

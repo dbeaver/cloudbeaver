@@ -93,8 +93,9 @@ module.exports = (env, argv) => {
         options: {
           esModule: true,
           modules: {
-            auto: /(module|m)\.(css|s[ac]ss)$/,
+            auto: /module\.(css|s[ac]ss)$/,
             localIdentName: '[local]___[hash:base64:5]',
+            namedExport: false,
           },
         },
       },
@@ -118,15 +119,6 @@ module.exports = (env, argv) => {
       },
     ];
   }
-
-  var babelLoader = {
-    loader: require.resolve('babel-loader'),
-    options: {
-      root: __dirname,
-      // cacheDirectory: true,
-      envName: argv.mode,
-    },
-  };
 
   let entry = {};
 
@@ -295,10 +287,20 @@ module.exports = (env, argv) => {
           exclude: /node_modules/,
           use: ['source-map-loader'],
         },
-        {
+        devMode && {
           test: /\.jsx?$/,
           exclude: /node_modules/,
-          use: ['thread-loader', babelLoader],
+          use: [
+            'thread-loader',
+            {
+              loader: 'swc-loader',
+              options: {
+                jsc: {
+                  target: 'esnext',
+                },
+              },
+            },
+          ],
         },
         {
           test: /\.(css|s[ac]ss)$/,

@@ -1905,7 +1905,7 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
         } catch (SQLException e) {
             throw new DBCException("Session invalidation failed", e);
         }
-        application.getEventController().addEvent(new WSUserCloseSessionsEvent(List.of()));
+        application.getEventController().addEvent(new WSUserCloseSessionsEvent(List.of(), getSmSessionId(), getUserId()));
     }
 
     private void invalidateAllUserTokens(@NotNull String userId) throws DBCException {
@@ -2399,7 +2399,7 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
         List<String> smSessionsId = findActiveUserSessions(userId, currentTime)
                 .stream().map(SMActiveSession::sessionId).collect(Collectors.toList());
         deleteSessionsTokens(smSessionsId);
-        application.getEventController().addEvent(new WSUserCloseSessionsEvent(smSessionsId));
+        application.getEventController().addEvent(new WSUserCloseSessionsEvent(smSessionsId, getSmSessionId(), getUserId()));
     }
 
     /**

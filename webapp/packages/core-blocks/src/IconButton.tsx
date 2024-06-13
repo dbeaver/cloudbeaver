@@ -10,7 +10,7 @@ import type React from 'react';
 import { ButtonProps, Button as ReakitButton } from 'reakit/Button';
 
 import { Icon } from './Icon';
-import IconButtonStyles from './IconButton.m.css';
+import IconButtonStyles from './IconButton.module.css';
 import { s } from './s';
 import { StaticImage } from './StaticImage';
 import { useS } from './useS';

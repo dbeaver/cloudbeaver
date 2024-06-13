@@ -7,7 +7,7 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import style from './Cell.m.css';
+import style from './Cell.module.css';
 import { Container } from './Containers/Container';
 import { s } from './s';
 import { useS } from './useS';

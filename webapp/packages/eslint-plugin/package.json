@@ -13,6 +13,6 @@
     "eslint-plugin"
   ],
   "devDependencies": {
-    "eslint": "^8.57.0"
+    "eslint": "^8"
   }
 }

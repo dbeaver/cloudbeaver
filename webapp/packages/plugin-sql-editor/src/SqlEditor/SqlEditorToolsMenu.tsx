@@ -17,8 +17,8 @@ import type { ISqlEditorTabState } from '../ISqlEditorTabState';
 import { DATA_CONTEXT_SQL_EDITOR_DATA } from './DATA_CONTEXT_SQL_EDITOR_DATA';
 import type { ISQLEditorData } from './ISQLEditorData';
 import { SQL_EDITOR_TOOLS_MENU } from './SQL_EDITOR_TOOLS_MENU';
-import SqlEditorActionsMenuBarStyles from './SqlEditorActionsMenuBar.m.css';
-import SqlEditorActionsMenuBarItemStyles from './SqlEditorActionsMenuBarItem.m.css';
+import SqlEditorActionsMenuBarStyles from './SqlEditorActionsMenuBar.module.css';
+import SqlEditorActionsMenuBarItemStyles from './SqlEditorActionsMenuBarItem.module.css';
 
 interface Props {
   data: ISQLEditorData;

@@ -11,7 +11,7 @@ import { Icon, Menu, MenuItem, MenuItemElement, s, TimerIcon, useS, useTranslate
 import { declensionOfNumber } from '@cloudbeaver/core-utils';
 
 import type { IDatabaseDataModel } from '../../../DatabaseDataModel/IDatabaseDataModel';
-import styles from './AutoRefreshButton.m.css';
+import styles from './AutoRefreshButton.module.css';
 import { useAutoRefresh } from './useAutoRefresh';
 
 interface Props {

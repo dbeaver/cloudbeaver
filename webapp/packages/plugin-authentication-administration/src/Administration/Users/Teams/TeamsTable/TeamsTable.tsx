@@ -8,19 +8,32 @@
 import { observer } from 'mobx-react-lite';
 
 import type { TeamInfo } from '@cloudbeaver/core-authentication';
-import { ExceptionMessageStyles, Loader, SContext, StyleRegistry, Table, TableBody, TableColumnHeader, TableHeader, TableSelect, useTranslate } from '@cloudbeaver/core-blocks';
+import {
+  ExceptionMessageStyles,
+  Loader,
+  SContext,
+  StyleRegistry,
+  Table,
+  TableBody,
+  TableColumnHeader,
+  TableHeader,
+  TableSelect,
+  useTranslate,
+} from '@cloudbeaver/core-blocks';
 import type { ILoadableState } from '@cloudbeaver/core-utils';
 
 import { Team } from './Team';
-import teamsTableStyle from './TeamsTable.m.css';
+import teamsTableStyle from './TeamsTable.module.css';
 
-const registry: StyleRegistry = [[
-  ExceptionMessageStyles,
-  {
-    mode: 'append',
-    styles: [teamsTableStyle],
-  },
-]];
+const registry: StyleRegistry = [
+  [
+    ExceptionMessageStyles,
+    {
+      mode: 'append',
+      styles: [teamsTableStyle],
+    },
+  ],
+];
 
 interface Props {
   teams: TeamInfo[];
