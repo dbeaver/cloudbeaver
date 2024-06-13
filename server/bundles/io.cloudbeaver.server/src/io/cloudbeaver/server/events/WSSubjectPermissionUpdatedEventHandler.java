@@ -17,6 +17,7 @@
 package io.cloudbeaver.server.events;
 
 import io.cloudbeaver.model.session.BaseWebSession;
+import io.cloudbeaver.model.session.WebHeadlessSession;
 import io.cloudbeaver.service.security.SMUtils;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.DBException;
@@ -41,7 +42,8 @@ public class WSSubjectPermissionUpdatedEventHandler extends WSDefaultEventHandle
         }
         activeUserSession.refreshUserData();
         var newUserPermissions = activeUserSession.getUserContext().getUserPermissions();
-        boolean shouldUpdateData = !(SMUtils.isRMAdmin(oldUserPermissions) && SMUtils.isRMAdmin(newUserPermissions));
+        boolean shouldUpdateData = activeUserSession instanceof WebHeadlessSession
+            || !(SMUtils.isRMAdmin(oldUserPermissions) && SMUtils.isRMAdmin(newUserPermissions));
         if (shouldUpdateData) {
             super.updateSessionData(activeUserSession, event);
         }
