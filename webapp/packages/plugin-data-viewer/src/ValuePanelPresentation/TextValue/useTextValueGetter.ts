@@ -8,47 +8,33 @@
 import { observable } from 'mobx';
 
 import { useObservableRef, useSuspense } from '@cloudbeaver/core-blocks';
-import { useService } from '@cloudbeaver/core-di';
 import type { ResultDataFormat } from '@cloudbeaver/core-sdk';
 import { blobToBase64, isNotNullDefined, removeMetadataFromDataURL } from '@cloudbeaver/core-utils';
 
 import type { IResultSetElementKey } from '../../DatabaseDataModel/Actions/ResultSet/IResultSetDataKey';
 import { isResultSetBlobValue } from '../../DatabaseDataModel/Actions/ResultSet/isResultSetBlobValue';
 import { isResultSetContentValue } from '../../DatabaseDataModel/Actions/ResultSet/isResultSetContentValue';
-import { useResultSetActions } from '../../DatabaseDataModel/Actions/ResultSet/useResultSetActions';
-import type { IDatabaseDataModel } from '../../DatabaseDataModel/IDatabaseDataModel';
-import type { IDatabaseResultSet } from '../../DatabaseDataModel/IDatabaseResultSet';
+import type { ResultSetDataContentAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetDataContentAction';
+import type { ResultSetEditAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetEditAction';
+import type { ResultSetFormatAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetFormatAction';
 import { formatText } from './formatText';
 import { MAX_BLOB_PREVIEW_SIZE } from './MAX_BLOB_PREVIEW_SIZE';
-import { TextValuePresentationService } from './TextValuePresentationService';
 
 interface IUseTextValueArgs {
-  resultIndex: number;
-  model: IDatabaseDataModel<any, IDatabaseResultSet>;
   dataFormat: ResultDataFormat | null;
-  currentContentType: string | null;
-  elementKey?: IResultSetElementKey;
-}
-
-interface ITextValueInfo {
-  valueGetter: () => string;
   contentType: string;
+  elementKey?: IResultSetElementKey;
+  contentAction: ResultSetDataContentAction;
+  formatAction: ResultSetFormatAction;
+  editAction: ResultSetEditAction;
 }
 
-const DEFAULT_CONTENT_TYPE = 'text/plain';
+type ValueGetter = () => string;
 
-export function useTextValue({ model, dataFormat, resultIndex, currentContentType, elementKey }: IUseTextValueArgs): ITextValueInfo {
-  const { formatAction, editAction, contentAction } = useResultSetActions({ model, resultIndex });
+export function useTextValueGetter({ contentType, elementKey, formatAction, contentAction, editAction }: IUseTextValueArgs): ValueGetter {
   const suspense = useSuspense();
   const contentValue = elementKey ? formatAction.get(elementKey) : null;
-  const textValuePresentationService = useService(TextValuePresentationService);
-  const activeTabs = textValuePresentationService.tabs.getDisplayed({
-    dataFormat: dataFormat,
-    model: model,
-    resultIndex: resultIndex,
-  });
   const limitInfo = elementKey ? contentAction.getLimitInfo(elementKey) : null;
-
   const observedContentValue = useObservableRef(
     {
       contentValue,
@@ -56,40 +42,6 @@ export function useTextValue({ model, dataFormat, resultIndex, currentContentTyp
     },
     { contentValue: observable.ref, limitInfo: observable.ref },
   );
-
-  let contentType = currentContentType;
-  let autoContentType = DEFAULT_CONTENT_TYPE;
-  let contentValueType;
-
-  if (isResultSetContentValue(contentValue)) {
-    contentValueType = contentValue.contentType;
-  }
-
-  if (isResultSetBlobValue(contentValue)) {
-    contentValueType = contentValue.blob.type;
-  }
-
-  if (contentValueType) {
-    switch (contentValueType) {
-      case 'text/json':
-        autoContentType = 'application/json';
-        break;
-      case 'application/octet-stream':
-        autoContentType = 'application/octet-stream;type=base64';
-        break;
-      default:
-        autoContentType = contentValueType;
-        break;
-    }
-  }
-
-  if (contentType === null) {
-    contentType = autoContentType ?? DEFAULT_CONTENT_TYPE;
-  }
-
-  if (activeTabs.length > 0 && !activeTabs.some(tab => tab.key === contentType)) {
-    contentType = activeTabs[0].key;
-  }
 
   const parsedBlobValueGetter = suspense.observedValue(
     'value-blob',
@@ -135,14 +87,11 @@ export function useTextValue({ model, dataFormat, resultIndex, currentContentTyp
     }
 
     if (!editAction.isElementEdited(elementKey) || isBinary) {
-      value = formatText(contentType!, value);
+      value = formatText(contentType, value);
     }
 
     return value;
   }
 
-  return {
-    valueGetter,
-    contentType,
-  };
+  return valueGetter;
 }

@@ -11,6 +11,7 @@ import type { ConnectionExecutionContextService, IConnectionExecutionContext, IC
 import type { IServiceInjector } from '@cloudbeaver/core-di';
 import type { ITask } from '@cloudbeaver/core-executor';
 import {
+  AsyncTask,
   AsyncTaskInfoService,
   GraphQLService,
   ResultDataFormat,
@@ -73,46 +74,10 @@ export class ContainerDataSource extends ResultSetDataSource<IDataContainerOptio
   }
 
   async request(prevResults: IDatabaseResultSet[]): Promise<IDatabaseResultSet[]> {
-    const options = this.options;
-
-    if (!options) {
-      throw new Error('containerNodePath must be provided for table');
-    }
-
     const executionContext = await this.ensureContextCreated();
     const context = executionContext.context!;
-    const offset = this.offset;
     const limit = this.count;
-
-    let firstResultId: string | undefined;
-
-    if (
-      prevResults.length === 1 &&
-      prevResults[0].contextId === context.id &&
-      prevResults[0].connectionId === context.connectionId &&
-      prevResults[0].id !== null
-    ) {
-      firstResultId = prevResults[0].id;
-    }
-
-    const task = this.asyncTaskInfoService.create(async () => {
-      const { taskInfo } = await this.graphQLService.sdk.asyncReadDataFromContainer({
-        projectId: context.projectId,
-        connectionId: context.connectionId,
-        contextId: context.id,
-        containerNodePath: options.containerNodePath,
-        resultId: firstResultId,
-        filter: {
-          offset,
-          limit,
-          constraints: options.constraints,
-          where: options.whereFilter || undefined,
-        },
-        dataFormat: this.dataFormat,
-      });
-
-      return taskInfo;
-    });
+    const task = await this.getRequestTask(prevResults, context);
 
     this.currentTask = executionContext.run(
       async () => {
@@ -217,6 +182,58 @@ export class ContainerDataSource extends ResultSetDataSource<IDataContainerOptio
     return prevResults;
   }
 
+  protected getConfig(prevResults: IDatabaseResultSet[], context: IConnectionExecutionContextInfo) {
+    const options = this.options;
+
+    if (!options) {
+      throw new Error('Options must be provided');
+    }
+
+    const offset = this.offset;
+    const limit = this.count;
+    const resultId = this.getResultId(prevResults, context);
+
+    return {
+      projectId: context.projectId,
+      connectionId: context.connectionId,
+      contextId: context.id,
+      containerNodePath: options.containerNodePath,
+      resultId,
+      filter: {
+        offset,
+        limit,
+        constraints: options.constraints,
+        where: options.whereFilter || undefined,
+      },
+      dataFormat: this.dataFormat,
+    };
+  }
+
+  protected async getRequestTask(prevResults: IDatabaseResultSet[], context: IConnectionExecutionContextInfo): Promise<AsyncTask> {
+    const task = this.asyncTaskInfoService.create(async () => {
+      const config = this.getConfig(prevResults, context);
+      const { taskInfo } = await this.graphQLService.sdk.asyncReadDataFromContainer(config);
+      return taskInfo;
+    });
+
+    return task;
+  }
+
+  private getResultId(prevResults: IDatabaseResultSet[], context: IConnectionExecutionContextInfo) {
+    let resultId: string | undefined;
+
+    if (
+      prevResults.length === 1 &&
+      prevResults[0].contextId === context.id &&
+      prevResults[0].connectionId === context.connectionId &&
+      prevResults[0].id !== null
+    ) {
+      resultId = prevResults[0].id;
+    }
+
+    return resultId;
+  }
+
   private transformResults(executionContextInfo: IConnectionExecutionContextInfo, results: SqlQueryResults[], limit: number): IDatabaseResultSet[] {
     return results.map<IDatabaseResultSet>((result, index) => ({
       id: result.resultSet?.id || '0',
@@ -249,6 +266,7 @@ export class ContainerDataSource extends ResultSetDataSource<IDataContainerOptio
 
       this.setExecutionContext(executionContext);
     }
+
     return this.executionContext!;
   }
 }

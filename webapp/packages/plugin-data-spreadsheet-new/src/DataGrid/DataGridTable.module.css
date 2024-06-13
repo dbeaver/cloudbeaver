@@ -5,7 +5,12 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { DataGrid } from './DataGridLazy';
-
-export * from 'react-data-grid';
-export default DataGrid;
+.container {
+  outline: 0;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  overflow: auto;
+  user-select: none;
+  -webkit-user-select: none;
+}

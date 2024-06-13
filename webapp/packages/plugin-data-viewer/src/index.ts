@@ -1,3 +1,10 @@
+/*
+ * CloudBeaver - Cloud Database Manager
+ * Copyright (C) 2020-2024 DBeaver Corp and others
+ *
+ * Licensed under the Apache License, Version 2.0.
+ * you may not use this file except in compliance with the License.
+ */
 export * from './manifest';
 
 export * from './DatabaseDataModel/Actions/Document/DocumentDataAction';
@@ -59,6 +66,7 @@ export * from './DatabaseDataModel/IDatabaseDataSource';
 export * from './DatabaseDataModel/IDatabaseResultSet';
 export * from './DatabaseDataModel/Order';
 export * from './DataViewerService';
+export * from './useDataViewerModel';
 
 // All Services and Components that is provided by this plugin should be exported here
 export * from './TableViewer/TableViewerStorageService';
@@ -75,7 +83,6 @@ export * from './ContainerDataSource';
 export * from './ResultSetDataSource';
 export * from './DataPresentationService';
 export * from './DataViewerDataChangeConfirmationService';
-export * from './useDataModel';
 export * from './ValuePanelPresentation/BooleanValue/isBooleanValuePresentationAvailable';
 export * from './DataViewerSettingsService';
 export * from './DATA_EDITOR_SETTINGS_GROUP';

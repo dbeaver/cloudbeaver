@@ -12,6 +12,7 @@ import { ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
 
 import type { IDatabaseDataModel } from '../DatabaseDataModel/IDatabaseDataModel';
 import type { IDatabaseDataResult } from '../DatabaseDataModel/IDatabaseDataResult';
+import type { IDataViewerTableStorage } from '../IDataViewerTableStorage';
 
 export interface ITableViewerStorageChangeEventData {
   type: 'add' | 'remove';
@@ -19,7 +20,7 @@ export interface ITableViewerStorageChangeEventData {
 }
 
 @injectable()
-export class TableViewerStorageService {
+export class TableViewerStorageService implements IDataViewerTableStorage {
   readonly onChange: ISyncExecutor<ITableViewerStorageChangeEventData>;
   private readonly tableModelMap: Map<string, IDatabaseDataModel<any, any>> = new Map();
 
