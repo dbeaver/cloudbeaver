@@ -30,6 +30,7 @@ export default [
   ['data_viewer_data_save_error_title', 'Error occurred while saving changes'],
   ['data_viewer_auto_refresh_settings', 'Auto refresh Settings'],
   ['data_viewer_auto_refresh_settings_stop_on_error', 'Stop on error'],
+  ['data_viewer_presentation_value_no_active_elements', 'No selected table cells'],
   ['data_viewer_presentation_value_title', 'Value'],
   ['data_viewer_presentation_value_text_line_wrapping_wrap', 'Wrap lines'],
   ['data_viewer_presentation_value_text_line_wrapping_no_wrap', "Don't wrap lines"],

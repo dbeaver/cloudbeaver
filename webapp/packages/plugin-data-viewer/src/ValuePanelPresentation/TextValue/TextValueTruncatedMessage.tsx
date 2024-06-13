@@ -15,7 +15,8 @@ import { bytesToSize, isNotNullDefined } from '@cloudbeaver/core-utils';
 import type { IResultSetElementKey } from '../../DatabaseDataModel/Actions/ResultSet/IResultSetDataKey';
 import { isResultSetBlobValue } from '../../DatabaseDataModel/Actions/ResultSet/isResultSetBlobValue';
 import { isResultSetContentValue } from '../../DatabaseDataModel/Actions/ResultSet/isResultSetContentValue';
-import { useResultSetActions } from '../../DatabaseDataModel/Actions/ResultSet/useResultSetActions';
+import { ResultSetDataContentAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetDataContentAction';
+import { ResultSetFormatAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetFormatAction';
 import type { IDatabaseDataModel } from '../../DatabaseDataModel/IDatabaseDataModel';
 import type { IDatabaseResultSet } from '../../DatabaseDataModel/IDatabaseResultSet';
 import { QuotaPlaceholder } from '../QuotaPlaceholder';
@@ -30,7 +31,8 @@ interface Props {
 export const TextValueTruncatedMessage = observer<Props>(function TextValueTruncatedMessage({ model, resultIndex, elementKey }) {
   const translate = useTranslate();
   const notificationService = useService(NotificationService);
-  const { contentAction, formatAction } = useResultSetActions({ model, resultIndex });
+  const contentAction = model.source.getAction(resultIndex, ResultSetDataContentAction);
+  const formatAction = model.source.getAction(resultIndex, ResultSetFormatAction);
   const contentValue = formatAction.get(elementKey);
   let isTruncated = contentAction.isTextTruncated(elementKey);
   const isCacheLoaded = !!contentAction.retrieveFullTextFromCache(elementKey);
@@ -43,8 +45,8 @@ export const TextValueTruncatedMessage = observer<Props>(function TextValueTrunc
   if (!isTruncated || isCacheLoaded) {
     return null;
   }
-  const isTextColumn = formatAction.isText(elementKey);
 
+  const isTextColumn = formatAction.isText(elementKey);
   const valueSize =
     isResultSetContentValue(contentValue) && isNotNullDefined(contentValue.contentLength) ? bytesToSize(contentValue.contentLength) : undefined;
 

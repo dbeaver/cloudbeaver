@@ -11,7 +11,7 @@ import { Container, Link, s, usePermission, useS, useTranslate } from '@cloudbea
 import { EAdminPermission } from '@cloudbeaver/core-root';
 
 import type { IResultSetElementKey } from '../DatabaseDataModel/Actions/ResultSet/IResultSetDataKey';
-import { useResultSetActions } from '../DatabaseDataModel/Actions/ResultSet/useResultSetActions';
+import { ResultSetDataContentAction } from '../DatabaseDataModel/Actions/ResultSet/ResultSetDataContentAction';
 import type { IDatabaseDataModel } from '../DatabaseDataModel/IDatabaseDataModel';
 import type { IDatabaseResultSet } from '../DatabaseDataModel/IDatabaseResultSet';
 import styles from './QuotaPlaceholder.module.css';
@@ -35,7 +35,7 @@ export const QuotaPlaceholder: React.FC<React.PropsWithChildren<Props>> = observ
   const translate = useTranslate();
   const admin = usePermission(EAdminPermission.admin);
   const style = useS(styles);
-  const { contentAction } = useResultSetActions({ model, resultIndex });
+  const contentAction = model.source.getAction(resultIndex, ResultSetDataContentAction);
   const limitInfo = elementKey ? contentAction.getLimitInfo(elementKey) : null;
 
   return (

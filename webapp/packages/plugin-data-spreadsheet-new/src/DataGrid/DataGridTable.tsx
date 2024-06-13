@@ -30,12 +30,12 @@ import '@cloudbeaver/plugin-react-data-grid/react-data-grid-dist/lib/styles.css'
 
 import { CellPosition, EditingContext } from '../Editing/EditingContext';
 import { useEditing } from '../Editing/useEditing';
-import '../styles/base.scss';
 import { reactGridStyles } from '../styles/styles';
 import { CellRenderer } from './CellRenderer/CellRenderer';
 import { DataGridContext, IColumnResizeInfo, IDataGridContext } from './DataGridContext';
 import { DataGridSelectionContext } from './DataGridSelection/DataGridSelectionContext';
 import { useGridSelectionContext } from './DataGridSelection/useGridSelectionContext';
+import classes from './DataGridTable.module.css';
 import { CellFormatter } from './Formatters/CellFormatter';
 import { TableDataContext } from './TableDataContext';
 import { useGridDragging } from './useGridDragging';
@@ -435,7 +435,7 @@ export const DataGridTable = observer<IDataPresentationProps<any, IDatabaseResul
           <TableDataContext.Provider value={tableData}>
             <div
               ref={setContainersRef}
-              className="cb-react-grid-container"
+              className={`cb-react-grid-container ${classes.container}`}
               tabIndex={-1}
               onKeyDown={handleKeyDown}
               onMouseDown={onMouseDownHandler}
