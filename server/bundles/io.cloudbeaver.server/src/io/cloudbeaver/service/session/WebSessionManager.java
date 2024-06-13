@@ -37,6 +37,7 @@ import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.auth.SMAuthInfo;
 import org.jkiss.dbeaver.model.security.user.SMAuthPermissions;
 import org.jkiss.dbeaver.model.websocket.WSConstants;
+import org.jkiss.dbeaver.model.websocket.event.WSUserDeletedEvent;
 import org.jkiss.dbeaver.model.websocket.event.session.WSSessionStateEvent;
 import org.jkiss.utils.CommonUtils;
 
@@ -347,11 +348,15 @@ public class WebSessionManager {
         }
     }
 
-    public void closeUserSession(@NotNull String userId) {
+    public void closeUserSession(@NotNull WSUserDeletedEvent userDeletedEvent) {
         synchronized (sessionMap) {
             for (Iterator<BaseWebSession> iterator = sessionMap.values().iterator(); iterator.hasNext(); ) {
                 var session = iterator.next();
-                if (CommonUtils.equalObjects(session.getUserContext().getUserId(), userId)) {
+                if (CommonUtils.equalObjects(session.getUserContext().getUserId(),
+                    userDeletedEvent.getDeletedUserId())) {
+                    if (session instanceof WebHeadlessSession headlessSession) {
+                        headlessSession.addSessionEvent(userDeletedEvent);
+                    }
                     iterator.remove();
                     session.close();
                 }
