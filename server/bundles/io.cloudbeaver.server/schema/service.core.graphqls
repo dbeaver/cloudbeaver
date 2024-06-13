@@ -217,10 +217,10 @@ type DriverInfo {
     providerId: ID
     # Driver Java class name
     driverClassName: String
-    defaultHost: String
-    defaultPort: String
-    defaultDatabase: String
-    defaultServer: String
+    defaultHost: String @deprecated(reason: "24.1.1, use mainProperties")
+    defaultPort: String @deprecated(reason: "24.1.1, use mainProperties")
+    defaultDatabase: String @deprecated(reason: "24.1.1, use mainProperties")
+    defaultServer: String @deprecated(reason: "24.1.1, use mainProperties")
     defaultUser: String
     sampleURL: String
     driverInfoURL: String
@@ -250,7 +250,7 @@ type DriverInfo {
 
     # Main driver properties
     # Contains info about main fields (host, port, database, server name)
-    mainProperties: [ObjectPropertyInfo!]!
+    mainProperties: [ObjectPropertyInfo!]! @since(version: "24.1.1")
 
     # Additional driver provider properties
     # These properties can be configured by user on main connection page
@@ -286,7 +286,7 @@ enum ResultDataFormat {
 enum DriverConfigurationType {
     MANUAL,
     URL,
-    CUSTOM
+    CUSTOM @since(version: "24.1.1")
 }
 
 ## Network handler config
@@ -345,7 +345,7 @@ type ConnectionInfo {
     databaseName: String
     url: String
 
-    mainProperties: Object
+    mainProperties: Object @since(version: "24.1.1")
 
     keepAliveInterval: Int!
 
@@ -507,7 +507,7 @@ input ConnectionConfig {
     databaseName: String @deprecated(reason: "24.1.1, use mainProperties")
 
     # Host, port, serverName, databaseName are stored and mainProperties
-    mainProperties: Object
+    mainProperties: Object @since(version: "24.1.1")
 
     # Connection url jdbc:{driver}://{host}[:{port}]/[{database}]
     url: String

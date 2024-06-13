@@ -387,10 +387,10 @@ public class WebConnectionInfo {
     @Property
     public Map<String, String> getMainProperties() {
         Map<String, String> mainProperties = new LinkedHashMap<>();
-        mainProperties.put(DBConstants.PROP_HOST, dataSourceContainer.getConnectionConfiguration().getHostName());
-        mainProperties.put(DBConstants.PROP_PORT, dataSourceContainer.getConnectionConfiguration().getHostPort());
-        mainProperties.put(DBConstants.PROP_DATABASE, dataSourceContainer.getConnectionConfiguration().getDatabaseName());
-        mainProperties.put(DBConstants.PROP_SERVER, dataSourceContainer.getConnectionConfiguration().getServerName());
+        mainProperties.put(DBConstants.PROP_HOST, getHost());
+        mainProperties.put(DBConstants.PROP_PORT, getPort());
+        mainProperties.put(DBConstants.PROP_DATABASE, getDatabaseName());
+        mainProperties.put(DBConstants.PROP_SERVER, getServerName());
         return mainProperties;
     }
 
