@@ -21,8 +21,8 @@ import io.cloudbeaver.server.CBConstants;
 import io.cloudbeaver.service.rm.nio.RMNIOFileSystem;
 import io.cloudbeaver.service.rm.nio.RMNIOFileSystemProvider;
 import io.cloudbeaver.service.rm.nio.RMPath;
+import io.cloudbeaver.test.WebGQLClient;
 import io.cloudbeaver.test.platform.CEServerTestSuite;
-import io.cloudbeaver.utils.WebTestUtils;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.auth.SMAuthStatus;
 import org.jkiss.dbeaver.model.data.json.JSONUtils;
@@ -53,12 +53,12 @@ public class RMNIOTest {
     @BeforeClass
     public static void init() throws Exception {
         var cookieManager = new CookieManager();
-        var client = HttpClient.newBuilder()
+        var httpClient = HttpClient.newBuilder()
             .cookieHandler(cookieManager)
             .version(HttpClient.Version.HTTP_2)
             .build();
-        Map<String, Object> authInfo = WebTestUtils.authenticateUser(
-            client, CEServerTestSuite.getScriptsPath(), CEServerTestSuite.GQL_API_URL);
+        WebGQLClient client = CEServerTestSuite.createClient(httpClient);
+        Map<String, Object> authInfo = CEServerTestSuite.authenticateTestUser(client);
         Assert.assertEquals(SMAuthStatus.SUCCESS.name(), JSONUtils.getString(authInfo, "authStatus"));
 
         String sessionId = cookieManager.getCookieStore().getCookies()

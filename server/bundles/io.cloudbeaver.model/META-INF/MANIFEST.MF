@@ -41,6 +41,7 @@ Export-Package: io.cloudbeaver,
  io.cloudbeaver.service.admin,
  io.cloudbeaver.service.security,
  io.cloudbeaver.service.sql,
+ io.cloudbeaver.test,
  io.cloudbeaver.utils,
  io.cloudbeaver.utils.file
 Automatic-Module-Name: io.cloudbeaver.model
