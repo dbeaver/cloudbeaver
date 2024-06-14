@@ -5,6 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
+import { autorun } from 'mobx';
 import { useLayoutEffect, useState } from 'react';
 
 import { uuid } from '@cloudbeaver/core-utils';
@@ -14,16 +15,19 @@ import type { IDataContext } from './IDataContext';
 export function useDataContextLink(context: IDataContext | undefined, update: (context: IDataContext, id: string) => void): void {
   const [id] = useState(() => uuid());
 
-  useLayoutEffect(() => {
-    if (context) {
-      update(context, id);
-    }
-  });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useLayoutEffect(
+    autorun(() => {
+      if (context) {
+        update(context, id);
+      }
+    }),
+  );
 
   useLayoutEffect(
     () => () => {
       context?.deleteForId(id);
     },
-    [context],
+    [context, id],
   );
 }
