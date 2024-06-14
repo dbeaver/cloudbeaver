@@ -61,7 +61,7 @@ export class ResultSetTableFooterMenuService {
         const resultIndex = context.get(DATA_CONTEXT_DV_DDM_RESULT_INDEX)!;
         const result = model.getResult(resultIndex);
 
-        if (!result || result?.dataFormat !== ResultDataFormat.Resultset) {
+        if (!result || result.dataFormat !== ResultDataFormat.Resultset) {
           return false;
         }
         const constraint = model.source.tryGetAction(resultIndex, ResultSetConstraintAction);
