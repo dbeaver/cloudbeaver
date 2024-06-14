@@ -40,15 +40,7 @@ export class DataContext implements IDataContext {
   }
 
   has(context: DataContextGetter<any>): boolean {
-    if (this.hasOwn(context)) {
-      return true;
-    }
-
-    if (this.fallback?.has(context)) {
-      return true;
-    }
-
-    return false;
+    return this.hasOwn(context) || this.fallback?.has(context) || false;
   }
 
   hasOwnValue<T>(context: DataContextGetter<T>, value: T): boolean {
@@ -100,17 +92,12 @@ export class DataContext implements IDataContext {
   }
 
   deleteForId(id: string): this {
-    const ids = new Set<DataContextGetter<unknown>>();
     for (const [context, data] of this.store) {
       data.delete(id);
 
       if (data.size === 0) {
-        ids.add(context);
+        this.store.delete(context);
       }
-    }
-
-    for (const context of ids) {
-      this.store.delete(context);
     }
 
     return this;
