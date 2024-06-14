@@ -12,13 +12,11 @@ import { Form, getComputed, s, ToolsPanel, useS } from '@cloudbeaver/core-blocks
 import type { IDataContext } from '@cloudbeaver/core-data-context';
 import { useService } from '@cloudbeaver/core-di';
 
-import { ResultSetConstraintAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetConstraintAction';
 import type { IDatabaseDataModel } from '../../DatabaseDataModel/IDatabaseDataModel';
 import { DataViewerSettingsService } from '../../DataViewerSettingsService';
 import { AutoRefreshButton } from './AutoRefresh/AutoRefreshButton';
 import styles from './TableFooter.module.css';
 import { TableFooterMenu } from './TableFooterMenu/TableFooterMenu';
-import { TableFooterRowCount } from './TableFooterRowCount';
 
 interface Props {
   resultIndex: number;
@@ -53,7 +51,6 @@ export const TableFooter = observer<Props>(function TableFooter({ resultIndex, m
   }, [model.countGain]);
 
   const disabled = getComputed(() => model.isLoading() || model.isDisabled(resultIndex));
-  const constraint = model.getResult(resultIndex) ? model.source.getAction(resultIndex, ResultSetConstraintAction) : null;
 
   return (
     <ToolsPanel type="secondary" center minHeight>
@@ -73,7 +70,6 @@ export const TableFooter = observer<Props>(function TableFooter({ resultIndex, m
           />
         </Form>
       </div>
-      {constraint?.supported && <TableFooterRowCount model={model} resultIndex={resultIndex} />}
       <TableFooterMenu model={model} resultIndex={resultIndex} simple={simple} context={context} />
       {model.source.requestInfo.requestMessage.length > 0 && (
         <div className={s(style, { time: true })}>
