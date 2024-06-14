@@ -175,7 +175,7 @@ export class ConnectionOptionsTabService extends Bootstrap {
     const driver = await this.dbDriverResource.load(state.config.driverId, ['includeProviderProperties']);
 
     state.config.authModelId = driver?.defaultAuthModel;
-    state.config.configurationType = driver ? getDefaultConfigurationType(driver) : DriverConfigurationType.Manual;
+    state.config.configurationType = getDefaultConfigurationType(driver);
 
     state.config.host = driver?.defaultServer || 'localhost';
     state.config.port = driver?.defaultPort;
@@ -315,7 +315,7 @@ export class ConnectionOptionsTabService extends Bootstrap {
       const properties = await this.getConnectionAuthModelProperties(tempConfig.authModelId, state.info);
 
       if (this.isCredentialsChanged(properties, state.config.credentials)) {
-        tempConfig.credentials = this.prepareDynamicProperties(properties, toJS(state.config.credentials));
+        tempConfig.credentials = this.prepareDynamicProperties(properties, toJS(state.config.credentials), tempConfig.configurationType);
       }
 
       if (!tempConfig.saveCredentials) {
@@ -324,11 +324,19 @@ export class ConnectionOptionsTabService extends Bootstrap {
     }
 
     if (driver.providerProperties.length > 0) {
-      tempConfig.providerProperties = this.prepareDynamicProperties(driver.providerProperties, toJS(state.config.providerProperties));
+      tempConfig.providerProperties = this.prepareDynamicProperties(
+        driver.providerProperties,
+        toJS(state.config.providerProperties),
+        tempConfig.configurationType,
+      );
     }
 
     if (driver.mainProperties.length > 0) {
-      tempConfig.mainProperties = this.prepareDynamicProperties(driver.mainProperties, toJS(state.config.mainProperties));
+      tempConfig.mainProperties = this.prepareDynamicProperties(
+        driver.mainProperties,
+        toJS(state.config.mainProperties),
+        tempConfig.configurationType,
+      );
     }
 
     runInAction(() => {
@@ -336,7 +344,11 @@ export class ConnectionOptionsTabService extends Bootstrap {
     });
   }
 
-  private prepareDynamicProperties(propertiesInfo: ObjectPropertyInfo[], properties: Record<string, any>) {
+  private prepareDynamicProperties(
+    propertiesInfo: ObjectPropertyInfo[],
+    properties: Record<string, any>,
+    configurationType: DriverConfigurationType | undefined,
+  ) {
     const result: Record<string, any> = { ...properties };
 
     for (const propertyInfo of propertiesInfo) {
@@ -344,9 +356,15 @@ export class ConnectionOptionsTabService extends Bootstrap {
         continue;
       }
 
-      const isDefault = isNotNullDefined(propertyInfo.defaultValue);
-      if (!(propertyInfo.id in result) && isDefault) {
-        result[propertyInfo.id] = propertyInfo.defaultValue;
+      const supported = propertyInfo.supportedConfigurationTypes?.some(type => type === configurationType);
+
+      if (!supported) {
+        delete result[propertyInfo.id];
+      } else {
+        const isDefault = isNotNullDefined(propertyInfo.defaultValue);
+        if (!(propertyInfo.id in result) && isDefault) {
+          result[propertyInfo.id] = propertyInfo.defaultValue;
+        }
       }
     }
 

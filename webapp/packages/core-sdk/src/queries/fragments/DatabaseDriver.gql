@@ -23,11 +23,11 @@ fragment DatabaseDriver on DriverInfo {
   configurationTypes
 
   mainProperties {
-    ...DriverMainPropertyInfo
+    ...DriverPropertyInfo
   }
 
   providerProperties @include(if: $includeProviderProperties) {
-    ...DriverProviderPropertyInfo
+    ...DriverPropertyInfo
   }
 
   driverProperties @include(if: $includeDriverProperties) {

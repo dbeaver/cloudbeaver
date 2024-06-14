@@ -8,13 +8,17 @@
 import type { DBDriver } from '@cloudbeaver/core-connections';
 import { DriverConfigurationType } from '@cloudbeaver/core-sdk';
 
-export function getDefaultConfigurationType(driver: DBDriver) {
-  const isCustomConfiguration = driver?.configurationTypes.includes(DriverConfigurationType.Custom) && driver.mainProperties.length > 0;
-  const isManualConfiguration = driver?.configurationTypes.includes(DriverConfigurationType.Manual);
+export function getDefaultConfigurationType(driver: DBDriver | undefined) {
+  if (!driver) {
+    return DriverConfigurationType.Url;
+  }
 
-  if (isCustomConfiguration) {
+  const supportCustom = driver.configurationTypes.includes(DriverConfigurationType.Custom);
+  const supportManual = driver.configurationTypes.includes(DriverConfigurationType.Manual);
+
+  if (supportCustom && driver.mainProperties.length > 0) {
     return DriverConfigurationType.Custom;
   }
 
-  return isManualConfiguration ? DriverConfigurationType.Manual : DriverConfigurationType.Url;
+  return supportManual ? DriverConfigurationType.Manual : DriverConfigurationType.Url;
 }

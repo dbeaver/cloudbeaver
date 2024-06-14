@@ -6,9 +6,8 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import type { HTMLInputTypeAttribute } from 'react';
 
-import { getObjectPropertyType, type ObjectPropertyInfo, type ObjectPropertyType } from '@cloudbeaver/core-sdk';
+import { getObjectPropertyType, getObjectPropertyValueType, type ObjectPropertyInfo, type ObjectPropertyType } from '@cloudbeaver/core-sdk';
 import { removeMetadataFromDataURL } from '@cloudbeaver/core-utils';
 
 import { FieldCheckbox } from '../../FormControls/Checkboxes/FieldCheckbox';
@@ -71,7 +70,8 @@ export const RenderField = observer<RenderFieldProps>(function RenderField({
   const translate = useTranslate();
 
   const controlType = getObjectPropertyType(property);
-  const password = property.features.includes('password');
+  const type = getObjectPropertyValueType(property);
+  const isPassword = type === 'password';
   const required = property.required && !readOnly;
 
   const value = getValue(property.value, controlType);
@@ -173,7 +173,7 @@ export const RenderField = observer<RenderFieldProps>(function RenderField({
     );
   }
 
-  const passwordSaved = showRememberTip && ((password && !!property.value) || saved);
+  const passwordSaved = showRememberTip && ((isPassword && !!property.value) || saved);
   const passwordSavedMessage = passwordSaved ? translate('core_blocks_object_property_info_password_saved') : undefined;
 
   if (controlType === 'file' && state) {
@@ -230,22 +230,12 @@ export const RenderField = observer<RenderFieldProps>(function RenderField({
     );
   }
 
-  let type: HTMLInputTypeAttribute = 'text';
-
-  if (controlType === 'input:number') {
-    type = 'number';
-  }
-
-  if (password) {
-    type = 'password';
-  }
-
   if (state !== undefined) {
     return (
       <InputField
         required={required}
         type={type}
-        title={password ? property.description || property.displayName : undefined}
+        title={isPassword ? property.description || property.displayName : undefined}
         labelTooltip={property.description || property.displayName}
         name={property.id!}
         state={state}
@@ -269,7 +259,7 @@ export const RenderField = observer<RenderFieldProps>(function RenderField({
     <InputField
       required={required}
       type={type}
-      title={password ? property.description || property.displayName : undefined}
+      title={isPassword ? property.description || property.displayName : undefined}
       labelTooltip={property.description || property.displayName}
       name={property.id!}
       value={value}
