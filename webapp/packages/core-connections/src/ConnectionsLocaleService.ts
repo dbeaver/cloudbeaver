@@ -28,6 +28,8 @@ export class ConnectionsLocaleService extends Bootstrap {
         return (await import('./locales/it')).default;
       case 'zh':
         return (await import('./locales/zh')).default;
+      case 'fr':
+        return (await import('./locales/fr')).default;
       case 'de':
         return (await import('./locales/de')).default;
       default:
