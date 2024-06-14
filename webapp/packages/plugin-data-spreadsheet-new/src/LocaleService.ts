@@ -30,6 +30,8 @@ export class LocaleService extends Bootstrap {
         return (await import('./locales/zh')).default;
       case 'fr':
         return (await import('./locales/fr')).default;
+      case 'de':
+        return (await import('./locales/de')).default;
       default:
         return (await import('./locales/en')).default;
     }
