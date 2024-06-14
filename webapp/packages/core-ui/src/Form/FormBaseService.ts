@@ -22,13 +22,17 @@ export class FormBaseService<TState, TProps extends IFormProps<TState> = IFormPr
 
   readonly onConfigure: IExecutorHandlersCollection<IFormState<TState>>;
   readonly onFillDefaultConfig: IExecutorHandlersCollection<IFormState<TState>>;
-  readonly onPrepareConfig: IExecutorHandlersCollection<TState>;
+  readonly onPrepareConfig: IExecutorHandlersCollection<IFormState<TState>>;
   readonly onFormat: IExecutorHandlersCollection<IFormState<TState>>;
   readonly onValidate: IExecutorHandlersCollection<IFormState<TState>>;
   readonly onSubmit: IExecutorHandlersCollection<IFormState<TState>>;
   readonly onState: IExecutorHandlersCollection<TState>;
 
-  constructor(private readonly localizationService: LocalizationService, private readonly notificationService: NotificationService, name: string) {
+  constructor(
+    private readonly localizationService: LocalizationService,
+    private readonly notificationService: NotificationService,
+    name: string,
+  ) {
     this.parts = new TabsContainer(name);
     this.actionsContainer = new PlaceholderContainer();
     this.onConfigure = new ExecutorHandlersCollection();
