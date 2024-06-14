@@ -270,13 +270,7 @@ public class WebServiceAdmin implements DBWServiceAdmin {
         }
         try {
             var adminSecurityController = webSession.getAdminSecurityController();
-            SMTeam[] userTeams = adminSecurityController.getUserTeams(user);
-            List<String> teamIds = Arrays.stream(userTeams).map(SMTeam::getTeamId).collect(Collectors.toList());
-            if (teamIds.contains(team)) {
-                return true;
-            }
-            teamIds.add(team);
-            adminSecurityController.setUserTeams(user, teamIds.toArray(new String[0]), grantor.getUserId());
+            adminSecurityController.addUserTeams(user, new String[]{team}, grantor.getUserId());
             return true;
         } catch (Exception e) {
             throw new DBWebException("Error granting team", e);
@@ -299,8 +293,7 @@ public class WebServiceAdmin implements DBWServiceAdmin {
             SMTeam[] userTeams = adminSecurityController.getUserTeams(user);
             List<String> teamIds = Arrays.stream(userTeams).map(SMTeam::getTeamId).collect(Collectors.toList());
             if (teamIds.contains(team)) {
-                teamIds.remove(team);
-                adminSecurityController.setUserTeams(user, teamIds.toArray(new String[0]), grantor.getUserId());
+                adminSecurityController.deleteUserTeams(user, new String[]{team});
             } else {
                 throw new DBWebException("User '" + user + "' doesn't have team '" + team + "'");
             }
