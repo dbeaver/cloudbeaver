@@ -117,7 +117,7 @@ export function useAuthDialogState(accessRequest: boolean, providerId: string | 
       isTooManySessions: false,
       forceSessionsLogout: false,
       switchAuthMode(tabId: string | null, resetError = true): void {
-        if (tabId === this.tabId) {
+        if (tabId !== null && tabId === this.tabId) {
           return;
         }
 
