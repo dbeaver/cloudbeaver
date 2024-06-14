@@ -218,7 +218,7 @@ public class WebServiceUtils extends WebCommonUtils {
             }
             return;
         }
-        if (!CommonUtils.isEmpty(config.getUrl())) {
+        if (CommonUtils.isNotEmpty(config.getUrl())) {
             dsConfig.setUrl(config.getUrl());
             return;
         }
