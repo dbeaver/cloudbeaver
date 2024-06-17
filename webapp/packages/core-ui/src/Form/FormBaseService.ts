@@ -58,17 +58,17 @@ export class FormBaseService<TState, TProps extends IFormProps<TState> = IFormPr
     }
 
     if (status.messages.length > 0) {
-      // if (status.exception) {
-      //   this.notificationService.logException(status.exception, status.messages[0], status.messages.slice(1).join('\n'));
-      // } else {
-      //   this.notificationService.notify(
-      //     {
-      //       title: status.messages[0],
-      //       message: status.messages.slice(1).join('\n'),
-      //     },
-      //     status.saved ? ENotificationType.Success : ENotificationType.Error,
-      //   );
-      // }
+      if (status.exception) {
+        this.notificationService.logException(status.exception, status.messages[0], status.messages.slice(1).join('\n'));
+      } else {
+        this.notificationService.notify(
+          {
+            title: status.messages[0],
+            message: status.messages.slice(1).join('\n'),
+          },
+          status.saved ? ENotificationType.Success : ENotificationType.Error,
+        );
+      }
     }
   };
 
