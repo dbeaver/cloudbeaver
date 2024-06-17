@@ -59,6 +59,7 @@ export class DataGridSettingsService extends Dependency {
         },
         type: ESettingsValueType.Checkbox,
         name: 'plugin_data_spreadsheet_new_settings_disable',
+        description: 'plugin_data_spreadsheet_new_settings_disable_description',
       },
     ]);
   }

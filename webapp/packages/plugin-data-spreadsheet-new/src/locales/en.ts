@@ -1,3 +1,10 @@
+/*
+ * CloudBeaver - Cloud Database Manager
+ * Copyright (C) 2020-2024 DBeaver Corp and others
+ *
+ * Licensed under the Apache License, Version 2.0.
+ * you may not use this file except in compliance with the License.
+ */
 export default [
   ['data_grid_table_empty_placeholder', 'The table does not contain any columns'],
   ['data_grid_table_editing', 'Edit'],
@@ -23,4 +30,5 @@ export default [
   ['data_grid_table_index_column_tooltip', 'Select whole table'],
   ['data_grid_table_readonly_tooltip', 'Read-only'],
   ['plugin_data_spreadsheet_new_settings_disable', 'Disable Table presentation'],
+  ['plugin_data_spreadsheet_new_settings_disable_description', 'Disable table presentation of data for all users'],
 ];
