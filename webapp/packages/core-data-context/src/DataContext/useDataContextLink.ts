@@ -15,8 +15,7 @@ import type { IDataContext } from './IDataContext';
 export function useDataContextLink(context: IDataContext | undefined, update: (context: IDataContext, id: string) => void): void {
   const [id] = useState(() => uuid());
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  useLayoutEffect(
+  useLayoutEffect(() =>
     autorun(() => {
       if (context) {
         update(context, id);
