@@ -5,10 +5,13 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
+export * from './Action/Actions/ACTION_ADD';
+export * from './Action/Actions/ACTION_CANCEL';
 export * from './Action/Actions/ACTION_COLLAPSE_ALL';
 export * from './Action/Actions/ACTION_CREATE';
 export * from './Action/Actions/ACTION_DELETE';
 export * from './Action/Actions/ACTION_EDIT';
+export * from './Action/Actions/ACTION_DUPLICATE';
 export * from './Action/Actions/ACTION_EXPORT';
 export * from './Action/Actions/ACTION_FILTER';
 export * from './Action/Actions/ACTION_LAYOUT';
@@ -18,6 +21,7 @@ export * from './Action/Actions/ACTION_OPEN';
 export * from './Action/Actions/ACTION_REDO';
 export * from './Action/Actions/ACTION_REFRESH';
 export * from './Action/Actions/ACTION_RENAME';
+export * from './Action/Actions/ACTION_REVERT';
 export * from './Action/Actions/ACTION_SAVE';
 export * from './Action/Actions/ACTION_SETTINGS';
 export * from './Action/Actions/ACTION_UNDO';
