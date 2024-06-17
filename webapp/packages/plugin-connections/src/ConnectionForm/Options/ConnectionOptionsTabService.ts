@@ -21,7 +21,6 @@ import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import { LocalizationService } from '@cloudbeaver/core-localization';
 import { isSharedProject, ProjectInfoResource } from '@cloudbeaver/core-projects';
-import { ServerConfigResource } from '@cloudbeaver/core-root';
 import { DriverConfigurationType, isObjectPropertyInfoStateEqual, ObjectPropertyInfo } from '@cloudbeaver/core-sdk';
 import { formStateContext } from '@cloudbeaver/core-ui';
 import { getUniqueName, isNotNullDefined, isValuesEqual } from '@cloudbeaver/core-utils';
@@ -39,10 +38,14 @@ export const Options = React.lazy(async () => {
   return { default: Options };
 });
 
+const MAIN_PROPERTY_DATABASE_KEY = 'database';
+const MAIN_PROPERTY_HOST_KEY = 'host';
+const MAIN_PROPERTY_PORT_KEY = 'port';
+const MAIN_PROPERTY_SERVER_KEY = 'server';
+
 @injectable()
 export class ConnectionOptionsTabService extends Bootstrap {
   constructor(
-    private readonly serverConfigResource: ServerConfigResource,
     private readonly projectInfoResource: ProjectInfoResource,
     private readonly connectionFormService: ConnectionFormService,
     private readonly dbDriverResource: DBDriverResource,
@@ -220,10 +223,11 @@ export class ConnectionOptionsTabService extends Bootstrap {
     state.config.template = state.info.template;
     state.config.driverId = state.info.driverId;
 
-    state.config.host = state.info.host;
-    state.config.port = state.info.port;
-    state.config.serverName = state.info.serverName;
-    state.config.databaseName = state.info.databaseName;
+    state.config.host = state.info.mainProperties[MAIN_PROPERTY_HOST_KEY];
+    state.config.port = state.info.mainProperties[MAIN_PROPERTY_PORT_KEY];
+    state.config.serverName = state.info.mainProperties[MAIN_PROPERTY_SERVER_KEY];
+    state.config.databaseName = state.info.mainProperties[MAIN_PROPERTY_DATABASE_KEY];
+
     state.config.url = state.info.url;
     state.config.folder = state.info.folder;
 
@@ -264,7 +268,7 @@ export class ConnectionOptionsTabService extends Bootstrap {
       return;
     }
 
-    const driver = await this.dbDriverResource.load(state.config.driverId, ['includeProviderProperties']);
+    const driver = await this.dbDriverResource.load(state.config.driverId, ['includeProviderProperties', 'includeMainProperties']);
     const tempConfig = toJS(config);
 
     if (state.mode === 'edit') {
@@ -272,7 +276,6 @@ export class ConnectionOptionsTabService extends Bootstrap {
     }
 
     tempConfig.configurationType = state.config.configurationType;
-
     tempConfig.name = state.config.name?.trim();
 
     if (tempConfig.name && state.mode === 'create') {
@@ -283,11 +286,8 @@ export class ConnectionOptionsTabService extends Bootstrap {
     }
 
     tempConfig.description = state.config.description?.trim();
-
     tempConfig.template = state.config.template;
-
     tempConfig.driverId = state.config.driverId;
-
     tempConfig.keepAliveInterval = Number(state.config.keepAliveInterval);
 
     if (!state.config.template && state.config.folder) {
@@ -296,15 +296,21 @@ export class ConnectionOptionsTabService extends Bootstrap {
 
     if (tempConfig.configurationType === DriverConfigurationType.Url) {
       tempConfig.url = state.config.url?.trim();
-    } else {
+    }
+
+    tempConfig.mainProperties = toJS(state.config.mainProperties);
+
+    if (tempConfig.configurationType === DriverConfigurationType.Manual) {
+      tempConfig.mainProperties[MAIN_PROPERTY_DATABASE_KEY] = state.config.databaseName?.trim();
+
       if (!driver.embedded) {
-        tempConfig.host = state.config.host?.trim();
-        tempConfig.port = state.config.port?.trim();
+        tempConfig.mainProperties[MAIN_PROPERTY_HOST_KEY] = state.config.host?.trim();
+        tempConfig.mainProperties[MAIN_PROPERTY_PORT_KEY] = state.config.port?.trim();
       }
+
       if (driver.requiresServerName) {
-        tempConfig.serverName = state.config.serverName?.trim();
+        tempConfig.mainProperties[MAIN_PROPERTY_SERVER_KEY] = state.config.serverName?.trim();
       }
-      tempConfig.databaseName = state.config.databaseName?.trim();
     }
 
     if ((state.config.authModelId || driver.defaultAuthModel) && !driver.anonymousAccess) {
@@ -331,12 +337,8 @@ export class ConnectionOptionsTabService extends Bootstrap {
       );
     }
 
-    if (driver.mainProperties.length > 0) {
-      tempConfig.mainProperties = this.prepareDynamicProperties(
-        driver.mainProperties,
-        toJS(state.config.mainProperties),
-        tempConfig.configurationType,
-      );
+    if (tempConfig.configurationType === DriverConfigurationType.Custom && !!driver.mainProperties?.length) {
+      tempConfig.mainProperties = this.prepareDynamicProperties(driver.mainProperties, tempConfig.mainProperties, tempConfig.configurationType);
     }
 
     runInAction(() => {
@@ -381,7 +383,7 @@ export class ConnectionOptionsTabService extends Bootstrap {
     const config = contexts.getContext(connectionConfigContext);
     const stateContext = contexts.getContext(formStateContext);
 
-    const driver = await this.dbDriverResource.load(config.driverId!, ['includeProviderProperties']);
+    const driver = await this.dbDriverResource.load(config.driverId!, ['includeProviderProperties', 'includeMainProperties']);
     const authModel = await this.databaseAuthModelsResource.load(config.authModelId ?? data.info?.authModel ?? driver.defaultAuthModel);
 
     const providerId = authModel.requiredAuth ?? data.info?.requiredAuth ?? AUTH_PROVIDER_LOCAL_ID;
@@ -405,7 +407,7 @@ export class ConnectionOptionsTabService extends Bootstrap {
 
     const config = contexts.getContext(connectionConfigContext);
     const stateContext = contexts.getContext(formStateContext);
-    const driver = await this.dbDriverResource.load(data.config.driverId!, ['includeProviderProperties']);
+    const driver = await this.dbDriverResource.load(data.config.driverId!, ['includeProviderProperties', 'includeMainProperties']);
 
     if (
       !isValuesEqual(config.name, data.info.name, '') ||

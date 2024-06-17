@@ -75,7 +75,7 @@ const driverConfiguration: IDriverConfiguration[] = [
   {
     name: 'Custom',
     value: DriverConfigurationType.Custom,
-    isVisible: driver => driver.configurationTypes.includes(DriverConfigurationType.Custom) && driver.mainProperties.length > 0,
+    isVisible: driver => driver.configurationTypes.includes(DriverConfigurationType.Custom) && !!driver.mainProperties?.length,
   },
 ];
 
@@ -99,7 +99,7 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
   const driverMap = useResource(
     Options,
     DBDriverResource,
-    { key: config.driverId || null, includes: ['includeProviderProperties'] as const },
+    { key: config.driverId || null, includes: ['includeProviderProperties', 'includeMainProperties'] as const },
     {
       onData: data => {
         optionsHook.setDefaults(data);

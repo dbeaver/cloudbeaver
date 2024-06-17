@@ -16,7 +16,7 @@ export function getDefaultConfigurationType(driver: DBDriver | undefined) {
   const supportCustom = driver.configurationTypes.includes(DriverConfigurationType.Custom);
   const supportManual = driver.configurationTypes.includes(DriverConfigurationType.Manual);
 
-  if (supportCustom && driver.mainProperties.length > 0) {
+  if (supportCustom && !!driver.mainProperties?.length) {
     return DriverConfigurationType.Custom;
   }
 

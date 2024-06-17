@@ -22,7 +22,7 @@ fragment DatabaseDriver on DriverInfo {
   applicableNetworkHandlers
   configurationTypes
 
-  mainProperties {
+  mainProperties @include(if: $includeMainProperties) {
     ...DriverPropertyInfo
   }
 
