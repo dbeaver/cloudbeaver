@@ -7,12 +7,14 @@
  */
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { ResultDataFormat } from '@cloudbeaver/core-sdk';
-import { ActionService, menuExtractItems, MenuService } from '@cloudbeaver/core-view';
+import { ActionService, MenuService } from '@cloudbeaver/core-view';
 import {
   DATA_CONTEXT_DV_DDM,
   DATA_CONTEXT_DV_DDM_RESULT_INDEX,
+  DATA_CONTEXT_DV_PRESENTATION,
   DATA_VIEWER_DATA_MODEL_ACTIONS_MENU,
   DatabaseEditAction,
+  DataViewerPresentationType,
 } from '@cloudbeaver/plugin-data-viewer';
 
 import { ACTION_SQL_GENERATE } from './actions/ACTION_SQL_GENERATE';
@@ -31,12 +33,20 @@ export class GeneratorMenuBootstrap extends Bootstrap {
   register(): void {
     this.menuService.addCreator({
       menus: [DATA_VIEWER_DATA_MODEL_ACTIONS_MENU],
+      contexts: [DATA_CONTEXT_DV_DDM, DATA_CONTEXT_DV_DDM_RESULT_INDEX],
+      isApplicable: context => {
+        const model = context.get(DATA_CONTEXT_DV_DDM)!;
+        const resultIndex = context.get(DATA_CONTEXT_DV_DDM_RESULT_INDEX)!;
+        const presentation = context.get(DATA_CONTEXT_DV_PRESENTATION);
+        return (
+          !model.isReadonly(resultIndex) &&
+          model.source.getResult(resultIndex)?.dataFormat === ResultDataFormat.Resultset &&
+          !presentation?.readonly &&
+          (!presentation || presentation.type === DataViewerPresentationType.Data)
+        );
+      },
       getItems(context, items) {
         return [...items, ACTION_SQL_GENERATE];
-      },
-      orderItems(context, items) {
-        const extracted = menuExtractItems(items, [ACTION_SQL_GENERATE]);
-        return [...items, ...extracted];
       },
     });
 
@@ -45,11 +55,6 @@ export class GeneratorMenuBootstrap extends Bootstrap {
       menus: [DATA_VIEWER_DATA_MODEL_ACTIONS_MENU],
       actions: [ACTION_SQL_GENERATE],
       contexts: [DATA_CONTEXT_DV_DDM, DATA_CONTEXT_DV_DDM_RESULT_INDEX],
-      isActionApplicable(context) {
-        const model = context.get(DATA_CONTEXT_DV_DDM)!;
-        const resultIndex = context.get(DATA_CONTEXT_DV_DDM_RESULT_INDEX)!;
-        return !model.isReadonly(resultIndex) && model.source.getResult(resultIndex)?.dataFormat === ResultDataFormat.Resultset;
-      },
       isDisabled(context) {
         const model = context.get(DATA_CONTEXT_DV_DDM)!;
         const resultIndex = context.get(DATA_CONTEXT_DV_DDM_RESULT_INDEX)!;

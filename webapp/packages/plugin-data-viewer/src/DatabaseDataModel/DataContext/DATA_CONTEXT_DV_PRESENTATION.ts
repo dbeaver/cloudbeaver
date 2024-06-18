@@ -7,7 +7,13 @@
  */
 import { createDataContext } from '@cloudbeaver/core-data-context';
 
+export enum DataViewerPresentationType {
+  Data,
+  Analytical,
+}
+
 export interface IDataViewerPresentation {
+  type?: DataViewerPresentationType;
   readonly?: boolean;
 }
 

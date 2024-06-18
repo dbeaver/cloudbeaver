@@ -14,7 +14,6 @@ import {
   ACTION_REVERT,
   ACTION_SAVE,
   ActionService,
-  menuExtractItems,
   MenuService,
 } from '@cloudbeaver/core-view';
 
@@ -23,7 +22,7 @@ import { DatabaseSelectAction } from '../../../DatabaseDataModel/Actions/Databas
 import { DatabaseEditChangeType } from '../../../DatabaseDataModel/Actions/IDatabaseDataEditAction';
 import { DATA_CONTEXT_DV_DDM } from '../../../DatabaseDataModel/DataContext/DATA_CONTEXT_DV_DDM';
 import { DATA_CONTEXT_DV_DDM_RESULT_INDEX } from '../../../DatabaseDataModel/DataContext/DATA_CONTEXT_DV_DDM_RESULT_INDEX';
-import { DATA_CONTEXT_DV_PRESENTATION } from '../../../DatabaseDataModel/DataContext/DATA_CONTEXT_DV_PRESENTATION';
+import { DATA_CONTEXT_DV_PRESENTATION, DataViewerPresentationType } from '../../../DatabaseDataModel/DataContext/DATA_CONTEXT_DV_PRESENTATION';
 import type { IDatabaseDataModel } from '../../../DatabaseDataModel/IDatabaseDataModel';
 import { DATA_VIEWER_DATA_MODEL_ACTIONS_MENU } from './DATA_VIEWER_DATA_MODEL_ACTIONS_MENU';
 
@@ -41,15 +40,12 @@ export class TableFooterMenuService {
       isApplicable(context) {
         const model = context.get(DATA_CONTEXT_DV_DDM)!;
         const resultIndex = context.get(DATA_CONTEXT_DV_DDM_RESULT_INDEX)!;
+        const presentation = context.get(DATA_CONTEXT_DV_PRESENTATION);
 
-        return !model.isReadonly(resultIndex) && !context.get(DATA_CONTEXT_DV_PRESENTATION)?.readonly;
+        return !model.isReadonly(resultIndex) && !presentation?.readonly && (!presentation || presentation.type === DataViewerPresentationType.Data);
       },
       getItems(context, items) {
         return [ACTION_ADD, ACTION_DUPLICATE, ACTION_DELETE, ACTION_REVERT, ACTION_SAVE, ACTION_CANCEL, ...items];
-      },
-      orderItems(context, items) {
-        const extracted = menuExtractItems(items, [ACTION_ADD, ACTION_DUPLICATE, ACTION_DELETE, ACTION_REVERT, ACTION_SAVE, ACTION_CANCEL]);
-        return [...extracted, ...items];
       },
     });
     this.actionService.addHandler({

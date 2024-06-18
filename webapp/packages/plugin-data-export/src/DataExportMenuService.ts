@@ -13,11 +13,13 @@ import { LocalizationService } from '@cloudbeaver/core-localization';
 import { DATA_CONTEXT_NAV_NODE, EObjectFeature } from '@cloudbeaver/core-navigation-tree';
 import { EAdminPermission, SessionPermissionsResource } from '@cloudbeaver/core-root';
 import { withTimestamp } from '@cloudbeaver/core-utils';
-import { ACTION_EXPORT, ActionService, DATA_CONTEXT_MENU, menuExtractItems, MenuService } from '@cloudbeaver/core-view';
+import { ACTION_EXPORT, ActionService, menuExtractItems, MenuService } from '@cloudbeaver/core-view';
 import {
   DATA_CONTEXT_DV_DDM,
   DATA_CONTEXT_DV_DDM_RESULT_INDEX,
+  DATA_CONTEXT_DV_PRESENTATION,
   DATA_VIEWER_DATA_MODEL_ACTIONS_MENU,
+  DataViewerPresentationType,
   IDatabaseDataSource,
   IDataContainerOptions,
 } from '@cloudbeaver/plugin-data-viewer';
@@ -39,18 +41,26 @@ export class DataExportMenuService {
   ) {}
 
   register(): void {
+    this.menuService.addCreator({
+      menus: [DATA_VIEWER_DATA_MODEL_ACTIONS_MENU],
+      contexts: [DATA_CONTEXT_DV_DDM, DATA_CONTEXT_DV_DDM_RESULT_INDEX],
+      isApplicable: context => {
+        const presentation = context.get(DATA_CONTEXT_DV_PRESENTATION);
+        return !this.isExportDisabled() && (!presentation || presentation.type === DataViewerPresentationType.Data);
+      },
+      getItems(context, items) {
+        return [...items, ACTION_EXPORT];
+      },
+      orderItems(context, items) {
+        const extracted = menuExtractItems(items, [ACTION_EXPORT]);
+        return [...items, ...extracted];
+      },
+    });
     this.actionService.addHandler({
       id: 'data-export-base-handler',
+      menus: [DATA_VIEWER_DATA_MODEL_ACTIONS_MENU],
       contexts: [DATA_CONTEXT_DV_DDM, DATA_CONTEXT_DV_DDM_RESULT_INDEX],
-      isActionApplicable(context, action) {
-        const menu = context.hasValue(DATA_CONTEXT_MENU, DATA_VIEWER_DATA_MODEL_ACTIONS_MENU);
-
-        if (!menu) {
-          return false;
-        }
-
-        return [ACTION_EXPORT].includes(action);
-      },
+      actions: [ACTION_EXPORT],
       isDisabled(context) {
         const model = context.get(DATA_CONTEXT_DV_DDM)!;
         const resultIndex = context.get(DATA_CONTEXT_DV_DDM_RESULT_INDEX)!;
@@ -97,24 +107,14 @@ export class DataExportMenuService {
         }
       },
     });
-    this.menuService.addCreator({
-      menus: [DATA_VIEWER_DATA_MODEL_ACTIONS_MENU],
-      isApplicable: () => !this.isExportDisabled(),
-      getItems(context, items) {
-        return [...items, ACTION_EXPORT];
-      },
-      orderItems(context, items) {
-        const extracted = menuExtractItems(items, [ACTION_EXPORT]);
-        return [...items, ...extracted];
-      },
-    });
 
     this.menuService.addCreator({
       root: true,
+      contexts: [DATA_CONTEXT_NAV_NODE],
       isApplicable: context => {
-        const node = context.get(DATA_CONTEXT_NAV_NODE);
+        const node = context.get(DATA_CONTEXT_NAV_NODE)!;
 
-        if (node && !node.objectFeatures.includes(EObjectFeature.dataContainer)) {
+        if (!node.objectFeatures.includes(EObjectFeature.dataContainer)) {
           return false;
         }
 

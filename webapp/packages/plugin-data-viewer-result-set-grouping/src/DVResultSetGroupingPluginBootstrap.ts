@@ -13,9 +13,11 @@ import { ActionService, MenuService } from '@cloudbeaver/core-view';
 import {
   DATA_CONTEXT_DV_DDM,
   DATA_CONTEXT_DV_DDM_RESULT_INDEX,
+  DATA_CONTEXT_DV_PRESENTATION,
   DATA_VIEWER_DATA_MODEL_ACTIONS_MENU,
   DataPresentationService,
   DataPresentationType,
+  DataViewerPresentationType,
   ResultSetDataAction,
   ResultSetSelectAction,
 } from '@cloudbeaver/plugin-data-viewer';
@@ -61,6 +63,10 @@ export class DVResultSetGroupingPluginBootstrap extends Bootstrap {
       contexts: [DATA_CONTEXT_DV_DDM_RS_GROUPING],
       menus: [DATA_VIEWER_DATA_MODEL_ACTIONS_MENU],
       isActionApplicable(context, action) {
+        const presentation = context.get(DATA_CONTEXT_DV_PRESENTATION);
+        if (presentation && presentation.type !== DataViewerPresentationType.Data) {
+          return false;
+        }
         switch (action) {
           case ACTION_DATA_VIEWER_GROUPING_REMOVE_COLUMN:
             return context.has(DATA_CONTEXT_DV_DDM) && context.has(DATA_CONTEXT_DV_DDM_RESULT_INDEX);
