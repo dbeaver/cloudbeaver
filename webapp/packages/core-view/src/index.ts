@@ -70,6 +70,7 @@ export * from './Menu/MenuService';
 export * from './Menu/useMenu';
 export * from './Menu/useMenuContext';
 export * from './View/AppView';
+export * from './View/CaptureViewScopeLazy';
 export * from './View/CaptureViewLazy';
 export * from './View/CaptureViewContext';
 export * from './View/IActiveView';

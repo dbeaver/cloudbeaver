@@ -8,7 +8,7 @@
 import { observer } from 'mobx-react-lite';
 
 import { s, SContext, StyleRegistry, useS } from '@cloudbeaver/core-blocks';
-import { type IDataContext, useDataContextLink } from '@cloudbeaver/core-data-context';
+import { useDataContextLink } from '@cloudbeaver/core-data-context';
 import { MenuBar, MenuBarItemStyles } from '@cloudbeaver/core-ui';
 import { useMenu } from '@cloudbeaver/core-view';
 
@@ -24,15 +24,14 @@ interface Props {
   resultIndex: number;
   model: IDatabaseDataModel<any, any>;
   simple: boolean;
-  context?: IDataContext;
   className?: string;
 }
 
 const registry: StyleRegistry = [[MenuBarItemStyles, { mode: 'append', styles: [tableFooterMenuBarItemStyles] }]];
 
-export const TableFooterMenu = observer<Props>(function TableFooterMenu({ resultIndex, model, simple, context, className }) {
+export const TableFooterMenu = observer<Props>(function TableFooterMenu({ resultIndex, model, simple, className }) {
   const styles = useS(style, tableFooterMenuBarItemStyles);
-  const menu = useMenu({ menu: DATA_VIEWER_DATA_MODEL_ACTIONS_MENU, context });
+  const menu = useMenu({ menu: DATA_VIEWER_DATA_MODEL_ACTIONS_MENU });
 
   useDataContextLink(menu.context, (context, id) => {
     context.set(DATA_CONTEXT_DV_DDM, model, id);

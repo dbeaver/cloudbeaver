@@ -9,7 +9,6 @@ import { observer } from 'mobx-react-lite';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { Form, getComputed, s, ToolsPanel, useS } from '@cloudbeaver/core-blocks';
-import type { IDataContext } from '@cloudbeaver/core-data-context';
 import { useService } from '@cloudbeaver/core-di';
 
 import type { IDatabaseDataModel } from '../../DatabaseDataModel/IDatabaseDataModel';
@@ -22,10 +21,9 @@ interface Props {
   resultIndex: number;
   model: IDatabaseDataModel<any, any>;
   simple: boolean;
-  context?: IDataContext;
 }
 
-export const TableFooter = observer<Props>(function TableFooter({ resultIndex, model, simple, context }) {
+export const TableFooter = observer<Props>(function TableFooter({ resultIndex, model, simple }) {
   const ref = useRef<HTMLInputElement>(null);
   const [limit, setLimit] = useState(model.countGain + '');
   const dataViewerSettingsService = useService(DataViewerSettingsService);
@@ -70,7 +68,7 @@ export const TableFooter = observer<Props>(function TableFooter({ resultIndex, m
           />
         </Form>
       </div>
-      <TableFooterMenu model={model} resultIndex={resultIndex} simple={simple} context={context} />
+      <TableFooterMenu model={model} resultIndex={resultIndex} simple={simple} />
       {model.source.requestInfo.requestMessage.length > 0 && (
         <div className={s(style, { time: true })}>
           {model.source.requestInfo.requestMessage} - {model.source.requestInfo.requestDuration}ms
