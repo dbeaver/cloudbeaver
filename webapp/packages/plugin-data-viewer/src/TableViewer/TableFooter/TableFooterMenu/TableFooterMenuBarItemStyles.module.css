@@ -9,10 +9,6 @@
 .tableFooterMenu .menuBarItem {
   padding: 0 4px;
 
-  & .menuBarItemBox {
-    gap: 2px;
-  }
-
   & .menuBarItemLabel {
     padding: 0;
   }
