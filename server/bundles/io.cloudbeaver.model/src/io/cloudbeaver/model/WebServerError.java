@@ -17,8 +17,8 @@
 package io.cloudbeaver.model;
 
 import io.cloudbeaver.DBWebException;
-import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.sql.DBQuotaException;
+import org.jkiss.dbeaver.model.sql.SQLState;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -28,22 +28,18 @@ import java.io.StringWriter;
  */
 public class WebServerError {
 
-    private String message;
-    private String stackTrace;
-    private String errorType;
-    private String errorCode;
+    private final String message;
+    private final String stackTrace;
+    private final String errorType;
+    private final String errorCode;
 
     public WebServerError(Throwable ex) {
         this.message = ex.getMessage();
         StringWriter buf = new StringWriter();
         ex.printStackTrace(new PrintWriter(buf, true));
         this.stackTrace = buf.toString();
-        if (ex instanceof DBException) {
-            errorCode = String.valueOf(((DBException) ex).getErrorCode());
-        }
-        if (ex instanceof DBQuotaException) {
-            errorType = DBWebException.ERROR_CODE_QUOTA_EXCEEDED;
-        }
+        errorCode = String.valueOf(SQLState.getCodeFromException(ex));
+        errorType = ex instanceof DBQuotaException ? DBWebException.ERROR_CODE_QUOTA_EXCEEDED : null;
     }
 
     public String getMessage() {
