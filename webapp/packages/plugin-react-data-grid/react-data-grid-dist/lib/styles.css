@@ -15,7 +15,7 @@
     Root;
 }
 
-.mlln6zg7-0-0-beta-42 {
+.mlln6zg7-0-0-beta-44 {
   @layer rdg.MeasuringCell {
     contain: strict;
     grid-row: 1;
@@ -24,7 +24,7 @@
 }
 
 
-.cj343x07-0-0-beta-42 {
+.cj343x07-0-0-beta-44 {
   @layer rdg.Cell {
     /* max-content does not work with size containment
      * dynamically switching between different containment styles incurs a heavy relayout penalty
@@ -52,7 +52,7 @@
   }
 }
 
-.csofj7r7-0-0-beta-42 {
+.csofj7r7-0-0-beta-44 {
   @layer rdg.Cell {
     position: sticky;
     /* Should have a higher value than 0 to show up above unfrozen cells */
@@ -66,7 +66,7 @@
 }
 
 
-.c1bn88vv7-0-0-beta-42 {
+.c1bn88vv7-0-0-beta-44 {
   @layer rdg.CheckboxLabel {
     cursor: pointer;
     display: flex;
@@ -78,13 +78,13 @@
   }
 }
 
-.c1qt073l7-0-0-beta-42 {
+.c1qt073l7-0-0-beta-44 {
   @layer rdg.CheckboxInput {
     all: unset;
   }
 }
 
-.cf71kmq7-0-0-beta-42 {
+.cf71kmq7-0-0-beta-44 {
   @layer rdg.CheckboxIcon {
     content: '';
     inline-size: 20px;
@@ -92,23 +92,23 @@
     border: 2px solid var(--rdg-border-color);
     background-color: var(--rdg-background-color);
 
-    .c1qt073l7-0-0-beta-42:checked + & {
+    .c1qt073l7-0-0-beta-44:checked + & {
       background-color: var(--rdg-checkbox-color);
       outline: 4px solid var(--rdg-background-color);
       outline-offset: -6px;
     }
 
-    .c1qt073l7-0-0-beta-42:focus + & {
+    .c1qt073l7-0-0-beta-44:focus + & {
       border-color: var(--rdg-checkbox-focus-color);
     }
   }
 }
 
-.c1lwve4p7-0-0-beta-42 {
+.c1lwve4p7-0-0-beta-44 {
   @layer rdg.CheckboxLabel {
     cursor: default;
 
-    .cf71kmq7-0-0-beta-42 {
+    .cf71kmq7-0-0-beta-44 {
       border-color: var(--rdg-checkbox-disabled-border-color);
       background-color: var(--rdg-checkbox-disabled-background-color);
     }
@@ -116,13 +116,13 @@
 }
 
 
-.g1s9ylgp7-0-0-beta-42 {
+.g1s9ylgp7-0-0-beta-44 {
   @layer rdg.GroupCellContent {
     outline: none;
   }
 }
 
-.cz54e4y7-0-0-beta-42 {
+.cz54e4y7-0-0-beta-44 {
   @layer rdg.GroupCellCaret {
     margin-inline-start: 4px;
     stroke: currentColor;
@@ -137,24 +137,24 @@
 }
 
 
-.c6ra8a37-0-0-beta-42 {
+.c6ra8a37-0-0-beta-44 {
   @layer rdg.Cell {
     background-color: #ccccff;
   }
 }
 
-.cq910m07-0-0-beta-42 {
+.cq910m07-0-0-beta-44 {
   @layer rdg.Cell {
     background-color: #ccccff;
 
-    &.c6ra8a37-0-0-beta-42 {
+    &.c6ra8a37-0-0-beta-44 {
       background-color: #9999ff;
     }
   }
 }
 
 
-.c1w9bbhr7-0-0-beta-42 {
+.c1w9bbhr7-0-0-beta-44 {
   @layer rdg.DragHandle {
     --rdg-drag-handle-size: 8px;
     z-index: 0;
@@ -172,7 +172,7 @@
   }
 }
 
-.c1creorc7-0-0-beta-42 {
+.c1creorc7-0-0-beta-44 {
   @layer rdg.DragHandle {
     z-index: 1;
     position: sticky;
@@ -180,20 +180,20 @@
 }
 
 
-.cis5rrm7-0-0-beta-42 {
+.cis5rrm7-0-0-beta-44 {
   @layer rdg.EditCell {
     padding: 0;
   }
 }
 
 
-.h44jtk67-0-0-beta-42 {
+.h44jtk67-0-0-beta-44 {
   @layer rdg.SortableHeaderCell {
     display: flex;
   }
 }
 
-.hcgkhxz7-0-0-beta-42 {
+.hcgkhxz7-0-0-beta-44 {
   @layer rdg.SortableHeaderCellName {
     flex-grow: 1;
     overflow: clip;
@@ -202,19 +202,19 @@
 }
 
 
-.c6l2wv17-0-0-beta-42 {
+.c6l2wv17-0-0-beta-44 {
   @layer rdg.HeaderCell {
     cursor: pointer;
   }
 }
 
-.c1kqdw7y7-0-0-beta-42 {
+.c1kqdw7y7-0-0-beta-44 {
   @layer rdg.HeaderCell {
     touch-action: none;
   }
 }
 
-.r1y6ywlx7-0-0-beta-42 {
+.r1y6ywlx7-0-0-beta-44 {
   @layer rdg.HeaderCell {
     cursor: col-resize;
     position: absolute;
@@ -225,16 +225,16 @@
   }
 }
 
-.c1bezg5o7-0-0-beta-42 {
+.c1bezg5o7-0-0-beta-44 {
   opacity: 0.5;
 }
 
-.c1vc96037-0-0-beta-42 {
+.c1vc96037-0-0-beta-44 {
   background-color: var(--rdg-header-draggable-background-color);
 }
 
 
-.r1upfr807-0-0-beta-42 {
+.r1upfr807-0-0-beta-44 {
   @layer rdg.Row {
     display: contents;
     line-height: var(--rdg-row-height);
@@ -254,14 +254,14 @@
   }
 }
 
-.r190mhd37-0-0-beta-42 {
+.r190mhd37-0-0-beta-44 {
   @layer rdg.FocusSink {
     outline: 2px solid var(--rdg-selection-color);
     outline-offset: -2px;
   }
 }
 
-.r139qu9m7-0-0-beta-42 {
+.r139qu9m7-0-0-beta-44 {
   @layer rdg.FocusSink {
     &::before {
       content: '';
@@ -275,27 +275,27 @@
 }
 
 
-.h10tskcx7-0-0-beta-42 {
+.h10tskcx7-0-0-beta-44 {
   @layer rdg.HeaderRow {
     display: contents;
     line-height: var(--rdg-header-row-height);
     background-color: var(--rdg-header-background-color);
     font-weight: bold;
 
-    & > .cj343x07-0-0-beta-42 {
+    & > .cj343x07-0-0-beta-44 {
       /* Should have a higher value than 1 to show up above regular cells and the focus sink */
       z-index: 2;
       position: sticky;
     }
 
-    & > .csofj7r7-0-0-beta-42 {
+    & > .csofj7r7-0-0-beta-44 {
       z-index: 3;
     }
   }
 }
 
 
-.a3ejtar7-0-0-beta-42 {
+.a3ejtar7-0-0-beta-44 {
   @layer rdg.SortIcon {
     fill: currentColor;
 
@@ -306,7 +306,7 @@
 }
 
 
-.rnvodz57-0-0-beta-42 {
+.rnvodz57-0-0-beta-44 {
   @layer rdg.Defaults {
     *,
     *::before,
@@ -361,30 +361,30 @@
     }
 
     > :nth-last-child(1 of .rdg-top-summary-row) {
-      > .cj343x07-0-0-beta-42 {
+      > .cj343x07-0-0-beta-44 {
         border-block-end: 2px solid var(--rdg-summary-border-color);
       }
     }
 
     > :nth-child(1 of .rdg-bottom-summary-row) {
-      > .cj343x07-0-0-beta-42 {
+      > .cj343x07-0-0-beta-44 {
         border-block-start: 2px solid var(--rdg-summary-border-color);
       }
     }
   }
 }
 
-.vlqv91k7-0-0-beta-42 {
+.vlqv91k7-0-0-beta-44 {
   @layer rdg.Root {
     user-select: none;
 
-    & .r1upfr807-0-0-beta-42 {
+    & .r1upfr807-0-0-beta-44 {
       cursor: move;
     }
   }
 }
 
-.f1lsfrzw7-0-0-beta-42 {
+.f1lsfrzw7-0-0-beta-44 {
   @layer rdg.FocusSink {
     grid-column: 1/-1;
     pointer-events: none;
@@ -393,7 +393,7 @@
   }
 }
 
-.f1cte0lg7-0-0-beta-42 {
+.f1cte0lg7-0-0-beta-44 {
   @layer rdg.FocusSink {
     /* Should have a higher value than 3 to show up above header and summary rows */
     z-index: 3;
@@ -401,7 +401,7 @@
 }
 
 
-.s8wc6fl7-0-0-beta-42 {
+.s8wc6fl7-0-0-beta-44 {
   @layer rdg.SummaryCell {
     inset-block-start: var(--rdg-summary-row-top);
     inset-block-end: var(--rdg-summary-row-bottom);
@@ -409,44 +409,44 @@
 }
 
 
-.skuhp557-0-0-beta-42 {
+.skuhp557-0-0-beta-44 {
   @layer rdg.SummaryRow {
     line-height: var(--rdg-summary-row-height);
 
-    > .cj343x07-0-0-beta-42 {
+    > .cj343x07-0-0-beta-44 {
       position: sticky;
     }
   }
 }
 
-.tf8l5ub7-0-0-beta-42 {
+.tf8l5ub7-0-0-beta-44 {
   @layer rdg.SummaryRow {
-    > .cj343x07-0-0-beta-42 {
+    > .cj343x07-0-0-beta-44 {
       z-index: 2;
     }
 
-    > .csofj7r7-0-0-beta-42 {
+    > .csofj7r7-0-0-beta-44 {
       z-index: 3;
     }
   }
 }
 
 
-.g1yxluv37-0-0-beta-42 {
+.g1yxluv37-0-0-beta-44 {
   @layer rdg.GroupedRow {
     &:not([aria-selected='true']) {
       background-color: var(--rdg-header-background-color);
     }
 
-    > .cj343x07-0-0-beta-42:not(:last-child, .csofj7r7-0-0-beta-42),
-    > :nth-last-child(n + 2 of .csofj7r7-0-0-beta-42) {
+    > .cj343x07-0-0-beta-44:not(:last-child, .csofj7r7-0-0-beta-44),
+    > :nth-last-child(n + 2 of .csofj7r7-0-0-beta-44) {
       border-inline-end: none;
     }
   }
 }
 
 
-.t7vyx3i7-0-0-beta-42 {
+.t7vyx3i7-0-0-beta-44 {
   @layer rdg.TextEditor {
     appearance: none;
 
