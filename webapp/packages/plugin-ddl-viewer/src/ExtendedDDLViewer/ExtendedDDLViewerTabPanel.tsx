@@ -14,6 +14,7 @@ import {
   ConnectionInfoResource,
   createConnectionParam,
 } from '@cloudbeaver/core-connections';
+import { useDataContextLink } from '@cloudbeaver/core-data-context';
 import { MenuBar } from '@cloudbeaver/core-ui';
 import { useMenu } from '@cloudbeaver/core-view';
 import { useCodemirrorExtensions } from '@cloudbeaver/plugin-codemirror6';
@@ -39,18 +40,16 @@ export const ExtendedDDLViewerTabPanel: NavNodeTransformViewComponent = observer
   const sqlDialect = useSqlDialectExtension(connectionDialectResource.data);
   const extensions = useCodemirrorExtensions();
   extensions.set(...sqlDialect);
+  const extendedDDlData = extendedDDLResource.data;
 
-  menu.context.set(DATA_CONTEXT_DDL_VIEWER_NODE, nodeId);
-  menu.context.set(DATA_CONTEXT_DDL_VIEWER_VALUE, extendedDDLResource.data);
+  useDataContextLink(menu.context, (context, id) => {
+    context.set(DATA_CONTEXT_DDL_VIEWER_NODE, nodeId, id);
+    context.set(DATA_CONTEXT_DDL_VIEWER_VALUE, extendedDDlData, id);
+  });
 
   return (
     <div className={s(styles, { wrapper: true })}>
-      <SQLCodeEditorLoader
-        className={s(styles, { sqlCodeEditorLoader: true })}
-        value={extendedDDLResource.data ?? ''}
-        extensions={extensions}
-        readonly
-      />
+      <SQLCodeEditorLoader className={s(styles, { sqlCodeEditorLoader: true })} value={extendedDDlData ?? ''} extensions={extensions} readonly />
       <MenuBar className={s(styles, { menuBar: true })} menu={menu} />
     </div>
   );

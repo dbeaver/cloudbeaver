@@ -6,20 +6,20 @@
  * you may not use this file except in compliance with the License.
  */
 import type { UsersResource } from '@cloudbeaver/core-authentication';
-import { type ProjectInfoResource, isGlobalProject } from '@cloudbeaver/core-projects';
+import { isGlobalProject, type ProjectInfoResource } from '@cloudbeaver/core-projects';
 import { type AdminConnectionGrantInfo, AdminSubjectType } from '@cloudbeaver/core-sdk';
-import { FormMode, FormPart } from '@cloudbeaver/core-ui';
+import { FormMode, FormPart, IFormState } from '@cloudbeaver/core-ui';
 import { isArraysEqual } from '@cloudbeaver/core-utils';
 
 import type { IUserFormState } from '../AdministrationUserFormService';
-import type { AdministrationUserFormState } from '../AdministrationUserFormState';
-import { DATA_CONTEXT_USER_FORM_INFO_PART } from '../Info/DATA_CONTEXT_USER_FORM_INFO_PART';
+import type { UserFormInfoPart } from '../Info/UserFormInfoPart';
 
 export class UserFormConnectionAccessPart extends FormPart<AdminConnectionGrantInfo[], IUserFormState> {
   constructor(
-    formState: AdministrationUserFormState,
+    formState: IFormState<IUserFormState>,
     private readonly usersResource: UsersResource,
     private readonly projectInfoResource: ProjectInfoResource,
+    private readonly userFormInfoPart: UserFormInfoPart,
   ) {
     super(formState, []);
   }
@@ -65,8 +65,6 @@ export class UserFormConnectionAccessPart extends FormPart<AdminConnectionGrantI
       this.getGrantedConnections(this.state),
     );
 
-    const userFormInfoPart = this.formState.dataContext.get(DATA_CONTEXT_USER_FORM_INFO_PART);
-
     const globalProject = this.projectInfoResource.values.find(isGlobalProject);
 
     if (!globalProject) {
@@ -74,11 +72,11 @@ export class UserFormConnectionAccessPart extends FormPart<AdminConnectionGrantI
     }
 
     if (connectionsToRevoke.length > 0) {
-      await this.usersResource.deleteConnectionsAccess(globalProject.id, userFormInfoPart.state.userId, connectionsToRevoke);
+      await this.usersResource.deleteConnectionsAccess(globalProject.id, this.userFormInfoPart.state.userId, connectionsToRevoke);
     }
 
     if (connectionsToGrant.length > 0) {
-      await this.usersResource.addConnectionsAccess(globalProject.id, userFormInfoPart.state.userId, connectionsToGrant);
+      await this.usersResource.addConnectionsAccess(globalProject.id, this.userFormInfoPart.state.userId, connectionsToGrant);
     }
   }
 
@@ -94,11 +92,10 @@ export class UserFormConnectionAccessPart extends FormPart<AdminConnectionGrantI
   }
 
   protected override async loader() {
-    const userFormInfoPart = this.formState.dataContext.get(DATA_CONTEXT_USER_FORM_INFO_PART);
     let grantedConnections: AdminConnectionGrantInfo[] = [];
 
     if (this.formState.mode === FormMode.Edit) {
-      grantedConnections = await this.usersResource.loadConnections(userFormInfoPart.initialState.userId);
+      grantedConnections = await this.usersResource.loadConnections(this.userFormInfoPart.initialState.userId);
     }
 
     this.setInitialState(grantedConnections);

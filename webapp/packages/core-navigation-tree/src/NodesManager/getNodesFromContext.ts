@@ -12,8 +12,8 @@ import { DATA_CONTEXT_NAV_NODES } from './DATA_CONTEXT_NAV_NODES';
 import type { NavNode } from './EntityTypes';
 
 export function getNodesFromContext(context: IDataContextProvider): NavNode[] {
-  const node = context.tryGet(DATA_CONTEXT_NAV_NODE);
-  const getNodes = context.tryGet(DATA_CONTEXT_NAV_NODES);
+  const node = context.get(DATA_CONTEXT_NAV_NODE);
+  const getNodes = context.get(DATA_CONTEXT_NAV_NODES);
   let nodes = getNodes?.();
 
   if (!nodes || nodes.length < 2) {

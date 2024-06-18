@@ -532,7 +532,7 @@ export class ResultSetEditAction extends DatabaseEditAction<IResultSetElementKey
     super.updateResult(result, index);
 
     if (result.data?.singleEntity) {
-      this.features = ['add', 'delete'];
+      this.features = ['add', 'delete', 'revert'];
     }
   }
 

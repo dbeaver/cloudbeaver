@@ -12,8 +12,8 @@ import type { ResultDataFormat } from '@cloudbeaver/core-sdk';
 
 import type { IDatabaseDataModel } from '../DatabaseDataModel/IDatabaseDataModel';
 import type { IDataPresentationOptions } from '../DataPresentationService';
+import styles from './DataPresentation.module.css';
 import type { IDataTableActions } from './IDataTableActions';
-import styles from './TableGrid.module.css';
 import { TableStatistics } from './TableStatistics';
 
 interface Props {
@@ -26,7 +26,15 @@ interface Props {
   isStatistics: boolean;
 }
 
-export const TableGrid = observer<Props>(function TableGrid({ model, actions, dataFormat, presentation, resultIndex, simple, isStatistics }) {
+export const DataPresentation = observer<Props>(function DataPresentation({
+  model,
+  actions,
+  dataFormat,
+  presentation,
+  resultIndex,
+  simple,
+  isStatistics,
+}) {
   if ((presentation.dataFormat !== undefined && dataFormat !== presentation.dataFormat) || !model.source.hasResult(resultIndex)) {
     if (model.isLoading()) {
       return null;

@@ -49,13 +49,13 @@ export class SqlEditorGroupTabsBootstrap extends Bootstrap {
       id: 'result-tabs-group-base-handler',
       actions: [ACTION_TAB_CLOSE_SQL_RESULT_GROUP],
       menus: [MENU_TAB],
-      contexts: [DATA_CONTEXT_SQL_EDITOR_RESULT_ID, DATA_CONTEXT_SQL_EDITOR_STATE],
+      contexts: [DATA_CONTEXT_SQL_EDITOR_RESULT_ID, DATA_CONTEXT_SQL_EDITOR_STATE, DATA_CONTEXT_TABS_CONTEXT],
       isActionApplicable: context => {
-        const tab = context.get(DATA_CONTEXT_SQL_EDITOR_RESULT_ID);
-        const sqlEditorState = context.get(DATA_CONTEXT_SQL_EDITOR_STATE);
+        const tab = context.get(DATA_CONTEXT_SQL_EDITOR_RESULT_ID)!;
+        const sqlEditorState = context.get(DATA_CONTEXT_SQL_EDITOR_STATE)!;
 
-        const groupId = sqlEditorState?.resultTabs.find(tabState => tabState.tabId === tab?.id)?.groupId;
-        const hasTabsInGroup = (sqlEditorState?.resultTabs.filter(tabState => tabState.groupId === groupId) ?? []).length > 1;
+        const groupId = sqlEditorState?.resultTabs.find(tabState => tabState.tabId === tab.id)?.groupId;
+        const hasTabsInGroup = sqlEditorState.resultTabs.filter(tabState => tabState.groupId === groupId).length > 1;
 
         return hasTabsInGroup;
       },
@@ -72,9 +72,9 @@ export class SqlEditorGroupTabsBootstrap extends Bootstrap {
   }
 
   async closeResultTabGroup(context: IDataContextProvider) {
-    const tab = context.get(DATA_CONTEXT_SQL_EDITOR_RESULT_ID);
-    const sqlEditorState = context.get(DATA_CONTEXT_SQL_EDITOR_STATE);
-    const tabsContext = context.get(DATA_CONTEXT_TABS_CONTEXT);
+    const tab = context.get(DATA_CONTEXT_SQL_EDITOR_RESULT_ID)!;
+    const sqlEditorState = context.get(DATA_CONTEXT_SQL_EDITOR_STATE)!;
+    const tabsContext = context.get(DATA_CONTEXT_TABS_CONTEXT)!;
     const resultTabs = this.sqlResultTabsService.getResultTabs(sqlEditorState);
 
     const resultTab = resultTabs.find(tabState => tabState.tabId === tab.id);

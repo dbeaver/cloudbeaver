@@ -12,6 +12,7 @@ export * from './DatabaseDataModel/Actions/Document/DocumentEditAction';
 export * from './DatabaseDataModel/Actions/Document/IDatabaseDataDocument';
 export * from './DatabaseDataModel/Actions/Document/IDocumentElementKey';
 export * from './DatabaseDataModel/Actions/ResultSet/DataContext/DATA_CONTEXT_DV_DDM_RS_COLUMN_KEY';
+export * from './DatabaseDataModel/DataContext/DATA_CONTEXT_DV_PRESENTATION';
 export * from './DatabaseDataModel/DataContext/DATA_CONTEXT_DV_DDM';
 export * from './DatabaseDataModel/DataContext/DATA_CONTEXT_DV_DDM_RESULT_INDEX';
 export * from './DatabaseDataModel/Actions/ResultSet/compareResultSetRowKeys';

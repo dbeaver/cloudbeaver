@@ -11,8 +11,9 @@ import type { IDataContextProvider } from './IDataContextProvider';
 export type DeleteVersionedContextCallback = () => void;
 
 export interface IDataContext extends IDataContextProvider {
-  set: <T>(context: DataContextGetter<T>, value: T) => DeleteVersionedContextCallback;
-  delete: (context: DataContextGetter<any>, version?: number) => this;
+  set: <T>(context: DataContextGetter<T>, value: T, id: string) => this;
+  delete: (context: DataContextGetter<any>, id?: string) => this;
+  deleteForId: (id: string) => this;
   clear: () => void;
   setFallBack: (fallback?: IDataContextProvider) => void;
 }

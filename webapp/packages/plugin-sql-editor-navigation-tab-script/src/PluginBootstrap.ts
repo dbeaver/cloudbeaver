@@ -68,7 +68,7 @@ export class PluginBootstrap extends Bootstrap {
       actions: [ACTION_SAVE_AS_SCRIPT],
       contexts: [DATA_CONTEXT_SQL_EDITOR_STATE],
       isActionApplicable: (context): boolean => {
-        const state = context.get(DATA_CONTEXT_SQL_EDITOR_STATE);
+        const state = context.get(DATA_CONTEXT_SQL_EDITOR_STATE)!;
 
         if (!this.projectsService.activeProjects.some(project => project.canEditResources)) {
           return false;
@@ -79,7 +79,7 @@ export class PluginBootstrap extends Bootstrap {
         return dataSource instanceof MemorySqlDataSource || dataSource instanceof LocalStorageSqlDataSource;
       },
       handler: async (context, action) => {
-        const state = context.get(DATA_CONTEXT_SQL_EDITOR_STATE);
+        const state = context.get(DATA_CONTEXT_SQL_EDITOR_STATE)!;
 
         let dataSource: ISqlDataSource | ResourceSqlDataSource | undefined = this.sqlDataSourceService.get(state.editorId);
 
@@ -193,7 +193,7 @@ export class PluginBootstrap extends Bootstrap {
       menus: [SQL_EDITOR_TOOLS_MENU],
       contexts: [DATA_CONTEXT_SQL_EDITOR_STATE],
       isApplicable: context => {
-        const state = context.get(DATA_CONTEXT_SQL_EDITOR_STATE);
+        const state = context.get(DATA_CONTEXT_SQL_EDITOR_STATE)!;
 
         const dataSource = this.sqlDataSourceService.get(state.editorId);
 

@@ -8,18 +8,10 @@
 import { uuid } from '@cloudbeaver/core-utils';
 
 import type { DataContextGetter } from './DataContextGetter';
-import type { IDataContextProvider } from './IDataContextProvider';
 
-export function createDataContext<T>(
-  name: string,
-  defaultValue?: (context: IDataContextProvider) => T extends any ? T : undefined,
-): DataContextGetter<T> {
-  name = `@context/${name}`;
-  const obj = {
-    [name](context: IDataContextProvider): T {
-      return defaultValue?.(context) as T;
-    },
-  };
-  Object.defineProperty(obj[name], 'id', { value: uuid() });
-  return obj[name] as DataContextGetter<T>;
+export function createDataContext<T>(name: string): DataContextGetter<T> {
+  return {
+    id: uuid(),
+    name: `@context/${name}`,
+  } as Partial<DataContextGetter<T>> as DataContextGetter<T>;
 }
