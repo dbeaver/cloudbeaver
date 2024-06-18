@@ -6,7 +6,6 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import { useState } from 'react';
 
 import { s, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import { useTabLocalState } from '@cloudbeaver/core-ui';
@@ -26,6 +25,7 @@ export const DVResultSetGroupingPresentation: DataPresentationComponent<any, IDa
 }) {
   const state = useTabLocalState<IDVResultSetGroupingPresentationState>(() => ({
     presentationId: '',
+    valuePresentationId: null,
     columns: [],
     functions: [DEFAULT_GROUPING_QUERY_OPERATION],
     showDuplicatesOnly: false,
@@ -33,8 +33,6 @@ export const DVResultSetGroupingPresentation: DataPresentationComponent<any, IDa
   const style = useS(styles);
 
   const translate = useTranslate();
-  const [presentationId, setPresentation] = useState('');
-  const [valuePresentationId, setValuePresentation] = useState<string | null>(null);
   const model = useGroupingDataModel(originalModel, resultIndex, state);
   const dnd = useGroupingDnDColumns(state, originalModel, model);
 
@@ -66,11 +64,15 @@ export const DVResultSetGroupingPresentation: DataPresentationComponent<any, IDa
           <TableViewerLoader
             tableId={model.model.id}
             resultIndex={resultIndex}
-            presentationId={presentationId}
-            valuePresentationId={valuePresentationId}
+            presentationId={state.presentationId}
+            valuePresentationId={state.valuePresentationId}
             simple
-            onPresentationChange={setPresentation}
-            onValuePresentationChange={setValuePresentation}
+            onPresentationChange={presentationId => {
+              state.presentationId = presentationId;
+            }}
+            onValuePresentationChange={presentationId => {
+              state.valuePresentationId = presentationId;
+            }}
           />
         )}
       </div>
