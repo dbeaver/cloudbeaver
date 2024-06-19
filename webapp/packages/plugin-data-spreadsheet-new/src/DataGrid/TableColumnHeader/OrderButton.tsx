@@ -8,7 +8,7 @@
 import { observer } from 'mobx-react-lite';
 
 import { IconOrImage, s, useS, useTranslate } from '@cloudbeaver/core-blocks';
-import { EOrder, getNextOrder, IDatabaseDataModel, ResultSetConstraintAction } from '@cloudbeaver/plugin-data-viewer';
+import { DatabaseDataConstraintAction, EOrder, getNextOrder, IDatabaseDataModel } from '@cloudbeaver/plugin-data-viewer';
 
 import style from './OrderButton.module.css';
 
@@ -21,7 +21,7 @@ interface Props {
 
 export const OrderButton = observer<Props>(function OrderButton({ model, resultIndex, attributePosition, className }) {
   const translate = useTranslate();
-  const constraints = model.source.getAction(resultIndex, ResultSetConstraintAction);
+  const constraints = model.source.getAction(resultIndex, DatabaseDataConstraintAction);
   const currentOrder = constraints.getOrder(attributePosition);
   const disabled = model.isDisabled(resultIndex) || model.isLoading();
   const styles = useS(style);

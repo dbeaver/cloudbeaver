@@ -11,8 +11,8 @@ import { PlaceholderContainer } from '@cloudbeaver/core-blocks';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { ActionService, DATA_CONTEXT_MENU, MenuService } from '@cloudbeaver/core-view';
 
+import { DatabaseDataConstraintAction } from '../../DatabaseDataModel/Actions/DatabaseDataConstraintAction';
 import { DATA_VIEWER_CONSTRAINTS_DELETE_ACTION } from '../../DatabaseDataModel/Actions/ResultSet/Actions/DATA_VIEWER_CONSTRAINTS_DELETE_ACTION';
-import { ResultSetConstraintAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetConstraintAction';
 import { DATA_CONTEXT_DV_DDM } from '../../DatabaseDataModel/DataContext/DATA_CONTEXT_DV_DDM';
 import { DATA_CONTEXT_DV_DDM_RESULT_INDEX } from '../../DatabaseDataModel/DataContext/DATA_CONTEXT_DV_DDM_RESULT_INDEX';
 import type { IDatabaseDataModel } from '../../DatabaseDataModel/IDatabaseDataModel';
@@ -65,7 +65,7 @@ export class TableHeaderService extends Bootstrap {
           case DATA_VIEWER_CONSTRAINTS_DELETE_ACTION: {
             const model = context.get(DATA_CONTEXT_DV_DDM)!;
             const resultIndex = context.get(DATA_CONTEXT_DV_DDM_RESULT_INDEX)!;
-            const constraints = model.source.tryGetAction(resultIndex, ResultSetConstraintAction);
+            const constraints = model.source.tryGetAction(resultIndex, DatabaseDataConstraintAction);
 
             if (constraints) {
               constraints.deleteData();
@@ -91,7 +91,7 @@ export class TableHeaderService extends Bootstrap {
         }
 
         if (action === DATA_VIEWER_CONSTRAINTS_DELETE_ACTION) {
-          const constraints = model.source.tryGetAction(resultIndex, ResultSetConstraintAction);
+          const constraints = model.source.tryGetAction(resultIndex, DatabaseDataConstraintAction);
 
           if (model.source.options?.whereFilter) {
             return false;
