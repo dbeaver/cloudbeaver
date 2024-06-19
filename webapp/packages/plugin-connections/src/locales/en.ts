@@ -1,3 +1,10 @@
+/*
+ * CloudBeaver - Cloud Database Manager
+ * Copyright (C) 2020-2024 DBeaver Corp and others
+ *
+ * Licensed under the Apache License, Version 2.0.
+ * you may not use this file except in compliance with the License.
+ */
 export default [
   ['connections_public_connection_edit_menu_item_title', 'Edit Connection'],
   ['connections_public_connection_edit_cancel_title', 'Cancel confirmation'],
@@ -7,7 +14,7 @@ export default [
   ['connections_public_connection_edit_reconnect_failed', 'Failed to reconnect'],
   ['connections_public_connection_folder_move_failed', 'Failed to move to folder'],
   ['connections_public_connection_folder_move_duplication', 'Target folder or selected folders contains folder with the same name ({arg:name})'],
-  ['connections_public_connection_cloud_auth_required', 'You need to sign in with "{arg:providerLabel}" credentials to work with connection.'],
+  ['connections_public_connection_cloud_auth_required', 'You need to sign in with "{arg:providerLabel}" credentials to work with this connection.'],
   ['plugin_connections_connection_form_project_invalid', 'You have no access to create connections in selected project'],
   ['plugin_connections_connection_form_host_configuration_invalid', 'Host configuration is not supported'],
   ['plugin_connections_connection_form_name_invalid', "Field 'Connection name' can't be empty"],

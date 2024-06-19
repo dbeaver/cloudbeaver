@@ -59,7 +59,7 @@ export function useGroupingDataModel(
         source,
         model,
         dispose() {
-          this.model.dispose();
+          this.model.dispose(true);
           tableViewerStorageService.remove(this.model.id);
         },
       };

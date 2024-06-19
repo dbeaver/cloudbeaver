@@ -19,6 +19,7 @@ package io.cloudbeaver.model.rm;
 
 import io.cloudbeaver.model.session.WebSession;
 import org.jkiss.code.NotNull;
+import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBPHiddenObject;
@@ -81,8 +82,8 @@ public class DBNResourceManagerRoot extends DBNNode implements DBPHiddenObject, 
     }
 
     @Override
-    public DBNResourceManagerProject[] getChildren(DBRProgressMonitor monitor) throws DBException {
-        if (projects == null) {
+    public DBNResourceManagerProject[] getChildren(@NotNull DBRProgressMonitor monitor) throws DBException {
+        if (projects == null && !monitor.isForceCacheUsage()) {
             List<? extends DBPProject> projectList = getParentNode().getModel().getModelProjects();
             if (CommonUtils.isEmpty(projectList)) {
                 return new DBNResourceManagerProject[0];

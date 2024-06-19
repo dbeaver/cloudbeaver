@@ -10,6 +10,7 @@ import { useContext, useState } from 'react';
 
 import { getComputed, Icon, s, useMouse, useS, useStateDelay } from '@cloudbeaver/core-blocks';
 import { ConnectionInfoResource, DATA_CONTEXT_CONNECTION } from '@cloudbeaver/core-connections';
+import { useDataContextLink } from '@cloudbeaver/core-data-context';
 import { useService } from '@cloudbeaver/core-di';
 import { DATA_CONTEXT_NAV_NODE, type DBObject, type NavNode, NavNodeManagerService } from '@cloudbeaver/core-navigation-tree';
 import { ContextMenu } from '@cloudbeaver/core-ui';
@@ -33,14 +34,15 @@ export const Menu = observer<Props>(function Menu({ value, node }) {
   const menu = useMenu({ menu: MENU_NAV_TREE });
   const mouse = useMouse<HTMLDivElement>();
   const [menuOpened, switchState] = useState(false);
-
-  menu.context.set(DATA_CONTEXT_NAV_NODE, node);
-
   const connection = connectionsInfoResource.getConnectionForNode(node.id);
 
-  if (connection) {
-    menu.context.set(DATA_CONTEXT_CONNECTION, connection);
-  }
+  useDataContextLink(menu.context, (context, id) => {
+    context.set(DATA_CONTEXT_NAV_NODE, node, id);
+
+    if (connection) {
+      context.set(DATA_CONTEXT_CONNECTION, connection, id);
+    }
+  });
 
   function openNode() {
     navNodeManagerService.navToNode(node.id, node.parentId);
@@ -61,7 +63,7 @@ export const Menu = observer<Props>(function Menu({ value, node }) {
   return (
     <div ref={mouse.reference} className={s(styles, { container: true, empty: menuEmpty })} onDoubleClick={openNode}>
       <div className={classes.box}>
-        <div className={s(styles, { value: true }, 'cell-formatter__value')} title={value}>
+        <div className={s(styles, { value: true, cellValue: true })} title={value}>
           {value}
         </div>
         {!menuEmpty && (
@@ -90,8 +92,8 @@ export const CellFormatter = observer<RenderCellProps<DBObject>>(function CellFo
   const value = property ? getValue(property.value) : '';
 
   return (
-    <div className="cell-formatter" title={value}>
-      {columnIdx === 0 && !!node ? <Menu node={node} value={value} /> : <span className="cell-formatter__value">{value}</span>}
+    <div className={classes.cell} title={value}>
+      {columnIdx === 0 && !!node ? <Menu node={node} value={value} /> : <span className={classes.cellValue}>{value}</span>}
     </div>
   );
 });

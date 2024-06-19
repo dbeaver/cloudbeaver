@@ -9,7 +9,7 @@ import { importLazyComponent } from '@cloudbeaver/core-blocks';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 
 import { UserProfileFormService } from '../UserProfileFormService';
-import { DATA_CONTEXT_USER_PROFILE_FORM_AUTHENTICATION_PART } from './DATA_CONTEXT_USER_PROFILE_FORM_AUTHENTICATION_PART';
+import { getUserProfileFormAuthenticationPart } from './getUserProfileFormAuthenticationPart';
 
 const AuthenticationPanel = importLazyComponent(() => import('./AuthenticationPanel').then(m => m.AuthenticationPanel));
 
@@ -25,7 +25,7 @@ export class UserProfileFormAuthenticationPartBootstrap extends Bootstrap {
       name: 'ui_authentication',
       order: 2,
       panel: () => AuthenticationPanel,
-      stateGetter: props => () => props.formState.dataContext.get(DATA_CONTEXT_USER_PROFILE_FORM_AUTHENTICATION_PART),
+      stateGetter: props => () => getUserProfileFormAuthenticationPart(props.formState),
     });
   }
 }

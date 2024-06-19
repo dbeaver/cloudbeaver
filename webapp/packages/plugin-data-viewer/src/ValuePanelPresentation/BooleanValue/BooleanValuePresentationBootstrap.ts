@@ -38,17 +38,11 @@ export class BooleanValuePresentationBootstrap extends Bootstrap {
 
         if (activeElements.length > 0) {
           const view = context.model.source.getAction(context.resultIndex, ResultSetViewAction);
-
           const firstSelectedCell = activeElements[0];
           const cellValue = view.getCellValue(firstSelectedCell);
-
-          if (cellValue === undefined) {
-            return true;
-          }
-
           const column = view.getColumn(firstSelectedCell.column);
 
-          return column === undefined || !isBooleanValuePresentationAvailable(cellValue, column);
+          return cellValue === undefined || column === undefined || !isBooleanValuePresentationAvailable(cellValue, column);
         }
 
         return true;

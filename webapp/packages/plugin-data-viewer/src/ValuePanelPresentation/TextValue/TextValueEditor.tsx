@@ -25,6 +25,7 @@ interface Props {
 export const TextValueEditor = observer<Props>(function TextValueEditor({ contentType, valueGetter, readonly, lineWrapping, onChange }) {
   const value = valueGetter();
   const typeExtension = useMemo(() => getTypeExtension(contentType!) ?? [], [contentType]);
+
   const extensions = useCodemirrorExtensions(undefined, typeExtension);
   const dataViewerService = useService(DataViewerService);
 

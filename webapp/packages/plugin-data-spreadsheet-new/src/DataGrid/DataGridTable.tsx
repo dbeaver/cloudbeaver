@@ -13,9 +13,12 @@ import { useService } from '@cloudbeaver/core-di';
 import { EventContext, EventStopPropagationFlag } from '@cloudbeaver/core-events';
 import { Executor } from '@cloudbeaver/core-executor';
 import { ClipboardService } from '@cloudbeaver/core-ui';
+import { useCaptureViewContext } from '@cloudbeaver/core-view';
 import {
+  DATA_CONTEXT_DV_PRESENTATION,
   DatabaseDataSelectActionsData,
   DatabaseEditChangeType,
+  DataViewerPresentationType,
   IDatabaseResultSet,
   IDataPresentationProps,
   IResultSetEditActionData,
@@ -30,12 +33,12 @@ import '@cloudbeaver/plugin-react-data-grid/react-data-grid-dist/lib/styles.css'
 
 import { CellPosition, EditingContext } from '../Editing/EditingContext';
 import { useEditing } from '../Editing/useEditing';
-import '../styles/base.scss';
 import { reactGridStyles } from '../styles/styles';
 import { CellRenderer } from './CellRenderer/CellRenderer';
 import { DataGridContext, IColumnResizeInfo, IDataGridContext } from './DataGridContext';
 import { DataGridSelectionContext } from './DataGridSelection/DataGridSelectionContext';
 import { useGridSelectionContext } from './DataGridSelection/useGridSelectionContext';
+import classes from './DataGridTable.module.css';
 import { CellFormatter } from './Formatters/CellFormatter';
 import { TableDataContext } from './TableDataContext';
 import { useGridDragging } from './useGridDragging';
@@ -185,6 +188,10 @@ export const DataGridTable = observer<IDataPresentationProps<any, IDatabaseResul
     onDragEnd: (startPosition, currentPosition, event) => {
       gridSelectionContext.selectRange(startPosition, currentPosition, event.ctrlKey || event.metaKey, false);
     },
+  });
+
+  useCaptureViewContext((context, id) => {
+    context.set(DATA_CONTEXT_DV_PRESENTATION, { type: DataViewerPresentationType.Data }, id);
   });
 
   function handleKeyDown(event: React.KeyboardEvent<HTMLDivElement>) {
@@ -435,7 +442,7 @@ export const DataGridTable = observer<IDataPresentationProps<any, IDatabaseResul
           <TableDataContext.Provider value={tableData}>
             <div
               ref={setContainersRef}
-              className="cb-react-grid-container"
+              className={`cb-react-grid-container ${classes.container}`}
               tabIndex={-1}
               onKeyDown={handleKeyDown}
               onMouseDown={onMouseDownHandler}

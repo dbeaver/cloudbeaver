@@ -34,10 +34,11 @@ export class NavigationTreeFiltersBootstrap extends Bootstrap {
   register(): void {
     this.menuService.addCreator({
       root: true,
+      contexts: [DATA_CONTEXT_NAV_NODE],
       isApplicable: context => {
-        const node = context.tryGet(DATA_CONTEXT_NAV_NODE);
+        const node = context.get(DATA_CONTEXT_NAV_NODE)!;
 
-        if (!node || !node.folder || !NodeManagerUtils.isDatabaseObject(node.id)) {
+        if (!node.folder || !NodeManagerUtils.isDatabaseObject(node.id)) {
           return false;
         }
 
@@ -48,8 +49,9 @@ export class NavigationTreeFiltersBootstrap extends Bootstrap {
 
     this.menuService.addCreator({
       menus: [MENU_NAVIGATION_TREE_FILTERS],
+      contexts: [DATA_CONTEXT_NAV_NODE],
       getItems: (context, items) => {
-        const node = context.get(DATA_CONTEXT_NAV_NODE);
+        const node = context.get(DATA_CONTEXT_NAV_NODE)!;
         const actions = [
           new MenuBaseItem(
             {

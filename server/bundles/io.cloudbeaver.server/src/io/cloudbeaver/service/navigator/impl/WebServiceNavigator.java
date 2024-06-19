@@ -143,7 +143,7 @@ public class WebServiceNavigator implements DBWServiceNavigator {
                 return result.subList(offset, result.size());
             }
         } catch (DBException e) {
-            throw new DBWebException(e, null);
+            throw new DBWebException(e);
         }
     }
 
@@ -178,7 +178,7 @@ public class WebServiceNavigator implements DBWServiceNavigator {
 
             return nodeParents;
         } catch (DBException e) {
-            throw new DBWebException(e, null);
+            throw new DBWebException(e);
         }
     }
 

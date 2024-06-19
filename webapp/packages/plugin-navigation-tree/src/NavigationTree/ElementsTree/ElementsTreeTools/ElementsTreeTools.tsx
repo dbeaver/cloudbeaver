@@ -48,13 +48,14 @@ interface Props {
 
 export const ElementsTreeTools = observer<React.PropsWithChildren<Props>>(function ElementsTreeTools({ tree, settingsElements, children }) {
   const root = tree.root;
+  const baseRoot = tree.baseRoot;
   const translate = useTranslate();
   const [opened, setOpen] = useState(false);
   const styles = useS(ElementsTreeToolsStyles, ElementsTreeToolsIconButtonStyles);
 
-  useCaptureViewContext(context => {
-    context?.set(DATA_CONTEXT_NAV_TREE_ROOT, tree.baseRoot);
-    context?.set(DATA_CONTEXT_ELEMENTS_TREE, tree);
+  useCaptureViewContext((context, id) => {
+    context.set(DATA_CONTEXT_NAV_TREE_ROOT, baseRoot, id);
+    context.set(DATA_CONTEXT_ELEMENTS_TREE, tree, id);
   });
 
   const loading = tree.isLoading();
