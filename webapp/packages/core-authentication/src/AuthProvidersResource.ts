@@ -20,7 +20,6 @@ import { ServerConfigResource } from '@cloudbeaver/core-root';
 import { AuthProviderConfigurationInfoFragment, AuthProviderInfoFragment, GraphQLService } from '@cloudbeaver/core-sdk';
 
 import { AuthConfigurationsResource } from './AuthConfigurationsResource';
-import { AuthSettingsService } from './AuthSettingsService';
 
 export type AuthProvider = NonNullable<AuthProviderInfoFragment>;
 export type AuthProviderConfiguration = NonNullable<AuthProviderConfigurationInfoFragment>;
@@ -32,7 +31,6 @@ export class AuthProvidersResource extends CachedMapResource<string, AuthProvide
   }
 
   constructor(
-    private readonly authSettingsService: AuthSettingsService,
     private readonly graphQLService: GraphQLService,
     private readonly serverConfigResource: ServerConfigResource,
     private readonly authConfigurationsResource: AuthConfigurationsResource,

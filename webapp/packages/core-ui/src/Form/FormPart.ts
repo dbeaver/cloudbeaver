@@ -37,6 +37,7 @@ export abstract class FormPart<TPartState, TFormState = any> implements IFormPar
     this.loading = false;
 
     this.formState.submitTask.addHandler(executorHandlerFilter(() => this.isLoaded(), this.save.bind(this)));
+    this.formState.fillDefaultConfigTask.addHandler(executorHandlerFilter(() => this.isLoaded(), this.fillConfig.bind(this)));
     this.formState.configureTask.addHandler(executorHandlerFilter(() => this.isLoaded(), this.configure.bind(this)));
     this.formState.formatTask.addHandler(executorHandlerFilter(() => this.isLoaded(), this.format.bind(this)));
     this.formState.validationTask.addHandler(executorHandlerFilter(() => this.isLoaded(), this.validate.bind(this)));
@@ -150,6 +151,7 @@ export abstract class FormPart<TPartState, TFormState = any> implements IFormPar
   protected configure(data: IFormState<TFormState>, contexts: IExecutionContextProvider<IFormState<TFormState>>): void | Promise<void> {}
   protected format(data: IFormState<TFormState>, contexts: IExecutionContextProvider<IFormState<TFormState>>): void | Promise<void> {}
   protected validate(data: IFormState<TFormState>, contexts: IExecutionContextProvider<IFormState<TFormState>>): void | Promise<void> {}
+  protected fillConfig(data: IFormState<TFormState>, contexts: IExecutionContextProvider<IFormState<TFormState>>): void | Promise<void> {}
 
   protected abstract loader(): Promise<void>;
   protected abstract saveChanges(data: IFormState<TFormState>, contexts: IExecutionContextProvider<IFormState<TFormState>>): Promise<void>;
