@@ -30,5 +30,7 @@ export const dataViewerManifest: PluginManifest = {
     () => import('./TableViewer/ValuePanel/DataValuePanelBootstrap').then(m => m.DataValuePanelBootstrap),
     () => import('./DataViewerSettingsService').then(m => m.DataViewerSettingsService),
     () => import('./DataViewerService').then(m => m.DataViewerService),
+    () => import('./ResultSet/ResultSetTableFooterMenuService').then(m => m.ResultSetTableFooterMenuService),
+    () => import('./TableViewer/DataViewerViewService').then(m => m.DataViewerViewService),
   ],
 };

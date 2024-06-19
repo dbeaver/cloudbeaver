@@ -8,6 +8,7 @@
 import { observer } from 'mobx-react-lite';
 
 import { PlaceholderComponent, useS } from '@cloudbeaver/core-blocks';
+import { useDataContextLink } from '@cloudbeaver/core-data-context';
 import { MenuBar, MenuBarItemStyles, MenuBarStyles } from '@cloudbeaver/core-ui';
 import { useMenu } from '@cloudbeaver/core-view';
 
@@ -21,9 +22,11 @@ export const TableHeaderMenu: PlaceholderComponent<ITableHeaderPlaceholderProps>
   const menu = useMenu({ menu: DATA_VIEWER_DATA_MODEL_TOOLS_MENU });
   const menuBarStyles = useS(MenuBarStyles, MenuBarItemStyles);
 
-  menu.context.set(DATA_CONTEXT_DV_DDM, model);
-  menu.context.set(DATA_CONTEXT_DV_DDM_RESULT_INDEX, resultIndex);
-  menu.context.set(DATA_CONTEXT_DATA_VIEWER_SIMPLE, simple);
+  useDataContextLink(menu.context, (context, id) => {
+    context.set(DATA_CONTEXT_DV_DDM, model, id);
+    context.set(DATA_CONTEXT_DV_DDM_RESULT_INDEX, resultIndex, id);
+    context.set(DATA_CONTEXT_DATA_VIEWER_SIMPLE, simple, id);
+  });
 
   return <MenuBar className={menuBarStyles.floating} menu={menu} />;
 });

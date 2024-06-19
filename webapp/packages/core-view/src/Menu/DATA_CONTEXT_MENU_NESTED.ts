@@ -7,4 +7,4 @@
  */
 import { createDataContext } from '@cloudbeaver/core-data-context';
 
-export const DATA_CONTEXT_MENU_NESTED = createDataContext<boolean>('menu-nested', () => false);
+export const DATA_CONTEXT_MENU_NESTED = createDataContext<boolean>('menu-nested');

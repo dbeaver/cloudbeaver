@@ -13,9 +13,12 @@ import { useService } from '@cloudbeaver/core-di';
 import { EventContext, EventStopPropagationFlag } from '@cloudbeaver/core-events';
 import { Executor } from '@cloudbeaver/core-executor';
 import { ClipboardService } from '@cloudbeaver/core-ui';
+import { useCaptureViewContext } from '@cloudbeaver/core-view';
 import {
+  DATA_CONTEXT_DV_PRESENTATION,
   DatabaseDataSelectActionsData,
   DatabaseEditChangeType,
+  DataViewerPresentationType,
   IDatabaseResultSet,
   IDataPresentationProps,
   IResultSetEditActionData,
@@ -185,6 +188,10 @@ export const DataGridTable = observer<IDataPresentationProps<any, IDatabaseResul
     onDragEnd: (startPosition, currentPosition, event) => {
       gridSelectionContext.selectRange(startPosition, currentPosition, event.ctrlKey || event.metaKey, false);
     },
+  });
+
+  useCaptureViewContext((context, id) => {
+    context.set(DATA_CONTEXT_DV_PRESENTATION, { type: DataViewerPresentationType.Data }, id);
   });
 
   function handleKeyDown(event: React.KeyboardEvent<HTMLDivElement>) {

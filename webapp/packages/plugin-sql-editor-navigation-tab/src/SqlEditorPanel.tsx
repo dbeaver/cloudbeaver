@@ -14,11 +14,12 @@ import { DATA_CONTEXT_SQL_EDITOR_STATE, ISqlEditorTabState, SqlEditor } from '@c
 
 export const SqlEditorPanel: TabHandlerPanelComponent<ISqlEditorTabState> = observer(function SqlEditorPanel({ tab }) {
   const baseTab = useTab(tab.id);
+  const handlerState = tab.handlerState;
 
-  useCaptureViewContext(context => {
+  useCaptureViewContext((context, id) => {
     if (baseTab.selected) {
-      context?.set(DATA_CONTEXT_TAB_ID, tab.id);
-      context?.set(DATA_CONTEXT_SQL_EDITOR_STATE, tab.handlerState);
+      context.set(DATA_CONTEXT_TAB_ID, tab.id, id);
+      context.set(DATA_CONTEXT_SQL_EDITOR_STATE, handlerState, id);
     }
   });
 
@@ -31,5 +32,5 @@ export const SqlEditorPanel: TabHandlerPanelComponent<ISqlEditorTabState> = obse
     return null;
   }
 
-  return <SqlEditor state={tab.handlerState} />;
+  return <SqlEditor state={handlerState} />;
 });

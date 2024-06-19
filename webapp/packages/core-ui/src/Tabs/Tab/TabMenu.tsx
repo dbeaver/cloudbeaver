@@ -8,7 +8,7 @@
 import { observer } from 'mobx-react-lite';
 
 import { getComputed, s, useS } from '@cloudbeaver/core-blocks';
-import type { IDataContext } from '@cloudbeaver/core-data-context';
+import { type IDataContext, useDataContextLink } from '@cloudbeaver/core-data-context';
 import { useMenu } from '@cloudbeaver/core-view';
 
 import { ContextMenu } from '../../ContextMenu/ContextMenu';
@@ -31,8 +31,10 @@ export const TabMenu = observer<TabMenuProps>(function TabMenu({ children, tabId
     context: menuContext,
   });
 
-  menu.context.set(DATA_CONTEXT_TABS_CONTEXT, state);
-  menu.context.set(DATA_CONTEXT_TAB_ID, tabId);
+  useDataContextLink(menu.context, (context, id) => {
+    context.set(DATA_CONTEXT_TABS_CONTEXT, state, id);
+    context.set(DATA_CONTEXT_TAB_ID, tabId, id);
+  });
 
   const hidden = getComputed(() => !menu.items.length || menu.items.every(item => item.hidden));
 

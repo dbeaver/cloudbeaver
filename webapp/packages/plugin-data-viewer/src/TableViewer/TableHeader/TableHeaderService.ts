@@ -50,12 +50,11 @@ export class TableHeaderService extends Bootstrap {
 
     this.actionService.addHandler({
       id: 'table-header-menu-base-handler',
+      contexts: [DATA_CONTEXT_DV_DDM, DATA_CONTEXT_DV_DDM_RESULT_INDEX],
       isActionApplicable(context) {
         const menu = context.hasValue(DATA_CONTEXT_MENU, DATA_VIEWER_DATA_MODEL_TOOLS_MENU);
-        const model = context.tryGet(DATA_CONTEXT_DV_DDM);
-        const resultIndex = context.tryGet(DATA_CONTEXT_DV_DDM_RESULT_INDEX);
 
-        if (!menu || !model || resultIndex === undefined) {
+        if (!menu) {
           return false;
         }
 
@@ -64,8 +63,8 @@ export class TableHeaderService extends Bootstrap {
       handler: async (context, action) => {
         switch (action) {
           case DATA_VIEWER_CONSTRAINTS_DELETE_ACTION: {
-            const model = context.get(DATA_CONTEXT_DV_DDM);
-            const resultIndex = context.get(DATA_CONTEXT_DV_DDM_RESULT_INDEX);
+            const model = context.get(DATA_CONTEXT_DV_DDM)!;
+            const resultIndex = context.get(DATA_CONTEXT_DV_DDM_RESULT_INDEX)!;
             const constraints = model.source.tryGetAction(resultIndex, ResultSetConstraintAction);
 
             if (constraints) {
@@ -84,8 +83,8 @@ export class TableHeaderService extends Bootstrap {
         return action.info;
       },
       isDisabled: (context, action) => {
-        const model = context.get(DATA_CONTEXT_DV_DDM);
-        const resultIndex = context.get(DATA_CONTEXT_DV_DDM_RESULT_INDEX);
+        const model = context.get(DATA_CONTEXT_DV_DDM)!;
+        const resultIndex = context.get(DATA_CONTEXT_DV_DDM_RESULT_INDEX)!;
 
         if (model.isLoading() || model.isDisabled(resultIndex)) {
           return true;

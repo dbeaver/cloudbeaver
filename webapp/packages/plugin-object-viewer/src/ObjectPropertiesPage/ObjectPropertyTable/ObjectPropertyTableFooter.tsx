@@ -8,6 +8,7 @@
 import { observer } from 'mobx-react-lite';
 
 import type { TableState } from '@cloudbeaver/core-blocks';
+import { useDataContextLink } from '@cloudbeaver/core-data-context';
 import { useService } from '@cloudbeaver/core-di';
 import { DATA_CONTEXT_NAV_NODES, type NavNode, NavNodeInfoResource } from '@cloudbeaver/core-navigation-tree';
 import { resourceKeyList } from '@cloudbeaver/core-resource';
@@ -29,7 +30,9 @@ export const ObjectPropertyTableFooter = observer<Props>(function ObjectProperty
     return navNodeInfoResource.get(resourceKeyList(state.selectedList)).filter(Boolean) as NavNode[];
   }
 
-  menu.context.set(DATA_CONTEXT_NAV_NODES, getSelected);
+  useDataContextLink(menu.context, (context, id) => {
+    context.set(DATA_CONTEXT_NAV_NODES, getSelected, id);
+  });
 
   return <MenuBar className={className} menu={menu} />;
 });
