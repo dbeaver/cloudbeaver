@@ -146,9 +146,6 @@ export class FormState<TState> implements IFormState<TState> {
     }
 
     if (this.isLoaded() && !this.isOutdated() && !refresh) {
-      if (this.mode === FormMode.Create) {
-        await this.fillDefaultConfigTask.execute(this);
-      }
       return;
     }
 
