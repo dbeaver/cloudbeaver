@@ -1,4 +1,0 @@
-{
-  "query": "\n    query activeUser {\n  user: activeUser {\n    userId\n  }\n}\n    ",
-  "operationName": "activeUser"
-}
