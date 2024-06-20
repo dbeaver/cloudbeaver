@@ -105,16 +105,7 @@ public abstract class BaseWebApplication extends BaseApplicationImpl implements 
 
     protected boolean loadServerConfiguration() throws DBException {
         Path configFilePath = getMainConfigurationFilePath().toAbsolutePath();
-        Path configFolder = configFilePath.getParent();
 
-        // Configure logging
-        Path logbackConfigPath = getLogbackConfigPath(configFolder);
-
-        if (logbackConfigPath == null) {
-            System.err.println("Can't find slf4j configuration file in " + configFilePath.getParent());
-        } else {
-            System.setProperty("logback.configurationFile", logbackConfigPath.toString());
-        }
         Log.setLogHandler(new SLF4JLogHandler());
 
         // Load config file
@@ -210,7 +201,9 @@ public abstract class BaseWebApplication extends BaseApplicationImpl implements 
     }
 
     @SuppressWarnings("unchecked")
-    public static void patchConfigurationWithProperties(Map<String, Object> configProps, IVariableResolver varResolver) {
+    public static void patchConfigurationWithProperties(
+        Map<String, Object> configProps, IVariableResolver varResolver
+    ) {
         for (Map.Entry<String, Object> entry : configProps.entrySet()) {
             Object propValue = entry.getValue();
             if (propValue instanceof String) {
