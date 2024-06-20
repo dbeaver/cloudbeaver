@@ -92,7 +92,7 @@ export class SqlEditorBootstrap extends Bootstrap {
       root: true,
       contexts: [DATA_CONTEXT_CONNECTION],
       isApplicable: context => {
-        const node = context.tryGet(DATA_CONTEXT_NAV_NODE);
+        const node = context.get(DATA_CONTEXT_NAV_NODE);
 
         if (node && !node.objectFeatures.includes(EObjectFeature.dataSource)) {
           return false;
@@ -106,23 +106,27 @@ export class SqlEditorBootstrap extends Bootstrap {
     this.actionService.addHandler({
       id: 'sql-editor',
       isActionApplicable: (context, action) => {
-        if (action === ACTION_RENAME) {
-          const editorState = context.tryGet(DATA_CONTEXT_SQL_EDITOR_STATE);
+        switch (action) {
+          case ACTION_RENAME: {
+            const editorState = context.get(DATA_CONTEXT_SQL_EDITOR_STATE);
 
-          if (!editorState) {
-            return false;
+            if (!editorState) {
+              return false;
+            }
+
+            const dataSource = this.sqlDataSourceService.get(editorState.editorId);
+
+            return dataSource?.hasFeature(ESqlDataSourceFeatures.setName) ?? false;
           }
-
-          const dataSource = this.sqlDataSourceService.get(editorState.editorId);
-
-          return dataSource?.hasFeature(ESqlDataSourceFeatures.setName) ?? false;
+          case ACTION_SQL_EDITOR_OPEN:
+            return context.has(DATA_CONTEXT_CONNECTION);
         }
-        return action === ACTION_SQL_EDITOR_OPEN && context.has(DATA_CONTEXT_CONNECTION);
+        return false;
       },
       handler: async (context, action) => {
         switch (action) {
           case ACTION_RENAME: {
-            const state = context.get(DATA_CONTEXT_SQL_EDITOR_STATE);
+            const state = context.get(DATA_CONTEXT_SQL_EDITOR_STATE)!;
             const dataSource = this.sqlDataSourceService.get(state.editorId);
             const executionContext = dataSource?.executionContext;
 
@@ -155,7 +159,7 @@ export class SqlEditorBootstrap extends Bootstrap {
             break;
           }
           case ACTION_SQL_EDITOR_OPEN: {
-            const connection = context.get(DATA_CONTEXT_CONNECTION);
+            const connection = context.get(DATA_CONTEXT_CONNECTION)!;
 
             this.sqlEditorNavigatorService.openNewEditor({
               dataSourceKey: LocalStorageSqlDataSource.key,

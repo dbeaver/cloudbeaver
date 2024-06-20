@@ -48,7 +48,7 @@ export class ObjectPropertyTableFooterService {
       },
       isDisabled: (context, action) => {
         if (action === ACTION_DELETE) {
-          const selected = context.get(DATA_CONTEXT_NAV_NODES)();
+          const selected = context.get(DATA_CONTEXT_NAV_NODES)!();
           return !selected.some(node => node.features?.includes(ENodeFeature.canDelete)) || this.navTreeResource.isLoading();
         }
 
@@ -56,7 +56,7 @@ export class ObjectPropertyTableFooterService {
       },
       handler: async (context, action) => {
         if (action === ACTION_DELETE) {
-          const selected = context.get(DATA_CONTEXT_NAV_NODES)();
+          const selected = context.get(DATA_CONTEXT_NAV_NODES)!();
           const nodes = selected.filter(node => node.features?.includes(ENodeFeature.canDelete));
 
           try {

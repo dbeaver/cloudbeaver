@@ -42,7 +42,7 @@ export const NavigationNodeProjectControl: NavTreeControlComponent = observer<Na
 
     const outdated = getComputed(() => navNodeInfoResource.isOutdated(node.id) && !treeNodeContext.loading);
     const selected = treeNodeContext.selected;
-    const resourceType = viewContext?.tryGet(DATA_CONTEXT_RESOURCE_MANAGER_TREE_RESOURCE_TYPE_ID);
+    const resourceType = viewContext?.get(DATA_CONTEXT_RESOURCE_MANAGER_TREE_RESOURCE_TYPE_ID);
 
     const isDragging = getComputed(() => {
       if (!node.projectId || !elementsTreeContext?.tree.activeDnDData) {

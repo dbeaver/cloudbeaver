@@ -70,11 +70,9 @@ export class MenuService {
           continue;
         }
       }
-      if (handler.contexts.size > 0) {
-        for (const context of handler.contexts) {
-          if (!contexts.has(context, true)) {
-            continue handlers;
-          }
+      for (const context of handler.contexts) {
+        if (!contexts.has(context)) {
+          continue handlers;
         }
       }
       if (handler.isApplicable?.(contexts) !== false) {
@@ -156,7 +154,7 @@ function filterApplicable(contexts: IDataContextProvider): (creator: IMenuItemsC
 
     if (creator.contexts.size > 0) {
       for (const context of creator.contexts) {
-        if (!contexts.has(context, true)) {
+        if (!contexts.has(context)) {
           return false;
         }
       }

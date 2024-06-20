@@ -9,6 +9,7 @@ import { observer } from 'mobx-react-lite';
 import { forwardRef, useRef, useState } from 'react';
 
 import { getComputed, IMenuState, Menu, MenuItemElement, useAutoLoad, useObjectRef } from '@cloudbeaver/core-blocks';
+import { useDataContextLink } from '@cloudbeaver/core-data-context';
 import { DATA_CONTEXT_MENU_NESTED, DATA_CONTEXT_SUBMENU_ITEM, IMenuData, IMenuSubMenuItem, MenuActionItem, useMenu } from '@cloudbeaver/core-view';
 
 import type { IMenuItemRendererProps } from './MenuItemRenderer';
@@ -27,8 +28,11 @@ export const SubMenuElement = observer<ISubMenuElementProps, HTMLButtonElement>(
     const menu = useRef<IMenuState>();
     const subMenuData = useMenu({ menu: subMenu.menu, context: menuData.context });
     const [visible, setVisible] = useState(false);
-    subMenuData.context.set(DATA_CONTEXT_MENU_NESTED, true);
-    subMenuData.context.set(DATA_CONTEXT_SUBMENU_ITEM, subMenu);
+
+    useDataContextLink(subMenuData.context, (context, id) => {
+      context.set(DATA_CONTEXT_MENU_NESTED, true, id);
+      context.set(DATA_CONTEXT_SUBMENU_ITEM, subMenu, id);
+    });
 
     const handler = subMenuData.handler;
     const hidden = getComputed(() => handler?.isHidden?.(subMenuData.context));
