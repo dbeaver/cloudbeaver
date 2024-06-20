@@ -7,15 +7,11 @@
  */
 import { queryByAttribute, waitFor } from '@testing-library/react';
 
-import { coreEventsManifest } from '@cloudbeaver/core-events';
-import { coreLocalizationManifest } from '@cloudbeaver/core-localization';
-import { coreSettingsManifest } from '@cloudbeaver/core-settings';
-import { coreThemingManifest } from '@cloudbeaver/core-theming';
 import { createApp, renderInApp } from '@cloudbeaver/tests-runner';
 
 import { TimerIcon } from './TimerIcon';
 
-const app = createApp(coreEventsManifest, coreSettingsManifest, coreThemingManifest, coreLocalizationManifest);
+const app = createApp();
 
 describe('TimerIcon', () => {
   it('renders correctly with state "play" and interval 30', async () => {

@@ -7,15 +7,11 @@
  */
 import { waitFor } from '@testing-library/react';
 
-import { coreEventsManifest } from '@cloudbeaver/core-events';
-import { coreLocalizationManifest } from '@cloudbeaver/core-localization';
-import { coreSettingsManifest } from '@cloudbeaver/core-settings';
-import { coreThemingManifest } from '@cloudbeaver/core-theming';
 import { createApp, renderInApp } from '@cloudbeaver/tests-runner';
 
 import { Text } from './Text';
 
-const app = createApp(coreEventsManifest, coreSettingsManifest, coreThemingManifest, coreLocalizationManifest);
+const app = createApp();
 
 describe('Text Component', () => {
   it('renders children correctly', async () => {

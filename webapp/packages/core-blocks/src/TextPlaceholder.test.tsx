@@ -7,15 +7,11 @@
  */
 import { waitFor } from '@testing-library/react';
 
-import { coreEventsManifest } from '@cloudbeaver/core-events';
-import { coreLocalizationManifest } from '@cloudbeaver/core-localization';
-import { coreSettingsManifest } from '@cloudbeaver/core-settings';
-import { coreThemingManifest } from '@cloudbeaver/core-theming';
 import { createApp, renderInApp } from '@cloudbeaver/tests-runner';
 
 import { TextPlaceholder } from './TextPlaceholder';
 
-const app = createApp(coreEventsManifest, coreSettingsManifest, coreThemingManifest, coreLocalizationManifest);
+const app = createApp();
 
 describe('TextPlaceholder Component', () => {
   it('renders children correctly', async () => {
