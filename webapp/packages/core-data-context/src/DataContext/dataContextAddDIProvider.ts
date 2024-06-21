@@ -10,7 +10,7 @@ import type { App } from '@cloudbeaver/core-di';
 import { DATA_CONTEXT_DI_PROVIDER } from './DATA_CONTEXT_DI_PROVIDER';
 import type { IDataContext } from './IDataContext';
 
-export function dataContextAddDIProvider(context: IDataContext, app: App): IDataContext {
-  context.set(DATA_CONTEXT_DI_PROVIDER, app.getServiceInjector());
+export function dataContextAddDIProvider(context: IDataContext, app: App, id: string): IDataContext {
+  context.set(DATA_CONTEXT_DI_PROVIDER, app.getServiceInjector(), id);
   return context;
 }

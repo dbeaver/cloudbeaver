@@ -33,12 +33,12 @@ export class SqlGeneratorsBootstrap extends Bootstrap {
       menus: [MENU_SQL_GENERATORS],
       contexts: [DATA_CONTEXT_NAV_NODE],
       isDisabled: context => {
-        const node = context.get(DATA_CONTEXT_NAV_NODE);
+        const node = context.get(DATA_CONTEXT_NAV_NODE)!;
 
         return this.sqlGeneratorsResource.get(node.id)?.length === 0;
       },
       getLoader: (context, action) => {
-        const node = context.get(DATA_CONTEXT_NAV_NODE);
+        const node = context.get(DATA_CONTEXT_NAV_NODE)!;
 
         return getCachedMapResourceLoaderState(this.sqlGeneratorsResource, () => node.id);
       },
@@ -47,7 +47,7 @@ export class SqlGeneratorsBootstrap extends Bootstrap {
       root: true,
       contexts: [DATA_CONTEXT_NAV_NODE],
       isApplicable: context => {
-        const node = context.get(DATA_CONTEXT_NAV_NODE);
+        const node = context.get(DATA_CONTEXT_NAV_NODE)!;
 
         if (!(node.objectFeatures.includes(EObjectFeature.entity) || node.objectFeatures.includes(EObjectFeature.script))) {
           return false;
@@ -62,7 +62,7 @@ export class SqlGeneratorsBootstrap extends Bootstrap {
       menus: [MENU_SQL_GENERATORS],
       contexts: [DATA_CONTEXT_NAV_NODE],
       getItems: (context, items) => {
-        const node = context.get(DATA_CONTEXT_NAV_NODE);
+        const node = context.get(DATA_CONTEXT_NAV_NODE)!;
 
         const actions = this.sqlGeneratorsResource.get(node.id) || [];
 

@@ -17,24 +17,36 @@
 
 package io.cloudbeaver.test.platform;
 
-import io.cloudbeaver.utils.WebTestUtils;
+import io.cloudbeaver.test.WebGQLClient;
+import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.data.json.JSONUtils;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.dbeaver.utils.GeneralUtils;
-import org.jkiss.utils.CommonUtils;
+import org.junit.Assert;
 import org.junit.Test;
 
-import java.net.http.HttpClient;
 import java.nio.file.Path;
-import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
 public class ConnectionsTest {
-
-    public static final String GQL_TEMPLATE_CREATE_CONNECTION = "createConnection.json";
-    public static final String GQL_TEMPLATE_DELETE_CONNECTION = "deleteConnection.json";
-    public static final String GQL_TEMPLATE_USER_CONNECTIONS = "userConnections.json";
+    private static final String GQL_CONNECTIONS_GET = """
+        query userConnections {
+          result: userConnections {
+            id
+          }
+        }""";
+    private static final String GQL_CONNECTIONS_CREATE = """
+        mutation createConnection($config: ConnectionConfig!, $projectId: ID) {
+          result: createConnection(config: $config, projectId: $projectId) {
+            id
+          }
+        }""";
+    private static final String GQL_CONNECTIONS_DELETE = """
+        mutation deleteConnection($id: ID!, $projectId: ID) {
+          result: deleteConnection(id: $id, projectId: $projectId)
+        }""";
 
     @Test
     public void testAPlatformPresence() {
@@ -52,50 +64,34 @@ public class ConnectionsTest {
 
     @Test
     public void testBCreateConnection() throws Exception {
-        HttpClient client = CEServerTestSuite.createClient();
-        WebTestUtils.authenticateUser(
-            client, CEServerTestSuite.getScriptsPath(), CEServerTestSuite.GQL_API_URL);
+        WebGQLClient client = CEServerTestSuite.createClient();
+        CEServerTestSuite.authenticateTestUser(client);
 
-        List<Map<String, Object>> connections = getUserConnections(client);
-        Map<String, Object> addedConnection = createConnection(client);
-        if (!getUserConnections(client).contains(addedConnection)) {
-            throw new Exception("The new connection was not added");
-        }
+        Map<String, Object> configuration = new LinkedHashMap<>();
+        Map<String, Object> variables = new LinkedHashMap<>();
+        variables.put("config", configuration);
+        Assert.assertThrows(
+            "Template connection or driver must be specified",
+            DBException.class,
+            () -> client.sendQuery(GQL_CONNECTIONS_CREATE, variables)
+        );
+        String templateId = "test_template";
+        configuration.put("templateId", templateId);
+        Assert.assertThrows(
+            "Template connection '" + templateId + "' not found",
+            DBException.class,
+            () -> client.sendQuery(GQL_CONNECTIONS_CREATE, variables)
+        );
 
-        boolean deleteConnection = deleteConnection(client, CommonUtils.toString(addedConnection.get("id")));
-        if (!deleteConnection) {
-            throw new Exception("The new connection was not deleted");
-        }
-    }
+        configuration.remove("templateId");
+        configuration.put("driverId", "postgresql:postgres-jdbc");
 
-    private List<Map<String, Object>> getUserConnections(HttpClient client) throws Exception {
-        String input = WebTestUtils.readScriptTemplate(GQL_TEMPLATE_USER_CONNECTIONS, CEServerTestSuite.getScriptsPath());
-        Map<String, Object> map = WebTestUtils.doPost(CEServerTestSuite.GQL_API_URL, input, client);
-        Map<String, Object> data = JSONUtils.getObjectOrNull(map, "data");
-        if (data != null) {
-            return JSONUtils.getObjectList(data, "userConnections");
-        }
-        return Collections.emptyList();
-    }
+        Map<String, Object> addedConnection = client.sendQuery(GQL_CONNECTIONS_CREATE, variables);
 
-    private Map<String, Object> createConnection(HttpClient client) throws Exception {
-        String input = WebTestUtils.readScriptTemplate(GQL_TEMPLATE_CREATE_CONNECTION, CEServerTestSuite.getScriptsPath());
-        Map<String, Object> map = WebTestUtils.doPost(CEServerTestSuite.GQL_API_URL, input, client);
-        Map<String, Object> data = JSONUtils.getObjectOrNull(map, "data");
-        if (data != null) {
-            return JSONUtils.getObjectOrNull(data, "createConnection");
-        }
-        return Collections.emptyMap();
-    }
-
-    private boolean deleteConnection(HttpClient client, String connectionId) throws Exception {
-        String input = WebTestUtils.readScriptTemplate(GQL_TEMPLATE_DELETE_CONNECTION, CEServerTestSuite.getScriptsPath())
-            .replace("${connectionId}", connectionId);
-        Map<String, Object> map = WebTestUtils.doPost(CEServerTestSuite.GQL_API_URL, input, client);
-        Map<String, Object> data = JSONUtils.getObjectOrNull(map, "data");
-        if (data != null) {
-            return JSONUtils.getBoolean(data, "deleteConnection");
-        }
-        return false;
+        List<Map<String, Object>> connections = client.sendQuery(GQL_CONNECTIONS_GET, null);
+        Assert.assertTrue(connections.contains(addedConnection));
+        String connectionId = JSONUtils.getString(addedConnection, "id");
+        Assert.assertNotNull(connectionId);
+        Assert.assertTrue(client.sendQuery(GQL_CONNECTIONS_DELETE, Map.of("id", connectionId)));
     }
 }

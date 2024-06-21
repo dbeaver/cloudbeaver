@@ -10,6 +10,7 @@ import { useContext, useState } from 'react';
 
 import { getComputed, Icon, s, useMouse, useS, useStateDelay } from '@cloudbeaver/core-blocks';
 import { ConnectionInfoResource, DATA_CONTEXT_CONNECTION } from '@cloudbeaver/core-connections';
+import { useDataContextLink } from '@cloudbeaver/core-data-context';
 import { useService } from '@cloudbeaver/core-di';
 import { DATA_CONTEXT_NAV_NODE, type DBObject, type NavNode, NavNodeManagerService } from '@cloudbeaver/core-navigation-tree';
 import { ContextMenu } from '@cloudbeaver/core-ui';
@@ -33,14 +34,15 @@ export const Menu = observer<Props>(function Menu({ value, node }) {
   const menu = useMenu({ menu: MENU_NAV_TREE });
   const mouse = useMouse<HTMLDivElement>();
   const [menuOpened, switchState] = useState(false);
-
-  menu.context.set(DATA_CONTEXT_NAV_NODE, node);
-
   const connection = connectionsInfoResource.getConnectionForNode(node.id);
 
-  if (connection) {
-    menu.context.set(DATA_CONTEXT_CONNECTION, connection);
-  }
+  useDataContextLink(menu.context, (context, id) => {
+    context.set(DATA_CONTEXT_NAV_NODE, node, id);
+
+    if (connection) {
+      context.set(DATA_CONTEXT_CONNECTION, connection, id);
+    }
+  });
 
   function openNode() {
     navNodeManagerService.navToNode(node.id, node.parentId);

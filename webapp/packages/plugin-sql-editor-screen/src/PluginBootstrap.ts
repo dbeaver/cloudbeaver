@@ -34,7 +34,7 @@ export class PluginBootstrap extends Bootstrap {
       actions: [ACTION_OPEN_IN_TAB],
       contexts: [DATA_CONTEXT_SQL_EDITOR_STATE],
       isDisabled: context => {
-        const state = context.get(DATA_CONTEXT_SQL_EDITOR_STATE);
+        const state = context.get(DATA_CONTEXT_SQL_EDITOR_STATE)!;
 
         const dataSource = this.sqlDataSourceService.get(state.editorId);
         return dataSource?.executionContext === undefined;
@@ -46,6 +46,7 @@ export class PluginBootstrap extends Bootstrap {
       id: 'sql-editor',
       binding: KEY_BINDING_OPEN_IN_TAB,
       actions: [ACTION_OPEN_IN_TAB],
+      contexts: [DATA_CONTEXT_SQL_EDITOR_STATE],
       handler: this.openTab.bind(this),
     });
 
@@ -57,7 +58,7 @@ export class PluginBootstrap extends Bootstrap {
   }
 
   private openTab(contexts: IDataContextProvider, action: IAction) {
-    const context = contexts.get(DATA_CONTEXT_SQL_EDITOR_STATE);
+    const context = contexts.get(DATA_CONTEXT_SQL_EDITOR_STATE)!;
     const dataSource = this.sqlDataSourceService.get(context.editorId);
 
     if (!dataSource?.executionContext) {

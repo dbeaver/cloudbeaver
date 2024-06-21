@@ -1,7 +1,0 @@
-{
-  "query": "\n    mutation openSession($defaultLocale: String) {\n  session: openSession(defaultLocale: $defaultLocale) {\n    valid\n  }\n}\n    ",
-  "variables": {
-    "defaultLocale": "en"
-  },
-  "operationName": "openSession"
-}

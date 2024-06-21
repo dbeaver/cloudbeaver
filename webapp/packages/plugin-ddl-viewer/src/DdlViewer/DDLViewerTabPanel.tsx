@@ -14,6 +14,7 @@ import {
   ConnectionInfoResource,
   createConnectionParam,
 } from '@cloudbeaver/core-connections';
+import { useDataContextLink } from '@cloudbeaver/core-data-context';
 import { MenuBar } from '@cloudbeaver/core-ui';
 import { useMenu } from '@cloudbeaver/core-view';
 import { useCodemirrorExtensions } from '@cloudbeaver/plugin-codemirror6';
@@ -39,9 +40,12 @@ export const DDLViewerTabPanel: NavNodeTransformViewComponent = observer(functio
   const sqlDialect = useSqlDialectExtension(connectionDialectResource.data);
   const extensions = useCodemirrorExtensions();
   extensions.set(...sqlDialect);
+  const ddlData = ddlResource.data;
 
-  menu.context.set(DATA_CONTEXT_DDL_VIEWER_NODE, nodeId);
-  menu.context.set(DATA_CONTEXT_DDL_VIEWER_VALUE, ddlResource.data);
+  useDataContextLink(menu.context, (context, id) => {
+    context.set(DATA_CONTEXT_DDL_VIEWER_NODE, nodeId, id);
+    context.set(DATA_CONTEXT_DDL_VIEWER_VALUE, ddlData, id);
+  });
 
   return (
     <div className={s(styles, { wrapper: true })}>
