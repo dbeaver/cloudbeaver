@@ -50,6 +50,7 @@
     "@cloudbeaver/core-ui": "^0",
     "@cloudbeaver/core-version": "^0",
     "@cloudbeaver/core-version-update": "^0",
+    "@cloudbeaver/core-task-manager": "^0",
     "@cloudbeaver/core-view": "^0",
     "mobx": "^6",
     "react": "^18",
