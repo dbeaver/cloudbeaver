@@ -10,6 +10,7 @@ import { CommonDialogService, ComputedContextMenuModel, DialogueStateResult, ICo
 import { ClipboardService } from '@cloudbeaver/core-ui';
 import { replaceMiddle } from '@cloudbeaver/core-utils';
 import {
+  DatabaseDataConstraintAction,
   IDatabaseDataModel,
   IDatabaseDataOptions,
   IDatabaseResultSet,
@@ -18,7 +19,6 @@ import {
   IS_NULL_ID,
   isFilterConstraint,
   nullOperationsFilter,
-  ResultSetConstraintAction,
   ResultSetDataAction,
   ResultSetFormatAction,
   wrapOperationArgument,
@@ -54,7 +54,7 @@ export class DataGridContextMenuFilterService {
       return;
     }
 
-    const constraints = model.source.getAction(resultIndex, ResultSetConstraintAction);
+    const constraints = model.source.getAction(resultIndex, DatabaseDataConstraintAction);
     const data = model.source.getAction(resultIndex, ResultSetDataAction);
     const resultColumn = data.getColumn(column);
 
@@ -126,7 +126,7 @@ export class DataGridContextMenuFilterService {
           return true;
         }
 
-        const constraints = context.data.model.source.getAction(context.data.resultIndex, ResultSetConstraintAction);
+        const constraints = context.data.model.source.getAction(context.data.resultIndex, DatabaseDataConstraintAction);
         return !constraints.supported;
       },
     });
@@ -143,12 +143,12 @@ export class DataGridContextMenuFilterService {
           return true;
         }
 
-        const constraints = context.data.model.source.getAction(context.data.resultIndex, ResultSetConstraintAction);
+        const constraints = context.data.model.source.getAction(context.data.resultIndex, DatabaseDataConstraintAction);
         return constraints.orderConstraints.length === 0 && constraints.filterConstraints.length === 0;
       },
       onClick: async context => {
         const { model, resultIndex } = context.data;
-        const constraints = model.source.getAction(resultIndex, ResultSetConstraintAction);
+        const constraints = model.source.getAction(resultIndex, DatabaseDataConstraintAction);
 
         await model.requestDataAction(async () => {
           constraints.deleteData();
@@ -340,7 +340,7 @@ export class DataGridContextMenuFilterService {
       },
       isHidden: context => {
         const { model, resultIndex, key } = context.data;
-        const constraints = model.source.getAction(resultIndex, ResultSetConstraintAction);
+        const constraints = model.source.getAction(resultIndex, DatabaseDataConstraintAction);
         const data = model.source.getAction(resultIndex, ResultSetDataAction);
         const resultColumn = data.getColumn(key.column);
         const currentConstraint = resultColumn ? constraints.get(resultColumn.position) : undefined;
@@ -354,7 +354,7 @@ export class DataGridContextMenuFilterService {
       },
       onClick: async context => {
         const { model, resultIndex, key } = context.data;
-        const constraints = model.source.getAction(resultIndex, ResultSetConstraintAction);
+        const constraints = model.source.getAction(resultIndex, DatabaseDataConstraintAction);
         const data = model.source.getAction(resultIndex, ResultSetDataAction);
         const resultColumn = data.getColumn(key.column);
 
@@ -378,13 +378,13 @@ export class DataGridContextMenuFilterService {
       },
       isHidden: context => {
         const { model, resultIndex } = context.data;
-        const constraints = model.source.getAction(resultIndex, ResultSetConstraintAction);
+        const constraints = model.source.getAction(resultIndex, DatabaseDataConstraintAction);
 
         return constraints.filterConstraints.length === 0 && !model.requestInfo.requestFilter;
       },
       onClick: async context => {
         const { model, resultIndex } = context.data;
-        const constraints = model.source.getAction(resultIndex, ResultSetConstraintAction);
+        const constraints = model.source.getAction(resultIndex, DatabaseDataConstraintAction);
 
         await model.requestDataAction(async () => {
           constraints.deleteDataFilters();

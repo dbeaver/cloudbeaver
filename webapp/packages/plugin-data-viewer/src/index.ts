@@ -32,7 +32,7 @@ export * from './DatabaseDataModel/Actions/ResultSet/isResultSetComplexValue';
 export * from './DatabaseDataModel/Actions/ResultSet/isResultSetContentValue';
 export * from './DatabaseDataModel/Actions/ResultSet/isResultSetFileValue';
 export * from './DatabaseDataModel/Actions/ResultSet/isResultSetGeometryValue';
-export * from './DatabaseDataModel/Actions/ResultSet/ResultSetConstraintAction';
+export * from './DatabaseDataModel/Actions/DatabaseDataConstraintAction';
 export * from './DatabaseDataModel/Actions/ResultSet/ResultSetDataAction';
 export * from './DatabaseDataModel/Actions/ResultSet/ResultSetDataKeysUtils';
 export * from './DatabaseDataModel/Actions/ResultSet/ResultSetEditAction';
