@@ -27,7 +27,7 @@ import { useService } from '@cloudbeaver/core-di';
 import { ResultDataFormat } from '@cloudbeaver/core-sdk';
 import { CaptureView } from '@cloudbeaver/core-view';
 
-import { ResultSetConstraintAction } from '../DatabaseDataModel/Actions/ResultSet/ResultSetConstraintAction';
+import { DatabaseDataConstraintAction } from '../DatabaseDataModel/Actions/DatabaseDataConstraintAction';
 import { DataPresentationService, DataPresentationType } from '../DataPresentationService';
 import { DataPresentation } from './DataPresentation';
 import { DataViewerViewService } from './DataViewerViewService';
@@ -70,7 +70,7 @@ export const TableViewer = observer<TableViewerProps, HTMLDivElement>(
 
     const localActions = useObjectRef({
       clearConstraints() {
-        const constraints = dataModel?.source.tryGetAction(resultIndex, ResultSetConstraintAction);
+        const constraints = dataModel?.source.tryGetAction(resultIndex, DatabaseDataConstraintAction);
 
         if (constraints) {
           constraints.deleteAll();
