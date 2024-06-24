@@ -402,6 +402,14 @@ extend type Mutation {
 
     asyncSqlRowDataCountResult(taskId: ID!): Int!
 
+    @since(version: "24.1.2")
+    sqlGetDynamicTrace(
+        projectId: ID,
+        connectionId: ID!,
+        contextId: ID!,
+        resultsId: ID!
+    ): Object!
+
     @since(version: "24.0.1")
     asyncSqlSetAutoCommit(
         projectId: ID!,

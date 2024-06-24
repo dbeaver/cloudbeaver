@@ -149,6 +149,12 @@ public class WebServiceBindingSQL extends WebServiceBindingBase<DBWServiceSQL> i
                     env.getArgument("resultsId"),
                     env.getArgument("columnIndex"),
                     new WebSQLResultsRow(env.getArgument("row"))))
+            .dataFetcher("sqlGetDynamicTrace", env ->
+                getService(env).readDynamicTrace(
+                    getWebSession(env),
+                    getSQLContext(env),
+                    env.getArgument("resultsId")
+                ))
             .dataFetcher("updateResultsDataBatch", env ->
                 getService(env).updateResultsDataBatch(
                     getSQLContext(env),
