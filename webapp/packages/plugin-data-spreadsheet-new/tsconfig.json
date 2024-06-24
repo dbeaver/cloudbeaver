@@ -103,6 +103,9 @@
       "path": "../core-view/tsconfig.json"
     },
     {
+      "path": "../core-view/tsconfig.json"
+    },
+    {
       "path": "../plugin-data-viewer/tsconfig.json"
     },
     {

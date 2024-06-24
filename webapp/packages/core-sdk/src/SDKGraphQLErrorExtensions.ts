@@ -5,9 +5,9 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-export module 'graphql' {
-  export interface GraphQLErrorExtensions {
-    stackTrace?: string;
-    webErrorCode?: string;
-  }
+import { GraphQLErrorExtensions } from 'graphql';
+
+export interface SDKGraphQLErrorExtensions extends GraphQLErrorExtensions {
+  stackTrace?: string;
+  webErrorCode?: string;
 }
