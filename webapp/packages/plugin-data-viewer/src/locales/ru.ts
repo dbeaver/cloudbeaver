@@ -51,7 +51,7 @@ export default [
   ['data_viewer_total_count_canceled_message', 'Запрос был отменен пользователем'],
   ['data_viewer_total_count_failed', 'Не удалось получить количество записей'],
   ['data_viewer_model_not_loaded', 'Не удалось загрузить модель таблицы'],
-  ['data_viewer_copy_not_allowed', 'Возможность копирования данных отключена'],
+  ['data_viewer_copy_not_allowed', 'Копирование отключено'],
   ['data_viewer_copy_not_allowed_message', 'Если это не ожидаемо, обратитесь к администратору'],
   ['settings_data_editor', 'Редактор данных'],
   ['settings_data_editor_disable_edit_name', 'Отключить редактирование'],
