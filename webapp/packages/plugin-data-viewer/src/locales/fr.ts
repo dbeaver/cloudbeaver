@@ -57,7 +57,7 @@ export default [
   ['data_viewer_total_count_failed', "Échec de l'obtention du compte total"],
   ['data_viewer_model_not_loaded', "Le modèle de la table n'est pas chargé"],
   ['data_viewer_copy_not_allowed', 'An ability to copy data is disabled'],
-  ['data_viewer_copy_not_allowed_message', 'Please allow the "Preferences" to change it or ask your admin'],
+  ['data_viewer_copy_not_allowed_message', 'If this was unexpected, contact the administrator'],
   ['settings_data_editor', 'Éditeur de données'],
   ['settings_data_editor_disable_edit_name', "Désactiver l'édition"],
   ['settings_data_editor_disable_edit_description', "Désactiver l'édition des données dans le Data Viewer pour les utilisateurs non administrateurs"],
