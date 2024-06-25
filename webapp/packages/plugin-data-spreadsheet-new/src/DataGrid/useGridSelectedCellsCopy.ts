@@ -17,6 +17,7 @@ import {
   IResultSetElementKey,
   ResultSetDataKeysUtils,
   ResultSetSelectAction,
+  useDataViewerCopyHandler,
 } from '@cloudbeaver/plugin-data-viewer';
 
 import type { IDataGridSelectionContext } from './DataGridSelection/DataGridSelectionContext';
@@ -71,6 +72,7 @@ export function useGridSelectedCellsCopy(
 ) {
   const dataViewerService = useService(DataViewerService);
   const props = useObjectRef({ tableData, selectionContext, resultSetSelectAction });
+  const copyEventHandler = useDataViewerCopyHandler();
 
   const onKeydownHandler = useCallback((event: React.KeyboardEvent) => {
     if ((event.ctrlKey || event.metaKey) && event.nativeEvent.code === EVENT_KEY_CODE.C) {
@@ -98,6 +100,8 @@ export function useGridSelectedCellsCopy(
           copyToClipboard(value);
         }
       }
+
+      copyEventHandler(event);
     }
   }, []);
 
