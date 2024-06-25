@@ -19,7 +19,6 @@ package io.cloudbeaver.server.servlets;
 import com.google.gson.stream.JsonWriter;
 import io.cloudbeaver.server.CBApplication;
 import io.cloudbeaver.server.CBConstants;
-import io.cloudbeaver.server.CBPlatform;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -28,7 +27,6 @@ import org.eclipse.jetty.servlet.DefaultServlet;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.data.json.JSONUtils;
-import org.jkiss.dbeaver.model.exec.DBCException;
 import org.jkiss.dbeaver.utils.GeneralUtils;
 
 import java.io.IOException;
