@@ -36,6 +36,7 @@ import org.jkiss.dbeaver.registry.DataSourceProviderRegistry;
 import org.jkiss.dbeaver.registry.network.NetworkHandlerDescriptor;
 import org.jkiss.dbeaver.registry.network.NetworkHandlerRegistry;
 import org.jkiss.dbeaver.runtime.properties.PropertySourceCustom;
+import org.jkiss.utils.ArrayUtils;
 import org.jkiss.utils.CommonUtils;
 
 import java.util.Arrays;
@@ -292,5 +293,10 @@ public class WebDatabaseDriverInfo {
         return driver.getDriverLibraries().stream()
             .map(dbpDriverLibrary -> new WebDriverLibraryInfo(webSession, dbpDriverLibrary))
             .toArray(WebDriverLibraryInfo[]::new);
+    }
+
+    @Property
+    public boolean getUseCustomPage() {
+        return !ArrayUtils.isEmpty(driver.getMainPropertyDescriptors());
     }
 }

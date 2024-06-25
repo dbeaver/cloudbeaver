@@ -217,10 +217,10 @@ type DriverInfo {
     providerId: ID
     # Driver Java class name
     driverClassName: String
-    defaultHost: String @deprecated(reason: "24.1.1, use mainProperties")
-    defaultPort: String @deprecated(reason: "24.1.1, use mainProperties")
-    defaultDatabase: String @deprecated(reason: "24.1.1, use mainProperties")
-    defaultServer: String @deprecated(reason: "24.1.1, use mainProperties")
+    defaultHost: String
+    defaultPort: String
+    defaultDatabase: String
+    defaultServer: String
     defaultUser: String
     sampleURL: String
     driverInfoURL: String
@@ -229,6 +229,7 @@ type DriverInfo {
     enabled: Boolean!
     requiresServerName: Boolean
     requiresDatabaseName: Boolean
+    useCustomPage: Boolean! @since(version: "24.1.2") # if host, port, database, server name fields are custom
 
     licenseRequired: Boolean
     license: String
@@ -501,13 +502,13 @@ input ConnectionConfig {
 
     # Custom connection parameters (all optional)
 
-    host: String @deprecated(reason: "24.1.1, use mainProperties")
-    port: String @deprecated(reason: "24.1.1, use mainProperties")
-    serverName: String @deprecated(reason: "24.1.1, use mainProperties")
-    databaseName: String @deprecated(reason: "24.1.1, use mainProperties")
+    host: String
+    port: String
+    serverName: String
+    databaseName: String
 
-    # Host, port, serverName, databaseName are stored and mainProperties
-    mainProperties: Object @since(version: "24.1.1")
+    # Host, port, serverName, databaseName are also stored in mainProperties for custom pages
+    mainProperties: Object @since(version: "24.1.2")
 
     # Connection url jdbc:{driver}://{host}[:{port}]/[{database}]
     url: String
