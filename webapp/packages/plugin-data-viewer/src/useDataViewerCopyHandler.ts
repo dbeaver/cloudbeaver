@@ -16,8 +16,10 @@ export function useDataViewerCopyHandler() {
   const notificationService = useService(NotificationService);
   const dataViewerService = useService(DataViewerService);
 
-  return function (event?: ClipboardEvent | React.KeyboardEvent) {
+  return function (event?: ClipboardEvent | React.KeyboardEvent | React.ClipboardEvent) {
     if (!dataViewerService.canCopyData) {
+      event?.preventDefault();
+
       notificationService.logError({
         title: 'data_viewer_copy_not_allowed',
         message: 'data_viewer_copy_not_allowed_message',
