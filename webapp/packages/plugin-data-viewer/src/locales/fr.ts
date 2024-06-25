@@ -64,7 +64,7 @@ export default [
   ['settings_data_editor_disable_data_copy_name', 'Désactiver la copie'],
   [
     'settings_data_editor_disable_data_copy_description',
-    'Désactiver la copie des données dans le Data Viewer pour les utilisateurs non administrateurs. Fonctionne uniquement avec la fonction "Désactiver l\'édition" activée',
+    'Désactiver la copie des données dans le Data Viewer pour les utilisateurs non administrateurs',
   ],
   ['settings_data_editor_fetch_min_name', 'Taille de récupération minimale'],
   ['settings_data_editor_fetch_min_description', 'Nombre minimal de lignes à récupérer'],
