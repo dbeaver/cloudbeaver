@@ -46,6 +46,7 @@
     "@cloudbeaver/core-settings-localization": "^0",
     "@cloudbeaver/core-settings-user": "^0",
     "@cloudbeaver/core-storage": "^0",
+    "@cloudbeaver/core-task-manager": "^0",
     "@cloudbeaver/core-theming": "^0",
     "@cloudbeaver/core-ui": "^0",
     "@cloudbeaver/core-version": "^0",
