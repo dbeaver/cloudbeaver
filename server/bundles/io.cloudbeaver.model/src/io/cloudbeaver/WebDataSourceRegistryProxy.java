@@ -261,7 +261,7 @@ public class WebDataSourceRegistryProxy implements DBPDataSourceRegistry, DataSo
     }
 
     @Override
-    public void removeAuthProfile(DBAAuthProfile profile) {
+    public void removeAuthProfile(@NotNull DBAAuthProfile profile) {
         dataSourceRegistry.removeAuthProfile(profile);
     }
 

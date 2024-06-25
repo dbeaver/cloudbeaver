@@ -46,7 +46,7 @@ export class ElementsTreeToolsMenuService {
     this.actionService.addHandler({
       id: 'tree-tools-menu-base-handler',
       isActionApplicable(context, action): boolean {
-        const tree = context.tryGet(DATA_CONTEXT_ELEMENTS_TREE);
+        const tree = context.get(DATA_CONTEXT_ELEMENTS_TREE);
 
         if (!tree) {
           return false;
@@ -82,7 +82,7 @@ export class ElementsTreeToolsMenuService {
         return action.info;
       },
       isHidden: (context, action) => {
-        const tree = context.tryGet(DATA_CONTEXT_ELEMENTS_TREE);
+        const tree = context.get(DATA_CONTEXT_ELEMENTS_TREE);
 
         if (action === ACTION_LINK_OBJECT && tree) {
           const navNode = this.connectionSchemaManagerService.activeNavNode;
@@ -114,7 +114,7 @@ export class ElementsTreeToolsMenuService {
     this.actionService.addHandler({
       id: 'elements-tree-base',
       isActionApplicable: (contexts, action): boolean => {
-        const tree = contexts.tryGet(DATA_CONTEXT_ELEMENTS_TREE);
+        const tree = contexts.get(DATA_CONTEXT_ELEMENTS_TREE);
 
         if (!tree) {
           return false;

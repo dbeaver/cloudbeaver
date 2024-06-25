@@ -96,12 +96,9 @@ export class NavNodeContextMenuService extends Bootstrap {
 
     this.actionService.addHandler({
       id: 'nav-node-base-handler',
+      contexts: [DATA_CONTEXT_NAV_NODE],
       isActionApplicable: (context, action): boolean => {
-        const node = context.tryGet(DATA_CONTEXT_NAV_NODE);
-
-        if (!node) {
-          return false;
-        }
+        const node = context.get(DATA_CONTEXT_NAV_NODE)!;
 
         if (NodeManagerUtils.isDatabaseObject(node.id) || node.nodeType === NAV_NODE_TYPE_FOLDER) {
           if (action === ACTION_RENAME) {
@@ -120,7 +117,7 @@ export class NavNodeContextMenuService extends Bootstrap {
         return [ACTION_OPEN, ACTION_REFRESH].includes(action);
       },
       handler: async (context, action) => {
-        const node = context.get(DATA_CONTEXT_NAV_NODE);
+        const node = context.get(DATA_CONTEXT_NAV_NODE)!;
         const name = getNodePlainName(node);
 
         switch (action) {
@@ -137,7 +134,7 @@ export class NavNodeContextMenuService extends Bootstrap {
             break;
           }
           case ACTION_RENAME: {
-            const actions = context.tryGet(DATA_CONTEXT_NAV_NODE_ACTIONS);
+            const actions = context.get(DATA_CONTEXT_NAV_NODE_ACTIONS);
 
             const save = async (newName: string) => {
               if (name !== newName && newName.trim().length) {

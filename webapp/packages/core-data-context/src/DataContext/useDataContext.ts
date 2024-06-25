@@ -5,16 +5,18 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { useState } from 'react';
+import { useLayoutEffect, useState } from 'react';
 
+import { DataContext } from './DataContext';
 import type { IDataContext } from './IDataContext';
 import type { IDataContextProvider } from './IDataContextProvider';
-import { TempDataContext } from './TempDataContext';
 
 export function useDataContext(fallback?: IDataContextProvider): IDataContext {
-  const [context] = useState(() => new TempDataContext());
+  const [context] = useState(() => new DataContext());
 
-  context.setFallBack(fallback);
+  useLayoutEffect(() => {
+    context.setFallBack(fallback);
+  });
 
   return context;
 }

@@ -12,7 +12,7 @@ import { isGlobalProject, ProjectInfoResource } from '@cloudbeaver/core-projects
 import { CachedMapAllKey, getCachedMapResourceLoaderState } from '@cloudbeaver/core-resource';
 
 import { AdministrationUserFormService } from '../AdministrationUserFormService';
-import { DATA_CONTEXT_USER_FORM_CONNECTION_ACCESS_PART } from './DATA_CONTEXT_USER_FORM_CONNECTION_ACCESS_PART';
+import { getUserFormConnectionAccessPart } from './getUserFormConnectionAccessPart';
 
 const UserFormConnectionAccessPanel = React.lazy(async () => {
   const { UserFormConnectionAccessPanel } = await import('./UserFormConnectionAccessPanel');
@@ -36,7 +36,7 @@ export class UserFormConnectionAccessPartBootstrap extends Bootstrap {
       order: 3,
       panel: () => UserFormConnectionAccessPanel,
       isHidden: () => !this.projectInfoResource.values.some(isGlobalProject),
-      stateGetter: props => () => props.formState.dataContext.get(DATA_CONTEXT_USER_FORM_CONNECTION_ACCESS_PART),
+      stateGetter: props => () => getUserFormConnectionAccessPart(props.formState),
       getLoader: () => getCachedMapResourceLoaderState(this.projectInfoResource, () => CachedMapAllKey),
     });
   }

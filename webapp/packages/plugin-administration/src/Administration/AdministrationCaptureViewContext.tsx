@@ -15,8 +15,8 @@ export const AdministrationCaptureViewContext = observer(function Administration
   const administrationScreenService = useService(AdministrationScreenService);
   const route = administrationScreenService.activeScreen;
 
-  useCaptureViewContext(context => {
-    context?.set(DATA_CONTEXT_ADMINISTRATION_ITEM_ROUTE, route);
+  useCaptureViewContext((context, id) => {
+    context.set(DATA_CONTEXT_ADMINISTRATION_ITEM_ROUTE, route, id);
   });
 
   return null;

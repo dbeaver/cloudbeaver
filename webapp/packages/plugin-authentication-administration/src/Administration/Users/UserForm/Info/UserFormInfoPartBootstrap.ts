@@ -10,7 +10,7 @@ import React from 'react';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 
 import { AdministrationUserFormService } from '../AdministrationUserFormService';
-import { DATA_CONTEXT_USER_FORM_INFO_PART } from './DATA_CONTEXT_USER_FORM_INFO_PART';
+import { getUserFormInfoPart } from './getUserFormInfoPart';
 
 const UserFormInfo = React.lazy(async () => {
   const { UserFormInfo } = await import('./UserFormInfo');
@@ -30,7 +30,7 @@ export class UserFormInfoPartBootstrap extends Bootstrap {
       title: 'authentication_administration_user_info',
       order: 1,
       panel: () => UserFormInfo,
-      stateGetter: props => () => props.formState.dataContext.get(DATA_CONTEXT_USER_FORM_INFO_PART),
+      stateGetter: props => () => getUserFormInfoPart(props.formState),
     });
   }
 

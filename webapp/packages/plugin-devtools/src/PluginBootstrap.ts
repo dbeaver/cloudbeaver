@@ -80,7 +80,7 @@ export class PluginBootstrap extends Bootstrap {
     this.menuService.addCreator({
       menus: [MENU_DEVTOOLS],
       getItems: (context, items) => {
-        const search = context.tryGet(DATA_CONTEXT_MENU_SEARCH);
+        const search = context.get(DATA_CONTEXT_MENU_SEARCH);
 
         if (search) {
           return [
@@ -125,7 +125,7 @@ export class PluginBootstrap extends Bootstrap {
     this.menuService.addCreator({
       menus: [MENU_PLUGIN],
       isApplicable: context => {
-        const item = context.tryGet(DATA_CONTEXT_SUBMENU_ITEM);
+        const item = context.get(DATA_CONTEXT_SUBMENU_ITEM);
 
         if (item instanceof PluginSubMenuItem) {
           return this.app.getServices(item.plugin).some(service => service.prototype instanceof CachedResource);

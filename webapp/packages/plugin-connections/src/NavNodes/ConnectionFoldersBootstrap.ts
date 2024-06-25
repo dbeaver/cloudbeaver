@@ -122,10 +122,11 @@ export class ConnectionFoldersBootstrap extends Bootstrap {
 
     this.actionService.addHandler({
       id: 'tree-tools-menu-folders-handler',
+      contexts: [DATA_CONTEXT_ELEMENTS_TREE],
       isActionApplicable: (context, action) => {
-        const tree = context.tryGet(DATA_CONTEXT_ELEMENTS_TREE);
+        const tree = context.get(DATA_CONTEXT_ELEMENTS_TREE)!;
 
-        if (action !== ACTION_NEW_FOLDER || !tree || !this.userInfoResource.data || tree.baseRoot !== ROOT_NODE_PATH) {
+        if (action !== ACTION_NEW_FOLDER || !this.userInfoResource.data || tree.baseRoot !== ROOT_NODE_PATH) {
           return false;
         }
 
@@ -134,7 +135,7 @@ export class ConnectionFoldersBootstrap extends Bootstrap {
         return targetNode !== undefined;
       },
       // isDisabled: (context, action) => {
-      //   const tree = context.tryGet(DATA_CONTEXT_ELEMENTS_TREE);
+      //   const tree = context.get(DATA_CONTEXT_ELEMENTS_TREE);
 
       //   if (!tree) {
       //     return true;

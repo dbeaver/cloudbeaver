@@ -1,9 +1,0 @@
-{
-  "query": "\n    mutation rmDeleteResource($projectId: String!, $resourcePath: String!, $recursive: Boolean!) {\n  rmDeleteResource(\n    projectId: $projectId\n    resourcePath: $resourcePath\n    recursive: $recursive\n )\n}\n    ",
-  "variables": {
-    "projectId": "u_test",
-    "resourcePath": "testScript.sql",
-    "recursive": false
-  },
-  "operationName": "rmDeleteResource"
-}

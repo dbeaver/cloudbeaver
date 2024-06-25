@@ -1,3 +1,10 @@
+/*
+ * CloudBeaver - Cloud Database Manager
+ * Copyright (C) 2020-2024 DBeaver Corp and others
+ *
+ * Licensed under the Apache License, Version 2.0.
+ * you may not use this file except in compliance with the License.
+ */
 import { manifest } from './manifest';
 
 export default manifest;
@@ -10,7 +17,8 @@ export * from './Administration/Users/UsersTable/CreateUserService';
 export * from './Administration/Users/UsersAdministrationService';
 export * from './Administration/Users/UserForm/AdministrationUserFormService';
 export * from './Administration/Users/UserForm/AdministrationUserFormState';
-export * from './Administration/Users/UserForm/Info/DATA_CONTEXT_USER_FORM_INFO_PART';
+export * from './Administration/Users/UserForm/Info/getUserFormInfoPart';
+export * from './Administration/Users/UserForm/Info/UserFormInfoPart';
 export * from './Administration/Users/UserForm/Info/UserFormInfoPartService';
 export * from './Menus/MENU_USERS_ADMINISTRATION';
 export * from './AdministrationUsersManagementService';
