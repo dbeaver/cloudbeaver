@@ -341,6 +341,7 @@ type ConnectionInfo {
     url: String
 
     keepAliveInterval: Int!
+    defaultAutoCommit: Boolean!
 
     properties: Object
 
@@ -505,6 +506,7 @@ input ConnectionConfig {
 
     # Keep-Alive interval
     keepAliveInterval: Int
+    defaultAutoCommit: Boolean
 
     # Template connection
     template: Boolean

@@ -61,6 +61,7 @@ public class WebConnectionConfig {
     private List<WebNetworkHandlerConfigInput> networkHandlersConfig;
     private DBPDriverConfigurationType configurationType;
     private String selectedSecretId;
+    private boolean defaultAutoCommit;
 
     public WebConnectionConfig() {
     }
@@ -85,6 +86,7 @@ public class WebConnectionConfig {
             url = JSONUtils.getString(params, "url");
 
             keepAliveInterval = JSONUtils.getInteger(params, "keepAliveInterval", -1);
+            defaultAutoCommit = JSONUtils.getBoolean(params, "defaultAutoCommit", true);
 
             name = JSONUtils.getString(params, "name");
             description = JSONUtils.getString(params, "description");
@@ -233,6 +235,11 @@ public class WebConnectionConfig {
     @Property
     public Integer getKeepAliveInterval() {
         return keepAliveInterval;
+    }
+
+    @Property
+    public boolean isDefaultAutoCommit() {
+        return defaultAutoCommit;
     }
 
     @Nullable
