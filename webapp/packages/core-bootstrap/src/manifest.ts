@@ -32,6 +32,7 @@ import { coreSettingsManifest } from '@cloudbeaver/core-settings';
 import { coreSettingsLocalizationManifest } from '@cloudbeaver/core-settings-localization';
 import { coreSettingsUserManifest } from '@cloudbeaver/core-settings-user';
 import { coreStorageManifest } from '@cloudbeaver/core-storage';
+import { coreTaskManagerManifest } from '@cloudbeaver/core-task-manager';
 import { coreThemingManifest } from '@cloudbeaver/core-theming';
 import { coreUIManifest } from '@cloudbeaver/core-ui';
 import { coreVersionManifest } from '@cloudbeaver/core-version';
@@ -79,4 +80,5 @@ export const coreManifests: PluginManifest[] = [
   coreClientActivityManifest,
   coreNavigationTree,
   coreSettingsUserManifest,
+  coreTaskManagerManifest,
 ];

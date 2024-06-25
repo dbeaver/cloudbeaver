@@ -32,6 +32,7 @@
     "@cloudbeaver/core-theming": "^0",
     "@cloudbeaver/core-ui": "^0",
     "@cloudbeaver/core-utils": "^0",
+    "@cloudbeaver/core-view": "^0",
     "@cloudbeaver/plugin-data-viewer": "^0",
     "@cloudbeaver/plugin-react-data-grid": "^0",
     "@popperjs/core": "^2",
