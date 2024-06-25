@@ -17,14 +17,18 @@
 package io.cloudbeaver.server.servlets;
 
 import com.google.gson.stream.JsonWriter;
+import io.cloudbeaver.server.CBApplication;
 import io.cloudbeaver.server.CBConstants;
+import io.cloudbeaver.server.CBPlatform;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.eclipse.jetty.servlet.DefaultServlet;
+import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.data.json.JSONUtils;
+import org.jkiss.dbeaver.model.exec.DBCException;
 import org.jkiss.dbeaver.utils.GeneralUtils;
 
 import java.io.IOException;
@@ -44,6 +48,12 @@ public class CBStatusServlet extends DefaultServlet {
         infoMap.put("health", "ok");
         infoMap.put("product.name", GeneralUtils.getProductName());
         infoMap.put("product.version", GeneralUtils.getProductVersion().toString());
+        try {
+            CBApplication.getInstance().getStatusInfo(infoMap);
+        } catch (DBException e) {
+            log.error(e);
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Error additional status info : " + e.getMessage());
+        }
         try (JsonWriter writer = new JsonWriter(response.getWriter())) {
             JSONUtils.serializeMap(writer, infoMap);
         }
