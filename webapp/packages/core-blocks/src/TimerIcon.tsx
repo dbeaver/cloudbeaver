@@ -10,7 +10,7 @@ import type React from 'react';
 
 import { Icon } from './Icon';
 import { s } from './s';
-import style from './TimerIcon.module.css';
+import classes from './TimerIcon.module.css';
 import { useS } from './useS';
 
 interface Props {
@@ -19,7 +19,7 @@ interface Props {
 }
 
 export const TimerIcon = observer<Props & React.ButtonHTMLAttributes<HTMLDivElement>>(function TimerIcon({ state, interval, ...rest }) {
-  const styles = useS(style);
+  const styles = useS(classes);
 
   return (
     <div className={s(styles, { timer: true })} {...rest}>
