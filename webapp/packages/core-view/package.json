@@ -23,7 +23,6 @@
     "@cloudbeaver/core-di": "^0",
     "@cloudbeaver/core-extensions": "^0",
     "@cloudbeaver/core-localization": "^0",
-    "@cloudbeaver/core-theming": "^0",
     "@cloudbeaver/core-utils": "^0",
     "mobx": "^6",
     "mobx-react-lite": "^4",
