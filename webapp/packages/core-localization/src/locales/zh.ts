@@ -79,6 +79,8 @@ export default [
   ['ui_rename', '重命名'],
   ['ui_rename_processing', '重命名中...'],
   ['ui_name', '名称'],
+  ['ui_value', 'Value'],
+  ['ui_description', 'Description'],
   ['ui_interval', 'Interval'],
   ['ui_cant_delete_item', '此项目不能删除'],
   ['ui_no_items_placeholder', '还没有项目'],
