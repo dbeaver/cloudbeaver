@@ -212,6 +212,16 @@ type SQLScriptQuery {
     start: Int!
     end: Int!
 }
+
+####################################################
+# Dynamic trace info
+####################################################
+type DynamicTraceProperty {
+    name: String!
+    value: String
+    description: String
+}
+
 ####################################################
 # Query and Mutation
 ####################################################
@@ -409,7 +419,7 @@ extend type Mutation {
         connectionId: ID!,
         contextId: ID!,
         resultsId: ID!
-    ): Object!
+    ): [DynamicTraceProperty!]!
 
     @since(version: "24.0.1")
     asyncSqlSetAutoCommit(

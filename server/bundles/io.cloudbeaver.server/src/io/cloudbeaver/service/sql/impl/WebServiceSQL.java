@@ -458,14 +458,19 @@ public class WebServiceSQL implements DBWServiceSQL {
         return contextInfo.getProcessor().getWebSession().createAndRunAsyncTask("Read data from container " + nodePath, runnable);
     }
 
+    @NotNull
     @Override
-    public List<DBCTraceProperty> readDynamicTrace(@NotNull WebSession webSession, @NotNull WebSQLContextInfo contextInfo, @NotNull String resultsId) throws DBException {
+    public List<DBCTraceProperty> readDynamicTrace(
+        @NotNull WebSession webSession,
+        @NotNull WebSQLContextInfo contextInfo,
+        @NotNull String resultsId
+    ) throws DBException {
         WebSQLResultsInfo resultsInfo = contextInfo.getResults(resultsId);
         DBCTrace trace = resultsInfo.getTrace();
         if (trace instanceof DBCTraceDynamic traceDynamic) {
             return traceDynamic.getTraceProperties(webSession.getProgressMonitor());
         }
-        return null;
+        throw new DBWebException("Dynamic trace is not found in provided results info");
     }
 
     @Override

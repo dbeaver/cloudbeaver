@@ -143,6 +143,10 @@ public class WebSQLContextInfo implements WebSessionProvider {
         }
     }
 
+    /**
+     * Saves results info into cache.
+     * Helps to find it with results id sent by front-end.
+     */
     @NotNull
     public WebSQLResultsInfo saveResult(
         @NotNull DBSDataContainer dataContainer,

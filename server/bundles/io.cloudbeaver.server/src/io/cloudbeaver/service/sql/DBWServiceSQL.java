@@ -107,8 +107,16 @@ public interface DBWServiceSQL extends DBWService {
         @Nullable WebSQLDataFilter filter,
         @Nullable WebDataFormat dataFormat) throws DBWebException;
 
+    /**
+     * Reads dynamic trace from provided database results.
+     */
+    @NotNull
     @WebAction
-    List<DBCTraceProperty> readDynamicTrace(@NotNull WebSession webSession, @NotNull WebSQLContextInfo contextInfo, @NotNull String resultsId) throws DBException;
+    List<DBCTraceProperty> readDynamicTrace(
+        @NotNull WebSession webSession,
+        @NotNull WebSQLContextInfo contextInfo,
+        @NotNull String resultsId
+    ) throws DBException;
 
     @WebAction
     Boolean closeResult(@NotNull WebSQLContextInfo sqlContext, @NotNull String resultId) throws DBWebException;
