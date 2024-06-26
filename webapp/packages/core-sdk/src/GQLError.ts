@@ -7,13 +7,13 @@
  */
 // eslint-disable-next-line @typescript-eslint/triple-slash-reference
 /// <reference path="types.d.ts" />
-import type { ClientError, GraphQLRequestContext, GraphQLResponse } from 'graphql-request/build/cjs/types';
+import { ClientError } from 'graphql-request';
 
 import { DetailsError } from './DetailsError';
 
 export class GQLError extends DetailsError {
-  response: GraphQLResponse;
-  request: GraphQLRequestContext;
+  response: ClientError['response'];
+  request: ClientError['request'];
   errorCode?: string;
   isTextBody = false; // true when server returns not GQLError object but plain text or html error
 

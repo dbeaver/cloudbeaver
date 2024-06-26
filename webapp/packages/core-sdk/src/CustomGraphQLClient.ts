@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 import axios, { AxiosProgressEvent, AxiosResponse, CanceledError, isAxiosError, isCancel } from 'axios';
-import { ClientError, GraphQLClient, RequestDocument, RequestOptions, resolveRequestDocument, Variables } from 'graphql-request';
+import { resolveRequestDocument as analyzeDocument, ClientError, GraphQLClient, RequestDocument, RequestOptions, Variables } from 'graphql-request';
 
 import { GQLError } from './GQLError';
 import type { IResponseInterceptor } from './IResponseInterceptor';
@@ -102,9 +102,9 @@ export class CustomGraphQLClient extends GraphQLClient {
     this.blockRequestsReasonHandler();
     try {
       const requestOptions = parseRequestArgs(documentOrOptions, variables, requestHeaders);
-      const { query, operationName } = resolveRequestDocument(requestOptions.document);
+      const { query: expression, operationName } = analyzeDocument(requestOptions.document);
 
-      const response = await this.rawRequest<T, V>(query, variables, requestHeaders);
+      const response = await this.rawRequest<T, V>(expression, variables, requestHeaders);
 
       // TODO: seems here can be undefined
       return response.data;
@@ -131,7 +131,7 @@ export class CustomGraphQLClient extends GraphQLClient {
   ): Promise<T> {
     this.blockRequestsReasonHandler();
     try {
-      const { operationName } = resolveRequestDocument(query ?? '');
+      const { operationName } = analyzeDocument(query ?? '');
       // TODO: we don't support GQL response right now
       const data = {
         operationName,

@@ -8,10 +8,9 @@
 import { observer } from 'mobx-react-lite';
 import { useMemo } from 'react';
 
-import { useService } from '@cloudbeaver/core-di';
 import { EditorLoader, useCodemirrorExtensions } from '@cloudbeaver/plugin-codemirror6';
 
-import { DataViewerService } from '../../DataViewerService';
+import { useDataViewerCopyHandler } from '../../useDataViewerCopyHandler';
 import { getTypeExtension } from './getTypeExtension';
 
 interface Props {
@@ -27,7 +26,7 @@ export const TextValueEditor = observer<Props>(function TextValueEditor({ conten
   const typeExtension = useMemo(() => getTypeExtension(contentType!) ?? [], [contentType]);
 
   const extensions = useCodemirrorExtensions(undefined, typeExtension);
-  const dataViewerService = useService(DataViewerService);
+  const copyEventHandler = useDataViewerCopyHandler();
 
   return (
     <EditorLoader
@@ -35,7 +34,7 @@ export const TextValueEditor = observer<Props>(function TextValueEditor({ conten
       lineWrapping={lineWrapping}
       readonly={readonly}
       extensions={extensions}
-      disableCopy={!dataViewerService.canCopyData}
+      copyEventHandler={copyEventHandler}
       onChange={onChange}
     />
   );

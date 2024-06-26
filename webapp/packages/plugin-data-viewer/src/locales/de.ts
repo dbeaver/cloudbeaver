@@ -34,6 +34,8 @@ export default [
   ['data_viewer_script_preview_error_title', 'Kann das Skript nicht bekommen'],
   ['data_viewer_total_count_tooltip', 'Totalzahl erhalten'],
   ['data_viewer_model_not_loaded', 'Das Tabellenmodell ist nicht geladen'],
+  ['data_viewer_copy_not_allowed', 'An ability to copy data is disabled'],
+  ['data_viewer_copy_not_allowed_message', 'If this was unexpected, contact the administrator'],
   ['settings_data_editor', 'Dateneditor'],
   ['settings_data_editor_disable_edit_name', 'Bearbeiten deaktivieren'],
   ['settings_data_editor_disable_edit_description', 'Deaktivieren Sie die Bearbeitung von Daten in Data Viewer für Nicht-Admin-Benutzer'],
