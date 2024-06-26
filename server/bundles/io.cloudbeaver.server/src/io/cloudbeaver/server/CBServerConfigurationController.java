@@ -286,10 +286,17 @@ public abstract class CBServerConfigurationController<T extends CBServerConfig>
 
             configProps.putAll(readConfigurationFile(configPath));
 
-            var mergedOriginalConfigs = WebAppUtils.mergeConfigurations(configProps, originalConfigurationProperties);
-            this.originalConfigurationProperties.clear();
-            // saves original configuration file
-            this.originalConfigurationProperties.putAll(mergedOriginalConfigs);
+            if (originalConfigurationProperties.isEmpty()) {
+                originalConfigurationProperties.putAll(configProps);
+            } else {
+                var mergedOriginalConfigs = WebAppUtils.mergeConfigurations(
+                    originalConfigurationProperties,
+                    configProps
+                );
+                this.originalConfigurationProperties.clear();
+                // saves original configuration file
+                this.originalConfigurationProperties.putAll(mergedOriginalConfigs);
+            }
 
             configProps.putAll(readConfigurationFile(configPath));
             patchConfigurationWithProperties(configProps); // patch original properties
