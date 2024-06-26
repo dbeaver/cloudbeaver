@@ -64,6 +64,7 @@ export default [
   ['connections_connection_create_fail', 'Fail to create connection'],
   ['connections_connection_save_fail', 'Fail to save connection'],
   ['connections_connection_keep_alive', 'Keep alive (in seconds)'],
+  ['connections_connection_autocommit', 'Auto commit'],
   ['connections_connection_keep_alive_tooltip', 'No auto disconnect'],
   ['connections_network_handler_test', 'Test Tunnel'],
   ['connections_network_handler_test_fail', 'Tunnel test failed'],

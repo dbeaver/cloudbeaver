@@ -61,6 +61,7 @@ export default [
   ['connections_connection_create_fail', 'Не удалось создать подключение'],
   ['connections_connection_save_fail', 'Не удалось сохранить подключение'],
   ['connections_connection_keep_alive', 'Поддерживать соединение (в секундах)'],
+  ['connections_connection_autocommit', 'Авто коммит'],
   ['connections_connection_keep_alive_tooltip', 'Не отключать соединение'],
   ['connections_network_handler_test', 'Проверить подключение'],
   ['connections_network_handler_test_fail', 'Не удалось установить соединение'],

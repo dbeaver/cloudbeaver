@@ -70,6 +70,7 @@ export default [
   ['connections_connection_create_fail', 'Échec de la création de la connexion'],
   ['connections_connection_save_fail', 'Échec de la sauvegarde de la connexion'],
   ['connections_connection_keep_alive', 'Garder actif (en secondes)'],
+  ['connections_connection_autocommit', 'Auto commit'],
   ['connections_connection_keep_alive_tooltip', 'Pas de déconnexion automatique'],
   ['connections_network_handler_test', 'Tester le tunnel'],
   ['connections_network_handler_test_fail', 'Échec du test du tunnel'],

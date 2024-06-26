@@ -7,12 +7,13 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import { Expandable, Group, InputField, useTranslate } from '@cloudbeaver/core-blocks';
+import { Expandable, FieldCheckbox, Group, InputField, useTranslate } from '@cloudbeaver/core-blocks';
 import type { ConnectionConfig } from '@cloudbeaver/core-sdk';
 
 const MAX_KEEP_ALIVE_INTERVAL = 32767;
 const DEFAULT_CONFIG: ConnectionConfig = {
   keepAliveInterval: 0,
+  autocommit: true,
 };
 
 interface Props {
@@ -41,6 +42,17 @@ export const AdvancedPropertiesForm = observer<Props>(function AdvancedPropertie
         >
           {translate('connections_connection_keep_alive')}
         </InputField>
+
+        <FieldCheckbox
+          name="autocommit"
+          state={config}
+          defaultChecked={DEFAULT_CONFIG.autocommit}
+          title={translate('connections_connection_autocommit')}
+          disabled={disabled}
+          readOnly={readonly}
+        >
+          {translate('connections_connection_autocommit')}
+        </FieldCheckbox>
       </Expandable>
     </Group>
   );

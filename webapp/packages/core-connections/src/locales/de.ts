@@ -42,4 +42,5 @@ export default [
   ['connections_network_handler_ssh_tunnel_auth_type', 'Authentifizierungsmethode'],
   ['connections_network_handler_ssh_tunnel_advanced_settings', 'Erweiterte Einstellungen'],
   ['connections_not_found', 'Es wurden keine Datenbankverbindungen gefunden'],
+  ['connections_connection_autocommit', 'Auto commit'],
 ];
