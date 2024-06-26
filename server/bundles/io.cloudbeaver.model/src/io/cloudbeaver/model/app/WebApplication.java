@@ -97,7 +97,7 @@ public interface WebApplication extends DBPApplication {
 
     boolean isLicenseRequired();
 
-    default void getStatusInfo(Map<String, Object> infoMap) throws DBException {
+    default void getStatusInfo(Map<String, Object> infoMap) {
 
     }
 }

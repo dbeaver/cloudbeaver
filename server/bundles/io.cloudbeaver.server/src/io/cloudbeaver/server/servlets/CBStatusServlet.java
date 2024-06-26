@@ -46,12 +46,7 @@ public class CBStatusServlet extends DefaultServlet {
         infoMap.put("health", "ok");
         infoMap.put("product.name", GeneralUtils.getProductName());
         infoMap.put("product.version", GeneralUtils.getProductVersion().toString());
-        try {
-            CBApplication.getInstance().getStatusInfo(infoMap);
-        } catch (DBException e) {
-            log.error(e);
-            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Error additional status info : " + e.getMessage());
-        }
+        CBApplication.getInstance().getStatusInfo(infoMap);
         try (JsonWriter writer = new JsonWriter(response.getWriter())) {
             JSONUtils.serializeMap(writer, infoMap);
         }
