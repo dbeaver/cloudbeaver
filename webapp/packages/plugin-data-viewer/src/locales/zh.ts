@@ -57,6 +57,8 @@ export default [
   ['data_viewer_total_count_canceled_title', 'Total count canceled'],
   ['data_viewer_total_count_canceled_message', 'Statement was cancelled due to user request'],
   ['data_viewer_model_not_loaded', 'Table model is not loaded'],
+  ['data_viewer_copy_not_allowed', 'An ability to copy data is disabled'],
+  ['data_viewer_copy_not_allowed_message', 'If this was unexpected, contact the administrator'],
   ['settings_data_editor', 'Data Editor'],
   ['settings_data_editor_disable_edit_name', 'Disable Edit'],
   ['settings_data_editor_disable_edit_description', 'Disable editing of data in Data Viewer for non-admin users'],

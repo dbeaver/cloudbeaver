@@ -29,7 +29,6 @@
     "@cloudbeaver/core-bootstrap": "^0",
     "@cloudbeaver/core-di": "^0",
     "@cloudbeaver/core-localization": "^0",
-    "@cloudbeaver/core-task-manager": "^0",
     "@cloudbeaver/core-version-update": "^0",
     "@cloudbeaver/plugin-administration": "^0",
     "@cloudbeaver/plugin-authentication": "^0",

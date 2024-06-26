@@ -31,7 +31,7 @@
   "devDependencies": {
     "@testing-library/dom": "^10",
     "@testing-library/jest-dom": "^6",
-    "@testing-library/react": "^15",
+    "@testing-library/react": "^16",
     "@testing-library/user-event": "^14",
     "@types/jest": "^29",
     "@types/react": "^18",
