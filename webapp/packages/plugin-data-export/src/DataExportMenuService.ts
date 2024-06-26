@@ -20,6 +20,7 @@ import {
   DATA_CONTEXT_DV_PRESENTATION,
   DATA_VIEWER_DATA_MODEL_ACTIONS_MENU,
   DataViewerPresentationType,
+  DataViewerService,
   IDatabaseDataSource,
   IDataContainerOptions,
 } from '@cloudbeaver/plugin-data-viewer';
@@ -38,6 +39,7 @@ export class DataExportMenuService {
     private readonly menuService: MenuService,
     private readonly sessionPermissionsResource: SessionPermissionsResource,
     private readonly localizationService: LocalizationService,
+    private readonly dataViewerService: DataViewerService,
   ) {}
 
   register(): void {
@@ -60,6 +62,7 @@ export class DataExportMenuService {
       id: 'data-export-base-handler',
       menus: [DATA_VIEWER_DATA_MODEL_ACTIONS_MENU],
       contexts: [DATA_CONTEXT_DV_DDM, DATA_CONTEXT_DV_DDM_RESULT_INDEX],
+      isHidden: (context, action) => !this.dataViewerService.canDownload,
       actions: [ACTION_EXPORT],
       isDisabled(context) {
         const model = context.get(DATA_CONTEXT_DV_DDM)!;

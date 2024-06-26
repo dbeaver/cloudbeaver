@@ -11,6 +11,7 @@ import { QuotasService } from '@cloudbeaver/core-root';
 import { GraphQLService, ResultDataFormat } from '@cloudbeaver/core-sdk';
 import { bytesToSize, download, downloadFromURL, GlobalConstants, isNotNullDefined } from '@cloudbeaver/core-utils';
 
+import { DataViewerService } from '../../../DataViewerService';
 import { DatabaseDataAction } from '../../DatabaseDataAction';
 import type { IDatabaseDataSource } from '../../IDatabaseDataSource';
 import type { IDatabaseResultSet } from '../../IDatabaseResultSet';
@@ -42,6 +43,7 @@ export class ResultSetDataContentAction extends DatabaseDataAction<any, IDatabas
     private readonly graphQLService: GraphQLService,
     private readonly quotasService: QuotasService,
     private readonly cache: ResultSetCacheAction,
+    private readonly dataViewerService: DataViewerService,
   ) {
     super(source);
 
@@ -100,7 +102,7 @@ export class ResultSetDataContentAction extends DatabaseDataAction<any, IDatabas
   }
 
   isDownloadable(element: IResultSetElementKey) {
-    return !!this.result.data?.hasRowIdentifier && isResultSetContentValue(this.format.get(element));
+    return !!this.result.data?.hasRowIdentifier && isResultSetContentValue(this.format.get(element)) && this.dataViewerService.canDownload;
   }
 
   retrieveFullTextFromCache(element: IResultSetElementKey) {
