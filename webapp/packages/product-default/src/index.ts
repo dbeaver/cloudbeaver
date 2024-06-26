@@ -23,6 +23,7 @@ import { dataImportPluginManifest } from '@cloudbeaver/plugin-data-import';
 import { dataSpreadsheetNewManifest } from '@cloudbeaver/plugin-data-spreadsheet-new';
 import { dataViewerManifest } from '@cloudbeaver/plugin-data-viewer';
 import { dvResultSetGroupingPlugin } from '@cloudbeaver/plugin-data-viewer-result-set-grouping';
+import dataViewerResultTraceDetails from '@cloudbeaver/plugin-data-viewer-result-trace-details';
 import { datasourceContextSwitchPluginManifest } from '@cloudbeaver/plugin-datasource-context-switch';
 import { datasourceTransactionManagerPlugin } from '@cloudbeaver/plugin-datasource-transaction-manager';
 import ddlViewer from '@cloudbeaver/plugin-ddl-viewer';
@@ -82,6 +83,7 @@ const PLUGINS: PluginManifest[] = [
   dataExportManifest,
   dataImportPluginManifest,
   dataViewerManifest,
+  dataViewerResultTraceDetails,
   dvResultSetGroupingPlugin,
   gisViewer,
   ddlViewer,

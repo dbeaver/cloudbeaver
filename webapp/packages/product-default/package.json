@@ -49,6 +49,7 @@
     "@cloudbeaver/plugin-ddl-viewer": "^0",
     "@cloudbeaver/plugin-devtools": "^0",
     "@cloudbeaver/plugin-gis-viewer": "^0",
+    "@cloudbeaver/plugin-data-viewer-result-trace-details": "^0",
     "@cloudbeaver/plugin-help": "^0",
     "@cloudbeaver/plugin-localization": "^0",
     "@cloudbeaver/plugin-log-viewer": "^0",
