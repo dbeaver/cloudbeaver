@@ -100,9 +100,6 @@
       "path": "../core-theming/tsconfig.json"
     },
     {
-      "path": "../core-theming/tsconfig.json"
-    },
-    {
       "path": "../core-ui/tsconfig.json"
     },
     {

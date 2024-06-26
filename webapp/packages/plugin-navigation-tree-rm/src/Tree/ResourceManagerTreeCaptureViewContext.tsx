@@ -14,8 +14,8 @@ interface Props {
 }
 
 export const ResourceManagerTreeCaptureViewContext: React.FC<Props> = function ResourceManagerTreeCaptureViewContext({ resourceTypeId }) {
-  useCaptureViewContext(context => {
-    context?.set(DATA_CONTEXT_RESOURCE_MANAGER_TREE_RESOURCE_TYPE_ID, resourceTypeId);
+  useCaptureViewContext((context, id) => {
+    context.set(DATA_CONTEXT_RESOURCE_MANAGER_TREE_RESOURCE_TYPE_ID, resourceTypeId, id);
   });
 
   return null;

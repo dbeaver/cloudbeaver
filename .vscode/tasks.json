@@ -42,7 +42,7 @@
           "package",
           "-q",
           "exec:java",
-          "-Dexec.args= -eclipse.version ${eclipse-version} -config ${workspaceFolder}/../idea-workspace-dbeaver/rcp-gen.properties -productFile ${workspaceFolder}/server/product/web-server/CloudbeaverServer.product -projectsFolder ${workspaceFolder}/../ -eclipse ${workspaceFolder}/../dbeaver-workspace/dependencies -output ${workspaceFolder}/../dbeaver-workspace/products/CloudbeaverServer.product"
+          "-Dexec.args= -eclipse.version ${eclipse-version} -config ${workspaceFolder}/../idea-workspace-dbeaver/osgi-app.properties -productFile ${workspaceFolder}/server/product/web-server/CloudbeaverServer.product -projectsFolder ${workspaceFolder}/../ -eclipse ${workspaceFolder}/../dbeaver-workspace/dependencies -output ${workspaceFolder}/../dbeaver-workspace/products/CloudbeaverServer.product"
         ]
       },
       "windows": {
@@ -50,7 +50,7 @@
           "package",
           "-q",
           "exec:java",
-          "-Dexec.args= -eclipse.version ${eclipse-version} -config ${workspaceFolder}/../idea-workspace-dbeaver/rcp-gen.properties -productFile ${workspaceFolder}/server/product/web-server/CloudbeaverServer.product -projectsFolder ${workspaceFolder}/../ -eclipse ${workspaceFolder}/../dbeaver-workspace/dependencies -output ${workspaceFolder}/../dbeaver-workspace/products/CloudbeaverServer.product"
+          "-Dexec.args= -eclipse.version ${eclipse-version} -config ${workspaceFolder}/../cloudbeaver/osgi-app.properties"
         ]
       },
       "options": {

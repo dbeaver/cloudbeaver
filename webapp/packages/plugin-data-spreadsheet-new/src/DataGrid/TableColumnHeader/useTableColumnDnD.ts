@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 import { useCombinedRef } from '@cloudbeaver/core-blocks';
-import { useDataContext } from '@cloudbeaver/core-data-context';
+import { useDataContext, useDataContextLink } from '@cloudbeaver/core-data-context';
 import { IDNDBox, IDNDData, useDNDBox, useDNDData } from '@cloudbeaver/core-ui';
 import {
   DATA_CONTEXT_DV_DDM,
@@ -30,9 +30,11 @@ export function useTableColumnDnD(model: IDatabaseDataModel, resultIndex: number
   const context = useDataContext();
   const resultSetViewAction = model.source.tryGetAction(resultIndex, ResultSetViewAction);
 
-  context.set(DATA_CONTEXT_DV_DDM, model);
-  context.set(DATA_CONTEXT_DV_DDM_RESULT_INDEX, resultIndex);
-  context.set(DATA_CONTEXT_DV_DDM_RS_COLUMN_KEY, columnKey);
+  useDataContextLink(context, (context, id) => {
+    context.set(DATA_CONTEXT_DV_DDM, model, id);
+    context.set(DATA_CONTEXT_DV_DDM_RESULT_INDEX, resultIndex, id);
+    context.set(DATA_CONTEXT_DV_DDM_RS_COLUMN_KEY, columnKey, id);
+  });
 
   const dndData = useDNDData(context, {
     canDrag: () => !model.isDisabled(resultIndex),
@@ -60,7 +62,7 @@ export function useTableColumnDnD(model: IDatabaseDataModel, resultIndex: number
   let side: TableColumnInsertPositionSide = null;
 
   if (columnKey && dndBox.state.isOver && dndBox.state.context) {
-    const dndColumnKey = dndBox.state.context.tryGet(DATA_CONTEXT_DV_DDM_RS_COLUMN_KEY);
+    const dndColumnKey = dndBox.state.context.get(DATA_CONTEXT_DV_DDM_RS_COLUMN_KEY);
 
     if (resultSetViewAction && dndColumnKey && resultSetViewAction.columnIndex(columnKey) > resultSetViewAction.columnIndex(dndColumnKey)) {
       side = 'right';

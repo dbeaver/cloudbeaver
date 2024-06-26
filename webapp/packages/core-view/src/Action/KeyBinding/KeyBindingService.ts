@@ -37,7 +37,7 @@ export class KeyBindingService {
       }
       if (handler.contexts.size > 0) {
         for (const context of handler.contexts) {
-          if (!contexts.has(context, true)) {
+          if (!contexts.has(context)) {
             continue handlers;
           }
         }

@@ -87,7 +87,7 @@ export class ResourceFoldersBootstrap extends Bootstrap {
       id: 'tree-tools-menu-resource-folders-handler',
       actions: [ACTION_NEW_FOLDER],
       isActionApplicable: context => {
-        const tree = context.tryGet(DATA_CONTEXT_ELEMENTS_TREE);
+        const tree = context.get(DATA_CONTEXT_ELEMENTS_TREE);
 
         if (!tree?.baseRoot.startsWith(RESOURCES_NODE_PATH) || !this.userInfoResource.data) {
           return false;
@@ -164,7 +164,7 @@ export class ResourceFoldersBootstrap extends Bootstrap {
   }
 
   private async elementsTreeActionHandler(contexts: IDataContextProvider, action: IAction) {
-    const resourceTypeId = contexts.tryGet(DATA_CONTEXT_RESOURCE_MANAGER_TREE_RESOURCE_TYPE_ID);
+    const resourceTypeId = contexts.get(DATA_CONTEXT_RESOURCE_MANAGER_TREE_RESOURCE_TYPE_ID);
     switch (action) {
       case ACTION_NEW_FOLDER: {
         const targetNode = this.getTargetNode(contexts);

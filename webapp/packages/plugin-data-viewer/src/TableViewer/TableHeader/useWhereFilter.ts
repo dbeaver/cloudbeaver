@@ -9,7 +9,7 @@ import { action, computed, observable } from 'mobx';
 
 import { useObservableRef } from '@cloudbeaver/core-blocks';
 
-import { ResultSetConstraintAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetConstraintAction';
+import { DatabaseDataConstraintAction } from '../../DatabaseDataModel/Actions/DatabaseDataConstraintAction';
 import type { IDatabaseDataModel } from '../../DatabaseDataModel/IDatabaseDataModel';
 import type { IDatabaseDataOptions } from '../../DatabaseDataModel/IDatabaseDataOptions';
 
@@ -17,7 +17,7 @@ interface IState {
   model: IDatabaseDataModel<IDatabaseDataOptions, any>;
   resultIndex: number;
   readonly filter: string;
-  readonly constraints: ResultSetConstraintAction | null;
+  readonly constraints: DatabaseDataConstraintAction | null;
   readonly disabled: boolean;
   readonly applicableFilter: boolean;
   set: (value: string) => void;
@@ -39,7 +39,7 @@ export function useWhereFilter(model: IDatabaseDataModel<IDatabaseDataOptions, a
           return null;
         }
 
-        return this.model.source.tryGetAction(this.resultIndex, ResultSetConstraintAction) ?? null;
+        return this.model.source.tryGetAction(this.resultIndex, DatabaseDataConstraintAction) ?? null;
       },
       get disabled() {
         const supported = this.constraints?.supported ?? false;

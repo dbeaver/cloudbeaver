@@ -15,12 +15,14 @@ import { FormPart, IFormState } from '@cloudbeaver/core-ui';
 import { isObjectsEqual, isValuesEqual } from '@cloudbeaver/core-utils';
 
 import type { IUserProfileFormState } from '../UserProfileFormService';
-import type { UserProfileFormState } from '../UserProfileFormState';
 import { type IUserProfileFormInfoState, USER_PROFILE_FORM_INFO_PART_STATE_SCHEMA } from './IUserProfileFormInfoState';
 
 export class UserProfileFormInfoPart extends FormPart<IUserProfileFormInfoState, IUserProfileFormState> {
   private baseIncludes: CachedResourceIncludeArgs<AdminUserInfoFragment, UserResourceIncludes>;
-  constructor(formState: UserProfileFormState, private readonly userInfoResource: UserInfoResource) {
+  constructor(
+    formState: IFormState<IUserProfileFormState>,
+    private readonly userInfoResource: UserInfoResource,
+  ) {
     super(formState, {
       userId: userInfoResource.data?.userId || '',
       displayName: userInfoResource.data?.displayName || '',

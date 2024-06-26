@@ -9,12 +9,12 @@ import { computed, observable } from 'mobx';
 
 import { useObservableRef } from '@cloudbeaver/core-blocks';
 import {
+  DatabaseDataConstraintAction,
   IDatabaseDataModel,
   IDatabaseResultSet,
   IResultSetColumnKey,
   IResultSetElementKey,
   IResultSetRowKey,
-  ResultSetConstraintAction,
   ResultSetDataAction,
   ResultSetDataContentAction,
   ResultSetDataKeysUtils,
@@ -53,7 +53,7 @@ export function useTableData(
   const editor = model.source.getAction(resultIndex, ResultSetEditAction);
   const view = model.source.getAction(resultIndex, ResultSetViewAction);
   const dataContent = model.source.getAction(resultIndex, ResultSetDataContentAction);
-  const constraints = model.source.getAction(resultIndex, ResultSetConstraintAction);
+  const constraints = model.source.getAction(resultIndex, DatabaseDataConstraintAction);
 
   return useObservableRef<ITableData & { gridDIVElement: React.RefObject<HTMLDivElement | null> }>(
     () => ({

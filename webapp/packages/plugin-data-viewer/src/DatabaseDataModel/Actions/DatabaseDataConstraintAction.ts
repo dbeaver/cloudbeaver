@@ -9,19 +9,19 @@ import { computed, makeObservable } from 'mobx';
 
 import { DataTypeLogicalOperation, ResultDataFormat, SqlDataFilterConstraint } from '@cloudbeaver/core-sdk';
 
-import { DatabaseDataAction } from '../../DatabaseDataAction';
-import type { IDatabaseDataOptions } from '../../IDatabaseDataOptions';
-import type { IDatabaseDataSource } from '../../IDatabaseDataSource';
-import type { IDatabaseResultSet } from '../../IDatabaseResultSet';
-import { EOrder, Order } from '../../Order';
-import { databaseDataAction } from '../DatabaseDataActionDecorator';
-import type { IDatabaseDataConstraintAction } from '../IDatabaseDataConstraintAction';
+import { DatabaseDataAction } from '../DatabaseDataAction';
+import type { IDatabaseDataOptions } from '../IDatabaseDataOptions';
+import type { IDatabaseDataSource } from '../IDatabaseDataSource';
+import type { IDatabaseResultSet } from '../IDatabaseResultSet';
+import { EOrder, Order } from '../Order';
+import { databaseDataAction } from './DatabaseDataActionDecorator';
+import type { IDatabaseDataConstraintAction } from './IDatabaseDataConstraintAction';
 
 export const IS_NULL_ID = 'IS_NULL';
 export const IS_NOT_NULL_ID = 'IS_NOT_NULL';
 
 @databaseDataAction()
-export class ResultSetConstraintAction
+export class DatabaseDataConstraintAction
   extends DatabaseDataAction<IDatabaseDataOptions, IDatabaseResultSet>
   implements IDatabaseDataConstraintAction<IDatabaseResultSet>
 {

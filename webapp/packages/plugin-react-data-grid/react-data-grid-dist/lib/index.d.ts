@@ -28,7 +28,6 @@ export declare interface CalculatedColumn<TRow, TSummaryRow = unknown> extends C
     readonly sortable: boolean;
     readonly draggable: boolean;
     readonly frozen: boolean;
-    readonly isLastFrozenColumn: boolean;
     readonly renderCell: (props: RenderCellProps<TRow, TSummaryRow>) => ReactNode;
 }
 
@@ -168,7 +167,7 @@ export declare interface DataGridProps<R, SR = unknown, K extends Key = Key> ext
      * Grid and data Props
      */
     /** An array of objects representing each column on the grid */
-    columns: readonly ColumnOrColumnGroup<R, SR>[];
+    columns: readonly ColumnOrColumnGroup<NoInfer<R>, NoInfer<SR>>[];
     /** A function called for each rendered row that should return a plain key/value pair object */
     rows: readonly R[];
     /**
@@ -180,8 +179,8 @@ export declare interface DataGridProps<R, SR = unknown, K extends Key = Key> ext
      */
     bottomSummaryRows?: Maybe<readonly SR[]>;
     /** The getter should return a unique key for each row */
-    rowKeyGetter?: Maybe<(row: R) => K>;
-    onRowsChange?: Maybe<(rows: R[], data: RowsChangeData<R, SR>) => void>;
+    rowKeyGetter?: Maybe<(row: NoInfer<R>) => K>;
+    onRowsChange?: Maybe<(rows: NoInfer<R>[], data: RowsChangeData<NoInfer<R>, NoInfer<SR>>) => void>;
     /**
      * Dimensions props
      */
@@ -189,7 +188,7 @@ export declare interface DataGridProps<R, SR = unknown, K extends Key = Key> ext
      * The height of each row in pixels
      * @default 35
      */
-    rowHeight?: Maybe<number | ((row: R) => number)>;
+    rowHeight?: Maybe<number | ((row: NoInfer<R>) => number)>;
     /**
      * The height of the header row in pixels
      * @default 35
@@ -206,26 +205,26 @@ export declare interface DataGridProps<R, SR = unknown, K extends Key = Key> ext
     /** Set of selected row keys */
     selectedRows?: Maybe<ReadonlySet<K>>;
     /** Function called whenever row selection is changed */
-    onSelectedRowsChange?: Maybe<(selectedRows: Set<K>) => void>;
+    onSelectedRowsChange?: Maybe<(selectedRows: Set<NoInfer<K>>) => void>;
     /** Used for multi column sorting */
     sortColumns?: Maybe<readonly SortColumn[]>;
     onSortColumnsChange?: Maybe<(sortColumns: SortColumn[]) => void>;
-    defaultColumnOptions?: Maybe<DefaultColumnOptions<R, SR>>;
-    onFill?: Maybe<(event: FillEvent<R>) => R>;
-    onCopy?: Maybe<(event: CopyEvent<R>) => void>;
-    onPaste?: Maybe<(event: PasteEvent<R>) => R>;
+    defaultColumnOptions?: Maybe<DefaultColumnOptions<NoInfer<R>, NoInfer<SR>>>;
+    onFill?: Maybe<(event: FillEvent<NoInfer<R>>) => NoInfer<R>>;
+    onCopy?: Maybe<(event: CopyEvent<NoInfer<R>>) => void>;
+    onPaste?: Maybe<(event: PasteEvent<NoInfer<R>>) => NoInfer<R>>;
     /**
      * Event props
      */
     /** Function called whenever a cell is clicked */
-    onCellClick?: Maybe<(args: CellClickArgs<R, SR>, event: CellMouseEvent) => void>;
+    onCellClick?: Maybe<(args: CellClickArgs<NoInfer<R>, NoInfer<SR>>, event: CellMouseEvent) => void>;
     /** Function called whenever a cell is double clicked */
-    onCellDoubleClick?: Maybe<(args: CellClickArgs<R, SR>, event: CellMouseEvent) => void>;
+    onCellDoubleClick?: Maybe<(args: CellClickArgs<NoInfer<R>, NoInfer<SR>>, event: CellMouseEvent) => void>;
     /** Function called whenever a cell is right clicked */
-    onCellContextMenu?: Maybe<(args: CellClickArgs<R, SR>, event: CellMouseEvent) => void>;
-    onCellKeyDown?: Maybe<(args: CellKeyDownArgs<R, SR>, event: CellKeyboardEvent) => void>;
+    onCellContextMenu?: Maybe<(args: CellClickArgs<NoInfer<R>, NoInfer<SR>>, event: CellMouseEvent) => void>;
+    onCellKeyDown?: Maybe<(args: CellKeyDownArgs<NoInfer<R>, NoInfer<SR>>, event: CellKeyboardEvent) => void>;
     /** Function called whenever cell selection is changed */
-    onSelectedCellChange?: Maybe<(args: CellSelectArgs<R, SR>) => void>;
+    onSelectedCellChange?: Maybe<(args: CellSelectArgs<NoInfer<R>, NoInfer<SR>>) => void>;
     /** Called when the grid is scrolled */
     onScroll?: Maybe<(event: React.UIEvent<HTMLDivElement>) => void>;
     /** Called when a column is resized */
@@ -240,8 +239,8 @@ export declare interface DataGridProps<R, SR = unknown, K extends Key = Key> ext
     /**
      * Miscellaneous
      */
-    renderers?: Maybe<Renderers<R, SR>>;
-    rowClass?: Maybe<(row: R, rowIdx: number) => Maybe<string>>;
+    renderers?: Maybe<Renderers<NoInfer<R>, NoInfer<SR>>>;
+    rowClass?: Maybe<(row: NoInfer<R>, rowIdx: number) => Maybe<string>>;
     /** @default 'ltr' */
     direction?: Maybe<Direction>;
     'data-testid'?: Maybe<string>;
@@ -449,10 +448,10 @@ export declare function ToggleGroup<R, SR>({ groupKey, isExpanded, tabIndex, tog
 export declare const TreeDataGrid: <R, SR = unknown, K extends Key = Key>(props: TreeDataGridProps<R, SR, K> & RefAttributes<DataGridHandle>) => JSX.Element;
 
 export declare interface TreeDataGridProps<R, SR = unknown, K extends Key = Key> extends Omit_2<DataGridProps<R, SR, K>, 'columns' | 'role' | 'aria-rowcount' | 'rowHeight' | 'onFill'> {
-    columns: readonly Column<R, SR>[];
-    rowHeight?: Maybe<number | ((args: RowHeightArgs<R>) => number)>;
+    columns: readonly Column<NoInfer<R>, NoInfer<SR>>[];
+    rowHeight?: Maybe<number | ((args: RowHeightArgs<NoInfer<R>>) => number)>;
     groupBy: readonly string[];
-    rowGrouper: (rows: readonly R[], columnKey: string) => Record<string, readonly R[]>;
+    rowGrouper: (rows: readonly NoInfer<R>[], columnKey: string) => Record<string, readonly NoInfer<R>[]>;
     expandedGroupIds: ReadonlySet<unknown>;
     onExpandedGroupIdsChange: (expandedGroupIds: Set<unknown>) => void;
 }

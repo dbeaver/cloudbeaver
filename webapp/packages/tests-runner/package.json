@@ -15,7 +15,7 @@
   },
   "dependencies": {
     "@cloudbeaver/core-di": "^0",
-    "@testing-library/react": "^14",
+    "@testing-library/react": "^16",
     "mobx": "^6",
     "react": "^18"
   },

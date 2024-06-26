@@ -7,12 +7,14 @@
  */
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
-import { ACTION_IMPORT, ActionService, DATA_CONTEXT_MENU, menuExtractItems, MenuService } from '@cloudbeaver/core-view';
+import { ACTION_IMPORT, ActionService, menuExtractItems, MenuService } from '@cloudbeaver/core-view';
 import {
   ContainerDataSource,
   DATA_CONTEXT_DV_DDM,
   DATA_CONTEXT_DV_DDM_RESULT_INDEX,
+  DATA_CONTEXT_DV_PRESENTATION,
   DATA_VIEWER_DATA_MODEL_ACTIONS_MENU,
+  DataViewerPresentationType,
 } from '@cloudbeaver/plugin-data-viewer';
 
 import { DataImportDialogLazy } from './DataImportDialog/DataImportDialogLazy';
@@ -32,25 +34,11 @@ export class DataImportBootstrap extends Bootstrap {
   register() {
     this.actionService.addHandler({
       id: 'data-import-base-handler',
-      isActionApplicable(context, action) {
-        const menu = context.hasValue(DATA_CONTEXT_MENU, DATA_VIEWER_DATA_MODEL_ACTIONS_MENU);
-        const model = context.tryGet(DATA_CONTEXT_DV_DDM);
-        const resultIndex = context.tryGet(DATA_CONTEXT_DV_DDM_RESULT_INDEX);
-
-        if (!menu || !model || resultIndex === undefined) {
-          return false;
-        }
-
-        if (action === ACTION_IMPORT) {
-          const isContainer = model.source instanceof ContainerDataSource;
-          return !model.isReadonly(resultIndex) && isContainer;
-        }
-
-        return [ACTION_IMPORT].includes(action);
-      },
+      contexts: [DATA_CONTEXT_DV_DDM, DATA_CONTEXT_DV_DDM_RESULT_INDEX],
+      actions: [ACTION_IMPORT],
       isDisabled(context) {
-        const model = context.get(DATA_CONTEXT_DV_DDM);
-        const resultIndex = context.get(DATA_CONTEXT_DV_DDM_RESULT_INDEX);
+        const model = context.get(DATA_CONTEXT_DV_DDM)!;
+        const resultIndex = context.get(DATA_CONTEXT_DV_DDM_RESULT_INDEX)!;
 
         return model.isLoading() || model.isDisabled(resultIndex) || !model.getResult(resultIndex);
       },
@@ -62,8 +50,8 @@ export class DataImportBootstrap extends Bootstrap {
         return action.info;
       },
       handler: async (context, action) => {
-        const model = context.get(DATA_CONTEXT_DV_DDM);
-        const resultIndex = context.get(DATA_CONTEXT_DV_DDM_RESULT_INDEX);
+        const model = context.get(DATA_CONTEXT_DV_DDM)!;
+        const resultIndex = context.get(DATA_CONTEXT_DV_DDM_RESULT_INDEX)!;
 
         if (action === ACTION_IMPORT) {
           const result = model.getResult(resultIndex);
@@ -102,7 +90,20 @@ export class DataImportBootstrap extends Bootstrap {
 
     this.menuService.addCreator({
       menus: [DATA_VIEWER_DATA_MODEL_ACTIONS_MENU],
-      isApplicable: () => !this.dataImportService.disabled,
+      contexts: [DATA_CONTEXT_DV_DDM, DATA_CONTEXT_DV_DDM_RESULT_INDEX],
+      isApplicable: context => {
+        const model = context.get(DATA_CONTEXT_DV_DDM)!;
+        const resultIndex = context.get(DATA_CONTEXT_DV_DDM_RESULT_INDEX)!;
+        const presentation = context.get(DATA_CONTEXT_DV_PRESENTATION);
+        const isContainer = model.source instanceof ContainerDataSource;
+        return (
+          !model.isReadonly(resultIndex) &&
+          isContainer &&
+          !this.dataImportService.disabled &&
+          !presentation?.readonly &&
+          (!presentation || presentation.type === DataViewerPresentationType.Data)
+        );
+      },
       getItems(_, items) {
         return [...items, ACTION_IMPORT];
       },

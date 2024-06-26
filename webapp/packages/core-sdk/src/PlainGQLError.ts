@@ -6,15 +6,14 @@
  * you may not use this file except in compliance with the License.
  */
 import type { ClientError } from 'graphql-request';
-import type { GraphQLRequestContext, GraphQLResponse } from 'graphql-request/build/cjs/types';
 
 import { getTextBetween } from '@cloudbeaver/core-utils';
 
 import { DetailsError } from './DetailsError';
 
 export class PlainGQLError extends DetailsError {
-  response: GraphQLResponse;
-  request: GraphQLRequestContext;
+  response: ClientError['response'];
+  request: ClientError['request'];
   constructor(clientError: ClientError) {
     let message = clientError.message;
 
