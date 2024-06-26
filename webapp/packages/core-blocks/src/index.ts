@@ -198,7 +198,6 @@ export * from './TimerIcon';
 export * from './InfoItem';
 export * from './Iframe';
 export * from './Code';
-export * from './useClickEvents';
 export * from './useControlledScroll';
 export * from './useClipboard';
 export * from './useCombinedHandler';
