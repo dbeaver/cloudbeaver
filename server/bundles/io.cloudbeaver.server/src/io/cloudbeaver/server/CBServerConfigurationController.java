@@ -563,6 +563,10 @@ public abstract class CBServerConfigurationController<T extends CBServerConfig>
         String key,
         Object defaultValue
     ) {
+        //do not store empty values in runtime config
+        if (defaultValue instanceof String stringValue && CommonUtils.isEmpty(stringValue)) {
+            return;
+        }
         Object value = oldConfig.get(key);
         if (value instanceof Map && defaultValue instanceof Map) {
             Map<String, Object> subValue = new LinkedHashMap<>();
