@@ -13,7 +13,7 @@
     "jsx": "react-jsx",
     "target": "esnext",
     "module": "esnext",
-    "moduleResolution": "node",
+    "moduleResolution": "Bundler",
     "noImplicitAny": true,
     "noImplicitThis": true,
     "noImplicitReturns": true,

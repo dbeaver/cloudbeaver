@@ -9,12 +9,12 @@ import { createContext } from 'react';
 
 import type { SqlResultColumn } from '@cloudbeaver/core-sdk';
 import type {
+  DatabaseDataConstraintAction,
   DatabaseEditChangeType,
   IResultSetColumnKey,
   IResultSetElementKey,
   IResultSetRowKey,
   IResultSetValue,
-  ResultSetConstraintAction,
   ResultSetDataAction,
   ResultSetDataContentAction,
   ResultSetEditAction,
@@ -43,7 +43,7 @@ export interface ITableData {
   data: ResultSetDataAction;
   editor: ResultSetEditAction;
   view: ResultSetViewAction;
-  constraints: ResultSetConstraintAction;
+  constraints: DatabaseDataConstraintAction;
   columns: Array<Column<IResultSetRowKey, any>>;
   columnKeys: IResultSetColumnKey[];
   rows: IResultSetRowKey[];

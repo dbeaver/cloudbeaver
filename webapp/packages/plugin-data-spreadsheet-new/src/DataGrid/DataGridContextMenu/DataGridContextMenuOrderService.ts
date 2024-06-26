@@ -7,11 +7,11 @@
  */
 import { injectable } from '@cloudbeaver/core-di';
 import {
+  DatabaseDataConstraintAction,
   EOrder,
   IDatabaseDataModel,
   IResultSetColumnKey,
   Order,
-  ResultSetConstraintAction,
   ResultSetDataAction,
 } from '@cloudbeaver/plugin-data-viewer';
 
@@ -29,7 +29,7 @@ export class DataGridContextMenuOrderService {
 
   private async changeOrder(model: IDatabaseDataModel, resultIndex: number, column: IResultSetColumnKey, order: Order) {
     const data = model.source.getAction(resultIndex, ResultSetDataAction);
-    const constraints = model.source.getAction(resultIndex, ResultSetConstraintAction);
+    const constraints = model.source.getAction(resultIndex, DatabaseDataConstraintAction);
     const resultColumn = data.getColumn(column);
 
     if (!resultColumn) {
@@ -53,7 +53,7 @@ export class DataGridContextMenuOrderService {
         return context.contextType === DataGridContextMenuService.cellContext;
       },
       isHidden(context) {
-        const constraints = context.data.model.source.getAction(context.data.resultIndex, ResultSetConstraintAction);
+        const constraints = context.data.model.source.getAction(context.data.resultIndex, DatabaseDataConstraintAction);
         return !constraints.supported || context.data.model.isDisabled(context.data.resultIndex);
       },
     });
@@ -71,7 +71,7 @@ export class DataGridContextMenuOrderService {
       isChecked: context => {
         const { model, resultIndex, key } = context.data;
         const data = model.source.getAction(resultIndex, ResultSetDataAction);
-        const constraints = model.source.getAction(resultIndex, ResultSetConstraintAction);
+        const constraints = model.source.getAction(resultIndex, DatabaseDataConstraintAction);
         const resultColumn = data.getColumn(key.column);
 
         return !!resultColumn && constraints.getOrder(resultColumn.position) === EOrder.asc;
@@ -91,7 +91,7 @@ export class DataGridContextMenuOrderService {
       isChecked: context => {
         const { model, resultIndex, key } = context.data;
         const data = model.source.getAction(resultIndex, ResultSetDataAction);
-        const constraints = model.source.getAction(resultIndex, ResultSetConstraintAction);
+        const constraints = model.source.getAction(resultIndex, DatabaseDataConstraintAction);
         const resultColumn = data.getColumn(key.column);
 
         return !!resultColumn && constraints.getOrder(resultColumn.position) === EOrder.desc;
@@ -111,7 +111,7 @@ export class DataGridContextMenuOrderService {
       isChecked: context => {
         const { model, resultIndex, key } = context.data;
         const data = model.source.getAction(resultIndex, ResultSetDataAction);
-        const constraints = model.source.getAction(resultIndex, ResultSetConstraintAction);
+        const constraints = model.source.getAction(resultIndex, DatabaseDataConstraintAction);
         const resultColumn = data.getColumn(key.column);
 
         return !!resultColumn && constraints.getOrder(resultColumn.position) === null;
@@ -124,12 +124,12 @@ export class DataGridContextMenuOrderService {
         return context.contextType === DataGridContextMenuService.cellContext;
       },
       isHidden: context => {
-        const constraints = context.data.model.source.getAction(context.data.resultIndex, ResultSetConstraintAction);
+        const constraints = context.data.model.source.getAction(context.data.resultIndex, DatabaseDataConstraintAction);
         return !constraints.orderConstraints.length;
       },
       isDisabled: context => context.data.model.isLoading(),
       onClick: async context => {
-        const constraints = context.data.model.source.getAction(context.data.resultIndex, ResultSetConstraintAction);
+        const constraints = context.data.model.source.getAction(context.data.resultIndex, DatabaseDataConstraintAction);
         await context.data.model.requestDataAction(async () => {
           constraints.deleteOrders();
           await context.data.model.request(true);

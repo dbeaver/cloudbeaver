@@ -91,6 +91,9 @@
       "path": "../core-storage/tsconfig.json"
     },
     {
+      "path": "../core-task-manager/tsconfig.json"
+    },
+    {
       "path": "../core-theming/tsconfig.json"
     },
     {

@@ -11,8 +11,8 @@ import { NotificationService } from '@cloudbeaver/core-events';
 import { ResultDataFormat } from '@cloudbeaver/core-sdk';
 import { ActionService, menuExtractItems, MenuService } from '@cloudbeaver/core-view';
 
+import { DatabaseDataConstraintAction } from '../DatabaseDataModel/Actions/DatabaseDataConstraintAction';
 import { DatabaseMetadataAction } from '../DatabaseDataModel/Actions/DatabaseMetadataAction';
-import { ResultSetConstraintAction } from '../DatabaseDataModel/Actions/ResultSet/ResultSetConstraintAction';
 import { DATA_CONTEXT_DV_DDM } from '../DatabaseDataModel/DataContext/DATA_CONTEXT_DV_DDM';
 import { DATA_CONTEXT_DV_DDM_RESULT_INDEX } from '../DatabaseDataModel/DataContext/DATA_CONTEXT_DV_DDM_RESULT_INDEX';
 import { DATA_VIEWER_DATA_MODEL_ACTIONS_MENU } from '../TableViewer/TableFooter/TableFooterMenu/DATA_VIEWER_DATA_MODEL_ACTIONS_MENU';
@@ -41,7 +41,7 @@ export class ResultSetTableFooterMenuService {
         const resultIndex = context.get(DATA_CONTEXT_DV_DDM_RESULT_INDEX)!;
         const result = model.getResult(resultIndex);
 
-        return !!result && result.dataFormat === ResultDataFormat.Resultset;
+        return !!result;
       },
       getItems(context, items) {
         return [ACTION_COUNT_TOTAL_ELEMENTS, ...items];
@@ -61,10 +61,10 @@ export class ResultSetTableFooterMenuService {
         const resultIndex = context.get(DATA_CONTEXT_DV_DDM_RESULT_INDEX)!;
         const result = model.getResult(resultIndex);
 
-        if (!result || result.dataFormat !== ResultDataFormat.Resultset) {
+        if (!result) {
           return false;
         }
-        const constraint = model.source.tryGetAction(resultIndex, ResultSetConstraintAction);
+        const constraint = model.source.tryGetAction(resultIndex, DatabaseDataConstraintAction);
 
         switch (action) {
           case ACTION_COUNT_TOTAL_ELEMENTS: {

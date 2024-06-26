@@ -22,6 +22,12 @@ You can see live demo of CloudBeaver here: https://demo.cloudbeaver.io
 
 ## Changelog
 
+### 24.1.1. 2024-06-24
+- Unauthorized access vulnerability was fixed;
+- French language support was added (thanks to @matthieukhl);
+- Updated Firebird driver to version 5.0.4;
+- Many minor bug fixes, enhancements, and improvements have been made.
+
 ### 24.1.0. 2024-06-03
 ### Changes since 24.0.0:
 - General:

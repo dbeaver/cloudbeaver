@@ -143,7 +143,7 @@ function validateDependencies(currentPackageRoot) {
 
   function getVersion(dependency, current) {
     if (dependency.startsWith('@cloudbeaver')) {
-      return '~0.1.0';
+      return '^0';
     }
 
     if (current) {

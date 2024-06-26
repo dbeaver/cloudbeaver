@@ -43,6 +43,7 @@ import { ConnectionAuthModelSelector } from '../ConnectionAuthModelCredentials/C
 import { ConnectionFormService } from '../ConnectionFormService';
 import type { IConnectionFormProps } from '../IConnectionFormProps';
 import { CONNECTION_FORM_SHARED_CREDENTIALS_TAB_ID } from '../SharedCredentials/CONNECTION_FORM_SHARED_CREDENTIALS_TAB_ID';
+import { AdvancedPropertiesForm } from './AdvancedPropertiesForm';
 import { ConnectionOptionsTabService } from './ConnectionOptionsTabService';
 import styles from './Options.module.css';
 import { ParametersForm } from './ParametersForm';
@@ -338,6 +339,8 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
           {driver?.providerProperties && (
             <ProviderPropertiesForm config={config} properties={driver.providerProperties} disabled={disabled} readonly={readonly} />
           )}
+
+          <AdvancedPropertiesForm config={config} disabled={disabled} readonly={readonly} />
         </Container>
       </ColoredContainer>
     </Form>
