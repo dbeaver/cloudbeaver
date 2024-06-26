@@ -32,7 +32,6 @@
     "@cloudbeaver/core-projects": "^0",
     "@cloudbeaver/core-resource": "^0",
     "@cloudbeaver/core-settings": "^0",
-    "@cloudbeaver/core-theming": "^0",
     "@cloudbeaver/core-ui": "^0",
     "@cloudbeaver/core-utils": "^0",
     "@cloudbeaver/core-view": "^0",

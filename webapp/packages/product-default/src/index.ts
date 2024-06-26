@@ -9,7 +9,6 @@ import 'reflect-metadata';
 
 import { bootstrap } from '@cloudbeaver/core-bootstrap';
 import type { PluginManifest } from '@cloudbeaver/core-di';
-import { coreTaskManagerManifest } from '@cloudbeaver/core-task-manager';
 import administration from '@cloudbeaver/plugin-administration';
 import authentication from '@cloudbeaver/plugin-authentication';
 import authenticationAdministration from '@cloudbeaver/plugin-authentication-administration';
@@ -121,7 +120,6 @@ const PLUGINS: PluginManifest[] = [
   projects,
   browserPlugin,
   navigationTreeFilters,
-  coreTaskManagerManifest,
   taskManagerPluginManifest,
   settingsAdministrationPlugin,
   userProfileSettingsPlugin,
