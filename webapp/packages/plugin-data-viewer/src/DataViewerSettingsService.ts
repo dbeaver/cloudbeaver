@@ -78,7 +78,6 @@ export class DataViewerSettingsService extends Dependency {
       createSettingsAliasResolver(this.settingsResolverService, this.settings, {
         'plugin.data-viewer.disableEdit': 'core.app.dataViewer.disableEdit',
         'plugin.data-viewer.disableCopyData': 'core.app.dataViewer.disableCopyData',
-        'plugin.data-viewer.disableDownload': 'core.app.dataViewer.disableDownload',
         'plugin.data-viewer.fetchMin': 'core.app.dataViewer.fetchMin',
         'plugin.data-viewer.fetchMax': 'core.app.dataViewer.fetchMax',
         'resultset.maxrows': 'core.app.dataViewer.fetchDefault',
