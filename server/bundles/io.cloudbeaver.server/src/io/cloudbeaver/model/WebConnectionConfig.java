@@ -86,7 +86,7 @@ public class WebConnectionConfig {
             url = JSONUtils.getString(params, "url");
 
             keepAliveInterval = JSONUtils.getInteger(params, "keepAliveInterval", -1);
-            defaultAutoCommit = JSONUtils.getBoolean(params, "defaultAutoCommit", true);
+            defaultAutoCommit = JSONUtils.getBoolean(params, "autocommit", true);
 
             name = JSONUtils.getString(params, "name");
             description = JSONUtils.getString(params, "description");
