@@ -286,8 +286,7 @@ enum ResultDataFormat {
 
 enum DriverConfigurationType {
     MANUAL,
-    URL,
-    CUSTOM @since(version: "24.1.1")
+    URL
 }
 
 ## Network handler config
