@@ -46,7 +46,7 @@ export const DVResultTraceDetailsPresentation: DataPresentationComponent<any, ID
     const state = useResultTraceDetails(model, resultIndex);
 
     useS(RESULT_TRACE_DETAILS_TABLE_THEME_BASE_STYLES);
-    useAutoLoad(DVResultTraceDetailsPresentation, state);
+    useAutoLoad(DVResultTraceDetailsPresentation, state, undefined, undefined, true);
 
     if (!state.trace?.length) {
       return <TextPlaceholder>{translate('plugin_data_viewer_result_trace_no_data_placeholder')}</TextPlaceholder>;

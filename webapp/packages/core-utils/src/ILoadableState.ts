@@ -7,15 +7,15 @@
  */
 
 export interface ILoadableState {
+  readonly promise?: Promise<any> | null;
+  readonly exception?: (Error | null)[] | Error | null;
   lazy?: boolean;
   isLoading: () => boolean;
   isLoaded: () => boolean;
   isError: () => boolean;
-  readonly exception?: (Error | null)[] | Error | null;
   load: () => void | Promise<void>;
   reload?: () => void | Promise<void>;
 
-  promise?: Promise<any> | null;
   isOutdated?: () => boolean;
   isCancelled?: () => boolean;
   cancel?: () => void;
