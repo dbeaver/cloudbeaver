@@ -47,9 +47,9 @@ export interface IDatabaseDataSource<TOptions, TResult extends IDatabaseDataResu
   readonly canCancel: boolean;
   readonly cancelled: boolean;
   readonly serviceInjector: IServiceInjector;
-  readonly outdated: boolean;
   readonly totalCountRequestTask: ITask<number> | null;
 
+  isOutdated: () => boolean;
   isLoadable: () => boolean;
   isReadonly: (resultIndex: number) => boolean;
   isLoading: () => boolean;

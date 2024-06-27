@@ -32,7 +32,6 @@ export abstract class DatabaseDataSource<TOptions, TResult extends IDatabaseData
   requestInfo: IRequestInfo;
   error: Error | null;
   executionContext: IConnectionExecutionContext | null;
-  outdated: boolean;
   totalCountRequestTask: ITask<number> | null;
 
   get canCancel(): boolean {
@@ -57,6 +56,7 @@ export abstract class DatabaseDataSource<TOptions, TResult extends IDatabaseData
   private activeSave: Promise<TResult[]> | null;
   private activeTask: Promise<any> | null;
   private lastAction: () => Promise<void>;
+  private outdated: boolean;
 
   constructor(serviceInjector: IServiceInjector) {
     this.serviceInjector = serviceInjector;
@@ -87,7 +87,7 @@ export abstract class DatabaseDataSource<TOptions, TResult extends IDatabaseData
     this.error = null;
     this.lastAction = this.requestData.bind(this);
 
-    makeObservable<DatabaseDataSource<TOptions, TResult>, 'activeRequest' | 'activeSave' | 'activeTask' | 'disabled'>(this, {
+    makeObservable<DatabaseDataSource<TOptions, TResult>, 'activeRequest' | 'activeSave' | 'activeTask' | 'disabled' | 'outdated'>(this, {
       access: observable,
       dataFormat: observable,
       supportedDataFormats: observable,
@@ -202,6 +202,10 @@ export abstract class DatabaseDataSource<TOptions, TResult extends IDatabaseData
     return this;
   }
 
+  isOutdated(): boolean {
+    return this.outdated;
+  }
+
   isLoadable(): boolean {
     return !this.isLoading() && !this.disabled;
   }
@@ -215,7 +219,7 @@ export abstract class DatabaseDataSource<TOptions, TResult extends IDatabaseData
   }
 
   isDisabled(resultIndex: number): boolean {
-    return this.isLoading() || this.disabled;
+    return (!this.getResult(resultIndex)?.data && this.error === null) || !this.executionContext?.context;
   }
 
   setAccess(access: DatabaseDataAccessMode): this {
@@ -255,6 +259,7 @@ export abstract class DatabaseDataSource<TOptions, TResult extends IDatabaseData
 
   setExecutionContext(context: IConnectionExecutionContext | null): this {
     this.executionContext = context;
+    this.setOutdated();
     return this;
   }
 

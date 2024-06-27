@@ -8,8 +8,7 @@
 
 // TODO: importLazyComponent currently not working with components registry
 // eslint-disable-next-line @cloudbeaver/no-sync-component-import
-export { MenuBar, MenuBarAction, type IMenuBarActionProps } from './MenuBar';
+export { MenuBarItem, type MenuBarItemProps } from './MenuBarItem';
 // import { importLazyComponent } from '@cloudbeaver/core-blocks';
 
-// export const MenuBar = importLazyComponent(() => import('./MenuBar').then(m => m.MenuBar));
-// export const MenuBarAction = importLazyComponent(() => import('./MenuBar').then(m => m.MenuBarAction));
+// export const MenuBarItem = importLazyComponent(() => import('./MenuBarItem').then(m => m.MenuBarItem));

@@ -12,6 +12,7 @@ import { Checkbox, MenuItem, MenuItemCheckbox, MenuItemElement, MenuSeparator, u
 import {
   IMenuData,
   IMenuItem,
+  isMenuCustomItem,
   MenuActionItem,
   MenuBaseItem,
   MenuCheckboxItem,
@@ -44,10 +45,10 @@ export const MenuItemRenderer = observer<IMenuItemRendererProps>(function MenuIt
     [item, onItemClose],
   );
 
-  if (item instanceof MenuCustomItem) {
+  if (isMenuCustomItem(item)) {
     const CustomMenuItem = item.getComponent();
 
-    return <CustomMenuItem item={item} menuData={menuData} onClick={onClick} />;
+    return <CustomMenuItem item={item} context={menuData.context} onClick={onClick} />;
   }
 
   if (item instanceof MenuSubMenuItem) {

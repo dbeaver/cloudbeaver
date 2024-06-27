@@ -5,8 +5,9 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-.toolsMenu .menuBarItemGroup .menuBarItem {
-  & .menuBarItemLabel {
-    display: none;
-  }
+
+export interface IComponentsTreeNode<T> {
+  component: React.FC<any>;
+  props: T;
+  replacement: React.FC<any> | null;
 }

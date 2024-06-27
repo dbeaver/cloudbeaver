@@ -763,19 +763,6 @@ export function useElementsTree(options: IOptions): IElementsTree {
   });
 
   useExecutor({
-    executor: navNodeInfoResource.onItemDelete,
-    handlers: [
-      function deleteNodeState(key) {
-        runInAction(() => {
-          ResourceKeyUtils.forEach(key, key => {
-            state.delete(key);
-          });
-        });
-      },
-    ],
-  });
-
-  useExecutor({
     executor: navTreeResource.onItemDelete,
     handlers: [
       async function collapseDeletedTree(key) {

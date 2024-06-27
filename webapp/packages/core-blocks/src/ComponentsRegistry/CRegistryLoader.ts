@@ -5,8 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-.toolsMenu .menuBarItemGroup .menuBarItem {
-  & .menuBarItemLabel {
-    display: none;
-  }
-}
+import { importLazyComponent } from '../importLazyComponent';
+
+export const CRegistry = importLazyComponent(() => import('./CRegistry').then(m => m.CRegistry));
