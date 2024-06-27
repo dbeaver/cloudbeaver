@@ -12,5 +12,5 @@ export const coreWebsiteManifest: PluginManifest = {
     name: 'Core Website',
   },
 
-  providers: [() => import('./WebsiteBuyProductService').then(m => m.WebsiteBuyProductService)],
+  providers: [() => import('./WebsiteLinksService').then(m => m.WebsiteLinksService)],
 };

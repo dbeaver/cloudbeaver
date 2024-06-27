@@ -26,6 +26,7 @@
     "@cloudbeaver/core-theming": "^0",
     "@cloudbeaver/core-version": "^0",
     "@cloudbeaver/core-view": "^0",
+    "@cloudbeaver/core-website": "^0",
     "@cloudbeaver/plugin-settings-menu": "^0",
     "mobx-react-lite": "^4",
     "react": "^18"
