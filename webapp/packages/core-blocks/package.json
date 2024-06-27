@@ -39,10 +39,13 @@
   },
   "peerDependencies": {},
   "devDependencies": {
+    "@cloudbeaver/core-di": "^0",
+    "@cloudbeaver/core-dialogs": "^0",
     "@cloudbeaver/core-events": "^0",
     "@cloudbeaver/core-localization": "^0",
     "@cloudbeaver/core-settings": "^0",
     "@cloudbeaver/core-theming": "^0",
+    "@cloudbeaver/core-utils": "^0",
     "@cloudbeaver/tests-runner": "^0",
     "@testing-library/jest-dom": "^6",
     "@testing-library/react": "^16",
