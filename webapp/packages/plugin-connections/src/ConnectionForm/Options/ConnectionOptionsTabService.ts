@@ -349,7 +349,7 @@ export class ConnectionOptionsTabService extends Bootstrap {
   private prepareDynamicProperties(
     propertiesInfo: ObjectPropertyInfo[],
     properties: Record<string, any>,
-    configurationType: DriverConfigurationType | undefined,
+    configurationType?: DriverConfigurationType,
   ) {
     const result: Record<string, any> = { ...properties };
 
