@@ -31,7 +31,7 @@ export const ReactCodemirror = observer<IReactCodeMirrorProps, IEditorRef>(
       incomingValue,
       extensions = new Map<Compartment, Extension>(),
       readonly,
-      disableCopy,
+      copyEventHandler,
       autoFocus,
       onChange,
       onCursorChange,
@@ -45,11 +45,9 @@ export const ReactCodemirror = observer<IReactCodeMirrorProps, IEditorRef>(
     const eventHandlers = useMemo(
       () =>
         EditorView.domEventHandlers({
-          copy() {
-            return disableCopy;
-          },
+          copy: copyEventHandler,
         }),
-      [disableCopy],
+      [copyEventHandler],
     );
     extensions = useCodemirrorExtensions(extensions, [readOnlyFacet, eventHandlers]);
     const [container, setContainer] = useState<HTMLDivElement | null>(null);
