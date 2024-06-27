@@ -504,7 +504,9 @@ public class WebServiceCore implements DBWServiceCore {
         }
 
         dataSource.setFolder(config.getFolder() != null ? sessionRegistry.getFolder(config.getFolder()) : null);
-        dataSource.setDefaultAutoCommit(config.isDefaultAutoCommit());
+        if (config.isDefaultAutoCommit() != null) {
+            dataSource.setDefaultAutoCommit(config.isDefaultAutoCommit());
+        }
         WebServiceUtils.setConnectionConfiguration(dataSource.getDriver(),
             dataSource.getConnectionConfiguration(),
             config);
