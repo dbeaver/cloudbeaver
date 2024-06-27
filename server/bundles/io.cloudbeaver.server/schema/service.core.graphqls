@@ -251,7 +251,7 @@ type DriverInfo {
 
     # Main driver properties
     # Contains info about main fields (host, port, database, server name)
-    mainProperties: [ObjectPropertyInfo!]! @since(version: "24.1.1")
+    mainProperties: [ObjectPropertyInfo!]! @since(version: "24.1.2")
 
     # Additional driver provider properties
     # These properties can be configured by user on main connection page
@@ -506,8 +506,8 @@ input ConnectionConfig {
     serverName: String
     databaseName: String
 
-    # Host, port, serverName, databaseName are also stored in mainProperties for custom pages
-    mainProperties: Object @since(version: "24.1.2")
+    # Host, port, serverName, databaseName are also stored in mainPropertyValues for custom pages
+    mainPropertyValues: Object @since(version: "24.1.2")
 
     # Connection url jdbc:{driver}://{host}[:{port}]/[{database}]
     url: String

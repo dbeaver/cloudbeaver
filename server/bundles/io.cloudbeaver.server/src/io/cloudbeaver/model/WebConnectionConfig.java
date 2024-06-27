@@ -57,7 +57,7 @@ public class WebConnectionConfig {
     private Map<String, Object> credentials;
     private boolean saveCredentials;
     private boolean sharedCredentials;
-    private Map<String, Object> mainProperties;
+    private Map<String, Object> mainPropertyValues;
     private Map<String, Object> providerProperties;
     private List<WebNetworkHandlerConfigInput> networkHandlersConfig;
     private DBPDriverConfigurationType configurationType;
@@ -101,7 +101,7 @@ public class WebConnectionConfig {
             saveCredentials = JSONUtils.getBoolean(params, "saveCredentials");
             sharedCredentials = JSONUtils.getBoolean(params, "sharedCredentials");
 
-            mainProperties = JSONUtils.getObjectOrNull(params, "mainProperties");
+            mainPropertyValues = JSONUtils.getObjectOrNull(params, "mainPropertyValues");
             providerProperties = JSONUtils.getObjectOrNull(params, "providerProperties");
 
             String configType = JSONUtils.getString(params, "configurationType");
@@ -228,8 +228,8 @@ public class WebConnectionConfig {
     }
 
     @Property
-    public Map<String, Object> getMainProperties() {
-        return mainProperties;
+    public Map<String, Object> getMainPropertyValues() {
+        return mainPropertyValues;
     }
 
     @Property
