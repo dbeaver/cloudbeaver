@@ -300,7 +300,7 @@ export class ConnectionOptionsTabService extends Bootstrap {
 
     tempConfig.mainProperties = toJS(state.config.mainProperties);
 
-    if (tempConfig.configurationType === DriverConfigurationType.Manual) {
+    if (tempConfig.configurationType === DriverConfigurationType.Manual && !driver.useCustomPage) {
       tempConfig.mainProperties[MAIN_PROPERTY_DATABASE_KEY] = state.config.databaseName?.trim();
 
       if (!driver.embedded) {
@@ -337,7 +337,7 @@ export class ConnectionOptionsTabService extends Bootstrap {
       );
     }
 
-    if (tempConfig.configurationType === DriverConfigurationType.Custom && !!driver.mainProperties?.length) {
+    if (driver.useCustomPage && driver.mainProperties.length > 0) {
       tempConfig.mainProperties = this.prepareDynamicProperties(driver.mainProperties, tempConfig.mainProperties, tempConfig.configurationType);
     }
 

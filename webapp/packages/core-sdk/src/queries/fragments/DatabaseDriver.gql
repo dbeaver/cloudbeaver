@@ -11,6 +11,7 @@ fragment DatabaseDriver on DriverInfo {
   embedded
   enabled
   requiresServerName
+  useCustomPage
   anonymousAccess
   promotedScore
   providerId

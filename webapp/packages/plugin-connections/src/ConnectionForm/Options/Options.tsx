@@ -73,11 +73,6 @@ const driverConfiguration: IDriverConfiguration[] = [
     value: DriverConfigurationType.Url,
     isVisible: driver => driver.configurationTypes.includes(DriverConfigurationType.Url),
   },
-  {
-    name: 'Custom',
-    value: DriverConfigurationType.Custom,
-    isVisible: driver => driver.configurationTypes.includes(DriverConfigurationType.Custom) && !!driver.mainProperties?.length,
-  },
 ];
 
 export const Options: TabContainerPanelComponent<IConnectionFormProps> = observer(function Options({ state }) {
@@ -228,25 +223,24 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
               </InputField>
             )}
 
-            {config.configurationType === DriverConfigurationType.Manual && (
-              <ParametersForm
-                config={config}
-                embedded={driver?.embedded}
-                requiresServerName={driver?.requiresServerName}
-                disabled={disabled}
-                readOnly={readonly}
-                originLocal={originLocal}
-              />
-            )}
-
-            {config.configurationType === DriverConfigurationType.Custom && (
-              <ObjectPropertyInfoForm
-                state={config.mainProperties}
-                properties={driver?.mainProperties ?? EMPTY_ARRAY}
-                disabled={disabled}
-                readOnly={readonly}
-              />
-            )}
+            {config.configurationType === DriverConfigurationType.Manual &&
+              (driver?.useCustomPage ? (
+                <ObjectPropertyInfoForm
+                  state={config.mainProperties}
+                  properties={driver.mainProperties ?? EMPTY_ARRAY}
+                  disabled={disabled}
+                  readOnly={readonly}
+                />
+              ) : (
+                <ParametersForm
+                  config={config}
+                  embedded={driver?.embedded}
+                  requiresServerName={driver?.requiresServerName}
+                  disabled={disabled}
+                  readOnly={readonly}
+                  originLocal={originLocal}
+                />
+              ))}
           </Group>
           <Group form gap>
             <Container wrap gap>

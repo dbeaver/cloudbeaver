@@ -13,12 +13,6 @@ export function getDefaultConfigurationType(driver: DBDriver | undefined) {
     return DriverConfigurationType.Url;
   }
 
-  const supportCustom = driver.configurationTypes.includes(DriverConfigurationType.Custom);
   const supportManual = driver.configurationTypes.includes(DriverConfigurationType.Manual);
-
-  if (supportCustom && !!driver.mainProperties?.length) {
-    return DriverConfigurationType.Custom;
-  }
-
   return supportManual ? DriverConfigurationType.Manual : DriverConfigurationType.Url;
 }
