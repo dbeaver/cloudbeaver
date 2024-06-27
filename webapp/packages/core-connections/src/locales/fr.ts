@@ -69,6 +69,7 @@ export default [
   ['connections_connection_test_fail', 'Échec du test de connexion'],
   ['connections_connection_create_fail', 'Échec de la création de la connexion'],
   ['connections_connection_save_fail', 'Échec de la sauvegarde de la connexion'],
+  ['connections_connection_expert_settings', 'Expert settings'],
   ['connections_connection_keep_alive', 'Garder actif (en secondes)'],
   ['connections_connection_autocommit', 'Auto commit'],
   ['connections_connection_keep_alive_tooltip', 'Pas de déconnexion automatique'],

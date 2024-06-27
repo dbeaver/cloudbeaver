@@ -27,7 +27,7 @@ export const AdvancedPropertiesForm = observer<Props>(function AdvancedPropertie
 
   return (
     <Group form gap>
-      <Expandable label={translate('ui_advanced_settings')}>
+      <Expandable label={translate('connections_connection_expert_settings')}>
         <Container wrap gap>
           <InputField
             type="number"
