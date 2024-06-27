@@ -321,7 +321,7 @@ export class ConnectionOptionsTabService extends Bootstrap {
       const properties = await this.getConnectionAuthModelProperties(tempConfig.authModelId, state.info);
 
       if (this.isCredentialsChanged(properties, state.config.credentials)) {
-        tempConfig.credentials = this.prepareDynamicProperties(properties, toJS(state.config.credentials), tempConfig.configurationType);
+        tempConfig.credentials = this.prepareDynamicProperties(properties, toJS(state.config.credentials));
       }
 
       if (!tempConfig.saveCredentials) {
@@ -358,7 +358,7 @@ export class ConnectionOptionsTabService extends Bootstrap {
         continue;
       }
 
-      const supported = propertyInfo.supportedConfigurationTypes?.some(type => type === configurationType);
+      const supported = configurationType === undefined || propertyInfo.supportedConfigurationTypes?.some(type => type === configurationType);
 
       if (!supported) {
         delete result[propertyInfo.id];
