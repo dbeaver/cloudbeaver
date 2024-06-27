@@ -238,7 +238,7 @@ public class WebConnectionConfig {
     }
 
     @Property
-    public boolean isDefaultAutoCommit() {
+    public Boolean isDefaultAutoCommit() {
         return defaultAutoCommit;
     }
 
