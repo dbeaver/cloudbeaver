@@ -13,15 +13,12 @@ import { AppContext, IServiceInjector } from '@cloudbeaver/core-di';
 import type { IApplication } from './createApp';
 
 function ApplicationWrapper(serviceInjector: IServiceInjector): React.FC<React.PropsWithChildren> {
-  return function render({ children }) {
-    return (
-      <Suspense fallback={null}>
-        <AppContext app={serviceInjector}>{children}</AppContext>
-      </Suspense>
-    );
-  };
+  return ({ children }) => (
+    <Suspense fallback={null}>
+      <AppContext app={serviceInjector}>{children}</AppContext>
+    </Suspense>
+  );
 }
-
 export function renderInApp<
   Q extends Queries = typeof queries,
   Container extends Element | DocumentFragment = HTMLElement,

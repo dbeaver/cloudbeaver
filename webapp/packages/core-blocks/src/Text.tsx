@@ -7,8 +7,6 @@
  */
 import { observer } from 'mobx-react-lite';
 
-interface Props extends React.HTMLAttributes<HTMLDivElement> {}
-
-export const Text: React.FC<Props> = observer(function Text({ children, ...rest }) {
+export const Text: React.FC<React.HTMLAttributes<HTMLDivElement>> = observer(function Text({ children, ...rest }) {
   return <div {...rest}>{children}</div>;
 });
