@@ -60,15 +60,14 @@ export function useResultTraceDetails(model: IDatabaseDataModel<any, IDatabaseRe
 
         const result = this.model.getResult(this.resultIndex);
 
-        if (!result?.id) {
-          this.exception = new Error('Result is not found');
-          return;
-        }
-
-        this.loading = true;
-        this.exception = null;
-
         try {
+          if (!result?.id) {
+            throw new Error('Result is not found');
+          }
+
+          this.loading = true;
+          this.exception = null;
+
           const { trace } = await dvResultTraceDetailsService.getTraceDetails(result.projectId, result.connectionId, result.contextId, result.id);
 
           this.cache.set(FAKE_ELEMENT_KEY, RESULT_TRACE_DETAILS_CACHE_KEY, trace);

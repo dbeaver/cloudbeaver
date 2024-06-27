@@ -8,3 +8,4 @@
 import { dataViewerResultTraceDetailsPlugin } from './manifest';
 
 export default dataViewerResultTraceDetailsPlugin;
+export { dataViewerResultTraceDetailsPlugin };

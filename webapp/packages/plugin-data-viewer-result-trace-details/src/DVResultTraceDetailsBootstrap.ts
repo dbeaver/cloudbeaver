@@ -25,7 +25,7 @@ export class DVResultTraceDetailsBootstrap extends Bootstrap {
       id: 'result-trace-details-presentation',
       type: DataPresentationType.toolsPanel,
       dataFormat: ResultDataFormat.Resultset,
-      icon: '/icons/result_details.svg',
+      icon: '/icons/result_details_sm.svg',
       title: 'plugin_data_viewer_result_trace_details',
       hidden(dataFormat, model, resultIndex) {
         const result = model.getResult(resultIndex);
