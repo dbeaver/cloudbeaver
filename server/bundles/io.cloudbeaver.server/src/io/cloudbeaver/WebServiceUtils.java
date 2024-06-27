@@ -206,6 +206,10 @@ public class WebServiceUtils extends WebCommonUtils {
     }
 
     private static void setMainProperties(DBPConnectionConfiguration dsConfig, WebConnectionConfig config) {
+        if (CommonUtils.isNotEmpty(config.getUrl())) {
+            dsConfig.setUrl(config.getUrl());
+            return;
+        }
         if (config.getMainProperties() != null) {
             for (Map.Entry<String, Object> e : config.getMainProperties().entrySet()) {
                 switch (e.getKey()) {
@@ -216,10 +220,6 @@ public class WebServiceUtils extends WebCommonUtils {
                     default -> throw new IllegalStateException("Unexpected value: " + e.getKey());
                 }
             }
-            return;
-        }
-        if (CommonUtils.isNotEmpty(config.getUrl())) {
-            dsConfig.setUrl(config.getUrl());
             return;
         }
         if (config.getHost() != null) {
