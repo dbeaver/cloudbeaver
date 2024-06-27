@@ -43,8 +43,7 @@ export const ImageValuePresentation: TabContainerPanelComponent<IDataValuePanelP
     const loading = model.isLoading();
     const valueSize = bytesToSize(isResultSetContentValue(data.cellValue) ? data.cellValue.contentLength ?? 0 : 0);
     const isTruncatedMessageDisplay = !!data.truncated && !data.src;
-    const isDownloadable = isTruncatedMessageDisplay && !!data.selectedCell && data.contentAction.isDownloadable(data.selectedCell);
-    const isCacheDownloading = isDownloadable && data.contentAction.isLoading(data.selectedCell);
+    const isCacheDownloading = Boolean(data.canSave && data.selectedCell && data.contentAction.isLoading(data.selectedCell));
     const debouncedDownload = useMemo(() => throttle(() => data.download(), 1000, false), []);
     const srcGetter = suspense.observedValue(
       'src',
@@ -64,7 +63,7 @@ export const ImageValuePresentation: TabContainerPanelComponent<IDataValuePanelP
             {data.src && <ImageRenderer srcGetter={srcGetter} className={s(style, { img: true, stretch: state.stretch })} />}
             {isTruncatedMessageDisplay && (
               <QuotaPlaceholder model={data.model} resultIndex={data.resultIndex} elementKey={data.selectedCell}>
-                {isDownloadable && (
+                {data.canSave && (
                   <Button disabled={loading} loading={isCacheDownloading} loader onClick={data.loadFullImage}>
                     {`${translate('ui_view')} (${valueSize})`}
                   </Button>

@@ -18,6 +18,7 @@ import { ResultSetEditAction } from '../../DatabaseDataModel/Actions/ResultSet/R
 import { ResultSetFormatAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetFormatAction';
 import { ResultSetSelectAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetSelectAction';
 import type { IDatabaseResultSet } from '../../DatabaseDataModel/IDatabaseResultSet';
+import { DataViewerService } from '../../DataViewerService';
 import type { IDataValuePanelProps } from '../../TableViewer/ValuePanel/DataValuePanelService';
 import { getDefaultLineWrapping } from './getDefaultLineWrapping';
 import { isTextValueReadonly } from './isTextValueReadonly';
@@ -36,6 +37,7 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
     const translate = useTranslate();
     const notificationService = useService(NotificationService);
     const textValuePresentationService = useService(TextValuePresentationService);
+    const dataViewerService = useService(DataViewerService);
     const style = useS(styles, TextValuePresentationTab);
     const selectAction = model.source.getAction(resultIndex, ResultSetSelectAction);
     const formatAction = model.source.getAction(resultIndex, ResultSetFormatAction);
@@ -76,7 +78,7 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
     const autoLineWrapping = getDefaultLineWrapping(contentType);
     const lineWrapping = state.lineWrapping ?? autoLineWrapping;
     const isReadonly = isTextValueReadonly({ model, resultIndex, contentAction, cell: firstSelectedCell, formatAction });
-    const canSave = firstSelectedCell && contentAction.isDownloadable(firstSelectedCell);
+    const canSave = firstSelectedCell && contentAction.isDownloadable(firstSelectedCell) && dataViewerService.canDownload;
 
     function valueChangeHandler(newValue: string) {
       if (firstSelectedCell && !isReadonly) {

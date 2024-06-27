@@ -90,11 +90,15 @@ export function useValuePanelImageValue({ model, resultIndex }: Props) {
         return this.contentAction.retrieveBlobFromCache(this.selectedCell);
       },
       get canSave() {
+        if (!this.dataViewerService.canDownload) {
+          return false;
+        }
+
         if (this.truncated && this.selectedCell) {
           return this.contentAction.isDownloadable(this.selectedCell);
         }
 
-        return this.staticSrc && !this.truncated && this.dataViewerService.canDownload;
+        return this.staticSrc && !this.truncated;
       },
       get canUpload() {
         if (!this.selectedCell) {
