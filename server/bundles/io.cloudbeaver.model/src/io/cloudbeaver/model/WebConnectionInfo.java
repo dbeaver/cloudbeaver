@@ -385,7 +385,7 @@ public class WebConnectionInfo {
     }
 
     @Property
-    public Map<String, String> getMainProperties() {
+    public Map<String, String> getMainPropertyValues() {
         Map<String, String> mainProperties = new LinkedHashMap<>();
         mainProperties.put(DBConstants.PROP_HOST, getHost());
         mainProperties.put(DBConstants.PROP_PORT, getPort());
