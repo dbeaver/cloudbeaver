@@ -206,8 +206,8 @@ export class ConnectionOptionsTabService extends Bootstrap {
       state.config.providerProperties = {};
     }
 
-    if (!state.config.mainProperties || updated) {
-      state.config.mainProperties = {};
+    if (!state.config.mainPropertyValues || updated) {
+      state.config.mainPropertyValues = {};
     }
 
     if (!state.info) {
@@ -223,10 +223,10 @@ export class ConnectionOptionsTabService extends Bootstrap {
     state.config.template = state.info.template;
     state.config.driverId = state.info.driverId;
 
-    state.config.host = state.info.mainProperties[MAIN_PROPERTY_HOST_KEY];
-    state.config.port = state.info.mainProperties[MAIN_PROPERTY_PORT_KEY];
-    state.config.serverName = state.info.mainProperties[MAIN_PROPERTY_SERVER_KEY];
-    state.config.databaseName = state.info.mainProperties[MAIN_PROPERTY_DATABASE_KEY];
+    state.config.host = state.info.mainPropertyValues[MAIN_PROPERTY_HOST_KEY];
+    state.config.port = state.info.mainPropertyValues[MAIN_PROPERTY_PORT_KEY];
+    state.config.serverName = state.info.mainPropertyValues[MAIN_PROPERTY_SERVER_KEY];
+    state.config.databaseName = state.info.mainPropertyValues[MAIN_PROPERTY_DATABASE_KEY];
 
     state.config.url = state.info.url;
     state.config.folder = state.info.folder;
@@ -249,8 +249,8 @@ export class ConnectionOptionsTabService extends Bootstrap {
       state.config.providerProperties = { ...state.info.providerProperties };
     }
 
-    if (state.info.mainProperties) {
-      state.config.mainProperties = { ...state.info.mainProperties };
+    if (state.info.mainPropertyValues) {
+      state.config.mainPropertyValues = { ...state.info.mainPropertyValues };
     }
   }
 
@@ -298,18 +298,18 @@ export class ConnectionOptionsTabService extends Bootstrap {
       tempConfig.url = state.config.url?.trim();
     }
 
-    tempConfig.mainProperties = toJS(state.config.mainProperties);
+    tempConfig.mainPropertyValues = toJS(state.config.mainPropertyValues);
 
     if (tempConfig.configurationType === DriverConfigurationType.Manual && !driver.useCustomPage) {
-      tempConfig.mainProperties[MAIN_PROPERTY_DATABASE_KEY] = state.config.databaseName?.trim();
+      tempConfig.mainPropertyValues[MAIN_PROPERTY_DATABASE_KEY] = state.config.databaseName?.trim();
 
       if (!driver.embedded) {
-        tempConfig.mainProperties[MAIN_PROPERTY_HOST_KEY] = state.config.host?.trim();
-        tempConfig.mainProperties[MAIN_PROPERTY_PORT_KEY] = state.config.port?.trim();
+        tempConfig.mainPropertyValues[MAIN_PROPERTY_HOST_KEY] = state.config.host?.trim();
+        tempConfig.mainPropertyValues[MAIN_PROPERTY_PORT_KEY] = state.config.port?.trim();
       }
 
       if (driver.requiresServerName) {
-        tempConfig.mainProperties[MAIN_PROPERTY_SERVER_KEY] = state.config.serverName?.trim();
+        tempConfig.mainPropertyValues[MAIN_PROPERTY_SERVER_KEY] = state.config.serverName?.trim();
       }
     }
 
@@ -338,7 +338,11 @@ export class ConnectionOptionsTabService extends Bootstrap {
     }
 
     if (driver.useCustomPage && driver.mainProperties.length > 0) {
-      tempConfig.mainProperties = this.prepareDynamicProperties(driver.mainProperties, tempConfig.mainProperties, tempConfig.configurationType);
+      tempConfig.mainPropertyValues = this.prepareDynamicProperties(
+        driver.mainProperties,
+        tempConfig.mainPropertyValues,
+        tempConfig.configurationType,
+      );
     }
 
     runInAction(() => {
@@ -427,8 +431,8 @@ export class ConnectionOptionsTabService extends Bootstrap {
       (config.sharedCredentials !== undefined && config.sharedCredentials !== data.info.sharedCredentials) ||
       (config.providerProperties !== undefined &&
         !isObjectPropertyInfoStateEqual(driver.providerProperties, config.providerProperties, data.info.providerProperties)) ||
-      (config.mainProperties !== undefined &&
-        !isObjectPropertyInfoStateEqual(driver.mainProperties, config.mainProperties, data.info.mainProperties)) ||
+      (config.mainPropertyValues !== undefined &&
+        !isObjectPropertyInfoStateEqual(driver.mainProperties, config.mainPropertyValues, data.info.mainPropertyValues)) ||
       (config.keepAliveInterval !== undefined && !isValuesEqual(config.keepAliveInterval, data.info.keepAliveInterval))
     ) {
       stateContext.markEdited();

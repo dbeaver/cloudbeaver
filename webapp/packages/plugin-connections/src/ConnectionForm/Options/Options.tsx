@@ -226,7 +226,7 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
             {config.configurationType === DriverConfigurationType.Manual &&
               (driver?.useCustomPage ? (
                 <ObjectPropertyInfoForm
-                  state={config.mainProperties}
+                  state={config.mainPropertyValues}
                   properties={driver.mainProperties ?? EMPTY_ARRAY}
                   disabled={disabled}
                   readOnly={readonly}
