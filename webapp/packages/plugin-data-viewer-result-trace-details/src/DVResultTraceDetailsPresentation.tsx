@@ -7,9 +7,8 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import { Container, Loader, useAutoLoad, useS } from '@cloudbeaver/core-blocks';
+import { Container, TextPlaceholder, useAutoLoad, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import { DynamicTraceProperty } from '@cloudbeaver/core-sdk';
-import { EMPTY_ARRAY } from '@cloudbeaver/core-utils';
 import type { DataPresentationComponent, IDatabaseResultSet } from '@cloudbeaver/plugin-data-viewer';
 import DataGrid, { Column } from '@cloudbeaver/plugin-react-data-grid';
 
@@ -43,23 +42,20 @@ const COLUMNS: Column<DynamicTraceProperty>[] = [
 
 export const DVResultTraceDetailsPresentation: DataPresentationComponent<any, IDatabaseResultSet> = observer(
   function DVResultTraceDetailsPresentation({ model, resultIndex }) {
+    const translate = useTranslate();
     const state = useResultTraceDetails(model, resultIndex);
 
     useS(RESULT_TRACE_DETAILS_TABLE_THEME_BASE_STYLES);
     useAutoLoad(DVResultTraceDetailsPresentation, state);
 
+    if (!state.trace?.length) {
+      return <TextPlaceholder>{translate('plugin_data_viewer_result_trace_no_data_placeholder')}</TextPlaceholder>;
+    }
+
     return (
-      <Loader state={state}>
-        <Container className="result-trace-details-grid-container">
-          <DataGrid
-            className="result-trace-details-grid-theme"
-            rows={state.trace ?? EMPTY_ARRAY}
-            rowKeyGetter={row => row.name}
-            columns={COLUMNS}
-            rowHeight={30}
-          />
-        </Container>
-      </Loader>
+      <Container className="result-trace-details-grid-container">
+        <DataGrid className="result-trace-details-grid-theme" rows={state.trace} rowKeyGetter={row => row.name} columns={COLUMNS} rowHeight={30} />
+      </Container>
     );
   },
 );

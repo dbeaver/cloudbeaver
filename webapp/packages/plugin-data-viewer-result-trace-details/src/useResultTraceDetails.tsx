@@ -17,7 +17,6 @@ import { DVResultTraceDetailsService } from './DVResultTraceDetailsService';
 
 interface State extends ILoadableState {
   readonly trace: DynamicTraceProperty[] | undefined;
-  loading: boolean;
   loaded: boolean;
   exception: Error | null;
   model: IDatabaseDataModel<any, IDatabaseResultSet>;
@@ -42,11 +41,8 @@ export function useResultTraceDetails(model: IDatabaseDataModel<any, IDatabaseRe
       get trace(): DynamicTraceProperty[] | undefined {
         return this.cache.get(FAKE_ELEMENT_KEY, RESULT_TRACE_DETAILS_CACHE_KEY);
       },
-      loading: false,
+      promise: null,
       exception: null,
-      isLoading() {
-        return this.loading;
-      },
       isError() {
         return isContainsException(this.exception);
       },
@@ -54,10 +50,6 @@ export function useResultTraceDetails(model: IDatabaseDataModel<any, IDatabaseRe
         return this.trace !== undefined;
       },
       async load() {
-        if (this.loading) {
-          return;
-        }
-
         const result = this.model.getResult(this.resultIndex);
 
         try {
@@ -65,21 +57,25 @@ export function useResultTraceDetails(model: IDatabaseDataModel<any, IDatabaseRe
             throw new Error('Result is not found');
           }
 
-          this.loading = true;
+          if (this.promise) {
+            return;
+          }
+
           this.exception = null;
 
-          const { trace } = await dvResultTraceDetailsService.getTraceDetails(result.projectId, result.connectionId, result.contextId, result.id);
+          this.promise = dvResultTraceDetailsService.getTraceDetails(result.projectId, result.connectionId, result.contextId, result.id);
+          const { trace } = await this.promise;
 
           this.cache.set(FAKE_ELEMENT_KEY, RESULT_TRACE_DETAILS_CACHE_KEY, trace);
         } catch (exception: any) {
           this.exception = exception;
         } finally {
-          this.loading = false;
+          this.promise = null;
         }
       },
     }),
     {
-      loading: observable.ref,
+      promise: observable.ref,
       exception: observable.ref,
       trace: computed,
     },

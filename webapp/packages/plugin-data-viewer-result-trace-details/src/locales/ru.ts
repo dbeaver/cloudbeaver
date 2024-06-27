@@ -5,4 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-export default [['plugin_data_viewer_result_trace_details', 'Детализация результата']];
+export default [
+  ['plugin_data_viewer_result_trace_details', 'Детализация результата'],
+  ['plugin_data_viewer_result_trace_no_data_placeholder', 'Детали результата не найдены'],
+];
