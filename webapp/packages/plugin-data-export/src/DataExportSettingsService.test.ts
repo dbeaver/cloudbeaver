@@ -35,6 +35,7 @@ import {
 import { coreStorageManifest } from '@cloudbeaver/core-storage';
 import { coreUIManifest } from '@cloudbeaver/core-ui';
 import { coreViewManifest } from '@cloudbeaver/core-view';
+import { dataViewerManifest } from '@cloudbeaver/plugin-data-viewer';
 import { datasourceContextSwitchPluginManifest } from '@cloudbeaver/plugin-datasource-context-switch';
 import { navigationTabsPlugin } from '@cloudbeaver/plugin-navigation-tabs';
 import { navigationTreePlugin } from '@cloudbeaver/plugin-navigation-tree';
@@ -60,6 +61,7 @@ const app = createApp(
   coreProjectsManifest,
   coreUIManifest,
   coreRoutingManifest,
+  dataViewerManifest,
   coreAdministrationManifest,
   coreConnectionsManifest,
   coreDialogsManifest,
