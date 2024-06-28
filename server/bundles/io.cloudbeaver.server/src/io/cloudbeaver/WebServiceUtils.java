@@ -185,6 +185,9 @@ public class WebServiceUtils extends WebCommonUtils {
         if (config.getKeepAliveInterval() >= 0) {
             dsConfig.setKeepAliveInterval(config.getKeepAliveInterval());
         }
+        if (config.isDefaultAutoCommit() != null) {
+            dsConfig.getBootstrap().setDefaultAutoCommit(config.isDefaultAutoCommit());
+        }
         // Save provider props
         if (config.getProviderProperties() != null) {
             dsConfig.setProviderProperties(new LinkedHashMap<>());
