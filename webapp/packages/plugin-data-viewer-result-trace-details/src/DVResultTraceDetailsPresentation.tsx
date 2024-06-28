@@ -53,7 +53,7 @@ export const DVResultTraceDetailsPresentation: DataPresentationComponent<any, ID
     }
 
     return (
-      <Container className="result-trace-details-grid-container">
+      <Container className="result-trace-details-grid-container" overflow>
         <DataGrid className="result-trace-details-grid-theme" rows={state.trace} rowKeyGetter={row => row.name} columns={COLUMNS} rowHeight={30} />
       </Container>
     );
