@@ -139,7 +139,7 @@ export class SqlQueryResultService {
         let canClose = false;
 
         try {
-          await model.requestDataAction(() => {
+          await model.source.runTask(async () => {
             canClose = true;
           });
         } catch {}

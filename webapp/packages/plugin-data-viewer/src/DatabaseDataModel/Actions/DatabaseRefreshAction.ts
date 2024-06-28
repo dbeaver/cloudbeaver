@@ -5,7 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { makeObservable, observable } from 'mobx';
+import { observable } from 'mobx';
 
 import type { ResultDataFormat } from '@cloudbeaver/core-sdk';
 
@@ -79,18 +79,20 @@ export class DatabaseRefreshAction<TResult extends IDatabaseDataResult> extends 
 
   private startTimer(): void {
     if (this.timer) {
-      return;
+      this.stopTimer();
     }
     this.resume();
-    this.timer = setInterval(this.refresh.bind(this), this.state.interval);
+    this.timer = setTimeout(this.refresh.bind(this), this.state.interval);
   }
 
   private async refresh(): Promise<void> {
     if (this.state.paused) {
+      this.startTimer();
       return;
     }
     try {
       await this.source.refreshData();
+      this.startTimer();
     } catch (exception) {
       if (this.state.stopOnError) {
         this.stopTimer();

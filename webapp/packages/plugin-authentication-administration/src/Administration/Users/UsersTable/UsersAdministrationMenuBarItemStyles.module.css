@@ -8,6 +8,9 @@
 
 .menuBarItemGroup {
   & .menuBarItem {
+    & .menuBarItemBox {
+      gap: 0;
+    }
     & .menuBarItemLabel {
       font-size: 14px;
     }

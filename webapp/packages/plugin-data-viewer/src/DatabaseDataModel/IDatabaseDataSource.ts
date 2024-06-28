@@ -7,12 +7,23 @@
  */
 import type { IConnectionExecutionContext } from '@cloudbeaver/core-connections';
 import type { IServiceInjector } from '@cloudbeaver/core-di';
-import type { ITask } from '@cloudbeaver/core-executor';
+import type { IExecutor, ITask } from '@cloudbeaver/core-executor';
 import type { ResultDataFormat } from '@cloudbeaver/core-sdk';
 
 import type { IDatabaseDataAction, IDatabaseDataActionClass, IDatabaseDataActionInterface } from './IDatabaseDataAction';
 import type { IDatabaseDataActions } from './IDatabaseDataActions';
 import type { IDatabaseDataResult } from './IDatabaseDataResult';
+
+export enum DatabaseDataSourceOperation {
+  Load = 'load',
+  Save = 'save',
+  Refresh = 'refresh',
+  Task = 'task',
+}
+export interface IDatabaseDataSourceOperationEvent {
+  stage: 'request' | 'before' | 'after';
+  operation: DatabaseDataSourceOperation;
+}
 
 export interface IRequestInfo {
   readonly originalQuery: string;
@@ -48,10 +59,12 @@ export interface IDatabaseDataSource<TOptions, TResult extends IDatabaseDataResu
   readonly cancelled: boolean;
   readonly serviceInjector: IServiceInjector;
   readonly totalCountRequestTask: ITask<number> | null;
+  readonly onOperation: IExecutor<IDatabaseDataSourceOperationEvent>;
 
   isOutdated: () => boolean;
   isLoadable: () => boolean;
   isReadonly: (resultIndex: number) => boolean;
+  isDataAvailable: (offset: number, count: number) => boolean;
   isLoading: () => boolean;
   isDisabled: (resultIndex: number) => boolean;
 
@@ -83,6 +96,7 @@ export interface IDatabaseDataSource<TOptions, TResult extends IDatabaseDataResu
   setDataFormat: (dataFormat: ResultDataFormat) => this;
   setSupportedDataFormats: (dataFormats: ResultDataFormat[]) => this;
   setExecutionContext: (context: IConnectionExecutionContext | null) => this;
+
   setTotalCount: (resultIndex: number, count: number) => this;
   loadTotalCount: (resultIndex: number) => Promise<ITask<number>>;
   cancelLoadTotalCount: () => Promise<ITask<number> | null>;
@@ -91,7 +105,8 @@ export interface IDatabaseDataSource<TOptions, TResult extends IDatabaseDataResu
   /** Allows to perform an asynchronous action on the data source, this action will wait previous action to finish and save or load requests.
    * The data source will have a loading and disabled state while performing an action */
   runTask: <T>(task: () => Promise<T>) => Promise<T>;
-  requestData: () => Promise<void> | void;
+  requestDataPortion(offset: number, count: number): Promise<void>;
+  requestData: (mutation?: () => void) => Promise<void> | void;
   refreshData: () => Promise<void> | void;
   saveData: () => Promise<void> | void;
   cancel: () => Promise<void> | void;

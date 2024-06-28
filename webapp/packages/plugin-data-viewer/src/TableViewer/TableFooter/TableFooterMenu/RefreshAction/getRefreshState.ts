@@ -15,7 +15,7 @@ import { IDatabaseDataResult } from '../../../../DatabaseDataModel/IDatabaseData
 export function getRefreshState(context: IDataContextProvider): DatabaseRefreshAction<IDatabaseDataResult> | null {
   const model = context.get(DATA_CONTEXT_DV_DDM)!;
   const resultIndex = context.get(DATA_CONTEXT_DV_DDM_RESULT_INDEX);
-  if (resultIndex === undefined) {
+  if (resultIndex === undefined || !model.source.hasResult(resultIndex)) {
     return null;
   }
   return model.source.getAction(resultIndex, DatabaseRefreshAction);
