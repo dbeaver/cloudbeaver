@@ -77,6 +77,7 @@ const testValueNew = false;
 
 const deprecatedSettings = {
   'core.app.dataViewer.disableEdit': testValueDeprecated,
+  'plugin.data-export.disabled': testValueDeprecated,
 };
 
 const newSettings = {

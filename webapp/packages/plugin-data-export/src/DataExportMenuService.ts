@@ -11,7 +11,6 @@ import { injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
 import { LocalizationService } from '@cloudbeaver/core-localization';
 import { DATA_CONTEXT_NAV_NODE, EObjectFeature } from '@cloudbeaver/core-navigation-tree';
-import { EAdminPermission, SessionPermissionsResource } from '@cloudbeaver/core-root';
 import { withTimestamp } from '@cloudbeaver/core-utils';
 import { ACTION_EXPORT, ActionService, menuExtractItems, MenuService } from '@cloudbeaver/core-view';
 import {
@@ -26,18 +25,14 @@ import {
 } from '@cloudbeaver/plugin-data-viewer';
 import type { IDataQueryOptions } from '@cloudbeaver/plugin-sql-editor';
 
-import { DataExportSettingsService } from './DataExportSettingsService';
-
 const DataExportDialog = importLazyComponent(() => import('./Dialog/DataExportDialog').then(module => module.DataExportDialog));
 
 @injectable()
 export class DataExportMenuService {
   constructor(
     private readonly commonDialogService: CommonDialogService,
-    private readonly dataExportSettingsService: DataExportSettingsService,
     private readonly actionService: ActionService,
     private readonly menuService: MenuService,
-    private readonly sessionPermissionsResource: SessionPermissionsResource,
     private readonly localizationService: LocalizationService,
     private readonly dataViewerService: DataViewerService,
   ) {}
@@ -48,7 +43,7 @@ export class DataExportMenuService {
       contexts: [DATA_CONTEXT_DV_DDM, DATA_CONTEXT_DV_DDM_RESULT_INDEX],
       isApplicable: context => {
         const presentation = context.get(DATA_CONTEXT_DV_PRESENTATION);
-        return !this.isExportDisabled() && (!presentation || presentation.type === DataViewerPresentationType.Data);
+        return this.dataViewerService.canExportData && (!presentation || presentation.type === DataViewerPresentationType.Data);
       },
       getItems(context, items) {
         return [...items, ACTION_EXPORT];
@@ -62,7 +57,7 @@ export class DataExportMenuService {
       id: 'data-export-base-handler',
       menus: [DATA_VIEWER_DATA_MODEL_ACTIONS_MENU],
       contexts: [DATA_CONTEXT_DV_DDM, DATA_CONTEXT_DV_DDM_RESULT_INDEX],
-      isHidden: (context, action) => !this.dataViewerService.canDownload,
+      isHidden: (context, action) => !this.dataViewerService.canExportData,
       actions: [ACTION_EXPORT],
       isDisabled(context) {
         const model = context.get(DATA_CONTEXT_DV_DDM)!;
@@ -121,7 +116,7 @@ export class DataExportMenuService {
           return false;
         }
 
-        return !this.isExportDisabled() && context.has(DATA_CONTEXT_CONNECTION);
+        return this.dataViewerService.canExportData && context.has(DATA_CONTEXT_CONNECTION);
       },
       getItems: (context, items) => [...items, ACTION_EXPORT],
     });
@@ -143,13 +138,5 @@ export class DataExportMenuService {
         });
       },
     });
-  }
-
-  private isExportDisabled() {
-    if (this.sessionPermissionsResource.has(EAdminPermission.admin)) {
-      return false;
-    }
-
-    return this.dataExportSettingsService.disabled;
   }
 }

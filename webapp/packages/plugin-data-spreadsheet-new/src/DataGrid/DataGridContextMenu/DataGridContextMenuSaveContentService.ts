@@ -46,7 +46,7 @@ export class DataGridContextMenuSaveContentService {
       isHidden: context => {
         const content = context.data.model.source.getAction(context.data.resultIndex, ResultSetDataContentAction);
 
-        return !content.isDownloadable(context.data.key) || !this.dataViewerService.canDownload;
+        return !content.isDownloadable(context.data.key) || !this.dataViewerService.canExportData;
       },
       isDisabled: context => {
         const content = context.data.model.source.getAction(context.data.resultIndex, ResultSetDataContentAction);

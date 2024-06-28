@@ -78,7 +78,7 @@ export const TextValuePresentation: TabContainerPanelComponent<IDataValuePanelPr
     const autoLineWrapping = getDefaultLineWrapping(contentType);
     const lineWrapping = state.lineWrapping ?? autoLineWrapping;
     const isReadonly = isTextValueReadonly({ model, resultIndex, contentAction, cell: firstSelectedCell, formatAction });
-    const canSave = firstSelectedCell && contentAction.isDownloadable(firstSelectedCell) && dataViewerService.canDownload;
+    const canSave = firstSelectedCell && contentAction.isDownloadable(firstSelectedCell) && dataViewerService.canExportData;
 
     function valueChangeHandler(newValue: string) {
       if (firstSelectedCell && !isReadonly) {

@@ -28,10 +28,10 @@ const DEFAULT_FETCH_SIZE = 200;
 const defaultSettings = schema.object({
   'plugin.data-viewer.disableEdit': schemaExtra.stringedBoolean().default(false),
   'plugin.data-viewer.disableCopyData': schemaExtra.stringedBoolean().default(false),
-  'plugin.data-viewer.disableDownload': schemaExtra.stringedBoolean().default(false),
   'plugin.data-viewer.fetchMin': schema.coerce.number().min(FETCH_MIN).default(DEFAULT_FETCH_SIZE),
   'plugin.data-viewer.fetchMax': schema.coerce.number().min(FETCH_MIN).default(FETCH_MAX),
   'resultset.maxrows': schema.coerce.number().min(FETCH_MIN).max(FETCH_MAX).default(DEFAULT_FETCH_SIZE),
+  'plugin.data-export.disabled': schemaExtra.stringedBoolean().default(false),
 });
 
 export type DataViewerSettings = schema.infer<typeof defaultSettings>;
@@ -46,8 +46,8 @@ export class DataViewerSettingsService extends Dependency {
     return this.settings.getValue('plugin.data-viewer.disableCopyData');
   }
 
-  get disableDownload(): boolean {
-    return this.settings.getValue('plugin.data-viewer.disableDownload');
+  get disableExportData(): boolean {
+    return this.settings.getValue('plugin.data-export.disabled');
   }
 
   get maxFetchSize(): number {
@@ -133,16 +133,6 @@ export class DataViewerSettingsService extends Dependency {
           group: DATA_EDITOR_SETTINGS_GROUP,
         },
         {
-          key: 'plugin.data-viewer.disableDownload',
-          access: {
-            scope: ['server'],
-          },
-          type: ESettingsValueType.Checkbox,
-          name: 'settings_data_editor_disable_data_download_name',
-          description: 'settings_data_editor_disable_data_download_description',
-          group: DATA_EDITOR_SETTINGS_GROUP,
-        },
-        {
           key: 'plugin.data-viewer.fetchMin',
           access: {
             scope: ['server'],
@@ -161,6 +151,16 @@ export class DataViewerSettingsService extends Dependency {
           name: 'settings_data_editor_fetch_max_name',
           description: 'settings_data_editor_fetch_max_description',
           group: DATA_EDITOR_SETTINGS_GROUP,
+        },
+        {
+          group: DATA_EDITOR_SETTINGS_GROUP,
+          key: 'plugin.data-export.disabled',
+          type: ESettingsValueType.Checkbox,
+          name: 'settings_data_editor_disable_data_download_name',
+          description: 'settings_data_editor_disable_data_download_description',
+          access: {
+            scope: ['server'],
+          },
         },
       ];
 

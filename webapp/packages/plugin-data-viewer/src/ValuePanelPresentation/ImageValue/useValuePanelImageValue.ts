@@ -90,7 +90,7 @@ export function useValuePanelImageValue({ model, resultIndex }: Props) {
         return this.contentAction.retrieveBlobFromCache(this.selectedCell);
       },
       get canSave() {
-        if (!this.dataViewerService.canDownload) {
+        if (!this.dataViewerService.canExportData) {
           return false;
         }
 

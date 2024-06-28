@@ -17,8 +17,8 @@ export class DataViewerService {
     return this.sessionPermissionsResource.has(EAdminPermission.admin) || !this.dataViewerSettingsService.disableCopyData;
   }
 
-  get canDownload() {
-    return this.sessionPermissionsResource.has(EAdminPermission.admin) || !this.dataViewerSettingsService.disableDownload;
+  get canExportData() {
+    return this.sessionPermissionsResource.has(EAdminPermission.admin) || !this.dataViewerSettingsService.disableExportData;
   }
 
   constructor(
