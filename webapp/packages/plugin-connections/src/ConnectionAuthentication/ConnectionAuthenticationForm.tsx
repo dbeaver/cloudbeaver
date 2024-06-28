@@ -30,6 +30,7 @@ export interface ConnectionAuthenticationFormProps {
   networkHandlers?: string[];
   formId?: string;
   allowSaveCredentials?: boolean;
+  distributed: boolean;
   disabled?: boolean;
   className?: string;
   hideFeatures?: string[];
@@ -44,6 +45,7 @@ export const ConnectionAuthenticationForm = observer<ConnectionAuthenticationFor
   allowSaveCredentials,
   disabled,
   className,
+  distributed,
   hideFeatures,
 }) {
   const translate = useTranslate();
@@ -77,7 +79,16 @@ export const ConnectionAuthenticationForm = observer<ConnectionAuthenticationFor
                 <FieldCheckbox
                   id={formId || 'DBAuthSaveCredentials'}
                   name="saveCredentials"
-                  label={translate('connections_connection_edit_save_credentials')}
+                  label={translate(
+                    distributed
+                      ? 'connections_connection_authentication_save_credentials_for_user'
+                      : 'connections_connection_authentication_save_credentials_for_session',
+                  )}
+                  title={translate(
+                    distributed
+                      ? 'connections_connection_authentication_save_credentials_for_user_tooltip'
+                      : 'connections_connection_authentication_save_credentials_for_session_tooltip',
+                  )}
                   disabled={disabled}
                   state={config}
                 />
@@ -90,6 +101,7 @@ export const ConnectionAuthenticationForm = observer<ConnectionAuthenticationFor
       )}
       {networkHandlers && config.networkHandlersConfig && (
         <NetworkHandlers
+          distributed={distributed}
           networkHandlers={networkHandlers}
           networkHandlersConfig={config.networkHandlersConfig}
           allowSaveCredentials={allowSaveCredentials}

@@ -13,6 +13,7 @@ import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dial
 import { ENotificationType, NotificationService } from '@cloudbeaver/core-events';
 import { ExecutorHandlersCollection, ExecutorInterrupter, IExecutorHandler, IExecutorHandlersCollection } from '@cloudbeaver/core-executor';
 import { LocalizationService } from '@cloudbeaver/core-localization';
+import { ServerConfigResource } from '@cloudbeaver/core-root';
 import { TabsContainer } from '@cloudbeaver/core-ui';
 
 import { ConnectionAuthenticationDialogLoader } from '../ConnectionAuthentication/ConnectionAuthenticationDialogLoader';
@@ -52,6 +53,7 @@ export class ConnectionFormService {
     private readonly notificationService: NotificationService,
     private readonly commonDialogService: CommonDialogService,
     private readonly localizationService: LocalizationService,
+    private readonly serverConfigResource: ServerConfigResource,
   ) {
     this.tabsContainer = new TabsContainer('Connection settings');
     this.actionsContainer = new PlaceholderContainer();
@@ -153,6 +155,7 @@ export class ConnectionFormService {
       authModelId: credentialsState.authModelId,
       networkHandlers: credentialsState.networkHandlers,
       driverId: config.driverId,
+      distributed: this.serverConfigResource.distributed,
     });
 
     if (result === DialogueStateResult.Rejected) {

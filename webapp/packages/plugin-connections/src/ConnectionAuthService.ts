@@ -18,6 +18,8 @@ import {
 import { Dependency, injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
+import { isSharedProject, ProjectInfoResource } from '@cloudbeaver/core-projects';
+import { ServerConfigResource } from '@cloudbeaver/core-root';
 import { AuthenticationService } from '@cloudbeaver/plugin-authentication';
 
 const DatabaseAuthDialog = importLazyComponent(() => import('./DatabaseAuthDialog/DatabaseAuthDialog').then(m => m.DatabaseAuthDialog));
@@ -30,6 +32,8 @@ export class ConnectionAuthService extends Dependency {
     private readonly authProviderService: AuthProviderService,
     private readonly connectionsManagerService: ConnectionsManagerService,
     private readonly authenticationService: AuthenticationService,
+    private readonly serverConfigResource: ServerConfigResource,
+    private readonly projectInfoResource: ProjectInfoResource,
   ) {
     super();
 
@@ -38,6 +42,20 @@ export class ConnectionAuthService extends Dependency {
       connections: connectionInfoResource.values.filter(connection => connection.connected).map(createConnectionParam),
       state,
     }));
+  }
+
+  isConnectionShared(projectId: string | null): boolean {
+    if (projectId === null) {
+      return false;
+    }
+
+    const project = this.projectInfoResource.get(projectId);
+
+    if (!project) {
+      return false;
+    }
+
+    return isSharedProject(project);
   }
 
   private async connectionDialog(data: IRequireConnectionExecutorData, context: IExecutionContextProvider<IRequireConnectionExecutorData | null>) {
@@ -86,6 +104,7 @@ export class ConnectionAuthService extends Dependency {
         connection: key,
         networkHandlers,
         resetCredentials,
+        distributed: this.serverConfigResource.distributed,
       });
 
       if (resetCredentials && isConnectedInitially && result === DialogueStateResult.Rejected) {

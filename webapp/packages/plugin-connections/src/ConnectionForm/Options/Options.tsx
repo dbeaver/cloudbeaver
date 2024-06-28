@@ -38,13 +38,13 @@ import { DriverConfigurationType } from '@cloudbeaver/core-sdk';
 import { type TabContainerPanelComponent, TabsContext, useAuthenticationAction } from '@cloudbeaver/core-ui';
 import { ProjectSelect } from '@cloudbeaver/plugin-projects';
 
+import { ConnectionAuthService } from '../../ConnectionAuthService';
 import { ConnectionAuthModelCredentialsForm } from '../ConnectionAuthModelCredentials/ConnectionAuthModelCredentialsForm';
 import { ConnectionAuthModelSelector } from '../ConnectionAuthModelCredentials/ConnectionAuthModelSelector';
 import { ConnectionFormService } from '../ConnectionFormService';
 import type { IConnectionFormProps } from '../IConnectionFormProps';
 import { CONNECTION_FORM_SHARED_CREDENTIALS_TAB_ID } from '../SharedCredentials/CONNECTION_FORM_SHARED_CREDENTIALS_TAB_ID';
 import { AdvancedPropertiesForm } from './AdvancedPropertiesForm';
-import { ConnectionOptionsTabService } from './ConnectionOptionsTabService';
 import styles from './Options.module.css';
 import { ParametersForm } from './ParametersForm';
 import { ProviderPropertiesForm } from './ProviderPropertiesForm';
@@ -72,13 +72,14 @@ const driverConfiguration: IDriverConfiguration[] = [
 
 export const Options: TabContainerPanelComponent<IConnectionFormProps> = observer(function Options({ state }) {
   const serverConfigResource = useResource(Options, ServerConfigResource, undefined);
-  const connectionOptionsTabService = useService(ConnectionOptionsTabService);
   const service = useService(ConnectionFormService);
+  const connectionAuthService = useService(ConnectionAuthService);
   const formRef = useRef<HTMLFormElement>(null);
   const translate = useTranslate();
   const { info, config, availableDrivers, submittingTask: submittingHandlers, disabled } = state;
   const style = useS(styles);
   const tabsState = useContext(TabsContext);
+  const isSharedConnection = connectionAuthService.isConnectionShared(state.projectId);
 
   //@TODO it's here until the profile implementation in the CloudBeaver
   const readonly = state.readonly || info?.authModel === PROFILE_AUTH_MODEL_ID;
@@ -283,7 +284,7 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
           {!driver?.anonymousAccess && (authentication.authorized || !edit) && (
             <Group form gap>
               <GroupTitle>{translate('connections_connection_edit_authentication')}</GroupTitle>
-              {serverConfigResource.resource.distributed && connectionOptionsTabService.isProjectShared(state) && (
+              {serverConfigResource.resource.distributed && isSharedConnection && (
                 <FieldCheckbox
                   id={config.connectionId + 'isShared'}
                   name="sharedCredentials"
@@ -329,9 +330,18 @@ export const Options: TabContainerPanelComponent<IConnectionFormProps> = observe
                   state={config}
                   disabled={disabled || readonly || config.sharedCredentials}
                   mod={['primary']}
+                  title={translate(
+                    !isSharedConnection || serverConfigResource.data?.distributed
+                      ? 'connections_connection_authentication_save_credentials_for_user_tooltip'
+                      : 'connections_connection_edit_save_credentials_shared_tooltip',
+                  )}
                   keepSize
                 >
-                  {translate('connections_connection_edit_save_credentials')}
+                  {translate(
+                    !isSharedConnection || serverConfigResource.data?.distributed
+                      ? 'connections_connection_authentication_save_credentials_for_user'
+                      : 'connections_connection_edit_save_credentials_shared',
+                  )}
                 </FieldCheckbox>
               )}
             </Group>

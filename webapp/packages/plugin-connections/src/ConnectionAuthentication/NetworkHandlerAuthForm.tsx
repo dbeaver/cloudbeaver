@@ -19,9 +19,16 @@ interface Props {
   networkHandlersConfig: NetworkHandlerConfigInput[];
   allowSaveCredentials?: boolean;
   disabled?: boolean;
+  distributed: boolean;
 }
 
-export const NetworkHandlerAuthForm = observer<Props>(function NetworkHandlerAuthForm({ id, networkHandlersConfig, allowSaveCredentials, disabled }) {
+export const NetworkHandlerAuthForm = observer<Props>(function NetworkHandlerAuthForm({
+  id,
+  networkHandlersConfig,
+  allowSaveCredentials,
+  disabled,
+  distributed,
+}) {
   const translate = useTranslate();
   const handler = useResource(NetworkHandlerAuthForm, NetworkHandlerResource, id);
 
@@ -70,7 +77,16 @@ export const NetworkHandlerAuthForm = observer<Props>(function NetworkHandlerAut
           id={id + '_savePassword'}
           name="savePassword"
           state={state}
-          label={translate('connections_connection_edit_save_credentials')}
+          label={translate(
+            distributed
+              ? 'connections_connection_authentication_save_credentials_for_user'
+              : 'connections_connection_authentication_save_credentials_for_session',
+          )}
+          title={translate(
+            distributed
+              ? 'connections_connection_authentication_save_credentials_for_user_tooltip'
+              : 'connections_connection_authentication_save_credentials_for_session_tooltip',
+          )}
           disabled={disabled}
         />
       )}

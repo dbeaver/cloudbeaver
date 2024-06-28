@@ -27,10 +27,13 @@ import {
   useTranslate,
 } from '@cloudbeaver/core-blocks';
 import { NetworkHandlerResource, SSH_TUNNEL_ID } from '@cloudbeaver/core-connections';
+import { useService } from '@cloudbeaver/core-di';
+import { ServerConfigResource } from '@cloudbeaver/core-root';
 import { NetworkHandlerAuthType, NetworkHandlerConfigInput } from '@cloudbeaver/core-sdk';
 import type { TabContainerPanelComponent } from '@cloudbeaver/core-ui';
 import { isSafari } from '@cloudbeaver/core-utils';
 
+import { ConnectionAuthService } from '../../ConnectionAuthService';
 import type { IConnectionFormProps } from '../IConnectionFormProps';
 import { authTypes } from './authTypes';
 import styles from './SSH.module.css';
@@ -44,6 +47,7 @@ export const SSH: TabContainerPanelComponent<Props> = observer(function SSH({ st
   const { info, readonly, disabled: formDisabled } = formState;
   const [loading, setLoading] = useState(false);
   const { credentialsSavingEnabled } = useAdministrationSettings();
+  const serverConfigResource = useResource(SSH, ServerConfigResource, undefined);
 
   const initialConfig = info?.networkHandlersConfig?.find(handler => handler.id === SSH_TUNNEL_ID);
 
@@ -75,6 +79,8 @@ export const SSH: TabContainerPanelComponent<Props> = observer(function SSH({ st
   const passwordLabel = keyAuth ? 'Passphrase' : translate('connections_network_handler_ssh_tunnel_password');
   const passwordSaved = initialConfig?.password === '' && initialConfig.authType === handlerState.authType;
   const keySaved = initialConfig?.key === '';
+  const connectionAuthService = useService(ConnectionAuthService);
+  const isSharedConnection = connectionAuthService.isConnectionShared(formState.projectId);
 
   const aliveIntervalLabel = translate('connections_network_handler_ssh_tunnel_advanced_settings_alive_interval');
   const connectTimeoutLabel = translate('connections_network_handler_ssh_tunnel_advanced_settings_connect_timeout');
@@ -140,8 +146,22 @@ export const SSH: TabContainerPanelComponent<Props> = observer(function SSH({ st
             {keyAuth && <SSHKeyUploader state={handlerState} saved={keySaved} disabled={disabled || !enabled} readonly={readonly} />}
           </Container>
           {credentialsSavingEnabled && !formState.config.template && !formState.config.sharedCredentials && (
-            <FieldCheckbox id={SSH_TUNNEL_ID + '_savePassword'} name="savePassword" state={handlerState} disabled={disabled || !enabled || readonly}>
-              {translate('connections_connection_edit_save_credentials')}
+            <FieldCheckbox
+              id={SSH_TUNNEL_ID + '_savePassword'}
+              title={translate(
+                !isSharedConnection || serverConfigResource.data?.distributed
+                  ? 'connections_connection_authentication_save_credentials_for_user_tooltip'
+                  : 'connections_connection_edit_save_credentials_shared_tooltip',
+              )}
+              name="savePassword"
+              state={handlerState}
+              disabled={disabled || !enabled || readonly}
+            >
+              {translate(
+                !isSharedConnection || serverConfigResource.data?.distributed
+                  ? 'connections_connection_authentication_save_credentials_for_user_tooltip'
+                  : 'connections_connection_edit_save_credentials_shared_tooltip',
+              )}
             </FieldCheckbox>
           )}
           <Container gap>

@@ -17,6 +17,7 @@ import { DatabaseSecretAuthDialog } from './DatabaseSecretAuthDialog/DatabaseSec
 interface Payload {
   connection: IConnectionInfoParams;
   networkHandlers: string[];
+  distributed: boolean;
   resetCredentials?: boolean;
 }
 
@@ -50,6 +51,7 @@ export const DatabaseAuthDialog: DialogComponent<Payload> = observer(function Da
           connection={payload.connection}
           networkHandlers={payload.networkHandlers}
           resetCredentials={payload.resetCredentials}
+          distributed={payload.distributed}
           onLogin={resolveDialog}
         />
       )}

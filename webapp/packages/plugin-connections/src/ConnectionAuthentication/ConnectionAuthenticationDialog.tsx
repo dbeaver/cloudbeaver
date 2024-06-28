@@ -31,6 +31,7 @@ export interface ConnectionAuthenticationDialogPayload {
   authModelId: string | null;
   networkHandlers?: string[];
   driverId?: string;
+  distributed: boolean;
 }
 
 export const ConnectionAuthenticationDialog: DialogComponent<ConnectionAuthenticationDialogPayload> = observer(
@@ -57,6 +58,7 @@ export const ConnectionAuthenticationDialog: DialogComponent<ConnectionAuthentic
               formId={payload.config.connectionId || payload.driverId}
               className={s(styles, { connectionAuthenticationFormLoader: true })}
               hideFeatures={['nonSecuredProperty']}
+              distributed={payload.distributed}
             />
           </Form>
         </CommonDialogBody>
