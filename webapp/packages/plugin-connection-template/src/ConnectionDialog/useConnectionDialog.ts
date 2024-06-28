@@ -76,7 +76,7 @@ export function useConnectionDialog(onConnect?: () => void) {
         return this.template?.authModel || this.driver?.defaultAuthModel || null;
       },
       get distributed() {
-        return this.serverConfigResource.distributed;
+        return Boolean(this.serverConfigResource.data?.distributed);
       },
       step: ConnectionStep.ConnectionTemplateSelect,
       template: null as Connection | null,
