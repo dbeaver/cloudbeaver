@@ -52,6 +52,7 @@
     "@cloudbeaver/core-version": "^0",
     "@cloudbeaver/core-version-update": "^0",
     "@cloudbeaver/core-view": "^0",
+    "@cloudbeaver/core-website": "^0",
     "mobx": "^6",
     "react": "^18",
     "react-dom": "^18"

@@ -13,6 +13,12 @@
       "path": "../core-di/tsconfig.json"
     },
     {
+      "path": "../core-di/tsconfig.json"
+    },
+    {
+      "path": "../core-dialogs/tsconfig.json"
+    },
+    {
       "path": "../core-dialogs/tsconfig.json"
     },
     {
@@ -47,6 +53,9 @@
     },
     {
       "path": "../core-theming/tsconfig.json"
+    },
+    {
+      "path": "../core-utils/tsconfig.json"
     },
     {
       "path": "../core-utils/tsconfig.json"
