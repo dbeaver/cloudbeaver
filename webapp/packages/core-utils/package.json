@@ -26,7 +26,7 @@
     "md5": "^2",
     "mobx": "^6",
     "underscore": "^1",
-    "uuid": "^9",
+    "uuid": "^10",
     "whatwg-mimetype": "^4",
     "zod": "^3",
     "zod-i18n-map": "^2",
@@ -38,9 +38,10 @@
     "@types/md5": "^2",
     "@types/react": "^18",
     "@types/underscore": "^1",
-    "@types/uuid": "^9",
+    "@types/uuid": "^10",
     "@types/whatwg-mimetype": "^3",
     "react": "^18",
-    "typescript": "^5"
+    "typescript": "^5",
+    "zod": "^3"
   }
 }
