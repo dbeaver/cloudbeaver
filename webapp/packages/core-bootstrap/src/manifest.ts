@@ -38,6 +38,7 @@ import { coreUIManifest } from '@cloudbeaver/core-ui';
 import { coreVersionManifest } from '@cloudbeaver/core-version';
 import { coreVersionUpdateManifest } from '@cloudbeaver/core-version-update';
 import { coreViewManifest } from '@cloudbeaver/core-view';
+import { coreWebsiteManifest } from '@cloudbeaver/core-website';
 
 export const coreManifests: PluginManifest[] = [
   {
@@ -63,6 +64,7 @@ export const coreManifests: PluginManifest[] = [
   coreResourceManifest,
   coreSDKManifest,
   coreRootManifest,
+  coreWebsiteManifest,
   coreBrowserSettingsManifest,
   coreBrowserCookiesManifest,
   coreProductManifest,

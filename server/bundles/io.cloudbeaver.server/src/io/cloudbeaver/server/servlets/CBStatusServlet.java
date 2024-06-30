@@ -17,12 +17,14 @@
 package io.cloudbeaver.server.servlets;
 
 import com.google.gson.stream.JsonWriter;
+import io.cloudbeaver.server.CBApplication;
 import io.cloudbeaver.server.CBConstants;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.eclipse.jetty.servlet.DefaultServlet;
+import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.data.json.JSONUtils;
 import org.jkiss.dbeaver.utils.GeneralUtils;
@@ -44,6 +46,7 @@ public class CBStatusServlet extends DefaultServlet {
         infoMap.put("health", "ok");
         infoMap.put("product.name", GeneralUtils.getProductName());
         infoMap.put("product.version", GeneralUtils.getProductVersion().toString());
+        CBApplication.getInstance().getStatusInfo(infoMap);
         try (JsonWriter writer = new JsonWriter(response.getWriter())) {
             JSONUtils.serializeMap(writer, infoMap);
         }

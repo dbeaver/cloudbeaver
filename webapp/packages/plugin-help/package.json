@@ -28,6 +28,7 @@
     "@cloudbeaver/core-routing": "^0",
     "@cloudbeaver/core-utils": "^0",
     "@cloudbeaver/core-view": "^0",
+    "@cloudbeaver/core-website": "^0",
     "@cloudbeaver/plugin-navigation-tree": "^0",
     "@cloudbeaver/plugin-sql-editor": "^0",
     "@cloudbeaver/plugin-top-app-bar": "^0",
