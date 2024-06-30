@@ -135,8 +135,8 @@ export class DataViewerTabService {
       const model = this.tableViewerStorageService.get(tableId);
 
       if (model) {
-        this.tableViewerStorageService.remove(tableId);
         await model.dispose();
+        this.tableViewerStorageService.remove(tableId);
       }
     }
   }
