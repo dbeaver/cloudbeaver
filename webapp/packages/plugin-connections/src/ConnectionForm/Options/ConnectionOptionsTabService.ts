@@ -216,6 +216,7 @@ export class ConnectionOptionsTabService extends Bootstrap {
     state.config.sharedCredentials = state.info.sharedCredentials;
 
     state.config.keepAliveInterval = state.info.keepAliveInterval;
+    state.config.autocommit = state.info.autocommit;
 
     if (state.info.authProperties) {
       for (const property of state.info.authProperties) {
@@ -282,6 +283,7 @@ export class ConnectionOptionsTabService extends Bootstrap {
     tempConfig.driverId = state.config.driverId;
 
     tempConfig.keepAliveInterval = Number(state.config.keepAliveInterval);
+    tempConfig.autocommit = state.config.autocommit;
 
     if (!state.config.template && state.config.folder) {
       tempConfig.folder = state.config.folder;
@@ -398,7 +400,8 @@ export class ConnectionOptionsTabService extends Bootstrap {
       (config.sharedCredentials !== undefined && config.sharedCredentials !== data.info.sharedCredentials) ||
       (config.providerProperties !== undefined &&
         !isObjectPropertyInfoStateEqual(driver.providerProperties, config.providerProperties, data.info.providerProperties)) ||
-      (config.keepAliveInterval !== undefined && !isValuesEqual(config.keepAliveInterval, data.info.keepAliveInterval))
+      (config.keepAliveInterval !== undefined && !isValuesEqual(config.keepAliveInterval, data.info.keepAliveInterval)) ||
+      (config.autocommit !== undefined && !isValuesEqual(config.autocommit, data.info.autocommit))
     ) {
       stateContext.markEdited();
     }

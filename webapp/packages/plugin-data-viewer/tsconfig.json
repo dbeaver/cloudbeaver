@@ -112,6 +112,9 @@
       "path": "../core-view/tsconfig.json"
     },
     {
+      "path": "../core-website/tsconfig.json"
+    },
+    {
       "path": "../plugin-codemirror6/tsconfig.json"
     },
     {

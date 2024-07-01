@@ -42,6 +42,9 @@
       "path": "../core-utils/tsconfig.json"
     },
     {
+      "path": "../core-website/tsconfig.json"
+    },
+    {
       "path": "../tests-runner/tsconfig.json"
     }
   ],
