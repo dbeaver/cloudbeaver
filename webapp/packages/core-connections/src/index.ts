@@ -1,3 +1,10 @@
+/*
+ * CloudBeaver - Cloud Database Manager
+ * Copyright (C) 2020-2024 DBeaver Corp and others
+ *
+ * Licensed under the Apache License, Version 2.0.
+ * you may not use this file except in compliance with the License.
+ */
 export * from './ConnectionExecutionContext/ConnectionExecutionContext';
 export * from './ConnectionExecutionContext/ConnectionExecutionContextResource';
 export * from './ConnectionExecutionContext/ConnectionExecutionContextService';
@@ -32,6 +39,7 @@ export * from './ContainerResource';
 export * from './ConnectionsLocaleService';
 export * from './createConnectionFolderParam';
 export * from './DatabaseAuthModelsResource';
+export * from './ConnectionPublicSecretsResource';
 export * from './DatabaseConnection';
 export * from './DBDriverResource';
 export * from './CONNECTION_INFO_PARAM_SCHEMA';

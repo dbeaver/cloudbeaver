@@ -38,10 +38,6 @@ fragment DatabaseConnection on ConnectionInfo {
     ...ObjectOriginInfo
   }
 
-  sharedSecrets @include(if: $includeSharedSecrets) {
-    displayName
-    secretId
-  }
   authNeeded @include(if: $includeAuthNeeded)
   authModel
 

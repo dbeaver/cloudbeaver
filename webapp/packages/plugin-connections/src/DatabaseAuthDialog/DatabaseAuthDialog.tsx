@@ -8,7 +8,7 @@
 import { observer } from 'mobx-react-lite';
 
 import { CommonDialogHeader, CommonDialogWrapper, useResource, useTranslate } from '@cloudbeaver/core-blocks';
-import { ConnectionInfoResource, DBDriverResource, type IConnectionInfoParams } from '@cloudbeaver/core-connections';
+import { ConnectionInfoResource, ConnectionPublicSecretsResource, DBDriverResource, type IConnectionInfoParams } from '@cloudbeaver/core-connections';
 import type { DialogComponent } from '@cloudbeaver/core-dialogs';
 
 import { DatabaseCredentialsAuthDialog } from './DatabaseCredentialsAuthDialog/DatabaseCredentialsAuthDialog';
@@ -23,11 +23,12 @@ interface Payload {
 export const DatabaseAuthDialog: DialogComponent<Payload> = observer(function DatabaseAuthDialog({ payload, options, rejectDialog, resolveDialog }) {
   const connectionInfoLoader = useResource(DatabaseAuthDialog, ConnectionInfoResource, {
     key: payload.connection,
-    includes: ['includeAuthNeeded', 'includeSharedSecrets', 'includeNetworkHandlersConfig', 'includeCredentialsSaved'],
+    includes: ['includeAuthNeeded', 'includeNetworkHandlersConfig', 'includeCredentialsSaved'],
   });
   const translate = useTranslate();
   const driverLoader = useResource(DatabaseAuthDialog, DBDriverResource, connectionInfoLoader.data?.driverId || null);
-  const useSharedCredentials = (connectionInfoLoader.data?.sharedSecrets?.length || 0) > 1;
+  const connectionPublicSecretsLoader = useResource(DatabaseSecretAuthDialog, ConnectionPublicSecretsResource, payload.connection);
+  const useSharedCredentials = (connectionPublicSecretsLoader.data?.length || 0) > 1;
 
   let subtitle = connectionInfoLoader.data?.name;
 
