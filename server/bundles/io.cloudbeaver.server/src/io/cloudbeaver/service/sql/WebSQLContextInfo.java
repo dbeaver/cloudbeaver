@@ -29,6 +29,7 @@ import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBUtils;
 import org.jkiss.dbeaver.model.data.DBDAttributeBinding;
 import org.jkiss.dbeaver.model.exec.*;
+import org.jkiss.dbeaver.model.exec.trace.DBCTrace;
 import org.jkiss.dbeaver.model.meta.Property;
 import org.jkiss.dbeaver.model.qm.QMTransactionState;
 import org.jkiss.dbeaver.model.qm.QMUtils;
@@ -142,13 +143,21 @@ public class WebSQLContextInfo implements WebSessionProvider {
         }
     }
 
+    /**
+     * Saves results info into cache.
+     * Helps to find it with results id sent by front-end.
+     */
     @NotNull
-    public WebSQLResultsInfo saveResult(@NotNull DBSDataContainer dataContainer, @NotNull DBDAttributeBinding[] attributes) {
+    public WebSQLResultsInfo saveResult(
+        @NotNull DBSDataContainer dataContainer,
+        @NotNull DBCTrace trace,
+        @NotNull DBDAttributeBinding[] attributes) {
         WebSQLResultsInfo resultInfo = new WebSQLResultsInfo(
             dataContainer,
             String.valueOf(resultId.incrementAndGet())
         );
         resultInfo.setAttributes(attributes);
+        resultInfo.setTrace(trace);
         resultInfoMap.put(resultInfo.getId(), resultInfo);
         return resultInfo;
     }

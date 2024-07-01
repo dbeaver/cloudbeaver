@@ -7,7 +7,7 @@
  */
 import type { ObjectPropertyInfo } from './sdk';
 
-export type ObjectPropertyType = 'checkbox' | 'selector' | 'link' | 'input' | 'textarea' | 'file';
+export type ObjectPropertyType = 'checkbox' | 'selector' | 'link' | 'textarea' | 'file' | 'input';
 
 export function getObjectPropertyType(property: ObjectPropertyInfo): ObjectPropertyType {
   const dataType = property.dataType?.toLowerCase();

@@ -25,6 +25,8 @@ import org.jkiss.dbeaver.model.DBPDataKind;
 import org.jkiss.dbeaver.model.DBUtils;
 import org.jkiss.dbeaver.model.data.*;
 import org.jkiss.dbeaver.model.exec.*;
+import org.jkiss.dbeaver.model.exec.trace.DBCTrace;
+import org.jkiss.dbeaver.model.exec.trace.DBCTraceDynamic;
 import org.jkiss.dbeaver.model.impl.data.DBDValueError;
 import org.jkiss.dbeaver.model.meta.MetaData;
 import org.jkiss.dbeaver.model.sql.DBQuotaException;
@@ -48,6 +50,7 @@ class WebSQLQueryDataReceiver implements DBDDataReceiver {
     private final WebSQLQueryResultSet webResultSet = new WebSQLQueryResultSet();
 
     private DBDAttributeBinding[] bindings;
+    private DBCTrace trace;
     private List<WebSQLQueryResultSetRow> rows = new ArrayList<>();
     private final Number rowLimit;
 
@@ -70,6 +73,9 @@ class WebSQLQueryDataReceiver implements DBDDataReceiver {
         for (int i = 0; i < attributes.size(); i++) {
             DBCAttributeMetaData attrMeta = attributes.get(i);
             bindings[i] = new DBDAttributeBindingMeta(dataContainer, dbResult.getSession(), attrMeta);
+        }
+        if (dbResult instanceof DBCResultSetTrace resultSetTrace) {
+            this.trace = resultSetTrace.getExecutionTrace();
         }
     }
 
@@ -153,8 +159,9 @@ class WebSQLQueryDataReceiver implements DBDDataReceiver {
         webResultSet.setRows(List.of(rows.toArray(new WebSQLQueryResultSetRow[0])));
         webResultSet.setHasChildrenCollection(resultSet instanceof DBDSubCollectionResultSet);
         webResultSet.setSupportsDataFilter(dataContainer.isFeatureSupported(DBSDataContainer.FEATURE_DATA_FILTER));
+        webResultSet.setHasDynamicTrace(trace instanceof DBCTraceDynamic);
 
-        WebSQLResultsInfo resultsInfo = contextInfo.saveResult(dataContainer, bindings);
+        WebSQLResultsInfo resultsInfo = contextInfo.saveResult(dataContainer, trace, bindings);
         webResultSet.setResultsInfo(resultsInfo);
 
         boolean isSingleEntity = DBExecUtils.detectSingleSourceTable(bindings) != null;

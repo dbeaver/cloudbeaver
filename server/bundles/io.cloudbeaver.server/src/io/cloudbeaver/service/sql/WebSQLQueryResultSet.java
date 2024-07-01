@@ -39,6 +39,7 @@ public class WebSQLQueryResultSet {
 
     private boolean hasChildrenCollection;
     private boolean isSupportsDataFilter;
+    private boolean hasDynamicTrace;
 
     public WebSQLQueryResultSet() {
     }
@@ -131,5 +132,14 @@ public class WebSQLQueryResultSet {
 
     public void setSupportsDataFilter(boolean supportsDataFilter) {
         isSupportsDataFilter = supportsDataFilter;
+    }
+
+    @Property
+    public boolean isHasDynamicTrace() {
+        return hasDynamicTrace;
+    }
+
+    public void setHasDynamicTrace(boolean hasDynamicTrace) {
+        this.hasDynamicTrace = hasDynamicTrace;
     }
 }
