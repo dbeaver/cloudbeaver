@@ -9,6 +9,7 @@ import { observer } from 'mobx-react-lite';
 
 import { FieldCheckbox, GroupTitle, InputField, ObjectPropertyInfoForm, useResource, useTranslate } from '@cloudbeaver/core-blocks';
 import { NetworkHandlerResource, SSH_TUNNEL_ID } from '@cloudbeaver/core-connections';
+import { ServerConfigResource } from '@cloudbeaver/core-root';
 import { NetworkHandlerAuthType, NetworkHandlerConfigInput } from '@cloudbeaver/core-sdk';
 
 import { SSHKeyUploader } from '../ConnectionForm/SSH/SSHKeyUploader';
@@ -19,18 +20,13 @@ interface Props {
   networkHandlersConfig: NetworkHandlerConfigInput[];
   allowSaveCredentials?: boolean;
   disabled?: boolean;
-  distributed: boolean;
 }
 
-export const NetworkHandlerAuthForm = observer<Props>(function NetworkHandlerAuthForm({
-  id,
-  networkHandlersConfig,
-  allowSaveCredentials,
-  disabled,
-  distributed,
-}) {
+export const NetworkHandlerAuthForm = observer<Props>(function NetworkHandlerAuthForm({ id, networkHandlersConfig, allowSaveCredentials, disabled }) {
   const translate = useTranslate();
   const handler = useResource(NetworkHandlerAuthForm, NetworkHandlerResource, id);
+  const serverConfigResource = useResource(NetworkHandlerAuthForm, ServerConfigResource, undefined);
+  const distributed = Boolean(serverConfigResource?.data?.distributed);
 
   //@TODO Do not mutate state in component body
   if (!networkHandlersConfig.some(state => state.id === id)) {

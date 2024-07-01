@@ -17,16 +17,9 @@ interface Props {
   networkHandlersConfig: NetworkHandlerConfigInput[];
   disabled?: boolean;
   allowSaveCredentials?: boolean;
-  distributed: boolean;
 }
 
-export const NetworkHandlers = observer<Props>(function NetworkHandlers({
-  networkHandlers,
-  networkHandlersConfig,
-  allowSaveCredentials,
-  disabled,
-  distributed,
-}) {
+export const NetworkHandlers = observer<Props>(function NetworkHandlers({ networkHandlers, networkHandlersConfig, allowSaveCredentials, disabled }) {
   if (!networkHandlers.length) {
     return null;
   }
@@ -37,7 +30,6 @@ export const NetworkHandlers = observer<Props>(function NetworkHandlers({
         <NetworkHandlerAuthForm
           key={handler}
           id={handler}
-          distributed={distributed}
           networkHandlersConfig={networkHandlersConfig}
           allowSaveCredentials={allowSaveCredentials}
           disabled={disabled}

@@ -32,7 +32,6 @@ interface Props {
   connection: IConnectionInfoParams;
   networkHandlers: string[];
   resetCredentials?: boolean;
-  distributed: boolean;
   onLogin?: () => void;
 }
 
@@ -41,7 +40,6 @@ export const DatabaseCredentialsAuthDialog = observer<Props>(function DatabaseCr
   networkHandlers,
   resetCredentials,
   onLogin,
-  distributed,
 }) {
   const styles = useS(style);
   const translate = useTranslate();
@@ -64,11 +62,11 @@ export const DatabaseCredentialsAuthDialog = observer<Props>(function DatabaseCr
               authProperties={dialog.connection?.authProperties}
               networkHandlers={networkHandlers}
               formId={`${connection.projectId}:${connection.connectionId}`}
+              projectId={connection.projectId}
               allowSaveCredentials={credentialsSavingEnabled}
               className={s(styles, { connectionAuthenticationFormLoader: true })}
               disabled={dialog.authenticating}
               hideFeatures={['nonSecuredProperty']}
-              distributed={distributed}
             />
           </Loader>
         </Form>

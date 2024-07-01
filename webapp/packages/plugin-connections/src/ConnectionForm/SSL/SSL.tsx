@@ -24,12 +24,12 @@ import {
   useTranslate,
 } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
+import { ProjectInfoResource } from '@cloudbeaver/core-projects';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
 import type { NetworkHandlerConfigInput, NetworkHandlerDescriptor } from '@cloudbeaver/core-sdk';
 import type { TabContainerPanelComponent } from '@cloudbeaver/core-ui';
 import { isSafari } from '@cloudbeaver/core-utils';
 
-import { ConnectionAuthService } from '../../ConnectionAuthService';
 import type { IConnectionFormProps } from '../IConnectionFormProps';
 import { SAVED_VALUE_INDICATOR } from './SAVED_VALUE_INDICATOR';
 import styles from './SSL.module.css';
@@ -53,8 +53,8 @@ export const SSL: TabContainerPanelComponent<Props> = observer(function SSL({ st
   const enabled = handlerState.enabled || false;
   const initialHandler = info?.networkHandlersConfig?.find(h => h.id === handler.id);
   const autofillToken = isSafari ? 'section-connection-authentication-ssl section-ssl' : 'new-password';
-  const connectionAuthService = useService(ConnectionAuthService);
-  const isSharedConnection = connectionAuthService.isConnectionShared(formState.projectId);
+  const projectInfoResource = useService(ProjectInfoResource);
+  const isSharedProject = projectInfoResource.isProjectShared(formState.projectId);
 
   return (
     <Form className={s(style, { form: true })}>
@@ -108,13 +108,13 @@ export const SSL: TabContainerPanelComponent<Props> = observer(function SSL({ st
               state={handlerState}
               disabled={disabled || !enabled || readonly || formState.config.sharedCredentials}
               title={translate(
-                !isSharedConnection || serverConfigResource.data?.distributed
+                !isSharedProject || serverConfigResource.data?.distributed
                   ? 'connections_connection_authentication_save_credentials_for_user_tooltip'
                   : 'connections_connection_edit_save_credentials_shared_tooltip',
               )}
             >
               {translate(
-                !isSharedConnection || serverConfigResource.data?.distributed
+                !isSharedProject || serverConfigResource.data?.distributed
                   ? 'connections_connection_authentication_save_credentials_for_user'
                   : 'connections_connection_edit_save_credentials_shared',
               )}

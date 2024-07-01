@@ -8,7 +8,7 @@
 import { action, computed, observable } from 'mobx';
 
 import { AuthProviderService } from '@cloudbeaver/core-authentication';
-import { useObservableRef, useResource } from '@cloudbeaver/core-blocks';
+import { useObservableRef } from '@cloudbeaver/core-blocks';
 import {
   Connection,
   ConnectionInfoProjectKey,
@@ -22,7 +22,6 @@ import {
 import { useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { ProjectsService } from '@cloudbeaver/core-projects';
-import { ServerConfigResource } from '@cloudbeaver/core-root';
 import { NetworkHandlerAuthType } from '@cloudbeaver/core-sdk';
 import { getUniqueName } from '@cloudbeaver/core-utils';
 import type { IConnectionAuthenticationConfig } from '@cloudbeaver/plugin-connections';
@@ -38,7 +37,6 @@ interface IState {
   template: Connection | null;
   config: IConnectionAuthenticationConfig;
   processing: boolean;
-  distributed: boolean;
   connectException: Error | null;
   connect: () => Promise<void>;
   setStep: (step: ConnectionStep) => void;
@@ -61,7 +59,6 @@ export function useConnectionDialog(onConnect?: () => void) {
   const projectsService = useService(ProjectsService);
   const authProviderService = useService(AuthProviderService);
   const dbDriverResource = useService(DBDriverResource);
-  const serverConfigResource = useResource(useConnectionDialog, ServerConfigResource, undefined);
 
   const state: IState = useObservableRef(
     () => ({
@@ -74,9 +71,6 @@ export function useConnectionDialog(onConnect?: () => void) {
         }
 
         return this.template?.authModel || this.driver?.defaultAuthModel || null;
-      },
-      get distributed() {
-        return Boolean(this.serverConfigResource.data?.distributed);
       },
       step: ConnectionStep.ConnectionTemplateSelect,
       template: null as Connection | null,
@@ -205,7 +199,6 @@ export function useConnectionDialog(onConnect?: () => void) {
       notificationService,
       authProviderService,
       connectionInfoResource,
-      serverConfigResource,
       dbDriverResource,
       onConnect,
     },
