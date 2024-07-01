@@ -30,21 +30,22 @@ public class BruteForceUtils {
 
     private static final Log log = Log.getLog(BruteForceUtils.class);
 
-    public static void checkBruteforce(SMControllerConfiguration smConfig, List<UserLoginRecord> latestLogins) throws DBException {
-        if (latestLogins.isEmpty()) {
+    public static void checkBruteforce(SMControllerConfiguration smConfig, List<UserLoginRecord> latestLoginAttempts)
+        throws DBException {
+        if (latestLoginAttempts.isEmpty()) {
             return;
         }
 
-        var oldestLogin = latestLogins.get(latestLogins.size() - 1);
-        checkLoginInterval(oldestLogin.time(), smConfig.getMinimumLoginTimeout());
+        var oldestLoginAttempt = latestLoginAttempts.get(latestLoginAttempts.size() - 1);
+        checkLoginInterval(oldestLoginAttempt.time(), smConfig.getMinimumLoginTimeout());
 
-        long errorsCount = latestLogins.stream()
+        long errorsCount = latestLoginAttempts.stream()
             .filter(authAttemptSessionInfo -> authAttemptSessionInfo.smAuthStatus() == SMAuthStatus.ERROR).count();
 
         boolean shouldBlock = errorsCount >= smConfig.getMaxFailedLogin();
         if (shouldBlock) {
             int blockPeriod = smConfig.getBlockLoginPeriod();
-            LocalDateTime unblockTime = oldestLogin.time().plusSeconds(blockPeriod);
+            LocalDateTime unblockTime = oldestLoginAttempt.time().plusSeconds(blockPeriod);
 
             LocalDateTime now = LocalDateTime.now();
             shouldBlock = unblockTime.isAfter(now);
@@ -54,7 +55,7 @@ public class BruteForceUtils {
                 Duration lockDuration = Duration.ofSeconds(smConfig.getBlockLoginPeriod());
 
                 throw new SMException("Blocked the possibility of login for this user for " +
-                    lockDuration.minus(Duration.between(oldestLogin.time(), now)).getSeconds() + " seconds");
+                    lockDuration.minus(Duration.between(oldestLoginAttempt.time(), now)).getSeconds() + " seconds");
             }
         }
     }
