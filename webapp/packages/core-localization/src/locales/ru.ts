@@ -78,6 +78,8 @@ export default [
   ['ui_folder_new', 'Новая папка'],
   ['ui_rename_processing', 'Переименование...'],
   ['ui_name', 'Название'],
+  ['ui_value', 'Значение'],
+  ['ui_description', 'Описание'],
   ['ui_interval', 'Интервал'],
   ['ui_cant_delete_item', 'Этот элемент нельзя удалить'],
   ['ui_no_items_placeholder', 'Вы еще ничего не добавили.'],

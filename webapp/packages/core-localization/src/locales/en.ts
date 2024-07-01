@@ -83,6 +83,8 @@ export default [
   ['ui_rename_processing', 'Renaming...'],
   ['ui_interval', 'Interval'],
   ['ui_name', 'Name'],
+  ['ui_value', 'Value'],
+  ['ui_description', 'Description'],
   ['ui_cant_delete_item', "This item can't be deleted"],
   ['ui_no_items_placeholder', 'There are no items yet.'],
   ['ui_search_no_result_placeholder', 'No results have been found.'],

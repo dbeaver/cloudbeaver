@@ -36,6 +36,9 @@ import org.jkiss.dbeaver.model.data.DBDAttributeBinding;
 import org.jkiss.dbeaver.model.exec.DBCException;
 import org.jkiss.dbeaver.model.exec.DBCLogicalOperator;
 import org.jkiss.dbeaver.model.exec.DBExecUtils;
+import org.jkiss.dbeaver.model.exec.trace.DBCTrace;
+import org.jkiss.dbeaver.model.exec.trace.DBCTraceDynamic;
+import org.jkiss.dbeaver.model.exec.trace.DBCTraceProperty;
 import org.jkiss.dbeaver.model.impl.sql.BasicSQLDialect;
 import org.jkiss.dbeaver.model.navigator.DBNNode;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
@@ -453,6 +456,21 @@ public class WebServiceSQL implements DBWServiceSQL {
             }
         };
         return contextInfo.getProcessor().getWebSession().createAndRunAsyncTask("Read data from container " + nodePath, runnable);
+    }
+
+    @NotNull
+    @Override
+    public List<DBCTraceProperty> readDynamicTrace(
+        @NotNull WebSession webSession,
+        @NotNull WebSQLContextInfo contextInfo,
+        @NotNull String resultsId
+    ) throws DBException {
+        WebSQLResultsInfo resultsInfo = contextInfo.getResults(resultsId);
+        DBCTrace trace = resultsInfo.getTrace();
+        if (trace instanceof DBCTraceDynamic traceDynamic) {
+            return traceDynamic.getTraceProperties(webSession.getProgressMonitor());
+        }
+        throw new DBWebException("Dynamic trace is not found in provided results info");
     }
 
     @Override
