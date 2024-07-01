@@ -108,6 +108,7 @@ export const ConnectionAuthenticationForm = observer<ConnectionAuthenticationFor
       )}
       {networkHandlers && config.networkHandlersConfig && (
         <NetworkHandlers
+          projectId={projectId}
           networkHandlers={networkHandlers}
           networkHandlersConfig={config.networkHandlersConfig}
           allowSaveCredentials={allowSaveCredentials}
