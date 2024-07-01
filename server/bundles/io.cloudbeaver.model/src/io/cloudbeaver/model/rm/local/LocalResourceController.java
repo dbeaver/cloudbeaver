@@ -836,6 +836,27 @@ public class LocalResourceController implements RMController {
         }
     }
 
+    @Nullable
+    @Override
+    public String setResourceProperties(
+        @NotNull String projectId,
+        @NotNull String resourcePath,
+        @NotNull Map<String, Object> properties
+    ) throws DBException {
+        try (var projectLock = lockController.lockProject(projectId, "resourcePropertyUpdate")) {
+            validateResourcePath(resourcePath);
+            BaseWebProjectImpl webProject = getWebProject(projectId, false);
+            doFileWriteOperation(projectId, webProject.getMetadataFilePath(),
+                () -> {
+                    log.debug("Updating resource '" + resourcePath + "' properties in project '" + projectId + "'");
+                    webProject.setResourceProperties(resourcePath, properties);
+                    return null;
+                }
+            );
+            return DEFAULT_CHANGE_ID;
+        }
+    }
+
     private void validateResourcePath(String resourcePath) throws DBException {
         var fullPath = Paths.get(resourcePath);
         for (Path path : fullPath) {
