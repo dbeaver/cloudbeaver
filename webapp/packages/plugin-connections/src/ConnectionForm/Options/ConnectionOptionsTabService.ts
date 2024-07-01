@@ -21,7 +21,6 @@ import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import type { IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import { LocalizationService } from '@cloudbeaver/core-localization';
 import { isSharedProject, ProjectInfoResource } from '@cloudbeaver/core-projects';
-import { ServerConfigResource } from '@cloudbeaver/core-root';
 import { DriverConfigurationType, isObjectPropertyInfoStateEqual, ObjectPropertyInfo } from '@cloudbeaver/core-sdk';
 import { formStateContext } from '@cloudbeaver/core-ui';
 import { getUniqueName, isNotNullDefined, isValuesEqual } from '@cloudbeaver/core-utils';
@@ -32,16 +31,21 @@ import { connectionConfigContext } from '../Contexts/connectionConfigContext';
 import { connectionCredentialsStateContext } from '../Contexts/connectionCredentialsStateContext';
 import type { IConnectionFormFillConfigData, IConnectionFormState, IConnectionFormSubmitData } from '../IConnectionFormProps';
 import { getConnectionName } from './getConnectionName';
+import { getDefaultConfigurationType } from './getDefaultConfigurationType';
 
 export const Options = React.lazy(async () => {
   const { Options } = await import('./Options');
   return { default: Options };
 });
 
+const MAIN_PROPERTY_DATABASE_KEY = 'database';
+const MAIN_PROPERTY_HOST_KEY = 'host';
+const MAIN_PROPERTY_PORT_KEY = 'port';
+const MAIN_PROPERTY_SERVER_KEY = 'server';
+
 @injectable()
 export class ConnectionOptionsTabService extends Bootstrap {
   constructor(
-    private readonly serverConfigResource: ServerConfigResource,
     private readonly projectInfoResource: ProjectInfoResource,
     private readonly connectionFormService: ConnectionFormService,
     private readonly dbDriverResource: DBDriverResource,
@@ -160,10 +164,7 @@ export class ConnectionOptionsTabService extends Bootstrap {
     const driver = await this.dbDriverResource.load(state.config.driverId, ['includeProviderProperties']);
 
     state.config.authModelId = driver?.defaultAuthModel;
-
-    state.config.configurationType = driver?.configurationTypes.includes(DriverConfigurationType.Manual)
-      ? DriverConfigurationType.Manual
-      : DriverConfigurationType.Url;
+    state.config.configurationType = getDefaultConfigurationType(driver);
 
     state.config.host = driver?.defaultServer || 'localhost';
     state.config.port = driver?.defaultPort;
@@ -191,6 +192,10 @@ export class ConnectionOptionsTabService extends Bootstrap {
       state.config.providerProperties = {};
     }
 
+    if (!state.config.mainPropertyValues || updated) {
+      state.config.mainPropertyValues = {};
+    }
+
     if (!state.info) {
       await this.setDefaults(state);
       return;
@@ -204,10 +209,11 @@ export class ConnectionOptionsTabService extends Bootstrap {
     state.config.template = state.info.template;
     state.config.driverId = state.info.driverId;
 
-    state.config.host = state.info.host;
-    state.config.port = state.info.port;
-    state.config.serverName = state.info.serverName;
-    state.config.databaseName = state.info.databaseName;
+    state.config.host = state.info.mainPropertyValues[MAIN_PROPERTY_HOST_KEY];
+    state.config.port = state.info.mainPropertyValues[MAIN_PROPERTY_PORT_KEY];
+    state.config.serverName = state.info.mainPropertyValues[MAIN_PROPERTY_SERVER_KEY];
+    state.config.databaseName = state.info.mainPropertyValues[MAIN_PROPERTY_DATABASE_KEY];
+
     state.config.url = state.info.url;
     state.config.folder = state.info.folder;
 
@@ -229,25 +235,16 @@ export class ConnectionOptionsTabService extends Bootstrap {
     if (state.info.providerProperties) {
       state.config.providerProperties = { ...state.info.providerProperties };
     }
+
+    if (state.info.mainPropertyValues) {
+      state.config.mainPropertyValues = { ...state.info.mainPropertyValues };
+    }
   }
 
   private configure(data: IConnectionFormState, contexts: IExecutionContextProvider<IConnectionFormState>) {
     const configuration = contexts.getContext(connectionFormConfigureContext);
 
     configuration.include('includeOrigin', 'includeAuthProperties', 'includeCredentialsSaved', 'customIncludeOptions');
-  }
-
-  private getTrimmedPropertiesConfig(authProperties: ObjectPropertyInfo[], credentials: Record<string, any>): Record<string, any> {
-    const trimmedProperties: Record<string, any> = toJS(credentials);
-    for (const property of authProperties) {
-      const value = credentials?.[property.id!];
-
-      if (typeof value === 'string' && value) {
-        trimmedProperties[property.id!] = value?.trim();
-      }
-    }
-
-    return trimmedProperties;
   }
 
   private async prepareConfig({ state }: IConnectionFormSubmitData, contexts: IExecutionContextProvider<IConnectionFormSubmitData>) {
@@ -258,7 +255,7 @@ export class ConnectionOptionsTabService extends Bootstrap {
       return;
     }
 
-    const driver = await this.dbDriverResource.load(state.config.driverId, ['includeProviderProperties']);
+    const driver = await this.dbDriverResource.load(state.config.driverId, ['includeProviderProperties', 'includeMainProperties']);
     const tempConfig = toJS(config);
 
     if (state.mode === 'edit') {
@@ -266,7 +263,6 @@ export class ConnectionOptionsTabService extends Bootstrap {
     }
 
     tempConfig.configurationType = state.config.configurationType;
-
     tempConfig.name = state.config.name?.trim();
 
     if (tempConfig.name && state.mode === 'create') {
@@ -277,11 +273,8 @@ export class ConnectionOptionsTabService extends Bootstrap {
     }
 
     tempConfig.description = state.config.description?.trim();
-
     tempConfig.template = state.config.template;
-
     tempConfig.driverId = state.config.driverId;
-
     tempConfig.keepAliveInterval = Number(state.config.keepAliveInterval);
     tempConfig.autocommit = state.config.autocommit;
 
@@ -291,15 +284,21 @@ export class ConnectionOptionsTabService extends Bootstrap {
 
     if (tempConfig.configurationType === DriverConfigurationType.Url) {
       tempConfig.url = state.config.url?.trim();
-    } else {
+    }
+
+    tempConfig.mainPropertyValues = toJS(state.config.mainPropertyValues);
+
+    if (tempConfig.configurationType === DriverConfigurationType.Manual && !driver.useCustomPage) {
+      tempConfig.mainPropertyValues[MAIN_PROPERTY_DATABASE_KEY] = state.config.databaseName?.trim();
+
       if (!driver.embedded) {
-        tempConfig.host = state.config.host?.trim();
-        tempConfig.port = state.config.port?.trim();
+        tempConfig.mainPropertyValues[MAIN_PROPERTY_HOST_KEY] = state.config.host?.trim();
+        tempConfig.mainPropertyValues[MAIN_PROPERTY_PORT_KEY] = state.config.port?.trim();
       }
+
       if (driver.requiresServerName) {
-        tempConfig.serverName = state.config.serverName?.trim();
+        tempConfig.mainPropertyValues[MAIN_PROPERTY_SERVER_KEY] = state.config.serverName?.trim();
       }
-      tempConfig.databaseName = state.config.databaseName?.trim();
     }
 
     if ((state.config.authModelId || driver.defaultAuthModel) && !driver.anonymousAccess) {
@@ -310,7 +309,7 @@ export class ConnectionOptionsTabService extends Bootstrap {
       const properties = await this.getConnectionAuthModelProperties(tempConfig.authModelId, state.info);
 
       if (this.isCredentialsChanged(properties, state.config.credentials)) {
-        tempConfig.credentials = this.getTrimmedPropertiesConfig(properties, { ...state.config.credentials });
+        tempConfig.credentials = this.prepareDynamicProperties(properties, toJS(state.config.credentials));
       }
 
       if (!tempConfig.saveCredentials) {
@@ -319,32 +318,19 @@ export class ConnectionOptionsTabService extends Bootstrap {
     }
 
     if (driver.providerProperties.length > 0) {
-      const providerProperties: Record<string, any> = { ...state.config.providerProperties };
+      tempConfig.providerProperties = this.prepareDynamicProperties(
+        driver.providerProperties,
+        toJS(state.config.providerProperties),
+        tempConfig.configurationType,
+      );
+    }
 
-      for (const providerProperty of driver.providerProperties) {
-        if (!providerProperty.id) {
-          continue;
-        }
-
-        const supported = providerProperty.supportedConfigurationTypes?.some(t => t === tempConfig.configurationType);
-
-        if (!supported) {
-          delete providerProperties[providerProperty.id];
-        } else {
-          const isDefault = isNotNullDefined(providerProperty.defaultValue);
-          if (!(providerProperty.id in providerProperties) && isDefault) {
-            providerProperties[providerProperty.id] = providerProperty.defaultValue;
-          }
-        }
-      }
-
-      tempConfig.providerProperties = providerProperties;
-
-      for (const key of Object.keys(tempConfig.providerProperties)) {
-        if (typeof tempConfig.providerProperties[key] === 'string') {
-          tempConfig.providerProperties[key] = tempConfig.providerProperties[key]?.trim();
-        }
-      }
+    if (driver.useCustomPage && driver.mainProperties.length > 0) {
+      tempConfig.mainPropertyValues = this.prepareDynamicProperties(
+        driver.mainProperties,
+        tempConfig.mainPropertyValues,
+        tempConfig.configurationType,
+      );
     }
 
     runInAction(() => {
@@ -352,11 +338,44 @@ export class ConnectionOptionsTabService extends Bootstrap {
     });
   }
 
+  private prepareDynamicProperties(
+    propertiesInfo: ObjectPropertyInfo[],
+    properties: Record<string, any>,
+    configurationType?: DriverConfigurationType,
+  ) {
+    const result: Record<string, any> = { ...properties };
+
+    for (const propertyInfo of propertiesInfo) {
+      if (!propertyInfo.id) {
+        continue;
+      }
+
+      const supported = configurationType === undefined || propertyInfo.supportedConfigurationTypes?.some(type => type === configurationType);
+
+      if (!supported) {
+        delete result[propertyInfo.id];
+      } else {
+        const isDefault = isNotNullDefined(propertyInfo.defaultValue);
+        if (!(propertyInfo.id in result) && isDefault) {
+          result[propertyInfo.id] = propertyInfo.defaultValue;
+        }
+      }
+    }
+
+    for (const key of Object.keys(result)) {
+      if (typeof result[key] === 'string') {
+        result[key] = result[key]?.trim();
+      }
+    }
+
+    return result;
+  }
+
   private async formAuthState(data: IConnectionFormState, contexts: IExecutionContextProvider<IConnectionFormState>) {
     const config = contexts.getContext(connectionConfigContext);
     const stateContext = contexts.getContext(formStateContext);
 
-    const driver = await this.dbDriverResource.load(config.driverId!, ['includeProviderProperties']);
+    const driver = await this.dbDriverResource.load(config.driverId!, ['includeProviderProperties', 'includeMainProperties']);
     const authModel = await this.databaseAuthModelsResource.load(config.authModelId ?? data.info?.authModel ?? driver.defaultAuthModel);
 
     const providerId = authModel.requiredAuth ?? data.info?.requiredAuth ?? AUTH_PROVIDER_LOCAL_ID;
@@ -380,7 +399,7 @@ export class ConnectionOptionsTabService extends Bootstrap {
 
     const config = contexts.getContext(connectionConfigContext);
     const stateContext = contexts.getContext(formStateContext);
-    const driver = await this.dbDriverResource.load(data.config.driverId!, ['includeProviderProperties']);
+    const driver = await this.dbDriverResource.load(data.config.driverId!, ['includeProviderProperties', 'includeMainProperties']);
 
     if (
       !isValuesEqual(config.name, data.info.name, '') ||
@@ -400,6 +419,8 @@ export class ConnectionOptionsTabService extends Bootstrap {
       (config.sharedCredentials !== undefined && config.sharedCredentials !== data.info.sharedCredentials) ||
       (config.providerProperties !== undefined &&
         !isObjectPropertyInfoStateEqual(driver.providerProperties, config.providerProperties, data.info.providerProperties)) ||
+      (config.mainPropertyValues !== undefined &&
+        !isObjectPropertyInfoStateEqual(driver.mainProperties, config.mainPropertyValues, data.info.mainPropertyValues)) ||
       (config.keepAliveInterval !== undefined && !isValuesEqual(config.keepAliveInterval, data.info.keepAliveInterval)) ||
       (config.autocommit !== undefined && !isValuesEqual(config.autocommit, data.info.autocommit))
     ) {

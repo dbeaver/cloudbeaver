@@ -1,0 +1,4 @@
+fragment DriverPropertyInfo on ObjectPropertyInfo {
+  ...ObjectPropertyInfo
+  supportedConfigurationTypes
+}

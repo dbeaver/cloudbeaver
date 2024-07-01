@@ -32,6 +32,17 @@ jobs:
           sudo chmod 777 ../
         shell: bash
 
+      - name: Determine branches
+        id: determine-branch
+        run: |
+          echo "pr_branch=${{ github.head_ref }}" >> $GITHUB_ENV
+          echo "base_branch=${{ github.event.pull_request.base.ref }}" >> $GITHUB_ENV
+  
+      - name: Clone dbeaver/dbeaver
+        id: clone-repo
+        run: |
+          git clone -b ${{ env.pr_branch }} https://github.com/dbeaver/dbeaver.git ../dbeaver || git clone -b ${{ env.base_branch }} https://github.com/dbeaver/dbeaver.git ../dbeaver
+
       - name: Run build script
         run: ./build-backend.sh
         shell: bash
