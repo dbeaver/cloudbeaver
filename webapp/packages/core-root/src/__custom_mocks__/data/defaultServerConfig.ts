@@ -6,6 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 import type { ServerConfigQuery } from '@cloudbeaver/core-sdk';
+import { WebsiteLinks } from '@cloudbeaver/core-website';
 
 import { defaultProductConfiguration } from './defaultProductConfiguration';
 
@@ -112,7 +113,7 @@ export const defaultServerConfig: (productConfiguration?: Record<string, any>) =
     productInfo: {
       id: 'io.cloudbeaver.product.ce.product',
       version: '22.1.2.202207140640',
-      latestVersionInfo: 'https://dbeaver.com/product/cloudbeaver-ce-version.json',
+      latestVersionInfo: WebsiteLinks.LATEST_COMMUNITY_VERSION_PAGE,
       name: 'CloudBeaver CE Server',
       description: 'Cloudbeaver Web UI Application',
       buildTime: 'July 14, 2022',

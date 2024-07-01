@@ -36,6 +36,7 @@
     "@cloudbeaver/core-ui": "^0",
     "@cloudbeaver/core-utils": "^0",
     "@cloudbeaver/core-view": "^0",
+    "@cloudbeaver/core-website": "^0",
     "@cloudbeaver/plugin-codemirror6": "^0",
     "@cloudbeaver/plugin-navigation-tabs": "^0",
     "@cloudbeaver/plugin-object-viewer": "^0",

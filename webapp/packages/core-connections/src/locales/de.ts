@@ -25,6 +25,7 @@ export default [
   ['connections_connection_edit_access_team', 'Team'],
   ['connections_connection_edit_search', 'Suchen'],
   ['connections_connection_edit_search_hosts', 'Hostnamen'],
+  ['connections_connection_expert_settings', 'Expert settings'],
   ['connections_connection_address', 'Adresse'],
   ['connections_connection_folder', 'Ordner'],
   ['connections_connection_name', 'Verbindungsname'],
@@ -42,4 +43,5 @@ export default [
   ['connections_network_handler_ssh_tunnel_auth_type', 'Authentifizierungsmethode'],
   ['connections_network_handler_ssh_tunnel_advanced_settings', 'Erweiterte Einstellungen'],
   ['connections_not_found', 'Es wurden keine Datenbankverbindungen gefunden'],
+  ['connections_connection_autocommit', 'Auto commit'],
 ];
