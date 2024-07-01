@@ -36,9 +36,11 @@ import org.jkiss.dbeaver.registry.DataSourceProviderRegistry;
 import org.jkiss.dbeaver.registry.network.NetworkHandlerDescriptor;
 import org.jkiss.dbeaver.registry.network.NetworkHandlerRegistry;
 import org.jkiss.dbeaver.runtime.properties.PropertySourceCustom;
+import org.jkiss.utils.ArrayUtils;
 import org.jkiss.utils.CommonUtils;
 
 import java.util.Arrays;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -234,6 +236,22 @@ public class WebDatabaseDriverInfo {
     }
 
     @Property
+    public WebPropertyInfo[] getMainProperties() {
+        DBPPropertyDescriptor[] properties = driver.getMainPropertyDescriptors();
+        // set default values to main properties
+        Map<String, String> defaultValues = new LinkedHashMap<>();
+        defaultValues.put(DBConstants.PROP_HOST, getDefaultHost());
+        defaultValues.put(DBConstants.PROP_PORT, getDefaultPort());
+        defaultValues.put(DBConstants.PROP_DATABASE, getDefaultDatabase());
+        defaultValues.put(DBConstants.PROP_SERVER, getDefaultServer());
+        PropertySourceCustom propertySource = new PropertySourceCustom(properties, defaultValues);
+
+        return Arrays.stream(properties)
+            .map(p -> new WebPropertyInfo(webSession, p, propertySource))
+            .toArray(WebPropertyInfo[]::new);
+    }
+
+    @Property
     public WebPropertyInfo[] getProviderProperties() {
         return Arrays.stream(driver.getProviderPropertyDescriptors())
             .map(p -> new WebPropertyInfo(webSession, p, null))
@@ -275,5 +293,10 @@ public class WebDatabaseDriverInfo {
         return driver.getDriverLibraries().stream()
             .map(dbpDriverLibrary -> new WebDriverLibraryInfo(webSession, dbpDriverLibrary))
             .toArray(WebDriverLibraryInfo[]::new);
+    }
+
+    @Property
+    public boolean getUseCustomPage() {
+        return !ArrayUtils.isEmpty(driver.getMainPropertyDescriptors());
     }
 }

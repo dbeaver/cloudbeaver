@@ -22,6 +22,7 @@ import org.jkiss.dbeaver.model.DBPDataSource;
 import org.jkiss.dbeaver.model.DBUtils;
 import org.jkiss.dbeaver.model.data.DBDAttributeBinding;
 import org.jkiss.dbeaver.model.data.DBDRowIdentifier;
+import org.jkiss.dbeaver.model.exec.trace.DBCTrace;
 import org.jkiss.dbeaver.model.struct.*;
 
 import java.util.HashSet;
@@ -38,6 +39,7 @@ public class WebSQLResultsInfo {
     @NotNull
     private final String id;
     private DBDAttributeBinding[] attributes;
+    private DBCTrace trace;
     private String queryText;
 
     public WebSQLResultsInfo(@NotNull DBSDataContainer dataContainer, @NotNull String id) {
@@ -132,4 +134,11 @@ public class WebSQLResultsInfo {
             (!(entity instanceof DBSDocumentContainer) && !entity.getDataSource().getInfo().isDynamicMetadata());
     }
 
+    public DBCTrace getTrace() {
+        return trace;
+    }
+
+    public void setTrace(@NotNull DBCTrace trace) {
+        this.trace = trace;
+    }
 }
