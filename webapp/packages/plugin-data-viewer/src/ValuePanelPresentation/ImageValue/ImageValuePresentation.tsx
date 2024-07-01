@@ -57,7 +57,7 @@ export const ImageValuePresentation: TabContainerPanelComponent<IDataValuePanelP
       },
     );
 
-    function imageOnContextMenuHandler(event: React.MouseEvent<HTMLImageElement>) {
+    function imageContextMenuHandler(event: React.MouseEvent<HTMLImageElement>) {
       if (!data.canSave) {
         event.preventDefault();
       }
@@ -71,7 +71,7 @@ export const ImageValuePresentation: TabContainerPanelComponent<IDataValuePanelP
               <ImageRenderer
                 srcGetter={srcGetter}
                 className={s(style, { img: true, stretch: state.stretch })}
-                onContextMenu={imageOnContextMenuHandler}
+                onContextMenu={imageContextMenuHandler}
               />
             )}
             {isTruncatedMessageDisplay && (
