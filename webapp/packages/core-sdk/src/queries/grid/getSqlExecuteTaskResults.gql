@@ -41,6 +41,7 @@ mutation getSqlExecuteTaskResults($taskId: ID!) {
         hasRowIdentifier
         isSupportsDataFilter
         hasChildrenCollection
+        hasDynamicTrace
       }
     }
   }

@@ -120,6 +120,7 @@ type SQLResultSet {
     # can't update data or load LOB file if hasRowIdentifier = false
     hasRowIdentifier: Boolean!
     hasChildrenCollection: Boolean!
+    hasDynamicTrace: Boolean! @since(version: "24.1.2")
     isSupportsDataFilter: Boolean!
 }
 
@@ -211,6 +212,16 @@ type SQLScriptQuery {
     start: Int!
     end: Int!
 }
+
+####################################################
+# Dynamic trace info
+####################################################
+type DynamicTraceProperty {
+    name: String!
+    value: String
+    description: String
+}
+
 ####################################################
 # Query and Mutation
 ####################################################
@@ -401,6 +412,14 @@ extend type Mutation {
     ): AsyncTaskInfo!
 
     asyncSqlRowDataCountResult(taskId: ID!): Int!
+
+    @since(version: "24.1.2")
+    sqlGetDynamicTrace(
+        projectId: ID,
+        connectionId: ID!,
+        contextId: ID!,
+        resultsId: ID!
+    ): [DynamicTraceProperty!]!
 
     @since(version: "24.0.1")
     asyncSqlSetAutoCommit(

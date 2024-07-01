@@ -14,6 +14,7 @@ export * from './EnvironmentService';
 export * from './EServerErrorCode';
 export * from './getGQLResponse';
 export * from './getObjectPropertyType';
+export * from './getObjectPropertyValueType';
 export * from './GQLError';
 export * from './GQLErrorCatcher';
 export * from './GraphQLService';
