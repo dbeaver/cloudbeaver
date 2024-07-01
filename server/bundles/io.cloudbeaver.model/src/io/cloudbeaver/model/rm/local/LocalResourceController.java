@@ -836,7 +836,7 @@ public class LocalResourceController implements RMController {
         }
     }
 
-    @Nullable
+    @NotNull
     @Override
     public String setResourceProperties(
         @NotNull String projectId,
