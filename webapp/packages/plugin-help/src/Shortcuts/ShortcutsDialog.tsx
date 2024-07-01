@@ -20,6 +20,7 @@ import {
   useTranslate,
 } from '@cloudbeaver/core-blocks';
 import type { DialogComponent } from '@cloudbeaver/core-dialogs';
+import { WebsiteLinks } from '@cloudbeaver/core-website';
 
 import { Shortcut } from './Shortcut';
 import { DATA_VIEWER_SHORTCUTS, NAVIGATION_TREE_SHORTCUTS, SQL_EDITOR_SHORTCUTS } from './SHORTCUTS_DATA';
@@ -36,7 +37,7 @@ export const ShortcutsDialog: DialogComponent<null> = function ShortcutsDialog({
         <Container className={s(styles, { container: true })} gap wrap overflow>
           <Group box gap dense overflow>
             <GroupTitle header>
-              <Link href="https://dbeaver.com/docs/cloudbeaver/Data-editor/" target="_blank" wrapper indicator>
+              <Link href={WebsiteLinks.DATA_EDITOR_DOCUMENTATION_PAGE} target="_blank" wrapper indicator>
                 Data Viewer
               </Link>
             </GroupTitle>
@@ -46,7 +47,7 @@ export const ShortcutsDialog: DialogComponent<null> = function ShortcutsDialog({
           </Group>
           <Group box gap dense overflow>
             <GroupTitle header>
-              <Link href="https://dbeaver.com/docs/cloudbeaver/SQL-Editor/" target="_blank" wrapper indicator>
+              <Link href={WebsiteLinks.SQL_EDITOR_DOCUMENTATION_PAGE} target="_blank" wrapper indicator>
                 SQL Editor
               </Link>
             </GroupTitle>
@@ -56,7 +57,7 @@ export const ShortcutsDialog: DialogComponent<null> = function ShortcutsDialog({
           </Group>
           <Group box gap dense overflow>
             <GroupTitle header>
-              <Link href="https://dbeaver.com/docs/cloudbeaver/Database-Navigator/" target="_blank" wrapper indicator>
+              <Link href={WebsiteLinks.DATABASE_NAVIGATOR_DOCUMENTATION_PAGE} target="_blank" wrapper indicator>
                 Navigation Tree
               </Link>
             </GroupTitle>

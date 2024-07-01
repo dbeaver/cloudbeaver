@@ -5,6 +5,7 @@ fragment DatabaseConnection on ConnectionInfo {
   description
   driverId
   keepAliveInterval
+  autocommit
 
   template
   connected

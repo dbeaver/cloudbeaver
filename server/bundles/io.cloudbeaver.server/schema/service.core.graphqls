@@ -348,6 +348,7 @@ type ConnectionInfo {
     mainPropertyValues: Object @since(version: "24.1.2")
 
     keepAliveInterval: Int!
+    autocommit: Boolean
 
     properties: Object
 
@@ -516,6 +517,7 @@ input ConnectionConfig {
 
     # Keep-Alive interval
     keepAliveInterval: Int
+    autocommit: Boolean
 
     # Template connection
     template: Boolean

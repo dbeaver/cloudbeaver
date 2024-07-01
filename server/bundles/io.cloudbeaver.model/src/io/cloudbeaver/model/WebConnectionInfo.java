@@ -459,6 +459,15 @@ public class WebConnectionInfo {
     }
 
     @Property
+    public boolean isAutocommit() {
+        Boolean isAutoCommit = dataSourceContainer.getConnectionConfiguration().getBootstrap().getDefaultAutoCommit();
+        if (isAutoCommit == null) {
+            return true;
+        }
+        return isAutoCommit;
+    }
+
+    @Property
     public List<WebSecretInfo> getSharedSecrets() throws DBException {
         return dataSourceContainer.listSharedCredentials()
             .stream()
