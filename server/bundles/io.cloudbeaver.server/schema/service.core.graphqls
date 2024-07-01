@@ -229,6 +229,7 @@ type DriverInfo {
     enabled: Boolean!
     requiresServerName: Boolean
     requiresDatabaseName: Boolean
+    useCustomPage: Boolean! @since(version: "24.1.2") # if host, port, database, server name fields are custom
 
     licenseRequired: Boolean
     license: String
@@ -247,6 +248,10 @@ type DriverInfo {
     driverProperties: [ObjectPropertyInfo!]!
     # Driver parameters (map name->value)
     driverParameters: Object!
+
+    # Main driver properties
+    # Contains info about main fields (host, port, database, server name)
+    mainProperties: [ObjectPropertyInfo!]! @since(version: "24.1.2")
 
     # Additional driver provider properties
     # These properties can be configured by user on main connection page
@@ -339,6 +344,8 @@ type ConnectionInfo {
     serverName: String
     databaseName: String
     url: String
+
+    mainPropertyValues: Object @since(version: "24.1.2")
 
     keepAliveInterval: Int!
     autocommit: Boolean
@@ -499,6 +506,10 @@ input ConnectionConfig {
     port: String
     serverName: String
     databaseName: String
+
+    # Host, port, serverName, databaseName are also stored in mainPropertyValues for custom pages
+    mainPropertyValues: Object @since(version: "24.1.2")
+
     # Connection url jdbc:{driver}://{host}[:{port}]/[{database}]
     url: String
     # Properties

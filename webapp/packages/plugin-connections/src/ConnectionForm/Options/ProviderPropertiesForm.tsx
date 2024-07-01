@@ -16,13 +16,13 @@ import {
   useObjectPropertyCategories,
   useTranslate,
 } from '@cloudbeaver/core-blocks';
-import { type ConnectionConfig, type DriverProviderPropertyInfoFragment, getObjectPropertyType } from '@cloudbeaver/core-sdk';
+import { type ConnectionConfig, type DriverPropertyInfoFragment, getObjectPropertyType } from '@cloudbeaver/core-sdk';
 
-type DriverProviderPropertyInfo = DriverProviderPropertyInfoFragment;
+type DriverPropertyInfo = DriverPropertyInfoFragment;
 
 interface Props {
   config: ConnectionConfig;
-  properties: DriverProviderPropertyInfo[];
+  properties: DriverPropertyInfo[];
   disabled?: boolean;
   readonly?: boolean;
 }
@@ -93,6 +93,6 @@ export const ProviderPropertiesForm = observer<Props>(function ProviderPropertie
   );
 });
 
-function isOnlyBooleans(properties: DriverProviderPropertyInfo[], category?: string): boolean {
+function isOnlyBooleans(properties: DriverPropertyInfo[], category?: string): boolean {
   return properties.filter(property => !category || property.category === category).every(property => property.dataType === 'Boolean');
 }
