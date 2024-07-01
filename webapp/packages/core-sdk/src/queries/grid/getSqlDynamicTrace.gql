@@ -1,0 +1,7 @@
+mutation getSqlDynamicTrace($projectId: ID, $connectionId: ID!, $contextId: ID!, $resultsId: ID!) {
+  trace: sqlGetDynamicTrace(projectId: $projectId, connectionId: $connectionId, contextId: $contextId, resultsId: $resultsId) {
+    name
+    value
+    description
+  }
+}
