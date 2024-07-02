@@ -8,7 +8,6 @@
 import type { IDataContextProvider } from '@cloudbeaver/core-data-context';
 import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { ResultDataFormat } from '@cloudbeaver/core-sdk';
 import { ActionService, menuExtractItems, MenuService } from '@cloudbeaver/core-view';
 
 import { DatabaseDataConstraintAction } from '../DatabaseDataModel/Actions/DatabaseDataConstraintAction';
@@ -46,10 +45,6 @@ export class ResultSetTableFooterMenuService {
       getItems(context, items) {
         return [ACTION_COUNT_TOTAL_ELEMENTS, ...items];
       },
-      orderItems(context, items) {
-        const extracted = menuExtractItems(items, [ACTION_COUNT_TOTAL_ELEMENTS]);
-        return [...extracted, ...items];
-      },
     });
     this.actionService.addHandler({
       id: 'result-set-data-base-handler',
@@ -68,7 +63,7 @@ export class ResultSetTableFooterMenuService {
 
         switch (action) {
           case ACTION_COUNT_TOTAL_ELEMENTS: {
-            return !!constraint?.supported;
+            return !!constraint?.supported && !model.isDisabled(resultIndex);
           }
         }
         return true;

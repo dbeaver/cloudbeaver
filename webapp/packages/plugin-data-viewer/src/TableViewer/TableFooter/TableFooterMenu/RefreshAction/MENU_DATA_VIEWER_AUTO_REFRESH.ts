@@ -5,15 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
+import { ACTION_REFRESH, createMenu } from '@cloudbeaver/core-view';
 
-.tableFooterMenu .menuBarItem {
-  padding: 0 4px;
-
-  & .menuBarItemLabel {
-    padding: 0;
-  }
-
-  & .menuBarItemIcon + .menuBarItemLabel {
-    padding-left: 0;
-  }
-}
+export const MENU_DATA_VIEWER_AUTO_REFRESH = createMenu('auto-refresh', 'Auto-Refresh', undefined, 'data_viewer_action_auto_refresh', ACTION_REFRESH);

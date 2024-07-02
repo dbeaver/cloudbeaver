@@ -13,6 +13,7 @@ export const dataViewerManifest: PluginManifest = {
   },
 
   providers: [
+    () => import('./TableViewer/TableFooter/TableFooterMenu/RefreshAction/TableRefreshActionBootstrap').then(m => m.TableRefreshActionBootstrap),
     () => import('./DataViewerBootstrap').then(m => m.DataViewerBootstrap),
     () => import('./DataViewerTabService').then(m => m.DataViewerTabService),
     () => import('./DataViewerTableService').then(m => m.DataViewerTableService),
@@ -32,5 +33,7 @@ export const dataViewerManifest: PluginManifest = {
     () => import('./DataViewerService').then(m => m.DataViewerService),
     () => import('./ResultSet/ResultSetTableFooterMenuService').then(m => m.ResultSetTableFooterMenuService),
     () => import('./TableViewer/DataViewerViewService').then(m => m.DataViewerViewService),
+    () =>
+      import('./TableViewer/TableFooter/TableFooterMenu/FetchSizeAction/TableFetchSizeActionBootstrap').then(m => m.TableFetchSizeActionBootstrap),
   ],
 };
