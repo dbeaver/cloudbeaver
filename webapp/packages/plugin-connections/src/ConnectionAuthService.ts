@@ -41,12 +41,16 @@ export class ConnectionAuthService extends Dependency {
         connections: connectionInfoResource.values.filter(connection => connection.connected).map(createConnectionParam),
         state,
       }),
-      () => authInfoService.isAnonymous,
+      state => state === 'before' && authInfoService.isAnonymous,
     );
-    this.authenticationService.onLogout.before(connectionsManagerService.onDisconnect, state => ({
-      connections: connectionInfoResource.values.filter(connection => connection.connected).map(createConnectionParam),
-      state,
-    }));
+    this.authenticationService.onLogout.before(
+      connectionsManagerService.onDisconnect,
+      state => ({
+        connections: connectionInfoResource.values.filter(connection => connection.connected).map(createConnectionParam),
+        state,
+      }),
+      state => state === 'before',
+    );
   }
 
   private async connectionDialog(data: IRequireConnectionExecutorData, context: IExecutionContextProvider<IRequireConnectionExecutorData | null>) {
