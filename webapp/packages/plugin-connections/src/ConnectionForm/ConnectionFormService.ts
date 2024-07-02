@@ -152,7 +152,7 @@ export class ConnectionFormService {
       config,
       authModelId: credentialsState.authModelId,
       networkHandlers: credentialsState.networkHandlers,
-      driverId: config.driverId,
+      projectId: data.state.projectId,
     });
 
     if (result === DialogueStateResult.Rejected) {

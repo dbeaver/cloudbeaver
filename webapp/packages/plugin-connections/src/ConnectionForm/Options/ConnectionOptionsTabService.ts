@@ -84,20 +84,6 @@ export class ConnectionOptionsTabService extends Bootstrap {
 
   load(): void {}
 
-  isProjectShared(state: IConnectionFormState): boolean {
-    if (state.projectId === null) {
-      return false;
-    }
-
-    const project = this.projectInfoResource.get(state.projectId);
-
-    if (!project) {
-      return false;
-    }
-
-    return isSharedProject(project);
-  }
-
   private async save({ state, submitType }: IConnectionFormSubmitData, contexts: IExecutionContextProvider<IConnectionFormSubmitData>) {
     const status = contexts.getContext(this.connectionFormService.connectionStatusContext);
     const config = contexts.getContext(connectionConfigContext);
