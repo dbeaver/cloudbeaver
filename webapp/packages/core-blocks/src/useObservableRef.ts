@@ -70,11 +70,11 @@ export function useObservableRef<T extends Record<any, any>>(
       update = undefined;
     }
 
-    state = makeObservable(state, observed, { deep: false, name });
-
     if (bind) {
       bindFunctions(state, bind as []);
     }
+
+    state = makeObservable(state, observed, { deep: false, name });
 
     return state;
   });
