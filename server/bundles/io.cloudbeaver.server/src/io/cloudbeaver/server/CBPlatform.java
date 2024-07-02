@@ -30,6 +30,7 @@ import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
+import org.jkiss.dbeaver.model.DBConstants;
 import org.jkiss.dbeaver.model.DBFileController;
 import org.jkiss.dbeaver.model.app.DBACertificateStorage;
 import org.jkiss.dbeaver.model.app.DBPWorkspace;
@@ -56,7 +57,8 @@ import org.jkiss.utils.IOUtils;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.stream.Collectors;
 
 /**
@@ -115,7 +117,7 @@ public class CBPlatform extends BasePlatformImpl {
         this.queryManager.registerMetaListener(qmLogWriter);
 
         this.certificateStorage = new DefaultCertificateStorage(
-            WebPlatformActivator.getInstance().getStateLocation().toFile().toPath().resolve("security"));
+            WebPlatformActivator.getInstance().getStateLocation().toFile().toPath().resolve(DBConstants.CERTIFICATE_STORAGE_FOLDER));
         super.initialize();
 
         refreshApplicableDrivers();
