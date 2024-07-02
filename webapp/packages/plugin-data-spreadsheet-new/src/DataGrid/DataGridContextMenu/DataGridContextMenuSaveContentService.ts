@@ -8,7 +8,13 @@
 import { selectFiles } from '@cloudbeaver/core-browser';
 import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { createResultSetBlobValue, ResultSetDataContentAction, ResultSetEditAction, ResultSetFormatAction } from '@cloudbeaver/plugin-data-viewer';
+import {
+  createResultSetBlobValue,
+  DataViewerService,
+  ResultSetDataContentAction,
+  ResultSetEditAction,
+  ResultSetFormatAction,
+} from '@cloudbeaver/plugin-data-viewer';
 
 import { DataGridContextMenuService } from './DataGridContextMenuService';
 
@@ -17,6 +23,7 @@ export class DataGridContextMenuSaveContentService {
   constructor(
     private readonly dataGridContextMenuService: DataGridContextMenuService,
     private readonly notificationService: NotificationService,
+    private readonly dataViewerService: DataViewerService,
   ) {}
 
   register(): void {
@@ -38,7 +45,8 @@ export class DataGridContextMenuSaveContentService {
       },
       isHidden: context => {
         const content = context.data.model.source.getAction(context.data.resultIndex, ResultSetDataContentAction);
-        return !content.isDownloadable(context.data.key);
+
+        return !content.isDownloadable(context.data.key) || !this.dataViewerService.canExportData;
       },
       isDisabled: context => {
         const content = context.data.model.source.getAction(context.data.resultIndex, ResultSetDataContentAction);
