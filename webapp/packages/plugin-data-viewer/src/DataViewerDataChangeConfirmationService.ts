@@ -26,6 +26,7 @@ export class DataViewerDataChangeConfirmationService {
     this.checkUnsavedData = this.checkUnsavedData.bind(this);
   }
 
+  // TODO: should be automatically called when the model is created, we can add executor to TableViewerStorageService for that
   trackTableDataUpdate(modelId: string) {
     const model = this.dataViewerTableService.get(modelId);
 
