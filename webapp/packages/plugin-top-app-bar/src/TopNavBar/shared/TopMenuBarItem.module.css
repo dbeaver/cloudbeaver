@@ -27,6 +27,10 @@
     content: '';
   }
 
+  &:disabled {
+    opacity: 1;
+  }
+
   & .menuBarItemIcon {
     width: 32px;
     height: 32px;
