@@ -587,9 +587,10 @@ public class CBDatabase {
     }
 
     public static boolean isDefaultH2Configuration(WebDatabaseConfig databaseConfiguration) {
-        return H2Migrator.isH2Database(databaseConfiguration)
-            && (databaseConfiguration.getUrl().endsWith(V1_DB_NAME)
-            || databaseConfiguration.getUrl().endsWith(V2_DB_NAME));
+        var v1DefaultUrl = "jdbc:h2:/opt/cloudbeaver/workspace/.data/" + V1_DB_NAME;
+        var v2DefaultUrl = "jdbc:h2:/opt/cloudbeaver/workspace/.data/" + V2_DB_NAME;
+        return v1DefaultUrl.equals(databaseConfiguration.getUrl())
+            || v2DefaultUrl.equals(databaseConfiguration.getUrl());
     }
 
 }
