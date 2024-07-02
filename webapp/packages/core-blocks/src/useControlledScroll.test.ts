@@ -92,6 +92,7 @@ describe('useControlledScroll', () => {
     rerender({ el: null, state: scrollState });
 
     expect(removeEventListenerSpy).toHaveBeenCalledWith('scroll', expect.any(Function));
+
     removeEventListenerSpy.mockRestore();
   });
 });
