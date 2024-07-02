@@ -35,7 +35,7 @@ export class DataViewerDataChangeConfirmationService {
   }
 
   private async checkUnsavedData({ stage, model }: IRequestEventData<any, any>, contexts: IExecutionContextProvider<IRequestEventData<any, any>>) {
-    if (stage === 'before') {
+    if (stage === 'request') {
       const confirmationContext = contexts.getContext(SaveConfirmedContext);
 
       if (confirmationContext.confirmed === false) {

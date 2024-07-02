@@ -62,7 +62,10 @@ export abstract class DatabaseDataSource<TOptions, TResult extends IDatabaseData
   private outdated: boolean;
 
   readonly onOperation: IExecutor<IDatabaseDataSourceOperationEvent>;
-  private activeOperation: Promise<void> | null;
+  private get activeOperation(): Promise<void> | null {
+    return this.activeOperationStack[this.activeOperationStack.length - 1] ?? null;
+  }
+  private readonly activeOperationStack: Array<Promise<void>>;
 
   constructor(serviceInjector: IServiceInjector) {
     this.serviceInjector = serviceInjector;
@@ -70,6 +73,7 @@ export abstract class DatabaseDataSource<TOptions, TResult extends IDatabaseData
     this.actions = new DatabaseDataActions(this);
     this.access = DatabaseDataAccessMode.Default;
     this.results = [];
+    this.activeOperationStack = [];
     this.offset = 0;
     this.count = 0;
     this.prevOptions = null;
@@ -77,7 +81,6 @@ export abstract class DatabaseDataSource<TOptions, TResult extends IDatabaseData
     this.disabled = false;
     this.outdated = false;
     this.constraintsAvailable = true;
-    this.activeOperation = null;
     this.executionContext = null;
     this.onOperation = new Executor();
     this.dataFormat = ResultDataFormat.Resultset;
@@ -92,7 +95,7 @@ export abstract class DatabaseDataSource<TOptions, TResult extends IDatabaseData
     this.error = null;
     this.lastAction = this.requestData.bind(this);
 
-    makeObservable<DatabaseDataSource<TOptions, TResult>, 'disabled' | 'activeOperation' | 'outdated'>(this, {
+    makeObservable<DatabaseDataSource<TOptions, TResult>, 'disabled' | 'activeOperationStack' | 'outdated'>(this, {
       access: observable,
       dataFormat: observable,
       supportedDataFormats: observable,
@@ -108,7 +111,7 @@ export abstract class DatabaseDataSource<TOptions, TResult extends IDatabaseData
       disabled: observable,
       constraintsAvailable: observable.ref,
       outdated: observable.ref,
-      activeOperation: observable.ref,
+      activeOperationStack: observable.shallow,
       setResults: action,
       setSupportedDataFormats: action,
       resetData: action,
@@ -368,20 +371,19 @@ export abstract class DatabaseDataSource<TOptions, TResult extends IDatabaseData
   }
 
   private async tryExecuteOperation(type: DatabaseDataSourceOperation, operation: () => Promise<any>): Promise<void> {
-    if (this.activeOperation) {
-      // if (type === DatabaseDataSourceOperation.Task || type === DatabaseDataSourceOperation.Save) {
-      await this.activeOperation.catch(() => {});
-      // } else {
-      //   // TODO: maybe we need to rework this logic, because it can lead to skipping some actions
-      //   return this.activeOperation;
-      // }
+    if (this.activeOperation && type !== DatabaseDataSourceOperation.Task && type !== DatabaseDataSourceOperation.Save) {
+      await this.activeOperation;
     }
 
+    const operationTask = this.executeOperation(type, operation);
     try {
-      this.activeOperation = this.executeOperation(type, operation);
-      return await this.activeOperation;
+      this.activeOperationStack.push(operationTask);
+      return await operationTask;
     } finally {
-      this.activeOperation = null;
+      const index = this.activeOperationStack.indexOf(operationTask);
+      if (index !== -1) {
+        this.activeOperationStack.splice(index, 1);
+      }
     }
   }
 

@@ -118,12 +118,11 @@ export class TableRefreshActionBootstrap extends Bootstrap {
       getActionInfo(context, action) {
         if (action === ACTION_REFRESH) {
           const state = getRefreshState(context);
-          const autoRefreshing = !!state?.interval;
           return {
             ...action.info,
-            icon: autoRefreshing ? '/icons/timer_m.svg#root' : '/icons/refresh_m.svg#root',
+            icon: state?.isAutoRefresh ? '/icons/timer_m.svg#root' : '/icons/refresh_m.svg#root',
             label: '',
-            tooltip: autoRefreshing ? 'data_viewer_action_auto_refresh_stop' : 'data_viewer_action_refresh',
+            tooltip: state?.isAutoRefresh ? 'data_viewer_action_auto_refresh_stop' : 'data_viewer_action_refresh',
           };
         }
 
@@ -133,7 +132,7 @@ export class TableRefreshActionBootstrap extends Bootstrap {
         const model = context.get(DATA_CONTEXT_DV_DDM)!;
         const state = getRefreshState(context);
 
-        if (state?.interval) {
+        if (state?.isAutoRefresh) {
           state.setInterval(0);
         } else {
           model.refresh();

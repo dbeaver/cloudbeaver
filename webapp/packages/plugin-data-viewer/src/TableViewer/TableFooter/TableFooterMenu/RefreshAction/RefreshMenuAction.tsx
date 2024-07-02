@@ -53,7 +53,7 @@ export const REFRESH_MENU_ITEM_REGISTRY: CRegistryList = [
           }
           const state = getRefreshState(context);
 
-          return !!state?.interval;
+          return !!state?.isAutoRefresh;
         },
       } as IComponentsTreeNodeValidator<typeof MenuBarAction>,
       {

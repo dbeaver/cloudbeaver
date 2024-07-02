@@ -24,6 +24,10 @@ export interface IDatabaseRefreshState {
 export class DatabaseRefreshAction<TResult extends IDatabaseDataResult> extends DatabaseDataAction<any, TResult> {
   static dataFormat: ResultDataFormat[] | null = null;
 
+  get isAutoRefresh(): boolean {
+    return this.state.interval > 0;
+  }
+
   get interval(): number {
     return this.state.interval;
   }
@@ -49,6 +53,7 @@ export class DatabaseRefreshAction<TResult extends IDatabaseDataResult> extends 
 
     if (this.state.interval) {
       this.startTimer();
+      this.resume();
     } else {
       this.stopTimer();
     }
@@ -72,7 +77,7 @@ export class DatabaseRefreshAction<TResult extends IDatabaseDataResult> extends 
 
   private stopTimer(): void {
     if (this.timer) {
-      clearInterval(this.timer);
+      clearTimeout(this.timer);
       this.timer = null;
     }
   }
@@ -81,7 +86,6 @@ export class DatabaseRefreshAction<TResult extends IDatabaseDataResult> extends 
     if (this.timer) {
       this.stopTimer();
     }
-    this.resume();
     this.timer = setTimeout(this.refresh.bind(this), this.state.interval);
   }
 
