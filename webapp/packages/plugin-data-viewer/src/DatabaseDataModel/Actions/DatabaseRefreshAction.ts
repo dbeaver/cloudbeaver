@@ -83,6 +83,9 @@ export class DatabaseRefreshAction<TResult extends IDatabaseDataResult> extends 
   }
 
   private startTimer(): void {
+    if (this.state.interval <= 0) {
+      return;
+    }
     if (this.timer) {
       this.stopTimer();
     }
@@ -99,7 +102,7 @@ export class DatabaseRefreshAction<TResult extends IDatabaseDataResult> extends 
       this.startTimer();
     } catch (exception) {
       if (this.state.stopOnError) {
-        this.stopTimer();
+        this.setInterval(0);
       } else {
         this.startTimer();
       }
