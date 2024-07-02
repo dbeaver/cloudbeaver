@@ -84,4 +84,16 @@ public class WebDatabaseConfig implements InternalDatabaseConfig {
     public String getSchema() {
         return schema;
     }
+
+    void setPassword(String password) {
+        this.password = password;
+    }
+
+    void setSchema(String schema) {
+        this.schema = schema;
+    }
+
+    void setUser(String user) {
+        this.user = user;
+    }
 }
