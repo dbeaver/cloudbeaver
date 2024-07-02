@@ -9,6 +9,9 @@ import { observer } from 'mobx-react-lite';
 
 import { FieldCheckbox, GroupTitle, InputField, ObjectPropertyInfoForm, useResource, useTranslate } from '@cloudbeaver/core-blocks';
 import { NetworkHandlerResource, SSH_TUNNEL_ID } from '@cloudbeaver/core-connections';
+import { useService } from '@cloudbeaver/core-di';
+import { ProjectInfoResource } from '@cloudbeaver/core-projects';
+import { ServerConfigResource } from '@cloudbeaver/core-root';
 import { NetworkHandlerAuthType, NetworkHandlerConfigInput } from '@cloudbeaver/core-sdk';
 
 import { SSHKeyUploader } from '../ConnectionForm/SSH/SSHKeyUploader';
@@ -19,11 +22,22 @@ interface Props {
   networkHandlersConfig: NetworkHandlerConfigInput[];
   allowSaveCredentials?: boolean;
   disabled?: boolean;
+  projectId: string | null;
 }
 
-export const NetworkHandlerAuthForm = observer<Props>(function NetworkHandlerAuthForm({ id, networkHandlersConfig, allowSaveCredentials, disabled }) {
+export const NetworkHandlerAuthForm = observer<Props>(function NetworkHandlerAuthForm({
+  id,
+  networkHandlersConfig,
+  allowSaveCredentials,
+  disabled,
+  projectId,
+}) {
   const translate = useTranslate();
   const handler = useResource(NetworkHandlerAuthForm, NetworkHandlerResource, id);
+  const serverConfigResource = useResource(NetworkHandlerAuthForm, ServerConfigResource, undefined);
+  const distributed = Boolean(serverConfigResource?.data?.distributed);
+  const projectInfoResource = useService(ProjectInfoResource);
+  const isSharedProject = projectInfoResource.isProjectShared(projectId);
 
   //@TODO Do not mutate state in component body
   if (!networkHandlersConfig.some(state => state.id === id)) {
@@ -70,7 +84,16 @@ export const NetworkHandlerAuthForm = observer<Props>(function NetworkHandlerAut
           id={id + '_savePassword'}
           name="savePassword"
           state={state}
-          label={translate('connections_connection_edit_save_credentials')}
+          label={translate(
+            !isSharedProject || distributed
+              ? 'connections_connection_authentication_save_credentials_for_user'
+              : 'connections_connection_authentication_save_credentials_for_session',
+          )}
+          title={translate(
+            !isSharedProject || distributed
+              ? 'connections_connection_authentication_save_credentials_for_user_tooltip'
+              : 'connections_connection_authentication_save_credentials_for_session_tooltip',
+          )}
           disabled={disabled}
         />
       )}
