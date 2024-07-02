@@ -57,11 +57,23 @@ export const ImageValuePresentation: TabContainerPanelComponent<IDataValuePanelP
       },
     );
 
+    function imageContextMenuHandler(event: React.MouseEvent<HTMLImageElement>) {
+      if (!data.canSave) {
+        event.preventDefault();
+      }
+    }
+
     return (
       <Container vertical>
         <Container fill overflow center>
           <Loader suspense>
-            {data.src && <ImageRenderer srcGetter={srcGetter} className={s(style, { img: true, stretch: state.stretch })} />}
+            {data.src && (
+              <ImageRenderer
+                srcGetter={srcGetter}
+                className={s(style, { img: true, stretch: state.stretch })}
+                onContextMenu={imageContextMenuHandler}
+              />
+            )}
             {isTruncatedMessageDisplay && (
               <QuotaPlaceholder model={data.model} resultIndex={data.resultIndex} elementKey={data.selectedCell}>
                 {isDownloadable && (
@@ -99,14 +111,15 @@ export const ImageValuePresentation: TabContainerPanelComponent<IDataValuePanelP
 interface ImageRendererProps {
   className?: string;
   srcGetter: () => string | null;
+  onContextMenu?: (event: React.MouseEvent<HTMLImageElement>) => void;
 }
 
-export const ImageRenderer = observer<ImageRendererProps>(function ImageRenderer({ srcGetter, className }) {
+export const ImageRenderer = observer<ImageRendererProps>(function ImageRenderer({ srcGetter, className, onContextMenu }) {
   const src = srcGetter();
 
   if (!src) {
     return null;
   }
 
-  return <img src={src} className={className} />;
+  return <img src={src} className={className} onContextMenu={onContextMenu} />;
 });

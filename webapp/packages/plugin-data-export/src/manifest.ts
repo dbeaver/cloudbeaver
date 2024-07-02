@@ -15,7 +15,6 @@ export const dataExportManifest: PluginManifest = {
   providers: [
     () => import('./Bootstrap').then(m => m.Bootstrap),
     () => import('./DataExportMenuService').then(m => m.DataExportMenuService),
-    () => import('./DataExportSettingsService').then(m => m.DataExportSettingsService),
     () => import('./DataExportService').then(m => m.DataExportService),
     () => import('./DataExportProcessService').then(m => m.DataExportProcessService),
     () => import('./DataTransferProcessorsResource').then(m => m.DataTransferProcessorsResource),

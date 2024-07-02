@@ -25,6 +25,7 @@
     "@cloudbeaver/core-executor": "^0",
     "@cloudbeaver/core-utils": "^0",
     "axios": "^1",
+    "graphql": "^16",
     "graphql-request": "^6",
     "mobx": "^6"
   },

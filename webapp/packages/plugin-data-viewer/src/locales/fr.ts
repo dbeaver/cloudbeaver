@@ -62,6 +62,8 @@ export default [
   ['settings_data_editor_disable_edit_name', "Désactiver l'édition"],
   ['settings_data_editor_disable_edit_description', "Désactiver l'édition des données dans le Data Viewer pour les utilisateurs non administrateurs"],
   ['settings_data_editor_disable_data_copy_name', 'Désactiver la copie'],
+  ['settings_data_editor_disable_data_export_name', 'Disable Export'],
+  ['settings_data_editor_disable_data_export_description', 'Disable exporting of data in Data Viewer for non-admin users'],
   [
     'settings_data_editor_disable_data_copy_description',
     'Désactiver la copie des données dans le Data Viewer pour les utilisateurs non administrateurs',
