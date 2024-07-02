@@ -71,8 +71,8 @@ export class DataViewerDataChangeConfirmationService {
           }
         }
       } catch (exception: any) {
-        ExecutorInterrupter.interrupt(contexts);
         this.notificationService.logException(exception, 'data_viewer_data_save_error_title');
+        throw exception;
       }
     }
   }
