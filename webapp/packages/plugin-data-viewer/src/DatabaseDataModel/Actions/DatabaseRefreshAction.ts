@@ -96,6 +96,8 @@ export class DatabaseRefreshAction<TResult extends IDatabaseDataResult> extends 
     } catch (exception) {
       if (this.state.stopOnError) {
         this.stopTimer();
+      } else {
+        this.startTimer();
       }
     }
   }
