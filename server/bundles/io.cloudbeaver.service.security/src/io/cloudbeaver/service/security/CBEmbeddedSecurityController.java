@@ -1685,13 +1685,15 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
                     "    {table_prefix}CB_AUTH_ATTEMPT attempt" +
                     "        JOIN" +
                     "    {table_prefix}CB_AUTH_ATTEMPT_INFO info ON attempt.AUTH_ID = info.AUTH_ID" +
-                    " WHERE AUTH_PROVIDER_ID = ? AND AUTH_USERNAME = ?" +
+                    " WHERE AUTH_PROVIDER_ID = ? AND AUTH_USERNAME = ? AND attempt.CREATE_TIME > ?" +
                     " ORDER BY attempt.CREATE_TIME DESC " +
                     database.getDialect().getOffsetLimitQueryPart(0, smConfig.getMaxFailedLogin())
             )
         )) {
             dbStat.setString(1, authProviderId);
             dbStat.setString(2, inputLogin);
+            dbStat.setTimestamp(3,
+                Timestamp.valueOf(LocalDateTime.now().minusSeconds(smConfig.getBlockLoginPeriod())));
             try (ResultSet dbResult = dbStat.executeQuery()) {
                 while (dbResult.next()) {
                     UserLoginRecord loginDto = new UserLoginRecord(
