@@ -72,12 +72,13 @@ export class TableRefreshActionBootstrap extends Bootstrap {
         const state = getRefreshState(context);
         items = [...items];
         for (const interval of AUTO_REFRESH_INTERVALS) {
+          const label = this.getLabel(interval);
           items.push(
             new MenuBaseItem(
               {
                 id: `auto-refresh-${interval}`,
-                label: this.getLabel(interval),
-                tooltip: 'data_viewer_action_auto_refresh',
+                label,
+                tooltip: label,
                 disabled: state?.interval === interval * 1000,
               },
               {
@@ -94,7 +95,7 @@ export class TableRefreshActionBootstrap extends Bootstrap {
             {
               id: 'auto-refresh-custom',
               label: 'ui_custom',
-              tooltip: 'data_viewer_action_auto_refresh',
+              tooltip: 'plugin_data_viewer_action_auto_refresh_custom',
             },
             {
               onSelect: this.configureAutoRefresh.bind(this, context),
