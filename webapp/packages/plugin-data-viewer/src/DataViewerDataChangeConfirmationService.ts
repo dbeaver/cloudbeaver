@@ -31,7 +31,7 @@ export class DataViewerDataChangeConfirmationService {
     const model = this.dataViewerTableService.get(modelId);
 
     if (model && !model.onRequest.hasHandler(this.checkUnsavedData)) {
-      model.onRequest.addHandler(executorHandlerFilter(({ operation }) => operation !== DatabaseDataSourceOperation.Save, this.checkUnsavedData));
+      model.onRequest.addHandler(executorHandlerFilter(({ operation }) => operation === DatabaseDataSourceOperation.Request, this.checkUnsavedData));
     }
   }
 

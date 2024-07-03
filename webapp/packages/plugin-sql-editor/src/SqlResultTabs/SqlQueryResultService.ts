@@ -136,14 +136,7 @@ export class SqlQueryResultService {
       const model = this.tableViewerStorageService.get(group.modelId);
 
       if (model) {
-        let canClose = false;
-
-        try {
-          await model.source.runTask(async () => {
-            canClose = true;
-          });
-        } catch {}
-        return canClose;
+        return await model.source.canSafelyDispose();
       }
     }
     return true;
