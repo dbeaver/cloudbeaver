@@ -13,7 +13,7 @@ import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { LocalizationService } from '@cloudbeaver/core-localization';
 import { declensionOfNumber } from '@cloudbeaver/core-utils';
-import { ACTION_REFRESH, ActionService, MenuBaseItem, menuExtractItems, MenuService } from '@cloudbeaver/core-view';
+import { ACTION_REFRESH, ActionService, MenuBaseItem, menuExtractItems, MenuSeparatorItem, MenuService } from '@cloudbeaver/core-view';
 
 import { IDatabaseRefreshState } from '../../../../DatabaseDataModel/Actions/DatabaseRefreshAction';
 import { DATA_CONTEXT_DV_DDM } from '../../../../DatabaseDataModel/DataContext/DATA_CONTEXT_DV_DDM';
@@ -90,6 +90,8 @@ export class TableRefreshActionBootstrap extends Bootstrap {
           );
         }
 
+        items.push(new MenuSeparatorItem());
+
         items.push(
           new MenuBaseItem(
             {
@@ -99,6 +101,22 @@ export class TableRefreshActionBootstrap extends Bootstrap {
             },
             {
               onSelect: this.configureAutoRefresh.bind(this, context),
+            },
+          ),
+        );
+
+        items.push(
+          new MenuBaseItem(
+            {
+              id: 'auto-refresh-stop',
+              label: 'ui_processing_stop',
+              tooltip: 'data_viewer_action_auto_refresh_stop',
+              disabled: !state?.isAutoRefresh,
+            },
+            {
+              onSelect: () => {
+                state?.setInterval(0);
+              },
             },
           ),
         );
