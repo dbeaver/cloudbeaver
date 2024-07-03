@@ -389,6 +389,7 @@ export abstract class DatabaseDataSource<TOptions, TResult extends IDatabaseData
 
   private executeOperation(type: DatabaseDataSourceOperation, operation: () => Promise<void> | void): ITask<void> {
     return new Task(async () => await this.onOperation.execute({ stage: 'request', operation: type })).run().then(contexts => {
+      // TODO: maybe it's better to throw an exception instead, so we will not have unexpected undefined results
       if (ExecutorInterrupter.isInterrupted(contexts)) {
         return;
       }
@@ -402,8 +403,9 @@ export abstract class DatabaseDataSource<TOptions, TResult extends IDatabaseData
 
           return operation();
         })
-        .then(async () => {
+        .then(async result => {
           await this.onOperation.execute({ stage: 'after', operation: type });
+          return result;
         });
     });
   }
