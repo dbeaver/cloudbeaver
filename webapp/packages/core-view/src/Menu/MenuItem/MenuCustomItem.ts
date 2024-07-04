@@ -32,3 +32,7 @@ export class MenuCustomItem<TExtraProps = unknown> extends MenuItem implements I
     this.getExtraProps = getters?.getExtraProps;
   }
 }
+
+export function isMenuCustomItem(obj: any): obj is MenuCustomItem<unknown> {
+  return obj && obj instanceof MenuCustomItem;
+}

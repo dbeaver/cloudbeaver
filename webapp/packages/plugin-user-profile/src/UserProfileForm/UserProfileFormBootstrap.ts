@@ -27,7 +27,7 @@ export class UserProfileFormBootstrap extends Bootstrap {
       key: 'account',
       name: 'plugin_user_profile_account_title',
       order: 1,
-      isHidden: () => this.authInfoService.userInfo === null,
+      isHidden: () => this.authInfoService.isAnonymous,
       panel: () => UserProfileFormPanel,
     });
   }

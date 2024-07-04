@@ -6,7 +6,6 @@
  * you may not use this file except in compliance with the License.
  */
 
-export interface IAutoRefreshSettings {
-  interval: number | null;
-  stopOnError: boolean;
-}
+// TODO: importLazyComponent currently not working with components registry
+// eslint-disable-next-line @cloudbeaver/no-sync-component-import
+export { MenuBarItem, type MenuBarItemProps } from './MenuBarItem';

@@ -7,9 +7,9 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import { s, SContext, StyleRegistry, useS } from '@cloudbeaver/core-blocks';
+import { Container, CRegistry, s, useS } from '@cloudbeaver/core-blocks';
 import { useDataContextLink } from '@cloudbeaver/core-data-context';
-import { MenuBar, MenuBarItemStyles } from '@cloudbeaver/core-ui';
+import { MenuBar, MenuBarItemStyles, MenuBarStyles } from '@cloudbeaver/core-ui';
 import { useMenu } from '@cloudbeaver/core-view';
 
 import { DATA_CONTEXT_DV_DDM } from '../../../DatabaseDataModel/DataContext/DATA_CONTEXT_DV_DDM';
@@ -17,8 +17,7 @@ import { DATA_CONTEXT_DV_DDM_RESULT_INDEX } from '../../../DatabaseDataModel/Dat
 import type { IDatabaseDataModel } from '../../../DatabaseDataModel/IDatabaseDataModel';
 import { DATA_CONTEXT_DATA_VIEWER_SIMPLE } from '../../TableHeader/DATA_CONTEXT_DATA_VIEWER_SIMPLE';
 import { DATA_VIEWER_DATA_MODEL_ACTIONS_MENU } from './DATA_VIEWER_DATA_MODEL_ACTIONS_MENU';
-import style from './TableFooterMenu.module.css';
-import tableFooterMenuBarItemStyles from './TableFooterMenuBarItemStyles.module.css';
+import { REFRESH_MENU_ITEM_REGISTRY } from './RefreshAction/RefreshMenuAction';
 
 interface Props {
   resultIndex: number;
@@ -27,10 +26,8 @@ interface Props {
   className?: string;
 }
 
-const registry: StyleRegistry = [[MenuBarItemStyles, { mode: 'append', styles: [tableFooterMenuBarItemStyles] }]];
-
 export const TableFooterMenu = observer<Props>(function TableFooterMenu({ resultIndex, model, simple, className }) {
-  const styles = useS(style, tableFooterMenuBarItemStyles);
+  const styles = useS(MenuBarStyles, MenuBarItemStyles);
   const menu = useMenu({ menu: DATA_VIEWER_DATA_MODEL_ACTIONS_MENU });
 
   useDataContextLink(menu.context, (context, id) => {
@@ -40,10 +37,8 @@ export const TableFooterMenu = observer<Props>(function TableFooterMenu({ result
   });
 
   return (
-    <div className={s(styles, { wrapper: true, tableFooterMenu: true }, className)}>
-      <SContext registry={registry}>
-        <MenuBar menu={menu} />
-      </SContext>
-    </div>
+    <CRegistry registry={REFRESH_MENU_ITEM_REGISTRY}>
+      <MenuBar menu={menu} className={s(styles, { floating: true, withLabel: true }, className)} />
+    </CRegistry>
   );
 });
