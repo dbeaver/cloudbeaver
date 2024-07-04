@@ -127,8 +127,17 @@ public class CBDatabase {
 
         LoggingProgressMonitor monitor = new LoggingProgressMonitor(log);
 
+        if (isDefaultH2Configuration(databaseConfiguration)) {
+            //force use default values even if they are explicitly specified
+            databaseConfiguration.setUser(null);
+            databaseConfiguration.setPassword(null);
+            databaseConfiguration.setSchema(null);
+        }
+
         String dbUser = databaseConfiguration.getUser();
         String dbPassword = databaseConfiguration.getPassword();
+        String schemaName = databaseConfiguration.getSchema();
+
         if (CommonUtils.isEmpty(dbUser) && driver.isEmbedded()) {
             File pwdFile = application.getDataDirectory(true).resolve(DEFAULT_DB_PWD_FILE).toFile();
             if (!driver.isAnonymousAccess()) {
@@ -191,7 +200,6 @@ public class CBDatabase {
             DatabaseMetaData metaData = connection.getMetaData();
             log.debug("\tConnected to " + metaData.getDatabaseProductName() + " " + metaData.getDatabaseProductVersion());
 
-            var schemaName = databaseConfiguration.getSchema();
             if (dialect instanceof SQLDialectSchemaController && CommonUtils.isNotEmpty(schemaName)) {
                 var dialectSchemaController = (SQLDialectSchemaController) dialect;
                 var schemaExistQuery = dialectSchemaController.getSchemaExistQuery(schemaName);
@@ -576,6 +584,13 @@ public class CBDatabase {
     @NotNull
     public SQLDialect getDialect() {
         return dialect;
+    }
+
+    public static boolean isDefaultH2Configuration(WebDatabaseConfig databaseConfiguration) {
+        var v1DefaultUrl = "jdbc:h2:/opt/cloudbeaver/workspace/.data/" + V1_DB_NAME;
+        var v2DefaultUrl = "jdbc:h2:/opt/cloudbeaver/workspace/.data/" + V2_DB_NAME;
+        return v1DefaultUrl.equals(databaseConfiguration.getUrl())
+            || v2DefaultUrl.equals(databaseConfiguration.getUrl());
     }
 
 }

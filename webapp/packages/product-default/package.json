@@ -5,7 +5,7 @@
     "src/**/*.scss",
     "public/**/*"
   ],
-  "version": "24.1.2",
+  "version": "24.1.3",
   "description": "CloudBeaver Community",
   "license": "Apache-2.0",
   "main": "dist/index.js",
@@ -44,6 +44,7 @@
     "@cloudbeaver/plugin-data-spreadsheet-new": "^0",
     "@cloudbeaver/plugin-data-viewer": "^0",
     "@cloudbeaver/plugin-data-viewer-result-set-grouping": "^0",
+    "@cloudbeaver/plugin-data-viewer-result-trace-details": "^0",
     "@cloudbeaver/plugin-datasource-context-switch": "^0",
     "@cloudbeaver/plugin-datasource-transaction-manager": "^0",
     "@cloudbeaver/plugin-ddl-viewer": "^0",

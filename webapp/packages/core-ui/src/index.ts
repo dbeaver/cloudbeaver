@@ -11,6 +11,7 @@ export * from './Clipboard/ClipboardService';
 export * from './ContextMenu/ContextMenuLazy';
 export * from './ContextMenu/IContextMenuItemProps';
 export * from './ContextMenu/MenuBar/MenuBarLazy';
+export * from './ContextMenu/MenuBar/MenuBarItemLoader';
 export { default as MenuBarStyles } from './ContextMenu/MenuBar/MenuBar.module.css';
 export { default as MenuBarItemStyles } from './ContextMenu/MenuBar/MenuBarItem.module.css';
 

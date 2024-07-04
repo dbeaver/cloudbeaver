@@ -15,7 +15,7 @@ import { useS } from './useS';
 
 interface Props {
   state: 'play' | 'stop';
-  interval: number;
+  interval: React.ReactNode;
 }
 
 export const TimerIcon = observer<Props & React.ButtonHTMLAttributes<HTMLDivElement>>(function TimerIcon({ state, interval, ...rest }) {

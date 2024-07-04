@@ -62,9 +62,8 @@ export class DataGridContextMenuFilterService {
       throw new Error(`Failed to get result column info for the following column index: "${column.index}"`);
     }
 
-    await model.requestDataAction(async () => {
+    await model.request(() => {
       constraints.setFilter(resultColumn.position, operator, filterValue);
-      await model.request(true);
     });
   }
 
@@ -150,9 +149,8 @@ export class DataGridContextMenuFilterService {
         const { model, resultIndex } = context.data;
         const constraints = model.source.getAction(resultIndex, DatabaseDataConstraintAction);
 
-        await model.requestDataAction(async () => {
+        await model.request(() => {
           constraints.deleteData();
-          await model.request(true);
         });
       },
     });
@@ -362,9 +360,8 @@ export class DataGridContextMenuFilterService {
           throw new Error(`Failed to get result column info for the following column index: "${key.column.index}"`);
         }
 
-        await model.requestDataAction(async () => {
+        await model.request(() => {
           constraints.deleteFilter(resultColumn.position);
-          await model.request(true);
         });
       },
     });
@@ -386,9 +383,8 @@ export class DataGridContextMenuFilterService {
         const { model, resultIndex } = context.data;
         const constraints = model.source.getAction(resultIndex, DatabaseDataConstraintAction);
 
-        await model.requestDataAction(async () => {
+        await model.request(() => {
           constraints.deleteDataFilters();
-          await model.request(true);
         });
       },
     });

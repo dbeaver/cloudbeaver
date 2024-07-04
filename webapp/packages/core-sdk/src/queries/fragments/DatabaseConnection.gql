@@ -18,6 +18,8 @@ fragment DatabaseConnection on ConnectionInfo {
   folder
   nodePath
 
+  mainPropertyValues
+
   configurationType @include(if: $customIncludeOptions)
   useUrl @include(if: $customIncludeOptions)
   host @include(if: $customIncludeOptions)

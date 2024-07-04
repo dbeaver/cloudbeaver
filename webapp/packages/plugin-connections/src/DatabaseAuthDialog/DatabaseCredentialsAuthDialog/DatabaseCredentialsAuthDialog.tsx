@@ -62,6 +62,7 @@ export const DatabaseCredentialsAuthDialog = observer<Props>(function DatabaseCr
               authProperties={dialog.connection?.authProperties}
               networkHandlers={networkHandlers}
               formId={`${connection.projectId}:${connection.connectionId}`}
+              projectId={connection.projectId}
               allowSaveCredentials={credentialsSavingEnabled}
               className={s(styles, { connectionAuthenticationFormLoader: true })}
               disabled={dialog.authenticating}

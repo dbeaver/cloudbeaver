@@ -449,9 +449,7 @@ export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoPar
       this.onDataOutdated.execute(key);
     });
 
-    const connection = this.get(key)!;
-    this.onConnectionClose.execute(key);
-    return connection;
+    return this.get(key)!;
   }
 
   deleteConnection(key: IConnectionInfoParams): Promise<void>;
@@ -567,6 +565,10 @@ export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoPar
         ...handler,
       })),
     });
+
+    if (oldConnection?.connected && !value.connected) {
+      this.onConnectionClose.execute(key);
+    }
   }
 
   protected dataDelete(key: IConnectionInfoParams): void {

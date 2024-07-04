@@ -66,7 +66,8 @@ export class UsersResource extends CachedMapResource<string, AdminUser, UserReso
   ) {
     super();
 
-    sessionPermissionsResource.require(this, EAdminPermission.admin).outdateResource(this);
+    sessionPermissionsResource.require(this, EAdminPermission.admin);
+    sessionPermissionsResource.onDataOutdated.addHandler(() => this.markOutdated());
     this.aliases.add(UsersResourceFilterKey, key =>
       resourceKeyList(
         this.entries

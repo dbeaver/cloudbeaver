@@ -6,6 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 import type { IMenu } from '../IMenu';
+import type { IMenuActionItem } from './IMenuActionItem';
 import type { IMenuItem, IMenuItemEvents } from './IMenuItem';
 
 export interface IMenuSubMenuEvents extends IMenuItemEvents {
@@ -17,6 +18,11 @@ export interface IMenuSubMenuItemProperties<TExtraProps = unknown> {
   label?: string;
   icon?: string;
   tooltip?: string;
+
+  /**
+   * experimental, can be changed
+   */
+  readonly action?: IMenuActionItem;
   getExtraProps?: () => TExtraProps;
   iconComponent?: () => MenuSubMenuItemIconComponent<TExtraProps>;
 }

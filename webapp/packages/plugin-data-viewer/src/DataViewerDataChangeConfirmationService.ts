@@ -9,10 +9,11 @@ import { ConfirmationDialog } from '@cloudbeaver/core-blocks';
 import { injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { ExecutorInterrupter, IExecutionContextProvider } from '@cloudbeaver/core-executor';
+import { executorHandlerFilter, ExecutorInterrupter, IExecutionContextProvider } from '@cloudbeaver/core-executor';
 
 import { DatabaseEditAction } from './DatabaseDataModel/Actions/DatabaseEditAction';
 import type { IRequestEventData } from './DatabaseDataModel/IDatabaseDataModel';
+import { DatabaseDataSourceOperation } from './DatabaseDataModel/IDatabaseDataSource';
 import { TableViewerStorageService } from './TableViewer/TableViewerStorageService';
 
 @injectable()
@@ -25,16 +26,17 @@ export class DataViewerDataChangeConfirmationService {
     this.checkUnsavedData = this.checkUnsavedData.bind(this);
   }
 
+  // TODO: should be automatically called when the model is created, we can add executor to TableViewerStorageService for that
   trackTableDataUpdate(modelId: string) {
     const model = this.dataViewerTableService.get(modelId);
 
     if (model && !model.onRequest.hasHandler(this.checkUnsavedData)) {
-      model.onRequest.addHandler(this.checkUnsavedData);
+      model.onRequest.addHandler(executorHandlerFilter(({ operation }) => operation === DatabaseDataSourceOperation.Request, this.checkUnsavedData));
     }
   }
 
-  private async checkUnsavedData({ type, model }: IRequestEventData<any, any>, contexts: IExecutionContextProvider<IRequestEventData<any, any>>) {
-    if (type === 'before') {
+  private async checkUnsavedData({ stage, model }: IRequestEventData<any, any>, contexts: IExecutionContextProvider<IRequestEventData<any, any>>) {
+    if (stage === 'request') {
       const confirmationContext = contexts.getContext(SaveConfirmedContext);
 
       if (confirmationContext.confirmed === false) {
@@ -70,8 +72,8 @@ export class DataViewerDataChangeConfirmationService {
           }
         }
       } catch (exception: any) {
-        ExecutorInterrupter.interrupt(contexts);
         this.notificationService.logException(exception, 'data_viewer_data_save_error_title');
+        throw exception;
       }
     }
   }

@@ -33,8 +33,6 @@ export class DatabaseDataModel<TOptions, TResult extends IDatabaseDataResult = I
   readonly onOptionsChange: IExecutor;
   readonly onRequest: IExecutor<IRequestEventData<TOptions, TResult>>;
 
-  private currentTask: Promise<void> | null;
-
   constructor(source: IDatabaseDataSource<TOptions, TResult>) {
     this.id = uuid();
     this.name = null;
@@ -43,7 +41,7 @@ export class DatabaseDataModel<TOptions, TResult extends IDatabaseDataResult = I
     this.onDispose = new Executor();
     this.onOptionsChange = new Executor();
     this.onRequest = new Executor();
-    this.currentTask = null;
+    this.source.onOperation.next(this.onRequest, data => ({ ...data, model: this }));
 
     makeObservable(this, {
       countGain: observable,
@@ -63,7 +61,7 @@ export class DatabaseDataModel<TOptions, TResult extends IDatabaseDataResult = I
   }
 
   isDataAvailable(offset: number, count: number): boolean {
-    return this.source.offset <= offset && this.source.count >= count;
+    return this.source.isDataAvailable(offset, count);
   }
 
   getResults(): TResult[] {
@@ -121,37 +119,29 @@ export class DatabaseDataModel<TOptions, TResult extends IDatabaseDataResult = I
   }
 
   async save(): Promise<void> {
-    await this.requestSaveAction(() => this.source.saveData());
+    await this.source.saveData();
   }
 
   async retry(): Promise<void> {
-    await this.requestDataAction(() => this.source.retry());
+    await this.source.retry();
   }
 
-  async refresh(concurrent?: boolean): Promise<void> {
-    if (concurrent) {
-      await this.source.refreshData();
-      return;
-    }
-    await this.requestDataAction(() => this.source.refreshData());
+  async refresh(): Promise<void> {
+    await this.source.refreshData();
   }
 
-  async request(concurrent?: boolean): Promise<void> {
-    if (concurrent) {
-      await this.source.requestData();
-      return;
-    }
-    await this.requestDataAction(() => this.source.requestData());
+  async request(mutation?: () => void): Promise<void> {
+    await this.source.requestData(mutation);
   }
 
   async reload(): Promise<void> {
-    await this.requestDataAction(() => this.source.setSlice(0, this.countGain).requestData());
+    await this.request(() => {
+      this.setSlice(0, this.countGain);
+    });
   }
 
   async requestDataPortion(offset: number, count: number): Promise<void> {
-    if (!this.isDataAvailable(offset, count)) {
-      await this.requestDataAction(() => this.source.setSlice(offset, count).requestData());
-    }
+    await this.source.requestDataPortion(offset, count);
   }
 
   async cancel(): Promise<void> {
@@ -165,39 +155,5 @@ export class DatabaseDataModel<TOptions, TResult extends IDatabaseDataResult = I
   async dispose(keepExecutionContext = false): Promise<void> {
     await this.onDispose.execute();
     await this.source.dispose(keepExecutionContext);
-  }
-
-  async requestSaveAction(action: () => Promise<void> | void): Promise<void> {
-    return action();
-  }
-
-  async requestDataAction(action: () => Promise<void> | void): Promise<void> {
-    if (this.currentTask) {
-      return this.currentTask;
-    }
-
-    try {
-      this.currentTask = this.requestDataActionTask(action);
-      return await this.currentTask;
-    } finally {
-      this.currentTask = null;
-    }
-  }
-
-  private async requestDataActionTask(action: () => Promise<void> | void): Promise<void> {
-    let contexts = await this.onRequest.execute({ type: 'on', model: this });
-
-    if (ExecutorInterrupter.isInterrupted(contexts)) {
-      return;
-    }
-
-    contexts = await this.onRequest.execute({ type: 'before', model: this });
-
-    if (ExecutorInterrupter.isInterrupted(contexts)) {
-      return;
-    }
-
-    await action();
-    await this.onRequest.execute({ type: 'after', model: this });
   }
 }
