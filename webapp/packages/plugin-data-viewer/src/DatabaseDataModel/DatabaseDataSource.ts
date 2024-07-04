@@ -65,7 +65,7 @@ export abstract class DatabaseDataSource<TOptions, TResult extends IDatabaseData
   private get activeOperation(): Promise<void> | null {
     return this.activeOperationStack[this.activeOperationStack.length - 1] ?? null;
   }
-  private readonly activeOperationStack: Array<Promise<void>>;
+  private readonly activeOperationStack: Array<Promise<any>>;
 
   constructor(serviceInjector: IServiceInjector) {
     this.serviceInjector = serviceInjector;
@@ -286,12 +286,12 @@ export abstract class DatabaseDataSource<TOptions, TResult extends IDatabaseData
     await this.lastAction();
   }
 
-  async runTask(task: () => Promise<any>): Promise<any> {
+  async runOperation<T>(task: () => Promise<T>): Promise<T | null> {
     return this.tryExecuteOperation(DatabaseDataSourceOperation.Task, task);
   }
 
   async requestData(mutation?: () => void): Promise<void> {
-    await this.tryExecuteOperation(DatabaseDataSourceOperation.Load, () => {
+    await this.tryExecuteOperation(DatabaseDataSourceOperation.Request, () => {
       this.lastAction = this.requestData.bind(this);
 
       mutation?.();
@@ -300,7 +300,7 @@ export abstract class DatabaseDataSource<TOptions, TResult extends IDatabaseData
   }
 
   async requestDataPortion(offset: number, count: number): Promise<void> {
-    await this.tryExecuteOperation(DatabaseDataSourceOperation.Load, () => {
+    await this.tryExecuteOperation<TResult[] | void>(DatabaseDataSourceOperation.Request, () => {
       if (!this.isDataAvailable(offset, count)) {
         this.lastAction = this.requestDataPortion.bind(this, offset, count);
 
@@ -312,7 +312,7 @@ export abstract class DatabaseDataSource<TOptions, TResult extends IDatabaseData
   }
 
   async refreshData(): Promise<void> {
-    await this.tryExecuteOperation(DatabaseDataSourceOperation.Refresh, () => {
+    await this.tryExecuteOperation(DatabaseDataSourceOperation.Request, () => {
       this.lastAction = this.refreshData.bind(this);
 
       if (this.prevOptions) {
@@ -331,6 +331,15 @@ export abstract class DatabaseDataSource<TOptions, TResult extends IDatabaseData
         this.setResults(data);
       });
     });
+  }
+
+  async canSafelyDispose(): Promise<boolean> {
+    try {
+      const result = await this.tryExecuteOperation(DatabaseDataSourceOperation.Request, async () => true);
+      return result || false;
+    } catch {
+      return false;
+    }
   }
 
   clearError(): this {
@@ -358,7 +367,7 @@ export abstract class DatabaseDataSource<TOptions, TResult extends IDatabaseData
   abstract loadTotalCount(resultIndex: number): Promise<ITask<number>>;
   abstract cancelLoadTotalCount(): Promise<ITask<number> | null>;
 
-  private async requestDataAction(): Promise<TResult[] | null> {
+  private async requestDataAction(): Promise<TResult[]> {
     this.prevOptions = toJS(this.options);
     return this.request(this.results).then(data => {
       this.outdated = false;
@@ -370,8 +379,8 @@ export abstract class DatabaseDataSource<TOptions, TResult extends IDatabaseData
     });
   }
 
-  private async tryExecuteOperation(type: DatabaseDataSourceOperation, operation: () => Promise<any>): Promise<void> {
-    if (this.activeOperation && type !== DatabaseDataSourceOperation.Task && type !== DatabaseDataSourceOperation.Save) {
+  private async tryExecuteOperation<T>(type: DatabaseDataSourceOperation, operation: () => Promise<T>): Promise<T | null> {
+    if (this.activeOperation && type !== DatabaseDataSourceOperation.Request) {
       await this.activeOperation;
     }
 
@@ -387,23 +396,25 @@ export abstract class DatabaseDataSource<TOptions, TResult extends IDatabaseData
     }
   }
 
-  private executeOperation(type: DatabaseDataSourceOperation, operation: () => Promise<void> | void): ITask<void> {
+  private executeOperation<T>(type: DatabaseDataSourceOperation, operation: () => Promise<T> | T): ITask<T | null> {
     return new Task(async () => await this.onOperation.execute({ stage: 'request', operation: type })).run().then(contexts => {
+      // TODO: maybe it's better to throw an exception instead, so we will not have unexpected undefined results
       if (ExecutorInterrupter.isInterrupted(contexts)) {
-        return;
+        return null;
       }
 
       return new Task(async () => await this.onOperation.execute({ stage: 'before', operation: type }))
         .run()
         .then(contexts => {
           if (ExecutorInterrupter.isInterrupted(contexts)) {
-            return;
+            return null;
           }
 
           return operation();
         })
-        .then(async () => {
+        .then(async result => {
           await this.onOperation.execute({ stage: 'after', operation: type });
+          return result;
         });
     });
   }

@@ -15,10 +15,12 @@ import type { IDatabaseDataActions } from './IDatabaseDataActions';
 import type { IDatabaseDataResult } from './IDatabaseDataResult';
 
 export enum DatabaseDataSourceOperation {
-  Load = 'load',
-  Save = 'save',
-  Refresh = 'refresh',
+  /** Abstract operation with data, should not lead to data lost */
   Task = 'task',
+  /** Saving operation */
+  Save = 'save',
+  /** May lead to data lost */
+  Request = 'request',
 }
 export interface IDatabaseDataSourceOperationEvent {
   stage: 'request' | 'before' | 'after';
@@ -102,15 +104,19 @@ export interface IDatabaseDataSource<TOptions, TResult extends IDatabaseDataResu
   cancelLoadTotalCount: () => Promise<ITask<number> | null>;
 
   retry: () => Promise<void>;
-  /** Allows to perform an asynchronous action on the data source, this action will wait previous action to finish and save or load requests.
-   * The data source will have a loading and disabled state while performing an action */
-  runTask: <T>(task: () => Promise<T>) => Promise<T>;
+  /**
+   * Perform operation with data source. This action should not lead to data lost. Can be cancelled when operation is Task.
+   * @param operation Task or Promise
+   * @returns
+   */
+  runOperation: <T>(operation: () => Promise<T>) => Promise<T | null>;
   requestDataPortion(offset: number, count: number): Promise<void>;
-  requestData: (mutation?: () => void) => Promise<void> | void;
-  refreshData: () => Promise<void> | void;
-  saveData: () => Promise<void> | void;
-  cancel: () => Promise<void> | void;
+  requestData: (mutation?: () => void) => Promise<void>;
+  refreshData: () => Promise<void>;
+  saveData: () => Promise<void>;
+  cancel: () => Promise<void>;
   clearError: () => this;
   resetData: () => this;
+  canSafelyDispose: () => Promise<boolean>;
   dispose: (keepExecutionContext?: boolean) => Promise<void>;
 }

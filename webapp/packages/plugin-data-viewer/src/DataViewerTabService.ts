@@ -111,14 +111,7 @@ export class DataViewerTabService {
     const model = this.tableViewerStorageService.get(tab.handlerState.tableId || '');
 
     if (model) {
-      let canClose = false;
-      try {
-        await model.source.runTask(async () => {
-          canClose = true;
-        });
-      } catch {}
-
-      return canClose;
+      return await model.source.canSafelyDispose();
     }
 
     return true;
