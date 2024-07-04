@@ -21,6 +21,7 @@ export default [
   ['data_viewer_action_refresh', 'Actualiser'],
   ['data_viewer_action_auto_refresh', 'Actualisation automatique'],
   ['data_viewer_action_auto_refresh_stop', "Arrêter l'actualisation automatique"],
+  ['plugin_data_viewer_action_auto_refresh_custom', 'Configure auto-refresh'],
   ['data_viewer_action_edit_delete', 'Supprimer la sélection'],
   ['data_viewer_action_edit_add', 'Ajouter'],
   ['data_viewer_action_edit_add_copy', 'Dupliquer'],
