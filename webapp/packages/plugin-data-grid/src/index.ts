@@ -5,9 +5,12 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import ReactDataGrid from 'react-data-grid';
+import { dataGridPlugin } from './manifest';
 
-export default ReactDataGrid;
+export default dataGridPlugin;
+export { dataGridPlugin };
+
+export { DataGrid } from './DataGridLazy';
 
 export {
   type CellSelectArgs,
@@ -20,4 +23,4 @@ export {
   type CalculatedColumn,
   Cell,
   type CellRendererProps,
-} from 'react-data-grid';
+} from '@cloudbeaver/plugin-react-data-grid';

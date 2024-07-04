@@ -24,8 +24,8 @@
     "@cloudbeaver/core-sdk": "^0",
     "@cloudbeaver/core-theming": "^0",
     "@cloudbeaver/core-utils": "^0",
+    "@cloudbeaver/plugin-data-grid": "^0",
     "@cloudbeaver/plugin-data-viewer": "^0",
-    "@cloudbeaver/plugin-react-data-grid": "^0",
     "mobx": "^6",
     "mobx-react-lite": "^4",
     "react": "^18"

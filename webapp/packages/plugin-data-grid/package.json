@@ -1,5 +1,5 @@
 {
-  "name": "@cloudbeaver/plugin-object-viewer",
+  "name": "@cloudbeaver/plugin-data-grid",
   "sideEffects": [
     "src/**/*.css",
     "src/**/*.scss",
@@ -14,33 +14,18 @@
     "clean": "rimraf --glob dist",
     "lint": "eslint ./src/ --ext .ts,.tsx",
     "lint-fix": "eslint ./src/ --ext .ts,.tsx --fix",
+    "test": "core-cli-test",
     "validate-dependencies": "core-cli-validate-dependencies",
     "update-ts-references": "yarn run clean && typescript-resolve-references"
   },
   "dependencies": {
     "@cloudbeaver/core-blocks": "^0",
-    "@cloudbeaver/core-connections": "^0",
-    "@cloudbeaver/core-data-context": "^0",
     "@cloudbeaver/core-di": "^0",
-    "@cloudbeaver/core-events": "^0",
-    "@cloudbeaver/core-executor": "^0",
-    "@cloudbeaver/core-localization": "^0",
-    "@cloudbeaver/core-navigation-tree": "^0",
-    "@cloudbeaver/core-projects": "^0",
-    "@cloudbeaver/core-resource": "^0",
-    "@cloudbeaver/core-sdk": "^0",
     "@cloudbeaver/core-theming": "^0",
-    "@cloudbeaver/core-ui": "^0",
-    "@cloudbeaver/core-utils": "^0",
-    "@cloudbeaver/core-view": "^0",
-    "@cloudbeaver/plugin-connections": "^0",
-    "@cloudbeaver/plugin-data-grid": "^0",
-    "@cloudbeaver/plugin-navigation-tabs": "^0",
-    "@cloudbeaver/plugin-navigation-tree": "^0",
-    "mobx": "^6",
+    "@cloudbeaver/plugin-react-data-grid": "^0",
+    "clsx": "^2",
     "mobx-react-lite": "^4",
-    "react": "^18",
-    "reakit": "^1"
+    "react": "^18"
   },
   "peerDependencies": {},
   "devDependencies": {
