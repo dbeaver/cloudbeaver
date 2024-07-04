@@ -21,6 +21,7 @@ export default [
   ['data_viewer_action_refresh', 'Обновить'],
   ['data_viewer_action_auto_refresh', 'Автообновление'],
   ['data_viewer_action_auto_refresh_stop', 'Остановить автообновление'],
+  ['plugin_data_viewer_action_auto_refresh_custom', 'Настроить автообновление'],
   ['data_viewer_action_edit_delete', 'Удалить'],
   ['data_viewer_action_edit_add', 'Добавить'],
   ['data_viewer_action_edit_add_copy', 'Дублировать'],

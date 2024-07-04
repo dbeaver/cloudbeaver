@@ -24,7 +24,11 @@ export class ScriptPreviewService {
 
   async open(model: IDatabaseDataModel, resultIndex: number): Promise<void> {
     try {
-      const script = await model.source.runTask(() => this.tryGetScript(model, resultIndex));
+      const script = await model.source.runOperation(() => this.tryGetScript(model, resultIndex));
+
+      if (script === null) {
+        throw new Error('Script is not provided');
+      }
 
       this.commonDialogService.open(ScriptPreviewDialog, {
         script,
