@@ -24,5 +24,8 @@ export class TemplateConnectionsService {
     // );
     return [];
   }
-  constructor(private readonly templateConnectionsResource: TemplateConnectionsResource, private readonly projectsService: ProjectsService) {}
+  constructor(
+    private readonly templateConnectionsResource: TemplateConnectionsResource,
+    private readonly projectsService: ProjectsService,
+  ) {}
 }
