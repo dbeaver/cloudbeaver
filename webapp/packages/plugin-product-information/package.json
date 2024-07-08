@@ -1,5 +1,5 @@
 {
-  "name": "@cloudbeaver/plugin-product",
+  "name": "@cloudbeaver/plugin-product-information",
   "sideEffects": [
     "src/**/*.css",
     "src/**/*.scss",

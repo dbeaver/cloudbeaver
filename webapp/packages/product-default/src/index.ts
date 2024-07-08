@@ -37,7 +37,7 @@ import { navigationTreePlugin } from '@cloudbeaver/plugin-navigation-tree';
 import navigationTreeFilters from '@cloudbeaver/plugin-navigation-tree-filters';
 import { navigationTreeRMPlugin } from '@cloudbeaver/plugin-navigation-tree-rm';
 import { objectViewerManifest } from '@cloudbeaver/plugin-object-viewer';
-import productPlugin from '@cloudbeaver/plugin-product';
+import productInformationPlugin from '@cloudbeaver/plugin-product-information';
 import projects from '@cloudbeaver/plugin-projects';
 import resourceManager from '@cloudbeaver/plugin-resource-manager';
 import resourceManagerAdministration from '@cloudbeaver/plugin-resource-manager-administration';
@@ -98,7 +98,7 @@ const PLUGINS: PluginManifest[] = [
   connectionPlugin,
   connectionAdministration,
   versionUpdate,
-  productPlugin,
+  productInformationPlugin,
   settingsMenu,
   settingsMenuAdministration,
   settingsPanelPlugin,

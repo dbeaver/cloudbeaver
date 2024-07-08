@@ -58,7 +58,7 @@
     "@cloudbeaver/plugin-navigation-tree-filters": "^0",
     "@cloudbeaver/plugin-navigation-tree-rm": "^0",
     "@cloudbeaver/plugin-object-viewer": "^0",
-    "@cloudbeaver/plugin-product": "^0",
+    "@cloudbeaver/plugin-product-information": "^0",
     "@cloudbeaver/plugin-projects": "^0",
     "@cloudbeaver/plugin-resource-manager": "^0",
     "@cloudbeaver/plugin-resource-manager-administration": "^0",

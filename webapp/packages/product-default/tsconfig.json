@@ -106,7 +106,7 @@
       "path": "../plugin-object-viewer/tsconfig.json"
     },
     {
-      "path": "../plugin-product/tsconfig.json"
+      "path": "../plugin-product-information/tsconfig.json"
     },
     {
       "path": "../plugin-projects/tsconfig.json"
