@@ -19,7 +19,10 @@ export type ApplicationFeature = WebFeatureSet;
 @injectable()
 export class FeaturesResource extends CachedDataResource<ApplicationFeature[]> {
   private baseFeatures: string[];
-  constructor(private readonly graphQLService: GraphQLService, permissionsResource: SessionPermissionsResource) {
+  constructor(
+    private readonly graphQLService: GraphQLService,
+    permissionsResource: SessionPermissionsResource,
+  ) {
     super(() => []);
 
     this.baseFeatures = [];

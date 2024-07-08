@@ -9,8 +9,8 @@ import { ACTION_REFRESH, createMenu } from '@cloudbeaver/core-view';
 
 export const MENU_DATA_VIEWER_AUTO_REFRESH = createMenu(
   'auto-refresh',
-  'data_viewer_action_auto_refresh',
+  'data_viewer_action_auto_refresh_menu_tooltip',
   undefined,
-  'data_viewer_action_auto_refresh',
+  'data_viewer_action_auto_refresh_menu_tooltip',
   ACTION_REFRESH,
 );

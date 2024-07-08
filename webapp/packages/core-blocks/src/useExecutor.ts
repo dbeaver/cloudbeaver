@@ -74,7 +74,5 @@ export function useExecutor<T>(options: IUseExecutorOptions<T>): void {
         executor.removeBefore(before);
       }
     };
-  }, [
-    executor, props.handlers?.length, props.postHandlers?.length, before, next,
-  ]);
+  }, [executor, props.handlers?.length, props.postHandlers?.length, before, next]);
 }
