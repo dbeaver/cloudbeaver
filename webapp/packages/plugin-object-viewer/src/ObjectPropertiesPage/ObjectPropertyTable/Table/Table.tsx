@@ -14,7 +14,7 @@ import { type DBObject, NavTreeResource } from '@cloudbeaver/core-navigation-tre
 import type { ObjectPropertyInfo } from '@cloudbeaver/core-sdk';
 import { useTabLocalState } from '@cloudbeaver/core-ui';
 import { isDefined, TextTools } from '@cloudbeaver/core-utils';
-import { DataGrid } from '@cloudbeaver/plugin-data-grid';
+import { DataGrid, DataGridContainer } from '@cloudbeaver/plugin-data-grid';
 
 import { getValue } from '../../helpers';
 import { ObjectPropertyTableFooter } from '../ObjectPropertyTableFooter';
@@ -127,7 +127,7 @@ export const Table = observer<TableProps>(function Table({ objects, hasNextPage,
 
   return (
     <TableContext.Provider value={{ tableData, tableState }}>
-      <div ref={setTableContainerRef} className={s(styles, { container: true })}>
+      <DataGridContainer ref={setTableContainerRef} className={s(styles, { container: true })}>
         <DataGrid
           className={s(styles, { dataGrid: true })}
           rows={objects}
@@ -144,7 +144,7 @@ export const Table = observer<TableProps>(function Table({ objects, hasNextPage,
           </div>
         )}
         <ObjectPropertyTableFooter className={s(styles, { objectPropertyTableFooter: true })} state={tableState} />
-      </div>
+      </DataGridContainer>
     </TableContext.Provider>
   );
 });

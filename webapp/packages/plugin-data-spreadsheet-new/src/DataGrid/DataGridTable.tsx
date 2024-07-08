@@ -14,7 +14,7 @@ import { EventContext, EventStopPropagationFlag } from '@cloudbeaver/core-events
 import { Executor } from '@cloudbeaver/core-executor';
 import { ClipboardService } from '@cloudbeaver/core-ui';
 import { useCaptureViewContext } from '@cloudbeaver/core-view';
-import { type CellSelectArgs, DataGrid, type DataGridHandle, type Position } from '@cloudbeaver/plugin-data-grid';
+import { type CellSelectArgs, DataGrid, DataGridContainer, type DataGridHandle, type Position } from '@cloudbeaver/plugin-data-grid';
 import {
   DATA_CONTEXT_DV_PRESENTATION,
   DatabaseDataSelectActionsData,
@@ -437,7 +437,7 @@ export const DataGridTable = observer<IDataPresentationProps<any, IDatabaseResul
       <DataGridSelectionContext.Provider value={gridSelectionContext}>
         <EditingContext.Provider value={editingContext}>
           <TableDataContext.Provider value={tableData}>
-            <div
+            <DataGridContainer
               ref={setContainersRef}
               className={s(styles, { container: true }, className)}
               tabIndex={-1}
@@ -466,7 +466,7 @@ export const DataGridTable = observer<IDataPresentationProps<any, IDatabaseResul
                 onScroll={handleScroll}
               />
               <div ref={editorRef} />
-            </div>
+            </DataGridContainer>
           </TableDataContext.Provider>
         </EditingContext.Provider>
       </DataGridSelectionContext.Provider>

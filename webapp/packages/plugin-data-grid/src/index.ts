@@ -11,6 +11,7 @@ export default dataGridPlugin;
 export { dataGridPlugin };
 
 export { DataGrid } from './DataGridLazy';
+export { DataGridContainer } from './DataGridContainerLazy';
 
 export {
   type CellSelectArgs,

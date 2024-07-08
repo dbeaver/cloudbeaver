@@ -19,6 +19,7 @@
   outline: 0 !important;
   height: 100% !important;
   border: none !important;
+  color-scheme: inherit !important;
 
   :global(.rdg-cell) {
     outline: 0 !important;

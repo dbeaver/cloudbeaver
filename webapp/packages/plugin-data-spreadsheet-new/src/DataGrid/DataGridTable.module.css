@@ -41,10 +41,6 @@
     background-color: var(--data-grid-cell-selection-background-color-focus);
   }
 
-  :global(.rdg-cell[aria-selected='true']) {
-    box-shadow: inset 0 0 0 1px var(--rdg-selection-color);
-  }
-
   :global(.rdg-cell-custom-editing)::before {
     background-color: transparent;
   }
