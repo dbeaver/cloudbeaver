@@ -22,7 +22,7 @@ export class SettingsAdministrationPluginBootstrap extends Bootstrap {
     this.administrationItemService.create({
       name: 'settings',
       type: AdministrationItemType.Administration,
-      order: 2.2,
+      order: 3,
       getContentComponent: () => SettingsAdministration,
       getDrawerComponent: () => SettingsDrawerItem,
     });
