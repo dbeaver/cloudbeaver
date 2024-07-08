@@ -23,6 +23,6 @@
 }
 
 .objectPropertyTableFooter {
-  composes: theme-background-secondary theme-text-on-secondary theme-border-color-background from global;
+  composes: theme-background-surface theme-text-on-surface theme-border-color-background from global;
   border-top: 1px solid;
 }

@@ -30,7 +30,10 @@ export class AppAuthService extends Bootstrap {
 
   readonly auth: IExecutor<boolean>;
 
-  constructor(private readonly serverConfigResource: ServerConfigResource, private readonly userInfoResource: UserInfoResource) {
+  constructor(
+    private readonly serverConfigResource: ServerConfigResource,
+    private readonly userInfoResource: UserInfoResource,
+  ) {
     super();
     this.auth = new Executor();
     this.userInfoResource.onDataUpdate.addHandler(this.authUser.bind(this));

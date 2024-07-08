@@ -146,9 +146,7 @@ export const TableViewer = observer<TableViewerProps, HTMLDivElement>(
       ['setPresentation', 'setValuePresentation', 'switchValuePresentation', 'closeValuePresentation'],
     );
 
-    const needRefresh = getComputed(
-      () => dataModel?.source.error === null && dataModel.source.results.length === 0 && dataModel.source.outdated && dataModel.source.isLoadable(),
-    );
+    const needRefresh = getComputed(() => dataModel?.isDisabled(resultIndex) && dataModel.source.isOutdated() && dataModel.source.isLoadable());
 
     useEffect(() => {
       if (needRefresh) {

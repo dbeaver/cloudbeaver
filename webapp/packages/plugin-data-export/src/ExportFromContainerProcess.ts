@@ -18,7 +18,10 @@ export class ExportFromContainerProcess extends Deferred<string> {
   private timeout?: CancellablePromise<void>;
   private isCancelConfirmed = false; // true when server successfully executed cancelQueryAsync
 
-  constructor(private readonly graphQLService: GraphQLService, private readonly notificationService: NotificationService) {
+  constructor(
+    private readonly graphQLService: GraphQLService,
+    private readonly notificationService: NotificationService,
+  ) {
     super();
   }
 

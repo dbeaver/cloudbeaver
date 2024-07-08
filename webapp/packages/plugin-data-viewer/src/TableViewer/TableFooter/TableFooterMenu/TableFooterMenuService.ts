@@ -34,6 +34,10 @@ export class TableFooterMenuService {
   ) {}
 
   register() {
+    this.registerEditingActions();
+  }
+
+  private registerEditingActions() {
     this.menuService.addCreator({
       menus: [DATA_VIEWER_DATA_MODEL_ACTIONS_MENU],
       contexts: [DATA_CONTEXT_DV_DDM, DATA_CONTEXT_DV_DDM_RESULT_INDEX],
@@ -49,7 +53,7 @@ export class TableFooterMenuService {
       },
     });
     this.actionService.addHandler({
-      id: 'data-base-handler',
+      id: 'data-base-editing-handler',
       contexts: [DATA_CONTEXT_DV_DDM, DATA_CONTEXT_DV_DDM_RESULT_INDEX],
       menus: [DATA_VIEWER_DATA_MODEL_ACTIONS_MENU],
       actions: [ACTION_ADD, ACTION_DUPLICATE, ACTION_DELETE, ACTION_REVERT, ACTION_SAVE, ACTION_CANCEL],

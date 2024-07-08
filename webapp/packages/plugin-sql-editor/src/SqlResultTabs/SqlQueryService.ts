@@ -96,8 +96,8 @@ export class SqlQueryService {
         this.switchTabToActiveRequest(editorState, tabGroup, model);
         this.sqlQueryResultService.updateGroupTabs(editorState, model, tabGroup.groupId, first);
 
-        model.onRequest.addHandler(({ type, model }) => {
-          if (type === 'after') {
+        model.onRequest.addHandler(({ stage, model }) => {
+          if (stage === 'after') {
             const tabGroup = this.sqlQueryResultService.getModelGroup(editorState, model.id);
 
             if (tabGroup) {
@@ -295,8 +295,8 @@ export class SqlQueryService {
     tabGroup: IResultGroup,
     model: IDatabaseDataModel<IDataQueryOptions, IDatabaseResultSet>,
   ) {
-    model.onRequest.addPostHandler(({ type }) => {
-      if (type === 'on') {
+    model.onRequest.addPostHandler(({ stage }) => {
+      if (stage === 'request') {
         const activeGroupId = this.sqlQueryResultService.getSelectedGroup(editorState)?.groupId;
         for (const result of model.getResults()) {
           const editor = model.source.getActionImplementation(result, DatabaseEditAction);

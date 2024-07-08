@@ -35,9 +35,8 @@ export const OrderButton = observer<Props>(function OrderButton({ model, resultI
 
   const handleSort = async (e: React.MouseEvent<HTMLButtonElement>) => {
     const nextOrder = getNextOrder(currentOrder);
-    await model.requestDataAction(async () => {
+    await model.request(() => {
       constraints.setOrder(attributePosition, nextOrder, e.ctrlKey || e.metaKey);
-      await model.request(true);
     });
   };
 

@@ -22,7 +22,10 @@ export class Executor<T = void> extends ExecutorHandlersCollection<T> implements
 
   private readonly scheduler: TaskScheduler<T>;
 
-  constructor(private readonly defaultData: T | null = null, isBlocked: BlockedExecution<T> | null = null) {
+  constructor(
+    private readonly defaultData: T | null = null,
+    isBlocked: BlockedExecution<T> | null = null,
+  ) {
     super();
     this.scheduler = new TaskScheduler(isBlocked);
   }

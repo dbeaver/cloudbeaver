@@ -90,7 +90,6 @@ export class ObjectViewerTabService {
     this.navNodeManagerService.navigator.addHandler(this.navigationHandler.bind(this));
     this.navNodeManagerService.navigator.addPostHandler(this.navigationPostHandler.bind(this));
     this.connectionInfoResource.onItemUpdate.addHandler(this.updateConnectionTabs.bind(this));
-    this.connectionInfoResource.onConnectionClose.addHandler(this.closeConnectionTabs.bind(this));
     this.connectionInfoResource.onItemDelete.addHandler(this.closeConnectionTabs.bind(this));
     this.navNodeManagerService.navTree.onItemDelete.addHandler(this.removeTabs.bind(this));
     this.navTreeResource.onNodeRename.addHandler(this.handleNodeRename.bind(this));

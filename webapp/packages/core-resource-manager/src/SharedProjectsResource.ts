@@ -45,7 +45,7 @@ export class SharedProjectsResource extends CachedMapResource<string, SharedProj
     super(() => new Map(), []);
 
     sessionPermissionsResource.require(this, EAdminPermission.admin);
-    this.sync(sessionPermissionsResource, () => {});
+    sessionPermissionsResource.onDataOutdated.addHandler(() => this.markOutdated());
 
     this.connect(projectInfoResource);
     this.onDataOutdated.addHandler(() => projectInfoResource.markOutdated());
