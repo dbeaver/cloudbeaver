@@ -67,10 +67,7 @@ import org.jkiss.dbeaver.runtime.jobs.ConnectionTestJob;
 import org.jkiss.dbeaver.utils.RuntimeUtils;
 import org.jkiss.utils.CommonUtils;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -128,9 +125,9 @@ public class WebServiceCore implements DBWServiceCore {
         if (projectIds != null) {
             stream = stream.filter(c -> projectIds.contains(c.getProjectId()));
         }
-        List<DBPDriver> applicableDrivers = CBPlatform.getInstance().getApplicableDrivers();
-        return stream.filter(c -> applicableDrivers.contains(c.getDataSourceContainer().getDriver()))
-            .collect(Collectors.toList());
+        Set<String> applicableDrivers = WebServiceUtils.getApplicableDriversIds();
+        return stream.filter(c -> applicableDrivers.contains(c.getDataSourceContainer().getDriver().getId()))
+            .toList();
     }
 
     @Deprecated
