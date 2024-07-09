@@ -62,6 +62,7 @@ public class WebNavigatorNodeInfo {
     public static final String NODE_FEATURE_CONTAINER = "container";
     public static final String NODE_FEATURE_SHARED = "shared";
     public static final String NODE_FEATURE_CAN_DELETE = "canDelete";
+    public static final String NODE_FEATURE_CAN_FILTER = "canFilter";
     public static final String NODE_FEATURE_CAN_RENAME = "canRename";
     private final WebSession session;
     private final DBNNode node;
@@ -184,7 +185,9 @@ public class WebNavigatorNodeInfo {
             if (object instanceof DBSEntity || object instanceof DBSProcedure) {
                 features.add(NODE_FEATURE_LEAF);
             }
-
+        }
+        if (!(node instanceof DBNDatabaseFolder)) {
+            features.add(NODE_FEATURE_CAN_FILTER);
         }
         if (node instanceof DBNContainer) {
             features.add(NODE_FEATURE_CONTAINER);
