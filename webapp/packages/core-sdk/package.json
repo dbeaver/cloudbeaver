@@ -15,7 +15,6 @@
     "gql:gen": "yarn run clean && graphql-codegen",
     "gql:gen:dev": "yarn run clean && graphql-codegen --watch",
     "lint": "eslint ./src/ --ext .ts,.tsx",
-    "lint-fix": "eslint ./src/ --ext .ts,.tsx --fix",
     "test": "core-cli-test",
     "validate-dependencies": "core-cli-validate-dependencies",
     "update-ts-references": "yarn run clean && typescript-resolve-references"

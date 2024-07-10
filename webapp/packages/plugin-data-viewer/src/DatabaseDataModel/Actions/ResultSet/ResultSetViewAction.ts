@@ -159,7 +159,13 @@ export class ResultSetViewAction extends DatabaseDataAction<any, IDatabaseResult
       return undefined;
     }
 
-    return this.columns[key.index];
+    const index = this.columnIndex(key);
+
+    if (index === -1) {
+      return undefined;
+    }
+
+    return this.columns[index];
   }
 
   getColumnOperations(key: IResultSetColumnKey): DataTypeLogicalOperation[] {

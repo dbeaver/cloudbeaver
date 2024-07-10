@@ -34,7 +34,6 @@ import org.jkiss.dbeaver.model.DBFileController;
 import org.jkiss.dbeaver.model.app.DBACertificateStorage;
 import org.jkiss.dbeaver.model.app.DBPWorkspace;
 import org.jkiss.dbeaver.model.connection.DBPDataSourceProviderDescriptor;
-import org.jkiss.dbeaver.model.connection.DBPDataSourceProviderRegistry;
 import org.jkiss.dbeaver.model.connection.DBPDriver;
 import org.jkiss.dbeaver.model.connection.DBPDriverLibrary;
 import org.jkiss.dbeaver.model.impl.app.DefaultCertificateStorage;
@@ -56,7 +55,8 @@ import org.jkiss.utils.IOUtils;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.stream.Collectors;
 
 /**
@@ -197,12 +197,6 @@ public class CBPlatform extends BasePlatformImpl {
 
     public List<DBPDriver> getApplicableDrivers() {
         return applicableDrivers;
-    }
-
-    @NotNull
-    @Override
-    public DBPDataSourceProviderRegistry getDataSourceProviderRegistry() {
-        return DataSourceProviderRegistry.getInstance();
     }
 
     @NotNull
