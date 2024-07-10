@@ -36,6 +36,9 @@ import org.jkiss.dbeaver.model.meta.Property;
 import org.jkiss.dbeaver.model.navigator.*;
 import org.jkiss.dbeaver.model.navigator.fs.DBNFileSystem;
 import org.jkiss.dbeaver.model.navigator.fs.DBNPathBase;
+import org.jkiss.dbeaver.model.navigator.meta.DBXTreeFolder;
+import org.jkiss.dbeaver.model.navigator.meta.DBXTreeItem;
+import org.jkiss.dbeaver.model.navigator.meta.DBXTreeNode;
 import org.jkiss.dbeaver.model.rm.RMProject;
 import org.jkiss.dbeaver.model.rm.RMProjectPermission;
 import org.jkiss.dbeaver.model.struct.DBSEntity;
@@ -186,11 +189,19 @@ public class WebNavigatorNodeInfo {
                 features.add(NODE_FEATURE_LEAF);
             }
         }
-        if (!(node instanceof DBNDatabaseFolder)) {
-            features.add(NODE_FEATURE_CAN_FILTER);
-        }
         if (node instanceof DBNContainer) {
             features.add(NODE_FEATURE_CONTAINER);
+            if (node instanceof DBNDataSource dataSource) {
+                if (dataSource.getDataSourceContainer().getDataSource() != null) {
+                    List<DBXTreeNode> list = dataSource.getMeta().getChildren(null);
+                    boolean hasNonFolderNode = list.stream().anyMatch(dbxTreeNode -> !(dbxTreeNode instanceof DBXTreeFolder));
+                    if (hasNonFolderNode) {
+                        features.add(NODE_FEATURE_CAN_FILTER);
+                    }
+                }
+            } else {
+                features.add(NODE_FEATURE_CAN_FILTER);
+            }
         }
         boolean isShared = false;
         if (node instanceof DBNDatabaseNode) {
@@ -303,10 +314,10 @@ public class WebNavigatorNodeInfo {
 
     @Property
     public DBSObjectFilter getFilter() throws DBWebException {
-        if (!(node instanceof DBNDatabaseFolder)) {
+        if (!(node instanceof DBNDatabaseNode)) {
             throw new DBWebException("Invalid navigator node type: "  + node.getClass().getName());
         }
-        DBSObjectFilter filter = ((DBNDatabaseFolder) node).getNodeFilter(((DBNDatabaseFolder) node).getItemsMeta(), true);
+        DBSObjectFilter filter = ((DBNDatabaseNode) node).getNodeFilter(((DBNDatabaseNode) node).getItemsMeta(), true);
         return filter == null || filter.isEmpty() || !filter.isEnabled() ? null : filter;
     }
 
