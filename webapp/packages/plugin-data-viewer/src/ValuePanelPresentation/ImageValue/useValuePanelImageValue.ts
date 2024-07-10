@@ -24,6 +24,7 @@ import { ResultSetFormatAction } from '../../DatabaseDataModel/Actions/ResultSet
 import { ResultSetSelectAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetSelectAction';
 import type { IDatabaseDataModel } from '../../DatabaseDataModel/IDatabaseDataModel';
 import type { IDatabaseResultSet } from '../../DatabaseDataModel/IDatabaseResultSet';
+import { DataViewerService } from '../../DataViewerService';
 
 interface Props {
   model: IDatabaseDataModel<any, IDatabaseResultSet>;
@@ -32,6 +33,7 @@ interface Props {
 
 export function useValuePanelImageValue({ model, resultIndex }: Props) {
   const notificationService = useService(NotificationService);
+  const dataViewerService = useService(DataViewerService);
   const selectAction = model.source.getAction(resultIndex, ResultSetSelectAction);
   const formatAction = model.source.getAction(resultIndex, ResultSetFormatAction);
   const contentAction = model.source.getAction(resultIndex, ResultSetDataContentAction);
@@ -88,6 +90,10 @@ export function useValuePanelImageValue({ model, resultIndex }: Props) {
         return this.contentAction.retrieveBlobFromCache(this.selectedCell);
       },
       get canSave() {
+        if (!this.dataViewerService.canExportData) {
+          return false;
+        }
+
         if (this.truncated && this.selectedCell) {
           return this.contentAction.isDownloadable(this.selectedCell);
         }
@@ -158,6 +164,6 @@ export function useValuePanelImageValue({ model, resultIndex }: Props) {
       upload: action.bound,
       loadFullImage: action.bound,
     },
-    { model, resultIndex, notificationService, selectAction, formatAction, contentAction, editAction },
+    { model, resultIndex, notificationService, selectAction, formatAction, contentAction, editAction, dataViewerService },
   );
 }

@@ -6,14 +6,10 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import { useCallback, useEffect, useRef, useState } from 'react';
 
-import { Form, getComputed, s, ToolsPanel, useS } from '@cloudbeaver/core-blocks';
-import { useService } from '@cloudbeaver/core-di';
+import { Container, Fill, s, ToolsPanel, useS } from '@cloudbeaver/core-blocks';
 
 import type { IDatabaseDataModel } from '../../DatabaseDataModel/IDatabaseDataModel';
-import { DataViewerSettingsService } from '../../DataViewerSettingsService';
-import { AutoRefreshButton } from './AutoRefresh/AutoRefreshButton';
 import styles from './TableFooter.module.css';
 import { TableFooterMenu } from './TableFooterMenu/TableFooterMenu';
 
@@ -24,55 +20,18 @@ interface Props {
 }
 
 export const TableFooter = observer<Props>(function TableFooter({ resultIndex, model, simple }) {
-  const ref = useRef<HTMLInputElement>(null);
-  const [limit, setLimit] = useState(model.countGain + '');
-  const dataViewerSettingsService = useService(DataViewerSettingsService);
   const style = useS(styles);
-
-  const handleChange = useCallback(async () => {
-    if (!ref.current) {
-      return;
-    }
-
-    const value = dataViewerSettingsService.getDefaultRowsCount(parseInt(ref.current.value, 10));
-
-    setLimit(value + '');
-    if (model.countGain !== value) {
-      await model.setCountGain(value).reload();
-    }
-  }, [model]);
-
-  useEffect(() => {
-    if (limit !== model.countGain + '') {
-      setLimit(model.countGain + '');
-    }
-  }, [model.countGain]);
-
-  const disabled = getComputed(() => model.isLoading() || model.isDisabled(resultIndex));
 
   return (
     <ToolsPanel type="secondary" center minHeight>
-      <AutoRefreshButton model={model} disabled={disabled} />
-      <div className={s(style, { count: true })}>
-        <Form onSubmit={handleChange}>
-          <input
-            ref={ref}
-            className={s(style, { input: true })}
-            type="number"
-            value={limit}
-            disabled={disabled}
-            min={dataViewerSettingsService.minFetchSize}
-            max={dataViewerSettingsService.maxFetchSize}
-            onChange={e => setLimit(e.target.value)}
-            onBlur={handleChange}
-          />
-        </Form>
-      </div>
       <TableFooterMenu model={model} resultIndex={resultIndex} simple={simple} />
-      {model.source.requestInfo.requestMessage.length > 0 && (
-        <div className={s(style, { time: true })}>
-          {model.source.requestInfo.requestMessage} - {model.source.requestInfo.requestDuration}ms
-        </div>
+      {model.source.requestInfo.requestMessage && (
+        <>
+          <Fill />
+          <Container className={s(style, { time: true })} keepSize center>
+            {model.source.requestInfo.requestMessage} - {model.source.requestInfo.requestDuration}ms
+          </Container>
+        </>
       )}
     </ToolsPanel>
   );

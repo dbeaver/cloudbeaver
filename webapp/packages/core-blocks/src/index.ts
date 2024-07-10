@@ -16,6 +16,14 @@ export * from './CommonDialog/DialogsPortal';
 
 export * from './ErrorDetailsDialog/ErrorDetailsDialog';
 
+export * from './ComponentsRegistry/CRegistryLoader';
+// we don't expect to use this component directly only as a wrapper for another component
+// eslint-disable-next-line @cloudbeaver/no-sync-component-import
+export * from './ComponentsRegistry/registry';
+export * from './ComponentsRegistry/CRegistryList';
+export * from './ComponentsRegistry/IComponentsTreeNodeValidator';
+export * from './ComponentsRegistry/useParentProps';
+
 export * from './AppRefreshButton';
 export * from './ComplexLoader';
 export * from './DisplayError';

@@ -253,8 +253,8 @@ public abstract class CBServerConfigurationController<T extends CBServerConfig>
             try (Reader reader = new InputStreamReader(new FileInputStream(rtConfig), StandardCharsets.UTF_8)) {
                 var runtimeProductSettings = JSONUtils.parseMap(gson, reader);
                 var productSettings = serverConfiguration.getProductSettings();
-                productSettings.putAll(runtimeProductSettings);
-                Map<String, Object> flattenConfig = WebAppUtils.flattenMap(productSettings);
+                runtimeProductSettings.putAll(productSettings);
+                Map<String, Object> flattenConfig = WebAppUtils.flattenMap(runtimeProductSettings);
                 productSettings.clear();
                 productSettings.putAll(flattenConfig);
             } catch (Exception e) {

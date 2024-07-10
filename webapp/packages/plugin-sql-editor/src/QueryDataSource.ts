@@ -71,18 +71,6 @@ export class QueryDataSource<TOptions extends IDataQueryOptions = IDataQueryOpti
     });
   }
 
-  isLoadable(): boolean {
-    return super.isLoadable() && !!this.executionContext?.context;
-  }
-
-  isReadonly(resultIndex: number): boolean {
-    return super.isReadonly(resultIndex) || this.getResult(resultIndex)?.data?.hasRowIdentifier === false;
-  }
-
-  isDisabled(resultIndex: number): boolean {
-    return (!this.getResult(resultIndex)?.data && this.error === null) || !this.executionContext?.context;
-  }
-
   async cancel(): Promise<void> {
     await super.cancel();
     await this.currentTask?.cancel();
@@ -195,14 +183,8 @@ export class QueryDataSource<TOptions extends IDataQueryOptions = IDataQueryOpti
 
     let firstResultId: string | undefined;
 
-    if (
-      prevResults.length === 1 &&
-      prevResults[0].contextId === executionContext.context!.id &&
-      prevResults[0].connectionId === executionContext.context?.connectionId &&
-      prevResults[0].id !== null &&
-      this.requestInfo.query === this.options?.query
-    ) {
-      firstResultId = prevResults[0].id;
+    if (this.requestInfo.query === this.options?.query) {
+      firstResultId = this.getPreviousResultId(prevResults, executionContextInfo);
     }
 
     const task = this.asyncTaskInfoService.create(async () => {

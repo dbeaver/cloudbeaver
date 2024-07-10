@@ -7,7 +7,7 @@
  */
 import type { AdministrationItemDrawerProps } from '@cloudbeaver/core-administration';
 import { Translate } from '@cloudbeaver/core-blocks';
-import { TabIcon, Tab, TabTitle } from '@cloudbeaver/core-ui';
+import { Tab, TabIcon, TabTitle } from '@cloudbeaver/core-ui';
 
 export const SettingsDrawerItem: React.FC<AdministrationItemDrawerProps> = function SettingsDrawerItem({ item, onSelect, disabled }) {
   return (

@@ -10,6 +10,7 @@
   width: 16px;
   height: 16px;
   overflow: hidden;
+  user-select: none;
 
   & > .icon {
     width: 16px;
@@ -45,7 +46,6 @@
       opacity: 0;
     }
   }
-
 }
 .interval {
   font-size: 8px;

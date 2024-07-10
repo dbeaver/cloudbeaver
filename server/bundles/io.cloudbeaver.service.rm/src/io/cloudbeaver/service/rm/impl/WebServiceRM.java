@@ -105,7 +105,7 @@ public class WebServiceRM implements DBWServiceRM {
      * @param resourcePath  the resource path
      * @param propertyName  the property name
      * @param propertyValue the property value
-     * @return the resource property
+     * @return true on success
      * @throws DBException the db exception
      */
     @NotNull

@@ -5,93 +5,122 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-.menuBarItem {
+
+.menuBarItemGroup,
+.menuBarItem,
+.menuBarItemCustomSubmenuMark {
   composes: theme-ripple from global;
-  padding: 0 8px;
   cursor: pointer;
   background: transparent;
   outline: none;
   color: inherit;
+  padding: 0;
+}
+
+.menuBarItemGroup {
+  display: flex;
+
+  &.disabled {
+    pointer-events: none;
+  }
 
   &.hidden {
     display: none;
   }
 
-  & .menuBarItemBox {
-    display: flex;
-    align-items: center;
-  }
+  & .menuBarItem {
+    padding: 0 8px;
 
-  & .menuBarItemIcon {
-    display: flex;
-    width: 24px;
-    height: 24px;
-    padding: 4px;
-    box-sizing: border-box;
-    align-items: center;
-    justify-content: center;
-
-    &:empty {
-      display: none;
+    & .menuBarItemBox {
+      display: flex;
+      align-items: center;
+      gap: 4px;
     }
 
+    & .menuBarItemIcon {
+      display: flex;
+      width: 24px;
+      height: 24px;
+      padding: 4px;
+      box-sizing: border-box;
+      align-items: center;
+      justify-content: center;
+
+      &:empty {
+        display: none;
+      }
+
+      & .iconOrImage {
+        display: block;
+        object-fit: contain;
+      }
+    }
+
+    & .loader,
     & .iconOrImage {
+      width: 16px;
+    }
+
+    & .menuBarItemLabel {
       display: block;
-      object-fit: contain;
+      text-transform: uppercase;
+      font-weight: 700;
+      font-size: 12px;
+    }
+
+    & .menuBarItemMark {
+      display: none;
+
+      & .icon {
+        width: 12px;
+      }
     }
   }
 
-  & .loader,
-  & .iconOrImage {
-    width: 16px;
-  }
-
-  & .menuBarItemLabel {
-    display: block;
-    text-transform: uppercase;
-    font-weight: 700;
-    font-size: 12px;
-    padding: 0 4px;
-  }
-
-  & .menuBarItemIcon + .menuBarItemLabel {
-    padding-left: 4px;
-  }
-
-  & .menuBarItemMark {
-    display: none;
+  & .menuBarItemCustomSubmenuMark {
+    display: flex;
+    align-items: center;
+    width: 14px;
+    min-height: 24px;
+    height: 100%;
 
     & .icon {
-      width: 12px;
+      width: 14px;
+      height: 14px;
     }
   }
 }
 
 .floating {
-  & .menuBarItem {
-    padding: 4px;
+  & .menuBarItemGroup {
     margin: 2px;
-    width: 24px;
-    height: 24px;
-    overflow: hidden;
     flex-shrink: 0;
+    overflow: hidden;
     border-radius: var(--theme-form-element-radius);
-  }
-  & .menuBarItemLabel {
-    display: none;
-  }
-  & .menuBarItemIcon {
-    width: 16px;
-    height: 16px;
-    padding: 0px;
+
+    & .menuBarItem {
+      padding: 4px;
+      width: 24px;
+      height: 24px;
+    }
+    & .menuBarItemLabel {
+      display: none;
+    }
+    & .menuBarItemIcon {
+      width: 16px;
+      height: 16px;
+      padding: 0px;
+    }
   }
 
   &.withLabel {
-    & .menuBarItem {
-      width: auto;
-    }
-    & .menuBarItemLabel {
-      display: block;
+    & .menuBarItemGroup {
+      & .menuBarItem {
+        width: auto;
+      }
+      & .menuBarItemLabel {
+        display: block;
+      }
     }
   }
 }

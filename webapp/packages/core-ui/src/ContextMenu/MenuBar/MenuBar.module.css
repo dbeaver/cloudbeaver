@@ -8,6 +8,7 @@
 .menuBar {
   height: 32px;
   display: flex;
+  flex-shrink: 0;
 
   & > .menuSeparator {
     height: 100%;

@@ -5,7 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { action, computed, observable, runInAction } from 'mobx';
+import { action, autorun, computed, observable, runInAction } from 'mobx';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { getComputed, IFolderExplorerContext, useExecutor, useObjectRef, useObservableRef, useResource, useUserData } from '@cloudbeaver/core-blocks';
@@ -372,11 +372,12 @@ export function useElementsTree(options: IOptions): IElementsTree {
           data.filter = '';
         }
 
-        if (!options.settings?.saveExpanded) {
-          data.nodeState = [];
+        if (options.settings?.saveExpanded) {
+          state.sync(data.nodeState);
+        } else {
+          state.unSync();
+          state.clear();
         }
-
-        state.sync(data.nodeState);
       });
 
       try {
@@ -384,6 +385,21 @@ export function useElementsTree(options: IOptions): IElementsTree {
       } catch {}
     },
     data => typeof data === 'object' && typeof data.filter === 'string' && Array.isArray(data.nodeState),
+  );
+
+  useEffect(
+    () =>
+      autorun(() => {
+        if (options.settings?.saveExpanded) {
+          runInAction(() => {
+            userData.nodeState = Array.from(state);
+            state.sync(userData.nodeState);
+          });
+        } else {
+          state.unSync();
+        }
+      }),
+    [state, userData, options.settings],
   );
 
   const elementsTree = useObservableRef<IElementsTree>(
@@ -743,6 +759,21 @@ export function useElementsTree(options: IOptions): IElementsTree {
   });
 
   useExecutor({
+    executor: navNodeInfoResource.onItemDelete,
+    handlers: [
+      function deleteNodeState(key) {
+        runInAction(() => {
+          if (!options.settings?.saveExpanded) {
+            ResourceKeyUtils.forEach(key, key => {
+              state.delete(key);
+            });
+          }
+        });
+      },
+    ],
+  });
+
+  useExecutor({
     executor: projectInfoResource.onDataOutdated,
     handlers: [() => navTreeResource.markOutdated(ROOT_NODE_PATH)],
   });
@@ -757,19 +788,6 @@ export function useElementsTree(options: IOptions): IElementsTree {
           if (!children) {
             functionsRef.exitNodeFolder(key);
           }
-        });
-      },
-    ],
-  });
-
-  useExecutor({
-    executor: navNodeInfoResource.onItemDelete,
-    handlers: [
-      function deleteNodeState(key) {
-        runInAction(() => {
-          ResourceKeyUtils.forEach(key, key => {
-            state.delete(key);
-          });
         });
       },
     ],

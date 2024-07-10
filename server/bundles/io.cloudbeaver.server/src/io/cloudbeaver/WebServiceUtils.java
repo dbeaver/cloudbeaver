@@ -27,6 +27,7 @@ import io.cloudbeaver.registry.WebAuthProviderDescriptor;
 import io.cloudbeaver.registry.WebAuthProviderRegistry;
 import io.cloudbeaver.server.CBAppConfig;
 import io.cloudbeaver.server.CBApplication;
+import io.cloudbeaver.server.CBPlatform;
 import io.cloudbeaver.utils.WebAppUtils;
 import io.cloudbeaver.utils.WebCommonUtils;
 import io.cloudbeaver.utils.WebDataSourceUtils;
@@ -57,6 +58,7 @@ import org.jkiss.utils.CommonUtils;
 
 import java.io.InputStream;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Various constants
@@ -351,4 +353,13 @@ public class WebServiceUtils extends WebCommonUtils {
         return result;
     }
 
+    /**
+     * Returns set of applicable ids of drivers.
+     */
+    @NotNull
+    public static Set<String> getApplicableDriversIds() {
+        return CBPlatform.getInstance().getApplicableDrivers().stream()
+            .map(DBPDriver::getId)
+            .collect(Collectors.toSet());
+    }
 }

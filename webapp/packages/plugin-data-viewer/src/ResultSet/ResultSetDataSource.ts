@@ -5,12 +5,13 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
+import type { IConnectionExecutionContextInfo } from '@cloudbeaver/core-connections';
 import type { IServiceInjector } from '@cloudbeaver/core-di';
 import type { ITask } from '@cloudbeaver/core-executor';
 import type { AsyncTaskInfoService, GraphQLService } from '@cloudbeaver/core-sdk';
 
-import { DatabaseDataSource } from './DatabaseDataModel/DatabaseDataSource';
-import type { IDatabaseResultSet } from './DatabaseDataModel/IDatabaseResultSet';
+import { DatabaseDataSource } from '../DatabaseDataModel/DatabaseDataSource';
+import type { IDatabaseResultSet } from '../DatabaseDataModel/IDatabaseResultSet';
 
 export abstract class ResultSetDataSource<TOptions> extends DatabaseDataSource<TOptions, IDatabaseResultSet> {
   constructor(
@@ -19,6 +20,10 @@ export abstract class ResultSetDataSource<TOptions> extends DatabaseDataSource<T
     protected asyncTaskInfoService: AsyncTaskInfoService,
   ) {
     super(serviceInjector);
+  }
+
+  isReadonly(resultIndex: number): boolean {
+    return super.isReadonly(resultIndex) || this.getResult(resultIndex)?.data?.hasRowIdentifier === false;
   }
 
   async cancel(): Promise<void> {
@@ -87,6 +92,21 @@ export abstract class ResultSetDataSource<TOptions> extends DatabaseDataSource<T
       await this.closeResults(this.results);
     }
     return super.dispose(keepExecutionContext);
+  }
+
+  protected getPreviousResultId(prevResults: IDatabaseResultSet[], context: IConnectionExecutionContextInfo) {
+    let resultId: string | undefined;
+
+    if (
+      prevResults.length === 1 &&
+      prevResults[0].contextId === context.id &&
+      prevResults[0].connectionId === context.connectionId &&
+      prevResults[0].id !== null
+    ) {
+      resultId = prevResults[0].id;
+    }
+
+    return resultId;
   }
 
   private async closeResults(results: IDatabaseResultSet[]): Promise<void> {
