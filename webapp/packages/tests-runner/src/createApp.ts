@@ -34,7 +34,9 @@ export function createApp(...plugins: PluginManifest[]): IApplication {
 
   return {
     app,
-    serviceProvider: app.getServiceProvider(),
+    get serviceProvider() {
+      return app.getServiceProvider();
+    },
     async init() {
       await app.start();
     },
