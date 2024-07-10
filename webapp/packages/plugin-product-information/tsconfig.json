@@ -7,6 +7,9 @@
   },
   "references": [
     {
+      "path": "../core-administration/tsconfig.json"
+    },
+    {
       "path": "../core-blocks/tsconfig.json"
     },
     {
@@ -23,6 +26,9 @@
     },
     {
       "path": "../core-theming/tsconfig.json"
+    },
+    {
+      "path": "../core-ui/tsconfig.json"
     },
     {
       "path": "../core-version/tsconfig.json"

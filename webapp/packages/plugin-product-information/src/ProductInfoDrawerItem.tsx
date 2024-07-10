@@ -9,7 +9,7 @@ import type { AdministrationItemDrawerProps } from '@cloudbeaver/core-administra
 import { Translate } from '@cloudbeaver/core-blocks';
 import { Tab, TabIcon, TabTitle } from '@cloudbeaver/core-ui';
 
-export const LicenseDrawerItem: React.FC<AdministrationItemDrawerProps> = function LicenseDrawerItem({ item, onSelect, disabled }) {
+export const ProductInfoDrawerItem: React.FC<AdministrationItemDrawerProps> = function ProductInfoDrawerItem({ item, onSelect, disabled }) {
   return (
     <Tab tabId={item.name} disabled={disabled} onOpen={() => onSelect(item.name)}>
       <TabIcon icon="/icons/license.svg" viewBox="0 0 16 16" />

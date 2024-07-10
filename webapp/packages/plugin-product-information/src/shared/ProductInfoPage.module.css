@@ -5,9 +5,10 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { productInfoPlugin } from './manifest';
 
-export { default as ProductInfoDialogStyles } from './ProductInfoDialog.module.css';
-export * from './ProductInfoNavigationService';
-
-export default productInfoPlugin;
+.tabList {
+  position: relative;
+  flex-shrink: 0;
+  align-items: center;
+  padding: 0 24px;
+}

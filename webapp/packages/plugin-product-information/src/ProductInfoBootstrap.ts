@@ -14,11 +14,13 @@ import { MenuBaseItem, MenuService } from '@cloudbeaver/core-view';
 import { TOP_NAV_BAR_SETTINGS_MENU } from '@cloudbeaver/plugin-settings-menu';
 
 const ProductInfoDialog = importLazyComponent(() => import('./ProductInfoDialog').then(m => m.ProductInfoDialog));
-const ProductInfoDrawerItem = importLazyComponent(() => import('./ProductInfoDrawerItem').then(m => m.LicenseDrawerItem));
+const ProductInfoDrawerItem = importLazyComponent(() => import('./ProductInfoDrawerItem').then(m => m.ProductInfoDrawerItem));
 const ProductInfoPage = importLazyComponent(() => import('./ProductInfoPage').then(m => m.ProductInfoPage));
 
 @injectable()
 export class ProductInfoBootstrap extends Bootstrap {
+  static PAGE_NAME = 'product-info';
+
   constructor(
     private readonly serverConfigResource: ServerConfigResource,
     private readonly commonDialogService: CommonDialogService,
@@ -48,7 +50,7 @@ export class ProductInfoBootstrap extends Bootstrap {
     });
 
     this.administrationItemService.create({
-      name: 'product-info',
+      name: ProductInfoBootstrap.PAGE_NAME,
       type: AdministrationItemType.Administration,
       getContentComponent: () => ProductInfoPage,
       getDrawerComponent: () => ProductInfoDrawerItem,

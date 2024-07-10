@@ -34,9 +34,10 @@ export interface AdministrationItemContentProps {
 }
 export type AdministrationItemContentComponent = React.FunctionComponent<AdministrationItemContentProps>;
 
-export type AdministrationItemSubContentProps = AdministrationItemContentProps & {
+export type AdministrationItemSubContentProps = {
   sub: IAdministrationItemSubItem;
   param: string | null;
+  configurationWizard: boolean;
 };
 export type AdministrationItemSubContentComponent = React.FunctionComponent<AdministrationItemSubContentProps>;
 
@@ -52,6 +53,7 @@ export type AdministrationItemSubCanActivateEvent = (param: string | null, confi
 
 export interface IAdministrationItemSubItem {
   name: string;
+  title?: string;
   getComponent?: () => AdministrationItemSubContentComponent;
   onActivate?: AdministrationItemSubEvent;
   onDeActivate?: AdministrationItemSubEvent;

@@ -17,16 +17,19 @@
     "update-ts-references": "yarn run clean && typescript-resolve-references"
   },
   "dependencies": {
+    "@cloudbeaver/core-administration": "^0",
     "@cloudbeaver/core-blocks": "^0",
     "@cloudbeaver/core-di": "^0",
     "@cloudbeaver/core-dialogs": "^0",
     "@cloudbeaver/core-localization": "^0",
     "@cloudbeaver/core-root": "^0",
     "@cloudbeaver/core-theming": "^0",
+    "@cloudbeaver/core-ui": "^0",
     "@cloudbeaver/core-version": "^0",
     "@cloudbeaver/core-view": "^0",
     "@cloudbeaver/core-website": "^0",
     "@cloudbeaver/plugin-settings-menu": "^0",
+    "mobx": "^6",
     "mobx-react-lite": "^4",
     "react": "^18"
   },
