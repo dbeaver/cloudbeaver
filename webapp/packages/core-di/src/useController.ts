@@ -7,8 +7,8 @@
  */
 import { useContext, useEffect, useMemo, useRef } from 'react';
 
-import { appContext } from './AppContext';
 import type { ExtractInitArgs, IDestructibleController, IInitializableController, IServiceConstructor } from './IApp';
+import { serviceProviderContext } from './ServiceProviderContext';
 
 /**
  * @deprecated use hooks instead
@@ -22,7 +22,7 @@ export function useController<T>(ctor: IServiceConstructor<T>): T;
  * @deprecated use hooks instead
  */
 export function useController<T>(ctor: IServiceConstructor<T>, ...args: any[]): T {
-  const app = useContext(appContext);
+  const serviceProvider = useContext(serviceProviderContext);
   const controllerRef = useRef<T>();
 
   useMemo(() => {
@@ -30,7 +30,7 @@ export function useController<T>(ctor: IServiceConstructor<T>, ...args: any[]): 
       controllerRef.current.destruct();
     }
 
-    const controller = app.resolveServiceByClass(ctor);
+    const controller = serviceProvider.getService(ctor);
 
     if (isInitializableController(controller)) {
       controller.init(...args);

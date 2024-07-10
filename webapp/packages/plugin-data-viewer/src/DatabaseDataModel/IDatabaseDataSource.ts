@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 import type { IConnectionExecutionContext } from '@cloudbeaver/core-connections';
-import type { IServiceInjector } from '@cloudbeaver/core-di';
+import type { IServiceProvider } from '@cloudbeaver/core-di';
 import type { IExecutor, ITask } from '@cloudbeaver/core-executor';
 import type { ResultDataFormat } from '@cloudbeaver/core-sdk';
 
@@ -59,7 +59,7 @@ export interface IDatabaseDataSource<TOptions, TResult extends IDatabaseDataResu
   readonly executionContext: IConnectionExecutionContext | null;
   readonly canCancel: boolean;
   readonly cancelled: boolean;
-  readonly serviceInjector: IServiceInjector;
+  readonly serviceProvider: IServiceProvider;
   readonly totalCountRequestTask: ITask<number> | null;
   readonly onOperation: IExecutor<IDatabaseDataSourceOperationEvent>;
 

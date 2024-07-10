@@ -10,7 +10,7 @@ import { useEffect } from 'react';
 
 import { useObjectRef, useResource } from '@cloudbeaver/core-blocks';
 import { ConnectionInfoResource, createConnectionParam } from '@cloudbeaver/core-connections';
-import { App, useService } from '@cloudbeaver/core-di';
+import { IServiceProvider, useService } from '@cloudbeaver/core-di';
 import { AsyncTaskInfoService, GraphQLService } from '@cloudbeaver/core-sdk';
 import { isObjectsEqual } from '@cloudbeaver/core-utils';
 import {
@@ -35,7 +35,7 @@ export function useGroupingDataModel(
   state: IGroupingQueryState,
 ): IGroupingDataModel {
   const tableViewerStorageService = useService(TableViewerStorageService);
-  const app = useService(App);
+  const serviceProvider = useService(IServiceProvider);
   const graphQLService = useService(GraphQLService);
   const asyncTaskInfoService = useService(AsyncTaskInfoService);
   const dataViewerSettingsService = useService(DataViewerSettingsService);
@@ -49,7 +49,7 @@ export function useGroupingDataModel(
 
   const model = useObjectRef(
     () => {
-      const source = new GroupingDataSource(app.getServiceInjector(), graphQLService, asyncTaskInfoService);
+      const source = new GroupingDataSource(serviceProvider, graphQLService, asyncTaskInfoService);
 
       const model = tableViewerStorageService.add(new DatabaseDataModel(source));
 

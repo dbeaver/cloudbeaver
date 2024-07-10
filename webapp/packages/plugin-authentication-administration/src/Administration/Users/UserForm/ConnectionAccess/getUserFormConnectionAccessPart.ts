@@ -21,8 +21,8 @@ export function getUserFormConnectionAccessPart(formState: IFormState<IUserFormS
     const userFormInfoPart = getUserFormInfoPart(formState);
 
     const di = context.get(DATA_CONTEXT_DI_PROVIDER)!;
-    const usersResource = di.getServiceByClass(UsersResource);
-    const projectInfoResource = di.getServiceByClass(ProjectInfoResource);
+    const usersResource = di.getService(UsersResource);
+    const projectInfoResource = di.getService(ProjectInfoResource);
 
     return new UserFormConnectionAccessPart(formState, usersResource, projectInfoResource, userFormInfoPart);
   });

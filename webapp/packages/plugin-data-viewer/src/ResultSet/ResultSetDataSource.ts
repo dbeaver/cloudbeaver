@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 import type { IConnectionExecutionContextInfo } from '@cloudbeaver/core-connections';
-import type { IServiceInjector } from '@cloudbeaver/core-di';
+import type { IServiceProvider } from '@cloudbeaver/core-di';
 import type { ITask } from '@cloudbeaver/core-executor';
 import type { AsyncTaskInfoService, GraphQLService } from '@cloudbeaver/core-sdk';
 
@@ -15,11 +15,11 @@ import type { IDatabaseResultSet } from '../DatabaseDataModel/IDatabaseResultSet
 
 export abstract class ResultSetDataSource<TOptions> extends DatabaseDataSource<TOptions, IDatabaseResultSet> {
   constructor(
-    readonly serviceInjector: IServiceInjector,
+    readonly serviceProvider: IServiceProvider,
     protected graphQLService: GraphQLService,
     protected asyncTaskInfoService: AsyncTaskInfoService,
   ) {
-    super(serviceInjector);
+    super(serviceProvider);
   }
 
   isReadonly(resultIndex: number): boolean {

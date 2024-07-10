@@ -52,8 +52,8 @@ const newSettings = {
 };
 
 test('New settings override deprecated settings', async () => {
-  const settings = app.injector.getServiceByClass(SettingsLocalizationService);
-  const config = app.injector.getServiceByClass(ServerConfigResource);
+  const settings = app.serviceProvider.getService(SettingsLocalizationService);
+  const config = app.serviceProvider.getService(ServerConfigResource);
 
   server.use(endpoint.query('serverConfig', mockServerConfig(newSettings)));
 
@@ -64,8 +64,8 @@ test('New settings override deprecated settings', async () => {
 });
 
 test('Deprecated settings are used if new settings are not defined', async () => {
-  const settings = app.injector.getServiceByClass(SettingsLocalizationService);
-  const config = app.injector.getServiceByClass(ServerConfigResource);
+  const settings = app.serviceProvider.getService(SettingsLocalizationService);
+  const config = app.serviceProvider.getService(ServerConfigResource);
 
   server.use(endpoint.query('serverConfig', mockServerConfig(deprecatedSettings)));
 

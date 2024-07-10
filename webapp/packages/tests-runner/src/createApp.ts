@@ -7,13 +7,13 @@
  */
 import { configure } from 'mobx';
 
-import { App, IServiceInjector, PluginManifest } from '@cloudbeaver/core-di';
+import { App, IServiceProvider, PluginManifest } from '@cloudbeaver/core-di';
 
 import './__custom_mocks__/mockKnownConsoleMessages';
 
 export interface IApplication {
   app: App;
-  injector: IServiceInjector;
+  serviceProvider: IServiceProvider;
   init(): Promise<void>;
   dispose(): void;
 }
@@ -24,7 +24,6 @@ export function createApp(...plugins: PluginManifest[]): IApplication {
   configure({ enforceActions: 'never' });
 
   const app = new App(plugins);
-  const injector = app.getServiceInjector();
 
   beforeAll(async () => {
     await app.start();
@@ -35,7 +34,7 @@ export function createApp(...plugins: PluginManifest[]): IApplication {
 
   return {
     app,
-    injector,
+    serviceProvider: app.getServiceProvider(),
     async init() {
       await app.start();
     },

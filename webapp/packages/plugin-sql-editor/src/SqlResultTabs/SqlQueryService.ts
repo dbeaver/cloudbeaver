@@ -8,7 +8,7 @@
 import { makeObservable, observable } from 'mobx';
 
 import { ConnectionExecutionContextService, ConnectionInfoResource, createConnectionParam } from '@cloudbeaver/core-connections';
-import { App, injectable } from '@cloudbeaver/core-di';
+import { injectable, IServiceProvider } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { AsyncTaskInfoService, GraphQLService } from '@cloudbeaver/core-sdk';
 import {
@@ -46,7 +46,7 @@ export class SqlQueryService {
   private readonly statisticsMap: Map<string, IQueryExecutionStatistics>;
 
   constructor(
-    private readonly app: App,
+    private readonly serviceProvider: IServiceProvider,
     private readonly tableViewerStorageService: TableViewerStorageService,
     private readonly graphQLService: GraphQLService,
     private readonly notificationService: NotificationService,
@@ -130,7 +130,7 @@ export class SqlQueryService {
     let tabGroup = this.sqlQueryResultService.getSelectedGroup(editorState);
 
     if (inNewTab || !tabGroup) {
-      source = new QueryDataSource(this.app.getServiceInjector(), this.graphQLService, this.asyncTaskInfoService);
+      source = new QueryDataSource(this.serviceProvider, this.graphQLService, this.asyncTaskInfoService);
       model = this.tableViewerStorageService.add(new DatabaseDataModel(source));
       this.dataViewerDataChangeConfirmationService.trackTableDataUpdate(model.id);
       tabGroup = this.sqlQueryResultService.createGroup(editorState, model.id, query);
@@ -216,7 +216,7 @@ export class SqlQueryService {
       options?.onQueryExecutionStart?.(query, i);
 
       if (!model || !source) {
-        source = new QueryDataSource(this.app.getServiceInjector(), this.graphQLService, this.asyncTaskInfoService);
+        source = new QueryDataSource(this.serviceProvider, this.graphQLService, this.asyncTaskInfoService);
         model = this.tableViewerStorageService.add(new DatabaseDataModel(source));
         this.dataViewerDataChangeConfirmationService.trackTableDataUpdate(model.id);
       }

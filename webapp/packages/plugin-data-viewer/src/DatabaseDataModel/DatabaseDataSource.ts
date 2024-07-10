@@ -8,7 +8,7 @@
 import { action, makeObservable, observable, toJS } from 'mobx';
 
 import type { IConnectionExecutionContext } from '@cloudbeaver/core-connections';
-import type { IServiceInjector } from '@cloudbeaver/core-di';
+import type { IServiceProvider } from '@cloudbeaver/core-di';
 import { Executor, ExecutorInterrupter, IExecutor, ITask, Task } from '@cloudbeaver/core-executor';
 import { ResultDataFormat } from '@cloudbeaver/core-sdk';
 
@@ -56,7 +56,7 @@ export abstract class DatabaseDataSource<TOptions, TResult extends IDatabaseData
     return false;
   }
 
-  readonly serviceInjector: IServiceInjector;
+  readonly serviceProvider: IServiceProvider;
   protected disabled: boolean;
   private lastAction: () => Promise<void>;
   private outdated: boolean;
@@ -67,8 +67,8 @@ export abstract class DatabaseDataSource<TOptions, TResult extends IDatabaseData
   }
   private readonly activeOperationStack: Array<Promise<any>>;
 
-  constructor(serviceInjector: IServiceInjector) {
-    this.serviceInjector = serviceInjector;
+  constructor(serviceProvider: IServiceProvider) {
+    this.serviceProvider = serviceProvider;
     this.totalCountRequestTask = null;
     this.actions = new DatabaseDataActions(this);
     this.access = DatabaseDataAccessMode.Default;
