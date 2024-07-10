@@ -19,7 +19,6 @@
     "analyse": "yarn build && rimraf --glob lib && mkdir lib && core-cli-build --mode=production --config ../core-cli/configs/webpack.product.config.js --profile --json > ./lib/stats.json",
     "postanalyse": "core-cli-analyzer ./lib/stats.json",
     "lint": "eslint ./src/ --ext .ts,.tsx",
-    "lint-fix": "eslint ./src/ --ext .ts,.tsx --fix",
     "version:new": "yarn version --no-git-tag-version",
     "validate-dependencies": "core-cli-validate-dependencies",
     "update-ts-references": "yarn run clean && typescript-resolve-references"
