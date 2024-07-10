@@ -5,15 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
+import { importLazyComponent } from '../importLazyComponent';
 
-.tableFooterMenu .menuBarItem {
-  padding: 0 4px;
-
-  & .menuBarItemLabel {
-    padding: 0;
-  }
-
-  & .menuBarItemIcon + .menuBarItemLabel {
-    padding-left: 0;
-  }
-}
+export const CRegistry = importLazyComponent(() => import('./CRegistry').then(m => m.CRegistry));

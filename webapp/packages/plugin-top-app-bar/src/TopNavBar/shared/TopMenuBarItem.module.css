@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-.topMenuBar .menuBarItem {
+.topMenuBar .menuBarItemGroup .menuBarItem {
   background: none;
   border: none;
   outline: none !important;
@@ -27,6 +27,10 @@
     content: '';
   }
 
+  &:disabled {
+    opacity: 1;
+  }
+
   & .menuBarItemIcon {
     width: 32px;
     height: 32px;
@@ -41,6 +45,7 @@
     display: flex;
     align-items: center;
     flex: 1;
+    gap: 0;
     height: inherit;
     position: relative;
     justify-content: center;
@@ -51,9 +56,14 @@
     max-width: 240px;
     overflow-x: hidden;
     font-size: 14px;
+    padding: 0 4px;
     text-overflow: ellipsis;
     font-weight: inherit;
     text-transform: none;
+  }
+
+  & .menuBarItemIcon + .menuBarItemLabel {
+    padding-left: 4px;
   }
 
   &:hover,

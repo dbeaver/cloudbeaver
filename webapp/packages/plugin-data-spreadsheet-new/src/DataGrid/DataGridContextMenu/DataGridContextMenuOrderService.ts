@@ -36,9 +36,8 @@ export class DataGridContextMenuOrderService {
       throw new Error(`Failed to get result column info for the following column index: "${column.index}"`);
     }
 
-    await model.requestDataAction(async () => {
+    await model.request(() => {
       constraints.setOrder(resultColumn.position, order, true);
-      await model.request(true);
     });
   }
 
@@ -130,9 +129,8 @@ export class DataGridContextMenuOrderService {
       isDisabled: context => context.data.model.isLoading(),
       onClick: async context => {
         const constraints = context.data.model.source.getAction(context.data.resultIndex, DatabaseDataConstraintAction);
-        await context.data.model.requestDataAction(async () => {
+        await context.data.model.request(() => {
           constraints.deleteOrders();
-          await context.data.model.request(true);
         });
       },
     });
