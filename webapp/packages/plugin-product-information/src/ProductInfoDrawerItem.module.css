@@ -6,17 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-.tabList {
-  position: relative;
-  flex-shrink: 0;
-  align-items: center;
-  padding: 0 24px;
-}
-
 .icon {
-  position: absolute;
-  top: 6px;
-  right: 0;
   composes: theme-background-primary from global;
   width: 8px;
   height: 8px;

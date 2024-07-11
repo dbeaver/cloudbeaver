@@ -50,9 +50,9 @@ export const ProductInfoPage: AdministrationItemContentComponent = observer(func
         <TabList className={s(styles, { tabList: true, administrationTabs: true })} aria-label="Product Info Administration pages" underline>
           <SContext registry={mainTabsRegistry}>
             {subs.map(sub => (
-              // TODO mark tab for version as updated
-              <Tab key={'tab' + sub.name} tabId={sub.name}>
+              <Tab key={sub.name} tabId={sub.name} title={translate(sub.tooltip)}>
                 <TabTitle>{translate(sub.title ?? sub.name)}</TabTitle>
+                {sub.highlighted && <div className={s(styles, { icon: true })} />}
               </Tab>
             ))}
           </SContext>
@@ -63,7 +63,7 @@ export const ProductInfoPage: AdministrationItemContentComponent = observer(func
           const Component = sub.getComponent?.();
 
           return (
-            <TabPanel key={'tabPanel' + sub.name} tabId={sub.name}>
+            <TabPanel key={sub.name} tabId={sub.name}>
               {Component ? <Component configurationWizard={configurationWizard} sub={sub} param={param!} /> : null}
             </TabPanel>
           );

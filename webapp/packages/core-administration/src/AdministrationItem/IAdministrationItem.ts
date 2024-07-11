@@ -53,6 +53,8 @@ export type AdministrationItemSubCanActivateEvent = (param: string | null, confi
 
 export interface IAdministrationItemSubItem {
   name: string;
+  tooltip?: string;
+  highlighted?: boolean;
   title?: string;
   getComponent?: () => AdministrationItemSubContentComponent;
   onActivate?: AdministrationItemSubEvent;
@@ -75,6 +77,7 @@ export interface IConfigurationWizardItemOptions {
 
 export interface IAdministrationItemOptions {
   name: string;
+  highlighted?: boolean;
   /** By default will be set to AdministrationItemType.Administration */
   type?: AdministrationItemType;
   configurationWizardOptions?: IConfigurationWizardItemOptions;

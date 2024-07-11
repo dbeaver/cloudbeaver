@@ -163,6 +163,32 @@ export class AdministrationItemService {
     this.items.push(item);
   }
 
+  updateItem(name: string, partialItem: Partial<IAdministrationItem>, configurationWizard: boolean): void {
+    const item = this.getItem(name, configurationWizard);
+
+    if (!item) {
+      throw new Error(`Administration item "${name}" not found`);
+    }
+
+    Object.assign(item, partialItem);
+  }
+
+  updateItemSub(subName: string, partialSub: Partial<IAdministrationItemSubItem>, itemName: string, configurationWizard: boolean): void {
+    const item = this.getItem(itemName, configurationWizard);
+
+    if (!item) {
+      throw new Error(`Administration item "${itemName}" not found`);
+    }
+
+    const sub = this.getItemSub(item, subName);
+
+    if (!sub) {
+      throw new Error(`Administration item sub "${subName}" not found`);
+    }
+
+    Object.assign(sub, partialSub);
+  }
+
   createItemSub(sub: IAdministrationItemSubItem, itemName: string, configurationWizard: boolean): void {
     const item = this.getItem(itemName, configurationWizard);
 

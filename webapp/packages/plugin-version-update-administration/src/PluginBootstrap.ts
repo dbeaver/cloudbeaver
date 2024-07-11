@@ -5,9 +5,9 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { AdministrationItemService } from '@cloudbeaver/core-administration';
 import { importLazyComponent } from '@cloudbeaver/core-blocks';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
+import { VersionResource } from '@cloudbeaver/core-version';
 import { VersionUpdateService } from '@cloudbeaver/core-version-update';
 import { ProductInfoNavigationService } from '@cloudbeaver/plugin-product-information';
 
@@ -17,11 +17,22 @@ const VersionUpdate = importLazyComponent(() => import('./VersionUpdate').then(m
 @injectable()
 export class PluginBootstrap extends Bootstrap {
   constructor(
-    private readonly administrationItemService: AdministrationItemService,
     private readonly versionUpdateService: VersionUpdateService,
     private readonly productInfoNavigationService: ProductInfoNavigationService,
+    private readonly versionResource: VersionResource,
   ) {
     super();
+  }
+
+  private versionDataUpdateHandler() {
+    this.productInfoNavigationService.updateSub('version-update', {
+      highlighted: this.versionUpdateService.newVersionAvailable,
+      tooltip: this.versionUpdateService.newVersionAvailable ? 'version_update_new_version_available' : undefined,
+    });
+
+    this.productInfoNavigationService.updateItem({
+      highlighted: this.versionUpdateService.newVersionAvailable,
+    });
   }
 
   register(): void {
@@ -31,6 +42,11 @@ export class PluginBootstrap extends Bootstrap {
       title: 'Version Update',
     });
 
+    this.versionResource.onDataUpdate.addHandler(this.versionDataUpdateHandler.bind(this));
     this.versionUpdateService.registerGeneralInstruction(() => DockerUpdateInstructions);
+  }
+
+  async load(): Promise<void> {
+    await this.versionResource.load();
   }
 }
