@@ -43,13 +43,10 @@ public class CBServerConfigurationControllerEmbedded<T extends CBServerConfig> e
     @NotNull
     @Override
     protected Map<String, Object> collectServerConfigProperties(
-        String newServerName,
-        String newServerURL,
-        long sessionExpireTime,
-        Map<String, Object> originServerConfig
+        @NotNull CBServerConfig serverConfig,
+        @NotNull Map<String, Object> originServerConfig
     ) {
-        Map<String, Object> serverConfigProperties = super.collectServerConfigProperties(
-            newServerName, newServerURL, sessionExpireTime, originServerConfig);
+        Map<String, Object> serverConfigProperties = super.collectServerConfigProperties(serverConfig, originServerConfig);
 
         var databaseConfigProperties = new LinkedHashMap<String, Object>();
         Map<String, Object> oldRuntimeDBConfig = JSONUtils.getObject(originServerConfig,

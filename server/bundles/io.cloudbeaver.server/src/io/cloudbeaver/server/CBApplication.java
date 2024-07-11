@@ -373,14 +373,16 @@ public abstract class CBApplication<T extends CBServerConfig> extends BaseWebApp
             log.info("No auto configuration was found. Server must be configured manually");
             return;
         }
+        CBServerConfig serverConfig = new CBServerConfig();
+        serverConfig.setServerName(autoServerName);
+        serverConfig.setServerURL(autoServerURL);
+        serverConfig.setMaxSessionIdleTime(getMaxSessionIdleTime());
         try {
             finishConfiguration(
-                autoServerName,
-                autoServerURL,
                 autoAdminName,
                 autoAdminPassword,
                 Collections.emptyList(),
-                getMaxSessionIdleTime(),
+                serverConfig,
                 getAppConfiguration(),
                 null
             );
@@ -524,12 +526,10 @@ public abstract class CBApplication<T extends CBServerConfig> extends BaseWebApp
     }
 
     public synchronized void finishConfiguration(
-        @NotNull String newServerName,
-        @NotNull String newServerURL,
         @NotNull String adminName,
         @Nullable String adminPassword,
         @NotNull List<AuthInfo> authInfoList,
-        long sessionExpireTime,
+        @NotNull CBServerConfig serverConfig,
         @NotNull CBAppConfig appConfig,
         @Nullable SMCredentialsProvider credentialsProvider
     ) throws DBException {
@@ -543,7 +543,7 @@ public abstract class CBApplication<T extends CBServerConfig> extends BaseWebApp
 
         // Save runtime configuration
         log.debug("Saving runtime configuration");
-        getServerConfigurationController().saveRuntimeConfig(newServerName, newServerURL, sessionExpireTime, appConfig, credentialsProvider);
+        getServerConfigurationController().saveRuntimeConfig(serverConfig, appConfig, credentialsProvider);
 
         // Grant permissions to predefined connections
         if (appConfig.isGrantConnectionsAccessToAnonymousTeam()) {
