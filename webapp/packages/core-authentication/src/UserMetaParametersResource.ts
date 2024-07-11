@@ -23,7 +23,11 @@ export interface IUserMetaParameterOptions {
 
 @injectable()
 export class UserMetaParametersResource extends CachedDataResource<UserMetaParameter[]> {
-  constructor(private readonly graphQLService: GraphQLService, sessionResource: SessionResource, userInfoResource: UserInfoResource) {
+  constructor(
+    private readonly graphQLService: GraphQLService,
+    sessionResource: SessionResource,
+    userInfoResource: UserInfoResource,
+  ) {
     super(() => []);
 
     this.sync(

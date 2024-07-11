@@ -54,7 +54,7 @@ export const AutoRefreshSettingsDialog = observer<DialogComponentProps<Payload>>
 
   return (
     <CommonDialogWrapper size="small">
-      <CommonDialogHeader title="data_viewer_auto_refresh_settings" icon="/icons/settings_cog_m.svg" onReject={rejectDialog} />
+      <CommonDialogHeader title="plugin_data_viewer_auto_refresh_settings" icon="/icons/settings_cog_m.svg" onReject={rejectDialog} />
       <CommonDialogBody noBodyPadding noOverflow>
         <div className={s(styles, { wrapper: true })}>
           <Form ref={formRef} onSubmit={() => resolve()}>
@@ -65,7 +65,7 @@ export const AutoRefreshSettingsDialog = observer<DialogComponentProps<Payload>>
                 </InputField>
 
                 <FieldCheckbox id="dataViewer.tableViewer.autoRefresh.stopOnError" name="stopOnError" state={state}>
-                  {translate('data_viewer_auto_refresh_settings_stop_on_error')}
+                  {translate('plugin_data_viewer_auto_refresh_settings_stop_on_error')}
                 </FieldCheckbox>
               </Group>
             </Container>

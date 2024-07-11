@@ -13,7 +13,7 @@ import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { LocalizationService } from '@cloudbeaver/core-localization';
 import { declensionOfNumber } from '@cloudbeaver/core-utils';
-import { ACTION_REFRESH, ActionService, MenuBaseItem, menuExtractItems, MenuService } from '@cloudbeaver/core-view';
+import { ACTION_REFRESH, ActionService, MenuBaseItem, menuExtractItems, MenuSeparatorItem, MenuService } from '@cloudbeaver/core-view';
 
 import { IDatabaseRefreshState } from '../../../../DatabaseDataModel/Actions/DatabaseRefreshAction';
 import { DATA_CONTEXT_DV_DDM } from '../../../../DatabaseDataModel/DataContext/DATA_CONTEXT_DV_DDM';
@@ -72,12 +72,14 @@ export class TableRefreshActionBootstrap extends Bootstrap {
         const state = getRefreshState(context);
         items = [...items];
         for (const interval of AUTO_REFRESH_INTERVALS) {
+          const label = this.getLabel(interval);
+          const tooltip = this.localizationService.translate('data_viewer_action_auto_refresh_interval_tooltip', undefined, { interval: label });
           items.push(
             new MenuBaseItem(
               {
                 id: `auto-refresh-${interval}`,
-                label: this.getLabel(interval),
-                tooltip: 'data_viewer_action_auto_refresh',
+                label,
+                tooltip,
                 disabled: state?.interval === interval * 1000,
               },
               {
@@ -89,15 +91,33 @@ export class TableRefreshActionBootstrap extends Bootstrap {
           );
         }
 
+        items.push(new MenuSeparatorItem());
+
         items.push(
           new MenuBaseItem(
             {
               id: 'auto-refresh-custom',
               label: 'ui_custom',
-              tooltip: 'data_viewer_action_auto_refresh',
+              tooltip: 'data_viewer_action_auto_refresh_menu_configure_tooltip',
             },
             {
               onSelect: this.configureAutoRefresh.bind(this, context),
+            },
+          ),
+        );
+
+        items.push(
+          new MenuBaseItem(
+            {
+              id: 'auto-refresh-stop',
+              label: 'ui_processing_stop',
+              tooltip: 'data_viewer_action_auto_refresh_menu_stop_tooltip',
+              disabled: !state?.isAutoRefresh,
+            },
+            {
+              onSelect: () => {
+                state?.setInterval(0);
+              },
             },
           ),
         );
@@ -122,7 +142,7 @@ export class TableRefreshActionBootstrap extends Bootstrap {
             ...action.info,
             icon: state?.isAutoRefresh ? '/icons/timer_m.svg#root' : '/icons/refresh_m.svg#root',
             label: '',
-            tooltip: state?.isAutoRefresh ? 'data_viewer_action_auto_refresh_stop' : 'data_viewer_action_refresh',
+            tooltip: state?.isAutoRefresh ? 'data_viewer_action_auto_refresh_stop_tooltip' : 'data_viewer_action_refresh_tooltip',
           };
         }
 

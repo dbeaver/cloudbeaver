@@ -12,7 +12,10 @@ import { DataTransferProcessorInfo, GraphQLService } from '@cloudbeaver/core-sdk
 
 @injectable()
 export class DataTransferProcessorsResource extends CachedMapResource<string, DataTransferProcessorInfo> {
-  constructor(private readonly graphQLService: GraphQLService, serverConfigResource: ServerConfigResource) {
+  constructor(
+    private readonly graphQLService: GraphQLService,
+    serverConfigResource: ServerConfigResource,
+  ) {
     super(() => new Map());
     this.sync(
       serverConfigResource,

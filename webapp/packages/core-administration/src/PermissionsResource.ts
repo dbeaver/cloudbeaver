@@ -15,7 +15,10 @@ export type AdminObjectGrantInfo = AdminObjectGrantInfoFragment;
 
 @injectable()
 export class PermissionsResource extends CachedMapResource<string, PermissionInfo> {
-  constructor(private readonly graphQLService: GraphQLService, sessionDataResource: SessionDataResource) {
+  constructor(
+    private readonly graphQLService: GraphQLService,
+    sessionDataResource: SessionDataResource,
+  ) {
     super();
 
     this.sync(

@@ -125,7 +125,7 @@ export class ResultSetDataContentAction extends DatabaseDataAction<any, IDatabas
       throw new Error('Failed to get value metadata information');
     }
 
-    const fullText = await this.source.runTask(async () => {
+    const fullText = await this.source.runOperation(async () => {
       try {
         this.updateCache(element, { loading: true });
         return await this.loadFileFullText(this.result, column.position, row);
@@ -133,6 +133,10 @@ export class ResultSetDataContentAction extends DatabaseDataAction<any, IDatabas
         this.updateCache(element, { loading: false });
       }
     });
+
+    if (fullText === null) {
+      throw new Error('Failed to get value metadata information');
+    }
 
     this.updateCache(element, { fullText });
 
@@ -167,7 +171,7 @@ export class ResultSetDataContentAction extends DatabaseDataAction<any, IDatabas
     this.clearCache();
   }
 
-  private async getFileDataUrl(element: IResultSetElementKey) {
+  private async getFileDataUrl(element: IResultSetElementKey): Promise<string> {
     const column = this.data.getColumn(element.column);
     const row = this.data.getRowValue(element.row);
 
@@ -175,7 +179,7 @@ export class ResultSetDataContentAction extends DatabaseDataAction<any, IDatabas
       throw new Error('Failed to get value metadata information');
     }
 
-    const url = await this.source.runTask(async () => {
+    const url = await this.source.runOperation(async () => {
       try {
         this.updateCache(element, { loading: true });
         return await this.loadDataURL(this.result, column.position, row);
@@ -183,6 +187,10 @@ export class ResultSetDataContentAction extends DatabaseDataAction<any, IDatabas
         this.updateCache(element, { loading: false });
       }
     });
+
+    if (url === null) {
+      throw new Error('Failed to get value metadata information');
+    }
 
     return url;
   }
