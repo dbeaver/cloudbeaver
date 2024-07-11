@@ -39,7 +39,7 @@ export class PluginBootstrap extends Bootstrap {
     this.productInfoNavigationService.addToSub({
       name: 'version-update',
       getComponent: () => VersionUpdate,
-      title: 'Version Update',
+      title: 'plugin_version_update_administration_tab_title',
     });
 
     this.versionResource.onDataUpdate.addHandler(this.versionDataUpdateHandler.bind(this));

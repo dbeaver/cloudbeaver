@@ -42,8 +42,6 @@ export const ProductInfoPage: AdministrationItemContentComponent = observer(func
     productInfoNavigationService.navToSub(tabId, param || undefined);
   }
 
-  console.log({ sub, param, item, configurationWizard, subs, items: administrationItemService.items });
-
   return (
     <TabsState selectedId={subName} lazy onChange={openSub}>
       <ToolsPanel bottomBorder>
