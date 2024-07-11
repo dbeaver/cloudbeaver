@@ -34,6 +34,7 @@ import org.jkiss.dbeaver.model.app.DBPProject;
 import org.jkiss.dbeaver.model.connection.DBPAuthModelDescriptor;
 import org.jkiss.dbeaver.model.connection.DBPConnectionConfiguration;
 import org.jkiss.dbeaver.model.connection.DBPDriverConfigurationType;
+import org.jkiss.dbeaver.model.connection.DBPEditorContribution;
 import org.jkiss.dbeaver.model.impl.auth.AuthModelDatabaseNative;
 import org.jkiss.dbeaver.model.meta.Property;
 import org.jkiss.dbeaver.model.navigator.DBNBrowseSettings;
@@ -244,6 +245,13 @@ public class WebConnectionInfo {
 
         if (dataSourceContainer.isConnected()) {
             features.add("connected");
+            var contributedEditors = DBWorkbench.getPlatform().getDataSourceProviderRegistry().getContributedEditors(
+                DBPEditorContribution.MB_CONNECTION_EDITOR,
+                dataSourceContainer
+            );
+            if (contributedEditors.length > 0) {
+                features.add("hasTools");
+            }
         }
         if (dataSourceContainer.isHidden()) {
             features.add("virtual");
@@ -473,6 +481,15 @@ public class WebConnectionInfo {
             .stream()
             .map(WebSecretInfo::new)
             .collect(Collectors.toList());
+    }
+
+    @Property
+    public List<String> getTools() {
+        var contributedEditors = DBWorkbench.getPlatform().getDataSourceProviderRegistry().getContributedEditors(
+            DBPEditorContribution.MB_CONNECTION_EDITOR,
+            dataSourceContainer
+        );
+        return Arrays.stream(contributedEditors).map(DBPEditorContribution::getEditorId).toList();
     }
 
 }
