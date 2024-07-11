@@ -131,11 +131,6 @@ export class AuthenticationService extends Bootstrap {
   }
 
   private async auth(persistent: boolean, options: IAuthOptions) {
-    if (this.authPromise) {
-      await this.waitAuth();
-      return;
-    }
-
     const contexts = await this.onLogin.execute('before');
 
     if (ExecutorInterrupter.isInterrupted(contexts)) {
@@ -159,6 +154,11 @@ export class AuthenticationService extends Bootstrap {
           options.configurationId = configuration.id;
         }
       }
+    }
+
+    if (this.authPromise) {
+      await this.waitAuth();
+      return;
     }
 
     this.authPromise = this.authDialogService
