@@ -34,7 +34,6 @@ export const ProductInfoPage: AdministrationItemContentComponent = observer(func
   const subName = sub?.name || item.defaultSub || subs[0]?.name;
   const styles = useS(style, tabStyle);
 
-  // TODO why tabs disappear when we click on them?
   function openSub({ tabId }: ITabData) {
     if (subName === tabId) {
       return;

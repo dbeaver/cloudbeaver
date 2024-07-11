@@ -13,8 +13,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { action, makeObservable } from 'mobx';
-
 import { AdministrationItemService, AdministrationScreenService, IAdministrationItemSubItem } from '@cloudbeaver/core-administration';
 import { injectable } from '@cloudbeaver/core-di';
 
@@ -27,10 +25,6 @@ export class ProductInfoNavigationService {
     private readonly administrationItemService: AdministrationItemService,
   ) {
     this.navToRoot = this.navToRoot.bind(this);
-
-    makeObservable(this, {
-      addToSub: action,
-    });
   }
 
   navToRoot(): void {
