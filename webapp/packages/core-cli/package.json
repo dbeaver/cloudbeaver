@@ -50,7 +50,7 @@
     "webpack-bundle-analyzer": "^4",
     "webpack-cli": "^5",
     "webpack-dev-server": "^5",
-    "webpack-merge": "^5"
+    "webpack-merge": "^6"
   },
   "devDependencies": {
     "@pmmmwh/react-refresh-webpack-plugin": "^0",
@@ -59,7 +59,7 @@
     "@types/jest": "^29",
     "@types/madge": "^5",
     "fake-indexeddb": "^6",
-    "glob": "^10",
+    "glob": "^11",
     "http-proxy": "^1",
     "jest": "^29",
     "jest-environment-jsdom": "^29",
