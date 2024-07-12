@@ -13,8 +13,8 @@ import { usePopper } from 'react-popper';
 import { s, useS } from '@cloudbeaver/core-blocks';
 import { EventContext, EventStopPropagationFlag } from '@cloudbeaver/core-events';
 import { InlineEditor } from '@cloudbeaver/core-ui';
+import { RenderEditCellProps } from '@cloudbeaver/plugin-data-grid';
 import type { IResultSetElementKey, IResultSetRowKey } from '@cloudbeaver/plugin-data-viewer';
-import type { RenderEditCellProps } from '@cloudbeaver/plugin-react-data-grid';
 
 import style from './CellEditor.module.css';
 import { DataGridContext, IColumnResizeInfo } from './DataGridContext';
