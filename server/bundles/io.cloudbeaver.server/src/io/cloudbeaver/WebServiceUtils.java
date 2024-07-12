@@ -217,6 +217,9 @@ public class WebServiceUtils extends WebCommonUtils {
         }
         if (config.getMainPropertyValues() != null) {
             for (Map.Entry<String, Object> e : config.getMainPropertyValues().entrySet()) {
+                if (e.getValue() == null) {
+                    continue;
+                }
                 switch (e.getKey()) {
                     case DBConstants.PROP_HOST -> dsConfig.setHostName(CommonUtils.toString(e.getValue()));
                     case DBConstants.PROP_PORT -> dsConfig.setHostPort(CommonUtils.toString(e.getValue()));
