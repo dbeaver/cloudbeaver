@@ -10,7 +10,7 @@ import { useContext, useMemo } from 'react';
 
 import { getComputed, s, StaticImage, useS } from '@cloudbeaver/core-blocks';
 import type { SqlResultColumn } from '@cloudbeaver/core-sdk';
-import type { RenderHeaderCellProps } from '@cloudbeaver/plugin-react-data-grid';
+import type { RenderHeaderCellProps } from '@cloudbeaver/plugin-data-grid';
 
 import { DataGridContext } from '../DataGridContext';
 import { DataGridSelectionContext } from '../DataGridSelection/DataGridSelectionContext';

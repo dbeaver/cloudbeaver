@@ -12,8 +12,8 @@ import { useContext, useEffect } from 'react';
 import { getComputed, useCombinedHandler, useMouse, useObjectRef, useObservableRef } from '@cloudbeaver/core-blocks';
 import { EventContext, EventStopPropagationFlag } from '@cloudbeaver/core-events';
 import { clsx } from '@cloudbeaver/core-utils';
+import { type CalculatedColumn, Cell, type CellRendererProps } from '@cloudbeaver/plugin-data-grid';
 import { DatabaseEditChangeType, IResultSetElementKey, IResultSetRowKey, isBooleanValuePresentationAvailable } from '@cloudbeaver/plugin-data-viewer';
-import { CalculatedColumn, Cell, CellRendererProps } from '@cloudbeaver/plugin-react-data-grid';
 
 import { CellPosition, EditingContext } from '../../Editing/EditingContext';
 import { DataGridContext } from '../DataGridContext';

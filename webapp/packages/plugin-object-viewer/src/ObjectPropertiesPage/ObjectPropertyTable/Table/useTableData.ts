@@ -7,7 +7,7 @@
  */
 import { useObjectRef } from '@cloudbeaver/core-blocks';
 import type { DBObject } from '@cloudbeaver/core-navigation-tree';
-import type { CalculatedColumn as GridCalculatedColumn } from '@cloudbeaver/plugin-react-data-grid';
+import type { CalculatedColumn as GridCalculatedColumn } from '@cloudbeaver/plugin-data-grid';
 
 import type { ICustomColumn, IDataColumn } from './Column';
 
