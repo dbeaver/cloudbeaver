@@ -191,10 +191,19 @@ public class WebNavigatorNodeInfo {
         }
         if (node instanceof DBNContainer) {
             features.add(NODE_FEATURE_CONTAINER);
+        }
+        boolean isShared = false;
+        if (node instanceof DBNDatabaseNode) {
             if (node instanceof DBNDataSource dataSource) {
                 if (dataSource.getDataSourceContainer().getDataSource() != null) {
-                    List<DBXTreeNode> list = dataSource.getMeta().getChildren(null);
-                    boolean hasNonFolderNode = list.stream().anyMatch(dbxTreeNode -> !(dbxTreeNode instanceof DBXTreeFolder));
+                    boolean hasNonFolderNode = hasNonFolderNode(dataSource.getMeta().getChildren(null));
+                    if (hasNonFolderNode) {
+                        features.add(NODE_FEATURE_CAN_FILTER);
+                    }
+                }
+            } else if (node instanceof DBNDatabaseItem item) {
+                if (item.getDataSourceContainer().getDataSource() != null) {
+                    boolean hasNonFolderNode = hasNonFolderNode(item.getMeta().getChildren(null));
                     if (hasNonFolderNode) {
                         features.add(NODE_FEATURE_CAN_FILTER);
                     }
@@ -202,10 +211,7 @@ public class WebNavigatorNodeInfo {
             } else {
                 features.add(NODE_FEATURE_CAN_FILTER);
             }
-        }
-        boolean isShared = false;
-        if (node instanceof DBNDatabaseNode) {
-            isShared = !((DBNDatabaseNode) node).getOwnerProject().getName().equals(session.getUserId());
+            isShared = !node.getOwnerProject().getName().equals(session.getUserId());
         } else if (node instanceof DBNLocalFolder) {
             DataSourceFolder folder = (DataSourceFolder) ((DBNLocalFolder) node).getFolder();
             DBPProject project = folder.getDataSourceRegistry().getProject();
@@ -268,6 +274,10 @@ public class WebNavigatorNodeInfo {
         }
         var folderPath = ((DBNResourceManagerResource) node).getResourceFolder();
         return ResourceTypeRegistry.getInstance().getResourceTypeByRootPath(null, folderPath) != null;
+    }
+
+    private boolean hasNonFolderNode(List<DBXTreeNode> list) {
+        return list.stream().anyMatch(dbxTreeNode -> !(dbxTreeNode instanceof DBXTreeFolder));
     }
 
     ///////////////////////////////////
