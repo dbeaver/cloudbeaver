@@ -7,4 +7,5 @@
  */
 .container {
   composes: theme-typography--caption from global;
+  height: 100%;
 }

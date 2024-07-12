@@ -9,7 +9,7 @@ import { observer } from 'mobx-react-lite';
 
 import { s, TextPlaceholder, useAutoLoad, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import { DynamicTraceProperty } from '@cloudbeaver/core-sdk';
-import { type Column, DataGrid, DataGridContainer } from '@cloudbeaver/plugin-data-grid';
+import { type Column, DataGrid } from '@cloudbeaver/plugin-data-grid';
 import type { DataPresentationComponent, IDatabaseResultSet } from '@cloudbeaver/plugin-data-viewer';
 
 import classes from './DVResultTraceDetailsPresentation.module.css';
@@ -53,9 +53,9 @@ export const DVResultTraceDetailsPresentation: DataPresentationComponent<any, ID
     }
 
     return (
-      <DataGridContainer className={s(styles, { container: true })}>
+      <div className={s(styles, { container: true })}>
         <DataGrid rows={state.trace} rowKeyGetter={row => row.name} columns={COLUMNS} rowHeight={30} />
-      </DataGridContainer>
+      </div>
     );
   },
 );
