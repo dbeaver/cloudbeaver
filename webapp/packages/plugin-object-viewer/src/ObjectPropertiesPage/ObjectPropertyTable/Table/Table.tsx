@@ -14,8 +14,7 @@ import { type DBObject, NavTreeResource } from '@cloudbeaver/core-navigation-tre
 import type { ObjectPropertyInfo } from '@cloudbeaver/core-sdk';
 import { useTabLocalState } from '@cloudbeaver/core-ui';
 import { isDefined, TextTools } from '@cloudbeaver/core-utils';
-import DataGrid from '@cloudbeaver/plugin-react-data-grid';
-import '@cloudbeaver/plugin-react-data-grid/react-data-grid-dist/lib/styles.css';
+import { DataGrid } from '@cloudbeaver/plugin-data-grid';
 
 import { getValue } from '../../helpers';
 import { ObjectPropertyTableFooter } from '../ObjectPropertyTableFooter';
@@ -24,7 +23,6 @@ import type { IDataColumn } from './Column';
 import { ColumnIcon } from './Columns/ColumnIcon/ColumnIcon';
 import { ColumnSelect } from './Columns/ColumnSelect/ColumnSelect';
 import { HeaderRenderer } from './HeaderRenderer';
-import { tableStyles } from './styles/styles';
 import classes from './Table.module.css';
 import { TableContext } from './TableContext';
 import { useTableData } from './useTableData';
@@ -74,7 +72,7 @@ function getMeasuredCells(columns: ObjectPropertyInfo[], rows: DBObject[]) {
 const CUSTOM_COLUMNS = [ColumnSelect, ColumnIcon];
 
 export const Table = observer<TableProps>(function Table({ objects, hasNextPage, loadMore }) {
-  const styles = useS(classes, tableStyles);
+  const styles = useS(classes);
   const navTreeResource = useService(NavTreeResource);
 
   const [tableContainer, setTableContainerRef] = useState<HTMLDivElement | null>(null);
@@ -129,9 +127,9 @@ export const Table = observer<TableProps>(function Table({ objects, hasNextPage,
 
   return (
     <TableContext.Provider value={{ tableData, tableState }}>
-      <div ref={setTableContainerRef} className={s(styles, { container: true }, 'metadata-grid-container')}>
+      <div ref={setTableContainerRef} className={s(styles, { container: true })}>
         <DataGrid
-          className={s(styles, { dataGrid: true }, 'cb-metadata-grid-theme')}
+          className={s(styles, { dataGrid: true })}
           rows={objects}
           rowKeyGetter={row => row.id}
           columns={tableData.columns}
