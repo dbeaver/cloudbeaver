@@ -11,7 +11,10 @@ export class ExecutionContext<TData> implements IExecutionContext<TData> {
   readonly contexts: Map<IContextLoader<any, TData>, any>;
   readonly contextCreators: Map<IContextLoader<any, TData>, IContextLoader<any, TData>>;
 
-  constructor(private readonly data: TData, context?: IExecutionContext<any>) {
+  constructor(
+    private readonly data: TData,
+    context?: IExecutionContext<any>,
+  ) {
     this.contexts = context?.contexts || new Map();
     this.contextCreators = context?.contextCreators ?? new Map();
   }

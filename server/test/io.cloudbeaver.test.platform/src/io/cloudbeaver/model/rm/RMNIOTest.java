@@ -43,6 +43,7 @@ import java.nio.file.Path;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class RMNIOTest {
 
@@ -135,12 +136,14 @@ public class RMNIOTest {
         String file2 = "script" + SecurityUtils.generateUniqueId() + ".sql";
         rm.createResource(testProject.getId(), file1, true);
         rm.createResource(testProject.getId(), file2, false);
-        Set<String> filesFromNio =
-            Files.list(rootPath)
-                .map(path -> ((RMPath) path).getResourcePath())
-                .collect(Collectors.toSet());
-        Assert.assertTrue(filesFromNio.contains(file1));
-        Assert.assertTrue(filesFromNio.contains(file2));
+        try (Stream<Path> list = Files.list(rootPath)) {
+            Set<String> filesFromNio =
+                list
+                    .map(path -> ((RMPath) path).getResourcePath())
+                    .collect(Collectors.toSet());
+            Assert.assertTrue(filesFromNio.contains(file1));
+            Assert.assertTrue(filesFromNio.contains(file2));
+        }
     }
 
     @Test

@@ -12,7 +12,10 @@ import { GraphQLService } from '@cloudbeaver/core-sdk';
 
 @injectable()
 export class AuthRolesResource extends CachedDataResource<string[]> {
-  constructor(private readonly graphQLService: GraphQLService, sessionPermissionsResource: SessionPermissionsResource) {
+  constructor(
+    private readonly graphQLService: GraphQLService,
+    sessionPermissionsResource: SessionPermissionsResource,
+  ) {
     super(() => []);
 
     sessionPermissionsResource.require(this, EAdminPermission.admin).outdateResource(this);

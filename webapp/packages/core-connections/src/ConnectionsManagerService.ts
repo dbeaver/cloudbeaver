@@ -58,6 +58,10 @@ export class ConnectionsManagerService {
 
     this.connectionExecutor.addHandler(data => connectionInfo.load(data.key));
     this.onDelete.before(this.onDisconnect);
+    this.connectionInfo.onConnectionClose.next(this.onDisconnect, key => ({
+      connections: [key],
+      state: 'after' as const,
+    }));
 
     makeObservable(this, {
       projectConnections: computed<Connection[]>({
@@ -177,10 +181,6 @@ export class ConnectionsManagerService {
     try {
       for (const connection of this.projectConnections) {
         await this._closeConnectionAsync(connection);
-        this.onDisconnect.execute({
-          connections: [createConnectionParam(connection)],
-          state: 'after',
-        });
       }
 
       notification.close();
@@ -211,10 +211,6 @@ export class ConnectionsManagerService {
       await this._closeConnectionAsync(connection);
 
       notification.close();
-      this.onDisconnect.execute({
-        connections: [createConnectionParam(connection)],
-        state: 'after',
-      });
     } catch (exception: any) {
       controller.reject(exception);
     }

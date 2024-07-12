@@ -17,22 +17,20 @@ import { DATA_CONTEXT_MENU_SEARCH } from './DATA_CONTEXT_MENU_SEARCH';
 import styles from './SearchResourceMenuItemComponent.module.css';
 
 export const SearchResourceMenuItemComponent: ICustomMenuItemComponent<IContextMenuItemProps> = observer(function SearchResourceMenuItemComponent({
-  item,
-  onClick,
-  menuData,
+  context,
   className,
 }) {
   const style = useS(styles);
-  const value = menuData.context.get(DATA_CONTEXT_MENU_SEARCH) ?? '';
+  const value = context.get(DATA_CONTEXT_MENU_SEARCH) ?? '';
   const contextRefId = useRef<string | null>(null);
 
-  useDataContextLink(menuData.context, (context, id) => {
+  useDataContextLink(context, (context, id) => {
     contextRefId.current = id;
   });
 
   function handleChange(value: string) {
     if (contextRefId.current) {
-      menuData.context.set(DATA_CONTEXT_MENU_SEARCH, value, contextRefId.current);
+      context.set(DATA_CONTEXT_MENU_SEARCH, value, contextRefId.current);
     }
   }
 

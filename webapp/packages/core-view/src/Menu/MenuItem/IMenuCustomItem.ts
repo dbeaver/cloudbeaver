@@ -5,6 +5,8 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
+import { IDataContext } from '@cloudbeaver/core-data-context';
+
 import type { IMenuItem } from './IMenuItem';
 
 interface IMenuCustomItemCommonProperties<TExtraProps = unknown> {
@@ -17,6 +19,7 @@ export type ICustomMenuItemComponent<TExtraProps = unknown> = React.FC<ICustomMe
 
 export interface ICustomMenuItemProps<TExtraProps = unknown> {
   item: IMenuCustomItem<TExtraProps>;
+  context: IDataContext;
   onClick?: (keepMenuOpen: boolean) => void;
   className?: string;
 }

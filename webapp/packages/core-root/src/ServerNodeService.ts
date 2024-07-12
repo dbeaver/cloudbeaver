@@ -16,7 +16,10 @@ import { ServerEventId, SessionEventSource } from './SessionEventSource';
 export class ServerNodeService extends Dependency {
   private applicationRunId: string | null;
   onApplicationRunIdChange: IExecutor;
-  constructor(private readonly graphQLService: GraphQLService, private readonly sessionEventSource: SessionEventSource) {
+  constructor(
+    private readonly graphQLService: GraphQLService,
+    private readonly sessionEventSource: SessionEventSource,
+  ) {
     super();
     this.onApplicationRunIdChange = new Executor();
     this.applicationRunId = null;

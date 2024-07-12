@@ -30,6 +30,7 @@ export class MetadataMap<TKey, TValue> implements Map<TKey, TValue> {
 
     makeAutoObservable(this, {
       sync: action,
+      unSync: action,
     });
   }
 
@@ -42,12 +43,20 @@ export class MetadataMap<TKey, TValue> implements Map<TKey, TValue> {
   }
 
   sync(entities: Array<[TKey, TValue]>): void {
+    if (this.syncData === entities) {
+      return;
+    }
+
     this.temp.clear();
     this.data.clear();
     for (const [key, value] of entities) {
       this.data.set(key, value);
     }
     this.syncData = entities;
+  }
+
+  unSync(): void {
+    this.syncData = null;
   }
 
   forEach(callbackfn: (value: TValue, key: TKey, map: Map<TKey, TValue>) => void, thisArg?: any): void {

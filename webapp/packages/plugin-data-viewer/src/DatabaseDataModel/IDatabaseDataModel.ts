@@ -9,10 +9,10 @@ import type { IExecutor } from '@cloudbeaver/core-executor';
 import type { ResultDataFormat } from '@cloudbeaver/core-sdk';
 
 import type { IDatabaseDataResult } from './IDatabaseDataResult';
-import type { DatabaseDataAccessMode, IDatabaseDataSource, IRequestInfo } from './IDatabaseDataSource';
+import type { DatabaseDataAccessMode, IDatabaseDataSource, IDatabaseDataSourceOperationEvent, IRequestInfo } from './IDatabaseDataSource';
 
-export interface IRequestEventData<TOptions = any, TResult extends IDatabaseDataResult = IDatabaseDataResult> {
-  type: 'before' | 'after' | 'on';
+export interface IRequestEventData<TOptions = any, TResult extends IDatabaseDataResult = IDatabaseDataResult>
+  extends IDatabaseDataSourceOperationEvent {
   model: IDatabaseDataModel<TOptions, TResult>;
 }
 
@@ -48,11 +48,10 @@ export interface IDatabaseDataModel<TOptions = any, TResult extends IDatabaseDat
   setSupportedDataFormats: (dataFormats: ResultDataFormat[]) => this;
 
   requestOptionsChange: () => Promise<boolean>;
-  requestDataAction: (action: () => Promise<void> | void) => Promise<void>;
   retry: () => Promise<void>;
   save: () => Promise<void>;
-  refresh: (concurrent?: boolean) => Promise<void>;
-  request: (concurrent?: boolean) => Promise<void>;
+  refresh: () => Promise<void>;
+  request: (mutation?: () => void) => Promise<void>;
   reload: () => Promise<void>;
   requestDataPortion: (offset: number, count: number) => Promise<void>;
   cancel: () => Promise<void> | void;

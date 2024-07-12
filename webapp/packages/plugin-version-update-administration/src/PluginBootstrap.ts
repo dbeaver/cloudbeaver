@@ -16,7 +16,10 @@ const VersionUpdateDrawerItem = importLazyComponent(() => import('./VersionUpdat
 
 @injectable()
 export class PluginBootstrap extends Bootstrap {
-  constructor(private readonly administrationItemService: AdministrationItemService, private readonly versionUpdateService: VersionUpdateService) {
+  constructor(
+    private readonly administrationItemService: AdministrationItemService,
+    private readonly versionUpdateService: VersionUpdateService,
+  ) {
     super();
   }
 

@@ -26,17 +26,17 @@ import {
 } from '@cloudbeaver/core-blocks';
 import type { DialogComponentProps } from '@cloudbeaver/core-dialogs';
 
+import { IDatabaseRefreshState } from '../../../../DatabaseDataModel/Actions/DatabaseRefreshAction';
 import style from './AutoRefreshSettingsDialog.module.css';
-import type { IAutoRefreshSettings } from './IAutoRefreshSettings';
 
 interface Payload {
-  settings: IAutoRefreshSettings;
+  state: IDatabaseRefreshState;
 }
 
 export const AutoRefreshSettingsDialog = observer<DialogComponentProps<Payload>>(function AutoRefreshSettingsDialog({
   rejectDialog,
   resolveDialog,
-  payload,
+  payload: { state },
 }) {
   const translate = useTranslate();
   const styles = useS(style);
@@ -54,18 +54,18 @@ export const AutoRefreshSettingsDialog = observer<DialogComponentProps<Payload>>
 
   return (
     <CommonDialogWrapper size="small">
-      <CommonDialogHeader title="data_viewer_auto_refresh_settings" icon="/icons/settings_cog_m.svg" onReject={rejectDialog} />
+      <CommonDialogHeader title="plugin_data_viewer_auto_refresh_settings" icon="/icons/settings_cog_m.svg" onReject={rejectDialog} />
       <CommonDialogBody noBodyPadding noOverflow>
         <div className={s(styles, { wrapper: true })}>
           <Form ref={formRef} onSubmit={() => resolve()}>
             <Container>
               <Group form gap>
-                <InputField name="interval" state={payload.settings} type="number" min={5} max={3600}>
+                <InputField name="interval" state={state} type="number" min={5} max={3600}>
                   {translate('ui_interval')}
                 </InputField>
 
-                <FieldCheckbox id="dataViewer.tableViewer.autoRefresh.stopOnError" name="stopOnError" state={payload.settings}>
-                  {translate('data_viewer_auto_refresh_settings_stop_on_error')}
+                <FieldCheckbox id="dataViewer.tableViewer.autoRefresh.stopOnError" name="stopOnError" state={state}>
+                  {translate('plugin_data_viewer_auto_refresh_settings_stop_on_error')}
                 </FieldCheckbox>
               </Group>
             </Container>

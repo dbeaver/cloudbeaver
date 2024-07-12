@@ -14,7 +14,10 @@ export type DatabaseAuthModel = DatabaseAuthModelBase;
 
 @injectable()
 export class DatabaseAuthModelsResource extends CachedMapResource<string, DatabaseAuthModel> {
-  constructor(private readonly graphQLService: GraphQLService, serverConfigResource: ServerConfigResource) {
+  constructor(
+    private readonly graphQLService: GraphQLService,
+    serverConfigResource: ServerConfigResource,
+  ) {
     super();
     this.sync(
       serverConfigResource,

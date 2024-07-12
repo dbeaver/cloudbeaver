@@ -6,14 +6,8 @@
  * you may not use this file except in compliance with the License.
  */
 
-.tableFooterMenu .menuBarItem {
-  padding: 0 4px;
-
-  & .menuBarItemLabel {
-    padding: 0;
-  }
-
-  & .menuBarItemIcon + .menuBarItemLabel {
-    padding-left: 0;
-  }
+export interface IComponentsTreeNodeValidator<T extends React.FC<any>> {
+  component: T;
+  replacement?: T;
+  validator: (props: T extends React.FC<infer P> ? P : unknown) => boolean;
 }
