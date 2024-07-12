@@ -36,16 +36,6 @@
   }
 }
 
-.container:focus-within .grid {
-  :global(.rdg-cell-custom-selected::before) {
-    background-color: var(--data-grid-cell-selection-background-color-focus);
-  }
-
-  :global(.rdg-cell-custom-editing)::before {
-    background-color: transparent;
-  }
-}
-
 .container .grid {
   :global(.rdg-table-header__readonly-status) {
     background-color: var(--data-grid-readonly-status-color) !important;
@@ -82,5 +72,15 @@
   :global(.rdg-cell-custom-editing) {
     box-shadow: none;
     background-color: inherit;
+  }
+}
+
+.grid:focus-within {
+  :global(.rdg-cell-custom-selected::before) {
+    background-color: var(--data-grid-cell-selection-background-color-focus);
+  }
+
+  :global(.rdg-cell-custom-editing)::before {
+    background-color: transparent;
   }
 }
