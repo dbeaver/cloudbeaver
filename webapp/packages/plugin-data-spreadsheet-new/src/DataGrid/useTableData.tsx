@@ -8,6 +8,7 @@
 import { computed, observable } from 'mobx';
 
 import { useObservableRef } from '@cloudbeaver/core-blocks';
+import type { Column } from '@cloudbeaver/plugin-data-grid';
 import {
   DatabaseDataConstraintAction,
   IDatabaseDataModel,
@@ -22,7 +23,6 @@ import {
   ResultSetFormatAction,
   ResultSetViewAction,
 } from '@cloudbeaver/plugin-data-viewer';
-import type { Column } from '@cloudbeaver/plugin-react-data-grid';
 
 import { IndexFormatter } from './Formatters/IndexFormatter';
 import { TableColumnHeader } from './TableColumnHeader/TableColumnHeader';

@@ -8,8 +8,8 @@
 import { observer } from 'mobx-react-lite';
 import { useContext } from 'react';
 
+import type { RenderCellProps } from '@cloudbeaver/plugin-data-grid';
 import type { IResultSetRowKey } from '@cloudbeaver/plugin-data-viewer';
-import type { RenderCellProps } from '@cloudbeaver/plugin-react-data-grid';
 
 import { CellContext } from '../CellRenderer/CellContext';
 

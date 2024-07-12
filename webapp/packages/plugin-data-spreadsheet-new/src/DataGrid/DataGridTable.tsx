@@ -8,12 +8,13 @@
 import { observer } from 'mobx-react-lite';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
-import { TextPlaceholder, useObjectRef, useS, useTranslate } from '@cloudbeaver/core-blocks';
+import { s, TextPlaceholder, useObjectRef, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { EventContext, EventStopPropagationFlag } from '@cloudbeaver/core-events';
 import { Executor } from '@cloudbeaver/core-executor';
 import { ClipboardService } from '@cloudbeaver/core-ui';
 import { useCaptureViewContext } from '@cloudbeaver/core-view';
+import { type CellSelectArgs, DataGrid, type DataGridHandle, type Position } from '@cloudbeaver/plugin-data-grid';
 import {
   DATA_CONTEXT_DV_PRESENTATION,
   DatabaseDataSelectActionsData,
@@ -28,12 +29,9 @@ import {
   ResultSetDataKeysUtils,
   ResultSetSelectAction,
 } from '@cloudbeaver/plugin-data-viewer';
-import DataGrid, { CellSelectArgs, type DataGridHandle, type Position } from '@cloudbeaver/plugin-react-data-grid';
-import '@cloudbeaver/plugin-react-data-grid/react-data-grid-dist/lib/styles.css';
 
 import { CellPosition, EditingContext } from '../Editing/EditingContext';
 import { useEditing } from '../Editing/useEditing';
-import { reactGridStyles } from '../styles/styles';
 import { CellRenderer } from './CellRenderer/CellRenderer';
 import { DataGridContext, IColumnResizeInfo, IDataGridContext } from './DataGridContext';
 import { DataGridSelectionContext } from './DataGridSelection/DataGridSelectionContext';
@@ -67,6 +65,7 @@ export const DataGridTable = observer<IDataPresentationProps<any, IDatabaseResul
   className,
 }) {
   const translate = useTranslate();
+  const styles = useS(classes);
 
   const clipboardService = useService(ClipboardService);
   const gridContainerRef = useRef<HTMLDivElement | null>(null);
@@ -286,8 +285,6 @@ export const DataGridTable = observer<IDataPresentationProps<any, IDatabaseResul
     editingContext.edit({ idx, rowIdx }, event.nativeEvent.code, event.key);
   }
 
-  useS(reactGridStyles);
-
   useEffect(() => {
     function syncEditor(data: IResultSetEditActionData) {
       const editor = tableData.editor;
@@ -442,7 +439,7 @@ export const DataGridTable = observer<IDataPresentationProps<any, IDatabaseResul
           <TableDataContext.Provider value={tableData}>
             <div
               ref={setContainersRef}
-              className={`cb-react-grid-container ${classes.container}`}
+              className={s(styles, { container: true }, className)}
               tabIndex={-1}
               onKeyDown={handleKeyDown}
               onMouseDown={onMouseDownHandler}
@@ -450,7 +447,7 @@ export const DataGridTable = observer<IDataPresentationProps<any, IDatabaseResul
             >
               <DataGrid
                 ref={dataGridRef}
-                className={`cb-react-grid-theme ${className}`}
+                className={s(styles, { grid: true }, className)}
                 columns={tableData.columns}
                 defaultColumnOptions={{
                   minWidth: 80,

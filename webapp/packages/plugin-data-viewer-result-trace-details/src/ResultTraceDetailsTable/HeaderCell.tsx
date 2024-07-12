@@ -9,7 +9,7 @@ import { observer } from 'mobx-react-lite';
 
 import { useTranslate } from '@cloudbeaver/core-blocks';
 import { DynamicTraceProperty } from '@cloudbeaver/core-sdk';
-import type { RenderHeaderCellProps } from '@cloudbeaver/plugin-react-data-grid';
+import type { RenderHeaderCellProps } from '@cloudbeaver/plugin-data-grid';
 
 export const HeaderCell = observer<RenderHeaderCellProps<DynamicTraceProperty>>(function HeaderCell(props) {
   const translate = useTranslate();
