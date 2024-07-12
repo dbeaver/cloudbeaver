@@ -15,8 +15,8 @@ import { useService } from '@cloudbeaver/core-di';
 import { DATA_CONTEXT_NAV_NODE, type DBObject, type NavNode, NavNodeManagerService } from '@cloudbeaver/core-navigation-tree';
 import { ContextMenu } from '@cloudbeaver/core-ui';
 import { useMenu } from '@cloudbeaver/core-view';
+import type { RenderCellProps } from '@cloudbeaver/plugin-data-grid';
 import { MENU_NAV_TREE, useNode } from '@cloudbeaver/plugin-navigation-tree';
-import type { RenderCellProps } from '@cloudbeaver/plugin-react-data-grid';
 
 import { getValue } from '../../helpers';
 import classes from './CellFormatter.module.css';
