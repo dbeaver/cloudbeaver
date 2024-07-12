@@ -7,17 +7,5 @@
  */
 import ReactDataGrid from 'react-data-grid';
 
+export * from 'react-data-grid';
 export default ReactDataGrid;
-
-export {
-  type CellSelectArgs,
-  type DataGridHandle,
-  type Position,
-  type Column,
-  type RenderHeaderCellProps,
-  type RenderEditCellProps,
-  type RenderCellProps,
-  type CalculatedColumn,
-  Cell,
-  type CellRendererProps,
-} from 'react-data-grid';
