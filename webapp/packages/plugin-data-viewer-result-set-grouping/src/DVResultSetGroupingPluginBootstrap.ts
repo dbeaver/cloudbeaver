@@ -15,6 +15,7 @@ import {
   DATA_CONTEXT_DV_DDM_RESULT_INDEX,
   DATA_CONTEXT_DV_PRESENTATION,
   DATA_VIEWER_DATA_MODEL_ACTIONS_MENU,
+  DatabaseDataResultAction,
   DataPresentationService,
   DataPresentationType,
   DataViewerPresentationType,
@@ -186,11 +187,12 @@ export class DVResultSetGroupingPluginBootstrap extends Bootstrap {
       icon: '/icons/plugin_data_viewer_result_set_grouping_m.svg',
       dataFormat: ResultDataFormat.Resultset,
       hidden: (dataFormat, model, resultIndex) => {
+        const source = model.source;
         if (!model.source.hasResult(resultIndex)) {
           return true;
         }
 
-        const data = model.source.tryGetAction(resultIndex, ResultSetDataAction);
+        const data = source.getActionImplementation(resultIndex, DatabaseDataResultAction);
         return data?.empty ?? true;
       },
       getPresentationComponent: () => DVResultSetGroupingPresentation,

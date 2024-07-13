@@ -17,6 +17,7 @@
   align-items: center;
   flex: 1 1 auto;
   overflow: hidden;
+  gap: 8px;
   cursor: pointer;
 }
 .icon {
@@ -27,7 +28,6 @@
   height: 16px;
 }
 .name {
-  margin-left: 8px;
   font-weight: 400;
   flex-grow: 1;
 }

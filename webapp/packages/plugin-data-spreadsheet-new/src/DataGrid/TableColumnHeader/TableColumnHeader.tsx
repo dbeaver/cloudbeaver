@@ -71,13 +71,17 @@ export const TableColumnHeader = observer<RenderHeaderCellProps<any>>(function T
     }
   }, [calculatedColumn]);
 
+  const hasIcon = icon || (!dataReadonly && columnReadOnly);
+
   return (
     <div ref={dnd.setRef} data-s-rearrange={dnd.side} className={s(styles, { header: true, dragging: dnd.data.state.isDragging })}>
       <div title={columnTooltip} className={s(styles, { container: true })} onClick={handleClick}>
-        <div className={s(styles, { icon: true })}>
-          {icon && <StaticImage icon={icon} className={s(styles, { staticImage: true })} />}
-          {!dataReadonly && columnReadOnly && <div className={s(styles, { readonlyStatus: true }, 'rdg-table-header__readonly-status')} />}
-        </div>
+        {hasIcon && (
+          <div className={s(styles, { icon: true })}>
+            {icon && <StaticImage icon={icon} className={s(styles, { staticImage: true })} />}
+            {!dataReadonly && columnReadOnly && <div className={s(styles, { readonlyStatus: true }, 'rdg-table-header__readonly-status')} />}
+          </div>
+        )}
         <div className={s(styles, { name: true })}>{columnName}</div>
       </div>
       {!sortingDisabled && resultColumn && <OrderButton model={model} resultIndex={resultIndex} attributePosition={resultColumn.position} />}
