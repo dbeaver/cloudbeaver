@@ -7,10 +7,10 @@
  */
 import { injectable } from '@cloudbeaver/core-di';
 import { uuid } from '@cloudbeaver/core-utils';
-import { IDatabaseDataModel, IDatabaseResultSet, TableViewerStorageService } from '@cloudbeaver/plugin-data-viewer';
+import { IDatabaseDataModel, TableViewerStorageService } from '@cloudbeaver/plugin-data-viewer';
 
 import type { IResultGroup, IResultTab, ISqlEditorTabState, IStatisticsTab } from '../ISqlEditorTabState';
-import type { IDataQueryOptions } from '../QueryDataSource';
+import type { QueryDataSource } from '../QueryDataSource';
 
 @injectable()
 export class SqlQueryResultService {
@@ -41,7 +41,7 @@ export class SqlQueryResultService {
 
   updateGroupTabs(
     editorState: ISqlEditorTabState,
-    model: IDatabaseDataModel<IDataQueryOptions, IDatabaseResultSet>,
+    model: IDatabaseDataModel<QueryDataSource>,
     groupId: string,
     selectFirstResult?: boolean,
     resultCount?: number,
@@ -155,7 +155,7 @@ export class SqlQueryResultService {
         state.resultGroups.splice(state.resultGroups.indexOf(group), 1);
         const model = this.tableViewerStorageService.get(group.modelId);
 
-        model?.dispose(true).then(() => {
+        model?.dispose().then(() => {
           this.tableViewerStorageService.remove(group.modelId);
         });
       }
@@ -181,12 +181,7 @@ export class SqlQueryResultService {
     editorState.currentTabId = mainTab[0].tabId;
   }
 
-  private createTabsForGroup(
-    state: ISqlEditorTabState,
-    group: IResultGroup,
-    model: IDatabaseDataModel<IDataQueryOptions, IDatabaseResultSet>,
-    resultCount?: number,
-  ) {
+  private createTabsForGroup(state: ISqlEditorTabState, group: IResultGroup, model: IDatabaseDataModel<QueryDataSource>, resultCount?: number) {
     this.createResultTabForGroup(state, group, model, 0, resultCount);
 
     for (let i = 1; i < model.source.results.length; i++) {
@@ -197,7 +192,7 @@ export class SqlQueryResultService {
   private createResultTabForGroup(
     state: ISqlEditorTabState,
     group: IResultGroup,
-    model: IDatabaseDataModel<IDataQueryOptions, IDatabaseResultSet>,
+    model: IDatabaseDataModel<QueryDataSource>,
     indexInResultSet: number,
     resultCount?: number,
   ) {

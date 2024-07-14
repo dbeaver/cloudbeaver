@@ -5,25 +5,40 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import type { IConnectionExecutionContextInfo } from '@cloudbeaver/core-connections';
+import { makeObservable, observable } from 'mobx';
+
+import type { IConnectionExecutionContext, IConnectionExecutionContextInfo } from '@cloudbeaver/core-connections';
 import type { IServiceProvider } from '@cloudbeaver/core-di';
 import type { ITask } from '@cloudbeaver/core-executor';
 import type { AsyncTaskInfoService, GraphQLService } from '@cloudbeaver/core-sdk';
 
 import { DatabaseDataSource } from '../DatabaseDataModel/DatabaseDataSource';
+import { IDatabaseDataOptions } from '../DatabaseDataModel/IDatabaseDataOptions';
 import type { IDatabaseResultSet } from '../DatabaseDataModel/IDatabaseResultSet';
 
-export abstract class ResultSetDataSource<TOptions> extends DatabaseDataSource<TOptions, IDatabaseResultSet> {
+export abstract class ResultSetDataSource<TOptions = IDatabaseDataOptions> extends DatabaseDataSource<TOptions, IDatabaseResultSet> {
+  executionContext: IConnectionExecutionContext | null;
+  totalCountRequestTask: ITask<number> | null;
+  private keepExecutionContextOnDispose: boolean;
+
   constructor(
     readonly serviceProvider: IServiceProvider,
     protected graphQLService: GraphQLService,
     protected asyncTaskInfoService: AsyncTaskInfoService,
   ) {
     super(serviceProvider);
+    this.totalCountRequestTask = null;
+    this.executionContext = null;
+    this.keepExecutionContextOnDispose = false;
+
+    makeObservable(this, {
+      totalCountRequestTask: observable.ref,
+      executionContext: observable,
+    });
   }
 
   isReadonly(resultIndex: number): boolean {
-    return super.isReadonly(resultIndex) || this.getResult(resultIndex)?.data?.hasRowIdentifier === false;
+    return super.isReadonly(resultIndex) || !this.executionContext?.context || this.getResult(resultIndex)?.data?.hasRowIdentifier === false;
   }
 
   async cancel(): Promise<void> {
@@ -87,11 +102,24 @@ export abstract class ResultSetDataSource<TOptions> extends DatabaseDataSource<T
     return super.setResults(results);
   }
 
-  async dispose(keepExecutionContext?: boolean): Promise<void> {
-    if (keepExecutionContext) {
+  async dispose(): Promise<void> {
+    await super.dispose();
+    if (this.keepExecutionContextOnDispose) {
       await this.closeResults(this.results);
+    } else {
+      await this.executionContext?.destroy();
     }
-    return super.dispose(keepExecutionContext);
+  }
+
+  setKeepExecutionContextOnDispose(keep: boolean): this {
+    this.keepExecutionContextOnDispose = keep;
+    return this;
+  }
+
+  setExecutionContext(context: IConnectionExecutionContext | null): this {
+    this.executionContext = context;
+    this.setOutdated();
+    return this;
   }
 
   protected getPreviousResultId(prevResults: IDatabaseResultSet[], context: IConnectionExecutionContextInfo) {
@@ -107,6 +135,15 @@ export abstract class ResultSetDataSource<TOptions> extends DatabaseDataSource<T
     }
 
     return resultId;
+  }
+
+  private setTotalCount(resultIndex: number, count: number): this {
+    const result = this.getResult(resultIndex);
+
+    if (result) {
+      result.totalCount = count;
+    }
+    return this;
   }
 
   private async closeResults(results: IDatabaseResultSet[]): Promise<void> {
@@ -131,4 +168,8 @@ export abstract class ResultSetDataSource<TOptions> extends DatabaseDataSource<T
       }
     }
   }
+}
+
+export function isResultSetDataSource<T = IDatabaseDataOptions>(dataSource: any): dataSource is ResultSetDataSource<T> {
+  return dataSource instanceof ResultSetDataSource;
 }

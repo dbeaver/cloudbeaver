@@ -71,6 +71,10 @@ export class QueryDataSource<TOptions extends IDataQueryOptions = IDataQueryOpti
     });
   }
 
+  isDisabled(resultIndex?: number): boolean {
+    return super.isDisabled(resultIndex) || !this.executionContext?.context;
+  }
+
   async cancel(): Promise<void> {
     await super.cancel();
     await this.currentTask?.cancel();
@@ -154,23 +158,6 @@ export class QueryDataSource<TOptions extends IDataQueryOptions = IDataQueryOpti
     return this;
   }
 
-  getResults(executionContextInfo: IConnectionExecutionContextInfo, response: SqlExecuteInfo, limit: number): IDatabaseResultSet[] | null {
-    this.requestInfo = {
-      originalQuery: response.fullQuery || this.options?.query || '',
-      requestDuration: response.duration || 0,
-      requestMessage: response.statusMessage || '',
-      requestFilter: response.filterText || '',
-      source: this.options?.query || null,
-      query: this.options?.query || '',
-    };
-
-    if (!response.results) {
-      return null;
-    }
-
-    return this.transformResults(executionContextInfo, response.results, limit);
-  }
-
   async request(prevResults: IDatabaseResultSet[]): Promise<IDatabaseResultSet[]> {
     const options = this.options;
     const executionContext = this.executionContext;
@@ -221,7 +208,7 @@ export class QueryDataSource<TOptions extends IDataQueryOptions = IDataQueryOpti
     try {
       const response = await this.currentTask;
 
-      const results = this.getResults(executionContextInfo, response, limit);
+      const results = this.innerGetResults(executionContextInfo, response, limit);
       this.clearError();
 
       if (!results) {
@@ -233,6 +220,27 @@ export class QueryDataSource<TOptions extends IDataQueryOptions = IDataQueryOpti
       this.error = exception;
       throw exception;
     }
+  }
+
+  private innerGetResults(
+    executionContextInfo: IConnectionExecutionContextInfo,
+    response: SqlExecuteInfo,
+    limit: number,
+  ): IDatabaseResultSet[] | null {
+    this.requestInfo = {
+      originalQuery: response.fullQuery || this.options?.query || '',
+      requestDuration: response.duration || 0,
+      requestMessage: response.statusMessage || '',
+      requestFilter: response.filterText || '',
+      source: this.options?.query || null,
+      query: this.options?.query || '',
+    };
+
+    if (!response.results) {
+      return null;
+    }
+
+    return this.transformResults(executionContextInfo, response.results, limit);
   }
 
   private transformResults(executionContextInfo: IConnectionExecutionContextInfo, results: SqlQueryResults[], limit: number): IDatabaseResultSet[] {

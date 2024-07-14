@@ -28,7 +28,9 @@ import { ResultDataFormat } from '@cloudbeaver/core-sdk';
 import { CaptureView } from '@cloudbeaver/core-view';
 
 import { DatabaseDataConstraintAction } from '../DatabaseDataModel/Actions/DatabaseDataConstraintAction';
+import { IDatabaseDataOptions } from '../DatabaseDataModel/IDatabaseDataOptions';
 import { DataPresentationService, DataPresentationType } from '../DataPresentationService';
+import { isResultSetDataModel } from '../ResultSet/isResultSetDataModel';
 import { DataPresentation } from './DataPresentation';
 import { DataViewerViewService } from './DataViewerViewService';
 import type { IDataTableActionsPrivate } from './IDataTableActions';
@@ -63,13 +65,17 @@ export const TableViewer = observer<TableViewerProps, HTMLDivElement>(
     const dataPresentationService = useService(DataPresentationService);
     const tableViewerStorageService = useService(TableViewerStorageService);
     const dataModel = tableViewerStorageService.get(tableId);
-    const result = dataModel?.getResult(resultIndex);
+    const result = dataModel?.source.getResult(resultIndex);
     const loading = dataModel?.isLoading() ?? true;
     const dataFormat = result?.dataFormat || ResultDataFormat.Resultset;
     const splitState = useSplitUserState('table-viewer');
 
     const localActions = useObjectRef({
       clearConstraints() {
+        if (!isResultSetDataModel<IDatabaseDataOptions>(dataModel)) {
+          return;
+        }
+
         const constraints = dataModel?.source.tryGetAction(resultIndex, DatabaseDataConstraintAction);
 
         if (constraints) {
@@ -146,7 +152,7 @@ export const TableViewer = observer<TableViewerProps, HTMLDivElement>(
       ['setPresentation', 'setValuePresentation', 'switchValuePresentation', 'closeValuePresentation'],
     );
 
-    const needRefresh = getComputed(() => dataModel?.isDisabled(resultIndex) && dataModel.source.isOutdated() && dataModel.source.isLoadable());
+    const needRefresh = getComputed(() => !dataModel?.isDisabled(resultIndex) && dataModel?.source.isOutdated() && dataModel.source.isLoadable());
 
     useEffect(() => {
       if (needRefresh) {
@@ -229,7 +235,7 @@ export const TableViewer = observer<TableViewerProps, HTMLDivElement>(
                         presentation={presentation}
                         resultIndex={resultIndex}
                         simple={simple}
-                        isStatistics={isStatistics}
+                        isStatistics={!!isStatistics}
                       />
                     </Loader>
                     <TableError model={dataModel} loading={loading} />

@@ -5,12 +5,11 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import type { IConnectionExecutionContext } from '@cloudbeaver/core-connections';
 import type { IServiceProvider } from '@cloudbeaver/core-di';
-import type { IExecutor, ITask } from '@cloudbeaver/core-executor';
+import type { IExecutor } from '@cloudbeaver/core-executor';
 import type { ResultDataFormat } from '@cloudbeaver/core-sdk';
 
-import type { IDatabaseDataAction, IDatabaseDataActionClass, IDatabaseDataActionInterface } from './IDatabaseDataAction';
+import type { IDatabaseDataActionClass, IDatabaseDataActionInterface } from './IDatabaseDataAction';
 import type { IDatabaseDataActions } from './IDatabaseDataActions';
 import type { IDatabaseDataResult } from './IDatabaseDataResult';
 
@@ -41,7 +40,13 @@ export enum DatabaseDataAccessMode {
   Readonly,
 }
 
-export interface IDatabaseDataSource<TOptions, TResult extends IDatabaseDataResult = IDatabaseDataResult> {
+export type GetDatabaseDataSourceOptions<TSource extends IDatabaseDataSource<any, any>> =
+  TSource extends IDatabaseDataSource<infer TOptions> ? TOptions : never;
+
+export type GetDatabaseDataSourceResult<TSource extends IDatabaseDataSource<any, any>> =
+  TSource extends IDatabaseDataSource<any, infer TResult> ? TResult : never;
+
+export interface IDatabaseDataSource<TOptions = unknown, TResult extends IDatabaseDataResult = IDatabaseDataResult> {
   readonly access: DatabaseDataAccessMode;
   readonly dataFormat: ResultDataFormat;
   readonly supportedDataFormats: ResultDataFormat[];
@@ -56,11 +61,9 @@ export interface IDatabaseDataSource<TOptions, TResult extends IDatabaseDataResu
   readonly options: TOptions | null;
   readonly requestInfo: IRequestInfo;
   readonly error: Error | null;
-  readonly executionContext: IConnectionExecutionContext | null;
   readonly canCancel: boolean;
   readonly cancelled: boolean;
   readonly serviceProvider: IServiceProvider;
-  readonly totalCountRequestTask: ITask<number> | null;
   readonly onOperation: IExecutor<IDatabaseDataSourceOperationEvent>;
 
   isOutdated: () => boolean;
@@ -68,27 +71,22 @@ export interface IDatabaseDataSource<TOptions, TResult extends IDatabaseDataResu
   isReadonly: (resultIndex: number) => boolean;
   isDataAvailable: (offset: number, count: number) => boolean;
   isLoading: () => boolean;
-  isDisabled: (resultIndex: number) => boolean;
+  isDisabled: (resultIndex?: number) => boolean;
 
   hasResult: (resultIndex: number) => boolean;
 
-  tryGetAction: (<T extends IDatabaseDataAction<TOptions, TResult>>(
+  tryGetAction: (<T extends IDatabaseDataActionClass<TOptions, TResult, any>>(resultIndex: number, action: T) => InstanceType<T> | undefined) &
+    (<T extends IDatabaseDataActionClass<TOptions, TResult, any>>(result: TResult, action: T) => InstanceType<T> | undefined);
+  getAction: (<T extends IDatabaseDataActionClass<TOptions, TResult, any>>(resultIndex: number, action: T) => InstanceType<T>) &
+    (<T extends IDatabaseDataActionClass<TOptions, TResult, any>>(result: TResult, action: T) => InstanceType<T>);
+  getActionImplementation: (<T extends IDatabaseDataActionInterface<TOptions, TResult, any>>(
     resultIndex: number,
-    action: IDatabaseDataActionClass<TOptions, TResult, T>,
-  ) => T | undefined) &
-    (<T extends IDatabaseDataAction<TOptions, TResult>>(result: TResult, action: IDatabaseDataActionClass<TOptions, TResult, T>) => T | undefined);
-  getAction: (<T extends IDatabaseDataAction<TOptions, TResult>>(resultIndex: number, action: IDatabaseDataActionClass<TOptions, TResult, T>) => T) &
-    (<T extends IDatabaseDataAction<TOptions, TResult>>(result: TResult, action: IDatabaseDataActionClass<TOptions, TResult, T>) => T);
-  getActionImplementation: (<T extends IDatabaseDataAction<TOptions, TResult>>(
-    resultIndex: number,
-    action: IDatabaseDataActionInterface<TOptions, TResult, T>,
-  ) => T | undefined) &
-    (<T extends IDatabaseDataAction<TOptions, TResult>>(
-      result: TResult,
-      action: IDatabaseDataActionInterface<TOptions, TResult, T>,
-    ) => T | undefined);
+    action: T,
+  ) => InstanceType<T> | undefined) &
+    (<T extends IDatabaseDataActionInterface<TOptions, TResult, any>>(result: TResult, action: T) => InstanceType<T> | undefined);
 
   getResult: (index: number) => TResult | null;
+  getResults: () => TResult[];
 
   setOutdated: () => this;
   setResults: (results: TResult[]) => this;
@@ -97,11 +95,6 @@ export interface IDatabaseDataSource<TOptions, TResult extends IDatabaseDataResu
   setOptions: (options: TOptions) => this;
   setDataFormat: (dataFormat: ResultDataFormat) => this;
   setSupportedDataFormats: (dataFormats: ResultDataFormat[]) => this;
-  setExecutionContext: (context: IConnectionExecutionContext | null) => this;
-
-  setTotalCount: (resultIndex: number, count: number) => this;
-  loadTotalCount: (resultIndex: number) => Promise<ITask<number>>;
-  cancelLoadTotalCount: () => Promise<ITask<number> | null>;
 
   retry: () => Promise<void>;
   /**
@@ -116,7 +109,8 @@ export interface IDatabaseDataSource<TOptions, TResult extends IDatabaseDataResu
   saveData: () => Promise<void>;
   cancel: () => Promise<void>;
   clearError: () => this;
+  setError: (error: Error) => this;
   resetData: () => this;
   canSafelyDispose: () => Promise<boolean>;
-  dispose: (keepExecutionContext?: boolean) => Promise<void>;
+  dispose: () => Promise<void>;
 }

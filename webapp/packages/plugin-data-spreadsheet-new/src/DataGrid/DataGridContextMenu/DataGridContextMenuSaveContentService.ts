@@ -11,7 +11,9 @@ import { NotificationService } from '@cloudbeaver/core-events';
 import {
   createResultSetBlobValue,
   DataViewerService,
+  isResultSetDataSource,
   ResultSetDataContentAction,
+  ResultSetDataSource,
   ResultSetEditAction,
   ResultSetFormatAction,
 } from '@cloudbeaver/plugin-data-viewer';
@@ -33,10 +35,11 @@ export class DataGridContextMenuSaveContentService {
       title: 'ui_download',
       icon: '/icons/export.svg',
       isPresent(context) {
-        return context.contextType === DataGridContextMenuService.cellContext;
+        return context.contextType === DataGridContextMenuService.cellContext && isResultSetDataSource(context.data.model.source);
       },
       onClick: async context => {
-        const content = context.data.model.source.getAction(context.data.resultIndex, ResultSetDataContentAction);
+        const source = context.data.model.source as unknown as ResultSetDataSource;
+        const content = source.getAction(context.data.resultIndex, ResultSetDataContentAction);
         try {
           await content.downloadFileData(context.data.key);
         } catch (exception: any) {
@@ -44,12 +47,14 @@ export class DataGridContextMenuSaveContentService {
         }
       },
       isHidden: context => {
-        const content = context.data.model.source.getAction(context.data.resultIndex, ResultSetDataContentAction);
+        const source = context.data.model.source as unknown as ResultSetDataSource;
+        const content = source.getAction(context.data.resultIndex, ResultSetDataContentAction);
 
         return !content.isDownloadable(context.data.key) || !this.dataViewerService.canExportData;
       },
       isDisabled: context => {
-        const content = context.data.model.source.getAction(context.data.resultIndex, ResultSetDataContentAction);
+        const source = context.data.model.source as unknown as ResultSetDataSource;
+        const content = source.getAction(context.data.resultIndex, ResultSetDataContentAction);
 
         return context.data.model.isLoading() || content.isLoading(context.data.key);
       },
@@ -60,11 +65,12 @@ export class DataGridContextMenuSaveContentService {
       title: 'ui_upload',
       icon: '/icons/import.svg',
       isPresent(context) {
-        return context.contextType === DataGridContextMenuService.cellContext;
+        return context.contextType === DataGridContextMenuService.cellContext && isResultSetDataSource(context.data.model.source);
       },
       onClick: async context => {
         selectFiles(files => {
-          const edit = context.data.model.source.getAction(context.data.resultIndex, ResultSetEditAction);
+          const source = context.data.model.source as unknown as ResultSetDataSource;
+          const edit = source.getAction(context.data.resultIndex, ResultSetEditAction);
           const file = files?.[0] ?? undefined;
           if (file) {
             edit.set(context.data.key, createResultSetBlobValue(file));
@@ -72,12 +78,14 @@ export class DataGridContextMenuSaveContentService {
         });
       },
       isHidden: context => {
-        const format = context.data.model.source.getAction(context.data.resultIndex, ResultSetFormatAction);
+        const source = context.data.model.source as unknown as ResultSetDataSource;
+        const format = source.getAction(context.data.resultIndex, ResultSetFormatAction);
 
         return !format.isBinary(context.data.key) || context.data.model.isReadonly(context.data.resultIndex);
       },
       isDisabled: context => {
-        const content = context.data.model.source.getAction(context.data.resultIndex, ResultSetDataContentAction);
+        const source = context.data.model.source as unknown as ResultSetDataSource;
+        const content = source.getAction(context.data.resultIndex, ResultSetDataContentAction);
 
         return context.data.model.isLoading() || content.isLoading(context.data.key);
       },

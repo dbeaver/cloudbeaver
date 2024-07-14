@@ -19,14 +19,16 @@ import {
   DATA_CONTEXT_DV_PRESENTATION,
   DatabaseDataSelectActionsData,
   DatabaseEditChangeType,
+  DatabaseSelectAction,
   DataViewerPresentationType,
-  IDatabaseResultSet,
+  IDatabaseDataModel,
   IDataPresentationProps,
   IResultSetEditActionData,
   IResultSetElementKey,
   IResultSetPartialKey,
   IResultSetRowKey,
   ResultSetDataKeysUtils,
+  ResultSetDataSource,
   ResultSetSelectAction,
 } from '@cloudbeaver/plugin-data-viewer';
 
@@ -57,13 +59,7 @@ const rowHeight = 25;
 const headerHeight = 28;
 const MAX_CELL_TEXT_SIZE = 100 * 1024;
 
-export const DataGridTable = observer<IDataPresentationProps<any, IDatabaseResultSet>>(function DataGridTable({
-  model,
-  actions,
-  resultIndex,
-  simple,
-  className,
-}) {
+export const DataGridTable = observer<IDataPresentationProps>(function DataGridTable({ model, actions, resultIndex, simple, className }) {
   const translate = useTranslate();
   const styles = useS(classes);
 
@@ -81,11 +77,11 @@ export const DataGridTable = observer<IDataPresentationProps<any, IDatabaseResul
   );
   const [columnResize] = useState(() => new Executor<IColumnResizeInfo>());
 
-  const selectionAction = model.source.getAction(resultIndex, ResultSetSelectAction);
+  const selectionAction = (model.source as unknown as ResultSetDataSource).getAction(resultIndex, ResultSetSelectAction);
 
   const focusSyncRef = useRef<CellPosition | null>(null);
 
-  const tableData = useTableData(model, resultIndex, dataGridDivRef);
+  const tableData = useTableData(model as unknown as IDatabaseDataModel<ResultSetDataSource>, resultIndex, dataGridDivRef);
   const editingContext = useEditing({
     readonly: model.isReadonly(resultIndex) || model.isDisabled(resultIndex),
     onEdit: (position, code, key) => {
@@ -176,7 +172,7 @@ export const DataGridTable = observer<IDataPresentationProps<any, IDatabaseResul
     },
   }));
 
-  const gridSelectedCellCopy = useGridSelectedCellsCopy(tableData, selectionAction, gridSelectionContext);
+  const gridSelectedCellCopy = useGridSelectedCellsCopy(tableData, selectionAction as unknown as DatabaseSelectAction, gridSelectionContext);
   const { onMouseDownHandler, onMouseMoveHandler } = useGridDragging({
     onDragStart: startPosition => {
       hamdlers.selectCell({ idx: startPosition.colIdx, rowIdx: startPosition.rowIdx });
@@ -403,7 +399,7 @@ export const DataGridTable = observer<IDataPresentationProps<any, IDatabaseResul
         return;
       }
 
-      const result = model.getResult(resultIndex);
+      const result = model.source.getResult(resultIndex);
       if (result?.loadedFully) {
         return;
       }

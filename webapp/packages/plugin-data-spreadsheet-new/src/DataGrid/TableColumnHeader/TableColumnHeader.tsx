@@ -11,6 +11,7 @@ import { useContext, useMemo } from 'react';
 import { getComputed, s, StaticImage, useS } from '@cloudbeaver/core-blocks';
 import type { SqlResultColumn } from '@cloudbeaver/core-sdk';
 import type { RenderHeaderCellProps } from '@cloudbeaver/plugin-data-grid';
+import { DatabaseDataConstraintAction, isResultSetDataModel, ResultSetDataSource } from '@cloudbeaver/plugin-data-viewer';
 
 import { DataGridContext } from '../DataGridContext';
 import { DataGridSelectionContext } from '../DataGridSelection/DataGridSelectionContext';
@@ -29,9 +30,14 @@ export const TableColumnHeader = observer<RenderHeaderCellProps<any>>(function T
   const model = dataGridContext.model;
 
   const dnd = useTableColumnDnD(model, resultIndex, calculatedColumn.columnDataIndex);
+  let constraintsAction: DatabaseDataConstraintAction | undefined;
+
+  if (isResultSetDataModel(model)) {
+    constraintsAction = (model.source as ResultSetDataSource).tryGetAction(resultIndex, DatabaseDataConstraintAction);
+  }
 
   const dataReadonly = getComputed(() => tableDataContext.isReadOnly() || model.isReadonly(resultIndex));
-  const sortingDisabled = getComputed(() => !tableDataContext.constraints.supported || !model.source.executionContext?.context);
+  const sortingDisabled = getComputed(() => !constraintsAction?.supported || model.isDisabled(resultIndex));
 
   let resultColumn: SqlResultColumn | undefined;
   let icon = calculatedColumn.icon;
@@ -84,7 +90,9 @@ export const TableColumnHeader = observer<RenderHeaderCellProps<any>>(function T
         )}
         <div className={s(styles, { name: true })}>{columnName}</div>
       </div>
-      {!sortingDisabled && resultColumn && <OrderButton model={model} resultIndex={resultIndex} attributePosition={resultColumn.position} />}
+      {!sortingDisabled && resultColumn && isResultSetDataModel(model) && (
+        <OrderButton model={model} resultIndex={resultIndex} attributePosition={resultColumn.position} />
+      )}
     </div>
   );
 });

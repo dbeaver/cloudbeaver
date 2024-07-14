@@ -10,7 +10,7 @@ import { observer } from 'mobx-react-lite';
 import { s, TextPlaceholder, useAutoLoad, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import { DynamicTraceProperty } from '@cloudbeaver/core-sdk';
 import { type Column, DataGrid } from '@cloudbeaver/plugin-data-grid';
-import type { DataPresentationComponent, IDatabaseResultSet } from '@cloudbeaver/plugin-data-viewer';
+import { type DataPresentationComponent, IDatabaseDataOptions, isResultSetDataModel, isResultSetDataSource } from '@cloudbeaver/plugin-data-viewer';
 
 import classes from './DVResultTraceDetailsPresentation.module.css';
 import { HeaderCell } from './ResultTraceDetailsTable/HeaderCell';
@@ -40,22 +40,26 @@ const COLUMNS: Column<DynamicTraceProperty>[] = [
   },
 ];
 
-export const DVResultTraceDetailsPresentation: DataPresentationComponent<any, IDatabaseResultSet> = observer(
-  function DVResultTraceDetailsPresentation({ model, resultIndex }) {
-    const translate = useTranslate();
-    const styles = useS(classes);
-    const state = useResultTraceDetails(model, resultIndex);
+export const DVResultTraceDetailsPresentation: DataPresentationComponent = observer(function DVResultTraceDetailsPresentation({
+  model,
+  resultIndex,
+}) {
+  if (!isResultSetDataModel<IDatabaseDataOptions>(model)) {
+    throw new Error('DVResultTraceDetailsPresentation can only be used with ResultSetDataSource');
+  }
+  const translate = useTranslate();
+  const styles = useS(classes);
+  const state = useResultTraceDetails(model, resultIndex);
 
-    useAutoLoad(DVResultTraceDetailsPresentation, state, undefined, undefined, true);
+  useAutoLoad(DVResultTraceDetailsPresentation, state, undefined, undefined, true);
 
-    if (!state.trace?.length) {
-      return <TextPlaceholder>{translate('plugin_data_viewer_result_trace_no_data_placeholder')}</TextPlaceholder>;
-    }
+  if (!state.trace?.length) {
+    return <TextPlaceholder>{translate('plugin_data_viewer_result_trace_no_data_placeholder')}</TextPlaceholder>;
+  }
 
-    return (
-      <div className={s(styles, { container: true })}>
-        <DataGrid rows={state.trace} rowKeyGetter={row => row.name} columns={COLUMNS} rowHeight={30} />
-      </div>
-    );
-  },
-);
+  return (
+    <div className={s(styles, { container: true })}>
+      <DataGrid rows={state.trace} rowKeyGetter={row => row.name} columns={COLUMNS} rowHeight={30} />
+    </div>
+  );
+});

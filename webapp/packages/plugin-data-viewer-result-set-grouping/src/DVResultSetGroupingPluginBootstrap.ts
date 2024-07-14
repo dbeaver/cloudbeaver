@@ -19,7 +19,10 @@ import {
   DataPresentationService,
   DataPresentationType,
   DataViewerPresentationType,
+  IDatabaseDataModel,
+  isResultSetDataSource,
   ResultSetDataAction,
+  ResultSetDataSource,
   ResultSetSelectAction,
 } from '@cloudbeaver/plugin-data-viewer';
 
@@ -65,7 +68,8 @@ export class DVResultSetGroupingPluginBootstrap extends Bootstrap {
       menus: [DATA_VIEWER_DATA_MODEL_ACTIONS_MENU],
       isActionApplicable(context, action) {
         const presentation = context.get(DATA_CONTEXT_DV_PRESENTATION);
-        if (presentation && presentation.type !== DataViewerPresentationType.Data) {
+        const model = context.get(DATA_CONTEXT_DV_DDM)!;
+        if ((presentation && presentation.type !== DataViewerPresentationType.Data) || !isResultSetDataSource(model.source)) {
           return false;
         }
         switch (action) {
@@ -100,7 +104,7 @@ export class DVResultSetGroupingPluginBootstrap extends Bootstrap {
           case ACTION_DATA_VIEWER_GROUPING_CLEAR:
             return grouping.getColumns().length === 0;
           case ACTION_DATA_VIEWER_GROUPING_REMOVE_COLUMN: {
-            const model = context.get(DATA_CONTEXT_DV_DDM)!;
+            const model = context.get(DATA_CONTEXT_DV_DDM)! as unknown as IDatabaseDataModel<ResultSetDataSource>;
             const resultIndex = context.get(DATA_CONTEXT_DV_DDM_RESULT_INDEX)!;
             if (!model.source.hasResult(resultIndex)) {
               return true;
@@ -137,7 +141,7 @@ export class DVResultSetGroupingPluginBootstrap extends Bootstrap {
             grouping.clear();
             break;
           case ACTION_DATA_VIEWER_GROUPING_REMOVE_COLUMN: {
-            const model = context.get(DATA_CONTEXT_DV_DDM)!;
+            const model = context.get(DATA_CONTEXT_DV_DDM)! as unknown as IDatabaseDataModel<ResultSetDataSource>;
             const resultIndex = context.get(DATA_CONTEXT_DV_DDM_RESULT_INDEX)!;
             const selectionAction = model.source.getAction(resultIndex, ResultSetSelectAction);
             const dataAction = model.source.getAction(resultIndex, ResultSetDataAction);
@@ -188,7 +192,7 @@ export class DVResultSetGroupingPluginBootstrap extends Bootstrap {
       dataFormat: ResultDataFormat.Resultset,
       hidden: (dataFormat, model, resultIndex) => {
         const source = model.source;
-        if (!model.source.hasResult(resultIndex)) {
+        if (!source.hasResult(resultIndex) || !isResultSetDataSource(source)) {
           return true;
         }
 

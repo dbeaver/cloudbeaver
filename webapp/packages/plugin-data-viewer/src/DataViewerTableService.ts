@@ -10,11 +10,10 @@ import { injectable, IServiceProvider } from '@cloudbeaver/core-di';
 import { EObjectFeature, NavNode, NavNodeManagerService } from '@cloudbeaver/core-navigation-tree';
 import { AsyncTaskInfoService, GraphQLService } from '@cloudbeaver/core-sdk';
 
-import { ContainerDataSource, IDataContainerOptions } from './ContainerDataSource';
+import { ContainerDataSource } from './ContainerDataSource';
 import { DatabaseDataModel } from './DatabaseDataModel/DatabaseDataModel';
 import type { IDatabaseDataModel } from './DatabaseDataModel/IDatabaseDataModel';
 import { DatabaseDataAccessMode } from './DatabaseDataModel/IDatabaseDataSource';
-import type { IDatabaseResultSet } from './DatabaseDataModel/IDatabaseResultSet';
 import { DataViewerService } from './DataViewerService';
 import { DataViewerSettingsService } from './DataViewerSettingsService';
 import { TableViewerStorageService } from './TableViewer/TableViewerStorageService';
@@ -32,7 +31,7 @@ export class DataViewerTableService {
     private readonly dataViewerSettingsService: DataViewerSettingsService,
   ) {}
 
-  create(connection: Connection, node: NavNode | undefined): IDatabaseDataModel<IDataContainerOptions, IDatabaseResultSet> {
+  create(connection: Connection, node: NavNode | undefined): IDatabaseDataModel<ContainerDataSource> {
     const nodeInfo = this.navNodeManagerService.getNodeContainerInfo(node?.id ?? '');
 
     const source = new ContainerDataSource(
