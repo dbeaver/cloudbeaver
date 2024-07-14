@@ -66,6 +66,7 @@ export interface IDatabaseDataSource<TOptions = unknown, TResult extends IDataba
   readonly serviceProvider: IServiceProvider;
   readonly onOperation: IExecutor<IDatabaseDataSourceOperationEvent>;
 
+  isError: () => boolean;
   isOutdated: () => boolean;
   isLoadable: () => boolean;
   isReadonly: (resultIndex: number) => boolean;

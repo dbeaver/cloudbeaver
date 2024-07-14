@@ -190,6 +190,10 @@ export abstract class DatabaseDataSource<TOptions, TResult extends IDatabaseData
     return this;
   }
 
+  isError(): boolean {
+    return this.error !== null;
+  }
+
   isOutdated(): boolean {
     return this.outdated;
   }
@@ -338,14 +342,16 @@ export abstract class DatabaseDataSource<TOptions, TResult extends IDatabaseData
 
   private async requestDataAction(): Promise<TResult[]> {
     this.prevOptions = toJS(this.options);
-    return this.request(this.results).then(data => {
-      this.outdated = false;
-
-      if (data !== null) {
-        this.setResults(data);
-      }
-      return data;
-    });
+    return this.request(this.results)
+      .finally(() => {
+        this.outdated = false;
+      })
+      .then(data => {
+        if (data !== null) {
+          this.setResults(data);
+        }
+        return data;
+      });
   }
 
   private async tryExecuteOperation<T>(type: DatabaseDataSourceOperation, operation: () => Promise<T>): Promise<T | null> {

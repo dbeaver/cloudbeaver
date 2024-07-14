@@ -175,7 +175,7 @@ export const TableViewer = observer<TableViewerProps, HTMLDivElement>(
     // }, [dataFormat]);
 
     if (!dataModel) {
-      return <Loader />;
+      return <TextPlaceholder>{translate('plugin_data_viewer_no_available_presentation')}</TextPlaceholder>;
     }
 
     const presentation = dataPresentationService.getSupported(DataPresentationType.main, dataFormat, presentationId, dataModel, resultIndex);
