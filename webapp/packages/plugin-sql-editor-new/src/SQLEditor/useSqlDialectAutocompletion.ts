@@ -12,7 +12,7 @@ import { useService } from '@cloudbeaver/core-di';
 import { LocalizationService } from '@cloudbeaver/core-localization';
 import { GlobalConstants } from '@cloudbeaver/core-utils';
 import type { Compartment, Completion, CompletionConfig, CompletionContext, CompletionResult, Extension } from '@cloudbeaver/plugin-codemirror6';
-import type { ISQLEditorData, SQLProposal } from '@cloudbeaver/plugin-sql-editor';
+import { type ISQLEditorData, SqlEditorSettingsService, type SQLProposal } from '@cloudbeaver/plugin-sql-editor';
 
 const codemirrorComplexLoader = createComplexLoader(() => import('@cloudbeaver/plugin-codemirror6'));
 
@@ -22,20 +22,27 @@ type SqlCompletion = Completion & {
 
 const CLOSE_CHARACTERS = /[\s()[\]{};:>,=\\*]/;
 const COMPLETION_WORD = /[\w*]*/;
+const COMPLETION_WORD_LONG_PROPOSALS = /[\w.*]*/;
 
 export function useSqlDialectAutocompletion(data: ISQLEditorData): [Compartment, Extension] {
   const { closeCompletion, useEditorAutocompletion } = useComplexLoader(codemirrorComplexLoader);
   const localizationService = useService(LocalizationService);
-  const optionsRef = useObjectRef({ data });
+  const sqlEditorSettingsService = useService(SqlEditorSettingsService);
+  const optionsRef = useObjectRef({ data, sqlEditorSettingsService });
 
   const [config] = useState<CompletionConfig>(() => {
     function getOptionsFromProposals(explicit: boolean, word: string, proposals: SQLProposal[]): SqlCompletion[] {
       const wordLowerCase = word.toLocaleLowerCase();
-      const hasSameName = proposals.some(({ displayString }) => displayString.toLocaleLowerCase() === wordLowerCase);
+      const hasSameName = proposals.some(
+        ({ replacementString, displayString }) =>
+          displayString.toLocaleLowerCase() === wordLowerCase || replacementString.toLocaleLowerCase() === wordLowerCase,
+      );
       const filteredProposals = proposals
         .filter(
-          ({ displayString }) =>
-            word === '*' || (displayString.toLocaleLowerCase() !== wordLowerCase && displayString.toLocaleLowerCase().startsWith(wordLowerCase)),
+          ({ replacementString, displayString }) =>
+            word === '*' ||
+            (displayString.toLocaleLowerCase() !== wordLowerCase && displayString.toLocaleLowerCase().startsWith(wordLowerCase)) ||
+            (replacementString.toLocaleLowerCase() !== wordLowerCase && replacementString.toLocaleLowerCase().startsWith(wordLowerCase)),
         )
         .sort((a, b) => (b.score ?? 0) - (a.score ?? 0));
 
@@ -63,7 +70,7 @@ export function useSqlDialectAutocompletion(data: ISQLEditorData): [Compartment,
         return null;
       }
 
-      const word = context.matchBefore(COMPLETION_WORD);
+      const word = context.matchBefore(optionsRef.sqlEditorSettingsService.longNameProposals ? COMPLETION_WORD_LONG_PROPOSALS : COMPLETION_WORD);
 
       if (word === null) {
         return null;
