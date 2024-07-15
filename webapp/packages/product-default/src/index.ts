@@ -38,7 +38,8 @@ import { navigationTreePlugin } from '@cloudbeaver/plugin-navigation-tree';
 import navigationTreeFilters from '@cloudbeaver/plugin-navigation-tree-filters';
 import { navigationTreeRMPlugin } from '@cloudbeaver/plugin-navigation-tree-rm';
 import { objectViewerManifest } from '@cloudbeaver/plugin-object-viewer';
-import productInformationPlugin from '@cloudbeaver/plugin-product-information';
+import productPlugin from '@cloudbeaver/plugin-product';
+import productInformationPlugin from '@cloudbeaver/plugin-product-information-administration';
 import projects from '@cloudbeaver/plugin-projects';
 import resourceManager from '@cloudbeaver/plugin-resource-manager';
 import resourceManagerAdministration from '@cloudbeaver/plugin-resource-manager-administration';
@@ -72,6 +73,7 @@ import { defaultProductManifest } from './manifest';
 const PLUGINS: PluginManifest[] = [
   ssoPlugin,
   devTools,
+  productInformationPlugin,
   administration,
   dataSpreadsheetNewManifest,
   dataGridPlugin,
@@ -99,7 +101,6 @@ const PLUGINS: PluginManifest[] = [
   userProfileAdministration,
   connectionPlugin,
   connectionAdministration,
-  productInformationPlugin,
   versionUpdate,
   settingsMenu,
   settingsMenuAdministration,
@@ -116,6 +117,7 @@ const PLUGINS: PluginManifest[] = [
   topAppBar,
   administrationTopAppBarPlugin,
   version,
+  productPlugin,
   navigationTabsPlugin,
   root,
   sessionExpirationPlugin,

@@ -7,7 +7,6 @@
  */
 import { productInfoPlugin } from './manifest';
 
-export { default as ProductInfoDialogStyles } from './ProductInfoDialog.module.css';
 export * from './ProductInfoNavigationService';
 
 export default productInfoPlugin;

@@ -6,8 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 export default [
-  ['administration_settings_menu_title', 'Product Information'],
-  ['app_product_info', 'About'],
+  ['app_product_info', 'Product information'],
   ['app_product_info_name', 'Product name'],
   ['app_product_info_description', 'Product description'],
   ['app_product_info_contacts', 'Contacts'],

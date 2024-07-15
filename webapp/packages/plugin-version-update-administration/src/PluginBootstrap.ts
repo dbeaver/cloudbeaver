@@ -9,7 +9,7 @@ import { importLazyComponent } from '@cloudbeaver/core-blocks';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { VersionResource } from '@cloudbeaver/core-version';
 import { VersionUpdateService } from '@cloudbeaver/core-version-update';
-import { ProductInfoNavigationService } from '@cloudbeaver/plugin-product-information';
+import { ProductInfoNavigationService } from '@cloudbeaver/plugin-product-information-administration';
 
 const DockerUpdateInstructions = importLazyComponent(() => import('./DockerUpdateInstructions').then(m => m.DockerUpdateInstructions));
 const VersionUpdate = importLazyComponent(() => import('./VersionUpdate').then(m => m.VersionUpdate));

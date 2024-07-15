@@ -6,8 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 export default [
-  ['administration_settings_menu_title', 'Информация о продукте'],
-  ['app_product_info', 'О продукте'],
+  ['app_product_info', 'Информация о продукте'],
   ['app_product_info_name', 'Название продукта'],
   ['app_product_info_description', 'Описание продукта'],
   ['app_product_info_contacts', 'Контакты'],

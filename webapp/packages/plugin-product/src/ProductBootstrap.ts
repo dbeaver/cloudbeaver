@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { AdministrationItemService, AdministrationItemType } from '@cloudbeaver/core-administration';
 import { importLazyComponent } from '@cloudbeaver/core-blocks';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
@@ -14,18 +13,13 @@ import { MenuBaseItem, MenuService } from '@cloudbeaver/core-view';
 import { TOP_NAV_BAR_SETTINGS_MENU } from '@cloudbeaver/plugin-settings-menu';
 
 const ProductInfoDialog = importLazyComponent(() => import('./ProductInfoDialog').then(m => m.ProductInfoDialog));
-const ProductInfoDrawerItem = importLazyComponent(() => import('./ProductInfoDrawerItem').then(m => m.ProductInfoDrawerItem));
-const ProductInfoPage = importLazyComponent(() => import('./ProductInfoPage').then(m => m.ProductInfoPage));
 
 @injectable()
-export class ProductInfoBootstrap extends Bootstrap {
-  static PAGE_NAME = 'product-info';
-
+export class ProductBootstrap extends Bootstrap {
   constructor(
     private readonly serverConfigResource: ServerConfigResource,
     private readonly commonDialogService: CommonDialogService,
     private readonly menuService: MenuService,
-    private readonly administrationItemService: AdministrationItemService,
   ) {
     super();
   }
@@ -47,14 +41,6 @@ export class ProductInfoBootstrap extends Bootstrap {
           },
         ),
       ],
-    });
-
-    this.administrationItemService.create({
-      name: ProductInfoBootstrap.PAGE_NAME,
-      type: AdministrationItemType.Administration,
-      getContentComponent: () => ProductInfoPage,
-      getDrawerComponent: () => ProductInfoDrawerItem,
-      order: 12,
     });
   }
 }
