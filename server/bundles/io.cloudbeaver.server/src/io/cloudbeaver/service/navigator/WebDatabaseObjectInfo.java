@@ -22,6 +22,7 @@ import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.*;
 import org.jkiss.dbeaver.model.meta.Property;
+import org.jkiss.dbeaver.model.navigator.DBNDataSource;
 import org.jkiss.dbeaver.model.preferences.DBPPropertyDescriptor;
 import org.jkiss.dbeaver.model.struct.*;
 import org.jkiss.dbeaver.model.struct.rdb.DBSCatalog;
@@ -31,6 +32,7 @@ import org.jkiss.dbeaver.runtime.properties.PropertyCollector;
 import org.jkiss.utils.CommonUtils;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 
@@ -166,6 +168,7 @@ public class WebDatabaseObjectInfo {
                 }
             }
         }
+//        features.remove(3);
         return features.toArray(new String[0]);
     }
 
@@ -195,7 +198,7 @@ public class WebDatabaseObjectInfo {
         }
         if (object instanceof DBSSchema) features.add(OBJECT_FEATURE_SCHEMA);
         if (object instanceof DBSCatalog) features.add(OBJECT_FEATURE_CATALOG);
-        if (object instanceof DBSObjectContainer) {
+        if (object instanceof DBSObjectContainer objectContainer) {
             features.add(OBJECT_FEATURE_OBJECT_CONTAINER);
             try {
                 Class<? extends DBSObject> childType = ((DBSObjectContainer) object).getPrimaryChildType(null);
