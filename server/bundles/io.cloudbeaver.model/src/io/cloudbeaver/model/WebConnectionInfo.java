@@ -492,6 +492,7 @@ public class WebConnectionInfo {
     @Property
     public List<String> getTools() {
         List<String> tools = new ArrayList<>();
+        // checks inside that datasource is not null in container, and it is adaptable to session manager class
         if (DBUtils.getAdapter(DBAServerSessionManager.class, dataSourceContainer) != null) {
             tools.add(TOOL_SESSION_MANAGER);
         }
