@@ -42,6 +42,7 @@ export const AuthDialog: DialogComponent<IAuthOptions, null> = observer(function
   payload: { providerId, configurationId, linkUser = false, accessRequest = false },
   options,
   rejectDialog,
+  resolveDialog,
 }) {
   const styles = useS(style);
   const dialogData = useAuthDialogState(accessRequest, providerId, configurationId);
@@ -89,7 +90,7 @@ export const AuthDialog: DialogComponent<IAuthOptions, null> = observer(function
     try {
       await dialogData.login(linkUser, provider, configuration);
 
-      rejectDialog();
+      resolveDialog();
     } catch {}
   }
 

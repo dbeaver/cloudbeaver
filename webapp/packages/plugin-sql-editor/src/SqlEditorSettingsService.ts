@@ -56,6 +56,7 @@ const defaultSettings = schema.object({
     })
     .pipe(schema.enum(TABLE_ALIAS_OPTIONS))
     .default('PLAIN'),
+  'SQLEditor.ContentAssistant.proposals.long.name': schema.coerce.boolean().default(false),
 });
 
 export type SqlEditorSettings = schema.infer<typeof defaultSettings>;
@@ -76,6 +77,10 @@ export class SqlEditorSettingsService extends Dependency {
 
   get insertTableAlias(): schema.infer<typeof defaultSettings>['sql.proposals.insert.table.alias'] {
     return this.settings.getValue('sql.proposals.insert.table.alias');
+  }
+
+  get longNameProposals(): boolean {
+    return this.settings.getValue('SQLEditor.ContentAssistant.proposals.long.name');
   }
 
   readonly settings: SettingsProvider<typeof defaultSettings>;
