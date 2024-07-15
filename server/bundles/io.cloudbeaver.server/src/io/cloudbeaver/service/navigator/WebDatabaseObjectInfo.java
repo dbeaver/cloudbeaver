@@ -201,8 +201,9 @@ public class WebDatabaseObjectInfo {
         if (object instanceof DBSObjectContainer objectContainer) {
             features.add(OBJECT_FEATURE_OBJECT_CONTAINER);
             try {
-                Class<? extends DBSObject> childType = ((DBSObjectContainer) object).getPrimaryChildType(null);
-                if (DBSTable.class.isAssignableFrom(childType)) {
+                Class<? extends DBSObject> childType = objectContainer.getPrimaryChildType(null);
+                Collection<? extends DBSObject> childrenCollection = objectContainer.getChildren(null);
+                if (DBSTable.class.isAssignableFrom(childType) && childrenCollection != null) {
                     features.add(OBJECT_FEATURE_ENTITY_CONTAINER);
                 }
             } catch (Exception e) {
