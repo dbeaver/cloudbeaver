@@ -52,6 +52,9 @@
       "path": "../plugin-data-export/tsconfig.json"
     },
     {
+      "path": "../plugin-data-grid/tsconfig.json"
+    },
+    {
       "path": "../plugin-data-import/tsconfig.json"
     },
     {

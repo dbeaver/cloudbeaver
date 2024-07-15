@@ -9,8 +9,8 @@ import { observer } from 'mobx-react-lite';
 
 import { s, StaticImage, useS } from '@cloudbeaver/core-blocks';
 import type { DBObject } from '@cloudbeaver/core-navigation-tree';
+import type { RenderCellProps } from '@cloudbeaver/plugin-data-grid';
 import { useNode } from '@cloudbeaver/plugin-navigation-tree';
-import type { RenderCellProps } from '@cloudbeaver/plugin-react-data-grid';
 
 import style from './IconFormatter.module.css';
 

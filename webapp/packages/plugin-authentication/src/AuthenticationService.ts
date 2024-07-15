@@ -161,6 +161,11 @@ export class AuthenticationService extends Bootstrap {
       }
     }
 
+    if (this.authPromise) {
+      await this.waitAuth();
+      return;
+    }
+
     this.authPromise = this.authDialogService
       .showLoginForm(persistent, options)
       .then(async state => {
