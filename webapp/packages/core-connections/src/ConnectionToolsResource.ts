@@ -5,7 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { runInAction, toJS } from 'mobx';
+import { toJS } from 'mobx';
 
 import { injectable } from '@cloudbeaver/core-di';
 import { CachedMapResource, isResourceAlias, type ResourceKey, resourceKeyList, ResourceKeyUtils } from '@cloudbeaver/core-resource';
@@ -56,10 +56,8 @@ export class ConnectionToolsResource extends CachedMapResource<IConnectionInfoPa
       connectionsList.push(...connections);
     });
 
-    runInAction(() => {
-      const key = resourceKeyList(connectionsList.map(createConnectionParam));
-      this.set(key, connectionsList);
-    });
+    const key = resourceKeyList(connectionsList.map(createConnectionParam));
+    this.set(key, connectionsList);
 
     return this.data;
   }
