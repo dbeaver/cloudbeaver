@@ -8,8 +8,8 @@
 import { createContext } from 'react';
 
 import type { IExecutor } from '@cloudbeaver/core-executor';
+import type { DataGridHandle } from '@cloudbeaver/plugin-data-grid';
 import type { IDatabaseDataModel, IDataTableActions } from '@cloudbeaver/plugin-data-viewer';
-import type { DataGridHandle } from '@cloudbeaver/plugin-react-data-grid';
 
 export interface IColumnResizeInfo {
   column: number;
