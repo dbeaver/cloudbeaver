@@ -249,7 +249,7 @@ public class WebConnectionInfo {
                 DBPEditorContribution.MB_CONNECTION_EDITOR,
                 dataSourceContainer
             );
-            if (contributedEditors.length > 0) {
+            if (SMUtils.isRMAdmin(session) && contributedEditors.length > 0) {
                 features.add("hasTools");
             }
         }
