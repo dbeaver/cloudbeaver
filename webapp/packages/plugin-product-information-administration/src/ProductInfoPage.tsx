@@ -7,13 +7,13 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import { type AdministrationItemContentComponent, AdministrationItemService } from '@cloudbeaver/core-administration';
-import { s, SContext, StyleRegistry, ToolsPanel, useS, useTranslate } from '@cloudbeaver/core-blocks';
+import { type AdministrationItemContentComponent, AdministrationItemContentProps, AdministrationItemService } from '@cloudbeaver/core-administration';
+import { s, SContext, StyleRegistry, ToolsPanel, useS } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { ITabData, Tab, TabList, TabPanel, TabPanelStyles, TabsState, TabStyles, TabTitle, TabTitleStyles } from '@cloudbeaver/core-ui';
+import { ITabData, TabList, TabPanelList, TabPanelStyles, TabsState, TabStyles, TabTitle, TabTitleStyles } from '@cloudbeaver/core-ui';
 
-import { ProductInfoBootstrap } from './ProductInfoBootstrap';
 import { ProductInfoNavigationService } from './ProductInfoNavigationService';
+import { ProductInfoService } from './ProductInfoService';
 import style from './shared/ProductInfoPage.module.css';
 import tabStyle from './shared/ProductInfoPageTab.module.css';
 import tabPanelStyle from './shared/ProductInfoPageTabPanel.module.css';
@@ -26,46 +26,24 @@ const mainTabsRegistry: StyleRegistry = [
   [TabTitleStyles, { mode: 'append', styles: [TabTitleModuleStyles] }],
 ];
 
-export const ProductInfoPage: AdministrationItemContentComponent = observer(function ProductInfoPage({ sub, param, item, configurationWizard }) {
-  const translate = useTranslate();
+export const ProductInfoPage: AdministrationItemContentComponent = observer(function ProductInfoPage(props) {
   const productInfoNavigationService = useService(ProductInfoNavigationService);
-  const administrationItemService = useService(AdministrationItemService);
-  const subs = administrationItemService.getItem(ProductInfoBootstrap.PAGE_NAME, configurationWizard)?.sub || [];
-  const subName = sub?.name || item.defaultSub || subs[0]?.name;
   const styles = useS(style, tabStyle);
+  const productInfoService = useService(ProductInfoService);
 
-  function openSub({ tabId }: ITabData) {
-    if (subName === tabId) {
-      return;
-    }
-    param = null;
-    productInfoNavigationService.navToSub(tabId, param || undefined);
+  function openSub(data: ITabData<AdministrationItemContentProps>) {
+    productInfoNavigationService.navToTab(data.tabId);
   }
 
   return (
-    <TabsState selectedId={subName} lazy onChange={openSub}>
+    <TabsState item={props.item} configurationWizard={props.configurationWizard} container={productInfoService.tabsContainer} lazy onChange={openSub}>
       <ToolsPanel bottomBorder>
-        <TabList className={s(styles, { tabList: true, administrationTabs: true })} aria-label="Product Info Administration pages" underline>
-          <SContext registry={mainTabsRegistry}>
-            {subs.map(sub => (
-              <Tab key={sub.name} tabId={sub.name} title={translate(sub.tooltip)}>
-                <TabTitle>{translate(sub.title ?? sub.name)}</TabTitle>
-                {sub.highlighted && <div className={s(styles, { icon: true })} />}
-              </Tab>
-            ))}
-          </SContext>
-        </TabList>
+        <SContext registry={mainTabsRegistry}>
+          <TabList className={s(styles, { tabList: true, administrationTabs: true })} aria-label="Product Info Administration pages" underline />
+        </SContext>
       </ToolsPanel>
       <SContext registry={tabPanelRegistry}>
-        {subs.map(sub => {
-          const Component = sub.getComponent?.();
-
-          return (
-            <TabPanel key={sub.name} tabId={sub.name}>
-              {Component ? <Component configurationWizard={configurationWizard} sub={sub} param={param!} /> : null}
-            </TabPanel>
-          );
-        })}
+        <TabPanelList />
       </SContext>
     </TabsState>
   );

@@ -38,7 +38,7 @@ export const ItemContent = observer<Props>(function ItemContent({ activeScreen, 
   if (activeScreen.sub) {
     const sub = administrationItemService.getItemSub(item, activeScreen.sub);
     if (sub) {
-      const Component = item.getContentComponent();
+      const Component = sub.getComponent ? sub.getComponent() : item.getContentComponent();
 
       return (
         <TabPanel tabId={activeScreen.item} contents>

@@ -5,13 +5,10 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import {
-  AdministrationItemService,
-  AdministrationScreenService,
-  IAdministrationItem,
-  IAdministrationItemSubItem,
-} from '@cloudbeaver/core-administration';
+import { AdministrationItemService, AdministrationScreenService } from '@cloudbeaver/core-administration';
 import { injectable } from '@cloudbeaver/core-di';
+
+import { ProductInfoService } from './ProductInfoService';
 
 @injectable()
 export class ProductInfoNavigationService {
@@ -20,6 +17,7 @@ export class ProductInfoNavigationService {
   constructor(
     private readonly administrationScreenService: AdministrationScreenService,
     private readonly administrationItemService: AdministrationItemService,
+    private readonly productInfoService: ProductInfoService,
   ) {
     this.navToRoot = this.navToRoot.bind(this);
   }
@@ -28,28 +26,21 @@ export class ProductInfoNavigationService {
     this.administrationScreenService.navigateToItem(ProductInfoNavigationService.ROOT_ITEM);
   }
 
-  navToSub(sub: string, param?: string): void {
-    this.administrationScreenService.navigateToItemSub(ProductInfoNavigationService.ROOT_ITEM, sub, param);
-  }
+  navToTab(tabId: string | null): void {
+    if (this.productInfoService.tabsContainer.selectedId === tabId || !tabId) {
+      return;
+    }
 
-  addToSub(sub: IAdministrationItemSubItem) {
-    this.administrationItemService.createItemSub(sub, ProductInfoNavigationService.ROOT_ITEM, this.administrationScreenService.isConfigurationMode);
-  }
+    const item = this.administrationItemService.getItem(ProductInfoNavigationService.ROOT_ITEM, this.administrationScreenService.isConfigurationMode);
 
-  updateItem(partialItem: Partial<IAdministrationItem>) {
-    this.administrationItemService.updateItem(
-      ProductInfoNavigationService.ROOT_ITEM,
-      partialItem,
-      this.administrationScreenService.isConfigurationMode,
-    );
-  }
+    if (!item) {
+      throw new Error('This tab does not exits');
+    }
 
-  updateSub(subName: string, partialSub: Partial<IAdministrationItemSubItem>) {
-    this.administrationItemService.updateItemSub(
-      subName,
-      partialSub,
-      ProductInfoNavigationService.ROOT_ITEM,
-      this.administrationScreenService.isConfigurationMode,
-    );
+    this.productInfoService.tabsContainer.select(tabId, {
+      item,
+      configurationWizard: this.administrationScreenService.isConfigurationMode,
+    });
+    this.administrationScreenService.navigateToItemSub(ProductInfoNavigationService.ROOT_ITEM, tabId);
   }
 }

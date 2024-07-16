@@ -9,7 +9,7 @@ import { importLazyComponent } from '@cloudbeaver/core-blocks';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { VersionResource } from '@cloudbeaver/core-version';
 import { VersionUpdateService } from '@cloudbeaver/core-version-update';
-import { ProductInfoNavigationService } from '@cloudbeaver/plugin-product-information-administration';
+import { ProductInfoService } from '@cloudbeaver/plugin-product-information-administration';
 
 const DockerUpdateInstructions = importLazyComponent(() => import('./DockerUpdateInstructions').then(m => m.DockerUpdateInstructions));
 const VersionUpdate = importLazyComponent(() => import('./VersionUpdate').then(m => m.VersionUpdate));
@@ -18,31 +18,21 @@ const VersionUpdate = importLazyComponent(() => import('./VersionUpdate').then(m
 export class PluginBootstrap extends Bootstrap {
   constructor(
     private readonly versionUpdateService: VersionUpdateService,
-    private readonly productInfoNavigationService: ProductInfoNavigationService,
     private readonly versionResource: VersionResource,
+    private readonly productInfoService: ProductInfoService,
   ) {
     super();
   }
 
-  private versionDataUpdateHandler() {
-    this.productInfoNavigationService.updateSub('version-update', {
-      highlighted: this.versionUpdateService.newVersionAvailable,
-      tooltip: this.versionUpdateService.newVersionAvailable ? 'version_update_new_version_available' : undefined,
-    });
-
-    this.productInfoNavigationService.updateItem({
-      highlighted: this.versionUpdateService.newVersionAvailable,
-    });
-  }
-
   register(): void {
-    this.productInfoNavigationService.addToSub({
+    this.productInfoService.tabsContainer.add({
+      key: 'version-update',
       name: 'version-update',
-      getComponent: () => VersionUpdate,
+      panel: () => VersionUpdate,
       title: 'plugin_version_update_administration_tab_title',
+      order: 2,
     });
 
-    this.versionResource.onDataUpdate.addHandler(this.versionDataUpdateHandler.bind(this));
     this.versionUpdateService.registerGeneralInstruction(() => DockerUpdateInstructions);
   }
 

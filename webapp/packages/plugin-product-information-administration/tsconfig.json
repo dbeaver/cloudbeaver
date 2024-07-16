@@ -20,6 +20,12 @@
     },
     {
       "path": "../core-ui/tsconfig.json"
+    },
+    {
+      "path": "../core-version-update/tsconfig.json"
+    },
+    {
+      "path": "../core-version/tsconfig.json"
     }
   ],
   "include": [
