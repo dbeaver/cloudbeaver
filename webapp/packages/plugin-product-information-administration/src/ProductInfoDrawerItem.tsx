@@ -8,6 +8,7 @@
 import type { AdministrationItemDrawerProps } from '@cloudbeaver/core-administration';
 import { s, Translate, useResource, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
+import { CachedMapAllKey } from '@cloudbeaver/core-resource';
 import { Tab, TabIcon, TabTitle } from '@cloudbeaver/core-ui';
 import { VersionResource } from '@cloudbeaver/core-version';
 import { VersionUpdateService } from '@cloudbeaver/core-version-update';
@@ -20,7 +21,7 @@ export const ProductInfoDrawerItem: React.FC<AdministrationItemDrawerProps> = fu
   const newVersionAvailable = versionUpdateService.newVersionAvailable;
   const translate = useTranslate();
 
-  useResource(ProductInfoDrawerItem, VersionResource, null);
+  useResource(ProductInfoDrawerItem, VersionResource, CachedMapAllKey);
 
   return (
     <Tab
