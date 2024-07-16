@@ -20,9 +20,10 @@ import { useGroupingDataModel } from './useGroupingDataModel';
 import { useGroupingDnDColumns } from './useGroupingDnDColumns';
 
 export const DVResultSetGroupingPresentation: DataPresentationComponent = observer(function DVResultSetGroupingPresentation({
-  model: originalModel,
+  model: unknownModel,
   resultIndex,
 }) {
+  const originalModel = unknownModel as any;
   if (!isResultSetDataModel(originalModel)) {
     throw new Error('DVResultSetGroupingPresentation can only be used with ResultSetDataSource');
   }

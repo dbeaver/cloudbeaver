@@ -52,7 +52,7 @@ export class DataImportBootstrap extends Bootstrap {
         return action.info;
       },
       handler: async (context, action) => {
-        const model = context.get(DATA_CONTEXT_DV_DDM)!;
+        const model = context.get(DATA_CONTEXT_DV_DDM)! as any;
         const resultIndex = context.get(DATA_CONTEXT_DV_DDM_RESULT_INDEX)!;
 
         if (!isResultSetDataModel(model)) {
