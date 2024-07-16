@@ -42,8 +42,8 @@ const equalConfig = {
 };
 
 test('Read settings', async () => {
-  const settings = app.injector.getServiceByClass(AuthSettingsService);
-  const config = app.injector.getServiceByClass(ServerConfigResource);
+  const settings = app.serviceProvider.getService(AuthSettingsService);
+  const config = app.serviceProvider.getService(ServerConfigResource);
 
   server.use(endpoint.query('serverConfig', mockServerConfig(equalConfig)));
 

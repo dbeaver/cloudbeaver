@@ -8,14 +8,18 @@
 import type { IDataContextProvider } from '@cloudbeaver/core-data-context';
 import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
-import { ActionService, menuExtractItems, MenuService } from '@cloudbeaver/core-view';
+import { ActionService, MenuService } from '@cloudbeaver/core-view';
 
 import { DatabaseDataConstraintAction } from '../DatabaseDataModel/Actions/DatabaseDataConstraintAction';
 import { DatabaseMetadataAction } from '../DatabaseDataModel/Actions/DatabaseMetadataAction';
 import { DATA_CONTEXT_DV_DDM } from '../DatabaseDataModel/DataContext/DATA_CONTEXT_DV_DDM';
 import { DATA_CONTEXT_DV_DDM_RESULT_INDEX } from '../DatabaseDataModel/DataContext/DATA_CONTEXT_DV_DDM_RESULT_INDEX';
+import { IDatabaseDataModel } from '../DatabaseDataModel/IDatabaseDataModel';
+import { IDatabaseDataOptions } from '../DatabaseDataModel/IDatabaseDataOptions';
 import { DATA_VIEWER_DATA_MODEL_ACTIONS_MENU } from '../TableViewer/TableFooter/TableFooterMenu/DATA_VIEWER_DATA_MODEL_ACTIONS_MENU';
 import { ACTION_COUNT_TOTAL_ELEMENTS } from './ACTION_COUNT_TOTAL_ELEMENTS';
+import { isResultSetDataModel } from './isResultSetDataModel';
+import { ResultSetDataSource } from './ResultSetDataSource';
 
 interface IResultSetActionsMetadata {
   totalCount: {
@@ -38,7 +42,7 @@ export class ResultSetTableFooterMenuService {
       isApplicable(context) {
         const model = context.get(DATA_CONTEXT_DV_DDM)!;
         const resultIndex = context.get(DATA_CONTEXT_DV_DDM_RESULT_INDEX)!;
-        const result = model.getResult(resultIndex);
+        const result = model.source.getResult(resultIndex);
 
         return !!result;
       },
@@ -52,9 +56,14 @@ export class ResultSetTableFooterMenuService {
       actions: [ACTION_COUNT_TOTAL_ELEMENTS],
       contexts: [DATA_CONTEXT_DV_DDM, DATA_CONTEXT_DV_DDM_RESULT_INDEX],
       isActionApplicable(context, action) {
-        const model = context.get(DATA_CONTEXT_DV_DDM)!;
+        const model = context.get(DATA_CONTEXT_DV_DDM)! as any;
+
+        if (!isResultSetDataModel<IDatabaseDataOptions>(model)) {
+          return false;
+        }
+
         const resultIndex = context.get(DATA_CONTEXT_DV_DDM_RESULT_INDEX)!;
-        const result = model.getResult(resultIndex);
+        const result = model.source.getResult(resultIndex);
 
         if (!result) {
           return false;
@@ -69,10 +78,10 @@ export class ResultSetTableFooterMenuService {
         return true;
       },
       isDisabled: (context, action) => {
-        const model = context.get(DATA_CONTEXT_DV_DDM)!;
+        const model = context.get(DATA_CONTEXT_DV_DDM)! as unknown as IDatabaseDataModel<ResultSetDataSource>;
         const resultIndex = context.get(DATA_CONTEXT_DV_DDM_RESULT_INDEX)!;
 
-        if (model.isLoading() || model.isDisabled(resultIndex) || !model.getResult(resultIndex)) {
+        if (model.isLoading() || model.isDisabled(resultIndex) || !model.source.getResult(resultIndex)) {
           return true;
         }
 
@@ -98,13 +107,13 @@ export class ResultSetTableFooterMenuService {
         return false;
       },
       getActionInfo: (context, action) => {
-        const model = context.get(DATA_CONTEXT_DV_DDM)!;
+        const model = context.get(DATA_CONTEXT_DV_DDM)! as unknown as IDatabaseDataModel<ResultSetDataSource>;
         const resultIndex = context.get(DATA_CONTEXT_DV_DDM_RESULT_INDEX)!;
         const metadata = this.getState(context);
 
         switch (action) {
           case ACTION_COUNT_TOTAL_ELEMENTS: {
-            const result = model.getResult(resultIndex);
+            const result = model.source.getResult(resultIndex);
             if (!result) {
               return action.info;
             }
@@ -128,7 +137,7 @@ export class ResultSetTableFooterMenuService {
         return action.info;
       },
       handler: async (context, action) => {
-        const model = context.get(DATA_CONTEXT_DV_DDM)!;
+        const model = context.get(DATA_CONTEXT_DV_DDM)! as unknown as IDatabaseDataModel<ResultSetDataSource>;
         const resultIndex = context.get(DATA_CONTEXT_DV_DDM_RESULT_INDEX)!;
         const metadata = this.getState(context);
 

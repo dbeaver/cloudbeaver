@@ -9,7 +9,7 @@ import React from 'react';
 
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 
-import { ResultSetDataAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetDataAction';
+import { DatabaseDataResultAction } from '../../DatabaseDataModel/Actions/DatabaseDataResultAction';
 import { DataPresentationService, DataPresentationType } from '../../DataPresentationService';
 import { DataValuePanelService } from './DataValuePanelService';
 
@@ -20,7 +20,10 @@ export const ValuePanel = React.lazy(async () => {
 
 @injectable()
 export class DataValuePanelBootstrap extends Bootstrap {
-  constructor(private readonly dataPresentationService: DataPresentationService, private readonly dataValuePanelService: DataValuePanelService) {
+  constructor(
+    private readonly dataPresentationService: DataPresentationService,
+    private readonly dataValuePanelService: DataValuePanelService,
+  ) {
     super();
   }
 
@@ -35,12 +38,10 @@ export class DataValuePanelBootstrap extends Bootstrap {
           return true;
         }
 
-        const data = model.source.tryGetAction(resultIndex, ResultSetDataAction);
+        const data = model.source.getActionImplementation(resultIndex, DatabaseDataResultAction);
         return data?.empty || this.dataValuePanelService.getDisplayed({ model, resultIndex, dataFormat }).length === 0;
       },
       getPresentationComponent: () => ValuePanel,
     });
   }
-
-  load(): void {}
 }

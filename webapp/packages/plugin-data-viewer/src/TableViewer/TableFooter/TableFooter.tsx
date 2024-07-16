@@ -15,7 +15,7 @@ import { TableFooterMenu } from './TableFooterMenu/TableFooterMenu';
 
 interface Props {
   resultIndex: number;
-  model: IDatabaseDataModel<any, any>;
+  model: IDatabaseDataModel;
   simple: boolean;
 }
 

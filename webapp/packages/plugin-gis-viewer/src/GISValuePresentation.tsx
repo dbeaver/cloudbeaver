@@ -13,9 +13,9 @@ import wellknown, { GeoJSONGeometry } from 'wellknown';
 import { TextPlaceholder, useTranslate } from '@cloudbeaver/core-blocks';
 import {
   IDatabaseDataModel,
-  IDatabaseResultSet,
   IResultSetElementKey,
   ResultSetDataKeysUtils,
+  ResultSetDataSource,
   ResultSetSelectAction,
   ResultSetViewAction,
 } from '@cloudbeaver/plugin-data-viewer';
@@ -73,7 +73,7 @@ function getTransformedGeometry(from: CrsKey, to: CrsKey, geometry: GeoJSONGeome
 }
 
 interface Props {
-  model: IDatabaseDataModel<any, IDatabaseResultSet>;
+  model: IDatabaseDataModel<ResultSetDataSource>;
   resultIndex: number;
 }
 

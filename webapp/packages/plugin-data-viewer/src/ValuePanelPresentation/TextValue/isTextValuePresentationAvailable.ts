@@ -9,20 +9,20 @@ import { isResultSetBinaryValue } from '../../DatabaseDataModel/Actions/ResultSe
 import { isResultSetBlobValue } from '../../DatabaseDataModel/Actions/ResultSet/isResultSetBlobValue';
 import { ResultSetSelectAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetSelectAction';
 import { ResultSetViewAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetViewAction';
-import type { IDatabaseDataResult } from '../../DatabaseDataModel/IDatabaseDataResult';
-import type { IDataValuePanelProps } from '../../TableViewer/ValuePanel/DataValuePanelService';
+import { ITextValuePanelProps } from './TextValuePresentationService';
 
-export function isBlobPresentationAvailable(context: IDataValuePanelProps<any, IDatabaseDataResult> | undefined): boolean {
-  if (!context?.model.source.hasResult(context.resultIndex)) {
+export function isBlobPresentationAvailable(context: ITextValuePanelProps | undefined): boolean {
+  const source = context?.model.source;
+  if (!context || !source?.hasResult(context.resultIndex)) {
     return true;
   }
 
-  const selection = context.model.source.getAction(context.resultIndex, ResultSetSelectAction);
+  const selection = source.getAction(context.resultIndex, ResultSetSelectAction);
 
   const activeElements = selection.getActiveElements();
 
   if (activeElements.length > 0) {
-    const view = context.model.source.getAction(context.resultIndex, ResultSetViewAction);
+    const view = source.getAction(context.resultIndex, ResultSetViewAction);
 
     const firstSelectedCell = activeElements[0];
 

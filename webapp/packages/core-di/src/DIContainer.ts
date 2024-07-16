@@ -8,8 +8,6 @@
 import { Container, interfaces } from 'inversify';
 
 import type { IServiceCollection, IServiceConstructor, IServiceInjector } from './IApp';
-import type { InjectionToken } from './InjectionToken';
-import { isConstructor } from './isConstructor';
 
 function logger(planAndResolve: interfaces.Next): interfaces.Next {
   return (args: interfaces.NextArgs) => {
@@ -100,10 +98,6 @@ export class DIContainer implements IServiceInjector, IServiceCollection {
     return this.container.get<T>(ctor);
   }
 
-  getServiceByToken<T>(token: InjectionToken<T>): T {
-    return this.container.get<T>(token);
-  }
-
   resolveServiceByClass<T>(ctor: IServiceConstructor<T>): T {
     return this.container.resolve(ctor);
   }
@@ -113,14 +107,6 @@ export class DIContainer implements IServiceInjector, IServiceCollection {
       this.container.bind(Ctor).toConstantValue(value);
     } else {
       this.container.bind(Ctor).toSelf();
-    }
-  }
-
-  addServiceByToken<T extends Record<string, any>>(token: InjectionToken<T>, value: T | IServiceConstructor<T>): void {
-    if (isConstructor(value)) {
-      this.container.bind(token).to(value as IServiceConstructor<T>);
-    } else {
-      this.container.bind(token).toConstantValue(value);
     }
   }
 }

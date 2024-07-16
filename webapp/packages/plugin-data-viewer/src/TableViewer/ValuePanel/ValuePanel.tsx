@@ -16,7 +16,6 @@ import { MetadataMap } from '@cloudbeaver/core-utils';
 import { DatabaseDataResultAction } from '../../DatabaseDataModel/Actions/DatabaseDataResultAction';
 import { DatabaseMetadataAction } from '../../DatabaseDataModel/Actions/DatabaseMetadataAction';
 import { DatabaseSelectAction } from '../../DatabaseDataModel/Actions/DatabaseSelectAction';
-import type { IDatabaseResultSet } from '../../DatabaseDataModel/IDatabaseResultSet';
 import type { DataPresentationComponent } from '../../DataPresentationService';
 import { DataValuePanelService } from './DataValuePanelService';
 import styles from './shared/ValuePanel.module.css';
@@ -31,7 +30,7 @@ const tabPanelListRegistry: StyleRegistry = [
   [TabPanelStyles, { mode: 'append', styles: [ValuePanelEditorTabPanel] }],
 ];
 
-export const ValuePanel: DataPresentationComponent<any, IDatabaseResultSet> = observer(function ValuePanel({ dataFormat, model, resultIndex }) {
+export const ValuePanel: DataPresentationComponent = observer(function ValuePanel({ dataFormat, model, resultIndex }) {
   const service = useService(DataValuePanelService);
   const selectAction = model.source.getActionImplementation(resultIndex, DatabaseSelectAction);
   const dataResultAction = model.source.getActionImplementation(resultIndex, DatabaseDataResultAction);

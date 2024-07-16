@@ -43,7 +43,6 @@ export interface ITableData {
   data: ResultSetDataAction;
   editor: ResultSetEditAction;
   view: ResultSetViewAction;
-  constraints: DatabaseDataConstraintAction;
   columns: Array<Column<IResultSetRowKey, any>>;
   columnKeys: IResultSetColumnKey[];
   rows: IResultSetRowKey[];
