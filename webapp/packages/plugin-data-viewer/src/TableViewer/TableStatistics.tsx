@@ -11,7 +11,7 @@ import { s, useS, useTranslate } from '@cloudbeaver/core-blocks';
 
 import type { IDatabaseDataModel } from '../DatabaseDataModel/IDatabaseDataModel';
 import { IDatabaseResultSet } from '../DatabaseDataModel/IDatabaseResultSet';
-import { isResultSetDataSource } from '../ResultSet/ResultSetDataSource';
+import { isResultSetDataSource, ResultSetDataSource } from '../ResultSet/ResultSetDataSource';
 import classes from './TableStatistics.module.css';
 
 interface Props {
@@ -26,7 +26,7 @@ export const TableStatistics = observer<Props>(function TableStatistics({ model,
   let updatedRows: number | null = null;
 
   if (isResultSetDataSource(source)) {
-    const result = source.getResult(resultIndex) as IDatabaseResultSet | null;
+    const result = (source as ResultSetDataSource).getResult(resultIndex) as IDatabaseResultSet | null;
     updatedRows = result?.updateRowCount ?? null;
   }
 
