@@ -42,6 +42,5 @@ export class ProductInfoNavigationService {
       item,
       configurationWizard: this.administrationScreenService.isConfigurationMode,
     });
-    this.administrationScreenService.navigateToItemSub(ProductInfoNavigationService.ROOT_ITEM, tabId);
   }
 }
