@@ -21,5 +21,5 @@ export class DIService {
   }
 
   private readonly dependencyInjectorContext: ISyncContextLoader<<T>(ctor: IServiceConstructor<T>) => T> = () =>
-    this.serviceProvider.getService.bind(this);
+    this.serviceProvider.getService.bind(this.serviceProvider);
 }
