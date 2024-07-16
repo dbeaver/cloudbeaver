@@ -37,7 +37,6 @@ export type AdministrationItemContentComponent = React.FunctionComponent<Adminis
 export type AdministrationItemSubContentProps = AdministrationItemContentProps & {
   sub: IAdministrationItemSubItem;
   param: string | null;
-  configurationWizard: boolean;
 };
 export type AdministrationItemSubContentComponent = React.FunctionComponent<AdministrationItemSubContentProps>;
 
