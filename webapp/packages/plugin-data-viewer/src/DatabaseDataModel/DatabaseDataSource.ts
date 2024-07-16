@@ -355,7 +355,7 @@ export abstract class DatabaseDataSource<TOptions, TResult extends IDatabaseData
   }
 
   private async tryExecuteOperation<T>(type: DatabaseDataSourceOperation, operation: () => Promise<T>): Promise<T | null> {
-    if (this.activeOperation && type !== DatabaseDataSourceOperation.Request) {
+    if (this.activeOperation && type === DatabaseDataSourceOperation.Request) {
       await this.activeOperation;
     }
 
