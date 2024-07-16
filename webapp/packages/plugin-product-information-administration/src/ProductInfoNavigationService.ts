@@ -37,6 +37,7 @@ export class ProductInfoNavigationService {
       throw new Error('This tab does not exits');
     }
 
+    this.navToRoot();
     this.productInfoService.tabsContainer.select(tabId, {
       item,
       configurationWizard: this.administrationScreenService.isConfigurationMode,
