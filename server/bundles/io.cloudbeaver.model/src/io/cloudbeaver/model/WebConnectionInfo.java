@@ -39,6 +39,7 @@ import org.jkiss.dbeaver.model.navigator.DBNBrowseSettings;
 import org.jkiss.dbeaver.model.navigator.DBNDataSource;
 import org.jkiss.dbeaver.model.preferences.DBPPropertyDescriptor;
 import org.jkiss.dbeaver.model.preferences.DBPPropertySource;
+import org.jkiss.dbeaver.model.rm.RMConstants;
 import org.jkiss.dbeaver.model.rm.RMProjectPermission;
 import org.jkiss.dbeaver.model.runtime.DBRRunnableParametrized;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
@@ -254,7 +255,7 @@ public class WebConnectionInfo {
 
         if (dataSourceContainer.isConnected()) {
             features.add(FEATURE_CONNECTED);
-            if (SMUtils.isRMAdmin(session) && !getTools().isEmpty()) {
+            if (!getTools().isEmpty()) {
                 features.add(FEATURE_HAS_TOOLS);
             }
         }
@@ -491,6 +492,9 @@ public class WebConnectionInfo {
     @NotNull
     @Property
     public List<String> getTools() {
+        if (!session.hasPermission(RMConstants.PERMISSION_DATABASE_DEVELOPER)) {
+            return List.of();
+        }
         List<String> tools = new ArrayList<>();
         // checks inside that datasource is not null in container, and it is adaptable to session manager class
         if (DBUtils.getAdapter(DBAServerSessionManager.class, dataSourceContainer) != null) {
