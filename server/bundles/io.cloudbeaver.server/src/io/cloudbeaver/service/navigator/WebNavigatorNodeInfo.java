@@ -196,14 +196,14 @@ public class WebNavigatorNodeInfo {
         if (node instanceof DBNDatabaseNode) {
             if (node instanceof DBNDataSource dataSource) {
                 if (dataSource.getDataSourceContainer().getDataSource() != null) {
-                    boolean hasNonFolderNode = hasNonFolderNode(dataSource.getMeta().getChildren(null));
+                    boolean hasNonFolderNode = DBXTreeNode.hasNonFolderNode(dataSource.getMeta().getChildren(null));
                     if (hasNonFolderNode) {
                         features.add(NODE_FEATURE_CAN_FILTER);
                     }
                 }
             } else if (node instanceof DBNDatabaseItem item) {
                 if (item.getDataSourceContainer().getDataSource() != null) {
-                    boolean hasNonFolderNode = hasNonFolderNode(item.getMeta().getChildren(null));
+                    boolean hasNonFolderNode = DBXTreeNode.hasNonFolderNode(item.getMeta().getChildren(null));
                     if (hasNonFolderNode) {
                         features.add(NODE_FEATURE_CAN_FILTER);
                     }
@@ -274,10 +274,6 @@ public class WebNavigatorNodeInfo {
         }
         var folderPath = ((DBNResourceManagerResource) node).getResourceFolder();
         return ResourceTypeRegistry.getInstance().getResourceTypeByRootPath(null, folderPath) != null;
-    }
-
-    private boolean hasNonFolderNode(List<DBXTreeNode> list) {
-        return list.stream().anyMatch(dbxTreeNode -> !(dbxTreeNode instanceof DBXTreeFolder));
     }
 
     ///////////////////////////////////
