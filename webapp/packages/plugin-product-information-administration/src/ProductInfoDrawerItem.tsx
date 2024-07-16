@@ -29,7 +29,7 @@ export const ProductInfoDrawerItem: React.FC<AdministrationItemDrawerProps> = fu
       disabled={disabled}
       onOpen={() => onSelect(item.name)}
     >
-      <TabIcon icon="/icons/product-information.svg" viewBox="0 0 16 16" />
+      <TabIcon icon="/icons/license.svg" viewBox="0 0 16 16" />
       <TabTitle>
         <Translate token="administration_settings_menu_title" />
       </TabTitle>
