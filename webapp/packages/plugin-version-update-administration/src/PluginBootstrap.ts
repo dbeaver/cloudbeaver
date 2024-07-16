@@ -7,7 +7,6 @@
  */
 import { importLazyComponent } from '@cloudbeaver/core-blocks';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
-import { VersionResource } from '@cloudbeaver/core-version';
 import { VersionUpdateService } from '@cloudbeaver/core-version-update';
 import { ProductInfoService } from '@cloudbeaver/plugin-product-information-administration';
 
@@ -18,7 +17,6 @@ const VersionUpdate = importLazyComponent(() => import('./VersionUpdate').then(m
 export class PluginBootstrap extends Bootstrap {
   constructor(
     private readonly versionUpdateService: VersionUpdateService,
-    private readonly versionResource: VersionResource,
     private readonly productInfoService: ProductInfoService,
   ) {
     super();
@@ -33,9 +31,5 @@ export class PluginBootstrap extends Bootstrap {
     });
 
     this.versionUpdateService.registerGeneralInstruction(() => DockerUpdateInstructions);
-  }
-
-  async load(): Promise<void> {
-    await this.versionResource.load();
   }
 }

@@ -5,9 +5,10 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { productInfoPlugin } from './manifest';
+import { productInformationPlugin } from './manifest';
 
 export * from './ProductInfoNavigationService';
 export * from './ProductInfoService';
 
-export default productInfoPlugin;
+export { productInformationPlugin };
+export default productInformationPlugin;

@@ -19,7 +19,7 @@ import { VersionChecker } from './VersionChecker';
 import { VersionSelector } from './VersionSelector';
 import styles from './VersionUpdate.module.css';
 
-export const VersionUpdate: TabContainerPanelComponent<AdministrationItemContentProps> = observer(function VersionUpdate(props) {
+export const VersionUpdate: TabContainerPanelComponent<AdministrationItemContentProps> = observer(function VersionUpdate() {
   const style = useS(styles);
   const versionService = useService(VersionService);
   const versionUpdateService = useService(VersionUpdateService);

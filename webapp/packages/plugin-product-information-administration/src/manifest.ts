@@ -7,7 +7,7 @@
  */
 import type { PluginManifest } from '@cloudbeaver/core-di';
 
-export const productInfoPlugin: PluginManifest = {
+export const productInformationPlugin: PluginManifest = {
   info: { name: 'Product administration plugin' },
   providers: [
     () => import('./ProductInfoService').then(m => m.ProductInfoService),
