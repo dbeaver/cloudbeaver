@@ -5,7 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import type { IServiceInjector } from '../IApp';
-import { createValueToken } from '../InjectionToken';
+import { lazy } from 'react';
 
-export const ServiceInjectorToken = createValueToken<IServiceInjector>('IServiceInjector');
+export const ServiceProviderContext = lazy(() => import('./ServiceProviderContext').then(m => ({ default: m.ServiceProviderContext })));

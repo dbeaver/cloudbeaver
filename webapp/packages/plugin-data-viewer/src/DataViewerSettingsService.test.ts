@@ -88,8 +88,8 @@ const newSettings = {
 };
 
 async function setupSettingsService(mockConfig: any = {}) {
-  const settings = app.injector.getServiceByClass(DataViewerSettingsService);
-  const config = app.injector.getServiceByClass(ServerConfigResource);
+  const settings = app.serviceProvider.getService(DataViewerSettingsService);
+  const config = app.serviceProvider.getService(ServerConfigResource);
 
   server.use(endpoint.query('serverConfig', mockServerConfig(mockConfig)));
 

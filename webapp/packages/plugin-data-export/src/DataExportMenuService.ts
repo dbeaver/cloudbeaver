@@ -20,8 +20,8 @@ import {
   DATA_VIEWER_DATA_MODEL_ACTIONS_MENU,
   DataViewerPresentationType,
   DataViewerService,
-  IDatabaseDataSource,
   IDataContainerOptions,
+  isResultSetDataSource,
 } from '@cloudbeaver/plugin-data-viewer';
 import type { IDataQueryOptions } from '@cloudbeaver/plugin-sql-editor';
 
@@ -59,11 +59,15 @@ export class DataExportMenuService {
       contexts: [DATA_CONTEXT_DV_DDM, DATA_CONTEXT_DV_DDM_RESULT_INDEX],
       isHidden: (context, action) => !this.dataViewerService.canExportData,
       actions: [ACTION_EXPORT],
+      isActionApplicable: context => {
+        const model = context.get(DATA_CONTEXT_DV_DDM)!;
+        return isResultSetDataSource<IDataContainerOptions & IDataQueryOptions>(model.source);
+      },
       isDisabled(context) {
         const model = context.get(DATA_CONTEXT_DV_DDM)!;
         const resultIndex = context.get(DATA_CONTEXT_DV_DDM_RESULT_INDEX)!;
 
-        return model.isLoading() || model.isDisabled(resultIndex) || !model.getResult(resultIndex);
+        return model.isLoading() || model.isDisabled(resultIndex) || !model.source.getResult(resultIndex);
       },
       getActionInfo(context, action) {
         if (action === ACTION_EXPORT) {
@@ -77,13 +81,12 @@ export class DataExportMenuService {
         const resultIndex = context.get(DATA_CONTEXT_DV_DDM_RESULT_INDEX)!;
 
         if (action === ACTION_EXPORT) {
-          const result = model.getResult(resultIndex);
+          const result = model.source.getResult(resultIndex);
+          const source = model.source;
 
-          if (!result) {
+          if (!result || !isResultSetDataSource<IDataContainerOptions & IDataQueryOptions>(source)) {
             throw new Error('Result must be provided');
           }
-
-          const source = model.source as IDatabaseDataSource<IDataContainerOptions & IDataQueryOptions>;
 
           if (!source.options) {
             throw new Error('Source options must be provided');

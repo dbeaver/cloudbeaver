@@ -5,11 +5,9 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import type { ValueToken } from './InjectionToken';
 import type { ITypedConstructor } from './ITypedConstructor';
 
 export interface IServiceCollection {
-  addServiceByToken: <T extends Record<string, any>>(token: any, value: T) => void;
   addServiceByClass: (ctor: IServiceConstructor<any>, value?: any) => void;
   unbindAll: () => void;
 }
@@ -29,6 +27,5 @@ export type IServiceConstructor<T> = ITypedConstructor<T>;
 export interface IServiceInjector {
   hasServiceByClass: <T>(ctor: IServiceConstructor<T>) => boolean;
   getServiceByClass: <T>(ctor: IServiceConstructor<T>) => T;
-  getServiceByToken: <T>(token: ValueToken<T>) => T;
   resolveServiceByClass: <T>(ctor: IServiceConstructor<T>) => T;
 }

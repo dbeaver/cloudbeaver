@@ -14,6 +14,7 @@ import { Dependency } from './Dependency';
 import type { DIContainer } from './DIContainer';
 import type { IServiceCollection, IServiceConstructor, IServiceInjector } from './IApp';
 import { IDiWrapper, inversifyWrapper } from './inversifyWrapper';
+import { IServiceProvider } from './IServiceProvider';
 import type { PluginManifest } from './PluginManifest';
 
 export interface IStartData {
@@ -83,18 +84,23 @@ export class App {
     this.plugins.push(manifest);
   }
 
-  getServiceInjector(): IServiceInjector {
-    return this.diWrapper.injector;
+  getServiceProvider(): IServiceProvider {
+    return this.diWrapper.injector.resolveServiceByClass(IServiceProvider);
   }
 
   getServiceCollection(): IServiceCollection {
     return this.diWrapper.collection;
   }
 
+  getServiceInjector(): IServiceInjector {
+    return this.diWrapper.injector;
+  }
+
   // first phase register all dependencies
   private async registerServices(preload?: boolean): Promise<void> {
     if (!this.isAppServiceBound) {
       this.getServiceCollection().addServiceByClass(App, this);
+      this.getServiceCollection().addServiceByClass(IServiceProvider, new IServiceProvider(this.diWrapper.injector));
       this.isAppServiceBound = true;
     }
 

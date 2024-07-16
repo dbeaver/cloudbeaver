@@ -12,13 +12,12 @@ import type { ResultDataFormat } from '@cloudbeaver/core-sdk';
 import { uuid } from '@cloudbeaver/core-utils';
 
 import type { IDatabaseDataModel, IRequestEventData } from './IDatabaseDataModel';
-import type { IDatabaseDataResult } from './IDatabaseDataResult';
 import type { DatabaseDataAccessMode, IDatabaseDataSource, IRequestInfo } from './IDatabaseDataSource';
 
-export class DatabaseDataModel<TOptions, TResult extends IDatabaseDataResult = IDatabaseDataResult> implements IDatabaseDataModel<TOptions, TResult> {
+export class DatabaseDataModel<TSource extends IDatabaseDataSource<any, any> = IDatabaseDataSource> implements IDatabaseDataModel<TSource> {
   id: string;
   name: string | null;
-  source: IDatabaseDataSource<TOptions, TResult>;
+  source: TSource;
   countGain: number;
 
   get requestInfo(): IRequestInfo {
@@ -31,9 +30,9 @@ export class DatabaseDataModel<TOptions, TResult extends IDatabaseDataResult = I
 
   readonly onDispose: IExecutor;
   readonly onOptionsChange: IExecutor;
-  readonly onRequest: IExecutor<IRequestEventData<TOptions, TResult>>;
+  readonly onRequest: IExecutor<IRequestEventData<TSource>>;
 
-  constructor(source: IDatabaseDataSource<TOptions, TResult>) {
+  constructor(source: TSource) {
     this.id = uuid();
     this.name = null;
     this.source = source;
@@ -52,7 +51,7 @@ export class DatabaseDataModel<TOptions, TResult extends IDatabaseDataResult = I
     return this.source.isLoading();
   }
 
-  isDisabled(resultIndex: number): boolean {
+  isDisabled(resultIndex?: number): boolean {
     return this.source.isDisabled(resultIndex);
   }
 
@@ -64,21 +63,8 @@ export class DatabaseDataModel<TOptions, TResult extends IDatabaseDataResult = I
     return this.source.isDataAvailable(offset, count);
   }
 
-  getResults(): TResult[] {
-    return this.source.results;
-  }
-
-  getResult(index: number): TResult | null {
-    return this.source.getResult(index);
-  }
-
   setName(name: string | null) {
     this.name = name;
-    return this;
-  }
-
-  setResults(results: TResult[]): this {
-    this.source.setResults(results);
     return this;
   }
 
@@ -104,11 +90,6 @@ export class DatabaseDataModel<TOptions, TResult extends IDatabaseDataResult = I
 
   setSupportedDataFormats(dataFormats: ResultDataFormat[]): this {
     this.source.setSupportedDataFormats(dataFormats);
-    return this;
-  }
-
-  setOptions(options: TOptions): this {
-    this.source.setOptions(options);
     return this;
   }
 
@@ -152,8 +133,8 @@ export class DatabaseDataModel<TOptions, TResult extends IDatabaseDataResult = I
     this.source.resetData();
   }
 
-  async dispose(keepExecutionContext = false): Promise<void> {
+  async dispose(): Promise<void> {
     await this.onDispose.execute();
-    await this.source.dispose(keepExecutionContext);
+    await this.source.dispose();
   }
 }

@@ -9,7 +9,7 @@ import { observer } from 'mobx-react-lite';
 import { useState } from 'react';
 
 import { ConfirmationDialog, useExecutor } from '@cloudbeaver/core-blocks';
-import { App, useService } from '@cloudbeaver/core-di';
+import { IServiceProvider, useService } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 import { ExecutorInterrupter } from '@cloudbeaver/core-executor';
 import { FormMode, TabContainerPanelComponent } from '@cloudbeaver/core-ui';
@@ -21,13 +21,13 @@ import { UserProfileFormService } from './UserProfileFormService';
 import { UserProfileFormState } from './UserProfileFormState';
 
 export const UserProfileFormPanel: TabContainerPanelComponent = observer(function UserProfileFormPanel({ tabId }) {
-  const appService = useService(App);
+  const serviceProvider = useService(IServiceProvider);
   const userProfileFormService = useService(UserProfileFormService);
   const userProfileOptionsPanelService = useService(UserProfileOptionsPanelService);
   const commonDialogService = useService(CommonDialogService);
 
   const [state] = useState(() => {
-    const state = new UserProfileFormState(appService, userProfileFormService, {});
+    const state = new UserProfileFormState(serviceProvider, userProfileFormService, {});
     state.setMode(FormMode.Edit);
 
     return state;

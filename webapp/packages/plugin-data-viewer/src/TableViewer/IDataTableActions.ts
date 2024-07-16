@@ -12,7 +12,7 @@ import type { IDatabaseDataModel } from '../DatabaseDataModel/IDatabaseDataModel
 export interface IDataTableActions {
   presentationId: string | undefined;
   valuePresentationId: string | null | undefined;
-  dataModel: IDatabaseDataModel<any, any> | undefined;
+  dataModel: IDatabaseDataModel | undefined;
 
   setPresentation: (id: string) => void;
   setValuePresentation: (id: string | null) => void;

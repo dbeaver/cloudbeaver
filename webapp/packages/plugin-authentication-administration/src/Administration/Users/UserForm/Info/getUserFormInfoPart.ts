@@ -18,9 +18,9 @@ const DATA_CONTEXT_USER_FORM_INFO_PART = createDataContext<UserFormInfoPart>('Us
 export function getUserFormInfoPart(formState: IFormState<IUserFormState>): UserFormInfoPart {
   return formState.getPart(DATA_CONTEXT_USER_FORM_INFO_PART, context => {
     const di = context.get(DATA_CONTEXT_DI_PROVIDER)!;
-    const usersResource = di.getServiceByClass(UsersResource);
-    const serverConfigResource = di.getServiceByClass(ServerConfigResource);
-    const authRolesResource = di.getServiceByClass(AuthRolesResource);
+    const usersResource = di.getService(UsersResource);
+    const serverConfigResource = di.getService(ServerConfigResource);
+    const authRolesResource = di.getService(AuthRolesResource);
 
     return new UserFormInfoPart(authRolesResource, serverConfigResource, formState, usersResource);
   });

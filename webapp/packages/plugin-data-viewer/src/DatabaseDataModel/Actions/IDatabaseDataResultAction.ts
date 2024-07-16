@@ -9,6 +9,7 @@ import type { IDatabaseDataAction } from '../IDatabaseDataAction';
 import type { IDatabaseDataResult } from '../IDatabaseDataResult';
 
 export interface IDatabaseDataResultAction<TKey, TResult extends IDatabaseDataResult> extends IDatabaseDataAction<any, TResult> {
+  readonly empty: boolean;
   getIdentifier(key: TKey): string;
   serialize(key: TKey): string;
 }

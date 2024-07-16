@@ -16,7 +16,7 @@ import type { IDataTableActions } from './IDataTableActions';
 import styles from './TableToolsPanel.module.css';
 
 interface Props {
-  model: IDatabaseDataModel<any, any>;
+  model: IDatabaseDataModel;
   actions: IDataTableActions;
   dataFormat: ResultDataFormat;
   presentation: IDataPresentationOptions | null;
@@ -28,7 +28,7 @@ export const TableToolsPanel = observer<Props>(function TableToolsPanel({ model,
   const translate = useTranslate();
   const style = useS(styles);
 
-  const result = model.getResult(resultIndex);
+  const result = model.source.getResult(resultIndex);
 
   if (!presentation || (presentation.dataFormat !== undefined && dataFormat !== presentation.dataFormat)) {
     if (model.isLoading()) {

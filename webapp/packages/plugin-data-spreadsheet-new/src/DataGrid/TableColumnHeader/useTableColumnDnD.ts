@@ -14,6 +14,8 @@ import {
   DATA_CONTEXT_DV_DDM_RS_COLUMN_KEY,
   IDatabaseDataModel,
   IResultSetColumnKey,
+  isResultSetDataModel,
+  ResultSetDataSource,
   ResultSetViewAction,
 } from '@cloudbeaver/plugin-data-viewer';
 
@@ -28,7 +30,11 @@ interface TableColumnDnD {
 
 export function useTableColumnDnD(model: IDatabaseDataModel, resultIndex: number, columnKey: IResultSetColumnKey | null): TableColumnDnD {
   const context = useDataContext();
-  const resultSetViewAction = model.source.tryGetAction(resultIndex, ResultSetViewAction);
+  let resultSetViewAction: ResultSetViewAction | undefined;
+
+  if (isResultSetDataModel(model)) {
+    resultSetViewAction = (model.source as ResultSetDataSource).tryGetAction(resultIndex, ResultSetViewAction);
+  }
 
   useDataContextLink(context, (context, id) => {
     context.set(DATA_CONTEXT_DV_DDM, model, id);
