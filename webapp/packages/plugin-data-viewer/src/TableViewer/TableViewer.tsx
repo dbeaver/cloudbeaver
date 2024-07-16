@@ -72,11 +72,12 @@ export const TableViewer = observer<TableViewerProps, HTMLDivElement>(
 
     const localActions = useObjectRef({
       clearConstraints() {
-        if (!isResultSetDataModel<IDatabaseDataOptions>(dataModel)) {
+        const unknownModel = dataModel as any;
+        if (!isResultSetDataModel<IDatabaseDataOptions>(unknownModel)) {
           return;
         }
 
-        const constraints = dataModel?.source.tryGetAction(resultIndex, DatabaseDataConstraintAction);
+        const constraints = unknownModel?.source.tryGetAction(resultIndex, DatabaseDataConstraintAction);
 
         if (constraints) {
           constraints.deleteAll();
