@@ -11,7 +11,6 @@ export const productInfoPlugin: PluginManifest = {
   info: { name: 'Product administration plugin' },
   providers: [
     () => import('./ProductInfoService').then(m => m.ProductInfoService),
-    () => import('./ProductInfoBootstrap').then(m => m.ProductInfoBootstrap),
     () => import('./LocaleService').then(m => m.LocaleService),
     () => import('./ProductInfoNavigationService').then(m => m.ProductInfoNavigationService),
   ],

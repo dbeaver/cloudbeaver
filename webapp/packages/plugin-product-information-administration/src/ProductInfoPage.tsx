@@ -26,17 +26,24 @@ const mainTabsRegistry: StyleRegistry = [
   [TabTitleStyles, { mode: 'append', styles: [TabTitleModuleStyles] }],
 ];
 
-export const ProductInfoPage: AdministrationItemContentComponent = observer(function ProductInfoPage(props) {
+export const ProductInfoPage: AdministrationItemContentComponent = observer(function ProductInfoPage({ item, configurationWizard, sub }) {
   const productInfoNavigationService = useService(ProductInfoNavigationService);
   const styles = useS(style, tabStyle);
   const productInfoService = useService(ProductInfoService);
 
   function openSub(data: ITabData<AdministrationItemContentProps>) {
-    productInfoNavigationService.navToTab(data.tabId);
+    productInfoNavigationService.navigateToSub({ sub: data.tabId });
   }
 
   return (
-    <TabsState item={props.item} configurationWizard={props.configurationWizard} container={productInfoService.tabsContainer} lazy onChange={openSub}>
+    <TabsState
+      currentTabId={sub?.name}
+      item={item}
+      configurationWizard={configurationWizard}
+      container={productInfoService.tabsContainer}
+      lazy
+      onChange={openSub}
+    >
       <ToolsPanel bottomBorder>
         <SContext registry={mainTabsRegistry}>
           <TabList className={s(styles, { tabList: true, administrationTabs: true })} aria-label="Product Info Administration pages" underline />

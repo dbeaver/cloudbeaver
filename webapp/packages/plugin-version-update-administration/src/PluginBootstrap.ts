@@ -25,11 +25,10 @@ export class PluginBootstrap extends Bootstrap {
   }
 
   register(): void {
-    this.productInfoService.tabsContainer.add({
+    this.productInfoService.addSubItem({
       key: 'version-update',
-      name: 'version-update',
+      name: 'plugin_version_update_administration_tab_title',
       panel: () => VersionUpdate,
-      title: 'plugin_version_update_administration_tab_title',
       order: 2,
     });
 

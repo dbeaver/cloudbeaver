@@ -9,6 +9,5 @@ import { productInfoPlugin } from './manifest';
 
 export * from './ProductInfoNavigationService';
 export * from './ProductInfoService';
-export * from './ProductInfoBootstrap';
 
 export default productInfoPlugin;
