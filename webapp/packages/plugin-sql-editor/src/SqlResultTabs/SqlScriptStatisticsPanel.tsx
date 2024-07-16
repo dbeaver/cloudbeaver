@@ -9,7 +9,7 @@ import { observer } from 'mobx-react-lite';
 
 import { Loader, s, TextPlaceholder, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { TableViewerStorageService } from '@cloudbeaver/plugin-data-viewer';
+import { IDatabaseDataModel, TableViewerStorageService } from '@cloudbeaver/plugin-data-viewer';
 
 import type { IStatisticsTab } from '../ISqlEditorTabState';
 import type { QueryDataSource } from '../QueryDataSource';
@@ -31,9 +31,7 @@ export const SqlScriptStatisticsPanel = observer<IProps>(function SqlScriptStati
     return <TextPlaceholder>{translate('sql_editor_sql_statistics_unavailable')}</TextPlaceholder>;
   }
 
-  const source: QueryDataSource | undefined = statistics.modelId
-    ? (tableViewerStorageService.get(statistics.modelId)?.source as QueryDataSource)
-    : undefined;
+  const source = statistics.modelId ? tableViewerStorageService.get<IDatabaseDataModel<QueryDataSource>>(statistics.modelId)?.source : undefined;
 
   return (
     <div className={s(styles, { statistics: true })}>

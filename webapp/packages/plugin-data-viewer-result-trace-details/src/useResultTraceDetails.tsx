@@ -14,9 +14,9 @@ import { ILoadableState, isContainsException } from '@cloudbeaver/core-utils';
 import {
   DatabaseMetadataAction,
   IDatabaseDataModel,
-  IDatabaseResultSet,
   IResultSetElementKey,
   ResultSetCacheAction,
+  ResultSetDataSource,
 } from '@cloudbeaver/plugin-data-viewer';
 
 import { DVResultTraceDetailsService } from './DVResultTraceDetailsService';
@@ -29,7 +29,7 @@ interface MetadataState {
 }
 interface State extends ILoadableState {
   readonly trace: DynamicTraceProperty[] | undefined;
-  model: IDatabaseDataModel<any, IDatabaseResultSet>;
+  model: IDatabaseDataModel<ResultSetDataSource>;
   resultIndex: number;
   cache: ResultSetCacheAction;
   metadataState: MetadataState;
@@ -44,7 +44,7 @@ const FAKE_ELEMENT_KEY: IResultSetElementKey = {
   row: { index: Number.MAX_SAFE_INTEGER, subIndex: Number.MAX_SAFE_INTEGER },
 };
 
-export function useResultTraceDetails(model: IDatabaseDataModel<any, IDatabaseResultSet>, resultIndex: number) {
+export function useResultTraceDetails(model: IDatabaseDataModel<ResultSetDataSource>, resultIndex: number) {
   const dvResultTraceDetailsService = useService(DVResultTraceDetailsService);
   const cache = model.source.getAction(resultIndex, ResultSetCacheAction);
   const metadataAction = model.source.getAction(resultIndex, DatabaseMetadataAction);
@@ -74,7 +74,7 @@ export function useResultTraceDetails(model: IDatabaseDataModel<any, IDatabaseRe
         return this.trace !== undefined;
       },
       async load() {
-        const result = this.model.getResult(this.resultIndex);
+        const result = this.model.source.getResult(this.resultIndex);
 
         try {
           if (!result?.id) {
@@ -108,6 +108,7 @@ export function useResultTraceDetails(model: IDatabaseDataModel<any, IDatabaseRe
       promise: computed,
       exception: computed,
       trace: computed,
+      model: observable.ref,
     },
     { model, resultIndex, cache, metadataState },
   );

@@ -5,14 +5,17 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
+import { importLazyComponent } from '@cloudbeaver/core-blocks';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { ResultDataFormat } from '@cloudbeaver/core-sdk';
 
 import { ResultSetSelectAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetSelectAction';
 import { ResultSetViewAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetViewAction';
+import { isResultSetDataSource } from '../../ResultSet/ResultSetDataSource';
 import { DataValuePanelService } from '../../TableViewer/ValuePanel/DataValuePanelService';
-import { ImageValuePresentation } from './ImageValuePresentation';
 import { isImageValuePresentationAvailable } from './isImageValuePresentationAvailable';
+
+const ImageValuePresentation = importLazyComponent(() => import('./ImageValuePresentation').then(module => module.ImageValuePresentation));
 
 @injectable()
 export class ImageValuePresentationBootstrap extends Bootstrap {
@@ -23,21 +26,24 @@ export class ImageValuePresentationBootstrap extends Bootstrap {
   register(): void | Promise<void> {
     this.dataValuePanelService.add({
       key: 'image-presentation',
-      options: { dataFormat: [ResultDataFormat.Resultset] },
+      options: {
+        dataFormat: [ResultDataFormat.Resultset],
+      },
       name: 'data_viewer_presentation_value_image_title',
       order: 1,
       panel: () => ImageValuePresentation,
       isHidden: (_, context) => {
-        if (!context?.model.source.hasResult(context.resultIndex)) {
+        const source = context?.model.source as any;
+        if (!context?.model.source.hasResult(context.resultIndex) || !isResultSetDataSource(source)) {
           return true;
         }
 
-        const selection = context.model.source.getAction(context.resultIndex, ResultSetSelectAction);
+        const selection = source.getAction(context.resultIndex, ResultSetSelectAction);
 
         const activeElements = selection.getActiveElements();
 
         if (activeElements.length > 0) {
-          const view = context.model.source.getAction(context.resultIndex, ResultSetViewAction);
+          const view = source.getAction(context.resultIndex, ResultSetViewAction);
 
           const firstSelectedCell = activeElements[0];
 
@@ -50,6 +56,4 @@ export class ImageValuePresentationBootstrap extends Bootstrap {
       },
     });
   }
-
-  load(): void {}
 }

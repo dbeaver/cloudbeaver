@@ -18,13 +18,13 @@ import { isResultSetContentValue } from '../../DatabaseDataModel/Actions/ResultS
 import { ResultSetDataContentAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetDataContentAction';
 import { ResultSetFormatAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetFormatAction';
 import type { IDatabaseDataModel } from '../../DatabaseDataModel/IDatabaseDataModel';
-import type { IDatabaseResultSet } from '../../DatabaseDataModel/IDatabaseResultSet';
+import { ResultSetDataSource } from '../../ResultSet/ResultSetDataSource';
 import { QuotaPlaceholder } from '../QuotaPlaceholder';
 import { MAX_BLOB_PREVIEW_SIZE } from './MAX_BLOB_PREVIEW_SIZE';
 
 interface Props {
   resultIndex: number;
-  model: IDatabaseDataModel<any, IDatabaseResultSet>;
+  model: IDatabaseDataModel<ResultSetDataSource>;
   elementKey: IResultSetElementKey;
 }
 

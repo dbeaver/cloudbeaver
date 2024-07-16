@@ -113,6 +113,11 @@ export * from './Table/useTable';
 export * from './Table/TableState';
 export * from './Table/TableSelect';
 export * from './Table/getSelectedItems';
+export * from './Table/TableItemGroup';
+export * from './Table/TableItemGroupContext';
+export * from './Table/TableItemGroupExpand';
+export * from './Table/TableItemGroupContent';
+export * from './Table/TableItemGroupExpandSpace';
 
 export * from './Expand/Expandable';
 

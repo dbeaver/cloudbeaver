@@ -17,8 +17,8 @@ const DATA_CONTEXT_USER_PROFILE_FORM_AUTHENTICATION_PART = createDataContext<Use
 export function getUserProfileFormAuthenticationPart(formState: IFormState<IUserProfileFormState>): UserProfileFormAuthenticationPart {
   return formState.getPart(DATA_CONTEXT_USER_PROFILE_FORM_AUTHENTICATION_PART, context => {
     const di = context.get(DATA_CONTEXT_DI_PROVIDER)!;
-    const userInfoResource = di.getServiceByClass(UserInfoResource);
-    const passwordPolicyService = di.getServiceByClass(PasswordPolicyService);
+    const userInfoResource = di.getService(UserInfoResource);
+    const passwordPolicyService = di.getService(PasswordPolicyService);
 
     return new UserProfileFormAuthenticationPart(formState, userInfoResource, passwordPolicyService);
   });

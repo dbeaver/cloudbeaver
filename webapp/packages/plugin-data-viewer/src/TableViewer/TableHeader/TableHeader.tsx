@@ -15,7 +15,7 @@ import classes from './TableHeader.module.css';
 import { TableHeaderService } from './TableHeaderService';
 
 interface Props {
-  model: IDatabaseDataModel<any, any>;
+  model: IDatabaseDataModel;
   resultIndex: number;
   simple: boolean;
   className?: string;

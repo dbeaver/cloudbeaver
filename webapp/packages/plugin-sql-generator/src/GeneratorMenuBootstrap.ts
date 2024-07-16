@@ -15,6 +15,9 @@ import {
   DATA_VIEWER_DATA_MODEL_ACTIONS_MENU,
   DatabaseEditAction,
   DataViewerPresentationType,
+  IDatabaseDataModel,
+  isResultSetDataSource,
+  ResultSetDataSource,
 } from '@cloudbeaver/plugin-data-viewer';
 
 import { ACTION_SQL_GENERATE } from './actions/ACTION_SQL_GENERATE';
@@ -55,6 +58,10 @@ export class GeneratorMenuBootstrap extends Bootstrap {
       menus: [DATA_VIEWER_DATA_MODEL_ACTIONS_MENU],
       actions: [ACTION_SQL_GENERATE],
       contexts: [DATA_CONTEXT_DV_DDM, DATA_CONTEXT_DV_DDM_RESULT_INDEX],
+      isActionApplicable(context) {
+        const model = context.get(DATA_CONTEXT_DV_DDM)!;
+        return isResultSetDataSource(model.source);
+      },
       isDisabled(context) {
         const model = context.get(DATA_CONTEXT_DV_DDM)!;
         const resultIndex = context.get(DATA_CONTEXT_DV_DDM_RESULT_INDEX)!;
@@ -65,7 +72,10 @@ export class GeneratorMenuBootstrap extends Bootstrap {
         return !editor?.isEdited();
       },
       handler: context => {
-        this.scriptPreviewService.open(context.get(DATA_CONTEXT_DV_DDM)!, context.get(DATA_CONTEXT_DV_DDM_RESULT_INDEX)!);
+        this.scriptPreviewService.open(
+          context.get(DATA_CONTEXT_DV_DDM)! as unknown as IDatabaseDataModel<ResultSetDataSource>,
+          context.get(DATA_CONTEXT_DV_DDM_RESULT_INDEX)!,
+        );
       },
     });
   }

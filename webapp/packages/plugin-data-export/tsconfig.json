@@ -7,25 +7,7 @@
   },
   "references": [
     {
-      "path": "../core-administration/tsconfig.json"
-    },
-    {
-      "path": "../core-app/tsconfig.json"
-    },
-    {
-      "path": "../core-authentication/tsconfig.json"
-    },
-    {
       "path": "../core-blocks/tsconfig.json"
-    },
-    {
-      "path": "../core-browser/tsconfig.json"
-    },
-    {
-      "path": "../core-client-activity/tsconfig.json"
-    },
-    {
-      "path": "../core-connections/tsconfig.json"
     },
     {
       "path": "../core-connections/tsconfig.json"
@@ -37,28 +19,13 @@
       "path": "../core-dialogs/tsconfig.json"
     },
     {
-      "path": "../core-dialogs/tsconfig.json"
-    },
-    {
-      "path": "../core-events/tsconfig.json"
-    },
-    {
       "path": "../core-events/tsconfig.json"
     },
     {
       "path": "../core-localization/tsconfig.json"
     },
     {
-      "path": "../core-localization/tsconfig.json"
-    },
-    {
       "path": "../core-navigation-tree/tsconfig.json"
-    },
-    {
-      "path": "../core-navigation-tree/tsconfig.json"
-    },
-    {
-      "path": "../core-projects/tsconfig.json"
     },
     {
       "path": "../core-resource/tsconfig.json"
@@ -67,28 +34,7 @@
       "path": "../core-root/tsconfig.json"
     },
     {
-      "path": "../core-root/tsconfig.json"
-    },
-    {
-      "path": "../core-routing/tsconfig.json"
-    },
-    {
       "path": "../core-sdk/tsconfig.json"
-    },
-    {
-      "path": "../core-sdk/tsconfig.json"
-    },
-    {
-      "path": "../core-settings/tsconfig.json"
-    },
-    {
-      "path": "../core-settings/tsconfig.json"
-    },
-    {
-      "path": "../core-storage/tsconfig.json"
-    },
-    {
-      "path": "../core-ui/tsconfig.json"
     },
     {
       "path": "../core-ui/tsconfig.json"
@@ -100,28 +46,10 @@
       "path": "../core-view/tsconfig.json"
     },
     {
-      "path": "../core-view/tsconfig.json"
-    },
-    {
       "path": "../plugin-data-viewer/tsconfig.json"
     },
     {
-      "path": "../plugin-datasource-context-switch/tsconfig.json"
-    },
-    {
-      "path": "../plugin-navigation-tabs/tsconfig.json"
-    },
-    {
-      "path": "../plugin-navigation-tree/tsconfig.json"
-    },
-    {
-      "path": "../plugin-object-viewer/tsconfig.json"
-    },
-    {
       "path": "../plugin-sql-editor/tsconfig.json"
-    },
-    {
-      "path": "../tests-runner/tsconfig.json"
     }
   ],
   "include": [

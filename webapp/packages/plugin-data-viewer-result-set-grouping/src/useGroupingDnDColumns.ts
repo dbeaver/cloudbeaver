@@ -11,9 +11,10 @@ import {
   DATA_CONTEXT_DV_DDM_RESULT_INDEX,
   DATA_CONTEXT_DV_DDM_RS_COLUMN_KEY,
   IDatabaseDataModel,
-  IDatabaseResultSet,
   IResultSetColumnKey,
+  isResultSetDataSource,
   ResultSetDataAction,
+  ResultSetDataSource,
 } from '@cloudbeaver/plugin-data-viewer';
 
 import type { IGroupingQueryState } from './IGroupingQueryState';
@@ -26,20 +27,15 @@ interface IGroupingQueryResult {
 
 export function useGroupingDnDColumns(
   state: IGroupingQueryState,
-  sourceModel: IDatabaseDataModel<any, IDatabaseResultSet>,
+  sourceModel: IDatabaseDataModel<any>,
   groupingModel: IGroupingDataModel,
 ): IGroupingQueryResult {
-  async function dropItem(
-    model: IDatabaseDataModel<any, IDatabaseResultSet>,
-    resultIndex: number,
-    columnKey: IResultSetColumnKey | null,
-    outside: boolean,
-  ) {
+  async function dropItem(source: ResultSetDataSource, resultIndex: number, columnKey: IResultSetColumnKey | null, outside: boolean) {
     if (!columnKey) {
       return;
     }
 
-    const resultSetDataAction = model.source.getAction(resultIndex, ResultSetDataAction);
+    const resultSetDataAction = source.getAction(resultIndex, ResultSetDataAction);
     const name = resultSetDataAction.getColumn(columnKey)?.name;
 
     if (!name) {
@@ -59,16 +55,16 @@ export function useGroupingDnDColumns(
 
   const dndBox = useDNDBox({
     canDrop: context => {
-      const model = context.get(DATA_CONTEXT_DV_DDM);
+      const model = context.get(DATA_CONTEXT_DV_DDM)!;
 
-      return context.has(DATA_CONTEXT_DV_DDM_RS_COLUMN_KEY) && model === sourceModel;
+      return isResultSetDataSource(model.source) && context.has(DATA_CONTEXT_DV_DDM_RS_COLUMN_KEY) && model === sourceModel;
     },
     onDrop: async context => {
       const model = context.get(DATA_CONTEXT_DV_DDM)!;
       const resultIndex = context.get(DATA_CONTEXT_DV_DDM_RESULT_INDEX)!;
       const columnKey = context.get(DATA_CONTEXT_DV_DDM_RS_COLUMN_KEY)!;
 
-      dropItem(model, resultIndex, columnKey, false);
+      dropItem(model.source as unknown as ResultSetDataSource, resultIndex, columnKey, false);
     },
   });
 
@@ -76,14 +72,14 @@ export function useGroupingDnDColumns(
     canDrop: context => {
       const model = context.get(DATA_CONTEXT_DV_DDM);
 
-      return context.has(DATA_CONTEXT_DV_DDM_RS_COLUMN_KEY) && model?.id === groupingModel.model.id;
+      return context.has(DATA_CONTEXT_DV_DDM_RS_COLUMN_KEY) && model?.id === groupingModel.model.id && isResultSetDataSource(model.source);
     },
     onDrop: async context => {
       const model = context.get(DATA_CONTEXT_DV_DDM)!;
       const resultIndex = context.get(DATA_CONTEXT_DV_DDM_RESULT_INDEX)!;
       const columnKey = context.get(DATA_CONTEXT_DV_DDM_RS_COLUMN_KEY)!;
 
-      dropItem(model, resultIndex, columnKey, true);
+      dropItem(model.source as unknown as ResultSetDataSource, resultIndex, columnKey, true);
     },
   });
 

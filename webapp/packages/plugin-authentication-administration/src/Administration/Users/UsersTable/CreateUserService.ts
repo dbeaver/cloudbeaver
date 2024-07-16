@@ -8,7 +8,7 @@
 import { makeObservable, observable } from 'mobx';
 
 import { PlaceholderContainer } from '@cloudbeaver/core-blocks';
-import { App, injectable } from '@cloudbeaver/core-di';
+import { injectable, IServiceProvider } from '@cloudbeaver/core-di';
 
 import { AdministrationUserFormService } from '../UserForm/AdministrationUserFormService';
 import { AdministrationUserFormState } from '../UserForm/AdministrationUserFormState';
@@ -24,7 +24,7 @@ export class CreateUserService {
   readonly toolsContainer: PlaceholderContainer<IToolsContainerProps>;
 
   constructor(
-    private readonly app: App,
+    private readonly serviceProvider: IServiceProvider,
     private readonly administrationUserFormService: AdministrationUserFormService,
     private readonly usersAdministrationNavigationService: UsersAdministrationNavigationService,
   ) {
@@ -50,7 +50,7 @@ export class CreateUserService {
       return;
     }
 
-    this.state = new AdministrationUserFormState(this.app, this.administrationUserFormService, { userId: null });
+    this.state = new AdministrationUserFormState(this.serviceProvider, this.administrationUserFormService, { userId: null });
     this.usersAdministrationNavigationService.navToCreate();
   }
 

@@ -20,6 +20,10 @@ export abstract class DatabaseDataResultAction<TKey, TResult extends IDatabaseDa
 {
   static dataFormat: ResultDataFormat[] | null = null;
 
+  get empty(): boolean {
+    return !this.result.data;
+  }
+
   constructor(source: IDatabaseDataSource<any, TResult>) {
     super(source);
   }
