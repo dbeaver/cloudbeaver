@@ -17,7 +17,7 @@ describe('useControlledScroll', () => {
     jest.resetAllMocks();
     jest.useFakeTimers();
     element = document.createElement('div');
-    scrollState = { scrollTop: 0, scrollLeft: 0 };
+    scrollState = { scrollTop: 100, scrollLeft: 100 };
   });
 
   it('should set initial scroll position', () => {
@@ -44,11 +44,11 @@ describe('useControlledScroll', () => {
   it('should not update scroll state when scrolling was without scroll event', () => {
     renderHook(() => useControlledScroll(element, scrollState));
 
-    element.scrollTop = 100;
+    element.scrollTop = 150;
     element.scrollLeft = 50;
 
-    expect(scrollState.scrollTop).toBe(0);
-    expect(scrollState.scrollLeft).toBe(0);
+    expect(scrollState.scrollTop).toBe(100);
+    expect(scrollState.scrollLeft).toBe(100);
   });
 
   it('should update scroll position when state changes', () => {
@@ -82,19 +82,22 @@ describe('useControlledScroll', () => {
     expect(true).toBe(true);
   });
 
-  it('should change element and apply the current state to it', () => {
+  it('should change element', () => {
     const { rerender } = renderHook(({ el, state }) => useControlledScroll(el, state), {
       initialProps: { el: element, state: scrollState },
     });
 
     const newElement = document.createElement('div');
 
+    expect(newElement.scrollTop).toBe(0);
+    expect(newElement.scrollLeft).toBe(0);
+
     rerender({ el: newElement, state: scrollState });
 
     jest.runAllTimers();
 
-    expect(newElement.scrollTop).toBe(0);
-    expect(newElement.scrollLeft).toBe(0);
+    expect(newElement.scrollTop).toBe(100);
+    expect(newElement.scrollLeft).toBe(100);
   });
 
   it('should change element and state and apply the new state to the new element', () => {
@@ -104,6 +107,9 @@ describe('useControlledScroll', () => {
 
     const newElement = document.createElement('div');
     const newState = { scrollTop: 75, scrollLeft: 25 };
+
+    expect(newElement.scrollTop).toBe(0);
+    expect(newElement.scrollLeft).toBe(0);
 
     rerender({ el: newElement, state: newState });
 
