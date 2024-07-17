@@ -63,7 +63,7 @@ describe('useObservableRef', () => {
     expect(bindFunctions).toHaveBeenCalledTimes(1);
   });
 
-  test('handles computed properties', () => {
+  test('should handle computed properties', () => {
     const init = () => ({
       count: 0,
       get doubleCount() {

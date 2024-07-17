@@ -59,6 +59,25 @@ describe('useObjectRef', () => {
     expect(bindFunctions).toHaveBeenCalledTimes(1);
   });
 
+  test('should merge update to bind', () => {
+    renderHook(() =>
+      useObjectRef(
+        () => ({
+          count: 0,
+          increment: function (this: { count: number }) {
+            this.count++;
+          },
+        }),
+        {
+          count: 0,
+        },
+        ['increment'],
+      ),
+    );
+
+    expect(bindFunctions).toHaveBeenCalledTimes(2);
+  });
+
   test('should update ref via initial state method', () => {
     type TRef = { update: { count: number; increment?: (this: { count: number }) => void } };
     const init = () => ({ count: 0 });
