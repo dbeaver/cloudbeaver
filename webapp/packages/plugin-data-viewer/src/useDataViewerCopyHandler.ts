@@ -8,7 +8,7 @@
 import type React from 'react';
 
 import { useService } from '@cloudbeaver/core-di';
-import { ENotificationType, NotificationService } from '@cloudbeaver/core-events';
+import { NotificationService } from '@cloudbeaver/core-events';
 
 import { DataViewerService } from './DataViewerService';
 
@@ -20,13 +20,10 @@ export function useDataViewerCopyHandler() {
     if (!dataViewerService.canCopyData) {
       event?.preventDefault();
 
-      notificationService.notify(
-        {
-          title: 'data_viewer_copy_not_allowed',
-          message: 'data_viewer_copy_not_allowed_message',
-        },
-        ENotificationType.Info,
-      );
+      notificationService.logInfo({
+        title: 'data_viewer_copy_not_allowed',
+        message: 'data_viewer_copy_not_allowed_message',
+      });
     }
 
     return !dataViewerService.canCopyData;
