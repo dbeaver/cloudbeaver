@@ -15,6 +15,7 @@ import {
   DATA_CONTEXT_DV_PRESENTATION,
   DATA_VIEWER_DATA_MODEL_ACTIONS_MENU,
   DataViewerPresentationType,
+  isResultSetDataModel,
 } from '@cloudbeaver/plugin-data-viewer';
 
 import { DataImportDialogLazy } from './DataImportDialog/DataImportDialogLazy';
@@ -36,11 +37,12 @@ export class DataImportBootstrap extends Bootstrap {
       id: 'data-import-base-handler',
       contexts: [DATA_CONTEXT_DV_DDM, DATA_CONTEXT_DV_DDM_RESULT_INDEX],
       actions: [ACTION_IMPORT],
+      isActionApplicable: context => isResultSetDataModel(context.get(DATA_CONTEXT_DV_DDM)),
       isDisabled(context) {
         const model = context.get(DATA_CONTEXT_DV_DDM)!;
         const resultIndex = context.get(DATA_CONTEXT_DV_DDM_RESULT_INDEX)!;
 
-        return model.isLoading() || model.isDisabled(resultIndex) || !model.getResult(resultIndex);
+        return model.isLoading() || model.isDisabled(resultIndex) || !model.source.getResult(resultIndex);
       },
       getActionInfo(_, action) {
         if (action === ACTION_IMPORT) {
@@ -50,11 +52,15 @@ export class DataImportBootstrap extends Bootstrap {
         return action.info;
       },
       handler: async (context, action) => {
-        const model = context.get(DATA_CONTEXT_DV_DDM)!;
+        const model = context.get(DATA_CONTEXT_DV_DDM)! as any;
         const resultIndex = context.get(DATA_CONTEXT_DV_DDM_RESULT_INDEX)!;
 
+        if (!isResultSetDataModel(model)) {
+          throw new Error('Execution context is not provided');
+        }
+
         if (action === ACTION_IMPORT) {
-          const result = model.getResult(resultIndex);
+          const result = model.source.getResult(resultIndex);
 
           if (!result?.id) {
             throw new Error('Result must be provided');

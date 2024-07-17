@@ -5,14 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
+import { lazy } from 'react';
 
-@import '@cloudbeaver/core-theming/src/styles/theme-light';
-@import './base-react-grid';
-
-:global .#{$theme-class} {
-  @include base-react-grid;
-
-  .cb-react-grid-theme {
-    --rdg-color-scheme: light;
-  }
-}
+export const ServiceProviderContext = lazy(() => import('./ServiceProviderContext').then(m => ({ default: m.ServiceProviderContext })));

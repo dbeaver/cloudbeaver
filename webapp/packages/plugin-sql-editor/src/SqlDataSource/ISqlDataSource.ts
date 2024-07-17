@@ -8,9 +8,9 @@
 import type { IConnectionExecutionContextInfo } from '@cloudbeaver/core-connections';
 import type { ISyncExecutor } from '@cloudbeaver/core-executor';
 import type { ILoadableState } from '@cloudbeaver/core-utils';
-import type { IDatabaseDataModel, IDatabaseResultSet } from '@cloudbeaver/plugin-data-viewer';
+import type { IDatabaseDataModel } from '@cloudbeaver/plugin-data-viewer';
 
-import type { IDataQueryOptions } from '../QueryDataSource';
+import type { QueryDataSource } from '../QueryDataSource';
 import type { ESqlDataSourceFeatures } from './ESqlDataSourceFeatures';
 import type { ISqlDataSourceHistory } from './SqlDataSourceHistory/ISqlDataSourceHistory';
 
@@ -42,7 +42,7 @@ export interface ISqlDataSource extends ILoadableState {
   readonly incomingScript?: string;
   readonly history: ISqlDataSourceHistory;
 
-  readonly databaseModels: IDatabaseDataModel<IDataQueryOptions, IDatabaseResultSet>[];
+  readonly databaseModels: IDatabaseDataModel<QueryDataSource>[];
   readonly executionContext?: IConnectionExecutionContextInfo;
 
   readonly features: ESqlDataSourceFeatures[];
@@ -55,7 +55,7 @@ export interface ISqlDataSource extends ILoadableState {
 
   readonly onUpdate: ISyncExecutor;
   readonly onSetScript: ISyncExecutor<ISetScriptData>;
-  readonly onDatabaseModelUpdate: ISyncExecutor<IDatabaseDataModel<IDataQueryOptions, IDatabaseResultSet>[]>;
+  readonly onDatabaseModelUpdate: ISyncExecutor<IDatabaseDataModel<QueryDataSource>[]>;
 
   isOpened(): boolean;
   isReadonly(): boolean;

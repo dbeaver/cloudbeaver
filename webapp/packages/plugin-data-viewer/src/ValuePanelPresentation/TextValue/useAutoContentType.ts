@@ -13,12 +13,12 @@ import { isResultSetBlobValue } from '../../DatabaseDataModel/Actions/ResultSet/
 import { isResultSetContentValue } from '../../DatabaseDataModel/Actions/ResultSet/isResultSetContentValue';
 import type { IResultSetValue, ResultSetFormatAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetFormatAction';
 import type { IDatabaseDataModel } from '../../DatabaseDataModel/IDatabaseDataModel';
-import type { IDatabaseResultSet } from '../../DatabaseDataModel/IDatabaseResultSet';
+import { ResultSetDataSource } from '../../ResultSet/ResultSetDataSource';
 import { TextValuePresentationService } from './TextValuePresentationService';
 
 interface Args {
   resultIndex: number;
-  model: IDatabaseDataModel<any, IDatabaseResultSet>;
+  model: IDatabaseDataModel<ResultSetDataSource>;
   dataFormat: ResultDataFormat | null;
   currentContentType: string | null;
   elementKey?: IResultSetElementKey;

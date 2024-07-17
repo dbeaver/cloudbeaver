@@ -16,19 +16,17 @@
  */
 package io.cloudbeaver.service.navigator;
 
+import io.cloudbeaver.WebServiceUtils;
 import io.cloudbeaver.model.WebPropertyInfo;
 import io.cloudbeaver.model.session.WebSession;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.*;
 import org.jkiss.dbeaver.model.meta.Property;
-import org.jkiss.dbeaver.model.preferences.DBPPropertyDescriptor;
 import org.jkiss.dbeaver.model.struct.*;
 import org.jkiss.dbeaver.model.struct.rdb.DBSCatalog;
 import org.jkiss.dbeaver.model.struct.rdb.DBSSchema;
 import org.jkiss.dbeaver.model.struct.rdb.DBSTable;
-import org.jkiss.dbeaver.runtime.properties.PropertyCollector;
-import org.jkiss.utils.CommonUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -90,26 +88,7 @@ public class WebDatabaseObjectInfo {
 
     @Property
     public WebPropertyInfo[] filterProperties(@Nullable WebPropertyFilter filter) {
-        PropertyCollector propertyCollector = new PropertyCollector(object, true);
-        propertyCollector.setLocale(session.getLocale());
-        propertyCollector.collectProperties();
-        List<WebPropertyInfo> webProps = new ArrayList<>();
-        for (DBPPropertyDescriptor prop : propertyCollector.getProperties()) {
-            if (filter != null && !CommonUtils.isEmpty(filter.getIds()) && !filter.getIds().contains(CommonUtils.toString(prop.getId()))) {
-                continue;
-            }
-            WebPropertyInfo webProperty = new WebPropertyInfo(session, prop, propertyCollector);
-            if (filter != null) {
-                if (!CommonUtils.isEmpty(filter.getFeatures()) && !webProperty.hasAnyFeature(filter.getFeatures())) {
-                    continue;
-                }
-                if (!CommonUtils.isEmpty(filter.getCategories()) && !filter.getCategories().contains(webProperty.getCategory())) {
-                    continue;
-                }
-            }
-            webProps.add(webProperty);
-        }
-        return webProps.toArray(new WebPropertyInfo[0]);
+        return WebServiceUtils.getObjectFilteredProperties(session, object, filter);
     }
 
     ///////////////////////////////////

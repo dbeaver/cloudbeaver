@@ -10,12 +10,11 @@ import type { ResultDataFormat } from '@cloudbeaver/core-sdk';
 import type { TabProps } from '@cloudbeaver/core-ui';
 
 import type { IDatabaseDataModel } from './DatabaseDataModel/IDatabaseDataModel';
-import type { IDatabaseDataResult } from './DatabaseDataModel/IDatabaseDataResult';
 import type { IDataTableActions } from './TableViewer/IDataTableActions';
 
-export interface IDataPresentationProps<TOptions = any, TResult extends IDatabaseDataResult = IDatabaseDataResult> {
+export interface IDataPresentationProps {
   dataFormat: ResultDataFormat;
-  model: IDatabaseDataModel<TOptions, TResult>;
+  model: IDatabaseDataModel;
   actions: IDataTableActions;
   resultIndex: number;
   simple: boolean;
@@ -27,9 +26,7 @@ export enum DataPresentationType {
   toolsPanel,
 }
 
-export type DataPresentationComponent<TOptions = any, TResult extends IDatabaseDataResult = IDatabaseDataResult> = React.FunctionComponent<
-  IDataPresentationProps<TOptions, TResult>
->;
+export type DataPresentationComponent = React.FunctionComponent<IDataPresentationProps>;
 
 export type PresentationTabProps = TabProps & {
   presentation: IDataPresentationOptions;

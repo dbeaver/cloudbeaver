@@ -8,21 +8,27 @@
 import { injectable } from '@cloudbeaver/core-di';
 import { ITabInfo, ITabInfoOptions, TabsContainer } from '@cloudbeaver/core-ui';
 
+import { IDatabaseDataModel } from '../../DatabaseDataModel/IDatabaseDataModel';
+import { ResultSetDataSource } from '../../ResultSet/ResultSetDataSource';
 import type { IDataValuePanelOptions, IDataValuePanelProps } from '../../TableViewer/ValuePanel/DataValuePanelService';
+
+export interface ITextValuePanelProps extends Omit<IDataValuePanelProps, 'model'> {
+  model: IDatabaseDataModel<ResultSetDataSource>;
+}
 
 @injectable()
 export class TextValuePresentationService {
-  readonly tabs: TabsContainer<IDataValuePanelProps<any>, IDataValuePanelOptions>;
+  readonly tabs: TabsContainer<ITextValuePanelProps, IDataValuePanelOptions>;
 
   constructor() {
     this.tabs = new TabsContainer('Value presentation');
   }
 
-  get(tabId: string): ITabInfo<IDataValuePanelProps<any>, IDataValuePanelOptions> | undefined {
+  get(tabId: string): ITabInfo<ITextValuePanelProps, IDataValuePanelOptions> | undefined {
     return this.tabs.getTabInfo(tabId);
   }
 
-  add(tabInfo: ITabInfoOptions<IDataValuePanelProps<any>, IDataValuePanelOptions>): void {
+  add(tabInfo: ITabInfoOptions<ITextValuePanelProps, IDataValuePanelOptions>): void {
     this.tabs.add(tabInfo);
   }
 }

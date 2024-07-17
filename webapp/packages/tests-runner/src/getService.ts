@@ -10,5 +10,5 @@ import type { IServiceConstructor } from '@cloudbeaver/core-di';
 import type { IApplication } from './createApp';
 
 export function getService<T>(app: IApplication, ctor: IServiceConstructor<T>): T {
-  return app.injector.getServiceByClass(ctor);
+  return app.serviceProvider.getService(ctor);
 }

@@ -11,6 +11,8 @@ import { NavNodeManagerService } from '@cloudbeaver/core-navigation-tree';
 import type { ITab } from '@cloudbeaver/plugin-navigation-tabs';
 import type { IObjectViewerTabState } from '@cloudbeaver/plugin-object-viewer';
 
+import { ContainerDataSource } from '../ContainerDataSource';
+import { IDatabaseDataModel } from '../DatabaseDataModel/IDatabaseDataModel';
 import { DataPresentationService } from '../DataPresentationService';
 import { DataViewerDataChangeConfirmationService } from '../DataViewerDataChangeConfirmationService';
 import { DataViewerTableService } from '../DataViewerTableService';
@@ -39,9 +41,9 @@ export function useDataViewerPanel(tab: ITab<IObjectViewerTabState>) {
         return;
       }
 
-      let model = tableViewerStorageService.get(tab.handlerState.tableId || '');
+      let model = tableViewerStorageService.get<IDatabaseDataModel<ContainerDataSource>>(tab.handlerState.tableId || '');
 
-      if (model && !model.source.executionContext?.context && model.source.results.length > 0) {
+      if (model && !model.isDisabled() && model.source.results.length > 0) {
         model.resetData();
       }
 

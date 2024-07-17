@@ -58,6 +58,13 @@ $mdc-checkbox-icon-size: 16px;
     @include mdc-checkbox-container-colors($mdc-theme-surface, transparent, $mdc-theme-surface, $mdc-theme-surface);
   }
 
+  .theme-checkbox_on_primary {
+    $mdc-checkbox-mark-color: $mdc-theme-primary;
+    @include mdc-checkbox-ink-color($mdc-checkbox-mark-color, $query);
+    @include mdc-checkbox-disabled-ink-color(rgba($mdc-checkbox-mark-color, 0.5), $query);
+    @include mdc-checkbox-container-colors($mdc-theme-on-primary, transparent, $mdc-theme-on-primary, $mdc-theme-on-primary);
+  }
+
   .theme-checkbox_small {
     @include mdc-checkbox-density(-3);
   }

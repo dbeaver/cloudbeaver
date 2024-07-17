@@ -59,7 +59,7 @@ export class DatabaseDataActions<TOptions, TResult extends IDatabaseDataResult> 
           if (isDatabaseDataAction(dependency)) {
             depends.push(this.get(result, dependency));
           } else {
-            depends.push(this.source.serviceInjector.getServiceByClass(dependency as any));
+            depends.push(this.source.serviceProvider.getService(dependency as any));
           }
         }
 

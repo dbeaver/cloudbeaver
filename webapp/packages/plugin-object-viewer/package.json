@@ -28,14 +28,13 @@
     "@cloudbeaver/core-projects": "^0",
     "@cloudbeaver/core-resource": "^0",
     "@cloudbeaver/core-sdk": "^0",
-    "@cloudbeaver/core-theming": "^0",
     "@cloudbeaver/core-ui": "^0",
     "@cloudbeaver/core-utils": "^0",
     "@cloudbeaver/core-view": "^0",
     "@cloudbeaver/plugin-connections": "^0",
+    "@cloudbeaver/plugin-data-grid": "^0",
     "@cloudbeaver/plugin-navigation-tabs": "^0",
     "@cloudbeaver/plugin-navigation-tree": "^0",
-    "@cloudbeaver/plugin-react-data-grid": "^0",
     "mobx": "^6",
     "mobx-react-lite": "^4",
     "react": "^18",
@@ -43,7 +42,6 @@
   },
   "peerDependencies": {},
   "devDependencies": {
-    "@cloudbeaver/core-theming": "^0",
     "@types/react": "^18",
     "typescript": "^5",
     "typescript-plugin-css-modules": "^5"

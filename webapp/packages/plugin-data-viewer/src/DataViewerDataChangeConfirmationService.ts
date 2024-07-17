@@ -35,7 +35,7 @@ export class DataViewerDataChangeConfirmationService {
     }
   }
 
-  private async checkUnsavedData({ stage, model }: IRequestEventData<any, any>, contexts: IExecutionContextProvider<IRequestEventData<any, any>>) {
+  private async checkUnsavedData({ stage, model }: IRequestEventData, contexts: IExecutionContextProvider<IRequestEventData>) {
     if (stage === 'request') {
       const confirmationContext = contexts.getContext(SaveConfirmedContext);
 
@@ -43,13 +43,13 @@ export class DataViewerDataChangeConfirmationService {
         return;
       }
 
-      const results = model.getResults();
+      const results = model.source.getResults();
 
       try {
         for (let resultIndex = 0; resultIndex < results.length; resultIndex++) {
           const editor = model.source.getActionImplementation(resultIndex, DatabaseEditAction);
 
-          if (editor?.isEdited() && model.source.executionContext?.context) {
+          if (editor?.isEdited() && !model.isDisabled(resultIndex)) {
             if (confirmationContext.confirmed) {
               await model.save();
             } else {
