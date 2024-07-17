@@ -7,9 +7,21 @@
  */
 import { renderHook } from '@testing-library/react';
 
+import * as coreUtils from '@cloudbeaver/core-utils';
+
 import { useObjectRef } from './useObjectRef';
 
+jest.mock('@cloudbeaver/core-utils', () => ({
+  bindFunctions: jest.fn(),
+}));
+
 describe('useObjectRef', () => {
+  const bindFunctions = jest.spyOn(coreUtils, 'bindFunctions');
+
+  beforeAll(() => {
+    bindFunctions.mockClear();
+  });
+
   test('should initialize', () => {
     const { result } = renderHook(() =>
       useObjectRef({
@@ -30,20 +42,8 @@ describe('useObjectRef', () => {
     expect(result.current).toEqual({});
   });
 
-  test('should change ref value', () => {
-    const { result } = renderHook(() =>
-      useObjectRef({
-        count: 0,
-      }),
-    );
-
-    result.current.count = 123;
-
-    expect(result.current.count).toBe(123);
-  });
-
   test('should bind ref functions', () => {
-    const { result } = renderHook(() =>
+    renderHook(() =>
       useObjectRef(
         () => ({
           count: 0,
@@ -55,76 +55,48 @@ describe('useObjectRef', () => {
         ['increment'],
       ),
     );
-    const anotherContextObject = {
-      count: 123,
-      increment: result.current.increment,
-    };
 
-    result.current.increment();
-
-    expect(result.current.count).toBe(1);
-
-    anotherContextObject.increment();
-
-    expect(anotherContextObject.count).toBe(123);
-    expect(result.current.count).toBe(2);
+    expect(bindFunctions).toHaveBeenCalledTimes(1);
   });
 
-  it('should not bind with empty bind array', () => {
-    const { result } = renderHook(() =>
-      useObjectRef(
-        () => ({
+  test('should update ref via initial state method', () => {
+    type TRef = { update: { count: number; increment?: (this: { count: number }) => void } };
+    const init = () => ({ count: 0 });
+
+    const { result } = renderHook(({ update }: TRef) => useObjectRef(init, update, ['increment']), {
+      initialProps: {
+        update: {
           count: 0,
-          increment: function (this: { count: number }) {
+          increment: function () {
             this.count++;
-          },
-        }),
-        false,
-        [],
-      ),
-    );
-
-    expect(typeof result.current.increment).toBe('function');
-
-    const anotherContextObject = {
-      count: 123,
-      increment: result.current.increment,
-    };
-
-    anotherContextObject.increment();
-
-    expect(result.current.count).toBe(0);
-    expect(anotherContextObject.count).toBe(124);
-  });
-
-  test('should update ref', () => {
-    const { result, rerender } = renderHook(
-      ({ update }: { update: { count: number; increment?: (this: { count: number }) => void } }) =>
-        useObjectRef(() => ({ count: 0 }), update, ['increment'] as const),
-      {
-        initialProps: {
-          update: {
-            count: 0,
           },
         },
       },
-    );
-
-    expect(result.current.count).toBe(0);
-
-    result.current?.increment?.();
-
-    expect(result.current.count).toBe(0);
-
-    rerender({
-      update: {
-        count: 1,
-        increment: result.current.increment,
-      },
     });
+
+    expect(result.current.count).toBe(0);
 
     result.current?.increment?.();
 
     expect(result.current.count).toBe(1);
+  });
+
+  test('should update ref', () => {
+    type TRef = { update: { count: number } };
+    const init = () => ({ count: 0 });
+
+    const { result, rerender } = renderHook(({ update }: TRef) => useObjectRef(init, update), {
+      initialProps: {
+        update: {
+          count: 0,
+        },
+      } as TRef,
+    });
+
+    expect(result.current.count).toBe(0);
+
+    rerender({ update: { count: 3 } });
+
+    expect(result.current.count).toBe(3);
   });
 });

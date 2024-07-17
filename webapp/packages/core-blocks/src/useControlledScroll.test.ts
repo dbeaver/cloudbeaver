@@ -82,6 +82,37 @@ describe('useControlledScroll', () => {
     expect(true).toBe(true);
   });
 
+  it('should change element and apply the current state to it', () => {
+    const { rerender } = renderHook(({ el, state }) => useControlledScroll(el, state), {
+      initialProps: { el: element, state: scrollState },
+    });
+
+    const newElement = document.createElement('div');
+
+    rerender({ el: newElement, state: scrollState });
+
+    jest.runAllTimers();
+
+    expect(newElement.scrollTop).toBe(0);
+    expect(newElement.scrollLeft).toBe(0);
+  });
+
+  it('should change element and state and apply the new state to the new element', () => {
+    const { rerender } = renderHook(({ el, state }) => useControlledScroll(el, state), {
+      initialProps: { el: element, state: scrollState },
+    });
+
+    const newElement = document.createElement('div');
+    const newState = { scrollTop: 75, scrollLeft: 25 };
+
+    rerender({ el: newElement, state: newState });
+
+    jest.runAllTimers();
+
+    expect(newElement.scrollTop).toBe(75);
+    expect(newElement.scrollLeft).toBe(25);
+  });
+
   it('should remove event listener if element becomes null', () => {
     const { rerender } = renderHook(({ el, state }) => useControlledScroll(el, state), {
       initialProps: { el: element as HTMLDivElement | null, state: scrollState },

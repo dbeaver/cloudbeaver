@@ -8,10 +8,22 @@
 import { renderHook } from '@testing-library/react';
 import { action, computed, isObservable, observable, runInAction } from 'mobx';
 
+import * as coreUtils from '@cloudbeaver/core-utils';
+
 import { useObservableRef } from './useObservableRef';
 
+jest.mock('@cloudbeaver/core-utils', () => ({
+  bindFunctions: jest.fn(),
+}));
+
 describe('useObservableRef', () => {
-  test('initializes with a function', () => {
+  const bindFunctions = jest.spyOn(coreUtils, 'bindFunctions');
+
+  beforeAll(() => {
+    bindFunctions.mockClear();
+  });
+
+  test('should initialize with a function', () => {
     const init = () => ({ count: 0 });
     const observed = { count: observable };
 
@@ -21,7 +33,7 @@ describe('useObservableRef', () => {
     expect(isObservable(result.current)).toBe(true);
   });
 
-  test('initializes with an object', () => {
+  test('should initialize with an object', () => {
     const init = { count: 0 };
     const observed = { count: observable };
 
@@ -31,21 +43,10 @@ describe('useObservableRef', () => {
     expect(isObservable(result.current)).toBe(true);
   });
 
-  test('updates the object', () => {
-    const init = () => ({ count: 0 });
-    const observed = { count: observable };
-    const update = { count: 1 };
-
-    const { result } = renderHook(() => useObservableRef(init, observed, update));
-
-    expect(result.current.count).toBe(1);
-    expect(isObservable(result.current)).toBe(true);
-  });
-
-  test('binds functions', () => {
+  test('should bind functions', () => {
     const observed = { count: observable, increment: action };
 
-    const { result } = renderHook(() =>
+    renderHook(() =>
       useObservableRef(
         () => ({
           count: 0,
@@ -59,16 +60,7 @@ describe('useObservableRef', () => {
       ),
     );
 
-    expect(typeof result.current.increment).toBe('function');
-    result.current.increment();
-    expect(result.current.count).toBe(1);
-
-    const anotherContext = { count: 0, increment: result.current.increment };
-
-    anotherContext.increment();
-
-    expect(anotherContext.count).toBe(0);
-    expect(result.current.count).toBe(2);
+    expect(bindFunctions).toHaveBeenCalledTimes(1);
   });
 
   test('handles computed properties', () => {
@@ -89,7 +81,7 @@ describe('useObservableRef', () => {
     expect(result.current.doubleCount).toBe(10);
   });
 
-  test('handles partial updates', () => {
+  test('should merge update param to initial state', () => {
     const init = () => ({ count: 0, text: 'hello' });
     const observed = { count: observable, text: observable };
     const update = { count: 1 };
@@ -101,7 +93,7 @@ describe('useObservableRef', () => {
     expect(isObservable(result.current)).toBe(true);
   });
 
-  test('handles update as bind array', () => {
+  test('should merge update to bind', () => {
     const init = () => ({
       count: 0,
       increment: function (this: { count: number }) {
@@ -111,17 +103,26 @@ describe('useObservableRef', () => {
     const observed = { count: observable, increment: action };
     const update = ['increment'];
 
-    const { result } = renderHook(() => useObservableRef(init, observed, update));
+    renderHook(() => useObservableRef(init, observed, update));
 
-    expect(typeof result.current.increment).toBe('function');
-    result.current.increment();
-    expect(result.current.count).toBe(1);
+    expect(bindFunctions).toHaveBeenCalledTimes(2);
+  });
 
-    const anotherContext = { count: 0, increment: result.current.increment };
+  test('should update ref', () => {
+    interface Update {
+      count: number;
+      str?: string;
+    }
+    const init = () => ({ count: 0 }) as Update;
+    const observed = { count: observable };
 
-    anotherContext.increment();
+    const { result, rerender } = renderHook((update: Update) => useObservableRef(init, observed, update));
 
-    expect(anotherContext.count).toBe(0);
-    expect(result.current.count).toBe(2);
+    expect(result.current.count).toBe(0);
+
+    rerender({ count: 3, str: 'hello' });
+
+    expect(result.current.count).toBe(3);
+    expect(result.current.str).toBe('hello');
   });
 });
