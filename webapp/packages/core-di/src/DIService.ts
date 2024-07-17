@@ -7,23 +7,19 @@
  */
 import type { IExecutorHandlersCollection, ISyncContextLoader } from '@cloudbeaver/core-executor';
 
-import { App } from './App';
 import { dependencyInjectorContext } from './dependencyInjectorContext';
-import type { IServiceConstructor, IServiceInjector } from './IApp';
+import type { IServiceConstructor } from './IApp';
 import { injectable } from './injectable';
+import { IServiceProvider } from './IServiceProvider';
 
 @injectable()
 export class DIService {
-  get serviceInjector(): IServiceInjector {
-    return this.app.getServiceInjector();
-  }
-
-  constructor(private readonly app: App) {}
+  constructor(private readonly serviceProvider: IServiceProvider) {}
 
   addDIContext(context: IExecutorHandlersCollection<any>): void {
     context.addContextCreator(dependencyInjectorContext, this.dependencyInjectorContext);
   }
 
   private readonly dependencyInjectorContext: ISyncContextLoader<<T>(ctor: IServiceConstructor<T>) => T> = () =>
-    this.serviceInjector.getServiceByClass.bind(this);
+    this.serviceProvider.getService.bind(this.serviceProvider);
 }

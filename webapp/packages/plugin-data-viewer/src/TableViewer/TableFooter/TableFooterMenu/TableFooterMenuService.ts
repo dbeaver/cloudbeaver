@@ -89,7 +89,7 @@ export class TableFooterMenuService {
         const model = context.get(DATA_CONTEXT_DV_DDM)!;
         const resultIndex = context.get(DATA_CONTEXT_DV_DDM_RESULT_INDEX)!;
 
-        if (model.isLoading() || model.isDisabled(resultIndex) || !model.getResult(resultIndex)) {
+        if (model.isLoading() || model.isDisabled(resultIndex) || !model.source.getResult(resultIndex)) {
           return true;
         }
 

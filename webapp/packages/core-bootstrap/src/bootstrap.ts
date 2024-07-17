@@ -26,7 +26,7 @@ export async function bootstrap(plugins: PluginManifest[]): Promise<App> {
   }
 
   const { renderLayout } = await import('./renderLayout');
-  const render = renderLayout(app.getServiceInjector());
+  const render = renderLayout(app.getServiceProvider());
   const unmountExecutor = new SyncExecutor();
 
   unmountExecutor.addHandler(() => render.unmount());

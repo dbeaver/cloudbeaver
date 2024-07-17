@@ -5,13 +5,13 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import type { App } from '@cloudbeaver/core-di';
+import type { IServiceProvider } from '@cloudbeaver/core-di';
 import { FormState } from '@cloudbeaver/core-ui';
 
 import type { AdministrationUserFormService, IUserFormState } from './AdministrationUserFormService';
 
 export class AdministrationUserFormState extends FormState<IUserFormState> {
-  constructor(app: App, service: AdministrationUserFormService, config: IUserFormState) {
-    super(app, service, config);
+  constructor(serviceProvider: IServiceProvider, service: AdministrationUserFormService, config: IUserFormState) {
+    super(serviceProvider, service, config);
   }
 }

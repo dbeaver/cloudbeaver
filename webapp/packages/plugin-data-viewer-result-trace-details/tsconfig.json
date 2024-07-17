@@ -19,19 +19,13 @@
       "path": "../core-sdk/tsconfig.json"
     },
     {
-      "path": "../core-theming/tsconfig.json"
-    },
-    {
-      "path": "../core-theming/tsconfig.json"
-    },
-    {
       "path": "../core-utils/tsconfig.json"
     },
     {
-      "path": "../plugin-data-viewer/tsconfig.json"
+      "path": "../plugin-data-grid/tsconfig.json"
     },
     {
-      "path": "../plugin-react-data-grid/tsconfig.json"
+      "path": "../plugin-data-viewer/tsconfig.json"
     }
   ],
   "include": [

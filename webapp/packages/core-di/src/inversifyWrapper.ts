@@ -7,7 +7,6 @@
  */
 import { DIContainer } from './DIContainer';
 import type { IServiceCollection, IServiceConstructor, IServiceInjector } from './IApp';
-import type { ValueToken } from './InjectionToken';
 
 export interface IDiWrapper {
   injector: IServiceInjector;
@@ -25,9 +24,6 @@ export const inversifyWrapper: IDiWrapper = {
     getServiceByClass<T>(ctor: IServiceConstructor<T>): T {
       return mainContainer.getServiceByClass(ctor);
     },
-    getServiceByToken<T>(token: any): T {
-      return mainContainer.getServiceByToken(token);
-    },
     resolveServiceByClass<T>(ctor: IServiceConstructor<T>): T {
       return mainContainer.resolveServiceByClass(ctor);
     },
@@ -36,10 +32,6 @@ export const inversifyWrapper: IDiWrapper = {
   collection: {
     addServiceByClass(Ctor: IServiceConstructor<any>, value?: any): void {
       mainContainer.addServiceByClass(Ctor, value);
-    },
-
-    addServiceByToken<T extends Record<string, unknown>>(token: ValueToken<T> | IServiceConstructor<T>, value: T): void {
-      mainContainer.addServiceByToken(token, value);
     },
     unbindAll() {
       mainContainer.unbindAll();

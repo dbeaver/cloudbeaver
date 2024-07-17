@@ -6,10 +6,15 @@
  * you may not use this file except in compliance with the License.
  */
 import type { TabContainerPanelComponent } from '@cloudbeaver/core-ui';
-import type { IDatabaseResultSet, IDataValuePanelProps } from '@cloudbeaver/plugin-data-viewer';
+import { type IDataValuePanelProps, isResultSetDataModel } from '@cloudbeaver/plugin-data-viewer';
 
 import { GISValuePresentation } from './GISValuePresentation';
 
-export const GISViewer: TabContainerPanelComponent<IDataValuePanelProps<any, IDatabaseResultSet>> = function GISViewer({ model, resultIndex }) {
+export const GISViewer: TabContainerPanelComponent<IDataValuePanelProps> = function GISViewer({ model: unknownModel, resultIndex }) {
+  const model = unknownModel as any;
+  if (!isResultSetDataModel(model)) {
+    throw new Error('GISViewer can only be used with ResultSetDataSource');
+  }
+
   return <GISValuePresentation model={model} resultIndex={resultIndex} />;
 };

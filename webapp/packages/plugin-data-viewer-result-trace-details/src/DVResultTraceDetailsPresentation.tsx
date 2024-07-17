@@ -7,13 +7,13 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import { Container, TextPlaceholder, useAutoLoad, useS, useTranslate } from '@cloudbeaver/core-blocks';
+import { s, TextPlaceholder, useAutoLoad, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import { DynamicTraceProperty } from '@cloudbeaver/core-sdk';
-import type { DataPresentationComponent, IDatabaseResultSet } from '@cloudbeaver/plugin-data-viewer';
-import DataGrid, { Column } from '@cloudbeaver/plugin-react-data-grid';
+import { type Column, DataGrid } from '@cloudbeaver/plugin-data-grid';
+import { type DataPresentationComponent, IDatabaseDataOptions, isResultSetDataModel, isResultSetDataSource } from '@cloudbeaver/plugin-data-viewer';
 
+import classes from './DVResultTraceDetailsPresentation.module.css';
 import { HeaderCell } from './ResultTraceDetailsTable/HeaderCell';
-import { RESULT_TRACE_DETAILS_TABLE_THEME_BASE_STYLES } from './styles/styles';
 import { useResultTraceDetails } from './useResultTraceDetails';
 
 const COLUMNS: Column<DynamicTraceProperty>[] = [
@@ -40,22 +40,26 @@ const COLUMNS: Column<DynamicTraceProperty>[] = [
   },
 ];
 
-export const DVResultTraceDetailsPresentation: DataPresentationComponent<any, IDatabaseResultSet> = observer(
-  function DVResultTraceDetailsPresentation({ model, resultIndex }) {
-    const translate = useTranslate();
-    const state = useResultTraceDetails(model, resultIndex);
+export const DVResultTraceDetailsPresentation: DataPresentationComponent = observer(function DVResultTraceDetailsPresentation({
+  model,
+  resultIndex,
+}) {
+  if (!isResultSetDataModel<IDatabaseDataOptions>(model)) {
+    throw new Error('DVResultTraceDetailsPresentation can only be used with ResultSetDataSource');
+  }
+  const translate = useTranslate();
+  const styles = useS(classes);
+  const state = useResultTraceDetails(model, resultIndex);
 
-    useS(RESULT_TRACE_DETAILS_TABLE_THEME_BASE_STYLES);
-    useAutoLoad(DVResultTraceDetailsPresentation, state, undefined, undefined, true);
+  useAutoLoad(DVResultTraceDetailsPresentation, state, undefined, undefined, true);
 
-    if (!state.trace?.length) {
-      return <TextPlaceholder>{translate('plugin_data_viewer_result_trace_no_data_placeholder')}</TextPlaceholder>;
-    }
+  if (!state.trace?.length) {
+    return <TextPlaceholder>{translate('plugin_data_viewer_result_trace_no_data_placeholder')}</TextPlaceholder>;
+  }
 
-    return (
-      <Container className="result-trace-details-grid-container" overflow>
-        <DataGrid className="result-trace-details-grid-theme" rows={state.trace} rowKeyGetter={row => row.name} columns={COLUMNS} rowHeight={30} />
-      </Container>
-    );
-  },
-);
+  return (
+    <div className={s(styles, { container: true })}>
+      <DataGrid rows={state.trace} rowKeyGetter={row => row.name} columns={COLUMNS} rowHeight={30} />
+    </div>
+  );
+});

@@ -8,7 +8,7 @@
 import { action, computed, makeObservable, observable } from 'mobx';
 
 import { DataContext, dataContextAddDIProvider, DataContextGetter, type IDataContext } from '@cloudbeaver/core-data-context';
-import type { App } from '@cloudbeaver/core-di';
+import type { IServiceProvider } from '@cloudbeaver/core-di';
 import type { ENotificationType } from '@cloudbeaver/core-events';
 import { Executor, ExecutorInterrupter, IExecutionContextProvider, type IExecutor } from '@cloudbeaver/core-executor';
 import { isLoadableStateHasException, MetadataMap, uuid } from '@cloudbeaver/core-utils';
@@ -48,7 +48,7 @@ export class FormState<TState> implements IFormState<TState> {
   readonly formatTask: IExecutor<IFormState<TState>>;
   readonly validationTask: IExecutor<IFormState<TState>>;
 
-  constructor(app: App, service: FormBaseService<TState, any>, state: TState) {
+  constructor(serviceProvider: IServiceProvider, service: FormBaseService<TState, any>, state: TState) {
     this.id = uuid();
     this.service = service;
     this.dataContext = new DataContext();
@@ -84,7 +84,7 @@ export class FormState<TState> implements IFormState<TState> {
 
     this.dataContext.set(DATA_CONTEXT_LOADABLE_STATE, loadableStateContext(), this.id);
     this.dataContext.set(DATA_CONTEXT_FORM_STATE, this, this.id);
-    dataContextAddDIProvider(this.dataContext, app, this.id);
+    dataContextAddDIProvider(this.dataContext, serviceProvider, this.id);
 
     makeObservable<this>(this, {
       mode: observable,

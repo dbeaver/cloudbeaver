@@ -6,5 +6,5 @@
  * you may not use this file except in compliance with the License.
  */
 .checkbox {
-  composes: theme-checkbox_surface from global;
+  composes: theme-checkbox_on_primary from global;
 }

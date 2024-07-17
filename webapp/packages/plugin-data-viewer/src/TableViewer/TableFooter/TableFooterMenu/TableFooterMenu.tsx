@@ -7,7 +7,7 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import { Container, CRegistry, s, useS } from '@cloudbeaver/core-blocks';
+import { CRegistry, s, useS } from '@cloudbeaver/core-blocks';
 import { useDataContextLink } from '@cloudbeaver/core-data-context';
 import { MenuBar, MenuBarItemStyles, MenuBarStyles } from '@cloudbeaver/core-ui';
 import { useMenu } from '@cloudbeaver/core-view';
@@ -21,7 +21,7 @@ import { REFRESH_MENU_ITEM_REGISTRY } from './RefreshAction/RefreshMenuAction';
 
 interface Props {
   resultIndex: number;
-  model: IDatabaseDataModel<any, any>;
+  model: IDatabaseDataModel;
   simple: boolean;
   className?: string;
 }

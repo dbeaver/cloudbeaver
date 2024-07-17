@@ -49,8 +49,8 @@ const overrideConfig = {
 };
 
 test('New settings override deprecated settings', async () => {
-  const settings = app.injector.getServiceByClass(EventsSettingsService);
-  const config = app.injector.getServiceByClass(ServerConfigResource);
+  const settings = app.serviceProvider.getService(EventsSettingsService);
+  const config = app.serviceProvider.getService(ServerConfigResource);
 
   server.use(endpoint.query('serverConfig', mockServerConfig(overrideConfig)));
 
@@ -62,8 +62,8 @@ test('New settings override deprecated settings', async () => {
 });
 
 test('Deprecated settings accessible with new settings', async () => {
-  const settings = app.injector.getServiceByClass(EventsSettingsService);
-  const config = app.injector.getServiceByClass(ServerConfigResource);
+  const settings = app.serviceProvider.getService(EventsSettingsService);
+  const config = app.serviceProvider.getService(ServerConfigResource);
 
   server.use(endpoint.query('serverConfig', mockServerConfig(oldConfig)));
 
