@@ -66,6 +66,7 @@
     "@cloudbeaver/plugin-navigation-tree": "^0",
     "@cloudbeaver/plugin-object-viewer": "^0",
     "@cloudbeaver/tests-runner": "^0",
+    "@jest/globals": "^29.7.0",
     "@testing-library/jest-dom": "^6",
     "@types/jest": "^29",
     "@types/react": "^18",

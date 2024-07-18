@@ -24,6 +24,7 @@
     "mobx": "^6"
   },
   "devDependencies": {
+    "@jest/globals": "^29.7.0",
     "@types/jest": "^29",
     "mobx": "^6",
     "typescript": "^5"

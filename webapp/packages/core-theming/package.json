@@ -36,6 +36,7 @@
     "@cloudbeaver/core-settings": "^0",
     "@cloudbeaver/tests-runner": "^0",
     "@fontsource/roboto": "^5",
+    "@jest/globals": "^29.7.0",
     "@material/button": "^4",
     "@material/checkbox": "^4",
     "@material/elevation": "^4",
