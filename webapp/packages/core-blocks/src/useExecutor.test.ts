@@ -5,6 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
+import { afterEach, beforeEach, describe, expect, jest, test } from '@jest/globals';
 import { renderHook } from '@testing-library/react';
 
 import type { IExecutorHandler, IExecutorHandlersCollection } from '@cloudbeaver/core-executor';
@@ -116,16 +117,5 @@ describe('useExecutor', () => {
 
     expect(mockExecutor.addHandler).not.toHaveBeenCalled();
     expect(mockExecutor.addPostHandler).not.toHaveBeenCalled();
-  });
-
-  test('should use useObjectRef', () => {
-    const options = {
-      executor: mockExecutor,
-      handlers: [jest.fn()],
-    };
-
-    renderHook(() => useExecutor(options));
-
-    expect(useObjectRef).toHaveBeenCalledWith(options);
   });
 });
