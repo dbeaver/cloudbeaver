@@ -10,7 +10,8 @@ import { type IDataValuePanelProps, isResultSetDataModel } from '@cloudbeaver/pl
 
 import { GISValuePresentation } from './GISValuePresentation';
 
-export const GISViewer: TabContainerPanelComponent<IDataValuePanelProps> = function GISViewer({ model, resultIndex }) {
+export const GISViewer: TabContainerPanelComponent<IDataValuePanelProps> = function GISViewer({ model: unknownModel, resultIndex }) {
+  const model = unknownModel as any;
   if (!isResultSetDataModel(model)) {
     throw new Error('GISViewer can only be used with ResultSetDataSource');
   }

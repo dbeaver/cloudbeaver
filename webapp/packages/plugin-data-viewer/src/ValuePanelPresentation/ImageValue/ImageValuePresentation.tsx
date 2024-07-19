@@ -21,9 +21,10 @@ import styles from './ImageValuePresentation.module.css';
 import { useValuePanelImageValue } from './useValuePanelImageValue';
 
 export const ImageValuePresentation: TabContainerPanelComponent<IDataValuePanelProps> = observer(function ImageValuePresentation({
-  model,
+  model: unknownModel,
   resultIndex,
 }) {
+  const model = unknownModel as any;
   if (!isResultSetDataModel(model)) {
     throw new Error('ImageValuePresentation can be used only with ResultSetDataSource');
   }

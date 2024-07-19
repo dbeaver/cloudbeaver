@@ -191,8 +191,8 @@ export class DVResultSetGroupingPluginBootstrap extends Bootstrap {
       icon: '/icons/plugin_data_viewer_result_set_grouping_m.svg',
       dataFormat: ResultDataFormat.Resultset,
       hidden: (dataFormat, model, resultIndex) => {
-        const source = model.source;
-        if (!source.hasResult(resultIndex) || !isResultSetDataSource(source)) {
+        const source = model.source as any;
+        if (!isResultSetDataSource(source) || !source.hasResult(resultIndex)) {
           return true;
         }
 

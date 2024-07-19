@@ -16,7 +16,6 @@ mkdir ./cloudbeaver
 mkdir ./cloudbeaver/server
 mkdir ./cloudbeaver/conf
 mkdir ./cloudbeaver/workspace
-mkdir ./cloudbeaver/web
 
 echo "Pull cloudbeaver platform"
 
