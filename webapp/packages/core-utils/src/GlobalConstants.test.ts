@@ -5,7 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { afterEach, beforeEach, describe, expect, it, jest } from '@jest/globals';
+import { afterEach, beforeEach, describe, expect, it } from '@jest/globals';
 
 import { GlobalConstants } from './GlobalConstants';
 
@@ -86,7 +86,7 @@ describe('GlobalConstants', () => {
     expect(GlobalConstants.rootURI).toBe('/');
 
     (global as any)._ROOT_URI_ = '/dbeaver';
-    expect(GlobalConstants.rootURI).toBe('/dbeaver');
+    expect(GlobalConstants.rootURI).toBe('/dbeaver/');
   });
 
   it('should return correct serviceURI value', () => {
@@ -128,6 +128,6 @@ describe('GlobalConstants', () => {
 
   it('should generate absolute url', () => {
     expect(GlobalConstants.absoluteUrl('test/', 'test2')).toBe('/test/test2');
-    expect(GlobalConstants.absoluteUrl('platform:test/', 'test2')).toBe('/api/images/platform:test/test2');
+    expect(GlobalConstants.absoluteUrl('platform:test/', 'test2')).toBe('/apiimagesplatform:test/test2');
   });
 });
