@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 import { describe, expect, it, jest } from '@jest/globals';
-import { fireEvent, screen, waitFor } from '@testing-library/react';
+import { fireEvent, queryByAttribute, waitFor } from '@testing-library/react';
 
 import { createApp, renderInApp } from '@cloudbeaver/tests-runner';
 
@@ -20,7 +20,7 @@ describe('Link', () => {
     const linkElement = await waitFor(() => getByText('Test Link'));
 
     expect(linkElement.tagName).toBe('A');
-    expect(await screen.findByText('Test Link')).toBe(linkElement);
+    expect(linkElement).toBeInTheDocument();
   });
 
   it('should display the indicator icon when indicator is true', async () => {
@@ -31,7 +31,8 @@ describe('Link', () => {
       app,
     );
 
-    expect(container.querySelector('use')?.getAttribute('href')).toBe('/icons/icons.svg#external-link');
+    const icon = await waitFor(() => queryByAttribute('href', container, /external-link/i));
+    expect(icon).toBeInTheDocument();
   });
 
   it('should apply the className correctly', async () => {
@@ -43,7 +44,7 @@ describe('Link', () => {
     );
 
     const linkContainer = await waitFor(() => getByText('Test Link').closest('div'));
-    expect(linkContainer?.className).toBe('custom-class');
+    expect(linkContainer).toHaveClass('custom-class');
   });
 
   it('should handle onClick event', async () => {

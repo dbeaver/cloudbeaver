@@ -56,7 +56,6 @@
     "@pmmmwh/react-refresh-webpack-plugin": "^0",
     "@swc/core": "^1",
     "@swc/jest": "^0",
-    "@types/jest": "^29",
     "@types/madge": "^5",
     "fake-indexeddb": "^6",
     "glob": "^11",

@@ -36,4 +36,6 @@ module.exports = {
     // https://mswjs.io/docs/migrations/1.x-to-2.x#cannot-find-module-mswnode-jsdom
     customExportConditions: [''],
   },
+  // unset all global variables
+  globals: {},
 };

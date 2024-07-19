@@ -7,27 +7,27 @@
  */
 import { expect, test } from '@jest/globals';
 import '@testing-library/jest-dom';
-import { render } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 
 import { Icon } from './Icon';
 
-test('icons.svg#name', async () => {
+test('icons.svg#name', () => {
   (globalThis as any)._ROOT_URI_ = undefined;
 
-  const { container } = render(<Icon data-testid="Icon" name="test" />);
-  expect(container.querySelector('use')?.getAttribute('href')).toBe('/icons/icons.svg#test');
+  render(<Icon data-testid="Icon" name="test" />);
+  expect(screen.getByTestId('Icon').querySelector('use')).toHaveAttribute('href', '/icons/icons.svg#test');
 });
 
 test('/image.jpg', () => {
   (globalThis as any)._ROOT_URI_ = undefined;
 
-  const { container } = render(<Icon data-testid="Icon" name="/image.jpg" />);
-  expect(container.querySelector('use')?.getAttribute('href')).toBe('/image.jpg');
+  render(<Icon data-testid="Icon" name="/image.jpg" />);
+  expect(screen.getByTestId('Icon').querySelector('use')).toHaveAttribute('href', '/image.jpg');
 });
 
 test('{_ROOT_URI_}/icons.svg#name', () => {
   (globalThis as any)._ROOT_URI_ = '/path/';
 
-  const { container } = render(<Icon data-testid="Icon" name="test" />);
-  expect(container.querySelector('use')?.getAttribute('href')).toBe('/path/icons/icons.svg#test');
+  render(<Icon data-testid="Icon" name="test" />);
+  expect(screen.getByTestId('Icon').querySelector('use')).toHaveAttribute('href', '/path/icons/icons.svg#test');
 });

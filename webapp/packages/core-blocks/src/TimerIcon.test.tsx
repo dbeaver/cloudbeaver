@@ -16,26 +16,28 @@ const app = createApp();
 
 describe('TimerIcon', () => {
   it('renders correctly with state "play" and interval 30', async () => {
-    const { container } = renderInApp(<TimerIcon state="play" interval={30} />, app);
-    await waitFor(() => {
-      expect(screen.getByText('30')).toBeTruthy();
-      expect(queryByAttribute('href', container, '/icons/timer-play_m.svg#root')).toBeTruthy();
-    });
+    const { getByText, container } = renderInApp(<TimerIcon state="play" interval={30} />, app);
+    const text = await waitFor(() => getByText('30'));
+    const name = await waitFor(() => queryByAttribute('href', container, '/icons/timer-play_m.svg#root'));
+
+    expect(name).toBeInTheDocument();
+    expect(text).toBeInTheDocument();
   });
 
   it('renders correctly with state "stop" and interval 60', async () => {
-    const { container } = renderInApp(<TimerIcon state="stop" interval={60} />, app);
-    await waitFor(() => {
-      expect(screen.getByText('60')).toBeTruthy();
-      expect(queryByAttribute('href', container, '/icons/timer-stop_m.svg#root')).toBeTruthy();
-    });
+    const { getByText, container } = renderInApp(<TimerIcon state="stop" interval={60} />, app);
+    const text = await waitFor(() => getByText('60'));
+    const name = await waitFor(() => queryByAttribute('href', container, '/icons/timer-stop_m.svg#root'));
+
+    expect(name).toBeInTheDocument();
+    expect(text).toBeInTheDocument();
   });
 
   it('passes HTML attributes correctly', () => {
-    renderInApp(<TimerIcon state="play" interval={30} id="custom-id" data-testid="custom-testid" />, app);
+    const { container } = renderInApp(<TimerIcon state="play" interval={30} id="custom-id" data-testid="custom-testid" />, app);
 
-    const element = screen.getByTestId('custom-testid');
-    expect(element.id).toBe('custom-id');
-    expect(element.getAttribute('data-testid')).toBe('custom-testid');
+    const div = container.firstChild;
+    expect(div).toHaveAttribute('id', 'custom-id');
+    expect(div).toHaveAttribute('data-testid', 'custom-testid');
   });
 });
