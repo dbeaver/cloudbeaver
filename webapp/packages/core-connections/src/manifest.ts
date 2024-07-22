@@ -18,6 +18,7 @@ export const manifest: PluginManifest = {
     () => import('./ConnectionExecutionContext/ConnectionExecutionContextService').then(m => m.ConnectionExecutionContextService),
     () => import('./ConnectionsManagerService').then(m => m.ConnectionsManagerService),
     () => import('./ConnectionInfoResource').then(m => m.ConnectionInfoResource),
+    () => import('./ConnectionToolsResource').then(m => m.ConnectionToolsResource),
     () => import('./ContainerResource').then(m => m.ContainerResource),
     () => import('./ConnectionsLocaleService').then(m => m.ConnectionsLocaleService),
     () => import('./DatabaseAuthModelsResource').then(m => m.DatabaseAuthModelsResource),

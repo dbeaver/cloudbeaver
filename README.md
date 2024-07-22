@@ -22,6 +22,24 @@ You can see live demo of CloudBeaver here: https://demo.cloudbeaver.io
 
 ## Changelog
 
+### 24.1.3. 2024-07-22
+- Data Editor:
+  -    Enhanced IPv6 and DateTime32 data representation for Clickhouse;
+  -    Data editing was fixed for DuckDB;
+- SQL Editor:
+  -    We changed the save script icon to a floppy disk for better recognition;
+  -    The 'Use long objects names' preference behavior was enhanced for auto-completion actions;
+- DDL generation for Oracle Tablespaces was added (thanks to @pandya09);
+- Many minor bug fixes, enhancements, and improvements have been made.
+
+### 24.1.2. 2024-07-08
+- Added the ability to change the default commit mode for each connection separately;
+- Added additional notifications about restricted operations;
+- Improved application behavior when closing a connection - open editors won't be closed on disconnect;
+- Added the "Keep alive" setting for Db2 LUW and IMB i, Apache Kyuubi, Clickhouse, Firebird and Trino;
+- Fixed the dollar-quoted string parsing in the SQL editor for PostgreSQL;
+- Many minor bug fixes, enhancements, and improvements have been made.
+  
 ### 24.1.1. 2024-06-24
 - Unauthorized access vulnerability was fixed;
 - French language support was added (thanks to @matthieukhl);

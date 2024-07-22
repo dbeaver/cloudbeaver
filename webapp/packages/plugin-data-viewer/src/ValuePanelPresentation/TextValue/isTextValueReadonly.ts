@@ -9,12 +9,12 @@ import type { IResultSetElementKey } from '../../DatabaseDataModel/Actions/Resul
 import type { ResultSetDataContentAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetDataContentAction';
 import type { ResultSetFormatAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetFormatAction';
 import type { IDatabaseDataModel } from '../../DatabaseDataModel/IDatabaseDataModel';
-import type { IDatabaseResultSet } from '../../DatabaseDataModel/IDatabaseResultSet';
+import { ResultSetDataSource } from '../../ResultSet/ResultSetDataSource';
 
 interface Args {
   contentAction: ResultSetDataContentAction;
   formatAction: ResultSetFormatAction;
-  model: IDatabaseDataModel<any, IDatabaseResultSet>;
+  model: IDatabaseDataModel<ResultSetDataSource>;
   resultIndex: number;
   cell: IResultSetElementKey | undefined;
 }

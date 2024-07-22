@@ -6,6 +6,15 @@
  * you may not use this file except in compliance with the License.
  */
 .container {
+  --data-grid-edited-color: rgba(255, 153, 0, 0.3);
+  --data-grid-added-color: rgba(145, 255, 0, 0.3);
+  --data-grid-deleted-color: rgba(255, 51, 0, 0.3);
+  --data-grid-order-button-unordered: #c4c4c4;
+  --data-grid-readonly-status-color: #e28835;
+  --data-grid-cell-selection-background-color: rgba(150, 150, 150, 0.2);
+  --data-grid-cell-selection-background-color-focus: rgba(0, 145, 234, 0.2);
+
+  composes: theme-typography--caption from global;
   outline: 0;
   display: flex;
   flex-direction: column;
@@ -13,4 +22,65 @@
   overflow: auto;
   user-select: none;
   -webkit-user-select: none;
+
+  :global(.rdg-cell-custom-edited) {
+    background-color: var(--data-grid-edited-color) !important;
+  }
+
+  :global(.rdg-cell-custom-added) {
+    background-color: var(--data-grid-added-color) !important;
+  }
+
+  :global(.rdg-cell-custom-deleted) {
+    background-color: var(--data-grid-deleted-color) !important;
+  }
+}
+
+.container .grid {
+  :global(.rdg-table-header__readonly-status) {
+    background-color: var(--data-grid-readonly-status-color) !important;
+  }
+
+  :global(.rdg-table-header__order-button_unordered) {
+    color: var(--data-grid-order-button-unordered) !important;
+
+    &:hover {
+      color: var(--theme-primary) !important;
+    }
+  }
+
+  :global(.rdg-row:hover .rdg-cell),
+  :global(.rdg-row:hover .rdg-cell-frozen) {
+    border-bottom: 1px solid !important;
+    border-bottom-color: var(--theme-positive) !important;
+  }
+
+  :global(.rdg-cell-custom-selected) {
+    box-shadow: none !important;
+
+    &::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: var(--data-grid-cell-selection-background-color);
+    }
+  }
+
+  :global(.rdg-cell-custom-editing) {
+    box-shadow: none;
+    background-color: inherit;
+  }
+}
+
+.grid:focus-within {
+  :global(.rdg-cell-custom-selected::before) {
+    background-color: var(--data-grid-cell-selection-background-color-focus);
+  }
+
+  :global(.rdg-cell-custom-editing)::before {
+    background-color: transparent;
+  }
 }

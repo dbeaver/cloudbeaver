@@ -12,10 +12,13 @@ import { useObservableRef } from '@cloudbeaver/core-blocks';
 import { DatabaseDataConstraintAction } from '../../DatabaseDataModel/Actions/DatabaseDataConstraintAction';
 import type { IDatabaseDataModel } from '../../DatabaseDataModel/IDatabaseDataModel';
 import type { IDatabaseDataOptions } from '../../DatabaseDataModel/IDatabaseDataOptions';
+import { isResultSetDataModel } from '../../ResultSet/isResultSetDataModel';
+import { isResultSetDataSource } from '../../ResultSet/ResultSetDataSource';
 
 interface IState {
-  model: IDatabaseDataModel<IDatabaseDataOptions, any>;
+  model: IDatabaseDataModel;
   resultIndex: number;
+  readonly supported: boolean;
   readonly filter: string;
   readonly constraints: DatabaseDataConstraintAction | null;
   readonly disabled: boolean;
@@ -24,32 +27,42 @@ interface IState {
   apply: () => Promise<void>;
 }
 
-export function useWhereFilter(model: IDatabaseDataModel<IDatabaseDataOptions, any>, resultIndex: number): Readonly<IState> {
+export function useWhereFilter(model: IDatabaseDataModel, resultIndex: number): Readonly<IState> {
   return useObservableRef(
     () => ({
+      get supported() {
+        return isResultSetDataSource(this.model.source);
+      },
       get filter() {
+        const source = this.model.source;
+        if (!isResultSetDataSource<IDatabaseDataOptions>(source)) {
+          return '';
+        }
+
         if (this.constraints?.filterConstraints.length && this.model.source.requestInfo.requestFilter) {
           return this.model.requestInfo.requestFilter;
         }
 
-        return this.model.source.options?.whereFilter ?? '';
+        return source.options?.whereFilter ?? '';
       },
       get constraints() {
-        if (!this.model.source.hasResult(this.resultIndex)) {
+        const model = this.model as any;
+        if (!model.source.hasResult(this.resultIndex) || !isResultSetDataModel(model)) {
           return null;
         }
 
-        return this.model.source.tryGetAction(this.resultIndex, DatabaseDataConstraintAction) ?? null;
+        return model.source.tryGetAction(this.resultIndex, DatabaseDataConstraintAction) ?? null;
       },
       get disabled() {
         const supported = this.constraints?.supported ?? false;
         return !supported || this.model.isLoading() || this.model.isDisabled(resultIndex);
       },
       get applicableFilter() {
-        return (
-          this.model.source.prevOptions?.whereFilter !== this.model.source.options?.whereFilter ||
-          this.model.source.options?.whereFilter !== this.model.source.requestInfo.requestFilter
-        );
+        const source = this.model.source;
+        if (!isResultSetDataSource<IDatabaseDataOptions>(source)) {
+          return false;
+        }
+        return source.prevOptions?.whereFilter !== source.options?.whereFilter || source.options?.whereFilter !== source.requestInfo.requestFilter;
       },
       set(value: string) {
         if (!this.constraints) {

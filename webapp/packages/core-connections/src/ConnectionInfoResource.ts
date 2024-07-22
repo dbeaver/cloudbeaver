@@ -639,9 +639,13 @@ export function compareNewConnectionsInfo(a: DatabaseConnection, b: DatabaseConn
   return 0;
 }
 
+export function createConnectionParam(connection: Pick<Connection, 'id' | 'projectId'>): IConnectionInfoParams;
 export function createConnectionParam(connection: Connection): IConnectionInfoParams;
 export function createConnectionParam(projectId: string, connectionId: string): IConnectionInfoParams;
-export function createConnectionParam(projectIdOrConnection: string | Connection, connectionId?: string): IConnectionInfoParams {
+export function createConnectionParam(
+  projectIdOrConnection: string | Connection | Pick<Connection, 'id' | 'projectId'>,
+  connectionId?: string,
+): IConnectionInfoParams {
   if (typeof projectIdOrConnection === 'object') {
     connectionId = projectIdOrConnection.id;
     projectIdOrConnection = projectIdOrConnection.projectId;

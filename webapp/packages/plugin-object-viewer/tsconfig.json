@@ -40,12 +40,6 @@
       "path": "../core-sdk/tsconfig.json"
     },
     {
-      "path": "../core-theming/tsconfig.json"
-    },
-    {
-      "path": "../core-theming/tsconfig.json"
-    },
-    {
       "path": "../core-ui/tsconfig.json"
     },
     {
@@ -58,13 +52,13 @@
       "path": "../plugin-connections/tsconfig.json"
     },
     {
+      "path": "../plugin-data-grid/tsconfig.json"
+    },
+    {
       "path": "../plugin-navigation-tabs/tsconfig.json"
     },
     {
       "path": "../plugin-navigation-tree/tsconfig.json"
-    },
-    {
-      "path": "../plugin-react-data-grid/tsconfig.json"
     }
   ],
   "include": [

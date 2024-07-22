@@ -6,11 +6,11 @@
  * you may not use this file except in compliance with the License.
  */
 import type { IDatabaseDataModel } from './DatabaseDataModel/IDatabaseDataModel';
-import type { IDatabaseDataResult } from './DatabaseDataModel/IDatabaseDataResult';
+import { IDatabaseDataSource } from './DatabaseDataModel/IDatabaseDataSource';
 
 export interface IDataViewerTableStorage {
   has(tableId: string): boolean;
-  get<T extends IDatabaseDataModel<any, any>>(tableId: string): T | undefined;
-  add<TOptions, TResult extends IDatabaseDataResult>(model: IDatabaseDataModel<TOptions, TResult>): IDatabaseDataModel<TOptions, TResult>;
+  get<T extends IDatabaseDataModel<any> = IDatabaseDataModel>(tableId: string): T | undefined;
+  add<TSource extends IDatabaseDataSource<any, any> = IDatabaseDataSource>(model: IDatabaseDataModel<TSource>): IDatabaseDataModel<TSource>;
   remove(tableId: string): void;
 }

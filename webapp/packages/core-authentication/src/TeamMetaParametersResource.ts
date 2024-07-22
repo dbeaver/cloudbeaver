@@ -14,7 +14,10 @@ export type TeamMetaParameter = ObjectPropertyInfo;
 
 @injectable()
 export class TeamMetaParametersResource extends CachedDataResource<TeamMetaParameter[]> {
-  constructor(private readonly graphQLService: GraphQLService, sessionResource: SessionResource) {
+  constructor(
+    private readonly graphQLService: GraphQLService,
+    sessionResource: SessionResource,
+  ) {
     super(() => []);
 
     this.sync(

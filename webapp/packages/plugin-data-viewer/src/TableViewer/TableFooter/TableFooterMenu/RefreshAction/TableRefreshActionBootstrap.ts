@@ -73,12 +73,13 @@ export class TableRefreshActionBootstrap extends Bootstrap {
         items = [...items];
         for (const interval of AUTO_REFRESH_INTERVALS) {
           const label = this.getLabel(interval);
+          const tooltip = this.localizationService.translate('data_viewer_action_auto_refresh_interval_tooltip', undefined, { interval: label });
           items.push(
             new MenuBaseItem(
               {
                 id: `auto-refresh-${interval}`,
                 label,
-                tooltip: label,
+                tooltip,
                 disabled: state?.interval === interval * 1000,
               },
               {
@@ -97,7 +98,7 @@ export class TableRefreshActionBootstrap extends Bootstrap {
             {
               id: 'auto-refresh-custom',
               label: 'ui_custom',
-              tooltip: 'plugin_data_viewer_action_auto_refresh_custom',
+              tooltip: 'data_viewer_action_auto_refresh_menu_configure_tooltip',
             },
             {
               onSelect: this.configureAutoRefresh.bind(this, context),
@@ -110,7 +111,7 @@ export class TableRefreshActionBootstrap extends Bootstrap {
             {
               id: 'auto-refresh-stop',
               label: 'ui_processing_stop',
-              tooltip: 'data_viewer_action_auto_refresh_stop',
+              tooltip: 'data_viewer_action_auto_refresh_menu_stop_tooltip',
               disabled: !state?.isAutoRefresh,
             },
             {
@@ -141,7 +142,7 @@ export class TableRefreshActionBootstrap extends Bootstrap {
             ...action.info,
             icon: state?.isAutoRefresh ? '/icons/timer_m.svg#root' : '/icons/refresh_m.svg#root',
             label: '',
-            tooltip: state?.isAutoRefresh ? 'data_viewer_action_auto_refresh_stop' : 'data_viewer_action_refresh',
+            tooltip: state?.isAutoRefresh ? 'data_viewer_action_auto_refresh_stop_tooltip' : 'data_viewer_action_refresh_tooltip',
           };
         }
 

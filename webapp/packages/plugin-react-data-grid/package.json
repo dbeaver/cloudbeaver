@@ -13,18 +13,14 @@
     "build": "tsc -b",
     "clean": "rimraf --glob dist",
     "lint": "eslint ./src/ --ext .ts,.tsx",
-    "lint-fix": "eslint ./src/ --ext .ts,.tsx --fix",
     "validate-dependencies": "core-cli-validate-dependencies",
     "update-ts-references": "yarn run clean && typescript-resolve-references"
   },
   "dependencies": {
-    "@cloudbeaver/core-blocks": "^0",
-    "react": "^18",
     "react-data-grid": "file:react-data-grid-dist"
   },
   "peerDependencies": {},
   "devDependencies": {
-    "@types/react": "^18",
     "typescript": "^5"
   }
 }

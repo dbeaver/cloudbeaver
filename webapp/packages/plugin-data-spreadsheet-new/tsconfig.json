@@ -85,12 +85,6 @@
       "path": "../core-storage/tsconfig.json"
     },
     {
-      "path": "../core-theming/tsconfig.json"
-    },
-    {
-      "path": "../core-theming/tsconfig.json"
-    },
-    {
       "path": "../core-ui/tsconfig.json"
     },
     {
@@ -104,6 +98,9 @@
     },
     {
       "path": "../core-view/tsconfig.json"
+    },
+    {
+      "path": "../plugin-data-grid/tsconfig.json"
     },
     {
       "path": "../plugin-data-viewer/tsconfig.json"
@@ -122,9 +119,6 @@
     },
     {
       "path": "../plugin-object-viewer/tsconfig.json"
-    },
-    {
-      "path": "../plugin-react-data-grid/tsconfig.json"
     },
     {
       "path": "../tests-runner/tsconfig.json"

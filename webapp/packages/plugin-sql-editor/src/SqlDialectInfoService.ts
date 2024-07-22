@@ -12,7 +12,10 @@ import type { SqlDialectInfo } from '@cloudbeaver/core-sdk';
 
 @injectable()
 export class SqlDialectInfoService {
-  constructor(private readonly connectionDialectResource: ConnectionDialectResource, private readonly notificationService: NotificationService) {}
+  constructor(
+    private readonly connectionDialectResource: ConnectionDialectResource,
+    private readonly notificationService: NotificationService,
+  ) {}
 
   async formatScript(context: IConnectionExecutionContextInfo, query: string): Promise<string> {
     try {

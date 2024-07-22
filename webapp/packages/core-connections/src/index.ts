@@ -35,6 +35,7 @@ export * from './ConnectionInfoResource';
 export * from './CONNECTIONS_SETTINGS_GROUP';
 export * from './EConnectionFeature';
 export * from './ConnectionsSettingsService';
+export * from './ConnectionToolsResource';
 export * from './ContainerResource';
 export * from './ConnectionsLocaleService';
 export * from './createConnectionFolderParam';

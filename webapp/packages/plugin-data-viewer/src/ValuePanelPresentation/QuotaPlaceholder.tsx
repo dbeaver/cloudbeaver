@@ -14,13 +14,13 @@ import { WebsiteLinks } from '@cloudbeaver/core-website';
 import type { IResultSetElementKey } from '../DatabaseDataModel/Actions/ResultSet/IResultSetDataKey';
 import { ResultSetDataContentAction } from '../DatabaseDataModel/Actions/ResultSet/ResultSetDataContentAction';
 import type { IDatabaseDataModel } from '../DatabaseDataModel/IDatabaseDataModel';
-import type { IDatabaseResultSet } from '../DatabaseDataModel/IDatabaseResultSet';
+import { ResultSetDataSource } from '../ResultSet/ResultSetDataSource';
 import styles from './QuotaPlaceholder.module.css';
 
 interface Props {
   className?: string;
   elementKey: IResultSetElementKey | undefined;
-  model: IDatabaseDataModel<any, IDatabaseResultSet>;
+  model: IDatabaseDataModel<ResultSetDataSource>;
   resultIndex: number;
   keepSize?: boolean;
 }

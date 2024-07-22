@@ -8,6 +8,7 @@
 import { createContext } from 'react';
 
 import type { SqlResultColumn } from '@cloudbeaver/core-sdk';
+import type { Column } from '@cloudbeaver/plugin-data-grid';
 import type {
   DatabaseDataConstraintAction,
   DatabaseEditChangeType,
@@ -21,7 +22,6 @@ import type {
   ResultSetFormatAction,
   ResultSetViewAction,
 } from '@cloudbeaver/plugin-data-viewer';
-import type { Column } from '@cloudbeaver/plugin-react-data-grid';
 
 declare module 'react-data-grid' {
   interface Column<TRow, TSummaryRow = unknown> {
@@ -43,7 +43,6 @@ export interface ITableData {
   data: ResultSetDataAction;
   editor: ResultSetEditAction;
   view: ResultSetViewAction;
-  constraints: DatabaseDataConstraintAction;
   columns: Array<Column<IResultSetRowKey, any>>;
   columnKeys: IResultSetColumnKey[];
   rows: IResultSetRowKey[];

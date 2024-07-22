@@ -8,12 +8,12 @@
 import { observer } from 'mobx-react-lite';
 
 import { IconOrImage, s, useS, useTranslate } from '@cloudbeaver/core-blocks';
-import { DatabaseDataConstraintAction, EOrder, getNextOrder, IDatabaseDataModel } from '@cloudbeaver/plugin-data-viewer';
+import { DatabaseDataConstraintAction, EOrder, getNextOrder, IDatabaseDataModel, ResultSetDataSource } from '@cloudbeaver/plugin-data-viewer';
 
 import style from './OrderButton.module.css';
 
 interface Props {
-  model: IDatabaseDataModel;
+  model: IDatabaseDataModel<ResultSetDataSource>;
   resultIndex: number;
   attributePosition: number;
   className?: string;

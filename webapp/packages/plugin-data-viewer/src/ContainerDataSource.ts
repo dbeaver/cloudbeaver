@@ -8,7 +8,7 @@
 import { computed, makeObservable, observable } from 'mobx';
 
 import type { ConnectionExecutionContextService, IConnectionExecutionContext, IConnectionExecutionContextInfo } from '@cloudbeaver/core-connections';
-import type { IServiceInjector } from '@cloudbeaver/core-di';
+import type { IServiceProvider } from '@cloudbeaver/core-di';
 import type { ITask } from '@cloudbeaver/core-executor';
 import {
   AsyncTask,
@@ -44,12 +44,12 @@ export class ContainerDataSource extends ResultSetDataSource<IDataContainerOptio
   }
 
   constructor(
-    serviceInjector: IServiceInjector,
+    serviceProvider: IServiceProvider,
     graphQLService: GraphQLService,
     asyncTaskInfoService: AsyncTaskInfoService,
     protected connectionExecutionContextService: ConnectionExecutionContextService,
   ) {
-    super(serviceInjector, graphQLService, asyncTaskInfoService);
+    super(serviceProvider, graphQLService, asyncTaskInfoService);
 
     this.currentTask = null;
     this.executionContext = null;

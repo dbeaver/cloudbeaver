@@ -32,7 +32,10 @@ export class PasswordPolicyService {
     };
   }
 
-  constructor(private readonly serverConfigResource: ServerConfigResource, private readonly localizationService: LocalizationService) {
+  constructor(
+    private readonly serverConfigResource: ServerConfigResource,
+    private readonly localizationService: LocalizationService,
+  ) {
     makeObservable(this, {
       config: computed,
     });

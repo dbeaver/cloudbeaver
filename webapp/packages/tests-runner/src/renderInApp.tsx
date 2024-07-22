@@ -8,14 +8,14 @@
 import { queries, Queries, render, RenderOptions, RenderResult } from '@testing-library/react';
 import { Suspense } from 'react';
 
-import { AppContext, IServiceInjector } from '@cloudbeaver/core-di';
+import { IServiceProvider, ServiceProviderContext } from '@cloudbeaver/core-di';
 
 import type { IApplication } from './createApp';
 
-function ApplicationWrapper(serviceInjector: IServiceInjector): React.FC<React.PropsWithChildren> {
+function ApplicationWrapper(serviceInjector: IServiceProvider): React.FC<React.PropsWithChildren> {
   return ({ children }) => (
     <Suspense fallback={null}>
-      <AppContext app={serviceInjector}>{children}</AppContext>
+      <ServiceProviderContext serviceProvider={serviceInjector}>{children}</ServiceProviderContext>
     </Suspense>
   );
 }
@@ -28,5 +28,5 @@ export function renderInApp<
   app: IApplication,
   options?: Omit<RenderOptions<Q, Container, BaseElement>, 'queries' | 'wrapper'>,
 ): RenderResult<Q, Container, BaseElement> {
-  return render(ui, { wrapper: ApplicationWrapper(app.injector), ...options });
+  return render(ui, { wrapper: ApplicationWrapper(app.serviceProvider), ...options });
 }

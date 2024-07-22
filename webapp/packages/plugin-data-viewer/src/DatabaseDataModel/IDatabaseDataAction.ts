@@ -41,7 +41,6 @@ export type IDatabaseDataActionClass<
 
 export interface IDatabaseDataAction<TOptions, TResult extends IDatabaseDataResult> {
   readonly source: IDatabaseDataSource<TOptions, TResult>;
-  readonly empty: boolean;
   result: TResult;
   resultIndex: number;
   updateResult: (result: TResult, index: number) => void;
