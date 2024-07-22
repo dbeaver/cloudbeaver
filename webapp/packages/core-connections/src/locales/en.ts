@@ -58,7 +58,7 @@ export default [
   ['connections_connection_name', 'Connection name'],
   ['connections_connection_access_user_or_team_name', 'User or Team name'],
   ['connections_connection_access_filter_placeholder', 'Search for user or team name'],
-  ['connections_connection_access_admin_info', 'Administrators see all connections.'],
+  ['connections_connection_access_admin_info', 'Administrators see all connections except private connections of other users.'],
   ['connections_connection_description', 'Description'],
   ['connections_connection_project', 'Project'],
   ['connections_connection_driver', 'Driver'],
