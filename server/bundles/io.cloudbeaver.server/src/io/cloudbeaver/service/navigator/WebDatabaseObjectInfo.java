@@ -23,12 +23,15 @@ import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.*;
 import org.jkiss.dbeaver.model.meta.Property;
+import org.jkiss.dbeaver.model.navigator.DBNDataSource;
+import org.jkiss.dbeaver.model.preferences.DBPPropertyDescriptor;
 import org.jkiss.dbeaver.model.struct.*;
 import org.jkiss.dbeaver.model.struct.rdb.DBSCatalog;
 import org.jkiss.dbeaver.model.struct.rdb.DBSSchema;
 import org.jkiss.dbeaver.model.struct.rdb.DBSTable;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 
@@ -174,11 +177,12 @@ public class WebDatabaseObjectInfo {
         }
         if (object instanceof DBSSchema) features.add(OBJECT_FEATURE_SCHEMA);
         if (object instanceof DBSCatalog) features.add(OBJECT_FEATURE_CATALOG);
-        if (object instanceof DBSObjectContainer) {
+        if (object instanceof DBSObjectContainer objectContainer) {
             features.add(OBJECT_FEATURE_OBJECT_CONTAINER);
             try {
-                Class<? extends DBSObject> childType = ((DBSObjectContainer) object).getPrimaryChildType(null);
-                if (DBSTable.class.isAssignableFrom(childType)) {
+                Class<? extends DBSObject> childType = objectContainer.getPrimaryChildType(null);
+                Collection<? extends DBSObject> childrenCollection = objectContainer.getChildren(null);
+                if (DBSTable.class.isAssignableFrom(childType) && childrenCollection != null) {
                     features.add(OBJECT_FEATURE_ENTITY_CONTAINER);
                 }
             } catch (Exception e) {
