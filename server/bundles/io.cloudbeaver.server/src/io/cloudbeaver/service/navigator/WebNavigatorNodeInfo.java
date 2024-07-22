@@ -36,6 +36,9 @@ import org.jkiss.dbeaver.model.meta.Property;
 import org.jkiss.dbeaver.model.navigator.*;
 import org.jkiss.dbeaver.model.navigator.fs.DBNFileSystem;
 import org.jkiss.dbeaver.model.navigator.fs.DBNPathBase;
+import org.jkiss.dbeaver.model.navigator.meta.DBXTreeFolder;
+import org.jkiss.dbeaver.model.navigator.meta.DBXTreeItem;
+import org.jkiss.dbeaver.model.navigator.meta.DBXTreeNode;
 import org.jkiss.dbeaver.model.rm.RMProject;
 import org.jkiss.dbeaver.model.rm.RMProjectPermission;
 import org.jkiss.dbeaver.model.struct.DBSEntity;
@@ -62,6 +65,7 @@ public class WebNavigatorNodeInfo {
     public static final String NODE_FEATURE_CONTAINER = "container";
     public static final String NODE_FEATURE_SHARED = "shared";
     public static final String NODE_FEATURE_CAN_DELETE = "canDelete";
+    public static final String NODE_FEATURE_CAN_FILTER = "canFilter";
     public static final String NODE_FEATURE_CAN_RENAME = "canRename";
     private final WebSession session;
     private final DBNNode node;
@@ -184,14 +188,30 @@ public class WebNavigatorNodeInfo {
             if (object instanceof DBSEntity || object instanceof DBSProcedure) {
                 features.add(NODE_FEATURE_LEAF);
             }
-
         }
         if (node instanceof DBNContainer) {
             features.add(NODE_FEATURE_CONTAINER);
         }
         boolean isShared = false;
         if (node instanceof DBNDatabaseNode) {
-            isShared = !((DBNDatabaseNode) node).getOwnerProject().getName().equals(session.getUserId());
+            if (node instanceof DBNDataSource dataSource) {
+                if (dataSource.getDataSourceContainer().getDataSource() != null) {
+                    boolean hasNonFolderNode = DBXTreeNode.hasNonFolderNode(dataSource.getMeta().getChildren(null));
+                    if (hasNonFolderNode) {
+                        features.add(NODE_FEATURE_CAN_FILTER);
+                    }
+                }
+            } else if (node instanceof DBNDatabaseItem item) {
+                if (item.getDataSourceContainer().getDataSource() != null) {
+                    boolean hasNonFolderNode = DBXTreeNode.hasNonFolderNode(item.getMeta().getChildren(null));
+                    if (hasNonFolderNode) {
+                        features.add(NODE_FEATURE_CAN_FILTER);
+                    }
+                }
+            } else {
+                features.add(NODE_FEATURE_CAN_FILTER);
+            }
+            isShared = !node.getOwnerProject().getName().equals(session.getUserId());
         } else if (node instanceof DBNLocalFolder) {
             DataSourceFolder folder = (DataSourceFolder) ((DBNLocalFolder) node).getFolder();
             DBPProject project = folder.getDataSourceRegistry().getProject();
@@ -300,10 +320,10 @@ public class WebNavigatorNodeInfo {
 
     @Property
     public DBSObjectFilter getFilter() throws DBWebException {
-        if (!(node instanceof DBNDatabaseFolder)) {
+        if (!(node instanceof DBNDatabaseNode)) {
             throw new DBWebException("Invalid navigator node type: "  + node.getClass().getName());
         }
-        DBSObjectFilter filter = ((DBNDatabaseFolder) node).getNodeFilter(((DBNDatabaseFolder) node).getItemsMeta(), true);
+        DBSObjectFilter filter = ((DBNDatabaseNode) node).getNodeFilter(((DBNDatabaseNode) node).getItemsMeta(), true);
         return filter == null || filter.isEmpty() || !filter.isEnabled() ? null : filter;
     }
 
