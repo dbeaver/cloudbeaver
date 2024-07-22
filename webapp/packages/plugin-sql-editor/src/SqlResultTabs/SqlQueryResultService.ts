@@ -7,10 +7,10 @@
  */
 import { injectable } from '@cloudbeaver/core-di';
 import { uuid } from '@cloudbeaver/core-utils';
-import { IDatabaseDataModel, IDatabaseResultSet, TableViewerStorageService } from '@cloudbeaver/plugin-data-viewer';
+import { IDatabaseDataModel, TableViewerStorageService } from '@cloudbeaver/plugin-data-viewer';
 
-import type { IResultGroup, ISqlEditorTabState, IStatisticsTab } from '../ISqlEditorTabState';
-import type { IDataQueryOptions } from '../QueryDataSource';
+import type { IResultGroup, IResultTab, ISqlEditorTabState, IStatisticsTab } from '../ISqlEditorTabState';
+import type { QueryDataSource } from '../QueryDataSource';
 
 @injectable()
 export class SqlQueryResultService {
@@ -41,7 +41,7 @@ export class SqlQueryResultService {
 
   updateGroupTabs(
     editorState: ISqlEditorTabState,
-    model: IDatabaseDataModel<IDataQueryOptions, IDatabaseResultSet>,
+    model: IDatabaseDataModel<QueryDataSource>,
     groupId: string,
     selectFirstResult?: boolean,
     resultCount?: number,
@@ -136,14 +136,7 @@ export class SqlQueryResultService {
       const model = this.tableViewerStorageService.get(group.modelId);
 
       if (model) {
-        let canClose = false;
-
-        try {
-          await model.requestDataAction(() => {
-            canClose = true;
-          });
-        } catch {}
-        return canClose;
+        return await model.source.canSafelyDispose();
       }
     }
     return true;
@@ -160,16 +153,11 @@ export class SqlQueryResultService {
 
       if (isGroupEmpty) {
         state.resultGroups.splice(state.resultGroups.indexOf(group), 1);
-
-        // TODO: we need to dispose table model, but don't close execution context, so now we only
         const model = this.tableViewerStorageService.get(group.modelId);
-        // model?.dispose();
 
-        if (model?.isLoading()) {
-          model.cancel();
-        }
-
-        this.tableViewerStorageService.remove(group.modelId);
+        model?.dispose().then(() => {
+          this.tableViewerStorageService.remove(group.modelId);
+        });
       }
     }
   }
@@ -193,23 +181,18 @@ export class SqlQueryResultService {
     editorState.currentTabId = mainTab[0].tabId;
   }
 
-  private createTabsForGroup(
-    state: ISqlEditorTabState,
-    group: IResultGroup,
-    model: IDatabaseDataModel<IDataQueryOptions, IDatabaseResultSet>,
-    resultCount?: number,
-  ) {
-    this.updateResultTab(state, group, model, 0, resultCount);
+  private createTabsForGroup(state: ISqlEditorTabState, group: IResultGroup, model: IDatabaseDataModel<QueryDataSource>, resultCount?: number) {
+    this.createResultTabForGroup(state, group, model, 0, resultCount);
 
     for (let i = 1; i < model.source.results.length; i++) {
-      this.updateResultTab(state, group, model, i, resultCount);
+      this.createResultTabForGroup(state, group, model, i, resultCount);
     }
   }
 
-  private updateResultTab(
+  private createResultTabForGroup(
     state: ISqlEditorTabState,
     group: IResultGroup,
-    model: IDatabaseDataModel<IDataQueryOptions, IDatabaseResultSet>,
+    model: IDatabaseDataModel<QueryDataSource>,
     indexInResultSet: number,
     resultCount?: number,
   ) {
@@ -226,6 +209,16 @@ export class SqlQueryResultService {
     }
   }
 
+  updateResultTab(state: ISqlEditorTabState, id: string, resultTab: Partial<IResultTab>) {
+    const index = state.resultTabs.findIndex(tab => tab.tabId === id);
+
+    if (index === -1) {
+      return;
+    }
+
+    state.resultTabs[index] = { ...state.resultTabs[index], ...resultTab };
+  }
+
   private createResultTab(state: ISqlEditorTabState, group: IResultGroup, indexInResultSet: number, results: number, resultCount?: number) {
     const id = uuid();
 
@@ -233,6 +226,8 @@ export class SqlQueryResultService {
       tabId: id,
       groupId: group.groupId,
       indexInResultSet,
+      presentationId: '',
+      valuePresentationId: null,
     });
 
     state.tabs.push({

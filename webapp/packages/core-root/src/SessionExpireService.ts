@@ -9,14 +9,24 @@ import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { Executor, IExecutor } from '@cloudbeaver/core-executor';
 import { EServerErrorCode, GQLError, GraphQLService, SessionError } from '@cloudbeaver/core-sdk';
 import { errorOf } from '@cloudbeaver/core-utils';
+
+export const SESSION_EXPIRE_MIN_TIME = 5 * 1000 * 60;
+
 @injectable()
 export class SessionExpireService extends Bootstrap {
-  expired = false;
+  private isExpired = false;
 
   onSessionExpire: IExecutor;
   constructor(private readonly graphQLService: GraphQLService) {
     super();
+
+    this.sessionExpired = this.sessionExpired.bind(this);
+
     this.onSessionExpire = new Executor();
+  }
+
+  get expired() {
+    return this.isExpired;
   }
 
   register(): void {
@@ -32,7 +42,7 @@ export class SessionExpireService extends Bootstrap {
 
     const e = new SessionError('Session expired');
     this.graphQLService.blockRequests(e);
-    this.expired = true;
+    this.isExpired = true;
     this.onSessionExpire.execute();
   }
 

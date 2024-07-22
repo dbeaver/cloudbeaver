@@ -5,7 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { DetailsError, GQLError } from '@cloudbeaver/core-sdk';
+import { DetailsError, GQLError, SDKGraphQLErrorExtensions } from '@cloudbeaver/core-sdk';
 import { errorOf } from '@cloudbeaver/core-utils';
 
 export interface IErrorInfo {
@@ -38,7 +38,7 @@ export class ErrorModel {
       // GQL Error
       this.errors = (gqlError.response.errors || []).map<IErrorInfo>(error => ({
         message: error.message,
-        stackTrace: error.extensions.stackTrace || '',
+        stackTrace: (error.extensions as SDKGraphQLErrorExtensions).stackTrace || '',
       }));
 
       if (gqlError.isTextBody) {

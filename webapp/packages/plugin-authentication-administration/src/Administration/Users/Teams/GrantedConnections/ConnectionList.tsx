@@ -11,6 +11,7 @@ import { useCallback, useState } from 'react';
 
 import {
   Button,
+  Container,
   getComputed,
   getSelectedItems,
   Group,
@@ -26,11 +27,11 @@ import {
 import { Connection, DBDriverResource } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
 
+import styles from './ConnectionList.module.css';
 import { getFilteredConnections } from './getFilteredConnections';
 import { GrantedConnectionsTableHeader, IFilterState } from './GrantedConnectionsTableHeader/GrantedConnectionsTableHeader';
 import { GrantedConnectionsTableInnerHeader } from './GrantedConnectionsTableHeader/GrantedConnectionsTableInnerHeader';
 import { GrantedConnectionsTableItem } from './GrantedConnectionsTableItem';
-import styles from './ConnectionList.m.css';
 
 interface Props {
   connectionList: Connection[];
@@ -60,40 +61,40 @@ export const ConnectionList = observer<Props>(function ConnectionList({ connecti
   const keys = connections.map(connection => connection.id);
 
   return (
-    <Group className={s(style, { group: true })} box medium overflow>
-      <div className={s(style, { container: true })}>
-        <GrantedConnectionsTableHeader filterState={filterState} disabled={disabled}>
+    <Group className={s(style, { group: true })} box border medium overflow vertical>
+      <GrantedConnectionsTableHeader filterState={filterState} disabled={disabled}>
+        <Container keepSize>
           <Button disabled={disabled || !selected} mod={['unelevated']} onClick={grant}>
             {translate('ui_add')}
           </Button>
-        </GrantedConnectionsTableHeader>
-        <div className={s(style, { tableContainer: true })}>
-          <Table className={s(style, { table: true })} keys={keys} selectedItems={selectedSubjects} isItemSelectable={item => !grantedSubjects.includes(item)} size="big">
-            <GrantedConnectionsTableInnerHeader className={s(style, { grantedConnectionsTableHeader: true })} disabled={disabled} />
-            <TableBody>
-              {!connections.length && filterState.filterValue && (
-                <TableItem item="tableInfo" selectDisabled>
-                  <TableColumnValue colSpan={5}>{translate('ui_search_no_result_placeholder')}</TableColumnValue>
-                </TableItem>
-              )}
-              {connections.map(connection => {
-                const driver = driversResource.get(connection.driverId);
-                return (
-                  <GrantedConnectionsTableItem
-                    key={connection.id}
-                    id={connection.id}
-                    name={connection.name}
-                    tooltip={connection.name}
-                    host={`${connection.host || ''}${connection.host && connection.port ? ':' + connection.port : ''}`}
-                    icon={driver?.icon}
-                    disabled={disabled}
-                  />
-                );
-              })}
-            </TableBody>
-          </Table>
-        </div>
-      </div>
+        </Container>
+      </GrantedConnectionsTableHeader>
+      <Container overflow>
+        <Table keys={keys} selectedItems={selectedSubjects} isItemSelectable={item => !grantedSubjects.includes(item)}>
+          <GrantedConnectionsTableInnerHeader className={s(style, { header: true })} disabled={disabled} />
+          <TableBody>
+            {!connections.length && filterState.filterValue && (
+              <TableItem item="tableInfo" selectDisabled>
+                <TableColumnValue colSpan={5}>{translate('ui_search_no_result_placeholder')}</TableColumnValue>
+              </TableItem>
+            )}
+            {connections.map(connection => {
+              const driver = driversResource.get(connection.driverId);
+              return (
+                <GrantedConnectionsTableItem
+                  key={connection.id}
+                  id={connection.id}
+                  name={connection.name}
+                  tooltip={connection.name}
+                  host={`${connection.host || ''}${connection.host && connection.port ? ':' + connection.port : ''}`}
+                  icon={driver?.icon}
+                  disabled={disabled}
+                />
+              );
+            })}
+          </TableBody>
+        </Table>
+      </Container>
     </Group>
   );
 });

@@ -8,7 +8,6 @@
 import { observable } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import { useCallback, useState } from 'react';
-import styled, { css } from 'reshadow';
 
 import type { TeamInfo } from '@cloudbeaver/core-authentication';
 import {
@@ -16,45 +15,23 @@ import {
   getComputed,
   getSelectedItems,
   Group,
+  s,
   Table,
   TableBody,
   TableColumnValue,
   TableItem,
   useObjectRef,
+  useS,
   useTranslate,
 } from '@cloudbeaver/core-blocks';
 import type { TLocalizationToken } from '@cloudbeaver/core-localization';
 import type { AdminUserInfoFragment } from '@cloudbeaver/core-sdk';
 
+import styles from './ConnectionAccessGrantedList.module.css';
 import { ConnectionAccessTableHeader, IFilterState } from './ConnectionAccessTableHeader/ConnectionAccessTableHeader';
 import { ConnectionAccessTableInnerHeader } from './ConnectionAccessTableHeader/ConnectionAccessTableInnerHeader';
 import { ConnectionAccessTableItem } from './ConnectionAccessTableItem';
 import { getFilteredTeams, getFilteredUsers } from './getFilteredSubjects';
-
-const styles = css`
-  Table {
-    composes: theme-background-surface theme-text-on-surface from global;
-  }
-  Group {
-    position: relative;
-  }
-  Group,
-  container,
-  table-container {
-    height: 100%;
-  }
-  container {
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-  }
-  ConnectionAccessTableHeader {
-    flex: 0 0 auto;
-  }
-  table-container {
-    overflow: auto;
-  }
-`;
 
 interface Props {
   grantedUsers: AdminUserInfoFragment[];
@@ -73,6 +50,7 @@ export const ConnectionAccessGrantedList = observer<Props>(function ConnectionAc
 }) {
   const props = useObjectRef({ onRevoke, onEdit });
   const translate = useTranslate();
+  const style = useS(styles);
   const [selectedSubjects] = useState<Map<any, boolean>>(() => observable(new Map()));
   const [filterState] = useState<IFilterState>(() => observable({ filterValue: '' }));
 
@@ -96,10 +74,10 @@ export const ConnectionAccessGrantedList = observer<Props>(function ConnectionAc
     }
   }
 
-  return styled(styles)(
-    <Group box medium overflow>
-      <container>
-        <ConnectionAccessTableHeader filterState={filterState} disabled={disabled}>
+  return (
+    <Group className={s(style, { group: true })} box medium overflow>
+      <div className={s(style, { container: true })}>
+        <ConnectionAccessTableHeader className={s(style, { connectionAccessTableHeader: true })} filterState={filterState} disabled={disabled}>
           <Button disabled={disabled || !selected} mod={['outlined']} onClick={revoke}>
             {translate('ui_delete')}
           </Button>
@@ -107,8 +85,8 @@ export const ConnectionAccessGrantedList = observer<Props>(function ConnectionAc
             {translate('ui_edit')}
           </Button>
         </ConnectionAccessTableHeader>
-        <table-container>
-          <Table keys={keys} selectedItems={selectedSubjects}>
+        <div className={s(style, { tableContainer: true })}>
+          <Table className={s(style, { table: true })} keys={keys} selectedItems={selectedSubjects}>
             <ConnectionAccessTableInnerHeader disabled={disabled} />
             <TableBody>
               <TableItem item="tableInfo" selectDisabled>
@@ -139,8 +117,8 @@ export const ConnectionAccessGrantedList = observer<Props>(function ConnectionAc
               ))}
             </TableBody>
           </Table>
-        </table-container>
-      </container>
-    </Group>,
+        </div>
+      </div>
+    </Group>
   );
 });

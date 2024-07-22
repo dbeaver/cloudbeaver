@@ -9,21 +9,26 @@ import { forwardRef } from 'react';
 
 import { s } from '../s';
 import { useS } from '../useS';
-import style from './Container.m.css';
+import style from './Container.module.css';
 import { filterContainerFakeProps, getContainerProps } from './filterContainerFakeProps';
 import type { IContainerProps } from './IContainerProps';
-import elementsSizeStyle from './shared/ElementsSize.m.css';
+import elementsSizeStyle from './shared/ElementsSize.module.css';
 
-export const Container = forwardRef<HTMLDivElement, IContainerProps & React.HTMLAttributes<HTMLDivElement>>(function Container(
-  { className, ...rest },
+interface Props {
+  as?: 'div' | 'header' | 'footer' | 'section' | 'aside' | 'main' | 'nav';
+}
+
+export const Container = forwardRef<HTMLDivElement, Props & IContainerProps & React.HTMLAttributes<HTMLDivElement>>(function Container(
+  { as = 'div', className, ...rest },
   ref,
 ) {
   const styles = useS(style, elementsSizeStyle);
   const divProps = filterContainerFakeProps(rest);
   const containerProps = getContainerProps(rest);
+  const Element = as;
 
   return (
-    <div
+    <Element
       ref={ref}
       {...divProps}
       className={s(

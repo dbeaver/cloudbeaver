@@ -6,25 +6,28 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import { useCallback } from 'react';
+import { HTMLAttributes, useState } from 'react';
 
-import { IconButton } from '../IconButton';
+import { isNotNullDefined } from '@cloudbeaver/core-utils';
+
+import { ActionIconButton } from '../ActionIconButton';
+import { Container } from '../Containers/Container';
+import type { IContainerProps } from '../Containers/IContainerProps';
 import { s } from '../s';
 import { useFocus } from '../useFocus';
 import { useS } from '../useS';
-import filterStyle from './Filter.m.css';
+import filterStyle from './Filter.module.css';
 import { InputField } from './InputField/InputField';
 
-interface BaseProps {
+interface BaseProps extends Omit<HTMLAttributes<HTMLDivElement>, 'onChange'>, IContainerProps {
   placeholder?: string;
   disabled?: boolean;
-  disableActions?: boolean;
-  applyDisabled?: boolean;
-  max?: boolean;
+  disabledActions?: boolean;
+  manualApply?: boolean;
+  smallSize?: boolean;
+  onChange?: (value: string) => void;
+  onSearch?: (value: string) => void;
   className?: string;
-  onApply?: (value: string) => void;
-  onKeyDown?: (event: React.KeyboardEvent<HTMLInputElement>) => void;
-  onClick?: (event: React.MouseEvent<HTMLDivElement>) => void;
 }
 
 type ControlledProps = BaseProps & {
@@ -47,88 +50,92 @@ export const Filter = observer<ControlledProps | ObjectsProps<any, any>>(functio
   value: valueControlled,
   placeholder,
   disabled,
-  disableActions,
-  applyDisabled,
-  max,
+  disabledActions,
   className,
-  onApply,
+  manualApply,
+  smallSize,
+  onSearch,
   onChange,
-  onKeyDown,
-  onClick,
+  ...rest
 }) {
   const styles = useS(filterStyle);
   const [inputRef] = useFocus<HTMLInputElement>({});
 
-  const filter = useCallback(
-    (value: string | number, name?: string) => {
-      value = String(value);
-
-      if (state && name) {
-        state[name] = value;
-      }
-
-      if (onChange) {
-        onChange(value, name);
-      }
-    },
-    [onChange, state],
-  );
-
+  let valuePassedFromProps = isNotNullDefined(valueControlled);
   let value: any = valueControlled;
 
   if (state && name !== undefined && name in state) {
     value = state[name];
+    valuePassedFromProps = true;
+  }
+
+  value = String(value ?? '');
+
+  const [search, setSearch] = useState(value);
+
+  if (!valuePassedFromProps) {
+    value = search;
+  }
+
+  function handleChange(value: string | number) {
+    value = String(value);
+
+    if (state && name) {
+      state[name] = value;
+    }
+
+    if (onChange) {
+      onChange(value, name);
+    }
+
+    setSearch(value);
   }
 
   function handleKeyDown(event: React.KeyboardEvent<HTMLInputElement>) {
-    if (event.key === 'Enter' && onApply && !applyDisabled) {
-      onApply(value);
-    }
-
-    onKeyDown?.(event);
-  }
-
-  function clean() {
-    filter('', name);
-
-    if (onApply) {
-      onApply('');
+    if (event.key === 'Enter' && !disabledActions && !disabled) {
+      onSearch?.(value);
     }
   }
 
-  const manualMode = !!onApply;
+  function handleClear() {
+    handleChange('');
+    onSearch?.('');
+  }
+
+  function searchHandler() {
+    onSearch?.(value);
+  }
+
   const edited = !!String(value);
 
   return (
-    <div className={s(styles, { filterContainer: true }, className)} onClick={onClick}>
+    <Container {...rest} className={s(styles, { filterContainer: true, smallSize }, className)}>
       <InputField
         ref={inputRef}
-        className={s(styles, { inputField: true, max })}
+        type="search"
+        autoComplete="off"
+        className={s(styles, { inputField: true })}
         placeholder={placeholder}
         disabled={disabled}
         name={name}
         value={value}
-        onChange={filter}
+        onChange={handleChange}
         onKeyDown={handleKeyDown}
       />
 
-      {edited && (
-        <IconButton
-          className={s(styles, { iconButton: true, cross: true, manualMode })}
-          name="cross"
-          disabled={disabled || disableActions}
-          onClick={clean}
-        />
-      )}
-
-      {(!edited || manualMode) && (
-        <IconButton
-          className={s(styles, { iconButton: true, manualMode })}
-          name="search"
-          disabled={disabled || applyDisabled || disableActions}
-          onClick={onApply ? () => onApply(value) : undefined}
-        />
-      )}
-    </div>
+      <div className={s(styles, { actionButtons: true })}>
+        {edited && !manualApply ? (
+          <ActionIconButton name="cross" disabled={disabled || disabledActions} className={s(styles, { actionButton: true })} onClick={handleClear} />
+        ) : (
+          <ActionIconButton
+            name="search"
+            viewBox="4 4 16 16"
+            disabled={disabled || disabledActions}
+            className={s(styles, { actionButton: true })}
+            onClick={searchHandler}
+          />
+        )}
+      </div>
+    </Container>
   );
 });

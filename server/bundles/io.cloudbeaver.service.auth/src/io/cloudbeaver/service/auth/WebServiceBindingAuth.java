@@ -41,7 +41,9 @@ public class WebServiceBindingAuth extends WebServiceBindingBase<DBWServiceAuth>
                 env.getArgument("provider"),
                 env.getArgument("configuration"),
                 env.getArgument("credentials"),
-                CommonUtils.toBoolean(env.getArgument("linkUser"))))
+                CommonUtils.toBoolean(env.getArgument("linkUser")),
+                CommonUtils.toBoolean(env.getArgument("forceSessionsLogout"))
+            ))
             .dataFetcher("authLogoutExtended", env -> getService(env).authLogout(
                 getWebSession(env, false),
                 env.getArgument("provider"),
@@ -54,7 +56,7 @@ public class WebServiceBindingAuth extends WebServiceBindingBase<DBWServiceAuth>
                 return true;
             })
             .dataFetcher("authUpdateStatus", env -> getService(env).authUpdateStatus(
-                getWebSession(env),
+                getWebSession(env, false),
                 env.getArgument("authId"),
                 CommonUtils.toBoolean(env.getArgument("linkUser"))
             ))
@@ -73,6 +75,9 @@ public class WebServiceBindingAuth extends WebServiceBindingBase<DBWServiceAuth>
                 env -> getService(env).setUserConfigurationParameter(getWebSession(env),
                     env.getArgument("name"),
                     env.getArgument("value")))
+            .dataFetcher("setUserPreferences",
+                env -> getService(env).setUserConfigurationParameters(getWebSession(env),
+                    env.getArgument("preferences")))
         ;
     }
 }

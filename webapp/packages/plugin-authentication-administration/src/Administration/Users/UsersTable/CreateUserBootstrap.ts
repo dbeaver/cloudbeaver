@@ -38,6 +38,7 @@ export class CreateUserBootstrap extends Bootstrap {
 
     this.actionService.addHandler({
       id: 'users-table-base',
+      actions: [ACTION_CREATE],
       isActionApplicable: (context, action) => {
         if (action === ACTION_CREATE && !this.administrationUsersManagementService.externalUserProviderEnabled) {
           return this.authProvidersResource.has(AUTH_PROVIDER_LOCAL_ID);
@@ -47,7 +48,7 @@ export class CreateUserBootstrap extends Bootstrap {
       },
       isDisabled: (context, action) => {
         if (action === ACTION_CREATE) {
-          const administrationItemRoute = context.tryGet(DATA_CONTEXT_ADMINISTRATION_ITEM_ROUTE);
+          const administrationItemRoute = context.get(DATA_CONTEXT_ADMINISTRATION_ITEM_ROUTE);
 
           return administrationItemRoute?.param === ADMINISTRATION_ITEM_USER_CREATE_PARAM && !!this.createUserService.state;
         }

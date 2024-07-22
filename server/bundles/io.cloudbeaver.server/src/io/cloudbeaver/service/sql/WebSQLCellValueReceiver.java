@@ -41,15 +41,15 @@ public class WebSQLCellValueReceiver implements DBDDataReceiver {
     }
 
     @Override
-    public void fetchStart(DBCSession session, DBCResultSet resultSet, long offset, long maxRows) throws DBCException {
+    public void fetchStart(@NotNull DBCSession session, @NotNull DBCResultSet resultSet, long offset, long maxRows) throws DBCException {
         DBCResultSetMetaData meta = resultSet.getMeta();
-        List<DBCAttributeMetaData> attributes = meta.getAttributes();
+        List<? extends DBCAttributeMetaData> attributes = meta.getAttributes();
         DBCAttributeMetaData attrMeta = attributes.get(rowIndex);
         binding = new DBDAttributeBindingMeta(dataContainer, resultSet.getSession(), attrMeta);
     }
 
     @Override
-    public void fetchRow(DBCSession session, DBCResultSet resultSet) throws DBCException {
+    public void fetchRow(@NotNull DBCSession session, @NotNull DBCResultSet resultSet) throws DBCException {
         value = binding.getValueHandler().fetchValueObject(
             resultSet.getSession(),
             resultSet,
@@ -58,7 +58,7 @@ public class WebSQLCellValueReceiver implements DBDDataReceiver {
     }
 
     @Override
-    public void fetchEnd(DBCSession session, DBCResultSet resultSet) throws DBCException {
+    public void fetchEnd(@NotNull DBCSession session, @NotNull DBCResultSet resultSet) throws DBCException {
 
     }
 

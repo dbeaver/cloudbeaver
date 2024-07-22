@@ -8,6 +8,5 @@
 import { createDataContext } from '@cloudbeaver/core-data-context';
 
 import type { IDatabaseDataModel } from '../IDatabaseDataModel';
-import type { IDatabaseDataOptions } from '../IDatabaseDataOptions';
 
-export const DATA_CONTEXT_DV_DDM = createDataContext<IDatabaseDataModel<IDatabaseDataOptions>>('data-viewer-database-data-model');
+export const DATA_CONTEXT_DV_DDM = createDataContext<IDatabaseDataModel>('data-viewer-database-data-model');

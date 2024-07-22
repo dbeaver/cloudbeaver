@@ -24,7 +24,7 @@ import { Field } from './Field';
 import { FieldDescription } from './FieldDescription';
 import { FieldLabel } from './FieldLabel';
 import { FormContext } from './FormContext';
-import InputFilesStyles from './InputFiles.m.css';
+import InputFilesStyles from './InputFiles.module.css';
 import { isControlPresented } from './isControlPresented';
 
 type BaseProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'name' | 'value' | 'style'> &
@@ -168,7 +168,7 @@ export const InputFiles: InputFilesType = observer(
     const files = Array.from(value ?? []);
 
     return (
-      <Field {...layoutProps} className={className}>
+      <Field {...layoutProps} className={s(styles, { field: true }, className)}>
         <FieldLabel title={labelTooltip || rest.title} required={required} className={s(styles, { fieldLabel: true })}>
           {children}
         </FieldLabel>

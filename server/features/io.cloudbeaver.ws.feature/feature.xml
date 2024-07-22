@@ -2,7 +2,7 @@
 <feature
         id="io.cloudbeaver.ws.feature"
         label="%featureName"
-        version="1.0.45.qualifier"
+        version="1.0.56.qualifier"
         provider-name="%providerName"
         plugin="io.cloudbeaver.model">
 
@@ -18,7 +18,7 @@
         <import plugin="org.eclipse.core.resources" version="0.0.0" match="greaterOrEqual"/>
         <import plugin="org.eclipse.core.runtime" version="3.7" match="greaterOrEqual"/>
         <!-- Equinox -->
-        <import plugin="org.eclipse.equinox.launcher" version="0.0.0" match="greaterOrEqual"/>
+        <import plugin="org.jkiss.dbeaver.launcher" version="0.0.0" match="greaterOrEqual"/>
         <import plugin="org.eclipse.equinox.common" version="0.0.0" match="greaterOrEqual"/>
         <import plugin="org.eclipse.equinox.event" version="0.0.0" match="greaterOrEqual"/>
         <import plugin="org.eclipse.equinox.preferences" version="0.0.0" match="greaterOrEqual"/>

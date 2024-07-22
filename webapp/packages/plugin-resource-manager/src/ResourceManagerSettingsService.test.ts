@@ -7,76 +7,68 @@
  */
 import '@testing-library/jest-dom';
 
-import { coreBrowserManifest } from '@cloudbeaver/core-browser';
-import { coreEventsManifest } from '@cloudbeaver/core-events';
+import { coreClientActivityManifest } from '@cloudbeaver/core-client-activity';
 import { coreLocalizationManifest } from '@cloudbeaver/core-localization';
-import { corePluginManifest } from '@cloudbeaver/core-plugin';
-import { coreProductManifest } from '@cloudbeaver/core-product';
 import { coreRootManifest, ServerConfigResource } from '@cloudbeaver/core-root';
 import { createGQLEndpoint } from '@cloudbeaver/core-root/dist/__custom_mocks__/createGQLEndpoint';
+import '@cloudbeaver/core-root/dist/__custom_mocks__/expectWebsocketClosedMessage';
 import { mockAppInit } from '@cloudbeaver/core-root/dist/__custom_mocks__/mockAppInit';
 import { mockGraphQL } from '@cloudbeaver/core-root/dist/__custom_mocks__/mockGraphQL';
 import { mockServerConfig } from '@cloudbeaver/core-root/dist/__custom_mocks__/resolvers/mockServerConfig';
 import { coreSDKManifest } from '@cloudbeaver/core-sdk';
 import { coreSettingsManifest } from '@cloudbeaver/core-settings';
+import {
+  expectDeprecatedSettingMessage,
+  expectNoDeprecatedSettingMessage,
+} from '@cloudbeaver/core-settings/dist/__custom_mocks__/expectDeprecatedSettingMessage';
 import { createApp } from '@cloudbeaver/tests-runner';
 
 import { resourceManagerPlugin } from './manifest';
-import { ResourceManagerSettings, ResourceManagerSettingsService } from './ResourceManagerSettingsService';
+import { ResourceManagerSettingsService } from './ResourceManagerSettingsService';
 
 const endpoint = createGQLEndpoint();
+const server = mockGraphQL(...mockAppInit(endpoint));
 const app = createApp(
   resourceManagerPlugin,
-  coreEventsManifest,
-  corePluginManifest,
-  coreProductManifest,
   coreRootManifest,
   coreSDKManifest,
   coreSettingsManifest,
-  coreBrowserManifest,
   coreLocalizationManifest,
+  coreClientActivityManifest,
 );
-
-const server = mockGraphQL(...mockAppInit(endpoint));
-
-beforeAll(() => app.init());
 
 const testValueDeprecated = true;
 const testValueNew = false;
 
 const deprecatedSettings = {
-  plugin_resource_manager: {
-    disabled: testValueDeprecated,
-  } as ResourceManagerSettings,
+  'plugin_resource_manager.disabled': testValueDeprecated,
 };
 
 const newSettings = {
   ...deprecatedSettings,
-  plugin: {
-    'resource-manager': {
-      disabled: testValueNew,
-    } as ResourceManagerSettings,
-  },
+  'plugin.resource-manager.disabled': testValueNew,
 };
 
 test('New settings equal deprecated settings A', async () => {
-  const settings = app.injector.getServiceByClass(ResourceManagerSettingsService);
-  const config = app.injector.getServiceByClass(ServerConfigResource);
+  const settings = app.serviceProvider.getService(ResourceManagerSettingsService);
+  const config = app.serviceProvider.getService(ServerConfigResource);
 
   server.use(endpoint.query('serverConfig', mockServerConfig(newSettings)));
 
   await config.refresh();
 
-  expect(settings.settings.getValue('disabled')).toBe(testValueNew);
+  expect(settings.disabled).toBe(testValueNew);
+  expectNoDeprecatedSettingMessage();
 });
 
 test('New settings equal deprecated settings B', async () => {
-  const settings = app.injector.getServiceByClass(ResourceManagerSettingsService);
-  const config = app.injector.getServiceByClass(ServerConfigResource);
+  const settings = app.serviceProvider.getService(ResourceManagerSettingsService);
+  const config = app.serviceProvider.getService(ServerConfigResource);
 
   server.use(endpoint.query('serverConfig', mockServerConfig(deprecatedSettings)));
 
   await config.refresh();
 
-  expect(settings.settings.getValue('disabled')).toBe(testValueDeprecated);
+  expect(settings.disabled).toBe(testValueDeprecated);
+  expectDeprecatedSettingMessage();
 });

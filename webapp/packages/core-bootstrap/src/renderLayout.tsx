@@ -10,9 +10,9 @@ import { createRoot, Root } from 'react-dom/client';
 
 import { BodyLazy } from '@cloudbeaver/core-app';
 import { DisplayError, ErrorBoundary, Loader, s } from '@cloudbeaver/core-blocks';
-import { AppContext, IServiceInjector } from '@cloudbeaver/core-di';
+import { HideAppLoadingScreen, IServiceProvider, ServiceProviderContext } from '@cloudbeaver/core-di';
 
-import styles from './renderLayout.m.css';
+import styles from './renderLayout.module.css';
 
 interface IRender {
   initRoot(): Root;
@@ -21,7 +21,7 @@ interface IRender {
   unmount(): void;
 }
 
-export function renderLayout(serviceInjector: IServiceInjector): IRender {
+export function renderLayout(serviceProvider: IServiceProvider): IRender {
   let root: Root | undefined;
 
   return {
@@ -47,20 +47,29 @@ export function renderLayout(serviceInjector: IServiceInjector): IRender {
     },
     renderApp() {
       this.initRoot().render(
-        <AppContext app={serviceInjector}>
-          <ErrorBoundary root>
-            <Suspense fallback={<Loader className={s(styles, { loader: true })} />}>
-              <BodyLazy />
-            </Suspense>
-          </ErrorBoundary>
-        </AppContext>,
+        <ErrorBoundary fallback={<HideAppLoadingScreen />} simple>
+          <ServiceProviderContext serviceProvider={serviceProvider}>
+            <ErrorBoundary fallback={<HideAppLoadingScreen />} root>
+              <Suspense fallback={<Loader className={s(styles, { loader: true })} />}>
+                <BodyLazy />
+                <HideAppLoadingScreen />
+              </Suspense>
+            </ErrorBoundary>
+          </ServiceProviderContext>
+        </ErrorBoundary>,
       );
     },
     renderError(exception?: any) {
+      if (exception) {
+        console.error(exception);
+      }
       this.initRoot().render(
-        <AppContext app={serviceInjector}>
-          <DisplayError error={exception} root />
-        </AppContext>,
+        <ErrorBoundary fallback={<HideAppLoadingScreen />} simple>
+          <ServiceProviderContext serviceProvider={serviceProvider}>
+            <DisplayError error={exception} root />
+            <HideAppLoadingScreen />
+          </ServiceProviderContext>
+        </ErrorBoundary>,
       );
     },
   };

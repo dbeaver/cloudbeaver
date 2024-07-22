@@ -25,6 +25,10 @@ export class AuthInfoService {
     return this.userInfoResource.data;
   }
 
+  get isAnonymous(): boolean {
+    return !this.userInfoResource.data;
+  }
+
   constructor(
     private readonly userInfoResource: UserInfoResource,
     private readonly authProvidersResource: AuthProvidersResource,
@@ -35,10 +39,6 @@ export class AuthInfoService {
     return new AutoRunningTask(async () => await this.userInfoResource.login(providerId, options)).then(authInfo =>
       this.federatedAuthentication(providerId, options, authInfo),
     );
-  }
-
-  async logout(): Promise<void> {
-    await this.userInfoResource.logout();
   }
 
   private federatedAuthentication(

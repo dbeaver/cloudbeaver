@@ -8,19 +8,18 @@
 import { observable } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import { Suspense, useContext, useEffect, useRef, useState } from 'react';
-import styled, { use } from 'reshadow';
 
-import type { ComponentStyle } from '@cloudbeaver/core-theming';
 import { ILoadableState, uuid } from '@cloudbeaver/core-utils';
 
 import { Button } from '../Button';
 import { ErrorBoundary } from '../ErrorBoundary';
 import { ExceptionMessage } from '../ExceptionMessage';
 import { Translate } from '../localization/Translate';
+import { s } from '../s';
 import { StaticImage } from '../StaticImage';
-import { useStyles } from '../useStyles';
+import { useS } from '../useS';
+import styles from './Loader.module.css';
 import { ILoaderContext, LoaderContext } from './LoaderContext';
-import { loaderStyles, overlayStyles } from './loaderStyles';
 
 type LoaderState =
   | ILoadableState
@@ -52,7 +51,6 @@ interface Props {
   className?: string;
   fullSize?: boolean;
   state?: LoaderState | LoaderState[];
-  style?: ComponentStyle;
   children?: (() => React.ReactNode) | React.ReactNode;
   onCancel?: () => void;
 }
@@ -80,7 +78,6 @@ export const Loader = observer<Props>(function Loader({
   loading,
   inlineException,
   state,
-  style,
   children,
   onCancel,
 }) {
@@ -171,7 +168,7 @@ export const Loader = observer<Props>(function Loader({
     loading = false;
   }
 
-  style = useStyles(loaderStyles, style, overlay && overlayStyles);
+  const style = useS(styles);
   const [isVisible, setVisible] = useState(loading);
 
   const refLoaderDisplayed = { state: false };
@@ -230,9 +227,9 @@ export const Loader = observer<Props>(function Loader({
                 small={small}
                 inline={inline}
                 fullSize={fullSize}
+                overlay={overlay}
                 className={className}
                 inlineException={inlineException}
-                style={style}
               />
             }
           >
@@ -251,7 +248,7 @@ export const Loader = observer<Props>(function Loader({
     if (hideException) {
       return null;
     }
-    return styled(style)(<ExceptionMessage exception={exception} inline={inline || inlineException} className={className} onRetry={reload} />);
+    return <ExceptionMessage exception={exception} inline={inline || inlineException} className={className} onRetry={reload} />;
   }
 
   if (children && (!loader || !loading) && !overlay) {
@@ -274,31 +271,31 @@ export const Loader = observer<Props>(function Loader({
 
   refLoaderDisplayed.state = true;
 
-  return styled(style)(
+  return (
     <LoaderContext.Provider value={contextState}>
       <>
         {overlay && renderWrappedChildren()}
-        <loader ref={loaderRef} className={className} {...use({ small, fullSize, inline, secondary, overlay })}>
-          <icon>
-            <StaticImage icon={spinnerType.primary} {...use({ primaryIcon: true })} />
-            <StaticImage icon={spinnerType.primarySmall} {...use({ primarySmallIcon: true })} />
-            <StaticImage icon={spinnerType.secondary} {...use({ secondaryIcon: true })} />
-            <StaticImage icon={spinnerType.secondarySmall} {...use({ secondarySmallIcon: true })} />
-          </icon>
+        <div ref={loaderRef} className={s(style, { loader: true, loaderOverlay: overlay, small, fullSize, inline, secondary, overlay }, className)}>
+          <div className={s(style, { icon: true })}>
+            <StaticImage icon={spinnerType.primary} className={s(style, { staticImage: true, primaryIcon: true })} />
+            <StaticImage icon={spinnerType.primarySmall} className={s(style, { staticImage: true, primarySmallIcon: true })} />
+            <StaticImage icon={spinnerType.secondary} className={s(style, { staticImage: true, secondaryIcon: true })} />
+            <StaticImage icon={spinnerType.secondarySmall} className={s(style, { staticImage: true, secondarySmallIcon: true })} />
+          </div>
           {!hideMessage && (
-            <message>
+            <div className={s(style, { message: true })}>
               <Translate token={message || 'ui_processing_loading'} />
-            </message>
+            </div>
           )}
           {onCancel && (
-            <actions>
+            <div className={s(style, { actions: true })}>
               <Button type="button" mod={['unelevated']} disabled={cancelDisabled} onClick={onCancel}>
                 <Translate token="ui_processing_cancel" />
               </Button>
-            </actions>
+            </div>
           )}
-        </loader>
+        </div>
       </>
-    </LoaderContext.Provider>,
+    </LoaderContext.Provider>
   );
 });

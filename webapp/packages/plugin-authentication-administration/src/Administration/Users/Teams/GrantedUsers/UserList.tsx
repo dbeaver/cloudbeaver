@@ -12,6 +12,7 @@ import { useCallback, useState } from 'react';
 import { UsersResource } from '@cloudbeaver/core-authentication';
 import {
   Button,
+  Container,
   getComputed,
   getSelectedItems,
   Group,
@@ -25,13 +26,14 @@ import {
   useTranslate,
 } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
+import { ServerConfigResource } from '@cloudbeaver/core-root';
 import type { AdminUserInfoFragment } from '@cloudbeaver/core-sdk';
 
 import { getFilteredUsers } from './getFilteredUsers';
 import { GrantedUsersTableHeader, IFilterState } from './GrantedUsersTableHeader/GrantedUsersTableHeader';
-import { GrantedUsersTableInnerHeader } from './GrantedUsersTableHeader/GrantedUsersTableInnerHeader';
-import { GrantedUsersTableItem } from './GrantedUsersTableItem';
-import style from './UserList.m.css';
+import style from './UserList.module.css';
+import { UsersTableInnerHeader } from './UsersTableInnerHeader';
+import { UsersTableItem } from './UsersTableItem';
 
 interface Props {
   userList: AdminUserInfoFragment[];
@@ -46,6 +48,7 @@ export const UserList = observer<Props>(function UserList({ userList, grantedUse
   const translate = useTranslate();
 
   const usersResource = useService(UsersResource);
+  const serverConfigResource = useService(ServerConfigResource);
 
   const [selectedSubjects] = useState<Map<any, boolean>>(() => observable(new Map()));
   const [filterState] = useState<IFilterState>(() => observable({ filterValue: '' }));
@@ -60,46 +63,46 @@ export const UserList = observer<Props>(function UserList({ userList, grantedUse
     selectedSubjects.clear();
   }, []);
 
+  function isEditable(userId: string) {
+    if (serverConfigResource.distributed) {
+      return true;
+    }
+
+    return !usersResource.isActiveUser(userId);
+  }
+
   return (
-    <Group className={s(styles, { box: true })} box medium overflow>
-      <div className={s(styles, { innerBox: true })}>
-        <GrantedUsersTableHeader className={s(styles, { header: true })} filterState={filterState} disabled={disabled}>
+    <Group className={s(styles, { group: true })} border box medium overflow vertical>
+      <GrantedUsersTableHeader className={s(styles, { header: true })} filterState={filterState} disabled={disabled}>
+        <Container keepSize>
           <Button disabled={disabled || !selected} mod={['unelevated']} onClick={grant}>
             {translate('ui_add')}
           </Button>
-        </GrantedUsersTableHeader>
-        <div className={s(styles, { tableBox: true })}>
-          <Table
-            className={s(styles, { table: true })}
-            keys={keys}
-            selectedItems={selectedSubjects}
-            isItemSelectable={item => !(usersResource.isActiveUser(item) || grantedUsers.includes(item))}
-          >
-            <GrantedUsersTableInnerHeader disabled={disabled} />
-            <TableBody>
-              {!users.length && filterState.filterValue && (
-                <TableItem item="tableInfo" selectDisabled>
-                  <TableColumnValue colSpan={5}>{translate('ui_search_no_result_placeholder')}</TableColumnValue>
-                </TableItem>
-              )}
-              {users.map(user => {
-                const activeUser = usersResource.isActiveUser(user.userId);
-                return (
-                  <GrantedUsersTableItem
-                    key={user.userId}
-                    id={user.userId}
-                    name={`${user.userId}${activeUser ? ' (you)' : ''}`}
-                    tooltip={activeUser ? translate('administration_teams_team_granted_users_permission_denied') : user.userId}
-                    icon="/icons/user.svg"
-                    iconTooltip={translate('authentication_user_icon_tooltip')}
-                    disabled={disabled}
-                  />
-                );
-              })}
-            </TableBody>
-          </Table>
-        </div>
-      </div>
+        </Container>
+      </GrantedUsersTableHeader>
+      <Container overflow>
+        <Table keys={keys} selectedItems={selectedSubjects} isItemSelectable={item => isEditable(item) && !grantedUsers.includes(item)}>
+          <UsersTableInnerHeader disabled={disabled} />
+          <TableBody>
+            {!users.length && filterState.filterValue && (
+              <TableItem item="tableInfo" selectDisabled>
+                <TableColumnValue colSpan={5}>{translate('ui_search_no_result_placeholder')}</TableColumnValue>
+              </TableItem>
+            )}
+            {users.map(user => (
+              <UsersTableItem
+                key={user.userId}
+                id={user.userId}
+                name={`${user.userId}${usersResource.isActiveUser(user.userId) ? ` (${translate('ui_you')})` : ''}`}
+                tooltip={isEditable(user.userId) ? user.userId : translate('administration_teams_team_granted_users_permission_denied')}
+                icon="/icons/user.svg"
+                iconTooltip={translate('authentication_user_icon_tooltip')}
+                disabled={disabled}
+              />
+            ))}
+          </TableBody>
+        </Table>
+      </Container>
     </Group>
   );
 });

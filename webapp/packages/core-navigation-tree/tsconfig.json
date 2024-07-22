@@ -7,9 +7,6 @@
   },
   "references": [
     {
-      "path": "../core-app/tsconfig.json"
-    },
-    {
       "path": "../core-authentication/tsconfig.json"
     },
     {
@@ -17,6 +14,9 @@
     },
     {
       "path": "../core-browser/tsconfig.json"
+    },
+    {
+      "path": "../core-client-activity/tsconfig.json"
     },
     {
       "path": "../core-data-context/tsconfig.json"
@@ -38,15 +38,6 @@
     },
     {
       "path": "../core-localization/tsconfig.json"
-    },
-    {
-      "path": "../core-plugin/tsconfig.json"
-    },
-    {
-      "path": "../core-plugin/tsconfig.json"
-    },
-    {
-      "path": "../core-product/tsconfig.json"
     },
     {
       "path": "../core-projects/tsconfig.json"
@@ -76,7 +67,10 @@
       "path": "../core-settings/tsconfig.json"
     },
     {
-      "path": "../core-theming/tsconfig.json"
+      "path": "../core-settings/tsconfig.json"
+    },
+    {
+      "path": "../core-storage/tsconfig.json"
     },
     {
       "path": "../core-ui/tsconfig.json"

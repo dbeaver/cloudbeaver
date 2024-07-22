@@ -21,8 +21,8 @@ import io.cloudbeaver.server.CBConstants;
 import io.cloudbeaver.service.rm.nio.RMNIOFileSystem;
 import io.cloudbeaver.service.rm.nio.RMNIOFileSystemProvider;
 import io.cloudbeaver.service.rm.nio.RMPath;
+import io.cloudbeaver.test.WebGQLClient;
 import io.cloudbeaver.test.platform.CEServerTestSuite;
-import io.cloudbeaver.utils.WebTestUtils;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.auth.SMAuthStatus;
 import org.jkiss.dbeaver.model.data.json.JSONUtils;
@@ -43,6 +43,7 @@ import java.nio.file.Path;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class RMNIOTest {
 
@@ -53,12 +54,12 @@ public class RMNIOTest {
     @BeforeClass
     public static void init() throws Exception {
         var cookieManager = new CookieManager();
-        var client = HttpClient.newBuilder()
+        var httpClient = HttpClient.newBuilder()
             .cookieHandler(cookieManager)
             .version(HttpClient.Version.HTTP_2)
             .build();
-        Map<String, Object> authInfo = WebTestUtils.authenticateUser(
-            client, CEServerTestSuite.getScriptsPath(), CEServerTestSuite.GQL_API_URL);
+        WebGQLClient client = CEServerTestSuite.createClient(httpClient);
+        Map<String, Object> authInfo = CEServerTestSuite.authenticateTestUser(client);
         Assert.assertEquals(SMAuthStatus.SUCCESS.name(), JSONUtils.getString(authInfo, "authStatus"));
 
         String sessionId = cookieManager.getCookieStore().getCookies()
@@ -135,12 +136,14 @@ public class RMNIOTest {
         String file2 = "script" + SecurityUtils.generateUniqueId() + ".sql";
         rm.createResource(testProject.getId(), file1, true);
         rm.createResource(testProject.getId(), file2, false);
-        Set<String> filesFromNio =
-            Files.list(rootPath)
-                .map(path -> ((RMPath) path).getResourcePath())
-                .collect(Collectors.toSet());
-        Assert.assertTrue(filesFromNio.contains(file1));
-        Assert.assertTrue(filesFromNio.contains(file2));
+        try (Stream<Path> list = Files.list(rootPath)) {
+            Set<String> filesFromNio =
+                list
+                    .map(path -> ((RMPath) path).getResourcePath())
+                    .collect(Collectors.toSet());
+            Assert.assertTrue(filesFromNio.contains(file1));
+            Assert.assertTrue(filesFromNio.contains(file2));
+        }
     }
 
     @Test

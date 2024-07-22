@@ -7,46 +7,33 @@
  */
 import type { PluginManifest } from '@cloudbeaver/core-di';
 
-import { DataPresentationService } from './DataPresentationService';
-import { DataViewerBootstrap } from './DataViewerBootstrap';
-import { DataViewerDataChangeConfirmationService } from './DataViewerDataChangeConfirmationService';
-import { DataViewerService } from './DataViewerService';
-import { DataViewerSettingsService } from './DataViewerSettingsService';
-import { DataViewerTableService } from './DataViewerTableService';
-import { DataViewerTabService } from './DataViewerTabService';
-import { LocaleService } from './LocaleService';
-import { TableFooterMenuService } from './TableViewer/TableFooter/TableFooterMenu/TableFooterMenuService';
-import { TableHeaderService } from './TableViewer/TableHeader/TableHeaderService';
-import { TableViewerStorageService } from './TableViewer/TableViewerStorageService';
-import { DataValuePanelBootstrap } from './TableViewer/ValuePanel/DataValuePanelBootstrap';
-import { DataValuePanelService } from './TableViewer/ValuePanel/DataValuePanelService';
-import { BooleanValuePresentationBootstrap } from './ValuePanelPresentation/BooleanValue/BooleanValuePresentationBootstrap';
-import { ImageValuePresentationBootstrap } from './ValuePanelPresentation/ImageValue/ImageValuePresentationBootstrap';
-import { TextValuePresentationBootstrap } from './ValuePanelPresentation/TextValue/TextValuePresentationBootstrap';
-import { TextValuePresentationService } from './ValuePanelPresentation/TextValue/TextValuePresentationService';
-
 export const dataViewerManifest: PluginManifest = {
   info: {
     name: 'Data Viewer Plugin',
   },
 
   providers: [
-    DataViewerBootstrap,
-    DataViewerTabService,
-    DataViewerTableService,
-    DataPresentationService,
-    TableViewerStorageService,
-    TableFooterMenuService,
-    TableHeaderService,
-    LocaleService,
-    DataValuePanelService,
-    TextValuePresentationService,
-    DataViewerDataChangeConfirmationService,
-    TextValuePresentationBootstrap,
-    ImageValuePresentationBootstrap,
-    BooleanValuePresentationBootstrap,
-    DataValuePanelBootstrap,
-    DataViewerSettingsService,
-    DataViewerService,
+    () => import('./TableViewer/TableFooter/TableFooterMenu/RefreshAction/TableRefreshActionBootstrap').then(m => m.TableRefreshActionBootstrap),
+    () => import('./DataViewerBootstrap').then(m => m.DataViewerBootstrap),
+    () => import('./DataViewerTabService').then(m => m.DataViewerTabService),
+    () => import('./DataViewerTableService').then(m => m.DataViewerTableService),
+    () => import('./DataPresentationService').then(m => m.DataPresentationService),
+    () => import('./TableViewer/TableViewerStorageService').then(m => m.TableViewerStorageService),
+    () => import('./TableViewer/TableFooter/TableFooterMenu/TableFooterMenuService').then(m => m.TableFooterMenuService),
+    () => import('./TableViewer/TableHeader/TableHeaderService').then(m => m.TableHeaderService),
+    () => import('./LocaleService').then(m => m.LocaleService),
+    () => import('./TableViewer/ValuePanel/DataValuePanelService').then(m => m.DataValuePanelService),
+    () => import('./ValuePanelPresentation/TextValue/TextValuePresentationService').then(m => m.TextValuePresentationService),
+    () => import('./DataViewerDataChangeConfirmationService').then(m => m.DataViewerDataChangeConfirmationService),
+    () => import('./ValuePanelPresentation/TextValue/TextValuePresentationBootstrap').then(m => m.TextValuePresentationBootstrap),
+    () => import('./ValuePanelPresentation/ImageValue/ImageValuePresentationBootstrap').then(m => m.ImageValuePresentationBootstrap),
+    () => import('./ValuePanelPresentation/BooleanValue/BooleanValuePresentationBootstrap').then(m => m.BooleanValuePresentationBootstrap),
+    () => import('./TableViewer/ValuePanel/DataValuePanelBootstrap').then(m => m.DataValuePanelBootstrap),
+    () => import('./DataViewerSettingsService').then(m => m.DataViewerSettingsService),
+    () => import('./DataViewerService').then(m => m.DataViewerService),
+    () => import('./ResultSet/ResultSetTableFooterMenuService').then(m => m.ResultSetTableFooterMenuService),
+    () => import('./TableViewer/DataViewerViewService').then(m => m.DataViewerViewService),
+    () =>
+      import('./TableViewer/TableFooter/TableFooterMenu/FetchSizeAction/TableFetchSizeActionBootstrap').then(m => m.TableFetchSizeActionBootstrap),
   ],
 };

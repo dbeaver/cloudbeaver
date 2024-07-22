@@ -7,22 +7,19 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import type { ComponentStyle } from '@cloudbeaver/core-theming';
-
 import { s } from '../../s';
 import { useS } from '../../useS';
-import styles from './CommonDialogBody.m.css';
+import styles from './CommonDialogBody.module.css';
 
 interface Props {
   noBodyPadding?: boolean;
   noOverflow?: boolean;
   className?: string;
   children?: React.ReactNode;
-  style?: ComponentStyle;
 }
 
-export const CommonDialogBody = observer<Props>(function CommonDialogBody({ noBodyPadding, noOverflow, className, children, style }) {
-  const computedStyles = useS(styles, style);
+export const CommonDialogBody = observer<Props>(function CommonDialogBody({ noBodyPadding, noOverflow, className, children }) {
+  const computedStyles = useS(styles);
 
   return (
     <div className={s(computedStyles, { body: true, noBodyPadding, noOverflow }, className)}>

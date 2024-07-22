@@ -10,10 +10,10 @@
     "importsNotUsedAsValues": "error",
     "forceConsistentCasingInFileNames": true,
     "ignoreDeprecations": "5.0",
-    "jsx": "preserve",
+    "jsx": "react-jsx",
     "target": "esnext",
     "module": "esnext",
-    "moduleResolution": "node",
+    "moduleResolution": "Bundler",
     "noImplicitAny": true,
     "noImplicitThis": true,
     "noImplicitReturns": true,
@@ -28,6 +28,7 @@
     "strictNullChecks": true,
     "isolatedModules": true,
     "allowArbitraryExtensions": true,
+    "resolveJsonModule": true,
 
     "useDefineForClassFields": false,
     "esModuleInterop": true,
@@ -51,7 +52,6 @@
         // https://github.com/mrmckeb/typescript-plugin-css-modules/issues/222
         "name": "typescript-plugin-css-modules",
         "options": {
-          "customMatcher": "\\.m\\.(c|le|sa|sc)ss$",
           "goToDefinition": true
         }
       }

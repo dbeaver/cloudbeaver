@@ -1,0 +1,23 @@
+/*
+ * CloudBeaver - Cloud Database Manager
+ * Copyright (C) 2020-2024 DBeaver Corp and others
+ *
+ * Licensed under the Apache License, Version 2.0.
+ * you may not use this file except in compliance with the License.
+ */
+.tableHeader.fixed {
+  background: var(--theme-surface);
+  position: sticky;
+  top: 0;
+  /* TODO: place TableHeader after TableBody and remove z-index */
+  z-index: 1;
+
+  & > tr {
+    border-top: none !important;
+    border-bottom: none !important;
+
+    & > th {
+      box-shadow: inset 0 -1px 0 var(--theme-background);
+    }
+  }
+}

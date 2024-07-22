@@ -6,277 +6,198 @@
  * you may not use this file except in compliance with the License.
  */
 import { injectable } from '@cloudbeaver/core-di';
-import { ContextMenuService, IContextMenuItem, IMenuContext, IMenuItem } from '@cloudbeaver/core-dialogs';
+import {
+  ACTION_ADD,
+  ACTION_CANCEL,
+  ACTION_DELETE,
+  ACTION_DUPLICATE,
+  ACTION_REVERT,
+  ACTION_SAVE,
+  ActionService,
+  MenuService,
+} from '@cloudbeaver/core-view';
 
 import { DatabaseEditAction } from '../../../DatabaseDataModel/Actions/DatabaseEditAction';
 import { DatabaseSelectAction } from '../../../DatabaseDataModel/Actions/DatabaseSelectAction';
 import { DatabaseEditChangeType } from '../../../DatabaseDataModel/Actions/IDatabaseDataEditAction';
+import { DATA_CONTEXT_DV_DDM } from '../../../DatabaseDataModel/DataContext/DATA_CONTEXT_DV_DDM';
+import { DATA_CONTEXT_DV_DDM_RESULT_INDEX } from '../../../DatabaseDataModel/DataContext/DATA_CONTEXT_DV_DDM_RESULT_INDEX';
+import { DATA_CONTEXT_DV_PRESENTATION, DataViewerPresentationType } from '../../../DatabaseDataModel/DataContext/DATA_CONTEXT_DV_PRESENTATION';
 import type { IDatabaseDataModel } from '../../../DatabaseDataModel/IDatabaseDataModel';
-
-export interface ITableFooterMenuContext {
-  model: IDatabaseDataModel;
-  resultIndex: number;
-  simple: boolean;
-}
+import { DATA_VIEWER_DATA_MODEL_ACTIONS_MENU } from './DATA_VIEWER_DATA_MODEL_ACTIONS_MENU';
 
 @injectable()
 export class TableFooterMenuService {
-  static nodeContextType = 'NodeWithParent';
-  private readonly tableFooterMenuToken = 'tableFooterMenu';
+  constructor(
+    private readonly actionService: ActionService,
+    private readonly menuService: MenuService,
+  ) {}
 
-  constructor(private readonly contextMenuService: ContextMenuService) {
-    this.contextMenuService.addPanel(this.tableFooterMenuToken);
+  register() {
+    this.registerEditingActions();
+  }
 
-    this.registerMenuItem({
-      id: 'table_add',
-      order: 0.5,
-      icon: '/icons/data_add_sm.svg',
-      tooltip: 'data_viewer_action_edit_add',
-      isPresent(context) {
-        return context.contextType === TableFooterMenuService.nodeContextType;
+  private registerEditingActions() {
+    this.menuService.addCreator({
+      menus: [DATA_VIEWER_DATA_MODEL_ACTIONS_MENU],
+      contexts: [DATA_CONTEXT_DV_DDM, DATA_CONTEXT_DV_DDM_RESULT_INDEX],
+      isApplicable(context) {
+        const model = context.get(DATA_CONTEXT_DV_DDM)!;
+        const resultIndex = context.get(DATA_CONTEXT_DV_DDM_RESULT_INDEX)!;
+        const presentation = context.get(DATA_CONTEXT_DV_PRESENTATION);
+
+        return !model.isReadonly(resultIndex) && !presentation?.readonly && (!presentation || presentation.type === DataViewerPresentationType.Data);
       },
-      isHidden(context) {
-        if (context.data.model.isReadonly(context.data.resultIndex)) {
-          return true;
-        }
-
-        const editor = context.data.model.source.getActionImplementation(context.data.resultIndex, DatabaseEditAction);
-
-        return !editor?.hasFeature('add');
-      },
-      isDisabled(context) {
-        return (
-          context.data.model.isLoading() ||
-          context.data.model.isDisabled(context.data.resultIndex) ||
-          !context.data.model.source.hasResult(context.data.resultIndex)
-        );
-      },
-      onClick(context) {
-        const editor = context.data.model.source.getActionImplementation(context.data.resultIndex, DatabaseEditAction);
-
-        if (!editor) {
-          return;
-        }
-
-        const select = context.data.model.source.getActionImplementation(context.data.resultIndex, DatabaseSelectAction);
-
-        editor.add(select?.getFocusedElement());
+      getItems(context, items) {
+        return [ACTION_ADD, ACTION_DUPLICATE, ACTION_DELETE, ACTION_REVERT, ACTION_SAVE, ACTION_CANCEL, ...items];
       },
     });
-    this.registerMenuItem({
-      id: 'table_add_copy',
-      order: 0.55,
-      icon: '/icons/data_add_copy_sm.svg',
-      tooltip: 'data_viewer_action_edit_add_copy',
-      isPresent(context) {
-        return context.contextType === TableFooterMenuService.nodeContextType;
-      },
-      isHidden(context) {
-        if (context.data.model.isReadonly(context.data.resultIndex)) {
-          return true;
+    this.actionService.addHandler({
+      id: 'data-base-editing-handler',
+      contexts: [DATA_CONTEXT_DV_DDM, DATA_CONTEXT_DV_DDM_RESULT_INDEX],
+      menus: [DATA_VIEWER_DATA_MODEL_ACTIONS_MENU],
+      actions: [ACTION_ADD, ACTION_DUPLICATE, ACTION_DELETE, ACTION_REVERT, ACTION_SAVE, ACTION_CANCEL],
+      isActionApplicable(context, action) {
+        const model = context.get(DATA_CONTEXT_DV_DDM)!;
+        const resultIndex = context.get(DATA_CONTEXT_DV_DDM_RESULT_INDEX)!;
+
+        if (model.isReadonly(resultIndex)) {
+          return false;
         }
 
-        const editor = context.data.model.source.getActionImplementation(context.data.resultIndex, DatabaseEditAction);
-
-        return !editor?.hasFeature('add');
-      },
-      isDisabled(context) {
-        if (
-          context.data.model.isLoading() ||
-          context.data.model.isDisabled(context.data.resultIndex) ||
-          !context.data.model.source.hasResult(context.data.resultIndex)
-        ) {
-          return true;
-        }
-
-        const selectedElements = getActiveElements(context.data.model, context.data.resultIndex);
-
-        return selectedElements.length === 0;
-      },
-      onClick(context) {
-        const editor = context.data.model.source.getActionImplementation(context.data.resultIndex, DatabaseEditAction);
+        const editor = model.source.getActionImplementation(resultIndex, DatabaseEditAction);
 
         if (!editor) {
-          return;
+          return false;
         }
 
-        const selectedElements = getActiveElements(context.data.model, context.data.resultIndex);
+        switch (action) {
+          case ACTION_DUPLICATE:
+          case ACTION_ADD: {
+            return editor.hasFeature('add');
+          }
+          case ACTION_DELETE: {
+            return editor.hasFeature('delete');
+          }
+          case ACTION_REVERT: {
+            return editor.hasFeature('revert');
+          }
+        }
+        return true;
+      },
+      isDisabled(context, action) {
+        const model = context.get(DATA_CONTEXT_DV_DDM)!;
+        const resultIndex = context.get(DATA_CONTEXT_DV_DDM_RESULT_INDEX)!;
 
-        editor.duplicate(...selectedElements);
-      },
-    });
-    this.registerMenuItem({
-      id: 'table_delete',
-      order: 0.6,
-      icon: '/icons/data_delete_sm.svg',
-      tooltip: 'data_viewer_action_edit_delete',
-      isPresent(context) {
-        return context.contextType === TableFooterMenuService.nodeContextType;
-      },
-      isHidden(context) {
-        if (context.data.model.isReadonly(context.data.resultIndex)) {
+        if (model.isLoading() || model.isDisabled(resultIndex) || !model.source.getResult(resultIndex)) {
           return true;
         }
 
-        const editor = context.data.model.source.getActionImplementation(context.data.resultIndex, DatabaseEditAction);
+        switch (action) {
+          case ACTION_DUPLICATE: {
+            const selectedElements = getActiveElements(model, resultIndex);
 
-        return !editor?.hasFeature('delete');
-      },
-      isDisabled(context) {
-        if (
-          context.data.model.isLoading() ||
-          context.data.model.isDisabled(context.data.resultIndex) ||
-          !context.data.model.source.hasResult(context.data.resultIndex)
-        ) {
-          return true;
-        }
+            return selectedElements.length === 0;
+          }
+          case ACTION_DELETE: {
+            const editor = model.source.getActionImplementation(resultIndex, DatabaseEditAction);
 
-        const editor = context.data.model.source.getActionImplementation(context.data.resultIndex, DatabaseEditAction);
-
-        if (!editor) {
-          return true;
-        }
-
-        const selectedElements = getActiveElements(context.data.model, context.data.resultIndex);
-
-        if (selectedElements.length === 0) {
-          return true;
-        }
-
-        return !selectedElements.some(key => editor.getElementState(key) !== DatabaseEditChangeType.delete);
-      },
-      onClick(context) {
-        const editor = context.data.model.source.getActionImplementation(context.data.resultIndex, DatabaseEditAction);
-
-        const selectedElements = getActiveElements(context.data.model, context.data.resultIndex);
-
-        editor?.delete(...selectedElements);
-      },
-    });
-    this.registerMenuItem({
-      id: 'table_revert',
-      order: 0.7,
-      icon: '/icons/data_revert_sm.svg',
-      tooltip: 'data_viewer_action_edit_revert',
-      isPresent(context) {
-        return context.contextType === TableFooterMenuService.nodeContextType;
-      },
-      isHidden(context) {
-        if (context.data.model.isReadonly(context.data.resultIndex)) {
-          return true;
-        }
-
-        const editor = context.data.model.source.getActionImplementation(context.data.resultIndex, DatabaseEditAction);
-
-        return !editor;
-      },
-      isDisabled(context) {
-        if (
-          context.data.model.isLoading() ||
-          context.data.model.isDisabled(context.data.resultIndex) ||
-          !context.data.model.source.hasResult(context.data.resultIndex)
-        ) {
-          return true;
-        }
-
-        const editor = context.data.model.source.getActionImplementation(context.data.resultIndex, DatabaseEditAction);
-
-        const selectedElements = getActiveElements(context.data.model, context.data.resultIndex);
-
-        return (
-          !editor ||
-          selectedElements.length === 0 ||
-          !selectedElements.some(key => {
-            const state = editor.getElementState(key);
-
-            if (state === DatabaseEditChangeType.add) {
-              return editor.isElementEdited(key);
+            if (!editor) {
+              return true;
             }
 
-            return state !== null;
-          })
-        );
-      },
-      onClick(context) {
-        const editor = context.data.model.source.getActionImplementation(context.data.resultIndex, DatabaseEditAction);
+            const selectedElements = getActiveElements(model, resultIndex);
 
-        const selectedElements = getActiveElements(context.data.model, context.data.resultIndex);
+            return selectedElements.length === 0 || !selectedElements.some(key => editor.getElementState(key) !== DatabaseEditChangeType.delete);
+          }
+          case ACTION_REVERT: {
+            const editor = model.source.getActionImplementation(resultIndex, DatabaseEditAction);
 
-        editor?.revert(...selectedElements);
-      },
-    });
-    this.registerMenuItem({
-      id: 'save ',
-      order: 1,
-      title: 'ui_processing_save',
-      tooltip: 'ui_processing_save',
-      icon: 'table-save',
-      isPresent(context) {
-        return context.contextType === TableFooterMenuService.nodeContextType;
-      },
-      isHidden(context) {
-        return context.data.model.isReadonly(context.data.resultIndex);
-      },
-      isDisabled(context) {
-        if (
-          context.data.model.isLoading() ||
-          context.data.model.isDisabled(context.data.resultIndex) ||
-          !context.data.model.source.hasResult(context.data.resultIndex)
-        ) {
-          return true;
+            if (!editor) {
+              return true;
+            }
+
+            const selectedElements = getActiveElements(model, resultIndex);
+
+            return (
+              selectedElements.length === 0 ||
+              !selectedElements.some(key => {
+                const state = editor.getElementState(key);
+
+                if (state === DatabaseEditChangeType.add) {
+                  return editor.isElementEdited(key);
+                }
+
+                return state !== null;
+              })
+            );
+          }
+          case ACTION_SAVE:
+          case ACTION_CANCEL: {
+            const editor = model.source.getActionImplementation(resultIndex, DatabaseEditAction);
+
+            return !editor?.isEdited();
+          }
         }
 
-        const editor = context.data.model.source.getActionImplementation(context.data.resultIndex, DatabaseEditAction);
-
-        return !editor?.isEdited();
+        return false;
       },
-      onClick: context => context.data.model.save().catch(() => {}),
-    });
-
-    this.registerMenuItem({
-      id: 'cancel ',
-      order: 2,
-      title: 'data_viewer_value_revert',
-      tooltip: 'data_viewer_value_revert_title',
-      icon: '/icons/data_revert_all_sm.svg',
-      isPresent(context) {
-        return context.contextType === TableFooterMenuService.nodeContextType;
-      },
-      isHidden(context) {
-        return context.data.model.isReadonly(context.data.resultIndex);
-      },
-      isDisabled(context) {
-        if (
-          context.data.model.isLoading() ||
-          context.data.model.isDisabled(context.data.resultIndex) ||
-          !context.data.model.source.hasResult(context.data.resultIndex)
-        ) {
-          return true;
+      getActionInfo(context, action) {
+        switch (action) {
+          case ACTION_ADD:
+            return { ...action.info, label: '', icon: '/icons/data_add_sm.svg', tooltip: 'data_viewer_action_edit_add' };
+          case ACTION_DUPLICATE:
+            return { ...action.info, label: '', icon: '/icons/data_add_copy_sm.svg', tooltip: 'data_viewer_action_edit_add_copy' };
+          case ACTION_DELETE:
+            return { ...action.info, label: '', icon: '/icons/data_delete_sm.svg', tooltip: 'data_viewer_action_edit_delete' };
+          case ACTION_REVERT:
+            return { ...action.info, label: '', icon: '/icons/data_revert_sm.svg', tooltip: 'data_viewer_action_edit_revert' };
+          case ACTION_SAVE:
+            return { ...action.info, icon: 'table-save' };
+          case ACTION_CANCEL:
+            return { ...action.info, icon: '/icons/data_revert_all_sm.svg', tooltip: 'data_viewer_value_revert_title' };
         }
 
-        const editor = context.data.model.source.getActionImplementation(context.data.resultIndex, DatabaseEditAction);
-
-        return !editor?.isEdited();
+        return action.info;
       },
-      onClick: context => {
-        const editor = context.data.model.source.getActionImplementation(context.data.resultIndex, DatabaseEditAction);
-        editor?.clear();
+      handler: (context, action) => {
+        const model = context.get(DATA_CONTEXT_DV_DDM)!;
+        const resultIndex = context.get(DATA_CONTEXT_DV_DDM_RESULT_INDEX)!;
+        const editor = model.source.getActionImplementation(resultIndex, DatabaseEditAction);
+
+        if (!editor) {
+          return;
+        }
+        const select = model.source.getActionImplementation(resultIndex, DatabaseSelectAction);
+        const selectedElements = getActiveElements(model, resultIndex);
+
+        switch (action) {
+          case ACTION_ADD: {
+            editor.add(select?.getFocusedElement());
+            break;
+          }
+          case ACTION_DUPLICATE: {
+            editor.duplicate(...selectedElements);
+            break;
+          }
+          case ACTION_DELETE: {
+            editor.delete(...selectedElements);
+            break;
+          }
+          case ACTION_REVERT: {
+            editor.revert(...selectedElements);
+            break;
+          }
+          case ACTION_SAVE:
+            model.save().catch(() => {});
+            break;
+          case ACTION_CANCEL: {
+            editor.clear();
+            break;
+          }
+        }
       },
     });
-  }
-
-  constructMenuWithContext(model: IDatabaseDataModel, resultIndex: number, simple: boolean): IMenuItem[] {
-    const context: IMenuContext<ITableFooterMenuContext> = {
-      menuId: this.tableFooterMenuToken,
-      contextId: model.id,
-      contextType: TableFooterMenuService.nodeContextType,
-      data: { model, resultIndex, simple },
-    };
-    return this.contextMenuService.createContextMenu(context, this.tableFooterMenuToken).menuItems;
-  }
-
-  registerMenuItem(options: IContextMenuItem<ITableFooterMenuContext>): void {
-    this.contextMenuService.addMenuItem<ITableFooterMenuContext>(this.tableFooterMenuToken, options);
   }
 }
 

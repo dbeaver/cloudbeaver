@@ -12,13 +12,13 @@ import { coreBlocksManifest } from '@cloudbeaver/core-blocks';
 import { coreBrowserManifest } from '@cloudbeaver/core-browser';
 import { coreBrowserCookiesManifest } from '@cloudbeaver/core-browser-cookies';
 import { coreBrowserSettingsManifest } from '@cloudbeaver/core-browser-settings';
+import { coreClientActivityManifest } from '@cloudbeaver/core-client-activity';
 import { coreConnectionsManifest } from '@cloudbeaver/core-connections';
 import { coreDIManifest, PluginManifest } from '@cloudbeaver/core-di';
 import { coreDialogsManifest } from '@cloudbeaver/core-dialogs';
 import { coreEventsManifest } from '@cloudbeaver/core-events';
 import { coreLocalizationManifest } from '@cloudbeaver/core-localization';
 import { coreNavigationTree } from '@cloudbeaver/core-navigation-tree';
-import { corePluginManifest } from '@cloudbeaver/core-plugin';
 import { coreProductManifest } from '@cloudbeaver/core-product';
 import { coreProjectsManifest } from '@cloudbeaver/core-projects';
 import { coreResourceManifest } from '@cloudbeaver/core-resource';
@@ -30,11 +30,15 @@ import { coreServerLocalization } from '@cloudbeaver/core-server-localization';
 import { coreSessionLocalization } from '@cloudbeaver/core-session-localization';
 import { coreSettingsManifest } from '@cloudbeaver/core-settings';
 import { coreSettingsLocalizationManifest } from '@cloudbeaver/core-settings-localization';
+import { coreSettingsUserManifest } from '@cloudbeaver/core-settings-user';
+import { coreStorageManifest } from '@cloudbeaver/core-storage';
+import { coreTaskManagerManifest } from '@cloudbeaver/core-task-manager';
 import { coreThemingManifest } from '@cloudbeaver/core-theming';
 import { coreUIManifest } from '@cloudbeaver/core-ui';
 import { coreVersionManifest } from '@cloudbeaver/core-version';
 import { coreVersionUpdateManifest } from '@cloudbeaver/core-version-update';
 import { coreViewManifest } from '@cloudbeaver/core-view';
+import { coreWebsiteManifest } from '@cloudbeaver/core-website';
 
 export const coreManifests: PluginManifest[] = [
   {
@@ -47,6 +51,7 @@ export const coreManifests: PluginManifest[] = [
   },
   coreDIManifest,
   coreRoutingManifest, // important, should be first because the router starts in load phase first after all plugins register phase
+  coreBrowserManifest,
   coreThemingManifest,
   coreLocalizationManifest,
   coreSettingsLocalizationManifest,
@@ -54,12 +59,12 @@ export const coreManifests: PluginManifest[] = [
   coreServerLocalization,
   coreBlocksManifest,
   coreSettingsManifest,
+  coreStorageManifest,
   coreEventsManifest,
   coreResourceManifest,
   coreSDKManifest,
   coreRootManifest,
-  corePluginManifest,
-  coreBrowserManifest,
+  coreWebsiteManifest,
   coreBrowserSettingsManifest,
   coreBrowserCookiesManifest,
   coreProductManifest,
@@ -74,5 +79,8 @@ export const coreManifests: PluginManifest[] = [
   coreDialogsManifest,
   resourceManagerManifest,
   coreAppManifest,
+  coreClientActivityManifest,
   coreNavigationTree,
+  coreSettingsUserManifest,
+  coreTaskManagerManifest,
 ];

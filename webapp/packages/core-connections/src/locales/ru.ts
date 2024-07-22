@@ -1,3 +1,10 @@
+/*
+ * CloudBeaver - Cloud Database Manager
+ * Copyright (C) 2020-2024 DBeaver Corp and others
+ *
+ * Licensed under the Apache License, Version 2.0.
+ * you may not use this file except in compliance with the License.
+ */
 export default [
   ['core_connections_connections_settings_group', 'Подключения'],
   ['connections_administration_item', 'Шаблоны подключений'],
@@ -24,9 +31,23 @@ export default [
   ['connections_connection_connect', 'Подключиться'],
   ['connections_connection_create_custom', 'Настроить'],
   ['connections_connection_create_search_database', 'Найти'],
-  ['connections_connection_edit_save_credentials', ' Запомнить данные'],
-  ['connections_connection_share_credentials', 'Запомнить данные для всех пользователей'],
-  ['connections_connection_share_credentials_tooltip', 'Запомнить данные для всех пользователей'],
+  ['connections_connection_authentication_save_credentials_for_user', 'Сохранить данные для текущего пользователя'],
+  [
+    'connections_connection_authentication_save_credentials_for_user_tooltip',
+    'Эти учетные данные будут использоваться для автоматического подключения',
+  ],
+  ['connections_connection_authentication_save_credentials_for_session', 'Не спрашивать снова в течение сессии'],
+  ['connections_connection_authentication_save_credentials_for_session_tooltip', 'Эти учетные данные будут удалены после выхода из системы'],
+  ['connections_connection_edit_save_credentials_shared', 'Запомнить данные для всех пользователей с доступом'],
+  [
+    'connections_connection_edit_save_credentials_shared_tooltip',
+    'Эти учетные данные будут использоваться для автоматического подключения для всех пользователей с доступом',
+  ],
+  ['connections_connection_share_credentials', 'Поделиться учетными данными с командой'],
+  [
+    'connections_connection_share_credentials_tooltip',
+    'Эти учетные данные будут использоваться для автоматического подключения для всех пользователей в команде',
+  ],
   ['connections_connection_credentials_provisioning', 'Аутентификационные данные'],
   ['connections_connection_credentials_provisioning_description', 'Чтобы проверить подключение, необходимо заполнить или подтвердить данные доступа'],
   ['connections_connection_edit_authentication', 'Авторизация'],
@@ -54,7 +75,9 @@ export default [
   ['connections_connection_test_fail', 'Не удалось выполнить подключение'],
   ['connections_connection_create_fail', 'Не удалось создать подключение'],
   ['connections_connection_save_fail', 'Не удалось сохранить подключение'],
+  ['connections_connection_expert_settings', 'Продвинутые настройки'],
   ['connections_connection_keep_alive', 'Поддерживать соединение (в секундах)'],
+  ['connections_connection_autocommit', 'Авто коммит'],
   ['connections_connection_keep_alive_tooltip', 'Не отключать соединение'],
   ['connections_network_handler_test', 'Проверить подключение'],
   ['connections_network_handler_test_fail', 'Не удалось установить соединение'],

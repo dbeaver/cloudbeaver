@@ -25,6 +25,7 @@ import io.cloudbeaver.model.session.WebSessionAuthProcessor;
 import io.cloudbeaver.registry.WebHandlerRegistry;
 import io.cloudbeaver.registry.WebSessionHandlerDescriptor;
 import io.cloudbeaver.server.CBApplication;
+import io.cloudbeaver.server.events.WSWebUtils;
 import io.cloudbeaver.service.DBWSessionHandler;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -36,6 +37,7 @@ import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.auth.SMAuthInfo;
 import org.jkiss.dbeaver.model.security.user.SMAuthPermissions;
 import org.jkiss.dbeaver.model.websocket.WSConstants;
+import org.jkiss.dbeaver.model.websocket.event.WSUserDeletedEvent;
 import org.jkiss.dbeaver.model.websocket.event.session.WSSessionStateEvent;
 import org.jkiss.utils.CommonUtils;
 
@@ -79,10 +81,12 @@ public class WebSessionManager {
         return application;
     }
 
+    @Deprecated
     public boolean touchSession(@NotNull HttpServletRequest request,
                                 @NotNull HttpServletResponse response) throws DBWebException {
         WebSession webSession = getWebSession(request, response, false);
-        webSession.updateInfo(request, response);
+        webSession.updateSessionParameters(request);
+        webSession.updateInfo(!request.getSession().isNew());
         return true;
     }
 
@@ -93,12 +97,11 @@ public class WebSessionManager {
     }
 
     @NotNull
-    public WebSession getWebSession(@NotNull HttpServletRequest request, @NotNull HttpServletResponse response, boolean errorOnNoFound) throws DBWebException {
-        return getWebSession(request, response, true, errorOnNoFound);
-    }
-
-    @NotNull
-    public WebSession getWebSession(@NotNull HttpServletRequest request, @NotNull HttpServletResponse response, boolean updateInfo, boolean errorOnNoFound) throws DBWebException {
+    public WebSession getWebSession(
+        @NotNull HttpServletRequest request,
+        @NotNull HttpServletResponse response,
+        boolean errorOnNoFound
+    ) throws DBWebException {
         HttpSession httpSession = request.getSession(true);
         String sessionId = httpSession.getId();
         WebSession webSession;
@@ -106,14 +109,14 @@ public class WebSessionManager {
             var baseWebSession = sessionMap.get(sessionId);
             if (baseWebSession == null && CBApplication.getInstance().isConfigurationMode()) {
                 try {
-                    webSession = createWebSessionImpl(httpSession);
+                    webSession = createWebSessionImpl(request);
                 } catch (DBException e) {
                     throw new DBWebException("Failed to create web session", e);
                 }
                 sessionMap.put(sessionId, webSession);
             } else if (baseWebSession == null) {
                 try {
-                    webSession = createWebSessionImpl(httpSession);
+                    webSession = createWebSessionImpl(request);
                 } catch (DBException e) {
                     throw new DBWebException("Failed to create web session", e);
                 }
@@ -139,13 +142,6 @@ public class WebSessionManager {
                     throw new DBWebException("Unexpected session type: " + baseWebSession.getClass().getName());
                 }
                 webSession = (WebSession) baseWebSession;
-                if (updateInfo) {
-                    // Update only once per request
-                    if (!CommonUtils.toBoolean(request.getAttribute("sessionUpdated"))) {
-                        webSession.updateInfo(request, response);
-                        request.setAttribute("sessionUpdated", true);
-                    }
-                }
             }
         }
 
@@ -182,7 +178,7 @@ public class WebSessionManager {
                         return null;
                     }
 
-                    webSession = createWebSessionImpl(httpSession);
+                    webSession = createWebSessionImpl(request);
                     restorePreviousUserSession(webSession, oldAuthInfo);
 
                     sessionMap.put(sessionId, webSession);
@@ -216,8 +212,8 @@ public class WebSessionManager {
     }
 
     @NotNull
-    protected WebSession createWebSessionImpl(@NotNull HttpSession httpSession) throws DBException {
-        return new WebSession(httpSession, application, getSessionHandlers());
+    protected WebSession createWebSessionImpl(@NotNull HttpServletRequest request) throws DBException {
+        return new WebSession(request, application, getSessionHandlers());
     }
 
     @NotNull
@@ -280,7 +276,7 @@ public class WebSessionManager {
 
     public Collection<BaseWebSession> getAllActiveSessions() {
         synchronized (sessionMap) {
-            return sessionMap.values();
+            return new ArrayList<>(sessionMap.values());
         }
     }
 
@@ -328,27 +324,67 @@ public class WebSessionManager {
      */
     public void sendSessionsStates() {
         synchronized (sessionMap) {
-            for (var session : sessionMap.values()) {
-                if (session instanceof WebHeadlessSession) {
-                    continue;
-                }
-                try {
-                    session.addSessionEvent(new WSSessionStateEvent(session.getRemainingTime(), session.isValid()));
-                } catch (Exception e) {
-                    log.error("Failed to refresh session state: " + session.getSessionId(), e);
+            sessionMap.values()
+                .parallelStream()
+                .filter(session -> {
+                    if (session instanceof WebSession webSession) {
+                        return webSession.isAuthorizedInSecurityManager();
+                    }
+                    return false;
+                })
+                .forEach(session -> {
+                    try {
+                        session.addSessionEvent(new WSSessionStateEvent(
+                            session.getLastAccessTimeMillis(),
+                            session.getRemainingTime(),
+                            session.isValid(),
+                            ((WebSession) session).isCacheExpired(),
+                            ((WebSession) session).getLocale(),
+                            ((WebSession) session).getActionParameters()));
+                    } catch (Exception e) {
+                        log.error("Failed to refresh session state: " + session.getSessionId(), e);
+                    }
+                });
+        }
+    }
+
+    public void closeUserSession(@NotNull WSUserDeletedEvent userDeletedEvent) {
+        synchronized (sessionMap) {
+            for (Iterator<BaseWebSession> iterator = sessionMap.values().iterator(); iterator.hasNext(); ) {
+                var session = iterator.next();
+                if (CommonUtils.equalObjects(session.getUserContext().getUserId(),
+                    userDeletedEvent.getDeletedUserId())) {
+                    if (session instanceof WebHeadlessSession headlessSession) {
+                        headlessSession.addSessionEvent(userDeletedEvent);
+                    }
+                    iterator.remove();
+                    session.close();
                 }
             }
         }
     }
 
-    public void closeUserSessions(@NotNull String userId) {
+    public void closeSessions(@NotNull List<String> smSessionsId) {
         synchronized (sessionMap) {
             for (Iterator<BaseWebSession> iterator = sessionMap.values().iterator(); iterator.hasNext(); ) {
                 var session = iterator.next();
-                if (CommonUtils.equalObjects(session.getUserContext().getUserId(), userId)) {
+                if (smSessionsId.contains(session.getUserContext().getSmSessionId())) {
                     iterator.remove();
-                    session.close();
+                    session.close(false, true);
                 }
+            }
+        }
+    }
+
+    /**
+     * Closes all sessions in session manager.
+     */
+    public void closeAllSessions(@Nullable String initiatorSessionId) {
+        synchronized (sessionMap) {
+            for (Iterator<BaseWebSession> iterator = sessionMap.values().iterator(); iterator.hasNext(); ) {
+                var session = iterator.next();
+                iterator.remove();
+                session.close(false, !WSWebUtils.isSessionIdEquals(session, initiatorSessionId));
             }
         }
     }

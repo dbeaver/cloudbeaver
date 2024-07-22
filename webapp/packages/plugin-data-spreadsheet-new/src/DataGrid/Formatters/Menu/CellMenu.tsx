@@ -6,15 +6,14 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import styled from 'reshadow';
 
-import { Icon, MenuTrigger } from '@cloudbeaver/core-blocks';
+import { Icon, MenuPanelItemAndTriggerStyles, MenuTrigger, s, SContext, StyleRegistry, useS } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { EventContext, EventStopPropagationFlag } from '@cloudbeaver/core-events';
 import type { IDatabaseDataModel, IDataPresentationActions, IDataTableActions, IResultSetElementKey } from '@cloudbeaver/plugin-data-viewer';
 
 import { DataGridContextMenuService } from '../../DataGridContextMenu/DataGridContextMenuService';
-import { cellMenuStyles } from './cellMenuStyles';
+import styles from './CellMenu.module.css';
 
 interface Props {
   model: IDatabaseDataModel;
@@ -27,6 +26,16 @@ interface Props {
   onStateSwitch?: (state: boolean) => void;
 }
 
+const registry: StyleRegistry = [
+  [
+    MenuPanelItemAndTriggerStyles,
+    {
+      mode: 'append',
+      styles: [styles],
+    },
+  ],
+];
+
 export const CellMenu = observer<Props>(function CellMenu({
   model,
   actions,
@@ -37,6 +46,7 @@ export const CellMenu = observer<Props>(function CellMenu({
   onClick,
   onStateSwitch,
 }) {
+  const style = useS(styles);
   const dataGridContextMenuService = useService(DataGridContextMenuService);
 
   const panel = dataGridContextMenuService.constructMenuWithContext(model, actions, spreadsheetActions, resultIndex, cellKey, simple);
@@ -58,11 +68,13 @@ export const CellMenu = observer<Props>(function CellMenu({
     EventContext.set(event, EventStopPropagationFlag);
   }
 
-  return styled(cellMenuStyles)(
-    <cell-menu as="div" onMouseUp={markStopPropagation} onDoubleClick={stopPropagation}>
-      <MenuTrigger panel={panel} style={[cellMenuStyles]} modal onClick={handleClick} onVisibleSwitch={onStateSwitch}>
-        <Icon name="snack" viewBox="0 0 16 10" />
-      </MenuTrigger>
-    </cell-menu>,
+  return (
+    <SContext registry={registry}>
+      <div className={s(style, { cellMenu: true })} onMouseUp={markStopPropagation} onDoubleClick={stopPropagation}>
+        <MenuTrigger panel={panel} className={s(style, { menuTrigger: true })} modal onClick={handleClick} onVisibleSwitch={onStateSwitch}>
+          <Icon className={s(style, { icon: true })} name="snack" viewBox="0 0 16 10" />
+        </MenuTrigger>
+      </div>
+    </SContext>
   );
 });

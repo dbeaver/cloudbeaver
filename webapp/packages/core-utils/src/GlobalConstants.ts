@@ -52,6 +52,10 @@ export const GlobalConstants = {
     return pathJoin(this.rootURI, 'api');
   },
 
+  getHealthCheckUrl(host: string): string {
+    return `${host}/status`;
+  },
+
   absoluteRootUrl(...parts: string[]): string {
     return pathJoin(this.rootURI, ...parts);
   },

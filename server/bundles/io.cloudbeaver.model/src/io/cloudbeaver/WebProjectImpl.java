@@ -17,11 +17,13 @@
 package io.cloudbeaver;
 
 import org.jkiss.code.NotNull;
+import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.app.DBPDataSourceRegistry;
 import org.jkiss.dbeaver.model.app.DBPWorkspace;
 import org.jkiss.dbeaver.model.auth.SMSessionContext;
+import org.jkiss.dbeaver.model.preferences.DBPPreferenceStore;
 import org.jkiss.dbeaver.model.rm.RMController;
 import org.jkiss.dbeaver.model.rm.RMProject;
 import org.jkiss.dbeaver.registry.rm.DataSourceRegistryRM;
@@ -29,17 +31,21 @@ import org.jkiss.dbeaver.runtime.DBWorkbench;
 
 public abstract class WebProjectImpl extends BaseWebProjectImpl {
     private static final Log log = Log.getLog(WebProjectImpl.class);
-
+    @NotNull
+    private final DBPPreferenceStore preferenceStore;
     public WebProjectImpl(
         @NotNull DBPWorkspace workspace,
         @NotNull RMController resourceController,
         @NotNull SMSessionContext sessionContext,
         @NotNull RMProject project,
-        @NotNull DataSourceFilter dataSourceFilter
+        @NotNull DataSourceFilter dataSourceFilter,
+        @NotNull DBPPreferenceStore preferenceStore
     ) {
         super(workspace, resourceController, sessionContext, project, dataSourceFilter);
+        this.preferenceStore = preferenceStore;
     }
 
+    @Nullable
     @Override
     public Object getProjectProperty(String propName) {
         try {
@@ -51,7 +57,7 @@ public abstract class WebProjectImpl extends BaseWebProjectImpl {
     }
 
     @Override
-    public void setProjectProperty(String propName, Object propValue) {
+    public void setProjectProperty(@NotNull String propName, @Nullable Object propValue) {
         try {
             getResourceController().setProjectProperty(getId(), propName, propValue);
         } catch (DBException e) {
@@ -68,7 +74,7 @@ public abstract class WebProjectImpl extends BaseWebProjectImpl {
     @Override
     protected DBPDataSourceRegistry createDataSourceRegistry() {
         return new WebDataSourceRegistryProxy(
-            new DataSourceRegistryRM(this, getResourceController()),
+            new DataSourceRegistryRM(this, getResourceController(), preferenceStore),
             dataSourceFilter
         );
     }

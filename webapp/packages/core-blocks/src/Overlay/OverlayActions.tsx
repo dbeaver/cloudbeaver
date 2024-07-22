@@ -9,7 +9,7 @@ import { observer } from 'mobx-react-lite';
 
 import { s } from '../s';
 import { useS } from '../useS';
-import style from './OverlayActions.m.css';
+import style from './OverlayActions.module.css';
 
 interface Props {
   className?: string;

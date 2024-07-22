@@ -28,9 +28,6 @@
       "path": "../core-localization/tsconfig.json"
     },
     {
-      "path": "../core-plugin/tsconfig.json"
-    },
-    {
       "path": "../core-projects/tsconfig.json"
     },
     {
@@ -41,6 +38,9 @@
     },
     {
       "path": "../core-sdk/tsconfig.json"
+    },
+    {
+      "path": "../core-settings/tsconfig.json"
     },
     {
       "path": "../core-ui/tsconfig.json"

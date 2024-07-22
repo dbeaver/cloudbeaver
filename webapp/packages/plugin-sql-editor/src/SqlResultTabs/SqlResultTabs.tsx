@@ -6,50 +6,21 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import styled, { css, use } from 'reshadow';
 
-import { getComputed, TextPlaceholder, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
+import { getComputed, s, SContext, StyleRegistry, TextPlaceholder, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { BASE_TAB_STYLES, ITabData, TabList, TabPanel, TabsState } from '@cloudbeaver/core-ui';
+import { ITabData, TabIconStyles, TabList, TabListStyles, TabPanel, TabsState, TabStyles } from '@cloudbeaver/core-ui';
 
 import type { ISqlEditorTabState } from '../ISqlEditorTabState';
 import { ESqlDataSourceFeatures } from '../SqlDataSource/ESqlDataSourceFeatures';
 import { SqlDataSourceService } from '../SqlDataSource/SqlDataSourceService';
+import styles from './shared/SqlResultTabs.module.css';
+import SqlResultTabsTab from './shared/SqlResultTabsTab.module.css';
+import TabIconModuleStyles from './shared/SqlResultTabsTabIcon.module.css';
+import SqlResultTabsTabList from './shared/SqlResultTabsTabList.module.css';
 import { SqlResultPanel } from './SqlResultPanel';
 import { SqlResultTab } from './SqlResultTab';
 import { SqlResultTabsService } from './SqlResultTabsService';
-
-const styles = css`
-  Tab {
-    composes: theme-ripple theme-background-surface theme-text-text-primary-on-light from global;
-    height: 38px !important;
-  }
-  TabIcon {
-    composes: theme-text-surface from global;
-  }
-  wrapper {
-    overflow: auto;
-    display: flex;
-    flex-direction: column;
-    flex: 1;
-    height: 100%;
-    position: relative;
-  }
-  TabsBox {
-    height: 100%;
-  }
-  TabList {
-    composes: theme-background-background theme-text-text-primary-on-light from global;
-    display: flex;
-    overflow: auto;
-  }
-  TabList:not([|executable]) tab-outer:only-child {
-    display: none;
-  }
-  TextPlaceholder {
-    padding: 24px;
-  }
-`;
 
 interface Props {
   state: ISqlEditorTabState;
@@ -57,8 +28,14 @@ interface Props {
   onTabClose?: (tabId: string) => void;
 }
 
+const registry: StyleRegistry = [
+  [TabStyles, { mode: 'append', styles: [SqlResultTabsTab] }],
+  [TabIconStyles, { mode: 'append', styles: [TabIconModuleStyles] }],
+  [TabListStyles, { mode: 'append', styles: [SqlResultTabsTabList] }],
+];
+
 export const SqlResultTabs = observer<Props>(function SqlDataResult({ state, onTabSelect, onTabClose }) {
-  const style = useStyles(BASE_TAB_STYLES, styles);
+  const style = useS(styles);
   const translate = useTranslate();
   const sqlResultTabsService = useService(SqlResultTabsService);
   const sqlDataSourceService = useService(SqlDataSourceService);
@@ -80,8 +57,8 @@ export const SqlResultTabs = observer<Props>(function SqlDataResult({ state, onT
     onTabSelect?.(tab.tabId);
   }
 
-  async function handleClose(tab: ITabData) {
-    const canClose = await sqlResultTabsService.canCloseResultTab(state, tab.tabId);
+  function handleClose(tab: ITabData) {
+    const canClose = handleCanClose(tab);
 
     if (canClose) {
       sqlResultTabsService.removeResultTab(state, tab.tabId);
@@ -101,14 +78,18 @@ export const SqlResultTabs = observer<Props>(function SqlDataResult({ state, onT
   }
 
   if (!state.tabs.length) {
-    return styled(style)(<TextPlaceholder>{translate(dataSource?.emptyPlaceholder ?? 'sql_editor_placeholder')}</TextPlaceholder>);
+    return (
+      <TextPlaceholder className={s(style, { textPlaceholder: true })}>
+        {translate(dataSource?.emptyPlaceholder ?? 'sql_editor_placeholder')}
+      </TextPlaceholder>
+    );
   }
 
   const executable = dataSource?.hasFeature(ESqlDataSourceFeatures.executable);
   const tabList = orderedTabs.map(tab => tab.id);
 
-  return styled(style)(
-    <wrapper>
+  return (
+    <div className={s(style, { wrapper: true })}>
       <TabsState
         currentTabId={state.currentTabId}
         tabList={tabList}
@@ -117,17 +98,19 @@ export const SqlResultTabs = observer<Props>(function SqlDataResult({ state, onT
         onChange={handleSelect}
         onClose={handleClose}
       >
-        <TabList aria-label="SQL Results" {...use({ executable })} style={styles}>
-          {orderedTabs.map(result => (
-            <SqlResultTab key={result.id} result={result} style={styles} />
-          ))}
-        </TabList>
+        <SContext registry={registry}>
+          <TabList className={s(style, { tabListNotExecutable: !executable })} aria-label="SQL Results">
+            {orderedTabs.map(result => (
+              <SqlResultTab key={result.id} result={result} />
+            ))}
+          </TabList>
+        </SContext>
         {orderedTabs.map(result => (
           <TabPanel key={result.id} tabId={result.id} lazy>
             <SqlResultPanel state={state} id={result.id} />
           </TabPanel>
         ))}
       </TabsState>
-    </wrapper>,
+    </div>
   );
 });

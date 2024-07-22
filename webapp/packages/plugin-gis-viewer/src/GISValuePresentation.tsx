@@ -13,15 +13,15 @@ import wellknown, { GeoJSONGeometry } from 'wellknown';
 import { TextPlaceholder, useTranslate } from '@cloudbeaver/core-blocks';
 import {
   IDatabaseDataModel,
-  IDatabaseResultSet,
   IResultSetElementKey,
   ResultSetDataKeysUtils,
+  ResultSetDataSource,
   ResultSetSelectAction,
   ResultSetViewAction,
 } from '@cloudbeaver/plugin-data-viewer';
 
 import { CrsInput } from './CrsInput';
-import classes from './GISValuePresentation.m.css';
+import classes from './GISValuePresentation.module.css';
 import { CrsKey, IAssociatedValue, IGeoJSONFeature, LeafletMap } from './LeafletMap';
 import { ResultSetGISAction } from './ResultSetGISAction';
 
@@ -73,7 +73,7 @@ function getTransformedGeometry(from: CrsKey, to: CrsKey, geometry: GeoJSONGeome
 }
 
 interface Props {
-  model: IDatabaseDataModel<any, IDatabaseResultSet>;
+  model: IDatabaseDataModel<ResultSetDataSource>;
   resultIndex: number;
 }
 

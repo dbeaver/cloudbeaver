@@ -6,32 +6,14 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import styled, { css } from 'reshadow';
 
-import { Loader, Placeholder, StaticImage, TableColumnValue, TableItem, TableItemExpand, TableItemSelect } from '@cloudbeaver/core-blocks';
+import { Loader, Placeholder, s, StaticImage, TableColumnValue, TableItem, TableItemExpand, TableItemSelect, useS } from '@cloudbeaver/core-blocks';
 import { DatabaseConnection, DBDriverResource, IConnectionInfoParams } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
 
 import { ConnectionsAdministrationService } from '../ConnectionsAdministrationService';
+import styles from './Connection.module.css';
 import { ConnectionEdit } from './ConnectionEdit';
-
-const styles = css`
-  StaticImage {
-    display: flex;
-    width: 24px;
-
-    &:not(:last-child) {
-      margin-right: 16px;
-    }
-  }
-  TableColumnValue[expand] {
-    cursor: pointer;
-  }
-  Checkbox {
-    margin-left: -10px;
-    margin-right: -10px;
-  }
-`;
 
 interface Props {
   connectionKey: IConnectionInfoParams;
@@ -43,19 +25,20 @@ export const Connection = observer<Props>(function Connection({ connectionKey, c
   const driversResource = useService(DBDriverResource);
   const connectionsAdministrationService = useService(ConnectionsAdministrationService);
   const icon = driversResource.get(connection.driverId)?.icon;
+  const style = useS(styles);
 
-  return styled(styles)(
+  return (
     <TableItem item={connectionKey} expandElement={ConnectionEdit}>
       <TableColumnValue centerContent flex>
-        <TableItemSelect />
+        <TableItemSelect className={s(style, { tableItemSelect: true })} />
       </TableColumnValue>
-      <TableColumnValue centerContent flex expand>
+      <TableColumnValue className={s(style, { tableColumnValueExpand: true })} centerContent flex expand>
         <TableItemExpand />
       </TableColumnValue>
-      <TableColumnValue centerContent flex expand>
-        <StaticImage icon={icon} />
+      <TableColumnValue className={s(style, { tableColumnValueExpand: true })} centerContent flex expand>
+        <StaticImage className={s(style, { staticImage: true })} icon={icon} />
       </TableColumnValue>
-      <TableColumnValue title={connection.name} expand ellipsis>
+      <TableColumnValue title={connection.name} className={s(style, { tableColumnValueExpand: true })} expand ellipsis>
         {connection.name}
       </TableColumnValue>
       <TableColumnValue>
@@ -63,7 +46,7 @@ export const Connection = observer<Props>(function Connection({ connectionKey, c
         {connection.host && connection.port && `:${connection.port}`}
       </TableColumnValue>
       {projectName !== undefined && (
-        <TableColumnValue title={projectName ?? ''} expand ellipsis>
+        <TableColumnValue title={projectName ?? ''} className={s(style, { tableColumnValueExpand: true })} expand ellipsis>
           {projectName}
         </TableColumnValue>
       )}
@@ -72,6 +55,6 @@ export const Connection = observer<Props>(function Connection({ connectionKey, c
           <Placeholder container={connectionsAdministrationService.connectionDetailsPlaceholder} connection={connection} />
         </Loader>
       </TableColumnValue>
-    </TableItem>,
+    </TableItem>
   );
 });

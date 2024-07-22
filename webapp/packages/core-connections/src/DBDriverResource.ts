@@ -85,7 +85,7 @@ export class DBDriverResource extends CachedMapResource<string, DBDriver, DBDriv
     return this.data;
   }
 
-  async addDriverLibraries(driverId: string, files: FileList) {
+  async addDriverLibraries(driverId: string, files: File[]) {
     await this.graphQLService.sdk.uploadDriverLibrary(driverId, files);
     await this.refresh(driverId);
   }
@@ -112,6 +112,7 @@ export class DBDriverResource extends CachedMapResource<string, DBDriver, DBDriv
       includeDriverLibraries: false,
       includeDriverParameters: false,
       includeDriverProperties: false,
+      includeMainProperties: false,
       includeProviderProperties: false,
     };
   }

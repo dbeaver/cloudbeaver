@@ -74,7 +74,7 @@ public class CBDatabase {
     public static final String SCHEMA_UPDATE_SQL_PATH = "db/cb_schema_update_";
 
     private static final int LEGACY_SCHEMA_VERSION = 1;
-    private static final int CURRENT_SCHEMA_VERSION = 16;
+    private static final int CURRENT_SCHEMA_VERSION = 21;
 
     private static final String DEFAULT_DB_USER_NAME = "cb-data";
     private static final String DEFAULT_DB_PWD_FILE = ".database-credentials.dat";
@@ -82,7 +82,7 @@ public class CBDatabase {
     private static final String V2_DB_NAME = "cb.h2v2.dat";
 
     private final WebApplication application;
-    private final CBDatabaseConfig databaseConfiguration;
+    private final WebDatabaseConfig databaseConfiguration;
     private PoolingDataSource<PoolableConnection> cbDataSource;
     private transient volatile Connection exclusiveConnection;
 
@@ -90,7 +90,7 @@ public class CBDatabase {
     private SMAdminController adminSecurityController;
     private SQLDialect dialect;
 
-    public CBDatabase(WebApplication application, CBDatabaseConfig databaseConfiguration) {
+    public CBDatabase(WebApplication application, WebDatabaseConfig databaseConfiguration) {
         this.application = application;
         this.databaseConfiguration = databaseConfiguration;
     }
@@ -127,8 +127,17 @@ public class CBDatabase {
 
         LoggingProgressMonitor monitor = new LoggingProgressMonitor(log);
 
+        if (isDefaultH2Configuration(databaseConfiguration)) {
+            //force use default values even if they are explicitly specified
+            databaseConfiguration.setUser(null);
+            databaseConfiguration.setPassword(null);
+            databaseConfiguration.setSchema(null);
+        }
+
         String dbUser = databaseConfiguration.getUser();
         String dbPassword = databaseConfiguration.getPassword();
+        String schemaName = databaseConfiguration.getSchema();
+
         if (CommonUtils.isEmpty(dbUser) && driver.isEmbedded()) {
             File pwdFile = application.getDataDirectory(true).resolve(DEFAULT_DB_PWD_FILE).toFile();
             if (!driver.isAnonymousAccess()) {
@@ -191,7 +200,6 @@ public class CBDatabase {
             DatabaseMetaData metaData = connection.getMetaData();
             log.debug("\tConnected to " + metaData.getDatabaseProductName() + " " + metaData.getDatabaseProductVersion());
 
-            var schemaName = databaseConfiguration.getSchema();
             if (dialect instanceof SQLDialectSchemaController && CommonUtils.isNotEmpty(schemaName)) {
                 var dialectSchemaController = (SQLDialectSchemaController) dialect;
                 var schemaExistQuery = dialectSchemaController.getSchemaExistQuery(schemaName);
@@ -217,7 +225,8 @@ public class CBDatabase {
                 null,
                 schemaName,
                 CURRENT_SCHEMA_VERSION,
-                0
+                0,
+                databaseConfiguration
             );
             schemaManager.updateSchema(monitor);
 
@@ -549,8 +558,6 @@ public class CBDatabase {
     }
 
     private String getCurrentInstanceId() throws IOException {
-        // 12 chars - mac address
-        String macAddress = CommonUtils.toHexString(RuntimeUtils.getLocalMacAddress());
         // 16 chars - workspace ID
         String workspaceId = DBWorkbench.getPlatform().getWorkspace().getWorkspaceId();
         if (workspaceId.length() > 16) {
@@ -558,7 +565,7 @@ public class CBDatabase {
         }
 
         StringBuilder id = new StringBuilder(36);
-        id.append(macAddress);
+        id.append("000000000000"); // there was mac address, but it generates dynamically when docker is used
         id.append(":").append(workspaceId).append(":");
         while (id.length() < 36) {
             id.append("X");
@@ -577,6 +584,13 @@ public class CBDatabase {
     @NotNull
     public SQLDialect getDialect() {
         return dialect;
+    }
+
+    public static boolean isDefaultH2Configuration(WebDatabaseConfig databaseConfiguration) {
+        var v1DefaultUrl = "jdbc:h2:/opt/cloudbeaver/workspace/.data/" + V1_DB_NAME;
+        var v2DefaultUrl = "jdbc:h2:/opt/cloudbeaver/workspace/.data/" + V2_DB_NAME;
+        return v1DefaultUrl.equals(databaseConfiguration.getUrl())
+            || v2DefaultUrl.equals(databaseConfiguration.getUrl());
     }
 
 }

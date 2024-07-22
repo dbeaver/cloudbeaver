@@ -6,41 +6,44 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import styled, { css } from 'reshadow';
+import { useRef } from 'react';
 
-import { useStyles } from '@cloudbeaver/core-blocks';
+import { s, useS } from '@cloudbeaver/core-blocks';
+import { useDataContextLink } from '@cloudbeaver/core-data-context';
 import type { IContextMenuItemProps } from '@cloudbeaver/core-ui';
 import type { ICustomMenuItemComponent } from '@cloudbeaver/core-view';
 
 import { DATA_CONTEXT_MENU_SEARCH } from './DATA_CONTEXT_MENU_SEARCH';
-
-const styles = css`
-  search-box {
-    padding: 8px 12px;
-  }
-`;
+import styles from './SearchResourceMenuItemComponent.module.css';
 
 export const SearchResourceMenuItemComponent: ICustomMenuItemComponent<IContextMenuItemProps> = observer(function SearchResourceMenuItemComponent({
-  item,
-  onClick,
-  menuData,
+  context,
   className,
-  style,
 }) {
-  const value = menuData.context.tryGet(DATA_CONTEXT_MENU_SEARCH) ?? '';
+  const style = useS(styles);
+  const value = context.get(DATA_CONTEXT_MENU_SEARCH) ?? '';
+  const contextRefId = useRef<string | null>(null);
+
+  useDataContextLink(context, (context, id) => {
+    contextRefId.current = id;
+  });
+
   function handleChange(value: string) {
-    menuData.context.set(DATA_CONTEXT_MENU_SEARCH, value);
+    if (contextRefId.current) {
+      context.set(DATA_CONTEXT_MENU_SEARCH, value, contextRefId.current);
+    }
   }
 
-  return styled(useStyles(style, styles))(
-    <search-box dir="ltr" className={className}>
+  return (
+    <div dir="ltr" className={s(style, { searchBox: true }, className)}>
       <input
         name="search"
+        type="search"
         placeholder="Search for resource..."
         value={value}
         autoComplete="off"
         onChange={event => handleChange(event.target.value)}
       />
-    </search-box>,
+    </div>
   );
 });

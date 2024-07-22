@@ -1,8 +1,0 @@
-.groupSubTitle {
-  composes: theme-text-text-hint-on-light from global;
-  composes: theme-typography--caption from global;
-
-  display: block;
-  text-transform: none;
-  white-space: pre-wrap;
-}

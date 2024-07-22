@@ -26,9 +26,9 @@ import {
 } from './ElementsTree/ElementsTreeTools/NavigationTreeSettings/createElementsTreeSettings';
 import { transformFilteredNodeInfo } from './ElementsTree/transformFilteredNodeInfo';
 import type { IElementsTreeSettings } from './ElementsTree/useElementsTree';
-import elementsTreeToolsStyles from './ElementsTreeTools.m.css';
+import elementsTreeToolsStyles from './ElementsTreeTools.module.css';
 import { getNavigationTreeUserSettingsId } from './getNavigationTreeUserSettingsId';
-import style from './NavigationTree.m.css';
+import style from './NavigationTree.module.css';
 import { navigationTreeDuplicateFilter } from './navigationTreeDuplicateIdFilter';
 import { NavigationTreeService } from './NavigationTreeService';
 import { navigationTreeProjectFilter } from './ProjectsRenderer/navigationTreeProjectFilter';

@@ -7,48 +7,76 @@
  */
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { ResultDataFormat } from '@cloudbeaver/core-sdk';
-import { DatabaseEditAction, TableFooterMenuService } from '@cloudbeaver/plugin-data-viewer';
+import { ActionService, MenuService } from '@cloudbeaver/core-view';
+import {
+  DATA_CONTEXT_DV_DDM,
+  DATA_CONTEXT_DV_DDM_RESULT_INDEX,
+  DATA_CONTEXT_DV_PRESENTATION,
+  DATA_VIEWER_DATA_MODEL_ACTIONS_MENU,
+  DatabaseEditAction,
+  DataViewerPresentationType,
+  IDatabaseDataModel,
+  isResultSetDataSource,
+  ResultSetDataSource,
+} from '@cloudbeaver/plugin-data-viewer';
 
+import { ACTION_SQL_GENERATE } from './actions/ACTION_SQL_GENERATE';
 import { ScriptPreviewService } from './ScriptPreview/ScriptPreviewService';
 
 @injectable()
 export class GeneratorMenuBootstrap extends Bootstrap {
-  constructor(private readonly scriptPreviewService: ScriptPreviewService, private readonly tableFooterMenuService: TableFooterMenuService) {
+  constructor(
+    private readonly scriptPreviewService: ScriptPreviewService,
+    private readonly actionService: ActionService,
+    private readonly menuService: MenuService,
+  ) {
     super();
   }
 
   register(): void {
-    this.tableFooterMenuService.registerMenuItem({
-      id: 'script',
-      order: 3,
-      title: 'data_viewer_script_preview',
-      tooltip: 'data_viewer_script_preview',
-      icon: 'sql-script-preview',
-      isPresent(context) {
-        return context.contextType === TableFooterMenuService.nodeContextType;
-      },
-      isHidden(context) {
+    this.menuService.addCreator({
+      menus: [DATA_VIEWER_DATA_MODEL_ACTIONS_MENU],
+      contexts: [DATA_CONTEXT_DV_DDM, DATA_CONTEXT_DV_DDM_RESULT_INDEX],
+      isApplicable: context => {
+        const model = context.get(DATA_CONTEXT_DV_DDM)!;
+        const resultIndex = context.get(DATA_CONTEXT_DV_DDM_RESULT_INDEX)!;
+        const presentation = context.get(DATA_CONTEXT_DV_PRESENTATION);
         return (
-          context.data.model.isReadonly(context.data.resultIndex) ||
-          context.data.model.source.getResult(context.data.resultIndex)?.dataFormat !== ResultDataFormat.Resultset
+          !model.isReadonly(resultIndex) &&
+          model.source.getResult(resultIndex)?.dataFormat === ResultDataFormat.Resultset &&
+          !presentation?.readonly &&
+          (!presentation || presentation.type === DataViewerPresentationType.Data)
         );
       },
+      getItems(context, items) {
+        return [...items, ACTION_SQL_GENERATE];
+      },
+    });
+
+    this.actionService.addHandler({
+      id: 'data-sql-tools-handler',
+      menus: [DATA_VIEWER_DATA_MODEL_ACTIONS_MENU],
+      actions: [ACTION_SQL_GENERATE],
+      contexts: [DATA_CONTEXT_DV_DDM, DATA_CONTEXT_DV_DDM_RESULT_INDEX],
+      isActionApplicable(context) {
+        const model = context.get(DATA_CONTEXT_DV_DDM)!;
+        return isResultSetDataSource(model.source);
+      },
       isDisabled(context) {
-        if (
-          context.data.model.isLoading() ||
-          context.data.model.isDisabled(context.data.resultIndex) ||
-          !context.data.model.source.hasResult(context.data.resultIndex)
-        ) {
+        const model = context.get(DATA_CONTEXT_DV_DDM)!;
+        const resultIndex = context.get(DATA_CONTEXT_DV_DDM_RESULT_INDEX)!;
+        if (model.isLoading() || model.isDisabled(resultIndex) || !model.source.hasResult(resultIndex)) {
           return true;
         }
-        const editor = context.data.model.source.getActionImplementation(context.data.resultIndex, DatabaseEditAction);
+        const editor = model.source.getActionImplementation(resultIndex, DatabaseEditAction);
         return !editor?.isEdited();
       },
-      onClick: async context => {
-        await this.scriptPreviewService.open(context.data.model, context.data.resultIndex);
+      handler: context => {
+        this.scriptPreviewService.open(
+          context.get(DATA_CONTEXT_DV_DDM)! as unknown as IDatabaseDataModel<ResultSetDataSource>,
+          context.get(DATA_CONTEXT_DV_DDM_RESULT_INDEX)!,
+        );
       },
     });
   }
-
-  load(): void | Promise<void> {}
 }

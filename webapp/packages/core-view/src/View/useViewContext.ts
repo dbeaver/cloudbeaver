@@ -7,7 +7,7 @@
  */
 import { useContext } from 'react';
 
-import { IDataContext, useDataContext } from '@cloudbeaver/core-data-context';
+import { IDataContext, useDataContext, useDataContextLink } from '@cloudbeaver/core-data-context';
 
 import { CaptureViewContext } from './CaptureViewContext';
 import { DATA_CONTEXT_VIEW } from './DATA_CONTEXT_VIEW';
@@ -17,7 +17,9 @@ export function useViewContext(view: IView<any>, parentContext: IDataContext | u
   const context = useContext(CaptureViewContext);
   const viewContext = useDataContext(parentContext ?? context);
 
-  viewContext.set(DATA_CONTEXT_VIEW, view);
+  useDataContextLink(viewContext, (context, id) => {
+    context.set(DATA_CONTEXT_VIEW, view, id);
+  });
 
   return viewContext;
 }

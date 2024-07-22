@@ -8,21 +8,21 @@
 import { observer } from 'mobx-react-lite';
 import { useState } from 'react';
 
-import { Loader, s, TableItemExpandProps, useS } from '@cloudbeaver/core-blocks';
-import { App, useService } from '@cloudbeaver/core-di';
+import { Container, Loader, s, TableItemExpandProps, useS } from '@cloudbeaver/core-blocks';
+import { IServiceProvider, useService } from '@cloudbeaver/core-di';
 import { FormMode } from '@cloudbeaver/core-ui';
 
 import { AdministrationUserForm } from '../UserForm/AdministrationUserForm';
 import { AdministrationUserFormService } from '../UserForm/AdministrationUserFormService';
 import { AdministrationUserFormState } from '../UserForm/AdministrationUserFormState';
-import style from './UserEdit.m.css';
+import style from './UserEdit.module.css';
 
 export const UserEdit = observer<TableItemExpandProps<string>>(function UserEdit({ item, onClose }) {
   const styles = useS(style);
   const administrationUserFormService = useService(AdministrationUserFormService);
-  const app = useService(App);
+  const serviceProvider = useService(IServiceProvider);
   const [state] = useState(() => {
-    const state = new AdministrationUserFormState(app, administrationUserFormService, {
+    const state = new AdministrationUserFormState(serviceProvider, administrationUserFormService, {
       userId: item,
     });
     state.setMode(FormMode.Edit);
@@ -30,10 +30,10 @@ export const UserEdit = observer<TableItemExpandProps<string>>(function UserEdit
   });
 
   return (
-    <div className={s(styles, { box: true })}>
+    <Container className={s(styles, { box: true })} parent vertical>
       <Loader suspense>
         <AdministrationUserForm state={state} onClose={onClose} />
       </Loader>
-    </div>
+    </Container>
   );
 });

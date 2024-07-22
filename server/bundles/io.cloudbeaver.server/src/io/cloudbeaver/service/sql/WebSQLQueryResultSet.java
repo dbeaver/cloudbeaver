@@ -19,11 +19,9 @@ package io.cloudbeaver.service.sql;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.data.DBDAttributeBinding;
 import org.jkiss.dbeaver.model.meta.Property;
-import org.jkiss.utils.Pair;
 
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Web SQL query resultset.
@@ -33,7 +31,7 @@ public class WebSQLQueryResultSet {
     private static final Log log = Log.getLog(WebSQLQueryResultSet.class);
 
     private WebSQLQueryResultColumn[] columns;
-    private List<WebSQLQueryResultSetRow> rows;
+    private List<WebSQLQueryResultSetRow> rows = Collections.emptyList();
     private boolean hasMoreData;
     private WebSQLResultsInfo resultsInfo;
     private boolean singleEntity = true;
@@ -41,6 +39,7 @@ public class WebSQLQueryResultSet {
 
     private boolean hasChildrenCollection;
     private boolean isSupportsDataFilter;
+    private boolean hasDynamicTrace;
 
     public WebSQLQueryResultSet() {
     }
@@ -133,5 +132,14 @@ public class WebSQLQueryResultSet {
 
     public void setSupportsDataFilter(boolean supportsDataFilter) {
         isSupportsDataFilter = supportsDataFilter;
+    }
+
+    @Property
+    public boolean isHasDynamicTrace() {
+        return hasDynamicTrace;
+    }
+
+    public void setHasDynamicTrace(boolean hasDynamicTrace) {
+        this.hasDynamicTrace = hasDynamicTrace;
     }
 }

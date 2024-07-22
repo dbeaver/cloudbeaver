@@ -29,6 +29,7 @@ import org.jkiss.dbeaver.model.app.DBPProject;
 import org.jkiss.dbeaver.model.connection.DBPConnectionConfiguration;
 import org.jkiss.dbeaver.model.connection.DBPDriver;
 import org.jkiss.dbeaver.model.net.DBWNetworkProfile;
+import org.jkiss.dbeaver.model.preferences.DBPPreferenceStore;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.secret.DBSSecretController;
 import org.jkiss.dbeaver.model.struct.DBSObjectFilter;
@@ -51,6 +52,7 @@ public class WebDataSourceRegistryProxy implements DBPDataSourceRegistry, DataSo
         this.dataSourceFilter = filter;
     }
 
+    @NotNull
     @Override
     public DBPProject getProject() {
         return dataSourceRegistry.getProject();
@@ -58,7 +60,7 @@ public class WebDataSourceRegistryProxy implements DBPDataSourceRegistry, DataSo
 
     @Nullable
     @Override
-    public DBPDataSourceContainer getDataSource(String id) {
+    public DBPDataSourceContainer getDataSource(@NotNull String id) {
         DBPDataSourceContainer dataSource = dataSourceRegistry.getDataSource(id);
         if (dataSource == null || dataSourceFilter != null && !dataSourceFilter.filter(dataSource)) {
             return null;
@@ -68,7 +70,7 @@ public class WebDataSourceRegistryProxy implements DBPDataSourceRegistry, DataSo
 
     @Nullable
     @Override
-    public DBPDataSourceContainer getDataSource(DBPDataSource dataSource) {
+    public DBPDataSourceContainer getDataSource(@NotNull DBPDataSource dataSource) {
         if (dataSourceFilter != null && !dataSourceFilter.filter(dataSource.getContainer())) {
             return null;
         }
@@ -107,13 +109,13 @@ public class WebDataSourceRegistryProxy implements DBPDataSourceRegistry, DataSo
 
     @NotNull
     @Override
-    public DBPDataSourceContainer createDataSource(DBPDriver driver, DBPConnectionConfiguration connConfig) {
+    public DBPDataSourceContainer createDataSource(@NotNull DBPDriver driver, @NotNull DBPConnectionConfiguration connConfig) {
         return dataSourceRegistry.createDataSource(driver, connConfig);
     }
 
     @NotNull
     @Override
-    public DBPDataSourceContainer createDataSource(DBPDataSourceContainer source) {
+    public DBPDataSourceContainer createDataSource(@NotNull DBPDataSourceContainer source) {
         return dataSourceRegistry.createDataSource(source);
     }
 
@@ -164,18 +166,20 @@ public class WebDataSourceRegistryProxy implements DBPDataSourceRegistry, DataSo
         return dataSourceRegistry.getRootFolders();
     }
 
+    @Nullable
     @Override
-    public DBPDataSourceFolder getFolder(String path) {
+    public DBPDataSourceFolder getFolder(@NotNull String path) {
         return dataSourceRegistry.getFolder(path);
     }
 
+    @NotNull
     @Override
-    public DBPDataSourceFolder addFolder(DBPDataSourceFolder parent, String name) {
+    public DBPDataSourceFolder addFolder(@Nullable DBPDataSourceFolder parent, @NotNull String name) {
         return dataSourceRegistry.addFolder(parent, name);
     }
 
     @Override
-    public void removeFolder(DBPDataSourceFolder folder, boolean dropContents) {
+    public void removeFolder(@NotNull DBPDataSourceFolder folder, boolean dropContents) {
         dataSourceRegistry.removeFolder(folder, dropContents);
     }
 
@@ -197,18 +201,18 @@ public class WebDataSourceRegistryProxy implements DBPDataSourceRegistry, DataSo
     }
 
     @Override
-    public void updateSavedFilter(DBSObjectFilter filter) {
+    public void updateSavedFilter(@NotNull DBSObjectFilter filter) {
         dataSourceRegistry.updateSavedFilter(filter);
     }
 
     @Override
-    public void removeSavedFilter(String filterName) {
+    public void removeSavedFilter(@NotNull String filterName) {
         dataSourceRegistry.removeSavedFilter(filterName);
     }
 
     @Nullable
     @Override
-    public DBWNetworkProfile getNetworkProfile(String source, String name) {
+    public DBWNetworkProfile getNetworkProfile(@Nullable String source, @NotNull String name) {
         return dataSourceRegistry.getNetworkProfile(source, name);
     }
 
@@ -219,18 +223,18 @@ public class WebDataSourceRegistryProxy implements DBPDataSourceRegistry, DataSo
     }
 
     @Override
-    public void updateNetworkProfile(DBWNetworkProfile profile) {
+    public void updateNetworkProfile(@NotNull DBWNetworkProfile profile) {
         dataSourceRegistry.updateNetworkProfile(profile);
     }
 
     @Override
-    public void removeNetworkProfile(DBWNetworkProfile profile) {
+    public void removeNetworkProfile(@NotNull DBWNetworkProfile profile) {
         dataSourceRegistry.removeNetworkProfile(profile);
     }
 
     @Nullable
     @Override
-    public DBAAuthProfile getAuthProfile(String id) {
+    public DBAAuthProfile getAuthProfile(@NotNull String id) {
         return dataSourceRegistry.getAuthProfile(id);
     }
 
@@ -247,12 +251,17 @@ public class WebDataSourceRegistryProxy implements DBPDataSourceRegistry, DataSo
     }
 
     @Override
-    public void updateAuthProfile(DBAAuthProfile profile) {
+    public void updateAuthProfile(@NotNull DBAAuthProfile profile) {
         dataSourceRegistry.updateAuthProfile(profile);
     }
 
     @Override
-    public void removeAuthProfile(DBAAuthProfile profile) {
+    public void setAuthProfiles(@NotNull Collection<DBAAuthProfile> profiles) {
+        dataSourceRegistry.setAuthProfiles(profiles);
+    }
+
+    @Override
+    public void removeAuthProfile(@NotNull DBAAuthProfile profile) {
         dataSourceRegistry.removeAuthProfile(profile);
     }
 
@@ -271,6 +280,7 @@ public class WebDataSourceRegistryProxy implements DBPDataSourceRegistry, DataSo
         dataSourceRegistry.refreshConfig(dataSourceIds);
     }
 
+    @Nullable
     @Override
     public Throwable getLastError() {
         return dataSourceRegistry.getLastError();
@@ -287,7 +297,7 @@ public class WebDataSourceRegistryProxy implements DBPDataSourceRegistry, DataSo
     }
 
     @Override
-    public void notifyDataSourceListeners(DBPEvent event) {
+    public void notifyDataSourceListeners(@NotNull DBPEvent event) {
         dataSourceRegistry.notifyDataSourceListeners(event);
     }
 
@@ -307,9 +317,16 @@ public class WebDataSourceRegistryProxy implements DBPDataSourceRegistry, DataSo
         dataSourceRegistry.setAuthCredentialsProvider(authCredentialsProvider);
     }
 
+    @NotNull
     @Override
     public Set<DBPDataSourceFolder> getTemporaryFolders() {
         return dataSourceRegistry.getTemporaryFolders();
+    }
+
+    @NotNull
+    @Override
+    public DBPPreferenceStore getPreferenceStore() {
+        return dataSourceRegistry.getPreferenceStore();
     }
 
     @Override

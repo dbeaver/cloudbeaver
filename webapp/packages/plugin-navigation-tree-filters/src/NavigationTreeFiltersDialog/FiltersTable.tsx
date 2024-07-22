@@ -10,7 +10,7 @@ import { useState } from 'react';
 
 import { Button, Form, Group, InputField, s, Table, TableBody, useS, useTranslate } from '@cloudbeaver/core-blocks';
 
-import styles from './FiltersTable.m.css';
+import styles from './FiltersTable.module.css';
 import { FiltersTableItem } from './FiltersTableItem';
 
 interface Props {

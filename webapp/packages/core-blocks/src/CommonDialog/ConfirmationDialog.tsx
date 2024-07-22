@@ -12,13 +12,12 @@ import { Button } from '../Button';
 import { Fill } from '../Fill';
 import { Translate } from '../localization/Translate';
 import { s } from '../s';
-import { useFocus } from '../useFocus';
 import { useS } from '../useS';
 import { CommonDialogBody } from './CommonDialog/CommonDialogBody';
 import { CommonDialogFooter } from './CommonDialog/CommonDialogFooter';
 import { CommonDialogHeader } from './CommonDialog/CommonDialogHeader';
 import { CommonDialogWrapper } from './CommonDialog/CommonDialogWrapper';
-import style from './ConfirmationDialog.m.css';
+import style from './ConfirmationDialog.module.css';
 
 export interface ConfirmationDialogPayload {
   icon?: string;
@@ -40,11 +39,10 @@ export const ConfirmationDialog: DialogComponent<ConfirmationDialogPayload, Dial
   className,
 }) {
   const styles = useS(style);
-  const [focusedRef] = useFocus<HTMLDivElement>({ focusFirstChild: true });
   const { icon, title, subTitle, bigIcon, viewBox, message, confirmActionText, cancelActionText } = payload;
 
   return (
-    <CommonDialogWrapper ref={focusedRef} size="small" className={className} fixedWidth>
+    <CommonDialogWrapper size="small" className={className} fixedWidth>
       <CommonDialogHeader title={title} subTitle={subTitle} icon={icon} viewBox={viewBox} bigIcon={bigIcon} onReject={rejectDialog} />
       <CommonDialogBody>
         <Translate token={message} />

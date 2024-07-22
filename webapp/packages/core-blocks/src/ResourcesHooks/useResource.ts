@@ -40,9 +40,10 @@ export interface ResourceKeyWithIncludes<TKey, TIncludes> {
   readonly includes: TIncludes;
 }
 
-type ResourceData<TResource extends IResource<any, any, any, any>, TKey, TIncludes> = TResource extends CachedDataResource<any, any, any, any>
-  ? CachedResourceData<TResource>
-  : CachedMapResourceLoader<TKey, CachedResourceKey<TResource>, CachedResourceData<TResource> extends Map<any, infer I> ? I : never, TIncludes>;
+type ResourceData<TResource extends IResource<any, any, any, any>, TKey, TIncludes> =
+  TResource extends CachedDataResource<any, any, any, any>
+    ? CachedResourceData<TResource>
+    : CachedMapResourceLoader<TKey, CachedResourceKey<TResource>, CachedResourceData<TResource> extends Map<any, infer I> ? I : never, TIncludes>;
 
 interface IActions<TResource extends IResource<any, any, any, any>, TKey, TIncludes> {
   active?: boolean;
@@ -91,11 +92,12 @@ interface IDataResourceResult<TResource, TIncludes> extends IMapResourceState<TR
   exception: Error | null;
 }
 
-type TResult<TResource, TKey, TIncludes> = TResource extends CachedDataResource<any, any, any>
-  ? IDataResourceResult<TResource, TIncludes>
-  : TKey extends ResourceKeyList<any> | ResourceKeyListAlias<any, any>
-  ? IMapResourceListResult<TResource, TIncludes>
-  : IMapResourceResult<TResource, TIncludes>;
+type TResult<TResource, TKey, TIncludes> =
+  TResource extends CachedDataResource<any, any, any>
+    ? IDataResourceResult<TResource, TIncludes>
+    : TKey extends ResourceKeyList<any> | ResourceKeyListAlias<any, any>
+      ? IMapResourceListResult<TResource, TIncludes>
+      : IMapResourceResult<TResource, TIncludes>;
 
 /**
  * Accepts resource class or instance and returns resource state.
@@ -244,6 +246,7 @@ export function useResource<
           }
           this.exception = null;
         } catch (exception: any) {
+          console.error(exception);
           if (this.loadingPromise !== loadingPromise) {
             return;
           }

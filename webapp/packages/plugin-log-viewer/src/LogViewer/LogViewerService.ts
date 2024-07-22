@@ -30,7 +30,7 @@ export class LogViewerService {
   }
 
   get disabled() {
-    return this.toolsPanelService.disabled || this.logViewerSettingsService.settings.getValue('disabled');
+    return this.toolsPanelService.disabled || this.logViewerSettingsService.disabled;
   }
 
   constructor(

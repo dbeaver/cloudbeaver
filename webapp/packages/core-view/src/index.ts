@@ -1,7 +1,17 @@
+/*
+ * CloudBeaver - Cloud Database Manager
+ * Copyright (C) 2020-2024 DBeaver Corp and others
+ *
+ * Licensed under the Apache License, Version 2.0.
+ * you may not use this file except in compliance with the License.
+ */
+export * from './Action/Actions/ACTION_ADD';
+export * from './Action/Actions/ACTION_CANCEL';
 export * from './Action/Actions/ACTION_COLLAPSE_ALL';
 export * from './Action/Actions/ACTION_CREATE';
 export * from './Action/Actions/ACTION_DELETE';
 export * from './Action/Actions/ACTION_EDIT';
+export * from './Action/Actions/ACTION_DUPLICATE';
 export * from './Action/Actions/ACTION_EXPORT';
 export * from './Action/Actions/ACTION_FILTER';
 export * from './Action/Actions/ACTION_LAYOUT';
@@ -11,6 +21,7 @@ export * from './Action/Actions/ACTION_OPEN';
 export * from './Action/Actions/ACTION_REDO';
 export * from './Action/Actions/ACTION_REFRESH';
 export * from './Action/Actions/ACTION_RENAME';
+export * from './Action/Actions/ACTION_REVERT';
 export * from './Action/Actions/ACTION_SAVE';
 export * from './Action/Actions/ACTION_SETTINGS';
 export * from './Action/Actions/ACTION_UNDO';
@@ -18,6 +29,7 @@ export * from './Action/Actions/ACTION_ZOOM_IN';
 export * from './Action/Actions/ACTION_ZOOM_OUT';
 export * from './Action/Actions/ACTION_DOWNLOAD';
 export * from './Action/Actions/ACTION_UPLOAD';
+export * from './Action/Actions/ACTION_IMPORT';
 export * from './Action/KeyBinding/Bindings/KEY_BINDING_OPEN_IN_TAB';
 export * from './Action/KeyBinding/Bindings/KEY_BINDING_REDO';
 export * from './Action/KeyBinding/Bindings/KEY_BINDING_UNDO';
@@ -49,7 +61,6 @@ export * from './Menu/MenuItem/MenuLazyItem';
 export * from './Menu/MenuItem/MenuSeparatorItem';
 export * from './Menu/MenuItem/MenuSubMenuItem';
 export * from './Menu/createMenu';
-export * from './Menu/DATA_CONTEXT_MENU_LOCAL';
 export * from './Menu/DATA_CONTEXT_MENU_NESTED';
 export * from './Menu/DATA_CONTEXT_MENU';
 export * from './Menu/DATA_CONTEXT_SUBMENU_ITEM';
@@ -59,7 +70,8 @@ export * from './Menu/MenuService';
 export * from './Menu/useMenu';
 export * from './Menu/useMenuContext';
 export * from './View/AppView';
-export * from './View/CaptureView';
+export * from './View/CaptureViewScopeLazy';
+export * from './View/CaptureViewLazy';
 export * from './View/CaptureViewContext';
 export * from './View/IActiveView';
 export * from './View/IView';

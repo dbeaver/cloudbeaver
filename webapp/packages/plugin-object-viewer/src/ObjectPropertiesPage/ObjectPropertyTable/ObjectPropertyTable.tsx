@@ -14,7 +14,7 @@ import { type DBObject, DBObjectParentKey, DBObjectResource, NavTreeResource } f
 import { isDefined } from '@cloudbeaver/core-utils';
 import { NavNodeViewService } from '@cloudbeaver/plugin-navigation-tree';
 
-import styles from './ObjectPropertyTable.m.css';
+import styles from './ObjectPropertyTable.module.css';
 import { TableLoader } from './Table/TableLoader';
 
 interface ObjectPropertyTableProps {
@@ -26,11 +26,11 @@ interface ObjectPropertyTableProps {
 export const ObjectPropertyTable = observer<ObjectPropertyTableProps>(function ObjectPropertyTable({ objectId, parentId, className }) {
   const translate = useTranslate();
   const navNodeViewService = useService(NavNodeViewService);
-  const navTreeResource = useService(NavTreeResource);
+  const navTreeResource = useResource(ObjectPropertyTable, NavTreeResource, objectId, { forceSuspense: true });
 
   const pagination = useOffsetPagination(DBObjectResource, {
     key: DBObjectParentKey(objectId),
-    pageSize: navTreeResource.childrenLimit,
+    pageSize: navTreeResource.resource.childrenLimit,
   });
 
   const dbObjectLoader = useResource(ObjectPropertyTable, DBObjectResource, pagination.key);

@@ -10,13 +10,14 @@ import { useContext, useMemo } from 'react';
 
 import { getComputed, s, StaticImage, useS } from '@cloudbeaver/core-blocks';
 import type { SqlResultColumn } from '@cloudbeaver/core-sdk';
-import type { RenderHeaderCellProps } from '@cloudbeaver/plugin-react-data-grid';
+import type { RenderHeaderCellProps } from '@cloudbeaver/plugin-data-grid';
+import { DatabaseDataConstraintAction, isResultSetDataModel, ResultSetDataSource } from '@cloudbeaver/plugin-data-viewer';
 
 import { DataGridContext } from '../DataGridContext';
 import { DataGridSelectionContext } from '../DataGridSelection/DataGridSelectionContext';
 import { TableDataContext } from '../TableDataContext';
 import { OrderButton } from './OrderButton';
-import style from './TableColumnHeader.m.css';
+import style from './TableColumnHeader.module.css';
 import { useTableColumnDnD } from './useTableColumnDnD';
 
 export const TableColumnHeader = observer<RenderHeaderCellProps<any>>(function TableColumnHeader({ column: calculatedColumn }) {
@@ -29,9 +30,14 @@ export const TableColumnHeader = observer<RenderHeaderCellProps<any>>(function T
   const model = dataGridContext.model;
 
   const dnd = useTableColumnDnD(model, resultIndex, calculatedColumn.columnDataIndex);
+  let constraintsAction: DatabaseDataConstraintAction | undefined;
+
+  if (isResultSetDataModel(model)) {
+    constraintsAction = (model.source as ResultSetDataSource).tryGetAction(resultIndex, DatabaseDataConstraintAction);
+  }
 
   const dataReadonly = getComputed(() => tableDataContext.isReadOnly() || model.isReadonly(resultIndex));
-  const sortingDisabled = getComputed(() => !tableDataContext.constraints.supported || !model.source.executionContext?.context);
+  const sortingDisabled = getComputed(() => !constraintsAction?.supported || model.isDisabled(resultIndex));
 
   let resultColumn: SqlResultColumn | undefined;
   let icon = calculatedColumn.icon;
@@ -71,16 +77,22 @@ export const TableColumnHeader = observer<RenderHeaderCellProps<any>>(function T
     }
   }, [calculatedColumn]);
 
+  const hasIcon = icon || (!dataReadonly && columnReadOnly);
+
   return (
     <div ref={dnd.setRef} data-s-rearrange={dnd.side} className={s(styles, { header: true, dragging: dnd.data.state.isDragging })}>
       <div title={columnTooltip} className={s(styles, { container: true })} onClick={handleClick}>
-        <div className={s(styles, { icon: true })}>
-          {icon && <StaticImage icon={icon} className={s(styles, { staticImage: true })} />}
-          {!dataReadonly && columnReadOnly && <div className={s(styles, { readonlyStatus: true }, 'rdg-table-header__readonly-status')} />}
-        </div>
+        {hasIcon && (
+          <div className={s(styles, { icon: true })}>
+            {icon && <StaticImage icon={icon} className={s(styles, { staticImage: true })} />}
+            {!dataReadonly && columnReadOnly && <div className={s(styles, { readonlyStatus: true }, 'rdg-table-header__readonly-status')} />}
+          </div>
+        )}
         <div className={s(styles, { name: true })}>{columnName}</div>
       </div>
-      {!sortingDisabled && resultColumn && <OrderButton model={model} resultIndex={resultIndex} attributePosition={resultColumn.position} />}
+      {!sortingDisabled && resultColumn && isResultSetDataModel(model) && (
+        <OrderButton model={model} resultIndex={resultIndex} attributePosition={resultColumn.position} />
+      )}
     </div>
   );
 });

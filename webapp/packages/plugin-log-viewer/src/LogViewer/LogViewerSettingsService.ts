@@ -6,35 +6,67 @@
  * you may not use this file except in compliance with the License.
  */
 import { Dependency, injectable } from '@cloudbeaver/core-di';
-import { createSettingsAliasResolver, PluginManagerService, PluginSettings, SettingsManagerService } from '@cloudbeaver/core-plugin';
-import { ServerSettingsResolverService, ServerSettingsService } from '@cloudbeaver/core-root';
-import { schema } from '@cloudbeaver/core-utils';
+import {
+  createSettingsAliasResolver,
+  ROOT_SETTINGS_LAYER,
+  SettingsManagerService,
+  SettingsProvider,
+  SettingsProviderService,
+  SettingsResolverService,
+} from '@cloudbeaver/core-settings';
+import { schema, schemaExtra } from '@cloudbeaver/core-utils';
 
 const defaultSettings = schema.object({
-  refreshTimeout: schema.coerce.number().default(3000),
-  maxLogRecords: schema.coerce.number().default(1000),
-  logBatchSize: schema.coerce.number().default(2000),
-  maxFailedRequests: schema.coerce.number().default(3),
-  disabled: schema.coerce.boolean().default(false),
+  'plugin.log-viewer.refreshTimeout': schema.coerce.number().default(3000),
+  'plugin.log-viewer.maxLogRecords': schema.coerce.number().default(1000),
+  'plugin.log-viewer.logBatchSize': schema.coerce.number().default(2000),
+  'plugin.log-viewer.maxFailedRequests': schema.coerce.number().default(3),
+  'plugin.log-viewer.disabled': schemaExtra.stringedBoolean().default(false),
 });
 
 export type LogViewerSettings = schema.infer<typeof defaultSettings>;
 
 @injectable()
 export class LogViewerSettingsService extends Dependency {
-  readonly settings: PluginSettings<typeof defaultSettings>;
+  get disabled(): boolean {
+    return this.settings.getValue('plugin.log-viewer.disabled');
+  }
+
+  get refreshTimeout(): number {
+    return this.settings.getValue('plugin.log-viewer.refreshTimeout');
+  }
+
+  get maxLogRecords(): number {
+    return this.settings.getValue('plugin.log-viewer.maxLogRecords');
+  }
+
+  get logBatchSize(): number {
+    return this.settings.getValue('plugin.log-viewer.logBatchSize');
+  }
+
+  get maxFailedRequests(): number {
+    return this.settings.getValue('plugin.log-viewer.maxFailedRequests');
+  }
+
+  readonly settings: SettingsProvider<typeof defaultSettings>;
 
   constructor(
-    private readonly pluginManagerService: PluginManagerService,
+    private readonly settingsProviderService: SettingsProviderService,
     private readonly settingsManagerService: SettingsManagerService,
-    private readonly serverSettingsService: ServerSettingsService,
-    private readonly serverSettingsResolverService: ServerSettingsResolverService,
+    private readonly settingsResolverService: SettingsResolverService,
   ) {
     super();
-    this.settings = this.pluginManagerService.createSettings('log-viewer', 'plugin', defaultSettings);
-    this.serverSettingsResolverService.addResolver(
+    this.settings = this.settingsProviderService.createSettings(defaultSettings);
+    this.settingsResolverService.addResolver(
+      ROOT_SETTINGS_LAYER,
       /** @deprecated Use settings instead, will be removed in 23.0.0 */
-      createSettingsAliasResolver(this.serverSettingsService, this.settings, 'core.app.logViewer'),
+      createSettingsAliasResolver(this.settingsResolverService, this.settings, {
+        'plugin.log-viewer.disabled': 'core.app.logViewer.disabled',
+        'plugin.log-viewer.logBatchSize': 'core.app.logViewer.logBatchSize',
+        'plugin.log-viewer.maxFailedRequests': 'core.app.logViewer.maxFailedRequests',
+        'plugin.log-viewer.maxLogRecords': 'core.app.logViewer.maxLogRecords',
+        'plugin.log-viewer.refreshTimeout': 'core.app.logViewer.refreshTimeout',
+      }),
     );
 
     this.registerSettings();
@@ -71,8 +103,11 @@ export class LogViewerSettingsService extends Dependency {
       //   description: 'Max failed requests',
       // },
       // {
+      //   key: 'plugin.log-viewer.disabled',
+      //   access: {
+      //     scope: ['server', 'client'],
+      //   },
       //   group: LOG_VIEWER_SETTINGS_GROUP,
-      //   key: 'disabled',
       //   type: ESettingsValueType.Checkbox,
       //   name: 'Disable log viewer',
       //   description: 'Disable log viewer',

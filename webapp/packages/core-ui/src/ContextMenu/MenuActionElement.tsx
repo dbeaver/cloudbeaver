@@ -6,9 +6,8 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import React from 'react';
 
-import { Checkbox, MenuItem, MenuItemCheckbox, MenuItemElement, MenuItemRadio, Radio } from '@cloudbeaver/core-blocks';
+import { Checkbox, MenuItem, MenuItemCheckbox, MenuItemElement, MenuItemRadio, Radio, useTranslate } from '@cloudbeaver/core-blocks';
 import { getBindingLabel, IMenuActionItem } from '@cloudbeaver/core-view';
 
 import type { IContextMenuItemProps } from './IContextMenuItemProps';
@@ -18,6 +17,7 @@ interface IMenuActionElementProps extends IContextMenuItemProps {
 }
 
 export const MenuActionElement = observer<IMenuActionElementProps>(function MenuActionElement({ item, onClick }) {
+  const translate = useTranslate();
   const actionInfo = item.action.actionInfo;
   const loading = item.action.isLoading();
   let binding;
@@ -30,16 +30,18 @@ export const MenuActionElement = observer<IMenuActionElementProps>(function Menu
     item.action.activate();
   }
 
+  const label = translate(actionInfo.label);
+
   if (actionInfo.type === 'select') {
     const checked = item.action.isChecked();
     return (
       <MenuItemRadio
         hidden={item.hidden}
         id={item.id}
-        aria-label={actionInfo.label}
+        aria-label={label}
         disabled={item.disabled}
         name={item.id}
-        value={actionInfo.label}
+        value={label}
         checked={checked}
         onClick={handleClick}
       >
@@ -59,10 +61,10 @@ export const MenuActionElement = observer<IMenuActionElementProps>(function Menu
       <MenuItemCheckbox
         hidden={item.hidden}
         id={item.id}
-        aria-label={actionInfo.label}
+        aria-label={label}
         disabled={item.disabled}
         name={item.id}
-        value={actionInfo.label}
+        value={label}
         checked={checked}
         onClick={handleClick}
       >
@@ -77,7 +79,7 @@ export const MenuActionElement = observer<IMenuActionElementProps>(function Menu
   }
 
   return (
-    <MenuItem hidden={item.hidden} id={item.id} aria-label={actionInfo.label} disabled={item.disabled} onClick={handleClick}>
+    <MenuItem hidden={item.hidden} id={item.id} aria-label={label} disabled={item.disabled} onClick={handleClick}>
       <MenuItemElement label={actionInfo.label} icon={actionInfo.icon} binding={binding} tooltip={actionInfo.tooltip} loading={loading} />
     </MenuItem>
   );

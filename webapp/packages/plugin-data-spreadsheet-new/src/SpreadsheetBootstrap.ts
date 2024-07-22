@@ -41,7 +41,7 @@ export class SpreadsheetBootstrap extends Bootstrap {
       id: 'spreadsheet_grid',
       dataFormat: ResultDataFormat.Resultset,
       getPresentationComponent: () => SpreadsheetGrid,
-      hidden: () => this.dataGridSettingsService.settings.getValue('hidden'),
+      hidden: () => this.dataGridSettingsService.hidden,
       title: 'Table',
       icon: 'table-icon-sm',
     });
@@ -56,13 +56,13 @@ export class SpreadsheetBootstrap extends Bootstrap {
         return context.contextType === DataGridContextMenuService.cellContext;
       },
       isHidden(context) {
-        return typeof context.data.actions.valuePresentationId === 'string' || context.data.simple;
+        return context.data.actions.valuePresentationId === 'value-text-presentation' || context.data.simple;
       },
       order: 0.5,
       title: 'data_grid_table_open_value_panel',
       icon: 'value-panel',
       onClick(context) {
-        context.data.actions.setValuePresentation('');
+        context.data.actions.setValuePresentation('value-text-presentation');
       },
     });
   }

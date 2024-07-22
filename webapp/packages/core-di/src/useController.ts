@@ -5,18 +5,25 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { useContext, useEffect, useMemo, useRef } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 
-import { appContext } from './AppContext';
+import { App } from './App';
 import type { ExtractInitArgs, IDestructibleController, IInitializableController, IServiceConstructor } from './IApp';
+import { useService } from './useService';
 
 /**
  * @deprecated use hooks instead
  */
 export function useController<T extends IInitializableController>(ctor: IServiceConstructor<T>, ...args: ExtractInitArgs<T>): T;
+/**
+ * @deprecated use hooks instead
+ */
 export function useController<T>(ctor: IServiceConstructor<T>): T;
+/**
+ * @deprecated use hooks instead
+ */
 export function useController<T>(ctor: IServiceConstructor<T>, ...args: any[]): T {
-  const app = useContext(appContext);
+  const appService = useService(App);
   const controllerRef = useRef<T>();
 
   useMemo(() => {
@@ -24,7 +31,7 @@ export function useController<T>(ctor: IServiceConstructor<T>, ...args: any[]): 
       controllerRef.current.destruct();
     }
 
-    const controller = app.resolveServiceByClass(ctor);
+    const controller = appService.getServiceInjector().resolveServiceByClass(ctor);
 
     if (isInitializableController(controller)) {
       controller.init(...args);

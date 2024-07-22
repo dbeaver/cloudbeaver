@@ -7,11 +7,12 @@
  */
 import type { PluginManifest } from '@cloudbeaver/core-di';
 
-import { PluginBootstrap } from './PluginBootstrap';
-import { SessionExpiredDialogBootstrap } from './SessionExpireDialog/SessionExpiredDialogBootstrap';
-import { SessionExpireWarningDialogBootstrap } from './SessionExpireWarningDialog/SessionExpireWarningDialogBootstrap';
-
 export const sessionExpirationPlugin: PluginManifest = {
   info: { name: 'Session Expiration plugin' },
-  providers: [PluginBootstrap, SessionExpiredDialogBootstrap, SessionExpireWarningDialogBootstrap],
+  providers: [
+    () => import('./PluginBootstrap').then(m => m.PluginBootstrap),
+    () => import('./SessionExpireDialog/SessionExpiredDialogBootstrap').then(m => m.SessionExpiredDialogBootstrap),
+    () => import('./SessionExpireWarningDialog/SessionExpireWarningDialogBootstrap').then(m => m.SessionExpireWarningDialogBootstrap),
+    () => import('./LocaleService').then(m => m.LocaleService),
+  ],
 };

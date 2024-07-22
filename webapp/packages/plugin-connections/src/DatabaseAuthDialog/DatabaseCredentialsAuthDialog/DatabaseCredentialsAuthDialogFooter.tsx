@@ -6,25 +6,10 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import styled, { css } from 'reshadow';
 
-import { Button, useTranslate } from '@cloudbeaver/core-blocks';
+import { Button, s, useS, useTranslate } from '@cloudbeaver/core-blocks';
 
-const styles = css`
-  footer-container {
-    display: flex;
-    width: min-content;
-    flex: 1;
-    align-items: center;
-    justify-content: flex-end;
-  }
-  footer-container > :not(:first-child) {
-    margin-left: 16px;
-  }
-  Button {
-    flex: 0 0 auto;
-  }
-`;
+import styles from './DatabaseCredentialsAuthDialogFooter.module.css';
 
 export interface Props {
   isAuthenticating: boolean;
@@ -38,14 +23,22 @@ export const DatabaseCredentialsAuthDialogFooter = observer<React.PropsWithChild
   className,
   children,
 }) {
+  const style = useS(styles);
   const translate = useTranslate();
 
-  return styled(styles)(
-    <footer-container className={className}>
+  return (
+    <div className={s(style, { footerContainer: true }, className)}>
       {children}
-      <Button type="button" mod={['unelevated']} disabled={isAuthenticating} loading={isAuthenticating} onClick={onLogin}>
+      <Button
+        className={s(style, { button: true })}
+        type="button"
+        mod={['unelevated']}
+        disabled={isAuthenticating}
+        loading={isAuthenticating}
+        onClick={onLogin}
+      >
         {translate('authentication_login')}
       </Button>
-    </footer-container>,
+    </div>
   );
 });

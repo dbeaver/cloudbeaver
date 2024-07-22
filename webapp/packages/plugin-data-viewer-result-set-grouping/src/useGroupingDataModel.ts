@@ -10,7 +10,7 @@ import { useEffect } from 'react';
 
 import { useObjectRef, useResource } from '@cloudbeaver/core-blocks';
 import { ConnectionInfoResource, createConnectionParam } from '@cloudbeaver/core-connections';
-import { App, useService } from '@cloudbeaver/core-di';
+import { IServiceProvider, useService } from '@cloudbeaver/core-di';
 import { AsyncTaskInfoService, GraphQLService } from '@cloudbeaver/core-sdk';
 import { isObjectsEqual } from '@cloudbeaver/core-utils';
 import {
@@ -18,24 +18,24 @@ import {
   DatabaseDataModel,
   DataViewerSettingsService,
   IDatabaseDataModel,
-  IDatabaseResultSet,
+  ResultSetDataSource,
   TableViewerStorageService,
 } from '@cloudbeaver/plugin-data-viewer';
 
-import { GroupingDataSource, IDataGroupingOptions } from './GroupingDataSource';
+import { GroupingDataSource } from './GroupingDataSource';
 import type { IGroupingQueryState } from './IGroupingQueryState';
 
 export interface IGroupingDataModel {
-  model: IDatabaseDataModel<IDataGroupingOptions, IDatabaseResultSet>;
+  model: IDatabaseDataModel<GroupingDataSource>;
 }
 
 export function useGroupingDataModel(
-  sourceModel: IDatabaseDataModel<any, IDatabaseResultSet>,
+  sourceModel: IDatabaseDataModel<ResultSetDataSource>,
   sourceResultIndex: number,
   state: IGroupingQueryState,
 ): IGroupingDataModel {
   const tableViewerStorageService = useService(TableViewerStorageService);
-  const app = useService(App);
+  const serviceProvider = useService(IServiceProvider);
   const graphQLService = useService(GraphQLService);
   const asyncTaskInfoService = useService(AsyncTaskInfoService);
   const dataViewerSettingsService = useService(DataViewerSettingsService);
@@ -49,8 +49,9 @@ export function useGroupingDataModel(
 
   const model = useObjectRef(
     () => {
-      const source = new GroupingDataSource(app.getServiceInjector(), graphQLService, asyncTaskInfoService);
+      const source = new GroupingDataSource(serviceProvider, graphQLService, asyncTaskInfoService);
 
+      source.setKeepExecutionContextOnDispose(true);
       const model = tableViewerStorageService.add(new DatabaseDataModel(source));
 
       model.setAccess(DatabaseDataAccessMode.Readonly).setCountGain(dataViewerSettingsService.getDefaultRowsCount()).setSlice(0);
@@ -78,7 +79,7 @@ export function useGroupingDataModel(
   useEffect(() => {
     const sub = reaction(
       () => {
-        const result = sourceModel.source.hasResult(sourceResultIndex) ? sourceModel.source.getResult(sourceResultIndex) : null;
+        const result = sourceModel.source.getResult(sourceResultIndex);
 
         return {
           columns: state.columns,
@@ -90,14 +91,16 @@ export function useGroupingDataModel(
       async ({ columns, functions, sourceResultId }) => {
         if (columns.length !== 0 && functions.length !== 0 && sourceResultId) {
           const executionContext = sourceModel.source.executionContext;
-          model.model.source.setExecutionContext(executionContext).setSupportedDataFormats(connectionInfo?.supportedDataFormats ?? []);
+          model.source.setExecutionContext(executionContext).setSupportedDataFormats(connectionInfo?.supportedDataFormats ?? []);
           const context = executionContext?.context;
 
           if (context) {
             const connectionKey = createConnectionParam(context.projectId, context.connectionId);
 
             model.model
-              .setOptions({
+              .setCountGain(dataViewerSettingsService.getDefaultRowsCount())
+              .setSlice(0)
+              .source.setOptions({
                 query: '',
                 columns,
                 functions,
@@ -107,9 +110,7 @@ export function useGroupingDataModel(
                 constraints: [],
                 whereFilter: '',
               })
-              .setCountGain(dataViewerSettingsService.getDefaultRowsCount())
-              .setSlice(0)
-              .source.resetData();
+              .resetData();
           }
         } else {
           model.model
@@ -129,7 +130,5 @@ export function useGroupingDataModel(
 
   useEffect(() => model.dispose, []);
 
-  return {
-    model: model.model,
-  };
+  return model;
 }

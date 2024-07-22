@@ -14,7 +14,6 @@ import {
   ACTION_SAVE,
   ACTION_UNDO,
   ActionService,
-  DATA_CONTEXT_MENU,
   IAction,
   KEY_BINDING_REDO,
   KEY_BINDING_SAVE,
@@ -58,12 +57,10 @@ export class MenuBootstrap extends Bootstrap {
     this.windowEventsService.onFocusChange.addHandler(throttle(this.focusChangeHandler.bind(this), SYNC_DELAY, false));
     this.actionService.addHandler({
       id: 'sql-editor-base-handler',
+      contexts: [DATA_CONTEXT_SQL_EDITOR_STATE],
+      actions: [ACTION_SAVE],
       isActionApplicable: (context, action): boolean => {
-        const state = context.tryGet(DATA_CONTEXT_SQL_EDITOR_STATE);
-
-        if (!state) {
-          return false;
-        }
+        const state = context.get(DATA_CONTEXT_SQL_EDITOR_STATE)!;
 
         const dataSource = this.sqlDataSourceService.get(state.editorId);
 
@@ -75,7 +72,7 @@ export class MenuBootstrap extends Bootstrap {
       },
       handler: async (context, action) => {
         if (action === ACTION_SAVE) {
-          const state = context.get(DATA_CONTEXT_SQL_EDITOR_STATE);
+          const state = context.get(DATA_CONTEXT_SQL_EDITOR_STATE)!;
           const source = this.sqlDataSourceService.get(state.editorId);
 
           if (!source) {
@@ -87,7 +84,7 @@ export class MenuBootstrap extends Bootstrap {
       },
       isDisabled: (context, action) => {
         if (action === ACTION_SAVE) {
-          const state = context.get(DATA_CONTEXT_SQL_EDITOR_STATE);
+          const state = context.get(DATA_CONTEXT_SQL_EDITOR_STATE)!;
           const source = this.sqlDataSourceService.get(state.editorId);
 
           if (!source) {
@@ -112,16 +109,14 @@ export class MenuBootstrap extends Bootstrap {
     });
 
     this.menuService.addCreator({
+      menus: [SQL_EDITOR_TOOLS_MENU],
+      contexts: [DATA_CONTEXT_SQL_EDITOR_STATE],
       isApplicable: context => {
-        const state = context.tryGet(DATA_CONTEXT_SQL_EDITOR_STATE);
-
-        if (!state) {
-          return false;
-        }
+        const state = context.get(DATA_CONTEXT_SQL_EDITOR_STATE)!;
 
         const dataSource = this.sqlDataSourceService.get(state.editorId);
 
-        return context.get(DATA_CONTEXT_MENU) === SQL_EDITOR_TOOLS_MENU && !!dataSource?.hasFeature(ESqlDataSourceFeatures.script);
+        return !!dataSource?.hasFeature(ESqlDataSourceFeatures.script);
       },
       getItems: (context, items) => [...items, ACTION_SAVE],
     });
@@ -129,9 +124,10 @@ export class MenuBootstrap extends Bootstrap {
     this.keyBindingService.addKeyBindingHandler({
       id: 'sql-editor-save',
       binding: KEY_BINDING_SAVE,
-      isBindingApplicable: (context, action) => action === ACTION_SAVE,
+      actions: [ACTION_SAVE],
+      contexts: [DATA_CONTEXT_SQL_EDITOR_STATE],
       handler: async context => {
-        const state = context.get(DATA_CONTEXT_SQL_EDITOR_STATE);
+        const state = context.get(DATA_CONTEXT_SQL_EDITOR_STATE)!;
         const source = this.sqlDataSourceService.get(state.editorId);
 
         if (!source) {
@@ -144,12 +140,19 @@ export class MenuBootstrap extends Bootstrap {
 
     this.actionService.addHandler({
       id: 'sql-editor-actions',
+      actions: [
+        ACTION_SQL_EDITOR_EXECUTE,
+        ACTION_SQL_EDITOR_EXECUTE_NEW,
+        ACTION_SQL_EDITOR_EXECUTE_SCRIPT,
+        ACTION_SQL_EDITOR_FORMAT,
+        ACTION_REDO,
+        ACTION_UNDO,
+        ACTION_SQL_EDITOR_SHOW_EXECUTION_PLAN,
+        ACTION_SQL_EDITOR_SHOW_OUTPUT,
+      ],
+      contexts: [DATA_CONTEXT_SQL_EDITOR_DATA],
       isActionApplicable: (contexts, action): boolean => {
-        const sqlEditorData = contexts.tryGet(DATA_CONTEXT_SQL_EDITOR_DATA);
-
-        if (!sqlEditorData) {
-          return false;
-        }
+        const sqlEditorData = contexts.get(DATA_CONTEXT_SQL_EDITOR_DATA)!;
 
         if (sqlEditorData.readonly && [ACTION_SQL_EDITOR_FORMAT, ACTION_REDO, ACTION_UNDO].includes(action)) {
           return false;
@@ -176,16 +179,7 @@ export class MenuBootstrap extends Bootstrap {
           return false;
         }
 
-        return [
-          ACTION_SQL_EDITOR_EXECUTE,
-          ACTION_SQL_EDITOR_EXECUTE_NEW,
-          ACTION_SQL_EDITOR_EXECUTE_SCRIPT,
-          ACTION_SQL_EDITOR_FORMAT,
-          ACTION_REDO,
-          ACTION_UNDO,
-          ACTION_SQL_EDITOR_SHOW_EXECUTION_PLAN,
-          ACTION_SQL_EDITOR_SHOW_OUTPUT,
-        ].includes(action);
+        return true;
       },
       isDisabled: (context, action) => !context.has(DATA_CONTEXT_SQL_EDITOR_DATA),
       handler: this.sqlEditorActionHandler.bind(this),
@@ -194,6 +188,7 @@ export class MenuBootstrap extends Bootstrap {
     this.keyBindingService.addKeyBindingHandler({
       id: 'sql-editor-execute',
       binding: KEY_BINDING_SQL_EDITOR_EXECUTE,
+      contexts: [DATA_CONTEXT_SQL_EDITOR_DATA],
       isBindingApplicable: (contexts, action) => action === ACTION_SQL_EDITOR_EXECUTE,
       handler: this.sqlEditorActionHandler.bind(this),
     });
@@ -201,6 +196,7 @@ export class MenuBootstrap extends Bootstrap {
     this.keyBindingService.addKeyBindingHandler({
       id: 'sql-editor-execute-new',
       binding: KEY_BINDING_SQL_EDITOR_EXECUTE_NEW,
+      contexts: [DATA_CONTEXT_SQL_EDITOR_DATA],
       isBindingApplicable: (contexts, action) => action === ACTION_SQL_EDITOR_EXECUTE_NEW,
       handler: this.sqlEditorActionHandler.bind(this),
     });
@@ -208,8 +204,9 @@ export class MenuBootstrap extends Bootstrap {
     this.keyBindingService.addKeyBindingHandler({
       id: 'sql-editor-execute-script',
       binding: KEY_BINDING_SQL_EDITOR_EXECUTE_SCRIPT,
+      contexts: [DATA_CONTEXT_SQL_EDITOR_DATA],
       isBindingApplicable: (contexts, action) => {
-        const sqlEditorData = contexts.tryGet(DATA_CONTEXT_SQL_EDITOR_DATA);
+        const sqlEditorData = contexts.get(DATA_CONTEXT_SQL_EDITOR_DATA);
         return action === ACTION_SQL_EDITOR_EXECUTE_SCRIPT && sqlEditorData?.dataSource?.hasFeature(ESqlDataSourceFeatures.executable) === true;
       },
       handler: this.sqlEditorActionHandler.bind(this),
@@ -218,6 +215,7 @@ export class MenuBootstrap extends Bootstrap {
     this.keyBindingService.addKeyBindingHandler({
       id: 'sql-editor-format',
       binding: KEY_BINDING_SQL_EDITOR_FORMAT,
+      contexts: [DATA_CONTEXT_SQL_EDITOR_DATA],
       isBindingApplicable: (contexts, action) => action === ACTION_SQL_EDITOR_FORMAT,
       handler: this.sqlEditorActionHandler.bind(this),
     });
@@ -225,6 +223,7 @@ export class MenuBootstrap extends Bootstrap {
     this.keyBindingService.addKeyBindingHandler({
       id: 'sql-editor-redo',
       binding: KEY_BINDING_REDO,
+      contexts: [DATA_CONTEXT_SQL_EDITOR_DATA],
       isBindingApplicable: (contexts, action) => action === ACTION_REDO,
       handler: this.sqlEditorActionHandler.bind(this),
     });
@@ -232,6 +231,7 @@ export class MenuBootstrap extends Bootstrap {
     this.keyBindingService.addKeyBindingHandler({
       id: 'sql-editor-undo',
       binding: KEY_BINDING_UNDO,
+      contexts: [DATA_CONTEXT_SQL_EDITOR_DATA],
       isBindingApplicable: (contexts, action) => action === ACTION_UNDO,
       handler: this.sqlEditorActionHandler.bind(this),
     });
@@ -239,13 +239,14 @@ export class MenuBootstrap extends Bootstrap {
     this.keyBindingService.addKeyBindingHandler({
       id: 'sql-editor-show-execution-plan',
       binding: KEY_BINDING_SQL_EDITOR_SHOW_EXECUTION_PLAN,
+      contexts: [DATA_CONTEXT_SQL_EDITOR_DATA],
       isBindingApplicable: (contexts, action) => action === ACTION_SQL_EDITOR_SHOW_EXECUTION_PLAN,
       handler: this.sqlEditorActionHandler.bind(this),
     });
 
     // this.menuService.addCreator({
     //   isApplicable: context => (
-    //     context.tryGet(DATA_CONTEXT_SQL_EDITOR_DATA) !== undefined
+    //     context.get(DATA_CONTEXT_SQL_EDITOR_DATA) !== undefined
     //     && context.get(DATA_CONTEXT_MENU) === MENU_TAB
     //   ),
     //   getItems: (context, items) => [
@@ -256,7 +257,7 @@ export class MenuBootstrap extends Bootstrap {
   }
 
   private sqlEditorActionHandler(context: IDataContextProvider, action: IAction): void {
-    const data = context.get(DATA_CONTEXT_SQL_EDITOR_DATA);
+    const data = context.get(DATA_CONTEXT_SQL_EDITOR_DATA)!;
 
     switch (action) {
       case ACTION_SQL_EDITOR_EXECUTE:

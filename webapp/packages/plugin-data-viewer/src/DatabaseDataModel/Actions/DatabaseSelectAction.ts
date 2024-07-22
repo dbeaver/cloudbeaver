@@ -15,7 +15,7 @@ import { databaseDataAction } from './DatabaseDataActionDecorator';
 import type { DatabaseDataSelectActionsData, IDatabaseDataSelectAction } from './IDatabaseDataSelectAction';
 
 @databaseDataAction()
-export abstract class DatabaseSelectAction<TKey, TResult extends IDatabaseDataResult>
+export abstract class DatabaseSelectAction<TKey = unknown, TResult extends IDatabaseDataResult = IDatabaseDataResult>
   extends DatabaseDataAction<any, TResult>
   implements IDatabaseDataSelectAction<TKey, TResult>
 {
@@ -29,9 +29,11 @@ export abstract class DatabaseSelectAction<TKey, TResult extends IDatabaseDataRe
 
   abstract isSelected(): boolean;
   abstract isElementSelected(key: TKey): boolean;
+  abstract isFocused(key: TKey): boolean;
   abstract getFocusedElement(): TKey | null;
   abstract getSelectedElements(): TKey[];
   abstract getActiveElements(): TKey[];
   abstract set(key: TKey, selected: boolean): void;
+  abstract focus(key: TKey | null): void;
   abstract clear(): void;
 }

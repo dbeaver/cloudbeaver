@@ -11,19 +11,20 @@ import { injectable } from '@cloudbeaver/core-di';
 import { ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
 
 import type { IDatabaseDataModel } from '../DatabaseDataModel/IDatabaseDataModel';
-import type { IDatabaseDataResult } from '../DatabaseDataModel/IDatabaseDataResult';
+import { IDatabaseDataSource } from '../DatabaseDataModel/IDatabaseDataSource';
+import type { IDataViewerTableStorage } from '../IDataViewerTableStorage';
 
 export interface ITableViewerStorageChangeEventData {
   type: 'add' | 'remove';
-  model: IDatabaseDataModel<any, any>;
+  model: IDatabaseDataModel<any>;
 }
 
 @injectable()
-export class TableViewerStorageService {
+export class TableViewerStorageService implements IDataViewerTableStorage {
   readonly onChange: ISyncExecutor<ITableViewerStorageChangeEventData>;
-  private readonly tableModelMap: Map<string, IDatabaseDataModel<any, any>> = new Map();
+  private readonly tableModelMap: Map<string, IDatabaseDataModel<any>> = new Map();
 
-  get values(): Array<IDatabaseDataModel<any, any>> {
+  get values(): Array<IDatabaseDataModel<any>> {
     return Array.from(this.tableModelMap.values());
   }
 
@@ -40,11 +41,11 @@ export class TableViewerStorageService {
     return this.tableModelMap.has(tableId);
   }
 
-  get<T extends IDatabaseDataModel<any, any>>(tableId: string): T | undefined {
+  get<T extends IDatabaseDataModel<any> = IDatabaseDataModel>(tableId: string): T | undefined {
     return this.tableModelMap.get(tableId) as any;
   }
 
-  add<TOptions, TResult extends IDatabaseDataResult>(model: IDatabaseDataModel<TOptions, TResult>): IDatabaseDataModel<TOptions, TResult> {
+  add<TSource extends IDatabaseDataSource<any, any> = IDatabaseDataSource>(model: IDatabaseDataModel<TSource>): IDatabaseDataModel<TSource> {
     if (this.tableModelMap.has(model.id)) {
       return model;
     }

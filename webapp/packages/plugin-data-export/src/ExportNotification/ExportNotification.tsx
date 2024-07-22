@@ -22,7 +22,7 @@ import {
 import { ENotificationType } from '@cloudbeaver/core-events';
 import { EDeferredState } from '@cloudbeaver/core-utils';
 
-import styles from './ExportNotification.m.css';
+import styles from './ExportNotification.module.css';
 import type { IExportNotification } from './IExportNotification';
 import { useExportNotification } from './useExportNotification';
 
@@ -44,7 +44,7 @@ export const ExportNotification = observer<Props>(function ExportNotification({ 
       <SnackbarContent>
         <SnackbarBody title={translate(title)}>
           {message && <div className={s(style, { message: true })}>{message}</div>}
-          <div className={s(style, { 'source-name': true })}>
+          <div className={s(style, { sourceName: true })}>
             {state.sourceName}
             {state.task?.context.query && (
               <pre className={s(style, { pre: true })} title={state.task.context.query}>
@@ -57,7 +57,7 @@ export const ExportNotification = observer<Props>(function ExportNotification({ 
           {status === ENotificationType.Info && state.downloadUrl && (
             <>
               <Button type="button" mod={['outlined']} onClick={state.delete}>
-                {translate('data_transfer_notification_delete')}
+                {translate('ui_processing_cancel')}
               </Button>
               <Button tag="a" href={state.downloadUrl} mod={['unelevated']} download onClick={state.download}>
                 {translate('data_transfer_notification_download')}

@@ -1,0 +1,26 @@
+/*
+ * CloudBeaver - Cloud Database Manager
+ * Copyright (C) 2020-2024 DBeaver Corp and others
+ *
+ * Licensed under the Apache License, Version 2.0.
+ * you may not use this file except in compliance with the License.
+ */
+.row {
+  outline: none;
+  border-bottom: 1px solid;
+  border-color: var(--theme-background) !important;
+
+  &:last-child {
+    border-bottom: none;
+  }
+
+  &:not(.noHover):hover,
+  &:not(.noHover).selected,
+  &:not(.noHover).expanded {
+    background-color: var(--theme-sub-secondary);
+  }
+
+  &.disabled {
+    opacity: 0.85;
+  }
+}

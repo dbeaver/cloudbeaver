@@ -34,6 +34,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Map;
 
 public class WebDataTransferServlet extends WebServiceServletBase {
 
@@ -67,7 +68,7 @@ public class WebDataTransferServlet extends WebServiceServletBase {
         }
         String fileName = taskInfo.getExportFileName();
         if (!CommonUtils.isEmpty(fileName)) {
-            fileName += "." + WebDataTransferUtils.getProcessorFileExtension(processor);
+            fileName += "." + WebDataTransferUtils.getProcessorFileExtension(processor, taskInfo.getParameters().getProcessorProperties());
         } else {
             fileName = taskInfo.getDataFileId();
         }

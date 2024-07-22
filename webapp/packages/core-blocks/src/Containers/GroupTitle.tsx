@@ -8,13 +8,23 @@
 import { s } from '../s';
 import { useS } from '../useS';
 import { filterLayoutFakeProps, getLayoutProps } from './filterLayoutFakeProps';
-import styles from './GroupTitle.m.css';
+import styles from './GroupTitle.module.css';
 import type { ILayoutSizeProps } from './ILayoutSizeProps';
-import elementsSizeStyles from './shared/ElementsSize.m.css';
+import elementsSizeStyles from './shared/ElementsSize.module.css';
 
-export const GroupTitle: React.FC<ILayoutSizeProps & React.HTMLAttributes<HTMLHeadingElement>> = function GroupTitle({ className, ...rest }) {
+interface Props {
+  sticky?: boolean;
+  header?: boolean;
+}
+
+export const GroupTitle: React.FC<Props & ILayoutSizeProps & React.HTMLAttributes<HTMLHeadingElement>> = function GroupTitle({
+  sticky,
+  header,
+  className,
+  ...rest
+}) {
   const style = useS(styles, elementsSizeStyles);
   const divProps = filterLayoutFakeProps(rest);
   const layoutProps = getLayoutProps(rest);
-  return <h2 {...divProps} className={s(style, { groupTitle: true, ...layoutProps }, className)} />;
+  return <h2 tabIndex={-1} {...divProps} className={s(style, { groupTitle: true, sticky, header, ...layoutProps }, className)} />;
 };

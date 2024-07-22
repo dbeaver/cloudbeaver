@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 
-export function selectFiles(callback: (files: FileList | null) => any, multiple?: boolean): void {
+export function selectFiles(callback: (files: File[]) => any, multiple?: boolean): void {
   let removed = false;
   const input = document.createElement('input');
   input.type = 'file';
@@ -16,7 +16,7 @@ export function selectFiles(callback: (files: FileList | null) => any, multiple?
   }
 
   input.onchange = () => {
-    callback(input.files);
+    callback(input.files?.length ? Array.from(input.files) : []);
     removed = true;
     input.remove();
   };
@@ -30,9 +30,12 @@ export function selectFiles(callback: (files: FileList | null) => any, multiple?
 
   input.click();
 
-  setTimeout(() => {
-    if (!removed) {
-      input.remove();
-    }
-  }, 30 * 60 * 1000);
+  setTimeout(
+    () => {
+      if (!removed) {
+        input.remove();
+      }
+    },
+    30 * 60 * 1000,
+  );
 }

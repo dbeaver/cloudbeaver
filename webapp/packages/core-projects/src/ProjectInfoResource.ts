@@ -73,6 +73,20 @@ export class ProjectInfoResource extends CachedMapResource<string, ProjectInfo> 
     return this.get(`u_${userId}`);
   }
 
+  isProjectShared(projectId: string | null): boolean {
+    if (projectId === null) {
+      return false;
+    }
+
+    const project = this.get(projectId);
+
+    if (!project) {
+      return false;
+    }
+
+    return isSharedProject(project);
+  }
+
   getResourceType(project: ProjectInfo, resourceTypeId: string): ProjectInfoResourceType | undefined {
     const resourceType = project.resourceTypes.find(type => type.id === resourceTypeId);
 

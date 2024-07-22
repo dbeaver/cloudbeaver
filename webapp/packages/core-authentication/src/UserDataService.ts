@@ -8,7 +8,7 @@
 import { makeObservable, observable } from 'mobx';
 
 import { injectable } from '@cloudbeaver/core-di';
-import { SettingsService } from '@cloudbeaver/core-settings';
+import { StorageService } from '@cloudbeaver/core-storage';
 import { TempMap } from '@cloudbeaver/core-utils';
 
 import { UserInfoResource } from './UserInfoResource';
@@ -18,7 +18,10 @@ export class UserDataService {
   private readonly userData: Map<string, Record<string, any>>;
   private readonly tempData: TempMap<string, Record<string, any>>;
 
-  constructor(private readonly userInfoResource: UserInfoResource, private readonly settingsService: SettingsService) {
+  constructor(
+    private readonly userInfoResource: UserInfoResource,
+    private readonly storageService: StorageService,
+  ) {
     this.userData = new Map();
 
     makeObservable<this, 'userData'>(this, {
@@ -27,7 +30,7 @@ export class UserDataService {
 
     this.tempData = new TempMap(this.userData);
 
-    this.settingsService.registerSettings('user_data', this.userData, () => new Map());
+    this.storageService.registerSettings('user_data', this.userData, () => new Map());
   }
 
   getUserData<T extends Record<any, any>>(key: string, defaultValue: () => T, validate?: (data: T) => boolean): T {

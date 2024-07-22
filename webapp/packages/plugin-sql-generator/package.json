@@ -11,35 +11,35 @@
   "main": "dist/index.js",
   "scripts": {
     "build": "tsc -b",
+    "clean": "rimraf --glob dist",
     "lint": "eslint ./src/ --ext .ts,.tsx",
-    "lint-fix": "eslint ./src/ --ext .ts,.tsx --fix",
-    "test": "yarn build && core-cli-test",
+    "test": "core-cli-test",
     "validate-dependencies": "core-cli-validate-dependencies",
-    "update-ts-references": "rimraf --glob dist && typescript-resolve-references"
+    "update-ts-references": "yarn run clean && typescript-resolve-references"
   },
   "dependencies": {
-    "@cloudbeaver/core-blocks": "~0.1.0",
-    "@cloudbeaver/core-connections": "~0.1.0",
-    "@cloudbeaver/core-di": "~0.1.0",
-    "@cloudbeaver/core-dialogs": "~0.1.0",
-    "@cloudbeaver/core-events": "~0.1.0",
-    "@cloudbeaver/core-localization": "~0.1.0",
-    "@cloudbeaver/core-navigation-tree": "~0.1.0",
-    "@cloudbeaver/core-resource": "~0.1.0",
-    "@cloudbeaver/core-sdk": "~0.1.0",
-    "@cloudbeaver/core-view": "~0.1.0",
-    "@cloudbeaver/plugin-codemirror6": "~0.1.0",
-    "@cloudbeaver/plugin-data-viewer": "~0.1.0",
-    "@cloudbeaver/plugin-sql-editor": "~0.1.0",
-    "@cloudbeaver/plugin-sql-editor-new": "~0.1.0",
-    "mobx": "^6.12.0",
-    "mobx-react-lite": "^4.0.5",
-    "react": "^18.2.0"
+    "@cloudbeaver/core-blocks": "^0",
+    "@cloudbeaver/core-connections": "^0",
+    "@cloudbeaver/core-di": "^0",
+    "@cloudbeaver/core-dialogs": "^0",
+    "@cloudbeaver/core-events": "^0",
+    "@cloudbeaver/core-localization": "^0",
+    "@cloudbeaver/core-navigation-tree": "^0",
+    "@cloudbeaver/core-resource": "^0",
+    "@cloudbeaver/core-sdk": "^0",
+    "@cloudbeaver/core-view": "^0",
+    "@cloudbeaver/plugin-codemirror6": "^0",
+    "@cloudbeaver/plugin-data-viewer": "^0",
+    "@cloudbeaver/plugin-sql-editor": "^0",
+    "@cloudbeaver/plugin-sql-editor-new": "^0",
+    "mobx": "^6",
+    "mobx-react-lite": "^4",
+    "react": "^18"
   },
   "peerDependencies": {},
   "devDependencies": {
-    "@types/react": "^18.2.42",
-    "typescript": "^5.3.2",
-    "typescript-plugin-css-modules": "^5.0.2"
+    "@types/react": "^18",
+    "typescript": "^5",
+    "typescript-plugin-css-modules": "^5"
   }
 }

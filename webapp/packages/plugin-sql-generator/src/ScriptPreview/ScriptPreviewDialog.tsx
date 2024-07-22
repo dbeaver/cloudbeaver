@@ -20,41 +20,33 @@ import {
   useS,
   useTranslate,
 } from '@cloudbeaver/core-blocks';
-import { ConnectionDialectResource, ConnectionExecutionContextService, createConnectionParam } from '@cloudbeaver/core-connections';
-import { useService } from '@cloudbeaver/core-di';
+import { ConnectionDialectResource, IConnectionInfoParams } from '@cloudbeaver/core-connections';
 import type { DialogComponentProps } from '@cloudbeaver/core-dialogs';
 import { useCodemirrorExtensions } from '@cloudbeaver/plugin-codemirror6';
-import type { IDatabaseDataModel } from '@cloudbeaver/plugin-data-viewer';
 import { SQLCodeEditorLoader, useSqlDialectExtension } from '@cloudbeaver/plugin-sql-editor-new';
 
-import style from './ScriptPreviewDialog.m.css';
+import style from './ScriptPreviewDialog.module.css';
 
 interface Payload {
   script: string;
-  model: IDatabaseDataModel;
+  connectionKey: IConnectionInfoParams | null;
+  onApply: () => Promise<void>;
 }
 
-export const ScriptPreviewDialog = observer<DialogComponentProps<Payload>>(function ScriptPreviewDialog({ rejectDialog, payload }) {
+export const ScriptPreviewDialog = observer<DialogComponentProps<Payload>>(function ScriptPreviewDialog({ rejectDialog, resolveDialog, payload }) {
   const translate = useTranslate();
   const copy = useClipboard();
   const styles = useS(style);
 
-  const connectionExecutionContextService = useService(ConnectionExecutionContextService);
-  const context = connectionExecutionContextService.get(payload.model.source.executionContext?.context?.id ?? '');
-  const contextInfo = context?.context;
-  const dialect = useResource(
-    ScriptPreviewDialog,
-    ConnectionDialectResource,
-    contextInfo ? createConnectionParam(contextInfo.projectId, contextInfo.connectionId) : null,
-  );
+  const dialect = useResource(ScriptPreviewDialog, ConnectionDialectResource, payload.connectionKey);
   const sqlDialect = useSqlDialectExtension(dialect.data);
   const extensions = useCodemirrorExtensions();
   extensions.set(...sqlDialect);
 
   const apply = async () => {
     try {
-      await payload.model.save();
-      rejectDialog();
+      await payload.onApply();
+      resolveDialog();
     } catch {}
   };
 

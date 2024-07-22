@@ -7,9 +7,7 @@
  */
 import type { PluginManifest } from '@cloudbeaver/core-di';
 
-import { PluginBootstrap } from './PluginBootstrap';
-
 export const versionPlugin: PluginManifest = {
   info: { name: 'Version plugin' },
-  providers: [PluginBootstrap],
+  providers: [() => import('./PluginBootstrap').then(m => m.PluginBootstrap)],
 };

@@ -24,7 +24,7 @@ import {
 import type { DialogComponent } from '@cloudbeaver/core-dialogs';
 import { ConnectionAuthenticationFormLoader } from '@cloudbeaver/plugin-connections';
 
-import style from './ConnectionDialog.m.css';
+import style from './ConnectionDialog.module.css';
 import { ConnectionDialogFooter } from './ConnectionDialogFooter';
 import { ConnectionStep } from './EConnectionStep';
 import { TemplateConnectionSelector } from './TemplateConnectionSelector/TemplateConnectionSelector';
@@ -65,6 +65,7 @@ export const ConnectionDialog: DialogComponent<null, null> = observer(function C
                 allowSaveCredentials={credentialsSavingEnabled}
                 disabled={dialog.processing}
                 hideFeatures={['nonSecuredProperty']}
+                projectId={dialog.template?.projectId ?? null}
                 className={s(styles, { connectionAuthenticationFormLoader: true })}
               />
             </Form>

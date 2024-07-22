@@ -70,6 +70,9 @@ public interface DBWServiceAdmin extends DBWService {
     List<String> listAuthRoles();
 
     @WebAction(requirePermissions = DBWConstants.PERMISSION_ADMIN)
+    List<String> listTeamRoles();
+
+    @WebAction(requirePermissions = DBWConstants.PERMISSION_ADMIN)
     boolean deleteUser(@NotNull WebSession webSession, String userName) throws DBWebException;
 
     @WebAction(requirePermissions = DBWConstants.PERMISSION_ADMIN)
@@ -201,5 +204,11 @@ public interface DBWServiceAdmin extends DBWService {
 
     @WebAction(requirePermissions = DBWConstants.PERMISSION_ADMIN)
     Boolean setUserAuthRole(WebSession webSession, String userId, String authRole) throws DBWebException;
+
+    @WebAction(requirePermissions = DBWConstants.PERMISSION_ADMIN)
+    Boolean setUserTeamRole(
+        @NotNull WebSession webSession, @NotNull String userId,
+        @NotNull String teamId, @Nullable String teamRole
+    ) throws DBWebException;
 
 }

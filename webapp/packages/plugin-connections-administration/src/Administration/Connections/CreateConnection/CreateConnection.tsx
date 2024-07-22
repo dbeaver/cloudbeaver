@@ -6,146 +6,87 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import styled, { css } from 'reshadow';
 
-import { Icon, IconButton, Loader, StaticImage, useResource, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
+import {
+  ActionIconButton,
+  Container,
+  Group,
+  GroupClose,
+  GroupTitle,
+  Loader,
+  s,
+  SContext,
+  StaticImage,
+  StyleRegistry,
+  useResource,
+  useS,
+  useTranslate,
+} from '@cloudbeaver/core-blocks';
 import { DBDriverResource } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
-import { BASE_TAB_STYLES, TabPanelList, TabsState, UNDERLINE_TAB_STYLES } from '@cloudbeaver/core-ui';
+import { TabListStyles, TabPanelList, TabPanelStyles, TabsState, TabStyles } from '@cloudbeaver/core-ui';
 import { ConnectionFormLoader } from '@cloudbeaver/plugin-connections';
 
 import { CreateConnectionService } from '../CreateConnectionService';
-
-const styles = css`
-  title-bar {
-    composes: theme-border-color-background from global;
-  }
-
-  connection-create {
-    display: flex;
-    flex-direction: column;
-    height: 800px;
-    overflow: hidden;
-  }
-
-  connection-create-content {
-    composes: theme-background-secondary theme-text-on-secondary from global;
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    flex: 1;
-    overflow: auto;
-  }
-
-  Tab {
-    composes: theme-background-secondary theme-text-on-secondary from global;
-  }
-
-  TabList {
-    composes: theme-border-color-background theme-background-secondary theme-text-on-secondary from global;
-    border-top: solid 1px;
-    position: relative;
-    flex-shrink: 0;
-    align-items: center;
-
-    &:before {
-      content: '';
-      position: absolute;
-      bottom: 0;
-      width: 100%;
-      border-bottom: solid 2px;
-      border-color: inherit;
-    }
-  }
-
-  TabPanel,
-  CustomConnection,
-  SearchDatabase {
-    flex-direction: column;
-    height: 100%;
-    overflow: auto;
-  }
-
-  Loader {
-    z-index: 1;
-    height: 100%;
-  }
-
-  title-bar {
-    composes: theme-typography--headline6 from global;
-    padding: 16px 24px;
-    align-items: center;
-    display: flex;
-    font-weight: 400;
-    flex: auto 0 0;
-  }
-
-  StaticImage {
-    width: 32px;
-    max-height: 32px;
-    margin-right: 16px;
-  }
-
-  fill {
-    flex: 1;
-  }
-
-  back-button {
-    position: relative;
-    box-sizing: border-box;
-    margin-right: 16px;
-    display: flex;
-
-    & Icon {
-      box-sizing: border-box;
-      transform: rotate(90deg);
-      cursor: pointer;
-      height: 16px;
-      width: 16px;
-    }
-  }
-`;
-
-const componentStyle = [BASE_TAB_STYLES, styles, UNDERLINE_TAB_STYLES];
+import styles from './shared/CreateConnection.module.css';
+import CreateConnectionTab from './shared/CreateConnectionTab.module.css';
+import CreateConnectionTabList from './shared/CreateConnectionTabList.module.css';
+import CreateConnectionTabPanel from './shared/CreateConnectionTabPanel.module.css';
 
 interface Props {
   method: string | null | undefined;
   configurationWizard: boolean;
 }
 
+const tabsRegistry: StyleRegistry = [
+  [TabStyles, { mode: 'append', styles: [CreateConnectionTab] }],
+  [TabPanelStyles, { mode: 'append', styles: [CreateConnectionTabPanel] }],
+  [TabListStyles, { mode: 'append', styles: [CreateConnectionTabList] }],
+];
+
 export const CreateConnection = observer<Props>(function CreateConnection({ method }) {
-  const style = useStyles(componentStyle);
+  const style = useS(styles);
   const createConnectionService = useService(CreateConnectionService);
   const translate = useTranslate();
   const driver = useResource(CreateConnection, DBDriverResource, createConnectionService.data?.config.driverId || null);
 
   if (createConnectionService.data) {
-    return styled(style)(
-      <connection-create>
-        <title-bar>
-          <back-button>
-            <Icon name="angle" viewBox="0 0 15 8" onClick={createConnectionService.clearConnectionTemplate} />
-          </back-button>
-          {driver.data?.icon && <StaticImage icon={driver.data.icon} />}
-          {driver.data?.name ?? translate('connections_administration_connection_create')}
-          <fill />
-          <IconButton name="cross" viewBox="0 0 24 24" onClick={createConnectionService.cancelCreate} />
-        </title-bar>
-        <connection-create-content>
-          <Loader suspense>
+    return (
+      <Group className={s(style, { connectionCreate: true })} vertical box boxNoOverflow noWrap>
+        <GroupTitle header keepSize>
+          <Container gap dense noWrap>
+            <Container keepSize>
+              <ActionIconButton
+                name="angle"
+                viewBox="0 0 15 8"
+                className={s(style, { backButton: true })}
+                onClick={createConnectionService.clearConnectionTemplate}
+              />
+            </Container>
+            <Container keepSize center>
+              {driver.data?.icon && <StaticImage className={s(style, { staticImage: true })} icon={driver.data.icon} />}
+            </Container>
+            <Container keepSize center>
+              {translate('connections_administration_connection_create')}
+            </Container>
+          </Container>
+          <GroupClose onClick={createConnectionService.cancelCreate} />
+        </GroupTitle>
+        <Container overflow>
+          <Loader className={s(style, { loader: true })} suspense>
             <ConnectionFormLoader
               state={createConnectionService.data}
               onCancel={createConnectionService.clearConnectionTemplate}
               onSave={createConnectionService.clearConnectionTemplate}
             />
           </Loader>
-        </connection-create-content>
-      </connection-create>,
+        </Container>
+      </Group>
     );
   }
 
-  return styled(style)(
-    <connection-create>
+  return (
+    <Group className={s(style, { connectionCreate: true })} vertical box boxNoOverflow noWrap>
       <TabsState
         currentTabId={method}
         container={createConnectionService.tabsContainer}
@@ -153,16 +94,17 @@ export const CreateConnection = observer<Props>(function CreateConnection({ meth
         lazy
         onChange={({ tabId }) => createConnectionService.setCreateMethod(tabId)}
       >
-        <title-bar>
+        <GroupTitle keepSize>
           {translate('connections_administration_connection_create')}
-          <fill />
-          <IconButton name="cross" viewBox="0 0 16 16" onClick={createConnectionService.cancelCreate} />
-        </title-bar>
-        <connection-create-content>
-          <TabPanelList style={componentStyle} />
+          <GroupClose onClick={createConnectionService.cancelCreate} />
+        </GroupTitle>
+        <Container overflow>
+          <SContext registry={tabsRegistry}>
+            <TabPanelList />
+          </SContext>
           {createConnectionService.disabled && <Loader overlay />}
-        </connection-create-content>
+        </Container>
       </TabsState>
-    </connection-create>,
+    </Group>
   );
 });

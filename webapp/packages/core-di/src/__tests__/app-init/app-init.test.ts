@@ -12,12 +12,12 @@ import { TestService } from './TestService';
 
 test('App Initialization', async () => {
   const app = new App([manifest]);
-  const injector = app.getServiceInjector();
+  const serviceProvider = app.getServiceProvider();
 
-  (app as any).registerServices();
+  await (app as any).registerServices();
 
-  const service = injector.getServiceByClass(TestService);
-  const bootstrap = injector.getServiceByClass(TestBootstrap);
+  const service = serviceProvider.getService(TestService);
+  const bootstrap = serviceProvider.getService(TestBootstrap);
 
   expect(service).toBeInstanceOf(TestService);
   expect(service.sum(1, 2)).toBe(3);

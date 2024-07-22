@@ -33,6 +33,7 @@ import io.cloudbeaver.server.CBPlatform;
 import io.cloudbeaver.service.DBWServiceServerConfigurator;
 import io.cloudbeaver.service.admin.*;
 import io.cloudbeaver.service.security.SMUtils;
+import io.cloudbeaver.utils.WebAppUtils;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
@@ -173,6 +174,11 @@ public class WebServiceAdmin implements DBWServiceAdmin {
     }
 
     @Override
+    public List<String> listTeamRoles() {
+        return CBApplication.getInstance().getAvailableTeamRoles();
+    }
+
+    @Override
     public boolean deleteUser(@NotNull WebSession webSession, String userName) throws DBWebException {
         if (CommonUtils.equalObjects(userName, webSession.getUser().getUserId())) {
             throw new DBWebException("You cannot delete yourself");
@@ -257,18 +263,14 @@ public class WebServiceAdmin implements DBWServiceAdmin {
         if (grantor == null) {
             throw new DBWebException("Cannot grant team in anonymous mode");
         }
-        if (CommonUtils.equalObjects(user, webSession.getUser().getUserId())) {
+        if (!WebAppUtils.getWebApplication().isDistributed()
+            && CommonUtils.equalObjects(user, webSession.getUser().getUserId())
+        ) {
             throw new DBWebException("You cannot edit your own permissions");
         }
         try {
             var adminSecurityController = webSession.getAdminSecurityController();
-            SMTeam[] userTeams = adminSecurityController.getUserTeams(user);
-            List<String> teamIds = Arrays.stream(userTeams).map(SMTeam::getTeamId).collect(Collectors.toList());
-            if (teamIds.contains(team)) {
-                return true;
-            }
-            teamIds.add(team);
-            adminSecurityController.setUserTeams(user, teamIds.toArray(new String[0]), grantor.getUserId());
+            adminSecurityController.addUserTeams(user, new String[]{team}, grantor.getUserId());
             return true;
         } catch (Exception e) {
             throw new DBWebException("Error granting team", e);
@@ -281,7 +283,9 @@ public class WebServiceAdmin implements DBWServiceAdmin {
         if (grantor == null) {
             throw new DBWebException("Cannot revoke team in anonymous mode");
         }
-        if (CommonUtils.equalObjects(user, webSession.getUser().getUserId())) {
+        if (!WebAppUtils.getWebApplication().isDistributed() &&
+            CommonUtils.equalObjects(user, webSession.getUser().getUserId())
+        ) {
             throw new DBWebException("You cannot edit your own permissions");
         }
         try {
@@ -289,8 +293,7 @@ public class WebServiceAdmin implements DBWServiceAdmin {
             SMTeam[] userTeams = adminSecurityController.getUserTeams(user);
             List<String> teamIds = Arrays.stream(userTeams).map(SMTeam::getTeamId).collect(Collectors.toList());
             if (teamIds.contains(team)) {
-                teamIds.remove(team);
-                adminSecurityController.setUserTeams(user, teamIds.toArray(new String[0]), grantor.getUserId());
+                adminSecurityController.deleteUserTeams(user, new String[]{team});
             } else {
                 throw new DBWebException("User '" + user + "' doesn't have team '" + team + "'");
             }
@@ -381,6 +384,21 @@ public class WebServiceAdmin implements DBWServiceAdmin {
     public Boolean setUserAuthRole(WebSession webSession, String userId, String authRole) throws DBWebException {
         try {
             webSession.getAdminSecurityController().setUserAuthRole(userId, authRole);
+            return true;
+        } catch (Exception e) {
+            throw new DBWebException("Error updating user auth role", e);
+        }
+    }
+
+    @Override
+    public Boolean setUserTeamRole(
+        @NotNull WebSession webSession,
+        @NotNull String userId,
+        @NotNull String teamId,
+        @Nullable String teamRole
+    ) throws DBWebException {
+        try {
+            webSession.getAdminSecurityController().setUserTeamRole(userId, teamId, teamRole);
             return true;
         } catch (Exception e) {
             throw new DBWebException("Error updating user auth role", e);

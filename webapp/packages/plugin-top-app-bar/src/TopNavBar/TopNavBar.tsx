@@ -5,6 +5,8 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
+import { observer } from 'mobx-react-lite';
+
 import {
   CheckboxMarkupStyles,
   MenuItemElementStyles,
@@ -14,20 +16,22 @@ import {
   MenuStyles,
   Placeholder,
   PlaceholderContainer,
+  s,
   SContext,
   StyleRegistry,
   TopAppBar,
+  useS,
 } from '@cloudbeaver/core-blocks';
 import { MenuBarItemStyles, MenuBarStyles } from '@cloudbeaver/core-ui';
 
-import TopMenuStyles from './shared/TopMenu.m.css';
-import TopMenuBarStyles from './shared/TopMenuBar.m.css';
-import TopMenuBarItemStyles from './shared/TopMenuBarItem.m.css';
-import TopMenuCheckboxStyles from './shared/TopMenuCheckbox.m.css';
-import TopMenuItemStyles from './shared/TopMenuItem.m.css';
-import TopMenuItemElementStyles from './shared/TopMenuItemElement.m.css';
-import TopMenuPanelStyles from './shared/TopMenuPanel.m.css';
-import TopMenuSeparatorStyles from './shared/TopMenuSeparator.m.css';
+import TopMenuStyles from './shared/TopMenu.module.css';
+import TopMenuBarStyles from './shared/TopMenuBar.module.css';
+import TopMenuBarItemStyles from './shared/TopMenuBarItem.module.css';
+import TopMenuCheckboxStyles from './shared/TopMenuCheckbox.module.css';
+import TopMenuItemStyles from './shared/TopMenuItem.module.css';
+import TopMenuItemElementStyles from './shared/TopMenuItemElement.module.css';
+import TopMenuPanelStyles from './shared/TopMenuPanel.module.css';
+import TopMenuSeparatorStyles from './shared/TopMenuSeparator.module.css';
 
 interface Props {
   container: PlaceholderContainer<Record<string, any>>;
@@ -93,12 +97,13 @@ const registry: StyleRegistry = [
   ],
 ];
 
-export const TopNavBar: React.FC<Props> = function TopNavBar({ container, className }) {
+export const TopNavBar: React.FC<Props> = observer(function TopNavBar({ container, className }) {
+  const styles = useS(TopMenuStyles, TopMenuBarStyles, TopMenuBarItemStyles);
   return (
-    <TopAppBar className={className}>
+    <TopAppBar className={s(styles, { topMenuBar: true }, className)}>
       <SContext registry={registry}>
         <Placeholder container={container} />
       </SContext>
     </TopAppBar>
   );
-};
+});

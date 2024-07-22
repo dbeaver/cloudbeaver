@@ -34,6 +34,7 @@ import org.jkiss.dbeaver.model.security.SMController;
 import org.jkiss.dbeaver.model.websocket.event.WSEventController;
 
 import java.nio.file.Path;
+import java.util.Map;
 
 /**
  * Base interface for web application
@@ -42,6 +43,8 @@ public interface WebApplication extends DBPApplication {
     boolean isConfigurationMode();
 
     WebAppConfiguration getAppConfiguration();
+
+    WebServerConfiguration getServerConfiguration();
 
     Path getDataDirectory(boolean create);
 
@@ -93,4 +96,8 @@ public interface WebApplication extends DBPApplication {
     int getServerPort();
 
     boolean isLicenseRequired();
+
+    default void getStatusInfo(Map<String, Object> infoMap) {
+
+    }
 }

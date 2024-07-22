@@ -8,7 +8,7 @@
 import { makeObservable, observable } from 'mobx';
 
 import type { IConnectionExecutionContextInfo } from '@cloudbeaver/core-connections';
-import type { IServiceInjector } from '@cloudbeaver/core-di';
+import type { IServiceProvider } from '@cloudbeaver/core-di';
 import type { ITask } from '@cloudbeaver/core-executor';
 import {
   AsyncTaskInfoService,
@@ -49,8 +49,12 @@ export class QueryDataSource<TOptions extends IDataQueryOptions = IDataQueryOpti
     return this.currentTask?.cancelled || false;
   }
 
-  constructor(readonly serviceInjector: IServiceInjector, graphQLService: GraphQLService, asyncTaskInfoService: AsyncTaskInfoService) {
-    super(serviceInjector, graphQLService, asyncTaskInfoService);
+  constructor(
+    readonly serviceProvider: IServiceProvider,
+    graphQLService: GraphQLService,
+    asyncTaskInfoService: AsyncTaskInfoService,
+  ) {
+    super(serviceProvider, graphQLService, asyncTaskInfoService);
 
     this.currentTask = null;
     this.requestInfo = {
@@ -67,22 +71,13 @@ export class QueryDataSource<TOptions extends IDataQueryOptions = IDataQueryOpti
     });
   }
 
-  isLoadable(): boolean {
-    return super.isLoadable() && !!this.executionContext?.context;
-  }
-
-  isReadonly(resultIndex: number): boolean {
-    return super.isReadonly(resultIndex) || this.getResult(resultIndex)?.data?.hasRowIdentifier === false;
-  }
-
-  isDisabled(resultIndex: number): boolean {
-    return (!this.getResult(resultIndex)?.data && this.error === null) || !this.executionContext?.context;
+  isDisabled(resultIndex?: number): boolean {
+    return super.isDisabled(resultIndex) || !this.executionContext?.context;
   }
 
   async cancel(): Promise<void> {
-    if (this.currentTask) {
-      await this.currentTask.cancel();
-    }
+    await super.cancel();
+    await this.currentTask?.cancel();
   }
 
   async save(prevResults: IDatabaseResultSet[]): Promise<IDatabaseResultSet[]> {
@@ -163,23 +158,6 @@ export class QueryDataSource<TOptions extends IDataQueryOptions = IDataQueryOpti
     return this;
   }
 
-  getResults(executionContextInfo: IConnectionExecutionContextInfo, response: SqlExecuteInfo, limit: number): IDatabaseResultSet[] | null {
-    this.requestInfo = {
-      originalQuery: response.fullQuery || this.options?.query || '',
-      requestDuration: response.duration || 0,
-      requestMessage: response.statusMessage || '',
-      requestFilter: response.filterText || '',
-      source: this.options?.query || null,
-      query: this.options?.query || '',
-    };
-
-    if (!response.results) {
-      return null;
-    }
-
-    return this.transformResults(executionContextInfo, response.results, limit);
-  }
-
   async request(prevResults: IDatabaseResultSet[]): Promise<IDatabaseResultSet[]> {
     const options = this.options;
     const executionContext = this.executionContext;
@@ -192,18 +170,13 @@ export class QueryDataSource<TOptions extends IDataQueryOptions = IDataQueryOpti
 
     let firstResultId: string | undefined;
 
-    if (
-      prevResults.length === 1 &&
-      prevResults[0].contextId === executionContext.context!.id &&
-      prevResults[0].connectionId === executionContext.context?.connectionId &&
-      prevResults[0].id !== null &&
-      this.requestInfo.query === this.options?.query
-    ) {
-      firstResultId = prevResults[0].id;
+    if (this.requestInfo.query === this.options?.query) {
+      firstResultId = this.getPreviousResultId(prevResults, executionContextInfo);
     }
 
     const task = this.asyncTaskInfoService.create(async () => {
       const { taskInfo } = await this.graphQLService.sdk.asyncSqlExecuteQuery({
+        projectId: executionContextInfo.projectId,
         connectionId: executionContextInfo.connectionId,
         contextId: executionContextInfo.id,
         query: options.query,
@@ -235,14 +208,12 @@ export class QueryDataSource<TOptions extends IDataQueryOptions = IDataQueryOpti
     try {
       const response = await this.currentTask;
 
-      const results = this.getResults(executionContextInfo, response, limit);
+      const results = this.innerGetResults(executionContextInfo, response, limit);
       this.clearError();
 
       if (!results) {
         return prevResults;
       }
-
-      this.closeResults(prevResults);
 
       return results;
     } catch (exception: any) {
@@ -251,31 +222,32 @@ export class QueryDataSource<TOptions extends IDataQueryOptions = IDataQueryOpti
     }
   }
 
-  private async closeResults(results: IDatabaseResultSet[]) {
-    if (!this.executionContext?.context) {
-      return;
+  private innerGetResults(
+    executionContextInfo: IConnectionExecutionContextInfo,
+    response: SqlExecuteInfo,
+    limit: number,
+  ): IDatabaseResultSet[] | null {
+    this.requestInfo = {
+      originalQuery: response.fullQuery || this.options?.query || '',
+      requestDuration: response.duration || 0,
+      requestMessage: response.statusMessage || '',
+      requestFilter: response.filterText || '',
+      source: this.options?.query || null,
+      query: this.options?.query || '',
+    };
+
+    if (!response.results) {
+      return null;
     }
 
-    for (const result of results) {
-      if (result.id === null) {
-        continue;
-      }
-      try {
-        await this.graphQLService.sdk.closeResult({
-          connectionId: result.connectionId,
-          contextId: result.contextId,
-          resultId: result.id,
-        });
-      } catch (exception: any) {
-        console.log(`Error closing result (${result.id}):`, exception);
-      }
-    }
+    return this.transformResults(executionContextInfo, response.results, limit);
   }
 
   private transformResults(executionContextInfo: IConnectionExecutionContextInfo, results: SqlQueryResults[], limit: number): IDatabaseResultSet[] {
     return results.map<IDatabaseResultSet>((result, index) => ({
       id: result.resultSet?.id || null,
       uniqueResultId: `${executionContextInfo.connectionId}_${executionContextInfo.id}_${index}`,
+      projectId: executionContextInfo.projectId,
       connectionId: executionContextInfo.connectionId,
       contextId: executionContextInfo.id,
       dataFormat: result.dataFormat!,
@@ -287,10 +259,5 @@ export class QueryDataSource<TOptions extends IDataQueryOptions = IDataQueryOpti
       // || !result.resultSet?.hasMoreData,
       data: result.resultSet,
     }));
-  }
-
-  async dispose(): Promise<void> {
-    await this.closeResults(this.results);
-    await this.cancel();
   }
 }

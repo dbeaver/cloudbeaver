@@ -7,7 +7,7 @@
  */
 import { s } from '../s';
 import { useS } from '../useS';
-import style from './OverlayHeaderSubTitle.m.css';
+import style from './OverlayHeaderSubTitle.module.css';
 
 interface Props {
   className?: string;

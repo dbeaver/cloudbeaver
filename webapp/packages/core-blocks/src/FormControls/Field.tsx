@@ -1,12 +1,19 @@
+/*
+ * CloudBeaver - Cloud Database Manager
+ * Copyright (C) 2020-2024 DBeaver Corp and others
+ *
+ * Licensed under the Apache License, Version 2.0.
+ * you may not use this file except in compliance with the License.
+ */
 import { observer } from 'mobx-react-lite';
 import type { HTMLAttributes, PropsWithChildren } from 'react';
 
 import { filterLayoutFakeProps, getLayoutProps } from '../Containers/filterLayoutFakeProps';
 import type { ILayoutSizeProps } from '../Containers/ILayoutSizeProps';
-import elementsSizeStyles from '../Containers/shared/ElementsSize.m.css';
+import elementsSizeStyles from '../Containers/shared/ElementsSize.module.css';
 import { s } from '../s';
 import { useS } from '../useS';
-import fieldStyles from './Field.m.css';
+import fieldStyles from './Field.module.css';
 
 type Props = ILayoutSizeProps &
   HTMLAttributes<HTMLDivElement> & {

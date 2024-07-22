@@ -18,9 +18,9 @@ import {
   GroupTitle,
   Loader,
   Placeholder,
+  s,
   ToolsAction,
   ToolsPanel,
-  s,
   useFocus,
   useFormValidator,
   useS,
@@ -36,8 +36,8 @@ import { ServerConfigurationInfoForm } from './Form/ServerConfigurationInfoForm'
 import { ServerConfigurationNavigatorViewForm } from './Form/ServerConfigurationNavigatorViewForm';
 import { ServerConfigurationSecurityForm } from './Form/ServerConfigurationSecurityForm';
 import { ServerConfigurationDriversForm } from './ServerConfigurationDriversForm';
+import style from './ServerConfigurationPage.module.css';
 import { ServerConfigurationService } from './ServerConfigurationService';
-import style from './ServerConfigurationPage.m.css';
 
 export const ServerConfigurationPage: AdministrationItemContentComponent = observer(function ServerConfigurationPage({ configurationWizard }) {
   const translate = useTranslate();
@@ -81,43 +81,46 @@ export const ServerConfigurationPage: AdministrationItemContentComponent = obser
   }
 
   return (
-    <Form ref={focusedRef} className={s(styles, { form: true })} name="server_config" onChange={handleChange}>
-      {!configurationWizard && (
-        <ToolsPanel hasBottomBorder>
-          <ToolsAction
-            title={translate('administration_configuration_tools_save_tooltip')}
-            icon="admin-save"
-            viewBox="0 0 24 24"
-            disabled={!changed}
-            onClick={save}
-          >
-            {translate('ui_processing_save')}
-          </ToolsAction>
-          <ToolsAction
-            title={translate('administration_configuration_tools_cancel_tooltip')}
-            icon="admin-cancel"
-            viewBox="0 0 24 24"
-            disabled={!changed}
-            onClick={reset}
-          >
-            {translate('ui_processing_cancel')}
-          </ToolsAction>
-        </ToolsPanel>
-      )}
-      <ColoredContainer wrap gap overflow parent>
-        {configurationWizard && (
-          <Group form>
-            <GroupItem>
-              <h3>{translate('administration_configuration_wizard_configuration_title')}</h3>
-            </GroupItem>
-            <GroupItem>
-              <p className={s(styles, { message: true })}>{translate('administration_configuration_wizard_configuration_message')}</p>
-            </GroupItem>
+    <Form ref={focusedRef} name="server_config" contents onChange={handleChange}>
+      <ColoredContainer vertical wrap gap parent>
+        {!configurationWizard && (
+          <Group box keepSize>
+            <ToolsPanel rounded>
+              <ToolsAction
+                title={translate('administration_configuration_tools_save_tooltip')}
+                icon="admin-save"
+                viewBox="0 0 24 24"
+                disabled={!changed}
+                onClick={save}
+              >
+                {translate('ui_processing_save')}
+              </ToolsAction>
+              <ToolsAction
+                title={translate('administration_configuration_tools_cancel_tooltip')}
+                icon="admin-cancel"
+                viewBox="0 0 24 24"
+                disabled={!changed}
+                onClick={reset}
+              >
+                {translate('ui_processing_cancel')}
+              </ToolsAction>
+            </ToolsPanel>
           </Group>
         )}
-        <Loader state={service}>
-          {() =>
-            (
+
+        <Container overflow gap wrap>
+          {configurationWizard && (
+            <Group form>
+              <GroupItem>
+                <h3>{translate('administration_configuration_wizard_configuration_title')}</h3>
+              </GroupItem>
+              <GroupItem>
+                <p className={s(styles, { message: true })}>{translate('administration_configuration_wizard_configuration_message')}</p>
+              </GroupItem>
+            </Group>
+          )}
+          <Loader state={service}>
+            {() => (
               <Loader className={s(styles, { loader: true })} suspense>
                 <Container wrap gap grid medium>
                   <ServerConfigurationInfoForm state={service.state} />
@@ -133,9 +136,9 @@ export const ServerConfigurationPage: AdministrationItemContentComponent = obser
                   <ServerConfigurationDriversForm serverConfig={service.state.serverConfig} />
                 </Container>
               </Loader>
-            )
-          }
-        </Loader>
+            )}
+          </Loader>
+        </Container>
       </ColoredContainer>
     </Form>
   );

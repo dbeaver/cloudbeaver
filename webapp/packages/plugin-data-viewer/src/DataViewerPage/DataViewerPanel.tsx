@@ -7,24 +7,18 @@
  */
 import { observer } from 'mobx-react-lite';
 import { useCallback } from 'react';
-import styled, { css } from 'reshadow';
 
-import { Loader, TextPlaceholder } from '@cloudbeaver/core-blocks';
+import { TextPlaceholder, useAutoLoad, useTranslate } from '@cloudbeaver/core-blocks';
 import type { ObjectPagePanelComponent } from '@cloudbeaver/plugin-object-viewer';
 
 import type { IDataViewerPageState } from '../IDataViewerPageState';
 import { TableViewerLoader } from '../TableViewer/TableViewerLoader';
-import { useDataViewerDatabaseDataModel } from './useDataViewerDatabaseDataModel';
-
-const styles = css`
-  TableViewerLoader {
-    padding: 8px;
-    padding-bottom: 0;
-  }
-`;
+import classes from './DataViewerPanel.module.css';
+import { useDataViewerPanel } from './useDataViewerPanel';
 
 export const DataViewerPanel: ObjectPagePanelComponent<IDataViewerPageState> = observer(function DataViewerPanel({ tab, page }) {
-  const dataViewerDatabaseDataModel = useDataViewerDatabaseDataModel(tab);
+  const translate = useTranslate();
+  const panel = useDataViewerPanel(tab);
   const pageState = page.getState(tab);
 
   const handlePresentationChange = useCallback(
@@ -61,24 +55,21 @@ export const DataViewerPanel: ObjectPagePanelComponent<IDataViewerPageState> = o
     [page, tab],
   );
 
+  useAutoLoad(DataViewerPanel, panel);
+
   if (!tab.handlerState.tableId) {
-    return <TextPlaceholder>Table model not loaded</TextPlaceholder>;
+    return <TextPlaceholder>{translate('data_viewer_model_not_loaded')}</TextPlaceholder>;
   }
 
-  return styled(styles)(
-    <Loader state={dataViewerDatabaseDataModel}>
-      {tab.handlerState.tableId ? (
-        <TableViewerLoader
-          tableId={tab.handlerState.tableId}
-          resultIndex={pageState?.resultIndex}
-          presentationId={pageState?.presentationId}
-          valuePresentationId={pageState?.valuePresentationId}
-          onPresentationChange={handlePresentationChange}
-          onValuePresentationChange={handleValuePresentationChange}
-        />
-      ) : (
-        <TextPlaceholder>Table model not loaded</TextPlaceholder>
-      )}
-    </Loader>,
+  return (
+    <TableViewerLoader
+      className={classes.tableViewerLoader}
+      tableId={tab.handlerState.tableId}
+      resultIndex={pageState?.resultIndex}
+      presentationId={pageState?.presentationId}
+      valuePresentationId={pageState?.valuePresentationId}
+      onPresentationChange={handlePresentationChange}
+      onValuePresentationChange={handleValuePresentationChange}
+    />
   );
 });

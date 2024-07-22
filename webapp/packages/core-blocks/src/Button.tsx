@@ -8,7 +8,7 @@
 import { observable } from 'mobx';
 import { observer } from 'mobx-react-lite';
 
-import style from './Button.m.css';
+import style from './Button.module.css';
 import { IconOrImage } from './IconOrImage';
 import { Loader } from './Loader/Loader';
 import { s } from './s';
@@ -72,6 +72,12 @@ export const Button = observer<ButtonProps>(function Button({
     ['click'],
   );
 
+  function handleEnter(event: React.KeyboardEvent<HTMLElement>) {
+    if (event.key === 'Enter') {
+      event.currentTarget.click();
+    }
+  }
+
   loading = state.loading || loading;
 
   if (loading) {
@@ -81,6 +87,9 @@ export const Button = observer<ButtonProps>(function Button({
   const Button = tag;
   return (
     <Button
+      role="button"
+      tabIndex={0}
+      onKeyDown={handleEnter}
       {...rest}
       type={type}
       disabled={disabled}

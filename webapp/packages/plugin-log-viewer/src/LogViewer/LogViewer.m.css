@@ -1,9 +1,0 @@
-.logViewWrapper,
-.pane {
-  position: relative;
-  display: flex;
-  flex: 1;
-  flex-direction: column;
-  overflow: hidden;
-  composes: theme-background-surface theme-text-on-surface from global;
-}

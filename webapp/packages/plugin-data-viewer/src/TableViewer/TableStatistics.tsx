@@ -6,43 +6,44 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import styled, { css } from 'reshadow';
 
-import { useTranslate } from '@cloudbeaver/core-blocks';
+import { s, useS, useTranslate } from '@cloudbeaver/core-blocks';
 
 import type { IDatabaseDataModel } from '../DatabaseDataModel/IDatabaseDataModel';
+import { IDatabaseResultSet } from '../DatabaseDataModel/IDatabaseResultSet';
+import { isResultSetDataSource, ResultSetDataSource } from '../ResultSet/ResultSetDataSource';
+import classes from './TableStatistics.module.css';
 
 interface Props {
   model: IDatabaseDataModel;
   resultIndex: number;
 }
 
-const styles = css`
-  statistics {
-    composes: theme-typography--caption from global;
-    flex: 1;
-    overflow: auto;
-    box-sizing: border-box;
-    white-space: pre-wrap;
-    padding: 16px;
-  }
-`;
-
 export const TableStatistics = observer<Props>(function TableStatistics({ model, resultIndex }) {
+  const styles = useS(classes);
   const translate = useTranslate();
   const source = model.source;
-  const result = model.getResult(resultIndex);
+  let updatedRows: number | null = null;
 
-  return styled(styles)(
-    <statistics>
+  if (isResultSetDataSource(source)) {
+    const result = (source as ResultSetDataSource).getResult(resultIndex) as IDatabaseResultSet | null;
+    updatedRows = result?.updateRowCount ?? null;
+  }
+
+  return (
+    <div className={s(styles, { statistics: true })}>
       {translate('data_viewer_statistics_status')} {source.requestInfo.requestMessage}
       <br />
       {translate('data_viewer_statistics_duration')} {source.requestInfo.requestDuration} ms
       <br />
-      {translate('data_viewer_statistics_updated_rows')} {result?.updateRowCount || 0}
-      <br />
+      {updatedRows !== null && (
+        <>
+          {translate('data_viewer_statistics_updated_rows')} {updatedRows}
+          <br />
+        </>
+      )}
       <br />
       <pre>{source.requestInfo.source}</pre>
-    </statistics>,
+    </div>
   );
 });

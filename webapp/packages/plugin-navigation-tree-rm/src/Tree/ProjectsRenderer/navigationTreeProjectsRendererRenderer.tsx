@@ -27,7 +27,7 @@ import {
 import type { ResourceManagerService } from '@cloudbeaver/plugin-resource-manager';
 
 import { NavigationNodeProjectControl } from './NavigationNodeProjectControl';
-import style from './NavigationTreeProjectsRendererRenderer.m.css';
+import style from './NavigationTreeProjectsRendererRenderer.module.css';
 
 const registry: StyleRegistry = [
   [

@@ -1,3 +1,10 @@
+/*
+ * CloudBeaver - Cloud Database Manager
+ * Copyright (C) 2020-2024 DBeaver Corp and others
+ *
+ * Licensed under the Apache License, Version 2.0.
+ * you may not use this file except in compliance with the License.
+ */
 export default [
   ['core_connections_connections_settings_group', 'Connections'],
   ['connections_administration_item', 'Connection Templates'],
@@ -25,9 +32,17 @@ export default [
   ['connections_connection_connect', '连接'],
   ['connections_connection_create_custom', '自定义'],
   ['connections_connection_create_search_database', '搜索'],
-  ['connections_connection_edit_save_credentials', '保存凭据'],
-  ['connections_connection_share_credentials', 'Share credentials'],
-  ['connections_connection_share_credentials_tooltip', 'Share credentials across all users'],
+  ['connections_connection_authentication_save_credentials_for_user', 'Save credentials for the current user'],
+  ['connections_connection_authentication_save_credentials_for_user_tooltip', 'These credentials will be used to make automatic connection'],
+  ['connections_connection_authentication_save_credentials_for_session', 'Don’t ask again during the session'],
+  ['connections_connection_authentication_save_credentials_for_session_tooltip', 'These credentials will be removed after logout'],
+  ['connections_connection_edit_save_credentials_shared', 'Save credentials for all users with access'],
+  [
+    'connections_connection_edit_save_credentials_shared_tooltip',
+    'These credentials will be used to make automatic connection for all users having access',
+  ],
+  ['connections_connection_share_credentials', 'Share credentials with teammates'],
+  ['connections_connection_share_credentials_tooltip', 'These credentials will be used to make automatic connection for all users in a team'],
   ['connections_connection_credentials_provisioning', '认证凭据'],
   ['connections_connection_credentials_provisioning_description', '您却要填写或确认凭据以测试此连接。'],
   ['connections_connection_edit_authentication', '认证'],
@@ -52,7 +67,9 @@ export default [
   ['connections_connection_test_fail', '连接测试失败'],
   ['connections_connection_create_fail', '无法创建连接'],
   ['connections_connection_save_fail', '无法保存连接'],
+  ['connections_connection_expert_settings', 'Expert settings'],
   ['connections_connection_keep_alive', 'Keep alive (in seconds)'],
+  ['connections_connection_autocommit', 'Auto commit'],
   ['connections_connection_keep_alive_tooltip', 'No auto disconnect'],
   ['connections_network_handler_test', '测试隧道'],
   ['connections_network_handler_test_fail', '隧道测试失败'],

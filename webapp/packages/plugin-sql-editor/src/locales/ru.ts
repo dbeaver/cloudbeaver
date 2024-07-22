@@ -1,3 +1,10 @@
+/*
+ * CloudBeaver - Cloud Database Manager
+ * Copyright (C) 2020-2024 DBeaver Corp and others
+ *
+ * Licensed under the Apache License, Version 2.0.
+ * you may not use this file except in compliance with the License.
+ */
 export default [
   ['plugin_sql_editor_sql_editor_settings_group', 'SQL Редактор'],
   ['sql_editor_settings_insert_table_aliases_name', 'Вставлять алиасы таблиц (в FROM условии)'],
@@ -35,4 +42,5 @@ export default [
   ['sql_editor_close_result_tabs_dialog_title', 'Подтвердить закрытие вкладок'],
   ['plugin_sql_editor_action_overlay_title', 'Требуется действие'],
   ['plugin_sql_editor_action_overlay_description', 'Пожалуйста, перезапустите редактор для продолжения работы.'],
+  ['plugin_sql_editor_action_close_group', 'Закрыть все из этого запроса'],
 ];

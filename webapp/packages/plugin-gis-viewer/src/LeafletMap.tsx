@@ -11,12 +11,12 @@ import type geojson from 'geojson';
 import leaflet from 'leaflet';
 import { useCallback, useEffect, useState } from 'react';
 import { GeoJSON, LayersControl, MapContainer, TileLayer, type TileLayerProps } from 'react-leaflet';
-import styled, { css } from 'reshadow';
 
-import { useSplit, useTranslate } from '@cloudbeaver/core-blocks';
+import { s, useS, useSplit, useTranslate } from '@cloudbeaver/core-blocks';
 import type { IResultSetElementKey, IResultSetValue } from '@cloudbeaver/plugin-data-viewer';
 
-import baseStyles from './styles/base.scss';
+import styles from './LeafletMap.module.css';
+import './styles/base.scss';
 
 export interface IAssociatedValue {
   key: string;
@@ -104,13 +104,6 @@ function getCRS(crsKey: CrsKey): leaflet.CRS {
   }
 }
 
-const styles = css`
-  MapContainer {
-    width: 100%;
-    height: 100%;
-  }
-`;
-
 export const LeafletMap: React.FC<Props> = function LeafletMap({ geoJSON, crsKey, getAssociatedValues }) {
   const split = useSplit();
   const translate = useTranslate();
@@ -177,11 +170,10 @@ export const LeafletMap: React.FC<Props> = function LeafletMap({ geoJSON, crsKey
     }
   }, [split.state.isResizing, split.state.mode, mapRef]);
 
-  return styled(
-    styles,
-    baseStyles,
-  )(
-    <MapContainer ref={setMapRef} crs={leaflet.CRS.EPSG3857} zoom={12}>
+  const style = useS(styles);
+
+  return (
+    <MapContainer ref={setMapRef} className={s(style, { mapContainer: true })} crs={leaflet.CRS.EPSG3857} zoom={12}>
       <GeoJSON
         // data is not optional property, see react-leaflet.d.ts
         // data={[]}
@@ -210,6 +202,6 @@ export const LeafletMap: React.FC<Props> = function LeafletMap({ geoJSON, crsKey
           </LayersControl.BaseLayer>
         </LayersControl>
       )}
-    </MapContainer>,
+    </MapContainer>
   );
 };

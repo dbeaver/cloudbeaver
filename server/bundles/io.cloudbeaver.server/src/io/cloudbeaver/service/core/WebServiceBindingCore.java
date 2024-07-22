@@ -53,6 +53,7 @@ public class WebServiceBindingCore extends WebServiceBindingBase<DBWServiceCore>
         WebSessionManager sessionManager = platform.getSessionManager();
         model.getQueryType()
             .dataFetcher("serverConfig", env -> getService(env).getServerConfig())
+            .dataFetcher("productSettings", env -> getService(env).getProductSettings(getWebSession(env)))
 
             .dataFetcher("driverList", env -> getService(env).getDriverList(getWebSession(env), env.getArgument("id")))
             .dataFetcher("authModels", env -> getService(env).getAuthModels(getWebSession(env)))
@@ -98,6 +99,8 @@ public class WebServiceBindingCore extends WebServiceBindingBase<DBWServiceCore>
             })
             .dataFetcher("closeSession", env -> getService(env).closeSession(GraphQLEndpoint.getServletRequest(env)))
             .dataFetcher("touchSession", env -> getService(env).touchSession(
+                GraphQLEndpoint.getServletRequest(env), GraphQLEndpoint.getServletResponse(env)))
+            .dataFetcher("updateSession", env -> getService(env).updateSession(
                 GraphQLEndpoint.getServletRequest(env), GraphQLEndpoint.getServletResponse(env)))
             .dataFetcher("refreshSessionConnections", env -> getService(env).refreshSessionConnections(
                 GraphQLEndpoint.getServletRequest(env), GraphQLEndpoint.getServletResponse(env)))

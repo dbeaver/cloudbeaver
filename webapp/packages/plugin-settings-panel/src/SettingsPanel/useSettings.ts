@@ -7,23 +7,27 @@
  */
 import { computed, observable } from 'mobx';
 
-import { useObservableRef } from '@cloudbeaver/core-blocks';
+import { useAutoLoad, useObservableRef } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { ISettingDescriptionWithScope, ROOT_SETTINGS_GROUP, SettingsGroup, SettingsManagerService } from '@cloudbeaver/core-plugin';
+import { ISettingDescription, ROOT_SETTINGS_GROUP, SettingsGroup, SettingsManagerService } from '@cloudbeaver/core-settings';
 
 interface ISettings {
-  settings: Map<SettingsGroup, ISettingDescriptionWithScope<any>[]>;
+  settings: Map<SettingsGroup, ISettingDescription<any>[]>;
   groups: Set<SettingsGroup>;
 }
 
-export function useSettings(): ISettings {
+export function useSettings(accessor?: string[]): ISettings {
   const settingsManagerService = useService(SettingsManagerService);
+
+  useAutoLoad(useSettings, settingsManagerService.loaders);
 
   return useObservableRef(
     () => ({
       get settings() {
         const map = new Map();
-        const settings = this.settingsManagerService.getSettings().sort((a, b) => a.name.localeCompare(b.name));
+        const settings = this.settingsManagerService.activeSettings
+          .filter(setting => accessor?.some(value => setting.access.scope.includes(value)))
+          .sort((a, b) => a.name.localeCompare(b.name));
 
         for (const setting of settings) {
           map.set(setting.group, [...(map.get(setting.group) || []), setting]);
@@ -51,6 +55,6 @@ export function useSettings(): ISettings {
       groups: computed,
       settingsManagerService: observable.ref,
     },
-    { settingsManagerService },
+    { settingsManagerService, accessor },
   );
 }

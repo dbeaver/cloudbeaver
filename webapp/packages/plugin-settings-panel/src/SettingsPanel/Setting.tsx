@@ -9,45 +9,69 @@ import { observer } from 'mobx-react-lite';
 
 import { Combobox, FieldCheckbox, InputField, Textarea, useCustomInputValidation, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { ESettingsValueType, type ISettingDescriptionWithScope, PluginManagerService } from '@cloudbeaver/core-plugin';
-import type { ISettingsSource } from '@cloudbeaver/core-settings';
-import { schemaValidationError } from '@cloudbeaver/core-utils';
+import {
+  ESettingsValueType,
+  type ISettingDescription,
+  type ISettingsSource,
+  SettingsProviderService,
+  SettingsResolverService,
+} from '@cloudbeaver/core-settings';
+import { isNotNullDefined, schemaValidationError } from '@cloudbeaver/core-utils';
 
 interface Props {
   source: ISettingsSource;
-  setting: ISettingDescriptionWithScope;
+  setting: ISettingDescription;
 }
 
 export const Setting = observer<Props>(function Setting({ source, setting }) {
+  const settingsResolverService = useService(SettingsResolverService);
+  const settingsProviderService = useService(SettingsProviderService);
   const translate = useTranslate();
-  const pluginManagerService = useService(PluginManagerService);
 
-  const defaultValue = pluginManagerService.getSettings(setting.scope)?.getDefaultValue(setting.key);
-
-  const key = `${setting.scope}.${setting.key}`;
-  const value = source.getValue(key) ?? defaultValue ?? '';
   const name = translate(setting.name);
   const description = translate(setting.description);
   const disabled = false;
-  const readOnly = false;
+  const readOnly = settingsResolverService.isReadOnly(setting.key) ?? false;
+
+  let value = source.getEditedValue(setting.key);
+  if (readOnly || !isNotNullDefined(value)) {
+    value = settingsResolverService.getEditedValue(setting.key);
+  }
+
+  if (setting.key in settingsProviderService.schema.shape) {
+    const schema = settingsProviderService.schema.shape[setting.key];
+    if (!isNotNullDefined(value)) {
+      const result = schema.safeParse(undefined);
+      value = result.success ? result.data : '';
+    }
+
+    const result = schema.safeParse(value);
+    value = result.success ? result.data : value;
+  }
+
+  value = value ?? '';
+
   const customValidation = useCustomInputValidation(value => {
-    const result = setting.schema.safeParse(value);
+    if (!(setting.key in settingsProviderService.schema.shape)) {
+      return null;
+    }
+    const result = settingsProviderService.schema.shape[setting.key].safeParse(value);
 
     if (result.success) {
       return null;
     }
 
-    return schemaValidationError(result.error).toString();
+    return schemaValidationError(result.error, { prefix: null }).toString();
   });
 
   function handleChange(value: any) {
-    source.setValue(key, value);
+    source.setValue(setting.key, value);
   }
 
   if (setting.type === ESettingsValueType.Checkbox) {
     return (
       <FieldCheckbox
-        id={key}
+        id={String(setting.key)}
         checked={value}
         label={name}
         title={name}
@@ -64,15 +88,16 @@ export const Setting = observer<Props>(function Setting({ source, setting }) {
     const options = setting.options?.map(option => ({ ...option, name: translate(option.name) })) || [];
     return (
       <Combobox
-        id={key}
+        id={String(setting.key)}
         items={options}
-        keySelector={value => value.id}
+        keySelector={value => value.value}
         valueSelector={value => value.name}
         value={value}
-        title={description}
+        title={name}
         disabled={disabled}
         readOnly={readOnly}
-        tiny
+        description={description}
+        small
         onSelect={handleChange}
       >
         {name}
@@ -82,7 +107,15 @@ export const Setting = observer<Props>(function Setting({ source, setting }) {
 
   if (setting.type === ESettingsValueType.Textarea) {
     return (
-      <Textarea id={key} title={value} labelTooltip={description} value={value} disabled={disabled} readOnly={readOnly} onChange={handleChange}>
+      <Textarea
+        id={String(setting.key)}
+        title={value}
+        labelTooltip={description}
+        value={value}
+        disabled={disabled}
+        readOnly={readOnly}
+        onChange={handleChange}
+      >
         {name}
       </Textarea>
     );
@@ -91,7 +124,7 @@ export const Setting = observer<Props>(function Setting({ source, setting }) {
   return (
     <InputField
       ref={customValidation}
-      id={key}
+      id={String(setting.key)}
       type="text"
       title={value}
       labelTooltip={description}

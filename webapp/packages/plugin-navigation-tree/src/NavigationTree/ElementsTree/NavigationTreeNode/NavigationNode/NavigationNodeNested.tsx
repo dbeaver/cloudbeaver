@@ -13,7 +13,7 @@ import { isArraysEqual } from '@cloudbeaver/core-utils';
 
 import { ElementsTreeContext } from '../../ElementsTreeContext';
 import type { NavTreeNodeComponent } from '../../NavigationNodeComponent';
-import style from './NavigationNodeNested.m.css';
+import style from './NavigationNodeNested.module.css';
 
 interface Props {
   nodeId?: string;
@@ -50,6 +50,10 @@ export const NavigationNodeNested = observer(
     children = useDeferredValue(children);
     empty = useDeferredValue(empty);
 
+    if (empty && !treeContext?.tree.settings?.foldersTree) {
+      return null;
+    }
+
     if (nodeId !== undefined && rootFolder) {
       return <NavigationNode nodeId={nodeId} path={path} expanded />;
     }
@@ -68,3 +72,5 @@ export const NavigationNodeNested = observer(
     );
   }),
 );
+
+NavigationNodeNested.displayName = 'NavigationNodeNested';

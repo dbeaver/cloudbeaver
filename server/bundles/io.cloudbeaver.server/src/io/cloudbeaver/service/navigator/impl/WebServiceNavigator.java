@@ -26,7 +26,6 @@ import io.cloudbeaver.model.WebConnectionInfo;
 import io.cloudbeaver.model.rm.DBNAbstractResourceManagerNode;
 import io.cloudbeaver.model.rm.DBNResourceManagerResource;
 import io.cloudbeaver.model.session.WebSession;
-import io.cloudbeaver.server.CBPlatform;
 import io.cloudbeaver.service.navigator.DBWServiceNavigator;
 import io.cloudbeaver.service.navigator.WebCatalog;
 import io.cloudbeaver.service.navigator.WebNavigatorNodeInfo;
@@ -38,7 +37,6 @@ import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.*;
-import org.jkiss.dbeaver.model.connection.DBPDriver;
 import org.jkiss.dbeaver.model.edit.DBECommandContext;
 import org.jkiss.dbeaver.model.edit.DBEObjectMaker;
 import org.jkiss.dbeaver.model.edit.DBEObjectRenamer;
@@ -85,20 +83,20 @@ public class WebServiceNavigator implements DBWServiceNavigator {
             DBNNode[] nodeChildren;
             boolean isRootPath = CommonUtils.isEmpty(parentPath) || "/".equals(parentPath) || ROOT_DATABASES.equals(parentPath);
             DBNModel navigatorModel = session.getNavigatorModel();
-            List<DBPDriver> applicableDrivers = CBPlatform.getInstance().getApplicableDrivers();
+            Set<String> applicableDrivers = WebServiceUtils.getApplicableDriversIds();
             if (isRootPath) {
                 DBNRoot rootNode = navigatorModel.getRoot();
                 nodeChildren = DBNUtils.getNodeChildrenFiltered(monitor, rootNode, true);
             } else {
                 DBNNode parentNode = navigatorModel.getNodeByPath(monitor, parentPath);
-                    if (parentNode == null) {
-                        throw new DBWebException("Node '" + parentPath + "' not found");
-                    }
+                if (parentNode == null) {
+                    throw new DBWebException("Node '" + parentPath + "' not found");
+                }
                 if (!parentNode.hasChildren(false)) {
                     return EMPTY_NODE_LIST;
                 }
-                if (parentNode instanceof DBNProject) {
-                    parentNode = ((DBNProject) parentNode).getDatabases();
+                if (parentNode instanceof DBNProject projectNode) {
+                    parentNode = projectNode.getDatabases();
                 }
                 nodeChildren = DBNUtils.getNodeChildrenFiltered(monitor, parentNode, false);
             }
@@ -109,15 +107,16 @@ public class WebServiceNavigator implements DBWServiceNavigator {
             Set<String> nodeIds = new HashSet<>(); // filter duplicate node ids
 
             for (DBNNode node : nodeChildren) {
-                if (node instanceof DBNDatabaseFolder && CommonUtils.isEmpty(((DBNDatabaseFolder) node).getMeta().getChildren(null))) {
+                if (node instanceof DBNDatabaseFolder folderNode && CommonUtils.isEmpty(folderNode.getMeta().getChildren(null))) {
                     // Skip empty folders. Folder may become empty if their nested elements are provided by UI plugins.
                     continue;
                 }
                 if (!CommonUtils.toBoolean(onlyFolders) || node instanceof DBNContainer) {
                     // Skip connections which are not supported in CB
-                    if (node instanceof DBNDataSource) {
-                        DBPDataSourceContainer container = ((DBNDataSource) node).getDataSourceContainer();
-                        if (!applicableDrivers.contains(container.getDriver())) {
+                    if (node instanceof DBNDataSource dataSourceNode) {
+                        DBPDataSourceContainer container = dataSourceNode.getDataSourceContainer();
+                        // compare by id because driver object can be recreated if it was custom or disabled
+                        if (!applicableDrivers.contains(container.getDriver().getId())) {
                             continue;
                         }
                     }
@@ -143,7 +142,7 @@ public class WebServiceNavigator implements DBWServiceNavigator {
                 return result.subList(offset, result.size());
             }
         } catch (DBException e) {
-            throw new DBWebException(e, null);
+            throw new DBWebException(e);
         }
     }
 
@@ -178,7 +177,7 @@ public class WebServiceNavigator implements DBWServiceNavigator {
 
             return nodeParents;
         } catch (DBException e) {
-            throw new DBWebException(e, null);
+            throw new DBWebException(e);
         }
     }
 
@@ -221,9 +220,6 @@ public class WebServiceNavigator implements DBWServiceNavigator {
             if (node == null) {
                 throw new DBWebException("Navigator node '"  + nodePath + "' not found");
             }
-            if (!(node instanceof DBNDatabaseFolder)) {
-                throw new DBWebException("Invalid navigator node type: "  + node.getClass().getName());
-            }
             DBSObjectFilter filter = new DBSObjectFilter();
             if (!CommonUtils.isEmpty(include)) {
                 filter.setInclude(include);
@@ -232,11 +228,11 @@ public class WebServiceNavigator implements DBWServiceNavigator {
                 filter.setExclude(exclude);
             }
             filter.setEnabled(true);
-            ((DBNDatabaseFolder) node).setNodeFilter(
-                ((DBNDatabaseFolder) node).getItemsMeta(), filter, true);
+            ((DBNDatabaseNode) node).setNodeFilter(
+                ((DBNDatabaseNode) node).getItemsMeta(), filter, true);
             if (hasNodeEditPermission(webSession, node, ((WebProjectImpl) node.getOwnerProject()).getRmProject())) {
                 // Save settings
-                ((DBNDatabaseFolder) node).getDataSourceContainer().persistConfiguration();
+                ((DBNDatabaseNode) node).getDataSourceContainer().persistConfiguration();
             }
         } catch (DBException e) {
             if (e instanceof DBWebException) {

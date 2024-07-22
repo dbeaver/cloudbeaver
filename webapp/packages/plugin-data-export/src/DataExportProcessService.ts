@@ -31,7 +31,10 @@ export interface ExportProcess {
 export class DataExportProcessService {
   readonly exportProcesses = new OrderedMap<string, ExportProcess>(value => value.taskId);
 
-  constructor(private readonly graphQLService: GraphQLService, private readonly notificationService: NotificationService) {}
+  constructor(
+    private readonly graphQLService: GraphQLService,
+    private readonly notificationService: NotificationService,
+  ) {}
 
   async cancel(exportId: string): Promise<void> {
     const process = this.exportProcesses.get(exportId);

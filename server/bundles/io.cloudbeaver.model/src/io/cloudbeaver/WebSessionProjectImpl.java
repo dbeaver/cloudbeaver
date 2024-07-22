@@ -26,8 +26,19 @@ public class WebSessionProjectImpl extends WebProjectImpl {
 
     private final WebSession webSession;
 
-    public WebSessionProjectImpl(@NotNull WebSession webSession, @NotNull RMProject project, @NotNull DataSourceFilter dataSourceFilter) {
-        super(webSession.getWorkspace(), webSession.getRmController(), webSession.getSessionContext(), project, dataSourceFilter);
+    public WebSessionProjectImpl(
+        @NotNull WebSession webSession,
+        @NotNull RMProject project,
+        @NotNull DataSourceFilter dataSourceFilter
+    ) {
+        super(
+            webSession.getWorkspace(),
+            webSession.getRmController(),
+            webSession.getSessionContext(),
+            project,
+            dataSourceFilter,
+            webSession.getUserPreferenceStore()
+        );
         this.webSession = webSession;
     }
 

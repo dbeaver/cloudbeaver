@@ -7,15 +7,14 @@
  */
 import { observer } from 'mobx-react-lite';
 import { useCallback } from 'react';
-import styled from 'reshadow';
 
-import { Combobox, Group, GroupTitle, ITag, s, Tag, Tags, useResource, useS, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
+import { Combobox, Group, GroupTitle, ITag, s, Tag, Tags, useResource, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import { DBDriverResource } from '@cloudbeaver/core-connections';
 import { CachedMapAllKey, resourceKeyList } from '@cloudbeaver/core-resource';
 import type { ServerConfigInput } from '@cloudbeaver/core-sdk';
 import { isDefined } from '@cloudbeaver/core-utils';
 
-import style from './ServerConfigurationDriversForm.m.css';
+import style from './ServerConfigurationDriversForm.module.css';
 
 interface Props {
   serverConfig: ServerConfigInput;
@@ -55,7 +54,7 @@ export const ServerConfigurationDriversForm = observer<Props>(function ServerCon
     }
   }, []);
 
-  return styled(useStyles(style))(
+  return (
     <Group maximum gap>
       <GroupTitle>{translate('administration_disabled_drivers_title')}</GroupTitle>
       <Combobox
@@ -73,6 +72,6 @@ export const ServerConfigurationDriversForm = observer<Props>(function ServerCon
           <Tag key={tag.id} id={tag.id} label={tag.label} icon={tag.icon} onRemove={handleRemove} />
         ))}
       </Tags>
-    </Group>,
+    </Group>
   );
 });

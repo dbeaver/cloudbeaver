@@ -1,0 +1,27 @@
+/*
+ * CloudBeaver - Cloud Database Manager
+ * Copyright (C) 2020-2024 DBeaver Corp and others
+ *
+ * Licensed under the Apache License, Version 2.0.
+ * you may not use this file except in compliance with the License.
+ */
+.menuBar {
+  height: 32px;
+  display: flex;
+  flex-shrink: 0;
+
+  & > .menuSeparator {
+    height: 100%;
+    margin: 0;
+    border: 1px solid !important;
+
+    &:first-child,
+    &:last-child {
+      display: none;
+    }
+  }
+}
+
+.floating.menuBar {
+  height: 28px;
+}

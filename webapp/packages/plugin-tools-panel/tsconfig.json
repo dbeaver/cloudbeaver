@@ -19,7 +19,7 @@
       "path": "../core-localization/tsconfig.json"
     },
     {
-      "path": "../core-plugin/tsconfig.json"
+      "path": "../core-settings/tsconfig.json"
     },
     {
       "path": "../core-ui/tsconfig.json"

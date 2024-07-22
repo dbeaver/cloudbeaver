@@ -36,9 +36,11 @@ import org.jkiss.dbeaver.registry.DataSourceProviderRegistry;
 import org.jkiss.dbeaver.registry.network.NetworkHandlerDescriptor;
 import org.jkiss.dbeaver.registry.network.NetworkHandlerRegistry;
 import org.jkiss.dbeaver.runtime.properties.PropertySourceCustom;
+import org.jkiss.utils.ArrayUtils;
 import org.jkiss.utils.CommonUtils;
 
 import java.util.Arrays;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -182,6 +184,7 @@ public class WebDatabaseDriverInfo {
             cfg.setUrl(driver.getSampleURL());
             cfg.setHostName(DBConstants.HOST_LOCALHOST);
             cfg.setHostPort(driver.getDefaultPort());
+            cfg.setDatabaseName(driver.getDefaultDatabase());
             cfg.setUrl(driver.getConnectionURL(cfg));
             DBPPropertyDescriptor[] properties = driver.getDataSourceProvider().getConnectionProperties(webSession.getProgressMonitor(), driver, cfg);
             if (properties == null) {
@@ -214,12 +217,12 @@ public class WebDatabaseDriverInfo {
 
     @Property
     public String[] getApplicableNetworkHandlers() {
-        if (driver.isEmbedded()) {
-            return new String[0];
+        if (!driver.isEmbedded() || CommonUtils.toBoolean(driver.getDriverParameter(DBConstants.DRIVER_PARAM_ENABLE_NETWORK_PARAMETERS))) {
+            return NetworkHandlerRegistry.getInstance().getDescriptors(driver).stream()
+                .filter(h -> !h.isDesktopHandler())
+                .map(NetworkHandlerDescriptor::getId).toArray(String[]::new);
         }
-        return NetworkHandlerRegistry.getInstance().getDescriptors(driver).stream()
-            .filter(h -> !h.isDesktopHandler())
-            .map(NetworkHandlerDescriptor::getId).toArray(String[]::new);
+        return new String[0];
     }
 
     @Property
@@ -230,6 +233,22 @@ public class WebDatabaseDriverInfo {
             }
         }
         return AuthModelDatabaseNative.ID;
+    }
+
+    @Property
+    public WebPropertyInfo[] getMainProperties() {
+        DBPPropertyDescriptor[] properties = driver.getMainPropertyDescriptors();
+        // set default values to main properties
+        Map<String, String> defaultValues = new LinkedHashMap<>();
+        defaultValues.put(DBConstants.PROP_HOST, getDefaultHost());
+        defaultValues.put(DBConstants.PROP_PORT, getDefaultPort());
+        defaultValues.put(DBConstants.PROP_DATABASE, getDefaultDatabase());
+        defaultValues.put(DBConstants.PROP_SERVER, getDefaultServer());
+        PropertySourceCustom propertySource = new PropertySourceCustom(properties, defaultValues);
+
+        return Arrays.stream(properties)
+            .map(p -> new WebPropertyInfo(webSession, p, propertySource))
+            .toArray(WebPropertyInfo[]::new);
     }
 
     @Property
@@ -274,5 +293,10 @@ public class WebDatabaseDriverInfo {
         return driver.getDriverLibraries().stream()
             .map(dbpDriverLibrary -> new WebDriverLibraryInfo(webSession, dbpDriverLibrary))
             .toArray(WebDriverLibraryInfo[]::new);
+    }
+
+    @Property
+    public boolean getUseCustomPage() {
+        return !ArrayUtils.isEmpty(driver.getMainPropertyDescriptors());
     }
 }

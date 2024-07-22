@@ -15,7 +15,10 @@ import type { IExportContext } from './IExportContext';
 
 @injectable()
 export class DataExportService {
-  constructor(private readonly notificationService: NotificationService, private readonly dataExportProcessService: DataExportProcessService) {}
+  constructor(
+    private readonly notificationService: NotificationService,
+    private readonly dataExportProcessService: DataExportProcessService,
+  ) {}
 
   async cancel(exportId: string): Promise<void> {
     await this.dataExportProcessService.cancel(exportId);

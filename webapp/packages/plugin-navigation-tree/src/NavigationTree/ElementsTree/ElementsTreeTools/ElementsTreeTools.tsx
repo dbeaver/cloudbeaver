@@ -7,7 +7,6 @@
  */
 import { observer } from 'mobx-react-lite';
 import React, { useState } from 'react';
-import styled from 'reshadow';
 
 import {
   ActionIconButton,
@@ -18,17 +17,15 @@ import {
   SContext,
   StyleRegistry,
   useS,
-  useStyles,
   useTranslate,
 } from '@cloudbeaver/core-blocks';
-import type { ComponentStyle } from '@cloudbeaver/core-theming';
 import { useCaptureViewContext } from '@cloudbeaver/core-view';
 
 import { DATA_CONTEXT_ELEMENTS_TREE } from '../DATA_CONTEXT_ELEMENTS_TREE';
 import type { IElementsTree } from '../useElementsTree';
 import { ElementsTreeFilter } from './ElementsTreeFilter';
-import ElementsTreeToolsStyles from './ElementsTreeTools.m.css';
-import ElementsTreeToolsIconButtonStyles from './ElementsTreeToolsIconButton.m.css';
+import ElementsTreeToolsStyles from './ElementsTreeTools.module.css';
+import ElementsTreeToolsIconButtonStyles from './ElementsTreeToolsIconButton.module.css';
 import { ElementsTreeToolsMenu } from './ElementsTreeToolsMenu';
 import { DATA_CONTEXT_NAV_TREE_ROOT } from './NavigationTreeSettings/DATA_CONTEXT_NAV_TREE_ROOT';
 import type { IElementsTreeSettingsProps } from './NavigationTreeSettings/ElementsTreeSettingsService';
@@ -47,24 +44,23 @@ const registry: StyleRegistry = [
 interface Props {
   tree: IElementsTree;
   settingsElements?: PlaceholderElement<IElementsTreeSettingsProps>[];
-  style?: ComponentStyle;
 }
 
-export const ElementsTreeTools = observer<React.PropsWithChildren<Props>>(function ElementsTreeTools({ tree, settingsElements, style, children }) {
+export const ElementsTreeTools = observer<React.PropsWithChildren<Props>>(function ElementsTreeTools({ tree, settingsElements, children }) {
   const root = tree.root;
+  const baseRoot = tree.baseRoot;
   const translate = useTranslate();
   const [opened, setOpen] = useState(false);
-  const deprecatedStyles = useStyles(style);
   const styles = useS(ElementsTreeToolsStyles, ElementsTreeToolsIconButtonStyles);
 
-  useCaptureViewContext(context => {
-    context?.set(DATA_CONTEXT_NAV_TREE_ROOT, tree.baseRoot);
-    context?.set(DATA_CONTEXT_ELEMENTS_TREE, tree);
+  useCaptureViewContext((context, id) => {
+    context.set(DATA_CONTEXT_NAV_TREE_ROOT, baseRoot, id);
+    context.set(DATA_CONTEXT_ELEMENTS_TREE, tree, id);
   });
 
   const loading = tree.isLoading();
 
-  return styled(deprecatedStyles)(
+  return (
     <SContext registry={registry}>
       <div className={s(styles, { tools: true })}>
         <div className={s(styles, { actions: true })}>
@@ -88,10 +84,10 @@ export const ElementsTreeTools = observer<React.PropsWithChildren<Props>>(functi
             onClick={() => tree.refresh(root)}
           />
         </div>
-        {tree.settings && opened && <NavigationTreeSettings tree={tree} elements={settingsElements} style={style} />}
-        <ElementsTreeFilter tree={tree} style={style} />
+        {tree.settings && opened && <NavigationTreeSettings tree={tree} elements={settingsElements} />}
+        <ElementsTreeFilter tree={tree} />
         {children}
       </div>
-    </SContext>,
+    </SContext>
   );
 });

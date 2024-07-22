@@ -26,6 +26,7 @@ import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.exec.DBCLogicalOperator;
+import org.jkiss.dbeaver.model.exec.trace.DBCTraceProperty;
 import org.jkiss.dbeaver.model.sql.registry.SQLGeneratorDescriptor;
 
 import java.util.List;
@@ -106,6 +107,17 @@ public interface DBWServiceSQL extends DBWService {
         @Nullable WebSQLDataFilter filter,
         @Nullable WebDataFormat dataFormat) throws DBWebException;
 
+    /**
+     * Reads dynamic trace from provided database results.
+     */
+    @NotNull
+    @WebAction
+    List<DBCTraceProperty> readDynamicTrace(
+        @NotNull WebSession webSession,
+        @NotNull WebSQLContextInfo contextInfo,
+        @NotNull String resultsId
+    ) throws DBException;
+
     @WebAction
     Boolean closeResult(@NotNull WebSQLContextInfo sqlContext, @NotNull String resultId) throws DBWebException;
 
@@ -172,4 +184,22 @@ public interface DBWServiceSQL extends DBWService {
     @Nullable
     @WebAction
     Long getRowDataCountResult(@NotNull WebSession webSession, @NotNull String taskId) throws DBWebException;
+
+    @WebAction
+    WebAsyncTaskInfo asyncSqlSetAutoCommit(
+        @NotNull WebSession webSession,
+        @NotNull WebSQLContextInfo contextInfo,
+        boolean autoCommit
+    ) throws DBWebException;
+
+    @WebAction
+    WebAsyncTaskInfo asyncSqlRollbackTransaction(
+        @NotNull WebSession webSession,
+        @NotNull WebSQLContextInfo contextInfo
+    ) throws DBWebException;
+
+    @WebAction
+    WebAsyncTaskInfo asyncSqlCommitTransaction(
+        @NotNull WebSession webSession,
+        @NotNull WebSQLContextInfo sqlContext);
 }

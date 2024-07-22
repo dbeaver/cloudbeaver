@@ -29,6 +29,7 @@ import io.cloudbeaver.registry.WebServletHandlerDescriptor;
 import io.cloudbeaver.server.CBAppConfig;
 import io.cloudbeaver.server.CBApplication;
 import io.cloudbeaver.server.CBPlatform;
+import io.cloudbeaver.server.CBServerConfig;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -158,7 +159,8 @@ public class CBStaticServlet extends DefaultServlet {
                                 WebSession.CB_SESSION_TYPE,
                                 authProvider.getId(),
                                 activeAuthConfig.getId(),
-                                Map.of()
+                                Map.of(),
+                                false
                             );
                             String signInLink = authInfo.getRedirectUrl();
                             //ignore current routing if non-root page is open
@@ -212,9 +214,10 @@ public class CBStaticServlet extends DefaultServlet {
                 IOUtils.copyStream(fis, baos);
             }
             String indexContents = baos.toString(StandardCharsets.UTF_8);
+            CBServerConfig serverConfig = CBApplication.getInstance().getServerConfiguration();
             indexContents = indexContents
-                .replace("{ROOT_URI}", CBApplication.getInstance().getRootURI())
-                .replace("{STATIC_CONTENT}", CBApplication.getInstance().getStaticContent());
+                .replace("{ROOT_URI}", serverConfig.getRootURI())
+                .replace("{STATIC_CONTENT}", serverConfig.getStaticContent());
             byte[] indexBytes = indexContents.getBytes(StandardCharsets.UTF_8);
 
             putHeaders(response, content, indexBytes.length);

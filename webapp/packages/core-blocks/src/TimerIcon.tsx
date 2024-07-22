@@ -5,21 +5,21 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
+import { observer } from 'mobx-react-lite';
 import type React from 'react';
 
 import { Icon } from './Icon';
 import { s } from './s';
-import style from './TimerIcon.m.css';
+import classes from './TimerIcon.module.css';
 import { useS } from './useS';
-import {observer} from "mobx-react-lite";
 
 interface Props {
   state: 'play' | 'stop';
-  interval: number;
+  interval: React.ReactNode;
 }
 
 export const TimerIcon = observer<Props & React.ButtonHTMLAttributes<HTMLDivElement>>(function TimerIcon({ state, interval, ...rest }) {
-  const styles = useS(style);
+  const styles = useS(classes);
 
   return (
     <div className={s(styles, { timer: true })} {...rest}>

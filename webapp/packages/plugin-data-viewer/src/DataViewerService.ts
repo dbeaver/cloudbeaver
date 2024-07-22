@@ -7,19 +7,33 @@
  */
 import type { Connection } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
+import { EAdminPermission, SessionPermissionsResource } from '@cloudbeaver/core-root';
 
 import { DataViewerSettingsService } from './DataViewerSettingsService';
 
 @injectable()
 export class DataViewerService {
   get canCopyData() {
-    return !this.dataViewerSettingsService.settings.getValue('disableCopyData');
+    return this.sessionPermissionsResource.has(EAdminPermission.admin) || !this.dataViewerSettingsService.disableCopyData;
   }
 
-  constructor(private readonly dataViewerSettingsService: DataViewerSettingsService) {}
+  get canExportData() {
+    return this.sessionPermissionsResource.has(EAdminPermission.admin) || !this.dataViewerSettingsService.disableExportData;
+  }
+
+  constructor(
+    private readonly dataViewerSettingsService: DataViewerSettingsService,
+    private readonly sessionPermissionsResource: SessionPermissionsResource,
+  ) {}
 
   isDataEditable(connection: Connection) {
-    const disabled = this.dataViewerSettingsService.settings.getValue('disableEdit');
-    return !disabled && !connection.readOnly;
+    if (connection.readOnly) {
+      return false;
+    }
+
+    const isAdmin = this.sessionPermissionsResource.has(EAdminPermission.admin);
+    const disabled = this.dataViewerSettingsService.disableEdit;
+
+    return isAdmin || !disabled;
   }
 }

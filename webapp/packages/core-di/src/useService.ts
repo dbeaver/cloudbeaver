@@ -7,16 +7,21 @@
  */
 import { useContext } from 'react';
 
-import { appContext } from './AppContext';
 import type { IServiceConstructor } from './IApp';
-import type { ValueToken } from './InjectionToken';
+import { serviceProviderContext } from './ServiceProviderContext';
 
-export function useService<T>(ctor: IServiceConstructor<T>): T {
-  const app = useContext(appContext);
-  return app.getServiceByClass(ctor);
-}
+export function useService<T>(ctor: IServiceConstructor<T>): T;
+export function useService<T>(ctor: IServiceConstructor<T>, optional: true): T | undefined;
+export function useService<T>(ctor: IServiceConstructor<T>, optional?: boolean): T | undefined {
+  const serviceProvider = useContext(serviceProviderContext);
 
-export function useServiceByToken<T>(token: ValueToken<T>): T {
-  const app = useContext(appContext);
-  return app.getServiceByToken(token);
+  if (optional) {
+    try {
+      return serviceProvider.getService(ctor);
+    } catch {
+      return undefined;
+    }
+  }
+
+  return serviceProvider.getService(ctor);
 }

@@ -1,0 +1,3 @@
+query updateUserTeamRole($userId: ID!, $teamId: ID!, $teamRole: String) {
+  result: setUserTeamRole(userId: $userId, teamId: $teamId, teamRole: $teamRole)
+}

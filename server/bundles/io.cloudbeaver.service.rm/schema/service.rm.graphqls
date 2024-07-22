@@ -21,14 +21,6 @@ type RMResource {
     properties: Object
 }
 
-type RMResourceType {
-    id: String!
-    displayName: String!
-    icon: String
-    fileExtensions: [String!]!
-    rootFolder: String
-}
-
 input RMSubjectProjectPermissions {
     subjectId: String!
     permissions: [String!]!

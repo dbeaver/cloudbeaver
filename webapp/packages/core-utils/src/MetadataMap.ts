@@ -7,6 +7,7 @@
  */
 import { action, makeAutoObservable, observable } from 'mobx';
 
+import type { schema } from './schema';
 import { TempMap } from './TempMap';
 
 export type MetadataValueGetter<TKey, TValue> = (key: TKey, metadata: MetadataMap<TKey, any>) => TValue;
@@ -29,6 +30,7 @@ export class MetadataMap<TKey, TValue> implements Map<TKey, TValue> {
 
     makeAutoObservable(this, {
       sync: action,
+      unSync: action,
     });
   }
 
@@ -41,12 +43,20 @@ export class MetadataMap<TKey, TValue> implements Map<TKey, TValue> {
   }
 
   sync(entities: Array<[TKey, TValue]>): void {
+    if (this.syncData === entities) {
+      return;
+    }
+
     this.temp.clear();
     this.data.clear();
     for (const [key, value] of entities) {
       this.data.set(key, value);
     }
     this.syncData = entities;
+  }
+
+  unSync(): void {
+    this.syncData = null;
   }
 
   forEach(callbackfn: (value: TValue, key: TKey, map: Map<TKey, TValue>) => void, thisArg?: any): void {
@@ -74,8 +84,21 @@ export class MetadataMap<TKey, TValue> implements Map<TKey, TValue> {
     return this;
   }
 
-  get(key: TKey, defaultValue?: DefaultValueGetter<TKey, TValue>): TValue {
-    if (!this.temp.has(key)) {
+  // TODO replace zod schema with just validation callback returning true/false.
+  // In case we use something else than zod
+  get(key: TKey, defaultValue?: DefaultValueGetter<TKey, TValue>, schema?: schema.AnyZodObject): TValue {
+    const value = this.temp.get(key);
+    let invalidate = !this.temp.has(key);
+
+    if (!invalidate && schema) {
+      const parsed = schema.safeParse(value);
+
+      if (!parsed.success) {
+        invalidate = true;
+      }
+    }
+
+    if (invalidate) {
       const provider = defaultValue || this.defaultValueGetter;
 
       if (!provider) {
@@ -83,8 +106,11 @@ export class MetadataMap<TKey, TValue> implements Map<TKey, TValue> {
       }
 
       const value = provider(key, this);
-      this.temp.set(key, observable(value as any));
+      const isNotPrimitiveValue = typeof value === 'object' && value !== null;
+
+      this.temp.set(key, isNotPrimitiveValue ? observable(value) : value);
     }
+
     return this.temp.get(key)!;
   }
 

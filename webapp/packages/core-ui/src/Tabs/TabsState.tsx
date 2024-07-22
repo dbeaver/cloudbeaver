@@ -13,7 +13,7 @@ import { useTabState } from 'reakit/Tab';
 import { useAutoLoad, useExecutor, useObjectRef, useObservableRef } from '@cloudbeaver/core-blocks';
 import { useDataContext } from '@cloudbeaver/core-data-context';
 import { Executor, ExecutorInterrupter } from '@cloudbeaver/core-executor';
-import { isDefined, isNotNullDefined, MetadataMap, MetadataValueGetter } from '@cloudbeaver/core-utils';
+import { isDefined, isNotNullDefined, MetadataMap, MetadataValueGetter, schema } from '@cloudbeaver/core-utils';
 
 import type { ITabData, ITabInfo, ITabsContainer } from './TabsContainer/ITabsContainer';
 import { ITabsContext, type TabDirection, TabsContext } from './TabsContext';
@@ -21,7 +21,7 @@ import { TabsValidationProvider } from './TabsValidationProvider';
 
 type ExtractContainerProps<T> = T extends void ? Record<string, any> : T;
 
-type Props<T = Record<string, any>> = ExtractContainerProps<T> &
+export type TabsStateProps<T = Record<string, any>> = ExtractContainerProps<T> &
   React.PropsWithChildren<{
     selectedId?: string;
     orientation?: 'horizontal' | 'vertical';
@@ -54,7 +54,7 @@ export const TabsState = observer(function TabsState<T = Record<string, any>>({
   onClose,
   canClose,
   ...rest
-}: Props<T>): React.ReactElement | null {
+}: TabsStateProps<T>): React.ReactElement | null {
   const context = useDataContext();
   const props = useMemo(() => rest as any as T, [...Object.values(rest)]);
   let displayed: string[] = [];
@@ -73,7 +73,7 @@ export const TabsState = observer(function TabsState<T = Record<string, any>>({
   const [openExecutor] = useState(() => new Executor<ITabData<T>>());
 
   const state = useTabState({
-    selectedId: selectedId || currentTabId,
+    selectedId: selectedId || currentTabId || container?.selectedId || null,
     orientation,
     manual,
   });
@@ -164,11 +164,11 @@ export const TabsState = observer(function TabsState<T = Record<string, any>>({
       getTabInfo(tabId: string) {
         return dynamic.container?.getDisplayedTabInfo(tabId, dynamic.props);
       },
-      getTabState(tabId: string, valueGetter?: MetadataValueGetter<string, any>) {
-        return dynamic.container?.getTabState(dynamic.tabsState, tabId, dynamic.props, valueGetter);
+      getTabState(tabId: string, valueGetter?: MetadataValueGetter<string, any>, schema?: schema.AnyZodObject) {
+        return dynamic.container?.getTabState(dynamic.tabsState, tabId, dynamic.props, valueGetter, schema);
       },
-      getLocalState(tabId: string, valueGetter?: MetadataValueGetter<string, any>) {
-        return dynamic.tabsState.get(tabId, valueGetter);
+      getLocalState(tabId: string, valueGetter?: MetadataValueGetter<string, any>, schema?: schema.AnyZodObject) {
+        return dynamic.tabsState.get(tabId, valueGetter, schema);
       },
       async open(tabId: string) {
         await openExecutor.execute({

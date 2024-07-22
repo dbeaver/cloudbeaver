@@ -71,7 +71,8 @@ export class ConnectionExecutionContextResource extends CachedMapResource<string
   }
 
   async create(key: IConnectionInfoParams, defaultCatalog?: string, defaultSchema?: string): Promise<IConnectionExecutionContextInfo> {
-    return await this.performUpdate(getContextBaseId(key, ''), [], async () => {
+    const contextKey = getContextBaseId(key, '');
+    return await this.performUpdate(contextKey, [], async () => {
       const { context } = await this.graphQLService.sdk.executionContextCreate({
         ...key,
         defaultCatalog,
@@ -85,7 +86,10 @@ export class ConnectionExecutionContextResource extends CachedMapResource<string
         this.markOutdated(); // TODO: should be removed, currently multiple contexts for same connection may change catalog/schema for all contexts of connection
       });
 
-      return this.get(baseContext.id)!;
+      const result = this.get(baseContext.id)!;
+      this.onDataOutdated.execute(contextKey);
+
+      return result;
     });
   }
 
@@ -107,6 +111,7 @@ export class ConnectionExecutionContextResource extends CachedMapResource<string
 
       context.defaultCatalog = defaultCatalog;
       context.defaultSchema = defaultSchema;
+      this.onDataOutdated.execute(contextId);
     });
 
     this.markOutdated();
@@ -114,23 +119,23 @@ export class ConnectionExecutionContextResource extends CachedMapResource<string
   }
 
   async destroy(contextId: string): Promise<void> {
-    const context = this.get(contextId);
-
-    if (!context) {
-      return;
-    }
-
     await this.performUpdate(contextId, [], async () => {
+      const context = this.get(contextId);
+
+      if (!context) {
+        return;
+      }
+
       await this.graphQLService.sdk.executionContextDestroy({
         contextId: context.id,
         connectionId: context.connectionId,
         projectId: context.projectId,
       });
+      this.delete(contextId);
     });
 
     runInAction(() => {
       this.markOutdated(); // TODO: should be removed, currently multiple contexts for same connection may change catalog/schema for all contexts of connection
-      this.delete(contextId);
     });
   }
 

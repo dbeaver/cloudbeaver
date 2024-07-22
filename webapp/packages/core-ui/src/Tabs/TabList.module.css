@@ -1,0 +1,39 @@
+/*
+ * CloudBeaver - Cloud Database Manager
+ * Copyright (C) 2020-2024 DBeaver Corp and others
+ *
+ * Licensed under the Apache License, Version 2.0.
+ * you may not use this file except in compliance with the License.
+ */
+
+.tabList {
+  display: flex;
+  box-sizing: border-box;
+  outline: none;
+}
+
+.underline {
+  composes: underline from './Tab/TabUnderline.module.css';
+  composes: underline from './Tab/TabBigUnderlineStyles.module.css';
+  composes: underline from './Tab/TabTitleBigUnderlineStyles.module.css';
+}
+
+.big {
+  composes: big from './Tab/TabBigUnderlineStyles.module.css';
+  composes: big from './Tab/TabTitleBigUnderlineStyles.module.css';
+}
+
+.vertical {
+  composes: vertical from './Tab/TabVertical.module.css';
+
+  composes: vertical from './Tab/TabIconVerticalRotated.module.css';
+  composes: vertical from './Tab/TabTitleVerticalRotated.module.css';
+  composes: vertical from './Tab/TabVerticalRotated.module.css';
+  composes: vertical from './TabListVerticalRotated.module.css';
+}
+
+.rotated {
+  composes: rotated from './Tab/TabIconVerticalRotated.module.css';
+  composes: rotated from './Tab/TabTitleVerticalRotated.module.css';
+  composes: rotated from './Tab/TabVerticalRotated.module.css';
+}

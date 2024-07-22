@@ -9,15 +9,14 @@ import { computed } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import React, { ButtonHTMLAttributes, forwardRef, useCallback, useEffect, useMemo } from 'react';
 import { Menu, MenuButton, MenuInitialState, MenuItem, MenuItemCheckbox, MenuItemRadio, MenuStateReturn, useMenuState } from 'reakit/Menu';
-import styled, { use } from 'reshadow';
 
 import type { IMenuItem, IMenuPanel } from '@cloudbeaver/core-dialogs';
-import type { ComponentStyle } from '@cloudbeaver/core-theming';
 
+import { s } from '../s';
 import { useObjectRef } from '../useObjectRef';
-import { useStyles } from '../useStyles';
+import { useS } from '../useS';
 import { MenuPanelItem } from './MenuPanelItem';
-import { menuPanelStyles } from './menuPanelStyles';
+import MenuPanelItemAndTriggerStyles from './shared/MenuPanelItemAndTrigger.module.css';
 
 export type MenuState = MenuStateReturn;
 
@@ -26,7 +25,6 @@ export type MenuState = MenuStateReturn;
  */
 
 interface IMenuTriggerBaseProps extends Omit<ButtonHTMLAttributes<any>, 'style'> {
-  style?: ComponentStyle;
   menuRef?: React.RefObject<MenuState | undefined>;
   disclosure?: boolean;
   placement?: MenuInitialState['placement'];
@@ -44,15 +42,16 @@ interface IMenuTriggerLazyProps extends IMenuTriggerBaseProps {
 interface IMenuTriggerProps extends IMenuTriggerBaseProps {
   panel: IMenuPanel;
   getPanel?: () => IMenuPanel;
+  className?: string;
 }
 
 export const MenuTrigger = React.forwardRef<ButtonHTMLAttributes<any>, IMenuTriggerProps | IMenuTriggerLazyProps>(function MenuTrigger(
-  { panel, menuRef, getPanel, disclosure, children, style, placement, visible, onVisibleSwitch, modal, rtl, ...props },
+  { panel, menuRef, getPanel, disclosure, className, children, placement, visible, onVisibleSwitch, modal, rtl, ...props },
   ref,
 ) {
   const propsRef = useObjectRef({ onVisibleSwitch, visible });
   const menu = useMenuState({ modal, placement, visible, rtl });
-  const styles = useStyles(menuPanelStyles, style);
+  const style = useS(MenuPanelItemAndTriggerStyles);
 
   if (menuRef) {
     //@ts-expect-error ref mutation
@@ -73,22 +72,22 @@ export const MenuTrigger = React.forwardRef<ButtonHTMLAttributes<any>, IMenuTrig
 
   if (React.isValidElement(children) && disclosure) {
     return (
-      <>
-        <MenuButton ref={ref} {...menu} {...props} {...children.props}>
+      <div className={s(style, { menuTrigger: true }, className)}>
+        <MenuButton ref={ref} className={s(style, { menuButton: true })} {...menu} {...props} {...children.props}>
           {disclosureProps => React.cloneElement(children, disclosureProps)}
         </MenuButton>
-        {panel && <MenuPanel panel={panel} menu={menu} style={style} rtl={rtl} onItemClose={handleItemClose} />}
-      </>
+        {panel && <MenuPanel panel={panel} menu={menu} rtl={rtl} onItemClose={handleItemClose} />}
+      </div>
     );
   }
 
-  return styled(styles)(
-    <>
-      <MenuButton {...menu} {...props}>
-        <box>{children}</box>
+  return (
+    <div className={s(style, { menuTrigger: true })}>
+      <MenuButton className={s(style, { menuButton: true })} {...menu} {...props}>
+        <div className={s(style, { box: true })}>{children}</div>
       </MenuButton>
-      {panel && <MenuPanel panel={panel} menu={menu} style={style} rtl={rtl} onItemClose={handleItemClose} />}
-    </>,
+      {panel && <MenuPanel panel={panel} menu={menu} rtl={rtl} onItemClose={handleItemClose} />}
+    </div>
   );
 });
 
@@ -102,24 +101,22 @@ interface MenuPanelProps {
   panelAvailable?: boolean;
   onItemClose?: () => void;
   rtl?: boolean;
-  style?: ComponentStyle;
 }
 
-const MenuPanel = observer<MenuPanelProps>(function MenuPanel({ panel, menu, panelAvailable, rtl, onItemClose, style }) {
-  const styles = useStyles(menuPanelStyles, style);
-
+const MenuPanel = observer<MenuPanelProps>(function MenuPanel({ panel, menu, panelAvailable, rtl, onItemClose }) {
+  const style = useS(MenuPanelItemAndTriggerStyles);
   if (!menu.visible) {
     return null;
   }
 
-  return styled(styles)(
-    <Menu {...menu} aria-label={panel.id} visible={panelAvailable ?? menu.visible}>
-      <menu-box dir={rtl ? 'rtl' : undefined}>
+  return (
+    <Menu className={s(style, { menu: true })} {...menu} aria-label={panel.id} visible={panelAvailable ?? menu.visible}>
+      <div className={s(style, { menuBox: true })} dir={rtl ? 'rtl' : undefined}>
         {panel.menuItems.map(item => (
-          <MenuPanelElement key={item.id} item={item} menu={menu} style={style} onItemClose={onItemClose} />
+          <MenuPanelElement key={item.id} item={item} menu={menu} onItemClose={onItemClose} />
         ))}
-      </menu-box>
-    </Menu>,
+      </div>
+    </Menu>
   );
 });
 
@@ -131,11 +128,10 @@ interface IMenuPanelElementProps extends Omit<React.ButtonHTMLAttributes<any>, '
   item: IMenuItem;
   menu: MenuStateReturn; // from reakit useMenuState
   onItemClose?: () => void;
-  style?: ComponentStyle;
 }
 
-const MenuPanelElement = observer<IMenuPanelElementProps>(function MenuPanelElement({ item, menu, onItemClose, style }) {
-  const styles = useStyles(menuPanelStyles, style);
+const MenuPanelElement = observer<IMenuPanelElementProps>(function MenuPanelElement({ item, menu, onItemClose }) {
+  const style = useS(MenuPanelItemAndTriggerStyles);
   const onClick = useCallback(() => {
     if (item.onClick) {
       item.onClick();
@@ -152,26 +148,25 @@ const MenuPanelElement = observer<IMenuPanelElementProps>(function MenuPanelElem
   }
 
   if (item.panel) {
-    return styled(styles)(
+    return (
       <MenuItem
         {...menu}
-        {...use({ hidden: item.isHidden })}
+        className={s(style, { menuItem: true, hidden: item.isHidden })}
         aria-label={item.id}
         disabled={item.isDisabled}
         menuItem={item}
-        style={style}
         onItemClose={onItemClose}
         onClick={onClick}
         {...{ as: MenuInnerTrigger }}
-      />,
+      />
     );
   }
 
   if (item.type === 'radio') {
-    return styled(styles)(
+    return (
       <MenuItemRadio
         {...menu}
-        {...use({ hidden: item.isHidden })}
+        className={s(style, { menuItemRadio: true, hidden: item.isHidden })}
         aria-label={item.id}
         disabled={item.isDisabled}
         name={item.id}
@@ -179,16 +174,16 @@ const MenuPanelElement = observer<IMenuPanelElementProps>(function MenuPanelElem
         checked={item.isChecked}
         onClick={onClick}
       >
-        <MenuPanelItem menuItem={item} style={style} />
-      </MenuItemRadio>,
+        <MenuPanelItem className={s(style, { menuPanelItem: true })} menuItem={item} />
+      </MenuItemRadio>
     );
   }
 
   if (item.type === 'checkbox') {
-    return styled(styles)(
+    return (
       <MenuItemCheckbox
         {...menu}
-        {...use({ hidden: item.isHidden })}
+        className={s(style, { menuItemCheckbox: true, hidden: item.isHidden })}
         aria-label={item.id}
         disabled={item.isDisabled}
         name={item.id}
@@ -196,15 +191,21 @@ const MenuPanelElement = observer<IMenuPanelElementProps>(function MenuPanelElem
         checked={item.isChecked}
         onClick={onClick}
       >
-        <MenuPanelItem menuItem={item} style={style} />
-      </MenuItemCheckbox>,
+        <MenuPanelItem className={s(style, { menuPanelItem: true })} menuItem={item} />
+      </MenuItemCheckbox>
     );
   }
 
-  return styled(styles)(
-    <MenuItem {...menu} {...use({ hidden: item.isHidden })} aria-label={item.id} disabled={item.isDisabled} onClick={onClick}>
-      <MenuPanelItem menuItem={item} style={style} />
-    </MenuItem>,
+  return (
+    <MenuItem
+      className={s(style, { menuItem: true, hidden: item.isHidden })}
+      {...menu}
+      aria-label={item.id}
+      disabled={item.isDisabled}
+      onClick={onClick}
+    >
+      <MenuPanelItem className={s(style, { menuPanelItem: true })} menuItem={item} />
+    </MenuItem>
   );
 });
 
@@ -215,13 +216,13 @@ const MenuPanelElement = observer<IMenuPanelElementProps>(function MenuPanelElem
 interface IMenuInnerTriggerProps extends Omit<React.ButtonHTMLAttributes<any>, 'style'> {
   menuItem: IMenuItem;
   onItemClose?: () => void;
-  style?: ComponentStyle;
 }
 
 export const MenuInnerTrigger = observer<IMenuInnerTriggerProps, HTMLButtonElement>(
   forwardRef(function MenuInnerTrigger(props, ref) {
-    const { menuItem, style, onItemClose, ...rest } = props;
+    const { menuItem, onItemClose, ...rest } = props;
     const menu = useMenuState();
+    const style = useS(MenuPanelItemAndTriggerStyles);
 
     const handleItemClose = useCallback(() => {
       menu.hide();
@@ -232,17 +233,17 @@ export const MenuInnerTrigger = observer<IMenuInnerTriggerProps, HTMLButtonEleme
       menuItem.onMouseEnter?.();
     }, [menuItem.onMouseEnter]);
 
-    return styled(useStyles(menuPanelStyles, style))(
+    return (
       <>
-        <menu-panel-button-wrapper onMouseEnter={handleMouseEnter}>
-          <MenuButton ref={ref} {...menu} {...rest}>
-            <box>
-              <MenuPanelItem menuItem={menuItem} style={style} />
-            </box>
+        <div className={s(style, { menuPanelButtonWrapper: true })} onMouseEnter={handleMouseEnter}>
+          <MenuButton ref={ref} className={s(style, { menuButton: true })} {...menu} {...rest}>
+            <div className={s(style, { box: true })}>
+              <MenuPanelItem className={s(style, { menuPanelItem: true })} menuItem={menuItem} />
+            </div>
           </MenuButton>
-        </menu-panel-button-wrapper>
-        <MenuPanel panel={menuItem.panel!} menu={menu} style={style} panelAvailable={menuItem.isPanelAvailable} onItemClose={handleItemClose} />
-      </>,
+        </div>
+        <MenuPanel panel={menuItem.panel!} menu={menu} panelAvailable={menuItem.isPanelAvailable} onItemClose={handleItemClose} />
+      </>
     );
   }),
 );
