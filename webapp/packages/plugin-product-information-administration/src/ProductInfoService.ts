@@ -10,6 +10,7 @@ import {
   AdministrationItemService,
   AdministrationItemType,
   IAdministrationItem,
+  IAdministrationItemOptions,
 } from '@cloudbeaver/core-administration';
 import { importLazyComponent } from '@cloudbeaver/core-blocks';
 import { Dependency, injectable } from '@cloudbeaver/core-di';
@@ -35,6 +36,47 @@ export class ProductInfoService extends Dependency {
       getDrawerComponent: () => ProductInfoDrawerItem,
       order: 12,
     });
+  }
+
+  private modifyIsOnlyActive(isOnlyActive: ((configurationWizard: boolean) => boolean) | boolean) {
+    if (this.administrationItem.isOnlyActive === undefined) {
+      this.administrationItem.isOnlyActive = isOnlyActive;
+      return;
+    }
+
+    if (typeof this.administrationItem.isOnlyActive === 'boolean') {
+      this.administrationItem.isOnlyActive = isOnlyActive;
+      return;
+    }
+
+    const oldIsOnlyActive = this.administrationItem.isOnlyActive;
+
+    this.administrationItem.isOnlyActive = configurationWizard =>
+      oldIsOnlyActive(configurationWizard) && typeof isOnlyActive === 'function' && isOnlyActive(configurationWizard);
+  }
+
+  private modifyFilterOnlyActive(filterOnlyActive: (configurationWizard: boolean, item: IAdministrationItem) => boolean) {
+    if (this.administrationItem.filterOnlyActive === undefined) {
+      this.administrationItem.filterOnlyActive = filterOnlyActive;
+      return;
+    }
+
+    const oldFilterOnlyActive = this.administrationItem.filterOnlyActive;
+
+    this.administrationItem.filterOnlyActive = (configurationWizard, item) =>
+      oldFilterOnlyActive(configurationWizard, item) && filterOnlyActive(configurationWizard, item);
+  }
+
+  modify(item: Partial<IAdministrationItemOptions>) {
+    if (item.isOnlyActive !== undefined) {
+      this.modifyIsOnlyActive(item.isOnlyActive);
+    }
+
+    if (item.filterOnlyActive !== undefined) {
+      this.modifyFilterOnlyActive(item.filterOnlyActive);
+    }
+
+    Object.assign(this.administrationItem, item);
   }
 
   addSubItem(subItem: ITabInfoOptions<AdministrationItemContentProps>) {
