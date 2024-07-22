@@ -18,6 +18,10 @@ export const TableWhereFilter: PlaceholderComponent<ITableHeaderPlaceholderProps
   const translate = useTranslate();
   const state = useWhereFilter(model, resultIndex);
 
+  if (!state.supported) {
+    return null;
+  }
+
   return (
     <Container className={styles.imbeddedEditor}>
       <InlineEditor

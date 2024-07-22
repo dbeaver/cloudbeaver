@@ -82,6 +82,7 @@ export * from './TableViewer/TableFooter/TableFooterMenu/TableFooterMenuService'
 
 export * from './ContainerDataSource';
 export * from './ResultSet/ResultSetDataSource';
+export * from './ResultSet/isResultSetDataModel';
 export * from './DataPresentationService';
 export * from './DataViewerDataChangeConfirmationService';
 export * from './ValuePanelPresentation/BooleanValue/isBooleanValuePresentationAvailable';

@@ -10,31 +10,30 @@ import type { ResultDataFormat } from '@cloudbeaver/core-sdk';
 import { ITabInfo, ITabInfoOptions, TabsContainer } from '@cloudbeaver/core-ui';
 
 import type { IDatabaseDataModel } from '../../DatabaseDataModel/IDatabaseDataModel';
-import type { IDatabaseDataResult } from '../../DatabaseDataModel/IDatabaseDataResult';
 
 export interface IDataValuePanelOptions {
   dataFormat: ResultDataFormat[];
 }
 
-export interface IDataValuePanelProps<TOptions, TResult extends IDatabaseDataResult = IDatabaseDataResult> {
+export interface IDataValuePanelProps {
   dataFormat: ResultDataFormat | null;
-  model: IDatabaseDataModel<TOptions, TResult>;
+  model: IDatabaseDataModel;
   resultIndex: number;
 }
 
 @injectable()
 export class DataValuePanelService {
-  readonly tabs: TabsContainer<IDataValuePanelProps<any>, IDataValuePanelOptions>;
+  readonly tabs: TabsContainer<IDataValuePanelProps, IDataValuePanelOptions>;
 
   constructor() {
     this.tabs = new TabsContainer('Value Panel');
   }
 
-  get(tabId: string): ITabInfo<IDataValuePanelProps<any>, IDataValuePanelOptions> | undefined {
+  get(tabId: string): ITabInfo<IDataValuePanelProps, IDataValuePanelOptions> | undefined {
     return this.tabs.getTabInfo(tabId);
   }
 
-  getDisplayed(props?: IDataValuePanelProps<any>): Array<ITabInfo<IDataValuePanelProps<any>, IDataValuePanelOptions>> {
+  getDisplayed(props?: IDataValuePanelProps): Array<ITabInfo<IDataValuePanelProps, IDataValuePanelOptions>> {
     return this.tabs.tabInfoList.filter(
       info =>
         (props?.dataFormat === undefined || props.dataFormat === null || info.options?.dataFormat.includes(props.dataFormat)) &&
@@ -42,7 +41,7 @@ export class DataValuePanelService {
     );
   }
 
-  add(tabInfo: ITabInfoOptions<IDataValuePanelProps<any>, IDataValuePanelOptions>): void {
+  add(tabInfo: ITabInfoOptions<IDataValuePanelProps, IDataValuePanelOptions>): void {
     this.tabs.add(tabInfo);
   }
 }

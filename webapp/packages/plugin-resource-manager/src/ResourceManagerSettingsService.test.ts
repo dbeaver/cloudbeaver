@@ -50,8 +50,8 @@ const newSettings = {
 };
 
 test('New settings equal deprecated settings A', async () => {
-  const settings = app.injector.getServiceByClass(ResourceManagerSettingsService);
-  const config = app.injector.getServiceByClass(ServerConfigResource);
+  const settings = app.serviceProvider.getService(ResourceManagerSettingsService);
+  const config = app.serviceProvider.getService(ServerConfigResource);
 
   server.use(endpoint.query('serverConfig', mockServerConfig(newSettings)));
 
@@ -62,8 +62,8 @@ test('New settings equal deprecated settings A', async () => {
 });
 
 test('New settings equal deprecated settings B', async () => {
-  const settings = app.injector.getServiceByClass(ResourceManagerSettingsService);
-  const config = app.injector.getServiceByClass(ServerConfigResource);
+  const settings = app.serviceProvider.getService(ResourceManagerSettingsService);
+  const config = app.serviceProvider.getService(ServerConfigResource);
 
   server.use(endpoint.query('serverConfig', mockServerConfig(deprecatedSettings)));
 

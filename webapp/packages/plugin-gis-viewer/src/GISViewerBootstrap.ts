@@ -9,7 +9,7 @@ import { lazy } from 'react';
 
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { ResultDataFormat } from '@cloudbeaver/core-sdk';
-import { DataValuePanelService, ResultSetSelectAction } from '@cloudbeaver/plugin-data-viewer';
+import { DataValuePanelService, isResultSetDataSource, ResultSetSelectAction } from '@cloudbeaver/plugin-data-viewer';
 
 import { ResultSetGISAction } from './ResultSetGISAction';
 
@@ -28,17 +28,20 @@ export class GISViewerBootstrap extends Bootstrap {
   register(): void | Promise<void> {
     this.dataValuePanelService.add({
       key: 'gis-presentation',
-      options: { dataFormat: [ResultDataFormat.Resultset] },
+      options: {
+        dataFormat: [ResultDataFormat.Resultset],
+      },
       name: 'gis_presentation_title',
       order: 10,
       panel: () => GISViewer,
       isHidden: (_, context) => {
-        if (!context || !context.model.source.hasResult(context.resultIndex)) {
+        const source = context?.model.source as any;
+        if (!isResultSetDataSource(source) || !context || !source.hasResult(context.resultIndex)) {
           return true;
         }
 
-        const selection = context.model.source.getAction(context.resultIndex, ResultSetSelectAction);
-        const gis = context.model.source.getAction(context.resultIndex, ResultSetGISAction);
+        const selection = source.getAction(context.resultIndex, ResultSetSelectAction);
+        const gis = source.getAction(context.resultIndex, ResultSetGISAction);
 
         const activeElements = selection.getActiveElements();
 

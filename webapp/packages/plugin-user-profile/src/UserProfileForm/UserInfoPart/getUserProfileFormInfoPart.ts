@@ -17,7 +17,7 @@ const DATA_CONTEXT_USER_PROFILE_FORM_INFO_PART = createDataContext<UserProfileFo
 export function getUserProfileFormInfoPart(formState: IFormState<IUserProfileFormState>): UserProfileFormInfoPart {
   return formState.getPart(DATA_CONTEXT_USER_PROFILE_FORM_INFO_PART, context => {
     const di = context.get(DATA_CONTEXT_DI_PROVIDER)!;
-    const userInfoResource = di.getServiceByClass(UserInfoResource);
+    const userInfoResource = di.getService(UserInfoResource);
 
     return new UserProfileFormInfoPart(formState, userInfoResource);
   });

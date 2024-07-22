@@ -15,10 +15,6 @@ export abstract class DatabaseDataAction<TOptions, TResult extends IDatabaseData
   result!: TResult;
   resultIndex: number;
 
-  get empty(): boolean {
-    return !this.result.data;
-  }
-
   readonly source: IDatabaseDataSource<TOptions, TResult>;
 
   constructor(source: IDatabaseDataSource<TOptions, TResult>) {

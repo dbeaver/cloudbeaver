@@ -10,5 +10,10 @@ import type { SqlResultSet } from '@cloudbeaver/core-sdk';
 import type { IDatabaseDataResult } from './IDatabaseDataResult';
 
 export interface IDatabaseResultSet extends IDatabaseDataResult {
+  totalCount: number | null;
+  updateRowCount: number;
+  projectId: string;
+  connectionId: string;
+  contextId: string;
   data: SqlResultSet | undefined;
 }

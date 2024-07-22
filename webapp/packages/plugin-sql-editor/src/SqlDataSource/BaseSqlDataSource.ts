@@ -10,9 +10,9 @@ import { action, computed, makeObservable, observable, toJS } from 'mobx';
 import type { IConnectionExecutionContextInfo } from '@cloudbeaver/core-connections';
 import { ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
 import { isContainsException, isValuesEqual, staticImplements } from '@cloudbeaver/core-utils';
-import type { IDatabaseDataModel, IDatabaseResultSet } from '@cloudbeaver/plugin-data-viewer';
+import type { IDatabaseDataModel } from '@cloudbeaver/plugin-data-viewer';
 
-import type { IDataQueryOptions } from '../QueryDataSource';
+import type { QueryDataSource } from '../QueryDataSource';
 import { ESqlDataSourceFeatures } from './ESqlDataSourceFeatures';
 import type { ISetScriptData, ISqlDataSource, ISqlDataSourceKey, ISqlEditorCursor } from './ISqlDataSource';
 import type { ISqlDataSourceHistory } from './SqlDataSourceHistory/ISqlDataSourceHistory';
@@ -32,7 +32,7 @@ export abstract class BaseSqlDataSource implements ISqlDataSource {
 
   abstract get baseExecutionContext(): IConnectionExecutionContextInfo | undefined;
   abstract get executionContext(): IConnectionExecutionContextInfo | undefined;
-  databaseModels: IDatabaseDataModel<IDataQueryOptions, IDatabaseResultSet>[];
+  databaseModels: IDatabaseDataModel<QueryDataSource>[];
   incomingScript: string | undefined;
   incomingExecutionContext: IConnectionExecutionContextInfo | undefined | null;
   exception?: Error | Error[] | null | undefined;
@@ -81,7 +81,7 @@ export abstract class BaseSqlDataSource implements ISqlDataSource {
   readonly history: ISqlDataSourceHistory;
   readonly onUpdate: ISyncExecutor;
   readonly onSetScript: ISyncExecutor<ISetScriptData>;
-  readonly onDatabaseModelUpdate: ISyncExecutor<IDatabaseDataModel<IDataQueryOptions, IDatabaseResultSet>[]>;
+  readonly onDatabaseModelUpdate: ISyncExecutor<IDatabaseDataModel<QueryDataSource>[]>;
 
   protected outdated: boolean;
   protected editing: boolean;

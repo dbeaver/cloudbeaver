@@ -10,11 +10,7 @@
     "outDir": "dist",
     "tsBuildInfoFile": "dist/tsconfig.tsbuildinfo"
   },
-  "references": [
-    {
-      "path": "../core-blocks/tsconfig.json"
-    }
-  ],
+  "references": [],
   "include": [
     "__custom_mocks__/**/*",
     "src/**/*",

@@ -10,7 +10,7 @@ import { observer } from 'mobx-react-lite';
 import { s, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import { useTabLocalState } from '@cloudbeaver/core-ui';
 import { CaptureViewScope } from '@cloudbeaver/core-view';
-import { DataPresentationComponent, IDatabaseResultSet, TableViewerLoader } from '@cloudbeaver/plugin-data-viewer';
+import { DataPresentationComponent, isResultSetDataModel, TableViewerLoader } from '@cloudbeaver/plugin-data-viewer';
 
 import { DEFAULT_GROUPING_QUERY_OPERATION } from './DEFAULT_GROUPING_QUERY_OPERATION';
 import styles from './DVResultSetGroupingPresentation.module.css';
@@ -19,10 +19,14 @@ import type { IDVResultSetGroupingPresentationState } from './IDVResultSetGroupi
 import { useGroupingDataModel } from './useGroupingDataModel';
 import { useGroupingDnDColumns } from './useGroupingDnDColumns';
 
-export const DVResultSetGroupingPresentation: DataPresentationComponent<any, IDatabaseResultSet> = observer(function DVResultSetGroupingPresentation({
-  model: originalModel,
+export const DVResultSetGroupingPresentation: DataPresentationComponent = observer(function DVResultSetGroupingPresentation({
+  model: unknownModel,
   resultIndex,
 }) {
+  const originalModel = unknownModel as any;
+  if (!isResultSetDataModel(originalModel)) {
+    throw new Error('DVResultSetGroupingPresentation can only be used with ResultSetDataSource');
+  }
   const state = useTabLocalState<IDVResultSetGroupingPresentationState>(() => ({
     presentationId: '',
     valuePresentationId: null,

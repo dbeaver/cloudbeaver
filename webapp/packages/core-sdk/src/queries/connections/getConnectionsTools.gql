@@ -1,0 +1,5 @@
+query getConnectionsTools($projectId: ID, $connectionId: ID!) {
+  connections: userConnections(projectId: $projectId, id: $connectionId) {
+    ...DatabaseConnectionTools
+  }
+}
