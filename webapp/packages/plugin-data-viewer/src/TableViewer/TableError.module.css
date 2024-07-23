@@ -28,7 +28,6 @@
 .errorBody {
   display: flex;
   gap: 24px;
-  align-items: center;
   margin-bottom: 24px;
 }
 .errorMessage {
@@ -55,7 +54,9 @@
   & .iconOrImage {
     cursor: pointer;
   }
-
+  &.animated {
+    overflow: hidden;
+  }
   & .errorMessage,
   & .controls {
     display: none;
@@ -63,7 +64,7 @@
 }
 
 .animated {
-  overflow: hidden;
+  overflow: auto;
   pointer-events: auto;
   opacity: 1;
 }
