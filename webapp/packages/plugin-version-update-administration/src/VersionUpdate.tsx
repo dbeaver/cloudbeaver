@@ -7,10 +7,11 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import type { AdministrationItemContentComponent } from '@cloudbeaver/core-administration';
+import type { AdministrationItemContentProps } from '@cloudbeaver/core-administration';
 import { ColoredContainer, s, useResource, useS } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { CachedMapAllKey } from '@cloudbeaver/core-resource';
+import { TabContainerPanelComponent } from '@cloudbeaver/core-ui';
 import { VersionResource, VersionService } from '@cloudbeaver/core-version';
 import { VersionUpdateService } from '@cloudbeaver/core-version-update';
 
@@ -18,7 +19,7 @@ import { VersionChecker } from './VersionChecker';
 import { VersionSelector } from './VersionSelector';
 import styles from './VersionUpdate.module.css';
 
-export const VersionUpdate: AdministrationItemContentComponent = observer(function VersionUpdate() {
+export const VersionUpdate: TabContainerPanelComponent<AdministrationItemContentProps> = observer(function VersionUpdate() {
   const style = useS(styles);
   const versionService = useService(VersionService);
   const versionUpdateService = useService(VersionUpdateService);
