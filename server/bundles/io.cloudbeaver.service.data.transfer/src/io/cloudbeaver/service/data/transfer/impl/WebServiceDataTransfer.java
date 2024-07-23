@@ -368,6 +368,9 @@ public class WebServiceDataTransfer implements DBWServiceDataTransfer {
             consumer.setContainerMapping(databaseMappingContainer);
             try {
                 producer.transferData(monitor, consumer, processorInstance, producerSettings, null);
+                if (monitor.isCanceled()) {
+                    throw new DBWebException("Import is canceled");
+                }
             } catch (DBException e) {
                 throw new DBWebException("Import failed cause: " + e.getMessage());
             }

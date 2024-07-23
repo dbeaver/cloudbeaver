@@ -40,6 +40,7 @@ export * from './ContainerResource';
 export * from './ConnectionsLocaleService';
 export * from './createConnectionFolderParam';
 export * from './DatabaseAuthModelsResource';
+export * from './ConnectionPublicSecretsResource';
 export * from './DatabaseConnection';
 export * from './DBDriverResource';
 export * from './CONNECTION_INFO_PARAM_SCHEMA';

@@ -30,5 +30,8 @@ export default [
 
   ['plugin_connections_connection_form_shared_credentials_manage_info', 'Вы можете указать учетные данные в '],
   ['plugin_connections_connection_form_shared_credentials_manage_info_tab_link', 'во вкладке "Учетные данные"'],
-  ['plugin_connections_connection_auth_secret_description', 'Выберете учетные данные, предоставленные одной из ваших команд'],
+  [
+    'plugin_connections_connection_auth_secret_description',
+    'У вас есть несколько учетных записей для авторизации.\nВыберите учетную запись из списка.',
+  ],
 ];
