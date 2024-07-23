@@ -55,7 +55,6 @@ export type ConnectionInitConfig = Omit<
   | 'includeCredentialsSaved'
   | 'includeProperties'
   | 'includeProviderProperties'
-  | 'includeSharedSecrets'
   | 'customIncludeOptions'
 >;
 export type ConnectionInfoIncludes = Omit<GetUserConnectionsQueryVariables, 'id'>;
@@ -595,7 +594,6 @@ export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoPar
       includeCredentialsSaved: false,
       includeProperties: false,
       includeProviderProperties: false,
-      includeSharedSecrets: false,
       customIncludeOptions: false,
     };
   }

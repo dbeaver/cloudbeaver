@@ -23,7 +23,7 @@ import {
   useS,
   useTranslate,
 } from '@cloudbeaver/core-blocks';
-import { ConnectionInfoResource, type IConnectionInfoParams } from '@cloudbeaver/core-connections';
+import { ConnectionInfoResource, ConnectionPublicSecretsResource, type IConnectionInfoParams } from '@cloudbeaver/core-connections';
 
 import style from './DatabaseSecretAuthDialog.m.css';
 
@@ -37,7 +37,7 @@ export const DatabaseSecretAuthDialog = observer<Props>(function DatabaseSecretA
   const translate = useTranslate();
   const connectionInfoLoader = useResource(DatabaseSecretAuthDialog, ConnectionInfoResource, {
     key: connectionKey,
-    includes: ['includeAuthNeeded', 'includeSharedSecrets', 'includeNetworkHandlersConfig', 'includeCredentialsSaved'],
+    includes: ['includeAuthNeeded', 'includeNetworkHandlersConfig', 'includeCredentialsSaved'],
   });
   const state = useObservableRef(
     () => ({
@@ -50,7 +50,8 @@ export const DatabaseSecretAuthDialog = observer<Props>(function DatabaseSecretA
     },
     false,
   );
-  const secrets = connectionInfoLoader.data?.sharedSecrets || [];
+  const connectionPublicSecretsLoader = useResource(DatabaseSecretAuthDialog, ConnectionPublicSecretsResource, connectionKey);
+  const secrets = connectionPublicSecretsLoader.data || [];
 
   async function handleSecretSelect(secretId: string) {
     try {
