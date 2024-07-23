@@ -10,7 +10,6 @@ mutation createConnectionFromNode(
   $includeAuthNeeded: Boolean!
   $includeProperties: Boolean!
   $includeProviderProperties: Boolean!
-  $includeSharedSecrets: Boolean!
   $customIncludeOptions: Boolean!
 ) {
   connection: copyConnectionFromNode(projectId: $projectId, nodePath: $nodePath, config: $config) {

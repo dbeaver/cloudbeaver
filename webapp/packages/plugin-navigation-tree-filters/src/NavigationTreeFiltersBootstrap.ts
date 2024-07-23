@@ -10,7 +10,7 @@ import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { LocalizationService } from '@cloudbeaver/core-localization';
-import { DATA_CONTEXT_NAV_NODE, NavTreeResource, NodeManagerUtils } from '@cloudbeaver/core-navigation-tree';
+import { DATA_CONTEXT_NAV_NODE, ENodeFeature, NavTreeResource, NodeManagerUtils } from '@cloudbeaver/core-navigation-tree';
 import { DATA_CONTEXT_MENU, MenuBaseItem, MenuService } from '@cloudbeaver/core-view';
 
 import { MENU_NAVIGATION_TREE_FILTERS } from './MENU_NAVIGATION_TREE_FILTERS';
@@ -38,7 +38,7 @@ export class NavigationTreeFiltersBootstrap extends Bootstrap {
       isApplicable: context => {
         const node = context.get(DATA_CONTEXT_NAV_NODE)!;
 
-        if (!node.folder || !NodeManagerUtils.isDatabaseObject(node.id)) {
+        if (!node.features?.includes(ENodeFeature.canFilter)) {
           return false;
         }
 
