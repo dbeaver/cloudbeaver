@@ -95,7 +95,6 @@ public class RPAuthProvider implements SMAuthProviderExternal<SMSession>, SMSign
         }
 
         if (CommonUtils.isNotEmpty(fullName)) {
-            nameBuilder = new StringBuilder(fullName);
             userMeta.put(SMStandardMeta.META_FULL_NAME, fullName);
         }
 

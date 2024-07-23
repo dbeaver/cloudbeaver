@@ -15,7 +15,7 @@
             <propertyGroup label="Main">
                 <property id="firstName" label="First Name" type="string" description="User first name"/>
                 <property id="lastName" label="Last Name" type="string" description="User last name"/>
-                <property id="fullName" label="Full Name" type="string" description="Full name"/>
+                <property id="fullName" label="Full Name" type="string" description="User Full name"/>
             </propertyGroup>
         </metaParameters>
     </extension>
