@@ -113,7 +113,7 @@ public class RPSessionHandler implements DBWSessionHandler {
                     credentials.put(SMStandardMeta.META_LAST_NAME, lastName);
                 }
                 if (!CommonUtils.isEmpty(fullName)) {
-                    credentials.put(SMStandardMeta.META_FULL_NAME, fullName);
+                    credentials.put("fullName", fullName);
                 }
                 if (CommonUtils.isNotEmpty(logoutUrl)) {
                     credentials.put("logoutUrl", logoutUrl);

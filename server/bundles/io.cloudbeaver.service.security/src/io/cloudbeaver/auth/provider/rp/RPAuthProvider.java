@@ -83,7 +83,7 @@ public class RPAuthProvider implements SMAuthProviderExternal<SMSession>, SMSign
         Map<String, String> userMeta = new HashMap<>();
         String firstName = JSONUtils.getString(authParameters, SMStandardMeta.META_FIRST_NAME);
         String lastName = JSONUtils.getString(authParameters, SMStandardMeta.META_LAST_NAME);
-        String fullName = JSONUtils.getString(authParameters, SMStandardMeta.META_FULL_NAME);
+        String fullName = JSONUtils.getString(authParameters, "fullName");
         if (CommonUtils.isNotEmpty(firstName)) {
             nameBuilder.append(firstName);
             userMeta.put(SMStandardMeta.META_FIRST_NAME, firstName);
@@ -95,7 +95,7 @@ public class RPAuthProvider implements SMAuthProviderExternal<SMSession>, SMSign
         }
 
         if (CommonUtils.isNotEmpty(fullName)) {
-            userMeta.put(SMStandardMeta.META_FULL_NAME, fullName);
+            nameBuilder = new StringBuilder(fullName);
         }
 
         return new DBWUserIdentity(
