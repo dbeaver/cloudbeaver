@@ -88,8 +88,8 @@ export const Administration = observer<React.PropsWithChildren<Props>>(function 
   const optionsPanelService = useService(OptionsPanelService);
 
   const OptionsPanel = optionsPanelService.getPanelComponent();
-  const items = administrationItemService.getActiveItems(configurationWizard);
-  const onlyActiveItem = items.find(filterOnlyActive(configurationWizard));
+  const visibleItems = administrationItemService.getActiveItems(configurationWizard);
+  const onlyActiveItem = administrationItemService.items.find(filterOnlyActive(configurationWizard));
 
   useLayoutEffect(() => {
     contentRef.current?.scrollTo({ top: 0, left: 0 });
@@ -101,7 +101,7 @@ export const Administration = observer<React.PropsWithChildren<Props>>(function 
       <TabsState currentTabId={activeScreen?.item} localState={administrationScreenService.itemState} orientation="vertical">
         <SContext registry={tabsRegistry}>
           <TabList aria-label="Administration items" vertical>
-            {items.map(item => (
+            {visibleItems.map(item => (
               <DrawerItem
                 key={item.name}
                 item={item}

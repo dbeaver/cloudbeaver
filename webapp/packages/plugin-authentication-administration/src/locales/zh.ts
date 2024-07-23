@@ -22,7 +22,7 @@ export default [
   ['authentication_administration_user_auth_methods_empty', 'No available auth methods'],
   ['authentication_administration_user_auth_method_no_details', 'No details available'],
   ['authentication_administration_user_local', 'Local user'],
-  ['authentication_administration_item', '访问管理'],
+  ['authentication_administration_item', 'Users and Teams'],
   ['authentication_administration_item_users', '用户'],
   ['authentication_administration_item_metaParameters', '元参数'],
   ['authentication_administration_tools_add_tooltip', 'Create new user'],

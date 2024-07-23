@@ -61,14 +61,6 @@ export const ProductInfoDialog = observer<DialogComponentProps<null>>(function P
                 <FormFieldDescription className={s(styles, { formFieldDescription: true })} label={translate('app_product_info_description')}>
                   {productInfo.description}
                 </FormFieldDescription>
-                {productInfo.licenseInfo && (
-                  <FormFieldDescription className={s(styles, { formFieldDescription: true })} label={translate('app_product_info_license_info')}>
-                    {productInfo.licenseInfo}
-                  </FormFieldDescription>
-                )}
-                <FormFieldDescription className={s(styles, { formFieldDescription: true })} label={translate('app_product_info_build_time')}>
-                  {productInfo.buildTime}
-                </FormFieldDescription>
                 <FormFieldDescription className={s(styles, { formFieldDescription: true })} label="Backend version">
                   {productInfo.version}
                 </FormFieldDescription>
