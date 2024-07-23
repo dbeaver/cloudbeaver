@@ -54,7 +54,9 @@
   & .iconOrImage {
     cursor: pointer;
   }
-
+  &.animated {
+    overflow: hidden;
+  }
   & .errorMessage,
   & .controls {
     display: none;
@@ -62,6 +64,7 @@
 }
 
 .animated {
+  overflow: auto;
   pointer-events: auto;
   opacity: 1;
 }
