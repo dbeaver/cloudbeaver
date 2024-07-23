@@ -48,7 +48,7 @@
     @include mdc-switch-toggled-on-track-color($mdc-switch-baseline-theme-color, $query);
     @include mdc-switch-toggled-on-thumb-color($mdc-switch-baseline-theme-color, $query);
     @include mdc-switch-toggled-off-track-color($mdc-switch-toggled-off-track-color, $query);
-    @include mdc-switch-toggled-off-thumb-color($mdc-switch-toggled-off-thumb-color, $query);
+    @include mdc-switch-toggled-off-thumb-color(lighten($mdc-switch-toggled-off-thumb-color, 5%), $query);
   }
 }
 
