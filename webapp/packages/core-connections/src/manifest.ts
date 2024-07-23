@@ -30,5 +30,6 @@ export const manifest: PluginManifest = {
     () => import('./ConnectionInfoEventHandler').then(m => m.ConnectionInfoEventHandler),
     () => import('./ConnectionFolderEventHandler').then(m => m.ConnectionFolderEventHandler),
     () => import('./ConnectionsSettingsService').then(m => m.ConnectionsSettingsService),
+    () => import('./ConnectionPublicSecretsResource').then(m => m.ConnectionPublicSecretsResource),
   ],
 };
