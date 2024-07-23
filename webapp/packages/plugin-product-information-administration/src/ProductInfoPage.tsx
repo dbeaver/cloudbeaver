@@ -7,7 +7,12 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import { type AdministrationItemContentComponent, AdministrationItemContentProps } from '@cloudbeaver/core-administration';
+import {
+  type AdministrationItemContentComponent,
+  AdministrationItemContentProps,
+  AdministrationItemService,
+  filterOnlyActive,
+} from '@cloudbeaver/core-administration';
 import { s, SContext, StyleRegistry, ToolsPanel, useS } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { ITabData, TabList, TabPanelList, TabPanelStyles, TabsState, TabStyles, TabTitleStyles } from '@cloudbeaver/core-ui';
@@ -30,6 +35,9 @@ export const ProductInfoPage: AdministrationItemContentComponent = observer(func
   const productInfoNavigationService = useService(ProductInfoNavigationService);
   const styles = useS(style, tabStyle);
   const productInfoService = useService(ProductInfoService);
+  const administrationItemService = useService(AdministrationItemService);
+  const onlyActiveItem = administrationItemService.items.find(filterOnlyActive(configurationWizard));
+  const disabledTabs = Boolean(onlyActiveItem && onlyActiveItem.filterOnlyActive?.(configurationWizard, item));
 
   function openSub(data: ITabData<AdministrationItemContentProps>) {
     productInfoNavigationService.navigateToSub({ sub: data.tabId });
@@ -46,7 +54,12 @@ export const ProductInfoPage: AdministrationItemContentComponent = observer(func
     >
       <ToolsPanel bottomBorder>
         <SContext registry={mainTabsRegistry}>
-          <TabList className={s(styles, { tabList: true, administrationTabs: true })} aria-label="Product Info Administration pages" underline />
+          <TabList
+            disabled={disabledTabs}
+            className={s(styles, { tabList: true, administrationTabs: true })}
+            aria-label="Product Info Administration pages"
+            underline
+          />
         </SContext>
       </ToolsPanel>
       <SContext registry={tabPanelRegistry}>
