@@ -62,7 +62,7 @@ export default [
   ['connections_connection_name', 'Название подключения'],
   ['connections_connection_access_user_or_team_name', 'Имя пользователя или команды'],
   ['connections_connection_access_filter_placeholder', 'Поиск по имени пользователя или команде'],
-  ['connections_connection_access_admin_info', 'Администраторы видят все подключения.'],
+  ['connections_connection_access_admin_info', 'Администраторы видят все подключения, кроме приватных подключений других пользователей.'],
   ['connections_connection_description', 'Описание'],
   ['connections_connection_project', 'Проект'],
   ['connections_connection_driver', 'Драйвер'],
