@@ -59,7 +59,7 @@ export class ConnectionsAdministrationService extends Bootstrap {
     this.administrationItemService.create({
       name: 'connections',
       type: AdministrationItemType.Administration,
-      order: 2.2,
+      order: 5,
       configurationWizardOptions: {
         defaultRoute: { sub: 'create' },
         description: 'connections_administration_configuration_wizard_step_description',

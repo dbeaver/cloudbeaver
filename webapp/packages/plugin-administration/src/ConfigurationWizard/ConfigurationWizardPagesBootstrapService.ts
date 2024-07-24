@@ -49,7 +49,7 @@ export class ConfigurationWizardPagesBootstrapService extends Bootstrap {
         onFinish: this.serverConfigurationService.saveConfiguration.bind(this.serverConfigurationService, false),
         onConfigurationFinish: this.serverConfigurationService.saveConfiguration.bind(this.serverConfigurationService, true),
       },
-      order: 4,
+      order: 2,
       onActivate: () => this.serverConfigurationService.activate(),
       onDeActivate: this.serverConfigurationService.deactivate.bind(this.serverConfigurationService),
       onLoad: this.serverConfigurationService.loadConfig.bind(this.serverConfigurationService, false),

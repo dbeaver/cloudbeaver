@@ -1,5 +1,5 @@
 {
-  "name": "@cloudbeaver/plugin-version-update-administration",
+  "name": "@cloudbeaver/plugin-product-information-administration",
   "sideEffects": [
     "src/**/*.css",
     "src/**/*.scss",
@@ -21,15 +21,12 @@
     "@cloudbeaver/core-blocks": "^0",
     "@cloudbeaver/core-di": "^0",
     "@cloudbeaver/core-localization": "^0",
-    "@cloudbeaver/core-resource": "^0",
-    "@cloudbeaver/core-root": "^0",
     "@cloudbeaver/core-ui": "^0",
     "@cloudbeaver/core-version": "^0",
     "@cloudbeaver/core-version-update": "^0",
-    "@cloudbeaver/plugin-product-information-administration": "^0",
+    "mobx": "^6",
     "mobx-react-lite": "^4",
-    "react": "^18",
-    "react-markdown": "^9"
+    "react": "^18"
   },
   "peerDependencies": {},
   "devDependencies": {

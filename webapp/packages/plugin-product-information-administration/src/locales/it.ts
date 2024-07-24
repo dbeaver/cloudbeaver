@@ -5,8 +5,4 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-
-// TODO: same styles cloudbeaver/webapp/packages/plugin-product-information-administration/src/shared/ProductInfoPageTabPanel.module.css
-.tabPanel {
-  overflow: auto;
-}
+export default [['administration_settings_menu_title', 'Product Information']];
