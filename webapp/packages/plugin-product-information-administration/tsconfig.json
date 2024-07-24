@@ -19,12 +19,6 @@
       "path": "../core-localization/tsconfig.json"
     },
     {
-      "path": "../core-resource/tsconfig.json"
-    },
-    {
-      "path": "../core-root/tsconfig.json"
-    },
-    {
       "path": "../core-ui/tsconfig.json"
     },
     {
@@ -32,9 +26,6 @@
     },
     {
       "path": "../core-version/tsconfig.json"
-    },
-    {
-      "path": "../plugin-product-information-administration/tsconfig.json"
     }
   ],
   "include": [

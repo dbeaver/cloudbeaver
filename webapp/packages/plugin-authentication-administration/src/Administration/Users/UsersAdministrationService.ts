@@ -52,7 +52,7 @@ export class UsersAdministrationService extends Bootstrap {
   register() {
     this.administrationItemService.create({
       name: UsersAdministrationNavigationService.ItemName,
-      order: 3,
+      order: 4,
       sub: [
         {
           name: EUsersAdministrationSub.MetaProperties,

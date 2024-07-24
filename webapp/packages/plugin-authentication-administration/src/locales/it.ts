@@ -22,7 +22,7 @@ export default [
   ['authentication_administration_user_auth_methods', 'Auth Methods'],
   ['authentication_administration_user_auth_methods_empty', 'No available auth methods'],
   ['authentication_administration_user_auth_method_no_details', 'No details available'],
-  ['authentication_administration_item', 'Utenti'],
+  ['authentication_administration_item', 'Users and Teams'],
   ['authentication_administration_tools_add_tooltip', 'Create new user'],
   ['authentication_administration_tools_refresh_tooltip', 'Aggiorna la lista utenti'],
   ['authentication_administration_tools_delete_tooltip', 'Elimina gli utenti selezionati'],
