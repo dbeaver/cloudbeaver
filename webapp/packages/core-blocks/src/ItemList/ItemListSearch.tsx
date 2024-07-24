@@ -19,13 +19,13 @@ interface IProps {
   onChange?: (value: string) => void;
   onSearch?: (value: string) => void;
   className?: string;
-  alwaysShowSearchIcon?: boolean;
+  permanentSearchIcon?: boolean;
 }
 
 export const ItemListSearch: React.FC<IProps> = function ItemListSearch({
   value,
   placeholder,
-  alwaysShowSearchIcon,
+  permanentSearchIcon,
   disabled,
   onChange,
   onSearch,
@@ -40,7 +40,7 @@ export const ItemListSearch: React.FC<IProps> = function ItemListSearch({
         value={value}
         disabled={disabled}
         placeholder={translate(placeholder || 'ui_search')}
-        manualApply={alwaysShowSearchIcon}
+        permanentSearchIcon={permanentSearchIcon}
         onSearch={onSearch}
         onChange={onChange}
       />

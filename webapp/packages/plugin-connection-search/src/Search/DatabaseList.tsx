@@ -46,7 +46,7 @@ export const DatabaseList = observer<Props>(function DatabaseList({ databases, h
         value={hosts}
         placeholder={translate('connections_administration_search_database_tip')}
         disabled={disabled}
-        alwaysShowSearchIcon
+        permanentSearchIcon
         onChange={onChange}
         onSearch={searchHandler}
       />
