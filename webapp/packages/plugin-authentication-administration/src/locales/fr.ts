@@ -23,7 +23,7 @@ export default [
   ['authentication_administration_user_auth_methods', "Méthodes d'authentification"],
   ['authentication_administration_user_auth_methods_empty', "Aucune méthode d'authentification disponible"],
   ['authentication_administration_user_auth_method_no_details', 'Aucun détail disponible'],
-  ['authentication_administration_item', 'Gestion des accès'],
+  ['authentication_administration_item', 'Users and Teams'],
   ['authentication_administration_item_users', 'Utilisateurs'],
   ['authentication_administration_item_metaParameters', 'Paramètres Méta'],
   ['authentication_administration_tools_add_tooltip', 'Créer un nouvel utilisateur'],

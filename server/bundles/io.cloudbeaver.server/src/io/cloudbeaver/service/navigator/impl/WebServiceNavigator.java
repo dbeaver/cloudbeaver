@@ -220,9 +220,6 @@ public class WebServiceNavigator implements DBWServiceNavigator {
             if (node == null) {
                 throw new DBWebException("Navigator node '"  + nodePath + "' not found");
             }
-            if (!(node instanceof DBNDatabaseFolder)) {
-                throw new DBWebException("Invalid navigator node type: "  + node.getClass().getName());
-            }
             DBSObjectFilter filter = new DBSObjectFilter();
             if (!CommonUtils.isEmpty(include)) {
                 filter.setInclude(include);
@@ -231,11 +228,11 @@ public class WebServiceNavigator implements DBWServiceNavigator {
                 filter.setExclude(exclude);
             }
             filter.setEnabled(true);
-            ((DBNDatabaseFolder) node).setNodeFilter(
-                ((DBNDatabaseFolder) node).getItemsMeta(), filter, true);
+            ((DBNDatabaseNode) node).setNodeFilter(
+                ((DBNDatabaseNode) node).getItemsMeta(), filter, true);
             if (hasNodeEditPermission(webSession, node, ((WebProjectImpl) node.getOwnerProject()).getRmProject())) {
                 // Save settings
-                ((DBNDatabaseFolder) node).getDataSourceContainer().persistConfiguration();
+                ((DBNDatabaseNode) node).getDataSourceContainer().persistConfiguration();
             }
         } catch (DBException e) {
             if (e instanceof DBWebException) {

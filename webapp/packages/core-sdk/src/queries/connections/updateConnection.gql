@@ -9,7 +9,6 @@ mutation updateConnection(
   $includeAuthNeeded: Boolean!
   $includeProperties: Boolean!
   $includeProviderProperties: Boolean!
-  $includeSharedSecrets: Boolean!
   $customIncludeOptions: Boolean!
 ) {
   connection: updateConnection(projectId: $projectId, config: $config) {

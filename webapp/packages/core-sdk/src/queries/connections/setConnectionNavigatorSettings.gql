@@ -10,7 +10,6 @@ mutation setConnectionNavigatorSettings(
   $includeAuthNeeded: Boolean!
   $includeProperties: Boolean!
   $includeProviderProperties: Boolean!
-  $includeSharedSecrets: Boolean!
   $customIncludeOptions: Boolean!
 ) {
   connection: setConnectionNavigatorSettings(projectId: $projectId, id: $connectionId, settings: $settings) {
