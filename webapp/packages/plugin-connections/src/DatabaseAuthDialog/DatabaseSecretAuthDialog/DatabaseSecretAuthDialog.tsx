@@ -17,10 +17,15 @@ import {
   ListItem,
   ListItemName,
   Loader,
+  s,
   useObservableRef,
   useResource,
+  useS,
+  useTranslate,
 } from '@cloudbeaver/core-blocks';
-import { ConnectionInfoResource, type IConnectionInfoParams } from '@cloudbeaver/core-connections';
+import { ConnectionInfoResource, ConnectionPublicSecretsResource, type IConnectionInfoParams } from '@cloudbeaver/core-connections';
+
+import style from './DatabaseSecretAuthDialog.m.css';
 
 interface Props {
   connectionKey: IConnectionInfoParams;
@@ -28,9 +33,11 @@ interface Props {
 }
 
 export const DatabaseSecretAuthDialog = observer<Props>(function DatabaseSecretAuthDialog({ connectionKey, onLogin }) {
+  const styles = useS(style);
+  const translate = useTranslate();
   const connectionInfoLoader = useResource(DatabaseSecretAuthDialog, ConnectionInfoResource, {
     key: connectionKey,
-    includes: ['includeAuthNeeded', 'includeSharedSecrets', 'includeNetworkHandlersConfig', 'includeCredentialsSaved'],
+    includes: ['includeAuthNeeded', 'includeNetworkHandlersConfig', 'includeCredentialsSaved'],
   });
   const state = useObservableRef(
     () => ({
@@ -43,7 +50,8 @@ export const DatabaseSecretAuthDialog = observer<Props>(function DatabaseSecretA
     },
     false,
   );
-  const secrets = connectionInfoLoader.data?.sharedSecrets || [];
+  const connectionPublicSecretsLoader = useResource(DatabaseSecretAuthDialog, ConnectionPublicSecretsResource, connectionKey);
+  const secrets = connectionPublicSecretsLoader.data || [];
 
   async function handleSecretSelect(secretId: string) {
     try {
@@ -76,13 +84,15 @@ export const DatabaseSecretAuthDialog = observer<Props>(function DatabaseSecretA
           ))}
         </ItemList>
       </CommonDialogBody>
-      {state.exception && (
-        <CommonDialogFooter>
-          <Group secondary vertical dense>
+      <CommonDialogFooter>
+        <Group secondary vertical dense>
+          {state.exception ? (
             <ExceptionMessage exception={state.exception} inline />
-          </Group>
-        </CommonDialogFooter>
-      )}
+          ) : (
+            <span className={s(styles, { infoMessage: true })}>{translate('plugin_connections_connection_auth_secret_description')}</span>
+          )}
+        </Group>
+      </CommonDialogFooter>
     </>
   );
 });

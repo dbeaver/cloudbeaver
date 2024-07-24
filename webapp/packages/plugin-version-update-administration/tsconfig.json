@@ -32,6 +32,9 @@
     },
     {
       "path": "../core-version/tsconfig.json"
+    },
+    {
+      "path": "../plugin-product-information-administration/tsconfig.json"
     }
   ],
   "include": [
