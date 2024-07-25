@@ -24,6 +24,7 @@ interface Props<T = Record<string, any>> {
   component?: React.FC<TabProps & T>;
   className?: string;
   disabled?: boolean;
+  closeOnMouseWheelClick?: boolean;
   onOpen?: (tab: ITabData<any>) => void;
   onClose?: (tab: ITabData<any>) => void;
 }
@@ -33,6 +34,7 @@ export function TabDefault<T = Record<string, any>>({
   icon,
   name,
   component,
+  closeOnMouseWheelClick,
   className,
   disabled,
   onOpen,
@@ -48,6 +50,7 @@ export function TabDefault<T = Record<string, any>>({
     return (
       <TabContext.Provider value={tabContext}>
         <TabComponent
+          closeOnMouseWheelClick={closeOnMouseWheelClick}
           tabId={tabId}
           className={className}
           {...(rest as unknown as T)}
@@ -61,7 +64,15 @@ export function TabDefault<T = Record<string, any>>({
   }
 
   return (
-    <Tab tabId={tabId} className={className} selected={selected} disabled={disabled} onOpen={onOpen} onClose={onClose}>
+    <Tab
+      closeOnMouseWheelClick={closeOnMouseWheelClick}
+      tabId={tabId}
+      className={className}
+      selected={selected}
+      disabled={disabled}
+      onOpen={onOpen}
+      onClose={onClose}
+    >
       {icon && <TabIcon icon={icon} />}
       {name && (
         <TabTitle>

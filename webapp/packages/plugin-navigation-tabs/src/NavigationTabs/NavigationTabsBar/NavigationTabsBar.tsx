@@ -92,7 +92,7 @@ export const NavigationTabsBar = observer<Props>(function NavigationTabsBar({ cl
           tabs={
             <SContext registry={tabsRegistry}>
               {navigation.tabIdList.map(tabId => (
-                <TabHandlerTab key={tabId} tabId={tabId} onSelect={handleSelect} onClose={handleClose} />
+                <TabHandlerTab key={tabId} tabId={tabId} closeOnMouseWheelClick onSelect={handleSelect} onClose={handleClose} />
               ))}
             </SContext>
           }

@@ -18,10 +18,11 @@ import { DATA_CONTEXT_SQL_EDITOR_RESULT_ID } from './DATA_CONTEXT_SQL_EDITOR_RES
 interface Props {
   result: ISqlEditorResultTab;
   className?: string;
+  closeOnMouseWheelClick?: boolean;
   onClose?: (tab: ITabData) => Promise<void>;
 }
 
-export const SqlResultTab = observer<Props>(function SqlResultTab({ result, className, onClose }) {
+export const SqlResultTab = observer<Props>(function SqlResultTab({ result, className, onClose, closeOnMouseWheelClick }) {
   const viewContext = useContext(CaptureViewContext);
   const tabMenuContext = useDataContext(viewContext);
 
@@ -30,7 +31,15 @@ export const SqlResultTab = observer<Props>(function SqlResultTab({ result, clas
   });
 
   return (
-    <Tab key={result.id} tabId={result.id} title={result.name} menuContext={tabMenuContext} className={className} onClose={onClose}>
+    <Tab
+      key={result.id}
+      closeOnMouseWheelClick={closeOnMouseWheelClick}
+      tabId={result.id}
+      title={result.name}
+      menuContext={tabMenuContext}
+      className={className}
+      onClose={onClose}
+    >
       <TabIcon icon={result.icon} />
       <TabTitle>{result.name}</TabTitle>
     </Tab>

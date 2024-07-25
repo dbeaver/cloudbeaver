@@ -101,7 +101,7 @@ export const SqlResultTabs = observer<Props>(function SqlDataResult({ state, onT
         <SContext registry={registry}>
           <TabList className={s(style, { tabListNotExecutable: !executable })} aria-label="SQL Results">
             {orderedTabs.map(result => (
-              <SqlResultTab key={result.id} result={result} />
+              <SqlResultTab key={result.id} result={result} closeOnMouseWheelClick />
             ))}
           </TabList>
         </SContext>
