@@ -28,7 +28,7 @@ export const Tab = observer<TabProps>(function Tab(props) {
   const canClose = getComputed(() => !!onClose || (tab.closable && tab.state.closable));
 
   function onAuxClickHandler(event: React.MouseEvent<HTMLDivElement>) {
-    if (event.button === 1 && props.closeOnMouseWheelClick) {
+    if (event.button === 1 && props.closeOnMouseWheelClick && canClose) {
       tab.handleClose(event);
     }
   }
