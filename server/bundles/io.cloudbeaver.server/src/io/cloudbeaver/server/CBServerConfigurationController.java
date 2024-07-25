@@ -332,28 +332,21 @@ public abstract class CBServerConfigurationController<T extends CBServerConfig>
 
     protected void saveRuntimeConfig(SMCredentialsProvider credentialsProvider) throws DBException {
         saveRuntimeConfig(
-            serverConfiguration.getServerName(),
-            serverConfiguration.getServerURL(),
-            serverConfiguration.getMaxSessionIdleTime(),
+            serverConfiguration,
             appConfiguration,
             credentialsProvider
         );
     }
 
     protected void saveRuntimeConfig(
-        String newServerName,
-        String newServerURL,
-        long sessionExpireTime,
-        CBAppConfig appConfig,
+        @NotNull CBServerConfig serverConfig,
+        @NotNull CBAppConfig appConfig,
         SMCredentialsProvider credentialsProvider
     ) throws DBException {
-        if (newServerName == null) {
+        if (serverConfig.getServerName() == null) {
             throw new DBException("Invalid server configuration, server name cannot be empty");
         }
-        Map<String, Object> configurationProperties = collectConfigurationProperties(newServerName,
-            newServerURL,
-            sessionExpireTime,
-            appConfig);
+        Map<String, Object> configurationProperties = collectConfigurationProperties(serverConfig, appConfig);
         writeRuntimeConfig(getRuntimeAppConfigPath(), configurationProperties);
     }
 
@@ -382,18 +375,13 @@ public abstract class CBServerConfigurationController<T extends CBServerConfig>
     }
 
     protected Map<String, Object> collectConfigurationProperties(
-        String newServerName,
-        String newServerURL,
-        long sessionExpireTime,
-        CBAppConfig appConfig
+        @NotNull CBServerConfig serverConfig,
+        @NotNull CBAppConfig appConfig
     ) {
         Map<String, Object> rootConfig = new LinkedHashMap<>();
         {
             var originServerConfig = BaseWebApplication.getServerConfigProps(this.originalConfigurationProperties); // get server properties from original configuration file
-            var serverConfigProperties = collectServerConfigProperties(newServerName,
-                newServerURL,
-                sessionExpireTime,
-                originServerConfig);
+            var serverConfigProperties = collectServerConfigProperties(serverConfig, originServerConfig);
             rootConfig.put("server", serverConfigProperties);
         }
         {
@@ -511,28 +499,26 @@ public abstract class CBServerConfigurationController<T extends CBServerConfig>
 
     @NotNull
     protected Map<String, Object> collectServerConfigProperties(
-        String newServerName,
-        String newServerURL,
-        long sessionExpireTime,
+        @NotNull CBServerConfig serverConfig,
         Map<String, Object> originServerConfig
     ) {
         var serverConfigProperties = new LinkedHashMap<String, Object>();
-        if (!CommonUtils.isEmpty(newServerName)) {
+        if (!CommonUtils.isEmpty(serverConfig.getServerName())) {
             copyConfigValue(originServerConfig,
                 serverConfigProperties,
                 CBConstants.PARAM_SERVER_NAME,
-                newServerName);
+                serverConfig.getServerName());
         }
-        if (!CommonUtils.isEmpty(newServerURL)) {
+        if (!CommonUtils.isEmpty(serverConfig.getServerURL())) {
             copyConfigValue(
-                originServerConfig, serverConfigProperties, CBConstants.PARAM_SERVER_URL, newServerURL);
+                originServerConfig, serverConfigProperties, CBConstants.PARAM_SERVER_URL, serverConfig.getServerURL());
         }
-        if (sessionExpireTime > 0) {
+        if (serverConfig.getMaxSessionIdleTime() > 0) {
             copyConfigValue(
                 originServerConfig,
                 serverConfigProperties,
                 CBConstants.PARAM_SESSION_EXPIRE_PERIOD,
-                sessionExpireTime);
+                serverConfig.getMaxSessionIdleTime());
         }
         var productConfigProperties = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
         Map<String, Object> oldProductRuntimeConfig = JSONUtils.getObject(originServerConfig,
