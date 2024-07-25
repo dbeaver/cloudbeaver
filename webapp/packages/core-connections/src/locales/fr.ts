@@ -64,7 +64,7 @@ export default [
   ['connections_connection_name', 'Nom de la connexion'],
   ['connections_connection_access_user_or_team_name', "Nom de l'utilisateur ou de l'équipe"],
   ['connections_connection_access_filter_placeholder', "Rechercher un nom d'utilisateur ou d'équipe"],
-  ['connections_connection_access_admin_info', 'Les administrateurs voient toutes les connexions.'],
+  ['connections_connection_access_admin_info', "Les administrateurs voient toutes les connexions à l'exception des connexions privées des autres utilisateurs."],
   ['connections_connection_description', 'Description'],
   ['connections_connection_project', 'Projet'],
   ['connections_connection_driver', 'Pilote'],
