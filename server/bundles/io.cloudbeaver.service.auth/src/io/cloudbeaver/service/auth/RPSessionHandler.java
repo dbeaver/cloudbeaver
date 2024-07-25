@@ -97,6 +97,7 @@ public class RPSessionHandler implements DBWSessionHandler {
         String role = request.getHeader(resolveParam(paramConfigMap.get(RPConstants.PARAM_ROLE_NAME), RPAuthProvider.X_ROLE_TE));
         String firstName = request.getHeader(resolveParam(paramConfigMap.get(RPConstants.PARAM_FIRST_NAME), RPAuthProvider.X_FIRST_NAME));
         String lastName = request.getHeader(resolveParam(paramConfigMap.get(RPConstants.PARAM_LAST_NAME), RPAuthProvider.X_LAST_NAME));
+        String fullName = request.getHeader(resolveParam(paramConfigMap.get(RPConstants.PARAM_FULL_NAME), RPAuthProvider.X_FULL_NAME));
         String logoutUrl = Objects.requireNonNull(configuration).getParameter(RPConstants.PARAM_LOGOUT_URL);
         String teamDelimiter = JSONUtils.getString(configuration.getParameters(),
                 RPConstants.PARAM_TEAM_DELIMITER, "\\|");
@@ -110,6 +111,9 @@ public class RPSessionHandler implements DBWSessionHandler {
                 }
                 if (!CommonUtils.isEmpty(lastName)) {
                     credentials.put(SMStandardMeta.META_LAST_NAME, lastName);
+                }
+                if (!CommonUtils.isEmpty(fullName)) {
+                    credentials.put("fullName", fullName);
                 }
                 if (CommonUtils.isNotEmpty(logoutUrl)) {
                     credentials.put("logoutUrl", logoutUrl);

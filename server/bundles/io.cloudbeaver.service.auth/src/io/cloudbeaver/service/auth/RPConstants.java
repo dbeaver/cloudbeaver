@@ -22,6 +22,7 @@ interface RPConstants {
     String PARAM_TEAM = "team-header";
     String PARAM_FIRST_NAME = "first-name-header";
     String PARAM_LAST_NAME = "last-name-header";
+    String PARAM_FULL_NAME = "full-name-header";
     String PARAM_ROLE_NAME = "role-header";
     String PARAM_TEAM_DELIMITER = "team-delimiter";
 }
