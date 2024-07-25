@@ -77,6 +77,7 @@ public class ReverseProxyConfigurator implements DBWServiceServerConfigurator {
             parameters.put(RPConstants.PARAM_TEAM, RPAuthProvider.X_TEAM);
             parameters.put(RPConstants.PARAM_FIRST_NAME, RPAuthProvider.X_FIRST_NAME);
             parameters.put(RPConstants.PARAM_LAST_NAME, RPAuthProvider.X_LAST_NAME);
+            parameters.put(RPConstants.PARAM_FULL_NAME, RPAuthProvider.X_FULL_NAME);
             smReverseProxyProviderConfiguration.setParameters(parameters);
             authApplication.getAuthConfiguration().addAuthProviderConfiguration(smReverseProxyProviderConfiguration );
             try {
