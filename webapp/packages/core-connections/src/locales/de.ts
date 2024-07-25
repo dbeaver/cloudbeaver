@@ -42,7 +42,7 @@ export default [
   ['connections_connection_name', 'Verbindungsname'],
   ['connections_connection_access_user_or_team_name', 'Benutzer- oder Teamname'],
   ['connections_connection_access_filter_placeholder', 'Suchen Sie nach dem Benutzer- oder Teamnamen'],
-  ['connections_connection_access_admin_info', 'Administratoren sehen alle Verbindungen.'],
+  ['connections_connection_access_admin_info', 'Administratoren sehen alle Verbindungen außer den privaten Verbindungen anderer Benutzer.'],
   ['connections_connection_description', 'Beschreibung'],
   ['connections_connection_project', 'Projekt'],
   ['connections_connection_test_tooltip', 'Testverbindung'],
