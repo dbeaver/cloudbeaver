@@ -28,7 +28,7 @@ export const Tab = observer<TabProps>(function Tab(props) {
   const canClose = getComputed(() => !!onClose || (tab.closable && tab.state.closable));
 
   function onMouseUpHandler(event: React.MouseEvent<HTMLDivElement>) {
-    if (event.button === 1 && props.closeOnMouseWheelClick && canClose) {
+    if (event.button === 1 && canClose) {
       tab.handleClose(event);
     }
   }

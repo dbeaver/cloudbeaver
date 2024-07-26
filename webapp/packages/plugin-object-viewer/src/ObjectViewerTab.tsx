@@ -16,12 +16,7 @@ import { useNode } from '@cloudbeaver/plugin-navigation-tree';
 
 import type { IObjectViewerTabState } from './IObjectViewerTabState';
 
-export const ObjectViewerTab: TabHandlerTabComponent<IObjectViewerTabState> = observer(function ObjectViewerTab({
-  tab,
-  onSelect,
-  onClose,
-  closeOnMouseWheelClick,
-}) {
+export const ObjectViewerTab: TabHandlerTabComponent<IObjectViewerTabState> = observer(function ObjectViewerTab({ tab, onSelect, onClose }) {
   const viewContext = useContext(CaptureViewContext);
   const tabMenuContext = useDataContext(viewContext);
   const { node } = useNode(tab.handlerState.objectId);
@@ -30,14 +25,7 @@ export const ObjectViewerTab: TabHandlerTabComponent<IObjectViewerTabState> = ob
   const title = node?.name || tab.handlerState.tabTitle;
 
   return (
-    <Tab
-      closeOnMouseWheelClick={closeOnMouseWheelClick}
-      tabId={tab.id}
-      title={title}
-      menuContext={tabMenuContext}
-      onOpen={handleSelect}
-      onClose={handleClose}
-    >
+    <Tab tabId={tab.id} title={title} menuContext={tabMenuContext} onOpen={handleSelect} onClose={handleClose}>
       <TabIcon icon={node?.icon || tab.handlerState.tabIcon} />
       <TabTitle>{title}</TabTitle>
     </Tab>

@@ -26,12 +26,7 @@ import {
 import { DATA_CONTEXT_SQL_EDITOR_TAB } from './DATA_CONTEXT_SQL_EDITOR_TAB';
 import sqlEditorTabStyles from './SqlEditorTab.module.css';
 
-export const SqlEditorTab: TabHandlerTabComponent<ISqlEditorTabState> = observer(function SqlEditorTab({
-  tab,
-  onSelect,
-  onClose,
-  closeOnMouseWheelClick,
-}) {
+export const SqlEditorTab: TabHandlerTabComponent<ISqlEditorTabState> = observer(function SqlEditorTab({ tab, onSelect, onClose }) {
   const viewContext = useContext(CaptureViewContext);
   const tabMenuContext = useDataContext(viewContext);
   const handlerState = tab.handlerState;
@@ -65,14 +60,7 @@ export const SqlEditorTab: TabHandlerTabComponent<ISqlEditorTabState> = observer
   const handleClose = onClose ? ({ tabId }: ITabData<any>) => onClose(tabId) : undefined;
 
   return (
-    <Tab
-      closeOnMouseWheelClick={closeOnMouseWheelClick}
-      tabId={tab.id}
-      title={name}
-      menuContext={tabMenuContext}
-      onOpen={handleSelect}
-      onClose={handleClose}
-    >
+    <Tab tabId={tab.id} title={name} menuContext={tabMenuContext} onOpen={handleSelect} onClose={handleClose}>
       <TabIcon icon={icon} />
       <TabTitle>{name}</TabTitle>
       {isReadonly && isScript && (

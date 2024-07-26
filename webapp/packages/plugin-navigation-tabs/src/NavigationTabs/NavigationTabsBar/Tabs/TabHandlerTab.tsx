@@ -12,16 +12,15 @@ import { useTabHandler } from './useTabHandler';
 
 interface IProps {
   tabId: string;
-  closeOnMouseWheelClick?: boolean;
   onSelect: (tabId: string) => void;
   onClose?: (tabId: string) => void;
 }
 
-export const TabHandlerTab = observer<IProps>(function TabHandlerTab({ tabId, onSelect, onClose, closeOnMouseWheelClick }) {
+export const TabHandlerTab = observer<IProps>(function TabHandlerTab({ tabId, onSelect, onClose }) {
   const tab = useTab(tabId);
   const handler = useTabHandler(tab.handlerId);
 
   const TabHandlerTab = handler.getTabComponent();
 
-  return <TabHandlerTab closeOnMouseWheelClick={closeOnMouseWheelClick} tab={tab} handler={handler} onSelect={onSelect} onClose={onClose} />;
+  return <TabHandlerTab tab={tab} handler={handler} onSelect={onSelect} onClose={onClose} />;
 });

@@ -12,7 +12,6 @@ import type { ITab } from './ITab';
 export interface TabHandlerTabProps<T = any> {
   tab: ITab<T>;
   handler: TabHandler<T>;
-  closeOnMouseWheelClick?: boolean;
   onSelect: (tabId: string) => void;
   onClose?: (tabId: string) => void;
 }

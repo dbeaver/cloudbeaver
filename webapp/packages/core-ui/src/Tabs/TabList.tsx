@@ -27,7 +27,6 @@ export interface TabListProps extends Omit<TabListOptions, keyof TabStateReturn>
   rotated?: boolean;
   underline?: boolean;
   big?: boolean;
-  closeOnMouseWheelClick?: boolean;
   className?: string;
 }
 
@@ -38,7 +37,6 @@ export const TabList = observer<React.PropsWithChildren<TabListProps>>(function 
   rotated,
   underline,
   big,
-  closeOnMouseWheelClick,
   childrenFirst,
   ...props
 }) {
@@ -74,7 +72,6 @@ export const TabList = observer<React.PropsWithChildren<TabListProps>>(function 
                 (tabInfo, key) => (
                   <TabDefault
                     key={key}
-                    closeOnMouseWheelClick={closeOnMouseWheelClick}
                     tabId={key}
                     name={tabInfo.name}
                     icon={tabInfo.icon}

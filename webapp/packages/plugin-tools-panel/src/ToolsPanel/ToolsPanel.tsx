@@ -62,7 +62,7 @@ export const ToolsPanel = observer(function ToolsPanel() {
   return (
     <TabsState currentTabId={state.selectedTabId} container={toolsPanelService.tabsContainer} lazy onChange={handleTabChange}>
       <div className={s(style, { box: true })}>
-        <TabList className={s(style, { tabList: true })} closeOnMouseWheelClick underline />
+        <TabList className={s(style, { tabList: true })} underline />
         <div className={s(style, { contentBox: true })}>
           <TabPanelList />
         </div>

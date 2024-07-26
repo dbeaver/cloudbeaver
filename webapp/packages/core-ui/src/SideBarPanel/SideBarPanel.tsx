@@ -47,7 +47,7 @@ export const SideBarPanel = observer<SideBarPanelProps>(function SideBarPanel({ 
     <SContext registry={sideBarPanelRegistry}>
       <TabsState container={container} lazy>
         <div className={s(style, { box: true })}>
-          <TabList className={s(style, { tabList: true })} closeOnMouseWheelClick underline />
+          <TabList className={s(style, { tabList: true })} underline />
           <div className={s(style, { contentBox: true })}>
             <TabPanelList />
           </div>

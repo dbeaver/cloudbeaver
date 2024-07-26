@@ -18,7 +18,6 @@ export type TabProps = PropsWithChildren<{
   selected?: boolean;
   disabled?: boolean;
   className?: string;
-  closeOnMouseWheelClick?: boolean;
   onOpen?: (tab: ITabData<any>) => void;
   onClose?: (tab: ITabData<any>) => void;
   onClick?: (tabId: string) => void;
