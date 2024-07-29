@@ -2423,14 +2423,9 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
             return null;
         }
         if (activeUserId != null && userId != null && !activeUserId.equals(userId)) {
-            Object message = "User '" + activeUserId + "' is authenticated in '"
+            log.debug("User '" + activeUserId + "' is authenticated in '"
                 + authProvider.getId() + "' auth provider with credentials of user '"
-                + userIdFromCredentials + "'";
-            if (message instanceof Throwable) {
-                log.debug(message.toString(), (Throwable) message);
-            } else {
-                log.debug(message, null);
-            }
+                + userIdFromCredentials + "'");
         }
         if (userId == null && createNewUserIfNotExist) {
             if (!(authProvider.getInstance() instanceof SMAuthProviderExternal<?>)) {
