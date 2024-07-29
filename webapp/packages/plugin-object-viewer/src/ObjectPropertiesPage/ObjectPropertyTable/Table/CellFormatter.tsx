@@ -8,7 +8,7 @@
 import { observer } from 'mobx-react-lite';
 import { useContext, useState } from 'react';
 
-import { getComputed, Icon, s, useMouse, useS, useStateDelay } from '@cloudbeaver/core-blocks';
+import { getComputed, Icon, s, useMouse, useMouseContextMenu, useS, useStateDelay } from '@cloudbeaver/core-blocks';
 import { ConnectionInfoResource, DATA_CONTEXT_CONNECTION } from '@cloudbeaver/core-connections';
 import { useDataContextLink } from '@cloudbeaver/core-data-context';
 import { useService } from '@cloudbeaver/core-di';
@@ -35,6 +35,7 @@ export const Menu = observer<Props>(function Menu({ value, node }) {
   const mouse = useMouse<HTMLDivElement>();
   const [menuOpened, switchState] = useState(false);
   const connection = connectionsInfoResource.getConnectionForNode(node.id);
+  const mouseContextMenu = useMouseContextMenu();
 
   useDataContextLink(menu.context, (context, id) => {
     context.set(DATA_CONTEXT_NAV_NODE, node, id);
@@ -60,14 +61,22 @@ export const Menu = observer<Props>(function Menu({ value, node }) {
       return !menu.available;
     });
 
+  function onContextMenu(event: React.MouseEvent<HTMLDivElement>) {
+    if (mouse.ref) {
+      event.clientX += mouse.ref.clientWidth;
+    }
+
+    mouseContextMenu.handleContextMenuOpen(event);
+  }
+
   return (
-    <div ref={mouse.reference} className={s(styles, { container: true, empty: menuEmpty })} onDoubleClick={openNode}>
+    <div ref={mouse.reference} className={s(styles, { container: true, empty: menuEmpty })} onContextMenu={onContextMenu} onDoubleClick={openNode}>
       <div className={classes.box}>
         <div className={s(styles, { value: true, cellValue: true })} title={value}>
           {value}
         </div>
         {!menuEmpty && (
-          <ContextMenu menu={menu} modal disclosure onVisibleSwitch={switchState}>
+          <ContextMenu mouseContextMenu={mouseContextMenu} menu={menu} modal disclosure onVisibleSwitch={switchState}>
             <div>
               <Icon className={classes.icon} name="snack" viewBox="0 0 16 10" />
             </div>
