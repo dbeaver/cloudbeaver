@@ -27,9 +27,15 @@ export const Tab = observer<TabProps>(function Tab(props) {
   const styles = useS(style);
   const canClose = getComputed(() => !!onClose || (tab.closable && tab.state.closable));
 
+  function onMouseUpHandler(event: React.MouseEvent<HTMLDivElement>) {
+    if (event.button === 1 && canClose) {
+      tab.handleClose(event);
+    }
+  }
+
   return (
     <TabContext.Provider value={tabContext}>
-      <div className={s(styles, { tabOuter: true })}>
+      <div className={s(styles, { tabOuter: true })} onMouseUp={onMouseUpHandler}>
         <div className={s(styles, { tabInner: true, tabInnerSelected: tab.selected })}>
           <TabActions
             className={s(styles, { actions: true })}

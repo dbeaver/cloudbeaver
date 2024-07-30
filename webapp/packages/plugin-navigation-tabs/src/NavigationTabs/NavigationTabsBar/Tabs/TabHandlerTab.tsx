@@ -21,5 +21,6 @@ export const TabHandlerTab = observer<IProps>(function TabHandlerTab({ tabId, on
   const handler = useTabHandler(tab.handlerId);
 
   const TabHandlerTab = handler.getTabComponent();
+
   return <TabHandlerTab tab={tab} handler={handler} onSelect={onSelect} onClose={onClose} />;
 });
