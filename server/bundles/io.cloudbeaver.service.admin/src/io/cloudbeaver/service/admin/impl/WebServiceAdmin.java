@@ -26,10 +26,7 @@ import io.cloudbeaver.model.session.WebAuthInfo;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.model.user.WebUser;
 import io.cloudbeaver.registry.*;
-import io.cloudbeaver.server.CBAppConfig;
-import io.cloudbeaver.server.CBApplication;
-import io.cloudbeaver.server.CBConstants;
-import io.cloudbeaver.server.CBPlatform;
+import io.cloudbeaver.server.*;
 import io.cloudbeaver.service.DBWServiceServerConfigurator;
 import io.cloudbeaver.service.admin.*;
 import io.cloudbeaver.service.security.SMUtils;
@@ -528,11 +525,12 @@ public class WebServiceAdmin implements DBWServiceAdmin {
     public boolean configureServer(WebSession webSession, Map<String, Object> params) throws DBWebException {
         try {
             CBAppConfig appConfig = new CBAppConfig(CBApplication.getInstance().getAppConfiguration());
+            CBServerConfig serverConfig = new CBServerConfig();
+            serverConfig.setServerName(CBApplication.getInstance().getServerName());
+            serverConfig.setServerURL(CBApplication.getInstance().getServerURL());
+            serverConfig.setMaxSessionIdleTime(CBApplication.getInstance().getMaxSessionIdleTime());
             String adminName = null;
             String adminPassword = null;
-            String serverName = CBApplication.getInstance().getServerName();
-            String serverURL = CBApplication.getInstance().getServerURL();
-            long sessionExpireTime = CBApplication.getInstance().getMaxSessionIdleTime();
 
             if (!params.isEmpty()) {    // FE can send an empty configuration
                 var config = new AdminServerConfig(params);
@@ -557,9 +555,9 @@ public class WebServiceAdmin implements DBWServiceAdmin {
 
                 adminName = config.getAdminName();
                 adminPassword = config.getAdminPassword();
-                serverName = config.getServerName();
-                serverURL = config.getServerURL();
-                sessionExpireTime = config.getSessionExpireTime();
+                serverConfig.setServerName(config.getServerName());
+                serverConfig.setServerURL(config.getServerURL());
+                serverConfig.setMaxSessionIdleTime(config.getSessionExpireTime());
             }
 
             if (CommonUtils.isEmpty(adminName)) {
@@ -588,7 +586,7 @@ public class WebServiceAdmin implements DBWServiceAdmin {
             // Patch configuration by services
             for (DBWServiceServerConfigurator wsc : WebServiceRegistry.getInstance().getWebServices(DBWServiceServerConfigurator.class)) {
                 try {
-                    wsc.configureServer(CBApplication.getInstance(), webSession, appConfig);
+                    wsc.configureServer(CBApplication.getInstance(), webSession, serverConfig, appConfig);
                 } catch (Exception e) {
                     log.warn("Error configuring server by web service " + wsc.getClass().getName(), e);
                 }
@@ -597,12 +595,10 @@ public class WebServiceAdmin implements DBWServiceAdmin {
             boolean configurationMode = CBApplication.getInstance().isConfigurationMode();
 
             CBApplication.getInstance().finishConfiguration(
-                serverName,
-                serverURL,
                 adminName,
                 adminPassword,
                 authInfos,
-                sessionExpireTime,
+                serverConfig,
                 appConfig,
                 webSession
             );

@@ -20,7 +20,7 @@ export function useDataViewerCopyHandler() {
     if (!dataViewerService.canCopyData) {
       event?.preventDefault();
 
-      notificationService.logError({
+      notificationService.logInfo({
         title: 'data_viewer_copy_not_allowed',
         message: 'data_viewer_copy_not_allowed_message',
       });

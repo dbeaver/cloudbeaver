@@ -19,15 +19,31 @@ interface IProps {
   onChange?: (value: string) => void;
   onSearch?: (value: string) => void;
   className?: string;
+  permanentSearchIcon?: boolean;
 }
 
-export const ItemListSearch: React.FC<IProps> = function ItemListSearch({ value, placeholder, disabled, onChange, onSearch, className }) {
+export const ItemListSearch: React.FC<IProps> = function ItemListSearch({
+  value,
+  placeholder,
+  permanentSearchIcon,
+  disabled,
+  onChange,
+  onSearch,
+  className,
+}) {
   const styles = useS(style);
   const translate = useTranslate();
 
   return (
     <Container className={s(styles, { listSearch: true }, className)} keepSize>
-      <Filter value={value} disabled={disabled} placeholder={translate(placeholder || 'ui_search')} onSearch={onSearch} onChange={onChange} />
+      <Filter
+        value={value}
+        disabled={disabled}
+        placeholder={translate(placeholder || 'ui_search')}
+        permanentSearchIcon={permanentSearchIcon}
+        onSearch={onSearch}
+        onChange={onChange}
+      />
     </Container>
   );
 };
