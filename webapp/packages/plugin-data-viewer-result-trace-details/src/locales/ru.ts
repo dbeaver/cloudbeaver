@@ -6,6 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 export default [
-  ['plugin_data_viewer_result_trace_details', 'Детализация результата'],
+  ['plugin_data_viewer_result_trace_details', 'Детали'],
+  ['plugin_data_viewer_result_trace_details_tooltip', 'Открыть детали результата'],
   ['plugin_data_viewer_result_trace_no_data_placeholder', 'Детали результата не найдены'],
 ];
