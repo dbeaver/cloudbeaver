@@ -587,8 +587,11 @@ public class CBDatabase {
     }
 
     public static boolean isDefaultH2Configuration(WebDatabaseConfig databaseConfiguration) {
-        var v1DefaultUrl = "jdbc:h2:/opt/cloudbeaver/workspace/.data/" + V1_DB_NAME;
-        var v2DefaultUrl = "jdbc:h2:/opt/cloudbeaver/workspace/.data/" + V2_DB_NAME;
+        var workspace = WebAppUtils.getWebApplication().getWorkspaceDirectory();
+        var v1Path = workspace.resolve(".data").resolve(V1_DB_NAME);
+        var v2Path = workspace.resolve(".data").resolve(V2_DB_NAME);
+        var v1DefaultUrl = "jdbc:h2:" + v1Path;
+        var v2DefaultUrl = "jdbc:h2:" + v2Path;
         return v1DefaultUrl.equals(databaseConfiguration.getUrl())
             || v2DefaultUrl.equals(databaseConfiguration.getUrl());
     }
