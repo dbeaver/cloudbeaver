@@ -1,0 +1,96 @@
+/*
+ * CloudBeaver - Cloud Database Manager
+ * Copyright (C) 2020-2024 DBeaver Corp and others
+ *
+ * Licensed under the Apache License, Version 2.0.
+ * you may not use this file except in compliance with the License.
+ */
+
+.flex {
+  display: flex;
+  flex: 1 1 100%;
+}
+
+.overflow {
+  overflow: auto;
+}
+
+.gapXs {
+  gap: 8px;
+}
+
+.gapMd {
+  gap: 16px;
+}
+
+.gapLg {
+  gap: 24px;
+}
+
+.wrapWrap {
+  flex-wrap: wrap;
+}
+
+.wrapNoWrap {
+  flex-wrap: nowrap;
+}
+
+.wrapWrapReverse {
+  flex-wrap: wrap-reverse;
+}
+
+.directionRow {
+  flex-direction: row;
+}
+
+.directionColumn {
+  flex-direction: column;
+}
+
+.directionRowReverse {
+  flex-direction: row-reverse;
+}
+
+.directionColumnReverse {
+  flex-direction: column-reverse;
+}
+
+.alignStart {
+  align-items: flex-start;
+}
+
+.alignCenter {
+  align-items: center;
+}
+
+.alignEnd {
+  align-items: flex-end;
+}
+
+.alignStretch {
+  align-items: stretch;
+}
+
+.justifyStart {
+  justify-content: flex-start;
+}
+
+.justifyCenter {
+  justify-content: center;
+}
+
+.justifyEnd {
+  justify-content: flex-end;
+}
+
+.justifySpaceBetween {
+  justify-content: space-between;
+}
+
+.justifySpaceAround {
+  justify-content: space-around;
+}
+
+.justifySpaceEvenly {
+  justify-content: space-evenly;
+}
