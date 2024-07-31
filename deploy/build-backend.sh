@@ -2,6 +2,16 @@
 set -Eeo pipefail
 set +u
 
+if [ -z "$MAVEN_COMMON_OPTS" ]; then
+    # We set MAVEN_COMMON_OPTS on Jenkins side. If the variable is not set,
+    # then we are probably running this script locally for dev purposes.
+    MAVEN_OPTS="-T 1C"
+    MAVEN=$(realpath "../../dbeaver-common/mvnw")
+else
+    MAVEN_OPTS="$MAVEN_COMMON_OPTS"
+    MAVEN="mvn"
+fi
+
 # #command line arguments
 # CONFIGURATION_PATH=${1-"../config/sample-databases/DefaultConfiguration"}
 # SAMPLE_DATABASE_PATH=${2-""}
@@ -31,7 +41,7 @@ cd cloudbeaver/deploy
 echo "Build CloudBeaver server"
 
 cd ../server/product/aggregate
-mvn clean verify $MAVEN_COMMON_OPTS -Dheadless-platform
+"$MAVEN" clean verify $MAVEN_OPTS -Dheadless-platform
 if [[ "$?" -ne 0 ]] ; then
   echo 'Could not perform package'; exit $rc
 fi
