@@ -58,6 +58,7 @@
   $mdc-switch-track-height: 10px !global;
   $mdc-switch-thumb-diameter: 14px !global;
   $mdc-switch-ripple-size: 36px !global;
+  $mdc-switch-toggled-off-thumb-color: lighten($mdc-switch-toggled-off-thumb-color, 5%) !global;
 
   $mdc-switch-minimum-size: 24px !global;
   $mdc-switch-maximum-size: $mdc-switch-ripple-size !global;
