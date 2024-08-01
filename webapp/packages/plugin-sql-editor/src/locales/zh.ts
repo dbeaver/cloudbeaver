@@ -10,7 +10,7 @@ export default [
   ['sql_editor_settings_insert_table_aliases_name', 'Insert table aliases (in FROM clause)'],
   ['sql_editor_settings_insert_table_aliases_desc', 'Automatically inserts table aliases'],
   ['sql_editor_menu', 'SQL编辑器'],
-  ['sql_editor_script_editor', 'Editor'],
+  ['sql_editor_script_editor', 'SQL'],
   ['sql_editor_script_editor_tooltip', 'Open SQL Editor'],
   ['sql_editor_alias_loading_error', 'Error occurred while loading node alias'],
   ['sql_editor_restore_message', 'Do you want to restore the connection?'],
