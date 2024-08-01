@@ -5,7 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import React, { forwardRef, useState } from 'react';
+import React, { forwardRef, useRef, useState } from 'react';
 
 import { s } from '../s';
 import { useCombinedRef } from '../useCombinedRef';
@@ -32,6 +32,7 @@ export const Form = forwardRef<HTMLFormElement, FormDetailedProps>(function Form
   const st = useS(styles);
   const [focusedRef] = useFocus<HTMLFormElement>({ focusFirstChild });
   const [disabledLocal, setDisabledLocal] = useState(false);
+  const formLocalRef = useRef<HTMLFormElement | null>(null);
 
   const disabled = disabledLocal || disabledProp || false;
 
@@ -42,6 +43,7 @@ export const Form = forwardRef<HTMLFormElement, FormDetailedProps>(function Form
       try {
         setDisabledLocal(true);
         await onSubmit?.(event);
+        formLocalRef.current?.reset();
       } finally {
         setDisabledLocal(false);
       }
@@ -49,7 +51,7 @@ export const Form = forwardRef<HTMLFormElement, FormDetailedProps>(function Form
     onChange,
   });
 
-  const setFormRef = useCombinedRef<HTMLFormElement>(formContext.setRef, focusedRef, ref);
+  const setFormRef = useCombinedRef<HTMLFormElement>(formLocalRef, formContext.setRef, focusedRef, ref);
 
   if (formContext.parent && formContext.parent !== context) {
     return (
