@@ -54,7 +54,7 @@ export default [
   ['connections_connection_edit_search_hosts', 'Host names'],
   ['connections_connection_address', 'Address'],
   ['connections_connection_folder', 'Folder'],
-  ['connections_connection_folder_validation', "Folder's name may not contain the following symbols / : \" \\ and can't start with a dot"],
+  ['connections_connection_folder_validation', "Folder's name may not contain the following symbols / : \" \\ ' <> | ? * and can't start with a dot"],
   ['connections_connection_name', 'Connection name'],
   ['connections_connection_access_user_or_team_name', 'User or Team name'],
   ['connections_connection_access_filter_placeholder', 'Search for user or team name'],

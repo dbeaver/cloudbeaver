@@ -31,7 +31,7 @@ export interface IConnectionFolderParam {
   folderId: string;
 }
 
-export const CONNECTION_FOLDER_NAME_VALIDATION = /^(?!\.)[^\\/:\\"]+$/u;
+export const CONNECTION_FOLDER_NAME_VALIDATION = /^(?!\.)[^\\/:\\"'<>|?*]+$/u;
 
 export const ConnectionFolderProjectKey = resourceKeyAliasFactory('@connection-folder/project', (projectId: string) => ({ projectId }));
 
