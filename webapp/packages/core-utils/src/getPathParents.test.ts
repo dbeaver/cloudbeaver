@@ -9,11 +9,11 @@ import { describe, expect, it, jest } from '@jest/globals';
 
 import { getPathParents } from './getPathParents';
 
-jest.doMock('./createPath', () => ({
+jest.mock('./createPath', () => ({
   createPath: (...args: string[]) => args.join('/'),
 }));
 
-jest.doMock('./getPathParts', () => ({
+jest.mock('./getPathParts', () => ({
   getPathParts: (path: string) => path.split('/').filter(Boolean),
 }));
 

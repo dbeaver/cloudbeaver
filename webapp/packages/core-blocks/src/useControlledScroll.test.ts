@@ -5,7 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { beforeEach, describe, expect, it, jest } from '@jest/globals';
+import { afterEach, beforeEach, describe, expect, it, jest } from '@jest/globals';
 import { renderHook } from '@testing-library/react';
 
 import { IScrollState, useControlledScroll } from './useControlledScroll';
@@ -13,6 +13,10 @@ import { IScrollState, useControlledScroll } from './useControlledScroll';
 describe('useControlledScroll', () => {
   let element: HTMLDivElement;
   let scrollState: IScrollState;
+
+  afterEach(() => {
+    element.remove();
+  });
 
   beforeEach(() => {
     jest.resetAllMocks();
