@@ -148,6 +148,7 @@ type ServerConfig {
     localHostAddress: String
 
     configurationMode: Boolean!
+    initializationMode: Boolean! @since(version: "24.1.5")
     developmentMode: Boolean!
     redirectOnFederatedAuth: Boolean!
     distributed: Boolean!

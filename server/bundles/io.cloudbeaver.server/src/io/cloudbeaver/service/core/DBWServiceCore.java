@@ -38,7 +38,7 @@ import java.util.Map;
  */
 public interface DBWServiceCore extends DBWService {
 
-    @WebAction(authRequired = false)
+    @WebAction(authRequired = false, initializationRequired = false)
     WebServerConfig getServerConfig() throws DBWebException;
 
     @WebAction(authRequired = false)
