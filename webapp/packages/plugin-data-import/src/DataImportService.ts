@@ -72,7 +72,6 @@ export class DataImportService {
         file,
         event => {
           if (isCancelled) {
-            controller.setMessage('plugin_data_import_process_fail_cancel_message');
             return;
           }
 
