@@ -7,9 +7,9 @@
  */
 import { afterEach, beforeEach, describe, expect, it, jest } from '@jest/globals';
 
-// import { GlobalConstants } from './GlobalConstants';
+import { GlobalConstants } from './GlobalConstants';
 
-// type WindowSpyType = jest.SpiedGetter<Window>;
+type WindowSpyType = jest.SpiedGetter<Window>;
 
 jest.mock('./isValidUrl', () => ({
   isValidUrl: jest.fn().mockReturnValue(false),
@@ -19,119 +19,115 @@ jest.mock('./pathJoin', () => ({
   pathJoin: jest.fn((...args: string[]) => args.reduce((acc, arg) => acc + arg, '')),
 }));
 
-describe('GlobalConstants', () => {
-  // let windowSpy: WindowSpyType;
+describe.skip('GlobalConstants', () => {
+  let windowSpy: WindowSpyType;
 
-  // beforeEach(() => {
-  //   windowSpy = jest.spyOn(window, 'window', 'get');
-  // });
+  beforeEach(() => {
+    windowSpy = jest.spyOn(window, 'window', 'get');
+  });
 
-  // afterEach(() => {
-  //   windowSpy.mockRestore();
-  // });
+  afterEach(() => {
+    windowSpy.mockRestore();
+  });
 
-  // beforeEach(() => {
-  //   (global as any)._DEV_ = true;
-  //   (global as any)._VERSION_ = '1.0.0';
-  //   (global as any)._ROOT_URI_ = '{ROOT_URI}';
+  beforeEach(() => {
+    (global as any)._DEV_ = true;
+    (global as any)._VERSION_ = '1.0.0';
+    (global as any)._ROOT_URI_ = '{ROOT_URI}';
 
-  //   windowSpy.mockImplementation(
-  //     () =>
-  //       ({
-  //         location: {
-  //           protocol: 'http:',
-  //           host: 'localhost',
-  //         },
-  //       }) as any,
-  //   );
-  // });
+    windowSpy.mockImplementation(
+      () =>
+        ({
+          location: {
+            protocol: 'http:',
+            host: 'localhost',
+          },
+        }) as any,
+    );
+  });
 
-  // it('should return correct dev value', () => {
-  //   expect(GlobalConstants.dev).toBe(true);
-  // });
+  it('should return correct dev value', () => {
+    expect(GlobalConstants.dev).toBe(true);
+  });
 
-  // it('should return correct version value', () => {
-  //   expect(GlobalConstants.version).toBe('1.0.0');
-  // });
+  it('should return correct version value', () => {
+    expect(GlobalConstants.version).toBe('1.0.0');
+  });
 
-  // it('should return correct protocol value', () => {
-  //   expect(GlobalConstants.protocol).toBe('http:');
-  // });
+  it('should return correct protocol value', () => {
+    expect(GlobalConstants.protocol).toBe('http:');
+  });
 
-  // it('should return correct host value', () => {
-  //   expect(GlobalConstants.host).toBe('localhost');
-  // });
+  it('should return correct host value', () => {
+    expect(GlobalConstants.host).toBe('localhost');
+  });
 
-  // it('should return correct websocket protocol', () => {
-  //   expect(GlobalConstants.wsProtocol).toBe('ws:');
+  it('should return correct websocket protocol', () => {
+    expect(GlobalConstants.wsProtocol).toBe('ws:');
 
-  //   windowSpy.mockImplementationOnce(
-  //     () =>
-  //       ({
-  //         location: {
-  //           protocol: 'https:',
-  //         },
-  //       }) as any,
-  //   );
+    windowSpy.mockImplementationOnce(
+      () =>
+        ({
+          location: {
+            protocol: 'https:',
+          },
+        }) as any,
+    );
 
-  //   expect(GlobalConstants.wsProtocol).toBe('wss:');
-  // });
+    expect(GlobalConstants.wsProtocol).toBe('wss:');
+  });
 
-  // it('should return correct rootURI value', () => {
-  //   expect(GlobalConstants.rootURI).toBe('/');
+  it('should return correct rootURI value', () => {
+    expect(GlobalConstants.rootURI).toBe('/');
 
-  //   (global as any)._ROOT_URI_ = 'http://localhost:8080';
-  //   (require('./isValidUrl').isValidUrl as jest.Mock).mockReturnValueOnce(true);
+    (global as any)._ROOT_URI_ = 'http://localhost:8080';
+    (require('./isValidUrl').isValidUrl as jest.Mock).mockReturnValueOnce(true);
 
-  //   expect(GlobalConstants.rootURI).toBe('/');
+    expect(GlobalConstants.rootURI).toBe('/');
 
-  //   (global as any)._ROOT_URI_ = '/dbeaver';
-  //   expect(GlobalConstants.rootURI).toBe('/dbeaver/');
-  // });
+    (global as any)._ROOT_URI_ = '/dbeaver';
+    expect(GlobalConstants.rootURI).toBe('/dbeaver/');
+  });
 
-  // it('should return correct serviceURI value', () => {
-  //   expect(GlobalConstants.serviceURI).toBe('/api');
-  // });
+  it('should return correct serviceURI value', () => {
+    expect(GlobalConstants.serviceURI).toBe('/api');
+  });
 
-  // it('should return correct health check url', () => {
-  //   expect(GlobalConstants.getHealthCheckUrl('http://localhost')).toBe('http://localhost/status');
-  //   expect(GlobalConstants.getHealthCheckUrl('')).toBe('/status');
-  // });
+  it('should return correct health check url', () => {
+    expect(GlobalConstants.getHealthCheckUrl('http://localhost')).toBe('http://localhost/status');
+    expect(GlobalConstants.getHealthCheckUrl('')).toBe('/status');
+  });
 
-  // it('should generate absolute root url', () => {
-  //   expect(GlobalConstants.absoluteRootUrl('test/', 'test2')).toBe('/test/test2');
-  // });
+  it('should generate absolute root url', () => {
+    expect(GlobalConstants.absoluteRootUrl('test/', 'test2')).toBe('/test/test2');
+  });
 
-  // it('should generate absolute service url', () => {
-  //   expect(GlobalConstants.absoluteServiceUrl('/test/', 'test2')).toBe('/api/test/test2');
-  // });
+  it('should generate absolute service url', () => {
+    expect(GlobalConstants.absoluteServiceUrl('/test/', 'test2')).toBe('/api/test/test2');
+  });
 
-  // it('should generate absoluteServiceHTTPUrl', () => {
-  //   expect(GlobalConstants.absoluteServiceHTTPUrl('/test/', 'test2')).toBe('http://localhost/api/test/test2');
-  // });
+  it('should generate absoluteServiceHTTPUrl', () => {
+    expect(GlobalConstants.absoluteServiceHTTPUrl('/test/', 'test2')).toBe('http://localhost/api/test/test2');
+  });
 
-  // it('should generate absoluteServiceWSUrl', () => {
-  //   expect(GlobalConstants.absoluteServiceWSUrl('/test/', 'test2')).toBe('ws://localhost/api/test/test2');
+  it('should generate absoluteServiceWSUrl', () => {
+    expect(GlobalConstants.absoluteServiceWSUrl('/test/', 'test2')).toBe('ws://localhost/api/test/test2');
 
-  //   windowSpy.mockImplementationOnce(
-  //     () =>
-  //       ({
-  //         location: {
-  //           protocol: 'https:',
-  //           host: 'localhost',
-  //         },
-  //       }) as any,
-  //   );
+    windowSpy.mockImplementationOnce(
+      () =>
+        ({
+          location: {
+            protocol: 'https:',
+            host: 'localhost',
+          },
+        }) as any,
+    );
 
-  //   expect(GlobalConstants.absoluteServiceWSUrl('/test/', 'test2')).toBe('wss://localhost/api/test/test2');
-  // });
+    expect(GlobalConstants.absoluteServiceWSUrl('/test/', 'test2')).toBe('wss://localhost/api/test/test2');
+  });
 
-  // it('should generate absolute url', () => {
-  //   expect(GlobalConstants.absoluteUrl('test/', 'test2')).toBe('/test/test2');
-  //   expect(GlobalConstants.absoluteUrl('platform:test/', 'test2')).toBe('/apiimagesplatform:test/test2');
-  // });
-
-  it('TODO DELETE THIS', () => {
-    expect(true).toBe(true);
+  it('should generate absolute url', () => {
+    expect(GlobalConstants.absoluteUrl('test/', 'test2')).toBe('/test/test2');
+    expect(GlobalConstants.absoluteUrl('platform:test/', 'test2')).toBe('/apiimagesplatform:test/test2');
   });
 });

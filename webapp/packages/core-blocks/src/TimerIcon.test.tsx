@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 import { describe, expect, it } from '@jest/globals';
-import { queryByAttribute, screen, waitFor } from '@testing-library/react';
+import { queryByAttribute, waitFor } from '@testing-library/react';
 
 import { createApp, renderInApp } from '@cloudbeaver/tests-runner';
 
