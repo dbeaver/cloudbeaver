@@ -22,6 +22,12 @@ You can see live demo of CloudBeaver here: https://demo.cloudbeaver.io
 
 ## Changelog
 
+### 24.1.4. 2024-08-05
+- Redesigned administration navigation panel - now it is more compact and clear;
+- Added the ability to close editor tabs with the middle mouse button;
+- Improved display of the long error messages in the SQL Editor and Log viewer;
+- SQL Editor auto-completion was enhanced to get column, table, and function names faster.
+  
 ### 24.1.3. 2024-07-22
 - Data Editor:
   -    Enhanced IPv6 and DateTime32 data representation for Clickhouse;
