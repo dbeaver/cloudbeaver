@@ -3,14 +3,15 @@ Bundle-ManifestVersion: 2
 Bundle-Vendor: Cloudbeaver Web Service - Security
 Bundle-Vendor: DBeaver Corp
 Bundle-SymbolicName: io.cloudbeaver.service.security;singleton:=true
-Bundle-Version: 1.0.58.qualifier
-Bundle-Release-Date: 20240805
+Bundle-Version: 1.0.59.qualifier
+Bundle-Release-Date: 20240819
 Bundle-RequiredExecutionEnvironment: JavaSE-17
 Bundle-ActivationPolicy: lazy
 Bundle-ClassPath: .
 Require-Bundle: org.jkiss.dbeaver.model;visibility:=reexport,
  org.jkiss.dbeaver.model.jdbc,
  org.jkiss.dbeaver.model.sql,
+ org.jkiss.dbeaver.model.sql.jdbc,
  org.jkiss.dbeaver.registry;visibility:=reexport,
  org.jkiss.bundle.apache.dbcp;visibility:=reexport,
  io.cloudbeaver.model

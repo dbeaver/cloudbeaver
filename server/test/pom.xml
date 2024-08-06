@@ -17,6 +17,11 @@
         <module>io.cloudbeaver.test.platform</module>
     </modules>
 
+    <properties>
+        <!--        <debugArgs>-agentlib:jdwp=transport=dt_socket,server=y,address=localhost:15001,suspend=y</debugArgs>-->
+        <debugArgs></debugArgs>
+    </properties>
+
     <build>
         <plugins>
             <plugin>
@@ -55,7 +60,7 @@
                     <testRuntime>default</testRuntime>
                     <testClass>io.cloudbeaver.test.platform.CEServerTestSuite</testClass>
                     <appArgLine>-web-config workspace/conf/cloudbeaver.conf</appArgLine>
-<!--                    <argLine>-agentlib:jdwp=transport=dt_socket,server=y,address=localhost:5006,suspend=y</argLine>-->
+                    <argLine>-Dlogback.configurationFile=workspace/conf/logback.xml ${debugArgs}</argLine>
                 </configuration>
             </plugin>
         </plugins>
