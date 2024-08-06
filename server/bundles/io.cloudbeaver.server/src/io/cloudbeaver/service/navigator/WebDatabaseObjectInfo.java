@@ -104,7 +104,9 @@ public class WebDatabaseObjectInfo {
 
     @Property
     public String getFullyQualifiedName() {
-        return object instanceof DBPQualifiedObject ? ((DBPQualifiedObject) object).getFullyQualifiedName(DBPEvaluationContext.UI) : getName();
+        return object instanceof DBPQualifiedObject
+            ? ((DBPQualifiedObject) object).getFullyQualifiedName(DBPEvaluationContext.UI)
+            : getName();
     }
 
     @Property
@@ -151,7 +153,7 @@ public class WebDatabaseObjectInfo {
         return features.toArray(new String[0]);
     }
 
-    private static void getObjectFeatures(DBSObject object, List<String> features) {
+    private void getObjectFeatures(DBSObject object, List<String> features) {
         boolean isDiagramSupported = true;
         if (object instanceof DBPScriptObject) features.add(OBJECT_FEATURE_SCRIPT);
         if (object instanceof DBPScriptObjectExt) features.add(OBJECT_FEATURE_SCRIPT_EXTENDED);
@@ -181,7 +183,7 @@ public class WebDatabaseObjectInfo {
             features.add(OBJECT_FEATURE_OBJECT_CONTAINER);
             try {
                 Class<? extends DBSObject> childType = objectContainer.getPrimaryChildType(null);
-                Collection<? extends DBSObject> childrenCollection = objectContainer.getChildren(null);
+                Collection<? extends DBSObject> childrenCollection = objectContainer.getChildren(session.getProgressMonitor());
                 if (DBSTable.class.isAssignableFrom(childType) && childrenCollection != null) {
                     features.add(OBJECT_FEATURE_ENTITY_CONTAINER);
                 }
