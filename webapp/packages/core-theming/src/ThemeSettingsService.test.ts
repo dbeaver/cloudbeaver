@@ -6,7 +6,6 @@
  * you may not use this file except in compliance with the License.
  */
 import { expect, test } from '@jest/globals';
-import '@testing-library/jest-dom';
 
 import { coreClientActivityManifest } from '@cloudbeaver/core-client-activity';
 import { coreEventsManifest } from '@cloudbeaver/core-events';

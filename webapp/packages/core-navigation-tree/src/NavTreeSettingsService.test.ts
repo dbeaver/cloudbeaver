@@ -6,7 +6,6 @@
  * you may not use this file except in compliance with the License.
  */
 import { expect, test } from '@jest/globals';
-import '@testing-library/jest-dom';
 
 import { coreAuthenticationManifest } from '@cloudbeaver/core-authentication';
 import { mockAuthentication } from '@cloudbeaver/core-authentication/dist/__custom_mocks__/mockAuthentication';

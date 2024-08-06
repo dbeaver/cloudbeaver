@@ -6,7 +6,6 @@
  * you may not use this file except in compliance with the License.
  */
 import { beforeAll, describe, expect, test } from '@jest/globals';
-import '@testing-library/jest-dom';
 
 import { coreAdministrationManifest } from '@cloudbeaver/core-administration';
 import { coreAppManifest } from '@cloudbeaver/core-app';
