@@ -9,88 +9,92 @@
 .flex {
   display: flex;
   flex: 1 1 100%;
-}
 
-.overflow {
-  overflow: auto;
-}
+  &[data-s-overflow] {
+    overflow: auto;
+  }
 
-.gapXs {
-  gap: 8px;
-}
+  &[data-s-gap='xs'] {
+    gap: 8px;
+  }
 
-.gapMd {
-  gap: 16px;
-}
+  &[data-s-gap='md'] {
+    gap: 16px;
+  }
 
-.gapLg {
-  gap: 24px;
-}
+  &[data-s-gap='lg'] {
+    gap: 24px;
+  }
 
-.wrapWrap {
-  flex-wrap: wrap;
-}
+  &[data-s-wrap='wrap'] {
+    flex-wrap: wrap;
+  }
 
-.wrapNoWrap {
-  flex-wrap: nowrap;
-}
+  &[data-s-wrap='nowrap'] {
+    flex-wrap: nowrap;
+  }
 
-.wrapWrapReverse {
-  flex-wrap: wrap-reverse;
-}
+  &[data-s-wrap='wrap-reverse'] {
+    flex-wrap: wrap-reverse;
+  }
 
-.directionRow {
-  flex-direction: row;
-}
+  &[data-s-direction='row'] {
+    flex-direction: row;
+  }
 
-.directionColumn {
-  flex-direction: column;
-}
+  &[data-s-direction='column'] {
+    flex-direction: column;
+  }
 
-.directionRowReverse {
-  flex-direction: row-reverse;
-}
+  &[data-s-direction='row-reverse'] {
+    flex-direction: row-reverse;
+  }
 
-.directionColumnReverse {
-  flex-direction: column-reverse;
-}
+  &[data-s-direction='column-reverse'] {
+    flex-direction: column-reverse;
+  }
 
-.alignStart {
-  align-items: flex-start;
-}
+  &[data-s-align='start'] {
+    align-items: flex-start;
+  }
 
-.alignCenter {
-  align-items: center;
-}
+  &[data-s-align='center'] {
+    align-items: center;
+  }
 
-.alignEnd {
-  align-items: flex-end;
-}
+  &[data-s-align='end'] {
+    align-items: flex-end;
+  }
 
-.alignStretch {
-  align-items: stretch;
-}
+  &[data-s-align='stretch'] {
+    align-items: stretch;
+  }
 
-.justifyStart {
-  justify-content: flex-start;
-}
+  &[data-s-justify='start'] {
+    justify-content: flex-start;
+  }
 
-.justifyCenter {
-  justify-content: center;
-}
+  &[data-s-justify='center'] {
+    justify-content: center;
+  }
 
-.justifyEnd {
-  justify-content: flex-end;
-}
+  &[data-s-justify='end'] {
+    justify-content: flex-end;
+  }
 
-.justifySpaceBetween {
-  justify-content: space-between;
-}
+  &[data-s-justify='space-between'] {
+    justify-content: space-between;
+  }
 
-.justifySpaceAround {
-  justify-content: space-around;
-}
+  &[data-s-justify='space-around'] {
+    justify-content: space-around;
+  }
 
-.justifySpaceEvenly {
-  justify-content: space-evenly;
+  &[data-s-justify='space-evenly'] {
+    justify-content: space-evenly;
+  }
+
+  &[data-s-justify='stretch'] {
+    justify-content: stretch;
+  }
 }
