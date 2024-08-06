@@ -5,7 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { describe, expect, it, jest } from '@jest/globals';
+import { afterEach, beforeEach, describe, expect, it, jest } from '@jest/globals';
 
 import { cancellableTimeout } from './cancellableTimeout';
 
@@ -16,7 +16,13 @@ jest.mock('./CancellablePromise', () => ({
 }));
 
 describe('cancellableTimeout', () => {
-  jest.useFakeTimers();
+  beforeEach(() => {
+    jest.useFakeTimers();
+  });
+
+  afterEach(() => {
+    jest.useRealTimers();
+  });
 
   it('resolves after the specified timeout', async () => {
     const timeout = 0;

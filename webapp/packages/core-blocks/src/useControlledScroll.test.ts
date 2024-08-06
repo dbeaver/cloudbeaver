@@ -16,6 +16,7 @@ describe('useControlledScroll', () => {
 
   afterEach(() => {
     element.remove();
+    jest.useRealTimers();
   });
 
   beforeEach(() => {
