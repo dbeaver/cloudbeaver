@@ -27,8 +27,7 @@ export const Flex = forwardRef<HTMLDivElement, Props>(function Flex(
     <div
       ref={ref}
       {...rest}
-      className={s(classes, { flex: true }, className)}
-      data-s-overflow={overflow}
+      className={s(classes, { flex: true, overflow }, className)}
       data-s-gap={gap}
       data-s-wrap={wrap}
       data-s-direction={direction}

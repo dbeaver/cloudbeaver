@@ -10,7 +10,7 @@
   display: flex;
   flex: 1 1 100%;
 
-  &[data-s-overflow] {
+  &.overflow {
     overflow: auto;
   }
 
