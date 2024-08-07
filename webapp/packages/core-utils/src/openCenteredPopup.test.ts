@@ -5,10 +5,14 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
+import { afterEach, beforeEach, describe, expect, it, jest } from '@jest/globals';
+
 import { openCenteredPopup } from './openCenteredPopup';
 
+type WindowSpyType = jest.SpiedGetter<Window>;
+
 describe('openCenteredPopup', () => {
-  let windowSpy: jest.SpyInstance;
+  let windowSpy: WindowSpyType;
   const params = {
     url: 'http://localhost:3000',
     target: 'target',
@@ -37,7 +41,7 @@ describe('openCenteredPopup', () => {
         availWidth: 1000,
       },
       open: jest.fn(),
-    };
+    } as unknown as Window;
 
     windowSpy.mockImplementation(() => windowMock);
 
@@ -56,9 +60,12 @@ describe('openCenteredPopup', () => {
   it('should return null if window.top is null', () => {
     const { url, target, width, height, features } = params;
 
-    windowSpy.mockImplementation(() => ({
-      top: null,
-    }));
+    windowSpy.mockImplementation(
+      () =>
+        ({
+          top: null,
+        }) as Window,
+    );
 
     const result = openCenteredPopup({ url, target, width, height, features });
 
