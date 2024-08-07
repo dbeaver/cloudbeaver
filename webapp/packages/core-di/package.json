@@ -25,7 +25,7 @@
   },
   "peerDependencies": {},
   "devDependencies": {
-    "@types/jest": "^29",
+    "@jest/globals": "^29",
     "@types/react": "^18",
     "typescript": "^5"
   }
