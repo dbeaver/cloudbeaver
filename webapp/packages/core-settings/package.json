@@ -28,8 +28,8 @@
   "devDependencies": {
     "@cloudbeaver/core-executor": "^0",
     "@cloudbeaver/tests-runner": "^0",
+    "@jest/globals": "^29",
     "@testing-library/jest-dom": "^6",
-    "@types/jest": "^29",
     "typescript": "^5"
   }
 }
