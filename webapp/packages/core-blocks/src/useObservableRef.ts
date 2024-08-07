@@ -8,6 +8,8 @@
 import { action, AnnotationsMap, makeObservable, runInAction, untracked } from 'mobx';
 import { useLayoutEffect, useState } from 'react';
 
+import { bindFunctions } from '@cloudbeaver/core-utils';
+
 export function useObservableRef<T extends Record<any, any>>(
   init: () => T & ThisType<T>,
   observed: AnnotationsMap<T, never>,
@@ -96,16 +98,6 @@ export function useObservableRef<T extends Record<any, any>>(
   );
 
   return state;
-}
-
-function bindFunctions<T>(object: T, keys: Array<keyof T>): void {
-  for (const key of keys) {
-    const value = object[key];
-
-    if (typeof value === 'function') {
-      object[key] = value.bind(object);
-    }
-  }
 }
 
 function assign(object: any, update: any): void {

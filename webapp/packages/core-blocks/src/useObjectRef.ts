@@ -7,6 +7,8 @@
  */
 import { useState } from 'react';
 
+import { bindFunctions } from '@cloudbeaver/core-utils';
+
 export function useObjectRef<T extends Record<any, any>>(init: () => T & ThisType<T>, update: false, bind?: Array<keyof T>): T;
 export function useObjectRef<T extends Record<any, any>>(init: () => T & ThisType<T>): T;
 export function useObjectRef<T extends Record<any, any>, U extends Record<any, any>>(
@@ -57,14 +59,4 @@ export function useObjectRef<T extends Record<any, any>, U extends Record<any, a
   }
 
   return ref;
-}
-
-function bindFunctions<T>(object: T, keys: Array<keyof T>): void {
-  for (const key of keys) {
-    const value = object[key];
-
-    if (typeof value === 'function') {
-      object[key] = value.bind(object);
-    }
-  }
 }

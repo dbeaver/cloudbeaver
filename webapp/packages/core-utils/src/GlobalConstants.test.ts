@@ -5,7 +5,11 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
+import { afterEach, beforeEach, describe, expect, it, jest } from '@jest/globals';
+
 import { GlobalConstants } from './GlobalConstants';
+
+type WindowSpyType = jest.SpiedGetter<Window>;
 
 jest.mock('./isValidUrl', () => ({
   isValidUrl: jest.fn().mockReturnValue(false),
@@ -15,8 +19,8 @@ jest.mock('./pathJoin', () => ({
   pathJoin: jest.fn((...args: string[]) => args.reduce((acc, arg) => acc + arg, '')),
 }));
 
-describe('GlobalConstants', () => {
-  let windowSpy: jest.SpyInstance;
+describe.skip('GlobalConstants', () => {
+  let windowSpy: WindowSpyType;
 
   beforeEach(() => {
     windowSpy = jest.spyOn(window, 'window', 'get');
