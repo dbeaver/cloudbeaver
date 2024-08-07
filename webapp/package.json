@@ -33,7 +33,6 @@
     "@testing-library/jest-dom": "^6",
     "@testing-library/react": "^16",
     "@testing-library/user-event": "^14",
-    "@types/jest": "^29",
     "@types/react": "^18",
     "@types/react-dom": "^18",
     "concurrently": "^8",
