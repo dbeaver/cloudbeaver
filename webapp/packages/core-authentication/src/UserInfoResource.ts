@@ -141,7 +141,7 @@ export class UserInfoResource extends CachedDataResource<UserInfo | null, void, 
           },
           1000,
           undefined,
-          300_000, // 5 minutes
+          5 * 60 * 1000,
         );
 
         const authInfo = await activeTask;

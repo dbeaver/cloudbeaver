@@ -22,20 +22,20 @@ export function whileTask<T>(
   let reject: (reason?: any) => void;
   let fulfilled = false;
 
-  let intervalTimeoutId: NodeJS.Timeout | null;
-  let timeoutId: NodeJS.Timeout | null;
-  let activeTask: Promise<T> | null;
+  let intervalTimeoutId: NodeJS.Timeout | null = null;
+  let timeoutId: NodeJS.Timeout | null = null;
+  let activeTask: Promise<T> | null = null;
   let stopped = false;
 
   const lockPromise = new Promise<T>((_resolve, _reject) => {
     resolve = _resolve;
     reject = _reject;
   }).finally(() => {
-    if (intervalTimeoutId) {
+    if (intervalTimeoutId !== null) {
       clearTimeout(intervalTimeoutId);
     }
 
-    if (timeoutId) {
+    if (timeoutId !== null) {
       clearTimeout(timeoutId);
     }
 
@@ -43,7 +43,7 @@ export function whileTask<T>(
   });
 
   function stop() {
-    if (intervalTimeoutId) {
+    if (intervalTimeoutId !== null) {
       clearTimeout(intervalTimeoutId);
     }
     stopped = true;
@@ -63,7 +63,7 @@ export function whileTask<T>(
     reject(exception);
   }
 
-  if (timeout) {
+  if (timeout !== undefined) {
     timeoutId = setTimeout(() => cancelTask(new TimeoutError('Task timeout exceeded')), timeout);
   }
 
