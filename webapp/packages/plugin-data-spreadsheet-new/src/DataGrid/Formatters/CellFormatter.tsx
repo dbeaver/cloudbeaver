@@ -7,9 +7,8 @@
  */
 import { observer } from 'mobx-react-lite';
 import { useContext, useState } from 'react';
-import { useMenuState } from 'reakit';
 
-import { getComputed, s, useMouseContextMenu, useObjectRef, useS } from '@cloudbeaver/core-blocks';
+import { getComputed, s, useObjectRef, useS } from '@cloudbeaver/core-blocks';
 import type { RenderCellProps } from '@cloudbeaver/plugin-data-grid';
 import type { IDataPresentationActions, IResultSetElementKey, IResultSetRowKey } from '@cloudbeaver/plugin-data-viewer';
 
@@ -34,8 +33,6 @@ export const CellFormatter = observer<Props>(function CellFormatter({ className,
   const isEditing = cellContext.isEditing;
   const showCellMenu = getComputed(() => !isEditing && (cellContext.isFocused || cellContext.mouse.state.mouseEnter || menuVisible));
   const styles = useS(style);
-  const menu = useMenuState({ modal: true });
-  const mouseContextMenu = useMouseContextMenu();
 
   const spreadsheetActions = useObjectRef<IDataPresentationActions<IResultSetElementKey>>({
     edit(position) {
@@ -48,25 +45,14 @@ export const CellFormatter = observer<Props>(function CellFormatter({ className,
     },
   });
 
-  function onContextMenu(event: React.MouseEvent<HTMLDivElement>) {
-    if (!showCellMenu) {
-      return;
-    }
-
-    menu.hide();
-    mouseContextMenu.handleContextMenuOpen(event);
-    menu.show();
-  }
-
   return (
-    <div className={s(styles, { wrapper: true }, className)} onContextMenu={onContextMenu}>
+    <div className={s(styles, { wrapper: true }, className)}>
       <div className={s(styles, { container: true })}>
         <CellFormatterFactory {...rest} isEditing={isEditing} />
       </div>
       {showCellMenu && cellContext.cell && (
         <div className={s(styles, { menuContainer: true })}>
           <CellMenu
-            menu={menu}
             cellKey={cellContext.cell}
             model={context.model}
             actions={context.actions}

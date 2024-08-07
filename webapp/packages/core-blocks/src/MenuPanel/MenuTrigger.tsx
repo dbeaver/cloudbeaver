@@ -25,7 +25,6 @@ export type MenuState = MenuStateReturn;
  */
 
 interface IMenuTriggerBaseProps extends Omit<ButtonHTMLAttributes<any>, 'style'> {
-  menu: MenuStateReturn;
   menuRef?: React.RefObject<MenuState | undefined>;
   disclosure?: boolean;
   placement?: MenuInitialState['placement'];
@@ -47,10 +46,11 @@ interface IMenuTriggerProps extends IMenuTriggerBaseProps {
 }
 
 export const MenuTrigger = React.forwardRef<ButtonHTMLAttributes<any>, IMenuTriggerProps | IMenuTriggerLazyProps>(function MenuTrigger(
-  { panel, menuRef, getPanel, menu, disclosure, className, children, placement, visible, onVisibleSwitch, modal, rtl, ...props },
+  { panel, menuRef, getPanel, disclosure, className, children, placement, visible, onVisibleSwitch, modal, rtl, ...props },
   ref,
 ) {
   const propsRef = useObjectRef({ onVisibleSwitch, visible });
+  const menu = useMenuState({ modal, placement, visible, rtl });
   const style = useS(MenuPanelItemAndTriggerStyles);
 
   if (menuRef) {
@@ -220,7 +220,7 @@ interface IMenuInnerTriggerProps extends Omit<React.ButtonHTMLAttributes<any>, '
 
 export const MenuInnerTrigger = observer<IMenuInnerTriggerProps, HTMLButtonElement>(
   forwardRef(function MenuInnerTrigger(props, ref) {
-    const { menuItem, onItemClose, onClick, ...rest } = props;
+    const { menuItem, onItemClose, ...rest } = props;
     const menu = useMenuState();
     const style = useS(MenuPanelItemAndTriggerStyles);
 
@@ -233,18 +233,10 @@ export const MenuInnerTrigger = observer<IMenuInnerTriggerProps, HTMLButtonEleme
       menuItem.onMouseEnter?.();
     }, [menuItem.onMouseEnter]);
 
-    const onMenuButtonClick = useCallback(
-      (event: React.MouseEvent) => {
-        event.stopPropagation();
-        onClick?.(event);
-      },
-      [onClick],
-    );
-
     return (
       <>
         <div className={s(style, { menuPanelButtonWrapper: true })} onMouseEnter={handleMouseEnter}>
-          <MenuButton ref={ref} className={s(style, { menuButton: true })} onClick={onMenuButtonClick} {...menu} {...rest}>
+          <MenuButton ref={ref} className={s(style, { menuButton: true })} {...menu} {...rest}>
             <div className={s(style, { box: true })}>
               <MenuPanelItem className={s(style, { menuPanelItem: true })} menuItem={menuItem} />
             </div>

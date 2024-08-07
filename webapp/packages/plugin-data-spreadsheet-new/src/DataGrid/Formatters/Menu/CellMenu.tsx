@@ -6,7 +6,6 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import { MenuStateReturn } from 'reakit';
 
 import { Icon, MenuPanelItemAndTriggerStyles, MenuTrigger, s, SContext, StyleRegistry, useS } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
@@ -22,7 +21,6 @@ interface Props {
   spreadsheetActions: IDataPresentationActions<IResultSetElementKey>;
   resultIndex: number;
   cellKey: IResultSetElementKey;
-  menu: MenuStateReturn;
   simple: boolean;
   onClick?: () => void;
   onStateSwitch?: (state: boolean) => void;
@@ -43,7 +41,6 @@ export const CellMenu = observer<Props>(function CellMenu({
   actions,
   spreadsheetActions,
   resultIndex,
-  menu,
   cellKey,
   simple,
   onClick,
@@ -74,15 +71,7 @@ export const CellMenu = observer<Props>(function CellMenu({
   return (
     <SContext registry={registry}>
       <div className={s(style, { cellMenu: true })} onMouseUp={markStopPropagation} onDoubleClick={stopPropagation}>
-        <MenuTrigger
-          menu={menu}
-          panel={panel}
-          className={s(style, { menuTrigger: true })}
-          modal={menu.modal}
-          placement={menu.placement}
-          onClick={handleClick}
-          onVisibleSwitch={onStateSwitch}
-        >
+        <MenuTrigger panel={panel} className={s(style, { menuTrigger: true })} modal onClick={handleClick} onVisibleSwitch={onStateSwitch}>
           <Icon className={s(style, { icon: true })} name="snack" viewBox="0 0 16 10" />
         </MenuTrigger>
       </div>
