@@ -5,7 +5,8 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { waitFor } from '@testing-library/react';
+import { afterEach, describe, expect, it } from '@jest/globals';
+import { cleanup, waitFor } from '@testing-library/react';
 
 import { createApp, renderInApp } from '@cloudbeaver/tests-runner';
 
@@ -14,6 +15,10 @@ import { Cell } from './Cell';
 const app = createApp();
 
 describe('Cell', () => {
+  afterEach(() => {
+    cleanup();
+  });
+
   it('should render children correctly', async () => {
     const { getByText } = renderInApp(<Cell>Test Children</Cell>, app);
     const text = await waitFor(() => getByText('Test Children'));

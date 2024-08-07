@@ -89,11 +89,13 @@ export function useForm(options?: IOptions): IFormContext {
       async submit(event) {
         if (this.parent) {
           await this.parent.submit(event);
+          this.ref?.reset();
         } else {
           event?.preventDefault();
 
           if (this.validate()) {
             await this.onSubmit.execute(event);
+            this.ref?.reset();
           }
         }
       },
