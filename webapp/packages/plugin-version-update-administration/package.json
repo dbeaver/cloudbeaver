@@ -26,6 +26,7 @@
     "@cloudbeaver/core-ui": "^0",
     "@cloudbeaver/core-version": "^0",
     "@cloudbeaver/core-version-update": "^0",
+    "@cloudbeaver/plugin-product-information-administration": "^0",
     "mobx-react-lite": "^4",
     "react": "^18",
     "react-markdown": "^9"

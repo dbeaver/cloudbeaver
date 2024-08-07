@@ -39,6 +39,7 @@ import navigationTreeFilters from '@cloudbeaver/plugin-navigation-tree-filters';
 import { navigationTreeRMPlugin } from '@cloudbeaver/plugin-navigation-tree-rm';
 import { objectViewerManifest } from '@cloudbeaver/plugin-object-viewer';
 import productPlugin from '@cloudbeaver/plugin-product';
+import { productInformationPlugin } from '@cloudbeaver/plugin-product-information-administration';
 import projects from '@cloudbeaver/plugin-projects';
 import resourceManager from '@cloudbeaver/plugin-resource-manager';
 import resourceManagerAdministration from '@cloudbeaver/plugin-resource-manager-administration';
@@ -72,6 +73,7 @@ import { defaultProductManifest } from './manifest';
 const PLUGINS: PluginManifest[] = [
   ssoPlugin,
   devTools,
+  productInformationPlugin,
   administration,
   dataSpreadsheetNewManifest,
   dataGridPlugin,

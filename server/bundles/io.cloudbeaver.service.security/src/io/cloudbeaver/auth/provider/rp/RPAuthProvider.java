@@ -49,6 +49,7 @@ public class RPAuthProvider implements SMAuthProviderExternal<SMSession>, SMSign
     public static final String X_ROLE_TE = "X-Role-TE";
     public static final String X_FIRST_NAME = "X-First-name";
     public static final String X_LAST_NAME = "X-Last-name";
+    public static final String X_FULL_NAME = "X-Full-name";
     public static final String AUTH_PROVIDER = "reverseProxy";
     public static final String LOGOUT_URL = "logout-url";
 
@@ -82,6 +83,7 @@ public class RPAuthProvider implements SMAuthProviderExternal<SMSession>, SMSign
         Map<String, String> userMeta = new HashMap<>();
         String firstName = JSONUtils.getString(authParameters, SMStandardMeta.META_FIRST_NAME);
         String lastName = JSONUtils.getString(authParameters, SMStandardMeta.META_LAST_NAME);
+        String fullName = JSONUtils.getString(authParameters, "fullName");
         if (CommonUtils.isNotEmpty(firstName)) {
             nameBuilder.append(firstName);
             userMeta.put(SMStandardMeta.META_FIRST_NAME, firstName);
@@ -90,6 +92,10 @@ public class RPAuthProvider implements SMAuthProviderExternal<SMSession>, SMSign
         if (CommonUtils.isNotEmpty(lastName)) {
             nameBuilder.append(lastName);
             userMeta.put(SMStandardMeta.META_LAST_NAME, lastName);
+        }
+
+        if (CommonUtils.isNotEmpty(fullName)) {
+            nameBuilder = new StringBuilder(fullName);
         }
 
         return new DBWUserIdentity(

@@ -5,9 +5,6 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-.tabTitle {
-  flex: 1;
-}
 
 .icon {
   composes: theme-background-primary from global;
@@ -15,9 +12,4 @@
   height: 8px;
   border-radius: 50%;
   flex-shrink: 0;
-  margin-right: 12px;
-}
-
-.iconOrImage {
-  width: 16px;
 }

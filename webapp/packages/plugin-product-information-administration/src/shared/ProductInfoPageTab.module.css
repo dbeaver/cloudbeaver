@@ -1,0 +1,25 @@
+/*
+ * CloudBeaver - Cloud Database Manager
+ * Copyright (C) 2020-2024 DBeaver Corp and others
+ *
+ * Licensed under the Apache License, Version 2.0.
+ * you may not use this file except in compliance with the License.
+ */
+
+/* TODO: same styles cloudbeaver/webapp/packages/plugin-authentication-administration/src/Administration/Users/shared/UsersAdministrationTab.module.css */
+.administrationTabs {
+  & .tab {
+    height: 100%;
+    font-size: 14px;
+    font-weight: 700;
+    padding: 0 4px;
+  }
+
+  & .tabInner {
+    height: 100%;
+  }
+
+  & .tabOuter {
+    height: 100%;
+  }
+}

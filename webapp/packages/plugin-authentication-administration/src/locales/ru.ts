@@ -23,7 +23,7 @@ export default [
   ['authentication_administration_user_auth_methods', 'Способы входа'],
   ['authentication_administration_user_auth_methods_empty', 'Нет доступных способов входа'],
   ['authentication_administration_user_auth_method_no_details', 'Дополнительная информация не доступна'],
-  ['authentication_administration_item', 'Управление доступом'],
+  ['authentication_administration_item', 'Пользователи и команды'],
   ['authentication_administration_item_users', 'Пользователи'],
   ['authentication_administration_item_metaParameters', 'Свойства Пользователей'],
   ['authentication_administration_tools_add_tooltip', 'Создать нового пользователя'],

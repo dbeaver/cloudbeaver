@@ -5,7 +5,7 @@
     "src/**/*.scss",
     "public/**/*"
   ],
-  "version": "24.1.4",
+  "version": "24.1.5",
   "description": "CloudBeaver Community",
   "license": "Apache-2.0",
   "main": "dist/index.js",
@@ -59,6 +59,7 @@
     "@cloudbeaver/plugin-navigation-tree-rm": "^0",
     "@cloudbeaver/plugin-object-viewer": "^0",
     "@cloudbeaver/plugin-product": "^0",
+    "@cloudbeaver/plugin-product-information-administration": "^0",
     "@cloudbeaver/plugin-projects": "^0",
     "@cloudbeaver/plugin-resource-manager": "^0",
     "@cloudbeaver/plugin-resource-manager-administration": "^0",
