@@ -33,7 +33,7 @@ export class SpreadsheetBootstrap extends Bootstrap {
     exceptionsCatcherService: ExceptionsCatcherService,
   ) {
     super();
-    exceptionsCatcherService.ignore('ResizeObserver loop limit exceeded'); // Produces by react-data-grid
+    exceptionsCatcherService.ignore('ResizeObserver loop completed with undelivered notifications.'); // Produces by react-data-grid
   }
 
   register(): void | Promise<void> {
