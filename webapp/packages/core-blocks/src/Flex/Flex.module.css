@@ -1,0 +1,100 @@
+/*
+ * CloudBeaver - Cloud Database Manager
+ * Copyright (C) 2020-2024 DBeaver Corp and others
+ *
+ * Licensed under the Apache License, Version 2.0.
+ * you may not use this file except in compliance with the License.
+ */
+
+.flex {
+  display: flex;
+  flex: 1 1 100%;
+
+  &.overflow {
+    overflow: auto;
+  }
+
+  &[data-s-gap='xs'] {
+    gap: 8px;
+  }
+
+  &[data-s-gap='md'] {
+    gap: 16px;
+  }
+
+  &[data-s-gap='lg'] {
+    gap: 24px;
+  }
+
+  &[data-s-wrap='wrap'] {
+    flex-wrap: wrap;
+  }
+
+  &[data-s-wrap='nowrap'] {
+    flex-wrap: nowrap;
+  }
+
+  &[data-s-wrap='wrap-reverse'] {
+    flex-wrap: wrap-reverse;
+  }
+
+  &[data-s-direction='row'] {
+    flex-direction: row;
+  }
+
+  &[data-s-direction='column'] {
+    flex-direction: column;
+  }
+
+  &[data-s-direction='row-reverse'] {
+    flex-direction: row-reverse;
+  }
+
+  &[data-s-direction='column-reverse'] {
+    flex-direction: column-reverse;
+  }
+
+  &[data-s-align='start'] {
+    align-items: flex-start;
+  }
+
+  &[data-s-align='center'] {
+    align-items: center;
+  }
+
+  &[data-s-align='end'] {
+    align-items: flex-end;
+  }
+
+  &[data-s-align='stretch'] {
+    align-items: stretch;
+  }
+
+  &[data-s-justify='start'] {
+    justify-content: flex-start;
+  }
+
+  &[data-s-justify='center'] {
+    justify-content: center;
+  }
+
+  &[data-s-justify='end'] {
+    justify-content: flex-end;
+  }
+
+  &[data-s-justify='space-between'] {
+    justify-content: space-between;
+  }
+
+  &[data-s-justify='space-around'] {
+    justify-content: space-around;
+  }
+
+  &[data-s-justify='space-evenly'] {
+    justify-content: space-evenly;
+  }
+
+  &[data-s-justify='stretch'] {
+    justify-content: stretch;
+  }
+}

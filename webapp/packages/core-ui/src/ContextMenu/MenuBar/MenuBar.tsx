@@ -220,7 +220,7 @@ const SubMenuItem = observer<ISubMenuItemProps>(function SubMenuItem({ children,
   const panelAvailable = subMenuData.itemCreators.length > 0;
 
   return (
-    <ContextMenu menu={subMenuData} className={className} rtl={rtl} disclosure {...nestedMenuSettings}>
+    <ContextMenu menu={subMenuData} className={className} rtl={rtl} modal disclosure {...nestedMenuSettings}>
       {({ loading, disabled }) =>
         children || (
           <MenuBarItem
