@@ -34,7 +34,6 @@
     "@cloudbeaver/core-sdk": "^0",
     "@cloudbeaver/core-website": "^0",
     "@cloudbeaver/tests-runner": "^0",
-    "@types/jest": "^29",
     "msw": "^2",
     "typescript": "^5"
   }

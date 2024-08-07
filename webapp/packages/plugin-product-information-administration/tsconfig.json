@@ -19,6 +19,9 @@
       "path": "../core-localization/tsconfig.json"
     },
     {
+      "path": "../core-resource/tsconfig.json"
+    },
+    {
       "path": "../core-ui/tsconfig.json"
     },
     {
