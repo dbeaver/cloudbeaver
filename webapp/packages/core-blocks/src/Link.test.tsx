@@ -5,7 +5,8 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { fireEvent, queryByAttribute, waitFor } from '@testing-library/react';
+import { afterEach, describe, expect, it, jest } from '@jest/globals';
+import { cleanup, fireEvent, queryByAttribute, waitFor } from '@testing-library/react';
 
 import { createApp, renderInApp } from '@cloudbeaver/tests-runner';
 
@@ -14,6 +15,10 @@ import { Link } from './Link';
 const app = createApp();
 
 describe('Link', () => {
+  afterEach(() => {
+    cleanup();
+  });
+
   it('should render link and children correctly', async () => {
     const { getByText } = renderInApp(<Link href="#">Test Link</Link>, app);
     const linkElement = await waitFor(() => getByText('Test Link'));

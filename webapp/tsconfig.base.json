@@ -46,7 +46,7 @@
     "noEmitHelpers": false,
     "importHelpers": true,
 
-    "types": ["reflect-metadata", "node", "jest", "@cloudbeaver/core-cli/global.d.ts"],
+    "types": ["reflect-metadata", "node", "@cloudbeaver/core-cli/global.d.ts"],
     "plugins": [
       {
         // https://github.com/mrmckeb/typescript-plugin-css-modules/issues/222
