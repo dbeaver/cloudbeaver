@@ -33,7 +33,7 @@
   },
   "peerDependencies": {},
   "devDependencies": {
-    "@types/jest": "^29",
+    "@jest/globals": "^29",
     "@types/md5": "^2",
     "@types/underscore": "^1",
     "@types/uuid": "^10",
