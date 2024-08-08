@@ -6,6 +6,6 @@
  * you may not use this file except in compliance with the License.
  */
 .commonDialogWrapper {
-  // override because of the non-english locales and the medium size is too large
+  /* override because of the non-english locales and the medium size is too large */
   width: 440px !important;
 }
