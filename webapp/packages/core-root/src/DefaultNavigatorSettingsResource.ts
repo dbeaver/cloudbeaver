@@ -27,15 +27,7 @@ export class DefaultNavigatorSettingsResource extends CachedDataResource<Default
     super(() => null, undefined, []);
     this.sync(serverConfigResource);
 
-    this.update = {
-      hideFolders: false,
-      hideSchemas: false,
-      hideVirtualModel: false,
-      mergeEntities: false,
-      showOnlyEntities: false,
-      showSystemObjects: false,
-      showUtilityObjects: false,
-    };
+    this.update = getDefaultNavigatorSettings();
 
     makeObservable<this, 'syncUpdateData'>(this, {
       update: observable,
@@ -66,15 +58,7 @@ export class DefaultNavigatorSettingsResource extends CachedDataResource<Default
     if (this.data) {
       Object.assign(this.update, this.data);
     } else {
-      this.update = {
-        hideFolders: false,
-        hideSchemas: false,
-        hideVirtualModel: false,
-        mergeEntities: false,
-        showOnlyEntities: false,
-        showSystemObjects: false,
-        showUtilityObjects: false,
-      };
+      this.update = getDefaultNavigatorSettings();
     }
   }
 
@@ -104,4 +88,16 @@ export class DefaultNavigatorSettingsResource extends CachedDataResource<Default
   private syncUpdateData(defaultNavigatorSettings: DefaultNavigatorSettings) {
     Object.assign(this.update, defaultNavigatorSettings);
   }
+}
+
+function getDefaultNavigatorSettings(): NavigatorSettingsInput {
+  return {
+    hideFolders: false,
+    hideSchemas: false,
+    hideVirtualModel: false,
+    mergeEntities: false,
+    showOnlyEntities: false,
+    showSystemObjects: false,
+    showUtilityObjects: false,
+  };
 }
