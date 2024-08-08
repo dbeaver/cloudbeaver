@@ -530,7 +530,12 @@ public class WebServiceNavigator implements DBWServiceNavigator {
                     DBCExecutionContext executionContext = getCommandExecutionContext(object);
                     DBECommandContext commandContext = new WebCommandContext(executionContext, false);
                     ne.getValue().deleteObject(commandContext, object, options);
-                    commandContext.saveChanges(session.getProgressMonitor(), options);
+                    try {
+                        commandContext.saveChanges(session.getProgressMonitor(), options);
+                    } catch (DBException e) {
+                        commandContext.resetChanges(true);
+                        throw e;
+                    }
                 } else if (node instanceof DBNLocalFolder) {
                     var nodePath = node.getNodeItemPath();
                     node.getOwnerProject().getDataSourceRegistry().removeFolder(((DBNLocalFolder) node).getFolder(), false);

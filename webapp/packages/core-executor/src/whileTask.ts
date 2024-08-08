@@ -6,35 +6,54 @@
  * you may not use this file except in compliance with the License.
  */
 import { AutoRunningTask } from './TaskScheduler/AutoRunningTask';
+import { CancelError } from './TaskScheduler/CancelError';
 import type { ITask } from './TaskScheduler/ITask';
 import { Task } from './TaskScheduler/Task';
+import { TimeoutError } from './TaskScheduler/TimeoutError';
 
 export function whileTask<T>(
   callback: (value: T) => Promise<boolean> | boolean,
   task: () => Promise<T>,
   interval: number,
   cancelMessage?: string,
+  timeout?: number,
 ): ITask<T> {
   let resolve: (value: T | PromiseLike<T>) => void;
   let reject: (reason?: any) => void;
+  let fulfilled = false;
+
+  let intervalTimeoutId: NodeJS.Timeout | null = null;
+  let timeoutId: NodeJS.Timeout | null = null;
+  let activeTask: Promise<T> | null = null;
+  let stopped = false;
 
   const lockPromise = new Promise<T>((_resolve, _reject) => {
     resolve = _resolve;
     reject = _reject;
+  }).finally(() => {
+    if (intervalTimeoutId !== null) {
+      clearTimeout(intervalTimeoutId);
+    }
+
+    if (timeoutId !== null) {
+      clearTimeout(timeoutId);
+    }
+
+    fulfilled = true;
   });
 
-  let timeoutId: NodeJS.Timeout | null;
-  let activeTask: Promise<T> | null;
-  let stopped = false;
-
   function stop() {
-    if (timeoutId) {
-      clearTimeout(timeoutId);
+    if (intervalTimeoutId !== null) {
+      clearTimeout(intervalTimeoutId);
     }
     stopped = true;
   }
 
   async function cancelTask(exception?: any) {
+    if (fulfilled) {
+      return;
+    }
+
     stop();
 
     if (activeTask instanceof Task) {
@@ -42,6 +61,10 @@ export function whileTask<T>(
     }
 
     reject(exception);
+  }
+
+  if (timeout !== undefined) {
+    timeoutId = setTimeout(() => cancelTask(new TimeoutError('Task timeout exceeded')), timeout);
   }
 
   function runTask() {
@@ -56,7 +79,7 @@ export function whileTask<T>(
         if (state) {
           resolve(value);
         } else if (!stopped) {
-          timeoutId = setTimeout(runTask, interval);
+          intervalTimeoutId = setTimeout(runTask, interval);
         }
       })
       .catch(cancelTask);
@@ -67,6 +90,6 @@ export function whileTask<T>(
       runTask();
       return lockPromise;
     },
-    () => cancelTask(new Error(cancelMessage ?? 'Task was cancelled')),
+    () => cancelTask(new CancelError(cancelMessage ?? 'Task was cancelled')),
   );
 }
