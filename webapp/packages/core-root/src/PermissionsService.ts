@@ -18,14 +18,10 @@ export enum EPermission {}
 @injectable()
 export class PermissionsService {
   get publicDisabled(): boolean {
-    if (
+    return (
       this.serverConfigResource.configurationMode ||
       (this.serverLicenseStatusResource?.licenseRequired && !this.serverLicenseStatusResource.licenseValid)
-    ) {
-      return true;
-    }
-
-    return false;
+    );
   }
 
   constructor(
