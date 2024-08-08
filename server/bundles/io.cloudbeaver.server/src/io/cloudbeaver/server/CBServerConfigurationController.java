@@ -330,7 +330,7 @@ public abstract class CBServerConfigurationController<T extends CBServerConfig>
             .registerTypeAdapter(PasswordPolicyConfiguration.class, smPasswordPoliceConfigCreator);
     }
 
-    protected void saveRuntimeConfig(SMCredentialsProvider credentialsProvider) throws DBException {
+    public synchronized void saveRuntimeConfig(SMCredentialsProvider credentialsProvider) throws DBException {
         saveRuntimeConfig(
             serverConfiguration,
             appConfiguration,
@@ -338,7 +338,7 @@ public abstract class CBServerConfigurationController<T extends CBServerConfig>
         );
     }
 
-    protected void saveRuntimeConfig(
+    protected synchronized void saveRuntimeConfig(
         @NotNull CBServerConfig serverConfig,
         @NotNull CBAppConfig appConfig,
         SMCredentialsProvider credentialsProvider
@@ -350,7 +350,7 @@ public abstract class CBServerConfigurationController<T extends CBServerConfig>
         writeRuntimeConfig(getRuntimeAppConfigPath(), configurationProperties);
     }
 
-    private void writeRuntimeConfig(Path runtimeConfigPath, Map<String, Object> configurationProperties)
+    private synchronized void writeRuntimeConfig(Path runtimeConfigPath, Map<String, Object> configurationProperties)
         throws DBException {
         if (Files.exists(runtimeConfigPath)) {
             ContentUtils.makeFileBackup(runtimeConfigPath);
@@ -370,7 +370,8 @@ public abstract class CBServerConfigurationController<T extends CBServerConfig>
     }
 
 
-    public void updateServerUrl(@NotNull SMCredentialsProvider credentialsProvider, @Nullable String newPublicUrl) throws DBException {
+    public synchronized void updateServerUrl(@NotNull SMCredentialsProvider credentialsProvider,
+        @Nullable String newPublicUrl) throws DBException {
         getServerConfiguration().setServerURL(newPublicUrl);
     }
 

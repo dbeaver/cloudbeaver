@@ -69,6 +69,7 @@ import java.security.Permission;
 import java.security.Policy;
 import java.security.ProtectionDomain;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * This class controls all aspects of the application's execution
@@ -107,6 +108,8 @@ public abstract class CBApplication<T extends CBServerConfig> extends BaseWebApp
     protected final WSEventController eventController = new WSEventController();
 
     private WebSessionManager sessionManager;
+
+    private final Map<String, String> initActions = new ConcurrentHashMap<>();
 
     public CBApplication() {
         this.homeDirectory = new File(initHomeFolder());
@@ -552,7 +555,8 @@ public abstract class CBApplication<T extends CBServerConfig> extends BaseWebApp
         reloadConfiguration(credentialsProvider);
     }
 
-    public synchronized void reloadConfiguration(@Nullable SMCredentialsProvider credentialsProvider) throws DBException {
+    public synchronized void reloadConfiguration(@Nullable SMCredentialsProvider credentialsProvider)
+        throws DBException {
         // Re-load runtime configuration
         try {
             Path runtimeAppConfigPath = getServerConfigurationController().getRuntimeAppConfigPath();
@@ -717,7 +721,10 @@ public abstract class CBApplication<T extends CBServerConfig> extends BaseWebApp
         return CBPlatformUI.class;
     }
 
-    public void saveProductConfiguration(SMCredentialsProvider credentialsProvider, Map<String, Object> productConfiguration) throws DBException {
+    public void saveProductConfiguration(
+        SMCredentialsProvider credentialsProvider,
+        Map<String, Object> productConfiguration
+    ) throws DBException {
         getServerConfigurationController().saveProductConfiguration(productConfiguration);
         flushConfiguration(credentialsProvider);
         sendConfigChangedEvent(credentialsProvider);
@@ -749,5 +756,22 @@ public abstract class CBApplication<T extends CBServerConfig> extends BaseWebApp
     @Override
     public boolean isEnvironmentVariablesAccessible() {
         return getAppConfiguration().isSystemVariablesResolvingEnabled();
+    }
+
+    @Override
+    public boolean isInitializationMode() {
+        return !initActions.isEmpty();
+    }
+
+    public void addInitAction(@NotNull String actionId, @NotNull String description) {
+        initActions.put(actionId, description);
+    }
+
+    public void removeInitAction(@NotNull String actionId) {
+        initActions.remove(actionId);
+    }
+
+    public Map<String, String> getInitActions() {
+        return Map.copyOf(initActions);
     }
 }
