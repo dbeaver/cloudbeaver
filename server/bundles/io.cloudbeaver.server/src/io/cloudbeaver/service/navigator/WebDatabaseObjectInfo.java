@@ -104,7 +104,9 @@ public class WebDatabaseObjectInfo {
 
     @Property
     public String getFullyQualifiedName() {
-        return object instanceof DBPQualifiedObject ? ((DBPQualifiedObject) object).getFullyQualifiedName(DBPEvaluationContext.UI) : getName();
+        return object instanceof DBPQualifiedObject
+            ? ((DBPQualifiedObject) object).getFullyQualifiedName(DBPEvaluationContext.UI)
+            : getName();
     }
 
     @Property
