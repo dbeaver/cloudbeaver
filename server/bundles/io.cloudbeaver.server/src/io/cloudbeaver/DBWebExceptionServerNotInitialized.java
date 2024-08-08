@@ -14,25 +14,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.cloudbeaver;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
-
 /**
- * Object association annotation
+ * "Access denied" exception
  */
-@Target(value = {ElementType.METHOD})
-@Retention(RetentionPolicy.RUNTIME)
-public @interface WebAction {
+public class DBWebExceptionServerNotInitialized extends DBWebException {
 
-    String[] requirePermissions() default { };
-
-    boolean authRequired() default true;
-
-    boolean initializationRequired() default true;
-
+    public DBWebExceptionServerNotInitialized(String message) {
+        super(message, ERROR_CODE_SERVER_NOT_INITIALIZED);
+    }
 }
