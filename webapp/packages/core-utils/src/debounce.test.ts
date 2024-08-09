@@ -5,13 +5,18 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
+import { afterEach, beforeEach, describe, expect, jest, test } from '@jest/globals';
+
 import { debounce, debounceAsync } from './debounce';
 
-// https://jestjs.io/docs/timer-mocks
-// Tell Jest to mock all timeout functions
-jest.useFakeTimers();
-
 describe('Debounce', () => {
+  beforeEach(() => {
+    jest.useFakeTimers();
+  });
+  afterEach(() => {
+    jest.useRealTimers();
+  });
+
   test('function should be executed just once', () => {
     const func = jest.fn();
     const debouncedFunction = debounce(func, 1000);
@@ -28,6 +33,13 @@ describe('Debounce', () => {
 });
 
 describe('DebounceAsync', () => {
+  beforeEach(() => {
+    jest.useFakeTimers();
+  });
+  afterEach(() => {
+    jest.useRealTimers();
+  });
+
   test('function should be executed just once', async () => {
     const func = jest.fn(() => Promise.resolve(true));
     const debouncedFunction = debounceAsync(func, 1000);

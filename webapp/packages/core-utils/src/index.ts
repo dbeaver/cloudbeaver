@@ -86,3 +86,4 @@ export * from './withTimestamp';
 export * from './toSafeHtmlString';
 export * from './getProgressPercent';
 export * from './types/UndefinedToNull';
+export * from './bindFunctions';

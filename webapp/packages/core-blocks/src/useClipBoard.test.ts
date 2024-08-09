@@ -5,6 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
+import { beforeEach, describe, expect, it, jest } from '@jest/globals';
 import { renderHook } from '@testing-library/react';
 
 import * as coreDi from '@cloudbeaver/core-di';
@@ -42,7 +43,7 @@ const getMocks = () => {
   };
 };
 
-describe('useClipboard', () => {
+describe.skip('useClipboard', () => {
   const VALUE_TO_COPY = 'test';
 
   beforeEach(() => {

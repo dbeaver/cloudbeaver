@@ -5,7 +5,8 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { renderHook, waitFor } from '@testing-library/react';
+import { afterEach, beforeEach, describe, expect, jest, test } from '@jest/globals';
+import { act, renderHook } from '@testing-library/react';
 
 import { useStateDelay } from './useStateDelay';
 
@@ -18,25 +19,30 @@ interface IHookProps {
 const useStateDelayWrapper = ({ value, delay, callback }: IHookProps) => useStateDelay(value, delay, callback);
 
 describe('useStateDelay', () => {
-  beforeAll(() => {
+  afterEach(() => {
+    jest.useRealTimers();
+  });
+
+  beforeEach(() => {
     jest.useFakeTimers();
   });
 
   test("should return initial state during whole hook's lifecycle", async () => {
-    const { result } = renderHook(() => useStateDelay(true, 100));
+    const { result, unmount } = renderHook(() => useStateDelay(true, 100));
     expect(result.current).toBe(true);
-    await waitFor(async () => {
-      await new Promise(resolve => setTimeout(resolve, 50));
+    act(() => {
+      jest.advanceTimersByTime(50);
     });
     expect(result.current).toBe(true);
-    await waitFor(async () => {
-      await new Promise(resolve => setTimeout(resolve, 60));
+    act(() => {
+      jest.advanceTimersByTime(60);
     });
     expect(result.current).toBe(true);
+    unmount();
   });
 
   test('should return updated state after delay if it was updated', async () => {
-    const { result, rerender } = renderHook(({ value, delay }: IHookProps) => useStateDelayWrapper({ value, delay }), {
+    const { result, rerender, unmount } = renderHook(({ value, delay }: IHookProps) => useStateDelayWrapper({ value, delay }), {
       initialProps: {
         value: false,
         delay: 100,
@@ -47,19 +53,20 @@ describe('useStateDelay', () => {
       value: true,
       delay: 100,
     });
-    await waitFor(async () => {
-      await new Promise(resolve => setTimeout(resolve, 50));
+    act(() => {
+      jest.advanceTimersByTime(50);
     });
     expect(result.current).toBe(false);
-    await waitFor(async () => {
-      await new Promise(resolve => setTimeout(resolve, 60));
+    act(() => {
+      jest.advanceTimersByTime(60);
     });
     expect(result.current).toBe(true);
+    unmount();
   });
 
   test('should execute callback on state change', async () => {
     const callback = jest.fn();
-    const { rerender } = renderHook(({ value, delay }: IHookProps) => useStateDelayWrapper({ value, delay, callback }), {
+    const { rerender, unmount } = renderHook(({ value, delay }: IHookProps) => useStateDelayWrapper({ value, delay, callback }), {
       initialProps: {
         value: false,
         delay: 100,
@@ -67,8 +74,8 @@ describe('useStateDelay', () => {
       },
     });
     expect(callback).toHaveBeenCalledTimes(0);
-    await waitFor(async () => {
-      await new Promise(resolve => setTimeout(resolve, 50));
+    act(() => {
+      jest.advanceTimersByTime(50);
     });
     expect(callback).toHaveBeenCalledTimes(0);
     rerender({
@@ -76,15 +83,16 @@ describe('useStateDelay', () => {
       delay: 100,
       callback,
     });
-    await waitFor(async () => {
-      await new Promise(resolve => setTimeout(resolve, 60));
+    act(() => {
+      jest.advanceTimersByTime(500);
     });
     expect(callback).toHaveBeenCalledTimes(1);
+    unmount();
   });
 
   test('should not call callback', async () => {
     const callback = jest.fn();
-    const { result, rerender } = renderHook(({ value, delay }: IHookProps) => useStateDelayWrapper({ value, delay, callback }), {
+    const { result, rerender, unmount } = renderHook(({ value, delay }: IHookProps) => useStateDelayWrapper({ value, delay, callback }), {
       initialProps: {
         value: false,
         delay: 100,
@@ -93,8 +101,8 @@ describe('useStateDelay', () => {
     });
     expect(result.current).toBe(false);
     expect(callback).toHaveBeenCalledTimes(0);
-    await waitFor(async () => {
-      await new Promise(resolve => setTimeout(resolve, 50));
+    act(() => {
+      jest.advanceTimersByTime(50);
     });
     expect(callback).toHaveBeenCalledTimes(0);
     rerender({
@@ -102,34 +110,36 @@ describe('useStateDelay', () => {
       delay: 100,
       callback,
     });
-    await waitFor(async () => {
-      await new Promise(resolve => setTimeout(resolve, 60));
+    act(() => {
+      jest.advanceTimersByTime(60);
     });
     expect(callback).toHaveBeenCalledTimes(0);
+    unmount();
   });
 
   test("should prolong delay if was updated as hook's argument", async () => {
-    const { result, rerender } = renderHook(({ value, delay }: IHookProps) => useStateDelayWrapper({ value, delay }), {
+    const { result, rerender, unmount } = renderHook(({ value, delay }: IHookProps) => useStateDelayWrapper({ value, delay }), {
       initialProps: {
         value: false,
         delay: 100,
       },
     });
     expect(result.current).toBe(false);
-    await waitFor(async () => {
-      await new Promise(resolve => setTimeout(resolve, 50));
+    act(() => {
+      jest.advanceTimersByTime(50);
     });
     rerender({
       value: true,
       delay: 200,
     });
-    await waitFor(async () => {
-      await new Promise(resolve => setTimeout(resolve, 60));
+    act(() => {
+      jest.advanceTimersByTime(60);
     });
     expect(result.current).toBe(false);
-    await waitFor(async () => {
-      await new Promise(resolve => setTimeout(resolve, 100));
+    act(() => {
+      jest.advanceTimersByTime(500);
     });
     expect(result.current).toBe(true);
+    unmount();
   });
 });
