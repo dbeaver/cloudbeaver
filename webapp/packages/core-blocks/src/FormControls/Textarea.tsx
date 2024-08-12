@@ -8,9 +8,14 @@
 import { observer } from 'mobx-react-lite';
 import { useCallback, useContext, useLayoutEffect, useRef } from 'react';
 
+import { getTextFileReadingProcess } from '@cloudbeaver/core-utils';
+
+import { Button } from '../Button';
 import { filterLayoutFakeProps, getLayoutProps } from '../Containers/filterLayoutFakeProps';
 import type { ILayoutSizeProps } from '../Containers/ILayoutSizeProps';
+import { useTranslate } from '../localization/useTranslate';
 import { s } from '../s';
+import { UploadArea } from '../UploadArea';
 import { useS } from '../useS';
 import { Field } from './Field';
 import { FieldDescription } from './FieldDescription';
@@ -24,6 +29,7 @@ type BaseProps = Omit<React.TextareaHTMLAttributes<HTMLTextAreaElement>, 'onChan
     labelTooltip?: string;
     embedded?: boolean;
     cursorInitiallyAtEnd?: boolean;
+    uploadable?: boolean;
   };
 
 type ControlledProps = BaseProps & {
@@ -56,9 +62,11 @@ export const Textarea: TextareaType = observer(function Textarea({
   labelTooltip,
   embedded,
   cursorInitiallyAtEnd,
+  uploadable,
   onChange = () => {},
   ...rest
 }: ControlledProps | ObjectProps<any, any>) {
+  const translate = useTranslate();
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
   const layoutProps = getLayoutProps(rest);
   rest = filterLayoutFakeProps(rest);
@@ -66,15 +74,15 @@ export const Textarea: TextareaType = observer(function Textarea({
   const context = useContext(FormContext);
 
   const handleChange = useCallback(
-    (event: React.ChangeEvent<HTMLTextAreaElement>) => {
+    (value: string) => {
       if (state) {
-        state[name] = event.target.value;
+        state[name] = value;
       }
       if (onChange) {
-        onChange(event.target.value, name);
+        onChange(value, name);
       }
       if (context) {
-        context.change(event.target.value, name);
+        context.change(value, name);
       }
     },
     [state, name, onChange],
@@ -102,9 +110,34 @@ export const Textarea: TextareaType = observer(function Textarea({
         value={value ?? ''}
         name={name}
         data-embedded={embedded}
-        onChange={handleChange}
+        onChange={event => handleChange(event.target.value)}
       />
       {description && <FieldDescription>{description}</FieldDescription>}
+      {uploadable && (
+        <UploadArea
+          className={s(styles, { uploadButton: true })}
+          disabled={rest.disabled || rest.readOnly}
+          reset
+          onChange={async event => {
+            const file = event.target.files?.[0];
+
+            if (!file) {
+              throw new Error('File is not found');
+            }
+
+            const process = getTextFileReadingProcess(file);
+            const value = await process.promise;
+
+            if (value) {
+              handleChange(value);
+            }
+          }}
+        >
+          <Button tag="div" disabled={rest.disabled || rest.readOnly} mod={['outlined']}>
+            {translate('ui_file')}
+          </Button>
+        </UploadArea>
+      )}
     </Field>
   );
 });
