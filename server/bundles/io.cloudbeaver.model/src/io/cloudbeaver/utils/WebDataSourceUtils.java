@@ -97,6 +97,10 @@ public class WebDataSourceUtils {
     private static void setSecureProperties(DBWHandlerConfiguration handlerConfig, WebNetworkHandlerConfigInput cfgInput, boolean ignoreNulls) {
         var secureProperties = cfgInput.getSecureProperties();
         if (secureProperties == null) {
+            if (!handlerConfig.isSavePassword()) {
+                // clear all secure properties from handler config
+                handlerConfig.setSecureProperties(Map.of());
+            }
             return;
         }
         for (var pr : secureProperties.entrySet()) {
