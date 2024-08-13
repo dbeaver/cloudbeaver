@@ -23,6 +23,7 @@ import {
 } from '@cloudbeaver/core-resource';
 import { EAdminPermission, ServerConfigResource, SessionPermissionsResource } from '@cloudbeaver/core-root';
 import { AdminConnectionGrantInfo, AdminUserInfo, AdminUserInfoFragment, GetUsersListQueryVariables, GraphQLService } from '@cloudbeaver/core-sdk';
+import { isDefined } from '@cloudbeaver/core-utils';
 
 import { AUTH_PROVIDER_LOCAL_ID } from './AUTH_PROVIDER_LOCAL_ID';
 import { AuthInfoService } from './AuthInfoService';
@@ -292,12 +293,36 @@ export class UsersResource extends CachedMapResource<string, AdminUser, UserReso
 
         this.offsetPagination.setPageEnd(CachedResourceOffsetPageListKey(offset, users.length).setTarget(filterKey), users.length === limit);
       }
+
+      this.resolveUsersCollision(key, usersList);
     });
 
     const key = resourceKeyList(usersList.map(user => user.userId));
+
     this.set(key, usersList);
 
     return this.data;
+  }
+
+  private resolveUsersCollision(key: ResourceKey<string>, newUsers: AdminUserInfoFragment[]): void {
+    const userListIds = new Set(newUsers.map(user => user.userId));
+    const currentUsers = this.get(key);
+
+    if (!isDefined(currentUsers) || !this.isOutdated(key)) {
+      return;
+    }
+
+    if (currentUsers instanceof Array) {
+      currentUsers
+        .filter(user => !user?.userId || !userListIds.has(user.userId))
+        .filter(isDefined)
+        .forEach(user => this.data.delete(user.userId));
+      return;
+    }
+
+    if (currentUsers?.userId) {
+      this.data.delete(currentUsers.userId);
+    }
   }
 
   private getDefaultIncludes(): UserResourceIncludes {
