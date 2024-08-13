@@ -1,0 +1,5 @@
+fragment DefaultNavigatorSettings on ServerConfig {
+  defaultNavigatorSettings {
+    ...AllNavigatorSettings
+  }
+}

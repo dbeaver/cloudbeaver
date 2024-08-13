@@ -1,0 +1,3 @@
+fragment ResourceQuotas on ServerConfig {
+  resourceQuotas
+}
