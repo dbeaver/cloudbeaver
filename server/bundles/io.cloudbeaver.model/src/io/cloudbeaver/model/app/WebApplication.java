@@ -42,6 +42,10 @@ import java.util.Map;
 public interface WebApplication extends DBPApplication {
     boolean isConfigurationMode();
 
+   default boolean isInitializationMode() {
+       return false;
+   }
+
     WebAppConfiguration getAppConfiguration();
 
     WebServerConfiguration getServerConfiguration();

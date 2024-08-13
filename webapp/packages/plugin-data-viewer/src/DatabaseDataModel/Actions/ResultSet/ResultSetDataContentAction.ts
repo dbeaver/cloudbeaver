@@ -7,7 +7,7 @@
  */
 import { makeObservable, observable } from 'mobx';
 
-import { QuotasService } from '@cloudbeaver/core-root';
+import { QuotasService, ServerResourceQuotasResource } from '@cloudbeaver/core-root';
 import { GraphQLService, ResultDataFormat } from '@cloudbeaver/core-sdk';
 import { bytesToSize, download, downloadFromURL, GlobalConstants, isNotNullDefined } from '@cloudbeaver/core-utils';
 
@@ -34,16 +34,30 @@ interface ICacheEntry {
 @databaseDataAction()
 export class ResultSetDataContentAction extends DatabaseDataAction<any, IDatabaseResultSet> implements IResultSetDataContentAction {
   static dataFormat = [ResultDataFormat.Resultset];
+  private subscriptionDispose?: () => void;
 
   constructor(
     source: IDatabaseDataSource<any, IDatabaseResultSet>,
     private readonly data: ResultSetDataAction,
     private readonly format: ResultSetFormatAction,
     private readonly graphQLService: GraphQLService,
+    private readonly serverResourceQuotasResource: ServerResourceQuotasResource,
     private readonly quotasService: QuotasService,
     private readonly cache: ResultSetCacheAction,
   ) {
     super(source);
+
+    function loadQuotas() {
+      setTimeout(() => serverResourceQuotasResource.load(), 0);
+    }
+
+    this.serverResourceQuotasResource.onDataOutdated.addHandler(loadQuotas);
+
+    loadQuotas();
+
+    this.subscriptionDispose = () => {
+      this.serverResourceQuotasResource.onDataOutdated.removeHandler(loadQuotas);
+    };
 
     makeObservable<this, 'cache'>(this, {
       cache: observable,
@@ -168,6 +182,7 @@ export class ResultSetDataContentAction extends DatabaseDataAction<any, IDatabas
   }
 
   dispose(): void {
+    this.subscriptionDispose?.();
     this.clearCache();
   }
 

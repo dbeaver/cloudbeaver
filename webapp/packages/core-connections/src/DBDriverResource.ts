@@ -109,7 +109,6 @@ export class DBDriverResource extends CachedMapResource<string, DBDriver, DBDriv
 
   getDefaultIncludes(): DBDriverResourceIncludes {
     return {
-      includeDriverLibraries: false,
       includeDriverParameters: false,
       includeDriverProperties: false,
       includeMainProperties: false,

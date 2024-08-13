@@ -143,11 +143,13 @@ type ServerConfig {
 
     licenseRequired: Boolean!
     licenseValid: Boolean!
+    licenseStatus: String @since(version: "24.1.5")
 
     sessionExpireTime: Int!
     localHostAddress: String
 
     configurationMode: Boolean!
+    #    initializationMode: Boolean! @since(version: "24.1.5")
     developmentMode: Boolean!
     redirectOnFederatedAuth: Boolean!
     distributed: Boolean!

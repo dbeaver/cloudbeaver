@@ -38,6 +38,7 @@ public class DBWebException extends DBException implements GraphQLError {
 
     public static final String ERROR_CODE_SESSION_EXPIRED = "sessionExpired";
     public static final String ERROR_CODE_ACCESS_DENIED = "accessDenied";
+    public static final String ERROR_CODE_SERVER_NOT_INITIALIZED = "serverNotInitialized";
     public static final String ERROR_CODE_LICENSE_DENIED = "licenseRequired";
     public static final String ERROR_CODE_IDENT_REQUIRED = "identRequired";
     public static final String ERROR_CODE_AUTH_REQUIRED = "authRequired";

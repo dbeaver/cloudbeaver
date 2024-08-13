@@ -25,7 +25,7 @@ import {
 } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import type { DialogComponentProps } from '@cloudbeaver/core-dialogs';
-import { ServerConfigResource } from '@cloudbeaver/core-root';
+import { ProductInfoResource } from '@cloudbeaver/core-root';
 import { ThemeService } from '@cloudbeaver/core-theming';
 import { useAppVersion } from '@cloudbeaver/core-version';
 import { WebsiteLinks } from '@cloudbeaver/core-website';
@@ -34,12 +34,12 @@ import ProductInfoDialogStyles from './ProductInfoDialog.module.css';
 
 export const ProductInfoDialog = observer<DialogComponentProps<null>>(function ProductInfoDialog(props) {
   const translate = useTranslate();
-  const serverConfigResource = useService(ServerConfigResource);
+  const serverConfigResource = useService(ProductInfoResource);
   const themeService = useService(ThemeService);
 
   const version = useAppVersion();
 
-  const productInfo = serverConfigResource.data?.productInfo;
+  const productInfo = serverConfigResource.data;
   const logoIcon = themeService.themeId === 'light' ? '/icons/product-logo_light.svg' : '/icons/product-logo_dark.svg';
 
   const styles = useS(ProductInfoDialogStyles);
