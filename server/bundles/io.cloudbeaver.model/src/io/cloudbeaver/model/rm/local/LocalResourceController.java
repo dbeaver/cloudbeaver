@@ -685,7 +685,6 @@ public class LocalResourceController implements RMController {
             if (log.isDebugEnabled()) {
                 log.debug("Removing resource from '" + resourcePath + "' in project '" + projectId + "'" + (recursive ? " recursive" : ""));
             }
-            validateResourcePath(resourcePath);
             Path targetPath = getTargetPath(projectId, resourcePath);
             doFileWriteOperation(projectId, targetPath, () -> {
                 if (!Files.exists(targetPath)) {
