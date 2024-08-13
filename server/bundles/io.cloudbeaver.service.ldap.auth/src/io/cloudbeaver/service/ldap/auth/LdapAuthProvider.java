@@ -40,8 +40,6 @@ import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Map;
 import java.util.UUID;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class LdapAuthProvider implements SMAuthProviderExternal<SMSession>, SMBruteForceProtected {
     public LdapAuthProvider() {
@@ -56,15 +54,14 @@ public class LdapAuthProvider implements SMAuthProviderExternal<SMSession>, SMBr
         if (providerConfig == null) {
             throw new DBException("LDAP provider config is null");
         }
-        String userName = JSONUtils.getString(authParameters, LdapConstants.CRED_USERNAME);
+        String userName = JSONUtils.getString(authParameters, LdapConstants.CRED_USER_DN);
         if (CommonUtils.isEmpty(userName)) {
-            throw new DBException("LDAP user name is empty");
+            throw new DBException("LDAP user dn is empty");
         }
         String password = JSONUtils.getString(authParameters, LdapConstants.CRED_PASSWORD);
         if (CommonUtils.isEmpty(password)) {
             throw new DBException("LDAP password is empty");
         }
-        String unit = CommonUtils.nullIfEmpty(JSONUtils.getString(authParameters, LdapConstants.CRED_UNITS));
 
         LdapSettings ldapSettings = new LdapSettings(providerConfig);
         Hashtable<String, String> environment = new Hashtable<>();
@@ -74,23 +71,43 @@ public class LdapAuthProvider implements SMAuthProviderExternal<SMSession>, SMBr
         environment.put(Context.PROVIDER_URL, ldapProviderUrl);
         environment.put(Context.SECURITY_AUTHENTICATION, "simple");
 
-        String cn = "cn=" + userName;
-        var principal = Stream.of(cn, unit, ldapSettings.getBaseDN())
-            .filter(CommonUtils::isNotEmpty)
-            .collect(Collectors.joining(","));
+        String fullUserDN = userName;
 
-        environment.put(Context.SECURITY_PRINCIPAL, principal);
+        if (!fullUserDN.startsWith(ldapSettings.getUserIdentifierAttr())) {
+            fullUserDN = String.join("=", ldapSettings.getUserIdentifierAttr(), userName);
+        }
+        if (CommonUtils.isNotEmpty(ldapSettings.getBaseDN()) && !fullUserDN.endsWith(ldapSettings.getBaseDN())) {
+            fullUserDN = String.join(",", fullUserDN, ldapSettings.getBaseDN());
+        }
+
+        environment.put(Context.SECURITY_PRINCIPAL, fullUserDN);
         environment.put(Context.SECURITY_CREDENTIALS, password);
         try {
             DirContext context = new InitialDirContext(environment);
             context.close();
             Map<String, Object> userData = new HashMap<>();
-            userData.put(LdapConstants.CRED_USERNAME, userName);
+            userData.put(LdapConstants.CRED_USERNAME, findUserNameFromDN(fullUserDN, ldapSettings));
             userData.put(LdapConstants.CRED_SESSION_ID, UUID.randomUUID());
             return userData;
         } catch (Exception e) {
             throw new DBException("LDAP authentication failed: " + e.getMessage(), e);
         }
+    }
+
+    @NotNull
+    private String findUserNameFromDN(@NotNull String fullUserDN, @NotNull LdapSettings ldapSettings)
+        throws DBException {
+        String userId = null;
+        for (String dn : fullUserDN.split(",")) {
+            if (dn.startsWith(ldapSettings.getUserIdentifierAttr() + "=")) {
+                userId = dn.split("=")[1];
+                break;
+            }
+        }
+        if (userId == null) {
+            throw new DBException("Failed to determinate userId from user DN: " + fullUserDN);
+        }
+        return userId;
     }
 
     @NotNull

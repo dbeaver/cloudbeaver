@@ -20,10 +20,11 @@ public interface LdapConstants {
     String PARAM_HOST = "ldap-host";
     String PARAM_PORT = "ldap-port";
     String PARAM_DN = "ldap-dn";
+    String PARAM_USER_IDENTIFIER_ATTR = "ldap-identifier-attr";
 
 
     String CRED_USERNAME = "user";
+    String CRED_USER_DN = "user-dn";
     String CRED_PASSWORD = "password";
-    String CRED_UNITS = "units";
     String CRED_SESSION_ID = "session-id";
 }
