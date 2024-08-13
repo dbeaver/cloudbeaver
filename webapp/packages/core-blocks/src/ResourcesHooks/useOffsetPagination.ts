@@ -80,7 +80,6 @@ export function useOffsetPagination<TResource extends CachedMapResource<any, any
         }
       },
       refresh() {
-        this.resource.delete(this._key.target);
         this.resource.markOutdated(this._key.target);
       },
     }),
