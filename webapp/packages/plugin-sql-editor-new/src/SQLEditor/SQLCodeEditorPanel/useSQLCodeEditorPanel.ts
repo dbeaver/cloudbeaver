@@ -6,10 +6,8 @@
  * you may not use this file except in compliance with the License.
  */
 import { action } from 'mobx';
-import { useCallback } from 'react';
 
 import { useExecutor, useObservableRef } from '@cloudbeaver/core-blocks';
-import { throttle } from '@cloudbeaver/core-utils';
 import type { ISQLEditorData } from '@cloudbeaver/plugin-sql-editor';
 
 import type { IEditor } from '../SQLCodeEditor/useSQLCodeEditor';
@@ -24,33 +22,31 @@ export function useSQLCodeEditorPanel(data: ISQLEditorData, editor: IEditor) {
   const state: State = useObservableRef(
     () => ({
       highlightActiveQuery() {
-        this.editor.clearActiveQueryHighlight();
+        queueMicrotask(() => {
+          this.editor.clearActiveQueryHighlight();
 
-        const segment = this.data.activeSegment;
+          const segment = this.data.activeSegment;
 
-        if (segment) {
-          this.editor.highlightActiveQuery(segment.begin, segment.end);
-        }
+          if (segment) {
+            this.editor.highlightActiveQuery(segment.begin, segment.end);
+          }
+        });
       },
       onQueryChange(query: string) {
         this.data.setScript(query);
       },
       onCursorChange(begin: number, end?: number) {
         this.data.setCursor(begin, end);
+        this.highlightActiveQuery();
       },
     }),
-    { onQueryChange: action.bound, onCursorChange: action.bound },
+    { onQueryChange: action.bound, onCursorChange: action.bound, highlightActiveQuery: action.bound },
     { editor, data },
-  );
-
-  const updateHighlight = useCallback(
-    throttle(() => state.highlightActiveQuery(), 1000),
-    [state],
   );
 
   useExecutor({
     executor: data.onUpdate,
-    handlers: [updateHighlight],
+    handlers: [state.highlightActiveQuery],
   });
 
   useExecutor({
