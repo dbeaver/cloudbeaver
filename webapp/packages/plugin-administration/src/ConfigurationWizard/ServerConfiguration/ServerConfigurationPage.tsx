@@ -28,7 +28,7 @@ import {
 } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
-import { ServerConfigResource } from '@cloudbeaver/core-root';
+import { DefaultNavigatorSettingsResource, ServerConfigResource } from '@cloudbeaver/core-root';
 
 import { ServerConfigurationConfigurationForm } from './Form/ServerConfigurationConfigurationForm';
 import { ServerConfigurationFeaturesForm } from './Form/ServerConfigurationFeaturesForm';
@@ -45,9 +45,10 @@ export const ServerConfigurationPage: AdministrationItemContentComponent = obser
   const [focusedRef, state] = useFocus<HTMLFormElement>({ focusFirstChild: true });
   const service = useService(ServerConfigurationService);
   const serverConfigResource = useService(ServerConfigResource);
+  const defaultNavigatorSettingsResource = useService(DefaultNavigatorSettingsResource);
   const commonDialogService = useService(CommonDialogService);
   const configurationWizardService = useService(ConfigurationWizardService);
-  const changed = serverConfigResource.isChanged() || serverConfigResource.isNavigatorSettingsChanged();
+  const changed = serverConfigResource.isChanged() || defaultNavigatorSettingsResource.isChanged();
   useFormValidator(service.validationTask, state.reference);
 
   function handleChange() {

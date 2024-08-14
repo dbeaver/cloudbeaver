@@ -7,10 +7,13 @@
  */
 import { PasswordPolicyService } from '@cloudbeaver/core-authentication';
 import { useService } from '@cloudbeaver/core-di';
+import { PasswordPolicyResource } from '@cloudbeaver/core-root';
 
 import { useCustomInputValidation } from './FormControls/useCustomInputValidation';
+import { useResource } from './ResourcesHooks/useResource';
 
 export function usePasswordValidation() {
+  useResource(usePasswordValidation, PasswordPolicyResource, undefined);
   const passwordPolicyService = useService(PasswordPolicyService);
 
   const ref = useCustomInputValidation<string>(value => {

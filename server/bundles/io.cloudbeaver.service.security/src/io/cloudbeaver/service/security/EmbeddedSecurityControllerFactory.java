@@ -16,10 +16,12 @@
  */
 package io.cloudbeaver.service.security;
 
+import io.cloudbeaver.auth.NoAuthCredentialsProvider;
 import io.cloudbeaver.model.app.WebAuthApplication;
 import io.cloudbeaver.service.security.db.CBDatabase;
 import io.cloudbeaver.service.security.db.WebDatabaseConfig;
 import io.cloudbeaver.service.security.internal.ClearAuthAttemptInfoJob;
+import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.auth.SMCredentialsProvider;
 
@@ -36,7 +38,7 @@ public class EmbeddedSecurityControllerFactory<T extends WebAuthApplication> {
     /**
      * Create new security controller instance with custom configuration
      */
-    public CBEmbeddedSecurityController createSecurityService(
+    public CBEmbeddedSecurityController<T> createSecurityService(
         T application,
         WebDatabaseConfig databaseConfig,
         SMCredentialsProvider credentialsProvider,
@@ -45,32 +47,53 @@ public class EmbeddedSecurityControllerFactory<T extends WebAuthApplication> {
         if (DB_INSTANCE == null) {
             synchronized (EmbeddedSecurityControllerFactory.class) {
                 if (DB_INSTANCE == null) {
-                    DB_INSTANCE = new CBDatabase(application, databaseConfig);
+                    DB_INSTANCE = createAndInitDatabaseInstance(
+                        application,
+                        databaseConfig,
+                        smConfig
+                    );
                 }
             }
-            var securityController = createEmbeddedSecurityController(
-                application, DB_INSTANCE, credentialsProvider, smConfig
-            );
-            //FIXME circular dependency
-            DB_INSTANCE.setAdminSecurityController(securityController);
-            DB_INSTANCE.initialize();
+
             if (application.isLicenseRequired()) {
                 // delete expired auth info job in enterprise products
-                new ClearAuthAttemptInfoJob(securityController).schedule();
+                new ClearAuthAttemptInfoJob(createEmbeddedSecurityController(
+                    application, DB_INSTANCE, new NoAuthCredentialsProvider(), smConfig
+                )).schedule();
             }
-            return securityController;
         }
         return createEmbeddedSecurityController(
             application, DB_INSTANCE, credentialsProvider, smConfig
         );
     }
 
-    protected CBEmbeddedSecurityController createEmbeddedSecurityController(
+    protected @NotNull CBDatabase createAndInitDatabaseInstance(
+        @NotNull T application,
+        @NotNull WebDatabaseConfig databaseConfig,
+        @NotNull SMControllerConfiguration smConfig
+    ) throws DBException {
+        var database = new CBDatabase(application, databaseConfig);
+        var securityController = createEmbeddedSecurityController(
+            application, database, new NoAuthCredentialsProvider(), smConfig
+        );
+        //FIXME circular dependency
+        database.setAdminSecurityController(securityController);
+        try {
+            database.initialize();
+        } catch (DBException e) {
+            database.shutdown();
+            throw e;
+        }
+
+        return database;
+    }
+
+    protected CBEmbeddedSecurityController<T> createEmbeddedSecurityController(
         T application,
         CBDatabase database,
         SMCredentialsProvider credentialsProvider,
         SMControllerConfiguration smConfig
     ) {
-        return new CBEmbeddedSecurityController(application, database, credentialsProvider, smConfig);
+        return new CBEmbeddedSecurityController<T>(application, database, credentialsProvider, smConfig);
     }
 }

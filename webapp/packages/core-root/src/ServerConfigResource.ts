@@ -8,24 +8,21 @@
 import { action, makeObservable, observable } from 'mobx';
 
 import { injectable } from '@cloudbeaver/core-di';
-import { ExecutorInterrupter } from '@cloudbeaver/core-executor';
-import { CachedDataResource, type CachedResource } from '@cloudbeaver/core-resource';
-import { GraphQLService, NavigatorSettingsInput, ServerConfig as SDKServerConfig, ServerConfigInput } from '@cloudbeaver/core-sdk';
+import { CachedDataResource } from '@cloudbeaver/core-resource';
+import { GraphQLService, ServerConfigFragment, ServerConfigInput } from '@cloudbeaver/core-sdk';
 import { isArraysEqual } from '@cloudbeaver/core-utils';
 
-import { isNavigatorViewSettingsEqual } from './ConnectionNavigatorViewSettings';
 import { DataSynchronizationQueue } from './DataSynchronization/DataSynchronizationQueue';
 import { DataSynchronizationService } from './DataSynchronization/DataSynchronizationService';
 import { ServerConfigEventHandler } from './ServerConfigEventHandler';
 
 export const FEATURE_GIT_ID = 'git';
 
-export type ServerConfig = Omit<SDKServerConfig, 'hostName'>;
+export type ServerConfig = ServerConfigFragment;
 
 @injectable()
 export class ServerConfigResource extends CachedDataResource<ServerConfig | null> {
   update: ServerConfigInput;
-  navigatorSettingsUpdate: NavigatorSettingsInput;
 
   private readonly syncQueue: DataSynchronizationQueue;
 
@@ -42,19 +39,9 @@ export class ServerConfigResource extends CachedDataResource<ServerConfig | null
       }
     });
     this.update = {};
-    this.navigatorSettingsUpdate = {
-      hideFolders: false,
-      hideSchemas: false,
-      hideVirtualModel: false,
-      mergeEntities: false,
-      showOnlyEntities: false,
-      showSystemObjects: false,
-      showUtilityObjects: false,
-    };
 
     makeObservable<this, 'syncUpdateData'>(this, {
       update: observable,
-      navigatorSettingsUpdate: observable,
       unlinkUpdate: action,
       syncUpdateData: action,
     });
@@ -67,14 +54,6 @@ export class ServerConfigResource extends CachedDataResource<ServerConfig | null
       undefined,
       this,
     );
-  }
-
-  requirePublic<T>(resource: CachedResource<any, any, T, any, any>, map?: (param: void) => T): this {
-    resource.preloadResource(this, () => {}).before(ExecutorInterrupter.interrupter(() => this.publicDisabled));
-
-    this.outdateResource<T>(resource, map as any);
-
-    return this;
   }
 
   get redirectOnFederatedAuth(): boolean {
@@ -93,24 +72,8 @@ export class ServerConfigResource extends CachedDataResource<ServerConfig | null
     return this.data?.distributed || false;
   }
 
-  get licenseRequired(): boolean {
-    return this.data?.licenseRequired ?? false;
-  }
-
-  get licenseValid(): boolean {
-    return this.data?.licenseValid ?? false;
-  }
-
   get configurationMode(): boolean {
     return !!this.data?.configurationMode;
-  }
-
-  get publicDisabled(): boolean {
-    if (this.configurationMode || (this.data?.licenseRequired && !this.data.licenseValid)) {
-      return true;
-    }
-
-    return false;
   }
 
   get adminCredentialsSaveEnabled(): boolean {
@@ -143,14 +106,6 @@ export class ServerConfigResource extends CachedDataResource<ServerConfig | null
 
   get userCredentialsSaveEnabled(): boolean {
     return this.update.publicCredentialsSaveEnabled ?? this.data?.publicCredentialsSaveEnabled ?? false;
-  }
-
-  get resourceQuotas() {
-    return this.data?.resourceQuotas ?? {};
-  }
-
-  get passwordPolicy() {
-    return this.data?.passwordPolicyConfiguration ?? {};
   }
 
   get resourceManagerEnabled() {
@@ -192,20 +147,8 @@ export class ServerConfigResource extends CachedDataResource<ServerConfig | null
     );
   }
 
-  isNavigatorSettingsChanged(): boolean {
-    if (!this.data?.defaultNavigatorSettings) {
-      return false;
-    }
-
-    return !isNavigatorViewSettingsEqual(this.data.defaultNavigatorSettings, this.navigatorSettingsUpdate);
-  }
-
   setDataUpdate(update: ServerConfigInput): void {
     this.update = update;
-  }
-
-  setNavigatorSettingsUpdate(update: NavigatorSettingsInput): void {
-    this.navigatorSettingsUpdate = update;
   }
 
   resetUpdate(): void {
@@ -216,20 +159,6 @@ export class ServerConfigResource extends CachedDataResource<ServerConfig | null
 
   unlinkUpdate(): void {
     this.update = {};
-
-    if (this.data) {
-      Object.assign(this.navigatorSettingsUpdate, this.data.defaultNavigatorSettings);
-    } else {
-      this.navigatorSettingsUpdate = {
-        hideFolders: false,
-        hideSchemas: false,
-        hideVirtualModel: false,
-        mergeEntities: false,
-        showOnlyEntities: false,
-        showSystemObjects: false,
-        showUtilityObjects: false,
-      };
-    }
   }
 
   async updateProductConfiguration(configuration: any) {
@@ -240,31 +169,18 @@ export class ServerConfigResource extends CachedDataResource<ServerConfig | null
     });
   }
 
-  async save(skipConfigUpdate = false): Promise<void> {
+  async save(): Promise<void> {
     await this.performUpdate(
       undefined,
       undefined,
       async () => {
-        if (this.isNavigatorSettingsChanged()) {
-          await this.graphQLService.sdk.setDefaultNavigatorSettings({ settings: this.navigatorSettingsUpdate });
-
-          if (this.data) {
-            this.data.defaultNavigatorSettings = { ...this.navigatorSettingsUpdate };
-          } else {
-            this.setData(await this.loader());
-          }
-        }
-
-        if (this.isChanged() && !skipConfigUpdate) {
-          await this.graphQLService.sdk.configureServer({
-            configuration: this.update,
-          });
-          this.setData(await this.loader());
-        }
-
+        await this.graphQLService.sdk.configureServer({
+          configuration: this.update,
+        });
+        this.setData(await this.loader());
         this.onDataOutdated.execute();
       },
-      () => !this.isNavigatorSettingsChanged() && (!this.isChanged() || skipConfigUpdate),
+      () => !this.isChanged(),
     );
   }
 
@@ -289,15 +205,13 @@ export class ServerConfigResource extends CachedDataResource<ServerConfig | null
 
     this.syncUpdateData(serverConfig);
 
-    return serverConfig as ServerConfig;
+    return serverConfig;
   }
 
   private syncUpdateData(serverConfig: ServerConfig) {
     if (serverConfig.configurationMode) {
       return;
     }
-
-    Object.assign(this.navigatorSettingsUpdate, serverConfig.defaultNavigatorSettings);
 
     this.update.serverName = serverConfig.name;
     this.update.serverURL = serverConfig.serverURL;

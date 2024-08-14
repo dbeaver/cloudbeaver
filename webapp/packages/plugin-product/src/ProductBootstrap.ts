@@ -8,7 +8,7 @@
 import { importLazyComponent } from '@cloudbeaver/core-blocks';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
-import { ServerConfigResource } from '@cloudbeaver/core-root';
+import { ProductInfoResource } from '@cloudbeaver/core-root';
 import { MenuBaseItem, MenuService } from '@cloudbeaver/core-view';
 import { TOP_NAV_BAR_SETTINGS_MENU } from '@cloudbeaver/plugin-settings-menu';
 
@@ -17,7 +17,7 @@ const ProductInfoDialog = importLazyComponent(() => import('./ProductInfoDialog'
 @injectable()
 export class ProductBootstrap extends Bootstrap {
   constructor(
-    private readonly serverConfigResource: ServerConfigResource,
+    private readonly productInfoResource: ProductInfoResource,
     private readonly commonDialogService: CommonDialogService,
     private readonly menuService: MenuService,
   ) {
@@ -27,7 +27,7 @@ export class ProductBootstrap extends Bootstrap {
   register(): void {
     this.menuService.addCreator({
       menus: [TOP_NAV_BAR_SETTINGS_MENU],
-      isApplicable: () => !!this.serverConfigResource.data?.productInfo,
+      isApplicable: () => !!this.productInfoResource.data,
       getItems: (context, items) => [
         ...items,
         new MenuBaseItem(

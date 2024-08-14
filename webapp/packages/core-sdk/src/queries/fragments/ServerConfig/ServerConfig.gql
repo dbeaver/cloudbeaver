@@ -1,0 +1,35 @@
+fragment ServerConfig on ServerConfig {
+  name
+  version
+  workspaceId
+  serverURL
+  rootURI
+  containerId
+  defaultAuthRole
+  defaultUserTeam
+  productConfiguration
+  supportsCustomConnections
+  sessionExpireTime
+
+  anonymousAccessEnabled
+
+  adminCredentialsSaveEnabled
+  publicCredentialsSaveEnabled
+
+  resourceManagerEnabled
+
+  configurationMode
+  developmentMode
+  redirectOnFederatedAuth
+  distributed
+
+  enabledFeatures
+  disabledBetaFeatures
+  enabledAuthProviders
+  supportedLanguages {
+    isoCode
+    displayName
+    nativeName
+  }
+  disabledDrivers
+}

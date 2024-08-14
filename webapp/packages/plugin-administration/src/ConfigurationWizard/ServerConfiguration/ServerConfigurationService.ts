@@ -13,7 +13,7 @@ import { DEFAULT_NAVIGATOR_VIEW_SETTINGS } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
 import { ENotificationType, INotification, NotificationService } from '@cloudbeaver/core-events';
 import { Executor, ExecutorInterrupter, IExecutor, IExecutorHandler } from '@cloudbeaver/core-executor';
-import { ServerConfigResource, SessionDataResource } from '@cloudbeaver/core-root';
+import { DefaultNavigatorSettingsResource, ProductInfoResource, ServerConfigResource, SessionDataResource } from '@cloudbeaver/core-root';
 
 import { ADMINISTRATION_SERVER_CONFIGURATION_ITEM } from './ADMINISTRATION_SERVER_CONFIGURATION_ITEM';
 import type { IServerConfigurationPageState } from './IServerConfigurationPageState';
@@ -53,8 +53,10 @@ export class ServerConfigurationService {
   constructor(
     private readonly administrationScreenService: AdministrationScreenService,
     private readonly serverConfigResource: ServerConfigResource,
+    private readonly defaultNavigatorSettingsResource: DefaultNavigatorSettingsResource,
     private readonly notificationService: NotificationService,
     private readonly sessionDataResource: SessionDataResource,
+    private readonly productInfoResource: ProductInfoResource,
   ) {
     this.done = false;
     this.loading = true;
@@ -119,11 +121,13 @@ export class ServerConfigurationService {
         reset = true;
         this.stateLinked = true;
         await this.serverConfigResource.load();
+        await this.defaultNavigatorSettingsResource.load();
 
         this.serverConfigResource.setDataUpdate(this.state.serverConfig);
-        this.serverConfigResource.setNavigatorSettingsUpdate(this.state.navigatorConfig);
+        this.defaultNavigatorSettingsResource.setDataUpdate(this.state.navigatorConfig);
 
         if (reset) {
+          this.defaultNavigatorSettingsResource.resetUpdate();
           this.serverConfigResource.resetUpdate();
         }
       }
@@ -156,12 +160,14 @@ export class ServerConfigurationService {
 
     try {
       const config = await this.serverConfigResource.load();
+      const productInfo = await this.productInfoResource.load();
+      const defaultNavigatorSettings = await this.defaultNavigatorSettingsResource.load();
 
       if (!config) {
         return;
       }
 
-      data.state.serverConfig.serverName = config.name || config.productInfo.name;
+      data.state.serverConfig.serverName = config.name || productInfo?.name;
       data.state.serverConfig.serverURL = config.serverURL;
 
       if (this.administrationScreenService.isConfigurationMode && !config.distributed) {
@@ -175,7 +181,7 @@ export class ServerConfigurationService {
       data.state.serverConfig.customConnectionsEnabled = config.supportsCustomConnections;
       data.state.serverConfig.disabledDrivers = [...config.disabledDrivers];
 
-      Object.assign(data.state.navigatorConfig, config.defaultNavigatorSettings);
+      Object.assign(data.state.navigatorConfig, defaultNavigatorSettings);
     } catch (exception: any) {
       ExecutorInterrupter.interrupt(contexts);
       this.notificationService.logException(exception, "Can't load server configuration");
@@ -198,7 +204,10 @@ export class ServerConfigurationService {
     }
 
     try {
-      await this.serverConfigResource.save(data.configurationWizard);
+      await this.defaultNavigatorSettingsResource.save();
+      if (!data.configurationWizard) {
+        await this.serverConfigResource.save();
+      }
 
       if (data.configurationWizard && data.finish) {
         await this.serverConfigResource.finishConfiguration();
@@ -252,7 +261,7 @@ export class ServerConfigurationService {
 
   private showUnsavedNotification(close: boolean) {
     if (
-      (!this.serverConfigResource.isChanged() && !this.serverConfigResource.isNavigatorSettingsChanged()) ||
+      (!this.serverConfigResource.isChanged() && !this.defaultNavigatorSettingsResource.isChanged()) ||
       this.administrationScreenService.activeScreen?.item === ADMINISTRATION_SERVER_CONFIGURATION_ITEM
     ) {
       this.unSaveNotification?.close(true);
@@ -292,6 +301,7 @@ export class ServerConfigurationService {
     }
 
     this.unSaveNotification?.close(true);
+    this.defaultNavigatorSettingsResource.unlinkUpdate();
     this.serverConfigResource.unlinkUpdate();
     this.stateLinked = false;
   }
