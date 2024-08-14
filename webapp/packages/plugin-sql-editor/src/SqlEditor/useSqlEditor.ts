@@ -505,6 +505,15 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
   untracked(() => data.init());
 
   useExecutor({
+    executor: data.dataSource?.onSetCursor,
+    handlers: [
+      function handleCursorChange({ begin, end }) {
+        data.updateParserScripts(); // TODO should we add debounce here? 2000ms? 300ms?
+      },
+    ],
+  });
+
+  useExecutor({
     executor: data.dataSource?.onSetScript,
     handlers: [
       function setScript({ script }) {

@@ -56,6 +56,7 @@ export interface ISqlDataSource extends ILoadableState {
   readonly onUpdate: ISyncExecutor;
   readonly onSetScript: ISyncExecutor<ISetScriptData>;
   readonly onDatabaseModelUpdate: ISyncExecutor<IDatabaseDataModel<QueryDataSource>[]>;
+  readonly onSetCursor: ISyncExecutor<ISqlEditorCursor>;
 
   isOpened(): boolean;
   isReadonly(): boolean;

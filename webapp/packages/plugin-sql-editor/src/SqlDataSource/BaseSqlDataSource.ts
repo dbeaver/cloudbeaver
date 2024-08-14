@@ -82,6 +82,7 @@ export abstract class BaseSqlDataSource implements ISqlDataSource {
   readonly onUpdate: ISyncExecutor;
   readonly onSetScript: ISyncExecutor<ISetScriptData>;
   readonly onDatabaseModelUpdate: ISyncExecutor<IDatabaseDataModel<QueryDataSource>[]>;
+  readonly onSetCursor: ISyncExecutor<ISqlEditorCursor>;
 
   protected outdated: boolean;
   protected editing: boolean;
@@ -101,6 +102,7 @@ export abstract class BaseSqlDataSource implements ISqlDataSource {
     this.onUpdate = new SyncExecutor();
     this.onSetScript = new SyncExecutor();
     this.onDatabaseModelUpdate = new SyncExecutor();
+    this.onSetCursor = new SyncExecutor();
 
     this.onDatabaseModelUpdate.setInitialDataGetter(() => this.databaseModels);
     this.onSetScript.next(this.onUpdate);
@@ -244,6 +246,7 @@ export abstract class BaseSqlDataSource implements ISqlDataSource {
       end: Math.min(end, scriptLength),
     });
     this.onUpdate.execute();
+    this.onSetCursor.execute({ ...this.innerCursorState });
   }
 
   setEditing(state: boolean): void {

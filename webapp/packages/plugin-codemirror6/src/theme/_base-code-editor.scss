@@ -86,11 +86,8 @@
   }
 
   .editor .active-query {
-    /* disable because look too ugly */
-    /*
     display: inline-block;
     @include mdc-theme-prop(background, secondary, false);
-    */
   }
 
   .editor .cm-content ::selection {
