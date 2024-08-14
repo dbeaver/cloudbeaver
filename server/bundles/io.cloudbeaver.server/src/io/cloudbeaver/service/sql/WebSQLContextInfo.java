@@ -31,6 +31,7 @@ import org.jkiss.dbeaver.model.data.DBDAttributeBinding;
 import org.jkiss.dbeaver.model.exec.*;
 import org.jkiss.dbeaver.model.exec.trace.DBCTrace;
 import org.jkiss.dbeaver.model.meta.Property;
+import org.jkiss.dbeaver.model.qm.QMTransactionLogInfo;
 import org.jkiss.dbeaver.model.qm.QMTransactionState;
 import org.jkiss.dbeaver.model.qm.QMUtils;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
@@ -214,6 +215,11 @@ public class WebSQLContextInfo implements WebSessionProvider {
         };
         return getWebSession().createAndRunAsyncTask("Set auto-commit", runnable);
 
+    }
+
+    public QMTransactionLogInfo getTransactionLogInfo() {
+        DBCExecutionContext context = processor.getExecutionContext();
+        return QMUtils.getTransactionLogInfo(context);
     }
 
     public WebAsyncTaskInfo commitTransaction() {
