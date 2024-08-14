@@ -51,7 +51,7 @@ export default [
   ['connections_connection_edit_search_hosts', 'Host names'],
   ['connections_connection_address', 'Indirizzo'],
   ['connections_connection_folder', 'Folder'],
-  ['connections_connection_folder_validation', "Folder's name may not contain the following symbols / : \" \\ and can't start with a dot"],
+  ['connections_connection_folder_validation', "Folder's name may not contain the following symbols / : \" \\ ' <> | ? * and can't start with a dot"],
   ['connections_connection_name', 'Nome della connessione'],
   ['connections_connection_access_revoke', 'Revoca'],
   ['connections_connection_access_grant', 'Permetti'],

@@ -6,4 +6,12 @@
  * you may not use this file except in compliance with the License.
  */
 
-export const RESOURCE_NAME_REGEX = /^(?!\.)[^\\/:\\"'<>|?*]+$/u;
+export function getDomainFromUrl(url: string): string {
+  try {
+    const urlObject = new URL(url);
+    return urlObject.hostname;
+  } catch (e) {
+    console.error('Invalid URL:', e);
+    return '';
+  }
+}
