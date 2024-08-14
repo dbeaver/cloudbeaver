@@ -36,5 +36,10 @@ export const coreRootManifest: PluginManifest = {
     () => import('./Settings/ServerSettingsResource').then(m => m.ServerSettingsResource),
     () => import('./Settings/ServerSettingsManagerService').then(m => m.ServerSettingsManagerService),
     () => import('./RootBootstrap').then(m => m.RootBootstrap),
+    () => import('./ServerLicenseStatusResource').then(m => m.ServerLicenseStatusResource),
+    () => import('./PasswordPolicyResource').then(m => m.PasswordPolicyResource),
+    () => import('./ProductInfoResource').then(m => m.ProductInfoResource),
+    () => import('./DefaultNavigatorSettingsResource').then(m => m.DefaultNavigatorSettingsResource),
+    () => import('./ServerResourceQuotasResource').then(m => m.ServerResourceQuotasResource),
   ],
 };

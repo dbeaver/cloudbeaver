@@ -50,7 +50,7 @@ export class AdministrationScreenService {
   }
 
   get publicDisabled(): boolean {
-    return this.serverConfigResource.publicDisabled;
+    return this.permissionsService.publicDisabled;
   }
 
   readonly ensurePermissions: IExecutor;

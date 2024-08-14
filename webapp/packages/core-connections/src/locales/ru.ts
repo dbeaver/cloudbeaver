@@ -58,7 +58,7 @@ export default [
   ['connections_connection_edit_search_hosts', 'Названия хостов'],
   ['connections_connection_address', 'Адрес'],
   ['connections_connection_folder', 'Папка'],
-  ['connections_connection_folder_validation', 'Имя папки не может содержать следующие символы / : " \\ и не может начинаться с точки'],
+  ['connections_connection_folder_validation', 'Имя папки не может содержать следующие символы / : " \\ \' <> | ? * и не может начинаться с точки'],
   ['connections_connection_name', 'Название подключения'],
   ['connections_connection_access_user_or_team_name', 'Имя пользователя или команды'],
   ['connections_connection_access_filter_placeholder', 'Поиск по имени пользователя или команде'],

@@ -1,0 +1,5 @@
+fragment ServerLicenseStatus on ServerConfig {
+  licenseRequired
+  licenseValid
+  licenseStatus
+}
