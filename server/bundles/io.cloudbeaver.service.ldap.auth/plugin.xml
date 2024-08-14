@@ -18,7 +18,15 @@
                               description="LDAP attribute used as a user ID. Will be automatically added to the beginning of the 'User DN' value during authorization if not explicitly specified"/>
                     <property id="ldap-dn" label="Base Distinguished Name" type="string"
                               description="Base Distinguished Name applicable for all users, example: dc=myOrg,dc=com. Will be automatically added to the end of the 'User DN' value during authorization if not explicitly specified"
-                              required="false"
+                              required="false"/>
+                    <property id="ldap-bind-user" label="Bind User DN" type="string"
+                              description="DN of user, who has permissions to search for users to check access to the application with the specified filter."
+                              required="false"/>
+                    <property id="ldap-bind-user-pwd" label="Bind User Password" type="string"
+                              description="Bind user password."
+                              features="password" required="false"/>
+                    <property id="ldap-filter   " label="User Filter" type="string" required="false"
+                              description="Filter that will be used to verify users access to the application.To use the filter, the bind user configuration is mandatory."
                     />
                 </propertyGroup>
             </configuration>

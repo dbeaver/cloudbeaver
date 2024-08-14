@@ -20,6 +20,9 @@ public interface LdapConstants {
     String PARAM_HOST = "ldap-host";
     String PARAM_PORT = "ldap-port";
     String PARAM_DN = "ldap-dn";
+    String PARAM_BIND_USER = "ldap-bind-user";
+    String PARAM_BIND_USER_PASSWORD = "ldap-bind-user-pwd";
+    String PARAM_FILTER = "ldap-filter";
     String PARAM_USER_IDENTIFIER_ATTR = "ldap-identifier-attr";
 
 
