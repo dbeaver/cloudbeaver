@@ -218,7 +218,7 @@ export class UsersResource extends CachedMapResource<string, AdminUser, UserReso
     await this.refresh(userId);
   }
 
-  async delete(key: ResourceKeySimple<string>): Promise<void> {
+  async deleteUsers(key: ResourceKeySimple<string>): Promise<void> {
     await ResourceKeyUtils.forEachAsync(key, async key => {
       if (this.isActiveUser(key)) {
         throw new Error("You can't delete current logged user");
