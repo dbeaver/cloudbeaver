@@ -6,8 +6,10 @@
  * you may not use this file except in compliance with the License.
  */
 import { action } from 'mobx';
+import { useCallback } from 'react';
 
 import { useExecutor, useObservableRef } from '@cloudbeaver/core-blocks';
+import { throttle } from '@cloudbeaver/core-utils';
 import type { ISQLEditorData } from '@cloudbeaver/plugin-sql-editor';
 
 import type { IEditor } from '../SQLCodeEditor/useSQLCodeEditor';
@@ -37,16 +39,25 @@ export function useSQLCodeEditorPanel(data: ISQLEditorData, editor: IEditor) {
       },
       onCursorChange(begin: number, end?: number) {
         this.data.setCursor(begin, end);
-        this.highlightActiveQuery();
       },
     }),
-    { onQueryChange: action.bound, onCursorChange: action.bound, highlightActiveQuery: action.bound },
+    { onQueryChange: action.bound, onCursorChange: action.bound },
     { editor, data },
+  );
+
+  const updateHighlight = useCallback(
+    throttle(() => state.highlightActiveQuery(), 1000),
+    [state],
   );
 
   useExecutor({
     executor: data.onUpdate,
-    handlers: [state.highlightActiveQuery],
+    handlers: [updateHighlight],
+  });
+
+  useExecutor({
+    executor: data.dataSource?.onUpdate,
+    handlers: [updateHighlight],
   });
 
   useExecutor({
