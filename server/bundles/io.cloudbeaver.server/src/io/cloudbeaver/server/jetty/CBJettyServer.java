@@ -23,19 +23,16 @@ import io.cloudbeaver.server.graphql.GraphQLEndpoint;
 import io.cloudbeaver.server.servlets.CBImageServlet;
 import io.cloudbeaver.server.servlets.CBStaticServlet;
 import io.cloudbeaver.server.servlets.CBStatusServlet;
+import io.cloudbeaver.server.servlets.ProxyResourceHandler;
 import io.cloudbeaver.server.websockets.CBJettyWebSocketManager;
 import io.cloudbeaver.service.DBWServiceBindingServlet;
+import org.eclipse.jetty.ee10.servlet.*;
 import org.eclipse.jetty.server.*;
-import org.eclipse.jetty.server.session.DefaultSessionCache;
-import org.eclipse.jetty.server.session.DefaultSessionIdManager;
-import org.eclipse.jetty.server.session.NullSessionDataStore;
-import org.eclipse.jetty.server.session.SessionHandler;
-import org.eclipse.jetty.servlet.ErrorPageErrorHandler;
-import org.eclipse.jetty.servlet.ServletContextHandler;
-import org.eclipse.jetty.servlet.ServletHolder;
-import org.eclipse.jetty.servlet.ServletMapping;
-import org.eclipse.jetty.util.resource.PathResource;
-import org.eclipse.jetty.websocket.server.config.JettyWebSocketServletContainerInitializer;
+import org.eclipse.jetty.session.DefaultSessionCache;
+import org.eclipse.jetty.session.DefaultSessionIdManager;
+import org.eclipse.jetty.session.NullSessionDataStore;
+import org.eclipse.jetty.util.resource.ResourceFactory;
+import org.eclipse.jetty.websocket.server.WebSocketUpgradeHandler;
 import org.eclipse.jetty.xml.XmlConfiguration;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
@@ -67,15 +64,15 @@ public class CBJettyServer {
     public void runServer() {
         try {
             CBServerConfig serverConfiguration = application.getServerConfiguration();
-            JettyServer server;
+            Server server;
             int serverPort = serverConfiguration.getServerPort();
             String serverHost = serverConfiguration.getServerHost();
             Path sslPath = getSslConfigurationPath();
 
             boolean sslConfigurationExists = sslPath != null && Files.exists(sslPath);
             if (sslConfigurationExists) {
-                server = new JettyServer();
-                XmlConfiguration sslConfiguration = new XmlConfiguration(new PathResource(sslPath));
+                server = new Server();
+                XmlConfiguration sslConfiguration = new XmlConfiguration(ResourceFactory.of(server).newResource(sslPath));
                 ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
                 // method sslConfiguration.configure() does not see the context class of the Loader,
                 // so we have to configure it manually, then return the old classLoader.
@@ -84,9 +81,9 @@ public class CBJettyServer {
                 Thread.currentThread().setContextClassLoader(classLoader);
             } else {
                 if (CommonUtils.isEmpty(serverHost)) {
-                    server = new JettyServer(serverPort);
+                    server = new Server(serverPort);
                 } else {
-                    server = new JettyServer(
+                    server = new Server(
                         InetSocketAddress.createUnresolved(serverHost, serverPort));
                 }
             }
@@ -94,13 +91,15 @@ public class CBJettyServer {
             {
                 // Handler configuration
                 ServletContextHandler servletContextHandler = new ServletContextHandler(ServletContextHandler.SESSIONS);
-                servletContextHandler.setResourceBase(serverConfiguration.getContentRoot());
+                servletContextHandler.setBaseResourceAsString(serverConfiguration.getContentRoot());
                 String rootURI = serverConfiguration.getRootURI();
                 servletContextHandler.setContextPath(rootURI);
 
                 ServletHolder staticServletHolder = new ServletHolder("static", new CBStaticServlet());
                 staticServletHolder.setInitParameter("dirAllowed", "false");
+                staticServletHolder.setInitParameter("cacheControl", "public, max-age=" + CBStaticServlet.STATIC_CACHE_SECONDS);
                 servletContextHandler.addServlet(staticServletHolder, "/*");
+                servletContextHandler.insertHandler(new ProxyResourceHandler());
 
                 ServletHolder imagesServletHolder = new ServletHolder("images", new CBImageServlet());
                 servletContextHandler.addServlet(imagesServletHolder, serverConfiguration.getServicesURI() + "images/*");
@@ -121,12 +120,7 @@ public class CBJettyServer {
                     }
                 }
 
-                initSessionManager(this.application, servletContextHandler);
-
-                server.setHandler(servletContextHandler);
-
-                JettyWebSocketServletContainerInitializer.configure(servletContextHandler,
-                    (context, wsContainer) -> {
+                WebSocketUpgradeHandler webSocketHandler = WebSocketUpgradeHandler.from(server, servletContextHandler, (wsContainer) -> {
                         wsContainer.setIdleTimeout(Duration.ofMinutes(5));
                         // Add websockets
                         wsContainer.addMapping(
@@ -135,6 +129,12 @@ public class CBJettyServer {
                         );
                     }
                 );
+                servletContextHandler.insertHandler(webSocketHandler);
+
+                initSessionManager(this.application, server, servletContextHandler);
+
+                server.setHandler(servletContextHandler);
+
                 ErrorPageErrorHandler errorHandler = new ErrorPageErrorHandler();
                 //errorHandler.addErrorPage(404, "/missing.html");
                 servletContextHandler.setErrorHandler(errorHandler);
@@ -181,6 +181,7 @@ public class CBJettyServer {
 
     private void initSessionManager(
         @NotNull CBApplication<?> application,
+        @NotNull Server server,
         @NotNull ServletContextHandler servletContextHandler
     ) {
         // Init sessions persistence
@@ -199,27 +200,10 @@ public class CBJettyServer {
         sessionCache.setSessionDataStore(new NullSessionDataStore());
         sessionHandler.setSessionCache(sessionCache);
         servletContextHandler.setSessionHandler(sessionHandler);
-    }
 
-    public static class JettyServer extends Server {
-        public JettyServer(int serverPort) {
-            super(serverPort);
-        }
+        DefaultSessionIdManager idMgr = new DefaultSessionIdManager(server);
+        idMgr.setWorkerName(null);
+        server.addBean(idMgr, true);
 
-        public JettyServer() {
-            super();
-        }
-        public JettyServer(InetSocketAddress addr) {
-            super(addr);
-        }
-
-        @Override
-        public void setSessionIdManager(SessionIdManager sessionIdManager) {
-            if (sessionIdManager instanceof DefaultSessionIdManager) {
-                // Nullify worker name to avoid dummy prefixes in session ID cookie
-                ((DefaultSessionIdManager) sessionIdManager).setWorkerName(null);
-            }
-            super.setSessionIdManager(sessionIdManager);
-        }
     }
 }

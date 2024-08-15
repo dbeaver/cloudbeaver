@@ -21,8 +21,8 @@ import org.jkiss.dbeaver.model.websocket.event.session.WSAccessTokenExpiredEvent
 
 public class CBExpiredSessionWebSocket extends CBAbstractWebSocket {
     @Override
-    public void onWebSocketConnect(Session session) {
-        super.onWebSocketConnect(session);
+    public void onWebSocketOpen(Session session) {
+        super.onWebSocketOpen(session);
         handleEvent(new WSAccessTokenExpiredEvent());
         close();
     }
