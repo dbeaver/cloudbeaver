@@ -31,6 +31,7 @@ import io.cloudbeaver.service.DBWServiceServerConfigurator;
 import io.cloudbeaver.service.admin.*;
 import io.cloudbeaver.service.security.SMUtils;
 import io.cloudbeaver.utils.WebAppUtils;
+import io.cloudbeaver.utils.WebDataSourceUtils;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
@@ -656,7 +657,7 @@ public class WebServiceAdmin implements DBWServiceAdmin {
         String connectionId
     ) throws DBWebException {
         DBPProject globalProject = webSession.getProjectById(projectId);
-        if (!WebServiceUtils.isGlobalProject(globalProject)) {
+        if (!WebDataSourceUtils.isGlobalProject(globalProject)) {
             throw new DBWebException("Project '" + projectId + "'is not global");
         }
         try {
@@ -700,7 +701,7 @@ public class WebServiceAdmin implements DBWServiceAdmin {
 
     void validateThatConnectionGlobal(WebSession webSession, String projectId, Collection<String> connectionIds) throws DBWebException {
         DBPProject globalProject = webSession.getProjectById(projectId);
-        if (!WebServiceUtils.isGlobalProject(globalProject)) {
+        if (!WebDataSourceUtils.isGlobalProject(globalProject)) {
             throw new DBWebException("Project '" + projectId + "'is not global");
         }
         for (String connectionId : connectionIds) {

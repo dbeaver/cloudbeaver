@@ -18,11 +18,13 @@ package io.cloudbeaver.model.rm.local;
 
 import io.cloudbeaver.BaseWebProjectImpl;
 import io.cloudbeaver.DBWConstants;
+import io.cloudbeaver.model.WebNetworkHandlerConfigInput;
 import io.cloudbeaver.model.app.WebApplication;
 import io.cloudbeaver.model.rm.lock.RMFileLockController;
 import io.cloudbeaver.service.security.SMUtils;
 import io.cloudbeaver.service.sql.WebSQLConstants;
 import io.cloudbeaver.utils.WebAppUtils;
+import io.cloudbeaver.utils.WebDataSourceUtils;
 import io.cloudbeaver.utils.file.UniversalFileVisitor;
 import org.eclipse.core.runtime.IPath;
 import org.jkiss.code.NotNull;
@@ -37,6 +39,7 @@ import org.jkiss.dbeaver.model.app.DBPProject;
 import org.jkiss.dbeaver.model.app.DBPWorkspace;
 import org.jkiss.dbeaver.model.auth.SMCredentials;
 import org.jkiss.dbeaver.model.auth.SMCredentialsProvider;
+import org.jkiss.dbeaver.model.data.json.ConnectionCredentialsInfo;
 import org.jkiss.dbeaver.model.impl.auth.SessionContextImpl;
 import org.jkiss.dbeaver.model.rm.*;
 import org.jkiss.dbeaver.model.runtime.VoidProgressMonitor;
@@ -428,6 +431,28 @@ public class LocalResourceController implements RMController {
                 }
             );
         }
+    }
+
+    public boolean updateProjectDataSourceCredentials(
+        @NotNull String projectId,
+        @NotNull String configuration,
+        @NotNull String dataSourceId
+    ) throws DBException {
+        DBPProject project = getWebProject(projectId, false);
+        DBPDataSourceRegistry registry = project.getDataSourceRegistry();
+        DBPDataSourceContainer dataSourceContainer = registry.getDataSource(dataSourceId);
+
+        ConnectionCredentialsInfo info = ConnectionCredentialsInfo.deserializeJson(configuration);
+
+        WebDataSourceUtils.updateConnectionCredentials(
+            dataSourceContainer,
+            info.getAuthProperties(),
+            info.getNetworkHandlerCredentials().stream().map(WebNetworkHandlerConfigInput::new).toList(),
+            info.getSaveCredentials(),
+            info.getSharedCredentials(),
+            null
+        );
+        return true;
     }
 
     @Override

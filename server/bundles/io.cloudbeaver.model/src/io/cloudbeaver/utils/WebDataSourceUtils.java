@@ -16,6 +16,9 @@
  */
 package io.cloudbeaver.utils;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.InstanceCreator;
 import io.cloudbeaver.DBWConstants;
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.model.WebConnectionInfo;
@@ -27,14 +30,23 @@ import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
+import org.jkiss.dbeaver.model.access.DBAAuthCredentials;
 import org.jkiss.dbeaver.model.app.DBPDataSourceRegistry;
 import org.jkiss.dbeaver.model.app.DBPProject;
 import org.jkiss.dbeaver.model.connection.DBPConnectionConfiguration;
+import org.jkiss.dbeaver.model.impl.auth.AuthModelDatabaseNativeCredentials;
 import org.jkiss.dbeaver.model.net.DBWHandlerConfiguration;
+import org.jkiss.dbeaver.model.net.DBWHandlerType;
 import org.jkiss.dbeaver.model.net.ssh.SSHConstants;
+import org.jkiss.dbeaver.model.rm.RMProjectType;
+import org.jkiss.dbeaver.model.secret.DBSSecretController;
+import org.jkiss.dbeaver.registry.BaseApplicationImpl;
+import org.jkiss.dbeaver.registry.DataSourceDescriptor;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.utils.CommonUtils;
 
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -143,6 +155,9 @@ public class WebDataSourceUtils {
         handlerCfg.setSecureProperty(SSHConstants.PROP_KEY_VALUE, webConfig.getKey()); // backward compatibility
     }
 
+    public static boolean isGlobalProject(DBPProject project) {
+        return project.getId().equals(RMProjectType.GLOBAL.getPrefix() + "_" + BaseApplicationImpl.getInstance().getDefaultProjectName());
+    }
 
     public static boolean disconnectDataSource(@NotNull WebSession webSession, @NotNull DBPDataSourceContainer dataSource) {
         if (dataSource.isConnected()) {
@@ -156,5 +171,130 @@ public class WebDataSourceUtils {
             //new DisconnectJob(connectionInfo.getDataSource()).schedule();
         }
         return false;
+    }
+
+
+    public static void saveAuthProperties(
+        @NotNull DBPDataSourceContainer dataSourceContainer,
+        @NotNull DBPConnectionConfiguration configuration,
+        @Nullable Map<String, Object> authProperties,
+        boolean saveCredentials,
+        boolean sharedCredentials
+    ) {
+        saveAuthProperties(dataSourceContainer, configuration, authProperties, saveCredentials, sharedCredentials, false);
+    }
+
+    public static void saveAuthProperties(
+        @NotNull DBPDataSourceContainer dataSourceContainer,
+        @NotNull DBPConnectionConfiguration configuration,
+        @Nullable Map<String, Object> authProperties,
+        boolean saveCredentials,
+        boolean sharedCredentials,
+        boolean isTest
+    ) {
+        dataSourceContainer.setSavePassword(saveCredentials);
+        dataSourceContainer.setSharedCredentials(sharedCredentials);
+        if (!saveCredentials) {
+            // Reset credentials
+            if (authProperties == null) {
+                authProperties = new LinkedHashMap<>();
+            }
+            authProperties.replace(AuthModelDatabaseNativeCredentials.PROP_USER_PASSWORD, null);
+            dataSourceContainer.resetPassword();
+        } else {
+            if (authProperties == null) {
+                // No changes
+                return;
+            }
+        }
+        {
+            // Read save credentials
+            DBAAuthCredentials credentials = configuration.getAuthModel().loadCredentials(dataSourceContainer, configuration);
+
+            if (isTest) {
+                var currentAuthProps = new HashMap<String, String>();
+                for (Map.Entry<String, Object> stringObjectEntry : authProperties.entrySet()) {
+                    var value = stringObjectEntry.getValue() == null ? null : stringObjectEntry.getValue().toString();
+                    currentAuthProps.put(stringObjectEntry.getKey(), value);
+                }
+                configuration.setAuthProperties(currentAuthProps);
+            }
+            if (!authProperties.isEmpty()) {
+
+                // Make new Gson parser with type adapters to deserialize into existing credentials
+                InstanceCreator<DBAAuthCredentials> credTypeAdapter = type -> credentials;
+                Gson credGson = new GsonBuilder()
+                    .setLenient()
+                    .registerTypeAdapter(credentials.getClass(), credTypeAdapter)
+                    .create();
+
+                credGson.fromJson(credGson.toJsonTree(authProperties), credentials.getClass());
+            }
+
+            configuration.getAuthModel().saveCredentials(dataSourceContainer, configuration, credentials);
+        }
+    }
+
+    public static void updateConnectionCredentials(@NotNull DBPDataSourceContainer dataSourceContainer,
+                                                   @NotNull Map<String, Object> authProperties,
+                                                   @Nullable List<WebNetworkHandlerConfigInput> networkCredentials,
+                                                   @Nullable Boolean saveCredentials,
+                                                   @Nullable Boolean sharedCredentials,
+                                                   @Nullable WebConnectionInfo connectionInfo) throws DBWebException {
+        boolean saveConfig = false;
+
+        if (networkCredentials != null) {
+            for (WebNetworkHandlerConfigInput c: networkCredentials) {
+                if (CommonUtils.toBoolean(c.isSavePassword())) {
+                    DBWHandlerConfiguration handlerCfg = dataSourceContainer.getConnectionConfiguration().getHandler(c.getId());
+                    if (handlerCfg != null &&
+                        // check username param only for ssh config
+                        !(CommonUtils.isEmpty(c.getUserName()) && CommonUtils.equalObjects(handlerCfg.getType(),
+                            DBWHandlerType.TUNNEL))
+                    ) {
+                        WebDataSourceUtils.updateHandlerCredentials(handlerCfg, c);
+                        handlerCfg.setSavePassword(true);
+                        saveConfig = true;
+                    }
+                }
+            }
+        }
+        if (saveCredentials != null && saveCredentials) {
+            // Save all passed credentials in the datasource container
+            WebDataSourceUtils.saveAuthProperties(
+                dataSourceContainer,
+                dataSourceContainer.getConnectionConfiguration(),
+                authProperties,
+                true,
+                sharedCredentials == null ? false : sharedCredentials
+            );
+
+            var project = dataSourceContainer.getProject();
+            if (project.isUseSecretStorage()) {
+                try {
+                    dataSourceContainer.persistSecrets(
+                        DBSSecretController.getProjectSecretController(dataSourceContainer.getProject())
+                    );
+                } catch (DBException e) {
+                    throw new DBWebException("Failed to save credentials", e);
+                }
+            }
+
+            // TODO it seems that webConnectionInfo.getSavedAuthProperties() and webConnectionInfo.getSavedNetworkCredentials()
+            //  are always null here, so this call apparently is redundant, but let it bee for now because just moving code for another feature
+            if (connectionInfo != null) {
+                WebDataSourceUtils.saveCredentialsInDataSource(connectionInfo,
+                    dataSourceContainer,
+                    dataSourceContainer.getConnectionConfiguration());
+            }
+            saveConfig = true;
+        }
+        if (WebDataSourceUtils.isGlobalProject(dataSourceContainer.getProject())) {
+            // Do not flush config for global project (only admin can do it - CB-2415)
+            saveConfig = false;
+        }
+        if (saveConfig) {
+            dataSourceContainer.persistConfiguration();
+        }
     }
 }

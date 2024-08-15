@@ -18,7 +18,6 @@ package io.cloudbeaver;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.InstanceCreator;
 import io.cloudbeaver.model.WebConnectionConfig;
 import io.cloudbeaver.model.WebNetworkHandlerConfigInput;
 import io.cloudbeaver.model.WebPropertyInfo;
@@ -39,18 +38,14 @@ import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBConstants;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
 import org.jkiss.dbeaver.model.DBPObject;
-import org.jkiss.dbeaver.model.access.DBAAuthCredentials;
 import org.jkiss.dbeaver.model.app.DBPDataSourceRegistry;
-import org.jkiss.dbeaver.model.app.DBPProject;
 import org.jkiss.dbeaver.model.connection.DBPConnectionConfiguration;
 import org.jkiss.dbeaver.model.connection.DBPDriver;
-import org.jkiss.dbeaver.model.impl.auth.AuthModelDatabaseNativeCredentials;
 import org.jkiss.dbeaver.model.navigator.DBNBrowseSettings;
 import org.jkiss.dbeaver.model.navigator.DBNModel;
 import org.jkiss.dbeaver.model.navigator.DBNProject;
 import org.jkiss.dbeaver.model.net.DBWHandlerConfiguration;
 import org.jkiss.dbeaver.model.preferences.DBPPropertyDescriptor;
-import org.jkiss.dbeaver.model.rm.RMProjectType;
 import org.jkiss.dbeaver.registry.DataSourceDescriptor;
 import org.jkiss.dbeaver.registry.DataSourceNavigatorSettings;
 import org.jkiss.dbeaver.registry.DataSourceProviderDescriptor;
@@ -145,7 +140,7 @@ public class WebServiceUtils extends WebCommonUtils {
         //navSettings.setShowSystemObjects(false);
         ((DataSourceDescriptor)newDataSource).setNavigatorSettings(navSettings);
 
-        saveAuthProperties(
+        WebDataSourceUtils.saveAuthProperties(
             newDataSource,
             newDataSource.getConnectionConfiguration(),
             config.getCredentials(),
@@ -249,67 +244,6 @@ public class WebServiceUtils extends WebCommonUtils {
         }
     }
 
-    public static void saveAuthProperties(
-        @NotNull DBPDataSourceContainer dataSourceContainer,
-        @NotNull DBPConnectionConfiguration configuration,
-        @Nullable Map<String, Object> authProperties,
-        boolean saveCredentials,
-        boolean sharedCredentials
-    ) {
-        saveAuthProperties(dataSourceContainer, configuration, authProperties, saveCredentials, sharedCredentials, false);
-    }
-
-    public static void saveAuthProperties(
-        @NotNull DBPDataSourceContainer dataSourceContainer,
-        @NotNull DBPConnectionConfiguration configuration,
-        @Nullable Map<String, Object> authProperties,
-        boolean saveCredentials,
-        boolean sharedCredentials,
-        boolean isTest
-    ) {
-        dataSourceContainer.setSavePassword(saveCredentials);
-        dataSourceContainer.setSharedCredentials(sharedCredentials);
-        if (!saveCredentials) {
-            // Reset credentials
-            if (authProperties == null) {
-                authProperties = new LinkedHashMap<>();
-            }
-            authProperties.replace(AuthModelDatabaseNativeCredentials.PROP_USER_PASSWORD, null);
-            dataSourceContainer.resetPassword();
-        } else {
-            if (authProperties == null) {
-                // No changes
-                return;
-            }
-        }
-        {
-            // Read save credentials
-            DBAAuthCredentials credentials = configuration.getAuthModel().loadCredentials(dataSourceContainer, configuration);
-
-            if (isTest) {
-                var currentAuthProps = new HashMap<String, String>();
-                for (Map.Entry<String, Object> stringObjectEntry : authProperties.entrySet()) {
-                    var value = stringObjectEntry.getValue() == null ? null : stringObjectEntry.getValue().toString();
-                    currentAuthProps.put(stringObjectEntry.getKey(), value);
-                }
-                configuration.setAuthProperties(currentAuthProps);
-            }
-            if (!authProperties.isEmpty()) {
-
-                // Make new Gson parser with type adapters to deserialize into existing credentials
-                InstanceCreator<DBAAuthCredentials> credTypeAdapter = type -> credentials;
-                Gson credGson = new GsonBuilder()
-                    .setLenient()
-                    .registerTypeAdapter(credentials.getClass(), credTypeAdapter)
-                    .create();
-
-                credGson.fromJson(credGson.toJsonTree(authProperties), credentials.getClass());
-            }
-
-            configuration.getAuthModel().saveCredentials(dataSourceContainer, configuration, credentials);
-        }
-    }
-
     public static DBNBrowseSettings parseNavigatorSettings(Map<String, Object> settingsMap) {
         return gson.fromJson(
             gson.toJsonTree(settingsMap), DataSourceNavigatorSettings.class);
@@ -342,10 +276,6 @@ public class WebServiceUtils extends WebCommonUtils {
     public static void updateConfigAndRefreshDatabases(WebSession session, String projectId) {
         DBNProject projectNode = session.getNavigatorModel().getRoot().getProjectNode(session.getProjectById(projectId));
         DBNModel.updateConfigAndRefreshDatabases(projectNode.getDatabases());
-    }
-
-    public static boolean isGlobalProject(DBPProject project) {
-        return project.getId().equals(RMProjectType.GLOBAL.getPrefix() + "_" + CBApplication.getInstance().getDefaultProjectName());
     }
 
     public static List<WebAuthProviderDescriptor> getEnabledAuthProviders() {

@@ -46,15 +46,14 @@ import org.jkiss.dbeaver.model.app.DBPDataSourceRegistry;
 import org.jkiss.dbeaver.model.app.DBPProject;
 import org.jkiss.dbeaver.model.connection.DBPConnectionConfiguration;
 import org.jkiss.dbeaver.model.connection.DBPDriver;
+import io.cloudbeaver.model.WebNetworkHandlerConfigInput;
 import org.jkiss.dbeaver.model.navigator.*;
 import org.jkiss.dbeaver.model.net.DBWHandlerConfiguration;
-import org.jkiss.dbeaver.model.net.DBWHandlerType;
 import org.jkiss.dbeaver.model.net.DBWNetworkHandler;
 import org.jkiss.dbeaver.model.net.DBWTunnel;
 import org.jkiss.dbeaver.model.net.ssh.SSHSession;
 import org.jkiss.dbeaver.model.rm.RMProjectType;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
-import org.jkiss.dbeaver.model.secret.DBSSecretController;
 import org.jkiss.dbeaver.model.secret.DBSSecretValue;
 import org.jkiss.dbeaver.model.websocket.WSConstants;
 import org.jkiss.dbeaver.model.websocket.event.datasource.WSDataSourceProperty;
@@ -367,59 +366,9 @@ public class WebServiceCore implements DBWServiceCore {
             dataSourceContainer.setSavePassword(oldSavePassword);
             connectionInfo.clearCache();
         }
+
         // Mark all specified network configs as saved
-        boolean[] saveConfig = new boolean[1];
-
-        if (networkCredentials != null) {
-            networkCredentials.forEach(c -> {
-                if (CommonUtils.toBoolean(c.isSavePassword())) {
-                    DBWHandlerConfiguration handlerCfg = dataSourceContainer.getConnectionConfiguration()
-                        .getHandler(c.getId());
-                    if (handlerCfg != null &&
-                        // check username param only for ssh config
-                        !(CommonUtils.isEmpty(c.getUserName()) && CommonUtils.equalObjects(handlerCfg.getType(),
-                            DBWHandlerType.TUNNEL))
-                    ) {
-                        WebDataSourceUtils.updateHandlerCredentials(handlerCfg, c);
-                        handlerCfg.setSavePassword(true);
-                        saveConfig[0] = true;
-                    }
-                }
-            });
-        }
-        if (saveCredentials != null && saveCredentials) {
-            // Save all passed credentials in the datasource container
-            WebServiceUtils.saveAuthProperties(
-                dataSourceContainer,
-                dataSourceContainer.getConnectionConfiguration(),
-                authProperties,
-                true,
-                sharedCredentials == null ? false : sharedCredentials
-            );
-
-            var project = dataSourceContainer.getProject();
-            if (project.isUseSecretStorage()) {
-                try {
-                    dataSourceContainer.persistSecrets(
-                        DBSSecretController.getProjectSecretController(dataSourceContainer.getProject())
-                    );
-                } catch (DBException e) {
-                    throw new DBWebException("Failed to save credentials", e);
-                }
-            }
-
-            WebDataSourceUtils.saveCredentialsInDataSource(connectionInfo,
-                dataSourceContainer,
-                dataSourceContainer.getConnectionConfiguration());
-            saveConfig[0] = true;
-        }
-        if (WebServiceUtils.isGlobalProject(dataSourceContainer.getProject())) {
-            // Do not flush config for global project (only admin can do it - CB-2415)
-            saveConfig[0] = false;
-        }
-        if (saveConfig[0]) {
-            dataSourceContainer.persistConfiguration();
-        }
+        WebDataSourceUtils.updateConnectionCredentials(dataSourceContainer, authProperties, networkCredentials, saveCredentials, sharedCredentials, connectionInfo);
 
         return connectionInfo;
     }
@@ -515,7 +464,7 @@ public class WebServiceCore implements DBWServiceCore {
             .isUseSecretStorage() && dataSource.isSavePassword();
         if (sharedCredentials) {
             //we must notify about the shared password change
-            WebServiceUtils.saveAuthProperties(
+            WebDataSourceUtils.saveAuthProperties(
                 dataSource,
                 dataSource.getConnectionConfiguration(),
                 config.getCredentials(),
@@ -526,7 +475,7 @@ public class WebServiceCore implements DBWServiceCore {
         boolean sendEvent = !((DataSourceDescriptor) dataSource).equalSettings(oldDataSource);
         if (!sharedCredentials) {
             // secret controller is responsible for notification, password changes applied after checks
-            WebServiceUtils.saveAuthProperties(
+            WebDataSourceUtils.saveAuthProperties(
                 dataSource,
                 dataSource.getConnectionConfiguration(),
                 config.getCredentials(),
@@ -719,7 +668,7 @@ public class WebServiceCore implements DBWServiceCore {
                     throw new DBWebException("Failed to load secret value: " + connectionConfig.getSelectedSecretId());
                 }
             }
-            WebServiceUtils.saveAuthProperties(
+            WebDataSourceUtils.saveAuthProperties(
                 testDataSource,
                 testDataSource.getConnectionConfiguration(),
                 connectionConfig.getCredentials(),
