@@ -224,7 +224,7 @@ export class UsersResource extends CachedMapResource<string, AdminUser, UserReso
         throw new Error("You can't delete current logged user");
       }
       await this.graphQLService.sdk.deleteUser({ userId: key });
-      super.delete(key);
+      this.delete(key);
     });
   }
 
