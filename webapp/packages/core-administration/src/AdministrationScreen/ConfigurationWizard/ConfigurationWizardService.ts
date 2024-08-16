@@ -9,6 +9,8 @@ import { computed, makeObservable } from 'mobx';
 
 import { injectable } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
+import { ServerConfigResource } from '@cloudbeaver/core-root';
+import { ScreenService } from '@cloudbeaver/core-routing';
 
 import { AdministrationItemService, filterHiddenAdministrationItem } from '../../AdministrationItem/AdministrationItemService';
 import { filterConfigurationWizard } from '../../AdministrationItem/filterConfigurationWizard';
@@ -27,10 +29,6 @@ export class ConfigurationWizardService {
 
   get stepsToFinish(): IAdministrationItem[] {
     return this.steps.filter(step => step.configurationWizardOptions?.isDone);
-  }
-
-  get finishedSteps(): IAdministrationItem[] {
-    return this.steps.filter(step => step.configurationWizardOptions?.isDone && step.configurationWizardOptions.isDone());
   }
 
   get currentStepIndex(): number {
@@ -57,7 +55,7 @@ export class ConfigurationWizardService {
         return false;
       }
 
-      if (item.configurationWizardOptions?.isDisabled && item.configurationWizardOptions.isDisabled()) {
+      if (this.isStepDisabled(item)) {
         return false;
       }
 
@@ -73,34 +71,59 @@ export class ConfigurationWizardService {
     private administrationItemService: AdministrationItemService,
     private administrationScreenService: AdministrationScreenService,
     private notificationService: NotificationService,
+    private screenService: ScreenService,
+    private serverConfigResource: ServerConfigResource,
   ) {
     makeObservable(this, {
       steps: computed,
       stepsToFinish: computed,
-      finishedSteps: computed,
       currentStepIndex: computed,
       canFinish: computed,
       nextStep: computed,
       currentStep: computed,
     });
+
+    this.screenService.routeChange.addHandler(this.onRouteChange.bind(this));
+  }
+
+  private async onRouteChange() {
+    const isExistingPage =
+      this.administrationScreenService?.activeScreen?.item && this.isStepAvailable(this.administrationScreenService.activeScreen.item);
+    const isCurrentStepAvailable = this.currentStep && this.isStepAvailable(this.currentStep.name);
+
+    await this.serverConfigResource.load();
+
+    if (!this.serverConfigResource.data?.configurationMode) {
+      return;
+    }
+
+    if (!isExistingPage || !isCurrentStepAvailable) {
+      this.administrationScreenService.navigateToRoot();
+    }
+  }
+
+  private isStepDone(step: IAdministrationItem): boolean {
+    return step.configurationWizardOptions?.isDone ? step.configurationWizardOptions.isDone() : true;
+  }
+
+  private isStepDisabled(step: IAdministrationItem): boolean {
+    return step.configurationWizardOptions?.isDisabled ? step.configurationWizardOptions.isDisabled() : false;
   }
 
   isStepAvailable(name: string): boolean {
-    if (this.currentStep?.name === name) {
-      return true;
+    const stepIndex = this.steps.findIndex(step => step.name === name);
+    if (stepIndex === -1) {
+      return false;
     }
 
-    for (const step of this.steps) {
-      if (step.name === name) {
-        return true;
-      }
-
-      if (this.stepsToFinish.includes(step) && !this.finishedSteps.includes(step)) {
+    for (let i = 0; i < stepIndex; i++) {
+      const prevStep = this.steps[i];
+      if (!this.isStepDone(prevStep) || this.isStepDisabled(prevStep)) {
         return false;
       }
     }
 
-    return false;
+    return !this.isStepDisabled(this.steps[stepIndex]);
   }
 
   async finishStep(name: string): Promise<boolean> {
