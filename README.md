@@ -22,6 +22,11 @@ You can see live demo of CloudBeaver here: https://demo.cloudbeaver.io
 
 ## Changelog
 
+### 24.1.5. 2024-08-19
+- Added right-click support to open the context menu in the Metadata Editor
+- The list of forbidden characters for naming and renaming files has been updated, now it includes the following characters: / : " \ ' <> | ? *
+- Many minor bug fixes, enhancements, and improvements have been made
+
 ### 24.1.4. 2024-08-05
 - Redesigned administration navigation panel - now it is more compact and clear;
 - Added the ability to close editor tabs with the middle mouse button;
