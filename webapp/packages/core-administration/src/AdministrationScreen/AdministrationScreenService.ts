@@ -13,7 +13,7 @@ import { Executor, IExecutor } from '@cloudbeaver/core-executor';
 import { EAdminPermission, PermissionsService, ServerConfigResource, SessionPermissionsResource } from '@cloudbeaver/core-root';
 import { RouterState, ScreenService } from '@cloudbeaver/core-routing';
 import { StorageService } from '@cloudbeaver/core-storage';
-import { DefaultValueGetter, GlobalConstants, MetadataMap, schema } from '@cloudbeaver/core-utils';
+import { DefaultValueGetter, GlobalConstants, isNotNullDefined, MetadataMap, schema } from '@cloudbeaver/core-utils';
 
 import { AdministrationItemService } from '../AdministrationItem/AdministrationItemService';
 import type { IAdministrationItemRoute } from '../AdministrationItem/IAdministrationItemRoute';
@@ -111,6 +111,18 @@ export class AdministrationScreenService {
     this.permissionsResource.onDataUpdate.addPostHandler(() => {
       this.checkPermissions(this.screenService.routerService.state);
     });
+
+    this.screenService.routeChange.addHandler(this.onRouteChange.bind(this));
+  }
+
+  private async onRouteChange() {
+    const isExistingPage =
+      isNotNullDefined(this.activeScreen?.item) &&
+      isNotNullDefined(this.administrationItemService.items.find(page => page.name === this.activeScreen?.item));
+
+    if (!isExistingPage) {
+      this.navigateToRoot();
+    }
   }
 
   getRouteName(item?: string, sub?: string, param?: string) {

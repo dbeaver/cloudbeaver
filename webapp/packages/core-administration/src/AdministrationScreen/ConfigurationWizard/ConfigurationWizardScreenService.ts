@@ -16,9 +16,9 @@ import { ConfigurationWizardService } from './ConfigurationWizardService';
 @injectable()
 export class ConfigurationWizardScreenService extends Dependency {
   constructor(
-    private administrationScreenService: AdministrationScreenService,
-    private screenService: ScreenService,
-    private serverConfigResource: ServerConfigResource,
+    private readonly administrationScreenService: AdministrationScreenService,
+    private readonly screenService: ScreenService,
+    private readonly serverConfigResource: ServerConfigResource,
     private readonly configurationWizardService: ConfigurationWizardService,
   ) {
     super();
@@ -32,14 +32,11 @@ export class ConfigurationWizardScreenService extends Dependency {
       return;
     }
 
-    const isExistingPage =
-      isNotNullDefined(this.administrationScreenService?.activeScreen?.item) &&
-      this.configurationWizardService.isStepAvailable(this.administrationScreenService.activeScreen.item);
     const isCurrentStepAvailable =
       isNotNullDefined(this.configurationWizardService.currentStep) &&
       this.configurationWizardService.isStepAvailable(this.configurationWizardService.currentStep.name);
 
-    if (!isExistingPage || !isCurrentStepAvailable) {
+    if (!isCurrentStepAvailable) {
       this.administrationScreenService.navigateToRoot();
     }
   }
