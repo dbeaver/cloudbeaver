@@ -96,7 +96,9 @@ public class LdapAuthProvider implements SMAuthProviderExternal<SMSession>, SMBr
             throw new DBException("LDAP authentication failed: " + e.getMessage(), e);
         } finally {
             try {
-                context.close();
+                if (context != null) {
+                    context.close();
+                }
             } catch (NamingException e) {
                 log.warn("Error closing LDAP user context", e);
             }
