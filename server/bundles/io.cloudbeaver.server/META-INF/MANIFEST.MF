@@ -3,7 +3,7 @@ Bundle-ManifestVersion: 2
 Bundle-Vendor: DBeaver Corp
 Bundle-Name: Cloudbeaver Web Server
 Bundle-SymbolicName: io.cloudbeaver.server;singleton:=true
-Bundle-Version: 2.2.0.qualifier
+Bundle-Version: 24.2.0.qualifier
 Bundle-Release-Date: 20240909
 Bundle-RequiredExecutionEnvironment: JavaSE-17
 Bundle-ActivationPolicy: lazy
