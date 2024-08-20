@@ -26,17 +26,22 @@ public class CBServerContextListener implements ServletContextListener {
 
     // One week
     //private static final int CB_SESSION_LIFE_TIME = 60 * 60 * 24 * 7;
+    private final CBApplication<?> application;
+
+    public CBServerContextListener(CBApplication<?> application) {
+        this.application = application;
+    }
 
     public void contextInitialized(ServletContextEvent sce) {
-        SessionCookieConfig scf = sce.getServletContext().getSessionCookieConfig();
+        SessionCookieConfig cookieConfig = sce.getServletContext().getSessionCookieConfig();
 
-        scf.setComment("Cloudbeaver Session ID");
+        cookieConfig.setComment("Cloudbeaver Session ID");
         //scf.setDomain(domain);
         //scf.setHttpOnly(httpOnly);
         //scf.setMaxAge(CB_SESSION_LIFE_TIME);
-        scf.setPath(CBApplication.getInstance().getRootURI());
-        //scf.setSecure(isSecure);
-        scf.setName(CBConstants.CB_SESSION_COOKIE_NAME);
+        cookieConfig.setPath(CBApplication.getInstance().getRootURI());
+        cookieConfig.setSecure(application.getServerURL().startsWith("https"));
+        cookieConfig.setName(CBConstants.CB_SESSION_COOKIE_NAME);
     }
 
     public void contextDestroyed(ServletContextEvent sce) {

@@ -143,6 +143,7 @@ type ServerConfig {
 
     licenseRequired: Boolean!
     licenseValid: Boolean!
+    licenseStatus: String @since(version: "24.1.5")
 
     sessionExpireTime: Int!
     localHostAddress: String

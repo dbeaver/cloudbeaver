@@ -72,6 +72,9 @@ public class WebServiceAdmin implements DBWServiceAdmin {
     public AdminUserInfo getUserById(@NotNull WebSession webSession, @NotNull String userId) throws DBWebException {
         try {
             SMUser smUser = webSession.getAdminSecurityController().getUserById(userId);
+            if (smUser == null) {
+                throw new DBException("User '" + userId + "' not found");
+            }
             return new AdminUserInfo(webSession, new WebUser(smUser));
         } catch (Exception e) {
             throw new DBWebException("Error getting user - " + userId, e);

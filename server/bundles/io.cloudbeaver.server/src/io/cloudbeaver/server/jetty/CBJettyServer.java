@@ -108,7 +108,7 @@ public class CBJettyServer {
                 servletContextHandler.addServlet(new ServletHolder("status", new CBStatusServlet()), "/status");
 
                 servletContextHandler.addServlet(new ServletHolder("graphql", new GraphQLEndpoint()), serverConfiguration.getServicesURI() + "gql/*");
-                servletContextHandler.addEventListener(new CBServerContextListener());
+                servletContextHandler.addEventListener(new CBServerContextListener(application));
 
                 // Add extensions from services
 
@@ -198,7 +198,6 @@ public class CBJettyServer {
         DefaultSessionCache sessionCache = new DefaultSessionCache(sessionHandler);
         sessionCache.setSessionDataStore(new NullSessionDataStore());
         sessionHandler.setSessionCache(sessionCache);
-
         servletContextHandler.setSessionHandler(sessionHandler);
     }
 
