@@ -28,7 +28,7 @@ export class ConfigurationWizardScreenService extends Dependency {
   private async onRouteChange() {
     await this.serverConfigResource.load();
 
-    if (!this.serverConfigResource.data?.configurationMode) {
+    if (!this.administrationScreenService.isConfigurationMode) {
       return;
     }
 
