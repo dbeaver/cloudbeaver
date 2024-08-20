@@ -8,6 +8,8 @@
 import { observer } from 'mobx-react-lite';
 import { useCallback, useLayoutEffect, useRef, useState } from 'react';
 
+import { isNotNullDefined } from '@cloudbeaver/core-utils';
+
 import { ShadowInput } from '../FormControls/ShadowInput';
 import { Icon } from '../Icon';
 import { IconOrImage } from '../IconOrImage';
@@ -53,7 +55,7 @@ export const PropertyItem = observer<Props>(function PropertyItem({ property, va
 
   const focus = menuOpen;
   const keyPlaceholder = String(property.keyPlaceholder);
-  const valuePlaceholder = String(property.valuePlaceholder);
+  const valuePlaceholder = isNotNullDefined(property.valuePlaceholder) ? String(property.valuePlaceholder) : '';
 
   return (
     <div className={s(styles, { container: true })}>
