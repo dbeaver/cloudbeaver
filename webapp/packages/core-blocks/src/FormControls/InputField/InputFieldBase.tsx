@@ -113,20 +113,6 @@ export const InputFieldBase = observer<InputFieldBaseProps, HTMLInputElement>(
       canShowPassword = false;
     }
 
-    function onSubmit(event: React.FormEvent<HTMLInputElement>) {
-      if (!rest?.onSubmit) {
-        return;
-      }
-
-      const shouldNotEraseInputValue = rest.type === 'password';
-
-      rest.onSubmit?.(event);
-
-      if (shouldNotEraseInputValue) {
-        event.preventDefault();
-      }
-    }
-
     return (
       <Field {...layoutProps} className={s(styles, {}, className)}>
         <FieldLabel title={labelTooltip || rest.title} className={s(styles, { fieldLabel: true })} required={required}>
@@ -142,7 +128,6 @@ export const InputFieldBase = observer<InputFieldBaseProps, HTMLInputElement>(
             defaultValue={defaultValue}
             className={s(styles, { input: true })}
             required={required}
-            onSubmit={onSubmit}
             onChange={handleChange}
             onBlur={handleBlur}
             onKeyDown={handleKeyDown}
