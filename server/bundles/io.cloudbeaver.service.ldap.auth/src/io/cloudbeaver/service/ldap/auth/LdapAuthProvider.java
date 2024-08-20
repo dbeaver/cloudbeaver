@@ -141,7 +141,8 @@ public class LdapAuthProvider implements SMAuthProviderExternal<SMSession>, SMBr
         }
     }
 
-    private static @NotNull Hashtable<String, String> creteAuthEnvironment(LdapSettings ldapSettings) {
+    @NotNull
+    private static Hashtable<String, String> creteAuthEnvironment(LdapSettings ldapSettings) {
         Hashtable<String, String> environment = new Hashtable<>();
         environment.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
 
