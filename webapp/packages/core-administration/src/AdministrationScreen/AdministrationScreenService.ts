@@ -116,11 +116,11 @@ export class AdministrationScreenService {
   }
 
   private async onRouteChange() {
-    const isExistingPage =
-      isNotNullDefined(this.activeScreen?.item) &&
-      isNotNullDefined(this.administrationItemService.items.find(page => page.name === this.activeScreen?.item));
+    await this.serverConfigResource.load();
 
-    if (!isExistingPage) {
+    const item = this.administrationItemService.getItem(this.activeScreen?.item ?? '', this.isConfigurationMode);
+
+    if (!item) {
       this.navigateToRoot();
     }
   }
