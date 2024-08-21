@@ -240,9 +240,7 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
         const query = this.getSubQuery();
 
         try {
-          await this.executeQueryAction(await this.executeQueryAction(query, () => this.getResolvedSegment()), query =>
-            this.sqlQueryService.executeEditorQuery(this.state, query.query, false),
-          );
+          await this.executeQueryAction(query, query => this.sqlQueryService.executeEditorQuery(this.state, query.query, false));
         } catch {}
       },
 
