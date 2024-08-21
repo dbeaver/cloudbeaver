@@ -11,14 +11,15 @@ import { useS } from '../useS';
 import styles from './GroupClose.module.css';
 
 interface IProps {
+  disabled?: boolean;
   onClick?: () => void;
 }
 
-export const GroupClose: React.FC<IProps & React.HTMLAttributes<HTMLDivElement>> = function GroupClose({ onClick, className, ...rest }) {
+export const GroupClose: React.FC<IProps & React.HTMLAttributes<HTMLDivElement>> = function GroupClose({ disabled, onClick, className, ...rest }) {
   const style = useS(styles);
   return (
     <div {...rest} className={s(style, { groupClose: true }, className)}>
-      <ActionIconButton name="cross" viewBox="0 0 16 16" onClick={onClick} />
+      <ActionIconButton name="cross" viewBox="0 0 16 16" disabled={disabled} onClick={onClick} />
     </div>
   );
 };
