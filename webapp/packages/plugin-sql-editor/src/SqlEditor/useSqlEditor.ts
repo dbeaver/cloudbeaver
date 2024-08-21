@@ -57,6 +57,7 @@ interface ISQLEditorDataPrivate extends ISQLEditorData {
 }
 
 const MAX_HINTS_LIMIT = 200;
+const END_OF_THE_ACTIVE_QUERY_OFFSET = 2;
 
 export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
   const connectionExecutionContextService = useService(ConnectionExecutionContextService);
@@ -86,6 +87,13 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
       activeSegmentMode: {
         activeSegment: undefined,
         activeSegmentMode: false,
+      },
+
+      get isCursorInActiveQuerySegment(): boolean {
+        const segment = this.activeSegment;
+        const cursor = this.cursorSegment;
+
+        return !!segment && !!cursor && cursor.begin >= segment.begin && cursor.end - END_OF_THE_ACTIVE_QUERY_OFFSET <= segment.end;
       },
 
       get activeSegment(): ISQLScriptSegment | undefined {

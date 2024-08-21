@@ -29,6 +29,7 @@ export interface ISQLEditorData {
   readonly editing: boolean;
   readonly isScriptEmpty: boolean;
   readonly isDisabled: boolean;
+  readonly isCursorInActiveQuerySegment: boolean;
   readonly isIncomingChanges: boolean;
   readonly value: string;
   readonly incomingValue?: string;
