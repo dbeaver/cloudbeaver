@@ -30,8 +30,10 @@ export function useSQLCodeEditorPanel(data: ISQLEditorData, editor: IEditor) {
           this.editor.clearActiveQueryHighlight();
 
           const segment = this.data.activeSegment;
+          const cursor = this.data.cursorSegment;
+          const isCursorInSegment = cursor && segment && cursor.begin >= segment.begin && cursor.end - 2 <= segment.end;
 
-          if (segment) {
+          if (segment && isCursorInSegment) {
             this.editor.highlightActiveQuery(segment.begin, segment.end);
           }
         });
