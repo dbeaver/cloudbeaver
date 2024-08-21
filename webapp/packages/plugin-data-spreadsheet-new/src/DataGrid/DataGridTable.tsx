@@ -186,8 +186,12 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
         }
 
         if (!key?.column || !key?.row) {
-          focusSyncRef.current = { idx: 0, rowIdx: -1 };
-          this.selectCell(focusSyncRef.current);
+          if (initial) {
+            focusSyncRef.current = { idx: 0, rowIdx: -1 };
+            this.selectCell(focusSyncRef.current);
+          } else {
+            focusSyncRef.current = null;
+          }
           return;
         }
 
