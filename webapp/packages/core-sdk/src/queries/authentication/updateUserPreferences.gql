@@ -11,6 +11,11 @@ mutation updateUserPreferences(
     linkedAuthProviders
     metaParameters @include(if: $includeMetaParameters)
     configurationParameters @include(if: $includeConfigurationParameters)
+    teams {
+      teamId
+      teamName
+      teamRole
+    }
     authTokens {
       ...AuthToken
     }

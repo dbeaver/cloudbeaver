@@ -53,7 +53,7 @@ export const Form = forwardRef<HTMLFormElement, FormDetailedProps>(function Form
 
   if (formContext.parent && formContext.parent !== context) {
     return (
-      <fieldset disabled={disabled} className={s(st, { contents }, rest.className)} style={style}>
+      <fieldset disabled={disabled} className={s(st, { fieldset: true, contents }, rest.className)} style={style}>
         <FormContext.Provider value={formContext}>{children}</FormContext.Provider>
       </fieldset>
     );
@@ -61,7 +61,7 @@ export const Form = forwardRef<HTMLFormElement, FormDetailedProps>(function Form
 
   return (
     <form style={style} {...rest} ref={setFormRef} className={s(st, { contents }, rest.className)}>
-      <fieldset disabled={disabled} className={s(st, { contents }, rest.className)} style={style}>
+      <fieldset disabled={disabled} className={s(st, { fieldset: true, contents }, rest.className)} style={style}>
         <FormContext.Provider value={formContext}>{children}</FormContext.Provider>
       </fieldset>
       <button type="submit" disabled={disableEnterSubmit} aria-hidden={disableEnterSubmit} hidden />
