@@ -10,7 +10,6 @@ import { computed, observable } from 'mobx';
 import { useObservableRef } from '@cloudbeaver/core-blocks';
 import type { Column } from '@cloudbeaver/plugin-data-grid';
 import {
-  DatabaseDataConstraintAction,
   IDatabaseDataModel,
   IResultSetColumnKey,
   IResultSetElementKey,
@@ -79,6 +78,7 @@ export function useTableData(
           renderHeaderCell: props => <TableColumnHeader {...props} />,
           onRenderHeader: measurements.scheduleUpdate,
         }));
+
         columns.unshift(indexColumn);
 
         return columns;

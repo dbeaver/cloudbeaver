@@ -6,13 +6,14 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 
 import { s, TextPlaceholder, useObjectRef, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { EventContext, EventStopPropagationFlag } from '@cloudbeaver/core-events';
 import { Executor } from '@cloudbeaver/core-executor';
 import { ClipboardService } from '@cloudbeaver/core-ui';
+import { isNotNullDefined } from '@cloudbeaver/core-utils';
 import { useCaptureViewContext } from '@cloudbeaver/core-view';
 import { type CellSelectArgs, DataGrid, type DataGridHandle, type Position } from '@cloudbeaver/plugin-data-grid';
 import {
@@ -43,7 +44,7 @@ import { CellFormatter } from './Formatters/CellFormatter';
 import { TableDataContext } from './TableDataContext';
 import { useGridDragging } from './useGridDragging';
 import { useGridSelectedCellsCopy } from './useGridSelectedCellsCopy';
-import { useTableData } from './useTableData';
+import { indexColumn, useTableData } from './useTableData';
 
 interface IInnerState {
   lastCount: number;
@@ -164,7 +165,7 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
     }
   }
 
-  const hamdlers = useObjectRef(() => ({
+  const handlers = useObjectRef(() => ({
     selectCell(pos: Position, scroll = false): void {
       if (dataGridRef.current?.selectedCell.idx !== pos.idx || dataGridRef.current.selectedCell.rowIdx !== pos.rowIdx || scroll) {
         dataGridRef.current?.selectCell(pos);
@@ -175,7 +176,7 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
   const gridSelectedCellCopy = useGridSelectedCellsCopy(tableData, selectionAction as unknown as DatabaseSelectAction, gridSelectionContext);
   const { onMouseDownHandler, onMouseMoveHandler } = useGridDragging({
     onDragStart: startPosition => {
-      hamdlers.selectCell({ idx: startPosition.colIdx, rowIdx: startPosition.rowIdx });
+      handlers.selectCell({ idx: startPosition.colIdx, rowIdx: startPosition.rowIdx });
     },
     onDragOver: (startPosition, currentPosition, event) => {
       gridSelectionContext.selectRange(startPosition, currentPosition, event.ctrlKey || event.metaKey, true);
@@ -244,11 +245,11 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
 
           if (editingState === DatabaseEditChangeType.add) {
             if (rowIdx - 1 > 0) {
-              hamdlers.selectCell({ idx, rowIdx: rowIdx - 1 });
+              handlers.selectCell({ idx, rowIdx: rowIdx - 1 });
             }
           } else {
             if (rowIdx + 1 < tableData.rows.length) {
-              hamdlers.selectCell({ idx, rowIdx: rowIdx + 1 });
+              handlers.selectCell({ idx, rowIdx: rowIdx + 1 });
             }
           }
         }
@@ -319,7 +320,7 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
         return;
       }
 
-      hamdlers.selectCell({ idx, rowIdx });
+      handlers.selectCell({ idx, rowIdx });
     }
 
     tableData.editor.action.addHandler(syncEditor);
@@ -338,7 +339,7 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
 
           focusSyncRef.current = { idx, rowIdx };
 
-          hamdlers.selectCell({ idx, rowIdx });
+          handlers.selectCell({ idx, rowIdx });
         }
       }, 1);
     }
@@ -365,6 +366,34 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
 
     innerState.lastCount = model.source.count;
   }, [model.source.count]);
+
+  useLayoutEffect(() => {
+    const selected = selectionAction.getSelectedElements()[0];
+
+    let idx: number | undefined;
+    let rowIdx: number | undefined;
+
+    if (!selected) {
+      const column = tableData.columns.find(column => column.key !== indexColumn.key);
+
+      if (isNotNullDefined(column?.columnDataIndex)) {
+        const row = tableData.getRow(0);
+        const index = tableData.getColumnIndexFromColumnKey(column.columnDataIndex);
+
+        if (index !== -1 && row) {
+          idx = index;
+          rowIdx = row.index;
+        }
+      }
+    } else {
+      idx = tableData.getColumnIndexFromColumnKey(selected.column);
+      rowIdx = selected.row.index;
+    }
+
+    if (idx !== undefined && rowIdx !== undefined) {
+      handlers.selectCell({ idx, rowIdx });
+    }
+  }, [handlers, tableData, selectionAction]);
 
   const handleFocusChange = (event: CellSelectArgs<IResultSetRowKey>) => {
     const columnIndex = event.column.idx;
