@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 
 import { s, TextPlaceholder, useObjectRef, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
@@ -173,35 +173,32 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
       }
     },
     focusCell(key: Partial<IResultSetElementKey> | null, initial = false) {
-      // TODO: we need this delay to update focus after render rows update
-      setTimeout(() => {
-        if ((!key?.column || !key?.row) && initial) {
-          const selectedElements = selectionAction.getSelectedElements();
+      if ((!key?.column || !key?.row) && initial) {
+        const selectedElements = selectionAction.getSelectedElements();
 
-          if (selectedElements.length > 0) {
-            key = selectedElements[0];
-          } else {
-            key = { column: viewAction.columnKeys[0], row: viewAction.rowKeys[0] };
-          }
+        if (selectedElements.length > 0) {
+          key = selectedElements[0];
+        } else {
+          key = { column: viewAction.columnKeys[0], row: viewAction.rowKeys[0] };
         }
+      }
 
-        if (!key?.column || !key?.row) {
-          if (initial) {
-            focusSyncRef.current = { idx: 0, rowIdx: -1 };
-            this.selectCell(focusSyncRef.current);
-          } else {
-            focusSyncRef.current = null;
-          }
-          return;
+      if (!key?.column || !key?.row) {
+        if (initial) {
+          focusSyncRef.current = { idx: 0, rowIdx: -1 };
+          this.selectCell(focusSyncRef.current);
+        } else {
+          focusSyncRef.current = null;
         }
+        return;
+      }
 
-        const idx = tableData.getColumnIndexFromColumnKey(key.column!);
-        const rowIdx = tableData.getRowIndexFromKey(key.row!);
+      const idx = tableData.getColumnIndexFromColumnKey(key.column!);
+      const rowIdx = tableData.getRowIndexFromKey(key.row!);
 
-        focusSyncRef.current = { idx, rowIdx };
+      focusSyncRef.current = { idx, rowIdx };
 
-        this.selectCell({ idx, rowIdx });
-      }, 1);
+      this.selectCell({ idx, rowIdx });
     },
   }));
 
@@ -314,7 +311,7 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
     editingContext.edit({ idx, rowIdx }, event.nativeEvent.code, event.key);
   }
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     function syncEditor(data: IResultSetEditActionData) {
       const editor = tableData.editor;
       if (data.resultId !== editor.result.id || !data.value || data.value.length === 0 || data.type === DatabaseEditChangeType.delete) {
@@ -359,7 +356,10 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
 
     function syncFocus(data: DatabaseDataSelectActionsData<IResultSetPartialKey>) {
       if (data.type === 'focus') {
-        handlers.focusCell(data.key);
+        // TODO: we need this delay to update focus after render rows update
+        setTimeout(() => {
+          handlers.focusCell(data.key);
+        }, 1);
       }
     }
 
