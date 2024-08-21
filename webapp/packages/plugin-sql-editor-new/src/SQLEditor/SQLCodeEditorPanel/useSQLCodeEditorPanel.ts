@@ -9,7 +9,7 @@ import { action } from 'mobx';
 import { useCallback } from 'react';
 
 import { useExecutor, useObservableRef } from '@cloudbeaver/core-blocks';
-import { throttle } from '@cloudbeaver/core-utils';
+import { debounce } from '@cloudbeaver/core-utils';
 import type { ISQLEditorData } from '@cloudbeaver/plugin-sql-editor';
 
 import type { IEditor } from '../SQLCodeEditor/useSQLCodeEditor';
@@ -21,6 +21,8 @@ interface State {
 }
 
 export function useSQLCodeEditorPanel(data: ISQLEditorData, editor: IEditor) {
+  const script = data.dataSource?.script;
+
   const state: State = useObservableRef(
     () => ({
       highlightActiveQuery() {
@@ -46,18 +48,29 @@ export function useSQLCodeEditorPanel(data: ISQLEditorData, editor: IEditor) {
   );
 
   const updateHighlight = useCallback(
-    throttle(() => state.highlightActiveQuery(), 1000),
+    debounce(() => state.highlightActiveQuery(), 300),
     [state],
   );
 
+  function onUpdate() {
+    const newScript = data.dataSource?.script;
+    const isScriptChanged = script !== newScript;
+
+    editor.clearActiveQueryHighlight();
+
+    if (!isScriptChanged) {
+      updateHighlight();
+    }
+  }
+
   useExecutor({
     executor: data.onUpdate,
-    handlers: [updateHighlight],
+    handlers: [onUpdate],
   });
 
   useExecutor({
     executor: data.dataSource?.onUpdate,
-    handlers: [updateHighlight],
+    handlers: [onUpdate],
   });
 
   useExecutor({
