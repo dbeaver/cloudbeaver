@@ -441,14 +441,14 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
           return this.getSubQuery();
         }
 
-        if (this.activeSegment) {
-          return this.activeSegment;
-        }
-
         const result = await this.sqlEditorService.parseSQLQuery(projectId, connectionId, this.value, this.cursor.begin);
 
         if (result.end === 0 && result.start === 0) {
           return;
+        }
+
+        if (this.activeSegment) {
+          return this.activeSegment;
         }
 
         const segment = this.parser.getSegment(result.start, result.end);
