@@ -368,7 +368,7 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
   }, [model.source.count]);
 
   useLayoutEffect(() => {
-    const selected = selectionAction.getSelectedElements()[0];
+    const selected = selectionAction.getFocusedElement() ?? selectionAction.getSelectedElements()[0];
 
     let idx: number | undefined;
     let rowIdx: number | undefined;
