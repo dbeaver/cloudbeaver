@@ -166,7 +166,7 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
     }
   }
 
-  const hamdlers = useObjectRef(() => ({
+  const handlers = useObjectRef(() => ({
     selectCell(pos: Position, scroll = false): void {
       if (dataGridRef.current?.selectedCell.idx !== pos.idx || dataGridRef.current.selectedCell.rowIdx !== pos.rowIdx || scroll) {
         dataGridRef.current?.selectCell(pos);
@@ -208,7 +208,7 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
   const gridSelectedCellCopy = useGridSelectedCellsCopy(tableData, selectionAction as unknown as DatabaseSelectAction, gridSelectionContext);
   const { onMouseDownHandler, onMouseMoveHandler } = useGridDragging({
     onDragStart: startPosition => {
-      hamdlers.selectCell({ idx: startPosition.colIdx, rowIdx: startPosition.rowIdx });
+      handlers.selectCell({ idx: startPosition.colIdx, rowIdx: startPosition.rowIdx });
     },
     onDragOver: (startPosition, currentPosition, event) => {
       gridSelectionContext.selectRange(startPosition, currentPosition, event.ctrlKey || event.metaKey, true);
@@ -277,11 +277,11 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
 
           if (editingState === DatabaseEditChangeType.add) {
             if (rowIdx - 1 > 0) {
-              hamdlers.selectCell({ idx, rowIdx: rowIdx - 1 });
+              handlers.selectCell({ idx, rowIdx: rowIdx - 1 });
             }
           } else {
             if (rowIdx + 1 < tableData.rows.length) {
-              hamdlers.selectCell({ idx, rowIdx: rowIdx + 1 });
+              handlers.selectCell({ idx, rowIdx: rowIdx + 1 });
             }
           }
         }
@@ -352,19 +352,19 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
         return;
       }
 
-      hamdlers.selectCell({ idx, rowIdx });
+      handlers.selectCell({ idx, rowIdx });
     }
 
     tableData.editor.action.addHandler(syncEditor);
 
     function syncFocus(data: DatabaseDataSelectActionsData<IResultSetPartialKey>) {
       if (data.type === 'focus') {
-        hamdlers.focusCell(data.key);
+        handlers.focusCell(data.key);
       }
     }
 
     selectionAction.actions.addHandler(syncFocus);
-    hamdlers.focusCell(selectionAction.getFocusedElement(), true);
+    handlers.focusCell(selectionAction.getFocusedElement(), true);
 
     return () => {
       tableData.editor.action.removeHandler(syncEditor);
