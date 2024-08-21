@@ -441,7 +441,7 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
           return this.getSubQuery();
         }
 
-        if (this.activeSegmentMode.activeSegmentMode) {
+        if (this.activeSegment) {
           return this.activeSegment;
         }
 
