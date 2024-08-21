@@ -30,6 +30,7 @@ import {
   ResultSetDataKeysUtils,
   ResultSetDataSource,
   ResultSetSelectAction,
+  ResultSetViewAction,
 } from '@cloudbeaver/plugin-data-viewer';
 
 import { CellPosition, EditingContext } from '../Editing/EditingContext';
@@ -78,6 +79,7 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
   const [columnResize] = useState(() => new Executor<IColumnResizeInfo>());
 
   const selectionAction = (model.source as unknown as ResultSetDataSource).getAction(resultIndex, ResultSetSelectAction);
+  const viewAction = (model.source as unknown as ResultSetDataSource).getAction(resultIndex, ResultSetViewAction);
 
   const focusSyncRef = useRef<CellPosition | null>(null);
 
@@ -169,6 +171,33 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
       if (dataGridRef.current?.selectedCell.idx !== pos.idx || dataGridRef.current.selectedCell.rowIdx !== pos.rowIdx || scroll) {
         dataGridRef.current?.selectCell(pos);
       }
+    },
+    focusCell(key: Partial<IResultSetElementKey> | null, initial = false) {
+      // TODO: we need this delay to update focus after render rows update
+      setTimeout(() => {
+        if ((!key?.column || !key?.row) && initial) {
+          const selectedElements = selectionAction.getSelectedElements();
+
+          if (selectedElements.length > 0) {
+            key = selectedElements[0];
+          } else {
+            key = { column: viewAction.columnKeys[0], row: viewAction.rowKeys[0] };
+          }
+        }
+
+        if (!key?.column || !key?.row) {
+          focusSyncRef.current = { idx: 0, rowIdx: -1 };
+          this.selectCell(focusSyncRef.current);
+          return;
+        }
+
+        const idx = tableData.getColumnIndexFromColumnKey(key.column!);
+        const rowIdx = tableData.getRowIndexFromKey(key.row!);
+
+        focusSyncRef.current = { idx, rowIdx };
+
+        this.selectCell({ idx, rowIdx });
+      }, 1);
     },
   }));
 
@@ -325,25 +354,13 @@ export const DataGridTable = observer<IDataPresentationProps>(function DataGridT
     tableData.editor.action.addHandler(syncEditor);
 
     function syncFocus(data: DatabaseDataSelectActionsData<IResultSetPartialKey>) {
-      setTimeout(() => {
-        // TODO: update focus after render rows update
-        if (data.type === 'focus') {
-          if (!data.key?.column || !data.key.row) {
-            focusSyncRef.current = null;
-            return;
-          }
-
-          const idx = tableData.getColumnIndexFromColumnKey(data.key.column);
-          const rowIdx = tableData.getRowIndexFromKey(data.key.row);
-
-          focusSyncRef.current = { idx, rowIdx };
-
-          hamdlers.selectCell({ idx, rowIdx });
-        }
-      }, 1);
+      if (data.type === 'focus') {
+        hamdlers.focusCell(data.key);
+      }
     }
 
     selectionAction.actions.addHandler(syncFocus);
+    hamdlers.focusCell(selectionAction.getFocusedElement(), true);
 
     return () => {
       tableData.editor.action.removeHandler(syncEditor);
