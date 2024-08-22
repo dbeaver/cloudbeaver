@@ -199,7 +199,7 @@ public class WebAppUtils {
                 path = path.concat("; SameSite=" + sameSite);
             }
         }
-
+        sessionCookie.setHttpOnly(true);
         sessionCookie.setPath(path);
         response.addCookie(sessionCookie);
     }
