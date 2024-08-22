@@ -9,7 +9,7 @@ import type { ISqlDataSourceHistoryState } from './ISqlDataSourceHistoryState';
 
 export function createSqlDataSourceHistoryInitialState(value = ''): ISqlDataSourceHistoryState {
   return {
-    history: [{ value, source: 'initial' }],
+    history: [{ value, source: 'initial', timestamp: Date.now() }],
     historyIndex: 0,
   };
 }
