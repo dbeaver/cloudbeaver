@@ -29,6 +29,7 @@ interface Props {
 }
 
 const registry: StyleRegistry = [
+  [TabStyles, { mode: 'append', styles: [styles] }],
   [TabStyles, { mode: 'append', styles: [SqlResultTabsTab] }],
   [TabIconStyles, { mode: 'append', styles: [TabIconModuleStyles] }],
   [TabListStyles, { mode: 'append', styles: [SqlResultTabsTabList] }],
