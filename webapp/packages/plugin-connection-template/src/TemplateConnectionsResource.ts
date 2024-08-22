@@ -68,6 +68,7 @@ export class TemplateConnectionsResource extends CachedDataResource<Connection[]
       includeCredentialsSaved: false,
       includeProperties: false,
       includeProviderProperties: false,
+      includeSharedSecrets: false,
       customIncludeOptions: false,
     });
     return connections;

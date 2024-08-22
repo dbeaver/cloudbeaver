@@ -22,8 +22,8 @@ import {
 import { GraphQLService, SqlContextInfo } from '@cloudbeaver/core-sdk';
 import { flat } from '@cloudbeaver/core-utils';
 
+import type { IConnectionInfoParams } from '../CONNECTION_INFO_PARAM_SCHEMA';
 import { ConnectionInfoActiveProjectKey, ConnectionInfoResource } from '../ConnectionInfoResource';
-import type { IConnectionInfoParams } from '../IConnectionsResource';
 
 export const ConnectionExecutionContextProjectKey = resourceKeyAliasFactory('@connection-folder/project', (projectId: string) => ({ projectId }));
 

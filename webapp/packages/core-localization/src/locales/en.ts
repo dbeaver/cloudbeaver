@@ -78,6 +78,7 @@ export default [
   ['ui_reconnect', 'Reconnect'],
   ['ui_forget', 'Forget'],
   ['ui_set', 'Set'],
+  ['ui_restore', 'Restore'],
   ['ui_are_you_sure', 'Are you sure?'],
   ['ui_options', 'Options'],
   ['ui_changes_might_be_lost', 'Your changes might be lost'],

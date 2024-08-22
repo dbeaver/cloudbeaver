@@ -10,7 +10,7 @@ import { TaskScheduler } from '@cloudbeaver/core-executor';
 import { CachedMapAllKey, ResourceKeyUtils } from '@cloudbeaver/core-resource';
 import { MetadataMap } from '@cloudbeaver/core-utils';
 
-import type { IConnectionInfoParams } from '../IConnectionsResource';
+import type { IConnectionInfoParams } from '../CONNECTION_INFO_PARAM_SCHEMA';
 import { ConnectionExecutionContext } from './ConnectionExecutionContext';
 import { ConnectionExecutionContextResource } from './ConnectionExecutionContextResource';
 

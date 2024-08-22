@@ -164,6 +164,7 @@ public class WebSessionAuthProcessor {
                     authProviderDescriptor,
                     userIdentity,
                     authSession,
+                    authInfo,
                     OffsetDateTime.now()
                 );
                 webAuthInfo.setAuthProviderConfigurationId(authConfiguration.getAuthProviderConfigurationId());
