@@ -23,8 +23,6 @@ export const TableFooter = observer<Props>(function TableFooter({ resultIndex, m
   const translate = useTranslate();
   const style = useS(styles);
 
-  console.log(model.source.requestInfo.requestMessage);
-
   return (
     <ToolsPanel type="secondary" center minHeight>
       <TableFooterMenu model={model} resultIndex={resultIndex} simple={simple} />
