@@ -9,5 +9,4 @@ export * from './AdministrationScreen/AdministrationScreenService';
 export * from './AdministrationScreen/ConfigurationWizard/ConfigurationWizardService';
 export * from './DataContext/DATA_CONTEXT_ADMINISTRATION_ITEM_ROUTE';
 export * from './AdministrationLocaleService';
-export * from './AdministrationSettingsService';
 export * from './PermissionsResource';
