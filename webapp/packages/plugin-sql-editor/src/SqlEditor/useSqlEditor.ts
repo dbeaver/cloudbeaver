@@ -432,12 +432,13 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
       },
 
       async getResolvedSegment(): Promise<ISQLScriptSegment | undefined> {
-        const projectId = this.dataSource?.executionContext?.projectId;
-        const connectionId = this.dataSource?.executionContext?.connectionId;
-
         await data.updateParserScripts();
 
-        if (!projectId || !connectionId || this.cursor.begin !== this.cursor.end) {
+        return this.getLastResolvedSegment(this.cursor.begin, this.cursor.end);
+      },
+
+      getLastResolvedSegment(begin: number, end: number): ISQLScriptSegment | undefined {
+        if (begin !== end) {
           return this.getSubQuery();
         }
 
@@ -445,14 +446,7 @@ export function useSqlEditor(state: ISqlEditorTabState): ISQLEditorData {
           return this.activeSegment;
         }
 
-        const result = await this.sqlEditorService.parseSQLQuery(projectId, connectionId, this.value, this.cursor.begin);
-
-        if (result.end === 0 && result.start === 0) {
-          return;
-        }
-
-        const segment = this.parser.getSegment(result.start, result.end);
-        return segment;
+        return this.parser.getSegment(begin, end);
       },
 
       getSubQuery(): ISQLScriptSegment | undefined {
