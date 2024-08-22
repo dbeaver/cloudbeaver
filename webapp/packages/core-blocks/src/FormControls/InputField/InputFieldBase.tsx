@@ -20,7 +20,6 @@ import { useCombinedHandler } from '../../useCombinedHandler';
 import { useCombinedRef } from '../../useCombinedRef';
 import { useS } from '../../useS';
 import { useStateDelay } from '../../useStateDelay';
-import { useValidationStyles } from '../../useValidationStyles';
 import { Field } from '../Field';
 import { FieldDescription } from '../FieldDescription';
 import { FieldLabel } from '../FieldLabel';
@@ -113,8 +112,6 @@ export const InputFieldBase = observer<InputFieldBaseProps, HTMLInputElement>(
     if (!uncontrolledInputValue) {
       canShowPassword = false;
     }
-
-    useValidationStyles(inputRef);
 
     return (
       <Field {...layoutProps} className={s(styles, {}, className)}>

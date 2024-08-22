@@ -8,7 +8,7 @@
 import { observer } from 'mobx-react-lite';
 import { useEffect, useRef, useState } from 'react';
 
-import { Container, Form, getComputed, s, useS, useValidationStyles } from '@cloudbeaver/core-blocks';
+import { Container, Form, getComputed, s, useS } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { ICustomMenuItemComponent } from '@cloudbeaver/core-view';
 
@@ -43,8 +43,6 @@ export const FetchSizeAction: ICustomMenuItemComponent = observer(function Fetch
   }, [model.countGain]);
 
   const disabled = getComputed(() => model.isLoading());
-
-  useValidationStyles(ref);
 
   return (
     <Container className={s(style, { count: true })} keepSize noGrow center>

@@ -18,7 +18,6 @@ import { Loader } from '../Loader/Loader';
 import { useTranslate } from '../localization/useTranslate';
 import { s } from '../s';
 import { useS } from '../useS';
-import { useValidationStyles } from '../useValidationStyles';
 import comboboxStyles from './Combobox.module.css';
 import { Field } from './Field';
 import { FieldDescription } from './FieldDescription';
@@ -262,8 +261,6 @@ export const Combobox: ComboboxType = observer(function Combobox({
   if (loading && items.length === 0) {
     inputValue = translate('ui_processing_loading');
   }
-
-  useValidationStyles(inputRef);
 
   return (
     <Field {...layoutProps} className={s(styles, { field: true, inline }, className)}>
