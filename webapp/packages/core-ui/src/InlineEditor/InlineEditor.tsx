@@ -8,7 +8,7 @@
 import { observer } from 'mobx-react-lite';
 import React, { ChangeEvent, forwardRef, useCallback, useEffect, useImperativeHandle, useRef } from 'react';
 
-import { Icon, IconOrImage, Loader, s, useObjectRef, useS } from '@cloudbeaver/core-blocks';
+import { Icon, IconOrImage, Loader, s, useObjectRef, useS, useValidationStyles } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
 
@@ -109,6 +109,8 @@ export const InlineEditor = observer<InlineEditorProps, HTMLInputElement>(
     }, [disabled]);
 
     useImperativeHandle(ref, () => inputRef.current!);
+
+    useValidationStyles(inputRef);
 
     return (
       <div className={s(style, { editor: true, editorActive: active }, className)} onClick={onClick} onDoubleClick={onDoubleClick}>

@@ -8,7 +8,7 @@
 import { observer } from 'mobx-react-lite';
 import { useRef } from 'react';
 
-import { s, useS } from '@cloudbeaver/core-blocks';
+import { s, useS, useValidationStyles } from '@cloudbeaver/core-blocks';
 import { useDataContextLink } from '@cloudbeaver/core-data-context';
 import type { IContextMenuItemProps } from '@cloudbeaver/core-ui';
 import type { ICustomMenuItemComponent } from '@cloudbeaver/core-view';
@@ -23,6 +23,7 @@ export const SearchResourceMenuItemComponent: ICustomMenuItemComponent<IContextM
   const style = useS(styles);
   const value = context.get(DATA_CONTEXT_MENU_SEARCH) ?? '';
   const contextRefId = useRef<string | null>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   useDataContextLink(context, (context, id) => {
     contextRefId.current = id;
@@ -34,9 +35,12 @@ export const SearchResourceMenuItemComponent: ICustomMenuItemComponent<IContextM
     }
   }
 
+  useValidationStyles(inputRef);
+
   return (
     <div dir="ltr" className={s(style, { searchBox: true }, className)}>
       <input
+        ref={inputRef}
         name="search"
         type="search"
         placeholder="Search for resource..."

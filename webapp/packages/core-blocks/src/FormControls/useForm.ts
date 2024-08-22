@@ -11,6 +11,7 @@ import { Executor, ExecutorInterrupter, SyncExecutor } from '@cloudbeaver/core-e
 
 import { useExecutor } from '../useExecutor';
 import { useObjectRef } from '../useObjectRef';
+import { INVALID_CLASSNAME } from '../useValidationStyles';
 import { FormChangeHandler, FormContext, type IChangeData, type IFormContext } from './FormContext';
 
 interface IOptions {
@@ -89,13 +90,16 @@ export function useForm(options?: IOptions): IFormContext {
       async submit(event) {
         if (this.parent) {
           await this.parent.submit(event);
-          this.ref?.reset();
         } else {
           event?.preventDefault();
 
           if (this.validate()) {
             await this.onSubmit.execute(event);
-            this.ref?.reset();
+            const formInputs = this.ref?.querySelectorAll('input, textarea') ?? [];
+
+            for (const input of Array.from(formInputs)) {
+              input.classList.remove(INVALID_CLASSNAME);
+            }
           }
         }
       },

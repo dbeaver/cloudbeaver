@@ -6,12 +6,13 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import { useCallback, useContext } from 'react';
+import { useCallback, useContext, useRef } from 'react';
 
 import { filterLayoutFakeProps, getLayoutProps } from '../Containers/filterLayoutFakeProps';
 import type { ILayoutSizeProps } from '../Containers/ILayoutSizeProps';
 import { s } from '../s';
 import { useS } from '../useS';
+import { useValidationStyles } from '../useValidationStyles';
 import { Field } from './Field';
 import { FormContext } from './FormContext';
 import style from './Radio.module.css';
@@ -62,6 +63,7 @@ export const Radio: RadioType = observer(function Radio({
   rest = filterLayoutFakeProps(rest);
   const formContext = useContext(FormContext);
   const context = useContext(RadioGroupContext);
+  const ref = useRef<HTMLInputElement>(null);
 
   const name = context?.name || controlledName;
 
@@ -99,6 +101,8 @@ export const Radio: RadioType = observer(function Radio({
     checked = state[name] === value;
   }
 
+  useValidationStyles(ref);
+
   return (
     <Field {...layoutProps} className={s(styles, { field: true, menu: mod?.includes('menu') }, className)}>
       <div
@@ -111,6 +115,7 @@ export const Radio: RadioType = observer(function Radio({
         })}
       >
         <input
+          ref={ref}
           {...rest}
           className={s(styles, { input: true, disabledInput: rest.disabled })}
           type="radio"

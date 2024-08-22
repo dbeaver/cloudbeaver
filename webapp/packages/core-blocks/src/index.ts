@@ -233,6 +233,7 @@ export * from './useActivationDelay';
 export * from './useAdministrationSettings';
 export * from './useInterval';
 export * from './useSuspense';
+export * from './useValidationStyles';
 export * from './BlocksLocaleService';
 export * from './Snackbars/NotificationMark';
 export * from './Snackbars/SnackbarMarkups/SnackbarWrapper';

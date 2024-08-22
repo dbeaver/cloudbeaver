@@ -17,6 +17,7 @@ import {
   s,
   useS,
   useTranslate,
+  useValidationStyles,
 } from '@cloudbeaver/core-blocks';
 import type { DialogComponent, DialogComponentProps } from '@cloudbeaver/core-dialogs';
 
@@ -37,6 +38,8 @@ export const EditorDialog: DialogComponent<string, string> = observer(function E
   useEffect(() => {
     setTimeout(() => textareaRef.current?.focus(), 100);
   }, []);
+
+  useValidationStyles(textareaRef);
 
   return (
     <CommonDialogWrapper>

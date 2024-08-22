@@ -14,6 +14,7 @@ import { s } from './s';
 import style from './UploadArea.module.css';
 import { useRefInherit } from './useRefInherit';
 import { useS } from './useS';
+import { useValidationStyles } from './useValidationStyles';
 
 interface Props extends Omit<React.DetailedHTMLProps<React.InputHTMLAttributes<HTMLInputElement>, HTMLInputElement>, 'value'> {
   value?: FileList | null;
@@ -43,6 +44,8 @@ export const UploadArea = observer(
         ref.current.files = value;
       }
     });
+
+    useValidationStyles(ref);
 
     return (
       <>

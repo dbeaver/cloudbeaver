@@ -9,6 +9,7 @@ import { useLayoutEffect, useRef } from 'react';
 
 import { s } from '../../s';
 import { useS } from '../../useS';
+import { useValidationStyles } from '../../useValidationStyles';
 import CheckboxMarkupStyles from './CheckboxMarkup.module.css';
 
 export type CheckboxMod = 'primary' | 'surface' | 'small';
@@ -43,6 +44,8 @@ export const CheckboxMarkup: React.FC<ICheckboxMarkupProps> = function CheckboxM
       checkboxRef.current.indeterminate = indeterminate || false;
     }
   });
+
+  useValidationStyles(checkboxRef);
 
   return (
     <div className={s(styles, { checkboxContainer: true, small: mod.includes('small') }, className)} title={title}>

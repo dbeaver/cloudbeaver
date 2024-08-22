@@ -6,11 +6,13 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
+import { useRef } from 'react';
 
 import { filterLayoutFakeProps } from '../../Containers/filterLayoutFakeProps';
 import type { ILayoutSizeProps } from '../../Containers/ILayoutSizeProps';
 import { s } from '../../s';
 import { useS } from '../../useS';
+import { useValidationStyles } from '../../useValidationStyles';
 import { Field } from '../Field';
 import { FieldDescription } from '../FieldDescription';
 import { FieldLabel } from '../FieldLabel';
@@ -67,6 +69,9 @@ export const Switch: SwitchType = observer(function Switch({
   });
   rest = filterLayoutFakeProps(rest);
   const styles = useS(switchStyles, ...mod.map(mod => switchMod[mod]));
+  const ref = useRef<HTMLInputElement>(null);
+
+  useValidationStyles(ref);
 
   if (autoHide && !isControlPresented(name, state)) {
     return null;
@@ -80,6 +85,7 @@ export const Switch: SwitchType = observer(function Switch({
           <div className={styles.switchControlUnderlay}>
             <div className={styles.switchControlThumb} />
             <input
+              ref={ref}
               {...rest}
               type="checkbox"
               id={id || value || name}

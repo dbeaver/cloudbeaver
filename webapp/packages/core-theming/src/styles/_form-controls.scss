@@ -64,7 +64,7 @@
       box-shadow: 0 0 0 50px $input-background inset;
     }
 
-    &:user-invalid {
+    &.user-invalid {
       @include mdc-theme-prop(border-color, negative, false);
     }
 

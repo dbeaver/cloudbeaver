@@ -17,6 +17,7 @@ import { useTranslate } from '../localization/useTranslate';
 import { s } from '../s';
 import { UploadArea } from '../UploadArea';
 import { useS } from '../useS';
+import { useValidationStyles } from '../useValidationStyles';
 import { Field } from './Field';
 import { FieldDescription } from './FieldDescription';
 import { FieldLabel } from './FieldLabel';
@@ -96,6 +97,8 @@ export const Textarea: TextareaType = observer(function Textarea({
       textareaRef.current?.setSelectionRange(position, position);
     }
   }, [cursorInitiallyAtEnd]);
+
+  useValidationStyles(textareaRef);
 
   return (
     <Field {...layoutProps} className={s(styles, { field: true, embedded }, className)}>
