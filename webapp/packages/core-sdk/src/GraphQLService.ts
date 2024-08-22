@@ -11,6 +11,7 @@ import { CustomGraphQLClient } from './CustomGraphQLClient';
 import { EnvironmentService } from './EnvironmentService';
 import { uploadBlobResultSetExtension } from './Extensions/uploadBlobResultSetExtension';
 import { uploadDriverLibraryExtension } from './Extensions/uploadDriverLibraryExtension';
+import { uploadResultDataExtension } from './Extensions/uploadResultDataExtension';
 import type { IResponseInterceptor } from './IResponseInterceptor';
 import { getSdk } from './sdk';
 
@@ -21,6 +22,7 @@ function extendedSDK(client: CustomGraphQLClient) {
     ...sdk,
     ...uploadDriverLibraryExtension(client),
     ...uploadBlobResultSetExtension(client),
+    ...uploadResultDataExtension(client),
   };
 }
 

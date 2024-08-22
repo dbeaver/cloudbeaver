@@ -32,7 +32,7 @@ export const UserFormInfoTeams = observer<Props>(function UserFormInfoTeams({ fo
   return (
     <>
       <GroupTitle>{translate('authentication_user_team')}</GroupTitle>
-      <Group boxNoOverflow gap dense>
+      <Group boxNoOverflow box gap dense>
         {teams.map(team => {
           const isDefault = team.teamId === defaultTeam;
           const label = `${team.teamId}${team.teamName && team.teamName !== team.teamId ? ' (' + team.teamName + ')' : ''}`;

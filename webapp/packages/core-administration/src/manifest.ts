@@ -7,24 +7,16 @@
  */
 import type { PluginManifest } from '@cloudbeaver/core-di';
 
-import { AdministrationItemService } from './AdministrationItem/AdministrationItemService';
-import { AdministrationLocaleService } from './AdministrationLocaleService';
-import { AdministrationScreenService } from './AdministrationScreen/AdministrationScreenService';
-import { ConfigurationWizardService } from './AdministrationScreen/ConfigurationWizard/ConfigurationWizardService';
-import { AdministrationSettingsService } from './AdministrationSettingsService';
-import { PermissionsResource } from './PermissionsResource';
-
 export const coreAdministrationManifest: PluginManifest = {
   info: {
     name: 'Core Administration',
   },
 
   providers: [
-    AdministrationItemService,
-    PermissionsResource,
-    AdministrationScreenService,
-    ConfigurationWizardService,
-    AdministrationLocaleService,
-    AdministrationSettingsService,
+    () => import('./AdministrationItem/AdministrationItemService').then(m => m.AdministrationItemService),
+    () => import('./PermissionsResource').then(m => m.PermissionsResource),
+    () => import('./AdministrationScreen/AdministrationScreenService').then(m => m.AdministrationScreenService),
+    () => import('./AdministrationScreen/ConfigurationWizard/ConfigurationWizardService').then(m => m.ConfigurationWizardService),
+    () => import('./AdministrationLocaleService').then(m => m.AdministrationLocaleService),
   ],
 };

@@ -7,7 +7,6 @@
  */
 import { observer } from 'mobx-react-lite';
 import React, { forwardRef, useContext } from 'react';
-import styled, { css, use } from 'reshadow';
 
 import { getComputed, s, TreeNodeContext, TreeNodeControl, TreeNodeName, useMouseContextMenu, useS } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
@@ -27,7 +26,7 @@ import { ResourceManagerService } from '@cloudbeaver/plugin-resource-manager';
 
 import { getRmProjectNodeId } from '../../NavNodes/getRmProjectNodeId';
 import { DATA_CONTEXT_RESOURCE_MANAGER_TREE_RESOURCE_TYPE_ID } from '../DATA_CONTEXT_RESOURCE_MANAGER_TREE_RESOURCE_TYPE_ID';
-import style from './NavigationNodeProjectControl.m.css';
+import style from './NavigationNodeProjectControl.module.css';
 
 export const NavigationNodeProjectControl: NavTreeControlComponent = observer<NavTreeControlProps, HTMLDivElement>(
   forwardRef(function NavigationNodeProjectControl({ node, dndElement, dndPlaceholder, className }, ref) {
@@ -43,7 +42,7 @@ export const NavigationNodeProjectControl: NavTreeControlComponent = observer<Na
 
     const outdated = getComputed(() => navNodeInfoResource.isOutdated(node.id) && !treeNodeContext.loading);
     const selected = treeNodeContext.selected;
-    const resourceType = viewContext?.tryGet(DATA_CONTEXT_RESOURCE_MANAGER_TREE_RESOURCE_TYPE_ID);
+    const resourceType = viewContext?.get(DATA_CONTEXT_RESOURCE_MANAGER_TREE_RESOURCE_TYPE_ID);
 
     const isDragging = getComputed(() => {
       if (!node.projectId || !elementsTreeContext?.tree.activeDnDData) {
@@ -96,15 +95,15 @@ export const NavigationNodeProjectControl: NavTreeControlComponent = observer<Na
     return (
       <TreeNodeControl
         ref={ref}
+        className={s(styles, { treeNodeControl: true, outdated }, className)}
         onClick={handleClick}
         onContextMenu={handleContextMenuOpen}
-        className={s(styles, { treeNodeControl: true, outdated,  }, className)}
       >
         <TreeNodeName title={name} className={s(styles, { treeNodeName: true })}>
           <div className={s(styles, { nameBox: true })}>{name}</div>
         </TreeNodeName>
         {!dndPlaceholder && (
-          <div onClick={handlePortalClick} className={s(styles, { portal: true })}>
+          <div className={s(styles, { portal: true })} onClick={handlePortalClick}>
             <TreeNodeMenuLoader mouseContextMenu={mouseContextMenu} node={node} selected={selected} />
           </div>
         )}
@@ -112,3 +111,5 @@ export const NavigationNodeProjectControl: NavTreeControlComponent = observer<Na
     );
   }),
 );
+
+NavigationNodeProjectControl.displayName = 'NavigationNodeProjectControl';

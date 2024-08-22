@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 import { useCombinedRef } from '@cloudbeaver/core-blocks';
-import { useDataContext } from '@cloudbeaver/core-data-context';
+import { useDataContext, useDataContextLink } from '@cloudbeaver/core-data-context';
 import { IDNDBox, IDNDData, useDNDBox, useDNDData } from '@cloudbeaver/core-ui';
 import {
   DATA_CONTEXT_DV_DDM,
@@ -14,6 +14,8 @@ import {
   DATA_CONTEXT_DV_DDM_RS_COLUMN_KEY,
   IDatabaseDataModel,
   IResultSetColumnKey,
+  isResultSetDataModel,
+  ResultSetDataSource,
   ResultSetViewAction,
 } from '@cloudbeaver/plugin-data-viewer';
 
@@ -28,11 +30,17 @@ interface TableColumnDnD {
 
 export function useTableColumnDnD(model: IDatabaseDataModel, resultIndex: number, columnKey: IResultSetColumnKey | null): TableColumnDnD {
   const context = useDataContext();
-  const resultSetViewAction = model.source.tryGetAction(resultIndex, ResultSetViewAction);
+  let resultSetViewAction: ResultSetViewAction | undefined;
 
-  context.set(DATA_CONTEXT_DV_DDM, model);
-  context.set(DATA_CONTEXT_DV_DDM_RESULT_INDEX, resultIndex);
-  context.set(DATA_CONTEXT_DV_DDM_RS_COLUMN_KEY, columnKey);
+  if (isResultSetDataModel(model)) {
+    resultSetViewAction = (model.source as ResultSetDataSource).tryGetAction(resultIndex, ResultSetViewAction);
+  }
+
+  useDataContextLink(context, (context, id) => {
+    context.set(DATA_CONTEXT_DV_DDM, model, id);
+    context.set(DATA_CONTEXT_DV_DDM_RESULT_INDEX, resultIndex, id);
+    context.set(DATA_CONTEXT_DV_DDM_RS_COLUMN_KEY, columnKey, id);
+  });
 
   const dndData = useDNDData(context, {
     canDrag: () => !model.isDisabled(resultIndex),
@@ -60,7 +68,7 @@ export function useTableColumnDnD(model: IDatabaseDataModel, resultIndex: number
   let side: TableColumnInsertPositionSide = null;
 
   if (columnKey && dndBox.state.isOver && dndBox.state.context) {
-    const dndColumnKey = dndBox.state.context.tryGet(DATA_CONTEXT_DV_DDM_RS_COLUMN_KEY);
+    const dndColumnKey = dndBox.state.context.get(DATA_CONTEXT_DV_DDM_RS_COLUMN_KEY);
 
     if (resultSetViewAction && dndColumnKey && resultSetViewAction.columnIndex(columnKey) > resultSetViewAction.columnIndex(dndColumnKey)) {
       side = 'right';

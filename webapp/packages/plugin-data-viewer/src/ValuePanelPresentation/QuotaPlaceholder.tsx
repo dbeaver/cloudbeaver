@@ -9,17 +9,18 @@ import { observer } from 'mobx-react-lite';
 
 import { Container, Link, s, usePermission, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import { EAdminPermission } from '@cloudbeaver/core-root';
+import { WebsiteLinks } from '@cloudbeaver/core-website';
 
 import type { IResultSetElementKey } from '../DatabaseDataModel/Actions/ResultSet/IResultSetDataKey';
-import { useResultSetActions } from '../DatabaseDataModel/Actions/ResultSet/useResultSetActions';
+import { ResultSetDataContentAction } from '../DatabaseDataModel/Actions/ResultSet/ResultSetDataContentAction';
 import type { IDatabaseDataModel } from '../DatabaseDataModel/IDatabaseDataModel';
-import type { IDatabaseResultSet } from '../DatabaseDataModel/IDatabaseResultSet';
-import styles from './QuotaPlaceholder.m.css';
+import { ResultSetDataSource } from '../ResultSet/ResultSetDataSource';
+import styles from './QuotaPlaceholder.module.css';
 
 interface Props {
   className?: string;
   elementKey: IResultSetElementKey | undefined;
-  model: IDatabaseDataModel<any, IDatabaseResultSet>;
+  model: IDatabaseDataModel<ResultSetDataSource>;
   resultIndex: number;
   keepSize?: boolean;
 }
@@ -35,31 +36,23 @@ export const QuotaPlaceholder: React.FC<React.PropsWithChildren<Props>> = observ
   const translate = useTranslate();
   const admin = usePermission(EAdminPermission.admin);
   const style = useS(styles);
-  const { contentAction } = useResultSetActions({ model, resultIndex });
+  const contentAction = model.source.getAction(resultIndex, ResultSetDataContentAction);
   const limitInfo = elementKey ? contentAction.getLimitInfo(elementKey) : null;
 
   return (
     <Container className={className} keepSize={keepSize} vertical center>
       <Container center vertical>
-        {translate('data_viewer_presentation_value_content_was_truncated')}
-        <Container noWrap center>
-          <Container>{translate('data_viewer_presentation_value_content_truncated_placeholder')}</Container>
-          <Container className={s(style, { limitWord: true })} zeroBasis>
-            {admin ? (
-              <Link
-                className={s(style, { link: true })}
-                title={limitInfo?.limitWithSize}
-                href="https://dbeaver.com/docs/cloudbeaver/Server-configuration/#resource-quotas"
-                target="_blank"
-                indicator
-              >
-                {translate('ui_limit')}
-              </Link>
-            ) : (
-              translate('ui_limit')
-            )}
-          </Container>
-        </Container>
+        {translate('data_viewer_presentation_value_content_truncated_placeholder')}
+        &nbsp;
+        <span className={s(style, { limitWord: true })}>
+          {admin ? (
+            <Link title={limitInfo?.limitWithSize} href={WebsiteLinks.SERVER_CONFIGURATION_RESOURCE_QUOTAS_PAGE} target="_blank" indicator>
+              {translate('ui_limit')}
+            </Link>
+          ) : (
+            translate('ui_limit')
+          )}
+        </span>
       </Container>
       <Container>{children}</Container>
     </Container>

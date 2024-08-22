@@ -25,7 +25,7 @@ import { EventContext, EventStopPropagationFlag } from '@cloudbeaver/core-events
 import { EObjectFeature, NavNodeInfoResource, NavTreeResource } from '@cloudbeaver/core-navigation-tree';
 
 import type { NavTreeControlComponent, NavTreeControlProps } from '../ElementsTree/NavigationNodeComponent';
-import style from '../ElementsTree/NavigationTreeNode/NavigationNode/NavigationNodeControl.m.css';
+import style from '../ElementsTree/NavigationTreeNode/NavigationNode/NavigationNodeControl.module.css';
 import { NavigationNodeExpand } from '../ElementsTree/NavigationTreeNode/NavigationNode/NavigationNodeExpand';
 import { TreeNodeMenuLoader } from '../ElementsTree/NavigationTreeNode/TreeNodeMenu/TreeNodeMenuLoader';
 
@@ -84,3 +84,5 @@ export const ConnectionNavNodeControl: NavTreeControlComponent = observer<NavTre
     );
   }),
 );
+
+ConnectionNavNodeControl.displayName = 'ConnectionNavNodeControl';

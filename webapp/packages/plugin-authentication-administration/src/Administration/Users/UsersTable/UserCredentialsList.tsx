@@ -8,14 +8,13 @@
 import { observer } from 'mobx-react-lite';
 import { Fragment } from 'react';
 import { Menu, MenuButton, MenuItem, useMenuState } from 'reakit';
-import styled from 'reshadow';
 
 import { AUTH_PROVIDER_LOCAL_ID } from '@cloudbeaver/core-authentication';
-import { BASE_DROPDOWN_STYLES, PlaceholderComponent, s, StaticImage, useS, useTranslate } from '@cloudbeaver/core-blocks';
+import { BaseDropdownStyles, PlaceholderComponent, s, StaticImage, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import type { ObjectOrigin } from '@cloudbeaver/core-sdk';
 
 import type { IUserDetailsInfoProps } from '../UsersAdministrationService';
-import style from './UserCredentialsList.m.css';
+import style from './UserCredentialsList.module.css';
 
 const MAX_VISIBLE_CREDENTIALS = 3;
 
@@ -36,7 +35,7 @@ export const UserCredentials = observer<IUserCredentialsProps>(function UserCred
 });
 
 export const UserCredentialsList: PlaceholderComponent<IUserDetailsInfoProps> = observer(function UserCredentialsList({ user }) {
-  const styles = useS(style);
+  const styles = useS(style, BaseDropdownStyles);
   const translate = useTranslate();
   const menu = useMenuState({
     placement: 'top',
@@ -45,7 +44,7 @@ export const UserCredentialsList: PlaceholderComponent<IUserDetailsInfoProps> = 
 
   const visibleCredentials = user.origins.slice(0, MAX_VISIBLE_CREDENTIALS);
 
-  return styled(BASE_DROPDOWN_STYLES)(
+  return (
     <Fragment key="user-credentials-list">
       {visibleCredentials.map(origin => (
         <UserCredentials key={`${origin.type}${origin.subType ?? ''}`} origin={origin} />
@@ -58,7 +57,6 @@ export const UserCredentialsList: PlaceholderComponent<IUserDetailsInfoProps> = 
               <span>+{user.origins.length - MAX_VISIBLE_CREDENTIALS}</span>
             </div>
           </MenuButton>
-
           <Menu className={s(styles, { menu: true })} {...menu} modal>
             {user.origins.slice(MAX_VISIBLE_CREDENTIALS).map(origin => {
               const isLocal = origin.type === AUTH_PROVIDER_LOCAL_ID;
@@ -73,6 +71,6 @@ export const UserCredentialsList: PlaceholderComponent<IUserDetailsInfoProps> = 
           </Menu>
         </>
       )}
-    </Fragment>,
+    </Fragment>
   );
 });

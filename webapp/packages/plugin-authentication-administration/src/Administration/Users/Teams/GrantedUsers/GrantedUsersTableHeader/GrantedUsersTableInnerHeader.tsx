@@ -11,10 +11,11 @@ import { TableColumnHeader, TableHeader, TableSelect, useTranslate } from '@clou
 
 interface Props {
   disabled?: boolean;
+  showUserTeamRole?: boolean;
   className?: string;
 }
 
-export const GrantedUsersTableInnerHeader = observer<Props>(function GrantedUsersTableInnerHeader({ disabled, className }) {
+export const GrantedUsersTableInnerHeader = observer<Props>(function GrantedUsersTableInnerHeader({ disabled, showUserTeamRole, className }) {
   const translate = useTranslate();
 
   return (
@@ -24,6 +25,11 @@ export const GrantedUsersTableInnerHeader = observer<Props>(function GrantedUser
       </TableColumnHeader>
       <TableColumnHeader min />
       <TableColumnHeader>{translate('administration_teams_team_granted_users_user_id')}</TableColumnHeader>
+      {showUserTeamRole && (
+        <TableColumnHeader title={translate('plugin_authentication_administration_team_user_team_role_supervisor_description')}>
+          {translate('plugin_authentication_administration_team_user_team_role_supervisor')}
+        </TableColumnHeader>
+      )}
     </TableHeader>
   );
 });

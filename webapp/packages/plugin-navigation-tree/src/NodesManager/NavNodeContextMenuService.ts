@@ -32,7 +32,6 @@ import {
   ACTION_REFRESH,
   ACTION_RENAME,
   ActionService,
-  DATA_CONTEXT_MENU_NESTED,
   menuExtractItems,
   MenuSeparatorItem,
   MenuService,
@@ -97,12 +96,9 @@ export class NavNodeContextMenuService extends Bootstrap {
 
     this.actionService.addHandler({
       id: 'nav-node-base-handler',
+      contexts: [DATA_CONTEXT_NAV_NODE],
       isActionApplicable: (context, action): boolean => {
-        const node = context.tryGet(DATA_CONTEXT_NAV_NODE);
-
-        if (!node) {
-          return false;
-        }
+        const node = context.get(DATA_CONTEXT_NAV_NODE)!;
 
         if (NodeManagerUtils.isDatabaseObject(node.id) || node.nodeType === NAV_NODE_TYPE_FOLDER) {
           if (action === ACTION_RENAME) {
@@ -121,7 +117,7 @@ export class NavNodeContextMenuService extends Bootstrap {
         return [ACTION_OPEN, ACTION_REFRESH].includes(action);
       },
       handler: async (context, action) => {
-        const node = context.get(DATA_CONTEXT_NAV_NODE);
+        const node = context.get(DATA_CONTEXT_NAV_NODE)!;
         const name = getNodePlainName(node);
 
         switch (action) {
@@ -138,7 +134,7 @@ export class NavNodeContextMenuService extends Bootstrap {
             break;
           }
           case ACTION_RENAME: {
-            const actions = context.tryGet(DATA_CONTEXT_NAV_NODE_ACTIONS);
+            const actions = context.get(DATA_CONTEXT_NAV_NODE_ACTIONS);
 
             const save = async (newName: string) => {
               if (name !== newName && newName.trim().length) {
@@ -156,7 +152,7 @@ export class NavNodeContextMenuService extends Bootstrap {
               actions.rename(save);
             } else {
               const result = await this.commonDialogService.open(RenameDialog, {
-                value: name,
+                name,
                 subTitle: name,
                 objectName: node.nodeType || 'Object',
                 icon: node.icon,
@@ -185,19 +181,16 @@ export class NavNodeContextMenuService extends Bootstrap {
     });
 
     this.menuService.addCreator({
-      isApplicable: context => context.has(DATA_CONTEXT_NAV_NODE) && !context.has(DATA_CONTEXT_MENU_NESTED),
+      root: true,
+      contexts: [DATA_CONTEXT_NAV_NODE],
       getItems: (context, items) => {
-        const editingGlobalPermission = this.navTreeSettingsService.settings.getValue('editing');
-
-        const deleteGlobalPermission = this.navTreeSettingsService.settings.getValue('deleting');
-
         items = [ACTION_OPEN, ACTION_REFRESH, ...items];
 
-        if (editingGlobalPermission) {
+        if (this.navTreeSettingsService.editing) {
           items.push(ACTION_RENAME);
         }
 
-        if (deleteGlobalPermission) {
+        if (this.navTreeSettingsService.deleting) {
           items.push(ACTION_DELETE);
         }
 
@@ -222,6 +215,4 @@ export class NavNodeContextMenuService extends Bootstrap {
       },
     });
   }
-
-  load(): void {}
 }

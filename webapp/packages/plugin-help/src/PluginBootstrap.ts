@@ -87,7 +87,7 @@ export class PluginBootstrap extends Bootstrap {
 
     this.actionService.addHandler({
       id: 'app-help',
-      isActionApplicable: (context, action) => [ACTION_APP_HELP].includes(action),
+      actions: [ACTION_APP_HELP],
       handler: async (context, action) => {
         switch (action) {
           case ACTION_APP_HELP: {

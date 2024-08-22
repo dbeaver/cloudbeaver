@@ -10,7 +10,7 @@ import { observer } from 'mobx-react-lite';
 import { s, useS } from '@cloudbeaver/core-blocks';
 import type { EditorState } from '@cloudbeaver/plugin-codemirror6';
 
-import classes from './SqlEditorInfoBar.m.css';
+import classes from './SqlEditorInfoBar.module.css';
 
 interface Props {
   state: EditorState;

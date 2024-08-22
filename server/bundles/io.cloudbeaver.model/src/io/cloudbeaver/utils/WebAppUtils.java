@@ -37,10 +37,7 @@ import org.jkiss.dbeaver.utils.GeneralUtils;
 import org.jkiss.utils.CommonUtils;
 
 import java.nio.file.Path;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class WebAppUtils {
     private static final Log log = Log.getLog(WebAppUtils.class);
@@ -77,17 +74,25 @@ public class WebAppUtils {
     }
 
     @SuppressWarnings("unchecked")
-    public static Map<String, Object> mergeConfigurations(Map<String, Object> origin, Map<String, Object> additional) {
+    public static Map<String, Object> mergeConfigurations(
+        Map<String, Object> priorityConfiguration,
+        Map<String, Object> additional
+    ) {
         var resultConfig = new HashMap<String, Object>();
-        Set<String> rootKeys = new HashSet<>(origin.keySet());
+        Set<String> rootKeys = new HashSet<>(priorityConfiguration.keySet());
         rootKeys.addAll(additional.keySet());
 
         for (var rootKey : rootKeys) {
-            var originValue = origin.get(rootKey);
+            var originValue = priorityConfiguration.get(rootKey);
             var additionalValue = additional.get(rootKey);
 
             if (originValue == null || additionalValue == null) {
-                var resultValue = originValue != null ? originValue : additionalValue;
+                Object resultValue = null;
+                if (additional.containsKey(rootKey)) {
+                    resultValue = additionalValue;
+                } else if (originValue != null) {
+                    resultValue = originValue;
+                }
                 resultConfig.put(rootKey, resultValue);
                 continue;
             }
@@ -131,6 +136,10 @@ public class WebAppUtils {
 
     public static Object getExtractedValue(Object oldValue, Object newValue) {
         if (!(oldValue instanceof String)) {
+            return newValue;
+        }
+        //new value already contains variable pattern
+        if (newValue instanceof String newStringValue && GeneralUtils.isVariablePattern(newStringValue)) {
             return newValue;
         }
         String value = (String) oldValue;
@@ -179,7 +188,7 @@ public class WebAppUtils {
             sessionCookie.setMaxAge((int) (maxSessionIdleTime / 1000));
         }
 
-        String path = getWebApplication().getRootURI();
+        String path = getWebApplication().getServerConfiguration().getRootURI();
 
         if (sameSite != null) {
             if (!request.isSecure()) {
@@ -190,7 +199,7 @@ public class WebAppUtils {
                 path = path.concat("; SameSite=" + sameSite);
             }
         }
-
+        sessionCookie.setHttpOnly(true);
         sessionCookie.setPath(path);
         response.addCookie(sessionCookie);
     }
@@ -222,6 +231,42 @@ public class WebAppUtils {
             throw new DBWebException("Project '" + projectId + "' not found");
         }
         return project;
+    }
+
+    public static Map<String, Object> flattenMap(Map<String, Object> nestedMap) {
+        Map<String, Object> result = new LinkedHashMap<>();
+        flattenMapHelper(nestedMap, result, "");
+        return result;
+    }
+
+    private static void flattenMapHelper(Map<String, Object> nestedMap, Map<String, Object> result, String prefix) {
+        for (Map.Entry<String, Object> entry : nestedMap.entrySet()) {
+            String key = entry.getKey();
+            Object value = entry.getValue();
+            flattenResult(result, prefix, key, value);
+        }
+    }
+
+    private static void flattenResult(Map<String, Object> result, String prefix, String key, Object value) {
+        if (value instanceof Map) {
+            flattenMapHelper((Map<String, Object>) value, result, prefix + key + ".");
+        } else if (value instanceof Object[]) {
+            flattenArray((Object[]) value, result, prefix + key + ".");
+        } else {
+            String fullKey = prefix + key;
+            if (!result.containsKey(fullKey)) {
+                result.put(fullKey, value);
+            }
+        }
+    }
+
+    private static void flattenArray(Object[] array, Map<String, Object> result, String prefix) {
+        for (int i = 0; i < array.length; i++) {
+            String key = String.valueOf(i);
+            Object value = array[i];
+
+            flattenResult(result, prefix, key, value);
+        }
     }
 
 }

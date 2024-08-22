@@ -14,7 +14,8 @@ import {
   ConnectionInfoResource,
   createConnectionParam,
 } from '@cloudbeaver/core-connections';
-import { MenuBar } from '@cloudbeaver/core-ui';
+import { useDataContextLink } from '@cloudbeaver/core-data-context';
+import { MenuBar, MenuBarItemStyles, MenuBarStyles } from '@cloudbeaver/core-ui';
 import { useMenu } from '@cloudbeaver/core-view';
 import { useCodemirrorExtensions } from '@cloudbeaver/plugin-codemirror6';
 import type { NavNodeTransformViewComponent } from '@cloudbeaver/plugin-navigation-tree';
@@ -23,11 +24,11 @@ import { SQLCodeEditorLoader, useSqlDialectExtension } from '@cloudbeaver/plugin
 import { DATA_CONTEXT_DDL_VIEWER_NODE } from './DATA_CONTEXT_DDL_VIEWER_NODE';
 import { DATA_CONTEXT_DDL_VIEWER_VALUE } from './DATA_CONTEXT_DDL_VIEWER_VALUE';
 import { DdlResource } from './DdlResource';
-import style from './DDLViewerTabPanel.m.css';
+import style from './DDLViewerTabPanel.module.css';
 import { MENU_DDL_VIEWER_FOOTER } from './MENU_DDL_VIEWER_FOOTER';
 
 export const DDLViewerTabPanel: NavNodeTransformViewComponent = observer(function DDLViewerTabPanel({ nodeId, folderId }) {
-  const styles = useS(style);
+  const styles = useS(style, MenuBarStyles, MenuBarItemStyles);
   const menu = useMenu({ menu: MENU_DDL_VIEWER_FOOTER });
 
   const ddlResource = useResource(DDLViewerTabPanel, DdlResource, nodeId);
@@ -39,14 +40,17 @@ export const DDLViewerTabPanel: NavNodeTransformViewComponent = observer(functio
   const sqlDialect = useSqlDialectExtension(connectionDialectResource.data);
   const extensions = useCodemirrorExtensions();
   extensions.set(...sqlDialect);
+  const ddlData = ddlResource.data;
 
-  menu.context.set(DATA_CONTEXT_DDL_VIEWER_NODE, nodeId);
-  menu.context.set(DATA_CONTEXT_DDL_VIEWER_VALUE, ddlResource.data);
+  useDataContextLink(menu.context, (context, id) => {
+    context.set(DATA_CONTEXT_DDL_VIEWER_NODE, nodeId, id);
+    context.set(DATA_CONTEXT_DDL_VIEWER_VALUE, ddlData, id);
+  });
 
   return (
     <div className={s(styles, { wrapper: true })}>
       <SQLCodeEditorLoader className={s(styles, { sqlCodeEditorLoader: true })} value={ddlResource.data ?? ''} extensions={extensions} readonly />
-      <MenuBar className={s(styles, { menuBar: true })} menu={menu} />
+      <MenuBar className={s(styles, { menuBar: true, floating: true, withLabel: true })} menu={menu} />
     </div>
   );
 });

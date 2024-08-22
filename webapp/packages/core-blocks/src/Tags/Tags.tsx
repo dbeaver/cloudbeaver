@@ -6,9 +6,10 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
+
 import { s } from '../s';
 import { useS } from '../useS';
-import style from './Tags.m.css';
+import style from './Tags.module.css';
 
 interface Props {
   className?: string;
@@ -16,10 +17,6 @@ interface Props {
 
 export const Tags = observer<React.PropsWithChildren<Props>>(function Tags({ children, className }) {
   const styles = useS(style);
-  
-  return (
-    <ul className={s(styles, { tags: true }, className)}>
-      {children}
-    </ul>
-  );
+
+  return <ul className={s(styles, { tags: true }, className)}>{children}</ul>;
 });

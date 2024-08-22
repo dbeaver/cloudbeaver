@@ -7,15 +7,27 @@
  */
 import { observer } from 'mobx-react-lite';
 import { forwardRef, useCallback } from 'react';
-import type { MenuInitialState } from 'reakit';
 
-import { getComputed, MenuSeparator, MenuSeparatorStyles, s, SContext, StyleRegistry, useAutoLoad, useS } from '@cloudbeaver/core-blocks';
+import {
+  getComputed,
+  Loader,
+  MenuSeparator,
+  MenuSeparatorStyles,
+  registry,
+  s,
+  SContext,
+  StyleRegistry,
+  useAutoLoad,
+  useS,
+} from '@cloudbeaver/core-blocks';
+import { IDataContext, useDataContextLink } from '@cloudbeaver/core-data-context';
 import {
   DATA_CONTEXT_MENU_NESTED,
   DATA_CONTEXT_SUBMENU_ITEM,
   IMenuActionItem,
   IMenuData,
   IMenuItem,
+  isMenuCustomItem,
   MenuActionItem,
   MenuBaseItem,
   MenuSeparatorItem,
@@ -24,20 +36,11 @@ import {
 } from '@cloudbeaver/core-view';
 
 import { ContextMenu } from '../ContextMenu';
-import style from './MenuBar.m.css';
+import type { IMenuBarNestedMenuSettings, IMenuBarProps } from './IMenuBarProps';
+import style from './MenuBar.module.css';
 import { MenuBarItem } from './MenuBarItem';
 
-interface INestedMenuSettings extends MenuInitialState {
-  onVisibleSwitch?: (visible: boolean) => void;
-}
-
-interface IMenuBarProps extends React.HTMLAttributes<HTMLDivElement> {
-  menu: IMenuData;
-  nestedMenuSettings?: INestedMenuSettings;
-  rtl?: boolean;
-}
-
-const registry: StyleRegistry = [
+const styleRegistry: StyleRegistry = [
   [
     MenuSeparatorStyles,
     {
@@ -58,11 +61,13 @@ export const MenuBar = observer<IMenuBarProps, HTMLDivElement>(
     }
 
     return (
-      <SContext registry={registry}>
+      <SContext registry={styleRegistry}>
         <div ref={ref} className={s(styles, { menuBar: true }, className)} {...props}>
-          {items.map(item => (
-            <MenuBarElement key={item.id} item={item} menuData={menu} nestedMenuSettings={nestedMenuSettings} rtl={rtl} />
-          ))}
+          <Loader suspense small>
+            {items.map(item => (
+              <MenuBarElement key={item.id} item={item} menuData={menu} nestedMenuSettings={nestedMenuSettings} rtl={rtl} />
+            ))}
+          </Loader>
         </div>
       </SContext>
     );
@@ -72,7 +77,7 @@ export const MenuBar = observer<IMenuBarProps, HTMLDivElement>(
 interface IMenuBarElementProps {
   item: IMenuItem;
   menuData: IMenuData;
-  nestedMenuSettings?: INestedMenuSettings;
+  nestedMenuSettings?: IMenuBarNestedMenuSettings;
   className?: string;
   rtl?: boolean;
 }
@@ -87,6 +92,20 @@ const MenuBarElement = observer<IMenuBarElementProps>(function MenuBarElement({ 
   }
 
   if (item instanceof MenuSubMenuItem) {
+    if (item.action) {
+      return (
+        <MenuBarAction
+          item={item.action}
+          context={menuData.context}
+          submenu={({ children }) => (
+            <SubMenuItem item={item} menuData={menuData} className={className} rtl={rtl} nestedMenuSettings={nestedMenuSettings}>
+              {children}
+            </SubMenuItem>
+          )}
+          className={className}
+        />
+      );
+    }
     return <SubMenuItem item={item} menuData={menuData} className={className} rtl={rtl} nestedMenuSettings={nestedMenuSettings} />;
   }
 
@@ -94,8 +113,14 @@ const MenuBarElement = observer<IMenuBarElementProps>(function MenuBarElement({ 
     return <MenuSeparator className={className} />;
   }
 
+  if (isMenuCustomItem(item)) {
+    const CustomMenuItem = item.getComponent();
+
+    return <CustomMenuItem item={item} context={menuData.context} onClick={onClick} />;
+  }
+
   if (item instanceof MenuActionItem) {
-    return <MenuBarAction item={item} className={className} onClick={onClick} />;
+    return <MenuBarAction item={item} context={menuData.context} className={className} />;
   }
 
   if (item instanceof MenuBaseItem) {
@@ -117,59 +142,66 @@ const MenuBarElement = observer<IMenuBarElementProps>(function MenuBarElement({ 
   return null;
 });
 
-interface IMenuBarActionProps {
+export interface IMenuBarActionProps {
   item: IMenuActionItem;
+  context: IDataContext;
+  submenu?: React.FC<React.PropsWithChildren>;
   className?: string;
-  onClick: () => void;
 }
 
-const MenuBarAction = observer<IMenuBarActionProps>(function MenuBarAction({ item, className, onClick }) {
-  const actionInfo = item.action.actionInfo;
-  const loading = item.action.isLoading();
+export const MenuBarAction = registry(
+  observer<IMenuBarActionProps>(function MenuBarAction({ item, submenu, className }) {
+    const actionInfo = item.action.actionInfo;
+    const loading = item.action.isLoading();
 
-  /** @deprecated must be refactored (#1)*/
-  const displayLabel = item.action.isLabelVisible();
+    /** @deprecated must be refactored (#1)*/
+    const displayLabel = item.action.isLabelVisible();
 
-  function handleClick() {
-    onClick();
-    item.action.activate();
-  }
+    function handleClick() {
+      item.events?.onSelect?.();
+      item.action.activate();
+    }
 
-  return (
-    <MenuBarItem
-      id={item.id}
-      hidden={item.hidden}
-      aria-label={actionInfo.label}
-      label={actionInfo.label}
-      displayLabel={displayLabel}
-      icon={actionInfo.icon}
-      title={actionInfo.tooltip}
-      disabled={item.disabled}
-      loading={loading}
-      className={className}
-      onClick={handleClick}
-    />
-  );
-});
+    return (
+      <MenuBarItem
+        id={item.id}
+        hidden={item.hidden}
+        aria-label={actionInfo.label}
+        label={actionInfo.label}
+        displayLabel={displayLabel}
+        icon={actionInfo.icon}
+        title={actionInfo.tooltip}
+        disabled={item.disabled}
+        loading={loading}
+        submenu={submenu}
+        className={className}
+        onClick={handleClick}
+      />
+    );
+  }),
+);
 
-interface ISubMenuItemProps {
+interface ISubMenuItemProps extends React.PropsWithChildren {
   item: MenuSubMenuItem;
   menuData: IMenuData;
-  nestedMenuSettings?: INestedMenuSettings;
+  nestedMenuSettings?: IMenuBarNestedMenuSettings;
   className?: string;
   rtl?: boolean;
 }
 
-const SubMenuItem = observer<ISubMenuItemProps>(function SubmenuItem({ item, menuData, nestedMenuSettings, className, rtl }) {
+const SubMenuItem = observer<ISubMenuItemProps>(function SubMenuItem({ children, item, menuData, nestedMenuSettings, className, rtl }) {
   const subMenuData = useMenu({ menu: item.menu, context: menuData.context });
 
-  subMenuData.context.set(DATA_CONTEXT_MENU_NESTED, true);
-  subMenuData.context.set(DATA_CONTEXT_SUBMENU_ITEM, item);
+  useDataContextLink(subMenuData.context, (context, id) => {
+    subMenuData.context.set(DATA_CONTEXT_MENU_NESTED, true, id);
+    subMenuData.context.set(DATA_CONTEXT_SUBMENU_ITEM, item, id);
+  });
 
   const handler = subMenuData.handler;
   const hideIfEmpty = handler?.hideIfEmpty?.(subMenuData.context) ?? true;
   const hidden = getComputed(() => subMenuData.items.every(item => item.hidden));
 
+  // TODO: need to be fixed, in case when menu depend on data from loaders this may be always true
   if (hideIfEmpty && hidden) {
     return null;
   }
@@ -188,21 +220,23 @@ const SubMenuItem = observer<ISubMenuItemProps>(function SubmenuItem({ item, men
   const panelAvailable = subMenuData.itemCreators.length > 0;
 
   return (
-    <ContextMenu menu={subMenuData} className={className} rtl={rtl} disclosure {...nestedMenuSettings}>
-      {({ loading, disabled }) => (
-        <MenuBarItem
-          id={item.id}
-          hidden={item.hidden}
-          aria-label={item.menu.label}
-          label={label}
-          displayLabel={displayLabel}
-          icon={IconComponent ? <IconComponent item={item} {...extraProps} /> : icon}
-          title={tooltip}
-          loading={loading}
-          disabled={disabled}
-          displaySubmenuMark={panelAvailable}
-        />
-      )}
+    <ContextMenu menu={subMenuData} className={className} rtl={rtl} modal disclosure {...nestedMenuSettings}>
+      {({ loading, disabled }) =>
+        children || (
+          <MenuBarItem
+            id={item.id}
+            hidden={item.hidden}
+            aria-label={item.menu.label}
+            label={label}
+            displayLabel={displayLabel}
+            icon={IconComponent ? <IconComponent item={item} {...extraProps} /> : icon}
+            title={tooltip}
+            loading={loading}
+            disabled={disabled}
+            displaySubmenuMark={panelAvailable}
+          />
+        )
+      }
     </ContextMenu>
   );
 });

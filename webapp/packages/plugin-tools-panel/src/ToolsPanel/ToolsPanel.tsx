@@ -8,14 +8,13 @@
 import { action, untracked } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import { useRef } from 'react';
-import styled from 'reshadow';
 
-import { s, useS, useStyles, useUserData } from '@cloudbeaver/core-blocks';
+import { s, useS, useUserData } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { BASE_TAB_STYLES, ITabData, TabList, TabPanelList, TabsState, UNDERLINE_TAB_STYLES } from '@cloudbeaver/core-ui';
+import { ITabData, TabList, TabPanelList, TabsState } from '@cloudbeaver/core-ui';
 import { isArraysEqual } from '@cloudbeaver/core-utils';
 
-import styles from './ToolsPanel.m.css';
+import styles from './ToolsPanel.module.css';
 import { ToolsPanelService } from './ToolsPanelService';
 
 interface IToolsState {
@@ -27,7 +26,6 @@ export const ToolsPanel = observer(function ToolsPanel() {
   const style = useS(styles);
 
   const state = useUserData<IToolsState>('tools', () => ({ selectedTabId: undefined }));
-  const tabStyle = [BASE_TAB_STYLES, UNDERLINE_TAB_STYLES];
   const tabs = toolsPanelService.tabsContainer.getIdList();
   const prevTabs = useRef<string[]>(tabs);
   const equal = isArraysEqual(prevTabs.current, tabs);
@@ -61,14 +59,14 @@ export const ToolsPanel = observer(function ToolsPanel() {
     state.selectedTabId = tab.tabId;
   }
 
-  return styled(useStyles(tabStyle))(
+  return (
     <TabsState currentTabId={state.selectedTabId} container={toolsPanelService.tabsContainer} lazy onChange={handleTabChange}>
       <div className={s(style, { box: true })}>
-        <TabList className={s(style, { tabList: true })} style={tabStyle} />
+        <TabList className={s(style, { tabList: true })} underline />
         <div className={s(style, { contentBox: true })}>
-          <TabPanelList style={tabStyle} />
+          <TabPanelList />
         </div>
       </div>
-    </TabsState>,
+    </TabsState>
   );
 });

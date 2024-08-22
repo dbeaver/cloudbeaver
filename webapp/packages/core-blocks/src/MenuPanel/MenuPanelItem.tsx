@@ -6,10 +6,8 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import styled, { use } from 'reshadow';
 
 import type { IMenuItem } from '@cloudbeaver/core-dialogs';
-import type { ComponentStyle } from '@cloudbeaver/core-theming';
 
 import { Checkbox } from '../FormControls/Checkboxes/Checkbox';
 import { Radio } from '../FormControls/Radio';
@@ -17,16 +15,18 @@ import { Icon } from '../Icon';
 import { IconOrImage } from '../IconOrImage';
 import { Loader } from '../Loader/Loader';
 import { useTranslate } from '../localization/useTranslate';
-import { useStyles } from '../useStyles';
-import { menuPanelStyles } from './menuPanelStyles';
+import { s } from '../s';
+import { useS } from '../useS';
+import MenuPanelItemAndTriggerStyles from './shared/MenuPanelItemAndTrigger.module.css';
 
 interface MenuPanelItemProps {
   menuItem: IMenuItem;
-  style?: ComponentStyle;
+  className?: string;
 }
 
-export const MenuPanelItem = observer<MenuPanelItemProps>(function MenuPanelItem({ menuItem, style = [] }) {
+export const MenuPanelItem = observer<MenuPanelItemProps>(function MenuPanelItem({ menuItem }) {
   const translate = useTranslate();
+  const style = useS(MenuPanelItemAndTriggerStyles);
 
   const title = translate(menuItem.title);
   let control = null;
@@ -34,16 +34,25 @@ export const MenuPanelItem = observer<MenuPanelItemProps>(function MenuPanelItem
   if (menuItem.type === 'radio') {
     control = <Radio checked={menuItem.isChecked} mod={['primary', 'menu']} ripple={false} />;
   } else if (menuItem.type === 'checkbox') {
-    control = <Checkbox checked={menuItem.isChecked} mod={['primary', 'small']} style={style} ripple={false} />;
+    control = <Checkbox checked={menuItem.isChecked} mod={['primary', 'small']} ripple={false} />;
   }
 
-  return styled(useStyles(menuPanelStyles, style))(
-    <menu-panel-item {...use({ separator: menuItem.separator })}>
-      <menu-item-content>{menuItem.icon ? <IconOrImage icon={menuItem.icon} /> : control}</menu-item-content>
-      <menu-item-text title={title}>{title}</menu-item-text>
-      <menu-item-content>
-        {menuItem.panel && (menuItem.isProcessing ? <Loader small fullSize /> : <Icon name="arrow" viewBox="0 0 16 16" />)}
-      </menu-item-content>
-    </menu-panel-item>,
+  return (
+    <div className={s(style, { menuPanelItem: true, separator: menuItem.separator })}>
+      <div className={s(style, { menuItemContent: true })}>
+        {menuItem.icon ? <IconOrImage className={s(style, { iconOrImage: true })} icon={menuItem.icon} /> : control}
+      </div>
+      <div className={s(style, { menuItemText: true })} title={title}>
+        {title}
+      </div>
+      <div className={s(style, { menuItemContent: true })}>
+        {menuItem.panel &&
+          (menuItem.isProcessing ? (
+            <Loader className={s(style, { loader: true })} small fullSize />
+          ) : (
+            <Icon className={s(style, { icon: true })} name="arrow" viewBox="0 0 16 16" />
+          ))}
+      </div>
+    </div>
   );
 });

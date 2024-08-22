@@ -1,3 +1,10 @@
+/*
+ * CloudBeaver - Cloud Database Manager
+ * Copyright (C) 2020-2024 DBeaver Corp and others
+ *
+ * Licensed under the Apache License, Version 2.0.
+ * you may not use this file except in compliance with the License.
+ */
 export * from './CommonDialog/CommonDialog/CommonDialogBody';
 export * from './CommonDialog/CommonDialog/CommonDialogFooter';
 export * from './CommonDialog/CommonDialog/CommonDialogHeader';
@@ -8,6 +15,14 @@ export * from './CommonDialog/RenameDialog';
 export * from './CommonDialog/DialogsPortal';
 
 export * from './ErrorDetailsDialog/ErrorDetailsDialog';
+
+export * from './ComponentsRegistry/CRegistryLoader';
+// we don't expect to use this component directly only as a wrapper for another component
+// eslint-disable-next-line @cloudbeaver/no-sync-component-import
+export * from './ComponentsRegistry/registry';
+export * from './ComponentsRegistry/CRegistryList';
+export * from './ComponentsRegistry/IComponentsTreeNodeValidator';
+export * from './ComponentsRegistry/useParentProps';
 
 export * from './AppRefreshButton';
 export * from './ComplexLoader';
@@ -32,29 +47,29 @@ export * from './localization/Translate';
 export * from './localization/useTranslate';
 
 export * from './ConnectionImageWithMask/ConnectionImageWithMask';
-export { default as ConnectionImageWithMaskSvgStyles } from './ConnectionImageWithMask/ConnectionImageWithMaskSvg.m.css';
+export { default as ConnectionImageWithMaskSvgStyles } from './ConnectionImageWithMask/ConnectionImageWithMaskSvg.module.css';
 
 export * from './Menu/Menu';
-export { default as MenuStyles } from './Menu/Menu.m.css';
+export { default as MenuStyles } from './Menu/Menu.module.css';
 export * from './Menu/MenuBarSmallItem';
 export * from './Menu/MenuEmptyItem';
 export * from './Menu/MenuItem';
-export { default as MenuItemStyles } from './Menu/MenuItem.m.css';
+export { default as MenuItemStyles } from './Menu/MenuItem.module.css';
+export { default as MenuPanelItemAndTriggerStyles } from './MenuPanel/shared/MenuPanelItemAndTrigger.module.css';
 export * from './Menu/MenuItemCheckbox';
 export * from './Menu/MenuItemElement';
-export { default as MenuItemElementStyles } from './Menu/MenuItemElement.m.css';
+export { default as MenuItemElementStyles } from './Menu/MenuItemElement.module.css';
 export * from './Menu/MenuItemRadio';
 export * from './Menu/MenuPanel';
-export { default as MenuPanelStyles } from './Menu/MenuPanel.m.css';
+export { default as MenuPanelStyles } from './Menu/MenuPanel.module.css';
 export * from './Menu/MenuSeparator';
-export { default as MenuSeparatorStyles } from './Menu/MenuSeparator.m.css';
+export { default as MenuSeparatorStyles } from './Menu/MenuSeparator.module.css';
 export * from './Menu/MenuStateContext';
 export * from './Menu/useMouseContextMenu';
 export { MenuTrigger, type MenuState } from './MenuPanel/MenuTrigger';
 
-export * from './ObjectPropertyInfo/ObjectPropertyInfoForm/ObjectPropertyInfoForm';
+export * from './ObjectPropertyInfo/ObjectPropertyInfoForm/ObjectPropertyInfoFormLoader';
 export * from './ObjectPropertyInfo/useObjectPropertyCategories';
-export * from './ObjectPropertyInfo/ObjectPropertyInfoForm/getPropertyControlType';
 
 export * from './Overlay/Overlay';
 export * from './Overlay/OverlayActions';
@@ -73,7 +88,6 @@ export * from './PropertiesTable/IProperty';
 export * from './Slide/SlideBox';
 export * from './Slide/SlideElement';
 export * from './Slide/SlideOverlay';
-export { default as SlideBoxStyles } from './Slide/SlideBox.m.css';
 
 export * from './Split/SplitControls';
 export * from './Split/Pane';
@@ -99,6 +113,11 @@ export * from './Table/useTable';
 export * from './Table/TableState';
 export * from './Table/TableSelect';
 export * from './Table/getSelectedItems';
+export * from './Table/TableItemGroup';
+export * from './Table/TableItemGroupContext';
+export * from './Table/TableItemGroupExpand';
+export * from './Table/TableItemGroupContent';
+export * from './Table/TableItemGroupExpandSpace';
 
 export * from './Expand/Expandable';
 
@@ -116,21 +135,21 @@ export * from './Tree/TreeNode/TreeNodeNestedMessage';
 export * from './Tree/TreeNode/TreeNodeSelect';
 export * from './Button';
 export * from './Text';
-export { default as ButtonStyles } from './Button.m.css';
+export { default as ButtonStyles } from './Button.module.css';
 export * from './ToolsPanel/ToolsAction';
 export * from './ToolsPanel/ToolsPanel';
-export { default as ToolsPanelStyles } from './ToolsPanel/ToolsPanel.m.css';
-export { default as ToolsActionStyles } from './ToolsPanel/ToolsAction.m.css';
-export { default as TreeNodeNestedMessageStyles } from './Tree/TreeNode/TreeNodeNestedMessage.m.css';
-export { default as TreeNodeStyles } from './Tree/TreeNode/TreeNode.m.css';
+export { default as ToolsPanelStyles } from './ToolsPanel/ToolsPanel.module.css';
+export { default as ToolsActionStyles } from './ToolsPanel/ToolsAction.module.css';
+export { default as TreeNodeNestedMessageStyles } from './Tree/TreeNode/TreeNodeNestedMessage.module.css';
+export { default as TreeNodeStyles } from './Tree/TreeNode/TreeNode.module.css';
 export * from './FormControls/Checkboxes/Checkbox';
 export * from './FormControls/Checkboxes/FieldCheckbox';
 export * from './FormControls/Checkboxes/CheckboxMarkup';
 export * from './FormControls/Checkboxes/Switch';
 export * from './FormControls/Checkboxes/useCheckboxState';
-export * from './FormControls/BASE_DROPDOWN_STYLES';
 export * from './FormControls/Filter';
-export { default as FilterStyles } from './FormControls/Filter.m.css';
+export { default as BaseDropdownStyles } from './FormControls/BaseDropdown.module.css';
+export { default as FilterStyles } from './FormControls/Filter.module.css';
 export * from './Fill';
 
 export * from './Containers/Container';
@@ -152,11 +171,11 @@ export * from './FolderExplorer/useFolderExplorer';
 export * from './Tags/Tag';
 export * from './Tags/Tags';
 
-export * from './FormControls/Combobox';
+export * from './FormControls/ComboboxLoader';
 export * from './FormControls/FormContext';
 export * from './FormControls/FormFieldDescription';
 export * from './FormControls/InputField/InputField';
-export { default as InputFieldStyles } from './FormControls/InputField/InputField.m.css';
+export { default as InputFieldStyles } from './FormControls/InputField/InputField.module.css';
 export * from './FormControls/InputFiles';
 export * from './FormControls/InputFileTextContent';
 export * from './FormControls/Radio';
@@ -171,18 +190,18 @@ export * from './FormControls/useForm';
 export * from './FormControls/Textarea';
 export * from './Link';
 export * from './Cell';
-export { default as CellStyles } from './Cell.m.css';
+export { default as CellStyles } from './Cell.module.css';
 export * from './UploadArea';
 export * from './ErrorMessage';
 export * from './preventFocusHandler';
 export * from './StatusMessage';
 export * from './ExceptionMessage';
-export { default as ExceptionMessageStyles } from './ExceptionMessage.m.css';
+export { default as ExceptionMessageStyles } from './ExceptionMessage.module.css';
 export * from './getComputed';
 export * from './IconButton';
 export * from './ActionIconButton';
-export { default as IconButtonStyles } from './IconButton.m.css';
-export { default as ActionIconButtonStyles } from './ActionIconButton.m.css';
+export { default as IconButtonStyles } from './IconButton.module.css';
+export { default as ActionIconButtonStyles } from './ActionIconButton.module.css';
 export * from './IconOrImage';
 export * from './s';
 export * from './SContext';
@@ -192,7 +211,6 @@ export * from './TimerIcon';
 export * from './InfoItem';
 export * from './Iframe';
 export * from './Code';
-export * from './useClickEvents';
 export * from './useControlledScroll';
 export * from './useClipboard';
 export * from './useCombinedHandler';
@@ -214,7 +232,7 @@ export * from './useErrorDetails';
 export * from './useActivationDelay';
 export * from './useAdministrationSettings';
 export * from './useInterval';
-export * from './useStyles';
+export * from './useSuspense';
 export * from './BlocksLocaleService';
 export * from './Snackbars/NotificationMark';
 export * from './Snackbars/SnackbarMarkups/SnackbarWrapper';
@@ -230,3 +248,6 @@ export * from './useMergeRefs';
 export * from './usePasswordValidation';
 export * from './manifest';
 export * from './importLazyComponent';
+export * from './ClickableLoader';
+export * from './FormControls/TagsComboboxLoader';
+export * from './Flex/Flex';

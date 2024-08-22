@@ -18,7 +18,6 @@ package io.cloudbeaver.service.auth.impl;
 
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.WebServiceUtils;
-import io.cloudbeaver.auth.SMAuthProviderFederated;
 import io.cloudbeaver.auth.SMSignOutLinkProvider;
 import io.cloudbeaver.auth.provider.local.LocalAuthProvider;
 import io.cloudbeaver.model.WebPropertyInfo;
@@ -46,10 +45,12 @@ import org.jkiss.dbeaver.model.auth.SMSessionExternal;
 import org.jkiss.dbeaver.model.preferences.DBPPropertyDescriptor;
 import org.jkiss.dbeaver.model.security.SMController;
 import org.jkiss.dbeaver.model.security.SMSubjectType;
+import org.jkiss.dbeaver.model.security.exception.SMTooManySessionsException;
 import org.jkiss.dbeaver.model.security.user.SMUser;
 import org.jkiss.utils.CommonUtils;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -67,7 +68,8 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
         @NotNull String providerId,
         @Nullable String providerConfigurationId,
         @Nullable Map<String, Object> authParameters,
-        boolean linkWithActiveUser
+        boolean linkWithActiveUser,
+        boolean forceSessionsLogout
     ) throws DBWebException {
         if (CommonUtils.isEmpty(providerId)) {
             throw new DBWebException("Missing auth provider parameter");
@@ -93,7 +95,8 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
                 WebSession.CB_SESSION_TYPE,
                 providerId,
                 providerConfigurationId,
-                authParameters
+                authParameters,
+                forceSessionsLogout
             );
 
             linkWithActiveUser = linkWithActiveUser && CBApplication.getInstance().getAppConfiguration().isLinkExternalCredentialsWithUser();
@@ -105,6 +108,8 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
                 var authProcessor = new WebSessionAuthProcessor(webSession, smAuthInfo, linkWithActiveUser);
                 return new WebAuthStatus(smAuthInfo.getAuthStatus(), authProcessor.authenticateSession());
             }
+        } catch (SMTooManySessionsException e) {
+            throw new DBWebException("User authentication failed", e.getErrorType(), e);
         } catch (Exception e) {
             throw new DBWebException("User authentication failed", e);
         }
@@ -123,12 +128,16 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
                 case IN_PROGRESS:
                     return new WebAuthStatus(smAuthInfo.getAuthAttemptId(), smAuthInfo.getRedirectUrl(), smAuthInfo.getAuthStatus());
                 case ERROR:
-                    throw new DBWebException(smAuthInfo.getError());
+                    throw new DBWebException(smAuthInfo.getError(), smAuthInfo.getErrorCode());
                 case EXPIRED:
                     throw new DBException("Authorization has already been processed");
                 default:
                     throw new DBWebException("Unknown auth status:" + smAuthInfo.getAuthStatus());
             }
+        } catch (DBWebException e) {
+            throw e;
+        } catch (SMTooManySessionsException e) {
+            throw new DBWebException(e.getMessage(), e.getErrorType());
         } catch (DBException e) {
             throw new DBWebException(e.getMessage(), e);
         }
@@ -250,12 +259,48 @@ public class WebServiceAuthImpl implements DBWServiceAuth {
         @NotNull String name,
         @Nullable String value
     ) throws DBWebException {
+        if (webSession.getUser() == null) {
+            throw new DBWebException("Preferences cannot be changed for anonymous user");
+        }
+        return setPreference(webSession, name, value);
+    }
+
+    private static boolean setPreference(
+        @NotNull WebSession webSession,
+        @NotNull String name,
+        @Nullable Object value
+    ) throws DBWebException {
         webSession.addInfoMessage("Set user parameter - " + name);
         try {
-            webSession.getSecurityController().setCurrentUserParameter(name, value);
+            String serializedValue = value == null ? null : value.toString();
+            if (webSession.getUser() != null) {
+                webSession.getSecurityController().setCurrentUserParameter(name, serializedValue);
+            }
+            var params = new HashMap<String, Object>();
+            params.put(name, value);
+            webSession.getUserContext().getPreferenceStore().updatePreferenceValues(params);
             return true;
         } catch (DBException e) {
             throw new DBWebException("Error setting user parameter", e);
+        }
+    }
+
+    @Override
+    public WebUserInfo setUserConfigurationParameters(
+        @NotNull WebSession webSession,
+        @NotNull Map<String, Object> parameters
+    ) throws DBWebException {
+        if (webSession.getUser() == null) {
+            throw new DBWebException("Preferences cannot be changed for anonymous user");
+        }
+        try {
+            if (webSession.getUser() != null) {
+                webSession.getSecurityController().setCurrentUserParameters(parameters);
+            }
+            webSession.getUserContext().getPreferenceStore().updatePreferenceValues(parameters);
+            return new WebUserInfo(webSession, webSession.getUser());
+        } catch (DBException e) {
+            throw new DBWebException("Error setting user parameters", e);
         }
     }
 

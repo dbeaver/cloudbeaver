@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  */
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
-import { ActionService, DATA_CONTEXT_MENU, KeyBindingService, MenuCheckboxItem, MenuService } from '@cloudbeaver/core-view';
+import { ActionService, KeyBindingService, MenuCheckboxItem, MenuService } from '@cloudbeaver/core-view';
 
 import { ACTION_SQL_EDITOR_SHOW_OUTPUT } from '../../actions/ACTION_SQL_EDITOR_SHOW_OUTPUT';
 import { KEY_BINDING_SQL_EDITOR_SHOW_OUTPUT } from '../../actions/bindings/KEY_BINDING_SQL_EDITOR_SHOW_OUTPUT';
@@ -33,9 +33,9 @@ export class OutputMenuBootstrap extends Bootstrap {
     super();
   }
 
-  register(): void | Promise<void> {
+  register(): void {
     this.menuService.addCreator({
-      isApplicable: context => context.get(DATA_CONTEXT_MENU) === OUTPUT_LOGS_MENU,
+      menus: [OUTPUT_LOGS_MENU],
       getItems(context, items) {
         return [...items, OUTPUT_LOGS_FILTER_MENU, OUTPUT_LOGS_SETTINGS_MENU];
       },
@@ -44,7 +44,7 @@ export class OutputMenuBootstrap extends Bootstrap {
     this.menuService.addCreator({
       menus: [OUTPUT_LOGS_FILTER_MENU],
       getItems: (context, items) => {
-        const state = context.tryGet(DATA_CONTEXT_SQL_EDITOR_STATE);
+        const state = context.get(DATA_CONTEXT_SQL_EDITOR_STATE);
 
         if (!state) {
           return [];
@@ -86,7 +86,7 @@ export class OutputMenuBootstrap extends Bootstrap {
     this.menuService.addCreator({
       menus: [OUTPUT_LOGS_SETTINGS_MENU],
       getItems: (context, items) => {
-        const state = context.tryGet(DATA_CONTEXT_SQL_EDITOR_STATE);
+        const state = context.get(DATA_CONTEXT_SQL_EDITOR_STATE);
 
         if (!state) {
           return [];
@@ -118,24 +118,20 @@ export class OutputMenuBootstrap extends Bootstrap {
   private registerOutputLogsAction() {
     this.actionService.addHandler({
       id: 'output-logs-handler',
-      isActionApplicable: (context, action): boolean => {
-        const state = context.tryGet(DATA_CONTEXT_SQL_EDITOR_STATE);
+      actions: [ACTION_SHOW_OUTPUT_LOGS],
+      contexts: [DATA_CONTEXT_SQL_EDITOR_STATE],
+      isActionApplicable: (context): boolean => {
+        const state = context.get(DATA_CONTEXT_SQL_EDITOR_STATE)!;
 
-        if (state && action === ACTION_SHOW_OUTPUT_LOGS) {
-          const sqlDataSource = this.sqlDataSourceService.get(state.editorId);
-          const isQuery = sqlDataSource?.hasFeature(ESqlDataSourceFeatures.query);
-          const isExecutable = sqlDataSource?.hasFeature(ESqlDataSourceFeatures.executable);
+        const sqlDataSource = this.sqlDataSourceService.get(state.editorId);
+        const isQuery = sqlDataSource?.hasFeature(ESqlDataSourceFeatures.query);
+        const isExecutable = sqlDataSource?.hasFeature(ESqlDataSourceFeatures.executable);
 
-          if (isQuery && isExecutable) {
-            return true;
-          }
-        }
-
-        return false;
+        return !!isQuery && !!isExecutable;
       },
 
       handler: async (context, action) => {
-        const state = context.get(DATA_CONTEXT_SQL_EDITOR_STATE);
+        const state = context.get(DATA_CONTEXT_SQL_EDITOR_STATE)!;
 
         if (action === ACTION_SHOW_OUTPUT_LOGS) {
           this.outputLogsService.showOutputLogs(state);
@@ -151,9 +147,10 @@ export class OutputMenuBootstrap extends Bootstrap {
     this.keyBindingService.addKeyBindingHandler({
       id: 'sql-editor-show-output',
       binding: KEY_BINDING_SQL_EDITOR_SHOW_OUTPUT,
-      isBindingApplicable: (contexts, action) => action === ACTION_SQL_EDITOR_SHOW_OUTPUT,
+      actions: [ACTION_SQL_EDITOR_SHOW_OUTPUT],
+      contexts: [DATA_CONTEXT_SQL_EDITOR_STATE],
       handler: (context, action) => {
-        const state = context.get(DATA_CONTEXT_SQL_EDITOR_STATE);
+        const state = context.get(DATA_CONTEXT_SQL_EDITOR_STATE)!;
 
         if (action === ACTION_SQL_EDITOR_SHOW_OUTPUT) {
           this.outputLogsService.showOutputLogs(state);
@@ -161,6 +158,4 @@ export class OutputMenuBootstrap extends Bootstrap {
       },
     });
   }
-
-  async load(): Promise<void> {}
 }

@@ -10,7 +10,7 @@ import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
 import { DATA_CONTEXT_NAV_NODE, EObjectFeature } from '@cloudbeaver/core-navigation-tree';
 import { getCachedMapResourceLoaderState } from '@cloudbeaver/core-resource';
-import { DATA_CONTEXT_MENU, DATA_CONTEXT_MENU_NESTED, MenuBaseItem, MenuService } from '@cloudbeaver/core-view';
+import { MenuBaseItem, MenuService } from '@cloudbeaver/core-view';
 
 import { MENU_SQL_GENERATORS } from './MENU_SQL_GENERATORS';
 import { SqlGeneratorsResource } from './SqlGeneratorsResource';
@@ -30,35 +30,39 @@ export class SqlGeneratorsBootstrap extends Bootstrap {
   register(): void {
     this.menuService.setHandler({
       id: 'node-sql-generators',
-      isApplicable: context => context.get(DATA_CONTEXT_MENU) === MENU_SQL_GENERATORS,
+      menus: [MENU_SQL_GENERATORS],
+      contexts: [DATA_CONTEXT_NAV_NODE],
       isDisabled: context => {
-        const node = context.get(DATA_CONTEXT_NAV_NODE);
+        const node = context.get(DATA_CONTEXT_NAV_NODE)!;
 
         return this.sqlGeneratorsResource.get(node.id)?.length === 0;
       },
       getLoader: (context, action) => {
-        const node = context.get(DATA_CONTEXT_NAV_NODE);
+        const node = context.get(DATA_CONTEXT_NAV_NODE)!;
 
         return getCachedMapResourceLoaderState(this.sqlGeneratorsResource, () => node.id);
       },
     });
     this.menuService.addCreator({
+      root: true,
+      contexts: [DATA_CONTEXT_NAV_NODE],
       isApplicable: context => {
-        const node = context.tryGet(DATA_CONTEXT_NAV_NODE);
+        const node = context.get(DATA_CONTEXT_NAV_NODE)!;
 
-        if (!node || !(node.objectFeatures.includes(EObjectFeature.entity) || node.objectFeatures.includes(EObjectFeature.script))) {
+        if (!(node.objectFeatures.includes(EObjectFeature.entity) || node.objectFeatures.includes(EObjectFeature.script))) {
           return false;
         }
 
-        return !context.hasValue(DATA_CONTEXT_MENU, MENU_SQL_GENERATORS) && !context.has(DATA_CONTEXT_MENU_NESTED);
+        return true;
       },
       getItems: (context, items) => [...items, MENU_SQL_GENERATORS],
     });
 
     this.menuService.addCreator({
       menus: [MENU_SQL_GENERATORS],
+      contexts: [DATA_CONTEXT_NAV_NODE],
       getItems: (context, items) => {
-        const node = context.get(DATA_CONTEXT_NAV_NODE);
+        const node = context.get(DATA_CONTEXT_NAV_NODE)!;
 
         const actions = this.sqlGeneratorsResource.get(node.id) || [];
 
@@ -86,6 +90,4 @@ export class SqlGeneratorsBootstrap extends Bootstrap {
       },
     });
   }
-
-  load(): void | Promise<void> {}
 }

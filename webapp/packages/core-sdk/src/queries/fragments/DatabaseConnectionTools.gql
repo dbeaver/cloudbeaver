@@ -1,0 +1,5 @@
+fragment DatabaseConnectionTools on ConnectionInfo {
+  id
+  projectId
+  tools
+}

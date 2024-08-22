@@ -7,46 +7,29 @@
  */
 import type { PluginManifest } from '@cloudbeaver/core-di';
 
-import { LocaleService } from './LocaleService';
-import { MenuBootstrap } from './MenuBootstrap';
-import { LocalStorageSqlDataSourceBootstrap } from './SqlDataSource/LocalStorage/LocalStorageSqlDataSourceBootstrap';
-import { SqlDataSourceService } from './SqlDataSource/SqlDataSourceService';
-import { SqlDialectInfoService } from './SqlDialectInfoService';
-import { SqlEditorModeService } from './SqlEditorModeService';
-import { SqlEditorService } from './SqlEditorService';
-import { SqlEditorSettingsService } from './SqlEditorSettingsService';
-import { SqlEditorView } from './SqlEditorView';
-import { SqlExecutionPlanService } from './SqlResultTabs/ExecutionPlan/SqlExecutionPlanService';
-import { OutputMenuBootstrap } from './SqlResultTabs/OutputLogs/OutputMenuBootstrap';
-import { OutputLogsEventHandler } from './SqlResultTabs/OutputLogs/OutputLogsEventHandler';
-import { OutputLogsResource } from './SqlResultTabs/OutputLogs/OutputLogsResource';
-import { OutputLogsService } from './SqlResultTabs/OutputLogs/OutputLogsService';
-import { SqlQueryResultService } from './SqlResultTabs/SqlQueryResultService';
-import { SqlQueryService } from './SqlResultTabs/SqlQueryService';
-import { SqlResultTabsService } from './SqlResultTabs/SqlResultTabsService';
-
 export const sqlEditorPluginManifest: PluginManifest = {
   info: {
     name: 'Sql Editor Plugin',
   },
 
   providers: [
-    LocaleService,
-    SqlEditorService,
-    SqlDialectInfoService,
-    SqlQueryResultService,
-    SqlQueryService,
-    SqlExecutionPlanService,
-    SqlResultTabsService,
-    SqlEditorSettingsService,
-    SqlEditorModeService,
-    SqlEditorView,
-    MenuBootstrap,
-    SqlDataSourceService,
-    LocalStorageSqlDataSourceBootstrap,
-    OutputLogsEventHandler,
-    OutputLogsResource,
-    OutputLogsService,
-    OutputMenuBootstrap,
+    () => import('./LocaleService').then(m => m.LocaleService),
+    () => import('./SqlEditorService').then(m => m.SqlEditorService),
+    () => import('./SqlDialectInfoService').then(m => m.SqlDialectInfoService),
+    () => import('./SqlResultTabs/SqlQueryResultService').then(m => m.SqlQueryResultService),
+    () => import('./SqlResultTabs/SqlQueryService').then(m => m.SqlQueryService),
+    () => import('./SqlResultTabs/ExecutionPlan/SqlExecutionPlanService').then(m => m.SqlExecutionPlanService),
+    () => import('./SqlResultTabs/SqlResultTabsService').then(m => m.SqlResultTabsService),
+    () => import('./SqlEditorSettingsService').then(m => m.SqlEditorSettingsService),
+    () => import('./SqlEditorModeService').then(m => m.SqlEditorModeService),
+    () => import('./SqlEditorView').then(m => m.SqlEditorView),
+    () => import('./MenuBootstrap').then(m => m.MenuBootstrap),
+    () => import('./SqlDataSource/SqlDataSourceService').then(m => m.SqlDataSourceService),
+    () => import('./SqlDataSource/LocalStorage/LocalStorageSqlDataSourceBootstrap').then(m => m.LocalStorageSqlDataSourceBootstrap),
+    () => import('./SqlResultTabs/OutputLogs/OutputLogsEventHandler').then(m => m.OutputLogsEventHandler),
+    () => import('./SqlResultTabs/OutputLogs/OutputLogsResource').then(m => m.OutputLogsResource),
+    () => import('./SqlResultTabs/OutputLogs/OutputLogsService').then(m => m.OutputLogsService),
+    () => import('./SqlResultTabs/OutputLogs/OutputMenuBootstrap').then(m => m.OutputMenuBootstrap),
+    () => import('./SqlEditorGroupTabsBootstrap').then(m => m.SqlEditorGroupTabsBootstrap),
   ],
 };

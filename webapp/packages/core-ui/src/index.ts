@@ -1,20 +1,30 @@
+/*
+ * CloudBeaver - Cloud Database Manager
+ * Copyright (C) 2020-2024 DBeaver Corp and others
+ *
+ * Licensed under the Apache License, Version 2.0.
+ * you may not use this file except in compliance with the License.
+ */
 export * from './Clipboard/ClipboardBootstrap';
 export * from './Clipboard/ClipboardService';
 
-export * from './ContextMenu/ContextMenu';
+export * from './ContextMenu/ContextMenuLazy';
 export * from './ContextMenu/IContextMenuItemProps';
-export * from './ContextMenu/MenuBar/MenuBar';
-export { default as MenuBarStyles } from './ContextMenu/MenuBar/MenuBar.m.css';
-export { default as MenuBarItemStyles } from './ContextMenu/MenuBar/MenuBarItem.m.css';
+export * from './ContextMenu/MenuBar/MenuBarLazy';
+export * from './ContextMenu/MenuBar/MenuBarItemLoader';
+export { default as MenuBarStyles } from './ContextMenu/MenuBar/MenuBar.module.css';
+export { default as MenuBarItemStyles } from './ContextMenu/MenuBar/MenuBarItem.module.css';
 
 export * from './DragAndDrop/DND_ELEMENT_TYPE';
 export * from './DragAndDrop/DND_NATIVE_TYPE';
 export * from './DragAndDrop/DNDAcceptType';
-export * from './DragAndDrop/DNDPreview';
-export * from './DragAndDrop/DNDProvider';
+export * from './DragAndDrop/DNDPreviewLoader';
+export * from './DragAndDrop/DNDProviderLoader';
 export * from './DragAndDrop/useDNDBox';
 export * from './DragAndDrop/useDNDData';
 
+export * from './Form/Components/IBaseFormProps';
+export * from './Form/Components/BaseFormLazy';
 export * from './Form/DATA_CONTEXT_FORM_STATE';
 export * from './Form/FormBaseService';
 export * from './Form/FormMode';
@@ -28,49 +38,57 @@ export * from './Form/IFormProps';
 export * from './Form/IFormState';
 export * from './Form/IFormStateInfo';
 
-export * from './InlineEditor/InlineEditor';
+export * from './InlineEditor/InlineEditorLoader';
 
 export * from './Screens/AppScreen/NavigationService';
 export * from './Screens/AppScreen/OptionsPanelService';
 
 export * from './Tabs/ITab';
 export * from './Tabs/TabContext';
-export * from './Tabs/TabList';
-export * from './Tabs/TabPanel';
-export * from './Tabs/TabPanelList';
+export * from './Tabs/TabListLoader';
+export * from './Tabs/TabPanelLoader';
+export * from './Tabs/TabPanelListLoader';
 export * from './Tabs/TabPanelProps';
 export * from './Tabs/TabsContainer/ITabsContainer';
 export * from './Tabs/TabsContainer/TabsContainer';
 export * from './Tabs/TabsContext';
-export * from './Tabs/TabsState';
+export * from './Tabs/TabsStateLoader';
 export * from './Tabs/useTabState';
 export * from './Tabs/useTabLocalState';
+export { default as TabStyles } from './Tabs/Tab/Tab.module.css';
+export { default as TabTitleStyles } from './Tabs/Tab/TabTitle.module.css';
+export { default as TabVerticalRotatedStyles } from './Tabs/Tab/TabVerticalRotated.module.css';
+export { default as TabIconVerticalRotatedStyles } from './Tabs/Tab/TabIconVerticalRotated.module.css';
+export { default as TabTitleVerticalRotatedStyles } from './Tabs/Tab/TabTitleVerticalRotated.module.css';
+export { default as TabListVerticalRotatedStyles } from './Tabs/TabListVerticalRotated.module.css';
+export { default as TabPanelStyles } from './Tabs/TabPanel.module.css';
+export { default as TabListStyles } from './Tabs/TabList.module.css';
+export { default as TabVertical } from './Tabs/Tab/TabVertical.module.css';
+export { default as TabListVertical } from './Tabs/TabListVertical.module.css';
+export { default as TabUnderlineStyles } from './Tabs/Tab/TabUnderline.module.css';
+export { default as TabBigUnderlineStyles } from './Tabs/Tab/TabBigUnderlineStyles.module.css';
+export { default as TabTitleBigUnderlineStyles } from './Tabs/Tab/TabTitleBigUnderlineStyles.module.css';
+export { default as TabIconStyles } from './Tabs/Tab/TabIcon.module.css';
 
-export * from './Tabs/Tab/BASE_TAB_STYLES';
-export * from './Tabs/Tab/BorderTabStyles';
 export * from './Tabs/Tab/DATA_CONTEXT_TAB_ID';
 export * from './Tabs/Tab/DATA_CONTEXT_TABS_CONTEXT';
 export * from './Tabs/Tab/MENU_TAB';
-export * from './Tabs/Tab/Tab';
-export * from './Tabs/Tab/Tab';
-export * from './Tabs/Tab/TabDefault';
-export * from './Tabs/Tab/TabIcon';
+
+export * from './Tabs/Tab/TabLoader';
+export * from './Tabs/Tab/TabDefaultLoader';
+export * from './Tabs/Tab/TabIconLoader';
 export * from './Tabs/Tab/TabProps';
-export * from './Tabs/Tab/TabTitle';
+export * from './Tabs/Tab/TabTitleLoader';
 export * from './Tabs/Tab/useTab';
-export * from './Tabs/Tab/VERTICAL_ROTATED_TAB_STYLES';
-export * from './Tabs/Tab/UnderlineTabStyles';
-export * from './Tabs/Tab/verticalTabStyles';
 export * from './Tabs/TabsBootstrap';
 
-export * from './Tabs/TabsBox/TabsBox';
-export * from './Tabs/TabsBox/TabsBoxFromArray';
+export * from './Tabs/TabsBox/TabsBoxLoader';
 
 export * from './SideBarPanel/LeftBarPanelService';
-export * from './SideBarPanel/SideBarPanel';
+export * from './SideBarPanel/SideBarPanelLoader';
 export * from './SideBarPanel/SideBarPanelService';
 
-export * from './AuthenticationProvider';
+export * from './AuthenticationProviderLoader';
 export * from './useAuthenticationAction';
 
 export { manifest as coreUIManifest } from './manifest';

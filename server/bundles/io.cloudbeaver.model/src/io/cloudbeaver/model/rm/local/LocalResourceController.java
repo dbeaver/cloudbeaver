@@ -256,18 +256,20 @@ public class LocalResourceController implements RMController {
                 return new RMProject[0];
             }
             var projects = new ArrayList<RMProject>();
-            var allPaths = Files.list(sharedProjectsPath).collect(Collectors.toList());
-            for (Path path : allPaths) {
-                var projectPerms = getProjectPermissions(
-                    makeProjectIdFromPath(path, RMProjectType.SHARED),
-                    RMProjectType.SHARED
-                );
-                var rmProject = makeProjectFromPath(path, projectPerms, RMProjectType.SHARED, false);
-                projects.add(rmProject);
+            try (Stream<Path> list = Files.list(sharedProjectsPath)) {
+                var allPaths = list.toList();
+                for (Path path : allPaths) {
+                    var projectPerms = getProjectPermissions(
+                        makeProjectIdFromPath(path, RMProjectType.SHARED),
+                        RMProjectType.SHARED
+                    );
+                    var rmProject = makeProjectFromPath(path, projectPerms, RMProjectType.SHARED, false);
+                    projects.add(rmProject);
+                }
+                return projects.stream()
+                    .filter(Objects::nonNull)
+                    .toArray(RMProject[]::new);
             }
-            return projects.stream()
-                .filter(Objects::nonNull)
-                .toArray(RMProject[]::new);
         } catch (IOException e) {
             throw new DBException("Error reading shared projects", e);
         }
@@ -581,7 +583,7 @@ public class LocalResourceController implements RMController {
         @NotNull String resourcePath,
         boolean isFolder
     ) throws DBException {
-        try (var projectLock = lockController.lockProject(projectId, "createResource")) {
+        try (var ignoredLock = lockController.lockProject(projectId, "createResource")) {
             validateResourcePath(resourcePath);
             Path targetPath = getTargetPath(projectId, resourcePath);
             if (Files.exists(targetPath)) {
@@ -613,7 +615,7 @@ public class LocalResourceController implements RMController {
         @NotNull String oldResourcePath,
         @NotNull String newResourcePath
     ) throws DBException {
-        try (var projectLock = lockController.lockProject(projectId, "moveResource")) {
+        try (var ignoredLock = lockController.lockProject(projectId, "moveResource")) {
             var normalizedOldResourcePath = CommonUtils.normalizeResourcePath(oldResourcePath);
             var normalizedNewResourcePath = CommonUtils.normalizeResourcePath(newResourcePath);
             if (log.isDebugEnabled()) {
@@ -679,11 +681,10 @@ public class LocalResourceController implements RMController {
 
     @Override
     public void deleteResource(@NotNull String projectId, @NotNull String resourcePath, boolean recursive) throws DBException {
-        try (var projectLock = lockController.lockProject(projectId, "deleteResource")) {
+        try (var ignoredLock = lockController.lockProject(projectId, "deleteResource")) {
             if (log.isDebugEnabled()) {
                 log.debug("Removing resource from '" + resourcePath + "' in project '" + projectId + "'" + (recursive ? " recursive" : ""));
             }
-            validateResourcePath(resourcePath);
             Path targetPath = getTargetPath(projectId, resourcePath);
             doFileWriteOperation(projectId, targetPath, () -> {
                 if (!Files.exists(targetPath)) {
@@ -768,7 +769,7 @@ public class LocalResourceController implements RMController {
         @NotNull byte[] data,
         boolean forceOverwrite
     ) throws DBException {
-        try (var lock = lockController.lockProject(projectId, "setResourceContents")) {
+        try (var ignoredLock = lockController.lockProject(projectId, "setResourceContents")) {
             validateResourcePath(resourcePath);
             Number fileSizeLimit = WebAppUtils.getWebApplication()
                 .getAppConfiguration()
@@ -822,13 +823,34 @@ public class LocalResourceController implements RMController {
         @NotNull String propertyName,
         @Nullable Object propertyValue
     ) throws DBException {
-        try (var projectLock = lockController.lockProject(projectId, "resourcePropertyUpdate")) {
+        try (var ignoredLock = lockController.lockProject(projectId, "resourcePropertyUpdate")) {
             validateResourcePath(resourcePath);
             BaseWebProjectImpl webProject = getWebProject(projectId, false);
             doFileWriteOperation(projectId, webProject.getMetadataFilePath(),
                 () -> {
                     log.debug("Updating resource property '" + propertyName + "' in project '" + projectId + "'");
                     webProject.setResourceProperty(resourcePath, propertyName, propertyValue);
+                    return null;
+                }
+            );
+            return DEFAULT_CHANGE_ID;
+        }
+    }
+
+    @NotNull
+    @Override
+    public String setResourceProperties(
+        @NotNull String projectId,
+        @NotNull String resourcePath,
+        @NotNull Map<String, Object> properties
+    ) throws DBException {
+        try (var ignoredLock = lockController.lockProject(projectId, "resourcePropertyUpdate")) {
+            validateResourcePath(resourcePath);
+            BaseWebProjectImpl webProject = getWebProject(projectId, false);
+            doFileWriteOperation(projectId, webProject.getMetadataFilePath(),
+                () -> {
+                    log.debug("Updating resource '" + resourcePath + "' properties in project '" + projectId + "'");
+                    webProject.setResourceProperties(resourcePath, properties);
                     return null;
                 }
             );
@@ -1089,7 +1111,7 @@ public class LocalResourceController implements RMController {
                 );
             }
             if (readProperties) {
-                final BaseProjectImpl project = (BaseProjectImpl) getWebProject(projectId, true);
+                final BaseProjectImpl project = getWebProject(projectId, true);
                 final String resourcePath = getProjectRelativePath(projectId, path);
                 final Map<String, Object> properties = project.getResourceProperties(resourcePath);
 
@@ -1134,7 +1156,7 @@ public class LocalResourceController implements RMController {
         );
     }
 
-    private void fireRmProjectAddEvent(@NotNull RMProject project) throws DBException {
+    private void fireRmProjectAddEvent(@NotNull RMProject project) {
         RMEventManager.fireEvent(
             new RMEvent(
                 RMEvent.Action.RESOURCE_ADD,

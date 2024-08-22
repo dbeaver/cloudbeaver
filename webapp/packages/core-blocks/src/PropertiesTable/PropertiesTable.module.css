@@ -1,0 +1,65 @@
+/*
+ * CloudBeaver - Cloud Database Manager
+ * Copyright (C) 2020-2024 DBeaver Corp and others
+ *
+ * Licensed under the Apache License, Version 2.0.
+ * you may not use this file except in compliance with the License.
+ */
+
+.properties {
+  display: flex;
+  flex: 1 0 auto;
+  flex-direction: column;
+}
+
+.propertiesHeader {
+  composes: theme-background-surface theme-text-on-surface theme-border-color-secondary from global;
+  box-sizing: border-box;
+  display: inline-flex;
+  border-bottom: solid 1px;
+  align-items: center;
+}
+
+.propertiesHeaderName,
+.propertiesHeaderValue {
+  composes: theme-typography--caption from global;
+  text-transform: uppercase;
+  box-sizing: border-box;
+  flex: 1;
+  padding: 4px 36px;
+}
+
+.propertiesHeaderName {
+  flex: 0 0 auto;
+  width: 300px;
+  display: flex;
+  align-items: center;
+
+  & > :first-child:not(:last-child) {
+    margin-right: 8px;
+  }
+}
+
+.propertiesHeaderAdd {
+  flex: 0 0 auto;
+  padding: 0px 28px;
+}
+
+.propertiesList {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: auto;
+  max-height: 600px;
+  padding: 4px 0px;
+}
+
+.propertiesListOverflow {
+  composes: branding-overflow from global;
+  position: sticky;
+  flex-shrink: 0;
+  bottom: -4px;
+  width: 100%;
+  height: 24px;
+  pointer-events: none;
+}

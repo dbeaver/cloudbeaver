@@ -26,10 +26,10 @@ import { useService } from '@cloudbeaver/core-di';
 import { EventContext, EventStopPropagationFlag } from '@cloudbeaver/core-events';
 import { getNodePlainName, type INodeActions, NavNodeInfoResource, NavTreeResource } from '@cloudbeaver/core-navigation-tree';
 
-import type { NavTreeControlComponent, NavTreeControlProps } from '../../NavigationNodeComponent';
+import type { NavTreeControlComponent } from '../../NavigationNodeComponent';
 import { TreeNodeMenuLoader } from '../TreeNodeMenu/TreeNodeMenuLoader';
 import { DATA_ATTRIBUTE_NODE_EDITING } from './DATA_ATTRIBUTE_NODE_EDITING';
-import style from './NavigationNodeControl.m.css';
+import style from './NavigationNodeControl.module.css';
 import { NavigationNodeExpand } from './NavigationNodeExpand';
 import { NavigationNodeEditorLoader } from './NavigationNodeLoaders';
 
@@ -47,7 +47,7 @@ interface IEditingState {
   cancel(): void;
 }
 
-export const NavigationNodeControl: NavTreeControlComponent = observer<NavTreeControlProps, HTMLDivElement>(
+export const NavigationNodeControl: NavTreeControlComponent = observer(
   forwardRef(function NavigationNodeControl({ node, nodeInfo, dndElement, dndPlaceholder, className, onClick }, ref) {
     const styles = useS(style);
     const mouseContextMenu = useMouseContextMenu();
@@ -158,3 +158,5 @@ export const NavigationNodeControl: NavTreeControlComponent = observer<NavTreeCo
     );
   }),
 );
+
+NavigationNodeControl.displayName = 'NavigationNodeControl';

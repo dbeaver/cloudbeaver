@@ -6,25 +6,19 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import styled, { css } from 'reshadow';
+
+import { s, useS } from '@cloudbeaver/core-blocks';
 
 import type { ObjectPagePanelComponent } from '../ObjectPage/ObjectPage';
 import { ObjectFolders } from './ObjectFolders';
-
-const viewerStyles = css`
-  wrapper {
-    composes: theme-background-surface from global;
-    display: flex;
-    width: 100%;
-    flex: 1 1 auto;
-    padding-top: 16px;
-  }
-`;
+import classes from './ObjectPropertiesPagePanel.module.css';
 
 export const ObjectPropertiesPagePanel: ObjectPagePanelComponent = observer(function ObjectPropertiesPagePanel({ tab }) {
-  return styled(viewerStyles)(
-    <wrapper>
+  const styles = useS(classes);
+
+  return (
+    <div className={s(styles, { wrapper: true })}>
       <ObjectFolders tab={tab} />
-    </wrapper>,
+    </div>
   );
 });

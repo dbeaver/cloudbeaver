@@ -9,6 +9,7 @@ import { action, makeObservable, observable } from 'mobx';
 
 import { ISyncExecutor, SyncExecutor } from '@cloudbeaver/core-executor';
 import { ResultDataFormat, SqlResultRow, UpdateResultsDataBatchMutationVariables } from '@cloudbeaver/core-sdk';
+import { isNull } from '@cloudbeaver/core-utils';
 
 import type { IDatabaseDataSource } from '../../IDatabaseDataSource';
 import type { IDatabaseResultSet } from '../../IDatabaseResultSet';
@@ -142,7 +143,7 @@ export class ResultSetEditAction extends DatabaseEditAction<IResultSetElementKey
     const prevValue = update.source?.[key.column.index] as any;
 
     if (isResultSetContentValue(prevValue) && !isResultSetComplexValue(value)) {
-      if ('text' in prevValue) {
+      if ('text' in prevValue && !isNull(value)) {
         value = createResultSetContentValue({
           text: String(value),
           contentLength: String(value).length,
@@ -531,7 +532,7 @@ export class ResultSetEditAction extends DatabaseEditAction<IResultSetElementKey
     super.updateResult(result, index);
 
     if (result.data?.singleEntity) {
-      this.features = ['add', 'delete'];
+      this.features = ['add', 'delete', 'revert'];
     }
   }
 

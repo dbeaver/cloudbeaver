@@ -10,20 +10,18 @@ import { observer } from 'mobx-react-lite';
 import { useCallback, useMemo, useState } from 'react';
 
 import { Button } from '../Button';
-import ButtonStyles from '../Button.m.css';
+import ButtonStyles from '../Button.module.css';
 import { Filter } from '../FormControls/Filter';
-import FilterStyles from '../FormControls/Filter.m.css';
-import InputFieldStyles from '../FormControls/InputField/InputField.m.css';
+import InputFieldStyles from '../FormControls/InputField/InputField.module.css';
 import { useTranslate } from '../localization/useTranslate';
 import { s } from '../s';
 import { SContext, StyleRegistry } from '../SContext';
 import { useObjectRef } from '../useObjectRef';
 import { useS } from '../useS';
 import type { IProperty } from './IProperty';
-import styles from './PropertiesTable.m.css';
-import PropertiesTableAddButtonStyles from './PropertiesTableAddButtonStyles.m.css';
-import PropertiesTableFilterStyles from './PropertiesTableFilterStyles.m.css';
-import PropertiesTableInputStyles from './PropertiesTableInputStyles.m.css';
+import styles from './PropertiesTable.module.css';
+import PropertiesTableAddButtonStyles from './PropertiesTableAddButtonStyles.module.css';
+import PropertiesTableInputStyles from './PropertiesTableInputStyles.module.css';
 import { PropertyItem } from './PropertyItem';
 
 type PropertiesState = Record<string, string | null>;
@@ -46,13 +44,6 @@ const registry: StyleRegistry = [
     {
       mode: 'append',
       styles: [PropertiesTableInputStyles],
-    },
-  ],
-  [
-    FilterStyles,
-    {
-      mode: 'append',
-      styles: [PropertiesTableFilterStyles],
     },
   ],
   [
@@ -154,9 +145,7 @@ export const PropertiesTable = observer<Props>(function PropertiesTable(props) {
         <div className={s(style, { propertiesHeaderName: true })}>
           <div>{translate('core_block_properties_table_name')}</div>
           {props.filterable ? (
-            <SContext registry={registry}>
-              <Filter value={filterValue} placeholder={translate('core_block_properties_table_filter_name')} onChange={setFilterValue} />
-            </SContext>
+            <Filter value={filterValue} placeholder={translate('core_block_properties_table_filter_name')} smallSize onChange={setFilterValue} />
           ) : null}
         </div>
         <div className={s(style, { propertiesHeaderValue: true })}>{translate('core_block_properties_table_value')}</div>

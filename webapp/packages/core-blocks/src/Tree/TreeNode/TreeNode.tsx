@@ -14,7 +14,7 @@ import { useObjectRef } from '../../useObjectRef';
 import { useObservableRef } from '../../useObservableRef';
 import { useS } from '../../useS';
 import type { ITreeNodeState } from './ITreeNodeState';
-import style from './TreeNode.m.css';
+import style from './TreeNode.module.css';
 import { ITreeNodeContext, TreeNodeContext } from './TreeNodeContext';
 
 interface Props extends ITreeNodeState {
@@ -121,3 +121,5 @@ export const TreeNode = observer<Props, HTMLDivElement | null>(
     );
   }),
 );
+
+TreeNode.displayName = 'TreeNode';

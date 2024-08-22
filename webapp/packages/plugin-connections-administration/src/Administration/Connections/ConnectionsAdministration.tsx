@@ -17,11 +17,11 @@ import {
   GroupSubTitle,
   GroupTitle,
   Loader,
+  s,
   SContext,
   StyleRegistry,
   ToolsAction,
   ToolsPanel,
-  s,
   useResource,
   useS,
   useTranslate,
@@ -30,19 +30,21 @@ import { ConnectionInfoActiveProjectKey, ConnectionInfoResource, DBDriverResourc
 import { useController, useService } from '@cloudbeaver/core-di';
 import { CachedMapAllKey } from '@cloudbeaver/core-resource';
 
+import ConnectionsAdministrationStyle from './ConnectionsAdministration.module.css';
 import { ConnectionsAdministrationController } from './ConnectionsAdministrationController';
 import { ConnectionsTable } from './ConnectionsTable/ConnectionsTable';
 import { CreateConnection } from './CreateConnection/CreateConnection';
 import { CreateConnectionService } from './CreateConnectionService';
-import ConnectionsAdministrationStyle from './ConnectionsAdministration.m.css';
 
-const registry: StyleRegistry = [[
-  ExceptionMessageStyles,
-  {
-    mode: 'append',
-    styles: [ConnectionsAdministrationStyle],
-  },
-]];
+const registry: StyleRegistry = [
+  [
+    ExceptionMessageStyles,
+    {
+      mode: 'append',
+      styles: [ConnectionsAdministrationStyle],
+    },
+  ],
+];
 
 export const ConnectionsAdministration = observer<AdministrationItemContentProps>(function ConnectionsAdministration({
   sub,
@@ -66,7 +68,7 @@ export const ConnectionsAdministration = observer<AdministrationItemContentProps
         <GroupSubTitle>{translate('templates_administration_info_message')}</GroupSubTitle>
       </Group>
       <Group box keepSize>
-        <ToolsPanel>
+        <ToolsPanel rounded>
           <ToolsAction
             title={translate('connections_administration_tools_add_tooltip')}
             icon="add"
@@ -103,11 +105,7 @@ export const ConnectionsAdministration = observer<AdministrationItemContentProps
             <GroupItem className={s(style, { groupItem: true })}>{translate('connections_administration_configuration_wizard_message')}</GroupItem>
           </Group>
         )}
-        {sub && (
-          <Group box>
-            <CreateConnection method={param} configurationWizard={configurationWizard} />
-          </Group>
-        )}
+        {sub && <CreateConnection method={param} configurationWizard={configurationWizard} />}
         <Group boxNoOverflow>
           <SContext registry={registry}>
             <Loader loading={controller.isProcessing} overlay>

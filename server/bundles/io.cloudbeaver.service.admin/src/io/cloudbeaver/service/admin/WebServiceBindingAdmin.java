@@ -60,6 +60,8 @@ public class WebServiceBindingAdmin extends WebServiceBindingBase<DBWServiceAdmi
                 env -> getService(env).listPermissions(getWebSession(env)))
             .dataFetcher("listAuthRoles",
                 env -> getService(env).listAuthRoles())
+            .dataFetcher("listTeamRoles",
+                env -> getService(env).listTeamRoles())
             .dataFetcher("listTeamMetaParameters",
                 env -> getService(env).listTeamMetaParameters(getWebSession(env)))
             .dataFetcher("createUser",
@@ -106,6 +108,14 @@ public class WebServiceBindingAdmin extends WebServiceBindingBase<DBWServiceAdmi
                 env -> getService(env).enableUser(getWebSession(env), env.getArgument("userId"), env.getArgument("enabled")))
             .dataFetcher("setUserAuthRole",
                 env -> getService(env).setUserAuthRole(getWebSession(env), env.getArgument("userId"), env.getArgument("authRole")))
+            .dataFetcher("setUserTeamRole",
+                env -> getService(env).setUserTeamRole(
+                    getWebSession(env),
+                    env.getArgument("userId"),
+                    env.getArgument("teamId"),
+                    env.getArgument("teamRole")
+                )
+            )
             .dataFetcher("searchConnections", env -> getService(env).searchConnections(getWebSession(env), env.getArgument("hostNames")))
             .dataFetcher("getConnectionSubjectAccess",
                 env -> getService(env).getConnectionSubjectAccess(

@@ -1,9 +1,0 @@
-.menuBarItem {
-  & .menuBarItemLabel {
-    font-size: 14px;
-  }
-
-  & .menuBarItemIcon + .menuBarItemLabel {
-    padding-left: initial;
-  }
-}

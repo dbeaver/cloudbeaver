@@ -9,29 +9,33 @@ import { observer } from 'mobx-react-lite';
 
 import { AuthInfoService, DATA_CONTEXT_USER } from '@cloudbeaver/core-authentication';
 import { Icon, Loader, s, useS } from '@cloudbeaver/core-blocks';
+import { useDataContextLink } from '@cloudbeaver/core-data-context';
 import { useService } from '@cloudbeaver/core-di';
 import { ContextMenu } from '@cloudbeaver/core-ui';
 import { useMenu } from '@cloudbeaver/core-view';
 
 import { UserInfo } from '../UserInfo';
 import { MENU_USER_PROFILE } from './MENU_USER_PROFILE';
-import style from './UserMenu.m.css';
+import style from './UserMenu.module.css';
 
 export const UserMenu = observer(function UserMenu() {
   const styles = useS(style);
   const authInfoService = useService(AuthInfoService);
   const menu = useMenu({ menu: MENU_USER_PROFILE });
+  const userInfo = authInfoService.userInfo;
 
-  menu.context.set(DATA_CONTEXT_USER, authInfoService.userInfo);
+  useDataContextLink(menu.context, (context, id) => {
+    context.set(DATA_CONTEXT_USER, userInfo, id);
+  });
 
-  if (!authInfoService.userInfo) {
+  if (!userInfo) {
     return null;
   }
 
   return (
     <Loader suspense inline>
-      <UserInfo info={authInfoService.userInfo} />
-      <ContextMenu className={s(styles, { contextMenu: true })} menu={menu} rtl modal>
+      <UserInfo info={userInfo} />
+      <ContextMenu className={s(styles, { contextMenu: true })} menu={menu} modal>
         <Icon className={s(styles, { icon: true })} name="angle" viewBox="0 0 15 8" />
       </ContextMenu>
     </Loader>

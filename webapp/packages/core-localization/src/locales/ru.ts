@@ -1,3 +1,10 @@
+/*
+ * CloudBeaver - Cloud Database Manager
+ * Copyright (C) 2020-2024 DBeaver Corp and others
+ *
+ * Licensed under the Apache License, Version 2.0.
+ * you may not use this file except in compliance with the License.
+ */
 export default [
   ['name', 'ru'],
   ['ui_rename_taken_or_invalid', 'Имя занято или недопустимо'],
@@ -9,13 +16,17 @@ export default [
   ['ui_processing_loading', 'Загрузка...'],
   ['ui_processing_cancel', 'Отменить'],
   ['ui_processing_canceling', 'Отмена...'],
+  ['ui_processing_canceled', 'Отменено'],
   ['ui_processing_reload', 'Перезагрузить'],
   ['ui_processing_retry', 'Повторить'],
   ['ui_processing_ok', 'Принять'],
   ['ui_processing_create', 'Создать'],
   ['ui_processing_save', 'Сохранить'],
+  ['ui_processing_saving', 'Сохранение...'],
+  ['ui_processing_do_you_want_to_proceed', 'Хотите продолжить?'],
   ['ui_processing_saved', 'Сохранено'],
   ['ui_processing_stop', 'Остановить'],
+  ['ui_processing_skip', 'Пропустить'],
   ['ui_second_first_form', '{arg:interval} секунда'],
   ['ui_second_second_form', '{arg:interval} секунды'],
   ['ui_second_third_form', '{arg:interval} секунд'],
@@ -37,6 +48,10 @@ export default [
   ['ui_search', 'Поиск...'],
   ['ui_delete', 'Удалить'],
   ['ui_add', 'Добавить'],
+  ['ui_revert', 'Отменить изменения'],
+  ['ui_undo', 'Отменить'],
+  ['ui_redo', 'Повторить'],
+  ['ui_duplicate', 'Дублировать'],
   ['ui_refresh', 'Обновить'],
   ['ui_data_saving_error', 'Ошибка при сохранении изменений'],
   ['ui_no_matches_placeholder', 'По вашему запросу ничего не найдено.'],
@@ -63,6 +78,8 @@ export default [
   ['ui_folder_new', 'Новая папка'],
   ['ui_rename_processing', 'Переименование...'],
   ['ui_name', 'Название'],
+  ['ui_value', 'Значение'],
+  ['ui_description', 'Описание'],
   ['ui_interval', 'Интервал'],
   ['ui_cant_delete_item', 'Этот элемент нельзя удалить'],
   ['ui_no_items_placeholder', 'Вы еще ничего не добавили.'],
@@ -110,6 +127,7 @@ export default [
   ['ui_readonly', 'Доступно только для чтения'],
   ['ui_test', 'Проверить'],
   ['ui_export', 'Экспорт'],
+  ['ui_you', 'Вы'],
   ['ui_ms', 'мс'],
 
   ['root_permission_denied', 'Отказано в доступе'],

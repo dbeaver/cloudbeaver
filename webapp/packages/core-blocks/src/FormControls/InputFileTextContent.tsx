@@ -8,7 +8,6 @@
 import { observer } from 'mobx-react-lite';
 import { ReactNode, useContext, useState } from 'react';
 
-import type { ComponentStyle } from '@cloudbeaver/core-theming';
 import { blobToBase64, bytesToSize } from '@cloudbeaver/core-utils';
 
 import { Button } from '../Button';
@@ -22,7 +21,7 @@ import { Field } from './Field';
 import { FieldDescription } from './FieldDescription';
 import { FieldLabel } from './FieldLabel';
 import { FormContext } from './FormContext';
-import inputFileTextContentStyles from './InputFileTextContent.m.css';
+import inputFileTextContentStyles from './InputFileTextContent.module.css';
 
 const DEFAULT_MAX_FILE_SIZE = 2048;
 
@@ -34,7 +33,6 @@ interface Props<TState> extends ILayoutSizeProps {
   tooltip?: string;
   required?: boolean;
   fileName?: string;
-  style?: ComponentStyle;
   /** Max file size in KB */
   maxFileSize?: number;
   disabled?: boolean;

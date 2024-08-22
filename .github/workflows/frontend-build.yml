@@ -1,0 +1,91 @@
+name: Frontend Build
+
+on:
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+  # Allows you to reuse workflows by referencing their YAML files
+  workflow_call:
+    outputs:
+      build-status:
+        description: "Build status"
+        value: ${{ jobs.frontend-build.outputs.build-status }}
+      test-status:
+        description: "Test status"
+        value: ${{ jobs.frontend-build.outputs.test-status }}
+    inputs:
+      skip_cache:
+        required: false
+        type: string
+
+jobs:
+  frontend-build:
+    name: Frontend
+    runs-on: ubuntu-latest
+
+    outputs:
+      build-status: ${{ steps.build.outcome }}
+      test-status: ${{ steps.test.outcome }}
+
+    defaults:
+      run:
+        working-directory: ./webapp
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: yarn
+          cache-dependency-path: webapp/yarn.lock
+
+      - name: restore node_modules
+        uses: actions/cache@v4
+        with:
+          path: "**/node_modules"
+          key: ${{ runner.os }}-node_modules-${{ hashFiles('webapp/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-node_modules-
+
+      - name: restore typescript cache
+        uses: actions/cache@v4
+        with:
+          path: "**/packages/*/dist"
+          key: ${{ runner.os }}-dist-${{ hashFiles('webapp/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-dist-
+
+      - name: yarn clean
+        if: env.skip_cache == 'true'
+        uses: borales/actions-yarn@v5
+        with:
+          dir: webapp
+          cmd: clean
+
+      - name: yarn install --frozen-lockfile
+        uses: borales/actions-yarn@v5
+        with:
+          dir: webapp
+          cmd: install
+
+      - name: build
+        id: build
+        uses: borales/actions-yarn@v5
+        with:
+          dir: webapp/packages/product-default
+          cmd: bundle
+
+      - name: test
+        id: test
+        uses: borales/actions-yarn@v5
+        with:
+          dir: webapp
+          cmd: test
+
+      - name: Archive build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-build-artifacts
+          path: webapp/packages/product-default/lib
+          if-no-files-found: error

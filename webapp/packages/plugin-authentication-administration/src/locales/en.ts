@@ -1,3 +1,10 @@
+/*
+ * CloudBeaver - Cloud Database Manager
+ * Copyright (C) 2020-2024 DBeaver Corp and others
+ *
+ * Licensed under the Apache License, Version 2.0.
+ * you may not use this file except in compliance with the License.
+ */
 export default [
   ['authentication_administration_user_connections_user_add', 'User Creation'],
   ['authentication_administration_user_connections_user_new', 'New user'],
@@ -16,7 +23,7 @@ export default [
   ['authentication_administration_user_auth_methods', 'Auth Methods'],
   ['authentication_administration_user_auth_methods_empty', 'No available auth methods'],
   ['authentication_administration_user_auth_method_no_details', 'No details available'],
-  ['authentication_administration_item', 'Access Management'],
+  ['authentication_administration_item', 'Users and Teams'],
   ['authentication_administration_item_users', 'Users'],
   ['authentication_administration_item_metaParameters', 'Meta Parameters'],
   ['authentication_administration_tools_add_tooltip', 'Create new user'],
@@ -132,4 +139,6 @@ export default [
 
   ['plugin_authentication_administration_user_team_default_readonly_tooltip', "Default team. Can't be revoked"],
   ['plugin_authentication_administration_team_default_users_tooltip', 'Default team. Contains all users'],
+  ['plugin_authentication_administration_team_user_team_role_supervisor', 'Supervisor'],
+  ['plugin_authentication_administration_team_user_team_role_supervisor_description', 'Supervisors can view their team’s executed queries'],
 ];

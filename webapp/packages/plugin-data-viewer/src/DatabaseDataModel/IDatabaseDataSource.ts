@@ -5,14 +5,27 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import type { IConnectionExecutionContext } from '@cloudbeaver/core-connections';
-import type { IServiceInjector } from '@cloudbeaver/core-di';
-import type { TLocalizationToken } from '@cloudbeaver/core-localization';
+import type { IServiceProvider } from '@cloudbeaver/core-di';
+import type { IExecutor } from '@cloudbeaver/core-executor';
+import { TLocalizationToken } from '@cloudbeaver/core-localization';
 import type { ResultDataFormat } from '@cloudbeaver/core-sdk';
 
-import type { IDatabaseDataAction, IDatabaseDataActionClass, IDatabaseDataActionInterface } from './IDatabaseDataAction';
+import type { IDatabaseDataActionClass, IDatabaseDataActionInterface } from './IDatabaseDataAction';
 import type { IDatabaseDataActions } from './IDatabaseDataActions';
 import type { IDatabaseDataResult } from './IDatabaseDataResult';
+
+export enum DatabaseDataSourceOperation {
+  /** Abstract operation with data, should not lead to data lost */
+  Task = 'task',
+  /** Saving operation */
+  Save = 'save',
+  /** May lead to data lost */
+  Request = 'request',
+}
+export interface IDatabaseDataSourceOperationEvent {
+  stage: 'request' | 'before' | 'after';
+  operation: DatabaseDataSourceOperation;
+}
 
 export interface IRequestInfo {
   readonly originalQuery: string;
@@ -28,7 +41,13 @@ export enum DatabaseDataAccessMode {
   Readonly,
 }
 
-export interface IDatabaseDataSource<TOptions, TResult extends IDatabaseDataResult = IDatabaseDataResult> {
+export type GetDatabaseDataSourceOptions<TSource extends IDatabaseDataSource<any, any>> =
+  TSource extends IDatabaseDataSource<infer TOptions> ? TOptions : never;
+
+export type GetDatabaseDataSourceResult<TSource extends IDatabaseDataSource<any, any>> =
+  TSource extends IDatabaseDataSource<any, infer TResult> ? TResult : never;
+
+export interface IDatabaseDataSource<TOptions = unknown, TResult extends IDatabaseDataResult = IDatabaseDataResult> {
   readonly access: DatabaseDataAccessMode;
   readonly dataFormat: ResultDataFormat;
   readonly supportedDataFormats: ResultDataFormat[];
@@ -43,36 +62,33 @@ export interface IDatabaseDataSource<TOptions, TResult extends IDatabaseDataResu
   readonly options: TOptions | null;
   readonly requestInfo: IRequestInfo;
   readonly error: Error | null;
-  readonly executionContext: IConnectionExecutionContext | null;
   readonly canCancel: boolean;
   readonly cancelled: boolean;
-  readonly serviceInjector: IServiceInjector;
-  readonly outdated: boolean;
+  readonly serviceProvider: IServiceProvider;
+  readonly onOperation: IExecutor<IDatabaseDataSourceOperationEvent>;
 
+  isError: () => boolean;
+  isOutdated: () => boolean;
   isLoadable: () => boolean;
   isReadonly: (resultIndex: number) => boolean;
+  isDataAvailable: (offset: number, count: number) => boolean;
   isLoading: () => boolean;
-  isDisabled: (resultIndex: number) => boolean;
+  isDisabled: (resultIndex?: number) => boolean;
 
   hasResult: (resultIndex: number) => boolean;
 
-  tryGetAction: (<T extends IDatabaseDataAction<TOptions, TResult>>(
+  tryGetAction: (<T extends IDatabaseDataActionClass<TOptions, TResult, any>>(resultIndex: number, action: T) => InstanceType<T> | undefined) &
+    (<T extends IDatabaseDataActionClass<TOptions, TResult, any>>(result: TResult, action: T) => InstanceType<T> | undefined);
+  getAction: (<T extends IDatabaseDataActionClass<TOptions, TResult, any>>(resultIndex: number, action: T) => InstanceType<T>) &
+    (<T extends IDatabaseDataActionClass<TOptions, TResult, any>>(result: TResult, action: T) => InstanceType<T>);
+  getActionImplementation: (<T extends IDatabaseDataActionInterface<TOptions, TResult, any>>(
     resultIndex: number,
-    action: IDatabaseDataActionClass<TOptions, TResult, T>,
-  ) => T | undefined) &
-    (<T extends IDatabaseDataAction<TOptions, TResult>>(result: TResult, action: IDatabaseDataActionClass<TOptions, TResult, T>) => T | undefined);
-  getAction: (<T extends IDatabaseDataAction<TOptions, TResult>>(resultIndex: number, action: IDatabaseDataActionClass<TOptions, TResult, T>) => T) &
-    (<T extends IDatabaseDataAction<TOptions, TResult>>(result: TResult, action: IDatabaseDataActionClass<TOptions, TResult, T>) => T);
-  getActionImplementation: (<T extends IDatabaseDataAction<TOptions, TResult>>(
-    resultIndex: number,
-    action: IDatabaseDataActionInterface<TOptions, TResult, T>,
-  ) => T | undefined) &
-    (<T extends IDatabaseDataAction<TOptions, TResult>>(
-      result: TResult,
-      action: IDatabaseDataActionInterface<TOptions, TResult, T>,
-    ) => T | undefined);
+    action: T,
+  ) => InstanceType<T> | undefined) &
+    (<T extends IDatabaseDataActionInterface<TOptions, TResult, any>>(result: TResult, action: T) => InstanceType<T> | undefined);
 
   getResult: (index: number) => TResult | null;
+  getResults: () => TResult[];
 
   setOutdated: () => this;
   setResults: (results: TResult[]) => this;
@@ -81,19 +97,22 @@ export interface IDatabaseDataSource<TOptions, TResult extends IDatabaseDataResu
   setOptions: (options: TOptions) => this;
   setDataFormat: (dataFormat: ResultDataFormat) => this;
   setSupportedDataFormats: (dataFormats: ResultDataFormat[]) => this;
-  setExecutionContext: (context: IConnectionExecutionContext | null) => this;
-  setTotalCount: (resultIndex: number, count: number) => this;
-  loadTotalCount: (resultIndex: number) => Promise<void>;
 
   retry: () => Promise<void>;
-  /** Allows to perform an asynchronous action on the data source, this action will wait previous action to finish and save or load requests.
-   * The data source will have a loading and disabled state while performing an action */
-  runTask: <T>(task: () => Promise<T>) => Promise<T>;
-  requestData: () => Promise<void> | void;
-  refreshData: () => Promise<void> | void;
-  saveData: () => Promise<void> | void;
-  cancel: () => Promise<void> | void;
+  /**
+   * Perform operation with data source. This action should not lead to data lost. Can be cancelled when operation is Task.
+   * @param operation Task or Promise
+   * @returns
+   */
+  runOperation: <T>(operation: () => Promise<T>) => Promise<T | null>;
+  requestDataPortion(offset: number, count: number): Promise<void>;
+  requestData: (mutation?: () => void) => Promise<void>;
+  refreshData: () => Promise<void>;
+  saveData: () => Promise<void>;
+  cancel: () => Promise<void>;
   clearError: () => this;
+  setError: (error: Error) => this;
   resetData: () => this;
+  canSafelyDispose: () => Promise<boolean>;
   dispose: () => Promise<void>;
 }

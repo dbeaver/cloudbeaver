@@ -58,6 +58,10 @@ export class ConnectionsManagerService {
 
     this.connectionExecutor.addHandler(data => connectionInfo.load(data.key));
     this.onDelete.before(this.onDisconnect);
+    this.connectionInfo.onConnectionClose.next(this.onDisconnect, key => ({
+      connections: [key],
+      state: 'after' as const,
+    }));
 
     makeObservable(this, {
       projectConnections: computed<Connection[]>({
@@ -152,6 +156,7 @@ export class ConnectionsManagerService {
     if (!connection.connected) {
       return;
     }
+
     await this.connectionInfo.close(createConnectionParam(connection));
   }
 
@@ -159,6 +164,17 @@ export class ConnectionsManagerService {
     if (this.disconnecting) {
       return;
     }
+
+    const connectionParams = this.projectConnections.map(connection => createConnectionParam(connection));
+    const contexts = await this.onDisconnect.execute({
+      connections: connectionParams,
+      state: 'before',
+    });
+
+    if (ExecutorInterrupter.isInterrupted(contexts)) {
+      return;
+    }
+
     this.disconnecting = true;
     const { controller, notification } = this.notificationService.processNotification(() => ProcessSnackbar, {}, { title: 'Disconnecting...' });
 
@@ -166,6 +182,7 @@ export class ConnectionsManagerService {
       for (const connection of this.projectConnections) {
         await this._closeConnectionAsync(connection);
       }
+
       notification.close();
     } catch (e: any) {
       controller.reject(e);
@@ -194,10 +211,6 @@ export class ConnectionsManagerService {
       await this._closeConnectionAsync(connection);
 
       notification.close();
-      this.onDisconnect.execute({
-        connections: [createConnectionParam(connection)],
-        state: 'after',
-      });
     } catch (exception: any) {
       controller.reject(exception);
     }

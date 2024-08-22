@@ -1,5 +1,12 @@
+/*
+ * CloudBeaver - Cloud Database Manager
+ * Copyright (C) 2020-2024 DBeaver Corp and others
+ *
+ * Licensed under the Apache License, Version 2.0.
+ * you may not use this file except in compliance with the License.
+ */
 export * from './Promises/CancellablePromise';
-export * from './Promises/deferPromise';
+export * from './Promises/cancellableTimeout';
 export * from './Promises/Deferred';
 export * from './Promises/PromiseCancelledError';
 export * from './Promises/PromiseExecutor';
@@ -56,6 +63,7 @@ export * from './isMapsEqual';
 export * from './isObjectsEqual';
 export * from './openCenteredPopup';
 export * from './download';
+export * from './downloadFromURL';
 export * from './getTextFileReadingProcess';
 export * from './getTextBetween';
 export * from './timestampToDate';
@@ -64,15 +72,19 @@ export * from './createPath';
 export * from './debounce';
 export * from './schema';
 export * from './schemaValidationError';
-export * from './setByPath';
 export * from './svgToDataUri';
 export * from './TempMap';
+export * from './textToHex';
 export * from './uriToBlob';
 export * from './utf8ToBase64';
 export * from './createLastPromiseGetter';
-export * from './removeMetadataFromBase64';
-export * from './renamePathName';
+export * from './removeMetadataFromDataURL';
 export * from './removeLineBreak';
 export * from './replaceSubstring';
 export * from './formatNumber';
 export * from './withTimestamp';
+export * from './toSafeHtmlString';
+export * from './getProgressPercent';
+export * from './types/UndefinedToNull';
+export * from './bindFunctions';
+export * from './getDomainFromUrl';

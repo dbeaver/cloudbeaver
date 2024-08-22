@@ -57,10 +57,12 @@ public class WebConnectionConfig {
     private Map<String, Object> credentials;
     private boolean saveCredentials;
     private boolean sharedCredentials;
+    private Map<String, Object> mainPropertyValues;
     private Map<String, Object> providerProperties;
     private List<WebNetworkHandlerConfigInput> networkHandlersConfig;
     private DBPDriverConfigurationType configurationType;
     private String selectedSecretId;
+    private boolean defaultAutoCommit;
 
     public WebConnectionConfig() {
     }
@@ -85,6 +87,7 @@ public class WebConnectionConfig {
             url = JSONUtils.getString(params, "url");
 
             keepAliveInterval = JSONUtils.getInteger(params, "keepAliveInterval", -1);
+            defaultAutoCommit = JSONUtils.getBoolean(params, "autocommit", true);
 
             name = JSONUtils.getString(params, "name");
             description = JSONUtils.getString(params, "description");
@@ -100,6 +103,7 @@ public class WebConnectionConfig {
             saveCredentials = JSONUtils.getBoolean(params, "saveCredentials");
             sharedCredentials = JSONUtils.getBoolean(params, "sharedCredentials");
 
+            mainPropertyValues = JSONUtils.getObjectOrNull(params, "mainPropertyValues");
             providerProperties = JSONUtils.getObjectOrNull(params, "providerProperties");
 
             String configType = JSONUtils.getString(params, "configurationType");
@@ -226,6 +230,11 @@ public class WebConnectionConfig {
     }
 
     @Property
+    public Map<String, Object> getMainPropertyValues() {
+        return mainPropertyValues;
+    }
+
+    @Property
     public Map<String, Object> getProviderProperties() {
         return providerProperties;
     }
@@ -233,6 +242,11 @@ public class WebConnectionConfig {
     @Property
     public Integer getKeepAliveInterval() {
         return keepAliveInterval;
+    }
+
+    @Property
+    public Boolean isDefaultAutoCommit() {
+        return defaultAutoCommit;
     }
 
     @Nullable

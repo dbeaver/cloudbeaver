@@ -7,8 +7,6 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import type { ComponentStyle } from '@cloudbeaver/core-theming';
-
 import { useTab } from './useTab';
 import { useTabHandler } from './useTabHandler';
 
@@ -16,13 +14,13 @@ interface IProps {
   tabId: string;
   onSelect: (tabId: string) => void;
   onClose?: (tabId: string) => void;
-  style: ComponentStyle;
 }
 
-export const TabHandlerTab = observer<IProps>(function TabHandlerTab({ tabId, onSelect, onClose, style }) {
+export const TabHandlerTab = observer<IProps>(function TabHandlerTab({ tabId, onSelect, onClose }) {
   const tab = useTab(tabId);
   const handler = useTabHandler(tab.handlerId);
 
   const TabHandlerTab = handler.getTabComponent();
-  return <TabHandlerTab tab={tab} handler={handler} style={style} onSelect={onSelect} onClose={onClose} />;
+
+  return <TabHandlerTab tab={tab} handler={handler} onSelect={onSelect} onClose={onClose} />;
 });

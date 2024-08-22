@@ -15,7 +15,7 @@ import { type NavNode, NavNodeInfoResource } from '@cloudbeaver/core-navigation-
 import { ElementsTreeContext } from '../ElementsTreeContext';
 import type { NavTreeControlComponent } from '../NavigationNodeComponent';
 import { NavigationNodeControlLoader } from './NavigationNode/NavigationNodeLoaders';
-import style from './NavigationNodeControlRenderer.m.css';
+import style from './NavigationNodeControlRenderer.module.css';
 import type { INavigationNode } from './useNavigationNode';
 
 interface Props {
@@ -108,3 +108,5 @@ export const NavigationNodeControlRenderer = observer<Props, HTMLDivElement>(
     );
   }),
 );
+
+NavigationNodeControlRenderer.displayName = 'NavigationNodeControlRenderer';

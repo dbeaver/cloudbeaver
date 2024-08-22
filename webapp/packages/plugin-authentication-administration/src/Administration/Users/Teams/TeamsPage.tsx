@@ -29,7 +29,7 @@ export const TeamsPage = observer<Props>(function TeamsPage({ param }) {
   return (
     <ColoredContainer vertical wrap gap parent>
       <Group box keepSize>
-        <ToolsPanel>
+        <ToolsPanel rounded>
           <ToolsAction
             title={translate('administration_teams_add_tooltip')}
             icon="add"
@@ -37,7 +37,7 @@ export const TeamsPage = observer<Props>(function TeamsPage({ param }) {
             disabled={create || table.processing}
             onClick={service.create}
           >
-            {translate('ui_add')}
+            {translate('ui_create')}
           </ToolsAction>
           <ToolsAction
             title={translate('administration_teams_refresh_tooltip')}

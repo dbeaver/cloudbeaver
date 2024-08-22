@@ -1,8 +1,17 @@
+/*
+ * CloudBeaver - Cloud Database Manager
+ * Copyright (C) 2020-2024 DBeaver Corp and others
+ *
+ * Licensed under the Apache License, Version 2.0.
+ * you may not use this file except in compliance with the License.
+ */
+import { describe, expect, it } from '@jest/globals';
+
 import { getMIME } from './getMIME';
 
 describe('getMIME', () => {
-  it('should return null if binary is empty', () => {
-    expect(getMIME('')).toBe(null);
+  it("should return 'application/octet-stream' if binary is empty", () => {
+    expect(getMIME('')).toBe('application/octet-stream');
   });
 
   it('should return image/jpeg if binary starts with /', () => {
@@ -26,7 +35,7 @@ describe('getMIME', () => {
     expect(getMIME(webpBase64Image)).toBe('image/webp');
   });
 
-  it('should return null if binary starts with anything else', () => {
-    expect(getMIME('aasdqwe')).toBe(null);
+  it("should return 'application/octet-stream' if binary starts with anything else", () => {
+    expect(getMIME('aasdqwe')).toBe('application/octet-stream');
   });
 });

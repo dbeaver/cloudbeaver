@@ -31,6 +31,7 @@ import java.io.IOException;
 public class LocalServletHandler extends AbstractActionServletHandler {
 
     public static final String URI_PREFIX = "open";
+    public static final String PARAM_PROJECT_ID = "project_id";
     public static final String PARAM_CONNECTION_ID = "id";
     public static final String PARAM_CONNECTION_NAME = "name";
     public static final String PARAM_CONNECTION_URL = "url";

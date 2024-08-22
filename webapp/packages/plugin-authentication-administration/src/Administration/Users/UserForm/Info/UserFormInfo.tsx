@@ -7,7 +7,7 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import { ColoredContainer, Container, FieldCheckbox, Group, GroupTitle, Placeholder, useAutoLoad, useTranslate } from '@cloudbeaver/core-blocks';
+import { Container, FieldCheckbox, Group, GroupTitle, Placeholder, useAutoLoad, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { TabContainerPanelComponent, useTab, useTabState } from '@cloudbeaver/core-ui';
 
@@ -30,29 +30,21 @@ export const UserFormInfo: TabContainerPanelComponent<UserFormProps> = observer(
 
   const disabled = tabState.isLoading();
   const userManagementDisabled = administrationUsersManagementService.externalUserProviderEnabled;
-  // let info: TLocalizationToken | null = null;
-
-  // if (formState.mode === FormMode.Edit && tabState.isChanged()) {
-  //   info = 'ui_save_reminder';
-  // }
 
   return (
-    <ColoredContainer vertical gap overflow>
-      {/* {info && <InfoItem info={info} />} */}
-      <Container gap overflow>
-        <Group small gap vertical overflow>
-          <UserFormInfoCredentials formState={formState} tabState={tabState} tabSelected={tab.selected} disabled={disabled} />
-        </Group>
-        <Group small gap overflow>
-          <Placeholder container={userFormInfoPartService.placeholderContainer} formState={formState} />
-          <GroupTitle>{translate('authentication_user_status')}</GroupTitle>
-          <FieldCheckbox id={`${formState.id}_user_enabled`} name="enabled" state={tabState.state} disabled={disabled || userManagementDisabled}>
-            {translate('authentication_user_enabled')}
-          </FieldCheckbox>
-          <UserFormInfoTeams formState={formState} tabState={tabState} tabSelected={tab.selected} disabled={disabled} />
-        </Group>
-        <UserFormInfoMetaParameters formState={formState} tabState={tabState} tabSelected={tab.selected} disabled={disabled} />
-      </Container>
-    </ColoredContainer>
+    <Container overflow>
+      <Group small gap vertical overflow>
+        <UserFormInfoCredentials formState={formState} tabState={tabState} tabSelected={tab.selected} disabled={disabled} />
+      </Group>
+      <Group small gap overflow>
+        <Placeholder container={userFormInfoPartService.placeholderContainer} formState={formState} />
+        <GroupTitle>{translate('authentication_user_status')}</GroupTitle>
+        <FieldCheckbox id={`${formState.id}_user_enabled`} name="enabled" state={tabState.state} disabled={disabled || userManagementDisabled}>
+          {translate('authentication_user_enabled')}
+        </FieldCheckbox>
+        <UserFormInfoTeams formState={formState} tabState={tabState} tabSelected={tab.selected} disabled={disabled} />
+      </Group>
+      <UserFormInfoMetaParameters formState={formState} tabState={tabState} tabSelected={tab.selected} disabled={disabled} />
+    </Container>
   );
 });

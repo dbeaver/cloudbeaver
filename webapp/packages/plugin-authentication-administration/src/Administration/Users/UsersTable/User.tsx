@@ -25,7 +25,7 @@ import { clsx } from '@cloudbeaver/core-utils';
 
 import { AdministrationUsersManagementService } from '../../../AdministrationUsersManagementService';
 import { UsersAdministrationService } from '../UsersAdministrationService';
-import style from './User.m.css';
+import style from './User.module.css';
 import { UserEdit } from './UserEdit';
 
 interface Props {
@@ -36,7 +36,6 @@ interface Props {
 
 export const User = observer<Props>(function User({ user, displayAuthRole, selectable }) {
   const usersAdministrationService = useService(UsersAdministrationService);
-  const teams = user.grantedTeams.join(', ');
   const usersService = useService(UsersResource);
   const notificationService = useService(NotificationService);
   const administrationUsersManagementService = useService(AdministrationUsersManagementService);
@@ -57,6 +56,7 @@ export const User = observer<Props>(function User({ user, displayAuthRole, selec
     : undefined;
 
   const userManagementDisabled = administrationUsersManagementService.externalUserProviderEnabled;
+  const teams = user.grantedTeams.join(', ');
 
   return (
     <TableItem item={user.userId} expandElement={UserEdit} selectDisabled={!selectable}>

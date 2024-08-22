@@ -7,36 +7,38 @@
  */
 import { observer } from 'mobx-react-lite';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import styled from 'reshadow';
 
-import { TextPlaceholder, useObjectRef, useStyles, useTranslate } from '@cloudbeaver/core-blocks';
+import { s, TextPlaceholder, useObjectRef, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { EventContext, EventStopPropagationFlag } from '@cloudbeaver/core-events';
 import { Executor } from '@cloudbeaver/core-executor';
 import { ClipboardService } from '@cloudbeaver/core-ui';
+import { useCaptureViewContext } from '@cloudbeaver/core-view';
+import { type CellSelectArgs, DataGrid, type DataGridHandle, type Position } from '@cloudbeaver/plugin-data-grid';
 import {
+  DATA_CONTEXT_DV_PRESENTATION,
   DatabaseDataSelectActionsData,
   DatabaseEditChangeType,
-  IDatabaseResultSet,
+  DatabaseSelectAction,
+  DataViewerPresentationType,
+  IDatabaseDataModel,
   IDataPresentationProps,
   IResultSetEditActionData,
   IResultSetElementKey,
   IResultSetPartialKey,
   IResultSetRowKey,
   ResultSetDataKeysUtils,
+  ResultSetDataSource,
   ResultSetSelectAction,
 } from '@cloudbeaver/plugin-data-viewer';
-import DataGrid, { CellSelectArgs, type DataGridHandle, type Position } from '@cloudbeaver/plugin-react-data-grid';
-import '@cloudbeaver/plugin-react-data-grid/react-data-grid-dist/lib/styles.css';
 
 import { CellPosition, EditingContext } from '../Editing/EditingContext';
 import { useEditing } from '../Editing/useEditing';
-import baseStyles from '../styles/base.scss';
-import { reactGridStyles } from '../styles/styles';
 import { CellRenderer } from './CellRenderer/CellRenderer';
 import { DataGridContext, IColumnResizeInfo, IDataGridContext } from './DataGridContext';
 import { DataGridSelectionContext } from './DataGridSelection/DataGridSelectionContext';
 import { useGridSelectionContext } from './DataGridSelection/useGridSelectionContext';
+import classes from './DataGridTable.module.css';
 import { CellFormatter } from './Formatters/CellFormatter';
 import { TableDataContext } from './TableDataContext';
 import { useGridDragging } from './useGridDragging';
@@ -55,15 +57,11 @@ function isAtBottom(event: React.UIEvent<HTMLDivElement>): boolean {
 
 const rowHeight = 25;
 const headerHeight = 28;
+const MAX_CELL_TEXT_SIZE = 100 * 1024;
 
-export const DataGridTable = observer<IDataPresentationProps<any, IDatabaseResultSet>>(function DataGridTable({
-  model,
-  actions,
-  resultIndex,
-  simple,
-  className,
-}) {
+export const DataGridTable = observer<IDataPresentationProps>(function DataGridTable({ model, actions, resultIndex, simple, className }) {
   const translate = useTranslate();
+  const styles = useS(classes);
 
   const clipboardService = useService(ClipboardService);
   const gridContainerRef = useRef<HTMLDivElement | null>(null);
@@ -77,13 +75,13 @@ export const DataGridTable = observer<IDataPresentationProps<any, IDatabaseResul
     }),
     false,
   );
-  const styles = useStyles(reactGridStyles, baseStyles);
   const [columnResize] = useState(() => new Executor<IColumnResizeInfo>());
 
-  const selectionAction = model.source.getAction(resultIndex, ResultSetSelectAction);
+  const selectionAction = (model.source as unknown as ResultSetDataSource).getAction(resultIndex, ResultSetSelectAction);
 
   const focusSyncRef = useRef<CellPosition | null>(null);
 
+  const tableData = useTableData(model as unknown as IDatabaseDataModel<ResultSetDataSource>, resultIndex, dataGridDivRef);
   const editingContext = useEditing({
     readonly: model.isReadonly(resultIndex) || model.isDisabled(resultIndex),
     onEdit: (position, code, key) => {
@@ -116,6 +114,14 @@ export const DataGridTable = observer<IDataPresentationProps<any, IDatabaseResul
           }
       }
 
+      const isTruncated = tableData.dataContent.isTextTruncated(cellKey) || tableData.dataContent.isBlobTruncated(cellKey);
+      const isHugeText = tableData.format.getText(cellKey).length > MAX_CELL_TEXT_SIZE;
+
+      if (isHugeText || isTruncated) {
+        actions.setValuePresentation('value-text-presentation');
+        return false;
+      }
+
       return true;
     },
     onCloseEditor: () => {
@@ -123,18 +129,17 @@ export const DataGridTable = observer<IDataPresentationProps<any, IDatabaseResul
     },
   });
 
-  const tableData = useTableData(model, resultIndex, dataGridDivRef);
   const gridSelectionContext = useGridSelectionContext(tableData, selectionAction);
 
   function restoreFocus() {
     const gridDiv = gridContainerRef.current;
-    const focusSink = gridDiv?.querySelector<HTMLDivElement>('[tabindex="0"]');
+    const focusSink = gridDiv?.querySelector<HTMLDivElement>('[aria-selected="true"]');
     focusSink?.focus();
   }
 
   function isGridInFocus(): boolean {
     const gridDiv = gridContainerRef.current;
-    const focusSink = gridDiv?.querySelector('[tabindex="0"]');
+    const focusSink = gridDiv?.querySelector('[aria-selected="true"]');
 
     if (!gridDiv || !focusSink) {
       return false;
@@ -167,7 +172,7 @@ export const DataGridTable = observer<IDataPresentationProps<any, IDatabaseResul
     },
   }));
 
-  const gridSelectedCellCopy = useGridSelectedCellsCopy(tableData, selectionAction, gridSelectionContext);
+  const gridSelectedCellCopy = useGridSelectedCellsCopy(tableData, selectionAction as unknown as DatabaseSelectAction, gridSelectionContext);
   const { onMouseDownHandler, onMouseMoveHandler } = useGridDragging({
     onDragStart: startPosition => {
       hamdlers.selectCell({ idx: startPosition.colIdx, rowIdx: startPosition.rowIdx });
@@ -178,6 +183,10 @@ export const DataGridTable = observer<IDataPresentationProps<any, IDatabaseResul
     onDragEnd: (startPosition, currentPosition, event) => {
       gridSelectionContext.selectRange(startPosition, currentPosition, event.ctrlKey || event.metaKey, false);
     },
+  });
+
+  useCaptureViewContext((context, id) => {
+    context.set(DATA_CONTEXT_DV_PRESENTATION, { type: DataViewerPresentationType.Data }, id);
   });
 
   function handleKeyDown(event: React.KeyboardEvent<HTMLDivElement>) {
@@ -390,7 +399,7 @@ export const DataGridTable = observer<IDataPresentationProps<any, IDatabaseResul
         return;
       }
 
-      const result = model.getResult(resultIndex);
+      const result = model.source.getResult(resultIndex);
       if (result?.loadedFully) {
         return;
       }
@@ -419,14 +428,14 @@ export const DataGridTable = observer<IDataPresentationProps<any, IDatabaseResul
     return <TextPlaceholder>{translate('data_grid_table_empty_placeholder')}</TextPlaceholder>;
   }
 
-  return styled(styles)(
+  return (
     <DataGridContext.Provider value={gridContext}>
       <DataGridSelectionContext.Provider value={gridSelectionContext}>
         <EditingContext.Provider value={editingContext}>
           <TableDataContext.Provider value={tableData}>
-            <grid-container
+            <div
               ref={setContainersRef}
-              className="cb-react-grid-container"
+              className={s(styles, { container: true }, className)}
               tabIndex={-1}
               onKeyDown={handleKeyDown}
               onMouseDown={onMouseDownHandler}
@@ -434,7 +443,7 @@ export const DataGridTable = observer<IDataPresentationProps<any, IDatabaseResul
             >
               <DataGrid
                 ref={dataGridRef}
-                className={`cb-react-grid-theme ${className}`}
+                className={s(styles, { grid: true }, className)}
                 columns={tableData.columns}
                 defaultColumnOptions={{
                   minWidth: 80,
@@ -453,10 +462,10 @@ export const DataGridTable = observer<IDataPresentationProps<any, IDatabaseResul
                 onScroll={handleScroll}
               />
               <div ref={editorRef} />
-            </grid-container>
+            </div>
           </TableDataContext.Provider>
         </EditingContext.Provider>
       </DataGridSelectionContext.Provider>
-    </DataGridContext.Provider>,
+    </DataGridContext.Provider>
   );
 });

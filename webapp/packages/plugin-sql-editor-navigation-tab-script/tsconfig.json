@@ -31,9 +31,6 @@
       "path": "../core-navigation-tree/tsconfig.json"
     },
     {
-      "path": "../core-plugin/tsconfig.json"
-    },
-    {
       "path": "../core-projects/tsconfig.json"
     },
     {
@@ -47,6 +44,9 @@
     },
     {
       "path": "../core-settings/tsconfig.json"
+    },
+    {
+      "path": "../core-storage/tsconfig.json"
     },
     {
       "path": "../core-utils/tsconfig.json"

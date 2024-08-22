@@ -5,10 +5,11 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
+import { importLazyComponent } from '@cloudbeaver/core-blocks';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { TopNavService } from '@cloudbeaver/plugin-top-app-bar';
 
-import { UserMenu } from './UserMenu/UserMenu';
+const UserMenu = importLazyComponent(() => import('./UserMenu/UserMenu').then(m => m.UserMenu));
 
 @injectable()
 export class PluginBootstrap extends Bootstrap {
@@ -19,6 +20,4 @@ export class PluginBootstrap extends Bootstrap {
   register(): void {
     this.topNavService.placeholder.add(UserMenu, 4);
   }
-
-  load(): void {}
 }

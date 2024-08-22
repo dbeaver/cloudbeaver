@@ -9,7 +9,7 @@ import { computed, makeObservable } from 'mobx';
 
 import { injectable } from '@cloudbeaver/core-di';
 import { LocalizationService } from '@cloudbeaver/core-localization';
-import { ServerConfigResource } from '@cloudbeaver/core-root';
+import { PasswordPolicyResource } from '@cloudbeaver/core-root';
 import type { PasswordPolicyConfig } from '@cloudbeaver/core-sdk';
 
 const DEFAULT_PASSWORD_POLICY: PasswordPolicyConfig = {
@@ -25,19 +25,25 @@ type ValidationResult = { isValid: true; errorMessage: null } | { isValid: false
 export class PasswordPolicyService {
   get config(): PasswordPolicyConfig {
     return {
-      minLength: this.serverConfigResource.data?.passwordPolicyConfiguration?.minLength || DEFAULT_PASSWORD_POLICY.minLength,
-      minNumberCount: this.serverConfigResource.data?.passwordPolicyConfiguration?.minNumberCount || DEFAULT_PASSWORD_POLICY.minNumberCount,
-      minSymbolCount: this.serverConfigResource.data?.passwordPolicyConfiguration?.minSymbolCount || DEFAULT_PASSWORD_POLICY.minSymbolCount,
-      requireMixedCase: this.serverConfigResource.data?.passwordPolicyConfiguration?.requireMixedCase || DEFAULT_PASSWORD_POLICY.requireMixedCase,
+      minLength: this.passwordPolicyResource.data?.minLength || DEFAULT_PASSWORD_POLICY.minLength,
+      minNumberCount: this.passwordPolicyResource.data?.minNumberCount || DEFAULT_PASSWORD_POLICY.minNumberCount,
+      minSymbolCount: this.passwordPolicyResource.data?.minSymbolCount || DEFAULT_PASSWORD_POLICY.minSymbolCount,
+      requireMixedCase: this.passwordPolicyResource.data?.requireMixedCase || DEFAULT_PASSWORD_POLICY.requireMixedCase,
     };
   }
 
-  constructor(private readonly serverConfigResource: ServerConfigResource, private readonly localizationService: LocalizationService) {
+  constructor(
+    private readonly passwordPolicyResource: PasswordPolicyResource,
+    private readonly localizationService: LocalizationService,
+  ) {
     makeObservable(this, {
       config: computed,
     });
   }
 
+  /**
+   * PasswordPolicyResource should be loaded before calling this method
+   */
   validatePassword(password: string): ValidationResult {
     const trimmedPassword = password.trim();
 

@@ -18,6 +18,7 @@ package io.cloudbeaver.model;
 
 import io.cloudbeaver.model.session.WebSession;
 import org.jkiss.code.NotNull;
+import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.*;
 import org.jkiss.dbeaver.model.connection.DBPDriverConfigurationType;
@@ -27,6 +28,7 @@ import org.jkiss.dbeaver.model.meta.Property;
 import org.jkiss.dbeaver.model.meta.PropertyLength;
 import org.jkiss.dbeaver.model.preferences.DBPPropertyDescriptor;
 import org.jkiss.dbeaver.model.preferences.DBPPropertySource;
+import org.jkiss.dbeaver.registry.settings.ProductSettingDescriptor;
 import org.jkiss.dbeaver.runtime.properties.ObjectPropertyDescriptor;
 import org.jkiss.utils.CommonUtils;
 
@@ -242,4 +244,12 @@ public class WebPropertyInfo {
         return CommonUtils.toString(value);
     }
 
+    @Nullable
+    @Property
+    public List<String> getScopes() {
+        if (property instanceof ProductSettingDescriptor productSettingDescriptor) {
+            return productSettingDescriptor.getScopes();
+        }
+        return null;
+    }
 }

@@ -20,6 +20,7 @@ import io.cloudbeaver.auth.provider.rp.RPAuthProvider;
 import io.cloudbeaver.model.app.WebAppConfiguration;
 import io.cloudbeaver.model.app.WebApplication;
 import io.cloudbeaver.model.app.WebAuthApplication;
+import io.cloudbeaver.model.app.WebServerConfiguration;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.service.DBWServiceServerConfigurator;
 import org.jkiss.code.NotNull;
@@ -38,6 +39,7 @@ public class ReverseProxyConfigurator implements DBWServiceServerConfigurator {
     public void configureServer(
         @NotNull WebApplication application,
         @Nullable WebSession session,
+        @NotNull WebServerConfiguration serverConfiguration,
         @NotNull WebAppConfiguration appConfig
     ) throws DBException {
     }
@@ -77,6 +79,7 @@ public class ReverseProxyConfigurator implements DBWServiceServerConfigurator {
             parameters.put(RPConstants.PARAM_TEAM, RPAuthProvider.X_TEAM);
             parameters.put(RPConstants.PARAM_FIRST_NAME, RPAuthProvider.X_FIRST_NAME);
             parameters.put(RPConstants.PARAM_LAST_NAME, RPAuthProvider.X_LAST_NAME);
+            parameters.put(RPConstants.PARAM_FULL_NAME, RPAuthProvider.X_FULL_NAME);
             smReverseProxyProviderConfiguration.setParameters(parameters);
             authApplication.getAuthConfiguration().addAuthProviderConfiguration(smReverseProxyProviderConfiguration );
             try {

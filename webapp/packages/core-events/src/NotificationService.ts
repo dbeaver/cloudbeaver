@@ -52,7 +52,7 @@ export class NotificationService {
     if (options.persistent) {
       const persistentNotifications = this.notificationList.values.filter(value => value.persistent);
 
-      const maxPersistentAllow = this.settings.settings.getValue('maxPersistentAllow');
+      const maxPersistentAllow = this.settings.maxPersistentAllow;
 
       if (persistentNotifications.length >= maxPersistentAllow) {
         throw new Error(`You cannot create more than ${maxPersistentAllow} persistent notification`);
@@ -80,32 +80,47 @@ export class NotificationService {
 
     const id = this.notificationNextId++;
 
-    const notification: INotification<TProps> = {
-      id,
-      uuid: options.uuid,
-      title: options.title,
-      message: options.message,
-      details: options.details,
-      isSilent: !!options.isSilent,
-      customComponent: options.customComponent,
-      extraProps: options.extraProps || ({} as TProps),
-      autoClose: options.autoClose,
-      persistent: options.persistent,
-      state: observable({ deleteDelay: 0 }),
-      timestamp: options.timestamp || Date.now(),
-      type,
-      close: delayDeleting => {
-        this.close(id, delayDeleting);
-        options.onClose?.(delayDeleting);
+    const notification: INotification<TProps> = observable(
+      {
+        id,
+        uuid: options.uuid,
+        title: options.title,
+        message: options.message,
+        details: options.details,
+        isSilent: !!options.isSilent,
+        customComponent: options.customComponent,
+        extraProps: options.extraProps || ({} as TProps),
+        autoClose: options.autoClose,
+        persistent: options.persistent,
+        state: observable({ deleteDelay: 0 }),
+        timestamp: options.timestamp || Date.now(),
+        type,
+        close: delayDeleting => {
+          this.close(id, delayDeleting);
+          options.onClose?.(delayDeleting);
+        },
+        showDetails: this.showDetails.bind(this, id),
       },
-      showDetails: this.showDetails.bind(this, id),
-    };
+      {
+        title: observable.ref,
+        message: observable.ref,
+        details: observable.ref,
+        persistent: observable.ref,
+        isSilent: observable.ref,
+        customComponent: observable.ref,
+        extraProps: observable.ref,
+        autoClose: observable.ref,
+        type: observable.ref,
+        timestamp: observable.ref,
+        showDetails: observable.ref,
+      },
+    );
 
     this.notificationList.addValue(notification);
 
     const filteredNotificationList = this.notificationList.values.filter(notification => !notification.persistent);
 
-    const notificationsPool = this.settings.settings.getValue('notificationsPool');
+    const notificationsPool = this.settings.notificationsPool;
 
     if (filteredNotificationList.length > notificationsPool) {
       let i = 0;

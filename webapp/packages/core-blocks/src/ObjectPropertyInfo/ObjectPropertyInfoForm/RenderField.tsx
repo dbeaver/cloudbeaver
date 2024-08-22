@@ -7,8 +7,8 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import type { ObjectPropertyInfo } from '@cloudbeaver/core-sdk';
-import { removeMetadataFromBase64 } from '@cloudbeaver/core-utils';
+import { getObjectPropertyType, getObjectPropertyValueType, type ObjectPropertyInfo, type ObjectPropertyType } from '@cloudbeaver/core-sdk';
+import { removeMetadataFromDataURL } from '@cloudbeaver/core-utils';
 
 import { FieldCheckbox } from '../../FormControls/Checkboxes/FieldCheckbox';
 import { Combobox } from '../../FormControls/Combobox';
@@ -19,7 +19,6 @@ import { isControlPresented } from '../../FormControls/isControlPresented';
 import { Textarea } from '../../FormControls/Textarea';
 import { Link } from '../../Link';
 import { useTranslate } from '../../localization/useTranslate';
-import { type ControlType, getPropertyControlType } from './getPropertyControlType';
 
 const RESERVED_KEYWORDS = ['no', 'off', 'new-password'];
 
@@ -39,7 +38,7 @@ interface RenderFieldProps {
   onFocus?: (event: React.FocusEvent<HTMLInputElement>) => void;
 }
 
-function getValue(value: any, controlType: ControlType) {
+function getValue(value: any, controlType: ObjectPropertyType) {
   const checkbox = controlType === 'checkbox';
 
   if (value === null || value === undefined) {
@@ -70,8 +69,9 @@ export const RenderField = observer<RenderFieldProps>(function RenderField({
 }) {
   const translate = useTranslate();
 
-  const controlType = getPropertyControlType(property);
-  const password = property.features.includes('password');
+  const controlType = getObjectPropertyType(property);
+  const type = getObjectPropertyValueType(property);
+  const isPassword = type === 'password';
   const required = property.required && !readOnly;
 
   const value = getValue(property.value, controlType);
@@ -88,7 +88,7 @@ export const RenderField = observer<RenderFieldProps>(function RenderField({
   }
 
   if (!editable) {
-    if (autoHide && !isControlPresented(property.id!, state)) {
+    if (autoHide && !isControlPresented(property.id, state)) {
       return null;
     }
     return (
@@ -132,7 +132,7 @@ export const RenderField = observer<RenderFieldProps>(function RenderField({
     );
   }
 
-  if (controlType === 'combobox') {
+  if (controlType === 'selector') {
     if (state !== undefined) {
       return (
         <Combobox
@@ -173,7 +173,7 @@ export const RenderField = observer<RenderFieldProps>(function RenderField({
     );
   }
 
-  const passwordSaved = showRememberTip && ((password && !!property.value) || saved);
+  const passwordSaved = showRememberTip && ((isPassword && !!property.value) || saved);
   const passwordSavedMessage = passwordSaved ? translate('core_blocks_object_property_info_password_saved') : undefined;
 
   if (controlType === 'file' && state) {
@@ -187,7 +187,7 @@ export const RenderField = observer<RenderFieldProps>(function RenderField({
         disabled={disabled}
         fileName={passwordSavedMessage}
         className={className}
-        mapValue={removeMetadataFromBase64}
+        mapValue={removeMetadataFromDataURL}
       >
         {property.displayName}
       </InputFileTextContent>
@@ -234,14 +234,13 @@ export const RenderField = observer<RenderFieldProps>(function RenderField({
     return (
       <InputField
         required={required}
-        type={password ? 'password' : 'text'}
-        title={password ? property.description || property.displayName : undefined}
+        type={type}
+        title={isPassword ? property.description || property.displayName : undefined}
         labelTooltip={property.description || property.displayName}
         name={property.id!}
         state={state}
-        defaultState={defaultState}
+        defaultState={defaultState || { [property.id!]: defaultValue }}
         autoHide={autoHide}
-        defaultValue={defaultValue}
         description={property.hint}
         placeholder={passwordSavedMessage}
         disabled={disabled}
@@ -259,8 +258,8 @@ export const RenderField = observer<RenderFieldProps>(function RenderField({
   return (
     <InputField
       required={required}
-      type={password ? 'password' : 'text'}
-      title={password ? property.description || property.displayName : undefined}
+      type={type}
+      title={isPassword ? property.description || property.displayName : undefined}
       labelTooltip={property.description || property.displayName}
       name={property.id!}
       value={value}

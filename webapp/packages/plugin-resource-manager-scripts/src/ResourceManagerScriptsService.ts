@@ -42,7 +42,7 @@ export class ResourceManagerScriptsService {
   }
 
   get enabled() {
-    return this.resourceManagerService.enabled && !this.resourceManagerScriptsSettingsService.settings.getValue('disabled');
+    return this.resourceManagerService.enabled && !this.resourceManagerScriptsSettingsService.disabled;
   }
 
   constructor(

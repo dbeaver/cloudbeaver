@@ -1,6 +1,6 @@
 /*
  * CloudBeaver - Cloud Database Manager
- * Copyright (C) 2020-2023 DBeaver Corp and others
+ * Copyright (C) 2020-2024 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
@@ -11,9 +11,9 @@ import { useObservableRef } from '@cloudbeaver/core-blocks';
 import { TextTools } from '@cloudbeaver/core-utils';
 import {
   type IDatabaseDataModel,
-  type IDatabaseResultSet,
   type IResultSetColumnKey,
   ResultSetDataKeysUtils,
+  ResultSetDataSource,
   ResultSetFormatAction,
   ResultSetViewAction,
 } from '@cloudbeaver/plugin-data-viewer';
@@ -34,7 +34,7 @@ interface ITableDataMeasurements {
 }
 
 // TODO: clear removed columns from cache
-export function useTableDataMeasurements(model: IDatabaseDataModel<any, IDatabaseResultSet>, resultIndex: number): ITableDataMeasurements {
+export function useTableDataMeasurements(model: IDatabaseDataModel<ResultSetDataSource>, resultIndex: number): ITableDataMeasurements {
   const format = model.source.getAction(resultIndex, ResultSetFormatAction);
   const view = model.source.getAction(resultIndex, ResultSetViewAction);
 

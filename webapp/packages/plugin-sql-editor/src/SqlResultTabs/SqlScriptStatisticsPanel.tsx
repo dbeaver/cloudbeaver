@@ -6,59 +6,35 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import styled, { css } from 'reshadow';
 
-import { Loader, TextPlaceholder, useTranslate } from '@cloudbeaver/core-blocks';
+import { Loader, s, TextPlaceholder, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { TableViewerStorageService } from '@cloudbeaver/plugin-data-viewer';
+import { IDatabaseDataModel, TableViewerStorageService } from '@cloudbeaver/plugin-data-viewer';
 
 import type { IStatisticsTab } from '../ISqlEditorTabState';
 import type { QueryDataSource } from '../QueryDataSource';
 import { SqlQueryService } from './SqlQueryService';
+import classes from './SqlScriptStatisticsPanel.module.css';
 
 interface IProps {
   tab: IStatisticsTab;
 }
-
-const styles = css`
-  statistics {
-    composes: theme-typography--caption from global;
-    flex: 1;
-    overflow: auto;
-    box-sizing: border-box;
-    white-space: pre-wrap;
-    padding: 16px;
-  }
-  box {
-    display: flex;
-    align-items: center;
-  }
-  icon {
-    width: 16px;
-    height: 16px;
-    margin-right: 8px;
-  }
-  pre {
-    white-space: pre-wrap;
-  }
-`;
 
 export const SqlScriptStatisticsPanel = observer<IProps>(function SqlScriptStatisticsPanel({ tab }) {
   const sqlQueryService = useService(SqlQueryService);
   const tableViewerStorageService = useService(TableViewerStorageService);
   const statistics = sqlQueryService.getStatistics(tab.tabId);
   const translate = useTranslate();
+  const styles = useS(classes);
 
   if (!statistics) {
     return <TextPlaceholder>{translate('sql_editor_sql_statistics_unavailable')}</TextPlaceholder>;
   }
 
-  const source: QueryDataSource | undefined = statistics.modelId
-    ? (tableViewerStorageService.get(statistics.modelId)?.source as QueryDataSource)
-    : undefined;
+  const source = statistics.modelId ? tableViewerStorageService.get<IDatabaseDataModel<QueryDataSource>>(statistics.modelId)?.source : undefined;
 
-  return styled(styles)(
-    <statistics>
+  return (
+    <div className={s(styles, { statistics: true })}>
       {translate('sql_editor_sql_execution_executed_queries')} {statistics.executedQueries} / {statistics.queries}
       <br />
       {translate('data_viewer_statistics_duration')} {statistics.executeTime} {translate('ui_ms')}
@@ -68,9 +44,9 @@ export const SqlScriptStatisticsPanel = observer<IProps>(function SqlScriptStati
       {source && (
         <>
           <Loader message="sql_editor_sql_execution_executing" cancelDisabled={!source.canCancel} inline onCancel={() => source.cancel()} />
-          <pre>{source.options?.query}</pre>
+          <pre className={s(styles, { query: true })}>{source.options?.query}</pre>
         </>
       )}
-    </statistics>,
+    </div>
   );
 });

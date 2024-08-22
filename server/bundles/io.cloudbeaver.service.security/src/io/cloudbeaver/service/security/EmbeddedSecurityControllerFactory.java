@@ -16,17 +16,14 @@
  */
 package io.cloudbeaver.service.security;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.InstanceCreator;
+import io.cloudbeaver.auth.NoAuthCredentialsProvider;
 import io.cloudbeaver.model.app.WebAuthApplication;
 import io.cloudbeaver.service.security.db.CBDatabase;
-import io.cloudbeaver.service.security.db.CBDatabaseConfig;
+import io.cloudbeaver.service.security.db.WebDatabaseConfig;
 import io.cloudbeaver.service.security.internal.ClearAuthAttemptInfoJob;
+import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.auth.SMCredentialsProvider;
-
-import java.util.Map;
 
 /**
  * Embedded Security Controller Factory
@@ -41,56 +38,62 @@ public class EmbeddedSecurityControllerFactory<T extends WebAuthApplication> {
     /**
      * Create new security controller instance with custom configuration
      */
-    public CBEmbeddedSecurityController createSecurityService(
+    public CBEmbeddedSecurityController<T> createSecurityService(
         T application,
-        Map<String, Object> databaseConfig,
+        WebDatabaseConfig databaseConfig,
         SMCredentialsProvider credentialsProvider,
         SMControllerConfiguration smConfig
     ) throws DBException {
-        boolean initDb = false;
         if (DB_INSTANCE == null) {
             synchronized (EmbeddedSecurityControllerFactory.class) {
                 if (DB_INSTANCE == null) {
-                    initDatabase(application, databaseConfig);
-                    initDb = true;
+                    DB_INSTANCE = createAndInitDatabaseInstance(
+                        application,
+                        databaseConfig,
+                        smConfig
+                    );
                 }
             }
-        }
-        var securityController = createEmbeddedSecurityController(
-            application, DB_INSTANCE, credentialsProvider, smConfig
-        );
-        if (initDb) {
-            //FIXME circular dependency
-            DB_INSTANCE.setAdminSecurityController(securityController);
-            DB_INSTANCE.initialize();
-            securityController.initializeMetaInformation();
+
             if (application.isLicenseRequired()) {
                 // delete expired auth info job in enterprise products
-                new ClearAuthAttemptInfoJob(securityController).schedule();
+                new ClearAuthAttemptInfoJob(createEmbeddedSecurityController(
+                    application, DB_INSTANCE, new NoAuthCredentialsProvider(), smConfig
+                )).schedule();
             }
         }
-        return securityController;
+        return createEmbeddedSecurityController(
+            application, DB_INSTANCE, credentialsProvider, smConfig
+        );
     }
 
-    private synchronized void initDatabase(WebAuthApplication application, Map<String, Object> databaseConfig) {
-        CBDatabaseConfig databaseConfiguration = new CBDatabaseConfig();
-        InstanceCreator<CBDatabaseConfig> dbConfigCreator = type -> databaseConfiguration;
-        InstanceCreator<CBDatabaseConfig.Pool> dbPoolConfigCreator = type -> databaseConfiguration.getPool();
-        Gson gson = new GsonBuilder()
-            .registerTypeAdapter(CBDatabaseConfig.class, dbConfigCreator)
-            .registerTypeAdapter(CBDatabaseConfig.Pool.class, dbPoolConfigCreator)
-            .create();
-        gson.fromJson(gson.toJsonTree(databaseConfig), CBDatabaseConfig.class);
+    protected @NotNull CBDatabase createAndInitDatabaseInstance(
+        @NotNull T application,
+        @NotNull WebDatabaseConfig databaseConfig,
+        @NotNull SMControllerConfiguration smConfig
+    ) throws DBException {
+        var database = new CBDatabase(application, databaseConfig);
+        var securityController = createEmbeddedSecurityController(
+            application, database, new NoAuthCredentialsProvider(), smConfig
+        );
+        //FIXME circular dependency
+        database.setAdminSecurityController(securityController);
+        try {
+            database.initialize();
+        } catch (DBException e) {
+            database.shutdown();
+            throw e;
+        }
 
-        DB_INSTANCE = new CBDatabase(application, databaseConfiguration);
+        return database;
     }
 
-    protected CBEmbeddedSecurityController createEmbeddedSecurityController(
+    protected CBEmbeddedSecurityController<T> createEmbeddedSecurityController(
         T application,
         CBDatabase database,
         SMCredentialsProvider credentialsProvider,
         SMControllerConfiguration smConfig
     ) {
-        return new CBEmbeddedSecurityController(application, database, credentialsProvider, smConfig);
+        return new CBEmbeddedSecurityController<T>(application, database, credentialsProvider, smConfig);
     }
 }

@@ -8,7 +8,7 @@
 import { AppAuthService, UserInfoResource } from '@cloudbeaver/core-authentication';
 import { injectable } from '@cloudbeaver/core-di';
 import { CachedMapAllKey, CachedMapResource, resourceKeyList } from '@cloudbeaver/core-resource';
-import { ServerConfigResource } from '@cloudbeaver/core-root';
+import { PermissionsService } from '@cloudbeaver/core-root';
 import { GraphQLService, RmResourceType, ProjectInfo as SchemaProjectInfo } from '@cloudbeaver/core-sdk';
 
 import { createResourceOfType } from './createResourceOfType';
@@ -21,7 +21,7 @@ export class ProjectInfoResource extends CachedMapResource<string, ProjectInfo> 
   constructor(
     private readonly graphQLService: GraphQLService,
     private readonly userInfoResource: UserInfoResource,
-    serverConfigResource: ServerConfigResource,
+    permissionsService: PermissionsService,
     appAuthService: AppAuthService,
   ) {
     super(() => new Map(), []);
@@ -32,7 +32,7 @@ export class ProjectInfoResource extends CachedMapResource<string, ProjectInfo> 
       () => CachedMapAllKey,
     );
     appAuthService.requireAuthentication(this);
-    serverConfigResource.requirePublic(this);
+    permissionsService.requirePublic(this);
     this.userInfoResource.onUserChange.addPostHandler(() => {
       this.clear();
     });
@@ -71,6 +71,20 @@ export class ProjectInfoResource extends CachedMapResource<string, ProjectInfo> 
 
   getUserProject(userId: string): ProjectInfo | undefined {
     return this.get(`u_${userId}`);
+  }
+
+  isProjectShared(projectId: string | null): boolean {
+    if (projectId === null) {
+      return false;
+    }
+
+    const project = this.get(projectId);
+
+    if (!project) {
+      return false;
+    }
+
+    return isSharedProject(project);
   }
 
   getResourceType(project: ProjectInfo, resourceTypeId: string): ProjectInfoResourceType | undefined {

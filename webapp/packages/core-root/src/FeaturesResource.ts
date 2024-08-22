@@ -5,6 +5,8 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
+import { makeObservable, observable } from 'mobx';
+
 import { injectable } from '@cloudbeaver/core-di';
 import { CachedDataResource } from '@cloudbeaver/core-resource';
 import { GraphQLService, WebFeatureSet } from '@cloudbeaver/core-sdk';
@@ -16,10 +18,27 @@ export type ApplicationFeature = WebFeatureSet;
 
 @injectable()
 export class FeaturesResource extends CachedDataResource<ApplicationFeature[]> {
-  constructor(private readonly graphQLService: GraphQLService, permissionsResource: SessionPermissionsResource) {
+  private baseFeatures: string[];
+  constructor(
+    private readonly graphQLService: GraphQLService,
+    permissionsResource: SessionPermissionsResource,
+  ) {
     super(() => []);
 
+    this.baseFeatures = [];
     permissionsResource.require(this, EAdminPermission.admin).outdateResource(this);
+
+    makeObservable<this, 'baseFeatures'>(this, {
+      baseFeatures: observable,
+    });
+  }
+
+  isBase(id: string) {
+    return this.baseFeatures.includes(id);
+  }
+
+  setBaseFeatures(features: string[]) {
+    this.baseFeatures = features;
   }
 
   protected async loader(): Promise<ApplicationFeature[]> {

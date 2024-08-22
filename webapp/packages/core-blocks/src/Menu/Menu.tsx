@@ -14,7 +14,7 @@ import { s } from '../s';
 import { useCombinedRef } from '../useCombinedRef';
 import { useObjectRef } from '../useObjectRef';
 import { useS } from '../useS';
-import style from './Menu.m.css';
+import style from './Menu.module.css';
 import { MenuPanel } from './MenuPanel';
 import { IMenuState, MenuStateContext } from './MenuStateContext';
 import type { IMouseContextMenu } from './useMouseContextMenu';
@@ -70,6 +70,7 @@ export const Menu = observer<IMenuProps, HTMLButtonElement>(
       placement,
       visible,
       rtl,
+      unstable_fixed: true,
     });
     const styles = useS(style);
 

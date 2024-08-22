@@ -9,4 +9,5 @@
 export enum EServerErrorCode {
   'sessionExpired' = 'sessionExpired',
   'licenseRequired' = 'licenseRequired',
+  'tooManySessions' = 'tooManySessions',
 }

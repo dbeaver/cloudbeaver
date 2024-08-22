@@ -6,30 +6,17 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import styled, { css } from 'reshadow';
 
-import { Loader } from '@cloudbeaver/core-blocks';
+import { Loader, s, useS } from '@cloudbeaver/core-blocks';
 
 import type { ISqlDataSource } from './SqlDataSource/ISqlDataSource';
-
-const viewerStyles = css`
-  Loader {
-    composes: theme-background-surface theme-border-color-background from global;
-
-    position: absolute;
-    bottom: 0px;
-
-    border-top: 1px solid;
-    width: 100%;
-    padding: 0 8px;
-    box-sizing: border-box;
-  }
-`;
+import classes from './SqlEditorStatusBar.module.css';
 
 interface Props {
   dataSource: ISqlDataSource | undefined;
 }
 
 export const SqlEditorStatusBar = observer<Props>(function SqlEditorStatusBar({ dataSource }) {
-  return styled(viewerStyles)(<Loader state={dataSource} message={dataSource?.message} inline inlineException />);
+  const styles = useS(classes);
+  return <Loader className={s(styles, { loader: true })} state={dataSource} message={dataSource?.message} inline inlineException />;
 });

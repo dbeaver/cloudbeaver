@@ -16,7 +16,7 @@ import { s } from '../../s';
 import { useS } from '../../useS';
 import { EventTreeNodeSelectFlag } from './EventTreeNodeSelectFlag';
 import { TreeNodeContext } from './TreeNodeContext';
-import style from './TreeNodeSelect.m.css';
+import style from './TreeNodeSelect.module.css';
 
 interface Props {
   group?: boolean;

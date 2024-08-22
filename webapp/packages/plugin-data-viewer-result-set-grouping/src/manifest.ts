@@ -7,10 +7,10 @@
  */
 import type { PluginManifest } from '@cloudbeaver/core-di';
 
-import { DVResultSetGroupingPluginBootstrap } from './DVResultSetGroupingPluginBootstrap';
-import { LocaleService } from './LocaleService';
-
 export const dvResultSetGroupingPlugin: PluginManifest = {
   info: { name: 'Result Set Grouping plugin' },
-  providers: [DVResultSetGroupingPluginBootstrap, LocaleService],
+  providers: [
+    () => import('./DVResultSetGroupingPluginBootstrap').then(m => m.DVResultSetGroupingPluginBootstrap),
+    () => import('./LocaleService').then(m => m.LocaleService),
+  ],
 };

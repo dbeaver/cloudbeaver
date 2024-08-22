@@ -12,7 +12,7 @@ import { Form, ItemList, ItemListSearch, s, TextPlaceholder, useFocus, useS, use
 import type { AdminConnectionSearchInfo } from '@cloudbeaver/core-sdk';
 
 import { Database } from './Database';
-import style from './DatabaseList.m.css';
+import style from './DatabaseList.module.css';
 
 interface Props {
   databases: AdminConnectionSearchInfo[];
@@ -46,6 +46,7 @@ export const DatabaseList = observer<Props>(function DatabaseList({ databases, h
         value={hosts}
         placeholder={translate('connections_administration_search_database_tip')}
         disabled={disabled}
+        permanentSearchIcon
         onChange={onChange}
         onSearch={searchHandler}
       />

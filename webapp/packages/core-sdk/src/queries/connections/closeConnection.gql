@@ -9,7 +9,6 @@ mutation closeConnection(
   $includeAuthNeeded: Boolean!
   $includeProperties: Boolean!
   $includeProviderProperties: Boolean!
-  $includeSharedSecrets: Boolean!
   $customIncludeOptions: Boolean!
 ) {
   connection: closeConnection(projectId: $projectId, id: $connectionId) {

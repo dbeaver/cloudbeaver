@@ -14,16 +14,19 @@ import { NotificationService } from '@cloudbeaver/core-events';
 import { ServerSettingsService } from '@cloudbeaver/core-root';
 import { Settings } from '@cloudbeaver/plugin-settings-panel';
 
-import style from './SettingsAdministration.m.css';
+import style from './SettingsAdministration.module.css';
+
+const clientScope = ['server'];
 
 export const SettingsAdministration = observer<AdministrationItemContentProps>(function SettingsAdministration() {
   const translate = useTranslate();
   const serverSettingsService = useService(ServerSettingsService);
   const notificationService = useService(NotificationService);
   const styles = useS(style);
+  const changed = serverSettingsService.isEdited();
 
   async function handleSave() {
-    if (!serverSettingsService.isChanged) {
+    if (!changed) {
       return;
     }
     try {
@@ -44,13 +47,11 @@ export const SettingsAdministration = observer<AdministrationItemContentProps>(f
     serverSettingsService.resetChanges();
   }
 
-  const changed = serverSettingsService.isChanged;
-
   return (
-    <Form context={form} className={s(styles, { form: true })}>
+    <Form context={form} contents>
       <ColoredContainer parent vertical wrap gap>
         <Group box keepSize>
-          <ToolsPanel>
+          <ToolsPanel rounded>
             <ToolsAction icon="admin-save" viewBox="0 0 24 24" disabled={!changed} onClick={() => form.submit()}>
               {translate('ui_processing_save')}
             </ToolsAction>
@@ -59,7 +60,7 @@ export const SettingsAdministration = observer<AdministrationItemContentProps>(f
             </ToolsAction>
           </ToolsPanel>
         </Group>
-        <Settings source={serverSettingsService} />
+        <Settings source={serverSettingsService} accessor={clientScope} />
       </ColoredContainer>
     </Form>
   );

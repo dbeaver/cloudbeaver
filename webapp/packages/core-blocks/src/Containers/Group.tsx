@@ -9,22 +9,24 @@ import { forwardRef } from 'react';
 
 import { s } from '../s';
 import { useS } from '../useS';
-import containerStyles from './Container.m.css';
+import containerStyles from './Container.module.css';
 import { filterContainerFakeProps, getContainerProps } from './filterContainerFakeProps';
-import style from './Group.m.css';
+import style from './Group.module.css';
 import type { IContainerProps } from './IContainerProps';
-import elementsSizeStyles from './shared/ElementsSize.m.css';
+import elementsSizeStyles from './shared/ElementsSize.module.css';
 
 interface Props extends IContainerProps {
   form?: boolean;
   secondary?: boolean;
   center?: boolean;
   box?: boolean;
+  border?: boolean;
+  hideOverflow?: boolean;
   boxNoOverflow?: boolean;
 }
 
 export const Group = forwardRef<HTMLDivElement, Props & React.HTMLAttributes<HTMLDivElement>>(function Group(
-  { form, center, box, secondary, boxNoOverflow, className, ...rest },
+  { form, center, box, border, secondary, boxNoOverflow, hideOverflow, className, ...rest },
   ref,
 ) {
   const styles = useS(style, containerStyles, elementsSizeStyles);
@@ -34,6 +36,8 @@ export const Group = forwardRef<HTMLDivElement, Props & React.HTMLAttributes<HTM
   return (
     <div
       ref={ref}
+      role="group"
+      tabIndex={-1}
       {...divProps}
       className={s(
         styles,
@@ -46,7 +50,9 @@ export const Group = forwardRef<HTMLDivElement, Props & React.HTMLAttributes<HTM
           form,
           center,
           boxNoOverflow,
+          hideOverflow,
           box,
+          border,
         },
         className,
       )}

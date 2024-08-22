@@ -6,33 +6,15 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import { ButtonHTMLAttributes, forwardRef, useRef, useState } from 'react';
-import type { MenuInitialState } from 'reakit/Menu';
+import { forwardRef, useRef, useState } from 'react';
 
-import { getComputed, IMenuState, IMouseContextMenu, Menu, useAutoLoad, useObjectRef, useTranslate } from '@cloudbeaver/core-blocks';
-import { IMenuData, MenuActionItem } from '@cloudbeaver/core-view';
+import { getComputed, IMenuState, Menu, useAutoLoad, useObjectRef, useTranslate } from '@cloudbeaver/core-blocks';
+import { MenuActionItem } from '@cloudbeaver/core-view';
 
+import type { IContextMenuProps } from './IContextMenuProps';
 import { MenuItemRenderer } from './MenuItemRenderer';
 
-interface IMenuProps extends React.PropsWithChildren {
-  loading: boolean;
-  disabled: boolean;
-}
-
-type ContextMenuRenderingChildren = (props: IMenuProps) => React.ReactNode | React.ReactElement;
-
-interface IContextMenuProps extends Omit<ButtonHTMLAttributes<any>, 'children'> {
-  mouseContextMenu?: IMouseContextMenu;
-  menu: IMenuData;
-  disclosure?: boolean;
-  placement?: MenuInitialState['placement'];
-  modal?: boolean;
-  visible?: boolean;
-  rtl?: boolean;
-  children?: React.ReactNode | ContextMenuRenderingChildren;
-  onVisibleSwitch?: (visible: boolean) => void;
-}
-
+// TODO the click doesn't work for React components as children
 export const ContextMenu = observer<IContextMenuProps, HTMLButtonElement>(
   forwardRef(function ContextMenu(
     { mouseContextMenu, menu: menuData, disclosure, children, placement, visible, onVisibleSwitch, modal, rtl, ...props },
@@ -80,6 +62,7 @@ export const ContextMenu = observer<IContextMenuProps, HTMLButtonElement>(
 
     return (
       <Menu
+        {...props}
         ref={ref}
         label={translate(menuData.menu.label)}
         title={translate(menuData.menu.tooltip)}
@@ -101,7 +84,6 @@ export const ContextMenu = observer<IContextMenuProps, HTMLButtonElement>(
         disclosure={disclosure}
         getHasBindings={handlers.hasBindings}
         onVisibleSwitch={handlers.handleVisibleSwitch}
-        {...props}
       >
         {renderingChildren}
       </Menu>

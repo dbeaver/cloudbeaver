@@ -40,6 +40,7 @@ import { schemaValidationError } from '@cloudbeaver/core-utils';
 import { CONNECTION_INFO_PARAM_SCHEMA, type IConnectionInfoParams } from './CONNECTION_INFO_PARAM_SCHEMA';
 import { ConnectionInfoEventHandler, IConnectionInfoEvent } from './ConnectionInfoEventHandler';
 import type { DatabaseConnection } from './DatabaseConnection';
+import { DBDriverResource } from './DBDriverResource';
 
 export type Connection = DatabaseConnection & {
   authProperties?: UserConnectionAuthPropertiesFragment[];
@@ -54,7 +55,6 @@ export type ConnectionInitConfig = Omit<
   | 'includeCredentialsSaved'
   | 'includeProperties'
   | 'includeProviderProperties'
-  | 'includeSharedSecrets'
   | 'customIncludeOptions'
 >;
 export type ConnectionInfoIncludes = Omit<GetUserConnectionsQueryVariables, 'id'>;
@@ -80,7 +80,7 @@ export const DEFAULT_NAVIGATOR_VIEW_SETTINGS: NavigatorSettingsInput = {
 @injectable()
 export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoParams, Connection, ConnectionInfoIncludes> {
   readonly onConnectionCreate: ISyncExecutor<Connection>;
-  readonly onConnectionClose: ISyncExecutor<Connection>;
+  readonly onConnectionClose: ISyncExecutor<IConnectionInfoParams>;
 
   private sessionUpdate: boolean;
   private readonly nodeIdMap: Map<string, IConnectionInfoParams>;
@@ -89,6 +89,7 @@ export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoPar
     private readonly projectsService: ProjectsService,
     private readonly projectInfoResource: ProjectInfoResource,
     private readonly dataSynchronizationService: DataSynchronizationService,
+    dbDriverResource: DBDriverResource,
     sessionDataResource: SessionDataResource,
     appAuthService: AppAuthService,
     connectionInfoEventHandler: ConnectionInfoEventHandler,
@@ -113,6 +114,11 @@ export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoPar
     // this.onItemUpdate.addHandler(ExecutorInterrupter.interrupter(() => this.sessionUpdate));
     this.onItemDelete.addHandler(ExecutorInterrupter.interrupter(() => this.sessionUpdate));
     this.onConnectionCreate.addHandler(ExecutorInterrupter.interrupter(() => this.sessionUpdate));
+
+    dbDriverResource.onItemDelete.addHandler(data => {
+      const hiddenConnections = this.values.filter(connection => connection.driverId === data);
+      this.delete(resourceKeyList(hiddenConnections.map(connection => createConnectionParam(connection))));
+    });
 
     userInfoResource.onUserChange.addHandler(() => {
       this.clear();
@@ -357,6 +363,8 @@ export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoPar
         projectId: connectionKey.projectId,
         connectionId: connectionKey.connectionId,
       });
+
+      this.onDataOutdated.execute(connectionKey);
       return subjects;
     });
 
@@ -389,6 +397,7 @@ export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoPar
         ...this.getIncludesMap(key),
       });
       this.set(createConnectionParam(connection), connection);
+      this.onDataOutdated.execute(key);
     });
 
     return this.get(key)!;
@@ -406,6 +415,7 @@ export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoPar
       });
 
       this.set(createConnectionParam(connection), connection);
+      this.onDataOutdated.execute(key);
     });
 
     return this.get(key)!;
@@ -421,6 +431,7 @@ export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoPar
       });
 
       this.set(createConnectionParam(connection), connection);
+      this.onDataOutdated.execute(key);
     });
     return this.get(key)!;
   }
@@ -435,11 +446,10 @@ export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoPar
       });
 
       this.set(createConnectionParam(connection), connection);
+      this.onDataOutdated.execute(key);
     });
 
-    const connection = this.get(key)!;
-    this.onConnectionClose.execute(connection);
-    return connection;
+    return this.get(key)!;
   }
 
   deleteConnection(key: IConnectionInfoParams): Promise<void>;
@@ -453,6 +463,7 @@ export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoPar
       });
       this.delete(key);
     });
+    this.onDataOutdated.execute(key);
   }
 
   // async updateSessionConnections(): Promise<boolean> {
@@ -554,6 +565,10 @@ export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoPar
         ...handler,
       })),
     });
+
+    if (oldConnection?.connected && !value.connected) {
+      this.onConnectionClose.execute(key);
+    }
   }
 
   protected dataDelete(key: IConnectionInfoParams): void {
@@ -579,7 +594,6 @@ export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoPar
       includeCredentialsSaved: false,
       includeProperties: false,
       includeProviderProperties: false,
-      includeSharedSecrets: false,
       customIncludeOptions: false,
     };
   }
@@ -587,7 +601,7 @@ export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoPar
   protected validateKey(key: IConnectionInfoParams): boolean {
     const parse = CONNECTION_INFO_PARAM_SCHEMA.safeParse(toJS(key));
     if (!parse.success) {
-      this.logger.warn(`Invalid resource key ${schemaValidationError(parse.error).toString()}`);
+      this.logger.warn(`Invalid resource key ${(schemaValidationError(parse.error).toString(), { prefix: null })}`);
     }
     return parse.success;
   }
@@ -625,9 +639,13 @@ export function compareNewConnectionsInfo(a: DatabaseConnection, b: DatabaseConn
   return 0;
 }
 
+export function createConnectionParam(connection: Pick<Connection, 'id' | 'projectId'>): IConnectionInfoParams;
 export function createConnectionParam(connection: Connection): IConnectionInfoParams;
 export function createConnectionParam(projectId: string, connectionId: string): IConnectionInfoParams;
-export function createConnectionParam(projectIdOrConnection: string | Connection, connectionId?: string): IConnectionInfoParams {
+export function createConnectionParam(
+  projectIdOrConnection: string | Connection | Pick<Connection, 'id' | 'projectId'>,
+  connectionId?: string,
+): IConnectionInfoParams {
   if (typeof projectIdOrConnection === 'object') {
     connectionId = projectIdOrConnection.id;
     projectIdOrConnection = projectIdOrConnection.projectId;

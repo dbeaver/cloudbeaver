@@ -36,12 +36,9 @@ export class NavTreeRMContextMenuService extends Bootstrap {
   register(): void {
     this.actionService.addHandler({
       id: 'nav-node-rm-handler',
+      contexts: [DATA_CONTEXT_NAV_NODE],
       isActionApplicable: (context, action): boolean => {
-        const node = context.tryGet(DATA_CONTEXT_NAV_NODE);
-
-        if (!node) {
-          return false;
-        }
+        const node = context.get(DATA_CONTEXT_NAV_NODE)!;
 
         if (![NAV_NODE_TYPE_RM_RESOURCE, NAV_NODE_TYPE_RM_FOLDER].includes(node.nodeType as string)) {
           return false;
@@ -58,7 +55,7 @@ export class NavTreeRMContextMenuService extends Bootstrap {
         return false;
       },
       handler: async (context, action) => {
-        const node = context.get(DATA_CONTEXT_NAV_NODE);
+        const node = context.get(DATA_CONTEXT_NAV_NODE)!;
         const resourceKey = getResourceKeyFromNodeId(node.id);
 
         if (!resourceKey) {
@@ -80,7 +77,7 @@ export class NavTreeRMContextMenuService extends Bootstrap {
 
         switch (action) {
           case ACTION_RENAME: {
-            const actions = context.tryGet(DATA_CONTEXT_NAV_NODE_ACTIONS);
+            const actions = context.get(DATA_CONTEXT_NAV_NODE_ACTIONS);
 
             const save = async (newName: string) => {
               if (key.name !== newName && newName.trim().length) {
@@ -103,7 +100,7 @@ export class NavTreeRMContextMenuService extends Bootstrap {
               actions.rename(save);
             } else {
               const result = await this.commonDialogService.open(RenameDialog, {
-                value: key.name ?? '',
+                name: key.name ?? '',
                 subTitle: key.name,
                 objectName: node.nodeType || 'Object',
                 icon: node.icon,

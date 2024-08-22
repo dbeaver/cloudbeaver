@@ -7,7 +7,7 @@
  */
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { LocalizationService } from '@cloudbeaver/core-localization';
-import { ESettingsValueType, INTERFACE_SETTINGS_GROUP, SettingsManagerService } from '@cloudbeaver/core-plugin';
+import { ESettingsValueType, INTERFACE_SETTINGS_GROUP, SettingsManagerService } from '@cloudbeaver/core-settings';
 
 import { SettingsLocalizationService } from './SettingsLocalizationService';
 
@@ -26,16 +26,19 @@ export class LocalizationSettingsManagerService extends Bootstrap {
   }
 
   private registerSettings() {
-    this.settingsManagerService.registerSettings(this.settingsLocalizationService.pluginSettings, () => [
+    this.settingsManagerService.registerSettings(this.settingsLocalizationService.settingsProvider, () => [
       {
         group: INTERFACE_SETTINGS_GROUP,
-        key: 'defaultLanguage',
-        name: 'core_settings_localization_settings_default_locale_label',
-        description: 'core_settings_localization_settings_default_locale_description',
+        key: 'core.localization.language',
+        access: {
+          scope: ['server', 'client'],
+        },
+        name: 'core_settings_localization_settings_locale_label',
+        description: 'core_settings_localization_settings_locale_description',
         type: ESettingsValueType.Select,
         options: this.localizationService.supportedLanguages.map(language => ({
-          id: language.isoCode,
-          name: language.displayName,
+          value: language.isoCode,
+          name: language.nativeName ?? language.name,
         })),
       },
     ]);

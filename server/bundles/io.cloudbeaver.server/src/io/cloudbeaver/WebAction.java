@@ -33,4 +33,6 @@ public @interface WebAction {
 
     boolean authRequired() default true;
 
+    boolean initializationRequired() default true;
+
 }

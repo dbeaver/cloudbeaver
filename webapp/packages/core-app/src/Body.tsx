@@ -19,8 +19,9 @@ import { ThemeService } from '@cloudbeaver/core-theming';
 import { DNDProvider } from '@cloudbeaver/core-ui';
 import { useAppVersion } from '@cloudbeaver/core-version';
 
-import style from './Body.m.css';
+import style from './Body.module.css';
 import { useAppHeight } from './useAppHeight';
+import { useClientActivity } from './useClientActivity';
 
 export const Body = observer(function Body() {
   // const serverConfigLoader = useResource(Body, ServerConfigResource, undefined);
@@ -44,6 +45,7 @@ export const Body = observer(function Body() {
   });
 
   useAppHeight();
+  useClientActivity();
 
   return (
     <DNDProvider>
@@ -52,8 +54,12 @@ export const Body = observer(function Body() {
           <Loader className={s(styles, { loader: true })} suspense>
             {Screen && <Screen {...screenService.routerService.params} />}
           </Loader>
-          <DialogsPortal />
-          <Notifications />
+          <Loader suspense overlay>
+            <DialogsPortal />
+          </Loader>
+          <Loader suspense overlay>
+            <Notifications />
+          </Loader>
         </div>
       </Loader>
     </DNDProvider>

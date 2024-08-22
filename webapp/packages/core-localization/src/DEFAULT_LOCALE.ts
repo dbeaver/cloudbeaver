@@ -7,4 +7,4 @@
  */
 import type { ILocale } from './ILocale';
 
-export const DEFAULT_LOCALE: ILocale = { isoCode: 'en', displayName: 'English' };
+export const DEFAULT_LOCALE: ILocale = { isoCode: 'en', name: 'English' };

@@ -6,9 +6,10 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import styled, { css } from 'reshadow';
 
-import { StaticImage, TableColumnValue, TableItem, TableItemSelect } from '@cloudbeaver/core-blocks';
+import { s, StaticImage, TableColumnValue, TableItem, TableItemSelect, useS } from '@cloudbeaver/core-blocks';
+
+import styles from './ConnectionAccessTableItem.module.css';
 
 interface Props {
   id: any;
@@ -21,13 +22,6 @@ interface Props {
   className?: string;
 }
 
-const style = css`
-  StaticImage {
-    display: flex;
-    width: 24px;
-  }
-`;
-
 export const ConnectionAccessTableItem = observer<Props>(function ConnectionAccessTableItem({
   id,
   name,
@@ -38,16 +32,17 @@ export const ConnectionAccessTableItem = observer<Props>(function ConnectionAcce
   disabled,
   className,
 }) {
-  return styled(style)(
+  const style = useS(styles);
+  return (
     <TableItem item={id} title={tooltip} disabled={disabled} selectDisabled={disabled} className={className}>
       <TableColumnValue centerContent flex>
         <TableItemSelect disabled={disabled} />
       </TableColumnValue>
       <TableColumnValue>
-        <StaticImage icon={icon} title={iconTooltip} />
+        <StaticImage className={s(style, { staticImage: true })} icon={icon} title={iconTooltip} />
       </TableColumnValue>
       <TableColumnValue>{name}</TableColumnValue>
       <TableColumnValue>{description}</TableColumnValue>
-    </TableItem>,
+    </TableItem>
   );
 });

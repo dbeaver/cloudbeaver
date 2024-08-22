@@ -19,6 +19,7 @@ package io.cloudbeaver.service.auth;
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.model.user.WebUser;
+import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.meta.Property;
@@ -85,11 +86,22 @@ public class WebUserInfo {
 
     @Property
     public Map<String, Object> getConfigurationParameters() throws DBWebException {
-        try {
-            return session.getSecurityController().getCurrentUserParameters();
-        } catch (DBException e) {
-            throw new DBWebException("Error reading user parameters", e);
-        }
+        return session.getUserContext().getPreferenceStore().getCustomUserParameters();
     }
 
+    @NotNull
+    @Property
+    public List<WebUserTeamInfo> getTeams() throws DBWebException {
+        if (session.getUserContext().isNonAnonymousUserAuthorizedInSM()) {
+            try {
+                return Arrays.stream(session.getSecurityController().getCurrentUserTeams())
+                    .map(WebUserTeamInfo::new)
+                    .toList();
+            } catch (DBException e) {
+                throw new DBWebException("Error reading user's teams", e);
+            }
+        } else {
+            return List.of();
+        }
+    }
 }

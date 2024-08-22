@@ -30,11 +30,11 @@ import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
+import org.jkiss.dbeaver.model.DBConstants;
 import org.jkiss.dbeaver.model.DBFileController;
 import org.jkiss.dbeaver.model.app.DBACertificateStorage;
 import org.jkiss.dbeaver.model.app.DBPWorkspace;
 import org.jkiss.dbeaver.model.connection.DBPDataSourceProviderDescriptor;
-import org.jkiss.dbeaver.model.connection.DBPDataSourceProviderRegistry;
 import org.jkiss.dbeaver.model.connection.DBPDriver;
 import org.jkiss.dbeaver.model.connection.DBPDriverLibrary;
 import org.jkiss.dbeaver.model.impl.app.DefaultCertificateStorage;
@@ -56,7 +56,8 @@ import org.jkiss.utils.IOUtils;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.stream.Collectors;
 
 /**
@@ -68,12 +69,13 @@ public class CBPlatform extends BasePlatformImpl {
     public static final String PLUGIN_ID = "io.cloudbeaver.server"; //$NON-NLS-1$
 
     private static final Log log = Log.getLog(CBPlatform.class);
-    private static final String TEMP_FILE_FOLDER = "temp-sql-upload-files";
+    public static final String TEMP_FILE_FOLDER = "temp-sql-upload-files";
+    public static final String TEMP_FILE_IMPORT_FOLDER = "temp-import-files";
 
     public static final String WORK_DATA_FOLDER_NAME = ".work-data";
 
     @Nullable
-    private static CBApplication application = null;
+    private static CBApplication<?> application = null;
 
     private Path tempFolder;
 
@@ -114,12 +116,10 @@ public class CBPlatform extends BasePlatformImpl {
         this.queryManager.registerMetaListener(qmLogWriter);
 
         this.certificateStorage = new DefaultCertificateStorage(
-            WebPlatformActivator.getInstance().getStateLocation().toFile().toPath().resolve("security"));
+            WebPlatformActivator.getInstance().getStateLocation().toFile().toPath().resolve(DBConstants.CERTIFICATE_STORAGE_FOLDER));
         super.initialize();
 
         refreshApplicableDrivers();
-
-        refreshDisabledDriversConfig();
 
         new WebSessionMonitorJob(this)
             .scheduleMonitor();
@@ -135,6 +135,7 @@ public class CBPlatform extends BasePlatformImpl {
             protected IStatus run(DBRProgressMonitor monitor) {
                 try {
                     IOUtils.deleteDirectory(getTempFolder(monitor, TEMP_FILE_FOLDER));
+                    IOUtils.deleteDirectory(getTempFolder(monitor, TEMP_FILE_IMPORT_FOLDER));
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
@@ -191,18 +192,12 @@ public class CBPlatform extends BasePlatformImpl {
 
     @NotNull
     @Override
-    public CBApplication getApplication() {
+    public CBApplication<?> getApplication() {
         return application;
     }
 
     public List<DBPDriver> getApplicableDrivers() {
         return applicableDrivers;
-    }
-
-    @NotNull
-    @Override
-    public DBPDataSourceProviderRegistry getDataSourceProviderRegistry() {
-        return DataSourceProviderRegistry.getInstance();
     }
 
     @NotNull
@@ -223,7 +218,7 @@ public class CBPlatform extends BasePlatformImpl {
     }
 
     @NotNull
-    public Path getTempFolder(DBRProgressMonitor monitor, String name) {
+    public Path getTempFolder(@NotNull DBRProgressMonitor monitor, @NotNull String name) {
         if (tempFolder == null) {
             // Make temp folder
             monitor.subTask("Create temp folder");
@@ -291,18 +286,6 @@ public class CBPlatform extends BasePlatformImpl {
             }
         }
         log.info("Available drivers: " + applicableDrivers.stream().map(DBPDriver::getFullName).collect(Collectors.joining(",")));
-    }
-
-    private void refreshDisabledDriversConfig() {
-        CBAppConfig config = application.getAppConfiguration();
-        Set<String> disabledDrivers = new LinkedHashSet<>(Arrays.asList(config.getDisabledDrivers()));
-        for (DBPDriver driver : applicableDrivers) {
-            if (!driver.isEmbedded() || config.isDriverForceEnabled(driver.getFullId())) {
-                continue;
-            }
-            disabledDrivers.add(driver.getFullId());
-        }
-        config.setDisabledDrivers(disabledDrivers.toArray(new String[0]));
     }
 
     @NotNull

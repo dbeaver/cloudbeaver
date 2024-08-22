@@ -8,7 +8,7 @@
 import { makeObservable, observable } from 'mobx';
 
 import { ConnectionExecutionContextService, ConnectionInfoResource, createConnectionParam } from '@cloudbeaver/core-connections';
-import { App, injectable } from '@cloudbeaver/core-di';
+import { injectable, IServiceProvider } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { AsyncTaskInfoService, GraphQLService } from '@cloudbeaver/core-sdk';
 import {
@@ -19,12 +19,11 @@ import {
   DataViewerService,
   DataViewerSettingsService,
   IDatabaseDataModel,
-  IDatabaseResultSet,
   TableViewerStorageService,
 } from '@cloudbeaver/plugin-data-viewer';
 
 import type { IResultGroup, ISqlEditorTabState } from '../ISqlEditorTabState';
-import { IDataQueryOptions, QueryDataSource } from '../QueryDataSource';
+import { QueryDataSource } from '../QueryDataSource';
 import { SqlDataSourceService } from '../SqlDataSource/SqlDataSourceService';
 import { SqlQueryResultService } from './SqlQueryResultService';
 
@@ -46,7 +45,7 @@ export class SqlQueryService {
   private readonly statisticsMap: Map<string, IQueryExecutionStatistics>;
 
   constructor(
-    private readonly app: App,
+    private readonly serviceProvider: IServiceProvider,
     private readonly tableViewerStorageService: TableViewerStorageService,
     private readonly graphQLService: GraphQLService,
     private readonly notificationService: NotificationService,
@@ -96,8 +95,8 @@ export class SqlQueryService {
         this.switchTabToActiveRequest(editorState, tabGroup, model);
         this.sqlQueryResultService.updateGroupTabs(editorState, model, tabGroup.groupId, first);
 
-        model.onRequest.addHandler(({ type, model }) => {
-          if (type === 'after') {
+        model.onRequest.addHandler(({ stage, model }) => {
+          if (stage === 'after') {
             const tabGroup = this.sqlQueryResultService.getModelGroup(editorState, model.id);
 
             if (tabGroup) {
@@ -121,7 +120,7 @@ export class SqlQueryService {
     }
 
     let source: QueryDataSource;
-    let model: IDatabaseDataModel<IDataQueryOptions, IDatabaseResultSet>;
+    let model: IDatabaseDataModel<QueryDataSource>;
     let isNewTabCreated = false;
 
     const connectionKey = createConnectionParam(contextInfo.projectId, contextInfo.connectionId);
@@ -130,7 +129,7 @@ export class SqlQueryService {
     let tabGroup = this.sqlQueryResultService.getSelectedGroup(editorState);
 
     if (inNewTab || !tabGroup) {
-      source = new QueryDataSource(this.app.getServiceInjector(), this.graphQLService, this.asyncTaskInfoService);
+      source = new QueryDataSource(this.serviceProvider, this.graphQLService, this.asyncTaskInfoService);
       model = this.tableViewerStorageService.add(new DatabaseDataModel(source));
       this.dataViewerDataChangeConfirmationService.trackTableDataUpdate(model.id);
       tabGroup = this.sqlQueryResultService.createGroup(editorState, model.id, query);
@@ -148,22 +147,23 @@ export class SqlQueryService {
 
     model
       .setAccess(editable ? DatabaseDataAccessMode.Default : DatabaseDataAccessMode.Readonly)
+      .source.setExecutionContext(executionContext)
+      .setSupportedDataFormats(connectionInfo.supportedDataFormats)
+      .setKeepExecutionContextOnDispose(true)
       .setOptions({
         query: query,
         connectionKey,
         constraints: [],
         whereFilter: '',
         readLogs: isOutputLogsTabOpened,
-      })
-      .source.setExecutionContext(executionContext)
-      .setSupportedDataFormats(connectionInfo.supportedDataFormats);
+      });
 
     this.sqlQueryResultService.updateGroupTabs(editorState, model, tabGroup.groupId, true);
 
     try {
       await model.setCountGain(this.dataViewerSettingsService.getDefaultRowsCount()).setSlice(0).request();
 
-      model.setName(this.sqlQueryResultService.getTabNameForOrder(tabGroup.nameOrder, 0, model.getResults().length));
+      model.setName(this.sqlQueryResultService.getTabNameForOrder(tabGroup.nameOrder, 0, model.source.getResults().length));
       this.sqlQueryResultService.updateGroupTabs(editorState, model, tabGroup.groupId);
     } catch (exception: any) {
       // remove group if execution was cancelled
@@ -207,7 +207,7 @@ export class SqlQueryService {
     const statistics = this.getStatistics(statisticsTab.tabId)!;
 
     let source: QueryDataSource | undefined;
-    let model: IDatabaseDataModel<IDataQueryOptions, IDatabaseResultSet> | undefined;
+    let model: IDatabaseDataModel<QueryDataSource> | undefined;
     let resultCount = 0;
 
     for (let i = 0; i < queries.length; i++) {
@@ -216,7 +216,7 @@ export class SqlQueryService {
       options?.onQueryExecutionStart?.(query, i);
 
       if (!model || !source) {
-        source = new QueryDataSource(this.app.getServiceInjector(), this.graphQLService, this.asyncTaskInfoService);
+        source = new QueryDataSource(this.serviceProvider, this.graphQLService, this.asyncTaskInfoService);
         model = this.tableViewerStorageService.add(new DatabaseDataModel(source));
         this.dataViewerDataChangeConfirmationService.trackTableDataUpdate(model.id);
       }
@@ -227,15 +227,16 @@ export class SqlQueryService {
 
       model
         .setAccess(editable ? DatabaseDataAccessMode.Default : DatabaseDataAccessMode.Readonly)
+        .source.setExecutionContext(executionContext)
+        .setSupportedDataFormats(connectionInfo.supportedDataFormats)
+        .setKeepExecutionContextOnDispose(true)
         .setOptions({
           query: query,
           connectionKey,
           constraints: [],
           whereFilter: '',
           readLogs: isOutputLogsTabOpened,
-        })
-        .source.setExecutionContext(executionContext)
-        .setSupportedDataFormats(connectionInfo.supportedDataFormats);
+        });
 
       try {
         await model.setCountGain(this.dataViewerSettingsService.getDefaultRowsCount()).setSlice(0).request();
@@ -253,7 +254,7 @@ export class SqlQueryService {
           resultCount = resultCount + 1;
 
           const tabGroup = this.sqlQueryResultService.createGroup(editorState, model.id, query, groupNameOrder);
-          model.setName(this.sqlQueryResultService.getTabNameForOrder(tabGroup.nameOrder, 0, model.getResults().length, resultCount));
+          model.setName(this.sqlQueryResultService.getTabNameForOrder(tabGroup.nameOrder, 0, model.source.getResults().length, resultCount));
           this.switchTabToActiveRequest(editorState, tabGroup, model);
 
           this.sqlQueryResultService.updateGroupTabs(editorState, model, tabGroup.groupId, false, resultCount);
@@ -290,21 +291,17 @@ export class SqlQueryService {
     this.statisticsMap.delete(tabId);
   }
 
-  private switchTabToActiveRequest(
-    editorState: ISqlEditorTabState,
-    tabGroup: IResultGroup,
-    model: IDatabaseDataModel<IDataQueryOptions, IDatabaseResultSet>,
-  ) {
-    model.onRequest.addPostHandler(({ type }) => {
-      if (type === 'on') {
+  private switchTabToActiveRequest(editorState: ISqlEditorTabState, tabGroup: IResultGroup, model: IDatabaseDataModel<QueryDataSource>) {
+    model.onRequest.addPostHandler(({ stage }) => {
+      if (stage === 'request') {
         const activeGroupId = this.sqlQueryResultService.getSelectedGroup(editorState)?.groupId;
-        for (const result of model.getResults()) {
+        for (const result of model.source.getResults()) {
           const editor = model.source.getActionImplementation(result, DatabaseEditAction);
 
           const edited = editor?.isEdited() && model.source.executionContext?.context;
 
           if (edited && activeGroupId !== tabGroup.groupId) {
-            this.sqlQueryResultService.selectResult(editorState, tabGroup.groupId, model.getResults().indexOf(result));
+            this.sqlQueryResultService.selectResult(editorState, tabGroup.groupId, model.source.getResults().indexOf(result));
             return;
           }
         }

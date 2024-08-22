@@ -8,13 +8,14 @@
 import { observer } from 'mobx-react-lite';
 
 import { s, SContext, StyleRegistry, useS } from '@cloudbeaver/core-blocks';
+import { useDataContextLink } from '@cloudbeaver/core-data-context';
 import { MenuBar, MenuBarItemStyles, MenuBarStyles } from '@cloudbeaver/core-ui';
 import { useMenu } from '@cloudbeaver/core-view';
 
 import { DATA_CONTEXT_ELEMENTS_TREE } from '../DATA_CONTEXT_ELEMENTS_TREE';
 import type { IElementsTree } from '../useElementsTree';
-import elementsTreeMenuBarItemStyles from './ElementsTreeMenuBarItem.m.css';
-import style from './ElementsTreeToolsMenu.m.css';
+import elementsTreeMenuBarItemStyles from './ElementsTreeMenuBarItem.module.css';
+import style from './ElementsTreeToolsMenu.module.css';
 import { MENU_ELEMENTS_TREE_TOOLS } from './MENU_ELEMENTS_TREE_TOOLS';
 
 interface Props {
@@ -37,7 +38,9 @@ export const ElementsTreeToolsMenu = observer<Props>(function ElementsTreeToolsM
   const menuBarStyles = useS(MenuBarStyles, MenuBarItemStyles);
   const menu = useMenu({ menu: MENU_ELEMENTS_TREE_TOOLS });
 
-  menu.context.set(DATA_CONTEXT_ELEMENTS_TREE, tree);
+  useDataContextLink(menu.context, (context, id) => {
+    context.set(DATA_CONTEXT_ELEMENTS_TREE, tree, id);
+  });
 
   return (
     <SContext registry={registry}>

@@ -1,3 +1,10 @@
+/*
+ * CloudBeaver - Cloud Database Manager
+ * Copyright (C) 2020-2024 DBeaver Corp and others
+ *
+ * Licensed under the Apache License, Version 2.0.
+ * you may not use this file except in compliance with the License.
+ */
 export default [
   ['authentication_administration_user_connections_user_add', 'Создание пользователя'],
   ['authentication_administration_user_connections_user_new', 'Новый пользователь'],
@@ -16,7 +23,7 @@ export default [
   ['authentication_administration_user_auth_methods', 'Способы входа'],
   ['authentication_administration_user_auth_methods_empty', 'Нет доступных способов входа'],
   ['authentication_administration_user_auth_method_no_details', 'Дополнительная информация не доступна'],
-  ['authentication_administration_item', 'Управление доступом'],
+  ['authentication_administration_item', 'Пользователи и команды'],
   ['authentication_administration_item_users', 'Пользователи'],
   ['authentication_administration_item_metaParameters', 'Свойства Пользователей'],
   ['authentication_administration_tools_add_tooltip', 'Создать нового пользователя'],
@@ -137,4 +144,9 @@ export default [
 
   ['plugin_authentication_administration_user_team_default_readonly_tooltip', 'Команда по умолчанию. Не может быть отозвана'],
   ['plugin_authentication_administration_team_default_users_tooltip', 'Команда по умолчанию. Содержит всех пользователей'],
+  ['plugin_authentication_administration_team_user_team_role_supervisor', 'Супервайзер'],
+  [
+    'plugin_authentication_administration_team_user_team_role_supervisor_description',
+    'Супервайзеры могут просматривать выполненные запросы своей команды',
+  ],
 ];

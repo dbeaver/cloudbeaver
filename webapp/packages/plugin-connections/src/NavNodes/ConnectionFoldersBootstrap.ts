@@ -43,9 +43,9 @@ import {
   ROOT_NODE_PATH,
 } from '@cloudbeaver/core-navigation-tree';
 import { getProjectNodeId, NAV_NODE_TYPE_PROJECT, ProjectInfoResource } from '@cloudbeaver/core-projects';
-import { CachedMapAllKey, ResourceKeyAlias, resourceKeyList, ResourceKeySimple, ResourceKeyUtils } from '@cloudbeaver/core-resource';
+import { CachedMapAllKey, resourceKeyList, ResourceKeySimple, ResourceKeyUtils } from '@cloudbeaver/core-resource';
 import { createPath } from '@cloudbeaver/core-utils';
-import { ACTION_NEW_FOLDER, ActionService, DATA_CONTEXT_MENU, IAction, MenuService } from '@cloudbeaver/core-view';
+import { ACTION_NEW_FOLDER, ActionService, IAction, MenuService } from '@cloudbeaver/core-view';
 import { DATA_CONTEXT_ELEMENTS_TREE, type IElementsTree, MENU_ELEMENTS_TREE_TOOLS } from '@cloudbeaver/plugin-navigation-tree';
 import { FolderDialog } from '@cloudbeaver/plugin-projects';
 
@@ -80,7 +80,7 @@ export class ConnectionFoldersBootstrap extends Bootstrap {
     super();
   }
 
-  register(): void | Promise<void> {
+  register(): void {
     this.navNodeInfoResource.onItemUpdate.addHandler(this.syncWithNavTree.bind(this));
     this.navNodeInfoResource.onItemDelete.addHandler(this.syncWithNavTree.bind(this));
     this.navNodeManagerService.onMove.addHandler(this.moveConnectionToFolder.bind(this));
@@ -122,10 +122,11 @@ export class ConnectionFoldersBootstrap extends Bootstrap {
 
     this.actionService.addHandler({
       id: 'tree-tools-menu-folders-handler',
+      contexts: [DATA_CONTEXT_ELEMENTS_TREE],
       isActionApplicable: (context, action) => {
-        const tree = context.tryGet(DATA_CONTEXT_ELEMENTS_TREE);
+        const tree = context.get(DATA_CONTEXT_ELEMENTS_TREE)!;
 
-        if (action !== ACTION_NEW_FOLDER || !tree || !this.userInfoResource.data || tree.baseRoot !== ROOT_NODE_PATH) {
+        if (action !== ACTION_NEW_FOLDER || !this.userInfoResource.data || tree.baseRoot !== ROOT_NODE_PATH) {
           return false;
         }
 
@@ -134,7 +135,7 @@ export class ConnectionFoldersBootstrap extends Bootstrap {
         return targetNode !== undefined;
       },
       // isDisabled: (context, action) => {
-      //   const tree = context.tryGet(DATA_CONTEXT_ELEMENTS_TREE);
+      //   const tree = context.get(DATA_CONTEXT_ELEMENTS_TREE);
 
       //   if (!tree) {
       //     return true;
@@ -152,7 +153,7 @@ export class ConnectionFoldersBootstrap extends Bootstrap {
     });
 
     this.menuService.addCreator({
-      isApplicable: context => context.get(DATA_CONTEXT_MENU) === MENU_ELEMENTS_TREE_TOOLS,
+      menus: [MENU_ELEMENTS_TREE_TOOLS],
       getItems: (context, items) => {
         if (!items.includes(ACTION_NEW_FOLDER)) {
           return [...items, ACTION_NEW_FOLDER];
@@ -275,21 +276,8 @@ export class ConnectionFoldersBootstrap extends Bootstrap {
               return false;
             }
 
-            let parentKey:
-              | ResourceKeyAlias<
-                  any,
-                  {
-                    projectId: string;
-                  }
-                >
-              | IConnectionFolderParam = ConnectionFolderProjectKey(projectId);
-
-            if (folder) {
-              parentKey = createConnectionFolderParam(projectId, folder);
-            }
-
             try {
-              await this.connectionFolderResource.load(parentKey);
+              await this.connectionFolderResource.load(ConnectionFolderProjectKey(projectId));
 
               return !this.connectionFolderResource.has(createConnectionFolderParam(projectId, createPath(folder, trimmed)));
             } catch (exception: any) {

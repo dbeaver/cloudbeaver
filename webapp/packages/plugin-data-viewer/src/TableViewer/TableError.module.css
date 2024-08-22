@@ -1,0 +1,74 @@
+/*
+ * CloudBeaver - Cloud Database Manager
+ * Copyright (C) 2020-2024 DBeaver Corp and others
+ *
+ * Licensed under the Apache License, Version 2.0.
+ * you may not use this file except in compliance with the License.
+ */
+
+.error {
+  composes: theme-background-surface theme-text-on-surface from global;
+  position: absolute;
+  box-sizing: border-box;
+  width: 100%;
+  height: 100%;
+  padding: 16px;
+  overflow: auto;
+  pointer-events: none;
+  bottom: 0;
+  right: 0;
+  z-index: 1;
+  opacity: 0;
+  transition:
+    opacity 0.3s ease-in-out,
+    width 0.3s ease-in-out,
+    height 0.3s ease-in-out,
+    background 0.3s ease-in-out;
+}
+.errorBody {
+  display: flex;
+  gap: 24px;
+  margin-bottom: 24px;
+}
+.errorMessage {
+  white-space: pre-wrap;
+}
+.iconOrImage {
+  width: 40px;
+  height: 40px;
+}
+.controls {
+  display: flex;
+  gap: 16px;
+  & > .button {
+    flex-shrink: 0;
+  }
+}
+
+.collapsed {
+  pointer-events: auto;
+  width: 92px;
+  height: 72px;
+  background: transparent !important;
+
+  & .iconOrImage {
+    cursor: pointer;
+  }
+  &.animated {
+    overflow: hidden;
+  }
+  & .errorMessage,
+  & .controls {
+    display: none;
+  }
+}
+
+.animated {
+  overflow: auto;
+  pointer-events: auto;
+  opacity: 1;
+}
+.errorHidden {
+  pointer-events: none;
+  overflow: hidden;
+}

@@ -9,12 +9,12 @@ import { observer } from 'mobx-react-lite';
 import { useContext } from 'react';
 
 import { getComputed, IconOrImage, s, useS, useTranslate } from '@cloudbeaver/core-blocks';
-import type { RenderHeaderCellProps } from '@cloudbeaver/plugin-react-data-grid';
+import type { RenderHeaderCellProps } from '@cloudbeaver/plugin-data-grid';
 
 import { DataGridContext } from '../DataGridContext';
 import { DataGridSelectionContext } from '../DataGridSelection/DataGridSelectionContext';
 import { TableDataContext } from '../TableDataContext';
-import style from './TableIndexColumnHeader.m.css';
+import style from './TableIndexColumnHeader.module.css';
 
 export const TableIndexColumnHeader = observer<RenderHeaderCellProps<any>>(function TableIndexColumnHeader(props) {
   const dataGridContext = useContext(DataGridContext);

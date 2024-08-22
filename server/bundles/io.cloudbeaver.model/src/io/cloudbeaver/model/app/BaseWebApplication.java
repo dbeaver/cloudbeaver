@@ -16,8 +16,6 @@
  */
 package io.cloudbeaver.model.app;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import io.cloudbeaver.DataSourceFilter;
 import io.cloudbeaver.WebProjectImpl;
 import io.cloudbeaver.WebSessionProjectImpl;
@@ -43,6 +41,7 @@ import org.jkiss.dbeaver.model.rm.RMProject;
 import org.jkiss.dbeaver.model.secret.DBSSecretController;
 import org.jkiss.dbeaver.model.websocket.event.WSEventController;
 import org.jkiss.dbeaver.registry.BaseApplicationImpl;
+import org.jkiss.dbeaver.registry.BaseWorkspaceImpl;
 import org.jkiss.dbeaver.runtime.IVariableResolver;
 import org.jkiss.dbeaver.utils.GeneralUtils;
 import org.jkiss.dbeaver.utils.RuntimeUtils;
@@ -65,6 +64,8 @@ public abstract class BaseWebApplication extends BaseApplicationImpl implements 
 
 
     private static final Log log = Log.getLog(BaseWebApplication.class);
+
+    private String instanceId;
 
     @NotNull
     @Override
@@ -102,31 +103,21 @@ public abstract class BaseWebApplication extends BaseApplicationImpl implements 
         return true;
     }
 
-    @Nullable
-    protected Path loadServerConfiguration() throws DBException {
+    protected boolean loadServerConfiguration() throws DBException {
         Path configFilePath = getMainConfigurationFilePath().toAbsolutePath();
-        Path configFolder = configFilePath.getParent();
 
-        // Configure logging
-        Path logbackConfigPath = getLogbackConfigPath(configFolder);
-
-        if (logbackConfigPath == null) {
-            System.err.println("Can't find slf4j configuration file in " + configFilePath.getParent());
-        } else {
-            System.setProperty("logback.configurationFile", logbackConfigPath.toString());
-        }
         Log.setLogHandler(new SLF4JLogHandler());
 
         // Load config file
         log.debug("Loading configuration from " + configFilePath);
         try {
-            loadConfiguration(configFilePath);
+            getServerConfigurationController().loadServerConfiguration(configFilePath);
         } catch (Exception e) {
             log.error("Error parsing configuration", e);
-            return null;
+            return false;
         }
 
-        return configFilePath;
+        return true;
     }
 
     @Nullable
@@ -153,7 +144,7 @@ public abstract class BaseWebApplication extends BaseApplicationImpl implements 
         return getLogbackConfigPath(configFolder);
     }
 
-    private Path getMainConfigurationFilePath() {
+    protected Path getMainConfigurationFilePath() {
         String configPath = DEFAULT_CONFIG_FILE_PATH;
 
         String[] args = Platform.getCommandLineArgs();
@@ -178,8 +169,6 @@ public abstract class BaseWebApplication extends BaseApplicationImpl implements 
         var customConfigPath = configPath.resolve(CUSTOM_CONFIG_FOLDER).resolve(fileName);
         return Files.exists(customConfigPath) ? customConfigPath : configPath.resolve(fileName);
     }
-
-    protected abstract void loadConfiguration(Path configPath) throws DBException;
 
     @Override
     public WebProjectImpl createProjectImpl(
@@ -207,12 +196,14 @@ public abstract class BaseWebApplication extends BaseApplicationImpl implements 
         return VoidSecretController.INSTANCE;
     }
 
-    protected static Map<String, Object> getServerConfigProps(Map<String, Object> configProps) {
+    public static Map<String, Object> getServerConfigProps(Map<String, Object> configProps) {
         return JSONUtils.getObject(configProps, "server");
     }
 
     @SuppressWarnings("unchecked")
-    public static void patchConfigurationWithProperties(Map<String, Object> configProps, IVariableResolver varResolver) {
+    public static void patchConfigurationWithProperties(
+        Map<String, Object> configProps, IVariableResolver varResolver
+    ) {
         for (Map.Entry<String, Object> entry : configProps.entrySet()) {
             Object propValue = entry.getValue();
             if (propValue instanceof String) {
@@ -247,14 +238,27 @@ public abstract class BaseWebApplication extends BaseApplicationImpl implements 
     protected abstract void startServer() throws DBException;
 
     @Override
-    public String getApplicationInstanceId() throws DBException {
-        try {
-            byte[] macAddress = RuntimeUtils.getLocalMacAddress();
-            String appId = ApplicationRegistry.getInstance().getApplication().getId();
-            return appId + "_" + CommonUtils.toHexString(macAddress) + getServerPort();
-        } catch (Exception e) {
-            throw new DBException("Error during generation instance id generation", e);
+    public synchronized String getApplicationInstanceId() throws DBException {
+        if (instanceId == null) {
+            try {
+                byte[] macAddress = RuntimeUtils.getLocalMacAddress();
+                instanceId = String.join(
+                    "_",
+                    ApplicationRegistry.getInstance().getApplication().getId(),
+                    getWorkspaceIdProperty(), // workspace id is read from property file
+                    CommonUtils.toHexString(macAddress),
+                    CommonUtils.toString(getServerPort())
+                );
+            } catch (Exception e) {
+                throw new DBException("Error during generation instance id generation", e);
+            }
         }
+        return instanceId;
+    }
+
+    @NotNull
+    public String getWorkspaceIdProperty() throws DBException {
+        return BaseWorkspaceImpl.readWorkspaceIdProperty();
     }
 
     public String getApplicationId() {
@@ -270,11 +274,7 @@ public abstract class BaseWebApplication extends BaseApplicationImpl implements 
         return null;
     }
 
-    protected Gson getGson() {
-        return getGsonBuilder().create();
-    }
-
-    protected abstract GsonBuilder getGsonBuilder();
+    public abstract WebServerConfigurationController getServerConfigurationController();
 
     @Override
     public boolean isEnvironmentVariablesAccessible() {

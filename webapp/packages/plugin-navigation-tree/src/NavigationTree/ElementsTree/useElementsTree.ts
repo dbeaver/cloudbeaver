@@ -5,7 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { action, computed, observable, runInAction } from 'mobx';
+import { action, autorun, computed, observable, runInAction } from 'mobx';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { getComputed, IFolderExplorerContext, useExecutor, useObjectRef, useObservableRef, useResource, useUserData } from '@cloudbeaver/core-blocks';
@@ -100,7 +100,6 @@ export interface IElementsTree extends ILoadableState {
   root: string;
   readonly filtering: boolean;
   readonly filter: string;
-  loading: boolean;
   disabled: boolean;
   activeDnDData: IDNDData[];
   nodeInfoTransformers: IElementsTreeCustomNodeInfo[];
@@ -127,7 +126,7 @@ export interface IElementsTree extends ILoadableState {
   expand: (node: NavNode, state: boolean) => Promise<void>;
   show: (nodeId: string, parents: string[]) => Promise<void>;
   refresh: (nodeId: string) => Promise<void>;
-  collapse: () => void;
+  collapse: (nodeId?: string) => void;
   loadPath: (path: string[], lastNode?: string) => Promise<string | undefined>;
 }
 
@@ -170,89 +169,96 @@ export function useElementsTree(options: IOptions): IElementsTree {
       return false;
     }
   }
+  const [loadingNodes] = useState(() => observable.map(new Map<string, Promise<void>>(), { deep: false }));
 
   const functionsRef = useObjectRef({
-    async loadTree(nodeId: string) {
-      elementsTree.loading = true;
-      try {
-        await projectInfoResource.load();
-        await connectionInfoResource.load(ConnectionInfoActiveProjectKey);
-        const preloadedRoot = await elementsTree.loadPath(options.folderExplorer.state.fullPath);
+    async loadTree(...nodes: string[]) {
+      await Promise.all(loadingNodes.values());
+      await projectInfoResource.load();
+      await connectionInfoResource.load(ConnectionInfoActiveProjectKey);
+      const preloadedRoot = await elementsTree.loadPath(options.folderExplorer.state.fullPath);
 
-        if (preloadedRoot !== options.folderExplorer.state.folder) {
-          if (preloadedRoot === undefined) {
-            options.folderExplorer.open([], options.baseRoot);
-          } else {
-            this.exitNodeFolder(preloadedRoot);
-          }
-          return;
+      if (preloadedRoot !== options.folderExplorer.state.folder) {
+        if (preloadedRoot === undefined) {
+          options.folderExplorer.open([], options.baseRoot);
+        } else {
+          this.exitNodeFolder(preloadedRoot);
         }
-
-        let children = [nodeId];
-
-        while (children.length > 0) {
-          const nextChildren: string[] = [];
-
-          await Promise.all(
-            children.map(async child => {
-              await projectInfoResource.waitLoad();
-              await connectionInfoResource.waitLoad();
-              await navTreeResource.waitLoad();
-              await navNodeInfoResource.waitLoad();
-
-              const expanded = elementsTree.isNodeExpanded(child, true);
-              if (!expanded && child !== options.root) {
-                if (navNodeInfoResource.isOutdated(child)) {
-                  const node = navNodeInfoResource.get(child);
-
-                  if (node?.parentId !== undefined && !navTreeResource.isOutdated(node.parentId)) {
-                    await navNodeInfoResource.load(child);
-                  }
-                }
-                return;
-              }
-
-              const loaded = await handleLoadChildren(child, false);
-
-              if (!loaded) {
-                const node = navNodeInfoResource.get(child);
-
-                if (node) {
-                  await elementsTree.expand(node, false);
-                }
-                return;
-              }
-
-              const pageInfo = navTreeResource.offsetPagination.getPageInfo(CachedResourceOffsetPageKey(0, 0).setTarget(child));
-
-              if (pageInfo) {
-                const lastOffset = getNextPageOffset(pageInfo);
-                for (let offset = 0; offset < lastOffset; offset += navTreeResource.childrenLimit) {
-                  await navTreeResource.load(CachedResourceOffsetPageKey(offset, navTreeResource.childrenLimit).setTarget(child));
-                }
-              }
-
-              if (
-                elementsTree.settings?.foldersTree &&
-                options.folderExplorer.options.expandFoldersWithSingleElement &&
-                child === options.root &&
-                elementsTree.getNodeChildren(child).length === 1
-              ) {
-                const nextNode = elementsTree.getNodeChildren(child)[0];
-
-                if (elementsTree.isNodeExpandable(nextNode) || elementsTree.isNodeExpanded(nextNode)) {
-                  options.folderExplorer.open(navNodeInfoResource.getParents(nextNode), nextNode);
-                }
-              }
-              nextChildren.push(...(navTreeResource.get(child) || []));
-            }),
-          );
-
-          children = nextChildren;
-        }
-      } finally {
-        elementsTree.loading = false;
+        return;
       }
+
+      await this.loadNodes(...nodes);
+    },
+
+    async loadNodes(...nodes: string[]) {
+      const promises = [];
+      for (const nodeId of nodes) {
+        const promise = this.loadNode(nodeId).finally(() => loadingNodes.delete(nodeId));
+        loadingNodes.set(nodeId, promise);
+
+        promises.push(promise);
+      }
+
+      await Promise.all(promises);
+    },
+
+    async loadNode(nodeId: string) {
+      await projectInfoResource.waitLoad();
+      await connectionInfoResource.waitLoad();
+      await navTreeResource.waitLoad();
+      await navNodeInfoResource.waitLoad();
+
+      const expanded = elementsTree.isNodeExpanded(nodeId, true);
+      if (!expanded && nodeId !== options.root) {
+        if (navNodeInfoResource.isOutdated(nodeId)) {
+          const node = navNodeInfoResource.get(nodeId);
+
+          if (node?.parentId !== undefined && !navTreeResource.isOutdated(node.parentId)) {
+            await navNodeInfoResource.load(nodeId);
+          }
+        }
+        return;
+      }
+
+      const loaded = await handleLoadChildren(nodeId, false);
+
+      if (!loaded) {
+        if (expanded) {
+          elementsTree.collapse(nodeId);
+        }
+        return;
+      }
+
+      await navNodeInfoResource.load(nodeId);
+
+      const pageInfo = navTreeResource.offsetPagination.getPageInfo(CachedResourceOffsetPageKey(0, 0).setTarget(nodeId));
+
+      if (pageInfo) {
+        const lastOffset = getNextPageOffset(pageInfo);
+        for (let offset = 0; offset < lastOffset; offset += navTreeResource.childrenLimit) {
+          await navTreeResource.load(CachedResourceOffsetPageKey(offset, navTreeResource.childrenLimit).setTarget(nodeId));
+        }
+      }
+
+      if (expanded && elementsTree.isNodeExpandable(nodeId) && elementsTree.getNodeChildren(nodeId).length === 0 && !elementsTree.filtering) {
+        elementsTree.collapse(nodeId);
+        return;
+      }
+
+      if (
+        elementsTree.settings?.foldersTree &&
+        options.folderExplorer.options.expandFoldersWithSingleElement &&
+        nodeId === options.root &&
+        elementsTree.getNodeChildren(nodeId).length === 1
+      ) {
+        const nextNode = elementsTree.getNodeChildren(nodeId)[0];
+
+        if (elementsTree.isNodeExpandable(nextNode) || elementsTree.isNodeExpanded(nextNode)) {
+          options.folderExplorer.open(navNodeInfoResource.getParents(nextNode), nextNode);
+        }
+      }
+
+      await this.loadNodes(...(navTreeResource.get(nodeId) || []));
     },
 
     exitNodeFolder(nodeId: string) {
@@ -361,15 +367,18 @@ export function useElementsTree(options: IOptions): IElementsTree {
         filter: '',
       }),
     async data => {
-      if (!options.settings?.saveFilter) {
-        data.filter = '';
-      }
+      runInAction(() => {
+        if (!options.settings?.saveFilter) {
+          data.filter = '';
+        }
 
-      if (!options.settings?.saveExpanded) {
-        data.nodeState = [];
-      }
-
-      state.sync(data.nodeState);
+        if (options.settings?.saveExpanded) {
+          state.sync(data.nodeState);
+        } else {
+          state.unSync();
+          state.clear();
+        }
+      });
 
       try {
         await functionsRef.loadTree(options.root);
@@ -378,11 +387,25 @@ export function useElementsTree(options: IOptions): IElementsTree {
     data => typeof data === 'object' && typeof data.filter === 'string' && Array.isArray(data.nodeState),
   );
 
+  useEffect(
+    () =>
+      autorun(() => {
+        if (options.settings?.saveExpanded) {
+          runInAction(() => {
+            userData.nodeState = Array.from(state);
+            state.sync(userData.nodeState);
+          });
+        } else {
+          state.unSync();
+        }
+      }),
+    [state, userData, options.settings],
+  );
+
   const elementsTree = useObservableRef<IElementsTree>(
     () => ({
       actions: new SyncExecutor(),
       activeDnDData: [],
-      loading: options.settings?.saveExpanded || false,
       get filter(): string {
         return this.userData.filter;
       },
@@ -390,7 +413,7 @@ export function useElementsTree(options: IOptions): IElementsTree {
         return this.filter !== '';
       },
       isLoading(): boolean {
-        return this.loading;
+        return loadingNodes.size > 0;
       },
       isLoaded(): boolean {
         return navNodeInfoResource.isLoaded(this.root);
@@ -424,7 +447,7 @@ export function useElementsTree(options: IOptions): IElementsTree {
       },
       isNodeExpandable(nodeId: string): boolean {
         if (nodeId === this.root) {
-          return true;
+          return false;
         }
 
         if (options.expandStateGetters?.length) {
@@ -503,7 +526,19 @@ export function useElementsTree(options: IOptions): IElementsTree {
 
         await options.onFilter?.(value);
       },
-      collapse() {
+      async collapse(nodeId?: string) {
+        if (nodeId !== undefined) {
+          if (!this.isNodeExpandable(nodeId)) {
+            return;
+          }
+
+          const treeNodeState = this.state.get(nodeId);
+
+          treeNodeState.expanded = false;
+          treeNodeState.showInFilter = false;
+          return;
+        }
+
         for (const state of this.state.values()) {
           state.expanded = false;
           state.showInFilter = false;
@@ -664,7 +699,6 @@ export function useElementsTree(options: IOptions): IElementsTree {
       root: observable.ref,
       filter: computed,
       filtering: computed,
-      loading: observable.ref,
       renderers: observable.ref,
       nodeInfoTransformers: observable.ref,
       baseRoot: observable.ref,
@@ -682,7 +716,7 @@ export function useElementsTree(options: IOptions): IElementsTree {
       nodeInfoTransformers: options.nodeInfoTransformers,
       userData,
     },
-    ['isLoading', 'isLoaded'],
+    ['isLoaded'],
   );
 
   useEffect(() => {
@@ -725,6 +759,21 @@ export function useElementsTree(options: IOptions): IElementsTree {
   });
 
   useExecutor({
+    executor: navNodeInfoResource.onItemDelete,
+    handlers: [
+      function deleteNodeState(key) {
+        runInAction(() => {
+          if (!options.settings?.saveExpanded) {
+            ResourceKeyUtils.forEach(key, key => {
+              state.delete(key);
+            });
+          }
+        });
+      },
+    ],
+  });
+
+  useExecutor({
     executor: projectInfoResource.onDataOutdated,
     handlers: [() => navTreeResource.markOutdated(ROOT_NODE_PATH)],
   });
@@ -739,19 +788,6 @@ export function useElementsTree(options: IOptions): IElementsTree {
           if (!children) {
             functionsRef.exitNodeFolder(key);
           }
-        });
-      },
-    ],
-  });
-
-  useExecutor({
-    executor: navNodeInfoResource.onItemDelete,
-    handlers: [
-      function deleteNodeState(key) {
-        runInAction(() => {
-          ResourceKeyUtils.forEach(key, key => {
-            state.delete(key);
-          });
         });
       },
     ],

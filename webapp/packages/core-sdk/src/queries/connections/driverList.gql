@@ -1,4 +1,10 @@
-query driverList($driverId: ID, $includeProviderProperties: Boolean!, $includeDriverProperties: Boolean!, $includeDriverParameters: Boolean!, $includeDriverLibraries: Boolean!) {
+query driverList(
+  $driverId: ID
+  $includeProviderProperties: Boolean!
+  $includeMainProperties: Boolean!
+  $includeDriverProperties: Boolean!
+  $includeDriverParameters: Boolean!
+) {
   drivers: driverList(id: $driverId) {
     ...DatabaseDriver
   }

@@ -33,7 +33,12 @@ import org.jkiss.dbeaver.model.DBPDataSource;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
 import org.jkiss.dbeaver.model.DBUtils;
 import org.jkiss.dbeaver.model.data.DBDAttributeBinding;
-import org.jkiss.dbeaver.model.exec.*;
+import org.jkiss.dbeaver.model.exec.DBCException;
+import org.jkiss.dbeaver.model.exec.DBCLogicalOperator;
+import org.jkiss.dbeaver.model.exec.DBExecUtils;
+import org.jkiss.dbeaver.model.exec.trace.DBCTrace;
+import org.jkiss.dbeaver.model.exec.trace.DBCTraceDynamic;
+import org.jkiss.dbeaver.model.exec.trace.DBCTraceProperty;
 import org.jkiss.dbeaver.model.impl.sql.BasicSQLDialect;
 import org.jkiss.dbeaver.model.navigator.DBNNode;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
@@ -48,7 +53,6 @@ import org.jkiss.dbeaver.model.sql.parser.SQLScriptParser;
 import org.jkiss.dbeaver.model.sql.registry.SQLGeneratorConfigurationRegistry;
 import org.jkiss.dbeaver.model.sql.registry.SQLGeneratorDescriptor;
 import org.jkiss.dbeaver.model.struct.DBSDataContainer;
-import org.jkiss.dbeaver.model.struct.DBSEntity;
 import org.jkiss.dbeaver.model.struct.DBSObject;
 import org.jkiss.dbeaver.model.struct.DBSWrapper;
 import org.jkiss.dbeaver.utils.RuntimeUtils;
@@ -454,6 +458,21 @@ public class WebServiceSQL implements DBWServiceSQL {
         return contextInfo.getProcessor().getWebSession().createAndRunAsyncTask("Read data from container " + nodePath, runnable);
     }
 
+    @NotNull
+    @Override
+    public List<DBCTraceProperty> readDynamicTrace(
+        @NotNull WebSession webSession,
+        @NotNull WebSQLContextInfo contextInfo,
+        @NotNull String resultsId
+    ) throws DBException {
+        WebSQLResultsInfo resultsInfo = contextInfo.getResults(resultsId);
+        DBCTrace trace = resultsInfo.getTrace();
+        if (trace instanceof DBCTraceDynamic traceDynamic) {
+            return traceDynamic.getTraceProperties(webSession.getProgressMonitor());
+        }
+        throw new DBWebException("Dynamic trace is not found in provided results info");
+    }
+
     @Override
     public WebSQLExecuteInfo asyncGetQueryResults(@NotNull WebSession webSession, @NotNull String taskId) throws DBWebException {
         WebAsyncTaskInfo taskStatus = webSession.asyncTaskStatus(taskId, false);
@@ -556,7 +575,7 @@ public class WebServiceSQL implements DBWServiceSQL {
                 try {
                     monitor.beginTask("Get row data count", 1);
                     WebSQLResultsInfo results = contextInfo.getResults(resultsId);
-                    long rowCount = DBUtils.readRowCount(webSession.getProgressMonitor(), contextInfo.getProcessor().getExecutionContext(), results.getDataContainer(), null, this);
+                    long rowCount = DBUtils.readRowCount(monitor, contextInfo.getProcessor().getExecutionContext(), results.getDataContainer(), null, this);
                     this.result = "Row data count completed";
                     this.extendedResults = rowCount;
                 } catch (Throwable e) {
@@ -577,6 +596,21 @@ public class WebServiceSQL implements DBWServiceSQL {
             return (Long) taskStatus.getExtendedResult();
         }
         return null;
+    }
+
+    @Override
+    public WebAsyncTaskInfo asyncSqlSetAutoCommit(@NotNull WebSession webSession, @NotNull WebSQLContextInfo contextInfo, boolean autoCommit) throws DBWebException {
+        return contextInfo.setAutoCommit(autoCommit);
+    }
+
+    @Override
+    public WebAsyncTaskInfo asyncSqlRollbackTransaction(@NotNull WebSession webSession, @NotNull WebSQLContextInfo contextInfo) throws DBWebException {
+        return contextInfo.rollbackTransaction();
+    }
+
+    @Override
+    public WebAsyncTaskInfo asyncSqlCommitTransaction(@NotNull WebSession webSession, @NotNull WebSQLContextInfo contextInfo) {
+        return contextInfo.commitTransaction();
     }
 
 }

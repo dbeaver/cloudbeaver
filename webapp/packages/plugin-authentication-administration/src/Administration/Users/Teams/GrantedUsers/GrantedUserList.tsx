@@ -9,9 +9,10 @@ import { observable } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import { useCallback, useState } from 'react';
 
-import { UsersResource } from '@cloudbeaver/core-authentication';
+import { TeamRolesResource, UsersResource } from '@cloudbeaver/core-authentication';
 import {
   Button,
+  Container,
   getComputed,
   getSelectedItems,
   Group,
@@ -21,39 +22,45 @@ import {
   TableColumnValue,
   TableItem,
   useObjectRef,
+  useResource,
   useS,
   useTranslate,
 } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import type { TLocalizationToken } from '@cloudbeaver/core-localization';
-import type { AdminUserInfoFragment } from '@cloudbeaver/core-sdk';
+import { ServerConfigResource } from '@cloudbeaver/core-root';
 
 import { getFilteredUsers } from './getFilteredUsers';
-import style from './GrantedUserList.m.css';
+import style from './GrantedUserList.module.css';
 import { GrantedUsersTableHeader, IFilterState } from './GrantedUsersTableHeader/GrantedUsersTableHeader';
 import { GrantedUsersTableInnerHeader } from './GrantedUsersTableHeader/GrantedUsersTableInnerHeader';
 import { GrantedUsersTableItem } from './GrantedUsersTableItem';
+import type { IGrantedUser } from './IGrantedUser';
 
 interface Props {
-  grantedUsers: AdminUserInfoFragment[];
+  grantedUsers: IGrantedUser[];
   disabled: boolean;
   onRevoke: (subjectIds: string[]) => void;
+  onTeamRoleAssign: (subjectId: string, teamRole: string | null) => void;
   onEdit: () => void;
 }
 
-export const GrantedUserList = observer<Props>(function GrantedUserList({ grantedUsers, disabled, onRevoke, onEdit }) {
+export const GrantedUserList = observer<Props>(function GrantedUserList({ grantedUsers, disabled, onRevoke, onTeamRoleAssign, onEdit }) {
   const styles = useS(style);
   const props = useObjectRef({ onRevoke, onEdit });
   const translate = useTranslate();
 
   const usersResource = useService(UsersResource);
+  const serverConfigResource = useService(ServerConfigResource);
+
+  const teamRolesResource = useResource(GrantedUserList, TeamRolesResource, undefined);
 
   const [selectedSubjects] = useState<Map<any, boolean>>(() => observable(new Map()));
   const [filterState] = useState<IFilterState>(() => observable({ filterValue: '' }));
 
   const selected = getComputed(() => Array.from(selectedSubjects.values()).some(v => v));
 
-  const users = getFilteredUsers(grantedUsers, filterState.filterValue);
+  const users = getFilteredUsers(grantedUsers, filterState.filterValue) as IGrantedUser[];
   const keys = users.map(user => user.userId);
 
   const revoke = useCallback(() => {
@@ -70,49 +77,54 @@ export const GrantedUserList = observer<Props>(function GrantedUserList({ grante
     }
   }
 
+  function isEditable(userId: string) {
+    if (serverConfigResource.distributed) {
+      return true;
+    }
+
+    return !usersResource.isActiveUser(userId);
+  }
+
   return (
-    <Group className={s(styles, { box: true })} box medium overflow>
-      <div className={s(styles, { innerBox: true })}>
-        <GrantedUsersTableHeader className={s(styles, { header: true })} filterState={filterState} disabled={disabled}>
+    <Group className={s(styles, { group: true })} box border medium overflow vertical>
+      <GrantedUsersTableHeader className={s(styles, { header: true })} filterState={filterState} disabled={disabled}>
+        <Container keepSize>
           <Button disabled={disabled || !selected} mod={['outlined']} onClick={revoke}>
             {translate('ui_delete')}
           </Button>
+        </Container>
+        <Container keepSize>
           <Button disabled={disabled} mod={['unelevated']} onClick={props.onEdit}>
             {translate('ui_edit')}
           </Button>
-        </GrantedUsersTableHeader>
-        <div className={s(styles, { tableBox: true })}>
-          <Table
-            className={s(styles, { table: true })}
-            keys={keys}
-            selectedItems={selectedSubjects}
-            isItemSelectable={item => !usersResource.isActiveUser(item)}
-          >
-            <GrantedUsersTableInnerHeader disabled={disabled} />
-            <TableBody>
-              {tableInfoText && (
-                <TableItem item="tableInfo" selectDisabled>
-                  <TableColumnValue colSpan={5}>{translate(tableInfoText)}</TableColumnValue>
-                </TableItem>
-              )}
-              {users.map(user => {
-                const activeUser = usersResource.isActiveUser(user.userId);
-                return (
-                  <GrantedUsersTableItem
-                    key={user.userId}
-                    id={user.userId}
-                    name={`${user.userId}${activeUser ? ' (you)' : ''}`}
-                    tooltip={activeUser ? translate('administration_teams_team_granted_users_permission_denied') : user.userId}
-                    icon="/icons/user.svg"
-                    iconTooltip={translate('authentication_user_icon_tooltip')}
-                    disabled={disabled}
-                  />
-                );
-              })}
-            </TableBody>
-          </Table>
-        </div>
-      </div>
+        </Container>
+      </GrantedUsersTableHeader>
+      <Container overflow>
+        <Table keys={keys} selectedItems={selectedSubjects} isItemSelectable={item => isEditable(item)}>
+          <GrantedUsersTableInnerHeader disabled={disabled} showUserTeamRole={teamRolesResource.data.length > 0} />
+          <TableBody>
+            {tableInfoText && (
+              <TableItem item="tableInfo" selectDisabled>
+                <TableColumnValue colSpan={5}>{translate(tableInfoText)}</TableColumnValue>
+              </TableItem>
+            )}
+            {users.map(user => (
+              <GrantedUsersTableItem
+                key={user.userId}
+                id={user.userId}
+                name={`${user.userId}${usersResource.isActiveUser(user.userId) ? ` (${translate('ui_you')})` : ''}`}
+                tooltip={isEditable(user.userId) ? user.userId : translate('administration_teams_team_granted_users_permission_denied')}
+                icon="/icons/user.svg"
+                iconTooltip={translate('authentication_user_icon_tooltip')}
+                teamRole={user.teamRole}
+                teamRoles={teamRolesResource.data}
+                disabled={disabled}
+                onTeamRoleAssign={onTeamRoleAssign}
+              />
+            ))}
+          </TableBody>
+        </Table>
+      </Container>
     </Group>
   );
 });

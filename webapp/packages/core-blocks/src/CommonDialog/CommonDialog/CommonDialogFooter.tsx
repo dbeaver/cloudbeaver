@@ -7,20 +7,17 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import type { ComponentStyle } from '@cloudbeaver/core-theming';
-
 import { s } from '../../s';
 import { useS } from '../../useS';
-import styles from './CommonDialogFooter.m.css';
+import styles from './CommonDialogFooter.module.css';
 
 interface Props {
   className?: string;
   children?: React.ReactNode;
-  style?: ComponentStyle;
 }
 
-export const CommonDialogFooter = observer<Props>(function CommonDialogFooter({ children, className, style }) {
-  const computedStyles = useS(styles, style);
+export const CommonDialogFooter = observer<Props>(function CommonDialogFooter({ children, className }) {
+  const computedStyles = useS(styles);
 
   return <footer className={s(computedStyles, { footer: true }, className)}>{children}</footer>;
 });

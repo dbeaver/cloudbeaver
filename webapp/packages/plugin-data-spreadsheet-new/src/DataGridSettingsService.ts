@@ -9,35 +9,41 @@ import { Dependency, injectable } from '@cloudbeaver/core-di';
 import {
   createSettingsAliasResolver,
   ESettingsValueType,
-  PluginManagerService,
-  PluginSettings,
+  ROOT_SETTINGS_LAYER,
   SettingsManagerService,
-} from '@cloudbeaver/core-plugin';
-import { ServerSettingsResolverService, ServerSettingsService } from '@cloudbeaver/core-root';
-import { schema } from '@cloudbeaver/core-utils';
+  SettingsProvider,
+  SettingsProviderService,
+  SettingsResolverService,
+} from '@cloudbeaver/core-settings';
+import { schema, schemaExtra } from '@cloudbeaver/core-utils';
 import { DATA_EDITOR_SETTINGS_GROUP } from '@cloudbeaver/plugin-data-viewer';
 
 const defaultSettings = schema.object({
-  hidden: schema.coerce.boolean().default(false),
+  'plugin.data-spreadsheet.hidden': schemaExtra.stringedBoolean().default(false),
 });
 
 export type DataGridSettings = schema.infer<typeof defaultSettings>;
 
 @injectable()
 export class DataGridSettingsService extends Dependency {
-  readonly settings: PluginSettings<typeof defaultSettings>;
+  get hidden(): boolean {
+    return this.settings.getValue('plugin.data-spreadsheet.hidden');
+  }
+  readonly settings: SettingsProvider<typeof defaultSettings>;
 
   constructor(
-    private readonly pluginManagerService: PluginManagerService,
+    private readonly settingsProviderService: SettingsProviderService,
     private readonly settingsManagerService: SettingsManagerService,
-    private readonly serverSettingsService: ServerSettingsService,
-    private readonly serverSettingsResolverService: ServerSettingsResolverService,
+    private readonly settingsResolverService: SettingsResolverService,
   ) {
     super();
-    this.settings = this.pluginManagerService.createSettings('data-spreadsheet', 'plugin', defaultSettings);
-    this.serverSettingsResolverService.addResolver(
+    this.settings = this.settingsProviderService.createSettings(defaultSettings);
+    this.settingsResolverService.addResolver(
+      ROOT_SETTINGS_LAYER,
       /** @deprecated Use settings instead, will be removed in 23.0.0 */
-      createSettingsAliasResolver(this.serverSettingsService, this.settings, 'plugin_data_spreadsheet_new'),
+      createSettingsAliasResolver(this.settingsResolverService, this.settings, {
+        'plugin.data-spreadsheet.hidden': 'plugin_data_spreadsheet_new.hidden',
+      }),
     );
 
     this.registerSettings();
@@ -47,9 +53,13 @@ export class DataGridSettingsService extends Dependency {
     this.settingsManagerService.registerSettings(this.settings, () => [
       {
         group: DATA_EDITOR_SETTINGS_GROUP,
-        key: 'hidden',
+        key: 'plugin.data-spreadsheet.hidden',
+        access: {
+          scope: ['server'],
+        },
         type: ESettingsValueType.Checkbox,
         name: 'plugin_data_spreadsheet_new_settings_disable',
+        description: 'plugin_data_spreadsheet_new_settings_disable_description',
       },
     ]);
   }

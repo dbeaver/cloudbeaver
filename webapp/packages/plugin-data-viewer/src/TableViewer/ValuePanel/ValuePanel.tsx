@@ -7,55 +7,37 @@
  */
 import { observable } from 'mobx';
 import { observer } from 'mobx-react-lite';
-import styled, { css } from 'reshadow';
 
+import { s, SContext, type StyleRegistry, useS } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { BASE_TAB_STYLES, TabList, TabPanelList, TabsState, UNDERLINE_TAB_STYLES } from '@cloudbeaver/core-ui';
+import { TabList, TabPanelList, TabPanelStyles, TabsState, TabStyles } from '@cloudbeaver/core-ui';
 import { MetadataMap } from '@cloudbeaver/core-utils';
 
 import { DatabaseDataResultAction } from '../../DatabaseDataModel/Actions/DatabaseDataResultAction';
 import { DatabaseMetadataAction } from '../../DatabaseDataModel/Actions/DatabaseMetadataAction';
 import { DatabaseSelectAction } from '../../DatabaseDataModel/Actions/DatabaseSelectAction';
-import type { IDatabaseResultSet } from '../../DatabaseDataModel/IDatabaseResultSet';
 import type { DataPresentationComponent } from '../../DataPresentationService';
 import { DataValuePanelService } from './DataValuePanelService';
+import styles from './shared/ValuePanel.module.css';
+import ValuePanelEditorTabPanel from './shared/ValuePanelEditorTabPanel.module.css';
+import ValuePanelEditorTabs from './shared/ValuePanelEditorTabs.module.css';
+import ValuePanelTab from './shared/ValuePanelTab.module.css';
 
-const styles = css`
-  table-left-bar {
-    display: flex;
-  }
-  TabList {
-    composes: theme-border-color-background from global;
-    position: relative;
+const tabListRegistry: StyleRegistry = [[TabStyles, { mode: 'append', styles: [ValuePanelTab] }]];
 
-    &:before {
-      content: '';
-      position: absolute;
-      bottom: 0;
-      width: 100%;
-      border-bottom: solid 2px;
-      border-color: inherit;
-    }
-  }
-  TabList tab-outer:only-child {
-    display: none;
-  }
-  TabPanel {
-    padding-top: 8px;
-  }
-  TabList,
-  TabPanel {
-    composes: theme-background-secondary theme-text-on-secondary from global;
-  }
-`;
+const tabPanelListRegistry: StyleRegistry = [
+  [TabStyles, { mode: 'append', styles: [ValuePanelEditorTabs] }],
+  [TabPanelStyles, { mode: 'append', styles: [ValuePanelEditorTabPanel] }],
+];
 
-export const ValuePanel: DataPresentationComponent<any, IDatabaseResultSet> = observer(function ValuePanel({ dataFormat, model, resultIndex }) {
+export const ValuePanel: DataPresentationComponent = observer(function ValuePanel({ dataFormat, model, resultIndex }) {
   const service = useService(DataValuePanelService);
   const selectAction = model.source.getActionImplementation(resultIndex, DatabaseSelectAction);
   const dataResultAction = model.source.getActionImplementation(resultIndex, DatabaseDataResultAction);
   const metadataAction = model.source.getAction(resultIndex, DatabaseMetadataAction);
   const activeElements = selectAction?.getActiveElements();
   let elementKey: string | null = null;
+  const style = useS(styles);
 
   if (dataResultAction && activeElements && activeElements.length > 0) {
     elementKey = dataResultAction.getIdentifier(activeElements[0]);
@@ -84,11 +66,7 @@ export const ValuePanel: DataPresentationComponent<any, IDatabaseResultSet> = ob
     currentTabId = displayed[0].key;
   }
 
-  return styled(
-    BASE_TAB_STYLES,
-    styles,
-    UNDERLINE_TAB_STYLES,
-  )(
+  return (
     <TabsState
       currentTabId={currentTabId}
       container={service.tabs}
@@ -99,8 +77,12 @@ export const ValuePanel: DataPresentationComponent<any, IDatabaseResultSet> = ob
       lazy
       onChange={tab => state.setCurrentTabId(tab.tabId)}
     >
-      <TabList style={[BASE_TAB_STYLES, styles, UNDERLINE_TAB_STYLES]} />
-      <TabPanelList style={[BASE_TAB_STYLES, styles, UNDERLINE_TAB_STYLES]} />
-    </TabsState>,
+      <SContext registry={tabListRegistry}>
+        <TabList className={s(style, { tabList: true })} underline />
+      </SContext>
+      <SContext registry={tabPanelListRegistry}>
+        <TabPanelList />
+      </SContext>
+    </TabsState>
   );
 });

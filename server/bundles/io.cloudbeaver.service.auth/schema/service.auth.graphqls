@@ -134,13 +134,21 @@ type UserInfo {
     metaParameters: Object!
     # User configuration parameters
     configurationParameters: Object!
+    # User teams
+    teams: [UserTeamInfo!]!
+}
 
+type UserTeamInfo {
+    teamId: String!
+    teamName: String!
+    teamRole: String
 }
 
 extend type Query {
 
     # Authorize user using specified auth provider. If linkUser=true then associates new
-    authLogin(provider: ID!, configuration: ID, credentials: Object, linkUser: Boolean): AuthInfo!
+    # If forceSessionsLogout=true then kill another sessions
+    authLogin(provider: ID!, configuration: ID, credentials: Object, linkUser: Boolean, forceSessionsLogout: Boolean): AuthInfo!
 
     authUpdateStatus(authId: ID!, linkUser: Boolean): AuthInfo!
 
@@ -163,9 +171,12 @@ extend type Query {
 
 }
 
+
 extend type Mutation {
 
     # Set user config parameter. If parameter value is null then removes the parameter
     setUserConfigurationParameter(name: String!, value: Object): Boolean!
+    # Updates user preferences
+    setUserPreferences(preferences: Object!): UserInfo! @since(version: "24.0.1")
 
 }

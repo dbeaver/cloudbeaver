@@ -1,3 +1,10 @@
+/*
+ * CloudBeaver - Cloud Database Manager
+ * Copyright (C) 2020-2024 DBeaver Corp and others
+ *
+ * Licensed under the Apache License, Version 2.0.
+ * you may not use this file except in compliance with the License.
+ */
 export default [
   ['name', 'zh'],
   ['ui_rename_taken_or_invalid', 'This name is unavailable or invalid'],
@@ -11,12 +18,16 @@ export default [
   ['ui_processing_loading', '加载中...'],
   ['ui_processing_cancel', '取消'],
   ['ui_processing_canceling', '取消中...'],
+  ['ui_processing_canceled', 'Canceled'],
   ['ui_processing_retry', '重试'],
   ['ui_processing_ok', '好'],
   ['ui_processing_create', '创建'],
   ['ui_processing_save', '保存'],
+  ['ui_processing_saving', 'Saving...'],
+  ['ui_processing_do_you_want_to_proceed', 'Do you want to proceed?'],
   ['ui_processing_saved', 'Saved'],
   ['ui_processing_stop', 'Stop'],
+  ['ui_processing_skip', 'Skip'],
   ['ui_second_first_form', '{arg:interval} second'],
   ['ui_second_second_form', '{arg:interval} seconds'],
   ['ui_second_third_form', '{arg:interval} seconds'],
@@ -38,6 +49,10 @@ export default [
   ['ui_search', '搜索...'],
   ['ui_delete', '删除'],
   ['ui_add', '添加'],
+  ['ui_revert', 'Revert'],
+  ['ui_undo', 'Undo'],
+  ['ui_redo', 'Redo'],
+  ['ui_duplicate', 'Duplicate'],
   ['ui_refresh', '刷新'],
   ['ui_data_saving_error', '保存出错'],
   ['ui_data_remove_confirmation', 'Remove confirmation'],
@@ -64,6 +79,8 @@ export default [
   ['ui_rename', '重命名'],
   ['ui_rename_processing', '重命名中...'],
   ['ui_name', '名称'],
+  ['ui_value', 'Value'],
+  ['ui_description', 'Description'],
   ['ui_interval', 'Interval'],
   ['ui_cant_delete_item', '此项目不能删除'],
   ['ui_no_items_placeholder', '还没有项目'],
@@ -111,6 +128,7 @@ export default [
   ['ui_readonly', '只读'],
   ['ui_test', 'Test'],
   ['ui_export', 'Export'],
+  ['ui_you', 'You'],
   ['ui_ms', 'ms'],
 
   ['root_permission_denied', '您没有权限'],

@@ -7,110 +7,18 @@
  */
 import { observer } from 'mobx-react-lite';
 import { useCallback, useLayoutEffect, useRef, useState } from 'react';
-import styled, { css, use } from 'reshadow';
+
+import { isNotNullDefined } from '@cloudbeaver/core-utils';
 
 import { ShadowInput } from '../FormControls/ShadowInput';
 import { Icon } from '../Icon';
 import { IconOrImage } from '../IconOrImage';
 import { useTranslate } from '../localization/useTranslate';
+import { s } from '../s';
+import { useS } from '../useS';
 import type { IProperty } from './IProperty';
+import classes from './PropertyItem.module.css';
 import { PropertyValueSelector } from './PropertyValueSelector';
-
-const styles = css`
-  [|error] {
-    composes: theme-text-error from global;
-  }
-  property-item,
-  button {
-    composes: theme-ripple from global;
-  }
-  property-item {
-    box-sizing: border-box;
-    display: inline-flex;
-    padding: 0px 1px;
-  }
-  property-name,
-  property-value {
-    composes: theme-typography--caption from global;
-    position: relative;
-    display: flex;
-    align-items: center;
-    box-sizing: border-box;
-    flex: 1;
-    padding: 4px 0;
-
-    & ShadowInput {
-      height: 24px;
-      padding: 0 36px 0 12px;
-    }
-  }
-  property-value,
-  property-name {
-    margin-left: 24px;
-  }
-  property-name {
-    flex: 0 0 auto;
-    width: 276px;
-  }
-  property-remove {
-    position: relative;
-    flex: 0 0 auto;
-    align-items: center;
-    display: flex;
-    opacity: 0;
-  }
-  property-select {
-    flex: 0 0 auto;
-    align-items: center;
-    display: flex;
-  }
-  property-item:hover property-remove {
-    opacity: 1;
-  }
-  ShadowInput {
-    composes: theme-background-surface from global;
-  }
-  property-name ShadowInput,
-  property-value ShadowInput {
-    box-sizing: border-box;
-    font: inherit;
-    color: inherit;
-    width: 100%;
-    outline: none;
-
-    &[|edited] {
-      font-weight: 600;
-    }
-    &:global([readonly]),
-    &:not(:focus):not([|focus]) {
-      background: transparent !important;
-      border: solid 2px transparent !important;
-    }
-  }
-  Icon,
-  IconOrImage {
-    height: 16px;
-    display: block;
-  }
-  property-select Icon,
-  property-select IconOrImage {
-    &[|focus] {
-      transform: rotate(180deg);
-    }
-  }
-  button {
-    background: transparent;
-    outline: none;
-    padding: 4px;
-    cursor: pointer;
-  }
-  button,
-  PropertyValueSelector {
-    composes: theme-form-element-radius from global;
-    margin: 2px;
-    overflow: hidden;
-  }
-`;
 
 interface Props {
   property: IProperty;
@@ -123,6 +31,7 @@ interface Props {
 }
 
 export const PropertyItem = observer<Props>(function PropertyItem({ property, value, onNameChange, onValueChange, onRemove, error, readOnly }) {
+  const styles = useS(classes);
   const translate = useTranslate();
   const isDeletable = !readOnly && !property.displayName;
   const edited = value !== undefined && value !== property.defaultValue;
@@ -146,13 +55,14 @@ export const PropertyItem = observer<Props>(function PropertyItem({ property, va
 
   const focus = menuOpen;
   const keyPlaceholder = String(property.keyPlaceholder);
-  const valuePlaceholder = String(property.valuePlaceholder);
+  const valuePlaceholder = isNotNullDefined(property.valuePlaceholder) ? String(property.valuePlaceholder) : '';
 
-  return styled(styles)(
-    <property-item>
-      <property-name title={property.description} {...use({ error })}>
+  return (
+    <div className={s(styles, { container: true })}>
+      <div className={s(styles, { name: true, error })} title={property.description}>
         <ShadowInput
           ref={keyInputRef}
+          className={s(styles, { shadowInput: true })}
           type="text"
           name={property.id}
           placeholder={keyPlaceholder}
@@ -162,9 +72,10 @@ export const PropertyItem = observer<Props>(function PropertyItem({ property, va
         >
           {property.displayName || property.key}
         </ShadowInput>
-      </property-name>
-      <property-value ref={setValueRef} title={String(propertyValue)}>
+      </div>
+      <div ref={setValueRef} className={s(styles, { value: true })} title={String(propertyValue)}>
         <ShadowInput
+          className={s(styles, { shadowInput: true, edited })}
           type="text"
           name={`${property.id}_value`}
           placeholder={valuePlaceholder}
@@ -172,38 +83,38 @@ export const PropertyItem = observer<Props>(function PropertyItem({ property, va
           readOnly={readOnly}
           data-focus={focus}
           onChange={handleValueChange}
-          {...use({ focus, edited })}
         >
           {propertyValue}
         </ShadowInput>
         {edited && !isDeletable && (
-          <property-remove title={translate('core_blocks_properties_table_item_reset')}>
-            <button type="button" onClick={handleRevert}>
-              <IconOrImage icon="/icons/data_revert_all_sm.svg" viewBox="0 0 16 16" />
+          <div className={s(styles, { remove: true })} title={translate('core_blocks_properties_table_item_reset')}>
+            <button className={s(styles, { button: true })} type="button" onClick={handleRevert}>
+              <IconOrImage className={s(styles, { iconOrImage: true })} icon="/icons/data_revert_all_sm.svg" viewBox="0 0 16 16" />
             </button>
-          </property-remove>
+          </div>
         )}
         {isDeletable && (
-          <property-remove title={translate('core_blocks_properties_table_item_remove')}>
-            <button type="button" onClick={handleRemove}>
-              <Icon name="reject" viewBox="0 0 11 11" />
+          <div className={s(styles, { remove: true })} title={translate('core_blocks_properties_table_item_remove')}>
+            <button className={s(styles, { button: true })} type="button" onClick={handleRemove}>
+              <Icon className={s(styles, { icon: true })} name="reject" viewBox="0 0 11 11" />
             </button>
-          </property-remove>
+          </div>
         )}
         {!readOnly && property.validValues && property.validValues.length > 0 && (
-          <property-select>
+          <div className={s(styles, { select: true })}>
             <PropertyValueSelector
+              className={s(styles, { propertyValueSelector: true })}
               propertyName={property.id}
               values={property.validValues}
               container={valueRef}
               onSelect={handleValueChange}
               onSwitch={setMenuOpen}
             >
-              <Icon name="arrow" viewBox="0 0 16 16" {...use({ focus })} />
+              <Icon className={s(styles, { icon: true, focus })} name="arrow" viewBox="0 0 16 16" />
             </PropertyValueSelector>
-          </property-select>
+          </div>
         )}
-      </property-value>
-    </property-item>,
+      </div>
+    </div>
   );
 });

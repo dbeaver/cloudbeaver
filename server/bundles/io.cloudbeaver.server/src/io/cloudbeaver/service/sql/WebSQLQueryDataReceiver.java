@@ -18,12 +18,15 @@ package io.cloudbeaver.service.sql;
 
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.server.CBApplication;
+import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBPDataKind;
 import org.jkiss.dbeaver.model.DBUtils;
 import org.jkiss.dbeaver.model.data.*;
 import org.jkiss.dbeaver.model.exec.*;
+import org.jkiss.dbeaver.model.exec.trace.DBCTrace;
+import org.jkiss.dbeaver.model.exec.trace.DBCTraceDynamic;
 import org.jkiss.dbeaver.model.impl.data.DBDValueError;
 import org.jkiss.dbeaver.model.meta.MetaData;
 import org.jkiss.dbeaver.model.sql.DBQuotaException;
@@ -32,7 +35,10 @@ import org.jkiss.dbeaver.model.struct.DBSEntity;
 import org.jkiss.utils.CommonUtils;
 
 import java.lang.reflect.Method;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 class WebSQLQueryDataReceiver implements DBDDataReceiver {
@@ -44,6 +50,7 @@ class WebSQLQueryDataReceiver implements DBDDataReceiver {
     private final WebSQLQueryResultSet webResultSet = new WebSQLQueryResultSet();
 
     private DBDAttributeBinding[] bindings;
+    private DBCTrace trace;
     private List<WebSQLQueryResultSetRow> rows = new ArrayList<>();
     private final Number rowLimit;
 
@@ -59,18 +66,21 @@ class WebSQLQueryDataReceiver implements DBDDataReceiver {
     }
 
     @Override
-    public void fetchStart(DBCSession session, DBCResultSet dbResult, long offset, long maxRows) throws DBCException {
+    public void fetchStart(@NotNull DBCSession session, @NotNull DBCResultSet dbResult, long offset, long maxRows) throws DBCException {
         DBCResultSetMetaData meta = dbResult.getMeta();
-        List<DBCAttributeMetaData> attributes = meta.getAttributes();
+        List<? extends DBCAttributeMetaData> attributes = meta.getAttributes();
         bindings = new DBDAttributeBindingMeta[attributes.size()];
         for (int i = 0; i < attributes.size(); i++) {
             DBCAttributeMetaData attrMeta = attributes.get(i);
             bindings[i] = new DBDAttributeBindingMeta(dataContainer, dbResult.getSession(), attrMeta);
         }
+        if (dbResult instanceof DBCResultSetTrace resultSetTrace) {
+            this.trace = resultSetTrace.getExecutionTrace();
+        }
     }
 
     @Override
-    public void fetchRow(DBCSession session, DBCResultSet resultSet) throws DBCException {
+    public void fetchRow(@NotNull DBCSession session, @NotNull DBCResultSet resultSet) throws DBCException {
 
         Map<String, Object> metaDataMap = null;
         Object[] row = new Object[bindings.length];
@@ -111,7 +121,7 @@ class WebSQLQueryDataReceiver implements DBDDataReceiver {
     }
 
     @Override
-    public void fetchEnd(DBCSession session, DBCResultSet resultSet) throws DBCException {
+    public void fetchEnd(@NotNull DBCSession session, @NotNull DBCResultSet resultSet) throws DBCException {
 
         WebSession webSession = contextInfo.getProcessor().getWebSession();
         DBSEntity entity = dataContainer instanceof DBSEntity ? (DBSEntity) dataContainer : null;
@@ -149,8 +159,9 @@ class WebSQLQueryDataReceiver implements DBDDataReceiver {
         webResultSet.setRows(List.of(rows.toArray(new WebSQLQueryResultSetRow[0])));
         webResultSet.setHasChildrenCollection(resultSet instanceof DBDSubCollectionResultSet);
         webResultSet.setSupportsDataFilter(dataContainer.isFeatureSupported(DBSDataContainer.FEATURE_DATA_FILTER));
+        webResultSet.setHasDynamicTrace(trace instanceof DBCTraceDynamic);
 
-        WebSQLResultsInfo resultsInfo = contextInfo.saveResult(dataContainer, bindings);
+        WebSQLResultsInfo resultsInfo = contextInfo.saveResult(dataContainer, trace, bindings);
         webResultSet.setResultsInfo(resultsInfo);
 
         boolean isSingleEntity = DBExecUtils.detectSingleSourceTable(bindings) != null;

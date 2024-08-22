@@ -21,6 +21,7 @@ import io.cloudbeaver.registry.WebServiceRegistry;
 import io.cloudbeaver.server.CBApplication;
 import io.cloudbeaver.server.CBPlatform;
 import io.cloudbeaver.service.security.PasswordPolicyConfiguration;
+import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.model.meta.Property;
 import org.jkiss.dbeaver.model.navigator.DBNBrowseSettings;
 import org.jkiss.dbeaver.registry.language.PlatformLanguageDescriptor;
@@ -46,7 +47,7 @@ public class WebServerConfig {
 
     @Property
     public String getName() {
-        return CommonUtils.notEmpty(application.getServerName());
+        return CommonUtils.notEmpty(application.getServerConfiguration().getServerName());
     }
 
     @Property
@@ -61,12 +62,12 @@ public class WebServerConfig {
 
     @Property
     public String getServerURL() {
-        return CommonUtils.notEmpty(application.getServerURL());
+        return CommonUtils.notEmpty(application.getServerConfiguration().getServerURL());
     }
 
     @Property
     public String getRootURI() {
-        return CommonUtils.notEmpty(application.getRootURI());
+        return CommonUtils.notEmpty(application.getServerConfiguration().getRootURI());
     }
 
     @Deprecated
@@ -121,13 +122,18 @@ public class WebServerConfig {
     }
 
     @Property
+    public String getLicenseStatus() {
+        return application.getLicenseStatus();
+    }
+
+    @Property
     public boolean isConfigurationMode() {
         return application.isConfigurationMode();
     }
 
     @Property
     public boolean isDevelopmentMode() {
-        return application.isDevelMode();
+        return application.getServerConfiguration().isDevelMode();
     }
 
     @Property
@@ -142,7 +148,7 @@ public class WebServerConfig {
 
     @Property
     public long getSessionExpireTime() {
-        return application.getConfiguredMaxSessionIdleTime();
+        return application.getServerConfiguration().getMaxSessionIdleTime();
     }
 
     @Property
@@ -153,6 +159,12 @@ public class WebServerConfig {
     @Property
     public String[] getEnabledFeatures() {
         return application.getAppConfiguration().getEnabledFeatures();
+    }
+
+    @Property
+    @Nullable
+    public String[] getDisabledBetaFeatures() {
+        return application.getAppConfiguration().getDisabledBetaFeatures();
     }
 
     @Property

@@ -6,34 +6,54 @@
  * you may not use this file except in compliance with the License.
  */
 import { Dependency, injectable } from '@cloudbeaver/core-di';
-import { createSettingsAliasResolver, PluginManagerService, PluginSettings, SettingsManagerService } from '@cloudbeaver/core-plugin';
-import { ServerSettingsResolverService, ServerSettingsService } from '@cloudbeaver/core-root';
-import { schema } from '@cloudbeaver/core-utils';
+import {
+  createSettingsAliasResolver,
+  ROOT_SETTINGS_LAYER,
+  SettingsManagerService,
+  SettingsProvider,
+  SettingsProviderService,
+  SettingsResolverService,
+} from '@cloudbeaver/core-settings';
+import { schema, schemaExtra } from '@cloudbeaver/core-utils';
 
 const settingsSchema = schema.object({
-  childrenLimit: schema.coerce.number().default(100),
-  editing: schema.coerce.boolean().default(true),
-  deleting: schema.coerce.boolean().default(true),
+  'core.navigation-tree.childrenLimit': schema.coerce.number().min(10).max(1000).default(100),
+  'core.navigation-tree.editing': schemaExtra.stringedBoolean().default(true),
+  'core.navigation-tree.deleting': schemaExtra.stringedBoolean().default(true),
 });
 
 export type NavTreeSettings = schema.infer<typeof settingsSchema>;
 
 @injectable()
 export class NavTreeSettingsService extends Dependency {
-  readonly settings: PluginSettings<typeof settingsSchema>;
+  get childrenLimit(): number {
+    return this.settings.getValue('core.navigation-tree.childrenLimit');
+  }
+  get editing(): boolean {
+    return this.settings.getValue('core.navigation-tree.editing');
+  }
+  get deleting(): boolean {
+    return this.settings.getValue('core.navigation-tree.deleting');
+  }
+  readonly settings: SettingsProvider<typeof settingsSchema>;
 
   constructor(
-    private readonly pluginManagerService: PluginManagerService,
+    private readonly settingsProviderService: SettingsProviderService,
     private readonly settingsManagerService: SettingsManagerService,
-    private readonly serverSettingsService: ServerSettingsService,
-    private readonly serverSettingsResolverService: ServerSettingsResolverService,
+    private readonly settingsResolverService: SettingsResolverService,
   ) {
     super();
-    this.settings = this.pluginManagerService.createSettings('navigation-tree', 'core', settingsSchema);
-    this.serverSettingsResolverService.addResolver(
+    this.settings = this.settingsProviderService.createSettings(settingsSchema);
+    this.settingsResolverService.addResolver(
+      ROOT_SETTINGS_LAYER,
       /** @deprecated Use settings instead, will be removed in 23.0.0 */
-      createSettingsAliasResolver(this.serverSettingsService, this.settings, 'core.app.navigationTree'),
-      createSettingsAliasResolver(this.serverSettingsService, this.settings, 'core.app.metadata'),
+      createSettingsAliasResolver(this.settingsResolverService, this.settings, {
+        'core.navigation-tree.childrenLimit': 'core.app.navigationTree.childrenLimit',
+      }),
+      createSettingsAliasResolver(this.settingsResolverService, this.settings, {
+        'core.navigation-tree.deleting': 'core.app.metadata.deleting',
+        'core.navigation-tree.editing': 'core.app.metadata.editing',
+      }),
     );
 
     this.registerSettings();
@@ -42,8 +62,11 @@ export class NavTreeSettingsService extends Dependency {
   private registerSettings() {
     this.settingsManagerService.registerSettings(this.settings, () => [
       // {
-      //   group: NAVIGATION_TREE_SETTINGS_GROUP,
       //   key: 'childrenLimit',
+      //   access: {
+      //     accessor: ['server'],
+      //   },
+      //   group: NAVIGATION_TREE_SETTINGS_GROUP,
       //   name: 'Children limit',
       //   type: ESettingsValueType.Input,
       // },

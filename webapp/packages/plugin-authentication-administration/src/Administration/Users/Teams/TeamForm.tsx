@@ -7,26 +7,30 @@
  */
 import { observer } from 'mobx-react-lite';
 import { useEffect } from 'react';
-import { css } from 'reshadow';
 
 import type { TeamInfo } from '@cloudbeaver/core-authentication';
-import { Form, IconOrImage, Loader, Placeholder, s, useExecutor, useForm, useObjectRef, useS, useTranslate } from '@cloudbeaver/core-blocks';
+import {
+  Container,
+  Form,
+  Loader,
+  Placeholder,
+  s,
+  StatusMessage,
+  useExecutor,
+  useForm,
+  useObjectRef,
+  useS,
+  useTranslate,
+} from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
-import { BASE_TAB_STYLES, TabList, TabPanelList, TabsState, UNDERLINE_TAB_BIG_STYLES, UNDERLINE_TAB_STYLES } from '@cloudbeaver/core-ui';
+import { ENotificationType } from '@cloudbeaver/core-events';
+import { TabList, TabPanelList, TabsState } from '@cloudbeaver/core-ui';
 
 import { teamContext } from './Contexts/teamContext';
 import type { ITeamFormState } from './ITeamFormProps';
-import style from './TeamForm.m.css';
+import style from './TeamForm.module.css';
 import { ITeamFormActionsContext, TeamFormActionsContext } from './TeamFormActionsContext';
 import { TeamFormService } from './TeamFormService';
-
-const tabsStyles = css`
-  TabList {
-    position: relative;
-    flex-shrink: 0;
-    align-items: center;
-  }
-`;
 
 interface Props {
   state: ITeamFormState;
@@ -38,7 +42,6 @@ interface Props {
 export const TeamForm = observer<Props>(function TeamForm({ state, onCancel, onSave = () => {}, className }) {
   const translate = useTranslate();
   const props = useObjectRef({ onSave });
-  const innerTabStyles = [BASE_TAB_STYLES, tabsStyles, UNDERLINE_TAB_STYLES, UNDERLINE_TAB_BIG_STYLES];
   const styles = useS(style);
   const service = useService(TeamFormService);
   const form = useForm({
@@ -68,33 +71,26 @@ export const TeamForm = observer<Props>(function TeamForm({ state, onCancel, onS
   }, []);
 
   return (
-    <Form className={s(styles, { form: true })} context={form}>
+    <Form context={form} contents>
       <TabsState container={service.tabsContainer} localState={state.partsState} state={state} onCancel={onCancel}>
-        <div className={s(styles, { box: true }, className)}>
-          <div className={s(styles, { topBar: true })}>
-            <div className={s(styles, { topBarTabs: true })}>
-              <div className={s(styles, { statusMessage: true })}>
-                {state.statusMessage && (
-                  <>
-                    <IconOrImage className={s(styles, { iconOrImage: true })} icon="/icons/info_icon.svg" />
-                    {translate(state.statusMessage)}
-                  </>
-                )}
-              </div>
-              <TabList style={innerTabStyles} disabled={false} />
-            </div>
-            <div className={s(styles, { topBarActions: true })}>
+        <Container noWrap vertical>
+          <Container className={s(styles, { topBar: true })} gap keepSize noWrap>
+            <Container fill>
+              <StatusMessage message={translate(state.statusMessage || undefined)} type={ENotificationType.Info} />
+              <TabList disabled={false} underline big />
+            </Container>
+            <Container keepSize noWrap center gap compact>
               <Loader suspense inline hideMessage hideException>
                 <TeamFormActionsContext.Provider value={actions}>
                   <Placeholder container={service.actionsContainer} state={state} onCancel={onCancel} />
                 </TeamFormActionsContext.Provider>
               </Loader>
-            </div>
-          </div>
-          <div className={s(styles, { content: true })}>
-            <TabPanelList style={innerTabStyles} />
-          </div>
-        </div>
+            </Container>
+          </Container>
+          <Container vertical>
+            <TabPanelList />
+          </Container>
+        </Container>
       </TabsState>
     </Form>
   );

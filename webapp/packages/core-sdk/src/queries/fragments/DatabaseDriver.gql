@@ -11,6 +11,7 @@ fragment DatabaseDriver on DriverInfo {
   embedded
   enabled
   requiresServerName
+  useCustomPage
   anonymousAccess
   promotedScore
   providerId
@@ -22,8 +23,12 @@ fragment DatabaseDriver on DriverInfo {
   applicableNetworkHandlers
   configurationTypes
 
+  mainProperties @include(if: $includeMainProperties) {
+    ...DriverPropertyInfo
+  }
+
   providerProperties @include(if: $includeProviderProperties) {
-   ...DriverProviderPropertyInfo
+    ...DriverPropertyInfo
   }
 
   driverProperties @include(if: $includeDriverProperties) {
@@ -36,10 +41,4 @@ fragment DatabaseDriver on DriverInfo {
     validValues
   }
   driverParameters @include(if: $includeDriverParameters)
-
-  driverLibraries @include(if: $includeDriverLibraries) {
-    id
-    name
-    icon
-  }
 }

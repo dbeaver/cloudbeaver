@@ -10,27 +10,22 @@ import { observer } from 'mobx-react-lite';
 import {
   Container,
   Expandable,
-  getPropertyControlType,
   Group,
   GroupTitle,
-  InputField,
   ObjectPropertyInfoForm,
-  useCustomInputValidation,
   useObjectPropertyCategories,
   useTranslate,
 } from '@cloudbeaver/core-blocks';
-import type { ConnectionConfig, DriverProviderPropertyInfoFragment } from '@cloudbeaver/core-sdk';
+import { type ConnectionConfig, type DriverPropertyInfoFragment, getObjectPropertyType } from '@cloudbeaver/core-sdk';
 
-type DriverProviderPropertyInfo = DriverProviderPropertyInfoFragment;
+type DriverPropertyInfo = DriverPropertyInfoFragment;
 
 interface Props {
   config: ConnectionConfig;
-  properties: DriverProviderPropertyInfo[];
+  properties: DriverPropertyInfo[];
   disabled?: boolean;
   readonly?: boolean;
 }
-
-const MAX_KEEP_ALIVE_INTERVAL_IN_SECONDS = 32767;
 
 export const ProviderPropertiesForm = observer<Props>(function ProviderPropertiesForm({ config, properties, disabled, readonly }) {
   const translate = useTranslate();
@@ -77,21 +72,6 @@ export const ProviderPropertiesForm = observer<Props>(function ProviderPropertie
         </>
       )}
 
-      <InputField
-        type="number"
-        minLength={1}
-        min={0}
-        max={MAX_KEEP_ALIVE_INTERVAL_IN_SECONDS}
-        name="keepAliveInterval"
-        disabled={disabled}
-        readOnly={readonly}
-        defaultValue={config?.keepAliveInterval ?? 0}
-        title={translate('connections_connection_keep_alive_tooltip')}
-        state={config}
-      >
-        {translate('connections_connection_keep_alive')}
-      </InputField>
-
       {categories.map((category, index) => (
         <Container key={`${category}_${config.driverId}`} gap>
           <Expandable label={category} defaultExpanded={index === 0}>
@@ -102,7 +82,7 @@ export const ProviderPropertiesForm = observer<Props>(function ProviderPropertie
                 category={category}
                 disabled={disabled}
                 readOnly={readonly}
-                geLayoutSize={property => (getPropertyControlType(property) === 'checkbox' ? { maximum: true } : { small: true, noGrow: true })}
+                geLayoutSize={property => (getObjectPropertyType(property) === 'checkbox' ? { maximum: true } : { small: true, noGrow: true })}
                 hideEmptyPlaceholder
               />
             </Container>
@@ -113,6 +93,6 @@ export const ProviderPropertiesForm = observer<Props>(function ProviderPropertie
   );
 });
 
-function isOnlyBooleans(properties: DriverProviderPropertyInfo[], category?: string): boolean {
+function isOnlyBooleans(properties: DriverPropertyInfo[], category?: string): boolean {
   return properties.filter(property => !category || property.category === category).every(property => property.dataType === 'Boolean');
 }

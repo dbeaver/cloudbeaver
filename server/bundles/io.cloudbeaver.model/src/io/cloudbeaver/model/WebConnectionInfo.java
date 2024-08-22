@@ -24,12 +24,11 @@ import io.cloudbeaver.service.sql.WebDataFormat;
 import io.cloudbeaver.utils.CBModelConstants;
 import io.cloudbeaver.utils.WebAppUtils;
 import io.cloudbeaver.utils.WebCommonUtils;
+import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
-import org.jkiss.dbeaver.model.DBConstants;
-import org.jkiss.dbeaver.model.DBPDataSource;
-import org.jkiss.dbeaver.model.DBPDataSourceContainer;
-import org.jkiss.dbeaver.model.DBPDataSourceFolder;
+import org.jkiss.dbeaver.model.*;
+import org.jkiss.dbeaver.model.admin.sessions.DBAServerSessionManager;
 import org.jkiss.dbeaver.model.app.DBPProject;
 import org.jkiss.dbeaver.model.connection.DBPAuthModelDescriptor;
 import org.jkiss.dbeaver.model.connection.DBPConnectionConfiguration;
@@ -40,6 +39,7 @@ import org.jkiss.dbeaver.model.navigator.DBNBrowseSettings;
 import org.jkiss.dbeaver.model.navigator.DBNDataSource;
 import org.jkiss.dbeaver.model.preferences.DBPPropertyDescriptor;
 import org.jkiss.dbeaver.model.preferences.DBPPropertySource;
+import org.jkiss.dbeaver.model.rm.RMConstants;
 import org.jkiss.dbeaver.model.rm.RMProjectPermission;
 import org.jkiss.dbeaver.model.runtime.DBRRunnableParametrized;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
@@ -56,6 +56,17 @@ public class WebConnectionInfo {
 
     private static final Log log = Log.getLog(WebConnectionInfo.class);
     public static final String SECURED_VALUE = "********";
+
+    private static final String FEATURE_HAS_TOOLS = "hasTools";
+    private static final String FEATURE_CONNECTED = "connected";
+    private static final String FEATURE_VIRTUAL = "virtual";
+    private static final String FEATURE_TEMPORARY = "temporary";
+    private static final String FEATURE_READ_ONLY = "readOnly";
+    private static final String FEATURE_PROVIDED = "provided";
+    private static final String FEATURE_MANAGEABLE = "manageable";
+
+    private static final String TOOL_SESSION_MANAGER = "sessionManager";
+    
     private final WebSession session;
     private final DBPDataSourceContainer dataSourceContainer;
     private WebServerError connectError;
@@ -243,22 +254,25 @@ public class WebConnectionInfo {
         List<String> features = new ArrayList<>();
 
         if (dataSourceContainer.isConnected()) {
-            features.add("connected");
+            features.add(FEATURE_CONNECTED);
+            if (!getTools().isEmpty()) {
+                features.add(FEATURE_HAS_TOOLS);
+            }
         }
         if (dataSourceContainer.isHidden()) {
-            features.add("virtual");
+            features.add(FEATURE_VIRTUAL);
         }
         if (dataSourceContainer.isTemporary()) {
-            features.add("temporary");
+            features.add(FEATURE_TEMPORARY);
         }
         if (dataSourceContainer.isConnectionReadOnly()) {
-            features.add("readOnly");
+            features.add(FEATURE_READ_ONLY);
         }
         if (dataSourceContainer.isProvided()) {
-            features.add("provided");
+            features.add(FEATURE_PROVIDED);
         }
         if (dataSourceContainer.isManageable()) {
-            features.add("manageable");
+            features.add(FEATURE_MANAGEABLE);
         }
 
         return features.toArray(new String[0]);
@@ -385,6 +399,16 @@ public class WebConnectionInfo {
     }
 
     @Property
+    public Map<String, String> getMainPropertyValues() {
+        Map<String, String> mainProperties = new LinkedHashMap<>();
+        mainProperties.put(DBConstants.PROP_HOST, getHost());
+        mainProperties.put(DBConstants.PROP_PORT, getPort());
+        mainProperties.put(DBConstants.PROP_DATABASE, getDatabaseName());
+        mainProperties.put(DBConstants.PROP_SERVER, getServerName());
+        return mainProperties;
+    }
+
+    @Property
     public Map<String, String> getProviderProperties() {
         return dataSourceContainer.getConnectionConfiguration().getProviderProperties();
     }
@@ -449,11 +473,34 @@ public class WebConnectionInfo {
     }
 
     @Property
+    public boolean isAutocommit() {
+        Boolean isAutoCommit = dataSourceContainer.getConnectionConfiguration().getBootstrap().getDefaultAutoCommit();
+        if (isAutoCommit == null) {
+            return true;
+        }
+        return isAutoCommit;
+    }
+
+    @Property
     public List<WebSecretInfo> getSharedSecrets() throws DBException {
         return dataSourceContainer.listSharedCredentials()
             .stream()
             .map(WebSecretInfo::new)
             .collect(Collectors.toList());
+    }
+
+    @NotNull
+    @Property
+    public List<String> getTools() {
+        if (!session.hasPermission(RMConstants.PERMISSION_DATABASE_DEVELOPER)) {
+            return List.of();
+        }
+        List<String> tools = new ArrayList<>();
+        // checks inside that datasource is not null in container, and it is adaptable to session manager class
+        if (DBUtils.getAdapter(DBAServerSessionManager.class, dataSourceContainer) != null) {
+            tools.add(TOOL_SESSION_MANAGER);
+        }
+        return tools;
     }
 
 }

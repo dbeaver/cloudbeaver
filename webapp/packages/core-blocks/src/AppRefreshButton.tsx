@@ -10,7 +10,7 @@ import type React from 'react';
 import { App, useService } from '@cloudbeaver/core-di';
 import { clsx } from '@cloudbeaver/core-utils';
 
-import style from './AppRefreshButton.m.css';
+import style from './AppRefreshButton.module.css';
 
 interface IProps {
   className?: string;
@@ -20,7 +20,7 @@ export const AppRefreshButton: React.FC<IProps> = function AppRefreshButton({ cl
   const app = useService(App);
 
   function refresh() {
-    app.start();
+    app.restart();
   }
 
   return (

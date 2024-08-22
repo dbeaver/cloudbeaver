@@ -45,7 +45,7 @@ export class SharedProjectsResource extends CachedMapResource<string, SharedProj
     super(() => new Map(), []);
 
     sessionPermissionsResource.require(this, EAdminPermission.admin);
-    this.sync(sessionPermissionsResource, () => {});
+    sessionPermissionsResource.onDataOutdated.addHandler(() => this.markOutdated());
 
     this.connect(projectInfoResource);
     this.onDataOutdated.addHandler(() => projectInfoResource.markOutdated());
@@ -126,6 +126,8 @@ export class SharedProjectsResource extends CachedMapResource<string, SharedProj
 
           deleted.push(projectId);
         });
+
+        this.onDataOutdated.execute(key);
       });
     } finally {
       if (deleted.length > 0) {

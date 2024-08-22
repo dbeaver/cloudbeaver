@@ -6,14 +6,15 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
-import styled from 'reshadow';
 
 import { AuthProvider, AuthProviderConfiguration, UserInfoResource } from '@cloudbeaver/core-authentication';
 import {
+  Checkbox,
   CommonDialogBody,
   CommonDialogFooter,
   CommonDialogHeader,
   CommonDialogWrapper,
+  Container,
   ErrorMessage,
   Form,
   getComputed,
@@ -22,27 +23,26 @@ import {
   TextPlaceholder,
   useErrorDetails,
   useS,
-  useStyles,
   useTranslate,
 } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogComponent } from '@cloudbeaver/core-dialogs';
-import { BASE_TAB_STYLES, Tab, TabList, TabsState, TabTitle, UNDERLINE_TAB_BIG_STYLES, UNDERLINE_TAB_STYLES } from '@cloudbeaver/core-ui';
+import { Tab, TabList, TabsState, TabTitle } from '@cloudbeaver/core-ui';
 
 import { AuthenticationService } from '../AuthenticationService';
 import type { IAuthOptions } from '../IAuthOptions';
-import style from './AuthDialog.m.css';
+import style from './AuthDialog.module.css';
 import { AuthDialogFooter } from './AuthDialogFooter';
 import { AuthProviderForm } from './AuthProviderForm/AuthProviderForm';
 import { ConfigurationsList } from './AuthProviderForm/ConfigurationsList';
 import { FEDERATED_AUTH } from './FEDERATED_AUTH';
 import { getAuthProviderTabId, useAuthDialogState } from './useAuthDialogState';
-import { NotificationService } from '@cloudbeaver/core-events';
 
 export const AuthDialog: DialogComponent<IAuthOptions, null> = observer(function AuthDialog({
   payload: { providerId, configurationId, linkUser = false, accessRequest = false },
   options,
   rejectDialog,
+  resolveDialog,
 }) {
   const styles = useS(style);
   const dialogData = useAuthDialogState(accessRequest, providerId, configurationId);
@@ -50,7 +50,6 @@ export const AuthDialog: DialogComponent<IAuthOptions, null> = observer(function
   const authenticationService = useService(AuthenticationService);
   const userInfo = useService(UserInfoResource);
   const commonDialogService = useService(CommonDialogService);
-  const notificationService = useService(NotificationService);
   const translate = useTranslate();
   const state = dialogData.state;
 
@@ -90,7 +89,8 @@ export const AuthDialog: DialogComponent<IAuthOptions, null> = observer(function
   async function login(linkUser: boolean, provider?: AuthProvider, configuration?: AuthProviderConfiguration) {
     try {
       await dialogData.login(linkUser, provider, configuration);
-      rejectDialog();
+
+      resolveDialog();
     } catch {}
   }
 
@@ -142,14 +142,19 @@ export const AuthDialog: DialogComponent<IAuthOptions, null> = observer(function
     );
   }
 
-  return styled(useStyles(BASE_TAB_STYLES, UNDERLINE_TAB_STYLES, UNDERLINE_TAB_BIG_STYLES))(
+  return (
     <TabsState
       currentTabId={state.tabId}
       onChange={tabData => {
-        state.setTabId(tabData.tabId);
+        state.switchAuthMode(tabData.tabId);
       }}
     >
-      <CommonDialogWrapper className={s(styles, { wrapper: true })} size="large" aria-label={translate('authentication_login_dialog_title')}>
+      <CommonDialogWrapper
+        className={s(styles, { wrapper: true })}
+        size="large"
+        aria-label={translate('authentication_login_dialog_title')}
+        autofocus={false}
+      >
         <CommonDialogHeader
           title={dialogTitle}
           tooltip={tooltip}
@@ -157,9 +162,9 @@ export const AuthDialog: DialogComponent<IAuthOptions, null> = observer(function
           subTitle={subTitle}
           onReject={options?.persistent ? undefined : rejectDialog}
         />
-        <CommonDialogBody noBodyPadding>
+        <CommonDialogBody noOverflow={federate} noBodyPadding>
           {showTabs && (
-            <TabList className={s(styles, { tabList: true })} aria-label="Auth providers">
+            <TabList className={s(styles, { tabList: true })} aria-label="Auth providers" underline big>
               {dialogData.providers
                 .map(provider => {
                   if (provider.configurable) {
@@ -206,7 +211,7 @@ export const AuthDialog: DialogComponent<IAuthOptions, null> = observer(function
                   disabled={dialogData.authenticating}
                   onClick={() => {
                     state.setActiveProvider(null, null);
-                    state.setTabId(FEDERATED_AUTH);
+                    state.switchAuthMode(FEDERATED_AUTH);
                   }}
                 >
                   <TabTitle>{translate('authentication_auth_federated')}</TabTitle>
@@ -230,9 +235,25 @@ export const AuthDialog: DialogComponent<IAuthOptions, null> = observer(function
             </Form>
           )}
         </CommonDialogBody>
-        {!federate && (
-          <CommonDialogFooter>
-            <AuthDialogFooter authAvailable={!dialogData.configure} isAuthenticating={dialogData.authenticating} onLogin={() => login(linkUser)}>
+        <CommonDialogFooter>
+          <Container>
+            {state.isTooManySessions && (
+              <Checkbox
+                title={translate('authentication_auth_force_session_logout_checkbox_tooltip')}
+                className={s(styles, { tooManySessionsCheckbox: true })}
+                checked={state.forceSessionsLogout}
+                name="forceSessionLogout"
+                label={translate('authentication_auth_force_session_logout')}
+                onClick={e => {
+                  state.forceSessionsLogout = e.currentTarget.checked;
+                }}
+              />
+            )}
+            <AuthDialogFooter
+              authAvailable={!dialogData.configure && !federate}
+              isAuthenticating={dialogData.authenticating}
+              onLogin={() => login(linkUser)}
+            >
               {errorDetails.name && (
                 <ErrorMessage
                   className={s(styles, { errorMessage: true })}
@@ -242,9 +263,9 @@ export const AuthDialog: DialogComponent<IAuthOptions, null> = observer(function
                 />
               )}
             </AuthDialogFooter>
-          </CommonDialogFooter>
-        )}
+          </Container>
+        </CommonDialogFooter>
       </CommonDialogWrapper>
-    </TabsState>,
+    </TabsState>
   );
 });

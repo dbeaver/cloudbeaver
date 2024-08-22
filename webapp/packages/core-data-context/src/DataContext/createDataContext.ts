@@ -5,18 +5,13 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import type { DataContextGetter } from './DataContextGetter';
-import type { IDataContextProvider } from './IDataContextProvider';
+import { uuid } from '@cloudbeaver/core-utils';
 
-export function createDataContext<T>(
-  name: string,
-  defaultValue?: (context: IDataContextProvider) => T extends any ? T : undefined,
-): DataContextGetter<T> {
-  name = `@context/${name}`;
-  const obj = {
-    [name](context: IDataContextProvider): T {
-      return defaultValue?.(context) as T;
-    },
-  };
-  return obj[name];
+import type { DataContextGetter } from './DataContextGetter';
+
+export function createDataContext<T>(name: string): DataContextGetter<T> {
+  return {
+    id: uuid(),
+    name: `@context/${name}`,
+  } as Partial<DataContextGetter<T>> as DataContextGetter<T>;
 }

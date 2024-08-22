@@ -8,33 +8,18 @@
 import { computed, observable, runInAction } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import { useMemo, useState } from 'react';
-import styled, { css } from 'reshadow';
 
-import { ColoredContainer, Group, IProperty, PropertiesTable, useResource, useStyles } from '@cloudbeaver/core-blocks';
+import { ColoredContainer, Group, IProperty, PropertiesTable, s, useResource, useS } from '@cloudbeaver/core-blocks';
 import { DBDriverResource } from '@cloudbeaver/core-connections';
 import { TabContainerPanelComponent, useTab } from '@cloudbeaver/core-ui';
 import { uuid } from '@cloudbeaver/core-utils';
 
 import type { IConnectionFormProps } from '../IConnectionFormProps';
-
-const styles = css`
-  ColoredContainer {
-    flex: 1;
-    overflow: auto;
-  }
-  Group {
-    max-height: 100%;
-  }
-  PropertiesTable {
-    padding-top: 8px;
-    max-height: 100%;
-    box-sizing: border-box;
-  }
-`;
+import styles from './DriverProperties.module.css';
 
 export const DriverProperties: TabContainerPanelComponent<IConnectionFormProps> = observer(function DriverProperties({ tabId, state: formState }) {
-  const style = useStyles(styles);
   const { selected } = useTab(tabId);
+  const style = useS(styles);
 
   const [state] = useState(() => {
     const propertiesList: IProperty[] = observable([]);
@@ -93,10 +78,11 @@ export const DriverProperties: TabContainerPanelComponent<IConnectionFormProps> 
     [driver.data],
   );
 
-  return styled(style)(
-    <ColoredContainer parent>
-      <Group box large>
+  return (
+    <ColoredContainer className={s(style, { coloredContainer: true })} parent>
+      <Group className={s(style, { group: true })} box large>
         <PropertiesTable
+          className={s(style, { propertiesTable: true })}
           properties={joinedProperties.get()}
           propertiesState={formState.config.properties}
           readOnly={formState.readonly}
@@ -105,6 +91,6 @@ export const DriverProperties: TabContainerPanelComponent<IConnectionFormProps> 
           onRemove={state.remove}
         />
       </Group>
-    </ColoredContainer>,
+    </ColoredContainer>
   );
 });

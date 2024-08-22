@@ -17,7 +17,6 @@ import { isArraysEqual, isDefined, isObjectsEqual, isValuesEqual } from '@cloudb
 import { DATA_CONTEXT_LOADABLE_STATE } from '@cloudbeaver/core-view';
 
 import type { IUserFormState } from '../AdministrationUserFormService';
-import type { AdministrationUserFormState } from '../AdministrationUserFormState';
 import type { IUserFormInfoState } from './IUserFormInfoState';
 
 const DEFAULT_ENABLED = true;
@@ -27,7 +26,7 @@ export class UserFormInfoPart extends FormPart<IUserFormInfoState, IUserFormStat
   constructor(
     private readonly authRolesResource: AuthRolesResource,
     private readonly serverConfigResource: ServerConfigResource,
-    formState: AdministrationUserFormState,
+    formState: IFormState<IUserFormState>,
     private readonly usersResource: UsersResource,
   ) {
     super(formState, {
@@ -140,7 +139,7 @@ export class UserFormInfoPart extends FormPart<IUserFormInfoState, IUserFormStat
     }
   }
   protected override configure() {
-    const loadableStateContext = this.formState.dataContext.get(DATA_CONTEXT_LOADABLE_STATE);
+    const loadableStateContext = this.formState.dataContext.get(DATA_CONTEXT_LOADABLE_STATE)!;
 
     loadableStateContext.getState('user-info', () => [
       getCachedDataResourceLoaderState(this.serverConfigResource, () => undefined),

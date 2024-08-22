@@ -7,26 +7,13 @@
  */
 import { observer } from 'mobx-react-lite';
 import { useMemo } from 'react';
-import styled, { css } from 'reshadow';
 
-import { Loader } from '@cloudbeaver/core-blocks';
+import { Loader, s, useS } from '@cloudbeaver/core-blocks';
 import { ConnectionInfoResource, IConnectionInfoParams } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
 import { ConnectionFormLoader, useConnectionFormState } from '@cloudbeaver/plugin-connections';
 
-const styles = css`
-  box {
-    composes: theme-background-secondary theme-text-on-secondary from global;
-    box-sizing: border-box;
-    padding-bottom: 24px;
-    display: flex;
-    flex-direction: column;
-    height: 740px;
-  }
-  Loader {
-    height: 100%;
-  }
-`;
+import styles from './ConnectionEdit.module.css';
 
 interface Props {
   item: IConnectionInfoParams;
@@ -38,6 +25,7 @@ export const ConnectionEdit = observer<Props>(function ConnectionEditNew({ item 
   // const collapse = useCallback(() => tableContext?.setItemExpand(item, false), [tableContext, item]);
 
   const data = useConnectionFormState(connectionInfoResource, state => state.setOptions('edit', 'admin'));
+  const style = useS(styles);
 
   const projectId = item.projectId;
   const connectionId = item.connectionId;
@@ -46,15 +34,15 @@ export const ConnectionEdit = observer<Props>(function ConnectionEditNew({ item 
     data.setConfig(projectId, { connectionId });
   }, [data, projectId, connectionId]);
 
-  return styled(styles)(
-    <box>
-      <Loader suspense>
+  return (
+    <div className={s(style, { box: true })}>
+      <Loader className={s(style, { loader: true })} suspense>
         <ConnectionFormLoader
           state={data}
           // onCancel={collapse}
           // onSave={collapse}
         />
       </Loader>
-    </box>,
+    </div>
   );
 });

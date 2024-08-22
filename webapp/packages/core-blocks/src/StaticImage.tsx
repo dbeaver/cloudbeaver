@@ -8,7 +8,7 @@
 import { GlobalConstants, isValidUrl } from '@cloudbeaver/core-utils';
 
 import { s } from './s';
-import style from './StaticImage.m.css';
+import style from './StaticImage.module.css';
 import { useS } from './useS';
 
 interface Props {
@@ -28,5 +28,5 @@ export const StaticImage: React.FC<Props> = function StaticImage({ icon, classNa
 
   const url = isValidUrl(icon) ? icon : GlobalConstants.absoluteUrl(icon);
 
-  return <img className={s(styles, { block }, className)} src={url} title={title} width={width} onClick={onClick} />;
+  return <img alt={title} className={s(styles, { block }, className)} src={url} title={title} width={width} onClick={onClick} />;
 };

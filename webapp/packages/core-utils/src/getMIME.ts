@@ -6,9 +6,9 @@
  * you may not use this file except in compliance with the License.
  */
 
-export function getMIME(binary: string): string | null {
+export function getMIME(binary: string): string {
   if (binary.length === 0) {
-    return null;
+    return 'application/octet-stream';
   }
 
   switch (binary[0]) {
@@ -21,7 +21,7 @@ export function getMIME(binary: string): string | null {
     case 'U':
       return 'image/webp';
     default:
-      return null;
+      return 'application/octet-stream';
   }
 }
 

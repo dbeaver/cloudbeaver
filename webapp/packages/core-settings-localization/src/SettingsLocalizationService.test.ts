@@ -5,78 +5,72 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import '@testing-library/jest-dom';
+import { expect, test } from '@jest/globals';
 
-import { coreBrowserManifest } from '@cloudbeaver/core-browser';
+import { coreClientActivityManifest } from '@cloudbeaver/core-client-activity';
 import { coreLocalizationManifest } from '@cloudbeaver/core-localization';
-import { corePluginManifest } from '@cloudbeaver/core-plugin';
-import { coreProductManifest } from '@cloudbeaver/core-product';
 import { coreRootManifest, ServerConfigResource } from '@cloudbeaver/core-root';
 import { createGQLEndpoint } from '@cloudbeaver/core-root/dist/__custom_mocks__/createGQLEndpoint';
+import '@cloudbeaver/core-root/dist/__custom_mocks__/expectWebsocketClosedMessage';
 import { mockAppInit } from '@cloudbeaver/core-root/dist/__custom_mocks__/mockAppInit';
 import { mockGraphQL } from '@cloudbeaver/core-root/dist/__custom_mocks__/mockGraphQL';
 import { mockServerConfig } from '@cloudbeaver/core-root/dist/__custom_mocks__/resolvers/mockServerConfig';
 import { coreSDKManifest } from '@cloudbeaver/core-sdk';
 import { coreSettingsManifest } from '@cloudbeaver/core-settings';
+import {
+  expectDeprecatedSettingMessage,
+  expectNoDeprecatedSettingMessage,
+} from '@cloudbeaver/core-settings/dist/__custom_mocks__/expectDeprecatedSettingMessage';
 import { createApp } from '@cloudbeaver/tests-runner';
 
 import { coreSettingsLocalizationManifest } from './manifest';
-import { type ILocalizationSettings, SettingsLocalizationService } from './SettingsLocalizationService';
+import { SettingsLocalizationService } from './SettingsLocalizationService';
 
 const endpoint = createGQLEndpoint();
+const server = mockGraphQL(...mockAppInit(endpoint));
 const app = createApp(
   coreSettingsLocalizationManifest,
-  corePluginManifest,
+  coreClientActivityManifest,
   coreSettingsManifest,
   coreLocalizationManifest,
-  coreProductManifest,
   coreRootManifest,
   coreSDKManifest,
-  coreBrowserManifest,
 );
 
-const server = mockGraphQL(...mockAppInit(endpoint));
-
-beforeAll(() => app.init());
-
-const testValue = 'es';
-const testValueB = 'te';
+const deprecatedValue = 'es';
+const value = 'te';
 
 const deprecatedSettings = {
-  core: {
-    user: {
-      defaultLanguage: testValueB,
-    } as ILocalizationSettings,
-  },
+  'core.user.defaultLanguage': deprecatedValue,
+  'core.localization.defaultLanguage': deprecatedValue,
+  'app.defaultLanguage': deprecatedValue,
 };
 
 const newSettings = {
-  core: {
-    ...deprecatedSettings,
-    localization: {
-      defaultLanguage: testValue,
-    } as ILocalizationSettings,
-  },
+  ...deprecatedSettings,
+  'core.localization.language': value,
 };
 
 test('New settings override deprecated settings', async () => {
-  const settings = app.injector.getServiceByClass(SettingsLocalizationService);
-  const config = app.injector.getServiceByClass(ServerConfigResource);
+  const settings = app.serviceProvider.getService(SettingsLocalizationService);
+  const config = app.serviceProvider.getService(ServerConfigResource);
 
   server.use(endpoint.query('serverConfig', mockServerConfig(newSettings)));
 
   await config.refresh();
 
-  expect(settings.pluginSettings.getValue('defaultLanguage')).toBe(testValue);
+  expect(settings.language).toBe(value);
+  expectNoDeprecatedSettingMessage();
 });
 
 test('Deprecated settings are used if new settings are not defined', async () => {
-  const settings = app.injector.getServiceByClass(SettingsLocalizationService);
-  const config = app.injector.getServiceByClass(ServerConfigResource);
+  const settings = app.serviceProvider.getService(SettingsLocalizationService);
+  const config = app.serviceProvider.getService(ServerConfigResource);
 
   server.use(endpoint.query('serverConfig', mockServerConfig(deprecatedSettings)));
 
   await config.refresh();
 
-  expect(settings.pluginSettings.getValue('defaultLanguage')).toBe(testValueB);
+  expect(settings.language).toBe(deprecatedValue);
+  expectDeprecatedSettingMessage();
 });

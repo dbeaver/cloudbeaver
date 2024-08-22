@@ -5,9 +5,10 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
+import { Clickable } from '../Clickable';
 import { s } from '../s';
 import { useS } from '../useS';
-import style from './ItemList.m.css';
+import style from './ItemList.module.css';
 
 interface Props {
   onClick: () => void;
@@ -18,8 +19,8 @@ export const ListItem: React.FC<React.PropsWithChildren<Props>> = function ListI
   const styles = useS(style);
 
   return (
-    <div className={s(styles, { listItem: true }, className)} onClick={onClick}>
+    <Clickable as="div" className={s(styles, { listItem: true }, className)} focusable onClick={onClick}>
       {children}
-    </div>
+    </Clickable>
   );
 };

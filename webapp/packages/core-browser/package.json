@@ -11,24 +11,28 @@
   "main": "dist/index.js",
   "scripts": {
     "build": "tsc -b",
+    "clean": "rimraf --glob dist",
     "lint": "eslint ./src/ --ext .ts,.tsx",
-    "lint-fix": "eslint ./src/ --ext .ts,.tsx --fix",
-    "test": "yarn build && core-cli-test",
+    "test": "core-cli-test",
     "validate-dependencies": "core-cli-validate-dependencies",
-    "update-ts-references": "rimraf --glob dist && typescript-resolve-references"
+    "update-ts-references": "yarn run clean && typescript-resolve-references"
   },
   "dependencies": {
-    "@cloudbeaver/core-di": "~0.1.0",
-    "@cloudbeaver/core-executor": "~0.1.0",
-    "@cloudbeaver/core-utils": "~0.1.0",
-    "dexie": "^3.2.4",
-    "mobx": "^6.12.0",
-    "workbox-core": "~7.x.x",
-    "workbox-precaching": "~7.x.x",
-    "workbox-window": "~7.x.x"
+    "@cloudbeaver/core-di": "^0",
+    "@cloudbeaver/core-executor": "^0",
+    "@cloudbeaver/core-utils": "^0",
+    "dexie": "^4",
+    "mobx": "^6",
+    "workbox-cacheable-response": "^7",
+    "workbox-core": "^7",
+    "workbox-expiration": "^7",
+    "workbox-precaching": "^7",
+    "workbox-routing": "^7",
+    "workbox-strategies": "^7",
+    "workbox-window": "^7"
   },
   "peerDependencies": {},
   "devDependencies": {
-    "typescript": "^5.3.2"
+    "typescript": "^5"
   }
 }

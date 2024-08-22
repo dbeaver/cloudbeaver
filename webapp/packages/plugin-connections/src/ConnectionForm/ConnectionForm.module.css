@@ -1,0 +1,75 @@
+/*
+ * CloudBeaver - Cloud Database Manager
+ * Copyright (C) 2020-2024 DBeaver Corp and others
+ *
+ * Licensed under the Apache License, Version 2.0.
+ * you may not use this file except in compliance with the License.
+ */
+
+.tabList {
+  position: relative;
+  flex-shrink: 0;
+  align-items: center;
+}
+
+.connectionTopBar {
+  composes: theme-border-color-background theme-background-secondary theme-text-on-secondary from global;
+}
+
+.connectionTopBar {
+  position: relative;
+  display: flex;
+  padding-top: 16px;
+
+  &:before {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    border-bottom: solid 2px;
+    border-color: inherit;
+  }
+}
+
+.connectionTopBarTabs {
+  flex: 1;
+}
+
+.connectionTopBarActions {
+  display: flex;
+  align-items: center;
+  padding: 0 24px;
+  gap: 16px;
+}
+
+.connectionStatusMessage {
+  composes: theme-typography--caption from global;
+  height: 24px;
+  padding: 0 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  & .iconOrImage {
+    height: 24px;
+    width: 24px;
+  }
+}
+
+.box {
+  composes: theme-background-secondary theme-text-on-secondary from global;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  height: 100%;
+  overflow: auto;
+}
+
+.contentBox {
+  composes: theme-background-secondary theme-border-color-background from global;
+  position: relative;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  overflow: auto;
+}

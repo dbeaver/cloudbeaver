@@ -15,29 +15,31 @@
     "gql:gen": "yarn run clean && graphql-codegen",
     "gql:gen:dev": "yarn run clean && graphql-codegen --watch",
     "lint": "eslint ./src/ --ext .ts,.tsx",
-    "lint-fix": "eslint ./src/ --ext .ts,.tsx --fix",
-    "test": "yarn build && core-cli-test",
+    "test": "core-cli-test",
     "validate-dependencies": "core-cli-validate-dependencies",
-    "update-ts-references": "rimraf --glob dist && typescript-resolve-references"
+    "update-ts-references": "yarn run clean && typescript-resolve-references"
   },
   "dependencies": {
-    "@cloudbeaver/core-di": "~0.1.0",
-    "@cloudbeaver/core-utils": "~0.1.0",
-    "axios": "^1.6.2",
-    "graphql-request": "^6.1.0",
-    "mobx": "^6.12.0"
+    "@cloudbeaver/core-di": "^0",
+    "@cloudbeaver/core-executor": "^0",
+    "@cloudbeaver/core-utils": "^0",
+    "axios": "^1",
+    "graphql": "^16",
+    "graphql-request": "^6",
+    "mobx": "^6"
   },
   "devDependencies": {
-    "@graphql-codegen/add": "~5.0.0",
-    "@graphql-codegen/cli": "~5.0.0",
-    "@graphql-codegen/near-operation-file-preset": "~3.0.0",
-    "@graphql-codegen/typescript": "~4.0.1",
-    "@graphql-codegen/typescript-graphql-files-modules": "~3.0.0",
-    "@graphql-codegen/typescript-graphql-request": "~6.0.1",
-    "@graphql-codegen/typescript-operations": "~4.0.1",
-    "@parcel/watcher": "~2.3.0",
-    "graphql": "^16.8.1",
-    "typescript": "^5.3.2"
+    "@graphql-codegen/add": "^5",
+    "@graphql-codegen/cli": "^5",
+    "@graphql-codegen/near-operation-file-preset": "^3",
+    "@graphql-codegen/typescript": "^4",
+    "@graphql-codegen/typescript-graphql-files-modules": "^3",
+    "@graphql-codegen/typescript-graphql-request": "^6",
+    "@graphql-codegen/typescript-operations": "^4",
+    "@parcel/watcher": "^2",
+    "graphql": "^16",
+    "graphql-tag": "^2",
+    "typescript": "^5"
   },
   "peerDependencies": {}
 }

@@ -7,16 +7,22 @@
  */
 import { getMIME, isImageFormat, isValidUrl } from '@cloudbeaver/core-utils';
 
+import { isResultSetBinaryValue } from '../../DatabaseDataModel/Actions/ResultSet/isResultSetBinaryValue';
 import { isResultSetBlobValue } from '../../DatabaseDataModel/Actions/ResultSet/isResultSetBlobValue';
 import { isResultSetContentValue } from '../../DatabaseDataModel/Actions/ResultSet/isResultSetContentValue';
 import type { IResultSetValue } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetFormatAction';
 
 export function isImageValuePresentationAvailable(value: IResultSetValue) {
-  if (isResultSetContentValue(value) && value?.binary) {
-    return getMIME(value.binary || '') !== null;
+  let contentType = null;
+
+  if (isResultSetBinaryValue(value)) {
+    contentType = getMIME(value.binary);
+  } else if (isResultSetContentValue(value) || isResultSetBlobValue(value)) {
+    contentType = value?.contentType ?? null;
   }
-  if (isResultSetContentValue(value) || isResultSetBlobValue(value)) {
-    return value?.contentType?.startsWith('image/') ?? false;
+
+  if (contentType?.startsWith('image/')) {
+    return true;
   }
 
   if (typeof value !== 'string') {

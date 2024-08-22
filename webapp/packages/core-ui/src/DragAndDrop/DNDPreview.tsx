@@ -10,11 +10,11 @@ import { ConnectDragPreview, DragPreviewImage } from 'react-dnd';
 
 import type { IDNDData } from './useDNDData';
 
-interface Props {
+export interface DNDPreviewProps {
   src: string;
   data: IDNDData;
 }
 
-export const DNDPreview = observer<Props>(function DNDPreview({ src, data }) {
+export const DNDPreview = observer<DNDPreviewProps>(function DNDPreview({ src, data }) {
   return <DragPreviewImage connect={data.setPreviewRef as ConnectDragPreview} src={src} />;
 });

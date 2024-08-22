@@ -22,25 +22,16 @@
       "path": "../core-browser/tsconfig.json"
     },
     {
+      "path": "../core-client-activity/tsconfig.json"
+    },
+    {
       "path": "../core-di/tsconfig.json"
     },
     {
-      "path": "../core-events/tsconfig.json"
-    },
-    {
       "path": "../core-localization/tsconfig.json"
     },
     {
       "path": "../core-localization/tsconfig.json"
-    },
-    {
-      "path": "../core-plugin/tsconfig.json"
-    },
-    {
-      "path": "../core-plugin/tsconfig.json"
-    },
-    {
-      "path": "../core-product/tsconfig.json"
     },
     {
       "path": "../core-resource/tsconfig.json"
@@ -64,7 +55,10 @@
       "path": "../core-settings/tsconfig.json"
     },
     {
-      "path": "../core-theming/tsconfig.json"
+      "path": "../core-settings/tsconfig.json"
+    },
+    {
+      "path": "../core-storage/tsconfig.json"
     },
     {
       "path": "../core-utils/tsconfig.json"

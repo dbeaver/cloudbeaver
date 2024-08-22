@@ -7,14 +7,27 @@
  */
 import type { PluginManifest } from '@cloudbeaver/core-di';
 
-import { LocaleService } from './LocaleService';
-import { PluginBootstrap } from './PluginBootstrap';
-import { UserProfileService } from './UserProfileService';
-
 export const userProfilePlugin: PluginManifest = {
   info: {
     name: 'User profile plugin',
   },
 
-  providers: [PluginBootstrap, LocaleService, UserProfileService],
+  providers: [
+    () => import('./PluginBootstrap').then(m => m.PluginBootstrap),
+    () => import('./LocaleService').then(m => m.LocaleService),
+    () => import('./UserProfileTabsService').then(m => m.UserProfileTabsService),
+    () => import('./UserProfileOptionsPanelService').then(m => m.UserProfileOptionsPanelService),
+    () => import('./UserProfileForm/UserProfileFormBootstrap').then(m => m.UserProfileFormBootstrap),
+    () => import('./UserProfileForm/UserProfileFormService').then(m => m.UserProfileFormService),
+    () => import('./UserProfileForm/UserInfoPart/UserProfileFormInfoPartBootstrap').then(m => m.UserProfileFormInfoPartBootstrap),
+    () => import('./UserProfileForm/UserInfoPart/UserProfileFormInfoPartService').then(m => m.UserProfileFormInfoPartService),
+    () =>
+      import('./UserProfileForm/UserAuthenticationPart/UserProfileFormAuthenticationPartBootstrap').then(
+        m => m.UserProfileFormAuthenticationPartBootstrap,
+      ),
+    () =>
+      import('./UserProfileForm/UserAuthenticationPart/UserProfileFormAuthenticationPartService').then(
+        m => m.UserProfileFormAuthenticationPartService,
+      ),
+  ],
 };

@@ -18,9 +18,9 @@ import {
   GroupTitle,
   Loader,
   Placeholder,
+  s,
   ToolsAction,
   ToolsPanel,
-  s,
   useFocus,
   useFormValidator,
   useS,
@@ -28,7 +28,7 @@ import {
 } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { CommonDialogService, DialogueStateResult } from '@cloudbeaver/core-dialogs';
-import { ServerConfigResource } from '@cloudbeaver/core-root';
+import { DefaultNavigatorSettingsResource, ServerConfigResource } from '@cloudbeaver/core-root';
 
 import { ServerConfigurationConfigurationForm } from './Form/ServerConfigurationConfigurationForm';
 import { ServerConfigurationFeaturesForm } from './Form/ServerConfigurationFeaturesForm';
@@ -36,8 +36,8 @@ import { ServerConfigurationInfoForm } from './Form/ServerConfigurationInfoForm'
 import { ServerConfigurationNavigatorViewForm } from './Form/ServerConfigurationNavigatorViewForm';
 import { ServerConfigurationSecurityForm } from './Form/ServerConfigurationSecurityForm';
 import { ServerConfigurationDriversForm } from './ServerConfigurationDriversForm';
+import style from './ServerConfigurationPage.module.css';
 import { ServerConfigurationService } from './ServerConfigurationService';
-import style from './ServerConfigurationPage.m.css';
 
 export const ServerConfigurationPage: AdministrationItemContentComponent = observer(function ServerConfigurationPage({ configurationWizard }) {
   const translate = useTranslate();
@@ -45,9 +45,10 @@ export const ServerConfigurationPage: AdministrationItemContentComponent = obser
   const [focusedRef, state] = useFocus<HTMLFormElement>({ focusFirstChild: true });
   const service = useService(ServerConfigurationService);
   const serverConfigResource = useService(ServerConfigResource);
+  const defaultNavigatorSettingsResource = useService(DefaultNavigatorSettingsResource);
   const commonDialogService = useService(CommonDialogService);
   const configurationWizardService = useService(ConfigurationWizardService);
-  const changed = serverConfigResource.isChanged() || serverConfigResource.isNavigatorSettingsChanged();
+  const changed = serverConfigResource.isChanged() || defaultNavigatorSettingsResource.isChanged();
   useFormValidator(service.validationTask, state.reference);
 
   function handleChange() {
@@ -81,30 +82,33 @@ export const ServerConfigurationPage: AdministrationItemContentComponent = obser
   }
 
   return (
-    <Form ref={focusedRef} className={s(styles, { form: true })} name="server_config" onChange={handleChange}>
+    <ColoredContainer vertical wrap gap parent>
       {!configurationWizard && (
-        <ToolsPanel hasBottomBorder>
-          <ToolsAction
-            title={translate('administration_configuration_tools_save_tooltip')}
-            icon="admin-save"
-            viewBox="0 0 24 24"
-            disabled={!changed}
-            onClick={save}
-          >
-            {translate('ui_processing_save')}
-          </ToolsAction>
-          <ToolsAction
-            title={translate('administration_configuration_tools_cancel_tooltip')}
-            icon="admin-cancel"
-            viewBox="0 0 24 24"
-            disabled={!changed}
-            onClick={reset}
-          >
-            {translate('ui_processing_cancel')}
-          </ToolsAction>
-        </ToolsPanel>
+        <Group box keepSize>
+          <ToolsPanel rounded>
+            <ToolsAction
+              title={translate('administration_configuration_tools_save_tooltip')}
+              icon="admin-save"
+              viewBox="0 0 24 24"
+              disabled={!changed}
+              onClick={save}
+            >
+              {translate('ui_processing_save')}
+            </ToolsAction>
+            <ToolsAction
+              title={translate('administration_configuration_tools_cancel_tooltip')}
+              icon="admin-cancel"
+              viewBox="0 0 24 24"
+              disabled={!changed}
+              onClick={reset}
+            >
+              {translate('ui_processing_cancel')}
+            </ToolsAction>
+          </ToolsPanel>
+        </Group>
       )}
-      <ColoredContainer wrap gap overflow parent>
+
+      <Container overflow gap wrap>
         {configurationWizard && (
           <Group form>
             <GroupItem>
@@ -116,9 +120,9 @@ export const ServerConfigurationPage: AdministrationItemContentComponent = obser
           </Group>
         )}
         <Loader state={service}>
-          {() =>
-            (
-              <Loader className={s(styles, { loader: true })} suspense>
+          {() => (
+            <Loader className={s(styles, { loader: true })} suspense>
+              <Form ref={focusedRef} name="server_config" contents onChange={handleChange}>
                 <Container wrap gap grid medium>
                   <ServerConfigurationInfoForm state={service.state} />
                   <Group form gap>
@@ -132,11 +136,11 @@ export const ServerConfigurationPage: AdministrationItemContentComponent = obser
                   <ServerConfigurationSecurityForm serverConfig={service.state.serverConfig} />
                   <ServerConfigurationDriversForm serverConfig={service.state.serverConfig} />
                 </Container>
-              </Loader>
-            )
-          }
+              </Form>
+            </Loader>
+          )}
         </Loader>
-      </ColoredContainer>
-    </Form>
+      </Container>
+    </ColoredContainer>
   );
 });

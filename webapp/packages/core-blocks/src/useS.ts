@@ -27,10 +27,10 @@ type ExtractStyles<T extends ComponentStyle[]> = Intersect<
     ? U extends BaseStyles
       ? U
       : U extends (theme: string) => Promise<infer A>
-      ? A extends BaseStyles
-        ? A
+        ? A extends BaseStyles
+          ? A
+          : never
         : never
-      : never
     : never
 >;
 
@@ -46,18 +46,20 @@ export function useS<T extends ComponentStyle[]>(...componentStyles: [...T]): Ex
   const stylesRef = useRef<ComponentStyle[]>([]);
   const [patch, forceUpdate] = useState(0);
   const loadedStyles = useRef<BaseStyles[]>([]);
-  const themeService = useService(ThemeService);
-  const [currentThemeId, setCurrentThemeId] = useState(() => themeService.currentThemeId);
-  const lastThemeRef = useRef<string>(currentThemeId);
-  // @ts-ignore
-  const filteredStyles = themeService.mapStyles(componentStyles.flat(Infinity).filter(Boolean) as Style[], context);
+  const themeService = useService(ThemeService, true);
+  const [currentThemeId, setCurrentThemeId] = useState(() => themeService?.themeId);
+  const lastThemeRef = useRef<string | undefined>(currentThemeId);
+  const filteredStyles = themeService
+    ? // @ts-ignore
+      themeService.mapStyles(componentStyles.flat(Infinity).filter(Boolean) as Style[], context)
+    : (componentStyles.flat(Infinity).filter(Boolean) as Style[]);
   const trackTheme = filteredStyles.some(style => typeof style === 'function');
 
   useExecutor({
-    executor: themeService.onChange,
+    executor: themeService?.onChange,
     handlers: [
       function updateThemeId(theme) {
-        if (currentThemeId !== themeService.currentThemeId && trackTheme) {
+        if (currentThemeId !== themeService?.themeId && trackTheme) {
           setCurrentThemeId(theme.id);
         }
       },
@@ -76,22 +78,24 @@ export function useS<T extends ComponentStyle[]>(...componentStyles: [...T]): Ex
     lastThemeRef.current = currentThemeId;
 
     for (const style of filteredStyles) {
-      let data: ClassCollection<Record<string, string>> | Promise<undefined | BaseStyles | BaseStyles[]>;
+      let data: ClassCollection<Record<string, string>> | Promise<undefined | BaseStyles | BaseStyles[]> | undefined;
 
       if (typeof style === 'object') {
         data = style;
       } else {
-        if (!stylesCache.get(currentThemeId).has(style)) {
-          data = style(currentThemeId);
-          stylesCache.get(currentThemeId).set(style, style(currentThemeId));
-        } else {
-          data = stylesCache.get(currentThemeId).get(style)!;
+        if (currentThemeId !== undefined) {
+          if (!stylesCache.get(currentThemeId).has(style)) {
+            data = style(currentThemeId);
+            stylesCache.get(currentThemeId).set(style, style(currentThemeId));
+          } else {
+            data = stylesCache.get(currentThemeId).get(style)!;
+          }
         }
       }
 
       if (data instanceof Promise) {
         themedStyles.push(data);
-      } else {
+      } else if (data !== undefined) {
         staticStyles.push(data);
       }
     }

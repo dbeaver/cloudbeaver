@@ -22,6 +22,9 @@
       "path": "../core-events/tsconfig.json"
     },
     {
+      "path": "../core-localization/tsconfig.json"
+    },
+    {
       "path": "../core-root/tsconfig.json"
     },
     {

@@ -65,7 +65,7 @@ export class NavTreeResource extends CachedMapResource<string, string[], Record<
   readonly onNodeMove: IExecutor<INavNodeMoveData>;
 
   get childrenLimit(): number {
-    return this.navTreeSettingsService.settings.getValue('childrenLimit');
+    return this.navTreeSettingsService.childrenLimit;
   }
 
   constructor(
@@ -193,6 +193,7 @@ export class NavTreeResource extends CachedMapResource<string, string[], Record<
           await this.graphQLService.sdk.navDeleteNodes({ nodePaths: [path] });
           deletedPaths.push(path);
         }
+        this.onDataOutdated.execute(key);
       } finally {
         runInAction(() => {
           const deletedNodes: string[] = [];
@@ -223,8 +224,9 @@ export class NavTreeResource extends CachedMapResource<string, string[], Record<
 
   async moveTo(key: ResourceKeySimple<string>, target: string): Promise<void> {
     const parents = Array.from(new Set(ResourceKeyUtils.mapArray(key, key => this.navNodeInfoResource.get(key)?.parentId).filter(isDefined)));
+    const parentsKey = resourceKeyList(parents);
 
-    await this.performUpdate(resourceKeyList(parents), [], async () => {
+    await this.performUpdate(parentsKey, [], async () => {
       this.markLoading(target, true);
 
       try {
@@ -235,6 +237,7 @@ export class NavTreeResource extends CachedMapResource<string, string[], Record<
 
         this.moveToNode(key, target);
         this.markLoaded(target);
+        this.onDataOutdated.execute(parentsKey);
       } finally {
         this.markLoading(target, false);
       }
@@ -269,10 +272,12 @@ export class NavTreeResource extends CachedMapResource<string, string[], Record<
 
         const parts = node.id.split('/');
         parts.splice(parts.length - 1, 1, name);
+        const path = parts.join('/');
 
         this.markTreeOutdated(parentId);
         this.markLoaded(node.id);
-        return parts.join('/');
+        this.onDataOutdated.execute(parentId);
+        return path;
       } finally {
         this.markLoading(node.id, false);
       }

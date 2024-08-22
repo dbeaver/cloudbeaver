@@ -59,16 +59,6 @@ export class ResultSetFormatAction
       if (!readonly) {
         readonly = this.edit.getElementState(key as IResultSetElementKey) === DatabaseEditChangeType.delete;
       }
-
-      if (!readonly) {
-        const value = this.view.getCellValue(key as IResultSetElementKey);
-
-        if (isResultSetContentValue(value)) {
-          readonly = value.binary !== undefined || value.contentLength !== value.text?.length;
-        } else if (value !== null && typeof value === 'object') {
-          readonly = true;
-        }
-      }
     }
 
     return readonly;
@@ -102,6 +92,22 @@ export class ResultSetFormatAction
     return false;
   }
 
+  isGeometry(key: IResultSetPartialKey) {
+    if (key.column) {
+      const column = this.view.getColumn(key.column);
+      if (column?.dataKind?.toLocaleLowerCase() === 'geometry') {
+        return true;
+      }
+    }
+
+    if (key.row) {
+      const value = this.get(key as IResultSetElementKey);
+      return isResultSetComplexValue(value) && value.$type === 'geometry';
+    }
+
+    return false;
+  }
+
   isText(key: IResultSetPartialKey): boolean {
     if (!key?.column) {
       return false;
@@ -109,7 +115,19 @@ export class ResultSetFormatAction
 
     const column = this.view.getColumn(key.column);
 
-    return column?.dataKind?.toLocaleLowerCase() === 'string';
+    if (column?.dataKind?.toLocaleLowerCase() === 'string') {
+      return true;
+    }
+
+    if (key.row && !this.isBinary(key)) {
+      const value = this.get(key as IResultSetElementKey);
+
+      if (isResultSetContentValue(value)) {
+        return value.text !== undefined;
+      }
+    }
+
+    return false;
   }
 
   getHeaders(): string[] {
@@ -204,6 +222,10 @@ export class ResultSetFormatAction
     }
 
     if (this.isBinary(key)) {
+      if (isResultSetContentValue(value) && value.text === 'null') {
+        return '[null]';
+      }
+
       return '[blob]';
     }
 
@@ -220,8 +242,10 @@ export class ResultSetFormatAction
         if (typeof value.value === 'object' && value.value !== null) {
           return JSON.stringify(value.value);
         }
+
         return String(value.value);
       }
+
       return '[null]';
     }
 

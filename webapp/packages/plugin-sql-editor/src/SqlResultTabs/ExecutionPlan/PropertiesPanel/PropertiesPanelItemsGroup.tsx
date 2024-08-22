@@ -6,30 +6,13 @@
  * you may not use this file except in compliance with the License.
  */
 import { useState } from 'react';
-import styled, { css } from 'reshadow';
 
 import { TableColumnValue, TableItem } from '@cloudbeaver/core-blocks';
 import type { ObjectPropertyInfo } from '@cloudbeaver/core-sdk';
 
 import { Expand } from '../Expand';
 import { getPropertyValue } from '../getPropertyValue';
-
-const styles = css`
-  TableColumnValue {
-    white-space: pre;
-  }
-  control {
-    display: flex;
-    align-items: center;
-  }
-  expand-container {
-    width: 24px;
-    height: 24px;
-    margin-right: 4px;
-    cursor: pointer;
-    display: flex;
-  }
-`;
+import classes from './PropertiesPanelItemsGroup.module.css';
 
 interface Props {
   properties: ObjectPropertyInfo[];
@@ -39,18 +22,18 @@ interface Props {
 export const PropertiesPanelItemsGroup: React.FC<Props> = function PropertiesPanelItemsGroup({ properties, name }) {
   const [expanded, setExpanded] = useState(true);
 
-  return styled(styles)(
+  return (
     <>
       <TableItem item={`${name}_root`} selectDisabled>
-        <TableColumnValue title={name}>
-          <control>
-            <expand-container>
+        <TableColumnValue className={classes.tableColumnValue} title={name}>
+          <div className={classes.control}>
+            <div className={classes.expandContainer}>
               <Expand expanded={expanded} onClick={() => setExpanded(!expanded)} />
-            </expand-container>
+            </div>
             {name}
-          </control>
+          </div>
         </TableColumnValue>
-        <TableColumnValue />
+        <TableColumnValue className={classes.tableColumnValue} />
       </TableItem>
       {expanded &&
         properties.map(property => {
@@ -59,11 +42,15 @@ export const PropertiesPanelItemsGroup: React.FC<Props> = function PropertiesPan
           const value = getPropertyValue(property);
           return (
             <TableItem key={property.id} item={property.id} selectDisabled>
-              <TableColumnValue title={tooltip}>{'\t\t' + name}</TableColumnValue>
-              <TableColumnValue title={value}>{value}</TableColumnValue>
+              <TableColumnValue className={classes.tableColumnValue} title={tooltip}>
+                {'\t\t' + name}
+              </TableColumnValue>
+              <TableColumnValue className={classes.tableColumnValue} title={value}>
+                {value}
+              </TableColumnValue>
             </TableItem>
           );
         })}
-    </>,
+    </>
   );
 };

@@ -8,7 +8,6 @@
 import { computed } from 'mobx';
 import { observer } from 'mobx-react-lite';
 import { useMemo } from 'react';
-import styled, { css } from 'reshadow';
 
 import { TeamsResource, UsersResource, UsersResourceFilterKey } from '@cloudbeaver/core-authentication';
 import {
@@ -17,9 +16,11 @@ import {
   Group,
   InfoItem,
   Loader,
+  s,
   TextPlaceholder,
   useAutoLoad,
   useResource,
+  useS,
   useTranslate,
 } from '@cloudbeaver/core-blocks';
 import { isCloudConnection } from '@cloudbeaver/core-connections';
@@ -28,29 +29,15 @@ import { CachedMapAllKey, CachedResourceOffsetPageListKey } from '@cloudbeaver/c
 import { TabContainerPanelComponent, useTab } from '@cloudbeaver/core-ui';
 import type { IConnectionFormProps } from '@cloudbeaver/plugin-connections';
 
+import styles from './ConnectionAccess.module.css';
 import { ConnectionAccessGrantedList } from './ConnectionAccessGrantedList';
 import { ConnectionAccessList } from './ConnectionAccessList';
 import { useConnectionAccessState } from './useConnectionAccessState';
 
-const styles = css`
-  ColoredContainer {
-    flex: 1;
-    height: 100%;
-    box-sizing: border-box;
-  }
-  Group {
-    max-height: 100%;
-    position: relative;
-    overflow: auto !important;
-  }
-  Loader {
-    z-index: 2;
-  }
-`;
-
 export const ConnectionAccess: TabContainerPanelComponent<IConnectionFormProps> = observer(function ConnectionAccess({ tabId, state: formState }) {
   const state = useConnectionAccessState(formState.info);
   const translate = useTranslate();
+  const style = useS(styles);
 
   const { selected } = useTab(tabId);
 
@@ -86,41 +73,39 @@ export const ConnectionAccess: TabContainerPanelComponent<IConnectionFormProps> 
     info = 'cloud_connections_access_placeholder';
   }
 
-  return styled(styles)(
-    <Loader state={[users, teams, state.state]}>
-      {() =>
-        styled(styles)(
-          <ColoredContainer parent gap vertical>
-            {!users.resource.values.length && !teams.resource.values.length ? (
-              <Group keepSize large>
-                <TextPlaceholder>{translate('connections_administration_connection_access_empty')}</TextPlaceholder>
-              </Group>
-            ) : (
-              <>
-                {info && <InfoItem info={info} />}
-                <Container gap overflow>
-                  <ConnectionAccessGrantedList
-                    grantedUsers={grantedUsers.get()}
-                    grantedTeams={grantedTeams.get()}
+  return (
+    <Loader className={s(style, { loader: true })} state={[users, teams, state.state]}>
+      {() => (
+        <ColoredContainer className={s(style, { coloredContainer: true })} parent gap vertical>
+          {!users.resource.values.length && !teams.resource.values.length ? (
+            <Group className={s(style, { group: true })} keepSize large>
+              <TextPlaceholder>{translate('connections_administration_connection_access_empty')}</TextPlaceholder>
+            </Group>
+          ) : (
+            <>
+              {info && <InfoItem info={info} />}
+              <Container gap overflow>
+                <ConnectionAccessGrantedList
+                  grantedUsers={grantedUsers.get()}
+                  grantedTeams={grantedTeams.get()}
+                  disabled={disabled}
+                  onEdit={state.edit}
+                  onRevoke={state.revoke}
+                />
+                {state.state.editing && (
+                  <ConnectionAccessList
+                    userList={users.resource.values}
+                    teamList={teams.resource.values}
+                    grantedSubjects={state.state.grantedSubjects}
                     disabled={disabled}
-                    onEdit={state.edit}
-                    onRevoke={state.revoke}
+                    onGrant={state.grant}
                   />
-                  {state.state.editing && (
-                    <ConnectionAccessList
-                      userList={users.resource.values}
-                      teamList={teams.resource.values}
-                      grantedSubjects={state.state.grantedSubjects}
-                      disabled={disabled}
-                      onGrant={state.grant}
-                    />
-                  )}
-                </Container>
-              </>
-            )}
-          </ColoredContainer>,
-        )
-      }
-    </Loader>,
+                )}
+              </Container>
+            </>
+          )}
+        </ColoredContainer>
+      )}
+    </Loader>
   );
 });
