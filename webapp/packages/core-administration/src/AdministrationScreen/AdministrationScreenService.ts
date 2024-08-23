@@ -118,6 +118,12 @@ export class AdministrationScreenService {
   private async onRouteChange() {
     await this.serverConfigResource.load();
 
+    const isAdminScreen = this.isAdministrationRouteActive(this.screenService.routerService.state.name);
+
+    if (!isAdminScreen) {
+      return;
+    }
+
     const item = this.administrationItemService.getItem(this.activeScreen?.item ?? '', this.isConfigurationMode);
 
     if (!item) {
