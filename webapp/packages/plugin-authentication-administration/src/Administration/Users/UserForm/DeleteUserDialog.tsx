@@ -38,7 +38,7 @@ export const DeleteUserDialog: DialogComponent<IPayload> = function DeleteUserDi
 
   async function deleteUser() {
     try {
-      await usersResource.resource.delete(props.payload.userId);
+      await usersResource.resource.deleteUsers(props.payload.userId);
       notificationService.logSuccess({ title: 'authentication_administration_users_delete_user_success', message: props.payload.userId });
       props.resolveDialog();
     } catch (exception: any) {

@@ -69,6 +69,7 @@ export class DatabaseDataActions<TOptions, TResult extends IDatabaseDataResult> 
 
         action = new Action(this.source, ...depends);
         action.updateResult(result, this.source.results.indexOf(result));
+        action.afterResultUpdate();
         this.actions.set(result.uniqueResultId, [...this.actions.get(result.uniqueResultId), action]);
       });
     }
