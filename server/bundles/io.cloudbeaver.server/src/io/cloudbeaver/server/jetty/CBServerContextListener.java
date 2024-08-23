@@ -37,10 +37,10 @@ public class CBServerContextListener implements ServletContextListener {
 
         cookieConfig.setComment("Cloudbeaver Session ID");
         //scf.setDomain(domain);
-        //scf.setHttpOnly(httpOnly);
         //scf.setMaxAge(CB_SESSION_LIFE_TIME);
         cookieConfig.setPath(CBApplication.getInstance().getRootURI());
         cookieConfig.setSecure(application.getServerURL().startsWith("https"));
+        cookieConfig.setHttpOnly(true);
         cookieConfig.setName(CBConstants.CB_SESSION_COOKIE_NAME);
     }
 
