@@ -12,16 +12,27 @@
                 <propertyGroup label="LDAP" description="LDAP authentication">
                     <property id="ldap-host" label="Host" type="string" description="LDAP server host" required="true"/>
                     <property id="ldap-port" label="Port" type="integer" defaultValue="389" required="true" description="LDAP server port, default is 389"/>
-                    <property id="ldap-dn" label="Base Distinguished Name" type="string"
-                              description="Base Distinguished Name applicable for all users, example: dc=myOrg,dc=com"
+                    <property id="ldap-identifier-attr" label="User identifier attribute"
+                              defaultValue="cn"
                               required="true"
+                              description="LDAP attribute used as a user ID. Will be automatically added to the beginning of the 'User DN' value during authorization if not explicitly specified"/>
+                    <property id="ldap-dn" label="Base Distinguished Name" type="string"
+                              description="Base Distinguished Name applicable for all users, example: dc=myOrg,dc=com. Will be automatically added to the end of the 'User DN' value during authorization if not explicitly specified"
+                              required="false"/>
+                    <property id="ldap-bind-user" label="Bind User DN" type="string"
+                              description="DN of user, who has permissions to search for users to check access to the application with the specified filter."
+                              required="false"/>
+                    <property id="ldap-bind-user-pwd" label="Bind User Password" type="string"
+                              description="Bind user password."
+                              features="password" required="false"/>
+                    <property id="ldap-filter   " label="User Filter" type="string" required="false"
+                              description="Filter that will be used to verify users access to the application.To use the filter, the bind user configuration is mandatory."
                     />
                 </propertyGroup>
             </configuration>
             <credentials>
                 <propertyGroup label="Auth credentials">
-                    <property id="units" label="Unit paths" type="string" description="LDAP unit paths separated by commas. Example ou=unit1,ou=unit2" user="true"/>
-                    <property id="user" label="User name" type="string" description="LDAP user name" user="true"/>
+                    <property id="user-dn" label="User DN" type="string" description="LDAP user name" user="true"/>
                     <property id="password" label="User password" type="string" description="LDAP user password"
                               user="true" encryption="plain"/>
                 </propertyGroup>

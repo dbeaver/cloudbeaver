@@ -9,6 +9,7 @@ const { merge } = require('webpack-merge');
 const { resolve } = require('path');
 const webpack = require('webpack');
 const httpProxy = require('http-proxy');
+const { EsbuildPlugin } = require('esbuild-loader');
 const fs = require('fs');
 const { URL } = require('url');
 
@@ -97,9 +98,11 @@ module.exports = (env, argv) => {
       new CopyWebpackPlugin({
         patterns: getAssets(package, ''),
       }),
-      new webpack.DefinePlugin({
-        _VERSION_: JSON.stringify(package.version),
-        _DEV_: true,
+      new EsbuildPlugin({
+          define: {
+            _VERSION_: JSON.stringify(package.version),
+            _DEV_: JSON.stringify(true),
+          },
       }),
       new HtmlWebpackPlugin({
         template: resolve('src/index.html.ejs'),
