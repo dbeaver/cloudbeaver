@@ -191,15 +191,6 @@ export class ConnectionMenuBootstrap extends Bootstrap {
 
         return false;
       },
-      isHidden: (context, action) => {
-        const connection = context.get(DATA_CONTEXT_CONNECTION);
-
-        if (action === ACTION_CONNECTION_CHANGE_CREDENTIALS) {
-          return !connection?.credentialsSaved;
-        }
-
-        return false;
-      },
       getLoader: (context, action) => {
         const connection = context.get(DATA_CONTEXT_CONNECTION)!;
 
