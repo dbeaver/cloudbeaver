@@ -4,7 +4,7 @@
     "allowUnreachableCode": false,
     "allowSyntheticDefaultImports": true,
     "allowJs": false,
-    "lib": ["dom", "ES2019", "ES2022.Error"],
+    "lib": ["dom", "ES2022"],
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "importsNotUsedAsValues": "error",
