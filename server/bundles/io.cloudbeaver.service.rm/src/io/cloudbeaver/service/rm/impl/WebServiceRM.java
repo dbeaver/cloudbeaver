@@ -37,10 +37,8 @@ import org.jkiss.dbeaver.model.websocket.WSConstants;
 import org.jkiss.dbeaver.model.websocket.event.WSProjectUpdateEvent;
 import org.jkiss.dbeaver.model.websocket.event.permissions.WSObjectPermissionEvent;
 import org.jkiss.dbeaver.model.websocket.event.resource.WSResourceProperty;
-import org.jkiss.utils.CommonUtils;
 
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Path;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -216,17 +214,7 @@ public class WebServiceRM implements DBWServiceRM {
                 WSResourceProperty.NAME);
             return true;
         } catch (Exception e) {
-            Path oldPath = Path.of(oldResourcePath);
-            Path newPath = Path.of(newResourcePath);
-            if (CommonUtils.equalObjects(oldPath.getParent(), newPath.getParent())) {
-                throw new DBWebException("Error renaming resource %s to %s".formatted(oldPath.getFileName(), newPath.getFileName()), e);
-            }
-            throw new DBWebException(
-                "Error moving resource %s to %s".formatted(
-                    oldResourcePath,
-                    newPath.getParent() == null ? " the project root folder" : newPath.getParent()
-                ), e
-            );
+            throw new DBWebException(e.getMessage(), e);
         }
     }
 
