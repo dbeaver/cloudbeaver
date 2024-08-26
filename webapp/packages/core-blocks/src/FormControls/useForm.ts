@@ -83,7 +83,11 @@ export function useForm(options?: IOptions): IFormContext {
           this.parent.keyDown(event);
         } else if (event.key === 'Enter' && this.disableEnterSubmit === false) {
           event.preventDefault();
-          this.submit();
+          if (this.ref) {
+            this.ref?.requestSubmit();
+          } else {
+            this.submit();
+          }
         }
       },
       async submit(event) {
