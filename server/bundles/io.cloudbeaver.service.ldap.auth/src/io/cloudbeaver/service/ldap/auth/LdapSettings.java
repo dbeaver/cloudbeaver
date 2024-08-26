@@ -28,13 +28,26 @@ public class LdapSettings {
     @NotNull
     private final String baseDN;
     private final int port;
+    @NotNull
+    private final String userIdentifierAttr;
+    private final String bindUser;
+    private final String bindUserPassword;
+    private final String filter;
 
-    protected LdapSettings(SMAuthProviderCustomConfiguration providerConfiguration) {
+
+    protected LdapSettings(
+        SMAuthProviderCustomConfiguration providerConfiguration
+    ) {
         this.providerConfiguration = providerConfiguration;
         this.host = providerConfiguration.getParameter(LdapConstants.PARAM_HOST);
         this.port = CommonUtils.isNotEmpty(providerConfiguration.getParameter(LdapConstants.PARAM_PORT)) ? Integer.parseInt(
             providerConfiguration.getParameter(LdapConstants.PARAM_PORT)) : 389;
         this.baseDN = providerConfiguration.getParameterOrDefault(LdapConstants.PARAM_DN, "");
+        this.userIdentifierAttr = providerConfiguration.getParameterOrDefault(LdapConstants.PARAM_USER_IDENTIFIER_ATTR,
+            "cn");
+        this.bindUser = providerConfiguration.getParameterOrDefault(LdapConstants.PARAM_BIND_USER, "");
+        this.bindUserPassword = providerConfiguration.getParameterOrDefault(LdapConstants.PARAM_BIND_USER_PASSWORD, "");
+        this.filter = providerConfiguration.getParameterOrDefault(LdapConstants.PARAM_FILTER, "");
     }
 
 
@@ -50,5 +63,26 @@ public class LdapSettings {
 
     public int getPort() {
         return port;
+    }
+
+    public String getLdapProviderUrl() {
+        return "ldap://" + getHost() + ":" + getPort();
+    }
+
+    @NotNull
+    public String getUserIdentifierAttr() {
+        return userIdentifierAttr;
+    }
+
+    public String getBindUserDN() {
+        return bindUser;
+    }
+
+    public String getBindUserPassword() {
+        return bindUserPassword;
+    }
+
+    public String getFilter() {
+        return filter;
     }
 }
