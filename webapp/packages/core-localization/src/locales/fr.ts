@@ -126,6 +126,7 @@ export default [
   ['ui_test', 'Tester'],
   ['ui_export', 'Exporter'],
   ['ui_you', 'Vous'],
+  ['ui_ms', 'ms'],
 
   ['root_permission_denied', "Vous n'avez pas les permissions"],
   ['root_permission_no_permission', "Vous n'avez pas la permission pour cette action"],

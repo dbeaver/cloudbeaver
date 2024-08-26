@@ -7,6 +7,7 @@
  */
 import type { IServiceProvider } from '@cloudbeaver/core-di';
 import type { IExecutor } from '@cloudbeaver/core-executor';
+import { TLocalizationToken } from '@cloudbeaver/core-localization';
 import type { ResultDataFormat } from '@cloudbeaver/core-sdk';
 
 import type { IDatabaseDataActionClass, IDatabaseDataActionInterface } from './IDatabaseDataAction';
@@ -29,7 +30,7 @@ export interface IDatabaseDataSourceOperationEvent {
 export interface IRequestInfo {
   readonly originalQuery: string;
   readonly requestDuration: number;
-  readonly requestMessage: string;
+  readonly requestMessage: string | TLocalizationToken;
   /** A string representation of the filters constraints applied to the data request. Also returns as it is in case of whereFilter */
   readonly requestFilter: string;
   readonly source: string | null;

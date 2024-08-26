@@ -6,16 +6,22 @@
  * you may not use this file except in compliance with the License.
  */
 import { AdministrationItemService, AdministrationItemType, ConfigurationWizardService } from '@cloudbeaver/core-administration';
+import { importLazyComponent } from '@cloudbeaver/core-blocks';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 
-import { FinishPage } from './Finish/FinishPage';
-import { FinishPageDrawerItem } from './Finish/FinishPageDrawerItem';
 import { ADMINISTRATION_SERVER_CONFIGURATION_ITEM } from './ServerConfiguration/ADMINISTRATION_SERVER_CONFIGURATION_ITEM';
-import { ServerConfigurationDrawerItem } from './ServerConfiguration/ServerConfigurationDrawerItem';
-import { ServerConfigurationPage } from './ServerConfiguration/ServerConfigurationPage';
 import { ServerConfigurationService } from './ServerConfiguration/ServerConfigurationService';
-import { WelcomeDrawerItem } from './Welcome/WelcomeDrawerItem';
-import { WelcomePage } from './Welcome/WelcomePage';
+
+const FinishPage = importLazyComponent(() => import('./Finish/FinishPage').then(m => m.FinishPage));
+const FinishPageDrawerItem = importLazyComponent(() => import('./Finish/FinishPageDrawerItem').then(m => m.FinishPageDrawerItem));
+const ServerConfigurationDrawerItem = importLazyComponent(() =>
+  import('./ServerConfiguration/ServerConfigurationDrawerItem').then(m => m.ServerConfigurationDrawerItem),
+);
+const ServerConfigurationPage = importLazyComponent(() =>
+  import('./ServerConfiguration/ServerConfigurationPage').then(m => m.ServerConfigurationPage),
+);
+const WelcomeDrawerItem = importLazyComponent(() => import('./Welcome/WelcomeDrawerItem').then(m => m.WelcomeDrawerItem));
+const WelcomePage = importLazyComponent(() => import('./Welcome/WelcomePage').then(m => m.WelcomePage));
 
 @injectable()
 export class ConfigurationWizardPagesBootstrapService extends Bootstrap {
@@ -27,7 +33,7 @@ export class ConfigurationWizardPagesBootstrapService extends Bootstrap {
     super();
   }
 
-  register(): void | Promise<void> {
+  register(): void {
     this.administrationItemService.create({
       name: 'welcome',
       type: AdministrationItemType.ConfigurationWizard,
@@ -68,6 +74,4 @@ export class ConfigurationWizardPagesBootstrapService extends Bootstrap {
       getDrawerComponent: () => FinishPageDrawerItem,
     });
   }
-
-  load(): void | Promise<void> {}
 }
