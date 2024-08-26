@@ -8,7 +8,6 @@
 import { Dependency, injectable } from '@cloudbeaver/core-di';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
 import { ScreenService } from '@cloudbeaver/core-routing';
-import { isNotNullDefined } from '@cloudbeaver/core-utils';
 
 import { AdministrationScreenService } from '../AdministrationScreenService';
 import { ConfigurationWizardService } from './ConfigurationWizardService';
@@ -26,6 +25,7 @@ export class ConfigurationWizardScreenService extends Dependency {
   }
 
   private async onRouteChange() {
+    // this is need for this.isConfigurationMode
     await this.serverConfigResource.load();
 
     if (!this.administrationScreenService.isConfigurationMode) {
@@ -33,7 +33,7 @@ export class ConfigurationWizardScreenService extends Dependency {
     }
 
     const isCurrentStepAvailable =
-      isNotNullDefined(this.configurationWizardService.currentStep) &&
+      this.configurationWizardService.currentStep &&
       this.configurationWizardService.isStepAvailable(this.configurationWizardService.currentStep.name);
 
     if (!isCurrentStepAvailable) {
