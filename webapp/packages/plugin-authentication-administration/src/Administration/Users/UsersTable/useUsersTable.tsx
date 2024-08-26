@@ -85,7 +85,7 @@ export function useUsersTable(filters: IUserFilters) {
         this.loading = true;
 
         try {
-          await this.usersLoader.resource.delete(resourceKeyList(deletionList));
+          await this.usersLoader.resource.deleteUsers(resourceKeyList(deletionList));
           this.state.unselect();
 
           for (const id of deletionList) {

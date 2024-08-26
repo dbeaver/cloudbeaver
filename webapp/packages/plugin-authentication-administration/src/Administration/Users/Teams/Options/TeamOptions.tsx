@@ -21,7 +21,7 @@ export const TeamOptions: TabContainerPanelComponent<ITeamFormProps> = observer(
   const edit = state.mode === 'edit';
 
   return (
-    <Container>
+    <Container overflow>
       <Group small gap>
         <InputField name="teamId" state={state.config} readOnly={state.readonly || edit} disabled={state.disabled} required tiny fill>
           {translate('administration_teams_team_id')}

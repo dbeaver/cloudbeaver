@@ -129,6 +129,7 @@ export default [
   ['ui_test', 'Test'],
   ['ui_export', 'Export'],
   ['ui_you', 'You'],
+  ['ui_ms', 'ms'],
 
   ['root_permission_denied', '您没有权限'],
   ['root_permission_no_permission', '您没有权限执行此操作'],

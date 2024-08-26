@@ -259,6 +259,8 @@ public class WebSQLProcessor implements WebSessionProvider {
                         }
                     }
                 });
+            } else {
+                executeInfo.setResults(new WebSQLQueryResults[0]);
             }
         } catch (DBException e) {
             throw new DBWebException("Error executing query", e);

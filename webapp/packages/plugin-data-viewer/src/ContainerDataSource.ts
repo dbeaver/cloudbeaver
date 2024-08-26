@@ -164,7 +164,7 @@ export class ContainerDataSource extends ResultSetDataSource<IDataContainerOptio
         this.requestInfo = {
           ...this.requestInfo,
           requestDuration: response.result.duration,
-          requestMessage: 'Saved successfully',
+          requestMessage: 'plugin_data_viewer_result_set_save_success',
           source: null,
         };
       }
