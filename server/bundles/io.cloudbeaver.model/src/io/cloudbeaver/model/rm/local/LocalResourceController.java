@@ -630,6 +630,9 @@ public class LocalResourceController implements RMController {
                 }
                 Path newTargetPath = getTargetPath(projectId, normalizedNewResourcePath);
                 validateResourcePath(newTargetPath.toString());
+                if (Files.exists(newTargetPath)) {
+                    throw new DBException("Resource with name %s already exists".formatted(newTargetPath.getFileName()));
+                }
                 try {
                     Files.move(oldTargetPath, newTargetPath);
                 } catch (IOException e) {

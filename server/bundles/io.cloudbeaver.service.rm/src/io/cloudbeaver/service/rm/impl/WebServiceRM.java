@@ -214,7 +214,7 @@ public class WebServiceRM implements DBWServiceRM {
                 WSResourceProperty.NAME);
             return true;
         } catch (Exception e) {
-            throw new DBWebException("Error moving resource " + oldResourcePath, e);
+            throw new DBWebException(e.getMessage(), e);
         }
     }
 
