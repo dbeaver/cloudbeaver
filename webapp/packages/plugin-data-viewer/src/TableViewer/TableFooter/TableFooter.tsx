@@ -7,7 +7,7 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import { Container, Fill, s, ToolsPanel, useS } from '@cloudbeaver/core-blocks';
+import { Container, Fill, s, ToolsPanel, useS, useTranslate } from '@cloudbeaver/core-blocks';
 
 import type { IDatabaseDataModel } from '../../DatabaseDataModel/IDatabaseDataModel';
 import styles from './TableFooter.module.css';
@@ -20,6 +20,7 @@ interface Props {
 }
 
 export const TableFooter = observer<Props>(function TableFooter({ resultIndex, model, simple }) {
+  const translate = useTranslate();
   const style = useS(styles);
 
   return (
@@ -29,7 +30,8 @@ export const TableFooter = observer<Props>(function TableFooter({ resultIndex, m
         <>
           <Fill />
           <Container className={s(style, { time: true })} keepSize center>
-            {model.source.requestInfo.requestMessage} - {model.source.requestInfo.requestDuration}ms
+            {translate(model.source.requestInfo.requestMessage)} - {model.source.requestInfo.requestDuration}
+            {translate('ui_ms')}
           </Container>
         </>
       )}
