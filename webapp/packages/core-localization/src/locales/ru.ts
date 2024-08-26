@@ -128,6 +128,7 @@ export default [
   ['ui_test', 'Проверить'],
   ['ui_export', 'Экспорт'],
   ['ui_you', 'Вы'],
+  ['ui_ms', 'мс'],
 
   ['root_permission_denied', 'Отказано в доступе'],
   ['root_permission_no_permission', 'У вас нет разрешения на это действие'],
