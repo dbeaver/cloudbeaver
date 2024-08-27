@@ -141,7 +141,7 @@ export class QueryDataSource<TOptions extends IDataQueryOptions = IDataQueryOpti
         this.requestInfo = {
           ...this.requestInfo,
           requestDuration: response.result.duration,
-          requestMessage: 'Saved successfully',
+          requestMessage: 'plugin_data_viewer_result_set_save_success',
           source: this.options.query,
         };
       }
