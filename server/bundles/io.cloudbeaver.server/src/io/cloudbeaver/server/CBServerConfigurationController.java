@@ -625,4 +625,10 @@ public abstract class CBServerConfigurationController<T extends CBServerConfig>
         }
         return uri;
     }
+
+    @NotNull
+    @Override
+    public Map<String, Object> getOriginalConfigurationProperties() {
+        return originalConfigurationProperties;
+    }
 }
