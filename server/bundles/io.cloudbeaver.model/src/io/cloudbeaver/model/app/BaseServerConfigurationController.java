@@ -22,9 +22,10 @@ import com.google.gson.GsonBuilder;
 /**
  * Abstract class that contains methods for loading configuration with gson.
  */
-public abstract class BaseServerConfigurationController<T extends WebServerConfiguration> implements WebServerConfigurationController<T> {
+public abstract class BaseServerConfigurationController<T extends WebServerConfiguration>
+    implements WebServerConfigurationController<T> {
 
-    protected Gson getGson() {
+    public Gson getGson() {
         return getGsonBuilder().create();
     }
 

@@ -86,10 +86,6 @@ export class ConfigurationWizardService {
   }
 
   isStepAvailable(name: string): boolean {
-    if (this.currentStep?.name === name) {
-      return true;
-    }
-
     for (const step of this.steps) {
       if (step.name === name) {
         return true;

@@ -17,6 +17,7 @@ export const coreAdministrationManifest: PluginManifest = {
     () => import('./PermissionsResource').then(m => m.PermissionsResource),
     () => import('./AdministrationScreen/AdministrationScreenService').then(m => m.AdministrationScreenService),
     () => import('./AdministrationScreen/ConfigurationWizard/ConfigurationWizardService').then(m => m.ConfigurationWizardService),
+    () => import('./AdministrationScreen/ConfigurationWizard/ConfigurationWizardScreenService').then(m => m.ConfigurationWizardScreenService),
     () => import('./AdministrationLocaleService').then(m => m.AdministrationLocaleService),
   ],
 };

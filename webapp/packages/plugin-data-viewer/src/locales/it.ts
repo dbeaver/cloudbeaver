@@ -70,4 +70,5 @@ export default [
   ['settings_data_editor_fetch_default_name', 'Default fetch size'],
   ['settings_data_editor_fetch_default_description', 'Default number of rows to fetch'],
   ['plugin_data_viewer_no_available_presentation', 'No available presentation'],
+  ['plugin_data_viewer_result_set_save_success', 'Saved successfully'],
 ];
