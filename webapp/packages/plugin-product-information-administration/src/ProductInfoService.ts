@@ -37,8 +37,8 @@ export class ProductInfoService extends Dependency {
       type: AdministrationItemType.Administration,
       getContentComponent: () => ProductInfoPage,
       getDrawerComponent: () => ProductInfoDrawerItem,
-      onActivate: () => {
-        this.serverLicenseStatusResource.load();
+      onActivate: async () => {
+        await this.serverLicenseStatusResource.load();
       },
       order: 12,
     });
