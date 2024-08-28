@@ -321,7 +321,7 @@ module.exports = (env, argv) => {
       ],
     },
     ignoreWarnings: [/Failed to parse source map/],
-    devtool: devMode ? 'source-map' : false,
+    devtool: devMode ? 'eval-source-map' : false,
     plugins: [
       new webpack.WatchIgnorePlugin({
         paths: [/.tsbuildinfo$/],

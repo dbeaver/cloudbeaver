@@ -16,9 +16,12 @@
  */
 package io.cloudbeaver.model.app;
 
+import com.google.gson.Gson;
+import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.DBException;
 
 import java.nio.file.Path;
+import java.util.Map;
 
 /**
  * Server configuration controller.
@@ -31,4 +34,11 @@ public interface WebServerConfigurationController<T extends WebServerConfigurati
      */
     void loadServerConfiguration(Path configPath) throws DBException;
 
+    @NotNull
+    default Map<String, Object> getOriginalConfigurationProperties() {
+        return Map.of();
+    }
+
+    @NotNull
+    Gson getGson();
 }

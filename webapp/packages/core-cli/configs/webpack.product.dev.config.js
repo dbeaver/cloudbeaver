@@ -98,12 +98,18 @@ module.exports = (env, argv) => {
       new CopyWebpackPlugin({
         patterns: getAssets(package, ''),
       }),
-      new EsbuildPlugin({
-          define: {
-            _VERSION_: JSON.stringify(package.version),
-            _DEV_: JSON.stringify(true),
-          },
+      new webpack.DefinePlugin({
+        _VERSION_: JSON.stringify(package.version),
+        _DEV_: true,
       }),
+
+      // for some reason it doesn't work with source maps
+      // new EsbuildPlugin({
+      //     define: {
+      //       _VERSION_: JSON.stringify(package.version),
+      //       _DEV_: JSON.stringify(true),
+      //     },
+      // }),
       new HtmlWebpackPlugin({
         template: resolve('src/index.html.ejs'),
         inject: 'body',
