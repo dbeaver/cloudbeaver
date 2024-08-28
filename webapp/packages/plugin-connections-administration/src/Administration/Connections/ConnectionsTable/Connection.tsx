@@ -18,13 +18,12 @@ import { ConnectionEdit } from './ConnectionEdit';
 interface Props {
   connectionKey: IConnectionInfoParams;
   connection: DatabaseConnection;
-  projectName?: string | null;
+  projectName?: string;
+  icon?: string;
 }
 
-export const Connection = observer<Props>(function Connection({ connectionKey, connection, projectName }) {
-  const driversResource = useService(DBDriverResource);
+export const Connection = observer<Props>(function Connection({ connectionKey, connection, projectName, icon }) {
   const connectionsAdministrationService = useService(ConnectionsAdministrationService);
-  const icon = driversResource.get(connection.driverId)?.icon;
   const style = useS(styles);
 
   return (
@@ -46,7 +45,7 @@ export const Connection = observer<Props>(function Connection({ connectionKey, c
         {connection.host && connection.port && `:${connection.port}`}
       </TableColumnValue>
       {projectName !== undefined && (
-        <TableColumnValue title={projectName ?? ''} className={s(style, { tableColumnValueExpand: true })} expand ellipsis>
+        <TableColumnValue title={projectName} className={s(style, { tableColumnValueExpand: true })} expand ellipsis>
           {projectName}
         </TableColumnValue>
       )}
