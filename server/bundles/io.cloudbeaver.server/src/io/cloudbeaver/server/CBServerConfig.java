@@ -54,6 +54,8 @@ public class CBServerConfig implements WebServerConfiguration {
     private WebDatabaseConfig databaseConfiguration = new WebDatabaseConfig();
     private String staticContent = "";
 
+    private boolean secureCookies = false;
+
     public String getServerURL() {
         return serverURL;
     }
@@ -182,5 +184,9 @@ public class CBServerConfig implements WebServerConfiguration {
 
     public SMControllerConfiguration getSecurityManagerConfiguration() {
         return securityManagerConfiguration;
+    }
+
+    public boolean isSecureCookies() {
+        return secureCookies;
     }
 }
