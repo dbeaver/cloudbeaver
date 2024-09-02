@@ -16,22 +16,22 @@
  */
 package io.cloudbeaver.model.app;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+import io.cloudbeaver.registry.WebDriverRegistry;
 import org.jkiss.code.NotNull;
 
-/**
- * Abstract class that contains methods for loading configuration with gson.
- */
-public abstract class BaseServerConfigurationController<T extends WebServerConfiguration>
-    implements WebServerConfigurationController<T> {
+import java.net.InetAddress;
+import java.util.List;
+import java.util.Map;
+
+//FIXME: this interface should not exist,
+// the logic of platforms and applications should be separated from each other
+public interface CBApplicationAdapter extends WebApplication {
+    AppWebSessionManager getSessionManager();
+
+    WebDriverRegistry getDriverRegistry();
 
     @NotNull
-    public Gson getGson() {
-        return getGsonBuilder().create();
-    }
+    Map<String, Object> getProductConfiguration();
 
-    protected abstract GsonBuilder getGsonBuilder();
-
-    public abstract T getServerConfiguration();
+    List<InetAddress> getLocalInetAddresses();
 }

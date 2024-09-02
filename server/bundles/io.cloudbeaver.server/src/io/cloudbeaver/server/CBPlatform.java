@@ -18,44 +18,30 @@
 package io.cloudbeaver.server;
 
 import io.cloudbeaver.auth.NoAuthCredentialsProvider;
+import io.cloudbeaver.model.app.AppWebSessionManager;
+import io.cloudbeaver.model.app.CBApplicationAdapter;
 import io.cloudbeaver.server.jobs.SessionStateJob;
 import io.cloudbeaver.server.jobs.WebDataSourceMonitorJob;
 import io.cloudbeaver.server.jobs.WebSessionMonitorJob;
 import io.cloudbeaver.service.session.WebSessionManager;
-import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Plugin;
 import org.eclipse.core.runtime.Status;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
-import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
-import org.jkiss.dbeaver.model.DBConstants;
 import org.jkiss.dbeaver.model.DBFileController;
-import org.jkiss.dbeaver.model.app.DBACertificateStorage;
-import org.jkiss.dbeaver.model.app.DBPWorkspace;
 import org.jkiss.dbeaver.model.connection.DBPDataSourceProviderDescriptor;
 import org.jkiss.dbeaver.model.connection.DBPDriver;
 import org.jkiss.dbeaver.model.connection.DBPDriverLibrary;
-import org.jkiss.dbeaver.model.impl.app.DefaultCertificateStorage;
 import org.jkiss.dbeaver.model.preferences.DBPPreferenceStore;
-import org.jkiss.dbeaver.model.qm.QMRegistry;
-import org.jkiss.dbeaver.model.qm.QMUtils;
 import org.jkiss.dbeaver.model.runtime.AbstractJob;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
-import org.jkiss.dbeaver.model.runtime.VoidProgressMonitor;
-import org.jkiss.dbeaver.registry.BasePlatformImpl;
 import org.jkiss.dbeaver.registry.DataSourceProviderRegistry;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
-import org.jkiss.dbeaver.runtime.SecurityProviderUtils;
-import org.jkiss.dbeaver.runtime.qm.QMLogFileWriter;
-import org.jkiss.dbeaver.runtime.qm.QMRegistryImpl;
-import org.jkiss.dbeaver.utils.ContentUtils;
 import org.jkiss.utils.IOUtils;
 
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -63,7 +49,7 @@ import java.util.stream.Collectors;
 /**
  * CBPlatform
  */
-public class CBPlatform extends BasePlatformImpl {
+public class CBPlatform extends BaseWebPlatform {
 
     // The plug-in ID
     public static final String PLUGIN_ID = "io.cloudbeaver.server"; //$NON-NLS-1$
@@ -72,28 +58,21 @@ public class CBPlatform extends BasePlatformImpl {
     public static final String TEMP_FILE_FOLDER = "temp-sql-upload-files";
     public static final String TEMP_FILE_IMPORT_FOLDER = "temp-import-files";
 
-    public static final String WORK_DATA_FOLDER_NAME = ".work-data";
 
     @Nullable
-    private static CBApplication<?> application = null;
+    private static CBApplicationAdapter application = null;
 
-    private Path tempFolder;
-
-    private QMRegistryImpl queryManager;
-    private QMLogFileWriter qmLogWriter;
-    private DBACertificateStorage certificateStorage;
-    private WebGlobalWorkspace workspace;
     private CBPreferenceStore preferenceStore;
-    private final List<DBPDriver> applicableDrivers = new ArrayList<>();
+    protected final List<DBPDriver> applicableDrivers = new ArrayList<>();
 
     public static CBPlatform getInstance() {
         return (CBPlatform) DBWorkbench.getPlatform();
     }
 
-    CBPlatform() {
+    protected CBPlatform() {
     }
 
-    public static void setApplication(CBApplication application) {
+    public static void setApplication(@NotNull CBApplicationAdapter application) {
         CBPlatform.application = application;
     }
 
@@ -102,32 +81,23 @@ public class CBPlatform extends BasePlatformImpl {
         long startTime = System.currentTimeMillis();
         log.info("Initialize web platform...: ");
         this.preferenceStore = new CBPreferenceStore(this, WebPlatformActivator.getInstance().getPreferences());
-        // Register BC security provider
-        SecurityProviderUtils.registerSecurityProvider();
-
-        // Register properties adapter
-        this.workspace = new WebGlobalWorkspace(this, ResourcesPlugin.getWorkspace());
-        this.workspace.initializeProjects();
-
-        QMUtils.initApplication(this);
-        this.queryManager = new QMRegistryImpl();
-
-        this.qmLogWriter = new QMLogFileWriter();
-        this.queryManager.registerMetaListener(qmLogWriter);
-
-        this.certificateStorage = new DefaultCertificateStorage(
-            WebPlatformActivator.getInstance().getStateLocation().toFile().toPath().resolve(DBConstants.CERTIFICATE_STORAGE_FOLDER));
         super.initialize();
-
         refreshApplicableDrivers();
 
-        new WebSessionMonitorJob(this)
-            .scheduleMonitor();
+        scheduleServerJobs();
+        log.info("Web platform initialized (" + (System.currentTimeMillis() - startTime) + "ms)");
+    }
 
-        new SessionStateJob(this)
-            .scheduleMonitor();
+    protected void scheduleServerJobs() {
+        if (getSessionManager() instanceof WebSessionManager webSessionManager) {
+            new WebSessionMonitorJob(this, webSessionManager)
+                .scheduleMonitor();
 
-        new WebDataSourceMonitorJob(this)
+            new SessionStateJob(this, webSessionManager)
+                .scheduleMonitor();
+        }
+
+        new WebDataSourceMonitorJob(this, getSessionManager())
             .scheduleMonitor();
 
         new AbstractJob("Delete temp folder") {
@@ -142,7 +112,6 @@ public class CBPlatform extends BasePlatformImpl {
                 return Status.OK_STATUS;
             }
         }.schedule();
-        log.info("Web platform initialized (" + (System.currentTimeMillis() - startTime) + "ms)");
     }
 
     public synchronized void dispose() {
@@ -151,48 +120,15 @@ public class CBPlatform extends BasePlatformImpl {
 
         super.dispose();
 
-        if (this.qmLogWriter != null) {
-            this.queryManager.unregisterMetaListener(qmLogWriter);
-            this.qmLogWriter.dispose();
-            this.qmLogWriter = null;
-        }
-        if (this.queryManager != null) {
-            this.queryManager.dispose();
-            //queryManager = null;
-        }
-        DataSourceProviderRegistry.dispose();
-
-        if (workspace != null) {
-            try {
-                workspace.save(new VoidProgressMonitor());
-            } catch (DBException ex) {
-                log.error("Can't save workspace", ex); //$NON-NLS-1$
-            }
-        }
-
-        // Remove temp folder
-        if (tempFolder != null) {
-
-            if (!ContentUtils.deleteFileRecursive(tempFolder.toFile())) {
-                log.warn("Can't delete temp folder '" + tempFolder.toAbsolutePath() + "'");
-            }
-            tempFolder = null;
-        }
-
         CBPlatform.application = null;
         System.gc();
         log.debug("Shutdown completed in " + (System.currentTimeMillis() - startTime) + "ms");
     }
 
-    @NotNull
-    @Override
-    public DBPWorkspace getWorkspace() {
-        return workspace;
-    }
 
     @NotNull
     @Override
-    public CBApplication<?> getApplication() {
+    public CBApplicationAdapter getApplication() {
         return application;
     }
 
@@ -200,10 +136,6 @@ public class CBPlatform extends BasePlatformImpl {
         return applicableDrivers;
     }
 
-    @NotNull
-    public QMRegistry getQueryManager() {
-        return queryManager;
-    }
 
     @NotNull
     @Override
@@ -211,48 +143,12 @@ public class CBPlatform extends BasePlatformImpl {
         return preferenceStore;
     }
 
-    @NotNull
-    @Override
-    public DBACertificateStorage getCertificateStorage() {
-        return certificateStorage;
-    }
-
-    @NotNull
-    public Path getTempFolder(@NotNull DBRProgressMonitor monitor, @NotNull String name) {
-        if (tempFolder == null) {
-            // Make temp folder
-            monitor.subTask("Create temp folder");
-            tempFolder = workspace.getAbsolutePath().resolve(WORK_DATA_FOLDER_NAME);
-        }
-        if (!Files.exists(tempFolder)) {
-            try {
-                Files.createDirectories(tempFolder);
-            } catch (IOException e) {
-                log.error("Can't create temp directory " + tempFolder, e);
-            }
-        }
-        Path folder = tempFolder.resolve(name);
-        if (!Files.exists(folder)) {
-            try {
-                Files.createDirectories(folder);
-            } catch (IOException e) {
-                log.error("Error creating temp folder '" + folder.toAbsolutePath() + "'", e);
-            }
-        }
-        return folder;
-    }
-
-    @Override
-    protected Plugin getProductPlugin() {
-        return WebPlatformActivator.getInstance();
-    }
-
     @Override
     public boolean isShuttingDown() {
         return false;
     }
 
-    public WebSessionManager getSessionManager() {
+    public AppWebSessionManager getSessionManager() {
         return application.getSessionManager();
     }
 

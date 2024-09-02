@@ -121,7 +121,7 @@ public class CBJettyServer {
                     }
                 }
 
-                initSessionManager(this.application, servletContextHandler);
+                initSessionManager(this.application.getMaxSessionIdleTime(), servletContextHandler);
 
                 server.setHandler(servletContextHandler);
 
@@ -179,13 +179,12 @@ public class CBJettyServer {
         return sslConfiguration.isAbsolute() ? sslConfiguration : application.getHomeDirectory().resolve(sslConfiguration);
     }
 
-    private void initSessionManager(
-        @NotNull CBApplication<?> application,
+    public static void initSessionManager(
+        long maxIdleTime,
         @NotNull ServletContextHandler servletContextHandler
     ) {
         // Init sessions persistence
         SessionHandler sessionHandler = new SessionHandler();
-        var maxIdleTime = application.getMaxSessionIdleTime();
         int intMaxIdleSeconds;
         if (maxIdleTime > Integer.MAX_VALUE) {
             log.warn("Max session idle time value is greater than Integer.MAX_VALUE. Integer.MAX_VALUE will be used instead");

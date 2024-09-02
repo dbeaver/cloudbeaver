@@ -18,6 +18,7 @@ package io.cloudbeaver.service.session;
 
 import io.cloudbeaver.DBWebException;
 import io.cloudbeaver.auth.SMTokenCredentialProvider;
+import io.cloudbeaver.model.app.AppWebSessionManager;
 import io.cloudbeaver.model.session.BaseWebSession;
 import io.cloudbeaver.model.session.WebHeadlessSession;
 import io.cloudbeaver.model.session.WebSession;
@@ -47,7 +48,7 @@ import java.util.stream.Collectors;
 /**
  * Web session manager
  */
-public class WebSessionManager {
+public class WebSessionManager implements AppWebSessionManager {
 
     private static final Log log = Log.getLog(WebSessionManager.class);
 
@@ -61,6 +62,7 @@ public class WebSessionManager {
     /**
      * Closes Web Session, associated to HttpSession from {@code request}
      */
+    @Override
     public BaseWebSession closeSession(@NotNull HttpServletRequest request) {
         HttpSession session = request.getSession();
         if (session != null) {
@@ -82,20 +84,26 @@ public class WebSessionManager {
     }
 
     @Deprecated
-    public boolean touchSession(@NotNull HttpServletRequest request,
-                                @NotNull HttpServletResponse response) throws DBWebException {
+    public boolean touchSession(
+        @NotNull HttpServletRequest request,
+        @NotNull HttpServletResponse response
+    ) throws DBWebException {
         WebSession webSession = getWebSession(request, response, false);
         webSession.updateSessionParameters(request);
         webSession.updateInfo(!request.getSession().isNew());
         return true;
     }
 
+    @Override
     @NotNull
-    public WebSession getWebSession(@NotNull HttpServletRequest request,
-                                    @NotNull HttpServletResponse response) throws DBWebException {
+    public WebSession getWebSession(
+        @NotNull HttpServletRequest request,
+        @NotNull HttpServletResponse response
+    ) throws DBWebException {
         return getWebSession(request, response, true);
     }
 
+    @Override
     @NotNull
     public WebSession getWebSession(
         @NotNull HttpServletRequest request,
@@ -223,6 +231,7 @@ public class WebSessionManager {
             .collect(Collectors.toMap(WebSessionHandlerDescriptor::getId, WebSessionHandlerDescriptor::getInstance));
     }
 
+    @Override
     @Nullable
     public BaseWebSession getSession(@NotNull String sessionId) {
         synchronized (sessionMap) {
@@ -230,6 +239,7 @@ public class WebSessionManager {
         }
     }
 
+    @Override
     @Nullable
     public WebSession findWebSession(HttpServletRequest request) {
         String sessionId = request.getSession().getId();
@@ -242,6 +252,7 @@ public class WebSessionManager {
         }
     }
 
+    @Override
     public WebSession findWebSession(HttpServletRequest request, boolean errorOnNoFound) throws DBWebException {
         WebSession webSession = findWebSession(request);
         if (webSession != null) {
@@ -274,6 +285,7 @@ public class WebSessionManager {
         }
     }
 
+    @Override
     public Collection<BaseWebSession> getAllActiveSessions() {
         synchronized (sessionMap) {
             return new ArrayList<>(sessionMap.values());
@@ -289,7 +301,8 @@ public class WebSessionManager {
         synchronized (sessionMap) {
             var httpSession = request.getSession();
             var tempCredProvider = new SMTokenCredentialProvider(smAccessToken);
-            SMAuthPermissions authPermissions = application.createSecurityController(tempCredProvider).getTokenPermissions();
+            SMAuthPermissions authPermissions = application.createSecurityController(tempCredProvider)
+                .getTokenPermissions();
             var sessionId = httpSession != null ? httpSession.getId()
                 : authPermissions.getSessionId();
 

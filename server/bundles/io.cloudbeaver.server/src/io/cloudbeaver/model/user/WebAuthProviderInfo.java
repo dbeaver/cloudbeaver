@@ -21,6 +21,7 @@ import io.cloudbeaver.auth.SMAuthProviderFederated;
 import io.cloudbeaver.auth.provisioning.SMProvisioner;
 import io.cloudbeaver.registry.WebAuthProviderConfiguration;
 import io.cloudbeaver.registry.WebAuthProviderDescriptor;
+import io.cloudbeaver.server.CBAppConfig;
 import io.cloudbeaver.server.CBApplication;
 import io.cloudbeaver.server.CBPlatform;
 import org.jkiss.dbeaver.Log;
@@ -64,7 +65,10 @@ public class WebAuthProviderInfo {
     }
 
     public boolean isDefaultProvider() {
-        return descriptor.getId().equals(CBPlatform.getInstance().getApplication().getAppConfiguration().getDefaultAuthProvider());
+        if (CBPlatform.getInstance().getApplication().getAppConfiguration() instanceof CBAppConfig cbAppConfig) {
+            return descriptor.getId().equals(cbAppConfig.getDefaultAuthProvider());
+        }
+        return false;
     }
 
     public boolean isConfigurable() {

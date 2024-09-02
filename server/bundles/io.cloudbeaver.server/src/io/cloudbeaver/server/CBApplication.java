@@ -19,6 +19,7 @@ package io.cloudbeaver.server;
 import io.cloudbeaver.WebServiceUtils;
 import io.cloudbeaver.auth.NoAuthCredentialsProvider;
 import io.cloudbeaver.model.app.BaseWebApplication;
+import io.cloudbeaver.model.app.CBApplicationAdapter;
 import io.cloudbeaver.model.app.WebAuthApplication;
 import io.cloudbeaver.model.app.WebAuthConfiguration;
 import io.cloudbeaver.registry.WebDriverRegistry;
@@ -74,7 +75,8 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * This class controls all aspects of the application's execution
  */
-public abstract class CBApplication<T extends CBServerConfig> extends BaseWebApplication implements WebAuthApplication {
+public abstract class CBApplication<T extends CBServerConfig> extends
+    BaseWebApplication implements WebAuthApplication, CBApplicationAdapter {
 
     private static final Log log = Log.getLog(CBApplication.class);
 

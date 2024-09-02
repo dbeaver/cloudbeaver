@@ -16,10 +16,10 @@
  */
 package io.cloudbeaver.server.websockets;
 
+import io.cloudbeaver.model.app.AppWebSessionManager;
 import io.cloudbeaver.model.session.BaseWebSession;
 import io.cloudbeaver.model.session.WebHeadlessSession;
 import io.cloudbeaver.server.CBPlatform;
-import io.cloudbeaver.service.session.WebSessionManager;
 import jakarta.servlet.http.HttpServletRequest;
 import org.eclipse.jetty.websocket.server.JettyServerUpgradeRequest;
 import org.eclipse.jetty.websocket.server.JettyServerUpgradeResponse;
@@ -29,7 +29,6 @@ import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.security.exception.SMAccessTokenExpiredException;
-import org.jkiss.dbeaver.runtime.DBWorkbench;
 
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
@@ -41,9 +40,9 @@ import java.util.concurrent.CopyOnWriteArrayList;
 public class CBJettyWebSocketManager implements JettyWebSocketCreator {
     private static final Log log = Log.getLog(CBJettyWebSocketManager.class);
     private final Map<String, List<CBEventsWebSocket>> socketBySessionId = new ConcurrentHashMap<>();
-    private final WebSessionManager webSessionManager;
+    private final AppWebSessionManager webSessionManager;
 
-    public CBJettyWebSocketManager(@NotNull WebSessionManager webSessionManager) {
+    public CBJettyWebSocketManager(@NotNull AppWebSessionManager webSessionManager) {
         this.webSessionManager = webSessionManager;
 
         new WebSocketPingPongJob(CBPlatform.getInstance(), this).scheduleMonitor();

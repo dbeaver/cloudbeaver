@@ -26,7 +26,7 @@ import io.cloudbeaver.WebProjectImpl;
 import io.cloudbeaver.model.WebAsyncTaskInfo;
 import io.cloudbeaver.model.WebConnectionInfo;
 import io.cloudbeaver.model.WebServerMessage;
-import io.cloudbeaver.model.app.WebAuthApplication;
+import io.cloudbeaver.model.app.WebApplication;
 import io.cloudbeaver.model.user.WebUser;
 import io.cloudbeaver.service.DBWSessionHandler;
 import io.cloudbeaver.service.sql.WebSQLConstants;
@@ -89,6 +89,7 @@ import java.util.stream.Collectors;
  * Web session.
  * Is the main source of data in web application
  */
+//TODO: split to authenticated and non authenticated context
 public class WebSession extends BaseWebSession
     implements SMSessionWithAuth, SMCredentialsProvider, DBACredentialsProvider, IAdaptable {
 
@@ -125,20 +126,34 @@ public class WebSession extends BaseWebSession
 
     public WebSession(
         @NotNull HttpServletRequest request,
-        @NotNull WebAuthApplication application,
+        @NotNull WebApplication application,
         @NotNull Map<String, DBWSessionHandler> sessionHandlers
     ) throws DBException {
-        super(request.getSession().getId(), application);
+        this(
+            request.getSession().getId(),
+            CommonUtils.toString(request.getSession().getAttribute(ATTR_LOCALE), null),
+            application,
+            sessionHandlers
+        );
+        updateSessionParameters(request);
+    }
+
+    protected WebSession(
+        @NotNull String id,
+        @Nullable String locale,
+        @NotNull WebApplication application,
+        @NotNull Map<String, DBWSessionHandler> sessionHandlers
+    ) throws DBException {
+        super(id, application);
         this.lastAccessTime = this.createTime;
-        setLocale(CommonUtils.toString(request.getSession().getAttribute(ATTR_LOCALE), this.locale));
         this.sessionHandlers = sessionHandlers;
+        setLocale(locale);
         //force authorization of anonymous session to avoid access error,
         //because before authorization could be called by any request,
         //but now 'updateInfo' is called only in special requests,
         //and the order of requests is not guaranteed.
         //look at CB-4747
         refreshSessionAuth();
-        updateSessionParameters(request);
     }
 
     @Nullable
