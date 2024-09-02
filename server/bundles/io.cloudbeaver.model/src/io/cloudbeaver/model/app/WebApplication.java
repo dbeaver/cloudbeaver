@@ -17,7 +17,7 @@
 package io.cloudbeaver.model.app;
 
 import io.cloudbeaver.DataSourceFilter;
-import io.cloudbeaver.WebProjectImpl;
+import io.cloudbeaver.WebSessionProjectImpl;
 import io.cloudbeaver.model.session.WebSession;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.DBException;
@@ -58,7 +58,7 @@ public interface WebApplication extends DBPApplication {
 
     boolean isMultiNode();
 
-    WebProjectImpl createProjectImpl(
+    WebSessionProjectImpl createProjectImpl(
         @NotNull WebSession webSession,
         @NotNull RMProject project,
         @NotNull DataSourceFilter dataSourceFilter

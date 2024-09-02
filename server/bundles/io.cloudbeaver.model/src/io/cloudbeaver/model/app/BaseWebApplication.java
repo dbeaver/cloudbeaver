@@ -17,7 +17,6 @@
 package io.cloudbeaver.model.app;
 
 import io.cloudbeaver.DataSourceFilter;
-import io.cloudbeaver.WebProjectImpl;
 import io.cloudbeaver.WebSessionProjectImpl;
 import io.cloudbeaver.model.log.SLF4JLogHandler;
 import io.cloudbeaver.model.session.WebSession;
@@ -171,7 +170,7 @@ public abstract class BaseWebApplication extends BaseApplicationImpl implements 
     }
 
     @Override
-    public WebProjectImpl createProjectImpl(
+    public WebSessionProjectImpl createProjectImpl(
         @NotNull WebSession webSession,
         @NotNull RMProject project,
         @NotNull DataSourceFilter dataSourceFilter

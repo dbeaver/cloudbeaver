@@ -16,6 +16,7 @@
  */
 package io.cloudbeaver.server.events;
 
+import io.cloudbeaver.WebSessionProjectImpl;
 import io.cloudbeaver.model.session.BaseWebSession;
 import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.utils.WebAppUtils;
@@ -74,14 +75,14 @@ public class WSObjectPermissionUpdatedEventHandler extends WSDefaultEventHandler
                     var webSession = (WebSession) activeUserSession;
                     var dataSources = List.of(objectId);
 
-                    var project = webSession.getProjectById(WebAppUtils.getGlobalProjectId());
+                    WebSessionProjectImpl project = webSession.getProjectById(WebAppUtils.getGlobalProjectId());
                     if (project == null) {
                         log.error("Project " + WebAppUtils.getGlobalProjectId() +
                             " is not found in session " + activeUserSession.getSessionId());
                         return;
                     }
                     if (WSEventType.OBJECT_PERMISSIONS_UPDATED.getEventId().equals(event.getId())) {
-                        isAccessibleNow = webSession.findWebConnectionInfo(project.getId(), objectId) != null;
+                        isAccessibleNow = project.findWebConnectionInfo(objectId) != null;
                         if (isAccessibleNow) {
                             return;
                         }
