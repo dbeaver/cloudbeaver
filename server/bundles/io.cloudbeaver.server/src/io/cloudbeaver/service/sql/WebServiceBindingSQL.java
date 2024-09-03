@@ -296,6 +296,9 @@ public class WebServiceBindingSQL extends WebServiceBindingBase<DBWServiceSQL> i
 
     @Override
     public void addServlets(WebApplication application, DBWServletContext servletContext) throws DBException {
+        if (!application.isMultiuser()) {
+            return;
+        }
         servletContext.addServlet(
             "sqlResultValueViewer",
             new WebSQLResultServlet(application, getServiceImpl()),
