@@ -93,6 +93,7 @@ export class FormState<TState> implements IFormState<TState> {
       exception: observable.ref,
       isSaving: observable.ref,
       state: observable,
+      isChanged: computed,
       isDisabled: computed,
       setMode: action,
       setPartsState: action,
@@ -124,8 +125,8 @@ export class FormState<TState> implements IFormState<TState> {
     return this.dataContext.get(DATA_CONTEXT_LOADABLE_STATE)!.loaders.some(loader => loader.isCancelled?.() === true);
   }
 
-  isChanged(): boolean {
-    return Array.from(this.parts.values()).some(part => part.isChanged());
+  get isChanged(): boolean {
+    return Array.from(this.parts.values()).some(part => part.isChanged);
   }
 
   getPart<T extends IFormPart<any>>(getter: DataContextGetter<T>, init: (context: IDataContext, id: string) => T): T {

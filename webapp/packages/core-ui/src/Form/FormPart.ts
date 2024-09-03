@@ -5,7 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { action, makeObservable, observable, toJS } from 'mobx';
+import { action, computed, makeObservable, observable, toJS } from 'mobx';
 
 import { executorHandlerFilter, ExecutorInterrupter, type IExecutionContextProvider } from '@cloudbeaver/core-executor';
 import { isObjectsEqual } from '@cloudbeaver/core-utils';
@@ -49,6 +49,7 @@ export abstract class FormPart<TPartState, TFormState = any> implements IFormPar
       loaded: observable,
       loading: observable,
       setInitialState: action,
+      isChanged: computed,
     });
   }
 
@@ -68,7 +69,7 @@ export abstract class FormPart<TPartState, TFormState = any> implements IFormPar
     return this.exception !== null;
   }
 
-  isChanged(): boolean {
+  get isChanged(): boolean {
     if (!this.loaded || this.initialState === this.state) {
       return false;
     }
@@ -85,7 +86,7 @@ export abstract class FormPart<TPartState, TFormState = any> implements IFormPar
     try {
       await this.loader();
 
-      if (!this.isChanged()) {
+      if (!this.isChanged) {
         return;
       }
 
@@ -136,7 +137,7 @@ export abstract class FormPart<TPartState, TFormState = any> implements IFormPar
   protected setInitialState(initialState: TPartState) {
     this.initialState = initialState;
 
-    if (this.isChanged()) {
+    if (this.isChanged) {
       return;
     }
 

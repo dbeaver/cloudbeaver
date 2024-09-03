@@ -37,6 +37,8 @@ export interface IFormState<TState> extends ILoadableState {
   readonly formatTask: IExecutor<IFormState<TState>>;
   readonly validationTask: IExecutor<IFormState<TState>>;
 
+  get isChanged(): boolean;
+
   setMode(mode: FormMode): this;
   setPartsState(state: MetadataMap<string, any>): this;
   setException(exception: Error | (Error | null)[] | null): this;
@@ -49,7 +51,6 @@ export interface IFormState<TState> extends ILoadableState {
   isError(): boolean;
   isOutdated(): boolean;
   isCancelled(): boolean;
-  isChanged(): boolean;
 
   load(): Promise<void>;
   reload(): Promise<void>;

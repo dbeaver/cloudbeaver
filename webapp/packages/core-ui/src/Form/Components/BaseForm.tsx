@@ -22,7 +22,7 @@ export const BaseForm = observer<IBaseFormProps<any>>(function BaseForm({ servic
   const translate = useTranslate();
 
   const editing = state.mode === FormMode.Edit;
-  const changed = state.isChanged();
+  const changed = state.isChanged;
 
   const form = useForm({
     async onSubmit() {
