@@ -259,7 +259,7 @@ public class WebNavigatorNodeInfo {
         if (project == null) {
             return false;
         }
-        RMProject rmProject = project.getRmProject();
+        RMProject rmProject = project.getRMProject();
         return SMUtils.hasProjectPermission(session, rmProject, permission);
     }
 

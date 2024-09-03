@@ -30,7 +30,6 @@ import io.cloudbeaver.server.CBAppConfig;
 import io.cloudbeaver.server.CBApplication;
 import io.cloudbeaver.server.CBPlatform;
 import io.cloudbeaver.service.navigator.WebPropertyFilter;
-import io.cloudbeaver.utils.WebAppUtils;
 import io.cloudbeaver.utils.WebCommonUtils;
 import io.cloudbeaver.utils.WebDataSourceUtils;
 import org.jkiss.code.NotNull;
@@ -96,10 +95,6 @@ public class WebServiceUtils extends WebCommonUtils {
     @NotNull
     public static DBPDataSourceRegistry getGlobalDataSourceRegistry() throws DBWebException {
         return WebDataSourceUtils.getGlobalDataSourceRegistry();
-    }
-
-    public static DBPDataSourceRegistry getGlobalRegistry(WebSession session) {
-        return session.getProjectById(WebAppUtils.getGlobalProjectId()).getDataSourceRegistry();
     }
 
     public static InputStream openStaticResource(String path) {

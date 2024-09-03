@@ -230,7 +230,7 @@ public abstract class WebServiceBindingBase<API_TYPE extends DBWService> impleme
                 if (project == null) {
                     throw new DBException("Project not found:" + projectId);
                 }
-                RMProject rmProject = project.getRmProject();
+                RMProject rmProject = project.getRMProject();
 
                 for (String reqProjectPermission : requireProjectPermissions) {
                     if (!rmProject.hasProjectPermission(reqProjectPermission)) {

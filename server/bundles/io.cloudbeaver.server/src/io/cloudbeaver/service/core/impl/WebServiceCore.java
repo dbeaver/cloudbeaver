@@ -155,25 +155,25 @@ public class WebServiceCore implements DBWServiceCore {
     ) throws DBWebException {
         List<WebConnectionInfo> result = new ArrayList<>();
         if (projectId == null) {
-            for (DBPProject project : webSession.getAccessibleProjects()) {
+            for (WebSessionProjectImpl project : webSession.getAccessibleProjects()) {
                 getTemplateConnectionsFromProject(webSession, project, result);
             }
         } else {
-            DBPProject project = getProjectById(webSession, projectId);
+            WebSessionProjectImpl project = getProjectById(webSession, projectId);
             getTemplateConnectionsFromProject(webSession, project, result);
         }
-        webSession.filterAccessibleConnections(result);
         return result;
     }
 
     private void getTemplateConnectionsFromProject(
         @NotNull WebSession webSession,
-        @NotNull DBPProject project,
+        @NotNull WebSessionProjectImpl project,
         List<WebConnectionInfo> result
     ) {
         DBPDataSourceRegistry registry = project.getDataSourceRegistry();
         for (DBPDataSourceContainer ds : registry.getDataSources()) {
             if (ds.isTemplate() &&
+                project.getDataSourceFilter().filter(ds) &&
                 CBPlatform.getInstance().getApplicableDrivers().contains(ds.getDriver())) {
                 result.add(new WebConnectionInfo(webSession, ds));
             }
@@ -432,7 +432,7 @@ public class WebServiceCore implements DBWServiceCore {
         @NotNull WebConnectionConfig connectionConfig
     ) throws DBWebException {
         WebSessionProjectImpl project = getProjectById(webSession, projectId);
-        var rmProject = project.getRmProject();
+        var rmProject = project.getRMProject();
         if (rmProject.getType() == RMProjectType.USER
             && !webSession.hasPermission(DBWConstants.PERMISSION_ADMIN)
             && !CBApplication.getInstance().getAppConfiguration().isSupportsCustomConnections()
@@ -688,7 +688,7 @@ public class WebServiceCore implements DBWServiceCore {
         connectionConfig.setSaveCredentials(true); // It is used in createConnectionFromConfig
 
         DataSourceDescriptor dataSource = (DataSourceDescriptor) WebDataSourceUtils.getLocalOrGlobalDataSource(
-            CBApplication.getInstance(), webSession, projectId, connectionId);
+            webSession, projectId, connectionId);
 
         WebProjectImpl project = getProjectById(webSession, projectId);
         DBPDataSourceRegistry sessionRegistry = project.getDataSourceRegistry();

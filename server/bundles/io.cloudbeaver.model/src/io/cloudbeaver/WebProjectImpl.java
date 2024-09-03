@@ -32,16 +32,15 @@ import org.jkiss.dbeaver.runtime.DBWorkbench;
 public abstract class WebProjectImpl extends BaseWebProjectImpl {
     private static final Log log = Log.getLog(WebProjectImpl.class);
     @NotNull
-    private final DBPPreferenceStore preferenceStore;
+    protected final DBPPreferenceStore preferenceStore;
     public WebProjectImpl(
         @NotNull DBPWorkspace workspace,
         @NotNull RMController resourceController,
         @NotNull SMSessionContext sessionContext,
         @NotNull RMProject project,
-        @NotNull DataSourceFilter dataSourceFilter,
         @NotNull DBPPreferenceStore preferenceStore
     ) {
-        super(workspace, resourceController, sessionContext, project, dataSourceFilter);
+        super(workspace, resourceController, sessionContext, project);
         this.preferenceStore = preferenceStore;
     }
 
@@ -75,8 +74,13 @@ public abstract class WebProjectImpl extends BaseWebProjectImpl {
     protected DBPDataSourceRegistry createDataSourceRegistry() {
         return new WebDataSourceRegistryProxy(
             new DataSourceRegistryRM(this, getResourceController(), preferenceStore),
-            dataSourceFilter
+            getDataSourceFilter()
         );
+    }
+
+    @NotNull
+    public DataSourceFilter getDataSourceFilter() {
+        return (ds) -> true;
     }
 
 }

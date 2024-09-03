@@ -36,21 +36,19 @@ import java.util.stream.Collectors;
 
 public class WebSessionProjectImpl extends WebProjectImpl {
     private static final Log log = Log.getLog(WebSessionProjectImpl.class);
-    private final WebSession webSession;
+    protected final WebSession webSession;
     private final Map<String, WebConnectionInfo> connections = new HashMap<>();
     private boolean registryIsLoaded = false;
 
     public WebSessionProjectImpl(
         @NotNull WebSession webSession,
-        @NotNull RMProject project,
-        @NotNull DataSourceFilter dataSourceFilter
+        @NotNull RMProject project
     ) {
         super(
             webSession.getWorkspace(),
             webSession.getRmController(),
             webSession.getSessionContext(),
             project,
-            dataSourceFilter,
             webSession.getUserPreferenceStore()
         );
         this.webSession = webSession;
@@ -200,4 +198,7 @@ public class WebSessionProjectImpl extends WebProjectImpl {
         return sendDataSourceUpdatedEvent;
     }
 
+    public boolean isDataSourceAccessible(@NotNull DBPDataSourceContainer ds) {
+        return true;
+    }
 }

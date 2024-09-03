@@ -134,8 +134,8 @@ public class LocalResourceController implements RMController {
                     workspace,
                     this,
                     sessionContext,
-                    rmProject,
-                    (container) -> true);
+                    rmProject
+                );
                 projectRegistries.put(projectId, project);
             }
             return project;

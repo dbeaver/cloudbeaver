@@ -16,10 +16,7 @@
  */
 package io.cloudbeaver.model.app;
 
-import io.cloudbeaver.DataSourceFilter;
-import io.cloudbeaver.WebSessionProjectImpl;
 import io.cloudbeaver.model.log.SLF4JLogHandler;
-import io.cloudbeaver.model.session.WebSession;
 import io.cloudbeaver.server.WebGlobalWorkspace;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.runtime.Platform;
@@ -36,7 +33,6 @@ import org.jkiss.dbeaver.model.auth.SMSessionContext;
 import org.jkiss.dbeaver.model.data.json.JSONUtils;
 import org.jkiss.dbeaver.model.impl.app.ApplicationRegistry;
 import org.jkiss.dbeaver.model.rm.RMController;
-import org.jkiss.dbeaver.model.rm.RMProject;
 import org.jkiss.dbeaver.model.secret.DBSSecretController;
 import org.jkiss.dbeaver.model.websocket.event.WSEventController;
 import org.jkiss.dbeaver.registry.BaseApplicationImpl;
@@ -167,19 +163,6 @@ public abstract class BaseWebApplication extends BaseApplicationImpl implements 
     private Path getCustomConfigPath(Path configPath, String fileName) {
         var customConfigPath = configPath.resolve(CUSTOM_CONFIG_FOLDER).resolve(fileName);
         return Files.exists(customConfigPath) ? customConfigPath : configPath.resolve(fileName);
-    }
-
-    @Override
-    public WebSessionProjectImpl createProjectImpl(
-        @NotNull WebSession webSession,
-        @NotNull RMProject project,
-        @NotNull DataSourceFilter dataSourceFilter
-    ) {
-        return new WebSessionProjectImpl(
-            webSession,
-            project,
-            dataSourceFilter
-        );
     }
 
     /**

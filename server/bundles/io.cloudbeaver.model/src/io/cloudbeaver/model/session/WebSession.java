@@ -29,7 +29,6 @@ import io.cloudbeaver.model.user.WebUser;
 import io.cloudbeaver.service.DBWSessionHandler;
 import io.cloudbeaver.service.sql.WebSQLConstants;
 import io.cloudbeaver.utils.CBModelConstants;
-import io.cloudbeaver.utils.WebAppUtils;
 import io.cloudbeaver.utils.WebDataSourceUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import org.eclipse.core.runtime.IAdaptable;
@@ -41,7 +40,6 @@ import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBFileController;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
-import org.jkiss.dbeaver.model.DBPEvent;
 import org.jkiss.dbeaver.model.access.DBAAuthCredentials;
 import org.jkiss.dbeaver.model.access.DBACredentialsProvider;
 import org.jkiss.dbeaver.model.auth.*;
@@ -63,8 +61,6 @@ import org.jkiss.dbeaver.model.runtime.ProxyProgressMonitor;
 import org.jkiss.dbeaver.model.security.SMAdminController;
 import org.jkiss.dbeaver.model.security.SMConstants;
 import org.jkiss.dbeaver.model.security.SMController;
-import org.jkiss.dbeaver.model.security.SMObjectType;
-import org.jkiss.dbeaver.model.security.user.SMObjectPermissions;
 import org.jkiss.dbeaver.model.sql.DBQuotaException;
 import org.jkiss.dbeaver.model.websocket.event.MessageType;
 import org.jkiss.dbeaver.model.websocket.event.WSEventType;
@@ -98,11 +94,10 @@ public class WebSession extends BaseWebSession
     private String lastRemoteAddr;
     private String lastRemoteUserAgent;
 
-    private Set<String> accessibleConnectionIds = Collections.emptySet();
-
     private String locale;
     private boolean cacheExpired;
 
+    private WebSessionGlobalProjectImpl globalProject;
     private final List<WebServerMessage> sessionMessages = new ArrayList<>();
 
     private final Map<String, WebAsyncTaskInfo> asyncTasks = new HashMap<>();
@@ -262,6 +257,7 @@ public class WebSession extends BaseWebSession
             this.navigatorModel.dispose();
             this.navigatorModel = null;
         }
+        this.globalProject = null;
 
         loadProjects();
 
@@ -281,7 +277,6 @@ public class WebSession extends BaseWebSession
             // No anonymous mode in distributed apps
             return;
         }
-        refreshAccessibleConnectionIds();
         try {
             RMController controller = getRmController();
             RMProject[] rmProjects = controller.listAccessibleProjects();
@@ -302,11 +297,12 @@ public class WebSession extends BaseWebSession
     }
 
     public WebSessionProjectImpl createWebProject(RMProject project) {
-        // Do not filter data sources from user project
-        DataSourceFilter filter = project.getType() == RMProjectType.GLOBAL
-            ? this::isDataSourceAccessible
-            : x -> true;
-        WebSessionProjectImpl sessionProject = application.createProjectImpl(this, project, filter);
+        WebSessionProjectImpl sessionProject;
+        if (project.isGlobal()) {
+            sessionProject = createGlobalProject(project);
+        } else {
+            sessionProject = new WebSessionProjectImpl(this, project);
+        }
         // do not load data sources for anonymous project
         if (project.getType() == RMProjectType.USER && userContext.getUser() == null) {
             sessionProject.setInMemory(true);
@@ -318,30 +314,12 @@ public class WebSession extends BaseWebSession
         return sessionProject;
     }
 
-    public void filterAccessibleConnections(List<WebConnectionInfo> connections) {
-        connections.removeIf(c -> !isDataSourceAccessible(c.getDataSourceContainer()));
-    }
-
-    private boolean isDataSourceAccessible(DBPDataSourceContainer dataSource) {
-        return dataSource.isExternallyProvided() ||
-            dataSource.isTemporary() ||
-            this.hasPermission(DBWConstants.PERMISSION_ADMIN) ||
-            accessibleConnectionIds.contains(dataSource.getId());
-    }
-
-    @NotNull
-    private Set<String> readAccessibleConnectionIds() {
-        try {
-            return getSecurityController()
-                .getAllAvailableObjectsPermissions(SMObjectType.datasource)
-                .stream()
-                .map(SMObjectPermissions::getObjectId)
-                .collect(Collectors.toSet());
-        } catch (DBException e) {
-            addSessionError(e);
-            log.error("Error reading connection grants", e);
-            return Collections.emptySet();
-        }
+    private WebSessionProjectImpl createGlobalProject(RMProject project) {
+        WebSessionProjectImpl sessionProject;
+        this.globalProject = new WebSessionGlobalProjectImpl(this, project);
+        globalProject.refreshAccessibleConnectionIds();
+        sessionProject = globalProject;
+        return sessionProject;
     }
 
     private void resetSessionCache() throws DBCException {
@@ -373,7 +351,9 @@ public class WebSession extends BaseWebSession
                 authAsAnonymousUser();
             } else if (getUserId() != null) {
                 userContext.refreshPermissions();
-                refreshAccessibleConnectionIds();
+                if (globalProject != null) {
+                    globalProject.refreshAccessibleConnectionIds();
+                }
             }
 
         } catch (Exception e) {
@@ -382,40 +362,6 @@ public class WebSession extends BaseWebSession
         }
     }
 
-    private synchronized void refreshAccessibleConnectionIds() {
-        this.accessibleConnectionIds = readAccessibleConnectionIds();
-    }
-
-    public synchronized void addAccessibleConnectionToCache(@NotNull String dsId) {
-        this.accessibleConnectionIds.add(dsId);
-        var project = getProjectById(WebAppUtils.getGlobalProjectId());
-        if (project == null) {
-            return;
-        }
-        var registry = project.getDataSourceRegistry();
-        var dataSource = registry.getDataSource(dsId);
-        if (dataSource != null) {
-            project.addConnection(dataSource);
-            // reflect changes is navigator model
-            registry.notifyDataSourceListeners(new DBPEvent(DBPEvent.Action.OBJECT_ADD, dataSource, true));
-        }
-    }
-
-    public synchronized void removeAccessibleConnectionFromCache(@NotNull String dsId) {
-        var project = getProjectById(WebAppUtils.getGlobalProjectId());
-        if (project == null) {
-            return;
-        }
-        var registry = project.getDataSourceRegistry();
-        var dataSource = registry.getDataSource(dsId);
-        if (dataSource != null) {
-            this.accessibleConnectionIds.remove(dsId);
-            project.removeConnection(dataSource);
-            // reflect changes is navigator model
-            registry.notifyDataSourceListeners(new DBPEvent(DBPEvent.Action.OBJECT_REMOVE, dataSource));
-            dataSource.dispose();
-        }
-    }
 
     private synchronized void authAsAnonymousUser() throws DBException {
         if (!application.getAppConfiguration().isAnonymousAccessEnabled()) {
@@ -980,6 +926,11 @@ public class WebSession extends BaseWebSession
     @NotNull
     public DBPPreferenceStore getUserPreferenceStore() {
         return getUserContext().getPreferenceStore();
+    }
+
+    @Nullable
+    public WebSessionGlobalProjectImpl getGlobalProject() {
+        return globalProject;
     }
 
     private class SessionProgressMonitor extends BaseProgressMonitor {
