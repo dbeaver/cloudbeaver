@@ -5,10 +5,8 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { observable } from 'mobx';
-import { useEffect } from 'react';
+import { useRef } from 'react';
 
-import { useObservableRef } from '@cloudbeaver/core-blocks';
 import { IServiceProvider, useService } from '@cloudbeaver/core-di';
 
 import { AdministrationUserFormService } from '../UserForm/AdministrationUserFormService';
@@ -17,29 +15,14 @@ import { AdministrationUserFormState } from '../UserForm/AdministrationUserFormS
 export function useAdministrationUserFormState(id: string | null, configure?: (state: AdministrationUserFormState) => any) {
   const service = useService(AdministrationUserFormService);
   const serviceProvider = useService(IServiceProvider);
-  const ref = useObservableRef(
-    () => ({ formState: createFormState(id) }),
-    {
-      formState: observable.ref,
-    },
-    false,
-  );
+  const ref = useRef<null | AdministrationUserFormState>(null);
 
-  function createFormState(id: string | null) {
-    const formState = new AdministrationUserFormState(serviceProvider, service, {
+  if (ref.current?.id !== id) {
+    ref.current = new AdministrationUserFormState(serviceProvider, service, {
       userId: id,
     });
-    configure?.(formState);
-
-    return formState;
+    configure?.(ref.current);
   }
 
-  useEffect(() => {
-    if (ref.formState.id !== id) {
-      const formState = createFormState(id);
-      ref.formState = formState;
-    }
-  }, [id]);
-
-  return ref.formState;
+  return ref.current;
 }
