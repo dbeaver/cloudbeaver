@@ -179,12 +179,12 @@ public class WebDataSourceUtils {
         if (projectId == null) {
             webSession.addWarningMessage("Project id is not defined in request. Try to find it from connection cache");
             // try to find connection in all accessible projects
-            Optional<Map.Entry<String, WebConnectionInfo>> optional = webSession.getAccessibleProjects().stream()
-                .flatMap(p -> p.getConnectionMap().entrySet().stream()) // get connection cache from web projects
-                .filter(e -> e.getKey().contains(connectionId))
+            Optional<WebConnectionInfo> optional = webSession.getAccessibleProjects().stream()
+                .flatMap(p -> p.getConnections().stream()) // get connection cache from web projects
+                .filter(e -> e.getId().contains(connectionId))
                 .findFirst();
             if (optional.isPresent()) {
-                return optional.get().getValue();
+                return optional.get();
             }
         }
         return webSession.getAccessibleProjectById(projectId).getWebConnectionInfo(connectionId);

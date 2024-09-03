@@ -485,8 +485,6 @@ public class WebServiceCore implements DBWServiceCore {
 //        if (!CBApplication.getInstance().getAppConfiguration().isSupportsCustomConnections()) {
 //            throw new DBWebException("Connection edit is restricted by server configuration");
 //        }
-        WebSessionProjectImpl project = getProjectById(webSession, projectId);
-        DBPDataSourceRegistry sessionRegistry = project.getDataSourceRegistry();
 
         WebConnectionInfo connectionInfo = WebDataSourceUtils.getWebConnectionInfo(webSession, projectId, config.getConnectionId());
         DBPDataSourceContainer dataSource = connectionInfo.getDataSourceContainer();
@@ -501,6 +499,8 @@ public class WebServiceCore implements DBWServiceCore {
             dataSource.setDescription(config.getDescription());
         }
 
+        WebSessionProjectImpl project = getProjectById(webSession, projectId);
+        DBPDataSourceRegistry sessionRegistry = project.getDataSourceRegistry();
         dataSource.setFolder(config.getFolder() != null ? sessionRegistry.getFolder(config.getFolder()) : null);
         if (config.isDefaultAutoCommit() != null) {
             dataSource.setDefaultAutoCommit(config.isDefaultAutoCommit());

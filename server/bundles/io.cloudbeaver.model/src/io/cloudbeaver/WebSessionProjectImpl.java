@@ -98,6 +98,9 @@ public class WebSessionProjectImpl extends WebProjectImpl {
     }
 
 
+    /**
+     * Returns web connection info from cache (if exists).
+     */
     @Nullable
     public WebConnectionInfo findWebConnectionInfo(@NotNull String connectionId) {
         synchronized (connections) {
@@ -105,6 +108,10 @@ public class WebSessionProjectImpl extends WebProjectImpl {
         }
     }
 
+    /**
+     * Returns web connection info from cache, adds it to cache if not present.
+     * Throws exception if connection is not found.
+     */
     @NotNull
     public WebConnectionInfo getWebConnectionInfo(@NotNull String connectionId) throws DBWebException {
         WebConnectionInfo connectionInfo = findWebConnectionInfo(connectionId);
@@ -118,6 +125,9 @@ public class WebSessionProjectImpl extends WebProjectImpl {
         throw new DBWebException("Connection '%s' not found".formatted(connectionId));
     }
 
+    /**
+     * Adds connection to project cache.
+     */
     @NotNull
     public synchronized WebConnectionInfo addConnection(@NotNull DBPDataSourceContainer dataSourceContainer) {
         WebConnectionInfo connection = new WebConnectionInfo(webSession, dataSourceContainer);
@@ -127,6 +137,9 @@ public class WebSessionProjectImpl extends WebProjectImpl {
         return connection;
     }
 
+    /**
+     * Removes connection from project cache.
+     */
     public void removeConnection(@NotNull DBPDataSourceContainer dataSourceContainer) {
         WebConnectionInfo webConnectionInfo = connections.get(dataSourceContainer.getId());
         if (webConnectionInfo != null) {
@@ -137,6 +150,11 @@ public class WebSessionProjectImpl extends WebProjectImpl {
         }
     }
 
+    /**
+     * Loads connection from registry if they are not loaded.
+     *
+     * @return connections from cache.
+     */
     public List<WebConnectionInfo> getConnections() {
         if (!registryIsLoaded) {
             addDataSourcesToCache();
@@ -145,10 +163,6 @@ public class WebSessionProjectImpl extends WebProjectImpl {
         synchronized (connections) {
             return new ArrayList<>(connections.values());
         }
-    }
-
-    public Map<String, WebConnectionInfo> getConnectionMap() {
-        return connections;
     }
 
     /**
@@ -196,9 +210,5 @@ public class WebSessionProjectImpl extends WebProjectImpl {
             }
         }
         return sendDataSourceUpdatedEvent;
-    }
-
-    public boolean isDataSourceAccessible(@NotNull DBPDataSourceContainer ds) {
-        return true;
     }
 }

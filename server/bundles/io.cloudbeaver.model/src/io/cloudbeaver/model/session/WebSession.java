@@ -296,7 +296,7 @@ public class WebSession extends BaseWebSession
         }
     }
 
-    public WebSessionProjectImpl createWebProject(RMProject project) {
+    private WebSessionProjectImpl createWebProject(RMProject project) {
         WebSessionProjectImpl sessionProject;
         if (project.isGlobal()) {
             sessionProject = createGlobalProject(project);
@@ -768,9 +768,12 @@ public class WebSession extends BaseWebSession
             }
             configuration.setRuntimeAttribute(RUNTIME_PARAM_AUTH_INFOS, getAllAuthInfo());
 
-            WebConnectionInfo webConnectionInfo = getProjectById(dataSourceContainer.getProject().getId()).findWebConnectionInfo(dataSourceContainer.getId());
-            if (webConnectionInfo != null) {
-                WebDataSourceUtils.saveCredentialsInDataSource(webConnectionInfo, dataSourceContainer, configuration);
+            WebSessionProjectImpl project = getProjectById(dataSourceContainer.getProject().getId());
+            if (project != null) {
+                WebConnectionInfo webConnectionInfo = project.findWebConnectionInfo(dataSourceContainer.getId());
+                if (webConnectionInfo != null) {
+                    WebDataSourceUtils.saveCredentialsInDataSource(webConnectionInfo, dataSourceContainer, configuration);
+                }
             }
 
             // uncommented because we had the problem with non-native auth models
@@ -865,6 +868,11 @@ public class WebSession extends BaseWebSession
         return getWorkspace().getProjectById(projectId);
     }
 
+    /**
+     * Returns project info from session cache.
+     *
+     * @throws DBWebException if project with provided id is not found.
+     */
     public WebSessionProjectImpl getAccessibleProjectById(@Nullable String projectId) throws DBWebException {
         WebSessionProjectImpl project = null;
         if (projectId != null) {
@@ -880,6 +888,9 @@ public class WebSession extends BaseWebSession
         return getWorkspace().getProjects();
     }
 
+    /**
+     * Adds project to session cache and navigator tree.
+     */
     public void addSessionProject(@NotNull WebSessionProjectImpl project) {
         getWorkspace().addProject(project);
         if (navigatorModel != null) {
@@ -887,6 +898,9 @@ public class WebSession extends BaseWebSession
         }
     }
 
+    /**
+     * Removes project from session cache and navigator tree.
+     */
     public void deleteSessionProject(@Nullable WebSessionProjectImpl project) {
         if (project != null) {
             project.dispose();

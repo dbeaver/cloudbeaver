@@ -42,6 +42,9 @@ public class WebSessionGlobalProjectImpl extends WebSessionProjectImpl {
         super(webSession, project);
     }
 
+    /**
+     * Update info about accessible connections from a database.
+     */
     public synchronized void refreshAccessibleConnectionIds() {
         this.accessibleConnectionIds = readAccessibleConnectionIds();
     }
@@ -61,6 +64,9 @@ public class WebSessionGlobalProjectImpl extends WebSessionProjectImpl {
         }
     }
 
+    /**
+     * Checks if connection is accessible for current user.
+     */
     public boolean isDataSourceAccessible(@NotNull DBPDataSourceContainer dataSource) {
         return dataSource.isExternallyProvided() ||
             dataSource.isTemporary() ||
@@ -68,6 +74,10 @@ public class WebSessionGlobalProjectImpl extends WebSessionProjectImpl {
             accessibleConnectionIds.contains(dataSource.getId());
     }
 
+    /**
+     * Adds a connection if it became accessible.
+     * The method is processed when connection permissions were updated.
+     */
     public synchronized void addAccessibleConnectionToCache(@NotNull String dsId) {
         if (!getRMProject().isGlobal()) {
             return;
@@ -82,6 +92,10 @@ public class WebSessionGlobalProjectImpl extends WebSessionProjectImpl {
         }
     }
 
+    /**
+     * Removes a connection if it became not accessible.
+     * The method is processed when connection permissions were updated.
+     */
     public synchronized void removeAccessibleConnectionFromCache(@NotNull String dsId) {
         if (!getRMProject().isGlobal()) {
             return;
@@ -98,7 +112,6 @@ public class WebSessionGlobalProjectImpl extends WebSessionProjectImpl {
     }
 
     @NotNull
-    @Override
     public DataSourceFilter getDataSourceFilter() {
         return this::isDataSourceAccessible;
     }
