@@ -316,9 +316,11 @@ public class WebServiceCore implements DBWServiceCore {
 
     @Override
     public WebConnectionInfo getConnectionState(
-        WebSession webSession, @Nullable String projectId, String connectionId
+        @NotNull WebSession webSession,
+        @Nullable String projectId,
+        @NotNull String connectionId
     ) throws DBWebException {
-        return webSession.getWebConnectionInfo(projectId, connectionId);
+        return WebDataSourceUtils.getWebConnectionInfo(webSession, projectId, connectionId);
     }
 
 
@@ -333,7 +335,7 @@ public class WebServiceCore implements DBWServiceCore {
         @Nullable Boolean sharedCredentials,
         @Nullable String selectedSecretId
     ) throws DBWebException {
-        WebConnectionInfo connectionInfo = webSession.getWebConnectionInfo(projectId, connectionId);
+        WebConnectionInfo connectionInfo = WebDataSourceUtils.getWebConnectionInfo(webSession, projectId, connectionId);
         connectionInfo.setSavedCredentials(authProperties, networkCredentials);
 
         var dataSourceContainer = (DataSourceDescriptor) connectionInfo.getDataSourceContainer();
@@ -483,9 +485,10 @@ public class WebServiceCore implements DBWServiceCore {
 //        if (!CBApplication.getInstance().getAppConfiguration().isSupportsCustomConnections()) {
 //            throw new DBWebException("Connection edit is restricted by server configuration");
 //        }
-        DBPDataSourceRegistry sessionRegistry = getProjectById(webSession, projectId).getDataSourceRegistry();
+        WebSessionProjectImpl project = getProjectById(webSession, projectId);
+        DBPDataSourceRegistry sessionRegistry = project.getDataSourceRegistry();
 
-        WebConnectionInfo connectionInfo = webSession.getWebConnectionInfo(projectId, config.getConnectionId());
+        WebConnectionInfo connectionInfo = WebDataSourceUtils.getWebConnectionInfo(webSession, projectId, config.getConnectionId());
         DBPDataSourceContainer dataSource = connectionInfo.getDataSourceContainer();
         webSession.addInfoMessage("Update connection - " + WebServiceUtils.getConnectionContainerInfo(dataSource));
         var oldDataSource = new DataSourceDescriptor((DataSourceDescriptor) dataSource, dataSource.getRegistry());
@@ -574,7 +577,7 @@ public class WebServiceCore implements DBWServiceCore {
     public boolean deleteConnection(
         @NotNull WebSession webSession, @Nullable String projectId, @NotNull String connectionId
     ) throws DBWebException {
-        WebConnectionInfo connectionInfo = webSession.getWebConnectionInfo(projectId, connectionId);
+        WebConnectionInfo connectionInfo = WebDataSourceUtils.getWebConnectionInfo(webSession, projectId, connectionId);
         if (connectionInfo.getDataSourceContainer().getProject() != getProjectById(webSession, projectId)) {
             throw new DBWebException("Global connection '" + connectionInfo.getName() + "' configuration cannot be deleted");
         }
@@ -821,12 +824,12 @@ public class WebServiceCore implements DBWServiceCore {
         @NotNull String connectionId,
         boolean forceDelete
     ) throws DBWebException {
-        WebConnectionInfo connectionInfo = webSession.getWebConnectionInfo(projectId, connectionId);
+        WebSessionProjectImpl project = getProjectById(webSession, projectId);
+        WebConnectionInfo connectionInfo = project.getWebConnectionInfo(connectionId);
 
         DBPDataSourceContainer dataSourceContainer = connectionInfo.getDataSourceContainer();
         boolean disconnected = WebDataSourceUtils.disconnectDataSource(webSession, dataSourceContainer);
         if (forceDelete) {
-            WebSessionProjectImpl project = getProjectById(webSession, projectId);
             DBPDataSourceRegistry registry = project.getDataSourceRegistry();
             registry.removeDataSource(dataSourceContainer);
             try {
@@ -953,7 +956,7 @@ public class WebServiceCore implements DBWServiceCore {
     public WebConnectionInfo setConnectionNavigatorSettings(
         WebSession webSession, @Nullable String projectId, String id, DBNBrowseSettings settings
     ) throws DBWebException {
-        WebConnectionInfo connectionInfo = webSession.getWebConnectionInfo(projectId, id);
+        WebConnectionInfo connectionInfo = WebDataSourceUtils.getWebConnectionInfo(webSession, projectId, id);
         DataSourceDescriptor dataSourceDescriptor = ((DataSourceDescriptor) connectionInfo.getDataSourceContainer());
         dataSourceDescriptor.setNavigatorSettings(settings);
         dataSourceDescriptor.persistConfiguration();

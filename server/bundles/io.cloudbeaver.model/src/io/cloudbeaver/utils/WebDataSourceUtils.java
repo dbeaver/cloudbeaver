@@ -18,6 +18,7 @@ package io.cloudbeaver.utils;
 
 import io.cloudbeaver.DBWConstants;
 import io.cloudbeaver.DBWebException;
+import io.cloudbeaver.WebSessionProjectImpl;
 import io.cloudbeaver.model.WebConnectionInfo;
 import io.cloudbeaver.model.WebNetworkHandlerConfigInput;
 import io.cloudbeaver.model.app.WebApplication;
@@ -37,6 +38,7 @@ import org.jkiss.utils.CommonUtils;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 public class WebDataSourceUtils {
 
@@ -156,5 +158,38 @@ public class WebDataSourceUtils {
             //new DisconnectJob(connectionInfo.getDataSource()).schedule();
         }
         return false;
+    }
+
+    /**
+     * The method that seeks for web connection in session cache by connection id.
+     * Mostly used when project id is not defined.
+     */
+    @NotNull
+    public static WebConnectionInfo getWebConnectionInfo(
+        @NotNull WebSession webSession,
+        @Nullable String projectId,
+        @NotNull String connectionId
+    ) throws DBWebException {
+        if (projectId == null) {
+            webSession.addWarningMessage("Project id is not defined in request. Try to find it from connection cache");
+            // try to find connection in all accessible projects
+            Optional<Map.Entry<String, WebConnectionInfo>> optional = webSession.getAccessibleProjects().stream()
+                .flatMap(p -> p.getConnectionMap().entrySet().stream()) // get connection cache from web projects
+                .filter(e -> e.getKey().contains(connectionId))
+                .findFirst();
+            if (optional.isPresent()) {
+                return optional.get().getValue();
+            }
+        }
+        WebSessionProjectImpl project = webSession.getAccessibleProjectById(projectId);
+        WebConnectionInfo connectionInfo = project.findWebConnectionInfo(connectionId);
+        if (connectionInfo != null) {
+            return connectionInfo;
+        }
+        DBPDataSourceContainer dataSource = project.getDataSourceRegistry().getDataSource(connectionId);
+        if (dataSource != null) {
+            return project.addConnection(dataSource);
+        }
+        throw new DBWebException("Connection '%s' not found".formatted(connectionId));
     }
 }

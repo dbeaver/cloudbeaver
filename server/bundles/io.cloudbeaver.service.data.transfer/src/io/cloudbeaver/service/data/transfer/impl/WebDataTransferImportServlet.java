@@ -42,7 +42,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.*;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.UUID;
 
 @MultipartConfig
 public class WebDataTransferImportServlet extends WebServiceServletBase {
@@ -86,7 +88,7 @@ public class WebDataTransferImportServlet extends WebServiceServletBase {
                 throw new IllegalArgumentException("Missing required parameters");
             }
 
-            WebConnectionInfo webConnectionInfo = session.getWebConnectionInfo(projectId, connectionId);
+            WebConnectionInfo webConnectionInfo = session.getAccessibleProjectById(projectId).getWebConnectionInfo(connectionId);
             WebSQLProcessor processor = WebServiceBindingSQL.getSQLProcessor(webConnectionInfo);
             WebSQLContextInfo webSQLContextInfo = processor.getContext(contextId);
 

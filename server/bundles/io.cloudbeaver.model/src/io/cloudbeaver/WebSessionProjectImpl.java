@@ -18,19 +18,21 @@ package io.cloudbeaver;
 
 import io.cloudbeaver.model.WebConnectionInfo;
 import io.cloudbeaver.model.session.WebSession;
+import io.cloudbeaver.utils.WebDataSourceUtils;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
 import org.jkiss.dbeaver.model.app.DBPDataSourceRegistry;
+import org.jkiss.dbeaver.model.app.DBPDataSourceRegistryCache;
 import org.jkiss.dbeaver.model.navigator.DBNModel;
 import org.jkiss.dbeaver.model.rm.RMProject;
+import org.jkiss.dbeaver.model.websocket.event.WSEventType;
+import org.jkiss.dbeaver.registry.DataSourceDescriptor;
 import org.jkiss.dbeaver.runtime.jobs.DisconnectJob;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class WebSessionProjectImpl extends WebProjectImpl {
     private static final Log log = Log.getLog(WebSessionProjectImpl.class);
@@ -105,6 +107,20 @@ public class WebSessionProjectImpl extends WebProjectImpl {
         }
     }
 
+    @NotNull
+    public WebConnectionInfo getWebConnectionInfo(@NotNull String connectionId) throws DBWebException {
+        WebConnectionInfo connectionInfo = findWebConnectionInfo(connectionId);
+        if (connectionInfo != null) {
+            return connectionInfo;
+        }
+        DBPDataSourceContainer dataSource = getDataSourceRegistry().getDataSource(connectionId);
+        if (dataSource != null) {
+            return addConnection(dataSource);
+        }
+        throw new DBWebException("Connection '%s' not found".formatted(connectionId));
+    }
+
+    @NotNull
     public synchronized WebConnectionInfo addConnection(@NotNull DBPDataSourceContainer dataSourceContainer) {
         WebConnectionInfo connection = new WebConnectionInfo(webSession, dataSourceContainer);
         synchronized (connections) {
@@ -135,6 +151,53 @@ public class WebSessionProjectImpl extends WebProjectImpl {
 
     public Map<String, WebConnectionInfo> getConnectionMap() {
         return connections;
+    }
+
+    /**
+     * updates data sources based on event in web session
+     *
+     * @param dataSourceIds list of updated connections
+     * @param type          type of event
+     */
+    public synchronized boolean updateProjectDataSources(@NotNull List<String> dataSourceIds, @NotNull WSEventType type) {
+        var sendDataSourceUpdatedEvent = false;
+        DBPDataSourceRegistry registry = getDataSourceRegistry();
+        // save old connections
+        var oldDataSources = dataSourceIds.stream()
+            .map(registry::getDataSource)
+            .filter(Objects::nonNull)
+            .collect(Collectors.toMap(
+                DBPDataSourceContainer::getId,
+                ds -> new DataSourceDescriptor((DataSourceDescriptor) ds, ds.getRegistry())
+            ));
+        if (type == WSEventType.DATASOURCE_CREATED || type == WSEventType.DATASOURCE_UPDATED) {
+            registry.refreshConfig(dataSourceIds);
+        }
+        for (String dsId : dataSourceIds) {
+            DataSourceDescriptor ds = (DataSourceDescriptor) registry.getDataSource(dsId);
+            if (ds == null) {
+                continue;
+            }
+            switch (type) {
+                case DATASOURCE_CREATED -> {
+                    addConnection(ds);
+                    sendDataSourceUpdatedEvent = true;
+                }
+                case DATASOURCE_UPDATED -> // if settings were changed we need to send event
+                    sendDataSourceUpdatedEvent |= !ds.equalSettings(oldDataSources.get(dsId));
+                case DATASOURCE_DELETED -> {
+                    WebDataSourceUtils.disconnectDataSource(webSession, ds);
+                    if (registry instanceof DBPDataSourceRegistryCache dsrc) {
+                        dsrc.removeDataSourceFromList(ds);
+                    }
+                    removeConnection(ds);
+                    sendDataSourceUpdatedEvent = true;
+                }
+                default -> {
+                }
+            }
+        }
+        return sendDataSourceUpdatedEvent;
     }
 
 }

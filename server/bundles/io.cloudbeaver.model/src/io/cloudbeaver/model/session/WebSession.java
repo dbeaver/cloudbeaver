@@ -44,8 +44,6 @@ import org.jkiss.dbeaver.model.DBPDataSourceContainer;
 import org.jkiss.dbeaver.model.DBPEvent;
 import org.jkiss.dbeaver.model.access.DBAAuthCredentials;
 import org.jkiss.dbeaver.model.access.DBACredentialsProvider;
-import org.jkiss.dbeaver.model.app.DBPDataSourceRegistry;
-import org.jkiss.dbeaver.model.app.DBPDataSourceRegistryCache;
 import org.jkiss.dbeaver.model.auth.*;
 import org.jkiss.dbeaver.model.connection.DBPConnectionConfiguration;
 import org.jkiss.dbeaver.model.exec.DBCException;
@@ -71,7 +69,6 @@ import org.jkiss.dbeaver.model.sql.DBQuotaException;
 import org.jkiss.dbeaver.model.websocket.event.MessageType;
 import org.jkiss.dbeaver.model.websocket.event.WSEventType;
 import org.jkiss.dbeaver.model.websocket.event.WSSessionLogUpdatedEvent;
-import org.jkiss.dbeaver.registry.DataSourceDescriptor;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.utils.CommonUtils;
 
@@ -147,7 +144,7 @@ public class WebSession extends BaseWebSession
         }
     }
 
-    @NotNull
+    @Nullable
     public WebSessionProjectImpl getSingletonProject() {
         return getWorkspace().getActiveProject();
     }
@@ -243,58 +240,6 @@ public class WebSession extends BaseWebSession
         refreshSessionAuth();
 
         initNavigatorModel();
-    }
-
-    /**
-     * updates data sources based on event in web session
-     *
-     * @param project       project of connection
-     * @param dataSourceIds list of updated connections
-     * @param type          type of event
-     */
-    public synchronized boolean updateProjectDataSources(
-        @NotNull WebSessionProjectImpl project,
-        @NotNull List<String> dataSourceIds,
-        @NotNull WSEventType type
-    ) {
-        var sendDataSourceUpdatedEvent = false;
-        DBPDataSourceRegistry registry = project.getDataSourceRegistry();
-        // save old connections
-        var oldDataSources = dataSourceIds.stream()
-            .map(registry::getDataSource)
-            .filter(Objects::nonNull)
-            .collect(Collectors.toMap(
-                DBPDataSourceContainer::getId,
-                ds -> new DataSourceDescriptor((DataSourceDescriptor) ds, ds.getRegistry())
-            ));
-        if (type == WSEventType.DATASOURCE_CREATED || type == WSEventType.DATASOURCE_UPDATED) {
-            registry.refreshConfig(dataSourceIds);
-        }
-        for (String dsId : dataSourceIds) {
-            DataSourceDescriptor ds = (DataSourceDescriptor) registry.getDataSource(dsId);
-            if (ds == null) {
-                continue;
-            }
-            switch (type) {
-                case DATASOURCE_CREATED -> {
-                    project.addConnection(ds);
-                    sendDataSourceUpdatedEvent = true;
-                }
-                case DATASOURCE_UPDATED -> // if settings were changed we need to send event
-                    sendDataSourceUpdatedEvent |= !ds.equalSettings(oldDataSources.get(dsId));
-                case DATASOURCE_DELETED -> {
-                    WebDataSourceUtils.disconnectDataSource(this, ds);
-                    if (registry instanceof DBPDataSourceRegistryCache dsrc) {
-                        dsrc.removeDataSourceFromList(ds);
-                    }
-                    project.removeConnection(ds);
-                    sendDataSourceUpdatedEvent = true;
-                }
-                default -> {
-                }
-            }
-        }
-        return sendDataSourceUpdatedEvent;
     }
 
     // Note: for admin use only
@@ -535,35 +480,6 @@ public class WebSession extends BaseWebSession
         this.cacheExpired = false;
     }
 
-    @NotNull
-    public WebConnectionInfo getWebConnectionInfo(@Nullable String projectId, @NotNull String connectionID) throws DBWebException {
-        if (projectId == null) {
-            addWarningMessage("Project id is not defined in request. Try to find it from connection cache");
-            for (WebSessionProjectImpl project : getAccessibleProjects()) {
-                for (Map.Entry<String, WebConnectionInfo> entry : project.getConnectionMap().entrySet()) {
-                    String k = entry.getKey();
-                    WebConnectionInfo v = entry.getValue();
-                    if (k.contains(connectionID)) {
-                        return v;
-                    }
-                }
-            }
-        }
-        WebSessionProjectImpl project = getProjectById(projectId);
-        if (project == null) {
-            throw new DBWebException("Project '" + projectId + "' not found in web workspace");
-        }
-        WebConnectionInfo connectionInfo = project.findWebConnectionInfo(connectionID);
-        if (connectionInfo != null) {
-            return connectionInfo;
-        }
-        DBPDataSourceContainer dataSource = project.getDataSourceRegistry().getDataSource(connectionID);
-        if (dataSource != null) {
-            return project.addConnection(dataSource);
-        }
-        throw new DBWebException("Connection '" + connectionID + "' not found");
-    }
-
     @Override
     public void close() {
         try {
@@ -747,7 +663,7 @@ public class WebSession extends BaseWebSession
         synchronized (attributes) {
             Object value = attributes.get(name);
             if (value instanceof PersistentAttribute persistentAttribute) {
-                value = persistentAttribute.getValue();
+                value = persistentAttribute.value();
             }
             return (T) value;
         }
@@ -763,7 +679,7 @@ public class WebSession extends BaseWebSession
         synchronized (attributes) {
             Object value = attributes.get(name);
             if (value instanceof PersistentAttribute persistentAttribute) {
-                value = persistentAttribute.getValue();
+                value = persistentAttribute.value();
             }
             if (value == null) {
                 value = creator.apply(null);
@@ -1003,8 +919,8 @@ public class WebSession extends BaseWebSession
         return getWorkspace().getProjectById(projectId);
     }
 
-    public WebProjectImpl getAccessibleProjectById(@Nullable String projectId) throws DBWebException {
-        WebProjectImpl project = null;
+    public WebSessionProjectImpl getAccessibleProjectById(@Nullable String projectId) throws DBWebException {
+        WebSessionProjectImpl project = null;
         if (projectId != null) {
             project = getWorkspace().getProjectById(projectId);
         }
@@ -1100,15 +1016,6 @@ public class WebSession extends BaseWebSession
         }
     }
 
-    private static class PersistentAttribute {
-        private final Object value;
-
-        public PersistentAttribute(Object value) {
-            this.value = value;
-        }
-
-        public Object getValue() {
-            return value;
-        }
+    private record PersistentAttribute(Object value) {
     }
 }

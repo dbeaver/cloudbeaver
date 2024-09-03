@@ -40,8 +40,7 @@ public class WSDataSourceUpdatedEventHandlerImpl extends WSAbstractProjectEventH
                 log.debug("Project " + event.getProjectId() + " is not found in session " + webSession.getSessionId());
                 return;
             }
-            sendEvent = webSession.updateProjectDataSources(
-                project,
+            sendEvent = project.updateProjectDataSources(
                 event.getDataSourceIds(),
                 WSEventType.valueById(event.getId())
             );
