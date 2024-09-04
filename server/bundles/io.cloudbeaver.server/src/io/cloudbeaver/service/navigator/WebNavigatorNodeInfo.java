@@ -36,8 +36,6 @@ import org.jkiss.dbeaver.model.meta.Property;
 import org.jkiss.dbeaver.model.navigator.*;
 import org.jkiss.dbeaver.model.navigator.fs.DBNFileSystem;
 import org.jkiss.dbeaver.model.navigator.fs.DBNPathBase;
-import org.jkiss.dbeaver.model.navigator.meta.DBXTreeFolder;
-import org.jkiss.dbeaver.model.navigator.meta.DBXTreeItem;
 import org.jkiss.dbeaver.model.navigator.meta.DBXTreeNode;
 import org.jkiss.dbeaver.model.rm.RMProject;
 import org.jkiss.dbeaver.model.rm.RMProjectPermission;
@@ -182,18 +180,20 @@ public class WebNavigatorNodeInfo {
     @Association
     public String[] getFeatures() {
         List<String> features = new ArrayList<>();
+        boolean isLeaf = false;
         if (node instanceof DBNDatabaseItem) {
             features.add(NODE_FEATURE_ITEM);
             DBSObject object = ((DBNDatabaseItem) node).getObject();
             if (object instanceof DBSEntity || object instanceof DBSProcedure) {
                 features.add(NODE_FEATURE_LEAF);
+                isLeaf = true;
             }
         }
         if (node instanceof DBNContainer) {
             features.add(NODE_FEATURE_CONTAINER);
         }
         boolean isShared = false;
-        if (node instanceof DBNDatabaseNode) {
+        if (node instanceof DBNDatabaseNode && !isLeaf) {
             if (node instanceof DBNDataSource dataSource) {
                 if (dataSource.getDataSourceContainer().getDataSource() != null) {
                     boolean hasNonFolderNode = DBXTreeNode.hasNonFolderNode(dataSource.getMeta().getChildren(null));

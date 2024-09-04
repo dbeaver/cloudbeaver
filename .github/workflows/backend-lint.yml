@@ -33,7 +33,7 @@ jobs:
 
       - uses: dbelyaev/action-checkstyle@master
         with:
-          github_token: ${{ secrets.github_token }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
           reporter: github-pr-review
           filter_mode: diff_context
           checkstyle_config: ./dbeaver-checkstyle-config.xml

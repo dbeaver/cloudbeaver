@@ -126,6 +126,12 @@ export const ReactCodemirror = observer<IReactCodeMirrorProps, IEditorRef>(
 
         editorView.dom.addEventListener('keydown', event => {
           const newEvent = new KeyboardEvent('keydown', event);
+
+          // we handle undo/redo on the CaptureView level
+          if ((newEvent.metaKey || newEvent.ctrlKey) && ['z', 'y'].includes(newEvent.key.toLowerCase())) {
+            return;
+          }
+
           document.dispatchEvent(newEvent);
         });
 

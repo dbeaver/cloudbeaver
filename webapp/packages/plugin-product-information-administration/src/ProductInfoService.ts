@@ -13,6 +13,7 @@ import {
 } from '@cloudbeaver/core-administration';
 import { importLazyComponent } from '@cloudbeaver/core-blocks';
 import { Dependency, injectable } from '@cloudbeaver/core-di';
+import { ServerLicenseStatusResource } from '@cloudbeaver/core-root';
 import { ITabInfoOptions, TabsContainer } from '@cloudbeaver/core-ui';
 
 const ProductInfoDrawerItem = importLazyComponent(() => import('./ProductInfoDrawerItem').then(m => m.ProductInfoDrawerItem));
@@ -24,7 +25,10 @@ export class ProductInfoService extends Dependency {
   readonly tabsContainer: TabsContainer<AdministrationItemContentProps>;
   private readonly administrationItem: IAdministrationItem;
 
-  constructor(private readonly administrationItemService: AdministrationItemService) {
+  constructor(
+    private readonly administrationItemService: AdministrationItemService,
+    private readonly serverLicenseStatusResource: ServerLicenseStatusResource,
+  ) {
     super();
     this.tabsContainer = new TabsContainer('Product information administration settings');
 
@@ -33,6 +37,9 @@ export class ProductInfoService extends Dependency {
       type: AdministrationItemType.Administration,
       getContentComponent: () => ProductInfoPage,
       getDrawerComponent: () => ProductInfoDrawerItem,
+      onActivate: async () => {
+        await this.serverLicenseStatusResource.load();
+      },
       order: 12,
     });
   }

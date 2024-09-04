@@ -22,65 +22,32 @@ You can see live demo of CloudBeaver here: https://demo.cloudbeaver.io
 
 ## Changelog
 
-### 24.1.4. 2024-08-05
-- Redesigned administration navigation panel - now it is more compact and clear;
-- Added the ability to close editor tabs with the middle mouse button;
-- Improved display of the long error messages in the SQL Editor and Log viewer;
-- SQL Editor auto-completion was enhanced to get column, table, and function names faster.
-  
-### 24.1.3. 2024-07-22
-- Data Editor:
-  -    Enhanced IPv6 and DateTime32 data representation for Clickhouse;
-  -    Data editing was fixed for DuckDB;
-- SQL Editor:
-  -    We changed the save script icon to a floppy disk for better recognition;
-  -    The 'Use long objects names' preference behavior was enhanced for auto-completion actions;
-- DDL generation for Oracle Tablespaces was added (thanks to @pandya09);
-- Many minor bug fixes, enhancements, and improvements have been made.
-
-### 24.1.2. 2024-07-08
-- Added the ability to change the default commit mode for each connection separately;
-- Added additional notifications about restricted operations;
-- Improved application behavior when closing a connection - open editors won't be closed on disconnect;
-- Added the "Keep alive" setting for Db2 LUW and IMB i, Apache Kyuubi, Clickhouse, Firebird and Trino;
-- Fixed the dollar-quoted string parsing in the SQL editor for PostgreSQL;
-- Many minor bug fixes, enhancements, and improvements have been made.
-  
-### 24.1.1. 2024-06-24
-- Unauthorized access vulnerability was fixed;
-- French language support was added (thanks to @matthieukhl);
-- Updated Firebird driver to version 5.0.4;
-- Many minor bug fixes, enhancements, and improvements have been made.
-
-### 24.1.0. 2024-06-03
-### Changes since 24.0.0:
+### 24.2.0. 2024-09-02
+### Changes since 24.1.0:
 - General:
-  -    Added the ability to back up the internal database before schema migration (for H2 and PostgreSQL)
-  -    The process of application update has improved - you can track the application update process now;
-  -    Added the ability for users to configure personal settings for the interface, SQL editor, and data viewer through the settings panel
-  -    All popup dialogs became available for screen readers, including JAWS, to improve the experience for users with disabilities;
-- User authorization:
-  -    Security for unauthorized access enhanced;
-  -    Added LDAP authentication;
-- Data viewer and SQL editor:
-  -    Added support for manual and automatic modes for committing changes to the database
-  -    Large text values (more than 100 Kb) are now automatically opened in the Value panel;
-  -    Row count calculation in the grid can be canceled for Data Editor and SQL Editor;
-  -    Added the ability to set null values for BLOB and GIS data via the cell's context menu in the table;
-  -    Added spatial data visualization for DuckDB;
-  -    Aliases autocompletion fixed for DuckDB;
-  -    Procedure creation query recognition fixed for DB2i.
-- Connection settings:
-  -    Implemented support for utilizing environment variables within connection configurations;
-- Data transfer:
-  -    Added the ability to import data to the database from CSV file;
-  -    Added the ability to select a case for column names for export to CSV;
+  -    French language support was added (thanks to @matthieukhl)
+  -    Added the ability to close editor tabs with the middle mouse button
+  -    Added right-click support to open the context menu in the Metadata Editor
+  -    The list of forbidden characters for naming and renaming resource manager files has been updated, and now it includes the following characters: / : " \ ' <> | ? *
+  -    Application cookies security was improved
+- Authentication:
+  -    Improved LDAP authentication: added the ability to filter users via service account parameters and ability to specify custom unique user identifiers
+- Data Editor:
+  -    Added additional notifications about the restricted operations
+  -    Enhanced IPv6 and DateTime32 data representation for Clickhouse
+  -    Data editing was fixed for DuckDB
+- SQL Editor:
+  -    SQL Editor auto-completion was enhanced to get column, table, and function names faster
+  -    Fixed the dollar-quoted string parsing in the SQL Editor for PostgreSQL
+  -    Improved display of the long error messages in the SQL Editor and Log viewer
+  -    Changed the save script icon to a floppy disk for better recognition
+  -    Improved application behavior when closing a connection - open editors won't be closed on disconnect
+- Administration:
+  -    Redesigned administration navigation panel - now it is more compact and clear
+  -    Added the ability to change the default commit mode for each connection separately
+  -    Added the ability to configure the server property rootURI parameter (thanks to @arioko)
 - Databases:
-  -    Added a new Apache Kyuubi driver (thanks to @pan3793);
-  -    Enhanced security for connection through H2 driver;
-  -    DuckDB driver updated to version 0.10.2;
-  -    Oracle driver updated to version 23.2.0.0;
-  -    SQLite driver updated to version 3.44.1.0;
-  -    Clickhouse driver updated to version 0.6.0-patch2;
-  -    Trino driver updated to version 438 (thanks to @alaturqua).
+  -    Added the "Keep alive" setting for Db2 LUW and IMB i, Apache Kyuubi, Clickhouse, Firebird, and Trino
+  -    Updated Firebird driver to version 5.0.4
+  -    DDL generation for Oracle Tablespaces was added (thanks to @pandya09)
 
