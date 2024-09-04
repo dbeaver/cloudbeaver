@@ -1140,7 +1140,7 @@ public class WebSQLProcessor implements WebSessionProvider {
         return filter.hasFilters() ? DBCExecutionPurpose.USER_FILTERED : DBCExecutionPurpose.USER;
     }
 
-    private Object setCellRowValue(Object cellRow, WebSession webSession, DBCSession dbcSession, DBDAttributeBinding allAttributes, boolean withoutExecution) {
+    private Object setCellRowValue(Object cellRow, WebSession webSession, DBCSession dbcSession, DBDAttributeBinding allAttributes, boolean withoutExecution) throws DBCException {
         if (cellRow instanceof Map<?, ?>) {
             Map<String, Object> variables = (Map<String, Object>) cellRow;
             if (variables.get(FILE_ID) != null) {
@@ -1157,10 +1157,6 @@ public class WebSQLProcessor implements WebSessionProvider {
                 }
             }
         }
-        try {
-            return convertInputCellValue(dbcSession, allAttributes, cellRow, withoutExecution);
-        } catch (DBCException e) {
-            return new DBException(e.getMessage());
-        }
+        return convertInputCellValue(dbcSession, allAttributes, cellRow, withoutExecution);
     }
 }
