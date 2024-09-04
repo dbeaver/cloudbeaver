@@ -1162,10 +1162,6 @@ public class WebSQLProcessor implements WebSessionProvider {
                 }
             }
         }
-        try {
-            return convertInputCellValue(dbcSession, allAttributes, cellRow, withoutExecution);
-        } catch (DBCException e) {
-            throw new DBException(e.getMessage());
-        }
+        return convertInputCellValue(dbcSession, allAttributes, cellRow, withoutExecution);
     }
 }
