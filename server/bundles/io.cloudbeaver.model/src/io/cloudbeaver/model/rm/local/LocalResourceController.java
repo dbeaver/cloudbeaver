@@ -37,12 +37,14 @@ import org.jkiss.dbeaver.model.app.DBPProject;
 import org.jkiss.dbeaver.model.app.DBPWorkspace;
 import org.jkiss.dbeaver.model.auth.SMCredentials;
 import org.jkiss.dbeaver.model.auth.SMCredentialsProvider;
+import org.jkiss.dbeaver.model.impl.app.BaseProjectImpl;
 import org.jkiss.dbeaver.model.impl.auth.SessionContextImpl;
 import org.jkiss.dbeaver.model.rm.*;
 import org.jkiss.dbeaver.model.runtime.VoidProgressMonitor;
 import org.jkiss.dbeaver.model.security.SMController;
 import org.jkiss.dbeaver.model.security.SMObjectType;
 import org.jkiss.dbeaver.model.sql.DBQuotaException;
+import org.jkiss.dbeaver.model.task.DBTTaskManager;
 import org.jkiss.dbeaver.model.websocket.event.MessageType;
 import org.jkiss.dbeaver.model.websocket.event.WSEventType;
 import org.jkiss.dbeaver.model.websocket.event.WSSessionLogUpdatedEvent;
@@ -130,12 +132,7 @@ public class LocalResourceController implements RMController {
             if (project == null || refresh) {
                 SessionContextImpl sessionContext = new SessionContextImpl(null);
                 RMProject rmProject = makeProjectFromId(projectId, false);
-                project = new BaseWebProjectImpl(
-                    workspace,
-                    this,
-                    sessionContext,
-                    rmProject,
-                    (container) -> true);
+                project = new InternalWebProjectImpl(sessionContext, rmProject);
                 projectRegistries.put(projectId, project);
             }
             return project;
@@ -1288,5 +1285,28 @@ public class LocalResourceController implements RMController {
             rmProjectName.name.equals(userId);
     }
 
+
+    private class InternalWebProjectImpl extends BaseWebProjectImpl {
+        public InternalWebProjectImpl(SessionContextImpl sessionContext, RMProject rmProject) {
+            super(
+                LocalResourceController.this.workspace,
+                LocalResourceController.this,
+                sessionContext,
+                rmProject,
+                (container) -> true);
+        }
+
+        @NotNull
+        @Override
+        public DBTTaskManager getTaskManager() {
+            throw new IllegalStateException("Task manager is not supported in global web project");
+        }
+
+        @NotNull
+        @Override
+        protected DBPDataSourceRegistry createDataSourceRegistry() {
+            return new DataSourceRegistry(this);
+        }
+    }
 
 }

@@ -26,10 +26,11 @@ import org.jkiss.dbeaver.model.auth.SMSessionContext;
 import org.jkiss.dbeaver.model.preferences.DBPPreferenceStore;
 import org.jkiss.dbeaver.model.rm.RMController;
 import org.jkiss.dbeaver.model.rm.RMProject;
+import org.jkiss.dbeaver.model.task.DBTTaskManager;
 import org.jkiss.dbeaver.registry.rm.DataSourceRegistryRM;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
 
-public abstract class WebProjectImpl extends BaseWebProjectImpl {
+public class WebProjectImpl extends BaseWebProjectImpl {
     private static final Log log = Log.getLog(WebProjectImpl.class);
     @NotNull
     private final DBPPreferenceStore preferenceStore;
@@ -68,6 +69,12 @@ public abstract class WebProjectImpl extends BaseWebProjectImpl {
     @Override
     public boolean isUseSecretStorage() {
         return DBWorkbench.isDistributed();
+    }
+
+    @NotNull
+    @Override
+    public DBTTaskManager getTaskManager() {
+        throw new IllegalStateException("Task manager not supported");
     }
 
     @NotNull
