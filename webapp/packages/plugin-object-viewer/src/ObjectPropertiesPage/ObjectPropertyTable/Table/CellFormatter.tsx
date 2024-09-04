@@ -8,14 +8,15 @@
 import { observer } from 'mobx-react-lite';
 import { useContext, useState } from 'react';
 
-import { getComputed, Icon, s, useMouse, useS, useStateDelay } from '@cloudbeaver/core-blocks';
+import { getComputed, Icon, s, useMouse, useMouseContextMenu, useS, useStateDelay } from '@cloudbeaver/core-blocks';
 import { ConnectionInfoResource, DATA_CONTEXT_CONNECTION } from '@cloudbeaver/core-connections';
+import { useDataContextLink } from '@cloudbeaver/core-data-context';
 import { useService } from '@cloudbeaver/core-di';
 import { DATA_CONTEXT_NAV_NODE, type DBObject, type NavNode, NavNodeManagerService } from '@cloudbeaver/core-navigation-tree';
 import { ContextMenu } from '@cloudbeaver/core-ui';
 import { useMenu } from '@cloudbeaver/core-view';
+import type { RenderCellProps } from '@cloudbeaver/plugin-data-grid';
 import { MENU_NAV_TREE, useNode } from '@cloudbeaver/plugin-navigation-tree';
-import type { RenderCellProps } from '@cloudbeaver/plugin-react-data-grid';
 
 import { getValue } from '../../helpers';
 import classes from './CellFormatter.module.css';
@@ -33,14 +34,16 @@ export const Menu = observer<Props>(function Menu({ value, node }) {
   const menu = useMenu({ menu: MENU_NAV_TREE });
   const mouse = useMouse<HTMLDivElement>();
   const [menuOpened, switchState] = useState(false);
-
-  menu.context.set(DATA_CONTEXT_NAV_NODE, node);
-
   const connection = connectionsInfoResource.getConnectionForNode(node.id);
+  const mouseContextMenu = useMouseContextMenu();
 
-  if (connection) {
-    menu.context.set(DATA_CONTEXT_CONNECTION, connection);
-  }
+  useDataContextLink(menu.context, (context, id) => {
+    context.set(DATA_CONTEXT_NAV_NODE, node, id);
+
+    if (connection) {
+      context.set(DATA_CONTEXT_CONNECTION, connection, id);
+    }
+  });
 
   function openNode() {
     navNodeManagerService.navToNode(node.id, node.parentId);
@@ -58,21 +61,25 @@ export const Menu = observer<Props>(function Menu({ value, node }) {
       return !menu.available;
     });
 
+  function contextMenuOpenHandler(event: React.MouseEvent<HTMLDivElement>) {
+    mouseContextMenu.handleContextMenuOpen(event);
+  }
+
+  function valueFieldClickHandler(event: React.MouseEvent<HTMLDivElement>) {
+    event.preventDefault();
+  }
+
   return (
-    <div ref={mouse.reference} className={s(styles, { container: true, empty: menuEmpty })} onDoubleClick={openNode}>
-      <div className={classes.box}>
-        <div className={s(styles, { value: true, cellValue: true })} title={value}>
-          {value}
+    <ContextMenu mouseContextMenu={mouseContextMenu} menu={menu} placement="auto-end" modal disclosure onVisibleSwitch={switchState}>
+      <div className={s(styles, { container: true, empty: menuEmpty })} onDoubleClick={openNode}>
+        <div ref={mouse.reference} className={classes.box} onContextMenu={contextMenuOpenHandler}>
+          <div className={s(styles, { value: true, cellValue: true })} title={value} onClick={valueFieldClickHandler}>
+            {value}
+          </div>
+          {!menuEmpty && <Icon className={classes.icon} name="snack" viewBox="0 0 16 10" />}
         </div>
-        {!menuEmpty && (
-          <ContextMenu menu={menu} modal disclosure onVisibleSwitch={switchState}>
-            <div>
-              <Icon className={classes.icon} name="snack" viewBox="0 0 16 10" />
-            </div>
-          </ContextMenu>
-        )}
       </div>
-    </div>
+    </ContextMenu>
   );
 });
 

@@ -8,7 +8,7 @@
 import { computed, makeObservable, observable } from 'mobx';
 
 import type { ConnectionExecutionContextService, IConnectionExecutionContext, IConnectionExecutionContextInfo } from '@cloudbeaver/core-connections';
-import type { IServiceInjector } from '@cloudbeaver/core-di';
+import type { IServiceProvider } from '@cloudbeaver/core-di';
 import type { ITask } from '@cloudbeaver/core-executor';
 import {
   AsyncTask,
@@ -26,7 +26,7 @@ import type { IResultSetBlobValue } from './DatabaseDataModel/Actions/ResultSet/
 import { ResultSetEditAction } from './DatabaseDataModel/Actions/ResultSet/ResultSetEditAction';
 import type { IDatabaseDataOptions } from './DatabaseDataModel/IDatabaseDataOptions';
 import type { IDatabaseResultSet } from './DatabaseDataModel/IDatabaseResultSet';
-import { ResultSetDataSource } from './ResultSetDataSource';
+import { ResultSetDataSource } from './ResultSet/ResultSetDataSource';
 
 export interface IDataContainerOptions extends IDatabaseDataOptions {
   containerNodePath: string;
@@ -44,12 +44,12 @@ export class ContainerDataSource extends ResultSetDataSource<IDataContainerOptio
   }
 
   constructor(
-    serviceInjector: IServiceInjector,
+    serviceProvider: IServiceProvider,
     graphQLService: GraphQLService,
     asyncTaskInfoService: AsyncTaskInfoService,
     protected connectionExecutionContextService: ConnectionExecutionContextService,
   ) {
-    super(serviceInjector, graphQLService, asyncTaskInfoService);
+    super(serviceProvider, graphQLService, asyncTaskInfoService);
 
     this.currentTask = null;
     this.executionContext = null;
@@ -60,12 +60,8 @@ export class ContainerDataSource extends ResultSetDataSource<IDataContainerOptio
     });
   }
 
-  isReadonly(resultIndex: number): boolean {
-    return super.isReadonly(resultIndex) || this.getResult(resultIndex)?.data?.hasRowIdentifier === false;
-  }
-
-  isDisabled(resultIndex: number): boolean {
-    return !this.getResult(resultIndex)?.data && this.error === null;
+  isOutdated(): boolean {
+    return super.isOutdated() || !this.executionContext?.context;
   }
 
   async cancel(): Promise<void> {
@@ -168,7 +164,7 @@ export class ContainerDataSource extends ResultSetDataSource<IDataContainerOptio
         this.requestInfo = {
           ...this.requestInfo,
           requestDuration: response.result.duration,
-          requestMessage: 'Saved successfully',
+          requestMessage: 'plugin_data_viewer_result_set_save_success',
           source: null,
         };
       }
@@ -191,7 +187,7 @@ export class ContainerDataSource extends ResultSetDataSource<IDataContainerOptio
 
     const offset = this.offset;
     const limit = this.count;
-    const resultId = this.getResultId(prevResults, context);
+    const resultId = this.getPreviousResultId(prevResults, context);
 
     return {
       projectId: context.projectId,
@@ -219,19 +215,14 @@ export class ContainerDataSource extends ResultSetDataSource<IDataContainerOptio
     return task;
   }
 
-  private getResultId(prevResults: IDatabaseResultSet[], context: IConnectionExecutionContextInfo) {
-    let resultId: string | undefined;
+  setExecutionContext(context: IConnectionExecutionContext | null): this {
+    super.setExecutionContext(context);
 
-    if (
-      prevResults.length === 1 &&
-      prevResults[0].contextId === context.id &&
-      prevResults[0].connectionId === context.connectionId &&
-      prevResults[0].id !== null
-    ) {
-      resultId = prevResults[0].id;
+    for (const result of this.results) {
+      result.id = null;
     }
 
-    return resultId;
+    return this;
   }
 
   private transformResults(executionContextInfo: IConnectionExecutionContextInfo, results: SqlQueryResults[], limit: number): IDatabaseResultSet[] {

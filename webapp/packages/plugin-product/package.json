@@ -13,7 +13,6 @@
     "build": "tsc -b",
     "clean": "rimraf --glob dist",
     "lint": "eslint ./src/ --ext .ts,.tsx",
-    "lint-fix": "eslint ./src/ --ext .ts,.tsx --fix",
     "validate-dependencies": "core-cli-validate-dependencies",
     "update-ts-references": "yarn run clean && typescript-resolve-references"
   },
@@ -26,6 +25,7 @@
     "@cloudbeaver/core-theming": "^0",
     "@cloudbeaver/core-version": "^0",
     "@cloudbeaver/core-view": "^0",
+    "@cloudbeaver/core-website": "^0",
     "@cloudbeaver/plugin-settings-menu": "^0",
     "mobx-react-lite": "^4",
     "react": "^18"

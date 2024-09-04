@@ -4,7 +4,7 @@
     "allowUnreachableCode": false,
     "allowSyntheticDefaultImports": true,
     "allowJs": false,
-    "lib": ["dom", "ES2019", "ES2022.Error"],
+    "lib": ["dom", "ES2022"],
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "importsNotUsedAsValues": "error",
@@ -13,7 +13,7 @@
     "jsx": "react-jsx",
     "target": "esnext",
     "module": "esnext",
-    "moduleResolution": "node",
+    "moduleResolution": "Bundler",
     "noImplicitAny": true,
     "noImplicitThis": true,
     "noImplicitReturns": true,
@@ -46,7 +46,7 @@
     "noEmitHelpers": false,
     "importHelpers": true,
 
-    "types": ["reflect-metadata", "node", "jest", "@cloudbeaver/core-cli/global.d.ts"],
+    "types": ["reflect-metadata", "node", "@cloudbeaver/core-cli/global.d.ts"],
     "plugins": [
       {
         // https://github.com/mrmckeb/typescript-plugin-css-modules/issues/222

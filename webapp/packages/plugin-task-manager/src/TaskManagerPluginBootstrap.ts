@@ -13,7 +13,10 @@ import { ITaskDescriptor, TaskManagerService } from '@cloudbeaver/core-task-mana
 @injectable()
 export class TaskManagerPluginBootstrap extends Bootstrap {
   private notification: IProcessNotificationContainer<ProcessSnackbarProps> | null;
-  constructor(private readonly taskManagerService: TaskManagerService, private readonly notificationService: NotificationService) {
+  constructor(
+    private readonly taskManagerService: TaskManagerService,
+    private readonly notificationService: NotificationService,
+  ) {
     super();
     this.notification = null;
   }

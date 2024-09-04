@@ -11,11 +11,13 @@ import { PlaceholderContainer } from '@cloudbeaver/core-blocks';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { ActionService, DATA_CONTEXT_MENU, MenuService } from '@cloudbeaver/core-view';
 
+import { DatabaseDataConstraintAction } from '../../DatabaseDataModel/Actions/DatabaseDataConstraintAction';
 import { DATA_VIEWER_CONSTRAINTS_DELETE_ACTION } from '../../DatabaseDataModel/Actions/ResultSet/Actions/DATA_VIEWER_CONSTRAINTS_DELETE_ACTION';
-import { ResultSetConstraintAction } from '../../DatabaseDataModel/Actions/ResultSet/ResultSetConstraintAction';
 import { DATA_CONTEXT_DV_DDM } from '../../DatabaseDataModel/DataContext/DATA_CONTEXT_DV_DDM';
 import { DATA_CONTEXT_DV_DDM_RESULT_INDEX } from '../../DatabaseDataModel/DataContext/DATA_CONTEXT_DV_DDM_RESULT_INDEX';
 import type { IDatabaseDataModel } from '../../DatabaseDataModel/IDatabaseDataModel';
+import { IDatabaseDataOptions } from '../../DatabaseDataModel/IDatabaseDataOptions';
+import { isResultSetDataSource, ResultSetDataSource } from '../../ResultSet/ResultSetDataSource';
 import { DATA_VIEWER_DATA_MODEL_TOOLS_MENU } from './DATA_VIEWER_DATA_MODEL_TOOLS_MENU';
 
 export const TableWhereFilter = React.lazy(async () => {
@@ -28,7 +30,7 @@ export const TableHeaderMenu = React.lazy(async () => {
 });
 
 export interface ITableHeaderPlaceholderProps {
-  model: IDatabaseDataModel<any, any>;
+  model: IDatabaseDataModel;
   resultIndex: number;
   simple: boolean;
 }
@@ -50,12 +52,12 @@ export class TableHeaderService extends Bootstrap {
 
     this.actionService.addHandler({
       id: 'table-header-menu-base-handler',
+      contexts: [DATA_CONTEXT_DV_DDM, DATA_CONTEXT_DV_DDM_RESULT_INDEX],
       isActionApplicable(context) {
+        const model = context.get(DATA_CONTEXT_DV_DDM)!;
         const menu = context.hasValue(DATA_CONTEXT_MENU, DATA_VIEWER_DATA_MODEL_TOOLS_MENU);
-        const model = context.tryGet(DATA_CONTEXT_DV_DDM);
-        const resultIndex = context.tryGet(DATA_CONTEXT_DV_DDM_RESULT_INDEX);
 
-        if (!menu || !model || resultIndex === undefined) {
+        if (!menu || !isResultSetDataSource(model.source)) {
           return false;
         }
 
@@ -64,9 +66,9 @@ export class TableHeaderService extends Bootstrap {
       handler: async (context, action) => {
         switch (action) {
           case DATA_VIEWER_CONSTRAINTS_DELETE_ACTION: {
-            const model = context.get(DATA_CONTEXT_DV_DDM);
-            const resultIndex = context.get(DATA_CONTEXT_DV_DDM_RESULT_INDEX);
-            const constraints = model.source.tryGetAction(resultIndex, ResultSetConstraintAction);
+            const model = context.get(DATA_CONTEXT_DV_DDM)! as unknown as IDatabaseDataModel<ResultSetDataSource>;
+            const resultIndex = context.get(DATA_CONTEXT_DV_DDM_RESULT_INDEX)!;
+            const constraints = model.source.tryGetAction(resultIndex, DatabaseDataConstraintAction);
 
             if (constraints) {
               constraints.deleteData();
@@ -84,15 +86,15 @@ export class TableHeaderService extends Bootstrap {
         return action.info;
       },
       isDisabled: (context, action) => {
-        const model = context.get(DATA_CONTEXT_DV_DDM);
-        const resultIndex = context.get(DATA_CONTEXT_DV_DDM_RESULT_INDEX);
+        const model = context.get(DATA_CONTEXT_DV_DDM)! as unknown as IDatabaseDataModel<ResultSetDataSource>;
+        const resultIndex = context.get(DATA_CONTEXT_DV_DDM_RESULT_INDEX)!;
 
         if (model.isLoading() || model.isDisabled(resultIndex)) {
           return true;
         }
 
         if (action === DATA_VIEWER_CONSTRAINTS_DELETE_ACTION) {
-          const constraints = model.source.tryGetAction(resultIndex, ResultSetConstraintAction);
+          const constraints = model.source.tryGetAction(resultIndex, DatabaseDataConstraintAction);
 
           if (model.source.options?.whereFilter) {
             return false;

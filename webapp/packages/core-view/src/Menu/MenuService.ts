@@ -70,11 +70,9 @@ export class MenuService {
           continue;
         }
       }
-      if (handler.contexts.size > 0) {
-        for (const context of handler.contexts) {
-          if (!contexts.has(context, true)) {
-            continue handlers;
-          }
+      for (const context of handler.contexts) {
+        if (!contexts.has(context)) {
+          continue handlers;
         }
       }
       if (handler.isApplicable?.(contexts) !== false) {
@@ -133,7 +131,10 @@ export class MenuService {
           return this.createActionItem(context, item) as IMenuItem;
         }
         if (isMenu(item)) {
-          return new MenuSubMenuItem({ menu: item }) as IMenuItem;
+          return new MenuSubMenuItem({
+            menu: item,
+            action: (isAction(item.action) ? this.createActionItem(context, item.action) : undefined) || undefined,
+          }) as IMenuItem;
         }
         return item;
       })
@@ -156,7 +157,7 @@ function filterApplicable(contexts: IDataContextProvider): (creator: IMenuItemsC
 
     if (creator.contexts.size > 0) {
       for (const context of creator.contexts) {
-        if (!contexts.has(context, true)) {
+        if (!contexts.has(context)) {
           return false;
         }
       }

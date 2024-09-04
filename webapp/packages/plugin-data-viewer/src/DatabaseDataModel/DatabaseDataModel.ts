@@ -12,13 +12,12 @@ import type { ResultDataFormat } from '@cloudbeaver/core-sdk';
 import { uuid } from '@cloudbeaver/core-utils';
 
 import type { IDatabaseDataModel, IRequestEventData } from './IDatabaseDataModel';
-import type { IDatabaseDataResult } from './IDatabaseDataResult';
 import type { DatabaseDataAccessMode, IDatabaseDataSource, IRequestInfo } from './IDatabaseDataSource';
 
-export class DatabaseDataModel<TOptions, TResult extends IDatabaseDataResult = IDatabaseDataResult> implements IDatabaseDataModel<TOptions, TResult> {
+export class DatabaseDataModel<TSource extends IDatabaseDataSource<any, any> = IDatabaseDataSource> implements IDatabaseDataModel<TSource> {
   id: string;
   name: string | null;
-  source: IDatabaseDataSource<TOptions, TResult>;
+  source: TSource;
   countGain: number;
 
   get requestInfo(): IRequestInfo {
@@ -31,11 +30,9 @@ export class DatabaseDataModel<TOptions, TResult extends IDatabaseDataResult = I
 
   readonly onDispose: IExecutor;
   readonly onOptionsChange: IExecutor;
-  readonly onRequest: IExecutor<IRequestEventData<TOptions, TResult>>;
+  readonly onRequest: IExecutor<IRequestEventData<TSource>>;
 
-  private currentTask: Promise<void> | null;
-
-  constructor(source: IDatabaseDataSource<TOptions, TResult>) {
+  constructor(source: TSource) {
     this.id = uuid();
     this.name = null;
     this.source = source;
@@ -43,7 +40,7 @@ export class DatabaseDataModel<TOptions, TResult extends IDatabaseDataResult = I
     this.onDispose = new Executor();
     this.onOptionsChange = new Executor();
     this.onRequest = new Executor();
-    this.currentTask = null;
+    this.source.onOperation.next(this.onRequest, data => ({ ...data, model: this }));
 
     makeObservable(this, {
       countGain: observable,
@@ -54,7 +51,7 @@ export class DatabaseDataModel<TOptions, TResult extends IDatabaseDataResult = I
     return this.source.isLoading();
   }
 
-  isDisabled(resultIndex: number): boolean {
+  isDisabled(resultIndex?: number): boolean {
     return this.source.isDisabled(resultIndex);
   }
 
@@ -63,24 +60,11 @@ export class DatabaseDataModel<TOptions, TResult extends IDatabaseDataResult = I
   }
 
   isDataAvailable(offset: number, count: number): boolean {
-    return this.source.offset <= offset && this.source.count >= count;
-  }
-
-  getResults(): TResult[] {
-    return this.source.results;
-  }
-
-  getResult(index: number): TResult | null {
-    return this.source.getResult(index);
+    return this.source.isDataAvailable(offset, count);
   }
 
   setName(name: string | null) {
     this.name = name;
-    return this;
-  }
-
-  setResults(results: TResult[]): this {
-    this.source.setResults(results);
     return this;
   }
 
@@ -109,11 +93,6 @@ export class DatabaseDataModel<TOptions, TResult extends IDatabaseDataResult = I
     return this;
   }
 
-  setOptions(options: TOptions): this {
-    this.source.setOptions(options);
-    return this;
-  }
-
   async requestOptionsChange(): Promise<boolean> {
     const contexts = await this.onOptionsChange.execute();
 
@@ -121,37 +100,29 @@ export class DatabaseDataModel<TOptions, TResult extends IDatabaseDataResult = I
   }
 
   async save(): Promise<void> {
-    await this.requestSaveAction(() => this.source.saveData());
+    await this.source.saveData();
   }
 
   async retry(): Promise<void> {
-    await this.requestDataAction(() => this.source.retry());
+    await this.source.retry();
   }
 
-  async refresh(concurrent?: boolean): Promise<void> {
-    if (concurrent) {
-      await this.source.refreshData();
-      return;
-    }
-    await this.requestDataAction(() => this.source.refreshData());
+  async refresh(): Promise<void> {
+    await this.source.refreshData();
   }
 
-  async request(concurrent?: boolean): Promise<void> {
-    if (concurrent) {
-      await this.source.requestData();
-      return;
-    }
-    await this.requestDataAction(() => this.source.requestData());
+  async request(mutation?: () => void): Promise<void> {
+    await this.source.requestData(mutation);
   }
 
   async reload(): Promise<void> {
-    await this.requestDataAction(() => this.source.setSlice(0, this.countGain).requestData());
+    await this.request(() => {
+      this.setSlice(0, this.countGain);
+    });
   }
 
   async requestDataPortion(offset: number, count: number): Promise<void> {
-    if (!this.isDataAvailable(offset, count)) {
-      await this.requestDataAction(() => this.source.setSlice(offset, count).requestData());
-    }
+    await this.source.requestDataPortion(offset, count);
   }
 
   async cancel(): Promise<void> {
@@ -162,42 +133,8 @@ export class DatabaseDataModel<TOptions, TResult extends IDatabaseDataResult = I
     this.source.resetData();
   }
 
-  async dispose(keepExecutionContext = false): Promise<void> {
+  async dispose(): Promise<void> {
     await this.onDispose.execute();
-    await this.source.dispose(keepExecutionContext);
-  }
-
-  async requestSaveAction(action: () => Promise<void> | void): Promise<void> {
-    return action();
-  }
-
-  async requestDataAction(action: () => Promise<void> | void): Promise<void> {
-    if (this.currentTask) {
-      return this.currentTask;
-    }
-
-    try {
-      this.currentTask = this.requestDataActionTask(action);
-      return await this.currentTask;
-    } finally {
-      this.currentTask = null;
-    }
-  }
-
-  private async requestDataActionTask(action: () => Promise<void> | void): Promise<void> {
-    let contexts = await this.onRequest.execute({ type: 'on', model: this });
-
-    if (ExecutorInterrupter.isInterrupted(contexts)) {
-      return;
-    }
-
-    contexts = await this.onRequest.execute({ type: 'before', model: this });
-
-    if (ExecutorInterrupter.isInterrupted(contexts)) {
-      return;
-    }
-
-    await action();
-    await this.onRequest.execute({ type: 'after', model: this });
+    await this.source.dispose();
   }
 }

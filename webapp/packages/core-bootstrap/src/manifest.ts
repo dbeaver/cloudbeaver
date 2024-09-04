@@ -32,11 +32,13 @@ import { coreSettingsManifest } from '@cloudbeaver/core-settings';
 import { coreSettingsLocalizationManifest } from '@cloudbeaver/core-settings-localization';
 import { coreSettingsUserManifest } from '@cloudbeaver/core-settings-user';
 import { coreStorageManifest } from '@cloudbeaver/core-storage';
+import { coreTaskManagerManifest } from '@cloudbeaver/core-task-manager';
 import { coreThemingManifest } from '@cloudbeaver/core-theming';
 import { coreUIManifest } from '@cloudbeaver/core-ui';
 import { coreVersionManifest } from '@cloudbeaver/core-version';
 import { coreVersionUpdateManifest } from '@cloudbeaver/core-version-update';
 import { coreViewManifest } from '@cloudbeaver/core-view';
+import { coreWebsiteManifest } from '@cloudbeaver/core-website';
 
 export const coreManifests: PluginManifest[] = [
   {
@@ -62,6 +64,7 @@ export const coreManifests: PluginManifest[] = [
   coreResourceManifest,
   coreSDKManifest,
   coreRootManifest,
+  coreWebsiteManifest,
   coreBrowserSettingsManifest,
   coreBrowserCookiesManifest,
   coreProductManifest,
@@ -79,4 +82,5 @@ export const coreManifests: PluginManifest[] = [
   coreClientActivityManifest,
   coreNavigationTree,
   coreSettingsUserManifest,
+  coreTaskManagerManifest,
 ];

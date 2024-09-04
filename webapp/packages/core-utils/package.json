@@ -13,7 +13,6 @@
     "build": "tsc -b",
     "clean": "rimraf --glob dist",
     "lint": "eslint ./src/ --ext .ts,.tsx",
-    "lint-fix": "eslint ./src/ --ext .ts,.tsx --fix",
     "test": "core-cli-test",
     "validate-dependencies": "core-cli-validate-dependencies",
     "update-ts-references": "yarn run clean && typescript-resolve-references"
@@ -26,7 +25,7 @@
     "md5": "^2",
     "mobx": "^6",
     "underscore": "^1",
-    "uuid": "^9",
+    "uuid": "^10",
     "whatwg-mimetype": "^4",
     "zod": "^3",
     "zod-i18n-map": "^2",
@@ -34,13 +33,12 @@
   },
   "peerDependencies": {},
   "devDependencies": {
-    "@types/jest": "^29",
+    "@jest/globals": "^29",
     "@types/md5": "^2",
-    "@types/react": "^18",
     "@types/underscore": "^1",
-    "@types/uuid": "^9",
+    "@types/uuid": "^10",
     "@types/whatwg-mimetype": "^3",
-    "react": "^18",
-    "typescript": "^5"
+    "typescript": "^5",
+    "zod": "^3"
   }
 }

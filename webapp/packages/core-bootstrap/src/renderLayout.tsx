@@ -10,7 +10,7 @@ import { createRoot, Root } from 'react-dom/client';
 
 import { BodyLazy } from '@cloudbeaver/core-app';
 import { DisplayError, ErrorBoundary, Loader, s } from '@cloudbeaver/core-blocks';
-import { AppContext, HideAppLoadingScreen, IServiceInjector } from '@cloudbeaver/core-di';
+import { HideAppLoadingScreen, IServiceProvider, ServiceProviderContext } from '@cloudbeaver/core-di';
 
 import styles from './renderLayout.module.css';
 
@@ -21,7 +21,7 @@ interface IRender {
   unmount(): void;
 }
 
-export function renderLayout(serviceInjector: IServiceInjector): IRender {
+export function renderLayout(serviceProvider: IServiceProvider): IRender {
   let root: Root | undefined;
 
   return {
@@ -48,14 +48,14 @@ export function renderLayout(serviceInjector: IServiceInjector): IRender {
     renderApp() {
       this.initRoot().render(
         <ErrorBoundary fallback={<HideAppLoadingScreen />} simple>
-          <AppContext app={serviceInjector}>
+          <ServiceProviderContext serviceProvider={serviceProvider}>
             <ErrorBoundary fallback={<HideAppLoadingScreen />} root>
               <Suspense fallback={<Loader className={s(styles, { loader: true })} />}>
                 <BodyLazy />
                 <HideAppLoadingScreen />
               </Suspense>
             </ErrorBoundary>
-          </AppContext>
+          </ServiceProviderContext>
         </ErrorBoundary>,
       );
     },
@@ -65,10 +65,10 @@ export function renderLayout(serviceInjector: IServiceInjector): IRender {
       }
       this.initRoot().render(
         <ErrorBoundary fallback={<HideAppLoadingScreen />} simple>
-          <AppContext app={serviceInjector}>
+          <ServiceProviderContext serviceProvider={serviceProvider}>
             <DisplayError error={exception} root />
             <HideAppLoadingScreen />
-          </AppContext>
+          </ServiceProviderContext>
         </ErrorBoundary>,
       );
     },

@@ -224,6 +224,30 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
         addSubjectPermissionsUpdateEvent(userId, SMSubjectType.user);
     }
 
+    public void addUserTeams(@NotNull String userId, @NotNull String[] teamIds, @NotNull String grantorId) throws DBCException {
+        try (Connection dbCon = database.openConnection()) {
+            try (JDBCTransaction txn = new JDBCTransaction(dbCon)) {
+                addUserTeams(dbCon, userId, teamIds, grantorId);
+                txn.commit();
+            }
+        } catch (SQLException e) {
+            throw new DBCException("Error saving user teams in database", e);
+        }
+        addSubjectPermissionsUpdateEvent(userId, SMSubjectType.user);
+    }
+
+    public void deleteUserTeams(@NotNull String userId, @NotNull String[] teamIds) throws DBCException {
+        try (Connection dbCon = database.openConnection()) {
+            try (JDBCTransaction txn = new JDBCTransaction(dbCon)) {
+                deleteUserTeams(dbCon, userId, teamIds);
+                txn.commit();
+            }
+        } catch (SQLException e) {
+            throw new DBCException("Error delete user teams in database", e);
+        }
+        addSubjectPermissionsUpdateEvent(userId, SMSubjectType.user);
+    }
+
     @Override
     public void setUserTeamRole(
         @NotNull String userId,
@@ -276,11 +300,7 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
             teamIds = ArrayUtils.add(String.class, teamIds, defaultUserTeam);
         }
         if (!ArrayUtils.isEmpty(teamIds)) {
-            Set<String> currentUserTeams = new HashSet<>(JDBCUtils.queryStrings(
-                dbCon,
-                database.normalizeTableNames("SELECT TEAM_ID FROM {table_prefix}CB_USER_TEAM WHERE USER_ID=?"),
-                userId
-            ));
+            Set<String> currentUserTeams = getCurrentUserTeams(dbCon, userId);
 
             try (PreparedStatement dbStat = dbCon.prepareStatement(
                 database.normalizeTableNames("INSERT INTO {table_prefix}CB_USER_TEAM" +
@@ -297,6 +317,68 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
                     dbStat.execute();
                 }
             }
+        }
+    }
+
+    @NotNull
+    private Set<String> getCurrentUserTeams(@NotNull Connection dbCon, String userId) throws SQLException {
+        return new HashSet<>(JDBCUtils.queryStrings(
+            dbCon,
+            database.normalizeTableNames("SELECT TEAM_ID FROM {table_prefix}CB_USER_TEAM WHERE USER_ID=?"),
+            userId
+        ));
+    }
+
+    protected void addUserTeams(
+        @NotNull Connection dbCon,
+        @NotNull String userId,
+        @NotNull String[] teamIds,
+        @NotNull String grantorId
+    ) throws SQLException {
+        if (ArrayUtils.isEmpty(teamIds)) {
+            return;
+        }
+
+        String defaultUserTeam = getDefaultUserTeam();
+        if (CommonUtils.isNotEmpty(defaultUserTeam) && !ArrayUtils.contains(teamIds, defaultUserTeam)) {
+            teamIds = ArrayUtils.add(String.class, teamIds, defaultUserTeam);
+        }
+
+        Set<String> currentUserTeams = getCurrentUserTeams(dbCon, userId);
+
+        try (PreparedStatement dbStat = dbCon.prepareStatement(
+            database.normalizeTableNames("INSERT INTO {table_prefix}CB_USER_TEAM" +
+                "(USER_ID,TEAM_ID,GRANT_TIME,GRANTED_BY) VALUES(?,?,?,?)"))
+        ) {
+            for (String teamId : teamIds) {
+                if (currentUserTeams.contains(teamId)) {
+                    continue;
+                }
+                dbStat.setString(1, userId);
+                dbStat.setString(2, teamId);
+                dbStat.setTimestamp(3, new Timestamp(System.currentTimeMillis()));
+                dbStat.setString(4, grantorId);
+                dbStat.execute();
+            }
+        }
+    }
+
+    protected void deleteUserTeams(
+        @NotNull Connection dbCon,
+        @NotNull String userId,
+        @NotNull String[] teamIds
+    ) throws SQLException {
+        String deleteUserTeamsSql = "DELETE FROM {table_prefix}CB_USER_TEAM WHERE USER_ID=? " +
+                "AND TEAM_ID IN (" + SQLUtils.generateParamList(teamIds.length) + ")";
+
+        try (PreparedStatement dbStat = dbCon.prepareStatement(database.normalizeTableNames(deleteUserTeamsSql))) {
+            int index = 1;
+            dbStat.setString(index, userId);
+            for (String teamId : teamIds) {
+                index++;
+                dbStat.setString(index, teamId);
+            }
+            dbStat.execute();
         }
     }
 
@@ -1604,13 +1686,15 @@ public class CBEmbeddedSecurityController<T extends WebAuthApplication>
                     "    {table_prefix}CB_AUTH_ATTEMPT attempt" +
                     "        JOIN" +
                     "    {table_prefix}CB_AUTH_ATTEMPT_INFO info ON attempt.AUTH_ID = info.AUTH_ID" +
-                    " WHERE AUTH_PROVIDER_ID = ? AND AUTH_USERNAME = ?" +
+                    " WHERE AUTH_PROVIDER_ID = ? AND AUTH_USERNAME = ? AND attempt.CREATE_TIME > ?" +
                     " ORDER BY attempt.CREATE_TIME DESC " +
                     database.getDialect().getOffsetLimitQueryPart(0, smConfig.getMaxFailedLogin())
             )
         )) {
             dbStat.setString(1, authProviderId);
             dbStat.setString(2, inputLogin);
+            dbStat.setTimestamp(3,
+                Timestamp.valueOf(LocalDateTime.now().minusSeconds(smConfig.getBlockLoginPeriod())));
             try (ResultSet dbResult = dbStat.executeQuery()) {
                 while (dbResult.next()) {
                     UserLoginRecord loginDto = new UserLoginRecord(

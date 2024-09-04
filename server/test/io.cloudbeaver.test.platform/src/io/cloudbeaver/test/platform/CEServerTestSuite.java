@@ -17,11 +17,15 @@
 
 package io.cloudbeaver.test.platform;
 
+import io.cloudbeaver.auth.provider.local.LocalAuthProvider;
 import io.cloudbeaver.model.rm.RMNIOTest;
 import io.cloudbeaver.model.rm.lock.RMLockTest;
 import io.cloudbeaver.server.CBApplication;
 import io.cloudbeaver.server.CBApplicationCE;
+import io.cloudbeaver.test.WebGQLClient;
 import io.cloudbeaver.utils.WebTestUtils;
+import org.jkiss.code.NotNull;
+import org.jkiss.utils.SecurityUtils;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
@@ -29,7 +33,7 @@ import org.junit.runners.Suite;
 
 import java.net.CookieManager;
 import java.net.http.HttpClient;
-import java.nio.file.Path;
+import java.util.Map;
 
 @RunWith(Suite.class)
 @Suite.SuiteClasses(
@@ -44,43 +48,34 @@ import java.nio.file.Path;
 )
 public class CEServerTestSuite {
 
-    public static final String GQL_API_URL = "http://localhost:18978/api/gql";
-    public static final String SERVER_STATUS_URL = "http://localhost:18978/status";
+    private static final String GQL_API_URL = "http://localhost:18978/api/gql";
+    private static final String SERVER_STATUS_URL = "http://localhost:18978/status";
+    private static final Map<String, Object> TEST_CREDENTIALS = Map.of(
+        LocalAuthProvider.CRED_USER, "test",
+        LocalAuthProvider.CRED_PASSWORD, SecurityUtils.makeDigest("test")
+    );
 
-    private static boolean setUpIsDone = false;
-    private static boolean testFinished = false;
-
-    private static CBApplication testApp;
-    private static HttpClient client;
-    private static Path scriptsPath;
-    private static Thread thread;
+    private static CBApplication<?> testApp;
 
     @BeforeClass
     public static void startServer() throws Exception {
-        if (setUpIsDone) {
-            return;
-        } else {
-            System.out.println("Start CBApplication");
-            testApp = new CBApplicationCE();
-            thread = new Thread(() -> {
-                testApp.start(null);
-            });
-            thread.start();
-            client = createClient();
-            long startTime = System.currentTimeMillis();
-            long endTime = 0;
-            while (true) {
-                setUpIsDone = WebTestUtils.getServerStatus(client, SERVER_STATUS_URL);
-                endTime = System.currentTimeMillis() - startTime;
-                if (setUpIsDone || endTime > 300000) {
-                    break;
-                }
-            }
-            if (!setUpIsDone) {
-                throw new Exception("Server is not running");
-            }
-            scriptsPath = Path.of(testApp.getHomeDirectory().toString(), "/workspace/gql_scripts")
-                .toAbsolutePath();
+        System.out.println("Start CBApplication");
+        testApp = new CBApplicationCE();
+        Thread thread = new Thread(() -> testApp.start(null));
+        thread.start();
+        HttpClient httpClient = HttpClient.newBuilder()
+            .cookieHandler(new CookieManager())
+            .version(HttpClient.Version.HTTP_2)
+            .build();
+        long startTime = System.currentTimeMillis();
+        long endTime = 0;
+        boolean setUpIsDone = false;
+        while (!setUpIsDone && endTime < 300000) {
+            setUpIsDone = WebTestUtils.getServerStatus(httpClient, SERVER_STATUS_URL);
+            endTime = System.currentTimeMillis() - startTime;
+        }
+        if (!setUpIsDone) {
+            throw new Exception("Server is not running");
         }
     }
 
@@ -89,22 +84,29 @@ public class CEServerTestSuite {
         testApp.stop();
     }
 
-    public static CBApplication getTestApp() {
+    public static CBApplication<?> getTestApp() {
         return testApp;
     }
 
-    public static HttpClient getClient() {
-        return client;
-    }
-
-    public static HttpClient createClient() {
-        return HttpClient.newBuilder()
+    public static WebGQLClient createClient() {
+        HttpClient httpClient = HttpClient.newBuilder()
             .cookieHandler(new CookieManager())
             .version(HttpClient.Version.HTTP_2)
             .build();
+        return createClient(httpClient);
     }
 
-    public static Path getScriptsPath() {
-        return scriptsPath;
+    public static WebGQLClient createClient(@NotNull HttpClient httpClient) {
+        return new WebGQLClient(httpClient, GQL_API_URL);
+    }
+
+    public static Map<String, Object> authenticateTestUser(@NotNull WebGQLClient client) throws Exception {
+        return client.sendQuery(
+            WebGQLClient.GQL_AUTHENTICATE,
+            Map.of(
+                "provider", LocalAuthProvider.PROVIDER_ID,
+                "credentials", TEST_CREDENTIALS
+            )
+        );
     }
 }

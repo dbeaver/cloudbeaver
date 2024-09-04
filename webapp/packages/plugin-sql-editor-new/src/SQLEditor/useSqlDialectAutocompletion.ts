@@ -12,7 +12,7 @@ import { useService } from '@cloudbeaver/core-di';
 import { LocalizationService } from '@cloudbeaver/core-localization';
 import { GlobalConstants } from '@cloudbeaver/core-utils';
 import type { Compartment, Completion, CompletionConfig, CompletionContext, CompletionResult, Extension } from '@cloudbeaver/plugin-codemirror6';
-import type { ISQLEditorData, SQLProposal } from '@cloudbeaver/plugin-sql-editor';
+import { type ISQLEditorData, type SQLProposal } from '@cloudbeaver/plugin-sql-editor';
 
 const codemirrorComplexLoader = createComplexLoader(() => import('@cloudbeaver/plugin-codemirror6'));
 
@@ -31,11 +31,16 @@ export function useSqlDialectAutocompletion(data: ISQLEditorData): [Compartment,
   const [config] = useState<CompletionConfig>(() => {
     function getOptionsFromProposals(explicit: boolean, word: string, proposals: SQLProposal[]): SqlCompletion[] {
       const wordLowerCase = word.toLocaleLowerCase();
-      const hasSameName = proposals.some(({ displayString }) => displayString.toLocaleLowerCase() === wordLowerCase);
+      const hasSameName = proposals.some(
+        ({ replacementString, displayString }) =>
+          displayString.toLocaleLowerCase() === wordLowerCase || replacementString.toLocaleLowerCase() === wordLowerCase,
+      );
       const filteredProposals = proposals
         .filter(
-          ({ displayString }) =>
-            word === '*' || (displayString.toLocaleLowerCase() !== wordLowerCase && displayString.toLocaleLowerCase().startsWith(wordLowerCase)),
+          ({ replacementString, displayString }) =>
+            word === '*' ||
+            (displayString.toLocaleLowerCase() !== wordLowerCase && displayString.toLocaleLowerCase().startsWith(wordLowerCase)) ||
+            (replacementString.toLocaleLowerCase() !== wordLowerCase && replacementString.toLocaleLowerCase().startsWith(wordLowerCase)),
         )
         .sort((a, b) => (b.score ?? 0) - (a.score ?? 0));
 

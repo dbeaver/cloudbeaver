@@ -59,7 +59,7 @@ export class DatabaseDataActions<TOptions, TResult extends IDatabaseDataResult> 
           if (isDatabaseDataAction(dependency)) {
             depends.push(this.get(result, dependency));
           } else {
-            depends.push(this.source.serviceInjector.getServiceByClass(dependency as any));
+            depends.push(this.source.serviceProvider.getService(dependency as any));
           }
         }
 
@@ -69,6 +69,7 @@ export class DatabaseDataActions<TOptions, TResult extends IDatabaseDataResult> 
 
         action = new Action(this.source, ...depends);
         action.updateResult(result, this.source.results.indexOf(result));
+        action.afterResultUpdate();
         this.actions.set(result.uniqueResultId, [...this.actions.get(result.uniqueResultId), action]);
       });
     }

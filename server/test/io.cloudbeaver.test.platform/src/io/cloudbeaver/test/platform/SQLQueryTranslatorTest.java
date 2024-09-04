@@ -162,8 +162,10 @@ public class SQLQueryTranslatorTest {
         Map<SQLDialect, String> expectedSqlByDialect = new HashMap<>();
         expectedSqlByDialect.put(new H2SQLDialect(), basicSql);
         expectedSqlByDialect.put(new PostgreDialect(), "CREATE SEQUENCE CB_TEST_TYPES_AUTOINC_COLUMN;\n" +
-            "CREATE TABLE CB_TEST_TYPES (AUTOINC_COLUMN BIGINT NOT NULL DEFAULT NEXTVAL('CB_TEST_TYPES_AUTOINC_COLUMN'));" +
-            "\n");
+            "CREATE TABLE CB_TEST_TYPES (AUTOINC_COLUMN BIGINT NOT NULL DEFAULT NEXTVAL" +
+                "('CB_TEST_TYPES_AUTOINC_COLUMN'));\n" +
+            "ALTER SEQUENCE CB_TEST_TYPES_AUTOINC_COLUMN OWNED BY CB_TEST_TYPES.AUTOINC_COLUMN;\n"
+        );
         expectedSqlByDialect.put(new MySQLDialect(), basicSql);
 
         expectedSqlByDialect.put(

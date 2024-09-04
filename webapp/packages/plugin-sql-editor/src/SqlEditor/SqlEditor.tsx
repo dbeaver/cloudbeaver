@@ -39,8 +39,8 @@ export const SqlEditor = observer<ISqlEditorProps>(function SqlEditor({ state, c
     modesState.sync(state.modeState);
   }, [state]);
 
-  useCaptureViewContext(context => {
-    context?.set(DATA_CONTEXT_SQL_EDITOR_DATA, data);
+  useCaptureViewContext((context, id) => {
+    context.set(DATA_CONTEXT_SQL_EDITOR_DATA, data, id);
   });
 
   function handleModeSelect(tab: ITabData<ISqlEditorModeProps>) {

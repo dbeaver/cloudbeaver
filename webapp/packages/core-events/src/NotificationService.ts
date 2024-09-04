@@ -80,26 +80,41 @@ export class NotificationService {
 
     const id = this.notificationNextId++;
 
-    const notification: INotification<TProps> = {
-      id,
-      uuid: options.uuid,
-      title: options.title,
-      message: options.message,
-      details: options.details,
-      isSilent: !!options.isSilent,
-      customComponent: options.customComponent,
-      extraProps: options.extraProps || ({} as TProps),
-      autoClose: options.autoClose,
-      persistent: options.persistent,
-      state: observable({ deleteDelay: 0 }),
-      timestamp: options.timestamp || Date.now(),
-      type,
-      close: delayDeleting => {
-        this.close(id, delayDeleting);
-        options.onClose?.(delayDeleting);
+    const notification: INotification<TProps> = observable(
+      {
+        id,
+        uuid: options.uuid,
+        title: options.title,
+        message: options.message,
+        details: options.details,
+        isSilent: !!options.isSilent,
+        customComponent: options.customComponent,
+        extraProps: options.extraProps || ({} as TProps),
+        autoClose: options.autoClose,
+        persistent: options.persistent,
+        state: observable({ deleteDelay: 0 }),
+        timestamp: options.timestamp || Date.now(),
+        type,
+        close: delayDeleting => {
+          this.close(id, delayDeleting);
+          options.onClose?.(delayDeleting);
+        },
+        showDetails: this.showDetails.bind(this, id),
       },
-      showDetails: this.showDetails.bind(this, id),
-    };
+      {
+        title: observable.ref,
+        message: observable.ref,
+        details: observable.ref,
+        persistent: observable.ref,
+        isSilent: observable.ref,
+        customComponent: observable.ref,
+        extraProps: observable.ref,
+        autoClose: observable.ref,
+        type: observable.ref,
+        timestamp: observable.ref,
+        showDetails: observable.ref,
+      },
+    );
 
     this.notificationList.addValue(notification);
 

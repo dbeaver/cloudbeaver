@@ -5,7 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import { App, Bootstrap, DIService, injectable, IServiceConstructor } from '@cloudbeaver/core-di';
+import { App, Bootstrap, injectable, IServiceConstructor, IServiceProvider } from '@cloudbeaver/core-di';
 import { CachedResource } from '@cloudbeaver/core-resource';
 import { EAdminPermission, PermissionsService } from '@cloudbeaver/core-root';
 import { ActionService, DATA_CONTEXT_SUBMENU_ITEM, MenuBaseItem, MenuService } from '@cloudbeaver/core-view';
@@ -30,7 +30,7 @@ import { ResourceSubMenuItem } from './menu/ResourceSubMenuItem';
 export class PluginBootstrap extends Bootstrap {
   constructor(
     private readonly app: App,
-    private readonly diService: DIService,
+    private readonly serviceProvider: IServiceProvider,
     private readonly menuService: MenuService,
     private readonly actionService: ActionService,
     private readonly devToolsService: DevToolsService,
@@ -80,7 +80,7 @@ export class PluginBootstrap extends Bootstrap {
     this.menuService.addCreator({
       menus: [MENU_DEVTOOLS],
       getItems: (context, items) => {
-        const search = context.tryGet(DATA_CONTEXT_MENU_SEARCH);
+        const search = context.get(DATA_CONTEXT_MENU_SEARCH);
 
         if (search) {
           return [
@@ -125,7 +125,7 @@ export class PluginBootstrap extends Bootstrap {
     this.menuService.addCreator({
       menus: [MENU_PLUGIN],
       isApplicable: context => {
-        const item = context.tryGet(DATA_CONTEXT_SUBMENU_ITEM);
+        const item = context.get(DATA_CONTEXT_SUBMENU_ITEM);
 
         if (item instanceof PluginSubMenuItem) {
           return this.app.getServices(item.plugin).some(service => service.prototype instanceof CachedResource);
@@ -171,7 +171,7 @@ export class PluginBootstrap extends Bootstrap {
             },
             {
               onSelect: () => {
-                const instance = this.diService.serviceInjector.getServiceByClass<CachedResource<any, any, any, any, any>>(item.resource);
+                const instance = this.serviceProvider.getService<CachedResource<any, any, any, any, any>>(item.resource);
                 instance.markOutdated(undefined);
               },
             },

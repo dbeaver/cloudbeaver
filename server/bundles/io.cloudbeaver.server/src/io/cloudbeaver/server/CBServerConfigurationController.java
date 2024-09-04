@@ -255,8 +255,8 @@ public abstract class CBServerConfigurationController<T extends CBServerConfig>
             try (Reader reader = new InputStreamReader(new FileInputStream(rtConfig), StandardCharsets.UTF_8)) {
                 var runtimeProductSettings = JSONUtils.parseMap(gson, reader);
                 var productSettings = serverConfiguration.getProductSettings();
-                productSettings.putAll(runtimeProductSettings);
-                Map<String, Object> flattenConfig = WebAppUtils.flattenMap(productSettings);
+                runtimeProductSettings.putAll(productSettings);
+                Map<String, Object> flattenConfig = WebAppUtils.flattenMap(runtimeProductSettings);
                 productSettings.clear();
                 productSettings.putAll(flattenConfig);
             } catch (Exception e) {
@@ -288,10 +288,17 @@ public abstract class CBServerConfigurationController<T extends CBServerConfig>
 
             configProps.putAll(readConfigurationFile(configPath));
 
-            var mergedOriginalConfigs = WebAppUtils.mergeConfigurations(configProps, originalConfigurationProperties);
-            this.originalConfigurationProperties.clear();
-            // saves original configuration file
-            this.originalConfigurationProperties.putAll(mergedOriginalConfigs);
+            if (originalConfigurationProperties.isEmpty()) {
+                originalConfigurationProperties.putAll(configProps);
+            } else {
+                var mergedOriginalConfigs = WebAppUtils.mergeConfigurations(
+                    originalConfigurationProperties,
+                    configProps
+                );
+                this.originalConfigurationProperties.clear();
+                // saves original configuration file
+                this.originalConfigurationProperties.putAll(mergedOriginalConfigs);
+            }
 
             configProps.putAll(readConfigurationFile(configPath));
             patchConfigurationWithProperties(configProps); // patch original properties
@@ -325,34 +332,27 @@ public abstract class CBServerConfigurationController<T extends CBServerConfig>
             .registerTypeAdapter(PasswordPolicyConfiguration.class, smPasswordPoliceConfigCreator);
     }
 
-    protected void saveRuntimeConfig(SMCredentialsProvider credentialsProvider) throws DBException {
+    public synchronized void saveRuntimeConfig(SMCredentialsProvider credentialsProvider) throws DBException {
         saveRuntimeConfig(
-            serverConfiguration.getServerName(),
-            serverConfiguration.getServerURL(),
-            serverConfiguration.getMaxSessionIdleTime(),
+            serverConfiguration,
             appConfiguration,
             credentialsProvider
         );
     }
 
-    protected void saveRuntimeConfig(
-        String newServerName,
-        String newServerURL,
-        long sessionExpireTime,
-        CBAppConfig appConfig,
+    protected synchronized void saveRuntimeConfig(
+        @NotNull CBServerConfig serverConfig,
+        @NotNull CBAppConfig appConfig,
         SMCredentialsProvider credentialsProvider
     ) throws DBException {
-        if (newServerName == null) {
+        if (serverConfig.getServerName() == null) {
             throw new DBException("Invalid server configuration, server name cannot be empty");
         }
-        Map<String, Object> configurationProperties = collectConfigurationProperties(newServerName,
-            newServerURL,
-            sessionExpireTime,
-            appConfig);
+        Map<String, Object> configurationProperties = collectConfigurationProperties(serverConfig, appConfig);
         writeRuntimeConfig(getRuntimeAppConfigPath(), configurationProperties);
     }
 
-    private void writeRuntimeConfig(Path runtimeConfigPath, Map<String, Object> configurationProperties)
+    private synchronized void writeRuntimeConfig(Path runtimeConfigPath, Map<String, Object> configurationProperties)
         throws DBException {
         if (Files.exists(runtimeConfigPath)) {
             ContentUtils.makeFileBackup(runtimeConfigPath);
@@ -372,23 +372,19 @@ public abstract class CBServerConfigurationController<T extends CBServerConfig>
     }
 
 
-    public void updateServerUrl(@NotNull SMCredentialsProvider credentialsProvider, @Nullable String newPublicUrl) throws DBException {
+    public synchronized void updateServerUrl(@NotNull SMCredentialsProvider credentialsProvider,
+        @Nullable String newPublicUrl) throws DBException {
         getServerConfiguration().setServerURL(newPublicUrl);
     }
 
     protected Map<String, Object> collectConfigurationProperties(
-        String newServerName,
-        String newServerURL,
-        long sessionExpireTime,
-        CBAppConfig appConfig
+        @NotNull CBServerConfig serverConfig,
+        @NotNull CBAppConfig appConfig
     ) {
         Map<String, Object> rootConfig = new LinkedHashMap<>();
         {
             var originServerConfig = BaseWebApplication.getServerConfigProps(this.originalConfigurationProperties); // get server properties from original configuration file
-            var serverConfigProperties = collectServerConfigProperties(newServerName,
-                newServerURL,
-                sessionExpireTime,
-                originServerConfig);
+            var serverConfigProperties = collectServerConfigProperties(serverConfig, originServerConfig);
             rootConfig.put("server", serverConfigProperties);
         }
         {
@@ -506,28 +502,26 @@ public abstract class CBServerConfigurationController<T extends CBServerConfig>
 
     @NotNull
     protected Map<String, Object> collectServerConfigProperties(
-        String newServerName,
-        String newServerURL,
-        long sessionExpireTime,
+        @NotNull CBServerConfig serverConfig,
         Map<String, Object> originServerConfig
     ) {
         var serverConfigProperties = new LinkedHashMap<String, Object>();
-        if (!CommonUtils.isEmpty(newServerName)) {
+        if (!CommonUtils.isEmpty(serverConfig.getServerName())) {
             copyConfigValue(originServerConfig,
                 serverConfigProperties,
                 CBConstants.PARAM_SERVER_NAME,
-                newServerName);
+                serverConfig.getServerName());
         }
-        if (!CommonUtils.isEmpty(newServerURL)) {
+        if (!CommonUtils.isEmpty(serverConfig.getServerURL())) {
             copyConfigValue(
-                originServerConfig, serverConfigProperties, CBConstants.PARAM_SERVER_URL, newServerURL);
+                originServerConfig, serverConfigProperties, CBConstants.PARAM_SERVER_URL, serverConfig.getServerURL());
         }
-        if (sessionExpireTime > 0) {
+        if (serverConfig.getMaxSessionIdleTime() > 0) {
             copyConfigValue(
                 originServerConfig,
                 serverConfigProperties,
                 CBConstants.PARAM_SESSION_EXPIRE_PERIOD,
-                sessionExpireTime);
+                serverConfig.getMaxSessionIdleTime());
         }
         var productConfigProperties = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
         Map<String, Object> oldProductRuntimeConfig = JSONUtils.getObject(originServerConfig,
@@ -565,6 +559,10 @@ public abstract class CBServerConfigurationController<T extends CBServerConfig>
         String key,
         Object defaultValue
     ) {
+        //do not store empty values in runtime config
+        if (defaultValue instanceof String stringValue && CommonUtils.isEmpty(stringValue)) {
+            return;
+        }
         Object value = oldConfig.get(key);
         if (value instanceof Map && defaultValue instanceof Map) {
             Map<String, Object> subValue = new LinkedHashMap<>();
@@ -628,5 +626,11 @@ public abstract class CBServerConfigurationController<T extends CBServerConfig>
             uri = '/' + uri;
         }
         return uri;
+    }
+
+    @NotNull
+    @Override
+    public Map<String, Object> getOriginalConfigurationProperties() {
+        return originalConfigurationProperties;
     }
 }

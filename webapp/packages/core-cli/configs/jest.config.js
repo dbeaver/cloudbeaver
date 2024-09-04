@@ -27,7 +27,7 @@ module.exports = {
   },
   // passWithNoTests: true,
   setupFiles: [require.resolve('fake-indexeddb/auto'), require.resolve('../tests/setup.js')],
-  setupFilesAfterEnv: ['@testing-library/jest-dom'],
+  setupFilesAfterEnv: ['@testing-library/jest-dom/jest-globals'],
   transform: {
     '\\.jsx?$': [require.resolve('@swc/jest')],
   },
@@ -36,4 +36,5 @@ module.exports = {
     // https://mswjs.io/docs/migrations/1.x-to-2.x#cannot-find-module-mswnode-jsdom
     customExportConditions: [''],
   },
+  injectGlobals: false,
 };

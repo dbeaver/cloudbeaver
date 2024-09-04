@@ -65,6 +65,7 @@ export const ConnectionDialog: DialogComponent<null, null> = observer(function C
                 allowSaveCredentials={credentialsSavingEnabled}
                 disabled={dialog.processing}
                 hideFeatures={['nonSecuredProperty']}
+                projectId={dialog.template?.projectId ?? null}
                 className={s(styles, { connectionAuthenticationFormLoader: true })}
               />
             </Form>

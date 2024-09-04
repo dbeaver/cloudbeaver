@@ -9,8 +9,8 @@ import { observer } from 'mobx-react-lite';
 import { useContext, useState } from 'react';
 
 import { getComputed, s, useObjectRef, useS } from '@cloudbeaver/core-blocks';
+import type { RenderCellProps } from '@cloudbeaver/plugin-data-grid';
 import type { IDataPresentationActions, IResultSetElementKey, IResultSetRowKey } from '@cloudbeaver/plugin-data-viewer';
-import type { RenderCellProps } from '@cloudbeaver/plugin-react-data-grid';
 
 import { EditingContext } from '../../Editing/EditingContext';
 import { CellContext } from '../CellRenderer/CellContext';

@@ -5,7 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import '@testing-library/jest-dom';
+import { expect, test } from '@jest/globals';
 
 import { coreClientActivityManifest } from '@cloudbeaver/core-client-activity';
 import { coreLocalizationManifest } from '@cloudbeaver/core-localization';
@@ -52,8 +52,8 @@ const newSettings = {
 };
 
 test('New settings override deprecated settings', async () => {
-  const settings = app.injector.getServiceByClass(SettingsLocalizationService);
-  const config = app.injector.getServiceByClass(ServerConfigResource);
+  const settings = app.serviceProvider.getService(SettingsLocalizationService);
+  const config = app.serviceProvider.getService(ServerConfigResource);
 
   server.use(endpoint.query('serverConfig', mockServerConfig(newSettings)));
 
@@ -64,8 +64,8 @@ test('New settings override deprecated settings', async () => {
 });
 
 test('Deprecated settings are used if new settings are not defined', async () => {
-  const settings = app.injector.getServiceByClass(SettingsLocalizationService);
-  const config = app.injector.getServiceByClass(ServerConfigResource);
+  const settings = app.serviceProvider.getService(SettingsLocalizationService);
+  const config = app.serviceProvider.getService(ServerConfigResource);
 
   server.use(endpoint.query('serverConfig', mockServerConfig(deprecatedSettings)));
 

@@ -5,7 +5,7 @@
  * Licensed under the Apache License, Version 2.0.
  * you may not use this file except in compliance with the License.
  */
-import '@testing-library/jest-dom';
+import { expect, test } from '@jest/globals';
 
 import { coreBrowserManifest } from '@cloudbeaver/core-browser';
 import { coreClientActivityManifest } from '@cloudbeaver/core-client-activity';
@@ -52,8 +52,8 @@ const equalConfigB = {
 };
 
 test('New settings override deprecated settings', async () => {
-  const settings = app.injector.getServiceByClass(BrowserSettingsService);
-  const config = app.injector.getServiceByClass(ServerConfigResource);
+  const settings = app.serviceProvider.getService(BrowserSettingsService);
+  const config = app.serviceProvider.getService(ServerConfigResource);
 
   server.use(endpoint.query('serverConfig', mockServerConfig(equalConfigA)));
 
@@ -64,8 +64,8 @@ test('New settings override deprecated settings', async () => {
 });
 
 test('New settings fall back to deprecated settings', async () => {
-  const settings = app.injector.getServiceByClass(BrowserSettingsService);
-  const config = app.injector.getServiceByClass(ServerConfigResource);
+  const settings = app.serviceProvider.getService(BrowserSettingsService);
+  const config = app.serviceProvider.getService(ServerConfigResource);
 
   server.use(endpoint.query('serverConfig', mockServerConfig(equalConfigB)));
 

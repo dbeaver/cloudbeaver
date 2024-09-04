@@ -1,3 +1,10 @@
+/*
+ * CloudBeaver - Cloud Database Manager
+ * Copyright (C) 2020-2024 DBeaver Corp and others
+ *
+ * Licensed under the Apache License, Version 2.0.
+ * you may not use this file except in compliance with the License.
+ */
 export default [
   ['connections_public_connection_edit_menu_item_title', 'Изменить подключение'],
   ['connections_public_connection_edit_cancel_title', 'Отмена редактирования'],
@@ -23,5 +30,8 @@ export default [
 
   ['plugin_connections_connection_form_shared_credentials_manage_info', 'Вы можете указать учетные данные в '],
   ['plugin_connections_connection_form_shared_credentials_manage_info_tab_link', 'во вкладке "Учетные данные"'],
-  ['plugin_connections_connection_auth_secret_description', 'Выберете учетные данные, предоставленные одной из ваших команд'],
+  [
+    'plugin_connections_connection_auth_secret_description',
+    'У вас есть несколько учетных записей для авторизации.\nВыберите учетную запись из списка.',
+  ],
 ];

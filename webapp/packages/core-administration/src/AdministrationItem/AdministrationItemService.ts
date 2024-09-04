@@ -142,7 +142,7 @@ export class AdministrationItemService {
     return sub;
   }
 
-  create(options: IAdministrationItemOptions): void {
+  create(options: IAdministrationItemOptions): IAdministrationItem {
     const type = options.type ?? AdministrationItemType.Administration;
 
     const existedIndex = this.items.findIndex(
@@ -160,7 +160,9 @@ export class AdministrationItemService {
       sub: options.sub ?? [],
       order: options.order ?? Number.MAX_SAFE_INTEGER,
     };
-    this.items.push(item);
+    const index = this.items.push(item);
+
+    return this.items[index - 1];
   }
 
   async activate(screen: IAdministrationItemRoute, configurationWizard: boolean, outside: boolean, outsideAdminPage: boolean): Promise<void> {

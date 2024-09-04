@@ -17,9 +17,16 @@ interface Props {
   networkHandlersConfig: NetworkHandlerConfigInput[];
   disabled?: boolean;
   allowSaveCredentials?: boolean;
+  projectId: string | null;
 }
 
-export const NetworkHandlers = observer<Props>(function NetworkHandlers({ networkHandlers, networkHandlersConfig, allowSaveCredentials, disabled }) {
+export const NetworkHandlers = observer<Props>(function NetworkHandlers({
+  networkHandlers,
+  networkHandlersConfig,
+  allowSaveCredentials,
+  disabled,
+  projectId,
+}) {
   if (!networkHandlers.length) {
     return null;
   }
@@ -29,6 +36,7 @@ export const NetworkHandlers = observer<Props>(function NetworkHandlers({ networ
       {networkHandlers.map(handler => (
         <NetworkHandlerAuthForm
           key={handler}
+          projectId={projectId}
           id={handler}
           networkHandlersConfig={networkHandlersConfig}
           allowSaveCredentials={allowSaveCredentials}

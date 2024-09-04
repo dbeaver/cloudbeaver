@@ -16,6 +16,14 @@ export * from './CommonDialog/DialogsPortal';
 
 export * from './ErrorDetailsDialog/ErrorDetailsDialog';
 
+export * from './ComponentsRegistry/CRegistryLoader';
+// we don't expect to use this component directly only as a wrapper for another component
+// eslint-disable-next-line @cloudbeaver/no-sync-component-import
+export * from './ComponentsRegistry/registry';
+export * from './ComponentsRegistry/CRegistryList';
+export * from './ComponentsRegistry/IComponentsTreeNodeValidator';
+export * from './ComponentsRegistry/useParentProps';
+
 export * from './AppRefreshButton';
 export * from './ComplexLoader';
 export * from './DisplayError';
@@ -105,6 +113,11 @@ export * from './Table/useTable';
 export * from './Table/TableState';
 export * from './Table/TableSelect';
 export * from './Table/getSelectedItems';
+export * from './Table/TableItemGroup';
+export * from './Table/TableItemGroupContext';
+export * from './Table/TableItemGroupExpand';
+export * from './Table/TableItemGroupContent';
+export * from './Table/TableItemGroupExpandSpace';
 
 export * from './Expand/Expandable';
 
@@ -198,7 +211,6 @@ export * from './TimerIcon';
 export * from './InfoItem';
 export * from './Iframe';
 export * from './Code';
-export * from './useClickEvents';
 export * from './useControlledScroll';
 export * from './useClipboard';
 export * from './useCombinedHandler';
@@ -238,3 +250,4 @@ export * from './manifest';
 export * from './importLazyComponent';
 export * from './ClickableLoader';
 export * from './FormControls/TagsComboboxLoader';
+export * from './Flex/Flex';

@@ -3,6 +3,8 @@ set -Eeuo pipefail
 
 echo "Build static content"
 
+mkdir ./cloudbeaver/web
+
 cd ../../cloudbeaver/webapp
 
 yarn

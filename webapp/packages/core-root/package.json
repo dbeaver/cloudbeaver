@@ -13,7 +13,6 @@
     "build": "tsc -b",
     "clean": "rimraf --glob dist",
     "lint": "eslint ./src/ --ext .ts,.tsx",
-    "lint-fix": "eslint ./src/ --ext .ts,.tsx --fix",
     "validate-dependencies": "core-cli-validate-dependencies",
     "update-ts-references": "yarn run clean && typescript-resolve-references"
   },
@@ -33,8 +32,8 @@
   "peerDependencies": {},
   "devDependencies": {
     "@cloudbeaver/core-sdk": "^0",
+    "@cloudbeaver/core-website": "^0",
     "@cloudbeaver/tests-runner": "^0",
-    "@types/jest": "^29",
     "msw": "^2",
     "typescript": "^5"
   }

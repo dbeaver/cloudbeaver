@@ -8,12 +8,12 @@
 import { observer } from 'mobx-react-lite';
 
 import { IconOrImage, s, useS, useTranslate } from '@cloudbeaver/core-blocks';
-import { EOrder, getNextOrder, IDatabaseDataModel, ResultSetConstraintAction } from '@cloudbeaver/plugin-data-viewer';
+import { DatabaseDataConstraintAction, EOrder, getNextOrder, IDatabaseDataModel, ResultSetDataSource } from '@cloudbeaver/plugin-data-viewer';
 
 import style from './OrderButton.module.css';
 
 interface Props {
-  model: IDatabaseDataModel;
+  model: IDatabaseDataModel<ResultSetDataSource>;
   resultIndex: number;
   attributePosition: number;
   className?: string;
@@ -21,7 +21,7 @@ interface Props {
 
 export const OrderButton = observer<Props>(function OrderButton({ model, resultIndex, attributePosition, className }) {
   const translate = useTranslate();
-  const constraints = model.source.getAction(resultIndex, ResultSetConstraintAction);
+  const constraints = model.source.getAction(resultIndex, DatabaseDataConstraintAction);
   const currentOrder = constraints.getOrder(attributePosition);
   const disabled = model.isDisabled(resultIndex) || model.isLoading();
   const styles = useS(style);
@@ -35,9 +35,8 @@ export const OrderButton = observer<Props>(function OrderButton({ model, resultI
 
   const handleSort = async (e: React.MouseEvent<HTMLButtonElement>) => {
     const nextOrder = getNextOrder(currentOrder);
-    await model.requestDataAction(async () => {
+    await model.request(() => {
       constraints.setOrder(attributePosition, nextOrder, e.ctrlKey || e.metaKey);
-      await model.request(true);
     });
   };
 

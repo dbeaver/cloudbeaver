@@ -30,7 +30,7 @@ export interface ConnectionAuthenticationDialogPayload {
   config: ConnectionConfig;
   authModelId: string | null;
   networkHandlers?: string[];
-  driverId?: string;
+  projectId: string | null;
 }
 
 export const ConnectionAuthenticationDialog: DialogComponent<ConnectionAuthenticationDialogPayload> = observer(
@@ -38,7 +38,7 @@ export const ConnectionAuthenticationDialog: DialogComponent<ConnectionAuthentic
     const translate = useTranslate();
     const styles = useS(style);
     const [focusedRef] = useFocus<HTMLFormElement>({ focusFirstChild: true });
-    const { driver } = useDBDriver(payload.driverId || '');
+    const { driver } = useDBDriver(payload.config.driverId || '');
 
     return (
       <CommonDialogWrapper size="large">
@@ -52,9 +52,10 @@ export const ConnectionAuthenticationDialog: DialogComponent<ConnectionAuthentic
           <Form ref={focusedRef} className={s(styles, { submittingForm: true })} onSubmit={() => resolveDialog()}>
             <ConnectionAuthenticationFormLoader
               config={payload.config}
+              projectId={payload.projectId ?? null}
               authModelId={payload.authModelId}
               networkHandlers={payload.networkHandlers}
-              formId={payload.config.connectionId || payload.driverId}
+              formId={payload.config.connectionId || payload.config.driverId}
               className={s(styles, { connectionAuthenticationFormLoader: true })}
               hideFeatures={['nonSecuredProperty']}
             />

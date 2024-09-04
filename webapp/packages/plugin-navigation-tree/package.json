@@ -13,7 +13,6 @@
     "build": "tsc -b",
     "clean": "rimraf --glob dist",
     "lint": "eslint ./src/ --ext .ts,.tsx",
-    "lint-fix": "eslint ./src/ --ext .ts,.tsx --fix",
     "test": "core-cli-test",
     "validate-dependencies": "core-cli-validate-dependencies",
     "update-ts-references": "yarn run clean && typescript-resolve-references"
@@ -32,7 +31,6 @@
     "@cloudbeaver/core-projects": "^0",
     "@cloudbeaver/core-resource": "^0",
     "@cloudbeaver/core-settings": "^0",
-    "@cloudbeaver/core-theming": "^0",
     "@cloudbeaver/core-ui": "^0",
     "@cloudbeaver/core-utils": "^0",
     "@cloudbeaver/core-view": "^0",
@@ -66,8 +64,8 @@
     "@cloudbeaver/plugin-datasource-context-switch": "^0",
     "@cloudbeaver/plugin-navigation-tabs": "^0",
     "@cloudbeaver/tests-runner": "^0",
+    "@jest/globals": "^29",
     "@testing-library/jest-dom": "^6",
-    "@types/jest": "^29",
     "@types/react": "^18",
     "typescript": "^5",
     "typescript-plugin-css-modules": "^5"

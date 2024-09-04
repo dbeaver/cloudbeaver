@@ -21,7 +21,7 @@ import graphql.ErrorType;
 import graphql.GraphQLError;
 import graphql.language.SourceLocation;
 import org.jkiss.dbeaver.DBException;
-import org.jkiss.dbeaver.model.DBPDataSource;
+import org.jkiss.dbeaver.model.sql.SQLState;
 import org.jkiss.dbeaver.utils.GeneralUtils;
 import org.jkiss.utils.CommonUtils;
 
@@ -38,6 +38,7 @@ public class DBWebException extends DBException implements GraphQLError {
 
     public static final String ERROR_CODE_SESSION_EXPIRED = "sessionExpired";
     public static final String ERROR_CODE_ACCESS_DENIED = "accessDenied";
+    public static final String ERROR_CODE_SERVER_NOT_INITIALIZED = "serverNotInitialized";
     public static final String ERROR_CODE_LICENSE_DENIED = "licenseRequired";
     public static final String ERROR_CODE_IDENT_REQUIRED = "identRequired";
     public static final String ERROR_CODE_AUTH_REQUIRED = "authRequired";
@@ -65,12 +66,8 @@ public class DBWebException extends DBException implements GraphQLError {
         this.webErrorCode = errorCode;
     }
 
-    public DBWebException(Throwable cause, DBPDataSource dataSource) {
-        super(cause, dataSource);
-    }
-
-    public DBWebException(String message, Throwable cause, DBPDataSource dataSource) {
-        super(makeMessage(message, cause), cause, dataSource);
+    public DBWebException(Throwable cause) {
+        super(null, cause);
     }
 
     public String getWebErrorCode() {
@@ -128,14 +125,14 @@ public class DBWebException extends DBException implements GraphQLError {
             //stString = stString.substring(divPos + 1).trim();
         }
         extensions.put("stackTrace", stString.trim());
-        int errorCode = getErrorCode();
+        int errorCode = SQLState.getCodeFromException(this);
         if (errorCode != ERROR_CODE_NONE) {
             extensions.put("errorCode", errorCode);
         }
         if (!CommonUtils.isEmpty(webErrorCode)) {
             extensions.put("webErrorCode", webErrorCode);
         }
-        String databaseState = getDatabaseState();
+        String databaseState = SQLState.getStateFromException(this);
         if (databaseState != null) {
             extensions.put("databaseState", databaseState);
         }

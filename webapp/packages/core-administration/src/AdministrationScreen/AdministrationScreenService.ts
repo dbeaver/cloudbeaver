@@ -50,7 +50,7 @@ export class AdministrationScreenService {
   }
 
   get publicDisabled(): boolean {
-    return this.serverConfigResource.publicDisabled;
+    return this.permissionsService.publicDisabled;
   }
 
   readonly ensurePermissions: IExecutor;
@@ -111,6 +111,21 @@ export class AdministrationScreenService {
     this.permissionsResource.onDataUpdate.addPostHandler(() => {
       this.checkPermissions(this.screenService.routerService.state);
     });
+
+    this.screenService.routeChange.addHandler(this.onRouteChange.bind(this));
+  }
+
+  private async onRouteChange() {
+    // this is need for this.isConfigurationMode
+    await this.serverConfigResource.load();
+
+    if (!this.isAdministrationPageActive) {
+      return;
+    }
+
+    if (!this.activeScreen || !this.administrationItemService.getItem(this.activeScreen.item, this.isConfigurationMode)) {
+      this.navigateToRoot();
+    }
   }
 
   getRouteName(item?: string, sub?: string, param?: string) {

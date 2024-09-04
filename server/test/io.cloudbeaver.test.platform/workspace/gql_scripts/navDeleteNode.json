@@ -1,9 +1,0 @@
-{
-  "query": "\n    mutation navDeleteNodes($nodePaths: [ID!]!) {\n  navDeleteNodes(nodePaths: $nodePaths)\n}\n    ",
-  "variables": {
-    "nodePaths": [
-      "ext://resources/u_test/testScript.sql"
-    ]
-  },
-  "operationName": "navDeleteNodes"
-}

@@ -10,8 +10,8 @@ import { useCallback, useContext, useEffect, useRef } from 'react';
 
 import { getComputed, IconOrImage, importLazyComponent, Loader, s, useS } from '@cloudbeaver/core-blocks';
 import { isValidUrl } from '@cloudbeaver/core-utils';
+import type { RenderCellProps } from '@cloudbeaver/plugin-data-grid';
 import type { IResultSetRowKey } from '@cloudbeaver/plugin-data-viewer';
-import type { RenderCellProps } from '@cloudbeaver/plugin-react-data-grid';
 
 import { EditingContext } from '../../../Editing/EditingContext';
 import type { IEditorRef } from '../../CellEditor';

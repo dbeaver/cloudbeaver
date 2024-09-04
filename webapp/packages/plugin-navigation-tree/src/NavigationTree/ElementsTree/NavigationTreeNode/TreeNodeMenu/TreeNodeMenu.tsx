@@ -9,6 +9,7 @@ import { observer } from 'mobx-react-lite';
 
 import { getComputed, Icon, IMouseContextMenu, s, useS } from '@cloudbeaver/core-blocks';
 import { ConnectionInfoResource, DATA_CONTEXT_CONNECTION } from '@cloudbeaver/core-connections';
+import { useDataContextLink } from '@cloudbeaver/core-data-context';
 import { useService } from '@cloudbeaver/core-di';
 import { DATA_CONTEXT_NAV_NODE, type INodeActions, type NavNode } from '@cloudbeaver/core-navigation-tree';
 import { ContextMenu } from '@cloudbeaver/core-ui';
@@ -30,14 +31,16 @@ export const TreeNodeMenu = observer<TreeNodeMenuProps>(function TreeNodeMenu({ 
   const styles = useS(style);
   const connectionsInfoResource = useService(ConnectionInfoResource);
   const menu = useMenu({ menu: MENU_NAV_TREE });
-  menu.context.set(DATA_CONTEXT_NAV_NODE, node);
-  menu.context.set(DATA_CONTEXT_NAV_NODE_ACTIONS, actions);
-
   const connection = getComputed(() => connectionsInfoResource.getConnectionForNode(node.id));
 
-  if (connection) {
-    menu.context.set(DATA_CONTEXT_CONNECTION, connection);
-  }
+  useDataContextLink(menu.context, (context, id) => {
+    context.set(DATA_CONTEXT_NAV_NODE, node, id);
+    context.set(DATA_CONTEXT_NAV_NODE_ACTIONS, actions, id);
+
+    if (connection) {
+      context.set(DATA_CONTEXT_CONNECTION, connection, id);
+    }
+  });
 
   function handleVisibleSwitch(visible: boolean) {
     if (!visible) {

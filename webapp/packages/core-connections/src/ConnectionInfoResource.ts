@@ -55,7 +55,6 @@ export type ConnectionInitConfig = Omit<
   | 'includeCredentialsSaved'
   | 'includeProperties'
   | 'includeProviderProperties'
-  | 'includeSharedSecrets'
   | 'customIncludeOptions'
 >;
 export type ConnectionInfoIncludes = Omit<GetUserConnectionsQueryVariables, 'id'>;
@@ -450,9 +449,7 @@ export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoPar
       this.onDataOutdated.execute(key);
     });
 
-    const connection = this.get(key)!;
-    this.onConnectionClose.execute(key);
-    return connection;
+    return this.get(key)!;
   }
 
   deleteConnection(key: IConnectionInfoParams): Promise<void>;
@@ -568,6 +565,10 @@ export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoPar
         ...handler,
       })),
     });
+
+    if (oldConnection?.connected && !value.connected) {
+      this.onConnectionClose.execute(key);
+    }
   }
 
   protected dataDelete(key: IConnectionInfoParams): void {
@@ -593,7 +594,6 @@ export class ConnectionInfoResource extends CachedMapResource<IConnectionInfoPar
       includeCredentialsSaved: false,
       includeProperties: false,
       includeProviderProperties: false,
-      includeSharedSecrets: false,
       customIncludeOptions: false,
     };
   }
@@ -639,9 +639,13 @@ export function compareNewConnectionsInfo(a: DatabaseConnection, b: DatabaseConn
   return 0;
 }
 
+export function createConnectionParam(connection: Pick<Connection, 'id' | 'projectId'>): IConnectionInfoParams;
 export function createConnectionParam(connection: Connection): IConnectionInfoParams;
 export function createConnectionParam(projectId: string, connectionId: string): IConnectionInfoParams;
-export function createConnectionParam(projectIdOrConnection: string | Connection, connectionId?: string): IConnectionInfoParams {
+export function createConnectionParam(
+  projectIdOrConnection: string | Connection | Pick<Connection, 'id' | 'projectId'>,
+  connectionId?: string,
+): IConnectionInfoParams {
   if (typeof projectIdOrConnection === 'object') {
     connectionId = projectIdOrConnection.id;
     projectIdOrConnection = projectIdOrConnection.projectId;

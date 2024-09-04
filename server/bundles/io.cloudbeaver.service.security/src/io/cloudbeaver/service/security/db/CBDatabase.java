@@ -128,8 +128,17 @@ public class CBDatabase {
 
         LoggingProgressMonitor monitor = new LoggingProgressMonitor(log);
 
+        if (isDefaultH2Configuration(databaseConfiguration)) {
+            //force use default values even if they are explicitly specified
+            databaseConfiguration.setUser(null);
+            databaseConfiguration.setPassword(null);
+            databaseConfiguration.setSchema(null);
+        }
+
         String dbUser = databaseConfiguration.getUser();
         String dbPassword = databaseConfiguration.getPassword();
+        String schemaName = databaseConfiguration.getSchema();
+
         if (CommonUtils.isEmpty(dbUser) && driver.isEmbedded()) {
             File pwdFile = application.getDataDirectory(true).resolve(DEFAULT_DB_PWD_FILE).toFile();
             if (!driver.isAnonymousAccess()) {
@@ -192,7 +201,6 @@ public class CBDatabase {
             DatabaseMetaData metaData = connection.getMetaData();
             log.debug("\tConnected to " + metaData.getDatabaseProductName() + " " + metaData.getDatabaseProductVersion());
 
-            var schemaName = databaseConfiguration.getSchema();
             if (dialect instanceof SQLDialectSchemaController && CommonUtils.isNotEmpty(schemaName)) {
                 var dialectSchemaController = (SQLDialectSchemaController) dialect;
                 var schemaExistQuery = dialectSchemaController.getSchemaExistQuery(schemaName);
@@ -468,7 +476,7 @@ public class CBDatabase {
     // Persistence
 
 
-    private void validateInstancePersistentState(Connection connection) throws IOException, SQLException, DBException {
+    protected void validateInstancePersistentState(Connection connection) throws IOException, SQLException, DBException {
         try (JDBCTransaction txn = new JDBCTransaction(connection)) {
             checkInstanceRecord(connection);
             var defaultTeamId = application.getAppConfiguration().getDefaultUserTeam();
@@ -579,4 +587,25 @@ public class CBDatabase {
         return dialect;
     }
 
+    public static boolean isDefaultH2Configuration(WebDatabaseConfig databaseConfiguration) {
+        var workspace = WebAppUtils.getWebApplication().getWorkspaceDirectory();
+        var v1Path = workspace.resolve(".data").resolve(V1_DB_NAME);
+        var v2Path = workspace.resolve(".data").resolve(V2_DB_NAME);
+        var v1DefaultUrl = "jdbc:h2:" + v1Path;
+        var v2DefaultUrl = "jdbc:h2:" + v2Path;
+        return v1DefaultUrl.equals(databaseConfiguration.getUrl())
+            || v2DefaultUrl.equals(databaseConfiguration.getUrl());
+    }
+
+    protected WebDatabaseConfig getDatabaseConfiguration() {
+        return databaseConfiguration;
+    }
+
+    protected WebApplication getApplication() {
+        return application;
+    }
+
+    protected SMAdminController getAdminSecurityController() {
+        return adminSecurityController;
+    }
 }

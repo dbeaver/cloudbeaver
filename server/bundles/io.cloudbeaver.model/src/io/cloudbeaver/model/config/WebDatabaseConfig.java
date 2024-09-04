@@ -63,6 +63,7 @@ public class WebDatabaseConfig implements InternalDatabaseConfig {
         return user;
     }
 
+
     @Override
     public String getPassword() {
         return password;
@@ -83,5 +84,17 @@ public class WebDatabaseConfig implements InternalDatabaseConfig {
 
     public String getSchema() {
         return schema;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public void setSchema(String schema) {
+        this.schema = schema;
+    }
+
+    public void setUser(String user) {
+        this.user = user;
     }
 }

@@ -14,11 +14,11 @@ import { DataViewerSettingsService } from './DataViewerSettingsService';
 @injectable()
 export class DataViewerService {
   get canCopyData() {
-    if (this.sessionPermissionsResource.has(EAdminPermission.admin)) {
-      return true;
-    }
+    return this.sessionPermissionsResource.has(EAdminPermission.admin) || !this.dataViewerSettingsService.disableCopyData;
+  }
 
-    return !this.dataViewerSettingsService.disableCopyData;
+  get canExportData() {
+    return this.sessionPermissionsResource.has(EAdminPermission.admin) || !this.dataViewerSettingsService.disableExportData;
   }
 
   constructor(

@@ -9,7 +9,7 @@ import { importLazyComponent } from '@cloudbeaver/core-blocks';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 
 import { UserProfileFormService } from '../UserProfileFormService';
-import { DATA_CONTEXT_USER_PROFILE_FORM_INFO_PART } from './DATA_CONTEXT_USER_PROFILE_FORM_INFO_PART';
+import { getUserProfileFormInfoPart } from './getUserProfileFormInfoPart';
 
 const UserProfileFormInfo = importLazyComponent(() => import('./UserProfileFormInfo').then(m => m.UserProfileFormInfo));
 
@@ -25,7 +25,7 @@ export class UserProfileFormInfoPartBootstrap extends Bootstrap {
       name: 'plugin_user_profile_info',
       order: 1,
       panel: () => UserProfileFormInfo,
-      stateGetter: props => () => props.formState.getPart(DATA_CONTEXT_USER_PROFILE_FORM_INFO_PART),
+      stateGetter: props => () => getUserProfileFormInfoPart(props.formState),
     });
   }
 }

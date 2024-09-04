@@ -18,6 +18,14 @@
     border-radius: var(--theme-group-element-radius);
   }
 }
+
+.captureView {
+  flex: 1;
+  display: flex;
+  overflow: auto;
+  position: relative;
+}
+
 .tableViewer {
   composes: theme-background-secondary theme-text-on-secondary from global;
   position: relative;

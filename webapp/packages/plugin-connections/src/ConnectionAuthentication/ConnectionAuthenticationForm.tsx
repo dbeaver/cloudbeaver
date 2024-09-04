@@ -18,6 +18,9 @@ import {
   useTranslate,
 } from '@cloudbeaver/core-blocks';
 import { DatabaseAuthModelsResource } from '@cloudbeaver/core-connections';
+import { useService } from '@cloudbeaver/core-di';
+import { ProjectInfoResource } from '@cloudbeaver/core-projects';
+import { ServerConfigResource } from '@cloudbeaver/core-root';
 import type { ObjectPropertyInfo } from '@cloudbeaver/core-sdk';
 
 import type { IConnectionAuthenticationConfig } from './IConnectionAuthenticationConfig';
@@ -33,6 +36,7 @@ export interface ConnectionAuthenticationFormProps {
   disabled?: boolean;
   className?: string;
   hideFeatures?: string[];
+  projectId: string | null;
 }
 
 export const ConnectionAuthenticationForm = observer<ConnectionAuthenticationFormProps>(function ConnectionAuthenticationForm({
@@ -41,6 +45,7 @@ export const ConnectionAuthenticationForm = observer<ConnectionAuthenticationFor
   authProperties,
   authModelId,
   formId,
+  projectId,
   allowSaveCredentials,
   disabled,
   className,
@@ -48,6 +53,10 @@ export const ConnectionAuthenticationForm = observer<ConnectionAuthenticationFor
 }) {
   const translate = useTranslate();
   const authModel = useResource(ConnectionAuthenticationForm, DatabaseAuthModelsResource, authModelId);
+  const serverConfigResource = useResource(ConnectionAuthenticationForm, ServerConfigResource, undefined);
+  const distributed = Boolean(serverConfigResource?.data?.distributed);
+  const projectInfoResource = useService(ProjectInfoResource);
+  const isSharedProject = projectInfoResource.isProjectShared(projectId);
 
   let properties = authModel.data?.properties;
 
@@ -77,7 +86,16 @@ export const ConnectionAuthenticationForm = observer<ConnectionAuthenticationFor
                 <FieldCheckbox
                   id={formId || 'DBAuthSaveCredentials'}
                   name="saveCredentials"
-                  label={translate('connections_connection_edit_save_credentials')}
+                  label={translate(
+                    !isSharedProject || distributed
+                      ? 'connections_connection_authentication_save_credentials_for_user'
+                      : 'connections_connection_authentication_save_credentials_for_session',
+                  )}
+                  title={translate(
+                    !isSharedProject || distributed
+                      ? 'connections_connection_authentication_save_credentials_for_user_tooltip'
+                      : 'connections_connection_authentication_save_credentials_for_session_tooltip',
+                  )}
                   disabled={disabled}
                   state={config}
                 />
@@ -90,6 +108,7 @@ export const ConnectionAuthenticationForm = observer<ConnectionAuthenticationFor
       )}
       {networkHandlers && config.networkHandlersConfig && (
         <NetworkHandlers
+          projectId={projectId}
           networkHandlers={networkHandlers}
           networkHandlersConfig={config.networkHandlersConfig}
           allowSaveCredentials={allowSaveCredentials}

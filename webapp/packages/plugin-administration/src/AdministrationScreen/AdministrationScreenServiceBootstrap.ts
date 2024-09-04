@@ -6,12 +6,15 @@
  * you may not use this file except in compliance with the License.
  */
 import { AdministrationScreenService } from '@cloudbeaver/core-administration';
+import { importLazyComponent } from '@cloudbeaver/core-blocks';
 import { Bootstrap, injectable } from '@cloudbeaver/core-di';
 import { ServerConfigResource } from '@cloudbeaver/core-root';
 import { ScreenService } from '@cloudbeaver/core-routing';
 
-import { AdministrationScreen } from './AdministrationScreen';
-import { ConfigurationWizardScreen } from './ConfigurationWizard/ConfigurationWizardScreen';
+const AdministrationScreen = importLazyComponent(() => import('./AdministrationScreen').then(m => m.AdministrationScreen));
+const ConfigurationWizardScreen = importLazyComponent(() =>
+  import('./ConfigurationWizard/ConfigurationWizardScreen').then(m => m.ConfigurationWizardScreen),
+);
 
 @injectable()
 export class AdministrationScreenServiceBootstrap extends Bootstrap {

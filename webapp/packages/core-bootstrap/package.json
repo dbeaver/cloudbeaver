@@ -13,7 +13,6 @@
     "build": "tsc -b",
     "clean": "rimraf --glob dist",
     "lint": "eslint ./src/ --ext .ts,.tsx",
-    "lint-fix": "eslint ./src/ --ext .ts,.tsx --fix",
     "validate-dependencies": "core-cli-validate-dependencies",
     "update-ts-references": "yarn run clean && typescript-resolve-references"
   },
@@ -46,11 +45,13 @@
     "@cloudbeaver/core-settings-localization": "^0",
     "@cloudbeaver/core-settings-user": "^0",
     "@cloudbeaver/core-storage": "^0",
+    "@cloudbeaver/core-task-manager": "^0",
     "@cloudbeaver/core-theming": "^0",
     "@cloudbeaver/core-ui": "^0",
     "@cloudbeaver/core-version": "^0",
     "@cloudbeaver/core-version-update": "^0",
     "@cloudbeaver/core-view": "^0",
+    "@cloudbeaver/core-website": "^0",
     "mobx": "^6",
     "react": "^18",
     "react-dom": "^18"

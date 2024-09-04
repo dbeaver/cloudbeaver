@@ -6,11 +6,12 @@
  * you may not use this file except in compliance with the License.
  */
 import { importLazyComponent } from '@cloudbeaver/core-blocks';
+import { createConnectionParam, IConnectionInfoParams } from '@cloudbeaver/core-connections';
 import { injectable } from '@cloudbeaver/core-di';
 import { CommonDialogService } from '@cloudbeaver/core-dialogs';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { GraphQLService, ResultDataFormat, UpdateResultsDataBatchScriptMutationVariables } from '@cloudbeaver/core-sdk';
-import { DocumentEditAction, type IDatabaseDataModel, ResultSetEditAction } from '@cloudbeaver/plugin-data-viewer';
+import { DocumentEditAction, type IDatabaseDataModel, ResultSetDataSource, ResultSetEditAction } from '@cloudbeaver/plugin-data-viewer';
 
 const ScriptPreviewDialog = importLazyComponent(() => import('./ScriptPreviewDialog').then(m => m.ScriptPreviewDialog));
 
@@ -22,20 +23,30 @@ export class ScriptPreviewService {
     private readonly notificationService: NotificationService,
   ) {}
 
-  async open(model: IDatabaseDataModel, resultIndex: number): Promise<void> {
+  async open(model: IDatabaseDataModel<ResultSetDataSource>, resultIndex: number): Promise<void> {
     try {
-      const script = await model.source.runTask(() => this.tryGetScript(model, resultIndex));
+      const script = await model.source.runOperation(() => this.tryGetScript(model, resultIndex));
 
-      this.commonDialogService.open(ScriptPreviewDialog, {
+      if (script === null) {
+        throw new Error('Script is not provided');
+      }
+      let connectionKey: IConnectionInfoParams | null = null;
+
+      if (model.source.executionContext?.context) {
+        connectionKey = createConnectionParam(model.source.executionContext.context.projectId, model.source.executionContext.context.connectionId);
+      }
+
+      await this.commonDialogService.open(ScriptPreviewDialog, {
         script,
-        model,
+        connectionKey,
+        onApply: () => model.save(),
       });
     } catch (exception: any) {
       this.notificationService.logException(exception, 'data_viewer_script_preview_error_title');
     }
   }
 
-  private async tryGetScript(model: IDatabaseDataModel, resultIndex: number): Promise<string> {
+  private async tryGetScript(model: IDatabaseDataModel<ResultSetDataSource>, resultIndex: number): Promise<string> {
     const executionContext = model.source.executionContext?.context;
 
     if (!executionContext) {

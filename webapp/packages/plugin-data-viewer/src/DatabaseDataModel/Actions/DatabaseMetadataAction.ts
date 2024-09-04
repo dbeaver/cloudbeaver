@@ -9,20 +9,16 @@ import type { ResultDataFormat } from '@cloudbeaver/core-sdk';
 import { MetadataMap } from '@cloudbeaver/core-utils';
 
 import { DatabaseDataAction } from '../DatabaseDataAction';
-import type { IDatabaseDataResult } from '../IDatabaseDataResult';
 import type { IDatabaseDataSource } from '../IDatabaseDataSource';
 import { databaseDataAction } from './DatabaseDataActionDecorator';
 import type { IDatabaseDataMetadataAction } from './IDatabaseDataMetadataAction';
 
 @databaseDataAction()
-export class DatabaseMetadataAction<TKey, TResult extends IDatabaseDataResult>
-  extends DatabaseDataAction<any, TResult>
-  implements IDatabaseDataMetadataAction<TKey, TResult>
-{
+export class DatabaseMetadataAction<TKey> extends DatabaseDataAction<any, any> implements IDatabaseDataMetadataAction<TKey, any> {
   static dataFormat: ResultDataFormat[] | null = null;
   readonly metadata: MetadataMap<string, any>;
 
-  constructor(source: IDatabaseDataSource<any, TResult>) {
+  constructor(source: IDatabaseDataSource<any, any>) {
     super(source);
     this.metadata = new MetadataMap();
   }

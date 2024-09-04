@@ -23,7 +23,7 @@ interface BaseProps extends Omit<HTMLAttributes<HTMLDivElement>, 'onChange'>, IC
   placeholder?: string;
   disabled?: boolean;
   disabledActions?: boolean;
-  manualApply?: boolean;
+  permanentSearchIcon?: boolean;
   smallSize?: boolean;
   onChange?: (value: string) => void;
   onSearch?: (value: string) => void;
@@ -52,7 +52,7 @@ export const Filter = observer<ControlledProps | ObjectsProps<any, any>>(functio
   disabled,
   disabledActions,
   className,
-  manualApply,
+  permanentSearchIcon,
   smallSize,
   onSearch,
   onChange,
@@ -124,7 +124,7 @@ export const Filter = observer<ControlledProps | ObjectsProps<any, any>>(functio
       />
 
       <div className={s(styles, { actionButtons: true })}>
-        {edited && !manualApply ? (
+        {edited && !permanentSearchIcon ? (
           <ActionIconButton name="cross" disabled={disabled || disabledActions} className={s(styles, { actionButton: true })} onClick={handleClear} />
         ) : (
           <ActionIconButton

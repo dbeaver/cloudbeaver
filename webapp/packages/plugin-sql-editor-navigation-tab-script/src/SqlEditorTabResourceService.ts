@@ -13,7 +13,10 @@ import { ResourceSqlDataSource } from './ResourceSqlDataSource';
 
 @injectable()
 export class SqlEditorTabResourceService {
-  constructor(private readonly sqlEditorTabService: SqlEditorTabService, private readonly sqlDataSourceService: SqlDataSourceService) {}
+  constructor(
+    private readonly sqlEditorTabService: SqlEditorTabService,
+    private readonly sqlDataSourceService: SqlDataSourceService,
+  ) {}
 
   getResourceTab(key: string) {
     const dataSource = this.sqlDataSourceService.dataSources.find(

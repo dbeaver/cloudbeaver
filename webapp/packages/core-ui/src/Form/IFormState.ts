@@ -42,7 +42,7 @@ export interface IFormState<TState> extends ILoadableState {
   setException(exception: Error | (Error | null)[] | null): this;
   setState(state: TState): this;
 
-  getPart<T extends IFormPart<any>>(getter: DataContextGetter<T>): T;
+  getPart<T extends IFormPart<any>>(getter: DataContextGetter<T>, init: (context: IDataContext, id: string) => T): T;
 
   isLoading(): boolean;
   isLoaded(): boolean;

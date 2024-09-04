@@ -1,0 +1,5 @@
+query getProductInfo {
+  productInfo: serverConfig {
+    ...ProductInfo
+  }
+}

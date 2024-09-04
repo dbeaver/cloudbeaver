@@ -6,8 +6,10 @@
  * you may not use this file except in compliance with the License.
  */
 import { observer } from 'mobx-react-lite';
+import { useRef } from 'react';
 
 import { s, useS } from '@cloudbeaver/core-blocks';
+import { useDataContextLink } from '@cloudbeaver/core-data-context';
 import type { IContextMenuItemProps } from '@cloudbeaver/core-ui';
 import type { ICustomMenuItemComponent } from '@cloudbeaver/core-view';
 
@@ -15,15 +17,21 @@ import { DATA_CONTEXT_MENU_SEARCH } from './DATA_CONTEXT_MENU_SEARCH';
 import styles from './SearchResourceMenuItemComponent.module.css';
 
 export const SearchResourceMenuItemComponent: ICustomMenuItemComponent<IContextMenuItemProps> = observer(function SearchResourceMenuItemComponent({
-  item,
-  onClick,
-  menuData,
+  context,
   className,
 }) {
   const style = useS(styles);
-  const value = menuData.context.tryGet(DATA_CONTEXT_MENU_SEARCH) ?? '';
+  const value = context.get(DATA_CONTEXT_MENU_SEARCH) ?? '';
+  const contextRefId = useRef<string | null>(null);
+
+  useDataContextLink(context, (context, id) => {
+    contextRefId.current = id;
+  });
+
   function handleChange(value: string) {
-    menuData.context.set(DATA_CONTEXT_MENU_SEARCH, value);
+    if (contextRefId.current) {
+      context.set(DATA_CONTEXT_MENU_SEARCH, value, contextRefId.current);
+    }
   }
 
   return (

@@ -8,14 +8,12 @@
 const { resolve } = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
-const TerserPlugin = require('terser-webpack-plugin');
-const webpack = require('webpack');
+const { EsbuildPlugin } = require('esbuild-loader');
 const { merge } = require('webpack-merge');
 
 const commonConfig = require('./webpack.config.js');
 const { getAssets, withTimestamp } = require('./webpack.product.utils');
 const HtmlInjectWebpackPlugin = require('../utils/HtmlInjectWebpackPlugin.js');
-const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
 
 const ssoHtmlTemplate = require.resolve('@cloudbeaver/plugin-sso/src/index.html.ejs');
 const ssoErrorHtmlTemplate = require.resolve('@cloudbeaver/plugin-sso/src/ssoError.html.ejs');
@@ -39,26 +37,22 @@ module.exports = (env, argv) => {
       minimize: true,
 
       minimizer: [
-        new TerserPlugin({
-        extractComments: {
-          condition: /Copyright \(C\)/i,
-          filename: 'license.txt',
-        },
-        terserOptions: {
-          keep_classnames: true,
-          keep_fnames: true,
-        },
-      }),
-      new CssMinimizerPlugin(),
+        new EsbuildPlugin({
+            target: 'es2022',
+            keepNames: true,
+            css: true,
+        }),
     ],
     },
     plugins: [
       new CopyWebpackPlugin({
         patterns: getAssets(package, ''),
       }),
-      new webpack.DefinePlugin({
-        _VERSION_: JSON.stringify(timestampVersion),
-        _DEV_: false,
+      new EsbuildPlugin({
+          define: {
+            _VERSION_: JSON.stringify(timestampVersion),
+            _DEV_: JSON.stringify(false),
+          },
       }),
       new HtmlWebpackPlugin({
         template: resolve('src/index.html.ejs'),

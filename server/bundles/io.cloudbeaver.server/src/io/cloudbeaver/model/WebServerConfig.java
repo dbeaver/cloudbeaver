@@ -122,6 +122,11 @@ public class WebServerConfig {
     }
 
     @Property
+    public String getLicenseStatus() {
+        return application.getLicenseStatus();
+    }
+
+    @Property
     public boolean isConfigurationMode() {
         return application.isConfigurationMode();
     }

@@ -10,7 +10,6 @@ query getUserConnections(
   $includeAuthNeeded: Boolean!
   $includeProperties: Boolean!
   $includeProviderProperties: Boolean!
-  $includeSharedSecrets: Boolean!
   $customIncludeOptions: Boolean!
 ) {
   connections: userConnections(projectId: $projectId, id: $connectionId, projectIds: $projectIds) {

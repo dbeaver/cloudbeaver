@@ -9,7 +9,7 @@ import { observer } from 'mobx-react-lite';
 import { useState } from 'react';
 
 import { Container, Loader, s, TableItemExpandProps, useS } from '@cloudbeaver/core-blocks';
-import { App, useService } from '@cloudbeaver/core-di';
+import { IServiceProvider, useService } from '@cloudbeaver/core-di';
 import { FormMode } from '@cloudbeaver/core-ui';
 
 import { AdministrationUserForm } from '../UserForm/AdministrationUserForm';
@@ -20,9 +20,9 @@ import style from './UserEdit.module.css';
 export const UserEdit = observer<TableItemExpandProps<string>>(function UserEdit({ item, onClose }) {
   const styles = useS(style);
   const administrationUserFormService = useService(AdministrationUserFormService);
-  const app = useService(App);
+  const serviceProvider = useService(IServiceProvider);
   const [state] = useState(() => {
-    const state = new AdministrationUserFormState(app, administrationUserFormService, {
+    const state = new AdministrationUserFormState(serviceProvider, administrationUserFormService, {
       userId: item,
     });
     state.setMode(FormMode.Edit);

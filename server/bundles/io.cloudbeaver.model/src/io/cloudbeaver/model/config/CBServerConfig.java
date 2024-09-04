@@ -22,10 +22,7 @@ import io.cloudbeaver.model.app.WebServerConfiguration;
 import io.cloudbeaver.server.CBConstants;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.Log;
-import org.jkiss.utils.CommonUtils;
 
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -57,18 +54,6 @@ public class CBServerConfig implements WebServerConfiguration {
     private String staticContent = "";
 
     public String getServerURL() {
-        if (serverURL == null) {
-            String hostName = serverHost;
-            if (CommonUtils.isEmpty(hostName)) {
-                try {
-                    hostName = InetAddress.getLocalHost().getHostName();
-                } catch (UnknownHostException e) {
-                    log.debug("Error resolving localhost address: " + e.getMessage());
-                    hostName = CBConstants.HOST_LOCALHOST;
-                }
-            }
-            serverURL = "http://" + hostName + ":" + serverPort;
-        }
         return serverURL;
     }
 

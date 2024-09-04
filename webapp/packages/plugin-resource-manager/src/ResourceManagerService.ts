@@ -18,7 +18,10 @@ export class ResourceManagerService {
     return !!this.serverConfigResource.data?.resourceManagerEnabled && !!this.authInfoService.userInfo;
   }
 
-  constructor(private readonly authInfoService: AuthInfoService, private readonly serverConfigResource: ServerConfigResource) {
+  constructor(
+    private readonly authInfoService: AuthInfoService,
+    private readonly serverConfigResource: ServerConfigResource,
+  ) {
     makeObservable(this, {
       enabled: computed,
     });

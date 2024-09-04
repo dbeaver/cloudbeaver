@@ -66,7 +66,8 @@ export class UsersResource extends CachedMapResource<string, AdminUser, UserReso
   ) {
     super();
 
-    sessionPermissionsResource.require(this, EAdminPermission.admin).outdateResource(this);
+    sessionPermissionsResource.require(this, EAdminPermission.admin);
+    sessionPermissionsResource.onDataOutdated.addHandler(() => this.markOutdated());
     this.aliases.add(UsersResourceFilterKey, key =>
       resourceKeyList(
         this.entries
@@ -217,13 +218,13 @@ export class UsersResource extends CachedMapResource<string, AdminUser, UserReso
     await this.refresh(userId);
   }
 
-  async delete(key: ResourceKeySimple<string>): Promise<void> {
+  async deleteUsers(key: ResourceKeySimple<string>): Promise<void> {
     await ResourceKeyUtils.forEachAsync(key, async key => {
       if (this.isActiveUser(key)) {
         throw new Error("You can't delete current logged user");
       }
       await this.graphQLService.sdk.deleteUser({ userId: key });
-      super.delete(key);
+      this.delete(key);
     });
   }
 

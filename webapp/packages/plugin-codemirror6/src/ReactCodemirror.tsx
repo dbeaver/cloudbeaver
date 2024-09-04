@@ -31,7 +31,7 @@ export const ReactCodemirror = observer<IReactCodeMirrorProps, IEditorRef>(
       incomingValue,
       extensions = new Map<Compartment, Extension>(),
       readonly,
-      disableCopy,
+      copyEventHandler,
       autoFocus,
       onChange,
       onCursorChange,
@@ -45,11 +45,9 @@ export const ReactCodemirror = observer<IReactCodeMirrorProps, IEditorRef>(
     const eventHandlers = useMemo(
       () =>
         EditorView.domEventHandlers({
-          copy() {
-            return disableCopy;
-          },
+          copy: copyEventHandler,
         }),
-      [disableCopy],
+      [copyEventHandler],
     );
     extensions = useCodemirrorExtensions(extensions, [readOnlyFacet, eventHandlers]);
     const [container, setContainer] = useState<HTMLDivElement | null>(null);
@@ -128,6 +126,12 @@ export const ReactCodemirror = observer<IReactCodeMirrorProps, IEditorRef>(
 
         editorView.dom.addEventListener('keydown', event => {
           const newEvent = new KeyboardEvent('keydown', event);
+
+          // we handle undo/redo on the CaptureView level
+          if ((newEvent.metaKey || newEvent.ctrlKey) && ['z', 'y'].includes(newEvent.key.toLowerCase())) {
+            return;
+          }
+
           document.dispatchEvent(newEvent);
         });
 

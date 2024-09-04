@@ -1,5 +1,0 @@
-{"query": "query userConnections($id: ID) {userConnections(id: $id) { id}}", 
-"variables": {
-	"id" : null
-}, 
-"operationName":"userConnections"}

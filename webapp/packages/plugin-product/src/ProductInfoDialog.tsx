@@ -25,20 +25,21 @@ import {
 } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import type { DialogComponentProps } from '@cloudbeaver/core-dialogs';
-import { ServerConfigResource } from '@cloudbeaver/core-root';
+import { ProductInfoResource } from '@cloudbeaver/core-root';
 import { ThemeService } from '@cloudbeaver/core-theming';
 import { useAppVersion } from '@cloudbeaver/core-version';
+import { WebsiteLinks } from '@cloudbeaver/core-website';
 
 import ProductInfoDialogStyles from './ProductInfoDialog.module.css';
 
 export const ProductInfoDialog = observer<DialogComponentProps<null>>(function ProductInfoDialog(props) {
   const translate = useTranslate();
-  const serverConfigResource = useService(ServerConfigResource);
+  const serverConfigResource = useService(ProductInfoResource);
   const themeService = useService(ThemeService);
 
   const version = useAppVersion();
 
-  const productInfo = serverConfigResource.data?.productInfo;
+  const productInfo = serverConfigResource.data;
   const logoIcon = themeService.themeId === 'light' ? '/icons/product-logo_light.svg' : '/icons/product-logo_dark.svg';
 
   const styles = useS(ProductInfoDialogStyles);
@@ -60,14 +61,6 @@ export const ProductInfoDialog = observer<DialogComponentProps<null>>(function P
                 <FormFieldDescription className={s(styles, { formFieldDescription: true })} label={translate('app_product_info_description')}>
                   {productInfo.description}
                 </FormFieldDescription>
-                {productInfo.licenseInfo && (
-                  <FormFieldDescription className={s(styles, { formFieldDescription: true })} label={translate('app_product_info_license_info')}>
-                    {productInfo.licenseInfo}
-                  </FormFieldDescription>
-                )}
-                <FormFieldDescription className={s(styles, { formFieldDescription: true })} label={translate('app_product_info_build_time')}>
-                  {productInfo.buildTime}
-                </FormFieldDescription>
                 <FormFieldDescription className={s(styles, { formFieldDescription: true })} label="Backend version">
                   {productInfo.version}
                 </FormFieldDescription>
@@ -77,12 +70,12 @@ export const ProductInfoDialog = observer<DialogComponentProps<null>>(function P
                 <FormFieldDescription className={s(styles, { formFieldDescription: true })} label={translate('app_product_info_contacts')}>
                   <div className={s(styles, { contactsInfo: true })}>
                     You can contact us via our
-                    <Link href="https://dbeaver.com/company/contact/" target="_blank" rel="noopener noreferrer">
+                    <Link href={WebsiteLinks.CONTACT_PAGE} target="_blank" rel="noopener noreferrer">
                       {' '}
                       Site{' '}
                     </Link>
                     or
-                    <Link href="https://github.com/dbeaver/cloudbeaver" target="_blank" rel="noopener noreferrer">
+                    <Link href={WebsiteLinks.GITHUB_REPOSITORY_PAGE} target="_blank" rel="noopener noreferrer">
                       {' '}
                       Github
                     </Link>
