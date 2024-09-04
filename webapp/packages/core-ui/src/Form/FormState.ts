@@ -126,7 +126,13 @@ export class FormState<TState> implements IFormState<TState> {
   }
 
   get isChanged(): boolean {
-    return Array.from(this.parts.values()).some(part => part.isChanged);
+    for (const part of this.parts.values()) {
+      if (part.isChanged) {
+        return true;
+      }
+    }
+
+    return false;
   }
 
   getPart<T extends IFormPart<any>>(getter: DataContextGetter<T>, init: (context: IDataContext, id: string) => T): T {

@@ -59,7 +59,7 @@ export const AdministrationUserForm = observer<Props>(function AdministrationUse
     },
   });
 
-  useAutoLoad(AdministrationUserForm, state);
+  useAutoLoad(AdministrationUserForm, userFormInfoPart);
 
   return (
     <Form context={form} disabled={state.isDisabled} contents focusFirstChild>
