@@ -26,7 +26,7 @@ export function useAutoLoad(
   for (const loader of state as ReadonlyArray<ILoadableState>) {
     getComputed(
       // activate mobx subscriptions
-      () => (!loader.isLoaded() || loader.isOutdated?.() === true) && !loader.isError(),
+      () => (!loader.isChanged || !loader.isLoaded() || loader.isOutdated?.() === true) && !loader.isError(),
     );
   }
 

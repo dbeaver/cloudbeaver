@@ -10,6 +10,7 @@ export interface ILoadableState {
   readonly promise?: Promise<any> | null;
   readonly exception?: (Error | null)[] | Error | null;
   lazy?: boolean;
+  isChanged?: boolean;
   isLoading: () => boolean;
   isLoaded: () => boolean;
   isError: () => boolean;
