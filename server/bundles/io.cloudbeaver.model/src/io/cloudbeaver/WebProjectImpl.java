@@ -30,7 +30,7 @@ import org.jkiss.dbeaver.model.task.DBTTaskManager;
 import org.jkiss.dbeaver.registry.rm.DataSourceRegistryRM;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
 
-public class WebProjectImpl extends BaseWebProjectImpl {
+public abstract class WebProjectImpl extends BaseWebProjectImpl {
     private static final Log log = Log.getLog(WebProjectImpl.class);
     @NotNull
     private final DBPPreferenceStore preferenceStore;

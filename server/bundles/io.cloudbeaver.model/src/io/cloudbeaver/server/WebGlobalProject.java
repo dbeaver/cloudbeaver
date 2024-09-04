@@ -23,7 +23,6 @@ import org.jkiss.dbeaver.model.app.DBPDataSourceRegistry;
 import org.jkiss.dbeaver.model.app.DBPWorkspace;
 import org.jkiss.dbeaver.model.auth.SMSessionContext;
 import org.jkiss.dbeaver.model.impl.app.BaseProjectImpl;
-import org.jkiss.dbeaver.model.task.DBTTaskManager;
 import org.jkiss.dbeaver.registry.DataSourceRegistry;
 
 import java.nio.file.Path;
@@ -76,15 +75,6 @@ public class WebGlobalProject extends BaseProjectImpl {
     @Override
     public boolean isUseSecretStorage() {
         return false;
-    }
-
-    @NotNull
-    @Override
-    public DBTTaskManager getTaskManager() {
-        throw new IllegalStateException("Task manager is not supported in global web project");
-//        return new TaskManagerImpl(
-//            this,
-//            getWorkspace().getAbsolutePath().resolve(DBWConstants.WORK_DATA_FOLDER_NAME));
     }
 
     @NotNull
