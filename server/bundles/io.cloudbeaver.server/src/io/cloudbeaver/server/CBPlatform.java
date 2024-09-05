@@ -19,7 +19,7 @@ package io.cloudbeaver.server;
 
 import io.cloudbeaver.auth.NoAuthCredentialsProvider;
 import io.cloudbeaver.model.app.AppWebSessionManager;
-import io.cloudbeaver.model.app.CBApplicationAdapter;
+import io.cloudbeaver.model.app.GQLApplicationAdapter;
 import io.cloudbeaver.server.jobs.SessionStateJob;
 import io.cloudbeaver.server.jobs.WebDataSourceMonitorJob;
 import io.cloudbeaver.server.jobs.WebSessionMonitorJob;
@@ -60,7 +60,7 @@ public class CBPlatform extends BaseWebPlatform {
 
 
     @Nullable
-    private static CBApplicationAdapter application = null;
+    private static GQLApplicationAdapter application = null;
 
     private CBPreferenceStore preferenceStore;
     protected final List<DBPDriver> applicableDrivers = new ArrayList<>();
@@ -72,7 +72,7 @@ public class CBPlatform extends BaseWebPlatform {
     protected CBPlatform() {
     }
 
-    public static void setApplication(@NotNull CBApplicationAdapter application) {
+    public static void setApplication(@NotNull GQLApplicationAdapter application) {
         CBPlatform.application = application;
     }
 
@@ -128,7 +128,7 @@ public class CBPlatform extends BaseWebPlatform {
 
     @NotNull
     @Override
-    public CBApplicationAdapter getApplication() {
+    public GQLApplicationAdapter getApplication() {
         return application;
     }
 

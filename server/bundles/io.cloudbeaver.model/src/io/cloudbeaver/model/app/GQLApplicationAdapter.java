@@ -25,7 +25,7 @@ import java.util.Map;
 
 //FIXME: this interface should not exist,
 // the logic of platforms and applications should be separated from each other
-public interface CBApplicationAdapter extends WebApplication {
+public interface GQLApplicationAdapter extends WebApplication {
     AppWebSessionManager getSessionManager();
 
     WebDriverRegistry getDriverRegistry();
@@ -34,4 +34,10 @@ public interface CBApplicationAdapter extends WebApplication {
     Map<String, Object> getProductConfiguration();
 
     List<InetAddress> getLocalInetAddresses();
+
+    Map<String, String> getInitActions();
+
+    boolean isLicenseValid();
+
+    String getLicenseStatus();
 }
