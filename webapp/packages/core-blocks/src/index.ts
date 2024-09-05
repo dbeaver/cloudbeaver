@@ -10,6 +10,7 @@ export * from './CommonDialog/CommonDialog/CommonDialogFooter';
 export * from './CommonDialog/CommonDialog/CommonDialogHeader';
 export * from './CommonDialog/CommonDialog/CommonDialogWrapper';
 export * from './CommonDialog/ConfirmationDialog';
+export { default as ConfirmationDialogStyles } from './CommonDialog/ConfirmationDialog.module.css';
 export * from './CommonDialog/ConfirmationDialogDelete';
 export * from './CommonDialog/RenameDialog';
 export * from './CommonDialog/DialogsPortal';
