@@ -44,7 +44,6 @@ import org.jkiss.dbeaver.model.runtime.VoidProgressMonitor;
 import org.jkiss.dbeaver.model.security.SMController;
 import org.jkiss.dbeaver.model.security.SMObjectType;
 import org.jkiss.dbeaver.model.sql.DBQuotaException;
-import org.jkiss.dbeaver.model.task.DBTTaskManager;
 import org.jkiss.dbeaver.model.websocket.event.MessageType;
 import org.jkiss.dbeaver.model.websocket.event.WSEventType;
 import org.jkiss.dbeaver.model.websocket.event.WSSessionLogUpdatedEvent;
@@ -1294,12 +1293,6 @@ public class LocalResourceController implements RMController {
                 sessionContext,
                 rmProject,
                 (container) -> true);
-        }
-
-        @NotNull
-        @Override
-        public DBTTaskManager getTaskManager() {
-            throw new IllegalStateException("Task manager is not supported in global web project");
         }
 
         @NotNull
