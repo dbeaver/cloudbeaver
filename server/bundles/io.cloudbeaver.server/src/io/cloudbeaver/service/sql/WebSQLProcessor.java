@@ -795,6 +795,10 @@ public class WebSQLProcessor implements WebSessionProvider {
                     cellRawValue,
                     false,
                     true);
+                //FIXME: fix array editing for nosql databases
+                if (realCellValue == null && cellRawValue != null && updateAttribute.getDataKind() == DBPDataKind.ARRAY) {
+                    throw new DBCException("Array update is not supported");
+                }
             } catch (DBCException e) {
                 //checks if this function is used only for script generation
                 if (justGenerateScript) {
@@ -1140,7 +1144,8 @@ public class WebSQLProcessor implements WebSessionProvider {
         return filter.hasFilters() ? DBCExecutionPurpose.USER_FILTERED : DBCExecutionPurpose.USER;
     }
 
-    private Object setCellRowValue(Object cellRow, WebSession webSession, DBCSession dbcSession, DBDAttributeBinding allAttributes, boolean withoutExecution) throws DBCException {
+    private Object setCellRowValue(Object cellRow, WebSession webSession, DBCSession dbcSession, DBDAttributeBinding allAttributes, boolean withoutExecution)
+        throws DBException {
         if (cellRow instanceof Map<?, ?>) {
             Map<String, Object> variables = (Map<String, Object>) cellRow;
             if (variables.get(FILE_ID) != null) {
@@ -1153,7 +1158,7 @@ public class WebSQLProcessor implements WebSessionProvider {
                     var file = Files.newInputStream(path);
                     return convertInputCellValue(dbcSession, allAttributes, file, withoutExecution);
                 } catch (IOException | DBCException e) {
-                    return new DBException(e.getMessage());
+                    throw new DBException(e.getMessage());
                 }
             }
         }
