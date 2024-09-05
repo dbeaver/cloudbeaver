@@ -52,7 +52,9 @@ public class WebSQLContextInfo implements WebSessionProvider {
 
     private static final Log log = Log.getLog(WebSQLContextInfo.class);
 
+    @NotNull
     private final transient WebSQLProcessor processor;
+    @NotNull
     private final String id;
     private final String projectId;
     private final Map<String, WebSQLResultsInfo> resultInfoMap = new HashMap<>();
@@ -60,7 +62,11 @@ public class WebSQLContextInfo implements WebSessionProvider {
     private final AtomicInteger resultId = new AtomicInteger();
 
     public WebSQLContextInfo(
-        WebSQLProcessor processor, String id, String catalogName, String schemaName, String projectId
+        @NotNull WebSQLProcessor processor,
+        @NotNull String id,
+        String catalogName,
+        String schemaName,
+        String projectId
     ) throws DBCException {
         this.processor = processor;
         this.id = id;

@@ -8,7 +8,8 @@ Bundle-Release-Date: 20241021
 Bundle-RequiredExecutionEnvironment: JavaSE-17
 Bundle-ActivationPolicy: lazy
 Bundle-ClassPath: .
+Export-Package: io.cloudbeaver.service.data.transfer.impl
 Require-Bundle: io.cloudbeaver.server,
- org.jkiss.dbeaver.data.transfer,
+ org.jkiss.dbeaver.data.transfer;visibility:=reexport,
  org.jkiss.dbeaver.registry
 Automatic-Module-Name: io.cloudbeaver.service.data.transfer

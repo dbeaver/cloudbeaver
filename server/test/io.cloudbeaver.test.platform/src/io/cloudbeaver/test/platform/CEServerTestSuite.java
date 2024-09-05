@@ -43,7 +43,8 @@ import java.util.Map;
         AuthenticationTest.class,
         ResourceManagerTest.class,
         RMLockTest.class,
-        RMNIOTest.class
+        RMNIOTest.class,
+        DataTransferTest.class
     }
 )
 public class CEServerTestSuite {

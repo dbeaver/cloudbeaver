@@ -240,7 +240,7 @@ public class WebServiceBindingSQL extends WebServiceBindingBase<DBWServiceSQL> i
     }
 
     @NotNull
-    public static WebSQLConfiguration getSQLConfiguration(WebSession webSession) {
+    private static WebSQLConfiguration getSQLConfiguration(WebSession webSession) {
         return webSession.getAttribute("sqlConfiguration", cfg -> new WebSQLConfiguration(), WebSQLConfiguration::dispose);
     }
 
