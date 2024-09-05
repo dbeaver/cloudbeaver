@@ -89,6 +89,7 @@ type AdminAuthProviderConfiguration {
     redirectLink: String
     metadataLink: String
     acsLink: String
+    downloadMetadataFileLink: String @since(version: "24.2.1")
 }
 
 type WebFeatureSet {
