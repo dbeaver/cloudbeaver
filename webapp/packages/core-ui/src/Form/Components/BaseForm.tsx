@@ -22,7 +22,6 @@ export const BaseForm = observer<IBaseFormProps<any>>(function BaseForm({ servic
   const translate = useTranslate();
 
   const editing = state.mode === FormMode.Edit;
-  const changed = state.isChanged;
   const exceptions = getComputed(() => Array.from(state.parts.values()).map(part => part.exception));
 
   const form = useForm({
@@ -52,7 +51,7 @@ export const BaseForm = observer<IBaseFormProps<any>>(function BaseForm({ servic
                   {translate('ui_processing_cancel')}
                 </Button>
               )}
-              <Button type="button" disabled={state.isDisabled || !changed} mod={['unelevated']} onClick={() => form.submit()}>
+              <Button type="button" disabled={!state.isChanged || state.isDisabled} mod={['unelevated']} onClick={() => form.submit()}>
                 {translate(!editing ? 'ui_processing_create' : 'ui_processing_save')}
               </Button>
             </Container>
