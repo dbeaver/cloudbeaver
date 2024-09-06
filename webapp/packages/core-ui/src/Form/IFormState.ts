@@ -42,9 +42,9 @@ export interface IFormState<TState> {
 
   getPart<T extends IFormPart<any>>(getter: DataContextGetter<T>, init: (context: IDataContext, id: string) => T): T;
 
-  isError: boolean; // dont touch it
-  isCancelled: boolean; // dont touch it???
-  isChanged: boolean; // dont touch it
+  isError: boolean;
+  isCancelled: boolean;
+  isChanged: boolean;
 
   load(): Promise<void>;
   reload(): Promise<void>;
