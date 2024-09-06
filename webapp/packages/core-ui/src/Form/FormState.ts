@@ -32,7 +32,7 @@ export class FormState<TState> implements IFormState<TState> {
   promise: Promise<any> | null;
 
   get isDisabled(): boolean {
-    return Array.from(this.parts.values()).some(part => part.isDisabled);
+    return Array.from(this.parts.values()).some(part => part.isSaving || part?.isLoading?.());
   }
 
   readonly id: string;
