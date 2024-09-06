@@ -77,7 +77,7 @@ export class UserFormInfoPart extends FormPart<IUserFormInfoState, IUserFormStat
     return this.loaded;
   }
 
-  isChanged(): boolean {
+  get isChanged(): boolean {
     if (!this.loaded) {
       return false;
     }

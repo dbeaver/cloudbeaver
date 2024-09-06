@@ -25,16 +25,14 @@ export class FormState<TState> implements IFormState<TState> {
   mode: FormMode;
   parts: MetadataMap<string, IFormPart<any>>;
   state: TState;
-  isSaving: boolean;
 
   statusMessage: string | string[] | null;
   statusType: ENotificationType | null;
-  exception: Error | (Error | null)[] | null;
 
   promise: Promise<any> | null;
 
   get isDisabled(): boolean {
-    return this.isSaving || this.isLoading();
+    return Array.from(this.parts.values()).some(part => part.isDisabled);
   }
 
   readonly id: string;
@@ -56,11 +54,9 @@ export class FormState<TState> implements IFormState<TState> {
     this.mode = FormMode.Create;
     this.parts = new MetadataMap<string, any>();
     this.state = state;
-    this.isSaving = false;
 
     this.statusMessage = null;
     this.statusType = null;
-    this.exception = null;
 
     this.promise = null;
 
@@ -90,42 +86,27 @@ export class FormState<TState> implements IFormState<TState> {
       mode: observable,
       parts: observable.ref,
       promise: observable.ref,
-      exception: observable.ref,
-      isSaving: observable.ref,
       state: observable,
       isDisabled: computed,
       setMode: action,
       setPartsState: action,
-      setException: action,
       setState: action,
+      isChanged: computed,
+      isError: computed,
+      isCancelled: computed,
     });
   }
 
-  isLoading(): boolean {
-    return this.promise !== null || this.dataContext.get(DATA_CONTEXT_LOADABLE_STATE)!.loaders.some(loader => loader.isLoading());
+  get isError(): boolean {
+    return Array.from(this.parts.values()).some(part => part.isError());
   }
 
-  isLoaded(): boolean {
-    if (this.promise) {
-      return false;
-    }
-    return this.dataContext.get(DATA_CONTEXT_LOADABLE_STATE)!.loaders.every(loader => loader.isLoaded());
+  get isCancelled(): boolean {
+    return Array.from(this.parts.values()).some(part => part?.isCancelled?.());
   }
 
-  isError(): boolean {
-    return this.dataContext.get(DATA_CONTEXT_LOADABLE_STATE)!.loaders.some(loader => loader.isError());
-  }
-
-  isOutdated(): boolean {
-    return this.dataContext.get(DATA_CONTEXT_LOADABLE_STATE)!.loaders.some(loader => loader.isOutdated?.() === true);
-  }
-
-  isCancelled(): boolean {
-    return this.dataContext.get(DATA_CONTEXT_LOADABLE_STATE)!.loaders.some(loader => loader.isCancelled?.() === true);
-  }
-
-  isChanged(): boolean {
-    return Array.from(this.parts.values()).some(part => part.isChanged());
+  get isChanged(): boolean {
+    return Array.from(this.parts.values()).some(part => part.isChanged);
   }
 
   getPart<T extends IFormPart<any>>(getter: DataContextGetter<T>, init: (context: IDataContext, id: string) => T): T {
@@ -145,7 +126,7 @@ export class FormState<TState> implements IFormState<TState> {
       return this.promise;
     }
 
-    if (this.isLoaded() && !this.isOutdated() && !refresh) {
+    if (!refresh) {
       return;
     }
 
@@ -170,10 +151,6 @@ export class FormState<TState> implements IFormState<TState> {
         }
 
         await this.fillDefaultConfigTask.execute(this);
-        this.exception = null;
-      } catch (exception: any) {
-        this.exception = exception;
-        throw exception;
       } finally {
         this.promise = null;
       }
@@ -210,11 +187,6 @@ export class FormState<TState> implements IFormState<TState> {
     return this;
   }
 
-  setException(exception: Error | (Error | null)[] | null): this {
-    this.exception = exception;
-    return this;
-  }
-
   setState(state: TState): this {
     this.state = state;
     return this;
@@ -222,20 +194,15 @@ export class FormState<TState> implements IFormState<TState> {
 
   async save(): Promise<boolean> {
     try {
-      this.isSaving = true;
       const context = await this.submitTask.execute(this);
 
       if (ExecutorInterrupter.isInterrupted(context)) {
         return false;
       }
 
-      this.exception = null;
       return true;
-    } catch (exception: any) {
-      this.exception = exception;
-    } finally {
-      this.isSaving = false;
-    }
+    } catch (exception: any) {}
+
     return false;
   }
 
