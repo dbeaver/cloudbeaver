@@ -29,7 +29,7 @@ export const AdministrationUserForm = observer<Props>(function AdministrationUse
   const translate = useTranslate();
   const notificationService = useService(NotificationService);
   const administrationUserFormService = useService(AdministrationUserFormService);
-  const exception = getComputed(() => Array.from(state.parts.values()).find(part => part.exception));
+  const exceptions = getComputed(() => Array.from(state.parts.values()).map(part => part.exception));
 
   const editing = state.mode === FormMode.Edit;
 
@@ -68,7 +68,7 @@ export const AdministrationUserForm = observer<Props>(function AdministrationUse
             <Container fill>
               <StatusMessage
                 className={s(styles, { statusMessage: true })}
-                exception={getFirstException(exception)}
+                exception={getFirstException(exceptions)}
                 type={state.statusType}
                 message={state.statusMessage}
               />

@@ -7,7 +7,7 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import { Button, Container, Form, s, StatusMessage, useAutoLoad, useForm, useS, useTranslate } from '@cloudbeaver/core-blocks';
+import { Button, Container, Form, getComputed, s, StatusMessage, useForm, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import { getFirstException } from '@cloudbeaver/core-utils';
 
 import { TabList } from '../../Tabs/TabList';
@@ -23,7 +23,7 @@ export const BaseForm = observer<IBaseFormProps<any>>(function BaseForm({ servic
 
   const editing = state.mode === FormMode.Edit;
   const changed = state.isChanged;
-  const exception = Array.from(state.parts.values()).find(part => part.exception);
+  const exceptions = getComputed(() => Array.from(state.parts.values()).map(part => part.exception));
 
   const form = useForm({
     async onSubmit() {
@@ -43,7 +43,7 @@ export const BaseForm = observer<IBaseFormProps<any>>(function BaseForm({ servic
         <Container compact parent noWrap vertical>
           <Container className={s(styles, { bar: true })} gap keepSize noWrap>
             <Container fill>
-              <StatusMessage exception={getFirstException(exception)} type={state.statusType} message={state.statusMessage} />
+              <StatusMessage exception={getFirstException(exceptions)} type={state.statusType} message={state.statusMessage} />
               <TabList className={s(styles, { tabList: true })} underline big />
             </Container>
             <Container keepSize noWrap center gap compact>
