@@ -35,6 +35,7 @@ public interface DBWConstants {
     String PERMISSION_EDIT_DATA = "edit-data";
 
     String STATE_ATTR_SIGN_IN_STATE = "state.signin";
+    String WORK_DATA_FOLDER_NAME = ".work-data";
 
     enum SignInState {
         GLOBAL,
