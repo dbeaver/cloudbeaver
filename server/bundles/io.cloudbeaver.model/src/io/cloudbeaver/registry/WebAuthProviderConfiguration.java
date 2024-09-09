@@ -113,7 +113,7 @@ public class WebAuthProviderConfiguration {
     public String getDownloadMetadataFileLink() throws  DBException {
         SMAuthProvider<?> instance = providerDescriptor.getInstance();
         return instance instanceof SMAuthProviderFederated
-            ? ((SMAuthProviderFederated) instance).getDownloadMetadataFileLink(getId(), config.getParameters())
+            ? ((SMAuthProviderFederated) instance).getEntityIdLink(getId(), config.getParameters())
             : null;
     }
 

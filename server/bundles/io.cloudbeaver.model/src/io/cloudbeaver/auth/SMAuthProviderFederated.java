@@ -47,7 +47,7 @@ public interface SMAuthProviderFederated extends SMSignOutLinkProvider {
     String getAcsLink(String id, @NotNull Map<String, Object> providerConfig) throws DBException;
 
     @Nullable
-    String getDownloadMetadataFileLink(String id, @NotNull Map<String, Object> providerConfig) throws DBException;
+    String getEntityIdLink(String id, @NotNull Map<String, Object> providerConfig) throws DBException;
 
     @Nullable
     default String getRedirectLink(String id, @NotNull Map<String, Object> providerConfig) throws DBException {
