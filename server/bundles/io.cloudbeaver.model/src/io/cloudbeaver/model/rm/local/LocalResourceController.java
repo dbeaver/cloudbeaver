@@ -444,15 +444,21 @@ public class LocalResourceController implements RMController {
 
         ConnectionCredentialsInfo info = ConnectionCredentialsInfo.deserializeJson(configuration);
 
-        WebDataSourceUtils.updateConnectionCredentials(
-            dataSourceContainer,
-            info.getAuthProperties(),
-            info.getNetworkHandlerCredentials().stream().map(WebNetworkHandlerConfigInput::new).toList(),
-            info.getSaveCredentials(),
-            info.getSharedCredentials(),
-            null
-        );
-        return true;
+        if (dataSourceContainer != null) {
+            log.debug("Updating data source '" + dataSourceId + "' credentials in project '" + projectId + "'");
+            WebDataSourceUtils.updateConnectionCredentials(
+                dataSourceContainer,
+                info.getAuthProperties(),
+                info.getNetworkHandlerCredentials().stream().map(WebNetworkHandlerConfigInput::new).toList(),
+                info.getSaveCredentials(),
+                info.getSharedCredentials(),
+                null
+            );
+            return true;
+        } else {
+            log.warn("Could not find datasource " + dataSourceId + " to update associated credentials");
+            return false;
+        }
     }
 
     @Override

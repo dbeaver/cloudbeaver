@@ -41,7 +41,6 @@ import org.jkiss.dbeaver.model.net.ssh.SSHConstants;
 import org.jkiss.dbeaver.model.rm.RMProjectType;
 import org.jkiss.dbeaver.model.secret.DBSSecretController;
 import org.jkiss.dbeaver.registry.BaseApplicationImpl;
-import org.jkiss.dbeaver.registry.DataSourceDescriptor;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.utils.CommonUtils;
 
@@ -235,12 +234,14 @@ public class WebDataSourceUtils {
         }
     }
 
-    public static void updateConnectionCredentials(@NotNull DBPDataSourceContainer dataSourceContainer,
-                                                   @NotNull Map<String, Object> authProperties,
-                                                   @Nullable List<WebNetworkHandlerConfigInput> networkCredentials,
-                                                   @Nullable Boolean saveCredentials,
-                                                   @Nullable Boolean sharedCredentials,
-                                                   @Nullable WebConnectionInfo connectionInfo) throws DBWebException {
+    public static void updateConnectionCredentials(
+        @NotNull DBPDataSourceContainer dataSourceContainer,
+        @NotNull Map<String, Object> authProperties,
+        @Nullable List<WebNetworkHandlerConfigInput> networkCredentials,
+        @Nullable Boolean saveCredentials,
+        @Nullable Boolean sharedCredentials,
+        @Nullable WebConnectionInfo connectionInfo
+    ) throws DBWebException {
         boolean saveConfig = false;
 
         if (networkCredentials != null) {
