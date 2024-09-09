@@ -35,6 +35,10 @@ export class FormState<TState> implements IFormState<TState> {
     return Array.from(this.parts.values()).some(part => part.isSaving || part?.isLoading?.());
   }
 
+  get isSaving(): boolean {
+    return Array.from(this.parts.values()).some(part => part.isSaving);
+  }
+
   readonly id: string;
   readonly service: FormBaseService<TState, any>;
   readonly dataContext: IDataContext;
@@ -83,6 +87,7 @@ export class FormState<TState> implements IFormState<TState> {
       parts: observable.ref,
       promise: observable.ref,
       state: observable,
+      isSaving: computed,
       exception: computed,
       isDisabled: computed,
       setMode: action,
