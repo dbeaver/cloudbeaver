@@ -7,7 +7,7 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import { Button, Container, Form, s, StatusMessage, useForm, useS, useTranslate } from '@cloudbeaver/core-blocks';
+import { Button, Container, Form, getComputed, s, StatusMessage, useAutoLoad, useForm, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import { useService } from '@cloudbeaver/core-di';
 import { NotificationService } from '@cloudbeaver/core-events';
 import { FormMode, IFormState, TabList, TabPanelList, TabsState } from '@cloudbeaver/core-ui';
@@ -59,6 +59,8 @@ export const AdministrationUserForm = observer<Props>(function AdministrationUse
     },
   });
 
+  useAutoLoad(AdministrationUserForm, [userFormInfoPart]);
+
   return (
     <Form context={form} disabled={state.isDisabled} contents focusFirstChild>
       <TabsState container={administrationUserFormService.parts} localState={state.parts} formState={state}>
@@ -67,7 +69,7 @@ export const AdministrationUserForm = observer<Props>(function AdministrationUse
             <Container fill>
               <StatusMessage
                 className={s(styles, { statusMessage: true })}
-                exception={getFirstException(state.exception)}
+                exception={getFirstException(getComputed(() => state.exception))}
                 type={state.statusType}
                 message={state.statusMessage}
               />
