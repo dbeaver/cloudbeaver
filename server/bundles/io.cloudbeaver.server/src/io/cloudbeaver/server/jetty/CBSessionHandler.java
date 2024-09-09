@@ -67,7 +67,8 @@ public class CBSessionHandler extends SessionHandler {
         }
 
         public boolean isSecure() {
-            return CBSessionHandler.this.application.getServerURL().startsWith("https");
+            var serverUrl = CBSessionHandler.this.application.getServerURL();
+            return serverUrl != null && serverUrl.startsWith("https://");
         }
 
         public void setComment(String comment) {
