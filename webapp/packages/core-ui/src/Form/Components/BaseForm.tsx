@@ -22,7 +22,6 @@ export const BaseForm = observer<IBaseFormProps<any>>(function BaseForm({ servic
   const translate = useTranslate();
 
   const editing = state.mode === FormMode.Edit;
-  const exceptions = getComputed(() => Array.from(state.parts.values()).map(part => part.exception));
 
   const form = useForm({
     async onSubmit() {
@@ -42,7 +41,7 @@ export const BaseForm = observer<IBaseFormProps<any>>(function BaseForm({ servic
         <Container compact parent noWrap vertical>
           <Container className={s(styles, { bar: true })} gap keepSize noWrap>
             <Container fill>
-              <StatusMessage exception={getFirstException(exceptions)} type={state.statusType} message={state.statusMessage} />
+              <StatusMessage exception={getFirstException(state.exception)} type={state.statusType} message={state.statusMessage} />
               <TabList className={s(styles, { tabList: true })} underline big />
             </Container>
             <Container keepSize noWrap center gap compact>
