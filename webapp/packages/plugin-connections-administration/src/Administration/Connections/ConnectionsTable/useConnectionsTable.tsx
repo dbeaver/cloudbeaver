@@ -15,7 +15,6 @@ import {
   ConnectionInfoActiveProjectKey,
   ConnectionInfoResource,
   createConnectionParam,
-  DBDriverResource,
   IConnectionInfoParams,
 } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
@@ -29,11 +28,8 @@ import { isArraysEqual, isDefined, isObjectsEqual } from '@cloudbeaver/core-util
 export interface IConnectionsTableState {
   readonly connections: Connection[];
   readonly keys: IConnectionInfoParams[];
-  readonly shouldDisplayProjects: boolean;
   table: TableState<IConnectionInfoParams>;
   loading: boolean;
-  getProjectName: (projectId: string) => string | undefined;
-  getConnectionIcon: (connection: Connection) => string | undefined;
   update: () => Promise<void>;
   delete: () => Promise<void>;
 }
@@ -49,7 +45,6 @@ export function useConnectionsTable() {
     { forceSuspense: true },
   );
   const projectInfoResource = useResource(useConnectionsTable, ProjectInfoResource, CachedMapAllKey, { forceSuspense: true });
-  const dbDriverResource = useResource(useConnectionsTable, DBDriverResource, CachedMapAllKey, { forceSuspense: true });
 
   const notificationService = useService(NotificationService);
   const localizationService = useService(LocalizationService);
@@ -95,16 +90,7 @@ export function useConnectionsTable() {
       get keys() {
         return this.connections.map(createConnectionParam);
       },
-      get shouldDisplayProjects() {
-        return this.projectService.activeProjects.filter(project => isGlobalProject(project) || isSharedProject(project)).length > 1;
-      },
       loading: false,
-      getProjectName(projectId: string) {
-        return this.projectInfoResource.resource.get(projectId)?.name;
-      },
-      getConnectionIcon(connection: Connection) {
-        return this.dbDriverResource.resource.get(connection.driverId)?.icon;
-      },
       async update() {
         if (this.loading) {
           return;
@@ -168,10 +154,7 @@ export function useConnectionsTable() {
     {
       connections: computed<Connection[]>({ equals: (a, b) => isArraysEqual(a, b) }),
       keys: computed<IConnectionInfoParams[]>({ equals: (a, b) => isArraysEqual(a, b, isObjectsEqual) }),
-      shouldDisplayProjects: computed,
       loading: observable.ref,
-      getProjectName: action.bound,
-      getConnectionIcon: action.bound,
       update: action.bound,
       delete: action.bound,
     },
@@ -179,7 +162,6 @@ export function useConnectionsTable() {
       table,
       connectionInfoResource,
       projectInfoResource,
-      dbDriverResource,
       notificationService,
       localizationService,
       commonDialogService,

@@ -7,9 +7,21 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import { Loader, Placeholder, s, StaticImage, TableColumnValue, TableItem, TableItemExpand, TableItemSelect, useS } from '@cloudbeaver/core-blocks';
-import { DatabaseConnection, DBDriverResource, IConnectionInfoParams } from '@cloudbeaver/core-connections';
+import {
+  Loader,
+  Placeholder,
+  s,
+  StaticImage,
+  TableColumnValue,
+  TableItem,
+  TableItemExpand,
+  TableItemSelect,
+  useResource,
+  useS,
+} from '@cloudbeaver/core-blocks';
+import { DatabaseConnection, IConnectionInfoParams } from '@cloudbeaver/core-connections';
 import { useService } from '@cloudbeaver/core-di';
+import { ProjectInfoResource } from '@cloudbeaver/core-projects';
 
 import { ConnectionsAdministrationService } from '../ConnectionsAdministrationService';
 import styles from './Connection.module.css';
@@ -18,13 +30,16 @@ import { ConnectionEdit } from './ConnectionEdit';
 interface Props {
   connectionKey: IConnectionInfoParams;
   connection: DatabaseConnection;
-  projectName?: string;
+  shouldDisplayProject: boolean;
   icon?: string;
 }
 
-export const Connection = observer<Props>(function Connection({ connectionKey, connection, projectName, icon }) {
-  const connectionsAdministrationService = useService(ConnectionsAdministrationService);
+export const Connection = observer<Props>(function Connection({ connectionKey, connection, shouldDisplayProject, icon }) {
   const style = useS(styles);
+  const connectionsAdministrationService = useService(ConnectionsAdministrationService);
+  const projectInfoResource = useResource(Connection, ProjectInfoResource, connectionKey.projectId, { active: shouldDisplayProject });
+
+  const projectName = shouldDisplayProject ? (projectInfoResource.data?.name ?? '') : undefined;
 
   return (
     <TableItem item={connectionKey} expandElement={ConnectionEdit}>

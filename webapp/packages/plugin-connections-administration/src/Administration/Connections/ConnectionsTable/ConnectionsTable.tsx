@@ -7,8 +7,11 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import { Table, TableBody, TableColumnHeader, TableHeader, TableSelect, useTranslate } from '@cloudbeaver/core-blocks';
-import { serializeConnectionParam } from '@cloudbeaver/core-connections';
+import { Table, TableBody, TableColumnHeader, TableHeader, TableSelect, useResource, useTranslate } from '@cloudbeaver/core-blocks';
+import { DBDriverResource, serializeConnectionParam } from '@cloudbeaver/core-connections';
+import { useService } from '@cloudbeaver/core-di';
+import { isGlobalProject, isSharedProject, ProjectsService } from '@cloudbeaver/core-projects';
+import { CachedMapAllKey } from '@cloudbeaver/core-resource';
 
 import { Connection } from './Connection';
 import { IConnectionsTableState } from './useConnectionsTable';
@@ -19,6 +22,9 @@ interface Props {
 
 export const ConnectionsTable = observer<Props>(function ConnectionsTable({ state }) {
   const translate = useTranslate();
+  const projectService = useService(ProjectsService);
+  const dbDriverResource = useResource(ConnectionsTable, DBDriverResource, CachedMapAllKey);
+  const shouldDisplayProjects = projectService.activeProjects.filter(project => isGlobalProject(project) || isSharedProject(project)).length > 1;
 
   return (
     <Table keys={state.keys} selectedItems={state.table.selected} expandedItems={state.table.expanded} size="big">
@@ -30,7 +36,7 @@ export const ConnectionsTable = observer<Props>(function ConnectionsTable({ stat
         <TableColumnHeader min />
         <TableColumnHeader>{translate('connections_connection_name')}</TableColumnHeader>
         <TableColumnHeader>{translate('connections_connection_address')}</TableColumnHeader>
-        {state.shouldDisplayProjects && <TableColumnHeader>{translate('connections_connection_project')}</TableColumnHeader>}
+        {shouldDisplayProjects && <TableColumnHeader>{translate('connections_connection_project')}</TableColumnHeader>}
         <TableColumnHeader />
       </TableHeader>
       <TableBody>
@@ -39,8 +45,8 @@ export const ConnectionsTable = observer<Props>(function ConnectionsTable({ stat
             key={serializeConnectionParam(state.keys[i])}
             connectionKey={state.keys[i]}
             connection={connection}
-            projectName={state.shouldDisplayProjects ? (state.getProjectName(connection.projectId) ?? '') : undefined}
-            icon={state.getConnectionIcon(connection)}
+            shouldDisplayProject={shouldDisplayProjects}
+            icon={dbDriverResource.resource.get(connection.driverId)?.icon}
           />
         ))}
       </TableBody>

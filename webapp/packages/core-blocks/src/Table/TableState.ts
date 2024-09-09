@@ -9,15 +9,13 @@ import { action, computed, makeObservable, observable } from 'mobx';
 
 import { Executor, IExecutor } from '@cloudbeaver/core-executor';
 
-type Key = any;
-
-interface IData {
+interface IData<Key> {
   key: Key;
   value: boolean;
 }
 
 export class TableState<K = string> {
-  readonly onExpand: IExecutor<IData>;
+  readonly onExpand: IExecutor<IData<K>>;
 
   selected: Map<K, boolean>;
   expanded: Map<K, boolean>;
