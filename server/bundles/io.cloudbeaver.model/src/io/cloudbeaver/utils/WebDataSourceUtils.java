@@ -259,13 +259,13 @@ public class WebDataSourceUtils {
                 }
             }
         }
-        if (saveCredentials != null && saveCredentials) {
+        if (saveCredentials != null) {
             // Save all passed credentials in the datasource container
             WebDataSourceUtils.saveAuthProperties(
                 dataSourceContainer,
                 dataSourceContainer.getConnectionConfiguration(),
                 authProperties,
-                true,
+                saveCredentials,
                 sharedCredentials == null ? false : sharedCredentials
             );
 
