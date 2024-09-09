@@ -23,13 +23,13 @@ export interface IFormState<TState> {
   readonly parts: MetadataMap<string, any>;
   readonly state: TState;
   readonly isDisabled: boolean;
+  readonly exception: Error | (Error | null)[] | null;
 
   readonly promise: Promise<any> | null;
 
   readonly statusMessage: string | string[] | null;
   readonly statusType: ENotificationType | null;
 
-  readonly configureTask: IExecutor<IFormState<TState>>;
   readonly formStateTask: IExecutor<TState>;
   readonly fillDefaultConfigTask: IExecutor<IFormState<TState>>;
   readonly submitTask: IExecutor<IFormState<TState>>;
@@ -46,8 +46,6 @@ export interface IFormState<TState> {
   isCancelled: boolean;
   isChanged: boolean;
 
-  load(): Promise<void>;
-  reload(): Promise<void>;
   save(): Promise<boolean>;
   reset(): void;
   cancel(): void;

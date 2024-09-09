@@ -11,7 +11,7 @@ import { DataContext, dataContextAddDIProvider, DataContextGetter, type IDataCon
 import type { IServiceProvider } from '@cloudbeaver/core-di';
 import type { ENotificationType } from '@cloudbeaver/core-events';
 import { Executor, ExecutorInterrupter, IExecutionContextProvider, type IExecutor } from '@cloudbeaver/core-executor';
-import { isLoadableStateHasException, MetadataMap, uuid } from '@cloudbeaver/core-utils';
+import { isNotNullDefined, MetadataMap, uuid } from '@cloudbeaver/core-utils';
 import { DATA_CONTEXT_LOADABLE_STATE, loadableStateContext } from '@cloudbeaver/core-view';
 
 import { DATA_CONTEXT_FORM_STATE } from './DATA_CONTEXT_FORM_STATE';
@@ -39,7 +39,6 @@ export class FormState<TState> implements IFormState<TState> {
   readonly service: FormBaseService<TState, any>;
   readonly dataContext: IDataContext;
 
-  readonly configureTask: IExecutor<IFormState<TState>>;
   readonly formStateTask: IExecutor<TState>;
   readonly fillDefaultConfigTask: IExecutor<IFormState<TState>>;
   readonly submitTask: IExecutor<IFormState<TState>>;
@@ -59,9 +58,6 @@ export class FormState<TState> implements IFormState<TState> {
     this.statusType = null;
 
     this.promise = null;
-
-    this.configureTask = new Executor(this as IFormState<TState>, () => true);
-    this.configureTask.addCollection(service.onConfigure);
 
     this.formStateTask = new Executor<TState>(state, () => true);
     this.formStateTask.addCollection(service.onState).addPostHandler(this.updateFormState.bind(this));
@@ -87,6 +83,7 @@ export class FormState<TState> implements IFormState<TState> {
       parts: observable.ref,
       promise: observable.ref,
       state: observable,
+      exception: computed,
       isDisabled: computed,
       setMode: action,
       setPartsState: action,
@@ -95,6 +92,13 @@ export class FormState<TState> implements IFormState<TState> {
       isError: computed,
       isCancelled: computed,
     });
+  }
+
+  get exception(): Error | (Error | null)[] | null {
+    return Array.from(this.parts.values())
+      .map(part => part?.exception)
+      .flat()
+      .filter(isNotNullDefined);
   }
 
   get isError(): boolean {
@@ -119,46 +123,6 @@ export class FormState<TState> implements IFormState<TState> {
       this.dataContext.set(getter, part, this.id);
       return part;
     }) as T;
-  }
-
-  async load(refresh?: boolean): Promise<void> {
-    if (this.promise !== null) {
-      return this.promise;
-    }
-
-    if (!refresh) {
-      return;
-    }
-
-    this.promise = (async () => {
-      try {
-        await this.configureTask.execute(this);
-
-        const loaders = this.dataContext.get(DATA_CONTEXT_LOADABLE_STATE)!.loaders;
-
-        for (const loader of loaders) {
-          if (isLoadableStateHasException(loader)) {
-            continue;
-          }
-
-          if (!loader.isLoaded() || loader.isOutdated?.() === true) {
-            try {
-              await loader.load();
-            } catch {
-              return;
-            }
-          }
-        }
-
-        await this.fillDefaultConfigTask.execute(this);
-      } finally {
-        this.promise = null;
-      }
-    })();
-  }
-
-  async reload(): Promise<void> {
-    await this.load(true);
   }
 
   cancel(): void {
