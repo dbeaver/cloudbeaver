@@ -201,11 +201,9 @@ public class WebDataSourceUtils {
             }
             authProperties.replace(AuthModelDatabaseNativeCredentials.PROP_USER_PASSWORD, null);
             dataSourceContainer.resetPassword();
-            log.debug("saveAuthProperties: dataSourceContainer.resetPassword()");
         } else {
             if (authProperties == null) {
                 // No changes
-                log.debug("saveAuthProperties: authProperties == null");
                 return;
             }
         }
@@ -296,7 +294,6 @@ public class WebDataSourceUtils {
             saveConfig = false;
         }
         if (saveConfig) {
-            log.debug("updateConnectionCredentials: dataSourceContainer.persistConfiguration(saveCredentials: " + dataSourceContainer.isSavePassword() + ")");
             dataSourceContainer.persistConfiguration();
         }
     }
