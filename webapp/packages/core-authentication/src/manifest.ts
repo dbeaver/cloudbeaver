@@ -26,6 +26,7 @@ export const coreAuthenticationManifest: PluginManifest = {
     () => import('./TeamMetaParametersResource').then(m => m.TeamMetaParametersResource),
     () => import('./TeamsManagerService').then(m => m.TeamsManagerService),
     () => import('./TeamsResource').then(m => m.TeamsResource),
+    () => import('./TeamInfoMetaParametersResource').then(m => m.TeamInfoMetaParametersResource),
     () => import('./TeamRolesResource').then(m => m.TeamRolesResource),
     () => import('./UserConfigurationBootstrap').then(m => m.UserConfigurationBootstrap),
     () => import('./UserDataService').then(m => m.UserDataService),

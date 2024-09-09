@@ -74,7 +74,7 @@ export class TeamOptionsTabService extends Bootstrap {
 
       for (const key of Object.keys(config.metaParameters)) {
         if (typeof config.metaParameters[key] === 'string') {
-          config.metaParameters[key] = config.metaParameters[key].trim();
+          config.metaParameters[key] = (config.metaParameters[key] as any).trim();
         }
       }
     }
@@ -102,17 +102,17 @@ export class TeamOptionsTabService extends Bootstrap {
 
   private async save({ state }: ITeamFormSubmitData, contexts: IExecutionContextProvider<ITeamFormSubmitData>) {
     const status = contexts.getContext(this.teamFormService.configurationStatusContext);
-    const config = contexts.getContext(teamContext);
+    const { metaParameters, ...config } = contexts.getContext(teamContext);
 
     const create = state.mode === 'create';
 
     try {
       if (create) {
-        const team = await this.teamResource.createTeam(config);
+        const team = await this.teamResource.createTeam(config, metaParameters);
         status.info('administration_teams_team_info_created');
         status.info(team.teamId);
       } else {
-        const team = await this.teamResource.updateTeam(config);
+        const team = await this.teamResource.updateTeam(config, metaParameters);
 
         status.info('administration_teams_team_info_updated');
         status.info(team.teamId);

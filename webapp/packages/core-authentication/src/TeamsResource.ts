@@ -24,6 +24,8 @@ import {
 } from '@cloudbeaver/core-sdk';
 import { isArraysEqual, UndefinedToNull } from '@cloudbeaver/core-utils';
 
+import { TeamMetaParameter } from './TeamMetaParametersResource';
+
 const NEW_TEAM_SYMBOL = Symbol('new-team');
 
 export type TeamInfo = AdminTeamInfoFragment;
@@ -38,12 +40,14 @@ export class TeamsResource extends CachedMapResource<string, TeamInfo, TeamResou
     super();
   }
 
-  async createTeam({ teamId, teamPermissions, teamName, description, metaParameters }: TeamInfo): Promise<TeamInfo> {
+  async createTeam(
+    { teamId, teamPermissions, teamName, description }: TeamInfo,
+    metaParameters: Record<string, TeamMetaParameter>,
+  ): Promise<TeamInfo> {
     const response = await this.graphQLService.sdk.createTeam({
       teamId,
       teamName,
       description,
-      ...this.getDefaultIncludes(),
       ...this.getIncludesMap(teamId),
     });
 
@@ -61,12 +65,14 @@ export class TeamsResource extends CachedMapResource<string, TeamInfo, TeamResou
     return this.get(teamId)!;
   }
 
-  async updateTeam({ teamId, teamPermissions, teamName, description, metaParameters }: TeamInfo): Promise<TeamInfo> {
+  async updateTeam(
+    { teamId, teamPermissions, teamName, description }: TeamInfo,
+    metaParameters: Record<string, TeamMetaParameter>,
+  ): Promise<TeamInfo> {
     const { team } = await this.graphQLService.sdk.updateTeam({
       teamId,
       teamName,
       description,
-      ...this.getDefaultIncludes(),
       ...this.getIncludesMap(teamId),
     });
 
@@ -136,7 +142,6 @@ export class TeamsResource extends CachedMapResource<string, TeamInfo, TeamResou
 
       const { teams } = await this.graphQLService.sdk.getTeamsList({
         teamId,
-        ...this.getDefaultIncludes(),
         ...this.getIncludesMap(teamId, includes),
       });
 
@@ -162,12 +167,6 @@ export class TeamsResource extends CachedMapResource<string, TeamInfo, TeamResou
   protected dataSet(key: string, value: AdminTeamInfoFragment): void {
     const oldTeam = this.dataGet(key);
     super.dataSet(key, { ...oldTeam, ...value });
-  }
-
-  private getDefaultIncludes(): TeamResourceIncludes {
-    return {
-      includeMetaParameters: false,
-    };
   }
 
   protected validateKey(key: string): boolean {

@@ -25,6 +25,7 @@ export * from './UserInfoResource';
 export * from './UserMetaParametersResource';
 export * from './UsersResource';
 export * from './TeamMetaParametersResource';
+export * from './TeamInfoMetaParametersResource';
 export * from './AUTH_SETTINGS_GROUP';
 export * from './PasswordPolicyService';
 export * from './TeamRolesResource';
