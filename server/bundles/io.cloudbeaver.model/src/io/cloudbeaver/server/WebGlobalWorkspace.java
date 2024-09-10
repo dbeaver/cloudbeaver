@@ -16,23 +16,96 @@
  */
 package io.cloudbeaver.server;
 
-import org.eclipse.core.resources.IWorkspace;
+import io.cloudbeaver.WebProjectImpl;
+import io.cloudbeaver.utils.WebAppUtils;
+import org.eclipse.core.runtime.Platform;
+import org.jkiss.code.NotNull;
+import org.jkiss.code.Nullable;
+import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.app.DBPPlatform;
-import org.jkiss.dbeaver.registry.EclipseWorkspaceImpl;
+import org.jkiss.dbeaver.model.app.DBPProject;
+import org.jkiss.dbeaver.model.impl.app.BaseProjectImpl;
+import org.jkiss.dbeaver.model.impl.app.BaseWorkspaceImpl;
+
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Web global workspace.
- * <p>
- * Basically just a wrapper around Eclipse workspace.
  */
-public class WebGlobalWorkspace extends EclipseWorkspaceImpl {
+public class WebGlobalWorkspace extends BaseWorkspaceImpl {
 
-    public WebGlobalWorkspace(DBPPlatform platform, IWorkspace eclipseWorkspace) {
-        super(platform, eclipseWorkspace);
+    private static final Log log = Log.getLog(WebGlobalWorkspace.class);
+
+    protected final Map<String, WebProjectImpl> projects = new LinkedHashMap<>();
+    private WebGlobalProject globalProject;
+
+    public WebGlobalWorkspace(DBPPlatform platform) {
+        super(platform, Path.of(getWorkspaceURI()));
+    }
+
+    @NotNull
+    private static URI getWorkspaceURI() {
+        String workspacePath = Platform.getInstanceLocation().getURL().toString();
+        try {
+            return new URI(workspacePath);
+        } catch (URISyntaxException e) {
+            throw new IllegalStateException("Workspace path is invalid: " + workspacePath, e);
+        }
     }
 
     @Override
-    protected String initWorkspaceId() {
+    public void initializeProjects() {
+        initializeWorkspaceSession();
+
+        // Load global project
+        Path globalProjectPath = getAbsolutePath().resolve(WebAppUtils.getGlobalProjectId());
+        if (!Files.exists(globalProjectPath)) {
+            try {
+                Files.createDirectories(globalProjectPath);
+            } catch (IOException e) {
+                log.error("Error creating global project path: " + globalProject, e);
+            }
+        }
+
+        globalProject = new WebGlobalProject(
+            this,
+            getAuthContext(),
+            WebAppUtils.getGlobalProjectId());
+        activeProject = globalProject;
+    }
+
+    @NotNull
+    @Override
+    public String getWorkspaceId() {
         return readWorkspaceIdProperty();
+    }
+
+    @Nullable
+    @Override
+    public DBPProject getActiveProject() {
+        return super.getActiveProject();
+    }
+
+    @NotNull
+    @Override
+    public List<BaseProjectImpl> getProjects() {
+        return Collections.singletonList(globalProject);
+    }
+
+    @Nullable
+    @Override
+    public BaseProjectImpl getProject(@NotNull String projectName) {
+        if (globalProject.getId().equals(projectName)) {
+            return globalProject;
+        }
+        return null;
     }
 }
