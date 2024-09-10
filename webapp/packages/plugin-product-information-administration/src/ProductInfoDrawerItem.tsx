@@ -21,7 +21,7 @@ export const ProductInfoDrawerItem: React.FC<AdministrationItemDrawerProps> = fu
   const newVersionAvailable = versionUpdateService.newVersionAvailable;
   const translate = useTranslate();
 
-  useResource(ProductInfoDrawerItem, VersionResource, CachedMapAllKey);
+  useResource(ProductInfoDrawerItem, VersionResource, CachedMapAllKey, { silent: true });
 
   return (
     <Tab
