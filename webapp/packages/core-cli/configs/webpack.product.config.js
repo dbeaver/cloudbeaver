@@ -38,8 +38,13 @@ module.exports = (env, argv) => {
 
       minimizer: [
         new EsbuildPlugin({
-            target: 'es2022',
+            include: /.*?\/(core|plugin|main|sso|packages)-.*/,
+            target: 'es2023',
             keepNames: true,
+        }),
+        new EsbuildPlugin({
+            exclude: /.*?\/(core|plugin|main|sso|packages)-.*/,
+            target: 'es2023',
             css: true,
         }),
     ],
