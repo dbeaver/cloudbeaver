@@ -7,7 +7,7 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import { Button, Container, Form, getComputed, s, StatusMessage, useForm, useS, useTranslate } from '@cloudbeaver/core-blocks';
+import { Button, Container, Form, s, StatusMessage, useForm, useS, useTranslate } from '@cloudbeaver/core-blocks';
 import { getFirstException } from '@cloudbeaver/core-utils';
 
 import { TabList } from '../../Tabs/TabList';
@@ -22,6 +22,7 @@ export const BaseForm = observer<IBaseFormProps<any>>(function BaseForm({ servic
   const translate = useTranslate();
 
   const editing = state.mode === FormMode.Edit;
+  const changed = state.isChanged;
 
   const form = useForm({
     async onSubmit() {
@@ -50,7 +51,7 @@ export const BaseForm = observer<IBaseFormProps<any>>(function BaseForm({ servic
                   {translate('ui_processing_cancel')}
                 </Button>
               )}
-              <Button type="button" disabled={!state.isChanged || state.isDisabled} mod={['unelevated']} onClick={() => form.submit()}>
+              <Button type="button" disabled={state.isDisabled || !changed} mod={['unelevated']} onClick={() => form.submit()}>
                 {translate(!editing ? 'ui_processing_create' : 'ui_processing_save')}
               </Button>
             </Container>
