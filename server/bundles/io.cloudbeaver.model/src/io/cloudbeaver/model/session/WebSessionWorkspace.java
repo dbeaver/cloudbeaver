@@ -123,6 +123,11 @@ public class WebSessionWorkspace implements DBPWorkspace {
     }
 
     @Override
+    public void initializeProjects() {
+        // noop
+    }
+
+    @Override
     public void dispose() {
         clearProjects();
     }
