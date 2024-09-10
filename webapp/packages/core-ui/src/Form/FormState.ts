@@ -11,7 +11,7 @@ import { DataContext, dataContextAddDIProvider, DataContextGetter, type IDataCon
 import type { IServiceProvider } from '@cloudbeaver/core-di';
 import type { ENotificationType } from '@cloudbeaver/core-events';
 import { Executor, ExecutorInterrupter, IExecutionContextProvider, type IExecutor } from '@cloudbeaver/core-executor';
-import { isNotNullDefined, MetadataMap, uuid } from '@cloudbeaver/core-utils';
+import { isArraysEqual, isNotNullDefined, MetadataMap, uuid } from '@cloudbeaver/core-utils';
 import { DATA_CONTEXT_LOADABLE_STATE, loadableStateContext } from '@cloudbeaver/core-view';
 
 import { DATA_CONTEXT_FORM_STATE } from './DATA_CONTEXT_FORM_STATE';
@@ -20,6 +20,8 @@ import { FormMode } from './FormMode';
 import { formStateContext } from './formStateContext';
 import type { IFormPart } from './IFormPart';
 import type { IFormState } from './IFormState';
+
+type PartsValues = IFormPart<any>[];
 
 export class FormState<TState> implements IFormState<TState> {
   mode: FormMode;
@@ -32,11 +34,11 @@ export class FormState<TState> implements IFormState<TState> {
   promise: Promise<any> | null;
 
   get isDisabled(): boolean {
-    return Array.from(this.parts.values()).some(part => part.isSaving || part?.isLoading?.());
+    return this.partsValues.some(part => part.isSaving || part?.isLoading?.());
   }
 
   get isSaving(): boolean {
-    return Array.from(this.parts.values()).some(part => part.isSaving);
+    return this.partsValues.some(part => part.isSaving);
   }
 
   readonly id: string;
@@ -94,28 +96,35 @@ export class FormState<TState> implements IFormState<TState> {
       setPartsState: action,
       setState: action,
       isChanged: computed,
+      partsValues: computed<PartsValues>({
+        equals: isArraysEqual,
+      }),
       isError: computed,
       isCancelled: computed,
     });
   }
 
+  get partsValues() {
+    return Array.from(this.parts.values());
+  }
+
   get exception(): Error | (Error | null)[] | null {
-    return Array.from(this.parts.values())
+    return this.partsValues
       .map(part => part?.exception)
       .flat()
       .filter(isNotNullDefined);
   }
 
   get isError(): boolean {
-    return Array.from(this.parts.values()).some(part => part.isError());
+    return this.partsValues.some(part => part.isError());
   }
 
   get isCancelled(): boolean {
-    return Array.from(this.parts.values()).some(part => part?.isCancelled?.());
+    return this.partsValues.some(part => part?.isCancelled?.());
   }
 
   get isChanged(): boolean {
-    return Array.from(this.parts.values()).some(part => part.isChanged);
+    return this.partsValues.some(part => part.isChanged);
   }
 
   getPart<T extends IFormPart<any>>(getter: DataContextGetter<T>, init: (context: IDataContext, id: string) => T): T {

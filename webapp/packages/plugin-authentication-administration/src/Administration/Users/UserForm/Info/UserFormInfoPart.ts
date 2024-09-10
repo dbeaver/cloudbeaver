@@ -61,7 +61,7 @@ export class UserFormInfoPart extends FormPart<IUserFormInfoState, IUserFormStat
       return this.usersResource.isOutdated(this.initialState.userId, this.baseIncludes);
     }
 
-    return false;
+    return this.serverConfigResource.isOutdated() || this.authRolesResource.isOutdated();
   }
 
   isLoaded(): boolean {
@@ -211,7 +211,7 @@ export class UserFormInfoPart extends FormPart<IUserFormInfoState, IUserFormStat
 
   protected override async loader() {
     let user: AdminUser | null = null;
-    const [serverConfig, roles] = await Promise.all([this.serverConfigResource.load(), this.authRolesResource.load()]);
+    const [serverConfig] = await Promise.all([this.serverConfigResource.load(), this.authRolesResource.load()]);
 
     if (this.formState.mode === FormMode.Edit && this.initialState.userId) {
       user = await this.usersResource.load(this.initialState.userId, this.baseIncludes);
