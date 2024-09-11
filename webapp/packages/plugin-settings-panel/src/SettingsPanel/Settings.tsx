@@ -81,7 +81,8 @@ export const Settings = observer<ISettingsProps>(function Settings({ source, acc
       <Container style={{ height: '100%' }} overflow vertical gap noWrap>
         <Container gap keepSize>
           <Filter
-            value={treeFilter.filter}
+            state={treeFilter}
+            name="filter"
             placeholder={translate('plugin_settings_panel_search')}
             onChange={filter => treeFilter.setFilter(filter)}
           />

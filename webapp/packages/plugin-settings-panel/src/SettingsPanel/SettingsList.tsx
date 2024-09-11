@@ -16,7 +16,6 @@ import {
 } from '@cloudbeaver/core-settings';
 import type { ITreeData, ITreeFilter } from '@cloudbeaver/plugin-navigation-tree';
 
-import { settingsFilter } from './settingsFilter';
 import { SettingsGroup } from './SettingsGroup';
 import { useTreeScrollSync } from './useTreeScrollSync';
 
@@ -39,15 +38,14 @@ export const SettingsList = observer<Props>(function SettingsList({ treeData, tr
     groups.splice(0, 1, ...treeData.getChildren(groupId));
 
     const group = ROOT_SETTINGS_GROUP.get(groupId)!;
-    const groupSettings = settings.get(group)?.filter(settingsFilter(translate, treeFilter.filter));
 
-    list.push({ group, settings: groupSettings || [] });
+    list.push(group);
   }
 
   return (
     <Container ref={ref} gap overflow>
-      {list.map(({ group, settings }) => (
-        <SettingsGroup key={group.id} group={group} source={source} settings={settings} />
+      {list.map(group => (
+        <SettingsGroup key={group.id} group={group} source={source} settings={settings} treeFilter={treeFilter} />
       ))}
       {list.length === 0 && <TextPlaceholder>{translate('plugin_settings_panel_no_settings')}</TextPlaceholder>}
       <div style={{ height: '25%' }} />
