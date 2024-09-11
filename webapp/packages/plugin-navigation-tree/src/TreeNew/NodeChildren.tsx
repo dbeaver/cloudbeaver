@@ -13,10 +13,12 @@ import { getComputed, TreeNodeNested } from '@cloudbeaver/core-blocks';
 import { NodeSizeCacheContext } from './contexts/NodeSizeCacheContext';
 import { TreeDataContext } from './contexts/TreeDataContext';
 import { TreeVirtualizationContext } from './contexts/TreeVirtualizationContext';
+import { NodeEmptyPlaceholderComponent } from './NodeEmptyPlaceholderComponent';
 import { NodeRenderer } from './NodeRenderer';
 
 interface Props {
   nodeId: string;
+  emptyPlaceholder?: NodeEmptyPlaceholderComponent;
   offsetHeight: number;
   root?: boolean;
 }
@@ -31,7 +33,7 @@ function getPositionWithOverscan(position: number, forward: boolean) {
   return position - (position % OVERSCAN);
 }
 
-const NodeChildrenObserved = observer<Props>(function NodeChildren({ nodeId, offsetHeight, root }) {
+const NodeChildrenObserved = observer<Props>(function NodeChildren({ nodeId, emptyPlaceholder, offsetHeight, root }) {
   const data = useContext(TreeDataContext)!;
   const optimization = useContext(TreeVirtualizationContext)!;
   const sizeCache = useContext(NodeSizeCacheContext)!;
@@ -68,6 +70,11 @@ const NodeChildrenObserved = observer<Props>(function NodeChildren({ nodeId, off
 
     if (postFillHeight > 0) {
       elements.push(<div key={lastId} style={{ height: postFillHeight }} />);
+    }
+
+    if (elements.length === 0 && emptyPlaceholder) {
+      const EmptyPlaceholder = emptyPlaceholder;
+      elements.push(<EmptyPlaceholder key="empty" root={root} />);
     }
 
     return elements;

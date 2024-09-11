@@ -7,7 +7,7 @@
  */
 import { observer } from 'mobx-react-lite';
 
-import { Container, useTranslate } from '@cloudbeaver/core-blocks';
+import { Container, TextPlaceholder, useTranslate } from '@cloudbeaver/core-blocks';
 import {
   type ISettingDescription,
   type ISettingsSource,
@@ -49,6 +49,7 @@ export const SettingsList = observer<Props>(function SettingsList({ treeData, tr
       {list.map(({ group, settings }) => (
         <SettingsGroup key={group.id} group={group} source={source} settings={settings} />
       ))}
+      {list.length === 0 && <TextPlaceholder>{translate('plugin_settings_panel_no_settings')}</TextPlaceholder>}
       <div style={{ height: '25%' }} />
     </Container>
   );

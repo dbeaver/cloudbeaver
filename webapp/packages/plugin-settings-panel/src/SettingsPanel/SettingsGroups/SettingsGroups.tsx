@@ -10,6 +10,7 @@ import { observer } from 'mobx-react-lite';
 import { ITreeData, Tree } from '@cloudbeaver/plugin-navigation-tree';
 
 import { groupNodeRenderer } from './groupNodeRenderer';
+import { SettingsGroupsEmpty } from './SettingsGroupsEmpty';
 
 interface Props {
   treeData: ITreeData;
@@ -21,5 +22,13 @@ export const SettingsGroups = observer<Props>(function SettingsGroups({ treeData
     return 24;
   }
 
-  return <Tree data={treeData} getNodeHeight={getNodeHeight} nodeRenderers={[groupNodeRenderer]} onNodeClick={onClick} />;
+  return (
+    <Tree
+      data={treeData}
+      getNodeHeight={getNodeHeight}
+      nodeRenderers={[groupNodeRenderer]}
+      emptyPlaceholder={SettingsGroupsEmpty}
+      onNodeClick={onClick}
+    />
+  );
 });

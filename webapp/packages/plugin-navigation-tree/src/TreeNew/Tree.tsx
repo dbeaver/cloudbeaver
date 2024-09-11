@@ -17,6 +17,7 @@ import { TreeVirtualizationContext } from './contexts/TreeVirtualizationContext'
 import type { INodeRenderer } from './INodeRenderer';
 import type { ITreeData } from './ITreeData';
 import { NodeChildren } from './NodeChildren';
+import { NodeEmptyPlaceholderComponent } from './NodeEmptyPlaceholderComponent';
 import { useNodeSizeCache } from './useNodeSizeCache';
 import { useTree } from './useTree';
 import { useTreeDnD } from './useTreeDnD';
@@ -25,6 +26,7 @@ import { useTreeVirtualization } from './useTreeVirtualization';
 export interface NavigationTreeNewProps {
   data: ITreeData;
   nodeRenderers?: INodeRenderer[];
+  emptyPlaceholder?: NodeEmptyPlaceholderComponent;
   onNodeClick?(id: string): void | Promise<void>;
   onNodeDoubleClick?(id: string): void | Promise<void>;
   getNodeDnDContext?(id: string, context: IDataContext): void;
@@ -34,6 +36,7 @@ export interface NavigationTreeNewProps {
 export const Tree = observer<NavigationTreeNewProps>(function Tree({
   data,
   nodeRenderers,
+  emptyPlaceholder,
   onNodeClick,
   onNodeDoubleClick,
   getNodeDnDContext,
@@ -59,7 +62,7 @@ export const Tree = observer<NavigationTreeNewProps>(function Tree({
           <TreeVirtualizationContext.Provider value={mountOptimization}>
             <TreeContext.Provider value={tree}>
               <TreeDnDContext.Provider value={treeDnD}>
-                <NodeChildren nodeId={data.rootId} offsetHeight={0} root />
+                <NodeChildren nodeId={data.rootId} offsetHeight={0} emptyPlaceholder={emptyPlaceholder} root />
               </TreeDnDContext.Provider>
             </TreeContext.Provider>
           </TreeVirtualizationContext.Provider>

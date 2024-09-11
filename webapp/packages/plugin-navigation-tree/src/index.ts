@@ -53,6 +53,7 @@ export * from './TreeNew/useTreeData';
 export * from './TreeNew/ITreeData';
 export * from './TreeNew/useTreeFilter';
 export * from './TreeNew/INode';
+export * from './TreeNew/NodeEmptyPlaceholderComponent';
 
 export * from './NavigationTree/getNavigationTreeUserSettingsId';
 export * from './NodesManager/NavNodeView/IFolderTransform';
